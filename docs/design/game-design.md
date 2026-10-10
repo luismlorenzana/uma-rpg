@@ -178,7 +178,7 @@ fills the grades between in even steps:
 **[Owner]** Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself. They fill the Hub's
 Learning District (§9), with **several class hubs and several weapon hubs** (D21).
 
-**[Proposed]** One hall per class and one armory per distance:
+**[Proposed]** One hall per class and one armory per distance, with RPG names (D36):
 
 | Facility | Each slot trains | Unlocks |
 |---|---|---|
@@ -187,10 +187,10 @@ Learning District (§9), with **several class hubs and several weapon hubs** (D2
 | **Spell Blade Salle** | Spell Blade proficiency | Deeper Spell Blade skills |
 | **Cleric Chapel** | Cleric proficiency | Deeper Cleric skills |
 | **Summoner Circle** | Summoner proficiency | Deeper Summoner skills |
-| **Sprint Armory** | Short Sword, Bow or Garb mastery | Higher grades of that gear |
-| **Mile Armory** | Spear, Axe or Leather mastery | Higher grades of that gear |
-| **Medium Armory** | Mage Staff, Arcane Staff or Mail mastery | Higher grades of that gear |
-| **Long Armory** | Greatsword, Cleric Staff, Summoner Tome or Plate mastery | Higher grades of that gear |
+| **Ranger's Lodge** | Short Sword, Bow or Garb mastery | Higher grades of that gear |
+| **Lancer's Barracks** | Spear, Axe or Leather mastery | Higher grades of that gear |
+| **Arcane Armory** | Mage Staff, Arcane Staff or Mail mastery | Higher grades of that gear |
+| **Knight's Bastion** | Greatsword, Cleric Staff, Summoner Tome or Plate mastery | Higher grades of that gear |
 
 - **[Proposed]** Each armory holds one distance's gear (§7.2), so the Uma's aptitude for that distance sets her speed
   anywhere in the building, and each class hall pairs with one running style (§4.1).

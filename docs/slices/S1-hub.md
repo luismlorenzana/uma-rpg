@@ -51,7 +51,7 @@ already exists: all 268 Umas from master data, and Tier 1's chapters.
 |---|---|
 | Farmlands (10) | Fields, Orchard, Fishery, Herb Garden, Vegetable Garden, Mushroom Cave, Sugar Grove, Nut Grove, Pantry, Kitchen |
 | Wilds (10) | Monster Den, Ley Spring, Mine, Crystal Cavern, Quarry, Meadow, Forest, Fossil Dig, Workbench, Forge |
-| Learning District (9) | Brawler Dojo, Mage Tower, Spell Blade Salle, Cleric Chapel, Summoner Circle, Sprint Armory, Mile Armory, Medium Armory, Long Armory |
+| Learning District (9) | Brawler Dojo, Mage Tower, Spell Blade Salle, Cleric Chapel, Summoner Circle, Ranger's Lodge, Lancer's Barracks, Arcane Armory, Knight's Bastion |
 | Town (7) | Stable, Party Hall, Scenario Gate, Warehouse, Exchange, Observatory, Tier Finale |
 
 Farmlands and Wilds use the same layout, site for site (each farming site sits where its mirrored gathering site is).
