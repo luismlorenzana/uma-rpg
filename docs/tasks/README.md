@@ -1,28 +1,21 @@
-# Tasks — S1 Hub and foundation
+# Tasks — S2 Collection and parties
 
-Implementable tasks for the active slice ([S1 spec](../slices/S1-hub.md), [build plan](../plan.md)). Each file says
-what to build, which files to touch, the contracts, and how to prove it works. **A task file is deleted in the commit
-that finishes it** (D35). The design docs and code carry the result.
+Implementable tasks for the active slice ([S2 spec](../slices/S2-collection.md), [build plan](../plan.md)). **A task
+file is deleted in the commit that finishes it** (D35). S1's last task, the owner's phone check (T009), passed on
+2026-10-10: signed in on the iPhone and browsing the roster.
 
-T001–T008 are done (their rules now live in [architecture.md](../technical/architecture.md),
-[infrastructure.md](../technical/infrastructure.md) and the code). Production is live at https://uma-rpg.web.app.
-
-| Task | What | Status |
+| Task | What | Depends on |
 |---|---|---|
-| [T009](T009-release.md) | Phone proof: the S1 exit check | Claude's checks done ([s1-acceptance](../research/s1-acceptance.md)); the owner's device check is next |
+| [T010](T010-place-pages.md) | Place pages: quick look at `?peek=`, full pages at `/:page/:placeId/*` | — |
+| [T011](T011-save-v2.md) | Save v2: roster and parties, migration, unlock and party rules, server downgrade guard | — |
+| [T012](T012-stable-page.md) | Stable page: ownership, search, filters, sorts, views, unlock flow, owned profile | T010, T011 |
+| [T013](T013-party-hall.md) | Party Hall page: 20 parties, edit, picker, moves, busy look | T010, T011 |
+| [T014](T014-s2-release.md) | Hub summaries, Account count, deploy and phone check | all |
 
 ## Conventions every task follows
 
-- **Stack:** uma-platform architecture §4 (React 19, Vite, Tailwind 4, Motion `LazyMotion strict`, Zustand + Dexie,
-  React Router 7, NestJS 11, Firebase Hosting + Auth, Cloud Run, Firestore, Phaser 4). Package scope `@rpg/*`.
-- **Reuse uma-racer before inventing.** Copy from `../uma-racer` on `origin/main` (the local checkout may sit on an old
-  branch: read with `git -C ../uma-racer show origin/main:<path>`). Strip anything RPG-token, puzzle, farm, card or
-  race related.
-- **Local dev** runs on web :5174 and API :8081, so it can run beside uma-racer (:5173/:8080).
-- **Original-game content never goes in git.** Master data comes from uma-platform's private release; test fixtures
-  come from `@luismlorenzana/uma-data/testing`.
-- TypeScript strict with `noUncheckedIndexedAccess`; Vitest next to the code; no network in tests.
-- Mobile first at 390×844 portrait (also check 375×667): 44 pt targets, safe-area padding, `h-dvh`.
-- Main JS ≤ 180 KB gzip: Phaser, Firebase and every overlay are lazy chunks.
-- Conventional Commits. Claude commits and pushes to `main`. Run `pnpm lint && pnpm test && pnpm build` before
-  pushing.
+- Mobile first at 390×844 (check 375×667): 44 pt targets, safe areas, `h-dvh`. Main JS ≤ 180 KB gzip; place pages
+  are lazy chunks.
+- Rules live in `@rpg/domain` with Vitest tests; the web app only calls them. No network in tests; fixtures from
+  `@luismlorenzana/uma-data/testing`.
+- Every screen is a place (D31, D43). Conventional Commits; Claude commits and pushes to `main`.

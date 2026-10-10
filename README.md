@@ -18,7 +18,7 @@ cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/do
 | [docs/design/items.md](docs/design/items.md) | Item catalog: 160 raw and 160 refined items (draft) |
 | uma-platform `scripts/pixel-art` | Draws the original pixel art (`pnpm art:draw` there, into `assets/`) |
 | [docs/plan.md](docs/plan.md) | Build plan: slices S1–S8, each playable on the phone |
-| [docs/slices/](docs/slices/S1-hub.md) | The active slice's spec (S1: Hub and foundation) |
+| [docs/slices/](docs/slices/S2-collection.md) | Slice specs (S1 done; S2: collection and parties) |
 | [docs/tasks/](docs/tasks/README.md) | The active slice's implementable tasks |
 | [docs/decisions.md](docs/decisions.md) | This game's decisions (append-only) |
 | [docs/open-questions.md](docs/open-questions.md) | What waits on the owner |
