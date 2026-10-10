@@ -35,6 +35,11 @@ Never run `gcloud config set …`.
    - Firebase console → Authentication → Get started → Sign-in method → **Google** → Enable.
    - GitHub → `uma-data` package (uma-platform) → Package settings → **Manage Actions access** → add `uma-rpg` with
      the **Read** role, so CI's `GITHUB_TOKEN` can install it.
+   - Cloud console → APIs & Services → Credentials → "Web client (auto created by Google Service)"
+     (`727687479415-3dvep7lngmifib6i8msr9lphkq9bu3nc`) → **Authorized redirect URIs** → add
+     `https://uma-rpg.web.app/__/auth/handler` (keep the `firebaseapp.com` one), and `https://uma-rpg.web.app` under
+     JavaScript origins. The app's `authDomain` is the Hosting domain so redirect sign-in stays same-origin inside the
+     iOS Home Screen app; without this entry Google answers `redirect_uri_mismatch` (uma-racer's gcp-setup-guide step 7).
 
 ## Release
 
