@@ -19,7 +19,8 @@
 - **Refining is 1 → 1** (D19): every raw item has exactly one refined form of the same grade. Farming refines at the
   Pantry, and gathering refines at the Workbench.
 - **Totals:** 80 raw ingredients, 80 raw materials, 80 + 80 refined.
-- **Ids** are the kebab-case name (`golden-apple`, `copper-ingot`).
+- **Ids** are the name in kebab case: lowercase, apostrophes dropped, accents folded, spaces as hyphens (`golden-apple`,
+  `tomato-puree`, `cut-philosophers-stone`).
 - **Icons** are 32×32 original pixel art, drawn by uma-platform's `scripts/pixel-art` into its
   `assets/items/<family>/<id>.png` (D26).
   Drawn so far: Fruits and Ores.
