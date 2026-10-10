@@ -4,12 +4,12 @@ Implementable tasks for the active slice ([S1 spec](../slices/S1-hub.md), [build
 what to build, which files to touch, the contracts, and how to prove it works. **A task file is deleted in the commit
 that finishes it** (D35). The design docs and code carry the result.
 
-T001 and T003–T008 are done (their rules now live in [architecture.md](../technical/architecture.md) and the code).
+T001–T008 are done (their rules now live in [architecture.md](../technical/architecture.md),
+[infrastructure.md](../technical/infrastructure.md) and the code). Production is live at https://uma-rpg.web.app.
 
 | Task | What | Status |
 |---|---|---|
-| [T002](T002-infrastructure.md) | GCP/Firebase project, deploy pipeline, master data read access | Infrastructure created; waiting on two owner clicks (Google sign-in, package access) for the first deploy |
-| [T009](T009-release.md) | First deploy and phone proof (the S1 exit check) | Next |
+| [T009](T009-release.md) | Phone proof: the S1 exit check | Claude's checks done ([s1-acceptance](../research/s1-acceptance.md)); the owner's device check is next |
 
 ## Conventions every task follows
 

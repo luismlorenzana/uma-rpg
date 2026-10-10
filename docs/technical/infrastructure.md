@@ -31,7 +31,7 @@ Never run `gcloud config set …`.
 2. `CLOUDSDK_ACTIVE_CONFIG_NAME=default bash infra/github-actions/bootstrap.sh`: services, Firestore, Artifact Registry,
    service accounts and roles, the master bucket grant, WIF, the budget.
 3. Repository variables: `GCP_PROJECT_ID`, `WIF_PROVIDER`, `ALLOWED_EMAIL`, `MASTER_BUCKET`, `DEPLOY_ENABLED`.
-4. **Owner steps** (console only):
+4. **Owner steps** (console only, done 2026-10-10):
    - Firebase console → Authentication → Get started → Sign-in method → **Google** → Enable.
    - GitHub → `uma-data` package (uma-platform) → Package settings → **Manage Actions access** → add `uma-rpg` with
      the **Read** role, so CI's `GITHUB_TOKEN` can install it.
