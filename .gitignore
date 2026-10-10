@@ -20,3 +20,12 @@ build
 
 # claude local-only settings
 .claude/settings.local.json
+
+# build and tooling output
+apps/web/dist
+dev-dist/
+apps/api/dist
+packages/*/dist
+apps/api/.data/
+.firebase/
+firebase-debug.log

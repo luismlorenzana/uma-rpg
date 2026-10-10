@@ -1,0 +1,10 @@
+import { Controller, Get } from '@nestjs/common'
+
+// Served at /api/health. Not /healthz: Cloud Run's front end reserves some paths ending in "z".
+@Controller()
+export class HealthController {
+  @Get('health')
+  health() {
+    return { ok: true, build: process.env.BUILD_ID ?? 'local', uptime: process.uptime() }
+  }
+}

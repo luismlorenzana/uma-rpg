@@ -1,0 +1,9 @@
+# Keep any Cloud Build source upload small and free of original-game content.
+.git
+**/node_modules
+**/dist
+**/.turbo
+*.log
+/content
+apps/api/.data
+apps/api/.env
