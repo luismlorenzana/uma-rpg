@@ -4,6 +4,7 @@ import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normal
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
+import { firebaseEnabled } from '../auth/firebase'
 import { boot, createAccount, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
 
@@ -76,6 +77,11 @@ export function Root() {
 
   useEffect(() => startSyncTriggers(), [])
 
+  // Never run a production build signed out: every API call would fail (the S1 incident, D42).
+  if (import.meta.env.PROD && !firebaseEnabled)
+    return (
+      <div className="flex h-dvh items-center justify-center bg-page p-8 text-center text-ink-soft">This build is missing its sign-in configuration.</div>
+    )
   if (!auth.ready) return <Splash />
   if (auth.authRequired && !auth.user) return <SignIn onSignIn={() => void auth.signIn()} />
   if (status === 'idle' || status === 'booting') return <Splash />

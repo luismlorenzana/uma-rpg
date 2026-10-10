@@ -12,6 +12,8 @@ build
 .env
 .env.*
 !.env.example
+# Public Firebase web config (apiKey/authDomain/projectId are public by design); needed by the production build.
+!apps/web/.env.production
 
 # ORIGINAL-GAME CONTENT — never commit (uma-platform docs/architecture.md §2.2)
 /content

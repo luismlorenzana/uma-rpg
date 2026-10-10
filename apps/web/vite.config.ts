@@ -1,11 +1,20 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const buildId = (process.env.VITE_APP_BUILD_ID ?? process.env.GITHUB_SHA ?? 'local').slice(0, 12)
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // A production build without the Firebase web config would run signed out and every API call would get a 401.
+  // Fail the build instead (apps/web/.env.production must be committed).
+  if (mode === 'production') {
+    const env = loadEnv(mode, process.cwd(), 'VITE_')
+    const missing = ['VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_AUTH_DOMAIN', 'VITE_FIREBASE_PROJECT_ID'].filter((k) => !env[k])
+    if (missing.length > 0) throw new Error(`Production build is missing ${missing.join(', ')} (apps/web/.env.production)`)
+  }
+  return {
   define: {
     __APP_BUILD_ID__: JSON.stringify(buildId),
   },
@@ -75,4 +84,5 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
   },
+}
 })
