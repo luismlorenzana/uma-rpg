@@ -425,6 +425,9 @@ more you choose which single area to push. Laurels buy:
 
 ## 14. Next steps
 
+The build order is in [plan.md](../plan.md). Design work still to do:
+
+
 1. The owner reviews v0.2.
 2. Split into per-system docs: tiers and collection, classes and mastery, equipment, professions and items, Extra
    Stats, Hub.
