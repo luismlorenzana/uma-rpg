@@ -18,3 +18,10 @@ Newest entries at the bottom. To reverse a decision, add a new entry that supers
 | D11 | 2026-10-10 | **Classes are free:** every Uma can use and switch to any class. A class at proficiency rank 1 learns no skills | Owner |
 | D12 | 2026-10-10 | **Training facilities** take 2–3 Umas to raise class proficiency and weapon/armor mastery. Running-style aptitude sets class speed and distance aptitude sets equipment speed: A takes 50% of the time, G 100% | Owner |
 | D13 | 2026-10-10 | **Home is a huge Hub map** of passive facilities | Owner |
+| D14 | 2026-10-10 | An Unlock Ticket unlocks one **outfit** (268 today) | Owner (Q1). Stats and aptitudes differ per outfit |
+| D15 | 2026-10-10 | On promotion, the Uma's profession levels, class proficiency, equipment mastery and Extra Stats **start over** in the new tier; only her stat growth carries, through lifetime level | Owner (Q2) |
+| D16 | 2026-10-10 | Umas stay in their party permanently. A member busy at a facility or site **shows greyed out** in her party | Owner (Q3). Proposed: a party with a greyed-out member can't fight until she's recalled |
+| D17 | 2026-10-10 | **Extra Stats:** an Uma assigns **at most N of her unlocked slots**. Claude sets N and all values in the balance pass | Owner (Q4). Proposed N = 1 + ⌊level / 10⌋ |
+| D18 | 2026-10-10 | **Item depth:** every produce type has its own Hub site and its own effect. No families of near-identical items | Owner (Q5): uma-racer's five milks and five fruits were too shallow |
+| D19 | 2026-10-10 | **Three steps only:** raw → refined (1 → 1) → cooked or crafted. No packaging step | Owner (Q5): uma-racer's packaging tier is folded into cooking |
+| D20 | 2026-10-10 | **Parity:** there are as many material types as ingredient types, and cooking and crafting take equal time, so an Uma's time splits evenly between them | Owner (Q5) |

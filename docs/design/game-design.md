@@ -1,7 +1,7 @@
-# Uma RPG — game design (draft v0.1)
+# Uma RPG — game design (draft v0.2)
 
-> **Status: draft for owner review, 2026-10-10.** This is the first spec for uma-rpg as a standalone game. It will split
-> into one doc per system once each system is approved.
+> **Status: draft for owner review, 2026-10-10.** v0.2 folds in the owner's answers to Q1–Q5 (D14–D20). This is the
+> first spec for uma-rpg as a standalone game. It will split into one doc per system once each system is approved.
 >
 > Every rule is tagged:
 > **[Owner]** is the owner's direction and is decided.
@@ -21,10 +21,9 @@ scenario, and run a big Hub map where Umas farm, gather, cook, craft and train w
 2. **A living Hub.** Home is a huge map of facilities where Umas are assigned to passive work and training. **[Owner]**
 3. **Break battles through every scenario.** The current battle engine, classes and chapter maps carry over from
    uma-racer. **[Proposed]**
-4. **Make your own power.** Meals unlock Extra Stats, and materials become equipment. **[Owner]**
+4. **Make your own power.** Dishes unlock Extra Stats, and materials become equipment. Both matter equally. **[Owner]**
 5. **Symmetry.** Each system mirrors another (farming ↔ gathering, cooking ↔ crafting, class proficiency ↔ equipment
-   mastery), so learning one teaches the other. **[Owner]** (the "very symmetric" item families) **[Proposed]** (as a
-   pillar)
+   mastery), so learning one teaches the other. **[Owner]**
 
 **The loop**
 
@@ -33,10 +32,10 @@ flowchart LR
     Hub[Hub map] --> Assign[Assign Umas: party, farm, gather, train]
     Assign --> Battle[Chapters: break battles]
     Assign --> Passive[Facilities run while away]
-    Battle --> Lv[Uma levels + monster drops]
-    Passive --> Raw[Raw items]
+    Battle --> Lv[Uma levels + bonus drops]
+    Passive --> Raw[Raw ingredients / materials]
     Raw --> Refine[Refine 1 → 1]
-    Refine --> Cook[Cooking → meals]
+    Refine --> Cook[Cooking → dishes]
     Refine --> Craft[Crafting → equipment]
     Cook --> Extra[Extra Stats]
     Craft --> Gear[Equipment]
@@ -78,7 +77,7 @@ from tier N to tier N+1.
 - **Each tier gets different mechanics**, designed tier by tier. Tier 1 is described here. Tier 2 has no Uma unlocks;
   promotion is its only way in.
 
-**What the promoted Uma carries [Proposed, confirm: Open]**
+**What the promoted Uma carries [Owner]** (D15)
 
 | Thing | In the new tier |
 |---|---|
@@ -106,17 +105,14 @@ from tier N to tier N+1.
 ## 3. Collection (Tier 1 only) **[Owner]**
 
 - A new game starts with **no Umas** and **15 Uma Unlock Tickets**.
+- A Ticket unlocks one **outfit** of your choice (D14). There are 268 today.
 - Each Uma earns **1 Uma Shard at Lv 10, 20, 30, 40 and 50**. **5 Shards = 1 Ticket**, so every Uma who reaches Lv50
   pays exactly one Ticket, and partial progress across many Umas adds up too.
-- A Ticket unlocks any locked Uma of your choice.
 - Tier 2 and later have no unlocks.
 
-**[Open]** What a Ticket unlocks: an **outfit** (268 today) or a **character** (135)? The roster today is outfits, since
-stats and aptitudes differ per outfit, and Claude recommends keeping outfits.
-
-**Math (outfits):** unlocking all 268 takes 253 more Tickets, which means 253 Umas reaching Lv50 in Tier 1 (the last 15
-unlocked never need to level). The chain never stalls as long as you keep leveling. It's a long-term collection by
-design, so raising an Uma from 1 to 50 must get quicker with repeats:
+**Math:** unlocking all 268 takes 253 more Tickets, which means 253 Umas reaching Lv50 in Tier 1 (the last 15 unlocked
+never need to level). The chain never stalls as long as you keep leveling. It's a long-term collection by design, so
+raising an Uma from 1 to 50 must get quicker with repeats:
 
 - **[Proposed]** Keep today's EXP rule: fights above your level pay up to double, so new Umas catch up fast on chapters
   you've already cleared.
@@ -128,14 +124,14 @@ Every Uma has several independent levels, all per tier.
 
 | Level | Range | Raised by | Gives |
 |---|---|---|---|
-| **Uma Level** | 1–50 | Battles | Stats, skill points, Shards (Tier 1) |
-| **Farming & Cooking** | 1–50 | Farm work and cooking | Higher crop grades and recipes; speed |
-| **Gathering & Crafting** | 1–50 | Mining, woodcutting, gathering and crafting | Higher material grades and equipment; speed |
+| **Uma Level** | 1–50 | Battles | Stats, skill points, Shards (Tier 1), Extra Stat capacity |
+| **Farming & Cooking** | 1–50 | Farm sites, the Pantry and the Kitchen | Higher ingredient grades and dishes |
+| **Gathering & Crafting** | 1–50 | Gathering sites, the Workbench and the Forge | Higher material grades and equipment |
 | **Class proficiency** | Ranks 1–6, per class | Class Hall | Skill depths in that class's trees |
 | **Weapon mastery** | Ranks 1–10, per weapon type | Weapon Yard | Higher weapon grades |
 | **Armor mastery** | Ranks 1–10, per armor type | Armor Yard | Higher armor grades |
 
-- **[Owner]** Two profession verticals: Farming + Cooking, and Mining/Woodchopping/Gathering + Crafting.
+- **[Owner]** Two profession verticals, Farming + Cooking and Gathering + Crafting, that take **equal time** (§8.5).
 - **[Open]** A third vertical, possibly as a later tier's new mechanic.
 - **[Proposed]** Rank ranges (6 for classes, 10 for equipment), explained in §5 and §7.
 
@@ -171,9 +167,9 @@ fills the grades between in even steps:
 - **[Proposed]** **Skill points come from Uma Level, and every class tree gets the full amount.** Classes don't compete
   for points, so switching costs nothing; class rank is the real investment. Learned skills stay with their class.
 
-## 6. Training facilities **[Owner]**, with details **[Proposed]**
+## 6. Training facilities and assignments
 
-Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself:
+**[Owner]** Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself:
 
 | Facility | Each slot trains | Unlocks |
 |---|---|---|
@@ -184,9 +180,15 @@ Facilities where you slot **2 or 3 Umas** to raise something about the Uma herse
 - **[Proposed]** A facility starts with **2 slots** and gains a third with an upgrade (§9).
 - **[Proposed]** Time to the next rank grows with the rank and is scaled by aptitude (§4.1). Training runs while the
   app is closed.
-- **[Proposed] One activity at a time.** An Uma is fighting (in a party), working (farm or gathering site), training
-  (facility) or idle. Parties are saved lineups, so a party with a working or training member can't start a fight until
-  she's recalled. That's what makes allocation a real choice. **[Open]** Confirm.
+
+**Assignments [Owner]** (D16)
+
+- Umas stay in their party permanently.
+- A party member who's busy at a facility, farm site or gathering site **shows greyed out** in her party.
+- Umas outside any party can be assigned too.
+
+**[Proposed]** A party with a greyed-out member can't start a fight. Her card offers **Recall**, which cancels her job:
+its inputs come back and the unfinished output is lost.
 
 ## 7. Equipment **[Owner]**, with structure **[Proposed]**
 
@@ -198,14 +200,16 @@ Facilities where you slot **2 or 3 Umas** to raise something about the Uma herse
 
 Equipment should be very varied. Every Uma can equip anything, and distance aptitude sets how fast she masters it.
 
-### 7.1 Slots and grades **[Proposed]**
+### 7.1 Slots, grades and variety **[Proposed]**
 
 - **Slots:** the class's weapons (one or two, as today), one **armor**, one **accessory**.
-- **Ten grades per tier world**, matching the ten material grades (§8.2). Equipping a grade-k weapon or armor needs
+- **Ten grades per tier world**, matching the ten item grades (§8.2). Equipping a grade-k weapon or armor needs
   **mastery rank k** in its type. Crafting grade k needs **Gathering & Crafting Lv 5k − 4** (1, 6, 11 … 46).
   Accessories have no mastery gate.
-- **Variety** comes from type × grade × variant: elemental infusions, stat leanings and special effects that interact
-  with breaks, shields and Limit Breaks. The equipment catalog is its own design doc.
+- **Variety** comes from type × grade × accent. The **main material** decides what can be made: ingots for blades and
+  mail, planks for bows and staves, cloth for garb, leather for leather armor, cut gems and carvings for accessories. The
+  **accent material** adds its family's effect (§8.2), exactly as a dish's star ingredient does.
+- The equipment catalog is its own design doc.
 
 ### 7.2 Types by distance **[Proposed, draft]**
 
@@ -222,46 +226,88 @@ Light gear belongs to Sprint and heavy gear to Long.
 
 ### 7.3 Balance **[Owner]**
 
-Equipment needs a rebalance. **[Proposed]** Foe stats add the **expected gear and Extra Stats for their level**, so a
-party geared for its level feels like today's tuned difficulty, and an ungeared party feels harder.
+Equipment needs a rebalance, and Claude does the balancing (D17).
+
+- **[Proposed]** Extra Stats and equipment each add about the **same share of power** at every level, so neither
+  cooking nor crafting can be skipped.
+- **[Proposed]** Foe stats add the **expected gear and Extra Stats for their level**, so a party that's kept up with
+  both feels like today's tuned difficulty, and a party that skipped them feels harder.
 
 ## 8. Professions: gather → refine → make
 
-### 8.1 Two mirrored verticals
+### 8.1 What the owner asked for **[Owner]** (D18–D20)
 
-| | Farming vertical | Gathering vertical |
+- **Depth.** Every produce type has **its own place on the Hub and its own effect**. No family of near-identical items
+  (uma-racer's five milks and five fruits).
+- **Three steps only:** raw → refined (1 → 1) → cooked or crafted. **No packaging step.**
+- **Parity.** Cooking and crafting are mirror images. There are exactly as many material types as ingredient types,
+  and an Uma spends her time equally between the two.
+- Raw items are "Tier 0", with lots of variety and very symmetric types, like 10 fruits and 10 vegetables.
+- Cooking recipes are varied, and the system is authored from scratch.
+
+### 8.2 Families: one per effect, mirrored **[Proposed]**
+
+Eight effects. Each effect has one farming family and one gathering family, and every family has its own site.
+
+| Effect | Farming family | Site | Gathering family | Site |
+|---|---|---|---|---|
+| HP | Grains | Fields | Hides & Scales | Hunting Grounds |
+| MP | Fruits | Orchard | Essences | Ley Spring |
+| ATK | Fish | Fish Pond | Ores | Mine |
+| M.ATK | Herbs & Spices | Herb Garden | Crystals | Crystal Cavern |
+| DEF | Vegetables | Vegetable Garden | Stones | Quarry |
+| M.DEF | Mushrooms | Mushroom Cave | Fibers | Meadow |
+| Speed | Sweets (honey, cane, cacao, maple…) | Apiary | Woods | Forest |
+| Limit Break charge | Nuts & Seeds | Nut Grove | Bones & Horns | Fossil Dig |
+
+- **10 items per family, one per grade.** Grade k unlocks at profession **Lv 5k − 4** (1, 6, 11 … 46), the same ladder
+  in every family on both sides.
+- **Totals:** 80 raw ingredients and 80 raw materials, then 80 + 80 refined.
+- Example families:
+  - Fruits: apple, pear, peach, plum, orange, grape, mango, fig, pomegranate, starfruit.
+  - Ores: copper, tin, iron, silver, cobalt, gold, platinum, mythril, adamantite, orichalcum.
+- Battles drop a few raw items from **both** sides in equal amounts, as a bonus and never the only source.
+- The full item catalog (names and icons) is its own doc. Every icon is original pixel art generated by script.
+
+### 8.3 Refining, 1 → 1 **[Owner]**
+
+One refining station per side: the **Pantry** for ingredients and the **Workbench** for materials. **[Proposed]** Each
+raw item has exactly one refined form of the same grade:
+
+| Farming | Gathering |
+|---|---|
+| Grain → Flour | Hide → Leather |
+| Fruit → Preserve | Essence → Infusion |
+| Fish → Fillet | Ore → Ingot |
+| Herb → Spice Blend | Crystal → Cut Gem |
+| Vegetable → Prepped Vegetable | Stone → Block |
+| Mushroom → Dried Mushroom | Fiber → Cloth |
+| Sweet → Syrup or Chocolate | Wood → Plank |
+| Nut → Paste or Oil | Bone → Carving |
+
+### 8.4 Making **[Owner]**, with structure **[Proposed]**
+
+| | Cooking (Kitchen) | Crafting (Forge) |
 |---|---|---|
-| Uma level | Farming & Cooking 1–50 | Gathering & Crafting 1–50 |
-| Aptitude **[Proposed]** | Turf | Dirt |
-| Raw families **[Proposed]**, 10 grades each | Fruits, Vegetables, Grains, Herbs & Spices, Dairy & Eggs | Ores, Woods, Stones & Gems, Fibers, Monster Parts |
-| Sites | Orchard, Garden, Fields, Herb Garden, Ranch | Mine, Forest, Quarry, Meadow; Monster Parts drop from battles |
-| Refining, 1 → 1 **[Owner]** | Fruit → Preserve, Vegetable → Prepped Veg, Grain → Flour, Herb → Dried Herb, Milk/Egg → Butter/Custard | Ore → Ingot, Wood → Plank, Stone → Cut Gem, Fiber → Cloth, Part → Treated Hide |
-| Making **[Owner]** | **Cooking:** meals for Extra Stats, varied recipes | **Crafting:** weapons, armor and accessories, very varied |
-| Stations **[Proposed]** | Kitchen | Forge, Workshop, Loom, Jeweler |
+| Output | Dishes | Weapons, armor, accessories |
+| Sets the effect | The **star** ingredient's family | The **accent** material's family |
+| Sets the grade | The star ingredient | The main material |
+| Other inputs | 1–3 side ingredients from other families | The main material (sets the type) plus 0–2 more |
+| Variety | At least one dish per family per grade (80+), across dish types: soups, breads, grills, salads, desserts, drinks, feasts | Gear type × grade × accent effect |
+| Feeds | Extra Stats (§10) | Equipment (§7) |
 
-**[Owner]** Raw ingredients are "Tier 0": a lot of variety with very symmetric types, like 10 fruits, 10 vegetables
-and so on.
+Side ingredients and extra materials are spread so **every family is in demand** on both sides.
 
-**[Owner]** Cooking is authored from scratch. uma-racer's last Farm version isn't the model.
+### 8.5 Parity: equal time **[Proposed]**
 
-**[Proposed]** Monster Parts drop from battles. That ties combat into crafting the way the Ranch ties animals into
-cooking. The other nine families are passive sites.
+1. The same number of families, items and unlock levels on both sides (§8.2).
+2. For the same grade, a site job, a refining job and a making job take the same time and pay the same XP on both
+   sides.
+3. A dish and a piece of gear of the same grade use the same number of inputs.
+4. Farming & Cooking and Gathering & Crafting share one XP curve, so maxing either takes the same time.
+5. Extra Stats and equipment add about the same share of power (§7.3).
 
-### 8.2 Grades **[Proposed]**
-
-- Every family has **10 grades**. Grade k unlocks at the matching profession **Lv 5k − 4** (1, 6, 11 … 46), the same
-  ladder in every family.
-- Raw and refined grades match (refining is 1 → 1).
-- **Totals:** 100 raw, 100 refined, plus recipes. All item icons are original pixel art generated by script.
-
-### 8.3 Cooking **[Proposed]**
-
-- A recipe takes **2–4 ingredients from different families**, refined and sometimes raw. A meal's grade is its lowest
-  ingredient grade.
-- Recipes unlock by Farming & Cooking level and come in dish types (soups, breads, grills, salads, desserts, drinks,
-  feasts), so every family stays useful.
-
-### 8.4 Jobs **[Proposed]**
+### 8.6 Jobs **[Proposed]**
 
 - Sites and stations run **timed jobs** that finish while the app is closed. Durations grow with grade.
 - A finished job pays its item and profession XP to the Uma who worked it.
@@ -275,31 +321,32 @@ cooking. The other nine families are passive sites.
 
 - One map per tier world: a Phaser scene, scrollable and zoomable, built from original pixel tiles.
 - Districts:
-  - **Farmlands:** orchard, garden, fields, herb garden, ranch.
-  - **Wilds:** mine, forest, quarry, meadow.
-  - **Town:** kitchen, forge, workshop, loom, jeweler.
+  - **Farmlands** (8 sites): Fields, Orchard, Fish Pond, Herb Garden, Vegetable Garden, Mushroom Cave, Apiary, Nut Grove.
+  - **Wilds** (8 sites): Hunting Grounds, Ley Spring, Mine, Crystal Cavern, Quarry, Meadow, Forest, Fossil Dig.
+  - **Town:** Pantry and Kitchen; Workbench and Forge.
   - **Academy:** Class Hall, Weapon Yard, Armor Yard.
   - **The Gate:** chapters.
   - **The Tier Finale landmark.**
+- Farmlands and Wilds mirror each other across the map.
 - Assigned Umas show as chibis working at their site. A badge marks finished jobs. Tapping a site opens a React sheet
   (assign, collect, upgrade).
-- **Facility levels** are the tier world's own progression: materials from both verticals upgrade a facility for more
+- **Facility levels** are the tier world's own progression: materials from both sides upgrade a facility for more
   slots and speed. These levels stay with the tier world (§2.2).
 
 ## 10. Extra Stats **[Owner]**, with structure **[Proposed]**
 
-**[Owner]** An Uma eats cooked items to unlock Extra Stat slots. Unlocked slots are assigned freely, with a cap on how
-many can be allocated. The stats are the RPG's own, not racing stats.
+**[Owner]** (D17) An Uma eats dishes to unlock Extra Stat slots, then assigns **at most N of her unlocked slots**.
+Claude sets the numbers.
 
 **[Proposed]**
 
-- The stats are today's RPG combat stats: **HP, MP, ATK, M.ATK, DEF, M.DEF, Speed**.
-- Each Uma has **10 slots per tier**. Slot k unlocks when she eats a **meal of grade k or better**, and its value grows
-  with k.
-- Assign each unlocked slot to any stat, and reassign freely outside a fight.
-- **The cap:** at most **3 slots on the same stat**, so builds lean without dumping everything into one stat.
-- **[Open]** If "a cap on how many I can allocate" meant a total that is lower than the number of unlocked slots, this
-  changes to "unlock up to 10, assign up to N".
+- **Each different dish she eats unlocks one slot**, kept for the tier. The slot's effect is the dish's star family
+  (§8.2): HP, MP, ATK, M.ATK, DEF, M.DEF, Speed or Limit Break charge. Its value grows with the dish's grade.
+- **Active slots: N = 1 + ⌊Uma Level / 10⌋.** That's 1 until Lv9, then one more at Lv 10, 20, 30, 40 and 50, for
+  **6 at Lv50**.
+- Choose which unlocked slots are active and swap them freely outside a fight. Better dishes replace weaker ones in the
+  active set, so cooking keeps paying off.
+- Slot values come from the balance pass, together with equipment (§7.3).
 
 ## 11. Difficulty **[Owner]**
 
@@ -322,8 +369,9 @@ many can be allocated. The stats are the RPG's own, not racing stats.
 
 ## 13. Next steps
 
-1. The owner reviews this draft and answers [open-questions.md](../open-questions.md).
+1. The owner reviews v0.2.
 2. Split into per-system docs: tiers and collection, classes and mastery, equipment, professions and items, Extra
    Stats, Hub.
-3. Item and recipe catalogs (names, families, grades) and the pacing model (timers, XP curves).
+3. Catalogs: the 160 raw and 160 refined items, dishes and gear. Then the pacing model: timers, XP curves, and slot
+   and gear values.
 4. Phase 1 scaffold and the port of the battle engine.
