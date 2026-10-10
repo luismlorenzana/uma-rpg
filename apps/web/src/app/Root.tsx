@@ -1,6 +1,6 @@
 // Gates before the Hub: auth ready → signed in → save booted (or first launch). Nothing here waits on the network
 // once a device save exists (D32).
-import { DEFAULT_TRAINER_NAME, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
+import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
@@ -44,7 +44,7 @@ function FirstLaunch() {
         <p className="font-display text-3xl font-bold">Welcome, trainer</p>
         <p className="mt-2 text-ink-soft">Your stable starts empty. Tier 1 opens with</p>
         <p className="mt-1 flex items-center justify-center gap-1.5 font-display text-lg font-bold text-ticket">
-          <TicketIcon size={24} /> 15 Unlock Tickets
+          <TicketIcon size={24} /> {STARTING_UNLOCK_TICKETS} Unlock Tickets
         </p>
       </div>
       <label className="w-full max-w-xs">

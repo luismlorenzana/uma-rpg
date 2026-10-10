@@ -174,7 +174,7 @@ const TOWN: Place[] = [
   },
   {
     id: 'party-hall', page: 'town', kind: 'town', name: 'Party Hall', opensIn: 'S2', slots: 0, at: { x: 0.75, y: 0.13 },
-    blurb: 'Ten parties of five. Members stay in their party; busy ones show greyed out.',
+    blurb: 'Twenty parties of five. Members stay in their party; busy ones show greyed out.',
     details: ['Build and name parties', 'Busy members must be recalled before a fight'],
   },
   {

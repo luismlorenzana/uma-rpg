@@ -32,13 +32,13 @@ beforeEach(async () => {
 })
 
 describe('game store', () => {
-  it('asks for a trainer name on a fresh device with an empty server, then saves 15 Unlock Tickets', async () => {
+  it('asks for a trainer name on a fresh device with an empty server, then saves 20 Unlock Tickets', async () => {
     await boot('u1')
     expect(useGame.getState().status).toBe('first-launch')
     await createAccount('Luis')
     await syncNow()
     const state = useGame.getState()
-    expect(state.save?.tierWorlds['1']?.wallet.unlockTickets).toBe(15)
+    expect(state.save?.tierWorlds['1']?.wallet.unlockTickets).toBe(20)
     expect(state).toMatchObject({ status: 'ready', dirty: false, revision: 1 })
     expect(server.envelope.save?.account.trainerName).toBe('Luis')
   })

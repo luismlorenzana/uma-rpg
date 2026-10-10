@@ -22,7 +22,7 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
   revision it was based on, or do nothing. `PUT` with a stale `baseRevision` gets **409** carrying the stored
   envelope; when both sides changed, the save with the newer `account.updatedAt` wins whole.
 - Boot never waits on the network once a device save exists. A fresh device adopts the server's save, or shows first
-  launch (trainer name; Tier 1 with 15 Unlock Tickets).
+  launch (trainer name; Tier 1 with 20 Unlock Tickets).
 
 ## Master data
 

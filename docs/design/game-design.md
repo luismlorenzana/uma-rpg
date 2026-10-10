@@ -108,13 +108,13 @@ from tier N to tier N+1.
 
 ## 3. Collection (Tier 1 only) **[Owner]**
 
-- A new game starts with **no Umas** and **15 Uma Unlock Tickets**.
+- A new game starts with **no Umas** and **20 Uma Unlock Tickets** (D40).
 - A Ticket unlocks one **outfit** of your choice (D14). There are 268 today.
 - Each Uma earns **1 Uma Shard at Lv 10, 20, 30, 40 and 50**. **5 Shards = 1 Ticket**, so every Uma who reaches Lv50
   pays exactly one Ticket, and partial progress across many Umas adds up too.
 - Tier 2 and later have no unlocks.
 
-**Math:** unlocking all 268 takes 253 more Tickets, which means 253 Umas reaching Lv50 in Tier 1 (the last 15 unlocked
+**Math:** unlocking all 268 takes 248 more Tickets, which means 248 Umas reaching Lv50 in Tier 1 (the last 20 unlocked
 never need to level). The chain never stalls as long as you keep leveling. It's a long-term collection by design, so
 raising an Uma from 1 to 50 must get quicker with repeats:
 
@@ -420,7 +420,7 @@ more you choose which single area to push. Laurels buy:
 | Battle engine v5: breaks, shields, Limit Break, statuses, seeded replay | Inspiration tokens, Inventory/Convert for tokens, the Inspiration advance |
 | Five classes, their trees, hands and weapon sets | Class choice by A running style (classes are now free) |
 | Chapter maps, camps, carried MP, replays, Finals routes (re-cut to 10 levels) | 12-level chapters |
-| Ten saved parties, roster and profile screens | Enrollment freezing an outfit; fixed class per Uma |
+| Saved parties (twenty now, D41), roster and profile screens | Enrollment freezing an outfit; fixed class per Uma |
 | The campaign simulation harness | Anything paid into uma-racer |
 
 ## 14. Next steps

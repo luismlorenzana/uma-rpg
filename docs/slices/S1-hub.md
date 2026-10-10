@@ -17,7 +17,7 @@ already exists: all 268 Umas from master data, and Tier 1's chapters.
 - A signed-out screen with the game name and **Sign in with Google**. Only the owner's email gets in (allowlist),
   exactly as in uma-racer.
 - The first launch creates the account: you pick a **trainer name** (default "Trainer"), and the game creates the
-  **Tier 1 world** with its wallet: **15 Unlock Tickets**, 0 Shards, 0 Laurels.
+  **Tier 1 world** with its wallet: **20 Unlock Tickets**, 0 Shards, 0 Laurels.
 - Later launches open straight onto the Hub, from the device's save, with no waiting on the network.
 
 ### The Hub screen (390×844 portrait, safe areas respected)
@@ -68,7 +68,7 @@ live content or **"Opens in S#"** with a short preview of what it will do.
 **Live in S1:**
 
 - **Stable:** browse all **268 outfits**. A grid of Uma icons with search by name, every outfit shown as **locked**,
-  and the note "15 Unlock Tickets · unlocking opens in S2". Tapping an outfit shows a read-only profile: portrait,
+  and the note "20 Unlock Tickets · unlocking opens in S2". Tapping an outfit shows a read-only profile: portrait,
   name and character, rarity, aptitudes (surface, distance, running style), base stats, growth rates and unique skill.
 - **Scenario Gate:** the **Tier 1 chapters** in order (URA Finale → Grand Masters) with crest, name and level band
   (1–10 … 41–50). Tier 2 and Tier 3 are listed as locked. Tapping a chapter says "Battles open in S3".
@@ -97,7 +97,7 @@ chapter rows), Hub art beyond placeholders, and pan or zoom (each page fits the 
 
 On the owner's iPhone, from the Home Screen:
 
-1. Sign in, name the trainer, and land on Farmlands with 15 Unlock Tickets in the account bar.
+1. Sign in, name the trainer, and land on Farmlands with 20 Unlock Tickets in the account bar.
 2. Switch through all four pages by tab and by swipe. Every place is visible without scrolling, and each one opens
    its overlay.
 3. The Stable shows 268 outfits with art. Search works, and a profile opens.

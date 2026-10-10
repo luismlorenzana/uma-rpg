@@ -1,8 +1,8 @@
 // Save v1: one snapshot document per account (D32), shared by the web app (Dexie + store) and the API (validation).
-// Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 15 starting Unlock Tickets).
+// Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40).
 
 export const SAVE_SCHEMA_VERSION = 1
-export const STARTING_UNLOCK_TICKETS = 15
+export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
 
