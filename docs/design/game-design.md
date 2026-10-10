@@ -1,7 +1,8 @@
-# Uma RPG — game design (draft v0.3)
+# Uma RPG — game design (draft v0.4)
 
 > **Status: draft for owner review, 2026-10-10.** v0.2 folded in the owner's answers to Q1–Q5 (D14–D20). v0.3 adds the
-> four-page Hub, the Learning District and the Sun-and-planets Extra Stats map (D21–D23). This is the
+> four-page Hub, the Learning District and the Sun-and-planets Extra Stats map (D21–D23). v0.4 adds Laurels and the
+> Exchange, and gear that binds to its wearer (D27–D29). This is the
 > first spec for uma-rpg as a standalone game. It will split into one doc per system once each system is approved.
 >
 > Every rule is tagged:
@@ -33,7 +34,7 @@ flowchart LR
     Hub[Hub map] --> Assign[Assign Umas: party, farm, gather, train]
     Assign --> Battle[Chapters: break battles]
     Assign --> Passive[Facilities run while away]
-    Battle --> Lv[Uma levels + bonus drops]
+    Battle --> Lv[Uma levels + Laurels]
     Passive --> Raw[Raw ingredients / materials]
     Raw --> Refine[Refine 1 → 1]
     Refine --> Cook[Cooking → dishes]
@@ -43,6 +44,8 @@ flowchart LR
     Passive --> Mastery[Class proficiency + equipment mastery]
     Lv --> Shards[Uma Shards → Unlock Tickets]
     Shards --> Collect[New Umas]
+    Lv --> Exchange[Exchange: raw items, Rush and Sweep Tickets]
+    Exchange --> Raw
     Extra --> Battle
     Gear --> Battle
     Mastery --> Battle
@@ -118,6 +121,8 @@ raising an Uma from 1 to 50 must get quicker with repeats:
 - **[Proposed]** Keep today's EXP rule: fights above your level pay up to double, so new Umas catch up fast on chapters
   you've already cleared.
 - **[Proposed]** Replays of cleared nodes stay fully rewarded.
+- **[Owner]** Sweep Tickets bought with Laurels (§11) complete cleared regular fights at once, so Umas who are behind
+  can catch up without replaying every fight by hand.
 
 ## 4. An Uma's levels
 
@@ -219,6 +224,12 @@ Equipment should be very varied. Every Uma can equip anything, and distance apti
 - **Ten grades per tier world**, matching the ten item grades (§8.2). Equipping a grade-k weapon or armor needs
   **mastery rank k** in its type. Crafting grade k needs **Gathering & Crafting Lv 5k − 4** (1, 6, 11 … 46).
   Accessories have no mastery gate.
+- **[Owner] Gear binds on equip** (D28). Once an Uma equips a piece, it's hers permanently and can never move to another
+  Uma, so every fresh Uma crafts her own.
+- **[Owner] No Uma Level gate** (D29). Mastery rank is the only requirement to equip.
+- **[Proposed]** Bound pieces stay in **her locker**. She can swap freely among her own bound gear, so class switches
+  stay free, but bound gear can't be traded, sold or moved. When she's promoted, her bound gear stays behind in the old
+  tier world, like everything else (D15).
 - **Variety** comes from type × grade × accent. The **main material** decides what can be made: ingots for blades and
   mail, planks for bows and staves, cloth for garb, leather for leather armor, cut gems and carvings for accessories. The
   **accent material** adds its family's effect (§8.2), exactly as a dish's star ingredient does.
@@ -280,7 +291,7 @@ Eight effects. Each effect has one farming family and one gathering family, and 
 - Example families:
   - Fruits: apple, pear, peach, plum, orange, grape, mango, pomegranate, starpeach, golden apple.
   - Ores: copper, tin, iron, silver, cobalt, gold, platinum, titanium, mythril, orichalcum.
-- Battles drop a few raw items from **both** sides in equal amounts, as a bonus and never the only source.
+- Battles pay **Laurels** (§11), not items. Laurels buy raw items of both sides at the Exchange.
 - The full catalog is [items.md](items.md). Every icon is original pixel art drawn by uma-platform's `scripts/pixel-art` (D26).
 
 ### 8.3 Refining, 1 → 1 **[Owner]**
@@ -336,7 +347,7 @@ Side ingredients and extra materials are spread so **every family is in demand**
 | **Farmlands** | The 8 farming sites, the Pantry and the Kitchen |
 | **Wilds** | The 8 gathering sites, the Workbench and the Forge |
 | **Learning District** | The 5 class halls and the 4 armories (§6) |
-| **Town** | Stable (roster), Party Hall (parties), Scenario Gate (chapters), Warehouse (inventory), Observatory (Extra Stats), the Tier Finale landmark |
+| **Town** | Stable (roster), Party Hall (parties), Scenario Gate (chapters), Warehouse (inventory), Exchange (Laurels), Observatory (Extra Stats), the Tier Finale landmark |
 
 **[Owner]** (D22) Each place shows **tiny icons of the Umas assigned to it**. Tapping a place opens a **side overlay**
 previewing those Umas.
@@ -376,7 +387,24 @@ sets the numbers.
   the Sun, or land anywhere between.
 - The map opens from the Observatory in Town and from the Uma's profile.
 
-## 11. Difficulty **[Owner]**
+## 11. Laurels and the Exchange **[Owner]**, with details **[Proposed]**
+
+**[Owner]** (D27) Battles drop **Laurels**, a global currency spent at the **Exchange** in Town. The more you play, the
+more you choose which single area to push. Laurels buy:
+
+| Buy | Does | Rules **[Proposed]** |
+|---|---|---|
+| **Raw items** | Any raw ingredient or material | The soft scenario link: reaching a chapter stocks its grade pair (URA Finale grades 1–2, Unity Cup 3–4, Trackblazer 5–6, Our Grand Concert 7–8, Grand Masters 9–10). The price rises with grade. Producing items stays gated only by profession level |
+| **Rush Ticket** | Finishes one running job at once | Farm jobs only: Farmlands and Wilds sites, the Pantry, Kitchen, Workbench and Forge. Not Learning District training, where time stays the gate |
+| **Sweep Ticket** | Completes one cleared **regular** fight at once | Pays the fight's EXP (and so Shards), but **no Laurels**, so Laurels can't loop into more Laurels. Sub-bosses, champions and the Tier Finale must be fought |
+
+**[Proposed]**
+
+- Every win pays Laurels, replays included, scaled by the fight's level and kind (regular < sub-boss < champion).
+- One wallet per tier world, like the rest of a tier's stock (§2.2).
+- Prices and payouts come from the pacing model in the balance pass.
+
+## 12. Difficulty **[Owner]**
 
 - **[Owner]** The curve isn't steep. Today's regular, sub-boss and boss sets are a good base.
 - **[Owner]** Scaling is linear between scenarios: foe stats and HP grow like Uma stats and skill damage do.
@@ -385,7 +413,7 @@ sets the numbers.
 - **[Proposed]** Keep today's foe curve on lifetime level, `22 + 1.59 × (level − 1)` for the average stat, with the
   role, rank and shield rules from uma-racer's class doc, plus the gear and Extra Stats budget (§7.3).
 
-## 12. Carried over from uma-racer's RPG **[Proposed]**
+## 13. Carried over from uma-racer's RPG **[Proposed]**
 
 | Keep | Retire |
 |---|---|
@@ -395,12 +423,12 @@ sets the numbers.
 | Ten saved parties, roster and profile screens | Enrollment freezing an outfit; fixed class per Uma |
 | The campaign simulation harness | Anything paid into uma-racer |
 
-## 13. Next steps
+## 14. Next steps
 
 1. The owner reviews v0.2.
 2. Split into per-system docs: tiers and collection, classes and mastery, equipment, professions and items, Extra
    Stats, Hub.
 3. Catalogs: raw and refined items are drafted ([items.md](items.md)); dishes and gear are next. Then the pacing model:
-   timers, XP curves, and node and gear values.
-4. Icons for the remaining 14 families, once the owner approves the style of the first two.
+   timers, XP curves, node and gear values, Laurel payouts and Exchange prices.
+4. Icons for every raw and refined item (in progress in uma-platform `scripts/pixel-art`).
 5. Phase 1 scaffold and the port of the battle engine.
