@@ -19,7 +19,7 @@ features slot into places that already exist instead of growing global routes.
 
 | Slice | Delivers | Places that come alive | Exit check |
 |---|---|---|---|
-| **S1 — Hub and foundation** ([spec](slices/S1-hub.md)) | Repo, cloud, sign-in, save and sync, master data, the four-page Hub with all 36 places visible, account bar and global menu | Stable (browse all 268 outfits), Scenario Gate (Tier 1 chapters), Account | On the iPhone: sign in, see every place on every page, browse the Umas; the save survives a reload and syncs |
+| **S1 — Hub and foundation** ([spec](slices/S1-hub.md)) · *built; deploying* | Repo, cloud, sign-in, save and sync, master data, the four-page Hub with all 36 places visible, account bar and global menu | Stable (browse all 268 outfits), Scenario Gate (Tier 1 chapters), Account | On the iPhone: sign in, see every place on every page, browse the Umas; the save survives a reload and syncs |
 | **S2 — Collection and parties** | 15 Unlock Tickets, outfit unlocks, Uma profiles, 10 permanent parties, busy members greyed out | Stable (unlock), Party Hall | Unlock Umas and build parties |
 | **S3 — Battles and leveling** | The battle engine and campaign ported from uma-racer, Tier 1's five 10-level chapters, free classes, EXP, Shards → Tickets, Laurels | Scenario Gate (fight), Stable (levels) | The core loop: unlock, fight, level, earn Shards, unlock more |
 | **S4 — Farmlands and Wilds** | Timed jobs at the 16 sites, profession levels, raw items, refining, Uma icons on places, the Exchange (raw items, Rush and Sweep Tickets) | 16 sites, Pantry, Workbench, Warehouse, Exchange | Assign Umas, collect and refine while away, spend Laurels |
