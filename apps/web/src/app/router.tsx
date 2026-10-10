@@ -1,6 +1,6 @@
-// Every screen is a place on the Hub (D31): /:page and /:page/:placeId/*. Nothing else is a top-level route.
+// Every screen is a place on the Hub (D31, D43): /:page (+ ?peek=) and /:page/:placeId/*. Nothing else is a route.
 import { createBrowserRouter, Navigate } from 'react-router'
-import { HubRoute } from '../hub/HubScreen'
+import { HubRoute, PlaceRoute } from '../hub/HubScreen'
 import { lastPage } from '../hub/swipe'
 import { Root } from './Root'
 
@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <RedirectToLastPage /> },
       { path: ':page', element: <HubRoute /> },
-      { path: ':page/:placeId/*', element: <HubRoute /> },
+      { path: ':page/:placeId/*', element: <PlaceRoute /> },
     ],
   },
 ])

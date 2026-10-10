@@ -1,6 +1,6 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
-import { newSave, renameTrainer, type Save } from '@rpg/domain'
+import { newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type Save, type TierWorld } from '@rpg/domain'
 import { create } from 'zustand'
 import { conflictEnvelope, saveApi } from '../api/client'
 import { readSaveRow, writeSaveRow } from './db'
@@ -76,6 +76,28 @@ export async function renameAccount(trainerName: string): Promise<void> {
   const { save } = useGame.getState()
   if (!save) return
   await commit(renameTrainer(save, trainerName, nowIso()))
+}
+
+/** Spends one Unlock Ticket (final, D44). Throws SaveRuleError when it can't. */
+export async function unlock(outfitId: string): Promise<void> {
+  const { save } = useGame.getState()
+  if (save) await commit(unlockUma(save, outfitId, nowIso()))
+}
+
+/** Puts an owned Uma in a party slot, moving her from any other (D46); null empties the slot. */
+export async function setSlot(party: number, slot: number, outfitId: string | null): Promise<void> {
+  const { save } = useGame.getState()
+  if (save) await commit(setPartySlot(save, party, slot, outfitId, nowIso()))
+}
+
+export async function nameParty(party: number, name: string): Promise<void> {
+  const { save } = useGame.getState()
+  if (save) await commit(renameParty(save, party, name, nowIso()))
+}
+
+/** The Tier 1 world, or null before boot. */
+export function useWorld(): TierWorld | null {
+  return useGame((s) => s.save?.tierWorlds['1'] ?? null)
 }
 
 // --- Sync -------------------------------------------------------------------------------------------------------

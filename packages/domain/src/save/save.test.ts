@@ -4,7 +4,7 @@ import { newSave, normalizeTrainerName, parseSave, parseSavePut, renameTrainer, 
 const NOW = '2026-10-10T12:00:00.000Z'
 const LATER = '2026-10-10T13:00:00.000Z'
 
-describe('save v1', () => {
+describe('save', () => {
   it('starts Tier 1 with 20 Unlock Tickets and nothing else', () => {
     const save = newSave('  Luis  ', NOW)
     expect(save.account.trainerName).toBe('Luis')
@@ -32,10 +32,10 @@ describe('save v1', () => {
     const save = newSave('Luis', NOW)
     expect(() => parseSave({ ...save, extra: 1 })).toThrow(SaveParseError)
     expect(() => parseSave({ ...save, tierWorlds: {} })).toThrow(/tier 1 is required/)
-    expect(() => parseSave({ ...save, tierWorlds: { '1': { createdAt: NOW, wallet: { unlockTickets: -1, shards: 0, laurels: 0 } } } })).toThrow(/unlockTickets/)
+    expect(() => parseSave({ ...save, tierWorlds: { '1': { ...save.tierWorlds['1'], wallet: { unlockTickets: -1, shards: 0, laurels: 0 } } } })).toThrow(/unlockTickets/)
     expect(() => parseSave({ ...save, tierWorlds: { x: save.tierWorlds['1'] } })).toThrow(/positive integers/)
     expect(() => parseSave({ ...save, account: { ...save.account, trainerName: ' Luis' } })).toThrow(/trainerName/)
-    expect(() => parseSave({ ...save, schemaVersion: 2 })).toThrow(/schemaVersion/)
+    expect(() => parseSave({ ...save, schemaVersion: 3 })).toThrow(/schemaVersion/)
   })
 
   it('parses a PUT body', () => {

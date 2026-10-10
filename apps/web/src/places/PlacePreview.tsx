@@ -1,8 +1,8 @@
 import { SLICE_GOALS } from '@rpg/domain'
-import type { PlaceBodyProps } from './PlaceOverlay'
+import type { PeekProps } from './registry'
 
 /** The default overlay: what the place is for, its empty slots, and which slice opens it. */
-export function PlacePreview({ place }: PlaceBodyProps) {
+export function PlacePreview({ place }: PeekProps) {
   return (
     <div className="space-y-4 p-4">
       <p className="text-[15px] leading-relaxed text-ink">{place.blurb}</p>

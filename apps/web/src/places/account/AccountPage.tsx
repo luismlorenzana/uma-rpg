@@ -1,13 +1,13 @@
 // The Account (S1): trainer name, tier world, wallet, versions and sign-out. A hidden Town place (D31).
 import { TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
 import { useState } from 'react'
-import { APP_BUILD_ID } from '../app/build'
-import { useAppUpdate } from '../app/UpdateNotice'
-import { appUpdateLifecycle } from '../app/update-lifecycle'
-import { useAuth } from '../auth/AuthProvider'
-import { useMaster } from '../master/master'
-import { renameAccount, resetGame, useGame } from '../save/game'
-import { LaurelIcon, ShardIcon, TicketIcon } from '../ui/icons'
+import { APP_BUILD_ID } from '../../app/build'
+import { useAppUpdate } from '../../app/UpdateNotice'
+import { appUpdateLifecycle } from '../../app/update-lifecycle'
+import { useAuth } from '../../auth/AuthProvider'
+import { useMaster } from '../../master/master'
+import { renameAccount, resetGame, useGame } from '../../save/game'
+import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -18,7 +18,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   )
 }
 
-export default function AccountPlace() {
+export default function AccountPage() {
   const save = useGame((s) => s.save)
   const sync = useGame((s) => s.sync)
   const lastSyncedAt = useGame((s) => s.lastSyncedAt)
@@ -86,7 +86,7 @@ export default function AccountPlace() {
       <section>
         <Row label="Tier world">Tier 1</Row>
         <Row label="Trainer since">{new Date(save.account.createdAt).toLocaleDateString()}</Row>
-        <Row label="Umas unlocked">0 / {master.status === 'ready' ? master.view.roster.length : '…'}</Row>
+        <Row label="Umas unlocked">{Object.keys(save.tierWorlds['1']?.umas ?? {}).length} / {master.status === 'ready' ? master.view.roster.length : '…'}</Row>
         <Row label="Cloud save">{sync === 'synced' && lastSyncedAt ? `Synced ${new Date(lastSyncedAt).toLocaleTimeString()}` : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline' : sync === 'error' ? 'Paused' : '—'}</Row>
         <Row label="Game data">{master.status === 'ready' ? `${master.view.manifest.version} · schema ${master.view.manifest.schemaVersion}` : master.status === 'error' ? 'Not loaded' : 'Loading…'}</Row>
         <Row label="App build">{APP_BUILD_ID}</Row>

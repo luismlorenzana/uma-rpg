@@ -21,7 +21,7 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, createAccount, renameAccount, resetGame, syncNow, useGame } = await import('./game')
+const { boot, createAccount, nameParty, renameAccount, resetGame, setSlot, syncNow, unlock, useGame } = await import('./game')
 const { db } = await import('./db')
 
 beforeEach(async () => {
@@ -76,5 +76,38 @@ describe('game store', () => {
     await createAccount('Luis')
     await expect(renameAccount('   ')).rejects.toThrow()
     expect(useGame.getState().save?.account.trainerName).toBe('Luis')
+  })
+
+  it('unlocks Umas for tickets and builds parties, and all of it syncs (S2)', async () => {
+    await boot('u1')
+    await createAccount('Luis')
+    await unlock('100101')
+    await unlock('100201')
+    await setSlot(0, 0, '100101')
+    await setSlot(0, 1, '100201')
+    await setSlot(4, 2, '100101') // moves her from Party 1 to Party 5
+    await nameParty(4, 'Front runners')
+    await syncNow()
+    const world = server.envelope.save?.tierWorlds['1']
+    expect(world?.wallet.unlockTickets).toBe(18)
+    expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
+    expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
+    expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null] })
+    await expect(unlock('100101')).rejects.toThrow(/already/)
+  })
+
+  it('migrates a v1 device save when it boots', async () => {
+    await db.save.put({
+      id: 'main',
+      uid: 'u1',
+      revision: 1,
+      dirty: false,
+      save: { schemaVersion: 1, account: { trainerName: 'Old', createdAt: '2026-10-10T12:00:00.000Z', updatedAt: '2026-10-10T12:00:00.000Z' }, tierWorlds: { '1': { createdAt: '2026-10-10T12:00:00.000Z', wallet: { unlockTickets: 20, shards: 0, laurels: 0 } } } } as never,
+    })
+    server.envelope = { revision: 1, save: null }
+    await boot('u1')
+    const save = useGame.getState().save
+    expect(save?.schemaVersion).toBe(2)
+    expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
   })
 })

@@ -1,0 +1,154 @@
+// The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); busy
+// members show greyed out (D16, none until S4).
+import { isBusy, isPartyFull, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { useHubNavigation } from '../../hub/navigation'
+import { AtlasSprite } from '../../master/art'
+import type { MasterView } from '../../master/master'
+import { nameParty, setSlot, useWorld } from '../../save/game'
+import { BottomSheet } from '../../ui/BottomSheet'
+import { BackIcon } from '../../ui/icons'
+import { MasterGate } from '../MasterGate'
+import type { PageProps } from '../registry'
+import { UmaPicker } from './UmaPicker'
+
+export default function PartyHallPage({ place, rest }: PageProps) {
+  const world = useWorld()
+  const index = /^\d+$/.test(rest) ? Number(rest) - 1 : null
+  if (!world) return null
+  return (
+    <MasterGate>
+      {(view) =>
+        index !== null && index >= 0 && index < PARTY_COUNT ? (
+          <PartyEditor view={view} world={world} index={index} place={place} />
+        ) : (
+          <PartyList view={view} world={world} place={place} />
+        )
+      }
+    </MasterGate>
+  )
+}
+
+function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: TierWorld; outfitId: string | null; size: number }) {
+  if (!outfitId) return <span className="flex items-center justify-center rounded-sm border border-dashed border-hairline-strong text-ink-faint" style={{ width: size, height: size }}>+</span>
+  const busy = isBusy(world, outfitId)
+  return (
+    <span className="relative" style={{ width: size, height: size }}>
+      <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfitId} size={size} className={busy ? 'opacity-40 grayscale' : ''} />
+      <span className="absolute bottom-0 left-0 rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {world.umas[outfitId]?.level ?? 1}</span>
+      {busy && <span className="absolute inset-x-0 top-0 bg-black/70 text-center text-[9px] font-bold leading-3.5 text-ink-soft">Busy</span>}
+    </span>
+  )
+}
+
+function PartyList({ view, world, place }: { view: MasterView; world: TierWorld; place: Place }) {
+  const nav = useHubNavigation()
+  const owned = Object.keys(world.umas).length
+  return (
+    <div className="space-y-2 p-3">
+      {owned === 0 && (
+        <p className="rounded-md border border-accent/40 bg-accent/10 p-3 text-[13px] text-ink-soft">Your stable is empty: unlock Umas in the Stable, then build parties here.</p>
+      )}
+      {world.parties.map((party, i) => (
+        <button key={i} type="button" onClick={() => nav.sub(place, String(i + 1))} className="w-full rounded-md bg-panel p-2.5 text-left active:bg-raised">
+          <span className="mb-1.5 flex items-center justify-between">
+            <span className="font-display text-[15px] font-bold">{party.name}</span>
+            <span className={`text-[11px] font-semibold ${isPartyFull(party) ? 'text-success' : 'text-ink-faint'}`}>
+              {party.slots.filter(Boolean).length}/5 · Edit
+            </span>
+          </span>
+          <span className="grid grid-cols-5 gap-1.5">
+            {party.slots.map((s, k) => (
+              <SlotIcon key={k} view={view} world={world} outfitId={s} size={56} />
+            ))}
+          </span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function PartyEditor({ view, world, index, place }: { view: MasterView; world: TierWorld; index: number; place: Place }) {
+  const navigate = useNavigate()
+  const nav = useHubNavigation()
+  const party = world.parties[index] as Party
+  const [name, setName] = useState(party.name)
+  const [picking, setPicking] = useState<number | null>(null)
+  const [acting, setActing] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const valid = normalizeName(name, PARTY_NAME_MAX) !== null
+  const run = (p: Promise<void>) => p.then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Could not save.'))
+  const byId = new Map(view.roster.map((o) => [o.outfitId, o]))
+
+  return (
+    <div className="space-y-4 p-4">
+      <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
+        <BackIcon size={18} /> All parties
+      </button>
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (valid) void run(nameParty(index, name))
+        }}
+      >
+        <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Party name" aria-invalid={!valid} className="min-h-11 min-w-0 flex-1 rounded-sm bg-sunken px-3 font-display font-bold text-ink outline-none ring-accent focus:ring-2" />
+        <button type="submit" disabled={!valid || normalizeName(name, PARTY_NAME_MAX) === party.name} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink disabled:opacity-40">
+          Rename
+        </button>
+      </form>
+      <ul className="space-y-2">
+        {party.slots.map((outfitId, slot) => {
+          const outfit = outfitId ? byId.get(outfitId) : undefined
+          return (
+            <li key={slot}>
+              <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
+                <SlotIcon view={view} world={world} outfitId={outfitId} size={56} />
+                <span className="min-w-0 flex-1">
+                  {outfit ? (
+                    <>
+                      <span className="block truncate text-[14px] font-semibold">{outfit.name}</span>
+                      <span className="block truncate text-[11px] text-ink-faint">{outfit.title}</span>
+                    </>
+                  ) : (
+                    <span className="text-[14px] text-ink-faint">Slot {slot + 1} · add an Uma</span>
+                  )}
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      {error && <p className="text-[13px] text-danger">{error}</p>}
+
+      {picking !== null && (
+        <UmaPicker
+          view={view}
+          world={world}
+          partyIndex={index}
+          onClose={() => setPicking(null)}
+          onPick={(id) => {
+            void run(setSlot(index, picking, id))
+            setPicking(null)
+          }}
+        />
+      )}
+      {acting !== null && party.slots[acting] && (
+        <BottomSheet title={byId.get(party.slots[acting] ?? '')?.name ?? 'Uma'} onClose={() => setActing(null)}>
+          <div className="space-y-2">
+            <button type="button" onClick={() => { setPicking(acting); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
+              Swap with another Uma
+            </button>
+            <button type="button" onClick={() => navigate(`/town/stable/outfit/${party.slots[acting]}`, { state: { fromHub: true } })} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
+              View profile
+            </button>
+            <button type="button" onClick={() => { void run(setSlot(index, acting, null)); setActing(null) }} className="min-h-12 w-full rounded-sm border border-danger/50 font-semibold text-danger">
+              Remove from {party.name}
+            </button>
+          </div>
+        </BottomSheet>
+      )}
+    </div>
+  )
+}

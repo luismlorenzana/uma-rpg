@@ -12,10 +12,14 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 | `apps/web` (`@rpg/web`) | React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie + React Router 7 + Phaser 4 (lazy) + PWA |
 | `infra/github-actions/bootstrap.sh` | One-time GCP setup |
 
-## Save and sync (D32)
+## Save and sync (D32, D45)
 
-- One snapshot per account: `{ schemaVersion: 1, account, tierWorlds }`, validated by strict parsers in `@rpg/domain`
-  on both sides.
+- One snapshot per account: `{ schemaVersion: 2, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
+  outfits by id: unlock time, level, EXP) and exactly 20 `parties` of five slots, an Uma in at most one slot (D46).
+  Strict parsers in `@rpg/domain` validate on both sides; a v1 save parses into v2 (device rows on boot, server rows on
+  read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets) are pure and return a new save.
+- The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old
+  installed app can't overwrite newer data.
 - The device holds one Dexie row `{ uid, revision, save, dirty }` and a Zustand store. Every change writes both and
   schedules a sync (1.5 s debounce, plus app foreground and coming online).
 - A sync pass reads `GET /api/save`, then `reconcile` decides: **adopt** the server's save, **push** ours on top of the
@@ -37,8 +41,12 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## The Hub (D30, D31, D33)
 
-- Routes are `/:page` and `/:page/:placeId/*` only. Signed-out and first-launch screens render at any URL, so a deep
-  link survives sign-in.
+- Routes (D43): `/:page` is the Hub, `/:page?peek=:placeId` a place's quick look (the side panel), `/:page/:placeId/*` its
+  full page. Nothing else is a route. Opening from the Hub pushes history; **Enter** replaces the quick look with the
+  page, so back returns to the Hub. Signed-out and first-launch screens render at any URL, so a deep link survives
+  sign-in.
+- `apps/web/src/places/registry.tsx` maps each place to its lazy `Peek`, `Page` and header `Counter`; places without a
+  page show the honest preview and no Enter.
 - One place registry drives the map, the DOM place buttons, the menu and the routes.
 - The map is a lazy Phaser 4 game (`hub/scene/`): world units are CSS px with the camera zoomed by the device pixel ratio
   (≤ 2). It draws ground, code-drawn markers and ambient motion; it has **no text and no input**. Names, slot pips and

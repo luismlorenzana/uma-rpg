@@ -20,6 +20,7 @@ export interface RosterOutfit {
   uniqueSkillId: number | null
   /** Japan release date; the roster sorts by it. */
   releasedJp: string
+  realHorseSex: 'male' | 'female' | null
 }
 
 export interface ChapterInfo {
@@ -68,6 +69,7 @@ export function buildRoster(data: { characters: readonly Character[]; outfits: r
       growthRatePercents: outfit.growthRatePercents,
       uniqueSkillId: outfit.skills.unique[0] ?? null,
       releasedJp: outfit.release.jp,
+      realHorseSex: character.realHorseSex,
     })
   }
   return roster.sort((a, b) => a.releasedJp.localeCompare(b.releasedJp) || a.masterId - b.masterId)

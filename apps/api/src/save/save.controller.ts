@@ -24,7 +24,7 @@ export class SaveController {
       throw err
     }
     try {
-      return await this.saves.put(uid, request.baseRevision, request.save)
+      return await this.saves.put(uid, request.baseRevision, request.save, request.sentSchemaVersion)
     } catch (err) {
       if (err instanceof RevisionConflict) throw new ConflictException({ message: 'revision conflict', current: err.current })
       throw err

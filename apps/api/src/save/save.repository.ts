@@ -13,8 +13,11 @@ export class RevisionConflict extends Error {
 // One snapshot document per account (D32). Local JSON file in dev, Firestore in production.
 export interface SaveRepository {
   load(uid: string): Promise<SaveEnvelope>
-  /** Stores `save` as `baseRevision + 1` when the stored revision equals `baseRevision`; otherwise RevisionConflict. */
-  put(uid: string, baseRevision: number, save: Save): Promise<SaveEnvelope>
+  /**
+   * Stores `save` as `baseRevision + 1` when the stored revision equals `baseRevision` and the client's save version
+   * isn't older than the stored one (D45); otherwise RevisionConflict with what's stored.
+   */
+  put(uid: string, baseRevision: number, save: Save, sentSchemaVersion: number): Promise<SaveEnvelope>
 }
 
 export const SAVE_REPOSITORY = Symbol('SAVE_REPOSITORY')

@@ -201,6 +201,7 @@ Learning District (§9), with **several class hubs and several weapon hubs** (D2
 
 **Assignments [Owner]** (D16)
 
+- **Twenty parties** of five (D41). An Uma belongs to at most one party; adding her to another moves her (D46).
 - Umas stay in their party permanently.
 - A party member who's busy at a facility, farm site or gathering site **shows greyed out** in her party.
 - Umas outside any party can be assigned too.

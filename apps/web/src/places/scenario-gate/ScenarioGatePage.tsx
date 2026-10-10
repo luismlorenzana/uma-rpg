@@ -1,9 +1,9 @@
 // The Scenario Gate (S1): Tier 1's chapters with crest and level band; later tiers locked. Battles arrive in S3.
-import { AtlasSprite } from '../master/art'
-import { MasterGate } from './MasterGate'
-import { LockIcon } from '../ui/icons'
+import { AtlasSprite } from '../../master/art'
+import { LockIcon } from '../../ui/icons'
+import { MasterGate } from '../MasterGate'
 
-export default function ScenarioGatePlace() {
+export default function ScenarioGatePage() {
   return (
     <MasterGate>
       {(view) => {

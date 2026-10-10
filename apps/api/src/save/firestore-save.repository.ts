@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin'
-import { parseSave, type Save, type SaveEnvelope } from '@rpg/domain'
+import { parseSave, schemaVersionOf, type Save, type SaveEnvelope } from '@rpg/domain'
 import { EMPTY_ENVELOPE, RevisionConflict, type SaveRepository } from './save.repository'
 
 // Production persistence: `saves/{uid}` = { revision, save }, revision-checked inside a transaction.
@@ -19,11 +19,13 @@ export class FirestoreSaveRepository implements SaveRepository {
     return FirestoreSaveRepository.envelope(await this.db().collection('saves').doc(uid).get())
   }
 
-  put(uid: string, baseRevision: number, save: Save): Promise<SaveEnvelope> {
+  put(uid: string, baseRevision: number, save: Save, sentSchemaVersion: number): Promise<SaveEnvelope> {
     const ref = this.db().collection('saves').doc(uid)
     return this.db().runTransaction(async (tx) => {
-      const current = FirestoreSaveRepository.envelope(await tx.get(ref))
-      if (current.revision !== baseRevision) throw new RevisionConflict(current)
+      const snapshot = await tx.get(ref)
+      const current = FirestoreSaveRepository.envelope(snapshot)
+      const storedVersion = snapshot.exists ? schemaVersionOf((snapshot.data() as { save?: unknown }).save) : 0
+      if (current.revision !== baseRevision || sentSchemaVersion < storedVersion) throw new RevisionConflict(current)
       const next = { revision: baseRevision + 1, save }
       tx.set(ref, { ...next, updatedAt: admin.firestore.FieldValue.serverTimestamp() })
       return next
