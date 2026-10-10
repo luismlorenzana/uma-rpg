@@ -15,7 +15,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: null,
-      includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
+      // App icons are drawn in uma-platform (scripts/pixel-art, `pnpm art:icons`) and copied here; iOS keeps the icon it saw
+      // at Add to Home Screen, so change them only with a reinstall in mind.
+      includeAssets: ['icons/icon-64.png', 'icons/apple-touch-icon.png'],
       manifest: {
         name: 'Uma RPG',
         short_name: 'Uma RPG',
