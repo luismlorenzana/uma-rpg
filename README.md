@@ -6,7 +6,7 @@ party battles.
 
 ## Status
 
-Phase 1, design spec: draft v0.1 is under owner review. The scaffold and the RPG rules port come next. See the
+Phase 1, design spec: draft v0.3 and the item catalog are under owner review. The scaffold and the RPG rules port come next. See the
 cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
 
 ## Where things are decided
