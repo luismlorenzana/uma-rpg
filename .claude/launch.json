@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rpg-api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@rpg/api", "dev"],
+      "port": 8081
+    },
+    {
+      "name": "rpg-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@rpg/web", "dev"],
+      "port": 5174
+    }
+  ]
+}

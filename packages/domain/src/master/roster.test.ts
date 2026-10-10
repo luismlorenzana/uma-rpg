@@ -1,6 +1,6 @@
 import { syntheticMasterData } from '@luismlorenzana/uma-data/testing'
 import { describe, expect, it } from 'vitest'
-import { buildChapters, buildRoster, chapterFor, displayText, matchesSearch } from './roster'
+import { buildChapters, buildRoster, chapterFor, displayText, matchesSearch, skillText } from './roster'
 
 describe('master data adapter', () => {
   it('maps every synthetic outfit with its character, stats and unique skill', () => {
@@ -22,10 +22,14 @@ describe('master data adapter', () => {
     expect(buildRoster(data)).toEqual([])
   })
 
-  it('tolerates a unique skill id the release does not hold', () => {
+  it('resolves unique skills lazily and tolerates ids the release does not hold', () => {
     const data = syntheticMasterData()
-    data.skills = []
-    expect(buildRoster(data).every((o) => o.uniqueSkill === null)).toBe(true)
+    const roster = buildRoster(data)
+    const withSkill = roster.find((o) => o.uniqueSkillId !== null)
+    expect(withSkill).toBeDefined()
+    expect(skillText(data.skills, withSkill?.uniqueSkillId ?? null)?.name.length).toBeGreaterThan(0)
+    expect(skillText(new Map(), withSkill?.uniqueSkillId ?? null)).toBeNull()
+    expect(skillText(data.skills, null)).toBeNull()
   })
 
   it('puts five chapters in a tier, ten levels each', () => {

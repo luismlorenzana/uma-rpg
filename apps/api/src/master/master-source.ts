@@ -27,7 +27,11 @@ export function contentTypeFor(path: string): string {
   return CONTENT_TYPES[path.slice(path.lastIndexOf('.') + 1).toLowerCase()] ?? 'application/octet-stream'
 }
 
-/** Local dev: uma-platform's local release folder (`content/release` there), so dev never needs cloud credentials. */
+/**
+ * Local dev: uma-platform's local release folder (`content/release` there, P31), so dev never needs cloud credentials.
+ * That folder holds the files at their manifest paths (`data/…`, `art/…`) plus `manifest.json`, where the bucket has
+ * them under `files/`.
+ */
 export class DirectoryMasterSource implements MasterSource {
   private readonly root: string
   constructor(dir: string) {
@@ -37,7 +41,8 @@ export class DirectoryMasterSource implements MasterSource {
   async read(path: string): Promise<Uint8Array | null> {
     // The local release keeps the manifest at `manifest.json`; serve it for any `manifests/v1/<version>.json` and
     // synthesize the `latest` channel from it, so the local folder behaves like the bucket.
-    const full = resolve(this.root, path)
+    const local = path.startsWith('files/') ? path.slice('files/'.length) : path
+    const full = resolve(this.root, local)
     if (!full.startsWith(this.root + sep)) return null
     try {
       return new Uint8Array(await readFile(full))

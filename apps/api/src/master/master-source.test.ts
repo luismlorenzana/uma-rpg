@@ -24,9 +24,9 @@ describe('master data proxy', () => {
 
   it('serves a local release folder like the bucket', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'rpg-master-'))
-    await mkdir(join(dir, 'files', 'data'), { recursive: true })
+    await mkdir(join(dir, 'data'), { recursive: true })
     await writeFile(join(dir, 'manifest.json'), JSON.stringify({ schemaMajor: 1, version: 'abcdef123456', createdAt: '2026-10-10T00:00:00.000Z' }))
-    await writeFile(join(dir, 'files', 'data', 'x.json'), '{"ok":true}')
+    await writeFile(join(dir, 'data', 'x.json'), '{"ok":true}')
     const source = new DirectoryMasterSource(dir)
     const channel = JSON.parse(new TextDecoder().decode((await source.read('channels/v1/latest.json')) ?? new Uint8Array()))
     expect(channel).toMatchObject({ version: 'abcdef123456', manifest: 'manifests/v1/abcdef123456.json', channel: 'latest' })
