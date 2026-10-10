@@ -25,3 +25,8 @@ Newest entries at the bottom. To reverse a decision, add a new entry that supers
 | D18 | 2026-10-10 | **Item depth:** every produce type has its own Hub site and its own effect. No families of near-identical items | Owner (Q5): uma-racer's five milks and five fruits were too shallow |
 | D19 | 2026-10-10 | **Three steps only:** raw → refined (1 → 1) → cooked or crafted. No packaging step | Owner (Q5): uma-racer's packaging tier is folded into cooking |
 | D20 | 2026-10-10 | **Parity:** there are as many material types as ingredient types, and cooking and crafting take equal time, so an Uma's time splits evenly between them | Owner (Q5) |
+| D21 | 2026-10-10 | **The Hub has four pages**, swapped freely: Farmlands, Wilds, Learning District (several class hubs and weapon hubs) and Town (roster, parties, scenarios, inventory and more) | Owner |
+| D22 | 2026-10-10 | Each Hub place shows **tiny icons of its assigned Umas**, and tapping it opens a **side overlay** previewing them | Owner |
+| D23 | 2026-10-10 | **Extra Stats** use small increments and many slots, on uma-racer's Sun-and-planets model | Owner. Proposed: 8 planets × 10 moons, 16 bridges, 4 Sun nodes; N = 5 + ⌊level / 2⌋ active |
+| D24 | 2026-10-10 | Item grades 9–10 are **legendary** in every family, and their icons carry glints | Claude: one visual rule for the top of every ladder |
+| D25 | 2026-10-10 | Item icons are generated from code by `tools/pixel-art` (32×32, selective outline, hue-shifted ramps, top-left light). They live in uma-rpg until a second game needs them, then move to `uma-platform/assets/` | Claude. A deliberate exception to P15 while uma-platform's Phase 0 is in flight; P11's extract-on-second-use applies |

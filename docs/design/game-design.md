@@ -1,6 +1,7 @@
-# Uma RPG — game design (draft v0.2)
+# Uma RPG — game design (draft v0.3)
 
-> **Status: draft for owner review, 2026-10-10.** v0.2 folds in the owner's answers to Q1–Q5 (D14–D20). This is the
+> **Status: draft for owner review, 2026-10-10.** v0.2 folded in the owner's answers to Q1–Q5 (D14–D20). v0.3 adds the
+> four-page Hub, the Learning District and the Sun-and-planets Extra Stats map (D21–D23). This is the
 > first spec for uma-rpg as a standalone game. It will split into one doc per system once each system is approved.
 >
 > Every rule is tagged:
@@ -127,9 +128,9 @@ Every Uma has several independent levels, all per tier.
 | **Uma Level** | 1–50 | Battles | Stats, skill points, Shards (Tier 1), Extra Stat capacity |
 | **Farming & Cooking** | 1–50 | Farm sites, the Pantry and the Kitchen | Higher ingredient grades and dishes |
 | **Gathering & Crafting** | 1–50 | Gathering sites, the Workbench and the Forge | Higher material grades and equipment |
-| **Class proficiency** | Ranks 1–6, per class | Class Hall | Skill depths in that class's trees |
-| **Weapon mastery** | Ranks 1–10, per weapon type | Weapon Yard | Higher weapon grades |
-| **Armor mastery** | Ranks 1–10, per armor type | Armor Yard | Higher armor grades |
+| **Class proficiency** | Ranks 1–6, per class | Class halls | Skill depths in that class's trees |
+| **Weapon mastery** | Ranks 1–10, per weapon type | Armories | Higher weapon grades |
+| **Armor mastery** | Ranks 1–10, per armor type | Armories | Higher armor grades |
 
 - **[Owner]** Two profession verticals, Farming + Cooking and Gathering + Crafting, that take **equal time** (§8.5).
 - **[Open]** A third vertical, possibly as a later tier's new mechanic.
@@ -167,17 +168,29 @@ fills the grades between in even steps:
 - **[Proposed]** **Skill points come from Uma Level, and every class tree gets the full amount.** Classes don't compete
   for points, so switching costs nothing; class rank is the real investment. Learned skills stay with their class.
 
-## 6. Training facilities and assignments
+## 6. Learning District and assignments
 
-**[Owner]** Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself:
+**[Owner]** Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself. They fill the Hub's
+Learning District (§9), with **several class hubs and several weapon hubs** (D21).
+
+**[Proposed]** One hall per class and one armory per distance:
 
 | Facility | Each slot trains | Unlocks |
 |---|---|---|
-| **Class Hall** | One class's proficiency | Deeper skills in that class |
-| **Weapon Yard** | One weapon type's mastery | Higher-grade weapons of that type |
-| **Armor Yard** | One armor type's mastery | Higher-grade armor of that type |
+| **Brawler Dojo** | Brawler proficiency | Deeper Brawler skills |
+| **Mage Tower** | Mage proficiency | Deeper Mage skills |
+| **Spell Blade Salle** | Spell Blade proficiency | Deeper Spell Blade skills |
+| **Cleric Chapel** | Cleric proficiency | Deeper Cleric skills |
+| **Summoner Circle** | Summoner proficiency | Deeper Summoner skills |
+| **Sprint Armory** | Short Sword, Bow or Garb mastery | Higher grades of that gear |
+| **Mile Armory** | Spear, Axe or Leather mastery | Higher grades of that gear |
+| **Medium Armory** | Mage Staff, Arcane Staff or Mail mastery | Higher grades of that gear |
+| **Long Armory** | Greatsword, Cleric Staff, Summoner Tome or Plate mastery | Higher grades of that gear |
 
-- **[Proposed]** A facility starts with **2 slots** and gains a third with an upgrade (§9).
+- **[Proposed]** Each armory holds one distance's gear (§7.2), so the Uma's aptitude for that distance sets her speed
+  anywhere in the building, and each class hall pairs with one running style (§4.1).
+- **[Proposed]** A facility starts with **2 slots** and gains a third with an upgrade (§9). Each slot trains one class or
+  one gear type.
 - **[Proposed]** Time to the next rank grows with the rank and is scaled by aptitude (§4.1). Training runs while the
   app is closed.
 
@@ -251,23 +264,24 @@ Eight effects. Each effect has one farming family and one gathering family, and 
 
 | Effect | Farming family | Site | Gathering family | Site |
 |---|---|---|---|---|
-| HP | Grains | Fields | Hides & Scales | Hunting Grounds |
+| HP | Grains | Fields | Hides & Scales | Monster Den |
 | MP | Fruits | Orchard | Essences | Ley Spring |
-| ATK | Fish | Fish Pond | Ores | Mine |
+| ATK | Fish | Fishery | Ores | Mine |
 | M.ATK | Herbs & Spices | Herb Garden | Crystals | Crystal Cavern |
 | DEF | Vegetables | Vegetable Garden | Stones | Quarry |
 | M.DEF | Mushrooms | Mushroom Cave | Fibers | Meadow |
-| Speed | Sweets (honey, cane, cacao, maple…) | Apiary | Woods | Forest |
+| Speed | Sweets (honey, cane, cacao, maple…) | Sugar Grove | Woods | Forest |
 | Limit Break charge | Nuts & Seeds | Nut Grove | Bones & Horns | Fossil Dig |
 
 - **10 items per family, one per grade.** Grade k unlocks at profession **Lv 5k − 4** (1, 6, 11 … 46), the same ladder
   in every family on both sides.
 - **Totals:** 80 raw ingredients and 80 raw materials, then 80 + 80 refined.
+- Grades 1–8 run from common to rare. **Grades 9–10 are legendary** in every family and carry glints (D24).
 - Example families:
-  - Fruits: apple, pear, peach, plum, orange, grape, mango, fig, pomegranate, starfruit.
-  - Ores: copper, tin, iron, silver, cobalt, gold, platinum, mythril, adamantite, orichalcum.
+  - Fruits: apple, pear, peach, plum, orange, grape, mango, pomegranate, starpeach, golden apple.
+  - Ores: copper, tin, iron, silver, cobalt, gold, platinum, titanium, mythril, orichalcum.
 - Battles drop a few raw items from **both** sides in equal amounts, as a bonus and never the only source.
-- The full item catalog (names and icons) is its own doc. Every icon is original pixel art generated by script.
+- The full catalog is [items.md](items.md). Every icon is original pixel art generated by `tools/pixel-art` (D25).
 
 ### 8.3 Refining, 1 → 1 **[Owner]**
 
@@ -293,7 +307,7 @@ raw item has exactly one refined form of the same grade:
 | Sets the effect | The **star** ingredient's family | The **accent** material's family |
 | Sets the grade | The star ingredient | The main material |
 | Other inputs | 1–3 side ingredients from other families | The main material (sets the type) plus 0–2 more |
-| Variety | At least one dish per family per grade (80+), across dish types: soups, breads, grills, salads, desserts, drinks, feasts | Gear type × grade × accent effect |
+| Variety | At least one dish per family per grade (80+), across dish types: soups, breads, grills, salads, desserts, drinks. Plus **Duo dishes** (two star families) and **Feasts** (all eight) for the Extra Stats bridges and Sun (§10) | Gear type × grade × accent effect |
 | Feeds | Extra Stats (§10) | Equipment (§7) |
 
 Side ingredients and extra materials are spread so **every family is in demand** on both sides.
@@ -313,40 +327,54 @@ Side ingredients and extra materials are spread so **every family is in demand**
 - A finished job pays its item and profession XP to the Uma who worked it.
 - Exact timers come from a pacing model in the balance pass.
 
-## 9. Hub map **[Owner]**, with layout **[Proposed]**
+## 9. Hub **[Owner]**, with layout **[Proposed]**
 
-**[Owner]** Home is a huge map that opens many passive facilities.
+**[Owner]** (D21) Home is the Hub: **four pages you can swap between freely**, each one a big map.
+
+| Page | Places |
+|---|---|
+| **Farmlands** | The 8 farming sites, the Pantry and the Kitchen |
+| **Wilds** | The 8 gathering sites, the Workbench and the Forge |
+| **Learning District** | The 5 class halls and the 4 armories (§6) |
+| **Town** | Stable (roster), Party Hall (parties), Scenario Gate (chapters), Warehouse (inventory), Observatory (Extra Stats), the Tier Finale landmark |
+
+**[Owner]** (D22) Each place shows **tiny icons of the Umas assigned to it**. Tapping a place opens a **side overlay**
+previewing those Umas.
 
 **[Proposed]**
 
-- One map per tier world: a Phaser scene, scrollable and zoomable, built from original pixel tiles.
-- Districts:
-  - **Farmlands** (8 sites): Fields, Orchard, Fish Pond, Herb Garden, Vegetable Garden, Mushroom Cave, Apiary, Nut Grove.
-  - **Wilds** (8 sites): Hunting Grounds, Ley Spring, Mine, Crystal Cavern, Quarry, Meadow, Forest, Fossil Dig.
-  - **Town:** Pantry and Kitchen; Workbench and Forge.
-  - **Academy:** Class Hall, Weapon Yard, Armor Yard.
-  - **The Gate:** chapters.
-  - **The Tier Finale landmark.**
-- Farmlands and Wilds mirror each other across the map.
-- Assigned Umas show as chibis working at their site. A badge marks finished jobs. Tapping a site opens a React sheet
-  (assign, collect, upgrade).
+- Both at once: face icons with a progress ring always sit on the map, and the overlay shows larger portraits, job
+  progress and the actions (Collect, Assign, Recall, Upgrade).
+- Farmlands and Wilds mirror each other, site for site.
+- Pages switch with a bottom tab bar or a sideways swipe. A badge on a tab counts finished jobs on that page.
+- Each page is a Phaser scene you can scroll and zoom, built from original pixel tiles. Overlays are React.
+- One Hub per tier world.
 - **Facility levels** are the tier world's own progression: materials from both sides upgrade a facility for more
   slots and speed. These levels stay with the tier world (§2.2).
 
-## 10. Extra Stats **[Owner]**, with structure **[Proposed]**
+## 10. Extra Stats: the Sun and its planets **[Owner]**, with structure **[Proposed]**
 
-**[Owner]** (D17) An Uma eats dishes to unlock Extra Stat slots, then assigns **at most N of her unlocked slots**.
-Claude sets the numbers.
+**[Owner]** (D17, D23) An Uma eats dishes to unlock Extra Stat nodes and activates at most N of them. Increments are
+**small** and there are **many slots**, for variety in builds, on the model of uma-racer's Sun-and-planets map. Claude
+sets the numbers.
 
-**[Proposed]**
+**[Proposed] One map per Uma per tier, with 100 nodes:**
 
-- **Each different dish she eats unlocks one slot**, kept for the tier. The slot's effect is the dish's star family
-  (§8.2): HP, MP, ATK, M.ATK, DEF, M.DEF, Speed or Limit Break charge. Its value grows with the dish's grade.
-- **Active slots: N = 1 + ⌊Uma Level / 10⌋.** That's 1 until Lv9, then one more at Lv 10, 20, 30, 40 and 50, for
-  **6 at Lv50**.
-- Choose which unlocked slots are active and swap them freely outside a fight. Better dishes replace weaker ones in the
-  active set, so cooking keeps paying off.
-- Slot values come from the balance pass, together with equipment (§7.3).
+| Part | Nodes | Each node gives | Unlocked by eating |
+|---|---|---|---|
+| **8 planets**, one per effect, in a ring | 10 moons each: 80 | +1 point of that effect | A dish starring that effect's family, of grade ≥ the moon's number |
+| **8 bridges** between neighboring planets | 2 per pair: 16 | +½ point to each effect of the pair | A **Duo dish** starring both families (grade ≥ 3, then ≥ 7) |
+| **The Sun** at the center | 4 | +⅛ point to all eight effects | A **Feast** cooked from all eight families (grade ≥ 4, 6, 8, then 10) |
+
+- **Ring order:** HP – DEF – M.DEF – MP – M.ATK – ATK – Speed – Limit Break charge, then back to HP. Bridges pair stats
+  that build together: HP + DEF, MP + M.ATK, ATK + Speed.
+- **Every node is worth one point in total.** A point is a small fixed share of the stat, set in the balance pass
+  together with equipment (§7.3).
+- **One dish unlocks one node** and is eaten. Unlocked nodes stay for the tier.
+- **Active nodes: N = 5 + ⌊Uma Level / 2⌋**, so 5 at Lv1 and 30 at Lv50. Swap them freely outside a fight. With 100
+  nodes and 30 active, a build can stack one effect (its 10 moons plus both bridges), spread across everything with
+  the Sun, or land anywhere between.
+- The map opens from the Observatory in Town and from the Uma's profile.
 
 ## 11. Difficulty **[Owner]**
 
@@ -372,6 +400,7 @@ Claude sets the numbers.
 1. The owner reviews v0.2.
 2. Split into per-system docs: tiers and collection, classes and mastery, equipment, professions and items, Extra
    Stats, Hub.
-3. Catalogs: the 160 raw and 160 refined items, dishes and gear. Then the pacing model: timers, XP curves, and slot
-   and gear values.
-4. Phase 1 scaffold and the port of the battle engine.
+3. Catalogs: raw and refined items are drafted ([items.md](items.md)); dishes and gear are next. Then the pacing model:
+   timers, XP curves, and node and gear values.
+4. Icons for the remaining 14 families, once the owner approves the style of the first two.
+5. Phase 1 scaffold and the port of the battle engine.
