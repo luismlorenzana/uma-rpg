@@ -9,7 +9,7 @@ T010–T013 are done: place pages, save v2 and its rules, the Stable page and th
 
 | Task | What | Status |
 |---|---|---|
-| [T014](T014-s2-release.md) | Hub summaries, Account count, deploy and phone check | Built; deploying, then the owner's check |
+| [T014](T014-s2-release.md) | Hub summaries, Account count, deploy and phone check | Live (`2c60abe`, pipeline green); the owner's phone check is next |
 
 ## Conventions every task follows
 
