@@ -98,7 +98,10 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
         {stages.map((n, i) => {
           const s = status(n.id)
           const wins = run.wins[n.id] ?? 0
-          const lead = n.kind !== 'fight' ? n.enemies[0]?.castId : undefined
+          // Waves (W3): the boss leads her last wave.
+          const waves = [n.enemies, ...(n.waves ?? [])]
+          const foes = waves.reduce((sum, w) => sum + w.length, 0)
+          const lead = n.kind !== 'fight' ? waves.at(-1)![0]?.castId : undefined
           return (
             <li key={n.id}>
               <button type="button" onClick={() => setOpen(n)} aria-label={`Stage ${i + 1}, ${n.name}, ${s}`}
@@ -110,7 +113,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
                   <span className="block truncate text-[14px] font-semibold">{n.name}{n.kind === 'boss' ? ' ★' : n.kind === 'sub-boss' ? ' ♛' : ''}</span>
                   <span className="flex items-center gap-1 text-[12px] text-ink-soft">
                     {signatureOf(n).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
-                    <span>{n.enemies.length} foe{n.enemies.length > 1 ? 's' : ''}</span>
+                    <span>{waves.length > 1 ? `${waves.length} waves · ` : ''}{foes} foe{foes > 1 ? 's' : ''}</span>
                   </span>
                 </span>
                 <span className="shrink-0 text-[12px] text-ink-faint">{s === 'cleared' ? `✓${wins > 1 ? ` ×${wins}` : ''}` : s === 'locked' ? 'locked' : 'open'}</span>
@@ -138,28 +141,36 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           <p className="mb-2 flex items-center gap-1 text-[13px] text-ink-soft">
             {formatLevel(open.level)} · {open.kind === 'boss' ? 'Region boss' : open.kind === 'sub-boss' ? 'Elite' : 'Stage'} ·
             {signatureOf(open).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
+            {open.waves?.length ? ` · ${open.waves.length + 1} waves, pays 1.5×` : ''}
           </p>
-          <ul className="space-y-1.5">
-            {open.enemies.map((e) => (
-              <li key={e.id} className="flex items-center gap-2 rounded-sm bg-raised p-2">
-                <CastFace campaign={campaign} castId={e.castId} size={40} />
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-1 text-[13px] font-semibold">
-                    <ElementGlyph element={e.element} size={14} />
-                    <span className="truncate">{campaign.name(e.id, e.castId)}</span>
-                    {e.rank !== 'regular' && <span className="rounded-xs bg-accent/20 px-1 text-[10px] text-accent">{e.rank === 'boss' ? 'Boss' : 'Elite'}</span>}
-                  </p>
-                  <p className="flex items-center gap-1 text-[11px] text-ink-soft">Shield {e.shield} · weak <WeaknessIcons weaknesses={e.weaknesses} size={12} /></p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {[open.enemies, ...(open.waves ?? [])].map((wave, w, all) => (
+            <section key={w} className="mb-2">
+              {all.length > 1 && <h3 className="text-micro mb-1">Wave {w + 1}</h3>}
+              <ul className="space-y-1.5">
+                {wave.map((e) => (
+                  <li key={e.id} className="flex items-center gap-2 rounded-sm bg-raised p-2">
+                    <CastFace campaign={campaign} castId={e.castId} size={40} />
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-1 text-[13px] font-semibold">
+                        <ElementGlyph element={e.element} size={14} />
+                        {e.element2 && <ElementGlyph element={e.element2} size={14} />}
+                        <span className="truncate">{campaign.name(e.id, e.castId)}</span>
+                        {e.rank !== 'regular' && <span className="rounded-xs bg-accent/20 px-1 text-[10px] text-accent">{e.rank === 'boss' ? 'Boss' : 'Elite'}</span>}
+                        {e.twice && <span className="rounded-xs bg-danger/20 px-1 text-[10px] text-danger">Acts twice</span>}
+                      </p>
+                      <p className="flex items-center gap-1 text-[11px] text-ink-soft">Shield {e.shield} · weak <WeaknessIcons weaknesses={e.weaknesses} size={12} /></p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
           {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
         </BottomSheet>
       )}
       {sweepFor && (
         <BottomSheet title="Sweep" onClose={() => setSweepFor(null)}>
-          <p className="mb-3 text-[13px] text-ink-soft">Each sweep pays this stage's EXP and Shards (no Laurels or tokens) for one Sweep Ticket. You have {world.wallet.sweepTickets}.</p>
+          <p className="mb-3 text-[13px] text-ink-soft">Each sweep pays like a replay, a quarter of this stage's first clear (its EXP, Laurels and tokens' chance), for one Sweep Ticket. You have {world.wallet.sweepTickets}.</p>
           <div className="grid grid-cols-4 gap-2">
             {[1, 5, 10, world.wallet.sweepTickets].filter((n, i, a) => n >= 1 && n <= world.wallet.sweepTickets && a.indexOf(n) === i).map((n) => (
               <button key={n} type="button" onClick={() => void doSweep(sweepFor, n)} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">

@@ -3,7 +3,7 @@
 // rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  autoAction, battleActionsLeft, battleBroken, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  autoAction, battleActionsLeft, battleBroken, battleFoe, battleWaveCount, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -53,12 +53,14 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         cheer: await maybe(path('outfit-chibis', `${a.id}-b`)),
         bust: await maybe(path('outfit-busts', a.id)),
       }))),
-      Promise.all(state.input.enemies.map(async (e) => {
+      // Every wave's rivals load up front, so the next wave steps in without a wait (W3).
+      Promise.all([state.input.enemies, ...(state.input.waves ?? [])].flat().map(async (e) => {
         const member = campaign.cast.byId.get(e.castId)
         return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null) }
       })),
     ]).then(([allies, enemies]) => {
-      if (live) setSetup({ allies, enemies, color: campaign.color(chapter.id), reducedMotion })
+      const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
+      if (live) setSetup({ allies, enemies, field, color: campaign.color(chapter.id), reducedMotion })
     })
     return () => {
       live = false
@@ -139,7 +141,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   }, [])
 
   const name = (id: string) => {
-    const enemy = live?.input.enemies.find((e) => e.id === id)
+    const enemy = live ? battleFoe(live, id) : undefined
     return enemy ? campaign.name(id, enemy.castId) : campaign.name(id)
   }
 
@@ -183,7 +185,11 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       const g = game.current
       if (g) {
         await g.play(step.cues.filter((c) => c.kind !== 'intent'), (c) => {
-          display = followCue(display, c)
+          // A new wave (W3) is the act's last cue: the stage and the overlay jump to the foes stepping in.
+          if (c.kind === 'wave') {
+            display = step.state
+            g.sync(step.state)
+          } else display = followCue(display, c)
           setShown(display)
           setCue(c)
         })
@@ -243,7 +249,8 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
   const enemies = shown.units.filter((u) => u.side === 'enemy')
   const allies = shown.units.filter((u) => u.side === 'ally')
-  const layout = size.w > 0 ? stageLayout(size.w, size.h, state.input.enemies.map((e) => e.rank), allies.length) : null
+  const layout = size.w > 0 ? stageLayout(size.w, size.h, enemies.map((u) => battleFoe(state, u.id)!.rank), allies.length) : null
+  const waves = battleWaveCount(state.input)
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-page">
@@ -255,6 +262,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
           <p className="truncate text-[11px] text-ink-faint">{chapter.title}</p>
           <h1 className="truncate text-[15px] leading-tight">{node?.name ?? 'Fight'}</h1>
         </div>
+        {waves > 1 && <span className="rounded-full bg-[#8fd3ff]/15 px-2 py-1 text-[11px] font-bold text-[#8fd3ff]" aria-label={`Wave ${(shown.wave ?? 0) + 1} of ${waves}`}>W{(shown.wave ?? 0) + 1}/{waves}</span>}
         <span className="rounded-full bg-sunken px-2 py-1 text-[11px] font-bold">Round {state.round}</span>
         <button type="button" aria-pressed={prefs.auto} aria-label={`Auto-battle ${prefs.auto ? 'on' : 'off'}`}
           onClick={() => setPrefs((current) => ({ ...current, auto: !current.auto }))}
@@ -274,11 +282,14 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       <div ref={stageRef} className="relative min-h-0 flex-1 overflow-hidden" onClick={() => playing && game.current?.skip()}>
         {setup ? <BattleStage setup={setup} state={state} speed={prefs.speed} onGame={onGame} /> : <p className="p-6 text-center text-ink-soft">Setting the stage…</p>}
         {layout && enemies.map((unit, i) => {
-          const enemy = state.input.enemies.find((e) => e.id === unit.id)!
+          const enemy = battleFoe(state, unit.id)!
           const box = layout.enemies[i]!
           const info = layout.enemyInfo[i]!
-          const intent = state.intents.find((x) => x.enemyId === unit.id)
-          const move = intent && [...enemy.moves, ...(enemy.phaseTwo?.moves ?? [])].find((m) => m.id === intent.moveId)
+          // A foe that acts twice (W3) shows both of this round's moves.
+          const intents = state.intents.filter((x) => x.enemyId === unit.id)
+          const intent = intents[0]
+          const moveOf = (id: string) => [...enemy.moves, ...(enemy.phaseTwo?.moves ?? [])].find((m) => m.id === id)
+          const move = intent && moveOf(intent.moveId)
           const preview = actor && unit.hp > 0 && mode.kind !== 'guard' && !playing ? previewTarget(state, actor.id, effective, unit.id) : null
           const broken = battleBroken(unit)
           return (
@@ -290,7 +301,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   e.stopPropagation()
                   tapEnemy(unit)
                 }}
-                aria-label={`${name(unit.id)}, ${enemy.element}, HP ${unit.hp} of ${enemy.stats.hp}, ${broken ? 'broken' : `shield ${unit.shield}`}`}
+                aria-label={`${name(unit.id)}, ${enemy.element}${enemy.element2 ? ` and ${enemy.element2}` : ''}${enemy.twice ? ', acts twice' : ''}, HP ${unit.hp} of ${enemy.stats.hp}, ${broken ? 'broken' : `shield ${unit.shield}`}`}
                 className="absolute rounded-md"
                 style={{ left: box.x, top: box.y, width: box.w, height: box.h }}
               >
@@ -305,6 +316,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
               <div className={`pointer-events-none absolute flex flex-col items-center gap-0.5 text-center ${unit.hp <= 0 ? 'opacity-30' : ''}`} style={{ left: info.x, top: info.y, width: info.w }}>
                 <p className="flex max-w-full items-center gap-0.5 text-[11px] font-semibold leading-tight">
                   <ElementGlyph element={enemy.element} size={12} />
+                  {enemy.element2 && <ElementGlyph element={enemy.element2} size={12} />}
                   <span className="truncate">{name(unit.id)}</span>
                 </p>
                 <Bar className="w-full max-w-24" value={unit.hp} max={enemy.stats.hp} />
@@ -314,7 +326,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 </div>
                 {move && unit.hp > 0 && !broken && (
                   <p className="line-clamp-1 max-w-full text-[9.5px] leading-3 text-ink-faint">
-                    {move.label} → {intent!.targetId === 'all' ? 'all' : name(intent!.targetId)}
+                    {intents.map((x) => `${moveOf(x.moveId)?.label ?? ''} → ${x.targetId === 'all' ? 'all' : name(x.targetId)}`).join(' · ')}
                   </p>
                 )}
               </div>
@@ -420,7 +432,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
             {[...choices].sort((a, b) => (ally?.weapons.indexOf(a.skill.node.weapon) ?? 0) - (ally?.weapons.indexOf(b.skill.node.weapon) ?? 0)).map((choice) => {
               const kinds = skillKinds(choice.skill.def)
               const weak = enemies.filter((u) => {
-                const w = state.input.enemies.find((e) => e.id === u.id)!.weaknesses
+                const w = battleFoe(state, u.id)!.weaknesses
                 return u.hp > 0 && kinds.some((k) => (w.elements as string[]).includes(k) || (w.weapons as string[]).includes(k))
               })
               const def = choice.skill.def

@@ -72,9 +72,10 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Battles (D48–D53)
 
-- `@rpg/domain/rpg` is uma-racer's engine v5 (deterministic reducer: `createBattle`, `applyBattleAction`,
-  `replayBattle`), its class catalog, and its campaign re-cut to ten-level chapters, generated from the scenario order
-  and the cast. The web app builds Tier 1's chapters once per master release and cast (`battle/campaign.tsx`).
+- `@rpg/domain/rpg` is the battle engine, v7 since W3 (D91: up to eight foes a wave, dual-element foes, foes that act
+  twice, waves; v6 fights still replay), a deterministic reducer first ported from uma-racer (`createBattle`,
+  `applyBattleAction`, `replayBattle`, `battleFoe` across waves), the class catalog (D86) and the campaign machinery the
+  world map reuses (`world/world.ts` builds each region as a small chapter). The web app builds Tier 1's chapters once per master release and cast (`battle/campaign.tsx`).
 - Every fight action goes through the store (`fightAction`): the domain applies it to the save, and when it ends the
   fight the rewards land in the same save. The screen then plays the engine's cues.
 - The fight screen (`places/scenario-gate/FightScreen.tsx`) is a lazy Phaser stage (`battle/scene/`, DPR-aware like

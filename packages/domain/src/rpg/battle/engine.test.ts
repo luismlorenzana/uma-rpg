@@ -200,3 +200,94 @@ describe('Limit Break (D311, D86)', () => {
     expect(grand.state.summons).toEqual([{ allyId: 'a5', ref: skill('summoner-tome-fire.1'), scale: 0.6 }])
   })
 })
+
+describe('battle engine v7: eight foes, dual elements, twice-acting elites, waves (W3)', () => {
+  const v7 = (enemies: BattleEnemy[], waves?: BattleEnemy[][]): BattleInput => ({ version: 7, seed: 1234, allies: party(), enemies, ...(waves ? { waves } : {}) })
+  /** Every ready ally attacks the first living foe with her first weapon (a Spell Blade adds a Tome half). */
+  const round = (s: BattleState): BattleState => {
+    let state = s
+    const start = state.round
+    while (state.outcome === 'active' && state.round === start) {
+      const a = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)
+      const target = state.units.find((u) => u.side === 'enemy' && u.hp > 0)
+      if (!a || !target) break
+      const source = state.input.allies.find((x) => x.id === a.id)!
+      const pair = source.classId === 'spellblade' ? { pair: { weapon: source.weapons.find((w) => w.startsWith('tome-')) } } : {}
+      state = act(state, { kind: 'attack', actorId: a.id, targetId: target.id, weapon: source.weapons.find((w) => !w.startsWith('tome-')) ?? source.weapons[0], ...pair })
+    }
+    return state
+  }
+
+  it('fields up to eight foes in v7 and five in v6; dual elements, twice and waves are v7 only', () => {
+    const eight = Array.from({ length: 8 }, (_, i) => foe(`f${i + 1}`, 'fire'))
+    expect(createBattle(v7(eight)).state.units.filter((u) => u.side === 'enemy')).toHaveLength(8)
+    expect(() => createBattle(v7([...eight, foe('f9', 'fire')]))).toThrow(/header/)
+    expect(() => createBattle(input(eight.slice(0, 6)))).toThrow(/header/)
+    const dual = { ...foe('f1', 'fire'), element2: 'dark' as const }
+    expect(() => createBattle(v7([dual]))).not.toThrow()
+    expect(() => createBattle(input([dual]))).toThrow(/enemy/)
+    expect(() => createBattle(v7([{ ...dual, element2: 'fire' }]))).toThrow(/enemy/)
+    expect(() => createBattle({ ...input([foe('f1', 'fire')]), waves: [[foe('f2', 'ice')]] })).toThrow(/header/)
+    expect(() => createBattle(v7([foe('f1', 'fire')], [[foe('f1', 'ice')]]))).toThrow(/Duplicate/)
+    expect(() => createBattle(v7([foe('f1', 'fire')], [[foe('f2', 'ice')], [foe('f3', 'ice')], [foe('f4', 'ice')]]))).toThrow(/header/)
+  })
+
+  it('splits a dual foe’s elemental moves between her two elements', () => {
+    const f = rpgFoe({ id: 'f1', castId: 'c', element: 'fire', element2: 'dark', role: 'champion', rank: 'boss', level: 10, shield: 6,
+      weaknesses: { weapons: ['axe'], elements: ['lightning', 'light'] } })
+    const elements = new Set([...f.moves, ...f.phaseTwo!.moves].map((m) => m.element).filter(Boolean))
+    expect(elements).toEqual(new Set(['fire', 'dark']))
+    expect(f.element2).toBe('dark')
+  })
+
+  it('lets a twice-acting foe move twice a round, both after everyone’s first', () => {
+    const s = createBattle(v7([{ ...foe('f1', 'fire'), twice: true }, foe('f2', 'ice')])).state
+    expect(s.intents.map((i) => i.enemyId).filter((id) => id === 'f1')).toHaveLength(2)
+    expect(s.intents.at(-1)!.enemyId).toBe('f1')
+    // Same input without the flag: one move each.
+    expect(createBattle(v7([foe('f1', 'fire'), foe('f2', 'ice')])).state.intents).toHaveLength(2)
+  })
+
+  it('brings the next wave in a fresh round, keeping the party’s HP, MP and Limit charge', () => {
+    const weak = (id: string) => ({ ...foe(id, 'ice'), stats: { ...foe(id, 'ice').stats, hp: 1 } })
+    let s = createBattle(v7([weak('f1')], [[foe('f2', 'ice'), foe('f3', 'ice')], [foe('f4', 'ice')]])).state
+    expect(s.wave).toBe(0)
+    const before = s.units.filter((u) => u.side === 'ally').map((u) => ({ id: u.id, mp: u.mp }))
+    const step = applyBattleAction(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(step.error).toBeUndefined()
+    s = step.state
+    expect(step.cues.some((c) => c.kind === 'wave' && c.label === 'Wave 2 of 3')).toBe(true)
+    expect(s.outcome).toBe('active')
+    expect(s.wave).toBe(1)
+    expect(s.round).toBe(2)
+    expect(s.acted).toEqual([])
+    expect(s.units.filter((u) => u.side === 'enemy').map((u) => u.id)).toEqual(['f2', 'f3'])
+    expect(s.intents.every((i) => ['f2', 'f3'].includes(i.enemyId))).toBe(true)
+    expect(unitOf(s, 'a1').limit).toBe(battleLimitGain('attack'))
+    expect(s.units.filter((u) => u.side === 'ally').map((u) => ({ id: u.id, mp: u.mp }))).toEqual(before)
+    // Fight on to the end: the last wave's fall is the victory, and a replay lands the same state.
+    const actions: BattleAction[] = []
+    let state = s
+    for (let n = 0; n < 60 && state.outcome === 'active'; n++) {
+      const a = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)!
+      const t = state.units.find((u) => u.side === 'enemy' && u.hp > 0)!
+      const source = state.input.allies.find((x) => x.id === a.id)!
+      const action: BattleAction = { kind: 'attack', actorId: a.id, targetId: t.id, weapon: source.weapons.find((w) => !w.startsWith('tome-')) ?? source.weapons[0],
+        ...(source.classId === 'spellblade' ? { pair: { weapon: source.weapons.find((w) => w.startsWith('tome-')) } } : {}) }
+      actions.push(action)
+      state = act(state, action)
+    }
+    expect(state.outcome).toBe('victory')
+    expect(state.wave).toBe(2)
+    const replayed = replayBattle(v7([weak('f1')], [[foe('f2', 'ice'), foe('f3', 'ice')], [foe('f4', 'ice')]]),
+      [{ kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' }, ...actions])
+    expect(battleStateHash(replayed.state)).toBe(battleStateHash(state))
+  })
+
+  it('keeps a v6 fight as it was: version 6 and no wave field, so its hash and replay don’t move', () => {
+    const s = round(createBattle(input([foe('f1', 'ice'), foe('f2', 'fire')])).state)
+    expect(s.engineVersion).toBe(6)
+    expect(s.wave).toBeUndefined()
+    expect('wave' in createBattle(input([foe('f1', 'ice')])).state).toBe(false)
+  })
+})

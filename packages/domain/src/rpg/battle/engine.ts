@@ -1,7 +1,8 @@
-// Deterministic campaign battle reducer, engine v6 (D86, docs/design/class-rework.md; Limit Breaks D311).
+// Deterministic campaign battle reducer, engine v7 (W3, D91; classes D86, docs/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
+// v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; a v6 fight replays unchanged.
 import { rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
 import {
   isRpgDamageKind, isRpgTome, RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey,
@@ -36,13 +37,28 @@ function stable(value: unknown): string {
   }
   return JSON.stringify(value)
 }
+/** The prefix stays v6: it names the hash's shape, and v7 states hash the same way. */
 export function battleStateHash(state: BattleState): string {
   return `rpg-battle-v6:${hashNumber(stable(state)).toString(16).padStart(8, '0')}`
 }
 
 const unit = (s: BattleState, id: string) => s.units.find((u) => u.id === id)
 const allyOf = (s: BattleState, id: string) => s.input.allies.find((a) => a.id === id)
-const enemyOf = (s: BattleState, id: string) => s.input.enemies.find((e) => e.id === id)
+/** A foe of the fight, whichever wave she's in. */
+export function battleFoe(s: Pick<BattleState, 'input'>, id: string): BattleEnemy | undefined {
+  for (const e of s.input.enemies) if (e.id === id) return e
+  for (const wave of s.input.waves ?? []) for (const e of wave) if (e.id === id) return e
+  return undefined
+}
+const enemyOf = battleFoe
+/** How many waves the fight has: 1, or up to 3 in v7. */
+export const battleWaveCount = (input: BattleInput): number => 1 + (input.waves?.length ?? 0)
+/** The foes of the wave on the field, in their order. */
+export function battleWaveFoes(s: Pick<BattleState, 'input' | 'wave'>): BattleEnemy[] {
+  const wave = s.wave ?? 0
+  return wave === 0 ? s.input.enemies : s.input.waves?.[wave - 1] ?? []
+}
+const wavesLeft = (s: BattleState): boolean => (s.wave ?? 0) < (s.input.waves?.length ?? 0)
 const living = (s: BattleState, side: BattleSide) => s.units.filter((u) => u.side === side && u.hp > 0)
 const maxHp = (s: BattleState, id: string) => allyOf(s, id)?.stats.hp ?? enemyOf(s, id)!.stats.hp
 const stacks = (u: BattleUnit, kind: RpgStatusKind) => u.statuses.find((x) => x.kind === kind)?.stacks ?? 0
@@ -88,8 +104,10 @@ function validAlly(a: BattleAlly): boolean {
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
 }
-function validEnemy(e: BattleEnemy): boolean {
+function validEnemy(e: BattleEnemy, version: 6 | 7): boolean {
   const w = e.weaknesses
+  if (e.element2 !== undefined && (version !== 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
+  if (e.twice !== undefined && (version !== 7 || typeof e.twice !== 'boolean')) return false
   const set = <T>(list: unknown, all: readonly T[]) => Array.isArray(list) && list.length <= all.length &&
     list.every((k) => all.includes(k as T)) && new Set(list).size === list.length
   return SAFE_ID.test(e.id) && SAFE_ID.test(e.castId) && RPG_ELEMENTS.includes(e.element) &&
@@ -101,15 +119,25 @@ function validEnemy(e: BattleEnemy): boolean {
     (e.phaseTwo === undefined || (safeInt(e.phaseTwo.thresholdPercent, 1, 99) && e.phaseTwo.moves.length >= 1 &&
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
+/** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
+const MAX_FOES = { 6: 5, 7: 8 } as const
+const MAX_EXTRA_WAVES = 2
 function validateInput(input: BattleInput): void {
-  if (!input || input.version !== 6 || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
-    input.allies.length !== 5 || !Array.isArray(input.enemies) || input.enemies.length < 1 || input.enemies.length > 5) {
+  if (!input || (input.version !== 6 && input.version !== 7) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+    input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
-  const ids = [...input.allies.map((a) => a.id), ...input.enemies.map((e) => e.id)]
+  const max = MAX_FOES[input.version]
+  const sized = (wave: unknown) => Array.isArray(wave) && wave.length >= 1 && wave.length <= max
+  if (!sized(input.enemies) || (input.waves !== undefined && (input.version !== 7 || !Array.isArray(input.waves) ||
+    input.waves.length < 1 || input.waves.length > MAX_EXTRA_WAVES || !input.waves.every(sized)))) {
+    throw new RangeError('Invalid battle header')
+  }
+  const foes = [...input.enemies, ...(input.waves ?? []).flat()]
+  const ids = [...input.allies.map((a) => a.id), ...foes.map((e) => e.id)]
   if (new Set(ids).size !== ids.length) throw new RangeError('Duplicate battle unit')
   if (!input.allies.every(validAlly)) throw new RangeError('Invalid battle ally')
-  if (!input.enemies.every(validEnemy)) throw new RangeError('Invalid battle enemy')
+  if (!foes.every((e) => validEnemy(e, input.version))) throw new RangeError('Invalid battle enemy')
 }
 
 function clone(s: BattleState): BattleState {
@@ -121,24 +149,27 @@ const movesOf = (s: BattleState, u: BattleUnit): BattleEnemyMove[] => {
   return u.phase === 2 && e.phaseTwo ? e.phaseTwo.moves : e.moves
 }
 const byHpShare = (s: BattleState) => (a: BattleUnit, b: BattleUnit) => a.hp / maxHp(s, a.id) - b.hp / maxHp(s, b.id) || a.id.localeCompare(b.id)
-function chooseTarget(s: BattleState, e: BattleEnemy, m: BattleEnemyMove): string {
+function chooseTarget(s: BattleState, e: BattleEnemy, m: BattleEnemyMove, turn = 0): string {
   if (m.target === 'self') return e.id
   if (m.target === 'all') return 'all'
   if (m.target === 'ally') return [...living(s, 'enemy')].sort(byHpShare(s))[0]?.id ?? e.id
   const allies = living(s, 'ally')
   if (m.target === 'front') return allies[0]?.id ?? ''
   if (m.target === 'lowest-hp') return [...allies].sort(byHpShare(s))[0]?.id ?? ''
-  return allies[hashNumber(`${s.input.seed}:${s.round}:${e.id}:target`) % allies.length]?.id ?? ''
+  return allies[hashNumber(`${s.input.seed}:${s.round}:${e.id}${turn ? `:turn${turn}` : ''}:target`) % allies.length]?.id ?? ''
 }
-function intentFor(s: BattleState, u: BattleUnit): BattleIntent {
+/** A foe's move for this round; `turn` 1 is a twice-acting foe's second (v7). */
+function intentFor(s: BattleState, u: BattleUnit, turn = 0): BattleIntent {
   const e = enemyOf(s, u.id)!
   const moves = movesOf(s, u)
-  const move = moves[hashNumber(`${s.input.seed}:${s.round}:${e.id}:phase${u.phase}:move`) % moves.length]!
-  return { enemyId: e.id, moveId: move.id, targetId: chooseTarget(s, e, move) }
+  const move = moves[hashNumber(`${s.input.seed}:${s.round}:${e.id}:phase${u.phase}${turn ? `:turn${turn}` : ''}:move`) % moves.length]!
+  return { enemyId: e.id, moveId: move.id, targetId: chooseTarget(s, e, move, turn) }
 }
+/** Every living foe's move by initiative; foes that act twice add a second move after everyone's first. */
 function intentsFor(s: BattleState): BattleIntent[] {
-  return living(s, 'enemy').sort((a, b) => enemyOf(s, b.id)!.stats.initiative - enemyOf(s, a.id)!.stats.initiative ||
-    a.id.localeCompare(b.id)).map((u) => intentFor(s, u))
+  const order = living(s, 'enemy').sort((a, b) => enemyOf(s, b.id)!.stats.initiative - enemyOf(s, a.id)!.stats.initiative ||
+    a.id.localeCompare(b.id))
+  return [...order.map((u) => intentFor(s, u)), ...order.filter((u) => enemyOf(s, u.id)!.twice).map((u) => intentFor(s, u, 1))]
 }
 function reveal(s: BattleState): BattleCue[] {
   return s.intents.map((i) => {
@@ -155,7 +186,8 @@ export function createBattle(source: BattleInput): BattleStep {
     ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0 })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
-  const state: BattleState = { engineVersion: 6, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active' }
+  const state: BattleState = { engineVersion: input.version, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active',
+    ...(input.waves?.length ? { wave: 0 } : {}) }
   state.intents = intentsFor(state)
   return { state, cues: reveal(state), hash: battleStateHash(state) }
 }
@@ -202,7 +234,7 @@ function guardOf(s: BattleState, target: BattleUnit): BattleUnit {
 }
 function terminal(s: BattleState, cues: BattleCue[]): boolean {
   const allies = living(s, 'ally').length, enemies = living(s, 'enemy').length
-  if (allies && enemies) return false
+  if (allies && (enemies || wavesLeft(s))) return false
   // A party with nobody standing never clears, even if the last foe fell on the same tick.
   s.outcome = allies ? 'victory' : 'loss'
   s.intents = []
@@ -262,17 +294,44 @@ function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: Battl
   if (receiver.hp === 0) cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id })
 }
 
+/** When the wave on the field falls and another waits (v7), it enters at the start of a fresh round: the party keeps
+ * its HP, MP, statuses, Limit charge and lingering summons, and everyone acts again. */
+function nextWave(s: BattleState, cues: BattleCue[]): boolean {
+  if (!wavesLeft(s) || living(s, 'enemy').length || !living(s, 'ally').length) return false
+  const foes = s.input.waves![s.wave ?? 0]!
+  s.wave = (s.wave ?? 0) + 1
+  const base = { statuses: [], barrier: 0, phase: 1 as const, guardingFor: null, brokenAt: 0, revived: false, limit: 0, mp: 0 }
+  s.units = [...s.units.filter((u) => u.side === 'ally'),
+    ...foes.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, shield: e.shield }))]
+  for (const u of s.units) u.guardingFor = null
+  cues.push({ kind: 'wave', actorId: foes[0]!.id, targetId: foes[0]!.id, amount: s.wave + 1, label: `Wave ${s.wave + 1} of ${battleWaveCount(s.input)}` })
+  s.round += 1
+  s.acted = []
+  s.intents = intentsFor(s)
+  cues.push(...reveal(s))
+  return true
+}
+
 function updatePhases(s: BattleState, cues: BattleCue[]): void {
   for (const u of living(s, 'enemy')) {
     const phase = enemyOf(s, u.id)!.phaseTwo
     if (!phase || u.phase === 2 || u.hp * 100 > maxHp(s, u.id) * phase.thresholdPercent) continue
     u.phase = 2
     cues.push({ kind: 'phase', actorId: u.id, targetId: u.id, label: 'Phase 2' })
-    const index = s.intents.findIndex((i) => i.enemyId === u.id)
-    const next = intentFor(s, u)
-    if (index >= 0) s.intents[index] = next
-    const move = movesOf(s, u).find((m) => m.id === next.moveId)!
-    cues.push({ kind: 'intent', actorId: u.id, targetId: next.targetId, label: move.label })
+    // Each of her moves this round changes to phase two's (two for a foe that acts twice).
+    let turn = 0
+    const nexts: BattleIntent[] = []
+    s.intents = s.intents.map((i) => {
+      if (i.enemyId !== u.id) return i
+      const next = intentFor(s, u, turn++)
+      nexts.push(next)
+      return next
+    })
+    if (!nexts.length) nexts.push(intentFor(s, u))
+    for (const next of nexts) {
+      const move = movesOf(s, u).find((m) => m.id === next.moveId)!
+      cues.push({ kind: 'intent', actorId: u.id, targetId: next.targetId, label: move.label })
+    }
   }
 }
 
@@ -326,8 +385,9 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
   }
-  if (terminal(s, cues)) return
-  if (s.round >= BATTLE_MAX_ROUNDS) {
+  if (nextWave(s, cues) || terminal(s, cues)) return
+  // Each wave gets the round cap, so a three-wave stage isn't rushed.
+  if (s.round >= BATTLE_MAX_ROUNDS * battleWaveCount(s.input)) {
     s.outcome = 'loss'
     s.intents = []
     cues.push({ kind: 'result', label: 'loss' })
@@ -474,7 +534,7 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if (previous.engineVersion !== 6 || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if ((previous.engineVersion !== 6 && previous.engineVersion !== 7) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)
@@ -533,15 +593,18 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
   }
   if (charge) actor.limit = Math.min(BATTLE_LIMIT_MAX, actor.limit + battleLimitGain(charge))
   s.acted.push(actor.id)
-  if (!terminal(s, cues)) {
+  if (!nextWave(s, cues) && !terminal(s, cues)) {
     updatePhases(s, cues)
     if (living(s, 'ally').every((u) => battleActionsLeft(s, u.id) <= 0)) resolveEnemies(s, cues)
   }
   return { state: s, cues, hash: battleStateHash(s) }
 }
 
+/** The most actions a fight can take: five a round over every wave's round cap, with room to spare. */
+export const BATTLE_MAX_ACTIONS = BATTLE_MAX_ROUNDS * 10 * (1 + MAX_EXTRA_WAVES)
+
 export function replayBattle(input: BattleInput, actions: readonly BattleAction[]): BattleStep {
-  if (actions.length > BATTLE_MAX_ROUNDS * 10) throw new RangeError('Battle replay is too long')
+  if (actions.length > BATTLE_MAX_ACTIONS) throw new RangeError('Battle replay is too long')
   let result = createBattle(input)
   const cues = [...result.cues]
   for (const action of actions) {

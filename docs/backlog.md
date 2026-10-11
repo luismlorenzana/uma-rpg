@@ -22,7 +22,6 @@ Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script
 
 | Packet | What |
 |---|---|
-| [H09](handoff/tasks/H09-w3-foes-elements-waves.md) | W3: up to eight foes, dual-element foes, waves |
 | [H13](handoff/tasks/H13-w4-field-effects.md) | W4: field effects and home ground |
 | [H15](handoff/tasks/H15-capital-finals.md) | The capitals' Finals |
 | [H20](handoff/tasks/H20-key-boss-faces.md) | Key bosses' faces (the owner picks; packs are private) |

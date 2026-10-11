@@ -7,7 +7,7 @@ import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { openFightOf, payEntrants, stageLaurels, worldRun, type FightResult } from './battle'
-import { stageBand } from '../world/world'
+import { stageBand, stagePay } from '../world/world'
 import { PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
@@ -104,7 +104,9 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
   const node = chapter.nodes.find((n) => n.id === nodeId)!
   const run = worldRun(world)
   const wins = run.wins[nodeId] ?? 0
-  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level, stageLaurels('fight', chapter.tier, false, node.level), tier, REPLAY_SHARE)
+  const pay = stagePay(node)
+  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level,
+    Math.round(stageLaurels('fight', chapter.tier, false, node.level) * pay), tier, REPLAY_SHARE * pay)
   // Seeded by the stage and its win count, so each Sweep rolls afresh but a retried save rolls the same.
   const tokens = rollTokens(`sweep:${nodeId}:${wins}`, 'fight', levelBand(node.level), REPLAY_SHARE)
   const items = { ...paid.world.items }

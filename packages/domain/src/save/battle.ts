@@ -8,7 +8,7 @@ import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/c
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { levelBand, rollTokens } from '../economy/tokens'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
-import { SPRING_RECHARGE_MS } from '../world/world'
+import { SPRING_RECHARGE_MS, stagePay } from '../world/world'
 import {
   rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
   type RpgPartyMember, type RpgRun,
@@ -242,7 +242,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const world = worldOf(save, tier)
   const battle = run.battle
   if (!battle) throw new SaveRuleError('cannot-fight', 'no open fight')
-  const node: Pick<RpgMapNode, 'id' | 'kind' | 'level' | 'stage'> = chapter.nodes.find((n) => n.id === battle.nodeId) ??
+  const node: Pick<RpgMapNode, 'id' | 'kind' | 'level' | 'stage' | 'waves'> = chapter.nodes.find((n) => n.id === battle.nodeId) ??
     // A node a rebalance removed still settles, as a regular fight at its foes' level.
     { id: battle.nodeId, kind: 'fight', level: battle.input.enemies[0]?.level ?? chapter.levelStart, stage: 0 }
   const closed = rpgCloseRunBattle(run, state, { id: node.id, kind: node.kind }, now)
@@ -252,7 +252,10 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const kind = rpgRewardKind(node)
   const firstClear = (run.wins[node.id] ?? 0) === 0
   const share = firstClear ? 1 : REPLAY_SHARE
-  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, stageLaurels(kind, chapter.tier, firstClear, node.level), tier, share)
+  // A stage in waves pays 1.5× its EXP and Laurels (W3); tokens stay as they are.
+  const pay = stagePay(node)
+  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level,
+    Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * pay)
   // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
   const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share)
   const items = { ...paid.world.items }

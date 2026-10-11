@@ -2,7 +2,7 @@
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half.
 import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleBroken,
-  battleLimitPlan, battleSkillFor, isRpgElement, isRpgTome, isRpgWeaponKind, rpgWeaponKind,
+  battleFoe, battleLimitPlan, battleSkillFor, isRpgElement, isRpgTome, isRpgWeaponKind, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleEnemy, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
   type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 
@@ -136,6 +136,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'revive': return `${name(cue.targetId)} gets back up!`
     case 'limit': return `${name(cue.actorId)}: LIMIT BREAK · ${cue.label}!`
     case 'summon': return `${name(cue.actorId)}’s ${cue.label} strikes again`
+    case 'wave': return `${cue.label}: the next foes arrive`
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`
     case 'result': return cue.label === 'victory' ? 'Victory!' : 'Defeated'
   }
@@ -149,7 +150,7 @@ export function followCue(shown: BattleState, cue: BattleCue): BattleState {
   if (cue.kind === 'intent' || cue.kind === 'result') return shown
   const target = shown.units.find((u) => u.id === cue.targetId)
   if (!target) return shown
-  const maxHp = shown.input.allies.find((a) => a.id === target.id)?.stats.hp ?? shown.input.enemies.find((e) => e.id === target.id)?.stats.hp ?? target.hp
+  const maxHp = shown.input.allies.find((a) => a.id === target.id)?.stats.hp ?? battleFoe(shown, target.id)?.stats.hp ?? target.hp
   const next = { ...target }
   if (cue.kind === 'hit') next.hp = Math.max(0, target.hp - cue.amount)
   else if (cue.kind === 'heal') next.hp = Math.min(maxHp, target.hp + (cue.amount ?? 0))

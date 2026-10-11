@@ -1,4 +1,5 @@
-// Campaign battle vocabulary, engine v6 (D86, docs/design/class-rework.md; Limit Breaks D311).
+// Campaign battle vocabulary, engine v7 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311).
+// v6 fights (five foes at most, one wave) still replay unchanged.
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
 export type BattleSide = 'ally' | 'enemy'
@@ -47,6 +48,10 @@ export interface BattleEnemy {
   /** Cast member shown for this foe; presentation only. */
   castId: string
   element: RpgElement
+  /** A dual-element foe's second element (v7): her elemental moves split between the two. */
+  element2?: RpgElement
+  /** Acts twice a round (v7): solo elites, so they stay threatening alone. */
+  twice?: boolean
   rank: EnemyRank
   /** Lifetime level (Tier 1 Lv1 is 1, Tier 2 Lv1 is 51). */
   level: number
@@ -57,7 +62,15 @@ export interface BattleEnemy {
   moves: BattleEnemyMove[]
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
-export interface BattleInput { version: 6; seed: number; allies: BattleAlly[]; enemies: BattleEnemy[] }
+export interface BattleInput {
+  version: 6 | 7
+  seed: number
+  allies: BattleAlly[]
+  /** The first wave. */
+  enemies: BattleEnemy[]
+  /** Later waves (v7): each enters when the one before falls, at the start of a fresh round. */
+  waves?: BattleEnemy[][]
+}
 
 export interface BattleUnit {
   id: string
@@ -80,9 +93,11 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6
+  engineVersion: 6 | 7
   input: BattleInput
   round: number
+  /** The wave on the field, 0-based; only in fights with waves. */
+  wave?: number
   units: BattleUnit[]
   /** Allies who have acted this round: once each (D86). */
   acted: string[]
@@ -109,7 +124,7 @@ export type BattleCue =
   | { kind: 'intent'; actorId: string; targetId: string; label: string }
   | { kind: 'hit'; actorId: string; targetId: string; amount: number; channel: BattleChannel | 'status';
       element: RpgDamageKind | null; weak: boolean; label?: string }
-  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'heal' | 'mp' | 'revive' | 'limit' | 'summon';
+  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'heal' | 'mp' | 'revive' | 'limit' | 'summon' | 'wave';
       actorId: string; targetId: string; amount?: number; label?: string }
   | { kind: 'result'; label: 'victory' | 'loss' }
 export type BattleError = 'terminal' | 'invalid-actor' | 'already-acted' | 'invalid-target' |

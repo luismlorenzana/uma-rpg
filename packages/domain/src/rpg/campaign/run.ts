@@ -1,8 +1,7 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
-import { applyBattleAction, createBattle, replayBattle } from '../battle/engine'
-import { BATTLE_MAX_ROUNDS } from '../battle/skills'
+import { applyBattleAction, BATTLE_MAX_ACTIONS, createBattle, replayBattle } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
@@ -31,8 +30,8 @@ export interface RpgRun {
   updatedAt: string
 }
 export type RpgNodeStatus = 'locked' | 'available' | 'cleared'
-/** The most actions a fight can take: ten a round for the engine's longest fight. */
-export const RPG_MAX_BATTLE_ACTIONS = BATTLE_MAX_ROUNDS * 10
+/** The most actions a fight can take: the engine's own cap, which counts every wave. */
+export const RPG_MAX_BATTLE_ACTIONS = BATTLE_MAX_ACTIONS
 
 export const rpgRunKey = (party: number, chapterId: string): string => `${party}:${chapterId}`
 const battleIdOf = (run: Pick<RpgRun, 'party' | 'chapterId' | 'battles'>): string => `battle:${run.party}:${run.chapterId}:${run.battles + 1}`
@@ -73,7 +72,7 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
-/** Freezes the party (with its carried MP) and the node's foes into a new fight. The engine fights five against up to five. */
+/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v7: up to eight foes a wave, W3). */
 export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, nodeId: string,
   party: readonly RpgPartyMember[], now: string): RpgRun {
   const node = chapter.nodes.find((n) => n.id === nodeId)
@@ -83,7 +82,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
-    version: 6, seed: seedOf(battleId),
+    version: 7, seed: seedOf(battleId),
     allies: party.map(({ profile, loadout, orb, points }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
       return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
@@ -92,6 +91,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
         ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}) }
     }),
     enemies: node.enemies,
+    ...(node.waves?.length ? { waves: node.waves } : {}),
   }
   createBattle(input)
   return { ...run, battle: { battleId, nodeId, startedAt: now, input, actions: [] }, battles: run.battles + 1, updatedAt: now }

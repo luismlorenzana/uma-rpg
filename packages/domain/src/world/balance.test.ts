@@ -1,4 +1,4 @@
-// A balance simulation for the world map (D72, D75, D77, D86): a five-class party with expected skills plays every stage
+// A balance simulation for the world map (D72, D75, D77, D86, W3): a five-class party with expected skills plays every stage
 // of a region at its level with a simple policy, and we read win rates. Run the full table with `SIM=1 npx vitest run
 // src/world/balance.test.ts`; the always-on tests keep the shared Auto policy legal and the opening stages winnable.
 import { describe, expect, it } from 'vitest'
@@ -6,6 +6,7 @@ import { autoAction } from '../rpg/battle/auto'
 import { applyBattleAction, battleActionsLeft, createBattle } from '../rpg/battle/engine'
 import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
 import type { BattleAlly, BattleInput, BattleState } from '../rpg/battle/types'
+import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
 import { depthsOpen } from '../economy/training'
 import { RPG_FOE_TUNING } from '../rpg/campaign/enemies'
@@ -17,6 +18,9 @@ import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 const PARTY: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
+/** A stage's fight as the game starts it: engine v7, every wave (W3). */
+const stage = (node: RpgMapNode, seed: number, allies: BattleAlly[]): BattleInput =>
+  ({ version: 7, seed, allies, enemies: node.enemies, ...(node.waves?.length ? { waves: node.waves } : {}) })
 
 /** An average invented outfit of a class, at a level and class rank, with side skills learned deepest first. */
 function member(classId: RpgClass, i: number, level: number, rank: number, budget: number): BattleAlly {
@@ -63,7 +67,7 @@ function run(level: number, rank: number): { cleared: number[]; mpLeft: number }
     const full = party.reduce((n, a) => n + a.mp, 0)
     let n = 0
     for (const node of regionChapter(region, cast).nodes.filter((x) => x.kind !== 'camp')) {
-      const r = play({ version: 6, seed: 2000 + n, allies: party, enemies: node.enemies })
+      const r = play(stage(node, 2000 + n, party))
       if (!r.won) break
       n++
       party = party.map((a) => ({ ...a, mp: r.mp[a.id] ?? a.mp }))
@@ -82,7 +86,7 @@ function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 
   const out = { fight: { wins: 0, fights: 0, rounds: 0, hp: 0 }, 'sub-boss': { wins: 0, fights: 0, rounds: 0, hp: 0 }, boss: { wins: 0, fights: 0, rounds: 0, hp: 0 } }
   for (const region of continent.regions.filter((r) => r.level === level)) {
     regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp').forEach((node, i) => {
-      const r = play({ version: 6, seed: 1000 + i, allies: party, enemies: node.enemies })
+      const r = play(stage(node, 1000 + i, party))
       const bucket = out[node.kind as 'fight' | 'sub-boss' | 'boss']
       bucket.fights++
       bucket.wins += r.won ? 1 : 0
@@ -98,7 +102,7 @@ describe('world balance (D72, D86)', () => {
     const party = PARTY.map((classId, i) => member(classId, i, 10, 2, 1))
     const node = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions.find((region) => region.level === 10)!, cast).nodes.at(-1)!
     for (const ally of party) {
-      const state = createBattle({ version: 6, seed: 6999, allies: party, enemies: node.enemies }).state
+      const state = createBattle(stage(node, 6999, party)).state
       state.units.find((unit) => unit.id === ally.id)!.limit = BATTLE_LIMIT_MAX
       const action = autoAction(state, ally.id)
       expect(action.kind, ally.classId).toBe('limit')
@@ -113,7 +117,7 @@ describe('world balance (D72, D86)', () => {
       const budget = 1 + RPG_FOE_TUNING.budgetPerLevel * Math.max(0, region.level - RPG_FOE_TUNING.budgetFrom)
       const party = PARTY.map((classId, i) => member(classId, i, region.level, rank, budget))
       for (const node of regionChapter(region, cast).nodes.filter((candidate) => candidate.kind !== 'camp')) {
-        let state = createBattle({ version: 6, seed: 7000 + node.row, allies: party, enemies: node.enemies }).state
+        let state = createBattle(stage(node, 7000 + node.row, party)).state
         for (let n = 0; n < 600 && state.outcome === 'active'; n++) {
           const actor = state.units.find((unit) => unit.side === 'ally' && unit.hp > 0 && battleActionsLeft(state, unit.id) > 0)
           if (!actor) break
@@ -130,7 +134,7 @@ describe('world balance (D72, D86)', () => {
     const party = PARTY.map((c, i) => member(c, i, 1, 1, 1))
     const meadow = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions[0]!, cast)
     const opening = meadow.nodes.filter((n) => n.kind === 'fight').slice(0, 2)
-    for (const node of opening) expect(play({ version: 6, seed: 7, allies: party, enemies: node.enemies }).won, node.id).toBe(true)
+    for (const node of opening) expect(play(stage(node, 7, party)).won, node.id).toBe(true)
   })
 
   it.skipIf(!process.env.SIM)('prints win rates by level, rank and gear', () => {

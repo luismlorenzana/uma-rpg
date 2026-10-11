@@ -60,29 +60,41 @@ export function worldContinent(source: ContinentSource): WorldContinent {
 export const WORLD_TUNING = {
   regularHpPerLevel: 0.035, regularOffensePerLevel: 0.02,
   eliteHpPerLevel: 0.01, eliteOffensePerLevel: 0.005,
-  bossHp: 0.55, bossOffensePerLevel: 0.005,
+  bossHp: 0.5, bossOffensePerLevel: 0.005,
 } as const
 
-const FORMATION: Readonly<Record<Formation, { count: number; hp: number; shield: number; name: string }>> = {
-  solo: { count: 1, hp: 3.5, shield: 6, name: 'Lone elite' },
-  duo: { count: 2, hp: 1.8, shield: 4, name: 'Pair' },
-  trio: { count: 3, hp: 1.2, shield: 3, name: 'Trio' },
-  squad: { count: 4, hp: 1, shield: 2, name: 'Squad' },
-  // Five until the engine fights eight (W3); smaller each, so the budget holds.
-  swarm: { count: 5, hp: 0.7, shield: 1, name: 'Swarm' },
-  escort: { count: 3, hp: 0.8, shield: 2, name: 'Escort' },
+/**
+ * Formation templates (encounters.md, W3): how many foes, the HP they share in regular foes (so a solo and a swarm
+ * are about as hard) and each one's shield. A solo elite acts twice a round. An escort is a captain and her guards.
+ */
+const FORMATION: Readonly<Record<Formation, { count: readonly [number, number]; budget: number; shield: number; name: string }>> = {
+  solo: { count: [1, 1], budget: 3.5, shield: 6, name: 'Lone elite' },
+  duo: { count: [2, 2], budget: 3.6, shield: 4, name: 'Pair' },
+  trio: { count: [3, 3], budget: 3.6, shield: 3, name: 'Trio' },
+  squad: { count: [4, 5], budget: 4, shield: 2, name: 'Squad' },
+  swarm: { count: [6, 8], budget: 3.6, shield: 1, name: 'Swarm' },
+  escort: { count: [3, 5], budget: 0, shield: 2, name: 'Escort' },
 }
+/** An escort's captain and each guard, in regular foes' HP. */
+const ESCORT = { captain: 2.5, captainShield: 5, guard: 0.8 } as const
+/** Waves (W3): stages 8 and 9 come in two, the boss in three; a stage in waves pays 1.5× (`WAVE_PAY`), so its waves
+ * share 1.5 stages' HP, and the boss's two opening waves are lighter, so the champion's wave decides it. */
+const WAVE_STAGES: Readonly<Record<number, number>> = { 8: 2, 9: 2 }
+export const BOSS_WAVES = 3
+const WAVE_HP: Readonly<Record<number, number>> = { 1: 1, 2: 0.75, 3: 0.3 }
+
+export interface StagePlan { formation: Formation; signature: readonly RpgElement[]; waves: number }
 
 /**
  * What each of a region's twelve stages is: ten regular stages, an elite, the boss. Stages 1–2 teach (pairs of the
- * first two signatures), 7 is a crowd, 10 the biome's own formation; the rest walk the biome's formation × signature
- * combinations in a seeded order, so a region repeats one only when its biome runs out.
+ * first two signatures), 7 is a crowd, 8–9 come in two waves, 10 is the biome's own formation; the rest walk the
+ * biome's formation × signature combinations in a seeded order, so a region repeats one only when its biome runs out.
  */
-export function stagePlan(biome: BiomeDef, regionId: string): { formation: Formation; signature: readonly RpgElement[] }[] {
+export function stagePlan(biome: BiomeDef, regionId: string): StagePlan[] {
   const sigs = biome.signatures
   const combos = shuffle(biome.formations.flatMap((formation) => sigs.map((signature) => ({ formation, signature }))), `${regionId}:combos`)
   const used = new Set<number>()
-  const plan: { formation: Formation; signature: readonly RpgElement[] }[] = []
+  const plan: StagePlan[] = []
   // The next unused combination, preferring a formation unlike the stage before.
   const take = (): { formation: Formation; signature: readonly RpgElement[] } => {
     const previous = plan[plan.length - 1]?.formation
@@ -93,16 +105,17 @@ export function stagePlan(biome: BiomeDef, regionId: string): { formation: Forma
     return combos[i]!
   }
   for (let n = 1; n <= 10; n++) {
-    if (n <= 2) plan.push({ formation: 'duo', signature: sigs[(n - 1) % sigs.length]! })
+    const waves = WAVE_STAGES[n] ?? 1
+    if (n <= 2) plan.push({ formation: 'duo', signature: sigs[(n - 1) % sigs.length]!, waves })
     else if (n === 7) {
       const previous = plan[plan.length - 1]!.signature
-      plan.push({ formation: biome.formations.includes('swarm') ? 'swarm' : 'squad', signature: sigs.find((g) => g !== previous) ?? sigs[0]! })
+      plan.push({ formation: biome.formations.includes('swarm') ? 'swarm' : 'squad', signature: sigs.find((g) => g !== previous) ?? sigs[0]!, waves })
     }
-    else if (n === 10) plan.push({ formation: biome.formations[0]!, signature: sigs[0]! })
-    else plan.push(take())
+    else if (n === 10) plan.push({ formation: biome.formations[0]!, signature: sigs[0]!, waves })
+    else plan.push({ ...take(), waves })
   }
-  plan.push({ formation: 'solo', signature: sigs[sigs.length - 1]! })
-  plan.push({ formation: 'escort', signature: sigs[0]! })
+  plan.push({ formation: 'solo', signature: sigs[sigs.length - 1]!, waves: 1 })
+  plan.push({ formation: 'escort', signature: sigs[0]!, waves: BOSS_WAVES })
   return plan
 }
 
@@ -135,16 +148,19 @@ export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 
   plan.forEach((p, i) => {
     const id = ids[i]!
     const kind = i === WORLD_STAGES - 1 ? 'boss' : i === WORLD_STAGES - 2 ? 'sub-boss' : 'fight'
-    const enemies = stageEnemies(region, biome, id, kind, p.formation, p.signature, cast, reach)
+    const [enemies, ...waves] = stageWaves(region, biome, id, kind, p, cast, reach)
     nodes.push({ id, row: i + 1, col: 2, kind, level: region.level, stage: 0,
       name: kind === 'boss' ? `${biome.name} boss` : kind === 'sub-boss' ? 'Elite' : FORMATION[p.formation].name,
-      element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies, exits: ids[i + 1] ? [ids[i + 1]!] : [] })
+      element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies: enemies!,
+      ...(waves.length ? { waves } : {}), exits: ids[i + 1] ? [ids[i + 1]!] : [] })
   })
   return { id: region.id, order: 0, tier, title: `${region.name} · Lv ${region.level}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
 }
 
-function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', formation: Formation,
-  signature: readonly RpgElement[], cast: readonly RpgCastMember[], reach: number): BattleEnemy[] {
+/** A stage's foes, wave by wave. A pair signature makes dual-element foes (W3): each carries both elements, the lead
+ * one alternating by slot. Faces never repeat within a stage. */
+function stageWaves(region: WorldRegion, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', plan: StagePlan,
+  cast: readonly RpgCastMember[], reach: number): BattleEnemy[][] {
   const used = new Set<string>()
   // A pack with elements shows a face of the foe's own element when it has one.
   const face = (slot: number, element: RpgElement): RpgCastMember => {
@@ -157,8 +173,8 @@ function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kin
     }
     return pool[offset % pool.length]!
   }
-  const answers = signatureWeaknesses(signature)
-  const weaknesses = (slot: number, rank: EnemyRank): BattleWeaknesses => {
+  const weaknesses = (signature: readonly RpgElement[], slot: number, rank: EnemyRank): BattleWeaknesses => {
+    const answers = signatureWeaknesses(signature)
     const key = `${stageId}:${slot}`
     const weapons = [...RPG_WEAPON_KINDS].sort((a, b) => hash(`${key}:${a}`) - hash(`${key}:${b}`))
     // Light+dark answers to no element: those foes break on weapons alone (D66).
@@ -169,23 +185,52 @@ function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kin
   }
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
   const above = region.level - 1
-  const foe = (slot: number, rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number): BattleEnemy => {
+  let next = 0
+  const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, twice = false): BattleEnemy => {
+    const slot = next++
     const element = signature[slot % signature.length]!
-    const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot, element).id, element, role: r, rank, level: region.level, shield,
-      weaknesses: weaknesses(slot, rank), ...(rank === 'regular' ? {} : { reach }) })
+    const element2 = signature.length > 1 ? signature[(slot + 1) % signature.length] : undefined
+    const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot, element).id, element, ...(element2 && element2 !== element ? { element2 } : {}),
+      ...(twice ? { twice } : {}), role: r, rank, level: region.level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
     const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
     const offense = 1 + (rank === 'regular' ? WORLD_TUNING.regularOffensePerLevel : rank === 'sub-boss' ? WORLD_TUNING.eliteOffensePerLevel : WORLD_TUNING.bossOffensePerLevel) * above
     return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),
       atk: Math.round(base.stats.atk * offense), matk: Math.round(base.stats.matk * offense) } }
   }
-  if (kind === 'boss') {
-    return [foe(0, 'boss', 'champion', 1, RPG_FOE_TUNING.bossShield), foe(1, 'regular', 'guard', 0.8, 2), foe(2, 'regular', 'guard', 0.8, 2)]
+  /** One wave of regular foes in a formation, at a share of its HP. */
+  const formation = (f: Formation, signature: readonly RpgElement[], share: number, wave: number): BattleEnemy[] => {
+    const shape = FORMATION[f]
+    const [lo, hi] = shape.count
+    const count = lo + (hash(`${stageId}:${wave}:count`) % (hi - lo + 1))
+    if (f === 'escort') {
+      return [foe(signature, 'regular', 'striker', ESCORT.captain * share, ESCORT.captainShield),
+        ...Array.from({ length: count - 1 }, () => foe(signature, 'regular', 'guard', ESCORT.guard * share, shape.shield))]
+    }
+    const first = next
+    return Array.from({ length: count }, (_, k) => foe(signature, 'regular', role(first + k), (shape.budget / count) * share, shape.shield, f === 'solo'))
   }
-  if (kind === 'sub-boss') return [foe(0, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield)]
-  const f = FORMATION[formation]
-  if (formation === 'escort') return [foe(0, 'regular', 'striker', 2.5, 5), foe(1, 'regular', 'guard', f.hp, f.shield), foe(2, 'regular', 'guard', f.hp, f.shield)]
-  return Array.from({ length: f.count }, (_, slot) => foe(slot, 'regular', role(slot), f.hp, f.shield))
+  const sigs = biome.signatures
+  const after = (signature: readonly RpgElement[]) => sigs[(sigs.indexOf(signature) + 1) % sigs.length]!
+  if (kind === 'sub-boss') return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, true)]]
+  if (kind === 'boss') {
+    // Two lighter waves of the biome's other signatures lead to the champion, her guards and the biome's main pair.
+    const share = WAVE_HP[BOSS_WAVES]!
+    return [formation(biome.formations[0]!, after(plan.signature), share, 0), formation('trio', after(after(plan.signature)), share, 1),
+      [foe(plan.signature, 'boss', 'champion', 1, RPG_FOE_TUNING.bossShield), foe(plan.signature, 'regular', 'guard', 0.8, 2),
+        foe(plan.signature, 'regular', 'guard', 0.8, 2)]]
+  }
+  const share = WAVE_HP[plan.waves] ?? 1
+  const waves = [formation(plan.formation, plan.signature, share, 0)]
+  if (plan.waves > 1) {
+    const second = biome.formations.find((f) => f !== plan.formation) ?? 'trio'
+    waves.push(formation(second, after(plan.signature), share, 1))
+  }
+  return waves
 }
+
+/** EXP and Laurels a stage in waves pays, over a one-wave stage (encounters.md); tokens stay as they are (D82). */
+export const WAVE_PAY = 1.5
+export const stagePay = (node: Pick<RpgMapNode, 'waves'>): number => (node.waves?.length ? WAVE_PAY : 1)
 
 /** The region a stage id belongs to (`w1-3-2-s5` → `w1-3-2`). */
 export const stageRegionId = (stageId: string): string => stageId.replace(/-s\d+$/, '')

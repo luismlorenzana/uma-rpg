@@ -27,16 +27,19 @@ const ROLE: Readonly<Record<RpgFoeRole, RoleShape>> = {
 }
 const ELEMENT_NAME: Readonly<Record<RpgElement, string>> = { fire: 'Flame', ice: 'Frost', lightning: 'Volt', light: 'Dawn', dark: 'Shade' }
 
-function moves(role: RpgFoeRole, element: RpgElement): { moves: BattleEnemyMove[]; phaseTwo?: BattleEnemy['phaseTwo'] } {
+/** A foe's kit. A dual-element foe (W3) uses her second element for her second elemental move, so her moves split
+ * between the two. */
+function moves(role: RpgFoeRole, element: RpgElement, second: RpgElement = element): { moves: BattleEnemyMove[]; phaseTwo?: BattleEnemy['phaseTwo'] } {
   const e = ELEMENT_NAME[element]
+  const e2 = ELEMENT_NAME[second]
   const m = (id: string, kind: BattleEnemyMove['kind'], channel: BattleEnemyMove['channel'], el: RpgElement | null,
     power: number, target: BattleEnemyMove['target'], label: string, status?: BattleEnemyMove['status']): BattleEnemyMove =>
     ({ id, kind, channel, element: el, power, target, label, ...(status ? { status } : {}) })
   switch (role) {
     case 'striker': return { moves: [m('strike', 'damage', 'physical', null, 100, 'front', 'Strike the front'),
-      m('heavy', 'damage', 'physical', element, 130, 'seeded', `${e} blow`)] }
+      m('heavy', 'damage', 'physical', second, 130, 'seeded', `${e2} blow`)] }
     case 'caster': return { moves: [m('bolt', 'damage', 'magical', element, 110, 'lowest-hp', `${e} bolt at the weakest`),
-      m('hex', 'debuff', 'magical', element, 0, 'seeded', 'Hex: weaken', 'weaken')] }
+      m('hex', 'debuff', 'magical', second, 0, 'seeded', 'Hex: weaken', 'weaken')] }
     case 'guard': return { moves: [m('bash', 'damage', 'physical', null, 80, 'front', 'Shield bash'),
       m('cover', 'guard', 'physical', null, 0, 'ally', 'Guard an ally')] }
     case 'skirmisher': return { moves: [m('cut', 'damage', 'physical', element, 90, 'seeded', `${e} cut + mark`, 'mark'),
@@ -44,32 +47,33 @@ function moves(role: RpgFoeRole, element: RpgElement): { moves: BattleEnemyMove[
     case 'captain': return {
       moves: [m('smash', 'damage', 'physical', element, 150, 'front', `${e} smash`),
         m('rally', 'buff', 'physical', null, 0, 'self', 'Rally: power up', 'power-up'),
-        m('sweep', 'damage', 'magical', element, 55, 'all', `${e} sweep (all)`)],
-      phaseTwo: { thresholdPercent: 50, moves: [m('storm', 'damage', 'magical', element, 75, 'all', `${e} storm (all)`),
+        m('sweep', 'damage', 'magical', second, 55, 'all', `${e2} sweep (all)`)],
+      phaseTwo: { thresholdPercent: 50, moves: [m('storm', 'damage', 'magical', second, 75, 'all', `${e2} storm (all)`),
         m('crush', 'damage', 'physical', element, 190, 'lowest-hp', 'Crush the weakest')] } }
     case 'champion': return {
       moves: [m('smash', 'damage', 'physical', element, 160, 'front', `${e} smash`),
-        m('sweep', 'damage', 'magical', element, 60, 'all', `${e} sweep (all)`),
+        m('sweep', 'damage', 'magical', second, 60, 'all', `${e2} sweep (all)`),
         m('ward', 'buff', 'magical', null, 0, 'self', 'Ward: guard up', 'ward')],
-      phaseTwo: { thresholdPercent: 50, moves: [m('storm', 'damage', 'magical', element, 85, 'all', `${e} storm (all)`, element === 'fire' ? 'burn' : undefined),
+      phaseTwo: { thresholdPercent: 50, moves: [m('storm', 'damage', 'magical', second, 85, 'all', `${e2} storm (all)`, second === 'fire' ? 'burn' : undefined),
         m('crush', 'damage', 'physical', element, 210, 'lowest-hp', 'Crush the weakest'),
         m('focus', 'damage', 'physical', element, 170, 'front', `${e} lance`)] } }
   }
 }
 
 /** A foe's full frozen kit at a lifetime level. Stats are code, so a rebalance never needs a content publish. */
-export function rpgFoe(input: { id: string; castId: string; element: RpgElement; role: RpgFoeRole; rank: EnemyRank; level: number;
-  shield: number; weaknesses: BattleWeaknesses; reach?: number }): BattleEnemy {
+export function rpgFoe(input: { id: string; castId: string; element: RpgElement; element2?: RpgElement; twice?: boolean; role: RpgFoeRole;
+  rank: EnemyRank; level: number; shield: number; weaknesses: BattleWeaknesses; reach?: number }): BattleEnemy {
   const t = RPG_FOE_TUNING
   const s = rpgReferenceStat(input.level)
   const shape = ROLE[input.role]
   // Sub-bosses and champions also grow with the skill depth the party can reach (D282): that is where its MP goes.
   const scale = (input.rank === 'boss' ? t.bossHp : input.rank === 'sub-boss' ? t.subBossHp : 1) * (input.rank === 'regular' ? 1 : input.reach ?? 1)
-  const kit = moves(input.role, input.element)
+  const kit = moves(input.role, input.element, input.element2)
   // The party's expected gear and Extra Stats at this level, given to the foe too (§7.3, D59).
   const budget = 1 + t.budgetPerLevel * Math.max(0, input.level - t.budgetFrom)
   return {
-    id: input.id, castId: input.castId, element: input.element, rank: input.rank, level: input.level,
+    id: input.id, castId: input.castId, element: input.element, ...(input.element2 ? { element2: input.element2 } : {}),
+    ...(input.twice ? { twice: true } : {}), rank: input.rank, level: input.level,
     stats: {
       hp: Math.round((t.hpBase + t.hpPerStat * s) * shape.hp * scale * budget),
       atk: Math.round(s * t.offense * shape.atk * budget), matk: Math.round(s * t.offense * shape.matk * budget),

@@ -1,7 +1,21 @@
 # Encounters: making 1,000 fights differ
 
-> **Status: proposal for owner review, 2026-10-10.** Part of the [world map proposal](README.md). Today's engine fights
-> 1–5 foes with one element each; this page asks for up to 8 foes, two elements per foe and waves (build step W3).
+> **Status: built as W3 (D91, 2026-10-11)**, except the Ambush template and field effects (W4). Part of the [world
+> map proposal](README.md). Engine v7 fights up to 8 foes a wave, dual-element foes and 1–3 waves; v6 fights still
+> replay.
+
+## As built (W3, D91)
+
+| Piece | How it works |
+|---|---|
+| **Formations** | Squad 4–5 and swarm 6–8 foes (the count seeded by the stage), escort a captain and 2–4 guards. Each template shares about four regular foes' HP, so more foes means smaller ones |
+| **Dual elements** | A pair signature makes every foe carry both elements (`element2`). Her second elemental move uses the second element, and her weaknesses follow the pair rule below |
+| **Acts twice** | Solo elites and each region's elite (stage 11) take two moves a round, the second after every foe's first |
+| **Waves** | Stages 8 and 9 come in two waves at 0.75 HP each; the boss in three, two waves of the biome's other signatures at 0.3 HP, then the champion and her guards. A cleared wave ends the round: the next wave steps in at the start of a fresh one, and the party keeps its HP, MP, statuses, Limit charge and lingering summons |
+| **Pay** | A stage in waves pays 1.5× its EXP and Laurels, Sweeps included. Tokens don't change (D82's budget) |
+| **Stage** | Six to eight foes stand in two rows; a wave banner and a "W2/3" chip in the header. The region sheet lists foes by wave |
+| **Balance** | `SIM=1` on time: regular stages and elites 100%, bosses 100% with gear except the Lv15 Ruins boss (light+dark, weapons only), which a party with more Arms clears. That's the rotation the pairs are for |
+
 
 ## The building blocks
 

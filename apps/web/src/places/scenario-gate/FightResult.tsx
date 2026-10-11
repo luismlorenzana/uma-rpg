@@ -67,7 +67,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
           </>
         ) : (
           <p className="mt-4 text-[14px] text-ink-soft">
-            No reward, no penalty: the run is as it was before the fight. Equip skills that hit their weaknesses, rest at a camp, or level up on earlier nodes.
+            No reward, no penalty: the run is as it was before the fight. Equip skills that hit their weaknesses, refill MP at a Spring, swap in a party that covers them, or level up on earlier stages.
           </p>
         )}
       </div>

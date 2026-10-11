@@ -20,14 +20,13 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H06](tasks/H06-world-atlas.md) | The world atlas: 19 biomes' tiles, props, liquids, roads, markers, icons | ChatGPT | uma-platform | L | — |
 | [H07](tasks/H07-world-map-screens.md) | World, continent and region screens in pixel art | ChatGPT | uma-rpg | L | H06 published |
 | [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | H06 |
-| [H09](tasks/H09-w3-foes-elements-waves.md) | W3: up to eight foes, dual-element foes, waves | Claude | uma-rpg | L | — |
 | [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars | ChatGPT | both | M | — |
 | [H11](tasks/H11-ui-icons.md) | Class emblems and status icons | ChatGPT | both | S | — |
 | [H12](tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs | ChatGPT | uma-rpg | M | — |
 | **P3** | | | | | |
-| [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | uma-rpg | M | H09 |
+| [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | uma-rpg | M | — |
 | [H14](tasks/H14-pacing-simulator.md) | A pacing and economy simulator, Lv1 to 50 | ChatGPT | uma-rpg | M | — |
-| [H15](tasks/H15-capital-finals.md) | The capitals' Finals | ChatGPT | uma-rpg | M | H09 helps |
+| [H15](tasks/H15-capital-finals.md) | The capitals' Finals | ChatGPT | uma-rpg | M | — |
 | [H16](tasks/H16-main-js-split.md) | Split the domain out of the main JS chunk | ChatGPT | uma-rpg | S | — |
 | [H17](tasks/H17-device-accessibility-pass.md) | Device and accessibility pass | ChatGPT, then the owner | uma-rpg | M | — |
 | [H18](tasks/H18-sound-effects.md) | Synthesized sound effects | ChatGPT | uma-rpg | S | — |
@@ -44,7 +43,7 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 **For ChatGPT, in order:** H04, H05, H03, then H06 → H07 → H08, H10, H11, H12, H14, H15, H16, H17, H18, H19.
 
 **Done:** H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
-speed (D89).
+speed (D89), and H09, W3's eight foes, dual elements and waves (D91).
 
 ## Not relevant anymore
 

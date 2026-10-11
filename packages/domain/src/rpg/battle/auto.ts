@@ -2,13 +2,13 @@
 // skill or Attack for the living foes. This is intentionally a small policy, not another battle engine.
 import { rpgNode, type RpgSkillDef } from '../catalog'
 import { isRpgTome, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
-import { applyBattleAction, battleActorSkill, battleHitIsWeak } from './engine'
+import { applyBattleAction, battleActorSkill, battleFoe, battleHitIsWeak } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
 import type { BattleAction, BattleAlly, BattleHalf, BattleState, BattleUnit } from './types'
 
 /** How good a skill or Attack is against a foe now: power, weakness, every-foe reach and a small status premium. */
 function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: readonly BattleUnit[]): number {
-  const enemy = state.input.enemies.find((candidate) => candidate.id === foe.id)!
+  const enemy = battleFoe(state, foe.id)!
   const weak = def.hits.some((hit) => hit.parts.some((part) => battleHitIsWeak(enemy, foe, part.kind)))
   const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
   return total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) /

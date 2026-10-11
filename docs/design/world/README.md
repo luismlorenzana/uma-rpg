@@ -1,7 +1,8 @@
 # The world map
 
-> **Status: W1–W2 built (D72), quick and plain; owner's answers of 2026-10-11 folded in (D66, D71).** It replaces
-> chapters and runs ([battles.md](../battles.md), D48 and D52). Next: W3 (eight foes, dual elements, waves). Companion pages: [research.md](research.md) (how other
+> **Status: W1–W3 built (D72, D91); owner's answers of 2026-10-11 folded in (D66, D71).** It replaces
+> chapters and runs ([battles.md](../battles.md), D48 and D52). Next: W4 (field effects and home ground) and W5 (the
+> pixel-art maps, [map-art.md](map-art.md)). Companion pages: [research.md](research.md) (how other
 > games do it), [regions.md](regions.md) (biomes and continents), [encounters.md](encounters.md) (what makes the fights
 > differ) and [themes.md](themes.md) (elements or franchises). The token loop it feeds is in [../loop.md](../loop.md).
 
@@ -95,7 +96,7 @@ swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a comb
 |---|---|---|
 | W1 | The world generator in the domain, with tests (counts, levels, no repeated combination in a region) | — |
 | W2 | World, continent and region screens with flat art; active party; carried MP and Springs; stages on today's engine (≤5 foes, one element each); save migration | The new loop end to end |
-| W3 | Engine and stage: 6–8 foes, dual elements, waves | The variety you described |
+| W3 | Engine and stage: 6–8 foes, dual elements, waves (done, D91; [encounters.md](encounters.md)) | The variety you described |
 | W4 | Field effects and home ground; a campaign sim to tune EXP, budgets and token drops | Biomes that play differently |
 | W5 | Art: biome tiles, composed maps, battle backdrops ([map-art.md](map-art.md), D87) | The map looks like a world |
 

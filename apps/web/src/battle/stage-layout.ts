@@ -18,19 +18,27 @@ const PORTRAIT_ASPECT = 320 / 470
 export const ENEMY_INFO_HEIGHT = 46
 export const ALLY_INFO_HEIGHT = 34
 
+/** Up to five foes stand in one row; six to eight in two (W3), the back row's info just above the front row. */
+export const ONE_ROW_FOES = 5
+
 export function stageLayout(width: number, height: number, ranks: readonly EnemyRank[], allyCount: number): StageLayout {
-  const n = Math.max(1, ranks.length)
   const enemyBottom = height * 0.5
-  const slot = width / n
+  const split = ranks.length > ONE_ROW_FOES ? Math.ceil(ranks.length / 2) : ranks.length
+  const rows = split < ranks.length ? [ranks.slice(0, split), ranks.slice(split)] : [ranks]
+  const rowHeight = rows.length === 1 ? enemyBottom - 8 : (enemyBottom - 8 - ENEMY_INFO_HEIGHT - 4) / 2
   const enemies: Box[] = []
   const enemyInfo: Box[] = []
-  ranks.forEach((rank, i) => {
-    const scale = rank === 'boss' ? 1.12 : rank === 'sub-boss' ? 1.05 : 0.94
-    const h = Math.min(enemyBottom - 8, (slot * 0.96) / PORTRAIT_ASPECT) * scale
-    const w = h * PORTRAIT_ASPECT
-    const cx = slot * (i + 0.5)
-    enemies.push({ x: cx - w / 2, y: enemyBottom - h, w, h })
-    enemyInfo.push({ x: cx - slot / 2 + 2, y: enemyBottom + 2, w: slot - 4, h: ENEMY_INFO_HEIGHT })
+  rows.forEach((row, r) => {
+    const bottom = r === rows.length - 1 ? enemyBottom : 8 + rowHeight
+    const slot = width / Math.max(1, row.length)
+    row.forEach((rank, i) => {
+      const scale = rank === 'boss' ? 1.12 : rank === 'sub-boss' ? 1.05 : 0.94
+      const h = Math.min(rowHeight, (slot * 0.96) / PORTRAIT_ASPECT) * scale
+      const w = h * PORTRAIT_ASPECT
+      const cx = slot * (i + 0.5)
+      enemies.push({ x: cx - w / 2, y: bottom - h, w, h })
+      enemyInfo.push({ x: cx - slot / 2 + 2, y: bottom + 2, w: slot - 4, h: ENEMY_INFO_HEIGHT })
+    })
   })
   const allySlot = width / Math.max(1, allyCount)
   const top = enemyBottom + ENEMY_INFO_HEIGHT + 8

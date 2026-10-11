@@ -10,7 +10,9 @@ export interface StageAlly { id: string; idle: HTMLImageElement | null; cheer: H
 export interface StageEnemy { id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string }
 export interface StageSetup {
   allies: StageAlly[]
+  /** Every foe of the fight, all waves (W3); `field` names those standing on the stage now. */
   enemies: StageEnemy[]
+  field: string[]
   /** The chapter's colour, `#RRGGBB`. */
   color: string
   reducedMotion: boolean
@@ -34,6 +36,8 @@ export class BattleScene extends Phaser.Scene {
   private waiting = new Set<() => void>()
   private skipping = false
   private cssSize = { w: 1, h: 1 }
+  /** The foes on the stage now: the setup's field until a wave changes it (W3). */
+  private field: string[] = []
 
   constructor() {
     super('battle')
@@ -73,9 +77,30 @@ export class BattleScene extends Phaser.Scene {
     this.drawBackground()
     this.layer.removeAll(true)
     this.actors.clear()
-    const layout = stageLayout(cssW, cssH, setup.enemies.map((e) => e.rank), setup.allies.length)
-    setup.enemies.forEach((e, i) => this.addActor(e.id, 'enemy', `foe-${e.id}`, layout.enemies[i]!, i))
+    if (!this.field.length) this.field = [...setup.field]
+    const layout = this.layoutFoes()
     setup.allies.forEach((a, i) => this.addActor(a.id, 'ally', `ally-${a.id}`, layout.allies[i]!, i))
+  }
+
+  /** Lays out and adds the foes on the field; returns the stage layout for the party too. */
+  private layoutFoes(): ReturnType<typeof stageLayout> {
+    const foes = this.field.map((id) => this.setup.enemies.find((e) => e.id === id)).filter((e): e is StageEnemy => !!e)
+    const layout = stageLayout(this.cssSize.w, this.cssSize.h, foes.map((e) => e.rank), this.setup.allies.length)
+    foes.forEach((e, i) => this.addActor(e.id, 'enemy', `foe-${e.id}`, layout.enemies[i]!, i))
+    return layout
+  }
+
+  /** A new wave (W3): the fallen foes leave and the next ones take the stage. */
+  private changeField(field: string[]): void {
+    for (const [id, actor] of [...this.actors]) {
+      if (actor.side !== 'enemy') continue
+      actor.idle?.stop()
+      actor.sprite.destroy()
+      actor.shadow.destroy()
+      this.actors.delete(id)
+    }
+    this.field = field
+    this.layoutFoes()
   }
 
   private addTexture(key: string, image: HTMLImageElement | null): this {
@@ -137,6 +162,8 @@ export class BattleScene extends Phaser.Scene {
 
   /** Brings every unit's look in line with the state: knocked out, broken, or standing. */
   sync(state: BattleState): void {
+    const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
+    if (this.setup && field.join() !== this.field.join()) this.changeField(field)
     for (const unit of state.units) {
       const actor = this.actors.get(unit.id)
       if (!actor) continue
@@ -253,6 +280,8 @@ export class BattleScene extends Phaser.Scene {
         this.burst(cue.actorId, 0xc79bff, 14, -1)
         this.label(cue.actorId, `${cue.label ?? 'Summon'}!`, '#e0c8ff')
         return this.wait(360)
+      case 'wave':
+        return this.waveBanner(cue.label ?? 'Next wave')
       case 'result':
         return this.result(cue.label)
       default:
@@ -447,6 +476,21 @@ export class BattleScene extends Phaser.Scene {
       for (const o of [band, stripe, title, sub, bust]) o?.destroy()
     } })
     await this.wait(160)
+  }
+
+  /** "Wave 2 of 3" across the rivals' half while the next foes step in (W3). */
+  private async waveBanner(label: string): Promise<void> {
+    const d = this.dpr
+    const t = this.text(this.cssSize.w * d / 2, this.cssSize.h * 0.25 * d, label.toUpperCase(), '#8fd3ff', 26)
+    t.setScale(0.5)
+    this.tweens.add({ targets: t, scale: 1, duration: 200, ease: 'Back.easeOut' })
+    this.tweens.add({ targets: t, alpha: 0, delay: 620, duration: 260, onComplete: () => t.destroy() })
+    for (const actor of this.actors.values()) {
+      if (actor.side !== 'enemy') continue
+      actor.sprite.setAlpha(0)
+      this.tweens.add({ targets: actor.sprite, alpha: 1, duration: 320 })
+    }
+    await this.wait(760)
   }
 
   private async result(label: 'victory' | 'loss'): Promise<void> {

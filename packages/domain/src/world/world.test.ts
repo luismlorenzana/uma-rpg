@@ -26,7 +26,13 @@ describe('the world map (D66, D71)', () => {
       const stages = chapter.nodes.filter((n) => n.kind !== 'camp')
       expect(stages).toHaveLength(12)
       expect(stages.map((n) => n.kind)).toEqual([...Array(10).fill('fight'), 'sub-boss', 'boss'])
-      expect(stages.every((n) => n.level === region.level && n.enemies.length >= 1 && n.enemies.length <= 5)).toBe(true)
+      // W3: up to eight foes a wave; stages 8 and 9 in two waves, the boss in three; ids unique across a stage's waves.
+      const waves = (n: (typeof stages)[number]) => [n.enemies, ...(n.waves ?? [])]
+      expect(stages.every((n) => n.level === region.level && waves(n).every((w) => w.length >= 1 && w.length <= 8))).toBe(true)
+      expect(stages.map((n) => waves(n).length)).toEqual([1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 3])
+      for (const n of stages) expect(new Set(waves(n).flat().map((e) => e.id)).size).toBe(waves(n).flat().length)
+      expect(waves(stages[11]!).at(-1)![0]!.rank).toBe('boss')
+      expect(stages[10]!.enemies[0]!.twice).toBe(true)
       expect(stageBand(stages[0]!.id)).toBe(1)
       // Variety: a region's regular stages use at least four formation-and-signature combinations.
       const plan = stagePlan(BIOMES.find((b) => b.id === region.biome)!, region.id).slice(0, 10)
@@ -34,12 +40,26 @@ describe('the world map (D66, D71)', () => {
     }
   })
 
+  it('makes a pair signature into foes carrying both elements, and fields swarms of six to eight (W3)', () => {
+    const regions = [1, 2, 3, 4, 5].flatMap((order) => worldContinent({ name: 'URA', order }).regions)
+    const foes = regions.flatMap((r) => regionChapter(r, cast).nodes.flatMap((n) => [n.enemies, ...(n.waves ?? [])].flat()))
+    const volcano = regions.find((r) => r.biome === 'volcano')!
+    const duals = regionChapter(volcano, cast).nodes.filter((n) => n.note).flatMap((n) => n.enemies)
+    expect(duals.length).toBeGreaterThan(0)
+    expect(duals.every((f) => f.element2 !== undefined && f.element2 !== f.element)).toBe(true)
+    expect(foes.every((f) => f.element2 === undefined || f.element2 !== f.element)).toBe(true)
+    const swarms = regions.flatMap((r) => regionChapter(r, cast).nodes.filter((n) => n.name === 'Swarm'))
+    expect(swarms.length).toBeGreaterThan(0)
+    expect(swarms.every((n) => n.enemies.length >= 6 && n.enemies.length <= 8)).toBe(true)
+    expect(new Set(swarms.map((n) => n.enemies.length)).size).toBeGreaterThan(1)
+  })
+
   it('answers a pair with what beats either half, minus its own: light and dark answer to weapons alone', () => {
     expect(signatureWeaknesses(['fire', 'dark'])).toEqual(['lightning', 'light'])
     expect(signatureWeaknesses(['ice', 'lightning'])).toEqual(['fire'])
     expect(signatureWeaknesses(['light', 'dark'])).toEqual([])
     const rift = worldContinent({ name: 'URA', order: 1 }).regions.find((r) => r.biome === 'rift')!
-    const foes = regionChapter(rift, cast).nodes.flatMap((n) => n.enemies)
+    const foes = regionChapter(rift, cast).nodes.flatMap((n) => [n.enemies, ...(n.waves ?? [])].flat())
     expect(foes.every((f) => f.weaknesses.elements.length === 0 && f.weaknesses.weapons.length >= 1)).toBe(true)
   })
 

@@ -32,6 +32,8 @@ export interface RpgMapNode {
   /** A Finals route's one-line flavor. */
   note: string | null
   enemies: BattleEnemy[]
+  /** Later waves (W3): each enters when the one before falls. */
+  waves?: BattleEnemy[][]
   exits: string[]
 }
 /** Where a chapter sits: its scenario and release order (from master data, `buildChapters`). */
