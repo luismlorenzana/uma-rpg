@@ -13,6 +13,7 @@ REGION="us-central1"
 REPOSITORY="luismlorenzana/uma-rpg"
 AR_REPO="rpg"
 MASTER_BUCKET="${MASTER_BUCKET:-uma-platform-master-data}"
+CONTENT_BUCKET="${CONTENT_BUCKET:-uma-rpg-content}"
 MASTER_PROJECT="${MASTER_PROJECT:-uma-platform-lm}"
 POOL_ID="github-actions"
 PROVIDER_ID="uma-rpg"
@@ -69,10 +70,15 @@ for sa in "${DEPLOY_SA_ID}:GitHub Actions production deployer" "${RUNTIME_SA_ID}
   fi
 done
 
-# Runtime: Firestore read/write in this project + read-only on the platform's master data bucket. Nothing else.
+# Runtime: Firestore read/write in this project + read-only on the platform's master data bucket and on this game's
+# private content bucket (the PriConne cast, D50). Nothing else.
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" --member="serviceAccount:${RUNTIME_SA}" \
   --role="roles/datastore.user" --condition=None >/dev/null
 CLOUDSDK_CORE_PROJECT="${MASTER_PROJECT}" gcloud storage buckets add-iam-policy-binding "gs://${MASTER_BUCKET}" \
+  --member="serviceAccount:${RUNTIME_SA}" --role="roles/storage.objectViewer" >/dev/null
+gcloud storage buckets describe "gs://${CONTENT_BUCKET}" >/dev/null 2>&1 || gcloud storage buckets create "gs://${CONTENT_BUCKET}" \
+  --location="${REGION}" --uniform-bucket-level-access --public-access-prevention >/dev/null
+gcloud storage buckets add-iam-policy-binding "gs://${CONTENT_BUCKET}" \
   --member="serviceAccount:${RUNTIME_SA}" --role="roles/storage.objectViewer" >/dev/null
 
 # Deployer: same roles as uma-racer's deployer.
@@ -127,3 +133,4 @@ echo "GCP_PROJECT_ID = ${PROJECT_ID}"
 echo "PROJECT_NUMBER = ${PROJECT_NUMBER}"
 echo "WIF_PROVIDER   = ${PROVIDER_NAME}"
 echo "MASTER_BUCKET  = ${MASTER_BUCKET}"
+echo "CONTENT_BUCKET = ${CONTENT_BUCKET}"

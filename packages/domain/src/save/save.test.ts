@@ -35,7 +35,7 @@ describe('save', () => {
     expect(() => parseSave({ ...save, tierWorlds: { '1': { ...save.tierWorlds['1'], wallet: { unlockTickets: -1, shards: 0, laurels: 0 } } } })).toThrow(/unlockTickets/)
     expect(() => parseSave({ ...save, tierWorlds: { x: save.tierWorlds['1'] } })).toThrow(/positive integers/)
     expect(() => parseSave({ ...save, account: { ...save.account, trainerName: ' Luis' } })).toThrow(/trainerName/)
-    expect(() => parseSave({ ...save, schemaVersion: 3 })).toThrow(/schemaVersion/)
+    expect(() => parseSave({ ...save, schemaVersion: 4 })).toThrow(/schemaVersion/)
   })
 
   it('parses a PUT body', () => {

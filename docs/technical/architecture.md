@@ -7,17 +7,21 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 | Path | What |
 |---|---|
-| `packages/domain` (`@rpg/domain`) | Pure rules and contracts: the save (`save/`), the place registry (`hub/`), the master data adapter (`master/`). Builds CommonJS + declarations for the API; Vite and Vitest read its TypeScript source |
-| `apps/api` (`@rpg/api`) | NestJS on Cloud Run: auth guard, `/api/save`, `/api/master/*`, `/api/health` |
+| `packages/domain` (`@rpg/domain`) | Pure rules and contracts: the save and its rules (`save/`, including `save/battle.ts`), the battle engine, class catalog and campaign ported from uma-racer (`rpg/`), the place registry (`hub/`), the master data adapter (`master/`). Builds CommonJS + declarations for the API; Vite and Vitest read its TypeScript source |
+| `apps/api` (`@rpg/api`) | NestJS on Cloud Run: auth guard, `/api/save`, `/api/master/*`, `/api/content/*`, `/api/health` |
 | `apps/web` (`@rpg/web`) | React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie + React Router 7 + Phaser 4 (lazy) + PWA |
 | `infra/github-actions/bootstrap.sh` | One-time GCP setup |
+| `scripts/cast/` | The private PriConne cast: `import.mjs` builds `content/release/`, `publish.sh` uploads it (D50) |
 
-## Save and sync (D32, D45)
+## Save and sync (D32, D45, D52)
 
-- One snapshot per account: `{ schemaVersion: 2, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
-  outfits by id: unlock time, level, EXP) and exactly 20 `parties` of five slots, an Uma in at most one slot (D46).
-  Strict parsers in `@rpg/domain` validate on both sides; a v1 save parses into v2 (device rows on boot, server rows on
-  read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets) are pure and return a new save.
+- One snapshot per account: `{ schemaVersion: 3, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
+  outfits by id: unlock time, level, EXP, the class `build` she fights as and her `builds`: tree, equipped skills,
+  Familiar), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), and `runs` (one per party per
+  chapter: wins, carried MP, and the open fight as its frozen input plus every action).
+  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; v1 and v2 saves parse into v3
+  (device rows on boot, server rows on read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets;
+  `save/battle.ts`: builds, skills, fights and their rewards) are pure and return a new save.
 - The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old
   installed app can't overwrite newer data.
 - The device holds one Dexie row `{ uid, revision, save, dirty }` and a Zustand store. Every change writes both and
@@ -39,6 +43,28 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 - Art needs the owner's token, so images are fetched with it and shown from session blob URLs; the service worker caches
   the bytes.
 
+## Private content (D50)
+
+- uma-rpg's own private content, the PriConne cast, lives in the gitignored `content/` (sources, a fetch cache and
+  `release/`). `scripts/cast/import.mjs` turns the captured official list into `release/cast.json` plus hash-named
+  WebP portraits; `scripts/cast/publish.sh` uploads them to `gs://uma-rpg-content` (portraits first, the list last).
+- The API serves only `cast.json` (`no-cache`) and `cast/<slug>.<hash8>.webp` (`immutable`) at `/api/content/`, from
+  the bucket in production (`CONTENT_BUCKET`) and from `content/release` in dev. The web app loads the list once a
+  session and portraits as blob URLs; the service worker caches them.
+
+## Battles (D48–D53)
+
+- `@rpg/domain/rpg` is uma-racer's engine v5 (deterministic reducer: `createBattle`, `applyBattleAction`,
+  `replayBattle`), its class catalog, and its campaign re-cut to ten-level chapters, generated from the scenario order
+  and the cast. The web app builds Tier 1's chapters once per master release and cast (`battle/campaign.tsx`).
+- Every fight action goes through the store (`fightAction`): the domain applies it to the save, and when it ends the
+  fight the rewards land in the same save. The screen then plays the engine's cues.
+- The fight screen (`places/scenario-gate/FightScreen.tsx`) is a lazy Phaser stage (`battle/scene/`, DPR-aware like
+  the Hub, `window.__battle` in dev) under a DOM layer. Both place things with one function, `battle/stage-layout.ts`.
+  The canvas draws art and effects, including effect text; the DOM has every control and lasting number.
+  `battle/battle-view.ts` (ported) projects the engine for the UI: legal skills, damage previews, Limit Break options,
+  and `followCue`, which moves the DOM bars in step with the effects.
+
 ## The Hub (D30, D31, D33)
 
 - Routes (D43): `/:page` is the Hub, `/:page?peek=:placeId` a place's quick look (the side panel), `/:page/:placeId/*` its
@@ -57,4 +83,4 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Budgets
 
-Main JS ≤ 180 KB gzip (146 KB at S1). Phaser, Firebase, master data parsing and each place overlay are lazy chunks.
+Main JS ≤ 180 KB gzip (146 KB at S1, 175 KB at S3: the save parser replays open fights, so the battle engine and class catalog ship in the main chunk; the next slice should split them out or raise the budget on purpose). Phaser (Hub and battle stage), Firebase, master data parsing and each place page are lazy chunks.

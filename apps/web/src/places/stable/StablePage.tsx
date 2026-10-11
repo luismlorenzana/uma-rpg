@@ -7,11 +7,12 @@ import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import type { MasterView } from '../../master/master'
 import { useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
-import { CloseIcon, LockIcon, SearchIcon } from '../../ui/icons'
+import { BackIcon, CloseIcon, LockIcon, SearchIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 import { FiltersSheet } from './FiltersSheet'
 import { OutfitProfile } from './OutfitProfile'
+import { SkillsPage } from './SkillsPage'
 import { loadPrefs, savePrefs, type StablePrefs } from './stable-prefs'
 
 function Skeleton() {
@@ -25,8 +26,29 @@ function Skeleton() {
 }
 
 export default function StablePage({ place, rest }: PageProps) {
-  const outfitId = rest.startsWith('outfit/') ? rest.slice('outfit/'.length) : null
-  return <MasterGate skeleton={<Skeleton />}>{(view) => (outfitId ? <OutfitProfile view={view} outfitId={outfitId} place={place} /> : <Roster view={view} place={place} />)}</MasterGate>
+  const [, outfitId, sub] = rest.split('/')
+  return (
+    <MasterGate skeleton={<Skeleton />}>
+      {(view) => {
+        if (!outfitId) return <Roster view={view} place={place} />
+        const outfit = view.roster.find((o) => o.outfitId === outfitId)
+        if (sub === 'skills' && outfit) return <SkillsRoute outfit={outfit} place={place} />
+        return <OutfitProfile view={view} outfitId={outfitId} place={place} />
+      }}
+    </MasterGate>
+  )
+}
+
+function SkillsRoute({ outfit, place }: { outfit: RosterEntry['outfit']; place: PageProps['place'] }) {
+  const nav = useHubNavigation()
+  return (
+    <div className="space-y-2 p-4">
+      <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
+        <BackIcon size={18} /> {outfit.name}
+      </button>
+      <SkillsPage outfit={outfit} name={outfit.name} />
+    </div>
+  )
 }
 
 function facetChips(f: RosterFacets): { label: string; remove: (f: RosterFacets) => RosterFacets }[] {

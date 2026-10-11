@@ -29,6 +29,7 @@ env:
   DEPLOY_SERVICE_ACCOUNT: github-deployer@${{ vars.GCP_PROJECT_ID || 'uma-rpg' }}.iam.gserviceaccount.com
   RUNTIME_SERVICE_ACCOUNT: rpg-api-runtime@${{ vars.GCP_PROJECT_ID || 'uma-rpg' }}.iam.gserviceaccount.com
   MASTER_BUCKET: ${{ vars.MASTER_BUCKET || 'uma-platform-master-data' }}
+  CONTENT_BUCKET: ${{ vars.CONTENT_BUCKET || 'uma-rpg-content' }}
   HOSTING_URL: https://${{ vars.GCP_PROJECT_ID || 'uma-rpg' }}.web.app
   # @luismlorenzana/* packages (uma-platform) on GitHub Packages.
   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,6 +130,7 @@ jobs:
           env_vars: |
             PERSISTENCE=firestore
             MASTER_BUCKET=${{ env.MASTER_BUCKET }}
+            CONTENT_BUCKET=${{ env.CONTENT_BUCKET }}
             ALLOWED_ORIGIN=${{ env.HOSTING_URL }}
             ALLOWED_EMAIL=${{ vars.ALLOWED_EMAIL }}
             BUILD_ID=${{ github.sha }}
@@ -137,6 +139,7 @@ jobs:
         run: |
           curl --fail --silent --show-error --retry 10 --retry-delay 3 "${{ steps.deploy-api.outputs.url }}/api/health" > /dev/null
           test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${{ steps.deploy-api.outputs.url }}/api/save")" = "401"
+          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${{ steps.deploy-api.outputs.url }}/api/content/cast.json")" = "401"
 
       - name: Build web application
         run: pnpm --filter @rpg/web build

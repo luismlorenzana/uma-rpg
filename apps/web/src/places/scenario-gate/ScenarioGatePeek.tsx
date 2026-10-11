@@ -17,7 +17,7 @@ export default function ScenarioGatePeek() {
                 </li>
               ))}
             </ul>
-            <p className="text-[12px] text-ink-faint">Battles open in S3.</p>
+            <p className="text-[12px] text-ink-faint">Pick a chapter and a party of five, then fight PriConne rivals for EXP, Shards and Laurels.</p>
           </div>
         )
       }}

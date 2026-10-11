@@ -8,7 +8,8 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 | Site | https://uma-rpg.web.app (Firebase Hosting, classic). `/api/**` is rewritten to Cloud Run, so the app is same-origin |
 | API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
 | Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }` |
-| Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket only |
+| Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket |
+| Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the PriConne cast (D50). The runtime service account reads it; `scripts/cast/publish.sh` writes it with the owner's gcloud login |
 | Images | Artifact Registry `us-central1-docker.pkg.dev/uma-rpg/rpg`, keeps the last 3 |
 | Auth | Firebase Auth, Google sign-in; the API allows only `ALLOWED_EMAIL` |
 | Deploy | `.github/workflows/deploy.yml`, keyless Workload Identity Federation (`github-actions` pool, provider `uma-rpg`, main branch of `luismlorenzana/uma-rpg` only) |
@@ -30,7 +31,8 @@ Never run `gcloud config set …`.
    app; its public config is in `apps/web/.env.production`.
 2. `CLOUDSDK_ACTIVE_CONFIG_NAME=default bash infra/github-actions/bootstrap.sh`: services, Firestore, Artifact Registry,
    service accounts and roles, the master bucket grant, WIF, the budget.
-3. Repository variables: `GCP_PROJECT_ID`, `WIF_PROVIDER`, `ALLOWED_EMAIL`, `MASTER_BUCKET`, `DEPLOY_ENABLED`.
+3. Repository variables: `GCP_PROJECT_ID`, `WIF_PROVIDER`, `ALLOWED_EMAIL`, `MASTER_BUCKET`, `CONTENT_BUCKET`
+   (added 2026-10-10 with the bucket, S3), `DEPLOY_ENABLED`.
 4. **Owner steps** (console only, done 2026-10-10):
    - Firebase console → Authentication → Get started → Sign-in method → **Google** → Enable.
    - GitHub → `uma-data` package (uma-platform) → Package settings → **Manage Actions access** → add `uma-rpg` with
@@ -45,7 +47,11 @@ Never run `gcloud config set …`.
 
 Every push to `main` (outside docs) runs lint, test and build, then, with `DEPLOY_ENABLED=true`, builds the API image
 (the npm token passes as a BuildKit secret), deploys Cloud Run, builds the web app and deploys Hosting. The workflow
-verifies: `/api/health` 200 and `/api/save` 401 on Cloud Run and through Hosting, and the shell served `no-cache`.
+verifies: `/api/health` 200, `/api/save` and `/api/content/cast.json` 401 on Cloud Run, the same through Hosting, and
+the shell served `no-cache`.
+
+The cast is published separately, by hand: `node scripts/cast/import.mjs && bash scripts/cast/publish.sh`. The app
+picks a new cast up on its next load.
 
 Watch a deploy: `gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`.
 

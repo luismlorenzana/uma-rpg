@@ -1,7 +1,11 @@
 // An outfit's profile (S1, extended in S2): art, aptitudes and what they do here, stats, unique skill, and either the
 // Unlock flow (locked) or her state (owned: level, unlock date, party).
 import { STATS } from '@luismlorenzana/uma-data'
-import { best, DISTANCE_GEAR, KEY_LABELS, partyOf, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type Place, type RosterOutfit } from '@rpg/domain'
+import {
+  activeBuild, best, buildOf, DISTANCE_GEAR, KEY_LABELS, partyOf, RPG_TIER_MAX_LEVEL, rpgActiveSlots, rpgExpToNext, rpgTreePointsEarned,
+  rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
+} from '@rpg/domain'
+import { Bar, BUILD_LABEL } from '../../battle/labels'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
@@ -64,6 +68,32 @@ function AptitudesAtWork({ outfit }: { outfit: RosterOutfit }) {
           </div>
         ))}
       </div>
+    </section>
+  )
+}
+
+/** Her battle side (S3): EXP to the next level, the build she fights with, points to spend and equipped skills. */
+function BattleCard({ outfit, owned, onSkills }: { outfit: RosterOutfit; owned: OwnedUma; onSkills: () => void }) {
+  const build = activeBuild(outfit, owned)
+  const current = buildOf(owned, build)
+  const points = rpgTreePointsEarned(owned.level) - rpgTreePointsSpent(current.tree.map((id) => ({ tier: 1, id })))
+  const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
+  return (
+    <section className="space-y-2 rounded-md bg-raised p-3">
+      <div className="flex items-center justify-between text-[12px] text-ink-soft">
+        <span>EXP</span>
+        <span>{next ? `${owned.exp} / ${next}` : `Lv${RPG_TIER_MAX_LEVEL} · ${owned.exp} banked`}</span>
+      </div>
+      <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
+      <button type="button" onClick={onSkills} className="flex min-h-12 w-full items-center justify-between gap-2 rounded-sm bg-panel px-3 text-left active:bg-white/5">
+        <span className="min-w-0">
+          <span className="block truncate text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
+          <span className="block text-[12px] text-ink-soft">{current.loadout.length}/{rpgActiveSlots(owned.level)} skills equipped</span>
+        </span>
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold ${points > 0 ? 'bg-accent text-accent-ink' : 'bg-sunken text-ink-soft'}`}>
+          {points > 0 ? `${points} pts · Skills` : 'Skills'}
+        </span>
+      </button>
     </section>
   )
 }
@@ -163,6 +193,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
           </p>
         </section>
       )}
+
+      {owned && <BattleCard outfit={outfit} owned={owned} onSkills={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} />}
 
       <Aptitudes outfit={outfit} />
       <AptitudesAtWork outfit={outfit} />

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Uploads the private PriConne cast (D50) from content/release to the private content bucket: hash-named portraits
+# first, then cast.json, so a reader never sees a list that points at missing files. Never changes the gcloud account.
+#
+#   bash scripts/cast/publish.sh            # uploads to gs://uma-rpg-content
+set -euo pipefail
+cd "$(dirname "$0")/../.."
+export CLOUDSDK_ACTIVE_CONFIG_NAME="${CLOUDSDK_ACTIVE_CONFIG_NAME:-default}" CLOUDSDK_CORE_PROJECT="${CLOUDSDK_CORE_PROJECT:-uma-rpg}"
+BUCKET="${CONTENT_BUCKET:-uma-rpg-content}"
+test -f content/release/cast.json || { echo "Run node scripts/cast/import.mjs first" >&2; exit 1; }
+gcloud storage rsync content/release/cast "gs://${BUCKET}/cast" --checksums-only \
+  --cache-control="private, max-age=31536000, immutable" --content-type=image/webp
+gcloud storage cp content/release/cast.json "gs://${BUCKET}/cast.json" --cache-control="private, no-cache" --content-type=application/json
+echo "Published $(ls content/release/cast | wc -l | tr -d ' ') portraits and cast.json to gs://${BUCKET}"

@@ -1,20 +1,21 @@
-# Tasks — S2 Collection and parties
+# Tasks — S3 Battles and leveling
 
-Implementable tasks for the active slice ([S2 spec](../slices/S2-collection.md), [build plan](../plan.md)). **A task
-file is deleted in the commit that finishes it** (D35). S1's last task, the owner's phone check (T009), passed on
-2026-10-10: signed in on the iPhone and browsing the roster.
+Implementable tasks for the active slice ([S3 spec](../slices/S3-battles.md), [build plan](../plan.md)). **A task
+file is deleted in the commit that finishes it** (D35).
 
-T010–T013 are done: place pages, save v2 and its rules, the Stable page and the Party Hall (now in the code,
-[architecture.md](../technical/architecture.md) and the design docs).
+T015–T019 are done: the engine and campaign port with ten-level chapters, save v3 with class builds and runs, the
+private PriConne cast pipeline, the chapter map, the Phaser fight and result, and the skills page (now in the code,
+[battles.md](../design/battles.md), [architecture.md](../technical/architecture.md) and D48–D53).
 
 | Task | What | Status |
 |---|---|---|
-| [T014](T014-s2-release.md) | Hub summaries, Account count, deploy and phone check | Live (`2c60abe`, pipeline green); the owner's phone check is next |
+| [T014](T014-s2-release.md) | S2's phone check | Live since `2c60abe`; the owner's check is still open |
+| [T020](T020-s3-release.md) | Deploy S3 and the phone check | Deploying |
 
 ## Conventions every task follows
 
 - Mobile first at 390×844 (check 375×667): 44 pt targets, safe areas, `h-dvh`. Main JS ≤ 180 KB gzip; place pages
-  are lazy chunks.
-- Rules live in `@rpg/domain` with Vitest tests; the web app only calls them. No network in tests; fixtures from
-  `@luismlorenzana/uma-data/testing`.
+  and Phaser are lazy chunks.
+- Rules live in `@rpg/domain` with Vitest tests; the web app only calls them. No network in tests; fixtures are
+  invented (no original-game or PriConne content in tests or git).
 - Every screen is a place (D31, D43). Conventional Commits; Claude commits and pushes to `main`.

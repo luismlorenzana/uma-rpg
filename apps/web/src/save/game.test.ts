@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { newSave, type Save, type SaveEnvelope } from '@rpg/domain'
+import { newSave, SAVE_SCHEMA_VERSION, type Save, type SaveEnvelope } from '@rpg/domain'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // An in-memory server with the API's revision rules.
@@ -107,7 +107,7 @@ describe('game store', () => {
     server.envelope = { revision: 1, save: null }
     await boot('u1')
     const save = useGame.getState().save
-    expect(save?.schemaVersion).toBe(2)
+    expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
   })
 })

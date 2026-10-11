@@ -12,7 +12,7 @@ describe('collection rules', () => {
     const save = unlockUma(newSave('Luis', T0), '100101', T1)
     const world = worldOf(save)
     expect(world.wallet.unlockTickets).toBe(19)
-    expect(world.umas['100101']).toEqual({ unlockedAt: T1, level: 1, exp: 0 })
+    expect(world.umas['100101']).toEqual({ unlockedAt: T1, level: 1, exp: 0, build: null, builds: {} })
     expect(save.account.updatedAt).toBe(T1)
   })
 
@@ -91,7 +91,7 @@ describe('save v2 parsing', () => {
   it('migrates a v1 save: no Umas, twenty empty parties', () => {
     const v1 = { schemaVersion: 1, account: { trainerName: 'Luis', createdAt: T0, updatedAt: T0 }, tierWorlds: { '1': { createdAt: T0, wallet: { unlockTickets: 20, shards: 0, laurels: 0 } } } }
     const migrated = parseSave(v1)
-    expect(migrated.schemaVersion).toBe(2)
+    expect(migrated.schemaVersion).toBe(3)
     expect(migrated.tierWorlds['1']?.umas).toEqual({})
     expect(migrated.tierWorlds['1']?.parties).toHaveLength(20)
   })

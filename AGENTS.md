@@ -30,6 +30,8 @@ NODE_AUTH_TOKEN=$(gh auth token) pnpm install
 pnpm lint && pnpm test && pnpm build
 pnpm --filter @rpg/api dev     # API on :8081, auth off, local save, master data from ../uma-platform/content/release
 pnpm --filter @rpg/web dev     # web on :5174, /api proxied to :8081
+node scripts/cast/import.mjs   # private PriConne cast → content/release (gitignored; needs content/sources, D50)
+bash scripts/cast/publish.sh   # upload it to gs://uma-rpg-content (scoped gcloud, never changes the account)
 ```
 
 ## Conventions

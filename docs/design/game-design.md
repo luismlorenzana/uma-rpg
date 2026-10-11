@@ -66,8 +66,8 @@ data, so a newly released scenario slots in after a single import.
 | 3 | Design Your Island, Yukoma Hot Springs, Beyond Dreams, Tracen Diner, *next released scenario* |
 
 - **[Proposed]** Tier 3 opens with its four chapters. Its Tier Finale arrives with the fifth scenario.
-- **[Proposed]** Each chapter keeps today's map shape, compressed from 12 levels to 10: Debut Lv1–3, Classic 4–6,
-  Senior Year 7–9, Finals 10 (vanguard, then champion). A balance pass sets the exact node levels.
+- **[Settled, D48]** Each chapter keeps uma-racer's map shape, compressed from 12 levels to 10: Debut Lv1–3, Classic
+  4–6, Senior Year 7–9, Finals 10 (vanguard, then champion). Details in [battles.md](battles.md).
 
 ### 2.2 Tier worlds **[Owner]**
 
@@ -168,6 +168,8 @@ fills the grades between in even steps:
 - **[Owner]** Running-style aptitude sets how fast an Uma's class ranks up (§4.1).
 - **[Proposed]** Each class keeps today's weapon set (the class decides what she wields), today's trees and today's
   battle role. The five classes are Brawler, Mage, Spell Blade, Cleric and Summoner.
+- **[S3, D49]** Until the Learning District arrives (S5), depths open by Uma level (Lv1/10/20/30/40) and every class
+  can learn skills; each Uma has six class builds with their own trees ([battles.md](battles.md)).
 - **[Proposed]** **Ranks 1–6.** Each rank above 1 opens one tree depth: rank 2 opens depth 1, and rank 6 opens depth 5
   (the capstones). These ranks replace today's depth gates at Uma Lv 1/10/20/30/40.
 - **[Proposed]** **Skill points come from Uma Level, and every class tree gets the full amount.** Classes don't compete
@@ -414,14 +416,14 @@ more you choose which single area to push. Laurels buy:
 - **[Proposed]** Keep today's foe curve on lifetime level, `22 + 1.59 × (level − 1)` for the average stat, with the
   role, rank and shield rules from uma-racer's class doc, plus the gear and Extra Stats budget (§7.3).
 
-## 13. Carried over from uma-racer's RPG **[Proposed]**
+## 13. Carried over from uma-racer's RPG **[Done in S3]**
 
 | Keep | Retire |
 |---|---|
 | Battle engine v5: breaks, shields, Limit Break, statuses, seeded replay | Inspiration tokens, Inventory/Convert for tokens, the Inspiration advance |
 | Five classes, their trees, hands and weapon sets | Class choice by A running style (classes are now free) |
 | Chapter maps, camps, carried MP, replays, Finals routes (re-cut to 10 levels) | 12-level chapters |
-| Saved parties (twenty now, D41), roster and profile screens | Enrollment freezing an outfit; fixed class per Uma |
+| Saved parties (twenty now, D41) and PriConne's cast as rivals (all 109 playable characters now, D50) | Enrollment freezing an outfit; fixed class per Uma; the DOM fight screen (a Phaser stage now, D53) |
 | The campaign simulation harness | Anything paid into uma-racer |
 
 ## 14. Next steps

@@ -33,6 +33,7 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   'scenario-gate': {
     Peek: lazy(() => import('./scenario-gate/ScenarioGatePeek')),
     Page: lazy(() => import('./scenario-gate/ScenarioGatePage')),
+    Counter: lazy(() => import('./scenario-gate/LaurelCounter')),
   },
   account: {
     Page: lazy(() => import('./account/AccountPage')),

@@ -3,6 +3,7 @@
 import { normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SHARDS_PER_TICKET, type Party, type Save, type TierWorld, type Wallet } from './save'
 
 export type SaveRuleReason = 'no-ticket' | 'already-owned' | 'not-owned' | 'bad-party' | 'bad-slot' | 'bad-name' | 'no-world'
+  | 'bad-build' | 'cannot-learn' | 'bad-loadout' | 'cannot-fight' | 'in-fight'
 
 export class SaveRuleError extends Error {
   readonly reason: SaveRuleReason
@@ -33,7 +34,7 @@ export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER
   return withWorld(save, tier, {
     ...world,
     wallet: { ...world.wallet, unlockTickets: world.wallet.unlockTickets - 1 },
-    umas: { ...world.umas, [outfitId]: { unlockedAt: now, level: 1, exp: 0 } },
+    umas: { ...world.umas, [outfitId]: { unlockedAt: now, level: 1, exp: 0, build: null, builds: {} } },
   }, now)
 }
 
@@ -55,6 +56,10 @@ export function setPartySlot(save: Save, party: number, slot: number, outfitId: 
   if (!Number.isInteger(party) || party < 0 || party >= PARTY_COUNT) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
   if (!Number.isInteger(slot) || slot < 0 || slot >= PARTY_SIZE) throw new SaveRuleError('bad-slot', `slot ${slot} doesn't exist`)
   if (outfitId !== null && !world.umas[outfitId]) throw new SaveRuleError('not-owned', 'only owned Umas can join a party')
+  // A party in a fight keeps its line-up until the fight ends, and nobody leaves a fight for another party (D52).
+  const fighting = (p: number) => Object.values(world.runs).some((r) => r.party === p && r.battle)
+  const from = outfitId === null ? null : partyOf(world, outfitId)
+  if (fighting(party) || (from && fighting(from.party))) throw new SaveRuleError('in-fight', 'finish or leave the open fight first')
   const parties: Party[] = world.parties.map((p) => ({ ...p, slots: p.slots.map((s) => (outfitId !== null && s === outfitId ? null : s)) }))
   const target = parties[party]
   if (!target) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)

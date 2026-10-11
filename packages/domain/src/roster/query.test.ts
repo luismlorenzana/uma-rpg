@@ -7,7 +7,7 @@ import { DEFAULT_ROSTER_QUERY, EMPTY_FACETS, runRosterQuery, type RosterQuery } 
 const NOW = Date.parse('2026-10-10T12:00:00.000Z')
 const roster: RosterOutfit[] = buildRoster(syntheticMasterData())
 const first = roster[0]!
-const umas = { [first.outfitId]: { unlockedAt: '2026-10-10T11:00:00.000Z', level: 3, exp: 0 } }
+const umas = { [first.outfitId]: { unlockedAt: '2026-10-10T11:00:00.000Z', level: 3, exp: 0, build: null, builds: {} } }
 const q = (patch: Partial<RosterQuery>): RosterQuery => ({ ...DEFAULT_ROSTER_QUERY, ...patch })
 
 describe('roster query', () => {

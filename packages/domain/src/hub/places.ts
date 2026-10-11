@@ -180,7 +180,7 @@ const TOWN: Place[] = [
   {
     id: 'scenario-gate', page: 'town', kind: 'town', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.36 },
     blurb: 'The chapters of your tier: one scenario each, ten levels each.',
-    details: ['Tier 1: URA Finale → Grand Masters', 'Battles open in S3'],
+    details: ['Tier 1: URA Finale → Grand Masters', 'Fight PriConne rivals with a party of five: EXP, Shards and Laurels'],
   },
   {
     id: 'warehouse', page: 'town', kind: 'town', name: 'Warehouse', opensIn: 'S4', slots: 0, at: { x: 0.24, y: 0.6 },
@@ -237,4 +237,4 @@ export function isOpen(place: Place, current: SliceId): boolean {
 }
 
 /** The slice the deployed build implements. */
-export const CURRENT_SLICE: SliceId = 'S2'
+export const CURRENT_SLICE: SliceId = 'S3'

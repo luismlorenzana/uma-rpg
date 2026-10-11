@@ -1,6 +1,10 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
-import { newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type Save, type TierWorld } from '@rpg/domain'
+import {
+  actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
+  setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
+  type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
+} from '@rpg/domain'
 import { create } from 'zustand'
 import { conflictEnvelope, saveApi } from '../api/client'
 import { readSaveRow, writeSaveRow } from './db'
@@ -93,6 +97,34 @@ export async function setSlot(party: number, slot: number, outfitId: string | nu
 export async function nameParty(party: number, name: string): Promise<void> {
   const { save } = useGame.getState()
   if (save) await commit(renameParty(save, party, name, nowIso()))
+}
+
+// --- Battles (S3) ---------------------------------------------------------------------------------------------
+
+const edit = async (change: (save: Save, now: string) => Save): Promise<void> => {
+  const { save } = useGame.getState()
+  if (save) await commit(change(save, nowIso()))
+}
+
+/** Switches the build she fights with (free, design §5). */
+export const pickBuild = (outfitId: string, build: RpgBuildId) => edit((s, now) => chooseBuild(s, outfitId, build, now))
+/** Learns a node in a build; throws SaveRuleError with the reason when she can't. */
+export const learn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) => edit((s, now) => learnSkill(s, outfit, build, nodeId, now))
+export const unlearn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, build, nodeId, now))
+export const equip = (outfit: BattleOutfit, build: RpgBuildId, loadout: string[]) => edit((s, now) => equipSkills(s, outfit, build, loadout, now))
+export const chooseFamiliar = (outfitId: string, kind: RpgWeaponKind) => edit((s, now) => setFamiliar(s, outfitId, kind, now))
+export const beginFight = (chapter: RpgCampaignChapter, party: number, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>
+  edit((s, now) => startFight(s, chapter, party, nodeId, outfits, now))
+export const leaveFight = (chapter: RpgCampaignChapter, party: number) => edit((s, now) => retreat(s, chapter, party, now))
+export const rest = (chapter: RpgCampaignChapter, party: number, campId: string) => edit((s, now) => restAtCamp(s, chapter, party, campId, now))
+
+/** One action in the party's open fight. Saved at once; when it ends the fight, the rewards land in the same save. */
+export async function fightAction(chapter: RpgCampaignChapter, party: number, action: BattleAction): Promise<{ step: BattleStep; result: FightResult | null }> {
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const acted = actInFight(save, chapter, party, action, nowIso())
+  await commit(acted.save)
+  return { step: acted.step, result: acted.result }
 }
 
 /** The Tier 1 world, or null before boot. */

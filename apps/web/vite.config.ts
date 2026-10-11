@@ -62,6 +62,18 @@ export default defineConfig(({ mode }) => {
             handler: 'NetworkFirst',
             options: { cacheName: 'rpg-master-channel', networkTimeoutSeconds: 4 },
           },
+          {
+            // PriConne cast portraits are hash-named too (D50).
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/content/cast/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'rpg-content', expiration: { maxEntries: 400 } },
+          },
+          {
+            // The cast list changes when the cast grows: prefer the network, fall back to the last one offline.
+            urlPattern: ({ url }) => url.pathname === '/api/content/cast.json',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'rpg-content-list', networkTimeoutSeconds: 4 },
+          },
         ],
       },
     }),
