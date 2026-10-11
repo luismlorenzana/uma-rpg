@@ -11,7 +11,7 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 | `apps/api` (`@rpg/api`) | NestJS on Cloud Run: auth guard, `/api/save`, `/api/master/*`, `/api/content/*`, `/api/health` |
 | `apps/web` (`@rpg/web`) | React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie + React Router 7 + Phaser 4 (lazy) + PWA |
 | `infra/github-actions/bootstrap.sh` | One-time GCP setup |
-| `scripts/cast/` | The private PriConne cast: `import.mjs` builds `content/release/`, `publish.sh` uploads it (D50) |
+| `scripts/cast/` | The private face packs: `import.mjs` (PriConne, D50) and `import-azurlane.mjs` (D76) build `content/release/`, `pack.mjs` holds their shared fetch, trim and write steps, `publish.sh [pack]` uploads one |
 
 ## Save and sync (D32, D45, D52)
 

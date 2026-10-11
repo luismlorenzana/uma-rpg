@@ -6,6 +6,7 @@ import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
 import type { RpgCampaignChapter, RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { levelBand, rollTokens } from '../economy/tokens'
+import { FIRST_CLEAR_LAURELS, REPLAY_SHARE } from '../economy/pacing'
 import { SPRING_RECHARGE_MS } from '../world/world'
 import {
   rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
@@ -211,13 +212,20 @@ export interface FightResult {
   tickets: number
   /** Tokens the win dropped into the Warehouse (D67); Sweeps drop none. */
   tokens: Record<string, number>
-  /** The stage's first clear: its Laurels pay triple (D66). */
+  /** The stage's first clear: its Laurels pay triple (D66); later wins pay a quarter of it (D79). */
   firstClear?: boolean
+}
+
+/** Laurels a stage win pays: triple on its first clear (D66), a quarter of that on a replay or Sweep (D79). */
+export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: number, firstClear: boolean): number {
+  const full = rpgBattleLaurels(kind, tier) * FIRST_CLEAR_LAURELS
+  return firstClear ? full : Math.round(full * REPLAY_SHARE)
 }
 
 /**
  * Closes a finished fight. A win pays every entrant (KO'd included) EXP, a Shard at Lv10/20/30/40/50 in Tier 1, the
- * world Laurels (triple on a stage's first clear) and tokens; MP carries. A loss leaves the run as it was before.
+ * world Laurels (triple on a stage's first clear) and tokens; a stage already cleared pays a quarter of all of it (D79).
+ * MP carries. A loss leaves the run as it was before.
  */
 export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun, state: BattleState, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
   const world = worldOf(save, tier)
@@ -232,9 +240,10 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   if (state.outcome !== 'victory') return { save: withRun(save, closed, now, tier), result }
   const kind = rpgRewardKind(node)
   const firstClear = (run.wins[node.id] ?? 0) === 0
-  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, rpgBattleLaurels(kind, chapter.tier) * (firstClear ? 3 : 1), tier)
+  const share = firstClear ? 1 : REPLAY_SHARE
+  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, stageLaurels(kind, chapter.tier, firstClear), tier, share)
   // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
-  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level))
+  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share)
   const items = { ...paid.world.items }
   for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
   Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens, firstClear })
@@ -243,18 +252,18 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
 }
 
 /**
- * Pays a won fight to its entrants: EXP by the level gap, a Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket),
- * and the world's Laurels. Shared by fights and Sweeps (which pay no Laurels).
+ * Pays a won fight to its entrants: EXP by the level gap (times `share` on a replay, D79), a Shard at
+ * Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
  */
 export function payEntrants(world: TierWorld, outfitIds: readonly string[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
-  tier = TIER_ONE): { world: TierWorld; members: FightResult['members']; shards: number; tickets: number; laurels: number } {
+  tier = TIER_ONE, share = 1): { world: TierWorld; members: FightResult['members']; shards: number; tickets: number; laurels: number } {
   const umas = { ...world.umas }
   const members: FightResult['members'] = []
   let shards = 0
   for (const id of outfitIds) {
     const uma = umas[id]
     if (!uma) continue // released from the world since: nothing to pay
-    const exp = rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level }))
+    const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * share))
     const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
     const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
     umas[id] = { ...uma, level: gained.level, exp: gained.exp }

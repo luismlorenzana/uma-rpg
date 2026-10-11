@@ -43,8 +43,11 @@ export const isToken = (id: string): boolean => BY_ID.has(id)
 export const TOKEN_DROPS = { fight: 1, 'sub-boss': 2, vanguard: 2, boss: 3 } as const
 /** Odds of each token kind per drop: Cooking and Crafting alike, Promotions rarer (one per class rank a band). */
 export const TOKEN_ODDS: Readonly<Record<TokenKind, number>> = { cook: 0.425, craft: 0.425, class: 0.15 }
-/** Tokens the Exchange swaps for one of your choice, same kind and band. */
-export const TOKEN_SWAP_COST = 3
+/** Laurels a token sells for, per band (D80): 20 × its band. Any token costs twice that, so two tokens of a band buy
+ * one of any kind in it, and low bands can't cheaply buy high ones. */
+export const TOKEN_LAURELS_PER_BAND = 20
+export const tokenSellPrice = (id: string): number => (tokenById(id)?.band ?? 0) * TOKEN_LAURELS_PER_BAND
+export const tokenBuyPrice = (id: string): number => 2 * tokenSellPrice(id)
 
 function hash(text: string): number {
   let h = 0x811c9dc5
@@ -53,12 +56,14 @@ function hash(text: string): number {
 }
 const roll = (key: string): number => hash(key) / 4294967296
 
-/** The tokens a win drops, decided by its seed so a replayed fight drops the same ones. */
-export function rollTokens(seed: string, kind: keyof typeof TOKEN_DROPS, band: number): Record<string, number> {
+/** The tokens a win drops, decided by its seed so a replayed fight drops the same ones. On a replay (`share` below 1,
+ * D79) each drop happens only with that chance. */
+export function rollTokens(seed: string, kind: keyof typeof TOKEN_DROPS, band: number, share = 1): Record<string, number> {
   const out: Record<string, number> = {}
   const add = (id: string) => { out[id] = (out[id] ?? 0) + 1 }
   const pick = <T>(list: readonly T[], key: string): T => list[Math.floor(roll(key) * list.length)]!
   for (let i = 0; i < TOKEN_DROPS[kind]; i++) {
+    if (share < 1 && roll(`${seed}:keep:${i}`) >= share) continue
     const r = roll(`${seed}:kind:${i}`)
     const guaranteed = i === 0 && (kind === 'sub-boss' || kind === 'boss')
     const promotion = guaranteed || r < TOKEN_ODDS.class

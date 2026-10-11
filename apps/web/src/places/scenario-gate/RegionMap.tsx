@@ -116,7 +116,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           <div className="flex gap-2">
             <button type="button" disabled={status(open.id) === 'locked' || !!fightOpen?.battle} onClick={() => void fight(open)}
               className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-              {status(open.id) === 'locked' ? 'Clear the stage before it' : fightOpen?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight · first clear pays triple'}
+              {status(open.id) === 'locked' ? 'Clear the stage before it' : fightOpen?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again · pays ¼' : 'Fight · first clear pays triple'}
             </button>
             {open.kind === 'fight' && status(open.id) === 'cleared' && (
               <button type="button" disabled={!!sweepBlock(world, region, open.id)} onClick={() => setSweepFor(open.id)}

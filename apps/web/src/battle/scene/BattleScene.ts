@@ -100,12 +100,25 @@ export class BattleScene extends Phaser.Scene {
     const shadow = this.add.ellipse(cx, bottom - 2 * d, box.w * 0.7 * d, box.w * 0.16 * d, 0x000000, 0.35)
     // No art for this one (a new outfit, say): an invisible stand-in keeps the effects aimed; the DOM shows her icon.
     const missing = !this.textures.exists(key)
-    const sprite = this.add.image(cx, bottom, missing ? '__DEFAULT' : key).setOrigin(0.5, 1).setDisplaySize(box.w * d, box.h * d)
+    const sprite = this.add.image(cx, bottom, missing ? '__DEFAULT' : key).setOrigin(0.5, 1)
+    this.fit(sprite, box, side)
     if (missing) sprite.setVisible(false)
     this.layer.add([shadow, sprite])
     const actor: Actor = { id, side, sprite, shadow, box, index, scaleY: sprite.scaleY, idle: null }
     this.actors.set(id, actor)
     this.startIdle(actor)
+  }
+
+  /** Fills the box; a foe's portrait keeps its own shape inside it (franchise packs differ, D76), feet on the floor. */
+  private fit(sprite: Phaser.GameObjects.Image, box: Box, side: 'ally' | 'enemy'): void {
+    const d = this.dpr
+    const { width, height } = sprite.frame
+    if (side === 'ally' || width <= 1 || height <= 1) {
+      sprite.setDisplaySize(box.w * d, box.h * d)
+      return
+    }
+    const scale = Math.min((box.w * d) / width, (box.h * d) / height)
+    sprite.setDisplaySize(width * scale, height * scale)
   }
 
   /** Breathing: a small squash from the feet, so it never fights the lunges, which move them. */

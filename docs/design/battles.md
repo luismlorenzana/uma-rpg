@@ -74,7 +74,10 @@ The foes wear the faces of **Princess Connect! Re:Dive's playable characters**: 
 list minus story-only characters). Names, colours and bust portraits are private content, never in git:
 `node scripts/cast/import.mjs` builds `content/release/` from the captured list, `bash scripts/cast/publish.sh`
 uploads it to `gs://uma-rpg-content`, and the API serves it at `/api/content/` to the signed-in owner only. Growing
-the cast means capturing the list again and re-running both scripts; the chapters pick it up on the next load.
+the cast means capturing the list again and re-running both scripts; the chapters pick it up on the next load. Since
+D76 the faces follow the biome: the Sky Isles keep PriConne, the Underworld wears **Azur Lane's ships** (694 shipyard
+busts from the Azur Lane Wiki, `import-azurlane.mjs`), every other biome **Puzzle & Dragons** monsters once that pack
+exists (PriConne until then).
 Costume variants aren't on the official site and are out of scope.
 
 ## Presentation (D53)

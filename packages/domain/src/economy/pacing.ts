@@ -55,6 +55,11 @@ export const FACILITY_UPGRADE = [
 
 // --- Laurels (§11) ---------------------------------------------------------------------------------------------
 
+/** A cleared stage's later wins, Sweeps included, pay a quarter of its first clear (D79): EXP, Laurels and each token's
+ * chance to drop. */
+export const REPLAY_SHARE = 0.25
+/** A stage's first clear pays its Laurels three times over (D66). */
+export const FIRST_CLEAR_LAURELS = 3
 /** Laurels per won fight, times the chapter's tier (D51 numbers, set by this model). */
 export const BATTLE_LAURELS = { fight: 10, 'sub-boss': 25, vanguard: 30, boss: 50 } as const
 /** Exchange prices. A raw item costs about two fights per base hour of gathering (D65); a Time Ticket takes 30 minutes

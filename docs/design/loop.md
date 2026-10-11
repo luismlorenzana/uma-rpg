@@ -43,10 +43,11 @@ on (§8.2):
   sub-boss 2, Finals vanguard 2, champion 3. Sub-bosses and champions always include a Promotion Token. Each other drop is Crafting
   42.5%, Cooking 42.5%, Promotion 15%, at a random class or stat. Band 5 drops no Promotion Tokens: their share goes to
   Crafting or Cooking (D77).
-- **Sweeps drop no tokens**: tokens come from fights you play.
-- **Swaps**: the Exchange trades **three tokens of one kind and band for one of your choice**, so bad luck never
-  stalls a plan.
-- Tokens can't be sold. They sit in the Warehouse's **Tokens** shelf, by band.
+- **Replays** (D79): a stage already cleared drops each token with a 25% chance, and Sweeps pay as replays.
+- **Laurels** (D80): any token sells for **20 Laurels × its band** and the Exchange sells **any token for twice that**,
+  so two tokens of a band buy one of any kind in it, and bad luck never stalls a plan. Low bands can't cheaply buy high
+  ones: ten band-1 tokens buy one band-5 token.
+- They sit in the Warehouse's **Tokens** shelf, by band, and sell from there too.
 
 ## Ranks and levels are linear (D68, D70)
 
@@ -79,4 +80,4 @@ boss) and drop 1 / 2 / 3 tokens.
 
 About 45–50 tokens per party per band. With chapters today, a party's ~25 fights per band (plus replays) drop about
 30–40; on the world map, about 24 stages per band drop about the same, with elites and bosses carrying more. Tokens pool
-across parties and swap three for one, and the balance pass tunes the drops with the world map.
+across parties and trade two for one through Laurels, and the balance pass tunes the drops with the world map.

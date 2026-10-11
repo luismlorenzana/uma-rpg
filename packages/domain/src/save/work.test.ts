@@ -134,7 +134,7 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
     expect(() => buyRawItem(save, 'pearl-barley', 1, grades, at(0))).toThrow(/raw/)
   })
 
-  it('sweeps a beaten regular fight for EXP and Shards, without Laurels', () => {
+  it('sweeps a beaten regular stage as a replay: a quarter of its first clear (D79)', () => {
     let save = give(withUmas('101', '102', '103', '104', '105'), {}, 15)
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
@@ -145,9 +145,9 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
     expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s1')).toBe('No Sweep Tickets')
     save = buyTickets(save, 'sweep', 1, at(0))
     const swept = sweepFight(save, ura, 'w1-1-1-s1', at(0))
-    expect(swept.result).toMatchObject({ outcome: 'victory', laurels: 0 })
+    expect(swept.result).toMatchObject({ outcome: 'victory', laurels: 8, firstClear: false })
     expect(swept.result.members.every((m) => m.exp > 0)).toBe(true)
-    expect(worldOf(swept.save).wallet).toMatchObject({ laurels: 0, sweepTickets: 0 })
+    expect(worldOf(swept.save).wallet).toMatchObject({ laurels: 8, sweepTickets: 0 })
     expect(worldOf(swept.save).world.run.wins['w1-1-1-s1']).toBe(2)
   })
 })

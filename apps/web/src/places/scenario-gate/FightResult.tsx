@@ -22,7 +22,9 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
         <h1 className={`font-display text-4xl font-extrabold ${win ? 'text-accent' : 'text-ink-soft'}`}>{win ? 'Victory!' : 'Defeated'}</h1>
         <p className="text-[13px] text-ink-soft">
           {result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}`
-            : `Swept ${'swept' in result && (result as { swept: number }).swept > 1 ? `${(result as { swept: number }).swept} times` : 'with a ticket'}: EXP and Shards, no Laurels`}
+            : `Swept ${'swept' in result && (result as { swept: number }).swept > 1 ? `${(result as { swept: number }).swept} times` : 'with a ticket'}`}
+          {win && result.firstClear === true && ' · first clear: triple Laurels'}
+          {win && result.firstClear === false && ' · replay: a quarter of the first clear'}
         </p>
         {win ? (
           <>

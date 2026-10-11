@@ -52,7 +52,7 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 |---|---|
 | Raw item of grade g | `10 + 10g` (20 at grade 1, 110 at grade 10) |
 | Time Ticket: 30 minutes off any running job or training (D74) | 10 |
-| Sweep Ticket: completes a beaten regular fight (EXP and Shards, no Laurels) | 15 |
+| Sweep Ticket: replays a beaten regular stage (a quarter of its first clear, D79) | 15 |
 
 | Sell at the Warehouse (D62) | Laurels each |
 |---|---|

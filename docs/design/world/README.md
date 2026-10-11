@@ -36,8 +36,9 @@ hand-placed fights), so a rebalance never needs new content.
   per regular stage (more for elites and bosses). About 20 parties make the 100-hour mark. Low Umas next to high ones get there faster: the catch-up rule pays
   ±10% EXP per level of gap, from 10% to 200%.
 - So a fresh party needs two or three stages per level, and **a level's 48 stages are fresh first clears for about 20
-  parties**. Replays pay in full.
-- **First clears** pay a bonus (triple Laurels). Sweep Tickets work on any cleared stage.
+  parties**. Replays never run out but pay **a quarter of the first clear** (D79): its EXP, its Laurels and each
+  token's chance to drop.
+- **First clears** pay a bonus (triple Laurels). Sweep Tickets replay any cleared regular stage and pay as a replay.
 
 ## One active party, MP that carries
 

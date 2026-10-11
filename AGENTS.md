@@ -32,6 +32,7 @@ pnpm --filter @rpg/api dev     # API on :8081, auth off, local save, master data
 pnpm --filter @rpg/web dev     # web on :5174, /api proxied to :8081
 node scripts/cast/import.mjs   # private PriConne cast → content/release (gitignored; needs content/sources, D50)
 bash scripts/cast/publish.sh   # upload it to gs://uma-rpg-content (scoped gcloud, never changes the account)
+node scripts/cast/import-azurlane.mjs && bash scripts/cast/publish.sh azurlane   # the Underworld's Azur Lane pack (D76)
 ```
 
 ## Conventions

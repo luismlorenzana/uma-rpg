@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
-import { cookTokenId, craftTokenId, gradeBand, levelBand, promotionTokenId, rollTokens, TOKENS, tokenById } from '../economy/tokens'
+import { cookTokenId, craftTokenId, gradeBand, levelBand, promotionTokenId, rollTokens, tokenBuyPrice, TOKENS, tokenById, tokenSellPrice } from '../economy/tokens'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
-import { swapTokens } from './exchange'
+import { buyTokens, sellPrice, sellStock } from './exchange'
 
 const at = (n: number) => new Date(Date.parse('2026-10-11T12:00:00.000Z') + n).toISOString()
 const give = (save: Save, items: Record<string, number>): Save => ({ ...save, tierWorlds: { '1': { ...worldOf(save), items: { ...worldOf(save).items, ...items } } } })
@@ -41,12 +41,23 @@ describe('tokens (D67)', () => {
     }
   })
 
-  it('swaps three of a kind and band for one of your choice, and saves tokens like items', () => {
-    let save = give(unlockUma(newSave('Luis', at(0)), '101', at(0)), { 'token-cook-hp-1': 2, 'token-cook-mp-1': 1, 'token-craft-hp-1': 1 })
-    expect(() => swapTokens(save, { 'token-cook-hp-1': 2, 'token-craft-hp-1': 1 }, 'token-cook-atk-1', at(1))).toThrow(/same kind and band/)
-    expect(() => swapTokens(save, { 'token-cook-hp-1': 2 }, 'token-cook-atk-1', at(1))).toThrow(/swap 3/)
-    save = swapTokens(save, { 'token-cook-hp-1': 2, 'token-cook-mp-1': 1 }, 'token-cook-atk-1', at(1))
-    expect(worldOf(save).items).toEqual({ 'token-craft-hp-1': 1, 'token-cook-atk-1': 1 })
+  it('drops each token with a one-in-four chance on a replay (D79)', () => {
+    let dropped = 0
+    for (let i = 0; i < 400; i++) dropped += Object.values(rollTokens(`replay:${i}`, 'fight', 1, 0.25)).reduce((a, b) => a + b, 0)
+    expect(dropped).toBeGreaterThan(70)
+    expect(dropped).toBeLessThan(130)
+  })
+
+  it('sells any token for 20 × its band and buys any for twice that: two tokens buy one of another kind (D80)', () => {
+    let save = give(unlockUma(newSave('Luis', at(0)), '101', at(0)), { 'token-cook-hp-1': 2, 'token-craft-atk-3': 1 })
+    expect([tokenSellPrice('token-cook-hp-1'), tokenBuyPrice('token-cook-hp-1'), tokenBuyPrice('token-class-mage-4'), sellPrice('items', 'token-craft-atk-3')]).toEqual([20, 40, 160, 60])
+    save = sellStock(save, 'items', 'token-cook-hp-1', 2, at(1))
+    expect(worldOf(save).wallet.laurels).toBe(40)
+    save = buyTokens(save, 'token-class-brawler-1', 1, at(2))
+    expect(worldOf(save).items).toEqual({ 'token-craft-atk-3': 1, 'token-class-brawler-1': 1 })
+    expect(worldOf(save).wallet.laurels).toBe(0)
+    expect(() => buyTokens(save, 'token-cook-hp-1', 1, at(3))).toThrow(/40 Laurels/)
+    expect(() => buyTokens(save, 'token-class-mage-5', 1, at(3))).toThrow(/not a token/)
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 })

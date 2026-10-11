@@ -126,7 +126,7 @@ describe('fights (D52, D66)', () => {
     expect(worldRun(worldOf(retreat(save, T(6)))).battle).toBeNull()
   })
 
-  it('pays a win: EXP to all five, Laurels (triple on a first clear), and a Shard for each Uma that reaches Lv10', () => {
+  it('pays a win: EXP to all five, Laurels (triple on a first clear, a quarter of that on a replay), and a Shard for each Uma that reaches Lv10', () => {
     const fought = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4)))
     expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: S1, laurels: 30, shards: 0, firstClear: true })
     expect(fought.result!.members).toHaveLength(5)
@@ -135,7 +135,9 @@ describe('fights (D52, D66)', () => {
     expect(world.umas['101']!.exp).toBe(fought.result!.members[0]!.afterExp)
     expect(worldRun(world).wins).toMatchObject({ start: 1, [S1]: 1 })
     const again = autoplay(startFight(fought.save, ura, S1, OUTFITS, T(300)))
-    expect(again.result).toMatchObject({ laurels: 10, firstClear: false })
+    // A replay pays a quarter of the first clear (D79): 30 Laurels become 8, and a quarter of the EXP at most.
+    expect(again.result).toMatchObject({ laurels: 8, firstClear: false })
+    expect(again.result!.members[0]!.exp).toBeLessThanOrEqual(Math.ceil(fought.result!.members[0]!.exp / 4))
     // A band-1 token lands in the Warehouse (D67).
     const tokens = fought.result!.tokens
     expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(1)

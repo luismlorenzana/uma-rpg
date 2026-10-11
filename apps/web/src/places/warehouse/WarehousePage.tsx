@@ -1,6 +1,6 @@
 // The Warehouse (S4–S7): every item, dish and unbound piece of gear you own. Ingredients and materials filter by grade;
 // anything can be sold for a few Laurels (far below its Exchange price).
-import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, TOKEN_BANDS, tokenById, type ItemSide, type Shelf } from '@rpg/domain'
+import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, TOKEN_BANDS, TOKEN_LAURELS_PER_BAND, tokenById, type ItemSide, type Shelf } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -59,7 +59,7 @@ export default function WarehousePage() {
         <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.dishes).reduce((a, b) => a + b, 0)} dishes · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear · {tokenCount} tokens</p>
       </div>
       {side === 'gear' && list('gear')}
-      {side === 'tokens' && <TokenShelf items={world.items} grade={grade} />}
+      {side === 'tokens' && <TokenShelf items={world.items} grade={grade} onOpen={(id) => setOpen({ shelf: 'items', id })} />}
       {side === 'dishes' && list('dishes')}
       {(side === 'farming' || side === 'gathering') && (
         <div className="space-y-3 p-3">
@@ -93,8 +93,8 @@ export default function WarehousePage() {
   )
 }
 
-/** Tokens by band (D67): won fights drop them; promotions, crafting and cooking spend them; the Exchange swaps them. */
-function TokenShelf({ items, grade }: { items: Record<string, number>; grade: number | null }) {
+/** Tokens by band (D67): won fights drop them; promotions, crafting and cooking spend them; they sell for Laurels (D80). */
+function TokenShelf({ items, grade, onOpen }: { items: Record<string, number>; grade: number | null; onOpen: (id: string) => void }) {
   const owned = Object.entries(items).map(([id, n]) => ({ token: tokenById(id), n })).filter((t) => t.token && (grade === null || t.token.band === Math.ceil(grade / 2)))
   if (owned.length === 0) return <p className="p-3 text-[13px] text-ink-faint">No tokens{grade ? ' for that grade' : ''}: won fights drop them, of the fight's band (Lv1–10 is band 1).</p>
   return (
@@ -107,15 +107,17 @@ function TokenShelf({ items, grade }: { items: Record<string, number>; grade: nu
             <h3 className="mb-1.5 text-[13px] font-semibold">Band {band} <span className="font-normal text-ink-faint">· Lv{band * 10 - 9}–{band * 10} fights · grades {2 * band - 1}–{2 * band}</span></h3>
             <ul className="grid grid-cols-1 gap-1">
               {here.map(({ token, n }) => (
-                <li key={token!.id} className="flex items-center gap-2 text-[13px]">
-                  <ItemIcon id={token!.id} size={28} /> <span className="min-w-0 flex-1 truncate">{token!.name}</span> <span className="text-ink-soft">×{n}</span>
+                <li key={token!.id}>
+                  <button type="button" onClick={() => onOpen(token!.id)} className="flex min-h-10 w-full items-center gap-2 rounded-sm text-left text-[13px] active:bg-white/5">
+                    <ItemIcon id={token!.id} size={28} /> <span className="min-w-0 flex-1 truncate">{token!.name}</span> <span className="text-ink-soft">×{n}</span>
+                  </button>
                 </li>
               ))}
             </ul>
           </section>
         )
       })}
-      <p className="text-[12px] text-ink-faint">Three of a kind and band swap for one of your choice at the Exchange.</p>
+      <p className="text-[12px] text-ink-faint">Tap one to sell it for {TOKEN_LAURELS_PER_BAND} Laurels × its band; the Exchange sells any token for twice that.</p>
     </div>
   )
 }
