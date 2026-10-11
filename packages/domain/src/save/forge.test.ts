@@ -47,7 +47,7 @@ describe('the Forge and equipping (S7)', () => {
     let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 6 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1-atk', 2)!
     expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE / 2 })
-    expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2-atk', 1)!.block).toBe('Needs Gathering Lv6')
+    expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2-atk', 1)!.block).toBe('Needs Craft Lv6')
     save = startJob(save, 'forge', 0, smith, 'greatsword-g1-atk', 2, at(0))
     save = collectJob(save, 'forge', 0, at(2 * plan.msEach)).save
     expect(worldOf(save).gear).toEqual({ 'greatsword-g1-atk': 2 })

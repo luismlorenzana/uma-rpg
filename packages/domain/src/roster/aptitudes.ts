@@ -17,8 +17,8 @@ export const DISTANCE_GEAR: Record<keyof Aptitudes['distance'], { armory: string
 }
 
 export const SURFACE_PROFESSION: Record<keyof Aptitudes['surface'], string> = {
-  turf: 'Farming & Cooking',
-  dirt: 'Gathering & Crafting',
+  turf: 'Farm work (Farm Level)',
+  dirt: 'Wilds and Forge work (Craft Level)',
 }
 
 export const KEY_LABELS: Record<string, string> = {

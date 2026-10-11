@@ -111,7 +111,7 @@ const FARMLANDS: Place[] = [
   {
     id: 'pantry', page: 'farmlands', kind: 'station', name: 'Pantry', opensIn: 'S4', slots: 2, mirrorOf: 'workbench',
     blurb: 'Refines raw ingredients, one into one: wheat into flour, fruit into preserves.',
-    details: ['Refines every farming family', 'Raises Farming & Cooking'],
+    details: ['Refines every farming family', 'Raises Farm Level'],
     at: MIRROR_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
   },
   {
@@ -127,7 +127,7 @@ const WILDS: Place[] = [
   {
     id: 'workbench', page: 'wilds', kind: 'station', name: 'Workbench', opensIn: 'S4', slots: 2, mirrorOf: 'pantry',
     blurb: 'Refines raw materials, one into one: ore into ingots, logs into planks.',
-    details: ['Refines every gathering family', 'Raises Gathering & Crafting'],
+    details: ['Refines every gathering family', 'Raises Craft Level'],
     at: MIRROR_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
   },
   {

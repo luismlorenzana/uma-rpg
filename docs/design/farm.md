@@ -26,7 +26,7 @@ facility's two families (pacing.md). Facility levels belong to the tier world.
 
 ## Professions
 
-Each Uma has Farming & Cooking and Gathering & Crafting levels (1–50). Grades open every five levels. Sites, the
+Each Uma has Farm Level and Craft Level levels (1–50). Grades open every five levels. Sites, the
 Pantry and the Workbench raise them now; the Kitchen and the Forge will too (S6, S7).
 
 ## The Warehouse

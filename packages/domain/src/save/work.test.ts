@@ -48,7 +48,7 @@ describe('gathering (S4)', () => {
 
   it('opens a grade every five profession levels and makes only the site’s family', () => {
     const world = worldOf(withUmas('101'))
-    expect(planJob(world, 'fields', turfA, 'oats')?.block).toBe('Needs Farming Lv6')
+    expect(planJob(world, 'fields', turfA, 'oats')?.block).toBe('Needs Farm Lv6')
     expect(planJob(world, 'fields', turfA, 'apple')?.block).toBe('Not made here')
     expect(planJob(world, 'mine', turfA, 'copper-ore')?.block).toBeNull()
   })

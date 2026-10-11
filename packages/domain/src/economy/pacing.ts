@@ -7,10 +7,13 @@ export const HOUR = 60 * MINUTE
 
 // --- Professions (design §4, §8.5) ----------------------------------------------------------------------------------
 
-/** The two verticals. Farming & Cooking and Gathering & Crafting share one curve (parity, §8.5). */
+/** The two verticals, shown as **Farm Level** (farming, refining food, cooking) and **Craft Level** (gathering,
+ * refining materials, crafting), D60. They share one curve (parity, §8.5). */
 export const PROFESSIONS = ['farming', 'gathering'] as const
 export type Profession = typeof PROFESSIONS[number]
-export const PROFESSION_LABEL: Readonly<Record<Profession, string>> = { farming: 'Farming & Cooking', gathering: 'Gathering & Crafting' }
+export const PROFESSION_LABEL: Readonly<Record<Profession, string>> = { farming: 'Farm Level', gathering: 'Craft Level' }
+/** Short names, as in "Farm Lv 6". */
+export const PROFESSION_SHORT: Readonly<Record<Profession, string>> = { farming: 'Farm', gathering: 'Craft' }
 export const PROFESSION_MAX_LEVEL = 50
 
 /** EXP from level L to L+1. Lv46 (grade 10) takes 7,110 EXP; Lv50 takes 8,330. */

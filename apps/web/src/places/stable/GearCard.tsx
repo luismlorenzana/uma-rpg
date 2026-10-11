@@ -1,7 +1,7 @@
 // What she wears (S7, D59): one piece per weapon her build wields, an armor and an accessory. Pieces from the stock bind
 // to her for good when equipped; her own pieces swap freely. Mastery rank k in a type lets her wear grade k.
 import {
-  activeBuild, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearPoints, ITEM_EFFECTS, RPG_BUILD, SaveRuleError, slotOf, umaPoints,
+  activeBuild, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearPoints, ITEM_EFFECTS, RPG_BUILD, SaveRuleError, slotOf,
   type GearSlot, type OwnedUma, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -25,7 +25,6 @@ export function GearCard({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
   const slots: GearSlot[] = [...(RPG_BUILD[build].weapons as GearSlot[]), 'armor', 'accessory']
   const [open, setOpen] = useState<GearSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const total = umaPoints(uma, build)
   const run = (op: () => Promise<void>) => op().then(() => { setOpen(null); setError(null) }, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   const candidates = (slot: GearSlot) => {
     const fits = (id: string) => gearById(id) && slotOf(gearById(id)!.type) === slot
@@ -50,9 +49,6 @@ export function GearCard({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
           </button>
         )
       })}
-      <p className="text-[11px] text-ink-faint">
-        Gear + Extra Stats: {ITEM_EFFECTS.filter((e) => total[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, total[e])}`).join(' · ') || 'no bonuses yet'}
-      </p>
       {open && (() => {
         const { own, stock } = candidates(open)
         return (

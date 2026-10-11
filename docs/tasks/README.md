@@ -1,5 +1,7 @@
 # Tasks — S3 to S7
 
+Everything else open or deferred: [backlog.md](../backlog.md).
+
 Implementable tasks for the active slice ([S3 spec](../slices/S3-battles.md), [build plan](../plan.md)). **A task
 file is deleted in the commit that finishes it** (D35).
 
@@ -14,7 +16,7 @@ private PriConne cast pipeline, the chapter map, the Phaser fight and result, an
 | [T021](T021-s4-release.md) | S4's phone check | Live; the owner's check is open |
 | — | S5: the [exit check](../slices/S5-learning.md#exit-check) | Live; the owner's check is open |
 | — | S6: the [exit check](../slices/S6-kitchen.md#exit-check) | Live; the owner's check is open |
-| — | S7: deploy, then the [exit check](../slices/S7-forge.md#exit-check) | Deploying |
+| — | S7: the [exit check](../slices/S7-forge.md#exit-check) | Live; the owner's check is open |
 
 ## Conventions every task follows
 

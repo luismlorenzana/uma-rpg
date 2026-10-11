@@ -25,8 +25,10 @@ features slot into places that already exist instead of growing global routes.
 | **S4 — Farmlands and Wilds** ([spec](slices/S4-farm.md)) · *live 2026-10-10; owner device check pending* | Timed jobs at the 16 sites, profession levels, raw items, refining, Uma icons on places, the Exchange (raw items, Rush and Sweep Tickets), facility upgrades | 16 sites, Pantry, Workbench, Warehouse, Exchange | Assign Umas, collect and refine while away, spend Laurels |
 | **S5 — Learning District** ([spec](slices/S5-learning.md)) · *live 2026-10-10; owner device check pending* | Class ranks and gear mastery, aptitude speeds, ranks gating skill depths | 5 class halls, 4 armories | Train ranks while away; deeper skills unlock |
 | **S6 — Kitchen and Extra Stats** ([spec](slices/S6-kitchen.md)) · *live 2026-10-10; owner device check pending* | The dish catalog, cooking (Duo dishes, Feasts), the Sun-and-planets map | Kitchen, Observatory | Cook, eat, build Extra Stats |
-| **S7 — Forge and equipment** ([spec](slices/S7-forge.md)) · *deploying 2026-10-10* | The gear catalog, crafting, bound gear and lockers, the balance pass with equipment | Forge | Craft and equip; difficulty tuned with gear |
+| **S7 — Forge and equipment** ([spec](slices/S7-forge.md)) · *live 2026-10-10; owner device check pending* | The gear catalog, crafting, bound gear and lockers, the balance pass with equipment | Forge | Craft and equip; difficulty tuned with gear |
 | **S8 — Tier Finale and promotion** | The Tier Finale (open question Q6), promotion, the Tier 2 world | Tier Finale landmark | Promote an Uma into Tier 2 |
+
+Everything open or deferred is in [backlog.md](backlog.md).
 
 Before S4, a **pacing model** set the timers, XP curves, Laurel payouts and prices ([pacing.md](design/pacing.md),
 D54), and uma-platform published the item icons as `@luismlorenzana/uma-art` (its P37). S8 is far off (owner,

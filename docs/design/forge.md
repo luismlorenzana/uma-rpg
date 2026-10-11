@@ -19,7 +19,7 @@ Any **type × grade × accent** exists; nothing is stored as a list. A piece's i
 
 A recipe is 2 of the main material and 1 of the accent family's refined material, both of the piece's grade, plus 0–2
 extras (grade ⌈g/2⌉, rotating through the other gathering families) as grades climb, so a piece uses as many inputs as
-a dish of its grade. Crafting is a Forge job: Gathering & Crafting, three items' time, grade k at Lv `5k − 4`.
+a dish of its grade. Crafting is a Forge job: Craft Level, three items' time, grade k at Lv `5k − 4`.
 
 ## Wearing it
 

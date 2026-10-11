@@ -13,7 +13,7 @@ Every dish is generated from the item catalog, farming side only:
 | Duo dish | 16: one per bridge, at grades 3 and 7 ("Grain & Garden Platter") | 2 + 2 refined items of both families, plus 1 side | Its bridge |
 | Feast | 4: grades 4, 6, 8, 10 | one refined item of every farming family | The Sun |
 
-Cooking is a Kitchen job: Farming & Cooking, three items' time per dish, the recipe reserved at the start, grade k at
+Cooking is a Kitchen job: Farm Level, three items' time per dish, the recipe reserved at the start, grade k at
 Lv `5k − 4`. Dishes go on their own shelf in the Warehouse.
 
 ## The Sun-and-planets map (design §10)

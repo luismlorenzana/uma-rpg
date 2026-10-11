@@ -18,13 +18,13 @@
 
 | Rule | Value |
 |---|---|
-| Verticals | Farming & Cooking, Gathering & Crafting, per Uma, Lv1–50 each, one shared curve |
+| Verticals | Farm Level, Craft Level, per Uma, Lv1–50 each, one shared curve |
 | EXP to the next level | `20 + 6 × level` (Lv46: 7,110 EXP in all; Lv50: 8,330) |
 | Grade gate | Grade k opens at Lv `5k − 4` (1, 6, 11 … 46) |
 | EXP | **2 per base minute** of the job, whatever it makes (parity) |
 | Gather or refine one item | `2 + 2 × grade` base minutes (4 at grade 1, 22 at grade 10) |
 | Cook or craft one output (S6, S7) | three items' worth: `3 × (2 + 2 × grade)` |
-| Aptitude | Real time = base × share: A (and S) 50%, B 58%, C 67%, D 75%, E 83%, F 92%, G 100%. Turf sets Farming & Cooking, Dirt sets Gathering & Crafting (§4.1) |
+| Aptitude | Real time = base × share: A (and S) 50%, B 58%, C 67%, D 75%, E 83%, F 92%, G 100%. Turf sets Farm Level, Dirt sets Craft Level (§4.1) |
 | One job | 1–50 items |
 
 ## Facilities (§9)

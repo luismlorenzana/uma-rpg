@@ -3,7 +3,7 @@
 // output and her profession EXP.
 import {
   availabilityBlock, DISHES, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
-  itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, rushCost, SaveRuleError,
+  itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, rushCost, SaveRuleError,
   upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -51,7 +51,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
     <div className="space-y-3 p-4">
       <section className="rounded-md bg-raised p-3">
         <p className="font-display text-lg font-bold">{info.title}</p>
-        <p className="text-[13px] text-ink-soft">{info.line}. Raises {PROFESSION_LABEL[info.profession]}.</p>
+        <p className="text-[13px] text-ink-soft">{info.line}. Raises her {PROFESSION_LABEL[info.profession]}.</p>
         <div className="mt-2 flex items-center justify-between gap-2 text-[12px] text-ink-soft">
           <span>Level {facility.level} · {facility.jobs.length} slots{FACILITY_SPEED[facility.level - 1]! > 1 ? ' · 25% faster' : ''}</span>
           {upgradeCost(world, placeId) && (
@@ -176,7 +176,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
                   <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-semibold">{o.name}</span>
-                    <span className="block text-[12px] text-ink-soft">{block ?? `${PROFESSION_LABEL[profession]} Lv${prof.level} · ${profession === 'farming' ? 'Turf' : 'Dirt'} ${grade} ${SPEED_NOTE[grade]}`}</span>
+                    <span className="block text-[12px] text-ink-soft">{block ?? `${PROFESSION_SHORT[profession]} Lv ${prof.level} · ${profession === 'farming' ? 'Turf' : 'Dirt'} ${grade} ${SPEED_NOTE[grade]}`}</span>
                   </span>
                 </button>
               </li>
@@ -236,7 +236,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
             ))}
           </div>
           <p className="text-[12px] text-ink-soft">
-            {Math.min(count, max)} items · {formatDuration(plan.msEach * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {PROFESSION_LABEL[profession]} EXP
+            {Math.min(count, max)} items · {formatDuration(plan.msEach * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {PROFESSION_SHORT[profession]} EXP
           </p>
           <button type="button" onClick={() => setOutput(null)} className="text-[13px] text-ink-soft underline">Choose another item</button>
         </div>
@@ -263,7 +263,7 @@ function CraftPicker({ world, level, onPick }: { world: TierWorld; level: number
       <div>
         <p className="text-micro mb-1">Grade</p>
         <div className="flex flex-wrap gap-1">{Array.from({ length: 10 }, (_, i) => i + 1).map((g) => (
-          <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Gathering Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
+          <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Craft Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
         ))}</div>
       </div>
       <div>

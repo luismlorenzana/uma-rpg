@@ -1,225 +1,452 @@
-// An outfit's profile (S1, extended in S2): art, aptitudes and what they do here, stats, unique skill, and either the
-// Unlock flow (locked) or her state (owned: level, unlock date, party).
+// An outfit's profile (S1–S7, reorganised D60): a header with her Uma Level and EXP, her Farm and Craft Levels and what
+// she's doing now, then tabs: Battle (her RPG stats), Class (builds, skills, class ranks), Gear (equipment, mastery,
+// Extra Stats), Work (professions and jobs) and Racing (the original's aptitudes, stats and unique skill). A locked
+// outfit shows the Unlock flow and her racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeBuild, activeNodeSlots, best, buildOf, DISTANCE_GEAR, KEY_LABELS, partyOf, RPG_TIER_MAX_LEVEL, rpgActiveSlots, rpgExpToNext, rpgTreePointsEarned,
-  rpgTreePointsSpent, SaveRuleError, GEAR_TYPE_LABEL, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
+  activeBuild, activeNodeSlots, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL, GEAR_TYPE_LABEL, GEAR_TYPES,
+  gearDistance, highestGrade, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
+  PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_BUILD, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots,
+  rpgExpToNext, rpgNode, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
+  type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
-import { Bar, BUILD_LABEL, CLASS_LABEL } from '../../battle/labels'
-import { GearCard } from './GearCard'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { Bar, BUILD_LABEL, CLASS_LABEL, skillKinds, KindMark } from '../../battle/labels'
 import { useHubNavigation } from '../../hub/navigation'
+import { ItemIcon } from '../../items/ItemIcon'
+import { outputView } from '../../items/outputs'
 import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import { loadSkills, type MasterView } from '../../master/master'
 import { unlock, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon, LockIcon, TicketIcon } from '../../ui/icons'
+import { formatDuration, useNow } from '../../ui/useNow'
+import { pointText } from '../observatory/ObservatoryPage'
+import { GearCard } from './GearCard'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
 const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#eb6fb0', C: '#7fb8ff', D: '#6fd39a', E: '#b8a6f0', F: '#a6b0bc', G: '#8a94a0' }
+const TABS = ['battle', 'class', 'gear', 'work', 'racing'] as const
+type Tab = (typeof TABS)[number]
+const TAB_LABEL: Record<Tab, string> = { battle: 'Battle', class: 'Class', gear: 'Gear', work: 'Work', racing: 'Racing' }
+const TAB_KEY = 'rpg.profile.tab.v1'
 
-function Aptitudes({ outfit }: { outfit: RosterOutfit }) {
-  const groups = [
-    { name: 'Surface', grades: outfit.aptitudes.surface as Record<string, string> },
-    { name: 'Distance', grades: outfit.aptitudes.distance as Record<string, string> },
-    { name: 'Style', grades: outfit.aptitudes.strategy as Record<string, string> },
-  ]
+function storedTab(): Tab {
+  try {
+    const t = localStorage.getItem(TAB_KEY)
+    return (TABS as readonly string[]).includes(t ?? '') ? (t as Tab) : 'battle'
+  } catch {
+    return 'battle'
+  }
+}
+
+function GradeChip({ grade }: { grade: string }) {
   return (
-    <div className="space-y-2">
-      {groups.map((g) => (
-        <div key={g.name}>
-          <h4 className="text-micro mb-1">{g.name}</h4>
-          <div className="flex flex-wrap gap-1.5">
-            {Object.entries(g.grades).map(([key, grade]) => (
-              <span key={key} className="flex items-center gap-1.5 rounded-full bg-raised py-0.5 pl-2.5 pr-1 text-[12px]">
-                {KEY_LABELS[key] ?? key}
-                <span className="flex size-5 items-center justify-center rounded-full font-display text-[12px] font-bold text-accent-ink" style={{ background: GRADE_COLORS[grade] ?? '#999' }}>
-                  {grade}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
+    <span className="flex size-5 items-center justify-center rounded-full font-display text-[12px] font-bold text-accent-ink" style={{ background: GRADE_COLORS[grade] ?? '#999' }}>
+      {grade}
+    </span>
+  )
+}
+
+/** A labelled row in a card. */
+function Row({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 px-3 py-2 text-[13px]">
+      <span className="text-ink-soft">{label}</span>
+      <span className="text-right">
+        <span className="font-semibold">{value}</span>
+        {note && <span className="text-ink-faint"> · {note}</span>}
+      </span>
     </div>
   )
 }
 
-/** Design §4.1: running style → class speed, distance → gear speed, surface → profession speed. */
-function AptitudesAtWork({ outfit }: { outfit: RosterOutfit }) {
-  const [style, styleGrade] = best(outfit.aptitudes.strategy)
-  const [distance, distanceGrade] = best(outfit.aptitudes.distance)
-  const [surface, surfaceGrade] = best(outfit.aptitudes.surface)
-  const rows = [
-    { label: 'Learns fastest', value: STYLE_CLASSES[style].join(' / '), note: `${KEY_LABELS[style]} ${styleGrade}` },
-    { label: 'Masters fastest', value: DISTANCE_GEAR[distance].gear, note: `${KEY_LABELS[distance]} ${distanceGrade}` },
-    { label: 'Works fastest at', value: SURFACE_PROFESSION[surface], note: `${KEY_LABELS[surface]} ${surfaceGrade}` },
-  ]
-  return (
-    <section>
-      <h4 className="text-micro mb-1">Aptitudes at work</h4>
-      <div className="divide-y divide-hairline rounded-md bg-raised">
-        {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between gap-3 px-3 py-2 text-[13px]">
-            <span className="text-ink-soft">{r.label}</span>
-            <span className="text-right">
-              <span className="font-semibold">{r.value}</span> <span className="text-ink-faint">· {r.note}</span>
-            </span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/** Her battle side (S3): EXP to the next level, the build she fights with, points to spend and equipped skills. */
-function BattleCard({ outfit, owned, onSkills, onStars }: { outfit: RosterOutfit; owned: OwnedUma; onSkills: () => void; onStars: () => void }) {
-  const build = activeBuild(outfit, owned)
-  const current = buildOf(owned, build)
-  const points = rpgTreePointsEarned(owned.level) - rpgTreePointsSpent(current.tree.map((id) => ({ tier: 1, id })))
-  const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
-  return (
-    <section className="space-y-2 rounded-md bg-raised p-3">
-      <div className="flex items-center justify-between text-[12px] text-ink-soft">
-        <span>EXP</span>
-        <span>{next ? `${owned.exp} / ${next}` : `Lv${RPG_TIER_MAX_LEVEL} · ${owned.exp} banked`}</span>
-      </div>
-      <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
-      <button type="button" onClick={onSkills} className="flex min-h-12 w-full items-center justify-between gap-2 rounded-sm bg-panel px-3 text-left active:bg-white/5">
-        <span className="min-w-0">
-          <span className="block truncate text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
-          <span className="block text-[12px] text-ink-soft">{current.loadout.length}/{rpgActiveSlots(owned.level)} skills equipped</span>
-        </span>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold ${points > 0 ? 'bg-accent text-accent-ink' : 'bg-sunken text-ink-soft'}`}>
-          {points > 0 ? `${points} pts · Skills` : 'Skills'}
-        </span>
-      </button>
-      <button type="button" onClick={onStars} className="flex min-h-11 w-full items-center justify-between rounded-sm bg-panel px-3 text-left text-[14px] active:bg-white/5">
-        <span className="font-semibold">Extra Stats</span>
-        <span className="text-[12px] text-ink-soft">{owned.stars.active.length}/{activeNodeSlots(owned.level)} active · {owned.stars.unlocked.length}/100</span>
-      </button>
-      <div className="grid grid-cols-5 gap-1 text-center">
-        {(['brawler', 'mage', 'spellblade', 'cleric', 'summoner'] as const).map((c) => (
-          <span key={c} className="rounded-xs bg-panel py-1">
-            <span className="block text-[9.5px] text-ink-faint">{CLASS_LABEL[c]}</span>
-            <span className="font-display text-[14px] font-bold">{owned.ranks.classes[c]}</span>
-          </span>
-        ))}
-      </div>
-      <p className="text-[11px] text-ink-faint">
-        Class ranks (Learning District). Mastery:{' '}
-        {Object.entries(owned.ranks.mastery).filter(([, r]) => r > 1).map(([t, r]) => `${GEAR_TYPE_LABEL[t as keyof typeof GEAR_TYPE_LABEL]} ${r}`).join(', ') || 'none trained yet'}.
-      </p>
-    </section>
-  )
-}
-
 export function OutfitProfile({ view, outfitId, place }: { view: MasterView; outfitId: string; place: Place }) {
-  const navigate = useNavigate()
   const nav = useHubNavigation()
   const world = useWorld()
   const outfit = view.roster.find((o) => o.outfitId === outfitId)
   const owned = world?.umas[outfitId] ?? null
-  const tickets = world?.wallet.unlockTickets ?? 0
-  const inParty = world && owned ? partyOf(world, outfitId) : null
   const bust = useArtUrl(outfit ? imagePath(view.art, 'outfit-busts', outfit.outfitId) ?? imagePath(view.art, 'outfit-portraits', outfit.outfitId) : null)
-  const [unique, setUnique] = useState<{ name: string; description: string } | null | 'loading'>('loading')
-  const [confirming, setConfirming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let live = true
-    if (!outfit) return
-    loadSkills(view.manifest).then(
-      (skills) => live && setUnique(skillText(skills, outfit.uniqueSkillId)),
-      () => live && setUnique(null),
-    )
-    return () => {
-      live = false
+  const [tab, setTabState] = useState<Tab>(storedTab)
+  const setTab = (t: Tab) => {
+    setTabState(t)
+    try {
+      localStorage.setItem(TAB_KEY, t)
+    } catch {
+      // per-device convenience only
     }
-  }, [outfit, view.manifest])
+  }
 
   if (!outfit) {
     return (
       <div className="p-4">
         <p className="mb-3 text-ink-soft">That outfit isn’t in the current game data.</p>
-        <button type="button" onClick={() => nav.subBack(place)} className="min-h-11 rounded-sm bg-raised px-4 font-semibold">
-          Back to the Stable
-        </button>
+        <button type="button" onClick={() => nav.subBack(place)} className="min-h-11 rounded-sm bg-raised px-4 font-semibold">Back to the Stable</button>
       </div>
     )
   }
-
+  const shown: Tab = owned ? tab : 'racing'
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-3 p-4">
       <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
         <BackIcon size={18} /> All outfits
       </button>
+      <Header view={view} outfit={outfit} owned={owned} world={world} bust={bust} />
+      {owned && world ? (
+        <>
+          <div className="sticky top-0 z-10 -mx-4 bg-page/95 px-4 py-1.5 backdrop-blur">
+            <div className="grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Profile">
+              {TABS.map((t) => (
+                <button key={t} type="button" role="tab" aria-selected={shown === t} onClick={() => setTab(t)}
+                  className={`min-h-10 rounded-xs text-[12.5px] font-semibold ${shown === t ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
+                  {TAB_LABEL[t]}
+                </button>
+              ))}
+            </div>
+          </div>
+          {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} place={place} />}
+          {shown === 'class' && <ClassTab outfit={outfit} uma={owned} place={place} />}
+          {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
+          {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
+          {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
+        </>
+      ) : (
+        <>
+          <UnlockBox view={view} outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />
+          <RacingTab view={view} outfit={outfit} />
+        </>
+      )}
+    </div>
+  )
+}
+
+/** Art, name, the big Uma Level with its EXP, then Farm and Craft Levels and what she's up to. */
+function Header({ view, outfit, owned, world, bust }: { view: MasterView; outfit: RosterOutfit; owned: OwnedUma | null; world: TierWorld | null; bust: string | null }) {
+  const navigate = useNavigate()
+  const now = useNow(30_000)
+  const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
+  const work = owned && world ? workOf(world, outfit.outfitId) : null
+  const party = owned && world ? partyOf(world, outfit.outfitId) : null
+  const fighting = owned && world ? Object.values(world.runs).some((r) => r.battle?.input.allies.some((a) => a.id === outfit.outfitId)) : false
+  return (
+    <section className="space-y-3">
       <div className="flex items-end gap-3">
         <div className="relative size-28 shrink-0 overflow-hidden rounded-md bg-raised">
-          {bust ? (
-            <img src={bust} alt="" className={`size-full object-cover object-top ${owned ? '' : 'opacity-70 saturate-50'}`} />
-          ) : (
-            <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={112} />
-          )}
-          {!owned && (
-            <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[11px] text-locked">
-              <LockIcon size={11} /> Locked
-            </span>
-          )}
+          {bust ? <img src={bust} alt="" className={`size-full object-cover object-top ${owned ? '' : 'opacity-70 saturate-50'}`} />
+            : <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={112} />}
+          {!owned && <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[11px] text-locked"><LockIcon size={11} /> Locked</span>}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
           <h3 className="text-xl leading-tight">{outfit.name}</h3>
-          {outfit.title && <p className="text-[13px] text-ink-soft">{outfit.title}</p>}
+          {outfit.title && <p className="truncate text-[13px] text-ink-soft">{outfit.title}</p>}
+          {owned && (
+            <div className="mt-1.5">
+              <p className="font-display text-[26px] font-extrabold leading-none">Lv {owned.level}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></p>
+              <Bar className="mt-1.5" value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
+              <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
+            </div>
+          )}
         </div>
       </div>
-
-      {owned ? (
-        <section className="grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-md bg-raised p-2">
-            <p className="text-micro">Level</p>
-            <p className="font-display text-xl font-bold">{owned.level}</p>
-          </div>
-          <div className="rounded-md bg-raised p-2">
-            <p className="text-micro">Unlocked</p>
-            <p className="text-[13px] font-semibold">{new Date(owned.unlockedAt).toLocaleDateString()}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => navigate(inParty ? `/town/party-hall/${inParty.party + 1}` : '/town/party-hall', { state: { fromHub: true } })}
-            className="rounded-md bg-raised p-2 active:bg-white/5"
-          >
-            <p className="text-micro">Party</p>
-            <p className="text-[13px] font-semibold text-accent">{inParty ? world?.parties[inParty.party]?.name : 'None · add'}</p>
+      {owned && (
+        <div className="grid grid-cols-3 gap-2">
+          {(['farming', 'gathering'] as const).map((p) => (
+            <div key={p} className={`rounded-md p-2 ${p === 'farming' ? 'bg-[#2c3a26]' : 'bg-[#3a3026]'}`}>
+              <p className="text-[11px] font-semibold text-ink-soft">{PROFESSION_LABEL[p]}</p>
+              <p className="font-display text-xl font-bold leading-tight">{owned.professions[p].level}</p>
+              <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.professions[p].level)} open</p>
+            </div>
+          ))}
+          <button type="button" className="rounded-md bg-raised p-2 text-left active:bg-white/5"
+            onClick={() => (work ? navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })
+              : navigate(party ? `/town/party-hall/${party.party + 1}` : '/town/party-hall', { state: { fromHub: true } }))}>
+            <p className="text-[11px] font-semibold text-ink-soft">{work ? 'Working' : fighting ? 'Fighting' : 'Party'}</p>
+            <p className="truncate text-[13px] font-semibold text-accent">{work ? placeById(work.placeId)?.name : party ? world?.parties[party.party]?.name : 'None · add'}</p>
+            <p className="truncate text-[10.5px] text-ink-faint">
+              {work ? (jobFinished(work.job, now) >= work.job.count ? 'Done · collect' : formatDuration(jobEndsAt(work.job) - Date.parse(now))) : fighting ? 'Open fight' : 'Free'}
+            </p>
           </button>
-        </section>
-      ) : (
-        <section className="space-y-1.5">
-          <button
-            type="button"
-            disabled={tickets < 1}
-            onClick={() => setConfirming(true)}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accent font-display text-base font-bold text-accent-ink disabled:opacity-40"
-          >
-            <TicketIcon size={20} /> Unlock · 1 Ticket
-          </button>
-          <p className="text-center text-[12px] text-ink-faint">
-            {tickets > 0 ? `${tickets} Unlock Tickets left` : 'No tickets left: Umas earn Shards as they level (battles, S3); five Shards make a Ticket.'}
-          </p>
-        </section>
+        </div>
       )}
+    </section>
+  )
+}
 
-      {owned && <BattleCard outfit={outfit} owned={owned} onSkills={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)}
-        onStars={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} />}
-      {owned && world && <GearCard outfit={outfit} uma={owned} world={world} />}
+function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: RosterOutfit; tickets: number }) {
+  const [confirming, setConfirming] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  return (
+    <section className="space-y-1.5">
+      <button type="button" disabled={tickets < 1} onClick={() => setConfirming(true)}
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accent font-display text-base font-bold text-accent-ink disabled:opacity-40">
+        <TicketIcon size={20} /> Unlock · 1 Ticket
+      </button>
+      <p className="text-center text-[12px] text-ink-faint">
+        {tickets > 0 ? `${tickets} Unlock Tickets left` : 'No tickets left: Umas earn a Shard at Lv10, 20, 30, 40 and 50; five Shards make a Ticket.'}
+      </p>
+      {confirming && (
+        <BottomSheet title={`Unlock ${outfit.name}?`} onClose={() => setConfirming(false)} footer={
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setConfirming(false)} className="min-h-12 flex-1 rounded-sm border border-hairline-strong font-semibold text-ink-soft">Not now</button>
+            <button type="button" onClick={() => unlock(outfit.outfitId).then(() => { setConfirming(false); setError(null) }, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Could not unlock.'))}
+              className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink">Unlock for 1 Ticket</button>
+          </div>
+        }>
+          <div className="flex items-center gap-3">
+            <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={64} />
+            <div className="text-[14px]">
+              <p className="font-semibold">{outfit.title ?? outfit.name}</p>
+              <p className="text-ink-soft">{tickets} → {tickets - 1} Unlock Tickets. Unlocking is final.</p>
+            </div>
+          </div>
+          {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}
+        </BottomSheet>
+      )}
+    </section>
+  )
+}
 
-      <Aptitudes outfit={outfit} />
-      <AptitudesAtWork outfit={outfit} />
+// --- Battle: her RPG stats as she fights now ---------------------------------------------------------------------
 
+function BattleTab({ outfit, uma, world, place }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; place: Place }) {
+  const nav = useHubNavigation()
+  const build = activeBuild(outfit, uma)
+  const base = projectRpgStats(umaProfile(outfit, uma, 1, build))
+  const points = umaPoints(uma, build)
+  const boosted = applyPoints(base, points)
+  const current = buildOf(uma, build)
+  const party = partyOf(world, outfit.outfitId)
+  const rows: { label: string; base: number; now: number }[] = [
+    { label: 'HP', base: base.hp, now: boosted.stats.hp },
+    { label: 'MP', base: base.mp, now: boosted.stats.mp },
+    { label: 'ATK', base: base.atk, now: boosted.stats.atk },
+    { label: 'M.ATK', base: base.matk, now: boosted.stats.matk },
+    { label: 'DEF', base: base.pdef, now: boosted.stats.pdef },
+    { label: 'M.DEF', base: base.mdef, now: boosted.stats.mdef },
+  ]
+  return (
+    <div className="space-y-3">
+      <button type="button" onClick={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
+        <span>
+          <span className="block text-[11px] text-ink-faint">Fights as</span>
+          <span className="block text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
+        </span>
+        <span className="text-[12px] text-ink-soft">{current.loadout.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
+      </button>
+      <section className="rounded-md bg-raised">
+        <div className="flex justify-between px-3 pt-2 text-[11px] text-ink-faint"><span>Battle stats</span><span>base → with gear and Extra Stats</span></div>
+        <div className="divide-y divide-hairline">
+          {rows.map((r) => (
+            <Row key={r.label} label={r.label} value={<span className="font-display tabular-nums">{r.now}</span>}
+              note={r.now !== r.base ? <span className="text-success">+{r.now - r.base}</span> : undefined} />
+          ))}
+          <Row label="Evasion" value={`${(boosted.evasion / 10).toFixed(1)}%`} note="from Speed" />
+          <Row label="Limit Break head start" value={`${boosted.limitStart} / 12`} />
+        </div>
+      </section>
+      <section className="rounded-md bg-raised">
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Core stats (from her racing stats, grown by level)</p>
+        <div className="grid grid-cols-5 gap-1 p-2 text-center">
+          {STATS.map((s) => (
+            <span key={s} className="rounded-xs bg-panel py-1">
+              <span className="block text-[10px] text-ink-faint">{STAT_NAMES[s]}</span>
+              <span className="font-display text-[14px] font-bold tabular-nums">{base[s]}</span>
+            </span>
+          ))}
+        </div>
+        <p className="px-3 pb-2 text-[11px] text-ink-faint">Speed → ATK and M.ATK · Stamina and Power → HP · Wit → MP · Power and Wit → DEF.</p>
+      </section>
+      <p className="text-[11px] text-ink-faint">Unlocked {new Date(uma.unlockedAt).toLocaleDateString()}.</p>
+    </div>
+  )
+}
+
+// --- Class: builds, skills and class ranks ---------------------------------------------------------------------
+
+function ClassTab({ outfit, uma, place }: { outfit: RosterOutfit; uma: OwnedUma; place: Place }) {
+  const nav = useHubNavigation()
+  const navigate = useNavigate()
+  const build = activeBuild(outfit, uma)
+  const current = buildOf(uma, build)
+  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(current.tree.map((id) => ({ tier: 1, id })))
+  return (
+    <div className="space-y-3">
+      <button type="button" onClick={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md bg-raised px-3 text-left">
+        <span className="min-w-0">
+          <span className="block truncate text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
+          <span className="block text-[12px] text-ink-soft">{current.tree.length} learned · {current.loadout.length}/{rpgActiveSlots(uma.level)} equipped</span>
+        </span>
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold ${points > 0 && uma.ranks.classes[RPG_BUILD[build].classId] > 1 ? 'bg-accent text-accent-ink' : 'bg-sunken text-ink-soft'}`}>
+          {points > 0 ? `${points} pts · Skills` : 'Skills'}
+        </span>
+      </button>
+      {current.loadout.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {current.loadout.map((id) => {
+            const node = rpgNode(id)
+            return node ? (
+              <span key={id} className="flex items-center gap-1 rounded-full bg-raised px-2.5 py-1 text-[12px] font-semibold">
+                {node.skill && skillKinds(node.skill).map((k) => <KindMark key={k} kind={k} size={12} />)}{node.name}
+              </span>
+            ) : null
+          })}
+        </div>
+      )}
+      <section className="rounded-md bg-raised">
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks · each rank opens a skill depth · train at the Learning District</p>
+        <div className="divide-y divide-hairline">
+          {RPG_CLASSES.map((c) => {
+            const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === c)!
+            const rank = uma.ranks.classes[c]
+            const grade = outfit.aptitudes.strategy[hall[1].style]
+            return (
+              <button key={c} type="button" onClick={() => navigate(`/learning/${hall[0]}`, { state: { fromHub: true } })} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-[13px]">
+                <span className="flex items-center gap-2">
+                  <span className="font-semibold">{CLASS_LABEL[c]}</span>
+                  <span className="flex items-center gap-1 text-[11px] text-ink-faint">{KEY_LABELS[hall[1].style]} <GradeChip grade={grade} /></span>
+                </span>
+                <span className="text-right">
+                  <span className="font-display font-bold">Rank {rank}</span>
+                  <span className="block text-[11px] text-ink-faint">{rank >= CLASS_MAX_RANK ? 'every depth open' : `next ${formatDuration(classRankHours(rank) * HOUR * aptitudeTime(grade))}`}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+// --- Gear: what she wears, gear mastery, Extra Stats --------------------------------------------------------------
+
+function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
+  const navigate = useNavigate()
+  const points = umaPoints(uma, activeBuild(outfit, uma))
+  return (
+    <div className="space-y-3">
+      <GearCard outfit={outfit} uma={uma} world={world} />
+      <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
+        <span className="flex items-center justify-between">
+          <span className="text-[14px] font-semibold">Extra Stats</span>
+          <span className="text-[12px] text-ink-soft">{uma.stars.active.length}/{activeNodeSlots(uma.level)} active · {uma.stars.unlocked.length}/100 · map ›</span>
+        </span>
+        <span className="mt-1 block text-[11px] text-ink-faint">
+          Total with gear: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
+        </span>
+      </button>
+      <section className="rounded-md bg-raised">
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear mastery · rank k wears grade k · train at the armories</p>
+        <div className="grid grid-cols-2 gap-x-3 px-3 py-2">
+          {GEAR_TYPES.map((t) => {
+            const rank = uma.ranks.mastery[t]
+            const grade = outfit.aptitudes.distance[gearDistance(t)]
+            return (
+              <div key={t} className="flex items-center justify-between border-b border-hairline py-1.5 text-[12px] last:border-0">
+                <span className="truncate">{GEAR_TYPE_LABEL[t]}</span>
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <span className="text-[10px] text-ink-faint">{rank < MASTERY_MAX_RANK ? formatDuration(masteryRankHours(rank) * HOUR * aptitudeTime(grade)) : 'max'}</span>
+                  <span className="font-display font-bold">{rank}</span>
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+// --- Work: Farm Level and Craft Level, and her job -----------------------------------------------------------------
+
+function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
+  const navigate = useNavigate()
+  const now = useNow()
+  const work = workOf(world, outfit.outfitId)
+  const out = work ? outputView(work.job.output) : null
+  const surface = (p: Profession) => (p === 'farming' ? outfit.aptitudes.surface.turf : outfit.aptitudes.surface.dirt)
+  return (
+    <div className="space-y-3">
+      {work && (
+        <button type="button" onClick={() => navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })} className="flex w-full items-center gap-3 rounded-md bg-raised p-3 text-left">
+          {out?.icon ? <ItemIcon id={out.icon} size={36} /> : <span className="size-9" />}
+          <span className="min-w-0 flex-1">
+            <span className="block text-[11px] text-ink-faint">Working at {placeById(work.placeId)?.name}</span>
+            <span className="block truncate text-[14px] font-semibold">{out?.name} · {jobFinished(work.job, now)}/{work.job.count}</span>
+          </span>
+          <span className="shrink-0 text-[12px] text-ink-soft">{jobFinished(work.job, now) >= work.job.count ? 'Done' : formatDuration(jobEndsAt(work.job) - Date.parse(now))}</span>
+        </button>
+      )}
+      {(['farming', 'gathering'] as const).map((p) => {
+        const prof = uma.professions[p]
+        const next = prof.level < PROFESSION_MAX_LEVEL ? professionExpToNext(prof.level) : null
+        const grade = surface(p)
+        return (
+          <section key={p} className="rounded-md bg-raised p-3">
+            <div className="flex items-baseline justify-between">
+              <p className="text-[14px] font-semibold">{PROFESSION_LABEL[p]} <span className="font-display text-lg">{prof.level}</span></p>
+              <span className="flex items-center gap-1 text-[11px] text-ink-faint">{p === 'farming' ? 'Turf' : 'Dirt'} <GradeChip grade={grade} /> ×{(1 / aptitudeTime(grade)).toFixed(1)} speed</span>
+            </div>
+            <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />
+            <p className="mt-1 text-[11px] text-ink-faint">
+              {next ? `${prof.exp} / ${next} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
+              {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${PROFESSION_SHORT[p]} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
+            </p>
+            <p className="mt-1 text-[11px] text-ink-soft">
+              {p === 'farming' ? 'The eight Farmlands sites, the Pantry and the Kitchen.' : 'The eight Wilds sites, the Workbench and the Forge.'}
+            </p>
+          </section>
+        )
+      })}
+    </div>
+  )
+}
+
+// --- Racing: the original's profile ---------------------------------------------------------------------------
+
+function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit }) {
+  const [unique, setUnique] = useState<{ name: string; description: string } | null | 'loading'>('loading')
+  useEffect(() => {
+    let live = true
+    loadSkills(view.manifest).then((skills) => live && setUnique(skillText(skills, outfit.uniqueSkillId)), () => live && setUnique(null))
+    return () => {
+      live = false
+    }
+  }, [outfit, view.manifest])
+  const groups = [
+    { name: 'Surface', grades: outfit.aptitudes.surface as Record<string, string> },
+    { name: 'Distance', grades: outfit.aptitudes.distance as Record<string, string> },
+    { name: 'Style', grades: outfit.aptitudes.strategy as Record<string, string> },
+  ]
+  const [style, styleGrade] = best(outfit.aptitudes.strategy)
+  const [distance, distanceGrade] = best(outfit.aptitudes.distance)
+  const [surface, surfaceGrade] = best(outfit.aptitudes.surface)
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        {groups.map((g) => (
+          <div key={g.name}>
+            <h4 className="text-micro mb-1">{g.name}</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {Object.entries(g.grades).map(([key, grade]) => (
+                <span key={key} className="flex items-center gap-1.5 rounded-full bg-raised py-0.5 pl-2.5 pr-1 text-[12px]">{KEY_LABELS[key] ?? key}<GradeChip grade={grade} /></span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
       <section>
-        <h4 className="text-micro mb-1">Base stats · growth</h4>
+        <h4 className="text-micro mb-1">What her aptitudes do here</h4>
+        <div className="divide-y divide-hairline rounded-md bg-raised">
+          <Row label="Learns fastest" value={STYLE_CLASSES[style].join(' / ')} note={`${KEY_LABELS[style]} ${styleGrade}`} />
+          <Row label="Masters fastest" value={DISTANCE_GEAR[distance].gear} note={`${KEY_LABELS[distance]} ${distanceGrade}`} />
+          <Row label="Works fastest at" value={SURFACE_PROFESSION[surface]} note={`${KEY_LABELS[surface]} ${surfaceGrade}`} />
+        </div>
+      </section>
+      <section>
+        <h4 className="text-micro mb-1">Racing base stats · growth</h4>
         <table className="w-full text-[13px]">
           <tbody>
             {STATS.map((stat) => (
@@ -232,60 +459,15 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
           </tbody>
         </table>
       </section>
-
       <section>
-        <h4 className="text-micro mb-1">Unique skill</h4>
-        {unique === 'loading' ? (
-          <p className="text-[13px] text-ink-faint">Loading…</p>
-        ) : unique ? (
+        <h4 className="text-micro mb-1">Unique skill (racing)</h4>
+        {unique === 'loading' ? <p className="text-[13px] text-ink-faint">Loading…</p> : unique ? (
           <div className="rounded-md bg-raised p-3">
             <p className="font-display font-bold">{unique.name}</p>
             <p className="text-[13px] text-ink-soft">{unique.description}</p>
           </div>
-        ) : (
-          <p className="text-[13px] text-ink-faint">Not in the current game data.</p>
-        )}
+        ) : <p className="text-[13px] text-ink-faint">Not in the current game data.</p>}
       </section>
-
-      {confirming && (
-        <BottomSheet
-          title={`Unlock ${outfit.name}?`}
-          onClose={() => setConfirming(false)}
-          footer={
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setConfirming(false)} className="min-h-12 flex-1 rounded-sm border border-hairline-strong font-semibold text-ink-soft">
-                Not now
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  unlock(outfit.outfitId).then(
-                    () => {
-                      setConfirming(false)
-                      setError(null)
-                    },
-                    (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Could not unlock.'),
-                  )
-                }}
-                className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink"
-              >
-                Unlock for 1 Ticket
-              </button>
-            </div>
-          }
-        >
-          <div className="flex items-center gap-3">
-            <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={64} />
-            <div className="text-[14px]">
-              <p className="font-semibold">{outfit.title ?? outfit.name}</p>
-              <p className="text-ink-soft">
-                {tickets} → {tickets - 1} Unlock Tickets. Unlocking is final.
-              </p>
-            </div>
-          </div>
-          {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}
-        </BottomSheet>
-      )}
     </div>
   )
 }

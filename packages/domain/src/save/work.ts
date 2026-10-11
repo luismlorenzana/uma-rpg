@@ -75,7 +75,7 @@ export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, o
   let block: string | null = null
   if (spec.kind === 'gather' && (item.refined || item.family !== spec.family)) block = 'Not made here'
   else if (spec.kind === 'refine' && (!item.refined || item.side !== profession)) block = 'Not refined here'
-  else if (uma.professions[profession].level < gradeUnlockLevel(item.grade)) block = `Needs ${profession === 'farming' ? 'Farming' : 'Gathering'} Lv${gradeUnlockLevel(item.grade)}`
+  else if (uma.professions[profession].level < gradeUnlockLevel(item.grade)) block = `Needs ${profession === 'farming' ? 'Farm' : 'Craft'} Lv${gradeUnlockLevel(item.grade)}`
   else if (spec.kind === 'refine' && (world.items[item.pair] ?? 0) < count) block = `Needs ${count} ${itemById(item.pair)?.name ?? item.pair}`
   return { output: { id: item.id, name: item.name, grade: item.grade }, item, profession, msEach, expEach: itemMinutes(item.grade) * EXP_PER_MINUTE, inputs, block }
 }
@@ -96,7 +96,7 @@ function planCrafting(world: TierWorld, placeId: string, outfit: WorkOutfit, out
   const facility = facilityOf(world, placeId)
   const minutes = makeMinutes(piece.grade)
   const msEach = Math.max(1000, Math.round((minutes * MINUTE * aptitudeTime(professionAptitude(outfit, 'gathering'))) / FACILITY_SPEED[facility.level - 1]!))
-  const block = uma.professions.gathering.level < gradeUnlockLevel(piece.grade) ? `Needs Gathering Lv${gradeUnlockLevel(piece.grade)}` : inputsBlock(world, piece.inputs, count)
+  const block = uma.professions.gathering.level < gradeUnlockLevel(piece.grade) ? `Needs Craft Lv${gradeUnlockLevel(piece.grade)}` : inputsBlock(world, piece.inputs, count)
   return { output: { id: piece.id, name: piece.name, grade: piece.grade }, item: null, profession: 'gathering', msEach, expEach: minutes * EXP_PER_MINUTE, inputs: piece.inputs, block }
 }
 
@@ -108,7 +108,7 @@ function planCooking(world: TierWorld, placeId: string, outfit: WorkOutfit, outp
   const facility = facilityOf(world, placeId)
   const minutes = makeMinutes(dish.grade)
   const msEach = Math.max(1000, Math.round((minutes * MINUTE * aptitudeTime(professionAptitude(outfit, 'farming'))) / FACILITY_SPEED[facility.level - 1]!))
-  const block = uma.professions.farming.level < gradeUnlockLevel(dish.grade) ? `Needs Farming Lv${gradeUnlockLevel(dish.grade)}` : inputsBlock(world, dish.inputs, count)
+  const block = uma.professions.farming.level < gradeUnlockLevel(dish.grade) ? `Needs Farm Lv${gradeUnlockLevel(dish.grade)}` : inputsBlock(world, dish.inputs, count)
   return { output: { id: dish.id, name: dish.name, grade: dish.grade }, item: null, profession: 'farming', msEach, expEach: minutes * EXP_PER_MINUTE, inputs: dish.inputs, block }
 }
 
