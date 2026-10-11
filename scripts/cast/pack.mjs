@@ -128,6 +128,16 @@ function encodeRgba(width, height, px) {
   return Buffer.concat([Buffer.from(PNG_SIGNATURE, 'hex'), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(Buffer.concat(rows), { level: 9 })), chunk('IEND', Buffer.alloc(0))])
 }
 
+/** Crops a PNG to a centred portrait at most `aspect` wide for its height (showcase art with the figure mid-frame). */
+export function portraitPng(bytes, aspect = 0.8) {
+  const { width, height, px } = decodeRgba(bytes)
+  const w = Math.min(width, Math.round(height * aspect))
+  const x0 = Math.floor((width - w) / 2)
+  const out = Buffer.alloc(w * height * 4)
+  for (let y = 0; y < height; y++) px.copy(out, y * w * 4, (y * width + x0) * 4, (y * width + x0 + w) * 4)
+  return encodeRgba(w, height, out)
+}
+
 /** Crops a portrait to what isn't transparent, plus a small margin, so it fills its card. */
 export function trimPng(bytes, margin = 4) {
   const { width, height, px } = decodeRgba(bytes)
