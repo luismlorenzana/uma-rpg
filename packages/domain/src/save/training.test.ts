@@ -5,7 +5,7 @@ import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { learnSkill, startFight, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
-import { collectJob, facilityOf, rushJob, startTraining } from './work'
+import { collectJob, facilityOf, queueJob, rushJob, startTraining } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -85,5 +85,20 @@ describe('save v5', () => {
     elsewhere.tierWorlds['1'].facilities['mage-tower'] = elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     delete elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     expect(() => parseSave(elsewhere)).toThrow(SaveParseError)
+  })
+})
+
+describe('queued training (QoL, D62)', () => {
+  it('queues the next ranks of a track, each timed from the rank it will train', () => {
+    let save = startTraining(umas('101'), 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))
+    save = queueJob(save, 'brawler-dojo', 0, front, 'class:brawler', 1, at(0))
+    save = queueJob(save, 'brawler-dojo', 0, front, 'class:brawler', 1, at(0))
+    // Rank 2→3 is 2 hours and 3→4 is 6, halved by Front A.
+    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs[0]!.queue.map((q) => q.msEach)).toEqual([HOUR, 3 * HOUR])
+    expect(() => queueJob(save, 'brawler-dojo', 0, front, 'class:mage', 1, at(0))).toThrow(/not trained here/)
+    const r = collectJob(save, 'brawler-dojo', 0, at(1.5 * HOUR))
+    expect(r.got.rankUp).toBe(true)
+    expect(worldOf(r.save).umas['101']!.ranks.classes.brawler).toBe(3)
+    expect(facilityOf(worldOf(r.save), 'brawler-dojo').jobs[0]).toMatchObject({ output: 'class:brawler', startedAt: at(1.25 * HOUR) })
   })
 })

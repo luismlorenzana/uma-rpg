@@ -21,7 +21,13 @@ export interface Job {
   expEach: number
   /** Inputs reserved for each output (refining, cooking, crafting). They come back for outputs never made. */
   inputs: Record<string, number>
+  /** Up to three jobs queued after this one for the same Uma, each planned when queued (QoL, D62). */
+  queue: QueuedJob[]
 }
+
+/** A queued job: what it makes and how, fixed when it was queued; its inputs are taken when it starts. */
+export interface QueuedJob { output: string; count: number; msEach: number; expEach: number; inputs: Record<string, number> }
+export const MAX_QUEUE = 3
 
 export interface Facility {
   level: number
@@ -39,6 +45,17 @@ export function jobFinished(job: Job, now: string): number {
 export const jobReady = (job: Job, now: string): number => jobFinished(job, now) - job.collected
 export const jobEndsAt = (job: Job): number => at(job.startedAt) + job.count * job.msEach
 export const jobComplete = (job: Job, now: string): boolean => jobFinished(job, now) >= job.count
+/** When each queued job starts and ends, if each starts the moment the one before ends (and the Warehouse covers it). */
+export function queueTimeline(job: Job): { startsAt: number; endsAt: number }[] {
+  let t = jobEndsAt(job)
+  return job.queue.map((q) => {
+    const startsAt = t
+    t += q.count * q.msEach
+    return { startsAt, endsAt: t }
+  })
+}
+/** When the slot's whole chain, queue included, ends. */
+export const chainEndsAt = (job: Job): number => queueTimeline(job).at(-1)?.endsAt ?? jobEndsAt(job)
 /** Progress through the whole job, 0–1. */
 export const jobProgress = (job: Job, now: string): number =>
   Math.max(0, Math.min(1, (at(now) - at(job.startedAt)) / (job.count * job.msEach)))

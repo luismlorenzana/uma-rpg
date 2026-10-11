@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  parseTrack, buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, startTraining, sweepFight, upgradeFacility, type Track, type WorkOutfit,
+  parseTrack, sweepMany, sellStock, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, rushJob, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
@@ -137,9 +137,14 @@ export const recall = (placeId: string, slot: number) => edit((s, now) => recall
 export const train = (placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3], track: Track) =>
   edit((s, now) => startTraining(s, placeId, slot, outfit, track, now))
 export const rush = (placeId: string, slot: number) => edit((s, now) => rushJob(s, placeId, slot, now))
+/** Queues another job after the slot's current one, same Uma (QoL, D62). */
+export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
+  edit((s, now) => queueJob(s, placeId, slot, outfit, output, count, now))
+export const unqueueWork = (placeId: string, slot: number, index: number) => edit((s, now) => unqueueJob(s, placeId, slot, index, now))
 export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, placeId, now))
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
 export const buyTicket = (kind: 'rush' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
+export const sell = (shelf: Shelf, id: string, quantity: number) => edit((s, now) => sellStock(s, shelf, id, quantity, now))
 
 /** She eats a dish: one node unlocks on her map (S6). Returns the node. */
 export async function eat(outfitId: string, dishId: string): Promise<string> {
@@ -191,12 +196,13 @@ export async function rankUpAndContinue(placeId: string, slot: number, outfit: P
   await commit(startTraining(collectJob(save, placeId, slot, now).save, placeId, slot, outfit, track, now))
 }
 
-export async function sweep(chapter: RpgCampaignChapter, party: number, nodeId: string): Promise<FightResult> {
+/** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
+export async function sweep(chapter: RpgCampaignChapter, party: number, nodeId: string, times = 1): Promise<FightResult & { swept: number }> {
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
-  const r = sweepFight(save, chapter, party, nodeId, nowIso())
+  const r = sweepMany(save, chapter, party, nodeId, times, nowIso())
   await commit(r.save)
-  return r.result
+  return { ...r.result, swept: r.swept }
 }
 
 /** The Tier 1 world, or null before boot. */

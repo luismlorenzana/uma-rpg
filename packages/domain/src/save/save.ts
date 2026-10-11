@@ -1,10 +1,10 @@
-// Save v7: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v8: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
-import { facilitySpec, JOB_KINDS, type Facility, type Job } from '../economy/jobs'
+import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
 import { RPG_CLASSES } from '../rpg/kinds'
@@ -21,7 +21,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 7
+export const SAVE_SCHEMA_VERSION = 8
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -235,8 +235,22 @@ function parseItems(value: unknown, path: string): Record<string, number> {
 
 const JOB_KEYS = ['kind', 'outfitId', 'output', 'count', 'collected', 'startedAt', 'msEach', 'expEach', 'inputs'] as const
 
-function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<string, OwnedUma>): Job {
-  const j = object(value, path, JOB_KEYS)
+function parseQueue(value: unknown, path: string): QueuedJob[] {
+  if (!Array.isArray(value) || value.length > MAX_QUEUE) throw new SaveParseError(path, `expected at most ${MAX_QUEUE} queued jobs`)
+  return value.map((raw: unknown, i: number) => {
+    const at = `${path}.${i}`
+    const q = object(raw, at, ['output', 'count', 'msEach', 'expEach', 'inputs'])
+    if (typeof q.output !== 'string' || q.output.length < 1 || q.output.length > 80) throw new SaveParseError(`${at}.output`, 'expected an id')
+    const n = count(q.count, `${at}.count`)
+    if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${at}.count`, `expected 1–${MAX_JOB_COUNT}`)
+    const msEach = count(q.msEach, `${at}.msEach`)
+    if (msEach < 1) throw new SaveParseError(`${at}.msEach`, 'expected a positive duration')
+    return { output: q.output, count: n, msEach, expEach: count(q.expEach, `${at}.expEach`), inputs: parseItems(q.inputs, `${at}.inputs`) }
+  })
+}
+
+function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<string, OwnedUma>, version: number): Job {
+  const j = object(value, path, version < 8 ? JOB_KEYS : [...JOB_KEYS, 'queue'])
   if (j.kind !== kind || !JOB_KINDS.includes(j.kind as Job['kind'])) throw new SaveParseError(`${path}.kind`, `expected ${kind}`)
   if (typeof j.outfitId !== 'string' || !umas[j.outfitId]) throw new SaveParseError(`${path}.outfitId`, 'expected an owned outfit')
   if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
@@ -252,10 +266,10 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (msEach < 1) throw new SaveParseError(`${path}.msEach`, 'expected a positive duration')
   const inputs = parseItems(j.inputs, `${path}.inputs`)
   return { kind, outfitId: j.outfitId, output: j.output, count: n, collected, startedAt: timestamp(j.startedAt, `${path}.startedAt`), msEach,
-    expEach: count(j.expEach, `${path}.expEach`), inputs }
+    expEach: count(j.expEach, `${path}.expEach`), inputs, queue: version < 8 ? [] : parseQueue(j.queue, `${path}.queue`) }
 }
 
-function parseFacilities(value: unknown, path: string, umas: Record<string, OwnedUma>): Record<string, Facility> {
+function parseFacilities(value: unknown, path: string, umas: Record<string, OwnedUma>, version: number): Record<string, Facility> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const out: Record<string, Facility> = {}
   const working = new Set<string>()
@@ -270,7 +284,7 @@ function parseFacilities(value: unknown, path: string, umas: Record<string, Owne
     if (!Array.isArray(f.jobs) || f.jobs.length !== slots) throw new SaveParseError(`${at}.jobs`, `expected ${slots} slots`)
     const jobs = f.jobs.map((job: unknown, i: number) => {
       if (job === null) return null
-      const parsed = parseJob(job, `${at}.jobs.${i}`, spec.kind, umas)
+      const parsed = parseJob(job, `${at}.jobs.${i}`, spec.kind, umas, version)
       if (spec.kind === 'train' && (parsed.count !== 1 || !tracksAt(id).some((t) => trackId(t) === parsed.output))) {
         throw new SaveParseError(`${at}.jobs.${i}.output`, 'not trained here')
       }
@@ -517,7 +531,7 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), runs: version === 2 ? {} : parseRuns(w.runs, `${path}.runs`),
     items: version < 4 ? {} : parseItems(w.items, `${path}.items`),
-    facilities: version < 4 ? {} : parseFacilities(w.facilities, `${path}.facilities`, umas),
+    facilities: version < 4 ? {} : parseFacilities(w.facilities, `${path}.facilities`, umas, version),
     dishes: version < 6 ? {} : parseDishes(w.dishes, `${path}.dishes`),
     gear: version < 7 ? {} : parseGearStock(w.gear, `${path}.gear`),
   }
@@ -529,7 +543,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v7 save and always returns v7. */
+/** Parses a v1–v8 save and always returns v8. */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

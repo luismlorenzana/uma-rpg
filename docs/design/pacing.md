@@ -53,6 +53,12 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 | Rush Ticket: finishes up to an hour of a running farm job | 20 |
 | Sweep Ticket: completes a beaten regular fight (EXP and Shards, no Laurels) | 15 |
 
+| Sell at the Warehouse (D62) | Laurels each |
+|---|---|
+| Raw item of grade g | g |
+| Refined item of grade g | 2g |
+| Dish or unbound gear of grade g | 3g |
+
 - A job's Rush costs one ticket per started hour left. Training (S5) can't be rushed.
 - A chapter with at least one won fight stocks its grade pair: chapter n of a tier, grades `2n − 1` and `2n`.
 

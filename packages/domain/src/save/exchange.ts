@@ -1,6 +1,8 @@
 // The Exchange (S4, design §11, D54): Laurels from battles buy raw items of the chapters you've reached, Rush Tickets
 // and Sweep Tickets. A Sweep completes a beaten regular fight at once: its EXP and Shards, no Laurels.
 import { chapterGrades, rawItemPrice, RUSH_TICKET_PRICE, SWEEP_TICKET_PRICE } from '../economy/pacing'
+import { dishById } from '../economy/dishes'
+import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { rpgRunKey } from '../rpg/campaign/run'
@@ -62,6 +64,31 @@ export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, party:
   return null
 }
 
+/** Sweeps the same fight up to `times` times (stopping when tickets run out), adding up what each paid. */
+export function sweepMany(save: Save, chapter: RpgCampaignChapter, party: number, nodeId: string, times: number, now: string, tier = TIER_ONE): { save: Save; result: FightResult; swept: number } {
+  if (!Number.isInteger(times) || times < 1 || times > MAX_PURCHASE) throw new SaveRuleError('bad-count', `sweep 1–${MAX_PURCHASE} times`)
+  let current = save
+  const results: FightResult[] = []
+  for (let i = 0; i < times; i++) {
+    if (i > 0 && sweepBlock(worldOf(current, tier), chapter, party, nodeId)) break
+    const r = sweepFight(current, chapter, party, nodeId, now, tier)
+    current = r.save
+    results.push(r.result)
+  }
+  const first = results[0]!
+  const last = results[results.length - 1]!
+  const result: FightResult = {
+    ...first,
+    shards: results.reduce((n, r) => n + r.shards, 0),
+    tickets: results.reduce((n, r) => n + r.tickets, 0),
+    members: last.members.map((m) => {
+      const all = results.map((r) => r.members.find((x) => x.outfitId === m.outfitId)!)
+      return { ...m, beforeLevel: all[0]!.beforeLevel, exp: all.reduce((n, x) => n + x.exp, 0), shards: all.reduce((n, x) => n + x.shards, 0) }
+    }),
+  }
+  return { save: current, result, swept: results.length }
+}
+
 /** Spends a Sweep Ticket on a beaten regular fight: EXP and Shards as if won, no Laurels, MP untouched. */
 export function sweepFight(save: Save, chapter: RpgCampaignChapter, party: number, nodeId: string, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
   const world = worldOf(save, tier)
@@ -76,4 +103,29 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, party: numbe
     runs: { ...world.runs, [rpgRunKey(party, chapter.id)]: { ...run, wins: { ...run.wins, [nodeId]: (run.wins[nodeId] ?? 0) + 1 }, updatedAt: now } },
   }
   return { save: withWorld(save, tier, next, now), result: { outcome: 'victory', chapterId: chapter.id, nodeId, rounds: 0, members: paid.members, laurels: 0, shards: paid.shards, tickets: paid.tickets } }
+}
+
+// --- Selling (QoL): spare stock back for a few Laurels, always far below what buying costs ---------------------------
+
+export type Shelf = 'items' | 'dishes' | 'gear'
+/** Laurels for one: raw items their grade, refined twice that, dishes and unbound gear three times. */
+export function sellPrice(shelf: Shelf, id: string): number {
+  if (shelf === 'items') {
+    const item = itemById(id)
+    return item ? item.grade * (item.refined ? 2 : 1) : 0
+  }
+  const grade = shelf === 'dishes' ? dishById(id)?.grade : gearById(id)?.grade
+  return grade ? grade * 3 : 0
+}
+
+export function sellStock(save: Save, shelf: Shelf, id: string, quantity: number, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const stock = world[shelf]
+  const have = stock[id] ?? 0
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > have) throw new SaveRuleError('bad-count', `you have ${have}`)
+  const price = sellPrice(shelf, id)
+  if (price < 1) throw new SaveRuleError('bad-job', 'that can’t be sold')
+  const next = { ...stock, [id]: have - quantity }
+  if (next[id] === 0) delete next[id]
+  return withWorld(save, tier, { ...world, [shelf]: next, wallet: { ...world.wallet, laurels: world.wallet.laurels + price * quantity } }, now)
 }

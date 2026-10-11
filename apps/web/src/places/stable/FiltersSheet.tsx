@@ -54,6 +54,7 @@ export function FiltersSheet({ facets, onChange, onClose, resultCount }: { facet
         <section>
           <h3 className="text-micro mb-2">Collection</h3>
           <Chip label="New to you (24 h)" on={facets.newOnly} onClick={() => onChange({ ...facets, newOnly: !facets.newOnly })} />
+          <Chip label="Free now (not working or fighting)" on={facets.freeOnly} onClick={() => onChange({ ...facets, freeOnly: !facets.freeOnly })} />
         </section>
       </div>
     </BottomSheet>

@@ -20,7 +20,7 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
   Familiar, her two `professions`, her class and mastery `ranks`, her `stars` map and her `gear` locker), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), `runs`
   (one per party per chapter: wins, carried MP, and the open fight as its frozen input plus every action), `items`
   (the Warehouse), `dishes`, `gear` (unbound pieces) and `facilities` (level and job slots). The wallet holds Rush and Sweep Tickets too.
-  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v7
+  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v8
   (device rows on boot, server rows on read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets;
   `save/battle.ts`: builds, skills, fights and their rewards) are pure and return a new save.
 - The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old

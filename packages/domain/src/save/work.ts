@@ -10,6 +10,7 @@ import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/c
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
+import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
 import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -151,15 +152,50 @@ export function startJob(save: Save, placeId: string, slot: number, outfit: Work
   let items = world.items
   for (const [id, n] of Object.entries(plan.inputs)) items = take(items, id, n * count)
   const job: Job = { kind: facilitySpec(placeId)!.kind, outfitId: outfit.outfitId, output, count, collected: 0, startedAt: now, msEach: plan.msEach,
-    expEach: plan.expEach, inputs: plan.inputs }
+    expEach: plan.expEach, inputs: plan.inputs, queue: [] }
   return withWorld(save, tier, setJob({ ...world, items }, placeId, slot, job), now)
 }
 
 export interface Collected { items: number; exp: number; levelsUp: number; done: boolean; rankUp?: boolean }
 
+/**
+ * Collects a job; when it's finished and has a queue, its next job starts at the moment it finished (inputs taken
+ * then), and so on down the queue as far as `now` reaches, so a chain catches up however late it's collected.
+ */
 function collectIn(world: TierWorld, placeId: string, slot: number, now: string): { world: TierWorld; got: Collected } {
   const job = facilityOf(world, placeId).jobs[slot]
   if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
+  if (job.queue.length > 0 && jobFinished(job, now) >= job.count) {
+    const endedAt = new Date(jobEndsAt(job)).toISOString()
+    const first = collectOne(world, placeId, slot, job, endedAt)
+    const [next, ...rest] = job.queue
+    const started = startQueued(first.world, placeId, slot, job, next!, rest, endedAt)
+    if (!started) return { world: first.world, got: first.got }
+    const more = collectIn(started, placeId, slot, now)
+    return { world: more.world, got: { items: first.got.items + more.got.items, exp: first.got.exp + more.got.exp, levelsUp: first.got.levelsUp + more.got.levelsUp,
+      done: more.got.done, rankUp: first.got.rankUp || more.got.rankUp } }
+  }
+  return collectOne(world, placeId, slot, job, now)
+}
+
+/** Starts a queued job in a freed slot, or returns null (and drops the queue) when the Warehouse can't cover it. */
+function startQueued(world: TierWorld, placeId: string, slot: number, prev: Job, next: QueuedJob, rest: QueuedJob[], at: string): TierWorld | null {
+  let items = world.items
+  for (const [id, n] of Object.entries(next.inputs)) {
+    if ((items[id] ?? 0) < n * next.count) return null
+    items = take(items, id, n * next.count)
+  }
+  if (prev.kind === 'train') {
+    const track = parseTrack(next.output)
+    const uma = world.umas[prev.outfitId]
+    if (!track || !uma || rankOf(uma.ranks, track) >= maxRankOf(track)) return null
+  }
+  const job: Job = { kind: prev.kind, outfitId: prev.outfitId, output: next.output, count: next.count, collected: 0, startedAt: at, msEach: next.msEach,
+    expEach: next.expEach, inputs: next.inputs, queue: rest }
+  return setJob({ ...world, items }, placeId, slot, job)
+}
+
+function collectOne(world: TierWorld, placeId: string, slot: number, job: Job, now: string): { world: TierWorld; got: Collected } {
   if (job.kind === 'train') return collectTraining(world, placeId, slot, job, now)
   const finished = jobFinished(job, now)
   const ready = finished - job.collected
@@ -229,7 +265,7 @@ export function startTraining(save: Save, placeId: string, slot: number, outfit:
   const plan = planTraining(world, placeId, outfit, track)
   if (!plan) throw new SaveRuleError('bad-job', 'not trained here')
   if (plan.block) throw new SaveRuleError('bad-job', plan.block)
-  const job: Job = { kind: 'train', outfitId: outfit.outfitId, output: trackId(track), count: 1, collected: 0, startedAt: now, msEach: plan.msEach, expEach: 0, inputs: {} }
+  const job: Job = { kind: 'train', outfitId: outfit.outfitId, output: trackId(track), count: 1, collected: 0, startedAt: now, msEach: plan.msEach, expEach: 0, inputs: {}, queue: [] }
   return withWorld(save, tier, setJob(world, placeId, slot, job), now)
 }
 
@@ -247,11 +283,49 @@ function collectTraining(world: TierWorld, placeId: string, slot: number, job: J
   return { world: next, got: { items: 0, exp: 0, levelsUp: 0, done: true, rankUp: true } }
 }
 
+/**
+ * Queues another job after the slot's current one, for the same Uma: same kind of work, planned now (speed fixed with
+ * her aptitude and today's facility level), inputs taken when it starts. Training queues the next rank.
+ */
+export function queueJob(save: Save, placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const job = facilityOf(world, placeId).jobs[slot]
+  if (!job || job.outfitId !== outfit.outfitId) throw new SaveRuleError('bad-slot', 'queue behind her own job')
+  if (job.queue.length >= MAX_QUEUE) throw new SaveRuleError('bad-count', `at most ${MAX_QUEUE} queued`)
+  let entry: QueuedJob
+  if (job.kind === 'train') {
+    const track = parseTrack(output)
+    const uma = world.umas[outfit.outfitId]
+    if (!track || !uma || !outfit.aptitudes.strategy || !outfit.aptitudes.distance || !tracksAt(placeId).some((t) => trackId(t) === output)) throw new SaveRuleError('bad-job', 'not trained here')
+    // The rank it will train from: today's, plus the current job and each queued one of the same track.
+    const rank = rankOf(uma.ranks, track) + [job, ...job.queue].filter((j) => j.output === output).length
+    if (rank >= maxRankOf(track)) throw new SaveRuleError('bad-job', 'that would pass the top rank')
+    const msEach = Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, outfit.aptitudes as Pick<Aptitudes, 'strategy' | 'distance'>))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
+    entry = { output, count: 1, msEach, expEach: 0, inputs: {} }
+  } else {
+    if (!Number.isInteger(count) || count < 1 || count > MAX_JOB_COUNT) throw new SaveRuleError('bad-count', `make 1–${MAX_JOB_COUNT} at a time`)
+    const plan = planJob(world, placeId, outfit, output, 0)
+    if (!plan) throw new SaveRuleError('bad-job', 'nothing to make here')
+    // Planned for zero items, only a grade gate can block it; inputs are checked when it starts.
+    if (plan.block) throw new SaveRuleError('bad-job', plan.block)
+    entry = { output, count, msEach: plan.msEach, expEach: plan.expEach, inputs: plan.inputs }
+  }
+  return withWorld(save, tier, setJob(world, placeId, slot, { ...job, queue: [...job.queue, entry] }), now)
+}
+
+export function unqueueJob(save: Save, placeId: string, slot: number, index: number, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const job = facilityOf(world, placeId).jobs[slot]
+  if (!job || !job.queue[index]) throw new SaveRuleError('bad-slot', 'nothing queued there')
+  return withWorld(save, tier, setJob(world, placeId, slot, { ...job, queue: job.queue.filter((_, i) => i !== index) }), now)
+}
+
 /** Ends a job early: collects what's made; inputs for items never made come back; the item in progress is lost. */
 export function recallJob(save: Save, placeId: string, slot: number, now: string, tier = TIER_ONE): Save {
   const job = facilityOf(worldOf(save, tier), placeId).jobs[slot]
   if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
-  const collected = collectIn(worldOf(save, tier), placeId, slot, now)
+  // A recall drops the queue first, so nothing queued starts (or takes inputs) on the way out.
+  const collected = collectIn(setJob(worldOf(save, tier), placeId, slot, { ...job, queue: [] }), placeId, slot, now)
   let world = collected.world
   const unmade = job.count - jobFinished(job, now)
   for (const [id, n] of Object.entries(job.inputs)) world = { ...world, items: give(world.items, id, n * unmade) }

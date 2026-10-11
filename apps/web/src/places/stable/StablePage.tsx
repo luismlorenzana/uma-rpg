@@ -1,6 +1,6 @@
 // The Stable (S2, T012): every outfit, with ownership, search, filters, sorts and grid/list views in the spirit of
 // uma-racer's Stable, plus profiles with the unlock flow.
-import { activeFacetCount, bestAptitudeLine, KEY_LABELS, runRosterQuery, SORT_LABELS, type RosterEntry, type RosterFacets, type RosterSortKey } from '@rpg/domain'
+import { activeFacetCount, bestAptitudeLine, isBusy, isInFight, KEY_LABELS, runRosterQuery, SORT_LABELS, type RosterEntry, type RosterFacets, type RosterSortKey } from '@rpg/domain'
 import { useEffect, useMemo, useState } from 'react'
 import { useHubNavigation } from '../../hub/navigation'
 import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
@@ -51,6 +51,16 @@ function SkillsRoute({ outfit, place }: { outfit: RosterEntry['outfit']; place: 
   )
 }
 
+/** The badge on an owned Uma: whatever the list is sorted by, else her Uma Level. */
+function badgeOf(entry: RosterEntry, key: RosterSortKey): string {
+  const u = entry.owned
+  if (!u) return ''
+  if (key === 'farm') return `Farm ${u.professions.farming.level}`
+  if (key === 'craft') return `Craft ${u.professions.gathering.level}`
+  if (key === 'classRank') return `Rank ${Math.max(...Object.values(u.ranks.classes))}`
+  return `Lv ${u.level}`
+}
+
 function facetChips(f: RosterFacets): { label: string; remove: (f: RosterFacets) => RosterFacets }[] {
   const chips: { label: string; remove: (f: RosterFacets) => RosterFacets }[] = []
   for (const r of f.rarity) chips.push({ label: '★'.repeat(r), remove: (x) => ({ ...x, rarity: x.rarity.filter((v) => v !== r) }) })
@@ -59,6 +69,7 @@ function facetChips(f: RosterFacets): { label: string; remove: (f: RosterFacets)
   for (const k of f.strategy) chips.push({ label: `${KEY_LABELS[k]} A`, remove: (x) => ({ ...x, strategy: x.strategy.filter((v) => v !== k) }) })
   for (const k of f.sex) chips.push({ label: k === 'female' ? 'Mare' : k === 'male' ? 'Stallion' : 'Unknown', remove: (x) => ({ ...x, sex: x.sex.filter((v) => v !== k) }) })
   if (f.newOnly) chips.push({ label: 'New', remove: (x) => ({ ...x, newOnly: false }) })
+  if (f.freeOnly) chips.push({ label: 'Free now', remove: (x) => ({ ...x, freeOnly: false }) })
   return chips
 }
 
@@ -69,10 +80,10 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
   const [search, setSearch] = useState('')
   const [sheet, setSheet] = useState<'filters' | 'sort' | null>(null)
   useEffect(() => savePrefs(prefs), [prefs])
-  const result = useMemo(
-    () => runRosterQuery(view.roster, world?.umas ?? {}, { ...prefs.query, search }, Date.now()),
-    [view.roster, world?.umas, prefs.query, search],
-  )
+  const result = useMemo(() => {
+    const busy = new Set(world ? Object.keys(world.umas).filter((id) => isBusy(world, id) || isInFight(world, id)) : [])
+    return runRosterQuery(view.roster, world?.umas ?? {}, { ...prefs.query, search }, Date.now(), busy)
+  }, [view.roster, world, prefs.query, search])
   const setQuery = (patch: Partial<StablePrefs['query']>) => setPrefs((p) => ({ ...p, query: { ...p.query, ...patch } }))
   const open = (entry: RosterEntry) => nav.sub(place, `outfit/${entry.outfit.outfitId}`)
   const chips = facetChips(prefs.query.facets)
@@ -138,7 +149,7 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
                 <span className="relative">
                   <AtlasSprite art={view.art} family="outfit-icons" frameKey={e.outfit.outfitId} size={60} className={e.owned ? '' : 'opacity-55 grayscale-[40%]'} />
                   {e.owned ? (
-                    <span className="absolute bottom-0.5 left-0.5 rounded-full bg-black/70 px-1.5 font-display text-[10px] font-bold leading-4 text-ink">Lv {e.owned.level}</span>
+                    <span className="absolute bottom-0.5 left-0.5 rounded-full bg-black/70 px-1.5 font-display text-[10px] font-bold leading-4 text-ink">{badgeOf(e, prefs.query.sort.key)}</span>
                   ) : (
                     <span className="absolute bottom-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-locked">
                       <LockIcon size={12} />
@@ -155,7 +166,7 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
         <ul className="space-y-1.5 p-3">
           {result.entries.map((e) => (
             <li key={e.outfit.outfitId} style={{ contentVisibility: 'auto', containIntrinsicSize: '64px' }}>
-              <ListRow entry={e} view={view} onOpen={() => open(e)} />
+              <ListRow entry={e} view={view} onOpen={() => open(e)} badge={badgeOf(e, prefs.query.sort.key)} />
             </li>
           ))}
         </ul>
@@ -190,7 +201,7 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
   )
 }
 
-function ListRow({ entry, view, onOpen }: { entry: RosterEntry; view: MasterView; onOpen: () => void }) {
+function ListRow({ entry, view, onOpen, badge }: { entry: RosterEntry; view: MasterView; onOpen: () => void; badge: string }) {
   const bust = useArtUrl(imagePath(view.art, 'outfit-busts', entry.outfit.outfitId))
   return (
     <button type="button" onClick={onOpen} className="flex w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
@@ -213,7 +224,7 @@ function ListRow({ entry, view, onOpen }: { entry: RosterEntry; view: MasterView
       </span>
       <span className="shrink-0 text-right text-[12px]">
         {entry.owned ? (
-          <span className="font-display font-bold">Lv {entry.owned.level}</span>
+          <span className="font-display font-bold">{badge}</span>
         ) : (
           <span className="flex items-center gap-1 text-locked">
             <LockIcon size={12} /> Locked

@@ -19,7 +19,10 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
       <div className="pt-safe min-h-0 flex-1 overflow-y-auto p-4">
         <p className="text-[12px] text-ink-faint">{chapter.title} · {node?.name}</p>
         <h1 className={`font-display text-4xl font-extrabold ${win ? 'text-accent' : 'text-ink-soft'}`}>{win ? 'Victory!' : 'Defeated'}</h1>
-        <p className="text-[13px] text-ink-soft">{result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}` : 'Swept with a ticket: EXP and Shards, no Laurels'}</p>
+        <p className="text-[13px] text-ink-soft">
+          {result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}`
+            : `Swept ${'swept' in result && (result as { swept: number }).swept > 1 ? `${(result as { swept: number }).swept} times` : 'with a ticket'}: EXP and Shards, no Laurels`}
+        </p>
         {win ? (
           <>
             <div className="mt-4 flex flex-wrap items-center gap-2">

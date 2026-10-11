@@ -59,6 +59,7 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
   })
   const [open, setOpen] = useState<RpgMapNode | null>(null)
   const [swept, setSwept] = useState<{ result: Result; nodeId: string } | null>(null)
+  const [sweepFor, setSweepFor] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const setParty = (i: number) => {
     setPartyState(i)
@@ -98,12 +99,13 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
       setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.')
     }
   }
-  const doSweep = async (nodeId: string) => {
+  const doSweep = async (nodeId: string, times = 1) => {
     if (party === null) return
     setError(null)
     try {
-      const result = await sweep(chapter, party, nodeId)
+      const result = await sweep(chapter, party, nodeId, times)
       setOpen(null)
+      setSweepFor(null)
       setSwept({ result, nodeId })
     } catch (err) {
       setError(err instanceof SaveRuleError ? err.message : 'Couldn’t sweep.')
@@ -209,7 +211,7 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
                 {status(open.id) === 'locked' ? 'Clear a path to it first' : elsewhere?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
               </button>
               {open.kind === 'fight' && status(open.id) === 'cleared' && party !== null && (
-                <button type="button" disabled={!!sweepBlock(world, chapter, party, open.id)} onClick={() => void doSweep(open.id)}
+                <button type="button" disabled={!!sweepBlock(world, chapter, party, open.id)} onClick={() => setSweepFor(open.id)}
                   className="min-h-12 flex-1 rounded-sm border border-hairline-strong font-semibold disabled:opacity-40" aria-label={sweepBlock(world, chapter, party, open.id) ?? 'Sweep with a ticket'}>
                   Sweep · {world.wallet.sweepTickets}
                 </button>
@@ -237,6 +239,19 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
               ))}
             </ul>
           )}
+          {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
+        </BottomSheet>
+      )}
+      {sweepFor && party !== null && (
+        <BottomSheet title="Sweep" onClose={() => setSweepFor(null)}>
+          <p className="mb-3 text-[13px] text-ink-soft">Each sweep pays this fight's EXP and Shards (no Laurels) for one Sweep Ticket. You have {world.wallet.sweepTickets}.</p>
+          <div className="grid grid-cols-4 gap-2">
+            {[1, 5, 10, world.wallet.sweepTickets].filter((n, i, a) => n >= 1 && n <= world.wallet.sweepTickets && a.indexOf(n) === i).map((n) => (
+              <button key={n} type="button" onClick={() => void doSweep(sweepFor, n)} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">
+                {n === world.wallet.sweepTickets && n > 10 ? `All ${n}` : `×${n}`}
+              </button>
+            ))}
+          </div>
           {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
         </BottomSheet>
       )}

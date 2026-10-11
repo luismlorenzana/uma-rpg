@@ -11,12 +11,13 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectAndRepeat, collectEverything, recall, rush, startWork, upgrade, useWorld } from '../../save/game'
+import { collect, collectAndRepeat, collectEverything, queueWork, recall, rush, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
+import { QueueList } from './QueueList'
 
 const SPEED_NOTE: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 
@@ -37,6 +38,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   const world = useWorld()
   const now = useNow()
   const [assign, setAssign] = useState<number | null>(null)
+  const [queueing, setQueueing] = useState<number | null>(null)
   const [upgrading, setUpgrading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   if (!world) return null
@@ -70,7 +72,8 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
             {job ? (
               <JobCard view={view} job={job} now={now} placeId={placeId} onCollect={() => run(() => collect(placeId, slot))}
                 onRepeat={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => collectAndRepeat(placeId, slot, o)) }}
-                onRush={() => run(() => rush(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))} rushTickets={world.wallet.rushTickets} />
+                onRush={() => run(() => rush(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))} rushTickets={world.wallet.rushTickets}
+                onQueue={() => setQueueing(slot)} onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
                 <span className="flex size-10 items-center justify-center rounded-full bg-raised text-xl text-ink-faint">+</span>
@@ -83,13 +86,19 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
       {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} onClose={() => setAssign(null)}
         onStart={(outfit, output, count) => startWork(placeId, assign, outfit, output, count).then(() => setAssign(null))} />}
+      {queueing !== null && facility.jobs[queueing] && (
+        <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} onClose={() => setQueueing(null)}
+          fixed={view.roster.find((o) => o.outfitId === facility.jobs[queueing]!.outfitId)}
+          onStart={(outfit, output, count) => queueWork(placeId, queueing, outfit, output, count).then(() => setQueueing(null))} />
+      )}
       {upgrading && <UpgradeSheet world={world} placeId={placeId} onClose={() => setUpgrading(false)} onUpgrade={() => upgrade(placeId).then(() => setUpgrading(false))} />}
     </div>
   )
 }
 
-function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, onRush, onRecall }: {
+function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, onRush, onRecall, onQueue, onUnqueue }: {
   view: MasterView; job: Job; now: string; placeId: string; rushTickets: number; onCollect: () => void; onRepeat: () => void; onRush: () => void; onRecall: () => void
+  onQueue: () => void; onUnqueue: (index: number) => void
 }) {
   const item = outputView(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
@@ -116,9 +125,9 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, on
       </span>
       <div className="mt-2 flex gap-2">
         <button type="button" disabled={readyCount <= 0 && !done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">
-          {done ? `Collect ${readyCount}` : `Collect${readyCount > 0 ? ` ${readyCount}` : ''}`}
+          {done ? `Collect ${readyCount}${job.queue.length > 0 ? ' · next' : ''}` : `Collect${readyCount > 0 ? ` ${readyCount}` : ''}`}
         </button>
-        {done && (
+        {done && job.queue.length === 0 && (
           <button type="button" onClick={onRepeat} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold" aria-label={`Collect and make ${job.count} more`}>
             Repeat ×{job.count}
           </button>
@@ -132,17 +141,22 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, on
           Recall
         </button>
       </div>
+      <QueueList job={job} now={now} onAdd={onQueue} onRemove={onUnqueue} label={(q) => (
+        <><ItemIcon id={outputView(q.output).icon} size={18} /> {outputView(q.output).name} ×{q.count}</>
+      )} />
     </div>
   )
 }
 
-/** Pick an Uma, then what she makes, then how many. */
-function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
-  view: MasterView; world: TierWorld; placeId: string; profession: Profession; onClose: () => void
+/** Pick an Uma, then what she makes, then how many. With `fixed`, she's queueing another job: no Uma to pick, and no
+ * stock cap, since its inputs are taken when it starts. */
+function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart }: {
+  view: MasterView; world: TierWorld; placeId: string; profession: Profession; fixed?: RosterOutfit; onClose: () => void
   onStart: (outfit: RosterOutfit, output: string, count: number) => Promise<void>
 }) {
   const spec = facilitySpec(placeId)!
-  const [outfit, setOutfit] = useState<RosterOutfit | null>(null)
+  const queueing = !!fixed
+  const [outfit, setOutfit] = useState<RosterOutfit | null>(fixed ?? null)
   const [output, setOutput] = useState<string | null>(null)
   const [count, setCount] = useState(10)
   const [error, setError] = useState<string | null>(null)
@@ -158,19 +172,19 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
         ? DISHES.filter((d) => d.kind === dishKind).map((d) => d.id)
         : ITEM_FAMILIES.filter((f) => f.side === profession).flatMap((f) => f.refined.map((i) => i.id))
     : []
-  const plan = outfit && output ? planJob(world, placeId, outfit, output, count) : null
+  const plan = outfit && output ? planJob(world, placeId, outfit, output, queueing ? 0 : count) : null
   // How many the Warehouse covers: refining needs the raw item, cooking every ingredient.
   const makeable = (inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
-  const stock = plan && (spec.kind === 'refine' || spec.kind === 'cook' || spec.kind === 'craft') ? makeable(plan.inputs) : Infinity
+  const stock = plan && !queueing && (spec.kind === 'refine' || spec.kind === 'cook' || spec.kind === 'craft') ? makeable(plan.inputs) : Infinity
   const max = Math.max(1, Math.min(MAX_JOB_COUNT, stock))
-  const title = !outfit ? 'Who works here?' : !output ? 'What does she make?' : 'How many?'
+  const title = !outfit ? 'Who works here?' : !output ? (queueing ? 'Queue: what next?' : 'What does she make?') : 'How many?'
   return (
     <BottomSheet title={title} onClose={onClose} footer={outfit && output && plan ? (
       <button type="button" disabled={!!plan.block} onClick={() => {
         setError(null)
         onStart(outfit, output, Math.min(count, max)).catch((err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t start.'))
       }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-        {plan.block ?? `Start · ${formatDuration(plan.msEach * Math.min(count, max))}`}
+        {plan.block ?? `${queueing ? 'Queue' : 'Start'} · ${formatDuration(plan.msEach * Math.min(count, max))}`}
       </button>
     ) : undefined}>
       {!outfit && (
@@ -193,7 +207,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
         </ul>
       )}
       {outfit && !output && spec.kind === 'craft' && (
-        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} onPick={(id, have) => { setOutput(id); setCount(Math.max(1, Math.min(10, have))) }} />
+        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} queueing={queueing} onPick={(id, have) => { setOutput(id); setCount(Math.max(1, Math.min(10, have))) }} />
       )}
       {outfit && !output && spec.kind === 'cook' && (
         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -220,7 +234,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
             const have = spec.kind === 'refine' || spec.kind === 'cook' ? (p ? makeable(p.inputs) : 0) : null
             const dish = dishById(id)
             return (
-              <button key={id} type="button" disabled={locked || (have !== null && have < 1)} onClick={() => { setOutput(id); setCount(have !== null ? Math.min(10, have) : 10) }}
+              <button key={id} type="button" disabled={locked || (!queueing && have !== null && have < 1)} onClick={() => { setOutput(id); setCount(have !== null ? Math.max(1, Math.min(10, have)) : 10) }}
                 className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left disabled:opacity-40">
                 <ItemIcon id={out.icon} size={32} />
                 <span className="min-w-0">
@@ -271,7 +285,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
 }
 
 /** The Forge's picker: a type, a grade (her Gathering level opens them) and an accent (the effect it adds). */
-function CraftPicker({ world, level, onPick }: { world: TierWorld; level: number; onPick: (id: string, have: number) => void }) {
+function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; level: number; queueing: boolean; onPick: (id: string, have: number) => void }) {
   const [type, setType] = useState<EquipType>('greatsword')
   const [grade, setGrade] = useState(1)
   const [accent, setAccent] = useState<ItemEffect>('atk')
@@ -301,8 +315,8 @@ function CraftPicker({ world, level, onPick }: { world: TierWorld; level: number
             <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {itemById(id)?.name} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>
           ))}
         </ul>
-        <button type="button" disabled={have < 1} onClick={() => onPick(piece.id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-          {have < 1 ? 'Not enough materials' : `Next · ${have} possible`}
+        <button type="button" disabled={have < 1 && !queueing} onClick={() => onPick(piece.id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
+          {have < 1 ? (queueing ? 'Next · none in stock yet' : 'Not enough materials') : `Next · ${have} possible`}
         </button>
       </div>
     </div>
@@ -354,7 +368,7 @@ export function FacilityPeek({ place }: PeekProps) {
             {job ? (
               <>
                 <ItemIcon id={outputView(job.output).icon} size={24} />
-                <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {jobFinished(job, now)}/{job.count}</span>
+                <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {jobFinished(job, now)}/{job.count}{job.queue.length > 0 ? ` +${job.queue.length}` : ''}</span>
                 <span className="text-ink-soft">{jobFinished(job, now) >= job.count ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span>
               </>
             ) : <span className="text-ink-faint">Slot {i + 1} · free</span>}

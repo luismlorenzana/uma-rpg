@@ -47,12 +47,9 @@ The numbers are a first pass from the pacing model (D54), pinned by tests but no
 
 ## Quality of life
 
-1. **A job queue** per slot (one-tap **Repeat** and **Rank up · train next** shipped 2026-10-10).
-2. **Notifications** when jobs or training finish (PWA push isn't set up).
-3. **Sweep ×N** for a beaten fight.
-4. **Filters**: the Stable by Farm/Craft Level or class rank, the Warehouse by grade (the Kitchen got kind and
-   "can cook now" filters).
-5. **Warehouse limits**: nothing can be sold or discarded; storage is unlimited.
+1. **Notifications** when jobs or training finish (PWA push isn't set up). Job queues, Sweep ×N, the Stable and
+   Warehouse filters and selling shipped 2026-10-10 (D62).
+2. **Warehouse limits**: storage is unlimited; there's no cap to manage yet.
 
 ## Engineering
 

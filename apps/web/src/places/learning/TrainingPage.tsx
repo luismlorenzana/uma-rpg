@@ -1,7 +1,7 @@
 // The Learning District (S5, D57): class halls train class ranks (each rank opens a skill depth) and armories train
 // gear mastery (rank k lets an Uma equip grade-k gear, S7). Running style sets class speed; distance sets mastery speed.
 import {
-  ARMORIES, availabilityBlock, CLASS_HALLS, CLASS_MAX_RANK, depthsOpen, facilityOf, GEAR_TYPE_LABEL, jobEndsAt, jobFinished, jobProgress,
+  ARMORIES, availabilityBlock, MAX_QUEUE, CLASS_HALLS, CLASS_MAX_RANK, depthsOpen, facilityOf, GEAR_TYPE_LABEL, jobEndsAt, jobFinished, jobProgress,
   maxRankOf, parseTrack, planTraining, rankOf, SaveRuleError, trackAptitude, tracksAt, trackId, upgradeCost, type Job, type RosterOutfit,
   type TierWorld, type Track,
 } from '@rpg/domain'
@@ -9,11 +9,12 @@ import { useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectEverything, rankUpAndContinue, recall, train, upgrade, useWorld } from '../../save/game'
+import { collect, collectEverything, queueWork, rankUpAndContinue, recall, train, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
+import { QueueList } from '../work/QueueList'
 
 const SPEED: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 const STYLE_LABEL: Record<string, string> = { front: 'Front', pace: 'Pace', late: 'Late', end: 'End', sprint: 'Sprint', mile: 'Mile', medium: 'Medium', long: 'Long' }
@@ -66,8 +67,10 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
         {facility.jobs.map((job, slot) => (
           <li key={slot}>
             {job ? (
-              <TrainingCard view={view} job={job} now={now} onCollect={() => run(() => collect(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))}
-                onContinue={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => rankUpAndContinue(placeId, slot, o)) }} />
+              <TrainingCard view={view} world={world} job={job} now={now} tracks={tracks} onCollect={() => run(() => collect(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))}
+                onContinue={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => rankUpAndContinue(placeId, slot, o)) }}
+                onQueue={(t) => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => queueWork(placeId, slot, o, trackId(t), 1)) }}
+                onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
                 <span className="flex size-10 items-center justify-center rounded-full bg-raised text-xl text-ink-faint">+</span>
@@ -84,10 +87,19 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-function TrainingCard({ view, job, now, onCollect, onRecall, onContinue }: { view: MasterView; job: Job; now: string; onCollect: () => void; onRecall: () => void; onContinue: () => void }) {
+function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onContinue, onQueue, onUnqueue }: {
+  view: MasterView; world: TierWorld; job: Job; now: string; tracks: Track[]; onCollect: () => void; onRecall: () => void; onContinue: () => void
+  onQueue: (t: Track) => void; onUnqueue: (index: number) => void
+}) {
   const track = parseTrack(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
   const done = jobFinished(job, now) >= job.count
+  const uma = world.umas[job.outfitId]
+  // The rank each job trains from: today's, plus every job of the same track ahead of it.
+  const rankAt = (output: string, ahead: readonly { output: string }[]) => {
+    const t = parseTrack(output)
+    return t && uma ? rankOf(uma.ranks, t) + ahead.filter((j) => j.output === output).length : 0
+  }
   return (
     <div className="rounded-md bg-raised p-3">
       <div className="flex items-center gap-3">
@@ -103,9 +115,28 @@ function TrainingCard({ view, job, now, onCollect, onRecall, onContinue }: { vie
       </span>
       <div className="mt-2 flex gap-2">
         <button type="button" disabled={!done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">Rank up</button>
-        {done && <button type="button" onClick={onContinue} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold">Rank up · train next</button>}
+        {done && job.queue.length === 0 && <button type="button" onClick={onContinue} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold">Rank up · train next</button>}
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft">Recall</button>
       </div>
+      <QueueList job={job} now={now} onRemove={onUnqueue} note="Each rank starts training when the one before ends." label={(q) => {
+        const t = parseTrack(q.output)
+        const from = rankAt(q.output, [job, ...job.queue.slice(0, job.queue.indexOf(q))])
+        return t ? `${trackLabel(t)} rank ${from} → ${from + 1}` : q.output
+      }} />
+      {job.queue.length < MAX_QUEUE && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {tracks.map((t) => {
+            const from = rankAt(trackId(t), [job, ...job.queue])
+            const top = from >= maxRankOf(t)
+            return (
+              <button key={trackId(t)} type="button" disabled={top} onClick={() => onQueue(t)}
+                className="min-h-9 flex-1 rounded-sm border border-dashed border-hairline-strong px-2 text-[12px] font-semibold text-ink-soft disabled:opacity-40">
+                {top ? `${trackLabel(t)} · top rank` : `+ Queue ${trackLabel(t)} ${from} → ${from + 1}`}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -172,7 +203,7 @@ export function TrainingPeek({ place }: PeekProps) {
           const t = job ? parseTrack(job.output) : null
           return (
             <li key={i} className="flex items-center justify-between rounded-sm bg-raised p-2 text-[13px]">
-              {job && t ? <><span>{trackLabel(t)}</span><span className="text-ink-soft">{jobFinished(job, now) >= job.count ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span></>
+              {job && t ? <><span>{trackLabel(t)}{job.queue.length > 0 ? ` +${job.queue.length}` : ''}</span><span className="text-ink-soft">{jobFinished(job, now) >= job.count ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span></>
                 : <span className="text-ink-faint">Slot {i + 1} · free</span>}
             </li>
           )

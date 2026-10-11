@@ -6,7 +6,7 @@ import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from '.
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { isBusy } from './rules'
-import { collectAll, collectJob, facilityOf, planJob, recallJob, rushCost, rushJob, startJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
+import { collectAll, collectJob, facilityOf, planJob, queueJob, recallJob, rushCost, rushJob, startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -165,5 +165,79 @@ describe('pacing model (D54)', () => {
     expect(Math.round(minutesTo(46, 0.5) / 60)).toBe(30)
     expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 1) / 60)).toBe(69)
     expect(HOUR).toBe(60 * MINUTE)
+  })
+})
+
+describe('Sweep ×N (QoL)', () => {
+  it('sweeps until the tickets run out and adds up what it paid', async () => {
+    const { sweepMany } = await import('./exchange')
+    let save = give(withUmas('101', '102', '103', '104', '105'), {}, 45)
+    ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
+    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const w = worldOf(save)
+    save = { ...save, tierWorlds: { '1': { ...w, runs: { '0:1': { party: 0, chapterId: '1', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) } } } } }
+    save = buyTickets(save, 'sweep', 3, at(0))
+    const one = sweepFight(save, ura, 0, 'a1r1c1', at(0)).result.members[0]!.exp
+    const r = sweepMany(save, ura, 0, 'a1r1c1', 5, at(0))
+    expect(r.swept).toBe(3)
+    expect(r.result.members[0]!.exp).toBeGreaterThanOrEqual(3 * one - 3)
+    expect(r.result.members[0]!.beforeLevel).toBe(1)
+    expect(worldOf(r.save).wallet.sweepTickets).toBe(0)
+    expect(worldOf(r.save).runs['0:1']!.wins.a1r1c1).toBe(4)
+  })
+})
+
+describe('selling (QoL)', () => {
+  it('sells spare stock for far less than it costs to buy', async () => {
+    const { sellPrice, sellStock } = await import('./exchange')
+    expect([sellPrice('items', 'barley'), sellPrice('items', 'pearl-barley'), sellPrice('dishes', 'dish-fruits-2'), sellPrice('gear', 'greatsword-g4-atk')]).toEqual([3, 6, 6, 12])
+    let save = give(withUmas('101'), { barley: 5 })
+    save = sellStock(save, 'items', 'barley', 5, at(0))
+    expect(worldOf(save).items.barley).toBeUndefined()
+    expect(worldOf(save).wallet.laurels).toBe(15)
+    expect(() => sellStock(save, 'items', 'barley', 1, at(0))).toThrow(/you have 0/)
+  })
+})
+
+describe('job queues (QoL, D62)', () => {
+  it('starts each queued job when the last one finishes, catching up however late it’s collected', () => {
+    let save = startJob(withUmas('101'), 'fields', 0, turfA, 'wheat', 2, at(0))
+    save = queueJob(save, 'fields', 0, turfA, 'wheat', 3, at(0))
+    save = queueJob(save, 'fields', 0, turfA, 'wheat', 1, at(0))
+    expect(() => queueJob(save, 'fields', 0, plain, 'wheat', 1, at(0))).toThrow(/her own job/)
+    expect(() => queueJob(save, 'fields', 0, turfA, 'oats', 1, at(0))).toThrow(/Needs Farm Lv6/)
+    expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    // 2 minutes each at A: the first job ends at 4, the second starts then and has one done at 6.
+    const mid = collectJob(save, 'fields', 0, at(7 * MINUTE))
+    expect(mid.got).toMatchObject({ items: 3, done: false })
+    const job = facilityOf(worldOf(mid.save), 'fields').jobs[0]!
+    expect(job).toMatchObject({ count: 3, collected: 1, startedAt: at(4 * MINUTE) })
+    expect(job.queue).toHaveLength(1)
+    const end = collectAll(mid.save, at(HOUR))
+    expect(worldOf(end.save).items.wheat).toBe(6)
+    expect(facilityOf(worldOf(end.save), 'fields').jobs[0]).toBeNull()
+  })
+
+  it('takes a queued job’s inputs when it starts, and drops the queue when the Warehouse can’t cover it', () => {
+    let save = give(withUmas('101'), { wheat: 2 })
+    save = startJob(save, 'pantry', 0, turfA, 'wheat-flour', 2, at(0))
+    save = queueJob(save, 'pantry', 0, turfA, 'wheat-flour', 2, at(0))
+    const short = collectJob(save, 'pantry', 0, at(HOUR)).save
+    expect(worldOf(short).items).toEqual({ 'wheat-flour': 2 })
+    expect(facilityOf(worldOf(short), 'pantry').jobs[0]).toBeNull()
+    const stocked = collectJob(give(save, { wheat: 3 }), 'pantry', 0, at(HOUR)).save
+    expect(worldOf(stocked).items).toEqual({ 'wheat-flour': 4, wheat: 1 })
+  })
+
+  it('removes a queued job, and a recall drops the whole queue without taking its inputs', () => {
+    let save = give(withUmas('101'), { wheat: 4 })
+    save = startJob(save, 'pantry', 0, turfA, 'wheat-flour', 2, at(0))
+    save = queueJob(save, 'pantry', 0, turfA, 'wheat-flour', 1, at(0))
+    save = queueJob(save, 'pantry', 0, turfA, 'wheat-flour', 2, at(0))
+    save = unqueueJob(save, 'pantry', 0, 0, at(0))
+    expect(facilityOf(worldOf(save), 'pantry').jobs[0]!.queue.map((q) => q.count)).toEqual([2])
+    save = recallJob(save, 'pantry', 0, at(HOUR))
+    expect(worldOf(save).items).toEqual({ 'wheat-flour': 2, wheat: 2 })
+    expect(facilityOf(worldOf(save), 'pantry').jobs[0]).toBeNull()
   })
 })
