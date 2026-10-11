@@ -427,7 +427,6 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
       {sheet === 'skills' && actor && (
         <BottomSheet title={`${name(actor.id)} · ${actor.mp} MP`} onClose={() => setSheet(null)}>
-          {paired && <p className="mb-2 text-[12px] text-ink-soft">A Spell Blade’s act is an Arm and a Tome: a pick replaces that half.</p>}
           <ul className="space-y-1.5">
             {[...choices].sort((a, b) => (ally?.weapons.indexOf(a.skill.node.weapon) ?? 0) - (ally?.weapons.indexOf(b.skill.node.weapon) ?? 0)).map((choice) => {
               const kinds = skillKinds(choice.skill.def)
@@ -470,12 +469,12 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
         return (
           <BottomSheet title={`Limit Break · ${name(id)}`} onClose={() => setSheet(null)}>
             {!now ? (
-              <p className="text-[14px] text-ink-soft">Ready from her next turn: a Limit Break takes her whole turn, so use it before she acts.</p>
+              <p className="text-[14px] text-ink-soft">Ready on her next turn</p>
             ) : options.length === 0 ? (
               <p className="text-[14px] text-ink-soft">Equip a summon to use her Limit Break.</p>
             ) : (
               <ul className="space-y-1.5">
-                <li className="text-[12px] text-ink-soft">{pick === 2 ? `Pick an Arms skill and a Tome skill. ${limitPicks.length}/2 picked.` : 'Her whole turn, at 0 MP. Pick one, then tap a rival.'}</li>
+                <li className="text-[12px] text-ink-soft">{pick === 2 ? `Pick an Arms skill and a Tome skill · ${limitPicks.length}/2` : 'Pick one, then tap a rival'}</li>
                 {options.map((o) => (
                   <li key={o.key}>
                     <button type="button" onClick={() => {
@@ -498,9 +497,9 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       {sheet === 'menu' && (
         <BottomSheet title="Fight" onClose={() => setSheet(null)}>
           <div className="space-y-2">
-            <button type="button" onClick={onMap} className="flex min-h-12 w-full items-center justify-center rounded-sm bg-raised font-semibold">Back to the map · the fight stays open</button>
+            <button type="button" onClick={onMap} className="flex min-h-12 w-full items-center justify-center rounded-sm bg-raised font-semibold">Back to the map</button>
             <button type="button" onClick={() => void leaveFight().then(onMap)} className="flex min-h-12 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold text-ink-soft">
-              Give up · no reward, MP as before the fight
+              Give up
             </button>
           </div>
         </BottomSheet>

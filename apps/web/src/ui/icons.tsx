@@ -87,3 +87,13 @@ export function BackIcon(props: IconProps) {
     </Svg>
   )
 }
+
+export function InfoIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="7.5" r="1.2" fill="currentColor" />
+    </Svg>
+  )
+}

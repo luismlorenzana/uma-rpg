@@ -33,7 +33,7 @@ export function buyRawItem(save: Save, itemId: string, quantity: number, stocked
   const world = worldOf(save, tier)
   const item = itemById(itemId)
   if (!item || item.refined) throw new SaveRuleError('bad-job', 'the Exchange sells raw items only')
-  if (!stocked.includes(item.grade)) throw new SaveRuleError('bad-job', `grade ${item.grade} isn’t stocked yet: reach its chapter`)
+  if (!stocked.includes(item.grade)) throw new SaveRuleError('bad-job', `Grade ${item.grade} isn’t stocked yet: win a stage on its continent`)
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
   const cost = rawItemPrice(item.grade) * quantity
   if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)

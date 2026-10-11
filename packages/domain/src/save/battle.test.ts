@@ -173,7 +173,7 @@ describe('fights (D52, D66)', () => {
   })
 
   it('opens stages in order, carries MP per Uma, and refills the active party at a Spring every two hours', () => {
-    expect(() => startFight(withParty(), ura, 'w1-1-1-s2', OUTFITS, T(4))).toThrow(/Clear a path/)
+    expect(() => startFight(withParty(), ura, 'w1-1-1-s2', OUTFITS, T(4))).toThrow(/Clear the stage before it/)
     const won = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4))).save
     const w = worldOf(won)
     const tired = { ...won, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...w.world.run, mp: { '101': 1, '102': 2 } } } } } }

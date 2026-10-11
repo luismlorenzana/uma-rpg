@@ -23,7 +23,7 @@ export default function WarehousePage() {
     return (
       <ul className="space-y-1.5 p-3">
         {Object.keys(stock).length === 0 && (
-          <li className="text-[13px] text-ink-faint">{shelf === 'gear' ? 'No unbound gear: craft at the Forge, equip from an Uma’s profile.' : 'No dishes: cook at the Kitchen, eat at the Observatory.'}</li>
+          <li className="text-[13px] text-ink-faint">{shelf === 'gear' ? 'No gear yet' : 'No dishes yet'}</li>
         )}
         {Object.entries(stock).filter(([id]) => grade === null || outputView(id).grade === grade).map(([id, n]) => (
           <li key={id}>
@@ -96,7 +96,7 @@ export default function WarehousePage() {
 /** Tokens by band (D67): won fights drop them; promotions, crafting and cooking spend them; they sell for Laurels (D80). */
 function TokenShelf({ items, grade, onOpen }: { items: Record<string, number>; grade: number | null; onOpen: (id: string) => void }) {
   const owned = Object.entries(items).map(([id, n]) => ({ token: tokenById(id), n })).filter((t) => t.token && (grade === null || t.token.band === Math.ceil(grade / 2)))
-  if (owned.length === 0) return <p className="p-3 text-[13px] text-ink-faint">No tokens{grade ? ' for that grade' : ''}: won fights drop them, of the fight's band (Lv1–10 is band 1).</p>
+  if (owned.length === 0) return <p className="p-3 text-[13px] text-ink-faint">No tokens{grade ? ' for that grade' : ''} yet</p>
   return (
     <div className="space-y-3 p-3">
       {Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((band) => {
@@ -104,7 +104,7 @@ function TokenShelf({ items, grade, onOpen }: { items: Record<string, number>; g
         if (here.length === 0) return null
         return (
           <section key={band} className="rounded-md bg-panel p-2.5">
-            <h3 className="mb-1.5 text-[13px] font-semibold">Band {band} <span className="font-normal text-ink-faint">· Lv{band * 10 - 9}–{band * 10} fights · grades {2 * band - 1}–{2 * band}</span></h3>
+            <h3 className="mb-1.5 text-[13px] font-semibold">Band {band} <span className="font-normal text-ink-faint">· Lv {band * 10 - 9}–{band * 10}</span></h3>
             <ul className="grid grid-cols-1 gap-1">
               {here.map(({ token, n }) => (
                 <li key={token!.id}>
@@ -117,7 +117,6 @@ function TokenShelf({ items, grade, onOpen }: { items: Record<string, number>; g
           </section>
         )
       })}
-      <p className="text-[12px] text-ink-faint">Tap one to sell it for {TOKEN_LAURELS_PER_BAND} Laurels × its band; the Exchange sells any token for twice that.</p>
     </div>
   )
 }

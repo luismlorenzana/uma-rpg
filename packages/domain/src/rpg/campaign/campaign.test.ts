@@ -123,7 +123,7 @@ describe('runs (D52)', () => {
     const below = ura.nodes.find((n) => n.id === first)!.exits[0]!
     expect(rpgNodeStatus(ura, run, first)).toBe('available')
     expect(rpgNodeStatus(ura, run, below)).toBe('locked')
-    expect(() => rpgBeginRunBattle(ura, run, below, party, T(2))).toThrow(/path/)
+    expect(() => rpgBeginRunBattle(ura, run, below, party, T(2))).toThrow(/Clear the stage/)
     expect(() => rpgBeginRunBattle(ura, run, first, party.slice(0, 4), T(2))).toThrow(/five/)
     run = rpgBeginRunBattle(ura, run, first, party, T(2))
     // Two actions, then the replayed state matches the live one.
@@ -136,7 +136,7 @@ describe('runs (D52)', () => {
       expect(acted.step.state).toEqual(live)
     }
     expect(rpgRunBattleStep(run)!.state).toEqual(live)
-    expect(() => rpgActInRun(run, { kind: 'attack', actorId: 'm1', targetId: 'foe1' }, T(5))).toThrow(/refused/)
+    expect(() => rpgActInRun(run, { kind: 'attack', actorId: 'm1', targetId: 'foe1' }, T(5))).toThrow(/already acted/)
     const won = autoplay(live)
     expect(won.outcome).toBe('victory')
     run = rpgCloseRunBattle(run, won, ura.nodes.find((n) => n.id === first)!, T(6))

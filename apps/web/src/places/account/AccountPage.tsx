@@ -91,7 +91,7 @@ export default function AccountPage() {
         <Row label="Trainer since">{new Date(save.account.createdAt).toLocaleDateString()}</Row>
         <Row label="Umas unlocked">{Object.keys(save.tierWorlds['1']?.umas ?? {}).length} / {master.status === 'ready' ? master.view.roster.length : '…'}</Row>
         <Row label="Cloud save">{sync === 'synced' && lastSyncedAt ? `Synced ${new Date(lastSyncedAt).toLocaleTimeString()}` : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline' : sync === 'error' ? 'Paused' : '—'}</Row>
-        <Row label="Game data">{master.status === 'ready' ? `${master.view.manifest.version} · schema ${master.view.manifest.schemaVersion}` : master.status === 'error' ? 'Not loaded' : 'Loading…'}</Row>
+        <Row label="Game data">{master.status === 'ready' ? master.view.manifest.version : master.status === 'error' ? 'Not loaded' : 'Loading…'}</Row>
         <Row label="App build">{APP_BUILD_ID}</Row>
       </section>
 

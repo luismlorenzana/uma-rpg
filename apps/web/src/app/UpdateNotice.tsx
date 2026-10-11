@@ -18,7 +18,7 @@ export function UpdateNotice() {
     >
       <div className="min-w-0 flex-1">
         <p className="font-display text-sm font-bold">Update ready</p>
-        <p className="text-xs text-ink-soft">{working ? 'Preparing the new build…' : 'Restart to use the new build.'}</p>
+        <p className="text-xs text-ink-soft">{working ? 'Updating…' : 'Restart to update'}</p>
       </div>
       {!working && (
         <button type="button" onClick={() => appUpdateLifecycle.requestRestart()} className="min-h-11 shrink-0 rounded-sm bg-accent px-4 font-display text-sm font-bold text-accent-ink">

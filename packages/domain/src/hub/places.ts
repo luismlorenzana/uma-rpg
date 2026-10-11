@@ -97,7 +97,7 @@ function sites(page: HubPage, kind: PlaceKind, specs: SiteSpec[], mirrors: SiteS
     page,
     kind,
     name: s.name,
-    blurb: `${verb} ${s.family.toLowerCase()} while you're away. ${s.family} feed the ${s.effect} effect.`,
+    blurb: `${verb} ${s.family.toLowerCase()} while you're away, for the ${s.effect} stat.`,
     details: [`Produces ${s.family}: ${s.firstItems}`, `Effect family: ${s.effect}`, 'Two Uma slots; more with upgrades'],
     slots: 2,
     opensIn: 'S4',
@@ -116,7 +116,7 @@ const FARMLANDS: Place[] = [
   },
   {
     id: 'kitchen', page: 'farmlands', kind: 'station', name: 'Kitchen', opensIn: 'S6', slots: 2, mirrorOf: 'forge',
-    blurb: 'Cooks dishes from refined ingredients. Each new dish an Uma eats unlocks an Extra Stats node.',
+    blurb: 'Cooks dishes that grow Extra Stats.',
     details: ['Dishes, Duo dishes and Feasts', 'Feeds the Observatory’s Sun-and-planets map'],
     at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
@@ -132,7 +132,7 @@ const WILDS: Place[] = [
   },
   {
     id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: 2, mirrorOf: 'kitchen',
-    blurb: 'Crafts weapons, armor and accessories. Gear binds to the Uma who equips it.',
+    blurb: 'Crafts weapons, armor and accessories.',
     details: ['Four refined items of the grade; Craft Level sets the grades she can make', 'Arms, Tomes, armor, Rings, Charms and Orbs in ten grades'],
     at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
@@ -141,7 +141,7 @@ const WILDS: Place[] = [
 function hall(id: string, name: string, cls: string, style: string, weapons: string, at: { x: number; y: number }): Place {
   return {
     id, page: 'learning', kind: 'class-hall', name, opensIn: 'S5', slots: 2, at,
-    blurb: `Trains the ${cls} rank and the ${cls} Weapon Level. Each rank opens a deeper tier of ${cls} skills; Weapon Level k wears grade-k ${weapons}.`,
+    blurb: `Trains the ${cls} rank, which opens skill depths, and the ${cls} Weapon Level for ${weapons}.`,
     details: ['Class rank 1–5: each promotion spends a Promotion Token', `Weapon Level 1–10: ${weapons}`, `${style} aptitude sets the training speed`],
   }
 }
@@ -154,12 +154,12 @@ const LEARNING: Place[] = [
   hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', 'her three Tomes and two Arms', { x: 0.5, y: 0.56 }),
   {
     id: 'armory', page: 'learning', kind: 'armory', name: 'Armory', opensIn: 'S5', slots: 2, at: { x: 0.26, y: 0.82 },
-    blurb: 'Trains the Armor Level: level k wears grade-k Garb, Leather, Mail and Plate.',
+    blurb: 'Trains the Armor Level for Garb, Leather, Mail and Plate.',
     details: ['Armor Level 1–10, one for every armor type', 'Her best distance aptitude sets the training speed'],
   },
   {
     id: 'jeweler', page: 'learning', kind: 'armory', name: 'Jeweler', opensIn: 'S5', slots: 2, at: { x: 0.74, y: 0.82 },
-    blurb: 'Trains the Accessory Level: level k wears grade-k Rings, Charms and Orbs.',
+    blurb: 'Trains the Accessory Level for Rings, Charms and Orbs.',
     details: ['Accessory Level 1–10, for every accessory', 'Her best running-style aptitude sets the training speed'],
   },
 ]
@@ -172,12 +172,12 @@ const TOWN: Place[] = [
   },
   {
     id: 'party-hall', page: 'town', kind: 'town', name: 'Party Hall', opensIn: 'S2', slots: 0, at: { x: 0.75, y: 0.13 },
-    blurb: 'Twenty parties of five. Members stay in their party; busy ones show greyed out.',
+    blurb: 'Twenty parties of five.',
     details: ['Build and name parties', 'Busy members must be recalled before a fight'],
   },
   {
     id: 'scenario-gate', page: 'town', kind: 'town', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.36 },
-    blurb: 'The world map: a continent per scenario, ten levels each, with regions of stages to clear.',
+    blurb: 'The world map: five continents of regions to clear.',
     details: ['Tier 1: five continents of 40 regions', 'Fight rivals with a party of five: EXP, Shards, Laurels and tokens'],
   },
   {
@@ -187,7 +187,7 @@ const TOWN: Place[] = [
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
-    blurb: 'Spend Laurels from battles on raw items, Time Tickets and Sweep Tickets; trade tokens, two for one of another kind.',
+    blurb: 'Laurels buy raw items, tickets and tokens here.',
     details: ['Raw items of every continent you have reached', 'Time Ticket: 30 minutes off any job or training', 'Sweep: clear a beaten regular stage now'],
   },
   {
@@ -197,7 +197,7 @@ const TOWN: Place[] = [
   },
   {
     id: 'tier-finale', page: 'town', kind: 'town', name: 'Tier Finale', opensIn: 'S8', slots: 0, at: { x: 0.75, y: 0.86 },
-    blurb: "The tier's great final event. Win it with an Uma at Lv50 to promote her to the next tier.",
+    blurb: "The tier's final event, and promotion to the next tier.",
     details: ['Harder fights or party switching', 'Promotion moves her to Tier 2 at Lv1'],
   },
   {

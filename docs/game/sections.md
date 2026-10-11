@@ -32,55 +32,55 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Fields | `fields` | farm-site | 2 | Grows grains while you're away. Grains feed the HP effect. |
-| Orchard | `orchard` | farm-site | 2 | Grows fruits while you're away. Fruits feed the MP effect. |
-| Fishery | `fishery` | farm-site | 2 | Grows fish while you're away. Fish feed the ATK effect. |
-| Herb Garden | `herb-garden` | farm-site | 2 | Grows herbs & spices while you're away. Herbs & Spices feed the M.ATK effect. |
-| Vegetable Garden | `vegetable-garden` | farm-site | 2 | Grows vegetables while you're away. Vegetables feed the DEF effect. |
-| Mushroom Cave | `mushroom-cave` | farm-site | 2 | Grows mushrooms while you're away. Mushrooms feed the M.DEF effect. |
-| Sugar Grove | `sugar-grove` | farm-site | 2 | Grows sweets while you're away. Sweets feed the Speed effect. |
-| Nut Grove | `nut-grove` | farm-site | 2 | Grows nuts & seeds while you're away. Nuts & Seeds feed the Limit Break charge effect. |
+| Fields | `fields` | farm-site | 2 | Grows grains while you're away, for the HP stat. |
+| Orchard | `orchard` | farm-site | 2 | Grows fruits while you're away, for the MP stat. |
+| Fishery | `fishery` | farm-site | 2 | Grows fish while you're away, for the ATK stat. |
+| Herb Garden | `herb-garden` | farm-site | 2 | Grows herbs & spices while you're away, for the M.ATK stat. |
+| Vegetable Garden | `vegetable-garden` | farm-site | 2 | Grows vegetables while you're away, for the DEF stat. |
+| Mushroom Cave | `mushroom-cave` | farm-site | 2 | Grows mushrooms while you're away, for the M.DEF stat. |
+| Sugar Grove | `sugar-grove` | farm-site | 2 | Grows sweets while you're away, for the Speed stat. |
+| Nut Grove | `nut-grove` | farm-site | 2 | Grows nuts & seeds while you're away, for the Limit Break charge stat. |
 | Pantry | `pantry` | station | 2 | Refines raw ingredients, one into one: wheat into flour, fruit into preserves. |
-| Kitchen | `kitchen` | station | 2 | Cooks dishes from refined ingredients. Each new dish an Uma eats unlocks an Extra Stats node. |
+| Kitchen | `kitchen` | station | 2 | Cooks dishes that grow Extra Stats. |
 
 ### Wilds (`wilds`)
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Monster Den | `monster-den` | gather-site | 2 | Gathers hides & scales while you're away. Hides & Scales feed the HP effect. |
-| Ley Spring | `ley-spring` | gather-site | 2 | Gathers essences while you're away. Essences feed the MP effect. |
-| Mine | `mine` | gather-site | 2 | Gathers ores while you're away. Ores feed the ATK effect. |
-| Crystal Cavern | `crystal-cavern` | gather-site | 2 | Gathers crystals while you're away. Crystals feed the M.ATK effect. |
-| Quarry | `quarry` | gather-site | 2 | Gathers stones while you're away. Stones feed the DEF effect. |
-| Meadow | `meadow` | gather-site | 2 | Gathers fibers while you're away. Fibers feed the M.DEF effect. |
-| Forest | `forest` | gather-site | 2 | Gathers woods while you're away. Woods feed the Speed effect. |
-| Fossil Dig | `fossil-dig` | gather-site | 2 | Gathers bones & horns while you're away. Bones & Horns feed the Limit Break charge effect. |
+| Monster Den | `monster-den` | gather-site | 2 | Gathers hides & scales while you're away, for the HP stat. |
+| Ley Spring | `ley-spring` | gather-site | 2 | Gathers essences while you're away, for the MP stat. |
+| Mine | `mine` | gather-site | 2 | Gathers ores while you're away, for the ATK stat. |
+| Crystal Cavern | `crystal-cavern` | gather-site | 2 | Gathers crystals while you're away, for the M.ATK stat. |
+| Quarry | `quarry` | gather-site | 2 | Gathers stones while you're away, for the DEF stat. |
+| Meadow | `meadow` | gather-site | 2 | Gathers fibers while you're away, for the M.DEF stat. |
+| Forest | `forest` | gather-site | 2 | Gathers woods while you're away, for the Speed stat. |
+| Fossil Dig | `fossil-dig` | gather-site | 2 | Gathers bones & horns while you're away, for the Limit Break charge stat. |
 | Workbench | `workbench` | station | 2 | Refines raw materials, one into one: ore into ingots, logs into planks. |
-| Forge | `forge` | station | 2 | Crafts weapons, armor and accessories. Gear binds to the Uma who equips it. |
+| Forge | `forge` | station | 2 | Crafts weapons, armor and accessories. |
 
 ### Learning (`learning`)
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Brawler Dojo | `brawler-dojo` | class-hall | 2 | Trains the Brawler rank and the Brawler Weapon Level. Each rank opens a deeper tier of Brawler skills; Weapon Level k wears grade-k Greatswords, Axes, Lances, Bows and Katanas. |
-| Mage Tower | `mage-tower` | class-hall | 2 | Trains the Mage rank and the Mage Weapon Level. Each rank opens a deeper tier of Mage skills; Weapon Level k wears grade-k Fire, Blizzard, Thunder, Light and Dark Tomes. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | 2 | Trains the Spell Blade rank and the Spell Blade Weapon Level. Each rank opens a deeper tier of Spell Blade skills; Weapon Level k wears grade-k her three Arms and two Tomes. |
-| Cleric Chapel | `cleric-chapel` | class-hall | 2 | Trains the Cleric rank and the Cleric Weapon Level. Each rank opens a deeper tier of Cleric skills; Weapon Level k wears grade-k any five Arms and Tomes. |
-| Summoner Circle | `summoner-circle` | class-hall | 2 | Trains the Summoner rank and the Summoner Weapon Level. Each rank opens a deeper tier of Summoner skills; Weapon Level k wears grade-k her three Tomes and two Arms. |
-| Armory | `armory` | armory | 2 | Trains the Armor Level: level k wears grade-k Garb, Leather, Mail and Plate. |
-| Jeweler | `jeweler` | armory | 2 | Trains the Accessory Level: level k wears grade-k Rings, Charms and Orbs. |
+| Brawler Dojo | `brawler-dojo` | class-hall | 2 | Trains the Brawler rank, which opens skill depths, and the Brawler Weapon Level for Greatswords, Axes, Lances, Bows and Katanas. |
+| Mage Tower | `mage-tower` | class-hall | 2 | Trains the Mage rank, which opens skill depths, and the Mage Weapon Level for Fire, Blizzard, Thunder, Light and Dark Tomes. |
+| Spell Blade Salle | `spell-blade-salle` | class-hall | 2 | Trains the Spell Blade rank, which opens skill depths, and the Spell Blade Weapon Level for her three Arms and two Tomes. |
+| Cleric Chapel | `cleric-chapel` | class-hall | 2 | Trains the Cleric rank, which opens skill depths, and the Cleric Weapon Level for any five Arms and Tomes. |
+| Summoner Circle | `summoner-circle` | class-hall | 2 | Trains the Summoner rank, which opens skill depths, and the Summoner Weapon Level for her three Tomes and two Arms. |
+| Armory | `armory` | armory | 2 | Trains the Armor Level for Garb, Leather, Mail and Plate. |
+| Jeweler | `jeweler` | armory | 2 | Trains the Accessory Level for Rings, Charms and Orbs. |
 
 ### Town (`town`)
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
 | Stable | `stable` | town | — | Every Uma outfit, locked or yours. Unlock Tickets open new ones. |
-| Party Hall | `party-hall` | town | — | Twenty parties of five. Members stay in their party; busy ones show greyed out. |
-| Scenario Gate | `scenario-gate` | town | — | The world map: a continent per scenario, ten levels each, with regions of stages to clear. |
+| Party Hall | `party-hall` | town | — | Twenty parties of five. |
+| Scenario Gate | `scenario-gate` | town | — | The world map: five continents of regions to clear. |
 | Warehouse | `warehouse` | town | — | Every item you own: ingredients, materials, dishes, gear and tokens. |
-| Exchange | `exchange` | town | — | Spend Laurels from battles on raw items, Time Tickets and Sweep Tickets; trade tokens, two for one of another kind. |
+| Exchange | `exchange` | town | — | Laurels buy raw items, tickets and tokens here. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
-| Tier Finale | `tier-finale` | town | — | The tier's great final event. Win it with an Uma at Lv50 to promote her to the next tier. |
+| Tier Finale | `tier-finale` | town | — | The tier's final event, and promotion to the next tier. |
 <!-- /live -->
 
 Farmlands and Wilds mirror each other site for site:
@@ -224,7 +224,7 @@ Reached from the account bar.
 
 ### Tier Finale
 
-A locked place: "Opens in S8". Promotion to Tier 2 isn't built.
+A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't built.
 
 ## Global UI
 
@@ -232,7 +232,7 @@ A locked place: "Opens in S8". Promotion to Tier 2 isn't built.
   - your initial and name, and a Tier 1 chip;
   - Offline or Sync paused, when it applies;
   - Tickets, Shards and Laurels.
-- **Menu sheet** (☰): every place by page, and the Account.
+- **Menu sheet** (☰): every place by page (locked ones show a lock), and the Account.
 - **Overlays:** full place pages slide in from the right at 88% width. They close with ✕, a swipe right, a backdrop tap,
   Escape or back. Bottom sheets are used for everything else (`ui/BottomSheet.tsx`).
 - **Push notifications** (`apps/web/src/push/`, server `apps/api/src/push/`):

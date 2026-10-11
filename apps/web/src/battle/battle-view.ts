@@ -77,16 +77,16 @@ export function limitOptions(state: BattleState, actorId: string): { pick: 1 | 2
   const skills = ally.loadout.flatMap((ref) => { const skill = battleActorSkill(state, actorId, ref); return skill ? [skill] : [] })
   const key = (ref: RpgNodeRef) => `${ref.tier}:${ref.id}`
   if (ally.classId === 'mage') return { pick: 1, options: [{ key: 'nova', name: BATTLE_LIMIT_NAMES.mage, choice: {},
-    detail: 'One foe: a hit of each element · about two and a half of her casts' }] }
+    detail: 'A hit of each element' }] }
   if (ally.classId === 'cleric') return { pick: 1, options: [{ key: 'patrons', name: BATTLE_LIMIT_NAMES.cleric, choice: {},
-    detail: 'One foe: a hit with each weapon, every one’s status at three stacks' }] }
+    detail: 'A hit with each weapon, statuses ×3' }] }
   if (ally.classId === 'summoner') return { pick: 1, options: skills.filter((s) => s.def.summon).map((s) => ({ key: key(s.ref), name: `${BATTLE_LIMIT_NAMES.grand} · ${s.label}`,
-    choice: { skill: s.ref }, detail: 'Twice as strong, and it lingers twice as strong' })) }
+    choice: { skill: s.ref }, detail: '×2, lingers ×2' })) }
   if (ally.classId === 'spellblade') return { pick: 2, options: skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skills: [s.ref] },
-    detail: isRpgTome(s.node.weapon) ? 'The Tome half, at full strength' : 'The Arms half, at full strength' })) }
+    detail: isRpgTome(s.node.weapon) ? 'Tome half, full strength' : 'Arms half, full strength' })) }
   return { pick: 1, options: skills.length
-    ? skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skill: s.ref }, detail: 'Cast twice in a row' }))
-    : ally.weapons.map((w) => ({ key: w, name: `${BATTLE_LIMIT_NAMES.twin} · ${WEAPON_LABEL[w]}`, choice: { weapon: w }, detail: 'Two full Attacks in a row' })) }
+    ? skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skill: s.ref }, detail: 'Cast twice' }))
+    : ally.weapons.map((w) => ({ key: w, name: `${BATTLE_LIMIT_NAMES.twin} · ${WEAPON_LABEL[w]}`, choice: { weapon: w }, detail: 'Two Attacks' })) }
 }
 /** The mode a menu pick (or a Spell Blade's two picks) sets, or null if the engine would refuse it. */
 export function limitMode(state: BattleState, actorId: string, choice: BattleLimitChoice): BattleMode | null {

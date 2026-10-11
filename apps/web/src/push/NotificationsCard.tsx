@@ -32,7 +32,7 @@ export function NotificationsCard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[14px] font-semibold">Notifications</p>
-          <p className="text-[12px] text-ink-soft">When work or training finishes, within about five minutes.</p>
+          <p className="text-[12px] text-ink-soft">Work and training done</p>
         </div>
         <button type="button" role="switch" aria-checked={on} aria-label="Notify me when work finishes" disabled={!ready || busy || (!on && key === null)} onClick={toggle}
           className={`relative h-8 w-14 shrink-0 rounded-full transition-colors disabled:opacity-40 ${on ? 'bg-accent' : 'bg-sunken'}`}>
@@ -40,7 +40,6 @@ export function NotificationsCard() {
         </button>
       </div>
       {NOTE[state] && <p className="mt-2 text-[12px] text-ink-faint">{NOTE[state]}</p>}
-      {ready && key === null && !on && <p className="mt-2 text-[12px] text-ink-faint">Notifications aren’t set up on the server yet.</p>}
       {on && (
         <button type="button" onClick={() => void testPush().then((n) => setMessage(n > 0 ? 'Sent: it should arrive in a moment.' : 'No device is subscribed.'))}
           className="mt-2 min-h-9 rounded-sm bg-panel px-3 text-[12px] font-semibold">Send a test</button>

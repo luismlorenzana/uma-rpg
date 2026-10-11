@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { buyItem, buyTicket, buyToken, sell, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 
@@ -39,7 +40,7 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
           </button>
           <button type="button" onClick={() => setBuying({ kind: 'sweep', price: SWEEP_TICKET_PRICE, name: 'Sweep Ticket' })} className="rounded-md bg-raised p-3 text-left">
             <p className="font-semibold">Sweep Ticket</p>
-            <p className="text-[12px] text-ink-soft">Replays a beaten regular stage: a quarter of its first clear</p>
+            <p className="text-[12px] text-ink-soft">Instant replay of a cleared stage</p>
             <p className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-laurel"><LaurelIcon size={16} /> {SWEEP_TICKET_PRICE}</p>
           </button>
         </div>
@@ -47,7 +48,7 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
       <section>
         <h3 className="text-micro mb-1.5">Raw items</h3>
         {stocked.length === 0 ? (
-          <p className="text-[13px] text-ink-soft">Win a stage on a continent to stock its grades: {chapters.map((c) => `${c.name} ${2 * c.order - 1}–${2 * c.order}`).join(', ')}.</p>
+          <p className="text-[13px] text-ink-soft">Nothing in stock yet: win a stage on a continent to stock its grades.</p>
         ) : (
           <>
             <div className="mb-2 grid grid-cols-2 rounded-sm bg-sunken p-1" role="tablist" aria-label="Side">
@@ -91,8 +92,13 @@ function TokenTrade({ items, onOpen }: { items: Record<string, number>; onOpen: 
   const [band, setBand] = useState(1)
   return (
     <section>
-      <h3 className="text-micro mb-1.5">Tokens</h3>
-      <p className="mb-2 text-[12px] text-ink-soft">Sell any token for {TOKEN_LAURELS_PER_BAND} Laurels × its band and buy any for twice that, so two tokens buy one of another kind.</p>
+      <div className="-my-2 flex items-center justify-between">
+        <h3 className="text-micro">Tokens</h3>
+        <HelpButton title="Token trading">
+          <p>Sell any token for {TOKEN_LAURELS_PER_BAND} Laurels × its band, and buy any for twice that, so two tokens buy one of another kind.</p>
+          <p>Fights drop tokens of their band: Lv 1–10 is band 1, Lv 41–50 band 5.</p>
+        </HelpButton>
+      </div>
       <div className="mb-2 grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Band">
         {Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((b) => (
           <button key={b} type="button" role="tab" aria-selected={band === b} onClick={() => setBand(b)}
@@ -100,7 +106,7 @@ function TokenTrade({ items, onOpen }: { items: Record<string, number>; onOpen: 
         ))}
       </div>
       <p className="mb-2 flex items-center gap-1 text-[12px] text-ink-faint">
-        Lv{10 * band - 9}–{10 * band} fights drop these · sell <LaurelIcon size={12} /> {TOKEN_LAURELS_PER_BAND * band} · buy <LaurelIcon size={12} /> {2 * TOKEN_LAURELS_PER_BAND * band}
+        Sell <LaurelIcon size={12} /> {TOKEN_LAURELS_PER_BAND * band} · Buy <LaurelIcon size={12} /> {2 * TOKEN_LAURELS_PER_BAND * band}
       </p>
       {KINDS.map((kind) => {
         const list = TOKENS.filter((t) => t.band === band && t.kind === kind)

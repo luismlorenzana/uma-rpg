@@ -11,7 +11,6 @@ export default function StablePeek() {
     <MasterGate>
       {(view) => (
         <div className="space-y-4 p-4">
-          <p className="text-[15px] leading-relaxed text-ink">Every Uma outfit, locked or yours. Unlock Tickets open new ones.</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md bg-raised p-3">
               <p className="text-micro">Owned</p>

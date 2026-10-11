@@ -78,7 +78,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   const node = chapter.nodes.find((n) => n.id === nodeId)
   if (!node || node.kind === 'camp') throw new Error('That node has no fight')
   if (run.battle) throw new Error('Finish the open fight first')
-  if (rpgNodeStatus(chapter, run, nodeId) === 'locked') throw new Error('Clear a path to this node first')
+  if (rpgNodeStatus(chapter, run, nodeId) === 'locked') throw new Error('Clear the stage before it')
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
@@ -102,6 +102,13 @@ export function rpgRunBattleStep(run: RpgRun): BattleStep | null {
   return run.battle ? replayBattle(run.battle.input, run.battle.actions) : null
 }
 
+/** What the player reads when the engine refuses an action. */
+const REFUSED: Readonly<Record<NonNullable<BattleStep['error']>, string>> = {
+  terminal: 'The fight is over', 'invalid-actor': 'She can’t act now', 'already-acted': 'She has already acted this round',
+  'invalid-target': 'Pick another target', 'invalid-skill': 'She can’t use that now', 'insufficient-mp': 'Not enough MP',
+  'invalid-state': 'That didn’t work', 'limit-not-ready': 'Her Limit Break isn’t ready',
+}
+
 /** Takes one action in the open fight. Throws when the engine refuses it, so a bad action never reaches the save. */
 export function rpgActInRun(run: RpgRun, action: BattleAction, now: string): { run: RpgRun; step: BattleStep } {
   const battle = run.battle
@@ -110,7 +117,7 @@ export function rpgActInRun(run: RpgRun, action: BattleAction, now: string): { r
   if (current.state.outcome !== 'active') throw new Error('The fight is over')
   if (battle.actions.length >= RPG_MAX_BATTLE_ACTIONS) throw new Error('Too many actions')
   const step = applyBattleAction(current.state, action)
-  if (step.error) throw new Error(`Action refused: ${step.error}`)
+  if (step.error) throw new Error(REFUSED[step.error])
   return { run: { ...run, battle: { ...battle, actions: [...battle.actions, action] }, updatedAt: now }, step }
 }
 

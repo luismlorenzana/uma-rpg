@@ -10,7 +10,6 @@ export default function PartyHallPeek() {
   const owned = Object.keys(world?.umas ?? {}).length
   return (
     <div className="space-y-4 p-4">
-      <p className="text-[15px] leading-relaxed text-ink">Twenty parties of five. Each Uma belongs to one party; busy ones show greyed out.</p>
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-md bg-raised p-3">
           <p className="text-micro">Full parties</p>

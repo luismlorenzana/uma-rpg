@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, SLOT_LABEL, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { equip, learn, pickClass, pickWeapons, unlearn, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
   const navigate = useNavigate()
@@ -60,7 +61,15 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   return (
     <div className="space-y-4">
       <section className="space-y-2">
-        <h4 className="text-micro">Class · free to switch</h4>
+        <div className="-my-2 flex items-center justify-between">
+          <h4 className="text-micro">Class</h4>
+          <HelpButton title="Classes and skills">
+            <p>{CLASS_BLURB[classId]}</p>
+            <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
+            <p>Core skills come free: depth d opens at class rank d and Lv 1, 10, 20, 30 or 40. She earns a point a level for side skills, which open at Lv 5, 15, 25, 35 and 45. Take one side of each fork; swap whenever you like.</p>
+            <p>Until you equip skills yourself, each weapon's deepest skill is equipped for her.</p>
+          </HelpButton>
+        </div>
         <div className="grid grid-cols-5 gap-1" role="radiogroup" aria-label="Class">
           {RPG_CLASSES.map((c) => (
             <button key={c} type="button" role="radio" aria-checked={c === classId} onClick={() => switchTo(c)}
@@ -71,9 +80,8 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
             </button>
           ))}
         </div>
-        <p className="text-[12px] text-ink-soft">{CLASS_BLURB[classId]}</p>
         <div>
-          <h4 className="text-micro mb-1">Weapons{rpgPicksWeapons(classId) ? ' · tap a slot to change it' : ''}</h4>
+          <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-5 gap-1" aria-label="Weapon slots">
             {weapons.map((w, i) => (
               <button key={`${i}-${w}`} type="button" disabled={!rpgPicksWeapons(classId)} onClick={() => setSlotPick(i)}
@@ -101,7 +109,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           <span className={`text-[12px] ${points > 0 ? 'font-semibold text-accent' : 'text-ink-soft'}`}>{points} point{points === 1 ? '' : 's'} for side skills</span>
         </div>
         {equipped.length === 0 ? (
-          <p className="text-[12px] text-ink-faint">No skills yet: she fights with her weapons’ Attacks.</p>
+          <p className="text-[12px] text-ink-faint">No skills yet</p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
             {equipped.map((id) => {
@@ -116,8 +124,8 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           </div>
         )}
         <p className="mt-1.5 text-[11px] text-ink-faint">
-          {auto ? 'Until you pick, each weapon’s deepest skill is equipped for her, and new ones as they open. ' : ''}
-          {!auto && <button type="button" onClick={() => run(() => equip(outfit, classId, null))} className="font-semibold text-accent">Let the game choose again</button>}
+          {auto ? <span className="rounded-full bg-panel px-2 py-0.5 font-semibold">Auto</span>
+            : <button type="button" onClick={() => run(() => equip(outfit, classId, null))} className="min-h-9 font-semibold text-accent">Back to auto</button>}
         </p>
       </section>
 
@@ -136,7 +144,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           })}
         </div>
         {!weapons.includes(weapon) && (
-          <p className="mb-2 rounded-sm bg-raised px-2.5 py-2 text-[12px] text-ink-soft">Not one of her five weapons now: side skills learned here wait until she wields it.</p>
+          <p className="mb-2 text-[12px] font-semibold text-ink-faint">Not equipped</p>
         )}
         <div className="space-y-1.5 rounded-md bg-panel p-2">
           {[1, 2, 3, 4, 5].map((depth) => {
@@ -171,10 +179,6 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
         </div>
       </section>
       {error && <p className="sticky bottom-2 rounded-sm bg-danger/90 p-2 text-center text-[13px]">{error}</p>}
-      <p className="text-[11px] text-ink-faint">
-        Core skills come free: depth d opens at class rank d and Lv 1, 10, 20, 30 or 40. {name} earns a point a level for side skills (one side of
-        each fork, swapped freely), which open at Lv 5, 15, 25, 35 and 45.
-      </p>
 
       {slotPick !== null && (
         <BottomSheet title={`${CLASS_LABEL[classId]}: slot ${slotPick + 1} (${SLOT_LABEL[RPG_CLASS_SLOTS[classId][slotPick]!]})`} onClose={() => setSlotPick(null)}>

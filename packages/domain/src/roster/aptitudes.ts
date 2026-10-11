@@ -9,11 +9,12 @@ export const STYLE_CLASSES: Record<keyof Aptitudes['strategy'], string[]> = {
   end: ['Summoner'],
 }
 
+/** What her best distance speeds (D70): Armor Level training at the Armory, whichever distance it is. */
 export const DISTANCE_GEAR: Record<keyof Aptitudes['distance'], { armory: string; gear: string }> = {
-  sprint: { armory: "Ranger's Lodge", gear: 'Short Swords, Bows, Garb' },
-  mile: { armory: "Lancer's Barracks", gear: 'Spears, Axes, Leather' },
-  medium: { armory: 'Arcane Armory', gear: 'Mage and Arcane Staves, Mail' },
-  long: { armory: "Knight's Bastion", gear: 'Greatswords, Cleric Staves, Tomes, Plate' },
+  sprint: { armory: 'Armory', gear: 'Armor Level (Armory)' },
+  mile: { armory: 'Armory', gear: 'Armor Level (Armory)' },
+  medium: { armory: 'Armory', gear: 'Armor Level (Armory)' },
+  long: { armory: 'Armory', gear: 'Armor Level (Armory)' },
 }
 
 export const SURFACE_PROFESSION: Record<keyof Aptitudes['surface'], string> = {

@@ -21,6 +21,7 @@ import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import { loadSkills, type MasterView } from '../../master/master'
 import { unlock, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, LockIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { pointText } from '../observatory/ObservatoryPage'
@@ -187,7 +188,7 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
         <TicketIcon size={20} /> Unlock · 1 Ticket
       </button>
       <p className="text-center text-[12px] text-ink-faint">
-        {tickets > 0 ? `${tickets} Unlock Tickets left` : 'No tickets left: Umas earn a Shard at Lv10, 20, 30, 40 and 50; five Shards make a Ticket.'}
+        {tickets > 0 ? `${tickets} Unlock Tickets left` : 'No Unlock Tickets left'}
       </p>
       {confirming && (
         <BottomSheet title={`Unlock ${outfit.name}?`} onClose={() => setConfirming(false)} footer={
@@ -238,7 +239,13 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
         <span className="text-[12px] text-ink-soft">{equipped.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
       </button>
       <section className="rounded-md bg-raised">
-        <div className="flex justify-between px-3 pt-2 text-[11px] text-ink-faint"><span>Battle stats</span><span>base → with gear and Extra Stats</span></div>
+        <div className="-mb-2 flex items-center justify-between pl-3 text-[11px] text-ink-faint">
+          <span>Battle stats</span>
+          <HelpButton title="Battle stats">
+            <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
+            <p>Green numbers are what gear and Extra Stats add: 1.5% a point. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+          </HelpButton>
+        </div>
         <div className="divide-y divide-hairline">
           {rows.map((r) => (
             <Row key={r.label} label={r.label} value={<span className="font-display tabular-nums">{r.now}</span>}
@@ -249,7 +256,7 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
         </div>
       </section>
       <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Core stats (from her racing stats, grown by level)</p>
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Core stats</p>
         <div className="grid grid-cols-5 gap-1 p-2 text-center">
           {STATS.map((s) => (
             <span key={s} className="rounded-xs bg-panel py-1">
@@ -258,7 +265,6 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
             </span>
           ))}
         </div>
-        <p className="px-3 pb-2 text-[11px] text-ink-faint">Speed → ATK and M.ATK · Stamina and Power → HP · Wit → MP · Power and Wit → DEF.</p>
       </section>
       <p className="text-[11px] text-ink-faint">Unlocked {new Date(uma.unlockedAt).toLocaleDateString()}.</p>
     </div>
@@ -288,7 +294,7 @@ function SkillsTab({ outfit, uma }: { outfit: RosterOutfit; uma: OwnedUma }) {
     <div className="space-y-4">
       <SkillsPage outfit={outfit} name={outfit.name} />
       <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks · rank r opens depths 1–r · train at the Learning District</p>
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks</p>
         <div className="divide-y divide-hairline">
           {RPG_CLASSES.map((c) => {
             const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === c)!
@@ -337,7 +343,7 @@ function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
         </span>
       </button>
       <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear levels · level k wears grade k · weapons at each class hall, armor at the Armory, accessories at the Jeweler</p>
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear levels</p>
         <div className="grid grid-cols-2 gap-x-3 px-3 py-2">
           {GEAR_LEVEL_TRACKS.map(({ key, label, track }) => {
             const rank = rankOf(uma.ranks, track)
@@ -392,9 +398,6 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
             <p className="mt-1 text-[11px] text-ink-faint">
               {next ? `${prof.exp} / ${next} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
               {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${PROFESSION_SHORT[p]} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
-            </p>
-            <p className="mt-1 text-[11px] text-ink-soft">
-              {p === 'farming' ? 'The eight Farmlands sites, the Pantry and the Kitchen.' : 'The eight Wilds sites, the Workbench and the Forge.'}
             </p>
           </section>
         )

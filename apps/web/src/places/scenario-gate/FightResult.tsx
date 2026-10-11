@@ -3,6 +3,7 @@ import { rpgTreePointsEarned, stockName, type FightResult as Result, type RpgCam
 import type { Campaign } from '../../battle/campaign'
 import { ItemIcon } from '../../items/ItemIcon'
 import { AtlasSprite } from '../../master/art'
+import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
 export function FightResult({ campaign, chapter, result, onAgain, onMap, againLabel }: {
@@ -23,8 +24,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
         <p className="text-[13px] text-ink-soft">
           {result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}`
             : `Swept ${'swept' in result && (result as { swept: number }).swept > 1 ? `${(result as { swept: number }).swept} times` : 'with a ticket'}`}
-          {win && result.firstClear === true && ' · first clear: triple Laurels'}
-          {win && result.firstClear === false && ' · replay: a quarter of the first clear'}
+          {win && result.firstClear === true && ' · First clear!'}
         </p>
         {win ? (
           <>
@@ -66,9 +66,13 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
             </ul>
           </>
         ) : (
-          <p className="mt-4 text-[14px] text-ink-soft">
-            No reward, no penalty: the run is as it was before the fight. Equip skills that hit their weaknesses, refill MP at a Spring, swap in a party that covers them, or level up on earlier stages.
-          </p>
+          <div className="mt-4 flex items-center justify-center gap-1 text-[14px] text-ink-soft">
+            No penalty
+            <HelpButton title="Tips">
+              <p>Nothing is lost: MP is as it was before the fight.</p>
+              <p>Equip skills that hit the foes' weaknesses, refill MP at a Spring, swap in a party whose weapons cover them, or level up on earlier stages.</p>
+            </HelpButton>
+          </div>
         )}
       </div>
       <div className="pb-safe grid grid-cols-2 gap-2 border-t border-hairline bg-panel p-3">

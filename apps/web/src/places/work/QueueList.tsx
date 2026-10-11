@@ -3,10 +3,8 @@ import { MAX_QUEUE, queueTimeline, type Job, type QueuedJob } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { formatDuration } from '../../ui/useNow'
 
-const STOCK_NOTE = 'Each starts when the one before ends; inputs are taken then, and the queue stops if the Warehouse is short.'
-
-export function QueueList({ job, now, label, onRemove, onAdd, addLabel = 'Queue next', note = STOCK_NOTE }: {
-  job: Job; now: string; label: (q: QueuedJob) => ReactNode; onRemove: (index: number) => void; onAdd?: () => void; addLabel?: string; note?: string
+export function QueueList({ job, now, label, onRemove, onAdd, addLabel = 'Queue next' }: {
+  job: Job; now: string; label: (q: QueuedJob) => ReactNode; onRemove: (index: number) => void; onAdd?: () => void; addLabel?: string
 }) {
   const times = queueTimeline(job)
   const t = Date.parse(now)
@@ -29,7 +27,6 @@ export function QueueList({ job, now, label, onRemove, onAdd, addLabel = 'Queue 
           + {addLabel} ({job.queue.length}/{MAX_QUEUE})
         </button>
       )}
-      {job.queue.length > 0 && <p className="text-[11px] text-ink-faint">{note}</p>}
     </div>
   )
 }

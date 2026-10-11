@@ -13,6 +13,7 @@ import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
 import { collect, collectAndRepeat, collectEverything, cutTime, queueWork, recall, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
@@ -22,13 +23,22 @@ import { TimeCut } from './TimeCut'
 
 const SPEED_NOTE: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 
-function describe(placeId: string): { title: string; line: string; profession: Profession } {
+/** A facility's title and its help: what it makes and what it raises. */
+function describe(placeId: string): { title: string; help: string[]; profession: Profession } {
   const spec = facilitySpec(placeId)!
   const family = spec.family ? familyById(spec.family) : null
-  if (family) return { title: family.name, line: `Gathers ${family.name.toLowerCase()} for the ${EFFECT_LABEL[family.effect]} effect`, profession: spec.profession! }
-  if (spec.kind === 'cook') return { title: 'Cooking', line: 'Cooks dishes from refined ingredients; each new dish an Uma eats unlocks an Extra Stats node', profession: 'farming' }
-  if (spec.kind === 'craft') return { title: 'Crafting', line: 'Crafts weapons, armor and accessories: the main material sets the type and grade, the accent adds its effect', profession: 'gathering' }
-  return { title: 'Refining', line: `Refines every ${spec.profession === 'farming' ? 'farming' : 'gathering'} family, one into one`, profession: spec.profession! }
+  const level = (p: Profession) => `Each job raises her ${PROFESSION_LABEL[p]}; grade g opens at ${PROFESSION_LABEL[p]} 5g − 4.`
+  if (family) {
+    const verb = spec.profession === 'farming' ? 'Grows' : 'Gathers'
+    return { title: family.name, profession: spec.profession!,
+      help: [`${verb} ${family.name.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, ten grades.`, level(spec.profession!)] }
+  }
+  if (spec.kind === 'cook') return { title: 'Cooking', profession: 'farming',
+    help: ['Cooks dishes from refined ingredients and Cooking Tokens. Eating a dish unlocks a node on her Extra Stats map.', level('farming')] }
+  if (spec.kind === 'craft') return { title: 'Crafting', profession: 'gathering',
+    help: ['Crafts weapons, armor, Rings, Charms and Orbs: four refined items of the grade, one from each of the type\'s families. The accent picks the stat it adds.', level('gathering')] }
+  return { title: 'Refining', profession: spec.profession!,
+    help: [`Refines raw ${spec.profession === 'farming' ? 'ingredients' : 'materials'}, one into one.`, level(spec.profession!)] }
 }
 
 export default function FacilityPage({ place }: PageProps) {
@@ -53,8 +63,10 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   return (
     <div className="space-y-3 p-4">
       <section className="rounded-md bg-raised p-3">
-        <p className="font-display text-lg font-bold">{info.title}</p>
-        <p className="text-[13px] text-ink-soft">{info.line}. Raises her {PROFESSION_LABEL[info.profession]}.</p>
+        <div className="-mr-2 -mt-2 flex items-center justify-between">
+          <p className="font-display text-lg font-bold">{info.title}</p>
+          <HelpButton title={info.title}>{info.help.map((line) => <p key={line}>{line}</p>)}</HelpButton>
+        </div>
         <div className="mt-2 flex items-center justify-between gap-2 text-[12px] text-ink-soft">
           <span>Level {facility.level} · {facility.jobs.length} slots{FACILITY_SPEED[facility.level - 1]! > 1 ? ' · 25% faster' : ''}</span>
           {upgradeCost(world, placeId) && (
@@ -347,7 +359,7 @@ function UpgradeSheet({ world, placeId, onClose, onUpgrade }: { world: TierWorld
       <button type="button" disabled={!enough} onClick={() => onUpgrade().catch((err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t upgrade.'))}
         className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">{enough ? 'Upgrade' : 'Not enough yet'}</button>
     }>
-      <p className="mb-3 text-[14px] text-ink-soft">{next === 2 ? `A third slot (${FACILITY_SLOTS[1]} in all).` : 'Every job here a quarter faster.'}</p>
+      <p className="mb-3 text-[14px] text-ink-soft">{next === 2 ? `+1 slot (${FACILITY_SLOTS[1]})` : 'Jobs 25% faster'}</p>
       <ul className="space-y-1.5 text-[14px]">
         <li className="flex items-center justify-between rounded-sm bg-raised p-2"><span className="flex items-center gap-2"><LaurelIcon size={20} /> Laurels</span><span>{world.wallet.laurels} / {cost.laurels}</span></li>
         {Object.entries(cost.items).map(([id, n]) => (
@@ -372,8 +384,7 @@ export function FacilityPeek({ place }: PeekProps) {
   const ready = facility.jobs.some((j) => j && (jobFinished(j, now) > j.collected || jobFinished(j, now) >= j.count))
   return (
     <div className="space-y-3 p-4">
-      <p className="text-[15px] leading-relaxed">{place.blurb}</p>
-      <p className="text-[12px] text-ink-soft">{info.line} · level {facility.level}</p>
+      <p className="text-[12px] text-ink-soft">{info.title} · level {facility.level}</p>
       <ul className="space-y-1.5">
         {facility.jobs.map((job, i) => (
           <li key={i} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-[13px]">

@@ -1,6 +1,6 @@
 import { CURRENT_SLICE, HUB_PAGE_NAMES, HUB_PAGES, isOpen, placeById, placesOn, type Place } from '@rpg/domain'
 import { useEffect, useRef } from 'react'
-import { CloseIcon } from '../ui/icons'
+import { CloseIcon, LockIcon } from '../ui/icons'
 
 /** Every place grouped by page, plus the Account and the Guide (T006 global menu). */
 export function MenuSheet({ onClose, onOpen }: { onClose: () => void; onOpen: (place: Place) => void }) {
@@ -31,7 +31,7 @@ export function MenuSheet({ onClose, onOpen }: { onClose: () => void; onOpen: (p
                   <li key={place.id}>
                     <button type="button" onClick={() => onOpen(place)} className="flex min-h-11 w-full items-center justify-between gap-2 rounded-sm bg-raised px-3 text-left text-[13px] font-semibold">
                       <span className="truncate">{place.name}</span>
-                      {!isOpen(place, CURRENT_SLICE) && <span className="shrink-0 text-[10px] font-bold text-ink-faint">{place.opensIn}</span>}
+                      {!isOpen(place, CURRENT_SLICE) && <LockIcon size={14} className="shrink-0 text-locked" aria-label="Not open yet" />}
                     </button>
                   </li>
                 ))}
@@ -44,9 +44,6 @@ export function MenuSheet({ onClose, onOpen }: { onClose: () => void; onOpen: (p
                 Account
               </button>
             )}
-            <button type="button" disabled className="min-h-11 rounded-sm bg-raised/50 px-3 text-left text-[13px] font-semibold text-ink-faint">
-              Guide <span className="text-[10px]">· coming later</span>
-            </button>
           </section>
         </div>
       </div>

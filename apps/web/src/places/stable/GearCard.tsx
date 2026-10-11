@@ -55,7 +55,7 @@ export function GearCard({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
           <BottomSheet title={slotLabel(open)} onClose={() => { setOpen(null); setError(null) }}>
             {uma.gear.equipped[open] && (
               <button type="button" onClick={() => run(() => takeOff(outfit.outfitId, open))} className="mb-2 min-h-11 w-full rounded-sm border border-hairline-strong text-[13px] font-semibold text-ink-soft">
-                Take off (it stays in her locker)
+                Take off
               </button>
             )}
             {own.length + stock.length === 0 && <p className="text-[14px] text-ink-soft">Nothing for this slot yet: craft some at the Forge (Wilds).</p>}

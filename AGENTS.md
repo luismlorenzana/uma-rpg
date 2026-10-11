@@ -45,4 +45,8 @@ node scripts/cast/import-girlsfrontline.mjs && bash scripts/cast/publish.sh girl
 
 - TypeScript strict with `noUncheckedIndexedAccess`; Vitest next to the code; no network in tests.
 - Mobile first at 390×844 (check 375×667): 44 pt targets, safe areas, `h-dvh`. Main JS ≤ 230 KB gzip (D56); heavy code lazy.
+- **Player-facing text is short.** Labels, counts, buttons and plain empty states ("No gear yet"). No placeholders,
+  slice or build jargon ("Opens in S6"), and no paragraphs explaining a rule or formula on a screen. Put an
+  explanation behind a help button (`apps/web/src/ui/HelpButton.tsx`, an (i) that opens a sheet) only where it helps
+  (D95).
 - Conventional Commits; the body explains why.

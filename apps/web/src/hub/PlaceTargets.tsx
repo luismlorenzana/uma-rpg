@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AtlasSprite } from '../master/art'
 import { useMaster } from '../master/master'
 import { useWorld } from '../save/game'
+import { LockIcon } from '../ui/icons'
 import { useNow } from '../ui/useNow'
 import { BUILDING, hubDpr, hubGrid, placeAnchor } from './grid'
 
@@ -51,14 +52,14 @@ export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (pla
             type="button"
             data-place={place.id}
             onClick={() => onOpen(place)}
-            aria-label={open ? place.name : `${place.name}, opens in ${place.opensIn}`}
+            aria-label={open ? place.name : `${place.name}, not open yet`}
             className="group absolute flex w-32 flex-col items-center"
             style={anchor ? { left: anchor.x, top: anchor.y, transform: `translate(-50%, -${tapH}px)` } : { left: `${place.at.x * 100}%`, top: `${place.at.y * 100}%`, transform: 'translate(-50%, -36px)' }}
           >
             <span className="relative rounded-md transition group-active:scale-95 group-active:bg-white/10" style={{ width: tapW, height: tapH }}>
               {!open && (
-                <span className="absolute -right-1 -top-1 rounded-full bg-sunken/90 px-1.5 text-[10px] font-bold leading-4 text-ink-soft ring-1 ring-hairline-strong">
-                  {place.opensIn}
+                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-sunken/90 text-locked ring-1 ring-hairline-strong">
+                  <LockIcon size={12} />
                 </span>
               )}
             </span>

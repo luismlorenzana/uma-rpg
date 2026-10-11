@@ -11,6 +11,7 @@ import { castArtUrl } from '../../content/cast'
 import { useHubNavigation } from '../../hub/navigation'
 import { beginFight, sweep, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
 import { FightResult } from './FightResult'
@@ -128,7 +129,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           <div className="flex gap-2">
             <button type="button" disabled={status(open.id) === 'locked' || !!fightOpen?.battle} onClick={() => void fight(open)}
               className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-              {status(open.id) === 'locked' ? 'Clear the stage before it' : fightOpen?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again · pays ¼' : 'Fight · first clear pays triple'}
+              {status(open.id) === 'locked' ? 'Clear the stage before it' : fightOpen?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
             </button>
             {open.kind === 'fight' && status(open.id) === 'cleared' && (
               <button type="button" disabled={!!sweepBlock(world, region, open.id)} onClick={() => setSweepFor(open.id)}
@@ -141,7 +142,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           <p className="mb-2 flex items-center gap-1 text-[13px] text-ink-soft">
             {formatLevel(open.level)} · {open.kind === 'boss' ? 'Region boss' : open.kind === 'sub-boss' ? 'Elite' : 'Stage'} ·
             {signatureOf(open).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
-            {open.waves?.length ? ` · ${open.waves.length + 1} waves, pays 1.5×` : ''}
+            {open.waves?.length ? ` · ${open.waves.length + 1} waves` : ''}
           </p>
           {[open.enemies, ...(open.waves ?? [])].map((wave, w, all) => (
             <section key={w} className="mb-2">
@@ -170,7 +171,12 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
       )}
       {sweepFor && (
         <BottomSheet title="Sweep" onClose={() => setSweepFor(null)}>
-          <p className="mb-3 text-[13px] text-ink-soft">Each sweep pays like a replay, a quarter of this stage's first clear (its EXP, Laurels and tokens' chance), for one Sweep Ticket. You have {world.wallet.sweepTickets}.</p>
+          <div className="-mt-2 mb-1 flex items-center justify-between text-[13px] text-ink-soft">
+            <span>Sweep Tickets: {world.wallet.sweepTickets}</span>
+            <HelpButton title="Sweeps">
+              <p>A sweep wins a cleared regular stage at once for one Sweep Ticket. It pays like a replay: a quarter of the first clear's EXP and Laurels, and each token at a quarter of its chance. MP isn't used.</p>
+            </HelpButton>
+          </div>
           <div className="grid grid-cols-4 gap-2">
             {[1, 5, 10, world.wallet.sweepTickets].filter((n, i, a) => n >= 1 && n <= world.wallet.sweepTickets && a.indexOf(n) === i).map((n) => (
               <button key={n} type="button" onClick={() => void doSweep(sweepFor, n)} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">

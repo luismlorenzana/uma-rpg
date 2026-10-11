@@ -148,7 +148,6 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
             </div>
           )
         })}
-        <p className="rounded-md bg-panel p-3 text-center text-[12px] text-ink-faint">Capital · Lv {continent.levelStart + 9}: the scenario’s Finals arrive in a later step.</p>
       </div>
     </div>
   )
