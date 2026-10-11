@@ -193,6 +193,13 @@ describe('save parsing', () => {
     save = actInFight(save, ura, action, T(5)).save
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     expect(applyBattleAction(rpgRunBattleStep(openFightOf(worldOf(save))!)!.state, action).error).toBe('already-acted')
+    // A Spell Blade's act carries its other half (D86): the save must keep it.
+    let bladed = startFight(chooseClass(withParty(), '102', 'spellblade', T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
+    const blade = rpgRunBattleStep(openFightOf(worldOf(bladed))!)!.state.input.allies.find((a) => a.id === '102')!
+    const pair: BattleAction = { kind: 'attack', actorId: blade.id, targetId: 'foe1', weapon: blade.weapons.find((w) => !w.startsWith('tome-')),
+      pair: { weapon: blade.weapons.find((w) => w.startsWith('tome-')) } }
+    bladed = actInFight(bladed, ura, pair, T(6)).save
+    expect(parseSave(JSON.parse(JSON.stringify(bladed)))).toEqual(bladed)
   })
 
   it('rejects a side skill too deep, a skill of another class, wrong weapons, a refused action and an unknown Spring', () => {

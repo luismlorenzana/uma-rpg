@@ -474,10 +474,11 @@ function counts(value: unknown, path: string, min: number): Record<string, numbe
   return value as Record<string, number>
 }
 
+// A Spell Blade's act carries its other half as `pair` (D86); `blessing` stays readable for fights saved before it.
 const ACTION_KEYS: Record<BattleAction['kind'], readonly string[]> = {
-  attack: ['kind', 'actorId', 'targetId', 'weapon'],
+  attack: ['kind', 'actorId', 'targetId', 'weapon', 'pair'],
   guard: ['kind', 'actorId', 'targetId'],
-  skill: ['kind', 'actorId', 'targetId', 'skill', 'blessing'],
+  skill: ['kind', 'actorId', 'targetId', 'skill', 'pair', 'blessing'],
   limit: ['kind', 'actorId', 'targetId', 'skill', 'skills', 'weapon'],
 }
 
