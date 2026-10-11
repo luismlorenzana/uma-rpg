@@ -1,6 +1,6 @@
 # The world map's art (W5)
 
-> **Status: spec, 2026-10-11 (D87).** The world, continent and region screens are lists with flat biome colors today
+> **Status: spec, 2026-10-11 (D87, D90).** The world, continent and region screens are lists with flat biome colors today
 > (W2, D72). This page specifies their pixel art: what uma-platform draws (the `world` atlas) and how uma-rpg lays it
 > out. The handoff packets [H06](../../handoff/tasks/H06-world-atlas.md) (art) and
 > [H07](../../handoff/tasks/H07-world-map-screens.md) (screens) build it; [H08](../../handoff/tasks/H08-battle-backdrops.md)
@@ -27,7 +27,7 @@ Every frame id below is part of the contract; the build checks the list. Sizes a
 |---|---|---|---|
 | Ground | `ground/<biome>-0` … `-3`, plus `ground/ocean-0` … `-3` | 16×16, seamless with each other in any order | 80 |
 | Props | `prop/<biome>/<name>`, three per biome (names in the table below) | 16×16, or 16×32 when tall | 57 |
-| Liquids | `liquid/<liquid>-<mask>` for `water`, `lava`, `marsh`, `ice`, `void`, `cloud`; mask 0–15 | 16×16 | 96 |
+| Liquids | `liquid/<liquid>-<mask>` for `water`, `lava`, `marsh`, `ice`, `void`, `cloud`; corner mask 1–15 | 16×16 | 90 |
 | Roads | `road/<material>-<mask>` for `dirt`, `stone`, `boards`; mask 0–15 | 16×16 | 48 |
 | Stage markers | `marker/<fight\|elite\|boss>-<locked\|open\|cleared>` | 16×16 | 9 |
 | Frontier ring | `marker/frontier-0`, `marker/frontier-1` (a two-frame pulse drawn over a marker) | 16×16 | 2 |
@@ -36,8 +36,18 @@ Every frame id below is part of the contract; the build checks the list. Sizes a
 | Biome icons | `icon/<biome>` for list cells and headers | 16×16 | 19 |
 | Backdrops | `backdrop/<biome>` (battle horizon strips, [H08](../../handoff/tasks/H08-battle-backdrops.md)) | 128×48, seamless left to right | 19 |
 
-**Autotile masks** follow the Hub's (`scripts/pixel-art/src/tiles/autotile.ts`): the mask is the sum of the
-neighbors of the same kind, N 1, E 2, S 4, W 8. A liquid's edge shows a shore or rim drawn on the liquid's own tile.
+**Two kinds of autotile** (D90, after the [H01 calibration](../../handoff/README.md)):
+
+- **Roads are networks** with the Hub's edge masks (`scripts/pixel-art/src/tiles/autotile.ts`): the mask is the sum of
+  the neighbors that are road, N 1, E 2, S 4, W 8. Layouts never close a 2×2 block of road (the Hub's `closesBlock` in
+  `tiles/maps.ts`), so junctions never show as little loops. Stone roads are flagstone paths with grass or dust in the
+  joints, not brick walls.
+- **Liquids are areas** with corner masks, so a pond is a filled blob with a shore all round. The liquid is placed on
+  the grid's corners (vertices); a tile's mask is the sum of its corners that are liquid, NW 1, NE 2, SE 4, SW 8. Mask
+  15 is open liquid, 0 is never drawn, and the other 14 are shores and inlets. A layout's liquid patch is a blob of
+  corners at least 2×2, grown from a seed by the region's hash, so no two ponds look alike.
+
+Both are transparent overlays drawn over the biome's ground, so one family serves every biome.
 
 `atlas.json` follows the tiles atlas' shape: `{ schemaVersion: 1, width, height, frames: { id: { x, y, w, h, group,
 biome?, anchorY? } } }`.

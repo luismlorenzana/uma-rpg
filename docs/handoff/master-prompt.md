@@ -22,14 +22,13 @@ THE PROJECT
   source of truth, and docs/decisions.md is the decision log (D-numbers in uma-rpg, P-numbers in uma-platform).
 
 YOUR QUEUE
-- The packets are in uma-rpg/docs/handoff/tasks/, ranked in uma-rpg/docs/handoff/README.md. Start with H01, then go on
-  in this order: H02, H04, H05, H03, H06, H07, H08, H10, H11, H12, H14, H15, H16, H17, H18, H19. The packets marked
-  "Claude" or "the owner" are there for context only.
+- The packets are in uma-rpg/docs/handoff/tasks/, ranked in uma-rpg/docs/handoff/README.md. Take them in the order
+  that README gives under "For ChatGPT, in order". The packets marked "Claude" or "the owner" are there for context
+  only.
 - Each packet has Why, Context, Do, Done when and Deliver. Read the files in Context before writing code. The Do steps
   already make the design decisions; follow them. Where a packet leaves a choice open, pick the sensible default, write
   it under "Decisions" in the pull request, and carry on. The owner prefers that to questions.
-- H01 is a calibration round for your pixel art. Open it as a draft pull request, then work on H02, H04 and H05 while
-  the owner looks at it. H03, H06, H08, H10 and H11 start once H01 is approved.
+- Your pixel art passed its calibration round (H01, decision D90). The lessons are folded into the art packets.
 
 HOW TO WORK
 - One task, one branch, one pull request, named as the packet's Deliver section says. Base it on the latest

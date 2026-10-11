@@ -18,15 +18,10 @@
 
 Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script.md) replaces them with one current script.
 
-## In progress (Claude)
-
-- **Echocalypse's leftover bucket folder** (about 5 MB): deleted once the owner says so.
-
 ## Game
 
 | Packet | What |
 |---|---|
-| [H02](handoff/tasks/H02-auto-battle-and-speed.md) | Auto-battle and battle speed |
 | [H09](handoff/tasks/H09-w3-foes-elements-waves.md) | W3: up to eight foes, dual-element foes, waves |
 | [H13](handoff/tasks/H13-w4-field-effects.md) | W4: field effects and home ground |
 | [H15](handoff/tasks/H15-capital-finals.md) | The capitals' Finals |
@@ -38,7 +33,6 @@ Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script
 
 | Packet | What |
 |---|---|
-| [H01](handoff/tasks/H01-art-calibration.md) | Art calibration round for a delegated artist |
 | [H03](handoff/tasks/H03-gear-icons-d86.md) | Gear icons for D86's types (today they borrow older art with a kind badge) |
 | [H06](handoff/tasks/H06-world-atlas.md), [H07](handoff/tasks/H07-world-map-screens.md) | The world map in pixel art (W5, [map-art.md](design/world/map-art.md)) |
 | [H08](handoff/tasks/H08-battle-backdrops.md) | Battle backdrops by biome |

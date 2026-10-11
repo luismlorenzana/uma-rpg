@@ -24,6 +24,17 @@ piece of art the three map screens need. [H07](H07-world-map-screens.md) lays th
 - **The biome list** mirrors uma-rpg `packages/domain/src/world/biomes.ts`. Copy the 19 ids and colors into
   `src/world/spec.ts`, with a comment naming that file as the source.
 
+## From H01's review
+
+H01 passed (D90). Its painters in `scripts/pixel-art/src/world/` are the base. Three things change at full scale:
+
+- **Liquids become areas** with corner masks (map-art.md, "Two kinds of autotile"). The band liquids made ponds that
+  read as L-shaped strips. Redraw `liquid/*` as corner tiles, and grow each patch as a blob of at least 2×2 corners.
+- **Roads never close a 2×2 block.** H01's junctions show little window holes. Reuse `closesBlock` from
+  `src/tiles/maps.ts` in every layout.
+- **Stone roads are flagstones**, irregular slabs with darker joints and a ragged edge into the ground, not
+  rows of bricks.
+
 ## Do
 
 Work in three milestones, a pull request each, so the owner sees the look early.

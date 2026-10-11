@@ -1,6 +1,6 @@
 # H03 — Gear icons for D86: Katana, Lance, five Tomes, ten Orbs
 
-**Priority P1 · ChatGPT, then Claude wires uma-rpg · uma-platform · M.** After H01 passes.
+**Priority P1 · ChatGPT, then Claude wires uma-rpg · uma-platform · M.** H01 passed (D90).
 
 ## Why
 
@@ -25,6 +25,15 @@ warehouse screen. Four of the old rows (the three staves and the Summoner Tome) 
     the Arcana half (crystals, fibers, essences, bones-horns) to Tomes and Elemental Orbs.
 - **Element colors** (uma-rpg `apps/web/src/battle/labels.tsx`): fire `#ff8a5c`, ice `#8fd3ff`, lightning `#ffd84d`,
   light `#fff2b0`, dark `#c79bff`.
+
+## From H01's review
+
+The Katana and the Fire Orb passed as they are. The Fire Tome's grades barely differ: from grade 1 to 10, only a few
+clasp pixels change. Give each Tome grade a visible step, so the grade reads at 1× as it does on the other gear:
+
+- the corner plates and spine bands grow and take the grade's material;
+- the cover gem appears from grade 4;
+- top grades get gilded page edges.
 
 ## Do
 

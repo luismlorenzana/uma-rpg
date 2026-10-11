@@ -94,7 +94,9 @@ Costume variants aren't on the official site and are out of scope.
   dark band.
 - **The DOM carries everything lasting**: tap targets, HP and MP bars, shields, weaknesses, intents, damage previews,
   commands and sheets. The canvas only draws effect text (damage numbers, WEAK, BREAK).
-- Tap the stage to skip the playback. Reduced motion skips it entirely. An Uma without a chibi in the master data
+- Tap the stage to skip the playback. Reduced motion skips it entirely. **Auto** plays every ally's turn with the
+  same weakness-aware policy the balance simulation uses (`rpg/battle/auto.ts`), and any manual tap hands control back;
+  **speed** runs playback at 1×, 2× or 4×. Both are remembered per device (D89). An Uma without a chibi in the master data
   shows her outfit icon instead.
 - Art stays lean (the owner, 2026-10-10): existing master-data art and official portraits plus a few procedural
   effects; no bespoke sprite sheets.
