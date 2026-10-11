@@ -1,8 +1,9 @@
 # Class rework: the Class Sheet
 
-> **Status: proposal for owner review, 2026-10-11.** Nothing here is built yet. It replaces the five classes and six
-> builds of [classes.md](classes.md) and [battles.md](battles.md) once approved (it would be D86). Everything marked
-> **(my call)** is a decision the owner didn't specify; say the word and it changes.
+> **Status: approved by the owner, 2026-10-11 (D86), with three notes folded in:** hybrids may equip any of the ten
+> Orbs; Light and Dark take the mirrored shapes (§2, §11.2); and every material family is produced and consumed
+> equally (§10). It replaces the five classes and six builds of [classes.md](classes.md) and [battles.md](battles.md).
+> Everything marked **(my call)** is a decision the owner didn't specify.
 
 ## 1. The shape in one table
 
@@ -28,8 +29,11 @@ with an Orb. What differs is which kinds and how hard each turn hits.
 | **Greatsword** | Single target, heavy | ↔ | **Fire** | Single target |
 | **Axe** | Every foe | ↔ | **Ice** (Blizzard) | Every foe |
 | **Lance** (was Spear) | Random multi-hit | ↔ | **Lightning** (Thunder) | Random multi-hit |
-| **Bow** | Single target, many hits | ↔ | **Light** | Every foe (as you asked; see §11.2) |
-| **Katana** (new, replaces Short Sword) | Single target, double slashes | ↔ | **Dark** | Every foe (as you asked; see §11.2) |
+| **Bow** | Single target, many hits | ↔ | **Light** | Single target, many hits |
+| **Katana** (new, replaces Short Sword) | Single target, double slashes | ↔ | **Dark** | Single target, two heavy casts |
+
+Every class follows the same shape per kind: its Greatsword and Fire skills hit one foe hard, its Axe and Ice skills
+every foe, and so on.
 
 - **Foes keep five Arms and five element weaknesses**; Short Sword weaknesses become Katana and Spear becomes Lance.
   The elemental triangle (Fire > Ice > Lightning > Fire, Light ↔ Dark) is unchanged.
@@ -105,6 +109,8 @@ Names (core / A / B, depth 1 → 5):
 
 - **Slots**: Fire, Blizzard, Thunder, Light and Dark **Tomes**, all five always, plus an **Arms Orb** (Greatsword, Axe,
   Lance, Bow or Katana: a spectral weapon joins every cast) or a stat accessory.
+- **Orbs**: Brawlers take Elemental Orbs and Mages Arms Orbs (one their weapons don't already cover); **Summoner, Spell
+  Blade and Cleric may take any of the ten.**
 - **Acts once a turn** (it was twice at 0.6), at full power. **Five active trees.**
 - **Coverage**: all 5 elements + 1 Arm.
 - The trees are today's Mage-staff and Arcane-staff branches, one tree per Tome, minus Ultima:
@@ -114,8 +120,8 @@ Names (core / A / B, depth 1 → 5):
 | **Fire Tome** | One foe, 1 hit | **Wave**: every foe | **Chain**: random 2/2/3/3/4 hits | Flare Star: Burn 2 |
 | **Blizzard Tome** | Every foe, 1 hit | **Spike**: one foe | **Shards**: random multi-hit | Absolute Zero: 2 hits on every foe + Enfeeble 1 |
 | **Thunder Tome** | Random 2/2/3/3/4 hits | **Bolt**: one foe | **Squall**: every foe | Judgment Storm: Shock 1 per hit |
-| **Light Tome** | Every foe, 1 hit | **Lux Lance**: one foe | **Lux Cascade**: 2 hits on every foe at 50% | Holy: 2 hits on every foe, +30% against a Broken foe |
-| **Dark Tome** | Every foe, 1 hit | **Nox Lance**: one foe | **Nox Cascade**: 2 hits on every foe at 50% | Black Hole: 2 hits on every foe, +30% against a foe under half HP |
+| **Light Tome** | One foe, 2/2/4/4/6 hits | **Lux Lance**: half the hits, ×1.15 | **Lux Cascade**: 2 hits on every foe at 50% | Holy: +30% against a Broken foe |
+| **Dark Tome** | One foe, 2 heavy casts | **Nox Pierce**: 1 cast ×1.15, full damage before the Break | **Nox Cascade**: 2 hits on every foe at 50% | Black Hole: +30% against a foe under half HP |
 
 Names are today's: Fire, Fira, Firaga, Firaja, Flare Star (Wave and Chain variants); Blizzard … Absolute Zero (Spike,
 Shards); Thunder … Judgment Storm (Bolt, Squall); Lux … Holy (Lance, Cascade); Nox … Black Hole (Lance, Cascade).
@@ -137,18 +143,19 @@ under a pure DPS class as asked, and every turn shows two kinds.
 
 | Tree | Summons, depth 1 → 5 | Shape | Depth 5 core adds |
 |---|---|---|---|
-| **Fire Tome** | Ember Sprites, Salamander, Fire Drake, Infernal Wyrm, Phoenix | Every foe, 1/2/2/3/3 hits | Burn 1 on every foe |
+| **Fire Tome** | Ember Sprites, Salamander, Fire Drake, Infernal Wyrm, Phoenix | One foe, 1/1/2/2/3 hits | Burn 2 |
 | **Blizzard Tome** | Frost Sprites, Snow Wolves, Ice Golem, Frost Titan, Winter Queen | Every foe, 1/2/2/3/3 hits | Enfeeble 1 on every foe |
-| **Thunder Tome** | Spark Sprites, Thunderbird, Storm Roc, Thunder Kirin, Raijin | Every foe, 1/2/2/3/3 hits | Shock 1 on every foe |
-| **Light Tome** | Cherub, Angel Lancer, Seraph Phalanx, Dominion Host, Heaven's Legion | Random foes, 1/1/1/2/2 hits | Barrier 1 on every ally |
-| **Dark Tome** | Imp Brute, Hellknight, Dread Knight, Demon Lord, Abyssal Overlord | One foe, 1/1/1/2/2 hits | Enfeeble 2 |
+| **Thunder Tome** | Spark Sprites, Thunderbird, Storm Roc, Thunder Kirin, Raijin | Random foes, 2/2/3/3/4 hits | Shock 1 on each foe hit |
+| **Light Tome** | Cherub, Angel Lancer, Seraph Phalanx, Dominion Host, Heaven's Legion | One foe, 2/2/3/3/4 hits | Barrier 1 on every ally |
+| **Dark Tome** | Imp Brute, Hellknight, Dread Knight, Demon Lord, Abyssal Overlord | One foe, 2 hits | Enfeeble 2 |
 | **Greatsword** | Squire, Sword Knight, Paladin, Blade Champion, Sword Saint | One foe, 1/1/2/2/3 hits | Armor Break 2 |
 | **Axe** | Brigand, Berserker, Axe Ogre, Minotaur Chief, Jotun Warlord | Every foe, 1/1/2/2/3 hits | Armor Break 1 on every foe |
 | **Lance** | Pikeman, Dragoon, Lance Knight, Valkyrie, Valkyrie Queen | Random foes, 2/2/3/3/4 hits | Armor Break 1 on each foe hit |
 | **Bow** | Slinger, Archer, Ranger, Sylph Archer, Sagittarius | One foe, 2/2/3/3/4 hits | Armor Break 2 |
 | **Katana** | Ronin, Samurai, Kensei, Blade Shogun, Sword Spirit | One foe, 2 hits | +30% to a Broken foe |
 
-The Fire, Ice, Lightning, Light and Dark summons are today's; the Arms summons are new and mirror the Brawler's shapes.
+The Fire, Ice, Lightning, Light and Dark summons are today's; the Arms summons are new. Every summon takes its kind's
+shape (§2).
 
 Side skills, the same rule in every tree (my call):
 
@@ -210,26 +217,42 @@ Side skills in every tree: **A: Focus**, one hit fewer, ×1.1; **B: Flurry**, on
 
 ## 10. Equipment, crafting and the Hub
 
-**Weapon types: ten, all craftable at the Forge**, each `type × grade 1–10 × accent`, as today:
+**Weapon types: ten, all craftable at the Forge**, each `type × grade 1–10 × accent`, as today.
 
-| Type | Main material | Stat | Status |
-|---|---|---|---|
-| Greatsword, Axe, Lance, Katana | Ores | ATK | Lance is Spear renamed; Katana is new |
-| Bow | Woods | ATK | Unchanged |
-| Fire Tome | Hides & Scales | M.ATK | New |
-| Blizzard Tome | Crystals | M.ATK | New |
-| Thunder Tome | Essences | M.ATK | New |
-| Light Tome | Fibers | M.ATK | New |
-| Dark Tome | Bones & Horns | M.ATK | New |
+**Materials, symmetric by construction (owner, D86).** Every recipe is **four refined items of its grade, one from each
+of four gathering families, plus one Crafting Token of its accent's stat** (the accent no longer takes a material of
+its own, and the extras retire). The eight gathering families split into two halves, by flavor:
 
+| Half | Families | Flavor |
+|---|---|---|
+| **Arms** | Ores, Stones, Woods, Hides & Scales | blade, whetstone, haft, grip |
+| **Arcana** | Crystals, Fibers, Essences, Bones & Horns | focus, pages, ink, binding |
+
+| Pieces | Recipe |
+|---|---|
+| Greatsword, Axe, Lance, Bow, Katana, Arms Orbs | The four Arms families |
+| Fire, Blizzard, Thunder, Light, Dark Tomes, Elemental Orbs | The four Arcana families |
+| Plate | Ores, Stones, Essences, Bones & Horns |
+| Mail | Ores, Hides & Scales, Crystals, Essences |
+| Leather | Hides & Scales, Woods, Fibers, Bones & Horns |
+| Garb | Woods, Stones, Fibers, Crystals |
+| Ring | Crystals, Essences, Ores, Stones |
+| Charm | Bones & Horns, Fibers, Hides & Scales, Woods |
+
+Every piece takes four different families, every armor and accessory two from each half, and each family sits in
+exactly two armors and one stat accessory. A roster that mixes Brawlers and Mages, as any will, consumes all eight
+families equally. Cooking already does the same for the eight farming families: each planet dish takes its own
+family's refined item, sides rotate evenly around the ring, each family sits in two Duo dishes and every Feast takes all
+eight. A test (`materials.test.ts`) keeps both true. Every site produces at the same rate (only grade sets the time).
+
+- **Stats**: weapons give ATK (Arms) or M.ATK (Tomes); armor and accessories as today.
 - **Retired**: Short Sword, Mage Staff, Arcane Staff, Cleric Staff, Summoner Tome.
 - **A weapon's stat is its grade split over the five slots** (as today's split over a build's weapons): a Summoner's 3
   Tomes and 2 Arms give 60% M.ATK, 40% ATK. That is the right lean, because summons of Arms hit with ATK and summons
   of elements with M.ATK.
-- **Accessories (Jeweler)**: Ring and Charm stay the stat accessories (accent at double weight). **Orbs are new, ten of
-  them**: five Elemental Orbs and five Arms Orbs, graded 1–10 like other accessories, with their accent at normal weight
-  (half a Ring's), crafted from Stones (unused as a main material until now) and a Crafting Token. You choose: an Orb's
-  extra kind, or a Ring or Charm's extra damage.
+- **Accessories**: Ring and Charm stay the stat accessories (accent at double weight). **Orbs are new, ten of them**:
+  five Elemental Orbs and five Arms Orbs, graded 1–10 like other accessories, with their accent at normal weight (half
+  a Ring's). You choose: an Orb's extra kind, or a Ring or Charm's extra damage.
 - **Icons (lean)**: the shared art atlas has rows for today's types. Until an art round in uma-platform adds new ones,
   Lance reuses Spear's icons, Katana reuses Short Sword's, the five Tomes reuse the Summoner Tome tinted by element, and
   Orbs reuse the Ring tinted by kind with the kind's glyph on top.
@@ -266,11 +289,8 @@ re-checks D75's targets before anything ships.
 ## 11. Recommendations on symmetry
 
 1. **Retire Ultima** (done above). Ten kinds, five and five, and every Limit Break hits with what's equipped.
-2. **Mirror the Mage's Light and Dark onto the Bow and Katana (recommended).** You asked for Light and Dark both every
-   foe, like today. If instead **Light is single target with many hits (like Bow) and Dark is two heavy casts (like
-   Katana)**, the Brawler and Mage line up one-to-one on all five: ST heavy, every foe, random, ST many-hit and double.
-   Their side skills would keep the old every-foe Light and Dark casts as options. Today's version is in §5; this is a
-   one-line change per tree.
+2. **Mirror Light and Dark onto the Bow and Katana** (approved, built into §2, §5 and §6): every class's skills of a
+   kind share a shape, and the old every-foe Light and Dark casts live on as their Cascade side skills.
 3. **Orbs for everyone** (done above): one accessory slot, Orb or stat. Every class can reach six kinds, and the
    hybrids decide which one.
 4. **Pair the statuses Arm ↔ Element** (done above for the Cleric, and the depth-5 riders follow it): physical trees
