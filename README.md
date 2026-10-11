@@ -1,25 +1,30 @@
 # Uma RPG
 
 A personal, never-distributed party RPG inspired by *Umamusume: Pretty Derby* and Octopath Traveler, played on the
-owner's iPhone as a Home Screen web app. It has its own Hub, passive farm, per-Uma leveling, chapter maps and turn-based
-party battles.
+owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
+
+- a four-page Hub of farms, mines and halls;
+- passive professions;
+- per-Uma leveling with five classes and forty skill trees;
+- cooking, crafting and Extra Stats;
+- a world map of five continents and turn-based party battles with Breaks, waves and Limit Breaks.
 
 ## Status
 
-Phase 1: the design (v0.4) and item catalog are drafted; **S1, the Hub and foundation**, is specified and broken into
-tasks ([plan](docs/plan.md)). See the
-cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
+Tier 1 is playable end to end: slices S1–S7, the world map (W1–W3) and the class rework (D86). The Tier Finale and
+promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/handoff/README.md). See the cross-game
+[roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
 
-## Where things are decided
+## Documentation
 
 | Doc | What |
 |---|---|
-| [docs/design/game-design.md](docs/design/game-design.md) | The game design (draft) |
-| [docs/design/items.md](docs/design/items.md) | Item catalog: 160 raw and 160 refined items (draft) |
-| uma-platform `scripts/pixel-art` | Draws the original pixel art (`pnpm art:draw` there, into `assets/`) |
-| [docs/plan.md](docs/plan.md) | Build plan: slices S1–S8, each playable on the phone |
-| [docs/slices/](docs/slices/S2-collection.md) | Slice specs (S1 done; S2: collection and parties) |
-| [docs/tasks/](docs/tasks/README.md) | The active slice's implementable tasks |
-| [docs/decisions.md](docs/decisions.md) | This game's decisions (append-only) |
+| [docs/game/](docs/game/README.md) | **The manual: the game as it is today.** Architecture, dependencies, loops, sections, combat, classes, every skill tree, materials, the world map. Its lists are generated from the code |
+| [docs/decisions.md](docs/decisions.md) | Why things are the way they are (append-only) |
+| [docs/handoff/](docs/handoff/README.md) | Every open task, ranked, as a self-contained packet |
+| [docs/backlog.md](docs/backlog.md) | Everything open, linked to its packet |
+| [docs/design/](docs/design/) | Specs and proposals, including some for things not built yet |
+| [docs/technical/infrastructure.md](docs/technical/infrastructure.md) | Every production value |
 | [docs/open-questions.md](docs/open-questions.md) | What waits on the owner |
-| uma-platform `docs/architecture.md` | Cross-game architecture: master data, shared packages, stack, art |
+| [docs/plan.md](docs/plan.md), [docs/slices/](docs/slices/S2-collection.md) | The build history, slice by slice |
+| uma-platform `docs/architecture.md` | Cross-game architecture: master data, shared packages, art |

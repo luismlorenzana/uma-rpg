@@ -45,7 +45,7 @@ export function MenuSheet({ onClose, onOpen }: { onClose: () => void; onOpen: (p
               </button>
             )}
             <button type="button" disabled className="min-h-11 rounded-sm bg-raised/50 px-3 text-left text-[13px] font-semibold text-ink-faint">
-              Guide <span className="text-[10px]">· arrives with S3</span>
+              Guide <span className="text-[10px]">· coming later</span>
             </button>
           </section>
         </div>

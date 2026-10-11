@@ -2,6 +2,8 @@
 
 - Before working here, read the cross-game plan in the sibling repo: `../uma-platform/docs/architecture.md`,
   `roadmap.md` and `decisions.md` (also on GitHub at `luismlorenzana/uma-platform`).
+- **`docs/game/` is the manual of the game as built.** Read it first for any rule, list or screen. After a rule change,
+  run `pnpm docs:update` so its generated lists match, and keep its hand-written pages in step with the code.
 - This game stands alone: its own save, rules, economy and Firebase/GCP project. It reads master data from uma-platform
   by stable IDs only, and never imports from uma-racer or uma-puzzle at runtime.
 - The RPG rules being ported live in uma-racer on `origin/main`: `packages/domain/src/rpg/`, `apps/web/src/screens/rpg/`,

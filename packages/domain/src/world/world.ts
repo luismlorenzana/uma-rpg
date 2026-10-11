@@ -29,7 +29,8 @@ const pick = <T>(list: readonly T[], key: string): T => list[hash(key) % list.le
 const shuffle = <T>(list: readonly T[], key: string): T[] => list.map((v, i) => ({ v, k: hash(`${key}:${i}`) })).sort((a, b) => a.k - b.k).map((x) => x.v)
 
 /** Each continent's climate lean: the biome it holds a third of (D66). */
-const LEAN: readonly Biome[] = ['forest', 'coast', 'desert', 'tundra', 'moor']
+export const CONTINENT_LEAN: readonly Biome[] = ['forest', 'coast', 'desert', 'tundra', 'moor']
+const LEAN = CONTINENT_LEAN
 const ROMAN = ['', ' II', ' III']
 
 /** A continent of the first tier: `order` 1–5, levels `10 × (order − 1) + 1` on. */
@@ -67,7 +68,7 @@ export const WORLD_TUNING = {
  * Formation templates (encounters.md, W3): how many foes, the HP they share in regular foes (so a solo and a swarm
  * are about as hard) and each one's shield. A solo elite acts twice a round. An escort is a captain and her guards.
  */
-const FORMATION: Readonly<Record<Formation, { count: readonly [number, number]; budget: number; shield: number; name: string }>> = {
+export const WORLD_FORMATIONS: Readonly<Record<Formation, { count: readonly [number, number]; budget: number; shield: number; name: string }>> = {
   solo: { count: [1, 1], budget: 3.5, shield: 6, name: 'Lone elite' },
   duo: { count: [2, 2], budget: 3.6, shield: 4, name: 'Pair' },
   trio: { count: [3, 3], budget: 3.6, shield: 3, name: 'Trio' },
@@ -76,12 +77,14 @@ const FORMATION: Readonly<Record<Formation, { count: readonly [number, number]; 
   escort: { count: [3, 5], budget: 0, shield: 2, name: 'Escort' },
 }
 /** An escort's captain and each guard, in regular foes' HP. */
-const ESCORT = { captain: 2.5, captainShield: 5, guard: 0.8 } as const
+export const WORLD_ESCORT = { captain: 2.5, captainShield: 5, guard: 0.8 } as const
+const ESCORT = WORLD_ESCORT
+const FORMATION = WORLD_FORMATIONS
 /** Waves (W3): stages 8 and 9 come in two, the boss in three; a stage in waves pays 1.5× (`WAVE_PAY`), so its waves
  * share 1.5 stages' HP, and the boss's two opening waves are lighter, so the champion's wave decides it. */
-const WAVE_STAGES: Readonly<Record<number, number>> = { 8: 2, 9: 2 }
+export const WAVE_STAGES: Readonly<Record<number, number>> = { 8: 2, 9: 2 }
 export const BOSS_WAVES = 3
-const WAVE_HP: Readonly<Record<number, number>> = { 1: 1, 2: 0.75, 3: 0.3 }
+export const WAVE_HP: Readonly<Record<number, number>> = { 1: 1, 2: 0.75, 3: 0.3 }
 
 export interface StagePlan { formation: Formation; signature: readonly RpgElement[]; waves: number }
 

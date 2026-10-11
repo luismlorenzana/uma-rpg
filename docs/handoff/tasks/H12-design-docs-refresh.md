@@ -8,7 +8,6 @@ The design docs are the source of truth (`AGENTS.md`), but several lag the decis
 
 - `docs/design/game-design.md` is still "draft v0.4", with `[Proposed]` tags on rules settled since.
 - `items.md` and §14 predate the item rebalance and D86's recipes.
-- `AGENTS.md` says the main JS budget is 180 KB, but D56 raised it to 230.
 
 Agents and the owner read stale rules.
 
@@ -21,8 +20,10 @@ Agents and the owner read stale rules.
   - `docs/design/loop.md`, `forge.md`, `kitchen.md` and `pacing.md`.
 
   Check each against the code before trusting it.
-- **Docs to fold:** `docs/design/game-design.md` (its §2, §3, §6, §7 and §12–§14), `docs/design/items.md`,
-  `docs/technical/architecture.md` (save schema v14, engine v6, routes) and `AGENTS.md` (the budget line).
+- **Docs to fold:** `docs/design/game-design.md` (its §2, §3, §6, §7 and §12–§14), `docs/design/items.md` and
+  `docs/technical/architecture.md` (save schema v14, engine v7, routes).
+- **The manual** (`docs/game/`, D92) already describes the game as built, with lists generated from the code. Where a
+  design doc restates a current rule, point to the manual instead of copying it.
 - **Code is the tiebreaker** where docs disagree:
   - `packages/domain/src/economy/` (`pacing.ts`, `tokens.ts`, `gear.ts`, `dishes.ts`, `training.ts`);
   - `packages/domain/src/items/catalog.ts`;
@@ -42,8 +43,7 @@ Agents and the owner read stale rules.
 3. Update `items.md` to the catalog in code: families, grades and refined items, with the D86 gear recipes (four refined
    of the grade, one of each family of the type's half, plus a Crafting Token). Update the families-to-sites
    symmetry (`economy/materials.test.ts`).
-4. Fix `AGENTS.md`'s budget line to D56's 230 KB gzip.
-5. Keep the house style: short sentences, tables for comparisons, decision numbers in parentheses, no new rules. Where
+4. Keep the house style: short sentences, tables for comparisons, decision numbers in parentheses, no new rules. Where
    the docs and the code disagree and no decision explains it, list the case in the pull request rather than choosing.
 
 ## Done when

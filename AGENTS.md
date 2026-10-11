@@ -5,11 +5,13 @@ as a Home Screen web app. Read this before changing anything.
 
 ## Read first
 
-1. `README.md`: status and the documentation map.
-2. `docs/design/` for the system you're touching. **The design docs are the source of truth.** Code follows them.
-3. `docs/plan.md` (slices), the active slice spec in `docs/slices/`, and your task in `docs/tasks/`.
-4. `docs/decisions.md` (append-only) and `docs/technical/architecture.md`.
-5. The cross-game plan: uma-platform `docs/architecture.md`.
+1. `docs/game/`: **the manual of the game as it is.** Look up any rule, list or screen there first. Its lists are
+   generated from the code; after changing a rule, run `pnpm docs:update` and commit the result (CI fails on a stale page).
+2. `README.md`: status and the documentation map.
+3. Your task: a packet in `docs/handoff/tasks/`, or a slice spec in `docs/slices/` with its tasks in `docs/tasks/`.
+4. `docs/design/` for the system you're changing: specs and intent. When a design changes a rule, update the manual in
+   the same change.
+5. `docs/decisions.md` (append-only), and the cross-game plan in uma-platform `docs/architecture.md`.
 
 ## Hard rules
 
@@ -42,5 +44,5 @@ node scripts/cast/import-girlsfrontline.mjs && bash scripts/cast/publish.sh girl
 ## Conventions
 
 - TypeScript strict with `noUncheckedIndexedAccess`; Vitest next to the code; no network in tests.
-- Mobile first at 390×844 (check 375×667): 44 pt targets, safe areas, `h-dvh`. Main JS ≤ 180 KB gzip; heavy code lazy.
+- Mobile first at 390×844 (check 375×667): 44 pt targets, safe areas, `h-dvh`. Main JS ≤ 230 KB gzip (D56); heavy code lazy.
 - Conventional Commits; the body explains why.

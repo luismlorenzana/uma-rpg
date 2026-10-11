@@ -257,7 +257,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level,
     Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * pay)
   // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
-  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share)
+  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share, node.waves?.length ?? 0)
   const items = { ...paid.world.items }
   for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
   Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens, firstClear })

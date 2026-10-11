@@ -133,7 +133,7 @@ const WILDS: Place[] = [
   {
     id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: 2, mirrorOf: 'kitchen',
     blurb: 'Crafts weapons, armor and accessories. Gear binds to the Uma who equips it.',
-    details: ['Main material sets the type; accent sets the effect', 'Ten grades per tier world'],
+    details: ['Four refined items of the grade plus a Crafting Token of the accent', 'Arms, Tomes, armor, Rings, Charms and Orbs in ten grades'],
     at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
 ]
@@ -142,16 +142,16 @@ function hall(id: string, name: string, cls: string, style: string, weapons: str
   return {
     id, page: 'learning', kind: 'class-hall', name, opensIn: 'S5', slots: 2, at,
     blurb: `Trains the ${cls} rank and the ${cls} Weapon Level. Each rank opens a deeper tier of ${cls} skills; Weapon Level k wears grade-k ${weapons}.`,
-    details: ['Class rank 1–6: each promotion spends a Promotion Token', `Weapon Level 1–10: ${weapons}`, `${style} aptitude sets the training speed`],
+    details: ['Class rank 1–5: each promotion spends a Promotion Token', `Weapon Level 1–10: ${weapons}`, `${style} aptitude sets the training speed`],
   }
 }
 
 const LEARNING: Place[] = [
-  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', 'Front Runner', 'Greatswords, Spears, Axes and Bows', { x: 0.24, y: 0.1 }),
-  hall('mage-tower', 'Mage Tower', 'Mage', 'Pace Chaser', 'Mage Staves and Arcane Staves', { x: 0.76, y: 0.11 }),
-  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', 'Pace Chaser', 'Short Swords', { x: 0.22, y: 0.33 }),
-  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', 'Late Surger', 'Arcane Staves and Cleric Staves', { x: 0.78, y: 0.33 }),
-  hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', 'Summoner Tomes', { x: 0.5, y: 0.56 }),
+  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', 'Front Runner', 'Greatswords, Axes, Lances, Bows and Katanas', { x: 0.24, y: 0.1 }),
+  hall('mage-tower', 'Mage Tower', 'Mage', 'Pace Chaser', 'Fire, Blizzard, Thunder, Light and Dark Tomes', { x: 0.76, y: 0.11 }),
+  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', 'Pace Chaser', 'her three Arms and two Tomes', { x: 0.22, y: 0.33 }),
+  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', 'Late Surger', 'any five Arms and Tomes', { x: 0.78, y: 0.33 }),
+  hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', 'her three Tomes and two Arms', { x: 0.5, y: 0.56 }),
   {
     id: 'armory', page: 'learning', kind: 'armory', name: 'Armory', opensIn: 'S5', slots: 2, at: { x: 0.26, y: 0.82 },
     blurb: 'Trains the Armor Level: level k wears grade-k Garb, Leather, Mail and Plate.',
@@ -159,8 +159,8 @@ const LEARNING: Place[] = [
   },
   {
     id: 'jeweler', page: 'learning', kind: 'armory', name: 'Jeweler', opensIn: 'S5', slots: 2, at: { x: 0.74, y: 0.82 },
-    blurb: 'Trains the Accessory Level: level k wears grade-k Rings and Charms.',
-    details: ['Accessory Level 1–10, for both accessories', 'Her best running-style aptitude sets the training speed'],
+    blurb: 'Trains the Accessory Level: level k wears grade-k Rings, Charms and Orbs.',
+    details: ['Accessory Level 1–10, for every accessory', 'Her best running-style aptitude sets the training speed'],
   },
 ]
 
@@ -168,7 +168,7 @@ const TOWN: Place[] = [
   {
     id: 'stable', page: 'town', kind: 'town', name: 'Stable', opensIn: 'S1', slots: 0, at: { x: 0.26, y: 0.12 },
     blurb: 'Every Uma outfit, locked or yours. Unlock Tickets open new ones.',
-    details: ['Browse all outfits and their profiles', 'Unlocking opens in S2'],
+    details: ['Browse all outfits and their profiles', 'Unlock Tickets open outfits; five Shards make a Ticket'],
   },
   {
     id: 'party-hall', page: 'town', kind: 'town', name: 'Party Hall', opensIn: 'S2', slots: 0, at: { x: 0.75, y: 0.13 },
@@ -178,16 +178,16 @@ const TOWN: Place[] = [
   {
     id: 'scenario-gate', page: 'town', kind: 'town', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.36 },
     blurb: 'The world map: a continent per scenario, ten levels each, with regions of stages to clear.',
-    details: ['Tier 1: URA Finale → Grand Masters', 'Fight PriConne rivals with a party of five: EXP, Shards and Laurels'],
+    details: ['Tier 1: five continents of 40 regions', 'Fight rivals with a party of five: EXP, Shards, Laurels and tokens'],
   },
   {
     id: 'warehouse', page: 'town', kind: 'town', name: 'Warehouse', opensIn: 'S4', slots: 0, at: { x: 0.24, y: 0.6 },
-    blurb: 'Every item you own: ingredients, materials, dishes and gear.',
+    blurb: 'Every item you own: ingredients, materials, dishes, gear and tokens.',
     details: ['160 raw and 160 refined items across 16 families', 'Filled by the sites, the Pantry, the Workbench and the Exchange'],
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
-    blurb: 'Spend Laurels from battles on raw items, Time Tickets and Sweep Tickets; swap tokens three for one.',
+    blurb: 'Spend Laurels from battles on raw items, Time Tickets and Sweep Tickets; trade tokens, two for one of another kind.',
     details: ['Raw items of every continent you have reached', 'Time Ticket: 30 minutes off any job or training', 'Sweep: clear a beaten regular stage now'],
   },
   {

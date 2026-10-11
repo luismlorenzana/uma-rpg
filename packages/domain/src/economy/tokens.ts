@@ -61,12 +61,13 @@ function hash(text: string): number {
 const roll = (key: string): number => hash(key) / 4294967296
 
 /** The tokens a win drops, decided by its seed so a replayed fight drops the same ones. On a replay (`share` below 1,
- * D79) each drop happens only with that chance. */
-export function rollTokens(seed: string, kind: keyof typeof TOKEN_DROPS, band: number, share = 1): Record<string, number> {
+ * D79) each drop happens only with that chance. A stage in waves drops one more per extra wave (`extra`, D93), so its
+ * 1.5× EXP doesn't thin the tokens an Uma earns per level (D82). */
+export function rollTokens(seed: string, kind: keyof typeof TOKEN_DROPS, band: number, share = 1, extra = 0): Record<string, number> {
   const out: Record<string, number> = {}
   const add = (id: string) => { out[id] = (out[id] ?? 0) + 1 }
   const pick = <T>(list: readonly T[], key: string): T => list[Math.floor(roll(key) * list.length)]!
-  for (let i = 0; i < TOKEN_DROPS[kind]; i++) {
+  for (let i = 0; i < TOKEN_DROPS[kind] + extra; i++) {
     if (share < 1 && roll(`${seed}:keep:${i}`) >= share) continue
     const r = roll(`${seed}:kind:${i}`)
     const guaranteed = i === 0 && (kind === 'sub-boss' || kind === 'boss')
