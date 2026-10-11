@@ -47,13 +47,12 @@ The numbers are a first pass from the pacing model (D54), pinned by tests but no
 
 ## Quality of life
 
-1. **Repeat** a finished job with one tap, and an optional queue per slot.
-2. **Collect everything** across the Hub in one tap (today: per place).
-3. **Notifications** when jobs or training finish (PWA push isn't set up).
-4. **Sweep ×N** for a beaten fight.
-5. **Filters**: the Kitchen's 100 dishes, the Stable by Farm/Craft Level or class rank, the Warehouse by grade.
-6. **The Observatory**: what a locked node needs, shown on tap.
-7. **Warehouse limits**: nothing can be sold or discarded; storage is unlimited.
+1. **A job queue** per slot (one-tap **Repeat** and **Rank up · train next** shipped 2026-10-10).
+2. **Notifications** when jobs or training finish (PWA push isn't set up).
+3. **Sweep ×N** for a beaten fight.
+4. **Filters**: the Stable by Farm/Craft Level or class rank, the Warehouse by grade (the Kitchen got kind and
+   "can cook now" filters).
+5. **Warehouse limits**: nothing can be sold or discarded; storage is unlimited.
 
 ## Engineering
 

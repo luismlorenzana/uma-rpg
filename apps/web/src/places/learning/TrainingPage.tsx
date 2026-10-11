@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectEverything, recall, train, upgrade, useWorld } from '../../save/game'
+import { collect, collectEverything, rankUpAndContinue, recall, train, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
@@ -66,7 +66,8 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
         {facility.jobs.map((job, slot) => (
           <li key={slot}>
             {job ? (
-              <TrainingCard view={view} job={job} now={now} onCollect={() => run(() => collect(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))} />
+              <TrainingCard view={view} job={job} now={now} onCollect={() => run(() => collect(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))}
+                onContinue={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => rankUpAndContinue(placeId, slot, o)) }} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
                 <span className="flex size-10 items-center justify-center rounded-full bg-raised text-xl text-ink-faint">+</span>
@@ -83,7 +84,7 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-function TrainingCard({ view, job, now, onCollect, onRecall }: { view: MasterView; job: Job; now: string; onCollect: () => void; onRecall: () => void }) {
+function TrainingCard({ view, job, now, onCollect, onRecall, onContinue }: { view: MasterView; job: Job; now: string; onCollect: () => void; onRecall: () => void; onContinue: () => void }) {
   const track = parseTrack(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
   const done = jobFinished(job, now) >= job.count
@@ -102,6 +103,7 @@ function TrainingCard({ view, job, now, onCollect, onRecall }: { view: MasterVie
       </span>
       <div className="mt-2 flex gap-2">
         <button type="button" disabled={!done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">Rank up</button>
+        {done && <button type="button" onClick={onContinue} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold">Rank up · train next</button>}
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft">Recall</button>
       </div>
     </div>

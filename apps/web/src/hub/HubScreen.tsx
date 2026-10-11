@@ -12,8 +12,10 @@ import { MenuSheet } from './MenuSheet'
 import { useHubNavigation } from './navigation'
 import { OverlayHost } from './OverlayHost'
 import { PageTabs } from './PageTabs'
-import { PlaceTargets } from './PlaceTargets'
+import { PlaceTargets, readyPlaces } from './PlaceTargets'
 import { lastPage, neighbourPage, rememberPage, swipeDirection, type Point } from './swipe'
+import { collectEverything, useWorld } from '../save/game'
+import { useNow } from '../ui/useNow'
 
 function useReducedMotion(): boolean {
   const query = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null
@@ -66,6 +68,25 @@ function QuickLook({ place, onEnter }: { place: Place; onEnter: () => void }) {
   )
 }
 
+/** One tap collects every finished job and training on every page (the backlog's "collect everything"). */
+function CollectAll() {
+  const world = useWorld()
+  const now = useNow(15_000)
+  const [note, setNote] = useState<string | null>(null)
+  const ready = readyPlaces(world, now).size
+  if (ready === 0 && !note) return null
+  return (
+    <button type="button" disabled={ready === 0}
+      onClick={() => void collectEverything().then((r) => {
+        setNote(r.items > 0 ? `+${r.items} collected` : 'Collected')
+        setTimeout(() => setNote(null), 2200)
+      })}
+      className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-success px-4 py-2 font-display text-[14px] font-bold text-white shadow-3 disabled:opacity-80">
+      {note ?? `Collect all · ${ready} ready`}
+    </button>
+  )
+}
+
 function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const nav = useHubNavigation()
   const [menu, setMenu] = useState(false)
@@ -93,6 +114,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
       >
         <HubCanvas page={page} places={places} paused={peek !== undefined || menu} reducedMotion={reducedMotion} />
         <PlaceTargets places={places} onOpen={nav.peek} />
+        <CollectAll />
       </main>
       <PageTabs page={page} onPage={nav.goPage} onMenu={() => setMenu(true)} />
       {menu && (

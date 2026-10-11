@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, startTraining, sweepFight, upgradeFacility, type Track, type WorkOutfit,
+  parseTrack, buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, startTraining, sweepFight, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
@@ -169,6 +169,26 @@ export async function collectEverything(placeIds?: readonly string[]): Promise<{
   const r = collectAll(save, nowIso(), placeIds)
   if (r.items > 0 || r.save.tierWorlds['1'] !== save.tierWorlds['1']) await commit(r.save)
   return { items: r.items, levelsUp: r.levelsUp }
+}
+
+/** Collects a finished job and starts the same one again with the same Uma (if the Warehouse covers its inputs). */
+export async function collectAndRepeat(placeId: string, slot: number, outfit: WorkOutfit): Promise<void> {
+  const { save } = useGame.getState()
+  const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
+  if (!save || !job) return
+  const now = nowIso()
+  const collected = collectJob(save, placeId, slot, now).save
+  await commit(startJob(collected, placeId, slot, outfit, job.output, job.count, now))
+}
+
+/** Ranks up a finished training and starts the next rank with the same Uma. */
+export async function rankUpAndContinue(placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3]): Promise<void> {
+  const { save } = useGame.getState()
+  const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
+  const track = job ? parseTrack(job.output) : null
+  if (!save || !job || !track) return
+  const now = nowIso()
+  await commit(startTraining(collectJob(save, placeId, slot, now).save, placeId, slot, outfit, track, now))
 }
 
 export async function sweep(chapter: RpgCampaignChapter, party: number, nodeId: string): Promise<FightResult> {

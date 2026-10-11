@@ -48,7 +48,10 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
     op().then((r) => ok && setMessage(ok(r)), (err: unknown) => setMessage(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   }
   const toggle = (node: string) => {
-    if (!uma.stars.unlocked.includes(node)) return
+    if (!uma.stars.unlocked.includes(node)) {
+      const kind = node.split(':')[0]
+      return setMessage(`${nodeLabel(node)}: eat a grade-${nodeGrade(node)}+ ${kind === 'moon' ? 'dish of its planet' : kind === 'bridge' ? 'Duo dish of its pair' : 'Feast'} (cook it at the Kitchen)`)
+    }
     const on = uma.stars.active.includes(node)
     if (!on && uma.stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
     run(() => activate(id, on ? uma.stars.active.filter((n) => n !== node) : [...uma.stars.active, node]))

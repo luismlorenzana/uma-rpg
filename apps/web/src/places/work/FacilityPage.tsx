@@ -11,7 +11,7 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectEverything, recall, rush, startWork, upgrade, useWorld } from '../../save/game'
+import { collect, collectAndRepeat, collectEverything, recall, rush, startWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
@@ -69,6 +69,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
           <li key={slot}>
             {job ? (
               <JobCard view={view} job={job} now={now} placeId={placeId} onCollect={() => run(() => collect(placeId, slot))}
+                onRepeat={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => collectAndRepeat(placeId, slot, o)) }}
                 onRush={() => run(() => rush(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))} rushTickets={world.wallet.rushTickets} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
@@ -87,8 +88,8 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRush, onRecall }: {
-  view: MasterView; job: Job; now: string; placeId: string; rushTickets: number; onCollect: () => void; onRush: () => void; onRecall: () => void
+function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, onRush, onRecall }: {
+  view: MasterView; job: Job; now: string; placeId: string; rushTickets: number; onCollect: () => void; onRepeat: () => void; onRush: () => void; onRecall: () => void
 }) {
   const item = outputView(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
@@ -117,6 +118,11 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRush, onRe
         <button type="button" disabled={readyCount <= 0 && !done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">
           {done ? `Collect ${readyCount}` : `Collect${readyCount > 0 ? ` ${readyCount}` : ''}`}
         </button>
+        {done && (
+          <button type="button" onClick={onRepeat} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold" aria-label={`Collect and make ${job.count} more`}>
+            Repeat ×{job.count}
+          </button>
+        )}
         {!done && (
           <button type="button" disabled={rushTickets < cost} onClick={onRush} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold disabled:opacity-35" aria-label={`Rush for ${cost} Rush Tickets`}>
             Rush · {cost}
@@ -140,6 +146,8 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
   const [output, setOutput] = useState<string | null>(null)
   const [count, setCount] = useState(10)
   const [error, setError] = useState<string | null>(null)
+  const [dishKind, setDishKind] = useState<'planet' | 'duo' | 'feast'>('planet')
+  const [readyOnly, setReadyOnly] = useState(false)
   const owned = view.roster.filter((o) => world.umas[o.outfitId])
     .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession] }))
     .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || a.o.name.localeCompare(b.o.name))
@@ -147,7 +155,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
     ? spec.kind === 'gather'
       ? familyById(spec.family!)!.raw.map((i) => i.id)
       : spec.kind === 'cook'
-        ? DISHES.map((d) => d.id)
+        ? DISHES.filter((d) => d.kind === dishKind).map((d) => d.id)
         : ITEM_FAMILIES.filter((f) => f.side === profession).flatMap((f) => f.refined.map((i) => i.id))
     : []
   const plan = outfit && output ? planJob(world, placeId, outfit, output, count) : null
@@ -187,9 +195,25 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
       {outfit && !output && spec.kind === 'craft' && (
         <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} onPick={(id, have) => { setOutput(id); setCount(Math.max(1, Math.min(10, have))) }} />
       )}
+      {outfit && !output && spec.kind === 'cook' && (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {(['planet', 'duo', 'feast'] as const).map((k) => (
+            <button key={k} type="button" onClick={() => setDishKind(k)}
+              className={`min-h-9 rounded-full px-3 text-[12px] font-semibold ${dishKind === k ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'}`}>
+              {k === 'planet' ? 'Dishes' : k === 'duo' ? 'Duo dishes' : 'Feasts'}
+            </button>
+          ))}
+          <button type="button" aria-pressed={readyOnly} onClick={() => setReadyOnly((v) => !v)}
+            className={`min-h-9 rounded-full px-3 text-[12px] font-semibold ${readyOnly ? 'bg-success text-white' : 'bg-raised text-ink-soft'}`}>Can cook now</button>
+        </div>
+      )}
       {outfit && !output && spec.kind !== 'craft' && (
         <div className="grid grid-cols-2 gap-1.5">
-          {options.map((id) => {
+          {options.filter((id) => {
+            if (!readyOnly || spec.kind !== 'cook') return true
+            const p = planJob(world, placeId, outfit, id, 1)
+            return !!p && !p.block
+          }).map((id) => {
             const out = outputView(id)
             const p = planJob(world, placeId, outfit, id, 1)
             const locked = world.umas[outfit.outfitId]!.professions[profession].level < gradeUnlockLevel(out.grade)
