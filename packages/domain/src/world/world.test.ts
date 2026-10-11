@@ -42,4 +42,16 @@ describe('the world map (D66, D71)', () => {
     const foes = regionChapter(rift, cast).nodes.flatMap((n) => n.enemies)
     expect(foes.every((f) => f.weaknesses.elements.length === 0 && f.weaknesses.weapons.length >= 1)).toBe(true)
   })
+
+  it('dresses each biome in its franchise: Sky Isles PriConne, Underworld Azur Lane, the rest P&D by element (D76)', () => {
+    const packs = {
+      priconne: [{ id: 'pc1', name: 'P1' }, { id: 'pc2', name: 'P2' }, { id: 'pc3', name: 'P3' }],
+      pad: (['fire', 'ice', 'lightning', 'light', 'dark'] as const).flatMap((element) => [1, 2, 3].map((n) => ({ id: `pad-${element}-${n}`, name: `${element} ${n}`, element }))),
+    }
+    const c = worldContinent({ name: 'URA', order: 1 })
+    const faces = (biome: string) => regionChapter(c.regions.find((r) => r.biome === biome)!, packs).nodes.flatMap((n) => n.enemies)
+    expect(faces('sky').every((f) => f.castId.startsWith('pc'))).toBe(true)
+    expect(faces('underworld').every((f) => f.castId.startsWith('pc'))).toBe(true)
+    expect(faces('meadow').every((f) => f.castId === `pad-${f.element}-${f.castId.split('-').pop()}`)).toBe(true)
+  })
 })

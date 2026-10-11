@@ -2,7 +2,7 @@
 // RPG and changed for uma-rpg: every class is free to use (design §5), each class build keeps its own tree with the
 // full point budget, and depths open by Uma level until S5's class ranks replace the gates (D49).
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { RPG_VARIANTS_PER_TREE, rpgNode, type RpgNode } from './catalog'
+import { RPG_VARIANTS_PER_TREE, rpgNode, rpgSideNodeLevel, type RpgNode } from './catalog'
 import { type RpgClass, type RpgTreeId, type RpgWeapon, type RpgWeaponKind } from './kinds'
 
 export * from './kinds'
@@ -10,7 +10,8 @@ export * from './kinds'
 export const RPG_TIER_MAX_LEVEL = 50
 /** Two points a level up to Lv45, plus five each time a depth opens: 115 a tier. */
 export const RPG_TREE_POINTS_PER_LEVEL = 2
-export const RPG_TREE_POINT_MAX_LEVEL = 45
+/** Two points a level all the way to Lv50 (D73: side nodes at every depth need the room). */
+export const RPG_TREE_POINT_MAX_LEVEL = 50
 export const RPG_TREE_POINTS_PER_DEPTH = 5
 /** Uma levels that open depths 1–5 (D49: until S5's class ranks). */
 export const RPG_DEPTH_GATES = [1, 10, 20, 30, 40] as const
@@ -228,6 +229,7 @@ export function rpgLearnBlock(profile: Pick<RpgProfile, 'classId' | 'weapons' | 
   if (profile.tree.some((ref) => ref.id === id)) return 'Already learned'
   const depth = rpgDepthBlock(profile, node.depth)
   if (depth) return depth
+  if (node.variant !== null && profile.level < rpgSideNodeLevel(node.depth)) return `Opens at Lv${rpgSideNodeLevel(node.depth)}`
   if (rpgTreePointsSpent(profile.tree) + node.cost > rpgTreePointsEarned(profile.level)) return 'Not enough points'
   return rpgShapeBlock(profile.tree.map((ref) => rpgNode(ref.id)!).filter(Boolean), node)
 }
@@ -263,6 +265,7 @@ export function validRpgTree(profile: Pick<RpgProfile, 'classId' | 'weapons' | '
   for (const ref of profile.tree) {
     const node = rpgNode(ref.id)
     if (!node || ref.tier !== profile.tier || !trees.includes(node.tree) || rpgDepthBlock(profile, node.depth)) return false
+    if (node.variant !== null && profile.level < rpgSideNodeLevel(node.depth)) return false
     nodes.push(node)
   }
   if (new Set(nodes.map((n) => n.id)).size !== nodes.length || rpgTreePointsSpent(profile.tree) > rpgTreePointsEarned(profile.level)) return false

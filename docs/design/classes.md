@@ -118,6 +118,10 @@ mark, weaken).
 
 ## 5. Points, variants and slots
 
+- **uma-rpg (D73):** points are two a level to **Lv50** plus five whenever a depth opens. A depth's core opens with the class
+  rank; its **variants open at Uma Lv 5, 15, 25, 35 and 45**. The attack-skill trees have forks at every depth (1–5) and
+  allow five variants per tree; the Cleric's blessings keep their forks at depths 2–4. The bullets below are uma-racer's
+  original rules.
 - **Points are unchanged:** two a level up to Lv45 plus five whenever a depth opens (Lv1/10/20/30/40): 115 at Lv45.
 - **Skill levels are gone.** A node is learned once; Fire → Fira → Firaga → Firaja is the power curve. A cheap low
   tier stays useful because MP carries between fights.

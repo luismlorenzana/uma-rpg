@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  parseTrack, sweepMany, sellStock, swapTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, rushJob, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
+  parseTrack, sweepMany, sellStock, swapTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, cutJobTime, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
@@ -138,14 +138,15 @@ export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, out
 export const recall = (placeId: string, slot: number) => edit((s, now) => recallJob(s, placeId, slot, now))
 export const train = (placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3], track: Track) =>
   edit((s, now) => startTraining(s, placeId, slot, outfit, track, now))
-export const rush = (placeId: string, slot: number) => edit((s, now) => rushJob(s, placeId, slot, now))
+/** Spends Time Tickets on a job or training, 30 minutes each (D74). */
+export const cutTime = (placeId: string, slot: number, tickets: number) => edit((s, now) => cutJobTime(s, placeId, slot, tickets, now))
 /** Queues another job after the slot's current one, same Uma (QoL, D62). */
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
   edit((s, now) => queueJob(s, placeId, slot, outfit, output, count, now))
 export const unqueueWork = (placeId: string, slot: number, index: number) => edit((s, now) => unqueueJob(s, placeId, slot, index, now))
 export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, placeId, now))
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
-export const buyTicket = (kind: 'rush' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
+export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
 export const sell = (shelf: Shelf, id: string, quantity: number) => edit((s, now) => sellStock(s, shelf, id, quantity, now))
 /** Three tokens of a kind and band for one of your choice (D67). */
 export const swap = (offered: Record<string, number>, wanted: string) => edit((s, now) => swapTokens(s, offered, wanted, now))

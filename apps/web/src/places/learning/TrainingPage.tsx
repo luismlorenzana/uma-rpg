@@ -10,12 +10,13 @@ import { useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectEverything, queueWork, rankUpAndContinue, recall, train, unqueueWork, upgrade, useWorld } from '../../save/game'
+import { collect, collectEverything, cutTime, queueWork, rankUpAndContinue, recall, train, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { QueueList } from '../work/QueueList'
+import { TimeCut } from '../work/TimeCut'
 
 const SPEED: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 const STYLE_LABEL: Record<string, string> = { front: 'Front', pace: 'Pace', late: 'Late', end: 'End', sprint: 'Sprint', mile: 'Mile', medium: 'Medium', long: 'Long' }
@@ -59,7 +60,7 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
         <p className="text-[13px] text-ink-soft">
           {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth, and each promotion spends a Promotion Token of its band (fights drop them). Weapon Level k wears grade-k weapons of this class.'
             : GEAR_HALLS[placeId] === 'armor' ? 'Armor Level k wears grade-k Garb, Leather, Mail and Plate.' : 'Accessory Level k wears grade-k Rings and Charms.'}{' '}
-          {aptitudeKey(placeId)} aptitude sets the speed. Training can’t be rushed.
+          {aptitudeKey(placeId)} aptitude sets the speed. Time Tickets take 30 minutes off.
         </p>
         <div className="mt-2 flex items-center justify-between text-[12px] text-ink-soft">
           <span>Level {facility.level} · {facility.jobs.length} slots</span>
@@ -78,7 +79,7 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
               <TrainingCard view={view} world={world} job={job} now={now} tracks={tracks} onCollect={() => run(() => collect(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))}
                 onContinue={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => rankUpAndContinue(placeId, slot, o)) }}
                 onQueue={(t) => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => queueWork(placeId, slot, o, trackId(t), 1)) }}
-                onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
+                onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} timeTickets={world.wallet.timeTickets} onCut={(n) => run(() => cutTime(placeId, slot, n))} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
                 <span className="flex size-10 items-center justify-center rounded-full bg-raised text-xl text-ink-faint">+</span>
@@ -95,9 +96,9 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onContinue, onQueue, onUnqueue }: {
+function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onContinue, onQueue, onUnqueue, timeTickets, onCut }: {
   view: MasterView; world: TierWorld; job: Job; now: string; tracks: Track[]; onCollect: () => void; onRecall: () => void; onContinue: () => void
-  onQueue: (t: Track) => void; onUnqueue: (index: number) => void
+  onQueue: (t: Track) => void; onUnqueue: (index: number) => void; timeTickets: number; onCut: (n: number) => void
 }) {
   const track = parseTrack(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
@@ -124,6 +125,7 @@ function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onCo
       <div className="mt-2 flex gap-2">
         <button type="button" disabled={!done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">Rank up</button>
         {done && job.queue.length === 0 && <button type="button" onClick={onContinue} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold">Rank up · train next</button>}
+        <TimeCut job={job} now={now} tickets={timeTickets} onCut={onCut} />
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft">Recall</button>
       </div>
       <QueueList job={job} now={now} onRemove={onUnqueue} note={track?.kind === 'class' ? 'Each rank starts when the one before ends and spends its Promotion Token then; the queue stops if you have none.' : 'Each rank starts training when the one before ends.'} label={(q) => {

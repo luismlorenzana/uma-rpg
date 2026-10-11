@@ -38,6 +38,13 @@ export const BIOMES: readonly BiomeDef[] = [
   { id: 'ruins', name: 'Ancient Ruins', signatures: [['light', 'dark'], ['fire'], ['ice'], ['lightning']], formations: ['escort', 'trio'], roles: ['guard'], color: '#a39a86' },
   { id: 'rift', name: 'Twilight Rift', signatures: [['light', 'dark']], formations: ['solo'], roles: ['striker', 'caster'], color: '#3d3f8f' },
 ]
+/** Whose faces a biome's foes wear (D76): the angelic Sky Isles PriConne's cast, the demonic Underworld Azur Lane's,
+ * everywhere else Puzzle & Dragons monsters as a placeholder. Packs are private content; a missing pack falls back to
+ * PriConne. */
+export type Franchise = 'priconne' | 'azurlane' | 'pad'
+export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'pad']
+export const biomeFranchise = (biome: Biome): Franchise => (biome === 'sky' ? 'priconne' : biome === 'underworld' ? 'azurlane' : 'pad')
+
 const BY_ID = new Map(BIOMES.map((b) => [b.id, b]))
 export const biomeById = (id: Biome): BiomeDef => BY_ID.get(id)!
 

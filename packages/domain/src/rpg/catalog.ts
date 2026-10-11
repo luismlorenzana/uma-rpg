@@ -8,8 +8,11 @@ export const RPG_SKILL_MP = [10, 14, 18, 22, 26] as const
 /** Every-foe skills deal this share of single-target power to each foe; random multi-hits get a small bonus. */
 export const RPG_AOE_SHARE = 0.55
 export const RPG_RANDOM_BONUS = 1.05
-export const RPG_VARIANT_DEPTHS = [2, 3, 4] as const
-export const RPG_VARIANTS_PER_TREE = 3
+/** Side nodes (variants) sit at every depth of the active-skill trees (D73; Cleric blessings keep theirs at 2–4). */
+export const RPG_VARIANT_DEPTHS = [1, 2, 3, 4, 5] as const
+export const RPG_VARIANTS_PER_TREE = 5
+/** A depth's side nodes open at mid-band, Uma Lv 5, 15, 25, 35 and 45 (D73): its core opens with the class rank. */
+export const rpgSideNodeLevel = (depth: number): number => 10 * depth - 5
 
 export interface RpgPart { kind: RpgDamageKind; share: number }
 export interface RpgHit { power: number; parts: RpgPart[] }
@@ -104,7 +107,7 @@ function addActive(spec: ActiveTree): void {
       for (const side of ['a', 'b'] as const) {
         const variant = (side === 'a' ? spec.a : spec.b)(b.branch, d)
         NODES.push({ id: `${spec.tree}.${b.branch}.${d}${side}`, tree: spec.tree, branch: b.branch, depth: d, variant: side,
-          name: (side === 'a' ? b.a : b.b)[d - 2]!, cost: d, skill: variant, passive: null, summary: spec.summary(variant) })
+          name: (side === 'a' ? b.a : b.b)[d - 1]!, cost: d, skill: variant, passive: null, summary: spec.summary(variant) })
       }
     }
   }
@@ -130,11 +133,11 @@ const el = (branch: string) => branch as Elemental
 
 addActive({ tree: 'greatsword', summary: describe, branches: [
   { branch: 'fire', names: ['Flame Slash', 'Blazing Cleave', 'Inferno Edge', 'Volcanic Rend', 'Meteor Strike'],
-    a: ['Searing Crush', 'Magma Breaker', 'Cataclysm'], b: ['Twin Embers', 'Ember Flurry', 'Wildfire Combo'] },
+    a: ['Scorch Crush', 'Searing Crush', 'Magma Breaker', 'Cataclysm', 'Worldbreaker'], b: ['Ember Pair', 'Twin Embers', 'Ember Flurry', 'Wildfire Combo', 'Inferno Combo'] },
   { branch: 'ice', names: ['Frost Slash', 'Rime Cleave', 'Glacier Edge', 'Frozen Rend', 'Glacial Execution'],
-    a: ['Avalanche Crush', 'Permafrost Breaker', 'Iceberg Splitter'], b: ['Twin Icicles', 'Hailstorm Flurry', 'Blizzard Combo'] },
+    a: ['Chill Crush', 'Avalanche Crush', 'Permafrost Breaker', 'Iceberg Splitter', 'Worldfrost Splitter'], b: ['Icicle Pair', 'Twin Icicles', 'Hailstorm Flurry', 'Blizzard Combo', 'Whiteout Combo'] },
   { branch: 'lightning', names: ['Volt Slash', 'Thunder Cleave', 'Tempest Edge', 'Lightning Rend', "Heaven's Fury"],
-    a: ['Storm Crush', 'Thunderclap Breaker', 'Judgment Blade'], b: ['Twin Sparks', 'Static Flurry', 'Chain Combo'] },
+    a: ['Jolt Crush', 'Storm Crush', 'Thunderclap Breaker', 'Judgment Blade', 'Ragnarok Blade'], b: ['Spark Pair', 'Twin Sparks', 'Static Flurry', 'Chain Combo', 'Tempest Combo'] },
 ],
 core: (b, d) => ({ target: 'one', hits: dual(at(GH, d), power(d), 'greatsword', el(b)), mp: mp(d), primary: el(b),
   ...(d === 5 ? { rider: { status: RIDER[el(b)], stacks: 2, per: 'foe' as const } } : {}) }),
@@ -144,11 +147,11 @@ b: (b, d) => ({ target: 'one', hits: dual(at(GH, d) + 1, 0.92 * power(d), 'great
 
 addActive({ tree: 'spear', summary: describe, branches: [
   { branch: 'fire', names: ['Ember Thrust', 'Flame Lance', 'Burning Barrage', 'Inferno Spiral', "Dragon's Rain"],
-    a: ['Searing Pierce', 'Magma Pierce', 'Inferno Pierce'], b: ['Steam Lance', 'Steam Barrage', 'Steam Spiral'] },
+    a: ['Ember Pierce', 'Searing Pierce', 'Magma Pierce', 'Inferno Pierce', 'Solar Pierce'], b: ['Steam Jab', 'Steam Lance', 'Steam Barrage', 'Steam Spiral', 'Steam Tempest'] },
   { branch: 'ice', names: ['Frost Thrust', 'Ice Lance', 'Shard Barrage', 'Blizzard Spiral', 'Glacier Rain'],
-    a: ['Glacial Pierce', 'Permafrost Pierce', 'Absolute Pierce'], b: ['Frostvolt Lance', 'Frostvolt Barrage', 'Frostvolt Spiral'] },
+    a: ['Chill Pierce', 'Glacial Pierce', 'Permafrost Pierce', 'Absolute Pierce', 'Zero Pierce'], b: ['Frostvolt Jab', 'Frostvolt Lance', 'Frostvolt Barrage', 'Frostvolt Spiral', 'Frostvolt Tempest'] },
   { branch: 'lightning', names: ['Spark Thrust', 'Volt Lance', 'Static Barrage', 'Thunder Spiral', 'Storm Rain'],
-    a: ['Thunder Pierce', 'Storm Pierce', 'Heaven Pierce'], b: ['Plasma Lance', 'Plasma Barrage', 'Plasma Spiral'] },
+    a: ['Spark Pierce', 'Thunder Pierce', 'Storm Pierce', 'Heaven Pierce', 'Godspeed Pierce'], b: ['Plasma Jab', 'Plasma Lance', 'Plasma Barrage', 'Plasma Spiral', 'Plasma Tempest'] },
 ],
 core: (b, d) => ({ target: 'random', hits: alternate(at(SH, d), RPG_RANDOM_BONUS * power(d), 'spear', el(b)), mp: mp(d), primary: el(b),
   ...(d === 5 ? { rider: { status: RIDER[el(b)], stacks: 1, per: 'element-hit' as const } } : {}) }),
@@ -159,11 +162,11 @@ b: (b, d) => ({ target: 'random', hits: [...alternate(at(SH, d), RPG_RANDOM_BONU
 
 addActive({ tree: 'axe', summary: describe, branches: [
   { branch: 'fire', names: ['Flame Sweep', 'Blazing Whirl', 'Inferno Cyclone', 'Volcanic Quake', 'Firestorm'],
-    a: ['Ember Rampage', 'Blaze Rampage', 'Inferno Rampage'], b: ['Pyre Execution', 'Searing Execution', 'Cinder Execution'] },
+    a: ['Kindling Rampage', 'Ember Rampage', 'Blaze Rampage', 'Inferno Rampage', 'Pyroclasm Rampage'], b: ['Ash Execution', 'Pyre Execution', 'Searing Execution', 'Cinder Execution', 'Phoenix Execution'] },
   { branch: 'ice', names: ['Frost Sweep', 'Rime Whirl', 'Glacier Cyclone', 'Avalanche Quake', 'Absolute Maelstrom'],
-    a: ['Hail Rampage', 'Sleet Rampage', 'Blizzard Rampage'], b: ['Frostbite Execution', 'Rime Execution', 'Glacier Execution'] },
+    a: ['Flurry Rampage', 'Hail Rampage', 'Sleet Rampage', 'Blizzard Rampage', 'Avalanche Rampage'], b: ['Chill Execution', 'Frostbite Execution', 'Rime Execution', 'Glacier Execution', 'Absolute Execution'] },
   { branch: 'lightning', names: ['Volt Sweep', 'Thunder Whirl', 'Tempest Cyclone', 'Thunderclap Quake', 'Thunderstorm'],
-    a: ['Spark Rampage', 'Static Rampage', 'Tempest Rampage'], b: ['Storm Execution', 'Thunder Execution', 'Judgment Execution'] },
+    a: ['Jolt Rampage', 'Spark Rampage', 'Static Rampage', 'Tempest Rampage', 'Ragnarok Rampage'], b: ['Shock Execution', 'Storm Execution', 'Thunder Execution', 'Judgment Execution', 'Heaven Execution'] },
 ],
 core: (b, d) => ({ target: 'all', hits: dual(at(GH, d), RPG_AOE_SHARE * power(d), 'axe', el(b)), mp: mp(d) + 4, primary: el(b),
   ...(d === 5 ? { rider: { status: RIDER[el(b)], stacks: 1, per: 'foe' as const } } : {}) }),
@@ -174,11 +177,11 @@ b: (b, d) => ({ target: 'all', hits: dual(at(GH, d), 0.45 * power(d), 'axe', el(
 
 addActive({ tree: 'bow', summary: describe, branches: [
   { branch: 'fire', names: ['Fire Arrow', 'Twin Flame Arrows', 'Blazing Quiver', 'Inferno Volley', 'Sunfall Barrage'],
-    a: ['Searing Shot', 'Magma Shot', 'Sun Lance Shot'], b: ['Exploding Arrow', 'Cluster Fire', 'Napalm Volley'] },
+    a: ['Ember Shot', 'Searing Shot', 'Magma Shot', 'Sun Lance Shot', 'Solar Flare Shot'], b: ['Flare Arrow', 'Exploding Arrow', 'Cluster Fire', 'Napalm Volley', 'Firestorm Volley'] },
   { branch: 'ice', names: ['Ice Arrow', 'Twin Frost Arrows', 'Frozen Quiver', 'Blizzard Volley', 'Diamond Dust Barrage'],
-    a: ['Icicle Shot', 'Glacial Shot', 'Comet Shot'], b: ['Shatter Arrow', 'Frost Cluster', 'Hail Volley'] },
+    a: ['Frost Shot', 'Icicle Shot', 'Glacial Shot', 'Comet Shot', 'Starfall Shot'], b: ['Splinter Arrow', 'Shatter Arrow', 'Frost Cluster', 'Hail Volley', 'Diamond Volley'] },
   { branch: 'lightning', names: ['Spark Arrow', 'Twin Volt Arrows', 'Static Quiver', 'Thunder Volley', 'Thunderhead Barrage'],
-    a: ['Rail Shot', 'Volt Shot', 'Thunderbolt Shot'], b: ['Arc Arrow', 'Chain Cluster', 'Storm Volley'] },
+    a: ['Spark Shot', 'Rail Shot', 'Volt Shot', 'Thunderbolt Shot', 'Railgun Shot'], b: ['Fork Arrow', 'Arc Arrow', 'Chain Cluster', 'Storm Volley', 'Tempest Volley'] },
 ],
 core: (b, d) => ({ target: 'one', hits: alternate(at(SH, d), power(d), 'bow', el(b)), mp: mp(d), primary: el(b),
   ...(d === 5 ? { rider: { status: RIDER[el(b)], stacks: 1, per: 'element-hit' as const } } : {}) }),
@@ -198,9 +201,9 @@ const SHAPES: Readonly<Record<string, readonly [Shape, Shape, Shape]>> = {
   lightning: [(d) => chain('lightning', d), (d) => single('lightning', d), (d) => wave('lightning', d)],
 }
 addActive({ tree: 'mage-staff', summary: describe, branches: [
-  { branch: 'fire', names: ['Fire', 'Fira', 'Firaga', 'Firaja', 'Flare Star'], a: ['Fira Wave', 'Firaga Wave', 'Firaja Wave'], b: ['Fira Chain', 'Firaga Chain', 'Firaja Chain'] },
-  { branch: 'ice', names: ['Blizzard', 'Blizzara', 'Blizzaga', 'Blizzaja', 'Absolute Zero'], a: ['Blizzara Spike', 'Blizzaga Spike', 'Blizzaja Spike'], b: ['Blizzara Shards', 'Blizzaga Shards', 'Blizzaja Shards'] },
-  { branch: 'lightning', names: ['Thunder', 'Thundara', 'Thundaga', 'Thundaja', 'Judgment Storm'], a: ['Thundara Bolt', 'Thundaga Bolt', 'Thundaja Bolt'], b: ['Thundara Storm', 'Thundaga Storm', 'Thundaja Storm'] },
+  { branch: 'fire', names: ['Fire', 'Fira', 'Firaga', 'Firaja', 'Flare Star'], a: ['Fire Wave', 'Fira Wave', 'Firaga Wave', 'Firaja Wave', 'Flare Wave'], b: ['Fire Chain', 'Fira Chain', 'Firaga Chain', 'Firaja Chain', 'Flare Chain'] },
+  { branch: 'ice', names: ['Blizzard', 'Blizzara', 'Blizzaga', 'Blizzaja', 'Absolute Zero'], a: ['Blizzard Spike', 'Blizzara Spike', 'Blizzaga Spike', 'Blizzaja Spike', 'Zero Spike'], b: ['Blizzard Shards', 'Blizzara Shards', 'Blizzaga Shards', 'Blizzaja Shards', 'Zero Shards'] },
+  { branch: 'lightning', names: ['Thunder', 'Thundara', 'Thundaga', 'Thundaja', 'Judgment Storm'], a: ['Thunder Bolt', 'Thundara Bolt', 'Thundaga Bolt', 'Thundaja Bolt', 'Judgment Bolt'], b: ['Thunder Squall', 'Thundara Storm', 'Thundaga Storm', 'Thundaja Storm', 'Judgment Tempest'] },
 ],
 core: (b, d) => {
   if (d < 5) return SHAPES[b]![0](d)
@@ -217,9 +220,9 @@ const ultima = (d: number, coda?: 'light' | 'dark'): RpgSkillDef => ({ target: '
   hits: [...pure(at(UH, d), RPG_RANDOM_BONUS * power(d), 'ultima'), ...(coda ? pure(1, 0.25 * power(d), coda) : [])],
   mp: mp(d) + (coda ? 4 : 2), primary: 'ultima' })
 addActive({ tree: 'arcane-staff', summary: describe, branches: [
-  { branch: 'light', names: ['Lux', 'Luxra', 'Luxaga', 'Luxaja', 'Holy'], a: ['Luxra Lance', 'Luxaga Lance', 'Luxaja Lance'], b: ['Luxra Cascade', 'Luxaga Cascade', 'Luxaja Cascade'] },
-  { branch: 'dark', names: ['Nox', 'Noxra', 'Noxaga', 'Noxaja', 'Black Hole'], a: ['Noxra Lance', 'Noxaga Lance', 'Noxaja Lance'], b: ['Noxra Cascade', 'Noxaga Cascade', 'Noxaja Cascade'] },
-  { branch: 'ultima', names: ['Arcana', 'Arcanara', 'Arcanaga', 'Arcanaja', 'Ultima'], a: ['Arcanara Dawn', 'Arcanaga Dawn', 'Arcanaja Dawn'], b: ['Arcanara Dusk', 'Arcanaga Dusk', 'Arcanaja Dusk'] },
+  { branch: 'light', names: ['Lux', 'Luxra', 'Luxaga', 'Luxaja', 'Holy'], a: ['Lux Lance', 'Luxra Lance', 'Luxaga Lance', 'Luxaja Lance', 'Holy Lance'], b: ['Lux Cascade', 'Luxra Cascade', 'Luxaga Cascade', 'Luxaja Cascade', 'Holy Cascade'] },
+  { branch: 'dark', names: ['Nox', 'Noxra', 'Noxaga', 'Noxaja', 'Black Hole'], a: ['Nox Lance', 'Noxra Lance', 'Noxaga Lance', 'Noxaja Lance', 'Void Lance'], b: ['Nox Cascade', 'Noxra Cascade', 'Noxaga Cascade', 'Noxaja Cascade', 'Void Cascade'] },
+  { branch: 'ultima', names: ['Arcana', 'Arcanara', 'Arcanaga', 'Arcanaja', 'Ultima'], a: ['Arcana Dawn', 'Arcanara Dawn', 'Arcanaga Dawn', 'Arcanaja Dawn', 'Ultima Dawn'], b: ['Arcana Dusk', 'Arcanara Dusk', 'Arcanaga Dusk', 'Arcanaja Dusk', 'Ultima Dusk'] },
 ],
 core: (b, d) => {
   if (b === 'ultima') return d < 5 ? ultima(d) : { ...ultima(5), special: 'pierce' }
@@ -235,31 +238,32 @@ b: (b, d) => b === 'ultima' ? ultima(d, 'dark')
 // --- Summoner ----------------------------------------------------------------------------------------------------------
 const EH = [1, 2, 2, 3, 3]
 const LEGION: readonly RpgWeaponKind[] = ['greatsword', 'spear', 'axe', 'bow', 'short-sword']
-const CONVERT: readonly (readonly [RpgWeaponKind | 'legion', RpgWeaponKind | 'legion'])[] = [['greatsword', 'spear'], ['axe', 'bow'], ['short-sword', 'legion']]
+/** What a summon's side nodes turn its element into, depth 1 to 5 (squires and slingers first, champions and the horde last, D73). */
+const CONVERT: readonly (readonly [RpgWeaponKind | 'legion', RpgWeaponKind | 'legion'])[] = [['greatsword', 'bow'], ['greatsword', 'spear'], ['axe', 'bow'], ['short-sword', 'legion'], ['greatsword', 'legion']]
 const summonWave = (kind: RpgWeaponKind | Elemental | 'legion', d: number): RpgSkillDef => ({ target: 'all',
   hits: pure(at(EH, d), RPG_AOE_SHARE * power(d), kind === 'legion' ? LEGION : kind), mp: mp(d) + 4, primary: kind === 'legion' ? 'greatsword' : kind })
 addActive({ tree: 'summon-elemental', summary: describe, branches: [
   { branch: 'fire', names: ['Ember Sprites', 'Salamander', 'Fire Drake', 'Infernal Wyrm', 'Phoenix'],
-    a: ['Skeleton Swordsmen', 'Skeleton Berserkers', 'Skeleton Duelists'], b: ['Skeleton Lancers', 'Skeleton Archers', 'Bone Legion'] },
+    a: ['Skeleton Squires', 'Skeleton Swordsmen', 'Skeleton Berserkers', 'Skeleton Duelists', 'Skeleton Champions'], b: ['Skeleton Slingers', 'Skeleton Lancers', 'Skeleton Archers', 'Bone Legion', 'Bone Horde'] },
   { branch: 'ice', names: ['Frost Sprites', 'Snow Wolves', 'Ice Golem', 'Frost Titan', 'Winter Queen'],
-    a: ['Frost Knights', 'Glacier Reavers', 'Frost Duelists'], b: ['Ice Pikemen', 'Snow Rangers', 'Frozen Legion'] },
+    a: ['Frost Squires', 'Frost Knights', 'Glacier Reavers', 'Frost Duelists', 'Frost Champions'], b: ['Snow Slingers', 'Ice Pikemen', 'Snow Rangers', 'Frozen Legion', 'Winter Horde'] },
   { branch: 'lightning', names: ['Spark Sprites', 'Thunderbird', 'Storm Roc', 'Thunder Kirin', 'Raijin'],
-    a: ['Brass Knights', 'Steam Reavers', 'Spring Duelists'], b: ['Gear Lancers', 'Bolt Rangers', 'Clockwork Legion'] },
+    a: ['Brass Squires', 'Brass Knights', 'Steam Reavers', 'Spring Duelists', 'Brass Champions'], b: ['Cog Slingers', 'Gear Lancers', 'Bolt Rangers', 'Clockwork Legion', 'Clockwork Horde'] },
 ],
 core: (b, d) => d < 5 ? summonWave(el(b), d)
   : { target: 'all', hits: pure(3, RPG_AOE_SHARE * power(5), el(b)), mp: mp(5) + 4, primary: el(b), rider: { status: RIDER[el(b)], stacks: 1, per: 'foe' } },
-a: (_b, d) => summonWave(CONVERT[d - 2]![0], d),
-b: (_b, d) => summonWave(CONVERT[d - 2]![1], d),
+a: (_b, d) => summonWave(CONVERT[d - 1]![0], d),
+b: (_b, d) => summonWave(CONVERT[d - 1]![1], d),
 })
 
 const P2 = [1, 1, 1, 2, 2], AR = [2, 2, 3, 3, 4]
 addActive({ tree: 'summon-arcane', summary: describe, branches: [
   { branch: 'angels', names: ['Cherub', 'Angel Lancer', 'Seraph Phalanx', 'Dominion Host', "Heaven's Legion"],
-    a: ['Angel Archer', 'Seraph Archers', 'Dominion Volley'], b: ['Valkyrie', 'Valkyrie Blade', 'Valkyrie Charge'] },
+    a: ['Cherub Archer', 'Angel Archer', 'Seraph Archers', 'Dominion Volley', "Heaven's Volley"], b: ['Squire Valkyrie', 'Valkyrie', 'Valkyrie Blade', 'Valkyrie Charge', 'Valkyrie Host'] },
   { branch: 'demons', names: ['Imp Brute', 'Hellknight', 'Dread Knight', 'Demon Lord', 'Abyssal Overlord'],
-    a: ['Hell Reaver', 'Dread Reaver', 'Abyss Reaver'], b: ['Nightmare', 'Night Terror', 'Dream Eater'] },
+    a: ['Imp Reaver', 'Hell Reaver', 'Dread Reaver', 'Abyss Reaver', 'Overlord Reaver'], b: ['Night Shade', 'Nightmare', 'Night Terror', 'Dream Eater', 'Nightmare Lord'] },
   { branch: 'archons', names: ['Herald', 'Archangel', "Archangel's Rain", "Archangel's Judgment", 'Armageddon'],
-    a: ['Archdemon', "Archdemon's Ruin", "Archdemon's Cataclysm"], b: ['Twilight Herald', 'Twilight Archon', 'Eclipse Archon'] },
+    a: ['Lesser Archdemon', 'Archdemon', "Archdemon's Ruin", "Archdemon's Cataclysm", "Archdemon's Doom"], b: ['Twilight Squire', 'Twilight Herald', 'Twilight Archon', 'Eclipse Archon', 'Twilight Overlord'] },
 ],
 core: (b, d) => {
   if (b === 'angels') return { target: 'random', hits: fused(at(P2, d), RPG_RANDOM_BONUS * power(d), 'light', ['spear']), mp: mp(d), primary: 'light',
@@ -293,11 +297,11 @@ function weave(n: number, total: number, kind: RpgDamageKind): RpgHit[] {
 const CODA = 0.3
 addActive({ tree: 'blade-elemental', summary: describe, branches: [
   { branch: 'fire', names: ['Fire Blade', 'Flame Brand', 'Blazing Saber', 'Inferno Saber', 'Phoenix Blade'],
-    a: ['Searing Strike', 'Magma Strike', 'Solar Strike'], b: ['Twin Flames', 'Flame Dance', 'Wildfire Dance'] },
+    a: ['Ember Strike', 'Searing Strike', 'Magma Strike', 'Solar Strike', 'Supernova Strike'], b: ['Flicker Step', 'Twin Flames', 'Flame Dance', 'Wildfire Dance', 'Phoenix Dance'] },
   { branch: 'ice', names: ['Frost Blade', 'Ice Brand', 'Rime Saber', 'Glacial Saber', 'Diamond Blade'],
-    a: ['Shatter Strike', 'Permafrost Strike', 'Avalanche Strike'], b: ['Twin Frost', 'Frost Dance', 'Blizzard Dance'] },
+    a: ['Chill Strike', 'Shatter Strike', 'Permafrost Strike', 'Avalanche Strike', 'Diamond Strike'], b: ['Frost Step', 'Twin Frost', 'Frost Dance', 'Blizzard Dance', 'Diamond Dance'] },
   { branch: 'lightning', names: ['Thunder Blade', 'Volt Brand', 'Storm Saber', 'Tempest Saber', 'Thunderlord Blade'],
-    a: ['Bolt Strike', 'Thunderclap Strike', 'Judgment Strike'], b: ['Twin Volts', 'Spark Dance', 'Storm Dance'] },
+    a: ['Jolt Strike', 'Bolt Strike', 'Thunderclap Strike', 'Judgment Strike', 'Thunderlord Strike'], b: ['Spark Step', 'Twin Volts', 'Spark Dance', 'Storm Dance', 'Thunderlord Dance'] },
 ],
 core: (b, d) => ({ target: 'one', hits: blade(at(GH, d), power(d), el(b)), mp: mp(d), primary: el(b),
   ...(d === 5 ? { rider: { status: RIDER[el(b)], stacks: 2, per: 'foe' as const } } : {}) }),
@@ -311,11 +315,11 @@ const arcaneBlade = (b: string, d: number): RpgSkillDef => {
 }
 addActive({ tree: 'blade-arcane', summary: describe, branches: [
   { branch: 'light', names: ['Gleam Cut', 'Radiant Flurry', 'Dawn Waltz', 'Sunburst Waltz', 'Holy Blade'],
-    a: ['Radiant Coda', 'Dawn Coda', 'Sunburst Coda'], b: ['Radiant Riposte', 'Dawn Riposte', 'Sunburst Riposte'] },
+    a: ['Gleam Coda', 'Radiant Coda', 'Dawn Coda', 'Sunburst Coda', 'Holy Coda'], b: ['Gleam Riposte', 'Radiant Riposte', 'Dawn Riposte', 'Sunburst Riposte', 'Holy Riposte'] },
   { branch: 'dark', names: ['Shade Cut', 'Umbral Flurry', 'Dusk Waltz', 'Eclipse Waltz', 'Abyss Blade'],
-    a: ['Umbral Coda', 'Dusk Coda', 'Eclipse Coda'], b: ['Umbral Riposte', 'Dusk Riposte', 'Eclipse Riposte'] },
+    a: ['Shade Coda', 'Umbral Coda', 'Dusk Coda', 'Eclipse Coda', 'Abyss Coda'], b: ['Shade Riposte', 'Umbral Riposte', 'Dusk Riposte', 'Eclipse Riposte', 'Abyss Riposte'] },
   { branch: 'ultima', names: ['Arcane Cut', 'Arcane Flurry', 'Mystic Waltz', 'Astral Waltz', 'Ultima Blade'],
-    a: ['Arcane Twilight', 'Mystic Twilight', 'Astral Twilight'], b: ['Arcane Riposte', 'Mystic Riposte', 'Astral Riposte'] },
+    a: ['Faint Twilight', 'Arcane Twilight', 'Mystic Twilight', 'Astral Twilight', 'Ultima Twilight'], b: ['Glimmer Riposte', 'Arcane Riposte', 'Mystic Riposte', 'Astral Riposte', 'Ultima Riposte'] },
 ],
 core: (b, d) => d < 5 ? arcaneBlade(b, d)
   : { ...arcaneBlade(b, 5), special: b === 'light' ? 'vs-broken' : b === 'dark' ? 'vs-wounded' : 'pierce' },

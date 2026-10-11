@@ -4,7 +4,7 @@ import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { facilitySpec, jobEndsAt, jobFinished, type Facility, type Job } from '../economy/jobs'
 import {
   aptitudeTime, EXP_PER_MINUTE, makeMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MAX_JOB_COUNT, MINUTE,
-  PROFESSION_MAX_LEVEL, professionExpToNext, rushTicketsFor, type Profession,
+  PROFESSION_MAX_LEVEL, professionExpToNext, TIME_TICKET_SPAN, timeTicketsToFinish, type Profession,
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
 import { dishById } from '../economy/dishes'
@@ -345,22 +345,26 @@ export function recallJob(save: Save, placeId: string, slot: number, now: string
   return withWorld(save, tier, world, now)
 }
 
-/** Rush Tickets a job needs to finish now: one per started hour left. Training can't be rushed (§11). */
-export function rushCost(job: Job, now: string): number {
-  return rushTicketsFor(Math.max(0, jobEndsAt(job) - Date.parse(now)))
+/** Time Tickets that would finish a running job now: one per started 30 minutes left (D74). */
+export function ticketsToFinish(job: Job, now: string): number {
+  return timeTicketsToFinish(Math.max(0, jobEndsAt(job) - Date.parse(now)))
 }
 
-/** Finishes a farm job at once for its Rush Tickets. Collect afterwards as usual. */
-export function rushJob(save: Save, placeId: string, slot: number, now: string, tier = TIER_ONE): Save {
+/**
+ * Spends Time Tickets on a running job or training: each takes 30 minutes off (D74), never past done. The items it
+ * finishes are collected as usual.
+ */
+export function cutJobTime(save: Save, placeId: string, slot: number, tickets: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const job = facilityOf(world, placeId).jobs[slot]
   if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
-  if (job.kind === 'train') throw new SaveRuleError('bad-job', 'training can’t be rushed')
   if (jobFinished(job, now) >= job.count) throw new SaveRuleError('bad-job', 'already finished')
-  const cost = rushCost(job, now)
-  if (world.wallet.rushTickets < cost) throw new SaveRuleError('no-ticket', `needs ${cost} Rush Ticket${cost > 1 ? 's' : ''}`)
-  const startedAt = new Date(Date.parse(now) - job.count * job.msEach).toISOString()
-  const next = setJob({ ...world, wallet: { ...world.wallet, rushTickets: world.wallet.rushTickets - cost } }, placeId, slot, { ...job, startedAt })
+  const needed = ticketsToFinish(job, now)
+  if (!Number.isInteger(tickets) || tickets < 1 || tickets > needed) throw new SaveRuleError('bad-count', `use 1–${needed} Time Tickets here`)
+  if (world.wallet.timeTickets < tickets) throw new SaveRuleError('no-ticket', `needs ${tickets} Time Ticket${tickets > 1 ? 's' : ''}`)
+  const left = jobEndsAt(job) - Date.parse(now)
+  const startedAt = new Date(Date.parse(job.startedAt) - Math.min(left, tickets * TIME_TICKET_SPAN)).toISOString()
+  const next = setJob({ ...world, wallet: { ...world.wallet, timeTickets: world.wallet.timeTickets - tickets } }, placeId, slot, { ...job, startedAt })
   return withWorld(save, tier, next, now)
 }
 

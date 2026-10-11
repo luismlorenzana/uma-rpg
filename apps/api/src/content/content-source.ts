@@ -3,17 +3,18 @@ import { resolve, sep } from 'node:path'
 import type { MasterSource } from '../master/master-source'
 
 /**
- * uma-rpg's own private content (D50): the PriConne cast, built by `scripts/cast/import.mjs`. Only `cast.json` and the
- * hash-named portraits under `cast/` are served. Null when refused.
+ * uma-rpg's own private content: the foes' faces by franchise (D50, D76). PriConne's pack sits at the root, Azur Lane's
+ * and Puzzle & Dragons' in their own folders; only each `cast.json` and its hash-named portraits are served. Null when
+ * refused.
  */
 export function safeContentPath(raw: string): string | null {
   const path = raw.replace(/^\/+/, '')
-  if (path === 'cast.json') return path
-  return /^cast\/[a-z0-9_-]{1,40}\.[a-f0-9]{8}\.webp$/.test(path) ? path : null
+  if (/^((azurlane|pad)\/)?cast\.json$/.test(path)) return path
+  return /^((azurlane|pad)\/)?cast\/[a-z0-9_-]{1,60}\.[a-f0-9]{8}\.(webp|png)$/.test(path) ? path : null
 }
 
 export function contentCacheControl(path: string): string {
-  return path === 'cast.json' ? 'private, no-cache' : 'private, max-age=31536000, immutable'
+  return path.endsWith('cast.json') ? 'private, no-cache' : 'private, max-age=31536000, immutable'
 }
 
 /** Local dev: the repo's gitignored `content/release`. */

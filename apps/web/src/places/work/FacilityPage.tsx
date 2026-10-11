@@ -3,7 +3,7 @@
 // output and her profession EXP.
 import {
   availabilityBlock, DISHES, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
-  itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, rushCost, SaveRuleError,
+  itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, SaveRuleError,
   stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -11,13 +11,14 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectAndRepeat, collectEverything, queueWork, recall, rush, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
+import { collect, collectAndRepeat, collectEverything, cutTime, queueWork, recall, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { QueueList } from './QueueList'
+import { TimeCut } from './TimeCut'
 
 const SPEED_NOTE: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 
@@ -72,7 +73,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
             {job ? (
               <JobCard view={view} job={job} now={now} placeId={placeId} onCollect={() => run(() => collect(placeId, slot))}
                 onRepeat={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => collectAndRepeat(placeId, slot, o)) }}
-                onRush={() => run(() => rush(placeId, slot))} onRecall={() => run(() => recall(placeId, slot))} rushTickets={world.wallet.rushTickets}
+                onCut={(n) => run(() => cutTime(placeId, slot, n))} onRecall={() => run(() => recall(placeId, slot))} timeTickets={world.wallet.timeTickets}
                 onQueue={() => setQueueing(slot)} onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
             ) : (
               <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
@@ -96,8 +97,8 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, onRush, onRecall, onQueue, onUnqueue }: {
-  view: MasterView; job: Job; now: string; placeId: string; rushTickets: number; onCollect: () => void; onRepeat: () => void; onRush: () => void; onRecall: () => void
+function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, onCut, onRecall, onQueue, onUnqueue }: {
+  view: MasterView; job: Job; now: string; placeId: string; timeTickets: number; onCollect: () => void; onRepeat: () => void; onCut: (n: number) => void; onRecall: () => void
   onQueue: () => void; onUnqueue: (index: number) => void
 }) {
   const item = outputView(job.output)
@@ -106,7 +107,6 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, on
   const readyCount = finished - job.collected
   const done = finished >= job.count
   const left = jobEndsAt(job) - Date.parse(now)
-  const cost = done ? 0 : rushCost(job, now)
   return (
     <div className="rounded-md bg-raised p-3">
       <div className="flex items-center gap-3">
@@ -132,11 +132,7 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRepeat, on
             Repeat ×{job.count}
           </button>
         )}
-        {!done && (
-          <button type="button" disabled={rushTickets < cost} onClick={onRush} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold disabled:opacity-35" aria-label={`Rush for ${cost} Rush Tickets`}>
-            Rush · {cost}
-          </button>
-        )}
+        <TimeCut job={job} now={now} tickets={timeTickets} onCut={onCut} />
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft" aria-label={`Recall ${outfit?.name ?? ''} from ${placeId}`}>
           Recall
         </button>

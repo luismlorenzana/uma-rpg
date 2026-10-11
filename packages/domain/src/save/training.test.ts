@@ -5,7 +5,7 @@ import { depthsOpen } from '../economy/training'
 import { learnSkill, startFight, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
-import { collectJob, facilityOf, queueJob, rushJob, startTraining } from './work'
+import { collectJob, cutJobTime, facilityOf, queueJob, startTraining } from './work'
 import { trackId, tracksAt } from '../economy/training'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
@@ -31,7 +31,8 @@ describe('class ranks (S5, D57)', () => {
     expect(worldOf(save).items['token-class-brawler-1']).toBeUndefined()
     // Every rank is 6 base hours (D68), halved by Front A.
     expect(facilityOf(worldOf(save), 'brawler-dojo').jobs.map((j) => j!.msEach)).toEqual([3 * HOUR, 6 * HOUR])
-    expect(() => rushJob(save, 'brawler-dojo', 0, at(0))).toThrow(/can’t be rushed/)
+    // Training takes Time Tickets too (D74); none in the wallet yet.
+    expect(() => cutJobTime(save, 'brawler-dojo', 0, 1, at(0))).toThrow(/Time Ticket/)
     expect(collectJob(save, 'brawler-dojo', 0, at(2.5 * HOUR)).got.done).toBe(false)
     save = collectJob(save, 'brawler-dojo', 0, at(3 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.classes.brawler).toBe(2)
@@ -89,7 +90,7 @@ describe('saves', () => {
     expect(world.umas['101']).toMatchObject({ level: 1, exp: 0, build: null, builds: {} })
     expect(world.umas['101']!.ranks.classes.brawler).toBe(1)
     expect(world.parties[0]!.slots[0]).toBe('101')
-    expect(world.wallet).toEqual({ unlockTickets: w.wallet.unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
+    expect(world.wallet).toEqual({ unlockTickets: w.wallet.unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0 })
     expect(world.items).toEqual({})
     expect(parseSave(JSON.parse(JSON.stringify(reset)))).toEqual(reset)
   })

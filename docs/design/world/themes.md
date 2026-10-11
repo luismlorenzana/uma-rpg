@@ -1,6 +1,7 @@
 # Elements or franchises?
 
-> **Status: proposal for owner review, 2026-10-10.** Part of the [world map proposal](README.md). You asked to explore
+> **Status: decided for now (D76, 2026-10-11): Sky Isles PriConne, Underworld Azur Lane, every other biome Puzzle &
+> Dragons as a placeholder.** The options below were the proposal. Part of the [world map proposal](README.md). You asked to explore
 > regions themed by franchise (a Persona region, a Final Fantasy region, a PriConne region) as well as by element.
 > Two separate questions sit inside that: **what gives a region its identity**, and **what the foes look like**.
 

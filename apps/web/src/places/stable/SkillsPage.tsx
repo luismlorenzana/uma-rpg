@@ -159,7 +159,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
         </div>
       </section>
       {error && <p className="sticky bottom-2 rounded-sm bg-danger/90 p-2 text-center text-[13px]">{error}</p>}
-      <p className="text-[11px] text-ink-faint">{name} earns 2 points a level (to Lv45) and 5 more as each depth opens, in every build at once.</p>
+      <p className="text-[11px] text-ink-faint">{name} earns 2 points a level (to Lv50) and 5 more as each depth opens, in every build at once. A depth’s core skills open with her class rank; its side skills (variants) at Lv 5, 15, 25, 35 and 45.</p>
     </div>
   )
 }

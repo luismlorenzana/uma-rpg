@@ -6,7 +6,7 @@ import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/typ
 import { rpgChapterReach, type RpgCampaignChapter, type RpgCastMember, type RpgMapNode } from '../rpg/campaign/chapters'
 import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
-import { BIOMES, biomeById, signatureWeaknesses, type Biome, type BiomeDef, type Formation } from './biomes'
+import { BIOMES, biomeById, biomeFranchise, signatureWeaknesses, type Biome, type BiomeDef, type Formation, type Franchise } from './biomes'
 
 export const WORLD_LEVELS = 10
 export const WORLD_REGIONS_PER_LEVEL = 4
@@ -52,6 +52,17 @@ export function worldContinent(source: ContinentSource): WorldContinent {
   return { id, order: source.order, name: source.name, levelStart, regions, springs }
 }
 
+/**
+ * World tuning (D75), set against the balance simulation (`SIM=1 npx vitest run src/world/balance.test.ts`). Skills
+ * grow with depth faster than the foe curve, so foes gain HP and offense per level on top of it (a regular foe ×2.7 HP
+ * and ×2 offense by Lv50); a region boss is a fraction of a chapter champion (one of forty per continent).
+ */
+export const WORLD_TUNING = {
+  regularHpPerLevel: 0.035, regularOffensePerLevel: 0.02,
+  eliteHpPerLevel: 0.01, eliteOffensePerLevel: 0.005,
+  bossHp: 0.55, bossOffensePerLevel: 0.005,
+} as const
+
 const FORMATION: Readonly<Record<Formation, { count: number; hp: number; shield: number; name: string }>> = {
   solo: { count: 1, hp: 3.5, shield: 6, name: 'Lone elite' },
   duo: { count: 2, hp: 1.8, shield: 4, name: 'Pair' },
@@ -95,9 +106,19 @@ export function stagePlan(biome: BiomeDef, regionId: string): { formation: Forma
   return plan
 }
 
+/** Faces for a region: one list, or packs by franchise (D76); a missing or empty pack falls back to PriConne's. */
+export type CastPacks = readonly RpgCastMember[] | Partial<Record<Franchise, readonly RpgCastMember[]>>
+function facesFor(cast: CastPacks, biome: Biome): readonly RpgCastMember[] {
+  if (Array.isArray(cast)) return cast as readonly RpgCastMember[]
+  const packs = cast as Partial<Record<Franchise, readonly RpgCastMember[]>>
+  const own = packs[biomeFranchise(biome)]
+  return own && own.length > 0 ? own : packs.priconne ?? []
+}
+
 /** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. */
-export function regionChapter(region: WorldRegion, cast: readonly RpgCastMember[], tier = 1): RpgCampaignChapter {
+export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 1): RpgCampaignChapter {
   const biome = biomeById(region.biome)
+  const cast = facesFor(castPacks, region.biome)
   const plan = stagePlan(biome, region.id)
   const reach = rpgChapterReach(Math.floor((region.level - 1) / WORLD_LEVELS) * WORLD_LEVELS + 1)
   const ids = Array.from({ length: WORLD_STAGES }, (_, i) => `${region.id}-s${i + 1}`)
@@ -116,13 +137,16 @@ export function regionChapter(region: WorldRegion, cast: readonly RpgCastMember[
 function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', formation: Formation,
   signature: readonly RpgElement[], cast: readonly RpgCastMember[], reach: number): BattleEnemy[] {
   const used = new Set<string>()
-  const face = (slot: number): RpgCastMember => {
+  // A franchise with elements (P&D) shows a monster of the foe's own element when it has one.
+  const face = (slot: number, element: RpgElement): RpgCastMember => {
+    const matching = cast.filter((m) => m.element === element)
+    const pool = matching.length > 0 ? matching : cast
     const offset = hash(`${stageId}:${slot}:cast`)
-    for (let i = 0; i < cast.length; i++) {
-      const m = cast[(offset + i) % cast.length]!
-      if (!used.has(m.id) || used.size >= cast.length) { used.add(m.id); return m }
+    for (let i = 0; i < pool.length; i++) {
+      const m = pool[(offset + i) % pool.length]!
+      if (!used.has(m.id) || used.size >= pool.length) { used.add(m.id); return m }
     }
-    return cast[offset % cast.length]!
+    return pool[offset % pool.length]!
   }
   const answers = signatureWeaknesses(signature)
   const weaknesses = (slot: number, rank: EnemyRank): BattleWeaknesses => {
@@ -135,11 +159,15 @@ function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kin
     return { weapons: weapons.slice(0, w), elements: [...answers, ...extra] }
   }
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
+  const above = region.level - 1
   const foe = (slot: number, rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number): BattleEnemy => {
     const element = signature[slot % signature.length]!
-    const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot).id, element, role: r, rank, level: region.level, shield,
+    const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot, element).id, element, role: r, rank, level: region.level, shield,
       weaknesses: weaknesses(slot, rank), ...(rank === 'regular' ? {} : { reach }) })
-    return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp)) } }
+    const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
+    const offense = 1 + (rank === 'regular' ? WORLD_TUNING.regularOffensePerLevel : rank === 'sub-boss' ? WORLD_TUNING.eliteOffensePerLevel : WORLD_TUNING.bossOffensePerLevel) * above
+    return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),
+      atk: Math.round(base.stats.atk * offense), matk: Math.round(base.stats.matk * offense) } }
   }
   if (kind === 'boss') {
     return [foe(0, 'boss', 'champion', 1, RPG_FOE_TUNING.bossShield), foe(1, 'regular', 'guard', 0.8, 2), foe(2, 'regular', 'guard', 0.8, 2)]

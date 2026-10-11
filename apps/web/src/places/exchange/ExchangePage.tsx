@@ -1,7 +1,7 @@
-// The Exchange (S4, design §11): Laurels from battles buy raw items of the chapters you've reached, Rush Tickets (finish
-// an hour of a farm job) and Sweep Tickets (clear a beaten regular fight at once, without Laurels). Tokens swap three
+// The Exchange (S4, design §11): Laurels from battles buy raw items of the continents you've reached, Time Tickets
+// (30 minutes off any job or training, D74) and Sweep Tickets (clear a beaten regular stage at once, without Laurels). Tokens swap three
 // for one of your choice, same kind and band (D67).
-import { ITEM_FAMILIES, rawItemPrice, RUSH_TICKET_PRICE, SaveRuleError, stockedGrades, SWEEP_TICKET_PRICE, TOKEN_SWAP_COST, TOKENS, tokenById, type ItemSide, type TokenKind } from '@rpg/domain'
+import { ITEM_FAMILIES, rawItemPrice, SaveRuleError, TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, TOKEN_SWAP_COST, TOKENS, tokenById, type ItemSide, type TokenKind } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { buyItem, buyTicket, swap, useWorld } from '../../save/game'
@@ -17,22 +17,22 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
   const world = useWorld()
   const [side, setSide] = useState<ItemSide>('farming')
   const [swapping, setSwapping] = useState<{ kind: TokenKind; band: number } | null>(null)
-  const [buying, setBuying] = useState<{ kind: 'item'; id: string; price: number; name: string } | { kind: 'rush' | 'sweep'; price: number; name: string } | null>(null)
+  const [buying, setBuying] = useState<{ kind: 'item'; id: string; price: number; name: string } | { kind: 'time' | 'sweep'; price: number; name: string } | null>(null)
   if (!world) return null
   const stocked = stockedGrades(world)
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between rounded-md bg-raised p-3">
         <span className="flex items-center gap-2 font-display text-xl font-bold text-laurel"><LaurelIcon size={24} /> {world.wallet.laurels}</span>
-        <span className="text-right text-[12px] text-ink-soft">Rush {world.wallet.rushTickets} · Sweep {world.wallet.sweepTickets}</span>
+        <span className="text-right text-[12px] text-ink-soft">Time {world.wallet.timeTickets} · Sweep {world.wallet.sweepTickets}</span>
       </div>
       <section>
         <h3 className="text-micro mb-1.5">Tickets</h3>
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => setBuying({ kind: 'rush', price: RUSH_TICKET_PRICE, name: 'Rush Ticket' })} className="rounded-md bg-raised p-3 text-left">
-            <p className="font-semibold">Rush Ticket</p>
-            <p className="text-[12px] text-ink-soft">Finishes an hour of a farm job</p>
-            <p className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-laurel"><LaurelIcon size={16} /> {RUSH_TICKET_PRICE}</p>
+          <button type="button" onClick={() => setBuying({ kind: 'time', price: TIME_TICKET_PRICE, name: 'Time Ticket' })} className="rounded-md bg-raised p-3 text-left">
+            <p className="font-semibold">Time Ticket</p>
+            <p className="text-[12px] text-ink-soft">30 minutes off any job or training</p>
+            <p className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-laurel"><LaurelIcon size={16} /> {TIME_TICKET_PRICE}</p>
           </button>
           <button type="button" onClick={() => setBuying({ kind: 'sweep', price: SWEEP_TICKET_PRICE, name: 'Sweep Ticket' })} className="rounded-md bg-raised p-3 text-left">
             <p className="font-semibold">Sweep Ticket</p>

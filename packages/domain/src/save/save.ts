@@ -1,4 +1,4 @@
-// Save v11: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v12: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -22,7 +22,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 11
+export const SAVE_SCHEMA_VERSION = 12
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -38,7 +38,8 @@ export interface Wallet {
   shards: number
   laurels: number
   /** Each finishes up to an hour of a running farm job (§11). */
-  rushTickets: number
+  /** Each takes 30 minutes off a job or training (D74; Rush Tickets before v12, worth two each). */
+  timeTickets: number
   /** Each completes one beaten regular fight at once (§11). */
   sweepTickets: number
 }
@@ -152,7 +153,7 @@ export function defaultParties(): Party[] {
   return Array.from({ length: PARTY_COUNT }, (_, i) => ({ name: `Party ${i + 1}`, slots: Array.from({ length: PARTY_SIZE }, () => null) }))
 }
 
-export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
+export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
 export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {} } })
@@ -214,11 +215,13 @@ function timestamp(value: unknown, path: string): string {
 
 const OUTFIT_ID = /^[1-9]\d{0,11}$/
 
-function parseWallet(value: unknown, path: string): Wallet {
-  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', 'rushTickets', 'sweepTickets'])
+function parseWallet(value: unknown, path: string, version: number): Wallet {
+  // v11 → v12 (D74): an hour's Rush Ticket becomes two 30-minute Time Tickets.
+  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', version < 12 ? 'rushTickets' : 'timeTickets', 'sweepTickets'])
   return {
     unlockTickets: count(o.unlockTickets, `${path}.unlockTickets`), shards: count(o.shards, `${path}.shards`), laurels: count(o.laurels, `${path}.laurels`),
-    rushTickets: count(o.rushTickets, `${path}.rushTickets`), sweepTickets: count(o.sweepTickets, `${path}.sweepTickets`),
+    timeTickets: version < 12 ? 2 * count(o.rushTickets, `${path}.rushTickets`) : count(o.timeTickets, `${path}.timeTickets`),
+    sweepTickets: count(o.sweepTickets, `${path}.sweepTickets`),
   }
 }
 
@@ -534,7 +537,7 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
   const createdAt = timestamp(w.createdAt, `${path}.createdAt`)
   return {
-    createdAt, wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
+    createdAt, wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: version < 11 ? newWorldState(createdAt) : parseWorldState(w.world, `${path}.world`),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
@@ -547,7 +550,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v11 save and always returns v11; anything older than v10 starts its progress over (D69). */
+/** Parses a v1–v12 save and always returns v12; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

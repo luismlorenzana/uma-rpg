@@ -85,6 +85,19 @@ describe('class builds (D49)', () => {
     expect(() => forgetSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/variant/)
   })
 
+  it('opens each depth’s side nodes at mid-band, Lv 5, 15, 25, 35 and 45 (D73)', () => {
+    const save = withParty()
+    const atLevel = (level: number): Save => {
+      const w = worldOf(save)
+      return { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level } } } } }
+    }
+    const learned = learnSkill(atLevel(4), o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
+    expect(() => learnSkill(learned, o101, 'greatsword-spear', 'greatsword.fire.1a', T(4))).toThrow(/Opens at Lv5/)
+    const five = learnSkill(learnSkill(atLevel(5), o101, 'greatsword-spear', 'greatsword.fire.1', T(3)), o101, 'greatsword-spear', 'greatsword.fire.1a', T(4))
+    expect(worldOf(five).umas['101']!.builds['greatsword-spear']!.tree).toEqual(['greatsword.fire.1', 'greatsword.fire.1a'])
+    expect(parseSave(JSON.parse(JSON.stringify(five)))).toEqual(five)
+  })
+
   it('equips only learned skills within her slots', () => {
     let save = withParty()
     for (const id of ['greatsword.fire.1', 'greatsword.ice.1']) save = learnSkill(save, o101, 'greatsword-spear', id, T(3))

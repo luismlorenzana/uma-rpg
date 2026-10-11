@@ -62,8 +62,9 @@ hand-placed fights), so a rebalance never needs new content.
 Each region is a biome, and each biome sets an **element mix**, a **formation lean** and later a **field effect**:
 15 element signatures (five single elements, ten pairs), eight formation templates from a solo elite to an eight-foe
 swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a combination. Full lists in
-[regions.md](regions.md) and [encounters.md](encounters.md). Foes wear the PriConne cast's faces (D50); themed regions
-come later ([themes.md](themes.md)).
+[regions.md](regions.md) and [encounters.md](encounters.md). Foes' faces follow the biome (D76): the Sky Isles wear the
+PriConne cast, the Underworld Azur Lane's, every other biome Puzzle & Dragons monsters as a placeholder; PriConne stands
+in until a pack exists ([themes.md](themes.md)).
 
 ## On the phone
 
@@ -105,4 +106,5 @@ come later ([themes.md](themes.md)).
 3. **Everything open** from the start.
 4. **Lv1 → 50 in about 4 hours of fighting** for a fresh party, so about 20 parties make the 100-hour mark (owner,
    D71); the loop's passive steps pace it in practice.
-5. **The PriConne cast everywhere**; themed worlds or regions later.
+5. **Faces by franchise** (D76, superseding "PriConne everywhere"): Sky Isles PriConne, Underworld Azur Lane, the rest
+   Puzzle & Dragons for now; key bosses authored later.

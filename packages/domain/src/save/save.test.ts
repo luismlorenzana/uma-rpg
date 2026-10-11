@@ -8,7 +8,7 @@ describe('save', () => {
   it('starts Tier 1 with 20 Unlock Tickets and nothing else', () => {
     const save = newSave('  Luis  ', NOW)
     expect(save.account.trainerName).toBe('Luis')
-    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
+    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0 })
     expect(STARTING_UNLOCK_TICKETS).toBe(20)
   })
 

@@ -177,7 +177,7 @@ const TOWN: Place[] = [
   },
   {
     id: 'scenario-gate', page: 'town', kind: 'town', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.36 },
-    blurb: 'The chapters of your tier: one scenario each, ten levels each.',
+    blurb: 'The world map: a continent per scenario, ten levels each, with regions of stages to clear.',
     details: ['Tier 1: URA Finale → Grand Masters', 'Fight PriConne rivals with a party of five: EXP, Shards and Laurels'],
   },
   {
@@ -187,8 +187,8 @@ const TOWN: Place[] = [
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
-    blurb: 'Spend Laurels from battles on raw items, Rush Tickets and Sweep Tickets.',
-    details: ['Raw items of every chapter you have reached', 'Rush: finish a farm job now', 'Sweep: clear a beaten regular fight now'],
+    blurb: 'Spend Laurels from battles on raw items, Time Tickets and Sweep Tickets; swap tokens three for one.',
+    details: ['Raw items of every continent you have reached', 'Time Ticket: 30 minutes off any job or training', 'Sweep: clear a beaten regular stage now'],
   },
   {
     id: 'observatory', page: 'town', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.25, y: 0.86 },

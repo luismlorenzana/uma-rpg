@@ -12,7 +12,7 @@
   profession cap (Lv50) after 69 hours at G. With a few check-ins a day and jobs running overnight, a dedicated Uma gets
   there in one to two weeks; aptitude decides who's worth specializing.
 - Battles stay the only Laurel source, and Laurels buy shortcuts, never the whole game: an hour of work costs about
-  two fights, whether bought as an item or as a Rush.
+  two fights, whether bought as an item or as Time Tickets.
 - Extra Stats and gear each add about the same share of power (§7.3), small per point.
 
 ## Professions (design §4, §8.5)
@@ -51,7 +51,7 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 | Buy | Laurels |
 |---|---|
 | Raw item of grade g | `10 + 10g` (20 at grade 1, 110 at grade 10) |
-| Rush Ticket: finishes up to an hour of a running farm job | 20 |
+| Time Ticket: 30 minutes off any running job or training (D74) | 10 |
 | Sweep Ticket: completes a beaten regular fight (EXP and Shards, no Laurels) | 15 |
 
 | Sell at the Warehouse (D62) | Laurels each |
@@ -60,7 +60,7 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 | Refined item of grade g | `4 + 4g` |
 | Dish or unbound gear of grade g | `6 + 6g` |
 
-- A job's Rush costs one ticket per started hour left. Training (S5) can't be rushed.
+- Finishing a job or training takes one Time Ticket per started 30 minutes left (D74).
 - A chapter with at least one won fight stocks its grade pair: chapter n of a tier, grades `2n − 1` and `2n`.
 
 ## Learning District (S5)

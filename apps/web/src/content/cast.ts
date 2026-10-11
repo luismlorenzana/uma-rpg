@@ -1,6 +1,7 @@
-// The private PriConne cast (D50): names and bust portraits served by /api/content to the signed-in owner, loaded once a
-// session. Portraits are hash-named, so their blob URLs are kept for the session and the service worker caches the bytes.
-import type { RpgCastMember } from '@rpg/domain'
+// The foes' faces, by franchise (D50, D76): PriConne's cast (required), Azur Lane's and Puzzle & Dragons' (optional until
+// published), served by /api/content to the signed-in owner and loaded once a session. Portraits are hash-named, so
+// their blob URLs are kept for the session and the service worker caches the bytes.
+import { isRpgElement, type Franchise, type RpgCastMember } from '@rpg/domain'
 import { useSyncExternalStore } from 'react'
 import { authHeaders } from '../api/client'
 
@@ -10,8 +11,10 @@ export interface CastMember extends RpgCastMember {
   art: { path: string; width: number; height: number }
 }
 export interface Cast {
+  /** Every pack's members. */
   members: CastMember[]
   byId: Map<string, CastMember>
+  packs: Record<Franchise, CastMember[]>
 }
 export type CastState = { status: 'idle' | 'loading' } | { status: 'ready'; cast: Cast } | { status: 'error'; message: string }
 
@@ -22,12 +25,20 @@ const set = (next: CastState) => {
   for (const l of listeners) l()
 }
 
-function parseCast(raw: unknown): Cast {
+function parsePack(raw: unknown, folder: string): CastMember[] {
   const members = (raw as { schemaVersion?: number; members?: unknown })?.members
   if ((raw as { schemaVersion?: number }).schemaVersion !== 1 || !Array.isArray(members) || members.length === 0) throw new Error('The cast list is missing or empty')
-  const valid = members.filter((m): m is CastMember =>
-    typeof m?.id === 'string' && typeof m?.name === 'string' && typeof m?.art?.path === 'string' && /^cast\/[a-z0-9_-]+\.[a-f0-9]{8}\.webp$/.test(m.art.path))
-  return { members: valid, byId: new Map(valid.map((m) => [m.id, m])) }
+  const art = new RegExp(`^${folder}cast\\/[a-z0-9_-]+\\.[a-f0-9]{8}\\.(webp|png)$`)
+  return members.filter((m): m is CastMember =>
+    typeof m?.id === 'string' && typeof m?.name === 'string' && typeof m?.art?.path === 'string' && art.test(m.art.path) &&
+    (m.element === undefined || isRpgElement(m.element)))
+}
+
+async function fetchPack(folder: string): Promise<CastMember[] | null> {
+  const res = await fetch(`/api/content/${folder}cast.json`, { headers: await authHeaders() })
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`cast ${res.status}`)
+  return parsePack(await res.json(), folder)
 }
 
 export function loadCast(): void {
@@ -35,9 +46,11 @@ export function loadCast(): void {
   set({ status: 'loading' })
   void (async () => {
     try {
-      const res = await fetch('/api/content/cast.json', { headers: await authHeaders() })
-      if (!res.ok) throw new Error(res.status === 404 ? 'The cast hasn’t been published yet.' : `cast ${res.status}`)
-      set({ status: 'ready', cast: parseCast(await res.json()) })
+      const [priconne, azurlane, pad] = await Promise.all([fetchPack(''), fetchPack('azurlane/').catch(() => null), fetchPack('pad/').catch(() => null)])
+      if (!priconne) throw new Error('The cast hasn’t been published yet.')
+      const packs: Record<Franchise, CastMember[]> = { priconne, azurlane: azurlane ?? [], pad: pad ?? [] }
+      const members = [...packs.priconne, ...packs.azurlane, ...packs.pad]
+      set({ status: 'ready', cast: { members, byId: new Map(members.map((m) => [m.id, m])), packs } })
     } catch (err) {
       set({ status: 'error', message: err instanceof Error ? err.message : String(err) })
     }

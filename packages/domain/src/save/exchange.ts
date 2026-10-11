@@ -1,6 +1,6 @@
 // The Exchange (S4, design §11, D54): Laurels from battles buy raw items of the chapters you've reached, Rush Tickets
 // and Sweep Tickets. A Sweep completes a beaten regular fight at once: its EXP and Shards, no Laurels.
-import { chapterGrades, rawItemPrice, RUSH_TICKET_PRICE, SWEEP_TICKET_PRICE } from '../economy/pacing'
+import { chapterGrades, rawItemPrice, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE } from '../economy/pacing'
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
@@ -41,13 +41,13 @@ export function buyRawItem(save: Save, itemId: string, quantity: number, stocked
   }, now)
 }
 
-export function buyTickets(save: Save, kind: 'rush' | 'sweep', quantity: number, now: string, tier = TIER_ONE): Save {
+export function buyTickets(save: Save, kind: 'time' | 'sweep', quantity: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
-  const cost = (kind === 'rush' ? RUSH_TICKET_PRICE : SWEEP_TICKET_PRICE) * quantity
+  const cost = (kind === 'time' ? TIME_TICKET_PRICE : SWEEP_TICKET_PRICE) * quantity
   if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)
-  const wallet = kind === 'rush'
-    ? { ...world.wallet, laurels: world.wallet.laurels - cost, rushTickets: world.wallet.rushTickets + quantity }
+  const wallet = kind === 'time'
+    ? { ...world.wallet, laurels: world.wallet.laurels - cost, timeTickets: world.wallet.timeTickets + quantity }
     : { ...world.wallet, laurels: world.wallet.laurels - cost, sweepTickets: world.wallet.sweepTickets + quantity }
   return withWorld(save, tier, { ...world, wallet }, now)
 }

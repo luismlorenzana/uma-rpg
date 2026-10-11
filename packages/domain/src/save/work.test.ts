@@ -6,7 +6,7 @@ import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from '.
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { isBusy } from './rules'
-import { collectAll, collectJob, facilityOf, grantProfessionExp, planJob, queueJob, recallJob, rushCost, rushJob, startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
+import { collectAll, collectJob, facilityOf, grantProfessionExp, planJob, queueJob, recallJob, cutJobTime, ticketsToFinish, startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -84,16 +84,28 @@ describe('refining (S4)', () => {
   })
 })
 
-describe('Rush Tickets, upgrades and the Exchange (S4)', () => {
-  it('rushes a job for one ticket per hour left', () => {
+describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
+  it('takes 30 minutes off a job per Time Ticket, never past done', () => {
     let save = startJob(withUmas('102'), 'fields', 0, plain, 'wheat', 3, at(0)) // an hour each at G
     const job = facilityOf(worldOf(save), 'fields').jobs[0]!
-    expect(rushCost(job, at(0))).toBe(3)
-    expect(() => rushJob(save, 'fields', 0, at(0))).toThrow(/3 Rush Tickets/)
-    save = buyTickets(give(save, {}, 60), 'rush', 3, at(0))
-    save = rushJob(save, 'fields', 0, at(MINUTE))
+    expect(ticketsToFinish(job, at(0))).toBe(6)
+    expect(() => cutJobTime(save, 'fields', 0, 1, at(0))).toThrow(/1 Time Ticket/)
+    save = buyTickets(give(save, {}, 70), 'time', 7, at(0))
+    expect(() => cutJobTime(save, 'fields', 0, 7, at(0))).toThrow(/1–6/)
+    save = cutJobTime(save, 'fields', 0, 2, at(0))
+    expect(collectJob(save, 'fields', 0, at(MINUTE)).got).toMatchObject({ items: 1, done: false })
+    save = cutJobTime(save, 'fields', 0, 4, at(MINUTE))
     expect(collectJob(save, 'fields', 0, at(MINUTE)).got).toMatchObject({ items: 3, done: true })
-    expect(worldOf(save).wallet).toMatchObject({ laurels: 0, rushTickets: 0 })
+    expect(worldOf(save).wallet).toMatchObject({ laurels: 0, timeTickets: 1 })
+  })
+
+  it('turns each Rush Ticket of a v11 save into two Time Tickets', () => {
+    const old = JSON.parse(JSON.stringify(withUmas('101')))
+    old.schemaVersion = 11
+    const wallet = old.tierWorlds['1'].wallet
+    delete wallet.timeTickets
+    wallet.rushTickets = 3
+    expect(worldOf(parseSave(old)).wallet.timeTickets).toBe(6)
   })
 
   it('upgrades a facility with Laurels and refined items of its two families', () => {
