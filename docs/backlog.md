@@ -20,7 +20,6 @@ Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script
 
 ## In progress (Claude)
 
-- **Girls' Frontline's pack (D85)**: importing at the wiki's crawl delay; publish, check a Jungle region, then the docs.
 - **Echocalypse's leftover bucket folder** (about 5 MB): deleted once the owner says so.
 
 ## Game

@@ -13,7 +13,7 @@ import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { cachedFetcher, headBox, imageInfo, ROOT, writePack } from './pack.mjs'
+import { cachedFetcher, headBox, imageInfo, ROOT, trimPng, writePack } from './pack.mjs'
 
 const WIKI = 'https://iopwiki.com'
 const INDEX = join(ROOT, 'content/sources/girlsfrontline-tdoll-index.html')
@@ -62,6 +62,8 @@ for (const d of dolls) {
     continue
   }
   imageInfo(art) // rejects an error page
+  // Trimmed to the figure: the wiki's artwork sits on a square canvas, and the battle stage stands foes on its floor.
+  art = trimPng(art)
   const avatar = headBox(art)
   members.push({ id: `gf-${d.id}`, name: d.name, nameJa: '', color: COLOR[d.type] ?? '#888888', gun: d.type, rarity: d.rarity, ...(avatar ? { avatar } : {}), bytes: art })
   process.stdout.write(`\r${members.length + missing.length}/${dolls.length}`)

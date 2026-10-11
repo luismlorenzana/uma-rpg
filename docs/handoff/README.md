@@ -58,7 +58,7 @@ H16, H17, H18, H19. H02, H04, H05, H12, H14 and H16 don't touch art, so they can
 | Every family in demand | Balance 5 | D86 made it provable: `economy/materials.test.ts` checks gear and dishes use every family alike. Input counts move to H14 |
 | Puzzle & Dragons pack | Earlier session | The owner dropped it |
 | Echocalypse pack | D84 | Replaced by Girls' Frontline (D85). Its leftover bucket folder (about 5 MB) awaits the owner's OK to delete |
-| Girls' Frontline pack | Not built 1 | Claude is importing it now; publishing and the docs follow when it finishes |
+| Girls' Frontline pack | Not built 1 | Done: 418 T-Dolls published (D88) |
 | Chibis for newer outfits | Presentation 3 | The source has no chibis for them; the icon is the accepted fallback |
 | Rivals as bust portraits | Presentation 2 | Five of six packs ship full-body art (D81, D85); effects and sound are H10 and H18 |
 | Warehouse limits | Quality of life 1 | Recommendation: don't build. Unlimited storage costs nothing in a personal game, and a cap would only add chores |
