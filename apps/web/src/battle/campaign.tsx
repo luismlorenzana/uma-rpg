@@ -1,7 +1,7 @@
 // The campaign in the app: Tier 1's world map (D66: five continents, one per scenario, of generated regions) with the
 // PriConne cast's faces (D50), and the outfits' battle data. Pages render through CampaignGate once master data and the
 // cast are loaded.
-import { biomeById, regionChapter, stageRegionId, worldContinent, type RosterOutfit, type RpgCampaignChapter, type RpgElement, type WorldContinent, type WorldRegion } from '@rpg/domain'
+import { biomeById, FRANCHISES, regionChapter, stageRegionId, worldContinent, type RosterOutfit, type RpgCampaignChapter, type RpgElement, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
@@ -28,7 +28,7 @@ const cache = new WeakMap<MasterView, WeakMap<Cast, Campaign>>()
 
 function buildCampaign(view: MasterView, cast: Cast): Campaign {
   const face = (m: { id: string; name: string; element?: RpgElement }) => ({ id: m.id, name: m.name, ...(m.element ? { element: m.element } : {}) })
-  const members = { priconne: cast.packs.priconne.map(face), azurlane: cast.packs.azurlane.map(face), pad: cast.packs.pad.map(face) }
+  const members = Object.fromEntries(FRANCHISES.map((f) => [f, cast.packs[f].map(face)]))
   const continents = view.chapters.filter((c) => c.tier === 1).sort((a, b) => a.order - b.order).map((c) => worldContinent({ name: c.name, order: c.order }))
   const regions = new Map(continents.flatMap((c) => c.regions.map((r) => [r.id, r] as const)))
   const built = new Map<string, RpgCampaignChapter>()

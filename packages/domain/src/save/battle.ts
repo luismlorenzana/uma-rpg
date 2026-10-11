@@ -3,10 +3,10 @@
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { best } from '../roster/aptitudes'
 import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
-import type { RpgCampaignChapter, RpgMapNode } from '../rpg/campaign/chapters'
+import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { levelBand, rollTokens } from '../economy/tokens'
-import { FIRST_CLEAR_LAURELS, REPLAY_SHARE } from '../economy/pacing'
+import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
 import { SPRING_RECHARGE_MS } from '../world/world'
 import {
   rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
@@ -216,9 +216,11 @@ export interface FightResult {
   firstClear?: boolean
 }
 
-/** Laurels a stage win pays: triple on its first clear (D66), a quarter of that on a replay or Sweep (D79). */
-export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: number, firstClear: boolean): number {
-  const full = rpgBattleLaurels(kind, tier) * FIRST_CLEAR_LAURELS
+/** Laurels a stage win pays: triple on its first clear (D66), a quarter of that on a replay or Sweep (D79), four times
+ * as much at Lv41–50 (D82). */
+export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: number, firstClear: boolean, foeLevel: number): number {
+  const late = rpgTierLevel(foeLevel).level >= LATE_LAURELS.fromLevel ? LATE_LAURELS.factor : 1
+  const full = rpgBattleLaurels(kind, tier) * FIRST_CLEAR_LAURELS * late
   return firstClear ? full : Math.round(full * REPLAY_SHARE)
 }
 
@@ -241,7 +243,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const kind = rpgRewardKind(node)
   const firstClear = (run.wins[node.id] ?? 0) === 0
   const share = firstClear ? 1 : REPLAY_SHARE
-  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, stageLaurels(kind, chapter.tier, firstClear), tier, share)
+  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, stageLaurels(kind, chapter.tier, firstClear, node.level), tier, share)
   // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
   const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share)
   const items = { ...paid.world.items }

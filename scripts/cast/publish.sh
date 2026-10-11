@@ -4,15 +4,15 @@
 # account.
 #
 #   bash scripts/cast/publish.sh            # PriConne, at the bucket's root
-#   bash scripts/cast/publish.sh azurlane   # or pad: under gs://uma-rpg-content/<pack>/
+#   bash scripts/cast/publish.sh azurlane   # or lastorigin, destinychild, nikke: under gs://uma-rpg-content/<pack>/
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 export CLOUDSDK_ACTIVE_CONFIG_NAME="${CLOUDSDK_ACTIVE_CONFIG_NAME:-default}" CLOUDSDK_CORE_PROJECT="${CLOUDSDK_CORE_PROJECT:-uma-rpg}"
 BUCKET="${CONTENT_BUCKET:-uma-rpg-content}"
 case "${1:-priconne}" in
   priconne) DIR="content/release" PREFIX="" TYPE="image/webp" ;;
-  azurlane | pad) DIR="content/release/$1" PREFIX="$1/" TYPE="image/png" ;;
-  *) echo "Unknown pack $1: priconne, azurlane or pad" >&2; exit 1 ;;
+  azurlane | lastorigin | destinychild | nikke) DIR="content/release/$1" PREFIX="$1/" TYPE="image/png" ;;
+  *) echo "Unknown pack $1: priconne, azurlane, lastorigin, destinychild or nikke" >&2; exit 1 ;;
 esac
 test -f "$DIR/cast.json" || { echo "Run the pack's import first (scripts/cast/import*.mjs)" >&2; exit 1; }
 gcloud storage rsync "$DIR/cast" "gs://${BUCKET}/${PREFIX}cast" --checksums-only \

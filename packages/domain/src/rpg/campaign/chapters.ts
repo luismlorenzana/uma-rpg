@@ -17,7 +17,7 @@ export const RPG_FIGHT_LANES = [1, 2, 3] as const
 export const RPG_MAP_COLUMNS = 5
 export type RpgMapNodeKind = 'camp' | 'fight' | 'sub-boss' | 'boss'
 /** A face the foes wear: a PriConne character from the private cast (D50). */
-export interface RpgCastMember { id: string; name: string; /** A monster's own element, when its franchise has them (P&D, D76). */ element?: RpgElement }
+export interface RpgCastMember { id: string; name: string; /** Her own element, when her franchise's list has one (D76). */ element?: RpgElement }
 export interface RpgMapNode {
   id: string
   row: number

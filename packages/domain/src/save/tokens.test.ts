@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
-import { cookTokenId, craftTokenId, gradeBand, levelBand, promotionTokenId, rollTokens, tokenBuyPrice, TOKENS, tokenById, tokenSellPrice } from '../economy/tokens'
+import { BATTLE_LAURELS, FIRST_CLEAR_LAURELS, LATE_LAURELS } from '../economy/pacing'
+import {
+  cookTokenId, craftTokenId, gradeBand, levelBand, promotionTokenId, rollTokens, TOKEN_DROPS, TOKEN_ODDS, tokenBuyPrice, TOKENS, tokenById, tokenSellPrice,
+} from '../economy/tokens'
+import { RPG_BATTLE_EXP_WEIGHTS } from '../rpg/campaign/rewards'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
 import { buyTokens, sellPrice, sellStock } from './exchange'
@@ -33,19 +37,41 @@ describe('tokens (D67)', () => {
   it('drops the same tokens for the same fight, more from bosses, always a promotion from a boss', () => {
     const fight = rollTokens('seed:a1r1c1', 'fight', 1)
     expect(rollTokens('seed:a1r1c1', 'fight', 1)).toEqual(fight)
-    expect(Object.values(fight).reduce((a, b) => a + b, 0)).toBe(1)
+    expect(Object.values(fight).reduce((a, b) => a + b, 0)).toBe(TOKEN_DROPS.fight)
     for (let i = 0; i < 40; i++) {
       const boss = rollTokens(`seed:${i}`, 'boss', 3)
-      expect(Object.values(boss).reduce((a, b) => a + b, 0)).toBe(3)
+      expect(Object.values(boss).reduce((a, b) => a + b, 0)).toBe(TOKEN_DROPS.boss)
       expect(Object.keys(boss).some((id) => id.startsWith('token-class-') && id.endsWith('-3'))).toBe(true)
     }
+  })
+
+  it('earns each Uma, Lv1 to 50, two class tracks, two weapon tracks and two planets, plus ~1.5 classes of late Laurels (D82)', () => {
+    // A region's twelve stages pay 5.4 levels of EXP at its level, so a party clears about 10 / 5.4 regions per band;
+    // each Uma counts a fifth of what her party's fights drop.
+    const w = RPG_BATTLE_EXP_WEIGHTS
+    const regionsPerBand = 10 / (10 * w.fight + w['sub-boss'] + w.boss)
+    const drops = 10 * TOKEN_DROPS.fight + TOKEN_DROPS['sub-boss'] + TOKEN_DROPS.boss
+    const promotions = 2 + (drops - 2) * TOKEN_ODDS.class
+    const perUma = (perRegion: number, bands: number) => (perRegion * regionsPerBand * bands) / 5
+    // Bands 1–4 promote; band 5's promotion share goes half to Crafting, half to Cooking.
+    const craft = perUma((drops - promotions) / 2, 4) + perUma(drops / 2, 1)
+    expect(perUma(promotions, 4)).toBeGreaterThanOrEqual(2 * 4) // two classes, ranks 1 → 5
+    expect(craft).toBeGreaterThanOrEqual(2 * 10) // two weapons, one per grade
+    expect(TOKEN_ODDS.craft).toBe(TOKEN_ODDS.cook) // and as many Cooking: two planets of ten moons
+    // Lv41–50 Laurels: the extra over a band, per Uma, against a full class bought at the Exchange.
+    const firstClears = (10 * BATTLE_LAURELS.fight + BATTLE_LAURELS['sub-boss'] + BATTLE_LAURELS.boss) * FIRST_CLEAR_LAURELS
+    const extra = perUma(firstClears * (LATE_LAURELS.factor - 1), 1)
+    const fullClass = [1, 2, 3, 4].reduce((n, band) => n + tokenBuyPrice(promotionTokenId('mage', band)), 0)
+    expect(extra / fullClass).toBeGreaterThan(1.2)
+    expect(extra / fullClass).toBeLessThan(2)
   })
 
   it('drops each token with a one-in-four chance on a replay (D79)', () => {
     let dropped = 0
     for (let i = 0; i < 400; i++) dropped += Object.values(rollTokens(`replay:${i}`, 'fight', 1, 0.25)).reduce((a, b) => a + b, 0)
-    expect(dropped).toBeGreaterThan(70)
-    expect(dropped).toBeLessThan(130)
+    // 400 regular wins would drop 800 tokens; a quarter of that, give or take.
+    expect(dropped).toBeGreaterThan(160)
+    expect(dropped).toBeLessThan(240)
   })
 
   it('sells any token for 20 × its band and buys any for twice that: two tokens buy one of another kind (D80)', () => {

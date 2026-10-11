@@ -60,6 +60,9 @@ export const FACILITY_UPGRADE = [
 export const REPLAY_SHARE = 0.25
 /** A stage's first clear pays its Laurels three times over (D66). */
 export const FIRST_CLEAR_LAURELS = 3
+/** Stages at Lv41–50 of a tier pay four times the Laurels (D82): over the band, about one and a half more full classes
+ * per Uma at the Exchange, or anything else Laurels buy. */
+export const LATE_LAURELS = { fromLevel: 41, factor: 4 } as const
 /** Laurels per won fight, times the chapter's tier (D51 numbers, set by this model). */
 export const BATTLE_LAURELS = { fight: 10, 'sub-boss': 25, vanguard: 30, boss: 50 } as const
 /** Exchange prices. A raw item costs about two fights per base hour of gathering (D65); a Time Ticket takes 30 minutes

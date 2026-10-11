@@ -138,9 +138,9 @@ describe('fights (D52, D66)', () => {
     // A replay pays a quarter of the first clear (D79): 30 Laurels become 8, and a quarter of the EXP at most.
     expect(again.result).toMatchObject({ laurels: 8, firstClear: false })
     expect(again.result!.members[0]!.exp).toBeLessThanOrEqual(Math.ceil(fought.result!.members[0]!.exp / 4))
-    // A band-1 token lands in the Warehouse (D67).
+    // Band-1 tokens land in the Warehouse (D67, D82: two from a regular stage).
     const tokens = fought.result!.tokens
-    expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(1)
+    expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(2)
     expect(Object.keys(tokens).every((id) => id.endsWith('-1'))).toBe(true)
     for (const [id, n] of Object.entries(tokens)) expect(world.items[id]).toBe(n)
 

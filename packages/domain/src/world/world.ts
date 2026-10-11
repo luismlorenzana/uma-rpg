@@ -6,7 +6,7 @@ import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/typ
 import { rpgChapterReach, type RpgCampaignChapter, type RpgCastMember, type RpgMapNode } from '../rpg/campaign/chapters'
 import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
-import { BIOMES, biomeById, biomeFranchise, signatureWeaknesses, type Biome, type BiomeDef, type Formation, type Franchise } from './biomes'
+import { BIOMES, biomeById, biomeFranchise, FRANCHISES, signatureWeaknesses, type Biome, type BiomeDef, type Formation, type Franchise } from './biomes'
 
 export const WORLD_LEVELS = 10
 export const WORLD_REGIONS_PER_LEVEL = 4
@@ -106,13 +106,22 @@ export function stagePlan(biome: BiomeDef, regionId: string): { formation: Forma
   return plan
 }
 
-/** Faces for a region: one list, or packs by franchise (D76); a missing or empty pack falls back to PriConne's. */
+/** Faces each pack lends the mixed pool (D81). */
+export const POOL_PER_FRANCHISE = 5
+/** A pack's pool faces: the members whose ids hash lowest, so a growing pack rarely reshuffles them. */
+export const poolOf = <M extends RpgCastMember>(members: readonly M[]): M[] =>
+  [...members].sort((a, b) => hash(`pool:${a.id}`) - hash(`pool:${b.id}`)).slice(0, POOL_PER_FRANCHISE)
+
+/** Faces for a region: one list, or packs by franchise (D76, D81). A biome without its own pack, or whose pack is
+ * missing, draws from the mixed pool: a few faces from every pack there is. */
 export type CastPacks = readonly RpgCastMember[] | Partial<Record<Franchise, readonly RpgCastMember[]>>
 function facesFor(cast: CastPacks, biome: Biome): readonly RpgCastMember[] {
   if (Array.isArray(cast)) return cast as readonly RpgCastMember[]
   const packs = cast as Partial<Record<Franchise, readonly RpgCastMember[]>>
-  const own = packs[biomeFranchise(biome)]
-  return own && own.length > 0 ? own : packs.priconne ?? []
+  const franchise = biomeFranchise(biome)
+  const own = franchise ? packs[franchise] : undefined
+  if (own && own.length > 0) return own
+  return FRANCHISES.flatMap((f) => poolOf(packs[f] ?? []))
 }
 
 /** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. */
@@ -137,7 +146,7 @@ export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 
 function stageEnemies(region: WorldRegion, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', formation: Formation,
   signature: readonly RpgElement[], cast: readonly RpgCastMember[], reach: number): BattleEnemy[] {
   const used = new Set<string>()
-  // A franchise with elements (P&D) shows a monster of the foe's own element when it has one.
+  // A pack with elements shows a face of the foe's own element when it has one.
   const face = (slot: number, element: RpgElement): RpgCastMember => {
     const matching = cast.filter((m) => m.element === element)
     const pool = matching.length > 0 ? matching : cast

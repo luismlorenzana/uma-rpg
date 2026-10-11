@@ -104,7 +104,7 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
   const node = chapter.nodes.find((n) => n.id === nodeId)!
   const run = worldRun(world)
   const wins = run.wins[nodeId] ?? 0
-  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level, stageLaurels('fight', chapter.tier, false), tier, REPLAY_SHARE)
+  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level, stageLaurels('fight', chapter.tier, false, node.level), tier, REPLAY_SHARE)
   // Seeded by the stage and its win count, so each Sweep rolls afresh but a retried save rolls the same.
   const tokens = rollTokens(`sweep:${nodeId}:${wins}`, 'fight', levelBand(node.level), REPLAY_SHARE)
   const items = { ...paid.world.items }

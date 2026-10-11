@@ -1,7 +1,7 @@
 # Elements or franchises?
 
-> **Status: decided for now (D76, 2026-10-11): Sky Isles PriConne, Underworld Azur Lane, every other biome Puzzle &
-> Dragons as a placeholder.** The options below were the proposal. Part of the [world map proposal](README.md). You asked to explore
+> **Status: decided (D76, D81, 2026-10-11):** the Sky Isles PriConne, the Underworld Azur Lane, Ancient Ruins, Canyon and Volcano Last Origin, Desert, Tundra and Glacier NIKKE, Haunted Moor, Swamp and Twilight Rift Destiny Child; the other eight biomes draw from a mixed pool of five faces per pack (D81). Puzzle & Dragons was dropped. The options below were the
+> proposal. Part of the [world map proposal](README.md). You asked to explore
 > regions themed by franchise (a Persona region, a Final Fantasy region, a PriConne region) as well as by element.
 > Two separate questions sit inside that: **what gives a region its identity**, and **what the foes look like**.
 

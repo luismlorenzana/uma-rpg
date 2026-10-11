@@ -1,7 +1,7 @@
-// The foes' faces, by franchise (D50, D76): PriConne's cast (required), Azur Lane's and Puzzle & Dragons' (optional until
+// The foes' faces, by franchise (D50, D76, D81): PriConne's cast (required) and the other packs (optional until
 // published), served by /api/content to the signed-in owner and loaded once a session. Portraits are hash-named, so
 // their blob URLs are kept for the session and the service worker caches the bytes.
-import { isRpgElement, type Franchise, type RpgCastMember } from '@rpg/domain'
+import { FRANCHISES, isRpgElement, type Franchise, type RpgCastMember } from '@rpg/domain'
 import { useSyncExternalStore } from 'react'
 import { authHeaders } from '../api/client'
 
@@ -46,10 +46,11 @@ export function loadCast(): void {
   set({ status: 'loading' })
   void (async () => {
     try {
-      const [priconne, azurlane, pad] = await Promise.all([fetchPack(''), fetchPack('azurlane/').catch(() => null), fetchPack('pad/').catch(() => null)])
-      if (!priconne) throw new Error('The cast hasn’t been published yet.')
-      const packs: Record<Franchise, CastMember[]> = { priconne, azurlane: azurlane ?? [], pad: pad ?? [] }
-      const members = [...packs.priconne, ...packs.azurlane, ...packs.pad]
+      // PriConne's pack sits at the root; each other franchise has its folder.
+      const loaded = await Promise.all(FRANCHISES.map((f) => (f === 'priconne' ? fetchPack('') : fetchPack(`${f}/`).catch(() => null))))
+      if (!loaded[0]) throw new Error('The cast hasn’t been published yet.')
+      const packs = Object.fromEntries(FRANCHISES.map((f, i) => [f, loaded[i] ?? []])) as Record<Franchise, CastMember[]>
+      const members = FRANCHISES.flatMap((f) => packs[f])
       set({ status: 'ready', cast: { members, byId: new Map(members.map((m) => [m.id, m])), packs } })
     } catch (err) {
       set({ status: 'error', message: err instanceof Error ? err.message : String(err) })

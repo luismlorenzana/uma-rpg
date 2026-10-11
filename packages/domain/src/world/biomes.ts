@@ -38,12 +38,19 @@ export const BIOMES: readonly BiomeDef[] = [
   { id: 'ruins', name: 'Ancient Ruins', signatures: [['light', 'dark'], ['fire'], ['ice'], ['lightning']], formations: ['escort', 'trio'], roles: ['guard'], color: '#a39a86' },
   { id: 'rift', name: 'Twilight Rift', signatures: [['light', 'dark']], formations: ['solo'], roles: ['striker', 'caster'], color: '#3d3f8f' },
 ]
-/** Whose faces a biome's foes wear (D76): the angelic Sky Isles PriConne's cast, the demonic Underworld Azur Lane's,
- * everywhere else Puzzle & Dragons monsters as a placeholder. Packs are private content; a missing pack falls back to
- * PriConne. */
-export type Franchise = 'priconne' | 'azurlane' | 'pad'
-export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'pad']
-export const biomeFranchise = (biome: Biome): Franchise => (biome === 'sky' ? 'priconne' : biome === 'underworld' ? 'azurlane' : 'pad')
+/** Whose faces a biome's foes wear (D76, D81): the angelic Sky Isles PriConne's cast, the demonic Underworld Azur
+ * Lane's, war-torn lands Last Origin's, the surface wastes NIKKE's, the occult ones Destiny Child's. Every other biome
+ * draws from a mixed pool of a few faces from each pack. Packs are private content; a missing one falls back to the pool. */
+export type Franchise = 'priconne' | 'azurlane' | 'lastorigin' | 'destinychild' | 'nikke'
+export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'lastorigin', 'destinychild', 'nikke']
+const BIOME_FRANCHISE: Readonly<Partial<Record<Biome, Franchise>>> = {
+  sky: 'priconne', underworld: 'azurlane',
+  ruins: 'lastorigin', canyon: 'lastorigin', volcano: 'lastorigin',
+  desert: 'nikke', tundra: 'nikke', glacier: 'nikke',
+  moor: 'destinychild', swamp: 'destinychild', rift: 'destinychild',
+}
+/** A biome's own franchise, or null when it draws from the mixed pool. */
+export const biomeFranchise = (biome: Biome): Franchise | null => BIOME_FRANCHISE[biome] ?? null
 
 const BY_ID = new Map(BIOMES.map((b) => [b.id, b]))
 export const biomeById = (id: Biome): BiomeDef => BY_ID.get(id)!

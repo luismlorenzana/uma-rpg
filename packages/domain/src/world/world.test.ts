@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { BIOMES, signatureWeaknesses } from './biomes'
-import { regionChapter, stageBand, stagePlan, worldContinent } from './world'
+import { poolOf, regionChapter, stageBand, stagePlan, worldContinent } from './world'
 
 const cast = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 
@@ -43,15 +43,18 @@ describe('the world map (D66, D71)', () => {
     expect(foes.every((f) => f.weaknesses.elements.length === 0 && f.weaknesses.weapons.length >= 1)).toBe(true)
   })
 
-  it('dresses each biome in its franchise: Sky Isles PriConne, Underworld Azur Lane, the rest P&D by element (D76)', () => {
-    const packs = {
-      priconne: [{ id: 'pc1', name: 'P1' }, { id: 'pc2', name: 'P2' }, { id: 'pc3', name: 'P3' }],
-      pad: (['fire', 'ice', 'lightning', 'light', 'dark'] as const).flatMap((element) => [1, 2, 3].map((n) => ({ id: `pad-${element}-${n}`, name: `${element} ${n}`, element }))),
-    }
-    const c = worldContinent({ name: 'URA', order: 1 })
-    const faces = (biome: string) => regionChapter(c.regions.find((r) => r.biome === biome)!, packs).nodes.flatMap((n) => n.enemies)
-    expect(faces('sky').every((f) => f.castId.startsWith('pc'))).toBe(true)
-    expect(faces('underworld').every((f) => f.castId.startsWith('pc'))).toBe(true)
-    expect(faces('meadow').every((f) => f.castId === `pad-${f.element}-${f.castId.split('-').pop()}`)).toBe(true)
+  it('dresses each biome in its franchise, and the rest in a mixed pool of five faces a pack (D76, D81)', () => {
+    const pack = (prefix: string) => Array.from({ length: 12 }, (_, n) => ({ id: `${prefix}-${n}`, name: `${prefix} ${n}` }))
+    const packs = { priconne: pack('pc'), azurlane: pack('al'), nikke: pack('nk') }
+    const regions = [1, 2, 3, 4, 5].flatMap((order) => worldContinent({ name: 'URA', order }).regions)
+    const faces = (biome: string) => regions.filter((r) => r.biome === biome).flatMap((r) => regionChapter(r, packs).nodes.flatMap((n) => n.enemies))
+    expect(faces('sky').every((f) => f.castId.startsWith('pc-'))).toBe(true)
+    expect(faces('underworld').every((f) => f.castId.startsWith('al-'))).toBe(true)
+    expect(faces('desert').every((f) => f.castId.startsWith('nk-'))).toBe(true)
+    // Meadow has no franchise and Last Origin's ruins have no pack yet: both draw from the pool, five per pack.
+    const pool = new Set([...poolOf(packs.priconne), ...poolOf(packs.azurlane), ...poolOf(packs.nikke)].map((m) => m.id))
+    expect(pool.size).toBe(15)
+    for (const biome of ['meadow', 'ruins']) expect(faces(biome).every((f) => pool.has(f.castId))).toBe(true)
+    expect(new Set(faces('meadow').map((f) => f.castId.slice(0, 2))).size).toBeGreaterThan(1)
   })
 })

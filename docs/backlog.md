@@ -17,9 +17,9 @@
 
 ## Not built yet
 
-1. **Franchise packs (D76)**: Azur Lane's is built (the Underworld). Puzzle & Dragons' waits on the owner's OK to
-   download DadGuide's database (231 MB, the only live P&D source with attributes; PuzzleDragonX is gone); until then
-   the other biomes wear PriConne's faces. Key bosses' authored faces later.
+1. **Franchise packs (D81)**: PriConne and Azur Lane are built. Last Origin, Destiny Child and NIKKE wait on the
+   owner's OK for their sources' downloads; until then their biomes draw from the mixed pool. Key bosses' authored
+   faces later.
 2. **The world map**, W3–W5 (W1–W2 shipped as D72): eight-foe fights, dual-element foes and waves; field effects and
    home ground; biome art; the capitals' Finals; themed regions later. Design in [design/world/](design/world/README.md).
 3. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at

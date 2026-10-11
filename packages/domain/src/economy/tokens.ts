@@ -38,9 +38,13 @@ const BY_ID = new Map(TOKENS.map((t) => [t.id, t]))
 export const tokenById = (id: string): TokenDef | undefined => BY_ID.get(id)
 export const isToken = (id: string): boolean => BY_ID.has(id)
 
-/** Tokens a won fight drops, by its kind (half of D67's first numbers, owner 2026-10-11); sub-bosses and champions
- * always include a Class Promotion Token, except in band 5, where a promotion's share goes to Crafting or Cooking. */
-export const TOKEN_DROPS = { fight: 1, 'sub-boss': 2, vanguard: 2, boss: 3 } as const
+/**
+ * Tokens a won fight drops, by its kind (D82): sized so each Uma's Lv1 → 50, as a fifth of her party's fights, earns
+ * two full class tracks (8 Promotion Tokens), two weapon tracks (20 Crafting) and two Extra Stats planets (20 Cooking).
+ * Sub-bosses and champions always include a Class Promotion Token, except in band 5, where a promotion's share goes to
+ * Crafting or Cooking.
+ */
+export const TOKEN_DROPS = { fight: 2, 'sub-boss': 3, vanguard: 3, boss: 5 } as const
 /** Odds of each token kind per drop: Cooking and Crafting alike, Promotions rarer (one per class rank a band). */
 export const TOKEN_ODDS: Readonly<Record<TokenKind, number>> = { cook: 0.425, craft: 0.425, class: 0.15 }
 /** Laurels a token sells for, per band (D80): 20 × its band. Any token costs twice that, so two tokens of a band buy

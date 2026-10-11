@@ -3,14 +3,14 @@ import { resolve, sep } from 'node:path'
 import type { MasterSource } from '../master/master-source'
 
 /**
- * uma-rpg's own private content: the foes' faces by franchise (D50, D76). PriConne's pack sits at the root, Azur Lane's
- * and Puzzle & Dragons' in their own folders; only each `cast.json` and its hash-named portraits are served. Null when
- * refused.
+ * uma-rpg's own private content: the foes' faces by franchise (D50, D76, D81). PriConne's pack sits at the root, the
+ * others in their own folders; only each `cast.json` and its hash-named portraits are served. Null when refused.
  */
+const PACK = '((azurlane|lastorigin|destinychild|nikke)\\/)?'
 export function safeContentPath(raw: string): string | null {
   const path = raw.replace(/^\/+/, '')
-  if (/^((azurlane|pad)\/)?cast\.json$/.test(path)) return path
-  return /^((azurlane|pad)\/)?cast\/[a-z0-9_-]{1,60}\.[a-f0-9]{8}\.(webp|png)$/.test(path) ? path : null
+  if (new RegExp(`^${PACK}cast\\.json$`).test(path)) return path
+  return new RegExp(`^${PACK}cast\\/[a-z0-9_-]{1,60}\\.[a-f0-9]{8}\\.(webp|png)$`).test(path) ? path : null
 }
 
 export function contentCacheControl(path: string): string {

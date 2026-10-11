@@ -39,8 +39,8 @@ on (§8.2):
 | **Crafting** | 8: one per stat | Crafting a piece whose **accent** is that stat: an ATK Crafting Token makes any ATK-accent gear of its band |
 | **Cooking** | 8: one per stat | Cooking a dish that **feeds** that stat. Duo dishes take one of each of their two stats, Feasts one of each of all eight |
 
-- **Drops per win** (seeded by the fight, so a replay drops the same; halved by D71): regular fight 1, stage
-  sub-boss 2, Finals vanguard 2, champion 3. Sub-bosses and champions always include a Promotion Token. Each other drop is Crafting
+- **Drops per win** (seeded by the fight, so a replay drops the same; D82): regular stage 2, elite 3, Finals vanguard
+  3, boss or champion 5. Sub-bosses and champions always include a Promotion Token. Each other drop is Crafting
   42.5%, Cooking 42.5%, Promotion 15%, at a random class or stat. Band 5 drops no Promotion Tokens: their share goes to
   Crafting or Cooking (D77).
 - **Replays** (D79): a stage already cleared drops each token with a 25% chance, and Sweeps pay as replays.
@@ -68,16 +68,22 @@ each band waits on its promotions, gear and dishes.
 
 On the world map that means **about 0.4 of a level per regular stage**, so 48 stages a level serve about 20 parties'
 first clears ([world/README.md](world/README.md)). Built as D72: stages pay 0.4 / 0.6 / 0.8 of a level (regular, elite,
-boss) and drop 1 / 2 / 3 tokens.
+boss) and drop 2 / 3 / 5 tokens (D82).
 
-## What a party needs per band, and what it gets
+## What one Uma earns from Lv1 to Lv50 (D82)
 
-| Per Uma, per band | Tokens |
-|---|---|
-| One class promotion | 1 Promotion |
-| Weapon, armor and accessory, once | 3–4 Crafting |
-| About five dishes (five more active nodes per ten levels) | about 5 Cooking |
+Each Uma counts as a fifth of her party's fights. A region's twelve stages pay 5.4 levels of EXP at its level, so a
+party clears about 1.85 regions' worth of fresh stages per band and about nine on the way to Lv50.
 
-About 45–50 tokens per party per band. With chapters today, a party's ~25 fights per band (plus replays) drop about
-30–40; on the world map, about 24 stages per band drop about the same, with elites and bosses carrying more. Tokens pool
-across parties and trade two for one through Laurels, and the balance pass tunes the drops with the world map.
+| Track | Cost in tokens | Before D82, per Uma | Since D82, per Uma | Target |
+|---|---|---|---|---|
+| A class, rank 1 → 5 | 4 Promotion (one each of bands 1–4) | ~6 (1.5 classes) | ~8.7 (2.2 classes) | 2 classes |
+| A weapon track, grade 1 → 10 (the Weapon Level itself is time only) | 10 Crafting (two a band) | ~11 (1 track) | ~21 (2.1 tracks) | 2 tracks |
+| An Extra Stats planet, moons 1 → 10 | 10 Cooking (two a band) | ~11 (1 planet) | ~21 (2.1 planets) | 2 planets |
+
+The whole Sun-and-planets map (100 nodes) costs 144 Cooking Tokens: 80 for the eight planets, 32 for the sixteen
+bridges' Duo dishes and 32 for the Sun's four Feasts.
+
+**Late Laurels**: stages at Lv41–50 pay four times the Laurels, about 580 extra per Uma over the band. A full class's four
+Promotion Tokens cost 400 at the Exchange, so that's about one and a half more classes, or anything else Laurels buy.
+The test `tokens.test.ts` keeps these numbers honest.

@@ -63,9 +63,8 @@ hand-placed fights), so a rebalance never needs new content.
 Each region is a biome, and each biome sets an **element mix**, a **formation lean** and later a **field effect**:
 15 element signatures (five single elements, ten pairs), eight formation templates from a solo elite to an eight-foe
 swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a combination. Full lists in
-[regions.md](regions.md) and [encounters.md](encounters.md). Foes' faces follow the biome (D76): the Sky Isles wear the
-PriConne cast, the Underworld Azur Lane's, every other biome Puzzle & Dragons monsters as a placeholder; PriConne stands
-in until a pack exists ([themes.md](themes.md)).
+[regions.md](regions.md) and [encounters.md](encounters.md). Foes' faces follow the biome (D76, D81): the Sky Isles PriConne, the Underworld Azur Lane, Ancient Ruins, Canyon and Volcano Last Origin, Desert, Tundra and Glacier NIKKE, Haunted Moor, Swamp and Twilight Rift Destiny Child; the other eight biomes draw from a mixed pool of five faces per pack (D81). A biome whose pack isn't published yet draws from the pool
+([themes.md](themes.md)).
 
 ## On the phone
 
@@ -107,5 +106,5 @@ in until a pack exists ([themes.md](themes.md)).
 3. **Everything open** from the start.
 4. **Lv1 → 50 in about 4 hours of fighting** for a fresh party, so about 20 parties make the 100-hour mark (owner,
    D71); the loop's passive steps pace it in practice.
-5. **Faces by franchise** (D76, superseding "PriConne everywhere"): Sky Isles PriConne, Underworld Azur Lane, the rest
-   Puzzle & Dragons for now; key bosses authored later.
+5. **Faces by franchise** (D76, D81, superseding "PriConne everywhere"): five franchises by biome plus a mixed pool for
+   the rest; key bosses authored later.

@@ -9,7 +9,7 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 | API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
 | Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }` |
 | Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket |
-| Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the face packs: PriConne at the root (D50), Azur Lane under `azurlane/` and Puzzle & Dragons under `pad/` (D76). The runtime service account reads it; `scripts/cast/publish.sh` writes it with the owner's gcloud login |
+| Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the face packs: PriConne at the root (D50), the other franchises under `azurlane/`, `lastorigin/`, `destinychild/` and `nikke/` (D76, D81). The runtime service account reads it; `scripts/cast/publish.sh` writes it with the owner's gcloud login |
 | Images | Artifact Registry `us-central1-docker.pkg.dev/uma-rpg/rpg`, keeps the last 3 |
 | Auth | Firebase Auth, Google sign-in; the API allows only `ALLOWED_EMAIL` |
 | Push (D63) | Secret Manager `rpg-vapid` (VAPID keys, read by the runtime service account as `VAPID_KEYS`); Firestore `push/{uid}`; Cloud Scheduler `rpg-push-tick` (`us-central1`, every 5 minutes) POSTs `/api/push/tick` with an OIDC token for `rpg-push-scheduler@uma-rpg.iam.gserviceaccount.com`, audience the Cloud Run URL (repository variable `PUSH_AUDIENCE`). Set up by `infra/push/setup.sh` (2026-10-10). All in free tiers |
