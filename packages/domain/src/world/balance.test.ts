@@ -1,15 +1,17 @@
 // A balance simulation for the world map (D72, D75, D77, D86): a five-class party with expected skills plays every stage
 // of a region at its level with a simple policy, and we read win rates. Run the full table with `SIM=1 npx vitest run
-// src/world/balance.test.ts`; the always-on test only checks that the opening stages are winnable at Lv1.
+// src/world/balance.test.ts`; the always-on tests keep the shared Auto policy legal and the opening stages winnable.
 import { describe, expect, it } from 'vitest'
-import { applyBattleAction, battleActionsLeft, battleActorSkill, battleHitIsWeak, createBattle } from '../rpg/battle/engine'
-import type { BattleAction, BattleAlly, BattleHalf, BattleInput, BattleState, BattleUnit } from '../rpg/battle/types'
-import { rpgNode, type RpgSkillDef } from '../rpg/catalog'
+import { autoAction } from '../rpg/battle/auto'
+import { applyBattleAction, battleActionsLeft, createBattle } from '../rpg/battle/engine'
+import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
+import type { BattleAlly, BattleInput, BattleState } from '../rpg/battle/types'
+import { rpgNode } from '../rpg/catalog'
 import { depthsOpen } from '../economy/training'
 import { RPG_FOE_TUNING } from '../rpg/campaign/enemies'
 import {
-  isRpgTome, learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees, RPG_DEPTH_GATES,
-  rpgWeaponKind, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
+  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees, RPG_DEPTH_GATES,
+  type RpgClass, type RpgNodeRef, type RpgProfile,
 } from '../rpg/rules'
 import { regionChapter, worldContinent } from './world'
 
@@ -37,54 +39,13 @@ function member(classId: RpgClass, i: number, level: number, rank: number, budge
     loadout, mp: boosted.mp, maxDepth: depthsOpen(rank) }
 }
 
-/** How good a skill or Attack is against a foe now: power, more for weaknesses and every-foe reach. */
-function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: BattleUnit[]): number {
-  const enemy = state.input.enemies.find((e) => e.id === foe.id)!
-  const weak = def.hits.some((h) => h.parts.some((p) => battleHitIsWeak(enemy, foe, p.kind)))
-  const total = def.hits.reduce((n, h) => n + h.power, 0)
-  return total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) / (foe.shield > 0 ? 1 : 0.6) + (def.status ? 0.5 : 0)
-}
-const attackDef = (w: RpgWeapon): RpgSkillDef => ({ target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(w), share: 1 }] }], mp: 0, primary: rpgWeaponKind(w) })
-
 /** Plays a fight: each ally picks her best affordable skill or Attack (a Spell Blade one of each half), weakness-aware. */
 function play(input: BattleInput): { won: boolean; rounds: number; hpLeft: number; mp: Record<string, number> } {
   let state: BattleState = createBattle(input).state
   for (let n = 0; n < 600 && state.outcome === 'active'; n++) {
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)
     if (!ally) break
-    const foes = state.units.filter((u) => u.side === 'enemy' && u.hp > 0)
-    const source = state.input.allies.find((a) => a.id === ally.id)!
-    const best = (tome: boolean | null, budget: number): { half: BattleHalf; mp: number; foe: BattleUnit } => {
-      let pick: { half: BattleHalf; mp: number; foe: BattleUnit; score: number } = { half: { weapon: source.weapons.find((w) => tome === null || isRpgTome(w) === tome)! }, mp: 0, foe: foes[0]!, score: -1 }
-      for (const foe of foes) {
-        for (const w of source.weapons.filter((x) => tome === null || isRpgTome(x) === tome)) {
-          const v = score(state, attackDef(w), foe, foes)
-          if (v > pick.score) pick = { half: { weapon: w }, mp: 0, foe, score: v }
-        }
-        for (const ref of source.loadout) {
-          const skill = battleActorSkill(state, ally.id, ref)
-          if (!skill || skill.mp > budget || (tome !== null && isRpgTome(skill.node.weapon) !== tome)) continue
-          const v = score(state, skill.def, foe, foes)
-          if (v > pick.score) pick = { half: { skill: ref }, mp: skill.mp, foe, score: v }
-        }
-      }
-      return pick
-    }
-    let action: BattleAction
-    if (source.classId === 'spellblade') {
-      const arms = best(false, ally.mp)
-      const tome = best(true, ally.mp - arms.mp)
-      action = arms.half.skill
-        ? { kind: 'skill', actorId: ally.id, targetId: arms.foe.id, skill: arms.half.skill, pair: tome.half }
-        : { kind: 'attack', actorId: ally.id, targetId: arms.foe.id, weapon: arms.half.weapon, pair: tome.half }
-    } else {
-      const pick = best(null, ally.mp)
-      action = pick.half.skill ? { kind: 'skill', actorId: ally.id, targetId: pick.foe.id, skill: pick.half.skill }
-        : { kind: 'attack', actorId: ally.id, targetId: pick.foe.id, weapon: pick.half.weapon }
-    }
-    const step = applyBattleAction(state, action)
-    const friend = state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)?.id ?? ally.id
-    state = step.error ? applyBattleAction(state, { kind: 'guard', actorId: ally.id, targetId: friend }).state : step.state
+    state = applyBattleAction(state, autoAction(state, ally.id)).state
   }
   const allies = state.units.filter((u) => u.side === 'ally')
   const maxHp = state.input.allies.reduce((n, a) => n + a.stats.hp, 0)
@@ -133,6 +94,38 @@ function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 
 }
 
 describe('world balance (D72, D86)', () => {
+  it('uses each class’s first valid Limit option before a regular action', () => {
+    const party = PARTY.map((classId, i) => member(classId, i, 10, 2, 1))
+    const node = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions.find((region) => region.level === 10)!, cast).nodes.at(-1)!
+    for (const ally of party) {
+      const state = createBattle({ version: 6, seed: 6999, allies: party, enemies: node.enemies }).state
+      state.units.find((unit) => unit.id === ally.id)!.limit = BATTLE_LIMIT_MAX
+      const action = autoAction(state, ally.id)
+      expect(action.kind, ally.classId).toBe('limit')
+      expect(applyBattleAction(state, action).error, ally.classId).toBeUndefined()
+    }
+  })
+
+  it('always chooses an accepted action across one region per continent at its level', () => {
+    for (let order = 1; order <= 5; order++) {
+      const region = worldContinent({ name: 'Sim', order }).regions[0]!
+      const rank = RPG_DEPTH_GATES.filter((gate) => region.level >= gate).length
+      const budget = 1 + RPG_FOE_TUNING.budgetPerLevel * Math.max(0, region.level - RPG_FOE_TUNING.budgetFrom)
+      const party = PARTY.map((classId, i) => member(classId, i, region.level, rank, budget))
+      for (const node of regionChapter(region, cast).nodes.filter((candidate) => candidate.kind !== 'camp')) {
+        let state = createBattle({ version: 6, seed: 7000 + node.row, allies: party, enemies: node.enemies }).state
+        for (let n = 0; n < 600 && state.outcome === 'active'; n++) {
+          const actor = state.units.find((unit) => unit.side === 'ally' && unit.hp > 0 && battleActionsLeft(state, unit.id) > 0)
+          if (!actor) break
+          const action = autoAction(state, actor.id)
+          const step = applyBattleAction(state, action)
+          expect(step.error, `${node.id}: ${JSON.stringify(action)}`).toBeUndefined()
+          state = step.state
+        }
+      }
+    }
+  })
+
   it('lets a fresh Lv1 party win the opening pairs', () => {
     const party = PARTY.map((c, i) => member(c, i, 1, 1, 1))
     const meadow = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions[0]!, cast)

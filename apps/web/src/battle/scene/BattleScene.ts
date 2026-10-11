@@ -39,6 +39,12 @@ export class BattleScene extends Phaser.Scene {
     super('battle')
   }
 
+  /** Speeds every cue clock together; reduced motion still skips playback entirely. */
+  setSpeed(speed: 1 | 2 | 4): void {
+    this.tweens.timeScale = speed
+    this.time.timeScale = speed
+  }
+
   create(): void {
     this.background = this.add.graphics()
     this.layer = this.add.container(0, 0)

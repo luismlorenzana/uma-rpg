@@ -1,12 +1,14 @@
 // Creates the Phaser game for a fight inside a host element, like the Hub's (lazy chunk, DPR-aware, `?canvas` in dev).
 import type { BattleCue, BattleState } from '@rpg/domain'
 import Phaser from 'phaser'
+import type { BattleSpeed } from '../battle-prefs'
 import { BattleScene, type StageSetup } from './BattleScene'
 
 export interface BattleGame {
   play(cues: readonly BattleCue[], onCue: (cue: BattleCue) => void): Promise<void>
   skip(): void
   sync(state: BattleState): void
+  setSpeed(speed: BattleSpeed): void
   setPaused(paused: boolean): void
   destroy(): void
 }
@@ -52,6 +54,7 @@ export function createBattleGame(host: HTMLElement, setup: StageSetup, state: Ba
           latest = next
           scene.sync(next)
         },
+        setSpeed: (speed) => scene.setSpeed(speed),
         setPaused(paused) {
           if (paused) game.scene.pause('battle')
           else game.scene.resume('battle')

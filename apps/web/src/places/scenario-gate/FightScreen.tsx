@@ -3,7 +3,7 @@
 // rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  battleActionsLeft, battleBroken, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  autoAction, battleActionsLeft, battleBroken, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -13,6 +13,7 @@ import {
   type BattleMode, type SkillChoice,
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
+import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
 import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
@@ -83,6 +84,7 @@ function useSize(ref: React.RefObject<HTMLElement | null>): { w: number; h: numb
 }
 
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+const AUTO_DELAY_MS = 180
 
 export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   campaign: Campaign
@@ -103,13 +105,29 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   const [busy, setBusy] = useState(false)
   const [cue, setCue] = useState<BattleCue | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [prefs, setPrefs] = useState(loadBattlePreferences)
+  const [stageReady, setStageReady] = useState(false)
   const game = useRef<BattleGame | null>(null)
+  const actRef = useRef<(action: BattleAction) => Promise<void>>(async () => undefined)
   const setup = useStageSetup(campaign, chapter, live, reduced())
   const stageRef = useRef<HTMLDivElement>(null)
   const size = useSize(stageRef)
   const onGame = useCallback((g: BattleGame | null) => {
     game.current = g
+    setStageReady(g !== null)
   }, [])
+
+  useEffect(() => saveBattlePreferences(prefs), [prefs])
+
+  // Auto owns only the next ready ally. The action's cue playback keeps `busy` true, so the following ally waits until
+  // the stage has finished and synced. Reduced motion removes this small hand-off pause too.
+  useEffect(() => {
+    if (!prefs.auto || busy || cue || sheet || !stageReady || !live || live.outcome !== 'active') return
+    const actor = live.units.find((unit) => unit.side === 'ally' && unit.hp > 0 && battleActionsLeft(live, unit.id) > 0)
+    if (!actor) return
+    const timer = window.setTimeout(() => void actRef.current(autoAction(live, actor.id)), reduced() ? 0 : AUTO_DELAY_MS / prefs.speed)
+    return () => window.clearTimeout(timer)
+  }, [busy, cue, live, prefs.auto, prefs.speed, sheet, stageReady])
 
   // Hidden mid-playback: finish at once rather than animate into the background.
   useEffect(() => {
@@ -180,13 +198,18 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       setBusy(false)
     }
   }
+  actRef.current = act
+
+  const stopAuto = () => setPrefs((current) => current.auto ? { ...current, auto: false } : current)
 
   const tapEnemy = (unit: BattleUnit) => {
     if (busy || playing || !actor || unit.hp <= 0 || mode.kind === 'guard') return
+    stopAuto()
     void act(actionFor(effective, actor.id, unit.id))
   }
   const tapAlly = (unit: BattleUnit) => {
     if (busy || playing || !actor) return
+    stopAuto()
     if (mode.kind === 'guard') {
       if (unit.id !== actor.id && unit.hp > 0) void act({ kind: 'guard', actorId: actor.id, targetId: unit.id })
       return
@@ -197,16 +220,19 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
     }
   }
   const pickSkill = (choice: SkillChoice) => {
+    stopAuto()
     if (pair) setMode(pairMode(isRpgTome(choice.skill.node.weapon) ? { ...pair, tome: { skill: choice.ref } } : { ...pair, arms: { skill: choice.ref } }))
     else setMode({ kind: 'skill', ref: choice.ref })
     setSheet(null)
   }
   const pickWeapon = (w: RpgWeapon) => {
+    stopAuto()
     if (pair) setMode(pairMode(isRpgTome(w) ? { ...pair, tome: { weapon: w } } : { ...pair, arms: { weapon: w } }))
     else setMode({ kind: 'attack', weapon: w })
   }
 
   const hint = error ?? (cue ? describeCue(cue, name)
+    : prefs.auto ? `Auto · ${prefs.speed}×${actor ? ` · ${name(actor.id)}` : ''}`
     : mode.kind === 'guard' ? `Tap an ally for ${name(actor?.id ?? '')} to guard`
     : mode.kind === 'limit' ? `Tap a rival: LIMIT BREAK · ${mode.name}`
     : pair ? `Tap a rival: ${halfName(pair.arms)} + ${halfName(pair.tome)}${pairMp ? ` · ${pairMp} MP` : ''}`
@@ -227,14 +253,24 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
           <p className="truncate text-[11px] text-ink-faint">{chapter.title}</p>
           <h1 className="truncate text-[15px] leading-tight">{node?.name ?? 'Fight'}</h1>
         </div>
-        <span className="rounded-full bg-sunken px-2.5 py-1 text-[12px] font-bold">Round {state.round}</span>
-        <button type="button" onClick={() => setSheet('menu')} disabled={busy} className="flex size-11 items-center justify-center rounded-full text-ink-soft" aria-label="Fight menu">
+        <span className="rounded-full bg-sunken px-2 py-1 text-[11px] font-bold">Round {state.round}</span>
+        <button type="button" aria-pressed={prefs.auto} aria-label={`Auto-battle ${prefs.auto ? 'on' : 'off'}`}
+          onClick={() => setPrefs((current) => ({ ...current, auto: !current.auto }))}
+          className={`flex h-11 min-w-11 items-center justify-center rounded-full border text-[11px] font-bold ${prefs.auto ? 'border-accent bg-accent/15 text-accent' : 'border-transparent text-ink-soft'}`}>
+          Auto
+        </button>
+        <button type="button" aria-label={`Battle speed ${prefs.speed} times. Tap for ${nextBattleSpeed(prefs.speed)} times`}
+          onClick={() => setPrefs((current) => ({ ...current, speed: nextBattleSpeed(current.speed) }))}
+          className="flex size-11 items-center justify-center rounded-full text-[12px] font-bold text-ink-soft">
+          {prefs.speed}×
+        </button>
+        <button type="button" onClick={() => { stopAuto(); setSheet('menu') }} disabled={busy} className="flex size-11 items-center justify-center rounded-full text-ink-soft" aria-label="Fight menu">
           <MenuIcon />
         </button>
       </header>
 
       <div ref={stageRef} className="relative min-h-0 flex-1 overflow-hidden" onClick={() => playing && game.current?.skip()}>
-        {setup ? <BattleStage setup={setup} state={state} onGame={onGame} /> : <p className="p-6 text-center text-ink-soft">Setting the stage…</p>}
+        {setup ? <BattleStage setup={setup} state={state} speed={prefs.speed} onGame={onGame} /> : <p className="p-6 text-center text-ink-soft">Setting the stage…</p>}
         {layout && enemies.map((unit, i) => {
           const enemy = state.input.enemies.find((e) => e.id === unit.id)!
           const box = layout.enemies[i]!
@@ -314,6 +350,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   disabled={busy || playing}
                   onClick={(e) => {
                     e.stopPropagation()
+                    stopAuto()
                     setLimitPicks([])
                     setSheet({ limit: unit.id })
                   }}
@@ -361,7 +398,11 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
               type="button"
               disabled={busy || playing || !actor || (kind === 'skill' && choices.length === 0)}
               aria-pressed={mode.kind === kind}
-              onClick={() => (kind === 'skill' ? setSheet('skills') : setMode(kind === 'attack' ? (ally && paired ? pairMode(pairOf({ kind: 'attack' }, ally)) : { kind }) : { kind: 'guard' }))}
+              onClick={() => {
+                stopAuto()
+                if (kind === 'skill') setSheet('skills')
+                else setMode(kind === 'attack' ? (ally && paired ? pairMode(pairOf({ kind: 'attack' }, ally)) : { kind }) : { kind: 'guard' })
+              }}
               className={`min-h-12 rounded-sm border font-display text-[15px] font-bold disabled:opacity-40 ${mode.kind === kind ? 'border-accent bg-accent/15 text-accent' : 'border-hairline-strong bg-raised'}`}
             >
               {kind === 'skill' ? `Skills${choices.length ? ` (${choices.length})` : ''}` : kind === 'attack' ? 'Attack' : 'Guard'}
