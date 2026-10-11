@@ -8,7 +8,13 @@ import { authHeaders } from '../api/client'
 export interface CastMember extends RpgCastMember {
   nameJa: string
   color: string
+  /** The portrait the stage shows: a bust or, for some packs, full-body art. */
   art: { path: string; width: number; height: number }
+  /** A face icon for small round avatars, when the pack has them (D81). */
+  face?: { path: string; width: number; height: number }
+  /** Without one, a head-and-shoulders box in full-body art: x of the width, y and size of the height (hers, else the
+   * pack's). */
+  avatar?: { x: number; y: number; size: number }
 }
 export interface Cast {
   /** Every pack's members. */
@@ -25,13 +31,18 @@ const set = (next: CastState) => {
   for (const l of listeners) l()
 }
 
+const isBox = (b: unknown): b is { x: number; y: number; size: number } =>
+  typeof b === 'object' && b !== null && ['x', 'y', 'size'].every((k) => typeof (b as Record<string, unknown>)[k] === 'number')
+
 function parsePack(raw: unknown, folder: string): CastMember[] {
-  const members = (raw as { schemaVersion?: number; members?: unknown })?.members
-  if ((raw as { schemaVersion?: number }).schemaVersion !== 1 || !Array.isArray(members) || members.length === 0) throw new Error('The cast list is missing or empty')
-  const art = new RegExp(`^${folder}cast\\/[a-z0-9_-]+\\.[a-f0-9]{8}\\.(webp|png)$`)
+  const { schemaVersion, members, avatar } = (raw ?? {}) as { schemaVersion?: number; members?: unknown; avatar?: unknown }
+  if (schemaVersion !== 1 || !Array.isArray(members) || members.length === 0) throw new Error('The cast list is missing or empty')
+  const image = new RegExp(`^${folder}cast\\/[a-z0-9_-]+\\.[a-f0-9]{8}\\.(webp|png)$`)
   return members.filter((m): m is CastMember =>
-    typeof m?.id === 'string' && typeof m?.name === 'string' && typeof m?.art?.path === 'string' && art.test(m.art.path) &&
+    typeof m?.id === 'string' && typeof m?.name === 'string' && typeof m?.art?.path === 'string' && image.test(m.art.path) &&
+    (m.face === undefined || (typeof m.face?.path === 'string' && image.test(m.face.path))) &&
     (m.element === undefined || isRpgElement(m.element)))
+    .map((m) => (m.face || isBox(m.avatar) ? m : isBox(avatar) ? { ...m, avatar } : { ...m, avatar: undefined }))
 }
 
 async function fetchPack(folder: string): Promise<CastMember[] | null> {

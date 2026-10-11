@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Uploads a private face pack (D50, D76) from content/release to the private content bucket: hash-named portraits
+# Uploads a private face pack (D50, D76, D81) from content/release to the private content bucket: hash-named portraits
 # first, then its cast.json, so a reader never sees a list that points at missing files. Never changes the gcloud
 # account.
 #
@@ -11,7 +11,8 @@ export CLOUDSDK_ACTIVE_CONFIG_NAME="${CLOUDSDK_ACTIVE_CONFIG_NAME:-default}" CLO
 BUCKET="${CONTENT_BUCKET:-uma-rpg-content}"
 case "${1:-priconne}" in
   priconne) DIR="content/release" PREFIX="" TYPE="image/webp" ;;
-  azurlane | lastorigin | destinychild | nikke) DIR="content/release/$1" PREFIX="$1/" TYPE="image/png" ;;
+  azurlane | lastorigin | destinychild) DIR="content/release/$1" PREFIX="$1/" TYPE="image/png" ;;
+  nikke) DIR="content/release/$1" PREFIX="$1/" TYPE="image/webp" ;;
   *) echo "Unknown pack $1: priconne, azurlane, lastorigin, destinychild or nikke" >&2; exit 1 ;;
 esac
 test -f "$DIR/cast.json" || { echo "Run the pack's import first (scripts/cast/import*.mjs)" >&2; exit 1; }

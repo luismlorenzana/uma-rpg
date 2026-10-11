@@ -15,19 +15,28 @@ import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
 import { FightResult } from './FightResult'
 
+/** A foe's round face: her face icon, else full-body art zoomed onto the head (D81), else the bust's top. */
 export function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: string; size: number }) {
   const [url, setUrl] = useState<string | null>(null)
   const member = campaign.cast.byId.get(castId)
+  const image = member?.face ?? member?.art
   useEffect(() => {
     let live = true
-    if (member) void castArtUrl(member.art.path).then((u) => live && setUrl(u), () => undefined)
+    if (image) void castArtUrl(image.path).then((u) => live && setUrl(u), () => undefined)
     return () => {
       live = false
     }
-  }, [member])
+  }, [image])
+  const box = member && !member.face ? member.avatar : undefined
+  let zoom: React.CSSProperties | undefined
+  if (box && member) {
+    const height = size / box.size
+    const width = (height * member.art.width) / member.art.height
+    zoom = { position: 'absolute', maxWidth: 'none', width, height, left: size / 2 - box.x * width, top: size / 2 - box.y * height }
+  }
   return (
-    <span className="block shrink-0 overflow-hidden rounded-full bg-raised" style={{ width: size, height: size, background: member?.color }}>
-      {url && <img src={url} alt="" className="size-full object-cover object-top" />}
+    <span className="relative block shrink-0 overflow-hidden rounded-full bg-raised" style={{ width: size, height: size, background: member?.color }}>
+      {url && <img src={url} alt="" className={zoom ? '' : 'size-full object-cover object-top'} style={zoom} />}
     </span>
   )
 }

@@ -75,9 +75,11 @@ list minus story-only characters). Names, colours and bust portraits are private
 `node scripts/cast/import.mjs` builds `content/release/` from the captured list, `bash scripts/cast/publish.sh`
 uploads it to `gs://uma-rpg-content`, and the API serves it at `/api/content/` to the signed-in owner only. Growing
 the cast means capturing the list again and re-running both scripts; the chapters pick it up on the next load. Since
-D76 and D81 the faces follow the biome: the Sky Isles keep PriConne, the Underworld wears **Azur Lane's ships** (694
-shipyard busts from the Azur Lane Wiki, `import-azurlane.mjs`), war-torn biomes **Last Origin**, the surface wastes
-**NIKKE**, the occult ones **Destiny Child**, and the other eight biomes a mixed pool of five faces from each pack.
+D76, D81 and D83 the faces follow the biome, three biomes a franchise: PriConne, **Azur Lane** (694 shipyard busts,
+`import-azurlane.mjs`), **Last Origin** (full art and face icons, `import-lastorigin.mjs`, run by the owner), **NIKKE**
+(full-body art, `import-nikke.mjs`) and **Destiny Child** (full-body stills, `import-destinychild.mjs`); four biomes
+draw from a mixed pool of five faces per pack. Busts and full-body art both fit the stage by their own shape; the
+small round faces use a pack's face icons, or zoom onto the head of full-body art.
 Costume variants aren't on the official site and are out of scope.
 
 ## Presentation (D53)

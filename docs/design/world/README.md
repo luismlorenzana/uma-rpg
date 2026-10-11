@@ -63,7 +63,7 @@ hand-placed fights), so a rebalance never needs new content.
 Each region is a biome, and each biome sets an **element mix**, a **formation lean** and later a **field effect**:
 15 element signatures (five single elements, ten pairs), eight formation templates from a solo elite to an eight-foe
 swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a combination. Full lists in
-[regions.md](regions.md) and [encounters.md](encounters.md). Foes' faces follow the biome (D76, D81): the Sky Isles PriConne, the Underworld Azur Lane, Ancient Ruins, Canyon and Volcano Last Origin, Desert, Tundra and Glacier NIKKE, Haunted Moor, Swamp and Twilight Rift Destiny Child; the other eight biomes draw from a mixed pool of five faces per pack (D81). A biome whose pack isn't published yet draws from the pool
+[regions.md](regions.md) and [encounters.md](encounters.md). Foes' faces follow the biome (D76, D81): three biomes a franchise (D83): PriConne the Sky Isles, Highlands and Meadow; Azur Lane the Underworld, Coast and Glacier; Last Origin the Ancient Ruins, Canyon and Volcano; NIKKE the Desert, Tundra and Storm Peaks; Destiny Child the Haunted Moor, Swamp and Twilight Rift; Forest, Jungle, Geyser Basin and Crystal Caverns draw from a mixed pool of five faces per pack. A biome whose pack isn't published yet draws from the pool
 ([themes.md](themes.md)).
 
 ## On the phone

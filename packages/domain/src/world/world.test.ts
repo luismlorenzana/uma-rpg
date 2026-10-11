@@ -51,10 +51,12 @@ describe('the world map (D66, D71)', () => {
     expect(faces('sky').every((f) => f.castId.startsWith('pc-'))).toBe(true)
     expect(faces('underworld').every((f) => f.castId.startsWith('al-'))).toBe(true)
     expect(faces('desert').every((f) => f.castId.startsWith('nk-'))).toBe(true)
-    // Meadow has no franchise and Last Origin's ruins have no pack yet: both draw from the pool, five per pack.
+    // Forest has no franchise and Last Origin's ruins have no pack yet: both draw from the pool, five per pack.
     const pool = new Set([...poolOf(packs.priconne), ...poolOf(packs.azurlane), ...poolOf(packs.nikke)].map((m) => m.id))
     expect(pool.size).toBe(15)
-    for (const biome of ['meadow', 'ruins']) expect(faces(biome).every((f) => pool.has(f.castId))).toBe(true)
-    expect(new Set(faces('meadow').map((f) => f.castId.slice(0, 2))).size).toBeGreaterThan(1)
+    for (const biome of ['forest', 'ruins']) expect(faces(biome).every((f) => pool.has(f.castId))).toBe(true)
+    expect(new Set(faces('forest').map((f) => f.castId.slice(0, 2))).size).toBeGreaterThan(1)
+    expect(faces('meadow').every((f) => f.castId.startsWith('pc-'))).toBe(true)
+    expect(faces('coast').every((f) => f.castId.startsWith('al-'))).toBe(true)
   })
 })

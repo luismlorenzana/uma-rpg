@@ -38,15 +38,17 @@ export const BIOMES: readonly BiomeDef[] = [
   { id: 'ruins', name: 'Ancient Ruins', signatures: [['light', 'dark'], ['fire'], ['ice'], ['lightning']], formations: ['escort', 'trio'], roles: ['guard'], color: '#a39a86' },
   { id: 'rift', name: 'Twilight Rift', signatures: [['light', 'dark']], formations: ['solo'], roles: ['striker', 'caster'], color: '#3d3f8f' },
 ]
-/** Whose faces a biome's foes wear (D76, D81): the angelic Sky Isles PriConne's cast, the demonic Underworld Azur
- * Lane's, war-torn lands Last Origin's, the surface wastes NIKKE's, the occult ones Destiny Child's. Every other biome
- * draws from a mixed pool of a few faces from each pack. Packs are private content; a missing one falls back to the pool. */
+/** Whose faces a biome's foes wear (D76, D81): three biomes a franchise. PriConne the bright fantasy lands, Azur Lane
+ * the Underworld and the seas, Last Origin the war-torn ones, NIKKE the surface wastes, Destiny Child the occult ones.
+ * The other four draw from a mixed pool of a few faces from each pack. Packs are private content; a missing one falls
+ * back to the pool. */
 export type Franchise = 'priconne' | 'azurlane' | 'lastorigin' | 'destinychild' | 'nikke'
 export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'lastorigin', 'destinychild', 'nikke']
 const BIOME_FRANCHISE: Readonly<Partial<Record<Biome, Franchise>>> = {
-  sky: 'priconne', underworld: 'azurlane',
+  sky: 'priconne', highlands: 'priconne', meadow: 'priconne',
+  underworld: 'azurlane', coast: 'azurlane', glacier: 'azurlane',
   ruins: 'lastorigin', canyon: 'lastorigin', volcano: 'lastorigin',
-  desert: 'nikke', tundra: 'nikke', glacier: 'nikke',
+  desert: 'nikke', tundra: 'nikke', peaks: 'nikke',
   moor: 'destinychild', swamp: 'destinychild', rift: 'destinychild',
 }
 /** A biome's own franchise, or null when it draws from the mixed pool. */

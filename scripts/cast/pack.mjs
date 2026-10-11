@@ -1,11 +1,14 @@
-// Shared by the franchise pack imports (D76): a polite one-at-a-time fetcher with a cache, PNG sizes, slugs, and the
-// writer for content/release/<folder>/cast.json plus <folder>/cast/<slug>.<hash>.<ext>. Everything lands in the
-// gitignored content/ folder.
+// Shared by the franchise pack imports (D76, D81): a polite one-at-a-time fetcher with a cache, image sizes, slugs, a
+// PNG trimmer, and the writer for content/release/<folder>/cast.json plus <folder>/cast/<slug>.<hash>.<ext> (and
+// <slug>-face.<hash>.<ext> when a pack has separate face icons). Everything lands in the gitignored content/ folder.
 import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { deflateSync, inflateSync } from 'node:zlib'
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -23,6 +26,24 @@ export const slugOf = (name) =>
 export function pngSize(b) {
   if (b.subarray(0, 8).toString('hex') !== PNG_SIGNATURE) throw new Error('not a PNG')
   return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) }
+}
+
+/** Width and height of a WebP (VP8X, VP8L or VP8). */
+export function webpSize(b) {
+  if (b.toString('ascii', 0, 4) !== 'RIFF' || b.toString('ascii', 8, 12) !== 'WEBP') throw new Error('not a WebP')
+  const chunk = b.toString('ascii', 12, 16)
+  if (chunk === 'VP8X') return { width: 1 + b.readUIntLE(24, 3), height: 1 + b.readUIntLE(27, 3) }
+  if (chunk === 'VP8L') {
+    const bits = b.readUInt32LE(21)
+    return { width: 1 + (bits & 0x3fff), height: 1 + ((bits >> 14) & 0x3fff) }
+  }
+  if (chunk === 'VP8 ') return { width: b.readUInt16LE(26) & 0x3fff, height: b.readUInt16LE(28) & 0x3fff }
+  throw new Error(`unknown WebP chunk ${chunk}`)
+}
+
+/** An image's format and size: PNG or WebP, else a throw. */
+export function imageInfo(b) {
+  return b.subarray(0, 8).toString('hex') === PNG_SIGNATURE ? { ext: 'png', ...pngSize(b) } : { ext: 'webp', ...webpSize(b) }
 }
 
 const paeth = (a, b, c) => {
@@ -130,6 +151,48 @@ export function trimPng(bytes, margin = 4) {
 }
 
 /**
+ * A head-and-shoulders box in full-body art with a transparent background, for small round avatars: x of the width, y
+ * and size of the height. It takes the figure's top two fifths, centred on the figure's middle a little below its top
+ * (past any raised weapon or hat), which holds the face whatever the pose. WebP goes through macOS `sips` first; null
+ * when it can't.
+ */
+export function headBox(bytes) {
+  let png = bytes
+  if (bytes.subarray(0, 8).toString('hex') !== PNG_SIGNATURE) {
+    const dir = mkdtempSync(join(tmpdir(), 'cast-'))
+    try {
+      writeFileSync(join(dir, 'in.webp'), bytes)
+      execFileSync('sips', ['-s', 'format', 'png', join(dir, 'in.webp'), '--out', join(dir, 'out.png')], { stdio: 'ignore' })
+      png = readFileSync(join(dir, 'out.png'))
+    } catch {
+      return null
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  }
+  let image
+  try {
+    image = decodeRgba(png)
+  } catch {
+    return null
+  }
+  const { width, height, px } = image
+  const opaque = (x, y) => px[(y * width + x) * 4 + 3] > 128
+  let top = -1
+  let bottom = -1
+  for (let y = 0; y < height && top < 0; y++) for (let x = 0; x < width; x++) if (opaque(x, y)) { top = y; break }
+  for (let y = height - 1; y >= 0 && bottom < 0; y--) for (let x = 0; x < width; x++) if (opaque(x, y)) { bottom = y; break }
+  if (top < 0 || bottom <= top) return null
+  const tall = bottom - top
+  // Head and shoulders: the figure's top two fifths, centred on its middle below any raised weapon or hat.
+  const xs = []
+  for (let y = top + Math.round(tall * 0.08); y < top + Math.round(tall * 0.25); y++) for (let x = 0; x < width; x++) if (opaque(x, y)) xs.push(x)
+  xs.sort((a, b) => a - b)
+  const round = (v) => Math.round(v * 1000) / 1000
+  return { x: round((xs[xs.length >> 1] ?? width / 2) / width), y: round((top + tall * 0.2) / height), size: round((tall * 0.4) / height) }
+}
+
+/**
  * Fetches each url once into the cache, waiting `delayMs` between network requests (a site's Crawl-delay). Returns
  * the bytes, or null on a 404.
  */
@@ -151,18 +214,26 @@ export function cachedFetcher(cacheDir, delayMs) {
   }
 }
 
-/** Writes a pack: every portrait under <folder>/cast/, hash-named, then the list. Returns the total bytes. */
+/**
+ * Writes a pack: every portrait (and face icon, when given) under <folder>/cast/, hash-named, then the list. `meta` may
+ * carry an `avatar` box for full-body art without face icons: the head's centre and size as fractions of the image's
+ * width and height, so small round avatars zoom onto it. Returns the total bytes.
+ */
 export async function writePack(folder, meta, members) {
   const release = join(ROOT, 'content/release', folder)
   await rm(join(release, 'cast'), { recursive: true, force: true })
   await mkdir(join(release, 'cast'), { recursive: true })
-  const out = []
-  for (const { bytes, ext, ...member } of members) {
-    const path = `${folder}/cast/${member.id}.${sha256(bytes).slice(0, 8)}.${ext}`
+  const save = async (name, bytes) => {
+    const { ext, width, height } = imageInfo(bytes)
+    const path = `${folder}/cast/${name}.${sha256(bytes).slice(0, 8)}.${ext}`
     await writeFile(join(ROOT, 'content/release', path), bytes)
-    out.push({ ...member, art: { path, ...pngSize(bytes), bytes: bytes.length } })
+    return { path, width, height, bytes: bytes.length }
+  }
+  const out = []
+  for (const { bytes, face, ext: _ext, ...member } of members) {
+    out.push({ ...member, art: await save(member.id, bytes), ...(face ? { face: await save(`${member.id}-face`, face) } : {}) })
   }
   out.sort((a, b) => a.id.localeCompare(b.id))
   await writeFile(join(release, 'cast.json'), JSON.stringify({ schemaVersion: 1, ...meta, members: out }))
-  return out.reduce((n, m) => n + m.art.bytes, 0)
+  return out.reduce((n, m) => n + m.art.bytes + (m.face?.bytes ?? 0), 0)
 }
