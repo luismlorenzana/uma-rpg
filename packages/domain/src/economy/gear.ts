@@ -1,11 +1,11 @@
 // Equipment (S7, design §7, D59): every piece is generated from the catalog as type × grade × accent. The main
 // material sets what can be made, the accent material adds its family's effect, and the grade comes from the main
-// material. Gear binds to the Uma who equips it; mastery rank k in its type lets her equip grade k.
+// material. Gear binds to the Uma who equips it; her Weapon, Armor or Accessory Level k lets her equip grade k (D70).
 import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
 import type { RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
-import { craftTokenId, gradeBand } from './tokens'
-import { ARMOR_TYPES, WEAPON_TYPES, type ArmorType, type GearType, type WeaponType } from './training'
+import { craftTokenId, gradeBand, TOKEN_CLASS_NAME } from './tokens'
+import { ARMOR_TYPES, WEAPON_TYPES, weaponClasses, type ArmorType, type GearType, type Ranks, type WeaponType } from './training'
 
 export const ACCESSORY_TYPES = ['ring', 'charm'] as const
 export type AccessoryType = typeof ACCESSORY_TYPES[number]
@@ -30,6 +30,20 @@ const accentFamily = (effect: ItemEffect): ItemFamily => GATHER.find((f) => f.ef
 
 export const isArmor = (t: EquipType): t is ArmorType => (ARMOR_TYPES as readonly string[]).includes(t)
 export const isAccessory = (t: EquipType): t is AccessoryType => (ACCESSORY_TYPES as readonly string[]).includes(t)
+
+/** The grade of this type she may wear (D70): a weapon, the best Weapon Level among classes that wield it; armor,
+ * her Armor Level; an accessory, her Accessory Level. */
+export function gearLevel(ranks: Ranks, type: EquipType): number {
+  if (isAccessory(type)) return ranks.accessory
+  if (isArmor(type)) return ranks.armor
+  return Math.max(...weaponClasses(type as WeaponType).map((c) => ranks.weapons[c]))
+}
+/** What raises that level, for messages: "Brawler Weapon Level", "Armor Level". */
+export function gearLevelName(type: EquipType): string {
+  if (isAccessory(type)) return 'Accessory Level'
+  if (isArmor(type)) return 'Armor Level'
+  return `${weaponClasses(type as WeaponType).map((c) => TOKEN_CLASS_NAME[c]).join(' or ')} Weapon Level`
+}
 export const isWeapon = (t: EquipType): t is WeaponType => (WEAPON_TYPES as readonly string[]).includes(t)
 export const slotOf = (t: EquipType): GearSlot => (isArmor(t) ? 'armor' : isAccessory(t) ? 'accessory' : t)
 

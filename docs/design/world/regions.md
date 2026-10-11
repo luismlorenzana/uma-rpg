@@ -20,7 +20,7 @@ elements and the ten pairs. Every signature has a home; all but one have two or 
 
 ## The 19 biomes and the capital
 
-Each continent has 20 regions (all 19 biomes, one of them twice) plus its capital.
+Each continent has 40 regions (every biome twice, two of them three times) plus its capital.
 
 | # | Biome | Signatures | Formation lean | Roles lean | Field effect (later) | Map color |
 |---|---|---|---|---|---|---|
@@ -75,7 +75,7 @@ the Volcano's boss can take it as a third signature.
 
 Five continents a tier, one per scenario, in release order. **Every continent has every biome.** What differs is the
 band, the order (which biomes sit at the low levels and which at the high ones) and a **climate lean**: the biome on
-its theme appears twice.
+its theme appears an extra time.
 
 | Continent (Tier 1) | Band | Lean | Low levels | High levels |
 |---|---|---|---|---|
@@ -89,26 +89,19 @@ Tiers 2 and 3 get their own five continents, with the same 20 biomes laid out di
 
 ## A continent on the map
 
-Ten rows, one per level, low at the bottom; two regions per row; a Spring every two rows; the capital on top. A sketch
-of URA Finale (Lv1–10):
+Ten rows, one per level, low at the bottom; four regions per row (D71); a Spring every two rows; the capital on top.
+Every biome appears twice per continent, the Meadow and the continent's lean biome three times (19 × 2 + 2 = 40). The
+bottom of URA Finale (Lv1–10), for example:
 
 ```
             [ CAPITAL · Lv10 Finals ]
-Lv10   Twilight Rift     Volcano
-Lv9    Glacier           Ancient Ruins          ◆ Spring
-Lv8    Underworld        Geyser Basin
-Lv7    Sky Isles         Storm Peaks            ◆ Spring
-Lv6    Haunted Moor      Canyon
-Lv5    Crystal Caverns   Desert                 ◆ Spring
-Lv4    Tundra            Highlands
-Lv3    Jungle            Swamp                  ◆ Spring
-Lv2    Coast             Forest
-Lv1    Meadow            Meadow (east)          ◆ Spring
+  …
+Lv3    Desert        Tundra         Highlands      Jungle      ◆ Spring
+Lv2    Swamp         Haunted Moor   Coast          Forest
+Lv1    Meadow        Meadow         Forest         Coast       ◆ Spring
 ```
 
-Nineteen biomes fill twenty slots, so one biome appears twice per continent; URA Finale doubles its Meadow so Lv1
-teaches the basics. Other continents double their lean (Unity Cup a Coast, Trackblazer a Desert, and so on), and
-each continent orders the rows differently.
+Each continent orders the rows differently, so the same biome meets you at different levels.
 
 ## A region's data (authored once)
 
@@ -123,7 +116,7 @@ interface RegionDef {
 ```
 
 Everything else (signatures, formations, roles, field effect) comes from the biome. The twelve stages are generated
-from the region id with a fixed seed, so they never change under a save. The authored part is about 20 lines per
+from the region id with a fixed seed, so they never change under a save. The authored part is about 40 lines per
 continent, plus five Springs.
 
 ## Art, lean first

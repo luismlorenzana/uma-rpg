@@ -6,6 +6,7 @@ import { learnSkill, startFight, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
 import { collectJob, facilityOf, queueJob, rushJob, startTraining } from './work'
+import { trackId, tracksAt } from '../economy/training'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -40,14 +41,21 @@ describe('class ranks (S5, D57)', () => {
     expect([1, 2, 6].map(depthsOpen)).toEqual([0, 1, 5])
   })
 
-  it('trains gear mastery in the armory of its distance, at distance speed', () => {
-    let save = umas('101')
-    expect(() => startTraining(save, 'rangers-lodge', 0, front, { kind: 'mastery', type: 'greatsword' }, at(0))).toThrow(/not trained here/)
-    save = startTraining(save, 'rangers-lodge', 0, front, { kind: 'mastery', type: 'bow' }, at(0))
-    // Mastery is 3 base hours a rank and spends no token (D68).
-    expect(facilityOf(worldOf(save), 'rangers-lodge').jobs[0]!.msEach).toBe(1.5 * HOUR)
-    save = collectJob(save, 'rangers-lodge', 0, at(2 * HOUR)).save
-    expect(worldOf(save).umas['101']!.ranks.mastery.bow).toBe(2)
+  it('trains each class’s Weapon Level in its hall, and armor and accessories in their own halls (D70)', () => {
+    let save = umas('101', '102')
+    expect(tracksAt('brawler-dojo').map(trackId)).toEqual(['class:brawler', 'weapons:brawler'])
+    expect(tracksAt('armory').map(trackId)).toEqual(['armor'])
+    expect(tracksAt('jeweler').map(trackId)).toEqual(['accessory'])
+    expect(() => startTraining(save, 'armory', 0, front, { kind: 'weapons', classId: 'brawler' }, at(0))).toThrow(/not trained here/)
+    // Weapon Levels train at the class's running style (Front A here) and spend no token: 3 base hours, halved.
+    save = startTraining(save, 'brawler-dojo', 0, front, { kind: 'weapons', classId: 'brawler' }, at(0))
+    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs[0]!.msEach).toBe(1.5 * HOUR)
+    // Armor trains at her best distance (Sprint A even for an all-G runner); accessories at her best running style.
+    save = startTraining(save, 'armory', 0, plain, { kind: 'armor' }, at(0))
+    expect(facilityOf(worldOf(save), 'armory').jobs[0]!.msEach).toBe(1.5 * HOUR)
+    save = collectJob(collectJob(save, 'brawler-dojo', 0, at(2 * HOUR)).save, 'armory', 0, at(2 * HOUR)).save
+    expect(worldOf(save).umas['101']!.ranks.weapons.brawler).toBe(2)
+    expect(worldOf(save).umas['102']!.ranks.armor).toBe(2)
   })
 
   it('lets an Uma fight with skills deeper than her level would open, once her rank opens them', () => {
@@ -64,22 +72,26 @@ describe('class ranks (S5, D57)', () => {
   })
 })
 
-describe('save v5', () => {
-  it('migrates a v4 save: classes start at the rank their learned skills need', () => {
-    let save = umas('101')
-    save = learnSkill({ ...save, tierWorlds: { '1': { ...worldOf(save), umas: { '101': { ...worldOf(save).umas['101']!, ranks: { ...worldOf(save).umas['101']!.ranks, classes: { brawler: 2, mage: 1, spellblade: 1, cleric: 1, summoner: 1 } } } } } } },
-      front, 'greatsword-spear', 'greatsword.fire.1', at(0))
-    const v4 = JSON.parse(JSON.stringify(save))
-    v4.schemaVersion = 4
-    delete v4.tierWorlds['1'].umas['101'].ranks
-    delete v4.tierWorlds['1'].umas['101'].stars
-    delete v4.tierWorlds['1'].dishes
-    delete v4.tierWorlds['1'].gear
-    delete v4.tierWorlds['1'].umas['101'].gear
-    const migrated = parseSave(v4)
-    expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
-    expect(migrated.tierWorlds['1']!.umas['101']!.ranks.classes).toEqual({ brawler: 2, mage: 1, spellblade: 1, cleric: 1, summoner: 1 })
-    expect(migrated.tierWorlds['1']!.umas['101']!.ranks.mastery.plate).toBe(1)
+describe('saves', () => {
+  it('starts an older save over, keeping its Umas, parties and Unlock Tickets (D69)', () => {
+    let save = umas('101', '102')
+    save = setPartySlot(save, 0, 0, '101', at(0))
+    const w = worldOf(save)
+    save = { ...save, tierWorlds: { '1': { ...w, items: { wheat: 4 }, wallet: { ...w.wallet, laurels: 300 },
+      umas: { ...w.umas, '101': { ...w.umas['101']!, level: 12, ranks: { ...w.umas['101']!.ranks, classes: { ...w.umas['101']!.ranks.classes, brawler: 3 } } } } } } }
+    const old = JSON.parse(JSON.stringify(save))
+    old.schemaVersion = 9
+    old.tierWorlds['1'].umas['101'].ranks = { classes: { brawler: 3, mage: 1, spellblade: 1, cleric: 1, summoner: 1 }, mastery: { bow: 4 } }
+    const reset = parseSave(old)
+    expect(reset.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
+    const world = reset.tierWorlds['1']!
+    expect(Object.keys(world.umas)).toEqual(['101', '102'])
+    expect(world.umas['101']).toMatchObject({ level: 1, exp: 0, build: null, builds: {} })
+    expect(world.umas['101']!.ranks.classes.brawler).toBe(1)
+    expect(world.parties[0]!.slots[0]).toBe('101')
+    expect(world.wallet).toEqual({ unlockTickets: w.wallet.unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
+    expect(world.items).toEqual({})
+    expect(parseSave(JSON.parse(JSON.stringify(reset)))).toEqual(reset)
   })
 
   it('rejects a skill deeper than its class rank and training a track elsewhere', () => {

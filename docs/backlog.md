@@ -17,8 +17,9 @@
 
 ## Not built yet
 
-1. **The world map** (D66): five continents of 20 regions at fixed levels and 240 stages each, one active party,
-   carried MP and Springs, no chapters. Design in [design/world/](design/world/README.md); build steps W1–W5.
+1. **The world map** (D66, D71): five continents of 40 regions at fixed levels and 480 stages each, one active party,
+   carried MP and Springs, no chapters. Design in [design/world/](design/world/README.md); build steps W1–W5, with
+   plain art first (owner: something quick to see and give feedback on).
 2. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
    Lv50, the Tier 2 world, legacy skills, and what the banked EXP at Lv50 is for.
 3. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).

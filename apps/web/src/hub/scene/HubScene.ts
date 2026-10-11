@@ -8,7 +8,7 @@ import tilesIndex from '@luismlorenzana/uma-art/tiles/atlas.json'
 import tilesUrl from '@luismlorenzana/uma-art/tiles/atlas.png?url'
 import type { HubPage, Place } from '@rpg/domain'
 import Phaser from 'phaser'
-import { ART_TILE, hubGrid } from '../grid'
+import { ART_TILE, buildingFrame, hubGrid } from '../grid'
 import { drawMarker, type Ambient } from './markers'
 import { layTerrain } from './terrain'
 
@@ -152,9 +152,9 @@ export class HubScene extends Phaser.Scene {
     // Props and buildings by the row they stand on, so nearer ones overlap farther ones.
     const sprites = [
       ...terrain.props.map((p) => ({ row: p.row, key: TILES, frame: p.frame, x: p.col * ART_TILE, y: (p.tall ? p.row - 1 : p.row) * ART_TILE })),
-      ...places.filter((p) => buildings[p.id] && terrain.footprints[p.id]).map((p) => {
+      ...places.filter((p) => buildings[buildingFrame(p.id)] && terrain.footprints[p.id]).map((p) => {
         const { col, row } = terrain.footprints[p.id]!
-        return { row: row + 0.5, key: BUILDINGS, frame: p.id, x: (col - 1) * ART_TILE, y: (row - 2) * ART_TILE }
+        return { row: row + 0.5, key: BUILDINGS, frame: buildingFrame(p.id), x: (col - 1) * ART_TILE, y: (row - 2) * ART_TILE }
       }),
     ].sort((a, b) => a.row - b.row)
     for (const s of sprites) {

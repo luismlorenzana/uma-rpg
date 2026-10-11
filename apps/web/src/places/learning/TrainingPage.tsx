@@ -1,7 +1,8 @@
-// The Learning District (S5, D57): class halls train class ranks (each rank opens a skill depth) and armories train
-// gear mastery (rank k lets an Uma equip grade-k gear, S7). Running style sets class speed; distance sets mastery speed.
+// The Learning District (S5, D57, D70): each class hall trains its class rank (each opens a skill depth and spends a
+// Promotion Token) and its Weapon Level; the Armory trains the Armor Level and the Jeweler the Accessory Level (level k
+// wears grade k). Running style sets a hall's speed; best distance the Armory's; best running style the Jeweler's.
 import {
-  ARMORIES, availabilityBlock, MAX_QUEUE, CLASS_HALLS, CLASS_MAX_RANK, depthsOpen, facilityOf, GEAR_TYPE_LABEL, jobEndsAt, jobFinished, jobProgress,
+  availabilityBlock, CLASS_WEAPONS, GEAR_HALLS, GEAR_TYPE_LABEL as WEAPON_LABEL, MAX_QUEUE, CLASS_HALLS, CLASS_MAX_RANK, depthsOpen, facilityOf, GEAR_TYPE_LABEL, jobEndsAt, jobFinished, jobProgress,
   maxRankOf, parseTrack, planTraining, rankOf, SaveRuleError, trackAptitude, tracksAt, trackId, upgradeCost, type Job, type RosterOutfit,
   type TierWorld, type Track,
 } from '@rpg/domain'
@@ -19,13 +20,19 @@ import { QueueList } from '../work/QueueList'
 const SPEED: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 const STYLE_LABEL: Record<string, string> = { front: 'Front', pace: 'Pace', late: 'Late', end: 'End', sprint: 'Sprint', mile: 'Mile', medium: 'Medium', long: 'Long' }
 
-export const trackLabel = (t: Track): string => (t.kind === 'class' ? CLASS_LABEL[t.classId] : GEAR_TYPE_LABEL[t.type])
+export function trackLabel(t: Track): string {
+  if (t.kind === 'class') return `${CLASS_LABEL[t.classId]} rank`
+  if (t.kind === 'weapons') return `${CLASS_LABEL[t.classId]} Weapon Level`
+  return t.kind === 'armor' ? 'Armor Level' : 'Accessory Level'
+}
 function aptitudeKey(placeId: string): string {
-  return CLASS_HALLS[placeId] ? STYLE_LABEL[CLASS_HALLS[placeId]!.style]! : STYLE_LABEL[ARMORIES[placeId]?.distance ?? '']!
+  if (CLASS_HALLS[placeId]) return STYLE_LABEL[CLASS_HALLS[placeId]!.style]!
+  return GEAR_HALLS[placeId] === 'armor' ? 'Best distance' : 'Best running style'
 }
 function rankNote(t: Track, rank: number): string {
   if (t.kind === 'class') return rank >= CLASS_MAX_RANK ? 'every depth open' : `opens depth ${depthsOpen(rank + 1)}`
-  return `equips grade ${rank + 1} ${GEAR_TYPE_LABEL[t.type]}`
+  if (t.kind === 'weapons') return `wears grade ${rank + 1} ${CLASS_WEAPONS[t.classId].map((w) => WEAPON_LABEL[w]).join(', ')}`
+  return t.kind === 'armor' ? `wears grade ${rank + 1} armor` : `wears grade ${rank + 1} rings and charms`
 }
 
 export default function TrainingPage({ place }: PageProps) {
@@ -48,9 +55,10 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
   return (
     <div className="space-y-3 p-4">
       <section className="rounded-md bg-raised p-3">
-        <p className="font-display text-lg font-bold">{tracks.map(trackLabel).join(', ')}</p>
+        <p className="font-display text-lg font-bold">{tracks.map(trackLabel).join(' · ')}</p>
         <p className="text-[13px] text-ink-soft">
-          {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth, and each promotion spends a Promotion Token of its band (fights drop them).' : 'Gear mastery: rank k lets an Uma equip grade-k gear of that type.'}{' '}
+          {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth, and each promotion spends a Promotion Token of its band (fights drop them). Weapon Level k wears grade-k weapons of this class.'
+            : GEAR_HALLS[placeId] === 'armor' ? 'Armor Level k wears grade-k Garb, Leather, Mail and Plate.' : 'Accessory Level k wears grade-k Rings and Charms.'}{' '}
           {aptitudeKey(placeId)} aptitude sets the speed. Training can’t be rushed.
         </p>
         <div className="mt-2 flex items-center justify-between text-[12px] text-ink-soft">
@@ -106,7 +114,7 @@ function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onCo
         <AtlasSprite art={view.art} family="outfit-icons" frameKey={job.outfitId} size={44} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14px] font-semibold">{outfit?.name ?? job.outfitId}</p>
-          <p className="text-[12px] text-ink-soft">{track ? `${trackLabel(track)} → next rank` : job.output}</p>
+          <p className="text-[12px] text-ink-soft">{track ? `${trackLabel(track)} → next` : job.output}</p>
         </div>
         <span className="shrink-0 text-[12px] text-ink-soft">{done ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span>
       </div>
@@ -121,7 +129,7 @@ function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onCo
       <QueueList job={job} now={now} onRemove={onUnqueue} note={track?.kind === 'class' ? 'Each rank starts when the one before ends and spends its Promotion Token then; the queue stops if you have none.' : 'Each rank starts training when the one before ends.'} label={(q) => {
         const t = parseTrack(q.output)
         const from = rankAt(q.output, [job, ...job.queue.slice(0, job.queue.indexOf(q))])
-        return t ? `${trackLabel(t)} rank ${from} → ${from + 1}` : q.output
+        return t ? `${trackLabel(t)} ${from} → ${from + 1}` : q.output
       }} />
       {job.queue.length < MAX_QUEUE && (
         <div className="mt-1 flex flex-wrap gap-1">
@@ -131,7 +139,7 @@ function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onCo
             return (
               <button key={trackId(t)} type="button" disabled={top} onClick={() => onQueue(t)}
                 className="min-h-9 flex-1 rounded-sm border border-dashed border-hairline-strong px-2 text-[12px] font-semibold text-ink-soft disabled:opacity-40">
-                {top ? `${trackLabel(t)} · top rank` : `+ Queue ${trackLabel(t)} ${from} → ${from + 1}`}
+                {top ? `${trackLabel(t)} · maxed` : `+ Queue ${trackLabel(t)} ${from} → ${from + 1}`}
               </button>
             )
           })}
@@ -153,7 +161,7 @@ function AssignTraining({ view, world, placeId, onClose, onStart }: {
   return (
     <BottomSheet title="Who trains?" onClose={onClose}>
       {tracks.length > 1 && (
-        <div className="mb-3 flex flex-wrap gap-1.5" role="tablist" aria-label="Gear type">
+        <div className="mb-3 flex flex-wrap gap-1.5" role="tablist" aria-label="What to train">
           {tracks.map((t) => (
             <button key={trackId(t)} type="button" role="tab" aria-selected={trackId(t) === trackId(track)} onClick={() => setTrack(t)}
               className={`min-h-9 rounded-full px-3 text-[13px] font-semibold ${trackId(t) === trackId(track) ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'}`}>{trackLabel(t)}</button>
@@ -174,7 +182,7 @@ function AssignTraining({ view, world, placeId, onClose, onStart }: {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14px] font-semibold">{o.name}</span>
                   <span className="block text-[12px] text-ink-soft">
-                    {why ?? `${trackLabel(track)} rank ${rank} → ${rank + 1} (${rankNote(track, rank)}) · ${aptitudeKey(placeId)} ${grade} ${SPEED[grade]}${plan && Object.keys(plan.inputs).length > 0 ? ' · spends 1 Promotion Token' : ''}`}
+                    {why ?? `${trackLabel(track)} ${rank} → ${rank + 1} (${rankNote(track, rank)}) · ${aptitudeKey(placeId)} ${grade} ${SPEED[grade]}${plan && Object.keys(plan.inputs).length > 0 ? ' · spends 1 Promotion Token' : ''}`}
                   </span>
                 </span>
                 {!why && plan && <span className="shrink-0 text-[12px] font-semibold text-accent">{formatDuration(plan.msEach)}</span>}

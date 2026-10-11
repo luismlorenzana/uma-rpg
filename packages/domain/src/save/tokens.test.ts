@@ -29,10 +29,10 @@ describe('tokens (D67)', () => {
   it('drops the same tokens for the same fight, more from bosses, always a promotion from a boss', () => {
     const fight = rollTokens('seed:a1r1c1', 'fight', 1)
     expect(rollTokens('seed:a1r1c1', 'fight', 1)).toEqual(fight)
-    expect(Object.values(fight).reduce((a, b) => a + b, 0)).toBe(2)
+    expect(Object.values(fight).reduce((a, b) => a + b, 0)).toBe(1)
     for (let i = 0; i < 40; i++) {
       const boss = rollTokens(`seed:${i}`, 'boss', 3)
-      expect(Object.values(boss).reduce((a, b) => a + b, 0)).toBe(6)
+      expect(Object.values(boss).reduce((a, b) => a + b, 0)).toBe(3)
       expect(Object.keys(boss).some((id) => id.startsWith('token-class-') && id.endsWith('-3'))).toBe(true)
     }
   })

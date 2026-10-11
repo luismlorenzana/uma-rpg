@@ -9,7 +9,7 @@ import {
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
-import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
+import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track, withRank } from '../economy/training'
 import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
 import { stockName } from '../economy/stock'
 import { promotionTokenId } from '../economy/tokens'
@@ -290,9 +290,7 @@ function collectTraining(world: TierWorld, placeId: string, slot: number, job: J
   const uma = world.umas[job.outfitId]
   let next = setJob(world, placeId, slot, null)
   if (track && uma) {
-    const ranks = track.kind === 'class'
-      ? { ...uma.ranks, classes: { ...uma.ranks.classes, [track.classId]: Math.min(maxRankOf(track), uma.ranks.classes[track.classId] + 1) } }
-      : { ...uma.ranks, mastery: { ...uma.ranks.mastery, [track.type]: Math.min(maxRankOf(track), uma.ranks.mastery[track.type] + 1) } }
+    const ranks = withRank(uma.ranks, track, Math.min(maxRankOf(track), rankOf(uma.ranks, track) + 1))
     next = { ...next, umas: { ...next.umas, [job.outfitId]: { ...uma, ranks } } }
   }
   return { world: next, got: { items: 0, exp: 0, levelsUp: 0, done: true, rankUp: true } }

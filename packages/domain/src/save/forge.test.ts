@@ -60,7 +60,7 @@ describe('the Forge and equipping (S7)', () => {
     expect(worldOf(save).gear).toEqual({ 'plate-g2-def': 1 })
     expect(worldOf(save).umas['101']!.gear).toEqual({ locker: ['greatsword-g1-atk'], equipped: { greatsword: 'greatsword-g1-atk' } })
     expect(() => equipGear(save, '102', 'greatsword-g1-atk', at(0))).toThrow(/none in stock/)
-    expect(equipBlock(worldOf(save).umas['101']!, 'plate-g2-def')).toMatch(/mastery 2/)
+    expect(equipBlock(worldOf(save).umas['101']!, 'plate-g2-def')).toMatch(/Armor Level 2/)
     save = unequipGear(save, '101', 'greatsword', at(0))
     expect(worldOf(save).umas['101']!.gear.locker).toEqual(['greatsword-g1-atk'])
     save = equipGear(save, '101', 'greatsword-g1-atk', at(0))

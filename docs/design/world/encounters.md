@@ -83,7 +83,7 @@ generator rerolls until they differ, and a test checks every region of every con
 
 - 15 signatures × 8 formations × role mixes × 1–3 waves gives thousands of combinations. Each region draws its twelve
   from its biome's slice, so a region feels coherent, and its neighbors feel different.
-- Across a continent the 20 regions cover all 19 biomes; across the tier, each continent arranges them in a new
+- Across a continent the 40 regions cover every biome at least twice; across the tier, each continent arranges them in a new
   order and band.
 - What repeats is the **biome**, five or more times a tier (at least once per continent), with new stages each time.
   You said that's fine.

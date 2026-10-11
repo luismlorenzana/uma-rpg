@@ -1,11 +1,11 @@
 // An outfit's profile (S1–S7, reorganised D60): a header with her Uma Level and EXP, her Farm and Craft Levels and what
-// she's doing now, then tabs: Battle (her RPG stats), Class (builds, skills, class ranks), Gear (equipment, mastery,
+// she's doing now, then tabs: Battle (her RPG stats), Class (builds, skills, class ranks), Gear (equipment, gear levels,
 // Extra Stats), Work (professions and jobs) and Racing (the original's aptitudes, stats and unique skill). A locked
 // outfit shows the Unlock flow and her racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeBuild, activeNodeSlots, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL, GEAR_TYPE_LABEL, GEAR_TYPES,
-  gearDistance, highestGrade, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
+  activeBuild, activeNodeSlots, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
+  highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_BUILD, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots,
   rpgExpToNext, rpgNode, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
@@ -320,7 +320,13 @@ function ClassTab({ outfit, uma, place }: { outfit: RosterOutfit; uma: OwnedUma;
   )
 }
 
-// --- Gear: what she wears, gear mastery, Extra Stats --------------------------------------------------------------
+// --- Gear: what she wears, gear levels (D70), Extra Stats ------------------------------------------------------------
+
+const GEAR_LEVEL_TRACKS: readonly { key: string; label: string; track: Track }[] = [
+  ...RPG_CLASSES.map((c) => ({ key: c, label: `${CLASS_LABEL[c]} weapons`, track: { kind: 'weapons', classId: c } as Track })),
+  { key: 'armor', label: 'Armor', track: { kind: 'armor' } },
+  { key: 'accessory', label: 'Accessories', track: { kind: 'accessory' } },
+]
 
 function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
@@ -338,14 +344,14 @@ function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
         </span>
       </button>
       <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear mastery · rank k wears grade k · train at the armories</p>
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear levels · level k wears grade k · weapons at each class hall, armor at the Armory, accessories at the Jeweler</p>
         <div className="grid grid-cols-2 gap-x-3 px-3 py-2">
-          {GEAR_TYPES.map((t) => {
-            const rank = uma.ranks.mastery[t]
-            const grade = outfit.aptitudes.distance[gearDistance(t)]
+          {GEAR_LEVEL_TRACKS.map(({ key, label, track }) => {
+            const rank = rankOf(uma.ranks, track)
+            const grade = trackAptitude(track, outfit.aptitudes)
             return (
-              <div key={t} className="flex items-center justify-between border-b border-hairline py-1.5 text-[12px] last:border-0">
-                <span className="truncate">{GEAR_TYPE_LABEL[t]}</span>
+              <div key={key} className="flex items-center justify-between border-b border-hairline py-1.5 text-[12px] last:border-0">
+                <span className="truncate">{label}</span>
                 <span className="flex shrink-0 items-center gap-1.5">
                   <span className="text-[10px] text-ink-faint">{rank < MASTERY_MAX_RANK ? formatDuration(masteryRankHours(rank) * HOUR * aptitudeTime(grade)) : 'max'}</span>
                   <span className="font-display font-bold">{rank}</span>

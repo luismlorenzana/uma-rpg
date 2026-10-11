@@ -85,8 +85,7 @@ const SPECS: FacilitySpec[] = [
   { id: 'workbench', kind: 'refine', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
   { id: 'kitchen', kind: 'cook', profession: 'farming', family: null, upgradeFamilies: BUILDING },
   { id: 'forge', kind: 'craft', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
-  ...['brawler-dojo', 'mage-tower', 'spell-blade-salle', 'cleric-chapel', 'summoner-circle', 'rangers-lodge', 'lancers-barracks', 'arcane-armory',
-    'knights-bastion'].map((id): FacilitySpec => ({ id, kind: 'train', profession: null, family: null, upgradeFamilies: BUILDING })),
+  ...['brawler-dojo', 'mage-tower', 'spell-blade-salle', 'cleric-chapel', 'summoner-circle', 'armory', 'jeweler'].map((id): FacilitySpec => ({ id, kind: 'train', profession: null, family: null, upgradeFamilies: BUILDING })),
 ]
 const SPEC_BY_ID = new Map(SPECS.map((s) => [s.id, s]))
 export const FACILITIES: readonly FacilitySpec[] = SPECS

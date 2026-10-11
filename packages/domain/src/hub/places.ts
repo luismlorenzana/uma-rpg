@@ -22,7 +22,7 @@ export const SLICE_GOALS: Record<SliceId, string> = {
   S2: 'Collection and parties: unlock Umas, build parties',
   S3: 'Battles and leveling: fight chapters, level Umas, earn Shards and Laurels',
   S4: 'Farmlands and Wilds: timed jobs, professions, refining and the Exchange',
-  S5: 'Learning District: class ranks and gear mastery',
+  S5: 'Learning District: class ranks, Weapon, Armor and Accessory Levels',
   S6: 'Kitchen and Extra Stats: cooking and the Sun-and-planets map',
   S7: 'Forge and equipment: crafting and bound gear',
   S8: 'Tier Finale and promotion into Tier 2',
@@ -138,32 +138,30 @@ const WILDS: Place[] = [
   },
 ]
 
-function hall(id: string, name: string, cls: string, style: string, at: { x: number; y: number }): Place {
+function hall(id: string, name: string, cls: string, style: string, weapons: string, at: { x: number; y: number }): Place {
   return {
     id, page: 'learning', kind: 'class-hall', name, opensIn: 'S5', slots: 2, at,
-    blurb: `Trains ${cls} proficiency. Each rank opens a deeper tier of ${cls} skills.`,
-    details: [`Ranks 1–6 (rank 1 learns no skills)`, `${style} aptitude sets the training speed`],
-  }
-}
-
-function armory(id: string, name: string, distance: string, gear: string, at: { x: number; y: number }): Place {
-  return {
-    id, page: 'learning', kind: 'armory', name, opensIn: 'S5', slots: 2, at,
-    blurb: `Trains mastery of ${gear}. Mastery rank k lets an Uma equip grade-k gear of that type.`,
-    details: [`Ranks 1–10 per gear type`, `${distance} aptitude sets the training speed`],
+    blurb: `Trains the ${cls} rank and the ${cls} Weapon Level. Each rank opens a deeper tier of ${cls} skills; Weapon Level k wears grade-k ${weapons}.`,
+    details: ['Class rank 1–6: each promotion spends a Promotion Token', `Weapon Level 1–10: ${weapons}`, `${style} aptitude sets the training speed`],
   }
 }
 
 const LEARNING: Place[] = [
-  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', 'Front Runner', { x: 0.24, y: 0.1 }),
-  hall('mage-tower', 'Mage Tower', 'Mage', 'Pace Chaser', { x: 0.76, y: 0.11 }),
-  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', 'Pace Chaser', { x: 0.22, y: 0.31 }),
-  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', 'Late Surger', { x: 0.78, y: 0.31 }),
-  hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', { x: 0.5, y: 0.5 }),
-  armory('rangers-lodge', "Ranger's Lodge", 'Sprint', 'Short Swords, Bows and Garb', { x: 0.24, y: 0.7 }),
-  armory('lancers-barracks', "Lancer's Barracks", 'Mile', 'Spears, Axes and Leather', { x: 0.76, y: 0.7 }),
-  armory('arcane-armory', 'Arcane Armory', 'Medium', 'Mage Staves, Arcane Staves and Mail', { x: 0.26, y: 0.9 }),
-  armory('knights-bastion', "Knight's Bastion", 'Long', 'Greatswords, Cleric Staves, Summoner Tomes and Plate', { x: 0.74, y: 0.9 }),
+  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', 'Front Runner', 'Greatswords, Spears, Axes and Bows', { x: 0.24, y: 0.1 }),
+  hall('mage-tower', 'Mage Tower', 'Mage', 'Pace Chaser', 'Mage Staves and Arcane Staves', { x: 0.76, y: 0.11 }),
+  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', 'Pace Chaser', 'Short Swords', { x: 0.22, y: 0.33 }),
+  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', 'Late Surger', 'Arcane Staves and Cleric Staves', { x: 0.78, y: 0.33 }),
+  hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', 'Summoner Tomes', { x: 0.5, y: 0.56 }),
+  {
+    id: 'armory', page: 'learning', kind: 'armory', name: 'Armory', opensIn: 'S5', slots: 2, at: { x: 0.26, y: 0.82 },
+    blurb: 'Trains the Armor Level: level k wears grade-k Garb, Leather, Mail and Plate.',
+    details: ['Armor Level 1–10, one for every armor type', 'Her best distance aptitude sets the training speed'],
+  },
+  {
+    id: 'jeweler', page: 'learning', kind: 'armory', name: 'Jeweler', opensIn: 'S5', slots: 2, at: { x: 0.74, y: 0.82 },
+    blurb: 'Trains the Accessory Level: level k wears grade-k Rings and Charms.',
+    details: ['Accessory Level 1–10, for both accessories', 'Her best running-style aptitude sets the training speed'],
+  },
 ]
 
 const TOWN: Place[] = [

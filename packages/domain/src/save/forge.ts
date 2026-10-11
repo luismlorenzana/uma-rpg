@@ -1,6 +1,6 @@
 // Equipping over the save (S7, design §7, D59): a piece from the gear stock binds to the Uma who equips it and stays
-// in her locker for good; she swaps freely among her own pieces. Mastery rank k in a type lets her wear grade k.
-import { gearById, slotOf, type GearSlot } from '../economy/gear'
+// in her locker for good; she swaps freely among her own pieces. Her Weapon, Armor or Accessory Level k wears grade k.
+import { gearById, gearLevel, gearLevelName, slotOf, type GearSlot } from '../economy/gear'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import type { OwnedUma, Save, TierWorld } from './save'
 
@@ -8,11 +8,11 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Why she can't wear this piece, or null: mastery for weapons and armor; accessories need none. */
+/** Why she can't wear this piece, or null: grade k needs her matching Weapon, Armor or Accessory Level k (D70). */
 export function equipBlock(uma: OwnedUma, gearId: string): string | null {
   const piece = gearById(gearId)
   if (!piece) return 'Unknown gear'
-  if (piece.type !== 'ring' && piece.type !== 'charm' && uma.ranks.mastery[piece.type] < piece.grade) return `Needs ${piece.type.replace('-', ' ')} mastery ${piece.grade}`
+  if (gearLevel(uma.ranks, piece.type) < piece.grade) return `Needs ${gearLevelName(piece.type)} ${piece.grade}`
   return null
 }
 

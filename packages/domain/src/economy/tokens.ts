@@ -35,8 +35,9 @@ const BY_ID = new Map(TOKENS.map((t) => [t.id, t]))
 export const tokenById = (id: string): TokenDef | undefined => BY_ID.get(id)
 export const isToken = (id: string): boolean => BY_ID.has(id)
 
-/** Tokens a won fight drops, by its kind; sub-bosses and champions always include a Class Promotion Token (D67). */
-export const TOKEN_DROPS = { fight: 2, 'sub-boss': 4, vanguard: 3, boss: 6 } as const
+/** Tokens a won fight drops, by its kind (half of D67's first numbers, owner 2026-10-11); sub-bosses and champions
+ * always include a Class Promotion Token. */
+export const TOKEN_DROPS = { fight: 1, 'sub-boss': 2, vanguard: 2, boss: 3 } as const
 /** Odds of each token kind per drop: Cooking and Crafting alike, Promotions rarer (one per class rank a band). */
 export const TOKEN_ODDS: Readonly<Record<TokenKind, number>> = { cook: 0.425, craft: 0.425, class: 0.15 }
 /** Tokens the Exchange swaps for one of your choice, same kind and band. */

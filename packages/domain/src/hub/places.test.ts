@@ -7,10 +7,10 @@ const MAP_H = 500
 const MIN_GAP = 44
 
 describe('place registry', () => {
-  it('has the 36 visible places of the S1 spec plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(36)
+  it('has 34 visible places (the S1 spec, with the four armories merged into an Armory and a Jeweler, D70) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(34)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([10, 10, 9, 7])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([10, 10, 7, 7])
   })
 
   it('keeps every place on a page at least 44 pt apart on the smallest phone', () => {

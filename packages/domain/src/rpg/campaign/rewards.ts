@@ -5,10 +5,11 @@ import { rpgExpToNext, RPG_TIER_MAX_LEVEL } from '../rules'
 import { RPG_FIGHT_STAGES, rpgTierLevel, type RpgMapNode } from './chapters'
 
 /**
- * Shares of one level at the foes' level. A stage's six fights and sub-boss pay about its three levels; the Finals'
- * three vanguards and three champions pay about one more, so clearing every node ends near the chapter's last level.
+ * Shares of one level at the foes' level: half of D48's (D66 as revised by the owner, 2026-10-11), so a fresh party
+ * needs about twice the fights; clearing every node of a chapter ends about halfway through its levels, and replays
+ * (with the catch-up rule) carry the rest.
  */
-export const RPG_BATTLE_EXP_WEIGHTS = { fight: 0.42, 'sub-boss': 0.28, vanguard: 0.15, boss: 0.2 } as const
+export const RPG_BATTLE_EXP_WEIGHTS = { fight: 0.21, 'sub-boss': 0.14, vanguard: 0.075, boss: 0.1 } as const
 export const RPG_LEVEL_EXP_STEP = 0.1
 export const RPG_LEVEL_EXP_MIN = 0.1
 export const RPG_LEVEL_EXP_MAX = 2

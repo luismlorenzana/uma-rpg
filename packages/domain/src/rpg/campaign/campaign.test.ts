@@ -70,9 +70,9 @@ describe('generated chapters (D48)', () => {
 describe('rewards (D51)', () => {
   it('pays a share of a level, scaled ±10% per level of gap within 10%–200%', () => {
     expect([rpgBattleBaseExp('fight', 5), rpgBattleBaseExp('sub-boss', 5), rpgBattleBaseExp('vanguard', 5), rpgBattleBaseExp('boss', 5)])
-      .toEqual([84, 56, 30, 40])
+      .toEqual([42, 28, 15, 20])
     expect([rpgLevelExpFactor(8, 5), rpgLevelExpFactor(5, 8), rpgLevelExpFactor(20, 5), rpgLevelExpFactor(1, 30)]).toEqual([0.7, 1.3, 0.1, 2])
-    expect(rpgBattleExp('fight', 5, 8)).toBe(59)
+    expect(rpgBattleExp('fight', 5, 8)).toBe(29)
     expect(ura.nodes.filter((n) => n.kind === 'sub-boss').map(rpgRewardKind)).toEqual(['sub-boss', 'sub-boss', 'sub-boss', 'vanguard', 'vanguard', 'vanguard'])
   })
 
@@ -81,7 +81,8 @@ describe('rewards (D51)', () => {
     expect([rpgShardsBetween(9, 10), rpgShardsBetween(10, 11), rpgShardsBetween(8, 31), rpgShardsBetween(49, 50)]).toEqual([1, 0, 3, 1])
   })
 
-  // Pacing (D48): a party that clears every node of a chapter ends near its last level; one path ends a few levels short.
+  // Pacing (D48, halved by D66): clearing every node of a chapter leaves a party a few levels short of its last level,
+  // one path further short; the catch-up rule (foes above her pay up to double) keeps the gap from growing.
   const levelAfter = (chapters: RpgCampaignChapter[], pick: (c: RpgCampaignChapter) => RpgMapNode[]) => {
     let me = { tier: 1, level: 1, exp: 0 }
     const ends: number[] = []
@@ -94,13 +95,13 @@ describe('rewards (D51)', () => {
     }
     return ends
   }
-  it('levels a party through Tier 1 at about ten levels a chapter', () => {
+  it('levels a party through Tier 1 a little slower than a chapter a band', () => {
     const everything = levelAfter(tier1, (c) => c.nodes.filter((n) => n.kind !== 'camp'))
     const onePath = levelAfter(tier1, (c) => c.nodes.filter((n) => n.kind !== 'camp' && (n.kind !== 'fight' || n.col === 2) &&
       (!n.id.startsWith('route') || n.id.startsWith('route1'))))
-    expect(everything).toEqual([10, 20, 30, 40, 50])
+    expect(everything).toEqual([7, 15, 24, 33, 43])
     // One path a chapter falls behind; replays close the gap, since fights above her level pay up to double.
-    expect(onePath).toEqual([6, 14, 22, 31, 40])
+    expect(onePath).toEqual([4, 10, 16, 22, 28])
   })
 })
 

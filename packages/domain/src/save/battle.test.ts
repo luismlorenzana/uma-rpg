@@ -115,9 +115,9 @@ describe('fights (D52)', () => {
     expect(world.wallet.laurels).toBe(10)
     expect(world.umas['101']!.exp).toBe(fought.result!.members[0]!.afterExp)
     expect(runOf(world, 0, ura.id)!.wins).toMatchObject({ start: 1, a1r1c1: 1 })
-    // Two band-1 tokens land in the Warehouse (D67).
+    // A band-1 token lands in the Warehouse (D67).
     const tokens = fought.result!.tokens
-    expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(2)
+    expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(1)
     expect(Object.keys(tokens).every((id) => id.endsWith('-1'))).toBe(true)
     for (const [id, n] of Object.entries(tokens)) expect(world.items[id]).toBe(n)
 

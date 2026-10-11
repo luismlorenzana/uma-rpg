@@ -10,7 +10,7 @@
 - Chapters tie progress to a party; the next party replays the same fights. Instead: **level many Umas, mix and match
   freely, bring high-level Umas with low-level ones.**
 - **Five continents**, one per scenario of the tier, each covering its ten levels (1–10, 11–20 …), each a big map of
-  regions (swamps, ice, mountains, deserts …). **Fixed levels, and a ton of them.**
+  regions (swamps, ice, mountains, deserts …). **Fixed levels, and a ton of them**, balanced for about 20 parties (D71).
 - **Variety**: solo fire+dark and fire+light foes on volcanoes; dark plus one element in the underworld; light plus
   one element on sky islands; fights with 8 foes and fights with 2.
 - **One active party**, swappable any time on any map. **Full HP every stage; MP carries, with restore points.**
@@ -21,21 +21,21 @@
 | Layer | How many | What it is |
 |---|---|---|
 | **World** | 1 per tier | Five continents on one screen |
-| **Continent** | 5 (one per scenario) | Ten levels; a map of 20 regions, two at each level, plus a capital and five Springs |
-| **Region** | 20 per continent | One biome at **one fixed level** (Volcano Lv8, Swamp Lv3 …) |
+| **Continent** | 5 (one per scenario) | Ten levels; a map of 40 regions, four at each level, plus a capital and five Springs |
+| **Region** | 40 per continent | One biome at **one fixed level** (Volcano Lv8, Swamp Lv3 …) |
 | **Stage** | 12 per region | One battle of 1–3 waves; the 11th an elite, the 12th the region boss |
 | **Wave** | 1–3 per stage | 1–8 foes; HP and MP carry between waves of one stage |
 
-**24 stages at every level, 240 a continent, 1,200 a tier.** Stages are generated from authored region data (no
+**48 stages at every level, 480 a continent, 2,400 a tier** (D71). Stages are generated from authored region data (no
 hand-placed fights), so a rebalance never needs new content.
 
 ## Levels: fixed, and a ton of them
 
-- Every region has one level; every level has two regions (two biomes), so **24 stages per level**.
-- **About 2 hours of fighting takes a fresh party from Lv1 to Lv50**: about 60 stages, at about 0.8 of a level per
-  regular stage (more for elites and bosses). Low Umas next to high ones get there faster: the catch-up rule pays
+- Every region has one level; every level has four regions (four biomes), so **48 stages per level**.
+- **About 4 hours of fighting takes a fresh party from Lv1 to Lv50** (D71): about 120 stages, at about 0.4 of a level
+  per regular stage (more for elites and bosses). About 20 parties make the 100-hour mark. Low Umas next to high ones get there faster: the catch-up rule pays
   ±10% EXP per level of gap, from 10% to 200%.
-- So a fresh party needs one or two stages per level, and **a level's 24 stages are fresh first clears for about 20
+- So a fresh party needs two or three stages per level, and **a level's 48 stages are fresh first clears for about 20
   parties**. Replays pay in full.
 - **First clears** pay a bonus (triple Laurels). Sweep Tickets work on any cleared stage.
 
@@ -70,7 +70,7 @@ come later ([themes.md](themes.md)).
 | Screen | Shows | Taps |
 |---|---|---|
 | **World** | Five continents on one screen, each with its band and % cleared | A continent zooms in |
-| **Continent** | Ten rows, one per level (low at the bottom), two region cells each, colored and iconed by biome; Springs between rows; the capital on top | A region zooms in; a Spring refills MP |
+| **Continent** | Ten rows, one per level (low at the bottom), four region cells each, colored and iconed by biome; Springs between rows; the capital on top | A region zooms in; a Spring refills MP |
 | **Region** | Its twelve stages on one short path, the boss at the end | A stage opens its sheet: level, foes and waves, elements and weaknesses once seen, rewards, **Fight** |
 
 - The **active party chip** sits at the top of all three screens, with each Uma's MP; tapping it swaps parties.
@@ -85,7 +85,7 @@ come later ([themes.md](themes.md)).
 | Save | `progress` (first clear and wins per stage), `activeParty`, each Uma's **MP**, and each Spring's last use replace `runs`. A migration drops chapter runs; Uma levels, skills, items, tokens and gear stay; an open chapter fight closes with no loss |
 | Battle engine | Up to **8 foes**, **dual-element foes**, **waves**; field effects later |
 | Battle stage | A two-row layout for 6–8 foes; a wave transition |
-| Rewards | EXP per stage kind (regular ≈ 0.8 of a level), Laurels with a first-clear bonus, **tokens of the band** ([../loop.md](../loop.md)) |
+| Rewards | EXP per stage kind (regular ≈ 0.4 of a level), Laurels with a first-clear bonus, **tokens of the band** ([../loop.md](../loop.md)) |
 | Tier Finale (S8, parked) | Fits as each capital's last fight or a sixth "continent" |
 
 ## Build order
@@ -100,9 +100,9 @@ come later ([themes.md](themes.md)).
 
 ## Decided (owner, 2026-10-11)
 
-1. **Fixed levels**, with a ton of stages per level (24).
+1. **Fixed levels**, with a ton of stages per level (48, D71).
 2. **Full HP every stage; MP carries**, refilled at Springs that recharge every 2 hours.
 3. **Everything open** from the start.
-4. **Lv1 → 50 in about 2 hours of fighting** for a fresh party (my recommendation, adopted for the numbers above);
-   the loop's passive steps pace it in practice.
+4. **Lv1 → 50 in about 4 hours of fighting** for a fresh party, so about 20 parties make the 100-hour mark (owner,
+   D71); the loop's passive steps pace it in practice.
 5. **The PriConne cast everywhere**; themed worlds or regions later.

@@ -68,9 +68,10 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 | Track | Base hours to the next rank (D68) | From the first rank to the top, at G |
 |---|---|---|
 | Class proficiency, ranks 1–6 | 6 each, plus a Class Promotion Token of the band (D67) | 30 h (15 h at A) |
-| Gear mastery, ranks 1–10 | 3 each | 27 h (13½ h at A) |
+| Weapon Level per class, Armor Level, Accessory Level, 1–10 (D70) | 3 each | 27 h (13½ h at A) |
 
-Running style sets class speed and distance sets mastery speed, with the same shares as professions.
+Running style sets a class hall's speed (rank and Weapon Level); her best distance sets the Armory's, her best
+running style the Jeweler's; the same shares as professions.
 
 ## Extra Stats and gear (S6, S7)
 

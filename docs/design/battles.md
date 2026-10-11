@@ -41,18 +41,19 @@ order; only the faces come from the private cast (D50).
 
 ## Rewards (D51)
 
-| Win | EXP weight (share of one level at the foes' level) | Laurels (× tier) |
+| Win | EXP weight (share of one level at the foes' level; halved by D71) | Laurels (× tier) |
 |---|---|---|
-| Fight | 0.42 | 2 |
-| Stage sub-boss | 0.28 | 5 |
-| Finals vanguard | 0.15 | 6 |
-| Finals champion | 0.20 | 10 |
+| Fight | 0.21 | 2 |
+| Stage sub-boss | 0.14 | 5 |
+| Finals vanguard | 0.075 | 6 |
+| Finals champion | 0.10 | 10 |
 
 - EXP scales **±10% per level of gap** between the Uma and the foes, from 10% to 200%, so new Umas catch up fast on
   cleared chapters. Every entrant earns it, knocked out or not. Level `L` needs `120 + 16L` EXP; Lv50 banks EXP for
   promotion (S8).
-- **Pacing, as pinned by tests:** clearing every node of each chapter ends at Lv 10, 20, 30, 40 and 50; one path per
-  chapter ends at Lv 6, 14, 22, 31 and 40, and replays close the gap.
+- **Pacing, as pinned by tests (D71):** clearing every node of each chapter ends at Lv 7, 15, 24, 33 and 43; one path
+  per chapter ends at Lv 4, 10, 16, 22 and 28, and replays (paid up to double above her level) close the gap. Every win
+  also drops tokens ([loop.md](loop.md)).
 - Laurels are **draft numbers**: the pacing model before S4 sets them with the Exchange's prices.
 - A loss pays nothing and costs nothing.
 
