@@ -17,12 +17,14 @@
 
 ## Not built yet
 
-1. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
+1. **The world map** (owner, 2026-10-10): five continents of 20 regions and 200 stages each, one active party, no
+   chapters. Proposal for review in [design/world/](design/world/README.md); build steps W1–W5 once approved.
+2. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
    Lv50, the Tier 2 world, legacy skills, and what the banked EXP at Lv50 is for.
-2. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).
-3. **Scenario flavor** (design §12): chapters differ only by their authored Finals; their foes' element and role mix
-   should lean per scenario.
-4. **The Tier Finale's difficulty spike** (design §12), with S8.
+3. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).
+4. **Scenario flavor** (design §12): chapters differ only by their authored Finals (the world map proposal answers
+   this with biomes and continent leans).
+5. **The Tier Finale's difficulty spike** (design §12), with S8.
 
 ## Balance: needs real play
 
