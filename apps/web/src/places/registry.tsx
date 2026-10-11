@@ -41,6 +41,9 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   warehouse: {
     Page: lazy(() => import('./warehouse/WarehousePage')),
   },
+  observatory: {
+    Page: lazy(() => import('./observatory/ObservatoryPage')),
+  },
   exchange: {
     Page: lazy(() => import('./exchange/ExchangePage')),
     Counter: lazy(() => import('./scenario-gate/LaurelCounter')),
@@ -54,6 +57,6 @@ const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ def
 const TrainingPage = lazy(() => import('./learning/TrainingPage'))
 const TrainingPeek = lazy(() => import('./learning/TrainingPage').then((m) => ({ default: m.TrainingPeek })))
 for (const f of FACILITIES) {
-  if (f.kind === 'gather' || f.kind === 'refine') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
+  if (f.kind === 'gather' || f.kind === 'refine' || f.kind === 'cook') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
   if (f.kind === 'train') PLACE_UI[f.id] = { Peek: TrainingPeek, Page: TrainingPage }
 }

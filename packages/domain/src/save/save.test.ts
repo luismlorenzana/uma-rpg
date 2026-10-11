@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { newSave, normalizeTrainerName, parseSave, parseSavePut, renameTrainer, resolveConflict, SaveParseError, STARTING_UNLOCK_TICKETS } from './save'
+import { newSave, normalizeTrainerName, parseSave, parseSavePut, renameTrainer, resolveConflict, SaveParseError, STARTING_UNLOCK_TICKETS, SAVE_SCHEMA_VERSION } from './save'
 
 const NOW = '2026-10-10T12:00:00.000Z'
 const LATER = '2026-10-10T13:00:00.000Z'
@@ -35,7 +35,7 @@ describe('save', () => {
     expect(() => parseSave({ ...save, tierWorlds: { '1': { ...save.tierWorlds['1'], wallet: { unlockTickets: -1, shards: 0, laurels: 0 } } } })).toThrow(/unlockTickets/)
     expect(() => parseSave({ ...save, tierWorlds: { x: save.tierWorlds['1'] } })).toThrow(/positive integers/)
     expect(() => parseSave({ ...save, account: { ...save.account, trainerName: ' Luis' } })).toThrow(/trainerName/)
-    expect(() => parseSave({ ...save, schemaVersion: 6 })).toThrow(/schemaVersion/)
+    expect(() => parseSave({ ...save, schemaVersion: SAVE_SCHEMA_VERSION + 1 })).toThrow(/schemaVersion/)
   })
 
   it('parses a PUT body', () => {

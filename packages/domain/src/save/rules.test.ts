@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError } from './save'
+import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION } from './save'
 import { addShards, isPartyFull, partyOf, renameParty, SaveRuleError, setPartySlot, unlockUma, worldOf } from './rules'
 
 const T0 = '2026-10-10T12:00:00.000Z'
@@ -92,7 +92,7 @@ describe('save v2 parsing', () => {
   it('migrates a v1 save: no Umas, twenty empty parties', () => {
     const v1 = { schemaVersion: 1, account: { trainerName: 'Luis', createdAt: T0, updatedAt: T0 }, tierWorlds: { '1': { createdAt: T0, wallet: { unlockTickets: 20, shards: 0, laurels: 0 } } } }
     const migrated = parseSave(v1)
-    expect(migrated.schemaVersion).toBe(5)
+    expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']?.umas).toEqual({})
     expect(migrated.tierWorlds['1']?.parties).toHaveLength(20)
   })

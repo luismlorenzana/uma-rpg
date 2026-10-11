@@ -15,6 +15,8 @@ import {
   rpgUsableLoadout, type RpgBuildId, type RpgProfile, type RpgWeaponKind,
 } from '../rpg/rules'
 import { depthsOpen } from '../economy/training'
+import { starPoints } from '../economy/dishes'
+import type { Points } from '../economy/bonus'
 import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassBuild, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
@@ -120,6 +122,11 @@ export function setFamiliar(save: Save, outfitId: string, familiar: RpgWeaponKin
   return withBuild(save, outfitId, 'summoner', { ...buildOf(uma, 'summoner'), familiar }, now, tier)
 }
 
+/** Every stat point she brings to a fight: her active Extra Stats nodes (S6). */
+export function umaPoints(uma: OwnedUma): Points {
+  return starPoints(uma.stars.active)
+}
+
 // --- Runs and fights -----------------------------------------------------------------------------------------------
 
 export const runOf = (world: TierWorld, party: number, chapterId: string): RpgRun | null => world.runs[rpgRunKey(party, chapterId)] ?? null
@@ -168,7 +175,7 @@ export function startFight(save: Save, chapter: RpgCampaignChapter, party: numbe
     const build = activeBuild(outfit, uma)
     const profile = umaProfile(outfit, uma, Number(tier), build)
     const loadout = rpgUsableLoadout(profile, buildOf(uma, build).loadout.map((n) => ({ tier: Number(tier), id: n })))
-    return { profile, loadout, familiar: buildOf(uma, 'summoner').familiar }
+    return { profile, loadout, familiar: buildOf(uma, 'summoner').familiar, points: umaPoints(uma) }
   })
   try {
     return withRun(save, rpgBeginRunBattle(chapter, runFor(world, party, chapter.id, now), nodeId, members, now), now, tier)

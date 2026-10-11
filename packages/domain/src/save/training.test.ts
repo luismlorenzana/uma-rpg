@@ -4,7 +4,7 @@ import { depthsOpen } from '../economy/training'
 import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { learnSkill, startFight, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, SaveParseError, type Save } from './save'
+import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
 import { collectJob, facilityOf, rushJob, startTraining } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
@@ -65,8 +65,10 @@ describe('save v5', () => {
     const v4 = JSON.parse(JSON.stringify(save))
     v4.schemaVersion = 4
     delete v4.tierWorlds['1'].umas['101'].ranks
+    delete v4.tierWorlds['1'].umas['101'].stars
+    delete v4.tierWorlds['1'].dishes
     const migrated = parseSave(v4)
-    expect(migrated.schemaVersion).toBe(5)
+    expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']!.umas['101']!.ranks.classes).toEqual({ brawler: 2, mage: 1, spellblade: 1, cleric: 1, summoner: 1 })
     expect(migrated.tierWorlds['1']!.umas['101']!.ranks.mastery.plate).toBe(1)
   })

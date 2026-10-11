@@ -365,7 +365,7 @@ previewing those Umas.
 - **Facility levels** are the tier world's own progression: materials from both sides upgrade a facility for more
   slots and speed. These levels stay with the tier world (§2.2).
 
-## 10. Extra Stats: the Sun and its planets **[Owner]**, with structure **[Proposed]**
+## 10. Extra Stats: the Sun and its planets **[Owner]**, with structure **[Settled in S6, D58]**
 
 **[Owner]** (D17, D23) An Uma eats dishes to unlock Extra Stat nodes and activates at most N of them. Increments are
 **small** and there are **many slots**, for variety in builds, on the model of uma-racer's Sun-and-planets map. Claude

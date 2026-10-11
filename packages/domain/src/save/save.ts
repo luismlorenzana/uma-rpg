@@ -1,13 +1,15 @@
-// Save v5: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v6: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
-// mastery (S5, D57).
+// mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58).
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, type Facility, type Job } from '../economy/jobs'
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
 import { RPG_CLASSES } from '../rpg/kinds'
+import { dishById, isStarNode } from '../economy/dishes'
+import { activeNodeSlots } from '../economy/pacing'
 import { itemById } from '../items/catalog'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
@@ -17,7 +19,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 5
+export const SAVE_SCHEMA_VERSION = 6
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -61,7 +63,11 @@ export interface OwnedUma {
   professions: Record<Profession, ProfessionLevel>
   /** Class proficiency (1–6) and gear mastery (1–10) ranks (S5, design §4). */
   ranks: Ranks
+  /** Her Sun-and-planets map: nodes unlocked by eating, and the ones active now (S6, design §10). */
+  stars: Stars
 }
+
+export interface Stars { unlocked: string[]; active: string[] }
 
 export interface Party {
   name: string
@@ -82,6 +88,8 @@ export interface TierWorld {
   items: Record<string, number>
   /** Facilities that have been used or upgraded, by place id; absent ones are level 1 and idle. */
   facilities: Record<string, Facility>
+  /** Cooked dishes waiting to be eaten, by dish id (S6). */
+  dishes: Record<string, number>
 }
 
 export interface Account {
@@ -136,10 +144,11 @@ export function defaultParties(): Party[] {
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
-export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks() })
+export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks(),
+  stars: { unlocked: [], active: [] } })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {}, dishes: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -224,6 +233,7 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
   if ((kind === 'gather' || kind === 'refine') && !itemById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
   if (kind === 'train' && !parseTrack(j.output)) throw new SaveParseError(`${path}.output`, 'unknown training track')
+  if (kind === 'cook' && !dishById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
   const n = count(j.count, `${path}.count`)
   if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_JOB_COUNT}`)
   const collected = count(j.collected, `${path}.collected`)
@@ -270,6 +280,26 @@ function ids(value: unknown, path: string, max: number): string[] {
   return value as string[]
 }
 
+function parseStars(value: unknown, path: string, level: number): Stars {
+  const o = object(value, path, ['unlocked', 'active'])
+  const unlocked = ids(o.unlocked, `${path}.unlocked`, 100)
+  if (unlocked.some((n) => !isStarNode(n))) throw new SaveParseError(`${path}.unlocked`, 'unknown node')
+  const active = ids(o.active, `${path}.active`, activeNodeSlots(level))
+  if (active.some((n) => !unlocked.includes(n))) throw new SaveParseError(`${path}.active`, 'only unlocked nodes can be active')
+  return { unlocked, active }
+}
+
+function parseDishes(value: unknown, path: string): Record<string, number> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const dishes: Record<string, number> = {}
+  for (const [id, n] of Object.entries(value)) {
+    if (!dishById(id)) throw new SaveParseError(`${path}.${id}`, 'unknown dish')
+    const c = count(n, `${path}.${id}`)
+    if (c > 0) dishes[id] = c
+  }
+  return dishes
+}
+
 function parseRanks(value: unknown, path: string): Ranks {
   const o = object(value, path, ['classes', 'mastery'])
   const ranks = newRanks()
@@ -310,12 +340,14 @@ function parseUmas(value: unknown, path: string, tier: number, version: number):
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
     const u = object(raw, at, version < 3 ? ['unlockedAt', 'level', 'exp'] : version < 4 ? ['unlockedAt', 'level', 'exp', 'build', 'builds']
-      : version < 5 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions'] : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks'])
+      : version < 5 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions'] : version < 6 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks']
+        : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks', 'stars'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), build: null, builds: {},
       professions: version < 4 ? newProfessions() : parseProfessions(u.professions, `${at}.professions`),
-      ranks: version < 5 ? newRanks() : parseRanks(u.ranks, `${at}.ranks`) }
+      ranks: version < 5 ? newRanks() : parseRanks(u.ranks, `${at}.ranks`),
+      stars: version < 6 ? { unlocked: [], active: [] } : parseStars(u.stars, `${at}.stars`, level) }
     if (version >= 3) {
       // v2 → v3 (D52): no build chosen and nothing learned.
       if (u.build !== null && !isRpgBuildId(u.build)) throw new SaveParseError(`${at}.build`, 'expected null or a class build')
@@ -432,10 +464,11 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
     // v1 → v3 (D45, D52): no Umas yet, twenty empty parties, no runs.
     const w = object(value, path, ['createdAt', 'wallet'])
     return { createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas: {}, parties: defaultParties(),
-      runs: {}, items: {}, facilities: {} }
+      runs: {}, items: {}, facilities: {}, dishes: {} }
   }
   const keys = version === 2 ? ['createdAt', 'wallet', 'umas', 'parties'] : version === 3 ? ['createdAt', 'wallet', 'umas', 'parties', 'runs']
-    : ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities']
+    : version < 6 ? ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities']
+      : ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities', 'dishes']
   const w = object(value, path, keys)
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
   return {
@@ -443,6 +476,7 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
     parties: parseParties(w.parties, `${path}.parties`, umas), runs: version === 2 ? {} : parseRuns(w.runs, `${path}.runs`),
     items: version < 4 ? {} : parseItems(w.items, `${path}.items`),
     facilities: version < 4 ? {} : parseFacilities(w.facilities, `${path}.facilities`, umas),
+    dishes: version < 6 ? {} : parseDishes(w.dishes, `${path}.dishes`),
   }
 }
 
@@ -452,7 +486,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v5 save and always returns v5. */
+/** Parses a v1–v6 save and always returns v6. */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

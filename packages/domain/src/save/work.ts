@@ -3,10 +3,11 @@
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { facilitySpec, jobEndsAt, jobFinished, type Facility, type Job } from '../economy/jobs'
 import {
-  aptitudeTime, EXP_PER_MINUTE, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MAX_JOB_COUNT, MINUTE,
+  aptitudeTime, EXP_PER_MINUTE, makeMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MAX_JOB_COUNT, MINUTE,
   PROFESSION_MAX_LEVEL, professionExpToNext, rushTicketsFor, type Profession,
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
+import { dishById } from '../economy/dishes'
 import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
 import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
@@ -44,7 +45,10 @@ export function grantProfessionExp(p: ProfessionLevel, exp: number): ProfessionL
 export const professionAptitude = (outfit: WorkOutfit, profession: Profession) => (profession === 'farming' ? outfit.aptitudes.surface.turf : outfit.aptitudes.surface.dirt)
 
 export interface JobPlan {
-  item: ItemDef
+  /** What it makes: its name and grade. */
+  output: { id: string; name: string; grade: number }
+  /** The raw or refined item, when it makes one. */
+  item: ItemDef | null
   profession: Profession
   /** Real milliseconds per item for this Uma here. */
   msEach: number
@@ -55,9 +59,10 @@ export interface JobPlan {
   block: string | null
 }
 
-/** What a gather or refine job would be: its speed for this Uma, its EXP, inputs and anything stopping it. */
+/** What a gather, refine or cook job would be: its speed for this Uma, its EXP, inputs and anything stopping it. */
 export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count = 1): JobPlan | null {
   const spec = facilitySpec(placeId)
+  if (spec?.kind === 'cook') return planCooking(world, placeId, outfit, output, count)
   const item = itemById(output)
   const uma = world.umas[outfit.outfitId]
   if (!spec || !item || !uma || !spec.profession || (spec.kind !== 'gather' && spec.kind !== 'refine')) return null
@@ -70,7 +75,27 @@ export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, o
   else if (spec.kind === 'refine' && (!item.refined || item.side !== profession)) block = 'Not refined here'
   else if (uma.professions[profession].level < gradeUnlockLevel(item.grade)) block = `Needs ${profession === 'farming' ? 'Farming' : 'Gathering'} Lv${gradeUnlockLevel(item.grade)}`
   else if (spec.kind === 'refine' && (world.items[item.pair] ?? 0) < count) block = `Needs ${count} ${itemById(item.pair)?.name ?? item.pair}`
-  return { item, profession, msEach, expEach: itemMinutes(item.grade) * EXP_PER_MINUTE, inputs, block }
+  return { output: { id: item.id, name: item.name, grade: item.grade }, item, profession, msEach, expEach: itemMinutes(item.grade) * EXP_PER_MINUTE, inputs, block }
+}
+
+/** Why the Warehouse can't cover `count` sets of these inputs, or null. */
+export function inputsBlock(world: TierWorld, inputs: Record<string, number>, count: number): string | null {
+  for (const [id, n] of Object.entries(inputs)) {
+    if ((world.items[id] ?? 0) < n * count) return `Needs ${n * count} ${itemById(id)?.name ?? id}`
+  }
+  return null
+}
+
+/** A dish at the Kitchen (S6): Farming & Cooking, three items' time, its recipe's refined ingredients. */
+function planCooking(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
+  const dish = dishById(output)
+  const uma = world.umas[outfit.outfitId]
+  if (!dish || !uma) return null
+  const facility = facilityOf(world, placeId)
+  const minutes = makeMinutes(dish.grade)
+  const msEach = Math.max(1000, Math.round((minutes * MINUTE * aptitudeTime(professionAptitude(outfit, 'farming'))) / FACILITY_SPEED[facility.level - 1]!))
+  const block = uma.professions.farming.level < gradeUnlockLevel(dish.grade) ? `Needs Farming Lv${gradeUnlockLevel(dish.grade)}` : inputsBlock(world, dish.inputs, count)
+  return { output: { id: dish.id, name: dish.name, grade: dish.grade }, item: null, profession: 'farming', msEach, expEach: minutes * EXP_PER_MINUTE, inputs: dish.inputs, block }
 }
 
 /** Why this Uma can't take a job now, or null: she works one job at a time and never mid-fight. */
@@ -127,7 +152,7 @@ function collectIn(world: TierWorld, placeId: string, slot: number, now: string)
   const spec = facilitySpec(placeId)!
   const done = finished >= job.count
   if (ready <= 0) return { world: done ? setJob(world, placeId, slot, null) : world, got: { items: 0, exp: 0, levelsUp: 0, done } }
-  let next: TierWorld = { ...world, items: give(world.items, job.output, ready) }
+  let next: TierWorld = job.kind === 'cook' ? { ...world, dishes: give(world.dishes, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
   let levelsUp = 0
   const exp = ready * job.expEach
   const uma = next.umas[job.outfitId]

@@ -23,6 +23,10 @@ export interface BattleAlly {
   mp: number
   /** Deepest skill depth her class rank opens (S5); absent in older fights, which gate depths by level. */
   maxDepth?: number
+  /** Share of every hit she avoids, per mille, from Speed points (S6, S7). */
+  evasion?: number
+  /** Limit Break charge she starts the fight with, from Limit Break points (S6, S7). */
+  limitStart?: number
 }
 export interface BattleEnemyStats { hp: number; atk: number; matk: number; pdef: number; mdef: number; initiative: number }
 export interface BattleEnemyMove {

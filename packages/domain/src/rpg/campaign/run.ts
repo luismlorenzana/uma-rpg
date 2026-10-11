@@ -4,6 +4,7 @@
 import { applyBattleAction, createBattle, replayBattle } from '../battle/engine'
 import { BATTLE_MAX_ROUNDS } from '../battle/skills'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
+import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 
@@ -56,13 +57,13 @@ export function rpgRestAtCamp(chapter: RpgCampaignChapter, run: RpgRun, campId: 
   return { ...run, wins: { ...run.wins, [campId]: Math.max(1, run.wins[campId] ?? 0) }, mp: {}, updatedAt: now }
 }
 
-/** A party member as she enters a fight: her profile and her build's equipped skills. */
-export interface RpgPartyMember { profile: RpgProfile; loadout: RpgProfile['tree']; familiar: BattleInput['allies'][number]['familiar'] }
+/** A party member as she enters a fight: her profile, her build's equipped skills, and her stat points (S6, S7). */
+export interface RpgPartyMember { profile: RpgProfile; loadout: RpgProfile['tree']; familiar: BattleInput['allies'][number]['familiar']; points?: Points }
 
 export const rpgMemberLevel = (profile: Pick<RpgProfile, 'tier' | 'level'>): number => rpgLifetimeLevels(profile.tier, profile.level) + 1
 
-export function rpgCarriedMp(run: Pick<RpgRun, 'mp'>, profile: RpgProfile): number {
-  const max = projectRpgStats(profile).mp
+export function rpgCarriedMp(run: Pick<RpgRun, 'mp'>, profile: RpgProfile, points?: Points): number {
+  const max = applyPoints(projectRpgStats(profile), points ?? noPoints()).stats.mp
   return Math.min(max, run.mp[profile.outfitId] ?? max)
 }
 
@@ -83,9 +84,13 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   const battleId = battleIdOf(run)
   const input: BattleInput = {
     version: 5, seed: seedOf(battleId),
-    allies: party.map(({ profile, loadout, familiar }) => ({ id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons],
-      tier: profile.tier, level: profile.level, stats: projectRpgStats(profile), tree: profile.tree, legacy: profile.legacy,
-      loadout, familiar, mp: rpgCarriedMp(run, profile), ...(profile.maxDepth !== undefined ? { maxDepth: profile.maxDepth } : {}) })),
+    allies: party.map(({ profile, loadout, familiar, points }) => {
+      const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
+      return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
+        tree: profile.tree, legacy: profile.legacy, loadout, familiar, mp: rpgCarriedMp(run, profile, points),
+        ...(profile.maxDepth !== undefined ? { maxDepth: profile.maxDepth } : {}),
+        ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}) }
+    }),
     enemies: node.enemies,
   }
   createBattle(input)

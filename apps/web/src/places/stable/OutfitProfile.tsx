@@ -2,7 +2,7 @@
 // Unlock flow (locked) or her state (owned: level, unlock date, party).
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeBuild, best, buildOf, DISTANCE_GEAR, KEY_LABELS, partyOf, RPG_TIER_MAX_LEVEL, rpgActiveSlots, rpgExpToNext, rpgTreePointsEarned,
+  activeBuild, activeNodeSlots, best, buildOf, DISTANCE_GEAR, KEY_LABELS, partyOf, RPG_TIER_MAX_LEVEL, rpgActiveSlots, rpgExpToNext, rpgTreePointsEarned,
   rpgTreePointsSpent, SaveRuleError, GEAR_TYPE_LABEL, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
 } from '@rpg/domain'
 import { Bar, BUILD_LABEL, CLASS_LABEL } from '../../battle/labels'
@@ -73,7 +73,7 @@ function AptitudesAtWork({ outfit }: { outfit: RosterOutfit }) {
 }
 
 /** Her battle side (S3): EXP to the next level, the build she fights with, points to spend and equipped skills. */
-function BattleCard({ outfit, owned, onSkills }: { outfit: RosterOutfit; owned: OwnedUma; onSkills: () => void }) {
+function BattleCard({ outfit, owned, onSkills, onStars }: { outfit: RosterOutfit; owned: OwnedUma; onSkills: () => void; onStars: () => void }) {
   const build = activeBuild(outfit, owned)
   const current = buildOf(owned, build)
   const points = rpgTreePointsEarned(owned.level) - rpgTreePointsSpent(current.tree.map((id) => ({ tier: 1, id })))
@@ -93,6 +93,10 @@ function BattleCard({ outfit, owned, onSkills }: { outfit: RosterOutfit; owned: 
         <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold ${points > 0 ? 'bg-accent text-accent-ink' : 'bg-sunken text-ink-soft'}`}>
           {points > 0 ? `${points} pts · Skills` : 'Skills'}
         </span>
+      </button>
+      <button type="button" onClick={onStars} className="flex min-h-11 w-full items-center justify-between rounded-sm bg-panel px-3 text-left text-[14px] active:bg-white/5">
+        <span className="font-semibold">Extra Stats</span>
+        <span className="text-[12px] text-ink-soft">{owned.stars.active.length}/{activeNodeSlots(owned.level)} active · {owned.stars.unlocked.length}/100</span>
       </button>
       <div className="grid grid-cols-5 gap-1 text-center">
         {(['brawler', 'mage', 'spellblade', 'cleric', 'summoner'] as const).map((c) => (
@@ -206,7 +210,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         </section>
       )}
 
-      {owned && <BattleCard outfit={outfit} owned={owned} onSkills={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} />}
+      {owned && <BattleCard outfit={outfit} owned={owned} onSkills={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)}
+        onStars={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} />}
 
       <Aptitudes outfit={outfit} />
       <AptitudesAtWork outfit={outfit} />

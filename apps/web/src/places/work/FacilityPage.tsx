@@ -1,12 +1,14 @@
-// A working facility (S4, D55): the 16 sites gather raw items; the Pantry and Workbench refine them, 1 → 1. Each slot
-// holds one Uma's job: what she makes, how many, how far along. Collect pays the items and her profession EXP.
+// A working facility (S4, S6; D55, D58): the 16 sites gather raw items, the Pantry and Workbench refine them 1 → 1, and
+// the Kitchen cooks dishes. Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
+// output and her profession EXP.
 import {
-  availabilityBlock, EFFECT_LABEL, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
+  availabilityBlock, DISHES, dishById, EFFECT_LABEL, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, rushCost, SaveRuleError,
   upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
+import { outputView } from '../../items/outputs'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
 import { collect, collectEverything, recall, rush, startWork, upgrade, useWorld } from '../../save/game'
@@ -22,6 +24,7 @@ function describe(placeId: string): { title: string; line: string; profession: P
   const spec = facilitySpec(placeId)!
   const family = spec.family ? familyById(spec.family) : null
   if (family) return { title: family.name, line: `Gathers ${family.name.toLowerCase()} for the ${EFFECT_LABEL[family.effect]} effect`, profession: spec.profession! }
+  if (spec.kind === 'cook') return { title: 'Cooking', line: 'Cooks dishes from refined ingredients; each new dish an Uma eats unlocks an Extra Stats node', profession: 'farming' }
   return { title: 'Refining', line: `Refines every ${spec.profession === 'farming' ? 'farming' : 'gathering'} family, one into one`, profession: spec.profession! }
 }
 
@@ -86,7 +89,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
 function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRush, onRecall }: {
   view: MasterView; job: Job; now: string; placeId: string; rushTickets: number; onCollect: () => void; onRush: () => void; onRecall: () => void
 }) {
-  const item = itemById(job.output)
+  const item = outputView(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
   const finished = jobFinished(job, now)
   const readyCount = finished - job.collected
@@ -100,8 +103,8 @@ function JobCard({ view, job, now, placeId, rushTickets, onCollect, onRush, onRe
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14px] font-semibold">{outfit?.name ?? job.outfitId}</p>
           <p className="flex items-center gap-1 text-[12px] text-ink-soft">
-            {item && <ItemIcon id={item.id} size={20} />}
-            <span className="truncate">{item?.name ?? job.output} ×{job.count}</span>
+            {item.icon && <ItemIcon id={item.icon} size={20} />}
+            <span className="truncate">{item.name} ×{job.count}</span>
           </p>
         </div>
         <span className="shrink-0 text-right text-[12px] text-ink-soft">{done ? 'Done' : formatDuration(left)}<br />{finished}/{job.count}</span>
@@ -142,10 +145,14 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
   const options = outfit
     ? spec.kind === 'gather'
       ? familyById(spec.family!)!.raw.map((i) => i.id)
-      : ITEM_FAMILIES.filter((f) => f.side === profession).flatMap((f) => f.refined.map((i) => i.id))
+      : spec.kind === 'cook'
+        ? DISHES.map((d) => d.id)
+        : ITEM_FAMILIES.filter((f) => f.side === profession).flatMap((f) => f.refined.map((i) => i.id))
     : []
   const plan = outfit && output ? planJob(world, placeId, outfit, output, count) : null
-  const stock = plan && spec.kind === 'refine' ? world.items[plan.item.pair] ?? 0 : Infinity
+  // How many the Warehouse covers: refining needs the raw item, cooking every ingredient.
+  const makeable = (inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
+  const stock = plan && (spec.kind === 'refine' || spec.kind === 'cook') ? makeable(plan.inputs) : Infinity
   const max = Math.max(1, Math.min(MAX_JOB_COUNT, stock))
   const title = !outfit ? 'Who works here?' : !output ? 'What does she make?' : 'How many?'
   return (
@@ -179,18 +186,20 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
       {outfit && !output && (
         <div className="grid grid-cols-2 gap-1.5">
           {options.map((id) => {
-            const item = itemById(id)!
+            const out = outputView(id)
             const p = planJob(world, placeId, outfit, id, 1)
-            const locked = world.umas[outfit.outfitId]!.professions[profession].level < gradeUnlockLevel(item.grade)
-            const have = spec.kind === 'refine' ? world.items[item.pair] ?? 0 : null
+            const locked = world.umas[outfit.outfitId]!.professions[profession].level < gradeUnlockLevel(out.grade)
+            const have = spec.kind === 'refine' || spec.kind === 'cook' ? (p ? makeable(p.inputs) : 0) : null
+            const dish = dishById(id)
             return (
               <button key={id} type="button" disabled={locked || (have !== null && have < 1)} onClick={() => { setOutput(id); setCount(have !== null ? Math.min(10, have) : 10) }}
                 className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left disabled:opacity-40">
-                <ItemIcon id={id} size={32} />
+                <ItemIcon id={out.icon} size={32} />
                 <span className="min-w-0">
-                  <span className="block truncate text-[12px] font-semibold">{item.name}</span>
-                  <span className="block text-[11px] text-ink-soft">
-                    {locked ? `Lv${gradeUnlockLevel(item.grade)}` : have !== null ? `${have} to refine` : `${formatDuration(p?.msEach ?? 0)} each`}
+                  <span className="block truncate text-[12px] font-semibold">{out.name}</span>
+                  <span className="block truncate text-[11px] text-ink-soft">
+                    {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} ${dish ? 'to cook' : 'to refine'}` : `${formatDuration(p?.msEach ?? 0)} each`}
+                    {dish ? ` · ${dish.effects.length === 8 ? 'all' : dish.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}` : ''}
                   </span>
                 </span>
               </button>
@@ -201,12 +210,22 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
       {outfit && output && plan && (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <ItemIcon id={output} size={48} />
+            <ItemIcon id={outputView(output).icon} size={48} />
             <div className="text-[14px]">
-              <p className="font-semibold">{plan.item.name} · grade {plan.item.grade}</p>
+              <p className="font-semibold">{plan.output.name} · grade {plan.output.grade}</p>
               <p className="text-ink-soft">{formatDuration(plan.msEach)} each · {plan.expEach} EXP each</p>
             </div>
           </div>
+          {Object.keys(plan.inputs).length > 0 && (
+            <ul className="flex flex-wrap gap-1.5 text-[12px]">
+              {Object.entries(plan.inputs).map(([id, n]) => (
+                <li key={id} className="flex items-center gap-1 rounded-sm bg-raised px-2 py-1">
+                  <ItemIcon id={id} size={20} /> {itemById(id)?.name} ×{n * Math.min(count, max)}
+                  <span className="text-ink-faint">({world.items[id] ?? 0})</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="flex flex-wrap gap-1.5">
             {[1, 5, 10, 25, 50].filter((n) => n <= max).concat(max > 1 && ![1, 5, 10, 25, 50].includes(max) ? [max] : []).map((n) => (
               <button key={n} type="button" onClick={() => setCount(n)} className={`min-h-10 min-w-12 rounded-sm px-3 font-semibold ${Math.min(count, max) === n ? 'bg-accent text-accent-ink' : 'bg-raised'}`}>×{n}</button>
@@ -267,8 +286,8 @@ export function FacilityPeek({ place }: PeekProps) {
           <li key={i} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-[13px]">
             {job ? (
               <>
-                <ItemIcon id={job.output} size={24} />
-                <span className="min-w-0 flex-1 truncate">{itemById(job.output)?.name} {jobFinished(job, now)}/{job.count}</span>
+                <ItemIcon id={outputView(job.output).icon} size={24} />
+                <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {jobFinished(job, now)}/{job.count}</span>
                 <span className="text-ink-soft">{jobFinished(job, now) >= job.count ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span>
               </>
             ) : <span className="text-ink-faint">Slot {i + 1} · free</span>}

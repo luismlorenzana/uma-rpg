@@ -84,6 +84,7 @@ function validAlly(a: BattleAlly): boolean {
   if (!SAFE_ID.test(a.id) || !RPG_CLASSES.includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons) ||
     !safeInt(a.tier, 1, 1_000_000) || !safeInt(a.level, 1, 50) || !validStats(a.stats as unknown as Record<string, unknown>, ALLY_STATS) ||
     !safeInt(a.mp, 0, a.stats.mp) || !RPG_WEAPON_KINDS.includes(a.familiar) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
+    (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
     a.loadout.length > rpgActiveSlots(a.level) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
   if (!validRpgTree(a) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id)?.skill)) return false
@@ -155,7 +156,7 @@ export function createBattle(source: BattleInput): BattleStep {
   const input = JSON.parse(JSON.stringify(source)) as BattleInput
   const base = { statuses: [], barrier: 0, phase: 1 as const, guardingFor: null, brokenAt: 0, revived: false, limit: 0 }
   const units: BattleUnit[] = [
-    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0 })),
+    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0 })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
   const state: BattleState = { engineVersion: 5, input, round: 1, units, acted: [], familiars: [], intents: [], outcome: 'active' }
@@ -195,6 +196,8 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   if (foe && options.special === 'vs-broken' && battleBroken(defender)) amount *= 1.3
   if (foe && options.special === 'vs-wounded' && defender.hp * 2 < foe.stats.hp) amount *= 1.3
   if (foe && !battleBroken(defender) && options.special !== 'pierce') amount *= BATTLE_UNBROKEN_FACTOR
+  const evasion = defender.side === 'ally' ? allyOf(s, defender.id)?.evasion ?? 0 : 0
+  if (evasion > 0) amount *= 1 - evasion / 1000
   return { amount: Math.max(1, Math.round(amount)), weak }
 }
 

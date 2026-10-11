@@ -2,6 +2,7 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, startTraining, sweepFight, upgradeFacility, type Track, type WorkOutfit,
+  eatDish, setActiveNodes,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
   type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
@@ -139,6 +140,16 @@ export const rush = (placeId: string, slot: number) => edit((s, now) => rushJob(
 export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, placeId, now))
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
 export const buyTicket = (kind: 'rush' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
+
+/** She eats a dish: one node unlocks on her map (S6). Returns the node. */
+export async function eat(outfitId: string, dishId: string): Promise<string> {
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const r = eatDish(save, outfitId, dishId, nowIso())
+  await commit(r.save)
+  return r.node
+}
+export const activate = (outfitId: string, nodes: string[]) => edit((s, now) => setActiveNodes(s, outfitId, nodes, now))
 
 /** Collects one job; returns what it gave. */
 export async function collect(placeId: string, slot: number): Promise<{ items: number; levelsUp: number }> {

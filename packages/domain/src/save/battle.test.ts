@@ -9,7 +9,7 @@ import {
 } from './battle'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
-import { newOwnedUma, newSave, parseSave, SaveParseError, type Save } from './save'
+import { newOwnedUma, newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
 
 const T = (n: number) => `2026-10-10T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
@@ -175,7 +175,7 @@ describe('save v3 parsing', () => {
       tierWorlds: { '1': { createdAt: T(0), wallet: { unlockTickets: 19, shards: 0, laurels: 0 }, umas: { '101': { unlockedAt: T(1), level: 1, exp: 0 } },
         parties: Array.from({ length: 20 }, (_, i) => ({ name: `Party ${i + 1}`, slots: [null, null, null, null, null] })) } } }
     const migrated = parseSave(v2)
-    expect(migrated.schemaVersion).toBe(5)
+    expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']!.umas['101']).toEqual(newOwnedUma(T(1)))
     expect(migrated.tierWorlds['1']!.runs).toEqual({})
   })

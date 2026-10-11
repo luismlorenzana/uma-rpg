@@ -1,5 +1,6 @@
 // The Warehouse (S4): every raw and refined item you own, family by family, on both sides.
-import { EFFECT_LABEL, ITEM_FAMILIES, itemById, type ItemSide } from '@rpg/domain'
+import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, type ItemSide } from '@rpg/domain'
+import { outputView } from '../../items/outputs'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { useWorld } from '../../save/game'
@@ -7,7 +8,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 
 export default function WarehousePage() {
   const world = useWorld()
-  const [side, setSide] = useState<ItemSide>('farming')
+  const [side, setSide] = useState<ItemSide | 'dishes'>('farming')
   const [open, setOpen] = useState<string | null>(null)
   if (!world) return null
   const total = Object.values(world.items).reduce((a, b) => a + b, 0)
@@ -15,16 +16,28 @@ export default function WarehousePage() {
   return (
     <div>
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
-        <div className="grid grid-cols-2 rounded-sm bg-sunken p-1" role="tablist" aria-label="Side">
-          {(['farming', 'gathering'] as const).map((s) => (
+        <div className="grid grid-cols-3 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
+          {(['farming', 'gathering', 'dishes'] as const).map((s) => (
             <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)}
               className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-              {s === 'farming' ? 'Ingredients' : 'Materials'}
+              {s === 'farming' ? 'Ingredients' : s === 'gathering' ? 'Materials' : 'Dishes'}
             </button>
           ))}
         </div>
         <p className="text-[12px] text-ink-faint">{total} items in stock</p>
       </div>
+      {side === 'dishes' && (
+        <ul className="space-y-1.5 p-3">
+          {Object.keys(world.dishes).length === 0 && <li className="text-[13px] text-ink-faint">No dishes: cook at the Kitchen, eat at the Observatory.</li>}
+          {Object.entries(world.dishes).map(([id, n]) => (
+            <li key={id} className="flex items-center gap-2 rounded-sm bg-panel p-2 text-[13px]">
+              <ItemIcon id={outputView(id).icon} size={32} />
+              <span className="min-w-0 flex-1 truncate font-semibold">{dishById(id)?.name}</span>
+              <span className="text-ink-soft">×{n}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="space-y-3 p-3">
         {ITEM_FAMILIES.filter((f) => f.side === side).map((f) => {
           const owned = [...f.raw, ...f.refined].filter((i) => (world.items[i.id] ?? 0) > 0)
