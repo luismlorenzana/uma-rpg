@@ -17,6 +17,9 @@
 
 ## Not built yet
 
+- **Gear icons for D86's new types**: Katana, the five Tomes and the ten Orbs reuse the Short Sword, Summoner Tome and
+  Ring art with a kind badge until an uma-platform art round draws their own.
+
 1. **Girls' Frontline's pack (D85)**: its biomes (Jungle, Geyser Basin, Crystal Caverns) draw from the pool until it's
    captured, which waits on the owner's OK for its source.
 2. **Key bosses' faces**: five packs are built (D81, D83); the owner authors key bosses' faces later. Last

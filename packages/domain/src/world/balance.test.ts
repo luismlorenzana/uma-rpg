@@ -1,78 +1,90 @@
-// A balance simulation for the world map (D72, D75, D77): a five-class party with expected skills plays every stage of a region
-// at its level with a simple policy, and we read win rates. Run the full table with `SIM=1 npx vitest run
+// A balance simulation for the world map (D72, D75, D77, D86): a five-class party with expected skills plays every stage
+// of a region at its level with a simple policy, and we read win rates. Run the full table with `SIM=1 npx vitest run
 // src/world/balance.test.ts`; the always-on test only checks that the opening stages are winnable at Lv1.
 import { describe, expect, it } from 'vitest'
 import { applyBattleAction, battleActionsLeft, battleActorSkill, battleHitIsWeak, createBattle } from '../rpg/battle/engine'
-import type { BattleAction, BattleAlly, BattleInput, BattleState } from '../rpg/battle/types'
+import type { BattleAction, BattleAlly, BattleHalf, BattleInput, BattleState, BattleUnit } from '../rpg/battle/types'
+import { rpgNode, type RpgSkillDef } from '../rpg/catalog'
 import { depthsOpen } from '../economy/training'
 import { RPG_FOE_TUNING } from '../rpg/campaign/enemies'
-import { rpgNode } from '../rpg/catalog'
-import { learnRpgNode, projectRpgStats, rpgActiveSlots, rpgLearnBlock, rpgProfileTrees, RPG_BUILD, RPG_DEPTH_GATES, type RpgBuildId, type RpgProfile } from '../rpg/rules'
-import { rpgTreeNodes } from '../rpg/catalog'
+import {
+  isRpgTome, learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees, RPG_DEPTH_GATES,
+  rpgWeaponKind, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
+} from '../rpg/rules'
 import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
-const PARTY: readonly RpgBuildId[] = ['greatsword-spear', 'mage', 'spellblade', 'cleric', 'summoner']
+const PARTY: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 
-/** An average invented outfit in a build, at a level and class rank, with its trees learned as far as points allow. */
-function member(build: RpgBuildId, i: number, level: number, rank: number, budget: number): BattleAlly {
-  const { classId, weapons } = RPG_BUILD[build]
+/** An average invented outfit of a class, at a level and class rank, with side skills learned deepest first. */
+function member(classId: RpgClass, i: number, level: number, rank: number, budget: number): BattleAlly {
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: [...weapons], tier: 1, level, exp: 0, tree: [], legacy: [], maxDepth: depthsOpen(rank) }
-  // Core nodes depth by depth across every branch, then side nodes, while points last.
-  for (let pass = 0; pass < 2; pass++) {
-    for (let d = 1; d <= 5; d++) {
-      for (const tree of rpgProfileTrees(profile)) {
-        for (const node of rpgTreeNodes(tree).filter((n) => n.depth === d && (pass === 0 ? n.variant === null : n.variant === 'a'))) {
-          if (!rpgLearnBlock(profile, node.id)) profile = learnRpgNode(profile, node.id)
-        }
-      }
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId), tier: 1, level, exp: 0,
+    tree: [], legacy: [], maxDepth: depthsOpen(rank) }
+  for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
+  // Equip the deepest skills, one weapon at a time, so every weapon brings something.
+  const known = rpgLearnedSkills(profile).sort((a, b) => rpgNode(b.id)!.depth - rpgNode(a.id)!.depth)
+  const loadout: RpgNodeRef[] = []
+  for (let pass = 0; pass < 5 && loadout.length < rpgActiveSlots(level); pass++) {
+    for (const w of profile.weapons) {
+      const next = known.find((r) => rpgNode(r.id)!.weapon === w && !loadout.includes(r))
+      if (next && loadout.length < rpgActiveSlots(level)) loadout.push(next)
     }
   }
-  const skills = profile.tree.filter((r) => rpgNode(r.id)?.skill).sort((a, b) => (rpgNode(b.id)!.depth - rpgNode(a.id)!.depth))
   const stats = projectRpgStats(profile)
   const boosted = Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v * budget) : v])) as unknown as typeof stats
-  return { id: profile.outfitId, classId, weapons: [...weapons], tier: 1, level, stats: boosted, tree: profile.tree, legacy: [],
-    loadout: skills.slice(0, rpgActiveSlots(level)), familiar: 'greatsword', mp: boosted.mp, maxDepth: depthsOpen(rank) }
+  return { id: profile.outfitId, classId, weapons: profile.weapons, tier: 1, level, stats: boosted, tree: profile.tree, legacy: [],
+    loadout, mp: boosted.mp, maxDepth: depthsOpen(rank) }
 }
 
-/** Plays a fight: each ally uses her strongest affordable skill that hits a living foe's weakness, else attacks. */
+/** How good a skill or Attack is against a foe now: power, more for weaknesses and every-foe reach. */
+function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: BattleUnit[]): number {
+  const enemy = state.input.enemies.find((e) => e.id === foe.id)!
+  const weak = def.hits.some((h) => h.parts.some((p) => battleHitIsWeak(enemy, foe, p.kind)))
+  const total = def.hits.reduce((n, h) => n + h.power, 0)
+  return total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) / (foe.shield > 0 ? 1 : 0.6) + (def.status ? 0.5 : 0)
+}
+const attackDef = (w: RpgWeapon): RpgSkillDef => ({ target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(w), share: 1 }] }], mp: 0, primary: rpgWeaponKind(w) })
+
+/** Plays a fight: each ally picks her best affordable skill or Attack (a Spell Blade one of each half), weakness-aware. */
 function play(input: BattleInput): { won: boolean; rounds: number; hpLeft: number; mp: Record<string, number> } {
   let state: BattleState = createBattle(input).state
   for (let n = 0; n < 600 && state.outcome === 'active'; n++) {
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)
     if (!ally) break
     const foes = state.units.filter((u) => u.side === 'enemy' && u.hp > 0)
-    const enemyOf = (id: string) => state.input.enemies.find((e) => e.id === id)!
     const source = state.input.allies.find((a) => a.id === ally.id)!
-    let action: BattleAction | null = null
-    if (source.classId === 'summoner' && state.familiars.includes(ally.id)) {
-      const friend = state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)
-      if (friend && source.loadout.length === 0) action = { kind: 'guard', actorId: ally.id, targetId: friend.id }
-    }
-    let best = -1
-    for (const ref of source.loadout) {
-      const skill = battleActorSkill(state, ally.id, ref)
-      if (!skill || skill.mp > ally.mp) continue
+    const best = (tome: boolean | null, budget: number): { half: BattleHalf; mp: number; foe: BattleUnit } => {
+      let pick: { half: BattleHalf; mp: number; foe: BattleUnit; score: number } = { half: { weapon: source.weapons.find((w) => tome === null || isRpgTome(w) === tome)! }, mp: 0, foe: foes[0]!, score: -1 }
       for (const foe of foes) {
-        const weak = skill.def.hits.some((h) => h.parts.some((p) => battleHitIsWeak(enemyOf(foe.id), foe, p.kind)))
-        const score = skill.power * (weak ? 1.6 : 1) * (skill.def.target === 'all' ? foes.length * 0.55 : 1) / (foe.shield > 0 ? 1 : 0.6)
-        if (score > best) { best = score; action = { kind: 'skill', actorId: ally.id, targetId: foe.id, skill: ref } }
+        for (const w of source.weapons.filter((x) => tome === null || isRpgTome(x) === tome)) {
+          const v = score(state, attackDef(w), foe, foes)
+          if (v > pick.score) pick = { half: { weapon: w }, mp: 0, foe, score: v }
+        }
+        for (const ref of source.loadout) {
+          const skill = battleActorSkill(state, ally.id, ref)
+          if (!skill || skill.mp > budget || (tome !== null && isRpgTome(skill.node.weapon) !== tome)) continue
+          const v = score(state, skill.def, foe, foes)
+          if (v > pick.score) pick = { half: { skill: ref }, mp: skill.mp, foe, score: v }
+        }
       }
+      return pick
     }
-    if (!action) {
-      const foe = [...foes].sort((a, b) => a.shield - b.shield || a.hp - b.hp)[0]!
-      action = source.classId === 'summoner' && state.familiars.includes(ally.id)
-        ? { kind: 'guard', actorId: ally.id, targetId: state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)?.id ?? ally.id }
-        : { kind: 'attack', actorId: ally.id, targetId: foe.id }
+    let action: BattleAction
+    if (source.classId === 'spellblade') {
+      const arms = best(false, ally.mp)
+      const tome = best(true, ally.mp - arms.mp)
+      action = arms.half.skill
+        ? { kind: 'skill', actorId: ally.id, targetId: arms.foe.id, skill: arms.half.skill, pair: tome.half }
+        : { kind: 'attack', actorId: ally.id, targetId: arms.foe.id, weapon: arms.half.weapon, pair: tome.half }
+    } else {
+      const pick = best(null, ally.mp)
+      action = pick.half.skill ? { kind: 'skill', actorId: ally.id, targetId: pick.foe.id, skill: pick.half.skill }
+        : { kind: 'attack', actorId: ally.id, targetId: pick.foe.id, weapon: pick.half.weapon }
     }
     const step = applyBattleAction(state, action)
-    if (step.error) {
-      const fallback = applyBattleAction(state, { kind: 'guard', actorId: ally.id, targetId: ally.id })
-      state = fallback.state
-    } else {
-      state = step.state
-    }
+    const friend = state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)?.id ?? ally.id
+    state = step.error ? applyBattleAction(state, { kind: 'guard', actorId: ally.id, targetId: friend }).state : step.state
   }
   const allies = state.units.filter((u) => u.side === 'ally')
   const maxHp = state.input.allies.reduce((n, a) => n + a.stats.hp, 0)
@@ -86,11 +98,11 @@ function run(level: number, rank: number): { cleared: number[]; mpLeft: number }
   const cleared: number[] = []
   let mpLeft = 0
   for (const region of continent.regions.filter((r) => r.level === level)) {
-    let party = PARTY.map((b, i) => member(b, i, level, rank, 1))
+    let party = PARTY.map((c, i) => member(c, i, level, rank, 1))
     const full = party.reduce((n, a) => n + a.mp, 0)
     let n = 0
     for (const node of regionChapter(region, cast).nodes.filter((x) => x.kind !== 'camp')) {
-      const r = play({ version: 5, seed: 2000 + n, allies: party, enemies: node.enemies })
+      const r = play({ version: 6, seed: 2000 + n, allies: party, enemies: node.enemies })
       if (!r.won) break
       n++
       party = party.map((a) => ({ ...a, mp: r.mp[a.id] ?? a.mp }))
@@ -103,15 +115,13 @@ function run(level: number, rank: number): { cleared: number[]; mpLeft: number }
 
 /** Win rate over every stage of the four regions at a level, by stage kind. */
 function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 'sub-boss' | 'boss', { wins: number; fights: number; rounds: number; hp: number }> {
-  const order = Math.ceil(level / 10)
-  const continent = worldContinent({ name: 'Sim', order })
+  const continent = worldContinent({ name: 'Sim', order: Math.ceil(level / 10) })
   const budget = gear ? 1 + RPG_FOE_TUNING.budgetPerLevel * Math.max(0, level - RPG_FOE_TUNING.budgetFrom) : 1
-  const party = PARTY.map((b, i) => member(b, i, level, rank, budget))
+  const party = PARTY.map((c, i) => member(c, i, level, rank, budget))
   const out = { fight: { wins: 0, fights: 0, rounds: 0, hp: 0 }, 'sub-boss': { wins: 0, fights: 0, rounds: 0, hp: 0 }, boss: { wins: 0, fights: 0, rounds: 0, hp: 0 } }
   for (const region of continent.regions.filter((r) => r.level === level)) {
-    const chapter = regionChapter(region, cast)
-    chapter.nodes.filter((n) => n.kind !== 'camp').forEach((node, i) => {
-      const r = play({ version: 5, seed: 1000 + i, allies: party, enemies: node.enemies })
+    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp').forEach((node, i) => {
+      const r = play({ version: 6, seed: 1000 + i, allies: party, enemies: node.enemies })
       const bucket = out[node.kind as 'fight' | 'sub-boss' | 'boss']
       bucket.fights++
       bucket.wins += r.won ? 1 : 0
@@ -122,12 +132,12 @@ function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 
   return out
 }
 
-describe('world balance (D72)', () => {
+describe('world balance (D72, D86)', () => {
   it('lets a fresh Lv1 party win the opening pairs', () => {
-    const party = PARTY.map((b, i) => member(b, i, 1, 1, 1))
+    const party = PARTY.map((c, i) => member(c, i, 1, 1, 1))
     const meadow = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions[0]!, cast)
     const opening = meadow.nodes.filter((n) => n.kind === 'fight').slice(0, 2)
-    for (const node of opening) expect(play({ version: 5, seed: 7, allies: party, enemies: node.enemies }).won, node.id).toBe(true)
+    for (const node of opening) expect(play({ version: 6, seed: 7, allies: party, enemies: node.enemies }).won, node.id).toBe(true)
   })
 
   it.skipIf(!process.env.SIM)('prints win rates by level, rank and gear', () => {

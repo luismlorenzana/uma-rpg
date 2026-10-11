@@ -1,32 +1,29 @@
-// Limit Breaks (docs/design/uma-rpg-classes.md#15-limit-breaks, D311), after Final Fantasy and Octopath Traveler: every
-// attack and skill charges a bar, and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
-import { RPG_SKILL_POWER, type RpgHit, type RpgSkillDef } from '../catalog'
-import { RPG_DEPTH_GATES, rpgHand, type RpgDamageKind, type RpgHand, type RpgNodeRef, type RpgWeapon, type RpgWeaponKind } from '../rules'
+// Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
+// and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
+import { RPG_SKILL_POWER, RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+import { RPG_DEPTH_GATES, RPG_ELEMENTS, isRpgTome, rpgHand, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
 
 export const BATTLE_LIMIT_MAX = 12
-/** An attack charges 1 and a skill 2; a one-action hand (Brawler, Cleric) charges double, so every class fills alike. */
-export const BATTLE_LIMIT_CHARGE = { attack: 1, skill: 2 } as const
-export const battleLimitGain = (hand: Pick<RpgHand, 'actions'>, kind: keyof typeof BATTLE_LIMIT_CHARGE): number =>
-  BATTLE_LIMIT_CHARGE[kind] * (hand.actions === 1 ? 2 : 1)
+/** An attack charges 2 and a skill 4: every class acts once a turn (D86), so every class fills alike. */
+export const BATTLE_LIMIT_CHARGE = { attack: 2, skill: 4 } as const
+export const battleLimitGain = (kind: keyof typeof BATTLE_LIMIT_CHARGE): number => BATTLE_LIMIT_CHARGE[kind]
 /**
- * Limit Break power, as a multiple of a turn: a Brawler's skill twice, a Summoner's two summons twice each and a Spell
- * Blade's skill made big are 2× her turn; the fixed ones are multiples of the single-target power open at her level
- * (a Mage's six hits are four of her casts, 2.4; a Cleric's patrons 1.5, three of her casts).
+ * Limit Break power, as a multiple of a single-target cast open at her level: a Mage's five elements are 2.4, a Cleric's
+ * patrons 1.5 with every status; the others replay her own skills at double strength.
  */
-export const BATTLE_LIMIT_POWER = { turn: 2, mage: 2.4, cleric: 1.5, triad: 2 } as const
-export const BATTLE_LIMIT_NAMES = { mage: 'Prismatic Nova', cleric: 'Divine Patrons', triad: 'Triad Blade', twin: 'Twin Strike' } as const
+export const BATTLE_LIMIT_POWER = { mage: 2.4, cleric: 1.5 } as const
+export const BATTLE_LIMIT_NAMES = { mage: 'Prismatic Nova', cleric: 'Divine Patrons', twin: 'Twin Strike', arts: 'Twin Arts', grand: 'Grand Summon' } as const
 
 export interface BattleLimitChoice { skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon }
-export interface BattleLimitPlan { name: string; casts: { def: RpgSkillDef; scale: number }[] }
+/** Each cast resolves at `scale`; a Grand Summon also leaves its summon lingering at `linger`. */
+export interface BattleLimitPlan { name: string; casts: { def: RpgSkillDef; scale: number }[]; linger?: { ref: RpgNodeRef; scale: number } }
 
 /** The deepest skill depth open at her level (Lv1/10/20/30/40). */
 export const rpgOpenDepth = (level: number): number => RPG_DEPTH_GATES.filter((gate) => level >= gate).length
 const round = (n: number) => Math.round(n * 1000) / 1000
-const total = (def: RpgSkillDef) => def.hits.reduce((sum, hit) => sum + hit.power, 0)
-const single = (hits: RpgHit[], primary: RpgDamageKind): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
-const even = (power: number, parts: RpgHit['parts'][]): RpgHit[] => parts.map((p) => ({ power: round(power / parts.length), parts: p }))
+const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
 
 /** The casts this Limit Break makes, or null when the choice names something she can't use. */
 export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): BattleLimitPlan | null {
@@ -37,13 +34,15 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): Ba
   switch (ally.classId) {
     case 'mage': {
       if (skill || skills || weapon) return null
-      return { name: BATTLE_LIMIT_NAMES.mage, casts: [{ scale: 1, def: single(even(BATTLE_LIMIT_POWER.mage * level,
-        (['fire', 'ice', 'lightning', 'light', 'dark', 'ultima'] as const).map((kind) => [{ kind, share: 1 }])), 'ultima') }] }
+      return { name: BATTLE_LIMIT_NAMES.mage, casts: [{ scale: 1, def: single(RPG_ELEMENTS.map((kind) =>
+        ({ power: round(BATTLE_LIMIT_POWER.mage * level / RPG_ELEMENTS.length), parts: [{ kind, share: 1 }] })), 'fire') }] }
     }
     case 'cleric': {
       if (skill || skills || weapon) return null
-      return { name: BATTLE_LIMIT_NAMES.cleric, casts: [{ scale: 1, def: single(even(BATTLE_LIMIT_POWER.cleric * level,
-        [0, 1].map(() => [{ kind: 'light' as const, share: 0.5 }, { kind: 'dark' as const, share: 0.5 }])), 'light') }] }
+      // A hit with every weapon she wields, each carrying its status at three stacks.
+      return { name: BATTLE_LIMIT_NAMES.cleric, casts: ally.weapons.map((w) => ({ scale: 1, def: {
+        ...single([{ power: round(BATTLE_LIMIT_POWER.cleric * level / ally.weapons.length), parts: [{ kind: rpgWeaponKind(w), share: 1 }] }], rpgWeaponKind(w)),
+        status: { key: RPG_CLERIC_STATUS[w], stacks: 3, turns: 2, to: isRpgTome(w) ? 'allies' as const : 'foe' as const } } })) }
     }
     case 'brawler': {
       if (skills) return null
@@ -51,31 +50,29 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): Ba
         const k = known(skill)
         return k ? { name: k.label, casts: [{ def: k.def, scale: hand.power }, { def: k.def, scale: hand.power }] } : null
       }
-      const kind = weapon ?? ally.weapons[0]!
-      if (!ally.weapons.includes(kind)) return null
-      const strike = single([{ power: hand.free.power, parts: [{ kind: kind as RpgWeaponKind, share: 1 }] }], kind as RpgWeaponKind)
+      const w = weapon ?? ally.weapons[0]!
+      if (!ally.weapons.includes(w)) return null
+      const strike = single([{ power: hand.power, parts: [{ kind: rpgWeaponKind(w), share: 1 }] }], rpgWeaponKind(w))
       return { name: BATTLE_LIMIT_NAMES.twin, casts: [{ def: strike, scale: 1 }, { def: strike, scale: 1 }] }
     }
     case 'spellblade': {
-      if (skills || weapon) return null
-      if (!skill) return { name: BATTLE_LIMIT_NAMES.triad, casts: [{ scale: 1, def: single(even(BATTLE_LIMIT_POWER.triad * level,
-        (['fire', 'ice', 'lightning'] as const).map((kind) => [{ kind: 'short-sword' as const, share: 0.5 }, { kind, share: 0.5 }])), 'fire') }] }
-      const k = known(skill)
-      if (!k) return null
-      // Her turn is two casts at her hand; the Limit Break is one cast worth two turns.
-      const power = BATTLE_LIMIT_POWER.turn * 2 * hand.power * total(k.def)
-      const def: RpgSkillDef = k.node.tree === 'blade-elemental'
-        ? { ...k.def, mp: 0, hits: even(power, [0, 1, 2].map(() => [{ kind: 'short-sword', share: 0.5 }, { kind: k.def.primary, share: 0.5 }])) }
-        : { ...k.def, mp: 0, hits: [...k.def.hits, ...k.def.hits].map((hit) => ({ ...hit, power: round(hit.power * power / (2 * total(k.def))) })) }
-      return { name: k.label, casts: [{ def, scale: 1 }] }
-    }
-    case 'summoner': {
+      // Both halves at full power: an Arms skill and a Tome skill.
       if (skill || weapon || !Array.isArray(skills) || skills.length !== 2) return null
       const picks = skills.map(known)
       if (picks.some((k) => !k)) return null
       const [a, b] = picks as NonNullable<ReturnType<typeof known>>[]
-      return { name: a!.label === b!.label ? a!.label : `${a!.label} + ${b!.label}`,
-        casts: [a!, a!, b!, b!].map((k) => ({ def: k.def, scale: hand.power })) }
+      if (isRpgTome(a!.node.weapon) === isRpgTome(b!.node.weapon)) return null
+      return { name: BATTLE_LIMIT_NAMES.arts, casts: [{ def: a!.def, scale: 1 }, { def: b!.def, scale: 1 }] }
+    }
+    case 'summoner': {
+      // One summon at twice her strength that lingers at twice too.
+      if (skills || weapon || !skill) return null
+      const k = known(skill)
+      if (!k?.def.summon) return null
+      return { name: BATTLE_LIMIT_NAMES.grand, casts: [{ def: k.def, scale: 2 * hand.power }], linger: { ref: k.ref, scale: 2 * k.def.summon.linger } }
     }
   }
 }
+
+/** The weapon a node belongs to, for menus. */
+export const battleSkillWeapon = (id: string): RpgWeapon | null => rpgNode(id)?.weapon ?? null

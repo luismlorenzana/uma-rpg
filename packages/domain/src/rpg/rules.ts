@@ -1,19 +1,18 @@
-// An Uma's battle build: class builds, stats, EXP and class trees (docs/design/classes.md). Ported from uma-racer's
-// RPG and changed for uma-rpg: every class is free to use (design §5), each class build keeps its own tree with the
-// full point budget, and depths open by Uma level until S5's class ranks replace the gates (D49).
+// An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
+// wields five weapons and has a tree per weapon; core skills come free as depths open (class rank and Uma level,
+// D77), points buy side skills, and a hand per class scales power and MP.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { RPG_VARIANTS_PER_TREE, rpgNode, rpgSideNodeLevel, type RpgNode } from './catalog'
-import { type RpgClass, type RpgTreeId, type RpgWeapon, type RpgWeaponKind } from './kinds'
+import { rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, type RpgNode } from './catalog'
+import {
+  isRpgTome, isRpgWeapon, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon,
+} from './kinds'
 
 export * from './kinds'
 
 export const RPG_TIER_MAX_LEVEL = 50
-/** Two points a level up to Lv45, plus five each time a depth opens: 115 a tier. */
-export const RPG_TREE_POINTS_PER_LEVEL = 2
-/** Two points a level all the way to Lv50 (D73: side nodes at every depth need the room). */
-export const RPG_TREE_POINT_MAX_LEVEL = 50
-export const RPG_TREE_POINTS_PER_DEPTH = 5
-/** Uma levels that open depths 1–5 (D49: until S5's class ranks). */
+/** Points buy side skills only (D86): one a level to Lv50. Core skills cost nothing. */
+export const RPG_SIDE_POINTS_PER_LEVEL = 1
+/** Uma levels that open depths 1–5, alongside class rank (D77). */
 export const RPG_DEPTH_GATES = [1, 10, 20, 30, 40] as const
 /** Three skill slots at Lv1, one more at each gate: ten by Lv40. */
 export const RPG_BASE_ACTIVE_SLOTS = 3
@@ -21,7 +20,10 @@ export const RPG_ACTIVE_SLOT_GATES = [10, 15, 20, 25, 30, 35, 40] as const
 export const RPG_MAX_ACTIVE_SLOTS = RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length
 /** Skills carried from an earlier tier (S8); the engine still checks the cap. */
 export const RPG_MAX_LEGACY_SLOTS = 2
-export const RPG_MAX_TREE_NODES = 40
+/** Side skills one class may hold: one per depth in each of ten trees. */
+export const RPG_MAX_TREE_NODES = 50
+/** Every class wields five weapons (D86). */
+export const RPG_WEAPON_SLOTS = 5
 
 /** A learned node of one tier. */
 export interface RpgNodeRef { tier: number; id: string }
@@ -31,15 +33,15 @@ export interface RpgProfile {
   baseStats: Stats
   growthRates: Stats
   classId: RpgClass
-  /** The class build's weapons, main hand first. */
+  /** The five weapons the class wields now (D86). */
   weapons: RpgWeapon[]
   tier: number
   level: number
   exp: number
-  /** The class build's learned nodes. */
+  /** The side skills she has learned in this class's trees. Core skills aren't listed: an open depth gives them. */
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
-  /** Deepest skill depth her class rank opens (S5, D57). Absent: depths open by level, as in S3. */
+  /** Deepest skill depth her class rank opens (D77). Absent: depths open by level alone. */
   maxDepth?: number
 }
 export interface RpgCoreStats extends Stats {
@@ -53,39 +55,47 @@ export interface RpgCoreStats extends Stats {
   mp: number
 }
 
-// --- Class builds ------------------------------------------------------------------------------------------------------
+// --- Classes and weapons (D86) -----------------------------------------------------------------------------------------
 
-/** Weapon sets a class fights with (the Mage is two staves; the Spell Blade carries a Short Sword). */
-export const RPG_CLASS_WEAPONS: Readonly<Record<RpgClass, readonly (readonly RpgWeapon[])[]>> = {
-  brawler: [['greatsword', 'spear'], ['axe', 'bow']],
-  mage: [['mage-staff', 'arcane-staff']],
-  spellblade: [['short-sword']],
-  cleric: [['arcane-staff', 'cleric-staff']],
-  summoner: [['summoner-tome']],
+/** What each of a class's five slots holds. Brawler and Mage wield all of their five; the others choose. */
+export type RpgSlotKind = 'arms' | 'tome' | 'any'
+export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = {
+  brawler: ['arms', 'arms', 'arms', 'arms', 'arms'],
+  mage: ['tome', 'tome', 'tome', 'tome', 'tome'],
+  summoner: ['tome', 'tome', 'tome', 'arms', 'arms'],
+  spellblade: ['arms', 'arms', 'arms', 'tome', 'tome'],
+  cleric: ['any', 'any', 'any', 'any', 'any'],
+}
+/** The weapons a class has trees for. */
+export const rpgClassWeapons = (classId: RpgClass): readonly RpgWeapon[] =>
+  classId === 'brawler' ? RPG_WEAPON_KINDS : classId === 'mage' ? RPG_TOMES : RPG_WEAPONS
+/** Whether a class picks its weapons (Summoner, Spell Blade, Cleric) or wields a fixed five. */
+export const rpgPicksWeapons = (classId: RpgClass): boolean => classId !== 'brawler' && classId !== 'mage'
+/** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */
+export function rpgDefaultWeapons(classId: RpgClass): RpgWeapon[] {
+  return ({
+    brawler: [...RPG_WEAPON_KINDS], mage: [...RPG_TOMES],
+    summoner: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'],
+    spellblade: ['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'],
+    cleric: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'],
+  } as Record<RpgClass, RpgWeapon[]>)[classId]
+}
+/** Five different weapons, as many Tomes and Arms as the class's slots say. */
+export function validRpgWeapons(classId: RpgClass, weapons: readonly RpgWeapon[]): boolean {
+  if (!Array.isArray(weapons) || weapons.length !== RPG_WEAPON_SLOTS || new Set(weapons).size !== weapons.length) return false
+  if (!weapons.every((w) => isRpgWeapon(w) && rpgClassWeapons(classId).includes(w))) return false
+  const slots = RPG_CLASS_SLOTS[classId]
+  const tomes = weapons.filter(isRpgTome).length
+  const want = slots.filter((k) => k === 'tome').length
+  return slots.includes('any') || tomes === want
 }
 
-/**
- * A class with one of its weapon sets. Each build keeps its own tree and loadout, and every build earns the full point
- * budget from Uma level, so switching costs nothing (design §5).
- */
-export const RPG_BUILDS = ['greatsword-spear', 'axe-bow', 'mage', 'spellblade', 'cleric', 'summoner'] as const
-export type RpgBuildId = typeof RPG_BUILDS[number]
-export const RPG_BUILD: Readonly<Record<RpgBuildId, { classId: RpgClass; weapons: readonly RpgWeapon[] }>> = {
-  'greatsword-spear': { classId: 'brawler', weapons: ['greatsword', 'spear'] },
-  'axe-bow': { classId: 'brawler', weapons: ['axe', 'bow'] },
-  mage: { classId: 'mage', weapons: ['mage-staff', 'arcane-staff'] },
-  spellblade: { classId: 'spellblade', weapons: ['short-sword'] },
-  cleric: { classId: 'cleric', weapons: ['arcane-staff', 'cleric-staff'] },
-  summoner: { classId: 'summoner', weapons: ['summoner-tome'] },
-}
-export const isRpgBuildId = (v: unknown): v is RpgBuildId => RPG_BUILDS.includes(v as RpgBuildId)
-
-/** The build an Uma starts in: her best running style's class (front Brawler, pace Mage, late Cleric, end Summoner). */
-export function rpgDefaultBuild(style: 'front' | 'pace' | 'late' | 'end'): RpgBuildId {
-  return ({ front: 'greatsword-spear', pace: 'mage', late: 'cleric', end: 'summoner' } as const)[style]
+/** The class an Uma starts in: her best running style's (front Brawler, pace Mage, late Cleric, end Summoner). */
+export function rpgDefaultClass(style: 'front' | 'pace' | 'late' | 'end'): RpgClass {
+  return ({ front: 'brawler', pace: 'mage', late: 'cleric', end: 'summoner' } as const)[style]
 }
 
-/** Each class leans the shared projection. The Spell Blade's hits are half physical, half magic. */
+/** Each class leans the shared projection. */
 export const RPG_CLASS_STATS: Readonly<Record<RpgClass, { hp: number; atk: number; matk: number; pdef: number; mdef: number; mp: number }>> = {
   brawler: { hp: 1.15, atk: 1.1, matk: 0.9, pdef: 1.1, mdef: 0.9, mp: 0.8 },
   mage: { hp: 0.9, atk: 0.9, matk: 1.15, pdef: 0.9, mdef: 1.1, mp: 1.3 },
@@ -94,33 +104,23 @@ export const RPG_CLASS_STATS: Readonly<Record<RpgClass, { hp: number; atk: numbe
   summoner: { hp: 1, atk: 1, matk: 1, pdef: 1, mdef: 1, mp: 1.1 },
 }
 
-export const sameRpgWeapons = (a: readonly RpgWeapon[], b: readonly RpgWeapon[]): boolean => a.length === b.length && a.every((w, i) => w === b[i])
-export function validRpgWeapons(classId: RpgClass, weapons: readonly RpgWeapon[]): boolean {
-  return RPG_CLASS_WEAPONS[classId]?.some((set) => sameRpgWeapons(set, weapons)) ?? false
-}
+/** Every tree of a class (5 or 10), and the ones her weapons make usable. */
+export const rpgClassTrees = (classId: RpgClass): RpgTreeId[] => rpgClassWeapons(classId).map((w) => rpgTreeOf(classId, w))
+export const rpgProfileTrees = (p: Pick<RpgProfile, 'classId' | 'weapons'>): RpgTreeId[] => p.weapons.map((w) => rpgTreeOf(p.classId, w))
 
-/** The class's two trees for its weapons. */
-export function rpgClassTrees(classId: RpgClass, weapons: readonly RpgWeapon[]): RpgTreeId[] {
-  if (classId === 'summoner') return ['summon-elemental', 'summon-arcane']
-  if (classId === 'spellblade') return ['blade-elemental', 'blade-arcane']
-  return weapons as RpgTreeId[]
+/**
+ * How a class acts (D86): once a turn for everyone. `power` and `mp` scale every skill and the Attack; a Summoner's
+ * summon lingers at `linger`; a Spell Blade's act is a `pair`, one Arms half and one Tome half.
+ */
+export interface RpgHand { power: number; mp: number; linger: number; pair: boolean }
+export function rpgHand(p: Pick<RpgProfile, 'classId'>): RpgHand {
+  switch (p.classId) {
+    case 'summoner': return { power: 0.6, mp: 0.7, linger: 0.3, pair: false }
+    case 'spellblade': return { power: 0.45, mp: 0.5, linger: 0, pair: true }
+    case 'cleric': return { power: 0.5, mp: 0.6, linger: 0, pair: false }
+    default: return { power: 1, mp: 1, linger: 0, pair: false }
+  }
 }
-export const rpgProfileTrees = (p: Pick<RpgProfile, 'classId' | 'weapons'>): RpgTreeId[] => rpgClassTrees(p.classId, p.weapons)
-export const rpgBuildTrees = (build: RpgBuildId): RpgTreeId[] => rpgClassTrees(RPG_BUILD[build].classId, RPG_BUILD[build].weapons)
-
-/** How a build acts each turn: actions, the power and MP share of each skill, and its free action. */
-export interface RpgHand { actions: 1 | 2; power: number; mp: number; free: { power: number; kind: 'weapon' | 'short-sword' | 'staff' | 'familiar' } }
-export function rpgHand(p: Pick<RpgProfile, 'classId' | 'weapons'>): RpgHand {
-  if (p.classId === 'brawler') return { actions: 1, power: 1, mp: 1, free: { power: 1, kind: 'weapon' } }
-  if (p.classId === 'cleric') return { actions: 1, power: 0.5, mp: 0.7, free: { power: 0.5, kind: 'staff' } }
-  if (p.classId === 'summoner') return { actions: 2, power: 0.5, mp: 0.5, free: { power: 0.5, kind: 'familiar' } }
-  // Two half-strength blade actions a turn, so a turn is worth one Brawler action.
-  if (p.classId === 'spellblade') return { actions: 2, power: 0.5, mp: 0.5, free: { power: 0.5, kind: 'short-sword' } }
-  return { actions: 2, power: 0.6, mp: 0.6, free: { power: 0.4, kind: 'staff' } }
-}
-
-/** The Summoner's Familiar forms: one per weapon kind. */
-export const RPG_DEFAULT_FAMILIAR: RpgWeaponKind = 'greatsword'
 
 // --- Levels and stats --------------------------------------------------------------------------------------------------
 
@@ -195,12 +195,11 @@ export function grantRpgExp(profile: Pick<RpgProfile, 'tier' | 'level' | 'exp'>,
   return { level, exp, levelsCrossed }
 }
 
-// --- Trees ------------------------------------------------------------------------------------------------------------
+// --- Trees (D77, D86) --------------------------------------------------------------------------------------------------
 
 export function rpgTreePointsEarned(level: number): number {
   rpgLifetimeLevels(1, level)
-  return Math.min(level, RPG_TREE_POINT_MAX_LEVEL) * RPG_TREE_POINTS_PER_LEVEL +
-    RPG_DEPTH_GATES.filter((gate) => level >= gate).length * RPG_TREE_POINTS_PER_DEPTH
+  return Math.min(level, RPG_TIER_MAX_LEVEL) * RPG_SIDE_POINTS_PER_LEVEL
 }
 
 export function rpgActiveSlots(level: number): number {
@@ -208,7 +207,7 @@ export function rpgActiveSlots(level: number): number {
   return RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.filter((gate) => level >= gate).length
 }
 
-/** Nodes cost their depth; unknown nodes count as out of budget. */
+/** Side skills cost their depth; unknown nodes count as out of budget. */
 export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
   return tree.reduce((sum, ref) => sum + (rpgNode(ref.id)?.cost ?? Number.MAX_SAFE_INTEGER / 64), 0)
 }
@@ -216,77 +215,90 @@ export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
 export const rpgNodeKey = (ref: RpgNodeRef): string => `${ref.tier}:${ref.id}`
 
 type DepthGated = Pick<RpgProfile, 'level' | 'maxDepth'>
-/** Why a depth is closed, or null: depth d needs class rank d (D77) and Uma Lv 1/10/20/30/40, as in uma-racer. */
+/** Why a depth is closed, or null: depth d needs class rank d (D77) and Uma Lv 1/10/20/30/40. */
 export function rpgDepthBlock(profile: DepthGated, depth: number): string | null {
   if (profile.maxDepth !== undefined && depth > profile.maxDepth) return `Needs class rank ${depth}`
   return profile.level < RPG_DEPTH_GATES[depth - 1]! ? `Opens at Lv${RPG_DEPTH_GATES[depth - 1]}` : null
 }
 
-/** Why this node can't be learned now, or null. The same rules validate a stored tree. */
-export function rpgLearnBlock(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>, id: string): string | null {
+/** The core skills an open depth gives in these trees, shallowest first. */
+export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'level' | 'maxDepth'>, trees: readonly RpgTreeId[]): RpgNodeRef[] {
+  return trees.flatMap((tree) => rpgTreeNodes(tree).filter((n) => n.variant === null && !rpgDepthBlock(profile, n.depth)))
+    .sort((a, b) => a.depth - b.depth).map((n) => ({ tier: profile.tier, id: n.id }))
+}
+
+type Learner = Pick<RpgProfile, 'classId' | 'tier' | 'level' | 'tree' | 'maxDepth'>
+/** Why this node can't be learned now, or null. Only side skills are learned; the same rules validate a stored tree. */
+export function rpgLearnBlock(profile: Learner, id: string): string | null {
   const node = rpgNode(id)
-  if (!node || !rpgProfileTrees(profile).includes(node.tree)) return 'Not in this class’s trees'
-  if (profile.tree.some((ref) => ref.id === id)) return 'Already learned'
+  if (!node || !rpgClassTrees(profile.classId).includes(node.tree)) return 'Not in this class’s trees'
   const depth = rpgDepthBlock(profile, node.depth)
+  if (node.variant === null) return depth ?? 'Learned'
+  if (profile.tree.some((ref) => ref.id === id)) return 'Already learned'
   if (depth) return depth
-  if (node.variant !== null && profile.level < rpgSideNodeLevel(node.depth)) return `Opens at Lv${rpgSideNodeLevel(node.depth)}`
+  if (profile.level < rpgSideNodeLevel(node.depth)) return `Opens at Lv${rpgSideNodeLevel(node.depth)}`
   if (rpgTreePointsSpent(profile.tree) + node.cost > rpgTreePointsEarned(profile.level)) return 'Not enough points'
-  return rpgShapeBlock(profile.tree.map((ref) => rpgNode(ref.id)!).filter(Boolean), node)
+  return otherSide(profile.tree, node) ? 'The other side is learned' : null
 }
+const otherSide = (tree: readonly RpgNodeRef[], node: RpgNode): boolean =>
+  tree.some((ref) => ref.id === `${node.tree}.${node.depth}${node.variant === 'a' ? 'b' : 'a'}`)
 
-/** Structure only: the core node above, the fork's other side and the variant cap. */
-function rpgShapeBlock(learned: readonly RpgNode[], node: RpgNode): string | null {
-  const has = (branchDepth: number, variant: 'a' | 'b' | null) =>
-    learned.some((n) => n.tree === node.tree && n.branch === node.branch && n.depth === branchDepth && n.variant === variant)
-  if (node.variant === null) return node.depth > 1 && !has(node.depth - 1, null) ? 'Needs the core skill above' : null
-  if (!has(node.depth, null)) return 'Needs its core skill first'
-  if (has(node.depth, node.variant === 'a' ? 'b' : 'a')) return 'The other side of this fork is learned'
-  if (learned.filter((n) => n.tree === node.tree && n.variant !== null).length >= RPG_VARIANTS_PER_TREE) return `${RPG_VARIANTS_PER_TREE} variants per tree`
-  return null
-}
-
-export function learnRpgNode<P extends Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>>(profile: P, id: string): P {
+export function learnRpgNode<P extends Learner>(profile: P, id: string): P {
   const block = rpgLearnBlock(profile, id)
   if (block) throw new RangeError(block)
   return { ...profile, tree: [...profile.tree, { tier: profile.tier, id }] }
 }
 
-/** Variants swap freely and the points come back. Core nodes are permanent. */
+/** Side skills swap freely and the points come back. */
 export function forgetRpgVariant<P extends Pick<RpgProfile, 'tree'>>(profile: P, id: string): P {
   const node = rpgNode(id)
-  if (!node || node.variant === null || !profile.tree.some((ref) => ref.id === id)) throw new RangeError('Only a learned variant can be swapped out')
+  if (!node || node.variant === null || !profile.tree.some((ref) => ref.id === id)) throw new RangeError('Only a learned side skill can be swapped out')
   return { ...profile, tree: profile.tree.filter((ref) => ref.id !== id) }
 }
 
-/** A stored tree obeys every learning rule at its level, whatever order it was learned in. */
-export function validRpgTree(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>): boolean {
-  const trees = rpgProfileTrees(profile)
+/** A stored set of side skills obeys every learning rule at her level, whatever order it was learned in. */
+export function validRpgTree(profile: Learner): boolean {
+  const trees = rpgClassTrees(profile.classId)
   const nodes: RpgNode[] = []
   for (const ref of profile.tree) {
     const node = rpgNode(ref.id)
-    if (!node || ref.tier !== profile.tier || !trees.includes(node.tree) || rpgDepthBlock(profile, node.depth)) return false
-    if (node.variant !== null && profile.level < rpgSideNodeLevel(node.depth)) return false
+    if (!node || node.variant === null || ref.tier !== profile.tier || !trees.includes(node.tree) || rpgDepthBlock(profile, node.depth)) return false
+    if (profile.level < rpgSideNodeLevel(node.depth)) return false
     nodes.push(node)
   }
   if (new Set(nodes.map((n) => n.id)).size !== nodes.length || rpgTreePointsSpent(profile.tree) > rpgTreePointsEarned(profile.level)) return false
-  return nodes.every((node) => rpgShapeBlock(nodes.filter((n) => n !== node), node) === null)
+  return !nodes.some((node) => otherSide(profile.tree, node))
 }
 
-/** Active skills she may equip: the build's learned skills and her legacy ones. */
-export function rpgLearnedSkills(profile: Pick<RpgProfile, 'tree' | 'legacy'>): RpgNodeRef[] {
-  return [...profile.tree, ...profile.legacy].filter((ref) => rpgNode(ref.id)?.skill)
-}
-
-/** The equipped skills she can still use, in order: learned, in her trees, unique, within her slots and the legacy cap. */
-export function rpgUsableLoadout(profile: RpgProfile, refs: readonly RpgNodeRef[]): RpgNodeRef[] {
-  const learned = new Set(rpgLearnedSkills(profile).map(rpgNodeKey))
+/** Skills she may equip now: the open cores and learned sides of her weapons' trees, and her legacy ones. */
+export function rpgLearnedSkills(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'maxDepth'>): RpgNodeRef[] {
   const trees = rpgProfileTrees(profile)
+  const sides = profile.tree.filter((ref) => trees.includes(rpgNode(ref.id)?.tree as RpgTreeId))
+  return [...rpgOpenCores(profile, trees), ...sides, ...profile.legacy]
+}
+
+/** The equipped skills she can still use, in order: known, in her weapons' trees, unique, within her slots. */
+export function rpgUsableLoadout(profile: RpgProfile, refs: readonly RpgNodeRef[]): RpgNodeRef[] {
+  const known = new Set(rpgLearnedSkills(profile).map(rpgNodeKey))
   const kept: RpgNodeRef[] = []
   for (const ref of refs) {
-    const key = rpgNodeKey(ref), node = rpgNode(ref.id)
-    if (!learned.has(key) || !node || !trees.includes(node.tree) || kept.some((r) => rpgNodeKey(r) === key)) continue
+    const key = rpgNodeKey(ref)
+    if (!known.has(key) || kept.some((r) => rpgNodeKey(r) === key)) continue
     if (ref.tier < profile.tier && kept.filter((r) => r.tier < profile.tier).length >= RPG_MAX_LEGACY_SLOTS) continue
     kept.push({ tier: ref.tier, id: ref.id })
   }
   return kept.slice(0, rpgActiveSlots(profile.level))
+}
+
+/** Skills chosen for her when she hasn't picked: each weapon's deepest open core in turn, then the next deepest. A
+ * hybrid's weapons alternate Arms and Tomes (her larger half first), so a Spell Blade always has both halves. */
+export function rpgAutoLoadout(profile: RpgProfile): RpgNodeRef[] {
+  const arms = profile.weapons.filter((w) => !isRpgTome(w)), tomes = profile.weapons.filter(isRpgTome)
+  const [first, second] = arms.length >= tomes.length ? [arms, tomes] : [tomes, arms]
+  const order = first.flatMap((w, i) => (second[i] ? [w, second[i]!] : [w]))
+  const trees = order.map((w) => rpgTreeOf(profile.classId, w))
+  const byTree = trees.map((tree) => rpgOpenCores(profile, [tree]).reverse())
+  const picks: RpgNodeRef[] = []
+  for (let round = 0; round < 5; round++) for (const list of byTree) if (list[round]) picks.push(list[round]!)
+  return picks.slice(0, rpgActiveSlots(profile.level))
 }

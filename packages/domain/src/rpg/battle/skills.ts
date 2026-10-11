@@ -1,12 +1,11 @@
-// Battle numbers and skill lookup, engine v5 (docs/design/uma-rpg-classes.md, D278–D281, D310).
+// Battle numbers and skill lookup, engine v6 (D86, docs/design/class-rework.md).
 import { rpgNode, type RpgNode, type RpgSkillDef } from '../catalog'
-import { rpgElementWeakness, rpgHand, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
+import { rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
 
 /** Octopath Traveler: a weakness hit ×1.3, a broken foe ×2 — here as ×0.5 before the break and ×1 after. */
 export const BATTLE_WEAK = 1.3
 export const BATTLE_UNBROKEN_FACTOR = 0.5
-export const BATTLE_ULTIMA = 1.2
 export const BATTLE_DEFENSE_SHARE = 0.5
 export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5
@@ -32,13 +31,12 @@ export const battleWeakness = (element: RpgElement): RpgElement => rpgElementWea
 
 export interface BattleSkill { node: RpgNode; def: RpgSkillDef; ref: RpgNodeRef; label: string; mp: number; power: number }
 
-/** A learned, equipped skill as this ally casts it: her hand scales power and MP, the skill's tier scales MP. */
-export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'tree' | 'legacy' | 'loadout'>, ref: RpgNodeRef): BattleSkill | null {
+/** A known, equipped skill as this ally casts it: her hand scales power and MP, the skill's tier scales MP. */
+export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'loadout' | 'maxDepth'>, ref: RpgNodeRef): BattleSkill | null {
   const node = rpgNode(ref.id)
-  if (!node?.skill || !rpgProfileTrees(ally).includes(node.tree)) return null
+  if (!node || (ref.tier === ally.tier && !rpgProfileTrees(ally).includes(node.tree))) return null
   const key = rpgNodeKey(ref)
-  const learned = ref.tier === ally.tier ? ally.tree : ally.legacy
-  if (!learned.some((r) => rpgNodeKey(r) === key) || !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
+  if (!rpgLearnedSkills(ally).some((r) => rpgNodeKey(r) === key) || !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
   const hand = rpgHand(ally)
   return { node, def: node.skill, ref, label: node.name, power: hand.power, mp: Math.max(1, Math.round(node.skill.mp * hand.mp)) * ref.tier }
 }

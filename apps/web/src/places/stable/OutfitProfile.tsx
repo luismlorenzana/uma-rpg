@@ -5,15 +5,15 @@
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeBuild, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
+  activeClass, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, classOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
-  PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_BUILD, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots,
+  PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Bar, BUILD_LABEL, CLASS_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, CLASS_LABEL, WeaponGlyph } from '../../battle/labels'
 import { useHubNavigation } from '../../hub/navigation'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -214,11 +214,11 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
 // --- Battle: her RPG stats as she fights now ---------------------------------------------------------------------
 
 function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
-  const build = activeBuild(outfit, uma)
-  const base = projectRpgStats(umaProfile(outfit, uma, 1, build))
-  const points = umaPoints(uma, build)
+  const classId = activeClass(outfit, uma)
+  const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
+  const points = umaPoints(uma, classId)
   const boosted = applyPoints(base, points)
-  const current = buildOf(uma, build)
+  const equipped = umaLoadout(outfit, uma, 1, classId)
   const party = partyOf(world, outfit.outfitId)
   const rows: { label: string; base: number; now: number }[] = [
     { label: 'HP', base: base.hp, now: boosted.stats.hp },
@@ -233,9 +233,9 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
       <button type="button" onClick={onClass} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
         <span>
           <span className="block text-[11px] text-ink-faint">Fights as</span>
-          <span className="block text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
+          <span className="block text-[14px] font-semibold">{CLASS_LABEL[classId]}</span>
         </span>
-        <span className="text-[12px] text-ink-soft">{current.loadout.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
+        <span className="text-[12px] text-ink-soft">{equipped.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
       </button>
       <section className="rounded-md bg-raised">
         <div className="flex justify-between px-3 pt-2 text-[11px] text-ink-faint"><span>Battle stats</span><span>base → with gear and Extra Stats</span></div>
@@ -265,16 +265,17 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
   )
 }
 
-// --- Skills: class, weapon pair, trees (D77), then every class's rank ------------------------------------------
+// --- Skills: class, weapons, trees (D86), then every class's rank ------------------------------------------------
 
-/** The class and weapon pair she fights as, under her level: one tap to the Skills tab. */
+/** The class she fights as and its five weapons, under her level: one tap to the Skills tab. */
 function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
-  const build = activeBuild(outfit, uma)
-  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((id) => ({ tier: 1, id })))
+  const classId = activeClass(outfit, uma)
+  const setup = classOf(uma, classId)
+  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier: 1, id })))
   return (
     <button type="button" onClick={onClick} className="mt-1.5 flex min-h-9 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
-      {RPG_BUILD[build].weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={14} />)}
-      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[RPG_BUILD[build].classId]} · rank {uma.ranks.classes[RPG_BUILD[build].classId]}</span>
+      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[classId]} · rank {uma.ranks.classes[classId]}</span>
+      <span className="flex shrink-0 gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
       {points > 0 && <span className="shrink-0 rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">{points} pts</span>}
       <span className="shrink-0 text-ink-faint">›</span>
     </button>
@@ -322,7 +323,7 @@ const GEAR_LEVEL_TRACKS: readonly { key: string; label: string; track: Track }[]
 
 function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
-  const points = umaPoints(uma, activeBuild(outfit, uma))
+  const points = umaPoints(uma, activeClass(outfit, uma))
   return (
     <div className="space-y-3">
       <GearCard outfit={outfit} uma={uma} world={world} />

@@ -1,5 +1,6 @@
-// Battle rules over the save (S3): class builds and skills, chapter runs, fights and their rewards. Pure functions that
-// return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md, D48–D52.
+// Battle rules over the save (S3, D86): classes, their weapons and skills, the world's fights and their rewards. Pure
+// functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
+// docs/design/class-rework.md.
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { best } from '../roster/aptitudes'
 import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
@@ -14,14 +15,14 @@ import {
 } from '../rpg/campaign/run'
 import { rpgNode } from '../rpg/catalog'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_BUILD, RPG_DEFAULT_FAMILIAR, RPG_WEAPON_KINDS, rpgActiveSlots, rpgDefaultBuild,
-  rpgUsableLoadout, type RpgBuildId, type RpgProfile, type RpgWeaponKind,
+  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
+  rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import { depthsOpen } from '../economy/training'
 import { starPoints } from '../economy/dishes'
 import { addPoints, type Points } from '../economy/bonus'
-import { equippedPoints } from '../economy/gear'
-import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassBuild, type OwnedUma, type Save, type TierWorld } from './save'
+import { equippedOrb, equippedPoints } from '../economy/gear'
+import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
 
@@ -43,92 +44,100 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
   return uma
 }
 
-// --- Builds --------------------------------------------------------------------------------------------------------
+// --- Classes (D86) ---------------------------------------------------------------------------------------------------
 
-/** The build she fights with: the chosen one, or her best running style's class. */
-export function activeBuild(outfit: BattleOutfit, uma: Pick<OwnedUma, 'build'>): RpgBuildId {
-  return uma.build ?? rpgDefaultBuild(best(outfit.aptitudes.strategy)[0])
+/** The class she fights as: the chosen one, or her best running style's. */
+export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>): RpgClass {
+  return uma.classId ?? rpgDefaultClass(best(outfit.aptitudes.strategy)[0])
 }
 
-export const EMPTY_BUILD: ClassBuild = { tree: [], loadout: [], familiar: RPG_DEFAULT_FAMILIAR }
-export const buildOf = (uma: Pick<OwnedUma, 'builds'>, build: RpgBuildId): ClassBuild => uma.builds[build] ?? EMPTY_BUILD
+/** Her setup for a class: what she saved, or its default five weapons with nothing learned and skills chosen for her. */
+export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass): ClassLoadout =>
+  uma.classes[classId] ?? { weapons: rpgDefaultWeapons(classId), tree: [], loadout: null }
 
-/** Her battle profile in a build (the active one by default), with depths gated by her level (D49). */
-export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, build: RpgBuildId = activeBuild(outfit, uma)): RpgProfile {
+/** Her battle profile as a class (the active one by default); her class rank opens the depths (D57, D77). */
+export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {
   const growth = (key: keyof BattleOutfit['growthRatePercents']) => Math.min(1, Math.max(0, outfit.growthRatePercents[key] / 100))
+  const setup = classOf(uma, classId)
   return {
     outfitId: outfit.outfitId,
     baseStats: { ...outfit.baseStats },
     growthRates: { speed: growth('speed'), stamina: growth('stamina'), power: growth('power'), guts: growth('guts'), wit: growth('wit') },
-    classId: RPG_BUILD[build].classId, weapons: [...RPG_BUILD[build].weapons], tier, level: uma.level, exp: uma.exp,
-    tree: buildOf(uma, build).tree.map((id) => ({ tier, id })), legacy: [],
-    // S5 (D57): her class rank opens the depths, not her level.
-    maxDepth: depthsOpen(uma.ranks.classes[RPG_BUILD[build].classId]),
+    classId, weapons: [...setup.weapons], tier, level: uma.level, exp: uma.exp,
+    tree: setup.tree.map((id) => ({ tier, id })), legacy: [],
+    maxDepth: depthsOpen(uma.ranks.classes[classId]),
   }
 }
 
-function withBuild(save: Save, outfitId: string, build: RpgBuildId, next: ClassBuild, now: string, tier = TIER_ONE): Save {
-  const world = worldOf(save, tier)
-  const uma = ownedOf(world, outfitId)
-  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, builds: { ...uma.builds, [build]: next } } } }, now)
+/** Her equipped skills as a class: the ones she picked that she can use, or, until she picks, chosen for her. */
+export function umaLoadout(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgNodeRef[] {
+  const profile = umaProfile(outfit, uma, tier, classId)
+  const picked = classOf(uma, classId).loadout
+  return picked === null ? rpgAutoLoadout(profile) : rpgUsableLoadout(profile, picked.map((id) => ({ tier, id })))
 }
 
-/** Switches the build she fights with. Free at any time; each build keeps its own tree (design §5). */
-export function chooseBuild(save: Save, outfitId: string, build: RpgBuildId, now: string, tier = TIER_ONE): Save {
+function withClass(save: Save, outfitId: string, classId: RpgClass, next: ClassLoadout, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
-  if (!(build in RPG_BUILD)) throw new SaveRuleError('bad-build', `no build ${build}`)
-  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, build } } }, now)
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classes: { ...uma.classes, [classId]: next } } } }, now)
 }
 
-/** Learns a node in a build. A new skill goes straight into a free slot. Throws with the reason it can't be learned. */
-export function learnSkill(save: Save, outfit: BattleOutfit, build: RpgBuildId, nodeId: string, now: string, tier = TIER_ONE): Save {
+/** Switches the class she fights as. Free at any time; each class keeps its own weapons and skills. */
+export function chooseClass(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const uma = ownedOf(world, outfitId)
+  if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-build', `no class ${classId}`)
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classId } } }, now)
+}
+
+/** Sets the five weapons a Summoner, Spell Blade or Cleric wields (a Brawler's and a Mage's are fixed). */
+export function setClassWeapons(save: Save, outfitId: string, classId: RpgClass, weapons: readonly RpgWeapon[], now: string, tier = TIER_ONE): Save {
+  const uma = ownedOf(worldOf(save, tier), outfitId)
+  if (!validRpgWeapons(classId, weapons)) throw new SaveRuleError('bad-build', 'those weapons don’t fit this class’s slots')
+  return withClass(save, outfitId, classId, { ...classOf(uma, classId), weapons: [...weapons] }, now, tier)
+}
+
+/** Learns a side skill. With skills she picked herself, a new one goes straight into a free slot. */
+export function learnSkill(save: Save, outfit: BattleOutfit, classId: RpgClass, nodeId: string, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
   let profile: RpgProfile
   try {
-    profile = learnRpgNode(umaProfile(outfit, uma, Number(tier), build), nodeId)
+    profile = learnRpgNode(umaProfile(outfit, uma, Number(tier), classId), nodeId)
   } catch (err) {
     throw new SaveRuleError('cannot-learn', err instanceof Error ? err.message : 'cannot learn that')
   }
-  const current = buildOf(uma, build)
-  const equip = rpgNode(nodeId)?.skill && current.loadout.length < rpgActiveSlots(uma.level)
-  return withBuild(save, outfit.outfitId, build, {
-    ...current, tree: profile.tree.map((r) => r.id), loadout: equip ? [...current.loadout, nodeId] : current.loadout,
-  }, now, tier)
+  const current = classOf(uma, classId)
+  const loadout = current.loadout !== null && current.loadout.length < rpgActiveSlots(uma.level) ? [...current.loadout, nodeId] : current.loadout
+  return withClass(save, outfit.outfitId, classId, { ...current, tree: profile.tree.map((r) => r.id), loadout }, now, tier)
 }
 
-/** Swaps out a learned variant: its points come back and it leaves the loadout. Core skills are permanent. */
-export function forgetSkill(save: Save, outfit: BattleOutfit, build: RpgBuildId, nodeId: string, now: string, tier = TIER_ONE): Save {
+/** Swaps out a learned side skill: its points come back and it leaves the loadout. */
+export function forgetSkill(save: Save, outfit: BattleOutfit, classId: RpgClass, nodeId: string, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
   let profile: RpgProfile
   try {
-    profile = forgetRpgVariant(umaProfile(outfit, uma, Number(tier), build), nodeId)
+    profile = forgetRpgVariant(umaProfile(outfit, uma, Number(tier), classId), nodeId)
   } catch (err) {
     throw new SaveRuleError('cannot-learn', err instanceof Error ? err.message : 'cannot swap that out')
   }
-  const current = buildOf(uma, build)
-  return withBuild(save, outfit.outfitId, build, { ...current, tree: profile.tree.map((r) => r.id), loadout: current.loadout.filter((id) => id !== nodeId) }, now, tier)
+  const current = classOf(uma, classId)
+  return withClass(save, outfit.outfitId, classId, { ...current, tree: profile.tree.map((r) => r.id), loadout: current.loadout?.filter((id) => id !== nodeId) ?? null }, now, tier)
 }
 
-/** Sets a build's equipped skills, in order. Every id must be a learned skill, within her slots. */
-export function equipSkills(save: Save, outfit: BattleOutfit, build: RpgBuildId, loadout: readonly string[], now: string, tier = TIER_ONE): Save {
+/** Sets a class's equipped skills, in order, or null to have them chosen for her. Every id must be a skill she knows. */
+export function equipSkills(save: Save, outfit: BattleOutfit, classId: RpgClass, loadout: readonly string[] | null, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
-  const profile = umaProfile(outfit, uma, Number(tier), build)
-  const refs = loadout.map((id) => ({ tier: Number(tier), id }))
-  const usable = rpgUsableLoadout(profile, refs)
-  if (usable.length !== loadout.length) throw new SaveRuleError('bad-loadout', `equip up to ${rpgActiveSlots(uma.level)} learned skills, once each`)
-  return withBuild(save, outfit.outfitId, build, { ...buildOf(uma, build), loadout: [...loadout] }, now, tier)
+  if (loadout !== null) {
+    const profile = umaProfile(outfit, uma, Number(tier), classId)
+    const usable = rpgUsableLoadout(profile, loadout.map((id) => ({ tier: Number(tier), id })))
+    if (usable.length !== loadout.length) throw new SaveRuleError('bad-loadout', `equip up to ${rpgActiveSlots(uma.level)} skills she knows, once each`)
+  }
+  return withClass(save, outfit.outfitId, classId, { ...classOf(uma, classId), loadout: loadout === null ? null : [...loadout] }, now, tier)
 }
 
-export function setFamiliar(save: Save, outfitId: string, familiar: RpgWeaponKind, now: string, tier = TIER_ONE): Save {
-  if (!RPG_WEAPON_KINDS.includes(familiar)) throw new SaveRuleError('bad-build', 'no such Familiar form')
-  const uma = ownedOf(worldOf(save, tier), outfitId)
-  return withBuild(save, outfitId, 'summoner', { ...buildOf(uma, 'summoner'), familiar }, now, tier)
-}
-
-/** Every stat point she brings to a fight as this build: her active Extra Stats nodes (S6) and what she wears (S7). */
-export function umaPoints(uma: OwnedUma, build: RpgBuildId): Points {
-  return addPoints(starPoints(uma.stars.active), equippedPoints(uma.gear.equipped, RPG_BUILD[build].weapons))
+/** Every stat point she brings to a fight as a class: her active Extra Stats nodes (S6) and what she wears (S7). */
+export function umaPoints(uma: OwnedUma, classId: RpgClass): Points {
+  return addPoints(starPoints(uma.stars.active), equippedPoints(uma.gear.equipped, classOf(uma, classId).weapons))
 }
 
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------
@@ -172,7 +181,7 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
   return withWorld(save, tier, { ...world, world: { ...world.world, run: { ...world.world.run, mp, updatedAt: now }, springs: { ...world.world.springs, [springId]: now } } }, now)
 }
 
-/** Starts a fight on a region's stage with the active party's five members in their active builds. */
+/** Starts a fight on a region's stage with the active party's five members as their active classes. */
 export function startFight(save: Save, region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>,
   now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
@@ -187,10 +196,10 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
     const uma = ownedOf(world, id)
-    const build = activeBuild(outfit, uma)
-    const profile = umaProfile(outfit, uma, Number(tier), build)
-    const loadout = rpgUsableLoadout(profile, buildOf(uma, build).loadout.map((n) => ({ tier: Number(tier), id: n })))
-    return { profile, loadout, familiar: buildOf(uma, 'summoner').familiar, points: umaPoints(uma, build) }
+    const classId = activeClass(outfit, uma)
+    const orb = equippedOrb(uma.gear.equipped)
+    return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
+      ...(orb ? { orb } : {}), points: umaPoints(uma, classId) }
   })
   try {
     return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)

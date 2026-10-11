@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
-import { equippedPoints, gearById, gearPoints } from '../economy/gear'
+import { equippedOrb, equippedPoints, gearById, gearPoints, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { rpgFoe } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
@@ -21,30 +21,37 @@ const umas = (...ids: string[]): Save => ids.reduce((s, id) => unlockUma(s, id, 
 const edit = (save: Save, fn: (w: ReturnType<typeof worldOf>) => ReturnType<typeof worldOf>): Save => ({ ...save, tierWorlds: { '1': fn(worldOf(save)) } })
 
 describe('gear (S7, D59)', () => {
-  it('generates any type × grade × accent from its main material, accent material and extras', () => {
-    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: { 'copper-ingot': 2, 'token-craft-atk-1': 1 } })
-    expect(gearById('bow-g1-speed')!.inputs).toEqual({ 'pine-plank': 2, 'token-craft-speed-1': 1 })
-    expect(Object.values(gearById('plate-g5-hp')!.inputs).reduce((a, b) => a + b, 0)).toBe(4)
-    expect(Object.values(gearById('ring-g9-mp')!.inputs).reduce((a, b) => a + b, 0)).toBe(5)
-    expect(gearById('short-sword-g3-def')?.type).toBe('short-sword')
+  it('makes every piece from four refined items, one of each of four families, and a Crafting Token (D86)', () => {
+    const arms = { 'copper-ingot': 1, 'limestone-block': 1, 'pine-plank': 1, 'puffbun-leather': 1 }
+    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: { ...arms, 'token-craft-atk-1': 1 } })
+    expect(gearById('bow-g1-speed')!.inputs).toEqual({ ...arms, 'token-craft-speed-1': 1 })
+    expect(gearById('tome-fire-g1-matk')!.inputs).toEqual({ 'cut-quartz': 1, linen: 1, 'mist-infusion': 1, 'shell-carving': 1, 'token-craft-matk-1': 1 })
+    expect(gearById('orb-fire-g1-hp')!.inputs).toEqual(gearById('tome-fire-g1-hp')!.inputs)
+    expect(gearById('orb-katana-g1-hp')!.inputs).toEqual(gearById('katana-g1-hp')!.inputs)
+    for (const type of EQUIP_TYPES) expect(new Set(recipeFamilies(type)).size).toBe(4)
+    expect(gearById('katana-g3-def')?.type).toBe('katana')
+    expect(gearById('short-sword-g3-def')).toBeUndefined()
     expect(gearById('greatsword-g11-atk')).toBeUndefined()
     expect(gearById('boots-g1-atk')).toBeUndefined()
   })
 
-  it('gives weapons offense split across her build’s weapons, armor defense, accessories their accent twice', () => {
-    expect(gearPoints(gearById('greatsword-g4-hp')!, 2)).toMatchObject({ atk: 2, hp: 2 })
-    expect(gearPoints(gearById('mage-staff-g4-mp')!, 1)).toMatchObject({ matk: 4, mp: 2 })
+  it('gives weapons offense split across her five weapons, armor defense, Rings their accent twice and Orbs once', () => {
+    expect(gearPoints(gearById('greatsword-g5-hp')!, 5)).toMatchObject({ atk: 1, hp: 3 })
+    expect(gearPoints(gearById('tome-ice-g5-mp')!, 5)).toMatchObject({ matk: 1, mp: 3 })
     expect(gearPoints(gearById('plate-g4-def')!)).toMatchObject({ def: 7, mdef: 2, hp: 2 })
     expect(gearPoints(gearById('garb-g4-speed')!)).toMatchObject({ def: 2, mdef: 2, speed: 4 })
     expect(gearPoints(gearById('ring-g4-limit')!)).toMatchObject({ limit: 4, atk: 0 })
-    // A Mage's staves don't count while she fights as a Brawler.
-    expect(equippedPoints({ 'mage-staff': 'mage-staff-g4-mp' }, ['greatsword', 'spear']).matk).toBe(0)
+    expect(gearPoints(gearById('orb-fire-g4-limit')!)).toMatchObject({ limit: 2, atk: 0 })
+    // A Mage's Tomes don't count while she fights as a Brawler.
+    expect(equippedPoints({ 'tome-fire': 'tome-fire-g4-mp' }, ['greatsword', 'axe', 'lance', 'bow', 'katana']).matk).toBe(0)
+    expect(equippedOrb({ accessory: 'orb-lance-g1-hp' })).toBe('lance')
+    expect(equippedOrb({ accessory: 'ring-g1-hp' })).toBeUndefined()
   })
 })
 
 describe('the Forge and equipping (S7)', () => {
   it('crafts with Gathering & Crafting into the gear stock', () => {
-    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 4, 'token-craft-atk-1': 2 } }))
+    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 2, 'limestone-block': 2, 'pine-plank': 2, 'puffbun-leather': 2, 'token-craft-atk-1': 2 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1-atk', 2)!
     expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE / 2 })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2-atk', 1)!.block).toBe('Needs Craft Lv6')
@@ -70,17 +77,18 @@ describe('the Forge and equipping (S7)', () => {
     expect(() => parseSave(stolen)).toThrow(SaveParseError)
   })
 
-  it('brings what she wears into her fights, for the build she fights as', () => {
-    let save = edit(umas('101', '102', '103', '104', '105'), (w) => ({ ...w, gear: { 'greatsword-g1-atk': 1, 'spear-g1-atk': 1, 'garb-g1-speed': 1 } }))
-    for (const g of ['greatsword-g1-atk', 'spear-g1-atk', 'garb-g1-speed']) save = equipGear(save, '101', g, at(0))
+  it('brings what she wears into her fights, for the class she fights as, Orb included', () => {
+    let save = edit(umas('101', '102', '103', '104', '105'), (w) => ({ ...w, gear: { 'greatsword-g1-atk': 1, 'lance-g1-atk': 1, 'garb-g1-speed': 1, 'orb-fire-g1-hp': 1 } }))
+    for (const g of ['greatsword-g1-atk', 'lance-g1-atk', 'garb-g1-speed', 'orb-fire-g1-hp']) save = equipGear(save, '101', g, at(0))
     const uma = worldOf(save).umas['101']!
-    expect(umaPoints(uma, 'greatsword-spear')).toMatchObject({ atk: 3, speed: 1.5, def: 0.5 })
+    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 2.4, speed: 1.5, def: 0.5, hp: 1 })
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...smith, outfitId: id }]))
     const ally = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input.allies[0]!
-    const bare = projectRpgStats(umaProfile(smith, uma, 1, 'greatsword-spear'))
-    expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'greatsword-spear')).stats.atk)
+    const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
+    expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
+    expect(ally.orb).toBe('fire')
     expect(ally.stats.atk).toBeGreaterThan(bare.atk)
     expect(ally.evasion).toBe(9)
   })

@@ -12,17 +12,18 @@ import { dishById, isStarNode } from '../economy/dishes'
 import { gearById, gearLevel, gearLevelName, slotOf, type GearSlot } from '../economy/gear'
 import { WEAPON_TYPES } from '../economy/training'
 import { activeNodeSlots } from '../economy/pacing'
-import { itemById } from '../items/catalog'
-import { isToken } from '../economy/tokens'
+import { ITEM_FAMILIES, itemById, type ItemEffect } from '../items/catalog'
+import { craftTokenId, gradeBand, isToken } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
-import { rpgNode, rpgSideNodeLevel } from '../rpg/catalog'
+import { rpgNode } from '../rpg/catalog'
 import {
-  isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgDepthBlock, validRpgTree, type RpgBuildId, type RpgWeaponKind,
+  isRpgWeapon, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
+  type RpgWeapon,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 13
+export const SAVE_SCHEMA_VERSION = 14
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -46,11 +47,12 @@ export interface Wallet {
 
 export interface ProfessionLevel { level: number; exp: number }
 
-/** One class build of an Uma: its learned nodes, equipped skills and (Summoner) Familiar form, by node id. */
-export interface ClassBuild {
+/** One class of an Uma (D86): the five weapons it wields, the side skills learned in its trees and the skills it has
+ * equipped (null: chosen for her, each weapon's deepest core first), by node id. */
+export interface ClassLoadout {
+  weapons: RpgWeapon[]
   tree: string[]
-  loadout: string[]
-  familiar: RpgWeaponKind
+  loadout: string[] | null
 }
 
 /** An outfit the trainer owns in a tier world. */
@@ -59,10 +61,10 @@ export interface OwnedUma {
   level: number
   /** EXP toward the next level (banked at Lv50). */
   exp: number
-  /** The build she fights with; null until chosen, which means her best running style's class. */
-  build: RpgBuildId | null
-  /** Every build she has learned anything in. */
-  builds: Partial<Record<RpgBuildId, ClassBuild>>
+  /** The class she fights as; null until chosen, which means her best running style's class. */
+  classId: RpgClass | null
+  /** Every class she has set up: weapons, side skills, equipped skills (D86). */
+  classes: Partial<Record<RpgClass, ClassLoadout>>
   /** Farming & Cooking and Gathering & Crafting, 1–50 each (design §4). */
   professions: Record<Profession, ProfessionLevel>
   /** Class proficiency (1–6) and gear mastery (1–10) ranks (S5, design §4). */
@@ -155,7 +157,7 @@ export function defaultParties(): Party[] {
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
-export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks(),
+export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, professions: newProfessions(), ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {} } })
 
 /** The world's state (D66). */
@@ -382,40 +384,56 @@ function parseRanks(value: unknown, path: string): Ranks {
   return { ...ranks, armor: level(o.armor, `${path}.armor`, MASTERY_MAX_RANK), accessory: level(o.accessory, `${path}.accessory`, MASTERY_MAX_RANK) }
 }
 
-/** A build's tree obeys every learning rule (depths by class rank from v5, by level before); its loadout is learned
- * skills within her slots. */
-function parseBuild(value: unknown, path: string, id: RpgBuildId, tier: number, level: number, maxDepth: number | undefined): ClassBuild {
-  const b = object(value, path, ['tree', 'loadout', 'familiar'])
+/** A class's weapons fit its slots, its side skills obey every learning rule at her level and rank, and its equipped
+ * skills are its trees' nodes within her slots (whether a core is open yet is checked when she fights). */
+function parseLoadout(value: unknown, path: string, classId: RpgClass, tier: number, level: number, maxDepth: number): ClassLoadout {
+  const b = object(value, path, ['weapons', 'tree', 'loadout'])
+  const weapons = ids(b.weapons, `${path}.weapons`, 5) as RpgWeapon[]
+  if (!weapons.every(isRpgWeapon) || !validRpgWeapons(classId, weapons)) throw new SaveParseError(`${path}.weapons`, `not five weapons a ${classId} can wield`)
   const tree = ids(b.tree, `${path}.tree`, 64)
-  const { classId, weapons } = RPG_BUILD[id]
-  if (!validRpgTree({ classId, weapons: [...weapons], tier, level, tree: tree.map((n) => ({ tier, id: n })), ...(maxDepth !== undefined ? { maxDepth } : {}) })) {
-    throw new SaveParseError(`${path}.tree`, `not a valid ${id} tree at Lv${level}`)
+  if (!validRpgTree({ classId, tier, level, tree: tree.map((n) => ({ tier, id: n })), maxDepth })) {
+    throw new SaveParseError(`${path}.tree`, `not a valid ${classId} tree at Lv${level}`)
   }
+  if (b.loadout === null) return { weapons, tree, loadout: null }
   const loadout = ids(b.loadout, `${path}.loadout`, rpgActiveSlots(level))
-  if (loadout.some((n) => !tree.includes(n) || !rpgNode(n)?.skill)) throw new SaveParseError(`${path}.loadout`, 'only learned skills can be equipped')
-  if (!RPG_WEAPON_KINDS.includes(b.familiar as RpgWeaponKind)) throw new SaveParseError(`${path}.familiar`, 'expected a weapon kind')
-  return { tree, loadout, familiar: b.familiar as RpgWeaponKind }
+  const trees: RpgTreeId[] = rpgClassTrees(classId)
+  if (loadout.some((n) => { const node = rpgNode(n); return !node || !trees.includes(node.tree) || (node.variant !== null && !tree.includes(n)) })) {
+    throw new SaveParseError(`${path}.loadout`, 'only skills of her trees can be equipped')
+  }
+  return { weapons, tree, loadout }
 }
 
-function parseUmas(value: unknown, path: string, tier: number): Record<string, OwnedUma> {
+/** v13 and older: the six builds of the old classes, by the class each belonged to (D86 replaced them). */
+const OLD_BUILD_CLASS: Readonly<Record<string, RpgClass>> = {
+  'greatsword-spear': 'brawler', 'axe-bow': 'brawler', mage: 'mage', spellblade: 'spellblade', cleric: 'cleric', summoner: 'summoner',
+}
+
+function parseUmas(value: unknown, path: string, tier: number, version: number): Record<string, OwnedUma> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const umas: Record<string, OwnedUma> = {}
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
-    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks', 'stars', 'gear'])
+    const old = version < 14
+    const u = object(raw, at, ['unlockedAt', 'level', 'exp', old ? 'build' : 'classId', old ? 'builds' : 'classes', 'professions', 'ranks', 'stars', 'gear'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const ranks = parseRanks(u.ranks, `${at}.ranks`)
-    const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), build: null, builds: {},
+    const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null, classes: {},
       professions: parseProfessions(u.professions, `${at}.professions`), ranks, stars: parseStars(u.stars, `${at}.stars`, level),
       gear: parseUmaGear(u.gear, `${at}.gear`, ranks) }
-    if (u.build !== null && !isRpgBuildId(u.build)) throw new SaveParseError(`${at}.build`, 'expected null or a class build')
-    owned.build = u.build as RpgBuildId | null
-    const builds = object(u.builds, `${at}.builds`, RPG_BUILDS)
-    for (const [key, build] of Object.entries(builds)) {
-      const classId = RPG_BUILD[key as RpgBuildId].classId
-      owned.builds[key as RpgBuildId] = parseBuild(build, `${at}.builds.${key}`, key as RpgBuildId, tier, level, depthsOpen(owned.ranks.classes[classId]))
+    if (old) {
+      // v13 → v14 (D86): the build's class carries over; learned skills reset (cores now come free, points come back).
+      if (u.build !== null && !(typeof u.build === 'string' && u.build in OLD_BUILD_CLASS)) throw new SaveParseError(`${at}.build`, 'expected null or a class build')
+      owned.classId = u.build === null ? null : OLD_BUILD_CLASS[u.build as string]!
+    } else {
+      if (u.classId !== null && !RPG_CLASSES.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
+      owned.classId = u.classId as RpgClass | null
+      const classes = object(u.classes, `${at}.classes`, RPG_CLASSES)
+      for (const [key, loadout] of Object.entries(classes)) {
+        const classId = key as RpgClass
+        owned.classes[classId] = parseLoadout(loadout, `${at}.classes.${key}`, classId, tier, level, depthsOpen(owned.ranks.classes[classId]))
+      }
     }
     umas[id] = owned
   }
@@ -563,28 +581,105 @@ function toV13(world: Record<string, unknown>): Record<string, unknown> {
         const r = classes[c]
         if (typeof r === 'number' && r > CLASS_MAX_RANK) classes[c] = CLASS_MAX_RANK
       }
-      for (const [key, build] of Object.entries(uma.builds)) {
-        if (!isRpgBuildId(key) || !isRecord(build) || !Array.isArray(build.tree) || !Array.isArray(build.loadout)) continue
-        const rank = classes[RPG_BUILD[key].classId]
-        const gate = { level, maxDepth: depthsOpen(typeof rank === 'number' ? rank : 1) }
-        const tree = build.tree.filter((id: unknown) => {
-          const node = typeof id === 'string' ? rpgNode(id) : undefined
-          return !node || (!rpgDepthBlock(gate, node.depth) && (node.variant === null || level >= rpgSideNodeLevel(node.depth)))
-        })
-        build.tree = tree
-        build.loadout = build.loadout.filter((id: unknown) => tree.includes(id))
-      }
     }
   }
   return w
 }
 
+/** Gear types D86 renamed, and the ones it retired with the families their old recipes took (main, then the accent's). */
+const RENAMED_GEAR: Readonly<Record<string, string>> = { spear: 'lance', 'short-sword': 'katana' }
+const RETIRED_GEAR: Readonly<Record<string, string>> = { 'mage-staff': 'woods', 'arcane-staff': 'woods', 'cleric-staff': 'woods', 'summoner-tome': 'fibers' }
+const ACCENT_FAMILY: Readonly<Record<string, string>> = {
+  hp: 'hides-scales', mp: 'essences', atk: 'ores', matk: 'crystals', def: 'stones', mdef: 'fibers', speed: 'woods', limit: 'bones-horns',
+}
+const OLD_GEAR = /^([a-z-]+)-g(\d{1,2})-([a-z]+)$/
+/** A v13 gear id as v14 reads it: renamed, or null when retired. */
+function v14Gear(id: unknown): string | null | undefined {
+  const m = typeof id === 'string' ? OLD_GEAR.exec(id) : null
+  if (!m) return undefined
+  if (m[1]! in RETIRED_GEAR) return null
+  return RENAMED_GEAR[m[1]!] ? `${RENAMED_GEAR[m[1]!]}-g${m[2]}-${m[3]}` : (id as string)
+}
+/** What a retired piece gives back: its old recipe's main and accent refined items and its Crafting Token. */
+function refundOf(id: string): Record<string, number> {
+  const [, type, g, accent] = OLD_GEAR.exec(id)!
+  const grade = Number(g)
+  const refined = (family: string) => ITEM_FAMILIES.find((f) => f.id === family)?.refined[grade - 1]?.id
+  const out: Record<string, number> = {}
+  for (const family of [RETIRED_GEAR[type!]!, ACCENT_FAMILY[accent!]]) { const r = family ? refined(family) : undefined; if (r) out[r] = (out[r] ?? 0) + 1 }
+  out[craftTokenId(accent as ItemEffect, gradeBand(grade))] = (out[craftTokenId(accent as ItemEffect, gradeBand(grade))] ?? 0) + 1
+  return out
+}
+
+/**
+ * v13 → v14 (D86): Spear pieces become Lance pieces and Short Swords Katanas; Mage, Arcane and Cleric Staves and
+ * Summoner Tomes are taken back and their materials and Crafting Token returned (a Forge job making one is cancelled the
+ * same way); an open fight closes with no loss. Builds become classes in parseUmas.
+ */
+function toV14(world: Record<string, unknown>): Record<string, unknown> {
+  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
+  const items = (isRecord(w.items) ? w.items : (w.items = {})) as Record<string, number>
+  const refund = (id: string, times = 1) => { for (const [k, n] of Object.entries(refundOf(id))) items[k] = (items[k] ?? 0) + n * times }
+  if (isRecord(w.gear)) {
+    const next: Record<string, unknown> = {}
+    for (const [id, n] of Object.entries(w.gear)) {
+      const to = v14Gear(id)
+      if (to === null) { refund(id, typeof n === 'number' ? n : 0); continue }
+      next[to ?? id] = n
+    }
+    w.gear = next
+  }
+  if (isRecord(w.umas)) {
+    for (const uma of Object.values(w.umas)) {
+      if (!isRecord(uma) || !isRecord(uma.gear)) continue
+      const gear = uma.gear
+      if (Array.isArray(gear.locker)) {
+        gear.locker = gear.locker.flatMap((id: unknown) => {
+          const to = v14Gear(id)
+          if (to === null) { refund(id as string); return [] }
+          return [to ?? id]
+        })
+      }
+      if (isRecord(gear.equipped)) {
+        const next: Record<string, unknown> = {}
+        for (const [slot, id] of Object.entries(gear.equipped)) {
+          const to = v14Gear(id)
+          if (to === null || slot in RETIRED_GEAR) continue
+          next[RENAMED_GEAR[slot] ?? slot] = to ?? id
+        }
+        gear.equipped = next
+      }
+    }
+  }
+  if (isRecord(w.facilities)) {
+    for (const f of Object.values(w.facilities)) {
+      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
+      f.jobs = f.jobs.map((job: unknown) => {
+        if (!isRecord(job) || job.kind !== 'craft') return job
+        if (Array.isArray(job.queue)) job.queue = job.queue.filter((q: unknown) => !(isRecord(q) && v14Gear(q.output) === null))
+          .map((q: unknown) => (isRecord(q) && v14Gear(q.output) ? { ...q, output: v14Gear(q.output) } : q))
+        const to = v14Gear(job.output)
+        if (to === null) {
+          // The pieces still to make give their inputs back.
+          const left = Math.max(0, Number(job.count) - Number(job.collected))
+          if (isRecord(job.inputs)) for (const [k, n] of Object.entries(job.inputs)) if (typeof n === 'number') items[k] = (items[k] ?? 0) + n * left
+          return null
+        }
+        return to ? { ...job, output: to } : job
+      })
+    }
+  }
+  if (isRecord(w.world) && isRecord(w.world.run)) w.world.run = { ...w.world.run, battle: null }
+  return w
+}
+
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  const value = version < 13 && isRecord(raw) ? toV13(raw) : raw
+  const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
+  const value = version < 14 && isRecord(v13) ? toV14(v13) : v13
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
-  const umas = parseUmas(w.umas, `${path}.umas`, tier)
+  const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
   const createdAt = timestamp(w.createdAt, `${path}.createdAt`)
   return {
     createdAt, wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas,

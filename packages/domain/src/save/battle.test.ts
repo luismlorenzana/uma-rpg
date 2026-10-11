@@ -4,8 +4,8 @@ import { applyBattleAction, battleActionsLeft } from '../rpg/battle/engine'
 import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
-  actInFight, activeBuild, chooseBuild, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, settleFight,
-  startFight, umaProfile, useSpring, worldRun, type BattleOutfit,
+  actInFight, activeClass, chooseClass, classOf, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, setClassWeapons,
+  settleFight, startFight, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
@@ -48,10 +48,11 @@ function autoplay(save: Save): { save: Save; result: ReturnType<typeof actInFigh
     const state: BattleState = rpgRunBattleStep(run)!.state
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)!
     const foe = state.units.filter((u) => u.side === 'enemy' && u.hp > 0).sort((a, b) => a.shield - b.shield || a.hp - b.hp)[0]!
-    // A Summoner's Familiar strikes once a round; her second action guards a friend.
-    const friend = state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)
-    const action: BattleAction = state.familiars.includes(ally.id) && friend
-      ? { kind: 'guard', actorId: ally.id, targetId: friend.id } : { kind: 'attack', actorId: ally.id, targetId: foe.id }
+    const source = state.input.allies.find((a) => a.id === ally.id)!
+    // A Spell Blade's act pairs an Arms Attack with a Tome Attack (D86).
+    const action: BattleAction = source.classId === 'spellblade'
+      ? { kind: 'attack', actorId: ally.id, targetId: foe.id, weapon: source.weapons[0], pair: { weapon: source.weapons.find((w) => w.startsWith('tome-')) } }
+      : { kind: 'attack', actorId: ally.id, targetId: foe.id }
     const acted = actInFight(s, ura, action, T(100 + n))
     s = acted.save
     if (acted.result) return { save: s, result: acted.result }
@@ -59,55 +60,61 @@ function autoplay(save: Save): { save: Save; result: ReturnType<typeof actInFigh
   throw new Error('fight never ended')
 }
 
-describe('class builds (D49)', () => {
-  it('starts in her best running style’s class and switches freely', () => {
+describe('classes (D86)', () => {
+  it('starts in her best running style’s class, switches freely, and keeps each class’s weapons', () => {
     const save = withParty()
     const uma = worldOf(save).umas['102']!
-    expect(activeBuild(OUTFITS.get('102')!, uma)).toBe('mage')
-    expect(activeBuild(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('summoner')
-    const switched = chooseBuild(save, '102', 'axe-bow', T(3))
-    expect(activeBuild(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('axe-bow')
+    expect(activeClass(OUTFITS.get('102')!, uma)).toBe('mage')
+    expect(activeClass(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('summoner')
+    const switched = chooseClass(save, '102', 'cleric', T(3))
+    expect(activeClass(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('cleric')
     const profile = umaProfile(o101, worldOf(save).umas['101']!, 1)
-    expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'spear'], level: 1, tree: [] })
+    expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], level: 1, tree: [] })
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
+    // A Cleric picks any five; a Summoner three Tomes and two Arms; a Brawler's five are fixed.
+    const picked = setClassWeapons(save, '101', 'cleric', ['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'], T(4))
+    expect(classOf(worldOf(picked).umas['101']!, 'cleric').weapons).toEqual(['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'])
+    expect(() => setClassWeapons(save, '101', 'summoner', ['katana', 'bow', 'axe', 'tome-ice', 'tome-dark'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'axe', 'lance', 'tome-dark'], T(4))).toThrow(/slots/)
   })
 
-  it('learns depth-1 skills from Lv1 into free slots, keeps each build’s tree, and gates deeper depths by level and rank (D77)', () => {
-    let save = withParty()
-    save = learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
-    save = learnSkill(save, o101, 'axe-bow', 'axe.ice.1', T(4))
+  it('knows every open depth’s core skills for free and chooses her skills until she picks (D86)', () => {
+    const save = withParty()
     const uma = worldOf(save).umas['101']!
-    expect(uma.builds['greatsword-spear']).toEqual({ tree: ['greatsword.fire.1'], loadout: ['greatsword.fire.1'], familiar: 'greatsword' })
-    expect(uma.builds['axe-bow']?.tree).toEqual(['axe.ice.1'])
-    expect(() => learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/Opens at Lv10/)
-    const rankOne = learnSkill(ranked(withParty(), 1), o101, 'greatsword-spear', 'greatsword.fire.1', T(5))
-    const w = worldOf(rankOne)
-    const tenAtRankOne: Save = { ...rankOne, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 10 } } } } }
-    expect(() => learnSkill(tenAtRankOne, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/class rank 2/)
-    expect(() => learnSkill(save, o101, 'greatsword-spear', 'mage-staff.fire.1', T(5))).toThrow(SaveRuleError)
-    expect(() => forgetSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/variant/)
+    expect(umaLoadout(o101, uma, 1).map((r) => r.id)).toEqual(['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1'])
+    const w = worldOf(save)
+    const ten: Save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...uma, level: 10 } } } } }
+    expect(umaLoadout(o101, worldOf(ten).umas['101']!, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
+    const atRankOne = ranked(ten, 1)
+    expect(umaLoadout(o101, worldOf(atRankOne).umas['101']!, 1).map((r) => r.id)[0]).toBe('brawler-greatsword.1')
+    expect(() => learnSkill(save, o101, 'brawler', 'brawler-greatsword.1', T(5))).toThrow(/Learned/)
   })
 
-  it('opens each depth’s side nodes at mid-band, Lv 5, 15, 25, 35 and 45 (D73)', () => {
+  it('learns side skills with points from Lv5, one per fork, swapped freely (D73, D86)', () => {
     const save = withParty()
     const atLevel = (level: number): Save => {
       const w = worldOf(save)
       return { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level } } } } }
     }
-    const learned = learnSkill(atLevel(4), o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
-    expect(() => learnSkill(learned, o101, 'greatsword-spear', 'greatsword.fire.1a', T(4))).toThrow(/Opens at Lv5/)
-    const five = learnSkill(learnSkill(atLevel(5), o101, 'greatsword-spear', 'greatsword.fire.1', T(3)), o101, 'greatsword-spear', 'greatsword.fire.1a', T(4))
-    expect(worldOf(five).umas['101']!.builds['greatsword-spear']!.tree).toEqual(['greatsword.fire.1', 'greatsword.fire.1a'])
+    expect(() => learnSkill(atLevel(4), o101, 'brawler', 'brawler-greatsword.1a', T(3))).toThrow(/Opens at Lv5/)
+    const five = learnSkill(atLevel(5), o101, 'brawler', 'brawler-greatsword.1a', T(4))
+    expect(classOf(worldOf(five).umas['101']!, 'brawler')).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: null })
+    expect(() => learnSkill(five, o101, 'brawler', 'brawler-greatsword.1b', T(5))).toThrow(/other side/)
+    expect(() => learnSkill(five, o101, 'brawler', 'mage-tome-fire.1a', T(5))).toThrow(SaveRuleError)
+    const swapped = forgetSkill(five, o101, 'brawler', 'brawler-greatsword.1a', T(6))
+    expect(classOf(worldOf(swapped).umas['101']!, 'brawler').tree).toEqual([])
     expect(parseSave(JSON.parse(JSON.stringify(five)))).toEqual(five)
   })
 
-  it('equips only learned skills within her slots', () => {
+  it('equips skills she knows within her slots, or goes back to having them chosen', () => {
     let save = withParty()
-    for (const id of ['greatsword.fire.1', 'greatsword.ice.1']) save = learnSkill(save, o101, 'greatsword-spear', id, T(3))
-    save = equipSkills(save, o101, 'greatsword-spear', ['greatsword.ice.1'], T(4))
-    expect(worldOf(save).umas['101']!.builds['greatsword-spear']?.loadout).toEqual(['greatsword.ice.1'])
-    expect(() => equipSkills(save, o101, 'greatsword-spear', ['greatsword.lightning.1'], T(5))).toThrow(/learned/)
-    expect(() => equipSkills(save, o101, 'greatsword-spear', ['greatsword.ice.1', 'greatsword.ice.1'], T(5))).toThrow(SaveRuleError)
+    save = equipSkills(save, o101, 'brawler', ['brawler-katana.1'], T(4))
+    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toEqual(['brawler-katana.1'])
+    expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['brawler-katana.1'])
+    expect(() => equipSkills(save, o101, 'brawler', ['brawler-katana.2'], T(5))).toThrow(/knows/)
+    expect(() => equipSkills(save, o101, 'brawler', ['brawler-axe.1', 'brawler-axe.1'], T(5))).toThrow(SaveRuleError)
+    save = equipSkills(save, o101, 'brawler', null, T(6))
+    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toBeNull()
   })
 })
 
@@ -179,8 +186,8 @@ describe('fights (D52, D66)', () => {
 })
 
 describe('save parsing', () => {
-  it('round-trips builds and an open fight with actions', () => {
-    let save = learnSkill(withParty(), o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
+  it('round-trips classes and an open fight with actions', () => {
+    let save = equipSkills(withParty(), o101, 'brawler', ['brawler-katana.1', 'brawler-bow.1'], T(3))
     save = startFight(save, ura, 'w1-1-1-s1', OUTFITS, T(4))
     const action: BattleAction = { kind: 'attack', actorId: '101', targetId: 'foe1' }
     save = actInFight(save, ura, action, T(5)).save
@@ -188,21 +195,44 @@ describe('save parsing', () => {
     expect(applyBattleAction(rpgRunBattleStep(openFightOf(worldOf(save))!)!.state, action).error).toBe('already-acted')
   })
 
-  it('rejects an invalid tree, an unlearned equipped skill, a refused action and an unknown Spring', () => {
-    const save = startFight(learnSkill(withParty(), o101, 'greatsword-spear', 'greatsword.fire.1', T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
+  it('rejects a side skill too deep, a skill of another class, wrong weapons, a refused action and an unknown Spring', () => {
+    const save = startFight(equipSkills(withParty(), o101, 'brawler', ['brawler-katana.1'], T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
     const raw = () => JSON.parse(JSON.stringify(save))
     const deep = raw()
-    deep.tierWorlds['1'].umas['101'].builds['greatsword-spear'].tree.push('greatsword.fire.2')
+    deep.tierWorlds['1'].umas['101'].classes.brawler.tree.push('brawler-greatsword.2a')
     expect(() => parseSave(deep)).toThrow(/tree/)
     const equip = raw()
-    equip.tierWorlds['1'].umas['101'].builds['greatsword-spear'].loadout = ['greatsword.ice.1']
-    expect(() => parseSave(equip)).toThrow(/learned/)
+    equip.tierWorlds['1'].umas['101'].classes.brawler.loadout = ['mage-tome-fire.1']
+    expect(() => parseSave(equip)).toThrow(/trees/)
+    const weapons = raw()
+    weapons.tierWorlds['1'].umas['101'].classes.brawler.weapons = ['greatsword', 'axe', 'lance', 'bow', 'tome-fire']
+    expect(() => parseSave(weapons)).toThrow(/weapons/)
     const refused = raw()
     refused.tierWorlds['1'].world.run.battle.actions = [{ kind: 'attack', actorId: '101', targetId: 'foe1' }, { kind: 'attack', actorId: '101', targetId: 'foe1' }]
     expect(() => parseSave(refused)).toThrow(/refused/)
     const spring = raw()
     spring.tierWorlds['1'].world.springs = { somewhere: T(1) }
     expect(() => parseSave(spring)).toThrow(SaveParseError)
+  })
+
+  it('moves a v13 save to classes: the build’s class carries over, skills reset, an open fight closes (D86)', () => {
+    const save = startFight(withParty(), ura, 'w1-1-1-s1', OUTFITS, T(4))
+    const old = JSON.parse(JSON.stringify(save))
+    old.schemaVersion = 13
+    for (const uma of Object.values(old.tierWorlds['1'].umas) as Record<string, unknown>[]) {
+      delete uma.classId
+      delete uma.classes
+      uma.build = null
+      uma.builds = { 'axe-bow': { tree: ['axe.ice.1'], loadout: ['axe.ice.1'], familiar: 'greatsword' } }
+    }
+    old.tierWorlds['1'].umas['102'].build = 'axe-bow'
+    old.tierWorlds['1'].world.run.battle.input.version = 5
+    const moved = parseSave(old)
+    expect(moved.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
+    expect(worldOf(moved).umas['102']).toMatchObject({ classId: 'brawler', classes: {} })
+    expect(worldOf(moved).umas['101']!.classId).toBeNull()
+    expect(worldRun(worldOf(moved)).battle).toBeNull()
+    expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
   })
 
   it('starts a v2 save over: no build chosen, nothing learned, a fresh world', () => {

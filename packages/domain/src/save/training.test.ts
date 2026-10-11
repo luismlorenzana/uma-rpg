@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { HOUR } from '../economy/pacing'
 import { depthsOpen } from '../economy/training'
-import { learnSkill, startFight, umaProfile } from './battle'
+import { learnSkill, startFight, umaLoadout, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
 import { collectJob, cutJobTime, facilityOf, queueJob, startTraining } from './work'
@@ -37,9 +37,8 @@ describe('class ranks (S5, D57)', () => {
     save = collectJob(save, 'brawler-dojo', 0, at(3 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.classes.brawler).toBe(2)
     // Rank r opens depths 1–r (D77); depth 2 still waits for Lv10.
-    expect(umaProfile(front, worldOf(save).umas['101']!, 1, 'greatsword-spear').maxDepth).toBe(2)
-    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(4 * HOUR))
-    expect(() => learnSkill(save, front, 'greatsword-spear', 'greatsword.ice.2', at(4 * HOUR))).toThrow(/Opens at Lv10/)
+    expect(umaProfile(front, worldOf(save).umas['101']!, 1, 'brawler').maxDepth).toBe(2)
+    expect(umaLoadout(front, worldOf(save).umas['101']!, 1, 'brawler').every((r) => r.id.endsWith('.1'))).toBe(true)
     expect([1, 2, 5].map(depthsOpen)).toEqual([1, 2, 5])
   })
 
@@ -64,8 +63,6 @@ describe('class ranks (S5, D57)', () => {
     let save = umas('101', '102', '103', '104', '105')
     const w = worldOf(save)
     save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 10, ranks: { ...w.umas['101']!.ranks, classes: { ...w.umas['101']!.ranks.classes, brawler: 2 } } } } } } }
-    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(0))
-    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.2', at(0))
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...front, outfitId: id }]))
@@ -88,7 +85,7 @@ describe('saves', () => {
     expect(reset.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     const world = reset.tierWorlds['1']!
     expect(Object.keys(world.umas)).toEqual(['101', '102'])
-    expect(world.umas['101']).toMatchObject({ level: 1, exp: 0, build: null, builds: {} })
+    expect(world.umas['101']).toMatchObject({ level: 1, exp: 0, classId: null, classes: {} })
     expect(world.umas['101']!.ranks.classes.brawler).toBe(1)
     expect(world.parties[0]!.slots[0]).toBe('101')
     expect(world.wallet).toEqual({ unlockTickets: w.wallet.unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0 })
@@ -98,8 +95,8 @@ describe('saves', () => {
 
   it('rejects a skill deeper than its class rank and training a track elsewhere', () => {
     const base = worldOf(umas('101')).umas['101']!
-    const ten = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 10, ranks: { ...base.ranks, classes: { ...base.ranks.classes, brawler: 2 } } } } } } }
-    const save = learnSkill(learnSkill(ten, front, 'greatsword-spear', 'greatsword.fire.1', at(0)), front, 'greatsword-spear', 'greatsword.fire.2', at(0))
+    const fifteen = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 15, ranks: { ...base.ranks, classes: { ...base.ranks.classes, brawler: 2 } } } } } } }
+    const save = learnSkill(fifteen, front, 'brawler', 'brawler-greatsword.2a', at(0))
     const low = JSON.parse(JSON.stringify(save))
     low.tierWorlds['1'].umas['101'].ranks.classes.brawler = 1
     expect(() => parseSave(low)).toThrow(/tree/)
@@ -109,22 +106,26 @@ describe('saves', () => {
     expect(() => parseSave(elsewhere)).toThrow(SaveParseError)
   })
 
-  it('moves a v12 save to rank 5 at most, forgetting skills the level gates now close (D77)', () => {
+  it('moves a v12 save to rank 5 at most and drops band-5 Promotion Tokens (D77), then its builds to classes (D86)', () => {
     const base = worldOf(umas('101')).umas['101']!
-    const strong = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 12, ranks: { ...base.ranks, classes: { ...base.ranks.classes, brawler: 3 } } } } } } }
-    let save = learnSkill(strong, front, 'greatsword-spear', 'greatsword.fire.1', at(0))
-    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.2', at(0))
+    const save = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 12 } } } } }
     const old = JSON.parse(JSON.stringify(save))
     old.schemaVersion = 12
-    // At v12 a rank-4 Uma at Lv5 could hold depth 2 (no level gate then), and a rank could reach 6.
-    old.tierWorlds['1'].umas['101'].level = 5
-    old.tierWorlds['1'].umas['101'].ranks.classes.brawler = 6
+    const uma = old.tierWorlds['1'].umas['101']
+    delete uma.classId
+    delete uma.classes
+    uma.build = 'greatsword-spear'
+    uma.builds = { 'greatsword-spear': { tree: ['greatsword.fire.1', 'greatsword.fire.2'], loadout: ['greatsword.fire.1'], familiar: 'greatsword' } }
+    uma.ranks.classes.brawler = 6
     old.tierWorlds['1'].items = { 'token-class-mage-5': 2, 'token-class-mage-4': 1 }
+    old.tierWorlds['1'].gear = { 'spear-g2-atk': 1, 'mage-staff-g1-mp': 1 }
     const moved = parseSave(old)
-    const uma = worldOf(moved).umas['101']!
-    expect(uma.ranks.classes.brawler).toBe(5)
-    expect(uma.builds['greatsword-spear']).toMatchObject({ tree: ['greatsword.fire.1'], loadout: ['greatsword.fire.1'] })
-    expect(worldOf(moved).items).toEqual({ 'token-class-mage-4': 1 })
+    const umaNow = worldOf(moved).umas['101']!
+    expect(umaNow.ranks.classes.brawler).toBe(5)
+    expect(umaNow).toMatchObject({ classId: 'brawler', classes: {} })
+    // The Spear became a Lance; the Mage Staff gave back its Woods, its accent's Essences and its Crafting Token.
+    expect(worldOf(moved).gear).toEqual({ 'lance-g2-atk': 1 })
+    expect(worldOf(moved).items).toEqual({ 'token-class-mage-4': 1, 'pine-plank': 1, 'mist-infusion': 1, 'token-craft-mp-1': 1 })
     expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
   })
 })

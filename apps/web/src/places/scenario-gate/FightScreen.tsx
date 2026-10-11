@@ -1,18 +1,19 @@
-// A fight (S3, D53): the Phaser stage shows the rivals and the party and plays every action; the DOM on top carries
-// taps, bars, shields, weaknesses and commands. Tap a rival to attack, or pick a skill first. Weak hits chip shields; a
-// Break leaves the rival open for two rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
+// A fight (S3, D53, D86): the Phaser stage shows the rivals and the party and plays every action; the DOM on top carries
+// taps, bars, shields, weaknesses and commands. Pick one of her five weapons to attack with, or a skill, then tap a
+// rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
+// rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  battleActionsLeft, battleBroken, openFightOf, rpgHand, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
-  type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef,
+  battleActionsLeft, battleBroken, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import {
-  actionFor, blessingChoices, describeCue, followCue, limitMode, limitNow, limitOptions, limitReady, previewTarget, skillChoices,
+  actionFor, describeCue, followCue, halfIsTome, limitMode, limitNow, limitOptions, limitReady, pairMode, pairOf, previewTarget, skillChoices,
   type BattleMode, type SkillChoice,
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
-import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, WeaknessIcons, WEAPON_KIND_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
 import { stageLayout } from '../../battle/stage-layout'
@@ -97,7 +98,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   const node = chapter.nodes.find((n) => n.id === nodeId.current)
   const [actorId, setActorId] = useState<string | null>(null)
   const [mode, setMode] = useState<BattleMode>({ kind: 'attack' })
-  const [sheet, setSheet] = useState<'skills' | 'menu' | { limit: string } | { bless: SkillChoice } | null>(null)
+  const [sheet, setSheet] = useState<'skills' | 'menu' | { limit: string } | null>(null)
   const [limitPicks, setLimitPicks] = useState<RpgNodeRef[]>([])
   const [busy, setBusy] = useState(false)
   const [cue, setCue] = useState<BattleCue | null>(null)
@@ -137,14 +138,19 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   const ready = state.units.filter((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)
   const actor = ready.find((u) => u.id === actorId) ?? ready[0] ?? null
   const ally = actor ? state.input.allies.find((a) => a.id === actor.id)! : null
-  const hand = ally ? rpgHand(ally) : null
   const choices = actor ? skillChoices(state, actor.id) : []
   const playing = cue !== null
-  const left = actor ? battleActionsLeft(state, actor.id) : 0
-  const familiarUsed = !!actor && hand?.free.kind === 'familiar' && state.familiars.includes(actor.id)
-  const attackLabel = hand?.free.kind === 'familiar' ? 'Familiar' : hand?.free.kind === 'short-sword' ? 'Slash' : hand?.free.kind === 'staff' ? 'Strike' : 'Attack'
+  const paired = ally?.classId === 'spellblade'
+  const pair = ally && paired ? pairOf(mode, ally) : null
   const skill = mode.kind === 'skill' ? choices.find((c) => c.ref.id === mode.ref.id) ?? null : null
-  const turn = hand && hand.actions > 1 ? ` · action ${hand.actions - left + 1} of ${hand.actions}` : ''
+  const halfName = (h: { skill?: RpgNodeRef; weapon?: RpgWeapon }) =>
+    h.skill ? choices.find((c) => c.ref.id === h.skill!.id)?.skill.label ?? '?' : h.weapon ? `${WEAPON_LABEL[h.weapon]} Attack` : '?'
+  const pairMp = pair ? [pair.arms, pair.tome].reduce((n, h) => n + (h.skill ? choices.find((c) => c.ref.id === h.skill!.id)?.skill.mp ?? 0 : 0), 0) : 0
+  /** The mode an act uses: a Spell Blade's always carries both halves. */
+  const effective: BattleMode = pair && (mode.kind === 'attack' || mode.kind === 'skill') ? pairMode(pair) : mode
+  /** The weapon an Attack uses now: hers, or for a Spell Blade whichever half is an Attack. */
+  const attackWeapon = (w: RpgWeapon) => (pair ? (isRpgTome(w) ? pair.tome.weapon === w : pair.arms.weapon === w)
+    : mode.kind === 'attack' && (mode.weapon ?? ally?.weapons[0]) === w)
 
   const act = async (action: BattleAction) => {
     if (busy) return
@@ -177,7 +183,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
   const tapEnemy = (unit: BattleUnit) => {
     if (busy || playing || !actor || unit.hp <= 0 || mode.kind === 'guard') return
-    void act(actionFor(mode, actor.id, unit.id))
+    void act(actionFor(effective, actor.id, unit.id))
   }
   const tapAlly = (unit: BattleUnit) => {
     if (busy || playing || !actor) return
@@ -191,20 +197,21 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
     }
   }
   const pickSkill = (choice: SkillChoice) => {
-    const options = blessingChoices(state, actor!.id, choice.skill)
-    if (options.length > 1) {
-      setSheet({ bless: choice })
-      return
-    }
-    setMode({ kind: 'skill', ref: choice.ref, ...(options[0] ? { blessing: options[0].id } : {}) })
+    if (pair) setMode(pairMode(isRpgTome(choice.skill.node.weapon) ? { ...pair, tome: { skill: choice.ref } } : { ...pair, arms: { skill: choice.ref } }))
+    else setMode({ kind: 'skill', ref: choice.ref })
     setSheet(null)
+  }
+  const pickWeapon = (w: RpgWeapon) => {
+    if (pair) setMode(pairMode(isRpgTome(w) ? { ...pair, tome: { weapon: w } } : { ...pair, arms: { weapon: w } }))
+    else setMode({ kind: 'attack', weapon: w })
   }
 
   const hint = error ?? (cue ? describeCue(cue, name)
     : mode.kind === 'guard' ? `Tap an ally for ${name(actor?.id ?? '')} to guard`
     : mode.kind === 'limit' ? `Tap a rival: LIMIT BREAK · ${mode.name}`
-    : skill ? `Tap a rival: ${skill.skill.label} · ${skill.skill.mp} MP${turn}`
-    : actor ? `${name(actor.id)}: tap a rival to ${attackLabel.toLowerCase()}${turn}` : '')
+    : pair ? `Tap a rival: ${halfName(pair.arms)} + ${halfName(pair.tome)}${pairMp ? ` · ${pairMp} MP` : ''}`
+    : skill ? `Tap a rival: ${skill.skill.label} · ${skill.skill.mp} MP`
+    : actor && ally ? `${name(actor.id)}: tap a rival to attack with her ${WEAPON_LABEL[mode.kind === 'attack' && mode.weapon ? mode.weapon : ally.weapons[0]!]}` : '')
 
   const enemies = shown.units.filter((u) => u.side === 'enemy')
   const allies = shown.units.filter((u) => u.side === 'ally')
@@ -234,7 +241,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
           const info = layout.enemyInfo[i]!
           const intent = state.intents.find((x) => x.enemyId === unit.id)
           const move = intent && [...enemy.moves, ...(enemy.phaseTwo?.moves ?? [])].find((m) => m.id === intent.moveId)
-          const preview = actor && unit.hp > 0 && mode.kind !== 'guard' && !playing ? previewTarget(state, actor.id, mode, unit.id) : null
+          const preview = actor && unit.hp > 0 && mode.kind !== 'guard' && !playing ? previewTarget(state, actor.id, effective, unit.id) : null
           const broken = battleBroken(unit)
           return (
             <div key={unit.id}>
@@ -333,15 +340,15 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
         <p aria-live="polite" className={`mb-1.5 min-h-5 text-center font-semibold ${error ? 'text-danger' : 'text-accent'} ${cue?.kind === 'break' || cue?.kind === 'limit' ? 'font-display text-[18px]' : 'text-[12px] leading-4'}`}>
           {hint}
         </p>
-        {ally && hand?.free.kind === 'weapon' && (
-          <div className="mb-2 grid grid-cols-2 gap-2" aria-label="Attack weapon">
+        {ally && (
+          <div className="mb-2 grid grid-cols-5 gap-1.5" aria-label={paired ? 'Attack weapons: one Arm and one Tome' : 'Attack weapon'}>
             {ally.weapons.map((w) => {
-              const on = mode.kind === 'attack' && (mode.weapon ?? ally.weapons[0]) === w
+              const on = attackWeapon(w)
               return (
-                <button key={w} type="button" aria-pressed={on} disabled={busy || playing} onClick={() => setMode({ kind: 'attack', weapon: w })}
-                  className={`flex min-h-10 items-center justify-center gap-1 rounded-sm border text-[12px] font-semibold ${on ? 'border-accent bg-accent/15 text-accent' : 'border-hairline-strong'}`}>
-                  <WeaponGlyph weapon={w} size={14} />
-                  {WEAPON_KIND_LABEL[w as keyof typeof WEAPON_KIND_LABEL] ?? w}
+                <button key={w} type="button" aria-pressed={on} aria-label={`Attack with ${WEAPON_LABEL[w]}`} disabled={busy || playing} onClick={() => pickWeapon(w)}
+                  className={`flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-sm border text-[10px] font-semibold leading-none ${on ? 'border-accent bg-accent/15 text-accent' : 'border-hairline-strong'}`}>
+                  <WeaponGlyph weapon={w} size={18} />
+                  <span className="max-w-full truncate px-0.5">{WEAPON_LABEL[w].replace(' Tome', '')}</span>
                 </button>
               )
             })}
@@ -352,12 +359,12 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
             <button
               key={kind}
               type="button"
-              disabled={busy || playing || !actor || (kind === 'skill' && choices.length === 0) || (kind === 'attack' && familiarUsed)}
+              disabled={busy || playing || !actor || (kind === 'skill' && choices.length === 0)}
               aria-pressed={mode.kind === kind}
-              onClick={() => (kind === 'skill' ? setSheet('skills') : setMode(kind === 'attack' ? { kind } : { kind: 'guard' }))}
+              onClick={() => (kind === 'skill' ? setSheet('skills') : setMode(kind === 'attack' ? (ally && paired ? pairMode(pairOf({ kind: 'attack' }, ally)) : { kind }) : { kind: 'guard' }))}
               className={`min-h-12 rounded-sm border font-display text-[15px] font-bold disabled:opacity-40 ${mode.kind === kind ? 'border-accent bg-accent/15 text-accent' : 'border-hairline-strong bg-raised'}`}
             >
-              {kind === 'skill' ? `Skills${choices.length ? ` (${choices.length})` : ''}` : kind === 'attack' ? attackLabel : 'Guard'}
+              {kind === 'skill' ? `Skills${choices.length ? ` (${choices.length})` : ''}` : kind === 'attack' ? 'Attack' : 'Guard'}
             </button>
           ))}
         </div>
@@ -365,8 +372,9 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
       {sheet === 'skills' && actor && (
         <BottomSheet title={`${name(actor.id)} · ${actor.mp} MP`} onClose={() => setSheet(null)}>
+          {paired && <p className="mb-2 text-[12px] text-ink-soft">A Spell Blade’s act is an Arm and a Tome: a pick replaces that half.</p>}
           <ul className="space-y-1.5">
-            {choices.map((choice) => {
+            {[...choices].sort((a, b) => (ally?.weapons.indexOf(a.skill.node.weapon) ?? 0) - (ally?.weapons.indexOf(b.skill.node.weapon) ?? 0)).map((choice) => {
               const kinds = skillKinds(choice.skill.def)
               const weak = enemies.filter((u) => {
                 const w = state.input.enemies.find((e) => e.id === u.id)!.weaknesses
@@ -378,7 +386,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   <button type="button" disabled={!choice.affordable} onClick={() => pickSkill(choice)}
                     className="flex min-h-14 w-full items-center justify-between gap-2 rounded-sm bg-raised p-3 text-left disabled:opacity-40">
                     <span className="min-w-0">
-                      <span className="flex items-center gap-1 font-semibold">{kinds.map((k) => <KindMark key={k} kind={k} size={14} />)}{choice.skill.label}</span>
+                      <span className="flex items-center gap-1 font-semibold"><WeaponGlyph weapon={choice.skill.node.weapon} size={14} />{kinds.map((k) => <KindMark key={k} kind={k} size={14} />)}{choice.skill.label}</span>
                       <span className="block text-[11px] text-ink-soft">
                         {def.target === 'all' ? 'All rivals' : def.target === 'random' ? `${def.hits.length} hits on random rivals` : def.hits.length > 1 ? `${def.hits.length} hits` : 'One rival'}
                         {weak.length ? ` · weak: ${weak.map((u) => name(u.id)).join(', ')}` : ''}
@@ -389,21 +397,6 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 </li>
               )
             })}
-          </ul>
-        </BottomSheet>
-      )}
-
-      {sheet && typeof sheet === 'object' && 'bless' in sheet && actor && (
-        <BottomSheet title={`${sheet.bless.skill.label}: pick a blessing`} onClose={() => setSheet(null)}>
-          <ul className="space-y-1.5">
-            {blessingChoices(state, actor.id, sheet.bless.skill).map((b) => (
-              <li key={b.id}>
-                <button type="button" onClick={() => {
-                  setMode({ kind: 'skill', ref: sheet.bless.ref, blessing: b.id })
-                  setSheet(null)
-                }} className="flex min-h-12 w-full items-center rounded-sm bg-raised p-3 text-left font-semibold">{b.name}</button>
-              </li>
-            ))}
           </ul>
         </BottomSheet>
       )}
@@ -427,7 +420,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
               <p className="text-[14px] text-ink-soft">Equip a summon to use her Limit Break.</p>
             ) : (
               <ul className="space-y-1.5">
-                <li className="text-[12px] text-ink-soft">{pick === 2 ? `Pick two summons (the same one twice is fine). ${limitPicks.length}/2 picked.` : 'Her whole turn, at 0 MP. Pick one, then tap a rival.'}</li>
+                <li className="text-[12px] text-ink-soft">{pick === 2 ? `Pick an Arms skill and a Tome skill. ${limitPicks.length}/2 picked.` : 'Her whole turn, at 0 MP. Pick one, then tap a rival.'}</li>
                 {options.map((o) => (
                   <li key={o.key}>
                     <button type="button" onClick={() => {

@@ -1,7 +1,8 @@
-// What she wears (S7, D59): one piece per weapon her build wields, an armor and an accessory. Pieces from the stock bind
+// What she wears (S7, D59, D86): one piece per weapon her class wields (five), an armor and an accessory (a Ring, a
+// Charm or an Orb). Pieces from the stock bind
 // to her for good when equipped; her own pieces swap freely. Mastery rank k in a type lets her wear grade k.
 import {
-  activeBuild, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearPoints, ITEM_EFFECTS, RPG_BUILD, SaveRuleError, slotOf,
+  activeClass, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearPoints, ITEM_EFFECTS, SaveRuleError, slotOf,
   type GearSlot, type OwnedUma, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -21,8 +22,7 @@ function pieceLine(id: string): string {
 }
 
 export function GearCard({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
-  const build = activeBuild(outfit, uma)
-  const slots: GearSlot[] = [...(RPG_BUILD[build].weapons as GearSlot[]), 'armor', 'accessory']
+  const slots: GearSlot[] = [...classOf(uma, activeClass(outfit, uma)).weapons, 'armor', 'accessory']
   const [open, setOpen] = useState<GearSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
   const run = (op: () => Promise<void>) => op().then(() => { setOpen(null); setError(null) }, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))

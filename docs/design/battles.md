@@ -60,13 +60,16 @@ order; only the faces come from the private cast (D50).
 - Laurels are **draft numbers**: the pacing model before S4 sets them with the Exchange's prices.
 - A loss pays nothing and costs nothing.
 
-## Builds and skills (D49)
+## Classes and skills (D86)
 
-See [classes.md](classes.md) for the trees. In uma-rpg every Uma has six class builds, each with its own tree, its
-own equipped skills and the full point budget (2 points a level up to Lv50, plus 5 as each depth opens: 125 at Lv50).
-Depth d opens at class rank d and Uma Lv 1/10/20/30/40 (D77), so she has skills from Lv1; side skills at Lv 5/15/25/35/45
-(D73). The profile's first tab, **Skills**, picks her class and weapon pair and shows both trees. Skill slots: 3 at Lv1, one more at Lv10, 15, 20, 25, 30, 35 and
-40. A newly learned skill goes straight into a free slot; variants swap out for a refund, core skills are permanent.
+The classes are in [class-rework.md](class-rework.md): every class wields five weapons (a Brawler the five Arms, a
+Mage the five Tomes; a Summoner, Spell Blade or Cleric picks), acts once a turn, and has a tree per weapon. Depth d opens
+at class rank d and Uma Lv 1/10/20/30/40 (D77) and brings its core skill free; side skills cost a point per depth (one a
+level, 50 at Lv50) and open at Lv 5/15/25/35/45 (D73), one side of each fork, swapped freely. Skill slots: 3 at Lv1, one
+more at Lv10, 15, 20, 25, 30, 35 and 40; until she picks, her skills are chosen for her (each weapon's deepest core in
+turn, Arms and Tomes alternating). The profile's first tab, **Skills**, picks her class, its weapons and her skills.
+In a fight, Attack uses any of her five weapons; a Spell Blade's act is an Arms half and a Tome half; a Summoner's
+summon lingers and strikes again when she next summons.
 
 ## The rivals: PriConne's cast (D50)
 

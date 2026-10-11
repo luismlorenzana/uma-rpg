@@ -98,10 +98,10 @@ describe('rewards (D51)', () => {
 /** An invented Lv1 party: five Brawlers with no skills. */
 function member(id: string, level = 1): RpgProfile {
   return { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: ['greatsword', 'spear'],
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'],
     tier: 1, level, exp: 0, tree: [], legacy: [] }
 }
-const party = ['m1', 'm2', 'm3', 'm4', 'm5'].map((id) => ({ profile: member(id), loadout: [], familiar: 'greatsword' as const }))
+const party = ['m1', 'm2', 'm3', 'm4', 'm5'].map((id) => ({ profile: member(id), loadout: [] }))
 
 /** Attacks the weakest-shielded foe with each weapon in turn until the fight ends. */
 function autoplay(state: BattleState): BattleState {

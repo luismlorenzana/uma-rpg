@@ -1,13 +1,13 @@
 // The active party (D66): the five who fight, swappable from any world screen outside a fight. Each Uma shows her level
 // and the MP she carries between stages (Springs refill it).
 import {
-  activeBuild, applyPoints, buildOf, isBusy, isPartyFull, openFightOf, projectRpgStats, RPG_BUILD, rpgCarriedMp, rpgTreePointsEarned,
+  activeClass, applyPoints, classOf, isBusy, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
   rpgTreePointsSpent, SaveRuleError, umaPoints, umaProfile, worldRun,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import type { Campaign } from '../../battle/campaign'
-import { BUILD_LABEL } from '../../battle/labels'
+import { CLASS_LABEL } from '../../battle/labels'
 import { pagePath } from '../../hub/navigation'
 import { AtlasSprite } from '../../master/art'
 import { chooseActiveParty, useWorld } from '../../save/game'
@@ -37,14 +37,14 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const uma = world.umas[id]!
           const outfit = campaign.outfits.get(id)
           if (!outfit) return null
-          const build = activeBuild(outfit, uma)
-          const profile = umaProfile(outfit, uma, 1, build)
-          const points = umaPoints(uma, build)
+          const classId = activeClass(outfit, uma)
+          const profile = umaProfile(outfit, uma, 1, classId)
+          const points = umaPoints(uma, classId)
           const max = applyPoints(projectRpgStats(profile), points).stats.mp
           const mp = rpgCarriedMp(run, profile, points)
-          const spare = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n })))
+          const spare = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(classOf(uma, classId).tree.map((n) => ({ tier: 1, id: n })))
           return (
-            <button key={id} type="button" className="relative w-12" title={BUILD_LABEL[build]} aria-label={`${outfit.name}: Lv ${uma.level}, MP ${mp} of ${max}`}
+            <button key={id} type="button" className="relative w-12" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: Lv ${uma.level}, MP ${mp} of ${max}`}
               onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
               <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={48} className={isBusy(world, id) ? 'opacity-40 grayscale' : ''} />
               <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">{isBusy(world, id) ? 'Busy' : `Lv ${uma.level}`}</span>

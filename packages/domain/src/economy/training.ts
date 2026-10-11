@@ -1,11 +1,11 @@
 // The Learning District (S5, design §5–§6, D57, D70): five class halls each train their class's rank (1–6) and Weapon
 // Level (1–10); the Armory trains the Armor Level and the Jeweler the Accessory Level (1–10 each).
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import type { RpgClass } from '../rpg/kinds'
+import { RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass } from '../rpg/kinds'
 import { CLASS_MAX_RANK, classRankHours, MASTERY_MAX_RANK, masteryRankHours } from './pacing'
 
-/** Every weapon and armor type (gear types, §7.2). */
-export const WEAPON_TYPES = ['short-sword', 'bow', 'spear', 'axe', 'mage-staff', 'arcane-staff', 'greatsword', 'cleric-staff', 'summoner-tome'] as const
+/** Every weapon and armor type (gear types, §7.2): the ten weapons of D86, then the four armors. */
+export const WEAPON_TYPES = RPG_WEAPONS
 export const ARMOR_TYPES = ['garb', 'leather', 'mail', 'plate'] as const
 export const GEAR_TYPES = [...WEAPON_TYPES, ...ARMOR_TYPES] as const
 export type WeaponType = typeof WEAPON_TYPES[number]
@@ -14,19 +14,16 @@ export type GearType = typeof GEAR_TYPES[number]
 export const isGearType = (v: unknown): v is GearType => GEAR_TYPES.includes(v as GearType)
 
 export const GEAR_TYPE_LABEL: Readonly<Record<GearType, string>> = {
-  'short-sword': 'Short Sword', bow: 'Bow', spear: 'Spear', axe: 'Axe', 'mage-staff': 'Mage Staff', 'arcane-staff': 'Arcane Staff',
-  greatsword: 'Greatsword', 'cleric-staff': 'Cleric Staff', 'summoner-tome': 'Summoner Tome', garb: 'Garb', leather: 'Leather', mail: 'Mail', plate: 'Plate',
+  greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana',
+  'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
+  garb: 'Garb', leather: 'Leather', mail: 'Mail', plate: 'Plate',
 }
 
 type Style = keyof Aptitudes['strategy']
 
-/** The weapons each class wields (its builds' weapons). The Arcane Staff serves both the Mage and the Cleric. */
+/** The weapons each class can wield (D86): the Brawler the five Arms, the Mage the five Tomes, the others any. */
 export const CLASS_WEAPONS: Readonly<Record<RpgClass, readonly WeaponType[]>> = {
-  brawler: ['greatsword', 'spear', 'axe', 'bow'],
-  mage: ['mage-staff', 'arcane-staff'],
-  spellblade: ['short-sword'],
-  cleric: ['arcane-staff', 'cleric-staff'],
-  summoner: ['summoner-tome'],
+  brawler: RPG_WEAPON_KINDS, mage: RPG_TOMES, spellblade: RPG_WEAPONS, cleric: RPG_WEAPONS, summoner: RPG_WEAPONS,
 }
 const CLASS_IDS: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 /** The classes that wield a weapon type. */

@@ -281,6 +281,15 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
 }
 
 /** The Forge's picker: a type, a grade (her Gathering level opens them) and an accent (the effect it adds). */
+/** The Forge's types by family (D86): Arms, Tomes, armor, stat accessories and Orbs. */
+const FORGE_GROUPS: readonly (readonly [string, readonly EquipType[]])[] = [
+  ['Arms', EQUIP_TYPES.filter((t) => ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t))],
+  ['Tomes', EQUIP_TYPES.filter((t) => t.startsWith('tome-'))],
+  ['Armor', EQUIP_TYPES.filter((t) => ['garb', 'leather', 'mail', 'plate'].includes(t))],
+  ['Accessory', EQUIP_TYPES.filter((t) => t === 'ring' || t === 'charm')],
+  ['Orbs', EQUIP_TYPES.filter((t) => t.startsWith('orb-'))],
+]
+
 function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; level: number; queueing: boolean; onPick: (id: string, have: number) => void }) {
   const [type, setType] = useState<EquipType>('greatsword')
   const [grade, setGrade] = useState(1)
@@ -292,7 +301,14 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
     <div className="space-y-3">
       <div>
         <p className="text-micro mb-1">Type</p>
-        <div className="flex flex-wrap gap-1">{EQUIP_TYPES.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t]}</button>)}</div>
+        <div className="space-y-1">
+          {FORGE_GROUPS.map(([label, types]) => (
+            <div key={label} className="flex flex-wrap items-center gap-1">
+              <span className="w-16 shrink-0 text-[11px] text-ink-faint">{label}</span>
+              {types.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t].replace(' Tome', '').replace(' Orb', '')}</button>)}
+            </div>
+          ))}
+        </div>
       </div>
       <div>
         <p className="text-micro mb-1">Grade</p>

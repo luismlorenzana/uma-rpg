@@ -242,6 +242,11 @@ export class BattleScene extends Phaser.Scene {
         return this.wait(300)
       case 'limit':
         return this.cutIn(cue.actorId, cue.label ?? '')
+      case 'summon':
+        // A Summoner's lingering summon strikes again before it leaves (D86).
+        this.burst(cue.actorId, 0xc79bff, 14, -1)
+        this.label(cue.actorId, `${cue.label ?? 'Summon'}!`, '#e0c8ff')
+        return this.wait(360)
       case 'result':
         return this.result(cue.label)
       default:

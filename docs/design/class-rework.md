@@ -1,6 +1,6 @@
 # Class rework: the Class Sheet
 
-> **Status: approved by the owner, 2026-10-11 (D86), with three notes folded in:** hybrids may equip any of the ten
+> **Status: built and live (D86, 2026-10-11; save v14, battle engine v6).** Approved by the owner with three notes folded in: hybrids may equip any of the ten
 > Orbs; Light and Dark take the mirrored shapes (§2, §11.2); and every material family is produced and consumed
 > equally (§10). It replaces the five classes and six builds of [classes.md](classes.md) and [battles.md](battles.md).
 > Everything marked **(my call)** is a decision the owner didn't specify.

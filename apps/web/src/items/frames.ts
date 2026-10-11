@@ -1,6 +1,6 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
 // the indexes never ship in the main chunk; frames.test.ts pins every position against them.
-import { DISHES, EQUIP_TYPES, gearById, ITEM_FAMILIES, itemById, type ItemEffect } from '@rpg/domain'
+import { DISHES, gearById, isOrb, ITEM_FAMILIES, itemById, orbKind, rpgWeaponKind, type EquipType, type ItemEffect, type RpgDamageKind, type RpgWeapon } from '@rpg/domain'
 
 export const ATLAS_CELL = 32
 export type Sheet = 'items' | 'dishes' | 'gear'
@@ -10,7 +10,20 @@ export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
   gear: { w: 320, h: 480 },
 }
 
-export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect }
+/** `kind`: a badge for pieces drawn with another type's art (a Tome's element, an Orb's kind). */
+export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect; kind?: RpgDamageKind }
+/** The published gear atlas's rows, one per type it drew (P38), in its order. */
+export const GEAR_ART_ROWS = ['short-sword', 'bow', 'spear', 'axe', 'mage-staff', 'arcane-staff', 'greatsword', 'cleric-staff', 'summoner-tome',
+  'garb', 'leather', 'mail', 'plate', 'ring', 'charm'] as const
+/** The art a type is drawn with until its own exists (D86): Lance the Spear's, Katana the Short Sword's, Tomes the
+ * Summoner Tome's and Orbs the Ring's, badged with their kind. */
+export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
+  if (type === 'lance') return { row: 'spear' }
+  if (type === 'katana') return { row: 'short-sword' }
+  if (type.startsWith('tome-')) return { row: 'summoner-tome', kind: rpgWeaponKind(type as RpgWeapon) }
+  if (isOrb(type)) return { row: 'ring', kind: orbKind(type) }
+  return { row: type as (typeof GEAR_ART_ROWS)[number] }
+}
 
 const ITEM_ROW = new Map(ITEM_FAMILIES.map((f, i) => [f.id, i * 2]))
 const FARM_ROW = new Map(ITEM_FAMILIES.filter((f) => f.side === 'farming').map((f, i) => [f.id, i]))
@@ -39,7 +52,10 @@ export function iconFrame(id: string): IconFrame | null {
   const dish = DISH_FRAMES.get(id)
   if (dish) return dish
   const piece = gearById(id)
-  if (piece) return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: EQUIP_TYPES.indexOf(piece.type) * ATLAS_CELL, accent: piece.accent }
+  if (piece) {
+    const art = gearArt(piece.type)
+    return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, accent: piece.accent, ...(art.kind ? { kind: art.kind } : {}) }
+  }
   return null
 }
 

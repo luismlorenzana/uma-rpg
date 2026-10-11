@@ -3,9 +3,9 @@
 import {
   parseTrack, sweepMany, sellStock, buyTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, cutJobTime, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
-  actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat, setFamiliar,
-  setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
-  type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
+  actInFight, chooseClass, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat, setClassWeapons,
+  setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
 import { create } from 'zustand'
 import { conflictEnvelope, saveApi } from '../api/client'
@@ -109,12 +109,13 @@ const edit = async (change: (save: Save, now: string) => Save): Promise<void> =>
 }
 
 /** Switches the build she fights with (free, design §5). */
-export const pickBuild = (outfitId: string, build: RpgBuildId) => edit((s, now) => chooseBuild(s, outfitId, build, now))
+export const pickClass = (outfitId: string, classId: RpgClass) => edit((s, now) => chooseClass(s, outfitId, classId, now))
+export const pickWeapons = (outfitId: string, classId: RpgClass, weapons: RpgWeapon[]) => edit((s, now) => setClassWeapons(s, outfitId, classId, weapons, now))
 /** Learns a node in a build; throws SaveRuleError with the reason when she can't. */
-export const learn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) => edit((s, now) => learnSkill(s, outfit, build, nodeId, now))
-export const unlearn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, build, nodeId, now))
-export const equip = (outfit: BattleOutfit, build: RpgBuildId, loadout: string[]) => edit((s, now) => equipSkills(s, outfit, build, loadout, now))
-export const chooseFamiliar = (outfitId: string, kind: RpgWeaponKind) => edit((s, now) => setFamiliar(s, outfitId, kind, now))
+export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => learnSkill(s, outfit, classId, nodeId, now))
+export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, classId, nodeId, now))
+/** Equips skills in order, or null to have them chosen for her (D86). */
+export const equip = (outfit: BattleOutfit, classId: RpgClass, loadout: string[] | null) => edit((s, now) => equipSkills(s, outfit, classId, loadout, now))
 export const beginFight = (region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>
   edit((s, now) => startFight(s, region, nodeId, outfits, now))
 export const leaveFight = () => edit((s, now) => retreat(s, now))

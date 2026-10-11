@@ -1,4 +1,4 @@
-// Campaign battle vocabulary, engine v5 (docs/design/uma-rpg-classes.md, D278–D281, D310, D311).
+// Campaign battle vocabulary, engine v6 (D86, docs/design/class-rework.md; Limit Breaks D311).
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
 export type BattleSide = 'ally' | 'enemy'
@@ -13,12 +13,12 @@ export interface BattleAlly {
   tier: number
   level: number
   stats: RpgCoreStats
-  /** Learned nodes of this tier: skills, Short Sword follow-ups and Cleric blessings. */
+  /** Side skills learned in this tier; open depths give the core skills. */
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
   loadout: RpgNodeRef[]
-  /** The Summoner's Familiar form; ignored for other classes. */
-  familiar: RpgWeaponKind
+  /** The kind her Orb adds to every hit, for weaknesses only (D86). */
+  orb?: RpgDamageKind
   /** MP carried into this fight from the run; HP always starts full. */
   mp: number
   /** Deepest skill depth her class rank opens (S5); absent in older fights, which gate depths by level. */
@@ -40,7 +40,7 @@ export interface BattleEnemyMove {
   status?: 'burn' | 'slow' | 'mark' | 'weaken' | 'ward' | 'power-up'
   label: string
 }
-/** Weapon and element weaknesses (D279); each weak part of a hit removes one shield point. */
+/** Weapon and element weaknesses (D279); each weak hit removes one shield point. */
 export interface BattleWeaknesses { weapons: RpgWeaponKind[]; elements: RpgElement[] }
 export interface BattleEnemy {
   id: string
@@ -57,7 +57,7 @@ export interface BattleEnemy {
   moves: BattleEnemyMove[]
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
-export interface BattleInput { version: 5; seed: number; allies: BattleAlly[]; enemies: BattleEnemy[] }
+export interface BattleInput { version: 6; seed: number; allies: BattleAlly[]; enemies: BattleEnemy[] }
 
 export interface BattleUnit {
   id: string
@@ -80,32 +80,36 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 5
+  engineVersion: 6
   input: BattleInput
   round: number
   units: BattleUnit[]
-  /** One entry per action spent this round; Guard spends every remaining action. */
+  /** Allies who have acted this round: once each (D86). */
   acted: string[]
-  /** Summoners who used their Familiar this round. */
-  familiars: string[]
+  /** Each Summoner's lingering summon: it acts again at `scale` when she next summons (D86). */
+  summons: BattleSummon[]
   intents: BattleIntent[]
   outcome: 'active' | 'victory' | 'loss'
 }
+export interface BattleSummon { allyId: string; ref: RpgNodeRef; scale: number }
+/** One half of a Spell Blade's act: a skill, or an Attack with a weapon. */
+export interface BattleHalf { skill?: RpgNodeRef; weapon?: RpgWeapon }
 export type BattleAction =
-  | { kind: 'attack'; actorId: string; targetId: string; weapon?: RpgWeapon }
+  /** An Attack with one of her weapons (the first if none is named). A Spell Blade adds the other half as `pair`. */
+  | { kind: 'attack'; actorId: string; targetId: string; weapon?: RpgWeapon; pair?: BattleHalf }
   | { kind: 'guard'; actorId: string; targetId: string }
-  | { kind: 'skill'; actorId: string; targetId: string; skill: RpgNodeRef; blessing?: string }
+  | { kind: 'skill'; actorId: string; targetId: string; skill: RpgNodeRef; pair?: BattleHalf }
   /**
-   * A Limit Break spends a full charge and her whole turn (D311). A Brawler names a skill to cast twice (or a weapon to
-   * strike twice), a Spell Blade a skill to cast big (or none, for Triad Blade), a Summoner two summons to cast twice
-   * each; Mages and Clerics have a fixed one.
+   * A Limit Break spends a full charge and her turn (D311). A Brawler names a skill to cast twice (or a weapon to
+   * strike twice), a Summoner a summon, a Spell Blade an Arms skill and a Tome skill (`skills`); Mages and Clerics have
+   * a fixed one.
    */
   | { kind: 'limit'; actorId: string; targetId: string; skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon }
 export type BattleCue =
   | { kind: 'intent'; actorId: string; targetId: string; label: string }
   | { kind: 'hit'; actorId: string; targetId: string; amount: number; channel: BattleChannel | 'status';
       element: RpgDamageKind | null; weak: boolean; label?: string }
-  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'heal' | 'mp' | 'revive' | 'limit';
+  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'heal' | 'mp' | 'revive' | 'limit' | 'summon';
       actorId: string; targetId: string; amount?: number; label?: string }
   | { kind: 'result'; label: 'victory' | 'loss' }
 export type BattleError = 'terminal' | 'invalid-actor' | 'already-acted' | 'invalid-target' |

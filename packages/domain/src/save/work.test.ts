@@ -102,6 +102,8 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
   it('turns each Rush Ticket of a v11 save into two Time Tickets', () => {
     const old = JSON.parse(JSON.stringify(withUmas('101')))
     old.schemaVersion = 11
+    // Before v14 an Uma had builds, not classes (D86).
+    for (const uma of Object.values(old.tierWorlds['1'].umas) as Record<string, unknown>[]) { delete uma.classId; delete uma.classes; uma.build = null; uma.builds = {} }
     const wallet = old.tierWorlds['1'].wallet
     delete wallet.timeTickets
     wallet.rushTickets = 3

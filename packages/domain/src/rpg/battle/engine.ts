@@ -1,21 +1,21 @@
-// Deterministic campaign battle reducer, engine v5 (docs/design/uma-rpg-classes.md, D278–D281, D310, D311).
-// Octopath Traveler breaks with class hands: every hit has one to three parts, and each weak part removes one shield
-// point. Mages, Spell Blades and Summoners act twice a round; a Cleric's Arcane cast carries a blessing chosen from the
-// branch its element points to. Unbroken foes take half damage. Attacks and skills charge a Limit Break.
-import { rpgBlessingBranch, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+// Deterministic campaign battle reducer, engine v6 (D86, docs/design/class-rework.md; Limit Breaks D311).
+// Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
+// once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
+// next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
+import { rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
 import {
-  RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey, validRpgTree, validRpgWeapons,
-  type RpgDamageKind, type RpgStatusKind,
+  isRpgDamageKind, isRpgTome, RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey,
+  rpgWeaponKind, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
-  BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT, BATTLE_CURE_PERCENT,
+  BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT,
   BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
-  BATTLE_REBIRTH_PERCENT, BATTLE_REGEN_PERCENT, BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
-  BATTLE_ULTIMA, BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleSkillFor, type BattleSkill,
+  BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
+  BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleSkillFor, type BattleSkill,
 } from './skills'
 import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
-import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, BattleEnemyMove, BattleError,
+import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, BattleEnemyMove, BattleError, BattleHalf,
   BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit } from './types'
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
@@ -37,7 +37,7 @@ function stable(value: unknown): string {
   return JSON.stringify(value)
 }
 export function battleStateHash(state: BattleState): string {
-  return `rpg-battle-v5:${hashNumber(stable(state)).toString(16).padStart(8, '0')}`
+  return `rpg-battle-v6:${hashNumber(stable(state)).toString(16).padStart(8, '0')}`
 }
 
 const unit = (s: BattleState, id: string) => s.units.find((u) => u.id === id)
@@ -47,13 +47,9 @@ const living = (s: BattleState, side: BattleSide) => s.units.filter((u) => u.sid
 const maxHp = (s: BattleState, id: string) => allyOf(s, id)?.stats.hp ?? enemyOf(s, id)!.stats.hp
 const stacks = (u: BattleUnit, kind: RpgStatusKind) => u.statuses.find((x) => x.kind === kind)?.stacks ?? 0
 export const battleBroken = (u: BattleUnit): boolean => u.brokenAt > 0
-const learnedPassive = (ally: BattleAlly, key: string): boolean => ally.tree.some((ref) => rpgNode(ref.id)?.passive === key)
-/** Actions this Uma has spent this round, and how many she has. */
+/** Actions this Uma has spent this round, and how many she has left: one a round for every class (D86). */
 export const battleActionsUsed = (s: BattleState, id: string): number => s.acted.filter((x) => x === id).length
-export const battleActionsLeft = (s: BattleState, id: string): number => {
-  const ally = allyOf(s, id)
-  return ally ? Math.max(0, rpgHand(ally).actions - battleActionsUsed(s, id)) : 0
-}
+export const battleActionsLeft = (s: BattleState, id: string): number => (allyOf(s, id) ? Math.max(0, 1 - battleActionsUsed(s, id)) : 0)
 
 function addStatus(target: BattleUnit, kind: RpgStatusKind, count = 1, turns = BATTLE_STATUS_TURNS, cap = BATTLE_STATUS_STACK_CAP): void {
   const current = target.statuses.find((x) => x.kind === kind)
@@ -83,11 +79,11 @@ function validMove(m: BattleEnemyMove): boolean {
 function validAlly(a: BattleAlly): boolean {
   if (!SAFE_ID.test(a.id) || !RPG_CLASSES.includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons) ||
     !safeInt(a.tier, 1, 1_000_000) || !safeInt(a.level, 1, 50) || !validStats(a.stats as unknown as Record<string, unknown>, ALLY_STATS) ||
-    !safeInt(a.mp, 0, a.stats.mp) || !RPG_WEAPON_KINDS.includes(a.familiar) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
+    !safeInt(a.mp, 0, a.stats.mp) || (a.orb !== undefined && !isRpgDamageKind(a.orb)) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
     (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
     a.loadout.length > rpgActiveSlots(a.level) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
-  if (!validRpgTree(a) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id)?.skill)) return false
+  if (!validRpgTree(a) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
@@ -106,7 +102,7 @@ function validEnemy(e: BattleEnemy): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
 function validateInput(input: BattleInput): void {
-  if (!input || input.version !== 5 || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || input.version !== 6 || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies) || input.enemies.length < 1 || input.enemies.length > 5) {
     throw new RangeError('Invalid battle header')
   }
@@ -118,7 +114,7 @@ function validateInput(input: BattleInput): void {
 
 function clone(s: BattleState): BattleState {
   return { ...s, units: s.units.map((u) => ({ ...u, statuses: u.statuses.map((x) => ({ ...x })) })),
-    acted: [...s.acted], familiars: [...s.familiars], intents: s.intents.map((i) => ({ ...i })) }
+    acted: [...s.acted], summons: s.summons.map((x) => ({ ...x, ref: { ...x.ref } })), intents: s.intents.map((i) => ({ ...i })) }
 }
 const movesOf = (s: BattleState, u: BattleUnit): BattleEnemyMove[] => {
   const e = enemyOf(s, u.id)!
@@ -159,19 +155,20 @@ export function createBattle(source: BattleInput): BattleStep {
     ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0 })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
-  const state: BattleState = { engineVersion: 5, input, round: 1, units, acted: [], familiars: [], intents: [], outcome: 'active' }
+  const state: BattleState = { engineVersion: 6, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active' }
   state.intents = intentsFor(state)
   return { state, cues: reveal(state), hash: battleStateHash(state) }
 }
 
-/** A part is weak when its kind is on the foe's lists, or it is Light or Dark against a Hexed foe. */
+/** A hit is weak when its kind is on the foe's lists, or it is Light or Dark against a Hexed foe. */
 export function battleHitIsWeak(enemy: BattleEnemy, foe: BattleUnit | null, kind: RpgDamageKind | null): boolean {
-  if (kind === null || kind === 'ultima' || kind === 'staff') return false
+  if (kind === null) return false
   return (enemy.weaknesses.weapons as string[]).includes(kind) || (enemy.weaknesses.elements as string[]).includes(kind) ||
     (!!foe && stacks(foe, 'hex') > 0 && (kind === 'light' || kind === 'dark'))
 }
 
-interface HitOptions { special?: RpgSkillDef['special']; area?: boolean }
+/** `orb`: the attacker's Orb kind, which makes a hit weak too (D86), with no damage of its own. */
+interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orb?: RpgDamageKind }
 /** One part's final amount; shared by live play, previews and the simulator. */
 export function battleDamage(s: BattleState, attacker: BattleUnit, defender: BattleUnit, channel: BattleChannel,
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
@@ -181,9 +178,8 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   const defense = channel === 'physical' ? def.pdef : def.mdef
   let amount = Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
-  const weak = !!foe && attacker.side === 'ally' && battleHitIsWeak(foe, defender, kind)
+  const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || battleHitIsWeak(foe, defender, options.orb ?? null))
   if (weak) amount *= BATTLE_WEAK
-  if (kind === 'ultima') amount *= BATTLE_ULTIMA
   const physical = channel === 'physical'
   amount *= 1 + stacks(attacker, physical ? 'brave' : 'faith') * BATTLE_STATUS_STEP
   amount *= 1 + stacks(attacker, 'power-up') * BATTLE_FOE_STATUS_STEP
@@ -225,7 +221,7 @@ function chip(s: BattleState, actor: BattleUnit, foe: BattleUnit, points: number
   }
 }
 
-/** Applies one hit's parts; each weak part on a standing shield removes a point (two with a Breaker charge). */
+/** Applies one hit's parts; a weak hit on a standing shield removes a point (two with a Breaker charge). */
 function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgHit, scale: number, cues: BattleCue[],
   intercept: boolean, options: HitOptions = {}): { receiver: BattleUnit; weak: boolean } {
   const receiver = intercept ? guardOf(s, target) : target
@@ -280,7 +276,6 @@ function updatePhases(s: BattleState, cues: BattleCue[]): void {
   }
 }
 
-const MALICE: readonly RpgStatusKind[] = ['armor-break', 'mind-break', 'enfeeble']
 function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
   for (const u of s.units) if (u.side === 'enemy') u.guardingFor = null
   for (const intent of s.intents) {
@@ -313,14 +308,13 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     }
     if (terminal(s, cues)) return
   }
-  // A break ends after its second enemy phase; guards lapse; burn and regen tick before durations decay.
+  // A break ends after its second enemy phase; guards lapse; burn ticks before durations decay.
   for (const u of s.units) {
     if (u.side === 'ally') u.guardingFor = null
     if (u.hp <= 0) continue
     if (u.side === 'enemy' && battleBroken(u) && s.round >= u.brokenAt + BATTLE_BREAK_ROUNDS - 1) {
-      const malice = MALICE.reduce((sum, kind) => sum + stacks(u, kind), 0)
       u.brokenAt = 0
-      u.shield = Math.max(1, enemyOf(s, u.id)!.shield - (stacks(u, 'erosion') && malice >= 2 ? 1 : 0))
+      u.shield = enemyOf(s, u.id)!.shield
       cues.push({ kind: 'recover', actorId: u.id, targetId: u.id, amount: u.shield })
     }
     const burn = stacks(u, 'burn')
@@ -329,11 +323,6 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
       u.hp = Math.max(0, u.hp - amount)
       cues.push({ kind: 'hit', actorId: u.id, targetId: u.id, amount, channel: 'status', element: 'fire', weak: false, label: 'Burn' })
       if (u.hp === 0) { cues.push({ kind: 'ko', actorId: u.id, targetId: u.id }); continue }
-    }
-    const regen = stacks(u, 'regen')
-    if (regen && u.side === 'ally') {
-      heal(s, u, Math.round(maxHp(s, u.id) * BATTLE_REGEN_PERCENT * regen), u.id, cues, false)
-      if (stacks(u, 'sacred')) restoreMp(s, u, 0.01 * regen, u.id, cues)
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
   }
@@ -346,18 +335,10 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
   }
   s.round += 1
   s.acted = []
-  s.familiars = []
   s.intents = intentsFor(s)
   cues.push(...reveal(s))
 }
 
-function heal(s: BattleState, u: BattleUnit, amount: number, actorId: string, cues: BattleCue[], overflow: boolean): void {
-  const room = maxHp(s, u.id) - u.hp
-  const healed = Math.min(room, Math.max(0, amount))
-  u.hp += healed
-  if (healed) cues.push({ kind: 'heal', actorId, targetId: u.id, amount: healed })
-  if (overflow && amount > healed) addBarrier(s, u, amount - healed, actorId, cues)
-}
 function restoreMp(s: BattleState, u: BattleUnit, share: number, actorId: string, cues: BattleCue[]): void {
   const max = allyOf(s, u.id)!.stats.mp
   const gained = Math.min(max - u.mp, Math.round(max * share))
@@ -385,16 +366,15 @@ function randomFoe(s: BattleState, actorId: string, hit: number, salt = 'random'
 
 interface CastLog { tapped: BattleUnit; struck: BattleUnit[]; hitFoes: BattleUnit[]; weak: boolean }
 
-/** Resolves a skill's hits, extras and riders. */
-function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random'): CastLog {
+/** Resolves a skill's hits, extras, riders and status. */
+function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random', orb?: RpgDamageKind): CastLog {
   const log: CastLog = { tapped, struck: [], hitFoes: [], weak: false }
-  const options: HitOptions = { special: def.special }
-  const note = (foe: BattleUnit, hit: RpgHit, weak: boolean) => {
+  const options: HitOptions = { special: def.special, orb }
+  const note = (foe: BattleUnit, _hit: RpgHit, weak: boolean) => {
     if (!log.struck.includes(foe)) log.struck.push(foe)
     log.hitFoes.push(foe)
     log.weak ||= weak
-    if (def.rider && def.rider.per !== 'foe' && foe.hp > 0 &&
-      (def.rider.per === 'hit' || hit.parts.some((p) => p.kind === 'fire' || p.kind === 'ice' || p.kind === 'lightning'))) {
+    if (def.rider?.per === 'hit' && foe.hp > 0) {
       addStatus(foe, def.rider.status)
       cues.push({ kind: 'status', actorId: actor.id, targetId: foe.id, label: def.rider.status })
     }
@@ -419,7 +399,11 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
   }
   for (const hit of def.focus ?? []) if (tapped.hp > 0) { const r = strike(s, actor, tapped, hit, scale, cues, false, options); note(r.receiver, hit, r.weak) }
   if (def.splash) for (const foe of living(s, 'enemy')) if (foe !== tapped) { const r = strike(s, actor, foe, def.splash, scale, cues, false, options); note(r.receiver, def.splash, r.weak) }
-  if (def.sweep) for (const foe of living(s, 'enemy')) { const r = strike(s, actor, foe, def.sweep, scale, cues, false, options); note(r.receiver, def.sweep, r.weak) }
+  if (def.other) {
+    const others = living(s, 'enemy').filter((foe) => foe !== tapped)
+    const foe = others[hashNumber(`${s.input.seed}:${s.round}:${actor.id}:${s.acted.length}:${salt}:other`) % Math.max(1, others.length)]
+    if (foe) for (const hit of def.other) if (foe.hp > 0) { const r = strike(s, actor, foe, hit, scale, cues, false, options); note(r.receiver, hit, r.weak) }
+  }
   if (def.rider?.per === 'foe') {
     for (const foe of log.struck) if (foe.hp > 0) {
       addStatus(foe, def.rider.status, def.rider.stacks)
@@ -427,115 +411,70 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
     }
   }
   if (def.allies) for (const friend of living(s, 'ally')) addBarrier(s, friend, maxHp(s, friend.id) * BATTLE_BARRIER_PERCENT * def.allies.stacks, actor.id, cues)
+  if (def.status) applyStatus(s, actor, def.status, log, cues)
   return log
 }
 
-// --- Cleric blessings (D281) -----------------------------------------------------------------------------------------
-
-const BEST_FIT: Readonly<Record<string, 'atk' | 'matk' | 'mp' | 'hp'>> = {
-  brave: 'atk', breaker: 'atk', faith: 'matk', exalt: 'matk', clarity: 'mp',
-  barrier: 'hp', regen: 'hp', aegis: 'hp', cure: 'hp', rebirth: 'hp',
-}
-function rankAllies(s: BattleState, key: string): BattleUnit[] {
-  const by = BEST_FIT[key] ?? 'hp'
-  const allies = living(s, 'ally')
-  const order = (u: BattleUnit) => s.input.allies.findIndex((a) => a.id === u.id)
-  if (by === 'atk' || by === 'matk') return [...allies].sort((a, b) => allyOf(s, b.id)!.stats[by] - allyOf(s, a.id)!.stats[by] || order(a) - order(b))
-  if (by === 'mp') return [...allies].sort((a, b) => a.mp / Math.max(1, allyOf(s, a.id)!.stats.mp) - b.mp / Math.max(1, allyOf(s, b.id)!.stats.mp) || order(a) - order(b))
-  return [...allies].sort((a, b) => byHpShare(s)(a, b) || order(a) - order(b))
-}
-
-/** One blessing's stacks on one unit. */
-function bless(s: BattleState, cleric: BattleUnit, ally: BattleAlly, key: string, target: BattleUnit, count: number, cues: BattleCue[]): void {
-  const has = (k: string) => learnedPassive(ally, k)
-  const grace = ['brave', 'faith', 'clarity', 'breaker', 'exalt'].includes(key)
-  const malice = ['armor-break', 'mind-break', 'enfeeble', 'hex', 'shatter'].includes(key)
-  const turns = (grace && has('lasting-grace')) || (malice && has('lingering-malice')) || (!grace && !malice && has('lasting-sanctuary')) ? 3 : BATTLE_STATUS_TURNS
-  if (malice && battleBroken(target) && has('exploit')) count += 1
-  if (target.hp <= 0 && key !== 'rebirth') return
-  const label = (text: string) => cues.push({ kind: 'status', actorId: cleric.id, targetId: target.id, label: text, amount: count })
-  switch (key) {
-    case 'brave': case 'faith': addStatus(target, key, count, turns, has('zeal') ? 4 : BATTLE_STATUS_STACK_CAP); label(key); break
-    case 'exalt':
-      for (const kind of ['brave', 'faith'] as const) addStatus(target, kind, count, turns, has('zeal') ? 4 : BATTLE_STATUS_STACK_CAP)
-      label('exalt'); break
-    case 'breaker': addStatus(target, 'breaker', count, turns, has('overcharge') ? 5 : BATTLE_STATUS_STACK_CAP); label('breaker'); break
-    case 'clarity': restoreMp(s, target, BATTLE_CLARITY_PERCENT * count, cleric.id, cues); break
-    case 'armor-break': case 'mind-break': case 'enfeeble': addStatus(target, key, count, turns); label(key); break
-    case 'hex': {
-      // Hex does not stack: two marks a Doom Hex (+10% from everything).
-      const level = has('doom-hex') ? 2 : 1, length = has('deep-hex') ? 3 : turns
-      const current = target.statuses.find((x) => x.kind === 'hex')
-      if (current) { current.stacks = Math.max(current.stacks, level); current.turns = Math.max(current.turns, length) }
-      else addStatus(target, 'hex', level, length, 2)
-      label('hex'); break
+/** A Cleric skill's status (D86): on the foe it hit (every foe at depth 5), or on every ally. */
+function applyStatus(s: BattleState, actor: BattleUnit, status: NonNullable<RpgSkillDef['status']>, log: CastLog, cues: BattleCue[]): void {
+  const targets = status.to === 'allies' ? living(s, 'ally') : status.to === 'foes' ? living(s, 'enemy') : log.tapped.hp > 0 ? [log.tapped] : []
+  for (const target of targets) {
+    const label = () => cues.push({ kind: 'status', actorId: actor.id, targetId: target.id, label: status.key, amount: status.stacks })
+    switch (status.key) {
+      case 'clarity': restoreMp(s, target, BATTLE_CLARITY_PERCENT * status.stacks, actor.id, cues); break
+      case 'shatter': chip(s, actor, target, status.stacks, cues); break
+      // Hex doesn't stack: the foe is weak to Light and Dark while it lasts.
+      case 'hex': addStatus(target, 'hex', 1, status.turns, 1); label(); break
+      default: addStatus(target, status.key, status.stacks, status.turns); label()
     }
-    case 'shatter': chip(s, cleric, target, count, cues); break
-    case 'barrier': addBarrier(s, target, maxHp(s, target.id) * (has('bulwark') ? 0.1 : BATTLE_BARRIER_PERCENT) * count, cleric.id, cues); break
-    case 'regen':
-      addStatus(target, 'regen', count, turns); label('regen')
-      if (has('sacred-ground')) addStatus(target, 'sacred', count, turns)
-      break
-    case 'aegis': addStatus(target, 'aegis', count, turns); label('aegis'); break
-    case 'cure': heal(s, target, maxHp(s, target.id) * (has('miracle') ? 0.15 : BATTLE_CURE_PERCENT) * count, cleric.id, cues, has('overflow')); break
-    case 'rebirth':
-      if (target.hp <= 0 && !target.revived) {
-        target.hp = Math.max(1, Math.round(maxHp(s, target.id) * BATTLE_REBIRTH_PERCENT * count))
-        target.revived = true
-        target.statuses = []
-        cues.push({ kind: 'revive', actorId: cleric.id, targetId: target.id, amount: target.hp })
-      } else if (target.hp > 0) addBarrier(s, target, maxHp(s, target.id) * BATTLE_BARRIER_PERCENT * count, cleric.id, cues)
-      break
-  }
-  if (malice && has('erosion') && target.side === 'enemy') addStatus(target, 'erosion', 1, turns, 1)
-  if (grace && has('inspiration') && key !== 'clarity') restoreMp(s, target, 0.01 * count, cleric.id, cues)
-  if (!grace && !malice && has('purify') && target.hp > 0) {
-    const debuff = target.statuses.find((x) => ['burn', 'slow', 'mark', 'weaken'].includes(x.kind))
-    if (debuff) target.statuses = target.statuses.filter((x) => x !== debuff)
   }
 }
 
-/** The cast's shape decides how the blessing lands: Focused, Party or Scatter. */
-function blessing(s: BattleState, cleric: BattleUnit, ally: BattleAlly, key: string, def: RpgSkillDef, log: CastLog, cues: BattleCue[]): void {
-  const onFoes = ['armor-break', 'mind-break', 'enfeeble', 'hex', 'shatter'].includes(key)
-  const grace = ['brave', 'faith', 'clarity', 'breaker', 'exalt'].includes(key)
-  const knockedOut = () => s.units.filter((u) => u.side === 'ally' && u.hp <= 0 && !u.revived)
-  if (def.target === 'one') {
-    if (onFoes) {
-      if (log.tapped.hp > 0) bless(s, cleric, ally, key, log.tapped, 3, cues)
-      if (learnedPassive(ally, 'spreading-malice')) for (const foe of living(s, 'enemy')) if (foe !== log.tapped) bless(s, cleric, ally, key, foe, 1, cues)
-      return
-    }
-    const ranked = key === 'rebirth' && knockedOut().length ? knockedOut() : rankAllies(s, key)
-    if (ranked[0]) bless(s, cleric, ally, key, ranked[0], 3, cues)
-    if (grace && learnedPassive(ally, 'second-blessing') && ranked[1]) bless(s, cleric, ally, key, ranked[1], 1, cues)
-  } else if (def.target === 'all') {
-    const count = Math.min(2, def.hits.length) + (grace && learnedPassive(ally, 'abundant-grace') ? 1 : 0)
-    if (onFoes) { for (const foe of log.struck) if (foe.hp > 0) bless(s, cleric, ally, key, foe, count, cues); return }
-    const targets = key === 'rebirth' ? [...knockedOut(), ...living(s, 'ally')] : living(s, 'ally')
-    for (const friend of targets) bless(s, cleric, ally, key, friend, count, cues)
-  } else {
-    log.hitFoes.forEach((foe, i) => {
-      if (onFoes) { if (foe.hp > 0) bless(s, cleric, ally, key, foe, 1, cues); return }
-      const pool = key === 'rebirth' && knockedOut().length ? knockedOut() : living(s, 'ally')
-      const friend = pool[hashNumber(`${s.input.seed}:${s.round}:${cleric.id}:${i}:scatter`) % Math.max(1, pool.length)]
-      if (friend) bless(s, cleric, ally, key, friend, 1, cues)
-    })
-  }
+// --- Acting (D86) -------------------------------------------------------------------------------------------------
+
+/** One part of an act: an Attack with a weapon, or a known, equipped skill. */
+type Half = { kind: 'attack'; weapon: RpgWeapon } | { kind: 'skill'; skill: BattleSkill }
+function halfOf(ally: BattleAlly, h: BattleHalf | undefined): Half | null {
+  if (!h || typeof h !== 'object') return null
+  if (h.skill) { const k = battleSkillFor(ally, h.skill); return k ? { kind: 'skill', skill: k } : null }
+  return h.weapon && ally.weapons.includes(h.weapon) ? { kind: 'attack', weapon: h.weapon } : null
+}
+const halfIsTome = (h: Half): boolean => isRpgTome(h.kind === 'attack' ? h.weapon : h.skill.node.weapon)
+
+/** A Summoner's lingering summon acts again, then leaves (D86). */
+function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: BattleUnit, cues: BattleCue[]): void {
+  const index = s.summons.findIndex((x) => x.allyId === actor.id)
+  if (index < 0) return
+  const [summon] = s.summons.splice(index, 1)
+  const node = rpgNode(summon!.ref.id)
+  const foes = living(s, 'enemy')
+  if (!node || !foes.length) return
+  cues.push({ kind: 'summon', actorId: actor.id, targetId: target.id, label: node.name })
+  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', ally.orb)
+}
+function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): void {
+  s.summons = [...s.summons.filter((x) => x.allyId !== allyId), { allyId, ref: { tier: ref.tier, id: ref.id }, scale }]
 }
 
-/** The Cleric's blessings for a cast: learned core nodes of the branch its primary kind points to. */
-export function battleBlessings(ally: BattleAlly, primary: RpgDamageKind): { id: string; key: string; name: string }[] {
-  const branch = ally.classId === 'cleric' ? rpgBlessingBranch(primary) : null
-  if (!branch) return []
-  return ally.tree.flatMap((ref) => {
-    const n = rpgNode(ref.id)
-    return n && n.tree === 'cleric-staff' && n.branch === branch && n.variant === null && n.passive ? [{ id: n.id, key: n.passive, name: n.name }] : []
-  })
+/** Resolves one half of her act at her hand's power. */
+function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: BattleUnit, half: Half, scale: number, cues: BattleCue[], salt: string): void {
+  const foes = living(s, 'enemy')
+  if (!foes.length || actor.hp <= 0) return
+  const tapped = target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!
+  if (half.kind === 'attack') {
+    strike(s, actor, tapped, { power: 1, parts: [{ kind: rpgWeaponKind(half.weapon), share: 1 }] }, scale, cues, true, { orb: ally.orb })
+    return
+  }
+  const def = half.skill.def
+  if (def.summon) linger(s, actor, ally, tapped, cues)
+  const now = tapped.hp > 0 ? tapped : living(s, 'enemy').sort(byHpShare(s))[0]
+  if (!now) return
+  cast(s, actor, now, def, scale, cues, salt, ally.orb)
+  if (def.summon) stay(s, actor.id, half.skill.ref, def.summon.linger)
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if (previous.engineVersion !== 5 || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if (previous.engineVersion !== 6 || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)
@@ -549,58 +488,51 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
   const ally = allyOf(s, actor.id)!
   const hand = rpgHand(ally)
   const cues: BattleCue[] = []
-  let spent = 1
+  let charge: 'attack' | 'skill' | null = null
   if (action.kind === 'guard') {
     if (target.side !== 'ally' || target.id === actor.id) return invalid(previous, 'invalid-target')
     actor.guardingFor = target.id
-    spent = battleActionsLeft(s, actor.id)
     cues.push({ kind: 'guard', actorId: actor.id, targetId: target.id })
-  } else if (action.kind === 'attack') {
-    if (target.side !== 'enemy') return invalid(previous, 'invalid-target')
-    let kind: RpgDamageKind = 'staff'
-    if (hand.free.kind === 'weapon') {
-      const weapon = action.weapon ?? ally.weapons[0]!
-      if (!ally.weapons.includes(weapon)) return invalid(previous, 'invalid-skill')
-      kind = weapon as RpgDamageKind
-    } else if (hand.free.kind === 'short-sword') kind = 'short-sword'
-    else if (hand.free.kind === 'familiar') {
-      if (s.familiars.includes(actor.id)) return invalid(previous, 'already-acted')
-      s.familiars.push(actor.id)
-      kind = ally.familiar
-    }
-    strike(s, actor, target, { power: hand.free.power, parts: [{ kind, share: 1 }] }, 1, cues, true)
   } else if (action.kind === 'limit') {
-    // A full charge and her whole turn, at 0 MP (D311).
+    // A full charge and her turn, at 0 MP (D311).
     if (target.side !== 'enemy') return invalid(previous, 'invalid-target')
     if (actor.limit < BATTLE_LIMIT_MAX || battleActionsUsed(s, actor.id) > 0) return invalid(previous, 'limit-not-ready')
     const plan = battleLimitPlan(ally, { skill: action.skill, skills: action.skills, weapon: action.weapon })
     if (!plan) return invalid(previous, 'invalid-skill')
     actor.limit = 0
-    spent = hand.actions
     cues.push({ kind: 'limit', actorId: actor.id, targetId: target.id, label: plan.name })
+    if (plan.linger) linger(s, actor, ally, target, cues)
     plan.casts.forEach((c, i) => {
       const foes = living(s, 'enemy')
       if (!foes.length || actor.hp <= 0) return
-      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random')
+      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random', ally.orb)
     })
+    if (plan.linger) stay(s, actor.id, plan.linger.ref, plan.linger.scale)
   } else {
-    if (!action.skill || typeof action.skill !== 'object') return invalid(previous, 'invalid-skill')
-    const legal = battleActorSkill(s, actor.id, action.skill)
-    if (!legal) return invalid(previous, 'invalid-skill')
     if (target.side !== 'enemy') return invalid(previous, 'invalid-target')
-    let key: string | null = null
-    if (action.blessing !== undefined) {
-      const choice = battleBlessings(ally, legal.def.primary).find((b) => b.id === action.blessing)
-      if (!choice) return invalid(previous, 'invalid-skill')
-      key = choice.key
+    let first: Half | null
+    if (action.kind === 'attack') {
+      const weapon = action.weapon ?? ally.weapons[0]!
+      first = ally.weapons.includes(weapon) ? { kind: 'attack', weapon } : null
+    } else {
+      first = action.skill && typeof action.skill === 'object' ? halfOf(ally, { skill: action.skill }) : null
     }
-    if (actor.mp < legal.mp) return invalid(previous, 'insufficient-mp')
-    actor.mp -= legal.mp
-    const log = cast(s, actor, target, legal.def, legal.power, cues)
-    if (key) blessing(s, actor, ally, key, legal.def, log, cues)
+    if (!first) return invalid(previous, 'invalid-skill')
+    const halves: Half[] = [first]
+    if (hand.pair) {
+      // A Spell Blade's act is one Arms half and one Tome half (D86).
+      const second = halfOf(ally, action.pair)
+      if (!second || halfIsTome(second) === halfIsTome(first)) return invalid(previous, 'invalid-skill')
+      halves.push(second)
+    } else if (action.pair !== undefined) return invalid(previous, 'invalid-skill')
+    const mp = halves.reduce((sum, h) => sum + (h.kind === 'skill' ? h.skill.mp : 0), 0)
+    if (actor.mp < mp) return invalid(previous, 'insufficient-mp')
+    actor.mp -= mp
+    halves.forEach((h, i) => resolveHalf(s, actor, ally, target, h, hand.power, cues, i ? 'pair' : 'random'))
+    charge = halves.some((h) => h.kind === 'skill') ? 'skill' : 'attack'
   }
-  if (action.kind === 'attack' || action.kind === 'skill') actor.limit = Math.min(BATTLE_LIMIT_MAX, actor.limit + battleLimitGain(hand, action.kind))
-  for (let i = 0; i < spent; i += 1) s.acted.push(actor.id)
+  if (charge) actor.limit = Math.min(BATTLE_LIMIT_MAX, actor.limit + battleLimitGain(charge))
+  s.acted.push(actor.id)
   if (!terminal(s, cues)) {
     updatePhases(s, cues)
     if (living(s, 'ally').every((u) => battleActionsLeft(s, u.id) <= 0)) resolveEnemies(s, cues)
