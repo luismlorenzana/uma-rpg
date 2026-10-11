@@ -1,7 +1,7 @@
 // What each place shows (D43): a quick look in the side panel (Peek), a full page (Page) and a header counter. Places
 // without a Peek use the honest preview; places without a Page have no Enter button. Every body is a lazy chunk.
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
-import type { Place } from '@rpg/domain'
+import { FACILITIES, type Place } from '@rpg/domain'
 
 export interface PeekProps {
   place: Place
@@ -38,4 +38,18 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   account: {
     Page: lazy(() => import('./account/AccountPage')),
   },
+  warehouse: {
+    Page: lazy(() => import('./warehouse/WarehousePage')),
+  },
+  exchange: {
+    Page: lazy(() => import('./exchange/ExchangePage')),
+    Counter: lazy(() => import('./scenario-gate/LaurelCounter')),
+  },
+}
+
+// Every gathering site and refining station shares one page (S4).
+const FacilityPage = lazy(() => import('./work/FacilityPage'))
+const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ default: m.FacilityPeek })))
+for (const f of FACILITIES) {
+  if (f.kind === 'gather' || f.kind === 'refine') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
 }

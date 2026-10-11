@@ -185,7 +185,7 @@ const TOWN: Place[] = [
   {
     id: 'warehouse', page: 'town', kind: 'town', name: 'Warehouse', opensIn: 'S4', slots: 0, at: { x: 0.24, y: 0.6 },
     blurb: 'Every item you own: ingredients, materials, dishes and gear.',
-    details: ['160 raw and 160 refined items across 16 families', 'Fills up once jobs open in S4'],
+    details: ['160 raw and 160 refined items across 16 families', 'Filled by the sites, the Pantry, the Workbench and the Exchange'],
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
@@ -237,4 +237,4 @@ export function isOpen(place: Place, current: SliceId): boolean {
 }
 
 /** The slice the deployed build implements. */
-export const CURRENT_SLICE: SliceId = 'S3'
+export const CURRENT_SLICE: SliceId = 'S4'

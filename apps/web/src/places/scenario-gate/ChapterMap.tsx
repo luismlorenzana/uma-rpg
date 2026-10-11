@@ -1,7 +1,7 @@
 // A chapter's map (S3): pick a party, then walk the nodes top to bottom. Fights open the nodes below them, camps refill
 // MP, and the Finals' three routes each end in a champion. Every party keeps its own run (D52).
 import {
-  activeBuild, buildOf, isPartyFull, openFightOf, rpgTreePointsEarned, rpgTreePointsSpent, RPG_STAGE_NAMES, rpgNodeStatus, runOf, SaveRuleError, type RpgCampaignChapter, type RpgMapNode,
+  activeBuild, buildOf, isBusy, isPartyFull, openFightOf, rpgTreePointsEarned, rpgTreePointsSpent, sweepBlock, type FightResult as Result, RPG_STAGE_NAMES, rpgNodeStatus, runOf, SaveRuleError, type RpgCampaignChapter, type RpgMapNode,
   type RpgNodeStatus,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -11,7 +11,8 @@ import { BUILD_LABEL, ElementGlyph, formatLevel, WeaknessIcons } from '../../bat
 import { castArtUrl } from '../../content/cast'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
 import { AtlasSprite } from '../../master/art'
-import { beginFight, rest, useWorld } from '../../save/game'
+import { beginFight, rest, sweep, useWorld } from '../../save/game'
+import { FightResult } from './FightResult'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
 
@@ -57,6 +58,7 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
     return stored !== null && full.some((f) => f.i === stored) ? stored : full[0]?.i ?? null
   })
   const [open, setOpen] = useState<RpgMapNode | null>(null)
+  const [swept, setSwept] = useState<{ result: Result; nodeId: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const setParty = (i: number) => {
     setPartyState(i)
@@ -96,6 +98,17 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
       setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.')
     }
   }
+  const doSweep = async (nodeId: string) => {
+    if (party === null) return
+    setError(null)
+    try {
+      const result = await sweep(chapter, party, nodeId)
+      setOpen(null)
+      setSwept({ result, nodeId })
+    } catch (err) {
+      setError(err instanceof SaveRuleError ? err.message : 'Couldn’t sweep.')
+    }
+  }
   const camp = async (node: RpgMapNode) => {
     if (party === null) return
     try {
@@ -130,8 +143,8 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
             return (
               <button key={id} type="button" className="relative" title={build ? BUILD_LABEL[build] : ''} aria-label={`${outfit?.name ?? id}: skills`}
                 onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
-                <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={40} />
-                <span className="absolute bottom-0 left-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {uma.level}</span>
+                <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={40} className={isBusy(world, id) ? 'opacity-40 grayscale' : ''} />
+                <span className="absolute bottom-0 left-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">{isBusy(world, id) ? 'Busy' : `Lv ${uma.level}`}</span>
                 {spare > 0 && <span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-page bg-accent" />}
               </button>
             )
@@ -189,10 +202,18 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
             <button type="button" disabled={status(open.id) === 'locked' || !!run?.battle} onClick={() => void camp(open)}
               className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">Rest · refill MP</button>
           ) : (
-            <button type="button" disabled={status(open.id) === 'locked' || !!elsewhere?.battle} onClick={() => void fight(open)}
-              className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-              {status(open.id) === 'locked' ? 'Clear a path to it first' : elsewhere?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
-            </button>
+            <div className="flex gap-2">
+              <button type="button" disabled={status(open.id) === 'locked' || !!elsewhere?.battle} onClick={() => void fight(open)}
+                className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
+                {status(open.id) === 'locked' ? 'Clear a path to it first' : elsewhere?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
+              </button>
+              {open.kind === 'fight' && status(open.id) === 'cleared' && party !== null && (
+                <button type="button" disabled={!!sweepBlock(world, chapter, party, open.id)} onClick={() => void doSweep(open.id)}
+                  className="min-h-12 flex-1 rounded-sm border border-hairline-strong font-semibold disabled:opacity-40" aria-label={sweepBlock(world, chapter, party, open.id) ?? 'Sweep with a ticket'}>
+                  Sweep · {world.wallet.sweepTickets}
+                </button>
+              )}
+            </div>
           )}>
           <p className="mb-2 text-[13px] text-ink-soft">
             {open.kind === 'camp' ? 'Rest here to refill every member’s MP.' : `${formatLevel(open.level)} · ${open.kind === 'fight' ? 'Rivals' : open.kind === 'boss' ? 'Champion' : open.stage >= 3 ? 'Vanguard' : 'Sub-boss'}`}
@@ -218,6 +239,8 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
           {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
         </BottomSheet>
       )}
+      {swept && <FightResult campaign={campaign} chapter={chapter} result={swept.result} onMap={() => setSwept(null)} againLabel={`Sweep again · ${world.wallet.sweepTickets}`}
+        onAgain={() => { if (party !== null && !sweepBlock(world, chapter, party, swept.nodeId)) void sweep(chapter, party, swept.nodeId).then((result) => setSwept({ result, nodeId: swept.nodeId })) }} />}
     </div>
   )
 }

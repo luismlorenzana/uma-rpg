@@ -8,7 +8,7 @@ describe('save', () => {
   it('starts Tier 1 with 20 Unlock Tickets and nothing else', () => {
     const save = newSave('  Luis  ', NOW)
     expect(save.account.trainerName).toBe('Luis')
-    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0 })
+    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
     expect(STARTING_UNLOCK_TICKETS).toBe(20)
   })
 
@@ -35,7 +35,7 @@ describe('save', () => {
     expect(() => parseSave({ ...save, tierWorlds: { '1': { ...save.tierWorlds['1'], wallet: { unlockTickets: -1, shards: 0, laurels: 0 } } } })).toThrow(/unlockTickets/)
     expect(() => parseSave({ ...save, tierWorlds: { x: save.tierWorlds['1'] } })).toThrow(/positive integers/)
     expect(() => parseSave({ ...save, account: { ...save.account, trainerName: ' Luis' } })).toThrow(/trainerName/)
-    expect(() => parseSave({ ...save, schemaVersion: 4 })).toThrow(/schemaVersion/)
+    expect(() => parseSave({ ...save, schemaVersion: 5 })).toThrow(/schemaVersion/)
   })
 
   it('parses a PUT body', () => {

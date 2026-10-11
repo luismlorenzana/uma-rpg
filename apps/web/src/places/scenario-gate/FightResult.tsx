@@ -4,12 +4,13 @@ import type { Campaign } from '../../battle/campaign'
 import { AtlasSprite } from '../../master/art'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
-export function FightResult({ campaign, chapter, result, onAgain, onMap }: {
+export function FightResult({ campaign, chapter, result, onAgain, onMap, againLabel }: {
   campaign: Campaign
   chapter: RpgCampaignChapter
   result: Result
   onAgain: () => void
   onMap: () => void
+  againLabel?: string
 }) {
   const win = result.outcome === 'victory'
   const node = chapter.nodes.find((n) => n.id === result.nodeId)
@@ -18,11 +19,11 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap }: {
       <div className="pt-safe min-h-0 flex-1 overflow-y-auto p-4">
         <p className="text-[12px] text-ink-faint">{chapter.title} · {node?.name}</p>
         <h1 className={`font-display text-4xl font-extrabold ${win ? 'text-accent' : 'text-ink-soft'}`}>{win ? 'Victory!' : 'Defeated'}</h1>
-        <p className="text-[13px] text-ink-soft">{result.rounds} round{result.rounds === 1 ? '' : 's'}</p>
+        <p className="text-[13px] text-ink-soft">{result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}` : 'Swept with a ticket: EXP and Shards, no Laurels'}</p>
         {win ? (
           <>
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-laurel"><LaurelIcon size={18} />+{result.laurels} Laurels</span>
+              {result.laurels > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-laurel"><LaurelIcon size={18} />+{result.laurels} Laurels</span>}
               {result.shards > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-shard"><ShardIcon size={18} />+{result.shards} Shard{result.shards > 1 ? 's' : ''}</span>}
               {result.tickets > 0 && <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-semibold text-ticket"><TicketIcon size={18} />+{result.tickets} Unlock Ticket{result.tickets > 1 ? 's' : ''}!</span>}
             </div>
@@ -56,7 +57,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap }: {
         )}
       </div>
       <div className="pb-safe grid grid-cols-2 gap-2 border-t border-hairline bg-panel p-3">
-        <button type="button" onClick={onAgain} className="min-h-12 rounded-sm border border-hairline-strong font-semibold">{win ? 'Fight again' : 'Retry'}</button>
+        <button type="button" onClick={onAgain} className="min-h-12 rounded-sm border border-hairline-strong font-semibold">{againLabel ?? (win ? 'Fight again' : 'Retry')}</button>
         <button type="button" onClick={onMap} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">Back to the map</button>
       </div>
     </div>

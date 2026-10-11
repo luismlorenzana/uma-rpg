@@ -15,11 +15,12 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Save and sync (D32, D45, D52)
 
-- One snapshot per account: `{ schemaVersion: 3, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
+- One snapshot per account: `{ schemaVersion: 4, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
   outfits by id: unlock time, level, EXP, the class `build` she fights as and her `builds`: tree, equipped skills,
-  Familiar), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), and `runs` (one per party per
-  chapter: wins, carried MP, and the open fight as its frozen input plus every action).
-  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; v1 and v2 saves parse into v3
+  Familiar, and her two `professions`), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), `runs`
+  (one per party per chapter: wins, carried MP, and the open fight as its frozen input plus every action), `items`
+  (the Warehouse) and `facilities` (level and job slots). The wallet holds Rush and Sweep Tickets too.
+  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v4
   (device rows on boot, server rows on read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets;
   `save/battle.ts`: builds, skills, fights and their rewards) are pure and return a new save.
 - The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old
@@ -42,6 +43,17 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
   `ChapterInfo` (five chapters per tier, ten levels each).
 - Art needs the owner's token, so images are fetched with it and shown from session blob URLs; the service worker caches
   the bytes.
+
+## Work, items and the Exchange (D54–D56)
+
+- `@rpg/domain` holds the item catalog (`items/`, generated from the art index and checked against it by a web
+  test), the pacing numbers and the job model (`economy/`), and the rules over the save (`save/work.ts`: start,
+  collect, recall, rush, upgrade; `save/exchange.ts`: buy, sweep). Jobs are computed from their start time.
+- Item icons come from `@luismlorenzana/uma-art` (uma-platform's P37): one atlas PNG that Vite hashes into the build
+  (precached by the service worker), drawn by CSS position (`items/ItemIcon.tsx`). The item's frame is computed from
+  the catalog order, so the 57 KB index never ships.
+- One page serves all 16 sites and both refining stations (`places/work/FacilityPage.tsx`). The Hub's place buttons
+  read the world to draw working Umas' faces, progress rings and Ready tags (`hub/PlaceTargets.tsx`).
 
 ## Private content (D50)
 
@@ -83,4 +95,4 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Budgets
 
-Main JS ≤ 180 KB gzip (146 KB at S1, 175 KB at S3: the save parser replays open fights, so the battle engine and class catalog ship in the main chunk; the next slice should split them out or raise the budget on purpose). Phaser (Hub and battle stage), Firebase, master data parsing and each place page are lazy chunks.
+Main JS ≤ 230 KB gzip (D56; 146 KB at S1, 175 KB at S3, 186 KB at S4: the save parser validates fights, items and jobs, so the domain rules ship in the main chunk). Phaser (Hub and battle stage), Firebase, master data parsing and each place page are lazy chunks.

@@ -77,7 +77,7 @@ describe('rewards (D51)', () => {
   })
 
   it('pays Laurels by kind and tier, and a Shard at Lv10, 20, 30, 40 and 50', () => {
-    expect([rpgBattleLaurels('fight', 1), rpgBattleLaurels('boss', 1), rpgBattleLaurels('boss', 2)]).toEqual([2, 10, 20])
+    expect([rpgBattleLaurels('fight', 1), rpgBattleLaurels('boss', 1), rpgBattleLaurels('boss', 2)]).toEqual([10, 50, 100])
     expect([rpgShardsBetween(9, 10), rpgShardsBetween(10, 11), rpgShardsBetween(8, 31), rpgShardsBetween(49, 50)]).toEqual([1, 0, 3, 1])
   })
 

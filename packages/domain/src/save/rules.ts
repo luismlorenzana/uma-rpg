@@ -1,9 +1,11 @@
 // Collection and party rules (S2): pure functions over the save that return a new save or throw SaveRuleError.
 // Design: game-design.md §3 (unlocks, D44 final), §6 (parties, one per Uma: D46), D47 (Shards → Tickets).
-import { normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SHARDS_PER_TICKET, type Party, type Save, type TierWorld, type Wallet } from './save'
+import { workOf } from './status'
+import { newOwnedUma, normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SHARDS_PER_TICKET, type Party, type Save, type TierWorld, type Wallet } from './save'
 
 export type SaveRuleReason = 'no-ticket' | 'already-owned' | 'not-owned' | 'bad-party' | 'bad-slot' | 'bad-name' | 'no-world'
   | 'bad-build' | 'cannot-learn' | 'bad-loadout' | 'cannot-fight' | 'in-fight'
+  | 'no-items' | 'bad-count' | 'busy' | 'bad-job' | 'no-laurels'
 
 export class SaveRuleError extends Error {
   readonly reason: SaveRuleReason
@@ -34,7 +36,7 @@ export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER
   return withWorld(save, tier, {
     ...world,
     wallet: { ...world.wallet, unlockTickets: world.wallet.unlockTickets - 1 },
-    umas: { ...world.umas, [outfitId]: { unlockedAt: now, level: 1, exp: 0, build: null, builds: {} } },
+    umas: { ...world.umas, [outfitId]: newOwnedUma(now) },
   }, now)
 }
 
@@ -82,9 +84,9 @@ export function addShards(wallet: Wallet, shards: number): Wallet {
   return { ...wallet, unlockTickets: wallet.unlockTickets + Math.floor(total / SHARDS_PER_TICKET), shards: total % SHARDS_PER_TICKET }
 }
 
-/** Busy at a site or training (D16). Nothing can make an Uma busy until S4 adds assignments. */
-export function isBusy(_world: TierWorld, _outfitId: string): boolean {
-  return false
+/** Busy at a site, a station or training (D16): she shows greyed out in her party and can't fight until recalled. */
+export function isBusy(world: TierWorld, outfitId: string): boolean {
+  return workOf(world, outfitId) !== null
 }
 
 export function isPartyFull(party: Party): boolean {

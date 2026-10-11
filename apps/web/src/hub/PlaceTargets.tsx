@@ -1,8 +1,27 @@
 // The tappable, accessible layer over the Phaser map (D33): one button per place at its registry position, with its
-// name, Uma slot pips and the slice badge. The canvas underneath only draws.
-import { CURRENT_SLICE, isOpen, type Place } from '@rpg/domain'
+// name, its Uma slots (the face of whoever works there, ringed by her job's progress, D22) and the slice badge. The
+// canvas underneath only draws.
+import { CURRENT_SLICE, facilityOf, facilitySpec, isOpen, jobFinished, jobProgress, type Place, type TierWorld } from '@rpg/domain'
+import { AtlasSprite } from '../master/art'
+import { useMaster } from '../master/master'
+import { useWorld } from '../save/game'
+import { useNow } from '../ui/useNow'
+
+/** Places with something to collect. */
+export function readyPlaces(world: TierWorld | null, now: string): Set<string> {
+  const ready = new Set<string>()
+  for (const [id, f] of Object.entries(world?.facilities ?? {})) {
+    if (f.jobs.some((j) => j && (jobFinished(j, now) > j.collected || jobFinished(j, now) >= j.count))) ready.add(id)
+  }
+  return ready
+}
 
 export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (place: Place) => void }) {
+  const world = useWorld()
+  const now = useNow(15_000)
+  const master = useMaster()
+  const art = master.status === 'ready' ? master.view.art : null
+  const ready = readyPlaces(world, now)
   return (
     <div className="absolute inset-0">
       {places.map((place) => {
@@ -24,11 +43,20 @@ export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (pla
                 </span>
               )}
             </span>
+            {open && ready.has(place.id) && (
+              <span className="absolute right-6 top-0 rounded-full bg-success px-1.5 text-[10px] font-bold leading-4 text-white shadow-2">Ready</span>
+            )}
             {place.slots > 0 && (
               <span className="mt-0.5 flex gap-1" aria-hidden="true">
-                {Array.from({ length: place.slots }, (_, i) => (
-                  <span key={i} className="size-2 rounded-full border border-white/50 bg-black/30" />
-                ))}
+                {(open && world && facilitySpec(place.id) ? facilityOf(world, place.id).jobs : Array.from({ length: place.slots }, () => null)).map((job, i) =>
+                  job ? (
+                    <span key={i} className="rounded-full p-[2px]" style={{ background: `conic-gradient(#d6a23e ${jobProgress(job, now) * 360}deg, rgb(255 255 255 / 0.18) 0)` }}>
+                      <AtlasSprite art={art} family="outfit-icons" frameKey={job.outfitId} size={18} className="rounded-full" />
+                    </span>
+                  ) : (
+                    <span key={i} className="mt-[5px] size-2 rounded-full border border-white/50 bg-black/30" />
+                  ),
+                )}
               </span>
             )}
             <span className={`mt-0.5 max-w-full truncate rounded-full px-2 py-0.5 text-[11px] font-semibold leading-4 shadow-2 ${open ? 'bg-accent text-accent-ink' : 'bg-sunken/85 text-ink'}`}>

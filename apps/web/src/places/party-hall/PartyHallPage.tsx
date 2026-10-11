@@ -1,12 +1,12 @@
 // The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); busy
-// members show greyed out (D16, none until S4).
-import { isBusy, isPartyFull, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
+// members show greyed out (D16) and can be recalled from their job here.
+import { isBusy, isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { nameParty, setSlot, useWorld } from '../../save/game'
+import { nameParty, recall, setSlot, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
@@ -143,6 +143,14 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
             <button type="button" onClick={() => navigate(`/town/stable/outfit/${party.slots[acting]}`, { state: { fromHub: true } })} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
               View profile
             </button>
+            {(() => {
+              const work = workOf(world, party.slots[acting] ?? '')
+              return work ? (
+                <button type="button" onClick={() => { void run(recall(work.placeId, work.slot)); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
+                  Recall from {placeById(work.placeId)?.name ?? work.placeId} · what's made is kept
+                </button>
+              ) : null
+            })()}
             <button type="button" onClick={() => { void run(setSlot(index, acting, null)); setActing(null) }} className="min-h-12 w-full rounded-sm border border-danger/50 font-semibold text-danger">
               Remove from {party.name}
             </button>

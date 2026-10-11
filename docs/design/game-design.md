@@ -335,11 +335,11 @@ Side ingredients and extra materials are spread so **every family is in demand**
 4. Farming & Cooking and Gathering & Crafting share one XP curve, so maxing either takes the same time.
 5. Extra Stats and equipment add about the same share of power (§7.3).
 
-### 8.6 Jobs **[Proposed]**
+### 8.6 Jobs **[Settled, D55]**
 
 - Sites and stations run **timed jobs** that finish while the app is closed. Durations grow with grade.
 - A finished job pays its item and profession XP to the Uma who worked it.
-- Exact timers come from a pacing model in the balance pass.
+- Rules in [farm.md](farm.md); timers in [pacing.md](pacing.md) (D54).
 
 ## 9. Hub **[Owner]**, with layout **[Proposed]**
 

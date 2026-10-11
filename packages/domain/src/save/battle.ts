@@ -16,6 +16,7 @@ import {
 } from '../rpg/rules'
 import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassBuild, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
+import { workOf } from './status'
 
 /** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
 export interface BattleOutfit {
@@ -125,10 +126,6 @@ export function openFightOf(world: TierWorld, party: number): RpgRun | null {
   return Object.values(world.runs).find((r) => r.party === party && r.battle) ?? null
 }
 
-/** True when the Uma is in a fight that hasn't ended: her party can't change until it does. */
-export function isInFight(world: TierWorld, outfitId: string): boolean {
-  return Object.values(world.runs).some((r) => r.battle?.input.allies.some((a) => a.id === outfitId))
-}
 
 function withRun(save: Save, run: RpgRun, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
@@ -159,6 +156,8 @@ export function startFight(save: Save, chapter: RpgCampaignChapter, party: numbe
   if (slots.some((s) => s === null) || slots.length !== PARTY_SIZE) throw new SaveRuleError('cannot-fight', 'a fight needs a full party of five')
   const open = openFightOf(world, party)
   if (open) throw new SaveRuleError('cannot-fight', 'this party is already in a fight')
+  const busy = (slots as string[]).filter((id) => workOf(world, id))
+  if (busy.length) throw new SaveRuleError('busy', `${busy.length === 1 ? 'one member is' : `${busy.length} members are`} working: recall them first`)
   const members: RpgPartyMember[] = (slots as string[]).map((id) => {
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
@@ -204,23 +203,35 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
     rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0 }
   if (state.outcome !== 'victory') return { save: withRun(save, closed, now, tier), result }
   const kind = rpgRewardKind(node)
-  const umas = { ...world.umas }
-  for (const ally of battle.input.allies) {
-    const uma = umas[ally.id]
-    if (!uma) continue // released from the world since: nothing to pay
-    const exp = rpgBattleExp(kind, node.level, rpgMemberLevel({ tier: Number(tier), level: uma.level }))
-    const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
-    const shards = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
-    umas[ally.id] = { ...uma, level: gained.level, exp: gained.exp }
-    result.members.push({ outfitId: ally.id, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards })
-    result.shards += shards
-  }
-  result.laurels = rpgBattleLaurels(kind, chapter.tier)
-  const pooled = world.wallet.shards + result.shards
-  result.tickets = Math.floor(pooled / SHARDS_PER_TICKET)
-  const wallet = { unlockTickets: world.wallet.unlockTickets + result.tickets, shards: pooled % SHARDS_PER_TICKET, laurels: world.wallet.laurels + result.laurels }
-  const next: TierWorld = { ...world, umas, wallet, runs: { ...world.runs, [rpgRunKey(closed.party, closed.chapterId)]: closed } }
+  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, rpgBattleLaurels(kind, chapter.tier), tier)
+  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels })
+  const next: TierWorld = { ...paid.world, runs: { ...world.runs, [rpgRunKey(closed.party, closed.chapterId)]: closed } }
   return { save: withWorld(save, tier, next, now), result }
+}
+
+/**
+ * Pays a won fight to its entrants: EXP by the level gap, a Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket),
+ * and the world's Laurels. Shared by fights and Sweeps (which pay no Laurels).
+ */
+export function payEntrants(world: TierWorld, outfitIds: readonly string[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
+  tier = TIER_ONE): { world: TierWorld; members: FightResult['members']; shards: number; tickets: number; laurels: number } {
+  const umas = { ...world.umas }
+  const members: FightResult['members'] = []
+  let shards = 0
+  for (const id of outfitIds) {
+    const uma = umas[id]
+    if (!uma) continue // released from the world since: nothing to pay
+    const exp = rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level }))
+    const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
+    const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
+    umas[id] = { ...uma, level: gained.level, exp: gained.exp }
+    members.push({ outfitId: id, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got })
+    shards += got
+  }
+  const pooled = world.wallet.shards + shards
+  const tickets = Math.floor(pooled / SHARDS_PER_TICKET)
+  const wallet = { ...world.wallet, unlockTickets: world.wallet.unlockTickets + tickets, shards: pooled % SHARDS_PER_TICKET, laurels: world.wallet.laurels + laurels }
+  return { world: { ...world, umas, wallet }, members, shards, tickets, laurels }
 }
 
 /** Takes one action in the party's open fight; when it ends the fight, settles it in the same save. */

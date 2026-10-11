@@ -1,6 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
+  buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, sweepFight, upgradeFacility, type WorkOutfit,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
   type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
@@ -125,6 +126,42 @@ export async function fightAction(chapter: RpgCampaignChapter, party: number, ac
   const acted = actInFight(save, chapter, party, action, nowIso())
   await commit(acted.save)
   return { step: acted.step, result: acted.result }
+}
+
+// --- Work and the Exchange (S4) ----------------------------------------------------------------------------------
+
+export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
+  edit((s, now) => startJob(s, placeId, slot, outfit, output, count, now))
+export const recall = (placeId: string, slot: number) => edit((s, now) => recallJob(s, placeId, slot, now))
+export const rush = (placeId: string, slot: number) => edit((s, now) => rushJob(s, placeId, slot, now))
+export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, placeId, now))
+export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
+export const buyTicket = (kind: 'rush' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
+
+/** Collects one job; returns what it gave. */
+export async function collect(placeId: string, slot: number): Promise<{ items: number; levelsUp: number }> {
+  const { save } = useGame.getState()
+  if (!save) return { items: 0, levelsUp: 0 }
+  const r = collectJob(save, placeId, slot, nowIso())
+  await commit(r.save)
+  return r.got
+}
+
+/** Collects every ready job (on these places, or everywhere). */
+export async function collectEverything(placeIds?: readonly string[]): Promise<{ items: number; levelsUp: number }> {
+  const { save } = useGame.getState()
+  if (!save) return { items: 0, levelsUp: 0 }
+  const r = collectAll(save, nowIso(), placeIds)
+  if (r.items > 0 || r.save.tierWorlds['1'] !== save.tierWorlds['1']) await commit(r.save)
+  return { items: r.items, levelsUp: r.levelsUp }
+}
+
+export async function sweep(chapter: RpgCampaignChapter, party: number, nodeId: string): Promise<FightResult> {
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const r = sweepFight(save, chapter, party, nodeId, nowIso())
+  await commit(r.save)
+  return r.result
 }
 
 /** The Tier 1 world, or null before boot. */

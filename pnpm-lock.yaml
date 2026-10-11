@@ -63,6 +63,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@luismlorenzana/uma-art':
+        specifier: 1.0.0
+        version: 1.0.0
       '@luismlorenzana/uma-data':
         specifier: 1.0.0
         version: 1.0.0
@@ -1342,6 +1345,9 @@ packages:
 
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
+
+  '@luismlorenzana/uma-art@1.0.0':
+    resolution: {integrity: sha512-dnsPISqqg4Mesj4WZzGfqG5czMA7++89pxI8n+vtUmhvcDhOHLsGRj1oGU3CiUok1HAz+EKK9eYVCWUxwWDdZw==, tarball: https://npm.pkg.github.com/download/@luismlorenzana/uma-art/1.0.0/71e8644574bc13a9dc01a6d14f3692c735e88b62}
 
   '@luismlorenzana/uma-data@1.0.0':
     resolution: {integrity: sha512-HuyoLWqV54722nYo3CqpsH3HM0sL3LN/qctGn4Q/jGM8T1XsUfnx/VdjIfyTXRqlrTOAiYfppU70HIWmyEr1+A==, tarball: https://npm.pkg.github.com/download/@luismlorenzana/uma-data/1.0.0/07ff967fe87a003984bee150577f153322865f2e}
@@ -5818,6 +5824,8 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2':
     optional: true
+
+  '@luismlorenzana/uma-art@1.0.0': {}
 
   '@luismlorenzana/uma-data@1.0.0': {}
 

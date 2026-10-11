@@ -1,4 +1,4 @@
-# Tasks — S3 Battles and leveling
+# Tasks — S3 to S7
 
 Implementable tasks for the active slice ([S3 spec](../slices/S3-battles.md), [build plan](../plan.md)). **A task
 file is deleted in the commit that finishes it** (D35).
@@ -10,7 +10,8 @@ private PriConne cast pipeline, the chapter map, the Phaser fight and result, an
 | Task | What | Status |
 |---|---|---|
 | [T014](T014-s2-release.md) | S2's phone check | Live since `2c60abe`; the owner's check is still open |
-| [T020](T020-s3-release.md) | Deploy S3 and the phone check | Deploying |
+| [T020](T020-s3-release.md) | S3's phone check | Live since `238b060`; the owner's check is open |
+| [T021](T021-s4-release.md) | S4's deploy and phone check | Deploying |
 
 ## Conventions every task follows
 

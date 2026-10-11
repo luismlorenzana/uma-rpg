@@ -4,11 +4,12 @@ import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
-  actInFight, activeBuild, chooseBuild, equipSkills, forgetSkill, isInFight, learnSkill, openFightOf, restAtCamp, retreat, runOf, settleFight,
+  actInFight, activeBuild, chooseBuild, equipSkills, forgetSkill, learnSkill, openFightOf, restAtCamp, retreat, runOf, settleFight,
   startFight, umaProfile, type BattleOutfit,
 } from './battle'
+import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, SaveParseError, type Save } from './save'
+import { newOwnedUma, newSave, parseSave, SaveParseError, type Save } from './save'
 
 const T = (n: number) => `2026-10-10T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
@@ -100,10 +101,10 @@ describe('fights (D52)', () => {
 
   it('pays a win: EXP to all five, Laurels, and a Shard for each Uma that reaches Lv10', () => {
     const fought = autoplay(startFight(withParty(), ura, 0, 'a1r1c1', OUTFITS, T(4)))
-    expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: 'a1r1c1', laurels: 2, shards: 0 })
+    expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: 'a1r1c1', laurels: 10, shards: 0 })
     expect(fought.result!.members).toHaveLength(5)
     const world = worldOf(fought.save)
-    expect(world.wallet.laurels).toBe(2)
+    expect(world.wallet.laurels).toBe(10)
     expect(world.umas['101']!.exp).toBe(fought.result!.members[0]!.afterExp)
     expect(runOf(world, 0, ura.id)!.wins).toMatchObject({ start: 1, a1r1c1: 1 })
 
@@ -166,8 +167,8 @@ describe('save v3 parsing', () => {
       tierWorlds: { '1': { createdAt: T(0), wallet: { unlockTickets: 19, shards: 0, laurels: 0 }, umas: { '101': { unlockedAt: T(1), level: 1, exp: 0 } },
         parties: Array.from({ length: 20 }, (_, i) => ({ name: `Party ${i + 1}`, slots: [null, null, null, null, null] })) } } }
     const migrated = parseSave(v2)
-    expect(migrated.schemaVersion).toBe(3)
-    expect(migrated.tierWorlds['1']!.umas['101']).toEqual({ unlockedAt: T(1), level: 1, exp: 0, build: null, builds: {} })
+    expect(migrated.schemaVersion).toBe(4)
+    expect(migrated.tierWorlds['1']!.umas['101']).toEqual(newOwnedUma(T(1)))
     expect(migrated.tierWorlds['1']!.runs).toEqual({})
   })
 })

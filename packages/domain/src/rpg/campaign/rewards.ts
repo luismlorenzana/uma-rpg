@@ -1,5 +1,6 @@
 // What a won fight pays (docs/design/battles.md): level-relative EXP for every entrant and Laurels for the world (D51).
-// EXP is uma-racer's rule re-weighted for ten-level chapters (D48); Laurels are draft numbers until the pacing model.
+// EXP is uma-racer's rule re-weighted for ten-level chapters (D48); Laurels come from the pacing model (D54).
+import { BATTLE_LAURELS } from '../../economy/pacing'
 import { rpgExpToNext, RPG_TIER_MAX_LEVEL } from '../rules'
 import { RPG_FIGHT_STAGES, rpgTierLevel, type RpgMapNode } from './chapters'
 
@@ -11,8 +12,8 @@ export const RPG_BATTLE_EXP_WEIGHTS = { fight: 0.42, 'sub-boss': 0.28, vanguard:
 export const RPG_LEVEL_EXP_STEP = 0.1
 export const RPG_LEVEL_EXP_MIN = 0.1
 export const RPG_LEVEL_EXP_MAX = 2
-/** Laurels per win, times the chapter's tier (D51, draft until the pacing model before S4). */
-export const RPG_BATTLE_LAURELS = { fight: 2, 'sub-boss': 5, vanguard: 6, boss: 10 } as const
+/** Laurels per win, times the chapter's tier (D51; the pacing model sets them, D54). */
+export const RPG_BATTLE_LAURELS = BATTLE_LAURELS
 /** Uma levels that pay one Uma Shard each, in Tier 1 (design §3). */
 export const RPG_SHARD_LEVELS = [10, 20, 30, 40, 50] as const
 

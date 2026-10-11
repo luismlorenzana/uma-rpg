@@ -1,0 +1,169 @@
+import { describe, expect, it } from 'vitest'
+import { HOUR, itemMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL } from '../economy/pacing'
+import { rpgCampaignChapter } from '../rpg/campaign/chapters'
+import { startFight, type BattleOutfit } from './battle'
+import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
+import { setPartySlot, unlockUma, worldOf } from './rules'
+import { newSave, parseSave, SaveParseError, type Save } from './save'
+import { isBusy } from './rules'
+import { collectAll, collectJob, facilityOf, planJob, recallJob, rushCost, rushJob, startJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
+
+const T0 = Date.parse('2026-10-10T12:00:00.000Z')
+const at = (ms: number) => new Date(T0 + ms).toISOString()
+// Invented outfits only.
+const outfit = (id: string, turf: 'A' | 'G' = 'G', dirt: 'A' | 'G' = 'G'): WorkOutfit & BattleOutfit => ({
+  outfitId: id, aptitudes: { surface: { turf, dirt }, strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } } as never,
+  baseStats: { speed: 100, stamina: 100, power: 100, guts: 100, wit: 100 }, growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 },
+})
+const turfA = outfit('101', 'A')
+const plain = outfit('102')
+
+function withUmas(...ids: string[]): Save {
+  return ids.reduce((s, id) => unlockUma(s, id, at(0)), newSave('Luis', at(0)))
+}
+const give = (save: Save, items: Record<string, number>, laurels = 0): Save => {
+  const w = worldOf(save)
+  return { ...save, tierWorlds: { '1': { ...w, items: { ...w.items, ...items }, wallet: { ...w.wallet, laurels: w.wallet.laurels + laurels } } } }
+}
+
+describe('gathering (S4)', () => {
+  it('makes items one after another, at aptitude speed, and pays EXP when collected', () => {
+    let save = withUmas('101', '102')
+    save = startJob(save, 'fields', 0, turfA, 'wheat', 3, at(0))
+    save = startJob(save, 'fields', 1, plain, 'wheat', 3, at(0))
+    const [a, g] = facilityOf(worldOf(save), 'fields').jobs
+    expect(a!.msEach).toBe(itemMinutes(1) * MINUTE / 2)
+    expect(g!.msEach).toBe(itemMinutes(1) * MINUTE)
+    // Two of the A-turf Uma's three are done after 4.5 minutes; collecting pays 2 wheat and their EXP.
+    const half = collectJob(save, 'fields', 0, at(4.5 * MINUTE))
+    expect(half.got).toMatchObject({ items: 2, exp: 16, done: false })
+    expect(worldOf(half.save).items.wheat).toBe(2)
+    expect(worldOf(half.save).umas['101']!.professions.farming).toEqual({ level: 1, exp: 16 })
+    const all = collectAll(half.save, at(12 * MINUTE))
+    expect(all.items).toBe(4)
+    expect(worldOf(all.save).items.wheat).toBe(6)
+    expect(worldOf(all.save).umas['101']!.professions.farming).toEqual({ level: 1, exp: 24 }) // 26 EXP opens Lv2
+    expect(facilityOf(worldOf(all.save), 'fields').jobs).toEqual([null, null])
+  })
+
+  it('opens a grade every five profession levels and makes only the site’s family', () => {
+    const world = worldOf(withUmas('101'))
+    expect(planJob(world, 'fields', turfA, 'oats')?.block).toBe('Needs Farming Lv6')
+    expect(planJob(world, 'fields', turfA, 'apple')?.block).toBe('Not made here')
+    expect(planJob(world, 'mine', turfA, 'copper-ore')?.block).toBeNull()
+  })
+
+  it('keeps an Uma to one job, out of fights, and refuses fights while she works', () => {
+    let save = withUmas('101', '102', '103', '104', '105')
+    save = startJob(save, 'fields', 0, turfA, 'wheat', 1, at(0))
+    expect(isBusy(worldOf(save), '101')).toBe(true)
+    expect(() => startJob(save, 'orchard', 0, turfA, 'apple', 1, at(0))).toThrow(/Already working/)
+    ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
+    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, outfit(id)]))
+    expect(() => startFight(save, ura, 0, 'a1r1c1', outfits, at(0))).toThrow(/recall/)
+    save = recallJob(save, 'fields', 0, at(MINUTE))
+    expect(isBusy(worldOf(save), '101')).toBe(false)
+    expect(() => startFight(save, ura, 0, 'a1r1c1', outfits, at(MINUTE))).not.toThrow()
+  })
+})
+
+describe('refining (S4)', () => {
+  it('reserves inputs, returns the ones for unmade items on recall, and loses the item in progress', () => {
+    let save = give(withUmas('101'), { wheat: 5 })
+    expect(() => startJob(save, 'pantry', 0, turfA, 'wheat-flour', 6, at(0))).toThrow(/Needs 6 Wheat/)
+    save = startJob(save, 'pantry', 0, turfA, 'wheat-flour', 5, at(0))
+    expect(worldOf(save).items.wheat).toBeUndefined()
+    // 2 min each at A: 2 done at 5 minutes, the third half made.
+    save = recallJob(save, 'pantry', 0, at(5 * MINUTE))
+    expect(worldOf(save).items).toEqual({ 'wheat-flour': 2, wheat: 3 })
+    expect(() => startJob(save, 'pantry', 0, turfA, 'copper-ingot', 1, at(0))).toThrow(/Not refined here/)
+  })
+})
+
+describe('Rush Tickets, upgrades and the Exchange (S4)', () => {
+  it('rushes a job for one ticket per hour left', () => {
+    let save = startJob(withUmas('102'), 'fields', 0, plain, 'wheat', 40, at(0)) // 4 min each: 160 minutes
+    const job = facilityOf(worldOf(save), 'fields').jobs[0]!
+    expect(rushCost(job, at(0))).toBe(3)
+    expect(() => rushJob(save, 'fields', 0, at(0))).toThrow(/3 Rush Tickets/)
+    save = buyTickets(give(save, {}, 60), 'rush', 3, at(0))
+    save = rushJob(save, 'fields', 0, at(MINUTE))
+    expect(collectJob(save, 'fields', 0, at(MINUTE)).got).toMatchObject({ items: 40, done: true })
+    expect(worldOf(save).wallet).toMatchObject({ laurels: 0, rushTickets: 0 })
+  })
+
+  it('upgrades a facility with Laurels and refined items of its two families', () => {
+    let save = withUmas('101')
+    expect(upgradeCost(worldOf(save), 'fields')).toEqual({ laurels: 150, items: { 'rolled-oats': 5, 'boarling-leather': 5 } })
+    expect(() => upgradeFacility(save, 'fields', at(0))).toThrow(/Laurels/)
+    save = give(save, { 'rolled-oats': 5, 'boarling-leather': 5 }, 150)
+    save = upgradeFacility(save, 'fields', at(0))
+    expect(facilityOf(worldOf(save), 'fields')).toEqual({ level: 2, jobs: [null, null, null] })
+    expect(worldOf(save).items).toEqual({})
+    expect(upgradeCost(worldOf(save), 'pantry')?.items).toEqual({ 'sandstone-block': 5, 'birch-plank': 5 })
+  })
+
+  it('stocks the grades of reached chapters and sells raw items and tickets for Laurels', () => {
+    const save = give(withUmas('101'), {}, 100)
+    const chapters = [{ id: '1', order: 1 }, { id: '2', order: 2 }, { id: '7', order: 7 }]
+    expect(stockedGrades(worldOf(save), chapters)).toEqual([])
+    const w = worldOf(save)
+    const reached = { ...w, runs: { '0:2': { party: 0, chapterId: '2', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) },
+      '0:7': { party: 0, chapterId: '7', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) } } }
+    const grades = stockedGrades(reached, chapters)
+    expect(grades).toEqual([3, 4])
+    expect(() => buyRawItem(save, 'wheat', 1, grades, at(0))).toThrow(/stocked/)
+    const bought = buyRawItem(save, 'barley', 4, grades, at(0)) // 20 Laurels each
+    expect(worldOf(bought).items.barley).toBe(4)
+    expect(worldOf(bought).wallet.laurels).toBe(20)
+    expect(() => buyRawItem(bought, 'barley', 2, grades, at(0))).toThrow(/Laurels/)
+    expect(() => buyRawItem(save, 'pearl-barley', 1, grades, at(0))).toThrow(/raw/)
+  })
+
+  it('sweeps a beaten regular fight for EXP and Shards, without Laurels', () => {
+    let save = give(withUmas('101', '102', '103', '104', '105'), {}, 15)
+    ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
+    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    expect(sweepBlock(worldOf(save), ura, 0, 'a1r1c1')).toBe('Beat it with this party first')
+    const w = worldOf(save)
+    save = { ...save, tierWorlds: { '1': { ...w, runs: { '0:1': { party: 0, chapterId: '1', wins: { start: 1, a1r1c1: 1, a1boss: 1 }, mp: {}, battle: null, battles: 2, clearedAt: null, updatedAt: at(0) } } } } }
+    expect(sweepBlock(worldOf(save), ura, 0, 'a1boss')).toBe('Only regular fights can be swept')
+    expect(sweepBlock(worldOf(save), ura, 0, 'a1r1c1')).toBe('No Sweep Tickets')
+    save = buyTickets(save, 'sweep', 1, at(0))
+    const swept = sweepFight(save, ura, 0, 'a1r1c1', at(0))
+    expect(swept.result).toMatchObject({ outcome: 'victory', laurels: 0 })
+    expect(swept.result.members.every((m) => m.exp > 0)).toBe(true)
+    expect(worldOf(swept.save).wallet).toMatchObject({ laurels: 0, sweepTickets: 0 })
+    expect(worldOf(swept.save).runs['0:1']!.wins.a1r1c1).toBe(2)
+  })
+})
+
+describe('save v4', () => {
+  it('round-trips the Warehouse, facilities and jobs, and rejects an Uma in two jobs or an unknown item', () => {
+    let save = give(withUmas('101', '102'), { wheat: 3 })
+    save = startJob(save, 'fields', 0, turfA, 'wheat', 2, at(0))
+    save = startJob(save, 'pantry', 0, plain, 'wheat-flour', 3, at(0))
+    expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    const twice = JSON.parse(JSON.stringify(save))
+    twice.tierWorlds['1'].facilities.pantry.jobs[1] = { ...twice.tierWorlds['1'].facilities.fields.jobs[0], kind: 'refine', output: 'wheat-flour' }
+    expect(() => parseSave(twice)).toThrow(/already working/)
+    const unknown = JSON.parse(JSON.stringify(save))
+    unknown.tierWorlds['1'].items.unobtainium = 1
+    expect(() => parseSave(unknown)).toThrow(SaveParseError)
+  })
+})
+
+describe('pacing model (D54)', () => {
+  const minutesTo = (level: number, aptitudeShare: number) => {
+    let exp = 0
+    for (let l = 1; l < level; l++) exp += professionExpToNext(l)
+    return (exp / 2) * aptitudeShare // 2 EXP per base minute
+  }
+  it('takes about 59 hours of work to reach grade 10 at G, half that at A', () => {
+    expect(Math.round(minutesTo(46, 1) / 60)).toBe(59)
+    expect(Math.round(minutesTo(46, 0.5) / 60)).toBe(30)
+    expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 1) / 60)).toBe(69)
+    expect(HOUR).toBe(60 * MINUTE)
+  })
+})
