@@ -194,6 +194,8 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       if (result) onEnd(result, nodeId.current)
     } catch (err) {
       setError(err instanceof SaveRuleError || err instanceof Error ? err.message : 'That action didn’t work.')
+      // A failed action hands control back, or Auto would resend it the moment `busy` clears.
+      setPrefs((current) => current.auto ? { ...current, auto: false } : current)
     } finally {
       setBusy(false)
     }
