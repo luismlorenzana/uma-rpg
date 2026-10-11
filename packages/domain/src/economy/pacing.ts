@@ -71,9 +71,10 @@ export const chapterGrades = (orderInTier: number): readonly [number, number] =>
 
 // --- Learning District (S5, §5, §6) ------------------------------------------------------------------------------
 
-export const CLASS_MAX_RANK = 6
+/** Ranks 1–5: rank r opens skill depths 1–r (D77). */
+export const CLASS_MAX_RANK = 5
 export const MASTERY_MAX_RANK = 10
-/** Base hours per class rank, the same for every rank (D68): 6 at G, 3 at A; 30 hours from rank 1 to 6 at G. Each
+/** Base hours per class rank, the same for every rank (D68): 6 at G, 3 at A; 24 hours from rank 1 to 5 at G. Each
  * promotion also spends a Class Promotion Token of its band (D67). */
 export const CLASS_RANK_HOURS = 6
 export const classRankHours = (rank: number): number => (rank >= 1 && rank < CLASS_MAX_RANK ? CLASS_RANK_HOURS : Infinity)

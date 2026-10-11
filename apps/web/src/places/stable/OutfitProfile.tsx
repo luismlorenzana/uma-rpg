@@ -1,18 +1,19 @@
-// An outfit's profile (S1–S7, reorganised D60): a header with her Uma Level and EXP, her Farm and Craft Levels and what
-// she's doing now, then tabs: Battle (her RPG stats), Class (builds, skills, class ranks), Gear (equipment, gear levels,
-// Extra Stats), Work (professions and jobs) and Racing (the original's aptitudes, stats and unique skill). A locked
-// outfit shows the Unlock flow and her racing profile.
+// An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
+// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, weapon pair, skill trees, class ranks;
+// first, as it changes most), Battle (her RPG stats), Gear (equipment, gear levels, Extra Stats), Work (professions and
+// jobs) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
+// racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
   activeBuild, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_BUILD, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots,
-  rpgExpToNext, rpgNode, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Bar, BUILD_LABEL, CLASS_LABEL, skillKinds, KindMark } from '../../battle/labels'
+import { Bar, BUILD_LABEL, CLASS_LABEL, WeaponGlyph } from '../../battle/labels'
 import { useHubNavigation } from '../../hub/navigation'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -24,20 +25,21 @@ import { BackIcon, LockIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { pointText } from '../observatory/ObservatoryPage'
 import { GearCard } from './GearCard'
+import { SkillsPage } from './SkillsPage'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
 const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#eb6fb0', C: '#7fb8ff', D: '#6fd39a', E: '#b8a6f0', F: '#a6b0bc', G: '#8a94a0' }
-const TABS = ['battle', 'class', 'gear', 'work', 'racing'] as const
+const TABS = ['skills', 'battle', 'gear', 'work', 'racing'] as const
 type Tab = (typeof TABS)[number]
-const TAB_LABEL: Record<Tab, string> = { battle: 'Battle', class: 'Class', gear: 'Gear', work: 'Work', racing: 'Racing' }
-const TAB_KEY = 'rpg.profile.tab.v1'
+const TAB_LABEL: Record<Tab, string> = { skills: 'Skills', battle: 'Battle', gear: 'Gear', work: 'Work', racing: 'Racing' }
+const TAB_KEY = 'rpg.profile.tab.v2'
 
 function storedTab(): Tab {
   try {
     const t = localStorage.getItem(TAB_KEY)
-    return (TABS as readonly string[]).includes(t ?? '') ? (t as Tab) : 'battle'
+    return (TABS as readonly string[]).includes(t ?? '') ? (t as Tab) : 'skills'
   } catch {
-    return 'battle'
+    return 'skills'
   }
 }
 
@@ -92,7 +94,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
       <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
         <BackIcon size={18} /> All outfits
       </button>
-      <Header view={view} outfit={outfit} owned={owned} world={world} bust={bust} />
+      <Header view={view} outfit={outfit} owned={owned} world={world} bust={bust} onClass={() => setTab('skills')} />
       {owned && world ? (
         <>
           <div className="sticky top-0 z-10 -mx-4 bg-page/95 px-4 py-1.5 backdrop-blur">
@@ -105,8 +107,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
               ))}
             </div>
           </div>
-          {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} place={place} />}
-          {shown === 'class' && <ClassTab outfit={outfit} uma={owned} place={place} />}
+          {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} />}
+          {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
           {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
           {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
           {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
@@ -121,8 +123,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   )
 }
 
-/** Art, name, the big Uma Level with its EXP, then Farm and Craft Levels and what she's up to. */
-function Header({ view, outfit, owned, world, bust }: { view: MasterView; outfit: RosterOutfit; owned: OwnedUma | null; world: TierWorld | null; bust: string | null }) {
+/** Art, name, the big Uma Level with its EXP and the class she fights as, then Farm and Craft Levels and what she's up to. */
+function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterView; outfit: RosterOutfit; owned: OwnedUma | null; world: TierWorld | null; bust: string | null; onClass: () => void }) {
   const navigate = useNavigate()
   const now = useNow(30_000)
   const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
@@ -146,6 +148,7 @@ function Header({ view, outfit, owned, world, bust }: { view: MasterView; outfit
               <p className="font-display text-[26px] font-extrabold leading-none">Lv {owned.level}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></p>
               <Bar className="mt-1.5" value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
               <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
+              <ClassChip outfit={outfit} uma={owned} onClick={onClass} />
             </div>
           )}
         </div>
@@ -210,8 +213,7 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
 
 // --- Battle: her RPG stats as she fights now ---------------------------------------------------------------------
 
-function BattleTab({ outfit, uma, world, place }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; place: Place }) {
-  const nav = useHubNavigation()
+function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
   const build = activeBuild(outfit, uma)
   const base = projectRpgStats(umaProfile(outfit, uma, 1, build))
   const points = umaPoints(uma, build)
@@ -228,7 +230,7 @@ function BattleTab({ outfit, uma, world, place }: { outfit: RosterOutfit; uma: O
   ]
   return (
     <div className="space-y-3">
-      <button type="button" onClick={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
+      <button type="button" onClick={onClass} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
         <span>
           <span className="block text-[11px] text-ink-faint">Fights as</span>
           <span className="block text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
@@ -263,39 +265,29 @@ function BattleTab({ outfit, uma, world, place }: { outfit: RosterOutfit; uma: O
   )
 }
 
-// --- Class: builds, skills and class ranks ---------------------------------------------------------------------
+// --- Skills: class, weapon pair, trees (D77), then every class's rank ------------------------------------------
 
-function ClassTab({ outfit, uma, place }: { outfit: RosterOutfit; uma: OwnedUma; place: Place }) {
-  const nav = useHubNavigation()
-  const navigate = useNavigate()
+/** The class and weapon pair she fights as, under her level: one tap to the Skills tab. */
+function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
   const build = activeBuild(outfit, uma)
-  const current = buildOf(uma, build)
-  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(current.tree.map((id) => ({ tier: 1, id })))
+  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((id) => ({ tier: 1, id })))
   return (
-    <div className="space-y-3">
-      <button type="button" onClick={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)} className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md bg-raised px-3 text-left">
-        <span className="min-w-0">
-          <span className="block truncate text-[14px] font-semibold">{BUILD_LABEL[build]}</span>
-          <span className="block text-[12px] text-ink-soft">{current.tree.length} learned · {current.loadout.length}/{rpgActiveSlots(uma.level)} equipped</span>
-        </span>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold ${points > 0 && uma.ranks.classes[RPG_BUILD[build].classId] > 1 ? 'bg-accent text-accent-ink' : 'bg-sunken text-ink-soft'}`}>
-          {points > 0 ? `${points} pts · Skills` : 'Skills'}
-        </span>
-      </button>
-      {current.loadout.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {current.loadout.map((id) => {
-            const node = rpgNode(id)
-            return node ? (
-              <span key={id} className="flex items-center gap-1 rounded-full bg-raised px-2.5 py-1 text-[12px] font-semibold">
-                {node.skill && skillKinds(node.skill).map((k) => <KindMark key={k} kind={k} size={12} />)}{node.name}
-              </span>
-            ) : null
-          })}
-        </div>
-      )}
+    <button type="button" onClick={onClick} className="mt-1.5 flex min-h-9 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
+      {RPG_BUILD[build].weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={14} />)}
+      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[RPG_BUILD[build].classId]} · rank {uma.ranks.classes[RPG_BUILD[build].classId]}</span>
+      {points > 0 && <span className="shrink-0 rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">{points} pts</span>}
+      <span className="shrink-0 text-ink-faint">›</span>
+    </button>
+  )
+}
+
+function SkillsTab({ outfit, uma }: { outfit: RosterOutfit; uma: OwnedUma }) {
+  const navigate = useNavigate()
+  return (
+    <div className="space-y-4">
+      <SkillsPage outfit={outfit} name={outfit.name} />
       <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks · each rank opens a skill depth · train at the Learning District</p>
+        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks · rank r opens depths 1–r · train at the Learning District</p>
         <div className="divide-y divide-hairline">
           {RPG_CLASSES.map((c) => {
             const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === c)!

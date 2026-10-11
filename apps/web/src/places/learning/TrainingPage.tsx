@@ -58,7 +58,7 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
       <section className="rounded-md bg-raised p-3">
         <p className="font-display text-lg font-bold">{tracks.map(trackLabel).join(' · ')}</p>
         <p className="text-[13px] text-ink-soft">
-          {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth, and each promotion spends a Promotion Token of its band (fights drop them). Weapon Level k wears grade-k weapons of this class.'
+          {CLASS_HALLS[placeId] ? 'Class rank r opens skill depths 1–r (each also waits for Lv 1/10/20/30/40); ranks top out at 5, and each promotion spends a Promotion Token of its band (fights drop them). Weapon Level k wears grade-k weapons of this class.'
             : GEAR_HALLS[placeId] === 'armor' ? 'Armor Level k wears grade-k Garb, Leather, Mail and Plate.' : 'Accessory Level k wears grade-k Rings and Charms.'}{' '}
           {aptitudeKey(placeId)} aptitude sets the speed. Time Tickets take 30 minutes off.
         </p>

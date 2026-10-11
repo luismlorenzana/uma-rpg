@@ -17,12 +17,12 @@ import { isToken } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
-import { rpgNode } from '../rpg/catalog'
+import { rpgNode, rpgSideNodeLevel } from '../rpg/catalog'
 import {
-  isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
+  isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgDepthBlock, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 12
+export const SAVE_SCHEMA_VERSION = 13
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -530,8 +530,58 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
   }
 }
 
-function parseTierWorld(value: unknown, path: string, version: number, tier: number): TierWorld {
-  if (version < 10) return resetTierWorld(value, path)
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
+const RETIRED_TOKEN = /^token-class-[a-z]+-5$/
+const dropRetired = (items: unknown) => {
+  if (isRecord(items)) for (const id of Object.keys(items)) if (RETIRED_TOKEN.test(id)) delete items[id]
+}
+
+/**
+ * v12 → v13 (D77): class ranks top out at 5, rank r opens depths 1–r behind the Uma-level gates, and band 5 drops no
+ * Promotion Tokens. Clamps ranks, forgets skills the gates now close (their points come back) and drops band-5
+ * Promotion Tokens. Anything malformed is left for the strict parse to reject.
+ */
+function toV13(world: Record<string, unknown>): Record<string, unknown> {
+  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
+  dropRetired(w.items)
+  if (isRecord(w.facilities)) {
+    for (const f of Object.values(w.facilities)) {
+      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
+      for (const job of f.jobs) {
+        if (!isRecord(job)) continue
+        dropRetired(job.inputs)
+        if (Array.isArray(job.queue)) for (const q of job.queue) if (isRecord(q)) dropRetired(q.inputs)
+      }
+    }
+  }
+  if (isRecord(w.umas)) {
+    for (const uma of Object.values(w.umas)) {
+      if (!isRecord(uma) || !isRecord(uma.ranks) || !isRecord(uma.ranks.classes) || !isRecord(uma.builds) || typeof uma.level !== 'number') continue
+      const classes = uma.ranks.classes
+      const level = uma.level
+      for (const c of Object.keys(classes)) {
+        const r = classes[c]
+        if (typeof r === 'number' && r > CLASS_MAX_RANK) classes[c] = CLASS_MAX_RANK
+      }
+      for (const [key, build] of Object.entries(uma.builds)) {
+        if (!isRpgBuildId(key) || !isRecord(build) || !Array.isArray(build.tree) || !Array.isArray(build.loadout)) continue
+        const rank = classes[RPG_BUILD[key].classId]
+        const gate = { level, maxDepth: depthsOpen(typeof rank === 'number' ? rank : 1) }
+        const tree = build.tree.filter((id: unknown) => {
+          const node = typeof id === 'string' ? rpgNode(id) : undefined
+          return !node || (!rpgDepthBlock(gate, node.depth) && (node.variant === null || level >= rpgSideNodeLevel(node.depth)))
+        })
+        build.tree = tree
+        build.loadout = build.loadout.filter((id: unknown) => tree.includes(id))
+      }
+    }
+  }
+  return w
+}
+
+function parseTierWorld(raw: unknown, path: string, version: number, tier: number): TierWorld {
+  if (version < 10) return resetTierWorld(raw, path)
+  const value = version < 13 && isRecord(raw) ? toV13(raw) : raw
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)

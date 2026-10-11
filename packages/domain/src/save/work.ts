@@ -265,7 +265,7 @@ function trainingInputs(track: Track, rank: number): Record<string, number> {
   return track.kind === 'class' && rank < maxRankOf(track) ? { [promotionTokenId(track.classId, rank)]: 1 } : {}
 }
 
-/** Starts training one rank: a class promotion takes its token now. It can't be rushed (§11). */
+/** Starts training one rank: a class promotion takes its token now. Time Tickets cut it like any job (D74). */
 export function startTraining(save: Save, placeId: string, slot: number, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track,
   now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)

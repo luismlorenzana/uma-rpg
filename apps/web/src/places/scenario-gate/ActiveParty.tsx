@@ -42,7 +42,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const points = umaPoints(uma, build)
           const max = applyPoints(projectRpgStats(profile), points).stats.mp
           const mp = rpgCarriedMp(run, profile, points)
-          const spare = uma.ranks.classes[RPG_BUILD[build].classId] > 1 ? rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n }))) : 0
+          const spare = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n })))
           return (
             <button key={id} type="button" className="relative w-12" title={BUILD_LABEL[build]} aria-label={`${outfit.name}: Lv ${uma.level}, MP ${mp} of ${max}`}
               onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>

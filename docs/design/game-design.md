@@ -169,8 +169,8 @@ fills the grades between in even steps:
 - **[Proposed]** Each class keeps today's weapon set (the class decides what she wields), today's trees and today's
   battle role. The five classes are Brawler, Mage, Spell Blade, Cleric and Summoner.
 - **[S3, D49]** Each Uma has six class builds with their own trees ([battles.md](battles.md)).
-- **[Settled, D57]** **Ranks 1–6.** Each rank above 1 opens one tree depth: rank 2 opens depth 1, and rank 6 opens depth 5
-  (the capstones). These ranks replace today's depth gates at Uma Lv 1/10/20/30/40.
+- **[Settled, D77, replacing D57]** **Ranks 1–5.** Rank r opens tree depths 1–r, and each depth also keeps uma-racer's
+  Uma-level gate (Lv 1/10/20/30/40), so an Uma has skills from Lv1 and rank 5 opens the capstones.
 - **[Proposed]** **Skill points come from Uma Level, and every class tree gets the full amount.** Classes don't compete
   for points, so switching costs nothing; class rank is the real investment. Learned skills stay with their class.
 

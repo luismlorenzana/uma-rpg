@@ -11,7 +11,11 @@ const give = (save: Save, items: Record<string, number>): Save => ({ ...save, ti
 
 describe('tokens (D67)', () => {
   it('mirrors crafting and cooking: eight stats each, five promotions, per band', () => {
-    expect(TOKENS).toHaveLength(5 * (5 + 8 + 8))
+    // Class ranks top out at 5 (D77): band 5 has no Promotion Tokens, and its bosses drop Crafting or Cooking instead.
+    expect(TOKENS).toHaveLength(5 * (8 + 8) + 4 * 5)
+    expect(tokenById(promotionTokenId('mage', 5))).toBeUndefined()
+    for (let n = 0; n < 40; n++) expect(Object.keys(rollTokens(`b5-${n}`, 'boss', 5)).some((id) => id.startsWith('token-class'))).toBe(false)
+    expect(Object.keys(rollTokens('b4', 'boss', 4)).some((id) => id.startsWith('token-class'))).toBe(true)
     expect(tokenById(craftTokenId('atk', 2))).toMatchObject({ kind: 'craft', band: 2, effect: 'atk', name: 'ATK Crafting Token (G3–4)' })
     expect(tokenById(cookTokenId('atk', 2))!.name).toBe('ATK Cooking Token (G3–4)')
     expect(tokenById(promotionTokenId('spellblade', 1))!.name).toBe('Spell Blade Promotion Token (rank 2)')

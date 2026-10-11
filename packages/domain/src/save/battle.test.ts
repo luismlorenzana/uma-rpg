@@ -25,7 +25,7 @@ const OUTFITS = new Map([['101', outfit('101', 'front')], ['102', outfit('102', 
   ['104', outfit('104', 'end')], ['105', outfit('105', 'front')]])
 const o101 = OUTFITS.get('101')!
 
-/** Every class at a rank, as if trained in the Learning District (S5: rank 1 learns nothing). */
+/** Every class at a rank, as if trained in the Learning District (D77: rank r opens depths 1–r). */
 function ranked(save: Save, rank = 2): Save {
   const w = worldOf(save)
   const classes = { brawler: rank, mage: rank, spellblade: rank, cleric: rank, summoner: rank }
@@ -72,15 +72,18 @@ describe('class builds (D49)', () => {
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
   })
 
-  it('learns depth-1 skills at class rank 2 into free slots, keeps each build’s tree, and gates deeper depths by rank (D57)', () => {
+  it('learns depth-1 skills from Lv1 into free slots, keeps each build’s tree, and gates deeper depths by level and rank (D77)', () => {
     let save = withParty()
     save = learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
     save = learnSkill(save, o101, 'axe-bow', 'axe.ice.1', T(4))
     const uma = worldOf(save).umas['101']!
     expect(uma.builds['greatsword-spear']).toEqual({ tree: ['greatsword.fire.1'], loadout: ['greatsword.fire.1'], familiar: 'greatsword' })
     expect(uma.builds['axe-bow']?.tree).toEqual(['axe.ice.1'])
-    expect(() => learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/class rank 3/)
-    expect(() => learnSkill(ranked(withParty(), 1), o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/class rank 2/)
+    expect(() => learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/Opens at Lv10/)
+    const rankOne = learnSkill(ranked(withParty(), 1), o101, 'greatsword-spear', 'greatsword.fire.1', T(5))
+    const w = worldOf(rankOne)
+    const tenAtRankOne: Save = { ...rankOne, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 10 } } } } }
+    expect(() => learnSkill(tenAtRankOne, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/class rank 2/)
     expect(() => learnSkill(save, o101, 'greatsword-spear', 'mage-staff.fire.1', T(5))).toThrow(SaveRuleError)
     expect(() => forgetSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/variant/)
   })

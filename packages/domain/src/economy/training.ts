@@ -102,5 +102,5 @@ export function withRank(ranks: Ranks, t: Track, rank: number): Ranks {
   return { ...ranks, [t.kind]: rank }
 }
 
-/** Skill depths a class rank opens: none at rank 1, then one more per rank (rank 6 opens depth 5, §5). */
-export const depthsOpen = (classRank: number): number => Math.max(0, Math.min(5, classRank - 1))
+/** Skill depths a class rank opens: rank r opens depths 1–r (D77), each also waiting on its Uma level gate. */
+export const depthsOpen = (classRank: number): number => Math.max(0, Math.min(5, classRank))

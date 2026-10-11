@@ -26,7 +26,7 @@ A **band** is ten levels: a continent of the world map. Band n covers:
 | 2 | Lv11–20 | rank 2 → 3 | 3–4 |
 | 3 | Lv21–30 | rank 3 → 4 | 5–6 |
 | 4 | Lv31–40 | rank 4 → 5 | 7–8 |
-| 5 | Lv41–50 | rank 5 → 6 | 9–10 |
+| 5 | Lv41–50 | — (rank 5 is the top, D77) | 9–10 |
 
 ## Tokens
 
@@ -35,13 +35,14 @@ on (§8.2):
 
 | Token | Kinds per band | Spent on |
 |---|---|---|
-| **Class Promotion** | 5: one per class | Starting a class rank in its hall (taken when the job starts, returned on recall) |
+| **Class Promotion** | 5: one per class (bands 1–4) | Starting a class rank in its hall (taken when the job starts, returned on recall) |
 | **Crafting** | 8: one per stat | Crafting a piece whose **accent** is that stat: an ATK Crafting Token makes any ATK-accent gear of its band |
 | **Cooking** | 8: one per stat | Cooking a dish that **feeds** that stat. Duo dishes take one of each of their two stats, Feasts one of each of all eight |
 
 - **Drops per win** (seeded by the fight, so a replay drops the same; halved by D71): regular fight 1, stage
   sub-boss 2, Finals vanguard 2, champion 3. Sub-bosses and champions always include a Promotion Token. Each other drop is Crafting
-  42.5%, Cooking 42.5%, Promotion 15%, at a random class or stat.
+  42.5%, Cooking 42.5%, Promotion 15%, at a random class or stat. Band 5 drops no Promotion Tokens: their share goes to
+  Crafting or Cooking (D77).
 - **Sweeps drop no tokens**: tokens come from fights you play.
 - **Swaps**: the Exchange trades **three tokens of one kind and band for one of your choice**, so bad luck never
   stalls a plan.
@@ -51,7 +52,7 @@ on (§8.2):
 
 | Track | Where | Per step, at G | At A | Whole track at G |
 |---|---|---|---|---|
-| Class rank (1 → 6) | Its class hall | 6 h | 3 h | 30 h, plus a Promotion Token per rank |
+| Class rank (1 → 5) | Its class hall | 6 h | 3 h | 24 h, plus a Promotion Token per rank |
 | Weapon Level (1 → 10), per class | Its class hall | 3 h | 1½ h | 27 h |
 | Armor Level (1 → 10) | The Armory | 3 h | 1½ h | 27 h |
 | Accessory Level (1 → 10) | The Jeweler | 3 h | 1½ h | 27 h |

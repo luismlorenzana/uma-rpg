@@ -216,9 +216,9 @@ export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
 export const rpgNodeKey = (ref: RpgNodeRef): string => `${ref.tier}:${ref.id}`
 
 type DepthGated = Pick<RpgProfile, 'level' | 'maxDepth'>
-/** Why a depth is closed, or null: her class rank's depth (S5), or the Uma-level gates before it. */
+/** Why a depth is closed, or null: depth d needs class rank d (D77) and Uma Lv 1/10/20/30/40, as in uma-racer. */
 export function rpgDepthBlock(profile: DepthGated, depth: number): string | null {
-  if (profile.maxDepth !== undefined) return depth > profile.maxDepth ? `Needs class rank ${depth + 1}` : null
+  if (profile.maxDepth !== undefined && depth > profile.maxDepth) return `Needs class rank ${depth}`
   return profile.level < RPG_DEPTH_GATES[depth - 1]! ? `Opens at Lv${RPG_DEPTH_GATES[depth - 1]}` : null
 }
 

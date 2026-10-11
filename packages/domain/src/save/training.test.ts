@@ -36,10 +36,11 @@ describe('class ranks (S5, D57)', () => {
     expect(collectJob(save, 'brawler-dojo', 0, at(2.5 * HOUR)).got.done).toBe(false)
     save = collectJob(save, 'brawler-dojo', 0, at(3 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.classes.brawler).toBe(2)
-    expect(umaProfile(front, worldOf(save).umas['101']!, 1, 'greatsword-spear').maxDepth).toBe(1)
+    // Rank r opens depths 1–r (D77); depth 2 still waits for Lv10.
+    expect(umaProfile(front, worldOf(save).umas['101']!, 1, 'greatsword-spear').maxDepth).toBe(2)
     save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(4 * HOUR))
-    expect(() => learnSkill(save, front, 'greatsword-spear', 'greatsword.ice.2', at(4 * HOUR))).toThrow(/class rank 3/)
-    expect([1, 2, 6].map(depthsOpen)).toEqual([0, 1, 5])
+    expect(() => learnSkill(save, front, 'greatsword-spear', 'greatsword.ice.2', at(4 * HOUR))).toThrow(/Opens at Lv10/)
+    expect([1, 2, 5].map(depthsOpen)).toEqual([1, 2, 5])
   })
 
   it('trains each class’s Weapon Level in its hall, and armor and accessories in their own halls (D70)', () => {
@@ -59,10 +60,10 @@ describe('class ranks (S5, D57)', () => {
     expect(worldOf(save).umas['102']!.ranks.armor).toBe(2)
   })
 
-  it('lets an Uma fight with skills deeper than her level would open, once her rank opens them', () => {
+  it('lets an Uma fight with the depths her rank and level open', () => {
     let save = umas('101', '102', '103', '104', '105')
     const w = worldOf(save)
-    save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 5, ranks: { ...w.umas['101']!.ranks, classes: { ...w.umas['101']!.ranks.classes, brawler: 3 } } } } } } }
+    save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 10, ranks: { ...w.umas['101']!.ranks, classes: { ...w.umas['101']!.ranks.classes, brawler: 2 } } } } } } }
     save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(0))
     save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.2', at(0))
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
@@ -96,8 +97,9 @@ describe('saves', () => {
   })
 
   it('rejects a skill deeper than its class rank and training a track elsewhere', () => {
-    const save = learnSkill({ ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...worldOf(umas('101')).umas['101']!, ranks: { ...worldOf(umas('101')).umas['101']!.ranks, classes: { brawler: 2, mage: 1, spellblade: 1, cleric: 1, summoner: 1 } } } } } } },
-      front, 'greatsword-spear', 'greatsword.fire.1', at(0))
+    const base = worldOf(umas('101')).umas['101']!
+    const ten = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 10, ranks: { ...base.ranks, classes: { ...base.ranks.classes, brawler: 2 } } } } } } }
+    const save = learnSkill(learnSkill(ten, front, 'greatsword-spear', 'greatsword.fire.1', at(0)), front, 'greatsword-spear', 'greatsword.fire.2', at(0))
     const low = JSON.parse(JSON.stringify(save))
     low.tierWorlds['1'].umas['101'].ranks.classes.brawler = 1
     expect(() => parseSave(low)).toThrow(/tree/)
@@ -105,6 +107,25 @@ describe('saves', () => {
     elsewhere.tierWorlds['1'].facilities['mage-tower'] = elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     delete elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     expect(() => parseSave(elsewhere)).toThrow(SaveParseError)
+  })
+
+  it('moves a v12 save to rank 5 at most, forgetting skills the level gates now close (D77)', () => {
+    const base = worldOf(umas('101')).umas['101']!
+    const strong = { ...umas('101'), tierWorlds: { '1': { ...worldOf(umas('101')), umas: { '101': { ...base, level: 12, ranks: { ...base.ranks, classes: { ...base.ranks.classes, brawler: 3 } } } } } } }
+    let save = learnSkill(strong, front, 'greatsword-spear', 'greatsword.fire.1', at(0))
+    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.2', at(0))
+    const old = JSON.parse(JSON.stringify(save))
+    old.schemaVersion = 12
+    // At v12 a rank-4 Uma at Lv5 could hold depth 2 (no level gate then), and a rank could reach 6.
+    old.tierWorlds['1'].umas['101'].level = 5
+    old.tierWorlds['1'].umas['101'].ranks.classes.brawler = 6
+    old.tierWorlds['1'].items = { 'token-class-mage-5': 2, 'token-class-mage-4': 1 }
+    const moved = parseSave(old)
+    const uma = worldOf(moved).umas['101']!
+    expect(uma.ranks.classes.brawler).toBe(5)
+    expect(uma.builds['greatsword-spear']).toMatchObject({ tree: ['greatsword.fire.1'], loadout: ['greatsword.fire.1'] })
+    expect(worldOf(moved).items).toEqual({ 'token-class-mage-4': 1 })
+    expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
   })
 })
 

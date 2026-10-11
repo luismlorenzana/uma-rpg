@@ -63,8 +63,9 @@ order; only the faces come from the private cast (D50).
 ## Builds and skills (D49)
 
 See [classes.md](classes.md) for the trees. In uma-rpg every Uma has six class builds, each with its own tree, its
-own equipped skills and the full point budget (2 points a level up to Lv45, plus 5 as each depth opens: 115 at Lv50).
-Her class rank opens the depths (S5, D57): rank 1 learns nothing, each rank one more. Skill slots: 3 at Lv1, one more at Lv10, 15, 20, 25, 30, 35 and
+own equipped skills and the full point budget (2 points a level up to Lv50, plus 5 as each depth opens: 125 at Lv50).
+Depth d opens at class rank d and Uma Lv 1/10/20/30/40 (D77), so she has skills from Lv1; side skills at Lv 5/15/25/35/45
+(D73). The profile's first tab, **Skills**, picks her class and weapon pair and shows both trees. Skill slots: 3 at Lv1, one more at Lv10, 15, 20, 25, 30, 35 and
 40. A newly learned skill goes straight into a free slot; variants swap out for a refund, core skills are permanent.
 
 ## The rivals: PriConne's cast (D50)

@@ -1,12 +1,13 @@
-// A balance simulation for the world map (D72): a five-class party with expected skills plays every stage of a region
+// A balance simulation for the world map (D72, D75, D77): a five-class party with expected skills plays every stage of a region
 // at its level with a simple policy, and we read win rates. Run the full table with `SIM=1 npx vitest run
 // src/world/balance.test.ts`; the always-on test only checks that the opening stages are winnable at Lv1.
 import { describe, expect, it } from 'vitest'
 import { applyBattleAction, battleActionsLeft, battleActorSkill, battleHitIsWeak, createBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleAlly, BattleInput, BattleState } from '../rpg/battle/types'
+import { depthsOpen } from '../economy/training'
 import { RPG_FOE_TUNING } from '../rpg/campaign/enemies'
 import { rpgNode } from '../rpg/catalog'
-import { learnRpgNode, projectRpgStats, rpgActiveSlots, rpgLearnBlock, rpgProfileTrees, RPG_BUILD, type RpgBuildId, type RpgProfile } from '../rpg/rules'
+import { learnRpgNode, projectRpgStats, rpgActiveSlots, rpgLearnBlock, rpgProfileTrees, RPG_BUILD, RPG_DEPTH_GATES, type RpgBuildId, type RpgProfile } from '../rpg/rules'
 import { rpgTreeNodes } from '../rpg/catalog'
 import { regionChapter, worldContinent } from './world'
 
@@ -17,7 +18,7 @@ const PARTY: readonly RpgBuildId[] = ['greatsword-spear', 'mage', 'spellblade', 
 function member(build: RpgBuildId, i: number, level: number, rank: number, budget: number): BattleAlly {
   const { classId, weapons } = RPG_BUILD[build]
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: [...weapons], tier: 1, level, exp: 0, tree: [], legacy: [], maxDepth: rank - 1 }
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: [...weapons], tier: 1, level, exp: 0, tree: [], legacy: [], maxDepth: depthsOpen(rank) }
   // Core nodes depth by depth across every branch, then side nodes, while points last.
   for (let pass = 0; pass < 2; pass++) {
     for (let d = 1; d <= 5; d++) {
@@ -32,7 +33,7 @@ function member(build: RpgBuildId, i: number, level: number, rank: number, budge
   const stats = projectRpgStats(profile)
   const boosted = Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v * budget) : v])) as unknown as typeof stats
   return { id: profile.outfitId, classId, weapons: [...weapons], tier: 1, level, stats: boosted, tree: profile.tree, legacy: [],
-    loadout: skills.slice(0, rpgActiveSlots(level)), familiar: 'greatsword', mp: boosted.mp, maxDepth: rank - 1 }
+    loadout: skills.slice(0, rpgActiveSlots(level)), familiar: 'greatsword', mp: boosted.mp, maxDepth: depthsOpen(rank) }
 }
 
 /** Plays a fight: each ally uses her strongest affordable skill that hits a living foe's weakness, else attacks. */
@@ -122,7 +123,7 @@ function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 
 }
 
 describe('world balance (D72)', () => {
-  it('lets a fresh Lv1 party with no skills win the opening pairs', () => {
+  it('lets a fresh Lv1 party win the opening pairs', () => {
     const party = PARTY.map((b, i) => member(b, i, 1, 1, 1))
     const meadow = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions[0]!, cast)
     const opening = meadow.nodes.filter((n) => n.kind === 'fight').slice(0, 2)
@@ -132,9 +133,9 @@ describe('world balance (D72)', () => {
   it.skipIf(!process.env.SIM)('prints win rates by level, rank and gear', () => {
     const rows: string[] = ['level | rank | gear | regular win% (rounds, hp left) | elite | boss']
     for (const level of [1, 3, 5, 10, 15, 20, 25, 30, 40, 50]) {
-      const band = Math.ceil(level / 10)
-      const scenarios: [string, number][] = [['lag', Math.min(6, band)], ['on time', Math.min(6, band + 1)]]
-      if (level <= 5) scenarios.unshift(['none', 1])
+      // On time: the rank that opens every depth her level allows (D77); lagging: one rank short.
+      const due = RPG_DEPTH_GATES.filter((gate) => level >= gate).length
+      const scenarios: [string, number][] = due > 1 ? [['lag', due - 1], ['on time', due]] : [['on time', due]]
       for (const [label, rank] of scenarios) {
         for (const gear of [false, true]) {
           const r = simulate(level, rank, gear)
@@ -146,7 +147,7 @@ describe('world balance (D72)', () => {
     }
     rows.push('', 'level | rank | stages cleared in a row per region (of 12), MP carried, no Spring | MP left')
     for (const level of [1, 5, 10, 15, 20, 30, 40, 50]) {
-      const rank = Math.min(6, Math.ceil(level / 10) + 1)
+      const rank = RPG_DEPTH_GATES.filter((gate) => level >= gate).length
       const r = run(level, rank)
       rows.push(`Lv${level} | ${rank} | ${r.cleared.join(', ')} | ${Math.round(100 * r.mpLeft)}%`)
     }
