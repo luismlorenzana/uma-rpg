@@ -77,8 +77,8 @@ uploads it to `gs://uma-rpg-content`, and the API serves it at `/api/content/` t
 the cast means capturing the list again and re-running both scripts; the chapters pick it up on the next load. Since
 D76, D81 and D83 the faces follow the biome, three biomes a franchise: PriConne, **Azur Lane** (694 shipyard busts,
 `import-azurlane.mjs`), **Last Origin** (full art and face icons, `import-lastorigin.mjs`, run by the owner), **NIKKE**
-(full-body art, `import-nikke.mjs`) and **Destiny Child** (full-body stills, `import-destinychild.mjs`); four biomes
-draw from a mixed pool of five faces per pack. Busts and full-body art both fit the stage by their own shape; the
+(full-body art, `import-nikke.mjs`), **Destiny Child** (full-body stills, `import-destinychild.mjs`) and
+**Echocalypse** (D84); Forest alone draws from a mixed pool of five faces per pack. Busts and full-body art both fit the stage by their own shape; the
 small round faces use a pack's face icons, or zoom onto the head of full-body art.
 Costume variants aren't on the official site and are out of scope.
 

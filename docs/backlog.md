@@ -17,17 +17,19 @@
 
 ## Not built yet
 
-1. **Key bosses' faces**: all five packs are built (D81, D83); the owner authors key bosses' faces later. Last
+1. **Echocalypse's pack (D84)**: its biomes (Jungle, Geyser Basin, Crystal Caverns) draw from the pool until it's
+   captured, which waits on the owner's OK for its source.
+2. **Key bosses' faces**: five packs are built (D81, D83); the owner authors key bosses' faces later. Last
    Origin's pack is refreshed by the owner (`node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh
    lastorigin`): its wiki asks AI agents not to fetch.
-2. **The world map**, W3–W5 (W1–W2 shipped as D72): eight-foe fights, dual-element foes and waves; field effects and
+3. **The world map**, W3–W5 (W1–W2 shipped as D72): eight-foe fights, dual-element foes and waves; field effects and
    home ground; biome art; the capitals' Finals; themed regions later. Design in [design/world/](design/world/README.md).
-3. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
+4. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
    Lv50, the Tier 2 world, legacy skills, and what the banked EXP at Lv50 is for.
-4. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).
-5. **Scenario flavor** (design §12): chapters differ only by their authored Finals (the world map proposal answers
+5. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).
+6. **Scenario flavor** (design §12): chapters differ only by their authored Finals (the world map proposal answers
    this with biomes and continent leans).
-6. **The Tier Finale's difficulty spike** (design §12), with S8.
+7. **The Tier Finale's difficulty spike** (design §12), with S8.
 
 ## Balance: needs real play
 

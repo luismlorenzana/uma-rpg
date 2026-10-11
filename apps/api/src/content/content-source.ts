@@ -3,10 +3,10 @@ import { resolve, sep } from 'node:path'
 import type { MasterSource } from '../master/master-source'
 
 /**
- * uma-rpg's own private content: the foes' faces by franchise (D50, D76, D81). PriConne's pack sits at the root, the
+ * uma-rpg's own private content: the foes' faces by franchise (D50, D76, D81, D84). PriConne's pack sits at the root, the
  * others in their own folders; only each `cast.json` and its hash-named portraits are served. Null when refused.
  */
-const PACK = '((azurlane|lastorigin|destinychild|nikke)\\/)?'
+const PACK = '((azurlane|lastorigin|destinychild|nikke|echocalypse)\\/)?'
 export function safeContentPath(raw: string): string | null {
   const path = raw.replace(/^\/+/, '')
   if (new RegExp(`^${PACK}cast\\.json$`).test(path)) return path
