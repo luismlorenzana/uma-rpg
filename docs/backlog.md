@@ -38,12 +38,11 @@ The numbers are a first pass from the pacing model (D54), pinned by tests but no
 
 ## Presentation and art (lean on purpose, owner 2026-10-10)
 
-1. **The Hub**: the design wants scrollable, zoomable pages of original pixel tiles; today they're code-drawn markers
-   on flat ground.
-2. **Dish and gear art**: both reuse their main ingredient's icon.
-3. **Battles**: rivals are bust portraits; effects are procedural; no sound, no battle speed or auto-battle option.
-4. **Chibis**: newer outfits without one in the master data show their icon.
-5. **PriConne names**: English names come from the site's slugs plus a few fixes; some may need proper spellings.
+1. **The Hub**: pixel-art terrain and buildings shipped 2026-10-10 (D64); the design's scrolling and zooming pages are
+   still to come (each page fits one screen).
+2. **Battles**: rivals are bust portraits; effects are procedural; no sound, no battle speed or auto-battle option.
+3. **Chibis**: newer outfits without one in the master data show their icon.
+4. **PriConne names**: English names come from the site's slugs plus a few fixes; some may need proper spellings.
    Costume variants are out of scope.
 
 ## Quality of life

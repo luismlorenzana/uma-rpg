@@ -1,9 +1,20 @@
-// The Hub map scene (T007): ground tiles in the page's palette, a marker per place, gentle ambient life. World units
-// are CSS pixels; the camera zooms by the device pixel ratio so shapes render crisp. No text: names, pips and badges
-// are DOM buttons over the canvas (D33).
+// The Hub map scene (T007, D61, P38): the page's pixel-art terrain and building sprites from uma-art, laid on the
+// shared grid and drawn once into a texture, with gentle ambient life on top. World units are CSS pixels; the camera
+// zooms by the device pixel ratio, and art pixels land on whole device pixels. No text: names, pips and badges are DOM
+// buttons over the canvas (D33). If the art can't load, the code-drawn markers stand in.
+import buildingsIndex from '@luismlorenzana/uma-art/buildings/atlas.json'
+import buildingsUrl from '@luismlorenzana/uma-art/buildings/atlas.png?url'
+import tilesIndex from '@luismlorenzana/uma-art/tiles/atlas.json'
+import tilesUrl from '@luismlorenzana/uma-art/tiles/atlas.png?url'
 import type { HubPage, Place } from '@rpg/domain'
 import Phaser from 'phaser'
+import { ART_TILE, hubGrid } from '../grid'
 import { drawMarker, type Ambient } from './markers'
+import { layTerrain } from './terrain'
+
+type Frames = Record<string, { x: number; y: number; w: number; h: number; smoke?: { x: number; y: number } }>
+const TILES = 'hub-tiles'
+const BUILDINGS = 'hub-buildings'
 
 interface Palette {
   ground: number[]
@@ -35,6 +46,7 @@ export interface HubSceneState {
 export class HubScene extends Phaser.Scene {
   private state: HubSceneState | null = null
   private ground!: Phaser.GameObjects.Graphics
+  private art: Phaser.GameObjects.RenderTexture | null = null
   private markers!: Phaser.GameObjects.Graphics
   private fx!: Phaser.GameObjects.Graphics
   private ambient: Ambient[] = []
@@ -46,7 +58,24 @@ export class HubScene extends Phaser.Scene {
     super('hub')
   }
 
+  preload(): void {
+    this.load.image(TILES, tilesUrl)
+    this.load.image(BUILDINGS, buildingsUrl)
+  }
+
+  /** Names every frame of an atlas the scene loaded; false when it didn't load. */
+  private addFrames(key: string, frames: Frames): boolean {
+    if (!this.textures.exists(key)) return false
+    const texture = this.textures.get(key)
+    for (const [id, f] of Object.entries(frames)) if (!texture.has(id)) texture.add(id, 0, f.x, f.y, f.w, f.h)
+    texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+    return true
+  }
+
+  private hasArt = false
+
   create(): void {
+    this.hasArt = this.addFrames(TILES, tilesIndex.frames as Frames) && this.addFrames(BUILDINGS, buildingsIndex.frames as Frames)
     this.ground = this.add.graphics()
     this.markers = this.add.graphics()
     this.fx = this.add.graphics()
@@ -84,7 +113,17 @@ export class HubScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(palette.background)
     const g = this.ground
     g.clear()
+    this.markers.clear()
+    this.ambient = []
     const pageSeed = page.length * 31 + page.charCodeAt(0)
+    this.clouds = [0, 1, 2].map((i) => ({ x: hash(i, 7, pageSeed) * w, y: (0.15 + i * 0.32) * h, w: 70 + i * 24, speed: 4 + i * 2 }))
+    this.art?.destroy()
+    this.art = null
+    if (this.hasArt) {
+      this.drawArt(page, places, w, h)
+      this.drawFx()
+      return
+    }
     for (let ty = 0; ty * TILE < h; ty++)
       for (let tx = 0; tx * TILE < w; tx++) {
         const r = hash(tx, ty, pageSeed)
@@ -96,11 +135,40 @@ export class HubScene extends Phaser.Scene {
         }
       }
     this.drawFeatures(g, page, places, w, h)
-    this.markers.clear()
-    this.ambient = []
     for (const place of places) this.ambient.push(...drawMarker(this.markers, place.id, place.at.x * w, place.at.y * h - 12))
-    this.clouds = [0, 1, 2].map((i) => ({ x: hash(i, 7, pageSeed) * w, y: (0.15 + i * 0.32) * h, w: 70 + i * 24, speed: 4 + i * 2 }))
     this.drawFx()
+  }
+
+  /** Terrain, props and buildings, stamped once in art pixels into one texture and scaled up crisp. */
+  private drawArt(page: HubPage, places: Place[], w: number, h: number): void {
+    const grid = hubGrid(w, h, this.dpr)
+    const terrain = layTerrain(page, places, grid.cols, grid.rows)
+    const buildings = buildingsIndex.frames as Frames
+    const rt = this.add.renderTexture(0, 0, grid.cols * ART_TILE, grid.rows * ART_TILE).setOrigin(0, 0).setScale(grid.scale).setDepth(-1)
+    const topLeft = { originX: 0, originY: 0 }
+    terrain.cells.forEach((frame, i) => rt.stamp(TILES, frame, (i % grid.cols) * ART_TILE, Math.floor(i / grid.cols) * ART_TILE, topLeft))
+    // Props and buildings by the row they stand on, so nearer ones overlap farther ones.
+    const sprites = [
+      ...terrain.props.map((p) => ({ row: p.row, key: TILES, frame: p.frame, x: p.col * ART_TILE, y: (p.tall ? p.row - 1 : p.row) * ART_TILE })),
+      ...places.filter((p) => buildings[p.id] && terrain.footprints[p.id]).map((p) => {
+        const { col, row } = terrain.footprints[p.id]!
+        return { row: row + 0.5, key: BUILDINGS, frame: p.id, x: (col - 1) * ART_TILE, y: (row - 2) * ART_TILE }
+      }),
+    ].sort((a, b) => a.row - b.row)
+    for (const s of sprites) {
+      rt.stamp(s.key, s.frame, s.x, s.y, topLeft)
+      const smoke = s.key === BUILDINGS ? buildings[s.frame]?.smoke : undefined
+      if (smoke) this.ambient.push({ kind: 'smoke', x: (s.x + smoke.x) * grid.scale, y: (s.y + smoke.y) * grid.scale })
+    }
+    rt.render()
+    rt.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+    this.art = rt
+    // A glint now and then on the Wilds' stream.
+    terrain.cells.forEach((frame, i) => {
+      if (frame.startsWith('wilds/water') && i % 5 === 0) {
+        this.ambient.push({ kind: 'shimmer', x: ((i % grid.cols) + 0.5) * grid.tile, y: (Math.floor(i / grid.cols) + 0.5) * grid.tile, w: grid.tile * 0.5, color: 0xd8f0ff })
+      }
+    })
   }
 
   private drawFeatures(g: Phaser.GameObjects.Graphics, page: HubPage, places: Place[], w: number, h: number): void {

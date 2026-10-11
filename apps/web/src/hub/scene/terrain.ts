@@ -1,8 +1,9 @@
 // The Hub's ground as a tile grid (D61): seeded ground variants, a path network from every place's door to the page's
-// trunk road (the Wilds also get a stream along their east edge), and props scattered where nothing else is. Pure, so the
+// trunk road down the middle (the Wilds also get a stream along their east edge), and props scattered where nothing else is. Pure, so the
 // same page always lays out the same way; the scene only draws what this returns. Frame ids follow the tiles atlas
 // in @luismlorenzana/uma-art (`<page>/ground-<n>`, `<page>/path-<mask>`, `wilds/water-<mask>`, `<page>/<prop>`).
 import type { HubPage } from '@rpg/domain'
+import { placeCell } from '../grid'
 
 /** Connection bits for path and water masks. */
 export const N = 1, E = 2, S = 4, W = 8
@@ -32,10 +33,7 @@ function hash(a: number, b: number, c: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296
 }
 
-/** The cell a place stands on: its column and the row its ground contact line is in. */
-export function placeCell(at: { x: number; y: number }, cols: number, rows: number): { col: number; row: number } {
-  return { col: Math.min(cols - 1, Math.max(0, Math.floor(at.x * cols))), row: Math.min(rows - 1, Math.max(0, Math.floor(at.y * rows))) }
-}
+export { placeCell } from '../grid'
 
 export function layTerrain(page: HubPage, places: readonly TerrainPlace[], cols: number, rows: number): Terrain {
   const seed = page.length * 31 + page.charCodeAt(0)
@@ -62,11 +60,8 @@ export function layTerrain(page: HubPage, places: readonly TerrainPlace[], cols:
       if (r > 0 && at(cols - 2 + wobble, r - 1) !== 'water') set(cols - 2 + (1 - wobble), r, 'water')
     }
   }
+  // No cross road: place rows sit too close together, so it would run into buildings and double up beside their doors.
   for (const t of trunks) for (let r = 0; r < rows; r++) set(t, r, 'path')
-  if (page === 'farmlands' || page === 'town') {
-    const across = Math.floor(rows * 0.51)
-    for (let c = 0; c < cols; c++) set(c, across, 'path')
-  }
   // Branches: from each place's door (the cell below its footprint) to the nearest trunk on its side.
   for (const p of places) {
     const { col, row } = footprints[p.id]!

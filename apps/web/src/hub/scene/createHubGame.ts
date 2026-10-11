@@ -1,6 +1,7 @@
 // Creates the Phaser game for the Hub map inside a host element (uma-racer's imperative scene pattern). Loaded lazily:
 // Phaser never enters the main chunk.
 import Phaser from 'phaser'
+import { hubDpr } from '../grid'
 import { HubScene, PALETTES, type HubSceneState } from './HubScene'
 
 export interface HubGame {
@@ -10,7 +11,7 @@ export interface HubGame {
 }
 
 export function createHubGame(host: HTMLElement, initial: HubSceneState): Promise<HubGame> {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  const dpr = hubDpr()
   const size = () => ({ w: Math.max(1, Math.round(host.clientWidth * dpr)), h: Math.max(1, Math.round(host.clientHeight * dpr)) })
   const { w, h } = size()
   const scene = new HubScene()

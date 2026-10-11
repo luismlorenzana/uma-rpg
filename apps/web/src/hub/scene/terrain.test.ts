@@ -48,3 +48,19 @@ describe('Hub terrain (D61)', () => {
     })
   }
 })
+
+describe('Hub art (P38)', () => {
+  it('draws only frames the tiles and buildings atlases have', async () => {
+    const tiles = (await import('@luismlorenzana/uma-art/tiles/atlas.json')).default.frames as Record<string, unknown>
+    const buildings = (await import('@luismlorenzana/uma-art/buildings/atlas.json')).default.frames as Record<string, unknown>
+    const { PROPS } = await import('./terrain')
+    for (const page of HUB_PAGES) {
+      for (const n of [0, 1, 2, 3]) expect(tiles[`${page}/ground-${n}`], `${page}/ground-${n}`).toBeDefined()
+      for (let m = 0; m < 16; m++) expect(tiles[`${page}/path-${m}`], `${page}/path-${m}`).toBeDefined()
+      for (const p of PROPS[page]) expect(tiles[`${page}/${p.id}`], `${page}/${p.id}`).toBeDefined()
+      for (const place of placesOn(page)) expect(buildings[place.id], place.id).toBeDefined()
+      for (const [cols, rows] of [[16, 29], [COLS, ROWS], [12, 22]] as const) for (const f of layTerrain(page, placesOn(page), cols, rows).cells) expect(tiles[f], f).toBeDefined()
+    }
+    for (let m = 0; m < 16; m++) expect(tiles[`wilds/water-${m}`]).toBeDefined()
+  })
+})

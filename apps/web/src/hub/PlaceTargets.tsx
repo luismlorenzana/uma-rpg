@@ -2,10 +2,12 @@
 // name, its Uma slots (the face of whoever works there, ringed by her job's progress, D22) and the slice badge. The
 // canvas underneath only draws.
 import { CURRENT_SLICE, facilityOf, facilitySpec, isOpen, jobFinished, jobProgress, type Place, type TierWorld } from '@rpg/domain'
+import { useEffect, useRef, useState } from 'react'
 import { AtlasSprite } from '../master/art'
 import { useMaster } from '../master/master'
 import { useWorld } from '../save/game'
 import { useNow } from '../ui/useNow'
+import { BUILDING, hubDpr, hubGrid, placeAnchor } from './grid'
 
 /** Places with something to collect. */
 export function readyPlaces(world: TierWorld | null, now: string): Set<string> {
@@ -22,10 +24,27 @@ export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (pla
   const master = useMaster()
   const art = master.status === 'ready' ? master.view.art : null
   const ready = readyPlaces(world, now)
+  // The map's grid, so each button sits on its building (the scene snaps buildings to the same grid).
+  const root = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+  useEffect(() => {
+    const el = root.current
+    if (!el) return
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  const grid = size && size.w > 0 ? hubGrid(size.w, size.h, hubDpr()) : null
+  // The tap area covers the building's sprite; the slots and name hang below its ground line.
+  const tapH = grid ? BUILDING.anchorY * grid.scale : 48
+  const tapW = grid ? grid.tile * 3 : 80
   return (
-    <div className="absolute inset-0">
+    <div ref={root} className="absolute inset-0">
       {places.map((place) => {
         const open = isOpen(place, CURRENT_SLICE)
+        const anchor = grid ? placeAnchor(place.at, grid) : null
         return (
           <button
             key={place.id}
@@ -34,9 +53,9 @@ export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (pla
             onClick={() => onOpen(place)}
             aria-label={open ? place.name : `${place.name}, opens in ${place.opensIn}`}
             className="group absolute flex w-32 flex-col items-center"
-            style={{ left: `${place.at.x * 100}%`, top: `${place.at.y * 100}%`, transform: 'translate(-50%, -36px)' }}
+            style={anchor ? { left: anchor.x, top: anchor.y, transform: `translate(-50%, -${tapH}px)` } : { left: `${place.at.x * 100}%`, top: `${place.at.y * 100}%`, transform: 'translate(-50%, -36px)' }}
           >
-            <span className="relative h-12 w-20 rounded-md transition group-active:scale-95 group-active:bg-white/10">
+            <span className="relative rounded-md transition group-active:scale-95 group-active:bg-white/10" style={{ width: tapW, height: tapH }}>
               {!open && (
                 <span className="absolute -right-1 -top-1 rounded-full bg-sunken/90 px-1.5 text-[10px] font-bold leading-4 text-ink-soft ring-1 ring-hairline-strong">
                   {place.opensIn}
