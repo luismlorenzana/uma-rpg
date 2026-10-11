@@ -145,6 +145,8 @@ export class HubScene extends Phaser.Scene {
     const terrain = layTerrain(page, places, grid.cols, grid.rows)
     const buildings = buildingsIndex.frames as Frames
     const rt = this.add.renderTexture(0, 0, grid.cols * ART_TILE, grid.rows * ART_TILE).setOrigin(0, 0).setScale(grid.scale).setDepth(-1)
+    // Before drawing: under WebGL, changing a render texture's filter rebuilds it empty.
+    rt.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
     const topLeft = { originX: 0, originY: 0 }
     terrain.cells.forEach((frame, i) => rt.stamp(TILES, frame, (i % grid.cols) * ART_TILE, Math.floor(i / grid.cols) * ART_TILE, topLeft))
     // Props and buildings by the row they stand on, so nearer ones overlap farther ones.
@@ -161,7 +163,6 @@ export class HubScene extends Phaser.Scene {
       if (smoke) this.ambient.push({ kind: 'smoke', x: (s.x + smoke.x) * grid.scale, y: (s.y + smoke.y) * grid.scale })
     }
     rt.render()
-    rt.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
     this.art = rt
     // A glint now and then on the Wilds' stream.
     terrain.cells.forEach((frame, i) => {
