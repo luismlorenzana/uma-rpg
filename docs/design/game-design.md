@@ -210,7 +210,7 @@ Learning District (§9), with **several class hubs and several weapon hubs** (D2
 **[Proposed]** A party with a greyed-out member can't start a fight. Her card offers **Recall**, which cancels her job:
 its inputs come back and the unfinished output is lost.
 
-## 7. Equipment **[Owner]**, with structure **[Proposed]**
+## 7. Equipment **[Owner]**, with structure **[Settled in S7, D59: [forge.md](forge.md)]**
 
 **[Owner]** Equipment is a big new system that mirrors farming and cooking:
 

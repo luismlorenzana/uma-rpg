@@ -237,4 +237,4 @@ export function isOpen(place: Place, current: SliceId): boolean {
 }
 
 /** The slice the deployed build implements. */
-export const CURRENT_SLICE: SliceId = 'S6'
+export const CURRENT_SLICE: SliceId = 'S7'

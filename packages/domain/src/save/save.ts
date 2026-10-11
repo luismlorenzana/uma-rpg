@@ -1,14 +1,16 @@
-// Save v6: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v7: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
-// mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58).
+// mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, type Facility, type Job } from '../economy/jobs'
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
 import { RPG_CLASSES } from '../rpg/kinds'
 import { dishById, isStarNode } from '../economy/dishes'
+import { gearById, slotOf, type GearSlot } from '../economy/gear'
+import { WEAPON_TYPES } from '../economy/training'
 import { activeNodeSlots } from '../economy/pacing'
 import { itemById } from '../items/catalog'
 import { replayBattle } from '../rpg/battle/engine'
@@ -19,7 +21,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 6
+export const SAVE_SCHEMA_VERSION = 7
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -65,7 +67,12 @@ export interface OwnedUma {
   ranks: Ranks
   /** Her Sun-and-planets map: nodes unlocked by eating, and the ones active now (S6, design §10). */
   stars: Stars
+  /** Gear bound to her (her locker) and what she wears: one piece per weapon type, an armor, an accessory (S7). */
+  gear: UmaGear
 }
+
+export interface UmaGear { locker: string[]; equipped: Partial<Record<GearSlot, string>> }
+export const GEAR_SLOTS: readonly GearSlot[] = [...WEAPON_TYPES, 'armor', 'accessory']
 
 export interface Stars { unlocked: string[]; active: string[] }
 
@@ -90,6 +97,8 @@ export interface TierWorld {
   facilities: Record<string, Facility>
   /** Cooked dishes waiting to be eaten, by dish id (S6). */
   dishes: Record<string, number>
+  /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. */
+  gear: Record<string, number>
 }
 
 export interface Account {
@@ -145,10 +154,10 @@ export function defaultParties(): Party[] {
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
 export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks(),
-  stars: { unlocked: [], active: [] } })
+  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {} } })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {}, dishes: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {}, dishes: {}, gear: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -234,6 +243,7 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if ((kind === 'gather' || kind === 'refine') && !itemById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
   if (kind === 'train' && !parseTrack(j.output)) throw new SaveParseError(`${path}.output`, 'unknown training track')
   if (kind === 'cook' && !dishById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
+  if (kind === 'craft' && !gearById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gear')
   const n = count(j.count, `${path}.count`)
   if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_JOB_COUNT}`)
   const collected = count(j.collected, `${path}.collected`)
@@ -289,6 +299,34 @@ function parseStars(value: unknown, path: string, level: number): Stars {
   return { unlocked, active }
 }
 
+function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGear {
+  const o = object(value, path, ['locker', 'equipped'])
+  const locker = ids(o.locker, `${path}.locker`, 200)
+  if (locker.some((g) => !gearById(g))) throw new SaveParseError(`${path}.locker`, 'unknown gear')
+  const slots = object(o.equipped, `${path}.equipped`, GEAR_SLOTS)
+  const equipped: Partial<Record<GearSlot, string>> = {}
+  for (const [slot, id] of Object.entries(slots)) {
+    const piece = typeof id === 'string' ? gearById(id) : undefined
+    if (!piece || !locker.includes(id as string) || slotOf(piece.type) !== slot) throw new SaveParseError(`${path}.equipped.${slot}`, 'expected a piece from her locker for this slot')
+    if (piece.type !== 'ring' && piece.type !== 'charm' && ranks.mastery[piece.type] < piece.grade) {
+      throw new SaveParseError(`${path}.equipped.${slot}`, `needs ${piece.type} mastery rank ${piece.grade}`)
+    }
+    equipped[slot as GearSlot] = id as string
+  }
+  return { locker, equipped }
+}
+
+function parseGearStock(value: unknown, path: string): Record<string, number> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const gear: Record<string, number> = {}
+  for (const [id, n] of Object.entries(value)) {
+    if (!gearById(id)) throw new SaveParseError(`${path}.${id}`, 'unknown gear')
+    const c = count(n, `${path}.${id}`)
+    if (c > 0) gear[id] = c
+  }
+  return gear
+}
+
 function parseDishes(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const dishes: Record<string, number> = {}
@@ -341,13 +379,16 @@ function parseUmas(value: unknown, path: string, tier: number, version: number):
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
     const u = object(raw, at, version < 3 ? ['unlockedAt', 'level', 'exp'] : version < 4 ? ['unlockedAt', 'level', 'exp', 'build', 'builds']
       : version < 5 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions'] : version < 6 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks']
-        : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks', 'stars'])
+        : version < 7 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks', 'stars']
+          : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks', 'stars', 'gear'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), build: null, builds: {},
       professions: version < 4 ? newProfessions() : parseProfessions(u.professions, `${at}.professions`),
       ranks: version < 5 ? newRanks() : parseRanks(u.ranks, `${at}.ranks`),
-      stars: version < 6 ? { unlocked: [], active: [] } : parseStars(u.stars, `${at}.stars`, level) }
+      stars: version < 6 ? { unlocked: [], active: [] } : parseStars(u.stars, `${at}.stars`, level),
+      gear: { locker: [], equipped: {} } }
+    if (version >= 7) owned.gear = parseUmaGear(u.gear, `${at}.gear`, owned.ranks)
     if (version >= 3) {
       // v2 → v3 (D52): no build chosen and nothing learned.
       if (u.build !== null && !isRpgBuildId(u.build)) throw new SaveParseError(`${at}.build`, 'expected null or a class build')
@@ -464,11 +505,12 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
     // v1 → v3 (D45, D52): no Umas yet, twenty empty parties, no runs.
     const w = object(value, path, ['createdAt', 'wallet'])
     return { createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas: {}, parties: defaultParties(),
-      runs: {}, items: {}, facilities: {}, dishes: {} }
+      runs: {}, items: {}, facilities: {}, dishes: {}, gear: {} }
   }
   const keys = version === 2 ? ['createdAt', 'wallet', 'umas', 'parties'] : version === 3 ? ['createdAt', 'wallet', 'umas', 'parties', 'runs']
     : version < 6 ? ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities']
-      : ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities', 'dishes']
+      : version < 7 ? ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities', 'dishes']
+        : ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities', 'dishes', 'gear']
   const w = object(value, path, keys)
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
   return {
@@ -477,6 +519,7 @@ function parseTierWorld(value: unknown, path: string, version: number, tier: num
     items: version < 4 ? {} : parseItems(w.items, `${path}.items`),
     facilities: version < 4 ? {} : parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: version < 6 ? {} : parseDishes(w.dishes, `${path}.dishes`),
+    gear: version < 7 ? {} : parseGearStock(w.gear, `${path}.gear`),
   }
 }
 
@@ -486,7 +529,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v6 save and always returns v6. */
+/** Parses a v1–v7 save and always returns v7. */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

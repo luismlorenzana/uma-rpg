@@ -15,12 +15,12 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Save and sync (D32, D45, D52)
 
-- One snapshot per account: `{ schemaVersion: 6, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
+- One snapshot per account: `{ schemaVersion: 7, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
   outfits by id: unlock time, level, EXP, the class `build` she fights as and her `builds`: tree, equipped skills,
-  Familiar, her two `professions`, her class and mastery `ranks` and her `stars` map), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), `runs`
+  Familiar, her two `professions`, her class and mastery `ranks`, her `stars` map and her `gear` locker), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), `runs`
   (one per party per chapter: wins, carried MP, and the open fight as its frozen input plus every action), `items`
-  (the Warehouse), `dishes` and `facilities` (level and job slots). The wallet holds Rush and Sweep Tickets too.
-  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v6
+  (the Warehouse), `dishes`, `gear` (unbound pieces) and `facilities` (level and job slots). The wallet holds Rush and Sweep Tickets too.
+  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v7
   (device rows on boot, server rows on read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets;
   `save/battle.ts`: builds, skills, fights and their rewards) are pure and return a new save.
 - The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old
@@ -55,7 +55,9 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 - One page serves all 16 sites and both refining stations (`places/work/FacilityPage.tsx`), and one serves the five
   class halls and four armories (`places/learning/TrainingPage.tsx`, D57: a training job is one rank). The Kitchen
   uses the facility page too; the Observatory draws each Uma's star map as SVG (D58).
-- Stat points (Extra Stats now, gear in S7) enter a fight through `economy/bonus.ts`: stats scaled per point, plus
+- The Forge uses the facility page with a type/grade/accent picker; gear pieces are generated from their id
+  (`economy/gear.ts`), never listed. Profiles carry a Gear card (`places/stable/GearCard.tsx`, D59).
+- Stat points (Extra Stats and gear) enter a fight through `economy/bonus.ts`: stats scaled per point, plus
   optional `evasion` and `limitStart` on each ally, which the engine reads. The Hub's place buttons
   read the world to draw working Umas' faces, progress rings and Ready tags (`hub/PlaceTargets.tsx`).
 

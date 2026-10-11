@@ -10,6 +10,8 @@ export type RpgFoeRole = typeof RPG_FOE_ROLES[number] | 'captain' | 'champion'
 export const RPG_FOE_TUNING = {
   hpBase: 40, hpPerStat: 4.2, offense: 3, defense: 0.8,
   subBossHp: 4.5, bossHp: 6.5,
+  /** Expected gear and Extra Stats by level (§7.3, D59): +0.35% to every stat per lifetime level past the first chapter. */
+  budgetPerLevel: 0.0035, budgetFrom: 10,
   /** Break shields (D279): regular foes 2 early and 3 from Senior Year, sub-bosses 6, champions 8. */
   regularShield: 2, lateRegularShield: 3, subBossShield: 6, bossShield: 8,
 } as const
@@ -64,12 +66,14 @@ export function rpgFoe(input: { id: string; castId: string; element: RpgElement;
   // Sub-bosses and champions also grow with the skill depth the party can reach (D282): that is where its MP goes.
   const scale = (input.rank === 'boss' ? t.bossHp : input.rank === 'sub-boss' ? t.subBossHp : 1) * (input.rank === 'regular' ? 1 : input.reach ?? 1)
   const kit = moves(input.role, input.element)
+  // The party's expected gear and Extra Stats at this level, given to the foe too (§7.3, D59).
+  const budget = 1 + t.budgetPerLevel * Math.max(0, input.level - t.budgetFrom)
   return {
     id: input.id, castId: input.castId, element: input.element, rank: input.rank, level: input.level,
     stats: {
-      hp: Math.round((t.hpBase + t.hpPerStat * s) * shape.hp * scale),
-      atk: Math.round(s * t.offense * shape.atk), matk: Math.round(s * t.offense * shape.matk),
-      pdef: Math.round(s * t.defense * shape.def), mdef: Math.round(s * t.defense * shape.mdef),
+      hp: Math.round((t.hpBase + t.hpPerStat * s) * shape.hp * scale * budget),
+      atk: Math.round(s * t.offense * shape.atk * budget), matk: Math.round(s * t.offense * shape.matk * budget),
+      pdef: Math.round(s * t.defense * shape.def * budget), mdef: Math.round(s * t.defense * shape.mdef * budget),
       initiative: Math.round(s * shape.speed),
     },
     shield: input.shield,

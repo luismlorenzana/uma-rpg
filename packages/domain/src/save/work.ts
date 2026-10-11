@@ -8,6 +8,7 @@ import {
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
 import { dishById } from '../economy/dishes'
+import { gearById } from '../economy/gear'
 import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
 import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
@@ -63,6 +64,7 @@ export interface JobPlan {
 export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count = 1): JobPlan | null {
   const spec = facilitySpec(placeId)
   if (spec?.kind === 'cook') return planCooking(world, placeId, outfit, output, count)
+  if (spec?.kind === 'craft') return planCrafting(world, placeId, outfit, output, count)
   const item = itemById(output)
   const uma = world.umas[outfit.outfitId]
   if (!spec || !item || !uma || !spec.profession || (spec.kind !== 'gather' && spec.kind !== 'refine')) return null
@@ -84,6 +86,18 @@ export function inputsBlock(world: TierWorld, inputs: Record<string, number>, co
     if ((world.items[id] ?? 0) < n * count) return `Needs ${n * count} ${itemById(id)?.name ?? id}`
   }
   return null
+}
+
+/** A piece of gear at the Forge (S7): Gathering & Crafting, three items' time, its materials. */
+function planCrafting(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
+  const piece = gearById(output)
+  const uma = world.umas[outfit.outfitId]
+  if (!piece || !uma) return null
+  const facility = facilityOf(world, placeId)
+  const minutes = makeMinutes(piece.grade)
+  const msEach = Math.max(1000, Math.round((minutes * MINUTE * aptitudeTime(professionAptitude(outfit, 'gathering'))) / FACILITY_SPEED[facility.level - 1]!))
+  const block = uma.professions.gathering.level < gradeUnlockLevel(piece.grade) ? `Needs Gathering Lv${gradeUnlockLevel(piece.grade)}` : inputsBlock(world, piece.inputs, count)
+  return { output: { id: piece.id, name: piece.name, grade: piece.grade }, item: null, profession: 'gathering', msEach, expEach: minutes * EXP_PER_MINUTE, inputs: piece.inputs, block }
 }
 
 /** A dish at the Kitchen (S6): Farming & Cooking, three items' time, its recipe's refined ingredients. */
@@ -152,7 +166,8 @@ function collectIn(world: TierWorld, placeId: string, slot: number, now: string)
   const spec = facilitySpec(placeId)!
   const done = finished >= job.count
   if (ready <= 0) return { world: done ? setJob(world, placeId, slot, null) : world, got: { items: 0, exp: 0, levelsUp: 0, done } }
-  let next: TierWorld = job.kind === 'cook' ? { ...world, dishes: give(world.dishes, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
+  let next: TierWorld = job.kind === 'cook' ? { ...world, dishes: give(world.dishes, job.output, ready) }
+    : job.kind === 'craft' ? { ...world, gear: give(world.gear, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
   let levelsUp = 0
   const exp = ready * job.expEach
   const uma = next.umas[job.outfitId]

@@ -57,6 +57,6 @@ const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ def
 const TrainingPage = lazy(() => import('./learning/TrainingPage'))
 const TrainingPeek = lazy(() => import('./learning/TrainingPage').then((m) => ({ default: m.TrainingPeek })))
 for (const f of FACILITIES) {
-  if (f.kind === 'gather' || f.kind === 'refine' || f.kind === 'cook') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
+  if (f.kind === 'gather' || f.kind === 'refine' || f.kind === 'cook' || f.kind === 'craft') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
   if (f.kind === 'train') PLACE_UI[f.id] = { Peek: TrainingPeek, Page: TrainingPage }
 }

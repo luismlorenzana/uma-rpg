@@ -67,6 +67,8 @@ describe('save v5', () => {
     delete v4.tierWorlds['1'].umas['101'].ranks
     delete v4.tierWorlds['1'].umas['101'].stars
     delete v4.tierWorlds['1'].dishes
+    delete v4.tierWorlds['1'].gear
+    delete v4.tierWorlds['1'].umas['101'].gear
     const migrated = parseSave(v4)
     expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']!.umas['101']!.ranks.classes).toEqual({ brawler: 2, mage: 1, spellblade: 1, cleric: 1, summoner: 1 })

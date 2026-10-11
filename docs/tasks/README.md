@@ -13,7 +13,8 @@ private PriConne cast pipeline, the chapter map, the Phaser fight and result, an
 | [T020](T020-s3-release.md) | S3's phone check | Live since `238b060`; the owner's check is open |
 | [T021](T021-s4-release.md) | S4's phone check | Live; the owner's check is open |
 | — | S5: the [exit check](../slices/S5-learning.md#exit-check) | Live; the owner's check is open |
-| — | S6: deploy, then the [exit check](../slices/S6-kitchen.md#exit-check) | Deploying |
+| — | S6: the [exit check](../slices/S6-kitchen.md#exit-check) | Live; the owner's check is open |
+| — | S7: deploy, then the [exit check](../slices/S7-forge.md#exit-check) | Deploying |
 
 ## Conventions every task follows
 

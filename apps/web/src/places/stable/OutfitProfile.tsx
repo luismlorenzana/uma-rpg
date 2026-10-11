@@ -6,6 +6,7 @@ import {
   rpgTreePointsSpent, SaveRuleError, GEAR_TYPE_LABEL, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
 } from '@rpg/domain'
 import { Bar, BUILD_LABEL, CLASS_LABEL } from '../../battle/labels'
+import { GearCard } from './GearCard'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
@@ -212,6 +213,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
 
       {owned && <BattleCard outfit={outfit} owned={owned} onSkills={() => nav.sub(place, `outfit/${outfit.outfitId}/skills`)}
         onStars={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} />}
+      {owned && world && <GearCard outfit={outfit} uma={owned} world={world} />}
 
       <Aptitudes outfit={outfit} />
       <AptitudesAtWork outfit={outfit} />

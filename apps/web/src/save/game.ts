@@ -2,7 +2,7 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   buyRawItem, buyTickets, collectAll, collectJob, recallJob, rushJob, startJob, startTraining, sweepFight, upgradeFacility, type Track, type WorkOutfit,
-  eatDish, setActiveNodes,
+  eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
   type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
@@ -150,6 +150,8 @@ export async function eat(outfitId: string, dishId: string): Promise<string> {
   return r.node
 }
 export const activate = (outfitId: string, nodes: string[]) => edit((s, now) => setActiveNodes(s, outfitId, nodes, now))
+export const wear = (outfitId: string, gearId: string) => edit((s, now) => equipGear(s, outfitId, gearId, now))
+export const takeOff = (outfitId: string, slot: GearSlot) => edit((s, now) => unequipGear(s, outfitId, slot, now))
 
 /** Collects one job; returns what it gave. */
 export async function collect(placeId: string, slot: number): Promise<{ items: number; levelsUp: number }> {

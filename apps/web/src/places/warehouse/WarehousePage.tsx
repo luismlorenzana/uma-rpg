@@ -8,7 +8,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 
 export default function WarehousePage() {
   const world = useWorld()
-  const [side, setSide] = useState<ItemSide | 'dishes'>('farming')
+  const [side, setSide] = useState<ItemSide | 'dishes' | 'gear'>('farming')
   const [open, setOpen] = useState<string | null>(null)
   if (!world) return null
   const total = Object.values(world.items).reduce((a, b) => a + b, 0)
@@ -16,16 +16,28 @@ export default function WarehousePage() {
   return (
     <div>
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
-        <div className="grid grid-cols-3 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
-          {(['farming', 'gathering', 'dishes'] as const).map((s) => (
+        <div className="grid grid-cols-4 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
+          {(['farming', 'gathering', 'dishes', 'gear'] as const).map((s) => (
             <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)}
               className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-              {s === 'farming' ? 'Ingredients' : s === 'gathering' ? 'Materials' : 'Dishes'}
+              {s === 'farming' ? 'Ingredients' : s === 'gathering' ? 'Materials' : s === 'dishes' ? 'Dishes' : 'Gear'}
             </button>
           ))}
         </div>
         <p className="text-[12px] text-ink-faint">{total} items in stock</p>
       </div>
+      {side === 'gear' && (
+        <ul className="space-y-1.5 p-3">
+          {Object.keys(world.gear).length === 0 && <li className="text-[13px] text-ink-faint">No unbound gear: craft at the Forge, equip from an Uma's profile.</li>}
+          {Object.entries(world.gear).map(([id, n]) => (
+            <li key={id} className="flex items-center gap-2 rounded-sm bg-panel p-2 text-[13px]">
+              <ItemIcon id={outputView(id).icon} size={32} />
+              <span className="min-w-0 flex-1 truncate font-semibold">{outputView(id).name} · G{outputView(id).grade}</span>
+              <span className="text-ink-soft">×{n}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {side === 'dishes' && (
         <ul className="space-y-1.5 p-3">
           {Object.keys(world.dishes).length === 0 && <li className="text-[13px] text-ink-faint">No dishes: cook at the Kitchen, eat at the Observatory.</li>}

@@ -1,8 +1,8 @@
 // A working facility (S4, S6; D55, D58): the 16 sites gather raw items, the Pantry and Workbench refine them 1 → 1, and
-// the Kitchen cooks dishes. Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
+// the Kitchen cooks dishes and the Forge crafts gear (S7, D59). Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
 // output and her profession EXP.
 import {
-  availabilityBlock, DISHES, dishById, EFFECT_LABEL, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
+  availabilityBlock, DISHES, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, rushCost, SaveRuleError,
   upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -25,6 +25,7 @@ function describe(placeId: string): { title: string; line: string; profession: P
   const family = spec.family ? familyById(spec.family) : null
   if (family) return { title: family.name, line: `Gathers ${family.name.toLowerCase()} for the ${EFFECT_LABEL[family.effect]} effect`, profession: spec.profession! }
   if (spec.kind === 'cook') return { title: 'Cooking', line: 'Cooks dishes from refined ingredients; each new dish an Uma eats unlocks an Extra Stats node', profession: 'farming' }
+  if (spec.kind === 'craft') return { title: 'Crafting', line: 'Crafts weapons, armor and accessories: the main material sets the type and grade, the accent adds its effect', profession: 'gathering' }
   return { title: 'Refining', line: `Refines every ${spec.profession === 'farming' ? 'farming' : 'gathering'} family, one into one`, profession: spec.profession! }
 }
 
@@ -152,7 +153,7 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
   const plan = outfit && output ? planJob(world, placeId, outfit, output, count) : null
   // How many the Warehouse covers: refining needs the raw item, cooking every ingredient.
   const makeable = (inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
-  const stock = plan && (spec.kind === 'refine' || spec.kind === 'cook') ? makeable(plan.inputs) : Infinity
+  const stock = plan && (spec.kind === 'refine' || spec.kind === 'cook' || spec.kind === 'craft') ? makeable(plan.inputs) : Infinity
   const max = Math.max(1, Math.min(MAX_JOB_COUNT, stock))
   const title = !outfit ? 'Who works here?' : !output ? 'What does she make?' : 'How many?'
   return (
@@ -183,7 +184,10 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
           })}
         </ul>
       )}
-      {outfit && !output && (
+      {outfit && !output && spec.kind === 'craft' && (
+        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} onPick={(id, have) => { setOutput(id); setCount(Math.max(1, Math.min(10, have))) }} />
+      )}
+      {outfit && !output && spec.kind !== 'craft' && (
         <div className="grid grid-cols-2 gap-1.5">
           {options.map((id) => {
             const out = outputView(id)
@@ -239,6 +243,45 @@ function AssignSheet({ view, world, placeId, profession, onClose, onStart }: {
       )}
       {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
     </BottomSheet>
+  )
+}
+
+/** The Forge's picker: a type, a grade (her Gathering level opens them) and an accent (the effect it adds). */
+function CraftPicker({ world, level, onPick }: { world: TierWorld; level: number; onPick: (id: string, have: number) => void }) {
+  const [type, setType] = useState<EquipType>('greatsword')
+  const [grade, setGrade] = useState(1)
+  const [accent, setAccent] = useState<ItemEffect>('atk')
+  const piece = gearById(gearId(type, grade, accent))!
+  const have = Math.min(...Object.entries(piece.inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
+  const chip = (on: boolean) => `min-h-9 rounded-full px-2.5 text-[12px] font-semibold ${on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'} disabled:opacity-35`
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-micro mb-1">Type</p>
+        <div className="flex flex-wrap gap-1">{EQUIP_TYPES.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t]}</button>)}</div>
+      </div>
+      <div>
+        <p className="text-micro mb-1">Grade</p>
+        <div className="flex flex-wrap gap-1">{Array.from({ length: 10 }, (_, i) => i + 1).map((g) => (
+          <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Gathering Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
+        ))}</div>
+      </div>
+      <div>
+        <p className="text-micro mb-1">Accent</p>
+        <div className="flex flex-wrap gap-1">{ITEM_EFFECTS.map((e) => <button key={e} type="button" onClick={() => setAccent(e)} className={chip(e === accent)}>{EFFECT_LABEL[e]}</button>)}</div>
+      </div>
+      <div className="rounded-sm bg-raised p-2.5">
+        <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(piece.id).icon} size={28} /> {piece.name}</p>
+        <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
+          {Object.entries(piece.inputs).map(([id, n]) => (
+            <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {itemById(id)?.name} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>
+          ))}
+        </ul>
+        <button type="button" disabled={have < 1} onClick={() => onPick(piece.id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
+          {have < 1 ? 'Not enough materials' : `Next · ${have} possible`}
+        </button>
+      </div>
+    </div>
   )
 }
 
