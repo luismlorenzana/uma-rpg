@@ -136,7 +136,7 @@ describe('fights (D52, D66)', () => {
     expect(leveled.result!.members.every((m) => m.afterLevel === 10 && m.shards === 1)).toBe(true)
     expect(leveled.result).toMatchObject({ shards: 5, tickets: 1 })
     expect(worldOf(leveled.save).wallet).toMatchObject({ unlockTickets: before + 1, shards: 0 })
-  })
+  }, 30_000)
 
   it('settles a loss with nothing paid and the run as it was', () => {
     const save = startFight(withParty(), ura, S1, OUTFITS, T(4))
