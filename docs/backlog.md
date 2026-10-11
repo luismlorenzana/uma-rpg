@@ -17,9 +17,9 @@
 
 ## Not built yet
 
-1. **Franchise packs (D81, D83)**: PriConne, Azur Lane, NIKKE and Destiny Child are built. **Last Origin** waits on
-   the owner running `node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh lastorigin` (its wiki asks
-   AI agents not to fetch); until then its biomes draw from the mixed pool. Key bosses' authored faces later.
+1. **Key bosses' faces**: all five packs are built (D81, D83); the owner authors key bosses' faces later. Last
+   Origin's pack is refreshed by the owner (`node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh
+   lastorigin`): its wiki asks AI agents not to fetch.
 2. **The world map**, W3–W5 (W1–W2 shipped as D72): eight-foe fights, dual-element foes and waves; field effects and
    home ground; biome art; the capitals' Finals; themed regions later. Design in [design/world/](design/world/README.md).
 3. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
