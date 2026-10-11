@@ -59,7 +59,7 @@ export function setPartySlot(save: Save, party: number, slot: number, outfitId: 
   if (!Number.isInteger(slot) || slot < 0 || slot >= PARTY_SIZE) throw new SaveRuleError('bad-slot', `slot ${slot} doesn't exist`)
   if (outfitId !== null && !world.umas[outfitId]) throw new SaveRuleError('not-owned', 'only owned Umas can join a party')
   // A party in a fight keeps its line-up until the fight ends, and nobody leaves a fight for another party (D52).
-  const fighting = (p: number) => Object.values(world.runs).some((r) => r.party === p && r.battle)
+  const fighting = (p: number) => world.world.run.party === p && world.world.run.battle !== null
   const from = outfitId === null ? null : partyOf(world, outfitId)
   if (fighting(party) || (from && fighting(from.party))) throw new SaveRuleError('in-fight', 'finish or leave the open fight first')
   const parties: Party[] = world.parties.map((p) => ({ ...p, slots: p.slots.map((s) => (outfitId !== null && s === outfitId ? null : s)) }))

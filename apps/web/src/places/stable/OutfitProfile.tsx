@@ -4,7 +4,7 @@
 // outfit shows the Unlock flow and her racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeBuild, activeNodeSlots, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
+  activeBuild, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, buildOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_BUILD, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots,
   rpgExpToNext, rpgNode, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
@@ -128,7 +128,7 @@ function Header({ view, outfit, owned, world, bust }: { view: MasterView; outfit
   const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
   const work = owned && world ? workOf(world, outfit.outfitId) : null
   const party = owned && world ? partyOf(world, outfit.outfitId) : null
-  const fighting = owned && world ? Object.values(world.runs).some((r) => r.battle?.input.allies.some((a) => a.id === outfit.outfitId)) : false
+  const fighting = owned && world ? isInFight(world, outfit.outfitId) : false
   return (
     <section className="space-y-3">
       <div className="flex items-end gap-3">

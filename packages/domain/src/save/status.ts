@@ -4,7 +4,7 @@ import type { TierWorld } from './save'
 
 /** True when the Uma is in a fight that hasn't ended: her party can't change until it does. */
 export function isInFight(world: TierWorld, outfitId: string): boolean {
-  return Object.values(world.runs).some((r) => r.battle?.input.allies.some((a) => a.id === outfitId))
+  return world.world.run.battle?.input.allies.some((a) => a.id === outfitId) ?? false
 }
 
 /** Where an Uma is working, or null. */

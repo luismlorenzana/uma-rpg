@@ -1,7 +1,7 @@
 # The world map
 
-> **Status: design, owner's answers of 2026-10-11 folded in (D66).** If built, it replaces chapters and runs
-> ([battles.md](../battles.md), D48 and D52). Not built yet. Companion pages: [research.md](research.md) (how other
+> **Status: W1–W2 built (D72), quick and plain; owner's answers of 2026-10-11 folded in (D66, D71).** It replaces
+> chapters and runs ([battles.md](../battles.md), D48 and D52). Next: W3 (eight foes, dual elements, waves). Companion pages: [research.md](research.md) (how other
 > games do it), [regions.md](regions.md) (biomes and continents), [encounters.md](encounters.md) (what makes the fights
 > differ) and [themes.md](themes.md) (elements or franchises). The token loop it feeds is in [../loop.md](../loop.md).
 

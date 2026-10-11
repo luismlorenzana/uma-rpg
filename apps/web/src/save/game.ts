@@ -3,7 +3,7 @@
 import {
   parseTrack, sweepMany, sellStock, swapTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, rushJob, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
-  actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
+  actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
   type RpgCampaignChapter, type RpgWeaponKind, type Save, type TierWorld,
 } from '@rpg/domain'
@@ -115,16 +115,18 @@ export const learn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) =
 export const unlearn = (outfit: BattleOutfit, build: RpgBuildId, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, build, nodeId, now))
 export const equip = (outfit: BattleOutfit, build: RpgBuildId, loadout: string[]) => edit((s, now) => equipSkills(s, outfit, build, loadout, now))
 export const chooseFamiliar = (outfitId: string, kind: RpgWeaponKind) => edit((s, now) => setFamiliar(s, outfitId, kind, now))
-export const beginFight = (chapter: RpgCampaignChapter, party: number, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>
-  edit((s, now) => startFight(s, chapter, party, nodeId, outfits, now))
-export const leaveFight = (chapter: RpgCampaignChapter, party: number) => edit((s, now) => retreat(s, chapter, party, now))
-export const rest = (chapter: RpgCampaignChapter, party: number, campId: string) => edit((s, now) => restAtCamp(s, chapter, party, campId, now))
+export const beginFight = (region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>
+  edit((s, now) => startFight(s, region, nodeId, outfits, now))
+export const leaveFight = () => edit((s, now) => retreat(s, now))
+/** Refills the active party's MP at a Spring (D66). */
+export const drinkAtSpring = (springId: string) => edit((s, now) => useSpring(s, springId, now))
+export const chooseActiveParty = (party: number) => edit((s, now) => setActiveParty(s, party, now))
 
 /** One action in the party's open fight. Saved at once; when it ends the fight, the rewards land in the same save. */
-export async function fightAction(chapter: RpgCampaignChapter, party: number, action: BattleAction): Promise<{ step: BattleStep; result: FightResult | null }> {
+export async function fightAction(region: RpgCampaignChapter, action: BattleAction): Promise<{ step: BattleStep; result: FightResult | null }> {
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
-  const acted = actInFight(save, chapter, party, action, nowIso())
+  const acted = actInFight(save, region, action, nowIso())
   await commit(acted.save)
   return { step: acted.step, result: acted.result }
 }
@@ -199,10 +201,10 @@ export async function rankUpAndContinue(placeId: string, slot: number, outfit: P
 }
 
 /** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
-export async function sweep(chapter: RpgCampaignChapter, party: number, nodeId: string, times = 1): Promise<FightResult & { swept: number }> {
+export async function sweep(region: RpgCampaignChapter, nodeId: string, times = 1): Promise<FightResult & { swept: number }> {
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
-  const r = sweepMany(save, chapter, party, nodeId, times, nowIso())
+  const r = sweepMany(save, region, nodeId, times, nowIso())
   await commit(r.save)
   return { ...r.result, swept: r.swept }
 }

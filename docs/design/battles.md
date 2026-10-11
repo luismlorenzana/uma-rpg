@@ -1,5 +1,8 @@
 # Battles, chapters and leveling
 
+> **Chapters and runs gave way to the world map (D72, [world/](world/README.md)).** The fight rules, rewards and
+> builds below still hold; stages replace chapter nodes and one world-wide run replaces per-party runs.
+
 > **Status: current (S3, 2026-10-10; D48–D53).** The fight rules themselves (hands, breaks, statuses, trees, Limit
 > Breaks) are in [classes.md](classes.md), ported from uma-racer. This page covers what uma-rpg builds around them.
 > Code: `packages/domain/src/rpg/` (engine, catalog, campaign) and `packages/domain/src/save/battle.ts` (the rules over

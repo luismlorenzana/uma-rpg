@@ -70,9 +70,9 @@ describe('generated chapters (D48)', () => {
 describe('rewards (D51)', () => {
   it('pays a share of a level, scaled ±10% per level of gap within 10%–200%', () => {
     expect([rpgBattleBaseExp('fight', 5), rpgBattleBaseExp('sub-boss', 5), rpgBattleBaseExp('vanguard', 5), rpgBattleBaseExp('boss', 5)])
-      .toEqual([42, 28, 15, 20])
+      .toEqual([80, 120, 120, 160])
     expect([rpgLevelExpFactor(8, 5), rpgLevelExpFactor(5, 8), rpgLevelExpFactor(20, 5), rpgLevelExpFactor(1, 30)]).toEqual([0.7, 1.3, 0.1, 2])
-    expect(rpgBattleExp('fight', 5, 8)).toBe(29)
+    expect(rpgBattleExp('fight', 5, 8)).toBe(56)
     expect(ura.nodes.filter((n) => n.kind === 'sub-boss').map(rpgRewardKind)).toEqual(['sub-boss', 'sub-boss', 'sub-boss', 'vanguard', 'vanguard', 'vanguard'])
   })
 
@@ -81,27 +81,17 @@ describe('rewards (D51)', () => {
     expect([rpgShardsBetween(9, 10), rpgShardsBetween(10, 11), rpgShardsBetween(8, 31), rpgShardsBetween(49, 50)]).toEqual([1, 0, 3, 1])
   })
 
-  // Pacing (D48, halved by D66): clearing every node of a chapter leaves a party a few levels short of its last level,
-  // one path further short; the catch-up rule (foes above her pay up to double) keeps the gap from growing.
-  const levelAfter = (chapters: RpgCampaignChapter[], pick: (c: RpgCampaignChapter) => RpgMapNode[]) => {
+  // Pacing (D71): regular world stages at her own level take a fresh Uma from Lv1 to Lv50 in about 120.
+  it('takes about 120 regular stages at her level from Lv1 to Lv50', () => {
     let me = { tier: 1, level: 1, exp: 0 }
-    const ends: number[] = []
-    for (const chapter of chapters) {
-      for (const node of pick(chapter)) {
-        const gained = grantRpgExp(me, rpgBattleExp(rpgRewardKind(node), node.level, me.level))
-        me = { ...me, level: gained.level, exp: gained.exp }
-      }
-      ends.push(me.level)
+    let stages = 0
+    while (me.level < 50 && stages < 1000) {
+      const gained = grantRpgExp(me, rpgBattleExp('fight', me.level, me.level))
+      me = { ...me, level: gained.level, exp: gained.exp }
+      stages++
     }
-    return ends
-  }
-  it('levels a party through Tier 1 a little slower than a chapter a band', () => {
-    const everything = levelAfter(tier1, (c) => c.nodes.filter((n) => n.kind !== 'camp'))
-    const onePath = levelAfter(tier1, (c) => c.nodes.filter((n) => n.kind !== 'camp' && (n.kind !== 'fight' || n.col === 2) &&
-      (!n.id.startsWith('route') || n.id.startsWith('route1'))))
-    expect(everything).toEqual([7, 15, 24, 33, 43])
-    // One path a chapter falls behind; replays close the gap, since fights above her level pay up to double.
-    expect(onePath).toEqual([4, 10, 16, 22, 28])
+    expect(stages).toBeGreaterThanOrEqual(115)
+    expect(stages).toBeLessThanOrEqual(130)
   })
 })
 

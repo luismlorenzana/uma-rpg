@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest'
+import { regionChapter, worldContinent } from '../world/world'
 import { applyBattleAction, battleActionsLeft } from '../rpg/battle/engine'
 import type { BattleAction, BattleState } from '../rpg/battle/types'
-import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
-  actInFight, activeBuild, chooseBuild, equipSkills, forgetSkill, learnSkill, openFightOf, restAtCamp, retreat, runOf, settleFight,
-  startFight, umaProfile, type BattleOutfit,
+  actInFight, activeBuild, chooseBuild, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, settleFight,
+  startFight, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
-import { newOwnedUma, newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
+import { newOwnedUma, newSave, newWorldState, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
 
 const T = (n: number) => `2026-10-10T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
-const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA Finale', order: 1 }, cast)
+const ura = regionChapter(worldContinent({ name: 'URA Finale', order: 1 }).regions[0]!, cast)
 
 // Invented outfits only.
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end'): BattleOutfit => ({
@@ -40,10 +40,10 @@ function withParty(): Save {
 }
 
 /** Each living ally attacks the foe with the least shield until the fight ends. */
-function autoplay(save: Save, party = 0): { save: Save; result: ReturnType<typeof actInFight>['result'] } {
+function autoplay(save: Save): { save: Save; result: ReturnType<typeof actInFight>['result'] } {
   let s = save
   for (let n = 0; n < 400; n += 1) {
-    const run = openFightOf(worldOf(s), party)
+    const run = openFightOf(worldOf(s))
     if (!run) throw new Error('no fight')
     const state: BattleState = rpgRunBattleStep(run)!.state
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)!
@@ -52,7 +52,7 @@ function autoplay(save: Save, party = 0): { save: Save; result: ReturnType<typeo
     const friend = state.units.find((u) => u.side === 'ally' && u.hp > 0 && u.id !== ally.id)
     const action: BattleAction = state.familiars.includes(ally.id) && friend
       ? { kind: 'guard', actorId: ally.id, targetId: friend.id } : { kind: 'attack', actorId: ally.id, targetId: foe.id }
-    const acted = actInFight(s, ura, party, action, T(100 + n))
+    const acted = actInFight(s, ura, action, T(100 + n))
     s = acted.save
     if (acted.result) return { save: s, result: acted.result }
   }
@@ -95,26 +95,31 @@ describe('class builds (D49)', () => {
   })
 })
 
-describe('fights (D52)', () => {
+const S1 = 'w1-1-1-s1'
+
+describe('fights (D52, D66)', () => {
   it('needs a full party, one fight at a time, and freezes the line-up until it ends', () => {
     const short = setPartySlot(withParty(), 0, 4, null, T(3))
-    expect(() => startFight(short, ura, 0, 'a1r1c1', OUTFITS, T(4))).toThrow(/five/)
-    const save = startFight(withParty(), ura, 0, 'a1r1c1', OUTFITS, T(4))
-    expect(() => startFight(save, ura, 0, 'a1r1c2', OUTFITS, T(5))).toThrow(/already/)
+    expect(() => startFight(short, ura, 'w1-1-1-s1', OUTFITS, T(4))).toThrow(/five/)
+    const save = startFight(withParty(), ura, 'w1-1-1-s1', OUTFITS, T(4))
+    expect(() => startFight(save, ura, 'w1-1-1-s2', OUTFITS, T(5))).toThrow(/already/)
     expect(isInFight(worldOf(save), '101')).toBe(true)
     expect(() => setPartySlot(save, 0, 0, null, T(5))).toThrow(/fight/)
     expect(() => setPartySlot(save, 1, 0, '101', T(5))).toThrow(/fight/)
-    expect(runOf(worldOf(retreat(save, ura, 0, T(6))), 0, ura.id)?.battle).toBeNull()
+    expect(() => setActiveParty(save, 1, T(5))).toThrow(/open fight/)
+    expect(worldRun(worldOf(retreat(save, T(6)))).battle).toBeNull()
   })
 
-  it('pays a win: EXP to all five, Laurels, and a Shard for each Uma that reaches Lv10', () => {
-    const fought = autoplay(startFight(withParty(), ura, 0, 'a1r1c1', OUTFITS, T(4)))
-    expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: 'a1r1c1', laurels: 10, shards: 0 })
+  it('pays a win: EXP to all five, Laurels (triple on a first clear), and a Shard for each Uma that reaches Lv10', () => {
+    const fought = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4)))
+    expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: S1, laurels: 30, shards: 0, firstClear: true })
     expect(fought.result!.members).toHaveLength(5)
     const world = worldOf(fought.save)
-    expect(world.wallet.laurels).toBe(10)
+    expect(world.wallet.laurels).toBe(30)
     expect(world.umas['101']!.exp).toBe(fought.result!.members[0]!.afterExp)
-    expect(runOf(world, 0, ura.id)!.wins).toMatchObject({ start: 1, a1r1c1: 1 })
+    expect(worldRun(world).wins).toMatchObject({ start: 1, [S1]: 1 })
+    const again = autoplay(startFight(fought.save, ura, S1, OUTFITS, T(300)))
+    expect(again.result).toMatchObject({ laurels: 10, firstClear: false })
     // A band-1 token lands in the Warehouse (D67).
     const tokens = fought.result!.tokens
     expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(1)
@@ -127,39 +132,46 @@ describe('fights (D52)', () => {
     const umas = Object.fromEntries(Object.entries(w.umas).map(([id, u]) => [id, { ...u, level: 9, exp: 270 }]))
     ready = { ...ready, tierWorlds: { '1': { ...w, umas } } }
     const before = worldOf(ready).wallet.unlockTickets
-    const leveled = autoplay(startFight(ready, ura, 0, 'a1r1c1', OUTFITS, T(4)))
+    const leveled = autoplay(startFight(ready, ura, 'w1-1-1-s1', OUTFITS, T(4)))
     expect(leveled.result!.members.every((m) => m.afterLevel === 10 && m.shards === 1)).toBe(true)
     expect(leveled.result).toMatchObject({ shards: 5, tickets: 1 })
     expect(worldOf(leveled.save).wallet).toMatchObject({ unlockTickets: before + 1, shards: 0 })
   })
 
   it('settles a loss with nothing paid and the run as it was', () => {
-    const save = startFight(withParty(), ura, 0, 'a1r1c1', OUTFITS, T(4))
-    const run = runOf(worldOf(save), 0, ura.id)!
+    const save = startFight(withParty(), ura, S1, OUTFITS, T(4))
+    const run = openFightOf(worldOf(save))!
     const lost = { ...rpgRunBattleStep(run)!.state, outcome: 'loss' as const }
     const settled = settleFight(save, ura, run, lost, T(5))
     expect(settled.result).toMatchObject({ outcome: 'loss', laurels: 0, members: [] })
-    expect(runOf(worldOf(settled.save), 0, ura.id)!.wins).toEqual({ start: 1 })
+    expect(worldRun(worldOf(settled.save)).wins).toEqual({ start: 1 })
   })
 
-  it('rests at reachable camps only', () => {
-    expect(() => restAtCamp(withParty(), ura, 0, 'a1camp', T(3))).toThrow(SaveRuleError)
-    expect(runOf(worldOf(restAtCamp(withParty(), ura, 0, 'start', T(3))), 0, ura.id)!.mp).toEqual({})
+  it('opens stages in order, carries MP per Uma, and refills the active party at a Spring every two hours', () => {
+    expect(() => startFight(withParty(), ura, 'w1-1-1-s2', OUTFITS, T(4))).toThrow(/Clear a path/)
+    const won = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4))).save
+    const w = worldOf(won)
+    const tired = { ...won, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...w.world.run, mp: { '101': 1, '102': 2 } } } } } }
+    const rested = useSpring(tired, 'w1-spring1', T(400))
+    expect(worldRun(worldOf(rested)).mp).toEqual({})
+    expect(() => useSpring(rested, 'w1-spring1', T(500))).toThrow(/recharging/)
+    expect(() => useSpring(rested, 'w1-spring2', T(500))).not.toThrow()
+    expect(worldOf(setActiveParty(rested, 3, T(500))).world.activeParty).toBe(3)
   })
 })
 
-describe('save v3 parsing', () => {
+describe('save parsing', () => {
   it('round-trips builds and an open fight with actions', () => {
     let save = learnSkill(withParty(), o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
-    save = startFight(save, ura, 0, 'a1r1c1', OUTFITS, T(4))
+    save = startFight(save, ura, 'w1-1-1-s1', OUTFITS, T(4))
     const action: BattleAction = { kind: 'attack', actorId: '101', targetId: 'foe1' }
-    save = actInFight(save, ura, 0, action, T(5)).save
+    save = actInFight(save, ura, action, T(5)).save
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
-    expect(applyBattleAction(rpgRunBattleStep(runOf(worldOf(save), 0, ura.id)!)!.state, action).error).toBe('already-acted')
+    expect(applyBattleAction(rpgRunBattleStep(openFightOf(worldOf(save))!)!.state, action).error).toBe('already-acted')
   })
 
-  it('rejects an invalid tree, an unlearned equipped skill, a refused action and two fights in one party', () => {
-    const save = startFight(learnSkill(withParty(), o101, 'greatsword-spear', 'greatsword.fire.1', T(3)), ura, 0, 'a1r1c1', OUTFITS, T(4))
+  it('rejects an invalid tree, an unlearned equipped skill, a refused action and an unknown Spring', () => {
+    const save = startFight(learnSkill(withParty(), o101, 'greatsword-spear', 'greatsword.fire.1', T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
     const raw = () => JSON.parse(JSON.stringify(save))
     const deep = raw()
     deep.tierWorlds['1'].umas['101'].builds['greatsword-spear'].tree.push('greatsword.fire.2')
@@ -168,20 +180,20 @@ describe('save v3 parsing', () => {
     equip.tierWorlds['1'].umas['101'].builds['greatsword-spear'].loadout = ['greatsword.ice.1']
     expect(() => parseSave(equip)).toThrow(/learned/)
     const refused = raw()
-    refused.tierWorlds['1'].runs[`0:${ura.id}`].battle.actions = [{ kind: 'attack', actorId: '101', targetId: 'foe1' }, { kind: 'attack', actorId: '101', targetId: 'foe1' }]
+    refused.tierWorlds['1'].world.run.battle.actions = [{ kind: 'attack', actorId: '101', targetId: 'foe1' }, { kind: 'attack', actorId: '101', targetId: 'foe1' }]
     expect(() => parseSave(refused)).toThrow(/refused/)
-    const twice = raw()
-    twice.tierWorlds['1'].runs['0:2'] = { ...twice.tierWorlds['1'].runs[`0:${ura.id}`], chapterId: '2' }
-    expect(() => parseSave(twice)).toThrow(SaveParseError)
+    const spring = raw()
+    spring.tierWorlds['1'].world.springs = { somewhere: T(1) }
+    expect(() => parseSave(spring)).toThrow(SaveParseError)
   })
 
-  it('migrates a v2 save: no build chosen, nothing learned, no runs', () => {
+  it('starts a v2 save over: no build chosen, nothing learned, a fresh world', () => {
     const v2 = { schemaVersion: 2, account: { trainerName: 'Luis', createdAt: T(0), updatedAt: T(0) },
       tierWorlds: { '1': { createdAt: T(0), wallet: { unlockTickets: 19, shards: 0, laurels: 0 }, umas: { '101': { unlockedAt: T(1), level: 1, exp: 0 } },
         parties: Array.from({ length: 20 }, (_, i) => ({ name: `Party ${i + 1}`, slots: [null, null, null, null, null] })) } } }
     const migrated = parseSave(v2)
     expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']!.umas['101']).toEqual(newOwnedUma(T(1)))
-    expect(migrated.tierWorlds['1']!.runs).toEqual({})
+    expect(migrated.tierWorlds['1']!.world).toEqual(newWorldState(T(0)))
   })
 })

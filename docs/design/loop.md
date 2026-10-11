@@ -18,7 +18,7 @@ While one party waits on its promotions and gear, you fight with another. That r
 
 ## Bands
 
-A **band** is ten levels: a continent of the world map (today, a chapter). Band n covers:
+A **band** is ten levels: a continent of the world map. Band n covers:
 
 | Band | Fights at | Class promotion | Gear and dish grades |
 |---|---|---|---|
@@ -65,8 +65,8 @@ higher-level ones (the catch-up EXP). **About 20 parties make the 100-hour mark*
 each band waits on its promotions, gear and dishes.
 
 On the world map that means **about 0.4 of a level per regular stage**, so 48 stages a level serve about 20 parties'
-first clears ([world/README.md](world/README.md)). In today's chapters, clearing every node ends a party at Lv 7, 15,
-24, 33 and 43, and replays close the gap.
+first clears ([world/README.md](world/README.md)). Built as D72: stages pay 0.4 / 0.6 / 0.8 of a level (regular, elite,
+boss) and drop 1 / 2 / 3 tokens.
 
 ## What a party needs per band, and what it gets
 

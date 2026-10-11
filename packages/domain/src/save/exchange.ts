@@ -5,8 +5,8 @@ import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
-import { rpgRunKey } from '../rpg/campaign/run'
-import { openFightOf, payEntrants, runOf, type FightResult } from './battle'
+import { openFightOf, payEntrants, worldRun, type FightResult } from './battle'
+import { stageBand } from '../world/world'
 import { PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
@@ -18,12 +18,12 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Grades the Exchange stocks: each chapter a party has won a fight in brings its grade pair (`order` within the tier). */
-export function stockedGrades(world: TierWorld, chapters: readonly { id: string; order: number }[]): number[] {
+/** Grades the Exchange stocks: each continent with a won stage brings its grade pair (band n: grades 2n − 1 and 2n). */
+export function stockedGrades(world: TierWorld): number[] {
   const grades = new Set<number>()
-  for (const c of chapters) {
-    const reached = Object.values(world.runs).some((r) => r.chapterId === c.id && Object.keys(r.wins).some((k) => k !== 'start'))
-    if (reached) for (const g of chapterGrades(((c.order - 1) % 5) + 1)) grades.add(g)
+  for (const [stageId, wins] of Object.entries(worldRun(world).wins)) {
+    const band = stageBand(stageId)
+    if (wins > 0 && band >= 1) for (const g of chapterGrades(((band - 1) % 5) + 1)) grades.add(g)
   }
   return [...grades].sort((a, b) => a - b)
 }
@@ -52,27 +52,27 @@ export function buyTickets(save: Save, kind: 'rush' | 'sweep', quantity: number,
   return withWorld(save, tier, { ...world, wallet }, now)
 }
 
-/** Why the party can't sweep this node, or null. */
-export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, party: number, nodeId: string): string | null {
+/** Why the active party can't sweep this stage, or null. */
+export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, nodeId: string): string | null {
   const node = chapter.nodes.find((n) => n.id === nodeId)
-  if (!node || node.kind !== 'fight') return 'Only regular fights can be swept'
-  if ((runOf(world, party, chapter.id)?.wins[nodeId] ?? 0) < 1) return 'Beat it with this party first'
-  const slots = world.parties[party]?.slots ?? []
+  if (!node || node.kind !== 'fight') return 'Only regular stages can be swept'
+  if ((worldRun(world).wins[nodeId] ?? 0) < 1) return 'Clear it first'
+  const slots = world.parties[world.world.activeParty]?.slots ?? []
   if (slots.length !== PARTY_SIZE || slots.some((s) => s === null)) return 'Needs a full party'
   if (slots.some((s) => s && workOf(world, s))) return 'A member is working'
-  if (openFightOf(world, party)) return 'Finish the open fight first'
+  if (openFightOf(world)) return 'Finish the open fight first'
   if (world.wallet.sweepTickets < 1) return 'No Sweep Tickets'
   return null
 }
 
-/** Sweeps the same fight up to `times` times (stopping when tickets run out), adding up what each paid. */
-export function sweepMany(save: Save, chapter: RpgCampaignChapter, party: number, nodeId: string, times: number, now: string, tier = TIER_ONE): { save: Save; result: FightResult; swept: number } {
+/** Sweeps the same stage up to `times` times (stopping when tickets run out), adding up what each paid. */
+export function sweepMany(save: Save, chapter: RpgCampaignChapter, nodeId: string, times: number, now: string, tier = TIER_ONE): { save: Save; result: FightResult; swept: number } {
   if (!Number.isInteger(times) || times < 1 || times > MAX_PURCHASE) throw new SaveRuleError('bad-count', `sweep 1–${MAX_PURCHASE} times`)
   let current = save
   const results: FightResult[] = []
   for (let i = 0; i < times; i++) {
-    if (i > 0 && sweepBlock(worldOf(current, tier), chapter, party, nodeId)) break
-    const r = sweepFight(current, chapter, party, nodeId, now, tier)
+    if (i > 0 && sweepBlock(worldOf(current, tier), chapter, nodeId)) break
+    const r = sweepFight(current, chapter, nodeId, now, tier)
     current = r.save
     results.push(r.result)
   }
@@ -90,18 +90,18 @@ export function sweepMany(save: Save, chapter: RpgCampaignChapter, party: number
   return { save: current, result, swept: results.length }
 }
 
-/** Spends a Sweep Ticket on a beaten regular fight: EXP and Shards as if won, no Laurels, MP untouched. */
-export function sweepFight(save: Save, chapter: RpgCampaignChapter, party: number, nodeId: string, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
+/** Spends a Sweep Ticket on a cleared regular stage: EXP and Shards as if won, no Laurels or tokens, MP untouched. */
+export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: string, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
   const world = worldOf(save, tier)
-  const block = sweepBlock(world, chapter, party, nodeId)
+  const block = sweepBlock(world, chapter, nodeId)
   if (block) throw new SaveRuleError('cannot-fight', block)
   const node = chapter.nodes.find((n) => n.id === nodeId)!
-  const run = runOf(world, party, chapter.id)!
-  const paid = payEntrants(world, world.parties[party]!.slots as string[], 'fight', node.level, 0, tier)
+  const run = worldRun(world)
+  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level, 0, tier)
   const next: TierWorld = {
     ...paid.world,
     wallet: { ...paid.world.wallet, sweepTickets: paid.world.wallet.sweepTickets - 1 },
-    runs: { ...world.runs, [rpgRunKey(party, chapter.id)]: { ...run, wins: { ...run.wins, [nodeId]: (run.wins[nodeId] ?? 0) + 1 }, updatedAt: now } },
+    world: { ...world.world, run: { ...run, wins: { ...run.wins, [nodeId]: (run.wins[nodeId] ?? 0) + 1 }, updatedAt: now } },
   }
   return { save: withWorld(save, tier, next, now), result: { outcome: 'victory', chapterId: chapter.id, nodeId, rounds: 0, members: paid.members, laurels: 0, shards: paid.shards, tickets: paid.tickets, tokens: {} } }
 }

@@ -19,7 +19,7 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
   const [swapping, setSwapping] = useState<{ kind: TokenKind; band: number } | null>(null)
   const [buying, setBuying] = useState<{ kind: 'item'; id: string; price: number; name: string } | { kind: 'rush' | 'sweep'; price: number; name: string } | null>(null)
   if (!world) return null
-  const stocked = stockedGrades(world, chapters)
+  const stocked = stockedGrades(world)
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between rounded-md bg-raised p-3">
@@ -44,7 +44,7 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
       <section>
         <h3 className="text-micro mb-1.5">Raw items</h3>
         {stocked.length === 0 ? (
-          <p className="text-[13px] text-ink-soft">Win a fight in a chapter to stock its grades: {chapters.map((c) => `${c.name} ${2 * c.order - 1}–${2 * c.order}`).join(', ')}.</p>
+          <p className="text-[13px] text-ink-soft">Win a stage on a continent to stock its grades: {chapters.map((c) => `${c.name} ${2 * c.order - 1}–${2 * c.order}`).join(', ')}.</p>
         ) : (
           <>
             <div className="mb-2 grid grid-cols-2 rounded-sm bg-sunken p-1" role="tablist" aria-label="Side">

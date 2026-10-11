@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints, noPoints } from '../economy/bonus'
 import { DISHES, dishById, nodesFor, STAR_NODES, starPoints } from '../economy/dishes'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { ITEM_FAMILIES } from '../items/catalog'
 import { battleDamage, createBattle } from '../rpg/battle/engine'
-import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { projectRpgStats } from '../rpg/rules'
 import { startFight, umaProfile } from './battle'
 import { eatDish, extraStatPoints, setActiveNodes } from './kitchen'
@@ -100,14 +100,14 @@ describe('Extra Stats in battle (S6)', () => {
     const nodes = ['moon:hp:1', 'moon:speed:1', 'moon:speed:2', 'moon:limit:1', 'moon:limit:2', 'moon:limit:3']
     save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level: 4, stars: { unlocked: nodes, active: nodes } } } } } }
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...cook, outfitId: id }]))
-    const fighting = startFight(save, ura, 0, 'a1r1c1', outfits, at(0))
-    const ally = worldOf(fighting).runs['0:1']!.battle!.input.allies[0]!
+    const fighting = startFight(save, ura, 'w1-1-1-s1', outfits, at(0))
+    const ally = worldOf(fighting).world.run.battle!.input.allies[0]!
     const plain = projectRpgStats(umaProfile(cook, { ...worldOf(save).umas['101']! }, 1))
     expect(ally.stats.hp).toBe(Math.round(plain.hp * 1.015))
     expect(ally).toMatchObject({ evasion: 12, limitStart: 1 })
-    const state = createBattle(worldOf(fighting).runs['0:1']!.battle!.input).state
+    const state = createBattle(worldOf(fighting).world.run.battle!.input).state
     expect(state.units.find((u) => u.id === '101')!.limit).toBe(1)
     // The same hit lands 1.2% softer on her than without evasion.
     const bare = createBattle({ ...state.input, allies: state.input.allies.map((a) => (a.id === '101' ? { ...a, evasion: undefined } : a)) }).state

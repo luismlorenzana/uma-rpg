@@ -1,4 +1,4 @@
-// Save v10: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v11: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -16,13 +16,13 @@ import { itemById } from '../items/catalog'
 import { isToken } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
-import { RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
+import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
 import { rpgNode } from '../rpg/catalog'
 import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 10
+export const SAVE_SCHEMA_VERSION = 11
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -90,8 +90,8 @@ export interface TierWorld {
   umas: Record<string, OwnedUma>
   /** Always PARTY_COUNT parties. An Uma is in at most one slot of one party (D46). */
   parties: Party[]
-  /** Chapter runs by `rpgRunKey(party, chapterId)`. */
-  runs: Record<string, RpgRun>
+  /** The world map's progress (D66): the active party, wins per stage, MP per Uma, the open fight, Spring uses. */
+  world: WorldState
   /** The Warehouse: raw and refined items by id. */
   items: Record<string, number>
   /** Facilities that have been used or upgraded, by place id; absent ones are level 1 and idle. */
@@ -157,8 +157,19 @@ export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farm
 export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {} } })
 
+/** The world's state (D66). */
+export interface WorldState {
+  /** The party that fights: any of the twenty, swapped any time outside a fight. */
+  activeParty: number
+  /** World-wide progress as one run: wins per stage, MP per Uma (absent is full), the open fight and its party. */
+  run: RpgRun
+  /** When each Spring was last used (they recharge in two hours). */
+  springs: Record<string, string>
+}
+export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
+
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {}, dishes: {}, gear: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -470,29 +481,30 @@ function parseBattle(value: unknown, path: string): RpgRunBattle {
   return { battleId: b.battleId, nodeId: b.nodeId, startedAt: timestamp(b.startedAt, `${path}.startedAt`), input: b.input as BattleInput, actions: b.actions as BattleAction[] }
 }
 
-function parseRuns(value: unknown, path: string): Record<string, RpgRun> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
-  const runs: Record<string, RpgRun> = {}
-  const fighting = new Set<number>()
-  for (const [key, raw] of Object.entries(value)) {
-    const at = `${path}.${key}`
-    const r = object(raw, at, ['party', 'chapterId', 'wins', 'mp', 'battle', 'battles', 'clearedAt', 'updatedAt'])
-    const party = count(r.party, `${at}.party`)
-    if (party >= PARTY_COUNT) throw new SaveParseError(`${at}.party`, `expected 0–${PARTY_COUNT - 1}`)
-    if (typeof r.chapterId !== 'string' || !CHAPTER_ID.test(r.chapterId)) throw new SaveParseError(`${at}.chapterId`, 'expected a scenario id')
-    if (key !== `${party}:${r.chapterId}`) throw new SaveParseError(at, 'key must be party:chapterId')
-    const battle = r.battle === null ? null : parseBattle(r.battle, `${at}.battle`)
-    if (battle) {
-      if (fighting.has(party)) throw new SaveParseError(`${at}.battle`, 'a party fights one fight at a time')
-      fighting.add(party)
-    }
-    runs[key] = {
-      party, chapterId: r.chapterId, wins: counts(r.wins, `${at}.wins`, 1), mp: counts(r.mp, `${at}.mp`, 0), battle,
-      battles: count(r.battles, `${at}.battles`), clearedAt: r.clearedAt === null ? null : timestamp(r.clearedAt, `${at}.clearedAt`),
-      updatedAt: timestamp(r.updatedAt, `${at}.updatedAt`),
-    }
+const SPRING_ID = /^w\d{1,2}-spring\d{1,2}$/
+
+/** The world's state (D66): its one run (chapter id `world`, party the open fight's), the active party, Spring uses. */
+function parseWorldState(value: unknown, path: string): WorldState {
+  const w = object(value, path, ['activeParty', 'run', 'springs'])
+  const activeParty = count(w.activeParty, `${path}.activeParty`)
+  if (activeParty >= PARTY_COUNT) throw new SaveParseError(`${path}.activeParty`, `expected 0–${PARTY_COUNT - 1}`)
+  const at = `${path}.run`
+  const r = object(w.run, at, ['party', 'chapterId', 'wins', 'mp', 'battle', 'battles', 'clearedAt', 'updatedAt'])
+  const party = count(r.party, `${at}.party`)
+  if (party >= PARTY_COUNT) throw new SaveParseError(`${at}.party`, `expected 0–${PARTY_COUNT - 1}`)
+  if (r.chapterId !== 'world') throw new SaveParseError(`${at}.chapterId`, 'expected world')
+  const run: RpgRun = {
+    party, chapterId: 'world', wins: counts(r.wins, `${at}.wins`, 1), mp: counts(r.mp, `${at}.mp`, 0),
+    battle: r.battle === null ? null : parseBattle(r.battle, `${at}.battle`), battles: count(r.battles, `${at}.battles`),
+    clearedAt: r.clearedAt === null ? null : timestamp(r.clearedAt, `${at}.clearedAt`), updatedAt: timestamp(r.updatedAt, `${at}.updatedAt`),
   }
-  return runs
+  if (typeof w.springs !== 'object' || w.springs === null || Array.isArray(w.springs)) throw new SaveParseError(`${path}.springs`, 'expected an object')
+  const springs: Record<string, string> = {}
+  for (const [id, used] of Object.entries(w.springs)) {
+    if (!SPRING_ID.test(id)) throw new SaveParseError(`${path}.springs.${id}`, 'unknown Spring')
+    springs[id] = timestamp(used, `${path}.springs.${id}`)
+  }
+  return { activeParty, run, springs }
 }
 
 /**
@@ -517,11 +529,13 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(value: unknown, path: string, version: number, tier: number): TierWorld {
   if (version < 10) return resetTierWorld(value, path)
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'runs', 'items', 'facilities', 'dishes', 'gear'])
+  // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
+  const createdAt = timestamp(w.createdAt, `${path}.createdAt`)
   return {
-    createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
-    parties: parseParties(w.parties, `${path}.parties`, umas), runs: parseRuns(w.runs, `${path}.runs`),
+    createdAt, wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
+    parties: parseParties(w.parties, `${path}.parties`, umas), world: version < 11 ? newWorldState(createdAt) : parseWorldState(w.world, `${path}.world`),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
   }
@@ -533,7 +547,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v10 save and always returns v10; anything older than v10 starts its progress over (D69). */
+/** Parses a v1–v11 save and always returns v11; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

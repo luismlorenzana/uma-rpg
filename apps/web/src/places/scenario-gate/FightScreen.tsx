@@ -2,7 +2,7 @@
 // taps, bars, shields, weaknesses and commands. Tap a rival to attack, or pick a skill first. Weak hits chip shields; a
 // Break leaves the rival open for two rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  battleActionsLeft, battleBroken, rpgHand, rpgRunBattleStep, runOf, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  battleActionsLeft, battleBroken, openFightOf, rpgHand, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -56,7 +56,7 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null) }
       })),
     ]).then(([allies, enemies]) => {
-      if (live) setSetup({ allies, enemies, color: campaign.view.chapters.find((c) => String(c.scenarioId) === chapter.id)?.color ?? '#3a4a66', reducedMotion })
+      if (live) setSetup({ allies, enemies, color: campaign.color(chapter.id), reducedMotion })
     })
     return () => {
       live = false
@@ -83,15 +83,14 @@ function useSize(ref: React.RefObject<HTMLElement | null>): { w: number; h: numb
 
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export function FightScreen({ campaign, chapter, party, onEnd, onMap }: {
+export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   campaign: Campaign
   chapter: RpgCampaignChapter
-  party: number
   onEnd: (result: FightResult, nodeId: string) => void
   onMap: () => void
 }) {
   const world = useWorld()
-  const run = world ? runOf(world, party, chapter.id) : null
+  const run = world ? openFightOf(world) : null
   const [live, setLive] = useState<BattleState | null>(() => (run?.battle ? rpgRunBattleStep(run)?.state ?? null : null))
   const [shown, setShown] = useState<BattleState | null>(live)
   const nodeId = useRef(run?.battle?.nodeId ?? '')
@@ -128,7 +127,7 @@ export function FightScreen({ campaign, chapter, party, onEnd, onMap }: {
   if (!live || !shown) {
     return (
       <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-page p-6 text-center">
-        <p>This party has no open fight.</p>
+        <p>No fight is open.</p>
         <button type="button" onClick={onMap} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink">Back to the map</button>
       </div>
     )
@@ -152,7 +151,7 @@ export function FightScreen({ campaign, chapter, party, onEnd, onMap }: {
     setBusy(true)
     setError(null)
     try {
-      const { step, result } = await fightAction(chapter, party, action)
+      const { step, result } = await fightAction(chapter, action)
       setLive(step.state)
       setMode({ kind: 'attack' })
       setActorId(battleActionsLeft(step.state, action.actorId) > 0 ? action.actorId : null)
@@ -452,7 +451,7 @@ export function FightScreen({ campaign, chapter, party, onEnd, onMap }: {
         <BottomSheet title="Fight" onClose={() => setSheet(null)}>
           <div className="space-y-2">
             <button type="button" onClick={onMap} className="flex min-h-12 w-full items-center justify-center rounded-sm bg-raised font-semibold">Back to the map · the fight stays open</button>
-            <button type="button" onClick={() => void leaveFight(chapter, party).then(onMap)} className="flex min-h-12 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold text-ink-soft">
+            <button type="button" onClick={() => void leaveFight().then(onMap)} className="flex min-h-12 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold text-ink-soft">
               Give up · no reward, MP as before the fight
             </button>
           </div>

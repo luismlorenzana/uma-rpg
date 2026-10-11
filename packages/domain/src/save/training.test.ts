@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { regionChapter, worldContinent } from '../world/world'
 import { HOUR } from '../economy/pacing'
 import { depthsOpen } from '../economy/training'
-import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { learnSkill, startFight, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
@@ -65,9 +65,9 @@ describe('class ranks (S5, D57)', () => {
     save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(0))
     save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.2', at(0))
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...front, outfitId: id }]))
-    const fighting = startFight(save, ura, 0, 'a1r1c1', outfits, at(0))
+    const fighting = startFight(save, ura, 'w1-1-1-s1', outfits, at(0))
     expect(parseSave(JSON.parse(JSON.stringify(fighting)))).toEqual(fighting)
   })
 })

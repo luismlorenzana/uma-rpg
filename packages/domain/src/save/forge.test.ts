@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
 import { equippedPoints, gearById, gearPoints } from '../economy/gear'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { rpgFoe } from '../rpg/campaign/enemies'
-import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { projectRpgStats } from '../rpg/rules'
 import { startFight, umaPoints, umaProfile } from './battle'
 import { equipBlock, equipGear, unequipGear } from './forge'
@@ -76,9 +76,9 @@ describe('the Forge and equipping (S7)', () => {
     const uma = worldOf(save).umas['101']!
     expect(umaPoints(uma, 'greatsword-spear')).toMatchObject({ atk: 3, speed: 1.5, def: 0.5 })
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...smith, outfitId: id }]))
-    const ally = worldOf(startFight(save, ura, 0, 'a1r1c1', outfits, at(0))).runs['0:1']!.battle!.input.allies[0]!
+    const ally = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'greatsword-spear'))
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'greatsword-spear')).stats.atk)
     expect(ally.stats.atk).toBeGreaterThan(bare.atk)

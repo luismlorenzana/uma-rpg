@@ -1,6 +1,7 @@
-// The campaign in the app: Tier 1's generated chapters (D48) with the PriConne cast's faces (D50), and the outfits'
-// battle data. Pages render through CampaignGate once master data and the cast are loaded.
-import { rpgCampaignChapter, type RosterOutfit, type RpgCampaignChapter } from '@rpg/domain'
+// The campaign in the app: Tier 1's world map (D66: five continents, one per scenario, of generated regions) with the
+// PriConne cast's faces (D50), and the outfits' battle data. Pages render through CampaignGate once master data and the
+// cast are loaded.
+import { biomeById, regionChapter, stageRegionId, worldContinent, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
@@ -9,9 +10,15 @@ import { MasterGate } from '../places/MasterGate'
 export interface Campaign {
   view: MasterView
   cast: Cast
-  /** Tier 1's chapters in release order. */
-  chapters: RpgCampaignChapter[]
-  chapter: (id: string) => RpgCampaignChapter | null
+  /** Tier 1's continents in release order. */
+  continents: WorldContinent[]
+  /** A region's stages as a small chapter for the battle rules (built on first use). */
+  region: (id: string) => RpgCampaignChapter | null
+  regionInfo: (id: string) => WorldRegion | null
+  /** The region chapter a stage belongs to. */
+  stageRegion: (stageId: string) => RpgCampaignChapter | null
+  /** A region's biome color. */
+  color: (regionId: string) => string
   outfits: Map<string, RosterOutfit>
   /** A unit's display name: a cast member for foes, an outfit for Umas. */
   name: (id: string, castId?: string) => string
@@ -21,11 +28,22 @@ const cache = new WeakMap<MasterView, WeakMap<Cast, Campaign>>()
 
 function buildCampaign(view: MasterView, cast: Cast): Campaign {
   const members = cast.members.map((m) => ({ id: m.id, name: m.name }))
-  const chapters = view.chapters.filter((c) => c.tier === 1).map((c) => rpgCampaignChapter({ scenarioId: c.scenarioId, name: c.name, order: c.order }, members))
+  const continents = view.chapters.filter((c) => c.tier === 1).sort((a, b) => a.order - b.order).map((c) => worldContinent({ name: c.name, order: c.order }))
+  const regions = new Map(continents.flatMap((c) => c.regions.map((r) => [r.id, r] as const)))
+  const built = new Map<string, RpgCampaignChapter>()
+  const region = (id: string): RpgCampaignChapter | null => {
+    const info = regions.get(id)
+    if (!info) return null
+    let chapter = built.get(id)
+    if (!chapter) built.set(id, (chapter = regionChapter(info, members)))
+    return chapter
+  }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return {
-    view, cast, chapters, outfits,
-    chapter: (id) => chapters.find((c) => c.id === id) ?? null,
+    view, cast, continents, outfits, region,
+    regionInfo: (id) => regions.get(id) ?? null,
+    stageRegion: (stageId) => region(stageRegionId(stageId)),
+    color: (id) => { const r = regions.get(id); return r ? biomeById(r.biome).color : '#3a4a66' },
     name: (id, castId) => (castId ? cast.byId.get(castId)?.name ?? castId : outfits.get(id)?.name ?? id),
   }
 }

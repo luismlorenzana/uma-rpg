@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { regionChapter, worldContinent } from '../world/world'
 import { HOUR, itemMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL } from '../economy/pacing'
-import { rpgCampaignChapter } from '../rpg/campaign/chapters'
 import { startFight, type BattleOutfit } from './battle'
 import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
 import { setPartySlot, unlockUma, worldOf } from './rules'
@@ -62,12 +62,12 @@ describe('gathering (S4)', () => {
     expect(isBusy(worldOf(save), '101')).toBe(true)
     expect(() => startJob(save, 'orchard', 0, turfA, 'apple', 1, at(0))).toThrow(/Already working/)
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, outfit(id)]))
-    expect(() => startFight(save, ura, 0, 'a1r1c1', outfits, at(0))).toThrow(/recall/)
+    expect(() => startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).toThrow(/recall/)
     save = recallJob(save, 'fields', 0, at(MINUTE))
     expect(isBusy(worldOf(save), '101')).toBe(false)
-    expect(() => startFight(save, ura, 0, 'a1r1c1', outfits, at(MINUTE))).not.toThrow()
+    expect(() => startFight(save, ura, 'w1-1-1-s1', outfits, at(MINUTE))).not.toThrow()
   })
 })
 
@@ -107,14 +107,12 @@ describe('Rush Tickets, upgrades and the Exchange (S4)', () => {
     expect(upgradeCost(worldOf(save), 'pantry')?.items).toEqual({ 'sandstone-block': 1, 'birch-plank': 1 })
   })
 
-  it('stocks the grades of reached chapters and sells raw items and tickets for Laurels', () => {
+  it('stocks the grades of continents with a won stage and sells raw items and tickets for Laurels', () => {
     const save = give(withUmas('101'), {}, 100)
-    const chapters = [{ id: '1', order: 1 }, { id: '2', order: 2 }, { id: '7', order: 7 }]
-    expect(stockedGrades(worldOf(save), chapters)).toEqual([])
+    expect(stockedGrades(worldOf(save))).toEqual([])
     const w = worldOf(save)
-    const reached = { ...w, runs: { '0:2': { party: 0, chapterId: '2', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) },
-      '0:7': { party: 0, chapterId: '7', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) } } }
-    const grades = stockedGrades(reached, chapters)
+    const reached = { ...w, world: { ...w.world, run: { ...w.world.run, wins: { start: 1, 'w2-1-1-s1': 1, 'w2-3-4-s2': 2 } } } }
+    const grades = stockedGrades(reached)
     expect(grades).toEqual([3, 4])
     expect(() => buyRawItem(save, 'wheat', 1, grades, at(0))).toThrow(/stocked/)
     const bought = buyRawItem(save, 'barley', 2, grades, at(0)) // 40 Laurels each
@@ -127,18 +125,18 @@ describe('Rush Tickets, upgrades and the Exchange (S4)', () => {
   it('sweeps a beaten regular fight for EXP and Shards, without Laurels', () => {
     let save = give(withUmas('101', '102', '103', '104', '105'), {}, 15)
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
-    expect(sweepBlock(worldOf(save), ura, 0, 'a1r1c1')).toBe('Beat it with this party first')
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
+    expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s1')).toBe('Clear it first')
     const w = worldOf(save)
-    save = { ...save, tierWorlds: { '1': { ...w, runs: { '0:1': { party: 0, chapterId: '1', wins: { start: 1, a1r1c1: 1, a1boss: 1 }, mp: {}, battle: null, battles: 2, clearedAt: null, updatedAt: at(0) } } } } }
-    expect(sweepBlock(worldOf(save), ura, 0, 'a1boss')).toBe('Only regular fights can be swept')
-    expect(sweepBlock(worldOf(save), ura, 0, 'a1r1c1')).toBe('No Sweep Tickets')
+    save = { ...save, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...w.world.run, wins: { start: 1, 'w1-1-1-s1': 1, 'w1-1-1-s12': 1 } } } } } }
+    expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s12')).toBe('Only regular stages can be swept')
+    expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s1')).toBe('No Sweep Tickets')
     save = buyTickets(save, 'sweep', 1, at(0))
-    const swept = sweepFight(save, ura, 0, 'a1r1c1', at(0))
+    const swept = sweepFight(save, ura, 'w1-1-1-s1', at(0))
     expect(swept.result).toMatchObject({ outcome: 'victory', laurels: 0 })
     expect(swept.result.members.every((m) => m.exp > 0)).toBe(true)
     expect(worldOf(swept.save).wallet).toMatchObject({ laurels: 0, sweepTickets: 0 })
-    expect(worldOf(swept.save).runs['0:1']!.wins.a1r1c1).toBe(2)
+    expect(worldOf(swept.save).world.run.wins['w1-1-1-s1']).toBe(2)
   })
 })
 
@@ -187,17 +185,17 @@ describe('Sweep ×N (QoL)', () => {
     const { sweepMany } = await import('./exchange')
     let save = give(withUmas('101', '102', '103', '104', '105'), {}, 45)
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
-    const ura = rpgCampaignChapter({ scenarioId: 1, name: 'URA', order: 1 }, [{ id: 'c', name: 'C' }])
+    const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const w = worldOf(save)
-    save = { ...save, tierWorlds: { '1': { ...w, runs: { '0:1': { party: 0, chapterId: '1', wins: { start: 1, a1r1c1: 1 }, mp: {}, battle: null, battles: 1, clearedAt: null, updatedAt: at(0) } } } } }
+    save = { ...save, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...w.world.run, wins: { start: 1, 'w1-1-1-s1': 1 } } } } } }
     save = buyTickets(save, 'sweep', 3, at(0))
-    const one = sweepFight(save, ura, 0, 'a1r1c1', at(0)).result.members[0]!.exp
-    const r = sweepMany(save, ura, 0, 'a1r1c1', 5, at(0))
+    const one = sweepFight(save, ura, 'w1-1-1-s1', at(0)).result.members[0]!.exp
+    const r = sweepMany(save, ura, 'w1-1-1-s1', 5, at(0))
     expect(r.swept).toBe(3)
     expect(r.result.members[0]!.exp).toBeGreaterThanOrEqual(3 * one - 3)
     expect(r.result.members[0]!.beforeLevel).toBe(1)
     expect(worldOf(r.save).wallet.sweepTickets).toBe(0)
-    expect(worldOf(r.save).runs['0:1']!.wins.a1r1c1).toBe(4)
+    expect(worldOf(r.save).world.run.wins['w1-1-1-s1']).toBe(4)
   })
 })
 

@@ -6,8 +6,9 @@ import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
 import type { RpgCampaignChapter, RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { levelBand, rollTokens } from '../economy/tokens'
+import { SPRING_RECHARGE_MS } from '../world/world'
 import {
-  createRpgRun, rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel, rpgRestAtCamp, rpgRunKey,
+  rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
   type RpgPartyMember, type RpgRun,
 } from '../rpg/campaign/run'
 import { rpgNode } from '../rpg/catalog'
@@ -129,45 +130,56 @@ export function umaPoints(uma: OwnedUma, build: RpgBuildId): Points {
   return addPoints(starPoints(uma.stars.active), equippedPoints(uma.gear.equipped, RPG_BUILD[build].weapons))
 }
 
-// --- Runs and fights -----------------------------------------------------------------------------------------------
+// --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------
 
-export const runOf = (world: TierWorld, party: number, chapterId: string): RpgRun | null => world.runs[rpgRunKey(party, chapterId)] ?? null
-
-/** The party's open fight, wherever it is. A party fights one fight at a time. */
-export function openFightOf(world: TierWorld, party: number): RpgRun | null {
-  return Object.values(world.runs).find((r) => r.party === party && r.battle) ?? null
-}
-
+/** The world's run: wins per stage, MP per Uma (absent is full) and the open fight, whichever party fights it. */
+export const worldRun = (world: TierWorld): RpgRun => world.world.run
+/** The open fight, or null. One at a time, world-wide. */
+export const openFightOf = (world: TierWorld): RpgRun | null => (world.world.run.battle ? world.world.run : null)
 
 function withRun(save: Save, run: RpgRun, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  return withWorld(save, tier, { ...world, runs: { ...world.runs, [rpgRunKey(run.party, run.chapterId)]: run } }, now)
+  return withWorld(save, tier, { ...world, world: { ...world.world, run } }, now)
 }
 
-function runFor(world: TierWorld, party: number, chapterId: string, now: string): RpgRun {
+/** Makes another of the twenty parties the one that fights; not while a fight is open. */
+export function setActiveParty(save: Save, party: number, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
   if (!Number.isInteger(party) || party < 0 || party >= world.parties.length) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
-  return runOf(world, party, chapterId) ?? createRpgRun(party, chapterId, now)
+  if (openFightOf(world)) throw new SaveRuleError('in-fight', 'finish the open fight first')
+  return withWorld(save, tier, { ...world, world: { ...world.world, activeParty: party } }, now)
 }
 
-/** Rests the party at a camp: every member's MP refills. */
-export function restAtCamp(save: Save, chapter: RpgCampaignChapter, party: number, campId: string, now: string, tier = TIER_ONE): Save {
-  const run = runFor(worldOf(save, tier), party, chapter.id, now)
-  try {
-    return withRun(save, rpgRestAtCamp(chapter, run, campId, now), now, tier)
-  } catch (err) {
-    throw new SaveRuleError('cannot-fight', err instanceof Error ? err.message : 'cannot rest there')
-  }
+/** When a Spring is ready again, or null when it is ready now. */
+export function springReadyAt(world: TierWorld, springId: string, now: string): string | null {
+  const last = world.world.springs[springId]
+  if (!last) return null
+  const ready = Date.parse(last) + SPRING_RECHARGE_MS
+  return ready > Date.parse(now) ? new Date(ready).toISOString() : null
 }
 
-/** Starts a fight on a node with the party's five members in their active builds. */
-export function startFight(save: Save, chapter: RpgCampaignChapter, party: number, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>,
+/** A Spring refills the active party's MP, then recharges for two hours (D66). */
+export function useSpring(save: Save, springId: string, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  if (!/^w\d+-spring\d+$/.test(springId)) throw new SaveRuleError('bad-job', 'no such Spring')
+  if (openFightOf(world)) throw new SaveRuleError('in-fight', 'finish the open fight first')
+  if (springReadyAt(world, springId, now)) throw new SaveRuleError('bad-job', 'the Spring is still recharging')
+  const members = (world.parties[world.world.activeParty]?.slots ?? []).filter((s): s is string => s !== null)
+  if (members.length === 0) throw new SaveRuleError('bad-party', 'the active party is empty')
+  const mp = { ...world.world.run.mp }
+  for (const id of members) delete mp[id]
+  return withWorld(save, tier, { ...world, world: { ...world.world, run: { ...world.world.run, mp, updatedAt: now }, springs: { ...world.world.springs, [springId]: now } } }, now)
+}
+
+/** Starts a fight on a region's stage with the active party's five members in their active builds. */
+export function startFight(save: Save, region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>,
   now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
+  const party = world.world.activeParty
   const slots = world.parties[party]?.slots
   if (!slots) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
   if (slots.some((s) => s === null) || slots.length !== PARTY_SIZE) throw new SaveRuleError('cannot-fight', 'a fight needs a full party of five')
-  const open = openFightOf(world, party)
-  if (open) throw new SaveRuleError('cannot-fight', 'this party is already in a fight')
+  if (openFightOf(world)) throw new SaveRuleError('cannot-fight', 'a fight is already open')
   const busy = (slots as string[]).filter((id) => workOf(world, id))
   if (busy.length) throw new SaveRuleError('busy', `${busy.length === 1 ? 'one member is' : `${busy.length} members are`} working: recall them first`)
   const members: RpgPartyMember[] = (slots as string[]).map((id) => {
@@ -180,7 +192,7 @@ export function startFight(save: Save, chapter: RpgCampaignChapter, party: numbe
     return { profile, loadout, familiar: buildOf(uma, 'summoner').familiar, points: umaPoints(uma, build) }
   })
   try {
-    return withRun(save, rpgBeginRunBattle(chapter, runFor(world, party, chapter.id, now), nodeId, members, now), now, tier)
+    return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)
   } catch (err) {
     throw new SaveRuleError('cannot-fight', err instanceof Error ? err.message : 'cannot start that fight')
   }
@@ -199,11 +211,13 @@ export interface FightResult {
   tickets: number
   /** Tokens the win dropped into the Warehouse (D67); Sweeps drop none. */
   tokens: Record<string, number>
+  /** The stage's first clear: its Laurels pay triple (D66). */
+  firstClear?: boolean
 }
 
 /**
- * Closes a finished fight. A win pays every entrant (KO'd included) EXP, a Shard at Lv10/20/30/40/50 in Tier 1, and the
- * world Laurels (D51); MP carries. A loss leaves the run as it was before the fight.
+ * Closes a finished fight. A win pays every entrant (KO'd included) EXP, a Shard at Lv10/20/30/40/50 in Tier 1, the
+ * world Laurels (triple on a stage's first clear) and tokens; MP carries. A loss leaves the run as it was before.
  */
 export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun, state: BattleState, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
   const world = worldOf(save, tier)
@@ -217,13 +231,14 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
     rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0, tokens: {} }
   if (state.outcome !== 'victory') return { save: withRun(save, closed, now, tier), result }
   const kind = rpgRewardKind(node)
-  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, rpgBattleLaurels(kind, chapter.tier), tier)
+  const firstClear = (run.wins[node.id] ?? 0) === 0
+  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, rpgBattleLaurels(kind, chapter.tier) * (firstClear ? 3 : 1), tier)
   // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
   const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level))
   const items = { ...paid.world.items }
   for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
-  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens })
-  const next: TierWorld = { ...paid.world, items, runs: { ...world.runs, [rpgRunKey(closed.party, closed.chapterId)]: closed } }
+  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens, firstClear })
+  const next: TierWorld = { ...paid.world, items, world: { ...world.world, run: closed } }
   return { save: withWorld(save, tier, next, now), result }
 }
 
@@ -252,10 +267,10 @@ export function payEntrants(world: TierWorld, outfitIds: readonly string[], kind
   return { world: { ...world, umas, wallet }, members, shards, tickets, laurels }
 }
 
-/** Takes one action in the party's open fight; when it ends the fight, settles it in the same save. */
-export function actInFight(save: Save, chapter: RpgCampaignChapter, party: number, action: BattleAction, now: string, tier = TIER_ONE):
+/** Takes one action in the open fight; when it ends the fight, settles it in the same save. */
+export function actInFight(save: Save, chapter: RpgCampaignChapter, action: BattleAction, now: string, tier = TIER_ONE):
   { save: Save; step: BattleStep; result: FightResult | null } {
-  const run = runOf(worldOf(save, tier), party, chapter.id)
+  const run = openFightOf(worldOf(save, tier))
   if (!run?.battle) throw new SaveRuleError('cannot-fight', 'no open fight')
   let acted: { run: RpgRun; step: BattleStep }
   try {
@@ -269,8 +284,8 @@ export function actInFight(save: Save, chapter: RpgCampaignChapter, party: numbe
 }
 
 /** Gives up the open fight: nothing is paid and the run is as it was before it. */
-export function retreat(save: Save, chapter: RpgCampaignChapter, party: number, now: string, tier = TIER_ONE): Save {
-  const run = runOf(worldOf(save, tier), party, chapter.id)
+export function retreat(save: Save, now: string, tier = TIER_ONE): Save {
+  const run = openFightOf(worldOf(save, tier))
   if (!run?.battle) throw new SaveRuleError('cannot-fight', 'no open fight')
   return withRun(save, rpgAbandonRunBattle(run, now), now, tier)
 }
