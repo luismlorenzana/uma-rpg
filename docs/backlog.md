@@ -13,6 +13,7 @@
 | S5 | [Learning District](slices/S5-learning.md#exit-check) |
 | S6 | [Kitchen and Extra Stats](slices/S6-kitchen.md#exit-check) |
 | S7 | [Forge and equipment](slices/S7-forge.md#exit-check) |
+| QoL | On the phone (Home Screen app): Account → Notifications on → Send a test; start a short job, close the app, get the push |
 
 ## Not built yet
 
@@ -47,9 +48,8 @@ The numbers are a first pass from the pacing model (D54), pinned by tests but no
 
 ## Quality of life
 
-1. **Notifications** when jobs or training finish (PWA push isn't set up). Job queues, Sweep ×N, the Stable and
-   Warehouse filters and selling shipped 2026-10-10 (D62).
-2. **Warehouse limits**: storage is unlimited; there's no cap to manage yet.
+1. **Warehouse limits**: storage is unlimited; there's no cap to manage yet. (Job queues, Sweep ×N, filters, selling
+   and push notifications shipped 2026-10-10: D62, D63.)
 
 ## Engineering
 

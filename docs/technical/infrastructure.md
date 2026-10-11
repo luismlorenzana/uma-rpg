@@ -12,6 +12,7 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 | Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the PriConne cast (D50). The runtime service account reads it; `scripts/cast/publish.sh` writes it with the owner's gcloud login |
 | Images | Artifact Registry `us-central1-docker.pkg.dev/uma-rpg/rpg`, keeps the last 3 |
 | Auth | Firebase Auth, Google sign-in; the API allows only `ALLOWED_EMAIL` |
+| Push (D63) | Secret Manager `rpg-vapid` (VAPID keys, read by the runtime service account as `VAPID_KEYS`); Firestore `push/{uid}`; Cloud Scheduler `rpg-push-tick` (`us-central1`, every 5 minutes) POSTs `/api/push/tick` with an OIDC token for `rpg-push-scheduler@uma-rpg.iam.gserviceaccount.com`, audience the Cloud Run URL (repository variable `PUSH_AUDIENCE`). Set up by `infra/push/setup.sh` (2026-10-10). All in free tiers |
 | Deploy | `.github/workflows/deploy.yml`, keyless Workload Identity Federation (`github-actions` pool, provider `uma-rpg`, main branch of `luismlorenzana/uma-rpg` only) |
 
 ## gcloud rule
@@ -42,6 +43,10 @@ Never run `gcloud config set …`.
      `https://uma-rpg.web.app/__/auth/handler` (keep the `firebaseapp.com` one), and `https://uma-rpg.web.app` under
      JavaScript origins. The app's `authDomain` is the Hosting domain so redirect sign-in stays same-origin inside the
      iOS Home Screen app; without this entry Google answers `redirect_uri_mismatch` (uma-racer's gcp-setup-guide step 7).
+
+5. **Push** (2026-10-10): `CLOUDSDK_ACTIVE_CONFIG_NAME=default bash infra/push/setup.sh`, then the repository
+   variable `PUSH_AUDIENCE` it prints. To rotate the VAPID keys, add a new secret version; every device must turn
+   notifications off and on again.
 
 ## Release
 

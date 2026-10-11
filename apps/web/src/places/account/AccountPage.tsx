@@ -6,6 +6,7 @@ import { useAppUpdate } from '../../app/UpdateNotice'
 import { appUpdateLifecycle } from '../../app/update-lifecycle'
 import { useAuth } from '../../auth/AuthProvider'
 import { useMaster } from '../../master/master'
+import { NotificationsCard } from '../../push/NotificationsCard'
 import { renameAccount, resetGame, useGame } from '../../save/game'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
@@ -82,6 +83,8 @@ export default function AccountPage() {
           ))}
         </div>
       </section>
+
+      <NotificationsCard />
 
       <section>
         <Row label="Tier world">Tier 1</Row>

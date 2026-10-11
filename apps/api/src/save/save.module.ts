@@ -20,5 +20,6 @@ import { SAVE_REPOSITORY, type SaveRepository } from './save.repository'
           : new LocalSaveRepository(resolve(process.cwd(), config.get<string>('LOCAL_SAVE_FILE') ?? '.data/save.json')),
     },
   ],
+  exports: [SAVE_REPOSITORY],
 })
 export class SaveModule {}

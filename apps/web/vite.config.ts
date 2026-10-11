@@ -44,6 +44,8 @@ export default defineConfig(({ mode }) => {
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Push notifications (D63): the handlers live in public/push-sw.js.
+        importScripts: ['push-sw.js'],
         // Phaser is a large lazy chunk: precache it too, so the Hub map works offline after install.
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
