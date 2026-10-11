@@ -112,10 +112,10 @@ export type Shelf = 'items' | 'dishes' | 'gear'
 export function sellPrice(shelf: Shelf, id: string): number {
   if (shelf === 'items') {
     const item = itemById(id)
-    return item ? item.grade * (item.refined ? 2 : 1) : 0
+    return item ? (2 + 2 * item.grade) * (item.refined ? 2 : 1) : 0
   }
   const grade = shelf === 'dishes' ? dishById(id)?.grade : gearById(id)?.grade
-  return grade ? grade * 3 : 0
+  return grade ? 6 + 6 * grade : 0
 }
 
 export function sellStock(save: Save, shelf: Shelf, id: string, quantity: number, now: string, tier = TIER_ONE): Save {

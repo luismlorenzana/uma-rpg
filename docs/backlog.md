@@ -28,7 +28,8 @@
 
 The numbers are a first pass from the pacing model (D54), pinned by tests but not yet played for long.
 
-1. Profession speed, job sizes, training times and facility upgrade costs.
+1. Profession speed, job sizes, training times and facility upgrade costs (items rebalanced to slow single items, D65,
+   after the owner's first play).
 2. The Laurel economy: payouts against Exchange prices, Rush and Sweep value.
 3. Battle difficulty past the first fights, with real rosters, gear and Extra Stats; the foe budget (+0.35% per level
    past Lv10, D59).

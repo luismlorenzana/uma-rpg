@@ -158,7 +158,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
   const queueing = !!fixed
   const [outfit, setOutfit] = useState<RosterOutfit | null>(fixed ?? null)
   const [output, setOutput] = useState<string | null>(null)
-  const [count, setCount] = useState(10)
+  const [count, setCount] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [dishKind, setDishKind] = useState<'planet' | 'duo' | 'feast'>('planet')
   const [readyOnly, setReadyOnly] = useState(false)
@@ -207,7 +207,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
         </ul>
       )}
       {outfit && !output && spec.kind === 'craft' && (
-        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} queueing={queueing} onPick={(id, have) => { setOutput(id); setCount(Math.max(1, Math.min(10, have))) }} />
+        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} queueing={queueing} onPick={(id) => { setOutput(id); setCount(1) }} />
       )}
       {outfit && !output && spec.kind === 'cook' && (
         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -234,7 +234,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
             const have = spec.kind === 'refine' || spec.kind === 'cook' ? (p ? makeable(p.inputs) : 0) : null
             const dish = dishById(id)
             return (
-              <button key={id} type="button" disabled={locked || (!queueing && have !== null && have < 1)} onClick={() => { setOutput(id); setCount(have !== null ? Math.max(1, Math.min(10, have)) : 10) }}
+              <button key={id} type="button" disabled={locked || (!queueing && have !== null && have < 1)} onClick={() => { setOutput(id); setCount(1) }}
                 className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left disabled:opacity-40">
                 <ItemIcon id={out.icon} size={32} />
                 <span className="min-w-0">
@@ -269,7 +269,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
             </ul>
           )}
           <div className="flex flex-wrap gap-1.5">
-            {[1, 5, 10, 25, 50].filter((n) => n <= max).concat(max > 1 && ![1, 5, 10, 25, 50].includes(max) ? [max] : []).map((n) => (
+            {[1, 2, 3, 5, 10].filter((n) => n <= max).concat(max > 1 && ![1, 2, 3, 5, 10].includes(max) ? [max] : []).map((n) => (
               <button key={n} type="button" onClick={() => setCount(n)} className={`min-h-10 min-w-12 rounded-sm px-3 font-semibold ${Math.min(count, max) === n ? 'bg-accent text-accent-ink' : 'bg-raised'}`}>×{n}</button>
             ))}
           </div>

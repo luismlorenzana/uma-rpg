@@ -3,7 +3,7 @@
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
-import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
+import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
@@ -242,7 +242,7 @@ function parseQueue(value: unknown, path: string): QueuedJob[] {
     const q = object(raw, at, ['output', 'count', 'msEach', 'expEach', 'inputs'])
     if (typeof q.output !== 'string' || q.output.length < 1 || q.output.length > 80) throw new SaveParseError(`${at}.output`, 'expected an id')
     const n = count(q.count, `${at}.count`)
-    if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${at}.count`, `expected 1–${MAX_JOB_COUNT}`)
+    if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${at}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
     const msEach = count(q.msEach, `${at}.msEach`)
     if (msEach < 1) throw new SaveParseError(`${at}.msEach`, 'expected a positive duration')
     return { output: q.output, count: n, msEach, expEach: count(q.expEach, `${at}.expEach`), inputs: parseItems(q.inputs, `${at}.inputs`) }
@@ -259,7 +259,7 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (kind === 'cook' && !dishById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
   if (kind === 'craft' && !gearById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gear')
   const n = count(j.count, `${path}.count`)
-  if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_JOB_COUNT}`)
+  if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
   const collected = count(j.collected, `${path}.collected`)
   if (collected > n) throw new SaveParseError(`${path}.collected`, 'more than the job makes')
   const msEach = count(j.msEach, `${path}.msEach`)

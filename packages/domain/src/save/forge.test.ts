@@ -22,10 +22,10 @@ const edit = (save: Save, fn: (w: ReturnType<typeof worldOf>) => ReturnType<type
 
 describe('gear (S7, D59)', () => {
   it('generates any type × grade × accent from its main material, accent material and extras', () => {
-    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: { 'copper-ingot': 3 } })
-    expect(gearById('bow-g1-speed')!.inputs).toEqual({ 'pine-plank': 3 })
-    expect(Object.values(gearById('plate-g5-hp')!.inputs).reduce((a, b) => a + b, 0)).toBe(4)
-    expect(Object.values(gearById('ring-g9-mp')!.inputs).reduce((a, b) => a + b, 0)).toBe(5)
+    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: { 'copper-ingot': 2 } })
+    expect(gearById('bow-g1-speed')!.inputs).toEqual({ 'pine-plank': 2 })
+    expect(Object.values(gearById('plate-g5-hp')!.inputs).reduce((a, b) => a + b, 0)).toBe(3)
+    expect(Object.values(gearById('ring-g9-mp')!.inputs).reduce((a, b) => a + b, 0)).toBe(4)
     expect(gearById('short-sword-g3-def')?.type).toBe('short-sword')
     expect(gearById('greatsword-g11-atk')).toBeUndefined()
     expect(gearById('boots-g1-atk')).toBeUndefined()
@@ -44,7 +44,7 @@ describe('gear (S7, D59)', () => {
 
 describe('the Forge and equipping (S7)', () => {
   it('crafts with Gathering & Crafting into the gear stock', () => {
-    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 6 } }))
+    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 4 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1-atk', 2)!
     expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE / 2 })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2-atk', 1)!.block).toBe('Needs Craft Lv6')

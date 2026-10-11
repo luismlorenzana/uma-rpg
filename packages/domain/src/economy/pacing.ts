@@ -22,13 +22,16 @@ export const professionExpToNext = (level: number): number => 20 + 6 * level
 /** Profession EXP per base minute of work: every job pays for its time, whatever it makes (§8.5). */
 export const EXP_PER_MINUTE = 2
 
-/** Base minutes to gather or refine one item of a grade: 4 at grade 1, 22 at grade 10. */
-export const itemMinutes = (grade: number): number => 2 + 2 * grade
-/** Base minutes to cook a dish or craft a piece of gear: three items' worth (S6, S7). */
-export const makeMinutes = (grade: number): number => 3 * itemMinutes(grade)
+/** Base minutes to gather or refine one item of a grade: an hour at grade 1, 5½ hours at grade 10. Items are few and
+ * slow, and every recipe needs about one of each (D65). */
+export const itemMinutes = (grade: number): number => 30 + 30 * grade
+/** Base minutes to cook a dish or craft a piece of gear: two items' worth (S6, S7, D65). */
+export const makeMinutes = (grade: number): number => 2 * itemMinutes(grade)
 
-/** One job makes at most this many items. */
-export const MAX_JOB_COUNT = 50
+/** One new job makes at most this many items (D65). */
+export const MAX_JOB_COUNT = 10
+/** Saves from before D65 may hold jobs of up to 50. */
+export const MAX_SAVED_JOB_COUNT = 50
 
 // --- Aptitudes set speed (§4.1) ----------------------------------------------------------------------------------
 
@@ -46,16 +49,17 @@ export const FACILITY_SLOTS = [2, 3, 3] as const
 export const FACILITY_SPEED = [1, 1, 1.25] as const
 /** Upgrading to level 2 or 3: Laurels plus refined items of the grade named, from the facility's two families. */
 export const FACILITY_UPGRADE = [
-  { laurels: 150, grade: 2, count: 5 },
-  { laurels: 500, grade: 5, count: 5 },
+  { laurels: 150, grade: 2, count: 1 },
+  { laurels: 500, grade: 5, count: 2 },
 ] as const
 
 // --- Laurels (§11) ---------------------------------------------------------------------------------------------
 
 /** Laurels per won fight, times the chapter's tier (D51 numbers, set by this model). */
 export const BATTLE_LAURELS = { fight: 10, 'sub-boss': 25, vanguard: 30, boss: 50 } as const
-/** Exchange prices. A raw item costs a regular fight or more; a Rush Ticket buys an hour of any farm job. */
-export const rawItemPrice = (grade: number): number => 5 + 5 * grade
+/** Exchange prices. A raw item costs about two fights per base hour of gathering (D65); a Rush Ticket buys an hour of
+ * any farm job. */
+export const rawItemPrice = (grade: number): number => 10 + 10 * grade
 export const RUSH_TICKET_PRICE = 20
 export const SWEEP_TICKET_PRICE = 15
 /** A Rush Ticket finishes up to an hour of a running job; one job uses as many as it needs. */

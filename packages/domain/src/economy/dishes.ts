@@ -32,7 +32,7 @@ export interface Dish {
   inputs: Record<string, number>
 }
 
-/** Sides: grade-⌈g/2⌉ refined items of other families, one per three grades, so every family stays in demand. */
+/** Sides: grade-⌈g/2⌉ refined items of other families, from grade 4 on, so every family stays in demand (D65). */
 function sides(star: ItemFamily, grade: number, count: number): Record<string, number> {
   const i = FARM.indexOf(star)
   const out: Record<string, number> = {}
@@ -53,14 +53,14 @@ const PLANET_DISHES: Dish[] = FARM.flatMap((f) => f.refined.map((refined, i): Di
   const grade = i + 1
   const raw = f.raw[i]!
   return { id: `dish-${f.id}-${grade}`, name: `${raw.name} ${STYLE[f.id] ?? 'Dish'}`, kind: 'planet', grade, effects: [f.effect],
-    inputs: add({ [refined.id]: 2 }, sides(f, grade, grade <= 3 ? 1 : grade <= 7 ? 2 : 3)) }
+    inputs: add({ [refined.id]: 1 }, sides(f, grade, grade <= 3 ? 0 : grade <= 7 ? 1 : 2)) }
 }))
 
 export const BRIDGES: readonly (readonly [ItemEffect, ItemEffect])[] = RING.map((e, i) => [e, RING[(i + 1) % RING.length]!] as const)
 const DUO_DISHES: Dish[] = BRIDGES.flatMap(([a, b]) => BRIDGE_GRADES.map((grade): Dish => {
   const fa = farmOf(a), fb = farmOf(b)
   return { id: `duo-${a}-${b}-${grade}`, name: `${SHORT[fa.id]} & ${SHORT[fb.id]} Platter${grade >= 7 ? ' Deluxe' : ''}`, kind: 'duo', grade, effects: [a, b],
-    inputs: add({ [fa.refined[grade - 1]!.id]: 2, [fb.refined[grade - 1]!.id]: 2 }, sides(fa, grade, 1)) }
+    inputs: add({ [fa.refined[grade - 1]!.id]: 1, [fb.refined[grade - 1]!.id]: 1 }, sides(fa, grade, grade >= 7 ? 1 : 0)) }
 }))
 const FEAST_NAMES: Record<number, string> = { 4: 'Spring Feast', 6: 'Summer Feast', 8: 'Harvest Feast', 10: 'Grand Feast' }
 const FEASTS: Dish[] = FEAST_GRADES.map((grade): Dish => ({

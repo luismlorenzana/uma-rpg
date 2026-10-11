@@ -62,10 +62,12 @@ function outputName(output: string): string {
 
 export interface Notice { title: string; body: string; tag: string; url: string }
 
-/** One notification for whatever finished: one job names itself; several are listed. */
-export function finishNotice(finishes: readonly Finish[]): Notice | null {
+/** One notification for the slots that went idle (a queue moving on to its next job needs nothing from you, D65):
+ * one names itself; several are listed. */
+export function finishNotice(all: readonly Finish[]): Notice | null {
+  const finishes = all.filter((f) => f.idle)
   if (finishes.length === 0) return null
-  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${f.kind === 'train' ? `${outputName(f.output)} ready` : `${outputName(f.output)} ×${f.count}`}${f.idle ? '' : ', next started'}`
+  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${f.kind === 'train' ? `${outputName(f.output)} ready` : `${outputName(f.output)} ×${f.count}`}`
   if (finishes.length === 1) {
     const f = finishes[0]!
     const place = placeById(f.placeId)

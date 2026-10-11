@@ -59,7 +59,7 @@ export function gearById(id: string): GearPiece | undefined {
   const acc = accentFamily(accent)
   const inputs: Record<string, number> = {}
   const put = (id: string, n: number) => { inputs[id] = (inputs[id] ?? 0) + n }
-  put(main.refined[grade - 1]!.id, 2)
+  put(main.refined[grade - 1]!.id, 1)
   put(acc.refined[grade - 1]!.id, 1)
   // Extras, like a dish's sides: grade ⌈g/2⌉ of other gathering families, more at higher grades (parity, §8.5).
   const extras = grade <= 3 ? 0 : grade <= 7 ? 1 : 2
