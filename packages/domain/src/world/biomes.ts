@@ -38,19 +38,19 @@ export const BIOMES: readonly BiomeDef[] = [
   { id: 'ruins', name: 'Ancient Ruins', signatures: [['light', 'dark'], ['fire'], ['ice'], ['lightning']], formations: ['escort', 'trio'], roles: ['guard'], color: '#a39a86' },
   { id: 'rift', name: 'Twilight Rift', signatures: [['light', 'dark']], formations: ['solo'], roles: ['striker', 'caster'], color: '#3d3f8f' },
 ]
-/** Whose faces a biome's foes wear (D76, D81, D83, D84): three biomes a franchise. PriConne the bright fantasy lands,
+/** Whose faces a biome's foes wear (D76, D81, D83, D85): three biomes a franchise. PriConne the bright fantasy lands,
  * Azur Lane the Underworld and the seas, Last Origin the war-torn ones, NIKKE the surface wastes, Destiny Child the
- * occult ones, Echocalypse the overgrown and strange. Forest alone draws from a mixed pool of a few faces from each
+ * occult ones, Girls' Frontline the overgrown and strange. Forest alone draws from a mixed pool of a few faces from each
  * pack. Packs are private content; a missing one falls back to the pool. */
-export type Franchise = 'priconne' | 'azurlane' | 'lastorigin' | 'destinychild' | 'nikke' | 'echocalypse'
-export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'lastorigin', 'destinychild', 'nikke', 'echocalypse']
+export type Franchise = 'priconne' | 'azurlane' | 'lastorigin' | 'destinychild' | 'nikke' | 'girlsfrontline'
+export const FRANCHISES: readonly Franchise[] = ['priconne', 'azurlane', 'lastorigin', 'destinychild', 'nikke', 'girlsfrontline']
 const BIOME_FRANCHISE: Readonly<Partial<Record<Biome, Franchise>>> = {
   sky: 'priconne', highlands: 'priconne', meadow: 'priconne',
   underworld: 'azurlane', coast: 'azurlane', glacier: 'azurlane',
   ruins: 'lastorigin', canyon: 'lastorigin', volcano: 'lastorigin',
   desert: 'nikke', tundra: 'nikke', peaks: 'nikke',
   moor: 'destinychild', swamp: 'destinychild', rift: 'destinychild',
-  jungle: 'echocalypse', geyser: 'echocalypse', crystal: 'echocalypse',
+  jungle: 'girlsfrontline', geyser: 'girlsfrontline', crystal: 'girlsfrontline',
 }
 /** A biome's own franchise, or null when it draws from the mixed pool. */
 export const biomeFranchise = (biome: Biome): Franchise | null => BIOME_FRANCHISE[biome] ?? null

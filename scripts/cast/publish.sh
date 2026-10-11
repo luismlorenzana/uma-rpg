@@ -4,18 +4,18 @@
 # account.
 #
 #   bash scripts/cast/publish.sh            # PriConne, at the bucket's root
-#   bash scripts/cast/publish.sh azurlane   # or lastorigin, destinychild, nikke, echocalypse: under gs://uma-rpg-content/<pack>/
+#   bash scripts/cast/publish.sh azurlane   # or lastorigin, destinychild, nikke, girlsfrontline: under gs://uma-rpg-content/<pack>/
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 export CLOUDSDK_ACTIVE_CONFIG_NAME="${CLOUDSDK_ACTIVE_CONFIG_NAME:-default}" CLOUDSDK_CORE_PROJECT="${CLOUDSDK_CORE_PROJECT:-uma-rpg}"
 BUCKET="${CONTENT_BUCKET:-uma-rpg-content}"
 case "${1:-priconne}" in
   priconne) DIR="content/release" PREFIX="" ;;
-  azurlane | lastorigin | destinychild | nikke | echocalypse) DIR="content/release/$1" PREFIX="$1/" ;;
-  *) echo "Unknown pack $1: priconne, azurlane, lastorigin, destinychild, nikke or echocalypse" >&2; exit 1 ;;
+  azurlane | lastorigin | destinychild | nikke | girlsfrontline) DIR="content/release/$1" PREFIX="$1/" ;;
+  *) echo "Unknown pack $1: priconne, azurlane, lastorigin, destinychild, nikke or girlsfrontline" >&2; exit 1 ;;
 esac
 test -f "$DIR/cast.json" || { echo "Run the pack's import first (scripts/cast/import*.mjs)" >&2; exit 1; }
-# A pack may mix WebP and PNG (Echocalypse's icons and showcases): one pass per type, each with its content type.
+# A pack may mix WebP and PNG (art and face icons): one pass per type, each with its content type.
 for EXT in webp png; do
   OTHER=$([ "$EXT" = webp ] && echo png || echo webp)
   ls "$DIR/cast/"*."$EXT" >/dev/null 2>&1 || continue

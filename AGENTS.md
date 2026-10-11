@@ -36,7 +36,6 @@ node scripts/cast/import-azurlane.mjs && bash scripts/cast/publish.sh azurlane  
 node scripts/cast/import-nikke.mjs && bash scripts/cast/publish.sh nikke         # NIKKE pack (D81)
 node scripts/cast/import-destinychild.mjs && bash scripts/cast/publish.sh destinychild   # Destiny Child pack (D81)
 node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh lastorigin       # owner only: its wiki asks AI agents not to fetch
-node scripts/cast/import-echocalypse.mjs && bash scripts/cast/publish.sh echocalypse     # Echocalypse pack (D84)
 ```
 
 ## Conventions

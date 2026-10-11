@@ -17,9 +17,8 @@
 
 ## Not built yet
 
-1. **Echocalypse full-body art (D84)**: its pack fights with the official showcase art for 20 Cases and face icons for
-   the other 73; no source that allows fetching has full-body art. If the owner finds a wiki with it, a script they run
-   themselves (like Last Origin's) can replace them.
+1. **Girls' Frontline's pack (D85)**: its biomes (Jungle, Geyser Basin, Crystal Caverns) draw from the pool until it's
+   captured, which waits on the owner's OK for its source.
 2. **Key bosses' faces**: five packs are built (D81, D83); the owner authors key bosses' faces later. Last
    Origin's pack is refreshed by the owner (`node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh
    lastorigin`): its wiki asks AI agents not to fetch.
