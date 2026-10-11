@@ -402,8 +402,8 @@ From grade 4 on, dishes add side ingredients from other families, so every famil
 ## Gear
 
 Crafted at the Forge. Any piece is a **type × grade (1–10) × accent** (one of the eight stats), with id
-`<type>-g<grade>-<accent>`. The recipe is four refined items of the grade, one from each of the type's four families,
-plus one Crafting Token of the accent's stat at the grade's band.
+`<type>-g<grade>-<accent>`. The recipe is four refined items of the grade, one from each of the type's four families.
+No token: the Uma's Craft Level gates the grade (5g − 4), as for every job (D94).
 
 - **Arms** and **Arms Orbs** use ores, stones, woods and hides-scales.
 - **Tomes** and **Elemental Orbs** use crystals, fibers, essences and bones-horns.
@@ -420,34 +420,34 @@ plus one Crafting Token of the accent's stat at the grade's band.
 ([classes](classes.md#ranks-and-levels)).
 
 <!-- live:gear -->
-| Type | Id | Slot | Recipe families (one refined item each) | Example recipe: grade 3, ATK accent | Points at grade 10, HP accent |
+| Type | Id | Slot | Recipe families (one refined item each) | Example recipe: grade 3 | Points at grade 10, HP accent |
 |---|---|---|---|---|---|
-| Greatsword | `greatsword` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5, ATK 2 |
-| Axe | `axe` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5, ATK 2 |
-| Lance | `lance` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5, ATK 2 |
-| Bow | `bow` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5, ATK 2 |
-| Katana | `katana` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5, ATK 2 |
-| Fire Tome | `tome-fire` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, M.ATK 2 |
-| Blizzard Tome | `tome-ice` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, M.ATK 2 |
-| Thunder Tome | `tome-lightning` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, M.ATK 2 |
-| Light Tome | `tome-light` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, M.ATK 2 |
-| Dark Tome | `tome-dark` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, M.ATK 2 |
-| Garb | `garb` | Armor | Woods, Stones, Fibers, Crystals | Cedar Plank, Slate Block, Hemp Cloth, Cut Citrine, ATK Crafting Token (G3–4) | HP 5, DEF 5, M.DEF 5, Speed 5 |
-| Leather | `leather` | Armor | Hides & Scales, Woods, Fibers, Bones & Horns | Wolfkin Leather, Cedar Plank, Hemp Cloth, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5, DEF 7.5, M.DEF 5, Speed 2.5 |
-| Mail | `mail` | Armor | Ores, Hides & Scales, Crystals, Essences | Iron Ingot, Wolfkin Leather, Cut Citrine, Breeze Infusion, ATK Crafting Token (G3–4) | HP 5, DEF 7.5, M.DEF 7.5 |
-| Plate | `plate` | Armor | Ores, Stones, Essences, Bones & Horns | Iron Ingot, Slate Block, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 10, DEF 12.5, M.DEF 5 |
-| Ring | `ring` | Accessory | Crystals, Essences, Ores, Stones | Cut Citrine, Breeze Infusion, Iron Ingot, Slate Block, ATK Crafting Token (G3–4) | HP 10 |
-| Charm | `charm` | Accessory | Bones & Horns, Fibers, Hides & Scales, Woods | Trilobite Carving, Hemp Cloth, Wolfkin Leather, Cedar Plank, ATK Crafting Token (G3–4) | HP 10 |
-| Greatsword Orb | `orb-greatsword` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5 |
-| Axe Orb | `orb-axe` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5 |
-| Lance Orb | `orb-lance` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5 |
-| Bow Orb | `orb-bow` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5 |
-| Katana Orb | `orb-katana` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather, ATK Crafting Token (G3–4) | HP 5 |
-| Fire Orb | `orb-fire` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5 |
-| Ice Orb | `orb-ice` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5 |
-| Lightning Orb | `orb-lightning` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5 |
-| Light Orb | `orb-light` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5 |
-| Dark Orb | `orb-dark` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving, ATK Crafting Token (G3–4) | HP 5 |
+| Greatsword | `greatsword` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
+| Axe | `axe` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
+| Lance | `lance` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
+| Bow | `bow` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
+| Katana | `katana` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
+| Fire Tome | `tome-fire` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
+| Blizzard Tome | `tome-ice` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
+| Thunder Tome | `tome-lightning` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
+| Light Tome | `tome-light` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
+| Dark Tome | `tome-dark` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
+| Garb | `garb` | Armor | Woods, Stones, Fibers, Crystals | Cedar Plank, Slate Block, Hemp Cloth, Cut Citrine | HP 5, DEF 5, M.DEF 5, Speed 5 |
+| Leather | `leather` | Armor | Hides & Scales, Woods, Fibers, Bones & Horns | Wolfkin Leather, Cedar Plank, Hemp Cloth, Trilobite Carving | HP 5, DEF 7.5, M.DEF 5, Speed 2.5 |
+| Mail | `mail` | Armor | Ores, Hides & Scales, Crystals, Essences | Iron Ingot, Wolfkin Leather, Cut Citrine, Breeze Infusion | HP 5, DEF 7.5, M.DEF 7.5 |
+| Plate | `plate` | Armor | Ores, Stones, Essences, Bones & Horns | Iron Ingot, Slate Block, Breeze Infusion, Trilobite Carving | HP 10, DEF 12.5, M.DEF 5 |
+| Ring | `ring` | Accessory | Crystals, Essences, Ores, Stones | Cut Citrine, Breeze Infusion, Iron Ingot, Slate Block | HP 10 |
+| Charm | `charm` | Accessory | Bones & Horns, Fibers, Hides & Scales, Woods | Trilobite Carving, Hemp Cloth, Wolfkin Leather, Cedar Plank | HP 10 |
+| Greatsword Orb | `orb-greatsword` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
+| Axe Orb | `orb-axe` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
+| Lance Orb | `orb-lance` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
+| Bow Orb | `orb-bow` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
+| Katana Orb | `orb-katana` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
+| Fire Orb | `orb-fire` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
+| Ice Orb | `orb-ice` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
+| Lightning Orb | `orb-lightning` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
+| Light Orb | `orb-light` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
+| Dark Orb | `orb-dark` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
 
 A weapon's offense is split over the five weapons of her build (shown that way above).
 <!-- /live -->
@@ -456,24 +456,25 @@ A weapon's offense is split over the five weapons of her build (shown that way a
 
 Fights drop tokens of the stage's **band** (its level's tens). Three kinds:
 - **Promotion** tokens rank up classes.
-- **Crafting** tokens go into gear.
+- **Mastery** tokens raise any Weapon, Armor or Accessory Level (D94). Before D94 they were Crafting Tokens, spent at
+  the Forge.
 - **Cooking** tokens go into dishes.
 
 The Exchange buys and sells them, so two tokens of one kind buy one of another (D80).
 
 <!-- live:tokens -->
-| Band | Dropped by stages at | Cooking and Crafting grades | Promotion | Token kinds |
-|---|---|---|---|---|
-| 1 | Lv 1–10 | G1–2 | rank 1 → 2 | 21 |
-| 2 | Lv 11–20 | G3–4 | rank 2 → 3 | 21 |
-| 3 | Lv 21–30 | G5–6 | rank 3 → 4 | 21 |
-| 4 | Lv 31–40 | G7–8 | rank 4 → 5 | 21 |
-| 5 | Lv 41–50 | G9–10 | — | 16 |
+| Band | Dropped by stages at | Cooking grades | Promotion | Mastery | Token kinds |
+|---|---|---|---|---|---|
+| 1 | Lv 1–10 | G1–2 | rank 1 → 2 | 1 → 2, 2 → 3 | 14 |
+| 2 | Lv 11–20 | G3–4 | rank 2 → 3 | 3 → 4, 4 → 5 | 14 |
+| 3 | Lv 21–30 | G5–6 | rank 3 → 4 | 5 → 6, 6 → 7 | 14 |
+| 4 | Lv 31–40 | G7–8 | rank 4 → 5 | 7 → 8, 8 → 9 | 14 |
+| 5 | Lv 41–50 | G9–10 | — | 9 → 10 | 9 |
 
 | Kind | Id pattern | Per band | Odds per drop | Used for |
 |---|---|---|---|---|
 | Promotion | `token-class-<class>-<band>` | 5 (bands 1–4) | 15% | Class rank-ups |
-| Crafting | `token-craft-<stat>-<band>` | 8 | 42.5% | Every gear recipe (the accent's stat) |
+| Mastery | `token-mastery-<band>` | 1 | 42.5% | Weapon, Armor and Accessory Level-ups: from Level L, band ⌈L/2⌉ |
 | Cooking | `token-cook-<stat>-<band>` | 8 | 42.5% | Every dish (each stat it feeds) |
 
 | Stage kind | Tokens per first clear |

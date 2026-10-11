@@ -5,7 +5,7 @@ import { depthsOpen } from '../economy/training'
 import { learnSkill, startFight, umaLoadout, umaProfile } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
-import { collectJob, cutJobTime, facilityOf, queueJob, startTraining } from './work'
+import { collectJob, cutJobTime, facilityOf, queueJob, startJob, startTraining } from './work'
 import { trackId, tracksAt } from '../economy/training'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
@@ -18,6 +18,8 @@ const front = {
 const plain = { ...front, outfitId: '102', aptitudes: { ...front.aptitudes, strategy: { front: 'G', pace: 'G', late: 'G', end: 'G' } } } as const
 
 const umas = (...ids: string[]): Save => ids.reduce((s, id) => unlockUma(s, id, at(0)), newSave('Luis', at(0)))
+/** A Forge job making three Greatswords, started now. */
+const startJobForTest = (save: Save, outfit: Parameters<typeof startJob>[3]): Save => startJob(save, 'forge', 0, outfit, 'greatsword-g1-atk', 3, at(0))
 const give = (save: Save, items: Record<string, number>): Save => ({ ...save, tierWorlds: { '1': { ...worldOf(save), items: { ...worldOf(save).items, ...items } } } })
 
 describe('class ranks (S5, D57)', () => {
@@ -48,7 +50,10 @@ describe('class ranks (S5, D57)', () => {
     expect(tracksAt('armory').map(trackId)).toEqual(['armor'])
     expect(tracksAt('jeweler').map(trackId)).toEqual(['accessory'])
     expect(() => startTraining(save, 'armory', 0, front, { kind: 'weapons', classId: 'brawler' }, at(0))).toThrow(/not trained here/)
-    // Weapon Levels train at the class's running style (Front A here) and spend no token: 3 base hours, halved.
+    // A Weapon, Armor or Accessory Level-up spends a Mastery Token: from Level L, band ⌈L/2⌉ (D94).
+    expect(() => startTraining(save, 'brawler-dojo', 0, front, { kind: 'weapons', classId: 'brawler' }, at(0))).toThrow(/Needs 1 Mastery Token \(to Level 2–3\)/)
+    save = give(save, { 'token-mastery-1': 2 })
+    // Weapon Levels train at the class's running style (Front A here): 3 base hours, halved.
     save = startTraining(save, 'brawler-dojo', 0, front, { kind: 'weapons', classId: 'brawler' }, at(0))
     expect(facilityOf(worldOf(save), 'brawler-dojo').jobs[0]!.msEach).toBe(1.5 * HOUR)
     // Armor trains at her best distance (Sprint A even for an all-G runner); accessories at her best running style.
@@ -57,6 +62,7 @@ describe('class ranks (S5, D57)', () => {
     save = collectJob(collectJob(save, 'brawler-dojo', 0, at(2 * HOUR)).save, 'armory', 0, at(2 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.weapons.brawler).toBe(2)
     expect(worldOf(save).umas['102']!.ranks.armor).toBe(2)
+    expect(worldOf(save).items['token-mastery-1']).toBeUndefined()
   })
 
   it('lets an Uma fight with the depths her rank and level open', () => {
@@ -123,9 +129,35 @@ describe('saves', () => {
     const umaNow = worldOf(moved).umas['101']!
     expect(umaNow.ranks.classes.brawler).toBe(5)
     expect(umaNow).toMatchObject({ classId: 'brawler', classes: {} })
-    // The Spear became a Lance; the Mage Staff gave back its Woods, its accent's Essences and its Crafting Token.
+    // The Spear became a Lance; the Mage Staff gave back its Woods, its accent's Essences and its Crafting Token, which
+    // v15 makes a Mastery Token (D94).
     expect(worldOf(moved).gear).toEqual({ 'lance-g2-atk': 1 })
-    expect(worldOf(moved).items).toEqual({ 'token-class-mage-4': 1, 'pine-plank': 1, 'mist-infusion': 1, 'token-craft-mp-1': 1 })
+    expect(worldOf(moved).items).toEqual({ 'token-class-mage-4': 1, 'pine-plank': 1, 'mist-infusion': 1, 'token-mastery-1': 1 })
+    expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
+  })
+})
+
+describe('Mastery Tokens (D94)', () => {
+  it('turns a v14 save\'s Crafting Tokens into Mastery Tokens, and gives back the ones a Forge job reserved', () => {
+    const smith = { ...front, aptitudes: { ...front.aptitudes, surface: { turf: 'G', dirt: 'A' } } } as const
+    let save = give(umas('101'), { 'copper-ingot': 3, 'limestone-block': 3, 'pine-plank': 3, 'puffbun-leather': 3 })
+    save = startJobForTest(save, smith)
+    const old = JSON.parse(JSON.stringify(save))
+    old.schemaVersion = 14
+    const w = old.tierWorlds['1']
+    w.items = { ...w.items, 'token-craft-atk-1': 2, 'token-craft-hp-1': 1, 'token-craft-def-3': 4 }
+    const job = w.facilities.forge.jobs[0]
+    job.inputs = { ...job.inputs, 'token-craft-atk-1': 1 }
+    job.queue = [{ output: 'axe-g1-atk', count: 1, msEach: job.msEach, expEach: job.expEach, inputs: { ...job.inputs } }]
+    const moved = parseSave(old)
+    // Three band-1 tokens in stock, plus the 3 the Forge job had reserved for its 3 pieces; four band-3 tokens.
+    expect(worldOf(moved).items['token-mastery-1']).toBe(6)
+    expect(worldOf(moved).items['token-mastery-3']).toBe(4)
+    expect(Object.keys(worldOf(moved).items).some((id) => id.startsWith('token-craft-'))).toBe(false)
+    const forge = facilityOf(worldOf(moved), 'forge').jobs[0]!
+    expect(Object.keys(forge.inputs).some((id) => id.startsWith('token-'))).toBe(false)
+    expect(Object.keys(forge.queue[0]!.inputs).some((id) => id.startsWith('token-'))).toBe(false)
+    expect(moved.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
   })
 })

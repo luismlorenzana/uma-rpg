@@ -80,11 +80,11 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
   )
 }
 
-const KIND_NAME: Record<TokenKind, string> = { class: 'Promotion', craft: 'Crafting', cook: 'Cooking' }
+const KIND_NAME: Record<TokenKind, string> = { class: 'Promotion', mastery: 'Mastery', cook: 'Cooking' }
 
-const KINDS: readonly TokenKind[] = ['class', 'craft', 'cook']
-/** "Brawler", "ATK": the token's class or stat, under its kind's heading. */
-const shortName = (name: string) => name.replace(/ (Promotion|Crafting|Cooking) Token.*$/, '')
+const KINDS: readonly TokenKind[] = ['class', 'mastery', 'cook']
+/** "Brawler", "ATK", "Level 4–5": the token's class, stat or levels, under its kind's heading. */
+const shortName = (name: string) => name.startsWith('Mastery Token') ? name.replace(/^Mastery Token \(to (.*)\)$/, '$1') : name.replace(/ (Promotion|Cooking) Token.*$/, '')
 
 /** Every token by band (D80): tap one to sell yours or buy more. */
 function TokenTrade({ items, onOpen }: { items: Record<string, number>; onOpen: (id: string) => void }) {

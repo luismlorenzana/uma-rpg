@@ -133,7 +133,7 @@ const WILDS: Place[] = [
   {
     id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: 2, mirrorOf: 'kitchen',
     blurb: 'Crafts weapons, armor and accessories. Gear binds to the Uma who equips it.',
-    details: ['Four refined items of the grade plus a Crafting Token of the accent', 'Arms, Tomes, armor, Rings, Charms and Orbs in ten grades'],
+    details: ['Four refined items of the grade; Craft Level sets the grades she can make', 'Arms, Tomes, armor, Rings, Charms and Orbs in ten grades'],
     at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
 ]

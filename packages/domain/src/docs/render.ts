@@ -8,7 +8,7 @@ import { DISHES } from '../economy/dishes'
 import { ACCESSORY_TYPES, EQUIP_LABEL, gearById, gearId, gearPoints, recipeFamilies, type EquipType } from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
 import { ARMOR_TYPES, CLASS_HALLS, GEAR_TYPE_LABEL, WEAPON_TYPES, weaponClasses } from '../economy/training'
-import { gradeBand, levelBand, PROMOTION_BANDS, TOKEN_BANDS, TOKEN_CLASS_NAME, TOKEN_DROPS, TOKEN_ODDS, tokenBuyPrice, TOKENS, tokenSellPrice } from '../economy/tokens'
+import { gradeBand, levelBand, masteryBand, PROMOTION_BANDS, TOKEN_BANDS, TOKEN_CLASS_NAME, TOKEN_DROPS, TOKEN_ODDS, tokenBuyPrice, TOKENS, tokenSellPrice } from '../economy/tokens'
 import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
 import { EFFECT_LABEL, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES, itemById } from '../items/catalog'
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
@@ -188,7 +188,7 @@ function gear(): string {
   const slot = (t: EquipType) => (WEAPON_TYPES as readonly string[]).includes(t) ? 'Weapon' : (ARMOR_TYPES as readonly string[]).includes(t) ? 'Armor' : 'Accessory'
   const points = (t: EquipType) => Object.entries(gearPoints(gearById(gearId(t, 10, 'hp'))!, 5)).filter(([, v]) => v > 0)
     .map(([k, v]) => `${EFFECT_LABEL[k as keyof typeof EFFECT_LABEL]} ${Math.round(v * 100) / 100}`).join(', ')
-  return table(['Type', 'Id', 'Slot', 'Recipe families (one refined item each)', 'Example recipe: grade 3, ATK accent', 'Points at grade 10, HP accent'], types.map((t) => [
+  return table(['Type', 'Id', 'Slot', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'Points at grade 10, HP accent'], types.map((t) => [
     EQUIP_LABEL[t], `\`${t}\``, slot(t), recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3, 'atk'))!.inputs), points(t),
   ])) + '\n\nA weapon\'s offense is split over the five weapons of her build (shown that way above).'
 }
@@ -196,17 +196,18 @@ function tokens(): string {
   const rows: Cell[][] = Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((band) => {
     const lv = [1, 11, 21, 31, 41][band - 1]!
     const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter((g) => gradeBand(g) === band)
+    const from = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((l) => masteryBand(l) === band)
     return [band, `Lv ${lv}–${lv + 9}`, `G${grades[0]}–${grades.at(-1)}`, band <= PROMOTION_BANDS ? `rank ${band} → ${band + 1}` : '—',
-      TOKENS.filter((t) => t.band === band).length]
+      from.map((l) => `${l} → ${l + 1}`).join(', '), TOKENS.filter((t) => t.band === band).length]
   })
-  return table(['Band', 'Dropped by stages at', 'Cooking and Crafting grades', 'Promotion', 'Token kinds'], rows) + '\n\n' +
+  return table(['Band', 'Dropped by stages at', 'Cooking grades', 'Promotion', 'Mastery', 'Token kinds'], rows) + '\n\n' +
     table(['Kind', 'Id pattern', 'Per band', 'Odds per drop', 'Used for'], [
       ['Promotion', '`token-class-<class>-<band>`', '5 (bands 1–4)', pct(TOKEN_ODDS.class), 'Class rank-ups'],
-      ['Crafting', '`token-craft-<stat>-<band>`', String(ITEM_EFFECTS.length), pct(TOKEN_ODDS.craft), 'Every gear recipe (the accent\'s stat)'],
+      ['Mastery', '`token-mastery-<band>`', '1', pct(TOKEN_ODDS.mastery), 'Weapon, Armor and Accessory Level-ups: from Level L, band ⌈L/2⌉'],
       ['Cooking', '`token-cook-<stat>-<band>`', String(ITEM_EFFECTS.length), pct(TOKEN_ODDS.cook), 'Every dish (each stat it feeds)'],
     ]) + '\n\n' + table(['Stage kind', 'Tokens per first clear'], Object.entries(TOKEN_DROPS).map(([k, n]) => [cap(k), n])) +
     `\n\nA stage in waves drops one more token per extra wave: ${TOKEN_DROPS.fight + 1} on stages 8 and 9, ${TOKEN_DROPS.boss + BOSS_WAVES - 1} from the boss.` +
-    `\n\nReplays and Sweeps roll each token at ${pct(REPLAY_SHARE)} of its odds. Exchange: sell for ${tokenSellPrice('token-craft-atk-1')} Laurels a band, buy for ${tokenBuyPrice('token-craft-atk-1')} a band.`
+    `\n\nReplays and Sweeps roll each token at ${pct(REPLAY_SHARE)} of its odds. Exchange: sell for ${tokenSellPrice('token-mastery-1')} Laurels a band, buy for ${tokenBuyPrice('token-mastery-1')} a band.`
 }
 
 // --- Economy -------------------------------------------------------------------------------------------------------
@@ -227,7 +228,7 @@ function prices(): string {
   return table(['Thing', 'Price (Laurels)'], [
     ...[1, 4, 7, 10].map((g) => [`Raw item, grade ${g}`, rawItemPrice(g)] as Cell[]),
     ['Time Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE],
-    ...[1, 3, 5].map((b) => [`Token, band ${b} (sell / buy)`, `${tokenSellPrice(`token-craft-atk-${b}`)} / ${tokenBuyPrice(`token-craft-atk-${b}`)}`] as Cell[]),
+    ...[1, 3, 5].map((b) => [`Token, band ${b} (sell / buy)`, `${tokenSellPrice(`token-mastery-${b}`)} / ${tokenBuyPrice(`token-mastery-${b}`)}`] as Cell[]),
   ]) + `\n\nA Time Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job or training.`
 }
 function jobs(): string {

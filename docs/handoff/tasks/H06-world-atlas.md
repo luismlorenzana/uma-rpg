@@ -35,15 +35,31 @@ H01 passed (D90). Its painters in `scripts/pixel-art/src/world/` are the base. T
 - **Stone roads are flagstones**, irregular slabs with darker joints and a ragged edge into the ground, not
   rows of bricks.
 
+## The quality gate
+
+The first milestone stops for Claude's review. It passes only when the art meets this checklist, judged at 2× on a
+phone-sized screenshot:
+
+- Each biome is recognizable from a single 4×3-tile plot: its ground color and texture plus one prop.
+- Ponds, lava and ice read as filled shapes with a shore on every edge. No L-shaped strips, no seams at any mask.
+- Roads read as one continuous path, with no window holes, and their edges fray into the ground instead of ending in a
+  hard rectangle.
+- Neighboring plots of different biomes sit together without clashing: similar value range, outlines only on props
+  and markers.
+- Stage markers read at 1×: fight, elite and boss, and locked, open and cleared, differ by shape, not only by color.
+- No visible repetition in any 4×4 area of ground: use all four variants and scatter the marks.
+
 ## Do
 
-Work in three milestones, a pull request each, so the owner sees the look early.
+Work in three milestones, a pull request each. The first is the gate.
 
 1. **Framework and five biomes.**
    - `src/world/`: `spec.ts` (ids, palettes, the frame list from map-art.md), the ground, prop, liquid and road
      painters, markers, icons, and `build.ts` writing `packages/art/world/atlas.png` + `atlas.json` and
      `assets/previews/world.png` + `world.html`.
-   - Biomes: Meadow, Forest, Coast, Volcano, Glacier.
+   - Biomes, at final quality: Meadow, Forest, Coast, Volcano, Glacier.
+   - In the preview: a region map per biome, and a continent strip 16 tiles wide and three level bands tall with the
+     five biomes side by side, the road switching sides between bands, and a Spring.
    - All six liquids and three roads.
    - Every marker, the Spring (ready and dry), the flags and the 48×48 capital.
    - Add the build to the `draw` script in `scripts/pixel-art/package.json`.

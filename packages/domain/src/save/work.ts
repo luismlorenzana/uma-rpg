@@ -12,7 +12,7 @@ import { gearById } from '../economy/gear'
 import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track, withRank } from '../economy/training'
 import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
 import { stockName } from '../economy/stock'
-import { promotionTokenId } from '../economy/tokens'
+import { masteryBand, masteryTokenId, promotionTokenId } from '../economy/tokens'
 import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -260,12 +260,14 @@ function trainingMs(world: TierWorld, placeId: string, outfit: WorkOutfit, track
   const aptitudes = outfit.aptitudes as Pick<Aptitudes, 'strategy' | 'distance'>
   return Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, aptitudes))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
 }
-/** A class promotion from rank r spends a Promotion Token of band r (D67); mastery is time alone. */
-function trainingInputs(track: Track, rank: number): Record<string, number> {
-  return track.kind === 'class' && rank < maxRankOf(track) ? { [promotionTokenId(track.classId, rank)]: 1 } : {}
+/** A class promotion from rank r spends a Promotion Token of band r (D67); a Weapon, Armor or Accessory Level-up from
+ * Level L a Mastery Token of band ⌈L/2⌉ (D94). */
+export function trainingInputs(track: Track, rank: number): Record<string, number> {
+  if (rank >= maxRankOf(track)) return {}
+  return { [track.kind === 'class' ? promotionTokenId(track.classId, rank) : masteryTokenId(masteryBand(rank))]: 1 }
 }
 
-/** Starts training one rank: a class promotion takes its token now. Time Tickets cut it like any job (D74). */
+/** Starts training one rank: its token (a Promotion or Mastery Token) is taken now. Time Tickets cut it like any job (D74). */
 export function startTraining(save: Save, placeId: string, slot: number, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track,
   now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)

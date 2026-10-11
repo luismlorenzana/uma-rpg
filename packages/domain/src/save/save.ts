@@ -1,4 +1,4 @@
-// Save v12: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v15: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -13,7 +13,7 @@ import { gearById, gearLevel, gearLevelName, slotOf, type GearSlot } from '../ec
 import { WEAPON_TYPES } from '../economy/training'
 import { activeNodeSlots } from '../economy/pacing'
 import { ITEM_FAMILIES, itemById, type ItemEffect } from '../items/catalog'
-import { craftTokenId, gradeBand, isToken } from '../economy/tokens'
+import { gradeBand, isToken, masteryTokenId } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
@@ -23,7 +23,7 @@ import {
   type RpgWeapon,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 14
+export const SAVE_SCHEMA_VERSION = 15
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -608,7 +608,9 @@ function refundOf(id: string): Record<string, number> {
   const refined = (family: string) => ITEM_FAMILIES.find((f) => f.id === family)?.refined[grade - 1]?.id
   const out: Record<string, number> = {}
   for (const family of [RETIRED_GEAR[type!]!, ACCENT_FAMILY[accent!]]) { const r = family ? refined(family) : undefined; if (r) out[r] = (out[r] ?? 0) + 1 }
-  out[craftTokenId(accent as ItemEffect, gradeBand(grade))] = (out[craftTokenId(accent as ItemEffect, gradeBand(grade))] ?? 0) + 1
+  // The Crafting Token as it was; v15 turns it into a Mastery Token like every other.
+  const token = `token-craft-${accent}-${gradeBand(grade)}`
+  out[token] = (out[token] ?? 0) + 1
   return out
 }
 
@@ -674,10 +676,50 @@ function toV14(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
+/** A Crafting Token's id before v15 (`token-craft-<stat>-<band>`), or null. */
+const OLD_CRAFT_TOKEN = /^token-craft-[a-z]+-(\d)$/
+/**
+ * v14 → v15 (D94): Crafting Tokens become Mastery Tokens of the same band, one for one; gear recipes take no token now.
+ * A Forge job's reserved tokens come back as Mastery Tokens and leave its inputs, and queued Forge jobs drop theirs.
+ */
+function toV15(world: Record<string, unknown>): Record<string, unknown> {
+  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
+  const items = (isRecord(w.items) ? w.items : (w.items = {})) as Record<string, number>
+  const add = (id: string, n: number) => { if (n > 0) items[id] = (items[id] ?? 0) + n }
+  for (const [id, n] of Object.entries(items)) {
+    const m = OLD_CRAFT_TOKEN.exec(id)
+    if (!m) continue
+    delete items[id]
+    add(masteryTokenId(Number(m[1])), typeof n === 'number' ? n : 0)
+  }
+  const strip = (inputs: unknown, times: number): Record<string, unknown> => {
+    const out: Record<string, unknown> = {}
+    if (!isRecord(inputs)) return out
+    for (const [id, n] of Object.entries(inputs)) {
+      const m = OLD_CRAFT_TOKEN.exec(id)
+      if (m) add(masteryTokenId(Number(m[1])), typeof n === 'number' ? n * times : 0)
+      else out[id] = n
+    }
+    return out
+  }
+  if (isRecord(w.facilities)) {
+    for (const f of Object.values(w.facilities)) {
+      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
+      for (const job of f.jobs) {
+        if (!isRecord(job)) continue
+        job.inputs = strip(job.inputs, Math.max(0, Number(job.count) - Number(job.collected)))
+        if (Array.isArray(job.queue)) for (const q of job.queue) if (isRecord(q)) q.inputs = strip(q.inputs, 0)
+      }
+    }
+  }
+  return w
+}
+
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
   const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
-  const value = version < 14 && isRecord(v13) ? toV14(v13) : v13
+  const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
+  const value = version < 15 && isRecord(v14) ? toV15(v14) : v14
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
@@ -696,7 +738,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v12 save and always returns v12; anything older than v10 starts its progress over (D69). */
+/** Parses a v1–v15 save and always returns v15; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

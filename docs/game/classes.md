@@ -102,8 +102,8 @@ The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no 
 | Track | Range | Trained at | What it does |
 |---|---|---|---|
 | Class rank | 1–5 | The class's hall (Learning page) | Opens skill depths. Each rank-up spends a Promotion Token of the band |
-| Weapon Level | 1–10 | The class's hall | Level k lets her wear grade-k weapons of that class |
-| Armor Level | 1–10 | Armory | Level k wears grade-k armor |
-| Accessory Level | 1–10 | Jeweler | Level k wears grade-k Rings, Charms and Orbs |
+| Weapon Level | 1–10 | The class's hall | Level k lets her wear grade-k weapons of that class. Each level-up spends a Mastery Token |
+| Armor Level | 1–10 | Armory | Level k wears grade-k armor. Each level-up spends a Mastery Token |
+| Accessory Level | 1–10 | Jeweler | Level k wears grade-k Rings, Charms and Orbs. Each level-up spends a Mastery Token |
 
 Times, token bands and aptitude speed are in [loops](loops.md#training).

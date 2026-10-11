@@ -140,7 +140,8 @@ the Forge:
 **The training page** (`places/learning/TrainingPage.tsx`), for the five class halls, the Armory and the Jeweler:
 - **Tracks:** class rank and Weapon Level, or Armor Level, or Accessory Level.
 - **Slot cards:** Rank up, Rank up · train next, time cuts, Recall.
-- **Assigning:** the sheet shows each Uma's aptitude speed and the Promotion Token a rank-up spends.
+- **Assigning:** the sheet shows each Uma's aptitude speed and the token the step spends: a Promotion Token for a
+  class rank, a Mastery Token for a Weapon, Armor or Accessory Level.
 
 ## Town
 

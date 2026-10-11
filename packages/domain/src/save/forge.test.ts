@@ -21,11 +21,11 @@ const umas = (...ids: string[]): Save => ids.reduce((s, id) => unlockUma(s, id, 
 const edit = (save: Save, fn: (w: ReturnType<typeof worldOf>) => ReturnType<typeof worldOf>): Save => ({ ...save, tierWorlds: { '1': fn(worldOf(save)) } })
 
 describe('gear (S7, D59)', () => {
-  it('makes every piece from four refined items, one of each of four families, and a Crafting Token (D86)', () => {
+  it('makes every piece from four refined items, one of each of four families, and no token (D86, D94)', () => {
     const arms = { 'copper-ingot': 1, 'limestone-block': 1, 'pine-plank': 1, 'puffbun-leather': 1 }
-    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: { ...arms, 'token-craft-atk-1': 1 } })
-    expect(gearById('bow-g1-speed')!.inputs).toEqual({ ...arms, 'token-craft-speed-1': 1 })
-    expect(gearById('tome-fire-g1-matk')!.inputs).toEqual({ 'cut-quartz': 1, linen: 1, 'mist-infusion': 1, 'shell-carving': 1, 'token-craft-matk-1': 1 })
+    expect(gearById('greatsword-g1-atk')).toMatchObject({ name: 'Fierce Copper Greatsword', inputs: arms })
+    expect(gearById('bow-g1-speed')!.inputs).toEqual(arms)
+    expect(gearById('tome-fire-g1-matk')!.inputs).toEqual({ 'cut-quartz': 1, linen: 1, 'mist-infusion': 1, 'shell-carving': 1 })
     expect(gearById('orb-fire-g1-hp')!.inputs).toEqual(gearById('tome-fire-g1-hp')!.inputs)
     expect(gearById('orb-katana-g1-hp')!.inputs).toEqual(gearById('katana-g1-hp')!.inputs)
     for (const type of EQUIP_TYPES) expect(new Set(recipeFamilies(type)).size).toBe(4)
@@ -51,7 +51,7 @@ describe('gear (S7, D59)', () => {
 
 describe('the Forge and equipping (S7)', () => {
   it('crafts with Gathering & Crafting into the gear stock', () => {
-    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 2, 'limestone-block': 2, 'pine-plank': 2, 'puffbun-leather': 2, 'token-craft-atk-1': 2 } }))
+    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 2, 'limestone-block': 2, 'pine-plank': 2, 'puffbun-leather': 2 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1-atk', 2)!
     expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE / 2 })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2-atk', 1)!.block).toBe('Needs Craft Lv6')

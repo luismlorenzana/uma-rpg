@@ -81,7 +81,7 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 | Sweep Tickets | The Exchange | One Sweep of a cleared regular stage |
 | Unlock Tickets | 20 at the start; 5 Shards each | Unlocking an outfit |
 | Shards | Lv 10, 20, 30, 40, 50 | Turned into Tickets automatically |
-| Tokens | Fights and Sweeps; the Exchange | Class ranks, dishes, gear; the Exchange |
+| Tokens | Fights and Sweeps; the Exchange | Class ranks, Weapon, Armor and Accessory Levels, dishes; the Exchange |
 
 <!-- live:prices -->
 | Thing | Price (Laurels) |
@@ -150,8 +150,10 @@ The Learning page's seven halls train ranks ([classes](classes.md#ranks-and-leve
 
 Rules:
 - One job trains one rank. The rank is granted on collect, and Time Tickets apply.
-- **A class rank-up spends one Promotion Token** of the band of the rank it leaves (rank r → r+1 takes band r). The
-  token is taken at the start and refunded on recall. Levels cost time only.
+- **A class rank-up spends one Promotion Token** of the band of the rank it leaves (rank r → r+1 takes band r).
+- **A Weapon, Armor or Accessory Level-up spends one Mastery Token** (D94): from Level L, band ⌈L/2⌉, so Levels 1 and 2
+  take band 1 and Level 9 takes band 5. A whole track, Level 1 → 10, takes nine.
+- Tokens are taken at the start and refunded on recall.
 - **Speed:**
   - A class hall goes by its running style (Brawler front, Mage and Spell Blade pace, Cleric late, Summoner end).
   - The Armory goes by her best distance aptitude, the Jeweler by her best running style.

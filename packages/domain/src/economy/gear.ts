@@ -1,13 +1,13 @@
-// Equipment (S7, design §7, D59, D86): every piece is generated from the catalog as type × grade × accent. A recipe is
-// four refined items of its grade, one from each of four gathering families, plus a Crafting Token of its accent's stat
-// (D86): the Arms half (Ores, Stones, Woods, Hides & Scales) makes Arms and Arms Orbs, the Arcana half (Crystals,
+// Equipment (S7, design §7, D59, D86, D94): every piece is generated from the catalog as type × grade × accent. A recipe
+// is four refined items of its grade, one from each of four gathering families, and Craft Level gates the grade (no
+// token since D94): the Arms half (Ores, Stones, Woods, Hides & Scales) makes Arms and Arms Orbs, the Arcana half (Crystals,
 // Fibers, Essences, Bones & Horns) Tomes and Elemental Orbs, and every armor and stat accessory takes two of each, so
 // all eight families are consumed alike. Gear binds to the Uma who equips it; her Weapon, Armor or Accessory Level k lets
 // her equip grade k (D70).
 import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
 import { isRpgTome, RPG_DAMAGE_KINDS, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
-import { craftTokenId, gradeBand, TOKEN_CLASS_NAME } from './tokens'
+import { TOKEN_CLASS_NAME } from './tokens'
 import { ARMOR_TYPES, GEAR_TYPE_LABEL, WEAPON_TYPES, weaponClasses, type ArmorType, type GearType, type Ranks, type WeaponType } from './training'
 
 /** Orbs (D86): an accessory that adds its kind to every hit, for weaknesses only. */
@@ -68,7 +68,7 @@ export interface GearPiece {
   grade: number
   accent: ItemEffect
   name: string
-  /** Refined materials and the Crafting Token, per piece. */
+  /** Refined materials, per piece. */
   inputs: Record<string, number>
 }
 const ACCENT_NAME: Readonly<Record<ItemEffect, string>> = {
@@ -86,8 +86,6 @@ export function gearById(id: string): GearPiece | undefined {
   if (!EQUIP_TYPES.includes(type) || grade < 1 || grade > 10 || !ITEM_EFFECTS.includes(accent)) return undefined
   const inputs: Record<string, number> = {}
   for (const family of recipeFamilies(type)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
-  // A Crafting Token of its accent's stat and its band, dropped by fights (D67).
-  inputs[craftTokenId(accent, gradeBand(grade))] = 1
   return { id, type, grade, accent, name: `${ACCENT_NAME[accent]} ${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`, inputs }
 }
 

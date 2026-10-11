@@ -19,10 +19,10 @@ describe('materials (D86)', () => {
     expect(same(tally(ARMOR_TYPES))).toBe(true)
     expect(Object.values(tally(ARMOR_TYPES))[0]).toBe(2)
     expect(tally(ACCESSORY_TYPES.filter((t) => t === 'ring' || t === 'charm'))).toEqual(Object.fromEntries(Object.keys(tally([])).map((k) => [k, 1])))
-    // And every recipe is four refined items of its own grade plus one Crafting Token.
+    // And every recipe is four refined items of its own grade, and nothing else (D94).
     const piece = gearById('plate-g7-def')!
     expect(Object.entries(piece.inputs).filter(([id]) => itemById(id)?.grade === 7)).toHaveLength(4)
-    expect(Object.keys(piece.inputs).filter((id) => id.startsWith('token-craft-'))).toEqual(['token-craft-def-4'])
+    expect(Object.keys(piece.inputs)).toHaveLength(4)
   })
 
   it('uses every farming family alike across all the dishes', () => {
