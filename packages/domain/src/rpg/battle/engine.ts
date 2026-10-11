@@ -83,7 +83,7 @@ function validMove(m: BattleEnemyMove): boolean {
 function validAlly(a: BattleAlly): boolean {
   if (!SAFE_ID.test(a.id) || !RPG_CLASSES.includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons) ||
     !safeInt(a.tier, 1, 1_000_000) || !safeInt(a.level, 1, 50) || !validStats(a.stats as unknown as Record<string, unknown>, ALLY_STATS) ||
-    !safeInt(a.mp, 0, a.stats.mp) || !RPG_WEAPON_KINDS.includes(a.familiar) ||
+    !safeInt(a.mp, 0, a.stats.mp) || !RPG_WEAPON_KINDS.includes(a.familiar) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
     a.loadout.length > rpgActiveSlots(a.level) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
   if (!validRpgTree(a) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id)?.skill)) return false

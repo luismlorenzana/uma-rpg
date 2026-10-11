@@ -3,9 +3,9 @@
 import { STATS } from '@luismlorenzana/uma-data'
 import {
   activeBuild, best, buildOf, DISTANCE_GEAR, KEY_LABELS, partyOf, RPG_TIER_MAX_LEVEL, rpgActiveSlots, rpgExpToNext, rpgTreePointsEarned,
-  rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
+  rpgTreePointsSpent, SaveRuleError, GEAR_TYPE_LABEL, skillText, STYLE_CLASSES, SURFACE_PROFESSION, type OwnedUma, type Place, type RosterOutfit,
 } from '@rpg/domain'
-import { Bar, BUILD_LABEL } from '../../battle/labels'
+import { Bar, BUILD_LABEL, CLASS_LABEL } from '../../battle/labels'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
@@ -94,6 +94,18 @@ function BattleCard({ outfit, owned, onSkills }: { outfit: RosterOutfit; owned: 
           {points > 0 ? `${points} pts · Skills` : 'Skills'}
         </span>
       </button>
+      <div className="grid grid-cols-5 gap-1 text-center">
+        {(['brawler', 'mage', 'spellblade', 'cleric', 'summoner'] as const).map((c) => (
+          <span key={c} className="rounded-xs bg-panel py-1">
+            <span className="block text-[9.5px] text-ink-faint">{CLASS_LABEL[c]}</span>
+            <span className="font-display text-[14px] font-bold">{owned.ranks.classes[c]}</span>
+          </span>
+        ))}
+      </div>
+      <p className="text-[11px] text-ink-faint">
+        Class ranks (Learning District). Mastery:{' '}
+        {Object.entries(owned.ranks.mastery).filter(([, r]) => r > 1).map(([t, r]) => `${GEAR_TYPE_LABEL[t as keyof typeof GEAR_TYPE_LABEL]} ${r}`).join(', ') || 'none trained yet'}.
+      </p>
     </section>
   )
 }

@@ -38,6 +38,8 @@ export interface RpgProfile {
   /** The class build's learned nodes. */
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
+  /** Deepest skill depth her class rank opens (S5, D57). Absent: depths open by level, as in S3. */
+  maxDepth?: number
 }
 export interface RpgCoreStats extends Stats {
   atk: number
@@ -212,12 +214,20 @@ export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
 
 export const rpgNodeKey = (ref: RpgNodeRef): string => `${ref.tier}:${ref.id}`
 
+type DepthGated = Pick<RpgProfile, 'level' | 'maxDepth'>
+/** Why a depth is closed, or null: her class rank's depth (S5), or the Uma-level gates before it. */
+export function rpgDepthBlock(profile: DepthGated, depth: number): string | null {
+  if (profile.maxDepth !== undefined) return depth > profile.maxDepth ? `Needs class rank ${depth + 1}` : null
+  return profile.level < RPG_DEPTH_GATES[depth - 1]! ? `Opens at Lv${RPG_DEPTH_GATES[depth - 1]}` : null
+}
+
 /** Why this node can't be learned now, or null. The same rules validate a stored tree. */
-export function rpgLearnBlock(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree'>, id: string): string | null {
+export function rpgLearnBlock(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>, id: string): string | null {
   const node = rpgNode(id)
   if (!node || !rpgProfileTrees(profile).includes(node.tree)) return 'Not in this class’s trees'
   if (profile.tree.some((ref) => ref.id === id)) return 'Already learned'
-  if (profile.level < RPG_DEPTH_GATES[node.depth - 1]!) return `Opens at Lv${RPG_DEPTH_GATES[node.depth - 1]}`
+  const depth = rpgDepthBlock(profile, node.depth)
+  if (depth) return depth
   if (rpgTreePointsSpent(profile.tree) + node.cost > rpgTreePointsEarned(profile.level)) return 'Not enough points'
   return rpgShapeBlock(profile.tree.map((ref) => rpgNode(ref.id)!).filter(Boolean), node)
 }
@@ -233,7 +243,7 @@ function rpgShapeBlock(learned: readonly RpgNode[], node: RpgNode): string | nul
   return null
 }
 
-export function learnRpgNode<P extends Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree'>>(profile: P, id: string): P {
+export function learnRpgNode<P extends Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>>(profile: P, id: string): P {
   const block = rpgLearnBlock(profile, id)
   if (block) throw new RangeError(block)
   return { ...profile, tree: [...profile.tree, { tier: profile.tier, id }] }
@@ -247,12 +257,12 @@ export function forgetRpgVariant<P extends Pick<RpgProfile, 'tree'>>(profile: P,
 }
 
 /** A stored tree obeys every learning rule at its level, whatever order it was learned in. */
-export function validRpgTree(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree'>): boolean {
+export function validRpgTree(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'maxDepth'>): boolean {
   const trees = rpgProfileTrees(profile)
   const nodes: RpgNode[] = []
   for (const ref of profile.tree) {
     const node = rpgNode(ref.id)
-    if (!node || ref.tier !== profile.tier || !trees.includes(node.tree) || profile.level < RPG_DEPTH_GATES[node.depth - 1]!) return false
+    if (!node || ref.tier !== profile.tier || !trees.includes(node.tree) || rpgDepthBlock(profile, node.depth)) return false
     nodes.push(node)
   }
   if (new Set(nodes.map((n) => n.id)).size !== nodes.length || rpgTreePointsSpent(profile.tree) > rpgTreePointsEarned(profile.level)) return false

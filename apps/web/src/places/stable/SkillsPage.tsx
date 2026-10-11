@@ -1,14 +1,14 @@
 // An Uma's class builds and skills (S3, D49): pick the build she fights with, spend her points in each build's two
-// trees (every build gets the full budget), and choose which skills she equips. Depths open at Lv1/10/20/30/40 until the
-// Learning District's class ranks (S5).
+// trees (every build gets the full budget), and choose which skills she equips. Her class rank opens the depths: rank 1
+// learns nothing, each rank one depth more (S5, D57); the class halls train it.
 import {
-  activeBuild, buildOf, RPG_BUILD, RPG_BUILDS, RPG_DEPTH_GATES, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBuildTrees, rpgLearnBlock, rpgNode,
+  activeBuild, buildOf, CLASS_HALLS, placeById, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBuildTrees, rpgLearnBlock, rpgNode,
   rpgTreeBranches, rpgTreeNodes, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, umaProfile, type BattleOutfit, type RpgBuildId,
   type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
 import {
-  BRANCH_LABEL, BUILD_LABEL, CLASS_BLURB, KindMark, skillKinds, skillLine, TREE_LABEL, WEAPON_KIND_LABEL, WeaponGlyph,
+  BRANCH_LABEL, BUILD_LABEL, CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, TREE_LABEL, WEAPON_KIND_LABEL, WeaponGlyph,
 } from '../../battle/labels'
 import { chooseFamiliar, equip, learn, pickBuild, unlearn, useWorld } from '../../save/game'
 
@@ -55,6 +55,17 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           })}
         </div>
         <p className="mt-2 text-[12px] text-ink-soft">{CLASS_BLURB[RPG_BUILD[shownBuild].classId]}</p>
+        {(() => {
+          const classId = RPG_BUILD[shownBuild].classId
+          const rank = uma.ranks.classes[classId]
+          const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === classId)?.[0]
+          return (
+            <p className={`mt-2 rounded-sm px-2.5 py-2 text-[12px] ${rank <= 1 ? 'bg-accent/15 text-accent' : 'bg-raised text-ink-soft'}`}>
+              {CLASS_LABEL[classId]} rank {rank}: {rank <= 1 ? 'learns no skills yet' : `depths 1–${rank - 1} open`}.
+              {rank < 6 && hall ? ` Train the next rank at the ${placeById(hall)?.name} (Learning District).` : ''}
+            </p>
+          )
+        })()}
         {shownBuild !== fighting && (
           <button type="button" onClick={() => run(() => pickBuild(outfit.outfitId, shownBuild))} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">
             Fight as {BUILD_LABEL[shownBuild]}
@@ -114,12 +125,12 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
                 <p className="mb-1.5 flex justify-between text-[12px] font-semibold text-ink-soft">
                   <span>{BRANCH_LABEL[branch] ?? branch}</span>
                   {(() => {
-                    const next = depths.find((depth) => uma.level < RPG_DEPTH_GATES[depth - 1]!)
-                    return next ? <span className="font-normal text-ink-faint">Depth {next} at Lv{RPG_DEPTH_GATES[next - 1]}</span> : null
+                    const next = depths.find((depth) => depth > (profile.maxDepth ?? 5))
+                    return next ? <span className="font-normal text-ink-faint">Depth {next} at rank {next + 1}</span> : null
                   })()}
                 </p>
                 <div className="space-y-1.5">
-                  {depths.filter((depth) => uma.level >= RPG_DEPTH_GATES[depth - 1]! || nodes.some((n) => n.depth === depth && learned.has(n.id))).map((depth) => {
+                  {depths.filter((depth) => depth <= (profile.maxDepth ?? 5) || nodes.some((n) => n.depth === depth && learned.has(n.id))).map((depth) => {
                     const row = nodes.filter((n) => n.depth === depth)
                     const core = row.find((n) => n.variant === null)
                     const forks = row.filter((n) => n.variant !== null)

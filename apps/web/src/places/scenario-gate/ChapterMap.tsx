@@ -1,7 +1,7 @@
 // A chapter's map (S3): pick a party, then walk the nodes top to bottom. Fights open the nodes below them, camps refill
 // MP, and the Finals' three routes each end in a champion. Every party keeps its own run (D52).
 import {
-  activeBuild, buildOf, isBusy, isPartyFull, openFightOf, rpgTreePointsEarned, rpgTreePointsSpent, sweepBlock, type FightResult as Result, RPG_STAGE_NAMES, rpgNodeStatus, runOf, SaveRuleError, type RpgCampaignChapter, type RpgMapNode,
+  activeBuild, buildOf, isBusy, RPG_BUILD, isPartyFull, openFightOf, rpgTreePointsEarned, rpgTreePointsSpent, sweepBlock, type FightResult as Result, RPG_STAGE_NAMES, rpgNodeStatus, runOf, SaveRuleError, type RpgCampaignChapter, type RpgMapNode,
   type RpgNodeStatus,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -139,7 +139,7 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
             const uma = world.umas[id]!
             const outfit = campaign.outfits.get(id)
             const build = outfit ? activeBuild(outfit, uma) : null
-            const spare = build ? rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n }))) : 0
+            const spare = build && uma.ranks.classes[RPG_BUILD[build].classId] > 1 ? rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n }))) : 0
             return (
               <button key={id} type="button" className="relative" title={build ? BUILD_LABEL[build] : ''} aria-label={`${outfit?.name ?? id}: skills`}
                 onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
@@ -152,7 +152,8 @@ export function ChapterMap({ campaign, chapter, place }: { campaign: Campaign; c
           {members.some((id) => {
             const uma = world.umas[id]!
             const outfit = campaign.outfits.get(id)
-            return outfit && rpgTreePointsEarned(uma.level) > rpgTreePointsSpent(buildOf(uma, activeBuild(outfit, uma)).tree.map((n) => ({ tier: 1, id: n })))
+            const build = outfit ? activeBuild(outfit, uma) : null
+            return build && uma.ranks.classes[RPG_BUILD[build].classId] > 1 && rpgTreePointsEarned(uma.level) > rpgTreePointsSpent(buildOf(uma, build).tree.map((n) => ({ tier: 1, id: n })))
           }) && <span className="text-[11px] leading-tight text-accent">Skill points to spend: tap an Uma</span>}
         </div>
         {elsewhere?.battle && (

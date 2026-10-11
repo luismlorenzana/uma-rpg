@@ -14,6 +14,7 @@ import {
   forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_BUILD, RPG_DEFAULT_FAMILIAR, RPG_WEAPON_KINDS, rpgActiveSlots, rpgDefaultBuild,
   rpgUsableLoadout, type RpgBuildId, type RpgProfile, type RpgWeaponKind,
 } from '../rpg/rules'
+import { depthsOpen } from '../economy/training'
 import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassBuild, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
@@ -55,6 +56,8 @@ export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, bu
     growthRates: { speed: growth('speed'), stamina: growth('stamina'), power: growth('power'), guts: growth('guts'), wit: growth('wit') },
     classId: RPG_BUILD[build].classId, weapons: [...RPG_BUILD[build].weapons], tier, level: uma.level, exp: uma.exp,
     tree: buildOf(uma, build).tree.map((id) => ({ tier, id })), legacy: [],
+    // S5 (D57): her class rank opens the depths, not her level.
+    maxDepth: depthsOpen(uma.ranks.classes[RPG_BUILD[build].classId]),
   }
 }
 

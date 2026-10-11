@@ -1,9 +1,13 @@
-// Save v4: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v5: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
-// docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55).
+// docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
+// mastery (S5, D57).
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, type Facility, type Job } from '../economy/jobs'
+import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
+import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
+import { RPG_CLASSES } from '../rpg/kinds'
 import { itemById } from '../items/catalog'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
@@ -13,7 +17,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 4
+export const SAVE_SCHEMA_VERSION = 5
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -55,6 +59,8 @@ export interface OwnedUma {
   builds: Partial<Record<RpgBuildId, ClassBuild>>
   /** Farming & Cooking and Gathering & Crafting, 1–50 each (design §4). */
   professions: Record<Profession, ProfessionLevel>
+  /** Class proficiency (1–6) and gear mastery (1–10) ranks (S5, design §4). */
+  ranks: Ranks
 }
 
 export interface Party {
@@ -130,7 +136,7 @@ export function defaultParties(): Party[] {
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, rushTickets: 0, sweepTickets: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
-export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions() })
+export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, build: null, builds: {}, professions: newProfessions(), ranks: newRanks() })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
   return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), runs: {}, items: {}, facilities: {} }
@@ -217,6 +223,7 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (typeof j.outfitId !== 'string' || !umas[j.outfitId]) throw new SaveParseError(`${path}.outfitId`, 'expected an owned outfit')
   if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
   if ((kind === 'gather' || kind === 'refine') && !itemById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
+  if (kind === 'train' && !parseTrack(j.output)) throw new SaveParseError(`${path}.output`, 'unknown training track')
   const n = count(j.count, `${path}.count`)
   if (n < 1 || n > MAX_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_JOB_COUNT}`)
   const collected = count(j.collected, `${path}.collected`)
@@ -244,6 +251,9 @@ function parseFacilities(value: unknown, path: string, umas: Record<string, Owne
     const jobs = f.jobs.map((job: unknown, i: number) => {
       if (job === null) return null
       const parsed = parseJob(job, `${at}.jobs.${i}`, spec.kind, umas)
+      if (spec.kind === 'train' && (parsed.count !== 1 || !tracksAt(id).some((t) => trackId(t) === parsed.output))) {
+        throw new SaveParseError(`${at}.jobs.${i}.output`, 'not trained here')
+      }
       if (working.has(parsed.outfitId)) throw new SaveParseError(`${at}.jobs.${i}.outfitId`, 'already working elsewhere')
       working.add(parsed.outfitId)
       return parsed
@@ -260,12 +270,31 @@ function ids(value: unknown, path: string, max: number): string[] {
   return value as string[]
 }
 
-/** A build's tree obeys every learning rule at her level; its loadout is learned skills within her slots. */
-function parseBuild(value: unknown, path: string, id: RpgBuildId, tier: number, level: number): ClassBuild {
+function parseRanks(value: unknown, path: string): Ranks {
+  const o = object(value, path, ['classes', 'mastery'])
+  const ranks = newRanks()
+  const classes = object(o.classes, `${path}.classes`, RPG_CLASSES)
+  for (const c of RPG_CLASSES) {
+    const r = count(classes[c], `${path}.classes.${c}`)
+    if (r < 1 || r > CLASS_MAX_RANK) throw new SaveParseError(`${path}.classes.${c}`, `expected 1–${CLASS_MAX_RANK}`)
+    ranks.classes[c] = r
+  }
+  const mastery = object(o.mastery, `${path}.mastery`, GEAR_TYPES)
+  for (const t of GEAR_TYPES) {
+    const r = count(mastery[t], `${path}.mastery.${t}`)
+    if (r < 1 || r > MASTERY_MAX_RANK) throw new SaveParseError(`${path}.mastery.${t}`, `expected 1–${MASTERY_MAX_RANK}`)
+    ranks.mastery[t] = r
+  }
+  return ranks
+}
+
+/** A build's tree obeys every learning rule (depths by class rank from v5, by level before); its loadout is learned
+ * skills within her slots. */
+function parseBuild(value: unknown, path: string, id: RpgBuildId, tier: number, level: number, maxDepth: number | undefined): ClassBuild {
   const b = object(value, path, ['tree', 'loadout', 'familiar'])
   const tree = ids(b.tree, `${path}.tree`, 64)
   const { classId, weapons } = RPG_BUILD[id]
-  if (!validRpgTree({ classId, weapons: [...weapons], tier, level, tree: tree.map((n) => ({ tier, id: n })) })) {
+  if (!validRpgTree({ classId, weapons: [...weapons], tier, level, tree: tree.map((n) => ({ tier, id: n })), ...(maxDepth !== undefined ? { maxDepth } : {}) })) {
     throw new SaveParseError(`${path}.tree`, `not a valid ${id} tree at Lv${level}`)
   }
   const loadout = ids(b.loadout, `${path}.loadout`, rpgActiveSlots(level))
@@ -281,17 +310,30 @@ function parseUmas(value: unknown, path: string, tier: number, version: number):
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
     const u = object(raw, at, version < 3 ? ['unlockedAt', 'level', 'exp'] : version < 4 ? ['unlockedAt', 'level', 'exp', 'build', 'builds']
-      : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions'])
+      : version < 5 ? ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions'] : ['unlockedAt', 'level', 'exp', 'build', 'builds', 'professions', 'ranks'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), build: null, builds: {},
-      professions: version < 4 ? newProfessions() : parseProfessions(u.professions, `${at}.professions`) }
+      professions: version < 4 ? newProfessions() : parseProfessions(u.professions, `${at}.professions`),
+      ranks: version < 5 ? newRanks() : parseRanks(u.ranks, `${at}.ranks`) }
     if (version >= 3) {
       // v2 → v3 (D52): no build chosen and nothing learned.
       if (u.build !== null && !isRpgBuildId(u.build)) throw new SaveParseError(`${at}.build`, 'expected null or a class build')
       owned.build = u.build as RpgBuildId | null
       const builds = object(u.builds, `${at}.builds`, RPG_BUILDS)
-      for (const [key, build] of Object.entries(builds)) owned.builds[key as RpgBuildId] = parseBuild(build, `${at}.builds.${key}`, key as RpgBuildId, tier, level)
+      for (const [key, build] of Object.entries(builds)) {
+        const classId = RPG_BUILD[key as RpgBuildId].classId
+        owned.builds[key as RpgBuildId] = parseBuild(build, `${at}.builds.${key}`, key as RpgBuildId, tier, level,
+          version < 5 ? undefined : depthsOpen(owned.ranks.classes[classId]))
+      }
+      // v4 → v5 (D57): skills learned under the level gates keep their depths: each class starts at the rank they need.
+      if (version < 5) {
+        for (const [key, build] of Object.entries(owned.builds)) {
+          const classId = RPG_BUILD[key as RpgBuildId].classId
+          const deepest = Math.max(0, ...build!.tree.map((n) => rpgNode(n)?.depth ?? 0))
+          owned.ranks.classes[classId] = Math.max(owned.ranks.classes[classId], deepest + 1)
+        }
+      }
     }
     umas[id] = owned
   }
@@ -410,7 +452,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v4 save and always returns v4. */
+/** Parses a v1–v5 save and always returns v5. */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

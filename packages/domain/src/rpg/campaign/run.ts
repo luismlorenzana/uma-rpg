@@ -85,7 +85,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
     version: 5, seed: seedOf(battleId),
     allies: party.map(({ profile, loadout, familiar }) => ({ id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons],
       tier: profile.tier, level: profile.level, stats: projectRpgStats(profile), tree: profile.tree, legacy: profile.legacy,
-      loadout, familiar, mp: rpgCarriedMp(run, profile) })),
+      loadout, familiar, mp: rpgCarriedMp(run, profile), ...(profile.maxDepth !== undefined ? { maxDepth: profile.maxDepth } : {}) })),
     enemies: node.enemies,
   }
   createBattle(input)

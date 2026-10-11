@@ -25,11 +25,18 @@ const OUTFITS = new Map([['101', outfit('101', 'front')], ['102', outfit('102', 
   ['104', outfit('104', 'end')], ['105', outfit('105', 'front')]])
 const o101 = OUTFITS.get('101')!
 
+/** Every class at a rank, as if trained in the Learning District (S5: rank 1 learns nothing). */
+function ranked(save: Save, rank = 2): Save {
+  const w = worldOf(save)
+  const classes = { brawler: rank, mage: rank, spellblade: rank, cleric: rank, summoner: rank }
+  return { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) => [id, { ...u, ranks: { ...u.ranks, classes } }])) } } }
+}
+
 function withParty(): Save {
   let save = newSave('Luis', T(0))
   for (const id of OUTFITS.keys()) save = unlockUma(save, id, T(1))
   ;[...OUTFITS.keys()].forEach((id, slot) => { save = setPartySlot(save, 0, slot, id, T(2)) })
-  return save
+  return ranked(save)
 }
 
 /** Each living ally attacks the foe with the least shield until the fight ends. */
@@ -65,14 +72,15 @@ describe('class builds (D49)', () => {
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
   })
 
-  it('learns depth-1 skills at Lv1 into free slots, keeps each build’s tree, and gates deeper depths by level', () => {
+  it('learns depth-1 skills at class rank 2 into free slots, keeps each build’s tree, and gates deeper depths by rank (D57)', () => {
     let save = withParty()
     save = learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(3))
     save = learnSkill(save, o101, 'axe-bow', 'axe.ice.1', T(4))
     const uma = worldOf(save).umas['101']!
     expect(uma.builds['greatsword-spear']).toEqual({ tree: ['greatsword.fire.1'], loadout: ['greatsword.fire.1'], familiar: 'greatsword' })
     expect(uma.builds['axe-bow']?.tree).toEqual(['axe.ice.1'])
-    expect(() => learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/Lv10/)
+    expect(() => learnSkill(save, o101, 'greatsword-spear', 'greatsword.fire.2', T(5))).toThrow(/class rank 3/)
+    expect(() => learnSkill(ranked(withParty(), 1), o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/class rank 2/)
     expect(() => learnSkill(save, o101, 'greatsword-spear', 'mage-staff.fire.1', T(5))).toThrow(SaveRuleError)
     expect(() => forgetSkill(save, o101, 'greatsword-spear', 'greatsword.fire.1', T(5))).toThrow(/variant/)
   })
@@ -167,7 +175,7 @@ describe('save v3 parsing', () => {
       tierWorlds: { '1': { createdAt: T(0), wallet: { unlockTickets: 19, shards: 0, laurels: 0 }, umas: { '101': { unlockedAt: T(1), level: 1, exp: 0 } },
         parties: Array.from({ length: 20 }, (_, i) => ({ name: `Party ${i + 1}`, slots: [null, null, null, null, null] })) } } }
     const migrated = parseSave(v2)
-    expect(migrated.schemaVersion).toBe(4)
+    expect(migrated.schemaVersion).toBe(5)
     expect(migrated.tierWorlds['1']!.umas['101']).toEqual(newOwnedUma(T(1)))
     expect(migrated.tierWorlds['1']!.runs).toEqual({})
   })

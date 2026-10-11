@@ -7,6 +7,8 @@ import {
   PROFESSION_MAX_LEVEL, professionExpToNext, rushTicketsFor, type Profession,
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
+import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
+import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import type { OwnedUma, ProfessionLevel, Save, TierWorld } from './save'
@@ -14,7 +16,7 @@ import type { OwnedUma, ProfessionLevel, Save, TierWorld } from './save'
 /** What work needs from an outfit's master data (a `RosterOutfit` fits). */
 export interface WorkOutfit {
   outfitId: string
-  aptitudes: Pick<Aptitudes, 'surface'>
+  aptitudes: Pick<Aptitudes, 'surface'> & Partial<Pick<Aptitudes, 'strategy' | 'distance'>>
 }
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
@@ -114,11 +116,12 @@ export function startJob(save: Save, placeId: string, slot: number, outfit: Work
   return withWorld(save, tier, setJob({ ...world, items }, placeId, slot, job), now)
 }
 
-export interface Collected { items: number; exp: number; levelsUp: number; done: boolean }
+export interface Collected { items: number; exp: number; levelsUp: number; done: boolean; rankUp?: boolean }
 
 function collectIn(world: TierWorld, placeId: string, slot: number, now: string): { world: TierWorld; got: Collected } {
   const job = facilityOf(world, placeId).jobs[slot]
   if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
+  if (job.kind === 'train') return collectTraining(world, placeId, slot, job, now)
   const finished = jobFinished(job, now)
   const ready = finished - job.collected
   const spec = facilitySpec(placeId)!
@@ -160,6 +163,48 @@ export function collectAll(save: Save, now: string, placeIds?: readonly string[]
     })
   }
   return { save: withWorld(save, tier, world, now), items, levelsUp }
+}
+
+// --- Training (S5, D57) -------------------------------------------------------------------------------------------
+
+/** What training a track here would take for this Uma, and anything stopping it. */
+export function planTraining(world: TierWorld, placeId: string, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track):
+  { rank: number; msEach: number; block: string | null } | null {
+  const uma = world.umas[outfit.outfitId]
+  if (!uma || !tracksAt(placeId).some((t) => trackId(t) === trackId(track))) return null
+  const rank = rankOf(uma.ranks, track)
+  const msEach = Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, outfit.aptitudes))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
+  return { rank, msEach, block: rank >= maxRankOf(track) ? 'Already at the top rank' : null }
+}
+
+/** Starts training one rank. Time is the only cost, and it can't be rushed (§11). */
+export function startTraining(save: Save, placeId: string, slot: number, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track,
+  now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const facility = facilityOf(world, placeId)
+  if (!Number.isInteger(slot) || slot < 0 || slot >= facility.jobs.length) throw new SaveRuleError('bad-slot', `slot ${slot} doesn't exist`)
+  if (facility.jobs[slot]) throw new SaveRuleError('bad-slot', 'that slot is busy')
+  const busy = availabilityBlock(world, outfit.outfitId)
+  if (busy) throw new SaveRuleError('busy', busy)
+  const plan = planTraining(world, placeId, outfit, track)
+  if (!plan) throw new SaveRuleError('bad-job', 'not trained here')
+  if (plan.block) throw new SaveRuleError('bad-job', plan.block)
+  const job: Job = { kind: 'train', outfitId: outfit.outfitId, output: trackId(track), count: 1, collected: 0, startedAt: now, msEach: plan.msEach, expEach: 0, inputs: {} }
+  return withWorld(save, tier, setJob(world, placeId, slot, job), now)
+}
+
+function collectTraining(world: TierWorld, placeId: string, slot: number, job: Job, now: string): { world: TierWorld; got: Collected } {
+  if (jobFinished(job, now) < job.count) return { world, got: { items: 0, exp: 0, levelsUp: 0, done: false } }
+  const track = parseTrack(job.output)
+  const uma = world.umas[job.outfitId]
+  let next = setJob(world, placeId, slot, null)
+  if (track && uma) {
+    const ranks = track.kind === 'class'
+      ? { ...uma.ranks, classes: { ...uma.ranks.classes, [track.classId]: Math.min(maxRankOf(track), uma.ranks.classes[track.classId] + 1) } }
+      : { ...uma.ranks, mastery: { ...uma.ranks.mastery, [track.type]: Math.min(maxRankOf(track), uma.ranks.mastery[track.type] + 1) } }
+    next = { ...next, umas: { ...next.umas, [job.outfitId]: { ...uma, ranks } } }
+  }
+  return { world: next, got: { items: 0, exp: 0, levelsUp: 0, done: true, rankUp: true } }
 }
 
 /** Ends a job early: collects what's made; inputs for items never made come back; the item in progress is lost. */

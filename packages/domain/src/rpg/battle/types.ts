@@ -21,6 +21,8 @@ export interface BattleAlly {
   familiar: RpgWeaponKind
   /** MP carried into this fight from the run; HP always starts full. */
   mp: number
+  /** Deepest skill depth her class rank opens (S5); absent in older fights, which gate depths by level. */
+  maxDepth?: number
 }
 export interface BattleEnemyStats { hp: number; atk: number; matk: number; pdef: number; mdef: number; initiative: number }
 export interface BattleEnemyMove {
