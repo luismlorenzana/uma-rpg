@@ -50,7 +50,7 @@ function Training({ view, placeId }: { view: MasterView; placeId: string }) {
       <section className="rounded-md bg-raised p-3">
         <p className="font-display text-lg font-bold">{tracks.map(trackLabel).join(', ')}</p>
         <p className="text-[13px] text-ink-soft">
-          {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth.' : 'Gear mastery: rank k lets an Uma equip grade-k gear of that type.'}{' '}
+          {CLASS_HALLS[placeId] ? 'Class rank: rank 1 learns no skills; each rank opens one more depth, and each promotion spends a Promotion Token of its band (fights drop them).' : 'Gear mastery: rank k lets an Uma equip grade-k gear of that type.'}{' '}
           {aptitudeKey(placeId)} aptitude sets the speed. Training can’t be rushed.
         </p>
         <div className="mt-2 flex items-center justify-between text-[12px] text-ink-soft">
@@ -118,7 +118,7 @@ function TrainingCard({ view, world, job, now, tracks, onCollect, onRecall, onCo
         {done && job.queue.length === 0 && <button type="button" onClick={onContinue} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] font-semibold">Rank up · train next</button>}
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft">Recall</button>
       </div>
-      <QueueList job={job} now={now} onRemove={onUnqueue} note="Each rank starts training when the one before ends." label={(q) => {
+      <QueueList job={job} now={now} onRemove={onUnqueue} note={track?.kind === 'class' ? 'Each rank starts when the one before ends and spends its Promotion Token then; the queue stops if you have none.' : 'Each rank starts training when the one before ends.'} label={(q) => {
         const t = parseTrack(q.output)
         const from = rankAt(q.output, [job, ...job.queue.slice(0, job.queue.indexOf(q))])
         return t ? `${trackLabel(t)} rank ${from} → ${from + 1}` : q.output
@@ -174,7 +174,7 @@ function AssignTraining({ view, world, placeId, onClose, onStart }: {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14px] font-semibold">{o.name}</span>
                   <span className="block text-[12px] text-ink-soft">
-                    {why ?? `${trackLabel(track)} rank ${rank} → ${rank + 1} (${rankNote(track, rank)}) · ${aptitudeKey(placeId)} ${grade} ${SPEED[grade]}`}
+                    {why ?? `${trackLabel(track)} rank ${rank} → ${rank + 1} (${rankNote(track, rank)}) · ${aptitudeKey(placeId)} ${grade} ${SPEED[grade]}${plan && Object.keys(plan.inputs).length > 0 ? ' · spends 1 Promotion Token' : ''}`}
                   </span>
                 </span>
                 {!why && plan && <span className="shrink-0 text-[12px] font-semibold text-accent">{formatDuration(plan.msEach)}</span>}

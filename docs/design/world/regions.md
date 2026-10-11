@@ -20,7 +20,7 @@ elements and the ten pairs. Every signature has a home; all but one have two or 
 
 ## The 19 biomes and the capital
 
-Each continent has all 20: one region of each biome plus its capital.
+Each continent has 20 regions (all 19 biomes, one of them twice) plus its capital.
 
 | # | Biome | Signatures | Formation lean | Roles lean | Field effect (later) | Map color |
 |---|---|---|---|---|---|---|
@@ -73,11 +73,11 @@ the Volcano's boss can take it as a third signature.
 
 ## Continents
 
-Five continents a tier, one per scenario, in release order. **Every continent has all 20 regions.** What differs is
-the band, the layout (which biomes sit near the coast and which at the frontier) and a **climate lean**: the biomes on
-its theme get the larger, more central cells.
+Five continents a tier, one per scenario, in release order. **Every continent has every biome.** What differs is the
+band, the order (which biomes sit at the low levels and which at the high ones) and a **climate lean**: the biome on
+its theme appears twice.
 
-| Continent (Tier 1) | Band | Lean | Coast (low) | Frontier (high) |
+| Continent (Tier 1) | Band | Lean | Low levels | High levels |
 |---|---|---|---|---|
 | URA Finale | 1–10 | Temperate | Meadow, Forest, Coast | Volcano, Glacier, Twilight Rift |
 | Unity Cup | 11–20 | Archipelago | Coast, Jungle, Highlands | Sky Isles, Storm Peaks, Underworld |
@@ -87,29 +87,28 @@ its theme get the larger, more central cells.
 
 Tiers 2 and 3 get their own five continents, with the same 20 biomes laid out differently.
 
-## A continent on the grid
+## A continent on the map
 
-A portrait 6 × 9 grid. Each region takes one to three cells, and the capital sits at the top. Locked regions stay
-under fog until a neighbor's boss falls. A sketch of URA Finale, where letters are regions and the coast is at the
-bottom:
+Ten rows, one per level, low at the bottom; two regions per row; a Spring every two rows; the capital on top. A sketch
+of URA Finale (Lv1–10):
 
 ```
-row 9   .  .  [CAPITAL]  .  .
-row 8   Ri Ri  Vo  Vo  Gl  .
-row 7   Ru Ru  Ca  Gy  Gl  Gl
-row 6   Un Un  Ca  Gy  SP  SP
-row 5   HM Sk  Sk  De  De  SP
-row 4   Sw Sw  Hi  De  Tu  Tu
-row 3   Sw Ju  Hi  Cr  Cr  Tu
-row 2   Fo Fo  Me  Me  Co  Co
-row 1   Fo .   Me  Me  Co  .        ← landing: Meadow and Coast open
+            [ CAPITAL · Lv10 Finals ]
+Lv10   Twilight Rift     Volcano
+Lv9    Glacier           Ancient Ruins          ◆ Spring
+Lv8    Underworld        Geyser Basin
+Lv7    Sky Isles         Storm Peaks            ◆ Spring
+Lv6    Haunted Moor      Canyon
+Lv5    Crystal Caverns   Desert                 ◆ Spring
+Lv4    Tundra            Highlands
+Lv3    Jungle            Swamp                  ◆ Spring
+Lv2    Coast             Forest
+Lv1    Meadow            Meadow (east)          ◆ Spring
 ```
 
-`Me` Meadow · `Fo` Forest · `Co` Coast · `Sw` Swamp · `Ju` Jungle · `Hi` Highlands · `Cr` Crystal Caverns ·
-`Tu` Tundra · `De` Desert · `SP` Storm Peaks · `HM` Haunted Moor · `Sk` Sky Isles · `Un` Underworld · `Ca` Canyon ·
-`Gy` Geyser Basin · `Gl` Glacier · `Ru` Ancient Ruins · `Ri` Twilight Rift · `Vo` Volcano
-
-Rows 1–3 are the Coast ring (Lv 1–4), rows 4–6 the Heartland (Lv 3–7), rows 7–8 the Frontier (Lv 6–10).
+Nineteen biomes fill twenty slots, so one biome appears twice per continent; URA Finale doubles its Meadow so Lv1
+teaches the basics. Other continents double their lean (Unity Cup a Coast, Trackblazer a Desert, and so on), and
+each continent orders the rows differently.
 
 ## A region's data (authored once)
 
@@ -118,18 +117,18 @@ interface RegionDef {
   id: string              // 'ura-volcano'
   biome: Biome            // 'volcano'
   name: string            // 'Cinder Reach'
-  cells: [col, row][]     // where it sits on the continent grid
-  window: [min, max]      // level window inside the continent band
-  neighbors: string[]     // opened when its boss falls
+  level: number           // its one fixed level, inside the continent's band
+  cell: [col, row]        // where it sits on the continent map
 }
 ```
 
-Everything else (signatures, formations, roles, field effect) comes from the biome. The ten stages are generated from
-the region id with a fixed seed, so they never change under a save. The authored part is about 20 lines per continent.
+Everything else (signatures, formations, roles, field effect) comes from the biome. The twelve stages are generated
+from the region id with a fixed seed, so they never change under a save. The authored part is about 20 lines per
+continent, plus five Springs.
 
 ## Art, lean first
 
 | Step | Look |
 |---|---|
-| W2 | Flat cells in the biome's color, a code-drawn biome icon, fog as a dark overlay, region names in DOM labels (like the Hub) |
+| W2 | Flat cells in the biome's color, a code-drawn biome icon, region names in DOM labels (like the Hub) |
 | W5 | uma-platform draws a 16 px tileset per biome: ground variants and two or three props, the same pipeline as the Hub tiles (P38) |

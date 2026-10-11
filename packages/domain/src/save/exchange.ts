@@ -10,6 +10,7 @@ import { openFightOf, payEntrants, runOf, type FightResult } from './battle'
 import { PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
+import { TOKEN_SWAP_COST, tokenById } from '../economy/tokens'
 
 export const MAX_PURCHASE = 99
 
@@ -102,13 +103,34 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, party: numbe
     wallet: { ...paid.world.wallet, sweepTickets: paid.world.wallet.sweepTickets - 1 },
     runs: { ...world.runs, [rpgRunKey(party, chapter.id)]: { ...run, wins: { ...run.wins, [nodeId]: (run.wins[nodeId] ?? 0) + 1 }, updatedAt: now } },
   }
-  return { save: withWorld(save, tier, next, now), result: { outcome: 'victory', chapterId: chapter.id, nodeId, rounds: 0, members: paid.members, laurels: 0, shards: paid.shards, tickets: paid.tickets } }
+  return { save: withWorld(save, tier, next, now), result: { outcome: 'victory', chapterId: chapter.id, nodeId, rounds: 0, members: paid.members, laurels: 0, shards: paid.shards, tickets: paid.tickets, tokens: {} } }
+}
+
+// --- Token swaps (D67): three of a kind and band for one of your choice ---------------------------------------------
+
+/** Swaps `offered` (three tokens in all, any mix) for one `wanted` token of the same kind and band. */
+export function swapTokens(save: Save, offered: Record<string, number>, wanted: string, now: string, tier = TIER_ONE): Save {
+  const target = tokenById(wanted)
+  if (!target) throw new SaveRuleError('bad-job', 'not a token')
+  const total = Object.values(offered).reduce((a, b) => a + b, 0)
+  if (total !== TOKEN_SWAP_COST) throw new SaveRuleError('bad-count', `swap ${TOKEN_SWAP_COST} tokens for one`)
+  const world = worldOf(save, tier)
+  const items = { ...world.items }
+  for (const [id, n] of Object.entries(offered)) {
+    const token = tokenById(id)
+    if (!token || token.kind !== target.kind || token.band !== target.band) throw new SaveRuleError('bad-job', 'swap tokens of the same kind and band')
+    if (!Number.isInteger(n) || n < 1 || (items[id] ?? 0) < n) throw new SaveRuleError('no-items', `not enough ${token.name}`)
+    items[id] = items[id]! - n
+    if (items[id] === 0) delete items[id]
+  }
+  items[wanted] = (items[wanted] ?? 0) + 1
+  return withWorld(save, tier, { ...world, items }, now)
 }
 
 // --- Selling (QoL): spare stock back for a few Laurels, always far below what buying costs ---------------------------
 
 export type Shelf = 'items' | 'dishes' | 'gear'
-/** Laurels for one: raw items their grade, refined twice that, dishes and unbound gear three times. */
+/** Laurels for one (D65): raw `2 + 2g`, refined twice that, dishes and unbound gear `6 + 6g`; tokens can't be sold. */
 export function sellPrice(shelf: Shelf, id: string): number {
   if (shelf === 'items') {
     const item = itemById(id)

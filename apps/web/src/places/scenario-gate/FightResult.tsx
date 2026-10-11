@@ -1,6 +1,7 @@
 // What a fight paid (D51): EXP and levels for all five, Laurels, Shards at Lv10/20/30/40/50 and any Ticket they made.
-import { rpgTreePointsEarned, type FightResult as Result, type RpgCampaignChapter } from '@rpg/domain'
+import { rpgTreePointsEarned, stockName, type FightResult as Result, type RpgCampaignChapter } from '@rpg/domain'
 import type { Campaign } from '../../battle/campaign'
+import { ItemIcon } from '../../items/ItemIcon'
 import { AtlasSprite } from '../../master/art'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
@@ -30,6 +31,15 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
               {result.shards > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-shard"><ShardIcon size={18} />+{result.shards} Shard{result.shards > 1 ? 's' : ''}</span>}
               {result.tickets > 0 && <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-semibold text-ticket"><TicketIcon size={18} />+{result.tickets} Unlock Ticket{result.tickets > 1 ? 's' : ''}!</span>}
             </div>
+            {Object.keys(result.tokens ?? {}).length > 0 && (
+              <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Tokens">
+                {Object.entries(result.tokens).map(([id, n]) => (
+                  <li key={id} className="flex items-center gap-1.5 rounded-full bg-raised py-1 pl-1 pr-3 text-[12px] font-semibold">
+                    <ItemIcon id={id} size={22} /> {n > 1 ? `${n}× ` : ''}{stockName(id)}
+                  </li>
+                ))}
+              </ul>
+            )}
             <ul className="mt-4 space-y-2">
               {result.members.map((m) => {
                 const up = m.afterLevel > m.beforeLevel

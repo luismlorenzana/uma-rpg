@@ -1,4 +1,4 @@
-// Save v8: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v9: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -13,6 +13,7 @@ import { gearById, slotOf, type GearSlot } from '../economy/gear'
 import { WEAPON_TYPES } from '../economy/training'
 import { activeNodeSlots } from '../economy/pacing'
 import { itemById } from '../items/catalog'
+import { isToken } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
@@ -21,7 +22,7 @@ import {
   isRpgBuildId, RPG_BUILD, RPG_BUILDS, RPG_WEAPON_KINDS, rpgActiveSlots, validRpgTree, type RpgBuildId, type RpgWeaponKind,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 8
+export const SAVE_SCHEMA_VERSION = 9
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -226,7 +227,7 @@ function parseItems(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const items: Record<string, number> = {}
   for (const [id, n] of Object.entries(value)) {
-    if (!itemById(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
+    if (!itemById(id) && !isToken(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
     const c = count(n, `${path}.${id}`)
     if (c > 0) items[id] = c
   }
@@ -543,7 +544,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v8 save and always returns v8. */
+/** Parses a v1–v9 save and always returns v9 (v9 lets the item stock hold tokens, D67). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

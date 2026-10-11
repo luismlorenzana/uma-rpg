@@ -17,20 +17,26 @@ const front = {
 const plain = { ...front, outfitId: '102', aptitudes: { ...front.aptitudes, strategy: { front: 'G', pace: 'G', late: 'G', end: 'G' } } } as const
 
 const umas = (...ids: string[]): Save => ids.reduce((s, id) => unlockUma(s, id, at(0)), newSave('Luis', at(0)))
+const give = (save: Save, items: Record<string, number>): Save => ({ ...save, tierWorlds: { '1': { ...worldOf(save), items: { ...worldOf(save).items, ...items } } } })
 
 describe('class ranks (S5, D57)', () => {
   it('trains one rank at running-style speed, pays it on collect, and opens a skill depth per rank', () => {
     let save = umas('101', '102')
+    // Promotion to rank 2 spends a band-1 Promotion Token (D67).
+    expect(() => startTraining(save, 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))).toThrow(/Needs 1 Brawler Promotion Token \(rank 2\)/)
+    save = give(save, { 'token-class-brawler-1': 2 })
     save = startTraining(save, 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))
     save = startTraining(save, 'brawler-dojo', 1, plain, { kind: 'class', classId: 'brawler' }, at(0))
-    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs.map((j) => j!.msEach)).toEqual([0.25 * HOUR, 0.5 * HOUR])
+    expect(worldOf(save).items['token-class-brawler-1']).toBeUndefined()
+    // Every rank is 6 base hours (D68), halved by Front A.
+    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs.map((j) => j!.msEach)).toEqual([3 * HOUR, 6 * HOUR])
     expect(() => rushJob(save, 'brawler-dojo', 0, at(0))).toThrow(/can’t be rushed/)
-    expect(collectJob(save, 'brawler-dojo', 0, at(0.2 * HOUR)).got.done).toBe(false)
-    save = collectJob(save, 'brawler-dojo', 0, at(0.25 * HOUR)).save
+    expect(collectJob(save, 'brawler-dojo', 0, at(2.5 * HOUR)).got.done).toBe(false)
+    save = collectJob(save, 'brawler-dojo', 0, at(3 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.classes.brawler).toBe(2)
     expect(umaProfile(front, worldOf(save).umas['101']!, 1, 'greatsword-spear').maxDepth).toBe(1)
-    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(HOUR))
-    expect(() => learnSkill(save, front, 'greatsword-spear', 'greatsword.ice.2', at(HOUR))).toThrow(/class rank 3/)
+    save = learnSkill(save, front, 'greatsword-spear', 'greatsword.fire.1', at(4 * HOUR))
+    expect(() => learnSkill(save, front, 'greatsword-spear', 'greatsword.ice.2', at(4 * HOUR))).toThrow(/class rank 3/)
     expect([1, 2, 6].map(depthsOpen)).toEqual([0, 1, 5])
   })
 
@@ -38,8 +44,9 @@ describe('class ranks (S5, D57)', () => {
     let save = umas('101')
     expect(() => startTraining(save, 'rangers-lodge', 0, front, { kind: 'mastery', type: 'greatsword' }, at(0))).toThrow(/not trained here/)
     save = startTraining(save, 'rangers-lodge', 0, front, { kind: 'mastery', type: 'bow' }, at(0))
-    expect(facilityOf(worldOf(save), 'rangers-lodge').jobs[0]!.msEach).toBe(0.25 * HOUR)
-    save = collectJob(save, 'rangers-lodge', 0, at(HOUR)).save
+    // Mastery is 3 base hours a rank and spends no token (D68).
+    expect(facilityOf(worldOf(save), 'rangers-lodge').jobs[0]!.msEach).toBe(1.5 * HOUR)
+    save = collectJob(save, 'rangers-lodge', 0, at(2 * HOUR)).save
     expect(worldOf(save).umas['101']!.ranks.mastery.bow).toBe(2)
   })
 
@@ -81,7 +88,7 @@ describe('save v5', () => {
     const low = JSON.parse(JSON.stringify(save))
     low.tierWorlds['1'].umas['101'].ranks.classes.brawler = 1
     expect(() => parseSave(low)).toThrow(/tree/)
-    const elsewhere = JSON.parse(JSON.stringify(startTraining(umas('101'), 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))))
+    const elsewhere = JSON.parse(JSON.stringify(startTraining(give(umas('101'), { 'token-class-brawler-1': 1 }), 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))))
     elsewhere.tierWorlds['1'].facilities['mage-tower'] = elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     delete elsewhere.tierWorlds['1'].facilities['brawler-dojo']
     expect(() => parseSave(elsewhere)).toThrow(SaveParseError)
@@ -89,16 +96,22 @@ describe('save v5', () => {
 })
 
 describe('queued training (QoL, D62)', () => {
-  it('queues the next ranks of a track, each timed from the rank it will train', () => {
-    let save = startTraining(umas('101'), 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))
+  it('queues the next ranks of a track, each spending its band’s token when it starts', () => {
+    let save = startTraining(give(umas('101'), { 'token-class-brawler-1': 1 }), 'brawler-dojo', 0, front, { kind: 'class', classId: 'brawler' }, at(0))
     save = queueJob(save, 'brawler-dojo', 0, front, 'class:brawler', 1, at(0))
     save = queueJob(save, 'brawler-dojo', 0, front, 'class:brawler', 1, at(0))
-    // Rank 2→3 is 2 hours and 3→4 is 6, halved by Front A.
-    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs[0]!.queue.map((q) => q.msEach)).toEqual([HOUR, 3 * HOUR])
+    // Every rank takes the same time; ranks 2→3 and 3→4 want band-2 and band-3 tokens.
+    expect(facilityOf(worldOf(save), 'brawler-dojo').jobs[0]!.queue.map((q) => [q.msEach, q.inputs])).toEqual([
+      [3 * HOUR, { 'token-class-brawler-2': 1 }], [3 * HOUR, { 'token-class-brawler-3': 1 }]])
     expect(() => queueJob(save, 'brawler-dojo', 0, front, 'class:mage', 1, at(0))).toThrow(/not trained here/)
-    const r = collectJob(save, 'brawler-dojo', 0, at(1.5 * HOUR))
+    // Without the band-2 token the queue stops after the first rank.
+    const short = collectJob(save, 'brawler-dojo', 0, at(7 * HOUR)).save
+    expect(worldOf(short).umas['101']!.ranks.classes.brawler).toBe(2)
+    expect(facilityOf(worldOf(short), 'brawler-dojo').jobs[0]).toBeNull()
+    const r = collectJob(give(save, { 'token-class-brawler-2': 1, 'token-class-brawler-3': 1 }), 'brawler-dojo', 0, at(6.5 * HOUR))
     expect(r.got.rankUp).toBe(true)
     expect(worldOf(r.save).umas['101']!.ranks.classes.brawler).toBe(3)
-    expect(facilityOf(worldOf(r.save), 'brawler-dojo').jobs[0]).toMatchObject({ output: 'class:brawler', startedAt: at(1.25 * HOUR) })
+    expect(facilityOf(worldOf(r.save), 'brawler-dojo').jobs[0]).toMatchObject({ output: 'class:brawler', startedAt: at(6 * HOUR) })
+    expect(worldOf(r.save).items).toEqual({})
   })
 })

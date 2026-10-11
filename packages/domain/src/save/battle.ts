@@ -5,6 +5,7 @@ import { best } from '../roster/aptitudes'
 import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
 import type { RpgCampaignChapter, RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
+import { levelBand, rollTokens } from '../economy/tokens'
 import {
   createRpgRun, rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel, rpgRestAtCamp, rpgRunKey,
   type RpgPartyMember, type RpgRun,
@@ -196,6 +197,8 @@ export interface FightResult {
   shards: number
   /** Unlock Tickets the Shards completed. */
   tickets: number
+  /** Tokens the win dropped into the Warehouse (D67); Sweeps drop none. */
+  tokens: Record<string, number>
 }
 
 /**
@@ -211,12 +214,16 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
     { id: battle.nodeId, kind: 'fight', level: battle.input.enemies[0]?.level ?? chapter.levelStart, stage: 0 }
   const closed = rpgCloseRunBattle(run, state, { id: node.id, kind: node.kind }, now)
   const result: FightResult = { outcome: state.outcome === 'victory' ? 'victory' : 'loss', chapterId: chapter.id, nodeId: node.id,
-    rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0 }
+    rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0, tokens: {} }
   if (state.outcome !== 'victory') return { save: withRun(save, closed, now, tier), result }
   const kind = rpgRewardKind(node)
   const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level, rpgBattleLaurels(kind, chapter.tier), tier)
-  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels })
-  const next: TierWorld = { ...paid.world, runs: { ...world.runs, [rpgRunKey(closed.party, closed.chapterId)]: closed } }
+  // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
+  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level))
+  const items = { ...paid.world.items }
+  for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
+  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens })
+  const next: TierWorld = { ...paid.world, items, runs: { ...world.runs, [rpgRunKey(closed.party, closed.chapterId)]: closed } }
   return { save: withWorld(save, tier, next, now), result }
 }
 

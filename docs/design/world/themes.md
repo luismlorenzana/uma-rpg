@@ -26,7 +26,7 @@ Both also have a "hits everything" element, which matches our Ultima (never a we
 | **2. Original monster families** | About 12 small pixel monsters drawn in uma-platform, each recolored per element | One art round, drawn from code like the item icons; recolors are free | Regular foes in biomes; any style we like; can go in the public art package |
 | **3. Franchise rosters** | Each franchise's own enemies (names and images) | A capture script and a mapping table per franchise; private only | Rifts |
 
-**Recommended mix:** start with **1** everywhere (no new work). Then **2** for regular foes, with PriConne rivals as
+**Decided for now (D66): 1 everywhere.** Later, the recommended mix: start with **1** everywhere (no new work). Then **2** for regular foes, with PriConne rivals as
 elites and bosses ("rival adventurers" exploring the same lands). Then **3** only in Rifts.
 
 ### Monster families (for option 2)

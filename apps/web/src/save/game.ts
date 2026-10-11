@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  parseTrack, sweepMany, sellStock, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, rushJob, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
+  parseTrack, sweepMany, sellStock, swapTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, rushJob, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
   eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
   actInFight, chooseBuild, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, restAtCamp, retreat, setFamiliar,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBuildId,
@@ -145,6 +145,8 @@ export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, 
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
 export const buyTicket = (kind: 'rush' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
 export const sell = (shelf: Shelf, id: string, quantity: number) => edit((s, now) => sellStock(s, shelf, id, quantity, now))
+/** Three tokens of a kind and band for one of your choice (D67). */
+export const swap = (offered: Record<string, number>, wanted: string) => edit((s, now) => swapTokens(s, offered, wanted, now))
 
 /** She eats a dish: one node unlocks on her map (S6). Returns the node. */
 export async function eat(outfitId: string, dishId: string): Promise<string> {

@@ -72,10 +72,13 @@ export const chapterGrades = (orderInTier: number): readonly [number, number] =>
 
 export const CLASS_MAX_RANK = 6
 export const MASTERY_MAX_RANK = 10
-/** Base hours to train a class from rank r to r + 1: 44.5 hours from rank 1 to 6 at G, half at A. */
-export const classRankHours = (rank: number): number => [0.5, 2, 6, 12, 24][rank - 1] ?? Infinity
-/** Base hours to train gear mastery from rank r to r + 1: r(r + 1)/4, 82.5 hours from 1 to 10 at G. */
-export const masteryRankHours = (rank: number): number => (rank >= MASTERY_MAX_RANK ? Infinity : (rank * (rank + 1)) / 4)
+/** Base hours per class rank, the same for every rank (D68): 6 at G, 3 at A; 30 hours from rank 1 to 6 at G. Each
+ * promotion also spends a Class Promotion Token of its band (D67). */
+export const CLASS_RANK_HOURS = 6
+export const classRankHours = (rank: number): number => (rank >= 1 && rank < CLASS_MAX_RANK ? CLASS_RANK_HOURS : Infinity)
+/** Base hours per gear mastery rank, the same for every rank (D68): 3 at G, 1½ at A; 27 hours from 1 to 10 at G. */
+export const MASTERY_RANK_HOURS = 3
+export const masteryRankHours = (rank: number): number => (rank >= 1 && rank < MASTERY_MAX_RANK ? MASTERY_RANK_HOURS : Infinity)
 
 // --- Extra Stats and gear (S6, S7, §7.3, §10) -----------------------------------------------------------------------
 

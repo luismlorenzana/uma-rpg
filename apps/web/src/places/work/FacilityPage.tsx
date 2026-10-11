@@ -4,7 +4,7 @@
 import {
   availabilityBlock, DISHES, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, rushCost, SaveRuleError,
-  upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
+  stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -262,7 +262,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
             <ul className="flex flex-wrap gap-1.5 text-[12px]">
               {Object.entries(plan.inputs).map(([id, n]) => (
                 <li key={id} className="flex items-center gap-1 rounded-sm bg-raised px-2 py-1">
-                  <ItemIcon id={id} size={20} /> {itemById(id)?.name} ×{n * Math.min(count, max)}
+                  <ItemIcon id={id} size={20} /> {stockName(id)} ×{n * Math.min(count, max)}
                   <span className="text-ink-faint">({world.items[id] ?? 0})</span>
                 </li>
               ))}
@@ -312,7 +312,7 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
         <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(piece.id).icon} size={28} /> {piece.name}</p>
         <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
           {Object.entries(piece.inputs).map(([id, n]) => (
-            <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {itemById(id)?.name} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>
+            <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {stockName(id)} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>
           ))}
         </ul>
         <button type="button" disabled={have < 1 && !queueing} onClick={() => onPick(piece.id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">

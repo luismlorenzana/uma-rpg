@@ -11,6 +11,8 @@ import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { maxRankOf, parseTrack, rankOf, trackAptitude, trackHours, tracksAt, trackId, type Track } from '../economy/training'
 import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
+import { stockName } from '../economy/stock'
+import { promotionTokenId } from '../economy/tokens'
 import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -84,7 +86,7 @@ export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, o
 /** Why the Warehouse can't cover `count` sets of these inputs, or null. */
 export function inputsBlock(world: TierWorld, inputs: Record<string, number>, count: number): string | null {
   for (const [id, n] of Object.entries(inputs)) {
-    if ((world.items[id] ?? 0) < n * count) return `Needs ${n * count} ${itemById(id)?.name ?? id}`
+    if ((world.items[id] ?? 0) < n * count) return `Needs ${n * count} ${stockName(id)}`
   }
   return null
 }
@@ -245,15 +247,25 @@ export function collectAll(save: Save, now: string, placeIds?: readonly string[]
 
 /** What training a track here would take for this Uma, and anything stopping it. */
 export function planTraining(world: TierWorld, placeId: string, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track):
-  { rank: number; msEach: number; block: string | null } | null {
+  { rank: number; msEach: number; inputs: Record<string, number>; block: string | null } | null {
   const uma = world.umas[outfit.outfitId]
   if (!uma || !tracksAt(placeId).some((t) => trackId(t) === trackId(track))) return null
   const rank = rankOf(uma.ranks, track)
-  const msEach = Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, outfit.aptitudes))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
-  return { rank, msEach, block: rank >= maxRankOf(track) ? 'Already at the top rank' : null }
+  const msEach = trainingMs(world, placeId, outfit, track, rank)
+  const inputs = trainingInputs(track, rank)
+  return { rank, msEach, inputs, block: rank >= maxRankOf(track) ? 'Already at the top rank' : inputsBlock(world, inputs, 1) }
 }
 
-/** Starts training one rank. Time is the only cost, and it can't be rushed (§11). */
+function trainingMs(world: TierWorld, placeId: string, outfit: WorkOutfit, track: Track, rank: number): number {
+  const aptitudes = outfit.aptitudes as Pick<Aptitudes, 'strategy' | 'distance'>
+  return Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, aptitudes))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
+}
+/** A class promotion from rank r spends a Promotion Token of band r (D67); mastery is time alone. */
+function trainingInputs(track: Track, rank: number): Record<string, number> {
+  return track.kind === 'class' && rank < maxRankOf(track) ? { [promotionTokenId(track.classId, rank)]: 1 } : {}
+}
+
+/** Starts training one rank: a class promotion takes its token now. It can't be rushed (§11). */
 export function startTraining(save: Save, placeId: string, slot: number, outfit: WorkOutfit & { aptitudes: Pick<Aptitudes, 'strategy' | 'distance'> }, track: Track,
   now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
@@ -265,8 +277,11 @@ export function startTraining(save: Save, placeId: string, slot: number, outfit:
   const plan = planTraining(world, placeId, outfit, track)
   if (!plan) throw new SaveRuleError('bad-job', 'not trained here')
   if (plan.block) throw new SaveRuleError('bad-job', plan.block)
-  const job: Job = { kind: 'train', outfitId: outfit.outfitId, output: trackId(track), count: 1, collected: 0, startedAt: now, msEach: plan.msEach, expEach: 0, inputs: {}, queue: [] }
-  return withWorld(save, tier, setJob(world, placeId, slot, job), now)
+  let items = world.items
+  for (const [id, n] of Object.entries(plan.inputs)) items = take(items, id, n)
+  const job: Job = { kind: 'train', outfitId: outfit.outfitId, output: trackId(track), count: 1, collected: 0, startedAt: now, msEach: plan.msEach, expEach: 0,
+    inputs: plan.inputs, queue: [] }
+  return withWorld(save, tier, setJob({ ...world, items }, placeId, slot, job), now)
 }
 
 function collectTraining(world: TierWorld, placeId: string, slot: number, job: Job, now: string): { world: TierWorld; got: Collected } {
@@ -300,8 +315,7 @@ export function queueJob(save: Save, placeId: string, slot: number, outfit: Work
     // The rank it will train from: today's, plus the current job and each queued one of the same track.
     const rank = rankOf(uma.ranks, track) + [job, ...job.queue].filter((j) => j.output === output).length
     if (rank >= maxRankOf(track)) throw new SaveRuleError('bad-job', 'that would pass the top rank')
-    const msEach = Math.max(1000, Math.round((trackHours(track, rank) * HOUR * aptitudeTime(trackAptitude(track, outfit.aptitudes as Pick<Aptitudes, 'strategy' | 'distance'>))) / FACILITY_SPEED[facilityOf(world, placeId).level - 1]!))
-    entry = { output, count: 1, msEach, expEach: 0, inputs: {} }
+    entry = { output, count: 1, msEach: trainingMs(world, placeId, outfit, track, rank), expEach: 0, inputs: trainingInputs(track, rank) }
   } else {
     if (!Number.isInteger(count) || count < 1 || count > MAX_JOB_COUNT) throw new SaveRuleError('bad-count', `make 1–${MAX_JOB_COUNT} at a time`)
     const plan = planJob(world, placeId, outfit, output, 0)

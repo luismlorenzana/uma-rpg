@@ -65,10 +65,10 @@ Pantry, Workbench, Kitchen, Forge, class halls and armories) take Stones and Woo
 
 ## Learning District (S5)
 
-| Track | Base hours to the next rank | From the first rank to the top, at G |
+| Track | Base hours to the next rank (D68) | From the first rank to the top, at G |
 |---|---|---|
-| Class proficiency, ranks 1–6 | 0.5, 2, 6, 12, 24 | 44.5 h (22 h at A) |
-| Gear mastery, ranks 1–10 | `rank × (rank + 1) / 4`: 0.5, 1.5, 3 … 22.5 | 82.5 h (41 h at A) |
+| Class proficiency, ranks 1–6 | 6 each, plus a Class Promotion Token of the band (D67) | 30 h (15 h at A) |
+| Gear mastery, ranks 1–10 | 3 each | 27 h (13½ h at A) |
 
 Running style sets class speed and distance sets mastery speed, with the same shares as professions.
 
@@ -87,3 +87,8 @@ Running style sets class speed and distance sets mastery speed, with the same sh
 | Duo dish (grades 3, 7) | 1 refined item of each of its two families, plus a side at grade 7 |
 | Feast (grades 4, 6, 8, 10) | 1 refined item of each farming family |
 | Gear of grade g | 1 refined main material and 1 refined accent material, plus an extra from grade 4 and a second from grade 8 |
+
+## Tokens (D67)
+
+Fights drop them; promotions, crafting and cooking spend them. Kinds, drops, odds and swaps are in
+[loop.md](loop.md).

@@ -4,6 +4,7 @@
 import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
 import type { RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
+import { craftTokenId, gradeBand } from './tokens'
 import { ARMOR_TYPES, WEAPON_TYPES, type ArmorType, type GearType, type WeaponType } from './training'
 
 export const ACCESSORY_TYPES = ['ring', 'charm'] as const
@@ -61,6 +62,8 @@ export function gearById(id: string): GearPiece | undefined {
   const put = (id: string, n: number) => { inputs[id] = (inputs[id] ?? 0) + n }
   put(main.refined[grade - 1]!.id, 1)
   put(acc.refined[grade - 1]!.id, 1)
+  // A Crafting Token of its accent's stat and its band, dropped by fights (D67).
+  put(craftTokenId(accent, gradeBand(grade)), 1)
   // Extras, like a dish's sides: grade ⌈g/2⌉ of other gathering families, more at higher grades (parity, §8.5).
   const extras = grade <= 3 ? 0 : grade <= 7 ? 1 : 2
   const others = GATHER.filter((f) => f.id !== main.id && f.id !== acc.id)

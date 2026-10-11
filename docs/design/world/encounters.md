@@ -54,17 +54,17 @@ dark beat each other, so every pair gets its own answer:
 So a Volcano full of fire+dark and fire+light foes wants lightning plus both light and dark: one party can't cover
 every Volcano stage. That's the push to rotate parties you asked for.
 
-## A region's ten stages
+## A region's twelve stages
 
 | Stage | What | Notes |
 |---|---|---|
 | 1–2 | A duo or squad with one single-element signature | Teaches the region |
-| 3–5 | The biome's formation lean across its signatures | No repeats |
-| 6 | Ambush or swarm | |
-| 7 | Two waves | |
-| 8 | The biome's signature formation (the Volcano's solo, the Underworld's swarm) | |
-| 9 | **Elite**: a solo or duo carrying the biome's rarest signature | Pays like a sub-boss |
-| 10 | **Boss**: an escort and three waves, captain or champion with the biome's main pair | Opens the neighboring regions |
+| 3–6 | The biome's formation lean across its signatures | No repeats |
+| 7 | Ambush or swarm | |
+| 8–9 | Two waves | |
+| 10 | The biome's signature formation (the Volcano's solo, the Underworld's swarm) | |
+| 11 | **Elite**: a solo or duo carrying the biome's rarest signature | Pays like a sub-boss |
+| 12 | **Boss**: an escort and three waves, captain or champion with the biome's main pair | Drops a Promotion Token every time |
 
 **The rule that keeps it fresh:** no two stages of a region share the same formation, signature and role mix; the
 generator rerolls until they differ, and a test checks every region of every continent.
@@ -73,20 +73,20 @@ generator rerolls until they differ, and a test checks every region of every con
 
 | You said | Stage |
 |---|---|
-| Solo fire+dark on a volcano | Volcano 8: **solo elite**, fire+dark, champion kit, acts twice, shield 6. Weak to lightning and light, axe |
-| Fire+light on a volcano | Volcano 9: **duo**, fire+light striker + fire+dark caster. Lightning hits both; light and dark each hit only one, so the party needs both to break them together |
-| Dark + one element in the underworld | Underworld 6: **swarm of 8**, mixed fire+dark, ice+dark and lightning+dark, shield 1 each |
+| Solo fire+dark on a volcano | Volcano 10: **solo elite**, fire+dark, champion kit, acts twice, shield 6. Weak to lightning and light, axe |
+| Fire+light on a volcano | Volcano 11: **duo**, fire+light striker + fire+dark caster. Lightning hits both; light and dark each hit only one, so the party needs both to break them together |
+| Dark + one element in the underworld | Underworld 7: **swarm of 8**, mixed fire+dark, ice+dark and lightning+dark, shield 1 each |
 | Light + one element on sky islands | Sky Isles 4: **trio of casters**, ice+light, lightning+light and fire+light, each weak to dark plus one |
 | 8 foes vs 2 foes | Haunted Moor swarms (6–8) vs Desert and Highlands duos |
 
 ## How many different fights is that?
 
-- 15 signatures × 8 formations × role mixes × 1–3 waves gives thousands of combinations. Each region draws its ten
+- 15 signatures × 8 formations × role mixes × 1–3 waves gives thousands of combinations. Each region draws its twelve
   from its biome's slice, so a region feels coherent, and its neighbors feel different.
-- Across a continent the 20 regions are 20 different biomes; across the tier, each continent arranges them in a new
+- Across a continent the 20 regions cover all 19 biomes; across the tier, each continent arranges them in a new
   order and band.
-- What repeats is the **biome**, five times a tier (once per continent), with new stages each time. You said that's
-  fine.
+- What repeats is the **biome**, five or more times a tier (at least once per continent), with new stages each time.
+  You said that's fine.
 
 ## Faces
 

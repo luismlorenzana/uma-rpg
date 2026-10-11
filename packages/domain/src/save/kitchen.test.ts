@@ -38,10 +38,10 @@ describe('dishes (S6, D58)', () => {
     const used = new Set(DISHES.flatMap((d) => Object.keys(d.inputs)))
     const farmingRefined = ITEM_FAMILIES.filter((f) => f.side === 'farming').flatMap((f) => f.refined.map((i) => i.id))
     expect(farmingRefined.every((id) => used.has(id))).toBe(true)
-    expect(dishById('dish-fruits-1')).toMatchObject({ name: 'Apple Tart', effects: ['mp'], inputs: { 'apple-preserve': 1 } })
+    expect(dishById('dish-fruits-1')).toMatchObject({ name: 'Apple Tart', effects: ['mp'], inputs: { 'apple-preserve': 1, 'token-cook-mp-1': 1 } })
     // One of each (D65): sides join from grade 4.
-    expect(Object.keys(dishById('dish-fruits-4')!.inputs)).toHaveLength(2)
-    expect(Object.values(dishById('dish-fruits-10')!.inputs).reduce((a, b) => a + b, 0)).toBe(3)
+    expect(Object.keys(dishById('dish-fruits-4')!.inputs)).toHaveLength(3)
+    expect(Object.values(dishById('dish-fruits-10')!.inputs).reduce((a, b) => a + b, 0)).toBe(4)
   })
 
   it('unlocks moons from the lowest up to the dish’s grade, bridges at grades 3 and 7, and the Sun with Feasts', () => {
@@ -54,7 +54,7 @@ describe('dishes (S6, D58)', () => {
 
 describe('cooking and eating (S6)', () => {
   it('cooks at the Kitchen with Farming & Cooking, reserving the recipe, and puts dishes on their own shelf', () => {
-    let save = stock(withUma(), { 'apple-preserve': 2 })
+    let save = stock(withUma(), { 'apple-preserve': 2, 'token-cook-mp-1': 2 })
     const plan = planJob(worldOf(save), 'kitchen', cook, 'dish-fruits-1', 2)!
     expect(plan.msEach).toBe(makeMinutes(1) * MINUTE / 2)
     expect(plan.block).toBeNull()
