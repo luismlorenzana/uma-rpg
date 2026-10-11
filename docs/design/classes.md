@@ -1,5 +1,8 @@
 # Classes and skill trees
 
+> **A rework is proposed in [class-rework.md](class-rework.md)** (2026-10-11): five weapon slots for every class, ten
+> weapon types, one action a turn. This page describes the classes as built until it is approved.
+
 > **Ported from uma-racer** (`docs/design/uma-rpg-classes.md` on its `origin/main`, D277–D282, D310, D311) together
 > with the code in `packages/domain/src/rpg/`. The combat rules, trees, nodes and numbers below apply to uma-rpg
 > unchanged. **uma-rpg reads it with these differences** (the "D2xx/D3xx" numbers below are uma-racer's decisions):
