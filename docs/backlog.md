@@ -1,7 +1,8 @@
 # Backlog: everything open or deferred
 
-> **Status: 2026-10-10, after S7.** Every known open item, by kind. When one is done, delete it here and record what
-> changed in the docs or [decisions.md](decisions.md). New slices still get a spec and tasks first (D35).
+> **Status: 2026-10-11, after D86.** Every open item now has a packet in [handoff/](handoff/README.md), ranked, with
+> the items that no longer apply listed there and why. When one is done, delete its packet and its line here, and record
+> what changed in the docs or [decisions.md](decisions.md). New slices still get a spec and tasks first (D35).
 
 ## Your checks
 
@@ -15,66 +16,64 @@
 | S7 | [Forge and equipment](slices/S7-forge.md#exit-check) |
 | QoL | On the phone (Home Screen app): Account → Notifications on → Send a test; start a short job, close the app, get the push |
 
-## Not built yet
+Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script.md) replaces them with one current script.
 
-- **Gear icons for D86's new types**: Katana, the five Tomes and the ten Orbs reuse the Short Sword, Summoner Tome and
-  Ring art with a kind badge until an uma-platform art round draws their own.
+## In progress (Claude)
 
-1. **Girls' Frontline's pack (D85)**: its biomes (Jungle, Geyser Basin, Crystal Caverns) draw from the pool until it's
-   captured, which waits on the owner's OK for its source.
-2. **Key bosses' faces**: five packs are built (D81, D83); the owner authors key bosses' faces later. Last
-   Origin's pack is refreshed by the owner (`node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh
-   lastorigin`): its wiki asks AI agents not to fetch.
-3. **The world map**, W3–W5 (W1–W2 shipped as D72): eight-foe fights, dual-element foes and waves; field effects and
-   home ground; biome art; the capitals' Finals; themed regions later. Design in [design/world/](design/world/README.md).
-4. **S8: the Tier Finale and promotion** (parked by the owner). Needs Q6 (Gauntlet, Raid or Siege), then promotion at
-   Lv50, the Tier 2 world, legacy skills, and what the banked EXP at Lv50 is for.
-5. **Tier 2 and 3 design**: each tier's own mechanic (design §2.2), Tier 3's four chapters, Q7 (a third profession).
-6. **Scenario flavor** (design §12): chapters differ only by their authored Finals (the world map proposal answers
-   this with biomes and continent leans).
-7. **The Tier Finale's difficulty spike** (design §12), with S8.
+- **Girls' Frontline's pack (D85)**: importing at the wiki's crawl delay; publish, check a Jungle region, then the docs.
+- **Echocalypse's leftover bucket folder** (about 5 MB): deleted once the owner says so.
+
+## Game
+
+| Packet | What |
+|---|---|
+| [H02](handoff/tasks/H02-auto-battle-and-speed.md) | Auto-battle and battle speed |
+| [H09](handoff/tasks/H09-w3-foes-elements-waves.md) | W3: up to eight foes, dual-element foes, waves |
+| [H13](handoff/tasks/H13-w4-field-effects.md) | W4: field effects and home ground |
+| [H15](handoff/tasks/H15-capital-finals.md) | The capitals' Finals |
+| [H20](handoff/tasks/H20-key-boss-faces.md) | Key bosses' faces (the owner picks; packs are private) |
+| [H23](handoff/tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion (parked; needs Q6) |
+| [H24](handoff/tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design (parked; needs Q7) |
+
+## Art and presentation
+
+| Packet | What |
+|---|---|
+| [H01](handoff/tasks/H01-art-calibration.md) | Art calibration round for a delegated artist |
+| [H03](handoff/tasks/H03-gear-icons-d86.md) | Gear icons for D86's types (today they borrow older art with a kind badge) |
+| [H06](handoff/tasks/H06-world-atlas.md), [H07](handoff/tasks/H07-world-map-screens.md) | The world map in pixel art (W5, [map-art.md](design/world/map-art.md)) |
+| [H08](handoff/tasks/H08-battle-backdrops.md) | Battle backdrops by biome |
+| [H10](handoff/tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars |
+| [H11](handoff/tasks/H11-ui-icons.md) | Class emblems and status icons |
+| [H18](handoff/tasks/H18-sound-effects.md) | Synthesized sound effects |
+| [H19](handoff/tasks/H19-hub-scroll-zoom.md) | Hub pages that scroll and zoom |
+| [H22](handoff/tasks/H22-priconne-name-spellings.md) | PriConne name spellings (private content) |
 
 ## Balance: needs real play
 
-The numbers are a first pass from the pacing model (D54), pinned by tests but not yet played for long.
+The numbers are a first pass from the pacing model (D54), pinned by tests but not yet played for long: professions and
+job times, the Laurel economy (replays D79, token trading D80, late Laurels D82, Time Tickets D74), battle difficulty
+with real rosters and gear, gear and food parity, recipe input counts, and the collection pace (all 268 outfits take
+248 Umas at Lv50, D40). The owner plays; [H14](handoff/tasks/H14-pacing-simulator.md) gives the numbers; Claude retunes.
 
-1. Profession speed, job sizes, training times and facility upgrade costs (items rebalanced to slow single items, D65,
-   after the owner's first play).
-2. The Laurel economy: payouts against Exchange prices, Rush and Sweep value.
-3. Battle difficulty past the first fights, with real rosters, gear and Extra Stats; the foe budget (+0.35% per level
-   past Lv10, D59).
-4. Extra Stats and gear point values (1.5% a point) and the gear-versus-food parity (§7.3).
-5. Dish and gear recipes: input counts, and whether every family really stays in demand.
-6. The collection pace: all 268 outfits take 248 Umas at Lv50 (D40).
+## Engineering and docs
 
-## Presentation and art (lean on purpose, owner 2026-10-10)
-
-1. **The Hub**: pixel-art terrain and buildings shipped 2026-10-10 (D64); the design's scrolling and zooming pages are
-   still to come (each page fits one screen).
-2. **Battles**: rivals are bust portraits; effects are procedural; no sound, no battle speed or auto-battle option.
-3. **Chibis**: newer outfits without one in the master data show their icon.
-4. **PriConne names**: English names come from the site's slugs plus a few fixes; some may need proper spellings.
-   Costume variants are out of scope.
-
-## Quality of life
-
-1. **Warehouse limits**: storage is unlimited; there's no cap to manage yet. (Job queues, Sweep ×N, filters, selling
-   and push notifications shipped 2026-10-10: D62, D63.)
-
-## Engineering
-
-1. **Main JS** is 191 KB of a 230 KB budget (D56): split the domain rules out of the main chunk.
-2. **A campaign simulator** for chapters 2–5 with gear and Extra Stats, like uma-racer's, to back the balance pass.
-3. **Device pass**: performance and accessibility on the iPhone; only phone layouts exist.
-4. **CI**: GitHub's `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19; watch the next deploy after that.
-5. **Docs**: game-design.md is still "draft v0.4" with `[Proposed]` tags on settled rules; items.md and §14 are out of
-   date. Fold them in when the owner reviews.
+| Packet | What |
+|---|---|
+| [H04](handoff/tasks/H04-phone-test-script.md) | One current phone test script |
+| [H05](handoff/tasks/H05-dead-code-sweep.md) | Code the class rework left behind |
+| [H12](handoff/tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs (game-design.md is still "draft v0.4") |
+| [H14](handoff/tasks/H14-pacing-simulator.md) | A pacing and economy simulator |
+| [H16](handoff/tasks/H16-main-js-split.md) | Main JS is about 194 KB of D56's 230 KB budget: split the domain out |
+| [H17](handoff/tasks/H17-device-accessibility-pass.md) | Device and accessibility pass |
+| [H21](handoff/tasks/H21-ci-ubuntu-26.md) | CI: `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19; watch the next deploy |
 
 ## Other repos (the cross-game roadmap)
 
-1. **uma-platform**: original art for tiles, maps, UI frames, effects and farm props; extract shared packages once a
-   second game needs them (its P11).
-2. **uma-racer (phase 3)**: a Farm rework spec with the owner, tag `pre-split`, switch to platform master data, strip
-   the RPG and puzzles. Untouched until then.
-3. **uma-puzzle (phase 4)**: design spec, scaffold from the shared kit, port the puzzle core. Its GCP project needs a
-   free slot on the billing account (5 of 5 used).
+| Packet | What |
+|---|---|
+| [H25](handoff/tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3: a Farm rework spec with the owner first |
+| [H26](handoff/tasks/H26-uma-puzzle-phase-4.md) | uma-puzzle phase 4: needs a free GCP project slot (5 of 5 used) |
+
+uma-platform's art round (tiles, maps, effects) is H03, H06, H08, H10 and H11; shared packages wait until a second game
+needs them (its P11).

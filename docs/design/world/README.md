@@ -75,8 +75,8 @@ swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a comb
 | **Region** | Its twelve stages on one short path, the boss at the end | A stage opens its sheet: level, foes and waves, elements and weaknesses once seen, rewards, **Fight** |
 
 - The **active party chip** sits at the top of all three screens, with each Uma's MP; tapping it swaps parties.
-- **Art, lean first**: flat biome-colored cells with a code-drawn icon per biome, like the Hub's markers before P38.
-  Biome tiles come in a later uma-platform round.
+- **Art, lean first**: flat biome-colored cells today. The pixel-art maps are specified in [map-art.md](map-art.md)
+  (D87): low levels at the bottom, the capital on top, each map opening at the frontier.
 
 ## What changes in the game
 
@@ -97,7 +97,7 @@ swarm, four foe roles, 1–3 waves. A region's twelve stages never repeat a comb
 | W2 | World, continent and region screens with flat art; active party; carried MP and Springs; stages on today's engine (≤5 foes, one element each); save migration | The new loop end to end |
 | W3 | Engine and stage: 6–8 foes, dual elements, waves | The variety you described |
 | W4 | Field effects and home ground; a campaign sim to tune EXP, budgets and token drops | Biomes that play differently |
-| W5 | Art: biome tiles; themed regions if wanted | The map looks like a world |
+| W5 | Art: biome tiles, composed maps, battle backdrops ([map-art.md](map-art.md), D87) | The map looks like a world |
 
 ## Decided (owner, 2026-10-11)
 
