@@ -6,17 +6,8 @@
 
 ## Your checks
 
-| Slice | Phone check |
-|---|---|
-| S2 | [Collection and parties](slices/S2-collection.md#exit-check) |
-| S3 | [Battles and leveling](slices/S3-battles.md#exit-check) |
-| S4 | [Farmlands and Wilds](slices/S4-farm.md#exit-check) |
-| S5 | [Learning District](slices/S5-learning.md#exit-check) |
-| S6 | [Kitchen and Extra Stats](slices/S6-kitchen.md#exit-check) |
-| S7 | [Forge and equipment](slices/S7-forge.md#exit-check) |
-| QoL | On the phone (Home Screen app): Account → Notifications on → Send a test; start a short job, close the app, get the push |
-
-Many of these steps predate D72–D86; [H04](handoff/tasks/H04-phone-test-script.md) replaces them with one current script.
+Run the [current phone check](testing/phone-check.md) for releases: collection, classes, battles, jobs, trading and
+push in one play-through. It marks the checks that need the installed app or production services.
 
 ## Game
 
@@ -52,7 +43,6 @@ with real rosters and gear, gear and food parity, recipe input counts, and the c
 
 | Packet | What |
 |---|---|
-| [H04](handoff/tasks/H04-phone-test-script.md) | One current phone test script |
 | [H12](handoff/tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs (game-design.md is still "draft v0.4") |
 | [H14](handoff/tasks/H14-pacing-simulator.md) | A pacing and economy simulator |
 | [H16](handoff/tasks/H16-main-js-split.md) | Main JS is about 194 KB of D56's 230 KB budget: split the domain out |

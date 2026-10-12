@@ -39,6 +39,8 @@ as the rivals.
 
 ## Exit check
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 On the iPhone, after **Update ready — Restart**:
 
 1. With a full party, open URA Finale, spend skill points on two Umas, and win a fight: the effects play, the result
