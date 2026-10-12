@@ -57,20 +57,25 @@ function play(input: BattleInput): { won: boolean; rounds: number; hpLeft: numbe
     mp: Object.fromEntries(allies.map((u) => [u.id, Math.max(0, u.mp)])) }
 }
 
-/** A region's twelve stages back to back with MP carried and no Spring: how many fall before the first loss. */
+/** A region's twelve stages back to back with MP carried and no Spring, the party at each stage's level (D97): how
+ * many fall before the first loss. Takes the regions whose climb holds `level`. */
 function run(level: number, rank: number): { cleared: number[]; mpLeft: number } {
   const continent = worldContinent({ name: 'Sim', order: Math.ceil(level / 10) })
   const cleared: number[] = []
   let mpLeft = 0
-  for (const region of continent.regions.filter((r) => r.level === level)) {
-    let party = PARTY.map((c, i) => member(c, i, level, rank, 1))
-    const full = party.reduce((n, a) => n + a.mp, 0)
+  for (const region of continent.regions.filter((r) => r.level <= level && level <= r.levelTop).slice(0, 4)) {
+    let mp: Record<string, number> = {}
+    let full = 0
     let n = 0
+    let party = PARTY.map((c, i) => member(c, i, region.level, rank, 1))
     for (const node of regionChapter(region, cast).nodes.filter((x) => x.kind !== 'camp')) {
+      party = PARTY.map((c, i) => member(c, i, node.level, rank, 1)).map((a) => ({ ...a, mp: Math.min(a.mp, mp[a.id] ?? a.mp) }))
+      if (n === 0) full = party.reduce((m, a) => m + a.mp, 0)
       const r = play(stage(node, 2000 + n, party))
       if (!r.won) break
       n++
-      party = party.map((a) => ({ ...a, mp: r.mp[a.id] ?? a.mp }))
+      mp = Object.fromEntries(party.map((a) => [a.id, r.mp[a.id] ?? a.mp]))
+      party = party.map((a) => ({ ...a, mp: mp[a.id]! }))
     }
     cleared.push(n)
     mpLeft += party.reduce((m, a) => m + a.mp, 0) / full
@@ -78,14 +83,14 @@ function run(level: number, rank: number): { cleared: number[]; mpLeft: number }
   return { cleared, mpLeft: mpLeft / Math.max(1, cleared.length) }
 }
 
-/** Win rate over every stage of the four regions at a level, by stage kind. */
+/** Win rate over every stage at a level across a continent's regions, by stage kind. */
 function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 'sub-boss' | 'boss', { wins: number; fights: number; rounds: number; hp: number }> {
   const continent = worldContinent({ name: 'Sim', order: Math.ceil(level / 10) })
   const budget = gear ? 1 + RPG_FOE_TUNING.budgetPerLevel * Math.max(0, level - RPG_FOE_TUNING.budgetFrom) : 1
   const party = PARTY.map((c, i) => member(c, i, level, rank, budget))
   const out = { fight: { wins: 0, fights: 0, rounds: 0, hp: 0 }, 'sub-boss': { wins: 0, fights: 0, rounds: 0, hp: 0 }, boss: { wins: 0, fights: 0, rounds: 0, hp: 0 } }
-  for (const region of continent.regions.filter((r) => r.level === level)) {
-    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp').forEach((node, i) => {
+  for (const region of continent.regions.filter((r) => r.level <= level && level <= r.levelTop)) {
+    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp' && n.level === level).forEach((node, i) => {
       const r = play(stage(node, 1000 + i, party))
       const bucket = out[node.kind as 'fight' | 'sub-boss' | 'boss']
       bucket.fights++
@@ -100,7 +105,7 @@ function simulate(level: number, rank: number, gear: boolean): Record<'fight' | 
 describe('world balance (D72, D86)', () => {
   it('uses each class’s first valid Limit option before a regular action', () => {
     const party = PARTY.map((classId, i) => member(classId, i, 10, 2, 1))
-    const node = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions.find((region) => region.level === 10)!, cast).nodes.at(-1)!
+    const node = regionChapter(worldContinent({ name: 'Sim', order: 1 }).regions.find((region) => region.levelTop === 10)!, cast).nodes.at(-1)!
     for (const ally of party) {
       const state = createBattle(stage(node, 6999, party)).state
       state.units.find((unit) => unit.id === ally.id)!.limit = BATTLE_LIMIT_MAX

@@ -49,18 +49,19 @@ Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight �
 
 - Level cap 50. At Lv 50 EXP keeps banking; nothing spends it yet (it's planned for promotion).
 - Every entrant is paid, knocked out or not.
-- A region's first clear at its level pays about six levels of EXP. Low Umas next to high ones catch up fast: up to 2×
-  when the foes are ten or more levels above her.
+- A regular stage at her level pays about a third of a level: about three fights a level-up. A region's twelve first
+  clears carry a party across its five levels, a little short of the next region's first level (D97). Low Umas next to
+  high ones catch up fast: up to 2× when the foes are ten or more levels above her.
 
 ## Laurels, EXP and tokens
 
 <!-- live:laurels -->
 | Stage kind | Laurels per win | First clear | Replay or Sweep | Lv 41–50 first clear | EXP weight |
 |---|---|---|---|---|---|
-| Fight | 10 | 30 | 8 | 120 | 0.4 |
-| Sub-boss | 25 | 75 | 19 | 300 | 0.6 |
-| Vanguard | 30 | 90 | 23 | 360 | 0.6 |
-| Boss | 50 | 150 | 38 | 600 | 0.8 |
+| Fight | 10 | 30 | 8 | 120 | 0.32 |
+| Sub-boss | 25 | 75 | 19 | 300 | 0.4 |
+| Vanguard | 30 | 90 | 23 | 360 | 0.4 |
+| Boss | 50 | 150 | 38 | 600 | 0.4 |
 
 A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the first clear's EXP and Laurels.
 <!-- /live -->

@@ -5,10 +5,12 @@ import { rpgExpToNext, RPG_TIER_MAX_LEVEL } from '../rules'
 import { RPG_FIGHT_STAGES, rpgTierLevel, type RpgMapNode } from './chapters'
 
 /**
- * Shares of one level at the foes' level, for the world map's stages (D71, D72): a regular stage about 0.4 of a level,
- * an elite 0.6, a region boss 0.8, so a fresh party needs about 120 stages from Lv1 to Lv50. (A vanguard is an elite.)
+ * Shares of one level at the foes' level, for the world map's stages (D97): a regular stage about a third of a level, so
+ * about three fights a level; the elite and the boss 0.4 each (the boss's three waves pay 1.5×). A region's twelve
+ * stages then carry a party across its five levels, and a fresh party clears 120 stages, ten regions, from Lv1 to
+ * Lv50. (A vanguard is an elite.)
  */
-export const RPG_BATTLE_EXP_WEIGHTS = { fight: 0.4, 'sub-boss': 0.6, vanguard: 0.6, boss: 0.8 } as const
+export const RPG_BATTLE_EXP_WEIGHTS = { fight: 0.32, 'sub-boss': 0.4, vanguard: 0.4, boss: 0.4 } as const
 export const RPG_LEVEL_EXP_STEP = 0.1
 export const RPG_LEVEL_EXP_MIN = 0.1
 export const RPG_LEVEL_EXP_MAX = 2

@@ -17,8 +17,9 @@ of 40 regions in ten bands with Springs and a capital, and a world of five islan
   - `RegionMap.tsx` is a list of 12 stages with a BottomSheet per stage.
   - Keep their behavior: the active party bar, Resume fight, Springs, the stage sheet, sweeps and errors.
 - **Data** (`packages/domain/src/world/`):
-  - `world.ts` has `WorldContinent`, `WorldRegion` (`row`, `col`, `biome`, `level`) and `WorldSpring` (`row`), plus
-    `regionChapter`.
+  - `world.ts` has `WorldContinent`, `WorldRegion` (`row`, `col`, `biome`, `level`, `levelTop`) and `WorldSpring`
+    (`row`), plus `regionChapter`. Since D97 a region climbs five levels: rows 1–5 hold the continent's first five, rows
+    6–10 its last five, and each stage node has its own `level`.
   - `biomes.ts` has `biomeById`.
   - Progress comes through `worldRun(world).wins`, `rpgNodeStatus` and `springReadyAt`.
 - **How the Hub does it:**
@@ -41,7 +42,7 @@ of 40 regions in ten bands with Springs and a capital, and a world of five islan
    Seed decoration by the region or continent id.
 2. **`MapCanvas.tsx`:**
    - Draws a layout with a 2D canvas, `imageSmoothingEnabled = false`, at the Hub's art scale.
-   - Positions a DOM button over every spot, with an accessible name: "Ember Crater, Lv 8, 5 of 12 cleared".
+   - Positions a DOM button over every spot, with an accessible name: "Ember Crater, Lv 6–10, 5 of 12 cleared".
    - Redraws only when progress changes.
    - The frontier ring animates in two frames, and not at all under reduced motion.
 3. **Wire the three screens:**

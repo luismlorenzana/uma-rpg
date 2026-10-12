@@ -177,11 +177,10 @@ Routes: `/town/scenario-gate`, `c/:continent`, `r/:region` and `fight`. The worl
   - **Resume the open fight**, when there is one.
 - **World:** the five Tier 1 continents with stages cleared; higher tiers locked.
 - **Continent:**
-  - ten level rows of four regions;
-  - **Spring** buttons between rows;
-  - a capital placeholder.
+  - ten rows of four regions under two headings, the continent's first five levels and its last five (D97);
+  - **Spring** buttons between rows.
 - **Region:**
-  - twelve stages, each locked, open or cleared, with its waves, ★ boss or ♛ elite.
+  - its level range, then twelve stages, each with its level, locked, open or cleared, its waves, ★ boss or ♛ elite.
   - **The stage sheet:**
     - foes by wave, elements, weaknesses, shields, "Acts twice";
     - **Fight**: the first clear pays triple, replays pay a quarter;

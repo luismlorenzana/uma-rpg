@@ -54,6 +54,11 @@ export function formatLevel(lifetime: number): string {
   return tier === 1 ? `Lv ${level}` : `T${tier} Lv ${level}`
 }
 
+/** A range of lifetime levels in one tier, as "Lv 1–5". */
+export function formatLevels(from: number, to: number): string {
+  return `${formatLevel(from)}–${rpgTierLevel(to).level}`
+}
+
 const ELEMENT_PATH: Readonly<Record<RpgElement, string>> = {
   fire: 'M10 2c1 4-3 5-1 8 1-2 3-2 4-5 6 7 1 13-3 13S2 15 5 10c0 3 2 3 2 3-2-4 0-7 3-11Z',
   ice: 'M10 1v18M2 5l16 10M18 5 2 15M7 3l3 3 3-3M7 17l3-3 3 3',

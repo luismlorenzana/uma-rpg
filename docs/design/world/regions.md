@@ -1,6 +1,7 @@
 # Regions and continents
 
-> **Status: proposal for owner review, 2026-10-10.** Part of the [world map proposal](README.md). Elements and roles
+> **Status: proposal for owner review, 2026-10-10.** Region levels are superseded by D97: a region climbs five levels,
+> not one ([maps](../../game/maps.md)). Part of the [world map proposal](README.md). Elements and roles
 > are today's engine's: fire, ice, lightning, light, dark (fire beats ice, ice beats lightning, lightning beats fire;
 > light and dark beat each other); striker, caster, guard, skirmisher, plus captains and champions for bosses.
 

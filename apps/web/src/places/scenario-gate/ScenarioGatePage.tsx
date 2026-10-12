@@ -1,10 +1,11 @@
-// The Scenario Gate opens the world map (D66): five continents, one per scenario of the tier, each ten levels of biome
-// regions with Springs between them; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
+// The Scenario Gate opens the world map (D66, D97): five continents, one per scenario of the tier, each ten levels of
+// biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `fight`. Plain art first (owner: something quick to see and give feedback on).
 import { biomeById, openFightOf, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
+import { formatLevels } from '../../battle/labels'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
 import { AtlasSprite } from '../../master/art'
 import { beginFight, drinkAtSpring, useWorld } from '../../save/game'
@@ -120,8 +121,14 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
         {rows.map((row) => {
           const spring = continent.springs.find((s) => s.row === row)
           const ready = spring ? springReadyAt(world, spring.id, now) : null
+          // A heading where the climb changes: the first five levels, then the last five (D97).
+          const first = continent.regions.find((r) => r.row === row)
+          const below = continent.regions.find((r) => r.row === row - 1)
           return (
             <div key={row} className="space-y-2">
+              {first && first.level !== below?.level && (
+                <h3 className="pt-1 font-display text-[13px] font-bold text-ink-soft">{formatLevels(first.level, first.levelTop)}</h3>
+              )}
               {spring && (
                 <button type="button" disabled={!!ready || !!openFightOf(world)}
                   onClick={() => drinkAtSpring(spring.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))}
@@ -129,9 +136,8 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
                   ◆ Spring · {ready ? `recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'refill the party’s MP'}
                 </button>
               )}
-              <div className="flex items-stretch gap-1.5">
-                <span className="flex w-10 shrink-0 items-center justify-center rounded-sm bg-panel font-display text-[12px] font-bold text-ink-soft">Lv{continent.levelStart + row}</span>
-                <div className="grid flex-1 grid-cols-2 gap-1.5">
+              <div>
+                <div className="grid grid-cols-2 gap-1.5">
                   {continent.regions.filter((r) => r.row === row).map((r) => {
                     const biome = biomeById(r.biome)
                     const won = cleared.get(r.id) ?? 0

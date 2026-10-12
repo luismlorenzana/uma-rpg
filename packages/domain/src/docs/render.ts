@@ -23,7 +23,7 @@ import {
 import { BIOMES, biomeFranchise, signatureWeaknesses } from '../world/biomes'
 import {
   BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT, WORLD_FORMATIONS,
-  WORLD_TUNING, worldContinent,
+  WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES, WORLD_TUNING, worldContinent,
 } from '../world/world'
 
 type Cell = string | number
@@ -294,9 +294,9 @@ function continents(): string {
     for (let row = 9; row >= 0; row--) {
       const regions = c.regions.filter((r) => r.row === row).sort((a, b) => a.col - b.col)
       const spring = c.springs.find((s) => s.row === row)
-      rows.push([`Lv ${c.levelStart + row}`, ...regions.map((r) => `${r.name} \`${r.id}\``), spring ? `Spring \`${spring.id}\`` : ''])
+      rows.push([`${row + 1}`, `Lv ${regions[0]!.level}–${regions[0]!.levelTop}`, ...regions.map((r) => `${r.name} \`${r.id}\``), spring ? `Spring \`${spring.id}\`` : ''])
     }
-    out.push(table(['Level', 'Region 1', 'Region 2', 'Region 3', 'Region 4', 'Spring on the way in'], rows), '')
+    out.push(table(['Row', 'Levels', 'Region 1', 'Region 2', 'Region 3', 'Region 4', 'Spring on the way in'], rows), '')
   }
   return out.join('\n').trimEnd()
 }
@@ -304,19 +304,19 @@ function regionSample(): string {
   const c = worldContinent({ name: 'Continent 1', order: 1 })
   const region = c.regions.find((r) => r.biome === 'volcano')!
   const chapter = regionChapter(region, SAMPLE_CAST)
-  return `${region.name} \`${region.id}\`, Lv ${region.level}:\n\n` + table(['Stage', 'Kind', 'Name', 'Signature', 'Foes per wave', 'Notes'],
+  return `${region.name} \`${region.id}\`, Lv ${region.level}–${region.levelTop}:\n\n` + table(['Stage', 'Level', 'Kind', 'Name', 'Signature', 'Foes per wave', 'Notes'],
     chapter.nodes.filter((n) => n.kind !== 'camp').map((n, i) => {
       const waves = [n.enemies, ...(n.waves ?? [])]
       const notes = [...new Set(waves.flat().flatMap((e) => [e.twice ? 'acts twice' : '', e.element2 ? 'dual element' : '', e.rank !== 'regular' ? e.rank : '']).filter(Boolean))]
-      return [i + 1, n.kind, n.name, n.note ?? n.element ?? '', waves.map((w) => w.length).join(' + '), notes.join(', ') || '—']
+      return [i + 1, n.level, n.kind, n.name, n.note ?? n.element ?? '', waves.map((w) => w.length).join(' + '), notes.join(', ') || '—']
     }))
 }
 function world(): string {
   return table(['Setting', 'Value'], [
     ['Continents', '5 per tier, one per scenario, 10 levels each'],
-    ['Regions', '40 per continent, 4 per level, every biome at least twice; the first is a Meadow'],
-    ['Stages', '12 per region: 10 regular, an elite (11), the boss (12)'],
-    ['Springs', `5 per continent, one every two levels; recharge ${SPRING_RECHARGE_MS / 3600000} h`],
+    ['Regions', `40 per continent in ${WORLD_ROWS} rows of ${WORLD_REGIONS_PER_ROW}, each climbing ${WORLD_REGION_LEVELS} levels: rows 1–5 the continent's first five, rows 6–10 its last five. Every biome at least twice; the first is a Meadow`],
+    ['Stages', `${WORLD_STAGES} per region: 10 regular climbing its levels two at a time, then an elite (11) and the boss (12) at its top level`],
+    ['Springs', `5 per continent, one every two rows; recharge ${SPRING_RECHARGE_MS / 3600000} h`],
     ['Waves pay', x(WAVE_PAY)],
   ])
 }

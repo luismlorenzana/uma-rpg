@@ -1,4 +1,4 @@
-// A region (D66): one biome at one level, its twelve stages on a path. Stages open in order and stay open for replays;
+// A region (D66, D97): one biome climbing five levels, its twelve stages on a path. Stages open in order and stay open for replays;
 // progress is the world's, whichever party won. Tap a stage for its rivals, then fight with the active party.
 import {
   biomeById, openFightOf, rpgNodeStatus, SaveRuleError, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
@@ -6,7 +6,7 @@ import {
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
-import { ElementGlyph, formatLevel, WeaknessIcons } from '../../battle/labels'
+import { ElementGlyph, formatLevel, formatLevels, WeaknessIcons } from '../../battle/labels'
 import { castArtUrl } from '../../content/cast'
 import { useHubNavigation } from '../../hub/navigation'
 import { beginFight, sweep, useWorld } from '../../save/game'
@@ -86,7 +86,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur" style={{ borderTop: `4px solid ${biome.color}` }}>
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="truncate font-display text-lg font-bold">{info.name}</h2>
-          <span className="shrink-0 text-[12px] text-ink-soft">{formatLevel(info.level)} · {cleared}/12 cleared</span>
+          <span className="shrink-0 text-[12px] text-ink-soft">{formatLevels(info.level, info.levelTop)} · {cleared}/12 cleared</span>
         </div>
         <ActivePartyBar campaign={campaign} />
         {fightOpen?.battle && (
@@ -114,7 +114,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
                   <span className="block truncate text-[14px] font-semibold">{n.name}{n.kind === 'boss' ? ' ★' : n.kind === 'sub-boss' ? ' ♛' : ''}</span>
                   <span className="flex items-center gap-1 text-[12px] text-ink-soft">
                     {signatureOf(n).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
-                    <span>{waves.length > 1 ? `${waves.length} waves · ` : ''}{foes} foe{foes > 1 ? 's' : ''}</span>
+                    <span>{formatLevel(n.level)} · {waves.length > 1 ? `${waves.length} waves · ` : ''}{foes} foe{foes > 1 ? 's' : ''}</span>
                   </span>
                 </span>
                 <span className="shrink-0 text-[12px] text-ink-faint">{s === 'cleared' ? `✓${wins > 1 ? ` ×${wins}` : ''}` : s === 'locked' ? 'locked' : 'open'}</span>

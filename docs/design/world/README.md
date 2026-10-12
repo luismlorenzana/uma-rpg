@@ -1,6 +1,8 @@
 # The world map
 
-> **Status: W1–W3 built (D72, D91); owner's answers of 2026-10-11 folded in (D66, D71).** It replaces
+> **Status: W1–W3 built (D72, D91); owner's answers of 2026-10-11 folded in (D66, D71).** **D97 (2026-10-12)
+> replaces the fixed levels below:** each region now climbs five levels (rows 1–5 a continent's first five, rows 6–10
+> its last five), so a party crosses a continent in two regions; the manual's [maps](../../game/maps.md) page is current. It replaces
 > chapters and runs ([battles.md](../battles.md), D48 and D52). Next: W4 (field effects and home ground) and W5 (the
 > pixel-art maps, [map-art.md](map-art.md)). Companion pages: [research.md](research.md) (how other
 > games do it), [regions.md](regions.md) (biomes and continents), [encounters.md](encounters.md) (what makes the fights

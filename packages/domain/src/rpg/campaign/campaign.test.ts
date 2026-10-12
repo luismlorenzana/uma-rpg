@@ -70,9 +70,9 @@ describe('generated chapters (D48)', () => {
 describe('rewards (D51)', () => {
   it('pays a share of a level, scaled ±10% per level of gap within 10%–200%', () => {
     expect([rpgBattleBaseExp('fight', 5), rpgBattleBaseExp('sub-boss', 5), rpgBattleBaseExp('vanguard', 5), rpgBattleBaseExp('boss', 5)])
-      .toEqual([80, 120, 120, 160])
+      .toEqual([64, 80, 80, 80])
     expect([rpgLevelExpFactor(8, 5), rpgLevelExpFactor(5, 8), rpgLevelExpFactor(20, 5), rpgLevelExpFactor(1, 30)]).toEqual([0.7, 1.3, 0.1, 2])
-    expect(rpgBattleExp('fight', 5, 8)).toBe(56)
+    expect(rpgBattleExp('fight', 5, 8)).toBe(45)
     expect(ura.nodes.filter((n) => n.kind === 'sub-boss').map(rpgRewardKind)).toEqual(['sub-boss', 'sub-boss', 'sub-boss', 'vanguard', 'vanguard', 'vanguard'])
   })
 
@@ -81,8 +81,9 @@ describe('rewards (D51)', () => {
     expect([rpgShardsBetween(9, 10), rpgShardsBetween(10, 11), rpgShardsBetween(8, 31), rpgShardsBetween(49, 50)]).toEqual([1, 0, 3, 1])
   })
 
-  // Pacing (D71): regular world stages at her own level take a fresh Uma from Lv1 to Lv50 in about 120.
-  it('takes about 120 regular stages at her level from Lv1 to Lv50', () => {
+  // Pacing (D97): about three regular stages a level at her own level. (A region's climb, elite and boss included, is
+  // in world.test.ts: ten regions from Lv1 to Lv50.)
+  it('takes about three regular stages a level at her level, Lv1 to Lv50', () => {
     let me = { tier: 1, level: 1, exp: 0 }
     let stages = 0
     while (me.level < 50 && stages < 1000) {
@@ -90,8 +91,8 @@ describe('rewards (D51)', () => {
       me = { ...me, level: gained.level, exp: gained.exp }
       stages++
     }
-    expect(stages).toBeGreaterThanOrEqual(115)
-    expect(stages).toBeLessThanOrEqual(130)
+    expect(stages / 49).toBeGreaterThanOrEqual(2.9)
+    expect(stages / 49).toBeLessThanOrEqual(3.3)
   })
 })
 

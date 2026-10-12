@@ -5,8 +5,7 @@ import { BATTLE_LAURELS, FIRST_CLEAR_LAURELS, LATE_LAURELS } from '../economy/pa
 import {
   cookTokenId, gradeBand, masteryBand, masteryTokenId, levelBand, promotionTokenId, rollTokens, TOKEN_DROPS, TOKEN_ODDS, tokenBuyPrice, TOKENS, tokenById, tokenSellPrice,
 } from '../economy/tokens'
-import { RPG_BATTLE_EXP_WEIGHTS } from '../rpg/campaign/rewards'
-import { BOSS_WAVES, WAVE_PAY, WAVE_STAGES } from '../world/world'
+import { BOSS_WAVES, WAVE_PAY, WAVE_STAGES, WORLD_LEVELS, WORLD_REGION_LEVELS } from '../world/world'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
 import { buyTokens, sellPrice, sellStock } from './exchange'
@@ -49,13 +48,11 @@ describe('tokens (D67)', () => {
   })
 
   it('earns each Uma, Lv1 to 50, two class tracks, two weapon tracks and two planets, plus ~1.5 classes of late Laurels (D82)', () => {
-    // A region's twelve stages pay about 6.2 levels of EXP at its level (stages in waves pay 1.5×, W3), so a party clears
-    // about 10 / 6.2 regions per band; each Uma counts a fifth of what her party's fights drop. Each extra wave drops a
-    // token more (D93).
-    const w = RPG_BATTLE_EXP_WEIGHTS
+    // A party crosses a band in two regions, each a climb of five levels (D97); each Uma counts a fifth of what her
+    // party's fights drop. Each extra wave drops a token more (D93).
     const waveFights = Object.keys(WAVE_STAGES).length
     const extraWaves = Object.values(WAVE_STAGES).reduce((n, waves) => n + waves - 1, 0) + BOSS_WAVES - 1
-    const regionsPerBand = 10 / ((10 - waveFights) * w.fight + waveFights * w.fight * WAVE_PAY + w['sub-boss'] + w.boss * WAVE_PAY)
+    const regionsPerBand = WORLD_LEVELS / WORLD_REGION_LEVELS
     const drops = 10 * TOKEN_DROPS.fight + TOKEN_DROPS['sub-boss'] + TOKEN_DROPS.boss + extraWaves
     const promotions = 2 + (drops - 2) * TOKEN_ODDS.class
     const perUma = (perRegion: number, bands: number) => (perRegion * regionsPerBand * bands) / 5

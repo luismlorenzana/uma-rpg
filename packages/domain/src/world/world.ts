@@ -1,5 +1,6 @@
-// The world map (D66, D71; docs/design/world/): a tier's five continents, one per scenario and ten levels each, of 40
-// biome regions at fixed levels (four per level) and five Springs; each region a path of twelve stages. Generated from
+// The world map (D66, D71, D97; docs/design/world/): a tier's five continents, one per scenario and ten levels each, of 40
+// biome regions and five Springs. Each region is a climb of twelve stages over five levels: half a continent's regions
+// cover its first five levels, half its last five, so a party crosses a continent in two regions. Generated from
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
@@ -9,14 +10,23 @@ import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
 import { BIOMES, biomeById, biomeFranchise, FRANCHISES, signatureWeaknesses, type Biome, type BiomeDef, type Formation, type Franchise } from './biomes'
 
 export const WORLD_LEVELS = 10
-export const WORLD_REGIONS_PER_LEVEL = 4
+/** Ten rows of four regions on a continent's map: rows 1–5 hold its first five levels, rows 6–10 its last five. */
+export const WORLD_ROWS = 10
+export const WORLD_REGIONS_PER_ROW = 4
+/** Levels one region climbs (D97). */
+export const WORLD_REGION_LEVELS = 5
 export const WORLD_STAGES = 12
 export const WORLD_SPRINGS = 5
 /** A Spring refills the active party's MP, then recharges for two hours (D66). */
 export const SPRING_RECHARGE_MS = 2 * 3600 * 1000
 
-export interface WorldRegion { id: string; continentId: string; biome: Biome; name: string; level: number; row: number; col: number }
-export interface WorldSpring { id: string; continentId: string; /** Sits above this level row (0 is the continent's first level). */ row: number }
+export interface WorldRegion {
+  id: string; continentId: string; biome: Biome; name: string
+  /** The region's first and last levels: its first stages are at `level`, its elite and boss at `levelTop` (D97). */
+  level: number; levelTop: number
+  row: number; col: number
+}
+export interface WorldSpring { id: string; continentId: string; /** Sits above this row (0 is the continent's bottom row). */ row: number }
 export interface WorldContinent { id: string; order: number; name: string; levelStart: number; regions: WorldRegion[]; springs: WorldSpring[] }
 export interface ContinentSource { name: string; order: number }
 
@@ -43,11 +53,13 @@ export function worldContinent(source: ContinentSource): WorldContinent {
   const order: Biome[] = ['meadow', ...rest]
   const seen = new Map<Biome, number>()
   const regions = order.map((biome, i): WorldRegion => {
-    const row = Math.floor(i / WORLD_REGIONS_PER_LEVEL)
-    const col = i % WORLD_REGIONS_PER_LEVEL
+    const row = Math.floor(i / WORLD_REGIONS_PER_ROW)
+    const col = i % WORLD_REGIONS_PER_ROW
     const n = seen.get(biome) ?? 0
     seen.set(biome, n + 1)
-    return { id: `${id}-${row + 1}-${col + 1}`, continentId: id, biome, name: `${biomeById(biome).name}${ROMAN[n] ?? ''}`, level: levelStart + row, row, col }
+    const level = levelStart + (row < WORLD_ROWS / 2 ? 0 : WORLD_REGION_LEVELS)
+    return { id: `${id}-${row + 1}-${col + 1}`, continentId: id, biome, name: `${biomeById(biome).name}${ROMAN[n] ?? ''}`, level,
+      levelTop: level + WORLD_REGION_LEVELS - 1, row, col }
   })
   const springs = Array.from({ length: WORLD_SPRINGS }, (_, k): WorldSpring => ({ id: `${id}-spring${k + 1}`, continentId: id, row: k * 2 }))
   return { id, order: source.order, name: source.name, levelStart, regions, springs }
@@ -122,6 +134,15 @@ export function stagePlan(biome: BiomeDef, regionId: string): StagePlan[] {
   return plan
 }
 
+/**
+ * A stage's level (D97): the ten regular stages climb the region's five levels two at a time, and the elite and the
+ * boss wait at the top. A regular stage pays about a third of a level, so a party that walks in at the region's first
+ * level reaches its last by stage 10 and leaves for the next region's first level after the boss, a little short
+ * rather than over: replaying a stage tops it up.
+ */
+export const stageLevel = (region: Pick<WorldRegion, 'level' | 'levelTop'>, stage: number): number =>
+  Math.min(region.levelTop, region.level + Math.floor((Math.min(stage, 10) - 1) / 2))
+
 /** Faces each pack lends the mixed pool (D81). */
 export const POOL_PER_FRANCHISE = 5
 /** A pack's pool faces: the members whose ids hash lowest, so a growing pack rarely reshuffles them. */
@@ -151,18 +172,19 @@ export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 
   plan.forEach((p, i) => {
     const id = ids[i]!
     const kind = i === WORLD_STAGES - 1 ? 'boss' : i === WORLD_STAGES - 2 ? 'sub-boss' : 'fight'
-    const [enemies, ...waves] = stageWaves(region, biome, id, kind, p, cast, reach)
-    nodes.push({ id, row: i + 1, col: 2, kind, level: region.level, stage: 0,
+    const level = stageLevel(region, i + 1)
+    const [enemies, ...waves] = stageWaves(level, biome, id, kind, p, cast, reach)
+    nodes.push({ id, row: i + 1, col: 2, kind, level, stage: 0,
       name: kind === 'boss' ? `${biome.name} boss` : kind === 'sub-boss' ? 'Elite' : FORMATION[p.formation].name,
       element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies: enemies!,
       ...(waves.length ? { waves } : {}), exits: ids[i + 1] ? [ids[i + 1]!] : [] })
   })
-  return { id: region.id, order: 0, tier, title: `${region.name} · Lv ${region.level}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
+  return { id: region.id, order: 0, tier, title: `${region.name} · Lv ${region.level}–${region.levelTop}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
 }
 
 /** A stage's foes, wave by wave. A pair signature makes dual-element foes (W3): each carries both elements, the lead
  * one alternating by slot. Faces never repeat within a stage. */
-function stageWaves(region: WorldRegion, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', plan: StagePlan,
+function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', plan: StagePlan,
   cast: readonly RpgCastMember[], reach: number): BattleEnemy[][] {
   const used = new Set<string>()
   // A pack with elements shows a face of the foe's own element when it has one.
@@ -187,14 +209,14 @@ function stageWaves(region: WorldRegion, biome: BiomeDef, stageId: string, kind:
     return { weapons: weapons.slice(0, w), elements: [...answers, ...extra] }
   }
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
-  const above = region.level - 1
+  const above = level - 1
   let next = 0
   const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, twice = false): BattleEnemy => {
     const slot = next++
     const element = signature[slot % signature.length]!
     const element2 = signature.length > 1 ? signature[(slot + 1) % signature.length] : undefined
     const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot, element).id, element, ...(element2 && element2 !== element ? { element2 } : {}),
-      ...(twice ? { twice } : {}), role: r, rank, level: region.level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
+      ...(twice ? { twice } : {}), role: r, rank, level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
     const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
     const offense = 1 + (rank === 'regular' ? WORLD_TUNING.regularOffensePerLevel : rank === 'sub-boss' ? WORLD_TUNING.eliteOffensePerLevel : WORLD_TUNING.bossOffensePerLevel) * above
     return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),

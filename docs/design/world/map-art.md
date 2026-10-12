@@ -15,7 +15,8 @@
 - **A plain 2D canvas**, not Phaser: the maps are still images with DOM buttons on top (D33's rule: no text in the
   canvas). No WebGL, so screenshots and previews work, and nothing heavy loads.
 - **Low levels at the bottom, the capital on top** (the design's original order, [README](README.md)): the map is a
-  climb. Each map opens scrolled to the party's frontier: the lowest level with a stage left to clear.
+  climb. Each map opens scrolled to the party's frontier: the lowest row with a stage left to clear. (Since D97 a region
+  climbs five levels: rows 1–5 hold a continent's first five levels and rows 6–10 its last five.)
 - **Same look as the Hub**: 16 px tiles, light from the top left, a 1 px outline on props and markers (never on ground),
   soft shadows, six-tone ramps from `color.ts`. Placement is seeded by ids, so a map looks the same on every visit.
 
@@ -99,15 +100,15 @@ nothing is lost while the art settles. Buttons over the canvas carry the names a
 
 ### Continent: ten levels and a capital
 
-- **16 tiles wide.** Each level is a band four tiles tall: four **region plots** of 4×3 tiles (each in its own biome, with
+- **16 tiles wide.** Each row is a band four tiles tall: four **region plots** of 4×3 tiles (each in its own biome, with
   a liquid patch or prop and a flag marker in the middle), and a one-tile road row below them.
 - Roads run along each band and switch sides between bands (left end, then right end), so one road climbs the whole
-  continent from Lv 1 at the bottom to the capital at the top.
+  continent from row 1 at the bottom to the capital at the top.
 - **Springs** sit on the road between the bands the domain gives them (`WorldSpring.row`): `marker/spring` when ready,
   `marker/spring-dry` while recharging; the button keeps today's behavior.
 - The **capital** stands in a 16×4 plaza of the continent's most common road material at the top.
-- The flag turns to `flag-cleared` at 12/12. DOM chips carry the level ("Lv 7") at the left edge and each region's
-  name and count on its plot.
+- The flag turns to `flag-cleared` at 12/12. A DOM heading carries each half's levels ("Lv 1–5", "Lv 6–10", D97), and
+  DOM chips each region's name and count on its plot.
 
 ### World: five islands
 
