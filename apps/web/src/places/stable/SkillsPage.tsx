@@ -4,19 +4,18 @@
 // she wears a crafted one. A depth's core skill comes free once her class rank and level open it, and side skills cost
 // points. Skills are chosen for her until she picks her own.
 import {
-  activeClass, CLASS_HALLS, classOf, gearById, placeById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons,
+  activeClass, classOf, classRankOf, classTrack, gearById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
   rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
   SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { equip, learn, pickClass, unlearn, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
+import { RankRow } from '../../ui/RankBars'
 import { WeaponSheet } from './WeaponSheet'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
-  const navigate = useNavigate()
   const world = useWorld()
   const uma = world?.umas[outfit.outfitId]
   const [treeIndex, setTreeIndex] = useState(0)
@@ -31,11 +30,10 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   const weapon = treeWeapons[Math.min(treeIndex, treeWeapons.length - 1)]!
   const equipped = umaLoadout(outfit, uma, 1, classId).map((r) => r.id)
   const auto = setup.loadout === null
-  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(profile.tree)
+  const rank = classRankOf(uma.ranks, classId)
+  const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(profile.tree)
   const slots = rpgActiveSlots(uma.level)
   const learned = new Set(setup.tree)
-  const rank = uma.ranks.classes[classId]
-  const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === classId)?.[0]
   const run = (op: () => Promise<void>) => {
     setError(null)
     op().catch((err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -60,7 +58,8 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
             <p>{CLASS_BLURB[classId]}</p>
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
             <p>Each weapon in her five slots opens its skill tree. She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>
-            <p>Core skills come free: depth d opens at class rank d and Lv 1, 10, 20, 30 or 40. She earns a point a level for side skills, which open at Lv 5, 15, 25, 35 and 45. Take one side of each fork; swap whenever you like.</p>
+            <p>Her Class Rank rises as she wins fights in this class. Core skills come free: depths open at Class Rank 1, 10, 20, 30 and 40. Each rank gives a point for side skills, which open at Class Rank 5, 15, 25, 35 and 45. Take one side of each fork; swap whenever you like.</p>
+            <p>Her Uma Level sets how many skills she can equip.</p>
             <p>Until you equip skills yourself, each weapon's deepest skill is equipped for her.</p>
           </HelpButton>
         </div>
@@ -70,7 +69,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
               className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-center ${c === classId ? 'bg-accent text-accent-ink' : 'bg-raised text-ink'}`}>
               <WeaponGlyph weapon={classOf(uma, c).weapons[0]!} size={16} />
               <span className="text-[11px] font-semibold leading-tight">{CLASS_LABEL[c]}</span>
-              <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>Rank {uma.ranks.classes[c]}</span>
+              <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>Rank {classRankOf(uma.ranks, c)}</span>
             </button>
           ))}
         </div>
@@ -90,14 +89,10 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
             })}
           </div>
         </div>
-        <button type="button" disabled={!hall} onClick={() => hall && navigate(`/learning/${hall}`, { state: { fromHub: true } })}
-          className="flex w-full items-center justify-between gap-2 rounded-sm bg-raised px-2.5 py-2 text-left text-[12px]">
-          <span>
-            <span className="font-semibold">{CLASS_LABEL[classId]} rank {rank}</span>
-            <span className="text-ink-soft"> · depth{rank > 1 ? `s 1–${rank}` : ' 1'} open</span>
-          </span>
-          {rank < 5 && hall && <span className="shrink-0 text-accent">Rank {rank + 1} at the {placeById(hall)?.name} ›</span>}
-        </button>
+        <div className="rounded-sm bg-raised px-2.5 py-2">
+          <RankRow label={CLASS_LABEL[classId]} kind="class" track={classTrack(uma.ranks, classId)} />
+          <p className="mt-0.5 text-[11px] text-ink-faint">Depth{rpgOpenDepth(rank) > 1 ? `s 1–${rpgOpenDepth(rank)}` : ' 1'} open</p>
+        </div>
       </section>
 
       <section>
@@ -149,13 +144,13 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
             const core = row.find((n) => n.variant === null)!
             const sides = row.filter((n) => n.variant !== null)
             const closed = rpgDepthBlock(profile, depth)
-            const needs = [depth > (profile.maxDepth ?? 5) ? `class rank ${depth}` : null, uma.level < RPG_DEPTH_GATES[depth - 1]! ? `Lv${RPG_DEPTH_GATES[depth - 1]}` : null].filter(Boolean)
+            const needs = rank < RPG_DEPTH_GATES[depth - 1]! ? [`Class Rank ${RPG_DEPTH_GATES[depth - 1]}`] : []
             const sidesAt = rpgSideNodeLevel(depth)
             const usable = !closed && weapons.includes(weapon)
             return (
               <div key={depth} className={`space-y-1 ${closed && !sides.some((n) => learned.has(n.id)) ? 'opacity-55' : ''}`}>
                 <p className="text-[10px] uppercase tracking-wide text-ink-faint">
-                  Depth {depth}{needs.length ? ` · needs ${needs.join(' and ')}` : ''}{!closed && uma.level < sidesAt ? ` · side skills at Lv${sidesAt}` : ''}
+                  Depth {depth}{needs.length ? ` · needs ${needs.join(' and ')}` : ''}{!closed && rank < sidesAt ? ` · side skills at Class Rank ${sidesAt}` : ''}
                 </p>
                 <NodeCard node={core} line={skillLine(profile, core.skill)} state={closed ? closed : 'Known'} equipped={equipped.includes(core.id)}
                   onEquip={usable ? () => toggleEquip(core.id) : undefined} />

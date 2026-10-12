@@ -21,6 +21,8 @@ const turfA = outfit('101', 'A')
 const U = (itemMinutes(1) * MINUTE) / 2
 const EXP1 = itemMinutes(1) * 2
 const plain = outfit('102')
+/** Every outfit the tests unlock, for fights and Sweeps. */
+const OUTFITS = new Map(['101', '102', '103', '104', '105'].map((id) => [id, outfit(id)]))
 
 function withUmas(...ids: string[]): Save {
   return ids.reduce((s, id) => unlockUma(s, id, at(0)), newSave('Luis', at(0)))
@@ -179,7 +181,7 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
     expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s12')).toBe('Only regular stages can be swept')
     expect(sweepBlock(worldOf(save), ura, 'w1-1-1-s1')).toBe('No Sweep Tickets')
     save = buyTickets(save, 'sweep', 1, at(0))
-    const swept = sweepFight(save, ura, 'w1-1-1-s1', at(0))
+    const swept = sweepFight(save, ura, 'w1-1-1-s1', OUTFITS, at(0))
     expect(swept.result).toMatchObject({ outcome: 'victory', laurels: 8, firstClear: false })
     expect(swept.result.members.every((m) => m.exp > 0)).toBe(true)
     expect(worldOf(swept.save).wallet).toMatchObject({ laurels: 8, sweepTickets: 0 })
@@ -255,8 +257,8 @@ describe('Sweep ×N (QoL)', () => {
     const w = worldOf(save)
     save = { ...save, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...w.world.run, wins: { start: 1, 'w1-1-1-s1': 1 } } } } } }
     save = buyTickets(save, 'sweep', 3, at(0))
-    const one = sweepFight(save, ura, 'w1-1-1-s1', at(0)).result.members[0]!.exp
-    const r = sweepMany(save, ura, 'w1-1-1-s1', 5, at(0))
+    const one = sweepFight(save, ura, 'w1-1-1-s1', OUTFITS, at(0)).result.members[0]!.exp
+    const r = sweepMany(save, ura, 'w1-1-1-s1', 5, OUTFITS, at(0))
     expect(r.swept).toBe(3)
     expect(r.result.members[0]!.exp).toBeGreaterThanOrEqual(3 * one - 3)
     expect(r.result.members[0]!.beforeLevel).toBe(1)
@@ -268,7 +270,7 @@ describe('Sweep ×N (QoL)', () => {
 describe('selling (QoL)', () => {
   it('sells spare stock for far less than it costs to buy', async () => {
     const { sellPrice, sellStock } = await import('./exchange')
-    expect([sellPrice('items', 'barley'), sellPrice('items', 'pearl-barley'), sellPrice('dishes', 'dish-fruits-2'), sellPrice('gear', 'greatsword-g4-atk')]).toEqual([8, 16, 18, 30])
+    expect([sellPrice('items', 'barley'), sellPrice('items', 'pearl-barley'), sellPrice('dishes', 'dish-fruits-2'), sellPrice('gear', 'greatsword-g4')]).toEqual([8, 16, 18, 30])
     let save = give(withUmas('101'), { barley: 5 })
     save = sellStock(save, 'items', 'barley', 5, at(0))
     expect(worldOf(save).items.barley).toBeUndefined()

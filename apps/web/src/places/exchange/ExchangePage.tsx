@@ -1,26 +1,30 @@
 // The Exchange (S4, design §11): Laurels from battles buy raw items of the continents you've reached, Time Tickets
-// (30 minutes off any job or training, D74), Sweep Tickets (replay a beaten regular stage at once, for a quarter of its
-// first clear, D79) and any token; tokens sell back for half what they cost, so two buy one of another kind (D80).
+// (30 minutes off any job, D74) and Sweep Tickets (replay a beaten regular stage at once, for a quarter of its first
+// clear, D79). Marks banked past max ranks buy Manuals: EXP for one bar of one Uma (D102).
 import {
-  ITEM_FAMILIES, rawItemPrice, SaveRuleError, TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, TOKEN_BANDS, TOKEN_LAURELS_PER_BAND, TOKENS, tokenBuyPrice,
-  tokenById, tokenSellPrice, type ItemSide, type TokenKind,
+  ARMOR_KINDS, ARMOR_LABEL, armorTrack, classTrack, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
+  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, weaponTrack, type ItemSide, type RankRef, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
+import { CLASS_LABEL, WEAPON_LABEL } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
-import { buyItem, buyTicket, buyToken, sell, useWorld } from '../../save/game'
+import { AtlasSprite } from '../../master/art'
+import type { MasterView } from '../../master/master'
+import { buyItem, buyTicket, readManual, useWorld } from '../../save/game'
+import { RankRow } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 
 export default function ExchangePage() {
-  return <MasterGate>{(view) => <Exchange chapters={view.chapters.filter((c) => c.tier === 1).map((c) => ({ id: String(c.scenarioId), order: c.order, name: c.name }))} />}</MasterGate>
+  return <MasterGate>{(view) => <Exchange view={view} />}</MasterGate>
 }
 
-function Exchange({ chapters }: { chapters: { id: string; order: number; name: string }[] }) {
+function Exchange({ view }: { view: MasterView }) {
   const world = useWorld()
   const [side, setSide] = useState<ItemSide>('farming')
-  const [trading, setTrading] = useState<string | null>(null)
+  const [reading, setReading] = useState(false)
   const [buying, setBuying] = useState<{ kind: 'item'; id: string; price: number; name: string } | { kind: 'time' | 'sweep'; price: number; name: string } | null>(null)
   if (!world) return null
   const stocked = stockedGrades(world)
@@ -35,7 +39,7 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={() => setBuying({ kind: 'time', price: TIME_TICKET_PRICE, name: 'Time Ticket' })} className="rounded-md bg-raised p-3 text-left">
             <p className="font-semibold">Time Ticket</p>
-            <p className="text-[12px] text-ink-soft">30 minutes off any job or training</p>
+            <p className="text-[12px] text-ink-soft">30 minutes off any job</p>
             <p className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-laurel"><LaurelIcon size={16} /> {TIME_TICKET_PRICE}</p>
           </button>
           <button type="button" onClick={() => setBuying({ kind: 'sweep', price: SWEEP_TICKET_PRICE, name: 'Sweep Ticket' })} className="rounded-md bg-raised p-3 text-left">
@@ -73,98 +77,75 @@ function Exchange({ chapters }: { chapters: { id: string; order: number; name: s
           </>
         )}
       </section>
-      <TokenTrade items={world.items} onOpen={setTrading} />
-      {trading && <TokenSheet id={trading} have={world.items[trading] ?? 0} laurels={world.wallet.laurels} onClose={() => setTrading(null)} />}
+      <section>
+        <div className="-my-2 flex items-center justify-between">
+          <h3 className="text-micro">Manuals</h3>
+          <HelpButton title="Manuals">
+            <p>Past a max rank, EXP banks at half rate as Marks: Gear Marks from Weapon and Armor Ranks, Class Marks from Class Ranks.</p>
+            <p>A Manual costs {MANUAL_PRICE.toLocaleString('en-US')} Marks and gives {MANUAL_EXP.toLocaleString('en-US')} EXP to one bar of one Uma.</p>
+          </HelpButton>
+        </div>
+        <button type="button" onClick={() => setReading(true)} className="mt-1 flex w-full items-center justify-between rounded-md bg-raised p-3 text-left">
+          <span>
+            <span className="block font-semibold">Read a Manual</span>
+            <span className="block text-[12px] text-ink-soft">Gear Marks {world.wallet.gearMarks.toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</span>
+          </span>
+          <span className="text-ink-faint">›</span>
+        </button>
+      </section>
+      {reading && <ManualSheet world={world} roster={view.roster} art={view.art} onClose={() => setReading(false)} />}
       {buying && <BuySheet laurels={world.wallet.laurels} {...buying} onClose={() => setBuying(null)}
         onBuy={(n) => (buying.kind === 'item' ? buyItem(buying.id, n, stocked) : buyTicket(buying.kind, n)).then(() => setBuying(null))} />}
     </div>
   )
 }
 
-const KIND_NAME: Record<TokenKind, string> = { class: 'Promotion', mastery: 'Mastery', cook: 'Cooking' }
-
-const KINDS: readonly TokenKind[] = ['class', 'mastery', 'cook']
-/** "Brawler", "ATK", "Level 4–5": the token's class, stat or levels, under its kind's heading. */
-const shortName = (name: string) => name.startsWith('Mastery Token') ? name.replace(/^Mastery Token \(to (.*)\)$/, '$1') : name.replace(/ (Promotion|Cooking) Token.*$/, '')
-
-/** Every token by band (D80): tap one to sell yours or buy more. */
-function TokenTrade({ items, onOpen }: { items: Record<string, number>; onOpen: (id: string) => void }) {
-  const [band, setBand] = useState(1)
-  return (
-    <section>
-      <div className="-my-2 flex items-center justify-between">
-        <h3 className="text-micro">Tokens</h3>
-        <HelpButton title="Token trading">
-          <p>Sell any token for {TOKEN_LAURELS_PER_BAND} Laurels × its band, and buy any for twice that, so two tokens buy one of another kind.</p>
-          <p>Fights drop tokens of their band: Lv 1–10 is band 1, Lv 41–50 band 5.</p>
-        </HelpButton>
-      </div>
-      <div className="mb-2 grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Band">
-        {Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((b) => (
-          <button key={b} type="button" role="tab" aria-selected={band === b} onClick={() => setBand(b)}
-            className={`min-h-10 rounded-xs text-[12.5px] font-semibold ${band === b ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>Band {b}</button>
-        ))}
-      </div>
-      <p className="mb-2 flex items-center gap-1 text-[12px] text-ink-faint">
-        Sell <LaurelIcon size={12} /> {TOKEN_LAURELS_PER_BAND * band} · Buy <LaurelIcon size={12} /> {2 * TOKEN_LAURELS_PER_BAND * band}
-      </p>
-      {KINDS.map((kind) => {
-        const list = TOKENS.filter((t) => t.band === band && t.kind === kind)
-        if (list.length === 0) return null
-        return (
-          <div key={kind} className="mb-2">
-            <h4 className="mb-1 text-[12px] font-semibold text-ink-soft">{KIND_NAME[kind]}</h4>
-            <div className="grid grid-cols-2 gap-1.5">
-              {list.map((t) => (
-                <button key={t.id} type="button" onClick={() => onOpen(t.id)} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left">
-                  <ItemIcon id={t.id} size={28} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-semibold">{shortName(t.name)}</span>
-                    <span className={`text-[11px] ${(items[t.id] ?? 0) > 0 ? 'text-ink-soft' : 'text-ink-faint'}`}>have {items[t.id] ?? 0}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )
-      })}
-    </section>
-  )
-}
-
-function TokenSheet({ id, have, laurels, onClose }: { id: string; have: number; laurels: number; onClose: () => void }) {
+/** Reads Manuals: pick an Uma, one of her bars, how many (D102). */
+function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster: readonly RosterOutfit[]; art: MasterView['art']; onClose: () => void }) {
+  const [outfitId, setOutfitId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const token = tokenById(id)
-  if (!token) return null
-  const sellEach = tokenSellPrice(id)
-  const buyEach = tokenBuyPrice(id)
-  const affordable = Math.min(99, Math.floor(laurels / buyEach))
-  const run = (op: Promise<void>) => void op.then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
+  const owned = roster.filter((o) => world.umas[o.outfitId])
+  const uma = outfitId ? world.umas[outfitId] : null
+  const read = (ref: RankRef, n: number) => readManual(outfitId!, ref, n).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t read it.'))
+  const bar = (ref: RankRef, label: string) => {
+    const track = ref.kind === 'class' ? classTrack(uma!.ranks, ref.id) : ref.kind === 'weapon' ? weaponTrack(uma!.ranks, ref.id) : armorTrack(uma!.ranks, ref.id)
+    const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks
+    const most = Math.floor(marks / MANUAL_PRICE)
+    return (
+      <li key={`${ref.kind}:${ref.id}`} className="flex items-center gap-2 rounded-sm bg-raised p-2">
+        <div className="min-w-0 flex-1"><RankRow label={label} kind={ref.kind} track={track} /></div>
+        {[1, 5].map((n) => (
+          <button key={n} type="button" disabled={!!manualBlock(world, outfitId!, ref, n) || n > most} onClick={() => void read(ref, n)}
+            className="min-h-9 shrink-0 rounded-sm bg-accent/15 px-2 text-[12px] font-semibold text-accent disabled:opacity-35">×{n}</button>
+        ))}
+      </li>
+    )
+  }
   return (
-    <BottomSheet title={token.name} onClose={onClose}>
-      <div className="flex items-center gap-3">
-        <ItemIcon id={id} size={48} />
-        <p className="flex items-center gap-1 text-[14px] text-ink-soft">{have} held · <LaurelIcon size={14} /> {laurels}</p>
-      </div>
-      <p className="mb-1.5 mt-4 flex items-center gap-1 text-[12px] text-ink-soft">Sell for <LaurelIcon size={14} /> {sellEach} each</p>
-      {have === 0 ? <p className="text-[12px] text-ink-faint">None to sell.</p> : (
-        <div className="grid grid-cols-3 gap-2">
-          {[1, 10, have].filter((n, i, a) => n <= have && a.indexOf(n) === i).map((n) => (
-            <button key={n} type="button" onClick={() => run(sell('items', id, n))} className="min-h-11 rounded-sm bg-raised text-[13px] font-semibold">
-              {n === have && n > 1 ? `All ${n}` : `×${n}`} · {sellEach * n}
-            </button>
+    <BottomSheet title={uma ? 'Which bar?' : 'Read a Manual'} onClose={onClose}>
+      {!uma ? (
+        <ul className="space-y-1.5">
+          {owned.length === 0 && <li className="text-[14px] text-ink-soft">No Umas yet</li>}
+          {owned.map((o) => (
+            <li key={o.outfitId}>
+              <button type="button" onClick={() => setOutfitId(o.outfitId)} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left">
+                <AtlasSprite art={art} family="outfit-icons" frameKey={o.outfitId} size={36} />
+                <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{o.name}</span>
+                <span className="text-[12px] text-ink-faint">Lv {world.umas[o.outfitId]!.level}</span>
+              </button>
+            </li>
           ))}
+        </ul>
+      ) : (
+        <div className="space-y-3">
+          <p className="text-[12px] text-ink-soft">Gear Marks {world.wallet.gearMarks.toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</p>
+          <section><h4 className="text-micro mb-1">Classes</h4><ul className="space-y-1">{RPG_CLASSES.map((c) => bar({ kind: 'class', id: c }, CLASS_LABEL[c]))}</ul></section>
+          <section><h4 className="text-micro mb-1">Weapons</h4><ul className="space-y-1">{WEAPON_TYPES.map((w) => bar({ kind: 'weapon', id: w }, WEAPON_LABEL[w]))}</ul></section>
+          <section><h4 className="text-micro mb-1">Armor</h4><ul className="space-y-1">{ARMOR_KINDS.map((k) => bar({ kind: 'armor', id: k }, ARMOR_LABEL[k]))}</ul></section>
+          <button type="button" onClick={() => setOutfitId(null)} className="text-[13px] text-ink-soft underline">Choose another Uma</button>
+          {error && <p className="text-[13px] text-danger">{error}</p>}
         </div>
       )}
-      <p className="mb-1.5 mt-4 flex items-center gap-1 text-[12px] text-ink-soft">Buy for <LaurelIcon size={14} /> {buyEach} each{affordable < 1 ? ': not enough Laurels' : ''}</p>
-      <div className="grid grid-cols-3 gap-2">
-        {[1, 5, 10].map((n) => (
-          <button key={n} type="button" disabled={n > affordable} onClick={() => run(buyToken(id, n))} className="min-h-11 rounded-sm bg-accent/15 text-[13px] font-semibold text-accent disabled:opacity-40">
-            ×{n} · {buyEach * n}
-          </button>
-        ))}
-      </div>
-      {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
     </BottomSheet>
   )
 }

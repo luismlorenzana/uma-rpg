@@ -8,7 +8,6 @@ import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
 import type { BattleAlly, BattleInput, BattleState } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
-import { depthsOpen } from '../economy/training'
 import { RPG_FOE_TUNING } from '../rpg/campaign/enemies'
 import {
   learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees, RPG_DEPTH_GATES,
@@ -18,15 +17,18 @@ import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 const PARTY: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
-/** A stage's fight as the game starts it: engine v7, every wave (W3). */
+/** A stage's fight as the game starts it: engine v8, every wave (W3). */
 const stage = (node: RpgMapNode, seed: number, allies: BattleAlly[]): BattleInput =>
-  ({ version: 7, seed, allies, enemies: node.enemies, ...(node.waves?.length ? { waves: node.waves } : {}) })
+  ({ version: 8, seed, allies, enemies: node.enemies, ...(node.waves?.length ? { waves: node.waves } : {}) })
+/** The Class Rank that opens `depths` depths at this level and no more (D102): the class played all along, or a depth short. */
+const rankFor = (depths: number, level: number): number =>
+  depths >= RPG_DEPTH_GATES.length ? Math.max(level, RPG_DEPTH_GATES.at(-1)!) : Math.max(1, Math.min(level, RPG_DEPTH_GATES[depths]! - 1))
 
 /** An average invented outfit of a class, at a level and class rank, with side skills learned deepest first. */
 function member(classId: RpgClass, i: number, level: number, rank: number, budget: number): BattleAlly {
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId), tier: 1, level, exp: 0,
-    tree: [], legacy: [], maxDepth: depthsOpen(rank) }
+    tree: [], legacy: [], classRank: rankFor(rank, level) }
   for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
   // Equip the deepest skills, one weapon at a time, so every weapon brings something.
   const known = rpgLearnedSkills(profile).sort((a, b) => rpgNode(b.id)!.depth - rpgNode(a.id)!.depth)
@@ -40,7 +42,7 @@ function member(classId: RpgClass, i: number, level: number, rank: number, budge
   const stats = projectRpgStats(profile)
   const boosted = Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v * budget) : v])) as unknown as typeof stats
   return { id: profile.outfitId, classId, weapons: profile.weapons, tier: 1, level, stats: boosted, tree: profile.tree, legacy: [],
-    loadout, mp: boosted.mp, maxDepth: depthsOpen(rank) }
+    loadout, mp: boosted.mp, classRank: profile.classRank }
 }
 
 /** Plays a fight: each ally picks her best affordable skill or Attack (a Spell Blade one of each half), weakness-aware. */

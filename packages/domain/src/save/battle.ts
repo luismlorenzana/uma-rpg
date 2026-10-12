@@ -1,12 +1,12 @@
-// Battle rules over the save (S3, D86): classes, their weapons and skills, the world's fights and their rewards. Pure
+// Battle rules over the save (S3, D86, D102): classes, their weapons and skills, the world's fights and their rewards. A
+// win fills four bars: Uma Level, the Class Rank she fought as, her five weapons' and her five armor kinds' ranks. Pure
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
-// docs/design/class-rework.md.
+// docs/design/class-rework.md, docs/design/progression.md.
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { best } from '../roster/aptitudes'
-import type { BattleAction, BattleState, BattleStep } from '../rpg/battle/types'
+import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
-import { levelBand, rollTokens } from '../economy/tokens'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
 import { SPRING_RECHARGE_MS, stagePay } from '../world/world'
 import {
@@ -19,12 +19,15 @@ import {
   forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
-import { depthsOpen } from '../economy/training'
+import {
+  ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares, withTrack,
+  type RankRef, type RankTrack, type Ranks,
+} from '../economy/ranks'
 import { starPoints } from '../economy/dishes'
 import { addPoints, type Points } from '../economy/bonus'
-import { equippedOrb, equippedPoints, gearById } from '../economy/gear'
+import { equippedGuard, equippedMight, equippedOrb, equippedPoints, gearById } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
-import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
+import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
 
@@ -57,7 +60,7 @@ export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>
 export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass): ClassLoadout =>
   uma.classes[classId] ?? { weapons: rpgDefaultWeapons(classId), tree: [], loadout: null }
 
-/** Her battle profile as a class (the active one by default); her class rank opens the depths (D57, D77). */
+/** Her battle profile as a class (the active one by default); its Class Rank opens the depths (D102). */
 export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {
   const growth = (key: keyof BattleOutfit['growthRatePercents']) => Math.min(1, Math.max(0, outfit.growthRatePercents[key] / 100))
   const setup = classOf(uma, classId)
@@ -67,7 +70,7 @@ export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, cl
     growthRates: { speed: growth('speed'), stamina: growth('stamina'), power: growth('power'), guts: growth('guts'), wit: growth('wit') },
     classId, weapons: [...setup.weapons], tier, level: uma.level, exp: uma.exp,
     tree: setup.tree.map((id) => ({ tier, id })), legacy: [],
-    maxDepth: depthsOpen(uma.ranks.classes[classId]),
+    classRank: classRankOf(uma.ranks, classId),
   }
 }
 
@@ -166,14 +169,14 @@ export function equipSkills(save: Save, outfit: BattleOutfit, classId: RpgClass,
   return withClass(save, outfit.outfitId, classId, { ...classOf(uma, classId), loadout: loadout === null ? null : [...loadout] }, now, tier)
 }
 
-/** Every stat point she brings to a fight as a class: her active Extra Stats nodes (S6) and what she wears (S7). */
+/** Every stat point she brings to a fight: her active Extra Stats nodes (S6) and her armor (S7, D104). */
 export function umaPoints(uma: OwnedUma, classId: RpgClass): Points {
   const { gear, extra } = umaPointParts(uma, classId)
   return addPoints(extra, gear)
 }
-/** Her points apart: what she wears as a class, and her active Extra Stats nodes. */
-export function umaPointParts(uma: OwnedUma, classId: RpgClass): { gear: Points; extra: Points } {
-  return { gear: equippedPoints(uma.gear.equipped, classOf(uma, classId).weapons), extra: starPoints(uma.stars.active) }
+/** Her points apart: what her armor gives, and her active Extra Stats nodes. (Weapons add Might to their hits instead.) */
+export function umaPointParts(uma: OwnedUma, _classId?: RpgClass): { gear: Points; extra: Points } {
+  return { gear: equippedPoints(uma.gear.equipped), extra: starPoints(uma.stars.active) }
 }
 
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------
@@ -234,8 +237,9 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
     const uma = ownedOf(world, id)
     const classId = activeClass(outfit, uma)
     const orb = equippedOrb(uma.gear.equipped)
+    const { barrier, regen } = equippedGuard(uma.gear.equipped)
     return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      ...(orb ? { orb } : {}), points: umaPoints(uma, classId) }
+      ...(orb ? { orb } : {}), points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons), barrier, regen }
   })
   try {
     return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)
@@ -250,15 +254,43 @@ export interface FightResult {
   chapterId: string
   nodeId: string
   rounds: number
-  members: { outfitId: string; exp: number; beforeLevel: number; afterLevel: number; afterExp: number; shards: number }[]
+  members: MemberGain[]
   laurels: number
   shards: number
   /** Unlock Tickets the Shards completed. */
   tickets: number
-  /** Tokens the win dropped into the Warehouse (D67); Sweeps drop none. */
-  tokens: Record<string, number>
+  /** Marks banked from EXP past max ranks (D102). */
+  gearMarks: number
+  classMarks: number
   /** The stage's first clear: its Laurels pay triple (D66); later wins pay a quarter of it (D79). */
   firstClear?: boolean
+}
+
+/** One bar a member filled: which, how much EXP, and the track before and after. */
+export interface RankGain { ref: RankRef; exp: number; before: RankTrack; after: RankTrack }
+/** What a won fight paid one member: Uma EXP and levels, Shards, and her Class, Weapon and Armor bars (D102). */
+export interface MemberGain {
+  outfitId: string; exp: number; beforeLevel: number; afterLevel: number; afterExp: number; shards: number
+  ranks: RankGain[]
+}
+/** Who fought, as what, with which weapons, and which of them she used. */
+export interface Entrant { outfitId: string; classId: RpgClass; weapons: readonly RpgWeapon[]; used: ReadonlySet<RpgWeapon> }
+
+/** The weapons each ally used in a fight: every attack, skill, Spell Blade half and Limit Break names one. */
+export function usedWeapons(input: BattleInput, actions: readonly BattleAction[]): Map<string, Set<RpgWeapon>> {
+  const out = new Map<string, Set<RpgWeapon>>(input.allies.map((a) => [a.id, new Set<RpgWeapon>()]))
+  for (const a of actions) {
+    const used = out.get(a.actorId)
+    if (!used || a.kind === 'guard') continue
+    const ally = input.allies.find((x) => x.id === a.actorId)!
+    const add = (w: RpgWeapon | undefined) => { if (w && ally.weapons.includes(w)) used.add(w) }
+    const skill = (ref: { id: string } | undefined) => add(ref ? rpgNode(ref.id)?.weapon : undefined)
+    if (a.kind === 'attack') add(a.weapon ?? ally.weapons[0])
+    if (a.kind === 'skill') skill(a.skill)
+    if ((a.kind === 'attack' || a.kind === 'skill') && a.pair) { add(a.pair.weapon); skill(a.pair.skill) }
+    if (a.kind === 'limit') { add(a.weapon); skill(a.skill); for (const r of a.skills ?? []) skill(r) }
+  }
+  return out
 }
 
 /** Laurels a stage win pays: triple on its first clear (D66), a quarter of that on a replay or Sweep (D79), four times
@@ -283,47 +315,63 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
     { id: battle.nodeId, kind: 'fight', level: battle.input.enemies[0]?.level ?? chapter.levelStart, stage: 0 }
   const closed = rpgCloseRunBattle(run, state, { id: node.id, kind: node.kind }, now)
   const result: FightResult = { outcome: state.outcome === 'victory' ? 'victory' : 'loss', chapterId: chapter.id, nodeId: node.id,
-    rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0, tokens: {} }
+    rounds: state.round, members: [], laurels: 0, shards: 0, tickets: 0, gearMarks: 0, classMarks: 0 }
   if (state.outcome !== 'victory') return { save: withRun(save, closed, now, tier), result }
   const kind = rpgRewardKind(node)
   const firstClear = (run.wins[node.id] ?? 0) === 0
   const share = firstClear ? 1 : REPLAY_SHARE
-  // A stage in waves pays 1.5× its EXP and Laurels (W3); tokens stay as they are.
+  // A stage in waves pays 1.5× its EXP and Laurels (W3).
   const pay = stagePay(node)
-  const paid = payEntrants(world, battle.input.allies.map((a) => a.id), kind, node.level,
-    Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * pay)
-  // Tokens of the fight's band, decided by its seed so the same fight always drops the same ones (D67).
-  const tokens = rollTokens(`${battle.input.seed}:${node.id}`, kind, levelBand(node.level), share, node.waves?.length ?? 0)
-  const items = { ...paid.world.items }
-  for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
-  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, tokens, firstClear })
-  const next: TierWorld = { ...paid.world, items, world: { ...world.world, run: closed } }
+  const used = usedWeapons(battle.input, battle.actions)
+  const entrants: Entrant[] = battle.input.allies.map((a) => ({ outfitId: a.id, classId: a.classId, weapons: a.weapons, used: used.get(a.id) ?? new Set() }))
+  const paid = payEntrants(world, entrants, kind, node.level, Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * pay)
+  Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, gearMarks: paid.gearMarks,
+    classMarks: paid.classMarks, firstClear })
+  const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }
   return { save: withWorld(save, tier, next, now), result }
 }
 
 /**
- * Pays a won fight to its entrants: EXP by the level gap (times `share` on a replay, D79), a Shard at
- * Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
+ * Pays a won fight to its entrants (D102). Each earns her Uma EXP `E` (a share of her own level, less when the foes are
+ * below her, times `share` on a replay, D79) and with it fills her bars: 2E to the class she fought as, 5E over her five
+ * weapons (double for each she used), E to each of her five armor kinds. EXP past a max rank banks at half rate as
+ * Marks. A Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
  */
-export function payEntrants(world: TierWorld, outfitIds: readonly string[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
-  tier = TIER_ONE, share = 1): { world: TierWorld; members: FightResult['members']; shards: number; tickets: number; laurels: number } {
+export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
+  tier = TIER_ONE, share = 1): { world: TierWorld; members: MemberGain[]; shards: number; tickets: number; laurels: number; gearMarks: number; classMarks: number } {
   const umas = { ...world.umas }
-  const members: FightResult['members'] = []
-  let shards = 0
-  for (const id of outfitIds) {
-    const uma = umas[id]
+  const members: MemberGain[] = []
+  let shards = 0, gearMarks = 0, classMarks = 0
+  for (const e of entrants) {
+    const uma = umas[e.outfitId]
     if (!uma) continue // released from the world since: nothing to pay
     const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * share))
     const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
     const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
-    umas[id] = { ...uma, level: gained.level, exp: gained.exp }
-    members.push({ outfitId: id, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got })
+    let ranks: Ranks = uma.ranks
+    const gains: RankGain[] = []
+    const fill = (ref: RankRef, amount: number) => {
+      if (amount <= 0) return
+      const before = trackOf(ranks, ref)
+      const r = grantTrack(before, ref.kind, amount)
+      ranks = withTrack(ranks, ref, r.track)
+      const marks = Math.floor(r.overflow * MARKS_SHARE)
+      if (ref.kind === 'class') classMarks += marks
+      else gearMarks += marks
+      gains.push({ ref, exp: amount, before, after: r.track })
+    }
+    fill({ kind: 'class', id: e.classId }, CLASS_EXP_SHARE * exp)
+    for (const [w, n] of Object.entries(weaponExpShares(e.weapons, e.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
+    for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
+    umas[e.outfitId] = { ...uma, level: gained.level, exp: gained.exp, ranks }
+    members.push({ outfitId: e.outfitId, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got, ranks: gains })
     shards += got
   }
   const pooled = world.wallet.shards + shards
   const tickets = Math.floor(pooled / SHARDS_PER_TICKET)
-  const wallet = { ...world.wallet, unlockTickets: world.wallet.unlockTickets + tickets, shards: pooled % SHARDS_PER_TICKET, laurels: world.wallet.laurels + laurels }
-  return { world: { ...world, umas, wallet }, members, shards, tickets, laurels }
+  const wallet = { ...world.wallet, unlockTickets: world.wallet.unlockTickets + tickets, shards: pooled % SHARDS_PER_TICKET, laurels: world.wallet.laurels + laurels,
+    gearMarks: world.wallet.gearMarks + gearMarks, classMarks: world.wallet.classMarks + classMarks }
+  return { world: { ...world, umas, wallet }, members, shards, tickets, laurels, gearMarks, classMarks }
 }
 
 /** Takes one action in the open fight; when it ends the fight, settles it in the same save. */

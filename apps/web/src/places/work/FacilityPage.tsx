@@ -2,7 +2,7 @@
 // the Kitchen cooks dishes and the Forge crafts gear (S7, D59). Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
 // output and her profession EXP.
 import {
-  activeClass, availabilityBlock, DISHES, facilityTargets, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
+  activeClass, availabilityBlock, DISHES, facilityTargets, hasAccent, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, SaveRuleError,
   stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -343,9 +343,10 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
 const FORGE_GROUPS: readonly (readonly [string, readonly EquipType[]])[] = [
   ['Arms', EQUIP_TYPES.filter((t) => ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t))],
   ['Tomes', EQUIP_TYPES.filter((t) => t.startsWith('tome-'))],
-  ['Armor', EQUIP_TYPES.filter((t) => ['garb', 'leather', 'mail', 'plate'].includes(t))],
-  ['Accessory', EQUIP_TYPES.filter((t) => t === 'ring' || t === 'charm')],
-  ['Orbs', EQUIP_TYPES.filter((t) => t.startsWith('orb-'))],
+  ['Physical', ['helm', 'cuirass', 'greaves', 'gauntlets']],
+  ['Magical', ['circlet', 'robe', 'leggings', 'bracers']],
+  ['Arms Orbs', ['orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana']],
+  ['Element Orbs', ['orb-fire', 'orb-ice', 'orb-lightning', 'orb-light', 'orb-dark']],
 ]
 
 function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; level: number; queueing: boolean; onPick: (id: string, have: number) => void }) {
@@ -362,7 +363,7 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
         <div className="space-y-1">
           {FORGE_GROUPS.map(([label, types]) => (
             <div key={label} className="flex flex-wrap items-center gap-1">
-              <span className="w-16 shrink-0 text-[11px] text-ink-faint">{label}</span>
+              <span className="w-20 shrink-0 text-[11px] text-ink-faint">{label}</span>
               {types.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t].replace(' Tome', '').replace(' Orb', '')}</button>)}
             </div>
           ))}
@@ -374,10 +375,12 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
           <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Craft Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
         ))}</div>
       </div>
-      <div>
-        <p className="text-micro mb-1">Accent</p>
-        <div className="flex flex-wrap gap-1">{ITEM_EFFECTS.map((e) => <button key={e} type="button" onClick={() => setAccent(e)} className={chip(e === accent)}>{EFFECT_LABEL[e]}</button>)}</div>
-      </div>
+      {hasAccent(type) && (
+        <div>
+          <p className="text-micro mb-1">Accent</p>
+          <div className="flex flex-wrap gap-1">{ITEM_EFFECTS.map((e) => <button key={e} type="button" onClick={() => setAccent(e)} className={chip(e === accent)}>{EFFECT_LABEL[e]}</button>)}</div>
+        </div>
+      )}
       <div className="rounded-sm bg-raised p-2.5">
         <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(piece.id).icon} size={28} /> {piece.name}</p>
         <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">

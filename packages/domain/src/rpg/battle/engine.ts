@@ -12,7 +12,7 @@ import {
   BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT,
   BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
   BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
-  BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleSkillFor, type BattleSkill,
+  BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
 } from './skills'
 import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
@@ -93,23 +93,29 @@ function validMove(m: BattleEnemyMove): boolean {
       : ['burn', 'slow', 'mark', 'weaken'].includes(m.status)))
 }
 
-/** Learned, slotted and legal for her class; the same tree rules the profile enforces. */
-function validAlly(a: BattleAlly): boolean {
+/** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
+ * weapons' Might, her armor's Barrier and Regen (D102, D104). */
+function validAlly(a: BattleAlly, version: 6 | 7 | 8): boolean {
+  const v8 = version >= 8
+  if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
+  if (v8 && (!safeInt(a.classRank, 1, 50) || a.maxDepth !== undefined || (a.barrier !== undefined && !safeInt(a.barrier, 0, 100_000)) ||
+    (a.regen !== undefined && !safeInt(a.regen, 0, 10_000)) || (a.might !== undefined && (typeof a.might !== 'object' || a.might === null ||
+    !Object.entries(a.might).every(([k, n]) => isRpgDamageKind(k) && safeInt(n, 0, 1_000)))))) return false
   if (!SAFE_ID.test(a.id) || !RPG_CLASSES.includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons) ||
     !safeInt(a.tier, 1, 1_000_000) || !safeInt(a.level, 1, 50) || !validStats(a.stats as unknown as Record<string, unknown>, ALLY_STATS) ||
     !safeInt(a.mp, 0, a.stats.mp) || (a.orb !== undefined && !isRpgDamageKind(a.orb)) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
     (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
     a.loadout.length > rpgActiveSlots(a.level) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
-  if (!validRpgTree(a) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
+  if (!validRpgTree({ ...a, classRank: battleClassRank(a) }) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
 }
-function validEnemy(e: BattleEnemy, version: 6 | 7): boolean {
+function validEnemy(e: BattleEnemy, version: 6 | 7 | 8): boolean {
   const w = e.weaknesses
-  if (e.element2 !== undefined && (version !== 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
-  if (e.twice !== undefined && (version !== 7 || typeof e.twice !== 'boolean')) return false
+  if (e.element2 !== undefined && (version < 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
+  if (e.twice !== undefined && (version < 7 || typeof e.twice !== 'boolean')) return false
   const set = <T>(list: unknown, all: readonly T[]) => Array.isArray(list) && list.length <= all.length &&
     list.every((k) => all.includes(k as T)) && new Set(list).size === list.length
   return SAFE_ID.test(e.id) && SAFE_ID.test(e.castId) && RPG_ELEMENTS.includes(e.element) &&
@@ -122,22 +128,22 @@ function validEnemy(e: BattleEnemy, version: 6 | 7): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8 } as const
 function validateInput(input: BattleInput): void {
-  if (!input || (input.version !== 6 && input.version !== 7) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || (input.version !== 6 && input.version !== 7 && input.version !== 8) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
   const max = MAX_FOES[input.version]
   const sized = (wave: unknown) => Array.isArray(wave) && wave.length >= 1 && wave.length <= max
-  if (!sized(input.enemies) || (input.waves !== undefined && (input.version !== 7 || !Array.isArray(input.waves) ||
+  if (!sized(input.enemies) || (input.waves !== undefined && (input.version < 7 || !Array.isArray(input.waves) ||
     input.waves.length < 1 || input.waves.length > MAX_EXTRA_WAVES || !input.waves.every(sized)))) {
     throw new RangeError('Invalid battle header')
   }
   const foes = [...input.enemies, ...(input.waves ?? []).flat()]
   const ids = [...input.allies.map((a) => a.id), ...foes.map((e) => e.id)]
   if (new Set(ids).size !== ids.length) throw new RangeError('Duplicate battle unit')
-  if (!input.allies.every(validAlly)) throw new RangeError('Invalid battle ally')
+  if (!input.allies.every((a) => validAlly(a, input.version))) throw new RangeError('Invalid battle ally')
   if (!foes.every((e) => validEnemy(e, input.version))) throw new RangeError('Invalid battle enemy')
 }
 
@@ -184,7 +190,7 @@ export function createBattle(source: BattleInput): BattleStep {
   const input = JSON.parse(JSON.stringify(source)) as BattleInput
   const base = { statuses: [], barrier: 0, phase: 1 as const, guardingFor: null, brokenAt: 0, revived: false, limit: 0 }
   const units: BattleUnit[] = [
-    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0 })),
+    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0, barrier: a.barrier ?? 0 })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
   const state: BattleState = { engineVersion: input.version, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active',
@@ -207,7 +213,9 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
   const atk = allyOf(s, attacker.id)?.stats ?? enemyOf(s, attacker.id)!.stats
   const def = allyOf(s, defender.id)?.stats ?? enemyOf(s, defender.id)!.stats
-  const offense = channel === 'physical' ? atk.atk : atk.matk
+  // v8: the weapon a hit is made with adds its Might (D104).
+  const might = attacker.side === 'ally' && kind !== null ? allyOf(s, attacker.id)?.might?.[kind] ?? 0 : 0
+  const offense = (channel === 'physical' ? atk.atk : atk.matk) + might
   const defense = channel === 'physical' ? def.pdef : def.mdef
   let amount = Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
@@ -385,6 +393,10 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
       if (u.hp === 0) { cues.push({ kind: 'ko', actorId: u.id, targetId: u.id }); continue }
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
+    // v8: magical armor's Regen (D104).
+    const regen = u.side === 'ally' ? allyOf(s, u.id)?.regen ?? 0 : 0
+    const healed = Math.min(regen, maxHp(s, u.id) - u.hp)
+    if (healed > 0) { u.hp += healed; cues.push({ kind: 'status', actorId: u.id, targetId: u.id, label: `Regen +${healed}`, amount: healed }) }
   }
   if (nextWave(s, cues) || terminal(s, cues)) return
   // Each wave gets the round cap, so a three-wave stage isn't rushed.
@@ -535,7 +547,7 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if ((previous.engineVersion !== 6 && previous.engineVersion !== 7) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if ((previous.engineVersion !== 6 && previous.engineVersion !== 7 && previous.engineVersion !== 8) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)

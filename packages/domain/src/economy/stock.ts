@@ -1,7 +1,6 @@
-// A display name for anything the Warehouse holds: items, dishes, gear and tokens.
+// A display name for anything the Warehouse holds: items, dishes and gear.
 import { itemById } from '../items/catalog'
 import { dishById } from './dishes'
 import { gearById } from './gear'
-import { tokenById } from './tokens'
 
-export const stockName = (id: string): string => itemById(id)?.name ?? tokenById(id)?.name ?? dishById(id)?.name ?? gearById(id)?.name ?? id
+export const stockName = (id: string): string => itemById(id)?.name ?? dishById(id)?.name ?? gearById(id)?.name ?? id

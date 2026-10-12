@@ -62,13 +62,13 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Brawler Dojo | `brawler-dojo` | class-hall | 2 | Trains the Brawler rank, which opens skill depths, and the Brawler Weapon Level for Greatswords, Axes, Lances, Bows and Katanas. |
-| Mage Tower | `mage-tower` | class-hall | 2 | Trains the Mage rank, which opens skill depths, and the Mage Weapon Level for Fire, Blizzard, Thunder, Light and Dark Tomes. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | 2 | Trains the Spell Blade rank, which opens skill depths, and the Spell Blade Weapon Level for her three Arms and two Tomes. |
-| Cleric Chapel | `cleric-chapel` | class-hall | 2 | Trains the Cleric rank, which opens skill depths, and the Cleric Weapon Level for any five Arms and Tomes. |
-| Summoner Circle | `summoner-circle` | class-hall | 2 | Trains the Summoner rank, which opens skill depths, and the Summoner Weapon Level for her three Tomes and two Arms. |
-| Armory | `armory` | armory | 2 | Trains the Armor Level for Garb, Leather, Mail and Plate. |
-| Jeweler | `jeweler` | armory | 2 | Trains the Accessory Level for Rings, Charms and Orbs. |
+| Brawler Dojo | `brawler-dojo` | class-hall | — | The Brawler hall. |
+| Mage Tower | `mage-tower` | class-hall | — | The Mage hall. |
+| Spell Blade Salle | `spell-blade-salle` | class-hall | — | The Spell Blade hall. |
+| Cleric Chapel | `cleric-chapel` | class-hall | — | The Cleric hall. |
+| Summoner Circle | `summoner-circle` | class-hall | — | The Summoner hall. |
+| Armory | `armory` | armory | — | Arms and armor on display. |
+| Jeweler | `jeweler` | armory | — | Orbs and fine settings. |
 
 ### Town (`town`)
 
@@ -77,8 +77,8 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 | Stable | `stable` | town | — | Every Uma outfit, locked or yours. Unlock Tickets open new ones. |
 | Party Hall | `party-hall` | town | — | Twenty parties of five. |
 | Scenario Gate | `scenario-gate` | town | — | The world map: five continents of regions to clear. |
-| Warehouse | `warehouse` | town | — | Every item you own: ingredients, materials, dishes, gear and tokens. |
-| Exchange | `exchange` | town | — | Laurels buy raw items, tickets and tokens here. |
+| Warehouse | `warehouse` | town | — | Every item you own: ingredients, materials, dishes and gear. |
+| Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
 | Tier Finale | `tier-finale` | town | — | The tier's final event, and promotion to the next tier. |
 <!-- /live -->
@@ -114,13 +114,6 @@ Every site, station and hall is a facility: Uma slots, a level, jobs ([loops](lo
 | Workbench | Refine | Gathering | Gathering refined items | Stones + Woods |
 | Kitchen | Cook | Farming | Dishes | Stones + Woods |
 | Forge | Craft | Gathering | Gear | Stones + Woods |
-| Brawler Dojo | Train | — | Brawler rank and Weapon Level | Stones + Woods |
-| Mage Tower | Train | — | Mage rank and Weapon Level | Stones + Woods |
-| Spell Blade Salle | Train | — | Spell Blade rank and Weapon Level | Stones + Woods |
-| Cleric Chapel | Train | — | Cleric rank and Weapon Level | Stones + Woods |
-| Summoner Circle | Train | — | Summoner rank and Weapon Level | Stones + Woods |
-| Armory | Train | — | Armor Level | Stones + Woods |
-| Jeweler | Train | — | Accessory Level | Stones + Woods |
 <!-- /live -->
 
 **The facility page** (`places/work/FacilityPage.tsx`), for the 16 sites, the Pantry, the Workbench, the Kitchen and
@@ -138,13 +131,11 @@ the Forge:
   - a queue of up to three.
 - **Assigning:** pick an Uma, then what to make, then how many (1–10).
 - **Kitchen:** tabs for Dishes, Duo, Feasts and "Can cook now".
-- **Forge:** a type picker (Arms, Tomes, Armor, Accessory, Orbs), then grade and accent.
+- **Forge:** a type picker (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs), then grade, and an accent for
+  armor (D103).
 
-**The training page** (`places/learning/TrainingPage.tsx`), for the five class halls, the Armory and the Jeweler:
-- **Tracks:** class rank and Weapon Level, or Armor Level, or Accessory Level.
-- **Slot cards:** Rank up, Rank up · train next, time cuts, Recall.
-- **Assigning:** the sheet shows each Uma's aptitude speed and the token the step spends: a Promotion Token for a
-  class rank, a Mastery Token for a Weapon, Armor or Accessory Level.
+**The Learning page** is closed (D102): its halls stopped training when fights began filling every rank. It waits for
+the Inheritance feature.
 
 ## Town
 
@@ -158,15 +149,18 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - Eight sorts, grid or list. These choices are remembered per device.
 - **An Uma's profile:**
   - **Header:** Uma Level and EXP, a class chip, Farm and Craft Levels, and a Working or Party card.
-  - **Tabs:** Skills, Battle, Gear (equipment, Extra Stats link, gear levels), Work and Racing.
+  - **Tabs:** Skills (with every Class Rank bar), Battle, Gear (five weapon and five armor slots, Extra Stats link, Weapon
+    and Armor Rank cells), Work and Racing.
   - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
-  - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
+  - **Battle tab:** each stat's total, then in brackets what armor adds (blue) and what active Extra Stats add (green)
     (D99).
   - A locked outfit shows **Unlock · 1 Ticket**.
 - **Skills page:**
   - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
     (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon the slot takes; Spell Blade,
-    Cleric and Summoner can change the weapon, Brawler and Mage only the piece (D98).
+    Cleric and Summoner can change the weapon, Brawler and Mage only the piece (D98). Each armor slot's sheet picks its
+    physical or magical kind and the piece (D103).
+  - The class's **Class Rank** bar, and the depths it opens (D102).
   - Browse her 5 or 10 **trees**, learn and forget side skills, and **equip** skills, or leave it on auto.
 
 ### Party Hall
@@ -198,13 +192,14 @@ Routes: `/town/scenario-gate`, `c/:continent`, `r/:region` and `fight`. The worl
     open; "Give up").
   - **Stage:** foes on top, in two rows from six; the party below.
   - **Controls:** a weapon row, then **Attack**, **Skills** and **Guard**, and the **Limit Break** sheet.
-- **Result:** Victory or Defeated, Laurels, Shards, Tickets, tokens, and each Uma's EXP and levels. Then "Fight again"
-  or back to the map.
+- **Result:** Victory or Defeated, Laurels, Marks, Shards and Tickets; for each Uma her EXP and level bar, her Class Rank
+  bar, and five Weapon and five Armor Rank cells, each glowing on a rank-up (D102). Then "Fight again" or back to the
+  map.
 
 ### Warehouse
 
 Shelf tabs:
-- Farm, Craft, Dishes, Gear and Tokens;
+- Farm, Craft, Dishes and Gear;
 - a grade filter (G1–G10);
 - a stock sheet with Sell ×1, 10 or All.
 
@@ -212,7 +207,8 @@ Shelf tabs:
 
 - Your Laurels and ticket counts.
 - **Buy:** Time Tickets, Sweep Tickets, and raw items of the grades your continents unlock.
-- **Token trading** by band: sell for 20 × band, buy for twice that.
+- **Manuals** (D102): pick an Uma, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
+  1,000 Gear or Class Marks into 1,000 EXP on it.
 
 ### Observatory
 
@@ -243,7 +239,7 @@ A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't bu
 - **Overlays:** full place pages slide in from the right at 88% width. They close with ✕, a swipe right, a backdrop tap,
   Escape or back. Bottom sheets are used for everything else (`ui/BottomSheet.tsx`).
 - **Push notifications** (`apps/web/src/push/`, server `apps/api/src/push/`):
-  - A server tick every five minutes sends "Work done", "Training done" or "N jobs done".
+  - A server tick every five minutes sends "Work done" or "N jobs done".
   - Tapping one opens the place.
   - The app badge counts ready slots.
   - They need the Home Screen app on iOS.

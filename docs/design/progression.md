@@ -1,7 +1,8 @@
 # Progression: Uma Level, Class Rank, Weapon and Armor Ranks
 
-> **Status: proposal for owner review, 2026-10-12 (second pass).** Nothing here is built. It replaces training, every
-> token kind (Promotion, Mastery and Cooking), Weapon/Armor/Accessory Levels and the Uma-Level skill gates once approved. Written from the owner's notes of
+> **Status: built 2026-10-12 (D102–D105).** The manual ([loops](../game/loops.md#ranks), [classes](../game/classes.md),
+> [materials](../game/materials.md#gear)) is current; this page keeps the reasoning. As built: stage EXP weights 0.36 and
+> 0.43 (not the D97 0.32/0.4), and 28 Forge types (ten weapons, eight armors, ten Orbs). Written from the owner's notes of
 > 2026-10-12; where they left a choice open, the choice is marked **(decided)** with its reason.
 
 ## Goals
@@ -105,7 +106,7 @@ weapon (+40 at grade 10). Only the weapon a hit uses counts, so each slot matter
 
 ## Crafting and recipes
 
-The Forge makes 30 types in ten grades; Craft Level gates the grade made (5g − 4), the matching rank the grade worn.
+The Forge makes 28 types in ten grades; Craft Level gates the grade made (5g − 4), the matching rank the grade worn.
 
 | Group | Types | Recipe (per piece) | Choice at the Forge |
 |---|---|---|---|

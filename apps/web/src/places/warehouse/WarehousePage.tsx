@@ -1,6 +1,6 @@
 // The Warehouse (S4–S7): every item, dish and unbound piece of gear you own. Ingredients and materials filter by grade;
 // anything can be sold for a few Laurels (far below its Exchange price).
-import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, TOKEN_BANDS, TOKEN_LAURELS_PER_BAND, tokenById, type ItemSide, type Shelf } from '@rpg/domain'
+import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type ItemSide, type Shelf } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -8,7 +8,7 @@ import { sell, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 
-type Tab = ItemSide | 'dishes' | 'gear' | 'tokens'
+type Tab = ItemSide | 'dishes' | 'gear'
 
 export default function WarehousePage() {
   const world = useWorld()
@@ -16,8 +16,7 @@ export default function WarehousePage() {
   const [grade, setGrade] = useState<number | null>(null)
   const [open, setOpen] = useState<{ shelf: Shelf; id: string } | null>(null)
   if (!world) return null
-  const total = Object.entries(world.items).reduce((a, [id, n]) => a + (tokenById(id) ? 0 : n), 0)
-  const tokenCount = Object.entries(world.items).reduce((a, [id, n]) => a + (tokenById(id) ? n : 0), 0)
+  const total = Object.values(world.items).reduce((a, n) => a + n, 0)
   const list = (shelf: 'dishes' | 'gear') => {
     const stock = world[shelf]
     return (
@@ -41,10 +40,10 @@ export default function WarehousePage() {
     <div>
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
         <div className="grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
-          {(['farming', 'gathering', 'dishes', 'gear', 'tokens'] as const).map((s) => (
+          {(['farming', 'gathering', 'dishes', 'gear'] as const).map((s) => (
             <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)} aria-label={s === 'farming' ? 'Farm items: ingredients' : s === 'gathering' ? 'Craft items: materials' : undefined}
               className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-              {s === 'farming' ? 'Farm' : s === 'gathering' ? 'Craft' : s === 'dishes' ? 'Dishes' : s === 'gear' ? 'Gear' : 'Tokens'}
+              {s === 'farming' ? 'Farm' : s === 'gathering' ? 'Craft' : s === 'dishes' ? 'Dishes' : 'Gear'}
             </button>
           ))}
         </div>
@@ -56,10 +55,9 @@ export default function WarehousePage() {
             </button>
           ))}
         </div>
-        <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.dishes).reduce((a, b) => a + b, 0)} dishes · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear · {tokenCount} tokens</p>
+        <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.dishes).reduce((a, b) => a + b, 0)} dishes · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear</p>
       </div>
       {side === 'gear' && list('gear')}
-      {side === 'tokens' && <TokenShelf items={world.items} grade={grade} onOpen={(id) => setOpen({ shelf: 'items', id })} />}
       {side === 'dishes' && list('dishes')}
       {(side === 'farming' || side === 'gathering') && (
         <div className="space-y-3 p-3">
@@ -89,34 +87,6 @@ export default function WarehousePage() {
         </div>
       )}
       {open && <StockSheet shelf={open.shelf} id={open.id} have={world[open.shelf][open.id] ?? 0} onClose={() => setOpen(null)} />}
-    </div>
-  )
-}
-
-/** Tokens by band (D67): won fights drop them; promotions, crafting and cooking spend them; they sell for Laurels (D80). */
-function TokenShelf({ items, grade, onOpen }: { items: Record<string, number>; grade: number | null; onOpen: (id: string) => void }) {
-  const owned = Object.entries(items).map(([id, n]) => ({ token: tokenById(id), n })).filter((t) => t.token && (grade === null || t.token.band === Math.ceil(grade / 2)))
-  if (owned.length === 0) return <p className="p-3 text-[13px] text-ink-faint">No tokens{grade ? ' for that grade' : ''} yet</p>
-  return (
-    <div className="space-y-3 p-3">
-      {Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((band) => {
-        const here = owned.filter((t) => t.token!.band === band).sort((a, b) => a.token!.kind.localeCompare(b.token!.kind) || a.token!.name.localeCompare(b.token!.name))
-        if (here.length === 0) return null
-        return (
-          <section key={band} className="rounded-md bg-panel p-2.5">
-            <h3 className="mb-1.5 text-[13px] font-semibold">Band {band} <span className="font-normal text-ink-faint">· Lv {band * 10 - 9}–{band * 10}</span></h3>
-            <ul className="grid grid-cols-1 gap-1">
-              {here.map(({ token, n }) => (
-                <li key={token!.id}>
-                  <button type="button" onClick={() => onOpen(token!.id)} className="flex min-h-10 w-full items-center gap-2 rounded-sm text-left text-[13px] active:bg-white/5">
-                    <ItemIcon id={token!.id} size={28} /> <span className="min-w-0 flex-1 truncate">{token!.name}</span> <span className="text-ink-soft">×{n}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )
-      })}
     </div>
   )
 }

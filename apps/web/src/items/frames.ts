@@ -15,14 +15,17 @@ export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEf
 /** Legacy published atlas row ids (P38), retained for icon lookup until H03's D86 art is published. */
 export const GEAR_ART_ROWS = ['short-sword', 'bow', 'spear', 'axe', 'mage-staff', 'arcane-staff', 'greatsword', 'cleric-staff', 'summoner-tome',
   'garb', 'leather', 'mail', 'plate', 'ring', 'charm'] as const
-/** The art a type is drawn with until its own exists (D86): Lance the Spear's, Katana the Short Sword's, Tomes the
- * Summoner Tome's and Orbs the Ring's, badged with their kind. */
+/** The art a type is drawn with until its own exists (D86, D103): Lance the Spear's, Katana the Short Sword's, Tomes the
+ * Summoner Tome's and Orbs the Ring's, badged with their kind; the ten armor kinds borrow the old armor rows. */
+const ARMOR_ART: Readonly<Record<string, (typeof GEAR_ART_ROWS)[number]>> = {
+  helm: 'plate', cuirass: 'mail', greaves: 'leather', gauntlets: 'plate', circlet: 'charm', robe: 'garb', leggings: 'garb', bracers: 'charm',
+}
 export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
   if (type === 'lance') return { row: 'spear' }
   if (type === 'katana') return { row: 'short-sword' }
   if (type.startsWith('tome-')) return { row: 'summoner-tome', kind: rpgWeaponKind(type as RpgWeapon) }
   if (isOrb(type)) return { row: 'ring', kind: orbKind(type) }
-  return { row: type as (typeof GEAR_ART_ROWS)[number] }
+  return { row: ARMOR_ART[type] ?? (type as (typeof GEAR_ART_ROWS)[number]) }
 }
 
 const ITEM_ROW = new Map(ITEM_FAMILIES.map((f, i) => [f.id, i * 2]))
@@ -54,7 +57,8 @@ export function iconFrame(id: string): IconFrame | null {
   const piece = gearById(id)
   if (piece) {
     const art = gearArt(piece.type)
-    return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, accent: piece.accent, ...(art.kind ? { kind: art.kind } : {}) }
+    return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, ...(piece.accent ? { accent: piece.accent } : {}),
+      ...(art.kind ? { kind: art.kind } : {}) }
   }
   return null
 }

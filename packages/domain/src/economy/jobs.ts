@@ -3,13 +3,13 @@
 import { ITEM_IDENTITIES as ITEM_FAMILIES, type ItemFamilyIdentity as ItemFamily } from '../items/identity'
 import type { Profession } from './pacing'
 
-export type JobKind = 'gather' | 'refine' | 'cook' | 'craft' | 'train'
-export const JOB_KINDS: readonly JobKind[] = ['gather', 'refine', 'cook', 'craft', 'train']
+export type JobKind = 'gather' | 'refine' | 'cook' | 'craft'
+export const JOB_KINDS: readonly JobKind[] = ['gather', 'refine', 'cook', 'craft']
 
 export interface Job {
   kind: JobKind
   outfitId: string
-  /** What it makes: an item id, a dish id, a gear recipe, or a training track (S5). */
+  /** What it makes: an item id, a dish id or a gear piece. */
   output: string
   count: number
   /** Outputs already moved to the Warehouse (or ranks already granted). */
@@ -65,7 +65,7 @@ export const jobProgress = (job: Job, now: string): number =>
 export interface FacilitySpec {
   id: string
   kind: JobKind
-  /** The profession its jobs raise (none for training). */
+  /** The profession its jobs raise. */
   profession: Profession | null
   /** The site's item family (gathering sites only). */
   family: string | null
@@ -85,7 +85,6 @@ const SPECS: FacilitySpec[] = [
   { id: 'workbench', kind: 'refine', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
   { id: 'kitchen', kind: 'cook', profession: 'farming', family: null, upgradeFamilies: BUILDING },
   { id: 'forge', kind: 'craft', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
-  ...['brawler-dojo', 'mage-tower', 'spell-blade-salle', 'cleric-chapel', 'summoner-circle', 'armory', 'jeweler'].map((id): FacilitySpec => ({ id, kind: 'train', profession: null, family: null, upgradeFamilies: BUILDING })),
 ]
 const SPEC_BY_ID = new Map(SPECS.map((s) => [s.id, s]))
 export const FACILITIES: readonly FacilitySpec[] = SPECS

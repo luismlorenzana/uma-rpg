@@ -1,7 +1,7 @@
 // The Observatory (S6, design §10, D58): each Uma's Sun-and-planets map. Eating a dish unlocks a node; up to
 // 5 + ⌊level / 2⌋ unlocked nodes are active at once, each adding a small share to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, dishById, EFFECT_LABEL, ITEM_EFFECTS, nodeFromDish, nodeGrade, POINT_EVASION, POINT_LIMIT, POINT_SHARE, RING, SaveRuleError,
+  activeNodeSlots, BRIDGES, dishById, EFFECT_LABEL, ITEM_EFFECTS, nodeFromDish, nodeGrade, POINT_EVASION, POINT_HP, POINT_LIMIT, RING, SaveRuleError,
   starPoints, type ItemEffect, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -25,7 +25,7 @@ function nodeLabel(id: string): string {
 export function pointText(e: ItemEffect, p: number): string {
   if (e === 'speed') return `${(p * POINT_EVASION * 100).toFixed(1)}% evasion`
   if (e === 'limit') return `+${Math.floor(p * POINT_LIMIT)} Limit start`
-  return `+${(p * POINT_SHARE * 100).toFixed(1)}%`
+  return `+${Math.round(p * (e === 'hp' ? POINT_HP : 1) * 10) / 10}`
 }
 
 export default function ObservatoryPage({ rest }: PageProps) {

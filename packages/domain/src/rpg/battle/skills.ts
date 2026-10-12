@@ -1,6 +1,6 @@
-// Battle numbers and skill lookup, engine v6 (D86, docs/design/class-rework.md).
+// Battle numbers and skill lookup, engine v6–v8 (D86, D102; docs/design/class-rework.md).
 import { rpgNode, type RpgNode, type RpgSkillDef } from '../catalog'
-import { rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
+import { RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
 
 /** Octopath Traveler: a weakness hit ×1.3, a broken foe ×2 — here as ×0.5 before the break and ×1 after. */
@@ -28,12 +28,20 @@ export const battleWeakness = (element: RpgElement): RpgElement => rpgElementWea
 
 export interface BattleSkill { node: RpgNode; def: RpgSkillDef; ref: RpgNodeRef; label: string; mp: number; power: number }
 
+/** The Class Rank that gates her trees: v8 sends it; a v6–v7 fight gated depths by her level and class rank (D77), and
+ * this rank opens exactly the same depths and side skills. */
+export function battleClassRank(ally: Pick<BattleAlly, 'classRank' | 'level' | 'maxDepth'>): number {
+  if (ally.classRank !== undefined) return ally.classRank
+  if (ally.maxDepth === undefined || ally.maxDepth >= RPG_DEPTH_GATES.length) return ally.level
+  return Math.min(ally.level, RPG_DEPTH_GATES[ally.maxDepth]! - 1)
+}
+
 /** A known, equipped skill as this ally casts it: her hand scales power and MP, the skill's tier scales MP. */
-export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'loadout' | 'maxDepth'>, ref: RpgNodeRef): BattleSkill | null {
+export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'loadout' | 'maxDepth' | 'classRank'>, ref: RpgNodeRef): BattleSkill | null {
   const node = rpgNode(ref.id)
   if (!node || (ref.tier === ally.tier && !rpgProfileTrees(ally).includes(node.tree))) return null
   const key = rpgNodeKey(ref)
-  if (!rpgLearnedSkills(ally).some((r) => rpgNodeKey(r) === key) || !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
+  if (!rpgLearnedSkills({ ...ally, classRank: battleClassRank(ally) }).some((r) => rpgNodeKey(r) === key) || !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
   const hand = rpgHand(ally)
   return { node, def: node.skill, ref, label: node.name, power: hand.power, mp: Math.max(1, Math.round(node.skill.mp * hand.mp)) * ref.tier }
 }

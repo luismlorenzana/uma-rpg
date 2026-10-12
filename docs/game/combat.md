@@ -1,6 +1,7 @@
 # Combat
 
-How a fight works today: engine v7. Every number below comes from the code. The tables between `live` markers are
+How a fight works today: engine v8 (D104: Class Ranks, Might, Barrier and Regen; v6 and v7 fights still replay as
+they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -49,8 +50,8 @@ Class rules change the act ([classes](classes.md)):
 
 For each part of each hit:
 
-1. **Base:** `max(offense × 0.2, offense − defense × 0.5) × power`. Offense is ATK for Arms kinds and MATK for elements.
-   Defense is the target's DEF or MDEF.
+1. **Base:** `max(offense × 0.2, offense − defense × 0.5) × power`. Offense is ATK for Arms kinds and MATK for elements,
+   plus the **Might** of the weapon the hit is made with (+4 a grade, D104). Defense is the target's DEF or MDEF.
 2. **Weak hit:** ×1.3 when the hit's kind is on the foe's weakness lists, or it's Light or Dark against a Hexed foe. An
    Uma's **Orb** adds its kind to every hit for this check, without extra damage.
 3. **Statuses** (table below) raise or cut it.
@@ -58,21 +59,24 @@ For each part of each hit:
    halving.
 5. **Unbroken foes take ×0.5.** Breaking them is how damage lands.
 6. An Uma's **evasion** (Speed Extra Stats, up to 50%) cuts what she takes.
-7. A guard intercepting a hit takes half of it, and a Barrier absorbs foe damage before HP. Damage is at least 1.
+7. A guard intercepting a hit takes half of it, and a Barrier absorbs foe damage before HP. Physical armor starts her
+   each fight with a Barrier (5 a grade), and magical armor heals Regen (1 HP a grade) at the end of each round (D104).
+   Damage is at least 1.
 
 Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
 
 | Stat | From the outfit's projected stats (base ÷ 5 + 1.5 × (1 + growth) per level) | Then |
 |---|---|---|
-| HP | 100 + 6 × Stamina + 2 × Power | × class lean, + Extra Stats and gear |
+| HP | 100 + 5 × Stamina + 2 × Power | × class lean, + Extra Stats and armor |
 | MP | 20 + 1.5 × Wit | × class lean, … |
 | ATK / MATK | Speed | × class lean, … |
 | DEF | Power | × class lean, … |
 | MDEF | (Power + Wit) ÷ 2 | × class lean, … |
 | Initiative | Stamina | Foes act by initiative; Umas act in the order you choose |
 
-Each Extra Stats or gear point adds 1.5% to its stat. Speed points give 0.6% evasion each, and Limit points a head
-start on the gauge ([loops](loops.md#extra-stats-and-gear)).
+Each Extra Stats or armor point adds a flat +1 to its stat (+5 HP). Speed points give 0.6% evasion each, and Limit
+points a head start on the gauge ([loops](loops.md#extra-stats-and-gear)). An average Uma's ATK is about 22 at Lv 1 and
+111 at Lv 50; HP about 276 and 928.
 
 ## Weaknesses, shields and Breaks
 

@@ -1,6 +1,6 @@
 // An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
-// wields five weapons and has a tree per weapon; core skills come free as depths open (class rank and Uma level,
-// D77), points buy side skills, and a hand per class scales power and MP.
+// wields five weapons and has a tree per weapon; its Class Rank opens the depths and pays the points for side skills
+// (D102), her Uma Level her stats and skill slots, and a hand per class scales power and MP.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
 import { rpgClassWeapons, rpgNodeIdentity as rpgNode, rpgSideNodeLevel, rpgTreeOf, type RpgNodeIdentity as RpgNode } from './node-identity'
 import {
@@ -11,9 +11,9 @@ export * from './kinds'
 export { rpgClassWeapons } from './node-identity'
 
 export const RPG_TIER_MAX_LEVEL = 50
-/** Points buy side skills only (D86): one a level to Lv50. Core skills cost nothing. */
+/** Points buy side skills only (D86): one a Class Rank, per class (D102). Core skills cost nothing. */
 export const RPG_SIDE_POINTS_PER_LEVEL = 1
-/** Uma levels that open depths 1–5, alongside class rank (D77). */
+/** Class Ranks that open depths 1–5 (D102; Uma levels before). */
 export const RPG_DEPTH_GATES = [1, 10, 20, 30, 40] as const
 /** Three skill slots at Lv1, one more at each gate: ten by Lv40. */
 export const RPG_BASE_ACTIVE_SLOTS = 3
@@ -42,8 +42,8 @@ export interface RpgProfile {
   /** The side skills she has learned in this class's trees. Core skills aren't listed: an open depth gives them. */
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
-  /** Deepest skill depth her class rank opens (D77). Absent: depths open by level alone. */
-  maxDepth?: number
+  /** Her rank in this class (1–50): it opens the trees' depths and pays their side points (D102). */
+  classRank: number
 }
 export interface RpgCoreStats extends Stats {
   atk: number
@@ -167,8 +167,9 @@ export function projectRpgStats(profile: Pick<RpgProfile, 'baseStats' | 'growthR
     requireSafe(projected, `projected ${key}`)
     core[key] = projected
   }
-  // Campaign MP: a pool worth a few skills that carries between fights; Wit buys more casts.
-  const hp = Math.round((100 + 6 * core.stamina + 2 * core.power) * lean.hp)
+  // Campaign MP: a pool worth a few skills that carries between fights; Wit buys more casts. HP stays under a thousand
+  // at Lv 50 (D104: 5 × Stamina, was 6 ×).
+  const hp = Math.round((100 + 5 * core.stamina + 2 * core.power) * lean.hp)
   const mp = Math.round((20 + 1.5 * core.wit) * lean.mp)
   requireSafe(hp, 'projected HP')
   requireSafe(mp, 'projected MP')
@@ -195,9 +196,9 @@ export function grantRpgExp(profile: Pick<RpgProfile, 'tier' | 'level' | 'exp'>,
 
 // --- Trees (D77, D86) --------------------------------------------------------------------------------------------------
 
-export function rpgTreePointsEarned(level: number): number {
-  rpgLifetimeLevels(1, level)
-  return Math.min(level, RPG_TIER_MAX_LEVEL) * RPG_SIDE_POINTS_PER_LEVEL
+/** Side points a class has earned: one per Class Rank. */
+export function rpgTreePointsEarned(classRank: number): number {
+  return Math.max(0, Math.min(classRank, RPG_TIER_MAX_LEVEL)) * RPG_SIDE_POINTS_PER_LEVEL
 }
 
 export function rpgActiveSlots(level: number): number {
@@ -212,21 +213,22 @@ export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
 
 export const rpgNodeKey = (ref: RpgNodeRef): string => `${ref.tier}:${ref.id}`
 
-type DepthGated = Pick<RpgProfile, 'level' | 'maxDepth'>
-/** Why a depth is closed, or null: depth d needs class rank d (D77) and Uma Lv 1/10/20/30/40. */
+type DepthGated = Pick<RpgProfile, 'classRank'>
+/** Why a depth is closed, or null: depth d opens at Class Rank 1, 10, 20, 30 or 40 (D102). */
 export function rpgDepthBlock(profile: DepthGated, depth: number): string | null {
-  if (profile.maxDepth !== undefined && depth > profile.maxDepth) return `Needs class rank ${depth}`
-  return profile.level < RPG_DEPTH_GATES[depth - 1]! ? `Opens at Lv${RPG_DEPTH_GATES[depth - 1]}` : null
+  return profile.classRank < RPG_DEPTH_GATES[depth - 1]! ? `Opens at Class Rank ${RPG_DEPTH_GATES[depth - 1]}` : null
 }
+/** The deepest depth a Class Rank opens. */
+export const rpgOpenDepth = (classRank: number): number => RPG_DEPTH_GATES.filter((gate) => classRank >= gate).length
 
 /** The core skills an open depth gives in these trees, shallowest first. */
-export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'level' | 'maxDepth'>, trees: readonly RpgTreeId[]): RpgNodeRef[] {
+export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'classRank'>, trees: readonly RpgTreeId[]): RpgNodeRef[] {
   return trees.flatMap((tree) => Array.from({ length: 5 }, (_, i) => rpgNode(`${tree}.${i + 1}`))
     .filter((n): n is RpgNode => !!n && !rpgDepthBlock(profile, n.depth)))
     .sort((a, b) => a.depth - b.depth).map((n) => ({ tier: profile.tier, id: n.id }))
 }
 
-type Learner = Pick<RpgProfile, 'classId' | 'tier' | 'level' | 'tree' | 'maxDepth'>
+type Learner = Pick<RpgProfile, 'classId' | 'tier' | 'classRank' | 'tree'>
 /** Why this node can't be learned now, or null. Only side skills are learned; the same rules validate a stored tree. */
 export function rpgLearnBlock(profile: Learner, id: string): string | null {
   const node = rpgNode(id)
@@ -235,8 +237,8 @@ export function rpgLearnBlock(profile: Learner, id: string): string | null {
   if (node.variant === null) return depth ?? 'Learned'
   if (profile.tree.some((ref) => ref.id === id)) return 'Already learned'
   if (depth) return depth
-  if (profile.level < rpgSideNodeLevel(node.depth)) return `Opens at Lv${rpgSideNodeLevel(node.depth)}`
-  if (rpgTreePointsSpent(profile.tree) + node.cost > rpgTreePointsEarned(profile.level)) return 'Not enough points'
+  if (profile.classRank < rpgSideNodeLevel(node.depth)) return `Opens at Class Rank ${rpgSideNodeLevel(node.depth)}`
+  if (rpgTreePointsSpent(profile.tree) + node.cost > rpgTreePointsEarned(profile.classRank)) return 'Not enough points'
   return otherSide(profile.tree, node) ? 'The other side is learned' : null
 }
 const otherSide = (tree: readonly RpgNodeRef[], node: RpgNode): boolean =>
@@ -255,22 +257,22 @@ export function forgetRpgVariant<P extends Pick<RpgProfile, 'tree'>>(profile: P,
   return { ...profile, tree: profile.tree.filter((ref) => ref.id !== id) }
 }
 
-/** A stored set of side skills obeys every learning rule at her level, whatever order it was learned in. */
+/** A stored set of side skills obeys every learning rule at its Class Rank, whatever order it was learned in. */
 export function validRpgTree(profile: Learner): boolean {
   const trees = rpgClassTrees(profile.classId)
   const nodes: RpgNode[] = []
   for (const ref of profile.tree) {
     const node = rpgNode(ref.id)
     if (!node || node.variant === null || ref.tier !== profile.tier || !trees.includes(node.tree) || rpgDepthBlock(profile, node.depth)) return false
-    if (profile.level < rpgSideNodeLevel(node.depth)) return false
+    if (profile.classRank < rpgSideNodeLevel(node.depth)) return false
     nodes.push(node)
   }
-  if (new Set(nodes.map((n) => n.id)).size !== nodes.length || rpgTreePointsSpent(profile.tree) > rpgTreePointsEarned(profile.level)) return false
+  if (new Set(nodes.map((n) => n.id)).size !== nodes.length || rpgTreePointsSpent(profile.tree) > rpgTreePointsEarned(profile.classRank)) return false
   return !nodes.some((node) => otherSide(profile.tree, node))
 }
 
 /** Skills she may equip now: the open cores and learned sides of her weapons' trees, and her legacy ones. */
-export function rpgLearnedSkills(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'maxDepth'>): RpgNodeRef[] {
+export function rpgLearnedSkills(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'classRank' | 'tree' | 'legacy'>): RpgNodeRef[] {
   const trees = rpgProfileTrees(profile)
   const sides = profile.tree.filter((ref) => trees.includes(rpgNode(ref.id)?.tree as RpgTreeId))
   return [...rpgOpenCores(profile, trees), ...sides, ...profile.legacy]

@@ -68,11 +68,13 @@ describe('generated chapters (D48)', () => {
 })
 
 describe('rewards (D51)', () => {
-  it('pays a share of a level, scaled ±10% per level of gap within 10%–200%', () => {
+  it('pays a share of her own level, 10% less per level she is above the foes, never more (D102)', () => {
     expect([rpgBattleBaseExp('fight', 5), rpgBattleBaseExp('sub-boss', 5), rpgBattleBaseExp('vanguard', 5), rpgBattleBaseExp('boss', 5)])
-      .toEqual([64, 80, 80, 80])
-    expect([rpgLevelExpFactor(8, 5), rpgLevelExpFactor(5, 8), rpgLevelExpFactor(20, 5), rpgLevelExpFactor(1, 30)]).toEqual([0.7, 1.3, 0.1, 2])
-    expect(rpgBattleExp('fight', 5, 8)).toBe(45)
+      .toEqual([72, 86, 86, 86])
+    expect([rpgLevelExpFactor(8, 5), rpgLevelExpFactor(5, 8), rpgLevelExpFactor(20, 5), rpgLevelExpFactor(1, 30)]).toEqual([0.7, 1, 0.1, 1])
+    // Her level sets the size: a Lv8 Uma on Lv5 foes gets 0.7 of her own share; a Lv1 Uma on Lv30 foes no more than her own.
+    expect(rpgBattleExp('fight', 5, 8)).toBe(62)
+    expect(rpgBattleExp('fight', 30, 1)).toBe(rpgBattleExp('fight', 1, 1))
     expect(ura.nodes.filter((n) => n.kind === 'sub-boss').map(rpgRewardKind)).toEqual(['sub-boss', 'sub-boss', 'sub-boss', 'vanguard', 'vanguard', 'vanguard'])
   })
 
@@ -91,8 +93,8 @@ describe('rewards (D51)', () => {
       me = { ...me, level: gained.level, exp: gained.exp }
       stages++
     }
-    expect(stages / 49).toBeGreaterThanOrEqual(2.9)
-    expect(stages / 49).toBeLessThanOrEqual(3.3)
+    expect(stages / 49).toBeGreaterThanOrEqual(2.7)
+    expect(stages / 49).toBeLessThanOrEqual(3.1)
   })
 })
 
@@ -100,7 +102,7 @@ describe('rewards (D51)', () => {
 function member(id: string, level = 1): RpgProfile {
   return { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'],
-    tier: 1, level, exp: 0, tree: [], legacy: [] }
+    tier: 1, level, exp: 0, tree: [], legacy: [], classRank: level }
 }
 const party = ['m1', 'm2', 'm3', 'm4', 'm5'].map((id) => ({ profile: member(id), loadout: [] }))
 

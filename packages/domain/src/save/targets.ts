@@ -1,15 +1,16 @@
 // Farming targets (D100): up to five Umas the facilities plan for. For each, what maxing her takes: a dish for every
-// Extra Stats node she hasn't opened, and the best piece she can wear now in each gear slot she wears it in. The needs
+// Extra Stats node she hasn't opened, and the best piece she can wear now in each of her ten gear slots (D103). The needs
 // cascade down the chain: pieces and dishes still to make need refined items, refined items still to make need raw
 // ones. At every step what the Warehouse holds and what running or queued jobs will bring counts first.
 import { DISHES, dishById, nodeGrade, nodesFor, STAR_NODES } from '../economy/dishes'
-import { EQUIP_LABEL, gearById, gearId, gearLevel, isAccessory, isArmor, type EquipType } from '../economy/gear'
+import { armorKindOf, EQUIP_LABEL, gearById, gearId, isWeapon, type EquipType } from '../economy/gear'
+import { ARMOR_LABEL, ARMOR_SLOTS, armorTrack, isArmorKind, weaponTrack, type ArmorKind } from '../economy/ranks'
 import { facilitySpec } from '../economy/jobs'
 import { itemById } from '../items/catalog'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { MAX_TARGETS, type OwnedUma, type Save, type TierWorld } from './save'
+import { MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
 /** Marks or unmarks an owned Uma as a target, five at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -23,7 +24,7 @@ export function setTarget(save: Save, outfitId: string, on: boolean, now: string
 
 /** One line of a plan: what to make, how many the targets need in all, what's here or on the way, and what's short. */
 export interface TargetNeed {
-  /** An item or dish id, or a gear key `<type>-g<grade>` (any accent will do). */
+  /** An item or dish id, or a gear key `<weapon or armor kind>-g<grade>` (any accent, any Orb of the kind will do). */
   key: string
   /** An id to draw its icon with. */
   icon: string
@@ -40,27 +41,25 @@ export interface TargetPlan { gear: TargetNeed[]; dishes: TargetNeed[]; refined:
 const NODE_DISH = new Map<string, string>()
 for (const dish of DISHES) for (const node of nodesFor(dish)) if (nodeGrade(node) === dish.grade) NODE_DISH.set(node, dish.id)
 
-/** Armor and accessory types to plan when she wears none. */
-export const TARGET_DEFAULT_ARMOR: EquipType = 'mail'
-export const TARGET_DEFAULT_ACCESSORY: EquipType = 'ring'
-
-const gearKey = (type: EquipType, grade: number) => `${type}-g${grade}`
+/** A piece's planning kind: its weapon, or its armor kind (any Orb of a kind is that kind). */
+const kindOf = (type: EquipType): string => (isWeapon(type) ? type : armorKindOf(type))
 const keyOf = (pieceId: string): string | null => {
   const piece = gearById(pieceId)
-  return piece ? gearKey(piece.type, piece.grade) : null
+  return piece ? `${kindOf(piece.type)}-g${piece.grade}` : null
 }
+/** A representative type to draw and cost a kind with: the kind itself, or its group's first Orb. */
+const typeOfKind = (kind: string): EquipType => (kind === 'arms-orb' ? 'orb-greatsword' : kind === 'elemental-orb' ? 'orb-fire' : kind as EquipType)
 
-/** The pieces one Uma still needs: per slot, the best grade she can wear now, unless she owns one that good. */
+/** The pieces one Uma still needs: per slot (her class's five weapons, her five armor slots' kinds), the best grade her
+ * rank lets her wear, unless she owns one that good. */
 function gearNeeds(uma: OwnedUma, classId: RpgClass): string[] {
   const owned = [...uma.gear.locker, ...Object.values(uma.gear.equipped)].map(gearById).filter((p) => p !== undefined)
-  const worn = (slot: 'armor' | 'accessory') => gearById(uma.gear.equipped[slot] ?? '')?.type
-  const types: EquipType[] = [...classOf(uma, classId).weapons, worn('armor') ?? TARGET_DEFAULT_ARMOR, worn('accessory') ?? TARGET_DEFAULT_ACCESSORY]
   const out: string[] = []
-  for (const type of types) {
-    const grade = gearLevel(uma.ranks, type)
-    const has = owned.some((p) => p.grade >= grade && (p.type === type || (isArmor(type) && isArmor(p.type)) || (isAccessory(type) && isAccessory(p.type))))
-    if (grade >= 1 && !has) out.push(gearKey(type, grade))
+  const need = (kind: string, grade: number) => {
+    if (!owned.some((p) => p.grade >= grade && kindOf(p.type) === kind)) out.push(`${kind}-g${grade}`)
   }
+  for (const w of classOf(uma, classId).weapons) need(w, weaponTrack(uma.ranks, w).rank)
+  for (const slot of ARMOR_SLOTS) { const kind = slotKind(uma.gear, slot); need(kind, armorTrack(uma.ranks, kind).rank) }
   return out
 }
 
@@ -71,7 +70,7 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
   const coming = new Map<string, number>()
   for (const f of Object.values(world.facilities)) {
     for (const job of f.jobs) {
-      if (!job || job.kind === 'train') continue
+      if (!job) continue
       count(coming, keyOf(job.output) ?? job.output, job.count - job.collected)
       for (const q of job.queue) count(coming, keyOf(q.output) ?? q.output, q.count)
     }
@@ -92,8 +91,9 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
   }
   const byGrade = (a: TargetNeed, b: TargetNeed) => a.grade - b.grade || a.name.localeCompare(b.name)
   const gear = [...gearNeed].map(([key, need]) => {
-    const [type, grade] = [key.replace(/-g\d+$/, '') as EquipType, Number(/-g(\d+)$/.exec(key)![1])]
-    return line(key, need, gearStock.get(key) ?? 0, gearId(type, grade, 'atk'), EQUIP_LABEL[type], grade)
+    const kind = key.replace(/-g\d+$/, ''), grade = Number(/-g(\d+)$/.exec(key)![1])
+    const type = typeOfKind(kind)
+    return line(key, need, gearStock.get(key) ?? 0, gearId(type, grade, 'atk'), isArmorKind(kind) ? ARMOR_LABEL[kind as ArmorKind] : EQUIP_LABEL[type], grade)
   }).sort(byGrade)
   const dishes = [...dishNeed].map(([id, need]) => line(id, need, world.dishes[id] ?? 0, id, dishById(id)!.name, dishById(id)!.grade)).sort(byGrade)
   // Refined items: what the pieces and dishes still short need. Tokens aren't farmed, so they're left out.

@@ -9,7 +9,7 @@ import type { BattleAlly, BattleEnemy, BattleInput, BattleState, BattleStep } fr
 // Invented outfits only; no private Uma or cast content. At Lv4 depth 1 is open, so every tree's depth-1 core is known.
 function profile(id: string, classId: RpgClass, weapons: RpgWeapon[], sides: string[] = [], level = 4): RpgProfile {
   const p: RpgProfile = { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.05, stamina: 0.05, power: 0.05, guts: 0.05, wit: 0.05 }, classId, weapons, tier: 1, level, exp: 0, tree: [], legacy: [] }
+    growthRates: { speed: 0.05, stamina: 0.05, power: 0.05, guts: 0.05, wit: 0.05 }, classId, weapons, tier: 1, level, exp: 0, tree: [], legacy: [], classRank: level }
   return sides.reduce(learnRpgNode, p)
 }
 function ally(p: RpgProfile, loadout: string[], mp?: number, orb?: RpgDamageKind): BattleAlly {
@@ -289,5 +289,42 @@ describe('battle engine v7: eight foes, dual elements, twice-acting elites, wave
     expect(s.engineVersion).toBe(6)
     expect(s.wave).toBeUndefined()
     expect('wave' in createBattle(input([foe('f1', 'ice')])).state).toBe(false)
+  })
+})
+
+describe('battle engine v8: Class Ranks, Might, Barrier and Regen (D102, D104)', () => {
+  const v8 = (allies: BattleAlly[], enemies: BattleEnemy[]): BattleInput => ({ version: 8, seed: 99, allies, enemies })
+  const ranked = (a: BattleAlly, extra: Partial<BattleAlly> = {}): BattleAlly => ({ ...a, classRank: a.level, ...extra })
+
+  it('adds a weapon\'s Might to the hits made with it, and only those', () => {
+    const plain = party().map((a) => ranked(a))
+    const strong = plain.map((a, i) => (i === 0 ? { ...a, might: { greatsword: 40 } } : a))
+    const hit = (allies: BattleAlly[], weapon: RpgWeapon) => {
+      const step = applyBattleAction(createBattle(v8(allies, [foe('f1', 'fire', ['greatsword', 'axe'], ['fire'], 9)])).state,
+        { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon })
+      return hits(step, 'f1').reduce((n, c) => n + (c.kind === 'hit' ? c.amount : 0), 0)
+    }
+    expect(hit(strong, 'greatsword')).toBeGreaterThan(hit(plain, 'greatsword'))
+    expect(hit(strong, 'axe')).toBe(hit(plain, 'axe'))
+  })
+
+  it('starts her with her armor\'s Barrier and heals her Regen at each round\'s end', () => {
+    const allies = party().map((a, i) => ranked(a, i === 0 ? { barrier: 30, regen: 7 } : {}))
+    const start = createBattle(v8(allies, [foe('f1', 'fire')])).state
+    expect(unitOf(start, 'a1').barrier).toBe(30)
+    const hurt = { ...start, units: start.units.map((u) => (u.id === 'a1' ? { ...u, hp: u.hp - 50 } : u)) }
+    let s: BattleState = hurt
+    allies.forEach((a, i) => { s = act(s, { kind: 'guard', actorId: a.id, targetId: allies[(i + 1) % allies.length]!.id }) })
+    expect(unitOf(s, 'a1').hp).toBeGreaterThan(unitOf(hurt, 'a1').hp - 50)
+    expect(s.round).toBe(2)
+  })
+
+  it('opens depths by Class Rank, not level: a Lv 50 Uma at Class Rank 9 has no depth-2 skill', () => {
+    const a = ranked(party()[0]!, { level: 50, classRank: 9, loadout: [skill('brawler-greatsword.2')] })
+    expect(() => createBattle(v8([a, ...party().slice(1).map((x) => ranked(x))], [foe('f1', 'fire')]))).toThrow(/Invalid battle ally/)
+    const ok = ranked(party()[0]!, { level: 1, classRank: 10, loadout: [skill('brawler-greatsword.2')] })
+    expect(() => createBattle(v8([ok, ...party().slice(1).map((x) => ranked(x))], [foe('f1', 'fire')]))).not.toThrow()
+    // v6 and v7 allies never carry the new fields.
+    expect(() => createBattle({ ...input([foe('f1', 'fire')]), allies: party().map((x) => ({ ...x, classRank: 4 })) })).toThrow(/Invalid battle ally/)
   })
 })

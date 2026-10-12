@@ -5,7 +5,7 @@ class's own weapons, learned skills and loadout. Classes and weapons are chosen 
 page ([sections](sections.md#stable)).
 
 Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots, hands, stat leans, learning rules),
-`catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks), `economy/training.ts`
+`catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks), `economy/ranks.ts`
 (ranks).
 
 ## The five classes
@@ -55,36 +55,38 @@ an Axe skill always reaches every foe, whoever swings it. A Cleric's skills with
 
 **Weapon slots (D98).** A class has five weapon slots, and the weapon in each slot opens its skill tree. Every Uma holds
 a **Training weapon** of all ten kinds: grade 0, no stats, always hers. A slot holds the Training weapon until she wears
-a crafted one of that kind, which opens the same tree and adds its stats. A crafted piece serves every class that holds
+a crafted one of that kind, which opens the same tree and adds its Might to the hits made with it (+4 a grade, D104). A
+crafted piece serves every class that holds
 its weapon. Spell Blade, Cleric and Summoner choose each slot's weapon within the slot's kind (Arms, Tome or any); a
 Brawler's and a Mage's slots are fixed to their five. A new Uma's slots hold her class's default spread, in Training
 weapons, so she starts with the depth-1 cores of those trees.
 
-**Orbs** are accessories, one per kind (`orb-<kind>`, ten in all). An Orb adds its kind to every hit for weaknesses only,
-with no damage of its own ([materials](materials.md#gear)).
+**Armor slots (D103)** mirror them: head, body, legs, arms and an accessory, each holding its physical or its magical
+kind, with a Training piece of each kind until she wears a crafted one ([materials](materials.md#gear)). The accessory
+slot holds an **Orb**, one per kind (`orb-<kind>`, ten in all): it adds its kind to every hit for weaknesses only, with
+no damage of its own.
 
 ## Skills: depths, points and slots
 
 - Each tree is **five depths**. Each depth has a **core** skill and two **side** skills, A and B, and you take one of the
   two (a fork).
 - **Cores are free**: a depth's core is known as soon as that depth opens.
-- **Sides cost points.** A side costs its depth. An Uma earns one side point per level and spends them across her
-  class's trees; she can forget a side to take the other.
-- **A depth opens** when both her **class rank** reaches the depth (trained in the Learning halls) and her level reaches
-  the gate. Side skills open at mid-band.
+- **Sides cost points.** A side costs its depth; she can forget a side to take the other.
+- **A depth opens** when her **Class Rank** in that class reaches its gate (D102). Her Uma Level no longer gates depths.
+- **Side points:** one per Class Rank, per class, spent across that class's trees.
 
 <!-- live:depths -->
 | Depth | Core skill opens | Side skills open | Side cost | Single-target power | Full-turn MP |
 |---|---|---|---|---|---|
-| 1 | Class rank 1 and Uma Lv 1 | Uma Lv 5 | 1 point | 1.6 | 10 |
-| 2 | Class rank 2 and Uma Lv 10 | Uma Lv 15 | 2 points | 2.2 | 14 |
-| 3 | Class rank 3 and Uma Lv 20 | Uma Lv 25 | 3 points | 2.9 | 18 |
-| 4 | Class rank 4 and Uma Lv 30 | Uma Lv 35 | 4 points | 3.7 | 22 |
-| 5 | Class rank 5 and Uma Lv 40 | Uma Lv 45 | 5 points | 4.6 | 26 |
+| 1 | Class Rank 1 | Class Rank 5 | 1 point | 1.6 | 10 |
+| 2 | Class Rank 10 | Class Rank 15 | 2 points | 2.2 | 14 |
+| 3 | Class Rank 20 | Class Rank 25 | 3 points | 2.9 | 18 |
+| 4 | Class Rank 30 | Class Rank 35 | 4 points | 3.7 | 22 |
+| 5 | Class Rank 40 | Class Rank 45 | 5 points | 4.6 | 26 |
 <!-- /live -->
 
 <!-- live:active-slots -->
-3 equipped skills at Lv 1, one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at most). 1 side point per level.
+3 equipped skills at Lv 1, one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at most). 1 side point per Class Rank, per class.
 <!-- /live -->
 
 A Brawler or Mage has 5 trees. The others have all 10, and the 5 weapons in her slots decide which are usable. Until
@@ -108,11 +110,14 @@ The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no 
 
 ## Ranks and levels
 
-| Track | Range | Trained at | What it does |
-|---|---|---|---|
-| Class rank | 1–5 | The class's hall (Learning page) | Opens skill depths. Each rank-up spends a Promotion Token of the band |
-| Weapon Level | 1–10 | The class's hall | Level k lets her wear grade-k weapons of that class. Each level-up spends a Mastery Token |
-| Armor Level | 1–10 | Armory | Level k wears grade-k armor. Each level-up spends a Mastery Token |
-| Accessory Level | 1–10 | Jeweler | Level k wears grade-k Rings, Charms and Orbs. Each level-up spends a Mastery Token |
+Four bars, all filled by winning fights (D102). Nothing is trained and no token is spent.
 
-Times, token bands and aptitude speed are in [loops](loops.md#training).
+| Bar | Range | Rises with | Opens |
+|---|---|---|---|
+| **Uma Level** | 1–50 | Every win | Her stats, skill slots (3 → 10) and Extra Stats slots |
+| **Class Rank**, per class | 1–50 | Wins as that class | That class's trees: cores at Rank 1, 10, 20, 30, 40, side skills at 5 … 45, a side point a rank. Her Limit Break's depth |
+| **Weapon Rank**, per weapon | 1–10 | Wins with that weapon in her slots | Wearing that weapon up to grade = rank, in every class |
+| **Armor Rank**, per armor kind | 1–10 | Wins wearing that kind | Wearing that kind up to grade = rank |
+
+Curves, EXP per win and Marks are in [loops](loops.md#ranks). A Lv 1 Uma can reach any rank: there are no caps between
+bars.

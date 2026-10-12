@@ -1,14 +1,19 @@
 // The live docs' generated blocks (docs/game/, D92): every list in the game manual is rendered here from the rules, so it
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
-import { BATTLE_LAURELS, CLASS_MAX_RANK, CLASS_RANK_HOURS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
-  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MASTERY_MAX_RANK, MASTERY_RANK_HOURS, MAX_JOB_COUNT, POINT_EVASION, POINT_LIMIT, POINT_SHARE,
+import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
+  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT,
   PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
 import { DISHES } from '../economy/dishes'
-import { ACCESSORY_TYPES, EQUIP_LABEL, gearById, gearId, gearPoints, recipeFamilies, type EquipType } from '../economy/gear'
+import {
+  accentPoints, BARRIER_PER_GRADE, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, hasAccent, isMagicalGear, isOrb, isWeapon, MIGHT_PER_GRADE, recipeFamilies,
+  REGEN_PER_GRADE, slotOf, type EquipType,
+} from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
-import { ARMOR_TYPES, CLASS_HALLS, GEAR_TYPE_LABEL, WEAPON_TYPES, weaponClasses } from '../economy/training'
-import { gradeBand, levelBand, masteryBand, PROMOTION_BANDS, TOKEN_BANDS, TOKEN_CLASS_NAME, TOKEN_DROPS, TOKEN_ODDS, tokenBuyPrice, TOKENS, tokenSellPrice } from '../economy/tokens'
+import {
+  ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
+  gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,
+} from '../economy/ranks'
 import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
 import { EFFECT_LABEL, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES, itemById } from '../items/catalog'
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
@@ -36,9 +41,9 @@ const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
 const x = (n: number) => `×${n}`
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-const CLASS_NAME: Readonly<Record<RpgClass, string>> = TOKEN_CLASS_NAME
-const weaponName = (w: RpgWeapon): string => GEAR_TYPE_LABEL[w]
-const itemName = (id: string) => itemById(id)?.name ?? TOKENS.find((t) => t.id === id)?.name ?? id
+const CLASS_NAME: Readonly<Record<RpgClass, string>> = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner' }
+const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]
+const itemName = (id: string) => itemById(id)?.name ?? id
 const inputs = (list: Record<string, number>) => Object.entries(list).map(([id, n]) => `${n > 1 ? `${n}× ` : ''}${itemName(id)}`).join(', ')
 
 /** Each kind's one shape in every class (D86). */
@@ -79,7 +84,7 @@ function weapons(): string {
   return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Cleric status', 'Classes'], RPG_WEAPONS.map((w) => {
     const kind = rpgWeaponKind(w)
     return [weaponName(w), `\`${w}\``, cap(kind), isRpgTome(w) ? 'Magical' : 'Physical', SHAPE[kind]!, statusName(RPG_CLERIC_STATUS[w]),
-      weaponClasses(w).map((c) => CLASS_NAME[c]).join(', ')]
+      RPG_CLASSES.filter((c) => rpgClassWeapons(c).includes(w)).map((c) => CLASS_NAME[c]).join(', ')]
   }))
 }
 const STATUS_NAME: Readonly<Record<string, string>> = {
@@ -90,7 +95,7 @@ const statusName = (key: string) => STATUS_NAME[key] ?? key
 
 function depths(): string {
   return table(['Depth', 'Core skill opens', 'Side skills open', 'Side cost', 'Single-target power', 'Full-turn MP'], [1, 2, 3, 4, 5].map((d) => [
-    d, `Class rank ${d} and Uma Lv ${RPG_DEPTH_GATES[d - 1]}`, `Uma Lv ${rpgSideNodeLevel(d)}`, `${d} point${d > 1 ? 's' : ''}`, RPG_SKILL_POWER[d - 1]!, RPG_SKILL_MP[d - 1]!,
+    d, `Class Rank ${RPG_DEPTH_GATES[d - 1]}`, `Class Rank ${rpgSideNodeLevel(d)}`, `${d} point${d > 1 ? 's' : ''}`, RPG_SKILL_POWER[d - 1]!, RPG_SKILL_MP[d - 1]!,
   ]))
 }
 
@@ -183,31 +188,26 @@ function dishes(): string {
     d.effects.map((e) => EFFECT_LABEL[e]).join(', '), inputs(d.inputs)]))
 }
 function gear(): string {
-  const types: EquipType[] = [...WEAPON_TYPES, ...ARMOR_TYPES, ...ACCESSORY_TYPES]
   const family = (id: string) => ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id
-  const slot = (t: EquipType) => (WEAPON_TYPES as readonly string[]).includes(t) ? 'Weapon' : (ARMOR_TYPES as readonly string[]).includes(t) ? 'Armor' : 'Accessory'
-  const points = (t: EquipType) => Object.entries(gearPoints(gearById(gearId(t, 10, 'hp'))!, 5)).filter(([, v]) => v > 0)
-    .map(([k, v]) => `${EFFECT_LABEL[k as keyof typeof EFFECT_LABEL]} ${Math.round(v * 100) / 100}`).join(', ')
-  return table(['Type', 'Id', 'Slot', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'Points at grade 10, HP accent'], types.map((t) => [
-    EQUIP_LABEL[t], `\`${t}\``, slot(t), recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3, 'atk'))!.inputs), points(t),
-  ])) + '\n\nA weapon\'s offense is split over the five weapons of her class (shown that way above).'
+  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon' : ARMOR_SLOT_LABEL[slotOf(t) as keyof typeof ARMOR_SLOT_LABEL])
+  const does = (t: EquipType) => isWeapon(t) ? `Might +${MIGHT_PER_GRADE * 10} on its hits` : isOrb(t) ? 'Its kind on every hit, for weaknesses'
+    : isMagicalGear(t) ? `M.DEF +10, Regen ${REGEN_PER_GRADE * 10}; accent +${accentPoints(10)}` : `DEF +10, Barrier ${BARRIER_PER_GRADE * 10}; accent +${accentPoints(10)}`
+  return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
+    EQUIP_LABEL[t], hasAccent(t) ? `\`${t}-g<grade>-<accent>\`` : `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
+    recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3, 'atk'))!.inputs), does(t),
+  ]))
 }
-function tokens(): string {
-  const rows: Cell[][] = Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((band) => {
-    const lv = [1, 11, 21, 31, 41][band - 1]!
-    const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter((g) => gradeBand(g) === band)
-    const from = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((l) => masteryBand(l) === band)
-    return [band, `Lv ${lv}–${lv + 9}`, `G${grades[0]}–${grades.at(-1)}`, band <= PROMOTION_BANDS ? `rank ${band} → ${band + 1}` : '—',
-      from.map((l) => `${l} → ${l + 1}`).join(', '), TOKENS.filter((t) => t.band === band).length]
-  })
-  return table(['Band', 'Dropped by stages at', 'Cooking grades', 'Promotion', 'Mastery', 'Token kinds'], rows) + '\n\n' +
-    table(['Kind', 'Id pattern', 'Per band', 'Odds per drop', 'Used for'], [
-      ['Promotion', '`token-class-<class>-<band>`', '5 (bands 1–4)', pct(TOKEN_ODDS.class), 'Class rank-ups'],
-      ['Mastery', '`token-mastery-<band>`', '1', pct(TOKEN_ODDS.mastery), 'Weapon, Armor and Accessory Level-ups: from Level L, band ⌈L/2⌉'],
-      ['Cooking', '`token-cook-<stat>-<band>`', String(ITEM_EFFECTS.length), pct(TOKEN_ODDS.cook), 'Every dish (each stat it feeds)'],
-    ]) + '\n\n' + table(['Stage kind', 'Tokens per first clear'], Object.entries(TOKEN_DROPS).map(([k, n]) => [cap(k), n])) +
-    `\n\nA stage in waves drops one more token per extra wave: ${TOKEN_DROPS.fight + 1} on stages 8 and 9, ${TOKEN_DROPS.boss + BOSS_WAVES - 1} from the boss.` +
-    `\n\nReplays and Sweeps roll each token at ${pct(REPLAY_SHARE)} of its odds. Exchange: sell for ${tokenSellPrice('token-mastery-1')} Laurels a band, buy for ${tokenBuyPrice('token-mastery-1')} a band.`
+
+function ranks(): string {
+  const gearRows: Cell[][] = [1, 2, 3, 5, 7, 9].map((r) => [r, gearExpToNext(r).toLocaleString('en-US'), `Lv ${5 * (r + 1) - 4}`])
+  const classRows: Cell[][] = [1, 10, 20, 30, 40, 49].map((r) => [r, classExpToNext(r).toLocaleString('en-US')])
+  return table(['Bar', 'Ranks', 'Per win worth E Uma EXP', 'Opens'], [
+    ['Class Rank, per class', `1–${CLASS_MAX_RANK}`, `${CLASS_EXP_SHARE}E to the class she fought as`, 'Its trees: cores at 1, 10, 20, 30, 40; side skills at 5 … 45; a side point a rank'],
+    ['Weapon Rank, per weapon', `1–${GEAR_MAX_RANK}`, `${WEAPON_EXP_SHARE}E over her five weapons, double for each she used`, 'Wears that weapon up to its rank\'s grade'],
+    ['Armor Rank, per armor kind', `1–${GEAR_MAX_RANK}`, `${ARMOR_EXP_SHARE}E to each of her five armor kinds`, 'Wears that kind up to its rank\'s grade'],
+  ]) + '\n\n' + table(['Class Rank', 'EXP to next'], classRows) + '\n\n' + table(['Weapon or Armor Rank', 'EXP to next', 'Next rank, used every fight, by'], gearRows) +
+    `\n\nPast a max rank, EXP banks at ${pct(MARKS_SHARE)} as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks and gives ${MANUAL_EXP.toLocaleString('en-US')} EXP to one bar of one Uma. ` +
+    `Armor kinds by slot: ${ARMOR_SLOTS.map((s) => `${ARMOR_SLOT_LABEL[s]} ${ARMOR_SLOT_KINDS[s].map((k) => ARMOR_LABEL[k]).join(' or ')}`).join('; ')}. ${ARMOR_KINDS.length} kinds in all.`
 }
 
 // --- Economy -------------------------------------------------------------------------------------------------------
@@ -222,26 +222,24 @@ function levels(): string {
   const rows: Cell[][] = []
   for (let lv = 1; lv < RPG_TIER_MAX_LEVEL; lv += 7) rows.push([lv, rpgExpToNext(lv), professionExpToNext(lv)])
   return table(['Level', 'Uma EXP to next', 'Profession EXP to next'], rows) +
-    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × the EXP to next level at the foes' level, ±${pct(RPG_LEVEL_EXP_STEP)} per level of gap (from ${pct(RPG_LEVEL_EXP_MIN)} to ${pct(RPG_LEVEL_EXP_MAX)}). Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Profession EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
+    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × her own EXP to next level, −${pct(RPG_LEVEL_EXP_STEP)} per level she's above the foes (down to ${pct(RPG_LEVEL_EXP_MIN)}), never more than ${pct(RPG_LEVEL_EXP_MAX)}. Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Profession EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
 }
 function prices(): string {
   return table(['Thing', 'Price (Laurels)'], [
     ...[1, 4, 7, 10].map((g) => [`Raw item, grade ${g}`, rawItemPrice(g)] as Cell[]),
     ['Time Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE],
-    ...[1, 3, 5].map((b) => [`Token, band ${b} (sell / buy)`, `${tokenSellPrice(`token-mastery-${b}`)} / ${tokenBuyPrice(`token-mastery-${b}`)}`] as Cell[]),
-  ]) + `\n\nA Time Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job or training.`
+  ]) + `\n\nA Time Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks, not Laurels.`
 }
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather or refine one item', 'grade g: 30 + 30 × g minutes (G1 1 h, G10 5 h 30)'],
+    ['Gather one item', `grade g: 30 + 30 × g minutes (G1 ${itemMinutes(1)} min, G10 ${itemMinutes(10)} min)`],
+    ['Refine one item', `a quarter of that (G1 ${refineMinutes(1)} min, G10 ${refineMinutes(10)} min)`],
     ['Cook or craft one', 'twice that: 60 + 60 × g minutes'],
     ['Outputs per job', `up to ${MAX_JOB_COUNT}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
     ['Facility levels', `1–3: ${FACILITY_SLOTS.join(', ')} Uma slots; speed ${FACILITY_SPEED.map(x).join(', ')}`],
     ['Upgrade to Lv 2 / 3', FACILITY_UPGRADE.map((u) => `${u.laurels} Laurels + ${u.count}× grade-${u.grade} refined of each of its two families`).join(' / ')],
-    ['Class rank', `${CLASS_RANK_HOURS} h of training per rank, ranks 1–${CLASS_MAX_RANK}`],
-    ['Weapon, Armor and Accessory Levels', `${MASTERY_RANK_HOURS} h per level, 1–${MASTERY_MAX_RANK}`],
-    ['Extra Stats', `${pct(POINT_SHARE)} to its stat per point; Speed ${pct(POINT_EVASION)} evasion; Limit +${POINT_LIMIT} starting charge`],
+    ['Extra Stats and armor points', `+1 to its stat per point (+${POINT_HP} HP); Speed ${pct(POINT_EVASION)} evasion; Limit +${POINT_LIMIT} starting charge`],
   ])
 }
 
@@ -259,8 +257,7 @@ function facilities(): string {
   const family = (id: string | null) => (id ? ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id : '—')
   return table(['Place', 'Job', 'Profession', 'Makes', 'Upgraded with'], FACILITIES.map((f) => [
     placeById(f.id)?.name ?? f.id, cap(f.kind), f.profession ? cap(f.profession) : '—',
-    f.kind === 'gather' ? family(f.family) : f.kind === 'train' ? (CLASS_HALLS[f.id] ? `${CLASS_NAME[CLASS_HALLS[f.id]!.classId]} rank and Weapon Level` : f.id === 'armory' ? 'Armor Level' : 'Accessory Level')
-      : f.kind === 'refine' ? (f.profession === 'farming' ? 'Farming refined items' : 'Gathering refined items') : f.kind === 'cook' ? 'Dishes' : 'Gear',
+    f.kind === 'gather' ? family(f.family) : f.kind === 'refine' ? (f.profession === 'farming' ? 'Farming refined items' : 'Gathering refined items') : f.kind === 'cook' ? 'Dishes' : 'Gear',
     f.upgradeFamilies.map(family).join(' + '),
   ]))
 }
@@ -335,9 +332,9 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
     classes, weapons, depths, 'skill-trees': skillTrees, limits, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
-    families, items, dishes, gear, tokens, laurels, levels, prices, jobs, places, facilities, biomes, formations, continents,
+    families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, formations, continents,
     'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
-    'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per level.`,
+    'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }
   return blocks[key]?.() ?? null
 }

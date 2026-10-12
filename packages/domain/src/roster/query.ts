@@ -97,7 +97,7 @@ function compare(a: RosterEntry, b: RosterEntry, key: RosterSortKey): number {
     case 'craft':
       return (a.owned?.professions.gathering.level ?? 0) - (b.owned?.professions.gathering.level ?? 0)
     case 'classRank': {
-      const top = (e: RosterEntry) => (e.owned ? Math.max(...Object.values(e.owned.ranks.classes)) : 0)
+      const top = (e: RosterEntry) => (e.owned ? Math.max(1, ...Object.values(e.owned.ranks.classes).map((t) => t.rank)) : 0)
       return top(a) - top(b)
     }
   }

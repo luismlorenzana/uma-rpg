@@ -4,22 +4,12 @@
 import dishesUrl from '@luismlorenzana/uma-art/dishes/atlas.png?url'
 import gearUrl from '@luismlorenzana/uma-art/gear/atlas.png?url'
 import itemsUrl from '@luismlorenzana/uma-art/items/atlas.png?url'
-import { tokenById } from '@rpg/domain'
 import { KindMark } from '../battle/labels'
 import { ACCENT_COLOR, ATLAS_CELL, iconFrame, SHEET_SIZE, type Sheet } from './frames'
-import { TokenBadge } from './TokenBadge'
 
 const URL: Readonly<Record<Sheet, string>> = { items: itemsUrl, dishes: dishesUrl, gear: gearUrl }
 
-export function ItemIcon({ id, size = 32, className = '', label }: { id: string; size?: number; className?: string; label?: string }) {
-  const token = tokenById(id)
-  if (token) {
-    return (
-      <span role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true} className={`inline-block shrink-0 ${className}`} style={{ width: size, height: size }}>
-        <TokenBadge token={token} size={size} />
-      </span>
-    )
-  }
+export function ItemIcon({ id, size = 32, className = '', label, plain = false }: { id: string; size?: number; className?: string; label?: string; plain?: boolean }) {
   const frame = iconFrame(id)
   const scale = size / ATLAS_CELL
   const sheet = frame ? SHEET_SIZE[frame.sheet] : null
@@ -39,7 +29,7 @@ export function ItemIcon({ id, size = 32, className = '', label }: { id: string;
           <KindMark kind={frame.kind} size={Math.max(8, Math.round(9 * scale))} />
         </span>
       )}
-      {frame?.accent && (
+      {frame?.accent && !plain && (
         <span className="absolute rounded-full ring-1 ring-black/70"
           style={{ right: 1.5 * scale, bottom: 1.5 * scale, width: 6 * scale, height: 6 * scale, background: ACCENT_COLOR[frame.accent] }} />
       )}

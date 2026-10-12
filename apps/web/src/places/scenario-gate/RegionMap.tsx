@@ -73,7 +73,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
   const doSweep = async (nodeId: string, times = 1) => {
     setError(null)
     try {
-      const result = await sweep(region, nodeId, times)
+      const result = await sweep(region, nodeId, campaign.outfits, times)
       setOpen(null)
       setSweepFor(null)
       setSwept({ result, nodeId })
@@ -188,7 +188,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
         </BottomSheet>
       )}
       {swept && <FightResult campaign={campaign} chapter={region} result={swept.result} onMap={() => setSwept(null)} againLabel={`Sweep again · ${world.wallet.sweepTickets}`}
-        onAgain={() => { if (!sweepBlock(world, region, swept.nodeId)) void sweep(region, swept.nodeId).then((result) => setSwept({ result, nodeId: swept.nodeId })) }} />}
+        onAgain={() => { if (!sweepBlock(world, region, swept.nodeId)) void sweep(region, swept.nodeId, campaign.outfits).then((result) => setSwept({ result, nodeId: swept.nodeId })) }} />}
     </div>
   )
 }

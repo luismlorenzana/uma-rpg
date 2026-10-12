@@ -1,7 +1,7 @@
-# Materials, dishes, gear and tokens
+# Materials, dishes and gear
 
-Everything an Uma gathers, refines, cooks or crafts, and the tokens fights drop. Lists are generated from
-`packages/domain/src/items/` and `economy/` (`dishes.ts`, `gear.ts`, `tokens.ts`). How the jobs work is in
+Everything an Uma gathers, refines, cooks or crafts. Lists are generated from `packages/domain/src/items/` and
+`economy/` (`dishes.ts`, `gear.ts`). There are no tokens (D105). How the jobs work is in
 [loops](loops.md#professions).
 
 ## Families
@@ -283,7 +283,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ## Dishes
 
-Cooked at the Kitchen from refined farming items plus Cooking Tokens. Eating a dish unlocks nodes on the Uma's
+Cooked at the Kitchen from refined farming items only (no token since D105). Eating a dish unlocks nodes on the Uma's
 Observatory map, her Extra Stats ([loops](loops.md#extra-stats-and-gear)).
 
 | Kind | What it is |
@@ -297,195 +297,162 @@ From grade 4 on, dishes add side ingredients from other families, so every famil
 <!-- live:dishes -->
 | Dish | Id | Kind | Grade | Feeds | Ingredients |
 |---|---|---|---|---|---|
-| Wheat Bread | `dish-grains-1` | Planet | 1 | HP | Wheat Flour, HP Cooking Token (G1–2) |
-| Oats Bread | `dish-grains-2` | Planet | 2 | HP | Rolled Oats, HP Cooking Token (G1–2) |
-| Barley Bread | `dish-grains-3` | Planet | 3 | HP | Pearl Barley, HP Cooking Token (G3–4) |
-| Rice Bread | `dish-grains-4` | Planet | 4 | HP | Polished Rice, HP Cooking Token (G3–4), Pear Preserve |
-| Corn Bread | `dish-grains-5` | Planet | 5 | HP | Cornmeal, HP Cooking Token (G5–6), Peach Preserve |
-| Rye Bread | `dish-grains-6` | Planet | 6 | HP | Rye Flour, HP Cooking Token (G5–6), Peach Preserve |
-| Buckwheat Bread | `dish-grains-7` | Planet | 7 | HP | Buckwheat Flour, HP Cooking Token (G7–8), Plum Preserve |
-| Wild Rice Bread | `dish-grains-8` | Planet | 8 | HP | Hulled Wild Rice, HP Cooking Token (G7–8), Plum Preserve, Dried Thyme |
-| Moonrice Bread | `dish-grains-9` | Planet | 9 | HP | Moonrice Flour, HP Cooking Token (G9–10), Orange Marmalade, Ground Ginger |
-| Sunwheat Bread | `dish-grains-10` | Planet | 10 | HP | Sunwheat Flour, HP Cooking Token (G9–10), Orange Marmalade, Ground Ginger |
-| Apple Tart | `dish-fruits-1` | Planet | 1 | MP | Apple Preserve, MP Cooking Token (G1–2) |
-| Pear Tart | `dish-fruits-2` | Planet | 2 | MP | Pear Preserve, MP Cooking Token (G1–2) |
-| Peach Tart | `dish-fruits-3` | Planet | 3 | MP | Peach Preserve, MP Cooking Token (G3–4) |
-| Plum Tart | `dish-fruits-4` | Planet | 4 | MP | Plum Preserve, MP Cooking Token (G3–4), Trout Fillet |
-| Orange Tart | `dish-fruits-5` | Planet | 5 | MP | Orange Marmalade, MP Cooking Token (G5–6), Sardine Fillet |
-| Grape Tart | `dish-fruits-6` | Planet | 6 | MP | Grape Jelly, MP Cooking Token (G5–6), Sardine Fillet |
-| Mango Tart | `dish-fruits-7` | Planet | 7 | MP | Mango Pulp, MP Cooking Token (G7–8), Mackerel Fillet |
-| Pomegranate Tart | `dish-fruits-8` | Planet | 8 | MP | Pomegranate Molasses, MP Cooking Token (G7–8), Mackerel Fillet, Diced Onion |
-| Starpeach Tart | `dish-fruits-9` | Planet | 9 | MP | Starpeach Nectar, MP Cooking Token (G9–10), Salmon Fillet, Tomato Purée |
-| Golden Apple Tart | `dish-fruits-10` | Planet | 10 | MP | Golden Apple Preserve, MP Cooking Token (G9–10), Salmon Fillet, Tomato Purée |
-| Carp Grill | `dish-fish-1` | Planet | 1 | ATK | Carp Fillet, ATK Cooking Token (G1–2) |
-| Trout Grill | `dish-fish-2` | Planet | 2 | ATK | Trout Fillet, ATK Cooking Token (G1–2) |
-| Sardine Grill | `dish-fish-3` | Planet | 3 | ATK | Sardine Fillet, ATK Cooking Token (G3–4) |
-| Mackerel Grill | `dish-fish-4` | Planet | 4 | ATK | Mackerel Fillet, ATK Cooking Token (G3–4), Dried Mint |
-| Salmon Grill | `dish-fish-5` | Planet | 5 | ATK | Salmon Fillet, ATK Cooking Token (G5–6), Dried Rosemary |
-| Sea Bream Grill | `dish-fish-6` | Planet | 6 | ATK | Sea Bream Fillet, ATK Cooking Token (G5–6), Dried Rosemary |
-| Eel Grill | `dish-fish-7` | Planet | 7 | ATK | Eel Fillet, ATK Cooking Token (G7–8), Dried Thyme |
-| Tuna Grill | `dish-fish-8` | Planet | 8 | ATK | Tuna Fillet, ATK Cooking Token (G7–8), Dried Thyme, Dried Enoki |
-| Silverfin Grill | `dish-fish-9` | Planet | 9 | ATK | Silverfin Fillet, ATK Cooking Token (G9–10), Ground Ginger, Dried Chanterelle |
-| Rainbow Koi Grill | `dish-fish-10` | Planet | 10 | ATK | Rainbow Koi Fillet, ATK Cooking Token (G9–10), Ground Ginger, Dried Chanterelle |
-| Basil Curry | `dish-herbs-spices-1` | Planet | 1 | M.ATK | Dried Basil, M.ATK Cooking Token (G1–2) |
-| Mint Curry | `dish-herbs-spices-2` | Planet | 2 | M.ATK | Dried Mint, M.ATK Cooking Token (G1–2) |
-| Rosemary Curry | `dish-herbs-spices-3` | Planet | 3 | M.ATK | Dried Rosemary, M.ATK Cooking Token (G3–4) |
-| Thyme Curry | `dish-herbs-spices-4` | Planet | 4 | M.ATK | Dried Thyme, M.ATK Cooking Token (G3–4), Diced Potato |
-| Ginger Curry | `dish-herbs-spices-5` | Planet | 5 | M.ATK | Ground Ginger, M.ATK Cooking Token (G5–6), Shredded Cabbage |
-| Peppercorn Curry | `dish-herbs-spices-6` | Planet | 6 | M.ATK | Ground Pepper, M.ATK Cooking Token (G5–6), Shredded Cabbage |
-| Cinnamon Curry | `dish-herbs-spices-7` | Planet | 7 | M.ATK | Ground Cinnamon, M.ATK Cooking Token (G7–8), Diced Onion |
-| Saffron Curry | `dish-herbs-spices-8` | Planet | 8 | M.ATK | Saffron Threads, M.ATK Cooking Token (G7–8), Diced Onion, Maple Syrup |
-| Mandrake Curry | `dish-herbs-spices-9` | Planet | 9 | M.ATK | Mandrake Powder, M.ATK Cooking Token (G9–10), Tomato Purée, Chocolate |
-| Phoenix Pepper Curry | `dish-herbs-spices-10` | Planet | 10 | M.ATK | Phoenix Spice, M.ATK Cooking Token (G9–10), Tomato Purée, Chocolate |
-| Carrot Salad | `dish-vegetables-1` | Planet | 1 | DEF | Chopped Carrot, DEF Cooking Token (G1–2) |
-| Potato Salad | `dish-vegetables-2` | Planet | 2 | DEF | Diced Potato, DEF Cooking Token (G1–2) |
-| Cabbage Salad | `dish-vegetables-3` | Planet | 3 | DEF | Shredded Cabbage, DEF Cooking Token (G3–4) |
-| Onion Salad | `dish-vegetables-4` | Planet | 4 | DEF | Diced Onion, DEF Cooking Token (G3–4), Dried Shiitake |
-| Tomato Salad | `dish-vegetables-5` | Planet | 5 | DEF | Tomato Purée, DEF Cooking Token (G5–6), Dried Oyster Mushroom |
-| Bell Pepper Salad | `dish-vegetables-6` | Planet | 6 | DEF | Sliced Bell Pepper, DEF Cooking Token (G5–6), Dried Oyster Mushroom |
-| Eggplant Salad | `dish-vegetables-7` | Planet | 7 | DEF | Sliced Eggplant, DEF Cooking Token (G7–8), Dried Enoki |
-| Asparagus Salad | `dish-vegetables-8` | Planet | 8 | DEF | Trimmed Asparagus, DEF Cooking Token (G7–8), Dried Enoki, Walnut Paste |
-| Golden Carrot Salad | `dish-vegetables-9` | Planet | 9 | DEF | Golden Carrot Purée, DEF Cooking Token (G9–10), Dried Chanterelle, Chestnut Paste |
-| Emperor Pumpkin Salad | `dish-vegetables-10` | Planet | 10 | DEF | Pumpkin Purée, DEF Cooking Token (G9–10), Dried Chanterelle, Chestnut Paste |
-| Button Mushroom Soup | `dish-mushrooms-1` | Planet | 1 | M.DEF | Dried Button Mushroom, M.DEF Cooking Token (G1–2) |
-| Shiitake Soup | `dish-mushrooms-2` | Planet | 2 | M.DEF | Dried Shiitake, M.DEF Cooking Token (G1–2) |
-| Oyster Mushroom Soup | `dish-mushrooms-3` | Planet | 3 | M.DEF | Dried Oyster Mushroom, M.DEF Cooking Token (G3–4) |
-| Enoki Soup | `dish-mushrooms-4` | Planet | 4 | M.DEF | Dried Enoki, M.DEF Cooking Token (G3–4), Cane Sugar |
-| Chanterelle Soup | `dish-mushrooms-5` | Planet | 5 | M.DEF | Dried Chanterelle, M.DEF Cooking Token (G5–6), Beet Sugar |
-| Porcini Soup | `dish-mushrooms-6` | Planet | 6 | M.DEF | Dried Porcini, M.DEF Cooking Token (G5–6), Beet Sugar |
-| Morel Soup | `dish-mushrooms-7` | Planet | 7 | M.DEF | Dried Morel, M.DEF Cooking Token (G7–8), Maple Syrup |
-| Truffle Soup | `dish-mushrooms-8` | Planet | 8 | M.DEF | Shaved Truffle, M.DEF Cooking Token (G7–8), Maple Syrup, Polished Rice |
-| Glowcap Soup | `dish-mushrooms-9` | Planet | 9 | M.DEF | Glowcap Powder, M.DEF Cooking Token (G9–10), Chocolate, Cornmeal |
-| King Reishi Soup | `dish-mushrooms-10` | Planet | 10 | M.DEF | Reishi Powder, M.DEF Cooking Token (G9–10), Chocolate, Cornmeal |
-| Honeycomb Cake | `dish-sweets-1` | Planet | 1 | Speed | Honey, Speed Cooking Token (G1–2) |
-| Sugarcane Cake | `dish-sweets-2` | Planet | 2 | Speed | Cane Sugar, Speed Cooking Token (G1–2) |
-| Sugar Beet Cake | `dish-sweets-3` | Planet | 3 | Speed | Beet Sugar, Speed Cooking Token (G3–4) |
-| Maple Sap Cake | `dish-sweets-4` | Planet | 4 | Speed | Maple Syrup, Speed Cooking Token (G3–4), Sunflower Oil |
-| Cacao Pod Cake | `dish-sweets-5` | Planet | 5 | Speed | Chocolate, Speed Cooking Token (G5–6), Sesame Paste |
-| Vanilla Pod Cake | `dish-sweets-6` | Planet | 6 | Speed | Vanilla Extract, Speed Cooking Token (G5–6), Sesame Paste |
-| Agave Heart Cake | `dish-sweets-7` | Planet | 7 | Speed | Agave Syrup, Speed Cooking Token (G7–8), Walnut Paste |
-| Palm Sap Cake | `dish-sweets-8` | Planet | 8 | Speed | Palm Sugar, Speed Cooking Token (G7–8), Walnut Paste, Plum Preserve |
-| Fairy Honeycomb Cake | `dish-sweets-9` | Planet | 9 | Speed | Fairy Honey, Speed Cooking Token (G9–10), Chestnut Paste, Orange Marmalade |
-| Ambrosia Blossom Cake | `dish-sweets-10` | Planet | 10 | Speed | Ambrosia, Speed Cooking Token (G9–10), Chestnut Paste, Orange Marmalade |
-| Peanut Cookies | `dish-nuts-seeds-1` | Planet | 1 | Limit Break charge | Peanut Butter, Limit Cooking Token (G1–2) |
-| Sunflower Seed Cookies | `dish-nuts-seeds-2` | Planet | 2 | Limit Break charge | Sunflower Oil, Limit Cooking Token (G1–2) |
-| Sesame Cookies | `dish-nuts-seeds-3` | Planet | 3 | Limit Break charge | Sesame Paste, Limit Cooking Token (G3–4) |
-| Walnut Cookies | `dish-nuts-seeds-4` | Planet | 4 | Limit Break charge | Walnut Paste, Limit Cooking Token (G3–4), Rolled Oats |
-| Chestnut Cookies | `dish-nuts-seeds-5` | Planet | 5 | Limit Break charge | Chestnut Paste, Limit Cooking Token (G5–6), Pearl Barley |
-| Almond Cookies | `dish-nuts-seeds-6` | Planet | 6 | Limit Break charge | Almond Paste, Limit Cooking Token (G5–6), Pearl Barley |
-| Pistachio Cookies | `dish-nuts-seeds-7` | Planet | 7 | Limit Break charge | Pistachio Paste, Limit Cooking Token (G7–8), Polished Rice |
-| Macadamia Cookies | `dish-nuts-seeds-8` | Planet | 8 | Limit Break charge | Macadamia Butter, Limit Cooking Token (G7–8), Polished Rice, Mackerel Fillet |
-| Thundernut Cookies | `dish-nuts-seeds-9` | Planet | 9 | Limit Break charge | Thundernut Oil, Limit Cooking Token (G9–10), Cornmeal, Salmon Fillet |
-| Worldseed Cookies | `dish-nuts-seeds-10` | Planet | 10 | Limit Break charge | Worldseed Oil, Limit Cooking Token (G9–10), Cornmeal, Salmon Fillet |
-| Grain & Garden Platter | `duo-hp-def-3` | Duo | 3 | HP, DEF | Pearl Barley, Shredded Cabbage, HP Cooking Token (G3–4), DEF Cooking Token (G3–4) |
-| Grain & Garden Platter Deluxe | `duo-hp-def-7` | Duo | 7 | HP, DEF | Buckwheat Flour, Sliced Eggplant, HP Cooking Token (G7–8), DEF Cooking Token (G7–8), Plum Preserve |
-| Garden & Mushroom Platter | `duo-def-mdef-3` | Duo | 3 | DEF, M.DEF | Shredded Cabbage, Dried Oyster Mushroom, DEF Cooking Token (G3–4), M.DEF Cooking Token (G3–4) |
-| Garden & Mushroom Platter Deluxe | `duo-def-mdef-7` | Duo | 7 | DEF, M.DEF | Sliced Eggplant, Dried Morel, DEF Cooking Token (G7–8), M.DEF Cooking Token (G7–8), Dried Enoki |
-| Mushroom & Fruit Platter | `duo-mdef-mp-3` | Duo | 3 | M.DEF, MP | Dried Oyster Mushroom, Peach Preserve, M.DEF Cooking Token (G3–4), MP Cooking Token (G3–4) |
-| Mushroom & Fruit Platter Deluxe | `duo-mdef-mp-7` | Duo | 7 | M.DEF, MP | Dried Morel, Mango Pulp, M.DEF Cooking Token (G7–8), MP Cooking Token (G7–8), Maple Syrup |
-| Fruit & Herb Platter | `duo-mp-matk-3` | Duo | 3 | MP, M.ATK | Peach Preserve, Dried Rosemary, MP Cooking Token (G3–4), M.ATK Cooking Token (G3–4) |
-| Fruit & Herb Platter Deluxe | `duo-mp-matk-7` | Duo | 7 | MP, M.ATK | Mango Pulp, Ground Cinnamon, MP Cooking Token (G7–8), M.ATK Cooking Token (G7–8), Mackerel Fillet |
-| Herb & Fish Platter | `duo-matk-atk-3` | Duo | 3 | M.ATK, ATK | Dried Rosemary, Sardine Fillet, M.ATK Cooking Token (G3–4), ATK Cooking Token (G3–4) |
-| Herb & Fish Platter Deluxe | `duo-matk-atk-7` | Duo | 7 | M.ATK, ATK | Ground Cinnamon, Eel Fillet, M.ATK Cooking Token (G7–8), ATK Cooking Token (G7–8), Diced Onion |
-| Fish & Honey Platter | `duo-atk-speed-3` | Duo | 3 | ATK, Speed | Sardine Fillet, Beet Sugar, ATK Cooking Token (G3–4), Speed Cooking Token (G3–4) |
-| Fish & Honey Platter Deluxe | `duo-atk-speed-7` | Duo | 7 | ATK, Speed | Eel Fillet, Agave Syrup, ATK Cooking Token (G7–8), Speed Cooking Token (G7–8), Dried Thyme |
-| Honey & Nut Platter | `duo-speed-limit-3` | Duo | 3 | Speed, Limit Break charge | Beet Sugar, Sesame Paste, Speed Cooking Token (G3–4), Limit Cooking Token (G3–4) |
-| Honey & Nut Platter Deluxe | `duo-speed-limit-7` | Duo | 7 | Speed, Limit Break charge | Agave Syrup, Pistachio Paste, Speed Cooking Token (G7–8), Limit Cooking Token (G7–8), Walnut Paste |
-| Nut & Grain Platter | `duo-limit-hp-3` | Duo | 3 | Limit Break charge, HP | Sesame Paste, Pearl Barley, Limit Cooking Token (G3–4), HP Cooking Token (G3–4) |
-| Nut & Grain Platter Deluxe | `duo-limit-hp-7` | Duo | 7 | Limit Break charge, HP | Pistachio Paste, Buckwheat Flour, Limit Cooking Token (G7–8), HP Cooking Token (G7–8), Polished Rice |
-| Spring Feast | `feast-4` | Feast | 4 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Polished Rice, Plum Preserve, Mackerel Fillet, Dried Thyme, Diced Onion, Dried Enoki, Maple Syrup, Walnut Paste, HP Cooking Token (G3–4), MP Cooking Token (G3–4), ATK Cooking Token (G3–4), M.ATK Cooking Token (G3–4), DEF Cooking Token (G3–4), M.DEF Cooking Token (G3–4), Speed Cooking Token (G3–4), Limit Cooking Token (G3–4) |
-| Summer Feast | `feast-6` | Feast | 6 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Rye Flour, Grape Jelly, Sea Bream Fillet, Ground Pepper, Sliced Bell Pepper, Dried Porcini, Vanilla Extract, Almond Paste, HP Cooking Token (G5–6), MP Cooking Token (G5–6), ATK Cooking Token (G5–6), M.ATK Cooking Token (G5–6), DEF Cooking Token (G5–6), M.DEF Cooking Token (G5–6), Speed Cooking Token (G5–6), Limit Cooking Token (G5–6) |
-| Harvest Feast | `feast-8` | Feast | 8 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Hulled Wild Rice, Pomegranate Molasses, Tuna Fillet, Saffron Threads, Trimmed Asparagus, Shaved Truffle, Palm Sugar, Macadamia Butter, HP Cooking Token (G7–8), MP Cooking Token (G7–8), ATK Cooking Token (G7–8), M.ATK Cooking Token (G7–8), DEF Cooking Token (G7–8), M.DEF Cooking Token (G7–8), Speed Cooking Token (G7–8), Limit Cooking Token (G7–8) |
-| Grand Feast | `feast-10` | Feast | 10 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Sunwheat Flour, Golden Apple Preserve, Rainbow Koi Fillet, Phoenix Spice, Pumpkin Purée, Reishi Powder, Ambrosia, Worldseed Oil, HP Cooking Token (G9–10), MP Cooking Token (G9–10), ATK Cooking Token (G9–10), M.ATK Cooking Token (G9–10), DEF Cooking Token (G9–10), M.DEF Cooking Token (G9–10), Speed Cooking Token (G9–10), Limit Cooking Token (G9–10) |
+| Wheat Bread | `dish-grains-1` | Planet | 1 | HP | Wheat Flour |
+| Oats Bread | `dish-grains-2` | Planet | 2 | HP | Rolled Oats |
+| Barley Bread | `dish-grains-3` | Planet | 3 | HP | Pearl Barley |
+| Rice Bread | `dish-grains-4` | Planet | 4 | HP | Polished Rice, Pear Preserve |
+| Corn Bread | `dish-grains-5` | Planet | 5 | HP | Cornmeal, Peach Preserve |
+| Rye Bread | `dish-grains-6` | Planet | 6 | HP | Rye Flour, Peach Preserve |
+| Buckwheat Bread | `dish-grains-7` | Planet | 7 | HP | Buckwheat Flour, Plum Preserve |
+| Wild Rice Bread | `dish-grains-8` | Planet | 8 | HP | Hulled Wild Rice, Plum Preserve, Dried Thyme |
+| Moonrice Bread | `dish-grains-9` | Planet | 9 | HP | Moonrice Flour, Orange Marmalade, Ground Ginger |
+| Sunwheat Bread | `dish-grains-10` | Planet | 10 | HP | Sunwheat Flour, Orange Marmalade, Ground Ginger |
+| Apple Tart | `dish-fruits-1` | Planet | 1 | MP | Apple Preserve |
+| Pear Tart | `dish-fruits-2` | Planet | 2 | MP | Pear Preserve |
+| Peach Tart | `dish-fruits-3` | Planet | 3 | MP | Peach Preserve |
+| Plum Tart | `dish-fruits-4` | Planet | 4 | MP | Plum Preserve, Trout Fillet |
+| Orange Tart | `dish-fruits-5` | Planet | 5 | MP | Orange Marmalade, Sardine Fillet |
+| Grape Tart | `dish-fruits-6` | Planet | 6 | MP | Grape Jelly, Sardine Fillet |
+| Mango Tart | `dish-fruits-7` | Planet | 7 | MP | Mango Pulp, Mackerel Fillet |
+| Pomegranate Tart | `dish-fruits-8` | Planet | 8 | MP | Pomegranate Molasses, Mackerel Fillet, Diced Onion |
+| Starpeach Tart | `dish-fruits-9` | Planet | 9 | MP | Starpeach Nectar, Salmon Fillet, Tomato Purée |
+| Golden Apple Tart | `dish-fruits-10` | Planet | 10 | MP | Golden Apple Preserve, Salmon Fillet, Tomato Purée |
+| Carp Grill | `dish-fish-1` | Planet | 1 | ATK | Carp Fillet |
+| Trout Grill | `dish-fish-2` | Planet | 2 | ATK | Trout Fillet |
+| Sardine Grill | `dish-fish-3` | Planet | 3 | ATK | Sardine Fillet |
+| Mackerel Grill | `dish-fish-4` | Planet | 4 | ATK | Mackerel Fillet, Dried Mint |
+| Salmon Grill | `dish-fish-5` | Planet | 5 | ATK | Salmon Fillet, Dried Rosemary |
+| Sea Bream Grill | `dish-fish-6` | Planet | 6 | ATK | Sea Bream Fillet, Dried Rosemary |
+| Eel Grill | `dish-fish-7` | Planet | 7 | ATK | Eel Fillet, Dried Thyme |
+| Tuna Grill | `dish-fish-8` | Planet | 8 | ATK | Tuna Fillet, Dried Thyme, Dried Enoki |
+| Silverfin Grill | `dish-fish-9` | Planet | 9 | ATK | Silverfin Fillet, Ground Ginger, Dried Chanterelle |
+| Rainbow Koi Grill | `dish-fish-10` | Planet | 10 | ATK | Rainbow Koi Fillet, Ground Ginger, Dried Chanterelle |
+| Basil Curry | `dish-herbs-spices-1` | Planet | 1 | M.ATK | Dried Basil |
+| Mint Curry | `dish-herbs-spices-2` | Planet | 2 | M.ATK | Dried Mint |
+| Rosemary Curry | `dish-herbs-spices-3` | Planet | 3 | M.ATK | Dried Rosemary |
+| Thyme Curry | `dish-herbs-spices-4` | Planet | 4 | M.ATK | Dried Thyme, Diced Potato |
+| Ginger Curry | `dish-herbs-spices-5` | Planet | 5 | M.ATK | Ground Ginger, Shredded Cabbage |
+| Peppercorn Curry | `dish-herbs-spices-6` | Planet | 6 | M.ATK | Ground Pepper, Shredded Cabbage |
+| Cinnamon Curry | `dish-herbs-spices-7` | Planet | 7 | M.ATK | Ground Cinnamon, Diced Onion |
+| Saffron Curry | `dish-herbs-spices-8` | Planet | 8 | M.ATK | Saffron Threads, Diced Onion, Maple Syrup |
+| Mandrake Curry | `dish-herbs-spices-9` | Planet | 9 | M.ATK | Mandrake Powder, Tomato Purée, Chocolate |
+| Phoenix Pepper Curry | `dish-herbs-spices-10` | Planet | 10 | M.ATK | Phoenix Spice, Tomato Purée, Chocolate |
+| Carrot Salad | `dish-vegetables-1` | Planet | 1 | DEF | Chopped Carrot |
+| Potato Salad | `dish-vegetables-2` | Planet | 2 | DEF | Diced Potato |
+| Cabbage Salad | `dish-vegetables-3` | Planet | 3 | DEF | Shredded Cabbage |
+| Onion Salad | `dish-vegetables-4` | Planet | 4 | DEF | Diced Onion, Dried Shiitake |
+| Tomato Salad | `dish-vegetables-5` | Planet | 5 | DEF | Tomato Purée, Dried Oyster Mushroom |
+| Bell Pepper Salad | `dish-vegetables-6` | Planet | 6 | DEF | Sliced Bell Pepper, Dried Oyster Mushroom |
+| Eggplant Salad | `dish-vegetables-7` | Planet | 7 | DEF | Sliced Eggplant, Dried Enoki |
+| Asparagus Salad | `dish-vegetables-8` | Planet | 8 | DEF | Trimmed Asparagus, Dried Enoki, Walnut Paste |
+| Golden Carrot Salad | `dish-vegetables-9` | Planet | 9 | DEF | Golden Carrot Purée, Dried Chanterelle, Chestnut Paste |
+| Emperor Pumpkin Salad | `dish-vegetables-10` | Planet | 10 | DEF | Pumpkin Purée, Dried Chanterelle, Chestnut Paste |
+| Button Mushroom Soup | `dish-mushrooms-1` | Planet | 1 | M.DEF | Dried Button Mushroom |
+| Shiitake Soup | `dish-mushrooms-2` | Planet | 2 | M.DEF | Dried Shiitake |
+| Oyster Mushroom Soup | `dish-mushrooms-3` | Planet | 3 | M.DEF | Dried Oyster Mushroom |
+| Enoki Soup | `dish-mushrooms-4` | Planet | 4 | M.DEF | Dried Enoki, Cane Sugar |
+| Chanterelle Soup | `dish-mushrooms-5` | Planet | 5 | M.DEF | Dried Chanterelle, Beet Sugar |
+| Porcini Soup | `dish-mushrooms-6` | Planet | 6 | M.DEF | Dried Porcini, Beet Sugar |
+| Morel Soup | `dish-mushrooms-7` | Planet | 7 | M.DEF | Dried Morel, Maple Syrup |
+| Truffle Soup | `dish-mushrooms-8` | Planet | 8 | M.DEF | Shaved Truffle, Maple Syrup, Polished Rice |
+| Glowcap Soup | `dish-mushrooms-9` | Planet | 9 | M.DEF | Glowcap Powder, Chocolate, Cornmeal |
+| King Reishi Soup | `dish-mushrooms-10` | Planet | 10 | M.DEF | Reishi Powder, Chocolate, Cornmeal |
+| Honeycomb Cake | `dish-sweets-1` | Planet | 1 | Speed | Honey |
+| Sugarcane Cake | `dish-sweets-2` | Planet | 2 | Speed | Cane Sugar |
+| Sugar Beet Cake | `dish-sweets-3` | Planet | 3 | Speed | Beet Sugar |
+| Maple Sap Cake | `dish-sweets-4` | Planet | 4 | Speed | Maple Syrup, Sunflower Oil |
+| Cacao Pod Cake | `dish-sweets-5` | Planet | 5 | Speed | Chocolate, Sesame Paste |
+| Vanilla Pod Cake | `dish-sweets-6` | Planet | 6 | Speed | Vanilla Extract, Sesame Paste |
+| Agave Heart Cake | `dish-sweets-7` | Planet | 7 | Speed | Agave Syrup, Walnut Paste |
+| Palm Sap Cake | `dish-sweets-8` | Planet | 8 | Speed | Palm Sugar, Walnut Paste, Plum Preserve |
+| Fairy Honeycomb Cake | `dish-sweets-9` | Planet | 9 | Speed | Fairy Honey, Chestnut Paste, Orange Marmalade |
+| Ambrosia Blossom Cake | `dish-sweets-10` | Planet | 10 | Speed | Ambrosia, Chestnut Paste, Orange Marmalade |
+| Peanut Cookies | `dish-nuts-seeds-1` | Planet | 1 | Limit Break charge | Peanut Butter |
+| Sunflower Seed Cookies | `dish-nuts-seeds-2` | Planet | 2 | Limit Break charge | Sunflower Oil |
+| Sesame Cookies | `dish-nuts-seeds-3` | Planet | 3 | Limit Break charge | Sesame Paste |
+| Walnut Cookies | `dish-nuts-seeds-4` | Planet | 4 | Limit Break charge | Walnut Paste, Rolled Oats |
+| Chestnut Cookies | `dish-nuts-seeds-5` | Planet | 5 | Limit Break charge | Chestnut Paste, Pearl Barley |
+| Almond Cookies | `dish-nuts-seeds-6` | Planet | 6 | Limit Break charge | Almond Paste, Pearl Barley |
+| Pistachio Cookies | `dish-nuts-seeds-7` | Planet | 7 | Limit Break charge | Pistachio Paste, Polished Rice |
+| Macadamia Cookies | `dish-nuts-seeds-8` | Planet | 8 | Limit Break charge | Macadamia Butter, Polished Rice, Mackerel Fillet |
+| Thundernut Cookies | `dish-nuts-seeds-9` | Planet | 9 | Limit Break charge | Thundernut Oil, Cornmeal, Salmon Fillet |
+| Worldseed Cookies | `dish-nuts-seeds-10` | Planet | 10 | Limit Break charge | Worldseed Oil, Cornmeal, Salmon Fillet |
+| Grain & Garden Platter | `duo-hp-def-3` | Duo | 3 | HP, DEF | Pearl Barley, Shredded Cabbage |
+| Grain & Garden Platter Deluxe | `duo-hp-def-7` | Duo | 7 | HP, DEF | Buckwheat Flour, Sliced Eggplant, Plum Preserve |
+| Garden & Mushroom Platter | `duo-def-mdef-3` | Duo | 3 | DEF, M.DEF | Shredded Cabbage, Dried Oyster Mushroom |
+| Garden & Mushroom Platter Deluxe | `duo-def-mdef-7` | Duo | 7 | DEF, M.DEF | Sliced Eggplant, Dried Morel, Dried Enoki |
+| Mushroom & Fruit Platter | `duo-mdef-mp-3` | Duo | 3 | M.DEF, MP | Dried Oyster Mushroom, Peach Preserve |
+| Mushroom & Fruit Platter Deluxe | `duo-mdef-mp-7` | Duo | 7 | M.DEF, MP | Dried Morel, Mango Pulp, Maple Syrup |
+| Fruit & Herb Platter | `duo-mp-matk-3` | Duo | 3 | MP, M.ATK | Peach Preserve, Dried Rosemary |
+| Fruit & Herb Platter Deluxe | `duo-mp-matk-7` | Duo | 7 | MP, M.ATK | Mango Pulp, Ground Cinnamon, Mackerel Fillet |
+| Herb & Fish Platter | `duo-matk-atk-3` | Duo | 3 | M.ATK, ATK | Dried Rosemary, Sardine Fillet |
+| Herb & Fish Platter Deluxe | `duo-matk-atk-7` | Duo | 7 | M.ATK, ATK | Ground Cinnamon, Eel Fillet, Diced Onion |
+| Fish & Honey Platter | `duo-atk-speed-3` | Duo | 3 | ATK, Speed | Sardine Fillet, Beet Sugar |
+| Fish & Honey Platter Deluxe | `duo-atk-speed-7` | Duo | 7 | ATK, Speed | Eel Fillet, Agave Syrup, Dried Thyme |
+| Honey & Nut Platter | `duo-speed-limit-3` | Duo | 3 | Speed, Limit Break charge | Beet Sugar, Sesame Paste |
+| Honey & Nut Platter Deluxe | `duo-speed-limit-7` | Duo | 7 | Speed, Limit Break charge | Agave Syrup, Pistachio Paste, Walnut Paste |
+| Nut & Grain Platter | `duo-limit-hp-3` | Duo | 3 | Limit Break charge, HP | Sesame Paste, Pearl Barley |
+| Nut & Grain Platter Deluxe | `duo-limit-hp-7` | Duo | 7 | Limit Break charge, HP | Pistachio Paste, Buckwheat Flour, Polished Rice |
+| Spring Feast | `feast-4` | Feast | 4 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Polished Rice, Plum Preserve, Mackerel Fillet, Dried Thyme, Diced Onion, Dried Enoki, Maple Syrup, Walnut Paste |
+| Summer Feast | `feast-6` | Feast | 6 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Rye Flour, Grape Jelly, Sea Bream Fillet, Ground Pepper, Sliced Bell Pepper, Dried Porcini, Vanilla Extract, Almond Paste |
+| Harvest Feast | `feast-8` | Feast | 8 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Hulled Wild Rice, Pomegranate Molasses, Tuna Fillet, Saffron Threads, Trimmed Asparagus, Shaved Truffle, Palm Sugar, Macadamia Butter |
+| Grand Feast | `feast-10` | Feast | 10 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Sunwheat Flour, Golden Apple Preserve, Rainbow Koi Fillet, Phoenix Spice, Pumpkin Purée, Reishi Powder, Ambrosia, Worldseed Oil |
 <!-- /live -->
 
 ## Gear
 
-Crafted at the Forge. Any piece is a **type × grade (1–10) × accent** (one of the eight stats), with id
-`<type>-g<grade>-<accent>`. The recipe is four refined items of the grade, one from each of the type's four families.
-No token: the Uma's Craft Level gates the grade (5g − 4), as for every job (D94).
+Crafted at the Forge (D103): 28 types in ten grades. The recipe is four refined items of the grade, one from each family
+of its half; the Uma's Craft Level gates the grade made (5g − 4), as for every job.
 
-- **Arms** and **Arms Orbs** use ores, stones, woods and hides-scales.
-- **Tomes** and **Elemental Orbs** use crystals, fibers, essences and bones-horns.
-- **Armor** and **Rings/Charms** mix the two halves.
+- **Physical:** the five Arms, the four physical armors (Helm, Cuirass, Greaves, Gauntlets) and the five Arms Orbs use
+  ores, stones, woods and hides-scales.
+- **Magical:** the five Tomes, the four magical armors (Circlet, Robe, Leggings, Bracers) and the five Elemental Orbs
+  use crystals, fibers, essences and bones-horns.
+- **Ids:** `<type>-g<grade>` for weapons and Orbs; `<type>-g<grade>-<accent>` for armor, whose accent is one of the
+  eight stats, picked at the Forge.
 
-**Points:**
-- A weapon gives offense, split over the five weapons of her class.
-- Armor gives defense.
-- A Ring or Charm gives only its accent, at double weight.
-- An Orb gives its accent at normal weight; its kind is the rest of its worth ([combat](combat.md#damage)).
-- Every accent adds ⌈grade ÷ 2⌉.
+**What a piece does (D104):**
+- A weapon's **Might**: +4 a grade to the offense of hits made with that weapon.
+- Physical armor: +1 DEF a grade and a **Barrier** of 5 a grade at the start of each fight.
+- Magical armor: +1 MDEF a grade and **Regen** of 1 HP a grade at the end of each round.
+- An armor accent: +⌈grade ÷ 2⌉ points to its stat ([loops](loops.md#extra-stats-and-gear)).
+- An Orb: its kind on every hit, for weaknesses only ([combat](combat.md#damage)).
 
-**Wearing:** she can wear grade k when her matching level (Weapon, Armor or Accessory Level) is at least k
-([classes](classes.md#ranks-and-levels)). Every Uma also holds a grade-0 **Training weapon** of each kind, with no stats,
-that fills a weapon slot until she wears a crafted one (D98).
+**Slots and wearing:** five weapon slots (her class's) and five armor slots: head, body, legs, arms and an accessory
+(an Arms or an Elemental Orb). Grade k needs her Weapon Rank for that weapon, or her Armor Rank for that armor kind, at
+k or more ([classes](classes.md#ranks-and-levels)). Every Uma holds a grade-0 **Training** piece of each weapon and armor
+kind, with no stats, that fills a slot until she wears a crafted one (D98, D103).
 
 <!-- live:gear -->
-| Type | Id | Slot | Recipe families (one refined item each) | Example recipe: grade 3 | Points at grade 10, HP accent |
-|---|---|---|---|---|---|
-| Greatsword | `greatsword` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
-| Axe | `axe` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
-| Lance | `lance` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
-| Bow | `bow` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
-| Katana | `katana` | Weapon | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5, ATK 2 |
-| Fire Tome | `tome-fire` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
-| Blizzard Tome | `tome-ice` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
-| Thunder Tome | `tome-lightning` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
-| Light Tome | `tome-light` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
-| Dark Tome | `tome-dark` | Weapon | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5, M.ATK 2 |
-| Garb | `garb` | Armor | Woods, Stones, Fibers, Crystals | Cedar Plank, Slate Block, Hemp Cloth, Cut Citrine | HP 5, DEF 5, M.DEF 5, Speed 5 |
-| Leather | `leather` | Armor | Hides & Scales, Woods, Fibers, Bones & Horns | Wolfkin Leather, Cedar Plank, Hemp Cloth, Trilobite Carving | HP 5, DEF 7.5, M.DEF 5, Speed 2.5 |
-| Mail | `mail` | Armor | Ores, Hides & Scales, Crystals, Essences | Iron Ingot, Wolfkin Leather, Cut Citrine, Breeze Infusion | HP 5, DEF 7.5, M.DEF 7.5 |
-| Plate | `plate` | Armor | Ores, Stones, Essences, Bones & Horns | Iron Ingot, Slate Block, Breeze Infusion, Trilobite Carving | HP 10, DEF 12.5, M.DEF 5 |
-| Ring | `ring` | Accessory | Crystals, Essences, Ores, Stones | Cut Citrine, Breeze Infusion, Iron Ingot, Slate Block | HP 10 |
-| Charm | `charm` | Accessory | Bones & Horns, Fibers, Hides & Scales, Woods | Trilobite Carving, Hemp Cloth, Wolfkin Leather, Cedar Plank | HP 10 |
-| Greatsword Orb | `orb-greatsword` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
-| Axe Orb | `orb-axe` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
-| Lance Orb | `orb-lance` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
-| Bow Orb | `orb-bow` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
-| Katana Orb | `orb-katana` | Accessory | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | HP 5 |
-| Fire Orb | `orb-fire` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
-| Ice Orb | `orb-ice` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
-| Lightning Orb | `orb-lightning` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
-| Light Orb | `orb-light` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
-| Dark Orb | `orb-dark` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
-
-A weapon's offense is split over the five weapons of her class (shown that way above).
+| Type | Id | Slot | Half | Recipe families (one refined item each) | Example recipe: grade 3 | At grade 10 |
+|---|---|---|---|---|---|---|
+| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
+| Axe | `axe-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
+| Lance | `lance-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
+| Bow | `bow-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
+| Katana | `katana-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
+| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
+| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
+| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
+| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
+| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
+| Helm | `helm-g<grade>-<accent>` | Head | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
+| Cuirass | `cuirass-g<grade>-<accent>` | Body | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
+| Greaves | `greaves-g<grade>-<accent>` | Legs | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
+| Gauntlets | `gauntlets-g<grade>-<accent>` | Arms | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
+| Circlet | `circlet-g<grade>-<accent>` | Head | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
+| Robe | `robe-g<grade>-<accent>` | Body | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
+| Leggings | `leggings-g<grade>-<accent>` | Legs | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
+| Bracers | `bracers-g<grade>-<accent>` | Arms | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
+| Greatsword Orb | `orb-greatsword-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
+| Axe Orb | `orb-axe-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
+| Lance Orb | `orb-lance-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
+| Bow Orb | `orb-bow-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
+| Katana Orb | `orb-katana-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
+| Fire Orb | `orb-fire-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
+| Ice Orb | `orb-ice-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
+| Lightning Orb | `orb-lightning-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
+| Light Orb | `orb-light-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
+| Dark Orb | `orb-dark-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
 <!-- /live -->
 
-## Tokens
-
-Fights drop tokens of the stage's **band** (its level's tens). Three kinds:
-- **Promotion** tokens rank up classes.
-- **Mastery** tokens raise any Weapon, Armor or Accessory Level (D94). Before D94 they were Crafting Tokens, spent at
-  the Forge.
-- **Cooking** tokens go into dishes.
-
-The Exchange buys and sells them, so two tokens of one kind buy one of another (D80).
-
-<!-- live:tokens -->
-| Band | Dropped by stages at | Cooking grades | Promotion | Mastery | Token kinds |
-|---|---|---|---|---|---|
-| 1 | Lv 1–10 | G1–2 | rank 1 → 2 | 1 → 2, 2 → 3 | 14 |
-| 2 | Lv 11–20 | G3–4 | rank 2 → 3 | 3 → 4, 4 → 5 | 14 |
-| 3 | Lv 21–30 | G5–6 | rank 3 → 4 | 5 → 6, 6 → 7 | 14 |
-| 4 | Lv 31–40 | G7–8 | rank 4 → 5 | 7 → 8, 8 → 9 | 14 |
-| 5 | Lv 41–50 | G9–10 | — | 9 → 10 | 9 |
-
-| Kind | Id pattern | Per band | Odds per drop | Used for |
-|---|---|---|---|---|
-| Promotion | `token-class-<class>-<band>` | 5 (bands 1–4) | 15% | Class rank-ups |
-| Mastery | `token-mastery-<band>` | 1 | 42.5% | Weapon, Armor and Accessory Level-ups: from Level L, band ⌈L/2⌉ |
-| Cooking | `token-cook-<stat>-<band>` | 8 | 42.5% | Every dish (each stat it feeds) |
-
-| Stage kind | Tokens per first clear |
-|---|---|
-| Fight | 2 |
-| Sub-boss | 3 |
-| Vanguard | 3 |
-| Boss | 5 |
-
-A stage in waves drops one more token per extra wave: 3 on stages 8 and 9, 7 from the boss.
-
-Replays and Sweeps roll each token at 25% of its odds. Exchange: sell for 20 Laurels a band, buy for 40 a band.
-<!-- /live -->

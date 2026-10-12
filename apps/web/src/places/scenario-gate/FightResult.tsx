@@ -1,8 +1,10 @@
-// What a fight paid (D51): EXP and levels for all five, Laurels, Shards at Lv10/20/30/40/50 and any Ticket they made.
-import { rpgTreePointsEarned, stockName, type FightResult as Result, type RpgCampaignChapter } from '@rpg/domain'
+// What a fight paid (D51, D102): EXP and levels for all five with every bar she filled (her class, five weapons, five
+// armor kinds), Laurels, Marks, Shards at Lv10/20/30/40/50 and any Ticket they made.
+import { rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter, type RpgClass } from '@rpg/domain'
+import { Bar, CLASS_LABEL } from '../../battle/labels'
 import type { Campaign } from '../../battle/campaign'
-import { ItemIcon } from '../../items/ItemIcon'
 import { AtlasSprite } from '../../master/art'
+import { RankCells, RankRow, type RankCell } from '../../ui/RankBars'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
@@ -33,33 +35,37 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
               {result.shards > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-shard"><ShardIcon size={18} />+{result.shards} Shard{result.shards > 1 ? 's' : ''}</span>}
               {result.tickets > 0 && <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-semibold text-ticket"><TicketIcon size={18} />+{result.tickets} Unlock Ticket{result.tickets > 1 ? 's' : ''}!</span>}
             </div>
-            {Object.keys(result.tokens ?? {}).length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Tokens">
-                {Object.entries(result.tokens).map(([id, n]) => (
-                  <li key={id} className="flex items-center gap-1.5 rounded-full bg-raised py-1 pl-1 pr-3 text-[12px] font-semibold">
-                    <ItemIcon id={id} size={22} /> {n > 1 ? `${n}× ` : ''}{stockName(id)}
-                  </li>
-                ))}
-              </ul>
+            {(result.gearMarks > 0 || result.classMarks > 0) && (
+              <p className="mt-2 text-[12px] font-semibold text-ink-soft">
+                {[result.gearMarks > 0 ? `+${result.gearMarks} Gear Marks` : '', result.classMarks > 0 ? `+${result.classMarks} Class Marks` : ''].filter(Boolean).join(' · ')}
+              </p>
             )}
             <ul className="mt-4 space-y-2">
               {result.members.map((m) => {
                 const up = m.afterLevel > m.beforeLevel
-                const points = rpgTreePointsEarned(m.afterLevel) - rpgTreePointsEarned(m.beforeLevel)
+                const next = m.afterLevel < RPG_TIER_MAX_LEVEL ? rpgExpToNext(m.afterLevel) : 0
+                const cls = m.ranks.find((g) => g.ref.kind === 'class')
+                const cells = (kind: 'weapon' | 'armor'): RankCell[] => m.ranks.filter((g): g is RankGain & { ref: { kind: typeof kind } } => g.ref.kind === kind)
+                  .map((g) => ({ key: `${kind}:${g.ref.id}`, kind, id: g.ref.id as RankCell['id'], track: g.after, before: g.before }))
                 return (
-                  <li key={m.outfitId} className="flex items-center gap-3 rounded-md bg-raised p-2">
-                    <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={m.outfitId} size={44} />
-                    <div className="min-w-0 flex-1 text-[13px]">
-                      <p className="flex justify-between gap-2">
-                        <span className="truncate font-semibold">{campaign.name(m.outfitId)}</span>
-                        <span className="shrink-0 text-accent">+{m.exp} EXP</span>
-                      </p>
-                      <p className={up ? 'font-semibold text-accent' : 'text-ink-soft'}>
-                        {up ? `Level up! Lv ${m.beforeLevel} → ${m.afterLevel}` : `Lv ${m.afterLevel}`}
-                        {points > 0 ? ` · +${points} skill points` : ''}
-                        {m.shards > 0 ? ' · +1 Shard' : ''}
-                      </p>
+                  <li key={m.outfitId} className="space-y-1.5 rounded-md bg-raised p-2">
+                    <div className="flex items-center gap-3">
+                      <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={m.outfitId} size={44} />
+                      <div className="min-w-0 flex-1 text-[13px]">
+                        <p className="flex justify-between gap-2">
+                          <span className="truncate font-semibold">{campaign.name(m.outfitId)}</span>
+                          <span className="shrink-0 text-accent">+{m.exp} EXP</span>
+                        </p>
+                        <p className={up ? 'font-semibold text-accent' : 'text-ink-soft'}>
+                          {up ? `Level up! Lv ${m.beforeLevel} → ${m.afterLevel}` : `Lv ${m.afterLevel}`}
+                          {m.shards > 0 ? ' · +1 Shard' : ''}
+                        </p>
+                        <Bar className="mt-0.5" value={next ? m.afterExp : 1} max={next || 1} tone="exp" />
+                      </div>
                     </div>
+                    {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
+                    <RankCells label="Weapon Ranks" cells={cells('weapon')} />
+                    <RankCells label="Armor Ranks" cells={cells('armor')} />
                   </li>
                 )
               })}

@@ -133,35 +133,25 @@ const WILDS: Place[] = [
   {
     id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: 2, mirrorOf: 'kitchen',
     blurb: 'Crafts weapons, armor and accessories.',
-    details: ['Four refined items of the grade; Craft Level sets the grades she can make', 'Arms, Tomes, armor, Rings, Charms and Orbs in ten grades'],
+    details: ['Four refined items of the grade; Craft Level sets the grades she can make', 'Weapons, armor and Orbs in ten grades'],
     at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
 ]
 
-function hall(id: string, name: string, cls: string, style: string, weapons: string, at: { x: number; y: number }): Place {
-  return {
-    id, page: 'learning', kind: 'class-hall', name, opensIn: 'S5', slots: 2, at,
-    blurb: `Trains the ${cls} rank, which opens skill depths, and the ${cls} Weapon Level for ${weapons}.`,
-    details: ['Class rank 1–5: each promotion spends a Promotion Token', `Weapon Level 1–10: ${weapons}`, `${style} aptitude sets the training speed`],
-  }
+/** The Learning District's halls stopped training when fights began filling every rank (D102); they wait for the
+ * owner's Inheritance feature, closed (S8). */
+function hall(id: string, name: string, cls: string, at: { x: number; y: number }): Place {
+  return { id, page: 'learning', kind: 'class-hall', name, opensIn: 'S8', slots: 0, at, blurb: `The ${cls} hall.`, details: [] }
 }
 
 const LEARNING: Place[] = [
-  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', 'Front Runner', 'Greatswords, Axes, Lances, Bows and Katanas', { x: 0.24, y: 0.1 }),
-  hall('mage-tower', 'Mage Tower', 'Mage', 'Pace Chaser', 'Fire, Blizzard, Thunder, Light and Dark Tomes', { x: 0.76, y: 0.11 }),
-  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', 'Pace Chaser', 'her three Arms and two Tomes', { x: 0.22, y: 0.33 }),
-  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', 'Late Surger', 'any five Arms and Tomes', { x: 0.78, y: 0.33 }),
-  hall('summoner-circle', 'Summoner Circle', 'Summoner', 'End Closer', 'her three Tomes and two Arms', { x: 0.5, y: 0.56 }),
-  {
-    id: 'armory', page: 'learning', kind: 'armory', name: 'Armory', opensIn: 'S5', slots: 2, at: { x: 0.26, y: 0.82 },
-    blurb: 'Trains the Armor Level for Garb, Leather, Mail and Plate.',
-    details: ['Armor Level 1–10, one for every armor type', 'Her best distance aptitude sets the training speed'],
-  },
-  {
-    id: 'jeweler', page: 'learning', kind: 'armory', name: 'Jeweler', opensIn: 'S5', slots: 2, at: { x: 0.74, y: 0.82 },
-    blurb: 'Trains the Accessory Level for Rings, Charms and Orbs.',
-    details: ['Accessory Level 1–10, for every accessory', 'Her best running-style aptitude sets the training speed'],
-  },
+  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', { x: 0.24, y: 0.1 }),
+  hall('mage-tower', 'Mage Tower', 'Mage', { x: 0.76, y: 0.11 }),
+  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', { x: 0.22, y: 0.33 }),
+  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', { x: 0.78, y: 0.33 }),
+  hall('summoner-circle', 'Summoner Circle', 'Summoner', { x: 0.5, y: 0.56 }),
+  { id: 'armory', page: 'learning', kind: 'armory', name: 'Armory', opensIn: 'S8', slots: 0, at: { x: 0.26, y: 0.82 }, blurb: 'Arms and armor on display.', details: [] },
+  { id: 'jeweler', page: 'learning', kind: 'armory', name: 'Jeweler', opensIn: 'S8', slots: 0, at: { x: 0.74, y: 0.82 }, blurb: 'Orbs and fine settings.', details: [] },
 ]
 
 const TOWN: Place[] = [
@@ -182,12 +172,12 @@ const TOWN: Place[] = [
   },
   {
     id: 'warehouse', page: 'town', kind: 'town', name: 'Warehouse', opensIn: 'S4', slots: 0, at: { x: 0.24, y: 0.6 },
-    blurb: 'Every item you own: ingredients, materials, dishes, gear and tokens.',
+    blurb: 'Every item you own: ingredients, materials, dishes and gear.',
     details: ['160 raw and 160 refined items across 16 families', 'Filled by the sites, the Pantry, the Workbench and the Exchange'],
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
-    blurb: 'Laurels buy raw items, tickets and tokens here.',
+    blurb: 'Laurels buy raw items and tickets here; Marks buy Manuals.',
     details: ['Raw items of every continent you have reached', 'Time Ticket: 30 minutes off any job or training', 'Sweep: clear a beaten regular stage now'],
   },
   {

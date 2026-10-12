@@ -2,7 +2,6 @@
 // a planet dish per farming family and grade, a Duo dish per bridge (grades 3 and 7), and four Feasts. Eating a dish
 // unlocks one node on an Uma's map; her active nodes add points to her stats.
 import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
-import { cookTokenId, gradeBand } from './tokens'
 import { BRIDGES, BRIDGE_GRADES, FEAST_GRADES, MOONS } from './dish-id'
 export { RING, BRIDGES, BRIDGE_GRADES, FEAST_GRADES, MOONS, STAR_NODES, isStarNode } from './dish-id'
 
@@ -50,18 +49,18 @@ const PLANET_DISHES: Dish[] = FARM.flatMap((f) => f.refined.map((refined, i): Di
   const grade = i + 1
   const raw = f.raw[i]!
   return { id: `dish-${f.id}-${grade}`, name: `${raw.name} ${STYLE[f.id] ?? 'Dish'}`, kind: 'planet', grade, effects: [f.effect],
-    inputs: add({ [refined.id]: 1, [cookTokenId(f.effect, gradeBand(grade))]: 1 }, sides(f, grade, grade <= 3 ? 0 : grade <= 7 ? 1 : 2)) }
+    inputs: add({ [refined.id]: 1 }, sides(f, grade, grade <= 3 ? 0 : grade <= 7 ? 1 : 2)) }
 }))
 
 const DUO_DISHES: Dish[] = BRIDGES.flatMap(([a, b]) => BRIDGE_GRADES.map((grade): Dish => {
   const fa = farmOf(a), fb = farmOf(b)
   return { id: `duo-${a}-${b}-${grade}`, name: `${SHORT[fa.id]} & ${SHORT[fb.id]} Platter${grade >= 7 ? ' Deluxe' : ''}`, kind: 'duo', grade, effects: [a, b],
-    inputs: add({ [fa.refined[grade - 1]!.id]: 1, [fb.refined[grade - 1]!.id]: 1, [cookTokenId(a, gradeBand(grade))]: 1, [cookTokenId(b, gradeBand(grade))]: 1 }, sides(fa, grade, grade >= 7 ? 1 : 0)) }
+    inputs: add({ [fa.refined[grade - 1]!.id]: 1, [fb.refined[grade - 1]!.id]: 1 }, sides(fa, grade, grade >= 7 ? 1 : 0)) }
 }))
 const FEAST_NAMES: Record<number, string> = { 4: 'Spring Feast', 6: 'Summer Feast', 8: 'Harvest Feast', 10: 'Grand Feast' }
 const FEASTS: Dish[] = FEAST_GRADES.map((grade): Dish => ({
   id: `feast-${grade}`, name: FEAST_NAMES[grade]!, kind: 'feast', grade, effects: [...ITEM_EFFECTS],
-  inputs: { ...Object.fromEntries(FARM.map((f) => [f.refined[grade - 1]!.id, 1])), ...Object.fromEntries(ITEM_EFFECTS.map((e) => [cookTokenId(e, gradeBand(grade)), 1])) },
+  inputs: Object.fromEntries(FARM.map((f) => [f.refined[grade - 1]!.id, 1])),
 }))
 
 export const DISHES: readonly Dish[] = [...PLANET_DISHES, ...DUO_DISHES, ...FEASTS]

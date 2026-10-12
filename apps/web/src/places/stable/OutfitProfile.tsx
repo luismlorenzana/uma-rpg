@@ -1,12 +1,12 @@
 // An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
-// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, five weapons, skill trees, class ranks;
-// first, as it changes most), Battle (her RPG stats), Gear (equipment, gear levels, Extra Stats), Work (professions and
+// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks;
+// first, as it changes most), Battle (her RPG stats), Gear (equipment, Weapon and Armor Ranks, Extra Stats), Work (professions and
 // jobs) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeClass, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, classOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
-  highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
+  activeClass, activeNodeSlots, ARMOR_KINDS, armorTrack, isInFight, aptitudeTime, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
+  highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, workOf,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
@@ -24,6 +24,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, LockIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
+import { RankCells, RankRow } from '../../ui/RankBars'
 import { pointText } from '../observatory/ObservatoryPage'
 import { GearCard } from './GearCard'
 import { SkillsPage } from './SkillsPage'
@@ -300,10 +301,11 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
 function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
-  const points = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier: 1, id })))
+  const rank = classRankOf(uma.ranks, classId)
+  const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier: 1, id })))
   return (
     <button type="button" onClick={onClick} className="mt-1.5 flex min-h-9 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
-      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[classId]} · rank {uma.ranks.classes[classId]}</span>
+      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[classId]} · Rank {rank}</span>
       <span className="flex shrink-0 gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
       {points > 0 && <span className="shrink-0 rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">{points} pts</span>}
       <span className="shrink-0 text-ink-faint">›</span>
@@ -312,43 +314,18 @@ function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedU
 }
 
 function SkillsTab({ outfit, uma }: { outfit: RosterOutfit; uma: OwnedUma }) {
-  const navigate = useNavigate()
   return (
     <div className="space-y-4">
       <SkillsPage outfit={outfit} name={outfit.name} />
-      <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Class ranks</p>
-        <div className="divide-y divide-hairline">
-          {RPG_CLASSES.map((c) => {
-            const hall = Object.entries(CLASS_HALLS).find(([, h]) => h.classId === c)!
-            const rank = uma.ranks.classes[c]
-            const grade = outfit.aptitudes.strategy[hall[1].style]
-            return (
-              <button key={c} type="button" onClick={() => navigate(`/learning/${hall[0]}`, { state: { fromHub: true } })} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-[13px]">
-                <span className="flex items-center gap-2">
-                  <span className="font-semibold">{CLASS_LABEL[c]}</span>
-                  <span className="flex items-center gap-1 text-[11px] text-ink-faint">{KEY_LABELS[hall[1].style]} <GradeChip grade={grade} /></span>
-                </span>
-                <span className="text-right">
-                  <span className="font-display font-bold">Rank {rank}</span>
-                  <span className="block text-[11px] text-ink-faint">{rank >= CLASS_MAX_RANK ? 'every depth open' : `next ${formatDuration(classRankHours(rank) * HOUR * aptitudeTime(grade))}`}</span>
-                </span>
-              </button>
-            )
-          })}
-        </div>
+      <section className="space-y-2 rounded-md bg-raised p-3">
+        <p className="text-[11px] text-ink-faint">Class Ranks</p>
+        {RPG_CLASSES.map((c) => <RankRow key={c} label={CLASS_LABEL[c]} kind="class" track={classTrack(uma.ranks, c)} />)}
       </section>
     </div>
   )
 }
 
-// --- Gear: what she wears, gear levels (D70), Extra Stats ------------------------------------------------------------
-
-const GEAR_LEVEL_TRACKS: readonly { key: string; label: string; track: Track }[] = [
-  ...RPG_CLASSES.map((c) => ({ key: c, label: `${CLASS_LABEL[c]} weapons`, track: { kind: 'weapons', classId: c } as Track })),
-  { key: 'armor', label: 'Armor', track: { kind: 'armor' } },
-  { key: 'accessory', label: 'Accessories', track: { kind: 'accessory' } },
-]
+// --- Gear: what she wears, Weapon and Armor Ranks (D102), Extra Stats -------------------------------------------------
 
 function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
@@ -362,26 +339,14 @@ function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
           <span className="text-[12px] text-ink-soft">{uma.stars.active.length}/{activeNodeSlots(uma.level)} active · {uma.stars.unlocked.length}/100 · map ›</span>
         </span>
         <span className="mt-1 block text-[11px] text-ink-faint">
-          Total with gear: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
+          Total with armor: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
         </span>
       </button>
-      <section className="rounded-md bg-raised">
-        <p className="px-3 pt-2 text-[11px] text-ink-faint">Gear levels</p>
-        <div className="grid grid-cols-2 gap-x-3 px-3 py-2">
-          {GEAR_LEVEL_TRACKS.map(({ key, label, track }) => {
-            const rank = rankOf(uma.ranks, track)
-            const grade = trackAptitude(track, outfit.aptitudes)
-            return (
-              <div key={key} className="flex items-center justify-between border-b border-hairline py-1.5 text-[12px] last:border-0">
-                <span className="truncate">{label}</span>
-                <span className="flex shrink-0 items-center gap-1.5">
-                  <span className="text-[10px] text-ink-faint">{rank < MASTERY_MAX_RANK ? formatDuration(masteryRankHours(rank) * HOUR * aptitudeTime(grade)) : 'max'}</span>
-                  <span className="font-display font-bold">{rank}</span>
-                </span>
-              </div>
-            )
-          })}
-        </div>
+      <section className="space-y-2 rounded-md bg-raised p-3">
+        <p className="text-[11px] text-ink-faint">Weapon Ranks</p>
+        <RankCells label="Weapon Ranks" cells={WEAPON_TYPES.map((w) => ({ key: w, kind: 'weapon' as const, id: w, track: weaponTrack(uma.ranks, w) }))} />
+        <p className="pt-1 text-[11px] text-ink-faint">Armor Ranks</p>
+        <RankCells label="Armor Ranks" cells={ARMOR_KINDS.map((k) => ({ key: k, kind: 'armor' as const, id: k, track: armorTrack(uma.ranks, k) }))} />
       </section>
     </div>
   )

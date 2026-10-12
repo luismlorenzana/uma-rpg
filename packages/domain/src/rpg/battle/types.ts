@@ -22,8 +22,16 @@ export interface BattleAlly {
   orb?: RpgDamageKind
   /** MP carried into this fight from the run; HP always starts full. */
   mp: number
-  /** Deepest skill depth her class rank opens (S5); absent in older fights, which gate depths by level. */
+  /** Deepest skill depth her class rank opened (S5, v6–v7 fights); v8 sends `classRank` instead. */
   maxDepth?: number
+  /** Her Class Rank (v8, D102): it opens her trees' depths and sets her Limit Break's depth. */
+  classRank?: number
+  /** Might by damage kind (v8, D104): a weapon's grade × 4, added to the offense of hits made with it. */
+  might?: Partial<Record<RpgDamageKind, number>>
+  /** A Barrier she starts the fight with, from physical armor (v8). */
+  barrier?: number
+  /** HP she regains at the end of each round, from magical armor (v8). */
+  regen?: number
   /** Share of every hit she avoids, per mille, from Speed points (S6, S7). */
   evasion?: number
   /** Limit Break charge she starts the fight with, from Limit Break points (S6, S7). */
@@ -63,7 +71,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7
+  version: 6 | 7 | 8
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -93,7 +101,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7
+  engineVersion: 6 | 7 | 8
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

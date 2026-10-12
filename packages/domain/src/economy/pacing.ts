@@ -62,13 +62,11 @@ export const FACILITY_UPGRADE = [
 
 // --- Laurels (§11) ---------------------------------------------------------------------------------------------
 
-/** A cleared stage's later wins, Sweeps included, pay a quarter of its first clear (D79): EXP, Laurels and each token's
- * chance to drop. */
+/** A cleared stage's later wins, Sweeps included, pay a quarter of its first clear (D79): every kind of EXP and Laurels. */
 export const REPLAY_SHARE = 0.25
 /** A stage's first clear pays its Laurels three times over (D66). */
 export const FIRST_CLEAR_LAURELS = 3
-/** Stages at Lv41–50 of a tier pay four times the Laurels (D82): over the band, about one and a half more full classes
- * per Uma at the Exchange, or anything else Laurels buy. */
+/** Stages at Lv41–50 of a tier pay four times the Laurels (D82). */
 export const LATE_LAURELS = { fromLevel: 41, factor: 4 } as const
 /** Laurels per won fight, times the chapter's tier (D51 numbers, set by this model). */
 export const BATTLE_LAURELS = { fight: 10, 'sub-boss': 25, vanguard: 30, boss: 50 } as const
@@ -84,23 +82,11 @@ export const timeTicketsToFinish = (remainingMs: number): number => Math.max(1, 
 /** Reaching a chapter stocks its grade pair at the Exchange: chapter n of a tier, grades 2n − 1 and 2n. */
 export const chapterGrades = (orderInTier: number): readonly [number, number] => [2 * orderInTier - 1, 2 * orderInTier]
 
-// --- Learning District (S5, §5, §6) ------------------------------------------------------------------------------
-
-/** Ranks 1–5: rank r opens skill depths 1–r (D77). */
-export const CLASS_MAX_RANK = 5
-export const MASTERY_MAX_RANK = 10
-/** Base hours per class rank, the same for every rank (D68): 6 at G, 3 at A; 24 hours from rank 1 to 5 at G. Each
- * promotion also spends a Class Promotion Token of its band (D67). */
-export const CLASS_RANK_HOURS = 6
-export const classRankHours = (rank: number): number => (rank >= 1 && rank < CLASS_MAX_RANK ? CLASS_RANK_HOURS : Infinity)
-/** Base hours per gear mastery rank, the same for every rank (D68): 3 at G, 1½ at A; 27 hours from 1 to 10 at G. */
-export const MASTERY_RANK_HOURS = 3
-export const masteryRankHours = (rank: number): number => (rank >= 1 && rank < MASTERY_MAX_RANK ? MASTERY_RANK_HOURS : Infinity)
-
 // --- Extra Stats and gear (S6, S7, §7.3, §10) -----------------------------------------------------------------------
 
-/** One Extra Stats point, as a share of the stat (or evasion, or a Limit Break head start). */
-export const POINT_SHARE = 0.015
+/** One Extra Stats or armor point (D104): a flat +1 to its stat, +5 HP; a Speed point 0.6% evasion; a Limit point a
+ * 0.4 head start on the Limit Break gauge. */
+export const POINT_HP = 5
 export const POINT_EVASION = 0.006
 export const POINT_LIMIT = 0.4
 /** Extra Stats nodes active at once: 5 at Lv1, 30 at Lv50. */

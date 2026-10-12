@@ -1,17 +1,17 @@
 // The Exchange (S4, design §11, D54): Laurels from battles buy raw items of the continents you've reached, Time
-// Tickets, Sweep Tickets and any token (D80); tokens and spare stock sell back for Laurels. A Sweep replays a beaten
+// Tickets and Sweep Tickets; spare stock sells back for Laurels; Marks buy Manuals (D102). A Sweep replays a beaten
 // regular stage at once and pays what a replay pays (D79).
 import { chapterGrades, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE } from '../economy/pacing'
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
-import { openFightOf, payEntrants, stageLaurels, worldRun, type FightResult } from './battle'
+import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
+import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
 import { stageBand, stagePay } from '../world/world'
 import { PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
-import { isToken, levelBand, rollTokens, tokenBuyPrice, tokenById, tokenSellPrice } from '../economy/tokens'
 
 export const MAX_PURCHASE = 99
 
@@ -66,38 +66,46 @@ export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, nodeId
   return null
 }
 
+/** One member's bars over several wins: first before, last after, EXP added up. */
+function mergeGains(all: readonly MemberGain[]): MemberGain {
+  const last = all[all.length - 1]!
+  const ranks: RankGain[] = []
+  for (const m of all) {
+    for (const g of m.ranks) {
+      const same = ranks.find((r) => r.ref.kind === g.ref.kind && r.ref.id === g.ref.id)
+      if (same) { same.exp += g.exp; same.after = g.after } else ranks.push({ ...g })
+    }
+  }
+  return { ...last, beforeLevel: all[0]!.beforeLevel, exp: all.reduce((n, x) => n + x.exp, 0), shards: all.reduce((n, x) => n + x.shards, 0), ranks }
+}
+
 /** Sweeps the same stage up to `times` times (stopping when tickets run out), adding up what each paid. */
-export function sweepMany(save: Save, chapter: RpgCampaignChapter, nodeId: string, times: number, now: string, tier = TIER_ONE): { save: Save; result: FightResult; swept: number } {
+export function sweepMany(save: Save, chapter: RpgCampaignChapter, nodeId: string, times: number, outfits: ReadonlyMap<string, BattleOutfit>, now: string,
+  tier = TIER_ONE): { save: Save; result: FightResult; swept: number } {
   if (!Number.isInteger(times) || times < 1 || times > MAX_PURCHASE) throw new SaveRuleError('bad-count', `sweep 1–${MAX_PURCHASE} times`)
   let current = save
   const results: FightResult[] = []
   for (let i = 0; i < times; i++) {
     if (i > 0 && sweepBlock(worldOf(current, tier), chapter, nodeId)) break
-    const r = sweepFight(current, chapter, nodeId, now, tier)
+    const r = sweepFight(current, chapter, nodeId, outfits, now, tier)
     current = r.save
     results.push(r.result)
   }
   const first = results[0]!
   const last = results[results.length - 1]!
-  const tokens: Record<string, number> = {}
-  for (const r of results) for (const [id, n] of Object.entries(r.tokens)) tokens[id] = (tokens[id] ?? 0) + n
+  const sum = (key: 'laurels' | 'shards' | 'tickets' | 'gearMarks' | 'classMarks') => results.reduce((n, r) => n + r[key], 0)
   const result: FightResult = {
     ...first,
-    laurels: results.reduce((n, r) => n + r.laurels, 0),
-    tokens,
-    shards: results.reduce((n, r) => n + r.shards, 0),
-    tickets: results.reduce((n, r) => n + r.tickets, 0),
-    members: last.members.map((m) => {
-      const all = results.map((r) => r.members.find((x) => x.outfitId === m.outfitId)!)
-      return { ...m, beforeLevel: all[0]!.beforeLevel, exp: all.reduce((n, x) => n + x.exp, 0), shards: all.reduce((n, x) => n + x.shards, 0) }
-    }),
+    laurels: sum('laurels'), shards: sum('shards'), tickets: sum('tickets'), gearMarks: sum('gearMarks'), classMarks: sum('classMarks'),
+    members: last.members.map((m) => mergeGains(results.map((r) => r.members.find((x) => x.outfitId === m.outfitId)!))),
   }
   return { save: current, result, swept: results.length }
 }
 
-/** Spends a Sweep Ticket on a cleared regular stage: it pays as a replay (D79), a quarter of the first clear's EXP and
- * Laurels and each token's chance, with MP untouched. */
-export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: string, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
+/** Spends a Sweep Ticket on a cleared regular stage: it pays as a replay (D79), a quarter of the first clear's EXP of
+ * every kind and Laurels, with MP untouched. Her five weapons share Weapon EXP evenly (nothing is "used" in a Sweep). */
+export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>, now: string,
+  tier = TIER_ONE): { save: Save; result: FightResult } {
   const world = worldOf(save, tier)
   const block = sweepBlock(world, chapter, nodeId)
   if (block) throw new SaveRuleError('cannot-fight', block)
@@ -105,42 +113,55 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
   const run = worldRun(world)
   const wins = run.wins[nodeId] ?? 0
   const pay = stagePay(node)
-  const paid = payEntrants(world, world.parties[world.world.activeParty]!.slots as string[], 'fight', node.level,
-    Math.round(stageLaurels('fight', chapter.tier, false, node.level) * pay), tier, REPLAY_SHARE * pay)
-  // Seeded by the stage and its win count, so each Sweep rolls afresh but a retried save rolls the same.
-  const tokens = rollTokens(`sweep:${nodeId}:${wins}`, 'fight', levelBand(node.level), REPLAY_SHARE, node.waves?.length ?? 0)
-  const items = { ...paid.world.items }
-  for (const [id, n] of Object.entries(tokens)) items[id] = (items[id] ?? 0) + n
+  const entrants = (world.parties[world.world.activeParty]!.slots as string[]).map((id) => {
+    const outfit = outfits.get(id)
+    if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
+    const classId = activeClass(outfit, world.umas[id]!)
+    return { outfitId: id, classId, weapons: classOf(world.umas[id]!, classId).weapons, used: new Set<never>() }
+  })
+  const paid = payEntrants(world, entrants, 'fight', node.level, Math.round(stageLaurels('fight', chapter.tier, false, node.level) * pay), tier, REPLAY_SHARE * pay)
   const next: TierWorld = {
-    ...paid.world, items,
+    ...paid.world,
     wallet: { ...paid.world.wallet, sweepTickets: paid.world.wallet.sweepTickets - 1 },
     world: { ...world.world, run: { ...run, wins: { ...run.wins, [nodeId]: wins + 1 }, updatedAt: now } },
   }
   return { save: withWorld(save, tier, next, now), result: { outcome: 'victory', chapterId: chapter.id, nodeId, rounds: 0, members: paid.members, laurels: paid.laurels,
-    shards: paid.shards, tickets: paid.tickets, tokens, firstClear: false } }
+    shards: paid.shards, tickets: paid.tickets, gearMarks: paid.gearMarks, classMarks: paid.classMarks, firstClear: false } }
 }
 
-// --- Tokens for Laurels (D80): any token sells for 20 × its band and buys for twice that ---------------------------
+// --- Manuals (D102): Marks for EXP on one bar of one Uma --------------------------------------------------------------
 
-/** Buys `quantity` of any token, of any kind and band, for Laurels. */
-export function buyTokens(save: Save, tokenId: string, quantity: number, now: string, tier = TIER_ONE): Save {
+/** Why she can't read Manuals for this bar now, or null. */
+export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, count = 1): string | null {
+  const uma = world.umas[outfitId]
+  if (!uma) return 'Not unlocked'
+  if (trackOf(uma.ranks, ref).rank >= maxRankOf(ref.kind)) return 'Already at the top rank'
+  const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks
+  return marks < MANUAL_PRICE * count ? `Needs ${MANUAL_PRICE * count} ${ref.kind === 'class' ? 'Class' : 'Gear'} Marks` : null
+}
+
+/** Buys and reads `count` Manuals for one Uma's bar: each spends 1,000 Marks for 1,000 EXP. EXP past the top rank banks
+ * back at half rate, like any other. Gear Marks buy Weapon and Armor Manuals, Class Marks Class Manuals. */
+export function readManuals(save: Save, outfitId: string, ref: RankRef, count: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  if (!tokenById(tokenId)) throw new SaveRuleError('bad-job', 'not a token')
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
-  const cost = tokenBuyPrice(tokenId) * quantity
-  if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)
+  if (!Number.isInteger(count) || count < 1 || count > MAX_PURCHASE) throw new SaveRuleError('bad-count', `read 1–${MAX_PURCHASE}`)
+  const block = manualBlock(world, outfitId, ref, count)
+  if (block) throw new SaveRuleError(block.startsWith('Needs') ? 'no-laurels' : 'bad-job', block)
+  const uma = world.umas[outfitId]!
+  const r = grantTrack(trackOf(uma.ranks, ref), ref.kind, MANUAL_EXP * count)
+  const back = Math.floor(r.overflow * MARKS_SHARE)
+  const key = ref.kind === 'class' ? 'classMarks' : 'gearMarks'
   return withWorld(save, tier, {
-    ...world, wallet: { ...world.wallet, laurels: world.wallet.laurels - cost }, items: { ...world.items, [tokenId]: (world.items[tokenId] ?? 0) + quantity },
+    ...world, umas: { ...world.umas, [outfitId]: { ...uma, ranks: withTrack(uma.ranks, ref, r.track) } },
+    wallet: { ...world.wallet, [key]: world.wallet[key] - MANUAL_PRICE * count + back },
   }, now)
 }
 
 // --- Selling (QoL): spare stock back for a few Laurels, always far below what buying costs ---------------------------
 
 export type Shelf = 'items' | 'dishes' | 'gear'
-/** Laurels for one (D65): raw `2 + 2g`, refined twice that, dishes and unbound gear `6 + 6g`; a token 20 × its band
- * (D80). */
+/** Laurels for one (D65): raw `2 + 2g`, refined twice that, dishes and unbound gear `6 + 6g`. */
 export function sellPrice(shelf: Shelf, id: string): number {
-  if (shelf === 'items' && isToken(id)) return tokenSellPrice(id)
   if (shelf === 'items') {
     const item = itemById(id)
     return item ? (2 + 2 * item.grade) * (item.refined ? 2 : 1) : 0

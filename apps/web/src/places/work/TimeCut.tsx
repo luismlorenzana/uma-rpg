@@ -1,4 +1,4 @@
-// Time Tickets on a running job or training (D74): each takes 30 minutes off; "Finish" spends what's left.
+// Time Tickets on a running job (D74): each takes 30 minutes off; "Finish" spends what's left.
 import { jobFinished, ticketsToFinish, type Job } from '@rpg/domain'
 
 export function TimeCut({ job, now, tickets, onCut }: { job: Job; now: string; tickets: number; onCut: (count: number) => void }) {

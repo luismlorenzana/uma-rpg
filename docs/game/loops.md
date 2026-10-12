@@ -7,15 +7,15 @@ is no promotion yet, and the Tier Finale is a locked place.
 ## The loop
 
 ```
- Unlock Umas ─► build parties ─► fight on the world map ─► EXP, Laurels, tokens, Shards
+ Unlock Umas ─► build parties ─► fight on the world map ─► Uma EXP, Class, Weapon and Armor EXP, Laurels, Shards
        ▲                                                          │
-       │            ┌────────────── tokens ◄──────────────────────┤
+       │            ┌────── ranks (deeper skills, higher grades) ◄┤── Marks past a max rank ─► Manuals
        │            ▼                                             ▼
-   Shards ─► Tickets      train class ranks (Learning)     Exchange: buy raw items, tickets, tokens
-                            │                                     │
-                            ▼                                     ▼
-                     deeper skills          gather ─► refine ─► cook (dishes ─► Extra Stats)
-                                                              └─► craft (gear ─► points, Orbs)
+   Shards ─► Tickets                                      Exchange: raw items, tickets, Manuals
+                                                                  │
+                                                                  ▼
+                                            gather ─► refine ─► cook (dishes ─► Extra Stats)
+                                                              └─► craft (weapons, armor, Orbs)
                                     └────────► a stronger party fights higher levels
 ```
 
@@ -44,45 +44,90 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 | 36 | 696 | 1965 |
 | 43 | 808 | 2070 |
 
-Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × the EXP to next level at the foes' level, ±10% per level of gap (from 10% to 200%). Shards at Lv 10, 20, 30, 40, 50. Profession EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
+Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × her own EXP to next level, −10% per level she's above the foes (down to 10%), never more than 100%. Shards at Lv 10, 20, 30, 40, 50. Profession EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
 <!-- /live -->
 
 - Level cap 50. At Lv 50 EXP keeps banking; nothing spends it yet (it's planned for promotion).
 - Every entrant is paid, knocked out or not.
+- **Uma EXP is never sped up (D102):** a stage pays a share of **her own** level, so a Lv 1 Uma in a Lv 40 fight still
+  gains about a third of a level. Fighting below her level pays less; above it, no more.
 - A regular stage at her level pays about a third of a level: about three fights a level-up. A region's twelve first
-  clears carry a party across its five levels, a little short of the next region's first level (D97). Low Umas next to
-  high ones catch up fast: up to 2× when the foes are ten or more levels above her.
+  clears carry a party across its five levels, a little short of the next region's first level (D97).
+- **Her Uma Level** sets her stats, her skill slots (3 → 10) and her Extra Stats slots. Skills open with **Class Rank**
+  ([ranks](#ranks)).
 
-## Laurels, EXP and tokens
+## Ranks
+
+Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-and-levels) for what each opens):
+
+<!-- live:ranks -->
+| Bar | Ranks | Per win worth E Uma EXP | Opens |
+|---|---|---|---|
+| Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees: cores at 1, 10, 20, 30, 40; side skills at 5 … 45; a side point a rank |
+| Weapon Rank, per weapon | 1–10 | 5E over her five weapons, double for each she used | Wears that weapon up to its rank's grade |
+| Armor Rank, per armor kind | 1–10 | 1E to each of her five armor kinds | Wears that kind up to its rank's grade |
+
+| Class Rank | EXP to next |
+|---|---|
+| 1 | 136 |
+| 10 | 280 |
+| 20 | 440 |
+| 30 | 600 |
+| 40 | 760 |
+| 49 | 904 |
+
+| Weapon or Armor Rank | EXP to next | Next rank, used every fight, by |
+|---|---|---|
+| 1 | 840 | Lv 6 |
+| 2 | 1,240 | Lv 11 |
+| 3 | 1,640 | Lv 16 |
+| 5 | 2,440 | Lv 26 |
+| 7 | 3,240 | Lv 36 |
+| 9 | 4,040 | Lv 46 |
+
+Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs 1,000 Marks and gives 1,000 EXP to one bar of one Uma. Armor kinds by slot: Head Helm or Circlet; Body Cuirass or Robe; Legs Greaves or Leggings; Arms Gauntlets or Bracers; Accessory Arms Orb or Elemental Orb. 10 kinds in all.
+<!-- /live -->
+
+- **What a win pays,** for `E` Uma EXP: her class 2E; her five slotted weapons share 5E, two parts for each weapon she
+  used that fight (an attack, a skill, a Spell Blade half, a Limit Break), one part for the rest; each of her five armor
+  slots' kinds E. A Sweep shares weapon EXP evenly.
+- **No caps between bars:** a Lv 1 Uma can wear a grade-10 weapon if its rank allows.
+- **A campaign** (about 120 first clears) takes one Uma to Lv 50, two classes to Rank 50, and five weapons and five
+  armor kinds to Rank 10.
+- **Marks:** past a max rank, a bar's EXP banks at half rate, world-wide: Gear Marks from weapons and armor, Class Marks
+  from classes. **Manuals** at the Exchange turn 1,000 Marks into 1,000 EXP on one bar of one Uma. Uma EXP is never for
+  sale.
+
+## Laurels and EXP
 
 <!-- live:laurels -->
 | Stage kind | Laurels per win | First clear | Replay or Sweep | Lv 41–50 first clear | EXP weight |
 |---|---|---|---|---|---|
-| Fight | 10 | 30 | 8 | 120 | 0.32 |
-| Sub-boss | 25 | 75 | 19 | 300 | 0.4 |
-| Vanguard | 30 | 90 | 23 | 360 | 0.4 |
-| Boss | 50 | 150 | 38 | 600 | 0.4 |
+| Fight | 10 | 30 | 8 | 120 | 0.36 |
+| Sub-boss | 25 | 75 | 19 | 300 | 0.43 |
+| Vanguard | 30 | 90 | 23 | 360 | 0.43 |
+| Boss | 50 | 150 | 38 | 600 | 0.43 |
 
 A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the first clear's EXP and Laurels.
 <!-- /live -->
 
-- **First clear** of a stage pays its Laurels ×3. **Later wins** pay a quarter of the first clear: EXP, Laurels, and
-  each token's chance. Sweeps count as wins.
-- **Lv 41–50** stages pay their Laurels ×4 (D82), so endgame fights fund extra classes.
+- **First clear** of a stage pays its Laurels ×3. **Later wins** pay a quarter of the first clear: every kind of EXP
+  and Laurels. Sweeps count as wins.
+- **Lv 41–50** stages pay their Laurels ×4 (D82).
 - A loss, or giving up, pays nothing and costs nothing (MP is as it was before the fight).
-- Tokens by kind and band: [materials](materials.md#tokens). An elite's or boss's first token is always a Promotion
-  Token (band 5 has none, since class ranks stop at 5); every other token is Cooking, Mastery or Promotion by chance.
+- There are no tokens (D105).
 
 ## Currencies
 
 | Currency | Earned | Spent |
 |---|---|---|
 | Laurels | Fights and Sweeps; selling stock | The Exchange; facility upgrades |
-| Time Tickets | The Exchange | 30 minutes off a running job or training (or "Finish": one per 30 minutes left) |
+| Time Tickets | The Exchange | 30 minutes off a running job (or "Finish": one per 30 minutes left) |
 | Sweep Tickets | The Exchange | One Sweep of a cleared regular stage |
 | Unlock Tickets | 20 at the start; 5 Shards each | Unlocking an outfit |
 | Shards | Lv 10, 20, 30, 40, 50 | Turned into Tickets automatically |
-| Tokens | Fights and Sweeps; the Exchange | Class ranks, Weapon, Armor and Accessory Levels, dishes; the Exchange |
+| Gear Marks | Weapon and Armor EXP past Rank 10, at half rate | Weapon and Armor Manuals |
+| Class Marks | Class EXP past Rank 50, at half rate | Class Manuals |
 
 <!-- live:prices -->
 | Thing | Price (Laurels) |
@@ -93,14 +138,11 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 | Raw item, grade 10 | 110 |
 | Time Ticket | 10 |
 | Sweep Ticket | 15 |
-| Token, band 1 (sell / buy) | 20 / 40 |
-| Token, band 3 (sell / buy) | 60 / 120 |
-| Token, band 5 (sell / buy) | 100 / 200 |
 
-A Time Ticket takes 30 minutes off a running job or training.
+A Time Ticket takes 30 minutes off a running job. A Manual costs 1,000 Marks, not Laurels.
 <!-- /live -->
 
-Selling pays 2 + 2g for a raw item, 4 + 4g refined, 6 + 6g for a dish or unbound gear, and 20 × band for a token. Bound
+Selling pays 2 + 2g for a raw item, 4 + 4g refined, and 6 + 6g for a dish or unbound gear. Bound
 gear can't be sold. The Exchange stocks raw grades 2n−1 and 2n once a stage on continent n has been won, up to 99 per
 purchase.
 
@@ -130,10 +172,10 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   ([sections](sections.md#global-ui)).
 - **Recall:** pays what's finished and returns the inputs of everything unfinished. Only the time is lost.
 - **Targets (D100):** mark up to five Umas on their profile. Every facility then lists what maxing them still takes
-  from it: a dish for each Extra Stats node they haven't opened, and the best piece they can wear now in each gear slot
-  (their class's five weapons, their armor, their accessory; a Mail and a Ring when they wear none). Needs cascade: the
-  pieces and dishes still short need refined items, and those still short need raw ones. The Warehouse and running or
-  queued jobs count first. Cooking Tokens aren't listed: fights drop them.
+  from it: a dish for each Extra Stats node they haven't opened, and the best piece their ranks let them wear in each
+  of their ten gear slots (their class's five weapons, their five armor slots' kinds). Needs cascade: the pieces and
+  dishes still short need refined items, and those still short need raw ones. The Warehouse and running or queued jobs
+  count first.
 - **Upgrades:**
   - Facilities level 1–3: more slots, then speed.
   - The cost is Laurels plus refined items of the facility's two families. A site's two families are its own and its
@@ -142,33 +184,15 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| Gather or refine one item | grade g: 30 + 30 × g minutes (G1 1 h, G10 5 h 30) |
+| Gather one item | grade g: 30 + 30 × g minutes (G1 60 min, G10 330 min) |
+| Refine one item | a quarter of that (G1 15 min, G10 82.5 min) |
 | Cook or craft one | twice that: 60 + 60 × g minutes |
 | Outputs per job | up to 10 |
 | Jobs queued after it | 3 |
 | Facility levels | 1–3: 2, 3, 3 Uma slots; speed ×1, ×1, ×1.25 |
 | Upgrade to Lv 2 / 3 | 150 Laurels + 1× grade-2 refined of each of its two families / 500 Laurels + 2× grade-5 refined of each of its two families |
-| Class rank | 6 h of training per rank, ranks 1–5 |
-| Weapon, Armor and Accessory Levels | 3 h per level, 1–10 |
-| Extra Stats | 1.5% to its stat per point; Speed 0.6% evasion; Limit +0.4 starting charge |
+| Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |
 <!-- /live -->
-
-## Training
-
-The Learning page's seven halls train ranks ([classes](classes.md#ranks-and-levels)):
-- Each class hall trains its class rank (1–5) and that class's Weapon Level (1–10).
-- The Armory trains the Armor Level; the Jeweler trains the Accessory Level.
-
-Rules:
-- One job trains one rank. The rank is granted on collect, and Time Tickets apply.
-- **A class rank-up spends one Promotion Token** of the band of the rank it leaves (rank r → r+1 takes band r).
-- **A Weapon, Armor or Accessory Level-up spends one Mastery Token** (D94): from Level L, band ⌈L/2⌉, so Levels 1 and 2
-  take band 1 and Level 9 takes band 5. A whole track, Level 1 → 10, takes nine.
-- Tokens are taken at the start and refunded on recall.
-- **Speed:**
-  - A class hall goes by its running style (Brawler front, Mage and Spell Blade pace, Cleric late, Summoner end).
-  - The Armory goes by her best distance aptitude, the Jeweler by her best running style.
-- Training pays no profession EXP.
 
 ## Extra Stats and gear
 
@@ -180,17 +204,21 @@ Rules:
   - Feasts open Sun nodes.
 - **Active nodes:** 5 + ⌊level ÷ 2⌋ at a time (5 at Lv 1, 30 at Lv 50), changed freely.
 - **Points:** a moon gives 1 point to its stat, a bridge ½ to each of its two, a Sun node ⅛ to all eight.
-- **What a point does:**
-  - HP, MP, ATK, MATK, DEF or MDEF: +1.5%.
+- **What a point does (D104, flat):**
+  - ATK, MATK, DEF, MDEF or MP: +1. HP: +5.
   - Speed: 0.6% evasion (up to 50%).
   - Limit: a 0.4 head start on the Limit Break gauge.
 
 **Gear** (the Forge, [materials](materials.md#gear)):
-- **Slots:** 12, one per weapon type, one armor and one accessory.
-- **Wearing a grade:** a piece of grade g needs the matching level ≥ g. For a weapon that's the highest Weapon Level
-  among the classes that can wield it.
+- **Slots (D103):** her class's five weapon slots and five armor slots (head, body, legs, arms, accessory), each armor
+  slot holding its physical or its magical kind. An empty slot holds the Training piece of its kind: grade 0, no stats.
+- **What it does (D104):**
+  - A weapon's **Might**, +4 a grade, adds to the offense of hits made with that weapon.
+  - Physical armor: +1 DEF a grade and a **Barrier** of 5 a grade at the start of each fight.
+  - Magical armor: +1 MDEF a grade and **Regen** of 1 HP a grade at the end of each round.
+  - An armor piece's accent: +⌈g ÷ 2⌉ points to its stat. An Orb adds its kind to every hit, for weaknesses.
+- **Wearing a grade:** grade g needs her Weapon Rank (for a weapon) or Armor Rank (for its kind) ≥ g.
 - **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.
-- **Points:** they add to her stats like Extra Stats.
 
 ## Springs, replays and Sweeps
 

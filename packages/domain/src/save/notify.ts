@@ -3,8 +3,6 @@
 import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { jobEndsAt, jobFinished, queueTimeline, type Job } from '../economy/jobs'
-import { TOKEN_CLASS_NAME } from '../economy/tokens'
-import { parseTrack } from '../economy/training'
 import { placeById } from '../hub/places'
 import { itemById } from '../items/catalog'
 import { TIER_ONE, worldOf } from './rules'
@@ -56,8 +54,6 @@ export function readySlots(save: Save, now: string, tier = TIER_ONE): number {
 }
 
 function outputName(output: string): string {
-  const track = parseTrack(output)
-  if (track) return track.kind === 'class' ? 'Class rank' : track.kind === 'weapons' ? `${TOKEN_CLASS_NAME[track.classId]} Weapon Level` : track.kind === 'armor' ? 'Armor Level' : 'Accessory Level'
   return itemById(output)?.name ?? dishById(output)?.name ?? gearById(output)?.name ?? output
 }
 
@@ -68,11 +64,11 @@ export interface Notice { title: string; body: string; tag: string; url: string 
 export function finishNotice(all: readonly Finish[]): Notice | null {
   const finishes = all.filter((f) => f.idle)
   if (finishes.length === 0) return null
-  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${f.kind === 'train' ? `${outputName(f.output)} ready` : `${outputName(f.output)} ×${f.count}`}`
+  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${outputName(f.output)} ×${f.count}`
   if (finishes.length === 1) {
     const f = finishes[0]!
     const place = placeById(f.placeId)
-    return { title: f.kind === 'train' ? 'Training done' : 'Work done', body: line(f), tag: `slot-${f.placeId}-${f.slot}`, url: place ? `/${place.page}/${place.id}` : '/' }
+    return { title: 'Work done', body: line(f), tag: `slot-${f.placeId}-${f.slot}`, url: place ? `/${place.page}/${place.id}` : '/' }
   }
   const shown = finishes.slice(-4).map(line)
   return { title: `${finishes.length} jobs done`, body: [...shown, ...(finishes.length > 4 ? [`and ${finishes.length - 4} more`] : [])].join('\n'), tag: 'work', url: '/' }

@@ -31,8 +31,8 @@ describe('farming targets (D100)', () => {
   it('plans a dish for every closed node and the best piece she can wear in each slot, cascading to refined and raw', () => {
     let save = setTarget(umas('101', '102'), '101', true, at(1))
     let plan = targetPlan(worldOf(save), brawler)
-    // A new Brawler: her five Arms, a Mail and a Ring, all grade 1; and all 100 nodes' dishes.
-    expect(plan.gear.map((g) => g.key)).toEqual(['axe-g1', 'bow-g1', 'greatsword-g1', 'katana-g1', 'lance-g1', 'mail-g1', 'ring-g1'])
+    // A new Brawler: her five Arms and her five armor slots' physical kinds, all grade 1; and all 100 nodes' dishes.
+    expect(plan.gear.map((g) => g.key)).toEqual(['arms-orb-g1', 'axe-g1', 'bow-g1', 'cuirass-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1'])
     expect(plan.dishes).toHaveLength(100)
     expect(plan.dishes.every((d) => d.need === 1 && d.short === 1)).toBe(true)
     // Every refined line is fed by the gear and dishes short; every raw line by the refined short, one for one.
@@ -53,15 +53,16 @@ describe('farming targets (D100)', () => {
     expect(facilityTargets(plan, 'fields').every((n) => n.key.length > 0 && familyById('grains')!.raw.some((i) => i.id === n.key))).toBe(true)
     expect(facilityTargets(plan, 'pantry').length).toBeGreaterThan(0)
     expect(facilityTargets(plan, 'kitchen')).toHaveLength(100)
-    expect(facilityTargets(plan, 'forge')).toHaveLength(7)
+    expect(facilityTargets(plan, 'forge')).toHaveLength(10)
   })
 
   it('counts a piece she owns at that grade as done, and none for an Uma who isn\'t a target', () => {
     let save = setTarget(umas('101'), '101', true, at(1))
     const w = worldOf(save)
     const uma = w.umas['101']!
-    save = { ...save, tierWorlds: { '1': { ...w, umas: { '101': { ...uma, gear: { locker: ['axe-g1-hp', 'plate-g1-def'], equipped: { axe: 'axe-g1-hp' } } } } } } }
-    expect(targetPlan(worldOf(save), brawler).gear.map((g) => g.key)).toEqual(['bow-g1', 'greatsword-g1', 'katana-g1', 'lance-g1', 'ring-g1'])
+    save = { ...save, tierWorlds: { '1': { ...w, umas: { '101': { ...uma, gear: { locker: ['axe-g1', 'cuirass-g1-def', 'orb-fire-g1'], equipped: { axe: 'axe-g1' }, kinds: {} } } } } } }
+    // The Elemental Orb doesn't count: her accessory slot holds an Arms Orb.
+    expect(targetPlan(worldOf(save), brawler).gear.map((g) => g.key)).toEqual(['arms-orb-g1', 'bow-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1'])
     expect(targetPlan(worldOf(setTarget(save, '101', false, at(2))), brawler)).toEqual({ gear: [], dishes: [], refined: [], raw: [] })
   })
 })

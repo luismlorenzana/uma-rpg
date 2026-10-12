@@ -1,7 +1,7 @@
 // Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
 // and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
 import { RPG_SKILL_POWER, RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
-import { RPG_DEPTH_GATES, RPG_ELEMENTS, isRpgTome, rpgHand, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
+import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
 
@@ -20,15 +20,15 @@ export interface BattleLimitChoice { skill?: RpgNodeRef; skills?: RpgNodeRef[]; 
 /** Each cast resolves at `scale`; a Grand Summon also leaves its summon lingering at `linger`. */
 export interface BattleLimitPlan { name: string; casts: { def: RpgSkillDef; scale: number }[]; linger?: { ref: RpgNodeRef; scale: number } }
 
-/** The deepest skill depth open at her level (Lv1/10/20/30/40). */
-export const rpgOpenDepth = (level: number): number => RPG_DEPTH_GATES.filter((gate) => level >= gate).length
+
 const round = (n: number) => Math.round(n * 1000) / 1000
 const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
 
 /** The casts this Limit Break makes, or null when the choice names something she can't use. */
 export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): BattleLimitPlan | null {
   const hand = rpgHand(ally)
-  const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.level)) - 1]!
+  // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level.
+  const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.classRank ?? ally.level)) - 1]!
   const known = (ref: unknown) => ref && typeof ref === 'object' ? battleSkillFor(ally, ref as RpgNodeRef) : null
   const { skill, skills, weapon } = choice
   switch (ally.classId) {

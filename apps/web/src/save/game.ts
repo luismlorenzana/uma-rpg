@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  parseTrack, type Shelf, type Track, type WorkOutfit, type startTraining, type GearSlot,
+  type ArmorKind, type ArmorSlot, type RankRef, type Shelf, type WorkOutfit, type GearSlot,
   newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
@@ -137,9 +137,7 @@ export async function fightAction(region: RpgCampaignChapter, action: BattleActi
 export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
   edit(import('@rpg/domain/work'), (d, s, now) => d.startJob(s, placeId, slot, outfit, output, count, now))
 export const recall = (placeId: string, slot: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.recallJob(s, placeId, slot, now))
-export const train = (placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3], track: Track) =>
-  edit(import('@rpg/domain/work'), (d, s, now) => d.startTraining(s, placeId, slot, outfit, track, now))
-/** Spends Time Tickets on a job or training, 30 minutes each (D74). */
+/** Spends Time Tickets on a job, 30 minutes each (D74). */
 export const cutTime = (placeId: string, slot: number, tickets: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.cutJobTime(s, placeId, slot, tickets, now))
 /** Queues another job after the slot's current one, same Uma (QoL, D62). */
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
@@ -149,8 +147,8 @@ export const upgrade = (placeId: string) => edit(import('@rpg/domain/work'), (d,
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyRawItem(s, itemId, quantity, stocked, now))
 export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyTickets(s, kind, quantity, now))
 export const sell = (shelf: Shelf, id: string, quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.sellStock(s, shelf, id, quantity, now))
-/** Three tokens of a kind and band for one of your choice (D67). */
-export const buyToken = (tokenId: string, quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyTokens(s, tokenId, quantity, now))
+/** Reads Manuals for one Uma's bar: 1,000 Marks for 1,000 EXP each (D102). */
+export const readManual = (outfitId: string, ref: RankRef, count: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.readManuals(s, outfitId, ref, count, now))
 
 /** She eats a dish: one node unlocks on her map (S6). Returns the node. */
 export async function eat(outfitId: string, dishId: string): Promise<string> {
@@ -164,6 +162,9 @@ export async function eat(outfitId: string, dishId: string): Promise<string> {
 export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/kitchen'), (d, s, now) => d.setActiveNodes(s, outfitId, nodes, now))
 export const wear = (outfitId: string, gearId: string) => edit(import('@rpg/domain/forge'), (d, s, now) => d.equipGear(s, outfitId, gearId, now))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/domain/forge'), (d, s, now) => d.unequipGear(s, outfitId, slot, now))
+/** Puts an armor kind in one of her five armor slots: its Training piece (null) or a crafted one (D103). */
+export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKind, gearId: string | null) =>
+  edit(import('@rpg/domain/forge'), (d, s, now) => d.wearArmor(s, outfitId, slot, kind, gearId, now))
 /** Marks or unmarks an Uma as a farming target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now) => d.setTarget(s, outfitId, on, now))
 /** Puts a weapon in a class's slot: its Training one (null) or a crafted piece (D98). */
@@ -201,23 +202,12 @@ export async function collectAndRepeat(placeId: string, slot: number, outfit: Wo
   await commit(startJob(collected, placeId, slot, outfit, job.output, job.count, now))
 }
 
-/** Ranks up a finished training and starts the next rank with the same Uma. */
-export async function rankUpAndContinue(placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3]): Promise<void> {
-  const { collectJob, startTraining } = await import('@rpg/domain/work')
-  const { save } = useGame.getState()
-  const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
-  const track = job ? parseTrack(job.output) : null
-  if (!save || !job || !track) return
-  const now = nowIso()
-  await commit(startTraining(collectJob(save, placeId, slot, now).save, placeId, slot, outfit, track, now))
-}
-
 /** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
-export async function sweep(region: RpgCampaignChapter, nodeId: string, times = 1): Promise<FightResult & { swept: number }> {
+export async function sweep(region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>, times = 1): Promise<FightResult & { swept: number }> {
   const { sweepMany } = await import('@rpg/domain/exchange')
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
-  const r = sweepMany(save, region, nodeId, times, nowIso())
+  const r = sweepMany(save, region, nodeId, times, outfits, nowIso())
   await commit(r.save)
   return { ...r.result, swept: r.swept }
 }

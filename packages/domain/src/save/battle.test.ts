@@ -25,10 +25,11 @@ const OUTFITS = new Map([['101', outfit('101', 'front')], ['102', outfit('102', 
   ['104', outfit('104', 'end')], ['105', outfit('105', 'front')]])
 const o101 = OUTFITS.get('101')!
 
-/** Every class at a rank, as if trained in the Learning District (D77: rank r opens depths 1–r). */
-function ranked(save: Save, rank = 2): Save {
+/** Every class at a Class Rank (D102: depths open at 1, 10, 20, 30, 40). */
+function ranked(save: Save, rank = 1): Save {
   const w = worldOf(save)
-  const classes = { brawler: rank, mage: rank, spellblade: rank, cleric: rank, summoner: rank }
+  const t = { rank, exp: 0 }
+  const classes = { brawler: t, mage: t, spellblade: t, cleric: t, summoner: t }
   return { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) => [id, { ...u, ranks: { ...u.ranks, classes } }])) } } }
 }
 
@@ -78,26 +79,23 @@ describe('classes (D86)', () => {
     expect(() => setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'axe', 'lance', 'tome-dark'], T(4))).toThrow(/slots/)
   })
 
-  it('knows every open depth’s core skills for free and chooses her skills until she picks (D86)', () => {
+  it('knows every open depth’s core skills for free and chooses her skills until she picks; Class Rank opens depths (D102)', () => {
     const save = withParty()
     const uma = worldOf(save).umas['101']!
     expect(umaLoadout(o101, uma, 1).map((r) => r.id)).toEqual(['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1'])
+    // Class Rank 10 opens depth 2, whatever her level; Lv 10 alone doesn't.
     const w = worldOf(save)
-    const ten: Save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...uma, level: 10 } } } } }
-    expect(umaLoadout(o101, worldOf(ten).umas['101']!, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
-    const atRankOne = ranked(ten, 1)
-    expect(umaLoadout(o101, worldOf(atRankOne).umas['101']!, 1).map((r) => r.id)[0]).toBe('brawler-greatsword.1')
+    const lv10: Save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...uma, level: 10 } } } } }
+    expect(umaLoadout(o101, worldOf(lv10).umas['101']!, 1).map((r) => r.id)[0]).toBe('brawler-greatsword.1')
+    const rank10 = ranked(save, 10)
+    expect(umaLoadout(o101, worldOf(rank10).umas['101']!, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
     expect(() => learnSkill(save, o101, 'brawler', 'brawler-greatsword.1', T(5))).toThrow(/Learned/)
   })
 
-  it('learns side skills with points from Lv5, one per fork, swapped freely (D73, D86)', () => {
+  it('learns side skills with points from Class Rank 5, one per fork, swapped freely (D73, D86, D102)', () => {
     const save = withParty()
-    const atLevel = (level: number): Save => {
-      const w = worldOf(save)
-      return { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, level } } } } }
-    }
-    expect(() => learnSkill(atLevel(4), o101, 'brawler', 'brawler-greatsword.1a', T(3))).toThrow(/Opens at Lv5/)
-    const five = learnSkill(atLevel(5), o101, 'brawler', 'brawler-greatsword.1a', T(4))
+    expect(() => learnSkill(ranked(save, 4), o101, 'brawler', 'brawler-greatsword.1a', T(3))).toThrow(/Opens at Class Rank 5/)
+    const five = learnSkill(ranked(save, 5), o101, 'brawler', 'brawler-greatsword.1a', T(4))
     expect(classOf(worldOf(five).umas['101']!, 'brawler')).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: null })
     expect(() => learnSkill(five, o101, 'brawler', 'brawler-greatsword.1b', T(5))).toThrow(/other side/)
     expect(() => learnSkill(five, o101, 'brawler', 'mage-tome-fire.1a', T(5))).toThrow(SaveRuleError)
@@ -112,6 +110,8 @@ describe('classes (D86)', () => {
     expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toEqual(['brawler-katana.1'])
     expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['brawler-katana.1'])
     expect(() => equipSkills(save, o101, 'brawler', ['brawler-katana.2'], T(5))).toThrow(/knows/)
+    // Five equipped skills need Lv 15 (her Uma Level keeps the slots).
+    expect(() => equipSkills(save, o101, 'brawler', ['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1', 'brawler-bow.1'], T(5))).toThrow(/up to 3/)
     expect(() => equipSkills(save, o101, 'brawler', ['brawler-axe.1', 'brawler-axe.1'], T(5))).toThrow(SaveRuleError)
     save = equipSkills(save, o101, 'brawler', null, T(6))
     expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toBeNull()
@@ -133,7 +133,7 @@ describe('fights (D52, D66)', () => {
     expect(worldRun(worldOf(retreat(save, T(6)))).battle).toBeNull()
   })
 
-  it('pays a win: EXP to all five, Laurels (triple on a first clear, a quarter of that on a replay), and a Shard for each Uma that reaches Lv10', () => {
+  it('pays a win: EXP to all five, their Class, Weapon and Armor bars, Laurels (triple on a first clear, a quarter on a replay), and a Shard at Lv10', () => {
     const fought = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4)))
     expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: S1, laurels: 30, shards: 0, firstClear: true })
     expect(fought.result!.members).toHaveLength(5)
@@ -145,11 +145,15 @@ describe('fights (D52, D66)', () => {
     // A replay pays a quarter of the first clear (D79): 30 Laurels become 8, and a quarter of the EXP at most.
     expect(again.result).toMatchObject({ laurels: 8, firstClear: false })
     expect(again.result!.members[0]!.exp).toBeLessThanOrEqual(Math.ceil(fought.result!.members[0]!.exp / 4))
-    // Band-1 tokens land in the Warehouse (D67, D82: two from a regular stage).
-    const tokens = fought.result!.tokens
-    expect(Object.values(tokens).reduce((a, b) => a + b, 0)).toBe(2)
-    expect(Object.keys(tokens).every((id) => id.endsWith('-1'))).toBe(true)
-    for (const [id, n] of Object.entries(tokens)) expect(world.items[id]).toBe(n)
+    // Her bars (D102): 2E to her class, her weapons share 5E (double for the one she attacked with), E to each armor kind.
+    const m = fought.result!.members[0]!
+    const gain = (kind: string, id: string) => m.ranks.find((g) => g.ref.kind === kind && g.ref.id === id)?.exp ?? 0
+    expect(gain('class', 'brawler')).toBe(2 * m.exp)
+    expect(gain('weapon', 'greatsword')).toBe(Math.round((5 * m.exp * 2) / 6))
+    expect(gain('weapon', 'axe')).toBe(Math.round((5 * m.exp) / 6))
+    expect(['helm', 'cuirass', 'greaves', 'gauntlets', 'arms-orb'].every((k) => gain('armor', k) === m.exp)).toBe(true)
+    expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
+    expect(world.items).toEqual({})
 
     // Lv9 Umas one fight short of Lv10: each earns a Shard, and five Shards make a Ticket.
     let ready = withParty()
