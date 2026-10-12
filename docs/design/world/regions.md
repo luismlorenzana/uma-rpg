@@ -1,7 +1,8 @@
 # Regions and continents
 
-> **Status: proposal for owner review, 2026-10-10.** Region levels are superseded by D97: a region climbs five levels,
-> not one ([maps](../../game/maps.md)). Part of the [world map proposal](README.md). Elements and roles
+> **Status: region generation built (D72, D97); each region climbs five levels. Field effects remain a W4 specification.** The generated
+> [map manual](../../game/maps.md) is the current biome and continent list (D92). Part of the [world design](README.md).
+> Elements and roles
 > are today's engine's: fire, ice, lightning, light, dark (fire beats ice, ice beats lightning, lightning beats fire;
 > light and dark beat each other); striker, caster, guard, skirmisher, plus captains and champions for bosses.
 
@@ -86,39 +87,42 @@ its theme appears an extra time.
 | Our Grand Concert | 31–40 | Far north | Tundra, Coast, Forest | Glacier, Crystal Caverns, Storm Peaks |
 | Grand Masters | 41–50 | Shadowlands | Swamp, Haunted Moor, Highlands | Underworld, Twilight Rift, Sky Isles |
 
-Tiers 2 and 3 get their own five continents, with the same 20 biomes laid out differently.
+Tiers 2 and 3 are not built. Their five-continent layout remains planned; there are nineteen region biomes plus
+the capital, not twenty region biomes.
 
 ## A continent on the map
 
-Ten rows, one per level, low at the bottom; four regions per row (D71); a Spring every two rows; the capital on top.
-Every biome appears twice per continent, the Meadow and the continent's lean biome three times (19 × 2 + 2 = 40). The
-bottom of URA Finale (Lv1–10), for example:
+Ten rows, low at the bottom, four regions per row; a Spring every two rows; the capital on top.
+Rows 1–5 hold twenty regions climbing the first five levels; rows 6–10 hold twenty climbing the last five (D97).
+Every biome appears twice per continent, the Meadow and the continent's lean biome three times (19 × 2 + 2 = 40).
+One party takes one region from each half; the other choices serve the rest of the roster.
 
 ```
-            [ CAPITAL · Lv10 Finals ]
-  …
-Lv3    Desert        Tundra         Highlands      Jungle      ◆ Spring
-Lv2    Swamp         Haunted Moor   Coast          Forest
-Lv1    Meadow        Meadow         Forest         Coast       ◆ Spring
+            [ CAPITAL · Lv10 Finals, not yet built ]
+Rows 6–10   [ 20 regions, each Lv6–10 ]
+Rows 1–5    [ 20 regions, each Lv1–5  ]
 ```
 
-Each continent orders the rows differently, so the same biome meets you at different levels.
+The generated [continent tables](../../game/maps.md#continents) give the actual row order and ranges.
 
-## A region's data (authored once)
+## A region's data (generated)
 
 ```ts
-interface RegionDef {
-  id: string              // 'ura-volcano'
-  biome: Biome            // 'volcano'
-  name: string            // 'Cinder Reach'
-  level: number           // its one fixed level, inside the continent's band
-  cell: [col, row]        // where it sits on the continent map
+interface WorldRegion {
+  id: string              // 'w1-1-1': continent, row, column (1-based in the id)
+  continentId: string     // 'w1'
+  biome: Biome            // 'meadow'
+  name: string            // generated biome name, with a suffix for repeated copies
+  level: number           // first level of its five-level climb
+  levelTop: number        // last level, where the elite and boss wait
+  row: number             // 0-based layout row, not a single level
+  col: number             // 0-based region column
 }
 ```
 
-Everything else (signatures, formations, roles, field effect) comes from the biome. The twelve stages are generated
-from the region id with a fixed seed, so they never change under a save. The authored part is about 40 lines per
-continent, plus five Springs.
+Signatures, formations and roles come from the biome. Field effects are not engine inputs yet. The region layout
+and its twelve stages are generated from fixed ids/seeds, not forty hand-authored region rows (D72).
+Ten regular stages rise two per level; the elite and boss sit at `levelTop` (D97).
 
 ## Art, lean first
 

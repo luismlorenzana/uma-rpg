@@ -1,104 +1,56 @@
-# Battles, chapters and leveling
+# Battles, world stages and leveling
 
-> **Chapters and runs gave way to the world map (D72, [world/](world/README.md)).** The fight rules, rewards and
-> builds below still hold; stages replace chapter nodes and one world-wide run replaces per-party runs.
-
-> **Status: current (S3, 2026-10-10; D48–D53).** The fight rules themselves (hands, breaks, statuses, trees, Limit
-> Breaks) are in [classes.md](classes.md), ported from uma-racer. This page covers what uma-rpg builds around them.
-> Code: `packages/domain/src/rpg/` (engine, catalog, campaign) and `packages/domain/src/save/battle.ts` (the rules over
-> the save).
+> **Status: built through W3, D86 and D93, 2026-10-12.** Chapters and per-party runs retired in D72.
+> [Combat](../game/combat.md), [classes](../game/classes.md) and [maps](../game/maps.md) are the current rule reference.
+> Code: `rpg/battle/`, `world/world.ts`, `save/battle.ts`.
 
 ## The loop
 
-Unlock Umas (S2) → put five in a party → pick a chapter and a node → fight → every entrant earns EXP → levels give
-skill points and, in Tier 1, a **Shard at Lv10, 20, 30, 40 and 50** → five Shards make an Unlock Ticket (D47) →
-unlock more. Every win also pays **Laurels**, the currency the Exchange spends from S4.
+Unlock Umas → fill a five-Uma party → pick a world stage → fight → EXP, Laurels and tokens → stronger parties.
+Tier 1 milestones pay Shards; five become an Unlock Ticket automatically (D47, D51).
+Every entrant receives win EXP, knocked out or not. Replays and Sweeps pay a quarter of a first clear (D79).
 
-## Chapters (D48)
+## One world run
 
-One chapter per scenario of the tier, in release order: Tier 1 is URA Finale (Lv1–10), Unity Cup (11–20), Trackblazer
-(21–30), Our Grand Concert (31–40) and Grand Masters (41–50). Chapters are **generated in code** from the scenario's
-order; only the faces come from the private cast (D50).
+Progress belongs to the world, not a party. One active party fights; switching is free when no fight is open (D72).
+Stages open in order inside a region; continents and regions are open from the start.
+Full HP returns at each stage, while MP carries per Uma after wins.
+Five Springs per continent refill the active party and recharge for two hours (D72).
+Capital Finals are not built; region bosses are not the scenario Finals.
 
-| Stage | Levels | Nodes |
-|---|---|---|
-| Debut, Classic, Senior | +0–2, +3–5, +6–8 | Two rows of three fights (lanes lean to an element; the middle lane is mixed), a camp, a sub-boss with escorts |
-| Finals | +9 | The last camp, then three authored routes, each a **vanguard** then a **champion** with authored escorts |
+An open fight stores frozen input and every action, and the parser replays it on load (D52).
+The lineup cannot change or take jobs mid-fight. Back to the map preserves the fight; Give up closes it without
+reward and leaves MP as it was before. Losses do the same.
+The final action and its rewards land in one save, not separate updates.
 
-- A node opens when a node above it is won. Any node can be replayed; replays pay in full.
-- Each of the fourteen authored Finals (uma-racer's, original names and lines) belongs to one release slot; a fifteenth
-  scenario reuses the first until it gets its own.
-- Every chapter is open from the start; its level band tells you when it's sensible.
+## Waves and foes
 
-## Runs: one per party per chapter (D52)
+Engine v7 supports 1–8 foes per wave, dual elements, twice-acting elites and up to three waves (D91).
+Clearing a wave ends the round; the next keeps party HP, MP, statuses, Limit charge and summons.
+Each wave has its own round cap. v6 fights replay unchanged.
+Look up foes with `battleFoe(state, id)`; `state.input.enemies` holds only the first wave.
 
-- A run remembers the nodes the party has won, the **MP each Uma carries** between fights (HP is always full at the
-  start of a fight), and the **open fight**.
-- **Camps** refill every member's MP.
-- A fight needs a **full party of five**. A party fights **one fight at a time**, and its line-up is locked until the
-  fight ends: nobody joins, leaves or moves to another party mid-fight.
-- The open fight is stored as its frozen input (the party's stats, trees and equipped skills when it began, and the
-  foes) plus **every action taken**. The state is replayed from them, so a fight survives a reload and continues on
-  another device, and the save parser rejects a fight that doesn't replay cleanly.
-- **Give up** closes the fight with no reward and MP as it was before; **back to the map** keeps it open.
+Formations, signatures and wave budgets are generated in [the map manual](../game/maps.md#formations-and-waves).
+The field-effect layer is deferred. Private franchise faces follow biome mappings; they do not define battle rules
+(D83, D85, D88). Missing art uses a plain fallback.
 
-## Rewards (D51)
+## Rewards
 
-| Win | EXP weight (share of one level at the foes' level; halved by D71) | Laurels (× tier) |
-|---|---|---|
-| Fight | 0.21 | 2 |
-| Stage sub-boss | 0.14 | 5 |
-| Finals vanguard | 0.075 | 6 |
-| Finals champion | 0.10 | 10 |
+Regular, elite and boss stages have different weights. First clears triple Laurels; replays use 25% of those
+first-clear rewards; Lv41–50 multiplies Laurels by four (D79, D82).
+Waves multiply EXP and Laurels by 1.5, and add a token per extra wave (D91, D93).
+The generated [reward table](../game/loops.md#laurels-exp-and-tokens) and
+[token catalog](../game/materials.md#tokens) replace the retired chapter payout tables.
 
-- EXP scales **±10% per level of gap** between the Uma and the foes, from 10% to 200%, so new Umas catch up fast on
-  cleared chapters. Every entrant earns it, knocked out or not. Level `L` needs `120 + 16L` EXP; Lv50 banks EXP for
-  promotion (S8).
-- **Pacing, as pinned by tests (D71):** clearing every node of each chapter ends at Lv 7, 15, 24, 33 and 43; one path
-  per chapter ends at Lv 4, 10, 16, 22 and 28, and replays (paid up to double above her level) close the gap. Every win
-  also drops tokens ([loop.md](loop.md)).
-- Laurels are **draft numbers**: the pacing model before S4 sets them with the Exchange's prices.
-- A loss pays nothing and costs nothing.
+EXP scales ±10% per level gap, clamped to 10%–200%; Uma EXP to the next level is 120 + 16 × level (D48).
+The four-hour Lv1→50 fight budget is a target, not a chapter-clear guarantee (D71).
+The game and balance simulation share the weakness-aware Auto policy (D89); the owner still validates difficulty
+in play.
 
-## Classes and skills (D86)
+## Presentation
 
-The classes are in [class-rework.md](class-rework.md): every class wields five weapons (a Brawler the five Arms, a
-Mage the five Tomes; a Summoner, Spell Blade or Cleric picks), acts once a turn, and has a tree per weapon. Depth d opens
-at class rank d and Uma Lv 1/10/20/30/40 (D77) and brings its core skill free; side skills cost a point per depth (one a
-level, 50 at Lv50) and open at Lv 5/15/25/35/45 (D73), one side of each fork, swapped freely. Skill slots: 3 at Lv1, one
-more at Lv10, 15, 20, 25, 30, 35 and 40; until she picks, her skills are chosen for her (each weapon's deepest core in
-turn, Arms and Tomes alternating). The profile's first tab, **Skills**, picks her class, its weapons and her skills.
-In a fight, Attack uses any of her five weapons; a Spell Blade's act is an Arms half and a Tome half; a Summoner's
-summon lingers and strikes again when she next summons.
-
-## The rivals: PriConne's cast (D50)
-
-The foes wear the faces of **Princess Connect! Re:Dive's playable characters**: 109 of them (the official character
-list minus story-only characters). Names, colours and bust portraits are private content, never in git:
-`node scripts/cast/import.mjs` builds `content/release/` from the captured list, `bash scripts/cast/publish.sh`
-uploads it to `gs://uma-rpg-content`, and the API serves it at `/api/content/` to the signed-in owner only. Growing
-the cast means capturing the list again and re-running both scripts; the chapters pick it up on the next load. Since
-D76, D81 and D83 the faces follow the biome, three biomes a franchise: PriConne, **Azur Lane** (694 shipyard busts,
-`import-azurlane.mjs`), **Last Origin** (full art and face icons, `import-lastorigin.mjs`, run by the owner), **NIKKE**
-(full-body art, `import-nikke.mjs`), **Destiny Child** (full-body stills, `import-destinychild.mjs`) and
-**Girls' Frontline** (D85); Forest alone draws from a mixed pool of five faces per pack. Busts and full-body art both fit the stage by their own shape; the
-small round faces use a pack's face icons, or zoom onto the head of full-body art.
-Costume variants aren't on the official site and are out of scope.
-
-## Presentation (D53)
-
-- **The stage is Phaser**, like the Hub: rivals stand as bust portraits on the top half, the party as chibis (idle
-  pose, cheer pose on a win) below. The engine decides everything first; the stage then plays its events: lunges,
-  hit flashes and shakes, element particles (fire, ice, lightning bolts, light, dark), weapon slashes, shield chips,
-  a **BREAK** shatter with a camera shake, knockouts, heals, and a **Limit Break cut-in** with the Uma's bust on a
-  dark band.
-- **The DOM carries everything lasting**: tap targets, HP and MP bars, shields, weaknesses, intents, damage previews,
-  commands and sheets. The canvas only draws effect text (damage numbers, WEAK, BREAK).
-- Six to eight foes stand in two rows; a stage in waves shows a wave banner and a "W2/3" chip, and the next wave's
-  portraits are loaded with the first (W3, D91).
-- Tap the stage to skip the playback. Reduced motion skips it entirely. **Auto** plays every ally's turn with the
-  same weakness-aware policy the balance simulation uses (`rpg/battle/auto.ts`), and any manual tap hands control back;
-  **speed** runs playback at 1×, 2× or 4×. Both are remembered per device (D89). An Uma without a chibi in the master data
-  shows her outfit icon instead.
-- Art stays lean (the owner, 2026-10-10): existing master-data art and official portraits plus a few procedural
-  effects; no bespoke sprite sheets.
+Phaser plays engine cues; DOM owns lasting numbers, controls and accessible names (D33, D53).
+Six to eight foes use two rows. Wave chips and transitions show progress; portraits fit their own aspect ratio (D91).
+Auto and 1×/2×/4× are remembered per device (D89).
+Reduced motion currently skips playback; code-drawn hit/familiar art is separate queued work, not shipped behavior.
+Player-facing labels are short and help lives behind a help button (D95).

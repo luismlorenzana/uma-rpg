@@ -1,89 +1,68 @@
 # The core loop: fights feed the Hub
 
-> **Status: current (owner, 2026-10-11; D66–D71).** Tokens and linear ranks are built; the world map that sets the
-> bands is a proposal ([world/](world/README.md)). Numbers live in `packages/domain/src/economy/tokens.ts` and
-> `pacing.ts`.
+> **Status: built through D96, 2026-10-12.** Current currencies, rewards and jobs are generated in
+> [the game-loop manual](../game/loops.md) and [materials](../game/materials.md). This page explains why they connect.
 
 ## The loop
 
-1. **Fight.** Win stages at your Umas' level. They earn EXP and Laurels, and the win drops **tokens** of the fight's band.
-2. **Craft and cook.** The Forge needs a **Crafting Token**, the Kitchen a **Cooking Token**, both of the band of what
-   you make, plus the usual refined items.
-3. **Equip and eat.** Gear goes on; dishes unlock Extra Stats nodes.
-4. **Promote.** A class rank trains passively in its hall but starts only by spending a **Class Promotion Token**.
-   Weapon, Armor and Accessory Levels train passively, time alone (D70).
-5. **Back to fighting**, one band up, for the next band's tokens.
+1. **Fight.** Stages pay Uma EXP, Laurels and tokens of their ten-level band (D72, D82, D93).
+2. **Craft and cook.** Forge gear takes four refined materials and no token. Kitchen dishes take refined ingredients
+   and Cooking Tokens (D86, D94).
+3. **Equip and eat.** Bound gear supplies points and Orb kinds; dishes unlock Extra Stats (D28, D58, D86).
+4. **Train.** Class ranks spend Promotion Tokens. Weapon, Armor and Accessory Levels spend Mastery Tokens (D94).
+5. **Fight higher levels**, or replay a cleared stage at a quarter reward (D79).
 
-While one party waits on its promotions and gear, you fight with another. That rotation is the point.
+While one party fights, many other Umas work the Hub in parallel. When fighters need training or MP, rotate parties
+(D55, D72, D96). This is not a serial five-Uma schedule.
 
 ## Bands
 
-A **band** is ten levels: a continent of the world map. Band n covers:
-
-| Band | Fights at | Class promotion | Gear and dish grades |
-|---|---|---|---|
-| 1 | Lv1–10 | rank 1 → 2 | 1–2 |
-| 2 | Lv11–20 | rank 2 → 3 | 3–4 |
-| 3 | Lv21–30 | rank 3 → 4 | 5–6 |
-| 4 | Lv31–40 | rank 4 → 5 | 7–8 |
-| 5 | Lv41–50 | — (rank 5 is the top, D77) | 9–10 |
+A band is a continent's ten levels. Class rank r → r+1 takes band r, up to rank 5 (D77).
+A gear-level step from L takes Mastery band ⌈L/2⌉; a dish of grade g takes Cooking band ⌈g/2⌉ (D94).
+Exact token ids, kinds and bands are generated in [tokens](../game/materials.md#tokens).
 
 ## Tokens
 
-Per band, 21 kinds; Crafting and Cooking mirror each other on the eight stats, the same eight the item families pair up
-on (§8.2):
-
-| Token | Kinds per band | Spent on |
+| Kind | Kinds per band | Spend |
 |---|---|---|
-| **Class Promotion** | 5: one per class (bands 1–4) | Starting a class rank in its hall (taken when the job starts, returned on recall) |
-| **Crafting** | 8: one per stat | Crafting a piece whose **accent** is that stat: an ATK Crafting Token makes any ATK-accent gear of its band |
-| **Cooking** | 8: one per stat | Cooking a dish that **feeds** that stat. Duo dishes take one of each of their two stats, Feasts one of each of all eight |
+| Promotion | Five classes, bands 1–4 only | One per class rank-up |
+| Mastery | One, bands 1–5 | One per Weapon, Armor or Accessory Level-up |
+| Cooking | Eight stats, bands 1–5 | Planet dish one, Duo two, Feast eight |
 
-- **Drops per win** (seeded by the fight, so a replay drops the same; D82): regular stage 2, elite 3, Finals vanguard
-  3, boss or champion 5. Sub-bosses and champions always include a Promotion Token. Each other drop is Crafting
-  42.5%, Cooking 42.5%, Promotion 15%, at a random class or stat. Band 5 drops no Promotion Tokens: their share goes to
-  Crafting or Cooking (D77).
-- **Replays** (D79): a stage already cleared drops each token with a 25% chance, and Sweeps pay as replays.
-- **Laurels** (D80): any token sells for **20 Laurels × its band** and the Exchange sells **any token for twice that**,
-  so two tokens of a band buy one of any kind in it, and bad luck never stalls a plan. Low bands can't cheaply buy high
-  ones: ten band-1 tokens buy one band-5 token.
-- They sit in the Warehouse's **Tokens** shelf, by band, and sell from there too.
+Crafting Tokens retired in D94. There are 65 token ids, not the earlier 21 per band.
+Tokens trade through Laurels: sell for 20 × band, buy for twice that (D80). They live in the Warehouse.
 
-## Ranks and levels are linear (D68, D70)
+A regular stage drops two, an elite three and a boss five, plus one per extra wave (D82, D93).
+A first-clear elite/boss guarantees a Promotion Token in bands 1–4; band 5 splits that share between Mastery and
+Cooking. Other drops use 15% Promotion, 42.5% Mastery and 42.5% Cooking. Replay/Sweep drops each have a 25% keep
+chance (D79). The seeded roll makes retried saves deterministic, not every separate replay identical.
 
-| Track | Where | Per step, at G | At A | Whole track at G |
-|---|---|---|---|---|
-| Class rank (1 → 5) | Its class hall | 6 h | 3 h | 24 h, plus a Promotion Token per rank |
-| Weapon Level (1 → 10), per class | Its class hall | 3 h | 1½ h | 27 h |
-| Armor Level (1 → 10) | The Armory | 3 h | 1½ h | 27 h |
-| Accessory Level (1 → 10) | The Jeweler | 3 h | 1½ h | 27 h |
+## Ranks and levels are linear
 
-Level k wears grade k. Per band that's one class rank and two levels of each gear track.
+Class ranks take six base hours per step, twenty-four from 1 to 5. Gear levels take three per step, twenty-seven
+from 1 to 10 (D68, D77). Aptitude and facility speed reduce these times; Time Tickets apply (D74).
+A full mastery track takes nine Mastery Tokens, usable on any gear-level track, not ten crafted pieces (D94).
+Training rules and hall mappings are in [the manual](../game/loops.md#training).
 
-## How long Lv1 → 50 takes (D71)
+## Fight-time and collection targets
 
-**About 4 hours of fighting for a fresh party** (about 120 stages of about two minutes), less for Umas riding with
-higher-level ones (the catch-up EXP). **About 20 parties make the 100-hour mark**, paced in practice by the loop above:
-each band waits on its promotions, gear and dishes.
+**About four hours of fighting for one fresh Lv1→50 party**, and about twenty parties around the hundred-hour
+mark, is the target (D71), not a measured wall-clock guarantee. W3 adds waves and extra rewards (D91, D93).
+[The pacing model](pacing.md) owns timers; the pacing simulator measures the current rules without retuning them.
 
-On the world map that means **about 0.4 of a level per regular stage**, so 48 stages a level serve about 20 parties'
-first clears ([world/README.md](world/README.md)). Built as D72: stages pay 0.4 / 0.6 / 0.8 of a level (regular, elite,
-boss) and drop 2 / 3 / 5 tokens (D82).
+## One Uma's budget (D82, D93, D94)
 
-## What one Uma earns from Lv1 to Lv50 (D82)
+Counting a fifth of the party's drops, one Uma's Lv1→50 progression is intended to fund:
 
-Each Uma counts as a fifth of her party's fights. A region's twelve stages pay 5.4 levels of EXP at its level, so a
-party clears about 1.85 regions' worth of fresh stages per band and about nine on the way to Lv50.
+| Track | Token cost | Target |
+|---|---|---|
+| Class rank 1→5 | Four Promotion Tokens | Two classes (eight) |
+| Gear Level 1→10 | Nine Mastery Tokens | Two mastery tracks (eighteen) |
+| Extra Stats planet | Ten Cooking Tokens | Two planets (twenty) |
 
-| Track | Cost in tokens | Before D82, per Uma | Since D82, per Uma | Target |
-|---|---|---|---|---|
-| A class, rank 1 → 5 | 4 Promotion (one each of bands 1–4) | ~6 (1.5 classes) | ~8.7 (2.2 classes) | 2 classes |
-| A weapon track, grade 1 → 10 (the Weapon Level itself is time only) | 10 Crafting (two a band) | ~11 (1 track) | ~21 (2.1 tracks) | 2 tracks |
-| An Extra Stats planet, moons 1 → 10 | 10 Cooking (two a band) | ~11 (1 planet) | ~21 (2.1 planets) | 2 planets |
+`save/tokens.test.ts` checks the expected budget using waves' EXP and drops, not the retired chapter model.
+It checks Lv41–50's fourfold Laurels against Exchange prices too: the extra Laurels buy roughly one and a half
+additional class tracks (D82). Drops are shared stock; random class/stat distribution may require trading (D80).
 
-The whole Sun-and-planets map (100 nodes) costs 144 Cooking Tokens: 80 for the eight planets, 32 for the sixteen
-bridges' Duo dishes and 32 for the Sun's four Feasts.
-
-**Late Laurels**: stages at Lv41–50 pay four times the Laurels, about 580 extra per Uma over the band. A full class's four
-Promotion Tokens cost 400 at the Exchange, so that's about one and a half more classes, or anything else Laurels buy.
-The test `tokens.test.ts` keeps these numbers honest.
+The whole Extra Stats map costs 144 Cooking Tokens: eighty moons, thirty-two for bridges and thirty-two for the
+Sun (D58, D67). Gear has a material budget, not a Crafting Token budget (D94).

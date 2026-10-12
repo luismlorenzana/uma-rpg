@@ -43,7 +43,6 @@ with real rosters and gear, gear and food parity, recipe input counts, and the c
 
 | Packet | What |
 |---|---|
-| [H12](handoff/tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs (game-design.md is still "draft v0.4") |
 | [H14](handoff/tasks/H14-pacing-simulator.md) | A pacing and economy simulator |
 | [H16](handoff/tasks/H16-main-js-split.md) | Main JS is about 194 KB of D56's 230 KB budget: split the domain out |
 | [H17](handoff/tasks/H17-device-accessibility-pass.md) | Device and accessibility pass |

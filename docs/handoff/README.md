@@ -20,7 +20,6 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | H06 |
 | [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars | ChatGPT | both | M | — |
 | [H11](tasks/H11-ui-icons.md) | Class emblems and status icons | ChatGPT | both | S | — |
-| [H12](tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs | ChatGPT | uma-rpg | M | — |
 | **P3** | | | | | |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | uma-rpg | M | — |
 | [H14](tasks/H14-pacing-simulator.md) | A pacing and economy simulator, Lv1 to 50 | ChatGPT | uma-rpg | M | — |
@@ -38,11 +37,12 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H25](tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3 | Owner and Claude | uma-racer | L | A Farm spec |
 | [H26](tasks/H26-uma-puzzle-phase-4.md) | uma-puzzle phase 4 | Owner and Claude | uma-puzzle | L | A billing slot |
 
-**For ChatGPT, in order:** H03, then H06 → H07 → H08, H10, H11, H12, H14, H15, H16, H17, H18, H19.
+**For ChatGPT, in order:** H03, then H06 → H07 → H08, H10, H11, H14, H15, H16, H17, H18, H19.
 
 **Done:** H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
 speed (D89), H09, W3's eight foes, dual elements and waves (D91), H04, the
-[current phone check](../testing/phone-check.md), and H05, the class-rework dead-code sweep.
+[current phone check](../testing/phone-check.md), H05, the class-rework dead-code sweep, and H12, the
+[design-doc refresh](../design/game-design.md) through D97.
 
 ## Not relevant anymore
 

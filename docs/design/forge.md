@@ -1,43 +1,42 @@
 # Forge and equipment
 
-> **Status: current (S7, 2026-10-10; D59).** Numbers in [pacing.md](pacing.md). Code: `packages/domain/src/economy/gear.ts`,
-> `src/save/forge.ts`.
+> **Status: built, D86 and D94, 2026-10-12.** Exact types, recipes and points are generated in
+> [the materials manual](../game/materials.md#gear). Code: `economy/gear.ts`, `save/forge.ts`.
 
-## Pieces
+## Pieces and recipes
 
-Any **type × grade × accent** exists; nothing is stored as a list. A piece's id is `<type>-g<grade>-<accent>`
-(`greatsword-g3-atk`), its name the accent's word, its main material and its type ("Fierce Copper Greatsword").
+Any type × grade × accent exists; ids are `<type>-g<grade>-<accent>`.
+There are ten weapons, four armor types, Ring, Charm and ten Orbs (D86).
+The grade's first recipe family names the piece; the accent chooses its extra stat effect.
 
-| Main material (sets the type and grade) | Types |
-|---|---|
-| Ingots (Ores) | Greatsword, Spear, Axe, Short Sword, Mail, Plate |
-| Planks (Woods) | Bow, Mage Staff, Arcane Staff, Cleric Staff |
-| Cloth (Fibers) | Garb, Summoner Tome |
-| Leather (Hides & Scales) | Leather Armor |
-| Cut gems (Crystals) | Ring |
-| Carvings (Bones & Horns) | Charm |
+Each piece takes **four same-grade refined items**, one per recipe family, and **no token** (D94).
+Arms and Arms Orbs take Ores, Stones, Woods and Hides & Scales.
+Tomes and Elemental Orbs take Crystals, Fibers, Essences and Bones & Horns.
+Armor and stat accessories take two families from each half (D86).
+[Items](items.md#gear-recipes) explains the catalog-wide symmetry; the manual generates the complete recipe table.
 
-A recipe is 2 of the main material and 1 of the accent family's refined material, both of the piece's grade, plus 0–2
-extras (grade ⌈g/2⌉, rotating through the other gathering families) as grades climb, so a piece uses as many inputs as
-a dish of its grade. Crafting is a Forge job: Craft Level, three items' time, grade k at Lv `5k − 4`.
+Crafting uses Craft Level and the Forge's slots. Grade k needs Lv 5k − 4.
+One output takes two items' base time, not the earlier three (D65).
+A job reserves inputs on start; collect grants completed pieces, and recall refunds unmade inputs (D55).
+Mastery Tokens never gate a Forge recipe (D94).
 
 ## Wearing it
 
-- Slots: **one piece per weapon type**, **an armor**, **an accessory**. Her active build uses the pieces for the
-  weapons it wields, so switching builds needs no re-equipping.
-- **Binding**: equipping a piece from the stock binds it to her for good; it stays in her locker and never moves to
-  another Uma. She swaps freely among her own pieces (taking one off keeps it).
-- **Mastery**: grade k needs mastery rank k in its type (S5's armories). Accessories need none.
+- The class uses five weapons, one armor and one accessory (D86). Stored equipment is keyed by each of ten weapon
+  types plus armor/accessory; switching class changes which five weapon pieces contribute.
+- Equipping from stock binds the piece to her locker permanently. She may swap her own pieces; bound gear cannot
+  move to another Uma or be sold (D28, D59).
+- Grade k requires the matching gear level ≥ k, with no Uma-level gate (D29, D70).
+  Weapons use the highest Weapon Level among classes that wield that type (`gearLevel`); armor and accessories
+  use their own levels. All level-ups spend Mastery Tokens (D94).
+- Class weapon selection and crafted pieces are separate: an uncrafted weapon still allows its skills and Attack.
 
-## Points (§7.3)
+## Points and Orbs
 
-| Piece | Points |
-|---|---|
-| Weapon, grade g | ATK g (staves and tomes: M.ATK; the Short Sword half each), split across her build's weapons |
-| Garb / Leather / Mail / Plate | DEF, M.DEF and Speed or HP by weight: lighter is faster, heavier sturdier |
-| Accessory | its accent only, g points |
-| Any accent | ⌈g/2⌉ points of its effect (accessories: g) |
+Weapon offense is split over the five active weapon slots: ATK for Arms, M.ATK for Tomes (D86).
+Armor trades lighter Speed/evasion for heavier defense or HP. Ring/Charm accents have double an Orb's weight;
+an Orb also adds one kind to every hit for weakness checks, never extra damage (D86).
+Any class may wear any Orb; its kind can overlap an existing weapon.
 
-Points join her Extra Stats in every fight. Foes past the first chapter carry the expected gear and Extra Stats too:
-+0.35% to every stat per lifetime level above 10 (about +14% at Lv50), so a party that keeps up with both feels like
-the tuned curve.
+Exact point tables are generated in [gear](../game/materials.md#gear) and explained in
+[combat](../game/combat.md#damage). There is no distance-by-gear-type mastery system anymore (D70).

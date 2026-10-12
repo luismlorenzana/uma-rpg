@@ -1,8 +1,9 @@
 # Encounters: making 1,000 fights differ
 
 > **Status: built as W3 (D91, 2026-10-11)**, except the Ambush template and field effects (W4). Part of the [world
-> map proposal](README.md). Engine v7 fights up to 8 foes a wave, dual-element foes and 1–3 waves; v6 fights still
-> replay.
+> map design](README.md). Engine v7 fights up to 8 foes a wave, dual-element foes and 1–3 waves; v6 fights still
+> replay. Exact counts/budgets are generated in [the map manual](../../game/maps.md#formations-and-waves).
+> Below “As built”, the original formation tables and examples record design targets, not additional live rules.
 
 ## As built (W3, D91)
 
@@ -12,7 +13,7 @@
 | **Dual elements** | A pair signature makes every foe carry both elements (`element2`). Her second elemental move uses the second element, and her weaknesses follow the pair rule below |
 | **Acts twice** | Solo elites and each region's elite (stage 11) take two moves a round, the second after every foe's first |
 | **Waves** | Stages 8 and 9 come in two waves at 0.75 HP each; the boss in three, two waves of the biome's other signatures at 0.3 HP, then the champion and her guards. A cleared wave ends the round: the next wave steps in at the start of a fresh one, and the party keeps its HP, MP, statuses, Limit charge and lingering summons |
-| **Pay** | A stage in waves pays 1.5× its EXP and Laurels, Sweeps included. Tokens don't change (D82's budget) |
+| **Pay** | A stage in waves pays 1.5× EXP and Laurels, Sweeps included (D91), and one additional token per extra wave (D93) |
 | **Stage** | Six to eight foes stand in two rows; a wave banner and a "W2/3" chip in the header. The region sheet lists foes by wave |
 | **Balance** | `SIM=1` on time: regular stages and elites 100%, bosses 100% with gear except the Lv15 Ruins boss (light+dark, weapons only), which a party with more Arms clears. That's the rotation the pairs are for |
 
@@ -27,7 +28,7 @@ A stage is generated from its region's biome ([regions.md](regions.md)) by picki
 | **Formation** | 8 templates (below) | The biome's lean, plus a spread |
 | **Roles** | Striker, caster, guard, skirmisher; captain or champion for bosses | The biome's lean |
 | **Waves** | 1–3 | The stage's place in the region |
-| **Weapon weaknesses** | 1–2 of the five physical weapons per foe | Its role (guards lean to axe and spear, skirmishers to bow and short sword) |
+| **Weapon weaknesses** | A seeded subset of the five Arms; light+dark foes have three | Built by `stageWaves`; exact signature/formation rules are in the manual |
 | **Field effect** (later) | One per biome | The biome |
 
 ## Formations
@@ -80,8 +81,9 @@ every Volcano stage. That's the push to rotate parties you asked for.
 | 11 | **Elite**: a solo or duo carrying the biome's rarest signature | Pays like a sub-boss |
 | 12 | **Boss**: an escort and three waves, captain or champion with the biome's main pair | Drops a Promotion Token every time |
 
-**The rule that keeps it fresh:** no two stages of a region share the same formation, signature and role mix; the
-generator rerolls until they differ, and a test checks every region of every continent.
+**As built:** the generator consumes the biome's formation/signature combinations, preferring a different formation
+from the previous stage. It restarts the cycle when that pool runs out; fixed teaching, crowd and boss stages can
+repeat a combination. It does not promise twelve unique combinations in a one-signature biome (`stagePlan`).
 
 ## Your examples, as stages
 
@@ -104,9 +106,9 @@ generator rerolls until they differ, and a test checks every region of every con
 
 ## Faces
 
-Foes keep today's faces at first: the private PriConne cast (D50), picked by the stage's seed. Elites and bosses draw
-from the cast's most recognizable members. Later options, in [themes.md](themes.md): original monster families for
-regular foes, recolored per element, and franchise realms.
+Six private packs now follow the biome; Forest draws five seeded members from each pack (D83, D85, D88).
+[The manual](../../game/maps.md#faces) lists the built mapping. The earlier original-monster/Rift options in
+[themes.md](themes.md) remain proposal history, not current content rules.
 
 ## What the engine and stage need
 
