@@ -1,7 +1,7 @@
 // Stat points from Extra Stats (S6) and gear (S7), applied to a battle profile (§7.3, §10, D58). One point is a small
 // share of its stat; Speed becomes evasion and Limit Break charge a head start on the gauge.
-import { ITEM_EFFECTS, type ItemEffect } from '../items/catalog'
-import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
+import { ITEM_EFFECTS, type ItemEffect } from '../items/kinds'
+import { BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
 import type { RpgCoreStats } from '../rpg/rules'
 import { POINT_EVASION, POINT_LIMIT, POINT_SHARE } from './pacing'
 

@@ -7,6 +7,8 @@ import {
   isRpgTome, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
+import { rpgTreeOf } from './node-identity'
+export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 
 /** Single-target total power by depth, and the full-turn MP by depth (6 + 4 × depth). */
 export const RPG_SKILL_POWER = [1.6, 2.2, 2.9, 3.7, 4.6] as const
@@ -14,9 +16,6 @@ export const RPG_SKILL_MP = [10, 14, 18, 22, 26] as const
 /** Every-foe skills deal this share of single-target power to each foe; random multi-hits get a small bonus. */
 export const RPG_AOE_SHARE = 0.55
 export const RPG_RANDOM_BONUS = 1.05
-/** A depth's side skills open at mid-band, Uma Lv 5, 15, 25, 35 and 45 (D73); its core with the class rank (D77). */
-export const rpgSideNodeLevel = (depth: number): number => 10 * depth - 5
-
 export interface RpgPart { kind: RpgDamageKind; share: number }
 export interface RpgHit { power: number; parts: RpgPart[] }
 export type RpgSkillTarget = 'one' | 'all' | 'random'
@@ -94,7 +93,6 @@ interface TreeSpec {
   sideA: (d: number) => RpgSkillDef
   sideB: (d: number) => RpgSkillDef
 }
-export const rpgTreeOf = (classId: RpgClass, weapon: RpgWeapon): RpgTreeId => `${classId}-${weapon}`
 function addTree(spec: TreeSpec): void {
   const tree = rpgTreeOf(spec.classId, spec.weapon)
   for (let d = 1; d <= 5; d += 1) {

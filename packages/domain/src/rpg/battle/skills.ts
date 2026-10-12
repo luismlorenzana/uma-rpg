@@ -11,7 +11,7 @@ export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5
 /** A break lasts the round it happens in and the next one. */
 export const BATTLE_BREAK_ROUNDS = 2
-export const BATTLE_MAX_ROUNDS = 40
+export { BATTLE_MAX_ROUNDS } from './caps'
 export const BATTLE_STATUS_TURNS = 2
 export const BATTLE_STATUS_STACK_CAP = 3
 export const BATTLE_BURN_PERCENT = 0.04

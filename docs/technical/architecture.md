@@ -102,4 +102,26 @@ How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md
 
 ## Budgets
 
-Main JS ≤ 230 KB gzip (D56; 146 KB at S1, 175 KB at S3, 186 KB at S4: the save parser validates fights, items and jobs, so the domain rules ship in the main chunk). Phaser (Hub and battle stage), Firebase, master data parsing and each place page are lazy chunks.
+Main JS ≤ 230 KB gzip (D56). H16 reduced the production entry from 195.96 to 133.15 KB gzip (measured when it merged onto main `888aeb2`).
+`scripts/check-size.mjs`, run by the web build, measures the HTML entry and all its static JS dependencies from
+Vite's manifest. Both must fit the budget; putting code in an eagerly imported vendor chunk cannot hide it.
+Phaser (Hub and battle stage), Firebase, master data parsing and each place page remain lazy chunks.
+
+### Boot and lazy domain boundaries (H16)
+
+- The save parser, Hub state readers and small id/gate validators stay in the entry. Item identities are an id-only
+  snapshot; `items/identity.test.ts` compares every field to the authored catalog. Update that snapshot when changing
+  item ids, families or sites. Skill, dish and gear identities share exact grammar and constants with their catalogs,
+  with exhaustive parity tests.
+- Device reads use `parseSaveAsync`: migrations load only for old versions, and the battle engine loads only when a
+  save contains a frozen fight. Every pending fight is replayed before the promise returns. There is no unchecked
+  intermediate save. The API keeps the synchronous, equally strict `parseSave` contract.
+- Gameplay commands dynamically import the domain's `battle`, `work`, `exchange`, `kitchen` and `forge` entry points.
+  They read the latest save after loading, so overlapping cold commands cannot overwrite one another's changes.
+  Skill definitions, the world generator and full recipes load with their screens, not with an idle Hub.
+- Dexie initializes on the existing asynchronous device-I/O path. Its separate 32.49 KB gzip chunk is still required
+  at boot: entry plus device storage is about 165.6 KB, not 133.15 KB. The database, row format and fallback behavior are
+  unchanged. No manual vendor-chunk partition hides startup work.
+- The service worker precaches every built JS chunk; a cold, uncached network pass is also required when changing
+  these boundaries. The H16 pass used 375×667, synthetic master data and rivals, all 34 open places, four Hub pages,
+  five continents, a region, profile tabs and a saved-fight reload under Fast 4G proxy shaping.

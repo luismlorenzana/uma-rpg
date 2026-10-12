@@ -25,7 +25,6 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | uma-rpg | M | — |
 | [H14](tasks/H14-pacing-simulator.md) | A pacing and economy simulator, Lv1 to 50 | ChatGPT | uma-rpg | M | — |
 | [H15](tasks/H15-capital-finals.md) | The capitals' Finals | ChatGPT | uma-rpg | M | — |
-| [H16](tasks/H16-main-js-split.md) | Split the domain out of the main JS chunk | ChatGPT | uma-rpg | S | — |
 | [H17](tasks/H17-device-accessibility-pass.md) | Device and accessibility pass | ChatGPT, then the owner | uma-rpg | M | — |
 | [H18](tasks/H18-sound-effects.md) | Synthesized sound effects | ChatGPT | uma-rpg | S | — |
 | [H19](tasks/H19-hub-scroll-zoom.md) | Hub pages that scroll and zoom | ChatGPT | uma-rpg | M | — |
@@ -42,7 +41,8 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 
 **Done:** H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
 speed (D89), H09, W3's eight foes, dual elements and waves (D91), H04, the
-[current phone check](../testing/phone-check.md), and H05, the class-rework dead-code sweep.
+[current phone check](../testing/phone-check.md), H05, the class-rework dead-code sweep, and H16, the lazy-domain
+split and build-time JS budget guard (195.96 → 133.15 KB gzip entry, measured on merge).
 
 ## Not relevant anymore
 

@@ -21,7 +21,7 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, createAccount, nameParty, renameAccount, resetGame, setSlot, syncNow, unlock, useGame } = await import('./game')
+const { boot, buyTicket, createAccount, nameParty, pickClass, renameAccount, resetGame, setSlot, syncNow, unlock, useGame } = await import('./game')
 const { db } = await import('./db')
 
 beforeEach(async () => {
@@ -32,6 +32,20 @@ beforeEach(async () => {
 })
 
 describe('game store', () => {
+  it('reads the latest save after lazy rules load, so concurrent cold actions preserve both changes', async () => {
+    await boot('u1')
+    await createAccount('Test')
+    await unlock('9000000')
+    const save = useGame.getState().save!
+    useGame.setState({ save: { ...save, tierWorlds: { '1': { ...save.tierWorlds['1']!, wallet: { ...save.tierWorlds['1']!.wallet, laurels: 100 } } } } })
+    await Promise.all([pickClass('9000000', 'mage'), buyTicket('time', 1)])
+    const world = useGame.getState().save!.tierWorlds['1']!
+    expect(world.umas['9000000']!.classId).toBe('mage')
+    expect(world.wallet).toMatchObject({ laurels: 90, timeTickets: 1 })
+    resetGame()
+    await boot('u1')
+    expect(useGame.getState().save!.tierWorlds['1']).toEqual(world)
+  })
   it('asks for a trainer name on a fresh device with an empty server, then saves 20 Unlock Tickets', async () => {
     await boot('u1')
     expect(useGame.getState().status).toBe('first-launch')

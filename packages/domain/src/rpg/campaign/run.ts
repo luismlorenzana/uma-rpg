@@ -1,44 +1,17 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
-import { applyBattleAction, BATTLE_MAX_ACTIONS, createBattle, replayBattle } from '../battle/engine'
+import { applyBattleAction, createBattle, replayBattle } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
-
-export interface RpgRunBattle {
-  battleId: string
-  nodeId: string
-  startedAt: string
-  input: BattleInput
-  /** Every action taken so far; the state is `replayBattle(input, actions)`. */
-  actions: BattleAction[]
-}
-export interface RpgRun {
-  /** 0-based party index. */
-  party: number
-  chapterId: string
-  /** Wins per battle node; visits per camp. */
-  wins: Record<string, number>
-  /** MP carried per Uma; an absent Uma is full. */
-  mp: Record<string, number>
-  battle: RpgRunBattle | null
-  /** Fights started, for unique battle ids and seeds. */
-  battles: number
-  clearedAt: string | null
-  updatedAt: string
-}
+import { RPG_MAX_BATTLE_ACTIONS, type RpgRun } from './run-state'
+export { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from './run-state'
 export type RpgNodeStatus = 'locked' | 'available' | 'cleared'
-/** The most actions a fight can take: the engine's own cap, which counts every wave. */
-export const RPG_MAX_BATTLE_ACTIONS = BATTLE_MAX_ACTIONS
 
 export const rpgRunKey = (party: number, chapterId: string): string => `${party}:${chapterId}`
 const battleIdOf = (run: Pick<RpgRun, 'party' | 'chapterId' | 'battles'>): string => `battle:${run.party}:${run.chapterId}:${run.battles + 1}`
-
-export function createRpgRun(party: number, chapterId: string, now: string): RpgRun {
-  return { party, chapterId, wins: { start: 1 }, mp: {}, battle: null, battles: 0, clearedAt: null, updatedAt: now }
-}
 
 export function rpgNodeStatus(chapter: RpgCampaignChapter, run: RpgRun | null, nodeId: string): RpgNodeStatus {
   if ((run?.wins[nodeId] ?? 0) > 0 || nodeId === 'start') return 'cleared'

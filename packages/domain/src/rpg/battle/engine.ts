@@ -18,6 +18,8 @@ import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
 import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, BattleEnemyMove, BattleError, BattleHalf,
   BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit } from './types'
+import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
+export { BATTLE_MAX_ACTIONS } from './caps'
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -121,7 +123,6 @@ function validEnemy(e: BattleEnemy, version: 6 | 7): boolean {
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
 const MAX_FOES = { 6: 5, 7: 8 } as const
-const MAX_EXTRA_WAVES = 2
 function validateInput(input: BattleInput): void {
   if (!input || (input.version !== 6 && input.version !== 7) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -600,9 +601,7 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
   return { state: s, cues, hash: battleStateHash(s) }
 }
 
-/** The most actions a fight can take: five a round over every wave's round cap, with room to spare. */
-export const BATTLE_MAX_ACTIONS = BATTLE_MAX_ROUNDS * 10 * (1 + MAX_EXTRA_WAVES)
-
+/** Rebuild a fight from its frozen input and bounded action log. */
 export function replayBattle(input: BattleInput, actions: readonly BattleAction[]): BattleStep {
   if (actions.length > BATTLE_MAX_ACTIONS) throw new RangeError('Battle replay is too long')
   let result = createBattle(input)

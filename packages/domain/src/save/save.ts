@@ -8,20 +8,22 @@ import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type Queue
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
 import { RPG_CLASSES } from '../rpg/kinds'
-import { dishById, isStarNode } from '../economy/dishes'
-import { gearById, gearLevel, gearLevelName, slotOf, type GearSlot } from '../economy/gear'
+import { isDishId, isStarNode } from '../economy/dish-id'
+import { gearIdentity as gearById, gearLevel, gearLevelName, slotOf, type GearSlot } from '../economy/gear-id'
 import { WEAPON_TYPES } from '../economy/training'
 import { activeNodeSlots } from '../economy/pacing'
-import { ITEM_FAMILIES, itemById, type ItemEffect } from '../items/catalog'
-import { gradeBand, isToken, masteryTokenId } from '../economy/tokens'
+import { isItemId } from '../items/identity'
+import type { ItemEffect } from '../items/kinds'
+import { isToken } from '../economy/tokens'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
-import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run'
-import { rpgNode } from '../rpg/catalog'
+import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
+import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
   isRpgWeapon, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
   type RpgWeapon,
 } from '../rpg/rules'
+import { migrateWorld } from './migrations'
 
 export const SAVE_SCHEMA_VERSION = 17
 /** Umas marked as farming targets (D100). */
@@ -246,7 +248,7 @@ function parseItems(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const items: Record<string, number> = {}
   for (const [id, n] of Object.entries(value)) {
-    if (!itemById(id) && !isToken(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
+    if (!isItemId(id) && !isToken(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
     const c = count(n, `${path}.${id}`)
     if (c > 0) items[id] = c
   }
@@ -274,9 +276,9 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (j.kind !== kind || !JOB_KINDS.includes(j.kind as Job['kind'])) throw new SaveParseError(`${path}.kind`, `expected ${kind}`)
   if (typeof j.outfitId !== 'string' || !umas[j.outfitId]) throw new SaveParseError(`${path}.outfitId`, 'expected an owned outfit')
   if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
-  if ((kind === 'gather' || kind === 'refine') && !itemById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
+  if ((kind === 'gather' || kind === 'refine') && !isItemId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
   if (kind === 'train' && !parseTrack(j.output)) throw new SaveParseError(`${path}.output`, 'unknown training track')
-  if (kind === 'cook' && !dishById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
+  if (kind === 'cook' && !isDishId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
   if (kind === 'craft' && !gearById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gear')
   const n = count(j.count, `${path}.count`)
   if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
@@ -363,7 +365,7 @@ function parseDishes(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const dishes: Record<string, number> = {}
   for (const [id, n] of Object.entries(value)) {
-    if (!dishById(id)) throw new SaveParseError(`${path}.${id}`, 'unknown dish')
+    if (!isDishId(id)) throw new SaveParseError(`${path}.${id}`, 'unknown dish')
     const c = count(n, `${path}.${id}`)
     if (c > 0) dishes[id] = c
   }
@@ -485,7 +487,16 @@ const ACTION_KEYS: Record<BattleAction['kind'], readonly string[]> = {
   limit: ['kind', 'actorId', 'targetId', 'skill', 'skills', 'weapon'],
 }
 
-function parseBattle(value: unknown, path: string): RpgRunBattle {
+type CheckBattle = (input: BattleInput, actions: BattleAction[], path: string) => void
+
+function checkReplay(replay: typeof replayBattle, input: BattleInput, actions: BattleAction[], path: string): void {
+  let step
+  try { step = replay(input, actions) }
+  catch (err) { throw new SaveParseError(`${path}.input`, err instanceof Error ? err.message : 'invalid fight') }
+  if (step.error) throw new SaveParseError(`${path}.actions`, `an action was refused: ${step.error}`)
+}
+
+function parseBattle(value: unknown, path: string, check: CheckBattle): RpgRunBattle {
   const b = object(value, path, ['battleId', 'nodeId', 'startedAt', 'input', 'actions'])
   if (typeof b.battleId !== 'string' || !NODE_ID.test(b.battleId)) throw new SaveParseError(`${path}.battleId`, 'bad id')
   if (typeof b.nodeId !== 'string' || !NODE_ID.test(b.nodeId)) throw new SaveParseError(`${path}.nodeId`, 'bad id')
@@ -496,20 +507,14 @@ function parseBattle(value: unknown, path: string): RpgRunBattle {
     object(a, `${path}.actions.${i}`, ACTION_KEYS[kind as BattleAction['kind']])
   })
   // The fight must replay cleanly: the engine validates the input and every action (D52).
-  let step
-  try {
-    step = replayBattle(b.input as BattleInput, b.actions as BattleAction[])
-  } catch (err) {
-    throw new SaveParseError(`${path}.input`, err instanceof Error ? err.message : 'invalid fight')
-  }
-  if (step.error) throw new SaveParseError(`${path}.actions`, `an action was refused: ${step.error}`)
+  check(b.input as BattleInput, b.actions as BattleAction[], path)
   return { battleId: b.battleId, nodeId: b.nodeId, startedAt: timestamp(b.startedAt, `${path}.startedAt`), input: b.input as BattleInput, actions: b.actions as BattleAction[] }
 }
 
 const SPRING_ID = /^w\d{1,2}-spring\d{1,2}$/
 
 /** The world's state (D66): its one run (chapter id `world`, party the open fight's), the active party, Spring uses. */
-function parseWorldState(value: unknown, path: string): WorldState {
+function parseWorldState(value: unknown, path: string, check: CheckBattle): WorldState {
   const w = object(value, path, ['activeParty', 'run', 'springs'])
   const activeParty = count(w.activeParty, `${path}.activeParty`)
   if (activeParty >= PARTY_COUNT) throw new SaveParseError(`${path}.activeParty`, `expected 0–${PARTY_COUNT - 1}`)
@@ -520,7 +525,7 @@ function parseWorldState(value: unknown, path: string): WorldState {
   if (r.chapterId !== 'world') throw new SaveParseError(`${at}.chapterId`, 'expected world')
   const run: RpgRun = {
     party, chapterId: 'world', wins: counts(r.wins, `${at}.wins`, 1), mp: counts(r.mp, `${at}.mp`, 0),
-    battle: r.battle === null ? null : parseBattle(r.battle, `${at}.battle`), battles: count(r.battles, `${at}.battles`),
+    battle: r.battle === null ? null : parseBattle(r.battle, `${at}.battle`, check), battles: count(r.battles, `${at}.battles`),
     clearedAt: r.clearedAt === null ? null : timestamp(r.clearedAt, `${at}.clearedAt`), updatedAt: timestamp(r.updatedAt, `${at}.updatedAt`),
   }
   if (typeof w.springs !== 'object' || w.springs === null || Array.isArray(w.springs)) throw new SaveParseError(`${path}.springs`, 'expected an object')
@@ -552,209 +557,17 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
   }
 }
 
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
-const RETIRED_TOKEN = /^token-class-[a-z]+-5$/
-const dropRetired = (items: unknown) => {
-  if (isRecord(items)) for (const id of Object.keys(items)) if (RETIRED_TOKEN.test(id)) delete items[id]
-}
 
-/**
- * v12 → v13 (D77): class ranks top out at 5, rank r opens depths 1–r behind the Uma-level gates, and band 5 drops no
- * Promotion Tokens. Clamps ranks, forgets skills the gates now close (their points come back) and drops band-5
- * Promotion Tokens. Anything malformed is left for the strict parse to reject.
- */
-function toV13(world: Record<string, unknown>): Record<string, unknown> {
-  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
-  dropRetired(w.items)
-  if (isRecord(w.facilities)) {
-    for (const f of Object.values(w.facilities)) {
-      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
-      for (const job of f.jobs) {
-        if (!isRecord(job)) continue
-        dropRetired(job.inputs)
-        if (Array.isArray(job.queue)) for (const q of job.queue) if (isRecord(q)) dropRetired(q.inputs)
-      }
-    }
-  }
-  if (isRecord(w.umas)) {
-    for (const uma of Object.values(w.umas)) {
-      if (!isRecord(uma) || !isRecord(uma.ranks) || !isRecord(uma.ranks.classes) || !isRecord(uma.builds) || typeof uma.level !== 'number') continue
-      const classes = uma.ranks.classes
-      const level = uma.level
-      for (const c of Object.keys(classes)) {
-        const r = classes[c]
-        if (typeof r === 'number' && r > CLASS_MAX_RANK) classes[c] = CLASS_MAX_RANK
-      }
-    }
-  }
-  return w
-}
-
-/** Gear types D86 renamed, and the ones it retired with the families their old recipes took (main, then the accent's). */
-const RENAMED_GEAR: Readonly<Record<string, string>> = { spear: 'lance', 'short-sword': 'katana' }
-const RETIRED_GEAR: Readonly<Record<string, string>> = { 'mage-staff': 'woods', 'arcane-staff': 'woods', 'cleric-staff': 'woods', 'summoner-tome': 'fibers' }
-const ACCENT_FAMILY: Readonly<Record<string, string>> = {
-  hp: 'hides-scales', mp: 'essences', atk: 'ores', matk: 'crystals', def: 'stones', mdef: 'fibers', speed: 'woods', limit: 'bones-horns',
-}
-const OLD_GEAR = /^([a-z-]+)-g(\d{1,2})-([a-z]+)$/
-/** A v13 gear id as v14 reads it: renamed, or null when retired. */
-function v14Gear(id: unknown): string | null | undefined {
-  const m = typeof id === 'string' ? OLD_GEAR.exec(id) : null
-  if (!m) return undefined
-  if (m[1]! in RETIRED_GEAR) return null
-  return RENAMED_GEAR[m[1]!] ? `${RENAMED_GEAR[m[1]!]}-g${m[2]}-${m[3]}` : (id as string)
-}
-/** What a retired piece gives back: its old recipe's main and accent refined items and its Crafting Token. */
-function refundOf(id: string): Record<string, number> {
-  const [, type, g, accent] = OLD_GEAR.exec(id)!
-  const grade = Number(g)
-  const refined = (family: string) => ITEM_FAMILIES.find((f) => f.id === family)?.refined[grade - 1]?.id
-  const out: Record<string, number> = {}
-  for (const family of [RETIRED_GEAR[type!]!, ACCENT_FAMILY[accent!]]) { const r = family ? refined(family) : undefined; if (r) out[r] = (out[r] ?? 0) + 1 }
-  // The Crafting Token as it was; v15 turns it into a Mastery Token like every other.
-  const token = `token-craft-${accent}-${gradeBand(grade)}`
-  out[token] = (out[token] ?? 0) + 1
-  return out
-}
-
-/**
- * v13 → v14 (D86): Spear pieces become Lance pieces and Short Swords Katanas; Mage, Arcane and Cleric Staves and
- * Summoner Tomes are taken back and their materials and Crafting Token returned (a Forge job making one is cancelled the
- * same way); an open fight closes with no loss. Builds become classes in parseUmas.
- */
-function toV14(world: Record<string, unknown>): Record<string, unknown> {
-  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
-  const items = (isRecord(w.items) ? w.items : (w.items = {})) as Record<string, number>
-  const refund = (id: string, times = 1) => { for (const [k, n] of Object.entries(refundOf(id))) items[k] = (items[k] ?? 0) + n * times }
-  if (isRecord(w.gear)) {
-    const next: Record<string, unknown> = {}
-    for (const [id, n] of Object.entries(w.gear)) {
-      const to = v14Gear(id)
-      if (to === null) { refund(id, typeof n === 'number' ? n : 0); continue }
-      next[to ?? id] = n
-    }
-    w.gear = next
-  }
-  if (isRecord(w.umas)) {
-    for (const uma of Object.values(w.umas)) {
-      if (!isRecord(uma) || !isRecord(uma.gear)) continue
-      const gear = uma.gear
-      if (Array.isArray(gear.locker)) {
-        gear.locker = gear.locker.flatMap((id: unknown) => {
-          const to = v14Gear(id)
-          if (to === null) { refund(id as string); return [] }
-          return [to ?? id]
-        })
-      }
-      if (isRecord(gear.equipped)) {
-        const next: Record<string, unknown> = {}
-        for (const [slot, id] of Object.entries(gear.equipped)) {
-          const to = v14Gear(id)
-          if (to === null || slot in RETIRED_GEAR) continue
-          next[RENAMED_GEAR[slot] ?? slot] = to ?? id
-        }
-        gear.equipped = next
-      }
-    }
-  }
-  if (isRecord(w.facilities)) {
-    for (const f of Object.values(w.facilities)) {
-      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
-      f.jobs = f.jobs.map((job: unknown) => {
-        if (!isRecord(job) || job.kind !== 'craft') return job
-        if (Array.isArray(job.queue)) job.queue = job.queue.filter((q: unknown) => !(isRecord(q) && v14Gear(q.output) === null))
-          .map((q: unknown) => (isRecord(q) && v14Gear(q.output) ? { ...q, output: v14Gear(q.output) } : q))
-        const to = v14Gear(job.output)
-        if (to === null) {
-          // The pieces still to make give their inputs back.
-          const left = Math.max(0, Number(job.count) - Number(job.collected))
-          if (isRecord(job.inputs)) for (const [k, n] of Object.entries(job.inputs)) if (typeof n === 'number') items[k] = (items[k] ?? 0) + n * left
-          return null
-        }
-        return to ? { ...job, output: to } : job
-      })
-    }
-  }
-  if (isRecord(w.world) && isRecord(w.world.run)) w.world.run = { ...w.world.run, battle: null }
-  return w
-}
-
-/** A Crafting Token's id before v15 (`token-craft-<stat>-<band>`), or null. */
-const OLD_CRAFT_TOKEN = /^token-craft-[a-z]+-(\d)$/
-/**
- * v14 → v15 (D94): Crafting Tokens become Mastery Tokens of the same band, one for one; gear recipes take no token now.
- * A Forge job's reserved tokens come back as Mastery Tokens and leave its inputs, and queued Forge jobs drop theirs.
- */
-function toV15(world: Record<string, unknown>): Record<string, unknown> {
-  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
-  const items = (isRecord(w.items) ? w.items : (w.items = {})) as Record<string, number>
-  const add = (id: string, n: number) => { if (n > 0) items[id] = (items[id] ?? 0) + n }
-  for (const [id, n] of Object.entries(items)) {
-    const m = OLD_CRAFT_TOKEN.exec(id)
-    if (!m) continue
-    delete items[id]
-    add(masteryTokenId(Number(m[1])), typeof n === 'number' ? n : 0)
-  }
-  const strip = (inputs: unknown, times: number): Record<string, unknown> => {
-    const out: Record<string, unknown> = {}
-    if (!isRecord(inputs)) return out
-    for (const [id, n] of Object.entries(inputs)) {
-      const m = OLD_CRAFT_TOKEN.exec(id)
-      if (m) add(masteryTokenId(Number(m[1])), typeof n === 'number' ? n * times : 0)
-      else out[id] = n
-    }
-    return out
-  }
-  if (isRecord(w.facilities)) {
-    for (const f of Object.values(w.facilities)) {
-      if (!isRecord(f) || !Array.isArray(f.jobs)) continue
-      for (const job of f.jobs) {
-        if (!isRecord(job)) continue
-        job.inputs = strip(job.inputs, Math.max(0, Number(job.count) - Number(job.collected)))
-        if (Array.isArray(job.queue)) for (const q of job.queue) if (isRecord(q)) q.inputs = strip(q.inputs, 0)
-      }
-    }
-  }
-  return w
-}
-
-/** EXP from level L to L+1 before D96, kept to carry levels over. */
-const OLD_PROFESSION_EXP = (level: number): number => 20 + 6 * level
-/**
- * v15 → v16 (D96): the profession curve is ten times longer. Jobs still pay the same EXP per minute of work, so every Farm
- * and Craft Level carries its EXP over whole and lands at the level that work earns on the new curve.
- */
-function toV16(world: Record<string, unknown>): Record<string, unknown> {
-  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
-  if (!isRecord(w.umas)) return w
-  for (const uma of Object.values(w.umas)) {
-    if (!isRecord(uma) || !isRecord(uma.professions)) continue
-    for (const p of Object.values(uma.professions)) {
-      if (!isRecord(p) || !Number.isInteger(p.level) || !Number.isInteger(p.exp)) continue
-      let bank = Number(p.exp)
-      for (let l = 1; l < Math.min(Number(p.level), PROFESSION_MAX_LEVEL); l++) bank += OLD_PROFESSION_EXP(l)
-      let level = 1
-      while (level < PROFESSION_MAX_LEVEL && bank >= professionExpToNext(level)) bank -= professionExpToNext(level++)
-      p.level = level
-      p.exp = bank
-    }
-  }
-  return w
-}
-
-function parseTierWorld(raw: unknown, path: string, version: number, tier: number): TierWorld {
+function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
-  const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
-  const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
-  const value = version < 16 && isRecord(v15) ? toV16(v15) : v15
+  const value = migrate(raw, version)
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear', 'targets'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
   const createdAt = timestamp(w.createdAt, `${path}.createdAt`)
   return {
     createdAt, wallet: parseWallet(w.wallet, `${path}.wallet`, version), umas,
-    parties: parseParties(w.parties, `${path}.parties`, umas), world: version < 11 ? newWorldState(createdAt) : parseWorldState(w.world, `${path}.world`),
+    parties: parseParties(w.parties, `${path}.parties`, umas), world: version < 11 ? newWorldState(createdAt) : parseWorldState(w.world, `${path}.world`, check),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
     // v16 → v17 (D100): no targets yet.
@@ -776,6 +589,24 @@ export function schemaVersionOf(value: unknown): number {
 
 /** Parses a v1–v17 save and always returns v17; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
+  return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
+}
+
+/** Browser boot: all the same strict parsing and migrations, loading the engine only if a surviving fight needs replay.
+ * No unchecked save escapes: every pending replay is validated before this promise resolves. The API stays synchronous. */
+export async function parseSaveAsync(value: unknown, path = 'save'): Promise<Save> {
+  const pending: { input: BattleInput; actions: BattleAction[]; path: string }[] = []
+  const version = schemaVersionOf(value)
+  const migrate = version >= 10 && version < SAVE_SCHEMA_VERSION ? (await import('./migrations')).migrateWorld : (raw: unknown) => raw
+  const parsed = parseSaveChecked(value, path, (input, actions, at) => { pending.push({ input, actions, path: at }) }, migrate)
+  if (pending.length) {
+    const engine = await import('../rpg/battle/engine')
+    for (const fight of pending) checkReplay(engine.replayBattle, fight.input, fight.actions, fight.path)
+  }
+  return parsed
+}
+
+function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migrate: typeof migrateWorld): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion
   if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > SAVE_SCHEMA_VERSION) {
@@ -790,7 +621,7 @@ export function parseSave(value: unknown, path = 'save'): Save {
   for (const [key, world] of Object.entries(worlds)) {
     const at = `${path}.tierWorlds.${key}`
     if (!/^[1-9]\d*$/.test(key)) throw new SaveParseError(at, 'tier keys are positive integers')
-    tierWorlds[key] = parseTierWorld(world, at, version, Number(key))
+    tierWorlds[key] = parseTierWorld(world, at, version, Number(key), check, migrate)
   }
   if (!tierWorlds['1']) throw new SaveParseError(`${path}.tierWorlds`, 'tier 1 is required')
   return { schemaVersion: SAVE_SCHEMA_VERSION, account, tierWorlds }

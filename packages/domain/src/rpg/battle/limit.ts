@@ -5,7 +5,7 @@ import { RPG_DEPTH_GATES, RPG_ELEMENTS, isRpgTome, rpgHand, rpgWeaponKind, type 
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
 
-export const BATTLE_LIMIT_MAX = 12
+export { BATTLE_LIMIT_MAX } from './caps'
 /** An attack charges 2 and a skill 4: every class acts once a turn (D86), so every class fills alike. */
 export const BATTLE_LIMIT_CHARGE = { attack: 2, skill: 4 } as const
 export const battleLimitGain = (kind: keyof typeof BATTLE_LIMIT_CHARGE): number => BATTLE_LIMIT_CHARGE[kind]

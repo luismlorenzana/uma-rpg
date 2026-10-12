@@ -94,6 +94,7 @@ export default defineConfig(({ mode }) => {
   preview: { port: 5174 },
   build: {
     target: 'es2022',
+    manifest: true,
   },
   test: {
     environment: 'jsdom',
