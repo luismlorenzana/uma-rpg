@@ -12,6 +12,9 @@
   level-3 facility), 3 at C and 2 at G, a little fewer as levels climb. Lv50 takes about 15 days at A and a month at
   G; grade 10 (Lv46) a day or two sooner. Aptitude decides who's worth specializing. (D54's curve took 69 hours of
   work at G: an Uma reached Lv27 in two batches.)
+- **The roster works in parallel.** One party of five fights while dozens of Umas work the facilities at once (up to
+  three per facility), so the roster's best Farm and Craft Levels run ahead of the fights even though each Uma levels
+  slowly. Pace professions per Uma; gear and dish grades won't trail the battles.
 - Battles stay the only Laurel source, and Laurels buy shortcuts, never the whole game: an hour of work costs about
   two fights, whether bought as an item or as Time Tickets.
 - Extra Stats and gear each add about the same share of power (§7.3), small per point.
