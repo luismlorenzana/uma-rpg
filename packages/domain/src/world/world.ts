@@ -257,7 +257,7 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
 export const WAVE_PAY = 1.5
 export const stagePay = (node: Pick<RpgMapNode, 'waves'>): number => (node.waves?.length ? WAVE_PAY : 1)
 
-/** Finals' six fights together grant about one level; Laurels and tokens retain their usual rates. */
+/** Finals' six fights together grant about one level; Laurels retain their usual rates. */
 export const stageExpPay = (node: Pick<RpgMapNode, 'id' | 'waves'>): number =>
   stagePay(node) * (/^w[1-9]\d*-capital-r[1-3]-s[12]$/.test(node.id) ? 0.5 : 1)
 

@@ -25,7 +25,7 @@ const outfits = new Map(classes.map((_, i) => {
   return [outfitId, outfit]
 }))
 
-/** On-time Lv10, class rank 2; automatic core loadouts, no gear, side skills or stat points. */
+/** On-time Lv10, Class Rank 10; automatic core loadouts, no gear, side skills or stat points. */
 function party(): Save {
   let save = newSave('Finals test', NOW)
   ;[...outfits.keys()].forEach((id, i) => {
@@ -34,7 +34,7 @@ function party(): Save {
   })
   const w = worldOf(save)
   return { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) =>
-    [id, { ...u, level: 10, ranks: { ...u.ranks, classes: { brawler: 2, mage: 2, spellblade: 2, cleric: 2, summoner: 2 } } }])) } } }
+    [id, { ...u, level: 10, ranks: { ...u.ranks, classes: Object.fromEntries(classes.map((classId) => [classId, { rank: 10, exp: 0 }])) } }])) } } }
 }
 
 function play(save: Save, nodeId: string): ReturnType<typeof actInFight> {
@@ -148,7 +148,13 @@ describe('capital Finals (H15)', () => {
     const first = play(party(), ids.vanguard)
     expect(first.result).toMatchObject({ outcome: 'victory', nodeId: ids.vanguard, chapterId: chapter.id, firstClear: true, laurels: 75 })
     expect(first.result!.members.every((m) => m.exp === Math.round(rpgBattleExp('sub-boss', 10, 10) / 2))).toBe(true)
-    expect(Object.values(first.result!.tokens).reduce((a, b) => a + b, 0)).toBe(3)
+    for (const member of first.result!.members) {
+      expect(member.ranks.find((r) => r.ref.kind === 'class')!.exp).toBe(2 * member.exp)
+      expect(member.ranks.filter((r) => r.ref.kind === 'weapon').reduce((n, r) => n + r.exp, 0)).toBeCloseTo(5 * member.exp, -1)
+      expect(member.ranks.filter((r) => r.ref.kind === 'armor')).toHaveLength(5)
+      expect(member.ranks.filter((r) => r.ref.kind === 'armor').every((r) => r.exp === member.exp)).toBe(true)
+    }
+    expect(first.result).not.toHaveProperty('tokens')
     expect(rpgNodeStatus(chapter, worldRun(worldOf(first.save)), ids.champion)).toBe('available')
     expect(parseSave(JSON.parse(JSON.stringify(first.save)))).toEqual(first.save)
     // A Spring between fights: the same carried-MP reset the real world uses, without adding a special capital refill.
@@ -158,7 +164,6 @@ describe('capital Finals (H15)', () => {
     }
     const boss = play(refill(first.save), ids.champion)
     expect(boss.result).toMatchObject({ outcome: 'victory', firstClear: true, laurels: 150 })
-    expect(Object.values(boss.result!.tokens).reduce((a, b) => a + b, 0)).toBe(5)
     const replay = play(refill(boss.save), ids.vanguard)
     expect(replay.result).toMatchObject({ outcome: 'victory', firstClear: false, laurels: 19 })
     expect(replay.result!.members.every((m) => m.exp <= Math.ceil(first.result!.members[0]!.exp / 4))).toBe(true)
