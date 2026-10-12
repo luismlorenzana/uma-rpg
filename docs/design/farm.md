@@ -1,45 +1,39 @@
 # Farm, refining and the Exchange
 
-> **Status: current (S4, 2026-10-10; D54–D56).** Numbers are in [pacing.md](pacing.md); items in [items.md](items.md).
-> Code: `packages/domain/src/economy/` (jobs, pacing), `src/items/catalog.ts`, `src/save/work.ts` and
-> `src/save/exchange.ts`.
+> **Status: built through D96, 2026-10-12.** [The job manual](../game/loops.md#professions) describes current
+> behavior and generates times/grades. Code: `economy/jobs.ts`, `save/work.ts`, `save/exchange.ts`.
 
-## Jobs (D55)
+## Jobs
 
-- Every facility has **slots**. Put an owned Uma in a free slot and choose **what** she makes and **how many** (1–50).
-  She makes them one after another while the app is closed; nothing ticks in the save, everything is computed from
-  the start time.
-- **Sites** (the 8 farming and 8 gathering sites) gather their family's raw items. **The Pantry and the Workbench**
-  refine one raw item into its refined form; a refining job **reserves its inputs** when it starts.
-- **Collect** moves finished items to the Warehouse and pays her profession EXP for them. Collect anytime; a finished
-  job frees the slot when collected. **Recall** ends the job: what's made is collected, inputs for items never made
-  come back, and the item in progress is lost.
-- An Uma works **one job at a time**, never while she's in an open fight, and a party with a working member can't start
-  a fight. Working members show **Busy** in their party; the Party Hall can recall them.
-- A job's speed is fixed when it starts: her surface aptitude for the profession and the facility's speed.
-- **Rush** finishes a farm job at once for one Rush Ticket per started hour left.
+Facilities assign one owned Uma per slot, for 1–10 outputs made in sequence (D55, D65).
+Sites gather raw items; Pantry and Workbench refine one-for-one.
+Kitchen and Forge make dishes and gear with reserved inputs (D58, D86, D94).
+Timers derive from start timestamps, so closing the app loses no progress.
 
-## Facilities
+Collect pays finished items and profession EXP. Recall pays finished outputs, refunds unmade inputs and drops the
+queue; only the unfinished output's time is lost (D55, D62).
+One Uma works one job at a time, and a working party member prevents fighting.
+Up to three further jobs queue for the same worker; missing inputs stop the chain.
+Up to five Umas can be marked as targets; each facility then lists what maxing them still takes from it, cascading from
+dishes and gear to refined and raw items (D100).
 
-Levels 1–3: a third slot at level 2, a quarter faster at level 3. Upgrades cost Laurels and refined items of the
-facility's two families (pacing.md). Facility levels belong to the tier world.
+Time Tickets take thirty minutes off any job or training; Finish spends one per started thirty minutes remaining.
+Rush retired in D74.
 
-## Professions
+## Facilities and professions
 
-Each Uma has Farm Level and Craft Level levels (1–50). Grades open every five levels. Sites, the
-Pantry and the Workbench raise them now; the Kitchen and the Forge will too (S6, S7).
+Facility upgrades add a third slot, then ×1.25 speed; the tier world owns the upgrades (D54).
+Farm and Craft are two shared-curve Lv1–50 professions. Turf and Dirt respectively set job speed.
+Grade k opens at Lv 5k − 4. Profession EXP is paid per base minute, not per batch (D54, D65).
+The longer curve takes weeks per Uma; the roster works many slots in parallel (D96).
 
-## The Warehouse
+## Warehouse and Exchange
 
-One stock per tier world: every raw and refined item by id. Dishes (S6) and gear (S7) get their own shelves.
+Raw/refined items, tokens, dishes and unbound gear have separate shelves (D55, D58, D59).
+The Exchange stocks a continent's grade pair after any stage there is won, and sells Time/Sweep Tickets and tokens.
+Stock can sell for Laurels, but bound gear cannot (D62, D80).
 
-## The Exchange
-
-Laurels buy raw items of reached chapters' grades, Rush Tickets and Sweep Tickets. A **Sweep** completes a regular
-fight the party has beaten before: the same EXP and Shards as a win, no Laurels, MP untouched, the win counted. It
-needs a full party with nobody working and no open fight.
-
-## The Hub
-
-Each place with slots shows them live: the face of each working Uma, ringed by her job's progress, and a **Ready**
-tag when there's something to collect. Each page tab counts its places with something ready.
+Sweeps replay a cleared regular stage with a full, idle active party and no open fight.
+They pay replay EXP, Shards, Laurels and seeded token drops, without touching MP (D79).
+Exact prices, restrictions and facility lists are in [the manual](../game/loops.md) and
+[sections](../game/sections.md#facilities).

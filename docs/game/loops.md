@@ -71,7 +71,7 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 - **Lv 41–50** stages pay their Laurels ×4 (D82), so endgame fights fund extra classes.
 - A loss, or giving up, pays nothing and costs nothing (MP is as it was before the fight).
 - Tokens by kind and band: [materials](materials.md#tokens). An elite's or boss's first token is always a Promotion
-  Token (band 5 has none, since class ranks stop at 5); every other token is Cooking, Crafting or Promotion by chance.
+  Token (band 5 has none, since class ranks stop at 5); every other token is Cooking, Mastery or Promotion by chance.
 
 ## Currencies
 

@@ -43,7 +43,6 @@ with real rosters and gear, gear and food parity, recipe input counts, and the c
 
 | Packet | What |
 |---|---|
-| [H12](handoff/tasks/H12-design-docs-refresh.md) | Fold settled rules into the design docs (game-design.md is still "draft v0.4") |
 | [H14](handoff/tasks/H14-pacing-simulator.md) | A pacing and economy simulator |
 | [H17](handoff/tasks/H17-device-accessibility-pass.md) | Device and accessibility pass |
 | [H21](handoff/tasks/H21-ci-ubuntu-26.md) | CI: `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19; watch the next deploy |

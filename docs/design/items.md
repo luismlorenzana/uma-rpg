@@ -1,285 +1,117 @@
-# Item catalog (draft v0.1)
+# Item catalog (v1.0, 2026-10-12)
 
-> **Status: draft for owner review, 2026-10-10.** The raw and refined items of Tier 1 (game design §8). Dishes and
-> gear get their own catalogs.
+> **Status: built, through D96.** The [materials manual](../game/materials.md) generates every family, item, dish,
+> gear recipe and token from code (D92). This page explains the catalog's structure and symmetry, without copying
+> its 320 item rows.
 
 ## Rules
 
-- **Eight effects, two sides.** Each effect has one farming family and one gathering family, and each family has its
-  own Hub site (D18, D20).
-- **Ten grades per family.** Grade k unlocks at the matching profession **Lv 5k − 4**. The ladder is the same in every
-  family:
+- Eight effects, two sides: each farming family mirrors a gathering family, with one Hub site per family (D18–D20).
+- Ten grades each. Grade k opens at profession Lv 5k − 4; both sides share the ladder (D54).
+- One raw item refines into one same-grade partner, at Pantry or Workbench (D19).
+- Totals: 80 raw ingredients, 80 raw materials, and 160 refined items.
+- Grades 9–10 are legendary and carry glints (D24).
+- Ids are explicit stable keys in `items/families.ts`, not ids inferred at runtime from a display name.
+- All item icons are drawn from code in uma-platform and bundled in `@luismlorenzana/uma-art` (D26, D64).
+- Farm and Craft Levels now take weeks per Uma; many workers progress in parallel (D96).
 
-  | Grade | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-  |---|---|---|---|---|---|---|---|---|---|---|
-  | Profession Lv | 1 | 6 | 11 | 16 | 21 | 26 | 31 | 36 | 41 | 46 |
+The live [family/site table](../game/materials.md#families) and
+[item rows](../game/materials.md#items-by-family) are the catalog. The grade ladder and timers are generated there,
+so the design has no second list to drift.
 
-- **Grades 1–8** run from common to rare. **Grades 9–10 are legendary** in every family, and their icons carry glints
-  (D24).
-- **Refining is 1 → 1** (D19): every raw item has exactly one refined form of the same grade. Farming refines at the
-  Pantry, and gathering refines at the Workbench.
-- **Totals:** 80 raw ingredients, 80 raw materials, 80 + 80 refined.
-- **Ids** are the name in kebab case: lowercase, apostrophes dropped, accents folded, spaces as hyphens (`golden-apple`,
-  `tomato-puree`, `cut-philosophers-stone`).
-- **Icons** are 32×32 original pixel art, drawn by uma-platform's `scripts/pixel-art` into its
-  `assets/items/<family>/<id>.png` (D26).
-  Drawn so far: Fruits and Ores.
+## Family links
 
-| Effect | Farming family | Site | Gathering family | Site |
-|---|---|---|---|---|
-| HP | [Grains](#grains) | Fields | [Hides & Scales](#hides--scales) | Monster Den |
-| MP | [Fruits](#fruits) | Orchard | [Essences](#essences) | Ley Spring |
-| ATK | [Fish](#fish) | Fishery | [Ores](#ores) | Mine |
-| M.ATK | [Herbs & Spices](#herbs--spices) | Herb Garden | [Crystals](#crystals) | Crystal Cavern |
-| DEF | [Vegetables](#vegetables) | Vegetable Garden | [Stones](#stones) | Quarry |
-| M.DEF | [Mushrooms](#mushrooms) | Mushroom Cave | [Fibers](#fibers) | Meadow |
-| Speed | [Sweets](#sweets) | Sugar Grove | [Woods](#woods) | Forest |
-| Limit Break charge | [Nuts & Seeds](#nuts--seeds) | Nut Grove | [Bones & Horns](#bones--horns) | Fossil Dig |
-
-## Farming
+These headings retain the original catalog's link targets. Names, ids, effects, sites and all raw/refined grades
+are in the linked generated rows.
 
 ### Grains
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Wheat | Wheat Flour |
-| 2 | Oats | Rolled Oats |
-| 3 | Barley | Pearl Barley |
-| 4 | Rice | Polished Rice |
-| 5 | Corn | Cornmeal |
-| 6 | Rye | Rye Flour |
-| 7 | Buckwheat | Buckwheat Flour |
-| 8 | Wild Rice | Hulled Wild Rice |
-| 9 | Moonrice | Moonrice Flour |
-| 10 | Sunwheat | Sunwheat Flour |
+[Grains](../game/materials.md#grains-grains-hp-fields): Farm, HP.
 
 ### Fruits
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Apple | Apple Preserve |
-| 2 | Pear | Pear Preserve |
-| 3 | Peach | Peach Preserve |
-| 4 | Plum | Plum Preserve |
-| 5 | Orange | Orange Marmalade |
-| 6 | Grape | Grape Jelly |
-| 7 | Mango | Mango Pulp |
-| 8 | Pomegranate | Pomegranate Molasses |
-| 9 | Starpeach | Starpeach Nectar |
-| 10 | Golden Apple | Golden Apple Preserve |
+[Fruits](../game/materials.md#fruits-fruits-mp-orchard): Farm, MP.
 
 ### Fish
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Carp | Carp Fillet |
-| 2 | Trout | Trout Fillet |
-| 3 | Sardine | Sardine Fillet |
-| 4 | Mackerel | Mackerel Fillet |
-| 5 | Salmon | Salmon Fillet |
-| 6 | Sea Bream | Sea Bream Fillet |
-| 7 | Eel | Eel Fillet |
-| 8 | Tuna | Tuna Fillet |
-| 9 | Silverfin | Silverfin Fillet |
-| 10 | Rainbow Koi | Rainbow Koi Fillet |
+[Fish](../game/materials.md#fish-fish-atk-fishery): Farm, ATK.
 
 ### Herbs & Spices
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Basil | Dried Basil |
-| 2 | Mint | Dried Mint |
-| 3 | Rosemary | Dried Rosemary |
-| 4 | Thyme | Dried Thyme |
-| 5 | Ginger | Ground Ginger |
-| 6 | Peppercorn | Ground Pepper |
-| 7 | Cinnamon | Ground Cinnamon |
-| 8 | Saffron | Saffron Threads |
-| 9 | Mandrake | Mandrake Powder |
-| 10 | Phoenix Pepper | Phoenix Spice |
+[Herbs & Spices](../game/materials.md#herbs--spices-herbs-spices-matk-herb-garden): Farm, M.ATK.
 
 ### Vegetables
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Carrot | Chopped Carrot |
-| 2 | Potato | Diced Potato |
-| 3 | Cabbage | Shredded Cabbage |
-| 4 | Onion | Diced Onion |
-| 5 | Tomato | Tomato Purée |
-| 6 | Bell Pepper | Sliced Bell Pepper |
-| 7 | Eggplant | Sliced Eggplant |
-| 8 | Asparagus | Trimmed Asparagus |
-| 9 | Golden Carrot | Golden Carrot Purée |
-| 10 | Emperor Pumpkin | Pumpkin Purée |
+[Vegetables](../game/materials.md#vegetables-vegetables-def-vegetable-garden): Farm, DEF.
 
 ### Mushrooms
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Button Mushroom | Dried Button Mushroom |
-| 2 | Shiitake | Dried Shiitake |
-| 3 | Oyster Mushroom | Dried Oyster Mushroom |
-| 4 | Enoki | Dried Enoki |
-| 5 | Chanterelle | Dried Chanterelle |
-| 6 | Porcini | Dried Porcini |
-| 7 | Morel | Dried Morel |
-| 8 | Truffle | Shaved Truffle |
-| 9 | Glowcap | Glowcap Powder |
-| 10 | King Reishi | Reishi Powder |
+[Mushrooms](../game/materials.md#mushrooms-mushrooms-mdef-mushroom-cave): Farm, M.DEF.
 
 ### Sweets
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Honeycomb | Honey |
-| 2 | Sugarcane | Cane Sugar |
-| 3 | Sugar Beet | Beet Sugar |
-| 4 | Maple Sap | Maple Syrup |
-| 5 | Cacao Pod | Chocolate |
-| 6 | Vanilla Pod | Vanilla Extract |
-| 7 | Agave Heart | Agave Syrup |
-| 8 | Palm Sap | Palm Sugar |
-| 9 | Fairy Honeycomb | Fairy Honey |
-| 10 | Ambrosia Blossom | Ambrosia |
+[Sweets](../game/materials.md#sweets-sweets-speed-sugar-grove): Farm, Speed.
 
 ### Nuts & Seeds
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Peanut | Peanut Butter |
-| 2 | Sunflower Seed | Sunflower Oil |
-| 3 | Sesame | Sesame Paste |
-| 4 | Walnut | Walnut Paste |
-| 5 | Chestnut | Chestnut Paste |
-| 6 | Almond | Almond Paste |
-| 7 | Pistachio | Pistachio Paste |
-| 8 | Macadamia | Macadamia Butter |
-| 9 | Thundernut | Thundernut Oil |
-| 10 | Worldseed | Worldseed Oil |
-
-## Gathering
+[Nuts & Seeds](../game/materials.md#nuts--seeds-nuts-seeds-limit-break-charge-nut-grove): Farm, Limit.
 
 ### Hides & Scales
 
-Gathered from the monsters of the Monster Den. No real animals are hunted.
-
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Puffbun Pelt | Puffbun Leather |
-| 2 | Boarling Hide | Boarling Leather |
-| 3 | Wolfkin Pelt | Wolfkin Leather |
-| 4 | Rock Lizard Scale | Lizard Leather |
-| 5 | Ironback Hide | Ironback Leather |
-| 6 | Basilisk Scale | Basilisk Leather |
-| 7 | Manticore Hide | Manticore Leather |
-| 8 | Behemoth Hide | Behemoth Leather |
-| 9 | Wyvern Scale | Wyvern Leather |
-| 10 | Dragon Scale | Dragonhide |
+[Hides & Scales](../game/materials.md#hides--scales-hides-scales-hp-monster-den): Craft, HP; monsters, not hunted animals.
 
 ### Essences
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Mist Essence | Mist Infusion |
-| 2 | Dew Essence | Dew Infusion |
-| 3 | Breeze Essence | Breeze Infusion |
-| 4 | Ember Essence | Ember Infusion |
-| 5 | Tide Essence | Tide Infusion |
-| 6 | Spark Essence | Spark Infusion |
-| 7 | Glimmer Essence | Glimmer Infusion |
-| 8 | Shadow Essence | Shadow Infusion |
-| 9 | Aether | Aether Infusion |
-| 10 | Prismatic Essence | Prismatic Infusion |
+[Essences](../game/materials.md#essences-essences-mp-ley-spring): Craft, MP.
 
 ### Ores
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Copper Ore | Copper Ingot |
-| 2 | Tin Ore | Tin Ingot |
-| 3 | Iron Ore | Iron Ingot |
-| 4 | Silver Ore | Silver Ingot |
-| 5 | Cobalt Ore | Cobalt Ingot |
-| 6 | Gold Ore | Gold Ingot |
-| 7 | Platinum Ore | Platinum Ingot |
-| 8 | Titanium Ore | Titanium Ingot |
-| 9 | Mythril Ore | Mythril Ingot |
-| 10 | Orichalcum Ore | Orichalcum Ingot |
+[Ores](../game/materials.md#ores-ores-atk-mine): Craft, ATK.
 
 ### Crystals
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Quartz | Cut Quartz |
-| 2 | Amethyst | Cut Amethyst |
-| 3 | Citrine | Cut Citrine |
-| 4 | Garnet | Cut Garnet |
-| 5 | Emerald | Cut Emerald |
-| 6 | Sapphire | Cut Sapphire |
-| 7 | Ruby | Cut Ruby |
-| 8 | Diamond | Cut Diamond |
-| 9 | Starstone | Cut Starstone |
-| 10 | Philosopher's Stone | Cut Philosopher's Stone |
+[Crystals](../game/materials.md#crystals-crystals-matk-crystal-cavern): Craft, M.ATK.
 
 ### Stones
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Limestone | Limestone Block |
-| 2 | Sandstone | Sandstone Block |
-| 3 | Slate | Slate Block |
-| 4 | Granite | Granite Block |
-| 5 | Basalt | Basalt Block |
-| 6 | Marble | Marble Block |
-| 7 | Obsidian | Obsidian Block |
-| 8 | Jade | Jade Block |
-| 9 | Runestone | Runestone Block |
-| 10 | Meteorite | Meteorite Block |
+[Stones](../game/materials.md#stones-stones-def-quarry): Craft, DEF.
 
 ### Fibers
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Flax | Linen |
-| 2 | Jute | Burlap |
-| 3 | Hemp | Hemp Cloth |
-| 4 | Cotton | Cotton Cloth |
-| 5 | Wool | Wool Cloth |
-| 6 | Alpaca Fleece | Alpaca Cloth |
-| 7 | Cashmere Fleece | Cashmere Cloth |
-| 8 | Silk Cocoon | Silk |
-| 9 | Moonsilk Cocoon | Moonsilk |
-| 10 | Cloudfleece | Cloudweave |
+[Fibers](../game/materials.md#fibers-fibers-mdef-meadow): Craft, M.DEF.
 
 ### Woods
 
-| Grade | Raw | Refined |
-|---|---|---|
-| 1 | Pine Log | Pine Plank |
-| 2 | Birch Log | Birch Plank |
-| 3 | Cedar Log | Cedar Plank |
-| 4 | Maple Log | Maple Plank |
-| 5 | Oak Log | Oak Plank |
-| 6 | Cherry Log | Cherry Plank |
-| 7 | Mahogany Log | Mahogany Plank |
-| 8 | Ebony Log | Ebony Plank |
-| 9 | Elderwood Log | Elderwood Plank |
-| 10 | Yggdrasil Branch | Yggdrasil Plank |
+[Woods](../game/materials.md#woods-woods-speed-forest): Craft, Speed.
 
 ### Bones & Horns
 
-Dug up as fossils at the Fossil Dig. No animals are hunted.
+[Bones & Horns](../game/materials.md#bones--horns-bones-horns-limit-break-charge-fossil-dig): Craft, Limit; fossils, not hunted animals.
 
-| Grade | Raw | Refined |
+## Gear recipes
+
+Every piece takes **four refined items of its own grade**, one per prescribed gathering family (D86).
+**No token is spent at the Forge**: D94 supersedes the H12 packet's earlier Crafting Token requirement.
+The accent chooses a stat, not a fifth material. Craft Level gates grade; Mastery Tokens raise the levels needed
+to wear it. The exact type/family table is generated in [gear](../game/materials.md#gear).
+
+| Half | Families | Makes |
 |---|---|---|
-| 1 | Seashell | Shell Carving |
-| 2 | Ammonite | Ammonite Carving |
-| 3 | Trilobite | Trilobite Carving |
-| 4 | Fossil Bone | Bone Carving |
-| 5 | Mammoth Tusk | Tusk Carving |
-| 6 | Saber Fang | Fang Carving |
-| 7 | Raptor Claw | Claw Carving |
-| 8 | Tyrant Tooth | Tooth Carving |
-| 9 | Titan Bone | Titan Carving |
-| 10 | Unicorn Horn | Unicorn Carving |
+| Arms | Ores, Stones, Woods, Hides & Scales | Five Arms and five Arms Orbs |
+| Arcana | Crystals, Fibers, Essences, Bones & Horns | Five Tomes and five Elemental Orbs |
+
+Armor and stat accessories take two families from each half. Every family appears in two armor recipes and one
+Ring/Charm recipe. Across the ten weapons and ten Orbs, each appears ten times; across all 26 types, thirteen times.
+`economy/materials.test.ts` proves this for the current catalog.
+
+## Dishes and symmetry
+
+D65 dishes keep one star ingredient, rotating lower-grade sides, two-family Duos and eight-family Feasts.
+Cooking also spends the corresponding Cooking Tokens (D67). Full recipes are in
+[the dish catalog](../game/materials.md#dishes) and the [Kitchen design](kitchen.md).
+
+Each site's output rate depends on grade, not family. Both sides use the same gather/refine/make times and
+profession EXP (D65, D96). Farming families are consumed equally across the whole dish catalog; gathering
+families equally across the gear catalog (D86). Gear and dishes no longer have identical input counts, and a
+particular party can favor one recipe half. Symmetry means catalog coverage, not equal demand in every player's
+inventory.

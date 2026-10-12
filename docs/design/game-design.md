@@ -1,439 +1,244 @@
-# Uma RPG — game design (draft v0.4)
+# Uma RPG — game design (v1.0, 2026-10-12)
 
-> **Status: draft for owner review, 2026-10-10.** v0.2 folded in the owner's answers to Q1–Q5 (D14–D20). v0.3 adds the
-> four-page Hub, the Learning District and the Sun-and-planets Extra Stats map (D21–D23). v0.4 adds Laurels and the
-> Exchange, and gear that binds to its wearer (D27–D29). This is the
-> first spec for uma-rpg as a standalone game. It will split into one doc per system once each system is approved.
->
-> Every rule is tagged:
-> **[Owner]** is the owner's direction and is decided.
-> **[Proposed]** is Claude's recommendation for a gap; it stands unless the owner changes it.
-> **[Open]** waits on the owner (see [open-questions.md](../open-questions.md)).
->
-> Decisions are in [decisions.md](../decisions.md). The cross-game architecture is in uma-platform `docs/architecture.md`.
+> **Status: Tier 1 built through S7, W3 and the class rework; settled rules through D100.**
+> This page records intent and the decisions behind the game. [The manual](../game/README.md) describes the running
+> game and generates its lists from code (D92). The [decision log](../decisions.md) is append-only.
+> Future-tier rules below are plans, not features. Only unanswered owner choices are marked as proposals.
 
 ## 1. What the game is
 
-A party RPG on the owner's iPhone. You collect Umas, level them through Octopath-style break battles across every
-scenario, and run a big Hub map where Umas farm, gather, cook, craft and train while the app is closed.
+A personal party RPG on the owner's iPhone. Collect outfits, build parties, fight on the world map and run a Hub
+where Umas farm, gather, cook, craft and train while the app is closed.
 
-**Pillars**
+| Pillar | Intent |
+|---|---|
+| Collection | Unlock and level many Umas; each Tier 1 Lv50 Uma pays back an Unlock Ticket (D14, D40, D47) |
+| A living Hub | Four pages of facilities, with work and training that continue offline (D21, D55) |
+| Break battles | Shields, weaknesses, Limit Breaks and seeded replay; a world map instead of chapters (D53, D72, D91) |
+| Make your own power | Dishes unlock Extra Stats; refined materials become bound equipment (D17, D28, D58, D86) |
+| Symmetry | Mirrored families, grades, job times and recipe demand (D18–D20, D65, D86) |
 
-1. **Collect and level every Uma.** Collection and leveling are among the biggest parts of the game. **[Owner]**
-2. **A living Hub.** Home is a huge map of facilities where Umas are assigned to passive work and training. **[Owner]**
-3. **Break battles through every scenario.** The current battle engine, classes and chapter maps carry over from
-   uma-racer. **[Proposed]**
-4. **Make your own power.** Dishes unlock Extra Stats, and materials become equipment. Both matter equally. **[Owner]**
-5. **Symmetry.** Each system mirrors another (farming ↔ gathering, cooking ↔ crafting, class proficiency ↔ equipment
-   mastery), so learning one teaches the other. **[Owner]**
-
-**The loop**
-
-```mermaid
-flowchart LR
-    Hub[Hub map] --> Assign[Assign Umas: party, farm, gather, train]
-    Assign --> Battle[Chapters: break battles]
-    Assign --> Passive[Facilities run while away]
-    Battle --> Lv[Uma levels + Laurels]
-    Passive --> Raw[Raw ingredients / materials]
-    Raw --> Refine[Refine 1 → 1]
-    Refine --> Cook[Cooking → dishes]
-    Refine --> Craft[Crafting → equipment]
-    Cook --> Extra[Extra Stats]
-    Craft --> Gear[Equipment]
-    Passive --> Mastery[Class proficiency + equipment mastery]
-    Lv --> Shards[Uma Shards → Unlock Tickets]
-    Shards --> Collect[New Umas]
-    Lv --> Exchange[Exchange: raw items, Rush and Sweep Tickets]
-    Exchange --> Raw
-    Extra --> Battle
-    Gear --> Battle
-    Mastery --> Battle
-    Collect --> Assign
-```
+The loop and its currencies are in [the manual](../game/loops.md). The design connection is
+[fights feed the Hub](loop.md): tokens support training and cooking; forging takes materials, not tokens (D94).
 
 ## 2. Tiers
 
-### 2.1 Tier = five scenarios, levels 1–50 **[Owner]**
+### 2.1 Tier = five scenarios, levels 1–50
 
-A chapter is one scenario and covers ten levels. Tiers follow the original game's release order, read from master
-data, so a newly released scenario slots in after a single import.
+A tier groups five scenarios in master-data release order, each covering ten levels (D2). **Only Tier 1 is
+playable.** Its scenarios name five continents, not chapters (D72). The generated continent and region lists are in
+[the world manual](../game/maps.md); the design is in [world/](world/README.md).
 
-| Tier | Scenarios (chapter levels) |
+Each continent has forty regions in ten rows of four, twelve stages per region and five Springs. Twenty regions
+climb the first five levels, twenty the last five; one party takes one region per half (D97). A tier still has
+2,400 region stages (D71, D72). Capital Finals are separate work; their hooks do not implement them yet.
+
+**[Proposed] (Q8)** A partially released later tier opens with its available scenarios; its Tier Finale waits for
+the fifth. This is still an owner choice, not current behavior ([open questions](../open-questions.md)).
+
+### 2.2 Tier worlds
+
+The planned tier model keeps an independent roster, Hub, facilities, stock and progression in each world (D3, D15).
+Promotion moves one Uma to the next tier; the old world and its other Umas stay.
+
+| Planned carry-over | In the next tier (D15) |
 |---|---|
-| 1 | URA Finale (1–10), Unity Cup (11–20), Trackblazer (21–30), Our Grand Concert (31–40), Grand Masters (41–50) |
-| 2 | Project L'Arc, U.A.F. Ready GO!, Great Food Festival, Run! Mecha Umamusume, The Twinkle Legends |
-| 3 | Design Your Island, Yukoma Hot Springs, Beyond Dreams, Tracen Diner, *next released scenario* |
+| Uma Level | Starts at Lv1 |
+| Base stat growth | Uses lifetime level: 50 × (tier − 1) + level |
+| Profession levels, class ranks, gear levels, Extra Stats | Start over |
+| Items and gear | Stay in the old world |
 
-- **[Proposed]** Tier 3 opens with its four chapters. Its Tier Finale arrives with the fifth scenario.
-- **[Settled, D48]** Each chapter keeps uma-racer's map shape, compressed from 12 levels to 10: Debut Lv1–3, Classic
-  4–6, Senior Year 7–9, Finals 10 (vanguard, then champion). Details in [battles.md](battles.md).
-
-### 2.2 Tier worlds **[Owner]**
-
-Each tier is its own world: its own Hub map, facilities, farm, item stock and roster view. Promotion moves one Uma
-from tier N to tier N+1.
-
-- The **old tier keeps everything**: the other Umas and their levels, facility levels, items and equipment. You can go
-  back any time and keep playing it. In Tier 1 that's where you keep unlocking Umas.
-- The **promoted Uma disappears from the old tier** and appears only in the new tier, at **Level 1**. Her progression
-  starts over there.
-- **Each tier gets different mechanics**, designed tier by tier. Tier 1 is described here. Tier 2 has no Uma unlocks;
-  promotion is its only way in.
-
-**What the promoted Uma carries [Owner]** (D15)
-
-| Thing | In the new tier |
-|---|---|
-| Uma Level | Lv1 |
-| Base stats | Keep growing by **lifetime level** (`50 × (tier − 1) + level`), as in uma-racer today, so a Tier 2 Lv1 Uma matches Tier 2 foes |
-| Profession levels, class proficiency, equipment mastery, Extra Stats | Start over |
-| Items and equipment | Stay in the old tier's world |
+Tier 2 has no outfit unlocks; promotion is its planned entry. Later mechanics are not implemented.
 
 ### 2.3 Promotion and the Tier Finale
 
-- **[Owner]** Every tier ends with a big event: harder fights, or fights that make you switch parties around. In
-  uma-racer this is Expeditions; uma-rpg needs its own idea.
-- **[Proposed]** Promotion is manual and per Uma. It needs **Lv50** and **a win in the Tier Finale with her in the
-  winning lineup**.
-- **[Open]** The Tier Finale's form. Candidates:
+Every tier is intended to end with a harder event that tests more of the roster (D4).
 
-  | Idea | How it plays | Cost |
-  |---|---|---|
-  | **Gauntlet** | Five back-to-back battles, one per scenario of the tier. Each needs a **different party** (25 Umas), and MP carries with few camps | Low: today's battle engine |
-  | **Raid** | One huge boss with phases. Parties rotate in between phases, and each party keeps its damage and statuses | Medium |
-  | **Siege** | A Fire Emblem/Wargroove-style grid map where three or four parties deploy as squads, and a break battle starts on contact | High: a new tactics layer, but it's the game's showcase for Phaser and pixel maps |
+**[Proposed] (Q6)** Manual, per-Uma promotion needs Lv50 and a Tier Finale win with her in the winning lineup.
+Neither that requirement nor the Finale's form is approved. [Q6](../open-questions.md) retains the Gauntlet, Raid
+and Siege options; Gauntlet first remains the recommendation. The Tier Finale and promotion are parked.
 
-  Claude's recommendation: ship the **Gauntlet** first and keep the **Siege** as the long-term goal.
+## 3. Collection (Tier 1 only)
 
-## 3. Collection (Tier 1 only) **[Owner]**
+Start with no Umas and 20 Unlock Tickets (D40). One Ticket unlocks one outfit permanently, after confirmation
+(D14, D44). Shards arrive at Lv10/20/30/40/50; five automatically become one Ticket (D47, D51).
+Thus one Uma reaching Lv50 replaces her unlock cost.
 
-- A new game starts with **no Umas** and **20 Uma Unlock Tickets** (D40).
-- A Ticket unlocks one **outfit** of your choice (D14). There are 268 today.
-- Each Uma earns **1 Uma Shard at Lv 10, 20, 30, 40 and 50**. **5 Shards = 1 Ticket**, so every Uma who reaches Lv50
-  pays exactly one Ticket, and partial progress across many Umas adds up too.
-- Tier 2 and later have no unlocks.
-
-**Math:** unlocking all 268 takes 248 more Tickets, which means 248 Umas reaching Lv50 in Tier 1 (the last 20 unlocked
-never need to level). The chain never stalls as long as you keep leveling. It's a long-term collection by design, so
-raising an Uma from 1 to 50 must get quicker with repeats:
-
-- **[Proposed]** Keep today's EXP rule: fights above your level pay up to double, so new Umas catch up fast on chapters
-  you've already cleared.
-- **[Proposed]** Replays of cleared nodes stay fully rewarded.
-- **[Owner]** Sweep Tickets bought with Laurels (§11) complete cleared regular fights at once, so Umas who are behind
-  can catch up without replaying every fight by hand.
+Above-level fights support catch-up EXP, capped at double (D48). Replays never run out but pay a quarter of the
+first clear's EXP and Laurels, with a quarter chance per token; Sweeps pay the same replay rewards (D79).
+Current counts, restrictions and prices are in [collection and parties](../game/loops.md#collection-and-parties)
+and [Springs, replays and Sweeps](../game/loops.md#springs-replays-and-sweeps).
 
 ## 4. An Uma's levels
 
-Every Uma has several independent levels, all per tier.
-
-| Level | Range | Raised by | Gives |
+| Track | Range | Raised by | Intent |
 |---|---|---|---|
-| **Uma Level** | 1–50 | Battles | Stats, skill points, Shards (Tier 1), Extra Stat capacity |
-| **Farming & Cooking** | 1–50 | Farm sites, the Pantry and the Kitchen | Higher ingredient grades and dishes |
-| **Gathering & Crafting** | 1–50 | Gathering sites, the Workbench and the Forge | Higher material grades and equipment |
-| **Class proficiency** | Ranks 1–6, per class | Class halls | Skill depths in that class's trees |
-| **Weapon mastery** | Ranks 1–10, per weapon type | Armories | Higher weapon grades |
-| **Armor mastery** | Ranks 1–10, per armor type | Armories | Higher armor grades |
+| Uma Level | 1–50 | Fights and Sweeps | Stats, side points, Shards and Extra Stats capacity (D51, D58, D86) |
+| Farm Level | 1–50 | Farm sites, Pantry, Kitchen | Ingredient grades and dishes (D60, D96) |
+| Craft Level | 1–50 | Wilds sites, Workbench, Forge | Material grades and gear (D60, D96) |
+| Class rank, per class | 1–5 | The class hall | Skill depths, with Uma-level gates (D77) |
+| Weapon Level, per class | 1–10 | The class hall | Weapon grades (D70, D94) |
+| Armor / Accessory Level | 1–10 each | Armory / Jeweler | Armor / accessory grades (D70, D94) |
 
-- **[Owner]** Two profession verticals, Farming + Cooking and Gathering + Crafting, that take **equal time** (§8.5).
-- **[Open]** A third vertical, possibly as a later tier's new mechanic.
-- **[Proposed]** Rank ranges (6 for classes, 10 for equipment), explained in §5 and §7.
+**[Proposed] (Q7)** A third profession vertical may become a later tier's new mechanic. Its purpose and tier remain
+open ([Q7](../open-questions.md)).
 
 ### 4.1 Aptitudes set learning speed
 
-**[Owner]** Running-style aptitude sets class learning speed, and distance aptitude sets equipment mastery speed.
-**[Proposed]** Surface aptitude sets profession speed, so **every original aptitude has a job**:
+| Aptitude | Speeds up |
+|---|---|
+| Turf / Dirt | Farm / Craft jobs respectively (D54, D60) |
+| Front / Pace / Late / End | Brawler / Mage and Spell Blade / Cleric / Summoner halls (D70) |
+| Best distance | Armor Level at the Armory (D70) |
+| Best running style | Accessory Level at the Jeweler (D70) |
 
-| Aptitude group | Speeds up | Mapping |
-|---|---|---|
-| Running style (Front, Pace, Late, End) | Class proficiency **[Owner]** | Front → Brawler; Pace → Mage, Spell Blade; Late → Cleric; End → Summoner (today's mapping) |
-| Distance (Sprint, Mile, Medium, Long) | Weapon and armor mastery **[Owner]** | Each weapon and armor type belongs to one distance (§7.2) |
-| Surface (Turf, Dirt) | Professions **[Proposed]** | Turf → Farming & Cooking; Dirt → Gathering & Crafting |
+A and S take half the base time; G takes all of it, with even steps between (D54). Facilities add their own speed.
+Exact shares and times are in [pacing](pacing.md) and [training](../game/loops.md#training).
 
-**Time to finish, by aptitude grade.** **[Owner]** sets the ends: A takes 50% of the time, G takes 100%. **[Proposed]**
-fills the grades between in even steps:
+## 5. Classes
 
-| A | B | C | D | E | F | G |
-|---|---|---|---|---|---|---|
-| 50% | 58% | 67% | 75% | 83% | 92% | 100% |
+Every Uma can switch freely outside a fight; each class retains its weapons, learned sides and loadout (D49, D86).
+Five classes replace the old six builds. Each acts once per turn and wields five different weapons: Brawler the
+five Arms, Mage the five Tomes, Summoner three Tomes and two Arms, Spell Blade three Arms and two Tomes, Cleric any
+five (D86). The weapons in her five slots are her trees; every Uma holds a grade-0 Training weapon of each kind, with
+no stats, that fills a slot until she wears a crafted one (D98).
 
-"A is 50% faster" is read as "A needs half the time", which is the same as earning progress twice as fast.
-
-## 5. Classes **[Owner]**, with ranks **[Proposed]**
-
-- **[Owner]** Every Uma can use every class and switch freely.
-- **[Owner]** A class at rank 1 can't learn any skills.
-- **[Owner]** Running-style aptitude sets how fast an Uma's class ranks up (§4.1).
-- **[Proposed]** Each class keeps today's weapon set (the class decides what she wields), today's trees and today's
-  battle role. The five classes are Brawler, Mage, Spell Blade, Cleric and Summoner.
-- **[S3, D49]** Each Uma has six class builds with their own trees ([battles.md](battles.md)).
-- **[Settled, D77, replacing D57]** **Ranks 1–5.** Rank r opens tree depths 1–r, and each depth also keeps uma-racer's
-  Uma-level gate (Lv 1/10/20/30/40), so an Uma has skills from Lv1 and rank 5 opens the capstones.
-- **[Proposed]** **Skill points come from Uma Level, and every class tree gets the full amount.** Classes don't compete
-  for points, so switching costs nothing; class rank is the real investment. Learned skills stay with their class.
+Class rank and Uma Level jointly open depths; cores are free and each class has the full side-point budget from
+Uma Level (D73, D77, D86). One point per level buys sides, one side of each fork; forgetting refunds it.
+The design is [the Class Sheet](class-rework.md). Current trees and numbers are in
+[classes](../game/classes.md) and [skill trees](../game/skill-trees.md).
 
 ## 6. Learning District and assignments
 
-**[Owner]** Facilities where you slot **2 or 3 Umas** to raise something about the Uma herself. They fill the Hub's
-Learning District (§9), with **several class hubs and several weapon hubs** (D21).
+Five class halls train their class rank and Weapon Level. The Armory trains Armor Level; the Jeweler trains
+Accessory Level (D70). The four old distance armories are retired.
 
-**[Proposed]** One hall per class and one armory per distance, with RPG names (D36):
+Each class step is six base hours and one Promotion Token; each gear-level step is three base hours and one
+Mastery Token (D68, D94). Tokens are spent on start and returned on recall. Ranks arrive on collect; Time Tickets
+apply to training too (D55, D74). Facilities start with two slots, then gain a third and finally speed (D54).
+See the generated [facility list](../game/sections.md#facilities) and [training rules](../game/loops.md#training).
 
-| Facility | Each slot trains | Unlocks |
-|---|---|---|
-| **Brawler Dojo** | Brawler proficiency | Deeper Brawler skills |
-| **Mage Tower** | Mage proficiency | Deeper Mage skills |
-| **Spell Blade Salle** | Spell Blade proficiency | Deeper Spell Blade skills |
-| **Cleric Chapel** | Cleric proficiency | Deeper Cleric skills |
-| **Summoner Circle** | Summoner proficiency | Deeper Summoner skills |
-| **Ranger's Lodge** | Short Sword, Bow or Garb mastery | Higher grades of that gear |
-| **Lancer's Barracks** | Spear, Axe or Leather mastery | Higher grades of that gear |
-| **Arcane Armory** | Mage Staff, Arcane Staff or Mail mastery | Higher grades of that gear |
-| **Knight's Bastion** | Greatsword, Cleric Staff, Summoner Tome or Plate mastery | Higher grades of that gear |
+Twenty saved parties hold five Umas each. An Uma belongs to at most one party, but party members may work (D41,
+D46, D55). A working member prevents the party fighting; recall pays finished outputs and refunds unmade inputs.
+One Uma takes one job at a time. A fight locks its lineup and its entrants' work until it ends (D52, D55).
 
-- **[Proposed]** Each armory holds one distance's gear (§7.2), so the Uma's aptitude for that distance sets her speed
-  anywhere in the building, and each class hall pairs with one running style (§4.1).
-- **[Proposed]** A facility starts with **2 slots** and gains a third with an upgrade (§9). Each slot trains one class or
-  one gear type.
-- **[Proposed]** Time to the next rank grows with the rank and is scaled by aptitude (§4.1). Training runs while the
-  app is closed.
+## 7. Equipment
 
-**Assignments [Owner]** (D16)
+### 7.1 Slots, grades and binding
 
-- **Twenty parties** of five (D41). An Uma belongs to at most one party; adding her to another moves her (D46).
-- Umas stay in their party permanently.
-- A party member who's busy at a facility, farm site or gathering site **shows greyed out** in her party.
-- Umas outside any party can be assigned too.
+The active class uses five weapons, one armor and one accessory (D86). The save keeps one equipped piece per
+weapon type, plus armor and accessory, so another class can reuse already equipped gear. That is twelve stored
+slots, of which seven affect a class at once. An empty weapon slot is the Training weapon of that kind (D98).
 
-**[Proposed]** A party with a greyed-out member can't start a fight. Her card offers **Recall**, which cancels her job:
-its inputs come back and the unfinished output is lost.
+Ten grades match the material ladder. Craft Level gates the grade made; gear levels gate the grade worn, with no
+Uma-level gate (D29, D70). Gear binds on equip and stays in her locker; it cannot move to another Uma or be sold
+(D28, D59). A weapon's equip gate uses the best Weapon Level among classes that can wield it (`gearLevel`).
+Details and generated recipes are in [the materials manual](../game/materials.md#gear).
 
-## 7. Equipment **[Owner]**, with structure **[Settled in S7, D59: [forge.md](forge.md)]**
+### 7.2 Types and recipes
 
-**[Owner]** Equipment is a big new system that mirrors farming and cooking:
+Ten weapons replace Spear, Short Sword and the staves: five Arms and five elemental Tomes; armor, Ring, Charm and
+ten Orbs complete the catalog (D86). Recipes use four same-grade refined items, one from each prescribed family.
+The accent no longer adds a material, and **the Forge takes no token** (D86, superseded for tokens by D94).
+See [items](items.md#gear-recipes) and [forge](forge.md).
 
-- gathering activities (mining, woodchopping, item gathering);
-- simple crafting (raw → refined);
-- equipment crafting.
+### 7.3 Balance
 
-Equipment should be very varied. Every Uma can equip anything, and distance aptitude sets how fast she masters it.
-
-### 7.1 Slots, grades and variety **[Proposed]**
-
-- **Slots:** the class's weapons (one or two, as today), one **armor**, one **accessory**.
-- **Ten grades per tier world**, matching the ten item grades (§8.2). Equipping a grade-k weapon or armor needs
-  **mastery rank k** in its type. Crafting grade k needs **Gathering & Crafting Lv 5k − 4** (1, 6, 11 … 46).
-  Accessories have no mastery gate.
-- **[Owner] Gear binds on equip** (D28). Once an Uma equips a piece, it's hers permanently and can never move to another
-  Uma, so every fresh Uma crafts her own.
-- **[Owner] No Uma Level gate** (D29). Mastery rank is the only requirement to equip.
-- **[Proposed]** Bound pieces stay in **her locker**. She can swap freely among her own bound gear, so class switches
-  stay free, but bound gear can't be traded, sold or moved. When she's promoted, her bound gear stays behind in the old
-  tier world, like everything else (D15).
-- **Variety** comes from type × grade × accent. The **main material** decides what can be made: ingots for blades and
-  mail, planks for bows and staves, cloth for garb, leather for leather armor, cut gems and carvings for accessories. The
-  **accent material** adds its family's effect (§8.2), exactly as a dish's star ingredient does.
-- The equipment catalog is its own design doc.
-
-### 7.2 Types by distance **[Proposed, draft]**
-
-Light gear belongs to Sprint and heavy gear to Long.
-
-| Distance | Weapon types | Armor type |
-|---|---|---|
-| Sprint | Short Sword, Bow | Garb (light) |
-| Mile | Spear, Axe | Leather |
-| Medium | Mage Staff, Arcane Staff | Mail |
-| Long | Greatsword, Cleric Staff, Summoner Tome | Plate (heavy) |
-
-**[Proposed]** Heavier armor trades Speed for DEF.
-
-### 7.3 Balance **[Owner]**
-
-Equipment needs a rebalance, and Claude does the balancing (D17).
-
-- **[Proposed]** Extra Stats and equipment each add about the **same share of power** at every level, so neither
-  cooking nor crafting can be skipped.
-- **[Proposed]** Foe stats add the **expected gear and Extra Stats for their level**, so a party that's kept up with
-  both feels like today's tuned difficulty, and a party that skipped them feels harder.
+Gear and Extra Stats are complementary small stat-point budgets (D17, D58, D59). Lighter armor contributes more
+Speed/evasion; heavier armor more defense or HP. Weapon offense is split across the class's five weapons (D86).
+Foes include expected progression and world formation tuning (D59, D75, D91).
+Exact values come from [combat](../game/combat.md) and [gear](../game/materials.md#gear), not a second design table.
 
 ## 8. Professions: gather → refine → make
 
-### 8.1 What the owner asked for **[Owner]** (D18–D20)
+### 8.1 Depth and parity
 
-- **Depth.** Every produce type has **its own place on the Hub and its own effect**. No family of near-identical items
-  (uma-racer's five milks and five fruits).
-- **Three steps only:** raw → refined (1 → 1) → cooked or crafted. **No packaging step.**
-- **Parity.** Cooking and crafting are mirror images. There are exactly as many material types as ingredient types,
-  and an Uma spends her time equally between the two.
-- Raw items are "Tier 0", with lots of variety and very symmetric types, like 10 fruits and 10 vegetables.
-- Cooking recipes are varied, and the system is authored from scratch.
+Raw → refined → cooked or crafted is the whole chain; there is no packaging step (D18–D20).
+Each family has its own site and effect. Farm and Craft share grades, time and profession EXP.
+Their recipes need not have identical input counts: D86 gear always takes four, while D65 dishes keep rotating sides.
 
-### 8.2 Families: one per effect, mirrored **[Proposed]**
+### 8.2 Families and grades
 
-Eight effects. Each effect has one farming family and one gathering family, and every family has its own site.
+Sixteen families, eight per side, pair across eight effects. Each has ten raw and ten refined items: 320 in all.
+Grade k opens at profession Lv 5k − 4 (D18–D20, D54). Grades 9–10 carry legendary glints (D24).
+The generated [family/site table and full item catalog](../game/materials.md) are the reference; [items](items.md)
+explains the symmetry.
 
-| Effect | Farming family | Site | Gathering family | Site |
-|---|---|---|---|---|
-| HP | Grains | Fields | Hides & Scales | Monster Den |
-| MP | Fruits | Orchard | Essences | Ley Spring |
-| ATK | Fish | Fishery | Ores | Mine |
-| M.ATK | Herbs & Spices | Herb Garden | Crystals | Crystal Cavern |
-| DEF | Vegetables | Vegetable Garden | Stones | Quarry |
-| M.DEF | Mushrooms | Mushroom Cave | Fibers | Meadow |
-| Speed | Sweets (honey, cane, cacao, maple…) | Sugar Grove | Woods | Forest |
-| Limit Break charge | Nuts & Seeds | Nut Grove | Bones & Horns | Fossil Dig |
+### 8.3 Refining
 
-- **10 items per family, one per grade.** Grade k unlocks at profession **Lv 5k − 4** (1, 6, 11 … 46), the same ladder
-  in every family on both sides.
-- **Totals:** 80 raw ingredients and 80 raw materials, then 80 + 80 refined.
-- Grades 1–8 run from common to rare. **Grades 9–10 are legendary** in every family and carry glints (D24).
-- Example families:
-  - Fruits: apple, pear, peach, plum, orange, grape, mango, pomegranate, starpeach, golden apple.
-  - Ores: copper, tin, iron, silver, cobalt, gold, platinum, titanium, mythril, orichalcum.
-- Battles pay **Laurels** (§11), not items. Laurels buy raw items of both sides at the Exchange.
-- The full catalog is [items.md](items.md). Every icon is original pixel art drawn by uma-platform's `scripts/pixel-art` (D26).
+Every raw item has one same-grade refined partner. Pantry handles farming items; Workbench handles gathering
+materials, one-for-one (D19, D55).
 
-### 8.3 Refining, 1 → 1 **[Owner]**
+### 8.4 Making
 
-One refining station per side: the **Pantry** for ingredients and the **Workbench** for materials. **[Proposed]** Each
-raw item has exactly one refined form of the same grade:
+Kitchen dishes unlock Extra Stats; Forge gear supplies equipment points and Orb kinds (D58, D86).
+Cooking uses refined ingredients plus stat-specific Cooking Tokens. Forging uses refined materials only (D94).
+Recipes and grade gates are in [kitchen](kitchen.md), [forge](forge.md) and the [materials manual](../game/materials.md).
 
-| Farming | Gathering |
+### 8.5 Equal time and family demand
+
+Every site produces at the same rate for a grade; both professions share one curve. Gathering and refining have
+the same time; making is twice that, on both sides (D65). Every gathering family is used equally across the gear
+catalog and every farming family equally across dishes; `economy/materials.test.ts` checks this (D86).
+That is catalog symmetry, not a promise that any single party consumes equal quantities of every family.
+
+### 8.6 Jobs
+
+Jobs use timestamps, finish offline, reserve inputs on start and grant profession EXP on collect (D55).
+Each slot may queue three more jobs for the same Uma; a short-input queue stops, and recall drops it (D62).
+New jobs make 1–10 outputs, not the old 50-output batches (D65). Profession leveling takes weeks per Uma; the
+roster's many facilities work in parallel while one party fights (D96, [pacing](pacing.md)).
+
+## 9. Hub
+
+Four freely swappable pages organize the loop (D21, D30). Farmlands and Wilds mirror each other, Learning holds
+seven halls, and Town holds the roster, parties, map, inventory, Exchange and Observatory.
+The generated [place registry](../game/sections.md) is the full list.
+
+A tap opens a quick look; Enter opens the place's full page. Every screen is a place route (D31, D38, D43).
+Phaser draws pixel terrain, props and buildings; DOM buttons carry names, workers and progress (D33, D64).
+Scrolling/zooming is deferred, not built. Upgrades belong to the tier world (D54).
+Player text stays short; helpful explanations sit behind a help button, never in placeholder paragraphs (D95).
+
+## 10. Extra Stats: the Sun and its planets
+
+Each Uma has 100 nodes: eighty moons, sixteen bridges and four Sun nodes (D58).
+Eating unlocks the lowest node the dish can reach. Active capacity grows with Uma Level; swaps are free outside
+fights. One total point is split over a node's effects. The generated dish list and current point values are in
+[materials](../game/materials.md#dishes) and [Extra Stats](../game/loops.md#extra-stats-and-gear).
+
+## 11. Laurels and the Exchange
+
+Laurels are each tier world's currency. Wins and Sweeps earn them; selling stock earns a smaller amount (D27,
+D62, D79). The Exchange sells raw items, Time Tickets, Sweep Tickets and tokens (D74, D80).
+One won stage on a continent stocks its grade pair; profession production is independently gated by level.
+A Time Ticket cuts thirty minutes from any job or training. A Sweep replays a cleared regular stage; it earns
+replay EXP, Laurels and tokens without spending MP (D74, D79).
+Prices and reward multipliers are generated in [the manual](../game/loops.md#laurels-exp-and-tokens).
+
+## 12. Difficulty
+
+Biomes vary signatures, formations and faces, not the continent's level curve (D72, D83, D85).
+World tuning budgets foes by formation; shields and different weaknesses reward party rotation (D75, D91).
+The shared weakness-aware Auto policy also drives the battle simulation (D89).
+Field effects and home ground are later work, not current rules. The owner validates balance in play; simulators
+supply measurements, not permission to retune. The Tier Finale's difficulty remains part of Q6.
+
+## 13. What carried over, and what retired
+
+| Kept | Replacement / retirement |
 |---|---|
-| Grain → Flour | Hide → Leather |
-| Fruit → Preserve | Essence → Infusion |
-| Fish → Fillet | Ore → Ingot |
-| Herb → Spice Blend | Crystal → Cut Gem |
-| Vegetable → Prepped Vegetable | Stone → Block |
-| Mushroom → Dried Mushroom | Fiber → Cloth |
-| Sweet → Syrup or Chocolate | Wood → Plank |
-| Nut → Paste or Oil | Bone → Carving |
-
-### 8.4 Making **[Owner]**, with structure **[Proposed]**
-
-| | Cooking (Kitchen) | Crafting (Forge) |
-|---|---|---|
-| Output | Dishes | Weapons, armor, accessories |
-| Sets the effect | The **star** ingredient's family | The **accent** material's family |
-| Sets the grade | The star ingredient | The main material |
-| Other inputs | 1–3 side ingredients from other families | The main material (sets the type) plus 0–2 more |
-| Variety | At least one dish per family per grade (80+), across dish types: soups, breads, grills, salads, desserts, drinks. Plus **Duo dishes** (two star families) and **Feasts** (all eight) for the Extra Stats bridges and Sun (§10) | Gear type × grade × accent effect |
-| Feeds | Extra Stats (§10) | Equipment (§7) |
-
-Side ingredients and extra materials are spread so **every family is in demand** on both sides.
-
-### 8.5 Parity: equal time **[Proposed]**
-
-1. The same number of families, items and unlock levels on both sides (§8.2).
-2. For the same grade, a site job, a refining job and a making job take the same time and pay the same XP on both
-   sides.
-3. A dish and a piece of gear of the same grade use the same number of inputs.
-4. Farming & Cooking and Gathering & Crafting share one XP curve, so maxing either takes the same time.
-5. Extra Stats and equipment add about the same share of power (§7.3).
-
-### 8.6 Jobs **[Settled, D55]**
-
-- Sites and stations run **timed jobs** that finish while the app is closed. Durations grow with grade.
-- A finished job pays its item and profession XP to the Uma who worked it.
-- Rules in [farm.md](farm.md); timers in [pacing.md](pacing.md) (D54).
-
-## 9. Hub **[Owner]**, with layout **[Proposed]**
-
-**[Owner]** (D21) Home is the Hub: **four pages you can swap between freely**, each one a big map.
-
-| Page | Places |
-|---|---|
-| **Farmlands** | The 8 farming sites, the Pantry and the Kitchen |
-| **Wilds** | The 8 gathering sites, the Workbench and the Forge |
-| **Learning District** | The 5 class halls and the 4 armories (§6) |
-| **Town** | Stable (roster), Party Hall (parties), Scenario Gate (chapters), Warehouse (inventory), Exchange (Laurels), Observatory (Extra Stats), the Tier Finale landmark |
-
-**[Owner]** (D22) Each place shows **tiny icons of the Umas assigned to it**. Tapping a place opens a **side overlay**
-previewing those Umas.
-
-**[Proposed]**
-
-- Both at once: face icons with a progress ring always sit on the map, and the overlay shows larger portraits, job
-  progress and the actions (Collect, Assign, Recall, Upgrade).
-- Farmlands and Wilds mirror each other, site for site.
-- Pages switch with a bottom tab bar or a sideways swipe. A badge on a tab counts finished jobs on that page.
-- Each page is a Phaser scene you can scroll and zoom, built from original pixel tiles. Overlays are React.
-- One Hub per tier world.
-- **Facility levels** are the tier world's own progression: materials from both sides upgrade a facility for more
-  slots and speed. These levels stay with the tier world (§2.2).
-
-## 10. Extra Stats: the Sun and its planets **[Owner]**, with structure **[Settled in S6, D58]**
-
-**[Owner]** (D17, D23) An Uma eats dishes to unlock Extra Stat nodes and activates at most N of them. Increments are
-**small** and there are **many slots**, for variety in builds, on the model of uma-racer's Sun-and-planets map. Claude
-sets the numbers.
-
-**[Proposed] One map per Uma per tier, with 100 nodes:**
-
-| Part | Nodes | Each node gives | Unlocked by eating |
-|---|---|---|---|
-| **8 planets**, one per effect, in a ring | 10 moons each: 80 | +1 point of that effect | A dish starring that effect's family, of grade ≥ the moon's number |
-| **8 bridges** between neighboring planets | 2 per pair: 16 | +½ point to each effect of the pair | A **Duo dish** starring both families (grade ≥ 3, then ≥ 7) |
-| **The Sun** at the center | 4 | +⅛ point to all eight effects | A **Feast** cooked from all eight families (grade ≥ 4, 6, 8, then 10) |
-
-- **Ring order:** HP – DEF – M.DEF – MP – M.ATK – ATK – Speed – Limit Break charge, then back to HP. Bridges pair stats
-  that build together: HP + DEF, MP + M.ATK, ATK + Speed.
-- **Every node is worth one point in total.** A point is a small fixed share of the stat, set in the balance pass
-  together with equipment (§7.3).
-- **One dish unlocks one node** and is eaten. Unlocked nodes stay for the tier.
-- **Active nodes: N = 5 + ⌊Uma Level / 2⌋**, so 5 at Lv1 and 30 at Lv50. Swap them freely outside a fight. With 100
-  nodes and 30 active, a build can stack one effect (its 10 moons plus both bridges), spread across everything with
-  the Sun, or land anywhere between.
-- The map opens from the Observatory in Town and from the Uma's profile.
-
-## 11. Laurels and the Exchange **[Owner]**, with details **[Proposed]**
-
-**[Owner]** (D27) Battles drop **Laurels**, a global currency spent at the **Exchange** in Town. The more you play, the
-more you choose which single area to push. Laurels buy:
-
-| Buy | Does | Rules **[Proposed]** |
-|---|---|---|
-| **Raw items** | Any raw ingredient or material | The soft scenario link: reaching a chapter stocks its grade pair (URA Finale grades 1–2, Unity Cup 3–4, Trackblazer 5–6, Our Grand Concert 7–8, Grand Masters 9–10). The price rises with grade. Producing items stays gated only by profession level |
-| **Rush Ticket** | Finishes one running job at once | Farm jobs only: Farmlands and Wilds sites, the Pantry, Kitchen, Workbench and Forge. Not Learning District training, where time stays the gate |
-| **Sweep Ticket** | Completes one cleared **regular** fight at once | Pays the fight's EXP (and so Shards), but **no Laurels**, so Laurels can't loop into more Laurels. Sub-bosses, champions and the Tier Finale must be fought |
-
-**[Proposed]**
-
-- Every win pays Laurels, replays included, scaled by the fight's level and kind (regular < sub-boss < champion).
-- One wallet per tier world, like the rest of a tier's stock (§2.2).
-- Prices and payouts come from the pacing model in the balance pass.
-
-## 12. Difficulty **[Owner]**
-
-- **[Owner]** The curve isn't steep. Today's regular, sub-boss and boss sets are a good base.
-- **[Owner]** Scaling is linear between scenarios: foe stats and HP grow like Uma stats and skill damage do.
-- **[Owner]** Scenarios differ by **flavor** (enemy distribution and types), not by difficulty. Details later.
-- **[Owner]** The Tier Finale is where difficulty rises. Details later.
-- **[Proposed]** Keep today's foe curve on lifetime level, `22 + 1.59 × (level − 1)` for the average stat, with the
-  role, rank and shield rules from uma-racer's class doc, plus the gear and Extra Stats budget (§7.3).
-
-## 13. Carried over from uma-racer's RPG **[Done in S3]**
-
-| Keep | Retire |
-|---|---|
-| Battle engine v5: breaks, shields, Limit Break, statuses, seeded replay | Inspiration tokens, Inventory/Convert for tokens, the Inspiration advance |
-| Five classes, their trees, hands and weapon sets | Class choice by A running style (classes are now free) |
-| Chapter maps, camps, carried MP, replays, Finals routes (re-cut to 10 levels) | 12-level chapters |
-| Saved parties (twenty now, D41) and PriConne's cast as rivals (all 109 playable characters now, D50) | Enrollment freezing an outfit; fixed class per Uma; the DOM fight screen (a Phaser stage now, D53) |
-| The campaign simulation harness | Anything paid into uma-racer |
+| Seeded combat, shields, Breaks, Limit Breaks, saved input/actions | Engine v7 adds eight foes, dual elements and waves (D52, D91) |
+| Five class identities | Per-class five-weapon loadouts replace six builds and old hands (D86) |
+| Party collection and passive jobs | Twenty parties, one world run, Springs instead of camps (D41, D55, D72) |
+| Campaign battle-building helpers | World regions replace player-facing chapter maps (D72) |
+| Timed shortcuts | Time Tickets replace Rush (D74) |
+| Private foe art | Six biome-linked packs, never in git (D83, D85, D88) |
+| Independent game economy | No Inspiration rewards or payments into uma-racer (D1) |
 
 ## 14. Next steps
 
-The build order is in [plan.md](../plan.md). Design work still to do:
-
-
-1. The owner reviews v0.2.
-2. Split into per-system docs: tiers and collection, classes and mastery, equipment, professions and items, Extra
-   Stats, Hub.
-3. Catalogs: raw and refined items are drafted ([items.md](items.md)); dishes and gear are next. Then the pacing model:
-   timers, XP curves, node and gear values, Laurel payouts and Exchange prices.
-4. Icons for every raw and refined item (in progress in uma-platform `scripts/pixel-art`).
-5. Phase 1 scaffold and the port of the battle engine.
+The game as built is in [the manual](../game/README.md). Remaining work is ranked in
+[the handoff queue](../handoff/README.md) and [backlog](../backlog.md).
+Open owner choices are [Q6–Q8](../open-questions.md): the Tier Finale/promotion, later-tier professions and a
+partially released tier. No design review, catalog authoring or initial scaffold remains pending.

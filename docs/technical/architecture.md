@@ -1,104 +1,92 @@
 # Architecture
 
-How uma-rpg is built. Cross-game rules are in uma-platform `docs/architecture.md`; production is in
-[infrastructure.md](infrastructure.md).
+> **Status: current, 2026-10-12; save v17, engine v7.** The full running-system reference is
+> [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
+> production values stay in [infrastructure.md](infrastructure.md).
+> Cross-game rules live in uma-platform `docs/architecture.md`.
 
 ## Layout
 
-| Path | What |
+| Path | Boundary |
 |---|---|
-| `packages/domain` (`@rpg/domain`) | Pure rules and contracts: the save and its rules (`save/`, including `save/battle.ts`), the battle engine, class catalog and campaign ported from uma-racer (`rpg/`), the place registry (`hub/`), the master data adapter (`master/`). Builds CommonJS + declarations for the API; Vite and Vitest read its TypeScript source |
-| `apps/api` (`@rpg/api`) | NestJS on Cloud Run: auth guard, `/api/save`, `/api/master/*`, `/api/content/*`, `/api/health` |
-| `apps/web` (`@rpg/web`) | React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie + React Router 7 + Phaser 4 (lazy) + PWA |
-| `infra/github-actions/bootstrap.sh` | One-time GCP setup |
-| `scripts/cast/` | The private face packs: `import.mjs` (PriConne, D50) and `import-<pack>.mjs` (Azur Lane, NIKKE, Destiny Child, Last Origin, Girls' Frontline; D76, D81, D85) build `content/release/`, `pack.mjs` holds their shared fetch, trim and write steps, `publish.sh [pack]` uploads one |
+| `packages/domain` | Pure rules: save/parsers/migrations, combat, world generation, economy, catalogs, places and master-data adapters |
+| `apps/web` | React UI and Zustand state; Vite consumes domain source. Phaser draws Hub/battles; DOM owns lasting labels and controls |
+| `apps/api` | NestJS auth, revisioned saves, master/private content proxies and Web Push. Consumes the domain's CommonJS build |
+| `scripts/cast/` | Private face-pack import/publish pipeline; output stays gitignored |
 
-## Save and sync (D32, D45, D52)
+Tooling and exact dependency versions are generated in [dependencies](../game/dependencies.md), not copied here.
 
-- One snapshot per account: `{ schemaVersion: 7, account, tierWorlds }`. Each tier world holds `wallet`, `umas` (owned
-  outfits by id: unlock time, level, EXP, the class `build` she fights as and her `builds`: tree, equipped skills,
-  Familiar, her two `professions`, her class and mastery `ranks`, her `stars` map and her `gear` locker), exactly 20 `parties` of five slots (an Uma in at most one slot, D46), `runs`
-  (one per party per chapter: wins, carried MP, and the open fight as its frozen input plus every action), `items`
-  (the Warehouse), `dishes`, `gear` (unbound pieces) and `facilities` (level and job slots). The wallet holds Rush and Sweep Tickets too.
-  Strict parsers in `@rpg/domain` validate on both sides, replaying any open fight; older saves parse into v8
-  (device rows on boot, server rows on read). Rules (`save/rules.ts`: unlock, party slots, renames, Shards → Tickets;
-  `save/battle.ts`: builds, skills, fights and their rewards) are pure and return a new save.
-- The API refuses (409, with the stored envelope) a `PUT` whose save version is older than the stored one, so an old
-  installed app can't overwrite newer data.
-- The device holds one Dexie row `{ uid, revision, save, dirty }` and a Zustand store. Every change writes both and
-  schedules a sync (1.5 s debounce, plus app foreground and coming online).
-- A sync pass reads `GET /api/save`, then `reconcile` decides: **adopt** the server's save, **push** ours on top of the
-  revision it was based on, or do nothing. `PUT` with a stale `baseRevision` gets **409** carrying the stored
-  envelope; when both sides changed, the save with the newer `account.updatedAt` wins whole.
-- Boot never waits on the network once a device save exists. A fresh device adopts the server's save, or shows first
-  launch (trainer name; Tier 1 with 20 Unlock Tickets).
+## Save and sync
 
-## Master data
+One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
+and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-- The API proxies uma-platform releases at `/api/master/{channels,manifests,files}/…`: the platform bucket in
-  production, uma-platform's local `content/release` in dev. Hash-named files are `private, immutable`; pointers are
-  `no-cache`.
-- The web app uses `@luismlorenzana/uma-data`'s release client (hash-verified) for characters, outfits and scenarios at
-  start, and the 2.5 MB skill set only when a profile needs it. `@rpg/domain`'s adapter makes `RosterOutfit` and
-  `ChapterInfo` (five chapters per tier, ten levels each).
-- Art needs the owner's token, so images are fetched with it and shown from session blob URLs; the service worker caches
-  the bytes.
+**Schema v17** (`save/save.ts`), not the old v7/v8 snapshot:
+- `account`: trainer name and timestamps.
+- `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, dishes, unbound gear and facilities.
+- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout), professions, ranks, Extra
+  Stats and bound gear. There are no active `build`/`builds` keys (D86).
+- `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
+  runs retired in v11 (D72).
+- Wallet shortcuts are `timeTickets` and `sweepTickets` (D74); tokens live in item stock.
+- `targets`: up to five owned Umas the facilities plan for (D100, `save/targets.ts`).
 
-## Work, items and the Exchange (D54–D56)
+| Migration | Decision |
+|---|---|
+| v10 progress reset, keeping unlocks and parties | D69 |
+| v11 world progress replaces chapter runs | D72 |
+| v12 Rush converts to Time Tickets | D74 |
+| v13 ranks cap at 5 | D77 |
+| v14 per-class loadouts, renamed/refunded gear | D86 |
+| v15 Crafting converts to Mastery Tokens; Forge inputs release reserved tokens | D94 |
+| v16 profession EXP moves to the longer curve without losing earned work | D96 |
+| v17 farming targets, none to start | D100 |
 
-- `@rpg/domain` holds the item catalog (`items/`, generated from the art index and checked against it by a web
-  test), the pacing numbers and the job model (`economy/`), and the rules over the save (`save/work.ts`: start,
-  collect, recall, rush, upgrade; `save/exchange.ts`: buy, sweep). Jobs are computed from their start time.
-- Item icons come from `@luismlorenzana/uma-art` (uma-platform's P37): one atlas PNG that Vite hashes into the build
-  (precached by the service worker), drawn by CSS position (`items/ItemIcon.tsx`). The item's frame is computed from
-  the catalog order, so the 57 KB index never ships.
-- One page serves all 16 sites and both refining stations (`places/work/FacilityPage.tsx`), and one serves the five
-  class halls and four armories (`places/learning/TrainingPage.tsx`, D57: a training job is one rank). The Kitchen
-  uses the facility page too; the Observatory draws each Uma's star map as SVG (D58).
-- The Forge uses the facility page with a type/grade/accent picker; gear pieces are generated from their id
-  (`economy/gear.ts`), never listed. Profiles carry a Gear card (`places/stable/GearCard.tsx`, D59).
-- Stat points (Extra Stats and gear) enter a fight through `economy/bonus.ts`: stats scaled per point, plus
-  optional `evasion` and `limitStart` on each ally, which the engine reads. The Hub's place buttons
-  read the world to draw working Umas' faces, progress rings and Ready tags (`hub/PlaceTargets.tsx`).
+`parseSave` accepts v1–v17 and returns v17; the earlier reset remains part of the migration chain.
+The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
+The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
+by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in
+[the manual](../game/architecture.md#the-save).
 
-## Private content (D50)
+## Domain boundaries
 
-- uma-rpg's own private content, the PriConne cast, lives in the gitignored `content/` (sources, a fetch cache and
-  `release/`). `scripts/cast/import.mjs` turns the captured official list into `release/cast.json` plus hash-named
-  WebP portraits; `scripts/cast/publish.sh` uploads them to `gs://uma-rpg-content` (portraits first, the list last).
-- The API serves only `cast.json` (`no-cache`) and `cast/<slug>.<hash8>.webp` (`immutable`) at `/api/content/`, from
-  the bucket in production (`CONTENT_BUCKET`) and from `content/release` in dev. The web app loads the list once a
-  session and portraits as blob URLs; the service worker caches them.
+| Module | Owns |
+|---|---|
+| `save/` | Pure actions over saves, refusals, inputs and reward settlement |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v7, with v6 replay compatibility (D91) |
+| `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, forty trees and learning rules |
+| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97) |
+| `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
+| `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |
 
-## Battles (D48–D53)
+Regions reuse campaign battle-building helpers internally; this is not a second player-facing chapter system.
+Fight settlement saves the final action and rewards together (D52).
+A foe lookup uses `battleFoe(state, id)`; `state.input.enemies` contains only the first wave (D91).
 
-- `@rpg/domain/rpg` is the battle engine, v7 since W3 (D91: up to eight foes a wave, dual-element foes, foes that act
-  twice, waves; v6 fights still replay), a deterministic reducer first ported from uma-racer (`createBattle`,
-  `applyBattleAction`, `replayBattle`, `battleFoe` across waves), the class catalog (D86) and the campaign machinery the
-  world map reuses (`world/world.ts` builds each region as a small chapter). The web app builds Tier 1's chapters once per master release and cast (`battle/campaign.tsx`).
-- Every fight action goes through the store (`fightAction`): the domain applies it to the save, and when it ends the
-  fight the rewards land in the same save. The screen then plays the engine's cues.
-- The fight screen (`places/scenario-gate/FightScreen.tsx`) is a lazy Phaser stage (`battle/scene/`, DPR-aware like
-  the Hub, `window.__battle` in dev) under a DOM layer. Both place things with one function, `battle/stage-layout.ts`.
-  The canvas draws art and effects, including effect text; the DOM has every control and lasting number.
-  `battle/battle-view.ts` (ported) projects the engine for the UI: legal skills, damage previews, Limit Break options,
-  and `followCue`, which moves the DOM bars in step with the effects.
+## Web boundaries and routes
 
-## The Hub (D30, D31, D33)
+Routes are exactly `/`, `/:page` and `/:page/:placeId/*`; `?peek=:placeId` opens a quick look (D31, D43).
+Sign-in and first launch render at the requested URL; there is no separate sign-in route (D38).
+Every place page is lazy. The generated [section map](../game/sections.md) lists the current screens.
 
-- Routes (D43): `/:page` is the Hub, `/:page?peek=:placeId` a place's quick look (the side panel), `/:page/:placeId/*` its
-  full page. Nothing else is a route. Opening from the Hub pushes history; **Enter** replaces the quick look with the
-  page, so back returns to the Hub. Signed-out and first-launch screens render at any URL, so a deep link survives
-  sign-in.
-- `apps/web/src/places/registry.tsx` maps each place to its lazy `Peek`, `Page` and header `Counter`; places without a
-  page show the honest preview and no Enter.
-- One place registry drives the map, the DOM place buttons, the menu and the routes.
-- The map is a lazy Phaser 4 game (`hub/scene/`): world units are CSS px with the camera zoomed by the device pixel ratio
-  (≤ 2). It draws ground, code-drawn markers and ambient motion; it has **no text and no input**. Names, slot pips and
-  slice badges are DOM buttons over it. Opening an overlay pauses the scene (the last frame stays); a hidden page gets
-  no animation frames.
-- Dev only: `?canvas` forces Phaser's Canvas renderer, because the preview pane's screenshots can't capture WebGL, and
-  `window.__hub` exposes the scene.
+Phaser is presentation only. Canvas effects may draw transient damage/WEAK/BREAK text; DOM carries lasting numbers,
+controls and accessible names (D33, D53). Six to eight foes use two rows and new-wave actors are keyed by foe id
+(D91). Auto shares its policy with the battle simulator; speed uses playback clocks (D89).
+The Hub stamps code-drawn art from uma-art; DOM anchors share its grid (D64). Opening an overlay pauses its scene,
+not the game loop (D39). Screen labels stay short, with explanations behind `HelpButton` (D95).
+
+Jobs derive progress from timestamps, not interval counters. Queues start at the previous job's finish and pay only
+through domain collect rules (D55, D62). Seven Learning halls replace the four distance armories (D70).
+Gear uses material-only recipes; Mastery Tokens belong to gear-level training (D94).
+
+## Content and deploy
+
+Master data comes through the authenticated API from uma-platform's content-addressed releases; game rules stay in
+this repo (platform P5, P7). Neutral release ids are adapted once for the roster and scenario/continent order.
+Six private cast packs supply foe faces by biome; none of their data or screenshots go in git (D83, D85, D88).
+Original code-drawn atlases are bundled from `@luismlorenzana/uma-art` (D26, D64).
+Bucket paths, endpoints, caching, local directories and deploy stages are in
+[the architecture manual](../game/architecture.md#private-content) and [infrastructure](infrastructure.md).
 
 ## Budgets
 

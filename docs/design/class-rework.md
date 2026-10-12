@@ -1,6 +1,9 @@
 # Class rework: the Class Sheet
 
-> **Status: built and live (D86, 2026-10-11; save v14, battle engine v6).** Approved by the owner with three notes folded in: hybrids may equip any of the ten
+> **Status: D86 built 2026-10-11; refreshed through D96 on 2026-10-12.** Current save v17, engine v7 (D91, D94, D96, D98).
+> This is the approved Class Sheet's intent; exact live skills and numbers are generated in the
+> [class manual](../game/classes.md) and [skill trees](../game/skill-trees.md) (D92).
+> Approved by the owner with three notes folded in: hybrids may equip any of the ten
 > Orbs; Light and Dark take the mirrored shapes (§2, §11.2); and every material family is produced and consumed
 > equally (§10). It replaces the five classes and six builds of [classes.md](classes.md) and [battles.md](battles.md).
 > Everything marked **(my call)** is a decision the owner didn't specify.
@@ -12,7 +15,7 @@
 | Flavor (never a restriction) | Front, Front+Pace | Pace, Pace+Late | End, Late+End | Pace, Pace+Late | Late |
 | Role | Pure physical DPS | Pure magic DPS | Hybrid DPS, magic-leaning | Hybrid DPS, physical-leaning | Support: buffs and debuffs |
 | Weapon slots (5) | 5 Arms, all fixed | 5 Tomes, all fixed | 3 Tomes + 2 Arms, chosen | 3 Arms + 2 Tomes, chosen | Any 5, chosen |
-| Accessory slot (1) | An Elemental Orb or a stat accessory | An Arms Orb or a stat accessory | Any Orb or a stat accessory | Any Orb or a stat accessory | Any Orb or a stat accessory |
+| Typical accessory (not a restriction) | An Elemental Orb or a stat accessory | An Arms Orb or a stat accessory | Any Orb or a stat accessory | Any Orb or a stat accessory | Any Orb or a stat accessory |
 | Armor slot (1) | Any armor | Any armor | Any armor | Any armor | Any armor |
 | Actions a turn | 1 | 1 | 1, plus the lingering summon | 1, made of an Arms skill and a Tome skill | 1 |
 | Damage per turn (Brawler = 1.0) | 1.0 | 1.0 | 0.6 + 0.3 linger = 0.9 | 0.45 + 0.45 = 0.9 | 0.5, plus a status |
@@ -32,8 +35,9 @@ with an Orb. What differs is which kinds and how hard each turn hits.
 | **Bow** | Single target, many hits | ↔ | **Light** | Single target, many hits |
 | **Katana** (new, replaces Short Sword) | Single target, double slashes | ↔ | **Dark** | Single target, two heavy casts |
 
-Every class follows the same shape per kind: its Greatsword and Fire skills hit one foe hard, its Axe and Ice skills
-every foe, and so on.
+These are the Brawler/Mage baseline patterns. Summoner patterns are in §6; Spell Blade halves and Cleric strikes
+are single-target (§7–§8). Side skills can change the shape. Read exact targets and hit counts from the
+[class-specific tree rows](../game/skill-trees.md), not as one universal targeting rule.
 
 - **Foes keep five Arms and five element weaknesses**; Short Sword weaknesses become Katana and Spear becomes Lance.
   The elemental triangle (Fire > Ice > Lightning > Fire, Light ↔ Dark) is unchanged.
@@ -109,8 +113,8 @@ Names (core / A / B, depth 1 → 5):
 
 - **Slots**: Fire, Blizzard, Thunder, Light and Dark **Tomes**, all five always, plus an **Arms Orb** (Greatsword, Axe,
   Lance, Bow or Katana: a spectral weapon joins every cast) or a stat accessory.
-- **Orbs**: Brawlers take Elemental Orbs and Mages Arms Orbs (one their weapons don't already cover); **Summoner, Spell
-  Blade and Cleric may take any of the ten.**
+- **Orbs**: Elemental Orbs usually expand a Brawler's coverage, Arms Orbs a Mage's. **Every class may wear any of the
+  ten** (D86); choosing an already covered kind adds no new weakness coverage.
 - **Acts once a turn** (it was twice at 0.6), at full power. **Five active trees.**
 - **Coverage**: all 5 elements + 1 Arm.
 - The trees are today's Mage-staff and Arcane-staff branches, one tree per Tome, minus Ultima:
@@ -203,7 +207,8 @@ Side skills in every tree: **A: Focus**, one hit fewer, ×1.1; **B: Flurry**, on
   Piety, Benediction; Ice Ward, Guard, Bulwark, Fortress, Sanctum; Lightning Spark, Charge, Surge, Overcharge, Breakstorm;
   Dark Calm, Focus, Clarity, Insight, Enlightenment.
 - **Side skills** in every tree: **A: Lasting**, the status lasts 1 round longer; **B: Heavy**, +1 stack, +4 MP.
-- Her old passive blessing tree retires. Barrier, Regen, Cure and Rebirth wait for the healing pass you mentioned.
+- Her old passive blessing/healing tree retires. Barrier still exists as a summon rider (§6); it is not a Cleric
+  healing-tree unlock. Regen, Cure and Rebirth are not current Cleric skills (D86).
 
 ## 9. Limit Breaks (kept close to today's)
 
@@ -220,8 +225,9 @@ Side skills in every tree: **A: Focus**, one hit fewer, ×1.1; **B: Flurry**, on
 **Weapon types: ten, all craftable at the Forge**, each `type × grade 1–10 × accent`, as today.
 
 **Materials, symmetric by construction (owner, D86).** Every recipe is **four refined items of its grade, one from each
-of four gathering families, plus one Crafting Token of its accent's stat** (the accent no longer takes a material of
-its own, and the extras retire). The eight gathering families split into two halves, by flavor:
+of four gathering families** (the accent no longer takes a material of its own, and the extras retire).
+**The Forge takes no token (D94)**, superseding D86's Crafting Token. The eight gathering families split into two
+halves, by flavor:
 
 | Half | Families | Flavor |
 |---|---|---|
@@ -256,10 +262,9 @@ eight. A test (`materials.test.ts`) keeps both true. Every site produces at the 
 - **Icons (lean)**: the shared art atlas has rows for today's types. Until an art round in uma-platform adds new ones,
   Lance reuses Spear's icons, Katana reuses Short Sword's, the five Tomes reuse the Summoner Tome tinted by element, and
   Orbs reuse the Ring tinted by kind with the kind's glyph on top.
-- **Token budget (D82)**: unchanged per Uma, two class tracks, two weapon tracks and two planets. A "weapon track" is
-  one weapon type crafted through grades 1–10 (10 Crafting Tokens). A Brawler or Mage wears five weapons, so outfitting
-  one fully across all grades is 50 Crafting Tokens. Most Umas will run a few grades behind, so the D82 numbers may
-  want raising once the new loop is played.
+- **Token budget (D82, D93, D94)**: two class tracks, two mastery tracks and two planets per Uma. A mastery track is
+  Weapon, Armor or Accessory Level 1→10 and costs nine Mastery Tokens, not ten crafted pieces. Crafting costs only
+  materials; `save/tokens.test.ts` checks the expected fight budget with waves included.
 
 **Screens.**
 
@@ -270,7 +275,7 @@ eight. A test (`materials.test.ts`) keeps both true. Every site produces at the 
 - **Fight**: **Attack** shows the five weapons as icons (one tap picks which to hit with); **Skills** opens a row of the
   five weapons, each filtering its skills. Spell Blade picks a blade skill, then a spell; Summoner's lingering summon
   shows beside her.
-- **Forge**: the ten weapon types; **Jeweler**: Rings, Charms and the ten Orbs.
+- **Forge**: all 26 gear types. **Jeweler**: Accessory Level training, covering Rings, Charms and Orbs (D70, D94).
 
 **Save v14 (migration).**
 
@@ -299,7 +304,7 @@ re-checks D75's targets before anything ships.
 5. **One budget per class, written down**: 1.0 / 1.0 / 0.9 / 0.9 / 0.5 + status. The sim checks each against it, so a
    change to one class can't quietly shift the others.
 
-## 12. Build order once approved
+## 12. Completed build order (D86)
 
 | Step | What |
 |---|---|
