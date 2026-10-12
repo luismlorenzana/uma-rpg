@@ -7,22 +7,18 @@ export type Sheet = 'items' | 'dishes' | 'gear'
 export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
   items: { w: 320, h: 1024 },
   dishes: { w: 320, h: 320 },
-  gear: { w: 320, h: 832 },
+  gear: { w: 320, h: 1088 },
 }
 
 /** `kind`: a badge for pieces drawn with another type's art (a Tome's element, an Orb's kind). */
 export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect; kind?: RpgDamageKind }
-/** The gear atlas' rows (uma-art 2.0.0, H03): D86's ten weapons, the four pre-D103 armor rows, Ring and Charm, and the
- * ten Orbs. Each weapon and Orb has its own art. */
+/** The gear atlas' rows (uma-art 2.1.0): D86's ten weapons (H03), the retired pre-D103 armor rows, Ring and Charm, the ten
+ * Orbs, and D103's eight armor pieces (H27). Every type the game crafts has its own row. */
 export const GEAR_ART_ROWS = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark',
   'garb', 'leather', 'mail', 'plate', 'ring', 'charm', 'orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana', 'orb-fire', 'orb-ice',
-  'orb-lightning', 'orb-light', 'orb-dark'] as const
-/** D103's eight armor pieces borrow the older armor rows until their own art exists (H27). */
-const ARMOR_ART: Readonly<Record<string, (typeof GEAR_ART_ROWS)[number]>> = {
-  helm: 'plate', cuirass: 'mail', greaves: 'leather', gauntlets: 'plate', circlet: 'charm', robe: 'garb', leggings: 'garb', bracers: 'charm',
-}
+  'orb-lightning', 'orb-light', 'orb-dark', 'helm', 'cuirass', 'greaves', 'gauntlets', 'circlet', 'robe', 'leggings', 'bracers'] as const
 export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
-  return { row: ARMOR_ART[type] ?? (type as (typeof GEAR_ART_ROWS)[number]) }
+  return { row: type as (typeof GEAR_ART_ROWS)[number] }
 }
 
 const ITEM_ROW = new Map(ITEM_FAMILIES.map((f, i) => [f.id, i * 2]))

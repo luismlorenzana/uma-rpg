@@ -13,7 +13,6 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | # | Task | Who | Repo | Size | Needs |
 |---|---|---|---|---|---|
 | **P2** | | | | | |
-| [H27](tasks/H27-armor-icons-d103.md) | Armor icons for D103: eight pieces in ten grades | ChatGPT, then Claude wires | uma-platform | M | — |
 | [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | — |
 | [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars: the game half (art published) | ChatGPT | uma-rpg | M | — |
 | [H11](tasks/H11-ui-icons.md) | Class emblems and status icons: the game half (art published) | ChatGPT | uma-rpg | S | — |
@@ -28,12 +27,13 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | **P4** | | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | Owner decides, Claude builds | uma-rpg | L | Q6 |
 | [H24](tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design | Owner and Claude | uma-rpg | M | Q7, H23 |
-| [H25](tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3 | Owner and Claude | uma-racer | L | A Farm spec |
+| [H25](tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3 | Owner and Claude | uma-racer | L | Planned; the owner's feature docs |
 | [H26](tasks/H26-uma-puzzle-phase-4.md) | uma-puzzle phase 4 | Owner and Claude | uma-puzzle | L | A billing slot |
 
-**For ChatGPT, in order:** H27 → H08, H10, H11, H17, H18, H19.
+**For ChatGPT, in order:** H08, H10, H11, H17, H18, H19.
 
-**Done:** H07, the pixel-art world, continent and region maps with a persistent list fallback, and H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
+**Done:** H07, the pixel-art world, continent and region maps with a persistent list fallback (D110), H27, D103's armor
+icons wired into the game on uma-art 2.1.0 (D111), and H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
 speed (D89), H09, W3's eight foes, dual elements and waves (D91), H04, the
 [current phone check](../testing/phone-check.md), H05, the class-rework dead-code sweep, H12, the
 [design-doc refresh](../design/game-design.md) (through D100), and H16, the lazy-domain split and build-time JS budget
