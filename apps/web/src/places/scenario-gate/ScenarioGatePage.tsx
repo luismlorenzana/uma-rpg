@@ -1,7 +1,7 @@
 // The Scenario Gate opens the world map (D66, D97): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
-// `r/<region>`, `fight`. Plain art first (owner: something quick to see and give feedback on).
-import { biomeById, openFightOf, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+// `r/<region>`, `capital/<continent>`, `fight`. Plain art first (owner: something quick to see and give feedback on).
+import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
@@ -13,6 +13,7 @@ import { LockIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
+import { CapitalMap } from './CapitalMap'
 import { FightResult } from './FightResult'
 import { FightScreen } from './FightScreen'
 import { RegionMap } from './RegionMap'
@@ -23,8 +24,12 @@ export default function ScenarioGatePage({ place, rest }: PageProps) {
     <CampaignGate>
       {(campaign) => {
         if (kind === 'fight') return <FightRoute campaign={campaign} place={place} />
+        if (kind === 'capital' && id) {
+          const continent = campaign.continents.find((c) => c.id === id)
+          return continent ? <CapitalMap campaign={campaign} continent={continent} place={place} /> : <p className="p-4 text-ink-soft">Capital not found.</p>
+        }
         if (kind === 'r' && id) {
-          const region = campaign.region(id)
+          const region = campaign.regionInfo(id) ? campaign.region(id) : null
           return region ? <RegionMap campaign={campaign} region={region} place={place} /> : <p className="p-4 text-ink-soft">That region isn’t on the map.</p>
         }
         if (kind === 'c' && id) {
@@ -106,6 +111,9 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
   const rows = Array.from({ length: 10 }, (_, row) => row)
+  const finals = rpgFinals(continent.order)
+  const wonFinals = finals.routes.flatMap((_, i) => Object.values(capitalStageIds(continent.id, i + 1)))
+    .filter((id) => (worldRun(world).wins[id] ?? 0) > 0).length
   return (
     <div>
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
@@ -154,6 +162,11 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
             </div>
           )
         })}
+        <button type="button" onClick={() => nav.sub(place, `capital/${continent.id}`)}
+          className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md border border-accent/50 bg-raised p-3 text-left">
+          <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · Lv {continent.levelStart + 9}</span></span>
+          <span className="text-[12px] text-ink-soft">{wonFinals}/6</span>
+        </button>
       </div>
     </div>
   )
@@ -165,9 +178,10 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
   const [ended, setEnded] = useState<{ result: Result; nodeId: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const run = world ? openFightOf(world) : null
-  const regionId = (ended?.nodeId ?? run?.battle?.nodeId ?? '').replace(/-s\d+$/, '')
-  const region = regionId ? campaign.region(regionId) : null
-  const toRegion = () => navigate(pagePath(place, region ? `r/${region.id}` : ''), { replace: true })
+  const stageId = ended?.nodeId ?? run?.battle?.nodeId
+  const region = stageId ? campaign.stageRegion(stageId) : null
+  const capital = campaign.continents.find((c) => capitalId(c.id) === region?.id)
+  const toRegion = () => navigate(pagePath(place, capital ? `capital/${capital.id}` : region ? `r/${region.id}` : ''), { replace: true })
   if (!region) return <p className="p-4 text-ink-soft">No fight is open.</p>
   if (ended) {
     return (

@@ -10,7 +10,7 @@ export interface RpgFinalsFoe {
   escorts: readonly [readonly [RpgEscortRole, RpgElement], readonly [RpgEscortRole, RpgElement]]
 }
 export interface RpgFinalsRoute { name: string; line: string; vanguard: RpgFinalsFoe; champion: RpgFinalsFoe }
-export interface RpgFinals { title: string; routes: readonly [RpgFinalsRoute, RpgFinalsRoute, RpgFinalsRoute] }
+export interface RpgFinals { routes: readonly [RpgFinalsRoute, RpgFinalsRoute, RpgFinalsRoute] }
 export const RPG_FINALS_ROUTES = 3
 
 const route = (name: string, line: string, vanguard: [RpgElement, RpgEscortRole, RpgElement, RpgEscortRole, RpgElement],
@@ -24,7 +24,7 @@ const route = (name: string, line: string, vanguard: [RpgElement, RpgEscortRole,
  * A vanguard may share her champion's element (one answer clears the route) or not (it needs two).
  */
 const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
-  'ura-finale': { title: 'URA Finals', routes: [
+  'ura-finale': { routes: [
     route('Sprint Final', 'Short and fierce: a lightning start, then a blazing finish.',
       ['lightning', 'skirmisher', 'lightning', 'striker', 'fire'], ['fire', 'skirmisher', 'fire', 'striker', 'lightning']),
     route('Mile Final', 'Clean and balanced: frost first, then a radiant miler.',
@@ -32,7 +32,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Long-Distance Final', "A stayer's grind through dusk and cold.",
       ['dark', 'guard', 'dark', 'caster', 'ice'], ['ice', 'guard', 'ice', 'caster', 'dark']),
   ] },
-  'unity-cup': { title: 'Unity Cup Final', routes: [
+  'unity-cup': { routes: [
     route('Team Blaze', 'A hot-blooded team that charges in together.',
       ['fire', 'striker', 'fire', 'striker', 'lightning'], ['fire', 'striker', 'fire', 'caster', 'lightning']),
     route('Team Glacier', 'A patient team that walls up and wears you down.',
@@ -40,7 +40,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Team Eclipse', 'Light and shadow trade places every turn.',
       ['light', 'caster', 'light', 'skirmisher', 'dark'], ['dark', 'skirmisher', 'dark', 'caster', 'light']),
   ] },
-  trackblazer: { title: 'Climax Races', routes: [
+  trackblazer: { routes: [
     route('Spring Climax', 'Fresh legs and quick feet: a fast, slippery pack.',
       ['light', 'skirmisher', 'light', 'striker', 'lightning'], ['lightning', 'skirmisher', 'lightning', 'skirmisher', 'light']),
     route('Summer Climax', 'Heat haze over the track; the favourite runs hot.',
@@ -48,7 +48,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Winter Climax', 'Long nights and cold ground, guarded to the end.',
       ['ice', 'guard', 'ice', 'caster', 'dark'], ['dark', 'caster', 'dark', 'guard', 'ice']),
   ] },
-  'grand-concert': { title: 'Grand Live', routes: [
+  'grand-concert': { routes: [
     route('Opening Act', 'An electric opener that never lets the tempo drop.',
       ['lightning', 'skirmisher', 'lightning', 'caster', 'fire'], ['lightning', 'skirmisher', 'lightning', 'striker', 'light']),
     route('Encore Stage', 'Spotlights and chorus: casters fill the stage.',
@@ -56,7 +56,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Midnight Live', 'A late show in the dark, loud and heavy.',
       ['dark', 'skirmisher', 'dark', 'striker', 'fire'], ['dark', 'striker', 'dark', 'caster', 'ice']),
   ] },
-  'grand-masters': { title: 'Trials of the Masters', routes: [
+  'grand-masters': { routes: [
     route('Trial of Radiance', 'A shining master whose guards never fall first.',
       ['light', 'guard', 'light', 'caster', 'ice'], ['light', 'caster', 'light', 'guard', 'fire']),
     route('Trial of Shadow', 'Quick shadows that mark you, then strike.',
@@ -64,7 +64,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Trial of Flame', 'Ice at the gate, fire at the summit.',
       ['ice', 'striker', 'ice', 'caster', 'fire'], ['fire', 'striker', 'fire', 'striker', 'fire']),
   ] },
-  'project-larc': { title: 'Arc Weekend', routes: [
+  'project-larc': { routes: [
     route('Longchamp Straight', 'The long straight under bright autumn sun.',
       ['lightning', 'skirmisher', 'lightning', 'striker', 'light'], ['light', 'striker', 'light', 'skirmisher', 'lightning']),
     route('Paris by Night', 'City lights and dark corners.',
@@ -72,7 +72,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Autumn Rain', 'Heavy going on a cold, soft track.',
       ['ice', 'guard', 'ice', 'caster', 'lightning'], ['ice', 'guard', 'ice', 'striker', 'dark']),
   ] },
-  uaf: { title: 'U.A.F. Finals', routes: [
+  uaf: { routes: [
     route('Red Division', 'Power events: big hits, no subtlety.',
       ['fire', 'striker', 'fire', 'skirmisher', 'fire'], ['fire', 'striker', 'fire', 'guard', 'lightning']),
     route('Blue Division', 'Water and speed: slippery and hard to pin down.',
@@ -80,7 +80,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Yellow Division', 'Precision events: sharp, electric and well drilled.',
       ['lightning', 'caster', 'lightning', 'guard', 'lightning'], ['lightning', 'caster', 'lightning', 'skirmisher', 'fire']),
   ] },
-  'great-food-festival': { title: 'Festival Showdown', routes: [
+  'great-food-festival': { routes: [
     route('Grill Masters', 'Smoke and sizzle: everything here burns.',
       ['fire', 'striker', 'fire', 'caster', 'lightning'], ['fire', 'striker', 'fire', 'caster', 'fire']),
     route('Frozen Dessert Bar', 'Sweet, cold and full of casters.',
@@ -88,7 +88,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Midnight Feast', 'The last stalls stay open late, and guarded.',
       ['dark', 'skirmisher', 'dark', 'striker', 'fire'], ['dark', 'guard', 'dark', 'striker', 'fire']),
   ] },
-  'mecha-umamusume': { title: 'Mecha Grand Prix', routes: [
+  'mecha-umamusume': { routes: [
     route('Reactor Core', 'Shielded by drones and charged to the limit.',
       ['fire', 'guard', 'lightning', 'caster', 'fire'], ['lightning', 'caster', 'lightning', 'guard', 'lightning']),
     route('Thruster Bay', 'Afterburners: everything here moves first.',
@@ -96,7 +96,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Coolant Plant', 'Cold machinery and heavy armour.',
       ['dark', 'guard', 'ice', 'caster', 'dark'], ['ice', 'guard', 'ice', 'caster', 'ice']),
   ] },
-  'twinkle-legends': { title: "Legends' Night", routes: [
+  'twinkle-legends': { routes: [
     route('Shooting Star', 'A streak of light, gone before you can swing.',
       ['lightning', 'skirmisher', 'light', 'skirmisher', 'lightning'], ['light', 'skirmisher', 'light', 'caster', 'lightning']),
     route('Eclipse', 'Day turns to night halfway round.',
@@ -104,7 +104,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Thunderhead', 'A storm legend with a heavy hand.',
       ['ice', 'striker', 'ice', 'guard', 'lightning'], ['lightning', 'striker', 'lightning', 'striker', 'ice']),
   ] },
-  'design-your-island': { title: 'Island Trials', routes: [
+  'design-your-island': { routes: [
     route('Volcano Peak', 'Lava rock and ash: tough, and hot.',
       ['fire', 'striker', 'fire', 'guard', 'fire'], ['fire', 'striker', 'fire', 'caster', 'dark']),
     route('Coral Caves', 'Echoing caves, cold water and casters.',
@@ -112,7 +112,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Monsoon Coast', 'Wind, rain and lightning on the shore.',
       ['lightning', 'skirmisher', 'lightning', 'striker', 'ice'], ['lightning', 'skirmisher', 'lightning', 'guard', 'ice']),
   ] },
-  'yukoma-hot-springs': { title: 'Hot Springs Festival', routes: [
+  'yukoma-hot-springs': { routes: [
     route('Steam Baths', 'Thick steam and scalding water.',
       ['fire', 'caster', 'fire', 'guard', 'ice'], ['fire', 'caster', 'fire', 'striker', 'fire']),
     route('Snow Garden', 'Quiet snow and stubborn defenders.',
@@ -120,7 +120,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Lantern Path', 'Paper lanterns light the night walk.',
       ['dark', 'skirmisher', 'dark', 'caster', 'light'], ['light', 'caster', 'light', 'skirmisher', 'dark']),
   ] },
-  'beyond-dreams': { title: 'Beyond the Dream', routes: [
+  'beyond-dreams': { routes: [
     route('Toward the Light', 'Push through the dark to reach the light.',
       ['dark', 'guard', 'dark', 'caster', 'dark'], ['light', 'caster', 'light', 'striker', 'light']),
     route('Shadow of Doubt', 'Old doubts that stand in the way.',
@@ -128,7 +128,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
     route('Forward Together', 'Shoulder to shoulder, at full speed.',
       ['fire', 'striker', 'fire', 'skirmisher', 'lightning'], ['lightning', 'striker', 'lightning', 'caster', 'fire']),
   ] },
-  'tracen-diner': { title: 'Diner Rush', routes: [
+  'tracen-diner': { routes: [
     route('Kitchen Fire', 'Woks on full flame.',
       ['fire', 'striker', 'fire', 'caster', 'fire'], ['fire', 'striker', 'fire', 'guard', 'lightning']),
     route('Cold Noodle Counter', 'Chilled bowls and quick hands.',
@@ -138,7 +138,7 @@ const BY_SLUG: Readonly<Record<string, RpgFinals>> = {
   ] },
 }
 
-/** The authored Finals in release order: URA Finale first, Tracen Diner fourteenth. */
+/** The fourteen authored Finals in release order; scenario names come from master data. */
 const SLUG_ORDER = ['ura-finale', 'unity-cup', 'trackblazer', 'grand-concert', 'grand-masters', 'project-larc', 'uaf',
   'great-food-festival', 'mecha-umamusume', 'twinkle-legends', 'design-your-island', 'yukoma-hot-springs', 'beyond-dreams', 'tracen-diner'] as const
 export const RPG_FINALS: readonly RpgFinals[] = SLUG_ORDER.map((slug) => BY_SLUG[slug]!)

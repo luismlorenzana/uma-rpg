@@ -14,7 +14,6 @@ push in one play-through. It marks the checks that need the installed app or pro
 | Packet | What |
 |---|---|
 | [H13](handoff/tasks/H13-w4-field-effects.md) | W4: field effects and home ground |
-| [H15](handoff/tasks/H15-capital-finals.md) | The capitals' Finals |
 | [H20](handoff/tasks/H20-key-boss-faces.md) | Key bosses' faces (the owner picks; packs are private) |
 | [H23](handoff/tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion (parked; needs Q6) |
 | [H24](handoff/tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design (parked; needs Q7) |

@@ -42,7 +42,7 @@ describe('generated chapters (D48)', () => {
   })
 
   it('is deterministic for a chapter and cast, and maps lifetime levels to tiers', () => {
-    const source = { scenarioId: 1001, name: 'URA', order: 1 }
+    const source = { scenarioId: 1001, name: 'Synthetic chapter', order: 1 }
     expect(JSON.stringify(rpgCampaignChapter(source, [...cast].reverse()))).toBe(JSON.stringify(rpgCampaignChapter(source, cast)))
     expect(rpgCampaignChapter({ ...source, order: 6 }, cast)).toMatchObject({ tier: 2, levelStart: 51 })
     expect(rpgTierLevel(51)).toEqual({ tier: 2, level: 1 })
@@ -51,7 +51,7 @@ describe('generated chapters (D48)', () => {
 
   it('reads the fourteen authored Finals by release order and reuses them past the fourteenth', () => {
     expect(RPG_FINALS).toHaveLength(14)
-    expect(rpgFinals(1).title).toBe('URA Finals')
+    expect(Object.keys(rpgFinals(1))).toEqual(['routes'])
     expect(rpgFinals(15)).toBe(rpgFinals(1))
     for (const finals of RPG_FINALS) expect(new Set(finals.routes.map((r) => r.champion.element)).size).toBe(3)
   })

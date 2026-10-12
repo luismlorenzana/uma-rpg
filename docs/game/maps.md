@@ -29,7 +29,9 @@ come in `docs/design/world/map-art.md`.
 - **Progress belongs to the world**, not to a party: one world-wide record of wins per stage, MP per Uma, and one open
   fight at a time.
 - **Springs** refill the active party's MP, then recharge for two hours.
-- Each continent's **capital** (Lv 10 of its band) will hold the scenario's Finals; it's a placeholder today.
+- Each continent's **capital** (Lv 10 of its band) holds three authored Finals routes. All vanguards open immediately;
+  each champion opens after her own vanguard. Both have two escorts. Vanguards pay as sub-bosses, champions as bosses;
+  their EXP is halved so all three routes add about one level. Replays pay a quarter, and neither can be swept.
 
 ## Biomes
 

@@ -4,7 +4,7 @@ import {
   biomeById, openFightOf, rpgNodeStatus, SaveRuleError, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
   type RpgMapNode, type RpgNodeStatus,
 } from '@rpg/domain'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import { ElementGlyph, formatLevel, formatLevels, WeaknessIcons } from '../../battle/labels'
 import { castArtUrl } from '../../content/cast'
@@ -46,15 +46,26 @@ function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: stri
 const signatureOf = (n: RpgMapNode): RpgElement[] => (n.note ? (n.note.split(' + ') as RpgElement[]) : n.element ? [n.element] : [])
 
 export function RegionMap({ campaign, region, place }: { campaign: Campaign; region: RpgCampaignChapter; place: PageProps['place'] }) {
+  const info = campaign.regionInfo(region.id)!
+  return <StageMap campaign={campaign} region={region} place={place} title={info.name}
+    levels={formatLevels(info.level, info.levelTop)} color={biomeById(info.biome).color} />
+}
+
+/** Regions and capital routes share stage choices, rival sheets, fight entry and sweep results. */
+export function StageMap({ campaign, region, place, title, levels, color, capital = false, renderStages }: {
+  campaign: Campaign; region: RpgCampaignChapter; place: PageProps['place']; title: string; levels: string; color: string
+  capital?: boolean; renderStages?: (choice: (node: RpgMapNode, index: number) => ReactNode) => ReactNode
+}) {
   const world = useWorld()
   const nav = useHubNavigation()
   const [open, setOpen] = useState<RpgMapNode | null>(null)
   const [swept, setSwept] = useState<{ result: Result; nodeId: string } | null>(null)
   const [sweepFor, setSweepFor] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
+  // A continent's capital sits at the end of its scroll. Enter its routes at the top, not at that inherited offset.
+  useEffect(() => { mapRef.current?.closest('main')?.scrollTo({ top: 0 }) }, [region.id, !!world])
   if (!world) return null
-  const info = campaign.regionInfo(region.id)!
-  const biome = biomeById(info.biome)
   const run = worldRun(world)
   const fightOpen = openFightOf(world)
   const status = (id: string): RpgNodeStatus => rpgNodeStatus(region, run, id)
@@ -81,12 +92,35 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
       setError(err instanceof SaveRuleError ? err.message : 'Couldn’t sweep.')
     }
   }
+  const choice = (n: RpgMapNode, i: number) => {
+    const s = status(n.id), wins = run.wins[n.id] ?? 0
+    // Waves (W3): the boss leads her last wave.
+    const waves = [n.enemies, ...(n.waves ?? [])]
+    const foes = waves.reduce((sum, w) => sum + w.length, 0)
+    const lead = n.kind !== 'fight' ? waves.at(-1)![0]?.castId : undefined
+    return (
+      <button type="button" onClick={() => setOpen(n)} aria-label={`Stage ${i + 1}, ${n.name}, ${s}`}
+        className={`flex min-h-11 w-full items-center gap-3 rounded-md p-2.5 text-left ${s === 'locked' ? 'bg-sunken opacity-55' : 'bg-raised'} ${s === 'available' ? 'ring-1 ring-ink/60' : ''}`}>
+        <span className={`flex size-10 shrink-0 items-center justify-center rounded-full font-display text-[15px] font-bold ${s === 'cleared' ? 'bg-accent/30 text-accent' : 'bg-panel'}`}>
+          {lead ? <CastFace campaign={campaign} castId={lead} size={36} /> : i + 1}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[14px] font-semibold">{capital ? n.kind === 'boss' ? 'Champion ★' : 'Vanguard ♛' : `${n.name}${n.kind === 'boss' ? ' ★' : n.kind === 'sub-boss' ? ' ♛' : ''}`}</span>
+          <span className="flex items-center gap-1 text-[12px] text-ink-soft">
+            {signatureOf(n).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
+            <span>{formatLevel(n.level)} · {waves.length > 1 ? `${waves.length} waves · ` : ''}{foes} foe{foes > 1 ? 's' : ''}</span>
+          </span>
+        </span>
+        <span className="shrink-0 text-[12px] text-ink-faint">{s === 'cleared' ? `✓${wins > 1 ? ` ×${wins}` : ''}` : s === 'locked' ? 'locked' : 'open'}</span>
+      </button>
+    )
+  }
   return (
-    <div>
-      <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur" style={{ borderTop: `4px solid ${biome.color}` }}>
+    <div ref={mapRef}>
+      <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur" style={{ borderTop: `4px solid ${color}` }}>
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="truncate font-display text-lg font-bold">{info.name}</h2>
-          <span className="shrink-0 text-[12px] text-ink-soft">{formatLevels(info.level, info.levelTop)} · {cleared}/12 cleared</span>
+          <h2 className="min-w-0 font-display text-lg font-bold">{title}</h2>
+          <span className="shrink-0 text-[12px] text-ink-soft">{levels} · {cleared}/{stages.length} cleared</span>
         </div>
         <ActivePartyBar campaign={campaign} />
         {fightOpen?.battle && (
@@ -95,41 +129,16 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           </button>
         )}
       </div>
-      <ol className="space-y-2 p-3">
-        {stages.map((n, i) => {
-          const s = status(n.id)
-          const wins = run.wins[n.id] ?? 0
-          // Waves (W3): the boss leads her last wave.
-          const waves = [n.enemies, ...(n.waves ?? [])]
-          const foes = waves.reduce((sum, w) => sum + w.length, 0)
-          const lead = n.kind !== 'fight' ? waves.at(-1)![0]?.castId : undefined
-          return (
-            <li key={n.id}>
-              <button type="button" onClick={() => setOpen(n)} aria-label={`Stage ${i + 1}, ${n.name}, ${s}`}
-                className={`flex w-full items-center gap-3 rounded-md p-2.5 text-left ${s === 'locked' ? 'bg-sunken opacity-55' : 'bg-raised'} ${s === 'available' ? 'ring-1 ring-ink/60' : ''}`}>
-                <span className={`flex size-10 shrink-0 items-center justify-center rounded-full font-display text-[15px] font-bold ${s === 'cleared' ? 'bg-accent/30 text-accent' : 'bg-panel'}`}>
-                  {lead ? <CastFace campaign={campaign} castId={lead} size={36} /> : i + 1}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[14px] font-semibold">{n.name}{n.kind === 'boss' ? ' ★' : n.kind === 'sub-boss' ? ' ♛' : ''}</span>
-                  <span className="flex items-center gap-1 text-[12px] text-ink-soft">
-                    {signatureOf(n).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
-                    <span>{formatLevel(n.level)} · {waves.length > 1 ? `${waves.length} waves · ` : ''}{foes} foe{foes > 1 ? 's' : ''}</span>
-                  </span>
-                </span>
-                <span className="shrink-0 text-[12px] text-ink-faint">{s === 'cleared' ? `✓${wins > 1 ? ` ×${wins}` : ''}` : s === 'locked' ? 'locked' : 'open'}</span>
-              </button>
-            </li>
-          )
-        })}
-      </ol>
+      {renderStages ? renderStages(choice) : <ol className="space-y-2 p-3">
+        {stages.map((n, i) => <li key={n.id}>{choice(n, i)}</li>)}
+      </ol>}
 
       {open && (
         <BottomSheet title={open.name} onClose={() => { setOpen(null); setError(null) }} footer={
           <div className="flex gap-2">
             <button type="button" disabled={status(open.id) === 'locked' || !!fightOpen?.battle} onClick={() => void fight(open)}
               className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-              {status(open.id) === 'locked' ? 'Clear the stage before it' : fightOpen?.battle ? 'Finish the open fight first' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
+              {status(open.id) === 'locked' ? 'Locked' : fightOpen?.battle ? 'Fight open' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
             </button>
             {open.kind === 'fight' && status(open.id) === 'cleared' && (
               <button type="button" disabled={!!sweepBlock(world, region, open.id)} onClick={() => setSweepFor(open.id)}
@@ -140,7 +149,7 @@ export function RegionMap({ campaign, region, place }: { campaign: Campaign; reg
           </div>
         }>
           <p className="mb-2 flex items-center gap-1 text-[13px] text-ink-soft">
-            {formatLevel(open.level)} · {open.kind === 'boss' ? 'Region boss' : open.kind === 'sub-boss' ? 'Elite' : 'Stage'} ·
+            {formatLevel(open.level)} · {open.kind === 'boss' ? capital ? 'Champion' : 'Region boss' : open.kind === 'sub-boss' ? capital ? 'Vanguard' : 'Elite' : 'Stage'} ·
             {signatureOf(open).map((e) => <ElementGlyph key={e} element={e} size={14} />)}
             {open.waves?.length ? ` · ${open.waves.length + 1} waves` : ''}
           </p>

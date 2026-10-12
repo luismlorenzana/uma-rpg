@@ -45,7 +45,12 @@ Each continent has 40 regions (every biome twice, two of them three times) plus 
 | 17 | **Crystal Caverns** | light, ice+light | Squads | Guards | Refraction: magic hits +10% | Cyan |
 | 18 | **Ancient Ruins** | light+dark, plus singles | Escorts (captain + guards) | Guards, captains | Wards: foes start with a shield point more | Stone |
 | 19 | **Twilight Rift** | light+dark | **Solo elites only** | Champions | Eclipse: light and dark both +15% | Indigo and gold |
-| 20 | **Capital** | The scenario's | Authored Finals routes | Vanguards and champions | — | The scenario's color |
+| 20 | **Capital** | The scenario's authored elements | Three routes, each a vanguard → champion, with two escorts each | Captains, champions and authored escorts | — | The scenario's color |
+
+The capital waits at the band's tenth level (10, 20, 30, 40 or 50). Every vanguard opens from the start; each champion
+needs only her own vanguard's clear. Stage ids stay `<continent>-capital-r<1–3>-s<1–2>`. Vanguards pay as sub-bosses,
+champions as bosses, with quarter rewards on replays; no capital stage is sweepable. The route cards and continent's
+capital row show the world's progress, whichever party won.
 
 The field effects are a later layer (step W4 in the build order). The table fixes them now so each biome has an
 identity from the start.

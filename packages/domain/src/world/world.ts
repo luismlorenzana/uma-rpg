@@ -257,7 +257,11 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
 export const WAVE_PAY = 1.5
 export const stagePay = (node: Pick<RpgMapNode, 'waves'>): number => (node.waves?.length ? WAVE_PAY : 1)
 
-/** The region a stage id belongs to (`w1-3-2-s5` → `w1-3-2`). */
-export const stageRegionId = (stageId: string): string => stageId.replace(/-s\d+$/, '')
+/** Finals' six fights together grant about one level; Laurels retain their usual rates. */
+export const stageExpPay = (node: Pick<RpgMapNode, 'id' | 'waves'>): number =>
+  stagePay(node) * (/^w[1-9]\d*-capital-r[1-3]-s[12]$/.test(node.id) ? 0.5 : 1)
+
+/** The region-like chapter a stage belongs to: `w1-3-2-s5` → `w1-3-2`, `w1-capital-r2-s1` → `w1-capital`. */
+export const stageRegionId = (stageId: string): string => stageId.replace(/(-capital)-r[1-3]-s[12]$/, '$1').replace(/-s\d+$/, '')
 /** A stage's band: its continent's order. */
 export const stageBand = (stageId: string): number => Number(/^w(\d+)-/.exec(stageId)?.[1] ?? 0)
