@@ -396,7 +396,7 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
             </div>
             <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />
             <p className="mt-1 text-[11px] text-ink-faint">
-              {next ? `${prof.exp} / ${next} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
+              {next ? `${prof.exp.toLocaleString('en-US')} / ${next.toLocaleString('en-US')} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
               {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${PROFESSION_SHORT[p]} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
             </p>
           </section>

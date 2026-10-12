@@ -1,9 +1,9 @@
-// Save v15: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v16: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
-import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
+import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, professionExpToNext, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
 import { depthsOpen, GEAR_TYPES, newRanks, parseTrack, tracksAt, trackId, type Ranks } from '../economy/training'
 import { CLASS_MAX_RANK, MASTERY_MAX_RANK } from '../economy/pacing'
@@ -23,7 +23,7 @@ import {
   type RpgWeapon,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 15
+export const SAVE_SCHEMA_VERSION = 16
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -714,11 +714,36 @@ function toV15(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
+/** EXP from level L to L+1 before D96, kept to carry levels over. */
+const OLD_PROFESSION_EXP = (level: number): number => 20 + 6 * level
+/**
+ * v15 → v16 (D96): the profession curve is ten times longer. Jobs still pay the same EXP per minute of work, so every Farm
+ * and Craft Level carries its EXP over whole and lands at the level that work earns on the new curve.
+ */
+function toV16(world: Record<string, unknown>): Record<string, unknown> {
+  const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
+  if (!isRecord(w.umas)) return w
+  for (const uma of Object.values(w.umas)) {
+    if (!isRecord(uma) || !isRecord(uma.professions)) continue
+    for (const p of Object.values(uma.professions)) {
+      if (!isRecord(p) || !Number.isInteger(p.level) || !Number.isInteger(p.exp)) continue
+      let bank = Number(p.exp)
+      for (let l = 1; l < Math.min(Number(p.level), PROFESSION_MAX_LEVEL); l++) bank += OLD_PROFESSION_EXP(l)
+      let level = 1
+      while (level < PROFESSION_MAX_LEVEL && bank >= professionExpToNext(level)) bank -= professionExpToNext(level++)
+      p.level = level
+      p.exp = bank
+    }
+  }
+  return w
+}
+
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
   const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
   const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
-  const value = version < 15 && isRecord(v14) ? toV15(v14) : v14
+  const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
+  const value = version < 16 && isRecord(v15) ? toV16(v15) : v15
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
@@ -737,7 +762,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v15 save and always returns v15; anything older than v10 starts its progress over (D69). */
+/** Parses a v1–v16 save and always returns v16; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

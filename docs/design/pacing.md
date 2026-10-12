@@ -1,6 +1,6 @@
 # Pacing model
 
-> **Status: current (2026-10-10, D54; items rebalanced by D65).** Every timer, curve, price and payout outside the battle engine. The numbers
+> **Status: current (2026-10-10, D54; items rebalanced by D65, profession curve by D96).** Every timer, curve, price and payout outside the battle engine. The numbers
 > live in `packages/domain/src/economy/pacing.ts`; tests pin what they mean in play time. Change them there, and update
 > this page with the reason.
 
@@ -8,9 +8,10 @@
 
 - **Items are few and slow, and every recipe needs about one of each (D65).** A grade-1 item takes an hour, a grade-10
   one most of a night; a day of single items keeps you progressing, with one collect per job instead of a stream of them.
-- One Uma reaches **grade 10 in a profession after about 59 hours of work at G aptitude, 30 at A** (Lv46), and the
-  profession cap (Lv50) after 69 hours at G. With a few check-ins a day and jobs running overnight, a dedicated Uma gets
-  there in one to two weeks; aptitude decides who's worth specializing.
+- **Professions are a long loop (D96).** An Uma working without a break gains about 4 levels a day at A aptitude (5 in a
+  level-3 facility), 3 at C and 2 at G, a little fewer as levels climb. Lv50 takes about 15 days at A and a month at
+  G; grade 10 (Lv46) a day or two sooner. Aptitude decides who's worth specializing. (D54's curve took 69 hours of
+  work at G: an Uma reached Lv27 in two batches.)
 - Battles stay the only Laurel source, and Laurels buy shortcuts, never the whole game: an hour of work costs about
   two fights, whether bought as an item or as Time Tickets.
 - Extra Stats and gear each add about the same share of power (§7.3), small per point.
@@ -20,7 +21,7 @@
 | Rule | Value |
 |---|---|
 | Verticals | Farm Level, Craft Level, per Uma, Lv1–50 each, one shared curve |
-| EXP to the next level | `20 + 6 × level` (Lv46: 7,110 EXP in all; Lv50: 8,330) |
+| EXP to the next level | `1,425 + 15 × level`: 12 base hours of work at Lv1, 18 at Lv49 (Lv46: 79,650 EXP in all; Lv50: 88,200, 735 base hours) (D96) |
 | Grade gate | Grade k opens at Lv `5k − 4` (1, 6, 11 … 46) |
 | EXP | **2 per base minute** of the job, whatever it makes (parity) |
 | Gather or refine one item | `30 + 30 × grade` base minutes (1 hour at grade 1, 5½ at grade 10) |

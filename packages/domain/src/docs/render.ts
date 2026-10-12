@@ -3,7 +3,7 @@
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import { BATTLE_LAURELS, CLASS_MAX_RANK, CLASS_RANK_HOURS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
   itemMinutes, LATE_LAURELS, makeMinutes, MASTERY_MAX_RANK, MASTERY_RANK_HOURS, MAX_JOB_COUNT, POINT_EVASION, POINT_LIMIT, POINT_SHARE,
-  professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
+  PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
 import { DISHES } from '../economy/dishes'
 import { ACCESSORY_TYPES, EQUIP_LABEL, gearById, gearId, gearPoints, recipeFamilies, type EquipType } from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
@@ -222,7 +222,7 @@ function levels(): string {
   const rows: Cell[][] = []
   for (let lv = 1; lv < RPG_TIER_MAX_LEVEL; lv += 7) rows.push([lv, rpgExpToNext(lv), professionExpToNext(lv)])
   return table(['Level', 'Uma EXP to next', 'Profession EXP to next'], rows) +
-    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × the EXP to next level at the foes' level, ±${pct(RPG_LEVEL_EXP_STEP)} per level of gap (from ${pct(RPG_LEVEL_EXP_MIN)} to ${pct(RPG_LEVEL_EXP_MAX)}). Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Profession EXP to next: 20 + 6 × level; jobs pay ${EXP_PER_MINUTE} EXP per minute of work.`
+    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × the EXP to next level at the foes' level, ±${pct(RPG_LEVEL_EXP_STEP)} per level of gap (from ${pct(RPG_LEVEL_EXP_MIN)} to ${pct(RPG_LEVEL_EXP_MAX)}). Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Profession EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
 }
 function prices(): string {
   return table(['Thing', 'Price (Laurels)'], [

@@ -180,17 +180,36 @@ describe('save v4', () => {
   })
 })
 
-describe('pacing model (D54)', () => {
-  const minutesTo = (level: number, aptitudeShare: number) => {
-    let exp = 0
-    for (let l = 1; l < level; l++) exp += professionExpToNext(l)
-    return (exp / 2) * aptitudeShare // 2 EXP per base minute
-  }
-  it('takes about 59 hours of work to reach grade 10 at G, half that at A', () => {
-    expect(Math.round(minutesTo(46, 1) / 60)).toBe(59)
-    expect(Math.round(minutesTo(46, 0.5) / 60)).toBe(30)
-    expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 1) / 60)).toBe(69)
+describe('profession pacing (D96)', () => {
+  const DAY = 24 * 60
+  // EXP from Lv1 to a level, and the real minutes of steady work it takes at an aptitude share (2 EXP per base minute).
+  const expTo = (level: number) => { let exp = 0; for (let l = 1; l < level; l++) exp += professionExpToNext(l); return exp }
+  const minutesTo = (level: number, aptitudeShare: number, speed = 1) => (expTo(level) / 2) * aptitudeShare / speed
+  it('gains about 4 levels a day at A aptitude, 3 at C and 2 at G early on, never more than 5', () => {
+    expect(DAY / ((professionExpToNext(1) / 2) * 0.5)).toBe(4)
+    expect(DAY / ((professionExpToNext(1) / 2) * (2 / 3))).toBe(3)
+    expect(DAY / (professionExpToNext(1) / 2)).toBe(2)
+    // A level-3 facility works a quarter faster: 5 a day at A.
+    expect(DAY / ((professionExpToNext(1) / 2) * 0.5 / 1.25)).toBe(5)
+  })
+  it('reaches Lv50 in about two weeks of steady work at A and a month at G; grade 10 a day or two sooner', () => {
+    expect(expTo(PROFESSION_MAX_LEVEL)).toBe(88_200)
+    expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 0.5) / DAY)).toBe(15)
+    expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 0.5, 1.25) / DAY)).toBe(12)
+    expect(Math.round(minutesTo(PROFESSION_MAX_LEVEL, 1) / DAY)).toBe(31)
+    expect(Math.round(minutesTo(46, 0.5) / DAY)).toBe(14)
     expect(HOUR).toBe(60 * MINUTE)
+  })
+  it('moves a v15 save\'s levels to what the same work earns on the new curve', () => {
+    const old = JSON.parse(JSON.stringify(withUmas('101', '102')))
+    old.schemaVersion = 15
+    // Lv27 with 50 EXP on the old 20 + 6L curve is 2,676 EXP of work; Lv50 with 100 banked is 8,430.
+    old.tierWorlds['1'].umas['101'].professions = { farming: { level: 27, exp: 50 }, gathering: { level: 1, exp: 0 } }
+    old.tierWorlds['1'].umas['102'].professions = { farming: { level: 50, exp: 100 }, gathering: { level: 6, exp: 10 } }
+    const moved = worldOf(parseSave(old)).umas
+    expect(moved['101']!.professions).toEqual({ farming: { level: 2, exp: 2676 - 1440 }, gathering: { level: 1, exp: 0 } })
+    expect(moved['102']!.professions).toEqual({ farming: grantProfessionExp({ level: 1, exp: 0 }, 8430), gathering: { level: 1, exp: 200 } })
+    expect(moved['102']!.professions.farming.level).toBe(6)
   })
 })
 

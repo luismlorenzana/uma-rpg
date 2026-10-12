@@ -16,8 +16,10 @@ export const PROFESSION_LABEL: Readonly<Record<Profession, string>> = { farming:
 export const PROFESSION_SHORT: Readonly<Record<Profession, string>> = { farming: 'Farm', gathering: 'Craft' }
 export const PROFESSION_MAX_LEVEL = 50
 
-/** EXP from level L to L+1. Lv46 (grade 10) takes 7,110 EXP; Lv50 takes 8,330. */
-export const professionExpToNext = (level: number): number => 20 + 6 * level
+/** EXP from level L to L+1 (D96): 12 base hours of work at Lv1, an eighth of an hour more each level, 18 at Lv49.
+ * Lv46 (grade 10) takes 79,650 EXP in all; Lv50 takes 88,200, 735 base hours. Working without a break, an Uma with A
+ * aptitude gains about 4 levels a day early on and reaches Lv50 in about 15 days; at G, 2 a day and about a month. */
+export const professionExpToNext = (level: number): number => 1425 + 15 * level
 
 /** Profession EXP per base minute of work: every job pays for its time, whatever it makes (§8.5). */
 export const EXP_PER_MINUTE = 2

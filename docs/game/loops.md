@@ -36,15 +36,15 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 <!-- live:levels -->
 | Level | Uma EXP to next | Profession EXP to next |
 |---|---|---|
-| 1 | 136 | 26 |
-| 8 | 248 | 68 |
-| 15 | 360 | 110 |
-| 22 | 472 | 152 |
-| 29 | 584 | 194 |
-| 36 | 696 | 236 |
-| 43 | 808 | 278 |
+| 1 | 136 | 1440 |
+| 8 | 248 | 1545 |
+| 15 | 360 | 1650 |
+| 22 | 472 | 1755 |
+| 29 | 584 | 1860 |
+| 36 | 696 | 1965 |
+| 43 | 808 | 2070 |
 
-Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × the EXP to next level at the foes' level, ±10% per level of gap (from 10% to 200%). Shards at Lv 10, 20, 30, 40, 50. Profession EXP to next: 20 + 6 × level; jobs pay 2 EXP per minute of work.
+Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × the EXP to next level at the foes' level, ±10% per level of gap (from 10% to 200%). Shards at Lv 10, 20, 30, 40, 50. Profession EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
 <!-- /live -->
 
 - Level cap 50. At Lv 50 EXP keeps banking; nothing spends it yet (it's planned for promotion).
@@ -113,6 +113,9 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 | **Craft Level** | `gathering` | The eight Wilds sites, the Workbench, the Forge | Dirt |
 
 - **Grades:** grade k opens at profession Lv 5k − 4 (1, 6, 11 … 46).
+- **Pace (D96):** a level takes 12 base hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Working
+  without a break, that's about 4 levels a day at A aptitude, 3 at C and 2 at G early on, and Lv50 in about 15 days at A
+  (12 with a level-3 facility) or a month at G. Batch size doesn't change it: EXP is paid per minute of work.
 - **A job:**
   - An Uma makes 1–10 outputs, one after another, and takes up a slot until it's done or recalled.
   - Inputs are reserved at the start.

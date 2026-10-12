@@ -38,7 +38,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v14, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs and training), `kitchen.ts`, `forge.ts`, `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
+| `save/` | The save (`save.ts`: schema v16, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs and training), `kitchen.ts`, `forge.ts`, `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
 | `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `battle/` (engine v7, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
 | `economy/` | `pacing.ts` (times, prices, Laurels), `tokens.ts`, `jobs.ts` (facilities), `training.ts` (ranks), `dishes.ts`, `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
@@ -98,7 +98,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v14** (`save/save.ts`).
+- **Schema v16** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -106,6 +106,8 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - **v12:** Time Tickets.
   - **v13:** class ranks capped at 5.
   - **v14:** the class rework (weapons renamed and refunded, open fight closed).
+  - **v15:** Crafting Tokens become Mastery Tokens (D94).
+  - **v16:** Farm and Craft Levels move to the longer curve, keeping the EXP earned (D96).
 
 ```
 Save { schemaVersion, account { trainerName, createdAt, updatedAt }, tierWorlds: { "1": TierWorld } }
