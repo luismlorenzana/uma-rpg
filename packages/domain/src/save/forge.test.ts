@@ -5,7 +5,8 @@ import { equippedOrb, equippedPoints, gearById, gearPoints, recipeFamilies, EQUI
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { rpgFoe } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
-import { startFight, umaPoints, umaProfile } from './battle'
+import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile } from './battle'
+import { rpgProfileTrees } from '../rpg/rules'
 import { equipBlock, equipGear, unequipGear } from './forge'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
@@ -91,6 +92,36 @@ describe('the Forge and equipping (S7)', () => {
     expect(ally.orb).toBe('fire')
     expect(ally.stats.atk).toBeGreaterThan(bare.atk)
     expect(ally.evasion).toBe(9)
+  })
+})
+
+describe('weapon slots (D98)', () => {
+  it('fills a class\'s five slots with Training weapons until she holds crafted ones; the slots pick her trees', () => {
+    let save = edit(umas('101'), (w) => ({ ...w, gear: { 'lance-g1-atk': 1 } }))
+    const uma = () => worldOf(save).umas['101']!
+    // A new Spell Blade holds the default spread, every one a Training weapon: no stats.
+    expect(classOf(uma(), 'spellblade').weapons).toEqual(['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'])
+    expect(Object.values(umaPointParts(uma(), 'spellblade').gear).every((n) => n === 0)).toBe(true)
+    // An Axe in slot 1 opens the Axe tree in place of the Greatsword's.
+    save = holdWeapon(save, '101', 'spellblade', 0, 'axe', null, at(1))
+    expect(rpgProfileTrees({ classId: 'spellblade', weapons: classOf(uma(), 'spellblade').weapons })).toContain('spellblade-axe')
+    expect(rpgProfileTrees({ classId: 'spellblade', weapons: classOf(uma(), 'spellblade').weapons })).not.toContain('spellblade-greatsword')
+    // A crafted Lance takes the Training one's place and binds to her; choosing Training again takes it off.
+    save = holdWeapon(save, '101', 'spellblade', 1, 'lance', 'lance-g1-atk', at(2))
+    expect(uma().gear.equipped.lance).toBe('lance-g1-atk')
+    expect(umaPointParts(uma(), 'spellblade').gear.atk).toBeGreaterThan(0)
+    save = holdWeapon(save, '101', 'spellblade', 1, 'lance', null, at(3))
+    expect(uma().gear.equipped.lance).toBeUndefined()
+    expect(uma().gear.locker).toContain('lance-g1-atk')
+    // A Tome already in the other Tome slot swaps places; a Tome can't go in an Arms slot; a Brawler's slots are fixed.
+    save = holdWeapon(save, '101', 'spellblade', 3, 'tome-lightning', null, at(4))
+    expect(classOf(uma(), 'spellblade').weapons.slice(3)).toEqual(['tome-lightning', 'tome-fire'])
+    expect(() => holdWeapon(save, '101', 'spellblade', 0, 'tome-ice', null, at(5))).toThrow(/doesn’t fit/)
+    expect(() => holdWeapon(save, '101', 'brawler', 0, 'bow', null, at(5))).toThrow(/fixed/)
+    expect(() => holdWeapon(save, '101', 'spellblade', 2, 'katana', 'lance-g1-atk', at(5))).toThrow(/isn’t this weapon/)
+    // A Brawler can still trade a slot's Training weapon for a crafted one of its kind.
+    save = holdWeapon(save, '101', 'brawler', classOf(uma(), 'brawler').weapons.indexOf('lance'), 'lance', 'lance-g1-atk', at(6))
+    expect(uma().gear.equipped.lance).toBe('lance-g1-atk')
   })
 })
 

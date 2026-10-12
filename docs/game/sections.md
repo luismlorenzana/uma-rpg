@@ -156,9 +156,13 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 - **An Uma's profile:**
   - **Header:** Uma Level and EXP, a class chip, Farm and Craft Levels, and a Working or Party card.
   - **Tabs:** Skills, Battle, Gear (equipment, Extra Stats link, gear levels), Work and Racing.
+  - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
+    (D99).
   - A locked outfit shows **Unlock · 1 Ticket**.
 - **Skills page:**
-  - Pick the **active class** and her **weapons** (Spell Blade, Cleric and Summoner choose theirs in a slot picker).
+  - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
+    (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon the slot takes; Spell Blade,
+    Cleric and Summoner can change the weapon, Brawler and Mage only the piece (D98).
   - Browse her 5 or 10 **trees**, learn and forget side skills, and **equip** skills, or leave it on auto.
 
 ### Party Hall

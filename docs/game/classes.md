@@ -53,6 +53,13 @@ an Axe skill always reaches every foe, whoever swings it. A Cleric's skills with
 | Dark Tome | `tome-dark` | Dark | Magical | Twice: the foe and one other | Clarity | Mage, Spell Blade, Cleric, Summoner |
 <!-- /live -->
 
+**Weapon slots (D98).** A class has five weapon slots, and the weapon in each slot opens its skill tree. Every Uma holds
+a **Training weapon** of all ten kinds: grade 0, no stats, always hers. A slot holds the Training weapon until she wears
+a crafted one of that kind, which opens the same tree and adds its stats. A crafted piece serves every class that holds
+its weapon. Spell Blade, Cleric and Summoner choose each slot's weapon within the slot's kind (Arms, Tome or any); a
+Brawler's and a Mage's slots are fixed to their five. A new Uma's slots hold her class's default spread, in Training
+weapons, so she starts with the depth-1 cores of those trees.
+
 **Orbs** are accessories, one per kind (`orb-<kind>`, ten in all). An Orb adds its kind to every hit for weaknesses only,
 with no damage of its own ([materials](materials.md#gear)).
 
@@ -80,7 +87,9 @@ with no damage of its own ([materials](materials.md#gear)).
 3 equipped skills at Lv 1, one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at most). 1 side point per level.
 <!-- /live -->
 
-A Brawler or Mage has 5 trees. The others have all 10, and the 5 weapons she picks decide which are usable. Every skill
+A Brawler or Mage has 5 trees. The others have all 10, and the 5 weapons in her slots decide which are usable. Until
+you pick her skills, the auto loadout takes each slot's deepest open core in turn (a hybrid's Arms and Tomes
+alternating, her larger half first). Every skill
 is listed in [skill trees](skill-trees.md).
 
 ## Limit Breaks

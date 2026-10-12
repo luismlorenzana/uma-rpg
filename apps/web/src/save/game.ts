@@ -2,8 +2,8 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   parseTrack, sweepMany, sellStock, buyTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, cutJobTime, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
-  eatDish, setActiveNodes, equipGear, unequipGear, type GearSlot,
-  actInFight, chooseClass, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat, setClassWeapons,
+  eatDish, setActiveNodes, equipGear, unequipGear, holdWeapon, type GearSlot,
+  actInFight, chooseClass, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
@@ -110,7 +110,6 @@ const edit = async (change: (save: Save, now: string) => Save): Promise<void> =>
 
 /** Switches her active class for free (D86). */
 export const pickClass = (outfitId: string, classId: RpgClass) => edit((s, now) => chooseClass(s, outfitId, classId, now))
-export const pickWeapons = (outfitId: string, classId: RpgClass, weapons: RpgWeapon[]) => edit((s, now) => setClassWeapons(s, outfitId, classId, weapons, now))
 /** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. */
 export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => learnSkill(s, outfit, classId, nodeId, now))
 export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, classId, nodeId, now))
@@ -163,6 +162,9 @@ export async function eat(outfitId: string, dishId: string): Promise<string> {
 export const activate = (outfitId: string, nodes: string[]) => edit((s, now) => setActiveNodes(s, outfitId, nodes, now))
 export const wear = (outfitId: string, gearId: string) => edit((s, now) => equipGear(s, outfitId, gearId, now))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit((s, now) => unequipGear(s, outfitId, slot, now))
+/** Puts a weapon in a class's slot: its Training one (null) or a crafted piece (D98). */
+export const hold = (outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null) =>
+  edit((s, now) => holdWeapon(s, outfitId, classId, slot, weapon, gearId, now))
 
 /** Collects one job; returns what it gave. */
 export async function collect(placeId: string, slot: number): Promise<{ items: number; levelsUp: number }> {

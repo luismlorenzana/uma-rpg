@@ -22,6 +22,8 @@ export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = {
 }
 /** What each slot holds, for the class's weapon pickers. */
 export const SLOT_LABEL = { arms: 'Arm', tome: 'Tome', any: 'Weapon' } as const
+/** The grade-0 weapon every Uma holds of each kind (D98): no stats, it opens the tree. */
+export const trainingName = (w: RpgWeapon): string => `Training ${WEAPON_LABEL[w]}`
 /** Element colors for the inline glyphs. */
 const ELEMENT_COLOR: Readonly<Record<RpgElement, string>> = {
   fire: '#ff8a5c', ice: '#8fd3ff', lightning: '#ffd84d', light: '#fff2b0', dark: '#c79bff',

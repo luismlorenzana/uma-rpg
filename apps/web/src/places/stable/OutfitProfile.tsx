@@ -8,7 +8,7 @@ import {
   activeClass, activeNodeSlots, isInFight, aptitudeTime, applyPoints, best, classOf, CLASS_HALLS, classRankHours, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, rankOf, trackAptitude, type Track, HOUR, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, masteryRankHours, MASTERY_MAX_RANK, CLASS_MAX_RANK, partyOf, placeById,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPoints, umaProfile, workOf,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, workOf,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -217,18 +217,14 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
 function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
   const classId = activeClass(outfit, uma)
   const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
-  const points = umaPoints(uma, classId)
-  const boosted = applyPoints(base, points)
+  const parts = umaPointParts(uma, classId)
+  const boosted = applyPoints(base, umaPoints(uma, classId))
+  // What gear adds alone; Extra Stats are the rest of the total, so the two always add up (D99).
+  const geared = applyPoints(base, parts.gear).stats
   const equipped = umaLoadout(outfit, uma, 1, classId)
   const party = partyOf(world, outfit.outfitId)
-  const rows: { label: string; base: number; now: number }[] = [
-    { label: 'HP', base: base.hp, now: boosted.stats.hp },
-    { label: 'MP', base: base.mp, now: boosted.stats.mp },
-    { label: 'ATK', base: base.atk, now: boosted.stats.atk },
-    { label: 'M.ATK', base: base.matk, now: boosted.stats.matk },
-    { label: 'DEF', base: base.pdef, now: boosted.stats.pdef },
-    { label: 'M.DEF', base: base.mdef, now: boosted.stats.mdef },
-  ]
+  const keys = [['HP', 'hp'], ['MP', 'mp'], ['ATK', 'atk'], ['M.ATK', 'matk'], ['DEF', 'pdef'], ['M.DEF', 'mdef']] as const
+  const rows = keys.map(([label, k]) => ({ label, now: boosted.stats[k], gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] }))
   return (
     <div className="space-y-3">
       <button type="button" onClick={onClass} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
@@ -239,17 +235,27 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
         <span className="text-[12px] text-ink-soft">{equipped.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
       </button>
       <section className="rounded-md bg-raised">
-        <div className="-mb-2 flex items-center justify-between pl-3 text-[11px] text-ink-faint">
-          <span>Battle stats</span>
+        <div className="-mb-2 flex items-center gap-2 pl-3 text-[11px] text-ink-faint">
+          <span className="flex-1">Battle stats</span>
+          <span className="text-shard">Gear</span>
+          <span className="text-success">Extra Stats</span>
           <HelpButton title="Battle stats">
             <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
-            <p>Green numbers are what gear and Extra Stats add: 1.5% a point. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+            <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green), 1.5% a point. Training weapons add nothing. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
           </HelpButton>
         </div>
         <div className="divide-y divide-hairline">
           {rows.map((r) => (
-            <Row key={r.label} label={r.label} value={<span className="font-display tabular-nums">{r.now}</span>}
-              note={r.now !== r.base ? <span className="text-success">+{r.now - r.base}</span> : undefined} />
+            <Row key={r.label} label={r.label} value={
+              <span className="tabular-nums">
+                <span className="font-display">{r.now}</span>
+                {(r.gear > 0 || r.extra > 0) && (
+                  <span className="font-normal text-ink-faint">
+                    {' ('}{r.gear > 0 && <span className="text-shard">+{r.gear}</span>}{r.gear > 0 && r.extra > 0 && ' '}{r.extra > 0 && <span className="text-success">+{r.extra}</span>})
+                  </span>
+                )}
+              </span>
+            } />
           ))}
           <Row label="Evasion" value={`${(boosted.evasion / 10).toFixed(1)}%`} note="from Speed" />
           <Row label="Limit Break head start" value={`${boosted.limitStart} / 12`} />

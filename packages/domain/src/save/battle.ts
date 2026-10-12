@@ -14,14 +14,16 @@ import {
   type RpgPartyMember, type RpgRun,
 } from '../rpg/campaign/run'
 import { rpgNode } from '../rpg/catalog'
+import { isRpgTome } from '../rpg/kinds'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
-  rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
+  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
+  rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import { depthsOpen } from '../economy/training'
 import { starPoints } from '../economy/dishes'
 import { addPoints, type Points } from '../economy/bonus'
-import { equippedOrb, equippedPoints } from '../economy/gear'
+import { equippedOrb, equippedPoints, gearById } from '../economy/gear'
+import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
@@ -97,6 +99,35 @@ export function setClassWeapons(save: Save, outfitId: string, classId: RpgClass,
   return withClass(save, outfitId, classId, { ...classOf(uma, classId), weapons: [...weapons] }, now, tier)
 }
 
+/**
+ * Puts a weapon in one of a class's five slots (D98); the weapons in her slots are the trees she fights with. Every Uma
+ * holds a Training weapon of all ten kinds (grade 0, no stats), so a null `gearId` means the Training one, and a crafted
+ * piece of that kind is worn instead (from her locker, or from the stock, binding it). A Summoner, Spell Blade or Cleric
+ * can change a slot's weapon within the slot's kind (one already in another slot swaps places); a Brawler's and a
+ * Mage's slots keep theirs. A crafted piece serves every class that holds its weapon.
+ */
+export function holdWeapon(save: Save, outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null, now: string,
+  tier = TIER_ONE): Save {
+  const uma = ownedOf(worldOf(save, tier), outfitId)
+  const weapons = [...classOf(uma, classId).weapons]
+  const kind = RPG_CLASS_SLOTS[classId][slot]
+  if (!kind || weapons[slot] === undefined) throw new SaveRuleError('bad-loadout', 'no such weapon slot')
+  let next = save
+  if (weapons[slot] !== weapon) {
+    if (!rpgPicksWeapons(classId)) throw new SaveRuleError('bad-loadout', 'this class’s weapons are fixed')
+    if (kind !== 'any' && (kind === 'tome') !== isRpgTome(weapon)) throw new SaveRuleError('bad-loadout', 'that weapon doesn’t fit this slot')
+    const other = weapons.indexOf(weapon)
+    if (other >= 0) weapons[other] = weapons[slot]!
+    weapons[slot] = weapon
+    next = setClassWeapons(next, outfitId, classId, weapons, now, tier)
+  }
+  if (gearId !== null) {
+    if (gearById(gearId)?.type !== weapon) throw new SaveRuleError('bad-loadout', 'that piece isn’t this weapon')
+    if (uma.gear.equipped[weapon] !== gearId) next = equipGear(next, outfitId, gearId, now, tier)
+  } else if (uma.gear.equipped[weapon]) next = unequipGear(next, outfitId, weapon, now, tier)
+  return next
+}
+
 /** Learns a side skill. With skills she picked herself, a new one goes straight into a free slot. */
 export function learnSkill(save: Save, outfit: BattleOutfit, classId: RpgClass, nodeId: string, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
@@ -137,7 +168,12 @@ export function equipSkills(save: Save, outfit: BattleOutfit, classId: RpgClass,
 
 /** Every stat point she brings to a fight as a class: her active Extra Stats nodes (S6) and what she wears (S7). */
 export function umaPoints(uma: OwnedUma, classId: RpgClass): Points {
-  return addPoints(starPoints(uma.stars.active), equippedPoints(uma.gear.equipped, classOf(uma, classId).weapons))
+  const { gear, extra } = umaPointParts(uma, classId)
+  return addPoints(extra, gear)
+}
+/** Her points apart: what she wears as a class, and her active Extra Stats nodes. */
+export function umaPointParts(uma: OwnedUma, classId: RpgClass): { gear: Points; extra: Points } {
+  return { gear: equippedPoints(uma.gear.equipped, classOf(uma, classId).weapons), extra: starPoints(uma.stars.active) }
 }
 
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------

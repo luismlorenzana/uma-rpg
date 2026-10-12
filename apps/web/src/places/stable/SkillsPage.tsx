@@ -1,18 +1,19 @@
-// An Uma's class, weapons and skills (D86, docs/design/class-rework.md), the first tab of her profile: pick the class
-// she fights as, its five weapons (a Brawler's and a Mage's are fixed; Summoner, Spell Blade and Cleric choose), then
-// her skills. Each weapon has a tree; a depth's core skill comes free once her class rank and level open it, and side
-// skills cost points. Skills are chosen for her until she picks her own.
+// An Uma's class, weapons and skills (D86, D98, docs/design/class-rework.md), the first tab of her profile: pick the class
+// she fights as, the weapons in its five slots (a Brawler's and a Mage's kinds are fixed; Summoner, Spell Blade and
+// Cleric choose), then her skills. Each weapon in a slot opens its tree; she holds a Training weapon of every kind until
+// she wears a crafted one. A depth's core skill comes free once her class rank and level open it, and side skills cost
+// points. Skills are chosen for her until she picks her own.
 import {
-  activeClass, CLASS_HALLS, classOf, isRpgTome, placeById, RPG_CLASS_SLOTS, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons,
-  rpgDepthBlock, rpgLearnBlock, rpgNode, rpgPicksWeapons, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
-  SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode, type RpgWeapon,
+  activeClass, CLASS_HALLS, classOf, gearById, placeById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons,
+  rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
+  SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { CLASS_BLURB, CLASS_LABEL, KindMark, SLOT_LABEL, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
-import { equip, learn, pickClass, pickWeapons, unlearn, useWorld } from '../../save/game'
-import { BottomSheet } from '../../ui/BottomSheet'
+import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { equip, learn, pickClass, unlearn, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
+import { WeaponSheet } from './WeaponSheet'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
   const navigate = useNavigate()
@@ -49,14 +50,6 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
     if (equipped.length >= slots) return setError(`All ${slots} skill slots are full: unequip one first`)
     run(() => equip(outfit, classId, [...equipped, id]))
   }
-  const swapWeapon = (slot: number, w: RpgWeapon) => {
-    const next = [...weapons]
-    const other = next.indexOf(w)
-    if (other >= 0) next[other] = next[slot]!
-    next[slot] = w
-    setSlotPick(null)
-    run(() => pickWeapons(outfit.outfitId, classId, next))
-  }
 
   return (
     <div className="space-y-4">
@@ -66,6 +59,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           <HelpButton title="Classes and skills">
             <p>{CLASS_BLURB[classId]}</p>
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
+            <p>Each weapon in her five slots opens its skill tree. She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>
             <p>Core skills come free: depth d opens at class rank d and Lv 1, 10, 20, 30 or 40. She earns a point a level for side skills, which open at Lv 5, 15, 25, 35 and 45. Take one side of each fork; swap whenever you like.</p>
             <p>Until you equip skills yourself, each weapon's deepest skill is equipped for her.</p>
           </HelpButton>
@@ -83,14 +77,17 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
         <div>
           <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-5 gap-1" aria-label="Weapon slots">
-            {weapons.map((w, i) => (
-              <button key={`${i}-${w}`} type="button" disabled={!rpgPicksWeapons(classId)} onClick={() => setSlotPick(i)}
-                className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-raised px-0.5 text-center disabled:cursor-default">
-                <WeaponGlyph weapon={w} size={18} />
-                <span className="w-full truncate text-[10.5px] font-semibold leading-tight">{WEAPON_LABEL[w].replace(' Tome', '')}</span>
-                <span className="text-[9.5px] leading-none text-ink-faint">{SLOT_LABEL[RPG_CLASS_SLOTS[classId][i]!]}</span>
-              </button>
-            ))}
+            {weapons.map((w, i) => {
+              const piece = uma.gear.equipped[w] ? gearById(uma.gear.equipped[w]!) : undefined
+              return (
+                <button key={`${i}-${w}`} type="button" onClick={() => setSlotPick(i)} aria-label={`Weapon ${i + 1}: ${piece ? piece.name : `Training ${WEAPON_LABEL[w]}`}`}
+                  className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-raised px-0.5 text-center">
+                  <WeaponGlyph weapon={w} size={18} />
+                  <span className="w-full truncate text-[10.5px] font-semibold leading-tight">{WEAPON_LABEL[w].replace(' Tome', '')}</span>
+                  <span className={`text-[9.5px] leading-none ${piece ? 'font-semibold text-accent' : 'text-ink-faint'}`}>{piece ? `G${piece.grade}` : 'Training'}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
         <button type="button" disabled={!hall} onClick={() => hall && navigate(`/learning/${hall}`, { state: { fromHub: true } })}
@@ -180,21 +177,8 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
       </section>
       {error && <p className="sticky bottom-2 rounded-sm bg-danger/90 p-2 text-center text-[13px]">{error}</p>}
 
-      {slotPick !== null && (
-        <BottomSheet title={`${CLASS_LABEL[classId]}: slot ${slotPick + 1} (${SLOT_LABEL[RPG_CLASS_SLOTS[classId][slotPick]!]})`} onClose={() => setSlotPick(null)}>
-          <div className="grid grid-cols-2 gap-1.5">
-            {rpgClassWeapons(classId).filter((w) => {
-              const kind = RPG_CLASS_SLOTS[classId][slotPick]!
-              return kind === 'any' || (kind === 'tome') === isRpgTome(w)
-            }).map((w) => (
-              <button key={w} type="button" onClick={() => swapWeapon(slotPick, w)} aria-pressed={weapons[slotPick] === w}
-                className={`flex min-h-12 items-center gap-2 rounded-sm px-3 text-left text-[13px] font-semibold ${weapons[slotPick] === w ? 'bg-accent/15 text-accent ring-1 ring-accent' : 'bg-raised'}`}>
-                <WeaponGlyph weapon={w} size={18} />
-                <span className="min-w-0 flex-1">{WEAPON_LABEL[w]}{weapons.includes(w) && weapons[slotPick] !== w ? <span className="block text-[11px] font-normal text-ink-faint">swaps with slot {weapons.indexOf(w) + 1}</span> : null}</span>
-              </button>
-            ))}
-          </div>
-        </BottomSheet>
+      {slotPick !== null && world && (
+        <WeaponSheet outfitId={outfit.outfitId} uma={uma} world={world} classId={classId} slot={slotPick} onClose={() => setSlotPick(null)} />
       )}
     </div>
   )

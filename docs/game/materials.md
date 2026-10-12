@@ -417,7 +417,8 @@ No token: the Uma's Craft Level gates the grade (5g − 4), as for every job (D9
 - Every accent adds ⌈grade ÷ 2⌉.
 
 **Wearing:** she can wear grade k when her matching level (Weapon, Armor or Accessory Level) is at least k
-([classes](classes.md#ranks-and-levels)).
+([classes](classes.md#ranks-and-levels)). Every Uma also holds a grade-0 **Training weapon** of each kind, with no stats,
+that fills a weapon slot until she wears a crafted one (D98).
 
 <!-- live:gear -->
 | Type | Id | Slot | Recipe families (one refined item each) | Example recipe: grade 3 | Points at grade 10, HP accent |
