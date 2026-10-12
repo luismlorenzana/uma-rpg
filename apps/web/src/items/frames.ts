@@ -1,30 +1,27 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
 // the indexes never ship in the main chunk; frames.test.ts pins every position against them.
-import { DISHES, gearById, isOrb, ITEM_FAMILIES, itemById, orbKind, rpgWeaponKind, type EquipType, type ItemEffect, type RpgDamageKind, type RpgWeapon } from '@rpg/domain'
+import { DISHES, gearById, ITEM_FAMILIES, itemById, type EquipType, type ItemEffect, type RpgDamageKind } from '@rpg/domain'
 
 export const ATLAS_CELL = 32
 export type Sheet = 'items' | 'dishes' | 'gear'
 export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
   items: { w: 320, h: 1024 },
   dishes: { w: 320, h: 320 },
-  gear: { w: 320, h: 480 },
+  gear: { w: 320, h: 832 },
 }
 
 /** `kind`: a badge for pieces drawn with another type's art (a Tome's element, an Orb's kind). */
 export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect; kind?: RpgDamageKind }
-/** Legacy published atlas row ids (P38), retained for icon lookup until H03's D86 art is published. */
-export const GEAR_ART_ROWS = ['short-sword', 'bow', 'spear', 'axe', 'mage-staff', 'arcane-staff', 'greatsword', 'cleric-staff', 'summoner-tome',
-  'garb', 'leather', 'mail', 'plate', 'ring', 'charm'] as const
-/** The art a type is drawn with until its own exists (D86, D103): Lance the Spear's, Katana the Short Sword's, Tomes the
- * Summoner Tome's and Orbs the Ring's, badged with their kind; the ten armor kinds borrow the old armor rows. */
+/** The gear atlas' rows (uma-art 2.0.0, H03): D86's ten weapons, the four pre-D103 armor rows, Ring and Charm, and the
+ * ten Orbs. Each weapon and Orb has its own art. */
+export const GEAR_ART_ROWS = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark',
+  'garb', 'leather', 'mail', 'plate', 'ring', 'charm', 'orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana', 'orb-fire', 'orb-ice',
+  'orb-lightning', 'orb-light', 'orb-dark'] as const
+/** D103's eight armor pieces borrow the older armor rows until their own art exists (H27). */
 const ARMOR_ART: Readonly<Record<string, (typeof GEAR_ART_ROWS)[number]>> = {
   helm: 'plate', cuirass: 'mail', greaves: 'leather', gauntlets: 'plate', circlet: 'charm', robe: 'garb', leggings: 'garb', bracers: 'charm',
 }
 export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
-  if (type === 'lance') return { row: 'spear' }
-  if (type === 'katana') return { row: 'short-sword' }
-  if (type.startsWith('tome-')) return { row: 'summoner-tome', kind: rpgWeaponKind(type as RpgWeapon) }
-  if (isOrb(type)) return { row: 'ring', kind: orbKind(type) }
   return { row: ARMOR_ART[type] ?? (type as (typeof GEAR_ART_ROWS)[number]) }
 }
 

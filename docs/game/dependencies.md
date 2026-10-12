@@ -25,7 +25,7 @@ are listed by hand below.
 
 **@rpg/web** (`apps/web/package.json`)
 
-- Runtime: `@luismlorenzana/uma-art` 1.1.0, `@luismlorenzana/uma-data` 1.0.0, `@rpg/domain` workspace:*, `dexie` ^4.4.6, `firebase` ^12.19.0, `phaser` 4.2.1, `react` ^19.3.0, `react-dom` ^19.3.0, `react-router` ^7.18.3, `workbox-window` ^7.4.0, `zustand` ^5.0.15
+- Runtime: `@luismlorenzana/uma-art` 2.0.0, `@luismlorenzana/uma-data` 1.0.0, `@rpg/domain` workspace:*, `dexie` ^4.4.6, `firebase` ^12.19.0, `phaser` 4.2.1, `react` ^19.3.0, `react-dom` ^19.3.0, `react-router` ^7.18.3, `workbox-window` ^7.4.0, `zustand` ^5.0.15
 - Dev: `@fontsource-variable/inter` ^5.3.0, `@fontsource-variable/outfit` ^5.3.0, `@tailwindcss/vite` ^4.3.3, `@testing-library/react` ^16.3.3, `@types/node` ^22.20.2, `@types/react` ^19.3.0, `@types/react-dom` ^19.3.0, `@vitejs/plugin-react` ^5.2.0, `fake-indexeddb` ^6.2.5, `jsdom` ^26.1.0, `tailwindcss` ^4.3.3, `typescript` ~5.9.3, `vite` ^7.3.6, `vite-plugin-pwa` ^1.3.0, `vitest` ^3.2.7
 
 **@rpg/api** (`apps/api/package.json`)
@@ -60,4 +60,4 @@ All values are in `docs/technical/infrastructure.md`. The budget alert is $5 a m
 | Package | Version | What uma-rpg takes from it |
 |---|---|---|
 | `@luismlorenzana/uma-data` | 1.0.0 | Master data types and the release client (web), test fixtures (domain) |
-| `@luismlorenzana/uma-art` | 1.1.0 | Item, dish, gear, building and tile atlases |
+| `@luismlorenzana/uma-art` | 2.0.0 | Item, dish, gear (D86 rows), building, tile, world, battle-effect and UI atlases |

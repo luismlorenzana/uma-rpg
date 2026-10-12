@@ -12,12 +12,10 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 
 | # | Task | Who | Repo | Size | Needs |
 |---|---|---|---|---|---|
-| **P1** | | | | | |
-| [H03](tasks/H03-gear-icons-d86.md) | Gear icons for D86: art published in uma-art 2.0.0; wire the rows into the game | Claude | uma-rpg | S | — |
 | **P2** | | | | | |
 | [H07](tasks/H07-world-map-screens.md) | World, continent and region screens in pixel art | ChatGPT | uma-rpg | L | — (uma-art 2.0.0) |
 | [H27](tasks/H27-armor-icons-d103.md) | Armor icons for D103: eight pieces in ten grades | ChatGPT, then Claude wires | uma-platform | M | — |
-| [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | H06 |
+| [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | — |
 | [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars: the game half (art published) | ChatGPT | uma-rpg | M | — |
 | [H11](tasks/H11-ui-icons.md) | Class emblems and status icons: the game half (art published) | ChatGPT | uma-rpg | S | — |
 | **P3** | | | | | |
@@ -41,7 +39,7 @@ speed (D89), H09, W3's eight foes, dual elements and waves (D91), H04, the
 [current phone check](../testing/phone-check.md), H05, the class-rework dead-code sweep, H12, the
 [design-doc refresh](../design/game-design.md) (through D100), and H16, the lazy-domain split and build-time JS budget
 guard (195.96 → 133.15 KB gzip entry, measured on merge).
-H06, the world atlas (310 frames, the continent and world compositions; uma-art 2.0.0 with H03's gear rows and the
+H03, D86's gear icons, wired into the game on uma-art 2.0.0, and H06, the world atlas (310 frames, the continent and world compositions; uma-art 2.0.0 with H03's gear rows and the
 art halves of H10 and H11). H15 restores all five capitals' authored Finals, with three independent vanguard → champion routes each. H14 adds the live
 pacing ledger in [Simulated](../design/pacing.md#simulated), including the current four bars and Marks.
 

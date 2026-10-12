@@ -22,7 +22,6 @@ push in one play-through. It marks the checks that need the installed app or pro
 
 | Packet | What |
 |---|---|
-| [H03](handoff/tasks/H03-gear-icons-d86.md) | Wire uma-art 2.0.0's D86 gear rows into the game (the art is published) |
 | [H07](handoff/tasks/H07-world-map-screens.md) | The world map in pixel art (W5, [map-art.md](design/world/map-art.md)); H06's atlas is published |
 | [H08](handoff/tasks/H08-battle-backdrops.md) | Battle backdrops by biome |
 | [H10](handoff/tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars |

@@ -184,7 +184,7 @@ The shared foundation, in the sibling repo (`../uma-platform`, `luismlorenzana/u
 | Package | Version used | What |
 |---|---|---|
 | `@luismlorenzana/uma-data` | 1.0.0 | Master data types, parsers, the release client; `/testing` fixtures |
-| `@luismlorenzana/uma-art` | 1.1.0 | Original pixel-art atlases, drawn from code by `scripts/pixel-art` (`pnpm art:draw`) |
+| `@luismlorenzana/uma-art` | 2.0.0 | Original pixel-art atlases, drawn from code by `scripts/pixel-art` (`pnpm art:draw`) |
 
 Master data releases are content-addressed (`files/`, `manifests/v1/`, `channels/v1/latest.json`) and published by
 the owner's pipeline. Shared changes (schema, art) happen in a uma-platform session.
