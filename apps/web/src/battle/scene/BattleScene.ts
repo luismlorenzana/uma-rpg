@@ -2,9 +2,11 @@
 // engine's cues: lunges, hit flashes, element particles, weapon slashes, the shield break and a Limit Break cut-in.
 // Playback never decides anything; the engine already did. The DOM overlay carries every lasting number and control,
 // and the canvas only draws effect text (damage numbers, BREAK).
-import { isRpgWeaponKind, type BattleCue, type BattleState, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
+import worldIndex from '@luismlorenzana/uma-art/world/atlas.json'
+import { isRpgWeaponKind, type BattleCue, type BattleState, type Biome, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
 import Phaser from 'phaser'
 import { stageLayout, type Box } from '../stage-layout'
+import { backgroundLayout } from './background-layout'
 
 export interface StageAlly { id: string; idle: HTMLImageElement | null; cheer: HTMLImageElement | null; bust: HTMLImageElement | null }
 export interface StageEnemy { id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string }
@@ -15,6 +17,7 @@ export interface StageSetup {
   field: string[]
   /** The region's colour, `#RRGGBB`. */
   color: string
+  biome?: Biome
   reducedMotion: boolean
   /** Busts of the Heroes the party's Learners inherit from, for their Limit Break cut-ins (D106). */
   heroes?: { id: string; bust: HTMLImageElement | null }[]
@@ -34,13 +37,14 @@ export class BattleScene extends Phaser.Scene {
   private layer!: Phaser.GameObjects.Container
   private fx!: Phaser.GameObjects.Container
   private background!: Phaser.GameObjects.Graphics
+  private terrain: Phaser.GameObjects.RenderTexture | null = null
   private waiting = new Set<() => void>()
   private skipping = false
   private cssSize = { w: 1, h: 1 }
   /** The foes on the stage now: the setup's field until a wave changes it (W3). */
   private field: string[] = []
 
-  constructor() {
+  constructor(private worldImage: HTMLImageElement | null = null) {
     super('battle')
   }
 
@@ -51,7 +55,14 @@ export class BattleScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.background = this.add.graphics()
+    if (this.worldImage) {
+      const texture = this.textures.addImage('battle-world', this.worldImage)
+      if (texture) {
+        for (const [id, f] of Object.entries(worldIndex.frames)) texture.add(id, 0, f.x, f.y, f.w, f.h)
+        texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+      }
+    }
+    this.background = this.add.graphics().setDepth(-2)
     this.layer = this.add.container(0, 0)
     this.fx = this.add.container(0, 0)
     const g = this.make.graphics({}, false)
@@ -124,6 +135,20 @@ export class BattleScene extends Phaser.Scene {
     this.background.fillRect(0, h * 0.5 * d, w * d, 2 * d)
     this.background.fillStyle(0x000000, 0.18)
     this.background.fillRect(0, h * 0.62 * d, w * d, h * 0.38 * d)
+    this.terrain?.destroy()
+    this.terrain = null
+    const biome = this.setup.biome, texture = this.textures.exists('battle-world') ? this.textures.get('battle-world') : null
+    // Missing atlas or frame keeps the complete old gradient, not an incomplete floor.
+    if (!biome || !texture?.has('backdrop/' + biome) || !texture.has('ground/' + biome + '-0')) return
+    const plan = backgroundLayout(w, h, d, biome)
+    const rt = this.add.renderTexture(0, 0, plan.width, plan.height).setOrigin(0, 0).setScale(plan.scale * d).setDepth(-1)
+    rt.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+    for (const c of plan.cells) rt.stamp('battle-world', c.frame, c.x, c.y, { originX: 0, originY: 0 })
+    // Keep the textured floor quiet behind the numbers, and retain the party's darker lower band.
+    rt.fill(0x000000, 0.6, 0, plan.floor, plan.width, plan.height - plan.floor)
+    rt.fill(0x000000, 0.18, 0, plan.partyBand, plan.width, plan.height - plan.partyBand)
+    rt.render()
+    this.terrain = rt
   }
 
   private addActor(id: string, side: 'ally' | 'enemy', key: string, box: Box, index: number): void {

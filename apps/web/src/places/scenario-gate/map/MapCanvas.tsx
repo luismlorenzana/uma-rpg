@@ -1,4 +1,5 @@
 import atlasUrl from '@luismlorenzana/uma-art/world/atlas.png?url'
+import atlasIndex from '@luismlorenzana/uma-art/world/atlas.json'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { artScale, hubDpr } from '../../../hub/grid'
 import { frames } from './visuals'
@@ -104,5 +105,5 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
 
 export function BiomeIcon({ biome }: { biome: string }) {
   const f = frames['icon/' + biome]!
-  return <span aria-hidden="true" className="inline-block size-6 shrink-0 bg-no-repeat align-middle" style={{ backgroundImage: `url(${atlasUrl})`, backgroundSize: '384px 768px', backgroundPosition: `-${f.x * 1.5}px -${f.y * 1.5}px`, imageRendering: 'pixelated' }} />
+  return <span aria-hidden="true" className="inline-block size-6 shrink-0 bg-no-repeat align-middle" style={{ backgroundImage: `url(${atlasUrl})`, backgroundSize: `${atlasIndex.width * 1.5}px ${atlasIndex.height * 1.5}px`, backgroundPosition: `-${f.x * 1.5}px -${f.y * 1.5}px`, imageRendering: 'pixelated' }} />
 }
