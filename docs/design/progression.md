@@ -1,7 +1,7 @@
 # Progression: Uma Level, Class Rank, Weapon and Armor Ranks
 
-> **Status: proposal for owner review, 2026-10-12.** Nothing here is built. It replaces training, Promotion and Mastery
-> Tokens, Weapon/Armor/Accessory Levels and the Uma-Level skill gates once approved. Written from the owner's notes of
+> **Status: proposal for owner review, 2026-10-12 (second pass).** Nothing here is built. It replaces training, every
+> token kind (Promotion, Mastery and Cooking), Weapon/Armor/Accessory Levels and the Uma-Level skill gates once approved. Written from the owner's notes of
 > 2026-10-12; where they left a choice open, the choice is marked **(decided)** with its reason.
 
 ## Goals
@@ -11,7 +11,9 @@
   **two classes to max rank**, and **five weapons and five armors to max rank**.
 - **Uma EXP is the one thing never sped up.** Every Uma walks the whole road to Lv 50.
 - **Later campaigns go faster:** progress past a max rank banks as a currency that buys books for any Uma.
-- **Small numbers, linear growth:** stats in the tens, hits in the hundreds, nothing in the thousands except big boss HP.
+- **Small numbers, linear growth:** stats in the tens to low hundreds, hits in the hundreds, nothing in the thousands
+  except big boss HP.
+- **No tokens anywhere** (second pass): what to push ahead is the player's choice, paid in time, materials and Marks.
 
 ## The four bars
 
@@ -94,70 +96,102 @@ armor types:
 
 | Type | Per grade g |
 |---|---|
-| Physical armor | +g DEF, and a **Barrier** of 3g at the start of each fight (absorbs damage before HP) |
-| Magical armor | +g MDEF, and **Regen** of ⌈g/2⌉ HP at the start of each of her turns |
-| Either, accent | The piece's accent stat: +⌈g/3⌉ (up to +4 at grade 10). Orbs keep their kind |
+| Physical armor | +g DEF, and a **Barrier** of 5g at the start of each fight (absorbs damage before HP) |
+| Magical armor | +g MDEF, and **Regen** of g HP at the start of each of her turns |
+| Either, accent | The piece's accent stat: +⌈g/2⌉ (up to +5 at grade 10). An Orb's accent is its kind instead |
 
-Weapons have no accent: a weapon's grade is its **Might**, +3 per grade added to the offense of hits made with that
-weapon (+30 at grade 10). Only the weapon a hit uses counts, so each slot matters for its own skills.
+Weapons have no accent: a weapon's grade is its **Might**, +4 per grade added to the offense of hits made with that
+weapon (+40 at grade 10). Only the weapon a hit uses counts, so each slot matters for its own skills.
+
+## Crafting and recipes
+
+The Forge makes 30 types in ten grades; Craft Level gates the grade made (5g − 4), the matching rank the grade worn.
+
+| Group | Types | Recipe (per piece) | Choice at the Forge |
+|---|---|---|---|
+| Arms | Greatsword, Axe, Lance, Bow, Katana | One refined item of the grade from each Arms family: ores, stones, woods, hides | None: grade only |
+| Tomes | Fire, Blizzard, Thunder, Light, Dark | One from each Tome family: crystals, fibers, essences, bones | None |
+| Physical armor | Helm, Cuirass, Greaves, Gauntlets | Same as Arms | Accent (one of eight stats) |
+| Magical armor | Circlet, Robe, Leggings, Bracers | Same as Tomes | Accent |
+| Arms Orb | One per weapon kind (5) | Same as Arms | None: the kind is the type |
+| Elemental Orb | One per element (5) | Same as Tomes | None |
+
+- Piece ids: `<type>-g<grade>` for weapons and Orbs, `<type>-g<grade>-<accent>` for armor.
+- The Forge picker groups the six rows above; weapons and Orbs skip the accent step.
+- **Dishes lose their Cooking Token:** a dish is its refined items only (planet dishes 1–3 items, Duo dishes 2–3,
+  Feasts 8, as today).
+- **Art** (a ChatGPT packet): icons for the eight new armor types in ten grades and Training armor marks; weapon and
+  Orb icons exist (H03).
 
 ## Stats and damage
 
-**Uma Level, linear and small:**
+**Uma Level keeps today's curve** (second pass): it is already linear and small. An average outfit as a Brawler:
 
 | Stat | Lv 1 | Each level | Lv 50 |
 |---|---|---|---|
-| ATK, MATK, DEF, MDEF | about 10 | +1 | about 60 |
-| HP | about 60 | +8 | about 450 |
-| MP | about 20 | +1 | about 70 |
+| ATK / MATK | 22 / 18 | about +1.8 / +1.5 | 111 / 91 |
+| DEF / MDEF | 22 / 18 | about +1.8 / +1.4 | 111 / 88 |
+| HP | 299 | about +15 | 1,044 today; trimmed to about 950 (6 × Stamina becomes 5 ×) to stay under a thousand |
+| MP | 40 | about +1.8 | 129 |
 
-The outfit's base stats and growth rates move these by about ±20%, and the class lean as today (±15%).
+The outfit's base stats and growth rates move these, and the class lean as today (±15%).
 
-**Extra Stats become flat** (decided, to stay readable): a moon +1 to its stat (+8 HP), a bridge +½ to each side, a Sun
-node +⅛ to all. A full map is about +12 to each stat.
+**What changes is the bonuses' shape:** gear and Extra Stats stop being percentages (1.5% a point) and become small
+flat adds, so every source reads as a number on the stat.
+- **Extra Stats:** a moon +1 to its stat (+5 HP), a bridge +½ to each side, a Sun node +⅛ to all. A full map is about
+  +12 to each stat.
+- **Weapon Might:** +4 per grade on hits made with that weapon (+40 at grade 10).
+- **Armor accent:** +⌈g/2⌉ to its stat (+5 at grade 10).
 
-**Where a Lv 50, fully built Uma's damage comes from** (one skill hit, the owner's question):
+**Where a Lv 50, fully built Uma's damage comes from** (one skill hit):
 
 | Source | Adds to offense | Share |
 |---|---|---|
-| Uma Level 50 | 60 | about 50% |
-| Weapon Rank 10, grade-10 weapon (Might) | +30 | about 25% |
-| Armor accents (five grade-10 ATK accents) | +20 | about 15% |
-| Extra Stats (every ATK node) | +12 | about 10% |
-| **Offense** | **122** | |
+| Uma Level 50 | 111 | about 60% |
+| Weapon Rank 10, grade-10 weapon (Might) | +40 | about 20% |
+| Armor accents (four grade-10 ATK accents; the Orb's is its kind) | +20 | about 12% |
+| Extra Stats (every ATK node) | +12 | about 7% |
+| **Offense** | **183** | |
 
 Then **Class Rank multiplies it all** through the skill depth it opens: a depth-1 skill hits at 1.6× offense, depth 5 at
-4.6× (2.9 times as hard). A full hit is about 122 × 4.6 ≈ 560 before defense; a fresh Lv 1 Uma's is about 10 × 1.6 = 16.
+4.6× (2.9 times as hard). A full hit is about 183 × 4.6 ≈ 840 before defense (about 630 against a Lv 50 foe's DEF); a
+fresh Lv 1 Uma's is about 22 × 1.6 ≈ 35.
 
-So, from biggest lever down: **Class Rank** (×2.9 on everything), **Uma Level** (half the offense), **weapons** (a
-quarter), **armor accents and Extra Stats** (the last quarter). Armor's main job is staying alive: Barrier and Regen.
+So, from biggest lever down: **Class Rank** (×2.9 on everything), **Uma Level** (about 60% of offense), **weapons**
+(about 20%), **armor accents and Extra Stats** (the rest). Armor's main job is staying alive: Barrier and Regen.
+
+**How far from today:** not far. Today a Lv 50 Uma's ATK is about 111 × 1.35 ≈ 150 with gear and Extra Stats; here it
+is 183, in the same range, with the weapon's share made visible. Foes keep their curves; what gets re-fitted is the
+gear and Extra Stats budget they're given (D59) and the boss Barrier/Regen pressure, by the simulation.
 
 **Damage formula unchanged:** `max(offense × 0.2, offense − defense × 0.5) × power`, then weakness, statuses, Breaks.
 
-**Foes need rescaling** to the new stat numbers. Win rates stay where the balance simulation has them today (D72,
-D86): the foe curves are re-fitted with `SIM=1`, not the difficulty.
+**Foes are re-fitted, not rescaled.** Win rates stay where the balance simulation has them today (D72, D86): the foes'
+gear budget moves from percentages to the same flat adds, checked with `SIM=1`.
 
 ## What goes away
 
 - Training jobs for class ranks and Weapon, Armor and Accessory Levels; the class halls, Armory and Jeweler stop
   training. The Learning page is left for the Inheritance feature.
-- Promotion and Mastery Tokens. **Cooking Tokens stay** (dishes are a separate system).
+- Every token kind: Promotion, Mastery and Cooking (second pass). Fights stop dropping tokens; the Exchange stops
+  trading them; the Warehouse's Tokens tab goes.
 - Uma Level's skill-depth gates and side points (moved to Class Rank).
 - The up-to-2× EXP for fighting above her level.
-- Rings, Charms, Garb, Leather, Mail and Plate (replaced by the ten armor types).
+- Rings, Charms, Garb, Leather, Mail and Plate (replaced by the ten armor types), and weapon accents.
 
-## Moving existing saves (nothing resets)
+## Moving existing saves: a progress reset (second pass)
 
-- **Uma Level and EXP:** unchanged.
-- **Class Rank:** each class starts at the rank that keeps every depth and side skill she can use today open and pays
-  for every side point she has spent (at least her Uma Level, capped by what her old rank opened); her learned sides
-  and loadouts stay.
-- **Weapon Rank:** each weapon starts at today's Weapon Level for it (the best among classes that wield it).
-- **Armor Ranks:** all ten start at her Armor Level.
-- **Gear:** Mail and Plate become Cuirasses, Garb and Leather Robes, of the same grade and accent; Rings and Charms
-  refund their materials. Orbs carry over.
-- **Tokens:** each Promotion Token becomes 200 × band Class Marks, each Mastery Token 200 × band Gear Marks.
-- **Stats** move to the new scale; the open fight, if any, finishes on the old one.
+The owner asked for a clean start to test the new balance (few Umas leveled so far). The new save version:
+- **Resets:** every stage win, the open fight and Spring uses; every Uma's Uma Level and EXP (Lv 1), Class Ranks,
+  Weapon and Armor Ranks (1, EXP 0), learned side skills and loadouts (back to auto).
+- **Keeps:** unlocked Umas, parties, each Uma's chosen class and weapon slots, Farm and Craft Levels, opened Extra
+  Stats nodes, items, dishes, facilities and their jobs, Laurels, Time and Sweep Tickets, targets.
+- **Converts:** Mail and Plate become Cuirasses, Garb and Leather Robes (same grade, same accent); a weapon keeps its
+  grade and loses its accent; Rings and Charms refund their materials; Orbs carry over by kind. Tokens go (they have no
+  use left); none are refunded.
+- Shards already paid for Lv 10 milestones will be paid again on the way back up (about two Unlock Tickets for ten
+  Umas); not worth guarding.
+- The API backs up the old save before replacing it (D69), so it can be restored by hand.
 
 ## Later (not part of this)
 
@@ -169,11 +203,12 @@ D86): the foe curves are re-fitted with `SIM=1`, not the difficulty.
 
 In order, each shippable on its own:
 1. **Bars and EXP:** Class Rank 1–50, Weapon and Armor Ranks, EXP per win, overflow to Marks, Uma EXP at her own
-   level, the migration. Skill trees read Class Rank. Training and the two token kinds go. Re-check D97's region
+   level, the progress reset. Skill trees read Class Rank. Training and every token kind go; dishes drop the token. Re-check D97's region
    climb under the new EXP rule (no bonus above her level) and retune the stage weights if it lands short.
-2. **Armor:** ten armor types, five slots, Training armor, crafting, Barrier and Regen in the engine (a new engine
-   version, so saved fights still replay), the migration of old armor.
-3. **Stats:** the linear stat scale, flat Extra Stats, weapon Might, then foes re-fitted with the simulation.
+2. **Gear and crafting:** ten armor types, five slots, Training armor, the new recipes and Forge picker, weapons and
+   Orbs without accents, Barrier and Regen in the engine (a new engine version, so saved fights still replay), the
+   old gear converted.
+3. **Stats:** flat Extra Stats and gear, weapon Might, HP trimmed, then foes re-fitted with the simulation.
 4. **Marks and books** at the Exchange.
 5. **Bars on screen:** the fight result fills Uma, Class, five Weapon and five Armor bars; the profile shows them all.
 
