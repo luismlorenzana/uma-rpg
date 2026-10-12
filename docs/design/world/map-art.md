@@ -1,10 +1,8 @@
 # The world map's art (W5)
 
-> **Status: spec, 2026-10-11 (D87, D90).** The world, continent and region screens are lists with flat biome colors today
-> (W2, D72). This page specifies their pixel art: what uma-platform draws (the `world` atlas) and how uma-rpg lays it
-> out. H06 drew the atlas (published in `@luismlorenzana/uma-art` 2.0.0); the handoff packet
-> [H07](../../handoff/tasks/H07-world-map-screens.md) (screens) builds the maps; [H08](../../handoff/tasks/H08-battle-backdrops.md)
-> reuses the biome palettes for battle backdrops.
+> **Status: built, 2026-10-12 (H07; D87, D90).** World, continent and region screens compose the published
+> `@luismlorenzana/uma-art` 2.0.0 world atlas in a plain 2D canvas, with DOM buttons and the complete lists alongside.
+> [H08](../../handoff/tasks/H08-battle-backdrops.md) reuses the biome palettes for battle backdrops.
 
 ## Decisions
 
@@ -120,5 +118,6 @@ nothing is lost while the art settles. Buttons over the canvas carry the names a
 ### Scale
 
 Reuse the Hub's grid rules (`apps/web/src/hub/grid.ts`): art pixels land on whole device pixels (`artScale`), the map
-is 16 tiles wide and centered, and on a 375 px screen the outer half-tile is cropped. The canvas is drawn once per
+is 16 tiles wide and centered. On a 2× 375 px screen the outer half-tile is cropped; tap targets are clamped inside
+its visible edges. On narrower or 1× viewports the scale steps down to the next whole device-pixel size. The canvas is drawn once per
 change of progress, not every frame; only the frontier ring animates (two frames, off under reduced motion).

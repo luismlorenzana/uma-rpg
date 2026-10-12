@@ -1,8 +1,8 @@
 // The Scenario Gate opens the world map (D66, D97): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
-// `r/<region>`, `capital/<continent>`, `fight`. Plain art first (owner: something quick to see and give feedback on).
+// `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
 import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
 import { formatLevels } from '../../battle/labels'
@@ -16,6 +16,9 @@ import { ActivePartyBar } from './ActiveParty'
 import { CapitalMap } from './CapitalMap'
 import { FightResult } from './FightResult'
 import { FightScreen } from './FightScreen'
+import { clearedIn, continentBandY, continentLayout, worldLayout } from './map/layout'
+import { BiomeIcon, MapCanvas } from './map/MapCanvas'
+import { MapViewSwitch, useMapView } from './map/MapView'
 import { RegionMap } from './RegionMap'
 
 export default function ScenarioGatePage({ place, rest }: PageProps) {
@@ -67,14 +70,29 @@ function ResumeFight({ place }: { place: PageProps['place'] }) {
 function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
   const world = useWorld()
   const nav = useHubNavigation()
+  const [view, setView] = useMapView()
+  const wins = world ? worldRun(world).wins : undefined
+  const layout = useMemo(() => worldLayout(campaign.continents, { wins: wins ?? {} }), [campaign.continents, wins])
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
   const later = [...new Set(campaign.view.chapters.filter((c) => c.tier > 1).map((c) => c.tier))]
   return (
-    <div className="space-y-4 p-4">
-      <ActivePartyBar campaign={campaign} />
-      <ResumeFight place={place} />
-      <section>
+    <div>
+      <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
+        <h2 className="font-display text-lg font-bold">World</h2>
+        <MapViewSwitch view={view} onChange={setView} />
+        <ActivePartyBar campaign={campaign} />
+        <ResumeFight place={place} />
+      </div>
+      {view === 'map' ? <MapCanvas layout={layout} focusKey="world" focusId={campaign.continents[0]?.id}
+        onSpot={(spot) => nav.sub(place, `c/${spot.id}`)} describe={(spot) => {
+          const c = campaign.continents.find((c) => c.id === spot.id)!, info = campaign.view.chapters.find((ch) => ch.tier === 1 && ch.order === c.order)
+          const won = c.regions.reduce((n, r) => n + clearedIn(r.id, { wins: wins! }), 0)
+          return { label: `${c.name}, Lv ${c.levelStart}–${c.levelStart + 9}, ${won} of 480 cleared`, content: <span className="absolute inset-x-0 bottom-0 flex items-center gap-1 rounded-sm bg-page/90 p-1 text-left">
+            {info && campaign.view.art && <AtlasSprite art={campaign.view.art} family="scenario-icons" frameKey={String(info.scenarioId)} size={24} />}
+            <span className="min-w-0"><span className="block text-[10px] font-bold">{c.name}</span><span className="block text-[10px] text-ink-soft">Lv {c.levelStart}–{c.levelStart + 9} · {won}/480</span></span>
+          </span> }
+        }} /> : <section className="p-3">
         <h3 className="text-micro mb-2">Tier 1 · five continents</h3>
         <ul className="space-y-2">
           {campaign.continents.map((c) => {
@@ -93,10 +111,10 @@ function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['p
             )
           })}
         </ul>
-      </section>
+      </section>}
       {later.map((tier) => (
         <div key={tier} className="flex items-center gap-2 rounded-md bg-raised/60 p-3 text-[13px] text-ink-soft">
-          <LockIcon size={16} className="text-locked" /> Tier {tier}: promote an Uma to reach it.
+          <LockIcon size={16} className="text-locked" /> Tier {tier} locked
         </div>
       ))}
     </div>
@@ -108,6 +126,10 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
   const nav = useHubNavigation()
   const now = useNow(30_000)
   const [error, setError] = useState<string | null>(null)
+  const [view, setView] = useMapView()
+  const wins = world ? worldRun(world).wins : undefined
+  const dryIds = world ? continent.springs.filter((s) => springReadyAt(world, s.id, now)).map((s) => s.id).join(',') : ''
+  const layout = useMemo(() => continentLayout(continent, { wins: wins ?? {}, drySprings: new Set(dryIds.split(',')) }), [continent, wins, dryIds])
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
   const rows = Array.from({ length: 10 }, (_, row) => row)
@@ -116,16 +138,32 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
     .filter((id) => (worldRun(world).wins[id] ?? 0) > 0).length
   return (
     <div>
-      <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
+      <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="truncate font-display text-lg font-bold">{continent.name}</h2>
           <span className="shrink-0 text-[12px] text-ink-soft">Lv {continent.levelStart}–{continent.levelStart + 9}</span>
         </div>
+        <MapViewSwitch view={view} onChange={setView} />
         <ActivePartyBar campaign={campaign} />
         <ResumeFight place={place} />
         {error && <p className="text-[12px] text-danger">{error}</p>}
       </div>
-      <div className="space-y-2 p-3">
+      {view === 'map' ? <MapCanvas layout={layout} focusKey={continent.id} focusId={layout.frontier ?? continent.id}
+        onSpot={(spot) => {
+          if (spot.kind === 'region') nav.sub(place, `r/${spot.id}`)
+          else if (spot.kind === 'capital') nav.sub(place, `capital/${continent.id}`)
+          else void drinkAtSpring(spot.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))
+        }} describe={(spot) => {
+          if (spot.kind === 'capital') return { label: `${continent.name}, Capital, Lv ${continent.levelStart + 9}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">Capital · {wonFinals}/6</span> }
+          if (spot.kind === 'spring') {
+            const ready = springReadyAt(world, spot.id, now)
+            return { label: ready ? `Spring, recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'Spring, refill party MP', disabled: !!ready || !!openFightOf(world) }
+          }
+          const r = continent.regions.find((r) => r.id === spot.id)!, won = cleared.get(r.id) ?? 0
+          return { label: `${r.name}, ${formatLevels(r.level, r.levelTop)}, ${won} of 12 cleared`, content: <><span className="absolute inset-x-0 top-0 rounded-xs bg-page/80 px-0.5 text-center text-[10px] font-semibold leading-tight">{r.name}</span><span className="absolute bottom-0 right-0 rounded-xs bg-page/85 px-1 text-[10px] text-ink-soft">{won}/12</span></> }
+        }}>
+        {[0, 5].map((row) => <h3 key={row} className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-page/90 px-2 text-[11px] font-bold" style={{ top: `${(continentBandY(row) + 3) / layout.rows * 100}%` }}>{formatLevels(continent.levelStart + (row === 0 ? 0 : 5), continent.levelStart + (row === 0 ? 4 : 9))}</h3>)}
+      </MapCanvas> : <div className="space-y-2 p-3">
         {rows.map((row) => {
           const spring = continent.springs.find((s) => s.row === row)
           const ready = spring ? springReadyAt(world, spring.id, now) : null
@@ -140,7 +178,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
               {spring && (
                 <button type="button" disabled={!!ready || !!openFightOf(world)}
                   onClick={() => drinkAtSpring(spring.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))}
-                  className="flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-[#5aa6f0]/60 bg-[#5aa6f0]/10 text-[13px] font-semibold text-[#8cc4ff] disabled:opacity-50">
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[#5aa6f0]/60 bg-[#5aa6f0]/10 text-[13px] font-semibold text-[#8cc4ff] disabled:opacity-50">
                   ◆ Spring · {ready ? `recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'refill the party’s MP'}
                 </button>
               )}
@@ -152,7 +190,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
                     return (
                       <button key={r.id} type="button" onClick={() => nav.sub(place, `r/${r.id}`)}
                         className="min-h-14 rounded-sm border-l-4 bg-raised px-2 py-1.5 text-left active:bg-white/5" style={{ borderColor: biome.color, background: `color-mix(in srgb, ${biome.color} 18%, var(--color-raised, #1b2533))` }}>
-                        <span className="block truncate text-[13px] font-semibold">{r.name}</span>
+                        <span className="flex items-center gap-1 text-[13px] font-semibold"><BiomeIcon biome={r.biome} /><span className="truncate">{r.name}</span></span>
                         <span className="block text-[11px] text-ink-soft">{won === 12 ? 'Cleared ✓' : `${won}/12`}</span>
                       </button>
                     )
@@ -167,7 +205,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · Lv {continent.levelStart + 9}</span></span>
           <span className="text-[12px] text-ink-soft">{wonFinals}/6</span>
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -4,7 +4,7 @@ import {
   biomeById, openFightOf, rpgNodeStatus, SaveRuleError, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
   type RpgMapNode, type RpgNodeStatus,
 } from '@rpg/domain'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import { ElementGlyph, formatLevel, formatLevels, WeaknessIcons } from '../../battle/labels'
 import { castArtUrl } from '../../content/cast'
@@ -14,6 +14,9 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
+import { regionLayout } from './map/layout'
+import { BiomeIcon, MapCanvas } from './map/MapCanvas'
+import { MapViewSwitch, useMapView } from './map/MapView'
 import { FightResult } from './FightResult'
 
 /** A foe's round face: her face icon, else full-body art zoomed onto the head (D81), else the bust's top. */
@@ -63,8 +66,17 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   const [sweepFor, setSweepFor] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
+  const [view, setView] = useMapView()
+  const info = campaign.regionInfo(region.id)
+  const wins = world ? worldRun(world).wins : undefined
+  const layout = useMemo(() => info && wins ? regionLayout(info, { wins }) : null, [info, wins])
   // A continent's capital sits at the end of its scroll. Enter its routes at the top, not at that inherited offset.
-  useEffect(() => { mapRef.current?.closest('main')?.scrollTo({ top: 0 }) }, [region.id, !!world])
+  useEffect(() => {
+    if (!capital) return
+    let parent = mapRef.current?.parentElement
+    while (parent && !/auto|scroll/.test(getComputedStyle(parent).overflowY)) parent = parent.parentElement
+    if (parent) parent.scrollTop = 0
+  }, [region.id, capital, !!world])
   if (!world) return null
   const run = worldRun(world)
   const fightOpen = openFightOf(world)
@@ -117,11 +129,12 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   }
   return (
     <div ref={mapRef}>
-      <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur" style={{ borderTop: `4px solid ${color}` }}>
+      <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur" style={{ borderTop: `4px solid ${color}` }}>
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="min-w-0 font-display text-lg font-bold">{title}</h2>
+          <h2 className="flex min-w-0 items-center gap-1 font-display text-lg font-bold">{info && <BiomeIcon biome={info.biome} />}{title}</h2>
           <span className="shrink-0 text-[12px] text-ink-soft">{levels} · {cleared}/{stages.length} cleared</span>
         </div>
+        {!capital && <MapViewSwitch view={view} onChange={setView} />}
         <ActivePartyBar campaign={campaign} />
         {fightOpen?.battle && (
           <button type="button" onClick={() => nav.sub(place, 'fight')} className="flex min-h-11 w-full items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink">
@@ -129,7 +142,12 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
           </button>
         )}
       </div>
-      {renderStages ? renderStages(choice) : <ol className="space-y-2 p-3">
+      {renderStages ? renderStages(choice) : view === 'map' && layout ? <MapCanvas layout={layout} focusKey={region.id}
+        focusId={layout.frontier ?? stages.at(-1)?.id} onSpot={(spot) => setOpen(stages.find((n) => n.id === spot.id)!)}
+        describe={(spot) => {
+          const node = stages.find((n) => n.id === spot.id)!, i = stages.indexOf(node), s = status(node.id)
+          return { label: `Stage ${i + 1}, ${node.name}, ${formatLevel(node.level)}, ${s}`, content: <span className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xs bg-page/90 px-1 text-[11px] font-semibold">{i + 1} · {formatLevel(node.level)}</span> }
+        }} /> : <ol className="space-y-2 p-3">
         {stages.map((n, i) => <li key={n.id}>{choice(n, i)}</li>)}
       </ol>}
 
@@ -183,7 +201,7 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
           <div className="-mt-2 mb-1 flex items-center justify-between text-[13px] text-ink-soft">
             <span>Sweep Tickets: {world.wallet.sweepTickets}</span>
             <HelpButton title="Sweeps">
-              <p>A sweep wins a cleared regular stage at once for one Sweep Ticket. It pays like a replay: a quarter of the first clear's EXP and Laurels, and each token at a quarter of its chance. MP isn't used.</p>
+              <p>A sweep wins a cleared regular stage at once for one Sweep Ticket. It pays like a replay: a quarter of the first clear's EXP and Laurels, with Marks at a quarter of their chance. MP isn't used.</p>
             </HelpButton>
           </div>
           <div className="grid grid-cols-4 gap-2">

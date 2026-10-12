@@ -8,7 +8,7 @@ export const BUILDING = { size: 48, anchorY: 44 } as const
 /** The device pixel ratio the Hub renders at (2 at most: more costs fill rate for nothing visible). */
 export const hubDpr = (): number => Math.min(window.devicePixelRatio || 1, 2)
 /** CSS px per art pixel: 1.5 on 2× screens (3 device pixels), 2 on 1× ones. */
-const artScale = (dpr: number): number => (dpr >= 2 ? 1.5 : 2)
+export const artScale = (dpr: number): number => (dpr >= 2 ? 1.5 : 2)
 
 export interface HubGrid { scale: number; tile: number; cols: number; rows: number }
 export function hubGrid(w: number, h: number, dpr: number): HubGrid {

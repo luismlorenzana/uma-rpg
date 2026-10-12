@@ -11,7 +11,7 @@ owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
 ## Status
 
-Tier 1 is playable end to end: slices S1–S7, the world map (W1–W3) and the class rework (D86). The Tier Finale and
+Tier 1 is playable end to end: slices S1–S7, the world map (W1–W3, W5 pixel maps) and the class rework (D86). The Tier Finale and
 promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/handoff/README.md). See the cross-game
 [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
 
