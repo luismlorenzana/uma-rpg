@@ -3,19 +3,19 @@ import { autoAction } from '../rpg/battle/auto'
 import { applyBattleAction, battleActionsLeft, createBattle } from '../rpg/battle/engine'
 import { rpgCampaignChapter, rpgFinalsNodeIds } from '../rpg/campaign/chapters'
 import { rpgFinals } from '../rpg/campaign/finals'
-import { rpgRewardKind } from '../rpg/campaign/rewards'
+import { rpgBattleExp, rpgRewardKind } from '../rpg/campaign/rewards'
 import { createRpgRun, rpgNodeStatus, rpgRunBattleStep } from '../rpg/campaign/run'
 import { actInFight, chooseClass, openFightOf, stageLaurels, startFight, worldRun, type BattleOutfit } from '../save/battle'
 import { setPartySlot, unlockUma, worldOf } from '../save/rules'
 import { newSave, parseSave, type Save } from '../save/save'
 import { capitalChapter, capitalId, capitalStageIds } from './capital'
-import { stageBand, stagePay, stageRegionId, worldContinent } from './world'
-import type { RpgClass } from '../rpg/rules'
+import { stageBand, stageExpPay, stagePay, stageRegionId, worldContinent } from './world'
+import { grantRpgExp, type RpgClass } from '../rpg/rules'
 
 const NOW = '2026-10-12T12:00:00.000Z'
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
-const ura = worldContinent({ name: 'URA', order: 1 })
-const chapter = capitalChapter(ura, cast)
+const synthetic = worldContinent({ name: 'Synthetic continent', order: 1 })
+const chapter = capitalChapter(synthetic, cast)
 const classes: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 const outfits = new Map(classes.map((_, i) => {
   const outfitId = `${9000000 + i}`
@@ -54,9 +54,9 @@ describe('capital Finals (H15)', () => {
     for (let order = 1; order <= 5; order++) {
       const continent = worldContinent({ name: `World ${order}`, order })
       const capital = capitalChapter(continent, cast)
-      const legacy = rpgCampaignChapter({ scenarioId: capitalId(continent.id), name: rpgFinals(order).title, order }, cast)
+      const legacy = rpgCampaignChapter({ scenarioId: capitalId(continent.id), name: continent.name, order }, cast)
       expect(capital).toEqual(capitalChapter(continent, [...cast].reverse()))
-      expect(capital.title).toBe(rpgFinals(order).title)
+      expect(capital.title).toBe(continent.name)
       expect(capital.nodes).toHaveLength(7)
       expect(capital.levelStart).toBe(order * 10)
       for (let route = 1; route <= 3; route++) {
@@ -71,27 +71,42 @@ describe('capital Finals (H15)', () => {
           expect(n.enemies.map((e) => e.element)).toEqual([spec.element, ...spec.escorts.map((e) => e[1])])
           expect(n.waves).toBeUndefined()
           expect(stagePay(n)).toBe(1)
+          expect(stageExpPay(n)).toBe(0.5)
           expect(stageRegionId(n.id)).toBe(capital.id)
           expect(stageBand(n.id)).toBe(order)
         }
       }
     }
+    expect(capitalChapter({ ...synthetic, name: 'Renamed synthetic continent' }, cast).title).toBe('Renamed synthetic continent')
+    expect(stageExpPay({ id: 'w1-1-1-s12' })).toBe(1)
+    expect(stageExpPay({ id: 'w1-1-1-s12', waves: [[]] })).toBe(1.5)
     expect(stageRegionId('w1-1-1-s12')).toBe('w1-1-1')
     for (const route of [0, 4, 1.5, NaN]) expect(() => capitalStageIds('w1', route)).toThrow(RangeError)
+  })
+
+  it('adds about one level, not two, when all three routes are cleared on time', () => {
+    for (const order of [1, 2, 3, 4]) {
+      const capital = capitalChapter(worldContinent({ name: 'Synthetic continent', order }), cast)
+      let member = { tier: 1, level: order * 10, exp: 0 }
+      for (const node of capital.nodes.filter((n) => n.kind !== 'camp')) {
+        member = { ...member, ...grantRpgExp(member, Math.round(rpgBattleExp(rpgRewardKind(node), node.level, member.level) * stageExpPay(node))) }
+      }
+      expect(member.level).toBe(order * 10 + 1)
+    }
   })
 
   it('opens all vanguards immediately and each champion only after her own vanguard', () => {
     const run = createRpgRun(0, 'world', NOW)
     for (let route = 1; route <= 3; route++) {
-      const ids = capitalStageIds(ura.id, route)
+      const ids = capitalStageIds(synthetic.id, route)
       expect(rpgNodeStatus(chapter, run, ids.vanguard)).toBe('available')
       expect(rpgNodeStatus(chapter, run, ids.champion)).toBe('locked')
       expect(() => startFight(party(), chapter, ids.champion, outfits, NOW)).toThrow(/before it/)
     }
-    run.wins[capitalStageIds(ura.id, 2).vanguard] = 1
-    expect(rpgNodeStatus(chapter, run, capitalStageIds(ura.id, 2).champion)).toBe('available')
-    expect(rpgNodeStatus(chapter, run, capitalStageIds(ura.id, 1).champion)).toBe('locked')
-    expect(rpgNodeStatus(chapter, run, capitalStageIds(ura.id, 3).champion)).toBe('locked')
+    run.wins[capitalStageIds(synthetic.id, 2).vanguard] = 1
+    expect(rpgNodeStatus(chapter, run, capitalStageIds(synthetic.id, 2).champion)).toBe('available')
+    expect(rpgNodeStatus(chapter, run, capitalStageIds(synthetic.id, 1).champion)).toBe('locked')
+    expect(rpgNodeStatus(chapter, run, capitalStageIds(synthetic.id, 3).champion)).toBe('locked')
   })
 
   it('pays sub-boss and boss rewards, not the legacy vanguard rate, including quarter replays and band 5', () => {
@@ -107,7 +122,7 @@ describe('capital Finals (H15)', () => {
     }
   })
 
-  it('lets an on-time Lv10 party win all six URA stages with the shared Auto policy over five seeds', () => {
+  it('lets an on-time Lv10 party win all six synthetic capital stages with the shared Auto policy over five seeds', () => {
     for (const node of chapter.nodes.filter((n) => n.kind !== 'camp')) {
       const save = party(), w = worldOf(save)
       const unlocked = { ...save, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...worldRun(w),
@@ -127,11 +142,12 @@ describe('capital Finals (H15)', () => {
   })
 
   it('saves and reloads capital fights, opens the champion after settlement and banks the correct first/replay rewards', () => {
-    const ids = capitalStageIds(ura.id, 1)
+    const ids = capitalStageIds(synthetic.id, 1)
     const frozen = startFight(party(), chapter, ids.vanguard, outfits, NOW)
     expect(parseSave(JSON.parse(JSON.stringify(frozen)))).toEqual(frozen)
     const first = play(party(), ids.vanguard)
     expect(first.result).toMatchObject({ outcome: 'victory', nodeId: ids.vanguard, chapterId: chapter.id, firstClear: true, laurels: 75 })
+    expect(first.result!.members.every((m) => m.exp === Math.round(rpgBattleExp('sub-boss', 10, 10) / 2))).toBe(true)
     expect(Object.values(first.result!.tokens).reduce((a, b) => a + b, 0)).toBe(3)
     expect(rpgNodeStatus(chapter, worldRun(worldOf(first.save)), ids.champion)).toBe('available')
     expect(parseSave(JSON.parse(JSON.stringify(first.save)))).toEqual(first.save)

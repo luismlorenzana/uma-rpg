@@ -164,7 +164,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
         })}
         <button type="button" onClick={() => nav.sub(place, `capital/${continent.id}`)}
           className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md border border-accent/50 bg-raised p-3 text-left">
-          <span><span className="block font-display font-bold">{finals.title}</span><span className="block text-[12px] text-ink-soft">Capital · Lv {continent.levelStart + 9}</span></span>
+          <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · Lv {continent.levelStart + 9}</span></span>
           <span className="text-[12px] text-ink-soft">{wonFinals}/6</span>
         </button>
       </div>

@@ -12,7 +12,7 @@ export function CapitalMap({ campaign, continent, place }: { campaign: Campaign;
   const finals = rpgFinals(continent.order)
   if (!world) return null
   const run = worldRun(world)
-  return <StageMap campaign={campaign} region={chapter} place={place} title={finals.title}
+  return <StageMap campaign={campaign} region={chapter} place={place} title={continent.name}
     levels={formatLevel(chapter.levelStart)} color={campaign.color(chapter.id)} capital renderStages={(choice) => (
       <div className="space-y-3 p-3">
         {finals.routes.map((route, i) => {

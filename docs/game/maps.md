@@ -31,7 +31,7 @@ come in `docs/design/world/map-art.md`.
 - **Springs** refill the active party's MP, then recharge for two hours.
 - Each continent's **capital** (Lv 10 of its band) holds three authored Finals routes. All vanguards open immediately;
   each champion opens after her own vanguard. Both have two escorts. Vanguards pay as sub-bosses, champions as bosses;
-  replays pay a quarter, and neither can be swept.
+  their EXP is halved so all three routes add about one level. Replays pay a quarter, and neither can be swept.
 
 ## Biomes
 

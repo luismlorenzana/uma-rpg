@@ -8,7 +8,7 @@ import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
-import { SPRING_RECHARGE_MS, stagePay } from '../world/world'
+import { SPRING_RECHARGE_MS, stageExpPay, stagePay } from '../world/world'
 import {
   rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
   type RpgPartyMember, type RpgRun,
@@ -324,7 +324,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const pay = stagePay(node)
   const used = usedWeapons(battle.input, battle.actions)
   const entrants: Entrant[] = battle.input.allies.map((a) => ({ outfitId: a.id, classId: a.classId, weapons: a.weapons, used: used.get(a.id) ?? new Set() }))
-  const paid = payEntrants(world, entrants, kind, node.level, Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * pay)
+  const paid = payEntrants(world, entrants, kind, node.level, Math.round(stageLaurels(kind, chapter.tier, firstClear, node.level) * pay), tier, share * stageExpPay(node))
   Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, gearMarks: paid.gearMarks,
     classMarks: paid.classMarks, firstClear })
   const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }

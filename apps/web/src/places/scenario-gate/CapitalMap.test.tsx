@@ -45,6 +45,10 @@ describe('capital routes and shared stage sheets', () => {
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
     try {
       await act(async () => { render() })
+      expect(host.querySelector('h2')?.textContent).toBe(continent.name)
+      continent.name = 'Renamed synthetic continent'
+      await act(async () => { render() })
+      expect(host.querySelector('h2')?.textContent).toBe('Renamed synthetic continent')
       expect([...host.querySelectorAll('h3')].map((h) => h.textContent)).toEqual(['Sprint Final', 'Mile Final', 'Long-Distance Final'])
       const stages = () => [...host.querySelectorAll<HTMLButtonElement>('button[aria-label^="Stage "]')]
       expect(stages()).toHaveLength(6)

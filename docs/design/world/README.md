@@ -63,7 +63,8 @@ the D97 level change preserves wins because stage ids do not move.
   so each scenario keeps its identity. Its three routes open independently: each vanguard is available immediately,
   and her champion opens after she is won. Both bring two authored escorts. The capital screen shows route names,
   one-line flavor, elements and progress, and uses the same rival sheet and fight entry as a region.
-- Capital vanguards pay as sub-bosses and champions as bosses; replays pay a quarter as elsewhere. They are not regular
+- Capital vanguards pay as sub-bosses and champions as bosses, with half EXP so all three routes add about one level;
+  replays pay a quarter as elsewhere. They are not regular
   stages and cannot be swept. Springs elsewhere on the continent refill carried MP; the capital grants no free refill.
 
 ## Variety

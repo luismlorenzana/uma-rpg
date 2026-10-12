@@ -15,7 +15,7 @@ export function capitalStageIds(continentId: string, route: number): { vanguard:
  * Stage 0 deliberately pays the vanguard as a sub-boss, not the legacy chapter's vanguard reward kind. */
 export function capitalChapter(continent: WorldContinent, cast: readonly RpgCastMember[]): RpgCampaignChapter {
   const id = capitalId(continent.id), finals = rpgFinals(continent.order)
-  const chapter = rpgCampaignChapter({ scenarioId: id, name: finals.title, order: continent.order }, cast)
+  const chapter = rpgCampaignChapter({ scenarioId: id, name: continent.name, order: continent.order }, cast)
   const level = continent.levelStart + WORLD_LEVELS - 1
   const nodes: RpgMapNode[] = []
   finals.routes.forEach((route, i) => {
