@@ -126,6 +126,9 @@ Every site, station and hall is a facility: Uma slots, a level, jobs ([loops](lo
 **The facility page** (`places/work/FacilityPage.tsx`), for the 16 sites, the Pantry, the Workbench, the Kitchen and
 the Forge:
 - **Header:** level, slots and **Upgrade**.
+- **For your targets** (D100): what the targets still need from this facility, lowest grade first, each with how many
+  are short, how many are in the Warehouse and how many are coming. Tap a line to start it in a free slot (not at the
+  Forge). The item picker badges every line the targets need ("Target ×3").
 - **Collect everything ready.**
 - **Each job card:**
   - Collect;
@@ -156,6 +159,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 - **An Uma's profile:**
   - **Header:** Uma Level and EXP, a class chip, Farm and Craft Levels, and a Working or Party card.
   - **Tabs:** Skills, Battle, Gear (equipment, Extra Stats link, gear levels), Work and Racing.
+  - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
   - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
     (D99).
   - A locked outfit shows **Unlock · 1 Ticket**.

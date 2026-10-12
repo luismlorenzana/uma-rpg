@@ -19,10 +19,10 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import { loadSkills, type MasterView } from '../../master/master'
-import { unlock, useWorld } from '../../save/game'
+import { markTarget, unlock, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
-import { BackIcon, LockIcon, TicketIcon } from '../../ui/icons'
+import { BackIcon, LockIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { pointText } from '../observatory/ObservatoryPage'
 import { GearCard } from './GearCard'
@@ -125,6 +125,20 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
 }
 
 /** Art, name, the big Uma Level with its EXP and the class she fights as, then Farm and Craft Levels and what she's up to. */
+/** Marks her as a farming target: the facilities list what maxing her takes (D100). */
+function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
+  const [error, setError] = useState<string | null>(null)
+  return (
+    <span className="relative -mr-1 -mt-2">
+      <button type="button" aria-pressed={on} onClick={() => markTarget(outfitId, !on).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))}
+        className={`flex min-h-9 items-center gap-1 rounded-full px-2.5 text-[12px] font-semibold ${on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'}`}>
+        <TargetIcon size={14} /> {on ? 'Target' : 'Mark target'}
+      </button>
+      {error && <span className="absolute right-0 top-full z-10 mt-1 w-48 rounded-sm bg-danger/90 p-1.5 text-right text-[11px] text-white">{error}</span>}
+    </span>
+  )
+}
+
 function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterView; outfit: RosterOutfit; owned: OwnedUma | null; world: TierWorld | null; bust: string | null; onClass: () => void }) {
   const navigate = useNavigate()
   const now = useNow(30_000)
@@ -141,7 +155,10 @@ function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterVie
           {!owned && <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[11px] text-locked"><LockIcon size={11} /> Locked</span>}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
+            {owned && world && <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} />}
+          </div>
           <h3 className="text-xl leading-tight">{outfit.name}</h3>
           {outfit.title && <p className="truncate text-[13px] text-ink-soft">{outfit.title}</p>}
           {owned && (

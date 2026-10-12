@@ -127,6 +127,11 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when
   ([sections](sections.md#global-ui)).
 - **Recall:** pays what's finished and returns the inputs of everything unfinished. Only the time is lost.
+- **Targets (D100):** mark up to five Umas on their profile. Every facility then lists what maxing them still takes
+  from it: a dish for each Extra Stats node they haven't opened, and the best piece they can wear now in each gear slot
+  (their class's five weapons, their armor, their accessory; a Mail and a Ring when they wear none). Needs cascade: the
+  pieces and dishes still short need refined items, and those still short need raw ones. The Warehouse and running or
+  queued jobs count first. Cooking Tokens aren't listed: fights drop them.
 - **Upgrades:**
   - Facilities level 1–3: more slots, then speed.
   - The cost is Laurels plus refined items of the facility's two families. A site's two families are its own and its

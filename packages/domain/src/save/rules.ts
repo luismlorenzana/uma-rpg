@@ -5,7 +5,7 @@ import { newOwnedUma, normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SH
 
 export type SaveRuleReason = 'no-ticket' | 'already-owned' | 'not-owned' | 'bad-party' | 'bad-slot' | 'bad-name' | 'no-world'
   | 'bad-class' | 'cannot-learn' | 'bad-loadout' | 'cannot-fight' | 'in-fight'
-  | 'no-items' | 'bad-count' | 'busy' | 'bad-job' | 'no-laurels'
+  | 'no-items' | 'bad-count' | 'busy' | 'bad-job' | 'no-laurels' | 'too-many'
 
 export class SaveRuleError extends Error {
   readonly reason: SaveRuleReason

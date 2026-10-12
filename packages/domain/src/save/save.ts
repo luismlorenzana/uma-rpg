@@ -1,4 +1,4 @@
-// Save v16: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
+// Save v17: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -23,7 +23,9 @@ import {
   type RpgWeapon,
 } from '../rpg/rules'
 
-export const SAVE_SCHEMA_VERSION = 16
+export const SAVE_SCHEMA_VERSION = 17
+/** Umas marked as farming targets (D100). */
+export const MAX_TARGETS = 5
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
@@ -102,6 +104,8 @@ export interface TierWorld {
   dishes: Record<string, number>
   /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. */
   gear: Record<string, number>
+  /** Up to five owned Umas whose gear and dishes the facilities plan for (D100). */
+  targets: string[]
 }
 
 export interface Account {
@@ -171,7 +175,7 @@ export interface WorldState {
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {}, targets: [] }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -745,7 +749,7 @@ function parseTierWorld(raw: unknown, path: string, version: number, tier: numbe
   const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
   const value = version < 16 && isRecord(v15) ? toV16(v15) : v15
   // v10 → v11 (D66): chapter runs give way to the world map; their wins and MP don't carry.
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear'])
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', version < 11 ? 'runs' : 'world', 'items', 'facilities', 'dishes', 'gear', 'targets'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier, version)
   const createdAt = timestamp(w.createdAt, `${path}.createdAt`)
   return {
@@ -753,7 +757,15 @@ function parseTierWorld(raw: unknown, path: string, version: number, tier: numbe
     parties: parseParties(w.parties, `${path}.parties`, umas), world: version < 11 ? newWorldState(createdAt) : parseWorldState(w.world, `${path}.world`),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
+    // v16 → v17 (D100): no targets yet.
+    targets: w.targets === undefined ? [] : parseTargets(w.targets, `${path}.targets`, umas),
   }
+}
+
+function parseTargets(value: unknown, path: string, umas: Record<string, OwnedUma>): string[] {
+  const list = ids(value, path, MAX_TARGETS)
+  if (list.some((id) => !umas[id])) throw new SaveParseError(path, 'targets must be owned')
+  return [...list]
 }
 
 /** The raw `schemaVersion` of a stored or sent save, or 0 when it has none. */
@@ -762,7 +774,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v16 save and always returns v16; anything older than v10 starts its progress over (D69). */
+/** Parses a v1–v17 save and always returns v17; anything older than v10 starts its progress over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion

@@ -2,7 +2,7 @@
 // the Kitchen cooks dishes and the Forge crafts gear (S7, D59). Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
 // output and her profession EXP.
 import {
-  availabilityBlock, DISHES, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
+  activeClass, availabilityBlock, DISHES, facilityTargets, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, SaveRuleError,
   stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -14,7 +14,7 @@ import type { MasterView } from '../../master/master'
 import { collect, collectAndRepeat, collectEverything, cutTime, queueWork, recall, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
-import { LaurelIcon } from '../../ui/icons'
+import { LaurelIcon, TargetIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
@@ -49,12 +49,18 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   const world = useWorld()
   const now = useNow()
   const [assign, setAssign] = useState<number | null>(null)
+  const [want, setWant] = useState<string | null>(null)
   const [queueing, setQueueing] = useState<number | null>(null)
   const [upgrading, setUpgrading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   if (!world) return null
   const facility = facilityOf(world, placeId)
   const info = describe(placeId)
+  // What the targets still need from here (D100), and the first free slot to start one in.
+  const classOf = (id: string) => { const o = view.roster.find((r) => r.outfitId === id); return o ? activeClass(o, world.umas[id]!) : 'brawler' }
+  const targets = world.targets.length > 0 ? facilityTargets(targetPlan(world, classOf), placeId) : null
+  const wanted = new Map((targets ?? []).map((n) => [n.key, n.short]))
+  const free = facility.jobs.findIndex((j) => j === null)
   const ready = facility.jobs.some((j) => j && (jobFinished(j, now) > j.collected || jobFinished(j, now) >= j.count))
   const run = (op: () => Promise<unknown>) => {
     setMessage(null)
@@ -79,6 +85,10 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
           Collect everything ready
         </button>
       )}
+      {targets && (
+        <TargetsCard lines={targets} canStart={free >= 0 && facilitySpec(placeId)?.kind !== 'craft'}
+          onPick={(key) => { setWant(key); setAssign(free) }} />
+      )}
       <ul className="space-y-2">
         {facility.jobs.map((job, slot) => (
           <li key={slot}>
@@ -88,7 +98,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
                 onCut={(n) => run(() => cutTime(placeId, slot, n))} onRecall={() => run(() => recall(placeId, slot))} timeTickets={world.wallet.timeTickets}
                 onQueue={() => setQueueing(slot)} onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
             ) : (
-              <button type="button" onClick={() => setAssign(slot)} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
+              <button type="button" onClick={() => { setWant(null); setAssign(slot) }} className="flex min-h-16 w-full items-center gap-3 rounded-md border border-dashed border-hairline-strong px-3 text-left">
                 <span className="flex size-10 items-center justify-center rounded-full bg-raised text-xl text-ink-faint">+</span>
                 <span className="text-[14px] text-ink-soft">Slot {slot + 1} · assign an Uma</span>
               </button>
@@ -97,15 +107,48 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
         ))}
       </ul>
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
-      {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} onClose={() => setAssign(null)}
-        onStart={(outfit, output, count) => startWork(placeId, assign, outfit, output, count).then(() => setAssign(null))} />}
+      {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} want={want} wanted={wanted}
+        onClose={() => setAssign(null)} onStart={(outfit, output, count) => startWork(placeId, assign, outfit, output, count).then(() => setAssign(null))} />}
       {queueing !== null && facility.jobs[queueing] && (
-        <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} onClose={() => setQueueing(null)}
+        <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} wanted={wanted} onClose={() => setQueueing(null)}
           fixed={view.roster.find((o) => o.outfitId === facility.jobs[queueing]!.outfitId)}
           onStart={(outfit, output, count) => queueWork(placeId, queueing, outfit, output, count).then(() => setQueueing(null))} />
       )}
       {upgrading && <UpgradeSheet world={world} placeId={placeId} onClose={() => setUpgrading(false)} onUpgrade={() => upgrade(placeId).then(() => setUpgrading(false))} />}
     </div>
+  )
+}
+
+/** What the targets still need from this facility (D100), lowest grade first; tap one to start it in a free slot. */
+function TargetsCard({ lines, canStart, onPick }: { lines: TargetNeed[]; canStart: boolean; onPick: (key: string) => void }) {
+  const [all, setAll] = useState(false)
+  const shown = all ? lines : lines.slice(0, 6)
+  return (
+    <section className="rounded-md bg-raised p-3">
+      <h4 className="text-micro mb-1.5 flex items-center gap-1.5"><TargetIcon size={13} className="text-accent" /> For your targets</h4>
+      {lines.length === 0 ? <p className="text-[13px] text-ink-soft">All set here</p> : (
+        <ul className="space-y-1">
+          {shown.map((n) => (
+            <li key={n.key}>
+              <button type="button" disabled={!canStart} onClick={() => onPick(n.key)}
+                className="flex w-full items-center gap-2 rounded-sm bg-panel px-2 py-1.5 text-left disabled:cursor-default">
+                <ItemIcon id={n.icon} size={28} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-semibold">{n.name} · G{n.grade}</span>
+                  <span className="block text-[11px] text-ink-faint">have {n.have}{n.coming ? ` · ${n.coming} coming` : ''}</span>
+                </span>
+                <span className="shrink-0 font-display text-[15px] font-bold text-accent">×{n.short}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {lines.length > 6 && (
+        <button type="button" onClick={() => setAll((v) => !v)} className="mt-1 min-h-9 text-[12px] font-semibold text-accent">
+          {all ? 'Show fewer' : `Show all ${lines.length}`}
+        </button>
+      )}
+    </section>
   )
 }
 
@@ -158,8 +201,10 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
 
 /** Pick an Uma, then what she makes, then how many. With `fixed`, she's queueing another job: no Uma to pick, and no
  * stock cap, since its inputs are taken when it starts. */
-function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart }: {
+function AssignSheet({ view, world, placeId, profession, fixed, want = null, wanted, onClose, onStart }: {
   view: MasterView; world: TierWorld; placeId: string; profession: Profession; fixed?: RosterOutfit; onClose: () => void
+  /** A target's line to start with, once she's chosen; and every line the targets need, to badge (D100). */
+  want?: string | null; wanted?: ReadonlyMap<string, number>
   onStart: (outfit: RosterOutfit, output: string, count: number) => Promise<void>
 }) {
   const spec = facilitySpec(placeId)!
@@ -202,7 +247,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
             const grade = professionAptitude(o, profession)
             return (
               <li key={o.outfitId}>
-                <button type="button" disabled={!!block} onClick={() => setOutfit(o)} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
+                <button type="button" disabled={!!block} onClick={() => { setOutfit(o); if (want) { setOutput(want); setCount(Math.min(MAX_JOB_COUNT, wanted?.get(want) ?? 1)) } }} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
                   <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-semibold">{o.name}</span>
@@ -248,6 +293,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, onClose, onStart
                 <span className="min-w-0">
                   <span className="block truncate text-[12px] font-semibold">{out.name}</span>
                   <span className="block truncate text-[11px] text-ink-soft">
+                    {wanted?.get(id) ? <span className="font-semibold text-accent">Target ×{wanted.get(id)} · </span> : null}
                     {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} ${dish ? 'to cook' : 'to refine'}` : `${formatDuration(p?.msEach ?? 0)} each`}
                     {dish ? ` · ${dish.effects.length === 8 ? 'all' : dish.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}` : ''}
                   </span>

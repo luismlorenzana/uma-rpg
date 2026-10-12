@@ -7,7 +7,7 @@ import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import type { MasterView } from '../../master/master'
 import { useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
-import { BackIcon, CloseIcon, LockIcon, SearchIcon } from '../../ui/icons'
+import { BackIcon, CloseIcon, LockIcon, SearchIcon, TargetIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 import { FiltersSheet } from './FiltersSheet'
@@ -156,6 +156,9 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
                     </span>
                   )}
                   {e.isNew && <span className="absolute -right-1 -top-1 rounded-full bg-accent px-1 text-[9px] font-bold leading-4 text-accent-ink">NEW</span>}
+                  {world?.targets.includes(e.outfit.outfitId) && (
+                    <span className="absolute -left-1 -top-1 rounded-full bg-accent p-0.5 text-accent-ink" aria-label="Target"><TargetIcon size={12} /></span>
+                  )}
                 </span>
                 <span className="line-clamp-2 break-words text-[10.5px] font-semibold leading-tight text-ink-soft [overflow-wrap:anywhere]">{e.outfit.name}</span>
               </button>

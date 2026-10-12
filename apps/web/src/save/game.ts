@@ -2,7 +2,7 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   parseTrack, sweepMany, sellStock, buyTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, cutJobTime, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
-  eatDish, setActiveNodes, equipGear, unequipGear, holdWeapon, type GearSlot,
+  eatDish, setActiveNodes, equipGear, unequipGear, holdWeapon, setTarget, type GearSlot,
   actInFight, chooseClass, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat,
   setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
@@ -162,6 +162,8 @@ export async function eat(outfitId: string, dishId: string): Promise<string> {
 export const activate = (outfitId: string, nodes: string[]) => edit((s, now) => setActiveNodes(s, outfitId, nodes, now))
 export const wear = (outfitId: string, gearId: string) => edit((s, now) => equipGear(s, outfitId, gearId, now))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit((s, now) => unequipGear(s, outfitId, slot, now))
+/** Marks or unmarks an Uma as a farming target (D100). */
+export const markTarget = (outfitId: string, on: boolean) => edit((s, now) => setTarget(s, outfitId, on, now))
 /** Puts a weapon in a class's slot: its Training one (null) or a crafted piece (D98). */
 export const hold = (outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null) =>
   edit((s, now) => holdWeapon(s, outfitId, classId, slot, weapon, gearId, now))

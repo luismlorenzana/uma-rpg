@@ -88,6 +88,17 @@ export function BackIcon(props: IconProps) {
   )
 }
 
+/** A farming target (D100): a crosshair. */
+export function TargetIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="7.5" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+      <path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Svg>
+  )
+}
+
 export function InfoIcon(props: IconProps) {
   return (
     <Svg {...props}>
