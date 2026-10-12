@@ -59,8 +59,12 @@ the D97 level change preserves wins because stage ids do not move.
 
 - **Everything is open from the start**: all five continents and all their regions. The levels tell you where to go.
 - Inside a region, stages open in order; any cleared stage can be replayed.
-- Each continent's **capital** is planned to hold the scenario's authored Finals (uma-racer's fourteen, D48),
-  so each scenario keeps its identity. Capital Finals are not built yet; region bosses are separate.
+- Each continent's **capital** (Lv 10 of its band) holds the scenario's authored Finals (uma-racer's fourteen, D48),
+  so each scenario keeps its identity. Its three routes open independently: each vanguard is available immediately,
+  and her champion opens after she is won. Both bring two authored escorts. The capital screen shows route names,
+  one-line flavor, elements and progress, and uses the same rival sheet and fight entry as a region.
+- Capital vanguards pay as sub-bosses and champions as bosses; replays pay a quarter as elsewhere. They are not regular
+  stages and cannot be swept. Springs elsewhere on the continent refill carried MP; the capital grants no free refill.
 
 ## Variety
 
