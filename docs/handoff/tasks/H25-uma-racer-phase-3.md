@@ -1,6 +1,9 @@
 # H25 — uma-racer phase 3
 
-**Priority P4 · the owner and Claude · uma-racer and uma-platform · L.** Waits on a Farm rework spec with the owner.
+**Priority P4 · the owner and Claude · uma-racer and uma-platform · L.** **Planned 2026-10-12** in uma-racer's
+[`docs/rearchitecture/`](https://github.com/luismlorenzana/uma-racer/blob/main/docs/rearchitecture/README.md) (its
+D321–D325): eight phases, a full wipe with 20 Uma Tickets, the RPG deleted, the Puzzles kept for now. The owner's
+feature and rebalancing docs come next. The steps below are superseded by that plan's `08-phases.md`.
 
 ## Why
 
