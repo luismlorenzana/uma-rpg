@@ -52,7 +52,7 @@ async function fetchPack(folder: string): Promise<CastMember[] | null> {
   return parsePack(await res.json(), folder)
 }
 
-export function loadCast(): void {
+function loadCast(): void {
   if (state.status === 'loading' || state.status === 'ready') return
   set({ status: 'loading' })
   void (async () => {

@@ -20,10 +20,7 @@ export const BATTLE_STATUS_STEP = 0.1
 export const BATTLE_FOE_STATUS_STEP = 0.15
 export const BATTLE_BARRIER_PERCENT = 0.08
 export const BATTLE_BARRIER_CAP = 0.3
-export const BATTLE_REGEN_PERCENT = 0.04
-export const BATTLE_CURE_PERCENT = 0.1
 export const BATTLE_CLARITY_PERCENT = 0.04
-export const BATTLE_REBIRTH_PERCENT = 0.1
 
 export const battleChannel = (kind: RpgDamageKind | null): BattleChannel => kind !== null && rpgPhysical(kind) ? 'physical' : 'magical'
 /** The element that a foe of this element is weak to. */

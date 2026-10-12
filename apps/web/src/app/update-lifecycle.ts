@@ -85,12 +85,3 @@ export class UpdateLifecycle {
 }
 
 export const appUpdateLifecycle = new UpdateLifecycle()
-
-export async function criticalGameplayAction<T>(action: () => Promise<T>): Promise<T> {
-  const finish = appUpdateLifecycle.beginCriticalAction()
-  try {
-    return await action()
-  } finally {
-    finish()
-  }
-}

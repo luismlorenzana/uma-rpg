@@ -1,5 +1,5 @@
 // An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
-// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, weapon pair, skill trees, class ranks;
+// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, five weapons, skill trees, class ranks;
 // first, as it changes most), Battle (her RPG stats), Gear (equipment, gear levels, Extra Stats), Work (professions and
 // jobs) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
 // racing profile.

@@ -9,7 +9,6 @@ import { KindMark } from '../battle/labels'
 import { ACCENT_COLOR, ATLAS_CELL, iconFrame, SHEET_SIZE, type Sheet } from './frames'
 import { TokenBadge } from './TokenBadge'
 
-export { ATLAS_CELL } from './frames'
 const URL: Readonly<Record<Sheet, string>> = { items: itemsUrl, dishes: dishesUrl, gear: gearUrl }
 
 export function ItemIcon({ id, size = 32, className = '', label }: { id: string; size?: number; className?: string; label?: string }) {

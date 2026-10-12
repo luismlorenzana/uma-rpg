@@ -28,7 +28,7 @@ import {
 
 type Cell = string | number
 /** A Markdown table; pipes in cells are escaped. */
-export function table(head: readonly string[], rows: readonly (readonly Cell[])[]): string {
+function table(head: readonly string[], rows: readonly (readonly Cell[])[]): string {
   const cell = (v: Cell) => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ')
   return [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...rows.map((r) => `| ${r.map(cell).join(' | ')} |`)].join('\n')
 }
@@ -36,8 +36,8 @@ const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
 const x = (n: number) => `×${n}`
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-export const CLASS_NAME: Readonly<Record<RpgClass, string>> = TOKEN_CLASS_NAME
-export const weaponName = (w: RpgWeapon): string => GEAR_TYPE_LABEL[w]
+const CLASS_NAME: Readonly<Record<RpgClass, string>> = TOKEN_CLASS_NAME
+const weaponName = (w: RpgWeapon): string => GEAR_TYPE_LABEL[w]
 const itemName = (id: string) => itemById(id)?.name ?? TOKENS.find((t) => t.id === id)?.name ?? id
 const inputs = (list: Record<string, number>) => Object.entries(list).map(([id, n]) => `${n > 1 ? `${n}× ` : ''}${itemName(id)}`).join(', ')
 
@@ -190,7 +190,7 @@ function gear(): string {
     .map(([k, v]) => `${EFFECT_LABEL[k as keyof typeof EFFECT_LABEL]} ${Math.round(v * 100) / 100}`).join(', ')
   return table(['Type', 'Id', 'Slot', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'Points at grade 10, HP accent'], types.map((t) => [
     EQUIP_LABEL[t], `\`${t}\``, slot(t), recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3, 'atk'))!.inputs), points(t),
-  ])) + '\n\nA weapon\'s offense is split over the five weapons of her build (shown that way above).'
+  ])) + '\n\nA weapon\'s offense is split over the five weapons of her class (shown that way above).'
 }
 function tokens(): string {
   const rows: Cell[][] = Array.from({ length: TOKEN_BANDS }, (_, i) => i + 1).map((band) => {

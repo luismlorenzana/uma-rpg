@@ -12,7 +12,7 @@ export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
 
 /** `kind`: a badge for pieces drawn with another type's art (a Tome's element, an Orb's kind). */
 export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect; kind?: RpgDamageKind }
-/** The published gear atlas's rows, one per type it drew (P38), in its order. */
+/** Legacy published atlas row ids (P38), retained for icon lookup until H03's D86 art is published. */
 export const GEAR_ART_ROWS = ['short-sword', 'bow', 'spear', 'axe', 'mage-staff', 'arcane-staff', 'greatsword', 'cleric-staff', 'summoner-tome',
   'garb', 'leather', 'mail', 'plate', 'ring', 'charm'] as const
 /** The art a type is drawn with until its own exists (D86): Lance the Spear's, Katana the Short Sword's, Tomes the

@@ -12,6 +12,7 @@ export async function authHeaders(): Promise<Record<string, string>> {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+/** Also used by the save tests' dynamic importOriginal API mock. */
 export class ApiError extends Error {
   readonly path: string
   readonly status: number

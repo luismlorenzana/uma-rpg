@@ -1,6 +1,6 @@
 // Save v15: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
-// §6 (parties: 20, D41; one party per Uma, D46); docs/design/battles.md (class builds and chapter runs, D52);
+// §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, PROFESSIONS, type Profession } from '../economy/pacing'
@@ -38,7 +38,6 @@ export interface Wallet {
   unlockTickets: number
   shards: number
   laurels: number
-  /** Each finishes up to an hour of a running farm job (§11). */
   /** Each takes 30 minutes off a job or training (D74; Rush Tickets before v12, worth two each). */
   timeTickets: number
   /** Each completes one beaten regular fight at once (§11). */
@@ -67,7 +66,7 @@ export interface OwnedUma {
   classes: Partial<Record<RpgClass, ClassLoadout>>
   /** Farming & Cooking and Gathering & Crafting, 1–50 each (design §4). */
   professions: Record<Profession, ProfessionLevel>
-  /** Class proficiency (1–6) and gear mastery (1–10) ranks (S5, design §4). */
+  /** Class ranks (1–5, D77) and Weapon, Armor and Accessory Levels (1–10, D70). */
   ranks: Ranks
   /** Her Sun-and-planets map: nodes unlocked by eating, and the ones active now (S6, design §10). */
   stars: Stars

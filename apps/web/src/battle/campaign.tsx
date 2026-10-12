@@ -49,7 +49,7 @@ function buildCampaign(view: MasterView, cast: Cast): Campaign {
   }
 }
 
-export function useCampaignOf(view: MasterView, cast: Cast): Campaign {
+function useCampaignOf(view: MasterView, cast: Cast): Campaign {
   return useMemo(() => {
     let byCast = cache.get(view)
     if (!byCast) cache.set(view, (byCast = new WeakMap()))

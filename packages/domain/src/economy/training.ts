@@ -1,4 +1,4 @@
-// The Learning District (S5, design §5–§6, D57, D70): five class halls each train their class's rank (1–6) and Weapon
+// The Learning District (S5, design §5–§6, D57, D70, D77): five class halls each train their class's rank (1–5) and Weapon
 // Level (1–10); the Armory trains the Armor Level and the Jeweler the Accessory Level (1–10 each).
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import { RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass } from '../rpg/kinds'
@@ -37,12 +37,12 @@ export const CLASS_HALLS: Readonly<Record<string, { classId: RpgClass; style: St
   'cleric-chapel': { classId: 'cleric', style: 'late' },
   'summoner-circle': { classId: 'summoner', style: 'end' },
 }
-/** The Armory trains the Armor Level (every armor type), the Jeweler the Accessory Level (rings and charms), D70. */
+/** The Armory trains the Armor Level, the Jeweler the Accessory Level (Rings, Charms and Orbs), D70/D86. */
 export const GEAR_HALLS: Readonly<Record<string, 'armor' | 'accessory'>> = { armory: 'armor', jeweler: 'accessory' }
 
 /**
- * An Uma's training (D57, D70): a rank per class (1–6, each promotion spending a Promotion Token), a Weapon Level per
- * class (1–10: level k wears grade-k weapons of that class), and one Armor and one Accessory Level (1–10).
+ * An Uma's training (D57, D70, D77): a rank per class (1–5, spending Promotion Tokens), a Weapon Level per class
+ * (1–10), and one Armor and one Accessory Level (1–10). Gear levels spend Mastery Tokens (D94).
  */
 export interface Ranks {
   classes: Record<RpgClass, number>

@@ -8,7 +8,7 @@ export const BUILDING = { size: 48, anchorY: 44 } as const
 /** The device pixel ratio the Hub renders at (2 at most: more costs fill rate for nothing visible). */
 export const hubDpr = (): number => Math.min(window.devicePixelRatio || 1, 2)
 /** CSS px per art pixel: 1.5 on 2× screens (3 device pixels), 2 on 1× ones. */
-export const artScale = (dpr: number): number => (dpr >= 2 ? 1.5 : 2)
+const artScale = (dpr: number): number => (dpr >= 2 ? 1.5 : 2)
 
 export interface HubGrid { scale: number; tile: number; cols: number; rows: number }
 export function hubGrid(w: number, h: number, dpr: number): HubGrid {
@@ -29,5 +29,5 @@ export function placeAnchor(at: { x: number; y: number }, grid: HubGrid): { x: n
 }
 
 /** Places drawn with another place's sprite until they get their own (D70 merged four armories into these two). */
-export const BUILDING_ART: Readonly<Record<string, string>> = { armory: 'knights-bastion', jeweler: 'arcane-armory' }
+const BUILDING_ART: Readonly<Record<string, string>> = { armory: 'knights-bastion', jeweler: 'arcane-armory' }
 export const buildingFrame = (placeId: string): string => BUILDING_ART[placeId] ?? placeId

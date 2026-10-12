@@ -1,8 +1,8 @@
-// The battle stage (D53): PriConne rivals as bust portraits, the party as chibis, and procedural effects that play the
+// The battle stage (D53, D81): rivals' full-body art, the party as chibis, and procedural effects that play the
 // engine's cues: lunges, hit flashes, element particles, weapon slashes, the shield break and a Limit Break cut-in.
 // Playback never decides anything; the engine already did. The DOM overlay carries every lasting number and control,
 // and the canvas only draws effect text (damage numbers, BREAK).
-import type { BattleCue, BattleState, EnemyRank, RpgDamageKind } from '@rpg/domain'
+import { isRpgWeaponKind, type BattleCue, type BattleState, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
 import Phaser from 'phaser'
 import { stageLayout, type Box } from '../stage-layout'
 
@@ -13,16 +13,15 @@ export interface StageSetup {
   /** Every foe of the fight, all waves (W3); `field` names those standing on the stage now. */
   enemies: StageEnemy[]
   field: string[]
-  /** The chapter's colour, `#RRGGBB`. */
+  /** The region's colour, `#RRGGBB`. */
   color: string
   reducedMotion: boolean
 }
 
-const KIND_COLOR: Record<string, number> = {
-  fire: 0xff8a5c, ice: 0x8fd3ff, lightning: 0xffd84d, light: 0xfff2b0, dark: 0xc79bff, ultima: 0xf0b8ff, staff: 0xd6c8ff,
-  greatsword: 0xffffff, spear: 0xffffff, axe: 0xffffff, bow: 0xffffff, 'short-sword': 0xffffff,
+const KIND_COLOR: Readonly<Record<RpgDamageKind, number>> = {
+  fire: 0xff8a5c, ice: 0x8fd3ff, lightning: 0xffd84d, light: 0xfff2b0, dark: 0xc79bff,
+  greatsword: 0xffffff, lance: 0xffffff, axe: 0xffffff, bow: 0xffffff, katana: 0xffffff,
 }
-const WEAPONS = new Set(['greatsword', 'spear', 'axe', 'bow', 'short-sword'])
 
 interface Actor { id: string; side: 'ally' | 'enemy'; sprite: Phaser.GameObjects.Image; shadow: Phaser.GameObjects.Ellipse; box: Box; index: number; scaleY: number; idle: Phaser.Tweens.Tween | null }
 
@@ -237,10 +236,6 @@ export class BattleScene extends Phaser.Scene {
     switch (cue.kind) {
       case 'hit':
         return this.hit(cue.actorId, cue.targetId, cue.amount, cue.element, cue.weak, cue.channel === 'status')
-      case 'heal':
-        this.burst(cue.targetId, 0x7be3a0, 14, -1)
-        this.number(cue.targetId, `+${cue.amount ?? 0}`, '#8ff0b0')
-        return this.wait(360)
       case 'mp':
         this.number(cue.targetId, `+${cue.amount ?? 0} MP`, '#8fc0ff', 0.75)
         return this.wait(220)
@@ -265,10 +260,6 @@ export class BattleScene extends Phaser.Scene {
         this.label(cue.targetId, 'Changes tactics!', '#ff9b9b')
         this.cameras.main.shake(220, 0.006)
         return this.wait(520)
-      case 'revive':
-        this.burst(cue.targetId, 0xffe08a, 18, -1)
-        this.actors.get(cue.targetId)?.sprite.setAlpha(1).clearTint()
-        return this.wait(480)
       case 'recover':
         this.actors.get(cue.targetId)?.sprite.clearTint().setAngle(0)
         this.ring(cue.targetId, 0xdfe8f3)
@@ -301,7 +292,7 @@ export class BattleScene extends Phaser.Scene {
     }
     const color = kind ? KIND_COLOR[kind] ?? 0xffffff : 0xffffff
     if (tick) this.burst(targetId, 0xff8a5c, 8, -1)
-    else if (kind && WEAPONS.has(kind)) this.slash(targetId, weak ? 0xffd84d : 0xffffff)
+    else if (kind && isRpgWeaponKind(kind)) this.slash(targetId, weak ? 0xffd84d : 0xffffff)
     else if (kind === 'lightning') this.bolt(targetId)
     else this.burst(targetId, color, weak ? 22 : 14, 0)
     this.flash(targetId, 0xffffff)

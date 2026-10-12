@@ -33,8 +33,6 @@ function hash(a: number, b: number, c: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296
 }
 
-export { placeCell } from '../grid'
-
 export function layTerrain(page: HubPage, places: readonly TerrainPlace[], cols: number, rows: number): Terrain {
   const seed = page.length * 31 + page.charCodeAt(0)
   const kind: ('ground' | 'path' | 'water' | 'block' | 'clear')[] = Array.from({ length: cols * rows }, () => 'ground')

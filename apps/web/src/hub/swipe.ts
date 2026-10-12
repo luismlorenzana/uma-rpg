@@ -6,7 +6,7 @@ export interface Point {
   y: number
 }
 
-export const SWIPE_MIN_PX = 60
+const SWIPE_MIN_PX = 60
 
 /** -1 = previous page (finger moved right), 1 = next page (moved left), 0 = not a swipe. */
 export function swipeDirection(start: Point, end: Point): -1 | 0 | 1 {

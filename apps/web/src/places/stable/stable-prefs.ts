@@ -10,7 +10,7 @@ export interface StablePrefs {
 
 const KEY = 'rpg.stable.v1'
 
-export const DEFAULT_PREFS: StablePrefs = { query: { ownership: DEFAULT_ROSTER_QUERY.ownership, facets: EMPTY_FACETS, sort: DEFAULT_ROSTER_QUERY.sort }, view: 'grid' }
+const DEFAULT_PREFS: StablePrefs = { query: { ownership: DEFAULT_ROSTER_QUERY.ownership, facets: EMPTY_FACETS, sort: DEFAULT_ROSTER_QUERY.sort }, view: 'grid' }
 
 export function loadPrefs(): StablePrefs {
   try {

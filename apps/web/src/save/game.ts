@@ -108,10 +108,10 @@ const edit = async (change: (save: Save, now: string) => Save): Promise<void> =>
   if (save) await commit(change(save, nowIso()))
 }
 
-/** Switches the build she fights with (free, design §5). */
+/** Switches her active class for free (D86). */
 export const pickClass = (outfitId: string, classId: RpgClass) => edit((s, now) => chooseClass(s, outfitId, classId, now))
 export const pickWeapons = (outfitId: string, classId: RpgClass, weapons: RpgWeapon[]) => edit((s, now) => setClassWeapons(s, outfitId, classId, weapons, now))
-/** Learns a node in a build; throws SaveRuleError with the reason when she can't. */
+/** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. */
 export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => learnSkill(s, outfit, classId, nodeId, now))
 export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, classId, nodeId, now))
 /** Equips skills in order, or null to have them chosen for her (D86). */
@@ -222,7 +222,7 @@ let timer: ReturnType<typeof setTimeout> | null = null
 let running: Promise<void> | null = null
 let again = false
 
-export function scheduleSync(delayMs = 1500): void {
+function scheduleSync(delayMs = 1500): void {
   if (timer) clearTimeout(timer)
   timer = setTimeout(() => {
     timer = null
