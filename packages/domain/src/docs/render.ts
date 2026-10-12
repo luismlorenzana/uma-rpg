@@ -4,6 +4,7 @@
 import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
   itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT,
   PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
+import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { DISHES } from '../economy/dishes'
 import {
   accentPoints, BARRIER_PER_GRADE, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, hasAccent, isMagicalGear, isOrb, isWeapon, MIGHT_PER_GRADE, recipeFamilies,
@@ -355,7 +356,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
   const blocks: Record<string, () => string> = {
     classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, formations, continents,
-    'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
+    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }
   return blocks[key]?.() ?? null

@@ -21,7 +21,8 @@ function refresh(text: string, unknown: string[]): string {
 }
 
 describe('live docs (D92)', () => {
-  const files = readdirSync(DOCS).filter((f) => f.endsWith('.md')).map((f) => join(DOCS, f))
+  const files = [...readdirSync(DOCS).filter((f) => f.endsWith('.md')).map((f) => join(DOCS, f)),
+    join(ROOT, 'docs', 'design', 'pacing.md')]
 
   it('has a game manual with live blocks', () => {
     expect(files.length).toBeGreaterThan(5)

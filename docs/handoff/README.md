@@ -13,17 +13,15 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | # | Task | Who | Repo | Size | Needs |
 |---|---|---|---|---|---|
 | **P1** | | | | | |
-| [H03](tasks/H03-gear-icons-d86.md) | Gear icons for D86: Katana, Lance, five Tomes, ten Orbs | ChatGPT, then Claude wires | uma-platform | M | — |
+| [H03](tasks/H03-gear-icons-d86.md) | Gear icons for D86: art published in uma-art 2.0.0; wire the rows into the game | Claude | uma-rpg | S | — |
 | **P2** | | | | | |
-| [H06](tasks/H06-world-atlas.md) | The world atlas: 19 biomes' tiles, props, liquids, roads, markers, icons | ChatGPT | uma-platform | L | — |
-| [H07](tasks/H07-world-map-screens.md) | World, continent and region screens in pixel art | ChatGPT | uma-rpg | L | H06 published |
-| [H27](tasks/H27-armor-icons-d103.md) | Armor icons for D103: eight pieces in ten grades | ChatGPT, then Claude wires | uma-platform | M | H03, H10, H11 merged |
+| [H07](tasks/H07-world-map-screens.md) | World, continent and region screens in pixel art | ChatGPT | uma-rpg | L | — (uma-art 2.0.0) |
+| [H27](tasks/H27-armor-icons-d103.md) | Armor icons for D103: eight pieces in ten grades | ChatGPT, then Claude wires | uma-platform | M | — |
 | [H08](tasks/H08-battle-backdrops.md) | Battle backdrops by biome | ChatGPT | both | M | H06 |
-| [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars | ChatGPT | both | M | — |
-| [H11](tasks/H11-ui-icons.md) | Class emblems and status icons | ChatGPT | both | S | — |
+| [H10](tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars: the game half (art published) | ChatGPT | uma-rpg | M | — |
+| [H11](tasks/H11-ui-icons.md) | Class emblems and status icons: the game half (art published) | ChatGPT | uma-rpg | S | — |
 | **P3** | | | | | |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | uma-rpg | M | — |
-| [H14](tasks/H14-pacing-simulator.md) | A pacing and economy simulator, Lv1 to 50 | ChatGPT | uma-rpg | M | — |
 | [H17](tasks/H17-device-accessibility-pass.md) | Device and accessibility pass | ChatGPT, then the owner | uma-rpg | M | — |
 | [H18](tasks/H18-sound-effects.md) | Synthesized sound effects | ChatGPT | uma-rpg | S | — |
 | [H19](tasks/H19-hub-scroll-zoom.md) | Hub pages that scroll and zoom | ChatGPT | uma-rpg | M | — |
@@ -36,14 +34,16 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H25](tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3 | Owner and Claude | uma-racer | L | A Farm spec |
 | [H26](tasks/H26-uma-puzzle-phase-4.md) | uma-puzzle phase 4 | Owner and Claude | uma-puzzle | L | A billing slot |
 
-**For ChatGPT, in order:** H03, then H06 → H07 → H08, H10, H11, H14, H17, H18, H19, H27.
+**For ChatGPT, in order:** H07 → H08, H10, H11, H17, H18, H19, H27.
 
 **Done:** H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
 speed (D89), H09, W3's eight foes, dual elements and waves (D91), H04, the
 [current phone check](../testing/phone-check.md), H05, the class-rework dead-code sweep, H12, the
 [design-doc refresh](../design/game-design.md) (through D100), and H16, the lazy-domain split and build-time JS budget
 guard (195.96 → 133.15 KB gzip entry, measured on merge).
-H15 restores all five capitals' authored Finals, with three independent vanguard → champion routes each.
+H06, the world atlas (310 frames, the continent and world compositions; uma-art 2.0.0 with H03's gear rows and the
+art halves of H10 and H11). H15 restores all five capitals' authored Finals, with three independent vanguard → champion routes each. H14 adds the live
+pacing ledger in [Simulated](../design/pacing.md#simulated), including the current four bars and Marks.
 
 ## Not relevant anymore
 

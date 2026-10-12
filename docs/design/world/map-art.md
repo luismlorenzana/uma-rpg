@@ -2,8 +2,8 @@
 
 > **Status: spec, 2026-10-11 (D87, D90).** The world, continent and region screens are lists with flat biome colors today
 > (W2, D72). This page specifies their pixel art: what uma-platform draws (the `world` atlas) and how uma-rpg lays it
-> out. The handoff packets [H06](../../handoff/tasks/H06-world-atlas.md) (art) and
-> [H07](../../handoff/tasks/H07-world-map-screens.md) (screens) build it; [H08](../../handoff/tasks/H08-battle-backdrops.md)
+> out. H06 drew the atlas (published in `@luismlorenzana/uma-art` 2.0.0); the handoff packet
+> [H07](../../handoff/tasks/H07-world-map-screens.md) (screens) builds the maps; [H08](../../handoff/tasks/H08-battle-backdrops.md)
 > reuses the biome palettes for battle backdrops.
 
 ## Decisions
