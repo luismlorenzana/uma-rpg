@@ -4,6 +4,10 @@ import { rpgFoe } from '../campaign/enemies'
 import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleLimitGain, battleStateHash, createBattle, replayBattle,
   type BattleAction } from './index'
 import { BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
+import { battleLimitPlan } from './limit'
+import { autoAction } from './auto'
+import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
+import { HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills } from '../heroes'
 import type { BattleAlly, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
 
 // Invented outfits only; no private Uma or cast content. At Lv4 depth 1 is open, so every tree's depth-1 core is known.
@@ -326,5 +330,84 @@ describe('battle engine v8: Class Ranks, Might, Barrier and Regen (D102, D104)',
     expect(() => createBattle(v8([ok, ...party().slice(1).map((x) => ranked(x))], [foe('f1', 'fire')]))).not.toThrow()
     // v6 and v7 allies never carry the new fields.
     expect(() => createBattle({ ...input([foe('f1', 'fire')]), allies: party().map((x) => ({ ...x, classRank: 4 })) })).toThrow(/Invalid battle ally/)
+  })
+})
+
+describe('battle engine v9: Heroes and inherited Limit Breaks (D106, D107)', () => {
+  const v9 = (allies: BattleAlly[], enemies: BattleEnemy[]): BattleInput => ({ version: 9, seed: 7, allies, enemies })
+  const team = (first: Partial<BattleAlly> = {}) => party().map((a, i) => ({ ...a, classRank: a.level, ...(i === 0 ? first : {}) }))
+  const ready = (s: BattleState, id = 'a1') => { unitOf(s, id).limit = BATTLE_LIMIT_MAX; return s }
+  const tough = () => [foe('f1', 'dark', ['bow'], ['light'], 9), foe('f2', 'dark', ['bow'], ['light'], 9)]
+  const dealt = (step: BattleStep) => step.cues.reduce((n, c) => n + (c.kind === 'hit' && c.actorId === 'a1' ? c.amount : 0), 0)
+
+  it('gives a Hero only her seat’s Limit Break, at full strength', () => {
+    const s = () => ready(createBattle(v9(team({ hero: 'brawler-1' }), tough())).state)
+    const step = applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
+    expect(step.cues.find((c) => c.kind === 'limit')).toEqual({ kind: 'limit', actorId: 'a1', targetId: 'f1', label: 'Arsenal Rush' })
+    expect(hits(step, 'f1').map((c) => c.kind === 'hit' && c.element)).toEqual(['greatsword', 'axe', 'lance', 'bow', 'katana'])
+    expect(applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1', hero: 'brawler-1' }).error).toBeUndefined()
+    expect(applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1', hero: 'mage-1' }).error).toBe('invalid-skill')
+    expect(applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1', weapon: 'axe' }).error).toBe('invalid-skill')
+    expect(battleLimitPlan({ ...team()[0]!, hero: 'brawler-1' }, {})).toMatchObject({ capacity: 1 })
+  })
+
+  it('lets a Learner pick an inherited one at 50% plus 5% a Bond Level, naming its Hero, or keep her own', () => {
+    const learner = (bond: number) => team({ inherits: [{ limit: 'brawler-1', bond, from: 'h1' }, { limit: 'mage-2', bond: 0, from: 'h2' }] })
+    const cast = (bond: number, hero?: 'brawler-1' | 'cleric-1') =>
+      applyBattleAction(ready(createBattle(v9(learner(bond), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1', ...(hero ? { hero } : {}) })
+    const hero = applyBattleAction(ready(createBattle(v9(team({ hero: 'brawler-1' }), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
+    expect(cast(0, 'brawler-1').cues.find((c) => c.kind === 'limit')).toMatchObject({ label: 'Arsenal Rush', from: 'h1' })
+    expect(dealt(cast(0, 'brawler-1')) / dealt(hero)).toBeCloseTo(0.5, 1)
+    expect(dealt(cast(4, 'brawler-1')) / dealt(hero)).toBeCloseTo(0.7, 1)
+    expect(dealt(cast(10, 'brawler-1'))).toBe(dealt(hero))
+    expect(battleLimitPlan(learner(6)[0]!, { hero: 'brawler-1' })).toMatchObject({ capacity: 0.8, from: 'h1' })
+    // A Mage's spells from a Brawler: a fused Light-and-Dark hit, magic she has no Tome for.
+    expect(battleLimitPlan(learner(0)[0]!, { hero: 'mage-2' })!.casts[0]!.def.hits[0]!.parts.map((p) => p.kind)).toEqual(['light', 'dark'])
+    expect(cast(0, 'cleric-1').error).toBe('invalid-skill')
+    expect(cast(0).cues.find((c) => c.kind === 'limit')).toMatchObject({ label: 'Twin Strike' })
+  })
+
+  it('casts every one of the twenty, statuses included', () => {
+    for (const id of HERO_LIMIT_IDS) {
+      const step = applyBattleAction(ready(createBattle(v9(team({ hero: id }), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
+      expect(step.error, id).toBeUndefined()
+      expect(dealt(step), id).toBeGreaterThan(0)
+    }
+    const demons = applyBattleAction(ready(createBattle(v9(team({ hero: 'cleric-2' }), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
+    // Hex first, so every Dark claw lands weak.
+    expect(demons.cues.filter((c) => c.kind === 'hit' && c.actorId === 'a1').every((c) => c.kind === 'hit' && c.weak)).toBe(true)
+    const choir = applyBattleAction(ready(createBattle(v9(team({ hero: 'cleric-1' }), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
+    expect(unitOf(choir.state, 'a3').statuses.map((x) => x.kind)).toContain('aegis')
+  })
+
+  it('keeps Heroes out of older fights and checks seats, Bonds and Heroes', () => {
+    const bad = (first: Partial<BattleAlly>) => () => createBattle(v9(team(first), tough()))
+    expect(() => createBattle({ ...v9(team({ hero: 'brawler-1' }), tough()), version: 8 })).toThrow(/Invalid battle ally/)
+    expect(bad({ hero: 'brawler-9' as never })).toThrow(/Invalid battle ally/)
+    expect(bad({ hero: 'brawler-1', inherits: [{ limit: 'mage-1', bond: 0, from: 'h1' }] })).toThrow(/Invalid battle ally/)
+    expect(bad({ inherits: [{ limit: 'mage-1', bond: 11, from: 'h1' }] })).toThrow(/Invalid battle ally/)
+    expect(bad({ inherits: [{ limit: 'mage-1', bond: 1, from: 'h1' }, { limit: 'mage-1', bond: 1, from: 'h2' }] })).toThrow(/Invalid battle ally/)
+    expect(bad({ inherits: ['mage-1', 'mage-2', 'mage-3'].map((limit) => ({ limit: limit as 'mage-1', bond: 0, from: 'h1' })) })).toThrow(/Invalid battle ally/)
+    expect(bad({ inherits: [{ limit: 'mage-1', bond: 3, from: 'h1' }] })).not.toThrow()
+  })
+
+  it('lets Auto fire a Hero’s Limit Break, and a Learner’s first Hero’s when she has none of her own', () => {
+    const hero = ready(createBattle(v9(team({ hero: 'brawler-2' }), tough())).state)
+    expect(autoAction(hero, 'a1')).toMatchObject({ kind: 'limit', hero: 'brawler-2' })
+    // A Summoner with no summon equipped has no Limit Break of her own.
+    const learner = team().map((a, i) => (i === 4 ? { ...a, loadout: [], inherits: [{ limit: 'mage-4' as const, bond: 2, from: 'h1' }] } : a))
+    expect(autoAction(ready(createBattle(v9(learner, tough())).state, 'a5'), 'a5')).toMatchObject({ kind: 'limit', hero: 'mage-4' })
+  })
+
+  it('makes each Limit Break worth her class’s own at full strength', () => {
+    const level = 1.6 // depth 1
+    for (const limit of HERO_LIMITS) {
+      const total = heroLimitSkills(limit, 10).reduce((n, def) => {
+        const factor = def.target === 'all' ? RPG_AOE_SHARE : def.target === 'random' ? RPG_RANDOM_BONUS : 1
+        return n + def.hits.reduce((m, h) => m + h.power / factor, 0) + (def.splash ? def.splash.power / RPG_AOE_SHARE : 0)
+      }, 0)
+      expect(total, limit.id).toBeCloseTo(10, 1)
+    }
+    expect(battleLimitPlan({ ...team()[0]!, hero: 'mage-3' }, {})!.casts[0]!.def.hits.reduce((n, h) => n + h.power, 0)).toBeCloseTo(HERO_LIMIT_POWER.brawler * level, 2)
   })
 })

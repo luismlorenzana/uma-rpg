@@ -167,6 +167,10 @@ export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKin
   edit(import('@rpg/domain/forge'), (d, s, now) => d.wearArmor(s, outfitId, slot, kind, gearId, now))
 /** Marks or unmarks an Uma as a farming target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now) => d.setTarget(s, outfitId, on, now))
+/** The Halls of Heroes (D106): seat or swap a Hero (null empties the seat), and add or remove a Learner. */
+export const appointHero = (seat: string, outfitId: string | null) => edit(import('@rpg/domain/heroes'), (d, s, now) => d.setHero(s, seat, outfitId, now))
+export const addLearner = (seat: string, outfitId: string) => edit(import('@rpg/domain/heroes'), (d, s, now) => d.addLearner(s, seat, outfitId, now))
+export const removeLearner = (seat: string, outfitId: string) => edit(import('@rpg/domain/heroes'), (d, s, now) => d.removeLearner(s, seat, outfitId, now))
 /** Puts a weapon in a class's slot: its Training one (null) or a crafted piece (D98). */
 export const hold = (outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null) =>
   edit(import('@rpg/domain/battle'), (d, s, now) => d.holdWeapon(s, outfitId, classId, slot, weapon, gearId, now))

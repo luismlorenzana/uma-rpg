@@ -1,6 +1,7 @@
 // Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
 // and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
 import { RPG_SKILL_POWER, RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+import { bondCapacity, HERO_LIMIT_POWER, heroLimit, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
 import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
@@ -16,13 +17,24 @@ export const battleLimitGain = (kind: keyof typeof BATTLE_LIMIT_CHARGE): number 
 export const BATTLE_LIMIT_POWER = { mage: 2.4, cleric: 1.5 } as const
 export const BATTLE_LIMIT_NAMES = { mage: 'Prismatic Nova', cleric: 'Divine Patrons', twin: 'Twin Strike', arts: 'Twin Arts', grand: 'Grand Summon' } as const
 
-export interface BattleLimitChoice { skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon }
-/** Each cast resolves at `scale`; a Grand Summon also leaves its summon lingering at `linger`. */
-export interface BattleLimitPlan { name: string; casts: { def: RpgSkillDef; scale: number }[]; linger?: { ref: RpgNodeRef; scale: number } }
+export interface BattleLimitChoice { skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon; hero?: HeroLimitId }
+/** Each cast resolves at `scale`; a Grand Summon also leaves its summon lingering at `linger`. An inherited Limit Break
+ * names the Hero it came from (`from`) and the strength it works at (`capacity`, D106). */
+export interface BattleLimitPlan {
+  name: string; casts: { def: RpgSkillDef; scale: number }[]; linger?: { ref: RpgNodeRef; scale: number }
+  from?: string; capacity?: number
+}
 
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
+
+/** A hero Limit Break at `capacity` of her class's Limit Break power (D106, D107). */
+function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: number, from?: string): BattleLimitPlan {
+  const limit = heroLimit(id)
+  return { name: limit.name, casts: heroLimitSkills(limit, HERO_LIMIT_POWER[ally.classId] * level).map((def) => ({ def, scale: capacity })),
+    capacity, ...(from ? { from } : {}) }
+}
 
 /** The casts this Limit Break makes, or null when the choice names something she can't use. */
 export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): BattleLimitPlan | null {
@@ -30,7 +42,13 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): Ba
   // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level.
   const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.classRank ?? ally.level)) - 1]!
   const known = (ref: unknown) => ref && typeof ref === 'object' ? battleSkillFor(ally, ref as RpgNodeRef) : null
-  const { skill, skills, weapon } = choice
+  const { skill, skills, weapon, hero } = choice
+  // v9 (D106): a Hero has only her seat's Limit Break, at 100%; a Learner may name one she inherits, at 50% + 5% a Bond.
+  if (ally.hero) return skill || skills || weapon || (hero !== undefined && hero !== ally.hero) ? null : heroPlan(ally, ally.hero, level, 1)
+  if (hero !== undefined) {
+    const from = isHeroLimitId(hero) && !skill && !skills && !weapon ? ally.inherits?.find((i) => i.limit === hero) : undefined
+    return from ? heroPlan(ally, from.limit, level, bondCapacity(from.bond), from.from) : null
+  }
   switch (ally.classId) {
     case 'mage': {
       if (skill || skills || weapon) return null

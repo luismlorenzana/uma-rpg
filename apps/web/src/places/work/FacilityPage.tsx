@@ -21,6 +21,7 @@ import type { PageProps, PeekProps } from '../registry'
 import { QueueList } from './QueueList'
 import { TimeCut } from './TimeCut'
 
+const GRADE_ORDER = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
 const SPEED_NOTE: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 
 /** A facility's title and its help: what it makes and what it raises. */
@@ -215,9 +216,11 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   const [error, setError] = useState<string | null>(null)
   const [dishKind, setDishKind] = useState<'planet' | 'duo' | 'feast'>('planet')
   const [readyOnly, setReadyOnly] = useState(false)
+  // Free Umas first, then the highest level here (and the most EXP into it), then the best aptitude for it.
   const owned = view.roster.filter((o) => world.umas[o.outfitId])
-    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession] }))
-    .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || a.o.name.localeCompare(b.o.name))
+    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession], grade: professionAptitude(o, profession) }))
+    .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp ||
+      GRADE_ORDER.indexOf(a.grade) - GRADE_ORDER.indexOf(b.grade) || a.o.name.localeCompare(b.o.name))
   const options = outfit
     ? spec.kind === 'gather'
       ? familyById(spec.family!)!.raw.map((i) => i.id)
@@ -243,15 +246,18 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
       {!outfit && (
         <ul className="space-y-1.5">
           {owned.length === 0 && <li className="text-[14px] text-ink-soft">Unlock Umas at the Stable first.</li>}
-          {owned.map(({ o, block, prof }) => {
-            const grade = professionAptitude(o, profession)
+          {owned.map(({ o, block, prof, grade }) => {
             return (
               <li key={o.outfitId}>
                 <button type="button" disabled={!!block} onClick={() => { setOutfit(o); if (want) { setOutput(want); setCount(Math.min(MAX_JOB_COUNT, wanted?.get(want) ?? 1)) } }} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
                   <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-semibold">{o.name}</span>
-                    <span className="block text-[12px] text-ink-soft">{block ?? `${PROFESSION_SHORT[profession]} Lv ${prof.level} · ${profession === 'farming' ? 'Turf' : 'Dirt'} ${grade} ${SPEED_NOTE[grade]}`}</span>
+                    <span className="block text-[12px] text-ink-soft">{block ?? `${profession === 'farming' ? 'Turf' : 'Dirt'} ${grade} ${SPEED_NOTE[grade]}`}</span>
+                  </span>
+                  <span className="shrink-0 text-center leading-none">
+                    <span className="block font-display text-[20px] font-bold">{prof.level}</span>
+                    <span className="block text-[10px] text-ink-faint">{PROFESSION_SHORT[profession]} Lv</span>
                   </span>
                 </button>
               </li>

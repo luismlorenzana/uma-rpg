@@ -2,8 +2,10 @@
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
-// v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; a v6 fight replays unchanged.
+// v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; v8 ranks, Might, Barrier and Regen
+// (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106). Older fights replay unchanged.
 import { rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
   isRpgDamageKind, isRpgTome, RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey,
   rpgWeaponKind, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
@@ -95,8 +97,9 @@ function validMove(m: BattleEnemyMove): boolean {
 
 /** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
  * weapons' Might, her armor's Barrier and Regen (D102, D104). */
-function validAlly(a: BattleAlly, version: 6 | 7 | 8): boolean {
+function validAlly(a: BattleAlly, version: 6 | 7 | 8 | 9): boolean {
   const v8 = version >= 8
+  if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
   if (v8 && (!safeInt(a.classRank, 1, 50) || a.maxDepth !== undefined || (a.barrier !== undefined && !safeInt(a.barrier, 0, 100_000)) ||
     (a.regen !== undefined && !safeInt(a.regen, 0, 10_000)) || (a.might !== undefined && (typeof a.might !== 'object' || a.might === null ||
@@ -112,7 +115,16 @@ function validAlly(a: BattleAlly, version: 6 | 7 | 8): boolean {
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
 }
-function validEnemy(e: BattleEnemy, version: 6 | 7 | 8): boolean {
+/** v9 (D106): a Hero has her seat and no Heroes of her own; a Learner at most two different seats, each with a Bond Level. */
+function validHeroes(a: BattleAlly): boolean {
+  if (a.hero !== undefined && (!isHeroLimitId(a.hero) || a.inherits !== undefined)) return false
+  if (a.inherits === undefined) return true
+  return Array.isArray(a.inherits) && a.inherits.length >= 1 && a.inherits.length <= LEARNER_MAX_PARENTS &&
+    new Set(a.inherits.map((i) => i?.limit)).size === a.inherits.length &&
+    a.inherits.every((i) => !!i && typeof i === 'object' && Object.keys(i).length === 3 && isHeroLimitId(i.limit) &&
+      safeInt(i.bond, 0, BOND_MAX_LEVEL) && typeof i.from === 'string' && SAFE_ID.test(i.from) && i.from !== a.id)
+}
+function validEnemy(e: BattleEnemy, version: 6 | 7 | 8 | 9): boolean {
   const w = e.weaknesses
   if (e.element2 !== undefined && (version < 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
   if (e.twice !== undefined && (version < 7 || typeof e.twice !== 'boolean')) return false
@@ -128,9 +140,9 @@ function validEnemy(e: BattleEnemy, version: 6 | 7 | 8): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8 } as const
 function validateInput(input: BattleInput): void {
-  if (!input || (input.version !== 6 && input.version !== 7 && input.version !== 8) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || ![6, 7, 8, 9].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
@@ -547,7 +559,7 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if ((previous.engineVersion !== 6 && previous.engineVersion !== 7 && previous.engineVersion !== 8) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if (![6, 7, 8, 9].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)
@@ -570,10 +582,10 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     // A full charge and her turn, at 0 MP (D311).
     if (target.side !== 'enemy') return invalid(previous, 'invalid-target')
     if (actor.limit < BATTLE_LIMIT_MAX || battleActionsUsed(s, actor.id) > 0) return invalid(previous, 'limit-not-ready')
-    const plan = battleLimitPlan(ally, { skill: action.skill, skills: action.skills, weapon: action.weapon })
+    const plan = battleLimitPlan(ally, { skill: action.skill, skills: action.skills, weapon: action.weapon, hero: action.hero })
     if (!plan) return invalid(previous, 'invalid-skill')
     actor.limit = 0
-    cues.push({ kind: 'limit', actorId: actor.id, targetId: target.id, label: plan.name })
+    cues.push({ kind: 'limit', actorId: actor.id, targetId: target.id, label: plan.name, ...(plan.from ? { from: plan.from } : {}) })
     if (plan.linger) linger(s, actor, ally, target, cues)
     plan.casts.forEach((c, i) => {
       const foes = living(s, 'enemy')

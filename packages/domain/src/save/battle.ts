@@ -30,6 +30,7 @@ import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { workOf } from './status'
+import { heroFields, payBonds, type BondGain } from './heroes'
 
 /** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
 export interface BattleOutfit {
@@ -239,7 +240,8 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
     const orb = equippedOrb(uma.gear.equipped)
     const { barrier, regen } = equippedGuard(uma.gear.equipped)
     return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      ...(orb ? { orb } : {}), points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons), barrier, regen }
+      ...(orb ? { orb } : {}), points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons), barrier, regen,
+      ...heroFields(world, id) }
   })
   try {
     return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)
@@ -268,10 +270,12 @@ export interface FightResult {
 
 /** One bar a member filled: which, how much EXP, and the track before and after. */
 export interface RankGain { ref: RankRef; exp: number; before: RankTrack; after: RankTrack }
-/** What a won fight paid one member: Uma EXP and levels, Shards, and her Class, Weapon and Armor bars (D102). */
+/** What a won fight paid one member: Uma EXP and levels, Shards, her Class, Weapon and Armor bars (D102), and her Bonds
+ * with the Heroes she learns under (D106). */
 export interface MemberGain {
   outfitId: string; exp: number; beforeLevel: number; afterLevel: number; afterExp: number; shards: number
   ranks: RankGain[]
+  bonds: BondGain[]
 }
 /** Who fought, as what, with which weapons, and which of them she used. */
 export interface Entrant { outfitId: string; classId: RpgClass; weapons: readonly RpgWeapon[]; used: ReadonlySet<RpgWeapon> }
@@ -335,7 +339,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
  * Pays a won fight to its entrants (D102). Each earns her Uma EXP `E` (a share of her own level, less when the foes are
  * below her, times `share` on a replay, D79) and with it fills her bars: 2E to the class she fought as, 5E over her five
  * weapons (double for each she used), E to each of her five armor kinds. EXP past a max rank banks at half rate as
- * Marks. A Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
+ * Marks. A Learner's Bonds fill too (D106). A Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
  */
 export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
   tier = TIER_ONE, share = 1): { world: TierWorld; members: MemberGain[]; shards: number; tickets: number; laurels: number; gearMarks: number; classMarks: number } {
@@ -363,8 +367,11 @@ export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind
     fill({ kind: 'class', id: e.classId }, CLASS_EXP_SHARE * exp)
     for (const [w, n] of Object.entries(weaponExpShares(e.weapons, e.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
     for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
-    umas[e.outfitId] = { ...uma, level: gained.level, exp: gained.exp, ranks }
-    members.push({ outfitId: e.outfitId, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got, ranks: gains })
+    // Bonds (D106) pay by the stage alone: every won fight counts, replays and Sweeps too.
+    const bonded = payBonds(world, e.outfitId, { ...uma, level: gained.level, exp: gained.exp, ranks }, kind)
+    umas[e.outfitId] = bonded.uma
+    members.push({ outfitId: e.outfitId, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got, ranks: gains,
+      bonds: bonded.gains })
     shards += got
   }
   const pooled = world.wallet.shards + shards

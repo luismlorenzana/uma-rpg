@@ -14,6 +14,7 @@ code as it runs on https://uma-rpg.web.app. Specs, plans and history live elsewh
 | [Combat](combat.md) | Rounds, actions, the damage formula, weaknesses and Breaks, statuses, Limit Breaks, foes, constants |
 | [Classes and weapons](classes.md) | The five classes, ten weapons, weapon and armor slots, skill depths, points and slots, the four bars |
 | [Skill trees](skill-trees.md) | All 40 trees, every node with its cost, MP and effect |
+| [Halls of Heroes](heroes.md) | Heroes, Learners, Bonds and the twenty unique Limit Breaks |
 | [Materials](materials.md) | The 16 families and 320 items, dishes, the 28 gear types and their recipes |
 | [The world map](maps.md) | Biomes, signatures, formations and waves, continents and regions, faces |
 

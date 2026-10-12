@@ -1,5 +1,6 @@
-// Campaign battle vocabulary, engine v7 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311).
-// v6 fights (five foes at most, one wave) still replay unchanged.
+// Campaign battle vocabulary, engine v9 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106). Older fights still replay unchanged.
+import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
 export type BattleSide = 'ally' | 'enemy'
@@ -36,7 +37,13 @@ export interface BattleAlly {
   evasion?: number
   /** Limit Break charge she starts the fight with, from Limit Break points (S6, S7). */
   limitStart?: number
+  /** v9 (D106): she is the Hero of this seat, and her Limit Break is always its unique one, at full strength. */
+  hero?: HeroLimitId
+  /** v9: the Heroes she learns under (two at most): each seat's Limit Break, her Bond Level with it, and the Hero. */
+  inherits?: BattleInherit[]
 }
+/** An inherited Limit Break (D106): it works at 50% plus 5% a Bond Level; `from` is the Hero's outfit, for the cut-in. */
+export interface BattleInherit { limit: HeroLimitId; bond: number; from: string }
 export interface BattleEnemyStats { hp: number; atk: number; matk: number; pdef: number; mdef: number; initiative: number }
 export interface BattleEnemyMove {
   id: string
@@ -71,7 +78,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8
+  version: 6 | 7 | 8 | 9
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -101,7 +108,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8
+  engineVersion: 6 | 7 | 8 | 9
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */
@@ -125,15 +132,17 @@ export type BattleAction =
   /**
    * A Limit Break spends a full charge and her turn (D311). A Brawler names a skill to cast twice (or a weapon to
    * strike twice), a Summoner a summon, a Spell Blade an Arms skill and a Tome skill (`skills`); Mages and Clerics have
-   * a fixed one.
+   * a fixed one. A Learner may name an inherited one instead (`hero`, v9); a Hero has only her own.
    */
-  | { kind: 'limit'; actorId: string; targetId: string; skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon }
+  | { kind: 'limit'; actorId: string; targetId: string; skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon; hero?: HeroLimitId }
 export type BattleCue =
   | { kind: 'intent'; actorId: string; targetId: string; label: string }
   | { kind: 'hit'; actorId: string; targetId: string; amount: number; channel: BattleChannel | 'status';
       element: RpgDamageKind | null; weak: boolean; label?: string }
-  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'mp' | 'limit' | 'summon' | 'wave';
+  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'mp' | 'summon' | 'wave';
       actorId: string; targetId: string; amount?: number; label?: string }
+  /** A Limit Break: its name, and for an inherited one the Hero it came from (D106). */
+  | { kind: 'limit'; actorId: string; targetId: string; label: string; from?: string; amount?: undefined }
   | { kind: 'result'; label: 'victory' | 'loss' }
 export type BattleError = 'terminal' | 'invalid-actor' | 'already-acted' | 'invalid-target' |
   'invalid-skill' | 'insufficient-mp' | 'invalid-state' | 'limit-not-ready'

@@ -30,10 +30,11 @@ export function rpgRestAtCamp(chapter: RpgCampaignChapter, run: RpgRun, campId: 
 }
 
 /** A party member as she enters a fight: her profile, her class's equipped skills, her Orb's kind, her stat points, her
- * weapons' Might and her armor's Barrier and Regen (D104). */
+ * weapons' Might and her armor's Barrier and Regen (D104), and her Hero seat or inherited Limit Breaks (D106). */
 export interface RpgPartyMember {
   profile: RpgProfile; loadout: RpgProfile['tree']; orb?: BattleInput['allies'][number]['orb']; points?: Points
   might?: BattleInput['allies'][number]['might']; barrier?: number; regen?: number
+  hero?: BattleInput['allies'][number]['hero']; inherits?: BattleInput['allies'][number]['inherits']
 }
 
 export const rpgMemberLevel = (profile: Pick<RpgProfile, 'tier' | 'level'>): number => rpgLifetimeLevels(profile.tier, profile.level) + 1
@@ -49,8 +50,8 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
-/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v8: Class Ranks, Might,
- * Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
+/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v9: Heroes and
+ * Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
 export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, nodeId: string,
   party: readonly RpgPartyMember[], now: string): RpgRun {
   const node = chapter.nodes.find((n) => n.id === nodeId)
@@ -60,14 +61,15 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
-    version: 8, seed: seedOf(battleId),
-    allies: party.map(({ profile, loadout, orb, points, might, barrier, regen }) => {
+    version: 9, seed: seedOf(battleId),
+    allies: party.map(({ profile, loadout, orb, points, might, barrier, regen, hero, inherits }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
       return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
         tree: profile.tree, legacy: profile.legacy, loadout, ...(orb ? { orb } : {}), mp: rpgCarriedMp(run, profile, points),
         classRank: profile.classRank,
         ...(might && Object.keys(might).length ? { might } : {}), ...(barrier ? { barrier } : {}), ...(regen ? { regen } : {}),
-        ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}) }
+        ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
+        ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }
     }),
     enemies: node.enemies,
     ...(node.waves?.length ? { waves: node.waves } : {}),

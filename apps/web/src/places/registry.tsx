@@ -1,7 +1,7 @@
 // What each place shows (D43): a quick look in the side panel (Peek), a full page (Page) and a header counter. Places
 // without a Peek use the honest preview; places without a Page have no Enter button. Every body is a lazy chunk.
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
-import { FACILITIES, type Place } from '@rpg/domain'
+import { FACILITIES, HERO_HALLS, type Place } from '@rpg/domain'
 
 export interface PeekProps {
   place: Place
@@ -57,3 +57,8 @@ const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ def
 for (const f of FACILITIES) {
   if (f.kind === 'gather' || f.kind === 'refine' || f.kind === 'cook' || f.kind === 'craft') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
 }
+
+// The five Halls of Heroes share one page (D106).
+const HallPage = lazy(() => import('./halls/HallPage'))
+const HallPeek = lazy(() => import('./halls/HallPage').then((m) => ({ default: m.HallPeek })))
+for (const id of Object.values(HERO_HALLS)) PLACE_UI[id] = { Peek: HallPeek, Page: HallPage }

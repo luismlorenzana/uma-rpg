@@ -18,6 +18,10 @@ import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
 import { EFFECT_LABEL, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES, itemById } from '../items/catalog'
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
 import * as K from '../rpg/battle/skills'
+import {
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitKinds,
+  LEARNER_MAX_PARENTS,
+} from '../rpg/heroes'
 import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
 import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
 import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
@@ -121,6 +125,24 @@ function skillTrees(): string {
 function limits(): string {
   return table(['Class', 'Limit Break'], RPG_CLASSES.map((c) => [CLASS_NAME[c], LIMIT_OF[c]])) + '\n\n' +
     `The gauge fills to ${BATTLE_LIMIT_MAX}: +${BATTLE_LIMIT_CHARGE.attack} for an Attack, +${BATTLE_LIMIT_CHARGE.skill} for a skill. A Limit Break costs no MP and takes her turn.`
+}
+
+/** The Halls of Heroes (D106, D107): every seat's Limit Break, and the Bond numbers. */
+function heroes(): string {
+  const hall = (c: RpgClass) => placeById(HERO_HALLS[c])?.name ?? c
+  const shape = (target: string) => (target === 'all' ? 'every foe' : target === 'random' ? 'random foes' : 'one foe')
+  return table(['Hall', 'Seat', 'Limit Break', 'Kinds', 'What it does', 'Casts'], HERO_LIMITS.map((l) => [
+    `${hall(l.classId)} (${CLASS_NAME[l.classId]})`, l.id.slice(l.id.lastIndexOf('-') + 1), l.name, heroLimitKinds(l).join(', '), l.blurb,
+    l.casts.map((c) => [c.hits.length ? `${c.hits.length} hit${c.hits.length === 1 ? '' : 's'} on ${shape(c.target)}` : '', c.splash ? 'splash' : '',
+      c.status ? `${c.status.key} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '']
+      .filter(Boolean).join(' + ')).join('; '),
+  ])) + '\n\n' + table(['Setting', 'Value'], [
+    ['Seats', `4 per hall, ${HERO_LIMITS.length} in all; a Hero sits in one seat`],
+    ['Learners', `${HERO_MAX_LEARNERS} per Hero; ${LEARNER_MAX_PARENTS} Heroes per Learner; a Hero is never a Learner`],
+    ['Power at 100%', `her own class's Limit Break, in single-target casts at her open depth: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${HERO_LIMIT_POWER[c]}×`).join(', ')}`],
+    ['Learner strength', `${bondCapacity(0) * 100}% at Bond 0, +5% a Bond Level, ${bondCapacity(BOND_MAX_LEVEL) * 100}% at Bond ${BOND_MAX_LEVEL}`],
+    ['Bond EXP per won fight', `${BOND_EXP_PER_WIN.fight} a stage, ${BOND_EXP_PER_WIN.boss} an elite or boss, toward each of her Heroes; ${BOND_EXP_TO_NEXT} a level (Sweeps and replays count)`],
+  ])
 }
 
 function battleConstants(): string {
@@ -331,7 +353,7 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 /** Every block a doc may embed, by key. */
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
-    classes, weapons, depths, 'skill-trees': skillTrees, limits, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
+    classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, formations, continents,
     'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,

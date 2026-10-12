@@ -138,10 +138,12 @@ const WILDS: Place[] = [
   },
 ]
 
-/** The Learning District's halls stopped training when fights began filling every rank (D102); they wait for the
- * owner's Inheritance feature, closed (S8). */
+/** The Learning District's class halls are its Halls of Heroes (D106): four Hero seats each, each seat's Hero with up to
+ * ten Learners who inherit her unique Limit Break. */
 function hall(id: string, name: string, cls: string, at: { x: number; y: number }): Place {
-  return { id, page: 'learning', kind: 'class-hall', name, opensIn: 'S8', slots: 0, at, blurb: `The ${cls} hall.`, details: [] }
+  return { id, page: 'learning', kind: 'class-hall', name, opensIn: 'S7', slots: 4, at,
+    blurb: `The ${cls} Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners.`,
+    details: ['A Hero always uses her seat’s Limit Break, at full strength.', 'Learners inherit it at 50%, plus 5% a Bond Level.'] }
 }
 
 const LEARNING: Place[] = [

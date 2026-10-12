@@ -1,7 +1,7 @@
 # Combat
 
-How a fight works today: engine v8 (D104: Class Ranks, Might, Barrier and Regen; v6 and v7 fights still replay as
-they were). Every number below comes from the code. The tables between `live` markers are
+How a fight works today: engine v9 (D106: Heroes and inherited Limit Breaks; D104: Class Ranks, Might, Barrier and
+Regen; v6–v8 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -125,6 +125,9 @@ add riders (a status on each foe hit) or Barriers; their rows in [skill trees](s
 
 The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn.
 <!-- /live -->
+
+A **Hero** (D106) has only her seat's unique Limit Break, at full strength. A **Learner** may use either of her Heroes'
+instead of her own, at 50% plus 5% a Bond Level, with its whole shape. See [Halls of Heroes](heroes.md).
 
 ## Foes
 

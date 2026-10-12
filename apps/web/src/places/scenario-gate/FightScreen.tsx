@@ -58,9 +58,13 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         const member = campaign.cast.byId.get(e.castId)
         return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null) }
       })),
-    ]).then(([allies, enemies]) => {
+      // The Heroes behind the party's inherited Limit Breaks, for the cut-in (D106).
+      Promise.all([...new Set(state.input.allies.flatMap((a) => (a.inherits ?? []).map((i) => i.from)))]
+        .filter((id) => !state.input.allies.some((a) => a.id === id))
+        .map(async (id) => ({ id, bust: await maybe(path('outfit-busts', id)) }))),
+    ]).then(([allies, enemies, heroes]) => {
       const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
-      if (live) setSetup({ allies, enemies, field, color: campaign.color(chapter.id), reducedMotion })
+      if (live) setSetup({ allies, enemies, field, color: campaign.color(chapter.id), reducedMotion, heroes })
     })
     return () => {
       live = false
@@ -475,16 +479,29 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
             ) : (
               <ul className="space-y-1.5">
                 <li className="text-[12px] text-ink-soft">{pick === 2 ? `Pick an Arms skill and a Tome skill · ${limitPicks.length}/2` : 'Pick one, then tap a rival'}</li>
-                {options.map((o) => (
+                {options.map((o, i) => (
                   <li key={o.key}>
+                    {o.face && o.face !== id && !options[i - 1]?.face && <p className="text-micro mb-1.5 mt-1">From her Heroes</p>}
                     <button type="button" onClick={() => {
-                      if (pick === 1) return choose(o.choice)
+                      if (pick === 1 || o.instant) return choose(o.choice)
                       const picks = [...limitPicks, o.choice.skills![0]!]
                       if (picks.length < 2) return setLimitPicks(picks)
                       choose({ skills: picks })
-                    }} className="flex min-h-14 w-full items-center justify-between gap-2 rounded-sm border border-[#ffd84d]/40 bg-raised p-3 text-left">
-                      <span><span className="block font-semibold">{o.name}</span><span className="block text-[11px] text-ink-soft">{o.detail}</span></span>
-                      <span className="text-[13px] font-semibold text-[#ffd84d]">0 MP</span>
+                    }} className="flex min-h-14 w-full items-center gap-2.5 rounded-sm border border-[#ffd84d]/40 bg-raised px-2.5 py-2 text-left">
+                      {o.face && (
+                        <span className="shrink-0 overflow-hidden rounded-full ring-1 ring-[#ffd84d]/80" title={name(o.face)}>
+                          <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={o.face} size={26} />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold leading-5">{o.name}</span>
+                        <span className="flex items-center gap-1 py-0.5">{o.kinds.map((k) => <KindMark key={k} kind={k} size={12} />)}</span>
+                        <span className="block text-[11px] leading-4 text-ink-soft">{o.detail}</span>
+                      </span>
+                      <span className="shrink-0 text-right text-[13px] font-semibold text-[#ffd84d]">
+                        {o.strength !== undefined && o.strength < 1 ? `${Math.round(o.strength * 100)}%` : o.strength === 1 && o.face !== id ? '100%' : ''}
+                        <span className="block text-[11px] font-normal text-ink-soft">0 MP</span>
+                      </span>
                     </button>
                   </li>
                 ))}

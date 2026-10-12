@@ -76,7 +76,14 @@ function mergeGains(all: readonly MemberGain[]): MemberGain {
       if (same) { same.exp += g.exp; same.after = g.after } else ranks.push({ ...g })
     }
   }
-  return { ...last, beforeLevel: all[0]!.beforeLevel, exp: all.reduce((n, x) => n + x.exp, 0), shards: all.reduce((n, x) => n + x.shards, 0), ranks }
+  const bonds: MemberGain['bonds'] = []
+  for (const m of all) {
+    for (const g of m.bonds) {
+      const same = bonds.find((b) => b.limit === g.limit)
+      if (same) { same.exp += g.exp; same.after = g.after } else bonds.push({ ...g })
+    }
+  }
+  return { ...last, beforeLevel: all[0]!.beforeLevel, exp: all.reduce((n, x) => n + x.exp, 0), shards: all.reduce((n, x) => n + x.shards, 0), ranks, bonds }
 }
 
 /** Sweeps the same stage up to `times` times (stopping when tickets run out), adding up what each paid. */

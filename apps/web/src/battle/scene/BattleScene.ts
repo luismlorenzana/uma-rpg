@@ -16,6 +16,8 @@ export interface StageSetup {
   /** The region's colour, `#RRGGBB`. */
   color: string
   reducedMotion: boolean
+  /** Busts of the Heroes the party's Learners inherit from, for their Limit Break cut-ins (D106). */
+  heroes?: { id: string; bust: HTMLImageElement | null }[]
 }
 
 const KIND_COLOR: Readonly<Record<RpgDamageKind, number>> = {
@@ -73,6 +75,7 @@ export class BattleScene extends Phaser.Scene {
     this.cssSize = { w: cssW, h: cssH }
     for (const a of setup.allies) this.addTexture(`ally-${a.id}`, a.idle).addTexture(`cheer-${a.id}`, a.cheer).addTexture(`bust-${a.id}`, a.bust)
     for (const e of setup.enemies) this.addTexture(`foe-${e.id}`, e.art)
+    for (const h of setup.heroes ?? []) this.addTexture(`bust-${h.id}`, h.bust)
     this.drawBackground()
     this.layer.removeAll(true)
     this.actors.clear()
@@ -265,7 +268,7 @@ export class BattleScene extends Phaser.Scene {
         this.ring(cue.targetId, 0xdfe8f3)
         return this.wait(300)
       case 'limit':
-        return this.cutIn(cue.actorId, cue.label ?? '')
+        return this.cutIn(cue.actorId, cue.label ?? '', cue.from)
       case 'summon':
         // A Summoner's lingering summon strikes again before it leaves (D86).
         this.burst(cue.actorId, 0xc79bff, 14, -1)
@@ -439,8 +442,9 @@ export class BattleScene extends Phaser.Scene {
     await this.wait(380)
   }
 
-  /** A Union Burst-style cut-in: a dark band, her bust sliding across and the Limit Break's name. */
-  private async cutIn(id: string, name: string): Promise<void> {
+  /** A Union Burst-style cut-in: a dark band, her bust sliding across and the Limit Break's name. An inherited Limit Break
+   * shows the Hero it came from (D106). */
+  private async cutIn(id: string, name: string, from?: string): Promise<void> {
     const { w, h } = this.cssSize
     const d = this.dpr
     const bandH = h * 0.34 * d
@@ -450,7 +454,7 @@ export class BattleScene extends Phaser.Scene {
     this.fx.add([band, stripe])
     this.tweens.add({ targets: band, scaleY: 1, duration: 140, ease: 'Quad.easeOut' })
     this.tweens.add({ targets: stripe, scaleX: 1, duration: 260 })
-    const key = `bust-${id}`
+    const key = from && this.textures.exists(`bust-${from}`) ? `bust-${from}` : `bust-${id}`
     let bust: Phaser.GameObjects.Image | null = null
     if (this.textures.exists(key)) {
       bust = this.add.image(-w * 0.3 * d, y + bandH / 2, key).setOrigin(0.5, 1)
@@ -458,7 +462,7 @@ export class BattleScene extends Phaser.Scene {
       this.fx.add(bust)
       this.tweens.add({ targets: bust, x: w * 0.3 * d, duration: 320, ease: 'Cubic.easeOut' })
     }
-    const title = this.text(w * 0.68 * d, y - 12 * d, 'LIMIT BREAK', '#ffd84d', 20).setAlpha(0)
+    const title = this.text(w * 0.68 * d, y - 12 * d, from ? 'INHERITED' : 'LIMIT BREAK', '#ffd84d', 20).setAlpha(0)
     const sub = this.text(w * 0.68 * d, y + 14 * d, name, '#ffffff', 15).setAlpha(0)
     this.tweens.add({ targets: [title, sub], alpha: 1, x: `-=${12 * d}`, duration: 260, delay: 120 })
     this.burst(id, 0xffd84d, 20, -1)

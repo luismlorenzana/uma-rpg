@@ -40,6 +40,10 @@
     "./targets": {
       "require": { "types": "./dist/cjs/save/targets.d.ts", "default": "./dist/cjs/save/targets.js" },
       "default": { "types": "./src/save/targets.ts", "default": "./src/save/targets.ts" }
+    },
+    "./heroes": {
+      "require": { "types": "./dist/cjs/save/heroes.d.ts", "default": "./dist/cjs/save/heroes.js" },
+      "default": { "types": "./src/save/heroes.ts", "default": "./src/save/heroes.ts" }
     }
   },
   "scripts": {

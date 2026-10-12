@@ -1,7 +1,9 @@
 // The tappable, accessible layer over the Phaser map (D33): one button per place at its registry position, with its
-// name, its Uma slots (the face of whoever works there, ringed by her job's progress, D22) and the slice badge. The
-// canvas underneath only draws.
-import { CURRENT_SLICE, facilityOf, facilitySpec, isOpen, jobFinished, jobProgress, type Place, type TierWorld } from '@rpg/domain'
+// name, its Uma slots (the face of whoever works there, ringed by her job's progress, D22; a hall's four Heroes, D106) and
+// the slice badge. The canvas underneath only draws.
+import {
+  CURRENT_SLICE, facilityOf, facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, isOpen, jobFinished, jobProgress, type Place, type TierWorld,
+} from '@rpg/domain'
 import { useEffect, useRef, useState } from 'react'
 import { AtlasSprite } from '../master/art'
 import { useMaster } from '../master/master'
@@ -68,7 +70,12 @@ export function PlaceTargets({ places, onOpen }: { places: Place[]; onOpen: (pla
             )}
             {place.slots > 0 && (
               <span className="mt-0.5 flex gap-1" aria-hidden="true">
-                {(open && world && facilitySpec(place.id) ? facilityOf(world, place.id).jobs : Array.from({ length: place.slots }, () => null)).map((job, i) =>
+                {open && world && hallClass(place.id) ? HERO_LIMIT_IDS.filter((id) => heroLimitClass(id) === hallClass(place.id)).map((id) => {
+                  const hero = world.heroes[id]?.hero
+                  return hero ? (
+                    <span key={id} className="rounded-full bg-[#ffd84d] p-[2px]"><AtlasSprite art={art} family="outfit-icons" frameKey={hero} size={18} className="rounded-full" /></span>
+                  ) : <span key={id} className="mt-[5px] size-2 rounded-full border border-white/50 bg-black/30" />
+                }) : (open && world && facilitySpec(place.id) ? facilityOf(world, place.id).jobs : Array.from({ length: place.slots }, () => null)).map((job, i) =>
                   job ? (
                     <span key={i} className="rounded-full p-[2px]" style={{ background: `conic-gradient(#d6a23e ${jobProgress(job, now) * 360}deg, rgb(255 255 255 / 0.18) 0)` }}>
                       <AtlasSprite art={art} family="outfit-icons" frameKey={job.outfitId} size={18} className="rounded-full" />

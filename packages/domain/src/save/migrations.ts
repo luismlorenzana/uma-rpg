@@ -203,7 +203,19 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
   const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
   const v16 = version < 16 && isRecord(v15) ? toV16(v15) : v15
-  return version < 18 && isRecord(v16) ? toV18(v16, version) : v16
+  const v18 = version < 18 && isRecord(v16) ? toV18(v16, version) : v16
+  return version < 19 && isRecord(v18) ? toV19(v18) : v18
+}
+
+// --- v18 → v19 (D106) --------------------------------------------------------------------------------------------------
+
+/** The Halls of Heroes open empty and nobody has a Bond yet; the owner's five Unlock Tickets for them (D106). */
+export const V19_UNLOCK_TICKETS = 5
+function toV19(world: Record<string, unknown>): Record<string, unknown> {
+  const umas = isRecord(world.umas) ? Object.fromEntries(Object.entries(world.umas).map(([id, u]) => [id, isRecord(u) ? { ...u, bonds: {} } : u])) : world.umas
+  const wallet = isRecord(world.wallet) && typeof world.wallet.unlockTickets === 'number'
+    ? { ...world.wallet, unlockTickets: world.wallet.unlockTickets + V19_UNLOCK_TICKETS } : world.wallet
+  return { ...world, umas, wallet, heroes: {} }
 }
 
 // --- v17 → v18 (D102–D105) ---------------------------------------------------------------------------------------------

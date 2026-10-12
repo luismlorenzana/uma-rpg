@@ -1,6 +1,9 @@
 // What a fight paid (D51, D102): EXP and levels for all five with every bar she filled (her class, five weapons, five
-// armor kinds), Laurels, Marks, Shards at Lv10/20/30/40/50 and any Ticket they made.
-import { rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter, type RpgClass } from '@rpg/domain'
+// armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Shards at Lv10/20/30/40/50 and any Ticket they made.
+import {
+  BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
+  type RpgClass,
+} from '@rpg/domain'
 import { Bar, CLASS_LABEL } from '../../battle/labels'
 import type { Campaign } from '../../battle/campaign'
 import { AtlasSprite } from '../../master/art'
@@ -66,6 +69,19 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                     {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
                     <RankCells label="Weapon Ranks" cells={cells('weapon')} />
                     <RankCells label="Armor Ranks" cells={cells('armor')} />
+                    {(m.bonds ?? []).map((b) => {
+                      const bondUp = b.after.level > b.before.level
+                      const top = b.after.level >= BOND_MAX_LEVEL
+                      return (
+                        <div key={b.limit} className="text-[12px]">
+                          <p className="flex items-baseline justify-between gap-2">
+                            <span className="truncate">Bond · {heroLimit(b.limit).name} <span className="font-semibold">{b.after.level}</span>{top ? ' · Max' : ''}</span>
+                            <span className={`shrink-0 ${bondUp ? 'font-semibold text-accent' : 'text-ink-faint'}`}>{bondUp ? `Bond up! ${b.before.level} → ${b.after.level}` : `+${b.exp}`}</span>
+                          </p>
+                          <Bar className="mt-0.5" value={top ? 1 : b.after.exp} max={top ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
+                        </div>
+                      )
+                    })}
                   </li>
                 )
               })}

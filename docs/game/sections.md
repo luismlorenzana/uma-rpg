@@ -62,11 +62,11 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Brawler Dojo | `brawler-dojo` | class-hall | — | The Brawler hall. |
-| Mage Tower | `mage-tower` | class-hall | — | The Mage hall. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | — | The Spell Blade hall. |
-| Cleric Chapel | `cleric-chapel` | class-hall | — | The Cleric hall. |
-| Summoner Circle | `summoner-circle` | class-hall | — | The Summoner hall. |
+| Brawler Dojo | `brawler-dojo` | class-hall | 4 | The Brawler Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Mage Tower | `mage-tower` | class-hall | 4 | The Mage Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
 | Armory | `armory` | armory | — | Arms and armor on display. |
 | Jeweler | `jeweler` | armory | — | Orbs and fine settings. |
 
@@ -89,7 +89,8 @@ Farmlands and Wilds mirror each other site for site:
 
 ### Facilities
 
-Every site, station and hall is a facility: Uma slots, a level, jobs ([loops](loops.md#professions)).
+Every site and station is a facility: Uma slots, a level, jobs ([loops](loops.md#professions)). The halls seat Heroes
+instead ([Halls of Heroes](heroes.md)).
 
 <!-- live:facilities -->
 | Place | Job | Profession | Makes | Upgraded with |
@@ -129,13 +130,16 @@ the Forge:
   - −30m and Finish (Time Tickets);
   - Recall;
   - a queue of up to three.
-- **Assigning:** pick an Uma, then what to make, then how many (1–10).
+- **Assigning:** pick an Uma (free ones first, then the highest level here, its EXP and her aptitude; the level shows
+  on the right), then what to make, then how many (1–10).
 - **Kitchen:** tabs for Dishes, Duo, Feasts and "Can cook now".
 - **Forge:** a type picker (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs), then grade, and an accent for
   armor (D103).
 
-**The Learning page** is closed (D102): its halls stopped training when fights began filling every rank. It waits for
-the Inheritance feature.
+**The Learning page** holds the five Halls of Heroes (D106), one page shared by all five (`places/halls/HallPage.tsx`).
+Each shows its four seats: the seat's Limit Break with its kinds, its Hero large on the left, and her Learners below with
+their Bond Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty the seat, `+` to add a Learner, and a
+Learner to see her Bond or send her away. The Armory and Jeweler stay closed. See [Halls of Heroes](heroes.md).
 
 ## Town
 

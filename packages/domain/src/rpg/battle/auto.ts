@@ -19,7 +19,13 @@ const attackDef = (weapon: RpgWeapon): RpgSkillDef => ({
   target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(weapon), share: 1 }] }], mp: 0, primary: rpgWeaponKind(weapon),
 })
 
+/** The menu's first Limit Break: a Hero's own (D106), else her class's first, else her first Hero's. */
 function firstLimitChoice(state: BattleState, actor: BattleAlly): BattleLimitChoice | null {
+  if (actor.hero) return { hero: actor.hero }
+  const own = classLimitChoice(state, actor)
+  return own ?? (actor.inherits?.[0] ? { hero: actor.inherits[0].limit } : null)
+}
+function classLimitChoice(state: BattleState, actor: BattleAlly): BattleLimitChoice | null {
   const skills = actor.loadout.flatMap((ref) => battleActorSkill(state, actor.id, ref) ? [ref] : [])
   if (actor.classId === 'mage' || actor.classId === 'cleric') return {}
   if (actor.classId === 'brawler') return skills[0] ? { skill: skills[0] } : actor.weapons[0] ? { weapon: actor.weapons[0] } : null

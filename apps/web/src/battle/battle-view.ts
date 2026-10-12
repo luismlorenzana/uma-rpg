@@ -2,11 +2,11 @@
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half.
 import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill,
-  battleLimitPlan, isRpgTome,
+  battleLimitPlan, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
-  type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
+  type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 
-import { WEAPON_LABEL } from './labels'
+import { skillKinds, WEAPON_LABEL } from './labels'
 
 export type BattleMode = { kind: 'attack'; weapon?: RpgWeapon; pair?: BattleHalf } | { kind: 'guard' } | { kind: 'skill'; ref: RpgNodeRef; pair?: BattleHalf }
   | ({ kind: 'limit'; name: string } & BattleLimitChoice)
@@ -42,7 +42,7 @@ export const halfIsTome = (half: BattleHalf, choices: readonly SkillChoice[]): b
 
 export function actionFor(mode: BattleMode, actorId: string, targetId: string): BattleAction {
   if (mode.kind === 'limit') return { kind: 'limit', actorId, targetId, ...(mode.skill ? { skill: mode.skill } : {}),
-    ...(mode.skills ? { skills: mode.skills } : {}), ...(mode.weapon ? { weapon: mode.weapon } : {}) }
+    ...(mode.skills ? { skills: mode.skills } : {}), ...(mode.weapon ? { weapon: mode.weapon } : {}), ...(mode.hero ? { hero: mode.hero } : {}) }
   if (mode.kind === 'skill') return { kind: 'skill', actorId, targetId, skill: mode.ref, ...(mode.pair ? { pair: mode.pair } : {}) }
   if (mode.kind === 'attack') return { kind: 'attack', actorId, targetId, ...(mode.weapon ? { weapon: mode.weapon } : {}), ...(mode.pair ? { pair: mode.pair } : {}) }
   return { kind: 'guard', actorId, targetId }
@@ -67,24 +67,42 @@ export const limitNow = (state: BattleState, id: string): boolean => {
   const unit = state.units.find((u) => u.id === id)
   return !!unit && unit.hp > 0 && limitReady(state, id) && battleActionsLeft(state, id) === 1
 }
-export interface LimitOption { key: string; name: string; detail: string; choice: BattleLimitChoice }
-/** The Limit Break menu: her class's fixed one, or one per equipped skill. A Spell Blade picks an Arms and a Tome skill (`pick: 2`). */
+/**
+ * One row of the Limit Break menu, with the kinds it deals. A Hero's own or an inherited one shows its Hero (`face`, an
+ * outfit id) and its strength, and is chosen at once even in a Spell Blade's two-pick menu (`instant`, D106).
+ */
+export interface LimitOption {
+  key: string; name: string; detail: string; choice: BattleLimitChoice; kinds: RpgDamageKind[]
+  face?: string; strength?: number; instant?: boolean
+}
+const heroOption = (limit: HeroLimitId, face: string, strength: number): LimitOption => {
+  const def = heroLimit(limit)
+  return { key: `hero:${limit}`, name: def.name, detail: def.blurb, choice: { hero: limit }, kinds: heroLimitKinds(def), face, strength, instant: true }
+}
+/** The Limit Break menu: her class's fixed one, or one per equipped skill. A Spell Blade picks an Arms and a Tome skill
+ * (`pick: 2`). A Hero has only her seat's; a Learner adds her Heroes' (D106). */
 export function limitOptions(state: BattleState, actorId: string): { pick: 1 | 2; options: LimitOption[] } {
   const ally = state.input.allies.find((a) => a.id === actorId)
   if (!ally) return { pick: 1, options: [] }
-  const skills = ally.loadout.flatMap((ref) => { const skill = battleActorSkill(state, actorId, ref); return skill ? [skill] : [] })
+  if (ally.hero) return { pick: 1, options: [heroOption(ally.hero, ally.id, 1)] }
+  const inherited = (ally.inherits ?? []).map((i) => heroOption(i.limit, i.from, bondCapacity(i.bond)))
+  const own = classOptions(state, ally)
+  return { pick: own.pick, options: [...own.options, ...inherited] }
+}
+function classOptions(state: BattleState, ally: BattleAlly): { pick: 1 | 2; options: LimitOption[] } {
+  const skills = ally.loadout.flatMap((ref) => { const skill = battleActorSkill(state, ally.id, ref); return skill ? [skill] : [] })
   const key = (ref: RpgNodeRef) => `${ref.tier}:${ref.id}`
   if (ally.classId === 'mage') return { pick: 1, options: [{ key: 'nova', name: BATTLE_LIMIT_NAMES.mage, choice: {},
-    detail: 'A hit of each element' }] }
+    detail: 'A hit of each element', kinds: [...RPG_ELEMENTS] }] }
   if (ally.classId === 'cleric') return { pick: 1, options: [{ key: 'patrons', name: BATTLE_LIMIT_NAMES.cleric, choice: {},
-    detail: 'A hit with each weapon, statuses ×3' }] }
+    detail: 'A hit with each weapon, statuses ×3', kinds: ally.weapons.map(rpgWeaponKind) }] }
   if (ally.classId === 'summoner') return { pick: 1, options: skills.filter((s) => s.def.summon).map((s) => ({ key: key(s.ref), name: `${BATTLE_LIMIT_NAMES.grand} · ${s.label}`,
-    choice: { skill: s.ref }, detail: '×2, lingers ×2' })) }
+    choice: { skill: s.ref }, detail: '×2, lingers ×2', kinds: skillKinds(s.def) })) }
   if (ally.classId === 'spellblade') return { pick: 2, options: skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skills: [s.ref] },
-    detail: isRpgTome(s.node.weapon) ? 'Tome half, full strength' : 'Arms half, full strength' })) }
+    detail: isRpgTome(s.node.weapon) ? 'Tome half, full strength' : 'Arms half, full strength', kinds: skillKinds(s.def) })) }
   return { pick: 1, options: skills.length
-    ? skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skill: s.ref }, detail: 'Cast twice' }))
-    : ally.weapons.map((w) => ({ key: w, name: `${BATTLE_LIMIT_NAMES.twin} · ${WEAPON_LABEL[w]}`, choice: { weapon: w }, detail: 'Two Attacks' })) }
+    ? skills.map((s) => ({ key: key(s.ref), name: s.label, choice: { skill: s.ref }, detail: 'Cast twice', kinds: skillKinds(s.def) }))
+    : ally.weapons.map((w) => ({ key: w, name: `${BATTLE_LIMIT_NAMES.twin} · ${WEAPON_LABEL[w]}`, choice: { weapon: w }, detail: 'Two Attacks', kinds: [rpgWeaponKind(w)] })) }
 }
 /** The mode a menu pick (or a Spell Blade's two picks) sets, or null if the engine would refuse it. */
 export function limitMode(state: BattleState, actorId: string, choice: BattleLimitChoice): BattleMode | null {
@@ -106,7 +124,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'guard': return `${name(cue.actorId)} guards ${name(cue.targetId)}`
     case 'skip': return `${name(cue.actorId)} is ${cue.label?.toLowerCase()} and loses its turn`
     case 'mp': return `${name(cue.targetId)} +${cue.amount} MP`
-    case 'limit': return `${name(cue.actorId)}: LIMIT BREAK · ${cue.label}!`
+    case 'limit': return `${name(cue.actorId)}: LIMIT BREAK · ${cue.label}${cue.from ? `, from ${name(cue.from)}` : ''}!`
     case 'summon': return `${name(cue.actorId)}’s ${cue.label} strikes again`
     case 'wave': return `${cue.label}: the next foes arrive`
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`

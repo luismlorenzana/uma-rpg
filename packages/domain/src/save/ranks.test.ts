@@ -7,7 +7,7 @@ import { regionChapter, worldContinent } from '../world/world'
 import { startFight, type BattleOutfit } from './battle'
 import { manualBlock, readManuals, sweepFight } from './exchange'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, type Save } from './save'
+import { newSave, parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 
 const T = (n: number) => new Date(Date.parse('2026-10-12T12:00:00.000Z') + n * 1000).toISOString()
 // Invented outfits only.
@@ -127,8 +127,8 @@ describe('save v18: the progress reset (D105)', () => {
     const save = parseSave(v17())
     const w = worldOf(save)
     const uma = w.umas['101']!
-    expect(save.schemaVersion).toBe(18)
-    expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {} } })
+    expect(save.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
+    expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {} }, bonds: {} })
     expect(uma.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: [], loadout: null })
     expect(uma.professions.farming).toEqual({ level: 7, exp: 3 })
     expect(uma.stars).toEqual({ unlocked: expect.arrayContaining(['moon:hp:1']), active: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1'] })

@@ -1,5 +1,6 @@
-// Save v18: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v18 (D102–D105):
-// ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset for every older save.
+// Save v19: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v19 (D106):
+// the Halls of Heroes, their Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no
+// tokens, and a progress reset for every older save.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -11,6 +12,7 @@ import {
   type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { RPG_CLASSES } from '../rpg/kinds'
+import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
 import { isDishId, isStarNode } from '../economy/dish-id'
 import { armorKindOf, GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isWeapon, slotOf, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
@@ -25,7 +27,7 @@ import {
 } from '../rpg/rules'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 18
+export const SAVE_SCHEMA_VERSION = 19
 /** Umas marked as farming targets (D100). */
 export const MAX_TARGETS = 5
 export const STARTING_UNLOCK_TICKETS = 20
@@ -80,7 +82,14 @@ export interface OwnedUma {
   stars: Stars
   /** Gear bound to her (her locker) and what she wears: one piece per weapon type and one per armor slot (S7, D103). */
   gear: UmaGear
+  /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
+  bonds: Partial<Record<HeroLimitId, BondTrack>>
 }
+
+/** Bond Level 0–10 and the EXP toward the next (D106). */
+export interface BondTrack { level: number; exp: number }
+/** A Hall of Heroes seat (D106): its Hero and up to ten Learners, keyed by the seat's Limit Break. An empty seat is absent. */
+export interface HeroSeat { hero: string; learners: string[] }
 
 /** `kinds`: which armor kind each armor slot holds (absent: the physical one). An empty slot holds the kind's Training
  * piece, grade 0, as an empty weapon slot holds a Training weapon (D98, D103). */
@@ -115,6 +124,8 @@ export interface TierWorld {
   gear: Record<string, number>
   /** Up to five owned Umas whose gear and dishes the facilities plan for (D100). */
   targets: string[]
+  /** The Halls of Heroes' seats (D106): an Uma is a Hero in one seat at most, or a Learner in two at most, never both. */
+  heroes: Partial<Record<HeroLimitId, HeroSeat>>
 }
 
 export interface Account {
@@ -170,7 +181,7 @@ export function defaultParties(): Party[] {
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
 export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
 export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, professions: newProfessions(), ranks: newRanks(),
-  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: {} } })
+  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: {} }, bonds: {} })
 
 /** The world's state (D66). */
 export interface WorldState {
@@ -184,7 +195,7 @@ export interface WorldState {
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {}, targets: [] }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {}, targets: [], heroes: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -405,6 +416,46 @@ function parseRanks(value: unknown, path: string): Ranks {
   return ranks
 }
 
+function parseBonds(value: unknown, path: string): Partial<Record<HeroLimitId, BondTrack>> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const bonds: Partial<Record<HeroLimitId, BondTrack>> = {}
+  for (const [id, raw] of Object.entries(value)) {
+    if (!isHeroLimitId(id)) throw new SaveParseError(`${path}.${id}`, 'not a Hero seat')
+    const b = object(raw, `${path}.${id}`, ['level', 'exp'])
+    const level = count(b.level, `${path}.${id}.level`)
+    if (level > BOND_MAX_LEVEL) throw new SaveParseError(`${path}.${id}.level`, `expected 0–${BOND_MAX_LEVEL}`)
+    const exp = count(b.exp, `${path}.${id}.exp`)
+    if (level < BOND_MAX_LEVEL ? exp >= BOND_EXP_TO_NEXT : exp !== 0) throw new SaveParseError(`${path}.${id}.exp`, level < BOND_MAX_LEVEL ? 'more than the level needs' : 'expected 0 at the top level')
+    bonds[id] = { level, exp }
+  }
+  return bonds
+}
+
+/** Hero seats (D106): owned Umas only, a Hero in one seat, ten Learners a seat, two seats a Learner, never a Hero. */
+function parseHeroes(value: unknown, path: string, umas: Record<string, OwnedUma>): Partial<Record<HeroLimitId, HeroSeat>> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const out: Partial<Record<HeroLimitId, HeroSeat>> = {}
+  const heroes = new Set<string>()
+  const parents = new Map<string, number>()
+  for (const [id, raw] of Object.entries(value)) {
+    const at = `${path}.${id}`
+    if (!isHeroLimitId(id)) throw new SaveParseError(at, 'not a Hero seat')
+    const seat = object(raw, at, ['hero', 'learners'])
+    if (typeof seat.hero !== 'string' || !umas[seat.hero]) throw new SaveParseError(`${at}.hero`, 'expected an owned outfit')
+    if (heroes.has(seat.hero)) throw new SaveParseError(`${at}.hero`, 'already a Hero in another seat')
+    heroes.add(seat.hero)
+    const learners = ids(seat.learners, `${at}.learners`, HERO_MAX_LEARNERS)
+    if (learners.some((l) => !umas[l])) throw new SaveParseError(`${at}.learners`, 'learners must be owned')
+    for (const l of learners) parents.set(l, (parents.get(l) ?? 0) + 1)
+    out[id] = { hero: seat.hero, learners: [...learners] }
+  }
+  for (const [l, n] of parents) {
+    if (heroes.has(l)) throw new SaveParseError(path, `outfit ${l} is a Hero and can't be a Learner`)
+    if (n > LEARNER_MAX_PARENTS) throw new SaveParseError(path, `outfit ${l} learns under more than ${LEARNER_MAX_PARENTS} Heroes`)
+  }
+  return out
+}
+
 /** A class's weapons fit its slots, its side skills obey every learning rule at its Class Rank, and its equipped skills
  * are its trees' nodes within her slots (whether a core is open yet is checked when she fights). */
 function parseLoadout(value: unknown, path: string, classId: RpgClass, tier: number, level: number, classRank: number): ClassLoadout {
@@ -430,13 +481,13 @@ function parseUmas(value: unknown, path: string, tier: number): Record<string, O
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
-    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'professions', 'ranks', 'stars', 'gear'])
+    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'professions', 'ranks', 'stars', 'gear', 'bonds'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const ranks = parseRanks(u.ranks, `${at}.ranks`)
     const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null, classes: {},
       professions: parseProfessions(u.professions, `${at}.professions`), ranks, stars: parseStars(u.stars, `${at}.stars`, level),
-      gear: parseUmaGear(u.gear, `${at}.gear`, ranks) }
+      gear: parseUmaGear(u.gear, `${at}.gear`, ranks), bonds: parseBonds(u.bonds, `${at}.bonds`) }
     if (u.classId !== null && !RPG_CLASSES.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
     owned.classId = u.classId as RpgClass | null
     const classes = object(u.classes, `${at}.classes`, RPG_CLASSES)
@@ -488,7 +539,7 @@ const ACTION_KEYS: Record<BattleAction['kind'], readonly string[]> = {
   attack: ['kind', 'actorId', 'targetId', 'weapon', 'pair'],
   guard: ['kind', 'actorId', 'targetId'],
   skill: ['kind', 'actorId', 'targetId', 'skill', 'pair', 'blessing'],
-  limit: ['kind', 'actorId', 'targetId', 'skill', 'skills', 'weapon'],
+  limit: ['kind', 'actorId', 'targetId', 'skill', 'skills', 'weapon', 'hero'],
 }
 
 type CheckBattle = (input: BattleInput, actions: BattleAction[], path: string) => void
@@ -564,16 +615,16 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v17 are migrated to v18's shape first (migrations.ts), so the parse below reads only v18.
+  // v10–v18 are migrated to v19's shape first (migrations.ts), so the parse below reads only v19.
   const value = migrate(raw, version)
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'dishes', 'gear', 'targets'])
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'dishes', 'gear', 'targets', 'heroes'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
     dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
-    targets: parseTargets(w.targets, `${path}.targets`, umas),
+    targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
   }
 }
 
@@ -589,8 +640,8 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v18 save and always returns v18. v10–v17 reset their progress (D105) and anything older than v10 starts
- * over (D69). */
+/** Parses a v1–v19 save and always returns v19. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+ * (D106) and anything older than v10 starts over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

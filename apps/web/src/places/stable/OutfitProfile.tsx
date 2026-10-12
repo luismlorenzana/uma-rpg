@@ -5,7 +5,7 @@
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeClass, activeNodeSlots, ARMOR_KINDS, armorTrack, isInFight, aptitudeTime, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
+  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, aptitudeTime, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, workOf,
@@ -109,7 +109,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
               ))}
             </div>
           </div>
-          {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} />}
+          {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
           {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
           {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
           {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
@@ -313,15 +313,46 @@ function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedU
   )
 }
 
-function SkillsTab({ outfit, uma }: { outfit: RosterOutfit; uma: OwnedUma }) {
+function SkillsTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   return (
     <div className="space-y-4">
       <SkillsPage outfit={outfit} name={outfit.name} />
+      <InheritanceCard outfitId={outfit.outfitId} uma={uma} world={world} />
       <section className="space-y-2 rounded-md bg-raised p-3">
         <p className="text-[11px] text-ink-faint">Class Ranks</p>
         {RPG_CLASSES.map((c) => <RankRow key={c} label={CLASS_LABEL[c]} kind="class" track={classTrack(uma.ranks, c)} />)}
       </section>
     </div>
+  )
+}
+
+/** Her place in the Halls of Heroes (D106): her seat as a Hero, or her Heroes and every Bond she has made. */
+function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: OwnedUma; world: TierWorld }) {
+  const navigate = useNavigate()
+  const seat = heroSeatOf(world, outfitId)
+  const parents = parentsOf(world, outfitId)
+  const bonds = HERO_LIMIT_IDS.filter((id) => uma.bonds[id] || parents.includes(id))
+  const hall = (id: (typeof HERO_LIMIT_IDS)[number]) => () => navigate(`/learning/${HERO_HALLS[heroLimitClass(id)]}`, { state: { fromHub: true } })
+  return (
+    <section className="space-y-1.5 rounded-md bg-raised p-3">
+      <p className="text-[11px] text-ink-faint">Inheritance</p>
+      {seat ? (
+        <button type="button" onClick={hall(seat)} className="block w-full text-left text-[13px]">
+          <span className="font-semibold">Hero</span> of the {CLASS_LABEL[heroLimitClass(seat)]} Hall · her Limit Break is always {heroLimit(seat).name} ›
+        </button>
+      ) : bonds.length === 0 ? (
+        <p className="text-[13px] text-ink-soft">Not learning under a Hero. Seat her as a Learner in a Hall of Heroes on the Learning page.</p>
+      ) : bonds.map((id) => {
+        const bond = uma.bonds[id] ?? { level: 0, exp: 0 }
+        const now = parents.includes(id)
+        return (
+          <button key={id} type="button" onClick={hall(id)} className="flex w-full items-baseline justify-between gap-2 text-left text-[13px]">
+            <span className="truncate">{heroLimit(id).name}{now ? '' : <span className="text-ink-faint"> · former Hero</span>}</span>
+            <span className="shrink-0 text-ink-soft">Bond {bond.level}/{BOND_MAX_LEVEL} · {Math.round(bondCapacity(bond.level) * 100)}% ›</span>
+          </button>
+        )
+      })}
+    </section>
   )
 }
 
