@@ -92,7 +92,7 @@ describe('Halls of Heroes (D106)', () => {
     w.umas['101'] = { ...w.umas['101']!, bonds: { 'mage-2': { level: 3, exp: 5 } } }
     expect(heroFields(w, '101')).toEqual({ inherits: [{ limit: 'brawler-1', bond: 0, from: '201' }, { limit: 'mage-2', bond: 3, from: '202' }] })
     const input = worldOf(startFight(s, ura, ura.nodes[1]!.id, OUTFITS, T(5))).world.run.battle!.input
-    expect(input.version).toBe(9)
+    expect(input.version).toBe(10)
     expect(input.allies.find((a) => a.id === '101')).toMatchObject({ inherits: [{ limit: 'brawler-1', bond: 0 }, { limit: 'mage-2', bond: 3 }] })
     expect(input.allies.find((a) => a.id === '102')).toMatchObject({ hero: 'cleric-4' })
     expect(input.allies.find((a) => a.id === '103')).not.toHaveProperty('hero')
@@ -115,6 +115,19 @@ describe('Halls of Heroes (D106)', () => {
     s = sweepFight(s, ura, ura.nodes[1]!.id, OUTFITS, T(7)).save
     expect(worldOf(s).umas['101']!.bonds).toEqual({ 'brawler-1': { level: 0, exp: 2 }, 'mage-2': { level: 0, exp: 4 } })
     round(s)
+  })
+
+  it('raises a Hero’s Bond with her own seat, so seated later as its Learner she starts at what she earned (D112)', () => {
+    let s = setHero(stable(), 'brawler-1', '101', T(3))
+    const w = worldOf(s)
+    w.world.run.wins = { start: 1, [ura.nodes[1]!.id]: 1 }
+    w.wallet.sweepTickets = 3
+    for (let i = 0; i < 3; i++) s = sweepFight(s, ura, ura.nodes[1]!.id, OUTFITS, T(4 + i)).save
+    expect(worldOf(s).umas['101']!.bonds).toEqual({ 'brawler-1': { level: 0, exp: 3 * BOND_EXP_PER_WIN.fight } })
+    s = setHero(s, 'brawler-1', '201', T(8))
+    s = addLearner(s, 'brawler-1', '101', T(9))
+    expect(heroFields(worldOf(s), '101')).toEqual({ inherits: [{ limit: 'brawler-1', bond: 0, from: '201' }] })
+    expect(worldOf(s).umas['101']!.bonds['brawler-1']).toEqual({ level: 0, exp: 6 })
   })
 
   it('opens the halls on a v18 save with five more Unlock Tickets', () => {

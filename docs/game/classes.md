@@ -19,13 +19,13 @@ Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots,
 | **Summoner** | Three Tomes and two Arms. Each summon strikes, stays, and strikes again when the next one comes |
 
 <!-- live:classes -->
-| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break | Starts as |
+| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break power | Starts as |
 |---|---|---|---|---|---|---|---|
-| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon | Front runners |
-| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all | Pace chasers |
-| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 | Twin Arts: an Arms skill and a Tome skill, both at full power (no half) | — |
-| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks | Late surgers |
-| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3 | ×1 ×1 ×1 ×1 ×1 ×1.1 | Grand Summon: one summon at twice her strength that lingers at twice its share | End closers |
+| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | 2× her open depth | Front runners |
+| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers |
+| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 | 2× her open depth | — |
+| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers |
+| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3 | ×1 ×1 ×1 ×1 ×1 ×1.1 | 1.8× her open depth | End closers |
 <!-- /live -->
 
 **Hand:** the share of full power and full MP her acts use. A Brawler's Attack is 1.0. A Spell Blade's two halves are
@@ -97,15 +97,17 @@ is listed in [skill trees](skill-trees.md).
 ## Limit Breaks
 
 <!-- live:limits -->
-| Class | Limit Break |
-|---|---|
-| Brawler | Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon |
-| Mage | Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all |
-| Spell Blade | Twin Arts: an Arms skill and a Tome skill, both at full power (no half) |
-| Cleric | Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks |
-| Summoner | Grand Summon: one summon at twice her strength that lingers at twice its share |
+**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a Learner uses either of her Heroes', at 50% plus 5% a Bond Level (100% at Bond 10). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is worth her class's power below, in single-target casts at her open depth:
 
-The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn.
+| Class | Limit Break power |
+|---|---|
+| Brawler | 2× |
+| Mage | 2.4× |
+| Spell Blade | 2× |
+| Cleric | 1.5× |
+| Summoner | 1.8× |
+
+The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
 <!-- /live -->
 
 ## Ranks and levels

@@ -50,8 +50,8 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
-/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v9: Heroes and
- * Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
+/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v10: Limit Breaks
+ * only from the Halls of Heroes, D112; v9 Heroes and Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
 export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, nodeId: string,
   party: readonly RpgPartyMember[], now: string): RpgRun {
   const node = chapter.nodes.find((n) => n.id === nodeId)
@@ -61,7 +61,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
-    version: 9, seed: seedOf(battleId),
+    version: 10, seed: seedOf(battleId),
     allies: party.map(({ profile, loadout, orb, points, might, barrier, regen, hero, inherits }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
       return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,

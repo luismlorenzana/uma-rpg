@@ -2,7 +2,7 @@
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half.
 import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill,
-  battleLimitPlan, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
+  battleHasLimit, battleLimitPlan, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 
@@ -60,8 +60,11 @@ export function previewTarget(state: BattleState, actorId: string, mode: BattleM
     chips: own.filter((c) => c.kind === 'shield').length, breaks: own.some((c) => c.kind === 'break') }
 }
 
-/** Her bar is full (D311). */
-export const limitReady = (state: BattleState, id: string): boolean => (state.units.find((u) => u.id === id)?.limit ?? 0) >= BATTLE_LIMIT_MAX
+/** Her bar is full (D311) and she has a Limit Break to spend it on: from v10, only a Hero or a Learner does (D112). */
+export const limitReady = (state: BattleState, id: string): boolean => {
+  const ally = state.input.allies.find((a) => a.id === id)
+  return !!ally && battleHasLimit(ally, state.engineVersion) && (state.units.find((u) => u.id === id)?.limit ?? 0) >= BATTLE_LIMIT_MAX
+}
 /** A Limit Break is her turn, so she can use it only before she acts this round. */
 export const limitNow = (state: BattleState, id: string): boolean => {
   const unit = state.units.find((u) => u.id === id)
@@ -79,13 +82,15 @@ const heroOption = (limit: HeroLimitId, face: string, strength: number): LimitOp
   const def = heroLimit(limit)
   return { key: `hero:${limit}`, name: def.name, detail: def.blurb, choice: { hero: limit }, kinds: heroLimitKinds(def), face, strength, instant: true }
 }
-/** The Limit Break menu: her class's fixed one, or one per equipped skill. A Spell Blade picks an Arms and a Tome skill
- * (`pick: 2`). A Hero has only her seat's; a Learner adds her Heroes' (D106). */
+/** The Limit Break menu. From v10 (D112) only the Halls of Heroes give them: a Hero has her seat's, a Learner her Heroes'.
+ * Older fights replay with their class's: a fixed one, or one per equipped skill, a Spell Blade picking an Arms and a Tome
+ * skill (`pick: 2`), plus a Learner's inherited ones (D106). */
 export function limitOptions(state: BattleState, actorId: string): { pick: 1 | 2; options: LimitOption[] } {
   const ally = state.input.allies.find((a) => a.id === actorId)
   if (!ally) return { pick: 1, options: [] }
   if (ally.hero) return { pick: 1, options: [heroOption(ally.hero, ally.id, 1)] }
   const inherited = (ally.inherits ?? []).map((i) => heroOption(i.limit, i.from, bondCapacity(i.bond)))
+  if (state.engineVersion >= 10) return { pick: 1, options: inherited }
   const own = classOptions(state, ally)
   return { pick: own.pick, options: [...own.options, ...inherited] }
 }
@@ -107,7 +112,7 @@ function classOptions(state: BattleState, ally: BattleAlly): { pick: 1 | 2; opti
 /** The mode a menu pick (or a Spell Blade's two picks) sets, or null if the engine would refuse it. */
 export function limitMode(state: BattleState, actorId: string, choice: BattleLimitChoice): BattleMode | null {
   const ally = state.input.allies.find((a) => a.id === actorId)
-  const plan = ally ? battleLimitPlan(ally, choice) : null
+  const plan = ally ? battleLimitPlan(ally, choice, state.engineVersion) : null
   return plan ? { kind: 'limit', name: plan.name, ...choice } : null
 }
 

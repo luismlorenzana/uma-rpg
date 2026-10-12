@@ -338,11 +338,15 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
       <p className="text-[11px] text-ink-faint">Inheritance</p>
       {seat ? (
         <button type="button" onClick={hall(seat)} className="block w-full text-left text-[13px]">
-          <span className="font-semibold">Hero</span> of the {CLASS_LABEL[heroLimitClass(seat)]} Hall · her Limit Break is always {heroLimit(seat).name} ›
+          <span className="font-semibold">Hero</span> of the {CLASS_LABEL[heroLimitClass(seat)]} Hall · her Limit Break is always {heroLimit(seat).name}
+          <span className="block text-ink-soft">Bond with her seat {(uma.bonds[seat] ?? { level: 0 }).level}/{BOND_MAX_LEVEL} ›</span>
         </button>
-      ) : bonds.length === 0 ? (
-        <p className="text-[13px] text-ink-soft">Not learning under a Hero. Seat her as a Learner in a Hall of Heroes on the Learning page.</p>
-      ) : bonds.map((id) => {
+      ) : (
+        <>
+          {parents.length === 0 && (
+            <p className="text-[13px] text-ink-soft">No Limit Break: seat her as a Hero or a Learner in a Hall of Heroes, on the Learning page.</p>
+          )}
+          {bonds.map((id) => {
         const bond = uma.bonds[id] ?? { level: 0, exp: 0 }
         const now = parents.includes(id)
         return (
@@ -351,7 +355,9 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
             <span className="shrink-0 text-ink-soft">Bond {bond.level}/{BOND_MAX_LEVEL} · {Math.round(bondCapacity(bond.level) * 100)}% ›</span>
           </button>
         )
-      })}
+          })}
+        </>
+      )}
     </section>
   )
 }

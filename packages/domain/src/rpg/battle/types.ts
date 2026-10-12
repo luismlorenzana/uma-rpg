@@ -1,5 +1,6 @@
-// Campaign battle vocabulary, engine v9 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
-// v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106). Older fights still replay unchanged.
+// Campaign battle vocabulary, engine v10 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112).
+// Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
@@ -78,7 +79,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9
+  version: 6 | 7 | 8 | 9 | 10
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -108,7 +109,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9
+  engineVersion: 6 | 7 | 8 | 9 | 10
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */
@@ -132,7 +133,8 @@ export type BattleAction =
   /**
    * A Limit Break spends a full charge and her turn (D311). A Brawler names a skill to cast twice (or a weapon to
    * strike twice), a Summoner a summon, a Spell Blade an Arms skill and a Tome skill (`skills`); Mages and Clerics have
-   * a fixed one. A Learner may name an inherited one instead (`hero`, v9); a Hero has only her own.
+   * a fixed one. A Learner may name an inherited one instead (`hero`, v9); a Hero has only her own. From v10 only the
+   * Heroes' Limit Breaks exist: a Hero's own, a Learner's inherited ones (D112).
    */
   | { kind: 'limit'; actorId: string; targetId: string; skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon; hero?: HeroLimitId }
 export type BattleCue =

@@ -108,7 +108,7 @@ describe('the Forge and equipping (S7)', () => {
     const input = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input
     const ally = input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
-    expect(input.version).toBe(9)
+    expect(input.version).toBe(10)
     expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 4, lance: 4 }, barrier: 5, regen: 1, orb: 'fire', evasion: 6 })
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
     expect(ally.stats.atk).toBe(bare.atk + 1)

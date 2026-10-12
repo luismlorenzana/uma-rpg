@@ -14,8 +14,8 @@ export const LEARNER_MAX_PARENTS = 2
 /** Bond Levels 0–10: an inherited Limit Break works at 50% and gains 5% a level, 100% at Bond 10. */
 export const BOND_MAX_LEVEL = 10
 export const BOND_EXP_TO_NEXT = 12
-/** Bond EXP a Learner earns toward each of her Heroes per won fight: about 55 wins bond two Heroes fully, so a Learner
- * bonds four by Lv50 on first clears alone (D106). */
+/** Bond EXP per won fight, toward each of a Learner's Heroes, or a Hero's own seat (D112): about 55 wins bond two Heroes
+ * fully, so a Learner bonds four by Lv50 on first clears alone (D106). */
 export const BOND_EXP_PER_WIN = { fight: 2, 'sub-boss': 3, vanguard: 3, boss: 3 } as const
 export const bondCapacity = (level: number): number => Math.round((0.5 + 0.05 * Math.max(0, Math.min(BOND_MAX_LEVEL, level))) * 100) / 100
 

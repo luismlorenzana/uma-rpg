@@ -53,12 +53,13 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
         <div className="-mr-2 -mt-2 flex items-center justify-between">
           <p className="font-display text-lg font-bold">{CLASS_LABEL[classId]} Hall of Heroes</p>
           <HelpButton title="Hall of Heroes">
-            <p>Each seat teaches its own Limit Break. Its Hero always uses it, at full strength: about twice a turn’s damage.</p>
+            <p>Limit Breaks come only from the Halls of Heroes. Each seat teaches its own; its Hero always uses it, at full strength: about twice a turn’s damage.</p>
             <p>Up to {HERO_MAX_LEARNERS} Learners sit under each Hero, and a Learner under {LEARNER_MAX_PARENTS} Heroes at most. In a fight she may use
-              either Hero’s Limit Break instead of her own, at 50% plus 5% a Bond Level (100% at Bond {BOND_MAX_LEVEL}), with all its weapons, elements,
-              hits and statuses, even ones she doesn’t carry.</p>
-            <p>Every won fight raises a Learner’s Bond with each of her Heroes: a stage {BOND_EXP_PER_WIN.fight}, an elite or a boss {BOND_EXP_PER_WIN.boss}, {BOND_EXP_TO_NEXT} a level. Her
-              Bond stays with her when she leaves.</p>
+              either Hero’s Limit Break, at 50% plus 5% a Bond Level (100% at Bond {BOND_MAX_LEVEL}), with all its weapons, elements,
+              hits and statuses, even ones she doesn’t carry. An Uma who is neither a Hero nor a Learner has no Limit Break.</p>
+            <p>Every won fight raises a Learner’s Bond with each of her Heroes, and a Hero’s Bond with her own seat: a stage {BOND_EXP_PER_WIN.fight}, an elite or a
+              boss {BOND_EXP_PER_WIN.boss}, {BOND_EXP_TO_NEXT} a level. A Bond stays when she leaves, so a Hero taken out of her seat and put back as its
+              Learner starts at the Bond she earned.</p>
             <p>A Hero can’t be a Learner. Swapping a Hero keeps the seat’s Learners; emptying the seat sends them away.</p>
           </HelpButton>
         </div>
@@ -125,6 +126,15 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
           <BottomSheet title={`Hero · ${heroLimit(heroOpen).name}`} onClose={() => setHeroOpen(null)}>
             <div className="space-y-2">
               <p className="text-[14px]"><span className="font-semibold">{outfit(seat.hero)?.name ?? seat.hero}</span> uses {heroLimit(heroOpen).name} as her only Limit Break, at full strength.</p>
+              {world.umas[seat.hero] && (() => {
+                const bond = bondOf(world.umas[seat.hero]!, heroOpen)
+                return (
+                  <div className="text-[13px]">
+                    <p className="text-ink-soft">Her own Bond with this seat: <span className="font-semibold text-ink">{bond.level}/{BOND_MAX_LEVEL}</span>, kept if she becomes its Learner</p>
+                    <Bar className="mt-1" value={bond.level >= BOND_MAX_LEVEL ? 1 : bond.exp} max={bond.level >= BOND_MAX_LEVEL ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
+                  </div>
+                )
+              })()}
               <button type="button" onClick={() => { setHeroOpen(null); setPick({ seat: heroOpen, role: 'hero' }) }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">Change Hero</button>
               <button type="button" onClick={() => run(() => appointHero(heroOpen, null), () => setHeroOpen(null))}
                 className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">

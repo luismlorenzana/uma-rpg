@@ -4,7 +4,7 @@ import { rpgFoe } from '../campaign/enemies'
 import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleLimitGain, battleStateHash, createBattle, replayBattle,
   type BattleAction } from './index'
 import { BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
-import { battleLimitPlan } from './limit'
+import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
 import { HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills } from '../heroes'
@@ -409,5 +409,34 @@ describe('battle engine v9: Heroes and inherited Limit Breaks (D106, D107)', () 
       expect(total, limit.id).toBeCloseTo(10, 1)
     }
     expect(battleLimitPlan({ ...team()[0]!, hero: 'mage-3' }, {})!.casts[0]!.def.hits.reduce((n, h) => n + h.power, 0)).toBeCloseTo(HERO_LIMIT_POWER.brawler * level, 2)
+  })
+})
+
+describe('battle engine v10: Limit Breaks only from the Halls of Heroes (D112)', () => {
+  const v10 = (allies: BattleAlly[], enemies: BattleEnemy[]): BattleInput => ({ version: 10, seed: 7, allies, enemies })
+  const team = (first: Partial<BattleAlly> = {}) => party().map((a, i) => ({ ...a, classRank: a.level, ...(i === 0 ? first : {}) }))
+  const ready = (s: BattleState, id = 'a1') => { unitOf(s, id).limit = BATTLE_LIMIT_MAX; return s }
+  const foes = () => [foe('f1', 'dark', ['bow'], ['light'], 9)]
+
+  it('gives an Uma with no Hero seat and no Heroes no Limit Break; class ones still replay in older fights', () => {
+    const s = () => ready(createBattle(v10(team(), foes())).state)
+    expect(applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1' }).error).toBe('invalid-skill')
+    expect(applyBattleAction(s(), { kind: 'limit', actorId: 'a1', targetId: 'f1', weapon: 'axe' }).error).toBe('invalid-skill')
+    expect(battleHasLimit(team()[0]!, 10)).toBe(false)
+    expect(battleHasLimit(team()[0]!, 9)).toBe(true)
+    const v9 = ready(createBattle({ ...v10(team(), foes()), version: 9 }).state)
+    expect(applyBattleAction(v9, { kind: 'limit', actorId: 'a1', targetId: 'f1' }).cues.find((c) => c.kind === 'limit')).toMatchObject({ label: 'Twin Strike' })
+  })
+
+  it('keeps a Hero’s own and a Learner’s inherited ones, and Auto fires the strongest Bond', () => {
+    const hero = ready(createBattle(v10(team({ hero: 'brawler-4' }), foes())).state)
+    expect(applyBattleAction(hero, { kind: 'limit', actorId: 'a1', targetId: 'f1' }).cues.find((c) => c.kind === 'limit')).toMatchObject({ label: 'Earthsplitter' })
+    const learner = team({ inherits: [{ limit: 'mage-1', bond: 2, from: 'h1' }, { limit: 'cleric-2', bond: 6, from: 'h2' }] })
+    const s = ready(createBattle(v10(learner, foes())).state)
+    expect(applyBattleAction(s, { kind: 'limit', actorId: 'a1', targetId: 'f1', hero: 'mage-1' }).error).toBeUndefined()
+    expect(applyBattleAction(s, { kind: 'limit', actorId: 'a1', targetId: 'f1', skill: skill('brawler-greatsword.1') }).error).toBe('invalid-skill')
+    expect(autoAction(s, 'a1')).toMatchObject({ kind: 'limit', hero: 'cleric-2' })
+    // Auto never reaches for a Limit Break she doesn't have.
+    expect(autoAction(ready(createBattle(v10(team(), foes())).state), 'a1').kind).not.toBe('limit')
   })
 })

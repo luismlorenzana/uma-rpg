@@ -3,7 +3,8 @@
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
 // v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; v8 ranks, Might, Barrier and Regen
-// (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106). Older fights replay unchanged.
+// (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112).
+// Older fights replay unchanged.
 import { rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
@@ -97,7 +98,7 @@ function validMove(m: BattleEnemyMove): boolean {
 
 /** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
  * weapons' Might, her armor's Barrier and Regen (D102, D104). */
-function validAlly(a: BattleAlly, version: 6 | 7 | 8 | 9): boolean {
+function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
@@ -124,7 +125,7 @@ function validHeroes(a: BattleAlly): boolean {
     a.inherits.every((i) => !!i && typeof i === 'object' && Object.keys(i).length === 3 && isHeroLimitId(i.limit) &&
       safeInt(i.bond, 0, BOND_MAX_LEVEL) && typeof i.from === 'string' && SAFE_ID.test(i.from) && i.from !== a.id)
 }
-function validEnemy(e: BattleEnemy, version: 6 | 7 | 8 | 9): boolean {
+function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
   const w = e.weaknesses
   if (e.element2 !== undefined && (version < 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
   if (e.twice !== undefined && (version < 7 || typeof e.twice !== 'boolean')) return false
@@ -140,9 +141,9 @@ function validEnemy(e: BattleEnemy, version: 6 | 7 | 8 | 9): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8 } as const
 function validateInput(input: BattleInput): void {
-  if (!input || ![6, 7, 8, 9].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || ![6, 7, 8, 9, 10].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
@@ -559,7 +560,7 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if (![6, 7, 8, 9].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if (![6, 7, 8, 9, 10].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)
@@ -582,7 +583,7 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     // A full charge and her turn, at 0 MP (D311).
     if (target.side !== 'enemy') return invalid(previous, 'invalid-target')
     if (actor.limit < BATTLE_LIMIT_MAX || battleActionsUsed(s, actor.id) > 0) return invalid(previous, 'limit-not-ready')
-    const plan = battleLimitPlan(ally, { skill: action.skill, skills: action.skills, weapon: action.weapon, hero: action.hero })
+    const plan = battleLimitPlan(ally, { skill: action.skill, skills: action.skills, weapon: action.weapon, hero: action.hero }, s.engineVersion)
     if (!plan) return invalid(previous, 'invalid-skill')
     actor.limit = 0
     cues.push({ kind: 'limit', actorId: actor.id, targetId: target.id, label: plan.name, ...(plan.from ? { from: plan.from } : {}) })

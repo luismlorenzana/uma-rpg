@@ -36,8 +36,13 @@ function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: nu
     capacity, ...(from ? { from } : {}) }
 }
 
-/** The casts this Limit Break makes, or null when the choice names something she can't use. */
-export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): BattleLimitPlan | null {
+/** Whether she has any Limit Break: from v10 only a Hero or a Learner does (D112); before, every class had its own. */
+export const battleHasLimit = (ally: Pick<BattleAlly, 'hero' | 'inherits'>, version: number): boolean =>
+  version < 10 || !!ally.hero || !!ally.inherits?.length
+
+/** The casts this Limit Break makes, or null when the choice names something she can't use. `version` is the fight's
+ * engine version: v10 has no class Limit Breaks (D112), older fights replay with theirs. */
+export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice, version = 10): BattleLimitPlan | null {
   const hand = rpgHand(ally)
   // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level.
   const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.classRank ?? ally.level)) - 1]!
@@ -49,6 +54,7 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice): Ba
     const from = isHeroLimitId(hero) && !skill && !skills && !weapon ? ally.inherits?.find((i) => i.limit === hero) : undefined
     return from ? heroPlan(ally, from.limit, level, bondCapacity(from.bond), from.from) : null
   }
+  if (version >= 10) return null
   switch (ally.classId) {
     case 'mage': {
       if (skill || skills || weapon) return null

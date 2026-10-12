@@ -1,7 +1,7 @@
 # Combat
 
-How a fight works today: engine v9 (D106: Heroes and inherited Limit Breaks; D104: Class Ranks, Might, Barrier and
-Regen; v6–v8 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
+How a fight works today: engine v10 (D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit
+Breaks; D104: Class Ranks, Might, Barrier and Regen; v6–v9 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -37,7 +37,7 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `
 | **Attack** | A hit of one weapon's kind at power 1.0 (× her hand) on the tapped foe. Free; fills the Limit gauge by 2 |
 | **Skill** | An equipped skill: its MP, its hits, its shape. Fills the gauge by 4 |
 | **Guard** | Covers another Uma until the end of the round. Hits aimed at her land on the guard at half damage |
-| **Limit Break** | With a full gauge (12): her class's Limit Break, at no MP, as her act ([classes](classes.md#limit-breaks)) |
+| **Limit Break** | With a full gauge (12), for a Hero or a Learner only: her seat's or one of her Heroes', at no MP, as her act ([Halls of Heroes](heroes.md)) |
 
 Class rules change the act ([classes](classes.md)):
 - **Spell Blade:** every act is a pair, one Arms half (an Attack or an Arms skill) and one Tome half. Both resolve at
@@ -115,19 +115,20 @@ add riders (a status on each foe hit) or Barriers; their rows in [skill trees](s
 ## Limit Breaks
 
 <!-- live:limits -->
-| Class | Limit Break |
-|---|---|
-| Brawler | Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon |
-| Mage | Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all |
-| Spell Blade | Twin Arts: an Arms skill and a Tome skill, both at full power (no half) |
-| Cleric | Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks |
-| Summoner | Grand Summon: one summon at twice her strength that lingers at twice its share |
+**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a Learner uses either of her Heroes', at 50% plus 5% a Bond Level (100% at Bond 10). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is worth her class's power below, in single-target casts at her open depth:
 
-The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn.
+| Class | Limit Break power |
+|---|---|
+| Brawler | 2× |
+| Mage | 2.4× |
+| Spell Blade | 2× |
+| Cleric | 1.5× |
+| Summoner | 1.8× |
+
+The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
 <!-- /live -->
 
-A **Hero** (D106) has only her seat's unique Limit Break, at full strength. A **Learner** may use either of her Heroes'
-instead of her own, at 50% plus 5% a Bond Level, with its whole shape. See [Halls of Heroes](heroes.md).
+The twenty Limit Breaks themselves, and how Heroes and Learners earn them, are in [Halls of Heroes](heroes.md).
 
 ## Foes
 

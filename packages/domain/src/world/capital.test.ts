@@ -122,7 +122,10 @@ describe('capital Finals (H15)', () => {
     }
   })
 
-  it('lets an on-time Lv10 party win all six synthetic capital stages with the shared Auto policy over five seeds', () => {
+  // D112: Limit Breaks come only from the Halls of Heroes, so this party, with no Heroes or Learners, has none. It won 30 of
+  // 30 with class Limit Breaks and 29 of 30 without; 27 is the bar, as for any boss.
+  it('lets an on-time Lv10 party win the six synthetic capital stages with the shared Auto policy over five seeds, without Limit Breaks', () => {
+    let wins = 0
     for (const node of chapter.nodes.filter((n) => n.kind !== 'camp')) {
       const save = party(), w = worldOf(save)
       const unlocked = { ...save, tierWorlds: { '1': { ...w, world: { ...w.world, run: { ...worldRun(w),
@@ -136,9 +139,11 @@ describe('capital Finals (H15)', () => {
           expect(step.error, node.id).toBeUndefined()
           state = step.state
         }
-        expect(state.outcome, `${node.id}, seed ${seed}`).toBe('victory')
+        expect(state.outcome, `${node.id}, seed ${seed}`).not.toBe('active')
+        if (state.outcome === 'victory') wins++
       }
     }
+    expect(wins).toBeGreaterThanOrEqual(27)
   })
 
   it('saves and reloads capital fights, opens the champion after settlement and banks the correct first/replay rewards', () => {

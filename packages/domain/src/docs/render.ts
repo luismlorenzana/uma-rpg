@@ -56,7 +56,8 @@ const SHAPE: Readonly<Record<string, string>> = {
   greatsword: 'One foe, heavy', fire: 'One foe, heavy', axe: 'Every foe', ice: 'Every foe', lance: 'Random foes', lightning: 'Random foes',
   bow: 'One foe, many hits', light: 'One foe, many hits', katana: 'Twice: the foe and one other', dark: 'Twice: the foe and one other',
 }
-const LIMIT_OF: Readonly<Record<RpgClass, string>> = {
+/** The classes' own Limit Breaks, retired by D112: fights from engine v6–v9 still replay with them. */
+const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
   brawler: `${BATTLE_LIMIT_NAMES.twin}: one equipped skill cast twice at full power, or two Attacks with a weapon`,
   mage: `${BATTLE_LIMIT_NAMES.mage}: a hit of each of the five elements, ${BATTLE_LIMIT_POWER.mage}× her open depth's power in all`,
   spellblade: `${BATTLE_LIMIT_NAMES.arts}: an Arms skill and a Tome skill, both at full power (no half)`,
@@ -75,13 +76,13 @@ function slots(c: RpgClass): string {
 // --- Classes and skills ---------------------------------------------------------------------------------------------
 
 function classes(): string {
-  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break', 'Starts as'],
+  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break power', 'Starts as'],
     RPG_CLASSES.map((c) => {
       const h = rpgHand({ classId: c })
       const s = RPG_CLASS_STATS[c]
       const special = h.pair ? 'Every act is an Arms half and a Tome half' : h.linger ? `A summon lingers and acts again at ${h.linger}` : c === 'cleric' ? 'Each skill carries a status' : '—'
       return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, `${x(h.power)}, ${x(h.mp)}`, special,
-        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), LIMIT_OF[c], STARTS_AS[c]]
+        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c]]
     }))
 }
 
@@ -123,9 +124,16 @@ function skillTrees(): string {
   return out.join('\n').trimEnd()
 }
 
+/** D112: Limit Breaks only from the Halls of Heroes; the classes' own replay in older fights. */
 function limits(): string {
-  return table(['Class', 'Limit Break'], RPG_CLASSES.map((c) => [CLASS_NAME[c], LIMIT_OF[c]])) + '\n\n' +
-    `The gauge fills to ${BATTLE_LIMIT_MAX}: +${BATTLE_LIMIT_CHARGE.attack} for an Attack, +${BATTLE_LIMIT_CHARGE.skill} for a skill. A Limit Break costs no MP and takes her turn.`
+  return `**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a ` +
+    `Learner uses either of her Heroes', at ${bondCapacity(0) * 100}% plus 5% a Bond Level (${bondCapacity(BOND_MAX_LEVEL) * 100}% at ` +
+    `Bond ${BOND_MAX_LEVEL}). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is ` +
+    `worth her class's power below, in single-target casts at her open depth:\n\n` +
+    table(['Class', 'Limit Break power'], RPG_CLASSES.map((c) => [CLASS_NAME[c], `${HERO_LIMIT_POWER[c]}×`])) + '\n\n' +
+    `The gauge fills to ${BATTLE_LIMIT_MAX}: +${BATTLE_LIMIT_CHARGE.attack} for an Attack, +${BATTLE_LIMIT_CHARGE.skill} for a skill. A Limit Break costs no MP and takes her turn. ` +
+    `Fights from engines v6–v9 replay with the classes' retired Limit Breaks: ` +
+    RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${RETIRED_LIMIT_OF[c]}`).join('; ') + '.'
 }
 
 /** The Halls of Heroes (D106, D107): every seat's Limit Break, and the Bond numbers. */
@@ -142,7 +150,7 @@ function heroes(): string {
     ['Learners', `${HERO_MAX_LEARNERS} per Hero; ${LEARNER_MAX_PARENTS} Heroes per Learner; a Hero is never a Learner`],
     ['Power at 100%', `her own class's Limit Break, in single-target casts at her open depth: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${HERO_LIMIT_POWER[c]}×`).join(', ')}`],
     ['Learner strength', `${bondCapacity(0) * 100}% at Bond 0, +5% a Bond Level, ${bondCapacity(BOND_MAX_LEVEL) * 100}% at Bond ${BOND_MAX_LEVEL}`],
-    ['Bond EXP per won fight', `${BOND_EXP_PER_WIN.fight} a stage, ${BOND_EXP_PER_WIN.boss} an elite or boss, toward each of her Heroes; ${BOND_EXP_TO_NEXT} a level (Sweeps and replays count)`],
+    ['Bond EXP per won fight', `${BOND_EXP_PER_WIN.fight} a stage, ${BOND_EXP_PER_WIN.boss} an elite or boss, toward each of a Learner's Heroes, or a Hero's own seat; ${BOND_EXP_TO_NEXT} a level (Sweeps and replays count)`],
   ])
 }
 

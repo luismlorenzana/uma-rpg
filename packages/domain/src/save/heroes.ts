@@ -1,6 +1,7 @@
-// The Halls of Heroes (D106): five halls, one per class, four seats each. A seat's Hero always fights with its unique
-// Limit Break; up to ten Learners sit under her, two Heroes at most each, and earn Bond with every won fight. A Bond
-// stays with the Learner when she leaves, so returning to a Hero picks up where she was.
+// The Halls of Heroes (D106, D112): five halls, one per class, four seats each, and the only source of Limit Breaks. A
+// seat's Hero always fights with its unique Limit Break; up to ten Learners sit under her, two Heroes at most each.
+// Every won fight raises the Bond of each Learner with her Heroes' seats, and of each Hero with her own seat. A Bond
+// stays with the Uma when she leaves the seat, so a Hero taken out of hers, then seated as its Learner, starts there.
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_LIMIT_IDS, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS,
   type HeroLimitId,
@@ -38,11 +39,17 @@ export function grantBond(track: BondTrack, amount: number): BondTrack {
 
 /** One Bond a won fight raised. */
 export interface BondGain { limit: HeroLimitId; exp: number; before: BondTrack; after: BondTrack }
-/** Bond EXP a won fight pays one Learner, toward each Hero she sits under. */
+/** The seats a won fight raises her Bond with: her own as a Hero (D112), or her Heroes' as a Learner. */
+export function bondSeatsOf(world: Pick<TierWorld, 'heroes'>, outfitId: string): HeroLimitId[] {
+  const hero = heroSeatOf(world, outfitId)
+  return hero ? [hero] : parentsOf(world, outfitId)
+}
+
+/** Bond EXP a won fight pays one Uma: a Learner toward each Hero she sits under, a Hero toward her own seat. */
 export function payBonds(world: Pick<TierWorld, 'heroes'>, outfitId: string, uma: OwnedUma, kind: keyof typeof BOND_EXP_PER_WIN): { uma: OwnedUma; gains: BondGain[] } {
   const gains: BondGain[] = []
   let bonds = uma.bonds
-  for (const limit of parentsOf(world, outfitId)) {
+  for (const limit of bondSeatsOf(world, outfitId)) {
     const before = bondOf(uma, limit)
     if (before.level >= BOND_MAX_LEVEL) continue
     const after = grantBond(before, BOND_EXP_PER_WIN[kind])

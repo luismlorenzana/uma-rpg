@@ -19,9 +19,14 @@ const attackDef = (weapon: RpgWeapon): RpgSkillDef => ({
   target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(weapon), share: 1 }] }], mp: 0, primary: rpgWeaponKind(weapon),
 })
 
-/** The menu's first Limit Break: a Hero's own (D106), else her class's first, else her first Hero's. */
+/** The Limit Break to fire: a Hero's own (D106); from v10 a Learner's strongest Bond (D112); before, her class's first,
+ * else her first Hero's. */
 function firstLimitChoice(state: BattleState, actor: BattleAlly): BattleLimitChoice | null {
   if (actor.hero) return { hero: actor.hero }
+  if (state.engineVersion >= 10) {
+    const best = [...(actor.inherits ?? [])].sort((a, b) => b.bond - a.bond)[0]
+    return best ? { hero: best.limit } : null
+  }
   const own = classLimitChoice(state, actor)
   return own ?? (actor.inherits?.[0] ? { hero: actor.inherits[0].limit } : null)
 }
@@ -41,7 +46,7 @@ function classLimitChoice(state: BattleState, actor: BattleAlly): BattleLimitCho
 function limitAction(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes: readonly BattleUnit[]): BattleAction | null {
   if (unit.limit < BATTLE_LIMIT_MAX) return null
   const choice = firstLimitChoice(state, actor)
-  const plan = choice ? battleLimitPlan(actor, choice) : null
+  const plan = choice ? battleLimitPlan(actor, choice, state.engineVersion) : null
   if (!choice || !plan) return null
   const target = [...foes].sort((a, b) => {
     const value = (foe: BattleUnit) => plan.casts.reduce((sum, cast) => sum + score(state, cast.def, foe, foes) * cast.scale, 0)
