@@ -18,5 +18,7 @@ Craft gear from refined materials, bind it to Umas, and feel it in battle; foes 
 
 ## Exit check
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 Craft a grade-1 weapon for an Uma's build and a garb, equip both (binding them), win a fight with her, and check that
 a grade-2 piece asks for mastery rank 2.

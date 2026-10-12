@@ -68,6 +68,8 @@ Battles, levels above 1, classes, jobs and anything that makes an Uma busy, part
 
 ## Exit check (on the iPhone)
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 1. The Stable's quick look shows the summary; **Enter** opens the full page. Filter to "Front A", sort by name, and
    switch to the list view.
 2. Unlock three Umas: the account bar's tickets drop 20 → 17, and they show as owned.

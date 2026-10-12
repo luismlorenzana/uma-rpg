@@ -22,5 +22,7 @@ level gates); mastery ranks will let them equip higher-grade gear (S7).
 
 ## Exit check
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 Train a fresh Uma to Brawler rank 2 at the Brawler Dojo, learn a depth-1 skill, and start a mastery rank at an
 armory; both show on the Hub while running.

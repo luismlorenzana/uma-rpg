@@ -19,5 +19,7 @@ Cook dishes from refined ingredients, feed them to Umas, and build each Uma's Ex
 
 ## Exit check
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 Refine ingredients, cook a grade-1 dish of two kinds, feed them to an Uma, switch a node off and on, and win a fight
 with her.

@@ -24,5 +24,7 @@ Laurels from battles buy items and shortcuts at the Exchange.
 
 ## Exit check
 
+Historical check; releases use the [current phone script](../testing/phone-check.md).
+
 On the iPhone: assign two Umas to a site and one to the Pantry, close the app, come back to **Ready** tags, collect,
 refine, buy a Rush Ticket and rush a job, upgrade a site, and sweep a beaten fight.
