@@ -176,15 +176,18 @@ Routes: `/town/party-hall` and `:n` (1–20).
 
 ### Scenario Gate
 
-Routes: `/town/scenario-gate`, `c/:continent`, `r/:region` and `fight`. The world map ([maps](maps.md)).
+Routes: `/town/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent` and `fight`. The world map ([maps](maps.md)).
 
 - **On every screen:**
   - the **active party bar**: swap the party, see each Uma's MP;
   - **Resume the open fight**, when there is one.
-- **World:** the five Tier 1 continents with stages cleared; higher tiers locked.
+- **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.
+  The maps climb from low levels at the bottom, opening at the frontier. Biome icons also appear in the lists.
+- **World:** five islands for the Tier 1 continents with stages cleared; higher tiers locked.
 - **Continent:**
   - ten rows of four regions under two headings, the continent's first five levels and its last five (D97);
-  - **Spring** buttons between rows.
+  - **Spring** buttons between rows, ready or dry;
+  - the **capital marker** opens its three Finals routes.
 - **Region:**
   - its level range, then twelve stages, each with its level, locked, open or cleared, its waves, ★ boss or ♛ elite.
   - **The stage sheet:**

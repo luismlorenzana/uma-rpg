@@ -4,8 +4,11 @@ Where the fights are: a tier's world of five continents, each a map of 40 biome 
 levels in twelve stages (D66, D71, D72, D91, D97). Everything is generated from fixed seeds, so ids and contents never move under
 a save. Lists here are generated from `packages/domain/src/world/` (`world.ts`, `biomes.ts`).
 
-The screens are in [sections](sections.md#scenario-gate), the fights in [combat](combat.md), and the pixel-art maps to
-come in `docs/design/world/map-art.md`.
+The screens are in [sections](sections.md#scenario-gate), the fights in [combat](combat.md), and the pixel-art compositions in `docs/design/world/map-art.md`.
+
+The World, Continent and Region screens default to pixel maps. **Map / List** in the sticky header remembers this
+device’s choice. Low levels are at the bottom; continents and regions open at the lowest uncleared frontier.
+Stage markers open the same rival sheets, Springs refill MP, and the capital opens its Finals routes.
 
 ## Shape
 

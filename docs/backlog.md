@@ -22,7 +22,6 @@ push in one play-through. It marks the checks that need the installed app or pro
 
 | Packet | What |
 |---|---|
-| [H07](handoff/tasks/H07-world-map-screens.md) | The world map in pixel art (W5, [map-art.md](design/world/map-art.md)); H06's atlas is published |
 | [H08](handoff/tasks/H08-battle-backdrops.md) | Battle backdrops by biome |
 | [H10](handoff/tasks/H10-battle-effects-and-familiars.md) | Battle hit effects and Summoner familiars |
 | [H11](handoff/tasks/H11-ui-icons.md) | Class emblems and status icons |
