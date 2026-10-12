@@ -37,13 +37,12 @@ push in one play-through. It marks the checks that need the installed app or pro
 The numbers are a first pass from the pacing model (D54), pinned by tests but not yet played for long: professions and
 job times, the Laurel economy (replays D79, token trading D80, late Laurels D82, Time Tickets D74), battle difficulty
 with real rosters and gear, gear and food parity, recipe input counts, and the collection pace (all 268 outfits take
-248 Umas at Lv50, D40). The owner plays; [H14](handoff/tasks/H14-pacing-simulator.md) gives the numbers; Claude retunes.
+248 Umas at Lv50, D40). The owner plays; [H14’s pacing ledger](design/pacing.md#simulated) gives the numbers; Claude retunes.
 
 ## Engineering and docs
 
 | Packet | What |
 |---|---|
-| [H14](handoff/tasks/H14-pacing-simulator.md) | A pacing and economy simulator |
 | [H17](handoff/tasks/H17-device-accessibility-pass.md) | Device and accessibility pass |
 | [H21](handoff/tasks/H21-ci-ubuntu-26.md) | CI: `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19; watch the next deploy |
 

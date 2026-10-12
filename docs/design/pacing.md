@@ -111,43 +111,42 @@ Fights and Sweeps drop them; class/gear-level training and cooking spend them. K
 
 ## Simulated
 
-H14's economic victory ledger on D97: five fresh Lv1 Umas, all rewards banked, one five-level region per half-band,
-then advance to its next frontier. Unused regions stay fresh for other parties; replay the last regular stage if
-EXP is short of the next region's first level. Stop immediately at Lv50, even before the final boss. This run has
-119 first clears and seven replays.
-Run `SIM=1 pnpm --filter @rpg/domain exec vitest run src/economy/pacing.sim.test.ts` (under a second locally).
+H14’s deterministic victory ledger follows the current rules (D97, D101–D105): five fresh Umas, one complete region
+whose level range contains the party’s level, then replays of its last regular stage until the next range opens.
+Unused regions remain fresh for other parties. It stops immediately at Lv50, even mid-region. Fight durations are
+packet assumptions: 40 seconds regular, 70 elite, 100 boss, not measured play times.
 
-<!-- pacing-sim -->
-| Band | Wins (first/replay) | Fight min | EXP/Uma | Laurels | P / M / C tokens |
-|---|---|---|---|---|---|
-| 1–10 | 24 (24/0) | 19.0 | 2083 | 1260 | 14 / 27 / 23 |
-| 11–20 | 26 (24/2) | 20.3 | 3703 | 1276 | 19 / 31 / 14 |
-| 21–30 | 26 (24/2) | 20.3 | 5296 | 1276 | 13 / 35 / 18 |
-| 31–40 | 26 (24/2) | 20.3 | 6867 | 1276 | 15 / 13 / 40 |
-| 41–50 | 24 (23/1) | 18.0 | 7834 | 4170 | 0 / 33 / 26 |
-<!-- /pacing-sim -->
+<!-- live:pacing-sim -->
+| Band | Wins (first/replay) | Fight min | Uma EXP | Class EXP | Weapon EXP | Armor EXP | Laurels | Gear / Class Marks |
+|---|---|---|---|---|---|---|---|---|
+| 1–10 | 25 (24/1) | 19.7 | 2100 | 4200 | 10500 | 10500 | 1268 | 0 / 0 |
+| 11–20 | 24 (24/0) | 19.0 | 3702 | 7404 | 18510 | 18510 | 1260 | 0 / 0 |
+| 21–30 | 24 (24/0) | 19.0 | 5311 | 10622 | 26555 | 26555 | 1260 | 0 / 0 |
+| 31–40 | 24 (24/0) | 19.0 | 6925 | 13850 | 34625 | 34625 | 1260 | 0 / 26490 |
+| 41–50 | 22 (22/0) | 16.2 | 7545 | 15090 | 37725 | 37725 | 3840 | 90550 / 37725 |
 
-P/M/C = Promotion/Mastery/Cooking. EXP is per Uma; currency is the whole party's shared stock. The always-on test
-checks this table against the current rules, including level-gap EXP, waves, late Laurels and seeded token drops.
+EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.
 
-- **Fight time: under.** At the packet's 40/70/100 seconds per regular/elite/boss win, 126 wins take **98.0 minutes**,
-  below D71's 180–300-minute range around four hours. The target assertion is an explicit Vitest expected failure;
-  if it starts passing, CI requires removing that marker. No EXP or timer changed to make it fit.
-- **Token budget: met in expectation.** Per Uma: **10.49 Promotion, 26.41 Mastery, 26.41 Cooking**, against the two-track
-  targets 8/18/20 (D82, D94). The seeded run earns 12.2/27.8/24.2. These are token equivalents, not a guarantee that
-  each class/stat/band has enough without Exchange trading. A full class costs 400 Laurels in Promotion Tokens;
-  the party banks 9,258 Laurels, or 23.15 class-track equivalents before spending on anything else.
-- **Late Laurels: met.** Extra Lv41–50 Laurels are **625.4 per Uma**, about **1.56** additional classes at Exchange
-  prices, matching D82's roughly 1.5. The packet's “a third class” wording does not match the logged budget.
-- **Materials: one-slot throughput is under a fresh set.** A Brawler's five weapons, Plate and Fire Orb need **28
-  same-grade refined materials** per set (grades 2/4/6/8/10), no Forge token (D94). At A aptitude in a Lv1 facility,
-  the respective band times produce 0.42/0.27/0.19/0.15/0.11 raw-item equivalents in either one Farm or one Wilds
-  slot, **if the worker already meets that grade's gate**. Partial outputs are unfinished; refining and forging
-  take additional work. Fresh A workers instead finish **three grade-1 raw items each** during the whole run and
-  remain Farm/Craft Lv1 (D96). This compares one slot, not the dozens of concurrent workers in a developed roster.
+| Grade | Refined / ten-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |
+|---|---|---|---|
+| 2 | 40 | 0.44 / 0.44 | 0 / 0 |
+| 4 | 40 | 0.25 / 0.25 | 1 / 1 |
+| 6 | 40 | 0.18 / 0.18 | 0 / 0 |
+| 8 | 40 | 0.14 / 0.14 | 1 / 1 |
+| 10 | 40 | 0.10 / 0.10 | 1 / 1 |
 
-This is a reward ledger, not a claim those fresh, untrained Umas win every fight. Combat win rates are in
-`world/balance.test.ts`. It does not estimate MP spending or training/collection waits; its elapsed time is fight
-time only. Spring readiness/refilling and recharge waits are tested with dry-MP input, but no MP spend is invented
-for abstract victories, so the baseline uses none. It does **not** establish a real wall-clock Lv1→50 schedule.
-Claude and the owner decide whether to change a target, a traversal assumption or game numbers.
+Total: **119 wins** (118 first, 1 replay), **92.8 fight minutes**, five Lv50 Umas.
+Representative Brawler: Class Rank 50; five Weapon Ranks 10/10/10/10/10; five Armor Ranks 10/10/10/10/10.
+Banked: 8888 Laurels, 90550 Gear Marks and 64215 Class Marks. No Manuals bought, no class switching, no tokens.
+Four-hour target (180–300 min): **under**. No game number retuned.
+*One slot at A, facility Lv1, conditional on the worker already meeting the grade gate; partial output is unfinished. Fresh A workers finish 3/3 grade-1 raw items and end at Farm/Craft Lv1. Refining and crafting need additional time.
+<!-- /live -->
+
+Run `SIM=1 pnpm --filter @rpg/domain exec vitest run src/economy/pacing.sim.test.ts` to print the same ledger.
+`pnpm docs:update` renders every exact total above; CI rejects a stale block. D82’s token budget is retired by D105.
+The four-hour target remains an explicit expected-failure assertion until tuning brings it within the target range.
+
+This assumes victory, not that untrained Umas win every fight. Combat win rates live in `world/balance.test.ts`.
+It models no MP expenditure, collection waits or job waits. Classes stay fixed and weapon EXP is shared evenly, as a
+Sweep; excess rank EXP banks as Marks. It buys no Manuals and silently trains nothing. Springs and recharge waits
+are tested separately with dry-MP input. Material capacity is one slot, not a developed roster’s parallel throughput.
