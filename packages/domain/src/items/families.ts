@@ -2,9 +2,8 @@
 // item with its one refined form. Ids match the icon atlas in @luismlorenzana/uma-art (P37); a web test keeps them in
 // step. Generated once from the atlas index; edit both together.
 
-export const ITEM_EFFECTS = ['hp', 'mp', 'atk', 'matk', 'def', 'mdef', 'speed', 'limit'] as const
-export type ItemEffect = typeof ITEM_EFFECTS[number]
-export type ItemSide = 'farming' | 'gathering'
+import type { ItemEffect, ItemSide } from './kinds'
+export * from './kinds'
 
 interface FamilySpec {
   id: string

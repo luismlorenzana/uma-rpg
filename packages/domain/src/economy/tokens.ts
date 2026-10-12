@@ -4,7 +4,7 @@
 // Promotion Tokens rank up a class; Mastery Tokens raise any Weapon, Armor or Accessory Level; Cooking Tokens, one per
 // stat, go into dishes. The Forge takes none (D94): Craft Level alone gates gear.
 // Tokens sit in the Warehouse's item stock under their own ids, so jobs take, return and check them like any input.
-import { ITEM_EFFECTS, type ItemEffect } from '../items/catalog'
+import { ITEM_EFFECTS, type ItemEffect } from '../items/kinds'
 import type { RpgClass } from '../rpg/kinds'
 
 export const TOKEN_BANDS = 5

@@ -1,6 +1,6 @@
 // Timed jobs (design §8.6, D55): an Uma in a facility slot makes `count` items one after another, each taking `msEach`
 // of real time, while the app is closed. Everything is computed from the start time; nothing ticks in the save.
-import { ITEM_FAMILIES, type ItemFamily } from '../items/catalog'
+import { ITEM_IDENTITIES as ITEM_FAMILIES, type ItemFamilyIdentity as ItemFamily } from '../items/identity'
 import type { Profession } from './pacing'
 
 export type JobKind = 'gather' | 'refine' | 'cook' | 'craft' | 'train'

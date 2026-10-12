@@ -1,10 +1,8 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  parseTrack, sweepMany, sellStock, buyTokens, type Shelf, buyRawItem, buyTickets, collectAll, collectJob, queueJob, recallJob, cutJobTime, startJob, startTraining, unqueueJob, upgradeFacility, type Track, type WorkOutfit,
-  eatDish, setActiveNodes, equipGear, unequipGear, holdWeapon, type GearSlot,
-  actInFight, chooseClass, equipSkills, forgetSkill, learnSkill, newSave, renameParty, renameTrainer, setActiveParty, useSpring, retreat,
-  setPartySlot, startFight, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  parseTrack, type Shelf, type Track, type WorkOutfit, type startTraining, type GearSlot,
+  newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
 import { create } from 'zustand'
@@ -103,27 +101,30 @@ export async function nameParty(party: number, name: string): Promise<void> {
 
 // --- Battles (S3) ---------------------------------------------------------------------------------------------
 
-const edit = async (change: (save: Save, now: string) => Save): Promise<void> => {
+const edit = async <Rules,>(rules: Promise<Rules>, change: (rules: Rules, save: Save, now: string) => Save): Promise<void> => {
+  const loaded = await rules
+  // Read after the lazy import: overlapping cold actions must never commit a stale captured save.
   const { save } = useGame.getState()
-  if (save) await commit(change(save, nowIso()))
+  if (save) await commit(change(loaded, save, nowIso()))
 }
 
 /** Switches her active class for free (D86). */
-export const pickClass = (outfitId: string, classId: RpgClass) => edit((s, now) => chooseClass(s, outfitId, classId, now))
+export const pickClass = (outfitId: string, classId: RpgClass) => edit(import('@rpg/domain/battle'), (d, s, now) => d.chooseClass(s, outfitId, classId, now))
 /** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. */
-export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => learnSkill(s, outfit, classId, nodeId, now))
-export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit((s, now) => forgetSkill(s, outfit, classId, nodeId, now))
+export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now) => d.learnSkill(s, outfit, classId, nodeId, now))
+export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now) => d.forgetSkill(s, outfit, classId, nodeId, now))
 /** Equips skills in order, or null to have them chosen for her (D86). */
-export const equip = (outfit: BattleOutfit, classId: RpgClass, loadout: string[] | null) => edit((s, now) => equipSkills(s, outfit, classId, loadout, now))
+export const equip = (outfit: BattleOutfit, classId: RpgClass, loadout: string[] | null) => edit(import('@rpg/domain/battle'), (d, s, now) => d.equipSkills(s, outfit, classId, loadout, now))
 export const beginFight = (region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>
-  edit((s, now) => startFight(s, region, nodeId, outfits, now))
-export const leaveFight = () => edit((s, now) => retreat(s, now))
+  edit(import('@rpg/domain/battle'), (d, s, now) => d.startFight(s, region, nodeId, outfits, now))
+export const leaveFight = () => edit(import('@rpg/domain/battle'), (d, s, now) => d.retreat(s, now))
 /** Refills the active party's MP at a Spring (D66). */
-export const drinkAtSpring = (springId: string) => edit((s, now) => useSpring(s, springId, now))
-export const chooseActiveParty = (party: number) => edit((s, now) => setActiveParty(s, party, now))
+export const drinkAtSpring = (springId: string) => edit(import('@rpg/domain/battle'), (d, s, now) => d.useSpring(s, springId, now))
+export const chooseActiveParty = (party: number) => edit(import('@rpg/domain/battle'), (d, s, now) => d.setActiveParty(s, party, now))
 
 /** One action in the party's open fight. Saved at once; when it ends the fight, the rewards land in the same save. */
 export async function fightAction(region: RpgCampaignChapter, action: BattleAction): Promise<{ step: BattleStep; result: FightResult | null }> {
+  const { actInFight } = await import('@rpg/domain/battle')
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
   const acted = actInFight(save, region, action, nowIso())
@@ -134,40 +135,42 @@ export async function fightAction(region: RpgCampaignChapter, action: BattleActi
 // --- Work and the Exchange (S4) ----------------------------------------------------------------------------------
 
 export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
-  edit((s, now) => startJob(s, placeId, slot, outfit, output, count, now))
-export const recall = (placeId: string, slot: number) => edit((s, now) => recallJob(s, placeId, slot, now))
+  edit(import('@rpg/domain/work'), (d, s, now) => d.startJob(s, placeId, slot, outfit, output, count, now))
+export const recall = (placeId: string, slot: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.recallJob(s, placeId, slot, now))
 export const train = (placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3], track: Track) =>
-  edit((s, now) => startTraining(s, placeId, slot, outfit, track, now))
+  edit(import('@rpg/domain/work'), (d, s, now) => d.startTraining(s, placeId, slot, outfit, track, now))
 /** Spends Time Tickets on a job or training, 30 minutes each (D74). */
-export const cutTime = (placeId: string, slot: number, tickets: number) => edit((s, now) => cutJobTime(s, placeId, slot, tickets, now))
+export const cutTime = (placeId: string, slot: number, tickets: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.cutJobTime(s, placeId, slot, tickets, now))
 /** Queues another job after the slot's current one, same Uma (QoL, D62). */
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
-  edit((s, now) => queueJob(s, placeId, slot, outfit, output, count, now))
-export const unqueueWork = (placeId: string, slot: number, index: number) => edit((s, now) => unqueueJob(s, placeId, slot, index, now))
-export const upgrade = (placeId: string) => edit((s, now) => upgradeFacility(s, placeId, now))
-export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit((s, now) => buyRawItem(s, itemId, quantity, stocked, now))
-export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit((s, now) => buyTickets(s, kind, quantity, now))
-export const sell = (shelf: Shelf, id: string, quantity: number) => edit((s, now) => sellStock(s, shelf, id, quantity, now))
+  edit(import('@rpg/domain/work'), (d, s, now) => d.queueJob(s, placeId, slot, outfit, output, count, now))
+export const unqueueWork = (placeId: string, slot: number, index: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.unqueueJob(s, placeId, slot, index, now))
+export const upgrade = (placeId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.upgradeFacility(s, placeId, now))
+export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyRawItem(s, itemId, quantity, stocked, now))
+export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyTickets(s, kind, quantity, now))
+export const sell = (shelf: Shelf, id: string, quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.sellStock(s, shelf, id, quantity, now))
 /** Three tokens of a kind and band for one of your choice (D67). */
-export const buyToken = (tokenId: string, quantity: number) => edit((s, now) => buyTokens(s, tokenId, quantity, now))
+export const buyToken = (tokenId: string, quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyTokens(s, tokenId, quantity, now))
 
 /** She eats a dish: one node unlocks on her map (S6). Returns the node. */
 export async function eat(outfitId: string, dishId: string): Promise<string> {
+  const { eatDish } = await import('@rpg/domain/kitchen')
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
   const r = eatDish(save, outfitId, dishId, nowIso())
   await commit(r.save)
   return r.node
 }
-export const activate = (outfitId: string, nodes: string[]) => edit((s, now) => setActiveNodes(s, outfitId, nodes, now))
-export const wear = (outfitId: string, gearId: string) => edit((s, now) => equipGear(s, outfitId, gearId, now))
-export const takeOff = (outfitId: string, slot: GearSlot) => edit((s, now) => unequipGear(s, outfitId, slot, now))
+export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/kitchen'), (d, s, now) => d.setActiveNodes(s, outfitId, nodes, now))
+export const wear = (outfitId: string, gearId: string) => edit(import('@rpg/domain/forge'), (d, s, now) => d.equipGear(s, outfitId, gearId, now))
+export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/domain/forge'), (d, s, now) => d.unequipGear(s, outfitId, slot, now))
 /** Puts a weapon in a class's slot: its Training one (null) or a crafted piece (D98). */
 export const hold = (outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null) =>
-  edit((s, now) => holdWeapon(s, outfitId, classId, slot, weapon, gearId, now))
+  edit(import('@rpg/domain/battle'), (d, s, now) => d.holdWeapon(s, outfitId, classId, slot, weapon, gearId, now))
 
 /** Collects one job; returns what it gave. */
 export async function collect(placeId: string, slot: number): Promise<{ items: number; levelsUp: number }> {
+  const { collectJob } = await import('@rpg/domain/work')
   const { save } = useGame.getState()
   if (!save) return { items: 0, levelsUp: 0 }
   const r = collectJob(save, placeId, slot, nowIso())
@@ -177,6 +180,7 @@ export async function collect(placeId: string, slot: number): Promise<{ items: n
 
 /** Collects every ready job (on these places, or everywhere). */
 export async function collectEverything(placeIds?: readonly string[]): Promise<{ items: number; levelsUp: number }> {
+  const { collectAll } = await import('@rpg/domain/work')
   const { save } = useGame.getState()
   if (!save) return { items: 0, levelsUp: 0 }
   const r = collectAll(save, nowIso(), placeIds)
@@ -186,6 +190,7 @@ export async function collectEverything(placeIds?: readonly string[]): Promise<{
 
 /** Collects a finished job and starts the same one again with the same Uma (if the Warehouse covers its inputs). */
 export async function collectAndRepeat(placeId: string, slot: number, outfit: WorkOutfit): Promise<void> {
+  const { collectJob, startJob } = await import('@rpg/domain/work')
   const { save } = useGame.getState()
   const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
   if (!save || !job) return
@@ -196,6 +201,7 @@ export async function collectAndRepeat(placeId: string, slot: number, outfit: Wo
 
 /** Ranks up a finished training and starts the next rank with the same Uma. */
 export async function rankUpAndContinue(placeId: string, slot: number, outfit: Parameters<typeof startTraining>[3]): Promise<void> {
+  const { collectJob, startTraining } = await import('@rpg/domain/work')
   const { save } = useGame.getState()
   const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
   const track = job ? parseTrack(job.output) : null
@@ -206,6 +212,7 @@ export async function rankUpAndContinue(placeId: string, slot: number, outfit: P
 
 /** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
 export async function sweep(region: RpgCampaignChapter, nodeId: string, times = 1): Promise<FightResult & { swept: number }> {
+  const { sweepMany } = await import('@rpg/domain/exchange')
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
   const r = sweepMany(save, region, nodeId, times, nowIso())

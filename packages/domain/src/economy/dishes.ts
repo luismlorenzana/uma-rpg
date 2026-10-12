@@ -3,12 +3,8 @@
 // unlocks one node on an Uma's map; her active nodes add points to her stats.
 import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
 import { cookTokenId, gradeBand } from './tokens'
-
-/** The ring, in order (§10): stats that build together sit side by side. */
-export const RING: readonly ItemEffect[] = ['hp', 'def', 'mdef', 'mp', 'matk', 'atk', 'speed', 'limit']
-export const BRIDGE_GRADES = [3, 7] as const
-export const FEAST_GRADES = [4, 6, 8, 10] as const
-export const MOONS = 10
+import { BRIDGES, BRIDGE_GRADES, FEAST_GRADES, MOONS } from './dish-id'
+export { RING, BRIDGES, BRIDGE_GRADES, FEAST_GRADES, MOONS, STAR_NODES, isStarNode } from './dish-id'
 
 const FARM = ITEM_FAMILIES.filter((f) => f.side === 'farming')
 const farmOf = (effect: ItemEffect): ItemFamily => FARM.find((f) => f.effect === effect)!
@@ -57,7 +53,6 @@ const PLANET_DISHES: Dish[] = FARM.flatMap((f) => f.refined.map((refined, i): Di
     inputs: add({ [refined.id]: 1, [cookTokenId(f.effect, gradeBand(grade))]: 1 }, sides(f, grade, grade <= 3 ? 0 : grade <= 7 ? 1 : 2)) }
 }))
 
-export const BRIDGES: readonly (readonly [ItemEffect, ItemEffect])[] = RING.map((e, i) => [e, RING[(i + 1) % RING.length]!] as const)
 const DUO_DISHES: Dish[] = BRIDGES.flatMap(([a, b]) => BRIDGE_GRADES.map((grade): Dish => {
   const fa = farmOf(a), fb = farmOf(b)
   return { id: `duo-${a}-${b}-${grade}`, name: `${SHORT[fa.id]} & ${SHORT[fb.id]} Platter${grade >= 7 ? ' Deluxe' : ''}`, kind: 'duo', grade, effects: [a, b],
@@ -74,15 +69,6 @@ const BY_ID = new Map(DISHES.map((d) => [d.id, d]))
 export const dishById = (id: string): Dish | undefined => BY_ID.get(id)
 
 // --- The map (§10) -------------------------------------------------------------------------------------------------
-
-/** Node ids: `moon:<effect>:<1–10>`, `bridge:<a>-<b>:<1–2>`, `sun:<1–4>`. 100 in all. */
-export const STAR_NODES: readonly string[] = [
-  ...RING.flatMap((e) => Array.from({ length: MOONS }, (_, i) => `moon:${e}:${i + 1}`)),
-  ...BRIDGES.flatMap(([a, b]) => [1, 2].map((n) => `bridge:${a}-${b}:${n}`)),
-  ...[1, 2, 3, 4].map((n) => `sun:${n}`),
-]
-const NODE_SET = new Set(STAR_NODES)
-export const isStarNode = (id: string): boolean => NODE_SET.has(id)
 
 /** The minimum dish grade a node needs. */
 export function nodeGrade(id: string): number {

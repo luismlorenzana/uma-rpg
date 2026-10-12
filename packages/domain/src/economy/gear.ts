@@ -4,30 +4,12 @@
 // Fibers, Essences, Bones & Horns) Tomes and Elemental Orbs, and every armor and stat accessory takes two of each, so
 // all eight families are consumed alike. Gear binds to the Uma who equips it; her Weapon, Armor or Accessory Level k lets
 // her equip grade k (D70).
-import { ITEM_EFFECTS, ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
-import { isRpgTome, RPG_DAMAGE_KINDS, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
+import { ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
+import { isRpgTome, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
-import { TOKEN_CLASS_NAME } from './tokens'
-import { ARMOR_TYPES, GEAR_TYPE_LABEL, WEAPON_TYPES, weaponClasses, type ArmorType, type GearType, type Ranks, type WeaponType } from './training'
-
-/** Orbs (D86): an accessory that adds its kind to every hit, for weaknesses only. */
-export type OrbType = `orb-${RpgDamageKind}`
-export const ORB_TYPES: readonly OrbType[] = RPG_DAMAGE_KINDS.map((k) => `orb-${k}` as OrbType)
-export const ACCESSORY_TYPES = ['ring', 'charm', ...ORB_TYPES] as const
-export type AccessoryType = 'ring' | 'charm' | OrbType
-export type EquipType = GearType | AccessoryType
-export const EQUIP_TYPES: readonly EquipType[] = [...WEAPON_TYPES, ...ARMOR_TYPES, ...ACCESSORY_TYPES]
-export type GearSlot = WeaponType | 'armor' | 'accessory'
-const KIND_NAME: Readonly<Record<RpgDamageKind, string>> = {
-  greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark',
-}
-export const EQUIP_LABEL: Readonly<Record<EquipType, string>> = {
-  ...GEAR_TYPE_LABEL, ring: 'Ring', charm: 'Charm',
-  ...Object.fromEntries(RPG_DAMAGE_KINDS.map((k) => [`orb-${k}`, `${KIND_NAME[k]} Orb`])) as Record<OrbType, string>,
-}
-export const isOrb = (t: EquipType): t is OrbType => t.startsWith('orb-')
-/** The kind an Orb adds to every hit. */
-export const orbKind = (t: OrbType): RpgDamageKind => t.slice('orb-'.length) as RpgDamageKind
+import { WEAPON_TYPES } from './training'
+import { EQUIP_LABEL, gearIdentity, isOrb, isWeapon, orbKind, type EquipType, type GearSlot } from './gear-id'
+export * from './gear-id'
 
 /** The two halves of the gathering families (D86), by flavor: blade, whetstone, haft, grip; focus, pages, ink, binding. */
 const ARMS = ['ores', 'stones', 'woods', 'hides-scales'] as const
@@ -43,23 +25,6 @@ export function recipeFamilies(type: EquipType): readonly string[] {
   } as Record<string, readonly string[]>)[type]!
 }
 const familyOf = (id: string): ItemFamily => ITEM_FAMILIES.find((f) => f.id === id)!
-export const isArmor = (t: EquipType): t is ArmorType => (ARMOR_TYPES as readonly string[]).includes(t)
-export const isAccessory = (t: EquipType): t is AccessoryType => (ACCESSORY_TYPES as readonly string[]).includes(t)
-/** The grade of this type she may wear (D70): a weapon, the best Weapon Level among classes that wield it; armor,
- * her Armor Level; an accessory, her Accessory Level. */
-export function gearLevel(ranks: Ranks, type: EquipType): number {
-  if (isAccessory(type)) return ranks.accessory
-  if (isArmor(type)) return ranks.armor
-  return Math.max(...weaponClasses(type as WeaponType).map((c) => ranks.weapons[c]))
-}
-/** What raises that level, for messages: "Brawler Weapon Level", "Armor Level". */
-export function gearLevelName(type: EquipType): string {
-  if (isAccessory(type)) return 'Accessory Level'
-  if (isArmor(type)) return 'Armor Level'
-  return `${weaponClasses(type as WeaponType).map((c) => TOKEN_CLASS_NAME[c]).join(' or ')} Weapon Level`
-}
-export const isWeapon = (t: EquipType): t is WeaponType => (WEAPON_TYPES as readonly string[]).includes(t)
-export const slotOf = (t: EquipType): GearSlot => (isArmor(t) ? 'armor' : isAccessory(t) ? 'accessory' : t)
 
 export interface GearPiece {
   /** `<type>-g<grade>-<accent>`, e.g. `greatsword-g3-atk`. */
@@ -77,13 +42,11 @@ const ACCENT_NAME: Readonly<Record<ItemEffect, string>> = {
 /** A grade's prefix from the first family's raw item: "Copper", "Oak". */
 const gradeWord = (type: EquipType, grade: number): string =>
   familyOf(recipeFamilies(type)[0]!).raw[grade - 1]!.name.replace(/ (Ore|Log|Pelt|Hide|Scale|Bundle|Crystal|Shard|Fiber|Essence|Bone|Horn|Stone)$/, '')
-export const gearId = (type: EquipType, grade: number, accent: ItemEffect): string => `${type}-g${grade}-${accent}`
 /** The piece an id names, or undefined. Pieces aren't stored as a list: any type × grade × accent exists. */
 export function gearById(id: string): GearPiece | undefined {
-  const m = /^([a-z-]+)-g(\d{1,2})-([a-z]+)$/.exec(id)
-  if (!m) return undefined
-  const type = m[1] as EquipType, grade = Number(m[2]), accent = m[3] as ItemEffect
-  if (!EQUIP_TYPES.includes(type) || grade < 1 || grade > 10 || !ITEM_EFFECTS.includes(accent)) return undefined
+  const piece = gearIdentity(id)
+  if (!piece) return undefined
+  const { type, grade, accent } = piece
   const inputs: Record<string, number> = {}
   for (const family of recipeFamilies(type)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
   return { id, type, grade, accent, name: `${ACCENT_NAME[accent]} ${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`, inputs }

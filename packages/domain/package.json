@@ -2,6 +2,7 @@
   "name": "@rpg/domain",
   "version": "0.1.0",
   "private": true,
+  "sideEffects": false,
   "description": "Uma RPG game rules and shared contracts: pure, no I/O.",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
@@ -15,6 +16,26 @@
         "types": "./src/index.ts",
         "default": "./src/index.ts"
       }
+    },
+    "./battle": {
+      "require": { "types": "./dist/cjs/save/battle.d.ts", "default": "./dist/cjs/save/battle.js" },
+      "default": { "types": "./src/save/battle.ts", "default": "./src/save/battle.ts" }
+    },
+    "./work": {
+      "require": { "types": "./dist/cjs/save/work.d.ts", "default": "./dist/cjs/save/work.js" },
+      "default": { "types": "./src/save/work.ts", "default": "./src/save/work.ts" }
+    },
+    "./exchange": {
+      "require": { "types": "./dist/cjs/save/exchange.d.ts", "default": "./dist/cjs/save/exchange.js" },
+      "default": { "types": "./src/save/exchange.ts", "default": "./src/save/exchange.ts" }
+    },
+    "./kitchen": {
+      "require": { "types": "./dist/cjs/save/kitchen.d.ts", "default": "./dist/cjs/save/kitchen.js" },
+      "default": { "types": "./src/save/kitchen.ts", "default": "./src/save/kitchen.ts" }
+    },
+    "./forge": {
+      "require": { "types": "./dist/cjs/save/forge.d.ts", "default": "./dist/cjs/save/forge.js" },
+      "default": { "types": "./src/save/forge.ts", "default": "./src/save/forge.ts" }
     }
   },
   "scripts": {

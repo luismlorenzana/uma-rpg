@@ -17,6 +17,8 @@ import { HOUR } from '../economy/pacing'
 import { isInFight, workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import type { OwnedUma, ProfessionLevel, Save, TierWorld } from './save'
+import { facilityOf } from './facility'
+export { facilityOf } from './facility'
 
 /** What work needs from an outfit's master data (a `RosterOutfit` fits). */
 export interface WorkOutfit {
@@ -27,12 +29,6 @@ export interface WorkOutfit {
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
-
-/** A facility's state: level 1 and idle until first used. */
-export function facilityOf(world: TierWorld, placeId: string): Facility {
-  return world.facilities[placeId] ?? { level: 1, jobs: Array.from({ length: FACILITY_SLOTS[0] }, () => null) }
-}
-
 
 /** Profession EXP in: levels up, banking EXP at Lv50. */
 export function grantProfessionExp(p: ProfessionLevel, exp: number): ProfessionLevel {

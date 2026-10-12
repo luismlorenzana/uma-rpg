@@ -11,7 +11,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "test": "turbo run test",
+    "test": "node --test scripts/check-size.test.mjs && turbo run test",
     "web": "pnpm --filter @rpg/web dev",
     "api": "pnpm --filter @rpg/api dev",
     "docs:update": "pnpm --filter @rpg/domain run docs:update"

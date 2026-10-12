@@ -2,12 +2,13 @@
 // wields five weapons and has a tree per weapon; core skills come free as depths open (class rank and Uma level,
 // D77), points buy side skills, and a hand per class scales power and MP.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, type RpgNode } from './catalog'
+import { rpgClassWeapons, rpgNodeIdentity as rpgNode, rpgSideNodeLevel, rpgTreeOf, type RpgNodeIdentity as RpgNode } from './node-identity'
 import {
   isRpgTome, isRpgWeapon, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon,
 } from './kinds'
 
 export * from './kinds'
+export { rpgClassWeapons } from './node-identity'
 
 export const RPG_TIER_MAX_LEVEL = 50
 /** Points buy side skills only (D86): one a level to Lv50. Core skills cost nothing. */
@@ -66,9 +67,6 @@ export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>>
   spellblade: ['arms', 'arms', 'arms', 'tome', 'tome'],
   cleric: ['any', 'any', 'any', 'any', 'any'],
 }
-/** The weapons a class has trees for. */
-export const rpgClassWeapons = (classId: RpgClass): readonly RpgWeapon[] =>
-  classId === 'brawler' ? RPG_WEAPON_KINDS : classId === 'mage' ? RPG_TOMES : RPG_WEAPONS
 /** Whether a class picks its weapons (Summoner, Spell Blade, Cleric) or wields a fixed five. */
 export const rpgPicksWeapons = (classId: RpgClass): boolean => classId !== 'brawler' && classId !== 'mage'
 /** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */
@@ -223,7 +221,8 @@ export function rpgDepthBlock(profile: DepthGated, depth: number): string | null
 
 /** The core skills an open depth gives in these trees, shallowest first. */
 export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'level' | 'maxDepth'>, trees: readonly RpgTreeId[]): RpgNodeRef[] {
-  return trees.flatMap((tree) => rpgTreeNodes(tree).filter((n) => n.variant === null && !rpgDepthBlock(profile, n.depth)))
+  return trees.flatMap((tree) => Array.from({ length: 5 }, (_, i) => rpgNode(`${tree}.${i + 1}`))
+    .filter((n): n is RpgNode => !!n && !rpgDepthBlock(profile, n.depth)))
     .sort((a, b) => a.depth - b.depth).map((n) => ({ tier: profile.tier, id: n.id }))
 }
 
