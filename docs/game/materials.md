@@ -11,7 +11,7 @@ Sixteen families on two sides:
 - **Gathering** (Wilds page) feeds the Forge.
 
 Each family feeds one of eight stats, has one site, and has ten grades. Every raw item refines one-for-one into its
-refined form, at the Pantry (farming) or the Workbench (gathering).
+refined form, at the Pantry (farming) or the Workbench (gathering), in a quarter of the time it took to gather (D101).
 
 <!-- live:families -->
 | Family | Id | Side | Feeds | Site | Refined at |
@@ -42,243 +42,243 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 <!-- live:items -->
 ### Grains (`grains`, HP, Fields)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Wheat (`wheat`) | Wheat Flour (`wheat-flour`) | 1 | 60 | 120 |
-| 2 | Oats (`oats`) | Rolled Oats (`rolled-oats`) | 6 | 90 | 180 |
-| 3 | Barley (`barley`) | Pearl Barley (`pearl-barley`) | 11 | 120 | 240 |
-| 4 | Rice (`rice`) | Polished Rice (`polished-rice`) | 16 | 150 | 300 |
-| 5 | Corn (`corn`) | Cornmeal (`cornmeal`) | 21 | 180 | 360 |
-| 6 | Rye (`rye`) | Rye Flour (`rye-flour`) | 26 | 210 | 420 |
-| 7 | Buckwheat (`buckwheat`) | Buckwheat Flour (`buckwheat-flour`) | 31 | 240 | 480 |
-| 8 | Wild Rice (`wild-rice`) | Hulled Wild Rice (`hulled-wild-rice`) | 36 | 270 | 540 |
-| 9 | Moonrice (`moonrice`) | Moonrice Flour (`moonrice-flour`) | 41 | 300 | 600 |
-| 10 | Sunwheat (`sunwheat`) | Sunwheat Flour (`sunwheat-flour`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Wheat (`wheat`) | Wheat Flour (`wheat-flour`) | 1 | 60 | 15 | 120 |
+| 2 | Oats (`oats`) | Rolled Oats (`rolled-oats`) | 6 | 90 | 22.5 | 180 |
+| 3 | Barley (`barley`) | Pearl Barley (`pearl-barley`) | 11 | 120 | 30 | 240 |
+| 4 | Rice (`rice`) | Polished Rice (`polished-rice`) | 16 | 150 | 37.5 | 300 |
+| 5 | Corn (`corn`) | Cornmeal (`cornmeal`) | 21 | 180 | 45 | 360 |
+| 6 | Rye (`rye`) | Rye Flour (`rye-flour`) | 26 | 210 | 52.5 | 420 |
+| 7 | Buckwheat (`buckwheat`) | Buckwheat Flour (`buckwheat-flour`) | 31 | 240 | 60 | 480 |
+| 8 | Wild Rice (`wild-rice`) | Hulled Wild Rice (`hulled-wild-rice`) | 36 | 270 | 67.5 | 540 |
+| 9 | Moonrice (`moonrice`) | Moonrice Flour (`moonrice-flour`) | 41 | 300 | 75 | 600 |
+| 10 | Sunwheat (`sunwheat`) | Sunwheat Flour (`sunwheat-flour`) | 46 | 330 | 82.5 | 660 |
 
 ### Fruits (`fruits`, MP, Orchard)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Apple (`apple`) | Apple Preserve (`apple-preserve`) | 1 | 60 | 120 |
-| 2 | Pear (`pear`) | Pear Preserve (`pear-preserve`) | 6 | 90 | 180 |
-| 3 | Peach (`peach`) | Peach Preserve (`peach-preserve`) | 11 | 120 | 240 |
-| 4 | Plum (`plum`) | Plum Preserve (`plum-preserve`) | 16 | 150 | 300 |
-| 5 | Orange (`orange`) | Orange Marmalade (`orange-marmalade`) | 21 | 180 | 360 |
-| 6 | Grape (`grape`) | Grape Jelly (`grape-jelly`) | 26 | 210 | 420 |
-| 7 | Mango (`mango`) | Mango Pulp (`mango-pulp`) | 31 | 240 | 480 |
-| 8 | Pomegranate (`pomegranate`) | Pomegranate Molasses (`pomegranate-molasses`) | 36 | 270 | 540 |
-| 9 | Starpeach (`starpeach`) | Starpeach Nectar (`starpeach-nectar`) | 41 | 300 | 600 |
-| 10 | Golden Apple (`golden-apple`) | Golden Apple Preserve (`golden-apple-preserve`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Apple (`apple`) | Apple Preserve (`apple-preserve`) | 1 | 60 | 15 | 120 |
+| 2 | Pear (`pear`) | Pear Preserve (`pear-preserve`) | 6 | 90 | 22.5 | 180 |
+| 3 | Peach (`peach`) | Peach Preserve (`peach-preserve`) | 11 | 120 | 30 | 240 |
+| 4 | Plum (`plum`) | Plum Preserve (`plum-preserve`) | 16 | 150 | 37.5 | 300 |
+| 5 | Orange (`orange`) | Orange Marmalade (`orange-marmalade`) | 21 | 180 | 45 | 360 |
+| 6 | Grape (`grape`) | Grape Jelly (`grape-jelly`) | 26 | 210 | 52.5 | 420 |
+| 7 | Mango (`mango`) | Mango Pulp (`mango-pulp`) | 31 | 240 | 60 | 480 |
+| 8 | Pomegranate (`pomegranate`) | Pomegranate Molasses (`pomegranate-molasses`) | 36 | 270 | 67.5 | 540 |
+| 9 | Starpeach (`starpeach`) | Starpeach Nectar (`starpeach-nectar`) | 41 | 300 | 75 | 600 |
+| 10 | Golden Apple (`golden-apple`) | Golden Apple Preserve (`golden-apple-preserve`) | 46 | 330 | 82.5 | 660 |
 
 ### Fish (`fish`, ATK, Fishery)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 | 60 | 120 |
-| 2 | Trout (`trout`) | Trout Fillet (`trout-fillet`) | 6 | 90 | 180 |
-| 3 | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 11 | 120 | 240 |
-| 4 | Mackerel (`mackerel`) | Mackerel Fillet (`mackerel-fillet`) | 16 | 150 | 300 |
-| 5 | Salmon (`salmon`) | Salmon Fillet (`salmon-fillet`) | 21 | 180 | 360 |
-| 6 | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 26 | 210 | 420 |
-| 7 | Eel (`eel`) | Eel Fillet (`eel-fillet`) | 31 | 240 | 480 |
-| 8 | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 36 | 270 | 540 |
-| 9 | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 41 | 300 | 600 |
-| 10 | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 | 60 | 15 | 120 |
+| 2 | Trout (`trout`) | Trout Fillet (`trout-fillet`) | 6 | 90 | 22.5 | 180 |
+| 3 | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 11 | 120 | 30 | 240 |
+| 4 | Mackerel (`mackerel`) | Mackerel Fillet (`mackerel-fillet`) | 16 | 150 | 37.5 | 300 |
+| 5 | Salmon (`salmon`) | Salmon Fillet (`salmon-fillet`) | 21 | 180 | 45 | 360 |
+| 6 | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 26 | 210 | 52.5 | 420 |
+| 7 | Eel (`eel`) | Eel Fillet (`eel-fillet`) | 31 | 240 | 60 | 480 |
+| 8 | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 36 | 270 | 67.5 | 540 |
+| 9 | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 41 | 300 | 75 | 600 |
+| 10 | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 46 | 330 | 82.5 | 660 |
 
 ### Herbs & Spices (`herbs-spices`, M.ATK, Herb Garden)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Basil (`basil`) | Dried Basil (`dried-basil`) | 1 | 60 | 120 |
-| 2 | Mint (`mint`) | Dried Mint (`dried-mint`) | 6 | 90 | 180 |
-| 3 | Rosemary (`rosemary`) | Dried Rosemary (`dried-rosemary`) | 11 | 120 | 240 |
-| 4 | Thyme (`thyme`) | Dried Thyme (`dried-thyme`) | 16 | 150 | 300 |
-| 5 | Ginger (`ginger`) | Ground Ginger (`ground-ginger`) | 21 | 180 | 360 |
-| 6 | Peppercorn (`peppercorn`) | Ground Pepper (`ground-pepper`) | 26 | 210 | 420 |
-| 7 | Cinnamon (`cinnamon`) | Ground Cinnamon (`ground-cinnamon`) | 31 | 240 | 480 |
-| 8 | Saffron (`saffron`) | Saffron Threads (`saffron-threads`) | 36 | 270 | 540 |
-| 9 | Mandrake (`mandrake`) | Mandrake Powder (`mandrake-powder`) | 41 | 300 | 600 |
-| 10 | Phoenix Pepper (`phoenix-pepper`) | Phoenix Spice (`phoenix-spice`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Basil (`basil`) | Dried Basil (`dried-basil`) | 1 | 60 | 15 | 120 |
+| 2 | Mint (`mint`) | Dried Mint (`dried-mint`) | 6 | 90 | 22.5 | 180 |
+| 3 | Rosemary (`rosemary`) | Dried Rosemary (`dried-rosemary`) | 11 | 120 | 30 | 240 |
+| 4 | Thyme (`thyme`) | Dried Thyme (`dried-thyme`) | 16 | 150 | 37.5 | 300 |
+| 5 | Ginger (`ginger`) | Ground Ginger (`ground-ginger`) | 21 | 180 | 45 | 360 |
+| 6 | Peppercorn (`peppercorn`) | Ground Pepper (`ground-pepper`) | 26 | 210 | 52.5 | 420 |
+| 7 | Cinnamon (`cinnamon`) | Ground Cinnamon (`ground-cinnamon`) | 31 | 240 | 60 | 480 |
+| 8 | Saffron (`saffron`) | Saffron Threads (`saffron-threads`) | 36 | 270 | 67.5 | 540 |
+| 9 | Mandrake (`mandrake`) | Mandrake Powder (`mandrake-powder`) | 41 | 300 | 75 | 600 |
+| 10 | Phoenix Pepper (`phoenix-pepper`) | Phoenix Spice (`phoenix-spice`) | 46 | 330 | 82.5 | 660 |
 
 ### Vegetables (`vegetables`, DEF, Vegetable Garden)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 | 60 | 120 |
-| 2 | Potato (`potato`) | Diced Potato (`diced-potato`) | 6 | 90 | 180 |
-| 3 | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 11 | 120 | 240 |
-| 4 | Onion (`onion`) | Diced Onion (`diced-onion`) | 16 | 150 | 300 |
-| 5 | Tomato (`tomato`) | Tomato Purée (`tomato-puree`) | 21 | 180 | 360 |
-| 6 | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 26 | 210 | 420 |
-| 7 | Eggplant (`eggplant`) | Sliced Eggplant (`sliced-eggplant`) | 31 | 240 | 480 |
-| 8 | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 36 | 270 | 540 |
-| 9 | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 41 | 300 | 600 |
-| 10 | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 | 60 | 15 | 120 |
+| 2 | Potato (`potato`) | Diced Potato (`diced-potato`) | 6 | 90 | 22.5 | 180 |
+| 3 | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 11 | 120 | 30 | 240 |
+| 4 | Onion (`onion`) | Diced Onion (`diced-onion`) | 16 | 150 | 37.5 | 300 |
+| 5 | Tomato (`tomato`) | Tomato Purée (`tomato-puree`) | 21 | 180 | 45 | 360 |
+| 6 | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 26 | 210 | 52.5 | 420 |
+| 7 | Eggplant (`eggplant`) | Sliced Eggplant (`sliced-eggplant`) | 31 | 240 | 60 | 480 |
+| 8 | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 36 | 270 | 67.5 | 540 |
+| 9 | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 41 | 300 | 75 | 600 |
+| 10 | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 46 | 330 | 82.5 | 660 |
 
 ### Mushrooms (`mushrooms`, M.DEF, Mushroom Cave)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Button Mushroom (`button-mushroom`) | Dried Button Mushroom (`dried-button-mushroom`) | 1 | 60 | 120 |
-| 2 | Shiitake (`shiitake`) | Dried Shiitake (`dried-shiitake`) | 6 | 90 | 180 |
-| 3 | Oyster Mushroom (`oyster-mushroom`) | Dried Oyster Mushroom (`dried-oyster-mushroom`) | 11 | 120 | 240 |
-| 4 | Enoki (`enoki`) | Dried Enoki (`dried-enoki`) | 16 | 150 | 300 |
-| 5 | Chanterelle (`chanterelle`) | Dried Chanterelle (`dried-chanterelle`) | 21 | 180 | 360 |
-| 6 | Porcini (`porcini`) | Dried Porcini (`dried-porcini`) | 26 | 210 | 420 |
-| 7 | Morel (`morel`) | Dried Morel (`dried-morel`) | 31 | 240 | 480 |
-| 8 | Truffle (`truffle`) | Shaved Truffle (`shaved-truffle`) | 36 | 270 | 540 |
-| 9 | Glowcap (`glowcap`) | Glowcap Powder (`glowcap-powder`) | 41 | 300 | 600 |
-| 10 | King Reishi (`king-reishi`) | Reishi Powder (`reishi-powder`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Button Mushroom (`button-mushroom`) | Dried Button Mushroom (`dried-button-mushroom`) | 1 | 60 | 15 | 120 |
+| 2 | Shiitake (`shiitake`) | Dried Shiitake (`dried-shiitake`) | 6 | 90 | 22.5 | 180 |
+| 3 | Oyster Mushroom (`oyster-mushroom`) | Dried Oyster Mushroom (`dried-oyster-mushroom`) | 11 | 120 | 30 | 240 |
+| 4 | Enoki (`enoki`) | Dried Enoki (`dried-enoki`) | 16 | 150 | 37.5 | 300 |
+| 5 | Chanterelle (`chanterelle`) | Dried Chanterelle (`dried-chanterelle`) | 21 | 180 | 45 | 360 |
+| 6 | Porcini (`porcini`) | Dried Porcini (`dried-porcini`) | 26 | 210 | 52.5 | 420 |
+| 7 | Morel (`morel`) | Dried Morel (`dried-morel`) | 31 | 240 | 60 | 480 |
+| 8 | Truffle (`truffle`) | Shaved Truffle (`shaved-truffle`) | 36 | 270 | 67.5 | 540 |
+| 9 | Glowcap (`glowcap`) | Glowcap Powder (`glowcap-powder`) | 41 | 300 | 75 | 600 |
+| 10 | King Reishi (`king-reishi`) | Reishi Powder (`reishi-powder`) | 46 | 330 | 82.5 | 660 |
 
 ### Sweets (`sweets`, Speed, Sugar Grove)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Honeycomb (`honeycomb`) | Honey (`honey`) | 1 | 60 | 120 |
-| 2 | Sugarcane (`sugarcane`) | Cane Sugar (`cane-sugar`) | 6 | 90 | 180 |
-| 3 | Sugar Beet (`sugar-beet`) | Beet Sugar (`beet-sugar`) | 11 | 120 | 240 |
-| 4 | Maple Sap (`maple-sap`) | Maple Syrup (`maple-syrup`) | 16 | 150 | 300 |
-| 5 | Cacao Pod (`cacao-pod`) | Chocolate (`chocolate`) | 21 | 180 | 360 |
-| 6 | Vanilla Pod (`vanilla-pod`) | Vanilla Extract (`vanilla-extract`) | 26 | 210 | 420 |
-| 7 | Agave Heart (`agave-heart`) | Agave Syrup (`agave-syrup`) | 31 | 240 | 480 |
-| 8 | Palm Sap (`palm-sap`) | Palm Sugar (`palm-sugar`) | 36 | 270 | 540 |
-| 9 | Fairy Honeycomb (`fairy-honeycomb`) | Fairy Honey (`fairy-honey`) | 41 | 300 | 600 |
-| 10 | Ambrosia Blossom (`ambrosia-blossom`) | Ambrosia (`ambrosia`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Honeycomb (`honeycomb`) | Honey (`honey`) | 1 | 60 | 15 | 120 |
+| 2 | Sugarcane (`sugarcane`) | Cane Sugar (`cane-sugar`) | 6 | 90 | 22.5 | 180 |
+| 3 | Sugar Beet (`sugar-beet`) | Beet Sugar (`beet-sugar`) | 11 | 120 | 30 | 240 |
+| 4 | Maple Sap (`maple-sap`) | Maple Syrup (`maple-syrup`) | 16 | 150 | 37.5 | 300 |
+| 5 | Cacao Pod (`cacao-pod`) | Chocolate (`chocolate`) | 21 | 180 | 45 | 360 |
+| 6 | Vanilla Pod (`vanilla-pod`) | Vanilla Extract (`vanilla-extract`) | 26 | 210 | 52.5 | 420 |
+| 7 | Agave Heart (`agave-heart`) | Agave Syrup (`agave-syrup`) | 31 | 240 | 60 | 480 |
+| 8 | Palm Sap (`palm-sap`) | Palm Sugar (`palm-sugar`) | 36 | 270 | 67.5 | 540 |
+| 9 | Fairy Honeycomb (`fairy-honeycomb`) | Fairy Honey (`fairy-honey`) | 41 | 300 | 75 | 600 |
+| 10 | Ambrosia Blossom (`ambrosia-blossom`) | Ambrosia (`ambrosia`) | 46 | 330 | 82.5 | 660 |
 
 ### Nuts & Seeds (`nuts-seeds`, Limit Break charge, Nut Grove)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Peanut (`peanut`) | Peanut Butter (`peanut-butter`) | 1 | 60 | 120 |
-| 2 | Sunflower Seed (`sunflower-seed`) | Sunflower Oil (`sunflower-oil`) | 6 | 90 | 180 |
-| 3 | Sesame (`sesame`) | Sesame Paste (`sesame-paste`) | 11 | 120 | 240 |
-| 4 | Walnut (`walnut`) | Walnut Paste (`walnut-paste`) | 16 | 150 | 300 |
-| 5 | Chestnut (`chestnut`) | Chestnut Paste (`chestnut-paste`) | 21 | 180 | 360 |
-| 6 | Almond (`almond`) | Almond Paste (`almond-paste`) | 26 | 210 | 420 |
-| 7 | Pistachio (`pistachio`) | Pistachio Paste (`pistachio-paste`) | 31 | 240 | 480 |
-| 8 | Macadamia (`macadamia`) | Macadamia Butter (`macadamia-butter`) | 36 | 270 | 540 |
-| 9 | Thundernut (`thundernut`) | Thundernut Oil (`thundernut-oil`) | 41 | 300 | 600 |
-| 10 | Worldseed (`worldseed`) | Worldseed Oil (`worldseed-oil`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Peanut (`peanut`) | Peanut Butter (`peanut-butter`) | 1 | 60 | 15 | 120 |
+| 2 | Sunflower Seed (`sunflower-seed`) | Sunflower Oil (`sunflower-oil`) | 6 | 90 | 22.5 | 180 |
+| 3 | Sesame (`sesame`) | Sesame Paste (`sesame-paste`) | 11 | 120 | 30 | 240 |
+| 4 | Walnut (`walnut`) | Walnut Paste (`walnut-paste`) | 16 | 150 | 37.5 | 300 |
+| 5 | Chestnut (`chestnut`) | Chestnut Paste (`chestnut-paste`) | 21 | 180 | 45 | 360 |
+| 6 | Almond (`almond`) | Almond Paste (`almond-paste`) | 26 | 210 | 52.5 | 420 |
+| 7 | Pistachio (`pistachio`) | Pistachio Paste (`pistachio-paste`) | 31 | 240 | 60 | 480 |
+| 8 | Macadamia (`macadamia`) | Macadamia Butter (`macadamia-butter`) | 36 | 270 | 67.5 | 540 |
+| 9 | Thundernut (`thundernut`) | Thundernut Oil (`thundernut-oil`) | 41 | 300 | 75 | 600 |
+| 10 | Worldseed (`worldseed`) | Worldseed Oil (`worldseed-oil`) | 46 | 330 | 82.5 | 660 |
 
 ### Hides & Scales (`hides-scales`, HP, Monster Den)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Puffbun Pelt (`puffbun-pelt`) | Puffbun Leather (`puffbun-leather`) | 1 | 60 | 120 |
-| 2 | Boarling Hide (`boarling-hide`) | Boarling Leather (`boarling-leather`) | 6 | 90 | 180 |
-| 3 | Wolfkin Pelt (`wolfkin-pelt`) | Wolfkin Leather (`wolfkin-leather`) | 11 | 120 | 240 |
-| 4 | Rock Lizard Scale (`rock-lizard-scale`) | Lizard Leather (`lizard-leather`) | 16 | 150 | 300 |
-| 5 | Ironback Hide (`ironback-hide`) | Ironback Leather (`ironback-leather`) | 21 | 180 | 360 |
-| 6 | Basilisk Scale (`basilisk-scale`) | Basilisk Leather (`basilisk-leather`) | 26 | 210 | 420 |
-| 7 | Manticore Hide (`manticore-hide`) | Manticore Leather (`manticore-leather`) | 31 | 240 | 480 |
-| 8 | Behemoth Hide (`behemoth-hide`) | Behemoth Leather (`behemoth-leather`) | 36 | 270 | 540 |
-| 9 | Wyvern Scale (`wyvern-scale`) | Wyvern Leather (`wyvern-leather`) | 41 | 300 | 600 |
-| 10 | Dragon Scale (`dragon-scale`) | Dragonhide (`dragonhide`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Puffbun Pelt (`puffbun-pelt`) | Puffbun Leather (`puffbun-leather`) | 1 | 60 | 15 | 120 |
+| 2 | Boarling Hide (`boarling-hide`) | Boarling Leather (`boarling-leather`) | 6 | 90 | 22.5 | 180 |
+| 3 | Wolfkin Pelt (`wolfkin-pelt`) | Wolfkin Leather (`wolfkin-leather`) | 11 | 120 | 30 | 240 |
+| 4 | Rock Lizard Scale (`rock-lizard-scale`) | Lizard Leather (`lizard-leather`) | 16 | 150 | 37.5 | 300 |
+| 5 | Ironback Hide (`ironback-hide`) | Ironback Leather (`ironback-leather`) | 21 | 180 | 45 | 360 |
+| 6 | Basilisk Scale (`basilisk-scale`) | Basilisk Leather (`basilisk-leather`) | 26 | 210 | 52.5 | 420 |
+| 7 | Manticore Hide (`manticore-hide`) | Manticore Leather (`manticore-leather`) | 31 | 240 | 60 | 480 |
+| 8 | Behemoth Hide (`behemoth-hide`) | Behemoth Leather (`behemoth-leather`) | 36 | 270 | 67.5 | 540 |
+| 9 | Wyvern Scale (`wyvern-scale`) | Wyvern Leather (`wyvern-leather`) | 41 | 300 | 75 | 600 |
+| 10 | Dragon Scale (`dragon-scale`) | Dragonhide (`dragonhide`) | 46 | 330 | 82.5 | 660 |
 
 ### Essences (`essences`, MP, Ley Spring)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Mist Essence (`mist-essence`) | Mist Infusion (`mist-infusion`) | 1 | 60 | 120 |
-| 2 | Dew Essence (`dew-essence`) | Dew Infusion (`dew-infusion`) | 6 | 90 | 180 |
-| 3 | Breeze Essence (`breeze-essence`) | Breeze Infusion (`breeze-infusion`) | 11 | 120 | 240 |
-| 4 | Ember Essence (`ember-essence`) | Ember Infusion (`ember-infusion`) | 16 | 150 | 300 |
-| 5 | Tide Essence (`tide-essence`) | Tide Infusion (`tide-infusion`) | 21 | 180 | 360 |
-| 6 | Spark Essence (`spark-essence`) | Spark Infusion (`spark-infusion`) | 26 | 210 | 420 |
-| 7 | Glimmer Essence (`glimmer-essence`) | Glimmer Infusion (`glimmer-infusion`) | 31 | 240 | 480 |
-| 8 | Shadow Essence (`shadow-essence`) | Shadow Infusion (`shadow-infusion`) | 36 | 270 | 540 |
-| 9 | Aether (`aether`) | Aether Infusion (`aether-infusion`) | 41 | 300 | 600 |
-| 10 | Prismatic Essence (`prismatic-essence`) | Prismatic Infusion (`prismatic-infusion`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Mist Essence (`mist-essence`) | Mist Infusion (`mist-infusion`) | 1 | 60 | 15 | 120 |
+| 2 | Dew Essence (`dew-essence`) | Dew Infusion (`dew-infusion`) | 6 | 90 | 22.5 | 180 |
+| 3 | Breeze Essence (`breeze-essence`) | Breeze Infusion (`breeze-infusion`) | 11 | 120 | 30 | 240 |
+| 4 | Ember Essence (`ember-essence`) | Ember Infusion (`ember-infusion`) | 16 | 150 | 37.5 | 300 |
+| 5 | Tide Essence (`tide-essence`) | Tide Infusion (`tide-infusion`) | 21 | 180 | 45 | 360 |
+| 6 | Spark Essence (`spark-essence`) | Spark Infusion (`spark-infusion`) | 26 | 210 | 52.5 | 420 |
+| 7 | Glimmer Essence (`glimmer-essence`) | Glimmer Infusion (`glimmer-infusion`) | 31 | 240 | 60 | 480 |
+| 8 | Shadow Essence (`shadow-essence`) | Shadow Infusion (`shadow-infusion`) | 36 | 270 | 67.5 | 540 |
+| 9 | Aether (`aether`) | Aether Infusion (`aether-infusion`) | 41 | 300 | 75 | 600 |
+| 10 | Prismatic Essence (`prismatic-essence`) | Prismatic Infusion (`prismatic-infusion`) | 46 | 330 | 82.5 | 660 |
 
 ### Ores (`ores`, ATK, Mine)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 | 60 | 120 |
-| 2 | Tin Ore (`tin-ore`) | Tin Ingot (`tin-ingot`) | 6 | 90 | 180 |
-| 3 | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 11 | 120 | 240 |
-| 4 | Silver Ore (`silver-ore`) | Silver Ingot (`silver-ingot`) | 16 | 150 | 300 |
-| 5 | Cobalt Ore (`cobalt-ore`) | Cobalt Ingot (`cobalt-ingot`) | 21 | 180 | 360 |
-| 6 | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 26 | 210 | 420 |
-| 7 | Platinum Ore (`platinum-ore`) | Platinum Ingot (`platinum-ingot`) | 31 | 240 | 480 |
-| 8 | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 36 | 270 | 540 |
-| 9 | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 41 | 300 | 600 |
-| 10 | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 | 60 | 15 | 120 |
+| 2 | Tin Ore (`tin-ore`) | Tin Ingot (`tin-ingot`) | 6 | 90 | 22.5 | 180 |
+| 3 | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 11 | 120 | 30 | 240 |
+| 4 | Silver Ore (`silver-ore`) | Silver Ingot (`silver-ingot`) | 16 | 150 | 37.5 | 300 |
+| 5 | Cobalt Ore (`cobalt-ore`) | Cobalt Ingot (`cobalt-ingot`) | 21 | 180 | 45 | 360 |
+| 6 | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 26 | 210 | 52.5 | 420 |
+| 7 | Platinum Ore (`platinum-ore`) | Platinum Ingot (`platinum-ingot`) | 31 | 240 | 60 | 480 |
+| 8 | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 36 | 270 | 67.5 | 540 |
+| 9 | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 41 | 300 | 75 | 600 |
+| 10 | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 46 | 330 | 82.5 | 660 |
 
 ### Crystals (`crystals`, M.ATK, Crystal Cavern)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 | 60 | 120 |
-| 2 | Amethyst (`amethyst`) | Cut Amethyst (`cut-amethyst`) | 6 | 90 | 180 |
-| 3 | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 11 | 120 | 240 |
-| 4 | Garnet (`garnet`) | Cut Garnet (`cut-garnet`) | 16 | 150 | 300 |
-| 5 | Emerald (`emerald`) | Cut Emerald (`cut-emerald`) | 21 | 180 | 360 |
-| 6 | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 26 | 210 | 420 |
-| 7 | Ruby (`ruby`) | Cut Ruby (`cut-ruby`) | 31 | 240 | 480 |
-| 8 | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 36 | 270 | 540 |
-| 9 | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 41 | 300 | 600 |
-| 10 | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 | 60 | 15 | 120 |
+| 2 | Amethyst (`amethyst`) | Cut Amethyst (`cut-amethyst`) | 6 | 90 | 22.5 | 180 |
+| 3 | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 11 | 120 | 30 | 240 |
+| 4 | Garnet (`garnet`) | Cut Garnet (`cut-garnet`) | 16 | 150 | 37.5 | 300 |
+| 5 | Emerald (`emerald`) | Cut Emerald (`cut-emerald`) | 21 | 180 | 45 | 360 |
+| 6 | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 26 | 210 | 52.5 | 420 |
+| 7 | Ruby (`ruby`) | Cut Ruby (`cut-ruby`) | 31 | 240 | 60 | 480 |
+| 8 | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 36 | 270 | 67.5 | 540 |
+| 9 | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 41 | 300 | 75 | 600 |
+| 10 | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 46 | 330 | 82.5 | 660 |
 
 ### Stones (`stones`, DEF, Quarry)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Limestone (`limestone`) | Limestone Block (`limestone-block`) | 1 | 60 | 120 |
-| 2 | Sandstone (`sandstone`) | Sandstone Block (`sandstone-block`) | 6 | 90 | 180 |
-| 3 | Slate (`slate`) | Slate Block (`slate-block`) | 11 | 120 | 240 |
-| 4 | Granite (`granite`) | Granite Block (`granite-block`) | 16 | 150 | 300 |
-| 5 | Basalt (`basalt`) | Basalt Block (`basalt-block`) | 21 | 180 | 360 |
-| 6 | Marble (`marble`) | Marble Block (`marble-block`) | 26 | 210 | 420 |
-| 7 | Obsidian (`obsidian`) | Obsidian Block (`obsidian-block`) | 31 | 240 | 480 |
-| 8 | Jade (`jade`) | Jade Block (`jade-block`) | 36 | 270 | 540 |
-| 9 | Runestone (`runestone`) | Runestone Block (`runestone-block`) | 41 | 300 | 600 |
-| 10 | Meteorite (`meteorite`) | Meteorite Block (`meteorite-block`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Limestone (`limestone`) | Limestone Block (`limestone-block`) | 1 | 60 | 15 | 120 |
+| 2 | Sandstone (`sandstone`) | Sandstone Block (`sandstone-block`) | 6 | 90 | 22.5 | 180 |
+| 3 | Slate (`slate`) | Slate Block (`slate-block`) | 11 | 120 | 30 | 240 |
+| 4 | Granite (`granite`) | Granite Block (`granite-block`) | 16 | 150 | 37.5 | 300 |
+| 5 | Basalt (`basalt`) | Basalt Block (`basalt-block`) | 21 | 180 | 45 | 360 |
+| 6 | Marble (`marble`) | Marble Block (`marble-block`) | 26 | 210 | 52.5 | 420 |
+| 7 | Obsidian (`obsidian`) | Obsidian Block (`obsidian-block`) | 31 | 240 | 60 | 480 |
+| 8 | Jade (`jade`) | Jade Block (`jade-block`) | 36 | 270 | 67.5 | 540 |
+| 9 | Runestone (`runestone`) | Runestone Block (`runestone-block`) | 41 | 300 | 75 | 600 |
+| 10 | Meteorite (`meteorite`) | Meteorite Block (`meteorite-block`) | 46 | 330 | 82.5 | 660 |
 
 ### Fibers (`fibers`, M.DEF, Meadow)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Flax (`flax`) | Linen (`linen`) | 1 | 60 | 120 |
-| 2 | Jute (`jute`) | Burlap (`burlap`) | 6 | 90 | 180 |
-| 3 | Hemp (`hemp`) | Hemp Cloth (`hemp-cloth`) | 11 | 120 | 240 |
-| 4 | Cotton (`cotton`) | Cotton Cloth (`cotton-cloth`) | 16 | 150 | 300 |
-| 5 | Wool (`wool`) | Wool Cloth (`wool-cloth`) | 21 | 180 | 360 |
-| 6 | Alpaca Fleece (`alpaca-fleece`) | Alpaca Cloth (`alpaca-cloth`) | 26 | 210 | 420 |
-| 7 | Cashmere Fleece (`cashmere-fleece`) | Cashmere Cloth (`cashmere-cloth`) | 31 | 240 | 480 |
-| 8 | Silk Cocoon (`silk-cocoon`) | Silk (`silk`) | 36 | 270 | 540 |
-| 9 | Moonsilk Cocoon (`moonsilk-cocoon`) | Moonsilk (`moonsilk`) | 41 | 300 | 600 |
-| 10 | Cloudfleece (`cloudfleece`) | Cloudweave (`cloudweave`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Flax (`flax`) | Linen (`linen`) | 1 | 60 | 15 | 120 |
+| 2 | Jute (`jute`) | Burlap (`burlap`) | 6 | 90 | 22.5 | 180 |
+| 3 | Hemp (`hemp`) | Hemp Cloth (`hemp-cloth`) | 11 | 120 | 30 | 240 |
+| 4 | Cotton (`cotton`) | Cotton Cloth (`cotton-cloth`) | 16 | 150 | 37.5 | 300 |
+| 5 | Wool (`wool`) | Wool Cloth (`wool-cloth`) | 21 | 180 | 45 | 360 |
+| 6 | Alpaca Fleece (`alpaca-fleece`) | Alpaca Cloth (`alpaca-cloth`) | 26 | 210 | 52.5 | 420 |
+| 7 | Cashmere Fleece (`cashmere-fleece`) | Cashmere Cloth (`cashmere-cloth`) | 31 | 240 | 60 | 480 |
+| 8 | Silk Cocoon (`silk-cocoon`) | Silk (`silk`) | 36 | 270 | 67.5 | 540 |
+| 9 | Moonsilk Cocoon (`moonsilk-cocoon`) | Moonsilk (`moonsilk`) | 41 | 300 | 75 | 600 |
+| 10 | Cloudfleece (`cloudfleece`) | Cloudweave (`cloudweave`) | 46 | 330 | 82.5 | 660 |
 
 ### Woods (`woods`, Speed, Forest)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 | 60 | 120 |
-| 2 | Birch Log (`birch-log`) | Birch Plank (`birch-plank`) | 6 | 90 | 180 |
-| 3 | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 11 | 120 | 240 |
-| 4 | Maple Log (`maple-log`) | Maple Plank (`maple-plank`) | 16 | 150 | 300 |
-| 5 | Oak Log (`oak-log`) | Oak Plank (`oak-plank`) | 21 | 180 | 360 |
-| 6 | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 26 | 210 | 420 |
-| 7 | Mahogany Log (`mahogany-log`) | Mahogany Plank (`mahogany-plank`) | 31 | 240 | 480 |
-| 8 | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 36 | 270 | 540 |
-| 9 | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 41 | 300 | 600 |
-| 10 | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 | 60 | 15 | 120 |
+| 2 | Birch Log (`birch-log`) | Birch Plank (`birch-plank`) | 6 | 90 | 22.5 | 180 |
+| 3 | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 11 | 120 | 30 | 240 |
+| 4 | Maple Log (`maple-log`) | Maple Plank (`maple-plank`) | 16 | 150 | 37.5 | 300 |
+| 5 | Oak Log (`oak-log`) | Oak Plank (`oak-plank`) | 21 | 180 | 45 | 360 |
+| 6 | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 26 | 210 | 52.5 | 420 |
+| 7 | Mahogany Log (`mahogany-log`) | Mahogany Plank (`mahogany-plank`) | 31 | 240 | 60 | 480 |
+| 8 | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 36 | 270 | 67.5 | 540 |
+| 9 | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 41 | 300 | 75 | 600 |
+| 10 | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 46 | 330 | 82.5 | 660 |
 
 ### Bones & Horns (`bones-horns`, Limit Break charge, Fossil Dig)
 
-| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather or refine one | Minutes to cook or craft at this grade |
-|---|---|---|---|---|---|
-| 1 | Seashell (`seashell`) | Shell Carving (`shell-carving`) | 1 | 60 | 120 |
-| 2 | Ammonite (`ammonite`) | Ammonite Carving (`ammonite-carving`) | 6 | 90 | 180 |
-| 3 | Trilobite (`trilobite`) | Trilobite Carving (`trilobite-carving`) | 11 | 120 | 240 |
-| 4 | Fossil Bone (`fossil-bone`) | Bone Carving (`bone-carving`) | 16 | 150 | 300 |
-| 5 | Mammoth Tusk (`mammoth-tusk`) | Tusk Carving (`tusk-carving`) | 21 | 180 | 360 |
-| 6 | Saber Fang (`saber-fang`) | Fang Carving (`fang-carving`) | 26 | 210 | 420 |
-| 7 | Raptor Claw (`raptor-claw`) | Claw Carving (`claw-carving`) | 31 | 240 | 480 |
-| 8 | Tyrant Tooth (`tyrant-tooth`) | Tooth Carving (`tooth-carving`) | 36 | 270 | 540 |
-| 9 | Titan Bone (`titan-bone`) | Titan Carving (`titan-carving`) | 41 | 300 | 600 |
-| 10 | Unicorn Horn (`unicorn-horn`) | Unicorn Carving (`unicorn-carving`) | 46 | 330 | 660 |
+| Grade | Raw | Refined | Unlocks at profession Lv | Minutes to gather one | Minutes to refine one | Minutes to cook or craft at this grade |
+|---|---|---|---|---|---|---|
+| 1 | Seashell (`seashell`) | Shell Carving (`shell-carving`) | 1 | 60 | 15 | 120 |
+| 2 | Ammonite (`ammonite`) | Ammonite Carving (`ammonite-carving`) | 6 | 90 | 22.5 | 180 |
+| 3 | Trilobite (`trilobite`) | Trilobite Carving (`trilobite-carving`) | 11 | 120 | 30 | 240 |
+| 4 | Fossil Bone (`fossil-bone`) | Bone Carving (`bone-carving`) | 16 | 150 | 37.5 | 300 |
+| 5 | Mammoth Tusk (`mammoth-tusk`) | Tusk Carving (`tusk-carving`) | 21 | 180 | 45 | 360 |
+| 6 | Saber Fang (`saber-fang`) | Fang Carving (`fang-carving`) | 26 | 210 | 52.5 | 420 |
+| 7 | Raptor Claw (`raptor-claw`) | Claw Carving (`claw-carving`) | 31 | 240 | 60 | 480 |
+| 8 | Tyrant Tooth (`tyrant-tooth`) | Tooth Carving (`tooth-carving`) | 36 | 270 | 67.5 | 540 |
+| 9 | Titan Bone (`titan-bone`) | Titan Carving (`titan-carving`) | 41 | 300 | 75 | 600 |
+| 10 | Unicorn Horn (`unicorn-horn`) | Unicorn Carving (`unicorn-carving`) | 46 | 330 | 82.5 | 660 |
 <!-- /live -->
 
 ## Dishes

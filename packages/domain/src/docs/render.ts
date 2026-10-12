@@ -2,7 +2,7 @@
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import { BATTLE_LAURELS, CLASS_MAX_RANK, CLASS_RANK_HOURS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
-  itemMinutes, LATE_LAURELS, makeMinutes, MASTERY_MAX_RANK, MASTERY_RANK_HOURS, MAX_JOB_COUNT, POINT_EVASION, POINT_LIMIT, POINT_SHARE,
+  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MASTERY_MAX_RANK, MASTERY_RANK_HOURS, MAX_JOB_COUNT, POINT_EVASION, POINT_LIMIT, POINT_SHARE,
   PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
 import { DISHES } from '../economy/dishes'
 import { ACCESSORY_TYPES, EQUIP_LABEL, gearById, gearId, gearPoints, recipeFamilies, type EquipType } from '../economy/gear'
@@ -172,8 +172,8 @@ function items(): string {
   const out: string[] = []
   for (const f of ITEM_FAMILIES) {
     out.push(`### ${f.name} (\`${f.id}\`, ${EFFECT_LABEL[f.effect]}, ${placeById(f.site)?.name ?? f.site})`, '')
-    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at profession Lv', 'Minutes to gather or refine one', 'Minutes to cook or craft at this grade'], f.raw.map((r, i) => [
-      r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade), itemMinutes(r.grade), makeMinutes(r.grade),
+    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at profession Lv', 'Minutes to gather one', 'Minutes to refine one', 'Minutes to cook or craft at this grade'], f.raw.map((r, i) => [
+      r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade), itemMinutes(r.grade), refineMinutes(r.grade), makeMinutes(r.grade),
     ])), '')
   }
   return out.join('\n').trimEnd()

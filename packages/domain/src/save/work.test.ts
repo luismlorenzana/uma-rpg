@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
-import { HOUR, itemMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL } from '../economy/pacing'
+import { aptitudeTime, EXP_PER_MINUTE, FACILITY_SPEED, HOUR, itemMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL, refineMinutes } from '../economy/pacing'
+import { ITEM_FAMILIES } from '../items/catalog'
 import { startFight, type BattleOutfit } from './battle'
 import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
 import { setPartySlot, unlockUma, worldOf } from './rules'
@@ -77,10 +78,42 @@ describe('refining (S4)', () => {
     expect(() => startJob(save, 'pantry', 0, turfA, 'wheat-flour', 6, at(0))).toThrow(/Needs 6 Wheat/)
     save = startJob(save, 'pantry', 0, turfA, 'wheat-flour', 5, at(0))
     expect(worldOf(save).items.wheat).toBeUndefined()
-    // 2 done at 2½ items' time, the third half made.
-    save = recallJob(save, 'pantry', 0, at(2.5 * U))
+    // Refining takes a quarter of gathering (D101): 2 done at 2½ items' time, the third half made.
+    const R = (refineMinutes(1) * MINUTE) / 2
+    expect(facilityOf(worldOf(save), 'pantry').jobs[0]!.msEach).toBe(R)
+    save = recallJob(save, 'pantry', 0, at(2.5 * R))
     expect(worldOf(save).items).toEqual({ 'wheat-flour': 2, wheat: 3 })
     expect(() => startJob(save, 'pantry', 0, turfA, 'copper-ingot', 1, at(0))).toThrow(/Not refined here/)
+  })
+})
+
+describe('job EXP (D96, D101)', () => {
+  it('pays every job the same EXP per real minute, whatever it makes, at any grade or facility level', () => {
+    // Profession EXP is 2 per base minute of the job itself, so a faster job pays less per item and never more per hour.
+    let save = withUmas('101', '102')
+    for (const level of [1, 2, 3] as const) {
+      const w = worldOf(save)
+      const facilities = Object.fromEntries(['fields', 'pantry', 'kitchen'].map((id) => [id, { level, jobs: Array.from({ length: level === 1 ? 2 : 3 }, () => null) }]))
+      save = { ...save, tierWorlds: { '1': { ...w, facilities } } }
+      for (const outfit of [turfA, plain]) {
+        const perMinute = (EXP_PER_MINUTE / aptitudeTime(outfit.aptitudes.surface.turf)) * FACILITY_SPEED[level - 1]!
+        for (let grade = 1; grade <= 10; grade++) {
+          const grains = ITEM_FAMILIES.find((f) => f.id === 'grains')!
+          for (const [place, output] of [['fields', grains.raw[grade - 1]!.id], ['pantry', grains.refined[grade - 1]!.id], ['kitchen', `dish-grains-${grade}`]] as const) {
+            const plan = planJob(worldOf(save), place, outfit, output, 1)!
+            expect((plan.expEach * MINUTE) / plan.msEach, `${place} G${grade} L${level}`).toBeCloseTo(perMinute, 3)
+          }
+        }
+      }
+    }
+  })
+
+  it('levels an A-aptitude refiner in a level-3 Pantry at most five times in a full day from Lv1', () => {
+    const msEach = (refineMinutes(1) * MINUTE * 0.5) / 1.25
+    const items = Math.floor((24 * HOUR) / msEach)
+    const after = grantProfessionExp({ level: 1, exp: 0 }, items * refineMinutes(1) * EXP_PER_MINUTE)
+    expect(after.level - 1).toBeGreaterThanOrEqual(4)
+    expect(after.level - 1).toBeLessThanOrEqual(5)
   })
 })
 

@@ -121,7 +121,9 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   - An Uma makes 1–10 outputs, one after another, and takes up a slot until it's done or recalled.
   - Inputs are reserved at the start.
   - Real time is the base time × her aptitude share (S/A 0.5 … G 1) ÷ the facility's speed.
-  - Profession EXP is 2 per base minute, whatever the speed.
+  - Refining takes a quarter of gathering's base time (D101); cooking and crafting take two items' worth.
+  - Profession EXP is 2 per base minute of the job itself, whatever the speed, so every job levels at the same rate per
+    hour: refining pays a quarter of gathering's EXP per item.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma. If the Warehouse can't cover the
   next one, the queue drops.
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when

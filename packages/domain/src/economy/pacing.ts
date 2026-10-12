@@ -27,6 +27,11 @@ export const EXP_PER_MINUTE = 2
 /** Base minutes to gather or refine one item of a grade: an hour at grade 1, 5½ hours at grade 10. Items are few and
  * slow, and every recipe needs about one of each (D65). */
 export const itemMinutes = (grade: number): number => 30 + 30 * grade
+/** Refining takes a quarter of gathering's time (D101), so one Pantry or Workbench keeps up with its eight sites. Like
+ * every job it pays EXP for its own minutes only, so an hour of refining levels exactly as fast as an hour of gathering. */
+export const REFINE_SHARE = 0.25
+/** Base minutes to refine one item: 15 at grade 1, 82½ at grade 10. */
+export const refineMinutes = (grade: number): number => itemMinutes(grade) * REFINE_SHARE
 /** Base minutes to cook a dish or craft a piece of gear: two items' worth (S6, S7, D65). */
 export const makeMinutes = (grade: number): number => 2 * itemMinutes(grade)
 

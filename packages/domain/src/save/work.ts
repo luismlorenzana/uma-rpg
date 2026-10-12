@@ -3,7 +3,7 @@
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { facilitySpec, jobEndsAt, jobFinished, type Facility, type Job } from '../economy/jobs'
 import {
-  aptitudeTime, EXP_PER_MINUTE, makeMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MAX_JOB_COUNT, MINUTE,
+  aptitudeTime, EXP_PER_MINUTE, makeMinutes, refineMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MAX_JOB_COUNT, MINUTE,
   PROFESSION_MAX_LEVEL, professionExpToNext, TIME_TICKET_SPAN, timeTicketsToFinish, type Profession,
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
@@ -69,14 +69,16 @@ export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, o
   if (!spec || !item || !uma || !spec.profession || (spec.kind !== 'gather' && spec.kind !== 'refine')) return null
   const profession = spec.profession
   const facility = facilityOf(world, placeId)
-  const msEach = Math.max(1000, Math.round((itemMinutes(item.grade) * MINUTE * aptitudeTime(professionAptitude(outfit, profession))) / FACILITY_SPEED[facility.level - 1]!))
+  // EXP follows the job's own base minutes (2 a minute), so a faster job pays less per item and the same per hour (D101).
+  const minutes = spec.kind === 'refine' ? refineMinutes(item.grade) : itemMinutes(item.grade)
+  const msEach = Math.max(1000, Math.round((minutes * MINUTE * aptitudeTime(professionAptitude(outfit, profession))) / FACILITY_SPEED[facility.level - 1]!))
   const inputs: Record<string, number> = spec.kind === 'refine' ? { [item.pair]: 1 } : {}
   let block: string | null = null
   if (spec.kind === 'gather' && (item.refined || item.family !== spec.family)) block = 'Not made here'
   else if (spec.kind === 'refine' && (!item.refined || item.side !== profession)) block = 'Not refined here'
   else if (uma.professions[profession].level < gradeUnlockLevel(item.grade)) block = `Needs ${profession === 'farming' ? 'Farm' : 'Craft'} Lv${gradeUnlockLevel(item.grade)}`
   else if (spec.kind === 'refine' && (world.items[item.pair] ?? 0) < count) block = `Needs ${count} ${itemById(item.pair)?.name ?? item.pair}`
-  return { output: { id: item.id, name: item.name, grade: item.grade }, item, profession, msEach, expEach: itemMinutes(item.grade) * EXP_PER_MINUTE, inputs, block }
+  return { output: { id: item.id, name: item.name, grade: item.grade }, item, profession, msEach, expEach: minutes * EXP_PER_MINUTE, inputs, block }
 }
 
 /** Why the Warehouse can't cover `count` sets of these inputs, or null. */

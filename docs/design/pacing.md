@@ -28,7 +28,8 @@
 | EXP to the next level | `1,425 + 15 × level`: 12 base hours of work at Lv1, 18 at Lv49 (Lv46: 79,650 EXP in all; Lv50: 88,200, 735 base hours) (D96) |
 | Grade gate | Grade k opens at Lv `5k − 4` (1, 6, 11 … 46) |
 | EXP | **2 per base minute** of the job, whatever it makes (parity) |
-| Gather or refine one item | `30 + 30 × grade` base minutes (1 hour at grade 1, 5½ at grade 10) |
+| Gather one item | `30 + 30 × grade` base minutes (1 hour at grade 1, 5½ at grade 10) |
+| Refine one item | a quarter of that: 15 minutes at grade 1, 82½ at grade 10 (D101) |
 | Cook or craft one output (S6, S7) | two items' worth: `2 × (30 + 30 × grade)` |
 | Aptitude | Real time = base × share: A (and S) 50%, B 58%, C 67%, D 75%, E 83%, F 92%, G 100%. Turf sets Farm Level, Dirt sets Craft Level (§4.1) |
 | One job | 1–10 items (saves from before D65 may hold up to 50) |

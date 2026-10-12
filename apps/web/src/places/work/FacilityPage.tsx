@@ -38,7 +38,7 @@ function describe(placeId: string): { title: string; help: string[]; profession:
   if (spec.kind === 'craft') return { title: 'Crafting', profession: 'gathering',
     help: ['Crafts weapons, armor, Rings, Charms and Orbs: four refined items of the grade, one from each of the type\'s families. The accent picks the stat it adds.', level('gathering')] }
   return { title: 'Refining', profession: spec.profession!,
-    help: [`Refines raw ${spec.profession === 'farming' ? 'ingredients' : 'materials'}, one into one.`, level(spec.profession!)] }
+    help: [`Refines raw ${spec.profession === 'farming' ? 'ingredients' : 'materials'}, one into one, in a quarter of the time it took to gather.`, level(spec.profession!)] }
 }
 
 export default function FacilityPage({ place }: PageProps) {
