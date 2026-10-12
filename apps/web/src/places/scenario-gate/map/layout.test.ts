@@ -24,8 +24,8 @@ function check(layout: MapLayout) {
   for (const s of layout.spots) { expect(s.x + s.w).toBeLessThanOrEqual(layout.cols * 16); expect(s.y + s.h).toBeLessThanOrEqual(layout.rows * 16) }
 }
 describe('published world compositions', () => {
-  it('makes twelve deterministic stage spots in every biome with the boss on top, no props on roads/markers and real atlas ids', () => {
-    for (const continent of continents) for (const r of continent.regions) {
+  it.each(continents)('$id: twelve deterministic stages in every biome, boss on top, clear props and real atlas ids', (continent) => {
+    for (const r of continent.regions) {
       const layout = regionLayout(r, progress)
       expect(layout).toEqual(regionLayout(r, progress)); expect(layout.spots).toHaveLength(12)
       expect(layout.spots.at(-1)!.y).toBe(Math.min(...layout.spots.map((s) => s.y)))
