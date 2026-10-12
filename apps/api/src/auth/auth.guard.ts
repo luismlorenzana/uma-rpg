@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import * as admin from 'firebase-admin'
 import type { Request } from 'express'
 
-export const LOCAL_DEV_UID = 'local-dev'
+const LOCAL_DEV_UID = 'local-dev'
 
 type AuthedRequest = Request & { user?: { uid: string; email?: string } }
 

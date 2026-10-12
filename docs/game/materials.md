@@ -449,7 +449,7 @@ No token: the Uma's Craft Level gates the grade (5g − 4), as for every job (D9
 | Light Orb | `orb-light` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
 | Dark Orb | `orb-dark` | Accessory | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | HP 5 |
 
-A weapon's offense is split over the five weapons of her build (shown that way above).
+A weapon's offense is split over the five weapons of her class (shown that way above).
 <!-- /live -->
 
 ## Tokens

@@ -1,6 +1,6 @@
 // What she wears (S7, D59, D86): one piece per weapon her class wields (five), an armor and an accessory (a Ring, a
 // Charm or an Orb). Pieces from the stock bind
-// to her for good when equipped; her own pieces swap freely. Mastery rank k in a type lets her wear grade k.
+// to her for good when equipped; her own pieces swap freely. Her matching gear level lets her wear its grade.
 import {
   activeClass, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearPoints, ITEM_EFFECTS, SaveRuleError, slotOf,
   type GearSlot, type OwnedUma, type RosterOutfit, type TierWorld,

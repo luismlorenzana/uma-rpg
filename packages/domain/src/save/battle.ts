@@ -86,14 +86,14 @@ function withClass(save: Save, outfitId: string, classId: RpgClass, next: ClassL
 export function chooseClass(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
-  if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-build', `no class ${classId}`)
+  if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classId } } }, now)
 }
 
 /** Sets the five weapons a Summoner, Spell Blade or Cleric wields (a Brawler's and a Mage's are fixed). */
 export function setClassWeapons(save: Save, outfitId: string, classId: RpgClass, weapons: readonly RpgWeapon[], now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfitId)
-  if (!validRpgWeapons(classId, weapons)) throw new SaveRuleError('bad-build', 'those weapons don’t fit this class’s slots')
+  if (!validRpgWeapons(classId, weapons)) throw new SaveRuleError('bad-loadout', 'those weapons don’t fit this class’s slots')
   return withClass(save, outfitId, classId, { ...classOf(uma, classId), weapons: [...weapons] }, now, tier)
 }
 

@@ -36,7 +36,7 @@ function client(): Promise<ReleaseClient> {
   return clientPromise
 }
 
-export function loadMaster(): void {
+function loadMaster(): void {
   if (state.status === 'loading' || state.status === 'ready') return
   set({ status: 'loading' })
   void (async () => {

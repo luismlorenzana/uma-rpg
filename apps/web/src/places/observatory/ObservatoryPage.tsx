@@ -16,7 +16,7 @@ import type { PageProps } from '../registry'
 const SHORT: Record<ItemEffect, string> = { hp: 'HP', mp: 'MP', atk: 'ATK', matk: 'MATK', def: 'DEF', mdef: 'MDEF', speed: 'SPD', limit: 'LB' }
 const COLOR: Record<ItemEffect, string> = { hp: '#e8706a', mp: '#6aa8ff', atk: '#ff9a4d', matk: '#c48bff', def: '#9fb4cc', mdef: '#5fd3c0', speed: '#ffd84d', limit: '#f0b8ff' }
 
-export function nodeLabel(id: string): string {
+function nodeLabel(id: string): string {
   const [kind, key, n] = id.split(':')
   if (kind === 'moon') return `${EFFECT_LABEL[key as ItemEffect]} moon ${n}`
   if (kind === 'bridge') return `${key!.split('-').map((e) => EFFECT_LABEL[e as ItemEffect]).join(' + ')} bridge ${n}`

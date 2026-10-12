@@ -1,10 +1,10 @@
 // Read-only projections of the engine for the fight screen: legal choices, previews and cue text. Ported from uma-racer,
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half.
-import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleBroken,
-  battleFoe, battleLimitPlan, battleSkillFor, isRpgElement, isRpgTome, isRpgWeaponKind, rpgWeaponKind,
-  type BattleAction, type BattleAlly, type BattleCue, type BattleEnemy, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
-  type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
+import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill,
+  battleLimitPlan, isRpgTome,
+  type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
+  type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 
 import { WEAPON_LABEL } from './labels'
 
@@ -24,7 +24,7 @@ export function skillChoices(state: BattleState, actorId: string): SkillChoice[]
 
 /** A Spell Blade's act: an Arms half and a Tome half, each a skill or an Attack (D86). */
 export interface Pair { arms: BattleHalf; tome: BattleHalf }
-export const defaultPair = (ally: Pick<BattleAlly, 'weapons'>): Pair => ({
+const defaultPair = (ally: Pick<BattleAlly, 'weapons'>): Pair => ({
   arms: { weapon: ally.weapons.find((w) => !isRpgTome(w)) }, tome: { weapon: ally.weapons.find(isRpgTome) },
 })
 /** The pair a mode holds, so a pick can change one half. */
@@ -60,8 +60,6 @@ export function previewTarget(state: BattleState, actorId: string, mode: BattleM
     chips: own.filter((c) => c.kind === 'shield').length, breaks: own.some((c) => c.kind === 'break') }
 }
 
-export const isBroken = battleBroken
-
 /** Her bar is full (D311). */
 export const limitReady = (state: BattleState, id: string): boolean => (state.units.find((u) => u.id === id)?.limit ?? 0) >= BATTLE_LIMIT_MAX
 /** A Limit Break is her turn, so she can use it only before she acts this round. */
@@ -95,30 +93,6 @@ export function limitMode(state: BattleState, actorId: string, choice: BattleLim
   return plan ? { kind: 'limit', name: plan.name, ...choice } : null
 }
 
-/** Kinds an Uma can land: her weapons' Attacks (and her Orb) and every hit of her equipped skills. */
-export function allyKinds(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'loadout' | 'maxDepth' | 'orb'>): { free: RpgDamageKind[]; skills: RpgDamageKind[] } {
-  const free = [...new Set([...ally.weapons.map(rpgWeaponKind), ...(ally.orb ? [ally.orb] : [])])]
-  const skills = new Set<RpgDamageKind>(ally.orb ? [ally.orb] : [])
-  for (const ref of ally.loadout) {
-    const skill = battleSkillFor(ally, ref)
-    if (!skill) continue
-    for (const hit of [...skill.def.hits, ...skill.def.focus ?? [], ...(skill.def.splash ? [skill.def.splash] : []), ...(skill.def.other ?? [])]) {
-      for (const part of hit.parts) skills.add(part.kind)
-    }
-  }
-  return { free, skills: [...skills] }
-}
-
-/** Whether this Uma can chip the foe: by a weapon kind or by an element, from an Attack, a skill or her Orb. */
-export function canChip(state: BattleState, allyId: string, enemy: BattleEnemy): { weapon: boolean; element: boolean } {
-  const ally = state.input.allies.find((a) => a.id === allyId)
-  if (!ally) return { weapon: false, element: false }
-  const { free, skills } = allyKinds(ally)
-  const all = [...free, ...skills]
-  return { weapon: all.some((k) => isRpgWeaponKind(k) && enemy.weaknesses.weapons.includes(k)),
-    element: all.some((k) => isRpgElement(k) && enemy.weaknesses.elements.includes(k)) }
-}
-
 export function describeCue(cue: BattleCue, name: (id: string) => string): string {
   switch (cue.kind) {
     case 'hit': return cue.label === 'Burn' ? `${name(cue.targetId)} burns for ${cue.amount}`
@@ -131,9 +105,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'status': return `${name(cue.targetId)}: ${cue.label}`
     case 'guard': return `${name(cue.actorId)} guards ${name(cue.targetId)}`
     case 'skip': return `${name(cue.actorId)} is ${cue.label?.toLowerCase()} and loses its turn`
-    case 'heal': return `${name(cue.targetId)} recovers ${cue.amount} HP`
     case 'mp': return `${name(cue.targetId)} +${cue.amount} MP`
-    case 'revive': return `${name(cue.targetId)} gets back up!`
     case 'limit': return `${name(cue.actorId)}: LIMIT BREAK · ${cue.label}!`
     case 'summon': return `${name(cue.actorId)}’s ${cue.label} strikes again`
     case 'wave': return `${cue.label}: the next foes arrive`
@@ -150,15 +122,12 @@ export function followCue(shown: BattleState, cue: BattleCue): BattleState {
   if (cue.kind === 'intent' || cue.kind === 'result') return shown
   const target = shown.units.find((u) => u.id === cue.targetId)
   if (!target) return shown
-  const maxHp = shown.input.allies.find((a) => a.id === target.id)?.stats.hp ?? battleFoe(shown, target.id)?.stats.hp ?? target.hp
   const next = { ...target }
   if (cue.kind === 'hit') next.hp = Math.max(0, target.hp - cue.amount)
-  else if (cue.kind === 'heal') next.hp = Math.min(maxHp, target.hp + (cue.amount ?? 0))
   else if (cue.kind === 'mp') next.mp = target.mp + (cue.amount ?? 0)
   else if (cue.kind === 'shield' || cue.kind === 'recover') next.shield = cue.amount ?? target.shield
   else if (cue.kind === 'break') next.brokenAt = Math.max(1, shown.round)
   else if (cue.kind === 'ko') next.hp = 0
-  else if (cue.kind === 'revive') next.hp = cue.amount ?? 1
   else return shown
   if (cue.kind === 'recover') next.brokenAt = 0
   return { ...shown, units: shown.units.map((u) => (u.id === next.id ? next : u)) }

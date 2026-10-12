@@ -15,7 +15,6 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | **P1** | | | | | |
 | [H03](tasks/H03-gear-icons-d86.md) | Gear icons for D86: Katana, Lance, five Tomes, ten Orbs | ChatGPT, then Claude wires | uma-platform | M | — |
 | [H04](tasks/H04-phone-test-script.md) | One current phone test script; retire the stale release tasks | ChatGPT | uma-rpg | S | — |
-| [H05](tasks/H05-dead-code-sweep.md) | Sweep code the class rework left behind | ChatGPT | uma-rpg | S | — |
 | **P2** | | | | | |
 | [H06](tasks/H06-world-atlas.md) | The world atlas: 19 biomes' tiles, props, liquids, roads, markers, icons | ChatGPT | uma-platform | L | — |
 | [H07](tasks/H07-world-map-screens.md) | World, continent and region screens in pixel art | ChatGPT | uma-rpg | L | H06 published |
@@ -40,10 +39,10 @@ Priority: **P1** now (it helps the owner's testing or every session), **P2** nex
 | [H25](tasks/H25-uma-racer-phase-3.md) | uma-racer phase 3 | Owner and Claude | uma-racer | L | A Farm spec |
 | [H26](tasks/H26-uma-puzzle-phase-4.md) | uma-puzzle phase 4 | Owner and Claude | uma-puzzle | L | A billing slot |
 
-**For ChatGPT, in order:** H04, H05, H03, then H06 → H07 → H08, H10, H11, H12, H14, H15, H16, H17, H18, H19.
+**For ChatGPT, in order:** H04, H03, then H06 → H07 → H08, H10, H11, H12, H14, H15, H16, H17, H18, H19.
 
 **Done:** H01, the art calibration (passed, D90; its lessons are folded into H03 and H06), and H02, auto-battle and
-speed (D89), and H09, W3's eight foes, dual elements and waves (D91).
+speed (D89), H09, W3's eight foes, dual elements and waves (D91), and H05, the class-rework dead-code sweep.
 
 ## Not relevant anymore
 

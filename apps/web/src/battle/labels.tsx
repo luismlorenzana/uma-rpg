@@ -1,17 +1,17 @@
 // Battle vocabulary for the UI: labels, element and weapon glyphs (inline SVG, ported from uma-racer), bars and the
 // break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes).
 import {
-  isRpgElement, isRpgTome, isRpgWeaponKind, rpgHand, rpgTierLevel, rpgWeaponKind, type BattleWeaknesses, type RpgClass, type RpgDamageKind,
+  isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, type BattleWeaknesses, type RpgClass, type RpgDamageKind,
   type RpgElement, type RpgProfile, type RpgSkillDef, type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
 
-export const WEAPON_KIND_LABEL: Readonly<Record<RpgWeaponKind, string>> = {
+const WEAPON_KIND_LABEL: Readonly<Record<RpgWeaponKind, string>> = {
   greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana',
 }
 export const WEAPON_LABEL: Readonly<Record<RpgWeapon, string>> = {
   ...WEAPON_KIND_LABEL, 'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
 }
-export const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' }
+const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' }
 export const CLASS_LABEL: Readonly<Record<RpgClass, string>> = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner' }
 export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = {
   brawler: 'Pure physical damage: all five Arms, one heavy action a turn. An Elemental Orb adds an element to every hit.',
@@ -22,16 +22,12 @@ export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = {
 }
 /** What each slot holds, for the class's weapon pickers. */
 export const SLOT_LABEL = { arms: 'Arm', tome: 'Tome', any: 'Weapon' } as const
-export const BRANCH_LABEL: Readonly<Record<string, string>> = {
-  fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark', ultima: 'Ultima', duel: 'Duel', melee: 'Melee',
-  tempo: 'Tempo', grace: 'Grace', malice: 'Malice', sanctuary: 'Sanctuary', angels: 'Angels', demons: 'Demons', archons: 'Archons',
-}
-/** Element colors, shared with the battle stage's effects. */
-export const ELEMENT_COLOR: Readonly<Record<RpgElement, string>> = {
+/** Element colors for the inline glyphs. */
+const ELEMENT_COLOR: Readonly<Record<RpgElement, string>> = {
   fire: '#ff8a5c', ice: '#8fd3ff', lightning: '#ffd84d', light: '#fff2b0', dark: '#c79bff',
 }
 
-export const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind) ? WEAPON_KIND_LABEL[kind] : ELEMENT_LABEL[kind])
+const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind) ? WEAPON_KIND_LABEL[kind] : ELEMENT_LABEL[kind])
 
 /** Distinct damage kinds a skill lands, in order. */
 export const skillKinds = (skill: RpgSkillDef): RpgDamageKind[] =>
@@ -47,7 +43,7 @@ export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: 
     : skill.summon ? ` · lingers ${skill.summon.linger}×` : ''
   return `${per} · ${skill.hits.length} hit${skill.hits.length === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}`
 }
-export const STATUS_LABEL: Readonly<Record<NonNullable<RpgSkillDef['status']>['key'], string>> = {
+const STATUS_LABEL: Readonly<Record<NonNullable<RpgSkillDef['status']>['key'], string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
   brave: 'Brave', faith: 'Faith', aegis: 'Aegis', breaker: 'Breaker', clarity: 'Clarity',
 }
@@ -99,10 +95,6 @@ export function KindMark({ kind, size = 16 }: { kind: RpgDamageKind; size?: numb
   if (isRpgElement(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex"><ElementGlyph element={kind} size={size} /></span>
   return null
 }
-/** A weapon's kind mark: an Arm's silhouette, a Tome's element. */
-export const weaponKindOf = (w: RpgWeapon): RpgDamageKind => rpgWeaponKind(w)
-export const isTome = isRpgTome
-
 export function Bar({ value, max, tone = 'hp', className = '' }: { value: number; max: number; tone?: 'hp' | 'mp' | 'exp' | 'limit'; className?: string }) {
   const color = tone === 'hp' ? 'bg-[#5fd28a]' : tone === 'mp' ? 'bg-[#6aa8ff]' : tone === 'limit' ? 'bg-[#ffd84d]' : 'bg-accent'
   const width = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0

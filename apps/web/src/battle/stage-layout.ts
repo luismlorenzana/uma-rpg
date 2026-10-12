@@ -16,10 +16,10 @@ export interface StageLayout {
 /** Bust portraits are 320×470. */
 const PORTRAIT_ASPECT = 320 / 470
 export const ENEMY_INFO_HEIGHT = 46
-export const ALLY_INFO_HEIGHT = 34
+const ALLY_INFO_HEIGHT = 34
 
 /** Up to five foes stand in one row; six to eight in two (W3), the back row's info just above the front row. */
-export const ONE_ROW_FOES = 5
+const ONE_ROW_FOES = 5
 
 export function stageLayout(width: number, height: number, ranks: readonly EnemyRank[], allyCount: number): StageLayout {
   const enemyBottom = height * 0.5

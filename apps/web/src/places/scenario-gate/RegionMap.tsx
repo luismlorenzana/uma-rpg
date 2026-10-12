@@ -17,7 +17,7 @@ import { ActivePartyBar } from './ActiveParty'
 import { FightResult } from './FightResult'
 
 /** A foe's round face: her face icon, else full-body art zoomed onto the head (D81), else the bust's top. */
-export function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: string; size: number }) {
+function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: string; size: number }) {
   const [url, setUrl] = useState<string | null>(null)
   const member = campaign.cast.byId.get(castId)
   const image = member?.face ?? member?.art
@@ -43,7 +43,7 @@ export function CastFace({ campaign, castId, size }: { campaign: Campaign; castI
 }
 
 /** The elements a stage's foes carry: one, or a pair. */
-export const signatureOf = (n: RpgMapNode): RpgElement[] => (n.note ? (n.note.split(' + ') as RpgElement[]) : n.element ? [n.element] : [])
+const signatureOf = (n: RpgMapNode): RpgElement[] => (n.note ? (n.note.split(' + ') as RpgElement[]) : n.element ? [n.element] : [])
 
 export function RegionMap({ campaign, region, place }: { campaign: Campaign; region: RpgCampaignChapter; place: PageProps['place'] }) {
   const world = useWorld()

@@ -86,7 +86,7 @@ export interface BattleUnit {
   shield: number
   /** Round the shield broke in: the foe loses that round's and the next round's action. 0 when standing. */
   brokenAt: number
-  /** Rebirth works once per Uma per fight. */
+  /** Inert pre-D86 Rebirth flag retained in the v6/v7 state hash shape. */
   revived: boolean
   /** Limit Break charge (allies, D311): attacks and skills fill it to BATTLE_LIMIT_MAX; it stays full until used. */
   limit: number
@@ -124,7 +124,7 @@ export type BattleCue =
   | { kind: 'intent'; actorId: string; targetId: string; label: string }
   | { kind: 'hit'; actorId: string; targetId: string; amount: number; channel: BattleChannel | 'status';
       element: RpgDamageKind | null; weak: boolean; label?: string }
-  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'heal' | 'mp' | 'revive' | 'limit' | 'summon' | 'wave';
+  | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'mp' | 'limit' | 'summon' | 'wave';
       actorId: string; targetId: string; amount?: number; label?: string }
   | { kind: 'result'; label: 'victory' | 'loss' }
 export type BattleError = 'terminal' | 'invalid-actor' | 'already-acted' | 'invalid-target' |
