@@ -17,6 +17,9 @@ promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/
 
 ## Documentation
 
+Private portrait review: [one-command / double-click setup](scripts/cast/README.md), with local votes for later cast
+authoring. It does not change the game.
+
 | Doc | What |
 |---|---|
 | [docs/game/](docs/game/README.md) | **The manual: the game as it is today.** Architecture, dependencies, loops, sections, combat, classes, every skill tree, materials, the world map. Its lists are generated from the code |

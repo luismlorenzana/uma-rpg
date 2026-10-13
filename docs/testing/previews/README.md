@@ -1,5 +1,9 @@
 # Synthetic browser previews
 
+`cast-review-desktop.png` (1200×900) and `cast-review-375.png` (375×667) show the standalone local portrait
+reviewer with invented test portraits/names. Four saved vote categories, no game integration or publishing.
+Actual franchise-art screenshots remain local and are not committed.
+
 `compact-path-{375,390}.png` shows the native 2×2 chess towers and three-column stage snake at 375×667 and 390×844.
 `compact-path-spring-375.png` shows MP refill and the unchanged shared recharge; the Volcano/Glacier companions
 show the compact biome families. These use synthetic master data/names and no franchise art. The 1× browser uses
