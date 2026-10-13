@@ -118,6 +118,9 @@ test('legacy first-pass edits preserve hidden franchise votes and keep their sna
   await saveVotes(release,file,[{franchise:'azurlane',id:'al-normal',rating:1}],8,{restoreArchived:true})
   assert.equal((await readRatings(file)).ratings.azurlane['al-normal'],1)
   assert.equal((await loadReview(release,file)).packs.find(p=>p.id==='azurlane').members.length,1)
+  await rm(file)
+  await assert.rejects(readRatings(file),/Restore it from history/)
+  await assert.rejects(loadReview(release,file),/Restore it from history/)
 })
 test('round API rejects stale clients and cross-round imports, serves JPEG, and detects catalogue mutation',async t=>{
   const {content,fetcher}=await fixture(t)

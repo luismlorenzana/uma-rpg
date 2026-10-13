@@ -1,5 +1,5 @@
 // Owner-only, private overlay (D123). This file contains no original-game records.
-import { readFile, rename, mkdir, open, unlink } from 'node:fs/promises'
+import { readFile, readdir, rename, mkdir, open, unlink } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { randomUUID, createHash } from 'node:crypto'
 
@@ -13,6 +13,7 @@ export const ratingsPath = release => resolve(dirname(release), 'cast-ratings.js
 export const validRating = rating => Number.isInteger(rating) && rating >= -2 && rating <= 2
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
 const safeId = id => typeof id === 'string' && /^[a-z0-9_-]{1,80}$/.test(id) && !['__proto__', 'constructor', 'prototype'].includes(id)
+const historyRoot = file => file.endsWith('/cast-ratings.json')?join(dirname(file),'authoring/legacy-history'):join(dirname(file),'history')
 
 export function parseRatings(raw) {
   if (!record(raw) || raw.schemaVersion !== 1 || !record(raw.ratings)) throw new Error('Invalid ratings file')
@@ -34,7 +35,12 @@ export function parseRatings(raw) {
 export async function readRatings(file) {
   try { return parseRatings(JSON.parse(await readFile(file, 'utf8'))) }
   catch (error) {
-    if (error.code === 'ENOENT') return { schemaVersion: 1, revision: 0, ratings: {} }
+    if (error.code === 'ENOENT') {
+      let history=[]
+      try {history=await readdir(historyRoot(file))}catch(missing){if(missing.code!=='ENOENT')throw missing}
+      if(history.some(name=>name.endsWith('.json')))throw new Error('Ratings file missing. Restore it from history before continuing.')
+      return { schemaVersion: 1, revision: 0, ratings: {} }
+    }
     throw error
   }
 }
@@ -84,8 +90,7 @@ export async function atomicJson(file, value) {
 export async function snapshotRatings(file, value) {
   value=parseRatings(value)
   const hash=createHash('sha256').update(JSON.stringify(value)).digest('hex')
-  const historyRoot=file.endsWith('/cast-ratings.json')?join(dirname(file),'authoring/legacy-history'):join(dirname(file),'history')
-  const history=join(historyRoot,String(value.revision).padStart(8,'0')+'-'+hash+'.json')
+  const history=join(historyRoot(file),String(value.revision).padStart(8,'0')+'-'+hash+'.json')
   try {
     const snapshot=JSON.parse(await readFile(history,'utf8'))
     if(snapshot.sha256!==hash || createHash('sha256').update(JSON.stringify(snapshot.data)).digest('hex')!==hash)throw new Error('Corrupt ratings history')
