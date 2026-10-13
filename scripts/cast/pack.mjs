@@ -1,6 +1,7 @@
 // Shared by the franchise pack imports (D76, D81): a polite one-at-a-time fetcher with a cache, image sizes, slugs, a
-// PNG trimmer, and the writer for content/release/<folder>/cast.json plus <folder>/cast/<slug>.<hash>.<ext> (and
-// <slug>-face.<hash>.<ext> when a pack has separate face icons). Everything lands in the gitignored content/ folder.
+// PNG trimmer and shrinker, and the writer for content/release/<folder>/cast.json plus
+// <folder>/cast/<slug>.<hash>.<ext> (and <slug>-face.<hash>.<ext> when a pack has separate face icons). Everything lands
+// in the gitignored content/ folder.
 import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
@@ -126,6 +127,20 @@ function encodeRgba(width, height, px) {
   ihdr.writeUInt32BE(height, 4)
   ihdr.set([8, 6, 0, 0, 0], 8)
   return Buffer.concat([Buffer.from(PNG_SIGNATURE, 'hex'), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(Buffer.concat(rows), { level: 9 })), chunk('IEND', Buffer.alloc(0))])
+}
+
+/** Shrinks a PNG with macOS `sips` to `size` px on its longer side (normalising it to 8-bit RGBA); smaller ones pass. */
+export function shrinkPng(bytes, size) {
+  const { width, height } = pngSize(bytes)
+  if (Math.max(width, height) <= size) return bytes
+  const dir = mkdtempSync(join(tmpdir(), 'cast-'))
+  try {
+    writeFileSync(join(dir, 'in.png'), bytes)
+    execFileSync('sips', ['-Z', String(size), join(dir, 'in.png'), '--out', join(dir, 'out.png')], { stdio: 'ignore' })
+    return readFileSync(join(dir, 'out.png'))
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
 }
 
 /** Crops a PNG to a centred portrait at most `aspect` wide for its height (showcase art with the figure mid-frame). */

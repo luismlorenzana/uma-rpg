@@ -12,13 +12,10 @@
 // private bucket.
 //
 //   node scripts/cast/import-azurlane.mjs
-import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { cachedFetcher, pngSize, ROOT, slugOf, trimPng, writePack } from './pack.mjs'
+import { cachedFetcher, pngSize, ROOT, shrinkPng, slugOf, trimPng, writePack } from './pack.mjs'
 
 const IMAGE_HOST = 'https://azurlane.netojuu.com/images'
 /** The figure's longer side: sharp on a 3× screen at the largest foe box, about 145 KB a ship. */
@@ -37,29 +34,15 @@ function imageUrl(file) {
   return `${IMAGE_HOST}/${h[0]}/${h.slice(0, 2)}/${encodeURIComponent(name)}`
 }
 
-/** macOS `sips` shrinks a PNG to `size` px on its longer side (and normalises it to 8-bit RGBA). */
-function shrink(bytes, size) {
-  const { width, height } = pngSize(bytes)
-  if (Math.max(width, height) <= size) return bytes
-  const dir = mkdtempSync(join(tmpdir(), 'al-'))
-  try {
-    writeFileSync(join(dir, 'in.png'), bytes)
-    execFileSync('sips', ['-Z', String(size), join(dir, 'in.png'), '--out', join(dir, 'out.png')], { stdio: 'ignore' })
-    return readFileSync(join(dir, 'out.png'))
-  } finally {
-    rmSync(dir, { recursive: true, force: true })
-  }
-}
-
 /** Full art trimmed to the figure, then shrunk to FULL_SIZE. Trimming reads 8-bit RGBA, so it works on a 2× copy. */
 function fullBody(bytes) {
-  let png = shrink(bytes, FULL_SIZE * 2)
+  let png = shrinkPng(bytes, FULL_SIZE * 2)
   try {
     png = trimPng(png)
   } catch {
     // A format the trimmer doesn't read: keep the margins.
   }
-  return shrink(png, FULL_SIZE)
+  return shrinkPng(png, FULL_SIZE)
 }
 
 const source = JSON.parse(await readFile(join(ROOT, 'content/sources/azurlane-ships.json'), 'utf8'))

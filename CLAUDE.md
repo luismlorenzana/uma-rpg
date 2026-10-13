@@ -12,9 +12,10 @@
 - **Original-game content never goes in git.**
 - The owner prefers **no open questions**: decide with a recommendation when a sensible default exists, and log it.
 - **Claude commits and pushes to `main`** in Conventional Commits style (owner, 2026-10-10). Delegated agents use a branch and a pull request. Check `git status` before every commit: no original-game content.
-- **Reviewing ChatGPT's pull requests:** Claude reviews and merges them all (the owner never merges). Send back only
-  must-fixes (a broken rule, original-game content, a failing check, a real bug); note polish in the merge summary
-  instead. Log each packet's decisions on merge, and version and publish uma-art releases in uma-platform.
+- **ChatGPT's pull requests:** ChatGPT may merge its own (owner, 2026-10-13), logging its packet's decisions. Before a
+  push, fetch `main` so decision numbers don't collide. When Claude reviews one, send back only must-fixes (a broken
+  rule, original-game content, a failing check, a real bug). Claude still versions and publishes uma-art releases in
+  uma-platform.
 
 ## Building and running
 
