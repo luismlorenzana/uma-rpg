@@ -4,6 +4,7 @@
 > `@luismlorenzana/uma-art` 2.0.0 world atlas in a plain 2D canvas, with DOM buttons and the complete lists alongside.
 > H08 adds the battle backdrops below, published in uma-art 2.2.0.
 > The owner's map feedback adds four-tile biome buildings in uma-art 2.3.0 and exposes each region band's existing Spring.
+> The compact revision (2.4.0, D122) adds a separate 32px tower sheet and three-column snake, retaining the 64px set.
 
 ## Decisions
 
@@ -39,6 +40,12 @@ Every frame id below is part of the contract; the build checks the list. Sizes a
 | Building frontier | `stage/frontier-0`, `stage/frontier-1` | 64×64 | 2 |
 
 The 2.3.0 atlas contains 502 frames at 256×3792. All 329 earlier frame positions and pixels remain unchanged.
+
+`world/stages-compact.png` / `.json` (2.4.0) is a separate 256×704 sheet: 171
+`stage-compact/<biome>/<fight|elite|boss>-<locked|open|cleared>` frames and two `stage-compact/frontier-0…1` frames.
+All are 32×32, with ground line y=28 on buildings. The index has the same schema as the world atlas. The runtime
+chooses the matching image by frame family; only regions load the extra image. The complete 2.3.0 world sheet,
+64px painters and their previews stay byte-for-byte unchanged and available for future screens.
 
 **Two kinds of autotile** (D90, after the [H01 calibration](../../handoff/README.md)):
 
@@ -105,18 +112,22 @@ nothing is lost while the art settles. Buttons over the canvas carry the names a
 
 ### Region: twelve stages up a path
 
-- **16 tiles wide, 46 tall**, with the region's biome ground everywhere. A serpentine road passes below each pair of
-  four-tile buildings; vertical climbs run along the outside edges, never through a building.
-- Stage 1 sits at the bottom; ten regular stages climb in pairs, the elite tower is stage 11, and the boss stronghold
-  stands alone at the top. All buildings are 64×64 native art pixels (4×4 times the previous 16×16 symbols), with
-  biome-specific roofs, stone, snow, vines or ornaments. On 2× iPhones the footprints/targets are 96×96 CSS pixels.
+- **16 tiles wide, 22 tall**, with the region's biome ground everywhere. Three columns of 2×2-tile buildings follow
+  the owner's snake: 1–2–3 across the bottom, 6–5–4 above, 7–8–9, then 12–11–10 at the top. The elite is 11, boss 12.
+- Each next stage rises **4 native art pixels** within its row, then 56px at the row turn. Half-tile columns align
+  doors with the road's tile centers; quarter-tile vertical offsets still land on whole art pixels. Roads cross below
+  each row and turn up the alternating outer edge, never through a building. Bounds checks reserve every intersected
+  tile around the offset sprites, not only their two-by-two nominal coordinates.
+- Regular stages are squat square chess/rook towers with crenels and castle masonry, not huts. Elite towers keep
+  peaked roofs; the final castle keeps its three-tower silhouette. All are authored at **32×32**, with the same biome
+  stone/snow/vines/ornaments. Targets are **48×48 CSS px on 2× phones**, at least 44px at 1×; none overlap.
 - Cleared buildings are completely grayscale. Uncleared buildings retain their biome colors; locked doors are
   boarded and windows dark, while open stages have lit windows and an open doorway. The next stage wears the larger
   frontier ring. DOM captions add a check or lock, and accessible labels name the state; cleared stages still replay.
 - Each region exposes the existing Spring for its continent's two-row band (`floor(region.row / 2) * 2`), at the road's
   start and in the sticky header. Both call the same refill operation and share the continent Spring id/cooldown.
   Its ready/dry art and short countdown update every 30 seconds; use is disabled during a fight. No new refill charges.
-- Decoration: up to three seeded, irregular liquid patches where the biome has one and props on free ground. Roads,
+- Decoration: up to two seeded, irregular liquid patches where the biome has one and props on free ground. Roads,
   full building footprints, the Spring and its target stay separate; no prop or pond covers a building.
 
 ### Continent: ten levels and a capital

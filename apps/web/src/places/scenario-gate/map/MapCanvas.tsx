@@ -1,19 +1,26 @@
 import atlasUrl from '@luismlorenzana/uma-art/world/atlas.png?url'
 import atlasIndex from '@luismlorenzana/uma-art/world/atlas.json'
+import compactUrl from '@luismlorenzana/uma-art/world/stages-compact.png?url'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { artScale, hubDpr } from '../../../hub/grid'
 import { frames } from './visuals'
 import type { MapLayout, MapSpot } from './layout'
 
-let imagePromise: Promise<HTMLImageElement> | undefined
-function atlasImage() {
-  return imagePromise ??= new Promise<HTMLImageElement>((resolve, reject) => {
+const imagePromises = new Map<string, Promise<HTMLImageElement>>()
+function atlasImage(url: string) {
+  const cached = imagePromises.get(url)
+  if (cached) return cached
+  const promise = new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
     image.onload = () => resolve(image)
-    image.onerror = () => { imagePromise = undefined; reject(new Error('Map art unavailable')) }
-    image.src = atlasUrl
+    image.onerror = () => { imagePromises.delete(url); reject(new Error('Map art unavailable')) }
+    image.src = url
   })
+  imagePromises.set(url, promise)
+  return promise
 }
+interface MapImages { world: HTMLImageElement; compact?: HTMLImageElement }
+const sourceFor = (images: MapImages, id: string) => id.startsWith('stage-compact/') ? images.compact : images.world
 /** Same whole-device-pixel scale as the Hub; allow at most half a tile of edge crop on narrow phones. */
 export const mapScale = (width: number, dpr: number): number =>
   Math.min(artScale(dpr), Math.max(1, Math.floor(width * dpr / 240)) / dpr)
@@ -23,16 +30,19 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
   focusKey: string; focusId?: string; children?: ReactNode
 }) {
   const host = useRef<HTMLDivElement>(null), canvas = useRef<HTMLCanvasElement>(null), ring = useRef<HTMLCanvasElement>(null)
-  const [image, setImage] = useState<HTMLImageElement | null>(null), [failed, setFailed] = useState(false)
+  const [image, setImage] = useState<MapImages | null>(null), [failed, setFailed] = useState(false)
   const [width, setWidth] = useState(390), [dpr, setDpr] = useState(hubDpr)
   const scale = mapScale(width, dpr), w = layout.cols * 16 * scale, h = layout.rows * 16 * scale
   const frontier = layout.sprites.find((s) => s.frame.endsWith('/frontier-0'))
   const frontierSize = frontier ? frames[frontier.frame]!.w : 16
+  const needsCompact = layout.sprites.some((s) => s.frame.startsWith('stage-compact/'))
   useEffect(() => {
     let live = true
-    void atlasImage().then((img) => { if (live) { setImage(img); setFailed(false) } }, () => { if (live) setFailed(true) })
+    void Promise.all([atlasImage(atlasUrl), needsCompact ? atlasImage(compactUrl) : undefined]).then(([world, compact]) => {
+      if (live) { setImage({ world, compact }); setFailed(false) }
+    }, () => { if (live) setFailed(true) })
     return () => { live = false }
-  }, [])
+  }, [needsCompact])
   useEffect(() => {
     const el = host.current!
     const measure = () => { setWidth(el.clientWidth || 390); setDpr(hubDpr()) }
@@ -42,28 +52,28 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
   }, [])
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d')
-    if (!ctx || !image) return
+    if (!ctx || !image || needsCompact && !image.compact) return
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0)
     ctx.imageSmoothingEnabled = false
     const draw = (id: string, x: number, y: number) => {
       const f = frames[id]!
-      ctx.drawImage(image, f.x, f.y, f.w, f.h, x, y, f.w, f.h)
+      ctx.drawImage(sourceFor(image, id)!, f.x, f.y, f.w, f.h, x, y, f.w, f.h)
     }
     ctx.clearRect(0, 0, layout.cols * 16, layout.rows * 16)
     for (const c of layout.cells) draw(c.frame, c.col * 16, c.row * 16)
     for (const s of layout.sprites) if (!s.frame.includes('/frontier-')) draw(s.frame, s.x, s.y)
-  }, [layout, image, scale, dpr])
+  }, [layout, image, needsCompact, scale, dpr])
   // Only the frontier ring redraws; the full terrain canvas never enters the animation loop.
   useEffect(() => {
     const ctx = ring.current?.getContext('2d')
-    if (!ctx || !image || !frontier) return
+    if (!ctx || !image || !frontier || !sourceFor(image, frontier.frame)) return
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
     let timer: ReturnType<typeof setInterval> | undefined, phase = 0
     const draw = () => {
       const f = frames[frontier.frame.replace(/0$/, String(phase))]!
       ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0); ctx.imageSmoothingEnabled = false
       ctx.clearRect(0, 0, f.w, f.h)
-      ctx.drawImage(image, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h)
+      ctx.drawImage(sourceFor(image, frontier.frame)!, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h)
     }
     const update = () => {
       clearInterval(timer); phase = 0; draw()

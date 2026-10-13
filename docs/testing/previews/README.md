@@ -1,5 +1,10 @@
 # Synthetic browser previews
 
+`compact-path-{375,390}.png` shows the native 2×2 chess towers and three-column stage snake at 375×667 and 390×844.
+`compact-path-spring-375.png` shows MP refill and the unchanged shared recharge; the Volcano/Glacier companions
+show the compact biome families. These use synthetic master data/names and no franchise art. The 1× browser uses
+44px minimum targets; DOM tests also verify 48px targets at both 2× phone widths. Original 4×4 previews below remain.
+
 `stage-map-375.png` shows the 4×4-tile destinations, grayscale clears, next-stage ring and MP Spring at 375×667.
 `stage-map-spring.png` captures a real refill: all five members at full MP and the shared two-hour recharge.
 `stage-map-volcano-390.png`, `stage-map-stronghold-390.png` and `stage-map-glacier-390.png` show themed barracks,

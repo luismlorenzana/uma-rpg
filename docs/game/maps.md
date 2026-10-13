@@ -8,8 +8,10 @@ The screens are in [sections](sections.md#scenario-gate), the fights in [combat]
 
 The World, Continent and Region screens default to pixel maps. **Map / List** in the sticky header remembers this
 device’s choice. Low levels are at the bottom; continents and regions open at the lowest uncleared frontier.
-Stages are four-tile buildings: barracks, elite towers and a boss stronghold. Cleared buildings turn completely gray;
-colored buildings remain to clear, with a ring around the next stage. Tapping still opens the same rival sheet.
+Stages are compact 2×2-tile buildings: square chess towers, an elite tower and a boss castle. The route snakes across
+three columns: 1–2–3, then 6–5–4, 7–8–9, and 12–11–10 at the top. Each stage rises slightly within its row.
+Cleared buildings turn completely gray; colored buildings remain to clear, with a ring around the next stage.
+Tapping still opens the same rival sheet. The larger 4×4 structures remain in the art package for other uses.
 Springs refill MP, and the capital opens its Finals routes. A region shows its continent band's existing Spring at
 the start of its road and as **Spring · MP** in the header. It shares that Spring's two-hour recharge, not a new charge.
 
