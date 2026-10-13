@@ -87,6 +87,10 @@ A biome's foes wear faces from a private franchise pack (D76, D81, D83, D85), th
 Forest draws from a mixed pool of five faces per pack, and so does any biome whose pack is missing. The packs live only
 in the gitignored `content/` and the private bucket ([architecture](architecture.md#private-content)).
 
+The battle stage shows each foe's art whole. Every pack but PriConne's is full-body art (Azur Lane since D116);
+PriConne's is a bust. The round faces on the region screens use a pack's face icon when it has one (Last Origin, Azur
+Lane), else zoom full-body art onto the head.
+
 ## Formations and waves
 
 <!-- live:formations -->
