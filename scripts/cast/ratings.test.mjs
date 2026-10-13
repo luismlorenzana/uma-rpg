@@ -19,8 +19,8 @@ async function fixture(t) {
 test('starts smallest first, displays persisted votes, and never changes any cast manifest',async t=>{
   const {release,file}=await fixture(t)
   const originals=await Promise.all(['priconne','nikke','azurlane'].map(p=>readFile(packPath(release,p),'utf8')))
-  assert.deepEqual((await loadReview(release,file)).packs.map(p=>[p.id,p.members.length]),[['nikke',2],['priconne',3],['azurlane',4]])
-  await saveVotes(release,file,[{franchise:'nikke',id:'unit0',rating:2}],0)
+  assert.deepEqual((await loadReview(release,file)).packs.map(p=>[p.id,p.members.length]),[['priconne',3],['azurlane',4]])
+  await saveVotes(release,file,[{franchise:'priconne',id:'unit0',rating:2}],0)
   const loaded=await loadReview(release,file)
   assert.equal(loaded.packs[0].members[0].rating,2)
   assert.equal(loaded.packs[0].members[0].extra,0)
@@ -41,14 +41,14 @@ test('votes survive reimports by stable ID and zero clears a vote in the separat
 })
 test('bad values, prototype keys and unknown IDs fail atomically; stale revisions do not overwrite votes',async t=>{
   const {release,file}=await fixture(t)
-  await saveVotes(release,file,[{franchise:'nikke',id:'unit0',rating:1}],0)
+  await saveVotes(release,file,[{franchise:'azurlane',id:'unit0',rating:1}],0)
   const before=await readFile(file,'utf8')
   for(const entries of [
-    [{franchise:'nikke',id:'unit1',rating:2},{franchise:'nikke',id:'missing',rating:2}],
-    [{franchise:'nikke',id:'unit1',rating:'2'}],[{franchise:'other',id:'unit1',rating:1}],
-    [{franchise:'nikke',id:'__proto__',rating:1}],
+    [{franchise:'azurlane',id:'unit1',rating:2},{franchise:'azurlane',id:'missing',rating:2}],
+    [{franchise:'azurlane',id:'unit1',rating:'2'}],[{franchise:'other',id:'unit1',rating:1}],
+    [{franchise:'azurlane',id:'__proto__',rating:1}],
   ]) await assert.rejects(saveVotes(release,file,entries,1))
-  await assert.rejects(saveVotes(release,file,[{franchise:'nikke',id:'unit0',rating:2}],0),/another tab/)
+  await assert.rejects(saveVotes(release,file,[{franchise:'azurlane',id:'unit0',rating:2}],0),/another tab/)
   assert.equal(await readFile(file,'utf8'),before)
   for(const raw of [{schemaVersion:2,ratings:{}},{schemaVersion:1,ratings:{nikke:{unit0:3}}},{schemaVersion:1,ratings:{other:{unit0:1}}},
     JSON.parse('{"schemaVersion":1,"ratings":{"nikke":{"__proto__":2}}}')]) assert.throws(()=>parseRatings(raw))

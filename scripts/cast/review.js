@@ -7,7 +7,8 @@ const members = () => (selectedPack()?.members ?? []).filter(m =>
   (!state.query || m.name.toLocaleLowerCase().includes(state.query) || m.id.toLocaleLowerCase().includes(state.query)))
 const selected = () => members().find(m => m.id === state.member)
 const imageUrl = path => '/art/' + path
-const remember = () => { try { localStorage.setItem('uma-cast-review-position', JSON.stringify({ pack: state.pack, member: state.member })) } catch { /* Votes live on disk even if browser storage is unavailable. */ } }
+const cursorKey = () => 'uma-cast-review-position-'+(state.data?.round?.id??'legacy')
+const remember = () => { try { localStorage.setItem(cursorKey(), JSON.stringify({ pack: state.pack, member: state.member })) } catch { /* Votes live on disk even if browser storage is unavailable. */ } }
 const totals = pack => pack.members.reduce((n, m) => { n[String(m.rating)]++; return n }, { '-2': 0, '-1': 0, '0': 0, '1': 0, '2': 0 })
 const fail = error => { $('error').hidden = false; $('error').querySelector('span').textContent = error.message; $('status').textContent = 'Not saved' }
 const clearError = () => { $('error').hidden = true }
@@ -15,7 +16,7 @@ function choose(id) { state.member = id; remember(); render() }
 
 async function post(path, body) {
   const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Review-Token': state.data.token },
-    body: JSON.stringify(body) })
+    body: JSON.stringify({ ...body, roundId:state.data.round?.id }) })
   const value = await response.json()
   if (!response.ok) throw new Error(value.error || 'Request failed')
   return value
@@ -49,6 +50,8 @@ function render() {
   if (!pack) { $('empty').hidden = false; $('single').hidden = true; enable(); return }
   if (!list.some(m => m.id === state.member)) state.member = list[0]?.id ?? ''
   const member = selected(), counts = totals(pack), reference = state.data.packs[0], ref = totals(reference)
+  $('round').textContent=state.data.round?.label??'First pass'
+  $('full').textContent=state.data.round?'Source':'Full'
   const options = state.data.packs.map(p => {
     const o = document.createElement('option'), n = totals(p)
     o.value = p.id; o.textContent = p.label + ' · ' + p.members.length + ' · ' + (p.members.length - n['0']) + ' reviewed'
@@ -66,6 +69,8 @@ function render() {
   if (member && state.view === 'single') {
     portrait(member)
     $('name').textContent = member.name; $('rating').textContent = labels[String(member.rating)]
+    $('prior').textContent = [member.previousRating === undefined ? '' : 'Previous · '+labels[String(member.previousRating)],
+      member.source?.missingSplash ? 'Face only · splash pending' : ''].filter(Boolean).join(' · ')
     $('position').textContent = (list.indexOf(member) + 1) + '/' + list.length
     const index = list.indexOf(member)
     $('upcoming').replaceChildren(...list.slice(index + 1, index + 7).map(m => {
@@ -131,10 +136,10 @@ async function load() {
     if (!response.ok) throw new Error(data.error)
     state.data = data
     let cursor
-    try { cursor = JSON.parse(localStorage.getItem('uma-cast-review-position') ?? '{}') } catch { cursor = {} }
-    state.pack = data.packs.find(p => p.id === cursor.pack)?.id ?? data.packs[0]?.id ?? ''
+    try { cursor = JSON.parse(localStorage.getItem(cursorKey()) ?? (data.round ? null : localStorage.getItem('uma-cast-review-position')) ?? '{}') } catch { cursor = {} }
+    state.pack = data.packs.find(p => p.id === cursor.pack)?.id ?? data.packs.find(p=>p.members.some(m=>!m.rating))?.id ?? data.packs[0]?.id ?? ''
     state.member = cursor.member ?? ''
-    clearError(); $('status').textContent = 'Saved'; render()
+    state.history=[];clearError(); $('status').textContent = 'Saved'; render()
   } catch (error) { fail(error) }
 }
 for (const button of document.querySelectorAll('[data-vote]')) button.addEventListener('click', () => vote(Number(button.dataset.vote)))
@@ -163,7 +168,7 @@ $('export').addEventListener('click', async () => {
     const response = await fetch('/api/export')
     if (!response.ok) throw new Error('Export failed')
     const url = URL.createObjectURL(new Blob([JSON.stringify(await response.json(), null, 2)], { type: 'application/json' }))
-    const link = document.createElement('a'); link.href = url; link.download = 'cast-ratings.json'; link.click(); URL.revokeObjectURL(url)
+    const link = document.createElement('a'); link.href = url; link.download = (state.data.round?.id??'cast')+'-ratings.json'; link.click(); URL.revokeObjectURL(url)
   } catch (error) { fail(error) }
 })
 document.addEventListener('keydown', event => {

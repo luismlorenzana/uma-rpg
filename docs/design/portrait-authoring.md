@@ -1,0 +1,69 @@
+# Private portrait authoring
+
+This is an owner-only, local workflow, separate from the game and its private bucket. Ranking does not select,
+remove, publish or change any in-game enemy. The current review scope is **PriConne and Azur Lane only**. Earlier
+franchises and their votes stay archived, not deleted.
+
+## Phase 1: local sources and ranking
+
+- PriConne: all character variants in the [JP character list](https://gamewith.jp/pricone-re/article/show/92923).
+  Keep the Japanese name, stable article ID, list face icon and the evaluation splash from each character page.
+- Azur Lane: use the owner's cached original full art and shipyard faces, not the reduced game portraits.
+  Exclude Normal and Rare from this review. The wiki currently refuses automated access; do not bypass it.
+- Store untouched original bytes and their SHA-256, dimensions and provenance. No automatic crops in this phase.
+- Four votes: +2 Key, +1 Regular, -1 Rare filler, -2 Exclude. PriConne base-character votes are previous-pass hints,
+  never silently assigned to costume variants. Same stable-ID ships/variants retain their previous votes.
+- Start with the franchise having the smallest total roster. Revisit any earlier rating with Show → All.
+
+The import is resumable and rate-limited. Incomplete sources cannot become an active round: the owner chose to keep
+the current round until every JP splash is available. A completed dataset, or one already used by a round, is
+immutable: use a new dataset ID for another source collection. Each new round has a separate ratings file.
+
+## Where the real data lives
+
+All paths are relative to the primary repo's **gitignored `content/` folder**, never a disposable task worktree:
+
+```text
+content/authoring/
+  project.json                         # active dataset and ranking round
+  datasets/<dataset-id>/
+    dataset.json                       # source provenance, counts, unresolved report
+    cast.json                          # JP variants
+    cast/*                             # original splash and face bytes
+    azurlane/cast.json                  # eligible ships
+    azurlane/cast/*                     # original full art and face bytes
+  rounds/<round-id>/
+    round.json                         # immutable roster hashes, previous-pass references, next phase
+    ratings.json                       # current votes; round/dataset identity + revision
+    history/<revision>-<sha256>.json    # full before/after snapshots of votes, imports and Undo
+  archive/                             # first-pass votes and frozen game-pack copy
+  legacy-history/                      # snapshots while the original first pass stays active
+  cache/gamewith/                      # resumable private source downloads
+```
+
+`content/cast-ratings.json`, the original game packs, and other franchises remain untouched. The initial first-pass
+archive also includes a frozen copy of those original portraits. Real names/art/records and screenshots never go
+in git; this guide and synthetic tests do. For off-machine safety, copy **all of `content/authoring/`** to your own
+backup drive. Export in the app additionally saves the active round's votes, not the source images.
+If waiting for missing JP splashes, the original first pass remains active at `content/cast-ratings.json`; its new
+history snapshots still live inside `content/authoring/legacy-history/`. The newly imported dataset is not activated
+automatically. Other franchises and AL Normal/Rare are hidden even in the original first-pass view.
+
+Each successful vote first persists history snapshots, then atomically replaces the current file and fsyncs it and
+its directory. The app acknowledges only after those writes succeed. Invalid/corrupt files cause an error, never a
+silent reset. Recovery: stop the app, preserve the corrupt current file, validate a history snapshot's `sha256`
+against `SHA256(JSON.stringify(data))`, then restore its `data` to `ratings.json`. Keep the same round/dataset IDs.
+History from an interrupted write may be one revision ahead of the current file; review it before recovery.
+
+## Phase 2: crop authoring, after ranking
+
+Build a separate local crop pass over the ranked source originals. A regular enemy needs **vertical full-body +
+small face**. An elite, sub-boss or final boss needs those plus a **wide splash** for attacks. Give each role an
+output size and a movable crop rectangle with zoom; pre-authored rectangles can be reviewed before export.
+Persist source SHA-256, pixel-coordinate crop rectangles, output dimensions and review state per role. Never
+overwrite originals or ranking results. +2 is a candidate designation, not an automatic in-game assignment.
+
+## Phase 3: final list and upload
+
+Only after crop review, author the final enemy list and local output images. A later owner-approved task uploads
+those authored images and separately reworks game enemies. No game/bucket writes belong to the current phase.

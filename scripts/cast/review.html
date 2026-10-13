@@ -20,7 +20,7 @@
       <label class="search">Search<input id="search" type="search" autocomplete="off"></label>
       <button id="grid-toggle" aria-pressed="false">Grid</button>
     </div>
-    <div id="counts"></div><div id="reference"></div>
+    <div id="round"></div><div id="counts"></div><div id="reference"></div>
   </header>
   <main>
     <section id="single">
@@ -28,6 +28,7 @@
         <div class="mode"><button id="full" aria-pressed="true">Full</button><button id="face" aria-pressed="false">Face</button></div>
       </div>
       <div class="caption"><h2 id="name"></h2><span id="rating"></span><span id="position"></span></div>
+      <div id="prior"></div>
       <div id="upcoming" aria-label="Next portraits"></div>
     </section>
     <section id="grid" hidden aria-label="Portrait grid"></section>
@@ -48,7 +49,8 @@
       <details><summary aria-label="Help">ⓘ</summary><div>
         <p>1 Exclude · 2 Rare · 3 Regular · 4 Key</p>
         <p>← Previous · → Skip · Z Undo</p>
-        <p>Votes autosave locally. Export them for later cast authoring.</p>
+        <p>Votes autosave on disk with history snapshots. Export a backup at any time.</p>
+        <p>Source images are originals, not final crops. Rank first; vertical/face crops and elite splashes follow.</p>
         <p>Planned use: Key leaders, Regular recurring foes, Rare filler, Excluded unused.</p>
       </div></details>
     </div>
