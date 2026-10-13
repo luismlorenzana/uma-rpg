@@ -1,6 +1,6 @@
 # Handoff: every deferred task, reviewed and ranked
 
-> **Status: 2026-10-11, after D86.** Every open or deferred item from [backlog.md](../backlog.md), the earlier session
+> **Status: 2026-10-12, after D112.** Every open or deferred item from [backlog.md](../backlog.md), the earlier session
 > notes and a fresh look at the game after the class rework, each with a self-contained packet in [tasks/](tasks/).
 > [master-prompt.md](master-prompt.md) starts a fresh ChatGPT session on them. Claude reviews and merges every pull
 > request. When a task is done, its packet is deleted and the backlog updated, as with D35's task files.
