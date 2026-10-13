@@ -103,5 +103,9 @@ export function equippedOrb(equipped: Partial<Record<GearSlot, string>>): RpgDam
   return piece && isOrb(piece.type) ? orbKind(piece.type) : undefined
 }
 
+/** A piece's track, the line an Uma climbs one grade at a time (D119): its weapon, its armor kind, or for an Orb its own
+ * type, so each of the ten Orbs climbs on its own. */
+export const gearTrackOf = (type: EquipType): string => (isWeapon(type) || isOrb(type) ? type : armorKindOf(type))
+
 /** A recipe's first family: every recipe family is a gathering family, so crafting raises Gathering & Crafting (§8.4). */
 export const mainFamily = (type: EquipType): string => recipeFamilies(type)[0]!

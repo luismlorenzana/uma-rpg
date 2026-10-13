@@ -1,6 +1,6 @@
-// The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); busy
-// members show greyed out (D16) and can be recalled from their job here.
-import { isBusy, isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
+// The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
+// member can be recalled from her job here, and fights either way (D119).
+import { isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
@@ -32,12 +32,10 @@ export default function PartyHallPage({ place, rest }: PageProps) {
 
 function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: TierWorld; outfitId: string | null; size: number }) {
   if (!outfitId) return <span className="flex items-center justify-center rounded-sm border border-dashed border-hairline-strong text-ink-faint" style={{ width: size, height: size }}>+</span>
-  const busy = isBusy(world, outfitId)
   return (
     <span className="relative" style={{ width: size, height: size }}>
-      <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfitId} size={size} className={busy ? 'opacity-40 grayscale' : ''} />
+      <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfitId} size={size} />
       <span className="absolute bottom-0 left-0 rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {world.umas[outfitId]?.level ?? 1}</span>
-      {busy && <span className="absolute inset-x-0 top-0 bg-black/70 text-center text-[9px] font-bold leading-3.5 text-ink-soft">Busy</span>}
     </span>
   )
 }

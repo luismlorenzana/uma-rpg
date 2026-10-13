@@ -1,7 +1,7 @@
 // The active party (D66): the five who fight, swappable from any world screen outside a fight. Each Uma shows her level
 // and the MP she carries between stages (Springs refill it).
 import {
-  activeClass, applyPoints, classOf, isBusy, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
+  activeClass, applyPoints, classOf, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
   rpgTreePointsSpent, SaveRuleError, umaPoints, umaProfile, worldRun,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -48,8 +48,8 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
             <button key={id} type="button" className="relative min-w-0 flex-1" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: ${CLASS_LABEL[classId]}, Lv ${uma.level}, MP ${mp} of ${max}`}
               onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
               <span className="relative mx-auto block w-12">
-                <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={48} className={isBusy(world, id) ? 'opacity-40 grayscale' : ''} />
-                <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">{isBusy(world, id) ? 'Busy' : `Lv ${uma.level}`}</span>
+                <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={48} />
+                <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {uma.level}</span>
                 {spare > 0 && <span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-page bg-accent" />}
               </span>
               <span className="mt-0.5 block h-1.5 overflow-hidden rounded-full bg-white/10">

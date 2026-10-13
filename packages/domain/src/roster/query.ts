@@ -17,7 +17,7 @@ export interface RosterFacets {
   sex: ('male' | 'female' | 'unknown')[]
   /** Unlocked within the last 24 hours. */
   newOnly: boolean
-  /** Owned and not working or fighting right now. */
+  /** Owned and not working right now (fighting doesn't count, D119). */
   freeOnly: boolean
 }
 
@@ -103,7 +103,7 @@ function compare(a: RosterEntry, b: RosterEntry, key: RosterSortKey): number {
   }
 }
 
-/** `busy`: Umas working or fighting now, for the "free only" facet. */
+/** `busy`: Umas working now, for the "free only" facet. */
 export function runRosterQuery(roster: readonly RosterOutfit[], umas: Readonly<Record<string, OwnedUma>>, query: RosterQuery, now: number,
   busy: ReadonlySet<string> = new Set()): RosterResult {
   const filtered: RosterEntry[] = []

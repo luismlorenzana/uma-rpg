@@ -5,9 +5,9 @@ import { equippedGuard, equippedMight, equippedOrb, equippedPoints, gearById, ge
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { rpgFoe } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
-import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile } from './battle'
+import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile, umaWeaponMight } from './battle'
 import { rpgProfileTrees } from '../rpg/rules'
-import { equipBlock, equipGear, unequipGear, wearArmor } from './forge'
+import { boundGrade, equipBlock, equipGear, gearChoices, unequipGear, wearArmor } from './forge'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { collectJob, planJob, startJob } from './work'
@@ -61,6 +61,47 @@ describe('the Forge and equipping (S7)', () => {
     save = collectJob(save, 'forge', 0, at(2 * plan.msEach)).save
     expect(worldOf(save).gear).toEqual({ 'greatsword-g1': 2 })
     expect(worldOf(save).items).toEqual({})
+  })
+
+  it('binds each track in order, one grade above her best, and offers only her best pieces and the stock above (D119)', () => {
+    const top = { rank: 10, exp: 0 }
+    let save = edit(umas('101'), (w) => ({ ...w,
+      gear: { 'greatsword-g1': 2, 'greatsword-g2': 1, 'greatsword-g3': 1, 'helm-g1-atk': 1, 'helm-g1-def': 1, 'orb-fire-g2': 1, 'orb-ice-g1': 1 },
+      umas: { '101': { ...w.umas['101']!, ranks: { ...w.umas['101']!.ranks, weapons: { greatsword: top }, armors: { helm: top, 'elemental-orb': top } } } } }))
+    const uma = () => worldOf(save).umas['101']!
+    const greatswords = () => gearChoices(uma(), worldOf(save).gear, (p) => p.type === 'greatsword')
+    // Nothing bound yet: grade 1 is next; grade 2 and 3 wait their turn.
+    expect(boundGrade(uma(), 'greatsword')).toBe(0)
+    expect(equipBlock(uma(), 'greatsword-g2')).toBe('Needs G1 first')
+    expect(() => equipGear(save, '101', 'greatsword-g3', at(0))).toThrow(/Needs G1 first/)
+    expect(greatswords()).toEqual([{ id: 'greatsword-g1', bound: false }, { id: 'greatsword-g2', bound: false }, { id: 'greatsword-g3', bound: false }])
+    save = equipGear(save, '101', 'greatsword-g1', at(0))
+    save = equipGear(save, '101', 'greatsword-g2', at(0))
+    // Grade 1 is spent: the spare in stock no longer shows, and her own grade 1 hides behind her grade 2.
+    expect(equipBlock(uma(), 'greatsword-g1')).toBeNull() // her own swaps freely
+    expect(greatswords()).toEqual([{ id: 'greatsword-g2', bound: true }, { id: 'greatsword-g3', bound: false }])
+    save = equipGear(save, '101', 'greatsword-g3', at(0))
+    expect(greatswords()).toEqual([{ id: 'greatsword-g3', bound: true }])
+    // A lower piece she still wears stays in view, so the sheet can show it held.
+    save = equipGear(save, '101', 'greatsword-g1', at(0))
+    expect(greatswords().map((c) => c.id)).toEqual(['greatsword-g3', 'greatsword-g1'])
+    // Armor climbs by kind, any accent: one grade-1 Helm spends grade 1.
+    save = equipGear(save, '101', 'helm-g1-atk', at(0))
+    expect(equipBlock(uma(), 'helm-g1-def')).toBe('Has G1 already')
+    expect(gearChoices(uma(), worldOf(save).gear, (p) => p.type === 'helm')).toEqual([{ id: 'helm-g1-atk', bound: true }])
+    // Each Orb climbs on its own: Fire waits for grade 1, Ice starts now.
+    expect(equipBlock(uma(), 'orb-fire-g2')).toBe('Needs G1 first')
+    expect(equipBlock(uma(), 'orb-ice-g1')).toBeNull()
+  })
+
+  it('averages her Arms\' Might into ATK and her Tomes\' into M.ATK for the profile (D119)', () => {
+    const w = worldOf(umas('101'))
+    const uma = w.umas['101']!
+    const geared = { ...uma, gear: { ...uma.gear, equipped: { greatsword: 'greatsword-g2', axe: 'axe-g3', 'tome-fire': 'tome-fire-g5' } } }
+    // A Brawler's five Arms: (8 + 12) / 5 = 4; her Tome isn't in her slots.
+    expect(umaWeaponMight(geared, 'brawler')).toEqual({ atk: 4, matk: 0 })
+    // A Mage's five Tomes: 20 / 5 = 4.
+    expect(umaWeaponMight(geared, 'mage')).toEqual({ atk: 0, matk: 4 })
   })
 
   it('binds a piece to whoever equips it; she swaps among her own; her rank sets the grade she wears', () => {

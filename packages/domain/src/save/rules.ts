@@ -84,7 +84,7 @@ export function addShards(wallet: Wallet, shards: number): Wallet {
   return { ...wallet, unlockTickets: wallet.unlockTickets + Math.floor(total / SHARDS_PER_TICKET), shards: total % SHARDS_PER_TICKET }
 }
 
-/** Busy at a site, a station or training (D16): she shows greyed out in her party and can't fight until recalled. */
+/** Working at a site or a station. She still fights (D119); she just can't take a second job. */
 export function isBusy(world: TierWorld, outfitId: string): boolean {
   return workOf(world, outfitId) !== null
 }

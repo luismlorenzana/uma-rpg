@@ -1,6 +1,7 @@
-// Eating and the Sun-and-planets map over the save (S6, design §10, D58): a dish unlocks the lowest locked node it
-// can on her map and is eaten; her active nodes (5 + level/2 at once) add points to her stats in every fight.
-import { dishById, nodesFor, starPoints } from '../economy/dishes'
+// Eating and the Sun-and-planets map over the save (S6, design §10, D58): a dish unlocks the node of its own grade on her
+// map, once every lower node of its track is open (D119), and is eaten; her active nodes (5 + level/2 at once) add points
+// to her stats in every fight.
+import { dishById, nodeGrade, nodesFor, starPoints } from '../economy/dishes'
 import { activeNodeSlots } from '../economy/pacing'
 import type { Points } from '../economy/bonus'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -10,10 +11,20 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** The node this dish would unlock for her, or null when it has nothing new for her. */
+/** Why she can't eat this dish now, or null: its node is open already, or a lower node of its track is still locked. */
+export function dishBlock(uma: OwnedUma, dishId: string): string | null {
+  const dish = dishById(dishId)
+  if (!dish) return 'Unknown dish'
+  const next = nodesFor(dish).find((n) => !uma.stars.unlocked.includes(n))
+  if (!next) return 'Already eaten'
+  return nodeGrade(next) < dish.grade ? `Eat the grade ${nodeGrade(next)} dish first` : null
+}
+
+/** The node this dish would unlock for her (its own grade's, D119), or null when she can't eat it now. */
 export function nodeFromDish(uma: OwnedUma, dishId: string): string | null {
   const dish = dishById(dishId)
-  return dish ? nodesFor(dish).find((n) => !uma.stars.unlocked.includes(n)) ?? null : null
+  if (!dish || dishBlock(uma, dishId)) return null
+  return nodesFor(dish).find((n) => !uma.stars.unlocked.includes(n)) ?? null
 }
 
 /** She eats one dish: its node unlocks and, while she has a free active slot, switches on. */
@@ -22,8 +33,9 @@ export function eatDish(save: Save, outfitId: string, dishId: string, now: strin
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'only owned Umas eat')
   if ((world.dishes[dishId] ?? 0) < 1) throw new SaveRuleError('no-items', 'none of that dish left')
-  const node = nodeFromDish(uma, dishId)
-  if (!node) throw new SaveRuleError('bad-job', 'nothing new for her in that dish')
+  const block = dishBlock(uma, dishId)
+  if (block) throw new SaveRuleError('bad-job', block)
+  const node = nodeFromDish(uma, dishId)!
   const unlocked = [...uma.stars.unlocked, node]
   const active = uma.stars.active.length < activeNodeSlots(uma.level) ? [...uma.stars.active, node] : uma.stars.active
   const dishes = { ...world.dishes, [dishId]: world.dishes[dishId]! - 1 }

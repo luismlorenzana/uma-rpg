@@ -156,8 +156,9 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - **Tabs:** Skills (with every Class Rank bar), Battle, Gear (five weapon and five armor slots, Extra Stats link, Weapon
     and Armor Rank cells), Work and Racing.
   - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
-  - **Battle tab:** each stat's total, then in brackets what armor adds (blue) and what active Extra Stats add (green)
-    (D99).
+  - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
+    (D99). Armor adds up; ATK and M.ATK add the average Might of her Arms and of her Tomes, since each hit uses its own
+    weapon's. Barrier (each fight) and Regen (each round) from her armor follow (D119).
   - A locked outfit shows **Unlock · 1 Ticket**.
 - **Skills page:**
   - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
@@ -170,7 +171,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 ### Party Hall
 
 Routes: `/town/party-hall` and `:n` (1–20).
-- The list shows 20 parties of five; busy members are greyed.
+- The list shows 20 parties of five. Working members fight like the rest (D119).
 - **The editor:** rename the party, or tap a slot to pick an Uma.
 - **A filled slot:** Swap, View profile, Recall from her job, Remove.
 

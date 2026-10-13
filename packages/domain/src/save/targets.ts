@@ -1,14 +1,16 @@
 // Farming targets (D100): up to five Umas the facilities plan for. For each, what maxing her takes: a dish for every
-// Extra Stats node she hasn't opened, and the best piece she can wear now in each of her ten gear slots (D103). The needs
+// Extra Stats node she hasn't opened, and in each of her ten gear slots (D103) every grade between the best she has bound
+// and the best she can wear now, since she binds them in order (D119). The needs
 // cascade down the chain: pieces and dishes still to make need refined items, refined items still to make need raw
 // ones. At every step what the Warehouse holds and what running or queued jobs will bring counts first.
 import { DISHES, dishById, nodeGrade, nodesFor, STAR_NODES } from '../economy/dishes'
-import { armorKindOf, EQUIP_LABEL, gearById, gearId, isWeapon, type EquipType } from '../economy/gear'
+import { EQUIP_LABEL, gearById, gearId, gearTrackOf, type EquipType } from '../economy/gear'
 import { ARMOR_LABEL, ARMOR_SLOTS, armorTrack, isArmorKind, weaponTrack, type ArmorKind } from '../economy/ranks'
 import { facilitySpec } from '../economy/jobs'
 import { itemById } from '../items/catalog'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
+import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
@@ -24,7 +26,7 @@ export function setTarget(save: Save, outfitId: string, on: boolean, now: string
 
 /** One line of a plan: what to make, how many the targets need in all, what's here or on the way, and what's short. */
 export interface TargetNeed {
-  /** An item or dish id, or a gear key `<weapon or armor kind>-g<grade>` (any accent, any Orb of the kind will do). */
+  /** An item or dish id, or a gear key `<track>-g<grade>` (D119: a weapon, an armor kind or an Orb; any accent will do). */
   key: string
   /** An id to draw its icon with. */
   icon: string
@@ -41,25 +43,29 @@ export interface TargetPlan { gear: TargetNeed[]; dishes: TargetNeed[]; refined:
 const NODE_DISH = new Map<string, string>()
 for (const dish of DISHES) for (const node of nodesFor(dish)) if (nodeGrade(node) === dish.grade) NODE_DISH.set(node, dish.id)
 
-/** A piece's planning kind: its weapon, or its armor kind (any Orb of a kind is that kind). */
-const kindOf = (type: EquipType): string => (isWeapon(type) ? type : armorKindOf(type))
+/** A piece's planning key: its track (D119) and grade. */
 const keyOf = (pieceId: string): string | null => {
   const piece = gearById(pieceId)
-  return piece ? `${kindOf(piece.type)}-g${piece.grade}` : null
+  return piece ? `${gearTrackOf(piece.type)}-g${piece.grade}` : null
 }
-/** A representative type to draw and cost a kind with: the kind itself, or its group's first Orb. */
+/** A representative type to draw and cost a track with: the track itself, or an Orb kind's first Orb. */
 const typeOfKind = (kind: string): EquipType => (kind === 'arms-orb' ? 'orb-greatsword' : kind === 'elemental-orb' ? 'orb-fire' : kind as EquipType)
 
-/** The pieces one Uma still needs: per slot (her class's five weapons, her five armor slots' kinds), the best grade her
- * rank lets her wear, unless she owns one that good. */
+/** The pieces one Uma still needs: per slot (her class's five weapons, her five armor slots' kinds), every grade above
+ * the best she has bound on its track, up to the best her rank lets her wear. An Orb slot climbs the Orb she wears. */
 function gearNeeds(uma: OwnedUma, classId: RpgClass): string[] {
-  const owned = [...uma.gear.locker, ...Object.values(uma.gear.equipped)].map(gearById).filter((p) => p !== undefined)
   const out: string[] = []
-  const need = (kind: string, grade: number) => {
-    if (!owned.some((p) => p.grade >= grade && kindOf(p.type) === kind)) out.push(`${kind}-g${grade}`)
+  const climb = (track: string, rank: number) => {
+    for (let g = boundGrade(uma, track) + 1; g <= rank; g++) out.push(`${track}-g${g}`)
   }
-  for (const w of classOf(uma, classId).weapons) need(w, weaponTrack(uma.ranks, w).rank)
-  for (const slot of ARMOR_SLOTS) { const kind = slotKind(uma.gear, slot); need(kind, armorTrack(uma.ranks, kind).rank) }
+  for (const w of classOf(uma, classId).weapons) climb(w, weaponTrack(uma.ranks, w).rank)
+  for (const slot of ARMOR_SLOTS) {
+    const kind = slotKind(uma.gear, slot)
+    // What she wears there is always of the slot's kind: changing the kind takes it off.
+    const worn = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+    const track = gearTrackOf(worn?.type ?? typeOfKind(kind))
+    climb(track, armorTrack(uma.ranks, kind).rank)
+  }
   return out
 }
 

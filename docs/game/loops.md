@@ -172,8 +172,9 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   ([sections](sections.md#global-ui)).
 - **Recall:** pays what's finished and returns the inputs of everything unfinished. Only the time is lost.
 - **Targets (D100):** mark up to five Umas on their profile. Every facility then lists what maxing them still takes
-  from it: a dish for each Extra Stats node they haven't opened, and the best piece their ranks let them wear in each
-  of their ten gear slots (their class's five weapons, their five armor slots' kinds). Needs cascade: the pieces and
+  from it: a dish for each Extra Stats node they haven't opened, and in each of their ten gear slots (their class's five
+  weapons, their five armor slots' kinds) every grade above the best they've bound, up to the best their ranks let them
+  wear (D119). A dish she has eaten or a piece she has bound drops off the list. Needs cascade: the pieces and
   dishes still short need refined items, and those still short need raw ones. The Warehouse and running or queued jobs
   count first.
 - **Upgrades:**
@@ -198,7 +199,9 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 
 **Extra Stats** (the Observatory):
 - Each Uma has a map of 100 nodes: 80 moons, 16 bridges and 4 Sun nodes.
-- **Eating a dish** unlocks the lowest node it reaches and uses the dish up:
+- **Eating a dish** opens the node of its own grade and uses the dish up. Nodes open in order (D119): a dish waits until
+  every lower node of its track is open, and a grade she has eaten is spent, so the Observatory lists only the dishes
+  she can eat now:
   - a planet dish of grade n opens moon n of its stat;
   - Duo dishes open bridges;
   - Feasts open Sun nodes.
@@ -219,6 +222,10 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   - An armor piece's accent: +⌈g ÷ 2⌉ points to its stat. An Orb adds its kind to every hit, for weaknesses.
 - **Wearing a grade:** grade g needs her Weapon Rank (for a weapon) or Armor Rank (for its kind) ≥ g.
 - **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.
+- **In order (D119):** each weapon, each armor kind and each of the ten Orbs is a track she climbs one grade at a time.
+  From the stock she can bind only the grade above the best she has on that track (her Training piece is grade 0), so
+  grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
+  and the stock above it.
 
 ## Springs, replays and Sweeps
 
@@ -226,6 +233,7 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 - **HP** is full every stage. **MP** carries after a win.
 - **Replays:** any cleared stage, for a quarter of its first-clear rewards.
 - **Sweeps:** a cleared regular stage (1–10), paid like a replay, for one Sweep Ticket, 1–99 at a time. Each needs the
-  active party full and idle, and no open fight. MP isn't touched.
-- **One open fight** in the whole world. While it's open, its Umas can't change parties or take jobs, and the active
+  active party full, and no open fight. MP isn't touched.
+- **Working and fighting (D119)** never block each other: an Uma at a job fights, and one in the open fight takes jobs.
+- **One open fight** in the whole world. While it's open, its Umas can't change parties, and the active
   party, Springs and Sweeps are locked. The fight is stored as its input plus every action ([combat](combat.md)).

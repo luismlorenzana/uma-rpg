@@ -1,6 +1,6 @@
 // The Stable (S2, T012): every outfit, with ownership, search, filters, sorts and grid/list views in the spirit of
 // uma-racer's Stable, plus profiles with the unlock flow.
-import { activeFacetCount, bestAptitudeLine, isBusy, isInFight, KEY_LABELS, runRosterQuery, SORT_LABELS, type RosterEntry, type RosterFacets, type RosterSortKey } from '@rpg/domain'
+import { activeFacetCount, bestAptitudeLine, isBusy, KEY_LABELS, runRosterQuery, SORT_LABELS, type RosterEntry, type RosterFacets, type RosterSortKey } from '@rpg/domain'
 import { useEffect, useMemo, useState } from 'react'
 import { useHubNavigation } from '../../hub/navigation'
 import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
@@ -81,7 +81,8 @@ function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }
   const [sheet, setSheet] = useState<'filters' | 'sort' | null>(null)
   useEffect(() => savePrefs(prefs), [prefs])
   const result = useMemo(() => {
-    const busy = new Set(world ? Object.keys(world.umas).filter((id) => isBusy(world, id) || isInFight(world, id)) : [])
+    // Free now: not working. Fighting doesn't stop her taking a job (D119).
+    const busy = new Set(world ? Object.keys(world.umas).filter((id) => isBusy(world, id)) : [])
     return runRosterQuery(view.roster, world?.umas ?? {}, { ...prefs.query, search }, Date.now(), busy)
   }, [view.roster, world, prefs.query, search])
   const setQuery = (patch: Partial<StablePrefs['query']>) => setPrefs((p) => ({ ...p, query: { ...p.query, ...patch } }))

@@ -11,7 +11,6 @@ import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, 
 import { stageBand, stagePay } from '../world/world'
 import { PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { workOf } from './status'
 
 export const MAX_PURCHASE = 99
 
@@ -60,7 +59,6 @@ export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, nodeId
   if ((worldRun(world).wins[nodeId] ?? 0) < 1) return 'Clear it first'
   const slots = world.parties[world.world.activeParty]?.slots ?? []
   if (slots.length !== PARTY_SIZE || slots.some((s) => s === null)) return 'Needs a full party'
-  if (slots.some((s) => s && workOf(world, s))) return 'A member is working'
   if (openFightOf(world)) return 'Finish the open fight first'
   if (world.wallet.sweepTickets < 1) return 'No Sweep Tickets'
   return null

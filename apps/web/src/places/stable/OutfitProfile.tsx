@@ -8,7 +8,7 @@ import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, aptitudeTime, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, workOf,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, umaWeaponMight, workOf, equippedGuard,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -238,12 +238,16 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
   const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
   const parts = umaPointParts(uma, classId)
   const boosted = applyPoints(base, umaPoints(uma, classId))
-  // What gear adds alone; Extra Stats are the rest of the total, so the two always add up (D99).
+  // What gear adds alone; Extra Stats are the rest of the total, so the two always add up (D99). Armor adds up; weapons
+  // add the average Might of those that hit with ATK (Arms) or M.ATK (Tomes), since each hit uses its own (D119).
   const geared = applyPoints(base, parts.gear).stats
+  const might = umaWeaponMight(uma, classId)
+  const guard = equippedGuard(uma.gear.equipped)
   const equipped = umaLoadout(outfit, uma, 1, classId)
   const party = partyOf(world, outfit.outfitId)
   const keys = [['HP', 'hp'], ['MP', 'mp'], ['ATK', 'atk'], ['M.ATK', 'matk'], ['DEF', 'pdef'], ['M.DEF', 'mdef']] as const
-  const rows = keys.map(([label, k]) => ({ label, now: boosted.stats[k], gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] }))
+  const weapon = (k: (typeof keys)[number][1]) => (k === 'atk' ? might.atk : k === 'matk' ? might.matk : 0)
+  const rows = keys.map(([label, k]) => ({ label, now: boosted.stats[k] + weapon(k), gear: geared[k] - base[k] + weapon(k), extra: boosted.stats[k] - geared[k] }))
   return (
     <div className="space-y-3">
       <button type="button" onClick={onClass} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
@@ -260,7 +264,8 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
           <span className="text-success">Extra Stats</span>
           <HelpButton title="Battle stats">
             <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
-            <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green), 1.5% a point. Training weapons add nothing. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+            <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green), one point each. Armor adds up: its defense and accents. Weapons add Might to their own hits, so ATK shows the average Might of her Arms and M.ATK of her Tomes; Training weapons add nothing.</p>
+            <p>Physical armor gives a Barrier at the start of each fight, magical armor Regen at the end of each round. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
           </HelpButton>
         </div>
         <div className="divide-y divide-hairline">
@@ -276,6 +281,8 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
               </span>
             } />
           ))}
+          <Row label="Barrier" value={<span className={guard.barrier > 0 ? 'text-shard' : ''}>{guard.barrier}</span>} note="each fight" />
+          <Row label="Regen" value={<span className={guard.regen > 0 ? 'text-shard' : ''}>{guard.regen} HP</span>} note="each round" />
           <Row label="Evasion" value={`${(boosted.evasion / 10).toFixed(1)}%`} note="from Speed" />
           <Row label="Limit Break head start" value={`${boosted.limitStart} / 12`} />
         </div>

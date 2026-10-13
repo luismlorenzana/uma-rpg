@@ -1,9 +1,10 @@
 // One of a class's five weapon slots (D98) or one of her five armor slots (D103): the weapon she holds there opens its
 // skill tree; the armor kind decides her Barrier or Regen. Every Uma holds a Training
 // weapon of each kind (grade 0, no stats); a crafted piece of the kind adds its stats. A Summoner, Spell Blade or Cleric
-// chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's slots keep theirs.
+// chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's slots keep theirs. She binds each kind's
+// grades in order (D119): the sheet shows her best piece and the stock above it, never the grades she has spent.
 import {
-  ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, armorKindOf, classOf, EFFECT_LABEL, equipBlock, gearById, gearPoints, isMagicalArmor, isRpgTome,
+  ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, armorKindOf, classOf, EFFECT_LABEL, equipBlock, gearById, gearChoices, gearPoints, isMagicalArmor, isRpgTome,
   isWeapon, ITEM_EFFECTS, MIGHT_PER_GRADE, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind, type ArmorKind, type ArmorSlot,
   type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
@@ -53,10 +54,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   const kinds = rpgPicksWeapons(classId)
     ? [here, ...rpgClassWeapons(classId).filter((w) => w !== here && (kind === 'any' || (kind === 'tome') === isRpgTome(w)))]
     : [here]
-  const pieces = (w: RpgWeapon) => [
-    ...uma.gear.locker.filter((id) => gearById(id)?.type === w).map((id) => ({ id, bound: true })),
-    ...Object.keys(world.gear).filter((id) => gearById(id)?.type === w && !uma.gear.locker.includes(id)).map((id) => ({ id, bound: false })),
-  ]
+  const pieces = (w: RpgWeapon) => gearChoices(uma, world.gear, (p) => p.type === w)
   const held = (w: RpgWeapon, id: string | null) => here === w && (uma.gear.equipped[w] ?? null) === id
   const choose = (w: RpgWeapon, id: string | null) =>
     hold(outfitId, classId, slot, w, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -114,11 +112,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
   const [error, setError] = useState<string | null>(null)
   const here = slotKind(uma.gear, slot)
   const kinds = [here, ...ARMOR_SLOT_KINDS[slot].filter((k) => k !== here)] as ArmorKind[]
-  const ofKind = (id: string, kind: ArmorKind) => { const p = gearById(id); return !!p && !isWeapon(p.type) && armorKindOf(p.type) === kind }
-  const pieces = (kind: ArmorKind) => [
-    ...uma.gear.locker.filter((id) => ofKind(id, kind)).map((id) => ({ id, bound: true })),
-    ...Object.keys(world.gear).filter((id) => ofKind(id, kind) && !uma.gear.locker.includes(id)).map((id) => ({ id, bound: false })),
-  ]
+  const pieces = (kind: ArmorKind) => gearChoices(uma, world.gear, (p) => !isWeapon(p.type) && armorKindOf(p.type) === kind)
   const held = (kind: ArmorKind, id: string | null) => here === kind && (uma.gear.equipped[slot] ?? null) === id
   const choose = (kind: ArmorKind, id: string | null) =>
     wearArmorPiece(outfitId, slot, kind, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))

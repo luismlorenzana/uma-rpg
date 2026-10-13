@@ -14,7 +14,7 @@ import {
   type RpgPartyMember, type RpgRun,
 } from '../rpg/campaign/run'
 import { rpgNode } from '../rpg/catalog'
-import { isRpgTome } from '../rpg/kinds'
+import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
   forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
@@ -29,7 +29,6 @@ import { equippedGuard, equippedMight, equippedOrb, equippedPoints, gearById } f
 import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { workOf } from './status'
 import { heroFields, payBonds, type BondGain } from './heroes'
 
 /** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
@@ -180,6 +179,17 @@ export function umaPointParts(uma: OwnedUma, _classId?: RpgClass): { gear: Point
   return { gear: equippedPoints(uma.gear.equipped), extra: starPoints(uma.stars.active) }
 }
 
+/** What her weapons add to each offense on her profile (D119): the average Might of the weapons in her class's five
+ * slots that hit with it, Arms with ATK and Tomes with M.ATK, a Training weapon counting 0. In a fight each hit adds its
+ * own weapon's Might. */
+export function umaWeaponMight(uma: OwnedUma, classId: RpgClass): { atk: number; matk: number } {
+  const weapons = classOf(uma, classId).weapons
+  const might = equippedMight(uma.gear.equipped, weapons)
+  const average = (ws: readonly RpgWeapon[]) =>
+    ws.length ? Math.round(ws.reduce((n, w) => n + (might[rpgWeaponKind(w)] ?? 0), 0) / ws.length) : 0
+  return { atk: average(weapons.filter((w) => !isRpgTome(w))), matk: average(weapons.filter(isRpgTome)) }
+}
+
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------
 
 /** The world's run: wins per stage, MP per Uma (absent is full) and the open fight, whichever party fights it. */
@@ -230,8 +240,7 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
   if (!slots) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
   if (slots.some((s) => s === null) || slots.length !== PARTY_SIZE) throw new SaveRuleError('cannot-fight', 'a fight needs a full party of five')
   if (openFightOf(world)) throw new SaveRuleError('cannot-fight', 'a fight is already open')
-  const busy = (slots as string[]).filter((id) => workOf(world, id))
-  if (busy.length) throw new SaveRuleError('busy', `${busy.length === 1 ? 'one member is' : `${busy.length} members are`} working: recall them first`)
+  // Working Umas fight too (D119): a job never keeps her out of a fight.
   const members: RpgPartyMember[] = (slots as string[]).map((id) => {
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)

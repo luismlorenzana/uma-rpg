@@ -11,7 +11,7 @@ import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
 import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
 import { stockName } from '../economy/stock'
-import { isInFight, workOf } from './status'
+import { workOf } from './status'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import type { OwnedUma, ProfessionLevel, Save, TierWorld } from './save'
 import { facilityOf } from './facility'
@@ -110,11 +110,10 @@ function planCooking(world: TierWorld, placeId: string, outfit: WorkOutfit, outp
   return { output: { id: dish.id, name: dish.name, grade: dish.grade }, item: null, profession: 'farming', msEach, expEach: minutes * EXP_PER_MINUTE, inputs: dish.inputs, block }
 }
 
-/** Why this Uma can't take a job now, or null: she works one job at a time and never mid-fight. */
+/** Why this Uma can't take a job now, or null: she works one job at a time. Fighting doesn't stop her (D119). */
 export function availabilityBlock(world: TierWorld, outfitId: string): string | null {
   if (!world.umas[outfitId]) return 'Not unlocked'
   if (workOf(world, outfitId)) return 'Already working'
-  if (isInFight(world, outfitId)) return 'In a fight'
   return null
 }
 

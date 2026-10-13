@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { familyById } from '../items/catalog'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
+import { equipGear } from './forge'
+import { eatDish } from './kitchen'
 import { facilityTargets, setTarget, targetPlan } from './targets'
 import { startJob } from './work'
 
@@ -32,7 +34,7 @@ describe('farming targets (D100)', () => {
     let save = setTarget(umas('101', '102'), '101', true, at(1))
     let plan = targetPlan(worldOf(save), brawler)
     // A new Brawler: her five Arms and her five armor slots' physical kinds, all grade 1; and all 100 nodes' dishes.
-    expect(plan.gear.map((g) => g.key)).toEqual(['arms-orb-g1', 'axe-g1', 'bow-g1', 'cuirass-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1'])
+    expect(plan.gear.map((g) => g.key).sort()).toEqual(['axe-g1', 'bow-g1', 'cuirass-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1', 'orb-greatsword-g1'])
     expect(plan.dishes).toHaveLength(100)
     expect(plan.dishes.every((d) => d.need === 1 && d.short === 1)).toBe(true)
     // Every refined line is fed by the gear and dishes short; every raw line by the refined short, one for one.
@@ -62,7 +64,25 @@ describe('farming targets (D100)', () => {
     const uma = w.umas['101']!
     save = { ...save, tierWorlds: { '1': { ...w, umas: { '101': { ...uma, gear: { locker: ['axe-g1', 'cuirass-g1-def', 'orb-fire-g1'], equipped: { axe: 'axe-g1' }, kinds: {} } } } } } }
     // The Elemental Orb doesn't count: her accessory slot holds an Arms Orb.
-    expect(targetPlan(worldOf(save), brawler).gear.map((g) => g.key)).toEqual(['arms-orb-g1', 'bow-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1'])
+    expect(targetPlan(worldOf(save), brawler).gear.map((g) => g.key).sort()).toEqual(['bow-g1', 'gauntlets-g1', 'greatsword-g1', 'greaves-g1', 'helm-g1', 'katana-g1', 'lance-g1', 'orb-greatsword-g1'])
     expect(targetPlan(worldOf(setTarget(save, '101', false, at(2))), brawler)).toEqual({ gear: [], dishes: [], refined: [], raw: [] })
+  })
+
+  it('drops what she has eaten or bound, and plans every grade she still has to climb in order (D119)', () => {
+    const top = { rank: 3, exp: 0 }
+    let save = setTarget(umas('101'), '101', true, at(1))
+    const w = worldOf(save)
+    save = { ...save, tierWorlds: { '1': { ...w, gear: { 'axe-g1': 1 }, dishes: { 'dish-grains-1': 1 },
+      umas: { '101': { ...w.umas['101']!, ranks: { ...w.umas['101']!.ranks, weapons: { axe: top } } } } } } }
+    const plan = () => targetPlan(worldOf(save), brawler)
+    // Axe Rank 3 and nothing bound: grades 1, 2 and 3, one each; the grade-1 Axe in stock covers the first.
+    expect(plan().gear.filter((g) => g.key.startsWith('axe-')).map((g) => [g.key, g.short])).toEqual([['axe-g1', 0], ['axe-g2', 1], ['axe-g3', 1]])
+    expect(plan().dishes.find((d) => d.key === 'dish-grains-1')).toMatchObject({ need: 1, have: 1, short: 0 })
+    // Once she binds the Axe and eats the dish, neither is listed, and nothing for them is short.
+    save = equipGear(save, '101', 'axe-g1', at(2))
+    save = eatDish(save, '101', 'dish-grains-1', at(2)).save
+    expect(plan().gear.filter((g) => g.key.startsWith('axe-')).map((g) => g.key)).toEqual(['axe-g2', 'axe-g3'])
+    expect(plan().dishes.some((d) => d.key === 'dish-grains-1')).toBe(false)
+    expect(plan().dishes).toHaveLength(99)
   })
 })

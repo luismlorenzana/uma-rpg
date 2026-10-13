@@ -7,7 +7,7 @@ import { ITEM_FAMILIES } from '../items/catalog'
 import { battleDamage, createBattle } from '../rpg/battle/engine'
 import { projectRpgStats } from '../rpg/rules'
 import { startFight, umaProfile } from './battle'
-import { eatDish, extraStatPoints, setActiveNodes } from './kitchen'
+import { dishBlock, eatDish, extraStatPoints, nodeFromDish, setActiveNodes } from './kitchen'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
 import { collectJob, facilityOf, grantProfessionExp, planJob, startJob } from './work'
@@ -66,13 +66,19 @@ describe('cooking and eating (S6)', () => {
     expect(facilityOf(worldOf(save), 'kitchen').jobs[0]).toBeNull()
   })
 
-  it('eats a dish for the lowest locked node, switches it on while slots last, and refuses a dish with nothing new', () => {
-    let save = stock(withUma(), {}, { 'dish-grains-2': 3 })
-    save = eatDish(save, '101', 'dish-grains-2', at(0)).save
+  it('eats a dish for its own grade\'s node once the lower ones are open, switches it on while slots last (D119)', () => {
+    let save = stock(withUma(), {}, { 'dish-grains-1': 2, 'dish-grains-2': 2 })
+    // Grade 2 waits for grade 1, and neither shows as edible until its turn.
+    expect(dishBlock(worldOf(save).umas['101']!, 'dish-grains-2')).toBe('Eat the grade 1 dish first')
+    expect(nodeFromDish(worldOf(save).umas['101']!, 'dish-grains-2')).toBeNull()
+    expect(() => eatDish(save, '101', 'dish-grains-2', at(0))).toThrow(/grade 1 dish first/)
+    save = eatDish(save, '101', 'dish-grains-1', at(0)).save
     save = eatDish(save, '101', 'dish-grains-2', at(0)).save
     expect(worldOf(save).umas['101']!.stars).toEqual({ unlocked: ['moon:hp:1', 'moon:hp:2'], active: ['moon:hp:1', 'moon:hp:2'] })
-    expect(() => eatDish(save, '101', 'dish-grains-2', at(0))).toThrow(/nothing new/)
-    expect(worldOf(save).dishes).toEqual({ 'dish-grains-2': 1 })
+    // Eaten grades are spent.
+    expect(() => eatDish(save, '101', 'dish-grains-1', at(0))).toThrow(/Already eaten/)
+    expect(() => eatDish(save, '101', 'dish-grains-2', at(0))).toThrow(/Already eaten/)
+    expect(worldOf(save).dishes).toEqual({ 'dish-grains-1': 1, 'dish-grains-2': 1 })
     expect(() => setActiveNodes(save, '101', ['moon:hp:3'], at(0))).toThrow(/unlocked/)
     save = setActiveNodes(save, '101', ['moon:hp:2'], at(0))
     expect(extraStatPoints(worldOf(save).umas['101']!)).toMatchObject({ hp: 1 })

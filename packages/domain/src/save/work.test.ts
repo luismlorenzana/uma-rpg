@@ -7,7 +7,7 @@ import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from '.
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { isBusy } from './rules'
-import { collectAll, collectJob, facilityOf, grantProfessionExp, planJob, queueJob, recallJob, cutJobTime, ticketsToFinish, startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
+import { availabilityBlock, collectAll, collectJob, facilityOf, grantProfessionExp, planJob, queueJob, recallJob, cutJobTime, ticketsToFinish, startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -59,7 +59,7 @@ describe('gathering (S4)', () => {
     expect(planJob(world, 'mine', turfA, 'copper-ore')?.block).toBeNull()
   })
 
-  it('keeps an Uma to one job, out of fights, and refuses fights while she works', () => {
+  it('keeps an Uma to one job, and lets her fight while she works and work while she fights (D119)', () => {
     let save = withUmas('101', '102', '103', '104', '105')
     save = startJob(save, 'fields', 0, turfA, 'wheat', 1, at(0))
     expect(isBusy(worldOf(save), '101')).toBe(true)
@@ -67,10 +67,10 @@ describe('gathering (S4)', () => {
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, outfit(id)]))
-    expect(() => startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).toThrow(/recall/)
-    save = recallJob(save, 'fields', 0, at(MINUTE))
-    expect(isBusy(worldOf(save), '101')).toBe(false)
-    expect(() => startFight(save, ura, 'w1-1-1-s1', outfits, at(MINUTE))).not.toThrow()
+    save = startFight(save, ura, 'w1-1-1-s1', outfits, at(0))
+    expect(availabilityBlock(worldOf(save), '102')).toBeNull()
+    save = startJob(save, 'orchard', 0, outfit('102', 'A'), 'apple', 1, at(0))
+    expect(isBusy(worldOf(save), '102')).toBe(true)
   })
 })
 
