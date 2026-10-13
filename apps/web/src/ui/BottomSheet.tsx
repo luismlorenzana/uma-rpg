@@ -1,5 +1,8 @@
-// A bottom sheet over the current screen: title, close, Escape, and focus moved in and back out.
+// A bottom sheet over the current screen: title, close, Escape, and focus moved in and back out. It renders into
+// <body>, so an ancestor with a transform or backdrop filter (the maps' sticky header) can't become its containing block
+// and squeeze it into that box.
 import { useEffect, useRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { CloseIcon } from './icons'
 
 export function BottomSheet({ title, onClose, children, footer }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
@@ -14,7 +17,7 @@ export function BottomSheet({ title, onClose, children, footer }: { title: strin
       previous?.focus()
     }
   }, [onClose])
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true" aria-label={title}>
       <button type="button" className="absolute inset-0 bg-black/55" aria-label="Close" tabIndex={-1} onClick={onClose} />
       <div className="pb-safe relative flex max-h-[85dvh] flex-col rounded-t-lg border-t border-hairline-strong bg-panel shadow-3">
@@ -27,6 +30,7 @@ export function BottomSheet({ title, onClose, children, footer }: { title: strin
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{children}</div>
         {footer && <div className="border-t border-hairline px-4 py-3">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
