@@ -50,6 +50,9 @@ kbd { font:inherit; font-size:12px; margin-right:2px; opacity:.65 }
 .rare { background:#383047; border-color:#817298 }
 .regular { background:#1a493f; border-color:#4f9d8c }
 .key { background:#4c3d1b; border-color:#c3a554 }
+.mini-boss { background:#383050; border-color:#a58ed5 }
+.final-boss { background:#512932; border-color:#d8828d }
+.votes button[aria-pressed=true] { outline:2px solid #f0c15b; outline-offset:-4px }
 .navigation { display:flex; justify-content:center; gap:8px; padding-top:6px }
 .navigation button { min-width:90px }
 .tools { display:flex; align-items:center; gap:6px; padding-top:6px }

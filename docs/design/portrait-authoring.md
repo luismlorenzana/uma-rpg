@@ -29,6 +29,24 @@ The active app reads original image bytes from that round's immutable dataset, n
 Pixel dimensions and **Original** let the owner inspect source resolution directly. Sources vary in quality:
 the tool does not resize, recompress or invent resolution. Final vertical/face crops remain a later pass.
 
+## Phase 1b: retained-unit role tiers (D126)
+
+After the completed quality-ranking pass, create a new **survivor-only** dataset and tier round. Remove every -1
+(Rare) and -2 (Excluded) unit from the active manifests, counts, grid, search, upcoming images, export and image
+allowlist. Preserve the complete preceding dataset, round/history and exact vote archive outside the active app;
+do not delete originals, alter the game release or upload anything. Stable IDs and original image bytes do not change.
+
+Retained +1 units start **Regular** and +2 units **KeyEnemy**. Add **MiniBoss** and **FinalBoss**, initially empty;
+the owner assigns them explicitly. Four buttons/keys (1–4), tier filters, Grid, Undo and autosave support another
+pass and later revisits. All retained units are visible by default, with only the four tier totals in the app.
+
+Tier ratings are schema 2 with `mode: "tiers"` and values 1–4. Schema 1 keeps its old -2…2 meaning for archival and
+earlier ranking rounds; imports cannot cross scales or round/dataset identity. Every active unit must have a tier,
+and unknown IDs are rejected. The migration refuses unfinished rankings, missing originals, bad hashes and existing
+output folders. It changes the active project pointer only after copies, snapshots and catalogue validation succeed.
+Stop the reviewer before migration. Old source/ranking data remains available for a separately requested recovery,
+but cannot accidentally reappear through an active-round import. This is local role authoring, not game integration.
+
 ## Where the real data lives
 
 All paths are relative to the primary repo's **gitignored `content/` folder**, never a disposable task worktree:
@@ -44,7 +62,7 @@ content/authoring/
     azurlane/cast/*                     # original full art and face bytes
   rounds/<round-id>/
     round.json                         # immutable roster hashes, previous-pass references, next phase
-    ratings.json                       # current votes; round/dataset identity + revision
+    ratings.json                       # current ranking votes or tiers; scale + identity + revision
     history/<revision>-<sha256>.json    # full before/after snapshots of votes, imports and Undo
   archive/                             # first-pass votes and frozen game-pack copy
   legacy-history/                      # snapshots while the original first pass stays active
@@ -71,7 +89,8 @@ Build a separate local crop pass over the ranked source originals. A regular ene
 small face**. An elite, sub-boss or final boss needs those plus a **wide splash** for attacks. Give each role an
 output size and a movable crop rectangle with zoom; pre-authored rectangles can be reviewed before export.
 Persist source SHA-256, pixel-coordinate crop rectangles, output dimensions and review state per role. Never
-overwrite originals or ranking results. +2 is a candidate designation, not an automatic in-game assignment.
+overwrite originals, ranking results or role tiers. Role tiers are candidate designations, not automatic in-game
+assignments; the detailed game treatment of KeyEnemy remains a later owner-approved decision.
 
 ## Phase 3: final list and upload
 

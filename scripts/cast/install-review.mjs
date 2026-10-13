@@ -10,7 +10,7 @@ export async function installReview(content, from = source, node = process.execP
   const release = await realpath(join(content, 'release'))
   const app = join(content, 'tools/cast-review')
   await mkdir(app, { recursive: true })
-  for (const file of ['ratings.mjs','authoring-round.mjs','authoring-import.mjs','review-server.mjs','review.mjs','review.html','review.js','review.css']) await copyFile(join(from,file),join(app,file))
+  for (const file of ['ratings.mjs','authoring-round.mjs','authoring-tiers.mjs','authoring-import.mjs','review-server.mjs','review.mjs','review.html','review.js','review.css']) await copyFile(join(from,file),join(app,file))
   const launcher = join(content, 'Portrait Review.command')
   await writeFile(launcher, '#!/bin/zsh\nexport CAST_CONTENT_DIR=' + quote(release) +
     '\nexport CAST_PROJECT_FILE=' + quote(join(content,'authoring/project.json')) +

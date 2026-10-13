@@ -10,26 +10,29 @@ const STORED_PACKS = [
 export const PACKS=STORED_PACKS.filter(([id])=>['priconne','azurlane'].includes(id))
 export const packPath = (release, franchise) => join(release, franchise === 'priconne' ? '' : franchise, 'cast.json')
 export const ratingsPath = release => resolve(dirname(release), 'cast-ratings.json')
-export const validRating = rating => Number.isInteger(rating) && rating >= -2 && rating <= 2
+export const validRating = (rating, schemaVersion = 1) => Number.isInteger(rating) &&
+  (schemaVersion === 2 ? rating >= 1 && rating <= 4 : rating >= -2 && rating <= 2)
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
 const safeId = id => typeof id === 'string' && /^[a-z0-9_-]{1,80}$/.test(id) && !['__proto__', 'constructor', 'prototype'].includes(id)
 const historyRoot = file => file.endsWith('/cast-ratings.json')?join(dirname(file),'authoring/legacy-history'):join(dirname(file),'history')
 
 export function parseRatings(raw) {
-  if (!record(raw) || raw.schemaVersion !== 1 || !record(raw.ratings)) throw new Error('Invalid ratings file')
+  if (!record(raw) || ![1,2].includes(raw.schemaVersion) || !record(raw.ratings)) throw new Error('Invalid ratings file')
+  if (raw.schemaVersion === 2 && (raw.mode !== 'tiers' || !safeId(raw.roundId) || !safeId(raw.datasetId))) throw new Error('Invalid tier round')
   const revision = raw.revision ?? 0
   if (!Number.isSafeInteger(revision) || revision < 0) throw new Error('Invalid ratings revision')
   const ratings = {}
   for (const [franchise, values] of Object.entries(raw.ratings)) {
     if (!STORED_PACKS.some(([id]) => id === franchise) || !record(values)) throw new Error('Invalid franchise ratings')
+    if (raw.schemaVersion === 2 && !PACKS.some(([id]) => id === franchise)) throw new Error('Invalid tier franchise')
     ratings[franchise] = {}
     for (const [id, rating] of Object.entries(values)) {
-      if (!safeId(id) || !validRating(rating)) throw new Error('Invalid member rating')
+      if (!safeId(id) || !validRating(rating, raw.schemaVersion)) throw new Error('Invalid member rating')
       ratings[franchise][id] = rating
     }
   }
   for(const key of ['roundId','datasetId']) if(raw[key] !== undefined && !safeId(raw[key])) throw new Error('Invalid review identity')
-  return { schemaVersion: 1, revision, ratings, ...(raw.roundId ? {roundId:raw.roundId} : {}), ...(raw.datasetId ? {datasetId:raw.datasetId} : {}) }
+  return { schemaVersion: raw.schemaVersion, ...(raw.schemaVersion === 2 ? {mode:'tiers'} : {}), revision, ratings, ...(raw.roundId ? {roundId:raw.roundId} : {}), ...(raw.datasetId ? {datasetId:raw.datasetId} : {}) }
 }
 
 export async function readRatings(file) {
@@ -51,6 +54,8 @@ export async function loadReview(release, file = ratingsPath(release), {includeA
   try { round=JSON.parse(await readFile(join(dirname(file),'round.json'),'utf8')) }
   catch(error){if(error.code!=='ENOENT')throw error}
   if(round && (round.schemaVersion!==1 || !safeId(round.id) || !safeId(round.datasetId) || typeof round.label!=='string' || votes.roundId!==round.id || votes.datasetId!==round.datasetId)) throw new Error('Review round identity mismatch')
+  if (votes.schemaVersion === 2 && (!round || round.votesMode !== 'tiers')) throw new Error('Tier round identity mismatch')
+  if (round?.votesMode === 'tiers' && votes.schemaVersion !== 2) throw new Error('Tier ratings schema mismatch')
   const packs = []
   for (const [id, label] of includeArchived && !round ? STORED_PACKS : PACKS) {
     if(round && !['priconne','azurlane'].includes(id))continue
@@ -66,13 +71,15 @@ export async function loadReview(release, file = ratingsPath(release), {includeA
     const members = raw.members.filter(member=>includeArchived || id!=='azurlane' || !['Normal','Rare'].includes(member.rarity)).map(member => {
       if (!safeId(member.id) || typeof member.name !== 'string' || seen.has(member.id)) throw new Error('Invalid cast member: ' + id)
       seen.add(member.id)
+      if (votes.schemaVersion === 2 && !validRating(votes.ratings[id]?.[member.id], 2)) throw new Error('Tier missing for active member')
       return { ...member, rating: votes.ratings[id]?.[member.id] ?? 0,
         ...(round?.previousRatings?.[id]?.[member.id] !== undefined ? {previousRating:round.previousRatings[id][member.id]} : {}) }
     })
+    if (votes.schemaVersion === 2 && Object.keys(votes.ratings[id] ?? {}).some(member => !seen.has(member))) throw new Error('Tier rating outside active catalogue')
     if (members.length) packs.push({ id, label, members, ...(raw.avatar ? { avatar: raw.avatar } : {}) })
   }
   packs.sort((a, b) => a.members.length - b.members.length || a.id.localeCompare(b.id))
-  return { schemaVersion: 1, revision: votes.revision, packs, ...(round?{round:{id:round.id,label:round.label,datasetId:round.datasetId}}:{}) }
+  return { schemaVersion: 1, mode: votes.schemaVersion === 2 ? 'tiers' : 'ranking', revision: votes.revision, packs, ...(round?{round:{id:round.id,label:round.label,datasetId:round.datasetId}}:{}) }
 }
 
 export async function atomicJson(file, value) {
@@ -109,7 +116,7 @@ export async function saveVotes(release, file, entries, revision, {restoreArchiv
   if (!Array.isArray(entries) || !entries.length || entries.length > 10000) throw new Error('Invalid votes')
   const known = new Map(data.packs.map(p => [p.id, new Set(p.members.map(m => m.id))]))
   for (const entry of entries) {
-    if (!record(entry) || !safeId(entry.id) || !known.get(entry.franchise)?.has(entry.id) || !validRating(entry.rating)) throw new Error('Unknown member or invalid vote')
+    if (!record(entry) || !safeId(entry.id) || !known.get(entry.franchise)?.has(entry.id) || !validRating(entry.rating, current.schemaVersion)) throw new Error('Unknown member or invalid vote')
   }
   // Preserve both sides of every edit/import/undo before acknowledging it. A corrupt current file is never reset.
   await snapshotRatings(file,current)

@@ -23,7 +23,38 @@ running, it just opens it. Keep that Terminal window running. Bookmark the URL f
 The small installed copy lives in `content/tools/cast-review/`, not another git checkout. No login item/background
 service. Reinstall after pulling updates.
 
-## Vote
+## Assign a tier
+
+After the completed quality pass, the active catalogue contains only retained units. Rare and Excluded units are
+absent from every count, filter, image endpoint and export; their originals and votes remain in earlier private
+datasets/rounds, not the app. Existing +1 votes become Regular and +2 votes become KeyEnemy. Boss tiers start empty.
+
+| Key/button | Tier |
+|---|---|
+| 1 | Regular |
+| 2 | KeyEnemy |
+| 3 | MiniBoss |
+| 4 | FinalBoss |
+
+Choose any tier to promote or demote the current unit. Assignments autosave and advance. **Show** filters by tier;
+**All** starts with the full retained roster. Grid, search, Previous/Skip and Z/Undo still work. The current tier is
+highlighted. No tier selects in-game enemies automatically.
+
+Stop the reviewer before creating a survivor-only tier round from a **completed** ranking pass:
+
+```sh
+node scripts/cast/authoring-tiers.mjs /absolute/path/to/uma-rpg/content retained-YYYYMMDD tiers-YYYYMMDD
+pnpm cast:install
+```
+
+This copies only surviving source images, verifying their original hashes, into a new immutable dataset. It archives
+the old votes exactly, leaves all old datasets/rounds intact, and activates the new round only after validation.
+Tier exports use schema 2 (`mode: "tiers"`, ratings 1–4); old ranking files use schema 1 and cannot be imported into a
+tier round. Unknown/removed IDs and negative values are rejected. Back up `content/authoring/` as before.
+
+## Earlier ranking rounds
+
+Legacy/ranking rounds retain their original four-vote scale:
 
 | Key/button | Vote | Intended later use |
 |---|---|---|

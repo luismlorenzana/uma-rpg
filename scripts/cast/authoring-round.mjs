@@ -21,6 +21,7 @@ export async function startRound(content,datasetId,roundId,{resetVotes=false,all
   try {const prior=await projectPaths(join(authoring,'project.json'));priorFile=prior.file;priorRelease=prior.release}
   catch(error){if(error.code!=='ENOENT')throw error}
   const priorBytes=await readFile(priorFile),prior=await readRatings(priorFile)
+  if (prior.schemaVersion === 2 && !resetVotes) throw new Error('Role tiers cannot be inherited as old ranking votes. Use an explicit fresh round.')
   const archived=join(authoring,'archive','votes-'+digest(priorBytes)+'.json')
   await mkdir(dirname(archived),{recursive:true});await copyFile(priorFile,archived,1)
     .catch(error=>{if(error.code!=='EEXIST')throw error})
