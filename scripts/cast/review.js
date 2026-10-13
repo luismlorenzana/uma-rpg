@@ -33,8 +33,12 @@ function portrait(member) {
   $('image-error').hidden = true; image.hidden = false
   image.removeAttribute('style'); box.classList.remove('face-crop')
   const face = state.mode === 'face'
+  const source=face && member.face ? member.face : member.art
   image.alt = member.name + (face ? ', face' : ', full art')
-  image.src = imageUrl(face && member.face ? member.face.path : member.art.path)
+  image.src = imageUrl(source.path)
+  $('dimensions').textContent=source.width+' × '+source.height+' px'
+  $('original').href=imageUrl(source.path)
+  $('original').setAttribute('aria-label','Open original image for '+member.name)
   if (face && !member.face) {
     const avatar = member.avatar ?? selectedPack().avatar ?? { x: .5, y: 0, size: .3 }
     const clamp = (v, min, max, fallback) => Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback

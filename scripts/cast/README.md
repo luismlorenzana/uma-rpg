@@ -67,6 +67,18 @@ listed in `dataset.json`, with a full `roster.json` retained. Do not activate th
 A dataset used by any round is locked against reimport. Another source collection uses a new dataset ID (the
 shared cache is reused). The owner chose to retain the current round until every JP splash is available.
 
+For an owner-requested fresh quality-review round (D125), stop the reviewer first, then:
+
+```sh
+node scripts/cast/authoring-round.mjs /absolute/path/to/uma-rpg/content jp-al-YYYYMMDD fresh-YYYYMMDD --fresh --allow-missing-splashes
+pnpm cast:install
+```
+
+`--fresh` archives the preceding votes and starts both franchises unreviewed, with no old-vote hints.
+`--allow-missing-splashes` is an explicit exception only when every roster face is available; the app marks missing
+splashes and uses those faces. The import remains incomplete. Omit this option to retain the complete-source guard.
+The reviewer serves the original local bytes; the dimensions and **Original** link help inspect their quality.
+
 Back up the whole `content/authoring/` folder for sources + all rounds. App Export covers only active votes.
 
 For a worktree or test fixture:

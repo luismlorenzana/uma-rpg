@@ -19,6 +19,16 @@ The import is resumable and rate-limited. Incomplete sources cannot become an ac
 the current round until every JP splash is available. A completed dataset, or one already used by a round, is
 immutable: use a new dataset ID for another source collection. Each new round has a separate ratings file.
 
+**Owner update (D125):** reset the votes from scratch and inspect the latest local downloads now. `--fresh` creates
+an empty round with no inherited votes or previous-vote hints, while archiving the preceding votes unchanged.
+An explicit `--allow-missing-splashes` may activate a complete face roster before all splashes arrive; pending
+members show their source face and a clear label. This is not a completed splash import. Defaults still refuse
+incomplete activation and keep same-ID carryover; neither exception is automatic.
+
+The active app reads original image bytes from that round's immutable dataset, not the small game-release art.
+Pixel dimensions and **Original** let the owner inspect source resolution directly. Sources vary in quality:
+the tool does not resize, recompress or invent resolution. Final vertical/face crops remain a later pass.
+
 ## Where the real data lives
 
 All paths are relative to the primary repo's **gitignored `content/` folder**, never a disposable task worktree:

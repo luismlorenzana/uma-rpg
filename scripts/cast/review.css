@@ -24,6 +24,9 @@ button[aria-pressed=true] { border-color:#e5b64c; background:#43361f }
 #round { color:#e5b64c; font-size:12px; margin-top:4px }
 #prior { color:#a8bdcd; font-size:12px; text-align:center }
 #prior:empty { display:none }
+.image-info { display:flex; align-items:center; justify-content:center; gap:12px; font-size:12px; color:#a8bdcd }
+.image-info a { min-height:44px; display:inline-flex; align-items:center; padding:4px 8px; color:#d7b66a }
+.image-info a:focus-visible { outline:3px solid #f0c15b; outline-offset:2px }
 main { min-height:0; padding:8px 12px; overflow:auto; display:grid }
 #single { min-height:0; display:flex; flex-direction:column; gap:6px }
 .portrait { position:relative; min-height:100px; flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #303e52; border-radius:12px; background:repeating-conic-gradient(#263042 0% 25%,#202a3b 0% 50%) 50% /24px 24px }
