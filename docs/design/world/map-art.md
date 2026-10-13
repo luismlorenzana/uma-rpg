@@ -60,7 +60,8 @@ biome?, anchorY? } } }`.
 
 All nineteen `backdrop/<biome>` strips are 128×48 with matching horizontal border pixels, a transparent sky,
 two silhouette depths and a foot blending into the matching ground. Appending them keeps H06's original 310
-positions and pixels; the world sheet is now 256×976 / 329 frames. CSS sprite users read dimensions from its JSON.
+positions and pixels; the 2.2.0 sheet was 256×976 / 329 frames, with 2.3.0's buildings appended below it.
+CSS sprite users read dimensions from its JSON.
 
 The Phaser stage draws its biome gradient behind the strip, repeating it on the rivals' floor at half the stage
 height, and tiles `ground/<biome>-*` below at the Hub's art scale. A render texture is stamped once on configuration

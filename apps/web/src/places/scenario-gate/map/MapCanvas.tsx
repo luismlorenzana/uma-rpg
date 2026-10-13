@@ -60,7 +60,7 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
     let timer: ReturnType<typeof setInterval> | undefined, phase = 0
     const draw = () => {
-      const f = frames[frontier.frame.replace(/0$/,String(phase))]!
+      const f = frames[frontier.frame.replace(/0$/, String(phase))]!
       ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0); ctx.imageSmoothingEnabled = false
       ctx.clearRect(0, 0, f.w, f.h)
       ctx.drawImage(image, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h)

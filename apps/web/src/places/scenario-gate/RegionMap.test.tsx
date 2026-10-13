@@ -1,5 +1,5 @@
 import { buildMemoryRelease, syntheticMasterData } from '@luismlorenzana/uma-data/testing'
-import { buildChapters, buildRoster, newSave, placeById, setPartySlot, unlockUma, useSpring, worldOf } from '@rpg/domain'
+import { buildChapters, buildRoster, newSave, placeById, setPartySlot, startFight, unlockUma, useSpring, worldOf } from '@rpg/domain'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter } from 'react-router'
@@ -24,14 +24,17 @@ vi.mock('./map/MapCanvas', () => ({
 }))
 
 async function fixture() {
-  const data = syntheticMasterData(), release = await buildMemoryRelease(data)
+  const data = syntheticMasterData(), outfit = data.outfits[0]!
+  data.outfits = Array.from({ length: 5 }, (_, i) => ({ ...outfit, id: 9000000 + i, costumeId: 9000000 + i, talentGroupId: 9000000 + i }))
+  const release = await buildMemoryRelease(data)
   const members: CastMember[] = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}`, nameJa: '', color: '#888888',
     art: { path: `cast/rival${i}.00000000.png`, width: 32, height: 32 } }))
   const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])),
     packs: { priconne: members, azurlane: [], lastorigin: [], nikke: [], destinychild: [], girlsfrontline: [] } }
   const campaign = buildCampaign({ manifest: release.manifest, roster: buildRoster(data), chapters: buildChapters(data.scenarios), art: null }, cast)
   const id = String(data.outfits[0]!.id)
-  save = setPartySlot(unlockUma(newSave('Test', NOW), id, NOW), 0, 0, id, NOW)
+  save = newSave('Test', NOW)
+  data.outfits.forEach((o, i) => { save = setPartySlot(unlockUma(save, String(o.id), NOW), 0, i, String(o.id), NOW) })
   worldOf(save).world.run.mp[id] = 5
   return { campaign, id, region: campaign.region('w1-1-1')! }
 }
@@ -68,6 +71,16 @@ describe('region stage destinations and shared Spring', () => {
       expect([...document.querySelectorAll<HTMLButtonElement>('button')].some((b) => b.textContent === 'Fight again' && !b.disabled)).toBe(true)
       await act(async () => { document.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click(); stage(3).click() })
       expect([...document.querySelectorAll<HTMLButtonElement>('button')].some((b) => b.textContent === 'Locked' && b.disabled)).toBe(true)
+      await act(async () => {
+        document.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click()
+        vi.advanceTimersByTime(2 * 60 * 60 * 1000)
+      })
+      save = startFight(save, region, region.id + '-s2', campaign.outfits, new Date().toISOString())
+      await act(async () => { render() })
+      expect(springs().every((b) => b.disabled && b.getAttribute('aria-label') === 'Spring, refill party MP')).toBe(true)
+      await act(async () => { springs()[0]!.click(); springs()[1]!.click() })
+      expect(drink).toHaveBeenCalledTimes(2)
+      expect(host.textContent).toContain('Resume the open fight')
     } finally {
       await act(async () => { root.unmount() }); host.remove()
       vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals()

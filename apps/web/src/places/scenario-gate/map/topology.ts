@@ -67,23 +67,24 @@ export function regionTopology(biome: Biome, label: string): RegionLayout {
       kind: i === 11 ? 'boss' : i === 10 ? 'elite' : 'fight', state: i < 4 ? 'cleared' : i === 4 ? 'open' : 'locked' })
   }
   const line = (x0: number, y0: number, x1: number, y1: number) => {
-    for (let y=Math.min(y0,y1); y<=Math.max(y0,y1); y++) for(let x=Math.min(x0,x1); x<=Math.max(x0,x1); x++) markRoad(road,x,y,REGION_ROWS)
+    for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
+      for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) markRoad(road, x, y, REGION_ROWS)
   }
   // Doors meet a serpentine road below each pair. Vertical climbs go round the outside, never through a building.
-  line(4,45,4,44)
-  stages.forEach((s,i) => {
+  line(4, 45, 4, 44)
+  stages.forEach((s, i) => {
     if (!i) return
-    const p=stages[i-1]!, px=p.x+2, py=p.y+4, x=s.x+2, y=s.y+4
-    if (py===y) line(px,y,x,y)
+    const p = stages[i - 1]!, px = p.x + 2, py = p.y + STAGE_TILES, x = s.x + 2, y = s.y + STAGE_TILES
+    if (py === y) line(px, y, x, y)
     else {
-      const edge=px<8?0:15
-      line(px,py,edge,py); line(edge,py,edge,y); line(edge,y,x,y)
+      const edge = px < 8 ? 0 : 15
+      line(px, py, edge, py); line(edge, py, edge, y); line(edge, y, x, y)
     }
   })
   // The existing continent Spring is shown between the starting destinations, not a new refill resource.
-  line(7,44,7,43)
-  const occupied = (x: number,y: number) => stages.some(s=>x>=s.x && x<s.x+STAGE_TILES && y>=s.y && y<s.y+STAGE_TILES)
-    || x===7 && y>=42 && y<44
+  line(7, 44, 7, 43)
+  const occupied = (x: number, y: number) => stages.some((s) => x >= s.x && x < s.x + STAGE_TILES && y >= s.y && y < s.y + STAGE_TILES)
+    || x === 7 && y >= 42 && y < 44
   const wet: Cells = new Set(), ponds: Cells[] = []
   if (visuals[biome].liquid) {
     const r = rng(`${label}:liquid`)
@@ -101,7 +102,7 @@ export function regionTopology(biome: Biome, label: string): RegionLayout {
         for (let tx = minX - 1; tx <= maxX; tx++) {
           if (!touches(tx, ty)) continue
           if (tx < 0 || ty < 0 || tx >= REGION_COLS || ty >= REGION_ROWS || hasCell(road, tx, ty) || cornerMaskAt((cx, cy) => hasCell(wet, cx, cy), tx, ty)
-            || occupied(tx,ty)) fits = false
+            || occupied(tx, ty)) fits = false
         }
       if (!fits) continue
       patch.forEach((k) => wet.add(k)); ponds.push(patch)

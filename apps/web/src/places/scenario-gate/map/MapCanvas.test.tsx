@@ -20,8 +20,13 @@ describe('map canvas and device preferences', () => {
     expect(mapScale(375, 1)).toBe(1); expect(mapScale(600, 1)).toBe(2)
     expect(mapScale(375, 1.25) * 1.25).toBe(1)
   })
-  it.each([16, 64])('draws terrain once, animates only the %ipx ring, honors reduced motion and keeps semantic targets', async (size) => {
+  it.each([
+    { size: 16, dpr: 1, width: 375 }, { size: 64, dpr: 1, width: 375 },
+    { size: 64, dpr: 2, width: 375 }, { size: 64, dpr: 2, width: 390 },
+  ])('draws once, animates only the $size px ring and keeps semantic targets at $width px / $dpr×', async ({ size, dpr, width }) => {
     vi.useFakeTimers(); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
+    vi.stubGlobal('devicePixelRatio', dpr)
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width)
     const draws = vi.fn(), context = { setTransform: vi.fn(), clearRect: vi.fn(), drawImage: draws, imageSmoothingEnabled: true }
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D)
     vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
@@ -42,9 +47,11 @@ describe('map canvas and device preferences', () => {
       const reduced = draws.mock.calls.length
       await act(async () => { vi.advanceTimersByTime(1950) }); expect(draws).toHaveBeenCalledTimes(reduced)
       const button = el.querySelector('button')!
-      expect(parseFloat(button.style.width)).toBe(Math.max(44,size)); expect(parseFloat(button.style.height)).toBe(Math.max(44,size))
-      expect(el.querySelectorAll('canvas')[1]!.width).toBe(size)
-      expect(context.clearRect).toHaveBeenLastCalledWith(0,0,size,size)
+      const scale = mapScale(width, dpr)
+      expect(parseFloat(button.style.width)).toBe(Math.max(44, size * scale))
+      expect(parseFloat(button.style.height)).toBe(Math.max(44, size * scale))
+      expect(el.querySelectorAll('canvas')[1]!.width).toBe(size * scale * dpr)
+      expect(context.clearRect).toHaveBeenLastCalledWith(0, 0, size, size)
       await act(async () => { button.click() }); expect(tap).toHaveBeenCalledWith(layout.spots[0])
     } finally { await act(async () => { root.unmount() }); el.remove(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals() }
     expect(listeners.size).toBe(0)

@@ -31,11 +31,11 @@ export function regionLayout(region: WorldRegion, progress: MapProgress, springI
   }
   const random = rng(region.id + ':props'), taken = new Set<string>(), props = propsOf(region.biome)
   const free = (x: number, y: number) => !hasCell(road, x, y) && !liquidMask(x, y) && !hasCell(taken, x, y)
-    && !stages.some((s) => x >= s.x && x < s.x+STAGE_TILES && y >= s.y && y < s.y+STAGE_TILES)
-    && !(x===7 && y>=42 && y<44)
+    && !stages.some((s) => x >= s.x && x < s.x + STAGE_TILES && y >= s.y && y < s.y + STAGE_TILES)
+    && !(x === 7 && y >= 42 && y < 44)
   for (let attempt = 0; attempt < 800 && out.sprites.length < 30; attempt++) {
     const edge = random() < 0.65, x = edge ? random() < 0.5 ? Math.floor(random() * 3) : 13 + Math.floor(random() * 3) : Math.floor(random() * 16)
-    const y = 1 + Math.floor(random() * (REGION_ROWS-1)), frame = props[Math.floor(random() * props.length)]!, h = frames[frame]!.h
+    const y = 1 + Math.floor(random() * (REGION_ROWS - 1)), frame = props[Math.floor(random() * props.length)]!, h = frames[frame]!.h
     if (!free(x, y) || h > TILE && !free(x, y - 1)) continue
     sprite(out, frame, x * TILE, (y + 1) * TILE - h)
     taken.add(cellKey(x, y)); if (h > TILE) taken.add(cellKey(x, y - 1))
@@ -45,12 +45,12 @@ export function regionLayout(region: WorldRegion, progress: MapProgress, springI
     const id = region.id + '-s' + (i + 1)
     const state = (progress.wins[id] ?? 0) > 0 ? 'cleared' : i === 0 || (progress.wins[region.id + '-s' + i] ?? 0) > 0 ? 'open' : 'locked'
     sprite(out, 'stage/' + region.biome + '/' + s.kind + '-' + state, s.x * TILE, s.y * TILE)
-    out.spots.push({ id, kind: 'stage', x: s.x * TILE, y: s.y * TILE, w: 64, h: 64 })
+    out.spots.push({ id, kind: 'stage', x: s.x * TILE, y: s.y * TILE, w: STAGE_TILES * TILE, h: STAGE_TILES * TILE })
     if (state === 'open' && !out.frontier) { out.frontier = id; sprite(out, 'stage/frontier-0', s.x * TILE, s.y * TILE) }
   })
   if (springId) {
-    sprite(out,progress.drySprings?.has(springId)?'marker/spring-dry':'marker/spring',7*TILE,42*TILE)
-    out.spots.push({ id:springId,kind:'spring',x:7*TILE,y:42*TILE,w:16,h:32 })
+    sprite(out, progress.drySprings?.has(springId) ? 'marker/spring-dry' : 'marker/spring', 7 * TILE, 42 * TILE)
+    out.spots.push({ id: springId, kind: 'spring', x: 7 * TILE, y: 42 * TILE, w: 16, h: 32 })
   }
   return out
 }
