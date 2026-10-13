@@ -36,6 +36,10 @@ Each region's fight has its biome's sky, a repeating pixel-art horizon and a til
 Capitals use Ancient Ruins. The lower party band and foe info panels stay dark for readable bars and numbers.
 The scene stamps the terrain once per size, not per animation frame; if the art is unavailable, the gradient remains.
 
+Hits use a four-pose pixel impact for their damage kind. Lingering summons have small, two-pose familiars beside
+their owner, replaced by the next summon and removed when she falls. Effects follow the scene clock at 1×, 2× or 4×,
+including later waves. Reduced motion shows a still final impact and no familiar idle; missing art uses the procedural fallback.
+
 ## The actions
 
 | Action | What it does |

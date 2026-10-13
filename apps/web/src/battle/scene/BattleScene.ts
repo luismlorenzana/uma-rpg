@@ -1,12 +1,14 @@
-// The battle stage (D53, D81): rivals' full-body art, the party as chibis, and procedural effects that play the
-// engine's cues: lunges, hit flashes, element particles, weapon slashes, the shield break and a Limit Break cut-in.
+// The battle stage (D53, D81, H10): portraits, chibis, pixel impacts and persistent Summoner familiars.
+// Procedural impacts remain a fallback; shield breaks and Limit Break cut-ins retain their effects.
 // Playback never decides anything; the engine already did. The DOM overlay carries every lasting number and control,
 // and the canvas only draws effect text (damage numbers, BREAK).
 import worldIndex from '@luismlorenzana/uma-art/world/atlas.json'
+import fxIndex from '@luismlorenzana/uma-art/fx/atlas.json'
 import { isRpgWeaponKind, type BattleCue, type BattleState, type Biome, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
 import Phaser from 'phaser'
 import { stageLayout, type Box } from '../stage-layout'
 import { backgroundLayout } from './background-layout'
+import { PixelEffects } from './pixel-effects'
 
 export interface StageAlly { id: string; idle: HTMLImageElement | null; cheer: HTMLImageElement | null; bust: HTMLImageElement | null }
 export interface StageEnemy { id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string }
@@ -38,23 +40,33 @@ export class BattleScene extends Phaser.Scene {
   private fx!: Phaser.GameObjects.Container
   private background!: Phaser.GameObjects.Graphics
   private terrain: Phaser.GameObjects.RenderTexture | null = null
+  private pixels!: PixelEffects
   private waiting = new Set<() => void>()
   private skipping = false
   private cssSize = { w: 1, h: 1 }
   /** The foes on the stage now: the setup's field until a wave changes it (W3). */
   private field: string[] = []
 
-  constructor(private worldImage: HTMLImageElement | null = null) {
+  constructor(private worldImage: HTMLImageElement | null = null, private fxImage: HTMLImageElement | null = null) {
     super('battle')
   }
 
-  /** Speeds every cue clock together; reduced motion still skips playback entirely. */
+  /** Speeds every cue and pixel-frame clock together. */
   setSpeed(speed: 1 | 2 | 4): void {
     this.tweens.timeScale = speed
     this.time.timeScale = speed
   }
 
   create(): void {
+    if (this.fxImage) {
+      const texture = this.textures.addImage('battle-fx', this.fxImage)
+      if (texture) {
+        for (const [id, f] of Object.entries(fxIndex.frames)) texture.add(id, 0, f.x, f.y, f.w, f.h)
+        texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+      }
+    }
+    this.pixels = new PixelEffects(this)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.pixels.destroy())
     if (this.worldImage) {
       const texture = this.textures.addImage('battle-world', this.worldImage)
       if (texture) {
@@ -64,7 +76,7 @@ export class BattleScene extends Phaser.Scene {
     }
     this.background = this.add.graphics().setDepth(-2)
     this.layer = this.add.container(0, 0)
-    this.fx = this.add.container(0, 0)
+    this.fx = this.add.container(0, 0).setDepth(3)
     const g = this.make.graphics({}, false)
     // Effect textures, drawn once: a soft dot, a shard and a ring.
     for (let r = 12; r > 0; r -= 2) {
@@ -209,6 +221,7 @@ export class BattleScene extends Phaser.Scene {
         this.startIdle(actor)
       }
     }
+    this.pixels.sync(state, this.actors, this.cssSize.w, this.dpr, this.setup.reducedMotion)
   }
 
   private basePos(actor: Actor): { x: number; y: number } {
@@ -237,10 +250,14 @@ export class BattleScene extends Phaser.Scene {
 
   /** Plays cues in order; `onCue` fires as each one starts, so the DOM can follow along. */
   async play(cues: readonly BattleCue[], onCue: (cue: BattleCue) => void): Promise<void> {
-    this.skipping = this.setup.reducedMotion
+    this.skipping = false
     for (const cue of cues) {
       onCue(cue)
       if (this.skipping) continue
+      if (this.setup.reducedMotion) {
+        this.stillCue(cue)
+        continue
+      }
       await this.animate(cue)
     }
     this.skipping = false
@@ -251,6 +268,7 @@ export class BattleScene extends Phaser.Scene {
     this.skipping = true
     for (const done of [...this.waiting]) done()
     this.fx.removeAll(true)
+    this.pixels.clearHits()
     for (const actor of this.actors.values()) {
       const base = this.basePos(actor)
       this.tweens.killTweensOf(actor.sprite)
@@ -317,17 +335,37 @@ export class BattleScene extends Phaser.Scene {
       const base = this.basePos(actor)
       this.tweens.add({ targets: actor.sprite, y: base.y + (actor.side === 'ally' ? -18 : 14) * d, duration: 110, yoyo: true, ease: 'Quad.easeOut' })
       await this.wait(110)
+      if (this.skipping) return
     }
     const color = kind ? KIND_COLOR[kind] ?? 0xffffff : 0xffffff
-    if (tick) this.burst(targetId, 0xff8a5c, 8, -1)
-    else if (kind && isRpgWeaponKind(kind)) this.slash(targetId, weak ? 0xffd84d : 0xffffff)
-    else if (kind === 'lightning') this.bolt(targetId)
-    else this.burst(targetId, color, weak ? 22 : 14, 0)
+    if (!this.pixels.hit(kind ?? (tick ? 'fire' : null), target, d, false)) {
+      if (tick) this.burst(targetId, 0xff8a5c, 8, -1)
+      else if (kind && isRpgWeaponKind(kind)) this.slash(targetId, weak ? 0xffd84d : 0xffffff)
+      else if (kind === 'lightning') this.bolt(targetId)
+      else this.burst(targetId, color, weak ? 22 : 14, 0)
+    }
     this.flash(targetId, 0xffffff)
     const base = this.basePos(target)
     this.tweens.add({ targets: target.sprite, x: base.x + 6 * d, duration: 40, yoyo: true, repeat: 2, onComplete: () => target.sprite.setX(base.x) })
     this.number(targetId, String(amount), target.side === 'ally' ? '#ff8f8f' : weak ? '#ffd84d' : '#ffffff', weak ? 1.15 : 1, weak ? 'WEAK' : undefined)
     await this.wait(tick ? 260 : 300)
+  }
+
+  /** No lunge, flashes, shake or moving text: just the final pose and readable result. */
+  private stillCue(cue: BattleCue): void {
+    if (cue.kind !== 'hit' && cue.kind !== 'break') return
+    const target = this.actors.get(cue.targetId)
+    if (!target) return
+    const { x, y } = this.center(cue.targetId)
+    if (cue.kind === 'hit' && !this.pixels.hit(cue.element ?? (cue.channel === 'status' ? 'fire' : null), target, this.dpr, true)) {
+      const dot = this.add.circle(x, y, 10 * this.dpr, cue.element ? KIND_COLOR[cue.element] : 0xffffff).setAlpha(0.7)
+      this.fx.add(dot)
+      this.time.delayedCall(500, () => dot.destroy())
+    }
+    const weak = cue.kind === 'hit' && cue.weak
+    const value = cue.kind === 'break' ? 'BREAK' : `${cue.amount}${weak ? ' WEAK' : ''}`
+    const text = this.text(x, y - 12 * this.dpr, value, cue.kind === 'break' || weak ? '#ffd84d' : '#ffffff', 18)
+    this.time.delayedCall(500, () => text.destroy())
   }
 
   private flash(id: string, color: number): void {
