@@ -1,6 +1,6 @@
 # H20 — Key bosses' faces
 
-**Priority P3 · Claude, then the owner · uma-rpg · S.** Private content: the faces live only in the gitignored packs
+**Claude, then the owner · uma-rpg · S.** The owner asked for it (D76). Private content: the faces live only in the gitignored packs
 and the private bucket.
 
 ## Why

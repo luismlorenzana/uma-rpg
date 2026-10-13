@@ -1,6 +1,6 @@
 # H13 — W4: field effects and home ground
 
-**Priority P3 · Claude · uma-rpg · M.** After H09.
+**Claude · uma-rpg · M.**
 
 ## Why
 
@@ -16,7 +16,7 @@ This is the step the world plan calls "biomes that play differently".
 - `docs/design/world/encounters.md`: "one modifier per fight, applied by the engine's existing damage and turn-order
   hooks", the field-effect column, the effect list.
 - `docs/design/world/regions.md`: each biome's lean.
-- **Engine** after H09: `packages/domain/src/rpg/battle/engine.ts` (`battleDamage`, turn order).
+- **Engine** (v10): `packages/domain/src/rpg/battle/engine.ts` (`battleDamage`, turn order).
 - `world/balance.test.ts` (`SIM=1`).
 
 ## Do
@@ -28,19 +28,19 @@ This is the step the world plan calls "biomes that play differently".
    - Twilight Rift: light and dark +10%.
    - …
 
-   The engine reads it from the battle input (a v8 input field), so old fights replay unchanged.
+   The engine reads it from the battle input (engine v11), so v6–v10 fights replay unchanged.
 2. **Home ground:** foes whose element matches the biome's signature get a small edge (+5% damage), shown on the stage
    sheet.
 3. **The UI:**
    - The region header and the stage sheet show the field effect in one line, with the element glyph.
    - The fight screen shows it in the top bar.
-4. **Retune** with `SIM=1` to D86's targets. Record the table.
+4. **Retune** with `SIM=1` to `world/balance.test.ts`'s targets. Record the table.
 
 ## Done when
 
-- The engine tests cover each effect's hook and a v7 replay.
+- The engine tests cover each effect's hook and a v10 replay.
 - The sim stays on target.
-- The docs (`encounters.md`, `battles.md`) and a decision row are updated.
+- The manual (`docs/game/combat.md`, `maps.md`, `pnpm docs:update`), `encounters.md` and a decision row are updated.
 
 ## Deliver
 

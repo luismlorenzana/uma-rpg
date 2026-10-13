@@ -1,6 +1,6 @@
 # H24 — Tier 2 and 3 design
 
-**Priority P4 (parked) · the owner and Claude · uma-rpg · M.** After H23. Needs Q7.
+**Parked by the owner · the owner and Claude · uma-rpg · M.** After H23. Needs Q7.
 
 ## Why
 

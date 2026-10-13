@@ -239,6 +239,6 @@ supply measurements, not permission to retune. The Tier Finale's difficulty rema
 ## 14. Next steps
 
 The game as built is in [the manual](../game/README.md). Remaining work is ranked in
-[the handoff queue](../handoff/README.md) and [backlog](../backlog.md).
+[the handoff queue](../handoff/README.md).
 Open owner choices are [Q6–Q8](../open-questions.md): the Tier Finale/promotion, later-tier professions and a
 partially released tier. No design review, catalog authoring or initial scaffold remains pending.

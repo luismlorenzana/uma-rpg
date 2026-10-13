@@ -1,6 +1,6 @@
 # Tasks — S3 to S7
 
-Everything else open or deferred: [backlog.md](../backlog.md).
+Everything else open: [handoff/](../handoff/README.md).
 
 Slice tasks and the [build plan](../plan.md) are history. Releases are checked with the
 [current phone script](../testing/phone-check.md). **A task file is deleted in the commit that finishes it** (D35).

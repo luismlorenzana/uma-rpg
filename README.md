@@ -21,8 +21,7 @@ promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/
 |---|---|
 | [docs/game/](docs/game/README.md) | **The manual: the game as it is today.** Architecture, dependencies, loops, sections, combat, classes, every skill tree, materials, the world map. Its lists are generated from the code |
 | [docs/decisions.md](docs/decisions.md) | Why things are the way they are (append-only) |
-| [docs/handoff/](docs/handoff/README.md) | Every open task, ranked, as a self-contained packet |
-| [docs/backlog.md](docs/backlog.md) | Everything open, linked to its packet |
+| [docs/handoff/](docs/handoff/README.md) | Every open task, ranked, as a self-contained packet; what was dropped and why |
 | [docs/testing/phone-check.md](docs/testing/phone-check.md) | The current release check on the iPhone |
 | [docs/design/](docs/design/) | Specs and proposals, including some for things not built yet |
 | [docs/technical/infrastructure.md](docs/technical/infrastructure.md) | Every production value |

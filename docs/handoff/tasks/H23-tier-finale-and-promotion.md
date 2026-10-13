@@ -1,6 +1,6 @@
 # H23 — S8: Tier Finale and promotion
 
-**Priority P4 (parked by the owner) · the owner decides, Claude builds · uma-rpg · L.** Needs Q6.
+**Parked by the owner · the owner decides, Claude builds · uma-rpg · L.** Needs Q6.
 
 ## Why
 
@@ -33,7 +33,7 @@ come as the long-term goal.
    - promotion at Lv50: what resets, what's kept (classes, ranks, gear), Tier 2's level band;
    - legacy skills: one learned skill per class carried as a passive;
    - banked EXP: overflow EXP converts to Laurels at a fixed rate, or feeds legacy slots.
-2. Save v15 for tier and legacy; the Tier 2 world uses the same generator with a tier offset.
+2. A save version (v20 or later) for tier and legacy; the Tier 2 world uses the same generator with a tier offset.
 3. Balance with H14's simulator and `SIM=1`.
 
 ## Done when

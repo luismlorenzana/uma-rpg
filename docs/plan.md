@@ -28,7 +28,7 @@ features slot into places that already exist instead of growing global routes.
 | **S7 — Forge and equipment** ([spec](slices/S7-forge.md)) · *live 2026-10-10; owner device check pending* | The gear catalog, crafting, bound gear and lockers, the balance pass with equipment | Forge | Craft and equip; difficulty tuned with gear |
 | **S8 — Tier Finale and promotion** | The Tier Finale (open question Q6), promotion, the Tier 2 world | Tier Finale landmark | Promote an Uma into Tier 2 |
 
-Everything open or deferred is in [backlog.md](backlog.md).
+Everything open is in [handoff/](handoff/README.md).
 
 Before S4, a **pacing model** set the timers, XP curves, Laurel payouts and prices ([pacing.md](design/pacing.md),
 D54), and uma-platform published the item icons as `@luismlorenzana/uma-art` (its P37). S8 is far off (owner,

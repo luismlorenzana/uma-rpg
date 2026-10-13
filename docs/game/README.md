@@ -39,7 +39,6 @@ Looking for one thing? Search this folder first (`rg -n "Spring" docs/game`). Ea
 | `docs/decisions.md` | The decision log (D-numbers): why things are the way they are |
 | `docs/design/` | Design specs and proposals; some describe plans or older rules |
 | `docs/handoff/` | Ranked open tasks as self-contained packets, for Claude or a delegated agent |
-| `docs/backlog.md` | Everything open, linked to its packet |
 | `docs/technical/` | Infrastructure values and older architecture notes |
 | `docs/slices/`, `docs/tasks/`, `docs/plan.md` | The build history, slice by slice |
 | `AGENTS.md`, `CLAUDE.md` | How to work in this repo |
