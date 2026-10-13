@@ -1,5 +1,10 @@
 # Synthetic browser previews
 
+`h10-effects.gif` is a short montage of sampled browser frames: Brawler, Mage ice on both foes, Spell Blade's
+Lance/Lightning pair, Cleric Fire, and a Summoner's fire familiar replaced by ice at 4×. Master data is from
+`uma-data/testing`; all names and portrait placeholders are synthetic. The samples are in capture order; pauses
+on the familiar views make their replacement visible. Frame sampling is not a performance measurement.
+
 `h16-victory-375x667.jpg` is a cold-load and lazy-action smoke check. All master data came from
 `@luismlorenzana/uma-data/testing`; outfit names and the colored rival placeholders are invented. No franchise art or
 private release data is included. The disposable five-Uma party is Lv10 with rank 2 classes, not a balance fixture.

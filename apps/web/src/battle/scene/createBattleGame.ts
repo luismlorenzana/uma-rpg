@@ -2,6 +2,7 @@
 import type { BattleCue, BattleState } from '@rpg/domain'
 import Phaser from 'phaser'
 import worldUrl from '@luismlorenzana/uma-art/world/atlas.png?url'
+import fxUrl from '@luismlorenzana/uma-art/fx/atlas.png?url'
 import type { BattleSpeed } from '../battle-prefs'
 import { BattleScene, type StageSetup } from './BattleScene'
 import { pixelImage } from './pixel-image'
@@ -19,7 +20,8 @@ export async function createBattleGame(host: HTMLElement, setup: StageSetup, sta
   const dpr = Math.min(window.devicePixelRatio || 1, 2)
   const css = () => ({ w: Math.max(1, host.clientWidth), h: Math.max(1, host.clientHeight) })
   const { w, h } = css()
-  const scene = new BattleScene(await pixelImage(worldUrl))
+  const [worldImage, fxImage] = await Promise.all([pixelImage(worldUrl), pixelImage(fxUrl)])
+  const scene = new BattleScene(worldImage, fxImage)
   const game = new Phaser.Game({
     type: import.meta.env.DEV && new URLSearchParams(location.search).has('canvas') ? Phaser.CANVAS : Phaser.AUTO,
     parent: host,
