@@ -19,6 +19,9 @@ as a Home Screen web app. Read this before changing anything.
   from `@luismlorenzana/uma-data/testing`. Screenshots showing original art stay local.
 - **Every screen is a place** (`/:page/:placeId/*`, D31). Don't add top-level routes.
 - **Don't push to `main`.** Work on `feat/…`, `fix/…` or `docs/…` and open a pull request. CI must pass.
+- **Owner-authorized agent delivery (2026-10-13):** use `gh` only for GitHub. After the required checks and CI pass,
+  merge the pull request and publish any needed uma-art release; no further owner approval is needed. Never bypass
+  repository protection. Use worktrees outside `~/workspace`, and remove them after merging, preserving unfinished work.
 - **Don't touch production infrastructure** (`.github/workflows/`, `infra/`, `firebase.json`, `.env.production`,
   `apps/api/Dockerfile`) unless your task says so.
 - Append decision rows; never edit old ones. A finished task's spec is deleted in the commit that finishes it (D35).

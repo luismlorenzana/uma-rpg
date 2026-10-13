@@ -26,7 +26,8 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
   const [image, setImage] = useState<HTMLImageElement | null>(null), [failed, setFailed] = useState(false)
   const [width, setWidth] = useState(390), [dpr, setDpr] = useState(hubDpr)
   const scale = mapScale(width, dpr), w = layout.cols * 16 * scale, h = layout.rows * 16 * scale
-  const frontier = layout.sprites.find((s) => s.frame === 'marker/frontier-0')
+  const frontier = layout.sprites.find((s) => s.frame.endsWith('/frontier-0'))
+  const frontierSize = frontier ? frames[frontier.frame]!.w : 16
   useEffect(() => {
     let live = true
     void atlasImage().then((img) => { if (live) { setImage(img); setFailed(false) } }, () => { if (live) setFailed(true) })
@@ -50,19 +51,19 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
     }
     ctx.clearRect(0, 0, layout.cols * 16, layout.rows * 16)
     for (const c of layout.cells) draw(c.frame, c.col * 16, c.row * 16)
-    for (const s of layout.sprites) if (!s.frame.startsWith('marker/frontier-')) draw(s.frame, s.x, s.y)
+    for (const s of layout.sprites) if (!s.frame.includes('/frontier-')) draw(s.frame, s.x, s.y)
   }, [layout, image, scale, dpr])
-  // Only the 16×16 ring redraws; the full terrain canvas never enters the animation loop.
+  // Only the frontier ring redraws; the full terrain canvas never enters the animation loop.
   useEffect(() => {
     const ctx = ring.current?.getContext('2d')
     if (!ctx || !image || !frontier) return
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
     let timer: ReturnType<typeof setInterval> | undefined, phase = 0
     const draw = () => {
-      const f = frames['marker/frontier-' + phase]!
+      const f = frames[frontier.frame.replace(/0$/,String(phase))]!
       ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0); ctx.imageSmoothingEnabled = false
-      ctx.clearRect(0, 0, 16, 16)
-      ctx.drawImage(image, f.x, f.y, f.w, f.h, 0, 0, 16, 16)
+      ctx.clearRect(0, 0, f.w, f.h)
+      ctx.drawImage(image, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h)
     }
     const update = () => {
       clearInterval(timer); phase = 0; draw()
@@ -88,7 +89,7 @@ export function MapCanvas({ layout, describe, onSpot, focusKey, focusId, childre
   return <div ref={host} className="relative w-full overflow-x-clip" data-map-canvas>
     <div className="relative mx-auto" style={{ width: w, height: h, marginLeft: w > width ? (width - w) / 2 : undefined }}>
       <canvas ref={canvas} aria-hidden="true" width={Math.round(w * dpr)} height={Math.round(h * dpr)} style={{ width: w, height: h, imageRendering: 'pixelated' }} />
-      {frontier && <canvas ref={ring} aria-hidden="true" width={Math.round(16 * scale * dpr)} height={Math.round(16 * scale * dpr)} className="pointer-events-none absolute" style={{ left: frontier.x * scale, top: frontier.y * scale, width: 16 * scale, height: 16 * scale, imageRendering: 'pixelated' }} />}
+      {frontier && <canvas ref={ring} aria-hidden="true" width={Math.round(frontierSize * scale * dpr)} height={Math.round(frontierSize * scale * dpr)} className="pointer-events-none absolute" style={{ left: frontier.x * scale, top: frontier.y * scale, width: frontierSize * scale, height: frontierSize * scale, imageRendering: 'pixelated' }} />}
       {layout.spots.map((spot) => {
         const item = describe(spot), bw = Math.max(44, spot.w * scale), bh = Math.max(44, spot.h * scale)
         const inset = Math.max(0, (w - width) / 2)

@@ -3,6 +3,7 @@
 > **Status: built, 2026-10-12 (H07; D87, D90).** World, continent and region screens compose the published
 > `@luismlorenzana/uma-art` 2.0.0 world atlas in a plain 2D canvas, with DOM buttons and the complete lists alongside.
 > H08 adds the battle backdrops below, published in uma-art 2.2.0.
+> The owner's map feedback adds four-tile biome buildings in uma-art 2.3.0 and exposes each region band's existing Spring.
 
 ## Decisions
 
@@ -34,6 +35,10 @@ Every frame id below is part of the contract; the build checks the list. Sizes a
 | Capital | `marker/capital` (ground line at y = 44, like the Hub's buildings) | 48×48 | 1 |
 | Biome icons | `icon/<biome>` for list cells and headers | 16×16 | 19 |
 | Backdrops | `backdrop/<biome>` (battle horizon strips, H08) | 128×48, seamless left to right | 19 |
+| Stage buildings | `stage/<biome>/<fight\|elite\|boss>-<locked\|open\|cleared>` | 64×64, ground line y=58 | 171 |
+| Building frontier | `stage/frontier-0`, `stage/frontier-1` | 64×64 | 2 |
+
+The 2.3.0 atlas contains 502 frames at 256×3792. All 329 earlier frame positions and pixels remain unchanged.
 
 **Two kinds of autotile** (D90, after the [H01 calibration](../../handoff/README.md)):
 
@@ -99,14 +104,19 @@ nothing is lost while the art settles. Buttons over the canvas carry the names a
 
 ### Region: twelve stages up a path
 
-- **16 tiles wide**, about 28 tall, the region's biome ground everywhere. A road (the biome's material) winds from the
-  bottom edge to an arena at the top.
-- Stage 1 sits at the bottom; stages climb in pairs, alternating sides of the road every two rows; the elite is stage
-  11, the boss stands alone in the top arena.
-- Each stage shows its marker: kind (fight, elite, boss) by state (locked, open, cleared). The frontier stage (the next
-  to clear) wears the pulsing ring. A DOM button over each marker opens today's stage sheet.
-- Decoration: two to four liquid patches if the biome has one, props scattered on open ground (more along the edges),
-  none on the road or within one tile of a marker. Seeded by the region id.
+- **16 tiles wide, 46 tall**, with the region's biome ground everywhere. A serpentine road passes below each pair of
+  four-tile buildings; vertical climbs run along the outside edges, never through a building.
+- Stage 1 sits at the bottom; ten regular stages climb in pairs, the elite tower is stage 11, and the boss stronghold
+  stands alone at the top. All buildings are 64×64 native art pixels (4×4 times the previous 16×16 symbols), with
+  biome-specific roofs, stone, snow, vines or ornaments. On 2× iPhones the footprints/targets are 96×96 CSS pixels.
+- Cleared buildings are completely grayscale. Uncleared buildings retain their biome colors; locked doors are
+  boarded and windows dark, while open stages have lit windows and an open doorway. The next stage wears the larger
+  frontier ring. DOM captions add a check or lock, and accessible labels name the state; cleared stages still replay.
+- Each region exposes the existing Spring for its continent's two-row band (`floor(region.row / 2) * 2`), at the road's
+  start and in the sticky header. Both call the same refill operation and share the continent Spring id/cooldown.
+  Its ready/dry art and short countdown update every 30 seconds; use is disabled during a fight. No new refill charges.
+- Decoration: up to three seeded, irregular liquid patches where the biome has one and props on free ground. Roads,
+  full building footprints, the Spring and its target stay separate; no prop or pond covers a building.
 
 ### Continent: ten levels and a capital
 

@@ -20,7 +20,7 @@ describe('map canvas and device preferences', () => {
     expect(mapScale(375, 1)).toBe(1); expect(mapScale(600, 1)).toBe(2)
     expect(mapScale(375, 1.25) * 1.25).toBe(1)
   })
-  it('draws terrain once, animates only the small ring, honors live reduced motion and keeps semantic 44px spots', async () => {
+  it.each([16, 64])('draws terrain once, animates only the %ipx ring, honors reduced motion and keeps semantic targets', async (size) => {
     vi.useFakeTimers(); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
     const draws = vi.fn(), context = { setTransform: vi.fn(), clearRect: vi.fn(), drawImage: draws, imageSmoothingEnabled: true }
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D)
@@ -28,7 +28,7 @@ describe('map canvas and device preferences', () => {
     const listeners = new Set<() => void>(), query = { matches: false, addEventListener: (_: string, f: () => void) => listeners.add(f), removeEventListener: (_: string, f: () => void) => listeners.delete(f) }
     vi.stubGlobal('matchMedia', () => query)
     vi.stubGlobal('Image', class { onload?: () => void; set src(_: string) { queueMicrotask(() => this.onload?.()) } })
-    const layout: MapLayout = { cols: 16, rows: 28, cells: [{ col: 0, row: 0, frame: 'ground/meadow-0' }], sprites: [{ x: 32, y: 32, frame: 'marker/frontier-0' }], spots: [{ id: 's1', kind: 'stage', x: 32, y: 32, w: 16, h: 16 }], frontier: 's1' }
+    const layout: MapLayout = { cols: 16, rows: 46, cells: [{ col: 0, row: 0, frame: 'ground/meadow-0' }], sprites: [{ x: 32, y: 32, frame: size === 64 ? 'stage/frontier-0' : 'marker/frontier-0' }], spots: [{ id: 's1', kind: 'stage', x: 32, y: 32, w: size, h: size }], frontier: 's1' }
     const el = document.createElement('div'), root = createRoot(el), tap = vi.fn()
     document.body.append(el)
     const render = () => root.render(<MapCanvas layout={layout} focusKey="test" describe={() => ({ label: 'Stage 1, Lv 1, available' })} onSpot={tap} />)
@@ -42,7 +42,9 @@ describe('map canvas and device preferences', () => {
       const reduced = draws.mock.calls.length
       await act(async () => { vi.advanceTimersByTime(1950) }); expect(draws).toHaveBeenCalledTimes(reduced)
       const button = el.querySelector('button')!
-      expect(parseFloat(button.style.width)).toBeGreaterThanOrEqual(44); expect(parseFloat(button.style.height)).toBeGreaterThanOrEqual(44)
+      expect(parseFloat(button.style.width)).toBe(Math.max(44,size)); expect(parseFloat(button.style.height)).toBe(Math.max(44,size))
+      expect(el.querySelectorAll('canvas')[1]!.width).toBe(size)
+      expect(context.clearRect).toHaveBeenLastCalledWith(0,0,size,size)
       await act(async () => { button.click() }); expect(tap).toHaveBeenCalledWith(layout.spots[0])
     } finally { await act(async () => { root.unmount() }); el.remove(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals() }
     expect(listeners.size).toBe(0)
