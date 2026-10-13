@@ -1,5 +1,6 @@
 // Published world's palette contract; props/dimensions come from atlas.json rather than a copied list.
 import index from '@luismlorenzana/uma-art/world/atlas.json'
+import compactIndex from '@luismlorenzana/uma-art/world/stages-compact.json'
 import type { Biome } from '@rpg/domain'
 export type Road = 'dirt' | 'stone' | 'boards'
 export const ROADS: readonly Road[] = ['dirt', 'stone', 'boards']
@@ -15,5 +16,5 @@ export const visuals: Record<Biome, { liquid: string | null; road: Road }> = {
   crystal: { liquid: 'water', road: 'stone' }, ruins: { liquid: 'water', road: 'stone' }, rift: { liquid: 'void', road: 'stone' },
 }
 export interface Frame { x: number; y: number; w: number; h: number; group: string; biome?: string }
-export const frames: Readonly<Record<string, Frame>> = index.frames
+export const frames: Readonly<Record<string, Frame>> = { ...index.frames, ...compactIndex.frames }
 export const propsOf = (biome: Biome): string[] => Object.keys(frames).filter((id) => id.startsWith('prop/' + biome + '/'))

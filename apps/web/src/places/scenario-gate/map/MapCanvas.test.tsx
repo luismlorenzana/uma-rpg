@@ -23,6 +23,7 @@ describe('map canvas and device preferences', () => {
   it.each([
     { size: 16, dpr: 1, width: 375 }, { size: 64, dpr: 1, width: 375 },
     { size: 64, dpr: 2, width: 375 }, { size: 64, dpr: 2, width: 390 },
+    { size: 32, dpr: 1, width: 375 }, { size: 32, dpr: 2, width: 375 }, { size: 32, dpr: 2, width: 390 },
   ])('draws once, animates only the $size px ring and keeps semantic targets at $width px / $dpr×', async ({ size, dpr, width }) => {
     vi.useFakeTimers(); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
     vi.stubGlobal('devicePixelRatio', dpr)
@@ -32,8 +33,8 @@ describe('map canvas and device preferences', () => {
     vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
     const listeners = new Set<() => void>(), query = { matches: false, addEventListener: (_: string, f: () => void) => listeners.add(f), removeEventListener: (_: string, f: () => void) => listeners.delete(f) }
     vi.stubGlobal('matchMedia', () => query)
-    vi.stubGlobal('Image', class { onload?: () => void; set src(_: string) { queueMicrotask(() => this.onload?.()) } })
-    const layout: MapLayout = { cols: 16, rows: 46, cells: [{ col: 0, row: 0, frame: 'ground/meadow-0' }], sprites: [{ x: 32, y: 32, frame: size === 64 ? 'stage/frontier-0' : 'marker/frontier-0' }], spots: [{ id: 's1', kind: 'stage', x: 32, y: 32, w: size, h: size }], frontier: 's1' }
+    vi.stubGlobal('Image', class { onload?: () => void; url = ''; set src(value: string) { this.url = value; queueMicrotask(() => this.onload?.()) } })
+    const layout: MapLayout = { cols: 16, rows: 22, cells: [{ col: 0, row: 0, frame: 'ground/meadow-0' }], sprites: [{ x: 32, y: 32, frame: size === 32 ? 'stage-compact/frontier-0' : size === 64 ? 'stage/frontier-0' : 'marker/frontier-0' }], spots: [{ id: 's1', kind: 'stage', x: 32, y: 32, w: size, h: size }], frontier: 's1' }
     const el = document.createElement('div'), root = createRoot(el), tap = vi.fn()
     document.body.append(el)
     const render = () => root.render(<MapCanvas layout={layout} focusKey="test" describe={() => ({ label: 'Stage 1, Lv 1, available' })} onSpot={tap} />)
@@ -52,6 +53,9 @@ describe('map canvas and device preferences', () => {
       expect(parseFloat(button.style.height)).toBe(Math.max(44, size * scale))
       expect(el.querySelectorAll('canvas')[1]!.width).toBe(size * scale * dpr)
       expect(context.clearRect).toHaveBeenLastCalledWith(0, 0, size, size)
+      const ringImage = draws.mock.calls.at(-1)![0] as { url: string }
+      expect(ringImage.url.includes('stages-compact')).toBe(size === 32)
+      expect((draws.mock.calls[0]![0] as { url: string }).url.includes('stages-compact')).toBe(false)
       await act(async () => { button.click() }); expect(tap).toHaveBeenCalledWith(layout.spots[0])
     } finally { await act(async () => { root.unmount() }); el.remove(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals() }
     expect(listeners.size).toBe(0)

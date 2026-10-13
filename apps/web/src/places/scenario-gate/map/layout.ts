@@ -3,7 +3,7 @@
 import { BIOMES, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { frames, propsOf, ROADS, visuals } from './visuals'
 import { rng } from './random'
-import { cellKey, hasCell, closesBlock, cornerMaskAt, edgeMaskAt, regionTopology, REGION_ROWS, STAGE_TILES, worldVariantAt } from './topology'
+import { cellKey, hasCell, closesBlock, cornerMaskAt, edgeMaskAt, regionTopology, REGION_ROWS, REGION_SPRING, stageCoversCell, STAGE_TILES, worldVariantAt } from './topology'
 
 export interface MapCell { col: number; row: number; frame: string }
 export interface MapSprite { x: number; y: number; frame: string }
@@ -31,8 +31,8 @@ export function regionLayout(region: WorldRegion, progress: MapProgress, springI
   }
   const random = rng(region.id + ':props'), taken = new Set<string>(), props = propsOf(region.biome)
   const free = (x: number, y: number) => !hasCell(road, x, y) && !liquidMask(x, y) && !hasCell(taken, x, y)
-    && !stages.some((s) => x >= s.x && x < s.x + STAGE_TILES && y >= s.y && y < s.y + STAGE_TILES)
-    && !(x === 7 && y >= 42 && y < 44)
+    && !stages.some((s) => stageCoversCell(s, x, y))
+    && !(x === REGION_SPRING.col && y >= REGION_SPRING.row && y < REGION_SPRING.row + 2)
   for (let attempt = 0; attempt < 800 && out.sprites.length < 30; attempt++) {
     const edge = random() < 0.65, x = edge ? random() < 0.5 ? Math.floor(random() * 3) : 13 + Math.floor(random() * 3) : Math.floor(random() * 16)
     const y = 1 + Math.floor(random() * (REGION_ROWS - 1)), frame = props[Math.floor(random() * props.length)]!, h = frames[frame]!.h
@@ -44,13 +44,13 @@ export function regionLayout(region: WorldRegion, progress: MapProgress, springI
   stages.forEach((s, i) => {
     const id = region.id + '-s' + (i + 1)
     const state = (progress.wins[id] ?? 0) > 0 ? 'cleared' : i === 0 || (progress.wins[region.id + '-s' + i] ?? 0) > 0 ? 'open' : 'locked'
-    sprite(out, 'stage/' + region.biome + '/' + s.kind + '-' + state, s.x * TILE, s.y * TILE)
+    sprite(out, 'stage-compact/' + region.biome + '/' + s.kind + '-' + state, s.x * TILE, s.y * TILE)
     out.spots.push({ id, kind: 'stage', x: s.x * TILE, y: s.y * TILE, w: STAGE_TILES * TILE, h: STAGE_TILES * TILE })
-    if (state === 'open' && !out.frontier) { out.frontier = id; sprite(out, 'stage/frontier-0', s.x * TILE, s.y * TILE) }
+    if (state === 'open' && !out.frontier) { out.frontier = id; sprite(out, 'stage-compact/frontier-0', s.x * TILE, s.y * TILE) }
   })
   if (springId) {
-    sprite(out, progress.drySprings?.has(springId) ? 'marker/spring-dry' : 'marker/spring', 7 * TILE, 42 * TILE)
-    out.spots.push({ id: springId, kind: 'spring', x: 7 * TILE, y: 42 * TILE, w: 16, h: 32 })
+    sprite(out, progress.drySprings?.has(springId) ? 'marker/spring-dry' : 'marker/spring', REGION_SPRING.col * TILE, REGION_SPRING.row * TILE)
+    out.spots.push({ id: springId, kind: 'spring', x: REGION_SPRING.col * TILE, y: REGION_SPRING.row * TILE, w: 16, h: 32 })
   }
   return out
 }

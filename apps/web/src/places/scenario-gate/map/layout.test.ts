@@ -1,7 +1,7 @@
 import { BIOMES, worldContinent } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import { clearedIn, continentLayout, regionLayout, springForRegion, worldLayout, type MapLayout } from './layout'
-import { cornerMaskAt, hasCell, regionTopology, REGION_ROWS, STAGE_TILES } from './topology'
+import { cornerMaskAt, hasCell, regionTopology, REGION_ROWS, stageEntrance, STAGE_TILES } from './topology'
 import { frames } from './visuals'
 const continents = Array.from({ length: 5 }, (_, i) => worldContinent({ name: 'Synthetic island ' + i, order: i + 1 }))
 const progress = { wins: { 'w1-1-1-s1': 1, 'w1-1-1-s2': 1, 'w1-1-1-s3': 2, 'w1-1-1-s4': 1 } }
@@ -12,7 +12,7 @@ function check(layout: MapLayout) {
     const [x, y] = k.split(',').map(Number) as [number, number]
     expect([roads.has((x + 1) + ',' + y), roads.has(x + ',' + (y + 1)), roads.has((x + 1) + ',' + (y + 1))].every(Boolean)).toBe(false)
   }
-  const markers = layout.sprites.filter((s) => /^(marker|stage)\//.test(s.frame))
+  const markers = layout.sprites.filter((s) => /^(marker|stage|stage-compact)\//.test(s.frame))
   for (const s of layout.sprites) {
     const f = frames[s.frame]!
     expect(f, s.frame).toBeDefined()
@@ -39,18 +39,18 @@ describe('published world compositions', () => {
     expect(partial.cells).toEqual(start.cells)
     expect(partial.sprites.filter((s) => s.frame.startsWith('prop/'))).toEqual(start.sprites.filter((s) => s.frame.startsWith('prop/')))
     expect(partial.frontier).toBe(region.id + '-s5'); expect(clearedIn(region.id, progress)).toBe(4)
-    expect(partial.sprites.some((s) => s.frame === 'stage/meadow/fight-cleared')).toBe(true)
-    expect(partial.sprites.some((s) => s.frame === 'stage/meadow/fight-open')).toBe(true)
-    expect(partial.sprites.some((s) => s.frame === 'stage/meadow/elite-locked')).toBe(true)
-    expect(partial.sprites.some((s) => s.frame === 'stage/meadow/boss-locked')).toBe(true)
+    expect(partial.sprites.some((s) => s.frame === 'stage-compact/meadow/fight-cleared')).toBe(true)
+    expect(partial.sprites.some((s) => s.frame === 'stage-compact/meadow/fight-open')).toBe(true)
+    expect(partial.sprites.some((s) => s.frame === 'stage-compact/meadow/elite-locked')).toBe(true)
+    expect(partial.sprites.some((s) => s.frame === 'stage-compact/meadow/boss-locked')).toBe(true)
     expect(regionLayout(region, { wins: Object.fromEntries(start.spots.map((s) => [s.id, 1])) }).frontier).toBeUndefined()
   })
-  it.each(continents)('$id: fits four-tile buildings and separate phone targets along one connected road without covering ponds', (c) => {
+  it.each(continents)('$id: fits two-tile towers and separate phone targets along one connected road without covering ponds', (c) => {
     for (const r of c.regions) {
       const spring = springForRegion(c, r)!, out = regionLayout(r, progress, spring.id)
       expect(out.rows).toBe(REGION_ROWS)
       const { road, wet, stages } = regionTopology(r.biome, r.id)
-      const queue = ['4,45'], connected = new Set(queue)
+      const queue = ['3,21'], connected = new Set(queue)
       for (let i = 0; i < queue.length; i++) {
         const [x, y] = queue[i]!.split(',').map(Number) as [number, number]
         for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
@@ -60,15 +60,16 @@ describe('published world compositions', () => {
       }
       expect(connected.size).toBe(road.size)
       for (const s of stages) {
-        expect(connected.has(`${s.x + 2},${s.y + 4}`)).toBe(true)
-        for (let y = s.y; y < s.y + STAGE_TILES; y++) for (let x = s.x; x < s.x + STAGE_TILES; x++) {
+        const door=stageEntrance(s)
+        expect(connected.has(`${door.x},${door.y}`)).toBe(true)
+        for (let y = Math.floor(s.y); y < Math.ceil(s.y + STAGE_TILES); y++) for (let x = Math.floor(s.x); x < Math.ceil(s.x + STAGE_TILES); x++) {
           expect(hasCell(road, x, y)).toBe(false)
           expect(cornerMaskAt((cx, cy) => hasCell(wet, cx, cy), x, y)).toBe(0)
         }
       }
       const spots = out.spots.filter((s) => s.kind === 'stage')
-      expect(spots.every((s) => s.w === 64 && s.h === 64)).toBe(true)
-      // Native 4×4 footprints are 96 CSS px on both 375 and 390 px, 2× phones.
+      expect(spots.every((s) => s.w === 32 && s.h === 32)).toBe(true)
+      // Native 2×2 footprints are 48 CSS px on 2× phones, and retain 44px minimums at 1×.
       for (const scale of [1, 1.5]) for (let i = 0; i < out.spots.length; i++) for (const b of out.spots.slice(i + 1)) {
         const a = out.spots[i]!, aw = Math.max(44, a.w * scale), ah = Math.max(44, a.h * scale)
         const bw = Math.max(44, b.w * scale), bh = Math.max(44, b.h * scale)
@@ -78,8 +79,19 @@ describe('published world compositions', () => {
       check(out)
     }
   })
-  it('exposes the same five continent Springs across their two-row region bands, with shared ready/dry frames', () => {
-    for (const c of continents) for (const r of c.regions) {
+  it('follows the owner’s three-column snake and rises 4px per stage within each row', () => {
+    const out=regionLayout(continents[0]!.regions[0]!,{wins:{}}), spots=out.spots
+    expect(out.rows).toBe(22)
+    expect(spots.map(s=>s.x)).toEqual([40,120,200,200,120,40,40,120,200,200,120,40])
+    for(let i=1;i<spots.length;i++) {
+      const rise=spots[i-1]!.y-spots[i]!.y
+      expect(rise).toBe(i%3===0?56:4)
+    }
+    expect(out.sprites.find(s=>s.frame.endsWith('/elite-locked'))?.x).toBe(spots[10]!.x)
+    expect(out.sprites.find(s=>s.frame.endsWith('/boss-locked'))?.x).toBe(spots[11]!.x)
+  })
+  it.each(continents)('$id: exposes the same continent Springs across their two-row region bands, with shared ready/dry frames', (c) => {
+    for (const r of c.regions) {
       const spring = springForRegion(c, r)!
       expect(spring.row).toBe(Math.floor(r.row / 2) * 2)
       const ready = regionLayout(r, { wins: {} }, spring.id)

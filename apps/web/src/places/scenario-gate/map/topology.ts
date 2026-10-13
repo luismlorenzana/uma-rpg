@@ -16,12 +16,18 @@ export function closesBlock(c: ReadonlySet<string>, x: number, y: number): boole
 }
 type StageKind = 'fight' | 'elite' | 'boss'
 type StageState = 'locked' | 'open' | 'cleared'
-export const REGION_COLS = 16, REGION_ROWS = 46, STAGE_TILES = 4
+export const REGION_COLS = 16, REGION_ROWS = 22, STAGE_TILES = 2
+export const REGION_SPRING = { col: 8, row: 19 } as const
 export type Cells = Set<string>
 export const cellKey = (x: number, y: number): string => `${x},${y}`
 export const hasCell = (cells: ReadonlySet<string>, x: number, y: number): boolean => cells.has(cellKey(x, y))
 export interface StageSpot { x: number; y: number; kind: StageKind; state: StageState }
 export interface RegionLayout { road: Cells; wet: Cells; stages: StageSpot[]; ponds: Cells[] }
+/** Half-tile columns and quarter-tile rises still land on whole art pixels; reserve every intersecting tile. */
+export const stageCoversCell = (s: StageSpot, x: number, y: number): boolean =>
+  x < s.x + STAGE_TILES && x + 1 > s.x && y < s.y + STAGE_TILES && y + 1 > s.y
+export const stageEntrance = (s: StageSpot): { x: number; y: number } =>
+  ({ x: Math.floor(s.x + STAGE_TILES / 2), y: Math.ceil(s.y + STAGE_TILES) })
 
 /** Every 2×2 ground deal contains all four variants, shuffled independently so a 4×4 plot has no regular pattern. */
 export function worldVariantAt(label: string, x: number, y: number): number {
@@ -62,33 +68,34 @@ export function regionTopology(biome: Biome, label: string): RegionLayout {
   const road: Cells = new Set()
   const stages: StageSpot[] = []
   for (let i = 0; i < 12; i++) {
-    const band = Math.floor(i / 2), right = (i % 2 === 1) !== (band % 2 === 1)
-    stages.push({ x: i === 11 ? 6 : i === 10 ? 10 : right ? 10 : 2, y: i === 11 ? 2 : 40 - band * 6,
+    const band = Math.floor(i / 3), step = i % 3, col = band % 2 === 0 ? step : 2 - step
+    stages.push({ x: 2.5 + col * 5, y: 16 - band * 4 - step / 4,
       kind: i === 11 ? 'boss' : i === 10 ? 'elite' : 'fight', state: i < 4 ? 'cleared' : i === 4 ? 'open' : 'locked' })
   }
   const line = (x0: number, y0: number, x1: number, y1: number) => {
     for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
       for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) markRoad(road, x, y, REGION_ROWS)
   }
-  // Doors meet a serpentine road below each pair. Vertical climbs go round the outside, never through a building.
-  line(4, 45, 4, 44)
+  // Three-column snake: 1→2→3, 6←5←4, 7→8→9, 12←11←10. Each following sprite rises 4px within its row.
+  // Roads join the doors below each row, turning outside the footprints on alternating edges.
+  line(3, REGION_ROWS - 1, 3, 18)
   stages.forEach((s, i) => {
     if (!i) return
-    const p = stages[i - 1]!, px = p.x + 2, py = p.y + STAGE_TILES, x = s.x + 2, y = s.y + STAGE_TILES
+    const p = stageEntrance(stages[i - 1]!), next = stageEntrance(s), px = p.x, py = p.y, x = next.x, y = next.y
     if (py === y) line(px, y, x, y)
     else {
       const edge = px < 8 ? 0 : 15
       line(px, py, edge, py); line(edge, py, edge, y); line(edge, y, x, y)
     }
   })
-  // The existing continent Spring is shown between the starting destinations, not a new refill resource.
-  line(7, 44, 7, 43)
-  const occupied = (x: number, y: number) => stages.some((s) => x >= s.x && x < s.x + STAGE_TILES && y >= s.y && y < s.y + STAGE_TILES)
-    || x === 7 && y >= 42 && y < 44
+  // The same continent Spring stays below the first row, with room for its 44pt target.
+  line(REGION_SPRING.col, 18, REGION_SPRING.col, REGION_SPRING.row + 1)
+  const occupied = (x: number, y: number) => stages.some((s) => stageCoversCell(s, x, y))
+    || x === REGION_SPRING.col && y >= REGION_SPRING.row && y < REGION_SPRING.row + 2
   const wet: Cells = new Set(), ponds: Cells[] = []
   if (visuals[biome].liquid) {
     const r = rng(`${label}:liquid`)
-    for (let attempt = 0; attempt < 500 && ponds.length < 3; attempt++) {
+    for (let attempt = 0; attempt < 150 && ponds.length < 2; attempt++) {
       const px = 1 + Math.floor(r() * (REGION_COLS - 2)), py = 1 + Math.floor(r() * (REGION_ROWS - 2))
       const patch = growPond(r, px, py)
       const points = [...patch].map((k) => k.split(',').map(Number))
