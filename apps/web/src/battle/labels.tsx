@@ -2,7 +2,7 @@
 // break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes).
 import {
   isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, type BattleWeaknesses, type RpgClass, type RpgDamageKind,
-  type RpgElement, type RpgProfile, type RpgSkillDef, type RpgWeapon, type RpgWeaponKind,
+  type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
 
 const WEAPON_KIND_LABEL: Readonly<Record<RpgWeaponKind, string>> = {
@@ -45,9 +45,10 @@ export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: 
     : skill.summon ? ` · lingers ${skill.summon.linger}×` : ''
   return `${per} · ${skill.hits.length} hit${skill.hits.length === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}`
 }
-const STATUS_LABEL: Readonly<Record<NonNullable<RpgSkillDef['status']>['key'], string>> = {
+export const STATUS_LABEL: Readonly<Record<RpgStatusKind | NonNullable<RpgSkillDef['status']>['key'], string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
   brave: 'Brave', faith: 'Faith', aegis: 'Aegis', breaker: 'Breaker', clarity: 'Clarity',
+  burn: 'Burn', shock: 'Shock', slow: 'Slow', mark: 'Mark', weaken: 'Weaken', ward: 'Ward', 'power-up': 'Power-up',
 }
 
 /** Tier 1 reads "Lv 7"; later tiers lead with their tier. */

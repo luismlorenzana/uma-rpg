@@ -10,14 +10,13 @@
 | # | Task | Who | Size | Needs |
 |---|---|---|---|---|
 | **Now** | | | | |
-| [H11](tasks/H11-ui-icons.md) | Class emblems and status icons (art published) | ChatGPT | S | — |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | M | — |
 | [H20](tasks/H20-key-boss-faces.md) | Key bosses' faces (D76) | Claude, then the owner | S | The owner's picks |
 | **Parked by the owner** | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | The owner decides, Claude builds | L | Q6 |
 | [H24](tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design | The owner and Claude | M | Q7, H23 |
 
-**For ChatGPT, in order:** H11.
+**For ChatGPT:** No open packets. H08, H10 and H11 are complete.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.

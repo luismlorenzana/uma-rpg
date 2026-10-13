@@ -15,6 +15,7 @@ import {
 import { BattleStage } from '../../battle/BattleStage'
 import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
 import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { StatusChips } from '../../battle/pixel-icons'
 import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
 import { stageLayout } from '../../battle/stage-layout'
@@ -335,6 +336,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   </p>
                 )}
               </div>
+              {unit.hp > 0 && <StatusChips statuses={unit.statuses} className="pointer-events-none absolute" style={{ left: box.x, bottom: size.h - box.y - box.h + 3, width: box.w }} />}
             </div>
           )
         })}
@@ -380,6 +382,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   LB
                 </button>
               )}
+              {unit.hp > 0 && <StatusChips statuses={unit.statuses} className="pointer-events-none absolute" style={{ left: box.x, bottom: size.h - box.y - box.h + 3, width: box.w }} />}
               <div className={`pointer-events-none absolute px-1 ${done ? 'opacity-55' : ''}`} style={{ left: info.x, top: info.y, width: info.w }}>
                 <Bar value={unit.hp} max={a.stats.hp} />
                 <Bar className="mt-0.5" value={unit.mp} max={a.stats.mp} tone="mp" />

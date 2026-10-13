@@ -122,6 +122,10 @@ points a head start on the gauge ([loops](loops.md#extra-stats-and-gear)). An av
 A Cleric's depth-5 skills put their status on every foe, or on every Uma. Some Brawler and Mage side skills also
 add riders (a status on each foe hit) or Barriers; their rows in [skill trees](skill-trees.md) say so.
 
+Battle badges show the published status glyph and its stack count, with the full name in the accessible label.
+Statuses without glyphs (including Burn and foes' Power-up) keep text badges. Skill descriptions keep full names
+beside decorative glyphs; Shatter and Clarity act immediately, so they do not create lingering badges.
+
 ## Limit Breaks
 
 <!-- live:limits -->
