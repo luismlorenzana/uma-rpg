@@ -30,6 +30,12 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `
 
   Any tap hands control back, and so does a failed action. Speed plays the animations at 1×, 2× or 4×.
 
+## Battle scenery
+
+Each region's fight has its biome's sky, a repeating pixel-art horizon and a tiled ground floor (uma-art 2.2.0).
+Capitals use Ancient Ruins. The lower party band and foe info panels stay dark for readable bars and numbers.
+The scene stamps the terrain once per size, not per animation frame; if the art is unavailable, the gradient remains.
+
 ## The actions
 
 | Action | What it does |

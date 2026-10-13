@@ -3,7 +3,7 @@
 // rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  autoAction, battleActionsLeft, battleBroken, battleFoe, battleWaveCount, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  autoAction, battleActionsLeft, battleBroken, battleFoe, battleWaveCount, biomeById, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -64,7 +64,8 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         .map(async (id) => ({ id, bust: await maybe(path('outfit-busts', id)) }))),
     ]).then(([allies, enemies, heroes]) => {
       const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
-      if (live) setSetup({ allies, enemies, field, color: campaign.color(chapter.id), reducedMotion, heroes })
+      const biome = campaign.regionInfo(chapter.id)?.biome ?? 'ruins'
+      if (live) setSetup({ allies, enemies, field, biome, color: biomeById(biome).color, reducedMotion, heroes })
     })
     return () => {
       live = false
@@ -317,7 +318,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 )}
                 {broken && unit.hp > 0 && <span className="absolute left-0 top-1 rounded-xs bg-accent px-1 text-[10px] font-bold text-accent-ink">BREAK</span>}
               </button>
-              <div className={`pointer-events-none absolute flex flex-col items-center gap-0.5 text-center ${unit.hp <= 0 ? 'opacity-30' : ''}`} style={{ left: info.x, top: info.y, width: info.w }}>
+              <div className={`pointer-events-none absolute flex flex-col items-center gap-0.5 rounded-sm bg-page/90 text-center ${unit.hp <= 0 ? 'opacity-30' : ''}`} style={{ left: info.x, top: info.y, width: info.w }}>
                 <p className="flex max-w-full items-center gap-0.5 text-[11px] font-semibold leading-tight">
                   <ElementGlyph element={enemy.element} size={12} />
                   {enemy.element2 && <ElementGlyph element={enemy.element2} size={12} />}

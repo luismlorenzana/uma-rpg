@@ -1,11 +1,20 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
-import { MapCanvas, mapScale } from './MapCanvas'
+import atlas from '@luismlorenzana/uma-art/world/atlas.json'
+import { BiomeIcon, MapCanvas, mapScale } from './MapCanvas'
 import { MapViewSwitch, useMapView } from './MapView'
 import type { MapLayout } from './layout'
 
 describe('map canvas and device preferences', () => {
+  it('uses the current atlas dimensions for biome icons when new frames grow the sheet', async () => {
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
+    const el = document.createElement('div'), root = createRoot(el)
+    try {
+      await act(async () => { root.render(<BiomeIcon biome="meadow" />) })
+      expect(el.querySelector('span')!.style.backgroundSize).toBe(`${atlas.width * 1.5}px ${atlas.height * 1.5}px`)
+    } finally { await act(async () => { root.unmount() }); vi.unstubAllGlobals() }
+  })
   it('snaps pixels, crops at most half a tile per edge on 2× phones, and fits a 1× phone', () => {
     expect(mapScale(390, 2)).toBe(1.5); expect(mapScale(375, 2)).toBe(1.5)
     expect(mapScale(375, 1)).toBe(1); expect(mapScale(600, 1)).toBe(2)

@@ -2,7 +2,7 @@
 
 > **Status: built, 2026-10-12 (H07; D87, D90).** World, continent and region screens compose the published
 > `@luismlorenzana/uma-art` 2.0.0 world atlas in a plain 2D canvas, with DOM buttons and the complete lists alongside.
-> [H08](../../handoff/tasks/H08-battle-backdrops.md) reuses the biome palettes for battle backdrops.
+> H08 adds the battle backdrops below, published in uma-art 2.2.0.
 
 ## Decisions
 
@@ -33,7 +33,7 @@ Every frame id below is part of the contract; the build checks the list. Sizes a
 | Places | `marker/spring`, `marker/spring-dry`, `marker/flag`, `marker/flag-cleared` | 16×32 | 4 |
 | Capital | `marker/capital` (ground line at y = 44, like the Hub's buildings) | 48×48 | 1 |
 | Biome icons | `icon/<biome>` for list cells and headers | 16×16 | 19 |
-| Backdrops | `backdrop/<biome>` (battle horizon strips, [H08](../../handoff/tasks/H08-battle-backdrops.md)) | 128×48, seamless left to right | 19 |
+| Backdrops | `backdrop/<biome>` (battle horizon strips, H08) | 128×48, seamless left to right | 19 |
 
 **Two kinds of autotile** (D90, after the [H01 calibration](../../handoff/README.md)):
 
@@ -50,6 +50,18 @@ Both are transparent overlays drawn over the biome's ground, so one family serve
 
 `atlas.json` follows the tiles atlas' shape: `{ schemaVersion: 1, width, height, frames: { id: { x, y, w, h, group,
 biome?, anchorY? } } }`.
+
+## Battle backdrops (H08, built)
+
+All nineteen `backdrop/<biome>` strips are 128×48 with matching horizontal border pixels, a transparent sky,
+two silhouette depths and a foot blending into the matching ground. Appending them keeps H06's original 310
+positions and pixels; the world sheet is now 256×976 / 329 frames. CSS sprite users read dimensions from its JSON.
+
+The Phaser stage draws its biome gradient behind the strip, repeating it on the rivals' floor at half the stage
+height, and tiles `ground/<biome>-*` below at the Hub's art scale. A render texture is stamped once on configuration
+or resize. The ground is muted and the party's lower 38% darkened; foe information has a dark DOM backplate.
+If the atlas or frame is missing, the old gradient is kept. Capital Finals use Ruins; actor and hit coordinates
+are unchanged, including the two foe rows and later waves.
 
 ## The biomes
 
