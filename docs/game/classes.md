@@ -4,6 +4,9 @@ Five classes and ten weapons (D86). Every Uma has one **active class** at a time
 class's own weapons, learned skills and loadout. Classes and weapons are chosen on the Stable → an Uma → **Skills**
 page ([sections](sections.md#stable)).
 
+Native-size pixel emblems accompany the full class names in the picker, profile chip and active party bar.
+The names remain available to accessibility tools.
+
 Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots, hands, stat leans, learning rules),
 `catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks), `economy/ranks.ts`
 (ranks).

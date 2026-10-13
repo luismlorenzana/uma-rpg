@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Bar, CLASS_LABEL, WeaponGlyph } from '../../battle/labels'
+import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -304,9 +305,15 @@ function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedU
   const rank = classRankOf(uma.ranks, classId)
   const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier: 1, id })))
   return (
-    <button type="button" onClick={onClick} className="mt-1.5 flex min-h-9 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
-      <span className="min-w-0 flex-1 truncate">{CLASS_LABEL[classId]} · Rank {rank}</span>
-      <span className="flex shrink-0 gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
+    <button type="button" onClick={onClick} className="mt-1.5 flex min-h-11 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
+      <ClassEmblem classId={classId} />
+      <span className="min-w-0 flex-1">
+        <span className="block leading-tight">{CLASS_LABEL[classId]}</span>
+        <span className="flex flex-wrap items-center gap-1 text-[10.5px] text-ink-soft">
+          <span>Rank {rank}</span>
+          <span className="inline-flex gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
+        </span>
+      </span>
       {points > 0 && <span className="shrink-0 rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">{points} pts</span>}
       <span className="shrink-0 text-ink-faint">›</span>
     </button>

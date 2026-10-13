@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import type { Campaign } from '../../battle/campaign'
 import { CLASS_LABEL } from '../../battle/labels'
+import { ClassEmblem } from '../../battle/pixel-icons'
 import { pagePath } from '../../hub/navigation'
 import { AtlasSprite } from '../../master/art'
 import { chooseActiveParty, useWorld } from '../../save/game'
@@ -32,7 +33,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
         </button>
         {!isPartyFull(party) && <span className="text-[11px] text-danger">A fight needs five</span>}
       </div>
-      <div className="flex gap-1.5">
+      <div className="flex gap-1">
         {members.map((id) => {
           const uma = world.umas[id]!
           const outfit = campaign.outfits.get(id)
@@ -44,13 +45,19 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const mp = rpgCarriedMp(run, profile, points)
           const spare = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent(classOf(uma, classId).tree.map((n) => ({ tier: 1, id: n })))
           return (
-            <button key={id} type="button" className="relative w-12" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: Lv ${uma.level}, MP ${mp} of ${max}`}
+            <button key={id} type="button" className="relative min-w-0 flex-1" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: ${CLASS_LABEL[classId]}, Lv ${uma.level}, MP ${mp} of ${max}`}
               onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
-              <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={48} className={isBusy(world, id) ? 'opacity-40 grayscale' : ''} />
-              <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">{isBusy(world, id) ? 'Busy' : `Lv ${uma.level}`}</span>
-              {spare > 0 && <span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-page bg-accent" />}
+              <span className="relative mx-auto block w-12">
+                <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={id} size={48} className={isBusy(world, id) ? 'opacity-40 grayscale' : ''} />
+                <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">{isBusy(world, id) ? 'Busy' : `Lv ${uma.level}`}</span>
+                {spare > 0 && <span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-page bg-accent" />}
+              </span>
               <span className="mt-0.5 block h-1.5 overflow-hidden rounded-full bg-white/10">
                 <span className="block h-full rounded-full bg-[#5aa6f0]" style={{ width: `${max > 0 ? (mp / max) * 100 : 0}%` }} />
+              </span>
+              <span className="mt-0.5 flex items-center justify-center gap-px">
+                <ClassEmblem classId={classId} />
+                <span className="min-w-0 font-display text-left text-[9px] leading-2.5 tracking-tight">{CLASS_LABEL[classId]}</span>
               </span>
             </button>
           )

@@ -10,6 +10,7 @@ import {
 } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { ClassEmblem, StatusGlyph } from '../../battle/pixel-icons'
 import { equip, learn, pickClass, unlearn, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { RankRow } from '../../ui/RankBars'
@@ -67,7 +68,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           {RPG_CLASSES.map((c) => (
             <button key={c} type="button" role="radio" aria-checked={c === classId} onClick={() => switchTo(c)}
               className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-center ${c === classId ? 'bg-accent text-accent-ink' : 'bg-raised text-ink'}`}>
-              <WeaponGlyph weapon={classOf(uma, c).weapons[0]!} size={16} />
+              <ClassEmblem classId={c} />
               <span className="text-[11px] font-semibold leading-tight">{CLASS_LABEL[c]}</span>
               <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>Rank {classRankOf(uma.ranks, c)}</span>
             </button>
@@ -197,7 +198,7 @@ function NodeCard({ node, line, state, equipped, compact = false, onLearn, onEqu
         <span className="min-w-0 flex-1 truncate">{node.name}</span>
         {node.variant ? <span className="text-[10px] font-normal text-ink-faint">side · {node.cost} pt{node.cost === 1 ? '' : 's'}</span> : <span className="text-[10px] font-normal text-ink-faint">core</span>}
       </p>
-      <p className="text-[10.5px] leading-snug text-ink-soft">{line}</p>
+      <p className="text-[10.5px] leading-snug text-ink-soft">{node.skill.status && <span className="mr-1 inline-flex align-middle"><StatusGlyph status={node.skill.status.key} /></span>}{line}</p>
       <div className="mt-1 flex flex-wrap gap-1">
         {onLearn ? (
           <button type="button" onClick={onLearn} className="min-h-8 rounded-xs bg-raised px-2 text-[11px] font-semibold text-accent">Learn · {node.cost} pt{node.cost === 1 ? '' : 's'}</button>

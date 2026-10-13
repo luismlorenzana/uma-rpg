@@ -1,5 +1,8 @@
 # Synthetic browser previews
 
+`h11-*-375.png` checks native 24px class emblems and 12px status glyphs at 375×667: profile, picker, party,
+Cleric skill text and battle buffs/debuffs. All names, outfit metadata and portrait placeholders are synthetic.
+
 `h10-effects.gif` is a short montage of sampled browser frames: Brawler, Mage ice on both foes, Spell Blade's
 Lance/Lightning pair, Cleric Fire, and a Summoner's fire familiar replaced by ice at 4×. Master data is from
 `uma-data/testing`; all names and portrait placeholders are synthetic. The samples are in capture order; pauses
