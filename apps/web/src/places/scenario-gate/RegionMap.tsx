@@ -1,7 +1,7 @@
 // A region (D66, D97): one biome climbing five levels, its twelve stages on a path. Stages open in order and stay open for replays;
 // progress is the world's, whichever party won. Tap a stage for its rivals, then fight with the active party.
 import {
-  biomeById, openFightOf, rpgNodeStatus, SaveRuleError, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
+  biomeById, openFightOf, rpgNodeStatus, SaveRuleError, springReadyAt, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
   type RpgMapNode, type RpgNodeStatus,
 } from '@rpg/domain'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -9,12 +9,14 @@ import type { Campaign } from '../../battle/campaign'
 import { ElementGlyph, formatLevel, formatLevels, WeaknessIcons } from '../../battle/labels'
 import { castArtUrl } from '../../content/cast'
 import { useHubNavigation } from '../../hub/navigation'
-import { beginFight, sweep, useWorld } from '../../save/game'
+import { beginFight, drinkAtSpring, sweep, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
+import { LockIcon } from '../../ui/icons'
+import { formatDuration, useNow } from '../../ui/useNow'
 import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
-import { regionLayout } from './map/layout'
+import { regionLayout, springForRegion } from './map/layout'
 import { BiomeIcon, MapCanvas } from './map/MapCanvas'
 import { MapViewSwitch, useMapView } from './map/MapView'
 import { FightResult } from './FightResult'
@@ -68,8 +70,12 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   const mapRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useMapView()
   const info = campaign.regionInfo(region.id)
+  const now = useNow(30_000)
+  const spring = info ? springForRegion(campaign.continents.find((c) => c.id === info.continentId), info) : undefined
+  const readyAt = world && spring ? springReadyAt(world, spring.id, now) : null, dry = !!readyAt
   const wins = world ? worldRun(world).wins : undefined
-  const layout = useMemo(() => info && wins ? regionLayout(info, { wins }) : null, [info, wins])
+  const layout = useMemo(() => info && wins ? regionLayout(info,
+    { wins, drySprings: new Set(dry && spring ? [spring.id] : []) }, spring?.id) : null, [info, wins, dry, spring?.id])
   // A continent's capital sits at the end of its scroll. Enter its routes at the top, not at that inherited offset.
   useEffect(() => {
     if (!capital) return
@@ -80,6 +86,12 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   if (!world) return null
   const run = worldRun(world)
   const fightOpen = openFightOf(world)
+  const springLabel = readyAt ? `Spring, recharges in ${formatDuration(Date.parse(readyAt) - Date.parse(now))}` : 'Spring, refill party MP'
+  const drink = async () => {
+    if (!spring) return
+    try { await drinkAtSpring(spring.id); setError(null) }
+    catch (err) { setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.') }
+  }
   const status = (id: string): RpgNodeStatus => rpgNodeStatus(region, run, id)
   const stages = region.nodes.filter((n) => n.kind !== 'camp')
   const cleared = stages.filter((n) => (run.wins[n.id] ?? 0) > 0).length
@@ -134,8 +146,15 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
           <h2 className="flex min-w-0 items-center gap-1 font-display text-lg font-bold">{info && <BiomeIcon biome={info.biome} />}{title}</h2>
           <span className="shrink-0 text-[12px] text-ink-soft">{levels} · {cleared}/{stages.length} cleared</span>
         </div>
-        {!capital && <MapViewSwitch view={view} onChange={setView} />}
+        {!capital && <div className="flex items-center gap-2">
+          <MapViewSwitch view={view} onChange={setView} />
+          {spring && <button type="button" aria-label={springLabel} disabled={dry || !!fightOpen}
+            onClick={() => void drink()} className="flex min-h-11 flex-1 items-center justify-center rounded-sm border border-[#5aa6f0]/50 bg-[#5aa6f0]/10 px-2 text-[12px] font-semibold text-[#8cc4ff] disabled:opacity-50">
+            Spring · {readyAt ? formatDuration(Date.parse(readyAt) - Date.parse(now)) : 'MP'}
+          </button>}
+        </div>}
         <ActivePartyBar campaign={campaign} />
+        {error && !open && <p role="alert" className="text-[12px] text-danger">{error}</p>}
         {fightOpen?.battle && (
           <button type="button" onClick={() => nav.sub(place, 'fight')} className="flex min-h-11 w-full items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink">
             Resume the open fight
@@ -143,10 +162,13 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
         )}
       </div>
       {renderStages ? renderStages(choice) : view === 'map' && layout ? <MapCanvas layout={layout} focusKey={region.id}
-        focusId={layout.frontier ?? stages.at(-1)?.id} onSpot={(spot) => setOpen(stages.find((n) => n.id === spot.id)!)}
+        focusId={layout.frontier ?? stages.at(-1)?.id} onSpot={(spot) => spot.kind === 'spring' ? void drink() : setOpen(stages.find((n) => n.id === spot.id)!)}
         describe={(spot) => {
+          if (spot.kind === 'spring') return { label: springLabel, disabled: dry || !!fightOpen,
+            content: <span className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xs bg-page/90 px-1 text-[11px] font-semibold">MP</span> }
           const node = stages.find((n) => n.id === spot.id)!, i = stages.indexOf(node), s = status(node.id)
-          return { label: `Stage ${i + 1}, ${node.name}, ${formatLevel(node.level)}, ${s}`, content: <span className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xs bg-page/90 px-1 text-[11px] font-semibold">{i + 1} · {formatLevel(node.level)}</span> }
+          return { label: `Stage ${i + 1}, ${node.name}, ${formatLevel(node.level)}, ${s}`, content: <span className={`absolute bottom-0 left-1/2 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-xs bg-page/90 px-1 text-[11px] font-semibold ${s === 'cleared' ? 'text-ink-faint' : s === 'available' ? 'text-accent' : 'text-ink-soft'}`}>
+            {s === 'cleared' ? <span aria-hidden="true">✓</span> : s === 'locked' ? <LockIcon size={10} /> : null}{i + 1} · {formatLevel(node.level)}</span> }
         }} /> : <ol className="space-y-2 p-3">
         {stages.map((n, i) => <li key={n.id}>{choice(n, i)}</li>)}
       </ol>}

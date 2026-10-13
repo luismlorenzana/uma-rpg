@@ -16,7 +16,7 @@ export function closesBlock(c: ReadonlySet<string>, x: number, y: number): boole
 }
 type StageKind = 'fight' | 'elite' | 'boss'
 type StageState = 'locked' | 'open' | 'cleared'
-export const REGION_COLS = 16, REGION_ROWS = 28
+export const REGION_COLS = 16, REGION_ROWS = 46, STAGE_TILES = 4
 export type Cells = Set<string>
 export const cellKey = (x: number, y: number): string => `${x},${y}`
 export const hasCell = (cells: ReadonlySet<string>, x: number, y: number): boolean => cells.has(cellKey(x, y))
@@ -59,27 +59,32 @@ export function growPond(random: () => number, px: number, py: number): Cells {
 }
 
 export function regionTopology(biome: Biome, label: string): RegionLayout {
-  const road: Cells = new Set(), atY: number[] = []
-  const rRoad = rng(`${label}:road`), offset = Math.floor(rRoad() * 3) - 1
-  let x = 7 + offset
-  // Each jog points away from the previous pair's branch and towards the next trunk. Adjacent rows share one cell.
-  const jogs = new Map([[23, 9 + offset], [19, 7 + offset], [15, 9 + offset], [11, 7 + offset], [7, 9 + offset], [3, 8]])
-  for (let y = REGION_ROWS - 1; y >= 0; y--) {
-    markRoad(road, x, y, REGION_ROWS)
-    const to = jogs.get(y)
-    if (to !== undefined) {
-      for (let xx = Math.min(x, to); xx <= Math.max(x, to); xx++) markRoad(road, xx, y, REGION_ROWS)
-      x = to
-    }
-    atY[y] = x
-  }
+  const road: Cells = new Set()
   const stages: StageSpot[] = []
   for (let i = 0; i < 12; i++) {
-    const y = i === 11 ? 2 : 26 - i * 2, trunk = atY[y]!
-    const sx = i === 11 ? 8 : trunk + (Math.floor(i / 2) % 2 === 0 ? -3 : 3)
-    for (let xx = Math.min(trunk, sx); xx <= Math.max(trunk, sx); xx++) markRoad(road, xx, y, REGION_ROWS)
-    stages.push({ x: sx, y, kind: i === 11 ? 'boss' : i === 10 ? 'elite' : 'fight', state: i < 4 ? 'cleared' : i === 4 ? 'open' : 'locked' })
+    const band = Math.floor(i / 2), right = (i % 2 === 1) !== (band % 2 === 1)
+    stages.push({ x: i === 11 ? 6 : i === 10 ? 10 : right ? 10 : 2, y: i === 11 ? 2 : 40 - band * 6,
+      kind: i === 11 ? 'boss' : i === 10 ? 'elite' : 'fight', state: i < 4 ? 'cleared' : i === 4 ? 'open' : 'locked' })
   }
+  const line = (x0: number, y0: number, x1: number, y1: number) => {
+    for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
+      for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) markRoad(road, x, y, REGION_ROWS)
+  }
+  // Doors meet a serpentine road below each pair. Vertical climbs go round the outside, never through a building.
+  line(4, 45, 4, 44)
+  stages.forEach((s, i) => {
+    if (!i) return
+    const p = stages[i - 1]!, px = p.x + 2, py = p.y + STAGE_TILES, x = s.x + 2, y = s.y + STAGE_TILES
+    if (py === y) line(px, y, x, y)
+    else {
+      const edge = px < 8 ? 0 : 15
+      line(px, py, edge, py); line(edge, py, edge, y); line(edge, y, x, y)
+    }
+  })
+  // The existing continent Spring is shown between the starting destinations, not a new refill resource.
+  line(7, 44, 7, 43)
+  const occupied = (x: number, y: number) => stages.some((s) => x >= s.x && x < s.x + STAGE_TILES && y >= s.y && y < s.y + STAGE_TILES)
+    || x === 7 && y >= 42 && y < 44
   const wet: Cells = new Set(), ponds: Cells[] = []
   if (visuals[biome].liquid) {
     const r = rng(`${label}:liquid`)
@@ -97,7 +102,7 @@ export function regionTopology(biome: Biome, label: string): RegionLayout {
         for (let tx = minX - 1; tx <= maxX; tx++) {
           if (!touches(tx, ty)) continue
           if (tx < 0 || ty < 0 || tx >= REGION_COLS || ty >= REGION_ROWS || hasCell(road, tx, ty) || cornerMaskAt((cx, cy) => hasCell(wet, cx, cy), tx, ty)
-            || stages.some((m) => Math.abs(m.x - tx) <= 1 && Math.abs(m.y - ty) <= 1)) fits = false
+            || occupied(tx, ty)) fits = false
         }
       if (!fits) continue
       patch.forEach((k) => wet.add(k)); ponds.push(patch)

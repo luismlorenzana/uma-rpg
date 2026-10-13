@@ -1,5 +1,13 @@
 # Synthetic browser previews
 
+`stage-map-375.png` shows the 4×4-tile destinations, grayscale clears, next-stage ring and MP Spring at 375×667.
+`stage-map-spring.png` captures a real refill: all five members at full MP and the shared two-hour recharge.
+`stage-map-volcano-390.png`, `stage-map-stronghold-390.png` and `stage-map-glacier-390.png` show themed barracks,
+elite tower, boss stronghold and snowy terrain at 390×844. All master data/names and portrait placeholders are
+synthetic (`uma-data/testing`); no franchise art or private release is included. The browser is 1×, so the native
+64px targets are 64 CSS px here; unit tests also verify 96px footprints on 2× 375/390px phones. These are UI checks,
+not balance or performance fixtures. Capture after installing published uma-art 2.3.0.
+
 `h11-*-375.png` checks native 24px class emblems and 12px status glyphs at 375×667: profile, picker, party,
 Cleric skill text and battle buffs/debuffs. All names, outfit metadata and portrait placeholders are synthetic.
 
