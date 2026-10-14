@@ -1,7 +1,8 @@
 # Combat
 
-How a fight works today: engine v10 (D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit
-Breaks; D104: Class Ranks, Might, Barrier and Regen; v6–v9 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
+How a fight works today: engine v11 (D124: two accessories, physical and magical shields, MP Regen, Lifesteal, MP Steal,
+damage cuts and returns; D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit Breaks;
+D104: Class Ranks and Might; v6–v10 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -69,9 +70,17 @@ For each part of each hit:
    halving.
 5. **Unbroken foes take ×0.5.** Breaking them is how damage lands.
 6. An Uma's **evasion** (Speed Extra Stats, up to 50%) cuts what she takes.
-7. A guard intercepting a hit takes half of it, and a Barrier absorbs foe damage before HP. Physical armor starts her
-   each fight with a Barrier (5 a grade), and magical armor heals Regen (1 HP a grade) at the end of each round (D104).
-   Damage is at least 1.
+7. A guard intercepting a hit takes half of it. Damage is at least 1.
+8. **Her accessories (D124):**
+   - **Shields:** a Bulwark Talisman's Barrier absorbs physical damage before HP, a Veil Amulet's Veil magical damage
+     (5 a grade each, from the start of the fight).
+   - **Damage cuts:** an Iron Talisman cuts the physical damage she takes, a Ward Amulet the magical (0.5% a grade).
+   - **Returned damage:** a Thorn Talisman returns physical damage she takes to its attacker, a Mirror Amulet magical
+     damage (1% a grade).
+   - **Drain:** a Vampire Talisman heals her by the physical damage she deals (0.5% a grade); a Siphon Amulet restores
+     MP from the magical damage she deals (0.2% a grade).
+   - **Each round's end:** a Vital Talisman heals 1 HP a grade, a Spring Amulet restores ⌈g/2⌉ MP.
+   - **Fights before v11:** a Barrier from physical armor took any damage, and magical armor gave Regen (D104).
 
 Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
 

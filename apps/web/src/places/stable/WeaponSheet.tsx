@@ -1,32 +1,45 @@
-// One of a class's five weapon slots (D98) or one of her five armor slots (D103): the weapon she holds there opens its
-// skill tree; the armor kind decides her Barrier or Regen. Every Uma holds a Training
-// weapon of each kind (grade 0, no stats); a crafted piece of the kind adds its stats. A Summoner, Spell Blade or Cleric
-// chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's slots keep theirs. She binds each kind's
-// grades in order (D119): the sheet shows her best piece and the stock above it, never the grades she has spent.
+// One of a class's five weapon slots (D98), one of her five armor slots (D103, D124) or one of her two accessory slots:
+// the weapon she holds there opens its skill tree; armor adds its stats; an accessory its kind or a defensive effect.
+// Every Uma holds a Training weapon and armor piece of each kind (grade 0, no stats), shown only until she binds its
+// grade 1. A Summoner, Spell Blade or Cleric chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's
+// slots keep theirs. She binds each kind's grades in order (D119): the sheet shows her best piece and the stock above it,
+// never the grades she has spent.
 import {
-  ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, armorKindOf, classOf, EFFECT_LABEL, equipBlock, gearById, gearChoices, gearPoints, isMagicalArmor, isRpgTome,
-  isWeapon, ITEM_EFFECTS, MIGHT_PER_GRADE, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind, type ArmorKind, type ArmorSlot,
-  type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld,
+  ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, ACCESSORY_TYPES, accessoryEffects, accessoryKindOf, ARMOR_LABEL,
+  ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory,
+  isMagicalArmor, isOrb, isRpgTome, isWeapon, ITEM_EFFECTS, MIGHT_PER_GRADE, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind,
+  type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
-import { hold, wearArmorPiece } from '../../save/game'
+import { hold, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
 import { ArmorMark } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../observatory/ObservatoryPage'
 
-/** What a piece does, in one line: a weapon's Might, armor's stats with its Barrier or Regen, an Orb's kind (D104). */
+/** Accessories' defensive effects, one phrase each (D124). */
+export function effectLines(a: AccessoryEffects): string[] {
+  const pct = (permille: number) => `${permille / 10}%`
+  return [
+    a.regen && `Heals ${a.regen} HP a round`, a.mpRegen && `Restores ${a.mpRegen} MP a round`,
+    a.lifesteal && `Heals ${pct(a.lifesteal)} of physical damage dealt`, a.mpSteal && `MP from ${pct(a.mpSteal)} of magical damage dealt`,
+    a.barrier && `Shield ${a.barrier} vs physical`, a.veil && `Shield ${a.veil} vs magical`,
+    a.guard && `${pct(a.guard)} less physical damage`, a.resist && `${pct(a.resist)} less magical damage`,
+    a.thorns && `Returns ${pct(a.thorns)} of physical damage`, a.mirror && `Returns ${pct(a.mirror)} of magical damage`,
+  ].filter((x): x is string => !!x)
+}
+
+/** What a piece does, in one line: a weapon's Might, armor's stats, an Orb's kind, an accessory's effect (D104, D124). */
 export function pieceLine(id: string): string {
   const piece = gearById(id)
   if (!piece) return ''
   if (isWeapon(piece.type)) return `Might +${piece.grade * MIGHT_PER_GRADE} on its hits`
+  if (isOrb(piece.type)) return 'Its kind on every hit, for weaknesses'
+  if (isAccessory(piece.type)) return effectLines(accessoryEffects(piece)).join(' · ')
   const p = gearPoints(piece)
-  const stats = ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, p[e])}`)
-  const kind = armorKindOf(piece.type as Exclude<typeof piece.type, RpgWeapon>)
-  if (kind === 'arms-orb' || kind === 'elemental-orb') return 'Its kind on every hit, for weaknesses'
-  return [...stats, isMagicalArmor(kind) ? `Regen ${piece.grade}` : `Barrier ${piece.grade * 5}`].join(' · ')
+  return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, p[e])}`).join(' · ')
 }
 
 /** What a slot holds: the weapon and its piece (null for the Training one). */
@@ -67,7 +80,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
               {WEAPON_LABEL[w]}{weapons.includes(w) && w !== here ? ` · swaps with slot ${weapons.indexOf(w) + 1}` : ''}
             </h4>
             <ul className="space-y-1">
-              <li>
+              {boundGrade(uma, w) === 0 && <li>
                 <button type="button" disabled={held(w, null)} onClick={() => void choose(w, null)}
                   className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${held(w, null) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
                   <TrainingIcon weapon={w} size={32} />
@@ -77,7 +90,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
                   </span>
                   <span className="shrink-0 text-[11px] text-ink-faint">{held(w, null) ? 'Held' : 'Hers'}</span>
                 </button>
-              </li>
+              </li>}
               {pieces(w).map(({ id, bound }) => {
                 const block = equipBlock(uma, id)
                 const out = outputView(id)
@@ -112,7 +125,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
   const [error, setError] = useState<string | null>(null)
   const here = slotKind(uma.gear, slot)
   const kinds = [here, ...ARMOR_SLOT_KINDS[slot].filter((k) => k !== here)] as ArmorKind[]
-  const pieces = (kind: ArmorKind) => gearChoices(uma, world.gear, (p) => !isWeapon(p.type) && armorKindOf(p.type) === kind)
+  const pieces = (kind: ArmorKind) => gearChoices(uma, world.gear, (p) => p.type === kind)
   const held = (kind: ArmorKind, id: string | null) => here === kind && (uma.gear.equipped[slot] ?? null) === id
   const choose = (kind: ArmorKind, id: string | null) =>
     wearArmorPiece(outfitId, slot, kind, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -123,7 +136,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
           <section key={kind}>
             <h4 className="text-micro mb-1">{ARMOR_LABEL[kind]} · {isMagicalArmor(kind) ? 'Magical' : 'Physical'}</h4>
             <ul className="space-y-1">
-              <li>
+              {boundGrade(uma, kind) === 0 && <li>
                 <button type="button" disabled={held(kind, null)} onClick={() => void choose(kind, null)}
                   className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${held(kind, null) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-xs border border-dashed border-hairline-strong opacity-70"><ArmorMark kind={kind} size={22} /></span>
@@ -133,7 +146,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
                   </span>
                   <span className="shrink-0 text-[11px] text-ink-faint">{held(kind, null) ? 'Worn' : 'Hers'}</span>
                 </button>
-              </li>
+              </li>}
               {pieces(kind).map(({ id, bound }) => {
                 const block = equipBlock(uma, id)
                 const out = outputView(id)
@@ -151,6 +164,60 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
                   </li>
                 )
               })}
+            </ul>
+          </section>
+        ))}
+        {error && <p className="text-[13px] text-danger">{error}</p>}
+      </div>
+    </BottomSheet>
+  )
+}
+
+/** One of her two accessory slots (D124): any accessory she has bound or the stock holds, grouped by kind, except the type
+ * she wears in the other slot. An empty slot holds nothing. */
+export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: AccessorySlot; onClose: () => void }) {
+  const [error, setError] = useState<string | null>(null)
+  const here = uma.gear.equipped[slot] ?? null
+  const other = ACCESSORY_SLOTS.find((s) => s !== slot)!
+  const otherType = uma.gear.equipped[other] ? gearById(uma.gear.equipped[other]!)?.type : undefined
+  const choose = (id: string | null) =>
+    wearAccessoryPiece(outfitId, slot, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
+  const groups = ACCESSORY_KINDS.map((kind) => ({
+    kind,
+    types: ACCESSORY_TYPES.filter((t) => accessoryKindOf(t) === kind && t !== otherType)
+      .map((t) => ({ t, pieces: gearChoices(uma, world.gear, (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
+  })).filter((g) => g.types.length > 0)
+  return (
+    <BottomSheet title={ACCESSORY_SLOT_LABEL[slot]} onClose={onClose}>
+      <div className="space-y-3">
+        {here && (
+          <button type="button" onClick={() => void choose(null)} className="min-h-11 w-full rounded-sm border border-hairline-strong text-[13px] font-semibold text-ink-soft">
+            Take it off (it stays hers)
+          </button>
+        )}
+        {groups.length === 0 && <p className="text-[13px] text-ink-soft">No accessories yet: the Forge makes them.</p>}
+        {groups.map(({ kind, types }) => (
+          <section key={kind}>
+            <h4 className="text-micro mb-1">{ACCESSORY_LABEL[kind]}</h4>
+            <ul className="space-y-1">
+              {types.flatMap(({ t, pieces }) => pieces.map(({ id, bound }) => {
+                const block = equipBlock(uma, id)
+                const out = outputView(id)
+                const worn = here === id
+                return (
+                  <li key={id}>
+                    <button type="button" disabled={!!block || worn} onClick={() => void choose(id)}
+                      className={`flex w-full items-center gap-2 rounded-sm p-2 text-left disabled:opacity-60 ${worn ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
+                      <ItemIcon id={out.icon} size={32} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[13px] font-semibold">{EQUIP_LABEL[t]} · G{out.grade}</span>
+                        <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
+                      </span>
+                      <span className="shrink-0 text-[11px] text-ink-faint">{worn ? 'Worn' : bound ? 'Hers' : `Stock ×${world.gear[id]} · binds`}</span>
+                    </button>
+                  </li>
+                )
+              }))}
             </ul>
           </section>
         ))}

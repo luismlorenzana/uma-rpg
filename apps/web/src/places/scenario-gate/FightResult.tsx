@@ -48,7 +48,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                 const up = m.afterLevel > m.beforeLevel
                 const next = m.afterLevel < RPG_TIER_MAX_LEVEL ? rpgExpToNext(m.afterLevel) : 0
                 const cls = m.ranks.find((g) => g.ref.kind === 'class')
-                const cells = (kind: 'weapon' | 'armor'): RankCell[] => m.ranks.filter((g): g is RankGain & { ref: { kind: typeof kind } } => g.ref.kind === kind)
+                const cells = (kind: 'weapon' | 'armor' | 'accessory'): RankCell[] => m.ranks.filter((g): g is RankGain & { ref: { kind: typeof kind } } => g.ref.kind === kind)
                   .map((g) => ({ key: `${kind}:${g.ref.id}`, kind, id: g.ref.id as RankCell['id'], track: g.after, before: g.before }))
                 return (
                   <li key={m.outfitId} className="space-y-1.5 rounded-md bg-raised p-2">
@@ -69,6 +69,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                     {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
                     <RankCells label="Weapon Ranks" cells={cells('weapon')} />
                     <RankCells label="Armor Ranks" cells={cells('armor')} />
+                    {cells('accessory').length > 0 && <RankCells label="Accessory Ranks" cells={cells('accessory')} />}
                     {(m.bonds ?? []).map((b) => {
                       const bondUp = b.after.level > b.before.level
                       const top = b.after.level >= BOND_MAX_LEVEL

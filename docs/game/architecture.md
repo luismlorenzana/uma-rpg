@@ -38,8 +38,8 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v19, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs), `kitchen.ts`, `forge.ts`, `targets.ts` (farming targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
-| `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v10, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
+| `save/` | The save (`save.ts`: schema v20, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs), `kitchen.ts`, `forge.ts`, `targets.ts` (farming targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
+| `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v11, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `dishes.ts`, `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 16 families and 320 items |
@@ -98,7 +98,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v19** (`save/save.ts`).
+- **Schema v20** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -112,6 +112,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - **v18:** ranks earned by fighting, five armor slots, Marks, no tokens; every older save starts its progress over
     (D102–D105).
   - **v19:** the Halls of Heroes' seats and each Uma's Bonds, both empty; 5 Unlock Tickets (D106).
+  - **v20:** armor without accents (one of each piece kept), a feet slot, two accessory slots, Accessory Ranks (D124).
 
 ```
 Save { schemaVersion, account { trainerName, createdAt, updatedAt }, tierWorlds: { "1": TierWorld } }
@@ -120,7 +121,7 @@ TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, swe
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
   items, facilities, dishes, gear, targets, heroes: { <seat>: { hero, learners[≤10] } } }
 OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons, tree, loadout } },
-  professions { farming, gathering }, ranks { classes, weapons, armors: { <id>: { rank, exp } } },
+  professions { farming, gathering }, ranks { classes, weapons, armors, accessories: { <id>: { rank, exp } } },
   stars { unlocked, active }, gear { locker, equipped, kinds }, bonds { <seat>: { level, exp } } }
 ```
 

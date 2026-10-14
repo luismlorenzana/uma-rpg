@@ -29,7 +29,7 @@ const ELEMENT_COLOR: Readonly<Record<RpgElement, string>> = {
   fire: '#ff8a5c', ice: '#8fd3ff', lightning: '#ffd84d', light: '#fff2b0', dark: '#c79bff',
 }
 
-const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind) ? WEAPON_KIND_LABEL[kind] : ELEMENT_LABEL[kind])
+export const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind) ? WEAPON_KIND_LABEL[kind] : ELEMENT_LABEL[kind])
 
 /** Distinct damage kinds a skill lands, in order. */
 export const skillKinds = (skill: RpgSkillDef): RpgDamageKind[] =>

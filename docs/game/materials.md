@@ -401,58 +401,82 @@ From grade 4 on, dishes add side ingredients from other families, so every famil
 
 ## Gear
 
-Crafted at the Forge (D103): 28 types in ten grades. The recipe is four refined items of the grade, one from each family
-of its half; the Uma's Craft Level gates the grade made (5g − 4), as for every job.
+Crafted at the Forge (D124, D125): 40 types in ten grades, five physical and five magical in every row:
+- ten weapons;
+- ten armor pieces;
+- twenty accessories (Arms Orbs, Elemental Orbs, Talismans, Amulets).
 
-- **Physical:** the five Arms, the four physical armors (Helm, Cuirass, Greaves, Gauntlets) and the five Arms Orbs use
-  ores, stones, woods and hides-scales.
-- **Magical:** the five Tomes, the four magical armors (Circlet, Robe, Leggings, Bracers) and the five Elemental Orbs
-  use crystals, fibers, essences and bones-horns.
-- **Ids:** `<type>-g<grade>` for weapons and Orbs; `<type>-g<grade>-<accent>` for armor, whose accent is one of the
-  eight stats, picked at the Forge.
+**Recipes:** two refined items of the grade, from its group's pair of families, so every family is used at every
+grade:
 
-**What a piece does (D104):**
-- A weapon's **Might**: +4 a grade to the offense of hits made with that weapon.
-- Physical armor: +1 DEF a grade and a **Barrier** of 5 a grade at the start of each fight.
-- Magical armor: +1 MDEF a grade and **Regen** of 1 HP a grade at the end of each round.
-- An armor accent: +⌈grade ÷ 2⌉ points to its stat ([loops](loops.md#extra-stats-and-gear)).
-- An Orb: its kind on every hit, for weaknesses only ([combat](combat.md#damage)).
+| Group | Physical (Arms half) | Magical (Arcana half) |
+|---|---|---|
+| Weapons | Ores + Woods | Crystals + Essences |
+| Armor | Hides & Scales + Stones | Bones & Horns + Fibers |
+| Accessories | Ores + Stones | Crystals + Fibers |
 
-**Slots and wearing:** five weapon slots (her class's) and five armor slots: head, body, legs, arms and an accessory
-(an Arms or an Elemental Orb). Grade k needs her Weapon Rank for that weapon, or her Armor Rank for that armor kind, at
-k or more ([classes](classes.md#ranks-and-levels)). Every Uma holds a grade-0 **Training** piece of each weapon and armor
-kind, with no stats, that fills a slot until she wears a crafted one (D98, D103).
+Maxing one Uma's twelve tracks takes 240 refined items, about what her 100 Extra Stats dishes take (232). The Uma's Craft
+Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade>`; pieces carry no accent.
+
+**What a piece does (D104, D124):**
+- **A weapon's Might:** +4 a grade to the offense of hits made with that weapon.
+- **Armor:** ATK (physical) or M.ATK (magical) +⌈grade ÷ 2⌉, and its slot's defensive stat +grade. Head DEF, body HP,
+  legs MP, arms MDEF, feet Speed.
+- **An Orb:** its kind on every hit, for weaknesses only.
+- **A Talisman or an Amulet:** the small effect in the table below ([combat](combat.md#damage)).
+
+**Slots and wearing:**
+- **Slots:** five weapon slots (her class's), five armor slots (head, body, legs, arms, feet) and two accessory slots
+  (any two different types).
+- **Wearing a grade:** grade k needs her Weapon Rank for that weapon, her Armor Rank for that armor kind, or her
+  Accessory Rank for the accessory's kind, at k or more ([classes](classes.md#ranks-and-levels)).
+- **Training pieces:** every Uma holds a grade-0 Training piece of each weapon and armor kind, with no stats. It fills a
+  slot until she binds that kind's grade 1, and isn't offered after (D98, D124).
 
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families (one refined item each) | Example recipe: grade 3 | At grade 10 |
 |---|---|---|---|---|---|---|
-| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
-| Axe | `axe-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
-| Lance | `lance-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
-| Bow | `bow-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
-| Katana | `katana-g<grade>` | Weapon | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Might +40 on its hits |
-| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
-| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
-| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
-| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
-| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Might +40 on its hits |
-| Helm | `helm-g<grade>-<accent>` | Head | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
-| Cuirass | `cuirass-g<grade>-<accent>` | Body | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
-| Greaves | `greaves-g<grade>-<accent>` | Legs | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
-| Gauntlets | `gauntlets-g<grade>-<accent>` | Arms | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | DEF +10, Barrier 50; accent +5 |
-| Circlet | `circlet-g<grade>-<accent>` | Head | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
-| Robe | `robe-g<grade>-<accent>` | Body | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
-| Leggings | `leggings-g<grade>-<accent>` | Legs | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
-| Bracers | `bracers-g<grade>-<accent>` | Arms | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | M.DEF +10, Regen 10; accent +5 |
-| Greatsword Orb | `orb-greatsword-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
-| Axe Orb | `orb-axe-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
-| Lance Orb | `orb-lance-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
-| Bow Orb | `orb-bow-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
-| Katana Orb | `orb-katana-g<grade>` | Accessory | Physical | Ores, Stones, Woods, Hides & Scales | Iron Ingot, Slate Block, Cedar Plank, Wolfkin Leather | Its kind on every hit, for weaknesses |
-| Fire Orb | `orb-fire-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Ice Orb | `orb-ice-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Lightning Orb | `orb-lightning-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Light Orb | `orb-light-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Dark Orb | `orb-dark-g<grade>` | Accessory | Magical | Crystals, Fibers, Essences, Bones & Horns | Cut Citrine, Hemp Cloth, Breeze Infusion, Trilobite Carving | Its kind on every hit, for weaknesses |
+| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Ores, Woods | Iron Ingot, Cedar Plank | Might +40 on its hits |
+| Axe | `axe-g<grade>` | Weapon | Physical | Ores, Woods | Iron Ingot, Cedar Plank | Might +40 on its hits |
+| Lance | `lance-g<grade>` | Weapon | Physical | Ores, Woods | Iron Ingot, Cedar Plank | Might +40 on its hits |
+| Bow | `bow-g<grade>` | Weapon | Physical | Ores, Woods | Iron Ingot, Cedar Plank | Might +40 on its hits |
+| Katana | `katana-g<grade>` | Weapon | Physical | Ores, Woods | Iron Ingot, Cedar Plank | Might +40 on its hits |
+| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Crystals, Essences | Cut Citrine, Breeze Infusion | Might +40 on its hits |
+| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Crystals, Essences | Cut Citrine, Breeze Infusion | Might +40 on its hits |
+| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Crystals, Essences | Cut Citrine, Breeze Infusion | Might +40 on its hits |
+| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Crystals, Essences | Cut Citrine, Breeze Infusion | Might +40 on its hits |
+| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Crystals, Essences | Cut Citrine, Breeze Infusion | Might +40 on its hits |
+| Helm | `helm-g<grade>` | Head | Physical | Hides & Scales, Stones | Wolfkin Leather, Slate Block | ATK +5, DEF +10 |
+| Cuirass | `cuirass-g<grade>` | Body | Physical | Hides & Scales, Stones | Wolfkin Leather, Slate Block | HP +10, ATK +5 |
+| Greaves | `greaves-g<grade>` | Legs | Physical | Hides & Scales, Stones | Wolfkin Leather, Slate Block | MP +10, ATK +5 |
+| Gauntlets | `gauntlets-g<grade>` | Arms | Physical | Hides & Scales, Stones | Wolfkin Leather, Slate Block | ATK +5, M.DEF +10 |
+| Boots | `boots-g<grade>` | Feet | Physical | Hides & Scales, Stones | Wolfkin Leather, Slate Block | ATK +5, Speed +10 |
+| Circlet | `circlet-g<grade>` | Head | Magical | Bones & Horns, Fibers | Trilobite Carving, Hemp Cloth | M.ATK +5, DEF +10 |
+| Robe | `robe-g<grade>` | Body | Magical | Bones & Horns, Fibers | Trilobite Carving, Hemp Cloth | HP +10, M.ATK +5 |
+| Leggings | `leggings-g<grade>` | Legs | Magical | Bones & Horns, Fibers | Trilobite Carving, Hemp Cloth | MP +10, M.ATK +5 |
+| Bracers | `bracers-g<grade>` | Arms | Magical | Bones & Horns, Fibers | Trilobite Carving, Hemp Cloth | M.ATK +5, M.DEF +10 |
+| Slippers | `slippers-g<grade>` | Feet | Magical | Bones & Horns, Fibers | Trilobite Carving, Hemp Cloth | M.ATK +5, Speed +10 |
+| Greatsword Orb | `orb-greatsword-g<grade>` | Accessory (Arms Orb) | Physical | Ores, Stones | Iron Ingot, Slate Block | Its kind on every hit, for weaknesses |
+| Axe Orb | `orb-axe-g<grade>` | Accessory (Arms Orb) | Physical | Ores, Stones | Iron Ingot, Slate Block | Its kind on every hit, for weaknesses |
+| Lance Orb | `orb-lance-g<grade>` | Accessory (Arms Orb) | Physical | Ores, Stones | Iron Ingot, Slate Block | Its kind on every hit, for weaknesses |
+| Bow Orb | `orb-bow-g<grade>` | Accessory (Arms Orb) | Physical | Ores, Stones | Iron Ingot, Slate Block | Its kind on every hit, for weaknesses |
+| Katana Orb | `orb-katana-g<grade>` | Accessory (Arms Orb) | Physical | Ores, Stones | Iron Ingot, Slate Block | Its kind on every hit, for weaknesses |
+| Fire Orb | `orb-fire-g<grade>` | Accessory (Elemental Orb) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | Its kind on every hit, for weaknesses |
+| Ice Orb | `orb-ice-g<grade>` | Accessory (Elemental Orb) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | Its kind on every hit, for weaknesses |
+| Lightning Orb | `orb-lightning-g<grade>` | Accessory (Elemental Orb) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | Its kind on every hit, for weaknesses |
+| Light Orb | `orb-light-g<grade>` | Accessory (Elemental Orb) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | Its kind on every hit, for weaknesses |
+| Dark Orb | `orb-dark-g<grade>` | Accessory (Elemental Orb) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | Its kind on every hit, for weaknesses |
+| Vital Talisman | `talisman-vital-g<grade>` | Accessory (Talisman) | Physical | Ores, Stones | Iron Ingot, Slate Block | heals 10 HP a round |
+| Vampire Talisman | `talisman-vampire-g<grade>` | Accessory (Talisman) | Physical | Ores, Stones | Iron Ingot, Slate Block | heals 5% of physical damage dealt |
+| Bulwark Talisman | `talisman-bulwark-g<grade>` | Accessory (Talisman) | Physical | Ores, Stones | Iron Ingot, Slate Block | a 50 shield against physical damage |
+| Iron Talisman | `talisman-iron-g<grade>` | Accessory (Talisman) | Physical | Ores, Stones | Iron Ingot, Slate Block | 5% less physical damage taken |
+| Thorn Talisman | `talisman-thorn-g<grade>` | Accessory (Talisman) | Physical | Ores, Stones | Iron Ingot, Slate Block | returns 10% of physical damage taken |
+| Spring Amulet | `amulet-spring-g<grade>` | Accessory (Amulet) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | restores 5 MP a round |
+| Siphon Amulet | `amulet-siphon-g<grade>` | Accessory (Amulet) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | restores MP as 2% of magical damage dealt |
+| Veil Amulet | `amulet-veil-g<grade>` | Accessory (Amulet) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | a 50 shield against magical damage |
+| Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | 5% less magical damage taken |
+| Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Crystals, Fibers | Cut Citrine, Hemp Cloth | returns 10% of magical damage taken |
+
+Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (5 at grade 10), and its slot's defensive stat +1 a grade. An Uma wears two accessories of different types.
 <!-- /live -->
 

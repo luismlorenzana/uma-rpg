@@ -1,5 +1,6 @@
-// Campaign battle vocabulary, engine v10 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
-// v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112).
+// Campaign battle vocabulary, engine v11 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
+// v11 two accessories and their defensive effects, D124).
 // Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -30,10 +31,27 @@ export interface BattleAlly {
   classRank?: number
   /** Might by damage kind (v8, D104): a weapon's grade × 4, added to the offense of hits made with it. */
   might?: Partial<Record<RpgDamageKind, number>>
-  /** A Barrier she starts the fight with, from physical armor (v8). */
+  /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
+   * absorbing physical damage only). */
   barrier?: number
-  /** HP she regains at the end of each round, from magical armor (v8). */
+  /** HP she regains at the end of each round (v8: magical armor; v11: a Vital Talisman). */
   regen?: number
+  /** v11 (D124): the kinds of the Orbs she wears, two at most; each makes her hits weak as `orb` did. Replaces `orb`. */
+  orbs?: RpgDamageKind[]
+  /** v11: a Veil absorbing magical damage, from the start of the fight (Veil Amulet). */
+  veil?: number
+  /** v11: MP restored at the end of each round (Spring Amulet). */
+  mpRegen?: number
+  /** v11, per mille: physical damage she deals healed back (Vampire Talisman); magical damage she deals restored as MP
+   * (Siphon Amulet). */
+  lifesteal?: number
+  mpSteal?: number
+  /** v11, per mille: physical (Iron Talisman) and magical (Ward Amulet) damage she doesn't take. */
+  guard?: number
+  resist?: number
+  /** v11, per mille: physical (Thorn Talisman) and magical (Mirror Amulet) damage she takes, returned to its attacker. */
+  thorns?: number
+  mirror?: number
   /** Share of every hit she avoids, per mille, from Speed points (S6, S7). */
   evasion?: number
   /** Limit Break charge she starts the fight with, from Limit Break points (S6, S7). */
@@ -79,7 +97,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10
+  version: 6 | 7 | 8 | 9 | 10 | 11
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -94,8 +112,10 @@ export interface BattleUnit {
   hp: number
   mp: number
   statuses: BattleStatus[]
-  /** Damage a Barrier absorbs before HP. */
+  /** Damage a Barrier absorbs before HP (v11: physical damage only). */
   barrier: number
+  /** v11: magical damage a Veil absorbs before HP. */
+  veil?: number
   phase: 1 | 2
   guardingFor: string | null
   /** Remaining break shield (enemies). */
@@ -109,7 +129,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

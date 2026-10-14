@@ -4,7 +4,7 @@ import { rpgRunBattleStep } from '../rpg/campaign/run'
 import { rpgDefaultWeapons } from '../rpg/rules'
 import { RPG_CLASSES } from '../rpg/kinds'
 import { DISHES } from '../economy/dishes'
-import { EQUIP_TYPES, hasAccent } from '../economy/gear'
+import { EQUIP_TYPES } from '../economy/gear'
 import { ITEMS } from '../items/catalog'
 import { regionChapter, worldContinent } from '../world/world'
 import { chooseClass, openFightOf, startFight, worldRun, type BattleOutfit } from './battle'
@@ -46,7 +46,7 @@ describe('asynchronous strict save parsing (H16)', () => {
     s = startJob(s, 'pantry', 0, workers[1]!, 'wheat-flour', 1, NOW)
     s = startJob(s, 'kitchen', 0, workers[2]!, DISHES[0]!.id, 1, NOW)
     s = startJob(s, 'forge', 0, workers[3]!, 'greatsword-g1', 1, NOW)
-    s = queueJob(s, 'forge', 0, workers[3]!, 'helm-g1-atk', 1, NOW)
+    s = queueJob(s, 'forge', 0, workers[3]!, 'helm-g1', 1, NOW)
     expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
     expect(await parseSaveAsync(rawOf(s))).toEqual(s)
   })
@@ -55,7 +55,7 @@ describe('asynchronous strict save parsing (H16)', () => {
     const s = party(), w = worldOf(s)
     w.items = Object.fromEntries(ITEMS.map((i) => [i.id, 1]))
     w.dishes = Object.fromEntries(DISHES.map((d) => [d.id, 1]))
-    w.gear = Object.fromEntries(EQUIP_TYPES.map((t) => [hasAccent(t) ? `${t}-g1-hp` : `${t}-g1`, 1]))
+    w.gear = Object.fromEntries(EQUIP_TYPES.map((t) => [`${t}-g1`, 1]))
     for (const u of Object.values(w.umas)) for (const classId of RPG_CLASSES) {
       u.level = 45
       u.ranks.classes[classId] = { rank: 45, exp: 0 }

@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  type ArmorKind, type ArmorSlot, type RankRef, type Shelf, type WorkOutfit, type GearSlot,
+  type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type Shelf, type WorkOutfit, type GearSlot,
   newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
@@ -165,6 +165,9 @@ export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/d
 /** Puts an armor kind in one of her five armor slots: its Training piece (null) or a crafted one (D103). */
 export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKind, gearId: string | null) =>
   edit(import('@rpg/domain/forge'), (d, s, now) => d.wearArmor(s, outfitId, slot, kind, gearId, now))
+/** Puts an accessory in one of her two accessory slots, or empties it (null) (D124). */
+export const wearAccessoryPiece = (outfitId: string, slot: AccessorySlot, gearId: string | null) =>
+  edit(import('@rpg/domain/forge'), (d, s, now) => d.wearAccessory(s, outfitId, slot, gearId, now))
 /** Marks or unmarks an Uma as a farming target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now) => d.setTarget(s, outfitId, on, now))
 /** The Halls of Heroes (D106): seat or swap a Hero (null empties the seat), and add or remove a Learner. */

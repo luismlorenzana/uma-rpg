@@ -151,7 +151,8 @@ describe('fights (D52, D66)', () => {
     expect(gain('class', 'brawler')).toBe(2 * m.exp)
     expect(gain('weapon', 'greatsword')).toBe(Math.round((5 * m.exp * 2) / 6))
     expect(gain('weapon', 'axe')).toBe(Math.round((5 * m.exp) / 6))
-    expect(['helm', 'cuirass', 'greaves', 'gauntlets', 'arms-orb'].every((k) => gain('armor', k) === m.exp)).toBe(true)
+    expect(['helm', 'cuirass', 'greaves', 'gauntlets', 'boots'].every((k) => gain('armor', k) === m.exp)).toBe(true)
+    expect(m.ranks.some((g) => g.ref.kind === 'accessory')).toBe(false) // she wears none
     expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
     expect(world.items).toEqual({})
 

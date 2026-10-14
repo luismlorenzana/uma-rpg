@@ -1,6 +1,7 @@
-// Save v19: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v19 (D106):
-// the Halls of Heroes, their Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no
-// tokens, and a progress reset for every older save.
+// Save v20: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v20 (D124):
+// armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106): the Halls of Heroes, their
+// Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset
+// for every older save.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -8,13 +9,15 @@
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, professionExpToNext, PROFESSIONS, type Profession } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
 import {
-  ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks, WEAPON_TYPES,
-  type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
+  ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
+  WEAPON_TYPES, type AccessoryKind, type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { RPG_CLASSES } from '../rpg/kinds'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
 import { isDishId, isStarNode } from '../economy/dish-id'
-import { armorKindOf, GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isWeapon, slotOf, type GearSlot } from '../economy/gear-id'
+import {
+  GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isAccessory, isAccessorySlot, isArmor, slotOf, type GearSlot,
+} from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { isItemId } from '../items/identity'
 import { replayBattle } from '../rpg/battle/engine'
@@ -27,7 +30,7 @@ import {
 } from '../rpg/rules'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 19
+export const SAVE_SCHEMA_VERSION = 20
 /** Umas marked as farming targets (D100). */
 export const MAX_TARGETS = 5
 export const STARTING_UNLOCK_TICKETS = 20
@@ -91,8 +94,9 @@ export interface BondTrack { level: number; exp: number }
 /** A Hall of Heroes seat (D106): its Hero and up to ten Learners, keyed by the seat's Limit Break. An empty seat is absent. */
 export interface HeroSeat { hero: string; learners: string[] }
 
-/** `kinds`: which armor kind each armor slot holds (absent: the physical one). An empty slot holds the kind's Training
- * piece, grade 0, as an empty weapon slot holds a Training weapon (D98, D103). */
+/** `kinds`: which armor kind each armor slot holds (absent: the physical one). An empty armor slot holds the kind's Training
+ * piece, grade 0, as an empty weapon slot holds a Training weapon (D98, D103); an empty accessory slot holds nothing.
+ * `equipped` keys: her weapons, her five armor slots and her two accessory slots (D124). */
 export interface UmaGear { locker: string[]; equipped: Partial<Record<GearSlot, string>>; kinds: Partial<Record<ArmorSlot, ArmorKind>> }
 /** The armor kind a slot holds now. */
 export const slotKind = (gear: Pick<UmaGear, 'kinds'>, slot: ArmorSlot): ArmorKind => gear.kinds[slot] ?? ARMOR_SLOT_KINDS[slot][0]
@@ -362,11 +366,14 @@ function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGear {
   const equipped: Partial<Record<GearSlot, string>> = {}
   for (const [slot, id] of Object.entries(slots)) {
     const piece = typeof id === 'string' ? gearById(id) : undefined
-    if (!piece || !locker.includes(id as string) || slotOf(piece.type) !== slot) throw new SaveParseError(`${path}.equipped.${slot}`, 'expected a piece from her locker for this slot')
-    if (!isWeapon(piece.type) && armorKindOf(piece.type) !== slotKind({ kinds }, slot as ArmorSlot)) throw new SaveParseError(`${path}.equipped.${slot}`, 'not the kind this slot holds')
+    const fits = !!piece && (isAccessorySlot(slot as GearSlot) ? isAccessory(piece.type) : !isAccessory(piece.type) && slotOf(piece.type) === slot)
+    if (!piece || !locker.includes(id as string) || !fits) throw new SaveParseError(`${path}.equipped.${slot}`, 'expected a piece from her locker for this slot')
+    if (isArmor(piece.type) && piece.type !== slotKind({ kinds }, slot as ArmorSlot)) throw new SaveParseError(`${path}.equipped.${slot}`, 'not the kind this slot holds')
     if (gearLevel(ranks, piece.type) < piece.grade) throw new SaveParseError(`${path}.equipped.${slot}`, `needs ${gearLevelName(piece.type)} ${piece.grade}`)
     equipped[slot as GearSlot] = id as string
   }
+  const a1 = equipped['accessory-1'] && gearById(equipped['accessory-1'])!.type, a2 = equipped['accessory-2'] && gearById(equipped['accessory-2'])!.type
+  if (a1 && a1 === a2) throw new SaveParseError(`${path}.equipped`, 'two accessories of the same type')
   return { locker, equipped, kinds }
 }
 
@@ -402,7 +409,7 @@ function parseTrack(value: unknown, path: string, max: number, toNext: (rank: nu
 }
 
 function parseRanks(value: unknown, path: string): Ranks {
-  const o = object(value, path, ['classes', 'weapons', 'armors'])
+  const o = object(value, path, ['classes', 'weapons', 'armors', 'accessories'])
   const ranks = newRanks()
   for (const [c, t] of Object.entries(object(o.classes, `${path}.classes`, RPG_CLASSES))) {
     ranks.classes[c as RpgClass] = parseTrack(t, `${path}.classes.${c}`, CLASS_MAX_RANK, classExpToNext)
@@ -410,8 +417,11 @@ function parseRanks(value: unknown, path: string): Ranks {
   for (const [w, t] of Object.entries(object(o.weapons, `${path}.weapons`, WEAPON_TYPES))) {
     ranks.weapons[w as RpgWeapon] = parseTrack(t, `${path}.weapons.${w}`, GEAR_MAX_RANK, gearExpToNext)
   }
-  for (const [a, t] of Object.entries(object(o.armors, `${path}.armors`, ARMOR_SLOTS.flatMap((x) => ARMOR_SLOT_KINDS[x])))) {
+  for (const [a, t] of Object.entries(object(o.armors, `${path}.armors`, ARMOR_KINDS))) {
     ranks.armors[a as ArmorKind] = parseTrack(t, `${path}.armors.${a}`, GEAR_MAX_RANK, gearExpToNext)
+  }
+  for (const [a, t] of Object.entries(object(o.accessories, `${path}.accessories`, ACCESSORY_KINDS))) {
+    ranks.accessories[a as AccessoryKind] = parseTrack(t, `${path}.accessories.${a}`, GEAR_MAX_RANK, gearExpToNext)
   }
   return ranks
 }

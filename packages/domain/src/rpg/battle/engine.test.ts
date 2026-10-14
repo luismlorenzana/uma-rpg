@@ -440,3 +440,75 @@ describe('battle engine v10: Limit Breaks only from the Halls of Heroes (D112)',
     expect(autoAction(ready(createBattle(v10(team(), foes())).state), 'a1').kind).not.toBe('limit')
   })
 })
+
+describe('battle engine v11: two accessories and their effects (D124)', () => {
+  const team = (each: Partial<BattleAlly> = {}, first: Partial<BattleAlly> = {}) =>
+    party().map((a, i) => ({ ...a, classRank: a.level, ...each, ...(i === 0 ? first : {}) }))
+  const v11 = (allies: BattleAlly[], enemies: BattleEnemy[]): BattleInput => ({ version: 11, seed: 5, allies, enemies })
+  /** A foe whose only move hits every ally on one channel. */
+  const hitter = (channel: 'physical' | 'magical', power = 100): BattleEnemy => {
+    const f = foe('f1', 'fire', ['greatsword'], ['fire'], 9)
+    return { ...f, moves: [{ id: 'all', kind: 'damage', channel, element: channel === 'magical' ? 'fire' : null, power, target: 'all', label: 'Hit' }], phaseTwo: undefined }
+  }
+  /** Everyone guards, so the round ends and the foe acts. */
+  const round = (s: BattleState): BattleState => {
+    const ids = s.input.allies.map((a) => a.id)
+    ids.forEach((id, i) => { s = act(s, { kind: 'guard', actorId: id, targetId: ids[(i + 1) % ids.length]! }) })
+    return s
+  }
+  const hpOf = (s: BattleState, id = 'a1') => unitOf(s, id).hp
+
+  it('shields physical damage with a Barrier and magical with a Veil, each only its own', () => {
+    const shielded = team({ barrier: 1000 })
+    expect(hpOf(round(createBattle(v11(shielded, [hitter('physical')])).state))).toBe(shielded[0]!.stats.hp)
+    expect(hpOf(round(createBattle(v11(shielded, [hitter('magical')])).state))).toBeLessThan(shielded[0]!.stats.hp)
+    const veiled = team({ veil: 1000 })
+    expect(hpOf(round(createBattle(v11(veiled, [hitter('magical')])).state))).toBe(veiled[0]!.stats.hp)
+    expect(unitOf(round(createBattle(v11(veiled, [hitter('magical')])).state), 'a1').veil).toBeLessThan(1000)
+    // Before v11 a Barrier took any damage.
+    const old = round(createBattle({ ...v11(team({ barrier: 1000 }), [hitter('magical')]), version: 10 }).state)
+    expect(hpOf(old)).toBe(team()[0]!.stats.hp)
+  })
+
+  it('cuts damage taken with Iron and Ward, and returns a share with Thorn and Mirror', () => {
+    const lost = (allies: BattleAlly[], channel: 'physical' | 'magical') => allies[0]!.stats.hp - hpOf(round(createBattle(v11(allies, [hitter(channel)])).state))
+    expect(lost(team({ guard: 500 }), 'physical')).toBeLessThan(lost(team(), 'physical'))
+    expect(lost(team({ guard: 500 }), 'magical')).toBe(lost(team(), 'magical'))
+    expect(lost(team({ resist: 500 }), 'magical')).toBeLessThan(lost(team(), 'magical'))
+    const s = round(createBattle(v11(team({}, { thorns: 1000 }), [hitter('physical')])).state)
+    const foeHp = unitOf(s, 'f1').hp
+    expect(foeHp).toBe(s.input.enemies[0]!.stats.hp - (team()[0]!.stats.hp - hpOf(s)))
+    const m = round(createBattle(v11(team({}, { mirror: 1000 }), [hitter('physical')])).state)
+    expect(unitOf(m, 'f1').hp).toBe(m.input.enemies[0]!.stats.hp)
+  })
+
+  it('heals from physical damage dealt (Vampire), restores MP from magical (Siphon) and each round (Spring)', () => {
+    const hurt = (s: BattleState, id: string) => { unitOf(s, id).hp = 10; unitOf(s, id).mp = 0; return s }
+    const swing = applyBattleAction(hurt(createBattle(v11(team({}, { lifesteal: 1000 }), [hitter('physical', 1)])).state, 'a1'), { kind: 'attack', actorId: 'a1', targetId: 'f1' })
+    const dealt = hits(swing, 'f1').reduce((n, c) => n + (c.kind === 'hit' ? c.amount : 0), 0)
+    expect(unitOf(swing.state, 'a1').hp).toBe(10 + dealt)
+    const mage = team({}, {})
+    mage[1] = { ...mage[1]!, mpSteal: 1000 }
+    const spell = applyBattleAction(hurt(createBattle(v11(mage, [hitter('physical', 1)])).state, 'a2'), { kind: 'attack', actorId: 'a2', targetId: 'f1', weapon: 'tome-fire' })
+    expect(unitOf(spell.state, 'a2').mp).toBe(hits(spell, 'f1').reduce((n, c) => n + (c.kind === 'hit' ? c.amount : 0), 0))
+    const spring = round(hurt(createBattle(v11(team({}, { mpRegen: 7 }), [hitter('physical', 1)])).state, 'a1'))
+    expect(unitOf(spring, 'a1').mp).toBe(7)
+  })
+
+  it('makes a hit weak through either of her two Orbs', () => {
+    const lanceFoe = foe('f1', 'ice', ['bow'], ['light'], 3)
+    const attack = (orbs: RpgDamageKind[]) => hits(applyBattleAction(createBattle(v11(team({}, { orbs }), [lanceFoe])).state,
+      { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'lance' }), 'f1').map((c) => c.kind === 'hit' && c.weak)
+    expect(attack(['axe'])).toEqual([false])
+    expect(attack(['axe', 'light'])).toEqual([true])
+  })
+
+  it('takes the new fields only from v11, and Orbs as a list there', () => {
+    expect(() => createBattle({ ...v11(team({ veil: 5 }), [hitter('physical')]), version: 10 })).toThrow(/Invalid battle ally/)
+    expect(() => createBattle({ ...v11(team({ orbs: ['fire'] }), [hitter('physical')]), version: 10 })).toThrow(/Invalid battle ally/)
+    expect(() => createBattle(v11(team({ orb: 'fire' }), [hitter('physical')]))).toThrow(/Invalid battle ally/)
+    expect(() => createBattle(v11(team({ orbs: ['fire', 'fire'] }), [hitter('physical')]))).toThrow(/Invalid battle ally/)
+    expect(() => createBattle(v11(team({ thorns: 1001 }), [hitter('physical')]))).toThrow(/Invalid battle ally/)
+    expect(() => createBattle(v11(team({ orbs: ['fire', 'katana'], lifesteal: 50, mpRegen: 3 }), [hitter('physical')]))).not.toThrow()
+  })
+})
