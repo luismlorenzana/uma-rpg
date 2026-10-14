@@ -37,6 +37,11 @@ durations are not LCP or React Profiler measurements.
 
 ## Portrait authoring rounds
 
+`crop-export-synthetic.png` compares frozen source-pixel rectangles with actual exported PNG files for both
+franchises and both ratios. Only invented geometric portraits from `crop-fixture.mjs` / `review-fixture.mjs`
+appear. The output generator is `scripts/cast/export-crops.mjs`; the contact-sheet renderer is a private QA helper,
+not the browser editor. Real source/crop comparisons stay under gitignored `content/authoring/previews/`.
+
 `crop-calibration-desktop.jpg` uses only the original synthetic geometry from
 `scripts/cast/crop-fixture.mjs` / `review-fixture.mjs`. They show the source-pixel crop rectangle, matching output
 preview, shared format ratios, autosave and per-format approval. Real calibration seeds, names and screenshots stay

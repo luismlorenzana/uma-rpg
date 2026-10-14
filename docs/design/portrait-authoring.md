@@ -128,6 +128,38 @@ the entire retained catalogue, and has one vertical crop per unit plus splash fo
 
 Game enemy behavior, final file export/import and bucket upload remain later owner-approved work.
 
+## Phase 2b: execute approved crops locally (D133)
+
+After every full-roster format is approved, execute the saved rectangles now; no game rework or upload is needed.
+The Node canvas executor uses the same nine-argument `drawImage` operation as the preview, preserving fractional
+source coordinates rather than rounding the framing. It outputs lossless PNG with transparency/backgrounds intact,
+at the existing native-resolution 640×960 / 1280×720 caps. No upscaling, extraction, AI-generated artwork or new sources.
+Face images are copied byte-for-byte, in their original format.
+
+Versioned bundles live under **`content/authoring/exports/<session>-r<revision>-<fingerprint>/`**:
+
+```text
+export.json                       # pinned encoder/algorithm, input fingerprints, start time
+snapshots/manifest.json           # exact source catalogue bytes
+snapshots/crops.json              # exact owner-approved recipe bytes
+snapshots/classification.json     # exact frozen classification bytes
+priconne/<stable-id>/vertical.<hash16>.png, face.<hash16>.<ext>, splash.<hash16>.png
+azurlane/<stable-id>/...           # same roles/ratios; Regular has no splash
+manifest.json                     # unit IDs/tiers, every output path/hash/dimension, source/recipe provenance
+complete.json                     # final manifest checksum; written only after the whole batch
+```
+
+The export hashes every original/face before writing, refuses pending/flagged formats, validates every finished
+asset and recipe, and fsyncs snapshots/output files. `exports/latest.json` points to the verified completed bundle.
+An interrupted run keeps its partial files and can resume from the same frozen inputs; it is not a usable completed
+bundle. A completed rerun verifies and reuses output, refusing corrupt files instead of resetting them. Later crop
+edits create a sibling export; earlier bundles, source images, live recipes and approval history remain unchanged.
+
+`scripts/cast/install-export.mjs` persists the seven executor modules and a pinned development-tool dependency
+inside `content/tools/cast-export/`; install its dependencies once before running it independently of a worktree.
+Copy all of `content/authoring/` to a separate backup drive for off-machine safety. These local PNGs are archival
+authoring outputs, not a game release: web encoding/packing and enemy rules still wait for the later integration.
+
 ## Phase 3: final list and upload
 
 Only after crop review, author the final enemy list and local output images. A later owner-approved task uploads

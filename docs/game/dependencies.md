@@ -21,7 +21,7 @@ are listed by hand below.
 **uma-rpg** (`package.json`)
 
 - Runtime: —
-- Dev: `turbo` ^2.10.13
+- Dev: `@napi-rs/canvas` 0.1.100, `turbo` ^2.10.13
 
 **@rpg/web** (`apps/web/package.json`)
 

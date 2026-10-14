@@ -86,6 +86,32 @@ The preceding classification is frozen exactly and becomes read-only. Crops save
 are capped to native resolution. Back up the whole authoring folder. Final image files are generated only after the
 whole crop-review pass is complete, not as each unit is approved. Do not seek new sources, change the game or upload.
 
+## Execute completed crops locally
+
+Once **every crop in the full roster is approved**, generate a versioned private export:
+
+```sh
+pnpm cast:export /absolute/path/to/uma-rpg/content
+```
+
+This writes lossless vertical/splash PNGs plus unchanged face copies to `content/authoring/exports/`, with exact
+frozen recipes/classification, a stable-ID manifest, hashes, dimensions and source provenance. Source images,
+current approvals, the game and bucket are untouched. Both franchises retain 2:3 / 16:9; native resolution caps
+prevent upscaling. No need to wait for game design. Later packing/encoding and upload are separate work.
+
+To keep the executor available after a temporary worktree is removed:
+
+```sh
+node scripts/cast/install-export.mjs /absolute/path/to/uma-rpg/content
+pnpm --dir /absolute/path/to/uma-rpg/content/tools/cast-export install
+node /absolute/path/to/uma-rpg/content/tools/cast-export/export-crops.mjs /absolute/path/to/uma-rpg/content
+```
+
+The same recipes/encoder fingerprint reuse and verify the completed export; interrupted runs retain and resume
+partial files. Corruption fails instead of overwriting. A changed recipe revision gets a new sibling folder.
+`complete.json` distinguishes finished bundles, and `exports/latest.json` points to the latest verified one.
+Back up all of `content/authoring/` to a separate drive; git intentionally contains no real images or votes.
+
 ## Legacy voting
 
 Legacy/ranking rounds retain their original four-vote scale:
