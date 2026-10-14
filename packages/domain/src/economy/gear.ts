@@ -1,79 +1,109 @@
-// Equipment (S7, design §7, D59, D86, D103; docs/design/progression.md): thirty types in ten grades. A recipe is four
-// refined items of its grade, one from each family of its half: the Arms half (Ores, Stones, Woods, Hides & Scales) makes
-// Arms, physical armor and Arms Orbs; the Arcana half (Crystals, Fibers, Essences, Bones & Horns) makes Tomes, magical
-// armor and Elemental Orbs. Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
-// What a piece does, all flat (D104): a weapon's Might (+4 a grade) adds to the offense of hits made with it; physical
-// armor adds DEF and a Barrier at the start of each fight, magical armor M.DEF and Regen each round; an armor piece's
-// accent adds ⌈g/2⌉ to its stat; an Orb adds its kind to every hit for weaknesses only.
-import { ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
+// Equipment (S7, design §7, D59, D86, D124; docs/design/gear-and-targets.md): forty types in ten grades. A recipe is two
+// refined items of its grade from its half (D125): physical gear takes the Arms half (Ores, Stones, Woods, Hides &
+// Scales), magical gear the Arcana half (Crystals, Fibers, Essences, Bones & Horns), each group its own pair so every
+// family is used at every grade. Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
+// What a piece does, all flat (D104, D124): a weapon's Might (+4 a grade) adds to the offense of hits made with it; an
+// armor piece adds ATK (physical) or M.ATK (magical), ⌈g/2⌉, and its slot's defensive stat, g; an Orb adds its kind to
+// every hit for weaknesses only; a Talisman or an Amulet gives one small defensive effect.
+import { ITEM_FAMILIES, type ItemFamily } from '../items/catalog'
 import { isRpgTome, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
-import { ARMOR_SLOTS, isMagicalArmor } from './ranks'
-import { armorKindOf, EQUIP_LABEL, gearIdentity, isOrb, isWeapon, orbKind, type EquipType, type GearSlot } from './gear-id'
+import { ACCESSORY_SLOTS, ARMOR_SLOT_STAT, ARMOR_SLOTS, armorSlotOf, isMagicalAccessory, isMagicalArmor } from './ranks'
+import {
+  accessoryKindOf, charmEffect, EQUIP_LABEL, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
+  type AccessoryEffects, type AccessoryType, type EquipType, type GearSlot,
+} from './gear-id'
 export * from './gear-id'
 
-/** The two halves of the gathering families (D86), by flavor: blade, whetstone, haft, grip; focus, pages, ink, binding. */
-const ARMS = ['ores', 'stones', 'woods', 'hides-scales'] as const
-const ARCANA = ['crystals', 'fibers', 'essences', 'bones-horns'] as const
-/** Whether a type is magical: Tomes, magical armor and Elemental Orbs. */
+/** Whether a type is magical: Tomes, magical armor, Elemental Orbs and Amulets. */
 export function isMagicalGear(type: EquipType): boolean {
   if (isWeapon(type)) return isRpgTome(type)
-  return isMagicalArmor(armorKindOf(type))
+  if (isArmor(type)) return isMagicalArmor(type)
+  return isMagicalAccessory(accessoryKindOf(type))
 }
-/** The four families each type takes, one refined item of each. */
-export const recipeFamilies = (type: EquipType): readonly string[] => (isMagicalGear(type) ? ARCANA : ARMS)
+/** The two families each group takes, one refined item of each (D125): weapons, armor, accessories; physical, magical. */
+const PAIRS = {
+  weapon: { physical: ['ores', 'woods'], magical: ['crystals', 'essences'] },
+  armor: { physical: ['hides-scales', 'stones'], magical: ['bones-horns', 'fibers'] },
+  accessory: { physical: ['ores', 'stones'], magical: ['crystals', 'fibers'] },
+} as const
+const groupOf = (type: EquipType): keyof typeof PAIRS => (isWeapon(type) ? 'weapon' : isArmor(type) ? 'armor' : 'accessory')
+export const recipeFamilies = (type: EquipType): readonly string[] => PAIRS[groupOf(type)][isMagicalGear(type) ? 'magical' : 'physical']
 const familyOf = (id: string): ItemFamily => ITEM_FAMILIES.find((f) => f.id === id)!
 
 export interface GearPiece {
-  /** `<type>-g<grade>`, or `<type>-g<grade>-<accent>` for armor, e.g. `lance-g3`, `helm-g3-atk`. */
+  /** `<type>-g<grade>`, e.g. `lance-g3`, `helm-g3`, `talisman-vital-g3`. */
   id: string
   type: EquipType
   grade: number
-  /** An armor piece's accent stat; null for weapons and Orbs. */
-  accent: ItemEffect | null
   name: string
   /** Refined materials, per piece. */
   inputs: Record<string, number>
 }
-const ACCENT_NAME: Readonly<Record<ItemEffect, string>> = {
-  hp: 'Stalwart', mp: 'Wellspring', atk: 'Fierce', matk: 'Arcane', def: 'Bulwark', mdef: 'Warded', speed: 'Swift', limit: 'Valiant',
-}
-/** A grade's prefix from the first family's raw item: "Copper", "Quartz". */
+/** A grade's prefix from its half's first family: "Copper", "Quartz". */
 const gradeWord = (type: EquipType, grade: number): string =>
-  familyOf(recipeFamilies(type)[0]!).raw[grade - 1]!.name.replace(/ (Ore|Log|Pelt|Hide|Scale|Bundle|Crystal|Shard|Fiber|Essence|Bone|Horn|Stone)$/, '')
-/** The piece an id names, or undefined. Pieces aren't stored as a list: any type × grade (× accent) exists. */
+  familyOf(isMagicalGear(type) ? 'crystals' : 'ores').raw[grade - 1]!.name.replace(/ (Ore|Log|Pelt|Hide|Scale|Bundle|Crystal|Shard|Fiber|Essence|Bone|Horn|Stone)$/, '')
+/** The piece an id names, or undefined. Pieces aren't stored as a list: any type × grade exists. */
 export function gearById(id: string): GearPiece | undefined {
   const piece = gearIdentity(id)
   if (!piece) return undefined
-  const { type, grade, accent } = piece
+  const { type, grade } = piece
   const inputs: Record<string, number> = {}
   for (const family of recipeFamilies(type)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
-  const name = `${accent ? `${ACCENT_NAME[accent]} ` : ''}${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`
-  return { id, type, grade, accent, name, inputs }
+  return { id, type, grade, name: `${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`, inputs }
 }
 
-// --- What a piece does (D104) -------------------------------------------------------------------------------------------
+// --- What a piece does (D104, D124) -------------------------------------------------------------------------------------
 
 /** A weapon's Might per grade, added to the offense of hits made with that weapon. */
 export const MIGHT_PER_GRADE = 4
-/** Physical armor's Barrier per grade at the start of each fight; magical armor's Regen per grade each round. */
-export const BARRIER_PER_GRADE = 5
-export const REGEN_PER_GRADE = 1
-export const accentPoints = (grade: number): number => Math.ceil(grade / 2)
+/** An armor piece's offense, ⌈g/2⌉ ATK or M.ATK; its slot's defensive stat is +1 a grade. */
+export const armorOffense = (grade: number): number => Math.ceil(grade / 2)
 
-/** An armor piece's stat points: its defense (DEF physical, M.DEF magical) and its accent. Weapons and Orbs give none. */
+/** The defensive effects of Talismans and Amulets (D124), per grade. Shares are per mille. */
+export const CHARM_PER_GRADE = {
+  /** HP healed each round (Vital); MP restored each round is ⌈g/2⌉ (Spring). */
+  regen: 1,
+  /** Share of physical damage she deals healed back (Vampire), of magical damage restored as MP (Siphon). */
+  lifesteal: 5, mpSteal: 2,
+  /** A shield against physical damage (Bulwark) or magical damage (Veil), at the start of each fight. */
+  shield: 5,
+  /** Share of physical (Iron) or magical (Ward) damage she doesn't take. */
+  guard: 5,
+  /** Share of physical (Thorn) or magical (Mirror) damage she takes that's returned to its attacker. */
+  thorns: 10,
+} as const
+
+/** One accessory's effect, added into `into`. */
+function addAccessory(into: AccessoryEffects, type: AccessoryType, g: number): void {
+  if (isOrb(type)) { into.orbs.push(orbKind(type)); return }
+  const c = CHARM_PER_GRADE
+  switch (charmEffect(type)) {
+    case 'vital': into.regen += c.regen * g; break
+    case 'vampire': into.lifesteal += c.lifesteal * g; break
+    case 'bulwark': into.barrier += c.shield * g; break
+    case 'iron': into.guard += c.guard * g; break
+    case 'thorn': into.thorns += c.thorns * g; break
+    case 'spring': into.mpRegen += Math.ceil(g / 2); break
+    case 'siphon': into.mpSteal += c.mpSteal * g; break
+    case 'veil': into.veil += c.shield * g; break
+    case 'ward': into.resist += c.guard * g; break
+    case 'mirror': into.mirror += c.thorns * g; break
+  }
+}
+
+/** A piece's stat points: armor gives its offense and its slot's defensive stat; weapons and accessories give none. */
 export function gearPoints(piece: GearPiece): Points {
   const p = noPoints()
-  if (isWeapon(piece.type) || isOrb(piece.type)) return p
-  if (isMagicalGear(piece.type)) p.mdef += piece.grade
-  else p.def += piece.grade
-  if (piece.accent) p[piece.accent] += accentPoints(piece.grade)
+  if (!isArmor(piece.type)) return p
+  p[isMagicalArmor(piece.type) ? 'matk' : 'atk'] += armorOffense(piece.grade)
+  p[ARMOR_SLOT_STAT[armorSlotOf(piece.type)]] += piece.grade
   return p
 }
 export const pieceOf = (equipped: Partial<Record<GearSlot, string>>, slot: GearSlot): GearPiece | undefined =>
   equipped[slot] ? gearById(equipped[slot]!) : undefined
 
-/** The points of what she wears: her five armor slots (weapons add Might instead). */
+/** The points of what she wears: her five armor slots (weapons add Might, accessories effects). */
 export function equippedPoints(equipped: Partial<Record<GearSlot, string>>): Points {
   return addPoints(noPoints(), ...ARMOR_SLOTS.map((s) => pieceOf(equipped, s)).filter((p) => p !== undefined).map(gearPoints))
 }
@@ -86,26 +116,24 @@ export function equippedMight(equipped: Partial<Record<GearSlot, string>>, weapo
   }
   return out
 }
-/** Her Barrier at the start of a fight (physical armor) and Regen each round (magical armor). */
-export function equippedGuard(equipped: Partial<Record<GearSlot, string>>): { barrier: number; regen: number } {
-  let barrier = 0, regen = 0
-  for (const slot of ARMOR_SLOTS) {
+/** What her two accessories do (D124). */
+export function equippedAccessories(equipped: Partial<Record<GearSlot, string>>): AccessoryEffects {
+  const out = noAccessoryEffects()
+  for (const slot of ACCESSORY_SLOTS) {
     const piece = pieceOf(equipped, slot)
-    if (!piece || isOrb(piece.type)) continue
-    if (isMagicalGear(piece.type)) regen += piece.grade * REGEN_PER_GRADE
-    else barrier += piece.grade * BARRIER_PER_GRADE
+    if (piece && isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade)
   }
-  return { barrier, regen }
+  return out
 }
-/** The kind her equipped Orb adds to every hit, if she wears one. */
-export function equippedOrb(equipped: Partial<Record<GearSlot, string>>): RpgDamageKind | undefined {
-  const piece = pieceOf(equipped, 'accessory')
-  return piece && isOrb(piece.type) ? orbKind(piece.type) : undefined
+/** One accessory's effects alone, for its line on a sheet. */
+export function accessoryEffects(piece: GearPiece): AccessoryEffects {
+  const out = noAccessoryEffects()
+  if (isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade)
+  return out
 }
 
-/** A piece's track, the line an Uma climbs one grade at a time (D119): its weapon, its armor kind, or for an Orb its own
- * type, so each of the ten Orbs climbs on its own. */
-export const gearTrackOf = (type: EquipType): string => (isWeapon(type) || isOrb(type) ? type : armorKindOf(type))
+/** A piece's track, the line an Uma climbs one grade at a time (D119): since D124 every type is its own track. */
+export const gearTrackOf = (type: EquipType): string => type
 
 /** A recipe's first family: every recipe family is a gathering family, so crafting raises Gathering & Crafting (§8.4). */
 export const mainFamily = (type: EquipType): string => recipeFamilies(type)[0]!

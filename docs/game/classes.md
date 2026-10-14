@@ -64,10 +64,13 @@ its weapon. Spell Blade, Cleric and Summoner choose each slot's weapon within th
 Brawler's and a Mage's slots are fixed to their five. A new Uma's slots hold her class's default spread, in Training
 weapons, so she starts with the depth-1 cores of those trees.
 
-**Armor slots (D103)** mirror them: head, body, legs, arms and an accessory, each holding its physical or its magical
-kind, with a Training piece of each kind until she wears a crafted one ([materials](materials.md#gear)). The accessory
-slot holds an **Orb**, one per kind (`orb-<kind>`, ten in all): it adds its kind to every hit for weaknesses only, with
-no damage of its own.
+**Armor slots (D103, D124)** mirror them: head, body, legs, arms and feet, each holding its physical or its magical
+piece, with a Training piece of each kind until she binds a crafted one ([materials](materials.md#gear)).
+
+**Two accessory slots (D124)** hold any two accessories of different types:
+- **Orbs** (offense): an Arms Orb or an Elemental Orb adds its kind to every hit, for weaknesses only, with no damage of
+  its own.
+- **Talismans** (physical defense) and **Amulets** (magical defense): one small effect each.
 
 ## Skills: depths, points and slots
 

@@ -1,6 +1,6 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
 // the indexes never ship in the main chunk; frames.test.ts pins every position against them.
-import { DISHES, gearById, ITEM_FAMILIES, itemById, type EquipType, type ItemEffect, type RpgDamageKind } from '@rpg/domain'
+import { DISHES, gearById, isAmulet, isTalisman, ITEM_FAMILIES, itemById, type EquipType, type RpgDamageKind } from '@rpg/domain'
 
 export const ATLAS_CELL = 32
 export type Sheet = 'items' | 'dishes' | 'gear'
@@ -11,13 +11,18 @@ export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
 }
 
 /** `kind`: a badge for pieces drawn with another type's art (a Tome's element, an Orb's kind). */
-export interface IconFrame { sheet: Sheet; x: number; y: number; accent?: ItemEffect; kind?: RpgDamageKind }
+export interface IconFrame { sheet: Sheet; x: number; y: number; kind?: RpgDamageKind }
 /** The gear atlas' rows (uma-art 2.1.0): D86's ten weapons (H03), the retired pre-D103 armor rows, Ring and Charm, the ten
- * Orbs, and D103's eight armor pieces (H27). Every type the game crafts has its own row. */
+ * Orbs, and D103's eight armor pieces (H27). D124's Boots and Slippers borrow the Greaves and Leggings rows, Talismans
+ * the Charm row and Amulets the Ring row, until their own art is drawn (H28). */
 export const GEAR_ART_ROWS = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark',
   'garb', 'leather', 'mail', 'plate', 'ring', 'charm', 'orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana', 'orb-fire', 'orb-ice',
   'orb-lightning', 'orb-light', 'orb-dark', 'helm', 'cuirass', 'greaves', 'gauntlets', 'circlet', 'robe', 'leggings', 'bracers'] as const
 export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
+  if (type === 'boots') return { row: 'greaves' }
+  if (type === 'slippers') return { row: 'leggings' }
+  if (isTalisman(type)) return { row: 'charm' }
+  if (isAmulet(type)) return { row: 'ring' }
   return { row: type as (typeof GEAR_ART_ROWS)[number] }
 }
 
@@ -38,7 +43,7 @@ const DISH_FRAMES = new Map<string, IconFrame>()
   }
 }
 
-/** An item, dish or gear piece's icon; gear carries its accent for the corner mark. */
+/** An item, dish or gear piece's icon. */
 export function iconFrame(id: string): IconFrame | null {
   const item = itemById(id)
   if (item) {
@@ -50,13 +55,7 @@ export function iconFrame(id: string): IconFrame | null {
   const piece = gearById(id)
   if (piece) {
     const art = gearArt(piece.type)
-    return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, ...(piece.accent ? { accent: piece.accent } : {}),
-      ...(art.kind ? { kind: art.kind } : {}) }
+    return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, ...(art.kind ? { kind: art.kind } : {}) }
   }
   return null
-}
-
-/** The accent mark's colour per effect (the gear atlas leaves its bottom-right 9×9 clear for it). */
-export const ACCENT_COLOR: Readonly<Record<ItemEffect, string>> = {
-  hp: '#e2504f', mp: '#4c8df0', atk: '#f08a35', matk: '#a66ff2', def: '#a3b0c2', mdef: '#33c2b0', speed: '#7cd650', limit: '#f4cb45',
 }

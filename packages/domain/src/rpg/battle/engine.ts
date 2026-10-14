@@ -101,6 +101,7 @@ function validMove(m: BattleEnemyMove): boolean {
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a)) return false
+  if (!validCharms(a, version)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
   if (v8 && (!safeInt(a.classRank, 1, 50) || a.maxDepth !== undefined || (a.barrier !== undefined && !safeInt(a.barrier, 0, 100_000)) ||
     (a.regen !== undefined && !safeInt(a.regen, 0, 10_000)) || (a.might !== undefined && (typeof a.might !== 'object' || a.might === null ||
@@ -116,6 +117,16 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
 }
+/** v11 (D124): two Orbs' kinds instead of one, and the accessories' defensive effects, each within its bounds. */
+function validCharms(a: BattleAlly, version: BattleInput['version']): boolean {
+  const shares = [a.lifesteal, a.mpSteal, a.guard, a.resist, a.thorns, a.mirror]
+  if (version < 11) return a.orbs === undefined && a.veil === undefined && a.mpRegen === undefined && shares.every((v) => v === undefined)
+  return a.orb === undefined && (a.orbs === undefined || (Array.isArray(a.orbs) && a.orbs.length <= 2 && a.orbs.every(isRpgDamageKind) &&
+    new Set(a.orbs).size === a.orbs.length)) && (a.veil === undefined || safeInt(a.veil, 0, 100_000)) &&
+    (a.mpRegen === undefined || safeInt(a.mpRegen, 0, 10_000)) && shares.every((v) => v === undefined || safeInt(v, 0, 1000))
+}
+/** The kinds her Orbs add to every hit: v11's two, or older fights' one. */
+const orbsOf = (a: BattleAlly): readonly RpgDamageKind[] | undefined => a.orbs ?? (a.orb ? [a.orb] : undefined)
 /** v9 (D106): a Hero has her seat and no Heroes of her own; a Learner at most two different seats, each with a Bond Level. */
 function validHeroes(a: BattleAlly): boolean {
   if (a.hero !== undefined && (!isHeroLimitId(a.hero) || a.inherits !== undefined)) return false
@@ -141,9 +152,9 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8 } as const
 function validateInput(input: BattleInput): void {
-  if (!input || ![6, 7, 8, 9, 10].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || ![6, 7, 8, 9, 10, 11].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
@@ -203,7 +214,8 @@ export function createBattle(source: BattleInput): BattleStep {
   const input = JSON.parse(JSON.stringify(source)) as BattleInput
   const base = { statuses: [], barrier: 0, phase: 1 as const, guardingFor: null, brokenAt: 0, revived: false, limit: 0 }
   const units: BattleUnit[] = [
-    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0, barrier: a.barrier ?? 0 })),
+    ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0, barrier: a.barrier ?? 0,
+      ...(input.version >= 11 ? { veil: a.veil ?? 0 } : {}) })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
   const state: BattleState = { engineVersion: input.version, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active',
@@ -219,8 +231,8 @@ export function battleHitIsWeak(enemy: BattleEnemy, foe: BattleUnit | null, kind
     (!!foe && stacks(foe, 'hex') > 0 && (kind === 'light' || kind === 'dark'))
 }
 
-/** `orb`: the attacker's Orb kind, which makes a hit weak too (D86), with no damage of its own. */
-interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orb?: RpgDamageKind }
+/** `orbs`: the attacker's Orb kinds, which make a hit weak too (D86, D124), with no damage of their own. */
+interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[] }
 /** One part's final amount; shared by live play, previews and the simulator. */
 export function battleDamage(s: BattleState, attacker: BattleUnit, defender: BattleUnit, channel: BattleChannel,
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
@@ -232,7 +244,7 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   const defense = channel === 'physical' ? def.pdef : def.mdef
   let amount = Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
-  const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || battleHitIsWeak(foe, defender, options.orb ?? null))
+  const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || !!options.orbs?.some((o) => battleHitIsWeak(foe, defender, o)))
   if (weak) amount *= BATTLE_WEAK
   const physical = channel === 'physical'
   amount *= 1 + stacks(attacker, physical ? 'brave' : 'faith') * BATTLE_STATUS_STEP
@@ -248,6 +260,9 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   if (foe && !battleBroken(defender) && options.special !== 'pierce') amount *= BATTLE_UNBROKEN_FACTOR
   const evasion = defender.side === 'ally' ? allyOf(s, defender.id)?.evasion ?? 0 : 0
   if (evasion > 0) amount *= 1 - evasion / 1000
+  // v11: an Iron Talisman or a Ward Amulet cuts the damage she takes of its channel (D124).
+  const cut = defender.side === 'ally' ? (physical ? allyOf(s, defender.id)?.guard : allyOf(s, defender.id)?.resist) ?? 0 : 0
+  if (cut > 0) amount *= 1 - cut / 1000
   return { amount: Math.max(1, Math.round(amount)), weak }
 }
 
@@ -288,6 +303,7 @@ function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgH
     receiver.hp = Math.max(0, receiver.hp - amount)
     cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel, element: part.kind, weak: result.weak,
       label: receiver !== target ? 'Intercepted' : undefined })
+    if (actor.side === 'ally') drain(s, actor, channel, amount, cues)
     if (receiver.hp === 0) { cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id }); break }
     if (!result.weak || battleBroken(receiver) || receiver.shield === 0) continue
     anyWeak = true
@@ -302,18 +318,46 @@ function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgH
   return { receiver, weak: anyWeak }
 }
 
-/** Damage from a foe to an ally: a Barrier absorbs first. */
+/** v11: a Vampire Talisman heals her from the physical damage she deals, a Siphon Amulet restores MP from the magical. */
+function drain(s: BattleState, actor: BattleUnit, channel: BattleChannel, amount: number, cues: BattleCue[]): void {
+  const ally = allyOf(s, actor.id)
+  if (!ally || actor.hp <= 0) return
+  if (channel === 'physical' && ally.lifesteal) {
+    const healed = Math.min(Math.floor(amount * ally.lifesteal / 1000), maxHp(s, actor.id) - actor.hp)
+    if (healed > 0) { actor.hp += healed; cues.push({ kind: 'status', actorId: actor.id, targetId: actor.id, label: `Lifesteal +${healed}`, amount: healed }) }
+  } else if (channel === 'magical' && ally.mpSteal) {
+    const gained = Math.min(Math.floor(amount * ally.mpSteal / 1000), ally.stats.mp - actor.mp)
+    if (gained > 0) { actor.mp += gained; cues.push({ kind: 'mp', actorId: actor.id, targetId: actor.id, amount: gained }) }
+  }
+}
+
+/** Damage from a foe to an ally: a Barrier absorbs first (v11: a Barrier physical damage, a Veil magical damage), and a
+ * Thorn Talisman or a Mirror Amulet returns a share of it to the foe (D124). */
 function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: BattleEnemyMove, cues: BattleCue[], intercept: boolean): void {
   const receiver = intercept ? guardOf(s, target) : target
   const result = battleDamage(s, actor, receiver, move.channel, move.power / 100, move.element, { area: move.target === 'all' })
   let amount = receiver !== target ? Math.max(1, Math.round(result.amount * BATTLE_GUARD_FACTOR)) : result.amount
-  const absorbed = Math.min(receiver.barrier, amount)
-  receiver.barrier -= absorbed
+  const taken = amount
+  const v11 = s.input.version >= 11
+  const useVeil = v11 && move.channel === 'magical'
+  const pool = useVeil ? receiver.veil ?? 0 : receiver.barrier
+  const absorbed = Math.min(pool, amount)
+  if (useVeil) receiver.veil = pool - absorbed
+  else receiver.barrier -= absorbed
   amount -= absorbed
   receiver.hp = Math.max(0, receiver.hp - amount)
   cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel: move.channel, element: move.element, weak: false,
-    label: receiver !== target ? 'Intercepted' : absorbed ? `Barrier −${absorbed}` : undefined })
+    label: receiver !== target ? 'Intercepted' : absorbed ? `${useVeil ? 'Veil' : 'Barrier'} −${absorbed}` : undefined })
   if (receiver.hp === 0) cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id })
+  const ally = v11 ? allyOf(s, receiver.id) : undefined
+  const share = ally ? (move.channel === 'physical' ? ally.thorns : ally.mirror) ?? 0 : 0
+  const back = Math.floor(taken * share / 1000)
+  if (back > 0 && actor.hp > 0) {
+    actor.hp = Math.max(0, actor.hp - back)
+    cues.push({ kind: 'hit', actorId: receiver.id, targetId: actor.id, amount: back, channel: move.channel, element: null, weak: false,
+      label: move.channel === 'physical' ? 'Thorns' : 'Mirror' })
+    if (actor.hp === 0) cues.push({ kind: 'ko', actorId: receiver.id, targetId: actor.id })
+  }
 }
 
 /** When the wave on the field falls and another waits (v7), it enters at the start of a fresh round: the party keeps
@@ -368,6 +412,7 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (!move) throw new RangeError('Frozen intent no longer matches phase')
     if (move.kind === 'damage' && move.target === 'all') {
       for (const target of living(s, 'ally')) {
+        if (actor.hp <= 0) break
         harm(s, actor, target, move, cues, false)
         if (target.hp > 0 && move.status) { addStatus(target, move.status); cues.push({ kind: 'status', actorId: actor.id, targetId: target.id, label: move.status }) }
       }
@@ -406,10 +451,13 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
       if (u.hp === 0) { cues.push({ kind: 'ko', actorId: u.id, targetId: u.id }); continue }
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
-    // v8: magical armor's Regen (D104).
+    // v8: magical armor's Regen (D104); v11: a Vital Talisman's, and a Spring Amulet's MP (D124).
     const regen = u.side === 'ally' ? allyOf(s, u.id)?.regen ?? 0 : 0
     const healed = Math.min(regen, maxHp(s, u.id) - u.hp)
     if (healed > 0) { u.hp += healed; cues.push({ kind: 'status', actorId: u.id, targetId: u.id, label: `Regen +${healed}`, amount: healed }) }
+    const mpRegen = u.side === 'ally' ? allyOf(s, u.id)?.mpRegen ?? 0 : 0
+    const mp = Math.min(mpRegen, (allyOf(s, u.id)?.stats.mp ?? 0) - u.mp)
+    if (mp > 0) { u.mp += mp; cues.push({ kind: 'mp', actorId: u.id, targetId: u.id, amount: mp }) }
   }
   if (nextWave(s, cues) || terminal(s, cues)) return
   // Each wave gets the round cap, so a three-wave stage isn't rushed.
@@ -453,9 +501,9 @@ function randomFoe(s: BattleState, actorId: string, hit: number, salt = 'random'
 interface CastLog { tapped: BattleUnit; struck: BattleUnit[]; hitFoes: BattleUnit[]; weak: boolean }
 
 /** Resolves a skill's hits, extras, riders and status. */
-function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random', orb?: RpgDamageKind): CastLog {
+function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random', orbs?: readonly RpgDamageKind[]): CastLog {
   const log: CastLog = { tapped, struck: [], hitFoes: [], weak: false }
-  const options: HitOptions = { special: def.special, orb }
+  const options: HitOptions = { special: def.special, orbs }
   const note = (foe: BattleUnit, _hit: RpgHit, weak: boolean) => {
     if (!log.struck.includes(foe)) log.struck.push(foe)
     log.hitFoes.push(foe)
@@ -536,7 +584,7 @@ function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: Bat
   const foes = living(s, 'enemy')
   if (!node || !foes.length) return
   cues.push({ kind: 'summon', actorId: actor.id, targetId: target.id, label: node.name })
-  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', ally.orb)
+  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', orbsOf(ally))
 }
 function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): void {
   s.summons = [...s.summons.filter((x) => x.allyId !== allyId), { allyId, ref: { tier: ref.tier, id: ref.id }, scale }]
@@ -548,19 +596,19 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
   if (!foes.length || actor.hp <= 0) return
   const tapped = target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!
   if (half.kind === 'attack') {
-    strike(s, actor, tapped, { power: 1, parts: [{ kind: rpgWeaponKind(half.weapon), share: 1 }] }, scale, cues, true, { orb: ally.orb })
+    strike(s, actor, tapped, { power: 1, parts: [{ kind: rpgWeaponKind(half.weapon), share: 1 }] }, scale, cues, true, { orbs: orbsOf(ally) })
     return
   }
   const def = half.skill.def
   if (def.summon) linger(s, actor, ally, tapped, cues)
   const now = tapped.hp > 0 ? tapped : living(s, 'enemy').sort(byHpShare(s))[0]
   if (!now) return
-  cast(s, actor, now, def, scale, cues, salt, ally.orb)
+  cast(s, actor, now, def, scale, cues, salt, orbsOf(ally))
   if (def.summon) stay(s, actor.id, half.skill.ref, def.summon.linger)
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if (![6, 7, 8, 9, 10].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if (![6, 7, 8, 9, 10, 11].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)
@@ -591,7 +639,7 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     plan.casts.forEach((c, i) => {
       const foes = living(s, 'enemy')
       if (!foes.length || actor.hp <= 0) return
-      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random', ally.orb)
+      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random', orbsOf(ally))
     })
     if (plan.linger) stay(s, actor.id, plan.linger.ref, plan.linger.scale)
   } else {

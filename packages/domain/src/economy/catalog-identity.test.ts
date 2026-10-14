@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { ITEM_EFFECTS } from '../items/kinds'
 import { DISHES } from './dishes'
 import { isDishId } from './dish-id'
 import { EQUIP_TYPES, gearById } from './gear'
@@ -14,15 +13,14 @@ describe('light cooking and equipment ids (H16)', () => {
       expect(isDishId(id), id).toBe(false)
     }
   })
-  it('matches every type × grade (× accent for armor), preserves readable zero-padded grades, and rejects bad ids (D103)', () => {
-    for (const type of EQUIP_TYPES) for (let grade = 1; grade <= 10; grade++) for (const accent of [...ITEM_EFFECTS, null]) {
-      const id = accent ? `${type}-g${grade}-${accent}` : `${type}-g${grade}`, piece = gearById(id)
-      if (!piece) { expect(gearIdentity(id), id).toBeUndefined(); continue }
-      expect(gearIdentity(id)).toEqual({ id: piece.id, type: piece.type, grade: piece.grade, accent: piece.accent })
+  it('matches every type × grade, preserves readable zero-padded grades, and rejects bad ids (D124)', () => {
+    for (const type of EQUIP_TYPES) for (let grade = 1; grade <= 10; grade++) {
+      const id = `${type}-g${grade}`, piece = gearById(id)!
+      expect(gearIdentity(id)).toEqual({ id: piece.id, type: piece.type, grade: piece.grade })
     }
-    expect(gearIdentity('lance-g01')).toMatchObject({ type: 'lance', grade: 1, accent: null })
-    expect(gearIdentity('helm-g01-atk')).toMatchObject({ type: 'helm', grade: 1, accent: 'atk' })
-    for (const id of ['spear-g1', 'lance-g0', 'lance-g11', 'lance-g001', 'lance-g1-atk', 'helm-g1-power', 'helm-g1', 'unknown']) {
+    expect(gearIdentity('lance-g01')).toMatchObject({ type: 'lance', grade: 1 })
+    expect(gearIdentity('talisman-thorn-g10')).toMatchObject({ type: 'talisman-thorn', grade: 10 })
+    for (const id of ['spear-g1', 'lance-g0', 'lance-g11', 'lance-g001', 'lance-g1-atk', 'helm-g1-atk', 'mail-g1', 'unknown']) {
       expect(gearIdentity(id), id).toBeUndefined()
     }
   })

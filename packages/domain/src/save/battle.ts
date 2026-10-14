@@ -1,5 +1,6 @@
 // Battle rules over the save (S3, D86, D102): classes, their weapons and skills, the world's fights and their rewards. A
-// win fills four bars: Uma Level, the Class Rank she fought as, her five weapons' and her five armor kinds' ranks. Pure
+// win fills four bars: Uma Level, the Class Rank she fought as, her five weapons' and her five armor kinds' ranks, and her
+// accessories' kinds (D124). Pure
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
 // docs/design/class-rework.md, docs/design/progression.md.
 import type { Aptitudes } from '@luismlorenzana/uma-data'
@@ -20,12 +21,12 @@ import {
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import {
-  ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares, withTrack,
-  type RankRef, type RankTrack, type Ranks,
+  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares,
+  withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { starPoints } from '../economy/dishes'
 import { addPoints, type Points } from '../economy/bonus'
-import { equippedGuard, equippedMight, equippedOrb, equippedPoints, gearById } from '../economy/gear'
+import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -246,11 +247,9 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
     const uma = ownedOf(world, id)
     const classId = activeClass(outfit, uma)
-    const orb = equippedOrb(uma.gear.equipped)
-    const { barrier, regen } = equippedGuard(uma.gear.equipped)
     return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      ...(orb ? { orb } : {}), points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons), barrier, regen,
-      ...heroFields(world, id) }
+      points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
+      accessories: equippedAccessories(uma.gear.equipped), ...heroFields(world, id) }
   })
   try {
     return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)
@@ -347,7 +346,8 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
 /**
  * Pays a won fight to its entrants (D102). Each earns her Uma EXP `E` (a share of her own level, less when the foes are
  * below her, times `share` on a replay, D79) and with it fills her bars: 2E to the class she fought as, 5E over her five
- * weapons (double for each she used), E to each of her five armor kinds. EXP past a max rank banks at half rate as
+ * weapons (double for each she used), E to each of her five armor kinds and E to the kind of each accessory she wears
+ * (D124). EXP past a max rank banks at half rate as
  * Marks. A Learner's Bonds fill too (D106). A Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
  */
 export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
@@ -376,6 +376,11 @@ export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind
     fill({ kind: 'class', id: e.classId }, CLASS_EXP_SHARE * exp)
     for (const [w, n] of Object.entries(weaponExpShares(e.weapons, e.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
     for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
+    // Each accessory she wears fills its kind's Accessory Rank (D124).
+    for (const slot of ACCESSORY_SLOTS) {
+      const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+      if (piece && isAccessory(piece.type)) fill({ kind: 'accessory', id: accessoryKindOf(piece.type) }, ACCESSORY_EXP_SHARE * exp)
+    }
     // Bonds (D106) pay by the stage alone: every won fight counts, replays and Sweeps too.
     const bonded = payBonds(world, e.outfitId, { ...uma, level: gained.level, exp: gained.exp, ranks }, kind)
     umas[e.outfitId] = bonded.uma

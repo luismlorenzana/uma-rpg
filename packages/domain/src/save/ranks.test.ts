@@ -44,7 +44,7 @@ describe('ranks (D102)', () => {
     expect(grantTrack({ rank: 9, exp: gearExpToNext(9) - 10 }, 'armor', 30)).toEqual({ track: { rank: 10, exp: 0 }, ranksUp: 1, overflow: 20 })
     expect(grantTrack({ rank: 50, exp: 0 }, 'class', 500)).toEqual({ track: { rank: 50, exp: 0 }, ranksUp: 0, overflow: 500 })
     // A fresh track isn't stored.
-    expect(withTrack({ classes: {}, weapons: { lance: { rank: 2, exp: 0 } }, armors: {} }, { kind: 'weapon', id: 'lance' }, { rank: 1, exp: 0 }).weapons).toEqual({})
+    expect(withTrack({ classes: {}, weapons: { lance: { rank: 2, exp: 0 } }, armors: {}, accessories: {} }, { kind: 'weapon', id: 'lance' }, { rank: 1, exp: 0 }).weapons).toEqual({})
   })
 
   it('splits 5E over her five weapons, two parts for each one she used', () => {
@@ -128,15 +128,16 @@ describe('save v18: the progress reset (D105)', () => {
     const w = worldOf(save)
     const uma = w.umas['101']!
     expect(save.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
-    expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {} }, bonds: {} })
+    expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {}, accessories: {} }, bonds: {} })
     expect(uma.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: [], loadout: null })
     expect(uma.professions.farming).toEqual({ level: 7, exp: 3 })
     expect(uma.stars).toEqual({ unlocked: expect.arrayContaining(['moon:hp:1']), active: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1'] })
     // Gear renamed: weapons and Orbs lose accents (a duplicate gives its materials back), Mail becomes a Cuirass, a Ring
     // gives its materials back; only grade-1 pieces stay on.
-    expect(uma.gear).toEqual({ locker: ['greatsword-g1', 'cuirass-g2-def', 'orb-fire-g1'], equipped: { greatsword: 'greatsword-g1', accessory: 'orb-fire-g1' },
-      kinds: { accessory: 'elemental-orb' } })
-    expect(w.gear).toEqual({ 'cuirass-g1-atk': 2, 'tome-ice-g1': 1 })
+    // v20 (D124) then drops armor accents and moves the Orb to her first accessory slot.
+    expect(uma.gear).toEqual({ locker: ['greatsword-g1', 'cuirass-g2', 'orb-fire-g1'], equipped: { greatsword: 'greatsword-g1', 'accessory-1': 'orb-fire-g1' },
+      kinds: {} })
+    expect(w.gear).toEqual({ 'cuirass-g1': 2, 'tome-ice-g1': 1 })
     expect(Object.keys(w.items).some((id) => id.startsWith('token-'))).toBe(false)
     expect(w.items['wheat-flour']).toBe(1)
     expect(w.items['copper-ingot']).toBe(2) // the duplicate Greatsword's and the Ring's

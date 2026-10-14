@@ -4,6 +4,7 @@
 import { applyBattleAction, createBattle, replayBattle } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
+import { noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
 import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 import { RPG_MAX_BATTLE_ACTIONS, type RpgRun } from './run-state'
@@ -29,11 +30,11 @@ export function rpgRestAtCamp(chapter: RpgCampaignChapter, run: RpgRun, campId: 
   return { ...run, wins: { ...run.wins, [campId]: Math.max(1, run.wins[campId] ?? 0) }, mp: {}, updatedAt: now }
 }
 
-/** A party member as she enters a fight: her profile, her class's equipped skills, her Orb's kind, her stat points, her
- * weapons' Might and her armor's Barrier and Regen (D104), and her Hero seat or inherited Limit Breaks (D106). */
+/** A party member as she enters a fight: her profile, her class's equipped skills, her stat points, her weapons' Might
+ * (D104), what her two accessories do (D124), and her Hero seat or inherited Limit Breaks (D106). */
 export interface RpgPartyMember {
-  profile: RpgProfile; loadout: RpgProfile['tree']; orb?: BattleInput['allies'][number]['orb']; points?: Points
-  might?: BattleInput['allies'][number]['might']; barrier?: number; regen?: number
+  profile: RpgProfile; loadout: RpgProfile['tree']; points?: Points
+  might?: BattleInput['allies'][number]['might']; accessories?: AccessoryEffects
   hero?: BattleInput['allies'][number]['hero']; inherits?: BattleInput['allies'][number]['inherits']
 }
 
@@ -50,8 +51,8 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
-/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v10: Limit Breaks
- * only from the Halls of Heroes, D112; v9 Heroes and Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
+/** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v11: two accessories
+ * and their effects, D124; v10 Limit Breaks only from the Halls of Heroes, D112; v9 Heroes and Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
 export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, nodeId: string,
   party: readonly RpgPartyMember[], now: string): RpgRun {
   const node = chapter.nodes.find((n) => n.id === nodeId)
@@ -61,13 +62,17 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
-    version: 10, seed: seedOf(battleId),
-    allies: party.map(({ profile, loadout, orb, points, might, barrier, regen, hero, inherits }) => {
+    version: 11, seed: seedOf(battleId),
+    allies: party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
+      const a = accessories ?? noAccessoryEffects()
+      // Only what's there goes in the frozen fight: an absent effect is 0.
+      const effects = Object.fromEntries((['barrier', 'veil', 'regen', 'mpRegen', 'lifesteal', 'mpSteal', 'guard', 'resist', 'thorns', 'mirror'] as const)
+        .filter((k) => a[k] > 0).map((k) => [k, a[k]]))
       return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
-        tree: profile.tree, legacy: profile.legacy, loadout, ...(orb ? { orb } : {}), mp: rpgCarriedMp(run, profile, points),
+        tree: profile.tree, legacy: profile.legacy, loadout, ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: rpgCarriedMp(run, profile, points),
         classRank: profile.classRank,
-        ...(might && Object.keys(might).length ? { might } : {}), ...(barrier ? { barrier } : {}), ...(regen ? { regen } : {}),
+        ...(might && Object.keys(might).length ? { might } : {}), ...effects,
         ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
         ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }
     }),

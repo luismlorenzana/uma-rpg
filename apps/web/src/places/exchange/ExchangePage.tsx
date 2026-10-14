@@ -2,8 +2,8 @@
 // (30 minutes off any job, D74) and Sweep Tickets (replay a beaten regular stage at once, for a quarter of its first
 // clear, D79). Marks banked past max ranks buy Manuals: EXP for one bar of one Uma (D102).
 import {
-  ARMOR_KINDS, ARMOR_LABEL, armorTrack, classTrack, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
-  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, weaponTrack, type ItemSide, type RankRef, type RosterOutfit, type TierWorld,
+  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
+  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type ItemSide, type RankRef, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_LABEL, WEAPON_LABEL } from '../../battle/labels'
@@ -108,7 +108,7 @@ function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster
   const uma = outfitId ? world.umas[outfitId] : null
   const read = (ref: RankRef, n: number) => readManual(outfitId!, ref, n).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t read it.'))
   const bar = (ref: RankRef, label: string) => {
-    const track = ref.kind === 'class' ? classTrack(uma!.ranks, ref.id) : ref.kind === 'weapon' ? weaponTrack(uma!.ranks, ref.id) : armorTrack(uma!.ranks, ref.id)
+    const track = trackOf(uma!.ranks, ref)
     const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks
     const most = Math.floor(marks / MANUAL_PRICE)
     return (
@@ -142,6 +142,7 @@ function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster
           <section><h4 className="text-micro mb-1">Classes</h4><ul className="space-y-1">{RPG_CLASSES.map((c) => bar({ kind: 'class', id: c }, CLASS_LABEL[c]))}</ul></section>
           <section><h4 className="text-micro mb-1">Weapons</h4><ul className="space-y-1">{WEAPON_TYPES.map((w) => bar({ kind: 'weapon', id: w }, WEAPON_LABEL[w]))}</ul></section>
           <section><h4 className="text-micro mb-1">Armor</h4><ul className="space-y-1">{ARMOR_KINDS.map((k) => bar({ kind: 'armor', id: k }, ARMOR_LABEL[k]))}</ul></section>
+          <section><h4 className="text-micro mb-1">Accessories</h4><ul className="space-y-1">{ACCESSORY_KINDS.map((k) => bar({ kind: 'accessory', id: k }, ACCESSORY_LABEL[k]))}</ul></section>
           <button type="button" onClick={() => setOutfitId(null)} className="text-[13px] text-ink-soft underline">Choose another Uma</button>
           {error && <p className="text-[13px] text-danger">{error}</p>}
         </div>

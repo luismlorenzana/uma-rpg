@@ -66,6 +66,7 @@ Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-an
 | Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees: cores at 1, 10, 20, 30, 40; side skills at 5 … 45; a side point a rank |
 | Weapon Rank, per weapon | 1–10 | 5E over her five weapons, double for each she used | Wears that weapon up to its rank's grade |
 | Armor Rank, per armor kind | 1–10 | 1E to each of her five armor kinds | Wears that kind up to its rank's grade |
+| Accessory Rank, per accessory kind | 1–10 | 1E to the kind of each accessory she wears | Wears accessories of that kind up to its rank's grade |
 
 | Class Rank | EXP to next |
 |---|---|
@@ -85,7 +86,7 @@ Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-an
 | 7 | 3,240 | Lv 36 |
 | 9 | 4,040 | Lv 46 |
 
-Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs 1,000 Marks and gives 1,000 EXP to one bar of one Uma. Armor kinds by slot: Head Helm or Circlet; Body Cuirass or Robe; Legs Greaves or Leggings; Arms Gauntlets or Bracers; Accessory Arms Orb or Elemental Orb. 10 kinds in all.
+Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs 1,000 Marks and gives 1,000 EXP to one bar of one Uma. Armor kinds by slot: Head Helm or Circlet; Body Cuirass or Robe; Legs Greaves or Leggings; Arms Gauntlets or Bracers; Feet Boots or Slippers. 10 kinds in all. Accessory kinds: Arms Orb, Elemental Orb, Talisman, Amulet.
 <!-- /live -->
 
 - **What a win pays,** for `E` Uma EXP: her class 2E; her five slotted weapons share 5E, two parts for each weapon she
@@ -171,12 +172,20 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when
   ([sections](sections.md#global-ui)).
 - **Recall:** pays what's finished and returns the inputs of everything unfinished. Only the time is lost.
-- **Targets (D100):** mark up to five Umas on their profile. Every facility then lists what maxing them still takes
-  from it: a dish for each Extra Stats node they haven't opened, and in each of their ten gear slots (their class's five
-  weapons, their five armor slots' kinds) every grade above the best they've bound, up to the best their ranks let them
-  wear (D119). A dish she has eaten or a piece she has bound drops off the list. Needs cascade: the pieces and
-  dishes still short need refined items, and those still short need raw ones. The Warehouse and running or queued jobs
-  count first.
+- **Targets (D100, D126):** mark up to five Umas on their profile. Every facility then lists what maxing them still
+  takes from it:
+  - **The Forge:** every grade above the best she has bound, up to 10, on her class's five weapons, her five armor
+    slots' kinds and the type in each accessory slot (an empty one plans nothing).
+  - **The Kitchen:** a dish for each Extra Stats node she hasn't opened.
+  - **The Pantry, Workbench and sites:** the refined and raw items those still need.
+  - **Each line** shows the total need, what's in the Warehouse and what's coming. It stays until the Warehouse holds
+    enough, then goes.
+  - **Cascade:** only what's still short (not in stock, not being made) reaches the ingredients, so when a line is
+    covered every line below it for that need goes too.
+  - **Stock held by queued jobs** isn't counted as free, and a queued job counts as coming only if its inputs are in
+    the Warehouse.
+  - **Leaving the list:** a piece she binds or a dish she eats drops off. Several targets add up.
+  ([design](../design/gear-and-targets.md))
 - **Upgrades:**
   - Facilities level 1–3: more slots, then speed.
   - The cost is Laurels plus refined items of the facility's two families. A site's two families are its own and its
@@ -213,16 +222,23 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   - Limit: a 0.4 head start on the Limit Break gauge.
 
 **Gear** (the Forge, [materials](materials.md#gear)):
-- **Slots (D103):** her class's five weapon slots and five armor slots (head, body, legs, arms, accessory), each armor
-  slot holding its physical or its magical kind. An empty slot holds the Training piece of its kind: grade 0, no stats.
-- **What it does (D104):**
+- **Slots (D124):**
+  - her class's five weapon slots;
+  - five armor slots (head, body, legs, arms, feet), each holding its physical or its magical piece;
+  - two accessory slots, holding two accessories of different types.
+
+  An empty weapon or armor slot holds the Training piece of its kind (grade 0, no stats); an empty accessory slot holds
+  nothing.
+- **What it does (D104, D124):**
   - A weapon's **Might**, +4 a grade, adds to the offense of hits made with that weapon.
-  - Physical armor: +1 DEF a grade and a **Barrier** of 5 a grade at the start of each fight.
-  - Magical armor: +1 MDEF a grade and **Regen** of 1 HP a grade at the end of each round.
-  - An armor piece's accent: +⌈g ÷ 2⌉ points to its stat. An Orb adds its kind to every hit, for weaknesses.
-- **Wearing a grade:** grade g needs her Weapon Rank (for a weapon) or Armor Rank (for its kind) ≥ g.
+  - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉, and its slot's defensive stat +g. Head DEF, body HP, legs MP,
+    arms MDEF, feet Speed.
+  - An Orb adds its kind to every hit, for weaknesses. A Talisman or an Amulet gives one small defensive effect
+    ([combat](combat.md#damage)).
+- **Wearing a grade:** grade g needs her Weapon Rank (for a weapon), Armor Rank (for its kind) or Accessory Rank (for
+  the accessory's kind) ≥ g.
 - **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.
-- **In order (D119):** each weapon, each armor kind and each of the ten Orbs is a track she climbs one grade at a time.
+- **In order (D119):** each weapon, each armor kind and each accessory type is a track she climbs one grade at a time.
   From the stock she can bind only the grade above the best she has on that track (her Training piece is grade 0), so
   grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
   and the stock above it.

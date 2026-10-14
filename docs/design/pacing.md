@@ -127,13 +127,13 @@ packet assumptions: 40 seconds regular, 70 elite, 100 boss, not measured play ti
 
 EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.
 
-| Grade | Refined / ten-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |
+| Grade | Refined / twelve-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |
 |---|---|---|---|
-| 2 | 40 | 0.44 / 0.44 | 0 / 0 |
-| 4 | 40 | 0.25 / 0.25 | 1 / 1 |
-| 6 | 40 | 0.18 / 0.18 | 0 / 0 |
-| 8 | 40 | 0.14 / 0.14 | 1 / 1 |
-| 10 | 40 | 0.10 / 0.10 | 1 / 1 |
+| 2 | 24 | 0.44 / 0.44 | 0 / 0 |
+| 4 | 24 | 0.25 / 0.25 | 1 / 1 |
+| 6 | 24 | 0.18 / 0.18 | 0 / 0 |
+| 8 | 24 | 0.14 / 0.14 | 1 / 1 |
+| 10 | 24 | 0.10 / 0.10 | 1 / 1 |
 
 Total: **119 wins** (118 first, 1 replay), **92.8 fight minutes**, five Lv50 Umas.
 Representative Brawler: Class Rank 50; five Weapon Ranks 10/10/10/10/10; five Armor Ranks 10/10/10/10/10.

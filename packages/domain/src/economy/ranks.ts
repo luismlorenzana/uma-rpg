@@ -1,6 +1,7 @@
 // The ranks (docs/design/progression.md, D102): beside her Uma Level, each Uma has a Class Rank for every class (1–50), a
-// Weapon Rank for each of the ten weapons and an Armor Rank for each of the ten armor kinds (1–10). Winning fights fills
-// them; past a max rank, EXP banks at half rate as Marks for the whole world. Nothing is trained and no token is spent.
+// Weapon Rank for each of the ten weapons, an Armor Rank for each of the ten armor kinds and an Accessory Rank for each of
+// the four accessory kinds (1–10, D124). Winning fights fills them; past a max rank, EXP banks at half rate as Marks for
+// the whole world. Nothing is trained and no token is spent.
 import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_TOMES, RPG_WEAPONS, type RpgClass, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 
 export const CLASS_MAX_RANK = 50
@@ -10,25 +11,33 @@ export const GEAR_MAX_RANK = 10
 export const WEAPON_TYPES = RPG_WEAPONS
 export type WeaponType = RpgWeapon
 
-/** The five armor slots, each holding its physical or its magical kind (D103). */
-export const ARMOR_SLOTS = ['head', 'body', 'legs', 'arms', 'accessory'] as const
+/** The five armor slots, each holding its physical or its magical piece (D103, D124: feet replace the accessory). */
+export const ARMOR_SLOTS = ['head', 'body', 'legs', 'arms', 'feet'] as const
 export type ArmorSlot = typeof ARMOR_SLOTS[number]
 export const ARMOR_SLOT_KINDS = {
-  head: ['helm', 'circlet'], body: ['cuirass', 'robe'], legs: ['greaves', 'leggings'], arms: ['gauntlets', 'bracers'], accessory: ['arms-orb', 'elemental-orb'],
+  head: ['helm', 'circlet'], body: ['cuirass', 'robe'], legs: ['greaves', 'leggings'], arms: ['gauntlets', 'bracers'], feet: ['boots', 'slippers'],
 } as const satisfies Record<ArmorSlot, readonly [string, string]>
 export type ArmorKind = typeof ARMOR_SLOT_KINDS[ArmorSlot][number]
-/** The ten armor kinds: physical first, then magical, slot by slot. */
+/** The ten armor kinds, each a wearable piece: physical first, then magical, slot by slot. */
 export const ARMOR_KINDS: readonly ArmorKind[] = [
   ...ARMOR_SLOTS.map((s) => ARMOR_SLOT_KINDS[s][0]), ...ARMOR_SLOTS.map((s) => ARMOR_SLOT_KINDS[s][1]),
 ]
-/** The eight wearable armor pieces (the accessory slot's kinds are Orbs). */
-export const ARMOR_PIECES = ['helm', 'cuirass', 'greaves', 'gauntlets', 'circlet', 'robe', 'leggings', 'bracers'] as const
-export type ArmorPiece = typeof ARMOR_PIECES[number]
+export const ARMOR_PIECES = ARMOR_KINDS
+export type ArmorPiece = ArmorKind
 export const isArmorKind = (v: unknown): v is ArmorKind => (ARMOR_KINDS as readonly unknown[]).includes(v)
 export const armorSlotOf = (kind: ArmorKind): ArmorSlot => ARMOR_SLOTS.find((s) => (ARMOR_SLOT_KINDS[s] as readonly string[]).includes(kind))!
 export const isMagicalArmor = (kind: ArmorKind): boolean => ARMOR_SLOT_KINDS[armorSlotOf(kind)][1] === kind
-/** An Orb's armor kind: an element's Orb is Elemental, a weapon kind's is an Arms Orb. */
-export const orbArmorKind = (kind: RpgDamageKind): ArmorKind => ((RPG_TOMES as readonly string[]).includes(`tome-${kind}`) ? 'elemental-orb' : 'arms-orb')
+/** Each slot's defensive stat, +1 a grade on either of its pieces (D124). */
+export const ARMOR_SLOT_STAT = { head: 'def', body: 'hp', legs: 'mp', arms: 'mdef', feet: 'speed' } as const satisfies Record<ArmorSlot, string>
+
+/** Her two accessory slots (D124): any two different accessory types. */
+export const ACCESSORY_SLOTS = ['accessory-1', 'accessory-2'] as const
+export type AccessorySlot = typeof ACCESSORY_SLOTS[number]
+/** The four accessory kinds: offense (Orbs) and defense (Talismans, Amulets), physical and magical. */
+export const ACCESSORY_KINDS = ['arms-orb', 'elemental-orb', 'talisman', 'amulet'] as const
+export type AccessoryKind = typeof ACCESSORY_KINDS[number]
+export const isAccessoryKind = (v: unknown): v is AccessoryKind => (ACCESSORY_KINDS as readonly unknown[]).includes(v)
+export const isMagicalAccessory = (kind: AccessoryKind): boolean => kind === 'elemental-orb' || kind === 'amulet'
 export { RPG_DAMAGE_KINDS }
 
 export const WEAPON_LABEL: Readonly<Record<WeaponType, string>> = {
@@ -36,32 +45,40 @@ export const WEAPON_LABEL: Readonly<Record<WeaponType, string>> = {
   'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
 }
 export const ARMOR_LABEL: Readonly<Record<ArmorKind, string>> = {
-  helm: 'Helm', cuirass: 'Cuirass', greaves: 'Greaves', gauntlets: 'Gauntlets', circlet: 'Circlet', robe: 'Robe', leggings: 'Leggings',
-  bracers: 'Bracers', 'arms-orb': 'Arms Orb', 'elemental-orb': 'Elemental Orb',
+  helm: 'Helm', cuirass: 'Cuirass', greaves: 'Greaves', gauntlets: 'Gauntlets', boots: 'Boots',
+  circlet: 'Circlet', robe: 'Robe', leggings: 'Leggings', bracers: 'Bracers', slippers: 'Slippers',
 }
-export const ARMOR_SLOT_LABEL: Readonly<Record<ArmorSlot, string>> = { head: 'Head', body: 'Body', legs: 'Legs', arms: 'Arms', accessory: 'Accessory' }
+export const ARMOR_SLOT_LABEL: Readonly<Record<ArmorSlot, string>> = { head: 'Head', body: 'Body', legs: 'Legs', arms: 'Arms', feet: 'Feet' }
+export const ACCESSORY_LABEL: Readonly<Record<AccessoryKind, string>> = {
+  'arms-orb': 'Arms Orb', 'elemental-orb': 'Elemental Orb', talisman: 'Talisman', amulet: 'Amulet',
+}
+export const ACCESSORY_SLOT_LABEL: Readonly<Record<AccessorySlot, string>> = { 'accessory-1': 'Accessory 1', 'accessory-2': 'Accessory 2' }
 
 // --- Tracks and curves ------------------------------------------------------------------------------------------------
 
 export interface RankTrack { rank: number; exp: number }
-/** Her ranks, sparse: a class, weapon or armor kind she hasn't earned EXP in yet is absent and stands at rank 1. */
+/** Her ranks, sparse: a class, weapon, armor or accessory kind she hasn't earned EXP in yet is absent and stands at rank 1. */
 export interface Ranks {
   classes: Partial<Record<RpgClass, RankTrack>>
   weapons: Partial<Record<WeaponType, RankTrack>>
   armors: Partial<Record<ArmorKind, RankTrack>>
+  accessories: Partial<Record<AccessoryKind, RankTrack>>
 }
-export const newRanks = (): Ranks => ({ classes: {}, weapons: {}, armors: {} })
+export const newRanks = (): Ranks => ({ classes: {}, weapons: {}, armors: {}, accessories: {} })
 const FRESH: RankTrack = { rank: 1, exp: 0 }
 
-export type RankKind = 'class' | 'weapon' | 'armor'
-/** What a track is: a class, a weapon or an armor kind. */
+export type RankKind = 'class' | 'weapon' | 'armor' | 'accessory'
+/** What a track is: a class, a weapon, an armor kind or an accessory kind. */
 export type RankRef = { kind: 'class'; id: RpgClass } | { kind: 'weapon'; id: WeaponType } | { kind: 'armor'; id: ArmorKind }
+  | { kind: 'accessory'; id: AccessoryKind }
 
 export const classTrack = (ranks: Ranks, id: RpgClass): RankTrack => ranks.classes[id] ?? FRESH
 export const weaponTrack = (ranks: Ranks, id: WeaponType): RankTrack => ranks.weapons[id] ?? FRESH
 export const armorTrack = (ranks: Ranks, id: ArmorKind): RankTrack => ranks.armors[id] ?? FRESH
+export const accessoryTrack = (ranks: Ranks, id: AccessoryKind): RankTrack => ranks.accessories[id] ?? FRESH
 export function trackOf(ranks: Ranks, ref: RankRef): RankTrack {
-  return ref.kind === 'class' ? classTrack(ranks, ref.id) : ref.kind === 'weapon' ? weaponTrack(ranks, ref.id) : armorTrack(ranks, ref.id)
+  return ref.kind === 'class' ? classTrack(ranks, ref.id) : ref.kind === 'weapon' ? weaponTrack(ranks, ref.id)
+    : ref.kind === 'armor' ? armorTrack(ranks, ref.id) : accessoryTrack(ranks, ref.id)
 }
 export const classRankOf = (ranks: Ranks, id: RpgClass): number => classTrack(ranks, id).rank
 
@@ -107,16 +124,18 @@ export function withTrack(ranks: Ranks, ref: RankRef, track: RankTrack): Ranks {
   }
   if (ref.kind === 'class') return { ...ranks, classes: set(ranks.classes, ref.id) }
   if (ref.kind === 'weapon') return { ...ranks, weapons: set(ranks.weapons, ref.id) }
-  return { ...ranks, armors: set(ranks.armors, ref.id) }
+  if (ref.kind === 'armor') return { ...ranks, armors: set(ranks.armors, ref.id) }
+  return { ...ranks, accessories: set(ranks.accessories, ref.id) }
 }
 
 // --- EXP per win and Marks (D102) ---------------------------------------------------------------------------------------
 
-/** For each win worth `E` Uma EXP: her class earns 2E, her five weapons share 5E (a weapon she used counts double), and
- * each of her five armor kinds earns E. */
+/** For each win worth `E` Uma EXP: her class earns 2E, her five weapons share 5E (a weapon she used counts double), each of
+ * her five armor kinds earns E, and each accessory she wears earns E for its kind (D124). */
 export const CLASS_EXP_SHARE = 2
 export const WEAPON_EXP_SHARE = 5
 export const ARMOR_EXP_SHARE = 1
+export const ACCESSORY_EXP_SHARE = 1
 /** EXP past a max rank banks at half rate as Marks. */
 export const MARKS_SHARE = 0.5
 /** A Manual: Marks spent for EXP on one track of one Uma, one for one. */
@@ -132,5 +151,5 @@ export function weaponExpShares(weapons: readonly WeaponType[], used: ReadonlySe
   return out
 }
 
-export const RANK_LABEL: Readonly<Record<RankKind, string>> = { class: 'Class Rank', weapon: 'Weapon Rank', armor: 'Armor Rank' }
+export const RANK_LABEL: Readonly<Record<RankKind, string>> = { class: 'Class Rank', weapon: 'Weapon Rank', armor: 'Armor Rank', accessory: 'Accessory Rank' }
 export const isRankClass = (v: unknown): v is RpgClass => (RPG_CLASSES as readonly unknown[]).includes(v)

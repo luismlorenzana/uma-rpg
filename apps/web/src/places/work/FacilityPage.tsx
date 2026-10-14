@@ -2,7 +2,7 @@
 // the Kitchen cooks dishes and the Forge crafts gear (S7, D59). Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
 // output and her profession EXP.
 import {
-  activeClass, availabilityBlock, DISHES, facilityTargets, hasAccent, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, ITEM_EFFECTS, type EquipType, type ItemEffect, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
+  activeClass, availabilityBlock, DISHES, facilityTargets, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
   itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, SaveRuleError,
   stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -19,6 +19,7 @@ import { formatDuration, useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { QueueList } from './QueueList'
+import { pieceLine } from '../stable/WeaponSheet'
 import { TimeCut } from './TimeCut'
 
 const GRADE_ORDER = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
@@ -87,7 +88,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
         </button>
       )}
       {targets && (
-        <TargetsCard lines={targets} canStart={free >= 0 && facilitySpec(placeId)?.kind !== 'craft'}
+        <TargetsCard lines={targets} canStart={free >= 0}
           onPick={(key) => { setWant(key); setAssign(free) }} />
       )}
       <ul className="space-y-2">
@@ -121,6 +122,8 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
 }
 
 /** What the targets still need from this facility (D100), lowest grade first; tap one to start it in a free slot. */
+/** What the targets still need from here (D126): every line the Warehouse doesn't cover yet, with what's in it and what's
+ * coming; tapping one starts what's still short. */
 function TargetsCard({ lines, canStart, onPick }: { lines: TargetNeed[]; canStart: boolean; onPick: (key: string) => void }) {
   const [all, setAll] = useState(false)
   const shown = all ? lines : lines.slice(0, 6)
@@ -131,14 +134,16 @@ function TargetsCard({ lines, canStart, onPick }: { lines: TargetNeed[]; canStar
         <ul className="space-y-1">
           {shown.map((n) => (
             <li key={n.key}>
-              <button type="button" disabled={!canStart} onClick={() => onPick(n.key)}
+              <button type="button" disabled={!canStart || n.short === 0} onClick={() => onPick(n.key)}
                 className="flex w-full items-center gap-2 rounded-sm bg-panel px-2 py-1.5 text-left disabled:cursor-default">
                 <ItemIcon id={n.icon} size={28} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-semibold">{n.name} · G{n.grade}</span>
-                  <span className="block text-[11px] text-ink-faint">have {n.have}{n.coming ? ` · ${n.coming} coming` : ''}</span>
+                  <span className="block text-[11px] text-ink-faint">need {n.need} · have {n.have}{n.coming ? ` · ${n.coming} coming` : ''}</span>
                 </span>
-                <span className="shrink-0 font-display text-[15px] font-bold text-accent">×{n.short}</span>
+                {n.short > 0
+                  ? <span className="shrink-0 font-display text-[15px] font-bold text-accent">×{n.short}</span>
+                  : <span className="shrink-0 text-[11px] font-semibold text-success">On the way</span>}
               </button>
             </li>
           ))}
@@ -344,22 +349,23 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   )
 }
 
-/** The Forge's picker: a type, a grade (her Gathering level opens them) and an accent (the effect it adds). */
-/** The Forge's types by family (D86): Arms, Tomes, armor, stat accessories and Orbs. */
+/** The Forge's picker: a type and a grade (her Craft Level opens them). Its types in eight rows of five (D124): weapons,
+ * armor and accessories, each physical and magical. */
 const FORGE_GROUPS: readonly (readonly [string, readonly EquipType[]])[] = [
   ['Arms', EQUIP_TYPES.filter((t) => ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t))],
   ['Tomes', EQUIP_TYPES.filter((t) => t.startsWith('tome-'))],
-  ['Physical', ['helm', 'cuirass', 'greaves', 'gauntlets']],
-  ['Magical', ['circlet', 'robe', 'leggings', 'bracers']],
+  ['Physical', ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']],
+  ['Magical', ['circlet', 'robe', 'leggings', 'bracers', 'slippers']],
   ['Arms Orbs', ['orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana']],
   ['Element Orbs', ['orb-fire', 'orb-ice', 'orb-lightning', 'orb-light', 'orb-dark']],
+  ['Talismans', EQUIP_TYPES.filter((t) => t.startsWith('talisman-'))],
+  ['Amulets', EQUIP_TYPES.filter((t) => t.startsWith('amulet-'))],
 ]
 
 function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; level: number; queueing: boolean; onPick: (id: string, have: number) => void }) {
   const [type, setType] = useState<EquipType>('greatsword')
   const [grade, setGrade] = useState(1)
-  const [accent, setAccent] = useState<ItemEffect>('atk')
-  const piece = gearById(gearId(type, grade, accent))!
+  const piece = gearById(gearId(type, grade))!
   const have = Math.min(...Object.entries(piece.inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
   const chip = (on: boolean) => `min-h-9 rounded-full px-2.5 text-[12px] font-semibold ${on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'} disabled:opacity-35`
   return (
@@ -370,7 +376,7 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
           {FORGE_GROUPS.map(([label, types]) => (
             <div key={label} className="flex flex-wrap items-center gap-1">
               <span className="w-20 shrink-0 text-[11px] text-ink-faint">{label}</span>
-              {types.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t].replace(' Tome', '').replace(' Orb', '')}</button>)}
+              {types.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t].replace(/ (Tome|Orb|Talisman|Amulet)$/, '')}</button>)}
             </div>
           ))}
         </div>
@@ -381,14 +387,9 @@ function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; lev
           <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Craft Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
         ))}</div>
       </div>
-      {hasAccent(type) && (
-        <div>
-          <p className="text-micro mb-1">Accent</p>
-          <div className="flex flex-wrap gap-1">{ITEM_EFFECTS.map((e) => <button key={e} type="button" onClick={() => setAccent(e)} className={chip(e === accent)}>{EFFECT_LABEL[e]}</button>)}</div>
-        </div>
-      )}
       <div className="rounded-sm bg-raised p-2.5">
         <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(piece.id).icon} size={28} /> {piece.name}</p>
+        <p className="mt-0.5 text-[12px] text-ink-soft">{pieceLine(piece.id)}</p>
         <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
           {Object.entries(piece.inputs).map(([id, n]) => (
             <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {stockName(id)} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>

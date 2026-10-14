@@ -1,6 +1,7 @@
 // Legacy migrations are needed only for old saves, not every current-save boot (H16).
 import { PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
 import { ITEM_IDENTITIES as ITEM_FAMILIES } from '../items/identity'
+import { gearById } from '../economy/gear'
 
 /** Class ranks topped out at 5 from v13 to v17 (D77). */
 const CLASS_MAX_RANK = 5
@@ -204,7 +205,8 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
   const v16 = version < 16 && isRecord(v15) ? toV16(v15) : v15
   const v18 = version < 18 && isRecord(v16) ? toV18(v16, version) : v16
-  return version < 19 && isRecord(v18) ? toV19(v18) : v18
+  const v19 = version < 19 && isRecord(v18) ? toV19(v18) : v18
+  return version < 20 && isRecord(v19) ? toV20(v19) : v19
 }
 
 // --- v18 → v19 (D106) --------------------------------------------------------------------------------------------------
@@ -369,3 +371,72 @@ function toV18(world: Record<string, unknown>, version: number): Record<string, 
   return w
 }
 
+// --- v19 → v20 (D124, D125) -------------------------------------------------------------------------------------------
+
+/** An accented armor id (`helm-g3-atk`) without its accent; anything else as it was. */
+const OLD_ARMOR = /^(helm|cuirass|greaves|gauntlets|circlet|robe|leggings|bracers)-g(\d{1,2})-[a-z]+$/
+const v20Gear = (id: unknown): unknown => (typeof id === 'string' ? id.replace(OLD_ARMOR, '$1-g$2') : id)
+
+/**
+ * Armor loses its accent, so an Uma who held the same piece in two accents keeps one, and the stock adds them together.
+ * Her accessory slot becomes her first of two; the Orbs' Armor Ranks become Accessory Ranks; Boots and Slippers start at
+ * her Greaves and Leggings ranks. Forge jobs make the renamed pieces, and queued ones cost the new two-item recipe.
+ */
+function toV20(world: Record<string, unknown>): Record<string, unknown> {
+  const w = { ...world }
+  if (isRecord(w.umas)) {
+    w.umas = Object.fromEntries(Object.entries(w.umas).map(([id, raw]) => {
+      if (!isRecord(raw)) return [id, raw]
+      const uma = { ...raw }
+      if (isRecord(uma.gear)) {
+        const gear = { ...uma.gear }
+        if (Array.isArray(gear.locker)) gear.locker = [...new Set(gear.locker.map(v20Gear))]
+        if (isRecord(gear.equipped)) {
+          const equipped: Record<string, unknown> = {}
+          for (const [slot, piece] of Object.entries(gear.equipped)) equipped[slot === 'accessory' ? 'accessory-1' : slot] = v20Gear(piece)
+          gear.equipped = equipped
+        }
+        if (isRecord(gear.kinds)) { const kinds = { ...gear.kinds }; delete kinds.accessory; gear.kinds = kinds }
+        uma.gear = gear
+      }
+      if (isRecord(uma.ranks)) {
+        const ranks = { ...uma.ranks }
+        const armors = isRecord(ranks.armors) ? { ...ranks.armors } : {}
+        const accessories: Record<string, unknown> = {}
+        for (const kind of ['arms-orb', 'elemental-orb']) if (armors[kind] !== undefined) { accessories[kind] = armors[kind]; delete armors[kind] }
+        if (armors.greaves !== undefined) armors.boots = armors.greaves
+        if (armors.leggings !== undefined) armors.slippers = armors.leggings
+        uma.ranks = { ...ranks, armors, accessories }
+      }
+      return [id, uma]
+    }))
+  }
+  if (isRecord(w.gear)) {
+    const stock: Record<string, number> = {}
+    for (const [id, n] of Object.entries(w.gear)) {
+      const next = v20Gear(id) as string
+      if (typeof n === 'number') stock[next] = (stock[next] ?? 0) + n
+    }
+    w.gear = stock
+  }
+  if (isRecord(w.facilities)) {
+    const recost = (output: unknown, inputs: unknown) => {
+      const piece = typeof output === 'string' ? gearById(output) : undefined
+      return piece ? { ...piece.inputs } : inputs
+    }
+    w.facilities = Object.fromEntries(Object.entries(w.facilities).map(([place, raw]) => {
+      if (!isRecord(raw) || !Array.isArray(raw.jobs)) return [place, raw]
+      const jobs = raw.jobs.map((job: unknown) => {
+        if (!isRecord(job)) return job
+        const queue = Array.isArray(job.queue) ? job.queue.map((q: unknown) => {
+          if (!isRecord(q)) return q
+          const output = v20Gear(q.output)
+          return { ...q, output, inputs: recost(output, q.inputs) }
+        }) : job.queue
+        return { ...job, output: v20Gear(job.output), queue }
+      })
+      return [place, { ...raw, jobs }]
+    }))
+  }
+  return w
+}

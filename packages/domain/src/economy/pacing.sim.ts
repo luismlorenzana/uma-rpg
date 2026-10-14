@@ -98,11 +98,11 @@ export function simulate(seed = 1400) {
   return { save, rows, visited, springUses, minutes: elapsed / MINUTE }
 }
 
-/** One Brawler's five weapons and five physical armor slots: 40 refined items (D103). */
+/** One Brawler's five weapons, five physical armor pieces and two accessories: 24 refined items (D124, D125). */
 export function fullSet(grade: number): Record<string, number> {
   const inputs: Record<string, number> = {}
-  for (const type of [...rpgDefaultWeapons('brawler'), 'helm', 'cuirass', 'greaves', 'gauntlets', 'orb-greatsword'] as const)
-    for (const [id, n] of Object.entries(gearById(gearId(type, grade, 'atk'))!.inputs)) inputs[id] = (inputs[id] ?? 0) + n
+  for (const type of [...rpgDefaultWeapons('brawler'), 'helm', 'cuirass', 'greaves', 'gauntlets', 'boots', 'orb-greatsword', 'talisman-vital'] as const)
+    for (const [id, n] of Object.entries(gearById(gearId(type, grade))!.inputs)) inputs[id] = (inputs[id] ?? 0) + n
   return inputs
 }
 
@@ -164,7 +164,7 @@ export function markdown(): string {
   for (const r of result.rows) rows.push(`| ${WORLD_LEVELS * (r.band - 1) + 1}–${WORLD_LEVELS * r.band} | ${r.fights} (${r.first}/${r.replays}) | ${(r.milliseconds / MINUTE).toFixed(1)} | ${r.exp} | ${r.classExp} | ${r.weaponExp} | ${r.armorExp} | ${r.laurels} | ${r.gearMarks} / ${r.classMarks} |`)
   const farm = freshWorker(result.rows, 'farming'), wilds = freshWorker(result.rows, 'gathering'), world = worldOf(result.save)
   rows.push('', 'EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.', '',
-    '| Grade | Refined / ten-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |', '|---|---|---|---|')
+    '| Grade | Refined / twelve-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |', '|---|---|---|---|')
   for (const r of result.rows) {
     const grade = 2 * r.band, minutes = r.milliseconds / MINUTE
     rows.push(`| ${grade} | ${Object.values(fullSet(grade)).reduce((n, v) => n + v, 0)} | ${capacity(world, grade, minutes, 'farming').toFixed(2)} / ${capacity(world, grade, minutes, 'gathering').toFixed(2)} | ${farm.production[r.band - 1]} / ${wilds.production[r.band - 1]} |`)

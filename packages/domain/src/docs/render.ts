@@ -7,12 +7,12 @@ import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILIT
 import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { DISHES } from '../economy/dishes'
 import {
-  accentPoints, BARRIER_PER_GRADE, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, hasAccent, isMagicalGear, isOrb, isWeapon, MIGHT_PER_GRADE, recipeFamilies,
-  REGEN_PER_GRADE, slotOf, type EquipType,
+  accessoryEffects, accessoryKindOf, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
+  MIGHT_PER_GRADE, recipeFamilies, slotOf, type EquipType,
 } from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
 import {
-  ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
+  ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
   gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,
 } from '../economy/ranks'
 import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
@@ -220,13 +220,29 @@ function dishes(): string {
 }
 function gear(): string {
   const family = (id: string) => ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id
-  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon' : ARMOR_SLOT_LABEL[slotOf(t) as keyof typeof ARMOR_SLOT_LABEL])
-  const does = (t: EquipType) => isWeapon(t) ? `Might +${MIGHT_PER_GRADE * 10} on its hits` : isOrb(t) ? 'Its kind on every hit, for weaknesses'
-    : isMagicalGear(t) ? `M.DEF +10, Regen ${REGEN_PER_GRADE * 10}; accent +${accentPoints(10)}` : `DEF +10, Barrier ${BARRIER_PER_GRADE * 10}; accent +${accentPoints(10)}`
+  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon' : isAccessory(t) ? `Accessory (${ACCESSORY_LABEL[accessoryKindOf(t)]})`
+    : ARMOR_SLOT_LABEL[slotOf(t) as keyof typeof ARMOR_SLOT_LABEL])
+  const g10 = (t: EquipType) => gearById(gearId(t, 10))!
+  const effect = (t: EquipType): string => {
+    const a = accessoryEffects(g10(t))
+    const parts = [a.regen && `heals ${a.regen} HP a round`, a.mpRegen && `restores ${a.mpRegen} MP a round`, a.lifesteal && `heals ${a.lifesteal / 10}% of physical damage dealt`,
+      a.mpSteal && `restores MP as ${a.mpSteal / 10}% of magical damage dealt`, a.barrier && `a ${a.barrier} shield against physical damage`,
+      a.veil && `a ${a.veil} shield against magical damage`, a.guard && `${a.guard / 10}% less physical damage taken`, a.resist && `${a.resist / 10}% less magical damage taken`,
+      a.thorns && `returns ${a.thorns / 10}% of physical damage taken`, a.mirror && `returns ${a.mirror / 10}% of magical damage taken`].filter(Boolean)
+    return parts.join('; ')
+  }
+  const does = (t: EquipType) => {
+    if (isWeapon(t)) return `Might +${MIGHT_PER_GRADE * 10} on its hits`
+    if (isOrb(t)) return 'Its kind on every hit, for weaknesses'
+    if (isAccessory(t)) return effect(t)
+    const p = gearPoints(g10(t))
+    return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} +${p[e]}`).join(', ')
+  }
   return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
-    EQUIP_LABEL[t], hasAccent(t) ? `\`${t}-g<grade>-<accent>\`` : `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
-    recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3, 'atk'))!.inputs), does(t),
-  ]))
+    EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
+    recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
+  ])) + `\n\nArmor adds ATK (physical) or M.ATK (magical), +1 every two grades (${armorOffense(10)} at grade 10), and its slot's defensive stat +1 a grade. ` +
+    `An Uma wears two accessories of different types.`
 }
 
 function ranks(): string {
@@ -236,9 +252,11 @@ function ranks(): string {
     ['Class Rank, per class', `1–${CLASS_MAX_RANK}`, `${CLASS_EXP_SHARE}E to the class she fought as`, 'Its trees: cores at 1, 10, 20, 30, 40; side skills at 5 … 45; a side point a rank'],
     ['Weapon Rank, per weapon', `1–${GEAR_MAX_RANK}`, `${WEAPON_EXP_SHARE}E over her five weapons, double for each she used`, 'Wears that weapon up to its rank\'s grade'],
     ['Armor Rank, per armor kind', `1–${GEAR_MAX_RANK}`, `${ARMOR_EXP_SHARE}E to each of her five armor kinds`, 'Wears that kind up to its rank\'s grade'],
+    ['Accessory Rank, per accessory kind', `1–${GEAR_MAX_RANK}`, `${ACCESSORY_EXP_SHARE}E to the kind of each accessory she wears`, 'Wears accessories of that kind up to its rank\'s grade'],
   ]) + '\n\n' + table(['Class Rank', 'EXP to next'], classRows) + '\n\n' + table(['Weapon or Armor Rank', 'EXP to next', 'Next rank, used every fight, by'], gearRows) +
     `\n\nPast a max rank, EXP banks at ${pct(MARKS_SHARE)} as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks and gives ${MANUAL_EXP.toLocaleString('en-US')} EXP to one bar of one Uma. ` +
-    `Armor kinds by slot: ${ARMOR_SLOTS.map((s) => `${ARMOR_SLOT_LABEL[s]} ${ARMOR_SLOT_KINDS[s].map((k) => ARMOR_LABEL[k]).join(' or ')}`).join('; ')}. ${ARMOR_KINDS.length} kinds in all.`
+    `Armor kinds by slot: ${ARMOR_SLOTS.map((s) => `${ARMOR_SLOT_LABEL[s]} ${ARMOR_SLOT_KINDS[s].map((k) => ARMOR_LABEL[k]).join(' or ')}`).join('; ')}. ${ARMOR_KINDS.length} kinds in all. ` +
+    `Accessory kinds: ${ACCESSORY_KINDS.map((k) => ACCESSORY_LABEL[k]).join(', ')}.`
 }
 
 // --- Economy -------------------------------------------------------------------------------------------------------

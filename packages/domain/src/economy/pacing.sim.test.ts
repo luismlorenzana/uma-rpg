@@ -72,9 +72,9 @@ describe('H14 pacing economy ledger', () => {
     expect(world.items).toEqual({})
   })
 
-  it('counts the material-only ten-piece set and separates unlocked capacity from fresh workers', () => {
+  it('counts the material-only twelve-piece set and separates unlocked capacity from fresh workers', () => {
     for (const grade of [2, 4, 6, 8, 10]) {
-      expect(Object.values(fullSet(grade)).reduce((a, b) => a + b, 0)).toBe(10 * 4)
+      expect(Object.values(fullSet(grade)).reduce((a, b) => a + b, 0)).toBe(12 * 2)
       expect(Object.keys(fullSet(grade)).some((id) => id.startsWith('token-'))).toBe(false)
     }
     expect(freshWorker(result.rows, 'farming')).toEqual(freshWorker(result.rows, 'gathering'))

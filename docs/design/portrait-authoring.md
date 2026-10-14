@@ -19,7 +19,7 @@ The import is resumable and rate-limited. Incomplete sources cannot become an ac
 the current round until every JP splash is available. A completed dataset, or one already used by a round, is
 immutable: use a new dataset ID for another source collection. Each new round has a separate ratings file.
 
-**Owner update (D125):** reset the votes from scratch and inspect the latest local downloads now. `--fresh` creates
+**Owner update (D129):** reset the votes from scratch and inspect the latest local downloads now. `--fresh` creates
 an empty round with no inherited votes or previous-vote hints, while archiving the preceding votes unchanged.
 An explicit `--allow-missing-splashes` may activate a complete face roster before all splashes arrive; pending
 members show their source face and a clear label. This is not a completed splash import. Defaults still refuse
@@ -29,7 +29,7 @@ The active app reads original image bytes from that round's immutable dataset, n
 Pixel dimensions and **Original** let the owner inspect source resolution directly. Sources vary in quality:
 the tool does not resize, recompress or invent resolution. Final vertical/face crops remain a later pass.
 
-## Phase 1b: retained-unit role tiers (D126)
+## Phase 1b: retained-unit role tiers (D130)
 
 After the completed quality-ranking pass, create a new **survivor-only** dataset and tier round. Remove every -1
 (Rare) and -2 (Excluded) unit from the active manifests, counts, grid, search, upcoming images, export and image
@@ -98,10 +98,10 @@ Both franchises use the **same 2:3 vertical ratio and 16:9 splash ratio**. Every
 preserve aspect ratio. Suggested export limits are 640×960 / 1280×720, clamped down to native crop resolution;
 the current Export saves recipes/approval state, not finished image files. Preview zoom is not export upscaling.
 
-### Reviewing crops (D127, D128)
+### Reviewing crops (D131, D132)
 
 `/crop` in the existing local reviewer holds the crop queue. Calibration remains available as an optional ten-unit
-sample per franchise, but the owner now chose to go directly through **every retained unit** (D128). The full-roster
+sample per franchise, but the owner now chose to go directly through **every retained unit** (D132). The full-roster
 initializer includes all units and preserves the active session's exact saved rectangles, statuses and timestamps;
 the preceding manifest, crops and history stay intact. Its provenance records the prior session, revision and hash.
 Unreviewed additions receive centered suggestions, not approvals. Drag to pan, drag the lower-right corner to resize, use Zoom/Fit or

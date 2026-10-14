@@ -74,7 +74,7 @@ pnpm cast:install
 
 This carries the active crop session's saved rectangles, approvals and flags forward unchanged. The preceding
 session and its history remain recoverable. New units start pending with centered suggestions; every format still
-needs manual review. The owner chose this full pass directly rather than waiting for calibration feedback (D128).
+needs manual review. The owner chose this full pass directly rather than waiting for calibration feedback (D132).
 
 Open **http://127.0.0.1:5194/crop**, or **Crops →** in the existing reviewer. Drag the rectangle, resize its corner,
 use Zoom/Fit or X/Y/Width fields, then **Approve & Next**. Changing an approved crop makes it pending again;
@@ -132,7 +132,7 @@ listed in `dataset.json`, with a full `roster.json` retained. Do not activate th
 A dataset used by any round is locked against reimport. Another source collection uses a new dataset ID (the
 shared cache is reused). The owner chose to retain the current round until every JP splash is available.
 
-For an owner-requested fresh quality-review round (D125), stop the reviewer first, then:
+For an owner-requested fresh quality-review round (D129), stop the reviewer first, then:
 
 ```sh
 node scripts/cast/authoring-round.mjs /absolute/path/to/uma-rpg/content jp-al-YYYYMMDD fresh-YYYYMMDD --fresh --allow-missing-splashes

@@ -1,12 +1,12 @@
-// Farming targets (D100): up to five Umas the facilities plan for. For each, what maxing her takes: a dish for every
-// Extra Stats node she hasn't opened, and in each of her ten gear slots (D103) every grade between the best she has bound
-// and the best she can wear now, since she binds them in order (D119). The needs
-// cascade down the chain: pieces and dishes still to make need refined items, refined items still to make need raw
-// ones. At every step what the Warehouse holds and what running or queued jobs will bring counts first.
+// Farming targets (D100, D126; docs/design/gear-and-targets.md §2): up to five Umas the facilities plan for. For each,
+// everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the dish of every Extra
+// Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top level
+// first, and only what is still short flows down: pieces and dishes to refined items, refined items to raw ones.
 import { DISHES, dishById, nodeGrade, nodesFor, STAR_NODES } from '../economy/dishes'
-import { EQUIP_LABEL, gearById, gearId, gearTrackOf, type EquipType } from '../economy/gear'
-import { ARMOR_LABEL, ARMOR_SLOTS, armorTrack, isArmorKind, weaponTrack, type ArmorKind } from '../economy/ranks'
+import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
 import { facilitySpec } from '../economy/jobs'
+import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
+import { planRequirements, type Requirement } from '../economy/requirements'
 import { itemById } from '../items/catalog'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
@@ -24,9 +24,12 @@ export function setTarget(save: Save, outfitId: string, on: boolean, now: string
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: { ...world, targets } } }
 }
 
-/** One line of a plan: what to make, how many the targets need in all, what's here or on the way, and what's short. */
+/**
+ * One line of a plan. `need`: what the targets need of it; `have`: in the Warehouse and free; `coming`: what jobs will
+ * still make; `short`: what still has to be started. A facility lists a line while `need > have`.
+ */
 export interface TargetNeed {
-  /** An item or dish id, or a gear key `<track>-g<grade>` (D119: a weapon, an armor kind or an Orb; any accent will do). */
+  /** An item, dish or gear piece id. */
   key: string
   /** An id to draw its icon with. */
   icon: string
@@ -43,85 +46,101 @@ export interface TargetPlan { gear: TargetNeed[]; dishes: TargetNeed[]; refined:
 const NODE_DISH = new Map<string, string>()
 for (const dish of DISHES) for (const node of nodesFor(dish)) if (nodeGrade(node) === dish.grade) NODE_DISH.set(node, dish.id)
 
-/** A piece's planning key: its track (D119) and grade. */
-const keyOf = (pieceId: string): string | null => {
-  const piece = gearById(pieceId)
-  return piece ? `${gearTrackOf(piece.type)}-g${piece.grade}` : null
-}
-/** A representative type to draw and cost a track with: the track itself, or an Orb kind's first Orb. */
-const typeOfKind = (kind: string): EquipType => (kind === 'arms-orb' ? 'orb-greatsword' : kind === 'elemental-orb' ? 'orb-fire' : kind as EquipType)
-
-/** The pieces one Uma still needs: per slot (her class's five weapons, her five armor slots' kinds), every grade above
- * the best she has bound on its track, up to the best her rank lets her wear. An Orb slot climbs the Orb she wears. */
-function gearNeeds(uma: OwnedUma, classId: RpgClass): string[] {
-  const out: string[] = []
-  const climb = (track: string, rank: number) => {
-    for (let g = boundGrade(uma, track) + 1; g <= rank; g++) out.push(`${track}-g${g}`)
+/** The gear types an Uma climbs (D124): her class's five weapons, each armor slot's kind, and the type in each accessory
+ * slot (an empty one plans nothing: nothing says which she wants). */
+function gearTypes(uma: OwnedUma, classId: RpgClass): EquipType[] {
+  const types: EquipType[] = [...classOf(uma, classId).weapons, ...ARMOR_SLOTS.map((slot) => slotKind(uma.gear, slot))]
+  for (const slot of ACCESSORY_SLOTS) {
+    const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+    if (piece && isAccessory(piece.type)) types.push(piece.type)
   }
-  for (const w of classOf(uma, classId).weapons) climb(w, weaponTrack(uma.ranks, w).rank)
-  for (const slot of ARMOR_SLOTS) {
-    const kind = slotKind(uma.gear, slot)
-    // What she wears there is always of the slot's kind: changing the kind takes it off.
-    const worn = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
-    const track = gearTrackOf(worn?.type ?? typeOfKind(kind))
-    climb(track, armorTrack(uma.ranks, kind).rank)
-  }
-  return out
+  return types
 }
 
-/** The plan for a world's targets. `classOf` gives the class each target fights as. */
-export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) => RpgClass): TargetPlan {
-  const count = (into: Map<string, number>, key: string, n = 1) => into.set(key, (into.get(key) ?? 0) + n)
-  // What running and queued jobs will still bring, by output (gear by its key).
+/** Everything maxing one Uma still takes: every grade above the best she has bound on each track, up to 10, and a dish
+ * for every Extra Stats node she hasn't opened. */
+export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, number> {
+  const demand = new Map<string, number>()
+  const add = (id: string) => demand.set(id, (demand.get(id) ?? 0) + 1)
+  for (const type of gearTypes(uma, classId)) {
+    for (let g = boundGrade(uma, gearTrackOf(type)) + 1; g <= GEAR_MAX_RANK; g++) add(gearId(type, g))
+  }
+  for (const node of STAR_NODES) if (!uma.stars.unlocked.includes(node)) add(NODE_DISH.get(node)!)
+  return demand
+}
+
+/** One item's recipe, per unit: a piece's or a dish's refined inputs, a refined item's raw one; a raw item has none. */
+function recipeOf(id: string): Readonly<Record<string, number>> | null {
+  const piece = gearById(id)
+  if (piece) return piece.inputs
+  const dish = dishById(id)
+  if (dish) return Object.fromEntries(Object.entries(dish.inputs).filter(([input]) => itemById(input)))
+  const item = itemById(id)
+  return item?.refined ? { [item.pair]: 1 } : null
+}
+
+/**
+ * What the jobs will bring and hold. Running jobs bring what they haven't handed over yet (their inputs were taken at
+ * start). A queued job holds its inputs from the Warehouse when it would start; it counts as coming only if the
+ * Warehouse can cover them, since a job it can't start brings nothing.
+ */
+export function jobSupply(world: TierWorld): { coming: Map<string, number>; held: Map<string, number> } {
   const coming = new Map<string, number>()
-  for (const f of Object.values(world.facilities)) {
-    for (const job of f.jobs) {
+  const held = new Map<string, number>()
+  const add = (into: Map<string, number>, id: string, n: number) => into.set(id, (into.get(id) ?? 0) + n)
+  const stock = (id: string) => (world.items[id] ?? 0) - (held.get(id) ?? 0)
+  for (const placeId of Object.keys(world.facilities).sort()) {
+    for (const job of world.facilities[placeId]!.jobs) {
       if (!job) continue
-      count(coming, keyOf(job.output) ?? job.output, job.count - job.collected)
-      for (const q of job.queue) count(coming, keyOf(q.output) ?? q.output, q.count)
+      add(coming, job.output, job.count - job.collected)
+      for (const q of job.queue) {
+        const needs = Object.entries(q.inputs).map(([id, n]) => [id, n * q.count] as const)
+        if (needs.some(([id, n]) => stock(id) < n)) continue
+        for (const [id, n] of needs) add(held, id, n)
+        add(coming, q.output, q.count)
+      }
     }
   }
-  const gearNeed = new Map<string, number>()
-  const dishNeed = new Map<string, number>()
+  return { coming, held }
+}
+
+/** The plan for a world's targets. `activeClassOf` gives the class each target fights as. */
+export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) => RpgClass): TargetPlan {
+  const demand = new Map<string, number>()
   for (const id of world.targets) {
     const uma = world.umas[id]
     if (!uma) continue
-    for (const key of gearNeeds(uma, activeClassOf(id))) count(gearNeed, key)
-    for (const node of STAR_NODES) if (!uma.stars.unlocked.includes(node)) count(dishNeed, NODE_DISH.get(node)!)
+    for (const [key, n] of targetDemand(uma, activeClassOf(id))) demand.set(key, (demand.get(key) ?? 0) + n)
   }
-  const gearStock = new Map<string, number>()
-  for (const [id, n] of Object.entries(world.gear)) { const key = keyOf(id); if (key) count(gearStock, key, n) }
-  const line = (key: string, need: number, have: number, icon: string, name: string, grade: number): TargetNeed => {
-    const on = coming.get(key) ?? 0
-    return { key, icon, name, grade, need, have, coming: on, short: Math.max(0, need - have - on) }
+  const { coming, held } = jobSupply(world)
+  const owned = (id: string) => (gearById(id) ? world.gear[id] : dishById(id) ? world.dishes[id] : world.items[id]) ?? 0
+  const plan = planRequirements({
+    demand, recipe: recipeOf,
+    supply: (id) => ({ onHand: Math.max(0, owned(id) - (held.get(id) ?? 0)), coming: coming.get(id) ?? 0 }),
+  })
+  const line = (r: Requirement): TargetNeed => {
+    const piece = gearById(r.id), dish = dishById(r.id), item = itemById(r.id)
+    const name = piece ? EQUIP_LABEL[piece.type] : dish?.name ?? item?.name ?? r.id
+    return { key: r.id, icon: r.id, name, grade: piece?.grade ?? dish?.grade ?? item?.grade ?? 0, need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
   }
+  const lines = [...plan.values()].filter((r) => r.gross > 0).map(line)
   const byGrade = (a: TargetNeed, b: TargetNeed) => a.grade - b.grade || a.name.localeCompare(b.name)
-  const gear = [...gearNeed].map(([key, need]) => {
-    const kind = key.replace(/-g\d+$/, ''), grade = Number(/-g(\d+)$/.exec(key)![1])
-    const type = typeOfKind(kind)
-    return line(key, need, gearStock.get(key) ?? 0, gearId(type, grade, 'atk'), isArmorKind(kind) ? ARMOR_LABEL[kind as ArmorKind] : EQUIP_LABEL[type], grade)
-  }).sort(byGrade)
-  const dishes = [...dishNeed].map(([id, need]) => line(id, need, world.dishes[id] ?? 0, id, dishById(id)!.name, dishById(id)!.grade)).sort(byGrade)
-  // Refined items: what the pieces and dishes still short need. Tokens aren't farmed, so they're left out.
-  const refinedNeed = new Map<string, number>()
-  for (const g of gear) for (const [id, n] of Object.entries(gearById(g.icon)!.inputs)) count(refinedNeed, id, n * g.short)
-  for (const d of dishes) for (const [id, n] of Object.entries(dishById(d.key)!.inputs)) if (itemById(id)) count(refinedNeed, id, n * d.short)
-  const item = (id: string, need: number) => line(id, need, world.items[id] ?? 0, id, itemById(id)!.name, itemById(id)!.grade)
-  const refined = [...refinedNeed].filter(([, n]) => n > 0).map(([id, n]) => item(id, n)).sort(byGrade)
-  // Raw items: one for each refined item still short.
-  const rawNeed = new Map<string, number>()
-  for (const r of refined) if (r.short > 0) count(rawNeed, itemById(r.key)!.pair, r.short)
-  const raw = [...rawNeed].map(([id, n]) => item(id, n)).sort(byGrade)
-  return { gear, dishes, refined, raw }
+  const pick = (test: (key: string) => boolean) => lines.filter((n) => test(n.key)).sort(byGrade)
+  return {
+    gear: pick((k) => !!gearById(k)),
+    dishes: pick((k) => !!dishById(k)),
+    refined: pick((k) => !!itemById(k)?.refined),
+    raw: pick((k) => { const i = itemById(k); return !!i && !i.refined }),
+  }
 }
 
 /** The lines a facility makes: a site its family's raw items, the Pantry or Workbench its side's refined items, the
- * Kitchen dishes, the Forge gear. Only what's still short. */
+ * Kitchen dishes, the Forge gear. Each stays while the Warehouse holds fewer than the targets need. */
 export function facilityTargets(plan: TargetPlan, placeId: string): TargetNeed[] {
   const spec = facilitySpec(placeId)
   if (!spec) return []
   const lines = spec.kind === 'gather' ? plan.raw.filter((n) => itemById(n.key)?.family === spec.family)
     : spec.kind === 'refine' ? plan.refined.filter((n) => itemById(n.key)?.side === spec.profession)
       : spec.kind === 'cook' ? plan.dishes : spec.kind === 'craft' ? plan.gear : []
-  return lines.filter((n) => n.short > 0)
+  return lines.filter((n) => n.need > n.have)
 }

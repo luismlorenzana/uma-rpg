@@ -120,9 +120,11 @@ instead ([Halls of Heroes](heroes.md)).
 **The facility page** (`places/work/FacilityPage.tsx`), for the 16 sites, the Pantry, the Workbench, the Kitchen and
 the Forge:
 - **Header:** level, slots and **Upgrade**.
-- **For your targets** (D100): what the targets still need from this facility, lowest grade first, each with how many
-  are short, how many are in the Warehouse and how many are coming. Tap a line to start it in a free slot (not at the
-  Forge). The item picker badges every line the targets need ("Target ×3").
+- **For your targets** (D100, D126): what the targets still need from this facility, lowest grade first.
+  - **Each line:** the total need, how many are in the Warehouse and how many are coming, then how many are short.
+    "On the way" when jobs already cover it.
+  - **Tapping a short line** starts it in a free slot.
+  - **Badges:** the item picker badges every line the targets need ("Target ×3").
 - **Collect everything ready.**
 - **Each job card:**
   - Collect;
@@ -133,8 +135,8 @@ the Forge:
 - **Assigning:** pick an Uma (free ones first, then the highest level here, its EXP and her aptitude; the level shows
   on the right), then what to make, then how many (1–10).
 - **Kitchen:** tabs for Dishes, Duo, Feasts and "Can cook now".
-- **Forge:** a type picker (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs), then grade, and an accent for
-  armor (D103).
+- **Forge:** a type picker in eight rows of five (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs,
+  Talismans, Amulets), then grade (D124).
 
 **The Learning page** holds the five Halls of Heroes (D106), one page shared by all five (`places/halls/HallPage.tsx`).
 Each shows its four seats: the seat's Limit Break with its kinds, its Hero large on the left, and her Learners below with
@@ -153,12 +155,17 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - Eight sorts, grid or list. These choices are remembered per device.
 - **An Uma's profile:**
   - **Header:** Uma Level and EXP, a class chip, Farm and Craft Levels, and a Working or Party card.
-  - **Tabs:** Skills (with every Class Rank bar), Battle, Gear (five weapon and five armor slots, Extra Stats link, Weapon
-    and Armor Rank cells), Work and Racing.
+  - **Tabs:**
+    - Skills, with every Class Rank bar;
+    - Battle;
+    - Gear: five weapon slots, five armor slots, two accessory slots, the Extra Stats link, and Weapon, Armor and
+      Accessory Rank cells;
+    - Work;
+    - Racing.
   - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
   - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
     (D99). Armor adds up; ATK and M.ATK add the average Might of her Arms and of her Tomes, since each hit uses its own
-    weapon's. Barrier (each fight) and Regen (each round) from her armor follow (D119).
+    weapon's. Her Orbs' kinds and each accessory effect follow (D119, D124).
   - A locked outfit shows **Unlock · 1 Ticket**.
 - **Skills page:**
   - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
