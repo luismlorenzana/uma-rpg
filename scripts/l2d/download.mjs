@@ -55,7 +55,8 @@ async function get(url) {
 function check(name, bytes) {
   if (name.endsWith('.png') && !bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) throw new Error(`${name}: not a PNG`)
   if (name.endsWith('.atlas') && !/\nsize:/.test(bytes.toString('utf8'))) throw new Error(`${name}: not a Spine atlas`)
-  if (name.endsWith('.skel') && /^\s*</.test(bytes.subarray(0, 64).toString('latin1'))) throw new Error(`${name}: not a Spine skeleton`)
+  // A binary skeleton starts with a hash (any bytes, even '<'), then the editor version.
+  if (name.endsWith('.skel') && !/\b[34]\.\d+\.\d+/.test(bytes.subarray(0, 64).toString('latin1'))) throw new Error(`${name}: not a Spine skeleton`)
 }
 
 /** The host answers a missing file with its web page and a 200, not a 404. */

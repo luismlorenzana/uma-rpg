@@ -17,6 +17,7 @@
     "cast:export": "node scripts/cast/export-crops.mjs",
     "l2d:download": "node scripts/l2d/download.mjs",
     "l2d:review": "node scripts/l2d/server.mjs",
+    "l2d:lock": "node scripts/l2d/lock.mjs",
     "web": "pnpm --filter @rpg/web dev",
     "api": "pnpm --filter @rpg/api dev",
     "docs:update": "pnpm --filter @rpg/domain run docs:update"

@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { isWebPage } from './download.mjs'
-import { posesOf, RENDERS, rendersForRole } from './formats.mjs'
+import { containCrop, faceCrop, posesOf, RENDERS, rendersForRole, verticalCrop } from './formats.mjs'
+import { lockPack, pngSize, unitId, verifyPack } from './lock.mjs'
 import { atlasPages, groupOf, idlesFor, poseStem, rosterOf, skinsFor } from './roster.mjs'
 import { l2dHandler, spineVersion } from './server.mjs'
 import { applyVote, emptyTiers, parseTiers, tierCounts } from './tiers.mjs'
@@ -169,4 +170,70 @@ test('saves votes with a history line each, and keeps renders under their allowl
   assert.ok(existsSync(join(content, 'renders/c123/full.webp')))
   assert.equal((await request('/renders/c123/full.webp')).text(), 'RIFF')
   assert.deepEqual((await request('/api/state')).json().entries[0].renders, { 'full.webp': 4 })
+})
+
+test('frames the vertical from the top of her head, centred on it, inside her bounds; the splash and face fit her', () => {
+  const near = (a, b) => Object.keys(b).every((k) => Math.abs(a[k] - b[k]) < 1e-6)
+  // A tall figure 200 wide, 1000 tall, holding something thin up to 1300: the top 75% from her head, never cut sideways.
+  const tall = { x: -100, y: 0, w: 200, h: 1300, top: 1000, crownX: 40 }
+  const v = verticalCrop(tall)
+  assert.ok(near({ h: v.h, ratio: v.w / v.h, top: v.y + v.h }, { h: 772.5, ratio: 2 / 3, top: 1000 + 0.03 * 772.5 }))
+  assert.ok(v.x <= tall.x && v.x + v.w >= tall.x + tall.w)
+  // A wide figure: cut at the sides around her head, but never past her edges.
+  const wide = { x: -500, y: 0, w: 1000, h: 800, top: 800, crownX: 480 }
+  const c = verticalCrop(wide)
+  assert.ok(c.x + c.w <= wide.x + wide.w + 0.03 * c.w + 1e-6 && c.x > -500)
+  const s = containCrop({ x: 0, y: 0, w: 400, h: 300 }, 16 / 9)
+  assert.ok(Math.abs(s.w / s.h - 16 / 9) < 1e-9 && s.x <= 0 && s.x + s.w >= 400 && s.y <= 0 && s.y + s.h >= 300)
+  const f = faceCrop(tall)
+  assert.ok(near({ w: f.w, h: f.h, cx: f.x + f.w / 2 }, { w: 200, h: 200, cx: 40 }))
+})
+
+/** A PNG header of a given size: all the lock step reads. */
+const png = (width, height, seed = 0) => {
+  const b = Buffer.alloc(33 + seed)
+  Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(b, 0)
+  b.writeUInt32BE(13, 8); b.write('IHDR', 12, 'latin1'); b.writeUInt32BE(width, 16); b.writeUInt32BE(height, 20)
+  return b
+}
+
+test('locks only kept units, with the images each role needs, into a verified bundle it reuses', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'l2d-lock-test-')), content = join(root, 'l2d'), exportsRoot = join(root, 'exports')
+  t.after(() => rm(root, { recursive: true, force: true }))
+  const entries = [{ id: 'c123', name: 'Unit A', group: 'base' }, { id: 'c124_01', name: 'Unit B', group: 'skin' }, { id: 'c125', name: 'Unit C', group: 'base' }, { id: 'c126', name: 'Unit D', group: 'base' }]
+  await mkdir(content, { recursive: true })
+  await writeFile(join(content, 'roster.json'), JSON.stringify({ schemaVersion: 1, entries }))
+  await writeFile(join(content, 'tiers.json'), JSON.stringify({ schemaVersion: 1, revision: 9, tiers: { c123: 'regular', c124_01: 'boss', c125: 'exclude' } }))
+  const poses = { fb: { stem: 'x_00', files: { 'x_00.skel': {} } }, aim: { stem: 'aim/x', files: { a: {} } }, cover: { stem: 'cover/x', files: { c: {} } } }
+  for (const [id, face] of [['c123', true], ['c124_01', false], ['c125', true], ['c126', true]]) {
+    await mkdir(join(content, 'sources', id), { recursive: true })
+    await mkdir(join(content, 'renders', id), { recursive: true })
+    await writeFile(join(content, 'sources', id, 'manifest.json'), JSON.stringify({ id, poses, ...(face ? { face: { sha256: 'f' } } : {}) }))
+    if (face) await writeFile(join(content, 'sources', id, 'face.png'), png(128, 128))
+    await writeFile(join(content, 'renders', id, 'pack-vertical.png'), png(640, 960))
+  }
+  await assert.rejects(lockPack(content, exportsRoot), /Render these first \(2\): c124_01 splash, c124_01 face/)
+  await writeFile(join(content, 'renders', 'c124_01', 'pack-splash.png'), png(1280, 720))
+  await writeFile(join(content, 'renders', 'c124_01', 'pack-face.png'), png(256, 256))
+  const manifest = await lockPack(content, exportsRoot)
+  assert.equal(manifest.id.startsWith('nikke-r9-'), true)
+  assert.deepEqual(manifest.units.map((u) => [u.id, u.tier, u.tierLabel, Object.keys(u.assets).sort()]),
+    [['nk-c123', 1, 'Regular', ['face', 'vertical']], ['nk-c124-01', 4, 'FinalBoss', ['face', 'splash', 'vertical']]])
+  assert.deepEqual(manifest.counts, { units: 2, vertical: 2, splash: 1, face: 2, files: 5 })
+  assert.deepEqual(manifest.units[1].assets.splash.poses, ['aim', 'cover'])
+  assert.equal(manifest.units[0].assets.face.reused, true)
+  assert.equal(unitId('c124_01'), 'nk-c124-01')
+  const folder = join(exportsRoot, manifest.id)
+  assert.deepEqual(pngSize(await readFile(join(folder, manifest.units[1].assets.splash.path))), { width: 1280, height: 720 })
+  assert.deepEqual(JSON.parse(await readFile(join(exportsRoot, 'latest-nikke.json'), 'utf8')).id, manifest.id)
+  // Same votes and images: the same bundle, untouched. A changed image: a new sibling.
+  assert.equal((await lockPack(content, exportsRoot)).createdAt, manifest.createdAt)
+  await writeFile(join(content, 'renders', 'c123', 'pack-vertical.png'), png(640, 960, 1))
+  assert.notEqual((await lockPack(content, exportsRoot)).id, manifest.id)
+  await verifyPack(folder)
+  await writeFile(join(folder, manifest.units[0].assets.vertical.path), png(640, 960, 2))
+  await assert.rejects(verifyPack(folder), /changed/)
+  await writeFile(join(content, 'renders', 'c126', 'pack-vertical.png'), png(600, 900))
+  await writeFile(join(content, 'tiers.json'), JSON.stringify({ schemaVersion: 1, revision: 10, tiers: { c126: 'regular' } }))
+  await assert.rejects(lockPack(content, exportsRoot), /600×900, not 640×960/)
 })

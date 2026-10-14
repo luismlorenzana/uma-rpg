@@ -2,7 +2,7 @@
 // frame; an animation is one frame every 1/fps s over the idle loop, joined by webp-anim.mjs; the GIF goes through
 // gifenc. Each pose is drawn by Spine on a WebGL canvas, then laid side by side on a 2D canvas.
 import { GIFEncoder, applyPalette, quantize } from '/vendor/gifenc.esm.js'
-import { MAX_LOOP_S, posesOf } from './formats.mjs'
+import { containCrop, faceCrop, MAX_LOOP_S, PACK, posesOf, RENDERS, verticalCrop } from './formats.mjs'
 import { poseAt, SpineStage } from './spine-view.js'
 import { animatedWebp } from './webp-anim.mjs'
 
@@ -78,4 +78,56 @@ export async function renderEntry(entry, renders, save, onStep = () => {}) {
     stage.gl.getExtension('WEBGL_lose_context')?.loseContext()
   }
   return saved
+}
+
+/**
+ * The locked pack's images for one unit (D134), as lossless PNG: her vertical, her splash when `splash`, her face
+ * when `face`. Each pose is framed on her trimmed bounds at the loop's start. Returns what was framed, for checking.
+ */
+export async function renderPack(entry, { splash = false, face = false }, save) {
+  const stage = new SpineStage(document.createElement('canvas'))
+  const out = document.createElement('canvas')
+  const ctx = out.getContext('2d')
+  const framed = {}
+  try {
+    const pose = async (name) => {
+      const actor = await stage.load(entry, name)
+      poseAt(actor, 0)
+      return { actor, fig: stage.figureBounds(actor) }
+    }
+    const png = async (canvas) => toBlob(canvas, 'image/png')
+    const standing = await pose('fb')
+    framed.figure = standing.fig
+
+    stage.resize(PACK.vertical.width, PACK.vertical.height)
+    stage.drawRect(standing.actor, framed.vertical = verticalCrop(standing.fig))
+    await save(PACK.vertical.name, await png(stage.canvas))
+
+    if (face) {
+      stage.resize(PACK.face.width, PACK.face.height)
+      stage.drawRect(standing.actor, framed.face = faceCrop(standing.fig))
+      await save(PACK.face.name, await png(stage.canvas))
+    }
+
+    if (splash) {
+      // Aim and Cover side by side when she has them, else Standing alone, each fitted to its half.
+      const poses = posesOf(RENDERS.find((r) => r.name === 'splash.webp'), Object.keys(entry.poses))
+      out.width = PACK.splash.width
+      out.height = PACK.splash.height
+      ctx.clearRect(0, 0, out.width, out.height)
+      const panel = Math.round(out.width / poses.length)
+      framed.splash = poses
+      for (const [i, name] of poses.entries()) {
+        const { actor, fig } = name === 'fb' ? standing : await pose(name)
+        stage.resize(panel, out.height)
+        stage.drawRect(actor, containCrop(fig, panel / out.height))
+        ctx.drawImage(stage.canvas, i * panel, 0)
+      }
+      await save(PACK.splash.name, await png(out))
+    }
+  } finally {
+    stage.unloadAll()
+    stage.gl.getExtension('WEBGL_lose_context')?.loseContext()
+  }
+  return framed
 }

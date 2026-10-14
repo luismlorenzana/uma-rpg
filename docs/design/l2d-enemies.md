@@ -83,8 +83,36 @@ content/l2d/                       gitignored
   download.log
 ```
 
-## 5. Next
+## 5. The locked pack (D134)
 
-1. The owner votes the roster.
-2. "Render all with a role" makes the stills, plus the animations for Sub-bosses and Bosses.
-3. Wiring them into the game (a private NIKKE pack, as D81's) is a separate task when the owner asks.
+The owner voted all 619 characters they saw: 389 Exclude, 70 Regular, 60 Key enemy, 50 Sub-boss, 50 Boss. The 230
+kept units are the third franchise pack, beside PriConne and Azur Lane, on their export terms (D133). Excluded units are
+delisted: they're in no pack, and their sources stay on disk.
+
+- **Images**, lossless PNG like the other two franchises:
+  - **Face:** the viewer's 128 px icon, unchanged. Three units without one get a 256 px square rendered around the
+    head.
+  - **Vertical, 640×960:** her Standing pose at the loop's start, cropped from the top of her head down to 75% of her
+    height (about the knees), centred on her head. This matches the other franchises' framing, which fills the frame
+    rather than showing a small whole figure.
+  - **Splash, 1280×720,** for Key enemies, Sub-bosses and Bosses: Aim and Cover side by side (Standing alone without
+    them), each pose fitted whole into its half.
+- **Framing** works on what's actually drawn, not on Spine's bounds, which count hidden attachments. The top of her
+  head is the highest row at least head-wide (3.5% of her height), so an upright rifle or a pole above her doesn't
+  count. Her head's middle is the centre of what's drawn just below that; bone names vary too much to use. Props wider
+  than the crop are cut at the sides, as rigging is in the Azur Lane crops.
+- **`pnpm l2d:lock`** checks that every kept unit has each image its role needs at the right size, then copies them
+  into `content/authoring/exports/nikke-r<votes revision>-<fingerprint>/`:
+  - `nikke/<id>/<role>.<hash16>.png`, with ids `nk-<viewer id>` (`nk-c550-01`);
+  - `manifest.json`, the same unit schema as the other exports: tier 1–4 with its label, assets with hash, size and
+    dimensions, and source provenance;
+  - snapshots of the votes and roster, and a `complete.json` marker.
+
+  `latest-nikke.json` points at the bundle. The same votes and images give the same bundle; any change makes a new
+  sibling.
+- **To add or change units later:** vote in the reviewer, press **Render pack images**, then run `pnpm l2d:lock`
+  again.
+
+## 6. Next
+
+Uploading the packs and wiring them into the game's fights is a separate task.

@@ -1,10 +1,10 @@
 // The L2D reviewer's page: one character at a time, playing live; a vote saves and moves on. Keys: 1–5 vote,
 // ← → move, Z undo, S A C switch pose.
-import { RENDERS, rendersForRole } from './formats.mjs'
+import { PACK, RENDERS } from './formats.mjs'
 
 /** The stills made for whoever is on screen. */
 const STILLS = RENDERS.filter((r) => r.kind === 'still' && !r.compare)
-import { renderEntry } from './render.js'
+import { renderEntry, renderPack } from './render.js'
 import { GROUPS, POSE_LABEL, POSES } from './roster.mjs'
 import { poseAt, SpineStage } from './spine-view.js'
 import { TIER_LABEL, TIERS, tierCounts } from './tiers.mjs'
@@ -171,7 +171,8 @@ function step(by) {
 function showRenders(entry) {
   $('render').disabled = !entry?.poses.fb
   $('render-status').textContent = entry?.pending?.length && entry.poses.fb ? 'Her splash waits for her Aim and Cover poses to download.' : ''
-  $('renders').replaceChildren(...RENDERS.filter((r) => entry?.renders[r.name]).map((r) => {
+  const shown = [...Object.entries(PACK).map(([role, p]) => ({ ...p, label: `Pack · ${role}` })), ...RENDERS]
+  $('renders').replaceChildren(...shown.filter((r) => entry?.renders[r.name]).map((r) => {
     const figure = document.createElement('figure')
     const img = document.createElement('img')
     img.src = `/renders/${entry.id}/${r.name}?v=${entry.renders[r.name]}`
@@ -207,22 +208,30 @@ async function renderCurrent() {
   }
 }
 
-/** What a batch still has to render: each voted unit's formats for her role that aren't on disk yet. */
-const batchWork = () => entries.map((e) => ({ entry: e, renders: rendersForRole(tiers[e.id]).filter((r) => !e.renders[r.name]) }))
-  .filter((w) => w.renders.length && w.entry.poses.fb)
+/** What the pack still needs (D134): each kept unit's vertical, her splash unless she's Regular, her face if the
+ * viewer has no icon for her. */
+const packNeeds = (e) => {
+  const tier = tiers[e.id]
+  if (!tier || tier === 'exclude' || !e.poses.fb || e.pending?.length) return null
+  const splash = tier !== 'regular' && !e.renders[PACK.splash.name], face = !e.face && !e.renders[PACK.face.name]
+  return !e.renders[PACK.vertical.name] || splash || face ? { splash: tier !== 'regular', face: !e.face } : null
+}
+const batchWork = () => entries.map((e) => ({ entry: e, needs: packNeeds(e) })).filter((w) => w.needs)
 
 let batching = false
-/** Renders every unit with a role, one at a time; press again to stop after the current one. */
+/** Renders the pack images of every kept unit still missing them, one at a time; press again to stop. Then
+ * `pnpm l2d:lock` locks them. */
 async function renderBatch() {
   if (batching) { batching = false; $('batch').textContent = 'Stopping…'; return }
   batching = true
   $('batch').textContent = 'Stop'
   const work = batchWork()
   let done = 0
-  for (const { entry, renders } of work) {
+  for (const { entry, needs } of work) {
     if (!batching) break
+    $('render-status').textContent = `${done + 1}/${work.length} ${entry.name}…`
     try {
-      await renderEntry(entry, renders, saver(entry), (label) => { $('render-status').textContent = `${done + 1}/${work.length} ${entry.name}: ${label}…` })
+      await renderPack(entry, needs, saver(entry))
     } catch (error) {
       console.error(entry.id, error)
     }
@@ -231,13 +240,13 @@ async function renderBatch() {
   batching = false
   await refresh()
   showRenders(current())
-  $('render-status').textContent = `Batch: ${done} of ${work.length} rendered.`
+  $('render-status').textContent = `Pack images: ${done} of ${work.length} rendered. Lock them with pnpm l2d:lock.`
   showBatch()
 }
 
 function showBatch() {
   const left = batchWork().length
-  $('batch').textContent = left ? `Render all with a role (${left})` : 'All roles rendered'
+  $('batch').textContent = left ? `Render pack images (${left})` : 'Pack images rendered'
   $('batch').disabled = !left && !batching
 }
 

@@ -51,3 +51,19 @@ Votes go to `content/l2d/tiers.json`, with every change appended to `tiers-histo
   Press it again to stop; it resumes where it left off. Keep the tab open; it can sit in the background.
 
 `L2D_CONTENT_DIR` and `L2D_PORT` override the folder and port. The server only answers on 127.0.0.1.
+
+## Lock the pack
+
+```sh
+pnpm l2d:lock
+```
+
+Locks every kept unit (not Excluded or unrated) as the NIKKE franchise pack, beside the PriConne and Azur Lane exports
+in `content/authoring/exports/`. Each unit gets:
+
+- a 640×960 vertical;
+- a 1280×720 splash, unless she's Regular;
+- a face.
+
+It refuses to lock while any of these are missing, so press **Render pack images** in the reviewer first.
+`latest-nikke.json` names the bundle.

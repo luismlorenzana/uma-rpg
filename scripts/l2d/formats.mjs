@@ -25,8 +25,50 @@ export const RENDERS = [
   { name: 'compare-splash-hq.webp', label: 'Compare · animated at 960×540, 15 fps', width: 960, height: 540, layout: 'splash', compare: true, ...ANIM, fps: 15, quality: 0.86 },
   { name: 'compare-splash.gif', label: 'Compare · GIF', width: 720, height: 405, layout: 'splash', compare: true, ...ANIM, kind: 'gif' },
 ]
-export const RENDER_NAMES = new Set(RENDERS.map((r) => r.name))
 export const RENDER_TYPE = { webp: 'image/webp', gif: 'image/gif', png: 'image/png' }
+
+/**
+ * The locked pack's images (D134), on the other franchises' export terms: lossless PNG, 2:3 vertical at 640×960, 16:9
+ * splash at 1280×720 (Key enemy, Sub-boss and Boss only), and a face only for the few without the viewer's icon.
+ */
+export const PACK = {
+  vertical: { name: 'pack-vertical.png', width: 640, height: 960 },
+  splash: { name: 'pack-splash.png', width: 1280, height: 720 },
+  face: { name: 'pack-face.png', width: 256, height: 256 },
+}
+export const RENDER_NAMES = new Set([...RENDERS.map((r) => r.name), ...Object.values(PACK).map((p) => p.name)])
+/** How much of a figure the vertical keeps, from the top: head to about the knees, so she fills the frame. */
+export const KEEP = 0.75
+
+// Framing, in world units with y up: a figure is her trimmed bounds { x, y, w, h } (y her lowest point), plus `top`, the
+// top of her head (below anything thin she holds up), and `crownX`, the middle of her head.
+
+/** The 2:3 vertical: the top KEEP of her height, from the top of her head, centred on her head; props wider than that
+ * are cut at the sides, and a narrow figure is never cut. */
+export function verticalCrop(fig, ratio = 2 / 3, keep = KEEP, margin = MARGIN) {
+  const top = fig.top ?? fig.y + fig.h, h = (top - fig.y) * keep * (1 + margin), w = h * ratio
+  return { x: centreWithin(fig, fig.crownX ?? fig.x + fig.w / 2, w, margin), y: top + margin * h - h, w, h }
+}
+
+/** The left edge of a crop `w` wide, centred on x but kept to the figure: no empty side while she fills the width,
+ * no cut while she's narrower. */
+function centreWithin(fig, x, w, margin) {
+  const a = fig.x - margin * w, b = fig.x + fig.w + margin * w - w
+  return Math.min(Math.max(x - w / 2, Math.min(a, b)), Math.max(a, b))
+}
+
+/** The whole figure, centred, at a ratio, with a margin all round. */
+export function containCrop(fig, ratio, margin = MARGIN) {
+  const w = Math.max(fig.w, fig.h * ratio) * (1 + 2 * margin), h = w / ratio
+  return { x: fig.x + fig.w / 2 - w / 2, y: fig.y + fig.h / 2 - h / 2, w, h }
+}
+
+/** A square face, centred on her head: about an eighth of her height below its top, so tall ears or hats don't push
+ * her face to the bottom edge. */
+export function faceCrop(fig) {
+  const top = fig.top ?? fig.y + fig.h, side = (top - fig.y) * 0.2, cy = top - (top - fig.y) * 0.11
+  return { x: (fig.crownX ?? fig.x + fig.w / 2) - side / 2, y: cy - side / 2, w: side, h: side }
+}
 
 /** The poses a render draws, left to right, for an entry with these poses downloaded; null if she can't have it. */
 export function posesOf(render, available) {
