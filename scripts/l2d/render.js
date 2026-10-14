@@ -9,10 +9,12 @@ import { animatedWebp } from './webp-anim.mjs'
 const toBlob = (canvas, type, quality) => new Promise((resolve, reject) =>
   canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error(`the browser couldn't encode ${type}`))), type, quality))
 
-/** Renders `renders` for an entry, skipping any she lacks the poses for. Returns the names saved. */
+/** Renders `renders` for an entry, skipping any she lacks the poses for, and her splash while poses are still to
+ * download (it would fall back to Standing). Returns the names saved. */
 export async function renderEntry(entry, renders, save, onStep = () => {}) {
   const available = Object.keys(entry.poses)
-  const jobs = renders.map((render) => ({ render, poses: posesOf(render, available) })).filter((j) => j.poses)
+  const jobs = renders.map((render) => ({ render, poses: posesOf(render, available) }))
+    .filter((j) => j.poses && !(j.render.layout === 'splash' && entry.pending?.length))
   const stage = new SpineStage(document.createElement('canvas'))
   const out = document.createElement('canvas')
   const ctx = out.getContext('2d', { willReadFrequently: true })

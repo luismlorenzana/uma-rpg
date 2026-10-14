@@ -9,6 +9,7 @@ import { createServer } from 'node:http'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { RENDER_NAMES, RENDER_TYPE } from './formats.mjs'
+import { POSES } from './roster.mjs'
 import { applyVote, emptyTiers, parseTiers } from './tiers.mjs'
 
 const ASSETS = dirname(fileURLToPath(import.meta.url))
@@ -65,7 +66,9 @@ export async function l2dHandler({ content, port }) {
     const renderDir = join(content, 'renders', entry.id)
     const renders = {}
     if (existsSync(renderDir)) for (const name of await readdir(renderDir)) if (RENDER_NAMES.has(name)) renders[name] = (await stat(join(renderDir, name))).size
-    return { ...entry, poses, spine, face: !!manifest.face?.sha256, renders }
+    // Poses the downloader hasn't tried yet: until it has, a splash can't know which poses she has.
+    const pending = POSES.filter((pose) => !manifest.poses[pose])
+    return { ...entry, poses, pending, spine, face: !!manifest.face?.sha256, renders }
   }
   const state = async () => ({ token, revision: tiers.revision, tiers: tiers.tiers, entries: await Promise.all(roster.map(entryState)) })
   await state()
@@ -174,6 +177,10 @@ async function main() {
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid L2D_PORT')
   if (!existsSync(join(content, 'roster.json'))) throw new Error('No roster yet: run `pnpm l2d:download` first')
   const server = createServer(await l2dHandler({ content, port }))
+  server.on('error', (error) => {
+    console.error(error.code === 'EADDRINUSE' ? `Port ${port} is taken: the reviewer may already be running (restart it to load changes).` : error.message)
+    process.exitCode = 1
+  })
   server.listen(port, '127.0.0.1', () => console.log(`L2D reviewer: http://127.0.0.1:${port}`))
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(() => process.exit()))
 }

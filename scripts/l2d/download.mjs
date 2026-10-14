@@ -1,12 +1,12 @@
 // Downloads the NIKKE L2D roster into the private, gitignored content/l2d/ (docs/design/l2d-enemies.md): the viewer's
 // list, each character's face icon and her three poses' Spine files (skeleton, atlas, texture pages), one request a
-// second. It resumes: files already on disk are kept. Every face and Standing pose comes first, so voting can start
-// while Aim and Cover finish. Also fetches the local app's two browser libraries, pinned and hash-checked.
+// second, one whole character at a time. It resumes: files already on disk are kept. Also fetches the local app's
+// browser libraries, pinned and hash-checked.
 //
-//   node scripts/l2d/download.mjs                          # the default groups, all three poses
+//   node scripts/l2d/download.mjs                          # every character model, all three poses
 //   node scripts/l2d/download.mjs --only c550_01           # one entry
 //   node scripts/l2d/download.mjs --poses fb               # faces and Standing only
-//   node scripts/l2d/download.mjs --groups base,skin,boss  # pick groups (base, skin, boss, story, collab)
+//   node scripts/l2d/download.mjs --groups base,skin,boss  # pick groups (base, skin, collab, story, boss, chibi)
 import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
@@ -117,26 +117,22 @@ async function main() {
   const entries = only ? roster.filter((e) => only.split(',').includes(e.id)) : roster
   if (only && !entries.length) throw new Error(`${only} isn't in the roster's groups`)
 
-  // Faces and Standing first, then the other poses.
-  const passes = [poses.filter((p) => p === 'fb'), poses.filter((p) => p !== 'fb')].filter((p) => p.length)
+  // One whole character at a time, so whoever the reviewer shows has all her poses (and so her splash).
   let done = 0
-  const total = entries.length * passes.length
   const failed = []
-  for (const pass of passes) {
-    for (const entry of entries) {
-      try {
-        const manifest = await readManifest(entry.id)
-        if (pass.includes('fb')) {
-          const face = await fetchOnce(join(CONTENT, 'sources', entry.id, 'face.png'), faceUrl(entry.id))
-          manifest.face = face ? { bytes: face.length, sha256: sha256(face) } : { missing: true }
-        }
-        for (const pose of pass) if (!manifest.poses[pose]?.files) manifest.poses[pose] = await downloadPose(entry, pose)
-        await writeAtomic(join(CONTENT, 'sources', entry.id, 'manifest.json'), JSON.stringify(manifest, null, 1))
-      } catch (error) {
-        failed.push(`${entry.id}: ${error.message}`)
+  for (const entry of entries) {
+    try {
+      const manifest = await readManifest(entry.id)
+      if (!manifest.face) {
+        const face = await fetchOnce(join(CONTENT, 'sources', entry.id, 'face.png'), faceUrl(entry.id))
+        manifest.face = face ? { bytes: face.length, sha256: sha256(face) } : { missing: true }
       }
-      process.stdout.write(`\r${++done}/${total} ${entry.id}          `)
+      for (const pose of poses) if (!manifest.poses[pose]?.files && !manifest.poses[pose]?.missing) manifest.poses[pose] = await downloadPose(entry, pose)
+      await writeAtomic(join(CONTENT, 'sources', entry.id, 'manifest.json'), JSON.stringify(manifest, null, 1))
+    } catch (error) {
+      failed.push(`${entry.id}: ${error.message}`)
     }
+    process.stdout.write(`\r${++done}/${entries.length} ${entry.id}          `)
   }
   console.log(`\n${entries.length} entries → ${join(CONTENT, 'sources')}`)
   if (failed.length) console.log(`Failed (run again to retry):\n  ${failed.join('\n  ')}`)
