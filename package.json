@@ -11,9 +11,11 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "test": "node --test scripts/check-size.test.mjs scripts/cast/*.test.mjs && turbo run test",
+    "test": "node --test scripts/check-size.test.mjs scripts/cast/*.test.mjs scripts/l2d/*.test.mjs && turbo run test",
     "cast:review": "node scripts/cast/review.mjs",
     "cast:install": "node scripts/cast/install-review.mjs",
+    "l2d:download": "node scripts/l2d/download.mjs",
+    "l2d:review": "node scripts/l2d/server.mjs",
     "web": "pnpm --filter @rpg/web dev",
     "api": "pnpm --filter @rpg/api dev",
     "docs:update": "pnpm --filter @rpg/domain run docs:update"

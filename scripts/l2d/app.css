@@ -1,0 +1,45 @@
+:root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #10151f; color: #e8edf6 }
+* { box-sizing: border-box }
+body { margin: 0 auto; min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; max-width: 1400px }
+header, footer { padding: 10px 16px; background: #171e2b }
+header { border-bottom: 1px solid #303e52 }
+footer { border-top: 1px solid #303e52; position: sticky; bottom: 0; padding-bottom: max(10px, env(safe-area-inset-bottom)) }
+h1, h2, p { margin: 0 }
+h1 { font-size: 20px }
+h2 { font-size: 17px }
+.title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px }
+#status { font-size: 13px; color: #9fbfcf }
+.filters { display: flex; gap: 8px; flex-wrap: wrap }
+label { font-size: 11px; display: grid; gap: 2px; color: #acb8c9; flex: 1; min-width: 120px }
+select, input { min-height: 40px; width: 100%; font: inherit; font-size: 14px; border: 1px solid #465772; border-radius: 6px; padding: 6px; background: #101722; color: #e8edf6 }
+#counts { font-size: 12px; color: #b5c2d3; margin-top: 6px }
+button { min-height: 44px; min-width: 44px; border: 1px solid #465772; border-radius: 7px; font: inherit; font-size: 14px; font-weight: 650; color: inherit; background: #233148; padding: 6px 12px; cursor: pointer; touch-action: manipulation }
+button:hover { filter: brightness(1.18) }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #f0c15b; outline-offset: 2px }
+button:disabled { opacity: .45; cursor: default }
+button[aria-pressed=true] { border-color: #e5b64c; background: #43361f }
+[hidden] { display: none !important }
+main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; padding: 12px 16px; min-height: 0 }
+@media (max-width: 900px) { main { grid-template-columns: 1fr } }
+.viewer { display: flex; flex-direction: column; gap: 8px; min-height: 0 }
+.who { display: flex; gap: 10px; align-items: center }
+#face { width: 56px; height: 56px; border-radius: 50%; background: #233148; object-fit: cover }
+#meta { font-size: 12px; color: #9eafc5 }
+.stage { position: relative; aspect-ratio: 2 / 3; height: min(calc(100dvh - 330px), 150vw); max-width: 100%; margin-inline: auto; border: 1px solid #303e52; border-radius: 12px; overflow: hidden;
+  background: repeating-conic-gradient(#263042 0% 25%, #202a3b 0% 50%) 50% / 24px 24px }
+.stage canvas { width: 100%; height: 100%; display: block }
+#message { position: absolute; inset: auto 12px 12px; padding: 8px 10px; border-radius: 8px; background: #000a; font-size: 13px }
+.poses { display: flex; gap: 6px }
+.poses button { flex: 1 }
+.formats { display: flex; flex-direction: column; gap: 8px; min-width: 0 }
+.formats-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap }
+.formats-actions { display: flex; gap: 6px; flex-wrap: wrap }
+#render-status { font-size: 12px; color: #9fbfcf; min-height: 1em }
+#renders { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px }
+figure { margin: 0; border: 1px solid #303e52; border-radius: 10px; overflow: hidden; background: #171e2b }
+figure img { display: block; width: 100%; background: repeating-conic-gradient(#263042 0% 25%, #202a3b 0% 50%) 50% / 16px 16px }
+figcaption { font-size: 12px; padding: 6px 8px; color: #b5c2d3 }
+.votes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 6px }
+.votes button { font-size: 13px; padding-inline: 4px }
+.votes kbd { opacity: .6; margin-right: 4px }
+.nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px }
