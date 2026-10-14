@@ -1,5 +1,8 @@
 # Local portrait review (D123)
 
+For the current two-franchise scope and multi-round source/ranking/crop workflow, see
+[Private portrait authoring](portrait-authoring.md) (D124). This page describes the original first-pass tool.
+
 An owner-only local browser app for reviewing the already-imported franchise portraits. It reads the existing private
 packs and saves a separate ratings file. **No game integration, publishing, automatic enemy selection or pack edits.**
 Cast authoring happens later, using the owner's results.

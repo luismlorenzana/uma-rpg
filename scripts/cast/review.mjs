@@ -5,10 +5,17 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { ratingsPath } from './ratings.mjs'
 import { reviewHandler } from './review-server.mjs'
+import { projectPaths } from './authoring-round.mjs'
 
 const assets = dirname(fileURLToPath(import.meta.url))
-const release = resolve(process.env.CAST_CONTENT_DIR ?? resolve(assets, '../../content/release'))
-const file = resolve(process.env.CAST_RATINGS_FILE ?? ratingsPath(release))
+const fallbackRelease=resolve(process.env.CAST_CONTENT_DIR ?? resolve(assets,'../../content/release'))
+const projectFile=process.env.CAST_PROJECT_FILE ?? (!process.env.CAST_RATINGS_FILE ? resolve(dirname(fallbackRelease),'authoring/project.json') : undefined)
+let paths
+if(projectFile) {
+  try{paths=await projectPaths(resolve(projectFile))}catch(error){if(error.code!=='ENOENT')throw error}
+}
+const release = paths?.release ?? fallbackRelease
+const file = paths?.file ?? resolve(process.env.CAST_RATINGS_FILE ?? ratingsPath(release))
 {
   const port = Number(process.env.CAST_REVIEW_PORT ?? 5194)
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid CAST_REVIEW_PORT')

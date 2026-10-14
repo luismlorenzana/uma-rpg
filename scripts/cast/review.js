@@ -1,29 +1,54 @@
 const $ = id => document.getElementById(id)
 const state = { data: null, pack: '', member: '', filter: 'unrated', query: '', mode: 'full', view: 'single', busy: false, history: [] }
-const labels = { '-2': 'Excluded ↓↓', '-1': 'Rare ↓', '0': 'Unreviewed', '1': 'Regular ↑', '2': 'Key ↑↑' }
+const rankingLabels = { '-2': 'Excluded ↓↓', '-1': 'Rare ↓', '0': 'Unreviewed', '1': 'Regular ↑', '2': 'Key ↑↑' }
+const tierLabels = { '1': 'Regular', '2': 'KeyEnemy', '3': 'MiniBoss', '4': 'FinalBoss' }
+const tierMode = () => state.data?.mode === 'tiers'
+const labels = () => tierMode() ? tierLabels : rankingLabels
+const scale = () => tierMode() ? [1,2,3,4] : [-2,-1,1,2]
 const selectedPack = () => state.data?.packs.find(p => p.id === state.pack)
 const members = () => (selectedPack()?.members ?? []).filter(m =>
   (state.filter === 'all' || (state.filter === 'unrated' ? !m.rating : m.rating === Number(state.filter))) &&
   (!state.query || m.name.toLocaleLowerCase().includes(state.query) || m.id.toLocaleLowerCase().includes(state.query)))
 const selected = () => members().find(m => m.id === state.member)
 const imageUrl = path => '/art/' + path
-const remember = () => { try { localStorage.setItem('uma-cast-review-position', JSON.stringify({ pack: state.pack, member: state.member })) } catch { /* Votes live on disk even if browser storage is unavailable. */ } }
-const totals = pack => pack.members.reduce((n, m) => { n[String(m.rating)]++; return n }, { '-2': 0, '-1': 0, '0': 0, '1': 0, '2': 0 })
+const cursorKey = () => 'uma-cast-review-position-'+(state.data?.round?.id??'legacy')
+const remember = () => { try { localStorage.setItem(cursorKey(), JSON.stringify({ pack: state.pack, member: state.member })) } catch { /* Votes live on disk even if browser storage is unavailable. */ } }
+const totals = pack => pack.members.reduce((n, m) => { n[String(m.rating)]++; return n }, { '-2': 0, '-1': 0, '0': 0, '1': 0, '2': 0, '3':0, '4':0 })
+const tierCounts = n => Object.entries(tierLabels).map(([rating,label]) => label+' '+n[rating]).join(' · ')
 const fail = error => { $('error').hidden = false; $('error').querySelector('span').textContent = error.message; $('status').textContent = 'Not saved' }
 const clearError = () => { $('error').hidden = true }
 function choose(id) { state.member = id; remember(); render() }
 
+function configureScale() {
+  const choices = tierMode() ? [['all','All'], ...Object.entries(tierLabels)] :
+    [['unrated','Unreviewed'],['all','All'],['2',rankingLabels['2']],['1',rankingLabels['1']],['-1',rankingLabels['-1']],['-2',rankingLabels['-2']]]
+  $('filter').replaceChildren(...choices.map(([value,label]) => {
+    const option=document.createElement('option'); option.value=value; option.textContent=label; return option
+  }))
+  state.filter = tierMode() ? 'all' : 'unrated'; $('filter').value=state.filter
+  const colors = tierMode() ? ['regular','key','mini-boss','final-boss'] : ['exclude','rare','regular','key']
+  for (const [index,button] of [...document.querySelectorAll('[data-key]')].entries()) {
+    const value=scale()[index], key=document.createElement('kbd')
+    key.textContent=String(index+1); button.dataset.vote=String(value); button.className=colors[index]
+    button.replaceChildren(key, ' '+labels()[String(value)])
+  }
+  $('scale-help').textContent=tierMode() ? '1 Regular · 2 KeyEnemy · 3 MiniBoss · 4 FinalBoss' : '1 Exclude · 2 Rare · 3 Regular · 4 Key'
+  $('use-help').textContent=tierMode() ? 'Choose any tier to move a unit up or down. Assignments stay local; they do not change the game.' : 'Planned use: Key leaders, Regular recurring foes, Rare filler, Excluded unused.'
+}
+
 async function post(path, body) {
   const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Review-Token': state.data.token },
-    body: JSON.stringify(body) })
+    body: JSON.stringify({ ...body, roundId:state.data.round?.id }) })
   const value = await response.json()
   if (!response.ok) throw new Error(value.error || 'Request failed')
   return value
 }
 function enable() {
   for (const button of document.querySelectorAll('button')) button.disabled = state.busy
-  for (const button of document.querySelectorAll('[data-vote]')) button.disabled = state.busy || state.view !== 'single' || !selected()
-  $('undo').disabled = state.busy || !state.history.length
+  for (const button of document.querySelectorAll('[data-vote]')) button.disabled = state.busy || state.data?.readOnly || state.view !== 'single' || !selected()
+  $('undo').disabled = state.busy || state.data?.readOnly || !state.history.length
+  $('import').disabled=state.busy || state.data?.readOnly
+  $('crop-link').hidden=!state.data?.readOnly
   $('previous').disabled = state.busy || members().findIndex(m => m.id === state.member) <= 0
   $('skip').disabled = state.busy || !members().length
 }
@@ -32,8 +57,12 @@ function portrait(member) {
   $('image-error').hidden = true; image.hidden = false
   image.removeAttribute('style'); box.classList.remove('face-crop')
   const face = state.mode === 'face'
+  const source=face && member.face ? member.face : member.art
   image.alt = member.name + (face ? ', face' : ', full art')
-  image.src = imageUrl(face && member.face ? member.face.path : member.art.path)
+  image.src = imageUrl(source.path)
+  $('dimensions').textContent=source.width+' × '+source.height+' px'
+  $('original').href=imageUrl(source.path)
+  $('original').setAttribute('aria-label','Open original image for '+member.name)
   if (face && !member.face) {
     const avatar = member.avatar ?? selectedPack().avatar ?? { x: .5, y: 0, size: .3 }
     const clamp = (v, min, max, fallback) => Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback
@@ -49,15 +78,19 @@ function render() {
   if (!pack) { $('empty').hidden = false; $('single').hidden = true; enable(); return }
   if (!list.some(m => m.id === state.member)) state.member = list[0]?.id ?? ''
   const member = selected(), counts = totals(pack), reference = state.data.packs[0], ref = totals(reference)
+  $('round').textContent=(state.data.round?.label??'First pass')+(state.data.readOnly?' · Final':'')
+  $('full').textContent=state.data.round?'Source':'Full'
   const options = state.data.packs.map(p => {
     const o = document.createElement('option'), n = totals(p)
-    o.value = p.id; o.textContent = p.label + ' · ' + p.members.length + ' · ' + (p.members.length - n['0']) + ' reviewed'
+    o.value = p.id; o.textContent = p.label + ' · ' + p.members.length + (tierMode() ? '' : ' · ' + (p.members.length - n['0']) + ' reviewed')
     return o
   })
   $('pack').replaceChildren(...options); $('pack').value = state.pack
-  $('counts').textContent = (pack.members.length - counts['0']) + '/' + pack.members.length +
+  $('counts').textContent = tierMode() ? tierCounts(counts) : (pack.members.length - counts['0']) + '/' + pack.members.length +
     ' reviewed · Key ' + counts['2'] + ' · Regular ' + counts['1'] + ' · Rare ' + counts['-1'] + ' · Excluded ' + counts['-2']
-  $('reference').textContent = 'Reference · ' + reference.label + ' (' + reference.members.length + ') · Key ' + ref['2'] + ' · Regular ' + ref['1']
+  $('reference').textContent = 'Reference · ' + reference.label + ' (' + reference.members.length + ') · ' +
+    (tierMode() ? tierCounts(ref) : 'Key ' + ref['2'] + ' · Regular ' + ref['1'])
+  for (const button of document.querySelectorAll('[data-vote]')) button.setAttribute('aria-pressed',String(tierMode() && member?.rating===Number(button.dataset.vote)))
   $('empty').hidden = list.length > 0
   $('single').hidden = !member || state.view !== 'single'
   $('grid').hidden = !list.length || state.view !== 'grid'
@@ -65,7 +98,9 @@ function render() {
   $('grid-toggle').setAttribute('aria-pressed', String(state.view === 'grid'))
   if (member && state.view === 'single') {
     portrait(member)
-    $('name').textContent = member.name; $('rating').textContent = labels[String(member.rating)]
+    $('name').textContent = member.name; $('rating').textContent = labels()[String(member.rating)]
+    $('prior').textContent = [member.previousRating === undefined ? '' : 'Previous · '+labels()[String(member.previousRating)],
+      member.source?.missingSplash ? 'Face only · splash pending' : ''].filter(Boolean).join(' · ')
     $('position').textContent = (list.indexOf(member) + 1) + '/' + list.length
     const index = list.indexOf(member)
     $('upcoming').replaceChildren(...list.slice(index + 1, index + 7).map(m => {
@@ -79,9 +114,9 @@ function render() {
   }
   if (state.view === 'grid') $('grid').replaceChildren(...list.map(m => {
     const button = document.createElement('button'), img = document.createElement('img'), name = document.createElement('span'), rating = document.createElement('span')
-    button.type = 'button'; button.setAttribute('aria-label', 'Review ' + m.name + ', ' + labels[String(m.rating)])
+    button.type = 'button'; button.setAttribute('aria-label', 'Review ' + m.name + ', ' + labels()[String(m.rating)])
     img.src = imageUrl(state.mode === 'face' && m.face ? m.face.path : m.art.path); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'
-    name.textContent = m.name; name.className = 'grid-name'; rating.textContent = labels[String(m.rating)]; rating.className = 'grid-rating'
+    name.textContent = m.name; name.className = 'grid-name'; rating.textContent = labels()[String(m.rating)]; rating.className = 'grid-rating'
     button.append(img, name, rating); button.addEventListener('click', () => { state.view = 'single'; choose(m.id) }); return button
   }))
   remember(); enable()
@@ -89,7 +124,7 @@ function render() {
 
 async function vote(rating) {
   const member = selected(), pack = selectedPack()
-  if (!member || state.busy || state.view !== 'single') return
+  if (!member || state.busy || state.data.readOnly || state.view !== 'single') return
   const old = member.rating, list = members(), index = list.indexOf(member)
   state.busy = true; clearError(); $('status').textContent = 'Saving'; enable()
   try {
@@ -108,7 +143,7 @@ async function vote(rating) {
   finally { state.busy = false; render() }
 }
 async function undo() {
-  if (state.busy || !state.history.length) return
+  if (state.busy || state.data.readOnly || !state.history.length) return
   const entry = state.history.at(-1)
   state.busy = true; clearError(); $('status').textContent = 'Saving'; enable()
   try {
@@ -129,15 +164,17 @@ async function load() {
   try {
     const response = await fetch('/api/review'), data = await response.json()
     if (!response.ok) throw new Error(data.error)
+    const roundChanged = state.data?.round?.id !== data.round?.id || state.data?.mode !== data.mode
     state.data = data
+    if(roundChanged) { state.query=''; $('search').value=''; configureScale() }
     let cursor
-    try { cursor = JSON.parse(localStorage.getItem('uma-cast-review-position') ?? '{}') } catch { cursor = {} }
-    state.pack = data.packs.find(p => p.id === cursor.pack)?.id ?? data.packs[0]?.id ?? ''
+    try { cursor = JSON.parse(localStorage.getItem(cursorKey()) ?? (data.round ? null : localStorage.getItem('uma-cast-review-position')) ?? '{}') } catch { cursor = {} }
+    state.pack = data.packs.find(p => p.id === cursor.pack)?.id ?? data.packs.find(p=>p.members.some(m=>!m.rating))?.id ?? data.packs[0]?.id ?? ''
     state.member = cursor.member ?? ''
-    clearError(); $('status').textContent = 'Saved'; render()
+    state.history=[];clearError(); $('status').textContent = 'Saved'; render()
   } catch (error) { fail(error) }
 }
-for (const button of document.querySelectorAll('[data-vote]')) button.addEventListener('click', () => vote(Number(button.dataset.vote)))
+for (const button of document.querySelectorAll('[data-key]')) button.addEventListener('click', () => vote(Number(button.dataset.vote)))
 $('pack').addEventListener('change', () => { state.pack = $('pack').value; state.member = ''; render() })
 $('filter').addEventListener('change', () => { state.filter = $('filter').value; render() })
 $('search').addEventListener('input', () => { state.query = $('search').value.toLocaleLowerCase().trim(); render() })
@@ -163,13 +200,13 @@ $('export').addEventListener('click', async () => {
     const response = await fetch('/api/export')
     if (!response.ok) throw new Error('Export failed')
     const url = URL.createObjectURL(new Blob([JSON.stringify(await response.json(), null, 2)], { type: 'application/json' }))
-    const link = document.createElement('a'); link.href = url; link.download = 'cast-ratings.json'; link.click(); URL.revokeObjectURL(url)
+    const link = document.createElement('a'); link.href = url; link.download = (state.data.round?.id??'cast')+'-ratings.json'; link.click(); URL.revokeObjectURL(url)
   } catch (error) { fail(error) }
 })
 document.addEventListener('keydown', event => {
   if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || /^(INPUT|SELECT|TEXTAREA)$/.test(event.target.tagName)) return
   if (state.busy || !state.data) return
-  if (['1','2','3','4'].includes(event.key)) { event.preventDefault(); void vote([-2,-1,1,2][Number(event.key)-1]) }
+  if (['1','2','3','4'].includes(event.key)) { event.preventDefault(); void vote(scale()[Number(event.key)-1]) }
   else if (event.key === 'ArrowLeft') { event.preventDefault(); skip(-1) }
   else if (event.key === 'ArrowRight') { event.preventDefault(); skip(1) }
   else if (event.key.toLowerCase() === 'z') { event.preventDefault(); void undo() }

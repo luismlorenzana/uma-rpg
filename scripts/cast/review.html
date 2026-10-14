@@ -9,18 +9,14 @@
 </head>
 <body>
   <header>
-    <div class="title"><h1>Portraits</h1><output id="status" aria-live="polite">Loading</output></div>
+    <div class="title"><h1>Portraits</h1><a id="crop-link" href="/crop" hidden>Crops →</a><output id="status" aria-live="polite">Loading</output></div>
     <div class="filters">
       <label>Franchise<select id="pack" aria-label="Franchise"></select></label>
-      <label>Show<select id="filter" aria-label="Show">
-        <option value="unrated">Unreviewed</option><option value="all">All</option>
-        <option value="2">Key ↑↑</option><option value="1">Regular ↑</option>
-        <option value="-1">Rare ↓</option><option value="-2">Excluded ↓↓</option>
-      </select></label>
+      <label>Show<select id="filter" aria-label="Show"></select></label>
       <label class="search">Search<input id="search" type="search" autocomplete="off"></label>
       <button id="grid-toggle" aria-pressed="false">Grid</button>
     </div>
-    <div id="counts"></div><div id="reference"></div>
+    <div id="round"></div><div id="counts"></div><div id="reference"></div>
   </header>
   <main>
     <section id="single">
@@ -28,17 +24,19 @@
         <div class="mode"><button id="full" aria-pressed="true">Full</button><button id="face" aria-pressed="false">Face</button></div>
       </div>
       <div class="caption"><h2 id="name"></h2><span id="rating"></span><span id="position"></span></div>
+      <div class="image-info"><span id="dimensions"></span><a id="original" target="_blank" rel="noopener noreferrer">Original ↗</a></div>
+      <div id="prior"></div>
       <div id="upcoming" aria-label="Next portraits"></div>
     </section>
     <section id="grid" hidden aria-label="Portrait grid"></section>
     <p id="empty" hidden>No portraits left</p>
   </main>
   <footer>
-    <div class="votes" aria-label="Rate this portrait">
-      <button data-vote="-2" class="exclude"><kbd>1</kbd> ↓↓ Exclude</button>
-      <button data-vote="-1" class="rare"><kbd>2</kbd> ↓ Rare</button>
-      <button data-vote="1" class="regular"><kbd>3</kbd> ↑ Regular</button>
-      <button data-vote="2" class="key"><kbd>4</kbd> ↑↑ Key</button>
+    <div class="votes" aria-label="Assign portrait tier">
+      <button data-key="1" disabled>Regular</button>
+      <button data-key="2" disabled>KeyEnemy</button>
+      <button data-key="3" disabled>MiniBoss</button>
+      <button data-key="4" disabled>FinalBoss</button>
     </div>
     <div class="navigation"><button id="previous">← Previous</button><button id="undo">Undo</button><button id="skip">Skip →</button></div>
     <div id="error" role="alert" hidden><span></span><button id="reload">Reload</button></div>
@@ -46,10 +44,12 @@
       <button id="export">Export</button><button id="import">Import</button>
       <input id="import-file" type="file" accept=".json,application/json" hidden>
       <details><summary aria-label="Help">ⓘ</summary><div>
-        <p>1 Exclude · 2 Rare · 3 Regular · 4 Key</p>
+        <p id="scale-help"></p>
         <p>← Previous · → Skip · Z Undo</p>
-        <p>Votes autosave locally. Export them for later cast authoring.</p>
-        <p>Planned use: Key leaders, Regular recurring foes, Rare filler, Excluded unused.</p>
+        <p>Votes autosave on disk with history snapshots. Export a backup at any time.</p>
+        <p>Source images are originals, not final crops. Rank first; vertical/face crops and elite splashes follow.</p>
+        <p>Original opens the unresized file. Pixel dimensions show its source resolution; face-only entries still need a splash.</p>
+        <p id="use-help"></p>
       </div></details>
     </div>
   </footer>
