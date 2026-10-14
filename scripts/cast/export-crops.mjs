@@ -1,8 +1,9 @@
 // Execute approved source-pixel recipes locally. No fetch, source mutation, game import or upload.
-import { readFile, mkdir, realpath, open, lstat } from 'node:fs/promises'
+import { readFile, mkdir, realpath, open, lstat, link, unlink } from 'node:fs/promises'
 import { join, dirname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
+import { randomUUID } from 'node:crypto'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { projectPaths } from './authoring-round.mjs'
 import { loadCropSession } from './crop-authoring.mjs'
@@ -23,12 +24,16 @@ async function safeDirectory(root,path) {
 }
 async function immutable(root,path,bytes) {
   await safeDirectory(root,dirname(path));let handle
+  const temp=path+'.'+randomUUID()+'.tmp'
   try {
-    handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();await handle.close();handle=null
+    // Publish only a fully written inode, without replacing an existing output. Mid-write interruption leaves
+    // an unreferenced temp, never a truncated final PNG/snapshot that would prevent safe resume.
+    handle=await open(temp,'wx',0o600);await handle.writeFile(bytes);await handle.sync();await handle.close();handle=null
+    await link(temp,path)
     await syncDirectory(dirname(path))
   }catch(error){await handle?.close();if(error.code!=='EEXIST')throw error
     if((await lstat(path)).isSymbolicLink() || !(await readFile(path)).equals(bytes))throw new Error('Existing export file differs: '+path)
-  }
+  }finally{await unlink(temp).catch(error=>{if(error.code!=='ENOENT')throw error})}
 }
 async function sourceBytes(root,image) {
   if(!image || !/^(?:azurlane\/)?cast\/[a-z0-9_-]{1,60}\.[a-f0-9]{8}\.(png|webp|jpg)$/.test(image.path) || !/^[a-f0-9]{64}$/.test(image.sha256??''))throw new Error('Invalid export source')
