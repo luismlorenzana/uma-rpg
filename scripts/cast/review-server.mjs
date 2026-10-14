@@ -65,7 +65,7 @@ export async function reviewHandler({ release, file = ratingsPath(release), port
       if (req.method === 'GET' && path === '/api/export') { await reviewData(); return send(res, 200, await readRatings(file)) }
       if(req.method==='GET' && ['/api/crops','/api/crops/export'].includes(path)) {
         const session=await loadCropSession(release,file)
-        if(!session)return send(res,404,{error:'No crop calibration prepared yet'})
+        if(!session)return send(res,404,{error:'No crop session prepared yet'})
         return send(res,200,{manifest:session.manifest,...session.data,...(path==='/api/crops'?{token}:{})})
       }
       if (req.method === 'GET' && path.startsWith('/art/')) {

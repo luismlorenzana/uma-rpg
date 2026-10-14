@@ -5,14 +5,14 @@ import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { cropFixture } from './crop-fixture.mjs'
-import { loadCropSession, saveCrops, startCropCalibration, calibrationMembers } from './crop-authoring.mjs'
+import { loadCropSession, saveCrops, startCropRoster, calibrationMembers } from './crop-authoring.mjs'
 import { loadReview, saveVotes, atomicJson } from './ratings.mjs'
 import { fitRect, moveRect, resizeRect, validRect, outputSize } from './crop-geometry.mjs'
 import { reviewHandler } from './review-server.mjs'
 
-async function fixture(t) {
+async function fixture(t,options) {
   const root=await mkdtemp(join(tmpdir(),'crop-authoring-test-'));t.after(()=>rm(root,{recursive:true,force:true}))
-  return cropFixture(root)
+  return cropFixture(root,options)
 }
 test('geometry keeps both ratios inside source bounds and caps output without upscaling',()=>{
   for(const image of [{width:400,height:225},{width:2048,height:1731},{width:96,height:96}])for(const role of ['vertical','splash']) {
@@ -58,6 +58,30 @@ test('crop edits, approvals and Undo persist with history without changing class
   await assert.rejects(saveCrops(f.release,f.file,{sessionId:'other',revision:2,updates:[{key:e.key,rect,status:'pending'}]}),/changed/)
   await assert.rejects(saveCrops(f.release,f.file,{sessionId:'calibration',revision:0,updates:[{key:e.key,rect,status:'pending'}]}),/changed/)
   assert.deepEqual(await readFile(reloaded.file),before)
+})
+test('full roster retains all units and carries saved rectangles, approvals and flags without mutating the prior session',async t=>{
+  const f=await fixture(t,{counts:[14,17]}),before=await loadCropSession(f.release,f.file)
+  const edits=before.data.entries.slice(0,3).map((entry,index)=>({key:entry.key,rect:entry.rect,status:['approved','flagged','pending'][index]}))
+  const member=before.manifest.members[0];edits[0].rect=moveRect(edits[0].rect,member.art,2,3)
+  const saved=await saveCrops(f.release,f.file,{sessionId:'calibration',revision:0,updates:edits})
+  const priorBytes=await readFile(before.file),priorManifest=await readFile(join(dirname(before.file),'manifest.json'))
+  const history=await readdir(join(dirname(before.file),'history'))
+  const started=await startCropRoster(f.content,'full'),session=await loadCropSession(f.release,f.file)
+  assert.equal(started.members,31);assert.equal(started.carried,saved.entries.length)
+  assert.equal(session.manifest.phase,'full-roster');assert.equal(session.manifest.carriedFrom.sessionId,'calibration')
+  assert.equal(session.manifest.carriedFrom.revision,1);assert.equal(session.data.revision,0)
+  const source=(await loadReview(f.release,f.file)).packs.flatMap(pack=>pack.members)
+  assert.equal(session.data.entries.length,31+source.filter(member=>member.rating!==1).length)
+  for(const entry of saved.entries)assert.deepEqual(session.data.entries.find(next=>next.key===entry.key),entry)
+  const inherited=new Set(saved.entries.map(entry=>entry.key))
+  for(const entry of session.data.entries.filter(entry=>!inherited.has(entry.key))) {
+    assert.equal(entry.status,'pending');assert.equal(entry.suggestion,'centered')
+  }
+  await assert.rejects(saveCrops(f.release,f.file,{sessionId:'calibration',revision:1,updates:edits}),/changed/)
+  await assert.rejects(startCropRoster(f.content,'full'),/EEXIST/)
+  assert.deepEqual(await readFile(before.file),priorBytes);assert.deepEqual(await readFile(join(dirname(before.file),'manifest.json')),priorManifest)
+  assert.deepEqual(await readdir(join(dirname(before.file),'history')),history);assert.deepEqual(await readFile(f.file),f.baseline)
+  assert.equal((await loadCropSession(f.release,f.file)).manifest.id,'full')
 })
 test('corrupt/missing crop records, catalogues or frozen classifications fail instead of silently resetting',async t=>{
   const f=await fixture(t),session=await loadCropSession(f.release,f.file),cropBytes=await readFile(session.file)

@@ -6,8 +6,8 @@ import { reviewFixture } from './review-fixture.mjs'
 import { atomicJson, packPath } from './ratings.mjs'
 import { digest } from './authoring-import.mjs'
 import { startCropCalibration } from './crop-authoring.mjs'
-export async function cropFixture(content) {
-  const originals=await reviewFixture(join(content,'generated'),{counts:[10,10]})
+export async function cropFixture(content,{counts=[10,10]}={}) {
+  const originals=await reviewFixture(join(content,'generated'),{counts})
   const root=join(content,'authoring'),release=join(root,'datasets','synthetic'),file=join(root,'rounds','tiers','ratings.json'),catalogues={},ratings={}
   for(const franchise of ['priconne','azurlane']) {
     const pack=JSON.parse(await readFile(packPath(originals.release,franchise)));ratings[franchise]={}

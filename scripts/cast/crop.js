@@ -87,9 +87,10 @@ function render() {
   $('task').replaceChildren(...options);$('task').value=state.key
   const all=state.data.entries.filter(item=>item.franchise===state.pack),approved=all.filter(item=>item.status==='approved').length,flagged=all.filter(item=>item.status==='flagged').length
   const units=state.data.manifest.members.filter(u=>u.franchise===state.pack).length
-  $('counts').textContent='Calibration · '+units+' units · '+approved+'/'+all.length+' approved'+(flagged?' · '+flagged+' need adjustment':'')
+  const phase=state.data.manifest.phase==='calibration'?'Calibration':'Full roster'
+  $('counts').textContent=phase+' · '+units+' units · '+approved+'/'+all.length+' approved'+(flagged?' · '+flagged+' need adjustment':'')
   $('empty').hidden=queue.length>0;$('editor').hidden=!e||!queue.length
-  if(!queue.length){$('empty').textContent=state.filter==='pending'?'Calibration complete for this franchise':'No matching crops';enable();return}
+  if(!queue.length){$('empty').textContent=state.filter==='pending'?'All crops approved for this franchise':'No matching crops';enable();return}
   $('name').textContent=m.name;$('tier').textContent=labels[m.rating];$('position').textContent=(queue.findIndex(item=>item.key===state.key)+1)+'/'+queue.length
   $('preview-title').textContent=CROP_ROLES[e.role].label+' · '+(e.role==='vertical'?'2:3':'16:9')
   $('source-size').textContent=m.art.width+' × '+m.art.height+' px';$('note').textContent=e.note??''

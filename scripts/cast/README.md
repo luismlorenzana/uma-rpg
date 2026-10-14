@@ -52,7 +52,7 @@ the old votes exactly, leaves all old datasets/rounds intact, and activates the 
 Tier exports use schema 2 (`mode: "tiers"`, ratings 1–4); old ranking files use schema 1 and cannot be imported into a
 tier round. Unknown/removed IDs and negative values are rejected. Back up `content/authoring/` as before.
 
-## Crop calibration
+## Crop review
 
 After the owner declares tiers final, stop the reviewer, then prepare a calibration from **existing local sources only**:
 
@@ -65,6 +65,17 @@ The optional seed file maps `franchise/id/vertical` or `franchise/id/splash` to 
 normalized center/coverage suggestions (`cx`, `cy`, `coverage`). Real IDs/coordinates belong in gitignored content.
 The default selects ten units per franchise across four tiers. No downloads or image transformation occurs.
 
+For a full manual pass over **every retained unit**, stop the reviewer and use a new session ID with `--full`:
+
+```sh
+node scripts/cast/crop-authoring.mjs /absolute/path/to/uma-rpg/content full-YYYYMMDD --full
+pnpm cast:install
+```
+
+This carries the active crop session's saved rectangles, approvals and flags forward unchanged. The preceding
+session and its history remain recoverable. New units start pending with centered suggestions; every format still
+needs manual review. The owner chose this full pass directly rather than waiting for calibration feedback (D128).
+
 Open **http://127.0.0.1:5194/crop**, or **Crops →** in the existing reviewer. Drag the rectangle, resize its corner,
 use Zoom/Fit or X/Y/Width fields, then **Approve & Next**. Changing an approved crop makes it pending again;
 **Needs adjustment** records framing feedback. Changes autosave with history; Undo is session-local. Both franchises
@@ -72,8 +83,8 @@ share 2:3 vertical and 16:9 splash frames; all non-Regular tiers need splash. Ex
 
 The preceding classification is frozen exactly and becomes read-only. Crops save separately under
 `content/authoring/crops/<session>/`. Export downloads recipes + approval state, not image files; output dimensions
-are capped to native resolution. Back up the whole authoring folder. Stop after this calibration for owner feedback
-before authoring the full roster; do not seek new sources, change the game or upload.
+are capped to native resolution. Back up the whole authoring folder. Final image files are generated only after the
+whole crop-review pass is complete, not as each unit is approved. Do not seek new sources, change the game or upload.
 
 ## Legacy voting
 

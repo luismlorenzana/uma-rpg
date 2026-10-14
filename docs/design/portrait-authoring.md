@@ -98,16 +98,20 @@ Both franchises use the **same 2:3 vertical ratio and 16:9 splash ratio**. Every
 preserve aspect ratio. Suggested export limits are 640×960 / 1280×720, clamped down to native crop resolution;
 the current Export saves recipes/approval state, not finished image files. Preview zoom is not export upscaling.
 
-### Calibration before the full roster (D127)
+### Reviewing crops (D127, D128)
 
-`/crop` in the existing local reviewer holds ten units per franchise, including all four tiers and varied poses.
-Rectangles are pre-aligned for owner review. Drag to pan, drag the lower-right corner to resize, use Zoom/Fit or
+`/crop` in the existing local reviewer holds the crop queue. Calibration remains available as an optional ten-unit
+sample per franchise, but the owner now chose to go directly through **every retained unit** (D128). The full-roster
+initializer includes all units and preserves the active session's exact saved rectangles, statuses and timestamps;
+the preceding manifest, crops and history stay intact. Its provenance records the prior session, revision and hash.
+Unreviewed additions receive centered suggestions, not approvals. Drag to pan, drag the lower-right corner to resize, use Zoom/Fit or
 source-pixel fields; the source and cropped preview are shown together. Approve & Next saves each format separately;
 Needs adjustment flags framing feedback without excluding the unit or changing its tier. Editing an approved crop
 returns it to review. Filters, Previous/Skip, session Undo and round-specific position help revisit work.
 
-Stop after the calibration and ask the owner about framing **before preparing the rest**. Completion does not
-automatically expand the catalogue or publish anything. Private records live in `content/authoring/crops/<session>/`:
+Review every required format manually. Save rectangles and approvals as the owner works, but generate final image
+files **only after the entire full-roster pass is complete**. Neither approval nor completion automatically renders,
+imports or uploads images. Existing faces are reused. Private records live in `content/authoring/crops/<session>/`:
 
 - `manifest.json`: immutable selected IDs, final tiers, source/face references and hashes, policy and baseline identity.
 - `crops.json`: current source-pixel rectangles, output dimensions, per-format pending/approved/flagged state and revision.
@@ -117,6 +121,10 @@ The tier round holds `classification-final-ratings.json` (exact original bytes),
 `classification-final.json`, and `crop-session.json` (active session and catalogue hash). Source/classification
 changes, corrupt/missing crop records, bad geometry and stale-tab revisions fail rather than reset data. Restore
 only a verified crop history snapshot while the reviewer is stopped, preserving the session and frozen classification.
+
+Stop the reviewer before creating a full-roster session; activate it only after source and carryover validation.
+Old tabs cannot save to a different session, even when revisions happen to match. A full-roster manifest must cover
+the entire retained catalogue, and has one vertical crop per unit plus splash for every non-Regular tier.
 
 Game enemy behavior, final file export/import and bucket upload remain later owner-approved work.
 

@@ -31,40 +31,51 @@ async function snapshot(file,data) {
     const old=JSON.parse(await readFile(path));if(old.sha256!==sha256 || digest(JSON.stringify(old.data))!==sha256)throw new Error('Corrupt crop history')
   }catch(error){if(error.code!=='ENOENT')throw error;await atomicJson(path,{savedAt:new Date().toISOString(),sha256,data})}
 }
-/** No fetches, image transformations or classification writes. Stop the reviewer before initialization. */
-export async function startCropCalibration(content,sessionId,{seeds={}}={}) {
+export const startCropCalibration = (content,sessionId,options) => startCropSession(content,sessionId,{...options,phase:'calibration'})
+export const startCropRoster = (content,sessionId,options) => startCropSession(content,sessionId,{...options,phase:'full-roster'})
+/** No fetches or image transformations. Stop the reviewer before changing the active crop pointer. */
+async function startCropSession(content,sessionId,{seeds={},phase}={}) {
   if(!safeId(sessionId))throw new Error('Invalid crop session')
   const project=join(resolve(content),'authoring/project.json'),{release,file}=await projectPaths(project)
   const bytes=await readFile(file),ratings=await readRatings(file),review=await loadReview(release,file)
   if(ratings.schemaVersion!==2 || !review.round)throw new Error('Final role tiers are required before cropping')
-  const members=calibrationMembers(review),session=join(rootFor(file),sessionId),createdAt=new Date().toISOString()
+  const previous=phase==='full-roster'?await loadCropSession(release,file):null
+  const previousBytes=previous?await readFile(previous.file):null
+  const carried=new Map(previous?.data.entries.map(entry=>[entry.key,entry])??[])
+  const members=phase==='full-roster'?review.packs.flatMap(pack=>pack.members.map(member=>({franchise:pack.id,...member}))):calibrationMembers(review)
+  const session=join(rootFor(file),sessionId),createdAt=new Date().toISOString()
   const sourceRoot=await realpath(release)
   for(const member of members)for(const image of [member.art,member.face]) {
     if(!image || !/^(?:azurlane\/)?cast\/[a-z0-9_-]{1,60}\.[a-f0-9]{8}\.(png|webp|jpg)$/.test(image.path) || !/^[a-f0-9]{64}$/.test(image.sha256??''))throw new Error('Invalid crop source image')
     const path=await realpath(join(sourceRoot,image.path))
     if(!path.startsWith(sourceRoot+sep) || digest(await readFile(path))!==image.sha256)throw new Error('Crop original hash mismatch')
   }
-  await mkdir(dirname(session),{recursive:true});await mkdir(session)
   const entries=members.flatMap(member=>(member.rating===1?['vertical']:['vertical','splash']).map(role=>{
     const key=member.franchise+'/'+member.id+'/'+role,seed=seeds[key]
+    const inherited=carried.get(key)
+    if(inherited){if(seed)throw new Error('Cannot replace a saved crop with a seed: '+key);return structuredClone(inherited)}
     const rect=seed?.rect??fitRect(member.art,role,seed)
     if(!validRect(rect,member.art,role) || !outputSize(rect,role).width)throw new Error('Invalid crop seed: '+key)
-    return {key,franchise:member.franchise,id:member.id,role,sourceSha256:member.art.sha256,rect,output:outputSize(rect,role),status:'pending',suggestion:'pre-aligned',...(seed?.note?{note:seed.note}:{})}
+    return {key,franchise:member.franchise,id:member.id,role,sourceSha256:member.art.sha256,rect,output:outputSize(rect,role),status:'pending',suggestion:seed?'pre-aligned':'centered',...(seed?.note?{note:seed.note}:{})}
   }))
-  if(Object.keys(seeds).some(key=>!entries.some(entry=>entry.key===key)))throw new Error('Crop seed outside calibration')
-  const manifest={schemaVersion:1,id:sessionId,phase:'calibration',createdAt,roundId:review.round.id,datasetId:review.round.datasetId,
-    classificationSha256:digest(bytes),members,policy:'Existing local sources only; full body is a vertical format; reuse faces; all non-Regular tiers need splash; review before expanding'}
+  if(Object.keys(seeds).some(key=>!entries.some(entry=>entry.key===key)))throw new Error('Crop seed outside session')
+  const manifest={schemaVersion:1,id:sessionId,phase,createdAt,roundId:review.round.id,datasetId:review.round.datasetId,
+    classificationSha256:digest(bytes),members,
+    ...(previous?{carriedFrom:{sessionId:previous.manifest.id,revision:previous.data.revision,sha256:digest(previousBytes),entries:carried.size}}:{}),
+    policy:'Existing local sources only; full body is a vertical format; reuse faces; all non-Regular tiers need splash; manually review each format; generate final images only after the full pass'}
+  await mkdir(dirname(session),{recursive:true});await mkdir(session)
   await atomicJson(join(session,'manifest.json'),manifest)
   const crops={schemaVersion:1,sessionId,revision:0,entries}
   await snapshot(join(session,'crops.json'),crops);await atomicJson(join(session,'crops.json'),crops)
   const archive=join(dirname(file),'classification-final-ratings.json')
   try {await copyFile(file,archive,constants.COPYFILE_EXCL)}catch(error){if(error.code!=='EEXIST')throw error}
   const archived=await open(archive,'r');try{await archived.sync()}finally{await archived.close()}
-  if(!(await readFile(archive)).equals(bytes) || !(await readFile(file)).equals(bytes))throw new Error('Classification changed during calibration setup')
+  if(!(await readFile(archive)).equals(bytes) || !(await readFile(file)).equals(bytes))throw new Error('Classification changed during crop setup')
   const existing=await classificationStatus(file)
   if(!existing)await atomicJson(join(dirname(file),'classification-final.json'),{schemaVersion:1,sha256:digest(bytes),roundId:review.round.id,datasetId:review.round.datasetId,revision:ratings.revision,finalizedAt:createdAt})
+  if(previous && !(await readFile(previous.file)).equals(previousBytes))throw new Error('Previous crops changed during setup; stop the reviewer and use a new session ID')
   await atomicJson(join(dirname(file),'crop-session.json'),{schemaVersion:1,id:sessionId,manifestSha256:digest(await readFile(join(session,'manifest.json')))})
-  return {session,members:members.length,crops:entries.length,classificationSha256:manifest.classificationSha256}
+  return {session,members:members.length,crops:entries.length,carried:carried.size,classificationSha256:manifest.classificationSha256}
 }
 export async function loadCropSession(release,file) {
   let pointer
@@ -73,10 +84,11 @@ export async function loadCropSession(release,file) {
   const session=join(rootFor(file),pointer.id),manifestBytes=await readFile(join(session,'manifest.json')),manifest=JSON.parse(manifestBytes)
   if(digest(manifestBytes)!==pointer.manifestSha256)throw new Error('Crop catalogue changed')
   const frozen=await classificationStatus(file),review=await loadReview(release,file)
-  if(manifest.schemaVersion!==1 || manifest.id!==pointer.id || manifest.phase!=='calibration' || !frozen ||
+  if(manifest.schemaVersion!==1 || manifest.id!==pointer.id || !['calibration','full-roster'].includes(manifest.phase) || !frozen ||
     frozen.sha256!==manifest.classificationSha256 || review.round?.id!==manifest.roundId || review.round.datasetId!==manifest.datasetId)throw new Error('Crop session identity mismatch')
   const source=new Map(review.packs.flatMap(p=>p.members.map(m=>[p.id+'/'+m.id,m])))
   if(!Array.isArray(manifest.members) || !manifest.members.length)throw new Error('Invalid crop catalogue')
+  if(manifest.phase==='full-roster' && manifest.members.length!==source.size)throw new Error('Incomplete full crop roster')
   const known=new Map()
   for(const member of manifest.members) {
     const original=source.get(member.franchise+'/'+member.id)
@@ -113,7 +125,7 @@ export async function saveCrops(release,file,{sessionId,revision,updates}) {
   return next
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
-  const [content,id,seeds]=process.argv.slice(2)
-  if(!content || !id)throw new Error('Usage: node scripts/cast/crop-authoring.mjs <private-content-folder> <new-session-id> [private-seeds.json]')
-  console.log(await startCropCalibration(content,id,{seeds:seeds?JSON.parse(await readFile(seeds)):undefined}))
+  const [content,id,...options]=process.argv.slice(2),seeds=options.find(option=>!option.startsWith('--'))
+  if(!content || !id || options.filter(option=>!option.startsWith('--')).length>1 || options.some(option=>option.startsWith('--')&&option!=='--full'))throw new Error('Usage: node scripts/cast/crop-authoring.mjs <private-content-folder> <new-session-id> [private-seeds.json] [--full]')
+  console.log(await (options.includes('--full')?startCropRoster:startCropCalibration)(content,id,{seeds:seeds?JSON.parse(await readFile(seeds)):undefined}))
 }
