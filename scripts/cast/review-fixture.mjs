@@ -21,9 +21,9 @@ function portrait(tone) {
   const header=Buffer.alloc(13);header.writeUInt32BE(width);header.writeUInt32BE(height,4);header[8]=8;header[9]=6
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(raw)),chunk('IEND',Buffer.alloc(0))])
 }
-export async function reviewFixture(root) {
+export async function reviewFixture(root,{counts=[4,6]}={}) {
   const release=join(root,'dataset'),file=join(root,'round/ratings.json'),catalogues={}
-  for(const [franchise,count] of [['priconne',4],['azurlane',6]]) {
+  for(const [franchise,count] of [['priconne',counts[0]],['azurlane',counts[1]]]) {
     const prefix=franchise==='priconne'?'':franchise+'/',members=[]
     await mkdir(join(release,prefix,'cast'),{recursive:true})
     for(let i=0;i<count;i++) {

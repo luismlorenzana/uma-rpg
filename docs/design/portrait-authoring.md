@@ -85,12 +85,40 @@ History from an interrupted write may be one revision ahead of the current file;
 
 ## Phase 2: crop authoring, after ranking
 
-Build a separate local crop pass over the ranked source originals. A regular enemy needs **vertical full-body +
-small face**. An elite, sub-boss or final boss needs those plus a **wide splash** for attacks. Give each role an
-output size and a movable crop rectangle with zoom; pre-authored rectangles can be reviewed before export.
-Persist source SHA-256, pixel-coordinate crop rectangles, output dimensions and review state per role. Never
-overwrite originals, ranking results or role tiers. Role tiers are candidate designations, not automatic in-game
-assignments; the detailed game treatment of KeyEnemy remains a later owner-approved decision.
+The owner declares the current classification final. Freeze an exact copy with its hash; the tier view remains
+read-only, and API/CLI edits/imports are refused. Crops have separate records and history, never overwrite the
+classification or originals, and reuse the existing face image for each stable ID.
+
+**Full body means the vertical format**, not a promise that every limb is visible. Existing PriConne illustrations
+and Azur Lane originals are the final source set: do not seek replacements, fetch more art or generate missing
+parts. Keep backgrounds/transparency as supplied; this pass authors rectangles, not character extraction.
+
+Both franchises use the **same 2:3 vertical ratio and 16:9 splash ratio**. Every unit needs vertical + existing face;
+**KeyEnemy, MiniBoss and FinalBoss also need splash**. Source-pixel rectangles stay inside the source image and
+preserve aspect ratio. Suggested export limits are 640×960 / 1280×720, clamped down to native crop resolution;
+the current Export saves recipes/approval state, not finished image files. Preview zoom is not export upscaling.
+
+### Calibration before the full roster (D127)
+
+`/crop` in the existing local reviewer holds ten units per franchise, including all four tiers and varied poses.
+Rectangles are pre-aligned for owner review. Drag to pan, drag the lower-right corner to resize, use Zoom/Fit or
+source-pixel fields; the source and cropped preview are shown together. Approve & Next saves each format separately;
+Needs adjustment flags framing feedback without excluding the unit or changing its tier. Editing an approved crop
+returns it to review. Filters, Previous/Skip, session Undo and round-specific position help revisit work.
+
+Stop after the calibration and ask the owner about framing **before preparing the rest**. Completion does not
+automatically expand the catalogue or publish anything. Private records live in `content/authoring/crops/<session>/`:
+
+- `manifest.json`: immutable selected IDs, final tiers, source/face references and hashes, policy and baseline identity.
+- `crops.json`: current source-pixel rectangles, output dimensions, per-format pending/approved/flagged state and revision.
+- `history/<revision>-<sha256>.json`: complete fsynced before/after records, including Undo and approvals.
+
+The tier round holds `classification-final-ratings.json` (exact original bytes), its hash marker in
+`classification-final.json`, and `crop-session.json` (active session and catalogue hash). Source/classification
+changes, corrupt/missing crop records, bad geometry and stale-tab revisions fail rather than reset data. Restore
+only a verified crop history snapshot while the reviewer is stopped, preserving the session and frozen classification.
+
+Game enemy behavior, final file export/import and bucket upload remain later owner-approved work.
 
 ## Phase 3: final list and upload
 

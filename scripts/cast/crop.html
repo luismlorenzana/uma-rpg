@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Crop review</title><link rel="stylesheet" href="/crop.css"><script type="module" src="/crop.js"></script>
+</head>
+<body>
+  <header>
+    <div class="title"><h1>Crops</h1><a href="/">Tiers</a><output id="status" aria-live="polite">Loading</output></div>
+    <div class="filters">
+      <label>Franchise<select id="pack" aria-label="Franchise"></select></label>
+      <label>Show<select id="filter" aria-label="Show"><option value="pending">To review</option><option value="all">All</option><option value="approved">Approved</option><option value="flagged">Needs adjustment</option></select></label>
+      <label>Format<select id="role" aria-label="Format"><option value="all">Both</option><option value="vertical">Full body</option><option value="splash">Splash</option></select></label>
+    </div>
+    <label class="task-label">Portrait<select id="task" aria-label="Portrait"></select></label>
+    <div id="counts"></div>
+  </header>
+  <main>
+    <section id="editor">
+      <div class="caption"><h2 id="name"></h2><span id="tier"></span><span id="position"></span></div>
+      <div class="panels">
+        <section class="source-panel"><div class="panel-title"><h3>Source</h3><a id="original" target="_blank" rel="noopener noreferrer">Original ↗</a></div>
+          <canvas id="source" tabindex="0" aria-label="Crop source"></canvas>
+          <div class="geometry">
+            <label>X<input id="x" type="number" step="1" min="0" aria-label="Crop X"></label>
+            <label>Y<input id="y" type="number" step="1" min="0" aria-label="Crop Y"></label>
+            <label>Width<input id="width" type="number" step="1" min="16" aria-label="Crop width"></label>
+            <button id="fit">Fit</button>
+          </div>
+          <label class="zoom-label">Zoom<input id="zoom" type="range" min="1" max="8" step=".01" value="1" aria-label="Crop zoom"></label>
+          <div id="source-size"></div>
+        </section>
+        <section class="preview-panel"><div class="panel-title"><h3 id="preview-title">Full body · 2:3</h3><span id="approval"></span></div>
+          <div class="preview-wrap"><canvas id="preview" aria-label="Crop preview"></canvas></div>
+          <div id="output-size"></div><div id="note"></div>
+        </section>
+      </div>
+    </section>
+    <p id="empty" hidden>No crops to review</p>
+    <div id="error" role="alert" hidden><span></span><button id="reload">Reload</button></div>
+  </main>
+  <footer>
+    <div class="primary"><button id="approve" disabled>Approve &amp; Next</button><button id="flag" disabled>Needs adjustment</button></div>
+    <div class="navigation"><button id="previous">← Previous</button><button id="undo">Undo</button><button id="next">Skip →</button><button id="export">Export</button>
+      <details><summary aria-label="Help">ⓘ</summary><div>
+        <p>Drag the rectangle to move it. Drag its corner to resize. Zoom or pixel fields work too.</p>
+        <p>Arrow keys move the focused source crop; + / − zoom. Enter approves. Z undoes this session’s edits.</p>
+        <p>Edits autosave on disk with history. Approve each format separately. Changing an approved crop sends it back to review.</p>
+        <p>Full body means the vertical format, not a requirement to show every limb. Existing sources and faces stay unchanged.</p>
+        <p>All non-Regular tiers need a splash. This is a 20-unit calibration; the rest wait for framing feedback.</p>
+        <p>Export backs up source-pixel rectangles and approval state, not finished image files. Output sizes are capped to source resolution. No uploads or game changes.</p>
+      </div></details>
+    </div>
+  </footer>
+</body>
+</html>

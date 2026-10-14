@@ -48,6 +48,13 @@ export async function readRatings(file) {
   }
 }
 
+export async function classificationStatus(file) {
+  let marker
+  try{marker=JSON.parse(await readFile(join(dirname(file),'classification-final.json'),'utf8'))}catch(error){if(error.code==='ENOENT')return null;throw error}
+  if(marker.schemaVersion!==1 || typeof marker.sha256!=='string' || createHash('sha256').update(await readFile(file)).digest('hex')!==marker.sha256)throw new Error('Final classification changed; restore the frozen file before continuing')
+  return marker
+}
+
 export async function loadReview(release, file = ratingsPath(release), {includeArchived=false}={}) {
   const votes = await readRatings(file)
   let round
@@ -79,7 +86,7 @@ export async function loadReview(release, file = ratingsPath(release), {includeA
     if (members.length) packs.push({ id, label, members, ...(raw.avatar ? { avatar: raw.avatar } : {}) })
   }
   packs.sort((a, b) => a.members.length - b.members.length || a.id.localeCompare(b.id))
-  return { schemaVersion: 1, mode: votes.schemaVersion === 2 ? 'tiers' : 'ranking', revision: votes.revision, packs, ...(round?{round:{id:round.id,label:round.label,datasetId:round.datasetId}}:{}) }
+  return { schemaVersion: 1, mode: votes.schemaVersion === 2 ? 'tiers' : 'ranking', readOnly:!!await classificationStatus(file), revision: votes.revision, packs, ...(round?{round:{id:round.id,label:round.label,datasetId:round.datasetId}}:{}) }
 }
 
 export async function atomicJson(file, value) {
@@ -108,6 +115,7 @@ export async function snapshotRatings(file, value) {
 }
 
 export async function saveVotes(release, file, entries, revision, {restoreArchived=false}={}) {
+  if(await classificationStatus(file)){const error=new Error('Classification is final. Crop edits do not change tiers.');error.status=423;throw error}
   const data = await loadReview(release, file,{includeArchived:restoreArchived}), current = await readRatings(file)
   if (revision !== current.revision) {
     const error = new Error('Votes changed in another tab. Reload and try again.')

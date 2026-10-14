@@ -45,8 +45,10 @@ async function post(path, body) {
 }
 function enable() {
   for (const button of document.querySelectorAll('button')) button.disabled = state.busy
-  for (const button of document.querySelectorAll('[data-vote]')) button.disabled = state.busy || state.view !== 'single' || !selected()
-  $('undo').disabled = state.busy || !state.history.length
+  for (const button of document.querySelectorAll('[data-vote]')) button.disabled = state.busy || state.data?.readOnly || state.view !== 'single' || !selected()
+  $('undo').disabled = state.busy || state.data?.readOnly || !state.history.length
+  $('import').disabled=state.busy || state.data?.readOnly
+  $('crop-link').hidden=!state.data?.readOnly
   $('previous').disabled = state.busy || members().findIndex(m => m.id === state.member) <= 0
   $('skip').disabled = state.busy || !members().length
 }
@@ -76,7 +78,7 @@ function render() {
   if (!pack) { $('empty').hidden = false; $('single').hidden = true; enable(); return }
   if (!list.some(m => m.id === state.member)) state.member = list[0]?.id ?? ''
   const member = selected(), counts = totals(pack), reference = state.data.packs[0], ref = totals(reference)
-  $('round').textContent=state.data.round?.label??'First pass'
+  $('round').textContent=(state.data.round?.label??'First pass')+(state.data.readOnly?' · Final':'')
   $('full').textContent=state.data.round?'Source':'Full'
   const options = state.data.packs.map(p => {
     const o = document.createElement('option'), n = totals(p)
@@ -122,7 +124,7 @@ function render() {
 
 async function vote(rating) {
   const member = selected(), pack = selectedPack()
-  if (!member || state.busy || state.view !== 'single') return
+  if (!member || state.busy || state.data.readOnly || state.view !== 'single') return
   const old = member.rating, list = members(), index = list.indexOf(member)
   state.busy = true; clearError(); $('status').textContent = 'Saving'; enable()
   try {
@@ -141,7 +143,7 @@ async function vote(rating) {
   finally { state.busy = false; render() }
 }
 async function undo() {
-  if (state.busy || !state.history.length) return
+  if (state.busy || state.data.readOnly || !state.history.length) return
   const entry = state.history.at(-1)
   state.busy = true; clearError(); $('status').textContent = 'Saving'; enable()
   try {

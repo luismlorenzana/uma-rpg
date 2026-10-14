@@ -52,7 +52,30 @@ the old votes exactly, leaves all old datasets/rounds intact, and activates the 
 Tier exports use schema 2 (`mode: "tiers"`, ratings 1–4); old ranking files use schema 1 and cannot be imported into a
 tier round. Unknown/removed IDs and negative values are rejected. Back up `content/authoring/` as before.
 
-## Earlier ranking rounds
+## Crop calibration
+
+After the owner declares tiers final, stop the reviewer, then prepare a calibration from **existing local sources only**:
+
+```sh
+node scripts/cast/crop-authoring.mjs /absolute/path/to/uma-rpg/content calibration-YYYYMMDD /absolute/path/to/private-seeds.json
+pnpm cast:install
+```
+
+The optional seed file maps `franchise/id/vertical` or `franchise/id/splash` to source-pixel rectangles (`rect`) or
+normalized center/coverage suggestions (`cx`, `cy`, `coverage`). Real IDs/coordinates belong in gitignored content.
+The default selects ten units per franchise across four tiers. No downloads or image transformation occurs.
+
+Open **http://127.0.0.1:5194/crop**, or **Crops →** in the existing reviewer. Drag the rectangle, resize its corner,
+use Zoom/Fit or X/Y/Width fields, then **Approve & Next**. Changing an approved crop makes it pending again;
+**Needs adjustment** records framing feedback. Changes autosave with history; Undo is session-local. Both franchises
+share 2:3 vertical and 16:9 splash frames; all non-Regular tiers need splash. Existing faces are reused.
+
+The preceding classification is frozen exactly and becomes read-only. Crops save separately under
+`content/authoring/crops/<session>/`. Export downloads recipes + approval state, not image files; output dimensions
+are capped to native resolution. Back up the whole authoring folder. Stop after this calibration for owner feedback
+before authoring the full roster; do not seek new sources, change the game or upload.
+
+## Legacy voting
 
 Legacy/ranking rounds retain their original four-vote scale:
 
