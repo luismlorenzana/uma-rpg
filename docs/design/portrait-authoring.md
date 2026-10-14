@@ -73,6 +73,8 @@ content/authoring/
 archive also includes a frozen copy of those original portraits. Real names/art/records and screenshots never go
 in git; this guide and synthetic tests do. For off-machine safety, copy **all of `content/authoring/`** to your own
 backup drive. Export in the app additionally saves the active round's votes, not the source images.
+The private-content regression tests check that originals, votes, crops, exports and model renders remain ignored,
+and fail if anything under `content/` is tracked, including a forced addition. Only synthetic previews belong in git.
 If waiting for missing JP splashes, the original first pass remains active at `content/cast-ratings.json`; its new
 history snapshots still live inside `content/authoring/legacy-history/`. The newly imported dataset is not activated
 automatically. Other franchises and AL Normal/Rare are hidden even in the original first-pass view.
