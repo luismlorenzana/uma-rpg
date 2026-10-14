@@ -35,7 +35,11 @@ function loadImage(url: string): Promise<HTMLImageElement> {
 }
 const maybe = (url: Promise<string> | null): Promise<HTMLImageElement | null> => (url ? url.then(loadImage).catch(() => null) : Promise.resolve(null))
 
-/** Loads the stage art: chibis (idle and cheer) and busts for the party, portraits for the rivals. Missing art is fine. */
+/** A cut-in's stripe by tier: Key enemies teal, Sub-bosses violet, Bosses red. */
+const SPLASH_ACCENT: Readonly<Record<string, number>> = { regular: 0xc9d2dd, key: 0x4fd1c5, subboss: 0xb07cff, boss: 0xff4d5e }
+
+/** Loads the stage art: chibis (idle and cheer) and busts for the party, verticals (and splashes) for the rivals.
+ * Missing art is fine. */
 function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: BattleState | null, reducedMotion: boolean): StageSetup | null {
   const [setup, setSetup] = useState<StageSetup | null>(null)
   const key = state ? `${state.input.seed}` : ''
@@ -57,7 +61,10 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
       // Every wave's rivals load up front, so the next wave steps in without a wait (W3).
       Promise.all([state.input.enemies, ...(state.input.waves ?? [])].flat().map(async (e) => {
         const member = campaign.cast.byId.get(e.castId)
-        return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null) }
+        // A Key enemy, Sub-boss or Boss brings her splash for the cut-ins (D135); Regulars have none.
+        const splash = member?.splash && member.tier !== 'regular' ? member.splash : null
+        return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null),
+          splash: await maybe(splash ? castArtUrl(splash.path) : null), accent: member ? SPLASH_ACCENT[member.tier] : undefined }
       })),
       // The Heroes behind the party's inherited Limit Breaks, for the cut-in (D106).
       Promise.all([...new Set(state.input.allies.flatMap((a) => (a.inherits ?? []).map((i) => i.from)))]

@@ -2,21 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { contentCacheControl, safeContentPath } from './content-source'
 
 describe('content paths', () => {
-  it('serves only the cast list and hash-named portraits', () => {
-    expect(safeContentPath('cast.json')).toBe('cast.json')
-    expect(safeContentPath('/cast/karyl.3c29e295.webp')).toBe('cast/karyl.3c29e295.webp')
-    for (const bad of ['cast/../save.json', 'cast/karyl.webp', 'sources/priconne-characters.json', '.cache/cast/karyl.webp', 'cast/Karyl.3c29e295.webp']) {
+  it('serves only the enemy list and its hash-named images (D135)', () => {
+    expect(safeContentPath('enemies.json')).toBe('enemies.json')
+    expect(safeContentPath('/enemies/al-admiral-graf-spee-art.3c29e295.webp')).toBe('enemies/al-admiral-graf-spee-art.3c29e295.webp')
+    expect(safeContentPath('enemies/nk-c550-01-splash.0a1b2c3d.webp')).toBe('enemies/nk-c550-01-splash.0a1b2c3d.webp')
+    expect(safeContentPath('enemies/gw-92870-face.0a1b2c3d.webp')).toBe('enemies/gw-92870-face.0a1b2c3d.webp')
+    for (const bad of ['cast.json', 'nikke/cast.json', 'cast/karyl.3c29e295.webp', 'enemies/../save.json', 'enemies/al-x-art.webp',
+      'enemies/al-x-art.3c29e295.png', 'enemies/al-x-bust.3c29e295.webp', 'enemies/AL-x-art.3c29e295.webp', 'enemies/sub/al-x-art.3c29e295.webp',
+      'enemies.json/../x', 'sources/list.json', 'enemies/-art.3c29e295.webp']) {
       expect(safeContentPath(bad)).toBeNull()
     }
-    expect(safeContentPath('azurlane/cast.json')).toBe('azurlane/cast.json')
-    expect(safeContentPath('nikke/cast/nk-rapi.0a1b2c3d.png')).toBe('nikke/cast/nk-rapi.0a1b2c3d.png')
-    expect(safeContentPath('lastorigin/cast.json')).toBe('lastorigin/cast.json')
-    expect(safeContentPath('girlsfrontline/cast.json')).toBe('girlsfrontline/cast.json')
-    expect(safeContentPath('echocalypse/cast.json')).toBeNull()
-    expect(safeContentPath('destinychild/cast/dc-1.0a1b2c3d.webp')).toBe('destinychild/cast/dc-1.0a1b2c3d.webp')
-    for (const bad of ['other/cast.json', 'pad/cast.json', 'pad/cast/x.0a1b2c3d.png', 'nikke/cast.json/../x', 'azurlane/sources/list.json']) expect(safeContentPath(bad)).toBeNull()
-    expect(contentCacheControl('cast.json')).toBe('private, no-cache')
-    expect(contentCacheControl('nikke/cast.json')).toBe('private, no-cache')
-    expect(contentCacheControl('cast/karyl.3c29e295.webp')).toContain('immutable')
+    expect(contentCacheControl('enemies.json')).toBe('private, no-cache')
+    expect(contentCacheControl('enemies/al-x-art.3c29e295.webp')).toContain('immutable')
   })
 })

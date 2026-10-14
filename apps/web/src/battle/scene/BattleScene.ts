@@ -11,7 +11,14 @@ import { backgroundLayout } from './background-layout'
 import { PixelEffects } from './pixel-effects'
 
 export interface StageAlly { id: string; idle: HTMLImageElement | null; cheer: HTMLImageElement | null; bust: HTMLImageElement | null }
-export interface StageEnemy { id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string }
+export interface StageEnemy {
+  id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string
+  /** Her 16:9 splash (D135), for a Key enemy, Sub-boss or Boss: it cuts in on her moves, her break, phase two and her
+   * defeat. */
+  splash?: HTMLImageElement | null
+  /** The stripe colour of her cut-in, by tier. */
+  accent?: number
+}
 export interface StageSetup {
   allies: StageAlly[]
   /** Every foe of the fight, all waves (W3); `field` names those standing on the stage now. */
@@ -36,6 +43,8 @@ export class BattleScene extends Phaser.Scene {
   private setup!: StageSetup
   private dpr = 1
   private actors = new Map<string, Actor>()
+  /** Foes whose move cut-in has played in this playback. */
+  private splashedMove = new Set<string>()
   private layer!: Phaser.GameObjects.Container
   private fx!: Phaser.GameObjects.Container
   private background!: Phaser.GameObjects.Graphics
@@ -97,7 +106,7 @@ export class BattleScene extends Phaser.Scene {
     this.dpr = dpr
     this.cssSize = { w: cssW, h: cssH }
     for (const a of setup.allies) this.addTexture(`ally-${a.id}`, a.idle).addTexture(`cheer-${a.id}`, a.cheer).addTexture(`bust-${a.id}`, a.bust)
-    for (const e of setup.enemies) this.addTexture(`foe-${e.id}`, e.art)
+    for (const e of setup.enemies) this.addTexture(`foe-${e.id}`, e.art).addTexture(`splash-${e.id}`, e.splash ?? null)
     for (const h of setup.heroes ?? []) this.addTexture(`bust-${h.id}`, h.bust)
     this.drawBackground()
     this.layer.removeAll(true)
@@ -251,6 +260,7 @@ export class BattleScene extends Phaser.Scene {
   /** Plays cues in order; `onCue` fires as each one starts, so the DOM can follow along. */
   async play(cues: readonly BattleCue[], onCue: (cue: BattleCue) => void): Promise<void> {
     this.skipping = false
+    this.splashedMove.clear()
     for (const cue of cues) {
       onCue(cue)
       if (this.skipping) continue
@@ -288,9 +298,17 @@ export class BattleScene extends Phaser.Scene {
       case 'shield':
         this.shards(cue.targetId, 4, 0xdfe8f3)
         return this.wait(140)
+      case 'move':
+        // A foe with a splash cuts in on her first move of each round (one playback is one round's enemy turn).
+        if (this.splashedMove.has(cue.actorId) || !this.hasSplash(cue.actorId)) return
+        this.splashedMove.add(cue.actorId)
+        return this.splashIn(cue.actorId, cue.label)
       case 'break':
-        return this.breakFx(cue.targetId)
+        await this.breakFx(cue.targetId)
+        if (this.hasSplash(cue.targetId)) await this.splashIn(cue.targetId, 'BREAK!')
+        return
       case 'ko':
+        if (this.hasSplash(cue.targetId)) await this.splashIn(cue.targetId, 'DEFEATED', true)
         return this.ko(cue.targetId)
       case 'guard':
         this.ring(cue.targetId, 0x8fd3ff)
@@ -302,6 +320,7 @@ export class BattleScene extends Phaser.Scene {
         this.label(cue.actorId, cue.label ?? '…', '#c9d2dd')
         return this.wait(260)
       case 'phase':
+        if (this.hasSplash(cue.targetId)) await this.splashIn(cue.targetId, 'Changes tactics!')
         this.flash(cue.targetId, 0xff5050)
         this.label(cue.targetId, 'Changes tactics!', '#ff9b9b')
         this.cameras.main.shake(220, 0.006)
@@ -534,6 +553,41 @@ export class BattleScene extends Phaser.Scene {
       for (const o of [band, stripe, title, sub, bust]) o?.destroy()
     } })
     await this.wait(160)
+  }
+
+  private hasSplash(id: string): boolean {
+    return this.textures.exists(`splash-${id}`)
+  }
+
+  /**
+   * A foe's splash cut-in (D135): her 16:9 art sweeps in from the rivals' side across the stage's width over a dark
+   * band, with a stripe in her tier's colour and a caption (her move, BREAK!, DEFEATED). A defeat fades to grey.
+   */
+  private async splashIn(id: string, caption: string, defeat = false): Promise<void> {
+    const { w, h } = this.cssSize
+    const d = this.dpr
+    // Across the rivals' half, above their name panels: as tall as 16:9 allows, at most 42% of the stage.
+    const width = w * d, artH = Math.min(width * 9 / 16, h * 0.42 * d)
+    const y = Math.max(artH / 2 + 4 * d, h * 0.25 * d)
+    const accent = this.setup.enemies.find((e) => e.id === id)?.accent ?? 0xff5c7a
+    const band = this.add.rectangle(width / 2, y, width, artH + 10 * d, 0x05080d, 0.78).setScale(1, 0)
+    const art = this.add.image(width * 1.5, y, `splash-${id}`)
+    // Cover the band, cropping the middle of the art when the band is shorter than 16:9 (masks are Canvas-only in Phaser 4).
+    const scale = Math.max(width / art.width, artH / art.height)
+    art.setScale(scale).setCrop((art.width - width / scale) / 2, (art.height - artH / scale) / 2, width / scale, artH / scale)
+    const stripe = this.add.rectangle(width / 2, y + artH / 2 + 2 * d, width, 4 * d, accent, 1).setScale(0, 1)
+    const text = this.text(width * 0.05, y - artH / 2 + 20 * d, caption, defeat ? '#c9d2dd' : '#ffffff', 22).setOrigin(0, 0.5).setAlpha(0)
+    this.fx.add([band, art, stripe, text])
+    this.tweens.add({ targets: band, scaleY: 1, duration: 120, ease: 'Quad.easeOut' })
+    this.tweens.add({ targets: art, x: width / 2, duration: 260, ease: 'Cubic.easeOut' })
+    this.tweens.add({ targets: stripe, scaleX: 1, duration: 300 })
+    this.tweens.add({ targets: text, alpha: 1, x: `+=${10 * d}`, duration: 220, delay: 120 })
+    if (defeat) this.time.delayedCall(320, () => art.setTint(0x8a8f98))
+    await this.wait(defeat ? 760 : 680)
+    this.tweens.add({ targets: [band, art, stripe, text], alpha: 0, duration: 160, onComplete: () => {
+      for (const o of [band, art, stripe, text]) o.destroy()
+    } })
+    await this.wait(120)
   }
 
   /** "Wave 2 of 3" across the rivals' half while the next foes step in (W3). */

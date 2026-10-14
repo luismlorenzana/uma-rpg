@@ -35,13 +35,9 @@ NODE_AUTH_TOKEN=$(gh auth token) pnpm install
 pnpm lint && pnpm test && pnpm build
 pnpm --filter @rpg/api dev     # API on :8081, auth off, local save, master data from ../uma-platform/content/release
 pnpm --filter @rpg/web dev     # web on :5174, /api proxied to :8081
-node scripts/cast/import.mjs   # private PriConne cast → content/release (gitignored; needs content/sources, D50)
-bash scripts/cast/publish.sh   # upload it to gs://uma-rpg-content (scoped gcloud, never changes the account)
-node scripts/cast/import-azurlane.mjs && bash scripts/cast/publish.sh azurlane   # Azur Lane pack (D76)
-node scripts/cast/import-nikke.mjs && bash scripts/cast/publish.sh nikke         # NIKKE pack (D81)
-node scripts/cast/import-destinychild.mjs && bash scripts/cast/publish.sh destinychild   # Destiny Child pack (D81)
-node scripts/cast/import-lastorigin.mjs && bash scripts/cast/publish.sh lastorigin       # owner only: its wiki asks AI agents not to fetch
-node scripts/cast/import-girlsfrontline.mjs && bash scripts/cast/publish.sh girlsfrontline   # Girls' Frontline (D85), ~2 h 20 min at the wiki's 20 s crawl delay
+pnpm l2d:review                # NIKKE reviewer (D127); pnpm l2d:lock locks its pack (D134)
+pnpm enemies:release           # the three locked packs → content/enemies-release (gitignored; D135)
+pnpm enemies:publish           # upload it to gs://uma-rpg-content (scoped gcloud, never changes the account)
 ```
 
 ## Conventions

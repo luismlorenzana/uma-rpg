@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { BIOMES, biomeFranchise, signatureWeaknesses } from './biomes'
+import { BIOMES, signatureWeaknesses } from './biomes'
+import { bandFranchise, capitalFranchise, ENEMY_TIERS, FRANCHISES, stageFaces, type RosterMember } from './roster'
 import { grantRpgExp } from '../rpg/rules'
 import { rpgBattleExp, rpgRewardKind } from '../rpg/campaign/rewards'
-import { poolOf, regionChapter, stageBand, stagePay, stagePlan, worldContinent } from './world'
+import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, worldContinent } from './world'
 
 const cast = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 
@@ -41,7 +42,8 @@ describe('the world map (D66, D71)', () => {
       expect(stages.map((n) => waves(n).length)).toEqual([1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 3])
       for (const n of stages) expect(new Set(waves(n).flat().map((e) => e.id)).size).toBe(waves(n).flat().length)
       expect(waves(stages[11]!).at(-1)![0]!.rank).toBe('boss')
-      expect(stages[10]!.enemies[0]!.twice).toBe(true)
+      // D135: the elite brings two assistants and so acts once a round.
+      expect(stages[10]!.enemies.map((e) => [e.rank, e.twice ?? false])).toEqual([['sub-boss', false], ['regular', false], ['regular', false]])
       expect(stageBand(stages[0]!.id)).toBe(1)
       // Variety: a region's regular stages use at least four formation-and-signature combinations.
       const plan = stagePlan(BIOMES.find((b) => b.id === region.biome)!, region.id).slice(0, 10)
@@ -100,23 +102,51 @@ describe('the world map (D66, D71)', () => {
     expect(foes.every((f) => f.weaknesses.elements.length === 0 && f.weaknesses.weapons.length >= 1)).toBe(true)
   })
 
-  it('dresses each biome in its franchise, and the rest in a mixed pool of five faces a pack (D76, D81)', () => {
-    const pack = (prefix: string) => Array.from({ length: 12 }, (_, n) => ({ id: `${prefix}-${n}`, name: `${prefix} ${n}` }))
-    const packs = { priconne: pack('pc'), azurlane: pack('al'), nikke: pack('nk'), girlsfrontline: pack('gf') }
+  it('gives PriConne the first continent and Azur Lane and NIKKE the rest by level band (D135)', () => {
     const regions = [1, 2, 3, 4, 5].flatMap((order) => worldContinent({ name: 'URA', order }).regions)
-    const faces = (biome: string) => regions.filter((r) => r.biome === biome).flatMap((r) => regionChapter(r, packs).nodes.flatMap((n) => n.enemies))
-    expect(faces('sky').every((f) => f.castId.startsWith('pc-'))).toBe(true)
-    expect(faces('underworld').every((f) => f.castId.startsWith('al-'))).toBe(true)
-    expect(faces('desert').every((f) => f.castId.startsWith('nk-'))).toBe(true)
-    // Forest has no franchise and Last Origin's ruins have no pack yet: both draw from the pool, five per pack.
-    const pool = new Set([...poolOf(packs.priconne), ...poolOf(packs.azurlane), ...poolOf(packs.nikke), ...poolOf(packs.girlsfrontline)].map((m) => m.id))
-    expect(pool.size).toBe(20)
-    for (const biome of ['forest', 'ruins']) expect(faces(biome).every((f) => pool.has(f.castId))).toBe(true)
-    expect(new Set(faces('forest').map((f) => f.castId.slice(0, 2))).size).toBeGreaterThan(1)
-    expect(faces('meadow').every((f) => f.castId.startsWith('pc-'))).toBe(true)
-    expect(faces('coast').every((f) => f.castId.startsWith('al-'))).toBe(true)
-    expect(faces('jungle').every((f) => f.castId.startsWith('gf-'))).toBe(true)
-    // Forest is the one biome without a franchise (D84, D85).
-    expect(BIOMES.filter((b) => biomeFranchise(b.id) === null).map((b) => b.id)).toEqual(['forest'])
+    const count = Object.fromEntries(FRANCHISES.map((f) => [f, regions.filter((r) => bandFranchise(Number(r.continentId.slice(1)), r.row) === f).length]))
+    expect(count).toEqual({ priconne: 40, azurlane: 100, nikke: 60 })
+    expect([1, 2, 3, 4, 5].map((o) => [bandFranchise(o, 0), bandFranchise(o, 9)])).toEqual([['priconne', 'priconne'], ['azurlane', 'nikke'],
+      ['azurlane', 'nikke'], ['azurlane', 'nikke'], ['azurlane', 'azurlane']])
+    expect([1, 2, 3, 4, 5].map(capitalFranchise)).toEqual(['priconne', 'azurlane', 'nikke', 'azurlane', 'nikke'])
+  })
+
+  it('dresses each stage by tier: regulars, an elite and her Key assistants, a boss among sub-bosses (D135)', () => {
+    const roster: RosterMember[] = FRANCHISES.flatMap((franchise) => ENEMY_TIERS.flatMap((tier) =>
+      Array.from({ length: 16 }, (_, n) => ({ id: `${franchise}-${tier}-${n}`, name: `${tier} ${n}`, franchise, tier }))))
+    const tierOf = (castId: string) => castId.split('-')[1]
+    const continent = worldContinent({ name: 'URA', order: 2 })
+    for (const region of [continent.regions.find((r) => r.row === 0)!, continent.regions.find((r) => r.row === TWIN_BOSS_ROW)!]) {
+      const franchise = region.row < 5 ? 'azurlane' : 'nikke'
+      const stages = regionChapter(region, roster).nodes.filter((n) => n.kind !== 'camp')
+      const waves = (n: (typeof stages)[number]) => [n.enemies, ...(n.waves ?? [])]
+      for (const n of stages) expect(waves(n).flat().every((f) => f.castId.startsWith(`${franchise}-`)), n.id).toBe(true)
+      for (const n of stages.slice(0, 10)) expect(waves(n).flat().every((f) => tierOf(f.castId) === 'regular'), n.id).toBe(true)
+      const elite = stages[10]!.enemies
+      expect(elite.map((f) => [f.rank, tierOf(f.castId)])).toEqual([['sub-boss', 'subboss'], ['regular', 'key'], ['regular', 'key']])
+      const boss = waves(stages[11]!)
+      expect(boss.slice(0, 2).flat().every((f) => tierOf(f.castId) === 'subboss')).toBe(true)
+      expect(boss[2]!.map((f) => [f.rank, tierOf(f.castId)])).toEqual(region.row === TWIN_BOSS_ROW
+        ? [['boss', 'boss'], ['boss', 'boss'], ['regular', 'subboss']] : [['boss', 'boss'], ['regular', 'subboss'], ['regular', 'subboss']])
+      // Faces never repeat within a stage.
+      for (const n of stages) expect(new Set(waves(n).flat().map((f) => f.castId)).size, n.id).toBe(waves(n).flat().length)
+    }
+  })
+
+  it('picks the same faces whatever the list order, borrows across empty tiers, and leaves a face blank only without a roster', () => {
+    const roster: RosterMember[] = [
+      ...Array.from({ length: 5 }, (_, n) => ({ id: `pc-r${n}`, name: 'r', franchise: 'priconne' as const, tier: 'regular' as const })),
+      ...Array.from({ length: 3 }, (_, n) => ({ id: `al-b${n}`, name: 'b', franchise: 'azurlane' as const, tier: 'boss' as const })),
+    ]
+    const picks = (list: RosterMember[]) => { const face = stageFaces(list, 'priconne', 'w1-1-1-s12'); return ['regular', 'boss', 'key', 'regular'].map((t, i) => face(t as never, i)?.id) }
+    expect(picks([...roster].reverse())).toEqual(picks(roster))
+    const [regular, boss, key] = picks(roster)
+    expect(regular).toMatch(/^pc-r/)
+    // No PriConne boss: another franchise's; no Key enemy anywhere: one of her own franchise's.
+    expect(boss).toMatch(/^al-b/)
+    expect(key).toMatch(/^pc-r/)
+    expect(stageFaces([], 'priconne', 'x')('boss', 0)).toBeNull()
+    const blank = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, []).nodes[1]!.enemies
+    expect(blank.every((f) => f.castId === '')).toBe(true)
   })
 })

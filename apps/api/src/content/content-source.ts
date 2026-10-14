@@ -3,21 +3,20 @@ import { resolve, sep } from 'node:path'
 import type { MasterSource } from '../master/master-source'
 
 /**
- * uma-rpg's own private content: the foes' faces by franchise (D50, D76, D81, D85). PriConne's pack sits at the root, the
- * others in their own folders; only each `cast.json` and its hash-named portraits are served. Null when refused.
+ * uma-rpg's own private content: the enemy release (D135), `enemies.json` and its hash-named images
+ * (`enemies/<unit>-<face|art|splash>.<hash8>.webp`). Nothing else is served. Null when refused.
  */
-const PACK = '((azurlane|lastorigin|destinychild|nikke|girlsfrontline)\\/)?'
 export function safeContentPath(raw: string): string | null {
   const path = raw.replace(/^\/+/, '')
-  if (new RegExp(`^${PACK}cast\\.json$`).test(path)) return path
-  return new RegExp(`^${PACK}cast\\/[a-z0-9_-]{1,60}\\.[a-f0-9]{8}\\.(webp|png)$`).test(path) ? path : null
+  if (path === 'enemies.json') return path
+  return /^enemies\/[a-z0-9]+(-[a-z0-9]+)*-(face|art|splash)\.[a-f0-9]{8}\.webp$/.test(path) && path.length <= 100 ? path : null
 }
 
 export function contentCacheControl(path: string): string {
-  return path.endsWith('cast.json') ? 'private, no-cache' : 'private, max-age=31536000, immutable'
+  return path === 'enemies.json' ? 'private, no-cache' : 'private, max-age=31536000, immutable'
 }
 
-/** Local dev: the repo's gitignored `content/release`. */
+/** Local dev: the repo's gitignored `content/enemies-release`. */
 export class DirectoryContentSource implements MasterSource {
   private readonly root: string
   constructor(dir: string) {

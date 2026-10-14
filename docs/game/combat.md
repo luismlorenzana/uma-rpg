@@ -171,8 +171,25 @@ elements, weaknesses and a shield.
 Shown with Fire; a foe uses her own element, and a dual-element foe her second element for her second elemental move.
 <!-- /live -->
 
-Captains and champions change tactics below 50% HP (their phase-two moves). Foe faces come from the biome's franchise
-pack, a private file; see [maps](maps.md#faces).
+Captains and champions change tactics below 50% HP (their phase-two moves). Foe faces come from the region's
+franchise and each slot's tier, from a private file; see [maps](maps.md#faces).
+
+### Splash cut-ins
+
+Key enemies, Sub-bosses and Bosses have a 16:9 splash (D135). It cuts in across the rivals' half of the stage:
+- on her first move of each round;
+- when she's broken, after the BREAK;
+- when she changes tactics at half HP;
+- when she's defeated, fading to grey.
+
+Each cut-in shows her art sweeping in from the right, a stripe in her tier's colour (Key enemies teal, Sub-bosses
+violet, Bosses red) and a caption: her move, BREAK!, Changes tactics! or DEFEATED. It holds for about 0.7 s.
+- **Skipping:** tapping the stage skips it, like any playback, and the speed setting shortens it.
+- **Reduced motion:** with reduced motion on, cut-ins don't play.
+- **Regulars:** Regular foes have no splash.
+
+The engine announces each foe move with a `move` cue. Cues are presentation only and never saved, so fights replay
+unchanged.
 
 <!-- live:foe-scaling -->
 | Setting | Value |

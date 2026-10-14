@@ -145,7 +145,7 @@ jobs:
         run: |
           curl --fail --silent --show-error --retry 10 --retry-delay 3 "${{ steps.deploy-api.outputs.url }}/api/health" > /dev/null
           test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${{ steps.deploy-api.outputs.url }}/api/save")" = "401"
-          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${{ steps.deploy-api.outputs.url }}/api/content/cast.json")" = "401"
+          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${{ steps.deploy-api.outputs.url }}/api/content/enemies.json")" = "401"
           test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' -X POST "${{ steps.deploy-api.outputs.url }}/api/push/tick")" = "401"
 
       - name: Build web application

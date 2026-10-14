@@ -30,7 +30,8 @@ import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
-import { BIOMES, biomeFranchise, signatureWeaknesses } from '../world/biomes'
+import { BIOMES, signatureWeaknesses } from '../world/biomes'
+import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
   BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT, WORLD_FORMATIONS,
   WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES, WORLD_TUNING, worldContinent,
@@ -314,10 +315,23 @@ function facilities(): string {
 // --- The world ------------------------------------------------------------------------------------------------------
 
 function biomes(): string {
-  return table(['Biome', 'Id', 'Signatures (weak to)', 'Formations', 'Roles', 'Faces'], BIOMES.map((b) => [
+  return table(['Biome', 'Id', 'Signatures (weak to)', 'Formations', 'Roles'], BIOMES.map((b) => [
     b.name, `\`${b.id}\``, b.signatures.map((s) => `${s.join('+')} (${signatureWeaknesses(s).join(', ') || 'weapons only'})`).join('; '),
-    b.formations.join(', '), b.roles.join(', '), biomeFranchise(b.id) ?? 'mixed pool',
+    b.formations.join(', '), b.roles.join(', '),
   ]))
+}
+const FRANCHISE_NAME: Record<string, string> = { priconne: 'PriConne', azurlane: 'Azur Lane', nikke: 'NIKKE' }
+/** Whose units each continent's halves and capital show (D135). */
+function faces(): string {
+  const rows = [1, 2, 3, 4, 5].map((order) => {
+    const start = (order - 1) * 10 + 1
+    return [`w${order}`, `${FRANCHISE_NAME[bandFranchise(order, 0)]} (Lv ${start}–${start + 4})`, `${FRANCHISE_NAME[bandFranchise(order, 5)]} (Lv ${start + 5}–${start + 9})`,
+      FRANCHISE_NAME[capitalFranchise(order)]!]
+  })
+  const regions = Object.fromEntries(FRANCHISES.map((f) => [f, 0]))
+  for (let order = 1; order <= 5; order++) for (let row = 0; row < 10; row++) regions[bandFranchise(order, row)]! += 4
+  return table(['Continent', 'Rows 1–5', 'Rows 6–10', 'Capital'], rows) + '\n\n' +
+    table(['Franchise', 'Regions'], FRANCHISES.map((f) => [FRANCHISE_NAME[f]!, regions[f]!]))
 }
 function formations(): string {
   return table(['Template', 'Foes', 'HP shared (regular foes)', 'Shield each', 'Notes'], (Object.keys(WORLD_FORMATIONS) as (keyof typeof WORLD_FORMATIONS)[]).map((k) => {
@@ -381,7 +395,7 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
     classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
-    families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, formations, continents,
+    families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
     'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }

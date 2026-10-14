@@ -65,14 +65,14 @@ export default defineConfig(({ mode }) => {
             options: { cacheName: 'rpg-master-channel', networkTimeoutSeconds: 4 },
           },
           {
-            // PriConne cast portraits are hash-named too (D50).
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/content/cast/'),
+            // Enemy faces, verticals and splashes are hash-named too (D135): about 2,000 files in all.
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/content/enemies/'),
             handler: 'CacheFirst',
-            options: { cacheName: 'rpg-content', expiration: { maxEntries: 400 } },
+            options: { cacheName: 'rpg-content', expiration: { maxEntries: 2500 } },
           },
           {
-            // The cast list changes when the cast grows: prefer the network, fall back to the last one offline.
-            urlPattern: ({ url }) => url.pathname === '/api/content/cast.json',
+            // The enemy list changes with each release: prefer the network, fall back to the last one offline.
+            urlPattern: ({ url }) => url.pathname === '/api/content/enemies.json',
             handler: 'NetworkFirst',
             options: { cacheName: 'rpg-content-list', networkTimeoutSeconds: 4 },
           },

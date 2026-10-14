@@ -1,7 +1,7 @@
 // The campaign in the app: Tier 1's world map (D66: five continents, one per scenario, of generated regions) with the
-// PriConne cast's faces (D50), and the outfits' battle data. Pages render through CampaignGate once master data and the
-// cast are loaded.
-import { biomeById, capitalChapter, capitalId, FRANCHISES, regionChapter, stageRegionId, worldContinent, type RosterOutfit, type RpgCampaignChapter, type RpgElement, type WorldContinent, type WorldRegion } from '@rpg/domain'
+// enemy roster's faces (D135), and the outfits' battle data. Pages render through CampaignGate once master data and the
+// roster are loaded.
+import { biomeById, capitalChapter, capitalId, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
@@ -27,8 +27,7 @@ export interface Campaign {
 const cache = new WeakMap<MasterView, WeakMap<Cast, Campaign>>()
 
 export function buildCampaign(view: MasterView, cast: Cast): Campaign {
-  const face = (m: { id: string; name: string; element?: RpgElement }) => ({ id: m.id, name: m.name, ...(m.element ? { element: m.element } : {}) })
-  const members = Object.fromEntries(FRANCHISES.map((f) => [f, cast.packs[f].map(face)]))
+  const roster: EnemyRoster = cast.members.map((m) => ({ id: m.id, name: m.name, franchise: m.franchise, tier: m.tier }))
   const continents = view.chapters.filter((c) => c.tier === 1).sort((a, b) => a.order - b.order).map((c) => worldContinent({ name: c.name, order: c.order }))
   const regions = new Map(continents.flatMap((c) => c.regions.map((r) => [r.id, r] as const)))
   const capitals = new Map(continents.map((c) => [capitalId(c.id), c] as const))
@@ -38,7 +37,7 @@ export function buildCampaign(view: MasterView, cast: Cast): Campaign {
     const capital = capitals.get(id)
     if (!info && !capital) return null
     let chapter = built.get(id)
-    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, members.priconne!) : regionChapter(info!, members)))
+    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
     return chapter
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
@@ -70,13 +69,13 @@ function CastGate({ view, children }: { view: MasterView; children: (campaign: C
   if (cast.status === 'error')
     return (
       <div className="space-y-3 p-4">
-        <p>The rival cast could not be loaded. {cast.message}</p>
+        <p>The enemies could not be loaded. {cast.message}</p>
         <button type="button" onClick={retryCast} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink">
           Try again
         </button>
       </div>
     )
-  return <p className="p-4 text-ink-soft">Gathering the rivals…</p>
+  return <p className="p-4 text-ink-soft">Gathering the enemies…</p>
 }
 
 function Ready({ view, cast, children }: { view: MasterView; cast: Cast; children: (campaign: Campaign) => ReactNode }) {

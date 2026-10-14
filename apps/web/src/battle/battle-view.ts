@@ -133,6 +133,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'summon': return `${name(cue.actorId)}’s ${cue.label} strikes again`
     case 'wave': return `${cue.label}: the next foes arrive`
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`
+    case 'move': return `${name(cue.actorId)}: ${cue.label}`
     case 'result': return cue.label === 'victory' ? 'Victory!' : 'Defeated'
   }
 }
@@ -142,7 +143,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
  * shields move with the effects. Playback ends by showing the engine's real state.
  */
 export function followCue(shown: BattleState, cue: BattleCue): BattleState {
-  if (cue.kind === 'intent' || cue.kind === 'result') return shown
+  if (cue.kind === 'intent' || cue.kind === 'move' || cue.kind === 'result') return shown
   const target = shown.units.find((u) => u.id === cue.targetId)
   if (!target) return shown
   const next = { ...target }

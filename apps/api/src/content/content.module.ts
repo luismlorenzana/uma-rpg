@@ -16,7 +16,7 @@ import { CONTENT_SOURCE, ContentController } from './content.controller'
       useFactory: (config: ConfigService): MasterSource => {
         const bucket = config.get<string>('CONTENT_BUCKET')
         if (bucket) return new BucketMasterSource(bucket)
-        return new DirectoryContentSource(resolve(process.cwd(), config.get<string>('CONTENT_DIR') ?? '../../content/release'))
+        return new DirectoryContentSource(resolve(process.cwd(), config.get<string>('CONTENT_DIR') ?? '../../content/enemies-release'))
       },
     },
   ],

@@ -46,27 +46,27 @@ the start of its road and as **Spring · MP** in the header. It shares that Spri
 Nineteen biomes. Each sets the **element signatures** its foes carry, its **formation** lean and its foe **roles**.
 
 <!-- live:biomes -->
-| Biome | Id | Signatures (weak to) | Formations | Roles | Faces |
-|---|---|---|---|---|---|
-| Meadow | `meadow` | fire (lightning); ice (fire); lightning (ice) | squad, duo, trio | striker, caster, skirmisher, guard | priconne |
-| Forest | `forest` | lightning (ice); light (dark); dark (light) | squad, trio, swarm | skirmisher, striker | mixed pool |
-| Coast | `coast` | ice+lightning (fire); ice (fire); lightning (ice) | trio, squad | caster, skirmisher | azurlane |
-| Swamp | `swamp` | lightning+dark (ice, light); dark (light) | squad, trio | caster, skirmisher | destinychild |
-| Jungle | `jungle` | fire+lightning (ice); lightning (ice) | swarm, squad | skirmisher, striker | girlsfrontline |
-| Desert | `desert` | fire+light (lightning, dark); fire (lightning); light (dark) | trio, duo | guard, striker | nikke |
-| Canyon | `canyon` | fire (lightning); lightning (ice); fire+lightning (ice) | duo, solo, trio | striker | lastorigin |
-| Volcano | `volcano` | fire+dark (lightning, light); fire+light (lightning, dark); fire (lightning) | solo, duo | striker, caster | lastorigin |
-| Geyser Basin | `geyser` | fire+ice (lightning); ice (fire); fire (lightning) | trio, squad | caster | girlsfrontline |
-| Tundra | `tundra` | ice (fire); ice+dark (fire, light) | squad, trio | guard, striker | nikke |
-| Glacier | `glacier` | ice+light (fire, dark); ice (fire) | solo, duo | guard | azurlane |
-| Storm Peaks | `peaks` | ice+lightning (fire); lightning (ice) | trio, squad | skirmisher | nikke |
-| Highlands | `highlands` | lightning+light (ice, dark); light (dark) | duo, trio | caster | priconne |
-| Sky Isles | `sky` | fire+light (lightning, dark); ice+light (fire, dark); lightning+light (ice, dark) | trio, duo | caster | priconne |
-| Underworld | `underworld` | fire+dark (lightning, light); ice+dark (fire, light); lightning+dark (ice, light) | swarm, squad | striker, caster, skirmisher | azurlane |
-| Haunted Moor | `moor` | dark (light); ice+dark (fire, light) | swarm, squad | skirmisher, caster | destinychild |
-| Crystal Caverns | `crystal` | ice+light (fire, dark); light (dark) | squad, trio | guard, caster | girlsfrontline |
-| Ancient Ruins | `ruins` | light+dark (weapons only); fire (lightning); ice (fire); lightning (ice) | escort, trio | guard | lastorigin |
-| Twilight Rift | `rift` | light+dark (weapons only) | solo | striker, caster | destinychild |
+| Biome | Id | Signatures (weak to) | Formations | Roles |
+|---|---|---|---|---|
+| Meadow | `meadow` | fire (lightning); ice (fire); lightning (ice) | squad, duo, trio | striker, caster, skirmisher, guard |
+| Forest | `forest` | lightning (ice); light (dark); dark (light) | squad, trio, swarm | skirmisher, striker |
+| Coast | `coast` | ice+lightning (fire); ice (fire); lightning (ice) | trio, squad | caster, skirmisher |
+| Swamp | `swamp` | lightning+dark (ice, light); dark (light) | squad, trio | caster, skirmisher |
+| Jungle | `jungle` | fire+lightning (ice); lightning (ice) | swarm, squad | skirmisher, striker |
+| Desert | `desert` | fire+light (lightning, dark); fire (lightning); light (dark) | trio, duo | guard, striker |
+| Canyon | `canyon` | fire (lightning); lightning (ice); fire+lightning (ice) | duo, solo, trio | striker |
+| Volcano | `volcano` | fire+dark (lightning, light); fire+light (lightning, dark); fire (lightning) | solo, duo | striker, caster |
+| Geyser Basin | `geyser` | fire+ice (lightning); ice (fire); fire (lightning) | trio, squad | caster |
+| Tundra | `tundra` | ice (fire); ice+dark (fire, light) | squad, trio | guard, striker |
+| Glacier | `glacier` | ice+light (fire, dark); ice (fire) | solo, duo | guard |
+| Storm Peaks | `peaks` | ice+lightning (fire); lightning (ice) | trio, squad | skirmisher |
+| Highlands | `highlands` | lightning+light (ice, dark); light (dark) | duo, trio | caster |
+| Sky Isles | `sky` | fire+light (lightning, dark); ice+light (fire, dark); lightning+light (ice, dark) | trio, duo | caster |
+| Underworld | `underworld` | fire+dark (lightning, light); ice+dark (fire, light); lightning+dark (ice, light) | swarm, squad | striker, caster, skirmisher |
+| Haunted Moor | `moor` | dark (light); ice+dark (fire, light) | swarm, squad | skirmisher, caster |
+| Crystal Caverns | `crystal` | ice+light (fire, dark); light (dark) | squad, trio | guard, caster |
+| Ancient Ruins | `ruins` | light+dark (weapons only); fire (lightning); ice (fire); lightning (ice) | escort, trio | guard |
+| Twilight Rift | `rift` | light+dark (weapons only) | solo | striker, caster |
 <!-- /live -->
 
 ### Element signatures
@@ -78,23 +78,45 @@ minus its own:
 
 ### Faces
 
-A biome's foes wear faces from a private franchise pack (D76, D81, D83, D85), three biomes a pack:
+Foes wear the faces of three private franchise packs (D135): PriConne, Azur Lane and NIKKE. The owner sorted every unit
+into a tier: Regular, Key enemy, Sub-boss or Boss. A region's franchise goes by level, not biome: PriConne holds the
+first continent, and Azur Lane and NIKKE alternate every five levels after it, roughly in proportion to their rosters.
 
-| Pack | Biomes |
+<!-- live:faces -->
+| Continent | Rows 1–5 | Rows 6–10 | Capital |
+|---|---|---|---|
+| w1 | PriConne (Lv 1–5) | PriConne (Lv 6–10) | PriConne |
+| w2 | Azur Lane (Lv 11–15) | NIKKE (Lv 16–20) | Azur Lane |
+| w3 | Azur Lane (Lv 21–25) | NIKKE (Lv 26–30) | NIKKE |
+| w4 | Azur Lane (Lv 31–35) | NIKKE (Lv 36–40) | Azur Lane |
+| w5 | Azur Lane (Lv 41–45) | Azur Lane (Lv 46–50) | NIKKE |
+
+| Franchise | Regions |
 |---|---|
-| PriConne | Sky Isles, Highlands, Meadow |
-| Azur Lane | Underworld, Coast, Glacier |
-| Last Origin | Ancient Ruins, Canyon, Volcano |
-| NIKKE | Desert, Tundra, Storm Peaks |
-| Destiny Child | Haunted Moor, Swamp, Twilight Rift |
-| Girls' Frontline | Jungle, Geyser Basin, Crystal Caverns |
+| PriConne | 40 |
+| Azur Lane | 100 |
+| NIKKE | 60 |
+<!-- /live -->
 
-Forest draws from a mixed pool of five faces per pack, and so does any biome whose pack is missing. The packs live only
-in the gitignored `content/` and the private bucket ([architecture](architecture.md#private-content)).
+Within a region, faces go by tier:
 
-The battle stage shows each foe's art whole, and every pack is full-body art (Azur Lane since D116, PriConne since
-D118). The round faces on the region screens use a pack's face icon when it has one (PriConne, Azur Lane, Last Origin),
-else zoom full-body art onto the head.
+| Stage | Faces |
+|---|---|
+| Regular stages (1–10) | Regular units |
+| Elite (11) | A Sub-boss with two Key enemy assistants |
+| Boss (12) | Sub-bosses in the two opening waves, then a Boss with two Sub-boss guards. On a continent's top row (row 10), two Bosses and one Sub-boss guard |
+| Capital Finals | Vanguard: a Sub-boss with Key enemy minions. Champion: a Boss with Sub-boss minions |
+
+- **Picking:** a stage picks each face by hash from its franchise's units of that tier, sorted by id, and never repeats a
+  face within the stage.
+- **Empty tiers:** a tier with no units borrows the same tier from another franchise, then any tier of its own.
+- **Storage:** the units live only in the gitignored `content/` and the private bucket
+  ([architecture](architecture.md#private-content)).
+
+Every unit has three images:
+- a square **face** for the round icons on the region screens;
+- a 2:3 **vertical**, which is what the battle stage shows;
+- for Key enemies, Sub-bosses and Bosses, a 16:9 **splash**. It cuts in during a fight ([combat](combat.md#splash-cut-ins)).
 
 ## Formations and waves
 
@@ -121,8 +143,10 @@ A region's twelve stages:
 - **1–2:** teaching pairs.
 - **3–10:** the biome's formation × signature combinations, never twice in a row. Stage 7 is a crowd, 8–9 come in two
   waves, and 10 is the biome's own formation.
-- **11:** the elite, a lone captain who acts twice.
-- **12:** the boss, three waves ending with a champion and her guards.
+- **11:** the elite: a captain with two Key enemy guards (0.8 of a regular foe's HP, shield 2 each). With help beside
+  her, she acts once a round (D135).
+- **12:** the boss: three waves ending with a champion and her two guards. On a continent's top row (row 10) it's two
+  champions, each with 55% of one champion's HP, and one guard (D135).
 
 A stage in waves pays 1.5× EXP and Laurels.
 
@@ -143,7 +167,7 @@ Volcano `w1-4-2`, Lv 1–5:
 | 8 | 4 | fight | Pair | fire + dark | 2 + 1 | dual element, acts twice |
 | 9 | 5 | fight | Lone elite | fire + light | 1 + 2 | acts twice, dual element |
 | 10 | 5 | fight | Lone elite | fire + dark | 1 | acts twice, dual element |
-| 11 | 5 | sub-boss | Elite | fire | 1 | acts twice, sub-boss |
+| 11 | 5 | sub-boss | Elite | fire | 3 | sub-boss |
 | 12 | 5 | boss | Volcano boss | fire + dark | 1 + 3 + 3 | acts twice, dual element, boss |
 <!-- /live -->
 

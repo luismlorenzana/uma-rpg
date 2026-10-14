@@ -25,7 +25,7 @@ import { FightResult } from './FightResult'
 function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: string; size: number }) {
   const [url, setUrl] = useState<string | null>(null)
   const member = campaign.cast.byId.get(castId)
-  const image = member?.face ?? member?.art
+  const image = member?.face
   useEffect(() => {
     let live = true
     if (image) void castArtUrl(image.path).then((u) => live && setUrl(u), () => undefined)
@@ -33,16 +33,9 @@ function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: stri
       live = false
     }
   }, [image])
-  const box = member && !member.face ? member.avatar : undefined
-  let zoom: React.CSSProperties | undefined
-  if (box && member) {
-    const height = size / box.size
-    const width = (height * member.art.width) / member.art.height
-    zoom = { position: 'absolute', maxWidth: 'none', width, height, left: size / 2 - box.x * width, top: size / 2 - box.y * height }
-  }
   return (
     <span className="relative block shrink-0 overflow-hidden rounded-full bg-raised" style={{ width: size, height: size, background: member?.color }}>
-      {url && <img src={url} alt="" className={zoom ? '' : 'size-full object-cover object-top'} style={zoom} />}
+      {url && <img src={url} alt="" className="size-full object-cover" />}
     </span>
   )
 }

@@ -129,13 +129,15 @@ An open fight is stored as `{ input, actions }`: the frozen fight and every acti
 
 ## Private content
 
-Franchise faces aren't original content, so they never go in git (CLAUDE.md, AGENTS.md):
-- `scripts/cast/import*.mjs` build each pack into `content/release/[<pack>/]` from the owner's sources. Last Origin's
-  import is run by the owner, because its wiki asks AI agents not to fetch.
-- `bash scripts/cast/publish.sh [pack]` uploads to `gs://uma-rpg-content`, with gcloud scoped to `uma-rpg`.
-- The app fetches them through `/api/content/` with the player's token.
-
-The packs: PriConne at the root, plus `azurlane/`, `lastorigin/`, `destinychild/`, `nikke/` and `girlsfrontline/`.
+Franchise art isn't original content, so it never goes in git (CLAUDE.md, AGENTS.md). The enemy release (D135) is
+built from three locked packs in `content/authoring/exports/`: PriConne and Azur Lane (ChatGPT's authoring pass, D133)
+and NIKKE (`pnpm l2d:lock`, D134).
+- `pnpm enemies:release` re-encodes every unit for the phone into the gitignored `content/enemies-release/`:
+  - a 128 px square face, a vertical of up to 480×720 and, above Regular, a splash of up to 1280×720, all WebP;
+  - `enemies.json`, the list: each unit's id, franchise, tier, name and images.
+- `pnpm enemies:publish` uploads it to `gs://uma-rpg-content` (images, then the list), with gcloud scoped to `uma-rpg`.
+- The app fetches `enemies.json` and the images through `/api/content/` with the player's token, and serves only those
+  paths. Local dev reads `content/enemies-release/`.
 
 ## Build and deploy
 

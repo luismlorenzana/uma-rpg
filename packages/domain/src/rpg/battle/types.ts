@@ -159,6 +159,8 @@ export type BattleAction =
   | { kind: 'limit'; actorId: string; targetId: string; skill?: RpgNodeRef; skills?: RpgNodeRef[]; weapon?: RpgWeapon; hero?: HeroLimitId }
 export type BattleCue =
   | { kind: 'intent'; actorId: string; targetId: string; label: string }
+  /** A foe makes her move, named as its intent was (D135: the cue a splash cuts in on). Presentation only. */
+  | { kind: 'move'; actorId: string; targetId: string; label: string }
   | { kind: 'hit'; actorId: string; targetId: string; amount: number; channel: BattleChannel | 'status';
       element: RpgDamageKind | null; weak: boolean; label?: string }
   | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'mp' | 'summon' | 'wave';

@@ -50,6 +50,18 @@ function play(save: Save, nodeId: string): ReturnType<typeof actInFight> {
 }
 
 describe('capital Finals (H15)', () => {
+  it('faces a vanguard as a Sub-boss with Key minions and a champion as a Boss with Sub-boss minions, from its franchise (D135)', () => {
+    const roster = (['priconne', 'azurlane', 'nikke'] as const).flatMap((franchise) => (['regular', 'key', 'subboss', 'boss'] as const)
+      .flatMap((tier) => Array.from({ length: 4 }, (_, n) => ({ id: `${franchise}-${tier}-${n}`, name: 'x', franchise, tier }))))
+    for (const [order, franchise] of [[1, 'priconne'], [2, 'azurlane'], [3, 'nikke']] as const) {
+      const capital = capitalChapter(worldContinent({ name: 'Synthetic', order }), roster)
+      for (const n of capital.nodes.filter((x) => x.kind !== 'camp')) {
+        const tiers = n.enemies.map((e) => e.castId.replace(`${franchise}-`, '').replace(/-\d+$/, ''))
+        expect(tiers, n.id).toEqual(n.kind === 'boss' ? ['boss', 'subboss', 'subboss'] : ['subboss', 'key', 'key'])
+      }
+    }
+  })
+
   it('builds three deterministic routes per continent with stable ids and the unchanged authored foes', () => {
     for (let order = 1; order <= 5; order++) {
       const continent = worldContinent({ name: `World ${order}`, order })
@@ -66,7 +78,9 @@ describe('capital Finals (H15)', () => {
           const n = capital.nodes.find((n) => n.id === ids[kind])!
           const spec = rpgFinals(order).routes[route - 1]![kind]
           expect(n.level).toBe(order * 10)
-          expect(n.enemies).toEqual(legacy.nodes.find((n) => n.id === old[kind])!.enemies)
+          // The authored foes, unchanged but for their faces (D135).
+          const faceless = (list: readonly { castId: string }[]) => list.map(({ castId: _, ...rest }) => rest)
+          expect(faceless(n.enemies)).toEqual(faceless(legacy.nodes.find((n) => n.id === old[kind])!.enemies))
           expect(n.enemies).toHaveLength(3)
           expect(n.enemies.map((e) => e.element)).toEqual([spec.element, ...spec.escorts.map((e) => e[1])])
           expect(n.waves).toBeUndefined()

@@ -1,5 +1,5 @@
 import { buildMemoryRelease, syntheticMasterData } from '@luismlorenzana/uma-data/testing'
-import { buildChapters, buildRoster, capitalId, capitalStageIds, FRANCHISES, newSave, placeById, worldOf } from '@rpg/domain'
+import { buildChapters, buildRoster, capitalId, capitalStageIds, newSave, placeById, worldOf } from '@rpg/domain'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter } from 'react-router'
@@ -16,11 +16,12 @@ vi.mock('../../content/cast', () => ({ castArtUrl: vi.fn(async () => 'blob:synth
 
 async function campaignFixture() {
   const data = syntheticMasterData(), release = await buildMemoryRelease(data)
-  const members: CastMember[] = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}`, nameJa: '', color: '#888888',
-    art: { path: `cast/rival${i}.00000000.png`, width: 32, height: 32 } }))
-  const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])),
-    packs: { priconne: members, azurlane: [], lastorigin: [], nikke: [], destinychild: [], girlsfrontline: [] } }
-  expect(Object.keys(cast.packs).sort()).toEqual([...FRANCHISES].sort())
+  // A synthetic roster: three units of each tier, PriConne's, so every stage of the first continent has faces.
+  const tiers = ['regular', 'key', 'subboss', 'boss'] as const
+  const members: CastMember[] = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}`, color: '#888888',
+    franchise: 'priconne', tier: tiers[i % 4]!, face: { path: `enemies/c${i}-face.00000000.webp`, width: 32, height: 32 },
+    art: { path: `enemies/c${i}-art.00000000.webp`, width: 32, height: 48 } }))
+  const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])) }
   return buildCampaign({ manifest: release.manifest, roster: buildRoster(data), chapters: buildChapters(data.scenarios), art: null }, cast)
 }
 

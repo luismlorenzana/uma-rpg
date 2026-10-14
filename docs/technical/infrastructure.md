@@ -9,7 +9,7 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 | API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
 | Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }` |
 | Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket |
-| Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the face packs: PriConne at the root (D50), the other franchises under `azurlane/`, `lastorigin/`, `destinychild/` and `nikke/` (D76, D81). The runtime service account reads it; `scripts/cast/publish.sh` writes it with the owner's gcloud login |
+| Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the enemy release (D135), `enemies.json` and `enemies/<unit>-<face\|art\|splash>.<hash>.webp`, about 105 MB. The runtime service account reads it; `pnpm enemies:publish` writes it with the owner's gcloud login |
 | Images | Artifact Registry `us-central1-docker.pkg.dev/uma-rpg/rpg`, keeps the last 3 |
 | Auth | Firebase Auth, Google sign-in; the API allows only `ALLOWED_EMAIL` |
 | Push (D63) | Secret Manager `rpg-vapid` (VAPID keys, read by the runtime service account as `VAPID_KEYS`); Firestore `push/{uid}`; Cloud Scheduler `rpg-push-tick` (`us-central1`, every 5 minutes) POSTs `/api/push/tick` with an OIDC token for `rpg-push-scheduler@uma-rpg.iam.gserviceaccount.com`, audience the Cloud Run URL (repository variable `PUSH_AUDIENCE`). Set up by `infra/push/setup.sh` (2026-10-10). All in free tiers |
@@ -52,12 +52,11 @@ Never run `gcloud config set …`.
 
 Every push to `main` (outside docs) runs lint, test and build, then, with `DEPLOY_ENABLED=true`, builds the API image
 (the npm token passes as a BuildKit secret), deploys Cloud Run, builds the web app and deploys Hosting. The workflow
-verifies: `/api/health` 200, `/api/save` and `/api/content/cast.json` 401 on Cloud Run, the same through Hosting, and
+verifies: `/api/health` 200, `/api/save` and `/api/content/enemies.json` 401 on Cloud Run, the same through Hosting, and
 the shell served `no-cache`.
 
-The face packs are published separately, by hand: `node scripts/cast/import.mjs && bash scripts/cast/publish.sh` for
-PriConne, `node scripts/cast/import-azurlane.mjs && bash scripts/cast/publish.sh azurlane` for Azur Lane (D76, under
-`azurlane/` in the bucket). The app picks a new pack up on its next load.
+The enemy release is published separately, by hand: `pnpm enemies:release && pnpm enemies:publish` (D135). The app
+picks a new release up on its next load.
 
 Watch a deploy: `gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`.
 

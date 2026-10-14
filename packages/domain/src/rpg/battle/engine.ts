@@ -410,6 +410,7 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     const source = enemyOf(s, actor.id)!
     const move = movesOf(s, actor).find((m) => m.id === intent.moveId)
     if (!move) throw new RangeError('Frozen intent no longer matches phase')
+    cues.push({ kind: 'move', actorId: actor.id, targetId: intent.targetId, label: move.label })
     if (move.kind === 'damage' && move.target === 'all') {
       for (const target of living(s, 'ally')) {
         if (actor.hp <= 0) break

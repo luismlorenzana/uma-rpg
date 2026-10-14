@@ -4,10 +4,11 @@
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
-import { rpgChapterReach, type RpgCampaignChapter, type RpgCastMember, type RpgMapNode } from '../rpg/campaign/chapters'
+import { rpgChapterReach, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
-import { BIOMES, biomeById, biomeFranchise, FRANCHISES, signatureWeaknesses, type Biome, type BiomeDef, type Formation, type Franchise } from './biomes'
+import { BIOMES, biomeById, signatureWeaknesses, type Biome, type BiomeDef, type Formation } from './biomes'
+import { bandFranchise, stageFaces, type EnemyRoster, type EnemyTier, type RosterMember } from './roster'
 
 export const WORLD_LEVELS = 10
 /** Ten rows of four regions on a continent's map: rows 1–5 hold its first five levels, rows 6–10 its last five. */
@@ -143,28 +144,14 @@ export function stagePlan(biome: BiomeDef, regionId: string): StagePlan[] {
 export const stageLevel = (region: Pick<WorldRegion, 'level' | 'levelTop'>, stage: number): number =>
   Math.min(region.levelTop, region.level + Math.floor((Math.min(stage, 10) - 1) / 2))
 
-/** Faces each pack lends the mixed pool (D81). */
-export const POOL_PER_FRANCHISE = 5
-/** A pack's pool faces: the members whose ids hash lowest, so a growing pack rarely reshuffles them. */
-export const poolOf = <M extends RpgCastMember>(members: readonly M[]): M[] =>
-  [...members].sort((a, b) => hash(`pool:${a.id}`) - hash(`pool:${b.id}`)).slice(0, POOL_PER_FRANCHISE)
+/** A region's twin-boss row (D135): its continent's top row, where the boss fight has two bosses. */
+export const TWIN_BOSS_ROW = WORLD_ROWS - 1
 
-/** Faces for a region: one list, or packs by franchise (D76, D81). A biome without its own pack, or whose pack is
- * missing, draws from the mixed pool: a few faces from every pack there is. */
-export type CastPacks = readonly RpgCastMember[] | Partial<Record<Franchise, readonly RpgCastMember[]>>
-function facesFor(cast: CastPacks, biome: Biome): readonly RpgCastMember[] {
-  if (Array.isArray(cast)) return cast as readonly RpgCastMember[]
-  const packs = cast as Partial<Record<Franchise, readonly RpgCastMember[]>>
-  const franchise = biomeFranchise(biome)
-  const own = franchise ? packs[franchise] : undefined
-  if (own && own.length > 0) return own
-  return FRANCHISES.flatMap((f) => poolOf(packs[f] ?? []))
-}
-
-/** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. */
-export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 1): RpgCampaignChapter {
+/** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. Its foes wear the
+ * faces of its franchise's units (D135), from `roster`. */
+export function regionChapter(region: WorldRegion, roster: EnemyRoster, tier = 1): RpgCampaignChapter {
   const biome = biomeById(region.biome)
-  const cast = facesFor(castPacks, region.biome)
+  const franchise = bandFranchise(Number(region.continentId.slice(1)), region.row)
   const plan = stagePlan(biome, region.id)
   const reach = rpgChapterReach(Math.floor((region.level - 1) / WORLD_LEVELS) * WORLD_LEVELS + 1)
   const ids = Array.from({ length: WORLD_STAGES }, (_, i) => `${region.id}-s${i + 1}`)
@@ -173,7 +160,8 @@ export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 
     const id = ids[i]!
     const kind = i === WORLD_STAGES - 1 ? 'boss' : i === WORLD_STAGES - 2 ? 'sub-boss' : 'fight'
     const level = stageLevel(region, i + 1)
-    const [enemies, ...waves] = stageWaves(level, biome, id, kind, p, cast, reach)
+    const faces = stageFaces(roster, franchise, id)
+    const [enemies, ...waves] = stageWaves(level, biome, id, kind, p, faces, reach, region.row === TWIN_BOSS_ROW)
     nodes.push({ id, row: i + 1, col: 2, kind, level, stage: 0,
       name: kind === 'boss' ? `${biome.name} boss` : kind === 'sub-boss' ? 'Elite' : FORMATION[p.formation].name,
       element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies: enemies!,
@@ -182,22 +170,19 @@ export function regionChapter(region: WorldRegion, castPacks: CastPacks, tier = 
   return { id: region.id, order: 0, tier, title: `${region.name} · Lv ${region.level}–${region.levelTop}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
 }
 
-/** A stage's foes, wave by wave. A pair signature makes dual-element foes (W3): each carries both elements, the lead
- * one alternating by slot. Faces never repeat within a stage. */
+/** An elite's assistants (D135): two Key enemies at a guard's share, beside the sub-boss. */
+export const ELITE_ASSISTANTS = { count: 2, hp: 0.8, shield: 2 } as const
+/** A twin-boss fight's two bosses each carry this share of one boss's HP, with one sub-boss guard. */
+export const TWIN_BOSS_HP = 0.55
+
+/**
+ * A stage's foes, wave by wave. A pair signature makes dual-element foes (W3): each carries both elements, the lead
+ * one alternating by slot. Faces by tier (D135): regular stages Regular units; the elite a Sub-boss with two Key
+ * assistants; the boss's opening waves and guards Sub-bosses around a Boss (two on a twin-boss row). Faces never
+ * repeat within a stage.
+ */
 function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', plan: StagePlan,
-  cast: readonly RpgCastMember[], reach: number): BattleEnemy[][] {
-  const used = new Set<string>()
-  // A pack with elements shows a face of the foe's own element when it has one.
-  const face = (slot: number, element: RpgElement): RpgCastMember => {
-    const matching = cast.filter((m) => m.element === element)
-    const pool = matching.length > 0 ? matching : cast
-    const offset = hash(`${stageId}:${slot}:cast`)
-    for (let i = 0; i < pool.length; i++) {
-      const m = pool[(offset + i) % pool.length]!
-      if (!used.has(m.id) || used.size >= pool.length) { used.add(m.id); return m }
-    }
-    return pool[offset % pool.length]!
-  }
+  faces: (tier: EnemyTier, slot: number) => RosterMember | null, reach: number, twin: boolean): BattleEnemy[][] {
   const weaknesses = (signature: readonly RpgElement[], slot: number, rank: EnemyRank): BattleWeaknesses => {
     const answers = signatureWeaknesses(signature)
     const key = `${stageId}:${slot}`
@@ -211,44 +196,49 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
   const above = level - 1
   let next = 0
-  const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, twice = false): BattleEnemy => {
+  const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, tier: EnemyTier, twice = false): BattleEnemy => {
     const slot = next++
     const element = signature[slot % signature.length]!
     const element2 = signature.length > 1 ? signature[(slot + 1) % signature.length] : undefined
-    const base = rpgFoe({ id: `foe${slot + 1}`, castId: face(slot, element).id, element, ...(element2 && element2 !== element ? { element2 } : {}),
+    const base = rpgFoe({ id: `foe${slot + 1}`, castId: faces(tier, slot)?.id ?? '', element, ...(element2 && element2 !== element ? { element2 } : {}),
       ...(twice ? { twice } : {}), role: r, rank, level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
     const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
     const offense = 1 + (rank === 'regular' ? WORLD_TUNING.regularOffensePerLevel : rank === 'sub-boss' ? WORLD_TUNING.eliteOffensePerLevel : WORLD_TUNING.bossOffensePerLevel) * above
     return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),
       atk: Math.round(base.stats.atk * offense), matk: Math.round(base.stats.matk * offense) } }
   }
-  /** One wave of regular foes in a formation, at a share of its HP. */
-  const formation = (f: Formation, signature: readonly RpgElement[], share: number, wave: number): BattleEnemy[] => {
+  /** One wave of regular-rank foes in a formation, at a share of its HP, wearing faces of a tier. */
+  const formation = (f: Formation, signature: readonly RpgElement[], share: number, wave: number, tier: EnemyTier): BattleEnemy[] => {
     const shape = FORMATION[f]
     const [lo, hi] = shape.count
     const count = lo + (hash(`${stageId}:${wave}:count`) % (hi - lo + 1))
     if (f === 'escort') {
-      return [foe(signature, 'regular', 'striker', ESCORT.captain * share, ESCORT.captainShield),
-        ...Array.from({ length: count - 1 }, () => foe(signature, 'regular', 'guard', ESCORT.guard * share, shape.shield))]
+      return [foe(signature, 'regular', 'striker', ESCORT.captain * share, ESCORT.captainShield, tier),
+        ...Array.from({ length: count - 1 }, () => foe(signature, 'regular', 'guard', ESCORT.guard * share, shape.shield, tier))]
     }
     const first = next
-    return Array.from({ length: count }, (_, k) => foe(signature, 'regular', role(first + k), (shape.budget / count) * share, shape.shield, f === 'solo'))
+    return Array.from({ length: count }, (_, k) => foe(signature, 'regular', role(first + k), (shape.budget / count) * share, shape.shield, tier, f === 'solo'))
   }
   const sigs = biome.signatures
   const after = (signature: readonly RpgElement[]) => sigs[(sigs.indexOf(signature) + 1) % sigs.length]!
-  if (kind === 'sub-boss') return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, true)]]
+  if (kind === 'sub-boss') {
+    // With her assistants beside her, the sub-boss acts once a round, not twice as she did alone.
+    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss'),
+      ...Array.from({ length: ELITE_ASSISTANTS.count }, () => foe(plan.signature, 'regular', 'guard', ELITE_ASSISTANTS.hp, ELITE_ASSISTANTS.shield, 'key'))]]
+  }
   if (kind === 'boss') {
-    // Two lighter waves of the biome's other signatures lead to the champion, her guards and the biome's main pair.
+    // Two lighter waves of sub-bosses on the biome's other signatures lead to the boss (or two) and her sub-boss guards.
     const share = WAVE_HP[BOSS_WAVES]!
-    return [formation(biome.formations[0]!, after(plan.signature), share, 0), formation('trio', after(after(plan.signature)), share, 1),
-      [foe(plan.signature, 'boss', 'champion', 1, RPG_FOE_TUNING.bossShield), foe(plan.signature, 'regular', 'guard', 0.8, 2),
-        foe(plan.signature, 'regular', 'guard', 0.8, 2)]]
+    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss')
+    const guard = () => foe(plan.signature, 'regular', 'guard', 0.8, 2, 'subboss')
+    return [formation(biome.formations[0]!, after(plan.signature), share, 0, 'subboss'), formation('trio', after(after(plan.signature)), share, 1, 'subboss'),
+      twin ? [champion(TWIN_BOSS_HP), champion(TWIN_BOSS_HP), guard()] : [champion(1), guard(), guard()]]
   }
   const share = WAVE_HP[plan.waves] ?? 1
-  const waves = [formation(plan.formation, plan.signature, share, 0)]
+  const waves = [formation(plan.formation, plan.signature, share, 0, 'regular')]
   if (plan.waves > 1) {
     const second = biome.formations.find((f) => f !== plan.formation) ?? 'trio'
-    waves.push(formation(second, after(plan.signature), share, 1))
+    waves.push(formation(second, after(plan.signature), share, 1, 'regular'))
   }
   return waves
 }

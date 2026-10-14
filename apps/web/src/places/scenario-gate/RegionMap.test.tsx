@@ -27,10 +27,12 @@ async function fixture() {
   const data = syntheticMasterData(), outfit = data.outfits[0]!
   data.outfits = Array.from({ length: 5 }, (_, i) => ({ ...outfit, id: 9000000 + i, costumeId: 9000000 + i, talentGroupId: 9000000 + i }))
   const release = await buildMemoryRelease(data)
-  const members: CastMember[] = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}`, nameJa: '', color: '#888888',
-    art: { path: `cast/rival${i}.00000000.png`, width: 32, height: 32 } }))
-  const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])),
-    packs: { priconne: members, azurlane: [], lastorigin: [], nikke: [], destinychild: [], girlsfrontline: [] } }
+  // A synthetic roster: three units of each tier, PriConne's, so every stage of the first continent has faces.
+  const tiers = ['regular', 'key', 'subboss', 'boss'] as const
+  const members: CastMember[] = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}`, color: '#888888',
+    franchise: 'priconne', tier: tiers[i % 4]!, face: { path: `enemies/c${i}-face.00000000.webp`, width: 32, height: 32 },
+    art: { path: `enemies/c${i}-art.00000000.webp`, width: 32, height: 48 } }))
+  const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])) }
   const campaign = buildCampaign({ manifest: release.manifest, roster: buildRoster(data), chapters: buildChapters(data.scenarios), art: null }, cast)
   const id = String(data.outfits[0]!.id)
   save = newSave('Test', NOW)
