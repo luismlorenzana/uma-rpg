@@ -24,7 +24,8 @@ function check(layout: MapLayout) {
   }
   for (const s of layout.spots) { expect(s.x + s.w).toBeLessThanOrEqual(layout.cols * 16); expect(s.y + s.h).toBeLessThanOrEqual(layout.rows * 16) }
 }
-describe('published world compositions', () => {
+// Lays out every region of every continent: well under a second here, but a loaded CI runner can pass 5s.
+describe('published world compositions', { timeout: 30_000 }, () => {
   it.each(continents)('$id: twelve deterministic stages in every biome, boss on top, clear props and real atlas ids', (continent) => {
     for (const r of continent.regions) {
       const layout = regionLayout(r, progress)
