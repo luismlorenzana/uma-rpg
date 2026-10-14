@@ -2,7 +2,7 @@
 // and draws any moment of her idle loop. The models use Spine 4.0 and 4.1, which read differently, so each skeleton
 // goes through its own version's runtime (/vendor/spine.js defines `spine40` and `spine41`). Used live by the reviewer
 // and frame by frame by the renderer.
-import { IDLE, skinsFor } from './roster.mjs'
+import { idlesFor, skinsFor } from './roster.mjs'
 import { MARGIN } from './formats.mjs'
 
 const RUNTIMES = { '4.0': 'spine40', '4.1': 'spine41' }
@@ -46,7 +46,7 @@ export class SpineStage {
     if (skin) skeleton.setSkinByName(skin)
     skeleton.setSlotsToSetupPose()
     const state = new spine.AnimationState(new spine.AnimationStateData(data))
-    const animation = data.findAnimation(IDLE[pose]) ?? data.findAnimation('idle') ?? data.animations[0]
+    const animation = idlesFor(entry.id, pose).map((name) => data.findAnimation(name)).find(Boolean) ?? data.animations[0]
     const actor = { pose, kit, skeleton, state, animation: animation?.name ?? null, duration: animation?.duration ?? 0 }
     if (animation) state.setAnimation(0, animation.name, true)
     actor.bounds = loopBounds(actor)

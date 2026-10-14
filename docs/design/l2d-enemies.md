@@ -12,26 +12,27 @@ with **Spine** (Esoteric Software's skeletal animation). Its "L2D" label is loos
 40% of the skeletons are Spine 4.0 and the rest 4.1; the two read differently, so each needs its own version of
 Spine's runtime. What the viewer offers us:
 
-- **The list**: `src/utils/json/l2d.json` in its repository, 745 entries with an id and English name: 204 base
-  characters (`c000`–`c799`), 149 of their outfits (`c123_01`), 74 collab entries (`c8xx`), 83 story characters
-  (`c9xx`, 15 of them faceless extras), 15 bosses (named `Boss: …`), and 220 event scenes, title cards and chibis.
+- **The list**: `src/utils/json/l2d.json` in its repository, 745 entries with an id and English name. 623 are
+  character models: 204 base characters (`c000`–`c799`), 163 outfits (`c123_01`, `c350_old`, and 13 treasure versions
+  `favorite_<id>`), 77 collab entries (`c8xx`, `c8xxx`), 128 story characters (`c9xx`, `c9xxx`, faceless extras
+  included), 15 bosses (named `Boss: …`) and 36 chibis (`smol_…`, `ce009_…`). The other 122 are event scenes, story
+  illustrations and title cards.
 - **Three poses per character**, each a skeleton, an atlas and one or two texture pages (2048², premultiplied
   alpha) under `nikke-db-legacy.pages.dev/l2d/<id>/`:
   - **Standing** (`<id>_00`): facing us, full body, idle loop about 2.7 s.
   - **Aim** (`aim/<id>_aim_00`): **from behind**, aiming down the field, idle loop 2 s.
   - **Cover** (`cover/<id>_cover_00`): crouched behind cover, turned **toward us** with her weapon, idle loop 2 s.
 
-  Bosses and story characters have only Standing.
+  Bosses, chibis and most story characters have only Standing.
 - **A 128 px square face icon** per entry (`images/sprite/si_<id>_00_s.png`), bosses included.
 
-A full character is 6–13 MB (Standing 3.5–6 MB, Aim and Cover 1–4 MB each). The default roster, 436 entries, is
-about 3 GB.
+A full character is 6–13 MB (Standing 3.5–6 MB, Aim and Cover 1–4 MB each). All 623 come to about 4 GB.
 
 ## 2. What we built (`scripts/l2d/`)
 
-- **`pnpm l2d:download`** captures the list, keeps the default groups (base, outfits, bosses, story; collabs are
-  left out as D81 did, and so are faceless extras; `--groups` adds collabs) and downloads every face and pose, one request a second. It resumes, and
-  fetches faces and Standing first so voting can start early. The host answers a missing file with its web page and a
+- **`pnpm l2d:download`** captures the list, keeps every character model (scenes, story illustrations and title
+  cards aside; `--groups` narrows it) and downloads every face and pose, one request a second. It resumes, and fetches
+  one whole character at a time, so whoever the reviewer shows has all her poses. The host answers a missing file with its web page and a
   200, so a pose that comes back as HTML counts as absent. Each entry gets a manifest with sizes and SHA-256s.
 - **`pnpm l2d:review`** (http://127.0.0.1:5195) plays each character live with Spine's own WebGL runtime (the 4.0 or
   4.1 one, read from the skeleton's header): Standing,

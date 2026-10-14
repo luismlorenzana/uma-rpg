@@ -7,23 +7,29 @@ export const ASSET_HOST = 'https://nikke-db-legacy.pages.dev/l2d/'
 /** The viewer's own 128 px square face icon. */
 export const faceUrl = (id) => `https://nikke-db-legacy.pages.dev/images/sprite/si_${id}_00_s.png`
 
-/** Standing (front, full body), Aim and Cover (both seen from behind, as in battle). */
+/** Standing (facing us, full body), Aim (from behind, as in battle) and Cover (crouched, turned toward us with her
+ * weapon). */
 export const POSES = ['fb', 'aim', 'cover']
 export const POSE_LABEL = { fb: 'Standing', aim: 'Aim', cover: 'Cover' }
-export const IDLE = { fb: 'idle', aim: 'aim_idle', cover: 'cover_idle' }
+const IDLE = { fb: 'idle', aim: 'aim_idle', cover: 'cover_idle' }
 
-export const GROUPS = ['base', 'skin', 'boss', 'story', 'collab']
-/** Collabs are other franchises' characters, left out as the earlier NIKKE pack did (D81). */
-export const DEFAULT_GROUPS = ['base', 'skin', 'boss', 'story']
+export const GROUPS = ['base', 'skin', 'collab', 'story', 'boss', 'chibi']
+/** Every character model; the owner sorts them. Only event scenes and title cards, which aren't one character, are out. */
+export const DEFAULT_GROUPS = GROUPS
 
-/** An entry's group, or null for what isn't a character: event scenes, title cards, chibis, faceless extras. */
+/**
+ * An entry's group, or null for an event scene or title card. Characters are `c` and three or four digits (base below
+ * c800, collabs c800–c899 and c8xxx, story characters c9xx and c9xxx), an outfit adds a suffix (`_01`, `_old`), a
+ * treasure version is `favorite_<id>`, bosses are named `Boss: …`, and chibis are `smol_…` and `ce009_…`.
+ */
 export function groupOf({ id, name }) {
   if (/^Boss:/.test(name)) return 'boss'
-  const m = /^c(\d{3})(_\d{2})?$/.exec(id)
+  if (/^(smol|ce\d{3})_/.test(id)) return 'chibi'
+  if (/^favorite_c\d{3}/.test(id)) return 'skin'
+  const m = /^c(\d{3,4})(_[a-z0-9]+)?$/.exec(id)
   if (!m) return null
-  const n = Number(m[1])
-  if (n >= 900) return /faceless/i.test(name) ? null : 'story'
-  if (n >= 800) return 'collab'
+  if (m[1][0] === '9') return 'story'
+  if (m[1][0] === '8') return 'collab'
   return m[2] ? 'skin' : 'base'
 }
 
@@ -51,6 +57,17 @@ export function poseStem(entry, pose) {
 export function atlasPages(text) {
   const lines = text.split(/\r?\n/).map((l) => l.trim())
   return lines.filter((line, i) => /\.(png|webp)$/i.test(line) && /^size:/.test(lines[i + 1] ?? ''))
+}
+
+/** The idle animations to try, best first: the viewer's per-pose idle, and its exceptions for chibis, treasure versions
+ * and a few others. The caller falls back to the skeleton's first animation. */
+export function idlesFor(id, pose) {
+  if (pose !== 'fb') return [IDLE[pose]]
+  if (id === 'mbg004_appearance' || id === 'c994') return [id === 'c994' ? 'idle_02' : id, 'idle']
+  if (id.startsWith('smol_')) return ['pose_idle', 'idle_front', 'idle']
+  if (id.startsWith('ce009_')) return ['down_idle', 'idle']
+  if (id.startsWith('favorite_')) return ['idle_merged', 'idle']
+  return ['idle']
 }
 
 // The viewer's skin choices, by id (its source's tables): some standing poses default to a skin with an accessory or a

@@ -1,6 +1,9 @@
 // The L2D reviewer's page: one character at a time, playing live; a vote saves and moves on. Keys: 1–5 vote,
 // ← → move, Z undo, S A C switch pose.
 import { RENDERS, rendersForRole } from './formats.mjs'
+
+/** The stills made for whoever is on screen. */
+const STILLS = RENDERS.filter((r) => r.kind === 'still' && !r.compare)
 import { renderEntry } from './render.js'
 import { GROUPS, POSE_LABEL, POSES } from './roster.mjs'
 import { poseAt, SpineStage } from './spine-view.js'
@@ -71,6 +74,30 @@ function show() {
   }))
   showRenders(entry)
   load(entry)
+  autoRender(entry)
+}
+
+let autoBusy = false
+/** Her stills, a moment after she comes on screen, if they're missing: one at a time, skipped if you've moved on. */
+function autoRender(entry) {
+  if (!entry?.poses.fb) return
+  const missing = STILLS.filter((r) => !entry.renders[r.name] && !(r.layout === 'splash' && entry.pending?.length))
+  if (!missing.length) return
+  setTimeout(async () => {
+    if (autoBusy || batching || currentId !== entry.id) return
+    autoBusy = true
+    try {
+      await renderEntry(entry, missing, async (name, blob) => {
+        await saver(entry)(name, blob)
+        entry.renders[name] = blob.size
+      })
+      if (currentId === entry.id) showRenders(entry)
+    } catch (error) {
+      if (currentId === entry.id) $('render-status').textContent = `Couldn't render her stills: ${error.message ?? error}`
+    } finally {
+      autoBusy = false
+    }
+  }, 500)
 }
 
 async function load(entry) {
@@ -143,6 +170,7 @@ function step(by) {
 
 function showRenders(entry) {
   $('render').disabled = !entry?.poses.fb
+  $('render-status').textContent = entry?.pending?.length && entry.poses.fb ? 'Her splash waits for her Aim and Cover poses to download.' : ''
   $('renders').replaceChildren(...RENDERS.filter((r) => entry?.renders[r.name]).map((r) => {
     const figure = document.createElement('figure')
     const img = document.createElement('img')
@@ -169,9 +197,9 @@ async function renderCurrent() {
   $('render').disabled = true
   try {
     await renderEntry(entry, RENDERS, saver(entry), (label) => { $('render-status').textContent = `Rendering ${label}…` })
-    $('render-status').textContent = 'Done.'
     await refresh()
     if (currentId === entry.id) showRenders(current())
+    $('render-status').textContent = 'Done.'
   } catch (error) {
     $('render-status').textContent = `Render failed: ${error.message ?? error}`
   } finally {

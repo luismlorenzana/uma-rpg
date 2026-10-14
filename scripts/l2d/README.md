@@ -10,9 +10,10 @@ format options are in [docs/design/l2d-enemies.md](../../docs/design/l2d-enemies
 pnpm l2d:download
 ```
 
-About 3 GB for the default groups: 436 entries, the base characters, their outfits, bosses and story characters.
-One request a second, so about an hour and a half. Faces and Standing poses come first. Run it again to resume or to
-retry failures. `--only <id,id>`, `--poses fb` and `--groups base,skin,boss,story,collab` narrow it. Progress is in
+About 4 GB for all 623 character models: base characters, outfits, collabs, story characters, bosses and chibis
+(event scenes and title cards aren't characters, so they're left out). One request a second, so about two hours,
+one whole character at a time: whoever the reviewer shows has all her poses. Run it again to resume or to retry
+failures. `--only <id,id>`, `--poses fb` and `--groups base,skin,collab,story,boss,chibi` narrow it. Progress is in
 `content/l2d/download.log` when it runs in the background.
 
 ## Review
@@ -39,6 +40,8 @@ Votes go to `content/l2d/tiers.json`, with every change appended to `tiers-histo
 
 ## Render
 
+- **On arrival:** the character on screen gets her two stills, the 2:3 vertical and the 16:9 splash, about a second
+  after you land on her. The splash waits until her Aim and Cover poses have downloaded.
 - **Render this one** draws every format for the character on screen, including the comparison images: GIF,
   high-quality animation, and Standing + Aim.
 - **Render all with a role** goes through every voted unit except Excluded ones, one at a time:

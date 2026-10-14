@@ -7,24 +7,32 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { isWebPage } from './download.mjs'
 import { posesOf, RENDERS, rendersForRole } from './formats.mjs'
-import { atlasPages, groupOf, poseStem, rosterOf, skinsFor } from './roster.mjs'
+import { atlasPages, groupOf, idlesFor, poseStem, rosterOf, skinsFor } from './roster.mjs'
 import { l2dHandler, spineVersion } from './server.mjs'
 import { applyVote, emptyTiers, parseTiers, tierCounts } from './tiers.mjs'
 import { animatedWebp, webpChunks } from './webp-anim.mjs'
 
-test('sorts the list into groups, keeps the default ones once each, and skips what is not a character', () => {
+test('keeps every character model once, in its group, and skips scenes, title cards and bad ids', () => {
   const list = [
-    { id: 'c123', name: 'Unit A' }, { id: 'c123_01', name: 'Unit A Outfit' }, { id: 'c812', name: 'Guest' },
-    { id: 'c951', name: 'Story Person' }, { id: 'c952', name: 'Faceless NPC 3' }, { id: 'xb001', name: 'Boss: Machine' },
-    { id: 'eventscene', name: 'A Scene' }, { id: '../x', name: 'Bad' }, { id: 'c123', name: 'Unit A again' },
-    { id: 'c124', name: 'Unit B', f: 'c124_alt' },
+    { id: 'c123', name: 'Unit A' }, { id: 'c123_01', name: 'Unit A Outfit' }, { id: 'c123_old', name: 'Unit A old' },
+    { id: 'favorite_c123', name: 'Favorite: Unit A' }, { id: 'c812', name: 'Guest' }, { id: 'c8004', name: 'Guest Two' },
+    { id: 'c951', name: 'Story Person' }, { id: 'c952', name: 'Faceless NPC 3' }, { id: 'c9001', name: 'Story Two' },
+    { id: 'xb001', name: 'Boss: Machine' }, { id: 'smol_unit', name: 'Smol Unit' }, { id: 'ce009_char_01', name: 'Smol Other', f: 'ce009_char_01' },
+    { id: 'eventscene', name: 'A Scene' }, { id: 'story0001', name: 'Story 00-01' }, { id: '../x', name: 'Bad' },
+    { id: 'c123', name: 'Unit A again' }, { id: 'c124', name: 'Unit B', f: 'c124_alt' },
   ]
-  assert.deepEqual(list.map(groupOf), ['base', 'skin', 'collab', 'story', null, 'boss', null, null, 'base', 'base'])
-  assert.deepEqual(rosterOf(list).map((e) => `${e.id}:${e.group}`), ['c123:base', 'c123_01:skin', 'c951:story', 'xb001:boss', 'c124:base'])
-  assert.deepEqual(rosterOf(list, ['collab']).map((e) => e.id), ['c812'])
-  const [a, , , , b] = rosterOf(list)
+  assert.deepEqual(list.map(groupOf), ['base', 'skin', 'skin', 'skin', 'collab', 'collab', 'story', 'story', 'story', 'boss', 'chibi', 'chibi',
+    null, null, null, 'base', 'base'])
+  const roster = rosterOf(list)
+  assert.deepEqual(roster.map((e) => e.id), ['c123', 'c123_01', 'c123_old', 'favorite_c123', 'c812', 'c8004', 'c951', 'c952', 'c9001', 'xb001',
+    'smol_unit', 'ce009_char_01', 'c124'])
+  assert.deepEqual(rosterOf(list, ['collab']).map((e) => e.id), ['c812', 'c8004'])
+  const [a] = roster, b = roster.at(-1)
   assert.deepEqual(['fb', 'aim', 'cover'].map((p) => poseStem(a, p)), ['c123_00', 'aim/c123_aim_00', 'cover/c123_cover_00'])
   assert.equal(poseStem(b, 'aim'), 'aim/c124_alt')
+  assert.equal(poseStem(roster.find((e) => e.id === 'ce009_char_01'), 'fb'), 'ce009_char_01')
+  assert.deepEqual(['c123', 'favorite_c123', 'smol_unit', 'ce009_char_01'].map((id) => idlesFor(id, 'fb')[0]), ['idle', 'idle_merged', 'pose_idle', 'down_idle'])
+  assert.deepEqual(idlesFor('c123', 'cover'), ['cover_idle'])
 })
 
 test('reads atlas pages and picks the skins the viewer shows, backdrops last', () => {
@@ -121,7 +129,8 @@ test('serves the app and only the files a manifest lists, to local hosts', async
   assert.match(page.text(), new RegExp(`content="${token}"`))
   assert.match(page.headers['Content-Security-Policy'], /script-src 'self'/)
   const state = (await request('/api/state')).json()
-  assert.deepEqual(state.entries.map((e) => [e.id, e.poses, e.spine, e.face]), [['c123', { fb: 'c123_00', aim: 'aim/c123_aim_00' }, { fb: '4.1', aim: '4.0' }, true], ['c124', {}, {}, false]])
+  assert.deepEqual(state.entries.map((e) => [e.id, e.poses, e.pending, e.spine, e.face]), [
+    ['c123', { fb: 'c123_00', aim: 'aim/c123_aim_00' }, [], { fb: '4.1', aim: '4.0' }, true], ['c124', {}, ['fb', 'aim', 'cover'], {}, false]])
   assert.match((await request('/src/c123/aim/c123_aim_00.skel')).text(), /aim skeleton$/)
   assert.equal((await request('/src/c123/face.png')).text(), 'face')
   // Both runtimes define `spine`: each is kept under its own name as it loads.
