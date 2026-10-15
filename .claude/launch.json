@@ -12,12 +12,6 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@rpg/web", "dev"],
       "port": 5174
-    },
-    {
-      "name": "l2d-review",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["scripts/l2d/server.mjs"],
-      "port": 5195
     }
   ]
 }

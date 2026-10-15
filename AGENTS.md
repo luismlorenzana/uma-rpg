@@ -35,8 +35,7 @@ NODE_AUTH_TOKEN=$(gh auth token) pnpm install
 pnpm lint && pnpm test && pnpm build
 pnpm --filter @rpg/api dev     # API on :8081, auth off, local save, master data from ../uma-platform/content/release
 pnpm --filter @rpg/web dev     # web on :5174, /api proxied to :8081
-pnpm l2d:review                # NIKKE reviewer (D127); pnpm l2d:lock locks its pack (D134)
-pnpm enemies:release           # the three locked packs → content/enemies-release (gitignored; D135)
+pnpm enemies:release           # locked packs in content/authoring/exports → content/enemies-release (D135, D137)
 pnpm enemies:publish           # upload it to gs://uma-rpg-content (scoped gcloud, never changes the account)
 ```
 

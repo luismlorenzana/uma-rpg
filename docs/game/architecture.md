@@ -130,8 +130,7 @@ An open fight is stored as `{ input, actions }`: the frozen fight and every acti
 ## Private content
 
 Franchise art isn't original content, so it never goes in git (CLAUDE.md, AGENTS.md). The enemy release (D135) is
-built from three locked packs in `content/authoring/exports/`: PriConne and Azur Lane (ChatGPT's authoring pass, D133)
-and NIKKE (`pnpm l2d:lock`, D134).
+built from locked franchise packs in `content/authoring/exports/`: PriConne and Azur Lane (D133) and NIKKE (D134).
 - `pnpm enemies:release` re-encodes every unit for the phone into the gitignored `content/enemies-release/`:
   - a 128 px square face, a vertical of up to 480×720 and, above Regular, a splash of up to 1280×720, all WebP;
   - `enemies.json`, the list: each unit's id, franchise, tier, name and images.
@@ -139,10 +138,9 @@ and NIKKE (`pnpm l2d:lock`, D134).
 - The app fetches `enemies.json` and the images through `/api/content/` with the player's token, and serves only those
   paths. Local dev reads `content/enemies-release/`.
 
-The completed PriConne/Azur Lane reviewer and crop app are retired (D136). Keep the locked PNG bundles, current
-WebP release and all authoring records. Redundant source images and installed app copies can be moved to Trash with
-`pnpm enemies:cleanup <private-content-folder> --apply` (omit `--apply` for an audit). See
-[retention and recovery](../design/portrait-authoring.md); cleanup never changes the bucket or game.
+The authoring tools are retired (D136, D137), and their images are off this machine: only `enemies.json` and the
+authoring records stay local, so local dev has no enemy images. Rebuilding needs the locked packs back
+([enemy roster](../design/enemy-roster.md#on-this-machine-d137)).
 
 ## Build and deploy
 

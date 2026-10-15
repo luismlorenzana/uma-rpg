@@ -1,8 +1,11 @@
 # The enemy roster: three franchises, four tiers, splash cut-ins (D135)
 
 The fight content was re-authored from three locked franchise packs:
-- **PriConne and Azur Lane**, from the portrait authoring pass ([portrait-authoring.md](portrait-authoring.md), D133);
-- **NIKKE**, from its animated models ([l2d-enemies.md](l2d-enemies.md), D134).
+- **PriConne and Azur Lane**, from the owner's portrait authoring pass (D123, D128–D133);
+- **NIKKE**, from its animated models (D127, D134).
+
+The local authoring tools that made them are retired, and their downloaded and rendered images are off the machine
+(D136, D137): the published release in the bucket is what the game uses.
 
 The owner sorted every unit into a tier: **Regular, Key enemy, Sub-boss or Boss**. This note covers how those units
 reach the game and where they appear. The rules live in `packages/domain/src/world/roster.ts` and `world.ts`; the
@@ -16,8 +19,9 @@ manual pages are [maps](../game/maps.md#faces) and [combat](../game/combat.md#sp
 
 ## 1. The pipeline
 
-1. **Lock** each franchise's images in `content/authoring/exports/`: ChatGPT's export for PriConne and Azur Lane,
-   `pnpm l2d:lock` for NIKKE. Each bundle has a completion marker and a hash for every file.
+1. **Lock** each franchise's images as a bundle in `content/authoring/exports/`, named by a pointer file
+   (`latest.json`, `latest-nikke.json`), with a completion marker and a hash for every file. A new franchise or a
+   re-authored one comes in the same way.
 2. **`pnpm enemies:release`** reads the bundles through their pointers (`latest.json`, `latest-nikke.json`), checking
    every hash. It re-encodes each unit for the phone into the gitignored `content/enemies-release/`:
 
@@ -37,13 +41,13 @@ manual pages are [maps](../game/maps.md#faces) and [combat](../game/combat.md#sp
 4. **The API** serves only `enemies.json` and those image names, behind sign-in. **The web** loads the list once a
    session, and the service worker caches the images.
 
-### Local retention (D136)
+### On this machine (D137)
 
-The completed PriConne/Azur Lane ranking/crop app and legacy cast importers are retired. Keep **both locked PNG
-bundles**, their pointers/snapshots, the current WebP release and every vote/crop/history record. The release builder
-needs only the locked bundles, not the source download caches or the retired app. NIKKE's separate tooling remains.
-Redundant images and installed portrait tools move to Trash, never to permanent deletion; the cleanup command checks
-every locked and runtime asset before and after moving anything. See [retention and recovery](portrait-authoring.md).
+Only `content/enemies-release/enemies.json` and the authoring records (votes, tiers, crop rectangles, manifests) stay
+local. The locked PNG bundles and the release's WebPs went to the macOS Trash after the upload, with a recovery list in
+`content/authoring/maintenance/`. Local dev therefore shows the map and fights without enemy images. To rebuild or
+republish, put the bundles back from the Trash (or lock new ones), then run `pnpm enemies:release` and
+`pnpm enemies:publish`.
 
 ## 2. Regions by franchise
 

@@ -17,8 +17,7 @@ promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/
 
 ## Documentation
 
-Private enemies: [locked packs and the release pipeline](docs/design/enemy-roster.md). The completed portrait
-review app is retired; [retained authoring data and local cleanup](docs/design/portrait-authoring.md).
+Private enemies: [the roster and its release pipeline](docs/design/enemy-roster.md).
 
 | Doc | What |
 |---|---|

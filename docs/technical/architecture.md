@@ -84,8 +84,8 @@ Gear uses material-only recipes; Mastery Tokens belong to gear-level training (D
 Master data comes through the authenticated API from uma-platform's content-addressed releases; game rules stay in
 this repo (platform P5, P7). Neutral release ids are adapted once for the roster and scenario/continent order.
 Three locked franchise packs supply enemies by region and tier (D135); none of their data or screenshots go in git.
-The old cast importers and portrait/crop app are retired (D136). Locked PNGs, the current WebP release and authoring
-records remain local; [retention and recovery](../design/portrait-authoring.md) covers redundant image cleanup.
+The image authoring tools are retired and their local images removed (D136, D137); the published release in the
+private bucket is the game's copy ([enemy roster](../design/enemy-roster.md)).
 Original code-drawn atlases are bundled from `@luismlorenzana/uma-art` (D26, D64).
 Bucket paths, endpoints, caching, local directories and deploy stages are in
 [the architecture manual](../game/architecture.md#private-content) and [infrastructure](infrastructure.md).

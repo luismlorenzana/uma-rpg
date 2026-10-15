@@ -17,7 +17,7 @@ test('private originals, votes, crops, exports and model renders all remain igno
   const paths=['content/release/cast/unit.png','content/sources/cast.json','content/authoring/datasets/private/cast/unit.png',
     'content/authoring/rounds/private/ratings.json','content/authoring/crops/private/crops.json',
     'content/authoring/exports/private/priconne/unit/vertical.png','content/authoring/previews/real-source.png',
-    'content/l2d/sources/unit/texture.png','content/l2d/renders/unit/full.webp',
+    'content/enemies-release/enemies/unit-art.0a1b2c3d.webp','content/enemies-release/enemies.json',
     'content/enemies-release/enemies.json','content/enemies-release/enemies/unit-art.hash.webp',
     'content/authoring/maintenance/private/moves.jsonl']
   const ignored=git(root,['check-ignore','--no-index','--stdin'],{input:paths.join('\n')+'\n'}).trimEnd().split('\n')
