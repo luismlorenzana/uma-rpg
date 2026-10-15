@@ -12,7 +12,7 @@
 | `packages/domain` | Pure rules: save/parsers/migrations, combat, world generation, economy, catalogs, places and master-data adapters |
 | `apps/web` | React UI and Zustand state; Vite consumes domain source. Phaser draws Hub/battles; DOM owns lasting labels and controls |
 | `apps/api` | NestJS auth, revisioned saves, master/private content proxies and Web Push. Consumes the domain's CommonJS build |
-| `scripts/cast/` | Private face-pack import/publish pipeline; output stays gitignored |
+| `scripts/enemies/` | Locked franchise packs to the private phone-sized enemy release; output stays gitignored |
 
 Tooling and exact dependency versions are generated in [dependencies](../game/dependencies.md), not copied here.
 
@@ -83,7 +83,9 @@ Gear uses material-only recipes; Mastery Tokens belong to gear-level training (D
 
 Master data comes through the authenticated API from uma-platform's content-addressed releases; game rules stay in
 this repo (platform P5, P7). Neutral release ids are adapted once for the roster and scenario/continent order.
-Six private cast packs supply foe faces by biome; none of their data or screenshots go in git (D83, D85, D88).
+Three locked franchise packs supply enemies by region and tier (D135); none of their data or screenshots go in git.
+The old cast importers and portrait/crop app are retired (D136). Locked PNGs, the current WebP release and authoring
+records remain local; [retention and recovery](../design/portrait-authoring.md) covers redundant image cleanup.
 Original code-drawn atlases are bundled from `@luismlorenzana/uma-art` (D26, D64).
 Bucket paths, endpoints, caching, local directories and deploy stages are in
 [the architecture manual](../game/architecture.md#private-content) and [infrastructure](infrastructure.md).

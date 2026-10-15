@@ -11,7 +11,6 @@
 |---|---|---|---|---|
 | **Now** | | | | |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | M | — |
-| [H20](tasks/H20-key-boss-faces.md) | Key bosses' faces (D76) | Claude, then the owner | S | The owner's picks |
 | [H28](tasks/H28-boots-and-accessory-icons.md) | Icons for D124's Boots, Slippers, Talismans and Amulets | ChatGPT | M | — |
 | **Parked by the owner** | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | The owner decides, Claude builds | L | Q6 |

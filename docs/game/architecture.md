@@ -13,7 +13,7 @@ production value and is the place to change them.
    apps/api  NestJS 11 on Cloud Run `rpg-api`
         ├─ saves ──────────► Firestore `saves/{uid}` (local: apps/api/.data/save.json)
         ├─ master data ────► gs://uma-platform-master-data (local: ../uma-platform/content/release)
-        ├─ private cast ───► gs://uma-rpg-content (local: content/release, gitignored)
+        ├─ private enemies ► gs://uma-rpg-content (local: content/enemies-release, gitignored)
         └─ push ───────────► Web Push (VAPID), ticked by Cloud Scheduler every 5 minutes
 
    packages/domain  @rpg/domain: every rule, pure TypeScript, shared by web and API
@@ -29,7 +29,7 @@ production value and is the place to change them.
 | `@rpg/domain` | `packages/domain` | Save schema and parsers, battle engine, classes and skills, world generator, economy, items, place registry, master data adapter | `tsc` → `dist/cjs` (CommonJS for the API); Vite and Vitest read the TypeScript source |
 | `@rpg/web` | `apps/web` | The game | `tsc --noEmit && vite build` → `apps/web/dist` |
 | `@rpg/api` | `apps/api` | Save, master data and content proxy, push | `nest build` → `dist/main.js`, shipped as a Docker image |
-| cast scripts | `scripts/cast/` | Import and publish the private franchise face packs | `content/release/` (gitignored) |
+| enemy scripts | `scripts/enemies/` | Build and publish the three locked franchise packs | `content/enemies-release/` (gitignored) |
 
 pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`, and tests are Vitest. Commands are in
 `AGENTS.md`.
@@ -65,7 +65,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     launch.
 - **PWA** (`vite.config.ts`, vite-plugin-pwa):
   - Updates are prompted ("Update ready · Restart"), never forced mid-action.
-  - The service worker precaches the app, Phaser included, and caches master data and cast art by URL hash.
+  - The service worker precaches the app, Phaser included, and caches master data and enemy art by URL hash.
   - `push-sw.js` shows notifications and sets the app badge.
 - **Auth:** Firebase Google sign-in with a redirect. The ID token goes to the API as `Authorization: Bearer`.
 - **Master data** (`master/master.ts`):
@@ -83,7 +83,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | `GET /api/health` | none | `{ ok, build, uptime }` |
 | `GET /api/save` · `PUT /api/save` | auth | The save envelope `{ revision, save }`. A PUT carries `baseRevision`: 400 on a parse error, 409 with the current save when stale |
 | `GET /api/master/*` | auth | Master data release files, manifests and channels, from the bucket |
-| `GET /api/content/*` | auth | The private cast: `[pack/]cast.json` and hash-named portraits |
+| `GET /api/content/*` | auth | `enemies.json` and its allowlisted, hash-named `enemies/*.webp` images |
 | `GET /api/push/key` · `PUT`/`DELETE /api/push/subscription` · `POST /api/push/test` | auth | Web Push |
 | `POST /api/push/tick` | Cloud Scheduler OIDC | Sends "work done" pushes since the last tick |
 
@@ -138,6 +138,11 @@ and NIKKE (`pnpm l2d:lock`, D134).
 - `pnpm enemies:publish` uploads it to `gs://uma-rpg-content` (images, then the list), with gcloud scoped to `uma-rpg`.
 - The app fetches `enemies.json` and the images through `/api/content/` with the player's token, and serves only those
   paths. Local dev reads `content/enemies-release/`.
+
+The completed PriConne/Azur Lane reviewer and crop app are retired (D136). Keep the locked PNG bundles, current
+WebP release and all authoring records. Redundant source images and installed app copies can be moved to Trash with
+`pnpm enemies:cleanup <private-content-folder> --apply` (omit `--apply` for an audit). See
+[retention and recovery](../design/portrait-authoring.md); cleanup never changes the bucket or game.
 
 ## Build and deploy
 

@@ -37,6 +37,14 @@ manual pages are [maps](../game/maps.md#faces) and [combat](../game/combat.md#sp
 4. **The API** serves only `enemies.json` and those image names, behind sign-in. **The web** loads the list once a
    session, and the service worker caches the images.
 
+### Local retention (D136)
+
+The completed PriConne/Azur Lane ranking/crop app and legacy cast importers are retired. Keep **both locked PNG
+bundles**, their pointers/snapshots, the current WebP release and every vote/crop/history record. The release builder
+needs only the locked bundles, not the source download caches or the retired app. NIKKE's separate tooling remains.
+Redundant images and installed portrait tools move to Trash, never to permanent deletion; the cleanup command checks
+every locked and runtime asset before and after moving anything. See [retention and recovery](portrait-authoring.md).
+
 ## 2. Regions by franchise
 
 A region's franchise goes by level, not biome, so each franchise owns whole stretches of the climb:
