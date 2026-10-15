@@ -3,6 +3,9 @@
 > **Status: built 2026-10-14 (D124–D126).** Replaces D103's accented armor and single accessory slot, and D100/D119's
 > targets arithmetic. The game manual (`docs/game/`) carries the result; this page keeps the reasoning.
 
+**Art (H28):** uma-art 2.5.0 supplies dedicated ten-grade rows for Boots, Slippers and all ten defensive accessories.
+The game no longer borrows Greaves, Leggings, Charm or Ring art for them. No gear/save/balance rule changes.
+
 ## 1. Gear: 10 weapons, 10 armor pieces, 20 accessories
 
 The owner's rule is symmetry: every list is five physical and five magical.
