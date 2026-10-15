@@ -401,6 +401,9 @@ From grade 4 on, dishes add side ingredients from other families, so every famil
 
 ## Gear
 
+Every gear type has its own ten-grade icon row (uma-art 2.5.0, H28), including Boots, Slippers and each Talisman and
+Amulet. Physical and magical feet share a silhouette with different materials; accessories have distinct shapes.
+
 Crafted at the Forge (D124, D125): 40 types in ten grades, five physical and five magical in every row:
 - ten weapons;
 - ten armor pieces;

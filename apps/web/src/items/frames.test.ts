@@ -16,7 +16,8 @@ describe('icon frames (P37–P38)', () => {
     }
     for (const t of EQUIP_TYPES) for (let g = 1; g <= 10; g++) {
       const art = gearArt(t)
-      const f = gear.frames[`${art.row}-g${g}` as keyof typeof gear.frames]
+      expect(art, `${t}: borrowed art is not allowed`).toEqual({ row: t })
+      const f = gear.frames[`${t}-g${g}` as keyof typeof gear.frames]
       expect(f, `${t}: no art row ${art.row}`).toBeDefined()
       expect(iconFrame(gearId(t, g)), `${t}-g${g}`).toEqual({ sheet: 'gear', x: f.x, y: f.y, ...(art.kind ? { kind: art.kind } : {}) })
     }

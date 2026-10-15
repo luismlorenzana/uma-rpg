@@ -11,12 +11,11 @@
 |---|---|---|---|---|
 | **Now** | | | | |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | M | — |
-| [H28](tasks/H28-boots-and-accessory-icons.md) | Icons for D124's Boots, Slippers, Talismans and Amulets | ChatGPT | M | — |
 | **Parked by the owner** | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | The owner decides, Claude builds | L | Q6 |
 | [H24](tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design | The owner and Claude | M | Q7, H23 |
 
-**For ChatGPT:** H28. H08, H10 and H11 are complete.
+**For ChatGPT:** no ready packets. H08, H10, H11 and H28 are complete.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
