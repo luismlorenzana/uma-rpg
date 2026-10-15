@@ -6,7 +6,8 @@
 // (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112);
 // v11 two accessories (D124); v12 the combat balance rework (D141, docs/design/combat-balance.md): a ratio damage formula,
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
-// strip foe buffs, and a breather between waves. Older fights replay unchanged.
+// strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules. Older fights
+// replay unchanged.
 import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
@@ -27,8 +28,8 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on; older versions still replay. */
-export const BATTLE_ENGINE_VERSION = 12
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12] as const
+export const BATTLE_ENGINE_VERSION = 13
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -160,7 +161,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -280,13 +281,15 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
   const atk = allyOf(s, attacker.id)?.stats ?? enemyOf(s, attacker.id)!.stats
   const def = allyOf(s, defender.id)?.stats ?? enemyOf(s, defender.id)!.stats
-  // v8: the weapon a hit is made with adds its Might (D104); from v12 (D141) Might is a percent on the hit.
-  const v12 = s.engineVersion >= 12
+  // The weapon a hit is made with adds its Might to offense (v8, D104; from v13 by D142's table); v12 alone took Might as
+  // a percent on the hit (D141).
+  const ratio = s.engineVersion >= 12
+  const percent = s.engineVersion === 12
   const might = attacker.side === 'ally' && kind !== null ? allyOf(s, attacker.id)?.might?.[kind] ?? 0 : 0
-  const offense = (channel === 'physical' ? atk.atk : atk.matk) + (v12 ? 0 : might)
+  const offense = (channel === 'physical' ? atk.atk : atk.matk) + (percent ? 0 : might)
   const defense = channel === 'physical' ? def.pdef : def.mdef
-  // v12: offense² ÷ (offense + defense), so the same ratio gives the same share at every level and never zero.
-  let amount = v12 ? (offense > 0 ? (offense * offense) / (offense + defense) : 0) * power * (1 + might / 100)
+  // From v12: offense² ÷ (offense + defense), so the same ratio gives the same share at every level and never zero.
+  let amount = ratio ? (offense > 0 ? (offense * offense) / (offense + defense) : 0) * power * (percent ? 1 + might / 100 : 1)
     : Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
   const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || !!options.orbs?.some((o) => battleHitIsWeak(foe, defender, o)))

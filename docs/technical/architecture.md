@@ -53,7 +53,7 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v12 (D141), every older version replaying as it was |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v13 (D141, D142), every older version replaying as it was |
 | `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, forty trees and learning rules |
 | `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97) |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |

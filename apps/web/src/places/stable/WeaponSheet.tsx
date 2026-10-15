@@ -7,7 +7,7 @@
 import {
   ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, ACCESSORY_TYPES, accessoryEffects, accessoryKindOf, ARMOR_LABEL,
   ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory,
-  isMagicalArmor, isOrb, isRpgTome, isWeapon, ITEM_EFFECTS, MIGHT_PER_GRADE, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind,
+  isMagicalArmor, isOrb, isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind,
   type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -35,7 +35,7 @@ export function effectLines(a: AccessoryEffects): string[] {
 export function pieceLine(id: string): string {
   const piece = gearById(id)
   if (!piece) return ''
-  if (isWeapon(piece.type)) return `Might: its hits deal +${piece.grade * MIGHT_PER_GRADE}%`
+  if (isWeapon(piece.type)) return `Might +${mightOf(piece.grade)} on its hits`
   if (isOrb(piece.type)) return 'Its kind on every hit, for weaknesses'
   if (isAccessory(piece.type)) return effectLines(accessoryEffects(piece)).join(' · ')
   const p = gearPoints(piece)

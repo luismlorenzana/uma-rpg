@@ -41,13 +41,16 @@ describe('gear (S7, D124, D125)', () => {
     // D141: the slot's defensive stat is +2 a grade.
     expect(gearPoints(gearById('helm-g4')!)).toMatchObject({ atk: 2, def: 8, matk: 0 })
     expect(gearPoints(gearById('robe-g4')!)).toMatchObject({ matk: 2, hp: 8, atk: 0 })
-    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 2, mp: 6 })
+    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 1, mp: 6 })
     expect(gearPoints(gearById('gauntlets-g10')!)).toMatchObject({ atk: 5, mdef: 20 })
-    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 3, speed: 10 })
+    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 2, speed: 10 })
+    // D142: armor's offense starts at grade 2.
+    expect(gearPoints(gearById('helm-g1')!)).toMatchObject({ atk: 0, def: 2 })
     expect(Object.values(gearPoints(gearById('orb-fire-g4')!)).every((n) => n === 0)).toBe(true)
-    // Might is 6% a grade on its own hits (D141), and counts only the weapons in her class's slots.
-    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 18 })
-    expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 12 })
+    // Might by grade (D142), counting only the weapons in her class's slots.
+    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 7 })
+    expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 4 })
+    expect(equippedMight({ bow: 'bow-g10' }, ['bow'] as never)).toEqual({ bow: 68 })
     expect(equippedPoints({ head: 'helm-g2', lance: 'lance-g3' })).toMatchObject({ def: 4, atk: 1, hp: 0 })
     // A Bulwark's shield is 2% of her max HP a grade (per mille here), made into HP when a fight starts.
     expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'talisman-bulwark-g3' })).toMatchObject({ orbs: ['lance'], barrier: 60, veil: 0 })
@@ -163,19 +166,20 @@ describe('the Forge and equipping (S7)', () => {
       gear: { 'greatsword-g1': 1, 'lance-g1': 1, 'helm-g1': 1, 'robe-g1': 1, 'boots-g1': 1, 'orb-fire-g1': 1, 'talisman-bulwark-g1': 1 } }))
     for (const g of ['greatsword-g1', 'lance-g1', 'helm-g1', 'robe-g1', 'boots-g1', 'orb-fire-g1', 'talisman-bulwark-g1']) save = equipGear(save, '101', g, at(0))
     const uma = worldOf(save).umas['101']!
-    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 2, matk: 1, def: 2, hp: 2, speed: 2 })
+    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 0, matk: 0, def: 2, hp: 2, speed: 2 })
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...smith, outfitId: id }]))
     const input = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input
     const ally = input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
-    expect(input.version).toBe(12)
-    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 6, lance: 6 }, barrier: Math.round(ally.stats.hp * 0.02), orbs: ['fire'], evasion: 12 })
+    expect(input.version).toBe(13)
+    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 1, lance: 1 }, barrier: Math.round(ally.stats.hp * 0.02), orbs: ['fire'], evasion: 12 })
     expect(ally).not.toHaveProperty('orb')
     expect(ally).not.toHaveProperty('regen')
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
-    expect(ally.stats.atk).toBe(bare.atk + 2)
+    // Grade-1 armor adds no offense (D142): her ATK is her own.
+    expect(ally.stats.atk).toBe(bare.atk)
   })
 })
 
@@ -194,7 +198,7 @@ describe('weapon slots (D98)', () => {
     // A crafted Lance takes the Training one's place and binds to her; choosing Training again takes it off.
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', 'lance-g1', at(2))
     expect(uma().gear.equipped.lance).toBe('lance-g1')
-    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 6 })
+    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 1 })
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', null, at(3))
     expect(uma().gear.equipped.lance).toBeUndefined()
     expect(uma().gear.locker).toContain('lance-g1')

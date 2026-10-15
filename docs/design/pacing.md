@@ -18,7 +18,7 @@
   slowly. Pace professions per Uma; gear and dish grades won't trail the battles.
 - Fights are the main Laurel source; selling stock also pays Laurels (D62). Laurels buy shortcuts: an hour of base work costs about
   two fights, whether bought as an item or as Time Tickets.
-- Extra Stats and gear each add a real share of power (D141): a node is worth its grade, a weapon 6% a grade on its
+- Extra Stats and gear each add a real share of power (D141): a node is worth its grade, a weapon's Might about 6% a grade at its tier on its
   hits, and foes are budgeted for a party built on curve ([combat balance](combat-balance.md)).
 
 ## Professions (design §4, §8.5)

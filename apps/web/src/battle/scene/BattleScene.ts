@@ -642,6 +642,7 @@ export class BattleScene extends Phaser.Scene {
         actor.sprite.setTint(0x8a8a8a)
       }
     }
-    await this.wait(700)
+    // Long enough for the cheer's two hops (up to 880 ms with its stagger) before the result screen.
+    await this.wait(900)
   }
 }

@@ -2,7 +2,7 @@
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
 import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
 import { formatLevels } from '../../battle/labels'
@@ -216,7 +216,12 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
   const [ended, setEnded] = useState<{ result: Result; nodeId: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const run = world ? openFightOf(world) : null
-  const stageId = ended?.nodeId ?? run?.battle?.nodeId
+  // The last action settles the fight in the save at once, while its cues still play. Keep showing the fight it was, so
+  // the screen isn't remounted mid-animation; its own onEnd then brings up the result.
+  const shownFight = useRef<{ battleId: string; nodeId: string } | null>(null)
+  if (run?.battle) shownFight.current = { battleId: run.battle.battleId, nodeId: run.battle.nodeId }
+  const fight = run?.battle ?? shownFight.current
+  const stageId = ended?.nodeId ?? fight?.nodeId
   const region = stageId ? campaign.stageRegion(stageId) : null
   const capital = campaign.continents.find((c) => capitalId(c.id) === region?.id)
   const toRegion = () => navigate(pagePath(place, capital ? `capital/${capital.id}` : region ? `r/${region.id}` : ''), { replace: true })
@@ -232,5 +237,5 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
       </>
     )
   }
-  return <FightScreen key={run?.battle?.battleId ?? 'none'} campaign={campaign} chapter={region} onMap={toRegion} onEnd={(result, nodeId) => setEnded({ result, nodeId })} />
+  return <FightScreen key={fight?.battleId ?? 'none'} campaign={campaign} chapter={region} onMap={toRegion} onEnd={(result, nodeId) => setEnded({ result, nodeId })} />
 }

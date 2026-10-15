@@ -7,7 +7,9 @@ import { applyBattleAction, battleActionsLeft, createBattle } from '../rpg/battl
 import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
 import type { BattleInput, BattleState } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
-import { balanceParty, balanceStage, type BalanceOptions } from './balance-party'
+import { balanceMember, balanceParty, balanceStage, type BalanceOptions } from './balance-party'
+import { rpgFoe } from '../rpg/campaign/enemies'
+import { MIGHT_BY_GRADE } from '../economy/gear'
 import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
@@ -116,6 +118,22 @@ describe('world balance', () => {
           state = step.state
         }
       }
+    }
+  })
+
+  it('sets each weapon grade’s Might to about 6% a grade of an on-curve Uma’s hit at the level it opens (D142)', () => {
+    for (let g = 1; g <= 10; g++) {
+      const level = 5 * g - 4
+      const foe = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
+      // The three offense leans: Brawler high ATK, Spell Blade even, Mage high M.ATK.
+      const boosts = (['brawler', 'spellblade', 'mage'] as const).map((c) => {
+        const a = balanceMember(c, 0, level, { gear: true, stars: true })
+        const [o, d] = c === 'mage' ? [a.stats.matk, foe.stats.mdef] : [a.stats.atk, foe.stats.pdef]
+        const f = (x: number) => (x * x) / (x + d)
+        return f(o + MIGHT_BY_GRADE[g]!) / f(o) - 1
+      })
+      const mean = boosts.reduce((n, b) => n + b, 0) / boosts.length
+      expect(Math.abs(mean - 0.06 * g), `grade ${g}`).toBeLessThan(0.02)
     }
   })
 

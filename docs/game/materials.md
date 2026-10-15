@@ -436,16 +436,16 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |
 |---|---|---|---|---|---|---|
-| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
-| Axe | `axe-g<grade>` | Weapon | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
-| Lance | `lance-g<grade>` | Weapon | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might: its hits deal +60% |
-| Bow | `bow-g<grade>` | Weapon | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might: its hits deal +60% |
-| Katana | `katana-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
-| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
-| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might: its hits deal +60% |
-| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might: its hits deal +60% |
-| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
-| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
+| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
+| Axe | `axe-g<grade>` | Weapon | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
+| Lance | `lance-g<grade>` | Weapon | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +68 on its hits |
+| Bow | `bow-g<grade>` | Weapon | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +68 on its hits |
+| Katana | `katana-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
+| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
+| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +68 on its hits |
+| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +68 on its hits |
+| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
+| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
 | Helm | `helm-g<grade>` | Head | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, DEF +20 |
 | Cuirass | `cuirass-g<grade>` | Body | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | HP +20, ATK +5 |
 | Greaves | `greaves-g<grade>` | Legs | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | MP +20, ATK +5 |
@@ -477,6 +477,6 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 | Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
 | Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 30% of magical damage taken |
 
-A weapon's Might is +6% a grade on the hits made with it. Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
+A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 7, 12, 18, 26, 34, 45, 55, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 2 (5 at grade 10, D142), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
 <!-- /live -->
 

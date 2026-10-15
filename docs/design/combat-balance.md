@@ -21,7 +21,7 @@
 | Brawler stays pure physical offense | No party-wide Guard for her. Guard is unchanged for everyone |
 | Brawler, Mage and Spell Blade are the offense classes | Unchanged |
 | Cleric and Summoner are half offense, half healer or shielder | Cleric: her magic spells heal and her physical blows put up a Barrier. Summoner: each summon line has a job (heal, Barrier, drain, Aegis, Enfeeble, revive, or strike), and several lines were renamed for it |
-| Might should grow with the grade, about 6% a step | Might is now +6% a grade on the weapon's own hits (+60% at grade 10) |
+| Might should grow with the grade, about 6% a step | First built as +6% a grade (D141); then, as the owner meant, fixed values bigger at later grades (D142): 1, 4, 7, 12, 18, 26, 34, 45, 55, 68, each worth about 6% × g at the level its grade opens, and more when worn early |
 
 ### What tuning changed
 

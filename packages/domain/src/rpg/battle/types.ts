@@ -30,8 +30,8 @@ export interface BattleAlly {
   maxDepth?: number
   /** Her Class Rank (v8, D102): it opens her trees' depths and sets her Limit Break's depth. */
   classRank?: number
-  /** Might by damage kind (v8, D104): a weapon's grade × 4, added to the offense of hits made with it. From v12 (D141) a
-   * percent: the hits made with that weapon deal this much more. */
+  /** Might by damage kind (v8, D104): added to the offense of hits made with that weapon (a grade × 4 to v11; D142's
+   * table from v13). In v12 alone (D141) a percent: the hits made with that weapon deal this much more. */
   might?: Partial<Record<RpgDamageKind, number>>
   /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
    * absorbing physical damage only). */
@@ -102,7 +102,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -145,7 +145,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

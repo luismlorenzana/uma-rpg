@@ -8,7 +8,7 @@ import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { DISHES } from '../economy/dishes'
 import {
   accessoryEffects, accessoryKindOf, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
-  MIGHT_PER_GRADE, recipeFamilies, slotOf, type EquipType,
+  MIGHT_BY_GRADE, mightOf, recipeFamilies, slotOf, type EquipType,
 } from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
 import {
@@ -26,9 +26,10 @@ import {
 import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
 import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
+import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
-  RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgWeaponKind, type RpgClass, type RpgWeapon,
+  RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
@@ -194,6 +195,44 @@ function foeRoles(): string {
   })) + '\n\nShown with Fire; a foe uses her own element, and a dual-element foe her second element for her second elemental move.'
 }
 
+/**
+ * Where an on-curve Uma's damage comes from, and what cuts the damage she takes (D142): the balance simulation's Brawler
+ * (`world/balance-party.ts`, gear of the grade her level opens and her level's Extra Stats nodes) against a regular
+ * striker of her level. Offense adds up; damage doesn't (offense² ÷ (offense + defense)), so each source is shown alone
+ * on top of her level stat, and all together.
+ */
+function damageSources(): string {
+  const offense: Cell[][] = []
+  const taken: Cell[][] = []
+  for (const level of [1, 10, 25, 40, 50]) {
+    const grade = onCurveGrade(level)
+    const foe = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
+    const bare = balanceMember('brawler', 0, level), geared = balanceMember('brawler', 0, level, { gear: true })
+    const built = balanceMember('brawler', 0, level, { gear: true, stars: true })
+    const own = bare.stats.atk, armor = geared.stats.atk - own, extra = built.stats.atk - geared.stats.atk, might = mightOf(grade)
+    const total = own + armor + extra + might
+    const hit = (o: number) => (o * o) / (o + foe.stats.pdef)
+    const part = (n: number) => `${n} (${Math.round((100 * n) / total)}%)`
+    const times = (o: number) => `×${(hit(o) / hit(own)).toFixed(2)}`
+    const depth = rpgOpenDepth(level)
+    offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(armor), total,
+      times(own + extra), times(own + might), times(own + armor), times(total), `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
+    // What a regular foe's 100% physical hit takes of her HP, as each defensive source joins.
+    const share = (u: typeof bare, cut = 0) => {
+      const o = foe.stats.atk
+      return `${Math.round((100 * (o * o) / (o + u.stats.pdef) * (1 - cut / 1000)) / u.stats.hp)}%`
+    }
+    const armorOnly = { ...bare, stats: { ...bare.stats, hp: geared.stats.hp, pdef: geared.stats.pdef } }
+    const starsOnly = { ...bare, stats: { ...bare.stats, hp: bare.stats.hp + built.stats.hp - geared.stats.hp, pdef: bare.stats.pdef + built.stats.pdef - geared.stats.pdef } }
+    taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(bare, built.guard ?? 0), share(built, built.guard ?? 0)])
+  }
+  return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Armor', 'Offense',
+    'Hit: + Extra Stats', 'Hit: + weapon', 'Hit: + armor', 'Hit: all three', 'Skill depth vs depth 1'], offense) +
+    '\n\nA regular foe\'s 100% physical hit, as a share of her HP:\n\n' +
+    table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', '+ Iron Talisman', 'All (on curve)'], taken) +
+    '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears a Vampire and an Iron Talisman.'
+}
+
 function foeScaling(): string {
   const t = RPG_FOE_TUNING
   return table(['Setting', 'Value'], [
@@ -244,7 +283,7 @@ function gear(): string {
     return parts.join('; ')
   }
   const does = (t: EquipType) => {
-    if (isWeapon(t)) return `Might: its hits deal +${MIGHT_PER_GRADE * 10}%`
+    if (isWeapon(t)) return `Might +${mightOf(10)} on its hits`
     if (isOrb(t)) return 'Its kind on every hit, for weaknesses'
     if (isAccessory(t)) return effect(t)
     const p = gearPoints(g10(t))
@@ -253,7 +292,7 @@ function gear(): string {
   return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families, grades 1–4 (then again from grade 5)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
     EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
     [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
-  ])) + `\n\nA weapon's Might is +${MIGHT_PER_GRADE}% a grade on the hits made with it. Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (${armorOffense(10)} at grade 10), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
+  ])) + `\n\nA weapon's Might adds to the offense of the hits made with it, by grade: ${MIGHT_BY_GRADE.slice(1).join(', ')} (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 2 (${armorOffense(10)} at grade 10, D142), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
     `An Uma wears two accessories of different types.`
 }
 
@@ -409,6 +448,7 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
     classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
+    'damage-sources': damageSources,
     families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
     'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,

@@ -561,17 +561,21 @@ describe('battle engine v12: the combat balance rework (D141)', () => {
   }
   const cuesOf = (step: BattleStep, kind: BattleStep['cues'][number]['kind']) => step.cues.filter((c) => c.kind === kind)
 
-  it('hits for offense² ÷ (offense + defense), with Might as a percent on the weapon’s own hits', () => {
+  it('hits for offense² ÷ (offense + defense), Might added to offense on the weapon’s own hits (v13; a percent in v12)', () => {
     const allies = crew()
+    const mightier = allies.map((a) => (a.id === 'a1' ? { ...a, might: { greatsword: 60 } } : a))
+    const hit = (s: BattleState, kind: 'greatsword' | 'axe') => battleDamage(s, unitOf(s, 'a1'), unitOf(s, 'f1'), 'physical', 1, kind).amount
     const plain = createBattle(v12([brute('f1', strike())], allies)).state
-    const mighty = createBattle(v12([brute('f1', strike())], allies.map((a) => (a.id === 'a1' ? { ...a, might: { greatsword: 60 } } : a)))).state
     const atk = allies[0]!.stats.atk, def = plain.input.enemies[0]!.stats.pdef
-    const one = battleDamage(plain, unitOf(plain, 'a1'), unitOf(plain, 'f1'), 'physical', 1, 'greatsword').amount
-    expect(one).toBe(Math.round((atk * atk) / (atk + def) * BATTLE_WEAK * BATTLE_UNBROKEN_FACTOR))
-    const boosted = battleDamage(mighty, unitOf(mighty, 'a1'), unitOf(mighty, 'f1'), 'physical', 1, 'greatsword').amount
-    expect(boosted / one).toBeCloseTo(1.6, 1)
-    expect(battleDamage(mighty, unitOf(mighty, 'a1'), unitOf(mighty, 'f1'), 'physical', 1, 'axe').amount).toBe(
-      battleDamage(plain, unitOf(plain, 'a1'), unitOf(plain, 'f1'), 'physical', 1, 'axe').amount)
+    const ratio = (o: number) => (o * o) / (o + def) * BATTLE_WEAK * BATTLE_UNBROKEN_FACTOR
+    expect(hit(plain, 'greatsword')).toBe(Math.round(ratio(atk)))
+    // v13 (D142): Might is offense.
+    const flat = createBattle({ ...v12([brute('f1', strike())], mightier), version: 13 }).state
+    expect(hit(flat, 'greatsword')).toBe(Math.round(ratio(atk + 60)))
+    expect(hit(flat, 'axe')).toBe(hit(plain, 'axe'))
+    // v12 (D141) took it as a percent on the hit; its fights replay so.
+    const percent = createBattle(v12([brute('f1', strike())], mightier)).state
+    expect(hit(percent, 'greatsword') / hit(plain, 'greatsword')).toBeCloseTo(1.6, 1)
   })
 
   it('lets a Cleric’s spell mend the most hurt and cleanse, and her blow shield the Uma the moves threaten', () => {

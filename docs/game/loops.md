@@ -240,8 +240,10 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   An empty weapon or armor slot holds the Training piece of its kind (grade 0, no stats); an empty accessory slot holds
   nothing.
 - **What it does (D104, D124):**
-  - A weapon's **Might**: the hits made with that weapon deal 6% more a grade (+60% at grade 10, D141).
-  - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉, and its slot's defensive stat +2g (D141). Head DEF, body HP, legs MP,
+  - A weapon's **Might** adds to the offense of the hits made with that weapon (D142): 1, 4, 7, 12, 18, 26, 34, 45, 55, 68
+    for grades 1–10. Each is set so that at the level its grade opens (Lv 5g − 4) the weapon adds about 6% × g to an
+    on-curve Uma's hits; worn ahead of its level it is worth more, kept long after less.
+  - Armor: ATK (physical) or M.ATK (magical) +⌊g ÷ 2⌋ from grade 2 (D142), and its slot's defensive stat +2g (D141). Head DEF, body HP, legs MP,
     arms MDEF, feet Speed.
   - An Orb adds its kind to every hit, for weaknesses. A Talisman or an Amulet gives one defensive effect, a share of
     her own numbers so it keeps its worth at every level ([combat](combat.md#damage), D141).

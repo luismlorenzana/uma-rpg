@@ -144,7 +144,9 @@ flat adds, so every source reads as a number on the stat.
 - **Weapon Might:** +4 per grade on hits made with that weapon (+40 at grade 10).
 - **Armor accent:** +⌈g/2⌉ to its stat (+5 at grade 10).
 
-**Where a Lv 50, fully built Uma's damage comes from** (one skill hit):
+**Where a Lv 50, fully built Uma's damage comes from** (one skill hit; the 2026-10-12 plan. Today's shares, generated
+from the code, are in [combat](../game/combat.md#where-damage-comes-from): D141–D142 moved to a ratio formula and
+grade-valued Extra Stats, and at Lv 50 offense is now 44% her own stats, 26% weapon, 20% Extra Stats, 10% armor):
 
 | Source | Adds to offense | Share |
 |---|---|---|
