@@ -78,7 +78,9 @@ Each capital's Finals take a franchise of their own: PriConne, Azur Lane, NIKKE,
 
 ### Balance
 
-The world simulation (`SIM=1 npx vitest run src/world/balance.test.ts`) was run before and after:
+The world simulation (`SIM=1 npx vitest run src/world/balance.test.ts`) was run before and after. It still plays engine
+v8, with class Limit Breaks that live fights no longer have (D112). On v11 these stages win less often; see
+[combat balance](combat-balance.md#2-what-we-measured).
 - **Elites, first try** (two Key enemies beside a captain who still acted twice): win rates fell from 100% to 40–100%,
   often below the Bosses'.
 - **Elites, with the captain acting once:** 95–100% wins with 60–93% of the party's HP left, over 5–12 rounds rather
