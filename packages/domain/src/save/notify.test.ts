@@ -7,9 +7,9 @@ import { queueJob, startJob, type WorkOutfit } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
-// An invented outfit, Turf A: a grade-1 item takes U.
-const turfA: WorkOutfit = { outfitId: '101', aptitudes: { surface: { turf: 'A', dirt: 'G' } } }
-const U = (itemMinutes(1) * MINUTE) / 2
+// An invented outfit at Farm Lv1: an item takes U, whatever its grade (D139).
+const turfA: WorkOutfit = { outfitId: '101' }
+const U = itemMinutes(1) * MINUTE
 const give = (save: Save, items: Record<string, number>): Save => {
   const w = worldOf(save)
   return { ...save, tierWorlds: { '1': { ...w, items: { ...w.items, ...items } } } }

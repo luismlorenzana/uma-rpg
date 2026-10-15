@@ -4,7 +4,7 @@ import { worldOf } from '../save/rules'
 import { parseSave, MAX_UMA_LEVEL, PARTY_SIZE, STARTING_UNLOCK_TICKETS, type Save } from '../save/save'
 import { stageLaurels } from '../save/battle'
 import { regionChapter } from '../world/world'
-import { aptitudeTime, FACILITY_SPEED, REPLAY_SHARE } from './pacing'
+import { FACILITY_SPEED, itemMinutes, REPLAY_SHARE } from './pacing'
 import { cast, continents, freshParty, freshWorker, frontierRegion, fullSet, ids, newBand,
   refillIfDry, regions, report, result, simulate, TARGET_MINUTES, TARGET_TOLERANCE, win } from './pacing.sim'
 
@@ -79,7 +79,7 @@ describe('H14 pacing economy ledger', () => {
     }
     expect(freshWorker(result.rows, 'farming')).toEqual(freshWorker(result.rows, 'gathering'))
     expect(freshWorker(result.rows, 'farming').profession.level).toBe(1)
-    expect(aptitudeTime('A')).toBe(0.5)
+    expect(itemMinutes(1)).toBe(54)
     expect(FACILITY_SPEED[0]).toBe(1)
   })
 

@@ -106,7 +106,7 @@ export function fullSet(grade: number): Record<string, number> {
   return inputs
 }
 
-export const worker: WorkOutfit = { outfitId: ids[0]!, aptitudes: { surface: { turf: 'A', dirt: 'A' } } }
+export const worker: WorkOutfit = { outfitId: ids[0]! }
 /** Conditional one-slot capacity at the band's grade. The worker must already meet that grade's profession gate. */
 export function capacity(world: TierWorld, grade: number, minutes: number, side: 'farming' | 'gathering'): number {
   const family = ITEM_FAMILIES.find((f) => f.side === side)!, uma = world.umas[worker.outfitId]!
@@ -118,7 +118,7 @@ export function capacity(world: TierWorld, grade: number, minutes: number, side:
   return minutes * MINUTE / plan.msEach
 }
 
-/** Fresh A workers continuously gather grade 1 in parallel with fights (not the fighting Umas in a real save).
+/** Fresh workers continuously gather grade 1 in parallel with fights (not the fighting Umas in a real save).
  * Keep partial-output time between band boundaries; use timestamp completion and the live profession EXP curve. */
 export function freshWorker(rows: Band[], side: 'farming' | 'gathering') {
   const world = worldOf(freshParty()), family = ITEM_FAMILIES.find((f) => f.side === side)!
@@ -175,7 +175,7 @@ export function markdown(): string {
     `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; five Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors).map((r) => r!.rank).join('/')}.`,
     `Banked: ${world.wallet.laurels} Laurels, ${world.wallet.gearMarks} Gear Marks and ${world.wallet.classMarks} Class Marks. No Manuals bought, no class switching, no tokens.`,
     `Four-hour target (180–300 min): **${result.minutes < TARGET_MINUTES * (1 - TARGET_TOLERANCE) ? 'under' : result.minutes > TARGET_MINUTES * (1 + TARGET_TOLERANCE) ? 'over' : 'met'}**. No game number retuned.`,
-    `*One slot at A, facility Lv1, conditional on the worker already meeting the grade gate; partial output is unfinished. Fresh A workers finish ${farm.finished}/${wilds.finished} grade-1 raw items and end at Farm/Craft Lv${farm.profession.level}. Refining and crafting need additional time.`)
+    `*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. Fresh workers finish ${farm.finished}/${wilds.finished} grade-1 raw items and end at Farm/Craft Lv${farm.profession.level}. Refining and crafting need additional time.`)
   return rows.join('\n')
 }
 export const report = (): string => 'Victory ledger: fixed classes; equal five-weapon shares; all currency banked; no combat or MP-spend estimate.\n\n' + markdown()

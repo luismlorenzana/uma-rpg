@@ -3,7 +3,7 @@
 // output and her profession EXP.
 import {
   activeClass, availabilityBlock, DISHES, facilityTargets, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
-  itemById, jobEndsAt, jobFinished, jobProgress, MAX_JOB_COUNT, planJob, professionAptitude, PROFESSION_LABEL, PROFESSION_SHORT, SaveRuleError,
+  itemById, itemMinutes, jobEndsAt, jobFinished, jobProgress, makeMinutes, maxJobCount, MINUTE, planJob, PROFESSION_LABEL, PROFESSION_SHORT, REFINE_BATCHES, refineMinutes, SaveRuleError,
   stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -22,8 +22,6 @@ import { QueueList } from './QueueList'
 import { pieceLine } from '../stable/WeaponSheet'
 import { TimeCut } from './TimeCut'
 
-const GRADE_ORDER = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
-const SPEED_NOTE: Record<string, string> = { S: '×2 speed', A: '×2 speed', B: '×1.7', C: '×1.5', D: '×1.33', E: '×1.2', F: '×1.1', G: '×1' }
 
 /** A facility's title and its help: what it makes and what it raises. */
 function describe(placeId: string): { title: string; help: string[]; profession: Profession } {
@@ -221,11 +219,10 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   const [error, setError] = useState<string | null>(null)
   const [dishKind, setDishKind] = useState<'planet' | 'duo' | 'feast'>('planet')
   const [readyOnly, setReadyOnly] = useState(false)
-  // Free Umas first, then the highest level here (and the most EXP into it), then the best aptitude for it.
+  // Free Umas first, then the highest level here (it sets her speed, D139), then the most EXP into it.
   const owned = view.roster.filter((o) => world.umas[o.outfitId])
-    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession], grade: professionAptitude(o, profession) }))
-    .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp ||
-      GRADE_ORDER.indexOf(a.grade) - GRADE_ORDER.indexOf(b.grade) || a.o.name.localeCompare(b.o.name))
+    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession] }))
+    .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp || a.o.name.localeCompare(b.o.name))
   const options = outfit
     ? spec.kind === 'gather'
       ? familyById(spec.family!)!.raw.map((i) => i.id)
@@ -237,7 +234,13 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   // How many the Warehouse covers: refining needs the raw item, cooking every ingredient.
   const makeable = (inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
   const stock = plan && !queueing && (spec.kind === 'refine' || spec.kind === 'cook' || spec.kind === 'craft') ? makeable(plan.inputs) : Infinity
-  const max = Math.max(1, Math.min(MAX_JOB_COUNT, stock))
+  // Her level sets the time, the same for every grade (D139); the facility's level speeds it.
+  const eachMs = (level: number) => (spec.kind === 'refine' ? refineMinutes(level) : spec.kind === 'gather' ? itemMinutes(level) : makeMinutes(level)) * MINUTE /
+    FACILITY_SPEED[facilityOf(world, placeId).level - 1]!
+  const most = maxJobCount(spec.kind)
+  const max = Math.max(1, Math.min(most, stock))
+  // Refining comes in batches of ×1, ×4, ×8, ×20 and ×40 (D139); the rest makes 1–10.
+  const sizes: readonly number[] = spec.kind === 'refine' ? REFINE_BATCHES : [1, 2, 3, 5, 10]
   const title = !outfit ? 'Who works here?' : !output ? (queueing ? 'Queue: what next?' : 'What does she make?') : 'How many?'
   return (
     <BottomSheet title={title} onClose={onClose} footer={outfit && output && plan ? (
@@ -251,14 +254,14 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
       {!outfit && (
         <ul className="space-y-1.5">
           {owned.length === 0 && <li className="text-[14px] text-ink-soft">Unlock Umas at the Stable first.</li>}
-          {owned.map(({ o, block, prof, grade }) => {
+          {owned.map(({ o, block, prof }) => {
             return (
               <li key={o.outfitId}>
-                <button type="button" disabled={!!block} onClick={() => { setOutfit(o); if (want) { setOutput(want); setCount(Math.min(MAX_JOB_COUNT, wanted?.get(want) ?? 1)) } }} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
+                <button type="button" disabled={!!block} onClick={() => { setOutfit(o); if (want) { setOutput(want); setCount(Math.min(most, wanted?.get(want) ?? 1)) } }} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
                   <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-semibold">{o.name}</span>
-                    <span className="block text-[12px] text-ink-soft">{block ?? `${profession === 'farming' ? 'Turf' : 'Dirt'} ${grade} ${SPEED_NOTE[grade]}`}</span>
+                    <span className="block text-[12px] text-ink-soft">{block ?? `${formatDuration(eachMs(prof.level))} each at her level`}</span>
                   </span>
                   <span className="shrink-0 text-center leading-none">
                     <span className="block font-display text-[20px] font-bold">{prof.level}</span>
@@ -334,7 +337,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
             </ul>
           )}
           <div className="flex flex-wrap gap-1.5">
-            {[1, 2, 3, 5, 10].filter((n) => n <= max).concat(max > 1 && ![1, 2, 3, 5, 10].includes(max) ? [max] : []).map((n) => (
+            {sizes.filter((n) => n <= max).concat(max > 1 && !sizes.includes(max) ? [max] : []).map((n) => (
               <button key={n} type="button" onClick={() => setCount(n)} className={`min-h-10 min-w-12 rounded-sm px-3 font-semibold ${Math.min(count, max) === n ? 'bg-accent text-accent-ink' : 'bg-raised'}`}>×{n}</button>
             ))}
           </div>

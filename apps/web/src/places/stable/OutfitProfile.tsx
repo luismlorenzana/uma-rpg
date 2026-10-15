@@ -5,7 +5,7 @@
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, aptitudeTime, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
+  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, umaWeaponMight, workOf, equippedAccessories, ACCESSORY_KINDS, accessoryTrack,
@@ -414,7 +414,6 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
   const now = useNow()
   const work = workOf(world, outfit.outfitId)
   const out = work ? outputView(work.job.output) : null
-  const surface = (p: Profession) => (p === 'farming' ? outfit.aptitudes.surface.turf : outfit.aptitudes.surface.dirt)
   return (
     <div className="space-y-3">
       {work && (
@@ -430,12 +429,11 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
       {(['farming', 'gathering'] as const).map((p) => {
         const prof = uma.professions[p]
         const next = prof.level < PROFESSION_MAX_LEVEL ? professionExpToNext(prof.level) : null
-        const grade = surface(p)
         return (
           <section key={p} className="rounded-md bg-raised p-3">
             <div className="flex items-baseline justify-between">
               <p className="text-[14px] font-semibold">{PROFESSION_LABEL[p]} <span className="font-display text-lg">{prof.level}</span></p>
-              <span className="flex items-center gap-1 text-[11px] text-ink-faint">{p === 'farming' ? 'Turf' : 'Dirt'} <GradeChip grade={grade} /> ×{(1 / aptitudeTime(grade)).toFixed(1)} speed</span>
+              <span className="text-[11px] text-ink-faint">10 gathered in {formatDuration(10 * itemMinutes(prof.level) * MINUTE)}</span>
             </div>
             <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />
             <p className="mt-1 text-[11px] text-ink-faint">

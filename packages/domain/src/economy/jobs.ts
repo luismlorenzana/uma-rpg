@@ -15,7 +15,7 @@ export interface Job {
   /** Outputs already moved to the Warehouse (or ranks already granted). */
   collected: number
   startedAt: string
-  /** Real milliseconds per output, fixed when the job starts (aptitude and facility speed included). */
+  /** Real milliseconds per output, fixed when the job starts (her profession level and the facility speed included). */
   msEach: number
   /** Profession EXP per output. */
   expEach: number

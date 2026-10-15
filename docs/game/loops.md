@@ -151,22 +151,29 @@ purchase.
 
 Two professions with one curve, raised by jobs at the facilities ([sections](sections.md#facilities)):
 
-| Profession | Save key | Facilities | Aptitude that speeds it |
-|---|---|---|---|
-| **Farm Level** | `farming` | The eight farm sites, the Pantry, the Kitchen | Turf |
-| **Craft Level** | `gathering` | The eight Wilds sites, the Workbench, the Forge | Dirt |
+| Profession | Save key | Facilities |
+|---|---|---|
+| **Farm Level** | `farming` | The eight farm sites, the Pantry, the Kitchen |
+| **Craft Level** | `gathering` | The eight Wilds sites, the Workbench, the Forge |
 
 - **Grades:** grade k opens at profession Lv 5k − 4 (1, 6, 11 … 46).
-- **Pace (D96):** a level takes 12 base hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Working
-  without a break, that's about 4 levels a day at A aptitude, 3 at C and 2 at G early on, and Lv50 in about 15 days at A
-  (12 with a level-3 facility) or a month at G. Batch size doesn't change it: EXP is paid per minute of work.
+- **Speed (D139):** set by the profession level alone, the same for every grade and every Uma. Aptitude doesn't
+  matter.
+  - Gathering one item takes 54 minutes at Lv1, falling evenly to 36 at Lv50, so ten take 9 hours at Lv1 and 6 at Lv50.
+    Umas of the same level finish together.
+  - A new grade comes at the speed its level gives: G10 (Lv46) is already near the floor.
+  - Refining takes a quarter of that (D101); cooking and crafting take twice that.
+  - A level-3 facility works a quarter faster.
+- **Pace (D96):** a level takes 12 hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Working without a
+  break, an Uma gains about 2 levels a day early on and reaches Lv50 in about a month (24 days at a level-3 facility).
+  Batch size doesn't change it: EXP is paid per minute of work.
 - **A job:**
-  - An Uma makes 1–10 outputs, one after another, and takes up a slot until it's done or recalled.
+  - An Uma makes its outputs one after another, and takes up a slot until it's done or recalled.
+  - **Batches (D139):** gathering, cooking and crafting make 1–10; refining makes ×1, ×4, ×8, ×20 or ×40, so a ×40
+    refine takes as long as a 10-item gather.
   - Inputs are reserved at the start.
-  - Real time is the base time × her aptitude share (S/A 0.5 … G 1) ÷ the facility's speed.
-  - Refining takes a quarter of gathering's base time (D101); cooking and crafting take two items' worth.
-  - Profession EXP is 2 per base minute of the job itself, whatever the speed, so every job levels at the same rate per
-    hour: refining pays a quarter of gathering's EXP per item.
+  - Profession EXP is 2 per minute of the job at her level, before the facility's speed, so every job levels at the
+    same rate per hour.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma. If the Warehouse can't cover the
   next one, the queue drops.
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when
@@ -194,10 +201,11 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| Gather one item | grade g: 30 + 30 × g minutes (G1 60 min, G10 330 min) |
-| Refine one item | a quarter of that (G1 15 min, G10 82.5 min) |
-| Cook or craft one | twice that: 60 + 60 × g minutes |
-| Outputs per job | up to 10 |
+| Gather one item | any grade, by profession level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
+| Refine one item | a quarter of that: 13.5 min at Lv1, 9 min at Lv50 |
+| Cook or craft one | twice a gather: 108 min at Lv1, 72 min at Lv50 |
+| Profession EXP | 2 per minute of the job at her level, before the facility's speed |
+| Outputs per job | gathering, cooking and crafting 1–10; refining ×1, ×4, ×8, ×20, ×40 |
 | Jobs queued after it | 3 |
 | Facility levels | 1–3: 2, 3, 3 Uma slots; speed ×1, ×1, ×1.25 |
 | Upgrade to Lv 2 / 3 | 150 Laurels + 1× grade-2 refined of each of its two families / 500 Laurels + 2× grade-5 refined of each of its two families |

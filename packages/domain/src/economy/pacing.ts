@@ -1,6 +1,5 @@
 // The pacing model (docs/design/pacing.md, D54): every timer, curve, price and payout outside the battle engine, in one
 // place so a balance pass changes numbers here and the tests say what they mean in play time.
-import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 
 export const MINUTE = 60_000
 export const HOUR = 60 * MINUTE
@@ -16,37 +15,43 @@ export const PROFESSION_LABEL: Readonly<Record<Profession, string>> = { farming:
 export const PROFESSION_SHORT: Readonly<Record<Profession, string>> = { farming: 'Farm', gathering: 'Craft' }
 export const PROFESSION_MAX_LEVEL = 50
 
-/** EXP from level L to L+1 (D96): 12 base hours of work at Lv1, an eighth of an hour more each level, 18 at Lv49.
- * Lv46 (grade 10) takes 79,650 EXP in all; Lv50 takes 88,200, 735 base hours. Working without a break, an Uma with A
- * aptitude gains about 4 levels a day early on and reaches Lv50 in about 15 days; at G, 2 a day and about a month. */
+/** EXP from level L to L+1 (D96): 12 hours of work at Lv1, an eighth of an hour more each level, 18 at Lv49. Lv46
+ * (grade 10) takes 79,650 EXP in all; Lv50 takes 88,200, 735 hours. Working without a break, every Uma gains about 2
+ * levels a day early on and reaches Lv50 in about a month (24 days at a level-3 facility); aptitude doesn't matter
+ * (D139). */
 export const professionExpToNext = (level: number): number => 1425 + 15 * level
 
-/** Profession EXP per base minute of work: every job pays for its time, whatever it makes (§8.5). */
+/** Profession EXP per minute of work at her level: every job pays for its time, whatever it makes (§8.5). */
 export const EXP_PER_MINUTE = 2
 
-/** Base minutes to gather or refine one item of a grade: an hour at grade 1, 5½ hours at grade 10. Items are few and
- * slow, and every recipe needs about one of each (D65). */
-export const itemMinutes = (grade: number): number => 30 + 30 * grade
+/**
+ * Minutes to gather one item (D139): the same for every grade, set by her profession level alone. 54 at Lv1, falling
+ * evenly to 36 at Lv50, so a 10-item job takes 9 hours at Lv1 and 6 at Lv50 and every Uma of a level finishes
+ * together. Grades open with levels (grade k at Lv 5k − 4): a new grade arrives at the speed its level gives.
+ */
+export const GATHER_MINUTES = { atFirst: 54, atMax: 36 } as const
+export const itemMinutes = (level: number): number => {
+  const l = Math.min(PROFESSION_MAX_LEVEL, Math.max(1, Math.floor(level)))
+  return GATHER_MINUTES.atFirst - ((GATHER_MINUTES.atFirst - GATHER_MINUTES.atMax) * (l - 1)) / (PROFESSION_MAX_LEVEL - 1)
+}
 /** Refining takes a quarter of gathering's time (D101), so one Pantry or Workbench keeps up with its eight sites. Like
  * every job it pays EXP for its own minutes only, so an hour of refining levels exactly as fast as an hour of gathering. */
 export const REFINE_SHARE = 0.25
-/** Base minutes to refine one item: 15 at grade 1, 82½ at grade 10. */
-export const refineMinutes = (grade: number): number => itemMinutes(grade) * REFINE_SHARE
-/** Base minutes to cook a dish or craft a piece of gear: two items' worth (S6, S7, D65). */
-export const makeMinutes = (grade: number): number => 2 * itemMinutes(grade)
+/** Minutes to refine one item at a profession level: 13½ at Lv1, 9 at Lv50. */
+export const refineMinutes = (level: number): number => itemMinutes(level) * REFINE_SHARE
+/** Minutes to cook a dish or craft a piece of gear at a profession level: two items' worth (S6, S7, D65). */
+export const makeMinutes = (level: number): number => 2 * itemMinutes(level)
+/** Profession EXP a job pays per item: 2 a minute of its time at her level, before a facility's speed (D96, D139). */
+export const jobExp = (minutes: number): number => Math.round(minutes * EXP_PER_MINUTE)
 
-/** One new job makes at most this many items (D65). */
+/** Gathering, cooking and crafting make 1–10 items a job (D65). */
 export const MAX_JOB_COUNT = 10
+/** Refining, at a quarter of the time, comes in these batches (D139): a ×40 refine takes as long as a 10-item gather. */
+export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
+/** The most items one new job of a kind makes. */
+export const maxJobCount = (kind: 'gather' | 'refine' | 'cook' | 'craft'): number => (kind === 'refine' ? REFINE_BATCHES.at(-1)! : MAX_JOB_COUNT)
 /** Saves from before D65 may hold jobs of up to 50. */
 export const MAX_SAVED_JOB_COUNT = 50
-
-// --- Aptitudes set speed (§4.1) ----------------------------------------------------------------------------------
-
-/** Share of the base time an Uma needs, by aptitude grade: A (and S) take half the time, G all of it. */
-export function aptitudeTime(grade: AptitudeGrade): number {
-  const share: Record<AptitudeGrade, number> = { S: 0.5, A: 0.5, B: 7 / 12, C: 2 / 3, D: 0.75, E: 5 / 6, F: 11 / 12, G: 1 }
-  return share[grade]
-}
 
 // --- Facilities (§9) -------------------------------------------------------------------------------------------
 

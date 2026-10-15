@@ -22,17 +22,16 @@ const umas = (...ids: string[]): Save => ids.reduce((s, id) => unlockUma(s, id, 
 const edit = (save: Save, fn: (w: ReturnType<typeof worldOf>) => ReturnType<typeof worldOf>): Save => ({ ...save, tierWorlds: { '1': fn(worldOf(save)) } })
 
 describe('gear (S7, D124, D125)', () => {
-  it('names forty types in ten grades, all by grade; a recipe is two refined items, each group its own pair', () => {
+  it('names forty types in ten grades, all by grade; a recipe is two refined items, its pair turning with the grade (D139)', () => {
     expect(EQUIP_TYPES).toHaveLength(40)
-    expect(gearById('greatsword-g1')).toMatchObject({ name: 'Copper Greatsword', inputs: { 'copper-ingot': 1, 'pine-plank': 1 } })
-    expect(gearById('tome-fire-g1')!.inputs).toEqual({ 'cut-quartz': 1, 'mist-infusion': 1 })
-    expect(gearById('helm-g1')).toMatchObject({ name: 'Copper Helm', inputs: { 'puffbun-leather': 1, 'limestone-block': 1 } })
-    expect(gearById('robe-g1')!.inputs).toEqual({ 'shell-carving': 1, linen: 1 })
+    expect(gearById('greatsword-g1')).toMatchObject({ name: 'Copper Greatsword', inputs: { 'pine-plank': 1, 'mist-infusion': 1 } })
+    expect(gearById('greatsword-g2')!.inputs).toEqual({ 'boarling-leather': 1, 'ammonite-carving': 1 })
+    expect(gearById('tome-fire-g1')!.inputs).toEqual({ 'puffbun-leather': 1, 'shell-carving': 1 })
+    expect(gearById('helm-g1')).toMatchObject({ name: 'Copper Helm', inputs: { 'limestone-block': 1, linen: 1 } })
     expect(gearById('boots-g1')).toMatchObject({ name: 'Copper Boots' })
-    expect(gearById('orb-katana-g1')!.inputs).toEqual({ 'copper-ingot': 1, 'limestone-block': 1 })
-    expect(gearById('talisman-vital-g1')).toMatchObject({ name: 'Copper Vital Talisman', inputs: { 'copper-ingot': 1, 'limestone-block': 1 } })
-    expect(gearById('amulet-mirror-g1')!.inputs).toEqual({ 'cut-quartz': 1, linen: 1 })
-    for (const type of EQUIP_TYPES) expect(new Set(recipeFamilies(type)).size).toBe(2)
+    expect(gearById('talisman-vital-g1')).toMatchObject({ name: 'Copper Vital Talisman', inputs: { 'limestone-block': 1, linen: 1 } })
+    expect(gearById('amulet-mirror-g1')!.inputs).toEqual({ 'copper-ingot': 1, 'cut-quartz': 1 })
+    for (const type of EQUIP_TYPES) for (let g = 1; g <= 10; g++) expect(new Set(recipeFamilies(type, g)).size).toBe(2)
     for (const bad of ['greatsword-g1-atk', 'helm-g1-atk', 'mail-g1', 'ring-g1', 'orb-fire-g1-hp', 'greatsword-g11', 'talisman-g1', 'amulet-heal-g1']) expect(gearById(bad), bad).toBeUndefined()
   })
 
@@ -58,9 +57,9 @@ describe('gear (S7, D124, D125)', () => {
 
 describe('the Forge and equipping (S7)', () => {
   it('crafts with Gathering & Crafting into the gear stock', () => {
-    let save = edit(umas('101'), (w) => ({ ...w, items: { 'copper-ingot': 2, 'pine-plank': 2 } }))
+    let save = edit(umas('101'), (w) => ({ ...w, items: { 'pine-plank': 2, 'mist-infusion': 2 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1', 2)!
-    expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE / 2 })
+    expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2', 1)!.block).toBe('Needs Craft Lv6')
     save = startJob(save, 'forge', 0, smith, 'greatsword-g1', 2, at(0))
     save = collectJob(save, 'forge', 0, at(2 * plan.msEach)).save
@@ -248,6 +247,6 @@ describe('save v20: gear symmetry (D124, D125)', () => {
     expect(worldOf(save).gear).toEqual({ 'cuirass-g1': 3, 'lance-g1': 1 })
     const job = worldOf(save).facilities.forge!.jobs[0]!
     expect(job.output).toBe('helm-g1')
-    expect(job.queue[0]).toMatchObject({ output: 'robe-g1', inputs: { 'shell-carving': 1, linen: 1 } })
+    expect(job.queue[0]).toMatchObject({ output: 'robe-g1', inputs: gearById('robe-g1')!.inputs })
   })
 })

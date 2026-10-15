@@ -2,7 +2,7 @@
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
-  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT,
+  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES,
   PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
 import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { DISHES } from '../economy/dishes'
@@ -209,8 +209,8 @@ function items(): string {
   const out: string[] = []
   for (const f of ITEM_FAMILIES) {
     out.push(`### ${f.name} (\`${f.id}\`, ${EFFECT_LABEL[f.effect]}, ${placeById(f.site)?.name ?? f.site})`, '')
-    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at profession Lv', 'Minutes to gather one', 'Minutes to refine one', 'Minutes to cook or craft at this grade'], f.raw.map((r, i) => [
-      r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade), itemMinutes(r.grade), refineMinutes(r.grade), makeMinutes(r.grade),
+    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at profession Lv'], f.raw.map((r, i) => [
+      r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade),
     ])), '')
   }
   return out.join('\n').trimEnd()
@@ -239,9 +239,9 @@ function gear(): string {
     const p = gearPoints(g10(t))
     return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} +${p[e]}`).join(', ')
   }
-  return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families (one refined item each)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
+  return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families, grades 1–4 (then again from grade 5)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
     EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
-    recipeFamilies(t).map(family).join(', '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
+    [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
   ])) + `\n\nArmor adds ATK (physical) or M.ATK (magical), +1 every two grades (${armorOffense(10)} at grade 10), and its slot's defensive stat +1 a grade. ` +
     `An Uma wears two accessories of different types.`
 }
@@ -280,12 +280,15 @@ function prices(): string {
     ['Time Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE],
   ]) + `\n\nA Time Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks, not Laurels.`
 }
+const minutes = (m: number): string => `${Number(m.toFixed(1))} min`
+const hours = (m: number): string => `${Number((m / 60).toFixed(1))} h`
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather one item', `grade g: 30 + 30 × g minutes (G1 ${itemMinutes(1)} min, G10 ${itemMinutes(10)} min)`],
-    ['Refine one item', `a quarter of that (G1 ${refineMinutes(1)} min, G10 ${refineMinutes(10)} min)`],
-    ['Cook or craft one', 'twice that: 60 + 60 × g minutes'],
-    ['Outputs per job', `up to ${MAX_JOB_COUNT}`],
+    ['Gather one item', `any grade, by profession level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
+    ['Refine one item', `a quarter of that: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
+    ['Cook or craft one', `twice a gather: ${minutes(makeMinutes(1))} at Lv1, ${minutes(makeMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
+    ['Profession EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the facility's speed`],
+    ['Outputs per job', `gathering, cooking and crafting 1–${MAX_JOB_COUNT}; refining ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
     ['Facility levels', `1–3: ${FACILITY_SLOTS.join(', ')} Uma slots; speed ${FACILITY_SPEED.map(x).join(', ')}`],
     ['Upgrade to Lv 2 / 3', FACILITY_UPGRADE.map((u) => `${u.laurels} Laurels + ${u.count}× grade-${u.grade} refined of each of its two families`).join(' / ')],

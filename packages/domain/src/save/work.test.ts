@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
-import { aptitudeTime, EXP_PER_MINUTE, FACILITY_SPEED, HOUR, itemMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL, refineMinutes } from '../economy/pacing'
+import { EXP_PER_MINUTE, FACILITY_SPEED, HOUR, itemMinutes, jobExp, makeMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL, REFINE_BATCHES, refineMinutes } from '../economy/pacing'
 import { ITEM_FAMILIES } from '../items/catalog'
 import { startFight, type BattleOutfit } from './battle'
 import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
@@ -17,9 +17,9 @@ const outfit = (id: string, turf: 'A' | 'G' = 'G', dirt: 'A' | 'G' = 'G'): WorkO
   baseStats: { speed: 100, stamina: 100, power: 100, guts: 100, wit: 100 }, growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 },
 })
 const turfA = outfit('101', 'A')
-// One grade-1 item at A aptitude: the unit these tests count time in.
-const U = (itemMinutes(1) * MINUTE) / 2
-const EXP1 = itemMinutes(1) * 2
+// One item at Lv1, any grade, any aptitude (D139): the unit these tests count time in.
+const U = itemMinutes(1) * MINUTE
+const EXP1 = jobExp(itemMinutes(1))
 const plain = outfit('102')
 /** Every outfit the tests unlock, for fights and Sweeps. */
 const OUTFITS = new Map(['101', '102', '103', '104', '105'].map((id) => [id, outfit(id)]))
@@ -33,23 +33,40 @@ const give = (save: Save, items: Record<string, number>, laurels = 0): Save => {
 }
 
 describe('gathering (S4)', () => {
-  it('makes items one after another, at aptitude speed, and pays EXP when collected', () => {
+  it('makes items one after another, at her Farm Level’s speed whatever her aptitude, and pays EXP when collected', () => {
     let save = withUmas('101', '102')
     save = startJob(save, 'fields', 0, turfA, 'wheat', 3, at(0))
     save = startJob(save, 'fields', 1, plain, 'wheat', 3, at(0))
     const [a, g] = facilityOf(worldOf(save), 'fields').jobs
-    expect(a!.msEach).toBe(itemMinutes(1) * MINUTE / 2)
-    expect(g!.msEach).toBe(itemMinutes(1) * MINUTE)
-    // Two of the A-turf Uma's three are done after 2¼ items' time; collecting pays 2 wheat and their EXP.
+    // D139: A turf and G turf at the same Farm Level take the same time.
+    expect(a!.msEach).toBe(U)
+    expect(g!.msEach).toBe(U)
+    // Two of three are done after 2¼ items' time; collecting pays 2 wheat and their EXP.
     const half = collectJob(save, 'fields', 0, at(2.25 * U))
     expect(half.got).toMatchObject({ items: 2, exp: 2 * EXP1, done: false })
     expect(worldOf(half.save).items.wheat).toBe(2)
     expect(worldOf(half.save).umas['101']!.professions.farming).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 2 * EXP1))
-    const all = collectAll(half.save, at(6 * U))
+    const all = collectAll(half.save, at(3 * U))
     expect(all.items).toBe(4)
     expect(worldOf(all.save).items.wheat).toBe(6)
     expect(worldOf(all.save).umas['101']!.professions.farming).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 3 * EXP1))
     expect(facilityOf(worldOf(all.save), 'fields').jobs).toEqual([null, null])
+  })
+
+  it('times a job by profession level alone: 9 hours for ten at Lv1, 6 at Lv50, every grade alike (D139)', () => {
+    expect([1, 25, 50].map((l) => (10 * itemMinutes(l)) / 60)).toEqual([9, 7.5306122448979593, 6].map((h) => expect.closeTo(h, 6)))
+    expect(itemMinutes(0)).toBe(itemMinutes(1))
+    expect(itemMinutes(99)).toBe(itemMinutes(50))
+    const w = worldOf(withUmas('101'))
+    const at50 = { ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, professions: { farming: { level: 50, exp: 0 }, gathering: { level: 25, exp: 0 } } } } }
+    const grains = ITEM_FAMILIES.find((f) => f.id === 'grains')!
+    for (let grade = 1; grade <= 10; grade++) {
+      expect(planJob(at50, 'fields', turfA, grains.raw[grade - 1]!.id)!.msEach).toBe(36 * MINUTE)
+      expect(planJob(at50, 'pantry', turfA, grains.refined[grade - 1]!.id)!.msEach).toBe(9 * MINUTE)
+      expect(planJob(at50, 'kitchen', turfA, `dish-grains-${grade}`)!.msEach).toBe(makeMinutes(50) * MINUTE)
+    }
+    // Craft Level, not Farm Level, times the Wilds.
+    expect(planJob(at50, 'mine', turfA, 'copper-ore')!.msEach).toBe(Math.round(itemMinutes(25) * MINUTE))
   })
 
   it('opens a grade every five profession levels and makes only the site’s family', () => {
@@ -81,7 +98,7 @@ describe('refining (S4)', () => {
     save = startJob(save, 'pantry', 0, turfA, 'wheat-flour', 5, at(0))
     expect(worldOf(save).items.wheat).toBeUndefined()
     // Refining takes a quarter of gathering (D101): 2 done at 2½ items' time, the third half made.
-    const R = (refineMinutes(1) * MINUTE) / 2
+    const R = refineMinutes(1) * MINUTE
     expect(facilityOf(worldOf(save), 'pantry').jobs[0]!.msEach).toBe(R)
     save = recallJob(save, 'pantry', 0, at(2.5 * R))
     expect(worldOf(save).items).toEqual({ 'wheat-flour': 2, wheat: 3 })
@@ -90,15 +107,15 @@ describe('refining (S4)', () => {
 })
 
 describe('job EXP (D96, D101)', () => {
-  it('pays every job the same EXP per real minute, whatever it makes, at any grade or facility level', () => {
-    // Profession EXP is 2 per base minute of the job itself, so a faster job pays less per item and never more per hour.
+  it('pays every job the same EXP per real minute, whatever it makes, at any grade, aptitude or facility level', () => {
+    // Profession EXP is 2 per minute of the job at her level, so a faster job pays less per item and never more per hour.
     let save = withUmas('101', '102')
     for (const level of [1, 2, 3] as const) {
       const w = worldOf(save)
       const facilities = Object.fromEntries(['fields', 'pantry', 'kitchen'].map((id) => [id, { level, jobs: Array.from({ length: level === 1 ? 2 : 3 }, () => null) }]))
       save = { ...save, tierWorlds: { '1': { ...w, facilities } } }
       for (const outfit of [turfA, plain]) {
-        const perMinute = (EXP_PER_MINUTE / aptitudeTime(outfit.aptitudes.surface.turf)) * FACILITY_SPEED[level - 1]!
+        const perMinute = EXP_PER_MINUTE * FACILITY_SPEED[level - 1]!
         for (let grade = 1; grade <= 10; grade++) {
           const grains = ITEM_FAMILIES.find((f) => f.id === 'grains')!
           for (const [place, output] of [['fields', grains.raw[grade - 1]!.id], ['pantry', grains.refined[grade - 1]!.id], ['kitchen', `dish-grains-${grade}`]] as const) {
@@ -110,18 +127,17 @@ describe('job EXP (D96, D101)', () => {
     }
   })
 
-  it('levels an A-aptitude refiner in a level-3 Pantry at most five times in a full day from Lv1', () => {
-    const msEach = (refineMinutes(1) * MINUTE * 0.5) / 1.25
+  it('levels a refiner in a level-3 Pantry about twice in a full day from Lv1', () => {
+    const msEach = (refineMinutes(1) * MINUTE) / 1.25
     const items = Math.floor((24 * HOUR) / msEach)
-    const after = grantProfessionExp({ level: 1, exp: 0 }, items * refineMinutes(1) * EXP_PER_MINUTE)
-    expect(after.level - 1).toBeGreaterThanOrEqual(4)
-    expect(after.level - 1).toBeLessThanOrEqual(5)
+    const after = grantProfessionExp({ level: 1, exp: 0 }, items * jobExp(refineMinutes(1)))
+    expect(after.level - 1).toBe(2)
   })
 })
 
 describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
   it('takes 30 minutes off a job per Time Ticket, never past done', () => {
-    let save = startJob(withUmas('102'), 'fields', 0, plain, 'wheat', 3, at(0)) // an hour each at G
+    let save = startJob(withUmas('102'), 'fields', 0, plain, 'wheat', 3, at(0)) // 54 minutes each at Lv1
     const job = facilityOf(worldOf(save), 'fields').jobs[0]!
     expect(ticketsToFinish(job, at(0))).toBe(6)
     expect(() => cutJobTime(save, 'fields', 0, 1, at(0))).toThrow(/1 Time Ticket/)
@@ -189,14 +205,20 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
   })
 })
 
-describe('slow single items (D65)', () => {
-  it('starts jobs of up to 10, and still loads saves holding jobs of up to 50', () => {
+describe('batch sizes (D65, D139)', () => {
+  it('starts gathering jobs of up to 10 and refining of up to 40, and still loads saves holding jobs of up to 50', () => {
     const save = startJob(withUmas('101'), 'fields', 0, turfA, 'wheat', 10, at(0))
     expect(() => startJob(save, 'fields', 1, plain, 'wheat', 11, at(0))).toThrow(/1–10/)
+    expect(REFINE_BATCHES).toEqual([1, 4, 8, 20, 40])
+    const refining = give(withUmas('101', '102'), { wheat: 41 })
+    const forty = startJob(refining, 'pantry', 0, turfA, 'wheat-flour', 40, at(0))
+    // Forty refines take as long as ten gathers.
+    const job = facilityOf(worldOf(forty), 'pantry').jobs[0]!
+    expect(job.count * job.msEach).toBe(10 * itemMinutes(1) * MINUTE)
+    expect(() => startJob(refining, 'pantry', 1, plain, 'wheat-flour', 41, at(0))).toThrow(/1–40/)
     const old = JSON.parse(JSON.stringify(save))
     old.tierWorlds['1'].facilities.fields.jobs[0].count = 50
     expect(facilityOf(worldOf(parseSave(old)), 'fields').jobs[0]!.count).toBe(50)
-    expect(itemMinutes(1)).toBe(60)
   })
 })
 

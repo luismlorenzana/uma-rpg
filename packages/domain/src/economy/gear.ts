@@ -1,7 +1,6 @@
 // Equipment (S7, design §7, D59, D86, D124; docs/design/gear-and-targets.md): forty types in ten grades. A recipe is two
-// refined items of its grade from its half (D125): physical gear takes the Arms half (Ores, Stones, Woods, Hides &
-// Scales), magical gear the Arcana half (Crystals, Fibers, Essences, Bones & Horns), each group its own pair so every
-// family is used at every grade. Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
+// refined items of its grade (D125), one from each half of the Wilds, the pair rotating with the grade so every Uma
+// uses all eight families alike (D139). Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
 // What a piece does, all flat (D104, D124): a weapon's Might (+4 a grade) adds to the offense of hits made with it; an
 // armor piece adds ATK (physical) or M.ATK (magical), ⌈g/2⌉, and its slot's defensive stat, g; an Orb adds its kind to
 // every hit for weaknesses only; a Talisman or an Amulet gives one small defensive effect.
@@ -10,7 +9,7 @@ import { isRpgTome, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '..
 import { addPoints, noPoints, type Points } from './bonus'
 import { ACCESSORY_SLOTS, ARMOR_SLOT_STAT, ARMOR_SLOTS, armorSlotOf, isMagicalAccessory, isMagicalArmor } from './ranks'
 import {
-  accessoryKindOf, charmEffect, EQUIP_LABEL, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
+  accessoryKindOf, charmEffect, EQUIP_LABEL, EQUIP_TYPES, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
   type AccessoryEffects, type AccessoryType, type EquipType, type GearSlot,
 } from './gear-id'
 export * from './gear-id'
@@ -22,13 +21,14 @@ export function isMagicalGear(type: EquipType): boolean {
   return isMagicalAccessory(accessoryKindOf(type))
 }
 /** The two families each group takes, one refined item of each (D125): weapons, armor, accessories; physical, magical. */
-const PAIRS = {
-  weapon: { physical: ['ores', 'woods'], magical: ['crystals', 'essences'] },
-  armor: { physical: ['hides-scales', 'stones'], magical: ['bones-horns', 'fibers'] },
-  accessory: { physical: ['ores', 'stones'], magical: ['crystals', 'fibers'] },
-} as const
-const groupOf = (type: EquipType): keyof typeof PAIRS => (isWeapon(type) ? 'weapon' : isArmor(type) ? 'armor' : 'accessory')
-export const recipeFamilies = (type: EquipType): readonly string[] => PAIRS[groupOf(type)][isMagicalGear(type) ? 'magical' : 'physical']
+/**
+ * A piece takes two refined items of its grade (D125): one from each half of the Wilds, as these four pairs. A type's
+ * grades walk through the pairs in turn, starting at its own place in the list of types, so every Uma's gear uses all
+ * eight families about equally, whatever her class and her armor's half (D139). Before D139 a type kept one pair, and
+ * an Uma of one class never used half the Wilds.
+ */
+const PAIRS = [['ores', 'crystals'], ['woods', 'essences'], ['hides-scales', 'bones-horns'], ['stones', 'fibers']] as const
+export const recipeFamilies = (type: EquipType, grade: number): readonly string[] => PAIRS[(EQUIP_TYPES.indexOf(type) + grade) % PAIRS.length]!
 const familyOf = (id: string): ItemFamily => ITEM_FAMILIES.find((f) => f.id === id)!
 
 export interface GearPiece {
@@ -49,7 +49,7 @@ export function gearById(id: string): GearPiece | undefined {
   if (!piece) return undefined
   const { type, grade } = piece
   const inputs: Record<string, number> = {}
-  for (const family of recipeFamilies(type)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
+  for (const family of recipeFamilies(type, grade)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
   return { id, type, grade, name: `${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`, inputs }
 }
 
@@ -135,5 +135,3 @@ export function accessoryEffects(piece: GearPiece): AccessoryEffects {
 /** A piece's track, the line an Uma climbs one grade at a time (D119): since D124 every type is its own track. */
 export const gearTrackOf = (type: EquipType): string => type
 
-/** A recipe's first family: every recipe family is a gathering family, so crafting raises Gathering & Crafting (§8.4). */
-export const mainFamily = (type: EquipType): string => recipeFamilies(type)[0]!

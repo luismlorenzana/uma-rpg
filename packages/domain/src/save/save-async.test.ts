@@ -38,9 +38,7 @@ describe('asynchronous strict save parsing (H16)', () => {
   it('validates every job kind and queued outputs without full recipes at boot', async () => {
     let s = party()
     worldOf(s).items = Object.fromEntries(ITEMS.map((i) => [i.id, 10]))
-    const workers = [...outfits.values()].map((o): WorkOutfit => ({ ...o, aptitudes: {
-      ...o.aptitudes, surface: { turf: 'A', dirt: 'A' }, distance: { sprint: 'A', mile: 'B', medium: 'C', long: 'D' },
-    } }))
+    const workers: WorkOutfit[] = [...outfits.values()]
     s = startJob(s, 'fields', 0, workers[0]!, 'wheat', 2, NOW)
     s = queueJob(s, 'fields', 0, workers[0]!, 'wheat', 2, NOW)
     s = startJob(s, 'pantry', 0, workers[1]!, 'wheat-flour', 1, NOW)

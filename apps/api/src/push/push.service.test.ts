@@ -12,9 +12,9 @@ const sub = (endpoint: string): Subscription => ({ endpoint, keys: { p256dh: 'p'
 
 describe('push tick (D63)', () => {
   it('announces each finish once, to every live device, and forgets devices that are gone', async () => {
-    // An invented outfit, Turf A: 2 wheat take an hour.
+    // An invented outfit at Farm Lv1: 2 wheat take 108 minutes (D139).
     const save: Save = startJob(unlockUma(newSave('Luis', at(0)), '101', at(0)), 'fields', 0,
-      { outfitId: '101', aptitudes: { surface: { turf: 'A', dirt: 'G' } } }, 'wheat', 2, at(0))
+      { outfitId: '101' }, 'wheat', 2, at(0))
     const saves = { load: async () => ({ revision: 1, save }), put: async () => { throw new Error('read only') } } as unknown as SaveRepository
     const sent: { endpoint: string; payload: object }[] = []
     const sender = { enabled: true, send: async (s: Subscription, payload: object): Promise<SendResult> => {
@@ -26,11 +26,11 @@ describe('push tick (D63)', () => {
     await push.subscribe('u', sub('https://push.example/phone'), T0)
     await push.subscribe('u', sub('https://push.example/gone'), T0)
 
-    expect(await push.tick(T0 + 40 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
-    expect(await push.tick(T0 + 65 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
+    expect(await push.tick(T0 + 100 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 110 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
     expect(sent.map((s) => s.endpoint)).toEqual(['https://push.example/phone', 'https://push.example/gone'])
     expect(sent[0]!.payload).toMatchObject({ title: 'Work done', body: 'Fields: Wheat ×2', url: '/farmlands/fields', badge: 1 })
     expect((await records.get('u'))!.subscriptions.map((s) => s.endpoint)).toEqual(['https://push.example/phone'])
-    expect(await push.tick(T0 + 70 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 115 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
   })
 })

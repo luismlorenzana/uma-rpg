@@ -132,8 +132,9 @@ the Forge:
   - −30m and Finish (Time Tickets);
   - Recall;
   - a queue of up to three.
-- **Assigning:** pick an Uma (free ones first, then the highest level here, its EXP and her aptitude; the level shows
-  on the right), then what to make, then how many (1–10).
+- **Assigning:** pick an Uma (free ones first, then the highest level here and its EXP; the level and her time per
+  item show on the right), then what to make, then how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Pantry and
+  Workbench (D139).
 - **Kitchen:** tabs for Dishes, Duo, Feasts and "Can cook now".
 - **Forge:** a type picker in eight rows of five (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs,
   Talismans, Amulets), then grade (D124).

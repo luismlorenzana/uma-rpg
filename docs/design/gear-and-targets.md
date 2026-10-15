@@ -59,6 +59,10 @@ Maxing one Uma must cost about as much in base materials for gear as for dishes:
 
 Which two families each group takes, so every family is used at every grade:
 
+**Superseded by D139:** the pairs below no longer follow a type's group. A type's grades now walk through four
+cross-half pairs (Ores + Crystals, Woods + Essences, Hides & Scales + Bones & Horns, Stones + Fibers), so every Uma's
+gear uses all eight Wilds families about equally ([materials](../game/materials.md#gear)).
+
 | Group | Physical (Arms half) | Magical (Arcana half) |
 |---|---|---|
 | Weapons | Ores + Woods | Crystals + Essences |

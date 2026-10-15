@@ -7,12 +7,12 @@
 
 ## Targets
 
-- **Items are few and slow (D65).** A grade-1 item takes an hour, a grade-10
-  one most of a night; a day of single items keeps you progressing, with one collect per job instead of a stream of them.
-- **Professions are a long loop (D96).** An Uma working without a break gains about 4 levels a day at A aptitude (5 in a
-  level-3 facility), 3 at C and 2 at G, a little fewer as levels climb. Lv50 takes about 15 days at A and a month at
-  G; grade 10 (Lv46) a day or two sooner. Aptitude decides who's worth specializing. (D54's curve took 69 hours of
-  work at G: an Uma reached Lv27 in two batches.)
+- **Items are few and slow (D65, D139).** Ten items take 9 hours at Lv1 and 6 at Lv50, at any grade: a job a
+  morning and one a night, and every Uma of a level finishes together, with one collect per job instead of a stream.
+- **Professions are a long loop (D96).** An Uma working without a break gains about 2 levels a day early on, a little
+  fewer as levels climb, and reaches Lv50 in about a month (24 days at a level-3 facility). Aptitude no longer
+  matters (D139); level is the bottleneck, and grades open with it. (D54's curve took 69 hours of work: an Uma
+  reached Lv27 in two batches.)
 - **The roster works in parallel.** One party of five fights while dozens of Umas work the facilities at once (up to
   three per facility), so the roster's best Farm and Craft Levels run ahead of the fights even though each Uma levels
   slowly. Pace professions per Uma; gear and dish grades won't trail the battles.
@@ -25,14 +25,13 @@
 | Rule | Value |
 |---|---|
 | Verticals | Farm Level, Craft Level, per Uma, Lv1–50 each, one shared curve |
-| EXP to the next level | `1,425 + 15 × level`: 12 base hours of work at Lv1, 18 at Lv49 (Lv46: 79,650 EXP in all; Lv50: 88,200, 735 base hours) (D96) |
+| EXP to the next level | `1,425 + 15 × level`: 12 hours of work at Lv1, 18 at Lv49 (Lv46: 79,650 EXP in all; Lv50: 88,200, 735 hours) (D96) |
 | Grade gate | Grade k opens at Lv `5k − 4` (1, 6, 11 … 46) |
-| EXP | **2 per base minute** of the job, whatever it makes (parity) |
-| Gather one item | `30 + 30 × grade` base minutes (1 hour at grade 1, 5½ at grade 10) |
-| Refine one item | a quarter of that: 15 minutes at grade 1, 82½ at grade 10 (D101) |
-| Cook or craft one output (S6, S7) | two items' worth: `2 × (30 + 30 × grade)` |
-| Aptitude | Real time = base × share: A (and S) 50%, B 58%, C 67%, D 75%, E 83%, F 92%, G 100%. Turf sets Farm Level, Dirt sets Craft Level (§4.1) |
-| One job | 1–10 items (saves from before D65 may hold up to 50) |
+| EXP | **2 per minute** of the job at her level, before the facility's speed, whatever it makes (parity) |
+| Gather one item | Any grade: 54 minutes at Lv1, falling evenly to 36 at Lv50 (ten in 9 hours, then 6) (D139) |
+| Refine one item | a quarter of that: 13½ minutes at Lv1, 9 at Lv50 (D101) |
+| Cook or craft one output (S6, S7) | two items' worth: 108 minutes at Lv1, 72 at Lv50 |
+| One job | 1–10 items; refining ×1, ×4, ×8, ×20 or ×40 (D139; saves from before D65 may hold up to 50) |
 
 ## Facilities (§9)
 
@@ -129,17 +128,17 @@ EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the 
 
 | Grade | Refined / twelve-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |
 |---|---|---|---|
-| 2 | 24 | 0.44 / 0.44 | 0 / 0 |
-| 4 | 24 | 0.25 / 0.25 | 1 / 1 |
-| 6 | 24 | 0.18 / 0.18 | 0 / 0 |
-| 8 | 24 | 0.14 / 0.14 | 1 / 1 |
-| 10 | 24 | 0.10 / 0.10 | 1 / 1 |
+| 2 | 24 | 0.38 / 0.38 | 0 / 0 |
+| 4 | 24 | 0.39 / 0.39 | 0 / 0 |
+| 6 | 24 | 0.42 / 0.42 | 1 / 1 |
+| 8 | 24 | 0.46 / 0.46 | 0 / 0 |
+| 10 | 24 | 0.43 / 0.43 | 0 / 0 |
 
 Total: **119 wins** (118 first, 1 replay), **92.8 fight minutes**, five Lv50 Umas.
 Representative Brawler: Class Rank 50; five Weapon Ranks 10/10/10/10/10; five Armor Ranks 10/10/10/10/10.
 Banked: 8888 Laurels, 90550 Gear Marks and 64215 Class Marks. No Manuals bought, no class switching, no tokens.
 Four-hour target (180–300 min): **under**. No game number retuned.
-*One slot at A, facility Lv1, conditional on the worker already meeting the grade gate; partial output is unfinished. Fresh A workers finish 3/3 grade-1 raw items and end at Farm/Craft Lv1. Refining and crafting need additional time.
+*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. Fresh workers finish 1/1 grade-1 raw items and end at Farm/Craft Lv1. Refining and crafting need additional time.
 <!-- /live -->
 
 Run `SIM=1 pnpm --filter @rpg/domain exec vitest run src/economy/pacing.sim.test.ts` to print the same ledger.

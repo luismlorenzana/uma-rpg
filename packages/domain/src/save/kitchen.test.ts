@@ -56,7 +56,7 @@ describe('cooking and eating (S6)', () => {
   it('cooks at the Kitchen with Farming & Cooking, reserving the recipe, and puts dishes on their own shelf', () => {
     let save = stock(withUma(), { 'apple-preserve': 2 })
     const plan = planJob(worldOf(save), 'kitchen', cook, 'dish-fruits-1', 2)!
-    expect(plan.msEach).toBe(makeMinutes(1) * MINUTE / 2)
+    expect(plan.msEach).toBe(makeMinutes(1) * MINUTE)
     expect(plan.block).toBeNull()
     save = startJob(save, 'kitchen', 0, cook, 'dish-fruits-1', 2, at(0))
     expect(worldOf(save).items).toEqual({}) // two tarts: one Apple Preserve each
