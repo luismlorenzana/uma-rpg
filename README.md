@@ -17,8 +17,8 @@ promotion (S8) wait on the owner. What's next is ranked in [docs/handoff/](docs/
 
 ## Documentation
 
-Private portrait review: [one-command / double-click setup](scripts/cast/README.md), with local votes for later cast
-authoring. It does not change the game.
+Private enemies: [locked packs and the release pipeline](docs/design/enemy-roster.md). The completed portrait
+review app is retired; [retained authoring data and local cleanup](docs/design/portrait-authoring.md).
 
 | Doc | What |
 |---|---|
