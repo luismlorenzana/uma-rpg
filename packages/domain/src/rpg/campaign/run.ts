@@ -1,7 +1,7 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
-import { applyBattleAction, createBattle, replayBattle } from '../battle/engine'
+import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
@@ -62,7 +62,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   if (party.length !== 5) throw new Error('A fight needs five party members')
   const battleId = battleIdOf(run)
   const input: BattleInput = {
-    version: 11, seed: seedOf(battleId),
+    version: BATTLE_ENGINE_VERSION, seed: seedOf(battleId),
     allies: party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
       const a = accessories ?? noAccessoryEffects()

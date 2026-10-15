@@ -14,7 +14,8 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `
 - **Five Umas against 1–8 foes**, in **1–3 waves**. The five are the active party ([sections](sections.md#scenario-gate)).
 - **Every stage starts at full HP. MP carries** from stage to stage and refills at Springs ([maps](maps.md)).
 - **Rounds.** Each round:
-  1. The foes' intents are shown: each foe's move and target.
+  1. The foes' intents are shown: each foe's move and target, and for a damaging move about what it will deal to
+     its target (the most it deals to anyone, for a move on everyone), before Barriers and guards (D140).
   2. Each living Uma acts **once**, in any order the player picks.
   3. When all have acted, the foes act in initiative order. A foe that **acts twice** takes her second move after every
      foe's first.

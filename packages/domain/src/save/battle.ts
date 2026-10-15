@@ -17,15 +17,16 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
+  forgetRpgVariant, grantRpgExp, learnRpgNode, projectRpgStats, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import {
-  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares,
+  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, WEAPON_LABEL, weaponExpShares,
   withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { starPoints } from '../economy/dishes'
-import { addPoints, type Points } from '../economy/bonus'
+import { addPoints, applyPoints, type Points } from '../economy/bonus'
+import { BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
@@ -189,6 +190,36 @@ export function umaWeaponMight(uma: OwnedUma, classId: RpgClass): { atk: number;
   const average = (ws: readonly RpgWeapon[]) =>
     ws.length ? Math.round(ws.reduce((n, w) => n + (might[rpgWeaponKind(w)] ?? 0), 0) / ws.length) : 0
   return { atk: average(weapons.filter((w) => !isRpgTome(w))), matk: average(weapons.filter(isRpgTome)) }
+}
+
+/** One line of her battle sheet: the total, and for the six core stats what gear and Extra Stats add. */
+export interface SheetRow { label: string; value: string; gear?: number; extra?: number }
+export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
+const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
+const permille = (n: number) => `${Math.round(n) / 10}%`
+/** Every battle stat she has with her active class, each always listed, 0 included (combat-balance.md §6.0). */
+export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma)): SheetGroup[] {
+  const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
+  const parts = umaPointParts(uma, classId)
+  const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
+  const geared = applyPoints(base, parts.gear).stats
+  const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>
+    ({ label, value: String(boosted.stats[k]), gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] })
+  const weapons = classOf(uma, classId).weapons
+  const might = equippedMight(uma.gear.equipped, weapons)
+  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ')
+  const a = equippedAccessories(uma.gear.equipped)
+  return [
+    { title: 'Offense', rows: [core('ATK', 'atk'), core('M.ATK', 'matk'), { label: 'Might', value: mightText || 'None' },
+      { label: 'Orbs', value: a.orbs.map(KIND_NAME).join(', ') || 'None' }] },
+    { title: 'Defense', rows: [core('DEF', 'pdef'), core('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) },
+      { label: 'Physical damage cut', value: permille(a.guard) }, { label: 'Magical damage cut', value: permille(a.resist) },
+      { label: 'Barrier at the start', value: String(a.barrier) }, { label: 'Veil at the start', value: String(a.veil) },
+      { label: 'Thorns', value: permille(a.thorns) }, { label: 'Mirror', value: permille(a.mirror) }] },
+    { title: 'Sustain', rows: [core('HP', 'hp'), { label: 'HP Regen', value: `${a.regen} a round` }, { label: 'Lifesteal', value: permille(a.lifesteal) },
+      core('MP', 'mp'), { label: 'MP Regen', value: `${a.mpRegen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) }] },
+    { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
+  ]
 }
 
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------

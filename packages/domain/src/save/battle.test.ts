@@ -5,7 +5,7 @@ import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
   actInFight, activeClass, chooseClass, classOf, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, setClassWeapons,
-  settleFight, startFight, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
+  settleFight, startFight, umaBattleSheet, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
@@ -255,5 +255,21 @@ describe('save parsing', () => {
     expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']!.umas['101']).toEqual(newOwnedUma(T(1)))
     expect(migrated.tierWorlds['1']!.world).toEqual(newWorldState(T(0)))
+  })
+})
+
+describe('her battle sheet (combat-balance.md §6.0)', () => {
+  it('lists every battle stat in four groups, 0 included, with gear and Extra Stats apart for the core six', () => {
+    const save = withParty()
+    const uma = worldOf(save).umas['101']!
+    const sheet = umaBattleSheet(o101, uma)
+    expect(sheet.map((g) => g.title)).toEqual(['Offense', 'Defense', 'Sustain', 'Other'])
+    const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
+    for (const label of ['ATK', 'M.ATK', 'Might', 'Orbs', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut', 'Barrier at the start',
+      'Veil at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen', 'MP Steal', 'Limit Break head start']) expect(labels).toContain(label)
+    const row = (label: string) => sheet.flatMap((g) => g.rows).find((r) => r.label === label)!
+    expect(row('HP Regen').value).toBe('0 a round')
+    expect(row('Might').value).toBe('None')
+    expect(Number(row('ATK').value)).toBeGreaterThan(0)
   })
 })

@@ -23,6 +23,8 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
   BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit } from './types'
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
+/** The engine new fights start on; older versions still replay. */
+export const BATTLE_ENGINE_VERSION = 11
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -264,6 +266,16 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   const cut = defender.side === 'ally' ? (physical ? allyOf(s, defender.id)?.guard : allyOf(s, defender.id)?.resist) ?? 0 : 0
   if (cut > 0) amount *= 1 - cut / 1000
   return { amount: Math.max(1, Math.round(amount)), weak }
+}
+
+/** What a foe's shown move would deal to each Uma it aims at, before Barriers and guards: one number per target, for
+ * the intent line (combat-balance.md §6.0). Moves that deal no damage give none. */
+export function battleIntentDamage(s: BattleState, intent: BattleIntent): { targetId: string; amount: number }[] {
+  const actor = unit(s, intent.enemyId)
+  const move = actor ? movesOf(s, actor).find((m) => m.id === intent.moveId) : undefined
+  if (!actor || !move || move.kind !== 'damage') return []
+  const targets = intent.targetId === 'all' ? living(s, 'ally') : [unit(s, intent.targetId)].filter((u): u is BattleUnit => !!u && u.hp > 0)
+  return targets.map((t) => ({ targetId: t.id, amount: battleDamage(s, actor, t, move.channel, move.power / 100, move.element, { area: move.target === 'all' }).amount }))
 }
 
 function guardOf(s: BattleState, target: BattleUnit): BattleUnit {

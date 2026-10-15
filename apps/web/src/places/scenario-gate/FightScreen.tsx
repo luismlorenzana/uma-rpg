@@ -3,7 +3,7 @@
 // rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
 import {
-  autoAction, battleActionsLeft, battleBroken, battleFoe, battleWaveCount, biomeById, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
+  autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, biomeById, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -339,7 +339,11 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 </div>
                 {move && unit.hp > 0 && !broken && (
                   <p className="line-clamp-1 max-w-full text-[9.5px] leading-3 text-ink-faint">
-                    {intents.map((x) => `${moveOf(x.moveId)?.label ?? ''} → ${x.targetId === 'all' ? 'all' : name(x.targetId)}`).join(' · ')}
+                    {intents.map((x) => {
+                      // What the move would deal, before Barriers and guards (combat-balance.md §6.0).
+                      const most = Math.max(0, ...battleIntentDamage(state, x).map((d) => d.amount))
+                      return `${moveOf(x.moveId)?.label ?? ''} → ${x.targetId === 'all' ? 'all' : name(x.targetId)}${most ? ` ~${most}` : ''}`
+                    }).join(' · ')}
                   </p>
                 )}
               </div>

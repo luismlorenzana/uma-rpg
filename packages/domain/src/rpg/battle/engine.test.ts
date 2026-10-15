@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { learnRpgNode, projectRpgStats, rpgHand, type RpgClass, type RpgDamageKind, type RpgElement, type RpgProfile, type RpgWeapon, type RpgWeaponKind } from '../rules'
 import { rpgFoe } from '../campaign/enemies'
-import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleLimitGain, battleStateHash, createBattle, replayBattle,
+import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleIntentDamage, battleLimitGain, battleStateHash, createBattle, replayBattle,
   type BattleAction } from './index'
 import { BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
 import { battleHasLimit, battleLimitPlan } from './limit'
@@ -501,6 +501,15 @@ describe('battle engine v11: two accessories and their effects (D124)', () => {
       { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'lance' }), 'f1').map((c) => c.kind === 'hit' && c.weak)
     expect(attack(['axe'])).toEqual([false])
     expect(attack(['axe', 'light'])).toEqual([true])
+  })
+
+  it('predicts each shown move’s damage on its targets, as the hit would land before Barriers', () => {
+    const s = createBattle(v11(team(), [hitter('physical')])).state
+    const predicted = battleIntentDamage(s, s.intents[0]!)
+    expect(predicted.map((d) => d.targetId)).toEqual(['a1', 'a2', 'a3', 'a4', 'a5'])
+    const after = round(s)
+    for (const d of predicted) expect(unitOf(s, d.targetId).hp - unitOf(after, d.targetId).hp).toBe(d.amount)
+    expect(battleIntentDamage(s, { ...s.intents[0]!, moveId: 'nope' })).toEqual([])
   })
 
   it('takes the new fields only from v11, and Orbs as a list there', () => {

@@ -5,10 +5,10 @@
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
-  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, applyPoints, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
+  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaPointParts, umaPoints, umaProfile, umaWeaponMight, workOf, equippedAccessories, ACCESSORY_KINDS, accessoryTrack,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaBattleSheet, umaPoints, umaProfile, workOf, ACCESSORY_KINDS, accessoryTrack,
   type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -28,7 +28,6 @@ import { formatDuration, useNow } from '../../ui/useNow'
 import { RankCells, RankRow } from '../../ui/RankBars'
 import { pointText } from '../observatory/ObservatoryPage'
 import { GearCard } from './GearCard'
-import { effectLines } from './WeaponSheet'
 import { SkillsPage } from './SkillsPage'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
@@ -237,19 +236,10 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
 function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
   const classId = activeClass(outfit, uma)
   const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
-  const parts = umaPointParts(uma, classId)
-  const boosted = applyPoints(base, umaPoints(uma, classId))
-  // What gear adds alone; Extra Stats are the rest of the total, so the two always add up (D99). Armor adds up; weapons
-  // add the average Might of those that hit with ATK (Arms) or M.ATK (Tomes), since each hit uses its own (D119).
-  const geared = applyPoints(base, parts.gear).stats
-  const might = umaWeaponMight(uma, classId)
-  const accessories = equippedAccessories(uma.gear.equipped)
-  const charms = effectLines(accessories)
+  // Every battle stat, always listed (combat-balance.md §6.0): the domain builds the sheet, so a rule change shows here.
+  const sheet = umaBattleSheet(outfit, uma, classId)
   const equipped = umaLoadout(outfit, uma, 1, classId)
   const party = partyOf(world, outfit.outfitId)
-  const keys = [['HP', 'hp'], ['MP', 'mp'], ['ATK', 'atk'], ['M.ATK', 'matk'], ['DEF', 'pdef'], ['M.DEF', 'mdef']] as const
-  const weapon = (k: (typeof keys)[number][1]) => (k === 'atk' ? might.atk : k === 'matk' ? might.matk : 0)
-  const rows = keys.map(([label, k]) => ({ label, now: boosted.stats[k] + weapon(k), gear: geared[k] - base[k] + weapon(k), extra: boosted.stats[k] - geared[k] }))
   return (
     <div className="space-y-3">
       <button type="button" onClick={onClass} className="flex min-h-12 w-full items-center justify-between rounded-md bg-raised px-3 text-left">
@@ -259,36 +249,38 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
         </span>
         <span className="text-[12px] text-ink-soft">{equipped.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
       </button>
-      <section className="rounded-md bg-raised">
-        <div className="-mb-2 flex items-center gap-2 pl-3 text-[11px] text-ink-faint">
-          <span className="flex-1">Battle stats</span>
-          <span className="text-shard">Gear</span>
-          <span className="text-success">Extra Stats</span>
-          <HelpButton title="Battle stats">
-            <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
-            <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green), one point each. Armor adds up: physical pieces ATK, magical pieces M.ATK, and each slot its defensive stat. Weapons add Might to their own hits, so ATK shows the average Might of her Arms and M.ATK of her Tomes; Training pieces add nothing.</p>
-            <p>Her two accessories add an Orb's kind to her hits, or a defensive effect: Regen, MP Regen, Lifesteal, MP Steal, a shield, less damage taken or damage returned. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
-          </HelpButton>
-        </div>
-        <div className="divide-y divide-hairline">
-          {rows.map((r) => (
-            <Row key={r.label} label={r.label} value={
-              <span className="tabular-nums">
-                <span className="font-display">{r.now}</span>
-                {(r.gear > 0 || r.extra > 0) && (
-                  <span className="font-normal text-ink-faint">
-                    {' ('}{r.gear > 0 && <span className="text-shard">+{r.gear}</span>}{r.gear > 0 && r.extra > 0 && ' '}{r.extra > 0 && <span className="text-success">+{r.extra}</span>})
-                  </span>
-                )}
-              </span>
-            } />
-          ))}
-          {accessories.orbs.length > 0 && <Row label="Orbs" value={<span className="text-shard">{accessories.orbs.map(kindLabel).join(', ')}</span>} note="on every hit" />}
-          {charms.map((line) => <Row key={line} label="Accessory" value={<span className="text-shard">{line}</span>} />)}
-          <Row label="Evasion" value={`${(boosted.evasion / 10).toFixed(1)}%`} note="from Speed" />
-          <Row label="Limit Break head start" value={`${boosted.limitStart} / 12`} />
-        </div>
-      </section>
+      {sheet.map((group, i) => (
+        <section key={group.title} className="rounded-md bg-raised">
+          <div className="-mb-2 flex items-center gap-2 pl-3 text-[11px] text-ink-faint">
+            <span className="flex-1">{group.title}</span>
+            {i === 0 && (
+              <>
+                <span className="text-shard">Gear</span>
+                <span className="text-success">Extra Stats</span>
+                <HelpButton title="Battle stats">
+                  <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
+                  <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green). Armor adds up: physical pieces ATK, magical pieces M.ATK, and each slot its defensive stat.</p>
+                  <p>Might is each weapon's own: it counts only for hits made with that weapon. Her two accessories add an Orb's kind to her hits, or a defensive effect. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+                </HelpButton>
+              </>
+            )}
+          </div>
+          <div className="divide-y divide-hairline pt-2">
+            {group.rows.map((r) => (
+              <Row key={r.label} label={r.label} value={
+                <span className="tabular-nums">
+                  <span className={r.gear === undefined ? '' : 'font-display'}>{r.value}</span>
+                  {(!!r.gear || !!r.extra) && (
+                    <span className="font-normal text-ink-faint">
+                      {' ('}{!!r.gear && <span className="text-shard">+{r.gear}</span>}{!!r.gear && !!r.extra && ' '}{!!r.extra && <span className="text-success">+{r.extra}</span>})
+                    </span>
+                  )}
+                </span>
+              } />
+            ))}
+          </div>
+        </section>
+      ))}
       <section className="rounded-md bg-raised">
         <p className="px-3 pt-2 text-[11px] text-ink-faint">Core stats</p>
         <div className="grid grid-cols-5 gap-1 p-2 text-center">

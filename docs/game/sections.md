@@ -164,9 +164,14 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     - Work;
     - Racing.
   - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
-  - **Battle tab:** each stat's total, then in brackets what gear adds (blue) and what active Extra Stats add (green)
-    (D99). Armor adds up; ATK and M.ATK add the average Might of her Arms and of her Tomes, since each hit uses its own
-    weapon's. Her Orbs' kinds and each accessory effect follow (D119, D124).
+  - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
+    - **Offense:** ATK, M.ATK, each weapon's Might, Orbs;
+    - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
+    - **Sustain:** HP, HP Regen, Lifesteal, MP, MP Regen, MP Steal;
+    - **Other:** the Limit Break head start.
+
+    The six core stats show their total, then in brackets what gear adds (blue) and what active Extra Stats add
+    (green) (D99). Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
   - A locked outfit shows **Unlock · 1 Ticket**.
 - **Skills page:**
   - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
