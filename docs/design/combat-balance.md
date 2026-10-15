@@ -1,15 +1,71 @@
 # Combat balance: stats that count, damage you can answer
 
-> **Status: proposal, 2026-10-15. Nothing here is built.** Written from the owner's notes of 2026-10-15:
+> **Status: built, 2026-10-15 (D140: §6.0; D141: §6.1–6.3, engine v12).** Written from the owner's notes of
+> 2026-10-15:
 > - a point of ATK doesn't feel worth the farm work behind it;
 > - the profile hides stats such as HP Regen and MP Regen;
 > - nothing mitigates or heals enemy damage, so a focused Uma stays hurt for the rest of the fight;
 > - every class is a damage dealer.
 >
-> Every number below was measured on the engine as deployed (v11, commit `1b7c209`), with the balance test's average
-> outfit (base 110, growth 0.1) and the shared Auto policy. The manual ([combat](../game/combat.md),
-> [classes](../game/classes.md)) describes the game as it is; this page proposes what changes.
-> **Decided here** (§8) marks the picks; the owner can overturn any.
+> §1–§5 are the measurements and research on engine v11 that led here, kept as they were. **§0 is what was built**,
+> including where the owner's review and the tuning changed the plan. The manual ([combat](../game/combat.md),
+> [classes](../game/classes.md), [loops](../game/loops.md)) is current.
+
+## 0. As built
+
+### The owner's review of the plan
+
+| Note | What changed from §6–§8 |
+|---|---|
+| Lift "nothing in the thousands" | Lifted: foe HP and big hits may run into the thousands where the game needs it |
+| Brawler stays pure physical offense | No party-wide Guard for her. Guard is unchanged for everyone |
+| Brawler, Mage and Spell Blade are the offense classes | Unchanged |
+| Cleric and Summoner are half offense, half healer or shielder | Cleric: her magic spells heal and her physical blows put up a Barrier. Summoner: each summon line has a job (heal, Barrier, drain, Aegis, Enfeeble, revive, or strike), and several lines were renamed for it |
+| Might should grow with the grade, about 6% a step | Might is now +6% a grade on the weapon's own hits (+60% at grade 10) |
+
+### What tuning changed
+
+- **A skill's Barrier lasts one round.** As Slay the Spire's Block, it guards against the moves shown, then lapses.
+  When Barriers stacked, the Summoner's Ice summons soaked every hit.
+- **Steel after a Break.** The party acts before any foe, so a strong party could Break a foe, hold her down two rounds
+  and Break her again before she moved: one elite died without acting once. Now a foe back up from a Break is Steeled
+  (her shield can't be chipped) until she has made a move.
+- **Foe curve:**
+  - **Offense:** set from the share of HP a 100% hit takes on an average Uma of her level. It ramps from 20% at Lv1 to
+    28% from Lv10, so a fresh party's first fights stay gentle.
+  - **Build budget:** a curve on the square of the level, so it barely moves early (gear grade 1–2) and grows late
+    (grade-10 Might, high-grade nodes). It reaches ×2.7 HP and ×1.5 offense at Lv50.
+  - **Elites' leaders and lone bosses act twice from Lv10.** Since D135 the elite's leader had acted once.
+  - **HP:** elites ×3.5 (was 4.5) and bosses ×5.5 (was 6.5); elites no longer gain extra HP each level.
+- **Support sizes:** a mend or Barrier takes 14–22% of the target's max HP by depth, and ×0.4 on every Uma. Summons
+  heal at half that and shield at 35%. Only healing repeats while a summon lingers.
+
+### The simulation as built
+
+Five Umas at the stage's level, Class Rank equal to it, the shared Auto policy.
+- **Bare:** no gear, no Extra Stats, no Heroes.
+- **Geared:** gear of the grade her level opens and an inherited Limit Break.
+- **On curve:** geared, plus every Extra Stats node her level allows.
+
+Each cell gives the win rate, the HP the party ends with, and in brackets how low any Uma fell.
+
+| Level | Party | Regular | Elite | Boss |
+|---|---|---|---|---|
+| 5 | bare | 100%, 96% (81%) | 100%, 86% (67%) | 90%, 57% (34%) |
+| 5 | geared | 100%, 98% (86%) | 100%, 90% (76%) | 100%, 84% (70%) |
+| 15 | bare | 100%, 98% (81%) | 55%, 28% (8%) | 5% |
+| 15 | geared | 100%, 99% (91%) | 100%, 82% (44%) | 100%, 80% (56%) |
+| 25 | geared | 100%, 99% (93%) | 100%, 89% (59%) | 100%, 89% (70%) |
+| 40 | geared | 100%, 100% (97%) | 100%, 97% (68%) | 100%, 98% (77%) |
+| 50 | geared | 100%, 100% (83%) | 100%, 88% (38%) | 100%, 90% (37%) |
+| 50 | on curve | 100%, 100% (94%) | 100%, 99% (78%) | 100%, 98% (73%) |
+
+- **Built parties** win everything. Elites and bosses push their weakest Uma well down; regular stages are quick.
+- **A party with no gear** clears regular stages through Lv25. It needs gear for elites from Lv15 and bosses from Lv10.
+- **Players beat Auto:** Auto plays greedily, so a player's own results run better.
+
+The owner's play sets the next pass: the share a hit takes (`hitShare`), the build budget, and the support shares
+are each one number.
 
 ## 1. The short answer
 
@@ -348,7 +404,7 @@ The rest adds rules on top of what exists.
 Raising bonuses alone would just make fights easier, and DEF would stay worthless while foe offense is 5× it. So the
 increases come only with the re-fit.
 
-## 8. Decided here (the owner can overturn any)
+## 8. Decided here (the owner can overturn any; §0 records what the owner's review changed)
 
 1. **Kept:** Break, intents, one act per Uma, five classes, ten weapons, the progression bars, small linear numbers,
    the in-order gear gates.

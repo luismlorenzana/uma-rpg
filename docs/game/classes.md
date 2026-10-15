@@ -18,17 +18,34 @@ Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots,
 | **Brawler** | Pure physical damage. All five Arms, one heavy act a turn. An Elemental Orb adds an element to every hit |
 | **Mage** | Pure magic. All five Tomes, one full cast a turn. An Arms Orb adds a weapon kind to every cast |
 | **Spell Blade** | Three Arms and two Tomes. Every act is a blade and a spell, each at about half strength |
-| **Cleric** | Any five weapons. Her blows weaken the foe they hit; her spells bless the whole party. No healing yet |
-| **Summoner** | Three Tomes and two Arms. Each summon strikes, stays, and strikes again when the next one comes |
+| **Cleric** | Any five weapons. Half offense, half healer and shielder (D141): her blows weaken the foe they hit and put a Barrier on the Uma in danger; her spells bless the whole party, mend the most hurt and cleanse. Rebirth raises the fallen |
+| **Summoner** | Three Tomes and two Arms. Each summon strikes, stays, and strikes again when the next one comes. Half offense, half support (D141): her summon lines each have a job, so her five weapons make her a striker, a healer or a shielder |
+
+Brawler, Mage and Spell Blade are pure offense; Cleric and Summoner share their turns between damage and support
+([combat](combat.md#support-v12)).
+
+**Summon lines (D141):**
+
+| Line | Summons | Job |
+|---|---|---|
+| Fire | Ember Sprites, Salamander, Fire Drake, Infernal Wyrm, Phoenix | Strike (Burn at depth 5) |
+| Blizzard | Frost Sprites, Snow Sentinel, Ice Golem, Frost Titan, Winter Queen | A Barrier on every Uma |
+| Thunder | Spark Sprites, Thunderbird, Storm Roc, Thunder Kirin, Raijin | Strike (Shock at depth 5) |
+| Light | Cherub, Mending Angel, Seraph Choir, Dominion Host, Heaven's Legion | Mend every Uma, and again each round while it lingers |
+| Dark | Leech Imp, Night Bat, Vampire Knight, Blood Countess, Abyssal Overlord | Drain: its damage heals the most hurt |
+| Greatsword | Squire, Shield Knight, Paladin, Aegis Champion, Sword Saint | Aegis on every Uma |
+| Axe | Brigand, Berserker, Axe Ogre, Minotaur Chief, Jotun Warlord | Enfeeble every foe it hits |
+| Lance | Pikeman, Dragoon, Lance Knight, Valkyrie, Valkyrie Queen | Valkyries (depth 4–5) raise the fallen |
+| Bow, Katana | Slinger … Sagittarius; Ronin … Sword Spirit | Strike |
 
 <!-- live:classes -->
-| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break power | Starts as |
+| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal) | Limit Break power | Starts as |
 |---|---|---|---|---|---|---|---|
-| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | 2× her open depth | Front runners |
-| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers |
-| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 | 2× her open depth | — |
-| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers |
-| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3 | ×1 ×1 ×1 ×1 ×1 ×1.1 | 1.8× her open depth | End closers |
+| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 ×0.8 | 2× her open depth | Front runners |
+| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 ×1 | 2.4× her open depth | Pace chasers |
+| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 ×0.9 | 2× her open depth | — |
+| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 ×1.3 | 1.5× her open depth | Late surgers |
+| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3; most summon lines also mend, shield, drain, bless or revive | ×1 ×1 ×1 ×1 ×1 ×1.1 ×1.2 | 1.8× her open depth | End closers |
 <!-- /live -->
 
 **Hand:** the share of full power and full MP her acts use. A Brawler's Attack is 1.0. A Spell Blade's two halves are

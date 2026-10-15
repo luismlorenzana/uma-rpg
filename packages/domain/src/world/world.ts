@@ -67,15 +67,17 @@ export function worldContinent(source: ContinentSource): WorldContinent {
 }
 
 /**
- * World tuning (D75), set against the balance simulation (`SIM=1 npx vitest run src/world/balance.test.ts`). Skills
- * grow with depth faster than the foe curve, so foes gain HP and offense per level on top of it (a regular foe ×2.7 HP
- * and ×2 offense by Lv50); a region boss is a fraction of a chapter champion (one of forty per continent).
+ * World tuning (D75, D141), set against the balance simulation (`SIM=1 npx vitest run src/world/balance.test.ts`). Skills
+ * grow with depth faster than the foe curve, so foes gain HP per level on top of it (a regular foe ×2.7 HP by Lv50); a
+ * region boss is a fraction of a chapter champion (one of forty per continent). Offense needs no world step: the foe
+ * curve sets it from the share of an Uma's HP a hit takes (D141).
  */
 export const WORLD_TUNING = {
-  regularHpPerLevel: 0.035, regularOffensePerLevel: 0.02,
-  eliteHpPerLevel: 0.01, eliteOffensePerLevel: 0.005,
-  bossHp: 0.5, bossOffensePerLevel: 0.005,
+  regularHpPerLevel: 0.035, eliteHpPerLevel: 0, bossHp: 0.5,
 } as const
+/** A lone region boss and an elite's sub-boss act twice from this level (D141). */
+export const WORLD_BOSS_TWICE_FROM = 10
+
 
 /**
  * Formation templates (encounters.md, W3): how many foes, the HP they share in regular foes (so a solo and a swarm
@@ -89,6 +91,10 @@ export const WORLD_FORMATIONS: Readonly<Record<Formation, { count: readonly [num
   swarm: { count: [6, 8], budget: 3.6, shield: 1, name: 'Swarm' },
   escort: { count: [3, 5], budget: 0, shield: 2, name: 'Escort' },
 }
+/** A formation foe's offense (D141): the square root of her HP share against a pair's foe, never above a full foe's, so a
+ * swarm hits often and small, and a squad in between. */
+export const WORLD_PAIR_SHARE = WORLD_FORMATIONS.duo.budget / 2
+export const formationOffense = (hpShare: number): number => Math.min(1, Math.sqrt(hpShare / WORLD_PAIR_SHARE))
 /** An escort's captain and each guard, in regular foes' HP. */
 export const WORLD_ESCORT = { captain: 2.5, captainShield: 5, guard: 0.8 } as const
 const ESCORT = WORLD_ESCORT
@@ -196,14 +202,14 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
   const above = level - 1
   let next = 0
-  const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, tier: EnemyTier, twice = false): BattleEnemy => {
+  const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, tier: EnemyTier, twice = false,
+    offense = 1): BattleEnemy => {
     const slot = next++
     const element = signature[slot % signature.length]!
     const element2 = signature.length > 1 ? signature[(slot + 1) % signature.length] : undefined
     const base = rpgFoe({ id: `foe${slot + 1}`, castId: faces(tier, slot)?.id ?? '', element, ...(element2 && element2 !== element ? { element2 } : {}),
       ...(twice ? { twice } : {}), role: r, rank, level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
     const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
-    const offense = 1 + (rank === 'regular' ? WORLD_TUNING.regularOffensePerLevel : rank === 'sub-boss' ? WORLD_TUNING.eliteOffensePerLevel : WORLD_TUNING.bossOffensePerLevel) * above
     return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),
       atk: Math.round(base.stats.atk * offense), matk: Math.round(base.stats.matk * offense) } }
   }
@@ -214,22 +220,24 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
     const count = lo + (hash(`${stageId}:${wave}:count`) % (hi - lo + 1))
     if (f === 'escort') {
       return [foe(signature, 'regular', 'striker', ESCORT.captain * share, ESCORT.captainShield, tier),
-        ...Array.from({ length: count - 1 }, () => foe(signature, 'regular', 'guard', ESCORT.guard * share, shape.shield, tier))]
+        ...Array.from({ length: count - 1 }, () => foe(signature, 'regular', 'guard', ESCORT.guard * share, shape.shield, tier, false, formationOffense(ESCORT.guard)))]
     }
     const first = next
-    return Array.from({ length: count }, (_, k) => foe(signature, 'regular', role(first + k), (shape.budget / count) * share, shape.shield, tier, f === 'solo'))
+    return Array.from({ length: count }, (_, k) => foe(signature, 'regular', role(first + k), (shape.budget / count) * share, shape.shield, tier, f === 'solo',
+      formationOffense(shape.budget / count)))
   }
   const sigs = biome.signatures
   const after = (signature: readonly RpgElement[]) => sigs[(sigs.indexOf(signature) + 1) % sigs.length]!
   if (kind === 'sub-boss') {
-    // With her assistants beside her, the sub-boss acts once a round, not twice as she did alone.
-    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss'),
+    // The sub-boss acts twice a round beside her assistants from Lv 10 (D141: foes act more, each move answerable).
+    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss', level >= WORLD_BOSS_TWICE_FROM),
       ...Array.from({ length: ELITE_ASSISTANTS.count }, () => foe(plan.signature, 'regular', 'guard', ELITE_ASSISTANTS.hp, ELITE_ASSISTANTS.shield, 'key'))]]
   }
   if (kind === 'boss') {
     // Two lighter waves of sub-bosses on the biome's other signatures lead to the boss (or two) and her sub-boss guards.
     const share = WAVE_HP[BOSS_WAVES]!
-    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss')
+    // A lone boss acts twice from Lv 10 (D141), so a fresh party's first bosses stay within reach; twin bosses once each.
+    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss', !twin && level >= WORLD_BOSS_TWICE_FROM)
     const guard = () => foe(plan.signature, 'regular', 'guard', 0.8, 2, 'subboss')
     return [formation(biome.formations[0]!, after(plan.signature), share, 0, 'subboss'), formation('trio', after(after(plan.signature)), share, 1, 'subboss'),
       twin ? [champion(TWIN_BOSS_HP), champion(TWIN_BOSS_HP), guard()] : [champion(1), guard(), guard()]]

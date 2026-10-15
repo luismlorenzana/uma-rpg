@@ -4,7 +4,7 @@
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
-import { noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
+import { accessoryFightFields, noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
 import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 import { RPG_MAX_BATTLE_ACTIONS, type RpgRun } from './run-state'
@@ -66,9 +66,8 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
     allies: party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
       const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
       const a = accessories ?? noAccessoryEffects()
-      // Only what's there goes in the frozen fight: an absent effect is 0.
-      const effects = Object.fromEntries((['barrier', 'veil', 'regen', 'mpRegen', 'lifesteal', 'mpSteal', 'guard', 'resist', 'thorns', 'mirror'] as const)
-        .filter((k) => a[k] > 0).map((k) => [k, a[k]]))
+      // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
+      const effects = accessoryFightFields(a, boosted.stats.hp)
       return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
         tree: profile.tree, legacy: profile.legacy, loadout, ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: rpgCarriedMp(run, profile, points),
         classRank: profile.classRank,

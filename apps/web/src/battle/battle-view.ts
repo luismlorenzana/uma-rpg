@@ -135,6 +135,10 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`
     case 'move': return `${name(cue.actorId)}: ${cue.label}`
     case 'result': return cue.label === 'victory' ? 'Victory!' : 'Defeated'
+    case 'heal': return `${name(cue.targetId)} +${cue.amount ?? 0} HP${cue.label ? ` · ${cue.label}` : ''}`
+    case 'cover': return `${name(cue.targetId)}: Barrier ${cue.amount ?? 0}`
+    case 'lock': return `${name(cue.targetId)}: a lock breaks${cue.amount ? ` (${cue.amount} left)` : ''}`
+    case 'cancel': return `${name(cue.targetId)}: ${cue.label ?? 'charge'} cancelled!`
   }
 }
 
@@ -148,6 +152,14 @@ export function followCue(shown: BattleState, cue: BattleCue): BattleState {
   if (!target) return shown
   const next = { ...target }
   if (cue.kind === 'hit') next.hp = Math.max(0, target.hp - cue.amount)
+  else if (cue.kind === 'heal') next.hp = target.hp + (cue.amount ?? 0)
+  else if (cue.kind === 'cover') next.cover = cue.amount ?? 0
+  else if (cue.kind === 'lock' && target.charging) {
+    const locks = [...target.charging.locks]
+    const at = locks.indexOf(cue.label as (typeof locks)[number])
+    if (at >= 0) locks.splice(at, 1)
+    next.charging = { ...target.charging, locks }
+  } else if (cue.kind === 'cancel') delete next.charging
   else if (cue.kind === 'mp') next.mp = target.mp + (cue.amount ?? 0)
   else if (cue.kind === 'shield' || cue.kind === 'recover') next.shield = cue.amount ?? target.shield
   else if (cue.kind === 'break') next.brokenAt = Math.max(1, shown.round)

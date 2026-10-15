@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, equippedPoints, gearById, gearPoints, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
+import { accessoryFightFields } from '../economy/gear-id'
 import { makeMinutes, MINUTE } from '../economy/pacing'
-import { rpgFoe } from '../rpg/campaign/enemies'
+import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeHitShare } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
-import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile, umaWeaponMight } from './battle'
+import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile } from './battle'
 import { rpgProfileTrees } from '../rpg/rules'
 import { boundGrade, equipBlock, equipGear, gearChoices, unequipGear, wearAccessory, wearArmor } from './forge'
 import { setPartySlot, unlockUma, worldOf } from './rules'
@@ -35,22 +36,26 @@ describe('gear (S7, D124, D125)', () => {
     for (const bad of ['greatsword-g1-atk', 'helm-g1-atk', 'mail-g1', 'ring-g1', 'orb-fire-g1-hp', 'greatsword-g11', 'talisman-g1', 'amulet-heal-g1']) expect(gearById(bad), bad).toBeUndefined()
   })
 
-  it('gives a weapon Might on its own hits, armor its offense and its slot\'s defense, accessories small effects (D124)', () => {
+  it('gives a weapon Might on its own hits, armor its offense and its slot\'s defense, accessories their effects (D124, D141)', () => {
     expect(Object.values(gearPoints(gearById('greatsword-g5')!)).every((n) => n === 0)).toBe(true)
-    expect(gearPoints(gearById('helm-g4')!)).toMatchObject({ atk: 2, def: 4, matk: 0 })
-    expect(gearPoints(gearById('robe-g4')!)).toMatchObject({ matk: 2, hp: 4, atk: 0 })
-    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 2, mp: 3 })
-    expect(gearPoints(gearById('gauntlets-g10')!)).toMatchObject({ atk: 5, mdef: 10 })
-    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 3, speed: 5 })
+    // D141: the slot's defensive stat is +2 a grade.
+    expect(gearPoints(gearById('helm-g4')!)).toMatchObject({ atk: 2, def: 8, matk: 0 })
+    expect(gearPoints(gearById('robe-g4')!)).toMatchObject({ matk: 2, hp: 8, atk: 0 })
+    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 2, mp: 6 })
+    expect(gearPoints(gearById('gauntlets-g10')!)).toMatchObject({ atk: 5, mdef: 20 })
+    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 3, speed: 10 })
     expect(Object.values(gearPoints(gearById('orb-fire-g4')!)).every((n) => n === 0)).toBe(true)
-    // Might counts only the weapons in her class's slots: a Brawler's Fire Tome adds nothing.
-    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 12 })
-    expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 8 })
-    expect(equippedPoints({ head: 'helm-g2', lance: 'lance-g3' })).toMatchObject({ def: 2, atk: 1, hp: 0 })
-    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'talisman-bulwark-g3' })).toMatchObject({ orbs: ['lance'], barrier: 15, veil: 0 })
-    expect(equippedAccessories({ 'accessory-1': 'amulet-spring-g3', 'accessory-2': 'talisman-vampire-g10' })).toMatchObject({ mpRegen: 2, lifesteal: 50 })
-    expect(equippedAccessories({ 'accessory-1': 'amulet-siphon-g10', 'accessory-2': 'amulet-ward-g4' })).toMatchObject({ mpSteal: 20, resist: 20 })
-    expect(equippedAccessories({ 'accessory-1': 'talisman-thorn-g2', 'accessory-2': 'amulet-mirror-g3' })).toMatchObject({ thorns: 20, mirror: 30 })
+    // Might is 6% a grade on its own hits (D141), and counts only the weapons in her class's slots.
+    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 18 })
+    expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 12 })
+    expect(equippedPoints({ head: 'helm-g2', lance: 'lance-g3' })).toMatchObject({ def: 4, atk: 1, hp: 0 })
+    // A Bulwark's shield is 2% of her max HP a grade (per mille here), made into HP when a fight starts.
+    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'talisman-bulwark-g3' })).toMatchObject({ orbs: ['lance'], barrier: 60, veil: 0 })
+    expect(accessoryFightFields(equippedAccessories({ 'accessory-1': 'talisman-vital-g10', 'accessory-2': 'amulet-spring-g4' }), 1000))
+      .toEqual({ regen: 50, mpRegen: 4 })
+    expect(equippedAccessories({ 'accessory-1': 'amulet-spring-g3', 'accessory-2': 'talisman-vampire-g10' })).toMatchObject({ mpRegen: 3, lifesteal: 200 })
+    expect(equippedAccessories({ 'accessory-1': 'amulet-siphon-g10', 'accessory-2': 'amulet-ward-g4' })).toMatchObject({ mpSteal: 50, resist: 60 })
+    expect(equippedAccessories({ 'accessory-1': 'talisman-thorn-g2', 'accessory-2': 'amulet-mirror-g3' })).toMatchObject({ thorns: 60, mirror: 90 })
     expect(equippedAccessories({})).toMatchObject({ orbs: [], barrier: 0, regen: 0 })
   })
 })
@@ -95,16 +100,6 @@ describe('the Forge and equipping (S7)', () => {
     // Each Orb climbs on its own: Fire waits for grade 1, Ice starts now.
     expect(equipBlock(uma(), 'orb-fire-g2')).toBe('Needs G1 first')
     expect(equipBlock(uma(), 'orb-ice-g1')).toBeNull()
-  })
-
-  it('averages her Arms\' Might into ATK and her Tomes\' into M.ATK for the profile (D119)', () => {
-    const w = worldOf(umas('101'))
-    const uma = w.umas['101']!
-    const geared = { ...uma, gear: { ...uma.gear, equipped: { greatsword: 'greatsword-g2', axe: 'axe-g3', 'tome-fire': 'tome-fire-g5' } } }
-    // A Brawler's five Arms: (8 + 12) / 5 = 4; her Tome isn't in her slots.
-    expect(umaWeaponMight(geared, 'brawler')).toEqual({ atk: 4, matk: 0 })
-    // A Mage's five Tomes: 20 / 5 = 4.
-    expect(umaWeaponMight(geared, 'mage')).toEqual({ atk: 0, matk: 4 })
   })
 
   it('binds a piece to whoever equips it; she swaps among her own; her rank sets the grade she wears', () => {
@@ -168,15 +163,15 @@ describe('the Forge and equipping (S7)', () => {
       gear: { 'greatsword-g1': 1, 'lance-g1': 1, 'helm-g1': 1, 'robe-g1': 1, 'boots-g1': 1, 'orb-fire-g1': 1, 'talisman-bulwark-g1': 1 } }))
     for (const g of ['greatsword-g1', 'lance-g1', 'helm-g1', 'robe-g1', 'boots-g1', 'orb-fire-g1', 'talisman-bulwark-g1']) save = equipGear(save, '101', g, at(0))
     const uma = worldOf(save).umas['101']!
-    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 2, matk: 1, def: 1, hp: 1, speed: 1 })
+    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 2, matk: 1, def: 2, hp: 2, speed: 2 })
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...smith, outfitId: id }]))
     const input = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input
     const ally = input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
-    expect(input.version).toBe(11)
-    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 4, lance: 4 }, barrier: 5, orbs: ['fire'], evasion: 6 })
+    expect(input.version).toBe(12)
+    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 6, lance: 6 }, barrier: Math.round(ally.stats.hp * 0.02), orbs: ['fire'], evasion: 12 })
     expect(ally).not.toHaveProperty('orb')
     expect(ally).not.toHaveProperty('regen')
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
@@ -199,7 +194,7 @@ describe('weapon slots (D98)', () => {
     // A crafted Lance takes the Training one's place and binds to her; choosing Training again takes it off.
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', 'lance-g1', at(2))
     expect(uma().gear.equipped.lance).toBe('lance-g1')
-    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 4 })
+    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 6 })
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', null, at(3))
     expect(uma().gear.equipped.lance).toBeUndefined()
     expect(uma().gear.locker).toContain('lance-g1')
@@ -215,13 +210,23 @@ describe('weapon slots (D98)', () => {
   })
 })
 
-describe('the foe budget (§7.3)', () => {
-  it('gives foes past the first chapter the gear and Extra Stats a party is expected to have', () => {
-    const at10 = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level: 10, shield: 2, weaknesses: { weapons: [], elements: [] } })
-    const at30 = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level: 30, shield: 2, weaknesses: { weapons: [], elements: [] } })
-    const plain30 = (stat: number, ref: number) => Math.round(stat / 1.07) === Math.round(ref) || Math.abs(stat / 1.07 - ref) < 1
-    expect(at10.stats.atk).toBe(Math.round((22 + 1.59 * 9) * 3))
-    expect(plain30(at30.stats.atk, (22 + 1.59 * 29) * 3)).toBe(true)
+describe('the foe budget (§7.3, D141)', () => {
+  const striker = (level: number) => rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
+  it('sets a foe’s offense so a 100% hit takes its share of an average Uma’s HP, raised by the budget of a built one', () => {
+    for (const level of [1, 10, 30, 50]) {
+      const s = 22 + 1.59 * (level - 1), atk = striker(level).stats.atk
+      const share = rpgFoeHitShare(level) * rpgFoeBudget(level, RPG_FOE_TUNING.offenseBudgetPerLevel)
+      expect(Math.abs((atk * atk) / (atk + s) / (100 + 7 * s) - share), `Lv${level}`).toBeLessThan(0.01)
+    }
+    // A fresh party's first fights are gentler: 20% at Lv 1, 28% from Lv 10 on.
+    expect(rpgFoeHitShare(1)).toBe(0.2)
+    expect(rpgFoeHitShare(10)).toBeCloseTo(0.28)
+    expect(rpgFoeHitShare(40)).toBeCloseTo(0.28)
+  })
+  it('grows HP with the square of the level, for the gear and Extra Stats a built party has', () => {
+    expect(rpgFoeBudget(1, 0.035)).toBe(1)
+    expect(rpgFoeBudget(50, 0.035)).toBeCloseTo(2.715)
+    expect(striker(50).stats.hp).toBeGreaterThan(striker(25).stats.hp * 2)
   })
 })
 

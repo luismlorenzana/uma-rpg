@@ -223,7 +223,9 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   - Duo dishes open bridges;
   - Feasts open Sun nodes.
 - **Active nodes:** 5 + ⌊level ÷ 2⌋ at a time (5 at Lv 1, 30 at Lv 50), changed freely.
-- **Points:** a moon gives 1 point to its stat, a bridge ½ to each of its two, a Sun node ⅛ to all eight.
+- **Points, worth the node's grade (D141):** a moon of grade g gives g points to its stat (moon 7: 7), a bridge g ÷ 2 to
+  each of its two, a Sun node g ÷ 8 to all eight. A full track of ten moons is 55 points; since D139 every grade takes the
+  same farm time, so a higher grade pays in what it gives.
 - **What a point does (D104, flat):**
   - ATK, MATK, DEF, MDEF or MP: +1. HP: +5.
   - Speed: 0.6% evasion (up to 50%).
@@ -238,11 +240,11 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   An empty weapon or armor slot holds the Training piece of its kind (grade 0, no stats); an empty accessory slot holds
   nothing.
 - **What it does (D104, D124):**
-  - A weapon's **Might**, +4 a grade, adds to the offense of hits made with that weapon.
-  - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉, and its slot's defensive stat +g. Head DEF, body HP, legs MP,
+  - A weapon's **Might**: the hits made with that weapon deal 6% more a grade (+60% at grade 10, D141).
+  - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉, and its slot's defensive stat +2g (D141). Head DEF, body HP, legs MP,
     arms MDEF, feet Speed.
-  - An Orb adds its kind to every hit, for weaknesses. A Talisman or an Amulet gives one small defensive effect
-    ([combat](combat.md#damage)).
+  - An Orb adds its kind to every hit, for weaknesses. A Talisman or an Amulet gives one defensive effect, a share of
+    her own numbers so it keeps its worth at every level ([combat](combat.md#damage), D141).
 - **Wearing a grade:** grade g needs her Weapon Rank (for a weapon), Armor Rank (for its kind) or Accessory Rank (for
   the accessory's kind) ≥ g.
 - **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.

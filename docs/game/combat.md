@@ -1,8 +1,9 @@
 # Combat
 
-How a fight works today: engine v11 (D124: two accessories, physical and magical shields, MP Regen, Lifesteal, MP Steal,
-damage cuts and returns; D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit Breaks;
-D104: Class Ranks and Might; v6–v10 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
+How a fight works today: engine v12 (D141, [combat balance](../design/combat-balance.md): a ratio damage formula,
+Might as a share, Cleric and Summoner support, Rally, charged foe moves with locks, Steel after a Break, a breather
+between waves; D124: two accessories; D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit
+Breaks; D104: Class Ranks; v6–v11 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -19,16 +20,20 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `
   2. Each living Uma acts **once**, in any order the player picks.
   3. When all have acted, the foes act in initiative order. A foe that **acts twice** takes her second move after every
      foe's first.
-  4. The round ends: Burn ticks, statuses count down, Breaks expire.
+  4. The round ends: Burn ticks, statuses count down, Breaks expire, skill Barriers lapse (v12), and a lingering summon
+     that mends mends again.
 - **Win:** every foe of the last wave falls. **Lose:** every Uma falls, or the fight passes 40 rounds per wave.
 - **Deterministic.** A fight is its frozen input plus the actions taken (D52), so it replays identically. Random targets
   are seeded by the fight, the round, the actor and the hit. Every action is saved, so a fight survives a reload and
   resumes on another device.
 - **Waves.** When a wave falls and another waits, the round ends at once. The next wave steps in at the start of a
-  fresh round, so everyone acts again. The party keeps its HP, MP, statuses, Limit charge and lingering summons.
+  fresh round, so everyone acts again. The party keeps its HP, MP, statuses, Limit charge and lingering summons; from
+  v12 every Uma standing recovers 10% of her max HP (a breather).
 - **Auto and speed.** Auto plays each Uma's turn with the same policy the balance simulation uses (`autoAction`):
   - a ready Limit Break first;
-  - otherwise the best affordable skill or Attack, weighing weaknesses and how many foes it reaches.
+  - otherwise the best affordable skill or Attack, weighing weaknesses and how many foes it reaches;
+  - from v12 a skill's support counts too: a mend for the hurt, a Barrier for the threatened, a revive for the fallen
+    (a support that uses its whole share is worth 1.5 casts of its depth's damage).
 
   Any tap hands control back, and so does a failed action. Speed plays the animations at 1×, 2× or 4×.
 
@@ -56,14 +61,18 @@ Class rules change the act ([classes](classes.md)):
   her hand (×0.45), and the MP is the sum of the halves.
 - **Summoner:** a summon **lingers**. When she next summons, the lingering one strikes again at its linger share
   (×0.3), then leaves.
-- **Cleric:** her Arms skills put a debuff on the foe they hit; her Tome skills put a buff on every Uma.
+- **Cleric:** her Arms skills put a debuff on the foe they hit and a **Barrier** on the Uma the shown moves threaten
+  most; her Tome skills put a buff on every Uma, **mend** the most hurt and **cleanse** one foe status from each. At
+  depth 5 the Barrier and the mend reach every Uma. See [Support](#support-v12).
 
 ## Damage
 
 For each part of each hit:
 
-1. **Base:** `max(offense × 0.2, offense − defense × 0.5) × power`. Offense is ATK for Arms kinds and MATK for elements,
-   plus the **Might** of the weapon the hit is made with (+4 a grade, D104). Defense is the target's DEF or MDEF.
+1. **Base:** `offense² ÷ (offense + defense) × power` (D141). Offense is ATK for Arms kinds and MATK for elements;
+   defense the target's DEF or MDEF. The same ratio gives the same share at every level, and it is never zero.
+   **Might**: the weapon a hit is made with adds 6% a grade to it (+60% at grade 10). (Before v12, fights used
+   `max(offense × 0.2, offense − defense × 0.5)`, with Might +4 a grade added to offense.)
 2. **Weak hit:** ×1.3 when the hit's kind is on the foe's weakness lists, or it's Light or Dark against a Hexed foe. An
    Uma's **Orb** adds its kind to every hit for this check, without extra damage.
 3. **Statuses** (table below) raise or cut it.
@@ -72,16 +81,18 @@ For each part of each hit:
 5. **Unbroken foes take ×0.5.** Breaking them is how damage lands.
 6. An Uma's **evasion** (Speed Extra Stats, up to 50%) cuts what she takes.
 7. A guard intercepting a hit takes half of it. Damage is at least 1.
-8. **Her accessories (D124):**
-   - **Shields:** a Bulwark Talisman's Barrier absorbs physical damage before HP, a Veil Amulet's Veil magical damage
-     (5 a grade each, from the start of the fight).
-   - **Damage cuts:** an Iron Talisman cuts the physical damage she takes, a Ward Amulet the magical (0.5% a grade).
+8. **A skill's Barrier** (v12) absorbs any damage first. It lasts until the end of the round it was raised in.
+9. **Her accessories (D124, D141: shares of her own numbers, so they keep their worth at every level):**
+   - **Shields:** a Bulwark Talisman's shield absorbs physical damage, a Veil Amulet's magical damage, from the start of
+     the fight (2% of her max HP a grade each).
+   - **Damage cuts:** an Iron Talisman cuts the physical damage she takes, a Ward Amulet the magical (1.5% a grade).
    - **Returned damage:** a Thorn Talisman returns physical damage she takes to its attacker, a Mirror Amulet magical
-     damage (1% a grade).
-   - **Drain:** a Vampire Talisman heals her by the physical damage she deals (0.5% a grade); a Siphon Amulet restores
-     MP from the magical damage she deals (0.2% a grade).
-   - **Each round's end:** a Vital Talisman heals 1 HP a grade, a Spring Amulet restores ⌈g/2⌉ MP.
-   - **Fights before v11:** a Barrier from physical armor took any damage, and magical armor gave Regen (D104).
+     damage (3% a grade).
+   - **Drain:** a Vampire Talisman heals her by the physical damage she deals (2% a grade); a Siphon Amulet restores
+     MP from the magical damage she deals (0.5% a grade).
+   - **Each round's end:** a Vital Talisman heals 0.5% of her max HP a grade, a Spring Amulet restores 1 MP a grade.
+   - **Older fights:** before v12 the effects were a fifth to a third of these and Regen and shields were flat; before
+     v11 a Barrier from physical armor took any damage, and magical armor gave Regen (D104).
 
 Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
 
@@ -93,10 +104,12 @@ Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
 | DEF | Power | × class lean, … |
 | MDEF | (Power + Wit) ÷ 2 | × class lean, … |
 | Initiative | Stamina | Foes act by initiative; Umas act in the order you choose |
+| Heal (v12) | Guts | × class heal lean (Cleric 1.3, Summoner 1.2). Raises her mends and Barriers ×(1 + Heal ÷ 300) |
 
-Each Extra Stats or armor point adds a flat +1 to its stat (+5 HP). Speed points give 0.6% evasion each, and Limit
-points a head start on the gauge ([loops](loops.md#extra-stats-and-gear)). An average Uma's ATK is about 22 at Lv 1 and
-111 at Lv 50; HP about 276 and 928.
+Each Extra Stats or armor point adds a flat +1 to its stat (+5 HP). An Extra Stats node is worth its grade (D141): moon
+7 gives 7 points. Speed points give 0.6% evasion each, and Limit points a head start on the gauge
+([loops](loops.md#extra-stats-and-gear)). An average Uma's ATK is about 22 at Lv 1 and 111 at Lv 50, before gear and
+Extra Stats; HP about 276 and 928.
 
 ## Weaknesses, shields and Breaks
 
@@ -106,6 +119,9 @@ points a head start on the gauge ([loops](loops.md#extra-stats-and-gear)). An av
   remove two, and Shatter removes points directly.
 - At zero the foe **Breaks**. She loses this round's and the next round's action, and takes full damage (×2 compared to
   unbroken). At the end of the second enemy phase she stands back up with her shield full.
+- **v12 (D141):** a Break also strips her buffs (Power-up, Ward), cancels a charged move and gives back the party's
+  Rally from her. Back up, she is **Steeled**: her shield can't be chipped until she has made a move, so a party can't
+  hold a foe down Break after Break. Her shield badge shows it.
 - Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**. A dual-element
   foe is weak to what beats either element, minus her own; a light+dark foe answers to weapons only.
 
@@ -135,6 +151,39 @@ add riders (a status on each foe hit) or Barriers; their rows in [skill trees](s
 Battle badges show the published status glyph and its stack count, with the full name in the accessible label.
 Statuses without glyphs (including Burn and foes' Power-up) keep text badges. Skill descriptions keep full names
 beside decorative glyphs; Shatter and Clarity act immediately, so they do not create lingering badges.
+
+## Support (v12)
+
+Engine v12 gives the party a defensive half without a new class (D141). Brawler, Mage and Spell Blade stay pure
+offense; Cleric and Summoner are half offense, half healer and shielder. Every support comes after the skill's hits.
+
+| Support | Who | What it does |
+|---|---|---|
+| **Mend** | Cleric Tome skills (the most hurt Uma; every Uma at depth 5); Summoner Light summons (every Uma) | Heals a share of the target's max HP by depth: 14%, 16%, 18%, 20%, 22%; on every Uma ×0.4 (summons ×0.5 of that) |
+| **Barrier** | Cleric Arms skills (the Uma the shown moves threaten most; every Uma at depth 5); Summoner Ice summons (every Uma, ×0.35) | Absorbs any damage first, the same shares, until the end of the round. Cap 40% of max HP |
+| **Cleanse** | Cleric Tome skills | Removes one foe-made status (Burn, Mark, Weaken, Slow) from each Uma |
+| **Revive** | Cleric's Rebirth (Light tree, depth-3 side B); Summoner Valkyries (Lance, depth 4–5) | Raises the first fallen Uma at 25% of her HP, once per Uma per fight |
+| **Drain** | Summoner Dark summons | 30% of the damage its hits deal heals the most hurt Uma |
+| **Aegis** | Summoner Greatsword knights | Aegis 1 on every Uma (2 at depth 5) |
+| **Enfeeble** | Summoner Axe brutes | Enfeeble 1 on every foe hit (2 at depth 5) |
+
+- **Heal** (from Guts) raises every mend, Barrier and revive ×(1 + Heal ÷ 300); her profile shows it.
+- **Lingering summons:** a Light summon that lingers mends again at each round's end, at its linger share (×0.3, or
+  ×0.4 for Bonded); its farewell strike mends at that share too. Other supports don't repeat.
+- **Rally:** 30% of the last foe hit an Uma took (after Barriers) shows grey on her HP bar. If the party Breaks or
+  defeats that foe before the foe moves again, the Uma wins it back.
+
+## Charged moves (v12)
+
+Sub-bosses and Bosses carry a charged move (D141): the captain's Execution (on the weakest) and Cataclysm (everyone,
+below half HP), the champion's Cataclysm and Apocalypse (below half HP).
+
+- **Announced a round early:** her intent reads "Charging: …" and her panel shows its **locks**, two to four kinds
+  drawn from her weaknesses. The splash cuts in as she gathers.
+- **Locks:** every hit of a lock's kind breaks one (an Orb's kind counts, as for weaknesses). The move lands the next
+  round at its power × the locks left ÷ all of them.
+- **Cancelled** when every lock breaks or when she is Broken; the splash cuts in again with "Cancelled!".
+- She doesn't charge two rounds running, and a foe that acts twice charges only with her first move.
 
 ## Limit Breaks
 
@@ -166,13 +215,14 @@ elements, weaknesses and a shield.
 | Caster | Flame bolt at the weakest (damage, 110%, lowest-hp); Hex: weaken (debuff, seeded) | — |
 | Guard | Shield bash (damage, 80%, front); Guard an ally (guard, ally) | — |
 | Skirmisher | Flame cut + mark (damage, 90%, seeded); Strike the front (damage, 100%, front) | — |
-| Captain | Flame smash (damage, 150%, front); Rally: power up (buff, self); Flame sweep (all) (damage, 55%, all) | Flame storm (all) (damage, 75%, all); Crush the weakest (damage, 190%, lowest-hp) |
-| Champion | Flame smash (damage, 160%, front); Flame sweep (all) (damage, 60%, all); Ward: guard up (buff, self) | Flame storm (all) (damage, 85%, all); Crush the weakest (damage, 210%, lowest-hp); Flame lance (damage, 170%, front) |
+| Captain | Flame smash (damage, 150%, front); Rally: power up (buff, self); Flame sweep (all) (damage, 55%, all); Flame execution (damage, 260%, lowest-hp, charged, 2 locks) | Flame storm (all) (damage, 75%, all); Crush the weakest (damage, 190%, lowest-hp); Flame cataclysm (all) (damage, 130%, all, charged, 3 locks) |
+| Champion | Flame smash (damage, 160%, front); Flame sweep (all) (damage, 60%, all); Ward: guard up (buff, self); Flame cataclysm (all) (damage, 130%, all, charged, 3 locks) | Flame storm (all) (damage, 85%, all); Crush the weakest (damage, 210%, lowest-hp); Flame lance (damage, 170%, front); Flame apocalypse (all) (damage, 170%, all, charged, 4 locks) |
 
 Shown with Fire; a foe uses her own element, and a dual-element foe her second element for her second elemental move.
 <!-- /live -->
 
-Captains and champions change tactics below 50% HP (their phase-two moves). Foe faces come from the region's
+Captains and champions change tactics below 50% HP (their phase-two moves); a charged move she is gathering or landing
+carries over. From Lv 10 a lone region boss and an elite's sub-boss act twice (D141). Foe faces come from the region's
 franchise and each slot's tier, from a private file; see [maps](maps.md#faces).
 
 ### Splash cut-ins
@@ -196,11 +246,14 @@ unchanged.
 | Setting | Value |
 |---|---|
 | HP | (40 + 4.2 × reference stat) × role × rank |
-| Sub-boss and boss HP | ×4.5 and ×6.5, times the party's reachable skill depth |
-| Gear budget | +0.4% to every stat per level past Lv 10 |
-| World: regular foes | +3.5% HP and +2% offense per level |
-| World: elites | +1% HP and +0.5% offense per level |
-| World: region bosses | ×0.5 a champion's HP, +0.5% offense per level |
+| Offense | Set so a 100% hit takes a share of an average Uma's HP at her level (20% at Lv 1, 28% from Lv 10), × the offense budget, × role |
+| Sub-boss and boss HP | ×3.5 and ×5.5, times the party's reachable skill depth |
+| Build budget | What a built party's gear and Extra Stats call for: HP and defense ×(1 + 0.035 × (L − 1)² ÷ 49), ××2.72 at Lv 50; offense ××1.49 at Lv 50 |
+| World: regular foes | +3.5% HP per level |
+| World: elites | +0% HP per level |
+| World: region bosses | ×0.5 a champion's HP |
+| Acting twice | From Lv 10: a lone region boss and an elite's sub-boss; a lone elite always |
+| Formations | A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's |
 | Shields | Regular 2 (by formation), sub-boss 6, boss 8 |
 <!-- /live -->
 
@@ -216,8 +269,8 @@ giving up pays nothing and leaves MP as it was before the fight. Numbers are in 
 |---|---|---|
 | `BATTLE_WEAK` | 1.3 | Damage multiplier of a weak hit |
 | `BATTLE_UNBROKEN_FACTOR` | 0.5 | Damage a foe takes while its shield stands |
-| `BATTLE_DEFENSE_SHARE` | 0.5 | Share of defense subtracted from offense |
-| `BATTLE_MIN_OFFENSE_SHARE` | 0.2 | Floor: a hit keeps at least this share of offense |
+| `BATTLE_DEFENSE_SHARE` | 0.5 | Before v12: share of defense subtracted from offense |
+| `BATTLE_MIN_OFFENSE_SHARE` | 0.2 | Before v12: a hit keeps at least this share of offense |
 | `BATTLE_GUARD_FACTOR` | 0.5 | Damage a guarding ally takes for the one she covers |
 | `BATTLE_BREAK_ROUNDS` | 2 | Rounds a Break lasts (the foe loses its actions) |
 | `BATTLE_MAX_ROUNDS` | 40 | Round cap per wave; past it the fight is lost |
@@ -227,7 +280,14 @@ giving up pays nothing and leaves MP as it was before the fight. Numbers are in 
 | `BATTLE_FOE_STATUS_STEP` | 0.15 | Per stack: foes' Weaken, Slow, Power-up, Ward |
 | `BATTLE_BURN_PERCENT` | 0.04 | Max HP lost per Burn stack at the end of a round |
 | `BATTLE_CLARITY_PERCENT` | 0.04 | Max MP restored per Clarity stack |
-| `BATTLE_BARRIER_PERCENT` | 0.08 | Barrier per stack, as a share of max HP |
-| `BATTLE_BARRIER_CAP` | 0.3 | Barrier cap, as a share of max HP |
+| `BATTLE_BARRIER_PERCENT` | 0.08 | Barrier per stack of a summon's rider, as a share of max HP |
+| `BATTLE_BARRIER_CAP` | 0.3 | Before v12: Barrier cap, as a share of max HP |
+| `BATTLE_COVER_CAP` | 0.4 | v12: a skill Barrier's cap, as a share of max HP; it lasts the round |
+| `RPG_SUPPORT_SHARE` | 0.14, 0.16, 0.18, 0.2, 0.22 | v12: a mend's or Barrier's share of the target's max HP, by depth |
+| `RPG_SUPPORT_ALL` | 0.4 | v12: that share on every Uma, at depth 5 and for summons |
+| `BATTLE_HEAL_SCALE` | 300 | v12: her Heal raises mends and Barriers ×(1 + Heal ÷ this) |
+| `BATTLE_REVIVE_SHARE` | 0.25 | v12: a revive's share of max HP, before her Heal |
+| `BATTLE_RALLY_SHARE` | 0.3 | v12: share of a foe hit she can Rally back |
+| `BATTLE_BREATHER` | 0.1 | v12: share of max HP every Uma recovers when a new wave enters |
 | `BATTLE_LIMIT_MAX` | 12 | Limit Break gauge |
 <!-- /live -->

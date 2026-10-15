@@ -18,8 +18,8 @@
 **For ChatGPT:** no ready packets. H08, H10, H11 and H28 are complete.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
-  retunes. **Combat** has a proposal awaiting the owner's go: [combat balance](../design/combat-balance.md) (measured
-  findings, research, a four-phase plan).
+  retunes. **Combat** was rebalanced by D140–D141 ([combat balance](../design/combat-balance.md)); its next pass comes
+  from the owner's play.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
 - **Other repos** (uma-racer phase 3, uma-puzzle phase 4) are in uma-platform's `docs/roadmap.md` and uma-racer's
   `docs/rearchitecture/`, not here.

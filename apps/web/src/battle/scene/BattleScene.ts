@@ -340,6 +340,23 @@ export class BattleScene extends Phaser.Scene {
         return this.waveBanner(cue.label ?? 'Next wave')
       case 'result':
         return this.result(cue.label)
+      // v12 (D141): heals rise green, Barriers ring blue, a lock breaks in shards, a cancelled charge cuts in.
+      case 'heal':
+        this.burst(cue.targetId, 0x7dffa8, 10, -1)
+        this.number(cue.targetId, `+${cue.amount ?? 0}`, '#7dffa8', 0.95, cue.label)
+        return this.wait(260)
+      case 'cover':
+        this.ring(cue.targetId, 0x8fd3ff)
+        this.label(cue.targetId, `Barrier ${cue.amount ?? 0}`, '#bfe6ff')
+        return this.wait(200)
+      case 'lock':
+        this.shards(cue.targetId, 5, 0xffd84d)
+        this.label(cue.targetId, cue.amount ? `Lock! ${cue.amount} left` : 'Lock!', '#ffd84d')
+        return this.wait(220)
+      case 'cancel':
+        if (this.hasSplash(cue.targetId)) await this.splashIn(cue.targetId, 'Cancelled!')
+        this.label(cue.targetId, 'Cancelled!', '#ffd84d')
+        return this.wait(320)
       default:
         return this.wait(0)
     }
@@ -372,6 +389,12 @@ export class BattleScene extends Phaser.Scene {
 
   /** No lunge, flashes, shake or moving text: just the final pose and readable result. */
   private stillCue(cue: BattleCue): void {
+    if (cue.kind === 'heal') {
+      const { x, y } = this.center(cue.targetId)
+      const text = this.text(x, y - 12 * this.dpr, `+${cue.amount ?? 0}`, '#7dffa8', 18)
+      this.time.delayedCall(500, () => text.destroy())
+      return
+    }
     if (cue.kind !== 'hit' && cue.kind !== 'break') return
     const target = this.actors.get(cue.targetId)
     if (!target) return

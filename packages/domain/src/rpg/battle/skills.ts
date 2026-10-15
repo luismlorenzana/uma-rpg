@@ -1,4 +1,4 @@
-// Battle numbers and skill lookup, engine v6–v8 (D86, D102; docs/design/class-rework.md).
+// Battle numbers and skill lookup, engine v6–v12 (D86, D102, D141; docs/design/class-rework.md, combat-balance.md).
 import { rpgNode, type RpgNode, type RpgSkillDef } from '../catalog'
 import { RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
@@ -21,6 +21,13 @@ export const BATTLE_FOE_STATUS_STEP = 0.15
 export const BATTLE_BARRIER_PERCENT = 0.08
 export const BATTLE_BARRIER_CAP = 0.3
 export const BATTLE_CLARITY_PERCENT = 0.04
+/** v12 (D141, combat-balance.md): a skill Barrier's cap as a share of max HP; the part of a foe hit she can Rally back;
+ * what every Uma recovers when a new wave enters; a revive's HP. */
+export const BATTLE_COVER_CAP = 0.4
+export const BATTLE_RALLY_SHARE = 0.3
+export const BATTLE_BREATHER = 0.1
+export const BATTLE_REVIVE_SHARE = 0.25
+export { BATTLE_HEAL_SCALE } from './caps'
 
 export const battleChannel = (kind: RpgDamageKind | null): BattleChannel => kind !== null && rpgPhysical(kind) ? 'physical' : 'magical'
 /** The element that a foe of this element is weak to. */

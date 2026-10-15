@@ -55,23 +55,25 @@ export function gearById(id: string): GearPiece | undefined {
 
 // --- What a piece does (D104, D124) -------------------------------------------------------------------------------------
 
-/** A weapon's Might per grade, added to the offense of hits made with that weapon. */
-export const MIGHT_PER_GRADE = 4
-/** An armor piece's offense, ⌈g/2⌉ ATK or M.ATK; its slot's defensive stat is +1 a grade. */
+/** A weapon's Might per grade (D141): the hits made with that weapon deal this many percent more (60% at grade 10). */
+export const MIGHT_PER_GRADE = 6
+/** An armor piece's offense, ⌈g/2⌉ ATK or M.ATK; its slot's defensive stat is +2 a grade (D141). */
 export const armorOffense = (grade: number): number => Math.ceil(grade / 2)
+export const ARMOR_DEFENSE_PER_GRADE = 2
 
-/** The defensive effects of Talismans and Amulets (D124), per grade. Shares are per mille. */
+/** The defensive effects of Talismans and Amulets (D124, D141), per grade, per mille. Regen and the two shields are shares
+ * of her max HP, made into HP when a fight starts, so they keep their worth at every level. */
 export const CHARM_PER_GRADE = {
-  /** HP healed each round (Vital); MP restored each round is ⌈g/2⌉ (Spring). */
-  regen: 1,
+  /** Max HP healed each round (Vital): 5% at grade 10. Spring restores 1 MP a grade each round. */
+  regen: 5, mpRegen: 1,
   /** Share of physical damage she deals healed back (Vampire), of magical damage restored as MP (Siphon). */
-  lifesteal: 5, mpSteal: 2,
-  /** A shield against physical damage (Bulwark) or magical damage (Veil), at the start of each fight. */
-  shield: 5,
+  lifesteal: 20, mpSteal: 5,
+  /** A shield of max HP against physical damage (Bulwark) or magical damage (Veil), at the start of each fight. */
+  shield: 20,
   /** Share of physical (Iron) or magical (Ward) damage she doesn't take. */
-  guard: 5,
+  guard: 15,
   /** Share of physical (Thorn) or magical (Mirror) damage she takes that's returned to its attacker. */
-  thorns: 10,
+  thorns: 30,
 } as const
 
 /** One accessory's effect, added into `into`. */
@@ -84,7 +86,7 @@ function addAccessory(into: AccessoryEffects, type: AccessoryType, g: number): v
     case 'bulwark': into.barrier += c.shield * g; break
     case 'iron': into.guard += c.guard * g; break
     case 'thorn': into.thorns += c.thorns * g; break
-    case 'spring': into.mpRegen += Math.ceil(g / 2); break
+    case 'spring': into.mpRegen += c.mpRegen * g; break
     case 'siphon': into.mpSteal += c.mpSteal * g; break
     case 'veil': into.veil += c.shield * g; break
     case 'ward': into.resist += c.guard * g; break
@@ -97,7 +99,7 @@ export function gearPoints(piece: GearPiece): Points {
   const p = noPoints()
   if (!isArmor(piece.type)) return p
   p[isMagicalArmor(piece.type) ? 'matk' : 'atk'] += armorOffense(piece.grade)
-  p[ARMOR_SLOT_STAT[armorSlotOf(piece.type)]] += piece.grade
+  p[ARMOR_SLOT_STAT[armorSlotOf(piece.type)]] += ARMOR_DEFENSE_PER_GRADE * piece.grade
   return p
 }
 export const pieceOf = (equipped: Partial<Record<GearSlot, string>>, slot: GearSlot): GearPiece | undefined =>

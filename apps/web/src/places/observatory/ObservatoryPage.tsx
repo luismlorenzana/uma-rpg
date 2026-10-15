@@ -22,6 +22,11 @@ function nodeLabel(id: string): string {
   if (kind === 'bridge') return `${key!.split('-').map((e) => EFFECT_LABEL[e as ItemEffect]).join(' + ')} bridge ${n}`
   return `Sun ${key}`
 }
+/** What one node gives: its grade's worth (D141), e.g. "+7 ATK" for ATK moon 7. */
+function nodeValue(id: string): string {
+  const points = starPoints([id])
+  return ITEM_EFFECTS.filter((e) => points[e] > 0).map((e) => `${pointText(e, points[e])}${e === 'speed' || e === 'limit' ? '' : ` ${SHORT[e]}`}`).join(', ')
+}
 export function pointText(e: ItemEffect, p: number): string {
   if (e === 'speed') return `${(p * POINT_EVASION * 100).toFixed(1)}% evasion`
   if (e === 'limit') return `+${Math.floor(p * POINT_LIMIT)} Limit start`
@@ -96,7 +101,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
                     <ItemIcon id={outputView(dishId).icon} size={32} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px] font-semibold">{dish.name} ×{n}</span>
-                      <span className="block text-[11px] text-ink-soft">Unlocks {nodeLabel(node)}</span>
+                      <span className="block text-[11px] text-ink-soft">Unlocks {nodeLabel(node)} · {nodeValue(node)}</span>
                     </span>
                     <span className="shrink-0 rounded-sm bg-accent px-2.5 py-1 text-[12px] font-bold text-accent-ink">Eat</span>
                   </button>

@@ -16,6 +16,9 @@ export const RPG_SKILL_MP = [10, 14, 18, 22, 26] as const
 /** Every-foe skills deal this share of single-target power to each foe; random multi-hits get a small bonus. */
 export const RPG_AOE_SHARE = 0.55
 export const RPG_RANDOM_BONUS = 1.05
+/** v12 (D141): a mend's or a Barrier's share of the target's max HP by depth, before her Heal; on every Uma it is ×0.4. */
+export const RPG_SUPPORT_SHARE = [0.14, 0.16, 0.18, 0.2, 0.22] as const
+export const RPG_SUPPORT_ALL = 0.4
 export interface RpgPart { kind: RpgDamageKind; share: number }
 export interface RpgHit { power: number; parts: RpgPart[] }
 export type RpgSkillTarget = 'one' | 'all' | 'random'
@@ -43,6 +46,27 @@ export interface RpgSkillDef {
   status?: { key: RpgStatusKey; stacks: number; turns: number; to: 'foe' | 'foes' | 'allies' }
   /** A summon: it stays on the field and acts again at this share when its Summoner next summons (D86). */
   summon?: { linger: number }
+  /** v12 (D141): what it does for the party besides its hits. Older engines ignore it, so old fights replay unchanged. */
+  support?: RpgSupport
+}
+/**
+ * A skill's support (combat-balance.md §6.2). `share` is of the target's max HP, raised by her Heal. A mend heals the
+ * most-hurt Uma or every Uma; a Barrier shields the Uma the shown moves threaten most, or every Uma. A lingering summon
+ * that mends mends again at each round's end, at its linger share.
+ */
+export interface RpgSupport {
+  share: number
+  mend?: 'hurt' | 'all'
+  shield?: 'threatened' | 'all'
+  /** Removes one foe-made status (Burn, Mark, Weaken, Slow) from each Uma it reaches. */
+  cleanse?: boolean
+  /** Raises the first fallen Uma at a quarter of her HP, once per Uma per fight. */
+  revive?: boolean
+  /** This share of the damage its hits deal heals the most-hurt Uma. */
+  drain?: number
+  /** A status on every Uma, or on every foe it hits. */
+  bless?: { status: 'aegis'; stacks: number }
+  curse?: { status: 'enfeeble'; stacks: number }
 }
 export interface RpgNode {
   id: string
@@ -79,6 +103,17 @@ function describe(skill: RpgSkillDef): string {
   const parts = [`${per} · ${n} hit${n === 1 ? '' : 's'} · ${round(total)}`]
   if (skill.status) parts.push(`${STATUS_TEXT[skill.status.key]} ${skill.status.stacks} ${skill.status.to === 'allies' ? 'on every ally' : skill.status.to === 'foes' ? 'on every foe' : 'on the foe'}`)
   if (skill.summon) parts.push(`lingers at ${skill.summon.linger}`)
+  const sup = skill.support
+  if (sup) {
+    const pct = `${Math.round(sup.share * 100)}%`
+    if (sup.mend) parts.push(sup.mend === 'all' ? `heals every ally ${pct}` : `heals the most hurt ${pct}`)
+    if (sup.shield) parts.push(sup.shield === 'all' ? `Barrier ${pct} on every ally` : `Barrier ${pct} on the most threatened`)
+    if (sup.cleanse) parts.push('cleanses')
+    if (sup.revive) parts.push('revives the fallen')
+    if (sup.drain) parts.push(`heals ${Math.round(sup.drain * 100)}% of its damage`)
+    if (sup.bless) parts.push(`${STATUS_TEXT[sup.bless.status]} ${sup.bless.stacks} on every ally`)
+    if (sup.curse) parts.push(`${STATUS_TEXT[sup.curse.status]} ${sup.curse.stacks} on every foe hit`)
+  }
   return parts.join(' · ')
 }
 
@@ -211,24 +246,40 @@ for (const weapon of RPG_TOMES) addTree({ classId: 'mage', weapon, ...MAGE[weapo
 // --- Summoner: one summon per weapon, growing every depth, lingering after (D86) ---------------------------------------
 
 const LINGER = 0.3
+/** Each summon line's job (D141): Fire, Lightning, Bow and Katana strike; Light mends, Ice shields, Dark drains, the
+ * Greatsword's knights guard (Aegis), the Axe's brutes intimidate (Enfeeble) and the Lance's Valkyries raise the fallen. */
 const SUMMONS: Readonly<Record<RpgWeapon, readonly string[]>> = {
   'tome-fire': ['Ember Sprites', 'Salamander', 'Fire Drake', 'Infernal Wyrm', 'Phoenix'],
-  'tome-ice': ['Frost Sprites', 'Snow Wolves', 'Ice Golem', 'Frost Titan', 'Winter Queen'],
+  'tome-ice': ['Frost Sprites', 'Snow Sentinel', 'Ice Golem', 'Frost Titan', 'Winter Queen'],
   'tome-lightning': ['Spark Sprites', 'Thunderbird', 'Storm Roc', 'Thunder Kirin', 'Raijin'],
-  'tome-light': ['Cherub', 'Angel Lancer', 'Seraph Phalanx', 'Dominion Host', "Heaven's Legion"],
-  'tome-dark': ['Imp Brute', 'Hellknight', 'Dread Knight', 'Demon Lord', 'Abyssal Overlord'],
-  greatsword: ['Squire', 'Sword Knight', 'Paladin', 'Blade Champion', 'Sword Saint'],
+  'tome-light': ['Cherub', 'Mending Angel', 'Seraph Choir', 'Dominion Host', "Heaven's Legion"],
+  'tome-dark': ['Leech Imp', 'Night Bat', 'Vampire Knight', 'Blood Countess', 'Abyssal Overlord'],
+  greatsword: ['Squire', 'Shield Knight', 'Paladin', 'Aegis Champion', 'Sword Saint'],
   axe: ['Brigand', 'Berserker', 'Axe Ogre', 'Minotaur Chief', 'Jotun Warlord'],
   lance: ['Pikeman', 'Dragoon', 'Lance Knight', 'Valkyrie', 'Valkyrie Queen'],
   bow: ['Slinger', 'Archer', 'Ranger', 'Sylph Archer', 'Sagittarius'],
   katana: ['Ronin', 'Samurai', 'Kensei', 'Blade Shogun', 'Sword Spirit'],
+}
+/** A summon line's support (D141), by depth, on every Uma: Light mends at half a Cleric's share, Ice shields at 35%. */
+function summonSupport(kind: RpgDamageKind, d: number): RpgSupport | undefined {
+  const share = (k: number) => Math.round(k * at(RPG_SUPPORT_SHARE, d) * 1000) / 1000
+  switch (kind) {
+    case 'light': return { share: share(0.5), mend: 'all' }
+    case 'ice': return { share: share(0.35), shield: 'all' }
+    case 'dark': return { share: 0, drain: 0.3 }
+    case 'greatsword': return { share: 0, bless: { status: 'aegis', stacks: d === 5 ? 2 : 1 } }
+    case 'axe': return { share: 0, curse: { status: 'enfeeble', stacks: d === 5 ? 2 : 1 } }
+    case 'lance': return d >= 4 ? { share: 0, revive: true } : undefined
+    default: return undefined
+  }
 }
 /** A summon by its kind's shape, `extra` hits more and `scale` times the power, with its depth-5 capstone. */
 function summon(weapon: RpgWeapon, d: number, extra = 0, scale = 1): RpgSkillDef {
   const kind = rpgWeaponKind(weapon)
   const p = scale * power(d)
   const capstone = d === 5
-  const base: Omit<RpgSkillDef, 'target' | 'hits'> = { mp: mp(d), primary: kind, summon: { linger: LINGER } }
+  const support = summonSupport(kind, d)
+  const base: Omit<RpgSkillDef, 'target' | 'hits'> = { mp: mp(d), primary: kind, summon: { linger: LINGER }, ...(support ? { support } : {}) }
   switch (kind) {
     case 'fire': case 'greatsword':
       return { ...base, target: 'one', hits: pure(at(GH, d) + extra, p, kind),
@@ -302,16 +353,28 @@ const CLERIC_NAMES: Readonly<Record<RpgWeapon, readonly string[]>> = {
   'tome-dark': ['Calm', 'Focus', 'Clarity', 'Insight', 'Enlightenment'],
 }
 const CLERIC_STACKS = [1, 1, 2, 2, 3]
-function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0): RpgSkillDef {
+/** Her spells mend and cleanse, her blows put up a Barrier (D141): on the one who needs it, on everyone at depth 5. The
+ * Light tree's depth-3 side B is Rebirth: it also raises the fallen. */
+function clericSupport(weapon: RpgWeapon, d: number, rebirth = false): RpgSupport {
+  const share = at(RPG_SUPPORT_SHARE, d)
+  return isRpgTome(weapon)
+    ? { share, mend: d === 5 ? 'all' : 'hurt', cleanse: true, ...(rebirth ? { revive: true } : {}) }
+    : { share, shield: d === 5 ? 'all' : 'threatened' }
+}
+function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0, rebirth = false): RpgSkillDef {
   const kind = rpgWeaponKind(weapon)
   const to = isRpgTome(weapon) ? 'allies' : d === 5 ? 'foes' : 'foe'
   return { target: 'one', hits: pure(1, power(d), kind), mp: mp(d) + extraMp, primary: kind,
-    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to } }
+    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to }, support: clericSupport(weapon, d, rebirth) }
 }
+/** The one side skill that isn't Lasting or Heavy: the Light tree's depth-3 B, Rebirth (D141). */
+export const RPG_REBIRTH_NODE = 'cleric-tome-light.3b'
 for (const weapon of RPG_WEAPONS) {
   const names = CLERIC_NAMES[weapon]
-  addTree({ classId: 'cleric', weapon, names, a: names.map((n) => `Lasting ${n}`), b: names.map((n) => `Heavy ${n}`),
-    core: (d) => cleric(weapon, d), sideA: (d) => cleric(weapon, d, 3, 0, 2), sideB: (d) => cleric(weapon, d, 2, 1, 4) })
+  const b = names.map((n, i) => (weapon === 'tome-light' && i === 2 ? 'Rebirth' : `Heavy ${n}`))
+  addTree({ classId: 'cleric', weapon, names, a: names.map((n) => `Lasting ${n}`), b,
+    core: (d) => cleric(weapon, d), sideA: (d) => cleric(weapon, d, 3, 0, 2),
+    sideB: (d) => cleric(weapon, d, 2, 1, 4, weapon === 'tome-light' && d === 3) })
 }
 
 export const RPG_NODES: readonly RpgNode[] = NODES

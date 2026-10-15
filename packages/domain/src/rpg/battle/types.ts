@@ -1,6 +1,7 @@
 // Campaign battle vocabulary, engine v11 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
-// v11 two accessories and their defensive effects, D124).
+// v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
+// Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md).
 // Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -29,7 +30,8 @@ export interface BattleAlly {
   maxDepth?: number
   /** Her Class Rank (v8, D102): it opens her trees' depths and sets her Limit Break's depth. */
   classRank?: number
-  /** Might by damage kind (v8, D104): a weapon's grade × 4, added to the offense of hits made with it. */
+  /** Might by damage kind (v8, D104): a weapon's grade × 4, added to the offense of hits made with it. From v12 (D141) a
+   * percent: the hits made with that weapon deal this much more. */
   might?: Partial<Record<RpgDamageKind, number>>
   /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
    * absorbing physical damage only). */
@@ -71,6 +73,9 @@ export interface BattleEnemyMove {
   element: RpgElement | null
   /** Percent of the enemy's offense; area moves hit every ally at this power. */
   power: number
+  /** v12 (D141): a charged move, announced a round before it lands, with this many locks drawn from her weaknesses. Each
+   * hit of a lock's kind breaks one and weakens the move; breaking all of them, or Breaking her, cancels it. */
+  charge?: number
   target: 'front' | 'lowest-hp' | 'seeded' | 'all' | 'self' | 'ally'
   status?: 'burn' | 'slow' | 'mark' | 'weaken' | 'ward' | 'power-up'
   label: string
@@ -97,7 +102,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -126,10 +131,21 @@ export interface BattleUnit {
   revived: boolean
   /** Limit Break charge (allies, D311): attacks and skills fill it to BATTLE_LIMIT_MAX; it stays full until used. */
   limit: number
+  /** v12 (D141): a Barrier from skills and summons, absorbing any damage before the accessories' shields and HP. It lasts
+   * until the end of the round. */
+  cover?: number
+  /** v12: part of the last foe hit she took, won back if the party Breaks or defeats that foe before it moves again. */
+  rally?: { from: string; amount: number }
+  /** v12: a foe's charged move: announced in `round`, it lands the round after at its power × locks left ÷ `total`. */
+  charging?: { moveId: string; locks: RpgDamageKind[]; total: number; round: number; targetId: string }
+  /** v12: the round her last charged move landed or was cancelled; she doesn't charge again the next round. */
+  charged?: number
+  /** v12: back up from a Break, her shield can't be chipped until she has made a move, so she acts between Breaks. */
+  steeled?: boolean
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */
@@ -165,6 +181,9 @@ export type BattleCue =
       element: RpgDamageKind | null; weak: boolean; label?: string }
   | { kind: 'shield' | 'break' | 'recover' | 'ko' | 'phase' | 'status' | 'guard' | 'skip' | 'mp' | 'summon' | 'wave';
       actorId: string; targetId: string; amount?: number; label?: string }
+  /** v12 (D141): HP restored (a mend, a revive, a Rally, a breather between waves), a Barrier's new total, a lock broken
+   * (`amount` locks left, `label` its kind) and a charged move cancelled. */
+  | { kind: 'heal' | 'cover' | 'lock' | 'cancel'; actorId: string; targetId: string; amount?: number; label?: string }
   /** A Limit Break: its name, and for an inherited one the Hero it came from (D106). */
   | { kind: 'limit'; actorId: string; targetId: string; label: string; from?: string; amount?: undefined }
   | { kind: 'result'; label: 'victory' | 'loss' }

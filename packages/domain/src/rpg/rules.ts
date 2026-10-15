@@ -51,6 +51,8 @@ export interface RpgCoreStats extends Stats {
   initiative: number
   pdef: number
   mdef: number
+  /** Her Heal (D141): Guts × her class's heal lean. Mends and Barriers grow ×(1 + Heal ÷ 300). Kept under its old name so
+   * frozen fights still parse. */
   dexterity: number
   hp: number
   mp: number
@@ -94,12 +96,12 @@ export function rpgDefaultClass(style: 'front' | 'pace' | 'late' | 'end'): RpgCl
 }
 
 /** Each class leans the shared projection. */
-export const RPG_CLASS_STATS: Readonly<Record<RpgClass, { hp: number; atk: number; matk: number; pdef: number; mdef: number; mp: number }>> = {
-  brawler: { hp: 1.15, atk: 1.1, matk: 0.9, pdef: 1.1, mdef: 0.9, mp: 0.8 },
-  mage: { hp: 0.9, atk: 0.9, matk: 1.15, pdef: 0.9, mdef: 1.1, mp: 1.3 },
-  spellblade: { hp: 1, atk: 1.05, matk: 1.05, pdef: 1, mdef: 1, mp: 1 },
-  cleric: { hp: 1, atk: 0.8, matk: 1, pdef: 1, mdef: 1.15, mp: 1.3 },
-  summoner: { hp: 1, atk: 1, matk: 1, pdef: 1, mdef: 1, mp: 1.1 },
+export const RPG_CLASS_STATS: Readonly<Record<RpgClass, { hp: number; atk: number; matk: number; pdef: number; mdef: number; mp: number; heal: number }>> = {
+  brawler: { hp: 1.15, atk: 1.1, matk: 0.9, pdef: 1.1, mdef: 0.9, mp: 0.8, heal: 0.8 },
+  mage: { hp: 0.9, atk: 0.9, matk: 1.15, pdef: 0.9, mdef: 1.1, mp: 1.3, heal: 1 },
+  spellblade: { hp: 1, atk: 1.05, matk: 1.05, pdef: 1, mdef: 1, mp: 1, heal: 0.9 },
+  cleric: { hp: 1, atk: 0.8, matk: 1, pdef: 1, mdef: 1.15, mp: 1.3, heal: 1.3 },
+  summoner: { hp: 1, atk: 1, matk: 1, pdef: 1, mdef: 1, mp: 1.1, heal: 1.2 },
 }
 
 /** Every tree of a class (5 or 10), and the ones her weapons make usable. */
@@ -175,7 +177,7 @@ export function projectRpgStats(profile: Pick<RpgProfile, 'baseStats' | 'growthR
   requireSafe(mp, 'projected MP')
   return { ...core, atk: Math.round(core.speed * lean.atk), matk: Math.round(core.speed * lean.matk), initiative: core.stamina,
     pdef: Math.round(core.power * lean.pdef), mdef: Math.round((core.power + core.wit) / 2 * lean.mdef),
-    dexterity: core.guts, hp, mp }
+    dexterity: Math.round(core.guts * lean.heal), hp, mp }
 }
 
 export function grantRpgExp(profile: Pick<RpgProfile, 'tier' | 'level' | 'exp'>, amount: number): { level: number; exp: number; levelsCrossed: number[] } {

@@ -84,6 +84,7 @@ function run(level: number, options: BalanceOptions): { cleared: number[]; mpLef
 }
 
 const ON_CURVE: BalanceOptions = { gear: true, stars: true, heroes: true }
+const GEARED: BalanceOptions = { gear: true, heroes: true }
 const pct = (x: number) => `${Math.round(100 * x)}%`
 const cell = (b: Bucket) => b.n ? `${pct(b.wins / b.n)} ${(b.rounds / b.n).toFixed(1)}r hp ${pct(b.hp / b.n)} low ${pct(b.lowest / b.n)} ko ${(b.kos / b.n).toFixed(1)} focus ${pct(b.focus / b.n)}` : '—'
 
@@ -125,16 +126,18 @@ describe('world balance', () => {
     for (const node of opening) expect(play(balanceStage(node, 7, party)).won, node.id).toBe(true)
   })
 
-  it.skipIf(!process.env.SIM)('prints win rates by level, bare and on curve', () => {
+  it.skipIf(!process.env.SIM)('prints win rates by level: bare, geared (no Extra Stats) and on curve', () => {
     const rows: string[] = ['level | party | regular | elite | boss']
-    for (const level of [1, 5, 10, 15, 20, 25, 30, 40, 50]) {
-      for (const [label, options] of [['bare', {}], ['on curve', ON_CURVE]] as const) {
+    // `SIM_LEVELS=5,25,50` narrows the table while tuning.
+    const levels = process.env.SIM_LEVELS ? process.env.SIM_LEVELS.split(',').map(Number) : [1, 5, 10, 15, 20, 25, 30, 40, 50]
+    for (const level of levels) {
+      for (const [label, options] of [['bare', {}], ['geared', GEARED], ['on curve', ON_CURVE]] as const) {
         const r = simulate(level, options)
         rows.push(`Lv${level} | ${label} | ${cell(r.fight)} | ${cell(r['sub-boss'])} | ${cell(r.boss)}`)
       }
     }
     rows.push('', 'level | stages cleared in a row per region (of 12), on curve, MP carried, no Spring | MP left')
-    for (const level of [1, 5, 10, 20, 30, 40, 50]) {
+    for (const level of process.env.SIM_LEVELS ? levels : [1, 5, 10, 20, 30, 40, 50]) {
       const r = run(level, ON_CURVE)
       rows.push(`Lv${level} | ${r.cleared.join(', ')} | ${pct(r.mpLeft)}`)
     }

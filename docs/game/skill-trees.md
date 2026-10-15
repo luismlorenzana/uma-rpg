@@ -434,201 +434,201 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-greatsword.1` | Core | Breach | free | 6 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe |
-| 1 | `cleric-greatsword.1a` | Side A | Lasting Breach | 1 | 7 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe |
-| 1 | `cleric-greatsword.1b` | Side B | Heavy Breach | 1 | 8 | one foe · 1 hit · 1.6 · Armor Break 2 on the foe |
-| 2 | `cleric-greatsword.2` | Core | Sunder Armor | free | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe |
-| 2 | `cleric-greatsword.2a` | Side A | Lasting Sunder Armor | 2 | 10 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe |
-| 2 | `cleric-greatsword.2b` | Side B | Heavy Sunder Armor | 2 | 11 | one foe · 1 hit · 2.2 · Armor Break 2 on the foe |
-| 3 | `cleric-greatsword.3` | Core | Rupture | free | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe |
-| 3 | `cleric-greatsword.3a` | Side A | Lasting Rupture | 3 | 12 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe |
-| 3 | `cleric-greatsword.3b` | Side B | Heavy Rupture | 3 | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe |
-| 4 | `cleric-greatsword.4` | Core | Ravage | free | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe |
-| 4 | `cleric-greatsword.4a` | Side A | Lasting Ravage | 4 | 14 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe |
-| 4 | `cleric-greatsword.4b` | Side B | Heavy Ravage | 4 | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe |
-| 5 | `cleric-greatsword.5` | Core | Ruin | free | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe |
-| 5 | `cleric-greatsword.5a` | Side A | Lasting Ruin | 5 | 17 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe |
-| 5 | `cleric-greatsword.5b` | Side B | Heavy Ruin | 5 | 18 | one foe · 1 hit · 4.6 · Armor Break 4 on every foe |
+| 1 | `cleric-greatsword.1` | Core | Breach | free | 6 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-greatsword.1a` | Side A | Lasting Breach | 1 | 7 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-greatsword.1b` | Side B | Heavy Breach | 1 | 8 | one foe · 1 hit · 1.6 · Armor Break 2 on the foe · Barrier 14% on the most threatened |
+| 2 | `cleric-greatsword.2` | Core | Sunder Armor | free | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-greatsword.2a` | Side A | Lasting Sunder Armor | 2 | 10 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-greatsword.2b` | Side B | Heavy Sunder Armor | 2 | 11 | one foe · 1 hit · 2.2 · Armor Break 2 on the foe · Barrier 16% on the most threatened |
+| 3 | `cleric-greatsword.3` | Core | Rupture | free | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-greatsword.3a` | Side A | Lasting Rupture | 3 | 12 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-greatsword.3b` | Side B | Heavy Rupture | 3 | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe · Barrier 18% on the most threatened |
+| 4 | `cleric-greatsword.4` | Core | Ravage | free | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-greatsword.4a` | Side A | Lasting Ravage | 4 | 14 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-greatsword.4b` | Side B | Heavy Ravage | 4 | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe · Barrier 20% on the most threatened |
+| 5 | `cleric-greatsword.5` | Core | Ruin | free | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-greatsword.5a` | Side A | Lasting Ruin | 5 | 17 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-greatsword.5b` | Side B | Heavy Ruin | 5 | 18 | one foe · 1 hit · 4.6 · Armor Break 4 on every foe · Barrier 22% on every ally |
 
 #### Cleric · Axe (`cleric-axe`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-axe.1` | Core | Hack | free | 6 | one foe · 1 hit · 1.6 · Enfeeble 1 on the foe |
-| 1 | `cleric-axe.1a` | Side A | Lasting Hack | 1 | 7 | one foe · 1 hit · 1.6 · Enfeeble 1 on the foe |
-| 1 | `cleric-axe.1b` | Side B | Heavy Hack | 1 | 8 | one foe · 1 hit · 1.6 · Enfeeble 2 on the foe |
-| 2 | `cleric-axe.2` | Core | Hamstring | free | 8 | one foe · 1 hit · 2.2 · Enfeeble 1 on the foe |
-| 2 | `cleric-axe.2a` | Side A | Lasting Hamstring | 2 | 10 | one foe · 1 hit · 2.2 · Enfeeble 1 on the foe |
-| 2 | `cleric-axe.2b` | Side B | Heavy Hamstring | 2 | 11 | one foe · 1 hit · 2.2 · Enfeeble 2 on the foe |
-| 3 | `cleric-axe.3` | Core | Maim | free | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe |
-| 3 | `cleric-axe.3a` | Side A | Lasting Maim | 3 | 12 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe |
-| 3 | `cleric-axe.3b` | Side B | Heavy Maim | 3 | 13 | one foe · 1 hit · 2.9 · Enfeeble 3 on the foe |
-| 4 | `cleric-axe.4` | Core | Cripple | free | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe |
-| 4 | `cleric-axe.4a` | Side A | Lasting Cripple | 4 | 14 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe |
-| 4 | `cleric-axe.4b` | Side B | Heavy Cripple | 4 | 16 | one foe · 1 hit · 3.7 · Enfeeble 3 on the foe |
-| 5 | `cleric-axe.5` | Core | Unmake | free | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe |
-| 5 | `cleric-axe.5a` | Side A | Lasting Unmake | 5 | 17 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe |
-| 5 | `cleric-axe.5b` | Side B | Heavy Unmake | 5 | 18 | one foe · 1 hit · 4.6 · Enfeeble 4 on every foe |
+| 1 | `cleric-axe.1` | Core | Hack | free | 6 | one foe · 1 hit · 1.6 · Enfeeble 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-axe.1a` | Side A | Lasting Hack | 1 | 7 | one foe · 1 hit · 1.6 · Enfeeble 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-axe.1b` | Side B | Heavy Hack | 1 | 8 | one foe · 1 hit · 1.6 · Enfeeble 2 on the foe · Barrier 14% on the most threatened |
+| 2 | `cleric-axe.2` | Core | Hamstring | free | 8 | one foe · 1 hit · 2.2 · Enfeeble 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-axe.2a` | Side A | Lasting Hamstring | 2 | 10 | one foe · 1 hit · 2.2 · Enfeeble 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-axe.2b` | Side B | Heavy Hamstring | 2 | 11 | one foe · 1 hit · 2.2 · Enfeeble 2 on the foe · Barrier 16% on the most threatened |
+| 3 | `cleric-axe.3` | Core | Maim | free | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-axe.3a` | Side A | Lasting Maim | 3 | 12 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-axe.3b` | Side B | Heavy Maim | 3 | 13 | one foe · 1 hit · 2.9 · Enfeeble 3 on the foe · Barrier 18% on the most threatened |
+| 4 | `cleric-axe.4` | Core | Cripple | free | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-axe.4a` | Side A | Lasting Cripple | 4 | 14 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-axe.4b` | Side B | Heavy Cripple | 4 | 16 | one foe · 1 hit · 3.7 · Enfeeble 3 on the foe · Barrier 20% on the most threatened |
+| 5 | `cleric-axe.5` | Core | Unmake | free | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-axe.5a` | Side A | Lasting Unmake | 5 | 17 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-axe.5b` | Side B | Heavy Unmake | 5 | 18 | one foe · 1 hit · 4.6 · Enfeeble 4 on every foe · Barrier 22% on every ally |
 
 #### Cleric · Lance (`cleric-lance`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-lance.1` | Core | Pierce Mind | free | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe |
-| 1 | `cleric-lance.1a` | Side A | Lasting Pierce Mind | 1 | 7 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe |
-| 1 | `cleric-lance.1b` | Side B | Heavy Pierce Mind | 1 | 8 | one foe · 1 hit · 1.6 · Mind Break 2 on the foe |
-| 2 | `cleric-lance.2` | Core | Puncture | free | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe |
-| 2 | `cleric-lance.2a` | Side A | Lasting Puncture | 2 | 10 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe |
-| 2 | `cleric-lance.2b` | Side B | Heavy Puncture | 2 | 11 | one foe · 1 hit · 2.2 · Mind Break 2 on the foe |
-| 3 | `cleric-lance.3` | Core | Impale | free | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe |
-| 3 | `cleric-lance.3a` | Side A | Lasting Impale | 3 | 12 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe |
-| 3 | `cleric-lance.3b` | Side B | Heavy Impale | 3 | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe |
-| 4 | `cleric-lance.4` | Core | Transfix | free | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe |
-| 4 | `cleric-lance.4a` | Side A | Lasting Transfix | 4 | 14 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe |
-| 4 | `cleric-lance.4b` | Side B | Heavy Transfix | 4 | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe |
-| 5 | `cleric-lance.5` | Core | Mindspike | free | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe |
-| 5 | `cleric-lance.5a` | Side A | Lasting Mindspike | 5 | 17 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe |
-| 5 | `cleric-lance.5b` | Side B | Heavy Mindspike | 5 | 18 | one foe · 1 hit · 4.6 · Mind Break 4 on every foe |
+| 1 | `cleric-lance.1` | Core | Pierce Mind | free | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-lance.1a` | Side A | Lasting Pierce Mind | 1 | 7 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-lance.1b` | Side B | Heavy Pierce Mind | 1 | 8 | one foe · 1 hit · 1.6 · Mind Break 2 on the foe · Barrier 14% on the most threatened |
+| 2 | `cleric-lance.2` | Core | Puncture | free | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-lance.2a` | Side A | Lasting Puncture | 2 | 10 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-lance.2b` | Side B | Heavy Puncture | 2 | 11 | one foe · 1 hit · 2.2 · Mind Break 2 on the foe · Barrier 16% on the most threatened |
+| 3 | `cleric-lance.3` | Core | Impale | free | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-lance.3a` | Side A | Lasting Impale | 3 | 12 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-lance.3b` | Side B | Heavy Impale | 3 | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe · Barrier 18% on the most threatened |
+| 4 | `cleric-lance.4` | Core | Transfix | free | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-lance.4a` | Side A | Lasting Transfix | 4 | 14 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-lance.4b` | Side B | Heavy Transfix | 4 | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe · Barrier 20% on the most threatened |
+| 5 | `cleric-lance.5` | Core | Mindspike | free | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-lance.5a` | Side A | Lasting Mindspike | 5 | 17 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-lance.5b` | Side B | Heavy Mindspike | 5 | 18 | one foe · 1 hit · 4.6 · Mind Break 4 on every foe · Barrier 22% on every ally |
 
 #### Cleric · Bow (`cleric-bow`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-bow.1` | Core | Chip | free | 6 | one foe · 1 hit · 1.6 · Shatter 1 on the foe |
-| 1 | `cleric-bow.1a` | Side A | Lasting Chip | 1 | 7 | one foe · 1 hit · 1.6 · Shatter 1 on the foe |
-| 1 | `cleric-bow.1b` | Side B | Heavy Chip | 1 | 8 | one foe · 1 hit · 1.6 · Shatter 2 on the foe |
-| 2 | `cleric-bow.2` | Core | Crack | free | 8 | one foe · 1 hit · 2.2 · Shatter 1 on the foe |
-| 2 | `cleric-bow.2a` | Side A | Lasting Crack | 2 | 10 | one foe · 1 hit · 2.2 · Shatter 1 on the foe |
-| 2 | `cleric-bow.2b` | Side B | Heavy Crack | 2 | 11 | one foe · 1 hit · 2.2 · Shatter 2 on the foe |
-| 3 | `cleric-bow.3` | Core | Fracture | free | 11 | one foe · 1 hit · 2.9 · Shatter 2 on the foe |
-| 3 | `cleric-bow.3a` | Side A | Lasting Fracture | 3 | 12 | one foe · 1 hit · 2.9 · Shatter 2 on the foe |
-| 3 | `cleric-bow.3b` | Side B | Heavy Fracture | 3 | 13 | one foe · 1 hit · 2.9 · Shatter 3 on the foe |
-| 4 | `cleric-bow.4` | Core | Splinter | free | 13 | one foe · 1 hit · 3.7 · Shatter 2 on the foe |
-| 4 | `cleric-bow.4a` | Side A | Lasting Splinter | 4 | 14 | one foe · 1 hit · 3.7 · Shatter 2 on the foe |
-| 4 | `cleric-bow.4b` | Side B | Heavy Splinter | 4 | 16 | one foe · 1 hit · 3.7 · Shatter 3 on the foe |
-| 5 | `cleric-bow.5` | Core | Shatterstorm | free | 16 | one foe · 1 hit · 4.6 · Shatter 3 on every foe |
-| 5 | `cleric-bow.5a` | Side A | Lasting Shatterstorm | 5 | 17 | one foe · 1 hit · 4.6 · Shatter 3 on every foe |
-| 5 | `cleric-bow.5b` | Side B | Heavy Shatterstorm | 5 | 18 | one foe · 1 hit · 4.6 · Shatter 4 on every foe |
+| 1 | `cleric-bow.1` | Core | Chip | free | 6 | one foe · 1 hit · 1.6 · Shatter 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-bow.1a` | Side A | Lasting Chip | 1 | 7 | one foe · 1 hit · 1.6 · Shatter 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-bow.1b` | Side B | Heavy Chip | 1 | 8 | one foe · 1 hit · 1.6 · Shatter 2 on the foe · Barrier 14% on the most threatened |
+| 2 | `cleric-bow.2` | Core | Crack | free | 8 | one foe · 1 hit · 2.2 · Shatter 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-bow.2a` | Side A | Lasting Crack | 2 | 10 | one foe · 1 hit · 2.2 · Shatter 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-bow.2b` | Side B | Heavy Crack | 2 | 11 | one foe · 1 hit · 2.2 · Shatter 2 on the foe · Barrier 16% on the most threatened |
+| 3 | `cleric-bow.3` | Core | Fracture | free | 11 | one foe · 1 hit · 2.9 · Shatter 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-bow.3a` | Side A | Lasting Fracture | 3 | 12 | one foe · 1 hit · 2.9 · Shatter 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-bow.3b` | Side B | Heavy Fracture | 3 | 13 | one foe · 1 hit · 2.9 · Shatter 3 on the foe · Barrier 18% on the most threatened |
+| 4 | `cleric-bow.4` | Core | Splinter | free | 13 | one foe · 1 hit · 3.7 · Shatter 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-bow.4a` | Side A | Lasting Splinter | 4 | 14 | one foe · 1 hit · 3.7 · Shatter 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-bow.4b` | Side B | Heavy Splinter | 4 | 16 | one foe · 1 hit · 3.7 · Shatter 3 on the foe · Barrier 20% on the most threatened |
+| 5 | `cleric-bow.5` | Core | Shatterstorm | free | 16 | one foe · 1 hit · 4.6 · Shatter 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-bow.5a` | Side A | Lasting Shatterstorm | 5 | 17 | one foe · 1 hit · 4.6 · Shatter 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-bow.5b` | Side B | Heavy Shatterstorm | 5 | 18 | one foe · 1 hit · 4.6 · Shatter 4 on every foe · Barrier 22% on every ally |
 
 #### Cleric · Katana (`cleric-katana`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-katana.1` | Core | Mark | free | 6 | one foe · 1 hit · 1.6 · Hex 1 on the foe |
-| 1 | `cleric-katana.1a` | Side A | Lasting Mark | 1 | 7 | one foe · 1 hit · 1.6 · Hex 1 on the foe |
-| 1 | `cleric-katana.1b` | Side B | Heavy Mark | 1 | 8 | one foe · 1 hit · 1.6 · Hex 2 on the foe |
-| 2 | `cleric-katana.2` | Core | Curse | free | 8 | one foe · 1 hit · 2.2 · Hex 1 on the foe |
-| 2 | `cleric-katana.2a` | Side A | Lasting Curse | 2 | 10 | one foe · 1 hit · 2.2 · Hex 1 on the foe |
-| 2 | `cleric-katana.2b` | Side B | Heavy Curse | 2 | 11 | one foe · 1 hit · 2.2 · Hex 2 on the foe |
-| 3 | `cleric-katana.3` | Core | Hex | free | 11 | one foe · 1 hit · 2.9 · Hex 2 on the foe |
-| 3 | `cleric-katana.3a` | Side A | Lasting Hex | 3 | 12 | one foe · 1 hit · 2.9 · Hex 2 on the foe |
-| 3 | `cleric-katana.3b` | Side B | Heavy Hex | 3 | 13 | one foe · 1 hit · 2.9 · Hex 3 on the foe |
-| 4 | `cleric-katana.4` | Core | Doom | free | 13 | one foe · 1 hit · 3.7 · Hex 2 on the foe |
-| 4 | `cleric-katana.4a` | Side A | Lasting Doom | 4 | 14 | one foe · 1 hit · 3.7 · Hex 2 on the foe |
-| 4 | `cleric-katana.4b` | Side B | Heavy Doom | 4 | 16 | one foe · 1 hit · 3.7 · Hex 3 on the foe |
-| 5 | `cleric-katana.5` | Core | Anathema | free | 16 | one foe · 1 hit · 4.6 · Hex 3 on every foe |
-| 5 | `cleric-katana.5a` | Side A | Lasting Anathema | 5 | 17 | one foe · 1 hit · 4.6 · Hex 3 on every foe |
-| 5 | `cleric-katana.5b` | Side B | Heavy Anathema | 5 | 18 | one foe · 1 hit · 4.6 · Hex 4 on every foe |
+| 1 | `cleric-katana.1` | Core | Mark | free | 6 | one foe · 1 hit · 1.6 · Hex 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-katana.1a` | Side A | Lasting Mark | 1 | 7 | one foe · 1 hit · 1.6 · Hex 1 on the foe · Barrier 14% on the most threatened |
+| 1 | `cleric-katana.1b` | Side B | Heavy Mark | 1 | 8 | one foe · 1 hit · 1.6 · Hex 2 on the foe · Barrier 14% on the most threatened |
+| 2 | `cleric-katana.2` | Core | Curse | free | 8 | one foe · 1 hit · 2.2 · Hex 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-katana.2a` | Side A | Lasting Curse | 2 | 10 | one foe · 1 hit · 2.2 · Hex 1 on the foe · Barrier 16% on the most threatened |
+| 2 | `cleric-katana.2b` | Side B | Heavy Curse | 2 | 11 | one foe · 1 hit · 2.2 · Hex 2 on the foe · Barrier 16% on the most threatened |
+| 3 | `cleric-katana.3` | Core | Hex | free | 11 | one foe · 1 hit · 2.9 · Hex 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-katana.3a` | Side A | Lasting Hex | 3 | 12 | one foe · 1 hit · 2.9 · Hex 2 on the foe · Barrier 18% on the most threatened |
+| 3 | `cleric-katana.3b` | Side B | Heavy Hex | 3 | 13 | one foe · 1 hit · 2.9 · Hex 3 on the foe · Barrier 18% on the most threatened |
+| 4 | `cleric-katana.4` | Core | Doom | free | 13 | one foe · 1 hit · 3.7 · Hex 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-katana.4a` | Side A | Lasting Doom | 4 | 14 | one foe · 1 hit · 3.7 · Hex 2 on the foe · Barrier 20% on the most threatened |
+| 4 | `cleric-katana.4b` | Side B | Heavy Doom | 4 | 16 | one foe · 1 hit · 3.7 · Hex 3 on the foe · Barrier 20% on the most threatened |
+| 5 | `cleric-katana.5` | Core | Anathema | free | 16 | one foe · 1 hit · 4.6 · Hex 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-katana.5a` | Side A | Lasting Anathema | 5 | 17 | one foe · 1 hit · 4.6 · Hex 3 on every foe · Barrier 22% on every ally |
+| 5 | `cleric-katana.5b` | Side B | Heavy Anathema | 5 | 18 | one foe · 1 hit · 4.6 · Hex 4 on every foe · Barrier 22% on every ally |
 
 #### Cleric · Fire Tome (`cleric-tome-fire`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-tome-fire.1` | Core | Valor | free | 6 | one foe · 1 hit · 1.6 · Brave 1 on every ally |
-| 1 | `cleric-tome-fire.1a` | Side A | Lasting Valor | 1 | 7 | one foe · 1 hit · 1.6 · Brave 1 on every ally |
-| 1 | `cleric-tome-fire.1b` | Side B | Heavy Valor | 1 | 8 | one foe · 1 hit · 1.6 · Brave 2 on every ally |
-| 2 | `cleric-tome-fire.2` | Core | Courage | free | 8 | one foe · 1 hit · 2.2 · Brave 1 on every ally |
-| 2 | `cleric-tome-fire.2a` | Side A | Lasting Courage | 2 | 10 | one foe · 1 hit · 2.2 · Brave 1 on every ally |
-| 2 | `cleric-tome-fire.2b` | Side B | Heavy Courage | 2 | 11 | one foe · 1 hit · 2.2 · Brave 2 on every ally |
-| 3 | `cleric-tome-fire.3` | Core | Bravery | free | 11 | one foe · 1 hit · 2.9 · Brave 2 on every ally |
-| 3 | `cleric-tome-fire.3a` | Side A | Lasting Bravery | 3 | 12 | one foe · 1 hit · 2.9 · Brave 2 on every ally |
-| 3 | `cleric-tome-fire.3b` | Side B | Heavy Bravery | 3 | 13 | one foe · 1 hit · 2.9 · Brave 3 on every ally |
-| 4 | `cleric-tome-fire.4` | Core | Heroism | free | 13 | one foe · 1 hit · 3.7 · Brave 2 on every ally |
-| 4 | `cleric-tome-fire.4a` | Side A | Lasting Heroism | 4 | 14 | one foe · 1 hit · 3.7 · Brave 2 on every ally |
-| 4 | `cleric-tome-fire.4b` | Side B | Heavy Heroism | 4 | 16 | one foe · 1 hit · 3.7 · Brave 3 on every ally |
-| 5 | `cleric-tome-fire.5` | Core | Exaltation | free | 16 | one foe · 1 hit · 4.6 · Brave 3 on every ally |
-| 5 | `cleric-tome-fire.5a` | Side A | Lasting Exaltation | 5 | 17 | one foe · 1 hit · 4.6 · Brave 3 on every ally |
-| 5 | `cleric-tome-fire.5b` | Side B | Heavy Exaltation | 5 | 18 | one foe · 1 hit · 4.6 · Brave 4 on every ally |
+| 1 | `cleric-tome-fire.1` | Core | Valor | free | 6 | one foe · 1 hit · 1.6 · Brave 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-fire.1a` | Side A | Lasting Valor | 1 | 7 | one foe · 1 hit · 1.6 · Brave 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-fire.1b` | Side B | Heavy Valor | 1 | 8 | one foe · 1 hit · 1.6 · Brave 2 on every ally · heals the most hurt 14% · cleanses |
+| 2 | `cleric-tome-fire.2` | Core | Courage | free | 8 | one foe · 1 hit · 2.2 · Brave 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-fire.2a` | Side A | Lasting Courage | 2 | 10 | one foe · 1 hit · 2.2 · Brave 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-fire.2b` | Side B | Heavy Courage | 2 | 11 | one foe · 1 hit · 2.2 · Brave 2 on every ally · heals the most hurt 16% · cleanses |
+| 3 | `cleric-tome-fire.3` | Core | Bravery | free | 11 | one foe · 1 hit · 2.9 · Brave 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-fire.3a` | Side A | Lasting Bravery | 3 | 12 | one foe · 1 hit · 2.9 · Brave 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-fire.3b` | Side B | Heavy Bravery | 3 | 13 | one foe · 1 hit · 2.9 · Brave 3 on every ally · heals the most hurt 18% · cleanses |
+| 4 | `cleric-tome-fire.4` | Core | Heroism | free | 13 | one foe · 1 hit · 3.7 · Brave 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-fire.4a` | Side A | Lasting Heroism | 4 | 14 | one foe · 1 hit · 3.7 · Brave 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-fire.4b` | Side B | Heavy Heroism | 4 | 16 | one foe · 1 hit · 3.7 · Brave 3 on every ally · heals the most hurt 20% · cleanses |
+| 5 | `cleric-tome-fire.5` | Core | Exaltation | free | 16 | one foe · 1 hit · 4.6 · Brave 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-fire.5a` | Side A | Lasting Exaltation | 5 | 17 | one foe · 1 hit · 4.6 · Brave 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-fire.5b` | Side B | Heavy Exaltation | 5 | 18 | one foe · 1 hit · 4.6 · Brave 4 on every ally · heals every ally 22% · cleanses |
 
 #### Cleric · Blizzard Tome (`cleric-tome-ice`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-tome-ice.1` | Core | Ward | free | 6 | one foe · 1 hit · 1.6 · Aegis 1 on every ally |
-| 1 | `cleric-tome-ice.1a` | Side A | Lasting Ward | 1 | 7 | one foe · 1 hit · 1.6 · Aegis 1 on every ally |
-| 1 | `cleric-tome-ice.1b` | Side B | Heavy Ward | 1 | 8 | one foe · 1 hit · 1.6 · Aegis 2 on every ally |
-| 2 | `cleric-tome-ice.2` | Core | Guard | free | 8 | one foe · 1 hit · 2.2 · Aegis 1 on every ally |
-| 2 | `cleric-tome-ice.2a` | Side A | Lasting Guard | 2 | 10 | one foe · 1 hit · 2.2 · Aegis 1 on every ally |
-| 2 | `cleric-tome-ice.2b` | Side B | Heavy Guard | 2 | 11 | one foe · 1 hit · 2.2 · Aegis 2 on every ally |
-| 3 | `cleric-tome-ice.3` | Core | Bulwark | free | 11 | one foe · 1 hit · 2.9 · Aegis 2 on every ally |
-| 3 | `cleric-tome-ice.3a` | Side A | Lasting Bulwark | 3 | 12 | one foe · 1 hit · 2.9 · Aegis 2 on every ally |
-| 3 | `cleric-tome-ice.3b` | Side B | Heavy Bulwark | 3 | 13 | one foe · 1 hit · 2.9 · Aegis 3 on every ally |
-| 4 | `cleric-tome-ice.4` | Core | Fortress | free | 13 | one foe · 1 hit · 3.7 · Aegis 2 on every ally |
-| 4 | `cleric-tome-ice.4a` | Side A | Lasting Fortress | 4 | 14 | one foe · 1 hit · 3.7 · Aegis 2 on every ally |
-| 4 | `cleric-tome-ice.4b` | Side B | Heavy Fortress | 4 | 16 | one foe · 1 hit · 3.7 · Aegis 3 on every ally |
-| 5 | `cleric-tome-ice.5` | Core | Sanctum | free | 16 | one foe · 1 hit · 4.6 · Aegis 3 on every ally |
-| 5 | `cleric-tome-ice.5a` | Side A | Lasting Sanctum | 5 | 17 | one foe · 1 hit · 4.6 · Aegis 3 on every ally |
-| 5 | `cleric-tome-ice.5b` | Side B | Heavy Sanctum | 5 | 18 | one foe · 1 hit · 4.6 · Aegis 4 on every ally |
+| 1 | `cleric-tome-ice.1` | Core | Ward | free | 6 | one foe · 1 hit · 1.6 · Aegis 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-ice.1a` | Side A | Lasting Ward | 1 | 7 | one foe · 1 hit · 1.6 · Aegis 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-ice.1b` | Side B | Heavy Ward | 1 | 8 | one foe · 1 hit · 1.6 · Aegis 2 on every ally · heals the most hurt 14% · cleanses |
+| 2 | `cleric-tome-ice.2` | Core | Guard | free | 8 | one foe · 1 hit · 2.2 · Aegis 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-ice.2a` | Side A | Lasting Guard | 2 | 10 | one foe · 1 hit · 2.2 · Aegis 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-ice.2b` | Side B | Heavy Guard | 2 | 11 | one foe · 1 hit · 2.2 · Aegis 2 on every ally · heals the most hurt 16% · cleanses |
+| 3 | `cleric-tome-ice.3` | Core | Bulwark | free | 11 | one foe · 1 hit · 2.9 · Aegis 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-ice.3a` | Side A | Lasting Bulwark | 3 | 12 | one foe · 1 hit · 2.9 · Aegis 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-ice.3b` | Side B | Heavy Bulwark | 3 | 13 | one foe · 1 hit · 2.9 · Aegis 3 on every ally · heals the most hurt 18% · cleanses |
+| 4 | `cleric-tome-ice.4` | Core | Fortress | free | 13 | one foe · 1 hit · 3.7 · Aegis 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-ice.4a` | Side A | Lasting Fortress | 4 | 14 | one foe · 1 hit · 3.7 · Aegis 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-ice.4b` | Side B | Heavy Fortress | 4 | 16 | one foe · 1 hit · 3.7 · Aegis 3 on every ally · heals the most hurt 20% · cleanses |
+| 5 | `cleric-tome-ice.5` | Core | Sanctum | free | 16 | one foe · 1 hit · 4.6 · Aegis 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-ice.5a` | Side A | Lasting Sanctum | 5 | 17 | one foe · 1 hit · 4.6 · Aegis 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-ice.5b` | Side B | Heavy Sanctum | 5 | 18 | one foe · 1 hit · 4.6 · Aegis 4 on every ally · heals every ally 22% · cleanses |
 
 #### Cleric · Thunder Tome (`cleric-tome-lightning`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-tome-lightning.1` | Core | Spark | free | 6 | one foe · 1 hit · 1.6 · Breaker 1 on every ally |
-| 1 | `cleric-tome-lightning.1a` | Side A | Lasting Spark | 1 | 7 | one foe · 1 hit · 1.6 · Breaker 1 on every ally |
-| 1 | `cleric-tome-lightning.1b` | Side B | Heavy Spark | 1 | 8 | one foe · 1 hit · 1.6 · Breaker 2 on every ally |
-| 2 | `cleric-tome-lightning.2` | Core | Charge | free | 8 | one foe · 1 hit · 2.2 · Breaker 1 on every ally |
-| 2 | `cleric-tome-lightning.2a` | Side A | Lasting Charge | 2 | 10 | one foe · 1 hit · 2.2 · Breaker 1 on every ally |
-| 2 | `cleric-tome-lightning.2b` | Side B | Heavy Charge | 2 | 11 | one foe · 1 hit · 2.2 · Breaker 2 on every ally |
-| 3 | `cleric-tome-lightning.3` | Core | Surge | free | 11 | one foe · 1 hit · 2.9 · Breaker 2 on every ally |
-| 3 | `cleric-tome-lightning.3a` | Side A | Lasting Surge | 3 | 12 | one foe · 1 hit · 2.9 · Breaker 2 on every ally |
-| 3 | `cleric-tome-lightning.3b` | Side B | Heavy Surge | 3 | 13 | one foe · 1 hit · 2.9 · Breaker 3 on every ally |
-| 4 | `cleric-tome-lightning.4` | Core | Overcharge | free | 13 | one foe · 1 hit · 3.7 · Breaker 2 on every ally |
-| 4 | `cleric-tome-lightning.4a` | Side A | Lasting Overcharge | 4 | 14 | one foe · 1 hit · 3.7 · Breaker 2 on every ally |
-| 4 | `cleric-tome-lightning.4b` | Side B | Heavy Overcharge | 4 | 16 | one foe · 1 hit · 3.7 · Breaker 3 on every ally |
-| 5 | `cleric-tome-lightning.5` | Core | Breakstorm | free | 16 | one foe · 1 hit · 4.6 · Breaker 3 on every ally |
-| 5 | `cleric-tome-lightning.5a` | Side A | Lasting Breakstorm | 5 | 17 | one foe · 1 hit · 4.6 · Breaker 3 on every ally |
-| 5 | `cleric-tome-lightning.5b` | Side B | Heavy Breakstorm | 5 | 18 | one foe · 1 hit · 4.6 · Breaker 4 on every ally |
+| 1 | `cleric-tome-lightning.1` | Core | Spark | free | 6 | one foe · 1 hit · 1.6 · Breaker 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-lightning.1a` | Side A | Lasting Spark | 1 | 7 | one foe · 1 hit · 1.6 · Breaker 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-lightning.1b` | Side B | Heavy Spark | 1 | 8 | one foe · 1 hit · 1.6 · Breaker 2 on every ally · heals the most hurt 14% · cleanses |
+| 2 | `cleric-tome-lightning.2` | Core | Charge | free | 8 | one foe · 1 hit · 2.2 · Breaker 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-lightning.2a` | Side A | Lasting Charge | 2 | 10 | one foe · 1 hit · 2.2 · Breaker 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-lightning.2b` | Side B | Heavy Charge | 2 | 11 | one foe · 1 hit · 2.2 · Breaker 2 on every ally · heals the most hurt 16% · cleanses |
+| 3 | `cleric-tome-lightning.3` | Core | Surge | free | 11 | one foe · 1 hit · 2.9 · Breaker 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-lightning.3a` | Side A | Lasting Surge | 3 | 12 | one foe · 1 hit · 2.9 · Breaker 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-lightning.3b` | Side B | Heavy Surge | 3 | 13 | one foe · 1 hit · 2.9 · Breaker 3 on every ally · heals the most hurt 18% · cleanses |
+| 4 | `cleric-tome-lightning.4` | Core | Overcharge | free | 13 | one foe · 1 hit · 3.7 · Breaker 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-lightning.4a` | Side A | Lasting Overcharge | 4 | 14 | one foe · 1 hit · 3.7 · Breaker 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-lightning.4b` | Side B | Heavy Overcharge | 4 | 16 | one foe · 1 hit · 3.7 · Breaker 3 on every ally · heals the most hurt 20% · cleanses |
+| 5 | `cleric-tome-lightning.5` | Core | Breakstorm | free | 16 | one foe · 1 hit · 4.6 · Breaker 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-lightning.5a` | Side A | Lasting Breakstorm | 5 | 17 | one foe · 1 hit · 4.6 · Breaker 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-lightning.5b` | Side B | Heavy Breakstorm | 5 | 18 | one foe · 1 hit · 4.6 · Breaker 4 on every ally · heals every ally 22% · cleanses |
 
 #### Cleric · Light Tome (`cleric-tome-light`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-tome-light.1` | Core | Grace | free | 6 | one foe · 1 hit · 1.6 · Faith 1 on every ally |
-| 1 | `cleric-tome-light.1a` | Side A | Lasting Grace | 1 | 7 | one foe · 1 hit · 1.6 · Faith 1 on every ally |
-| 1 | `cleric-tome-light.1b` | Side B | Heavy Grace | 1 | 8 | one foe · 1 hit · 1.6 · Faith 2 on every ally |
-| 2 | `cleric-tome-light.2` | Core | Faith | free | 8 | one foe · 1 hit · 2.2 · Faith 1 on every ally |
-| 2 | `cleric-tome-light.2a` | Side A | Lasting Faith | 2 | 10 | one foe · 1 hit · 2.2 · Faith 1 on every ally |
-| 2 | `cleric-tome-light.2b` | Side B | Heavy Faith | 2 | 11 | one foe · 1 hit · 2.2 · Faith 2 on every ally |
-| 3 | `cleric-tome-light.3` | Core | Devotion | free | 11 | one foe · 1 hit · 2.9 · Faith 2 on every ally |
-| 3 | `cleric-tome-light.3a` | Side A | Lasting Devotion | 3 | 12 | one foe · 1 hit · 2.9 · Faith 2 on every ally |
-| 3 | `cleric-tome-light.3b` | Side B | Heavy Devotion | 3 | 13 | one foe · 1 hit · 2.9 · Faith 3 on every ally |
-| 4 | `cleric-tome-light.4` | Core | Piety | free | 13 | one foe · 1 hit · 3.7 · Faith 2 on every ally |
-| 4 | `cleric-tome-light.4a` | Side A | Lasting Piety | 4 | 14 | one foe · 1 hit · 3.7 · Faith 2 on every ally |
-| 4 | `cleric-tome-light.4b` | Side B | Heavy Piety | 4 | 16 | one foe · 1 hit · 3.7 · Faith 3 on every ally |
-| 5 | `cleric-tome-light.5` | Core | Benediction | free | 16 | one foe · 1 hit · 4.6 · Faith 3 on every ally |
-| 5 | `cleric-tome-light.5a` | Side A | Lasting Benediction | 5 | 17 | one foe · 1 hit · 4.6 · Faith 3 on every ally |
-| 5 | `cleric-tome-light.5b` | Side B | Heavy Benediction | 5 | 18 | one foe · 1 hit · 4.6 · Faith 4 on every ally |
+| 1 | `cleric-tome-light.1` | Core | Grace | free | 6 | one foe · 1 hit · 1.6 · Faith 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-light.1a` | Side A | Lasting Grace | 1 | 7 | one foe · 1 hit · 1.6 · Faith 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-light.1b` | Side B | Heavy Grace | 1 | 8 | one foe · 1 hit · 1.6 · Faith 2 on every ally · heals the most hurt 14% · cleanses |
+| 2 | `cleric-tome-light.2` | Core | Faith | free | 8 | one foe · 1 hit · 2.2 · Faith 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-light.2a` | Side A | Lasting Faith | 2 | 10 | one foe · 1 hit · 2.2 · Faith 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-light.2b` | Side B | Heavy Faith | 2 | 11 | one foe · 1 hit · 2.2 · Faith 2 on every ally · heals the most hurt 16% · cleanses |
+| 3 | `cleric-tome-light.3` | Core | Devotion | free | 11 | one foe · 1 hit · 2.9 · Faith 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-light.3a` | Side A | Lasting Devotion | 3 | 12 | one foe · 1 hit · 2.9 · Faith 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-light.3b` | Side B | Rebirth | 3 | 13 | one foe · 1 hit · 2.9 · Faith 3 on every ally · heals the most hurt 18% · cleanses · revives the fallen |
+| 4 | `cleric-tome-light.4` | Core | Piety | free | 13 | one foe · 1 hit · 3.7 · Faith 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-light.4a` | Side A | Lasting Piety | 4 | 14 | one foe · 1 hit · 3.7 · Faith 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-light.4b` | Side B | Heavy Piety | 4 | 16 | one foe · 1 hit · 3.7 · Faith 3 on every ally · heals the most hurt 20% · cleanses |
+| 5 | `cleric-tome-light.5` | Core | Benediction | free | 16 | one foe · 1 hit · 4.6 · Faith 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-light.5a` | Side A | Lasting Benediction | 5 | 17 | one foe · 1 hit · 4.6 · Faith 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-light.5b` | Side B | Heavy Benediction | 5 | 18 | one foe · 1 hit · 4.6 · Faith 4 on every ally · heals every ally 22% · cleanses |
 
 #### Cleric · Dark Tome (`cleric-tome-dark`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `cleric-tome-dark.1` | Core | Calm | free | 6 | one foe · 1 hit · 1.6 · Clarity 1 on every ally |
-| 1 | `cleric-tome-dark.1a` | Side A | Lasting Calm | 1 | 7 | one foe · 1 hit · 1.6 · Clarity 1 on every ally |
-| 1 | `cleric-tome-dark.1b` | Side B | Heavy Calm | 1 | 8 | one foe · 1 hit · 1.6 · Clarity 2 on every ally |
-| 2 | `cleric-tome-dark.2` | Core | Focus | free | 8 | one foe · 1 hit · 2.2 · Clarity 1 on every ally |
-| 2 | `cleric-tome-dark.2a` | Side A | Lasting Focus | 2 | 10 | one foe · 1 hit · 2.2 · Clarity 1 on every ally |
-| 2 | `cleric-tome-dark.2b` | Side B | Heavy Focus | 2 | 11 | one foe · 1 hit · 2.2 · Clarity 2 on every ally |
-| 3 | `cleric-tome-dark.3` | Core | Clarity | free | 11 | one foe · 1 hit · 2.9 · Clarity 2 on every ally |
-| 3 | `cleric-tome-dark.3a` | Side A | Lasting Clarity | 3 | 12 | one foe · 1 hit · 2.9 · Clarity 2 on every ally |
-| 3 | `cleric-tome-dark.3b` | Side B | Heavy Clarity | 3 | 13 | one foe · 1 hit · 2.9 · Clarity 3 on every ally |
-| 4 | `cleric-tome-dark.4` | Core | Insight | free | 13 | one foe · 1 hit · 3.7 · Clarity 2 on every ally |
-| 4 | `cleric-tome-dark.4a` | Side A | Lasting Insight | 4 | 14 | one foe · 1 hit · 3.7 · Clarity 2 on every ally |
-| 4 | `cleric-tome-dark.4b` | Side B | Heavy Insight | 4 | 16 | one foe · 1 hit · 3.7 · Clarity 3 on every ally |
-| 5 | `cleric-tome-dark.5` | Core | Enlightenment | free | 16 | one foe · 1 hit · 4.6 · Clarity 3 on every ally |
-| 5 | `cleric-tome-dark.5a` | Side A | Lasting Enlightenment | 5 | 17 | one foe · 1 hit · 4.6 · Clarity 3 on every ally |
-| 5 | `cleric-tome-dark.5b` | Side B | Heavy Enlightenment | 5 | 18 | one foe · 1 hit · 4.6 · Clarity 4 on every ally |
+| 1 | `cleric-tome-dark.1` | Core | Calm | free | 6 | one foe · 1 hit · 1.6 · Clarity 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-dark.1a` | Side A | Lasting Calm | 1 | 7 | one foe · 1 hit · 1.6 · Clarity 1 on every ally · heals the most hurt 14% · cleanses |
+| 1 | `cleric-tome-dark.1b` | Side B | Heavy Calm | 1 | 8 | one foe · 1 hit · 1.6 · Clarity 2 on every ally · heals the most hurt 14% · cleanses |
+| 2 | `cleric-tome-dark.2` | Core | Focus | free | 8 | one foe · 1 hit · 2.2 · Clarity 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-dark.2a` | Side A | Lasting Focus | 2 | 10 | one foe · 1 hit · 2.2 · Clarity 1 on every ally · heals the most hurt 16% · cleanses |
+| 2 | `cleric-tome-dark.2b` | Side B | Heavy Focus | 2 | 11 | one foe · 1 hit · 2.2 · Clarity 2 on every ally · heals the most hurt 16% · cleanses |
+| 3 | `cleric-tome-dark.3` | Core | Clarity | free | 11 | one foe · 1 hit · 2.9 · Clarity 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-dark.3a` | Side A | Lasting Clarity | 3 | 12 | one foe · 1 hit · 2.9 · Clarity 2 on every ally · heals the most hurt 18% · cleanses |
+| 3 | `cleric-tome-dark.3b` | Side B | Heavy Clarity | 3 | 13 | one foe · 1 hit · 2.9 · Clarity 3 on every ally · heals the most hurt 18% · cleanses |
+| 4 | `cleric-tome-dark.4` | Core | Insight | free | 13 | one foe · 1 hit · 3.7 · Clarity 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-dark.4a` | Side A | Lasting Insight | 4 | 14 | one foe · 1 hit · 3.7 · Clarity 2 on every ally · heals the most hurt 20% · cleanses |
+| 4 | `cleric-tome-dark.4b` | Side B | Heavy Insight | 4 | 16 | one foe · 1 hit · 3.7 · Clarity 3 on every ally · heals the most hurt 20% · cleanses |
+| 5 | `cleric-tome-dark.5` | Core | Enlightenment | free | 16 | one foe · 1 hit · 4.6 · Clarity 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-dark.5a` | Side A | Lasting Enlightenment | 5 | 17 | one foe · 1 hit · 4.6 · Clarity 3 on every ally · heals every ally 22% · cleanses |
+| 5 | `cleric-tome-dark.5b` | Side B | Heavy Enlightenment | 5 | 18 | one foe · 1 hit · 4.6 · Clarity 4 on every ally · heals every ally 22% · cleanses |
 
 ### Summoner
 
@@ -638,41 +638,41 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `summoner-greatsword.1` | Core | Squire | free | 7 | one foe · 1 hit · 1.6 · lingers at 0.3 |
-| 1 | `summoner-greatsword.1a` | Side A | Squire Pack | 1 | 7 | one foe · 2 hits · 1.52 · lingers at 0.3 |
-| 1 | `summoner-greatsword.1b` | Side B | Bonded Squire | 1 | 8 | one foe · 1 hit · 1.6 · lingers at 0.4 |
-| 2 | `summoner-greatsword.2` | Core | Sword Knight | free | 10 | one foe · 1 hit · 2.2 · lingers at 0.3 |
-| 2 | `summoner-greatsword.2a` | Side A | Sword Knight Pack | 2 | 10 | one foe · 2 hits · 2.09 · lingers at 0.3 |
-| 2 | `summoner-greatsword.2b` | Side B | Bonded Sword Knight | 2 | 11 | one foe · 1 hit · 2.2 · lingers at 0.4 |
-| 3 | `summoner-greatsword.3` | Core | Paladin | free | 13 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 3 | `summoner-greatsword.3a` | Side A | Paladin Pack | 3 | 13 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 3 | `summoner-greatsword.3b` | Side B | Bonded Paladin | 3 | 14 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `summoner-greatsword.4` | Core | Blade Champion | free | 15 | one foe · 2 hits · 3.7 · lingers at 0.3 |
-| 4 | `summoner-greatsword.4a` | Side A | Blade Champion Pack | 4 | 15 | one foe · 3 hits · 3.516 · lingers at 0.3 |
-| 4 | `summoner-greatsword.4b` | Side B | Bonded Blade Champion | 4 | 17 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `summoner-greatsword.5` | Core | Sword Saint | free | 18 | one foe · 3 hits · 4.599 · lingers at 0.3 |
-| 5 | `summoner-greatsword.5a` | Side A | Sword Saint Pack | 5 | 18 | one foe · 4 hits · 4.368 · lingers at 0.3 |
-| 5 | `summoner-greatsword.5b` | Side B | Bonded Sword Saint | 5 | 20 | one foe · 3 hits · 4.599 · lingers at 0.4 |
+| 1 | `summoner-greatsword.1` | Core | Squire | free | 7 | one foe · 1 hit · 1.6 · lingers at 0.3 · Aegis 1 on every ally |
+| 1 | `summoner-greatsword.1a` | Side A | Squire Pack | 1 | 7 | one foe · 2 hits · 1.52 · lingers at 0.3 · Aegis 1 on every ally |
+| 1 | `summoner-greatsword.1b` | Side B | Bonded Squire | 1 | 8 | one foe · 1 hit · 1.6 · lingers at 0.4 · Aegis 1 on every ally |
+| 2 | `summoner-greatsword.2` | Core | Shield Knight | free | 10 | one foe · 1 hit · 2.2 · lingers at 0.3 · Aegis 1 on every ally |
+| 2 | `summoner-greatsword.2a` | Side A | Shield Knight Pack | 2 | 10 | one foe · 2 hits · 2.09 · lingers at 0.3 · Aegis 1 on every ally |
+| 2 | `summoner-greatsword.2b` | Side B | Bonded Shield Knight | 2 | 11 | one foe · 1 hit · 2.2 · lingers at 0.4 · Aegis 1 on every ally |
+| 3 | `summoner-greatsword.3` | Core | Paladin | free | 13 | one foe · 2 hits · 2.9 · lingers at 0.3 · Aegis 1 on every ally |
+| 3 | `summoner-greatsword.3a` | Side A | Paladin Pack | 3 | 13 | one foe · 3 hits · 2.754 · lingers at 0.3 · Aegis 1 on every ally |
+| 3 | `summoner-greatsword.3b` | Side B | Bonded Paladin | 3 | 14 | one foe · 2 hits · 2.9 · lingers at 0.4 · Aegis 1 on every ally |
+| 4 | `summoner-greatsword.4` | Core | Aegis Champion | free | 15 | one foe · 2 hits · 3.7 · lingers at 0.3 · Aegis 1 on every ally |
+| 4 | `summoner-greatsword.4a` | Side A | Aegis Champion Pack | 4 | 15 | one foe · 3 hits · 3.516 · lingers at 0.3 · Aegis 1 on every ally |
+| 4 | `summoner-greatsword.4b` | Side B | Bonded Aegis Champion | 4 | 17 | one foe · 2 hits · 3.7 · lingers at 0.4 · Aegis 1 on every ally |
+| 5 | `summoner-greatsword.5` | Core | Sword Saint | free | 18 | one foe · 3 hits · 4.599 · lingers at 0.3 · Aegis 2 on every ally |
+| 5 | `summoner-greatsword.5a` | Side A | Sword Saint Pack | 5 | 18 | one foe · 4 hits · 4.368 · lingers at 0.3 · Aegis 2 on every ally |
+| 5 | `summoner-greatsword.5b` | Side B | Bonded Sword Saint | 5 | 20 | one foe · 3 hits · 4.599 · lingers at 0.4 · Aegis 2 on every ally |
 
 #### Summoner · Axe (`summoner-axe`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `summoner-axe.1` | Core | Brigand | free | 10 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 1 | `summoner-axe.1a` | Side A | Brigand Pack | 1 | 10 | every foe · 2 hits · 0.836 · lingers at 0.3 |
-| 1 | `summoner-axe.1b` | Side B | Bonded Brigand | 1 | 11 | every foe · 1 hit · 0.88 · lingers at 0.4 |
-| 2 | `summoner-axe.2` | Core | Berserker | free | 13 | every foe · 1 hit · 1.21 · lingers at 0.3 |
-| 2 | `summoner-axe.2a` | Side A | Berserker Pack | 2 | 13 | every foe · 2 hits · 1.15 · lingers at 0.3 |
-| 2 | `summoner-axe.2b` | Side B | Bonded Berserker | 2 | 14 | every foe · 1 hit · 1.21 · lingers at 0.4 |
-| 3 | `summoner-axe.3` | Core | Axe Ogre | free | 15 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 3 | `summoner-axe.3a` | Side A | Axe Ogre Pack | 3 | 15 | every foe · 3 hits · 1.515 · lingers at 0.3 |
-| 3 | `summoner-axe.3b` | Side B | Bonded Axe Ogre | 3 | 17 | every foe · 2 hits · 1.596 · lingers at 0.4 |
-| 4 | `summoner-axe.4` | Core | Minotaur Chief | free | 18 | every foe · 2 hits · 2.036 · lingers at 0.3 |
-| 4 | `summoner-axe.4a` | Side A | Minotaur Chief Pack | 4 | 18 | every foe · 3 hits · 1.932 · lingers at 0.3 |
-| 4 | `summoner-axe.4b` | Side B | Bonded Minotaur Chief | 4 | 20 | every foe · 2 hits · 2.036 · lingers at 0.4 |
-| 5 | `summoner-axe.5` | Core | Jotun Warlord | free | 21 | every foe · 3 hits · 2.529 · lingers at 0.3 |
-| 5 | `summoner-axe.5a` | Side A | Jotun Warlord Pack | 5 | 21 | every foe · 4 hits · 2.404 · lingers at 0.3 |
-| 5 | `summoner-axe.5b` | Side B | Bonded Jotun Warlord | 5 | 22 | every foe · 3 hits · 2.529 · lingers at 0.4 |
+| 1 | `summoner-axe.1` | Core | Brigand | free | 10 | every foe · 1 hit · 0.88 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 1 | `summoner-axe.1a` | Side A | Brigand Pack | 1 | 10 | every foe · 2 hits · 0.836 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 1 | `summoner-axe.1b` | Side B | Bonded Brigand | 1 | 11 | every foe · 1 hit · 0.88 · lingers at 0.4 · Enfeeble 1 on every foe hit |
+| 2 | `summoner-axe.2` | Core | Berserker | free | 13 | every foe · 1 hit · 1.21 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 2 | `summoner-axe.2a` | Side A | Berserker Pack | 2 | 13 | every foe · 2 hits · 1.15 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 2 | `summoner-axe.2b` | Side B | Bonded Berserker | 2 | 14 | every foe · 1 hit · 1.21 · lingers at 0.4 · Enfeeble 1 on every foe hit |
+| 3 | `summoner-axe.3` | Core | Axe Ogre | free | 15 | every foe · 2 hits · 1.596 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 3 | `summoner-axe.3a` | Side A | Axe Ogre Pack | 3 | 15 | every foe · 3 hits · 1.515 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 3 | `summoner-axe.3b` | Side B | Bonded Axe Ogre | 3 | 17 | every foe · 2 hits · 1.596 · lingers at 0.4 · Enfeeble 1 on every foe hit |
+| 4 | `summoner-axe.4` | Core | Minotaur Chief | free | 18 | every foe · 2 hits · 2.036 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 4 | `summoner-axe.4a` | Side A | Minotaur Chief Pack | 4 | 18 | every foe · 3 hits · 1.932 · lingers at 0.3 · Enfeeble 1 on every foe hit |
+| 4 | `summoner-axe.4b` | Side B | Bonded Minotaur Chief | 4 | 20 | every foe · 2 hits · 2.036 · lingers at 0.4 · Enfeeble 1 on every foe hit |
+| 5 | `summoner-axe.5` | Core | Jotun Warlord | free | 21 | every foe · 3 hits · 2.529 · lingers at 0.3 · Enfeeble 2 on every foe hit |
+| 5 | `summoner-axe.5a` | Side A | Jotun Warlord Pack | 5 | 21 | every foe · 4 hits · 2.404 · lingers at 0.3 · Enfeeble 2 on every foe hit |
+| 5 | `summoner-axe.5b` | Side B | Bonded Jotun Warlord | 5 | 22 | every foe · 3 hits · 2.529 · lingers at 0.4 · Enfeeble 2 on every foe hit |
 
 #### Summoner · Lance (`summoner-lance`)
 
@@ -687,12 +687,12 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 | 3 | `summoner-lance.3` | Core | Lance Knight | free | 13 | random foes · 3 hits · 3.045 · lingers at 0.3 |
 | 3 | `summoner-lance.3a` | Side A | Lance Knight Pack | 3 | 13 | random foes · 4 hits · 2.892 · lingers at 0.3 |
 | 3 | `summoner-lance.3b` | Side B | Bonded Lance Knight | 3 | 14 | random foes · 3 hits · 3.045 · lingers at 0.4 |
-| 4 | `summoner-lance.4` | Core | Valkyrie | free | 15 | random foes · 3 hits · 3.885 · lingers at 0.3 |
-| 4 | `summoner-lance.4a` | Side A | Valkyrie Pack | 4 | 15 | random foes · 4 hits · 3.692 · lingers at 0.3 |
-| 4 | `summoner-lance.4b` | Side B | Bonded Valkyrie | 4 | 17 | random foes · 3 hits · 3.885 · lingers at 0.4 |
-| 5 | `summoner-lance.5` | Core | Valkyrie Queen | free | 18 | random foes · 4 hits · 4.832 · lingers at 0.3 |
-| 5 | `summoner-lance.5a` | Side A | Valkyrie Queen Pack | 5 | 18 | random foes · 5 hits · 4.59 · lingers at 0.3 |
-| 5 | `summoner-lance.5b` | Side B | Bonded Valkyrie Queen | 5 | 20 | random foes · 4 hits · 4.832 · lingers at 0.4 |
+| 4 | `summoner-lance.4` | Core | Valkyrie | free | 15 | random foes · 3 hits · 3.885 · lingers at 0.3 · revives the fallen |
+| 4 | `summoner-lance.4a` | Side A | Valkyrie Pack | 4 | 15 | random foes · 4 hits · 3.692 · lingers at 0.3 · revives the fallen |
+| 4 | `summoner-lance.4b` | Side B | Bonded Valkyrie | 4 | 17 | random foes · 3 hits · 3.885 · lingers at 0.4 · revives the fallen |
+| 5 | `summoner-lance.5` | Core | Valkyrie Queen | free | 18 | random foes · 4 hits · 4.832 · lingers at 0.3 · revives the fallen |
+| 5 | `summoner-lance.5a` | Side A | Valkyrie Queen Pack | 5 | 18 | random foes · 5 hits · 4.59 · lingers at 0.3 · revives the fallen |
+| 5 | `summoner-lance.5b` | Side B | Bonded Valkyrie Queen | 5 | 20 | random foes · 4 hits · 4.832 · lingers at 0.4 · revives the fallen |
 
 #### Summoner · Bow (`summoner-bow`)
 
@@ -758,21 +758,21 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `summoner-tome-ice.1` | Core | Frost Sprites | free | 10 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 1 | `summoner-tome-ice.1a` | Side A | Frost Sprites Pack | 1 | 10 | every foe · 2 hits · 0.836 · lingers at 0.3 |
-| 1 | `summoner-tome-ice.1b` | Side B | Bonded Frost Sprites | 1 | 11 | every foe · 1 hit · 0.88 · lingers at 0.4 |
-| 2 | `summoner-tome-ice.2` | Core | Snow Wolves | free | 13 | every foe · 2 hits · 1.21 · lingers at 0.3 |
-| 2 | `summoner-tome-ice.2a` | Side A | Snow Wolves Pack | 2 | 13 | every foe · 3 hits · 1.149 · lingers at 0.3 |
-| 2 | `summoner-tome-ice.2b` | Side B | Bonded Snow Wolves | 2 | 14 | every foe · 2 hits · 1.21 · lingers at 0.4 |
-| 3 | `summoner-tome-ice.3` | Core | Ice Golem | free | 15 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 3 | `summoner-tome-ice.3a` | Side A | Ice Golem Pack | 3 | 15 | every foe · 3 hits · 1.515 · lingers at 0.3 |
-| 3 | `summoner-tome-ice.3b` | Side B | Bonded Ice Golem | 3 | 17 | every foe · 2 hits · 1.596 · lingers at 0.4 |
-| 4 | `summoner-tome-ice.4` | Core | Frost Titan | free | 18 | every foe · 3 hits · 2.034 · lingers at 0.3 |
-| 4 | `summoner-tome-ice.4a` | Side A | Frost Titan Pack | 4 | 18 | every foe · 4 hits · 1.932 · lingers at 0.3 |
-| 4 | `summoner-tome-ice.4b` | Side B | Bonded Frost Titan | 4 | 20 | every foe · 3 hits · 2.034 · lingers at 0.4 |
-| 5 | `summoner-tome-ice.5` | Core | Winter Queen | free | 21 | every foe · 3 hits · 2.529 · lingers at 0.3 |
-| 5 | `summoner-tome-ice.5a` | Side A | Winter Queen Pack | 5 | 21 | every foe · 4 hits · 2.404 · lingers at 0.3 |
-| 5 | `summoner-tome-ice.5b` | Side B | Bonded Winter Queen | 5 | 22 | every foe · 3 hits · 2.529 · lingers at 0.4 |
+| 1 | `summoner-tome-ice.1` | Core | Frost Sprites | free | 10 | every foe · 1 hit · 0.88 · lingers at 0.3 · Barrier 5% on every ally |
+| 1 | `summoner-tome-ice.1a` | Side A | Frost Sprites Pack | 1 | 10 | every foe · 2 hits · 0.836 · lingers at 0.3 · Barrier 5% on every ally |
+| 1 | `summoner-tome-ice.1b` | Side B | Bonded Frost Sprites | 1 | 11 | every foe · 1 hit · 0.88 · lingers at 0.4 · Barrier 5% on every ally |
+| 2 | `summoner-tome-ice.2` | Core | Snow Sentinel | free | 13 | every foe · 2 hits · 1.21 · lingers at 0.3 · Barrier 6% on every ally |
+| 2 | `summoner-tome-ice.2a` | Side A | Snow Sentinel Pack | 2 | 13 | every foe · 3 hits · 1.149 · lingers at 0.3 · Barrier 6% on every ally |
+| 2 | `summoner-tome-ice.2b` | Side B | Bonded Snow Sentinel | 2 | 14 | every foe · 2 hits · 1.21 · lingers at 0.4 · Barrier 6% on every ally |
+| 3 | `summoner-tome-ice.3` | Core | Ice Golem | free | 15 | every foe · 2 hits · 1.596 · lingers at 0.3 · Barrier 6% on every ally |
+| 3 | `summoner-tome-ice.3a` | Side A | Ice Golem Pack | 3 | 15 | every foe · 3 hits · 1.515 · lingers at 0.3 · Barrier 6% on every ally |
+| 3 | `summoner-tome-ice.3b` | Side B | Bonded Ice Golem | 3 | 17 | every foe · 2 hits · 1.596 · lingers at 0.4 · Barrier 6% on every ally |
+| 4 | `summoner-tome-ice.4` | Core | Frost Titan | free | 18 | every foe · 3 hits · 2.034 · lingers at 0.3 · Barrier 7% on every ally |
+| 4 | `summoner-tome-ice.4a` | Side A | Frost Titan Pack | 4 | 18 | every foe · 4 hits · 1.932 · lingers at 0.3 · Barrier 7% on every ally |
+| 4 | `summoner-tome-ice.4b` | Side B | Bonded Frost Titan | 4 | 20 | every foe · 3 hits · 2.034 · lingers at 0.4 · Barrier 7% on every ally |
+| 5 | `summoner-tome-ice.5` | Core | Winter Queen | free | 21 | every foe · 3 hits · 2.529 · lingers at 0.3 · Barrier 8% on every ally |
+| 5 | `summoner-tome-ice.5a` | Side A | Winter Queen Pack | 5 | 21 | every foe · 4 hits · 2.404 · lingers at 0.3 · Barrier 8% on every ally |
+| 5 | `summoner-tome-ice.5b` | Side B | Bonded Winter Queen | 5 | 22 | every foe · 3 hits · 2.529 · lingers at 0.4 · Barrier 8% on every ally |
 
 #### Summoner · Thunder Tome (`summoner-tome-lightning`)
 
@@ -798,39 +798,39 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `summoner-tome-light.1` | Core | Cherub | free | 7 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 1 | `summoner-tome-light.1a` | Side A | Cherub Pack | 1 | 7 | one foe · 3 hits · 1.521 · lingers at 0.3 |
-| 1 | `summoner-tome-light.1b` | Side B | Bonded Cherub | 1 | 8 | one foe · 2 hits · 1.6 · lingers at 0.4 |
-| 2 | `summoner-tome-light.2` | Core | Angel Lancer | free | 10 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 2 | `summoner-tome-light.2a` | Side A | Angel Lancer Pack | 2 | 10 | one foe · 3 hits · 2.091 · lingers at 0.3 |
-| 2 | `summoner-tome-light.2b` | Side B | Bonded Angel Lancer | 2 | 11 | one foe · 2 hits · 2.2 · lingers at 0.4 |
-| 3 | `summoner-tome-light.3` | Core | Seraph Phalanx | free | 13 | one foe · 3 hits · 2.901 · lingers at 0.3 |
-| 3 | `summoner-tome-light.3a` | Side A | Seraph Phalanx Pack | 3 | 13 | one foe · 4 hits · 2.756 · lingers at 0.3 |
-| 3 | `summoner-tome-light.3b` | Side B | Bonded Seraph Phalanx | 3 | 14 | one foe · 3 hits · 2.901 · lingers at 0.4 |
-| 4 | `summoner-tome-light.4` | Core | Dominion Host | free | 15 | one foe · 3 hits · 3.699 · lingers at 0.3 |
-| 4 | `summoner-tome-light.4a` | Side A | Dominion Host Pack | 4 | 15 | one foe · 4 hits · 3.516 · lingers at 0.3 |
-| 4 | `summoner-tome-light.4b` | Side B | Bonded Dominion Host | 4 | 17 | one foe · 3 hits · 3.699 · lingers at 0.4 |
-| 5 | `summoner-tome-light.5` | Core | Heaven's Legion | free | 18 | one foe · 4 hits · 4.6 · lingers at 0.3 |
-| 5 | `summoner-tome-light.5a` | Side A | Heaven's Legion Pack | 5 | 18 | one foe · 5 hits · 4.37 · lingers at 0.3 |
-| 5 | `summoner-tome-light.5b` | Side B | Bonded Heaven's Legion | 5 | 20 | one foe · 4 hits · 4.6 · lingers at 0.4 |
+| 1 | `summoner-tome-light.1` | Core | Cherub | free | 7 | one foe · 2 hits · 1.6 · lingers at 0.3 · heals every ally 7% |
+| 1 | `summoner-tome-light.1a` | Side A | Cherub Pack | 1 | 7 | one foe · 3 hits · 1.521 · lingers at 0.3 · heals every ally 7% |
+| 1 | `summoner-tome-light.1b` | Side B | Bonded Cherub | 1 | 8 | one foe · 2 hits · 1.6 · lingers at 0.4 · heals every ally 7% |
+| 2 | `summoner-tome-light.2` | Core | Mending Angel | free | 10 | one foe · 2 hits · 2.2 · lingers at 0.3 · heals every ally 8% |
+| 2 | `summoner-tome-light.2a` | Side A | Mending Angel Pack | 2 | 10 | one foe · 3 hits · 2.091 · lingers at 0.3 · heals every ally 8% |
+| 2 | `summoner-tome-light.2b` | Side B | Bonded Mending Angel | 2 | 11 | one foe · 2 hits · 2.2 · lingers at 0.4 · heals every ally 8% |
+| 3 | `summoner-tome-light.3` | Core | Seraph Choir | free | 13 | one foe · 3 hits · 2.901 · lingers at 0.3 · heals every ally 9% |
+| 3 | `summoner-tome-light.3a` | Side A | Seraph Choir Pack | 3 | 13 | one foe · 4 hits · 2.756 · lingers at 0.3 · heals every ally 9% |
+| 3 | `summoner-tome-light.3b` | Side B | Bonded Seraph Choir | 3 | 14 | one foe · 3 hits · 2.901 · lingers at 0.4 · heals every ally 9% |
+| 4 | `summoner-tome-light.4` | Core | Dominion Host | free | 15 | one foe · 3 hits · 3.699 · lingers at 0.3 · heals every ally 10% |
+| 4 | `summoner-tome-light.4a` | Side A | Dominion Host Pack | 4 | 15 | one foe · 4 hits · 3.516 · lingers at 0.3 · heals every ally 10% |
+| 4 | `summoner-tome-light.4b` | Side B | Bonded Dominion Host | 4 | 17 | one foe · 3 hits · 3.699 · lingers at 0.4 · heals every ally 10% |
+| 5 | `summoner-tome-light.5` | Core | Heaven's Legion | free | 18 | one foe · 4 hits · 4.6 · lingers at 0.3 · heals every ally 11% |
+| 5 | `summoner-tome-light.5a` | Side A | Heaven's Legion Pack | 5 | 18 | one foe · 5 hits · 4.37 · lingers at 0.3 · heals every ally 11% |
+| 5 | `summoner-tome-light.5b` | Side B | Bonded Heaven's Legion | 5 | 20 | one foe · 4 hits · 4.6 · lingers at 0.4 · heals every ally 11% |
 
 #### Summoner · Dark Tome (`summoner-tome-dark`)
 
 | Depth | Node | Slot | Name | Cost | MP | What it does |
 |---|---|---|---|---|---|---|
-| 1 | `summoner-tome-dark.1` | Core | Imp Brute | free | 7 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 1 | `summoner-tome-dark.1a` | Side A | Imp Brute Pack | 1 | 7 | one foe · 3 hits · 1.521 · lingers at 0.3 |
-| 1 | `summoner-tome-dark.1b` | Side B | Bonded Imp Brute | 1 | 8 | one foe · 2 hits · 1.6 · lingers at 0.4 |
-| 2 | `summoner-tome-dark.2` | Core | Hellknight | free | 10 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 2 | `summoner-tome-dark.2a` | Side A | Hellknight Pack | 2 | 10 | one foe · 3 hits · 2.091 · lingers at 0.3 |
-| 2 | `summoner-tome-dark.2b` | Side B | Bonded Hellknight | 2 | 11 | one foe · 2 hits · 2.2 · lingers at 0.4 |
-| 3 | `summoner-tome-dark.3` | Core | Dread Knight | free | 13 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 3 | `summoner-tome-dark.3a` | Side A | Dread Knight Pack | 3 | 13 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 3 | `summoner-tome-dark.3b` | Side B | Bonded Dread Knight | 3 | 14 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `summoner-tome-dark.4` | Core | Demon Lord | free | 15 | one foe · 2 hits · 3.7 · lingers at 0.3 |
-| 4 | `summoner-tome-dark.4a` | Side A | Demon Lord Pack | 4 | 15 | one foe · 3 hits · 3.516 · lingers at 0.3 |
-| 4 | `summoner-tome-dark.4b` | Side B | Bonded Demon Lord | 4 | 17 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `summoner-tome-dark.5` | Core | Abyssal Overlord | free | 18 | one foe · 2 hits · 4.6 · lingers at 0.3 |
-| 5 | `summoner-tome-dark.5a` | Side A | Abyssal Overlord Pack | 5 | 18 | one foe · 3 hits · 4.371 · lingers at 0.3 |
-| 5 | `summoner-tome-dark.5b` | Side B | Bonded Abyssal Overlord | 5 | 20 | one foe · 2 hits · 4.6 · lingers at 0.4 |
+| 1 | `summoner-tome-dark.1` | Core | Leech Imp | free | 7 | one foe · 2 hits · 1.6 · lingers at 0.3 · heals 30% of its damage |
+| 1 | `summoner-tome-dark.1a` | Side A | Leech Imp Pack | 1 | 7 | one foe · 3 hits · 1.521 · lingers at 0.3 · heals 30% of its damage |
+| 1 | `summoner-tome-dark.1b` | Side B | Bonded Leech Imp | 1 | 8 | one foe · 2 hits · 1.6 · lingers at 0.4 · heals 30% of its damage |
+| 2 | `summoner-tome-dark.2` | Core | Night Bat | free | 10 | one foe · 2 hits · 2.2 · lingers at 0.3 · heals 30% of its damage |
+| 2 | `summoner-tome-dark.2a` | Side A | Night Bat Pack | 2 | 10 | one foe · 3 hits · 2.091 · lingers at 0.3 · heals 30% of its damage |
+| 2 | `summoner-tome-dark.2b` | Side B | Bonded Night Bat | 2 | 11 | one foe · 2 hits · 2.2 · lingers at 0.4 · heals 30% of its damage |
+| 3 | `summoner-tome-dark.3` | Core | Vampire Knight | free | 13 | one foe · 2 hits · 2.9 · lingers at 0.3 · heals 30% of its damage |
+| 3 | `summoner-tome-dark.3a` | Side A | Vampire Knight Pack | 3 | 13 | one foe · 3 hits · 2.754 · lingers at 0.3 · heals 30% of its damage |
+| 3 | `summoner-tome-dark.3b` | Side B | Bonded Vampire Knight | 3 | 14 | one foe · 2 hits · 2.9 · lingers at 0.4 · heals 30% of its damage |
+| 4 | `summoner-tome-dark.4` | Core | Blood Countess | free | 15 | one foe · 2 hits · 3.7 · lingers at 0.3 · heals 30% of its damage |
+| 4 | `summoner-tome-dark.4a` | Side A | Blood Countess Pack | 4 | 15 | one foe · 3 hits · 3.516 · lingers at 0.3 · heals 30% of its damage |
+| 4 | `summoner-tome-dark.4b` | Side B | Bonded Blood Countess | 4 | 17 | one foe · 2 hits · 3.7 · lingers at 0.4 · heals 30% of its damage |
+| 5 | `summoner-tome-dark.5` | Core | Abyssal Overlord | free | 18 | one foe · 2 hits · 4.6 · lingers at 0.3 · heals 30% of its damage |
+| 5 | `summoner-tome-dark.5a` | Side A | Abyssal Overlord Pack | 5 | 18 | one foe · 3 hits · 4.371 · lingers at 0.3 · heals 30% of its damage |
+| 5 | `summoner-tome-dark.5b` | Side B | Bonded Abyssal Overlord | 5 | 20 | one foe · 2 hits · 4.6 · lingers at 0.4 · heals 30% of its damage |
 <!-- /live -->

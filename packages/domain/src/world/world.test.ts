@@ -3,7 +3,7 @@ import { BIOMES, signatureWeaknesses } from './biomes'
 import { bandFranchise, capitalFranchise, ENEMY_TIERS, FRANCHISES, stageFaces, type RosterMember } from './roster'
 import { grantRpgExp } from '../rpg/rules'
 import { rpgBattleExp, rpgRewardKind } from '../rpg/campaign/rewards'
-import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, worldContinent } from './world'
+import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, WORLD_BOSS_TWICE_FROM, worldContinent } from './world'
 
 const cast = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 
@@ -42,8 +42,9 @@ describe('the world map (D66, D71)', () => {
       expect(stages.map((n) => waves(n).length)).toEqual([1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 3])
       for (const n of stages) expect(new Set(waves(n).flat().map((e) => e.id)).size).toBe(waves(n).flat().length)
       expect(waves(stages[11]!).at(-1)![0]!.rank).toBe('boss')
-      // D135: the elite brings two assistants and so acts once a round.
-      expect(stages[10]!.enemies.map((e) => [e.rank, e.twice ?? false])).toEqual([['sub-boss', false], ['regular', false], ['regular', false]])
+      // D135: the elite brings two assistants; D141: her sub-boss acts twice from Lv 10, and a lone boss too.
+      const twice = stages[10]!.level >= WORLD_BOSS_TWICE_FROM
+      expect(stages[10]!.enemies.map((e) => [e.rank, e.twice ?? false])).toEqual([['sub-boss', twice], ['regular', false], ['regular', false]])
       expect(stageBand(stages[0]!.id)).toBe(1)
       // Variety: a region's regular stages use at least four formation-and-signature combinations.
       const plan = stagePlan(BIOMES.find((b) => b.id === region.biome)!, region.id).slice(0, 10)

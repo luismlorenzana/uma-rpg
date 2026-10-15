@@ -19,13 +19,13 @@ import { ArmorMark } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../observatory/ObservatoryPage'
 
-/** Accessories' defensive effects, one phrase each (D124). */
+/** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
 export function effectLines(a: AccessoryEffects): string[] {
   const pct = (permille: number) => `${permille / 10}%`
   return [
-    a.regen && `Heals ${a.regen} HP a round`, a.mpRegen && `Restores ${a.mpRegen} MP a round`,
+    a.regen && `Heals ${pct(a.regen)} of her HP a round`, a.mpRegen && `Restores ${a.mpRegen} MP a round`,
     a.lifesteal && `Heals ${pct(a.lifesteal)} of physical damage dealt`, a.mpSteal && `MP from ${pct(a.mpSteal)} of magical damage dealt`,
-    a.barrier && `Shield ${a.barrier} vs physical`, a.veil && `Shield ${a.veil} vs magical`,
+    a.barrier && `Shield of ${pct(a.barrier)} of her HP vs physical`, a.veil && `Shield of ${pct(a.veil)} of her HP vs magical`,
     a.guard && `${pct(a.guard)} less physical damage`, a.resist && `${pct(a.resist)} less magical damage`,
     a.thorns && `Returns ${pct(a.thorns)} of physical damage`, a.mirror && `Returns ${pct(a.mirror)} of magical damage`,
   ].filter((x): x is string => !!x)
@@ -35,7 +35,7 @@ export function effectLines(a: AccessoryEffects): string[] {
 export function pieceLine(id: string): string {
   const piece = gearById(id)
   if (!piece) return ''
-  if (isWeapon(piece.type)) return `Might +${piece.grade * MIGHT_PER_GRADE} on its hits`
+  if (isWeapon(piece.type)) return `Might: its hits deal +${piece.grade * MIGHT_PER_GRADE}%`
   if (isOrb(piece.type)) return 'Its kind on every hit, for weaknesses'
   if (isAccessory(piece.type)) return effectLines(accessoryEffects(piece)).join(' · ')
   const p = gearPoints(piece)

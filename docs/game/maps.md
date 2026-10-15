@@ -143,10 +143,11 @@ A region's twelve stages:
 - **1–2:** teaching pairs.
 - **3–10:** the biome's formation × signature combinations, never twice in a row. Stage 7 is a crowd, 8–9 come in two
   waves, and 10 is the biome's own formation.
-- **11:** the elite: a captain with two Key enemy guards (0.8 of a regular foe's HP, shield 2 each). With help beside
-  her, she acts once a round (D135).
-- **12:** the boss: three waves ending with a champion and her two guards. On a continent's top row (row 10) it's two
-  champions, each with 55% of one champion's HP, and one guard (D135).
+- **11:** the elite: a captain with two Key enemy guards (0.8 of a regular foe's HP, shield 2 each). She acts once a
+  round below Lv 10 and twice from Lv 10 (D135, D141), and carries a charged move ([combat](combat.md#charged-moves-v12)).
+- **12:** the boss: three waves ending with a champion and her two guards; from Lv 10 a lone champion acts twice
+  (D141). On a continent's top row (row 10) it's two champions, each with 55% of one champion's HP, acting once, and
+  one guard (D135).
 
 A stage in waves pays 1.5× EXP and Laurels.
 

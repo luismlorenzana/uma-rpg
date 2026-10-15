@@ -82,7 +82,8 @@ export function gearIdentity(id: string): GearIdentity | undefined {
 }
 
 /** What her accessories do in a fight (D124): Orb kinds, and every defensive effect summed; absent effects are 0. Here,
- * not in gear.ts, so a fight can be built without the recipes. */
+ * not in gear.ts, so a fight can be built without the recipes. Every effect is per mille except `mpRegen` (MP a round);
+ * `regen`, `barrier` and `veil` are shares of her max HP (D141), made into HP by `accessoryFightFields`. */
 export interface AccessoryEffects {
   orbs: RpgDamageKind[]
   barrier: number; veil: number; regen: number; mpRegen: number; lifesteal: number; mpSteal: number
@@ -90,3 +91,13 @@ export interface AccessoryEffects {
 }
 export const noAccessoryEffects = (): AccessoryEffects =>
   ({ orbs: [], barrier: 0, veil: 0, regen: 0, mpRegen: 0, lifesteal: 0, mpSteal: 0, guard: 0, resist: 0, thorns: 0, mirror: 0 })
+const OF_HP = ['barrier', 'veil', 'regen'] as const
+const AS_IS = ['mpRegen', 'lifesteal', 'mpSteal', 'guard', 'resist', 'thorns', 'mirror'] as const
+/** Her accessories' effects as a fight takes them, for her max HP: Barrier, Veil and Regen in HP, the rest as they are.
+ * Only what's there: an absent effect is left out. */
+export function accessoryFightFields(a: AccessoryEffects, maxHp: number): Partial<Record<typeof OF_HP[number] | typeof AS_IS[number], number>> {
+  const out: Partial<Record<typeof OF_HP[number] | typeof AS_IS[number], number>> = {}
+  for (const k of OF_HP) if (a[k] > 0) out[k] = Math.max(1, Math.round((maxHp * a[k]) / 1000))
+  for (const k of AS_IS) if (a[k] > 0) out[k] = a[k]
+  return out
+}

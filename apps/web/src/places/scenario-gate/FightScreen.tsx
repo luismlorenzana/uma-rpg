@@ -14,7 +14,7 @@ import {
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
 import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
-import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, supportText, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { StatusChips } from '../../battle/pixel-icons'
 import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
@@ -334,15 +334,25 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 </p>
                 <Bar className="w-full max-w-24" value={unit.hp} max={enemy.stats.hp} />
                 <div className="flex items-center gap-1">
-                  <ShieldBadge value={unit.shield} broken={broken} />
+                  <ShieldBadge value={unit.shield} broken={broken} steeled={!!unit.steeled} />
                   <WeaknessIcons weaknesses={enemy.weaknesses} size={12} />
                 </div>
+                {unit.charging && unit.hp > 0 && (
+                  // A charged move's locks (D141): each hit of a lock's kind breaks one; break them all to cancel it.
+                  <p className="flex items-center gap-0.5 text-[9.5px] font-bold leading-3 text-[#ffd84d]" aria-label={`Charging, locks: ${unit.charging.locks.join(', ') || 'none'}`}>
+                    <span>Locks</span>
+                    {unit.charging.locks.map((k, n) => <KindMark key={`${k}${n}`} kind={k} size={11} />)}
+                  </p>
+                )}
                 {move && unit.hp > 0 && !broken && (
                   <p className="line-clamp-1 max-w-full text-[9.5px] leading-3 text-ink-faint">
                     {intents.map((x) => {
-                      // What the move would deal, before Barriers and guards (combat-balance.md §6.0).
+                      // What the move would deal, before Barriers and guards (combat-balance.md §6.0); a charge shows a
+                      // round early, then lands at the share of its locks left (D141).
                       const most = Math.max(0, ...battleIntentDamage(state, x).map((d) => d.amount))
-                      return `${moveOf(x.moveId)?.label ?? ''} → ${x.targetId === 'all' ? 'all' : name(x.targetId)}${most ? ` ~${most}` : ''}`
+                      const c = unit.charging?.moveId === x.moveId ? unit.charging : undefined
+                      const label = `${c && c.round === state.round ? 'Charging: ' : ''}${moveOf(x.moveId)?.label ?? ''}${c && c.round < state.round ? ` ${c.locks.length}/${c.total}` : ''}`
+                      return `${label} → ${x.targetId === 'all' ? 'all' : name(x.targetId)}${most ? ` ~${most}` : ''}`
                     }).join(' · ')}
                   </p>
                 )}
@@ -368,7 +378,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   e.stopPropagation()
                   tapAlly(unit)
                 }}
-                aria-label={`${name(unit.id)}, HP ${unit.hp} of ${a.stats.hp}, MP ${unit.mp} of ${a.stats.mp}${done ? ', done' : ''}`}
+                aria-label={`${name(unit.id)}, HP ${unit.hp} of ${a.stats.hp}, MP ${unit.mp} of ${a.stats.mp}${unit.cover ? `, Barrier ${unit.cover}` : ''}${unit.rally ? `, ${unit.rally.amount} to Rally back` : ''}${done ? ', done' : ''}`}
                 className="absolute flex items-end justify-center"
                 style={{ left: box.x, top: box.y, width: box.w, height: box.h }}
               >
@@ -395,10 +405,11 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
               )}
               {unit.hp > 0 && <StatusChips statuses={unit.statuses} className="pointer-events-none absolute" style={{ left: box.x, bottom: size.h - box.y - box.h + 3, width: box.w }} />}
               <div className={`pointer-events-none absolute px-1 ${done ? 'opacity-55' : ''}`} style={{ left: info.x, top: info.y, width: info.w }}>
-                <Bar value={unit.hp} max={a.stats.hp} />
+                <Bar value={unit.hp} max={a.stats.hp} ghost={unit.rally?.amount ?? 0} />
                 <Bar className="mt-0.5" value={unit.mp} max={a.stats.mp} tone="mp" />
                 <p className="truncate text-center text-[9.5px] leading-3 text-ink-soft">
                   {unit.hp <= 0 ? 'KO' : `${unit.hp} HP`}
+                  {unit.hp > 0 && !!unit.cover && <span className="text-[#8fd3ff]"> · Barrier {unit.cover}</span>}
                 </p>
               </div>
             </div>
@@ -462,6 +473,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                       <span className="flex items-center gap-1 font-semibold"><WeaponGlyph weapon={choice.skill.node.weapon} size={14} />{kinds.map((k) => <KindMark key={k} kind={k} size={14} />)}{choice.skill.label}</span>
                       <span className="block text-[11px] text-ink-soft">
                         {def.target === 'all' ? 'All rivals' : def.target === 'random' ? `${def.hits.length} hits on random rivals` : def.hits.length > 1 ? `${def.hits.length} hits` : 'One rival'}
+                        {state.engineVersion >= 12 && supportText(def.support) ? ` · ${supportText(def.support)}` : ''}
                         {weak.length ? ` · weak: ${weak.map((u) => name(u.id)).join(', ')}` : ''}
                       </span>
                     </span>

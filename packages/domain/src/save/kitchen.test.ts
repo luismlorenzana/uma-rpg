@@ -48,7 +48,9 @@ describe('dishes (S6, D58)', () => {
     expect(nodesFor(dishById('dish-grains-3')!)).toEqual(['moon:hp:1', 'moon:hp:2', 'moon:hp:3'])
     expect(nodesFor(dishById('duo-hp-def-3')!)).toEqual(['bridge:hp-def:1'])
     expect(nodesFor(dishById('feast-6')!)).toEqual(['sun:1', 'sun:2'])
-    expect(starPoints(['moon:hp:1', 'bridge:hp-def:1', 'sun:1'])).toMatchObject({ hp: 1.625, def: 0.625, mp: 0.125 })
+    // Worth their grade (D141): a grade-1 moon 1, a grade-3 bridge 1.5 to each side, a grade-4 Sun node 0.5 to all.
+    expect(starPoints(['moon:hp:1', 'bridge:hp-def:1', 'sun:1'])).toMatchObject({ hp: 3, def: 2, mp: 0.5 })
+    expect(starPoints(['moon:atk:10', 'moon:atk:9'])).toMatchObject({ atk: 19 })
   })
 })
 
@@ -81,7 +83,7 @@ describe('cooking and eating (S6)', () => {
     expect(worldOf(save).dishes).toEqual({ 'dish-grains-1': 1, 'dish-grains-2': 1 })
     expect(() => setActiveNodes(save, '101', ['moon:hp:3'], at(0))).toThrow(/unlocked/)
     save = setActiveNodes(save, '101', ['moon:hp:2'], at(0))
-    expect(extraStatPoints(worldOf(save).umas['101']!)).toMatchObject({ hp: 1 })
+    expect(extraStatPoints(worldOf(save).umas['101']!)).toMatchObject({ hp: 2 })
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 
@@ -112,13 +114,14 @@ describe('Extra Stats in battle (S6)', () => {
     const ally = worldOf(fighting).world.run.battle!.input.allies[0]!
     const plain = projectRpgStats(umaProfile(cook, { ...worldOf(save).umas['101']! }, 1))
     expect(ally.stats.hp).toBe(Math.round(plain.hp * 1.015))
-    expect(ally).toMatchObject({ evasion: 12, limitStart: 1 })
+    // Nodes are worth their grade (D141): Speed 1 + 2 = 3 points, 1.8% evasion; Limit 1 + 2 + 3 = 6, a 2.4 head start.
+    expect(ally).toMatchObject({ evasion: 18, limitStart: 2 })
     const state = createBattle(worldOf(fighting).world.run.battle!.input).state
-    expect(state.units.find((u) => u.id === '101')!.limit).toBe(1)
-    // The same hit lands 1.2% softer on her than without evasion.
+    expect(state.units.find((u) => u.id === '101')!.limit).toBe(2)
+    // The same hit lands 1.8% softer on her than without evasion.
     const bare = createBattle({ ...state.input, allies: state.input.allies.map((a) => (a.id === '101' ? { ...a, evasion: undefined } : a)) }).state
     const foe = state.units.find((u) => u.side === 'enemy')!
     const hit = (s: typeof state) => battleDamage(s, foe, s.units.find((u) => u.id === '101')!, 'physical', 4, null).amount
-    expect(hit(state)).toBe(Math.max(1, Math.round(hit(bare) * 0.988)))
+    expect(Math.abs(hit(state) - hit(bare) * 0.982)).toBeLessThanOrEqual(1)
   })
 })

@@ -3,17 +3,20 @@
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
 // v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; v8 ranks, Might, Barrier and Regen
-// (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112).
-// Older fights replay unchanged.
-import { rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+// (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112);
+// v11 two accessories (D124); v12 the combat balance rework (D141, docs/design/combat-balance.md): a ratio damage formula,
+// Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
+// strip foe buffs, and a breather between waves. Older fights replay unchanged.
+import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
   isRpgDamageKind, isRpgTome, RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey,
   rpgWeaponKind, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
-  BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT,
-  BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
+  BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BREATHER, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT, BATTLE_COVER_CAP,
+  BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_HEAL_SCALE, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
+  BATTLE_RALLY_SHARE, BATTLE_REVIVE_SHARE,
   BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
   BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
 } from './skills'
@@ -24,7 +27,8 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on; older versions still replay. */
-export const BATTLE_ENGINE_VERSION = 11
+export const BATTLE_ENGINE_VERSION = 12
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -88,7 +92,9 @@ function validStats(v: Record<string, unknown> | undefined, keys: readonly strin
 }
 const ALLY_STATS = ['speed', 'stamina', 'power', 'guts', 'wit', 'atk', 'matk', 'initiative', 'pdef', 'mdef', 'dexterity', 'hp', 'mp']
 const ENEMY_STATS = ['hp', 'atk', 'matk', 'pdef', 'mdef', 'initiative']
-function validMove(m: BattleEnemyMove): boolean {
+function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean {
+  // v12 (D141): a charged move is a damage move with one to six locks.
+  if (m.charge !== undefined && (version < 12 || m.kind !== 'damage' || !safeInt(m.charge, 1, 6))) return false
   return SAFE_ID.test(m.id) && ['damage', 'guard', 'buff', 'debuff'].includes(m.kind) &&
     ['physical', 'magical'].includes(m.channel) && (m.element === null || RPG_ELEMENTS.includes(m.element)) &&
     safeInt(m.power, 0, 1000) && typeof m.label === 'string' && m.label.length > 0 && m.label.length <= 80 &&
@@ -148,15 +154,15 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
     ['regular', 'sub-boss', 'boss'].includes(e.rank) && safeInt(e.level, 1, 1_000_000) &&
     validStats(e.stats as unknown as Record<string, unknown>, ENEMY_STATS) && safeInt(e.shield, 1, 20) &&
     !!w && set(w.weapons, RPG_WEAPON_KINDS) && set(w.elements, RPG_ELEMENTS) && w.weapons.length + w.elements.length >= 1 &&
-    Array.isArray(e.moves) && e.moves.length >= 1 && e.moves.length <= 8 && e.moves.every(validMove) &&
+    Array.isArray(e.moves) && e.moves.length >= 1 && e.moves.length <= 8 && e.moves.every((m) => validMove(m, version)) &&
     new Set(e.moves.map((m) => m.id)).size === e.moves.length &&
     (e.phaseTwo === undefined || (safeInt(e.phaseTwo.thresholdPercent, 1, 99) && e.phaseTwo.moves.length >= 1 &&
-      e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every(validMove)))
+      e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8 } as const
 function validateInput(input: BattleInput): void {
-  if (!input || ![6, 7, 8, 9, 10, 11].includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
+  if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
     throw new RangeError('Invalid battle header')
   }
@@ -174,12 +180,20 @@ function validateInput(input: BattleInput): void {
 }
 
 function clone(s: BattleState): BattleState {
-  return { ...s, units: s.units.map((u) => ({ ...u, statuses: u.statuses.map((x) => ({ ...x })) })),
+  return { ...s, units: s.units.map((u) => ({ ...u, statuses: u.statuses.map((x) => ({ ...x })),
+    ...(u.rally ? { rally: { ...u.rally } } : {}), ...(u.charging ? { charging: { ...u.charging, locks: [...u.charging.locks] } } : {}) })),
     acted: [...s.acted], summons: s.summons.map((x) => ({ ...x, ref: { ...x.ref } })), intents: s.intents.map((i) => ({ ...i })) }
 }
 const movesOf = (s: BattleState, u: BattleUnit): BattleEnemyMove[] => {
   const e = enemyOf(s, u.id)!
   return u.phase === 2 && e.phaseTwo ? e.phaseTwo.moves : e.moves
+}
+/** A move of hers by id: this phase's, or from v12 either phase's, since a charged move outlasts the change (D141). */
+function moveById(s: BattleState, u: BattleUnit, id: string): BattleEnemyMove | undefined {
+  const own = movesOf(s, u).find((m) => m.id === id)
+  if (own || s.engineVersion < 12) return own
+  const e = enemyOf(s, u.id)!
+  return [...e.moves, ...(e.phaseTwo?.moves ?? [])].find((m) => m.id === id)
 }
 const byHpShare = (s: BattleState) => (a: BattleUnit, b: BattleUnit) => a.hp / maxHp(s, a.id) - b.hp / maxHp(s, b.id) || a.id.localeCompare(b.id)
 function chooseTarget(s: BattleState, e: BattleEnemy, m: BattleEnemyMove, turn = 0): string {
@@ -191,13 +205,37 @@ function chooseTarget(s: BattleState, e: BattleEnemy, m: BattleEnemyMove, turn =
   if (m.target === 'lowest-hp') return [...allies].sort(byHpShare(s))[0]?.id ?? ''
   return allies[hashNumber(`${s.input.seed}:${s.round}:${e.id}${turn ? `:turn${turn}` : ''}:target`) % allies.length]?.id ?? ''
 }
-/** A foe's move for this round; `turn` 1 is a twice-acting foe's second (v7). */
+/** A foe's move for this round; `turn` 1 is a twice-acting foe's second (v7). From v12 (D141) a charged move announced
+ * last round lands now at the Uma it named, and a foe charges only on her first move, never two rounds running. */
 function intentFor(s: BattleState, u: BattleUnit, turn = 0): BattleIntent {
   const e = enemyOf(s, u.id)!
-  const moves = movesOf(s, u)
+  if (s.engineVersion >= 12 && turn === 0 && u.charging && u.charging.round === s.round - 1) {
+    const target = u.charging.targetId
+    const named = target === 'all' || (unit(s, target)?.hp ?? 0) > 0
+    return { enemyId: e.id, moveId: u.charging.moveId, targetId: named ? target : chooseTarget(s, e, moveById(s, u, u.charging.moveId)!, turn) }
+  }
+  const all = movesOf(s, u)
+  const rested = s.engineVersion >= 12 && (turn > 0 || !!u.charging || u.charged === s.round - 1)
+  const moves = rested && all.some((m) => !m.charge) ? all.filter((m) => !m.charge) : all
   const move = moves[hashNumber(`${s.input.seed}:${s.round}:${e.id}:phase${u.phase}${turn ? `:turn${turn}` : ''}:move`) % moves.length]!
   return { enemyId: e.id, moveId: move.id, targetId: chooseTarget(s, e, move, turn) }
 }
+/** v12: a charged move just shown arms its locks, drawn by the fight's seed from her weaknesses (D141). */
+function armCharges(s: BattleState): void {
+  if (s.engineVersion < 12) return
+  for (const intent of s.intents) {
+    const u = unit(s, intent.enemyId)
+    const move = u ? moveById(s, u, intent.moveId) : undefined
+    if (!u || !move?.charge || u.charging || u.charged === s.round) continue
+    const w = enemyOf(s, u.id)!.weaknesses
+    const kinds: RpgDamageKind[] = [...w.weapons, ...w.elements]
+    const locks = Array.from({ length: move.charge }, (_, k) => kinds[hashNumber(`${s.input.seed}:${s.round}:${u.id}:lock${k}`) % kinds.length]!)
+    u.charging = { moveId: move.id, locks, total: move.charge, round: s.round, targetId: intent.targetId }
+  }
+}
+/** v12: whether this shown move is a charge being gathered this round (it lands next round). */
+const gathering = (s: BattleState, u: BattleUnit, move: BattleEnemyMove): boolean =>
+  !!move.charge && u.charging?.moveId === move.id && u.charging.round === s.round
 /** Every living foe's move by initiative; foes that act twice add a second move after everyone's first. */
 function intentsFor(s: BattleState): BattleIntent[] {
   const order = living(s, 'enemy').sort((a, b) => enemyOf(s, b.id)!.stats.initiative - enemyOf(s, a.id)!.stats.initiative ||
@@ -206,8 +244,9 @@ function intentsFor(s: BattleState): BattleIntent[] {
 }
 function reveal(s: BattleState): BattleCue[] {
   return s.intents.map((i) => {
-    const move = movesOf(s, unit(s, i.enemyId)!).find((m) => m.id === i.moveId)!
-    return { kind: 'intent' as const, actorId: i.enemyId, targetId: i.targetId, label: move.label }
+    const u = unit(s, i.enemyId)!
+    const move = moveById(s, u, i.moveId)!
+    return { kind: 'intent' as const, actorId: i.enemyId, targetId: i.targetId, label: gathering(s, u, move) ? `Charging: ${move.label}` : move.label }
   })
 }
 
@@ -223,6 +262,7 @@ export function createBattle(source: BattleInput): BattleStep {
   const state: BattleState = { engineVersion: input.version, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active',
     ...(input.waves?.length ? { wave: 0 } : {}) }
   state.intents = intentsFor(state)
+  armCharges(state)
   return { state, cues: reveal(state), hash: battleStateHash(state) }
 }
 
@@ -240,11 +280,14 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
   const atk = allyOf(s, attacker.id)?.stats ?? enemyOf(s, attacker.id)!.stats
   const def = allyOf(s, defender.id)?.stats ?? enemyOf(s, defender.id)!.stats
-  // v8: the weapon a hit is made with adds its Might (D104).
+  // v8: the weapon a hit is made with adds its Might (D104); from v12 (D141) Might is a percent on the hit.
+  const v12 = s.engineVersion >= 12
   const might = attacker.side === 'ally' && kind !== null ? allyOf(s, attacker.id)?.might?.[kind] ?? 0 : 0
-  const offense = (channel === 'physical' ? atk.atk : atk.matk) + might
+  const offense = (channel === 'physical' ? atk.atk : atk.matk) + (v12 ? 0 : might)
   const defense = channel === 'physical' ? def.pdef : def.mdef
-  let amount = Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
+  // v12: offense² ÷ (offense + defense), so the same ratio gives the same share at every level and never zero.
+  let amount = v12 ? (offense > 0 ? (offense * offense) / (offense + defense) : 0) * power * (1 + might / 100)
+    : Math.max(offense * BATTLE_MIN_OFFENSE_SHARE, offense - defense * BATTLE_DEFENSE_SHARE) * power
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
   const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || !!options.orbs?.some((o) => battleHitIsWeak(foe, defender, o)))
   if (weak) amount *= BATTLE_WEAK
@@ -272,10 +315,139 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
  * the intent line (combat-balance.md §6.0). Moves that deal no damage give none. */
 export function battleIntentDamage(s: BattleState, intent: BattleIntent): { targetId: string; amount: number }[] {
   const actor = unit(s, intent.enemyId)
-  const move = actor ? movesOf(s, actor).find((m) => m.id === intent.moveId) : undefined
-  if (!actor || !move || move.kind !== 'damage') return []
+  const move = actor ? moveById(s, actor, intent.moveId) : undefined
+  // A charge being gathered deals nothing this round; one landing now hits at the share of its locks left (v12).
+  if (!actor || !move || move.kind !== 'damage' || gathering(s, actor, move)) return []
+  const share = move.charge ? (actor.charging?.moveId === move.id ? actor.charging.locks.length / actor.charging.total : 0) : 1
+  if (share <= 0) return []
   const targets = intent.targetId === 'all' ? living(s, 'ally') : [unit(s, intent.targetId)].filter((u): u is BattleUnit => !!u && u.hp > 0)
-  return targets.map((t) => ({ targetId: t.id, amount: battleDamage(s, actor, t, move.channel, move.power / 100, move.element, { area: move.target === 'all' }).amount }))
+  return targets.map((t) => ({ targetId: t.id, amount: battleDamage(s, actor, t, move.channel, (move.power * share) / 100, move.element, { area: move.target === 'all' }).amount }))
+}
+
+// --- v12 support (D141): mends, Barriers, revives, Rally, locks ------------------------------------------------------
+
+/** Her Heal raises what her mends and Barriers give: ×(1 + Heal ÷ 300). Heal comes from Guts (`dexterity`). */
+const healOf = (s: BattleState, actorId: string): number => 1 + (allyOf(s, actorId)?.stats.dexterity ?? 0) / BATTLE_HEAL_SCALE
+/** The Uma who most needs a mend: the lowest share of HP among the living. */
+const mostHurt = (s: BattleState): BattleUnit | undefined => [...living(s, 'ally')].sort(byHpShare(s))[0]
+/** What the shown moves would deal her this round, less the Barrier she has. */
+function threatOn(s: BattleState, allyId: string): number {
+  let total = 0
+  for (const intent of s.intents) {
+    const foe = unit(s, intent.enemyId)
+    if (!foe || foe.hp <= 0 || battleBroken(foe)) continue
+    for (const d of battleIntentDamage(s, intent)) if (d.targetId === allyId) total += d.amount
+  }
+  return Math.max(0, total - (unit(s, allyId)?.cover ?? 0))
+}
+/** The Uma the shown moves threaten most; with nothing aimed, the most hurt. */
+function mostThreatened(s: BattleState): BattleUnit | undefined {
+  const scored = living(s, 'ally').map((u) => ({ u, t: threatOn(s, u.id) })).filter((x) => x.t > 0)
+    .sort((a, b) => b.t - a.t || byHpShare(s)(a.u, b.u))
+  return scored[0]?.u ?? mostHurt(s)
+}
+function heal(s: BattleState, actorId: string, target: BattleUnit, amount: number, cues: BattleCue[], label?: string): void {
+  const healed = Math.min(Math.round(amount), maxHp(s, target.id) - target.hp)
+  if (healed <= 0 || target.hp <= 0) return
+  target.hp += healed
+  cues.push({ kind: 'heal', actorId, targetId: target.id, amount: healed, ...(label ? { label } : {}) })
+}
+/** A skill's Barrier: it absorbs any damage first, up to 40% of her max HP, until the end of the round. */
+function cover(s: BattleState, actorId: string, target: BattleUnit, amount: number, cues: BattleCue[]): void {
+  const now = target.cover ?? 0
+  const next = Math.min(Math.round(maxHp(s, target.id) * BATTLE_COVER_CAP), now + Math.round(amount))
+  if (next > now) { target.cover = next; cues.push({ kind: 'cover', actorId, targetId: target.id, amount: next }) }
+}
+const FOE_AILMENTS: readonly RpgStatusKind[] = ['burn', 'mark', 'weaken', 'slow']
+/** A skill's support after its hits (D141). `linger` < 1 is a lingering summon (at a round's end, or its farewell
+ * strike): it only mends, shields and drains, at that share. `dealt` is what the skill's hits took off foes. */
+function support(s: BattleState, actor: BattleUnit, sup: RpgSupport, dealt: number, cues: BattleCue[], linger = 1): void {
+  const boost = healOf(s, actor.id) * linger
+  const each = (u: BattleUnit) => maxHp(s, u.id) * sup.share * boost
+  if (sup.mend === 'all') for (const u of living(s, 'ally')) heal(s, actor.id, u, each(u) * RPG_SUPPORT_ALL, cues)
+  else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) heal(s, actor.id, u, each(u), cues) }
+  if (sup.shield === 'all') for (const u of living(s, 'ally')) cover(s, actor.id, u, each(u) * RPG_SUPPORT_ALL, cues)
+  else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) cover(s, actor.id, u, each(u), cues) }
+  if (sup.drain && dealt > 0) { const u = mostHurt(s); if (u) heal(s, actor.id, u, dealt * sup.drain, cues, 'Drain') }
+  if (linger < 1) return
+  if (sup.cleanse) {
+    for (const u of living(s, 'ally')) {
+      const ailment = FOE_AILMENTS.find((k) => stacks(u, k) > 0)
+      if (!ailment) continue
+      u.statuses = u.statuses.filter((x) => x.kind !== ailment)
+      cues.push({ kind: 'status', actorId: actor.id, targetId: u.id, label: `${ailment} cleansed` })
+    }
+  }
+  if (sup.revive) {
+    // The first fallen Uma in party order rises at a quarter of her HP, once a fight.
+    const fallen = s.units.find((u) => u.side === 'ally' && u.hp <= 0 && !u.revived)
+    if (fallen) {
+      const top = maxHp(s, fallen.id)
+      fallen.revived = true
+      fallen.hp = Math.max(1, Math.min(top, Math.round(top * BATTLE_REVIVE_SHARE * healOf(s, actor.id))))
+      fallen.statuses = []
+      cues.push({ kind: 'heal', actorId: actor.id, targetId: fallen.id, amount: fallen.hp, label: 'Revived' })
+    }
+  }
+  if (sup.bless) {
+    for (const u of living(s, 'ally')) {
+      addStatus(u, sup.bless.status, sup.bless.stacks)
+      cues.push({ kind: 'status', actorId: actor.id, targetId: u.id, label: sup.bless.status, amount: sup.bless.stacks })
+    }
+  }
+}
+/** What a support would do now, in shares of max HP restored or shielded across the party, plus 1 for a revive and 0.3
+ * for a status: for Auto and the simulator (D141). It follows the same targets the support would take. */
+export function battleSupportValue(s: BattleState, actorId: string, sup: RpgSupport | undefined): number {
+  if (!sup || s.engineVersion < 12) return 0
+  const actor = unit(s, actorId)
+  if (!actor) return 0
+  const boost = healOf(s, actorId)
+  const missing = (u: BattleUnit) => 1 - u.hp / maxHp(s, u.id)
+  const threat = (u: BattleUnit) => threatOn(s, u.id) / maxHp(s, u.id)
+  let value = 0
+  if (sup.mend === 'all') for (const u of living(s, 'ally')) value += Math.min(missing(u), sup.share * boost * RPG_SUPPORT_ALL)
+  else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) value += Math.min(missing(u), sup.share * boost) }
+  if (sup.shield === 'all') for (const u of living(s, 'ally')) value += Math.min(threat(u), sup.share * boost * RPG_SUPPORT_ALL)
+  else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) value += Math.min(threat(u), sup.share * boost) }
+  if (sup.revive && s.units.some((u) => u.side === 'ally' && u.hp <= 0 && !u.revived)) value += 1
+  if (sup.cleanse && living(s, 'ally').some((u) => FOE_AILMENTS.some((k) => stacks(u, k) > 0))) value += 0.1
+  if (sup.bless || sup.curse) value += 0.05
+  return value
+}
+/** v12: a foe Broken or defeated gives back every Rally she left (D141). */
+function rallyBack(s: BattleState, foe: BattleUnit, cues: BattleCue[]): void {
+  if (s.engineVersion < 12) return
+  for (const u of living(s, 'ally')) {
+    if (u.rally?.from !== foe.id) continue
+    heal(s, u.id, u, u.rally.amount, cues, 'Rally')
+    delete u.rally
+  }
+}
+/** v12: a foe falls: her Rallies come back and her charge ends with her. */
+function foeDown(s: BattleState, foe: BattleUnit, cues: BattleCue[]): void {
+  if (s.engineVersion < 12) return
+  rallyBack(s, foe, cues)
+  delete foe.charging
+}
+/** v12: a hit of a lock's kind breaks it (each of her Orbs' kinds too). Breaking the last cancels the charge. */
+function popLocks(s: BattleState, actor: BattleUnit, foe: BattleUnit, kinds: readonly RpgDamageKind[], cues: BattleCue[]): void {
+  const c = foe.charging
+  if (s.engineVersion < 12 || !c || foe.hp <= 0) return
+  for (const kind of kinds) {
+    const at = c.locks.indexOf(kind)
+    if (at < 0) continue
+    c.locks.splice(at, 1)
+    cues.push({ kind: 'lock', actorId: actor.id, targetId: foe.id, amount: c.locks.length, label: kind })
+    if (c.locks.length === 0) { cancelCharge(s, actor, foe, cues); return }
+  }
+}
+function cancelCharge(s: BattleState, actor: BattleUnit, foe: BattleUnit, cues: BattleCue[]): void {
+  const c = foe.charging
+  if (!c) return
+  delete foe.charging
+  foe.charged = s.round
+  cues.push({ kind: 'cancel', actorId: actor.id, targetId: foe.id, label: moveById(s, foe, c.moveId)?.label ?? 'Charge' })
 }
 
 function guardOf(s: BattleState, target: BattleUnit): BattleUnit {
@@ -293,12 +465,22 @@ function terminal(s: BattleState, cues: BattleCue[]): boolean {
 
 /** Removes shield points; at zero the foe Breaks. */
 function chip(s: BattleState, actor: BattleUnit, foe: BattleUnit, points: number, cues: BattleCue[]): void {
-  if (battleBroken(foe) || foe.shield === 0 || foe.hp <= 0 || points <= 0) return
+  if (battleBroken(foe) || foe.shield === 0 || foe.hp <= 0 || points <= 0 || foe.steeled) return
   foe.shield = Math.max(0, foe.shield - points)
   cues.push({ kind: 'shield', actorId: actor.id, targetId: foe.id, amount: foe.shield })
   if (foe.shield === 0) {
     foe.brokenAt = s.round
     cues.push({ kind: 'break', actorId: actor.id, targetId: foe.id })
+    if (s.engineVersion >= 12) {
+      // A Break strips her buffs and cancels her charge, and the party wins back what she took (D141).
+      const buffs = foe.statuses.filter((x) => x.kind === 'power-up' || x.kind === 'ward')
+      if (buffs.length) {
+        foe.statuses = foe.statuses.filter((x) => !buffs.includes(x))
+        cues.push({ kind: 'status', actorId: actor.id, targetId: foe.id, label: 'Buffs stripped' })
+      }
+      cancelCharge(s, actor, foe, cues)
+      rallyBack(s, foe, cues)
+    }
   }
 }
 
@@ -316,7 +498,12 @@ function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgH
     cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel, element: part.kind, weak: result.weak,
       label: receiver !== target ? 'Intercepted' : undefined })
     if (actor.side === 'ally') drain(s, actor, channel, amount, cues)
-    if (receiver.hp === 0) { cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id }); break }
+    if (receiver.side === 'enemy') popLocks(s, actor, receiver, [part.kind, ...(options.orbs ?? [])], cues)
+    if (receiver.hp === 0) {
+      cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id })
+      if (receiver.side === 'enemy') foeDown(s, receiver, cues)
+      break
+    }
     if (!result.weak || battleBroken(receiver) || receiver.shield === 0) continue
     anyWeak = true
     const charge = actor.side === 'ally' && stacks(actor, 'breaker') > 0
@@ -351,6 +538,9 @@ function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: Battl
   let amount = receiver !== target ? Math.max(1, Math.round(result.amount * BATTLE_GUARD_FACTOR)) : result.amount
   const taken = amount
   const v11 = s.input.version >= 11
+  // v12 (D141): a skill's Barrier absorbs any damage first.
+  const covered = Math.min(receiver.cover ?? 0, amount)
+  if (covered > 0) { receiver.cover = (receiver.cover ?? 0) - covered; amount -= covered }
   const useVeil = v11 && move.channel === 'magical'
   const pool = useVeil ? receiver.veil ?? 0 : receiver.barrier
   const absorbed = Math.min(pool, amount)
@@ -358,9 +548,15 @@ function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: Battl
   else receiver.barrier -= absorbed
   amount -= absorbed
   receiver.hp = Math.max(0, receiver.hp - amount)
+  const shields = [covered && `Barrier −${covered}`, absorbed && `${useVeil ? 'Veil' : s.engineVersion >= 12 ? 'Bulwark' : 'Barrier'} −${absorbed}`].filter(Boolean).join(' · ')
   cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel: move.channel, element: move.element, weak: false,
-    label: receiver !== target ? 'Intercepted' : absorbed ? `${useVeil ? 'Veil' : 'Barrier'} −${absorbed}` : undefined })
+    label: receiver !== target ? 'Intercepted' : shields || undefined })
   if (receiver.hp === 0) cues.push({ kind: 'ko', actorId: actor.id, targetId: receiver.id })
+  if (s.engineVersion >= 12) {
+    // Rally: part of the last foe hit she took, won back if that foe is Broken or defeated before she moves again.
+    if (receiver.hp > 0 && amount > 0) receiver.rally = { from: actor.id, amount: Math.round(amount * BATTLE_RALLY_SHARE) }
+    else if (receiver.hp === 0) delete receiver.rally
+  }
   const ally = v11 ? allyOf(s, receiver.id) : undefined
   const share = ally ? (move.channel === 'physical' ? ally.thorns : ally.mirror) ?? 0 : 0
   const back = Math.floor(taken * share / 1000)
@@ -368,7 +564,7 @@ function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: Battl
     actor.hp = Math.max(0, actor.hp - back)
     cues.push({ kind: 'hit', actorId: receiver.id, targetId: actor.id, amount: back, channel: move.channel, element: null, weak: false,
       label: move.channel === 'physical' ? 'Thorns' : 'Mirror' })
-    if (actor.hp === 0) cues.push({ kind: 'ko', actorId: receiver.id, targetId: actor.id })
+    if (actor.hp === 0) { cues.push({ kind: 'ko', actorId: receiver.id, targetId: actor.id }); foeDown(s, actor, cues) }
   }
 }
 
@@ -383,9 +579,14 @@ function nextWave(s: BattleState, cues: BattleCue[]): boolean {
     ...foes.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, shield: e.shield }))]
   for (const u of s.units) u.guardingFor = null
   cues.push({ kind: 'wave', actorId: foes[0]!.id, targetId: foes[0]!.id, amount: s.wave + 1, label: `Wave ${s.wave + 1} of ${battleWaveCount(s.input)}` })
+  if (s.engineVersion >= 12) {
+    // A breather (D141): every Uma standing recovers a tenth of her HP as the next foes step in.
+    for (const u of living(s, 'ally')) { delete u.rally; heal(s, u.id, u, maxHp(s, u.id) * BATTLE_BREATHER, cues, 'Breather') }
+  }
   s.round += 1
   s.acted = []
   s.intents = intentsFor(s)
+  armCharges(s)
   cues.push(...reveal(s))
   return true
 }
@@ -397,18 +598,21 @@ function updatePhases(s: BattleState, cues: BattleCue[]): void {
     u.phase = 2
     cues.push({ kind: 'phase', actorId: u.id, targetId: u.id, label: 'Phase 2' })
     // Each of her moves this round changes to phase two's (two for a foe that acts twice).
+    // v12: a charge she is gathering or landing stays as it is (D141).
     let turn = 0
     const nexts: BattleIntent[] = []
     s.intents = s.intents.map((i) => {
       if (i.enemyId !== u.id) return i
+      if (s.engineVersion >= 12 && u.charging?.moveId === i.moveId) { turn++; return i }
       const next = intentFor(s, u, turn++)
       nexts.push(next)
       return next
     })
-    if (!nexts.length) nexts.push(intentFor(s, u))
+    if (!nexts.length && !s.intents.some((i) => i.enemyId === u.id)) nexts.push(intentFor(s, u))
+    armCharges(s)
     for (const next of nexts) {
-      const move = movesOf(s, u).find((m) => m.id === next.moveId)!
-      cues.push({ kind: 'intent', actorId: u.id, targetId: next.targetId, label: move.label })
+      const move = moveById(s, u, next.moveId)!
+      cues.push({ kind: 'intent', actorId: u.id, targetId: next.targetId, label: gathering(s, u, move) ? `Charging: ${move.label}` : move.label })
     }
   }
 }
@@ -420,9 +624,26 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (!actor || actor.hp <= 0 || !living(s, 'ally').length) continue
     if (battleBroken(actor)) { cues.push({ kind: 'skip', actorId: actor.id, targetId: actor.id, label: 'Broken' }); continue }
     const source = enemyOf(s, actor.id)!
-    const move = movesOf(s, actor).find((m) => m.id === intent.moveId)
+    let move = s.engineVersion >= 12 ? moveById(s, actor, intent.moveId) : movesOf(s, actor).find((m) => m.id === intent.moveId)
     if (!move) throw new RangeError('Frozen intent no longer matches phase')
-    cues.push({ kind: 'move', actorId: actor.id, targetId: intent.targetId, label: move.label })
+    let label = move.label
+    if (s.engineVersion >= 12) {
+      // Her earlier hits can't be Rallied back once she moves again, and her move ends her Steel (D141).
+      for (const u of s.units) if (u.side === 'ally' && u.rally?.from === actor.id) delete u.rally
+      delete actor.steeled
+      if (move.charge) {
+        const c = actor.charging
+        if (!c || c.moveId !== move.id) { cues.push({ kind: 'skip', actorId: actor.id, targetId: actor.id, label: 'Cancelled' }); continue }
+        if (c.round === s.round) { cues.push({ kind: 'move', actorId: actor.id, targetId: intent.targetId, label: `Charging: ${move.label}` }); continue }
+        // It lands at the share of its locks still standing.
+        const share = c.locks.length / c.total
+        delete actor.charging
+        actor.charged = s.round
+        if (share < 1) label = `${move.label} (${c.locks.length}/${c.total})`
+        move = { ...move, power: Math.max(1, Math.round(move.power * share)) }
+      }
+    }
+    cues.push({ kind: 'move', actorId: actor.id, targetId: intent.targetId, label })
     if (move.kind === 'damage' && move.target === 'all') {
       for (const target of living(s, 'ally')) {
         if (actor.hp <= 0) break
@@ -454,6 +675,8 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (u.side === 'enemy' && battleBroken(u) && s.round >= u.brokenAt + BATTLE_BREAK_ROUNDS - 1) {
       u.brokenAt = 0
       u.shield = enemyOf(s, u.id)!.shield
+      // v12 (D141): Steeled until she moves, so a party can't hold her down Break after Break.
+      if (s.engineVersion >= 12) u.steeled = true
       cues.push({ kind: 'recover', actorId: u.id, targetId: u.id, amount: u.shield })
     }
     const burn = stacks(u, 'burn')
@@ -461,7 +684,12 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
       const amount = Math.max(1, Math.round(maxHp(s, u.id) * BATTLE_BURN_PERCENT * burn))
       u.hp = Math.max(0, u.hp - amount)
       cues.push({ kind: 'hit', actorId: u.id, targetId: u.id, amount, channel: 'status', element: 'fire', weak: false, label: 'Burn' })
-      if (u.hp === 0) { cues.push({ kind: 'ko', actorId: u.id, targetId: u.id }); continue }
+      if (u.hp === 0) {
+        cues.push({ kind: 'ko', actorId: u.id, targetId: u.id })
+        if (u.side === 'enemy') foeDown(s, u, cues)
+        else delete u.rally
+        continue
+      }
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
     // v8: magical armor's Regen (D104); v11: a Vital Talisman's, and a Spring Amulet's MP (D124).
@@ -471,6 +699,16 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     const mpRegen = u.side === 'ally' ? allyOf(s, u.id)?.mpRegen ?? 0 : 0
     const mp = Math.min(mpRegen, (allyOf(s, u.id)?.stats.mp ?? 0) - u.mp)
     if (mp > 0) { u.mp += mp; cues.push({ kind: 'mp', actorId: u.id, targetId: u.id, amount: mp }) }
+  }
+  if (s.engineVersion >= 12) {
+    // A skill's Barrier lasts the round it was raised in, against the moves shown (D141); then a lingering summon that
+    // mends mends again, at its linger share.
+    for (const u of living(s, 'ally')) if (u.cover) u.cover = 0
+    for (const summon of s.summons) {
+      const owner = unit(s, summon.allyId)
+      const sup = rpgNode(summon.ref.id)?.skill.support
+      if (owner && owner.hp > 0 && sup?.mend) support(s, owner, { share: sup.share, mend: sup.mend }, 0, cues, summon.scale)
+    }
   }
   if (nextWave(s, cues) || terminal(s, cues)) return
   // Each wave gets the round cap, so a three-wave stage isn't rushed.
@@ -483,6 +721,7 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
   s.round += 1
   s.acted = []
   s.intents = intentsFor(s)
+  armCharges(s)
   cues.push(...reveal(s))
 }
 
@@ -492,6 +731,8 @@ function restoreMp(s: BattleState, u: BattleUnit, share: number, actorId: string
   if (gained > 0) { u.mp += gained; cues.push({ kind: 'mp', actorId, targetId: u.id, amount: gained }) }
 }
 function addBarrier(s: BattleState, u: BattleUnit, amount: number, actorId: string, cues: BattleCue[]): void {
+  // v12: a skill's Barrier is the shield that absorbs any damage, apart from the Bulwark Talisman's (D141).
+  if (s.engineVersion >= 12) { cover(s, actorId, u, amount, cues); return }
   const cap = Math.round(maxHp(s, u.id) * BATTLE_BARRIER_CAP)
   const next = Math.min(cap, u.barrier + Math.round(amount))
   if (next > u.barrier) { cues.push({ kind: 'status', actorId, targetId: u.id, label: `barrier ${next}`, amount: next }); u.barrier = next }
@@ -514,9 +755,11 @@ function randomFoe(s: BattleState, actorId: string, hit: number, salt = 'random'
 interface CastLog { tapped: BattleUnit; struck: BattleUnit[]; hitFoes: BattleUnit[]; weak: boolean }
 
 /** Resolves a skill's hits, extras, riders and status. */
-function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random', orbs?: readonly RpgDamageKind[]): CastLog {
+function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random',
+  orbs?: readonly RpgDamageKind[], supportScale = 1): CastLog {
   const log: CastLog = { tapped, struck: [], hitFoes: [], weak: false }
   const options: HitOptions = { special: def.special, orbs }
+  const from = cues.length
   const note = (foe: BattleUnit, _hit: RpgHit, weak: boolean) => {
     if (!log.struck.includes(foe)) log.struck.push(foe)
     log.hitFoes.push(foe)
@@ -559,6 +802,17 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
   }
   if (def.allies) for (const friend of living(s, 'ally')) addBarrier(s, friend, maxHp(s, friend.id) * BATTLE_BARRIER_PERCENT * def.allies.stacks, actor.id, cues)
   if (def.status) applyStatus(s, actor, def.status, log, cues)
+  if (def.support && s.engineVersion >= 12 && actor.side === 'ally') {
+    // v12 (D141): her support after the hits. A curse lands on every foe struck; a drain heals from what the hits dealt.
+    const curse = def.support.curse
+    if (curse) for (const foe of log.struck) if (foe.hp > 0) {
+      addStatus(foe, curse.status, curse.stacks)
+      cues.push({ kind: 'status', actorId: actor.id, targetId: foe.id, label: curse.status, amount: curse.stacks })
+    }
+    const dealt = cues.slice(from).reduce((n, c) => n + (c.kind === 'hit' && c.actorId === actor.id && c.targetId !== actor.id &&
+      unit(s, c.targetId)?.side === 'enemy' ? c.amount : 0), 0)
+    support(s, actor, def.support, dealt, cues, supportScale)
+  }
   return log
 }
 
@@ -597,7 +851,8 @@ function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: Bat
   const foes = living(s, 'enemy')
   if (!node || !foes.length) return
   cues.push({ kind: 'summon', actorId: actor.id, targetId: target.id, label: node.name })
-  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', orbsOf(ally))
+  // Its farewell strike mends or shields at its linger share too (v12); a revive or a blessing doesn't repeat.
+  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', orbsOf(ally), summon!.scale)
 }
 function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): void {
   s.summons = [...s.summons.filter((x) => x.allyId !== allyId), { allyId, ref: { tier: ref.tier, id: ref.id }, scale }]
@@ -621,7 +876,7 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
-  if (![6, 7, 8, 9, 10, 11].includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
+  if (!(VERSIONS as readonly number[]).includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
   if (!action || !['attack', 'guard', 'skill', 'limit'].includes(action.kind)) return invalid(previous, 'invalid-state')
   const actorUnit = unit(previous, action.actorId)

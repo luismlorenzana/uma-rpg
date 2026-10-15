@@ -2,7 +2,7 @@
 // break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes).
 import {
   isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, type BattleWeaknesses, type RpgClass, type RpgDamageKind,
-  type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgWeapon, type RpgWeaponKind,
+  type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgSupport, type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
 
 const WEAPON_KIND_LABEL: Readonly<Record<RpgWeaponKind, string>> = {
@@ -43,7 +43,9 @@ export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: 
   const mp = Math.max(1, Math.round(skill.mp * hand.mp)) * profile.tier
   const extra = skill.status ? ` · ${STATUS_LABEL[skill.status.key]} ${skill.status.stacks}${skill.status.to === 'allies' ? ' to all' : skill.status.to === 'foes' ? ' on all foes' : ''}`
     : skill.summon ? ` · lingers ${skill.summon.linger}×` : ''
-  return `${per} · ${skill.hits.length} hit${skill.hits.length === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}`
+  // Its support (D141): what it does for the party besides its hits.
+  const support = supportText(skill.support)
+  return `${per} · ${skill.hits.length} hit${skill.hits.length === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}${support ? ` · ${support}` : ''}`
 }
 export const STATUS_LABEL: Readonly<Record<RpgStatusKind | NonNullable<RpgSkillDef['status']>['key'], string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -103,21 +105,35 @@ export function KindMark({ kind, size = 16 }: { kind: RpgDamageKind; size?: numb
   if (isRpgElement(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex"><ElementGlyph element={kind} size={size} /></span>
   return null
 }
-export function Bar({ value, max, tone = 'hp', className = '' }: { value: number; max: number; tone?: 'hp' | 'mp' | 'exp' | 'limit'; className?: string }) {
+/** A skill's support in a few words (D141): "heals the most hurt", "Barrier on every ally"… or '' for none. */
+export function supportText(sup: RpgSupport | undefined): string {
+  if (!sup) return ''
+  return [
+    sup.mend === 'hurt' ? 'heals the most hurt' : sup.mend === 'all' ? 'heals every ally' : '',
+    sup.shield === 'threatened' ? 'Barrier on the most threatened' : sup.shield === 'all' ? 'Barrier on every ally' : '',
+    sup.cleanse ? 'cleanses' : '', sup.revive ? 'revives the fallen' : '', sup.drain ? 'drains HP' : '',
+    sup.bless ? 'Aegis on every ally' : '', sup.curse ? 'Enfeebles the foes it hits' : '',
+  ].filter(Boolean).join(', ')
+}
+
+/** A bar; `ghost` is HP she can still Rally back (D141), drawn grey after the fill. */
+export function Bar({ value, max, tone = 'hp', className = '', ghost = 0 }: { value: number; max: number; tone?: 'hp' | 'mp' | 'exp' | 'limit'; className?: string; ghost?: number }) {
   const color = tone === 'hp' ? 'bg-[#5fd28a]' : tone === 'mp' ? 'bg-[#6aa8ff]' : tone === 'limit' ? 'bg-[#ffd84d]' : 'bg-accent'
   const width = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0
+  const grey = max > 0 && ghost > 0 ? Math.max(0, Math.min(100 - width, (ghost / max) * 100)) : 0
   return (
-    <span className={`block h-1.5 overflow-hidden rounded-full bg-white/10 ${className}`} aria-hidden>
-      <span className={`block h-full rounded-full ${color}`} style={{ width: `${width}%`, transition: 'width 240ms ease-out' }} />
+    <span className={`flex h-1.5 overflow-hidden rounded-full bg-white/10 ${className}`} aria-hidden>
+      <span className={`block h-full shrink-0 rounded-full ${color}`} style={{ width: `${width}%`, transition: 'width 240ms ease-out' }} />
+      {grey > 0 && <span className="block h-full shrink-0 bg-white/45" style={{ width: `${grey}%` }} />}
     </span>
   )
 }
 
-/** Octopath-style break gauge: the shield count, or ! while it is down. */
-export function ShieldBadge({ value, broken = false }: { value: number; broken?: boolean }) {
+/** Octopath-style break gauge: the shield count, or ! while it is down; Steeled (D141) while it can't be chipped. */
+export function ShieldBadge({ value, broken = false, steeled = false }: { value: number; broken?: boolean; steeled?: boolean }) {
   return (
-    <span role="img" aria-label={broken ? 'Broken' : `Shield ${value}`} className="relative inline-flex h-6 w-5 shrink-0 items-center justify-center">
-      <svg viewBox="0 0 24 28" className={`absolute inset-0 h-full w-full ${broken ? 'text-accent' : 'text-[#9fb4cc]'}`} aria-hidden>
+    <span role="img" aria-label={broken ? 'Broken' : `Shield ${value}${steeled ? ', Steeled until she moves' : ''}`} className="relative inline-flex h-6 w-5 shrink-0 items-center justify-center">
+      <svg viewBox="0 0 24 28" className={`absolute inset-0 h-full w-full ${broken ? 'text-accent' : steeled ? 'text-[#e6eef8]' : 'text-[#9fb4cc]'}`} aria-hidden>
         <path d="M12 1 2 5v8c0 7 4.5 11.5 10 14 5.5-2.5 10-7 10-14V5L12 1Z" fill="currentColor" opacity={broken ? 0.9 : 0.35} stroke="currentColor" strokeWidth="1.5" />
       </svg>
       <span className="relative text-[11px] font-bold leading-none">{broken ? '!' : value}</span>

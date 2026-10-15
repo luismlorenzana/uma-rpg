@@ -84,14 +84,16 @@ export function nodesFor(dish: Dish): string[] {
   return [1, 2, 3, 4].map((n) => `sun:${n}`).filter((n) => nodeGrade(n) <= dish.grade)
 }
 
-/** Points per effect from a set of active nodes: a moon gives 1, a bridge ½ to each side, the Sun ⅛ to all eight. */
+/** Points per effect from a set of active nodes, worth their grade (D141): a moon of grade g gives g, a bridge g ÷ 2 to
+ * each side, a Sun node g ÷ 8 to all eight. */
 export function starPoints(active: readonly string[]): Record<ItemEffect, number> {
   const points = Object.fromEntries(ITEM_EFFECTS.map((e) => [e, 0])) as Record<ItemEffect, number>
   for (const id of active) {
     const [kind, key] = id.split(':')
-    if (kind === 'moon') points[key as ItemEffect] += 1
-    else if (kind === 'bridge') for (const e of key!.split('-')) points[e as ItemEffect] += 0.5
-    else if (kind === 'sun') for (const e of ITEM_EFFECTS) points[e] += 0.125
+    const g = nodeGrade(id)
+    if (kind === 'moon') points[key as ItemEffect] += g
+    else if (kind === 'bridge') for (const e of key!.split('-')) points[e as ItemEffect] += g / 2
+    else if (kind === 'sun') for (const e of ITEM_EFFECTS) points[e] += g / 8
   }
   return points
 }

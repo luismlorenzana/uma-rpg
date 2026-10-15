@@ -13,7 +13,7 @@ import {
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/dishes'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
-import type { GearSlot } from '../economy/gear-id'
+import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
 import { ARMOR_SLOT_KINDS, ARMOR_SLOTS } from '../economy/ranks'
 import type { ItemEffect } from '../items/kinds'
 
@@ -71,8 +71,7 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   const boosted = applyPoints(projectRpgStats(profile), points)
   const might = options.gear ? equippedMight(equipped, profile.weapons) : {}
   const a = equippedAccessories(equipped)
-  const effects = Object.fromEntries((['barrier', 'veil', 'regen', 'mpRegen', 'lifesteal', 'mpSteal', 'guard', 'resist', 'thorns', 'mirror'] as const)
-    .filter((k) => a[k] > 0).map((k) => [k, a[k]]))
+  const effects = accessoryFightFields(a, boosted.stats.hp)
   // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23).
   const bond = Math.min(10, Math.floor(level / 2.3))
   const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined

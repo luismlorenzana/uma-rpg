@@ -7,7 +7,7 @@ import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILIT
 import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { DISHES } from '../economy/dishes'
 import {
-  accessoryEffects, accessoryKindOf, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
+  accessoryEffects, accessoryKindOf, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
   MIGHT_PER_GRADE, recipeFamilies, slotOf, type EquipType,
 } from '../economy/gear'
 import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
@@ -23,9 +23,9 @@ import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitKinds,
   LEARNER_MAX_PARENTS,
 } from '../rpg/heroes'
-import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
+import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
 import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
-import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
+import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgWeaponKind, type RpgClass, type RpgWeapon,
@@ -34,7 +34,7 @@ import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
   BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT, WORLD_FORMATIONS,
-  WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES, WORLD_TUNING, worldContinent,
+  WORLD_BOSS_TWICE_FROM, WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES, WORLD_TUNING, worldContinent,
 } from '../world/world'
 
 type Cell = string | number
@@ -77,13 +77,14 @@ function slots(c: RpgClass): string {
 // --- Classes and skills ---------------------------------------------------------------------------------------------
 
 function classes(): string {
-  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break power', 'Starts as'],
+  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal)', 'Limit Break power', 'Starts as'],
     RPG_CLASSES.map((c) => {
       const h = rpgHand({ classId: c })
       const s = RPG_CLASS_STATS[c]
-      const special = h.pair ? 'Every act is an Arms half and a Tome half' : h.linger ? `A summon lingers and acts again at ${h.linger}` : c === 'cleric' ? 'Each skill carries a status' : '—'
+      const special = h.pair ? 'Every act is an Arms half and a Tome half' : h.linger ? `A summon lingers and acts again at ${h.linger}; most summon lines also mend, shield, drain, bless or revive`
+        : c === 'cleric' ? 'Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier' : '—'
       return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, `${x(h.power)}, ${x(h.mp)}`, special,
-        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c]]
+        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp, s.heal].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c]]
     }))
 }
 
@@ -159,8 +160,8 @@ function battleConstants(): string {
   const rows: Cell[][] = [
     ['`BATTLE_WEAK`', K.BATTLE_WEAK, 'Damage multiplier of a weak hit'],
     ['`BATTLE_UNBROKEN_FACTOR`', K.BATTLE_UNBROKEN_FACTOR, 'Damage a foe takes while its shield stands'],
-    ['`BATTLE_DEFENSE_SHARE`', K.BATTLE_DEFENSE_SHARE, 'Share of defense subtracted from offense'],
-    ['`BATTLE_MIN_OFFENSE_SHARE`', K.BATTLE_MIN_OFFENSE_SHARE, 'Floor: a hit keeps at least this share of offense'],
+    ['`BATTLE_DEFENSE_SHARE`', K.BATTLE_DEFENSE_SHARE, 'Before v12: share of defense subtracted from offense'],
+    ['`BATTLE_MIN_OFFENSE_SHARE`', K.BATTLE_MIN_OFFENSE_SHARE, 'Before v12: a hit keeps at least this share of offense'],
     ['`BATTLE_GUARD_FACTOR`', K.BATTLE_GUARD_FACTOR, 'Damage a guarding ally takes for the one she covers'],
     ['`BATTLE_BREAK_ROUNDS`', K.BATTLE_BREAK_ROUNDS, 'Rounds a Break lasts (the foe loses its actions)'],
     ['`BATTLE_MAX_ROUNDS`', K.BATTLE_MAX_ROUNDS, 'Round cap per wave; past it the fight is lost'],
@@ -170,8 +171,15 @@ function battleConstants(): string {
     ['`BATTLE_FOE_STATUS_STEP`', K.BATTLE_FOE_STATUS_STEP, 'Per stack: foes\' Weaken, Slow, Power-up, Ward'],
     ['`BATTLE_BURN_PERCENT`', K.BATTLE_BURN_PERCENT, 'Max HP lost per Burn stack at the end of a round'],
     ['`BATTLE_CLARITY_PERCENT`', K.BATTLE_CLARITY_PERCENT, 'Max MP restored per Clarity stack'],
-    ['`BATTLE_BARRIER_PERCENT`', K.BATTLE_BARRIER_PERCENT, 'Barrier per stack, as a share of max HP'],
-    ['`BATTLE_BARRIER_CAP`', K.BATTLE_BARRIER_CAP, 'Barrier cap, as a share of max HP'],
+    ['`BATTLE_BARRIER_PERCENT`', K.BATTLE_BARRIER_PERCENT, 'Barrier per stack of a summon\'s rider, as a share of max HP'],
+    ['`BATTLE_BARRIER_CAP`', K.BATTLE_BARRIER_CAP, 'Before v12: Barrier cap, as a share of max HP'],
+    ['`BATTLE_COVER_CAP`', K.BATTLE_COVER_CAP, 'v12: a skill Barrier\'s cap, as a share of max HP; it lasts the round'],
+    ['`RPG_SUPPORT_SHARE`', RPG_SUPPORT_SHARE.join(', '), 'v12: a mend\'s or Barrier\'s share of the target\'s max HP, by depth'],
+    ['`RPG_SUPPORT_ALL`', RPG_SUPPORT_ALL, 'v12: that share on every Uma, at depth 5 and for summons'],
+    ['`BATTLE_HEAL_SCALE`', K.BATTLE_HEAL_SCALE, 'v12: her Heal raises mends and Barriers ×(1 + Heal ÷ this)'],
+    ['`BATTLE_REVIVE_SHARE`', K.BATTLE_REVIVE_SHARE, 'v12: a revive\'s share of max HP, before her Heal'],
+    ['`BATTLE_RALLY_SHARE`', K.BATTLE_RALLY_SHARE, 'v12: share of a foe hit she can Rally back'],
+    ['`BATTLE_BREATHER`', K.BATTLE_BREATHER, 'v12: share of max HP every Uma recovers when a new wave enters'],
     ['`BATTLE_LIMIT_MAX`', BATTLE_LIMIT_MAX, 'Limit Break gauge'],
   ]
   return table(['Constant', 'Value', 'Meaning'], rows)
@@ -181,7 +189,7 @@ function foeRoles(): string {
   const roles: RpgFoeRole[] = ['striker', 'caster', 'guard', 'skirmisher', 'captain', 'champion']
   return table(['Role', 'Moves', 'Below 50% HP'], roles.map((role) => {
     const f = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role, rank: role === 'champion' ? 'boss' : role === 'captain' ? 'sub-boss' : 'regular', level: 10, shield: 2, weaknesses: { weapons: [], elements: [] } })
-    const list = (moves: typeof f.moves) => moves.map((m) => `${m.label} (${m.kind}${m.power ? `, ${m.power}%` : ''}, ${m.target})`).join('; ')
+    const list = (moves: typeof f.moves) => moves.map((m) => `${m.label} (${m.kind}${m.power ? `, ${m.power}%` : ''}, ${m.target}${m.charge ? `, charged, ${m.charge} locks` : ''})`).join('; ')
     return [cap(role), list(f.moves), f.phaseTwo ? list(f.phaseTwo.moves) : '—']
   })) + '\n\nShown with Fire; a foe uses her own element, and a dual-element foe her second element for her second elemental move.'
 }
@@ -190,11 +198,14 @@ function foeScaling(): string {
   const t = RPG_FOE_TUNING
   return table(['Setting', 'Value'], [
     ['HP', `(${t.hpBase} + ${t.hpPerStat} × reference stat) × role × rank`],
+    ['Offense', `Set so a 100% hit takes a share of an average Uma's HP at her level (${pct(t.hitShareStart)} at Lv 1, ${pct(t.hitShare)} from Lv ${t.hitShareFull}), × the offense budget, × role`],
     ['Sub-boss and boss HP', `×${t.subBossHp} and ×${t.bossHp}, times the party's reachable skill depth`],
-    ['Gear budget', `+${pct(t.budgetPerLevel)} to every stat per level past Lv ${t.budgetFrom}`],
-    ['World: regular foes', `+${pct(WORLD_TUNING.regularHpPerLevel)} HP and +${pct(WORLD_TUNING.regularOffensePerLevel)} offense per level`],
-    ['World: elites', `+${pct(WORLD_TUNING.eliteHpPerLevel)} HP and +${pct(WORLD_TUNING.eliteOffensePerLevel)} offense per level`],
-    ['World: region bosses', `${x(WORLD_TUNING.bossHp)} a champion's HP, +${pct(WORLD_TUNING.bossOffensePerLevel)} offense per level`],
+    ['Build budget', `What a built party's gear and Extra Stats call for: HP and defense ×(1 + ${t.budgetPerLevel} × (L − 1)² ÷ 49), ×${x(Math.round(rpgFoeBudget(50, t.budgetPerLevel) * 100) / 100)} at Lv 50; offense ×${x(Math.round(rpgFoeBudget(50, t.offenseBudgetPerLevel) * 100) / 100)} at Lv 50`],
+    ['World: regular foes', `+${pct(WORLD_TUNING.regularHpPerLevel)} HP per level`],
+    ['World: elites', `+${pct(WORLD_TUNING.eliteHpPerLevel)} HP per level`],
+    ['World: region bosses', `${x(WORLD_TUNING.bossHp)} a champion's HP`],
+    ['Acting twice', `From Lv ${WORLD_BOSS_TWICE_FROM}: a lone region boss and an elite's sub-boss; a lone elite always`],
+    ['Formations', `A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's`],
     ['Shields', `Regular ${t.regularShield} (by formation), sub-boss ${t.subBossShield}, boss ${t.bossShield}`],
   ])
 }
@@ -226,14 +237,14 @@ function gear(): string {
   const g10 = (t: EquipType) => gearById(gearId(t, 10))!
   const effect = (t: EquipType): string => {
     const a = accessoryEffects(g10(t))
-    const parts = [a.regen && `heals ${a.regen} HP a round`, a.mpRegen && `restores ${a.mpRegen} MP a round`, a.lifesteal && `heals ${a.lifesteal / 10}% of physical damage dealt`,
-      a.mpSteal && `restores MP as ${a.mpSteal / 10}% of magical damage dealt`, a.barrier && `a ${a.barrier} shield against physical damage`,
-      a.veil && `a ${a.veil} shield against magical damage`, a.guard && `${a.guard / 10}% less physical damage taken`, a.resist && `${a.resist / 10}% less magical damage taken`,
+    const parts = [a.regen && `heals ${a.regen / 10}% of her HP a round`, a.mpRegen && `restores ${a.mpRegen} MP a round`, a.lifesteal && `heals ${a.lifesteal / 10}% of physical damage dealt`,
+      a.mpSteal && `restores MP as ${a.mpSteal / 10}% of magical damage dealt`, a.barrier && `a shield of ${a.barrier / 10}% of her HP against physical damage`,
+      a.veil && `a shield of ${a.veil / 10}% of her HP against magical damage`, a.guard && `${a.guard / 10}% less physical damage taken`, a.resist && `${a.resist / 10}% less magical damage taken`,
       a.thorns && `returns ${a.thorns / 10}% of physical damage taken`, a.mirror && `returns ${a.mirror / 10}% of magical damage taken`].filter(Boolean)
     return parts.join('; ')
   }
   const does = (t: EquipType) => {
-    if (isWeapon(t)) return `Might +${MIGHT_PER_GRADE * 10} on its hits`
+    if (isWeapon(t)) return `Might: its hits deal +${MIGHT_PER_GRADE * 10}%`
     if (isOrb(t)) return 'Its kind on every hit, for weaknesses'
     if (isAccessory(t)) return effect(t)
     const p = gearPoints(g10(t))
@@ -242,7 +253,7 @@ function gear(): string {
   return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families, grades 1–4 (then again from grade 5)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
     EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
     [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
-  ])) + `\n\nArmor adds ATK (physical) or M.ATK (magical), +1 every two grades (${armorOffense(10)} at grade 10), and its slot's defensive stat +1 a grade. ` +
+  ])) + `\n\nA weapon's Might is +${MIGHT_PER_GRADE}% a grade on the hits made with it. Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (${armorOffense(10)} at grade 10), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
     `An Uma wears two accessories of different types.`
 }
 

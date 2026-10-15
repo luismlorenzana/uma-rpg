@@ -1,8 +1,8 @@
 // Deterministic ally auto-battle policy (H02): prefer a ready Limit Break, otherwise choose the strongest affordable
 // skill or Attack for the living foes. This is intentionally a small policy, not another battle engine.
-import { rpgNode, type RpgSkillDef } from '../catalog'
+import { rpgNode, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
 import { isRpgTome, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
-import { applyBattleAction, battleActorSkill, battleFoe, battleHitIsWeak } from './engine'
+import { applyBattleAction, battleActorSkill, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
 import type { BattleAction, BattleAlly, BattleHalf, BattleState, BattleUnit } from './types'
 
@@ -13,6 +13,14 @@ function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: read
   const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
   return total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) /
     (foe.shield > 0 ? 1 : 0.6) + (def.status ? 0.5 : 0)
+}
+/** v12 (D141): what a skill's support is worth beside its hits. A support that restores or shields its whole share is
+ * worth 1.5 casts of its depth's damage, so a Cleric or Summoner mends the hurt and shields the threatened. */
+function supportScore(state: BattleState, actorId: string, def: RpgSkillDef, depth: number): number {
+  const value = battleSupportValue(state, actorId, def.support)
+  if (!value || !def.support) return 0
+  const full = def.support.share > 0 ? def.support.share : 0.2
+  return (value / full) * 1.5 * RPG_SKILL_POWER[Math.max(0, Math.min(4, depth - 1))]!
 }
 
 const attackDef = (weapon: RpgWeapon): RpgSkillDef => ({
@@ -68,7 +76,7 @@ function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes:
     for (const ref of actor.loadout) {
       const skill = battleActorSkill(state, unit.id, ref)
       if (!skill || skill.mp > budget || (tome !== null && isRpgTome(skill.node.weapon) !== tome)) continue
-      consider({ half: { skill: ref }, mp: skill.mp, foe, score: score(state, skill.def, foe, foes) })
+      consider({ half: { skill: ref }, mp: skill.mp, foe, score: score(state, skill.def, foe, foes) + supportScore(state, unit.id, skill.def, skill.node.depth) })
     }
   }
   return pick

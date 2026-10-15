@@ -18,7 +18,8 @@
   slowly. Pace professions per Uma; gear and dish grades won't trail the battles.
 - Fights are the main Laurel source; selling stock also pays Laurels (D62). Laurels buy shortcuts: an hour of base work costs about
   two fights, whether bought as an item or as Time Tickets.
-- Extra Stats and gear each add about the same share of power (§7.3), small per point.
+- Extra Stats and gear each add a real share of power (D141): a node is worth its grade, a weapon 6% a grade on its
+  hits, and foes are budgeted for a party built on curve ([combat balance](combat-balance.md)).
 
 ## Professions (design §4, §8.5)
 
@@ -86,8 +87,8 @@ Gear-level training from Level L takes Mastery band `⌈L/2⌉`, so a whole trac
 
 ## Extra Stats and gear (S6, S7)
 
-- **One point** is 1.5% of its stat (HP, MP, ATK, M.ATK, DEF, M.DEF), 0.6% evasion for Speed, or a 0.4-charge head
-  start on the Limit Break gauge (12 to fill).
+- **One point** is +1 to its stat (+5 HP), 0.6% evasion for Speed, or a 0.4-charge head start on the Limit Break
+  gauge (12 to fill). A node gives its grade in points (D141).
 - **Active Extra Stats nodes:** `5 + ⌊Uma level / 2⌋` (5 at Lv1, 30 at Lv50).
 
 ## Recipes (D65, D86, D94)

@@ -65,7 +65,7 @@ Each capital's Finals take a franchise of their own: PriConne, Azur Lane, NIKKE,
 | Stage | Faces |
 |---|---|
 | Regular stages (1–10) | Regular units |
-| Elite (11) | A Sub-boss with two **Key enemy** assistants (guards at 0.8 of a regular foe's HP, shield 2). With help beside her, she acts once a round instead of twice |
+| Elite (11) | A Sub-boss with two **Key enemy** assistants (guards at 0.8 of a regular foe's HP, shield 2). With help beside her, she acts once a round below Lv 10 and twice from Lv 10 (D141) |
 | Boss (12) | Two opening waves of Sub-bosses (at regular strength, as before), then a Boss with two Sub-boss guards |
 | Twin boss | On each continent's top row (row 10, its highest level), the boss's wave has two Bosses, each with 55% of one Boss's HP, and one Sub-boss guard |
 | Capital Finals | Vanguard: a Sub-boss with Key enemy minions. Champion: a Boss with Sub-boss minions |

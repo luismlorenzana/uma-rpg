@@ -265,8 +265,9 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     const sheet = umaBattleSheet(o101, uma)
     expect(sheet.map((g) => g.title)).toEqual(['Offense', 'Defense', 'Sustain', 'Other'])
     const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
-    for (const label of ['ATK', 'M.ATK', 'Might', 'Orbs', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut', 'Barrier at the start',
-      'Veil at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen', 'MP Steal', 'Limit Break head start']) expect(labels).toContain(label)
+    for (const label of ['ATK', 'M.ATK', 'Might', 'Orbs', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
+      'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'Heal', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen',
+      'MP Steal', 'Limit Break head start']) expect(labels).toContain(label)
     const row = (label: string) => sheet.flatMap((g) => g.rows).find((r) => r.label === label)!
     expect(row('HP Regen').value).toBe('0 a round')
     expect(row('Might').value).toBe('None')

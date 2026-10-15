@@ -436,26 +436,26 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |
 |---|---|---|---|---|---|---|
-| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +40 on its hits |
-| Axe | `axe-g<grade>` | Weapon | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +40 on its hits |
-| Lance | `lance-g<grade>` | Weapon | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +40 on its hits |
-| Bow | `bow-g<grade>` | Weapon | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +40 on its hits |
-| Katana | `katana-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +40 on its hits |
-| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +40 on its hits |
-| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +40 on its hits |
-| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +40 on its hits |
-| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +40 on its hits |
-| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +40 on its hits |
-| Helm | `helm-g<grade>` | Head | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, DEF +10 |
-| Cuirass | `cuirass-g<grade>` | Body | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | HP +10, ATK +5 |
-| Greaves | `greaves-g<grade>` | Legs | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | MP +10, ATK +5 |
-| Gauntlets | `gauntlets-g<grade>` | Arms | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | ATK +5, M.DEF +10 |
-| Boots | `boots-g<grade>` | Feet | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, Speed +10 |
-| Circlet | `circlet-g<grade>` | Head | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, DEF +10 |
-| Robe | `robe-g<grade>` | Body | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | HP +10, M.ATK +5 |
-| Leggings | `leggings-g<grade>` | Legs | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | MP +10, M.ATK +5 |
-| Bracers | `bracers-g<grade>` | Arms | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | M.ATK +5, M.DEF +10 |
-| Slippers | `slippers-g<grade>` | Feet | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, Speed +10 |
+| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
+| Axe | `axe-g<grade>` | Weapon | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
+| Lance | `lance-g<grade>` | Weapon | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might: its hits deal +60% |
+| Bow | `bow-g<grade>` | Weapon | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might: its hits deal +60% |
+| Katana | `katana-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
+| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
+| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might: its hits deal +60% |
+| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might: its hits deal +60% |
+| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might: its hits deal +60% |
+| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might: its hits deal +60% |
+| Helm | `helm-g<grade>` | Head | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, DEF +20 |
+| Cuirass | `cuirass-g<grade>` | Body | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | HP +20, ATK +5 |
+| Greaves | `greaves-g<grade>` | Legs | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | MP +20, ATK +5 |
+| Gauntlets | `gauntlets-g<grade>` | Arms | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | ATK +5, M.DEF +20 |
+| Boots | `boots-g<grade>` | Feet | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, Speed +20 |
+| Circlet | `circlet-g<grade>` | Head | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, DEF +20 |
+| Robe | `robe-g<grade>` | Body | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | HP +20, M.ATK +5 |
+| Leggings | `leggings-g<grade>` | Legs | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | MP +20, M.ATK +5 |
+| Bracers | `bracers-g<grade>` | Arms | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | M.ATK +5, M.DEF +20 |
+| Slippers | `slippers-g<grade>` | Feet | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, Speed +20 |
 | Greatsword Orb | `orb-greatsword-g<grade>` | Accessory (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Its kind on every hit, for weaknesses |
 | Axe Orb | `orb-axe-g<grade>` | Accessory (Arms Orb) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Its kind on every hit, for weaknesses |
 | Lance Orb | `orb-lance-g<grade>` | Accessory (Arms Orb) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Its kind on every hit, for weaknesses |
@@ -466,17 +466,17 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 | Lightning Orb | `orb-lightning-g<grade>` | Accessory (Elemental Orb) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Its kind on every hit, for weaknesses |
 | Light Orb | `orb-light-g<grade>` | Accessory (Elemental Orb) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Its kind on every hit, for weaknesses |
 | Dark Orb | `orb-dark-g<grade>` | Accessory (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Its kind on every hit, for weaknesses |
-| Vital Talisman | `talisman-vital-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | heals 10 HP a round |
-| Vampire Talisman | `talisman-vampire-g<grade>` | Accessory (Talisman) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | heals 5% of physical damage dealt |
-| Bulwark Talisman | `talisman-bulwark-g<grade>` | Accessory (Talisman) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | a 50 shield against physical damage |
-| Iron Talisman | `talisman-iron-g<grade>` | Accessory (Talisman) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | 5% less physical damage taken |
-| Thorn Talisman | `talisman-thorn-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | returns 10% of physical damage taken |
-| Spring Amulet | `amulet-spring-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | restores 5 MP a round |
-| Siphon Amulet | `amulet-siphon-g<grade>` | Accessory (Amulet) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | restores MP as 2% of magical damage dealt |
-| Veil Amulet | `amulet-veil-g<grade>` | Accessory (Amulet) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | a 50 shield against magical damage |
-| Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 5% less magical damage taken |
-| Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 10% of magical damage taken |
+| Vital Talisman | `talisman-vital-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | heals 5% of her HP a round |
+| Vampire Talisman | `talisman-vampire-g<grade>` | Accessory (Talisman) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | heals 20% of physical damage dealt |
+| Bulwark Talisman | `talisman-bulwark-g<grade>` | Accessory (Talisman) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | a shield of 20% of her HP against physical damage |
+| Iron Talisman | `talisman-iron-g<grade>` | Accessory (Talisman) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | 15% less physical damage taken |
+| Thorn Talisman | `talisman-thorn-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | returns 30% of physical damage taken |
+| Spring Amulet | `amulet-spring-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | restores 10 MP a round |
+| Siphon Amulet | `amulet-siphon-g<grade>` | Accessory (Amulet) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | restores MP as 5% of magical damage dealt |
+| Veil Amulet | `amulet-veil-g<grade>` | Accessory (Amulet) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | a shield of 20% of her HP against magical damage |
+| Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
+| Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 30% of magical damage taken |
 
-Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (5 at grade 10), and its slot's defensive stat +1 a grade. An Uma wears two accessories of different types.
+A weapon's Might is +6% a grade on the hits made with it. Armor adds ATK (physical) or M.ATK (magical), +1 every two grades (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
 <!-- /live -->
 

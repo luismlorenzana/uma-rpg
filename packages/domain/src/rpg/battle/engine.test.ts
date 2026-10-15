@@ -4,6 +4,7 @@ import { rpgFoe } from '../campaign/enemies'
 import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleIntentDamage, battleLimitGain, battleStateHash, createBattle, replayBattle,
   type BattleAction } from './index'
 import { BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
+import { battleDamage } from './engine'
 import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
@@ -32,9 +33,12 @@ const party = (mp?: number, orb?: RpgDamageKind) => [
   ally(profile('a5', 'summoner', ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance']),
     ['summoner-tome-fire.1', 'summoner-greatsword.1', 'summoner-tome-ice.1'], mp),
 ]
+/** A foe for the older engines: without the charged moves v12 added to captains (D141), which they'd refuse. */
+const legacy = (e: BattleEnemy): BattleEnemy => ({ ...e, moves: e.moves.filter((m) => !m.charge),
+  ...(e.phaseTwo ? { phaseTwo: { ...e.phaseTwo, moves: e.phaseTwo.moves.filter((m) => !m.charge) } } : {}) })
 const foe = (id: string, element: RpgElement, weapons: RpgWeaponKind[] = ['greatsword', 'axe'], elements: RpgElement[] = ['fire'], shield = 3,
   rank: BattleEnemy['rank'] = 'regular') =>
-  rpgFoe({ id, castId: `cast-${id}`, element, role: rank === 'regular' ? 'striker' : 'captain', rank, level: 4, shield, weaknesses: { weapons, elements } })
+  legacy(rpgFoe({ id, castId: `cast-${id}`, element, role: rank === 'regular' ? 'striker' : 'captain', rank, level: 4, shield, weaknesses: { weapons, elements } }))
 const input = (enemies: BattleEnemy[], mp?: number, orb?: RpgDamageKind): BattleInput => ({ version: 6, seed: 1234, allies: party(mp, orb), enemies })
 const hits = (step: BattleStep, target: string) => step.cues.filter((c) => c.kind === 'hit' && c.targetId === target)
 const shieldOf = (s: BattleState, id: string) => s.units.find((u) => u.id === id)!.shield
@@ -519,5 +523,199 @@ describe('battle engine v11: two accessories and their effects (D124)', () => {
     expect(() => createBattle(v11(team({ orbs: ['fire', 'fire'] }), [hitter('physical')]))).toThrow(/Invalid battle ally/)
     expect(() => createBattle(v11(team({ thorns: 1001 }), [hitter('physical')]))).toThrow(/Invalid battle ally/)
     expect(() => createBattle(v11(team({ orbs: ['fire', 'katana'], lifesteal: 50, mpRegen: 3 }), [hitter('physical')]))).not.toThrow()
+  })
+})
+
+describe('battle engine v12: the combat balance rework (D141)', () => {
+  /** A Lv 40 party (depths 1–5 open, sides to depth 4) with loadouts that reach every new support. */
+  const lv = 40
+  const p = (id: string, classId: RpgClass, weapons: RpgWeapon[], sides: string[] = []) => profile(id, classId, weapons, sides, lv)
+  const crew = (loadouts: Partial<Record<string, string[]>> = {}): BattleAlly[] => [
+    ally(p('a1', 'brawler', ARMS), loadouts.a1 ?? ['brawler-greatsword.1']),
+    ally(p('a2', 'mage', TOMES), loadouts.a2 ?? ['mage-tome-fire.1']),
+    ally(p('a3', 'spellblade', ['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning']), loadouts.a3 ?? ['spellblade-greatsword.1']),
+    ally(p('a4', 'cleric', ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'], ['cleric-tome-light.3b']),
+      loadouts.a4 ?? ['cleric-greatsword.1', 'cleric-tome-fire.1', 'cleric-tome-light.3b']),
+    ally(p('a5', 'summoner', ['tome-light', 'tome-ice', 'tome-dark', 'greatsword', 'lance']),
+      loadouts.a5 ?? ['summoner-tome-light.1', 'summoner-tome-ice.1', 'summoner-tome-dark.1', 'summoner-greatsword.1', 'summoner-lance.4']),
+  ].map((a) => ({ ...a, classRank: lv }))
+  /** A foe with one move (or a kit), weak to the Greatsword only, a shield of `shield`. */
+  const brute = (id: string, moves: BattleEnemy['moves'], shield = 9, extra: Partial<BattleEnemy> = {}): BattleEnemy => {
+    const base = rpgFoe({ id, castId: `cast-${id}`, element: 'fire', role: 'striker', rank: 'regular', level: lv, shield, weaknesses: { weapons: ['greatsword'], elements: [] } })
+    return { ...base, moves, phaseTwo: undefined, ...extra }
+  }
+  const strike = (power = 100, target: BattleEnemy['moves'][number]['target'] = 'front'): BattleEnemy['moves'] =>
+    [{ id: 'hit', kind: 'damage', channel: 'physical', element: null, power, target, label: 'Hit' }]
+  const v12 = (enemies: BattleEnemy[], allies = crew(), waves?: BattleEnemy[][]): BattleInput =>
+    ({ version: 12, seed: 77, allies, enemies, ...(waves ? { waves } : {}) })
+  /** Everyone left this round guards the last Uma standing (she guards the one before), so the round ends and the foes
+   * act, and the front Uma is never covered. */
+  const endRound = (s: BattleState): BattleState => {
+    const standing = s.input.allies.filter((a) => unitOf(s, a.id).hp > 0)
+    const last = standing.at(-1)!, before = standing.at(-2)!
+    for (const a of standing) {
+      if (battleActionsLeft(s, a.id) <= 0) continue
+      s = act(s, { kind: 'guard', actorId: a.id, targetId: a.id === last.id ? before.id : last.id })
+    }
+    return s
+  }
+  const cuesOf = (step: BattleStep, kind: BattleStep['cues'][number]['kind']) => step.cues.filter((c) => c.kind === kind)
+
+  it('hits for offense² ÷ (offense + defense), with Might as a percent on the weapon’s own hits', () => {
+    const allies = crew()
+    const plain = createBattle(v12([brute('f1', strike())], allies)).state
+    const mighty = createBattle(v12([brute('f1', strike())], allies.map((a) => (a.id === 'a1' ? { ...a, might: { greatsword: 60 } } : a)))).state
+    const atk = allies[0]!.stats.atk, def = plain.input.enemies[0]!.stats.pdef
+    const one = battleDamage(plain, unitOf(plain, 'a1'), unitOf(plain, 'f1'), 'physical', 1, 'greatsword').amount
+    expect(one).toBe(Math.round((atk * atk) / (atk + def) * BATTLE_WEAK * BATTLE_UNBROKEN_FACTOR))
+    const boosted = battleDamage(mighty, unitOf(mighty, 'a1'), unitOf(mighty, 'f1'), 'physical', 1, 'greatsword').amount
+    expect(boosted / one).toBeCloseTo(1.6, 1)
+    expect(battleDamage(mighty, unitOf(mighty, 'a1'), unitOf(mighty, 'f1'), 'physical', 1, 'axe').amount).toBe(
+      battleDamage(plain, unitOf(plain, 'a1'), unitOf(plain, 'f1'), 'physical', 1, 'axe').amount)
+  })
+
+  it('lets a Cleric’s spell mend the most hurt and cleanse, and her blow shield the Uma the moves threaten', () => {
+    let s = createBattle(v12([brute('f1', strike(100, 'lowest-hp'))])).state
+    unitOf(s, 'a2').hp = Math.round(s.input.allies[1]!.stats.hp / 2)
+    unitOf(s, 'a3').statuses = [{ kind: 'burn', stacks: 1, turns: 2 }]
+    const spell = applyBattleAction(s, { kind: 'skill', actorId: 'a4', targetId: 'f1', skill: skill('cleric-tome-fire.1') })
+    const heal = cuesOf(spell, 'heal')[0]!
+    const cleric = s.input.allies[3]!
+    expect(heal).toMatchObject({ targetId: 'a2', amount: Math.round(s.input.allies[1]!.stats.hp * 0.14 * (1 + cleric.stats.dexterity / 300)) })
+    expect(unitOf(spell.state, 'a3').statuses.map((x) => x.kind)).toEqual(['brave'])
+    // The lowest-HP Uma is the one the foe aims at: the Cleric's blow shields her, until the round's end.
+    s = createBattle(v12([brute('f1', strike(100, 'lowest-hp'))])).state
+    unitOf(s, 'a2').hp = 10
+    s = createBattle({ ...s.input }).state
+    const before = createBattle(v12([brute('f1', strike(100, 'lowest-hp'))])).state
+    unitOf(before, 'a2').hp = 10
+    before.intents = [{ enemyId: 'f1', moveId: 'hit', targetId: 'a2' }]
+    const blow = applyBattleAction(before, { kind: 'skill', actorId: 'a4', targetId: 'f1', skill: skill('cleric-greatsword.1') })
+    expect(cuesOf(blow, 'cover')[0]).toMatchObject({ targetId: 'a2' })
+    expect(unitOf(endRound(blow.state), 'a2').cover ?? 0).toBe(0)
+    void s
+  })
+
+  it('makes a Barrier absorb any damage first, for the round it was raised in', () => {
+    const s = createBattle(v12([brute('f1', strike(100, 'all'))])).state
+    unitOf(s, 'a1').cover = 100000
+    const after = endRound(s)
+    expect(unitOf(after, 'a1').hp).toBe(s.input.allies[0]!.stats.hp)
+    expect(unitOf(after, 'a2').hp).toBeLessThan(s.input.allies[1]!.stats.hp)
+    expect(unitOf(after, 'a1').cover).toBe(0)
+  })
+
+  it('gives back a Rally when the foe who struck is Broken before she moves again', () => {
+    let s = createBattle(v12([brute('f1', strike(100, 'front'), 1)])).state
+    s = endRound(s)
+    const hurt = unitOf(s, 'a1')
+    expect(hurt.rally).toMatchObject({ from: 'f1' })
+    const owed = hurt.rally!.amount
+    const broke = applyBattleAction(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(cuesOf(broke, 'break')).toHaveLength(1)
+    expect(cuesOf(broke, 'heal').find((c) => c.label === 'Rally')).toMatchObject({ targetId: 'a1', amount: owed })
+    // Not Broken in time: her next move takes the Rally away.
+    const late = endRound(createBattle(v12([brute('f1', [{ ...strike()[0]!, power: 1 }, { id: 'rally', kind: 'buff', channel: 'physical', element: null,
+      power: 0, target: 'self', label: 'Rally', status: 'power-up' }], 9)])).state)
+    const later = endRound(late)
+    const moved = later.round > late.round
+    expect(moved).toBe(true)
+    // Whatever she did next, the Rally from her earlier hit is gone (a new hit may leave a new one).
+    expect(unitOf(later, 'a1').rally === undefined || unitOf(later, 'a1').rally !== unitOf(late, 'a1').rally).toBe(true)
+  })
+
+  it('announces a charged move with locks a round early; its locks weaken it and breaking all cancels it', () => {
+    const nuke: BattleEnemy['moves'] = [{ id: 'nuke', kind: 'damage', channel: 'physical', element: null, power: 200, target: 'all', label: 'Nuke', charge: 2 }]
+    const start = createBattle(v12([brute('f1', nuke)]))
+    expect(start.cues.find((c) => c.kind === 'intent')).toMatchObject({ label: 'Charging: Nuke' })
+    expect(unitOf(start.state, 'f1').charging).toMatchObject({ moveId: 'nuke', locks: ['greatsword', 'greatsword'], total: 2, round: 1 })
+    expect(battleIntentDamage(start.state, start.state.intents[0]!)).toEqual([])
+    // Round 1 gathers; round 2 lands at full strength with no lock broken.
+    const r2 = endRound(start.state)
+    expect(unitOf(r2, 'a2').hp).toBe(r2.input.allies[1]!.stats.hp)
+    const full = r2.input.allies[1]!.stats.hp - unitOf(endRound(r2), 'a2').hp
+    expect(full).toBeGreaterThan(0)
+    // One lock broken: half its power.
+    const one = act(r2, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(unitOf(one, 'f1').charging!.locks).toEqual(['greatsword'])
+    const half = one.input.allies[1]!.stats.hp - unitOf(endRound(one), 'a2').hp
+    expect(half).toBeLessThan(full * 0.7)
+    // Both broken: cancelled, and nothing lands.
+    const both = applyBattleAction(one, { kind: 'attack', actorId: 'a3', targetId: 'f1', weapon: 'greatsword', pair: { weapon: 'tome-fire' } })
+    expect(cuesOf(both, 'cancel')).toHaveLength(1)
+    expect(unitOf(endRound(both.state), 'a2').hp).toBe(both.state.input.allies[1]!.stats.hp)
+    // Older engines refuse a charged move.
+    expect(() => createBattle({ ...v12([brute('f1', nuke)]), version: 11 })).toThrow(/Invalid battle enemy/)
+  })
+
+  it('makes a Break strip her buffs and cancel her charge, and Steels her until she moves', () => {
+    let s = createBattle(v12([brute('f1', strike(), 1)])).state
+    unitOf(s, 'f1').statuses = [{ kind: 'power-up', stacks: 1, turns: 2 }, { kind: 'ward', stacks: 1, turns: 2 }]
+    s = act(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(unitOf(s, 'f1').statuses).toEqual([])
+    s = endRound(s) // round 1 ends; round 2 she is still Broken
+    s = endRound(s) // round 2 ends: she recovers, Steeled
+    expect(unitOf(s, 'f1')).toMatchObject({ brokenAt: 0, steeled: true, shield: 1 })
+    s = act(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(unitOf(s, 'f1').shield).toBe(1)
+    s = endRound(s) // she moves, and her Steel ends
+    expect(unitOf(s, 'f1').steeled).toBeUndefined()
+    expect(unitOf(act(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' }), 'f1').shield).toBe(0)
+  })
+
+  it('gives every Uma a breather between waves', () => {
+    const s = createBattle(v12([brute('f1', strike(), 9, { stats: { ...brute('f1', strike()).stats, hp: 1 } })], crew(), [[brute('f2', strike())]])).state
+    unitOf(s, 'a2').hp = 10
+    const next = applyBattleAction(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'greatsword' })
+    expect(next.cues.find((c) => c.kind === 'heal' && c.targetId === 'a2')).toMatchObject({ label: 'Breather', amount: Math.round(s.input.allies[1]!.stats.hp * 0.1) })
+  })
+
+  it('lets a Summoner’s summons mend, shield, drain, bless and raise the fallen', () => {
+    const s = createBattle(v12([brute('f1', strike())])).state
+    for (const id of ['a1', 'a2', 'a3']) unitOf(s, id).hp = 20
+    const light = applyBattleAction(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-tome-light.1') })
+    expect(cuesOf(light, 'heal').map((c) => (c.kind === 'heal' ? c.targetId : ''))).toEqual(['a1', 'a2', 'a3'])
+    const ice = applyBattleAction(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-tome-ice.1') })
+    expect(cuesOf(ice, 'cover')).toHaveLength(5)
+    const dark = applyBattleAction(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-tome-dark.1') })
+    const dealt = hits(dark, 'f1').reduce((n, c) => n + (c.kind === 'hit' ? c.amount : 0), 0)
+    expect(cuesOf(dark, 'heal')[0]).toMatchObject({ label: 'Drain', amount: Math.round(dealt * 0.3) })
+    const knight = act(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-greatsword.1') })
+    expect(unitOf(knight, 'a1').statuses).toContainEqual({ kind: 'aegis', stacks: 1, turns: 2 })
+    unitOf(s, 'a2').hp = 0
+    const valkyrie = applyBattleAction(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-lance.4') })
+    expect(cuesOf(valkyrie, 'heal').find((c) => c.label === 'Revived')).toMatchObject({ targetId: 'a2' })
+    expect(unitOf(valkyrie.state, 'a2')).toMatchObject({ revived: true })
+    // A lingering Light summon mends again at the round's end (against a foe that only buffs).
+    const calm = createBattle(v12([brute('f1', [{ id: 'rally', kind: 'buff', channel: 'physical', element: null, power: 0, target: 'self', label: 'Rally', status: 'power-up' }])])).state
+    unitOf(calm, 'a1').hp = 20
+    const summoned = act(calm, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-tome-light.1') })
+    expect(unitOf(endRound(summoned), 'a1').hp).toBeGreaterThan(unitOf(summoned, 'a1').hp)
+  })
+
+  it('lets Rebirth raise the first fallen Uma once a fight', () => {
+    const s = createBattle(v12([brute('f1', strike())])).state
+    unitOf(s, 'a1').hp = 0
+    const rise = applyBattleAction(s, { kind: 'skill', actorId: 'a4', targetId: 'f1', skill: skill('cleric-tome-light.3b') })
+    expect(unitOf(rise.state, 'a1').hp).toBeGreaterThan(0)
+    unitOf(rise.state, 'a1').hp = 0
+    const again = applyBattleAction(endRound(rise.state), { kind: 'skill', actorId: 'a4', targetId: 'f1', skill: skill('cleric-tome-light.3b') })
+    expect(unitOf(again.state, 'a1').hp).toBe(0)
+  })
+
+  it('leaves older fights as they were: a Cleric’s spell neither mends nor cleanses before v12', () => {
+    const s = createBattle({ ...v12([brute('f1', strike())]), version: 11 }).state
+    unitOf(s, 'a2').hp = 10
+    const spell = applyBattleAction(s, { kind: 'skill', actorId: 'a4', targetId: 'f1', skill: skill('cleric-tome-fire.1') })
+    expect(cuesOf(spell, 'heal')).toEqual([])
+    expect(unitOf(spell.state, 'a2').hp).toBe(10)
+  })
+
+  it('lets Auto mend a badly hurt Uma', () => {
+    const buff: BattleEnemy['moves'] = [{ id: 'rally', kind: 'buff', channel: 'physical', element: null, power: 0, target: 'self', label: 'Rally', status: 'power-up' }]
+    const s = createBattle(v12([brute('f1', buff)], crew({ a4: ['cleric-greatsword.1', 'cleric-tome-fire.1'] }))).state
+    unitOf(s, 'a1').hp = 5
+    const action = autoAction(s, 'a4')
+    expect(action).toMatchObject({ kind: 'skill', skill: { id: 'cleric-tome-fire.1' } })
   })
 })

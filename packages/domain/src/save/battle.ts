@@ -26,7 +26,7 @@ import {
 } from '../economy/ranks'
 import { starPoints } from '../economy/dishes'
 import { addPoints, applyPoints, type Points } from '../economy/bonus'
-import { BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
+import { BATTLE_HEAL_SCALE, BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
@@ -207,16 +207,20 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
     ({ label, value: String(boosted.stats[k]), gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] })
   const weapons = classOf(uma, classId).weapons
   const might = equippedMight(uma.gear.equipped, weapons)
-  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ')
+  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}%`).join(' · ')
   const a = equippedAccessories(uma.gear.equipped)
+  // Regen and the two shields are shares of her max HP (D141): the sheet shows both.
+  const hp = boosted.stats.hp
+  const ofHp = (permilleOfHp: number, suffix = '') => permilleOfHp ? `${Math.max(1, Math.round((hp * permilleOfHp) / 1000))}${suffix} (${permille(permilleOfHp)})` : `0${suffix}`
   return [
     { title: 'Offense', rows: [core('ATK', 'atk'), core('M.ATK', 'matk'), { label: 'Might', value: mightText || 'None' },
       { label: 'Orbs', value: a.orbs.map(KIND_NAME).join(', ') || 'None' }] },
     { title: 'Defense', rows: [core('DEF', 'pdef'), core('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) },
       { label: 'Physical damage cut', value: permille(a.guard) }, { label: 'Magical damage cut', value: permille(a.resist) },
-      { label: 'Barrier at the start', value: String(a.barrier) }, { label: 'Veil at the start', value: String(a.veil) },
+      { label: 'Bulwark (physical) at the start', value: ofHp(a.barrier) }, { label: 'Veil (magical) at the start', value: ofHp(a.veil) },
       { label: 'Thorns', value: permille(a.thorns) }, { label: 'Mirror', value: permille(a.mirror) }] },
-    { title: 'Sustain', rows: [core('HP', 'hp'), { label: 'HP Regen', value: `${a.regen} a round` }, { label: 'Lifesteal', value: permille(a.lifesteal) },
+    { title: 'Sustain', rows: [core('HP', 'hp'), { label: 'Heal', value: `${base.dexterity} (mends ×${(1 + base.dexterity / BATTLE_HEAL_SCALE).toFixed(2)})` },
+      { label: 'HP Regen', value: ofHp(a.regen, ' a round') }, { label: 'Lifesteal', value: permille(a.lifesteal) },
       core('MP', 'mp'), { label: 'MP Regen', value: `${a.mpRegen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) }] },
     { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
   ]
