@@ -51,6 +51,12 @@ describe('Hub terrain (D61)', () => {
 })
 
 describe('Hub art (P38)', () => {
+  it('uses the dedicated H29 Lapidary workshop, not an Armory alias', async () => {
+    const { frames } = (await import('@luismlorenzana/uma-art/buildings/atlas.json')).default
+    expect(buildingFrame('lapidary')).toBe('lapidary')
+    expect(frames.lapidary).toEqual({ x: 192, y: 288, w: 48, h: 48, page: 'wilds', anchorY: 44 })
+    expect(placesOn('wilds').some(p => p.id === 'lapidary')).toBe(true)
+  })
   it('draws only frames the tiles and buildings atlases have', async () => {
     const tiles = (await import('@luismlorenzana/uma-art/tiles/atlas.json')).default.frames as Record<string, unknown>
     const buildings = (await import('@luismlorenzana/uma-art/buildings/atlas.json')).default.frames as Record<string, unknown>

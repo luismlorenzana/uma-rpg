@@ -1,12 +1,12 @@
 // An item, gear or Star Gem icon from the shared atlases (@luismlorenzana/uma-art, P37–P38), drawn pixel-crisp at any
-// size. A piece drawn with another type's art shows its kind as a badge (D86); a Star Gem its planets' (D144).
+// size. A piece drawn with another type's art shows its kind as a badge (D86); Star Gems use their own sheet (H29).
 import gearUrl from '@luismlorenzana/uma-art/gear/atlas.png?url'
+import gemsUrl from '@luismlorenzana/uma-art/gems/atlas.png?url'
 import itemsUrl from '@luismlorenzana/uma-art/items/atlas.png?url'
 import { KindMark } from '../battle/labels'
 import { ATLAS_CELL, iconFrame, SHEET_SIZE, type Sheet } from './frames'
-import { planetFill } from './planets'
 
-const URL: Readonly<Record<Sheet, string>> = { items: itemsUrl, gear: gearUrl }
+const URL: Readonly<Record<Sheet, string>> = { items: itemsUrl, gear: gearUrl, gems: gemsUrl }
 
 export function ItemIcon({ id, size = 32, className = '', label }: { id: string; size?: number; className?: string; label?: string }) {
   const frame = iconFrame(id)
@@ -27,9 +27,6 @@ export function ItemIcon({ id, size = 32, className = '', label }: { id: string;
         <span className="absolute left-0 top-0 inline-flex items-center justify-center rounded-full bg-black/70" style={{ width: 12 * scale, height: 12 * scale }}>
           <KindMark kind={frame.kind} size={Math.max(8, Math.round(9 * scale))} />
         </span>
-      )}
-      {frame?.planets && (
-        <span className="absolute bottom-0 right-0 rounded-full ring-1 ring-black/70" style={{ width: Math.max(6, 9 * scale), height: Math.max(6, 9 * scale), background: planetFill(frame.planets) }} />
       )}
     </span>
   )

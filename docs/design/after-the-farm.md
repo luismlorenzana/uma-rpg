@@ -15,8 +15,9 @@
   the labelled chips did. A type with no materials in stock is dimmed.
 - **The Lapidary's picker** works the same way: Moons (eight planets × ten grades), Bridges and Sun tabs, a dot on gems
   the targets need, and the node a gem opens and what it gives.
-- **Art:** Star Gems borrow the cut-crystal icons with a planet badge, and the Lapidary borrows the Arcane Armory's
-  building. [H29](../handoff/tasks/H29-star-gem-and-lapidary-art.md) asks ChatGPT for their own art.
+- **Art (H29):** uma-art 2.8.0 supplies all 100 gems with distinct planet silhouettes, two-colour bridges and gold Sun
+  prisms. The Lapidary has its own copper-roofed stone workshop with a grinding wheel and crystal bench. The temporary
+  cut-crystal badges and Arcane Armory alias are removed; no economy or save rule changes.
 - **Splash cut-ins** hold about 1.5 s now (shipped first, separately).
 
 ## 1. What the farm does today

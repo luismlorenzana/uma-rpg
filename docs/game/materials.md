@@ -163,8 +163,9 @@ Cut at the Lapidary from refined items (D144). Setting one opens a node on the U
 
 A gem is named for its grade's stone on the Crystal Cavern's ladder and its stat's virtue: HP Vigor, MP Spirit, ATK
 Strength, M.ATK Sorcery, DEF Fortitude, M.DEF Resolve, Speed Swiftness, Limit Valor. So "Garnet of Strength" is ATK's
-grade 4. Maxing one Uma's map takes 232 refined items, 29 of each family. Its icon is its grade's cut crystal with a
-badge in its planets' colours, until it has art of its own (H29).
+grade 4. Maxing one Uma's map takes 232 refined items, 29 of each family. Each planet has its own gem silhouette and
+colour (uma-art 2.8.0, H29): rough at grades 1–3, faceted at 4–6, mounted at 7–8, with legendary glints at 9–10.
+Bridges are two-colour twin crystals; Sun gems are gold prisms with more rays at each grade.
 
 <!-- live:gems -->
 | Star Gem | Id | Kind | Grade | Feeds | Materials |

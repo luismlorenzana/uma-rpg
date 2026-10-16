@@ -1,5 +1,6 @@
 import atlas from '@luismlorenzana/uma-art/gear/atlas.json'
-import { EQUIP_TYPES, gearId } from '@rpg/domain'
+import gems from '@luismlorenzana/uma-art/gems/atlas.json'
+import { EQUIP_TYPES, gearId, GEMS } from '@rpg/domain'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
@@ -23,6 +24,31 @@ describe('H28 gear icon rendering', () => {
         expect(icon.style.backgroundSize).toBe(`${atlas.width * scale}px ${atlas.height * scale}px`)
         expect(icon.style.backgroundPosition).toBe(`${-frame.x * scale}px ${-frame.y * scale}px`)
         expect(icon.style.backgroundImage).toContain('/gear/atlas.png')
+        expect(icon.style.imageRendering).toBe('pixelated')
+        expect(icon.children).toHaveLength(0)
+      })
+    } finally {
+      await act(async () => root.unmount()); host.remove(); vi.unstubAllGlobals()
+    }
+  })
+})
+
+describe('H29 gem icon rendering', () => {
+  it('renders all 100 own icons at picker/list sizes without planet badges', async () => {
+    const cases = GEMS.flatMap(g => [28, 32, 64].map(size => ({ id: g.id, name: g.name, size })))
+    const host = document.createElement('div'), root = createRoot(host)
+    document.body.append(host); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
+    try {
+      await act(async () => root.render(<>{cases.map(({ id, name, size }) => <ItemIcon key={`${id}:${size}`} id={id} size={size} label={name} />)}</>))
+      const icons = [...host.querySelectorAll<HTMLElement>('[role="img"]')]
+      expect(icons).toHaveLength(300)
+      cases.forEach(({ id, name, size }, i) => {
+        const icon = icons[i]!, f = gems.frames[id as keyof typeof gems.frames], scale = size / 32
+        expect(icon.getAttribute('aria-label')).toBe(name)
+        expect(icon.style.width).toBe(`${size}px`); expect(icon.style.height).toBe(`${size}px`)
+        expect(icon.style.backgroundImage).toContain('/gems/atlas.png')
+        expect(icon.style.backgroundSize).toBe(`${gems.width * scale}px ${gems.height * scale}px`)
+        expect(icon.style.backgroundPosition).toBe(`${-f.x * scale}px ${-f.y * scale}px`)
         expect(icon.style.imageRendering).toBe('pixelated')
         expect(icon.children).toHaveLength(0)
       })
