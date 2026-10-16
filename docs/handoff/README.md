@@ -29,8 +29,7 @@
   `@luismlorenzana/uma-kit`, planned in uma-platform's
   [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). This game's Phase 0
   is complete (H30). Phase A is done here (D147): this game runs on uma-kit 0.1.2, and uma-racer's session moves
-  uma-racer. H31's Laurel mark and Battle tile page are published in **uma-art 2.9.0** (platform P49); Claude owns
-  the game's version pin and art adoption. No game wiring was part of H31.
+  uma-racer. H31's Laurel mark and Battle tile page are in **uma-art 2.9.0** (platform P49), pinned here (D148).
 
 ## Removed on 2026-10-12
 

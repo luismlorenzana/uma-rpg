@@ -7,7 +7,7 @@ import {
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
-import { useKitArt, useReducedMotionSetting } from '@luismlorenzana/uma-kit/ui'
+import { useReducedMotionSetting } from '@luismlorenzana/uma-kit/ui'
 import type { ArtIndex } from '@luismlorenzana/uma-data'
 import { Suspense, useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
@@ -100,7 +100,6 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const now = useNow(15_000)
   const master = useMaster()
   const art = master.status === 'ready' ? master.view.art : null
-  const kitArt = useKitArt()
   const [params] = useSearchParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -108,7 +107,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const reducedMotion = useReducedMotionSetting()
   const featured = useFeatured()
   const ready = readyPlaces(world, now)
-  const ground = useMemo(() => pageGround(page, kitArt.tiles?.index.frames ?? {}), [page, kitArt.tiles])
+  const ground = useMemo(() => pageGround(page), [page])
   const places = placesOn(page).map((place): HubMapPlace => {
     const open = isOpen(place, CURRENT_SLICE)
     const isReady = open && ready.has(place.id)

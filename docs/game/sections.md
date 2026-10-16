@@ -86,8 +86,8 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 
 The Wilds hold every facility: eight sites in two columns, and the Workbench, the Lapidary and the Forge across the
 middle row, the Lapidary on the road between them (D144). Town Hall keeps its four places in the corners around the
-plaza. The Battle page holds the Scenario Gate and the Tier Finale. It is drawn with the Town tiles until its own tile
-page arrives (H31).
+plaza. The Battle page holds the Scenario Gate and the Tier Finale on a drill ground of its own, with flagstone roads,
+banners, weapon racks, training dummies and torches (H31, D148).
 
 ### Facilities
 

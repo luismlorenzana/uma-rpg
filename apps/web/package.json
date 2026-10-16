@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@luismlorenzana/uma-art": "2.8.0",
+    "@luismlorenzana/uma-art": "2.9.0",
     "@luismlorenzana/uma-data": "1.0.0",
     "@luismlorenzana/uma-kit": "0.1.2",
     "@rpg/domain": "workspace:*",
