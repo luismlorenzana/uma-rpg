@@ -10,12 +10,14 @@
 | # | Task | Who | Size | Needs |
 |---|---|---|---|---|
 | **Now** | | | | |
+| [H30](tasks/H30-phase-0-iphone-band-and-level-sort.md) | Sibling apps, Phase 0: fill the iPhone screen; Uma lists open on Uma Level | ChatGPT | S | — |
+| [H31](tasks/H31-laurel-mark-and-battle-tiles.md) | Art for Phase A: a Laurel mark and the Battle tile page | ChatGPT, Claude releases | S–M | — |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | M | — |
 | **Parked by the owner** | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | The owner decides, Claude builds | L | Q6 |
 | [H24](tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design | The owner and Claude | M | Q7, H23 |
 
-**For ChatGPT:** no ready packets. H08, H10, H11, H28 and H29 are complete.
+**For ChatGPT, in order:** H30, H31. H08, H10, H11, H28 and H29 are complete.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes. **Combat** was rebalanced by D140–D141 ([combat balance](../design/combat-balance.md)); its next pass comes
@@ -25,9 +27,10 @@
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
 - **Other repos** (uma-racer phase 3, uma-puzzle phase 4) are in uma-platform's `docs/roadmap.md` and uma-racer's
   `docs/rearchitecture/`, not here.
-- **Sibling apps** (proposal, 2026-10-16): one shell, Hub and Uma album shared with uma-racer, in uma-platform's
-  [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). It waits on the
-  owner; its Phase 0 (the iPhone band, the Uma Level sort rule) touches this repo.
+- **Sibling apps** (approved 2026-10-16, platform P48): one shell, Hub and Uma album shared with uma-racer through
+  `@luismlorenzana/uma-kit`, planned in uma-platform's
+  [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). Phase 0 is H30;
+  Phase A's art is H31. Claude builds the kit and moves this game onto it; uma-racer's session moves uma-racer.
 
 ## Removed on 2026-10-12
 
