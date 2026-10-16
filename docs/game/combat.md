@@ -263,7 +263,8 @@ Key enemies, Sub-bosses and Bosses have a 16:9 splash (D135). It cuts in across 
 - when she's defeated, fading to grey.
 
 Each cut-in shows her art sweeping in from the right, a stripe in her tier's colour (Key enemies teal, Sub-bosses
-violet, Bosses red) and a caption: her move, BREAK!, Changes tactics! or DEFEATED. It holds for about 0.7 s.
+violet, Bosses red) and a caption: her move, BREAK!, Changes tactics! or DEFEATED. It holds for about 1.5 s,
+zooming in slowly; 2× and 4× shorten it to about 1.1 s and 0.75 s.
 - **Skipping:** tapping the stage skips it, like any playback, and the speed setting shortens it.
 - **Reduced motion:** with reduced motion on, cut-ins don't play.
 - **Regulars:** Regular foes have no splash.

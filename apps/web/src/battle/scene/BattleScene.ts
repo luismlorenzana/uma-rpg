@@ -606,7 +606,11 @@ export class BattleScene extends Phaser.Scene {
     this.tweens.add({ targets: stripe, scaleX: 1, duration: 300 })
     this.tweens.add({ targets: text, alpha: 1, x: `+=${10 * d}`, duration: 220, delay: 120 })
     if (defeat) this.time.delayedCall(320, () => art.setTint(0x8a8f98))
-    await this.wait(defeat ? 760 : 680)
+    // She holds for 1.5 s at 1×, zooming in slowly so the art reads. Faster speeds shorten the hold by the square root of
+    // the speed only (about 1.1 s at 2×, 0.75 s at 4×), so a splash never just flickers past.
+    const hold = (defeat ? 1600 : 1500) * Math.sqrt(this.time.timeScale)
+    this.tweens.add({ targets: art, scale: scale * 1.03, duration: hold, delay: 260 })
+    await this.wait(hold)
     this.tweens.add({ targets: [band, art, stripe, text], alpha: 0, duration: 160, onComplete: () => {
       for (const o of [band, art, stripe, text]) o.destroy()
     } })

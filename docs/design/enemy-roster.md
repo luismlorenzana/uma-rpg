@@ -100,7 +100,8 @@ A foe with a splash cuts in across the rivals' half, above their name panels:
 - on her **defeat**, fading to grey.
 
 Each cut-in sweeps in from the right with a stripe in her tier's colour (Key teal, Sub-boss violet, Boss red) and a
-caption, and lasts about 0.7 s. Tapping skips it; the speed setting shortens it; with reduced motion it doesn't play.
+caption, and holds for about 1.5 s, zooming in slowly (0.7 s before 2026-10-16). Tapping skips it; the speed setting
+shortens it by its square root only (about 1.1 s at 2×, 0.75 s at 4×); with reduced motion it doesn't play.
 Bosses and Sub-bosses show it most, and Key enemies in elites show it too, so splashes come up often but never more
 than once per foe per round for moves.
 
