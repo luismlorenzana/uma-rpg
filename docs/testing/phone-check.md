@@ -14,8 +14,9 @@ Exchange sheets. Every button and footer should remain reachable without horizon
 
 1. **Phone only — install.** In Safari open the live game, tap Share → Add to Home Screen, then open Uma RPG from its
    icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator.
-   **iPhone 15, 393×852 (H30):** the frame and tab bar reach the bottom; no empty band below the bar. Only the home
-   indicator inset sits below its row. Place pages scroll inside the frame.
+   **iPhone 15, 393×852 (D149):** the bottom bar is docked to the screen's bottom edge, with no empty band below it.
+   Its panel runs under the home indicator, and its tabs sit just above it. Place pages, the side panel and sheets
+   reach the bottom too. Place pages scroll inside the frame.
    **Shell (D147):** the top bar shows your initial with the Tier crest, then Laurels, Speed Tickets and Uma Tickets
    `N · s/5`. The bottom bar reads Town Hall · Learning · Battle (raised) · Wilds · Menu. In **Account → Appearance**,
    Light and Dark switch the whole app at once and System follows the phone; a fight stays dark either way.

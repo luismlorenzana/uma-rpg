@@ -21,7 +21,7 @@ sideways to the next page. Each page is a pixel-art map fitted to the screen (um
 The app runs in uma-kit's shell, the same as uma-racer's (`hub/Shell.tsx`, D147):
 - a fixed full-screen frame;
 - the account bar on top;
-- the bottom bar floating in the thumb zone, lifted clear of the home indicator.
+- the bottom bar docked full width to the screen's bottom edge, its panel running under the home indicator (D149).
 
 Place pages open between the two bars and scroll inside them. A fight hides both bars.
 
@@ -255,8 +255,9 @@ A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't bu
   - three chips: **Laurels**, **Speed Tickets**, and **Uma Tickets** with the Uma Shards toward the next (`N · s/5`).
     Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
   - Offline or Sync paused, when it applies.
-- **Bottom bar:** Town Hall · Learning · **Battle** (raised, in the middle) · Wilds · Menu. The Wilds tab counts the jobs
-  ready to collect.
+- **Bottom bar:** Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked to the bottom edge
+  (D149). Battle is a gold disc rising out of the bar. The active tab has a gold marker on the bar's top edge and a
+  filled icon. The Wilds tab counts the jobs ready to collect.
 - **Menu sheet** (`?sheet=menu`): every place by page, with a lock on locked ones, and the Account.
 - **Side panel:** a quick look slides in from the right. It closes with ✕, a swipe right, a backdrop tap, Escape or back.
 - **Place pages:** they fill the space between the bars, and Back returns to where you opened them from. Bottom sheets
