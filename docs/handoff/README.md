@@ -29,7 +29,7 @@
 - **Sibling apps** (approved 2026-10-16, platform P48): one shell, Hub and Uma album shared with uma-racer through
   `@luismlorenzana/uma-kit`, planned in uma-platform's
   [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). This game's Phase 0
-  is complete (H30). Phase A is done here (D147): this game runs on uma-kit 0.1.1, and uma-racer's session moves
+  is complete (H30). Phase A is done here (D147): this game runs on uma-kit 0.1.2, and uma-racer's session moves
   uma-racer. Phase A's art is H31, a Laurel mark and the Battle tile page; Claude pins the uma-art release.
 
 ## Removed on 2026-10-12
