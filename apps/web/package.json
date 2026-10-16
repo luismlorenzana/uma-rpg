@@ -14,7 +14,7 @@
   "dependencies": {
     "@luismlorenzana/uma-art": "2.9.0",
     "@luismlorenzana/uma-data": "1.0.0",
-    "@luismlorenzana/uma-kit": "0.2.0",
+    "@luismlorenzana/uma-kit": "0.3.0",
     "@rpg/domain": "workspace:*",
     "dexie": "^4.4.6",
     "firebase": "^12.19.0",

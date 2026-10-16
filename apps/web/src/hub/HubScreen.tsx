@@ -1,5 +1,5 @@
 // The Hub (S1, D43, D147): a page's map on uma-kit (`HubMap`: the Phaser canvas, the place links and the page swipe),
-// Town Hall's featured Uma, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
+// Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
 import {
   CURRENT_SLICE, facilityOf, facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen,
@@ -18,7 +18,7 @@ import { PlacePreview } from '../places/PlacePreview'
 import { PLACE_UI } from '../places/registry'
 import { collectEverything, useWorld } from '../save/game'
 import { useNow } from '../ui/useNow'
-import { plaza, useFeatured } from './Featured'
+import { plaza, sheetFor, useCrowd } from './Featured'
 import { pageGround } from './grounds'
 import { readyPlaces } from './ready'
 import { lastPage } from './start'
@@ -105,7 +105,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const navigate = useNavigate()
   const leave = useLeave()
   const reducedMotion = useReducedMotionSetting()
-  const featured = useFeatured()
+  const crowd = useCrowd()
   const ready = readyPlaces(world, now)
   const ground = useMemo(() => pageGround(page), [page])
   const places = placesOn(page).map((place): HubMapPlace => {
@@ -134,7 +134,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
         onPage={(next) => navigate(`/${next}`, { replace: true })}
         ground={ground}
         places={places}
-        plaza={page === 'town' ? plaza(featured, withParam(location, 'sheet', 'featured')) : undefined}
+        plaza={page === 'town' ? plaza(crowd, (id) => sheetFor(location, id)) : undefined}
         covered={covered}
         reducedMotion={reducedMotion}
         canvas={import.meta.env.DEV && params.has('canvas')}

@@ -29,8 +29,11 @@ Place pages open between the two bars and scroll inside them. A fight hides both
   - a name pill;
   - slot pips showing the working Umas' faces in progress rings;
   - a "Ready" badge.
-- **Town Hall's plaza:** the featured Uma stands on the road. She is the one picked on this device, or else the highest
-  Uma Level. Tap her for Fight, Profile or "Feature another" (`?sheet=featured`).
+- **Town Hall's plaza** (D150): up to five small chibis stand on the road, each bobbing on its own beat.
+  - The featured Uma is in front. She is the one picked on this device, or else the highest Uma Level.
+  - The active party's other members stand round her, then the next highest levels.
+  - Tap any of them for her sheet: Fight, Profile or "Feature another" (`?sheet=featured&uma=:id`).
+  - An outfit without a chibi stands as a round token of her icon.
 - A floating **Collect all · N ready** button collects every finished job.
 - **Taps:** a place opens its **quick look** in the side panel (`/:page?peek=:id`). Its **Enter** button opens the
   place's page (`/:page/:placeId/*`). The Scenario Gate skips the quick look and opens its page at once.
