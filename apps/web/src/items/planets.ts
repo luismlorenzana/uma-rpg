@@ -1,5 +1,4 @@
-// Each planet's colour and short name on the Observatory map, and what a node gives, shared by the map, the Lapidary and
-// the Star Gem badges (D144).
+// Each planet's colour and short name on the Observatory map, and what a node gives, shared with the Lapidary.
 import { EFFECT_LABEL, ITEM_EFFECTS, POINT_EVASION, POINT_HP, POINT_LIMIT, starPoints, type ItemEffect } from '@rpg/domain'
 
 export const PLANET_SHORT: Readonly<Record<ItemEffect, string>> = { hp: 'HP', mp: 'MP', atk: 'ATK', matk: 'MATK', def: 'DEF', mdef: 'MDEF', speed: 'SPD', limit: 'LB' }
@@ -7,16 +6,6 @@ export const PLANET_SHORT: Readonly<Record<ItemEffect, string>> = { hp: 'HP', mp
 export const PLANET_COLOR: Readonly<Record<ItemEffect, string>> = {
   hp: '#e8706a', mp: '#6aa8ff', atk: '#ff9a4d', matk: '#c48bff', def: '#9fb4cc', mdef: '#5fd3c0', speed: '#ffd84d', limit: '#f0b8ff',
 }
-/** The Sun's gold, for a Sun gem that feeds all eight. */
-export const SUN_COLOR = '#f5c542'
-
-/** A badge's fill: one planet's colour, a bridge's two halves, or the Sun's gold. */
-export function planetFill(planets: readonly ItemEffect[]): string {
-  if (planets.length > 2) return SUN_COLOR
-  if (planets.length === 2) return `linear-gradient(90deg, ${PLANET_COLOR[planets[0]!]} 50%, ${PLANET_COLOR[planets[1]!]} 50%)`
-  return PLANET_COLOR[planets[0]!]
-}
-
 /** A node's name: "ATK moon 4", "HP + DEF bridge 1", "Sun 2". */
 export function nodeLabel(id: string): string {
   const [kind, key, n] = id.split(':')
