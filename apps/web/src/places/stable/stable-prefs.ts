@@ -8,7 +8,8 @@ export interface StablePrefs {
   view: StableView
 }
 
-const KEY = 'rpg.stable.v1'
+// H30 resets the old release-order default once; choices made from now on are still remembered.
+const KEY = 'rpg.stable.v2'
 
 const DEFAULT_PREFS: StablePrefs = { query: { ownership: DEFAULT_ROSTER_QUERY.ownership, facets: EMPTY_FACETS, sort: DEFAULT_ROSTER_QUERY.sort }, view: 'grid' }
 

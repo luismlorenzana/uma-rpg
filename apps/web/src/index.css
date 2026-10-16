@@ -58,6 +58,8 @@
   }
 
   html {
+    /* Match body even outside the fixed frame during iOS Home Screen viewport changes. */
+    background: var(--color-page);
     /* No rubber-band scrolling or pull-to-refresh behind the Hub. */
     overscroll-behavior: none;
     -webkit-text-size-adjust: 100%;

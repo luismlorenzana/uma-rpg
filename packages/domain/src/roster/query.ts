@@ -42,7 +42,7 @@ export interface RosterResult {
 
 export const EMPTY_FACETS: RosterFacets = { rarity: [], surface: [], distance: [], strategy: [], sex: [], newOnly: false, freeOnly: false }
 
-export const DEFAULT_ROSTER_QUERY: RosterQuery = { ownership: 'all', search: '', facets: EMPTY_FACETS, sort: { key: 'release', direction: 'desc' } }
+export const DEFAULT_ROSTER_QUERY: RosterQuery = { ownership: 'all', search: '', facets: EMPTY_FACETS, sort: { key: 'level', direction: 'desc' } }
 
 export const SORT_LABELS: Record<RosterSortKey, string> = {
   release: 'Release date',
@@ -78,7 +78,9 @@ function passesFacets(entry: RosterEntry, f: RosterFacets, busy: ReadonlySet<str
   return true
 }
 
-function compare(a: RosterEntry, b: RosterEntry, key: RosterSortKey): number {
+type SortEntry = Pick<RosterEntry, 'outfit' | 'owned'>
+
+function sortValue(a: SortEntry, b: SortEntry, key: RosterSortKey): number {
   switch (key) {
     case 'name':
       return a.outfit.name.localeCompare(b.outfit.name) || (a.outfit.title ?? '').localeCompare(b.outfit.title ?? '')
@@ -87,17 +89,30 @@ function compare(a: RosterEntry, b: RosterEntry, key: RosterSortKey): number {
     case 'statTotal':
       return statTotal(a.outfit) - statTotal(b.outfit)
     case 'level':
-      // Owned before locked whatever the direction would say; then by level.
       return (a.owned?.level ?? 0) - (b.owned?.level ?? 0)
     case 'release':
       return a.outfit.releasedJp.localeCompare(b.outfit.releasedJp)
     case 'craft':
       return (a.owned?.craft.level ?? 0) - (b.owned?.craft.level ?? 0)
     case 'classRank': {
-      const top = (e: RosterEntry) => (e.owned ? Math.max(1, ...Object.values(e.owned.ranks.classes).map((t) => t.rank)) : 0)
+      const top = (e: SortEntry) => (e.owned ? Math.max(1, ...Object.values(e.owned.ranks.classes).map((t) => t.rank)) : 0)
       return top(a) - top(b)
     }
   }
+}
+
+function compare(a: SortEntry, b: SortEntry, key: RosterSortKey, direction: SortDirection): number {
+  // Ownership is a group, not a numeric sort value: reversing the sort must never put locked Umas first.
+  return Number(b.owned !== null) - Number(a.owned !== null)
+    || (direction === 'asc' ? 1 : -1) * sortValue(a, b, key)
+    || b.outfit.releasedJp.localeCompare(a.outfit.releasedJp)
+    || a.outfit.name.localeCompare(b.outfit.name)
+    || a.outfit.masterId - b.outfit.masterId
+}
+
+/** The default for Uma lists and pickers: owned first, highest Uma Level, newest release, then name. */
+export function byUmaLevel(a: SortEntry, b: SortEntry): number {
+  return compare(a, b, 'level', 'desc')
 }
 
 /** `busy`: Umas working now, for the "free only" facet. */
@@ -113,7 +128,6 @@ export function runRosterQuery(roster: readonly RosterOutfit[], umas: Readonly<R
   const counts: Record<Ownership, number> = { all: filtered.length, owned: filtered.filter((e) => e.owned).length, locked: 0 }
   counts.locked = counts.all - counts.owned
   const shown = filtered.filter((e) => query.ownership === 'all' || (query.ownership === 'owned') === (e.owned !== null))
-  const sign = query.sort.direction === 'asc' ? 1 : -1
-  shown.sort((a, b) => sign * compare(a, b, query.sort.key) || b.outfit.releasedJp.localeCompare(a.outfit.releasedJp) || a.outfit.masterId - b.outfit.masterId)
+  shown.sort((a, b) => compare(a, b, query.sort.key, query.sort.direction))
   return { entries: shown, counts }
 }

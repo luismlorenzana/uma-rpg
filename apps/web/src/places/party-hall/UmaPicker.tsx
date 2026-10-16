@@ -1,5 +1,5 @@
 // Picks an owned Uma for a party slot. Umas already in another party are marked; picking one moves her (D46).
-import { matchesSearch, partyOf, type TierWorld } from '@rpg/domain'
+import { byUmaLevel, matchesSearch, partyOf, type TierWorld } from '@rpg/domain'
 import { useMemo, useState } from 'react'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
@@ -9,7 +9,8 @@ import { SearchIcon } from '../../ui/icons'
 export function UmaPicker({ view, world, partyIndex, onPick, onClose }: { view: MasterView; world: TierWorld; partyIndex: number; onPick: (outfitId: string) => void; onClose: () => void }) {
   const [search, setSearch] = useState('')
   const owned = useMemo(
-    () => view.roster.filter((o) => world.umas[o.outfitId] && matchesSearch(o, search)).sort((a, b) => a.name.localeCompare(b.name)),
+    () => view.roster.filter((o) => world.umas[o.outfitId] && matchesSearch(o, search))
+      .map(outfit => ({ outfit, owned: world.umas[outfit.outfitId]! })).sort(byUmaLevel).map(e => e.outfit),
     [view.roster, world.umas, search],
   )
   return (

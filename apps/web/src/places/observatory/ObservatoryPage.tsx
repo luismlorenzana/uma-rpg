@@ -1,7 +1,7 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
+  activeNodeSlots, BRIDGES, byUmaLevel, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -20,6 +20,7 @@ export default function ObservatoryPage({ rest }: PageProps) {
 function Observatory({ view, initial }: { view: MasterView; initial: string | null }) {
   const world = useWorld()
   const owned = view.roster.filter((o) => world?.umas[o.outfitId])
+    .map(outfit => ({ outfit, owned: world!.umas[outfit.outfitId]! })).sort(byUmaLevel).map(e => e.outfit)
   const [picked, setPicked] = useState<string | null>(initial)
   const [message, setMessage] = useState<string | null>(null)
   if (!world) return null

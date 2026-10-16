@@ -2,7 +2,7 @@
 // (30 minutes off any job, D74) and Sweep Tickets (replay a beaten regular stage at once, for a quarter of its first
 // clear, D79). Marks banked past max ranks buy Manuals: EXP for one bar of one Uma (D102).
 import {
-  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
+  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, byUmaLevel, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
   TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type RankRef, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -98,6 +98,7 @@ function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster
   const [outfitId, setOutfitId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const owned = roster.filter((o) => world.umas[o.outfitId])
+    .map(outfit => ({ outfit, owned: world.umas[outfit.outfitId]! })).sort(byUmaLevel).map(e => e.outfit)
   const uma = outfitId ? world.umas[outfitId] : null
   const read = (ref: RankRef, n: number) => readManual(outfitId!, ref, n).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t read it.'))
   const bar = (ref: RankRef, label: string) => {
