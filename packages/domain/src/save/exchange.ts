@@ -2,7 +2,7 @@
 // Tickets and Sweep Tickets; spare stock sells back for Laurels; Marks buy Manuals (D102). A Sweep replays a beaten
 // regular stage at once and pays what a replay pays (D79).
 import { chapterGrades, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE } from '../economy/pacing'
-import { dishById } from '../economy/dishes'
+import { gemById } from '../economy/gems'
 import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
@@ -164,14 +164,14 @@ export function readManuals(save: Save, outfitId: string, ref: RankRef, count: n
 
 // --- Selling (QoL): spare stock back for a few Laurels, always far below what buying costs ---------------------------
 
-export type Shelf = 'items' | 'dishes' | 'gear'
-/** Laurels for one (D65): raw `2 + 2g`, refined twice that, dishes and unbound gear `6 + 6g`. */
+export type Shelf = 'items' | 'gems' | 'gear'
+/** Laurels for one (D65): raw `2 + 2g`, refined twice that, Star Gems and unbound gear `6 + 6g`. */
 export function sellPrice(shelf: Shelf, id: string): number {
   if (shelf === 'items') {
     const item = itemById(id)
     return item ? (2 + 2 * item.grade) * (item.refined ? 2 : 1) : 0
   }
-  const grade = shelf === 'dishes' ? dishById(id)?.grade : gearById(id)?.grade
+  const grade = shelf === 'gems' ? gemById(id)?.grade : gearById(id)?.grade
   return grade ? 6 + 6 * grade : 0
 }
 

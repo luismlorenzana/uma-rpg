@@ -4,7 +4,7 @@ Use this script for a release, in order, on the [live game](https://uma-rpg.web.
 [game manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Start with five free Umas, an Uma at Lv5+ for side skills, and enough Laurels,
-raw/refined grade-1 items, Cooking, Promotion and Mastery Tokens for the jobs below. Earn missing stock in fights or
+raw/refined grade-1 items, Promotion and Mastery Tokens for the jobs below. Earn missing stock in fights or
 gather it; the Exchange trades tokens. Jobs can finish while you are away, or with the Time Tickets in step 39 (do
 that step early if needed). Keep one regular stage's first-clear rewards to compare with its replay and Sweep.
 
@@ -76,18 +76,19 @@ Exchange sheets. Every button and footer should remain reachable without horizon
     read its rules; expect them in a sheet. (D79, D91, D95)
 27. Return to the continent and tap **Spring** with some MP spent. Expect the active party's MP refilled and a
     recharge countdown of about two hours. It is disabled during an open fight or its recharge. (D72)
-28. At **Farmlands → Fields**, assign a free Uma, choose a grade-1 output, **×1 → Start**. Repeat at **Wilds → Mine**
-    with another Uma. Expect both timers and progress rings on the Hub; higher grades show their profession gate.
+28. The Hub has three pages: **Wilds**, Learning and Town. At **Wilds → Monster Den**, assign a free Uma, choose a
+    grade-1 output, **×1 → Start**. Repeat at **Wilds → Mine** with another Uma. Expect both timers and progress rings
+    on the Hub, three slots each; higher grades show their Craft Level gate. (D144)
 29. Open Party Hall with a working member. Expect **Busy**; her party cannot start a fight. Recall her from her slot
-    or facility and expect her free. Finish the other job and tap **Collect**: expect stock and profession EXP paid,
+    or facility and expect her free. Finish the other job and tap **Collect**: expect stock and Craft EXP paid,
     its slot freed, and its Hub Ready badge cleared.
-30. At **Pantry**, refine a raw ingredient; at **Workbench**, refine a raw material. Expect one raw input reserved per
-    output on **Start**, then a refined item and profession EXP on **Collect**. Recall an unfinished refining job;
+30. At **Workbench**, refine a raw material. Expect one raw input reserved per output on **Start**, then a refined item
+    and Craft EXP on **Collect**. Recall an unfinished refining job;
     expect its unused inputs returned.
-31. At **Kitchen**, choose an Uma and a grade-1 dish, review its refined ingredient and **Cooking Token**, then start
-    and collect it. Expect inputs spent and the dish on **Warehouse → Dishes**; cooking still needs its token. (D94)
-32. At **Observatory**, pick an Uma and tap the dish's **Eat**. Expect one dish consumed and its first eligible node
-    unlocked. Tap that node off and on: expect the active count and stat total to change, within the displayed limit.
+31. At **Lapidary**, choose an Uma and a grade-1 moon gem (Quartz of …) from the icon grid; review its refined
+    material, then start and collect it. Expect the input spent and the gem on **Warehouse → Star Gems**. (D144)
+32. At **Observatory**, pick an Uma and tap the gem's **Set**. Expect one gem used and its first eligible node
+    opened. Tap that node off and on: expect the active count and stat total to change, within the displayed limit.
 33. At **Forge**, pick an Uma, a grade-1 **Arm**, and an accent. Expect exactly four refined materials: one each from
     Ores, Stones, Woods and Hides & Scales, and **no token**. Start and collect it; expect gear and Craft EXP. (D86, D94)
 34. At the Forge inspect a **Tome** and an elemental **Orb**: expect Crystals, Fibers, Essences and Bones & Horns,
@@ -104,7 +105,7 @@ Exchange sheets. Every button and footer should remain reachable without horizon
 38. At **Exchange → Tokens**, open a band-1 token and tap **×1** in Sell twice, then buy one different kind in that band.
     Expect +40 then −40 Laurels, with stock changed. Check **Warehouse → Tokens** can sell one for 20 Laurels too;
     Mastery, Promotion and Cooking are the current kinds. (D80, D94)
-39. Buy **Time Tickets** at the Exchange (10 Laurels each). On a running gather/refine/cook/craft job and a training
+39. Buy **Time Tickets** at the Exchange (10 Laurels each). On a running gather/refine/craft/cut job and a training
     job, tap **−30m**: expect one Ticket spent and 30 minutes removed. Let the countdown refresh, then tap **Finish · N**
     when more than one Ticket is needed (use **−30m** for the last one). Expect N Tickets spent, **Done**, and
     **Collect/Rank up** still required to receive the output. (D74)

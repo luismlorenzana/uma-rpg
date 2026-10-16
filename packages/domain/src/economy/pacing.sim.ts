@@ -107,12 +107,10 @@ export function fullSet(grade: number): Record<string, number> {
 }
 
 export const worker: WorkOutfit = { outfitId: ids[0]! }
-/** Conditional one-slot capacity at the band's grade. The worker must already meet that grade's profession gate. */
-export function capacity(world: TierWorld, grade: number, minutes: number, side: 'farming' | 'gathering'): number {
-  const family = ITEM_FAMILIES.find((f) => f.side === side)!, uma = world.umas[worker.outfitId]!
-  const leveled = { ...world, umas: { ...world.umas, [worker.outfitId]: { ...uma, professions: {
-    ...uma.professions, [side]: { level: gradeUnlockLevel(grade), exp: 0 },
-  } } } }
+/** Conditional one-slot capacity at the band's grade. The worker must already meet that grade's Craft Level gate. */
+export function capacity(world: TierWorld, grade: number, minutes: number): number {
+  const family = ITEM_FAMILIES[0]!, uma = world.umas[worker.outfitId]!
+  const leveled = { ...world, umas: { ...world.umas, [worker.outfitId]: { ...uma, craft: { level: gradeUnlockLevel(grade), exp: 0 } } } }
   const plan = planJob(leveled, family.site, worker, family.raw[grade - 1]!.id)!
   if (plan.block) throw new Error(plan.block)
   return minutes * MINUTE / plan.msEach
@@ -120,8 +118,8 @@ export function capacity(world: TierWorld, grade: number, minutes: number, side:
 
 /** Fresh workers continuously gather grade 1 in parallel with fights (not the fighting Umas in a real save).
  * Keep partial-output time between band boundaries; use timestamp completion and the live profession EXP curve. */
-export function freshWorker(rows: Band[], side: 'farming' | 'gathering') {
-  const world = worldOf(freshParty()), family = ITEM_FAMILIES.find((f) => f.side === side)!
+export function freshWorker(rows: Band[]) {
+  const world = worldOf(freshParty()), family = ITEM_FAMILIES[0]!
   const plan = planJob(world, family.site, worker, family.raw[0]!.id)!
   let time = 0, finished = 0, completedBefore = 0, profession = { level: 1, exp: 0 }
   let job: Job = { kind: 'gather', outfitId: worker.outfitId, output: plan.output.id, count: MAX_JOB_COUNT, collected: 0,
@@ -162,12 +160,12 @@ export function markdown(): string {
     '|---|---|---|---|---|---|---|---|---|',
   ]
   for (const r of result.rows) rows.push(`| ${WORLD_LEVELS * (r.band - 1) + 1}–${WORLD_LEVELS * r.band} | ${r.fights} (${r.first}/${r.replays}) | ${(r.milliseconds / MINUTE).toFixed(1)} | ${r.exp} | ${r.classExp} | ${r.weaponExp} | ${r.armorExp} | ${r.laurels} | ${r.gearMarks} / ${r.classMarks} |`)
-  const farm = freshWorker(result.rows, 'farming'), wilds = freshWorker(result.rows, 'gathering'), world = worldOf(result.save)
+  const wilds = freshWorker(result.rows), world = worldOf(result.save)
   rows.push('', 'EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.', '',
-    '| Grade | Refined / twelve-piece set | Raw capacity Farm / Wilds* | Fresh G1 output Farm / Wilds |', '|---|---|---|---|')
+    '| Grade | Refined / twelve-piece set | Raw capacity* | Fresh G1 output |', '|---|---|---|---|')
   for (const r of result.rows) {
     const grade = 2 * r.band, minutes = r.milliseconds / MINUTE
-    rows.push(`| ${grade} | ${Object.values(fullSet(grade)).reduce((n, v) => n + v, 0)} | ${capacity(world, grade, minutes, 'farming').toFixed(2)} / ${capacity(world, grade, minutes, 'gathering').toFixed(2)} | ${farm.production[r.band - 1]} / ${wilds.production[r.band - 1]} |`)
+    rows.push(`| ${grade} | ${Object.values(fullSet(grade)).reduce((n, v) => n + v, 0)} | ${capacity(world, grade, minutes).toFixed(2)} | ${wilds.production[r.band - 1]} |`)
   }
   const total = result.rows.reduce((s, r) => ({ fights: s.fights + r.fights, first: s.first + r.first, replays: s.replays + r.replays }), { fights: 0, first: 0, replays: 0 })
   const uma = world.umas[ids[0]!]!
@@ -175,7 +173,7 @@ export function markdown(): string {
     `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; five Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors).map((r) => r!.rank).join('/')}.`,
     `Banked: ${world.wallet.laurels} Laurels, ${world.wallet.gearMarks} Gear Marks and ${world.wallet.classMarks} Class Marks. No Manuals bought, no class switching, no tokens.`,
     `Four-hour target (180–300 min): **${result.minutes < TARGET_MINUTES * (1 - TARGET_TOLERANCE) ? 'under' : result.minutes > TARGET_MINUTES * (1 + TARGET_TOLERANCE) ? 'over' : 'met'}**. No game number retuned.`,
-    `*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. Fresh workers finish ${farm.finished}/${wilds.finished} grade-1 raw items and end at Farm/Craft Lv${farm.profession.level}. Refining and crafting need additional time.`)
+    `*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. A fresh worker finishes ${wilds.finished} grade-1 raw items and ends at Craft Lv${wilds.profession.level}. Refining and crafting need additional time.`)
   return rows.join('\n')
 }
 export const report = (): string => 'Victory ledger: fixed classes; equal five-weapon shares; all currency banked; no combat or MP-spend estimate.\n\n' + markdown()

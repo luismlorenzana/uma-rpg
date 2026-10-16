@@ -1,37 +1,17 @@
-// The Observatory (S6, design §10, D58): each Uma's Sun-and-planets map. Eating a dish unlocks a node; up to
-// 5 + ⌊level / 2⌋ unlocked nodes are active at once, each adding a small share to her stats in every fight.
+// The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
+// 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, dishById, EFFECT_LABEL, ITEM_EFFECTS, nodeFromDish, nodeGrade, POINT_EVASION, POINT_HP, POINT_LIMIT, RING, SaveRuleError,
-  starPoints, type ItemEffect, type OwnedUma,
+  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
+import { nodeLabel, nodeValue, PLANET_COLOR as COLOR, PLANET_SHORT as SHORT, pointText } from '../../items/planets'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { activate, eat, useWorld } from '../../save/game'
+import { activate, setStarGem, useWorld } from '../../save/game'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
-
-const SHORT: Record<ItemEffect, string> = { hp: 'HP', mp: 'MP', atk: 'ATK', matk: 'MATK', def: 'DEF', mdef: 'MDEF', speed: 'SPD', limit: 'LB' }
-const COLOR: Record<ItemEffect, string> = { hp: '#e8706a', mp: '#6aa8ff', atk: '#ff9a4d', matk: '#c48bff', def: '#9fb4cc', mdef: '#5fd3c0', speed: '#ffd84d', limit: '#f0b8ff' }
-
-function nodeLabel(id: string): string {
-  const [kind, key, n] = id.split(':')
-  if (kind === 'moon') return `${EFFECT_LABEL[key as ItemEffect]} moon ${n}`
-  if (kind === 'bridge') return `${key!.split('-').map((e) => EFFECT_LABEL[e as ItemEffect]).join(' + ')} bridge ${n}`
-  return `Sun ${key}`
-}
-/** What one node gives: its grade's worth (D141), e.g. "+7 ATK" for ATK moon 7. */
-function nodeValue(id: string): string {
-  const points = starPoints([id])
-  return ITEM_EFFECTS.filter((e) => points[e] > 0).map((e) => `${pointText(e, points[e])}${e === 'speed' || e === 'limit' ? '' : ` ${SHORT[e]}`}`).join(', ')
-}
-export function pointText(e: ItemEffect, p: number): string {
-  if (e === 'speed') return `${(p * POINT_EVASION * 100).toFixed(1)}% evasion`
-  if (e === 'limit') return `+${Math.floor(p * POINT_LIMIT)} Limit start`
-  return `+${Math.round(p * (e === 'hp' ? POINT_HP : 1) * 10) / 10}`
-}
 
 export default function ObservatoryPage({ rest }: PageProps) {
   return <MasterGate>{(view) => <Observatory view={view} initial={rest || null} />}</MasterGate>
@@ -54,14 +34,13 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
   }
   const toggle = (node: string) => {
     if (!uma.stars.unlocked.includes(node)) {
-      const kind = node.split(':')[0]
-      return setMessage(`${nodeLabel(node)}: eat a grade-${nodeGrade(node)}+ ${kind === 'moon' ? 'dish of its planet' : kind === 'bridge' ? 'Duo dish of its pair' : 'Feast'} (cook it at the Kitchen)`)
+      return setMessage(`${nodeLabel(node)}: set a ${gemById(nodeGem(node))!.name} (cut it at the Lapidary, in the Wilds)`)
     }
     const on = uma.stars.active.includes(node)
     if (!on && uma.stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
     run(() => activate(id, on ? uma.stars.active.filter((n) => n !== node) : [...uma.stars.active, node]))
   }
-  const edible = Object.entries(world.dishes).filter(([d]) => nodeFromDish(uma, d))
+  const settable = Object.entries(world.gems).filter(([g]) => nodeFromGem(uma, g))
   return (
     <div className="space-y-3 p-3">
       <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1" role="tablist" aria-label="Uma">
@@ -74,7 +53,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
       </div>
       <div className="flex items-baseline justify-between">
         <h2 className="truncate font-display text-lg font-bold">{owned.find((o) => o.outfitId === id)?.name}</h2>
-        <span className="shrink-0 text-[13px] text-ink-soft">Active {uma.stars.active.length}/{slots} · {uma.stars.unlocked.length}/100 unlocked</span>
+        <span className="shrink-0 text-[13px] text-ink-soft">Active {uma.stars.active.length}/{slots} · {uma.stars.unlocked.length}/100 open</span>
       </div>
       <StarMap uma={uma} onToggle={toggle} />
       <div className="grid grid-cols-4 gap-1 text-center text-[11px]">
@@ -87,23 +66,23 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
       </div>
       {message && <p className="rounded-sm bg-raised p-2 text-[13px]">{message}</p>}
       <section>
-        <h3 className="text-micro mb-1.5">Eat · dishes from the Kitchen</h3>
-        {edible.length === 0 ? (
-          <p className="text-[13px] text-ink-faint">{Object.keys(world.dishes).length ? 'No dish on the shelf has anything new for her.' : 'No dishes yet: cook some at the Kitchen (Farmlands).'}</p>
+        <h3 className="text-micro mb-1.5">Set · Star Gems from the Lapidary</h3>
+        {settable.length === 0 ? (
+          <p className="text-[13px] text-ink-faint">{Object.keys(world.gems).length ? 'No gem on the shelf opens anything new for her.' : 'No Star Gems yet: cut some at the Lapidary (Wilds).'}</p>
         ) : (
           <ul className="space-y-1.5">
-            {edible.map(([dishId, n]) => {
-              const dish = dishById(dishId)!
-              const node = nodeFromDish(uma, dishId)!
+            {settable.map(([gemId, n]) => {
+              const gem = gemById(gemId)!
+              const node = nodeFromGem(uma, gemId)!
               return (
-                <li key={dishId}>
-                  <button type="button" onClick={() => run(() => eat(id, dishId), (r) => `Unlocked ${nodeLabel(String(r))}`)} className="flex w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
-                    <ItemIcon id={outputView(dishId).icon} size={32} />
+                <li key={gemId}>
+                  <button type="button" onClick={() => run(() => setStarGem(id, gemId), (r) => `Opened ${nodeLabel(String(r))}`)} className="flex w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
+                    <ItemIcon id={outputView(gemId).icon} size={32} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] font-semibold">{dish.name} ×{n}</span>
-                      <span className="block text-[11px] text-ink-soft">Unlocks {nodeLabel(node)} · {nodeValue(node)}</span>
+                      <span className="block truncate text-[13px] font-semibold">{gem.name} ×{n}</span>
+                      <span className="block text-[11px] text-ink-soft">Opens {nodeLabel(node)} · {nodeValue(node)}</span>
                     </span>
-                    <span className="shrink-0 rounded-sm bg-accent px-2.5 py-1 text-[12px] font-bold text-accent-ink">Eat</span>
+                    <span className="shrink-0 rounded-sm bg-accent px-2.5 py-1 text-[12px] font-bold text-accent-ink">Set</span>
                   </button>
                 </li>
               )
@@ -125,7 +104,7 @@ function StarMap({ uma, onToggle }: { uma: OwnedUma; onToggle: (node: string) =>
   const Node = ({ id, x, y, r, color }: { id: string; x: number; y: number; r: number; color: string }) => {
     const s = state(id)
     return (
-      <circle cx={x} cy={y} r={r} onClick={() => onToggle(id)} role="button" aria-label={`${nodeLabel(id)}, ${s === 'locked' ? `needs a grade-${nodeGrade(id)} dish` : s === 'on' ? 'active' : 'off'}`}
+      <circle cx={x} cy={y} r={r} onClick={() => onToggle(id)} role="button" aria-label={`${nodeLabel(id)}, ${s === 'locked' ? `needs a ${gemById(nodeGem(id))!.name}` : s === 'on' ? 'active' : 'off'}`}
         fill={s === 'on' ? color : s === 'off' ? 'rgb(255 255 255 / 0.35)' : 'transparent'} stroke={s === 'locked' ? 'rgb(255 255 255 / 0.22)' : color} strokeWidth={1.2}
         style={s === 'on' ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined} className={s === 'locked' ? '' : 'cursor-pointer'} />
     )

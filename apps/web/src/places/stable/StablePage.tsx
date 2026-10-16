@@ -55,8 +55,7 @@ function SkillsRoute({ outfit, place }: { outfit: RosterEntry['outfit']; place: 
 function badgeOf(entry: RosterEntry, key: RosterSortKey): string {
   const u = entry.owned
   if (!u) return ''
-  if (key === 'farm') return `Farm ${u.professions.farming.level}`
-  if (key === 'craft') return `Craft ${u.professions.gathering.level}`
+  if (key === 'craft') return `Craft ${u.craft.level}`
   if (key === 'classRank') return `Rank ${Math.max(1, ...Object.values(u.ranks.classes).map((t) => t.rank))}`
   return `Lv ${u.level}`
 }

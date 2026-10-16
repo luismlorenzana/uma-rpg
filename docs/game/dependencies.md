@@ -60,4 +60,4 @@ All values are in `docs/technical/infrastructure.md`. The budget alert is $5 a m
 | Package | Version | What uma-rpg takes from it |
 |---|---|---|
 | `@luismlorenzana/uma-data` | 1.0.0 | Master data types and the release client (web), test fixtures (domain) |
-| `@luismlorenzana/uma-art` | 2.1.0 | Item, dish, gear (D86 and D103 rows), building, tile, world, battle-effect and UI atlases |
+| `@luismlorenzana/uma-art` | 2.5.0 | Item, gear, building, tile, world, battle-effect and UI atlases (its dish atlas and farm rows are uma-racer's, D144) |

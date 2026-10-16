@@ -14,7 +14,7 @@ export interface Requirement {
   gross: number
   onHand: number
   coming: number
-  /** What still has to be started: `max(0, gross − onHand − coming)`. Only this flows down to its ingredients. */
+  /** What still has to be started: `max(0, gross − onHand − coming)`. Only this flows down to its inputs. */
   net: number
 }
 export interface RequirementsInput {

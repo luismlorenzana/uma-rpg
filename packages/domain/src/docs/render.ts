@@ -5,7 +5,7 @@ import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILIT
   itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES,
   PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
 import { markdown as pacingSimulation } from '../economy/pacing.sim'
-import { DISHES } from '../economy/dishes'
+import { GEMS } from '../economy/gems'
 import {
   accessoryEffects, accessoryKindOf, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
   MIGHT_BY_GRADE, mightOf, recipeFamilies, slotOf, type EquipType,
@@ -249,25 +249,24 @@ function foeScaling(): string {
   ])
 }
 
-// --- Materials, dishes, gear, tokens ---------------------------------------------------------------------------------
+// --- Materials, Star Gems, gear -------- ---------------------------------------------------------------------------------
 
 function families(): string {
-  return table(['Family', 'Id', 'Side', 'Feeds', 'Site', 'Refined at'], ITEM_FAMILIES.map((f) => [f.name, `\`${f.id}\``, f.side === 'farming' ? 'Farming' : 'Gathering',
-    EFFECT_LABEL[f.effect], placeById(f.site)?.name ?? f.site, f.side === 'farming' ? placeById('pantry')?.name ?? 'pantry' : placeById('workbench')?.name ?? 'workbench']))
+  return table(['Family', 'Id', 'Feeds', 'Site'], ITEM_FAMILIES.map((f) => [f.name, `\`${f.id}\``, EFFECT_LABEL[f.effect], placeById(f.site)?.name ?? f.site]))
 }
 function items(): string {
   const out: string[] = []
   for (const f of ITEM_FAMILIES) {
     out.push(`### ${f.name} (\`${f.id}\`, ${EFFECT_LABEL[f.effect]}, ${placeById(f.site)?.name ?? f.site})`, '')
-    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at profession Lv'], f.raw.map((r, i) => [
+    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at Craft Lv'], f.raw.map((r, i) => [
       r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade),
     ])), '')
   }
   return out.join('\n').trimEnd()
 }
-function dishes(): string {
-  return table(['Dish', 'Id', 'Kind', 'Grade', 'Feeds', 'Ingredients'], DISHES.map((d) => [d.name, `\`${d.id}\``, cap(d.kind), d.grade,
-    d.effects.map((e) => EFFECT_LABEL[e]).join(', '), inputs(d.inputs)]))
+function gems(): string {
+  return table(['Star Gem', 'Id', 'Kind', 'Grade', 'Feeds', 'Materials'], GEMS.map((g) => [g.name, `\`${g.id}\``, cap(g.kind), g.grade,
+    g.kind === 'sun' ? 'All eight' : g.effects.map((e) => EFFECT_LABEL[e]).join(', '), inputs(g.inputs)]))
 }
 function gear(): string {
   const family = (id: string) => ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id
@@ -321,8 +320,8 @@ function laurels(): string {
 function levels(): string {
   const rows: Cell[][] = []
   for (let lv = 1; lv < RPG_TIER_MAX_LEVEL; lv += 7) rows.push([lv, rpgExpToNext(lv), professionExpToNext(lv)])
-  return table(['Level', 'Uma EXP to next', 'Profession EXP to next'], rows) +
-    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × her own EXP to next level, −${pct(RPG_LEVEL_EXP_STEP)} per level she's above the foes (down to ${pct(RPG_LEVEL_EXP_MIN)}), never more than ${pct(RPG_LEVEL_EXP_MAX)}. Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Profession EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
+  return table(['Level', 'Uma EXP to next', 'Craft EXP to next'], rows) +
+    `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × her own EXP to next level, −${pct(RPG_LEVEL_EXP_STEP)} per level she's above the foes (down to ${pct(RPG_LEVEL_EXP_MIN)}), never more than ${pct(RPG_LEVEL_EXP_MAX)}. Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Craft EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
 }
 function prices(): string {
   return table(['Thing', 'Price (Laurels)'], [
@@ -334,11 +333,11 @@ const minutes = (m: number): string => `${Number(m.toFixed(1))} min`
 const hours = (m: number): string => `${Number((m / 60).toFixed(1))} h`
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather one item', `any grade, by profession level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
+    ['Gather one item', `any grade, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
     ['Refine one item', `a quarter of that: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Cook or craft one', `twice a gather: ${minutes(makeMinutes(1))} at Lv1, ${minutes(makeMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Profession EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the facility's speed`],
-    ['Outputs per job', `gathering, cooking and crafting 1–${MAX_JOB_COUNT}; refining ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
+    ['Craft or cut one', `twice a gather: ${minutes(makeMinutes(1))} at Lv1, ${minutes(makeMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
+    ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the facility's speed`],
+    ['Outputs per job', `gathering, crafting and cutting 1–${MAX_JOB_COUNT}; refining ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
     ['Facility levels', `1–3: ${FACILITY_SLOTS.join(', ')} Uma slots; speed ${FACILITY_SPEED.map(x).join(', ')}`],
     ['Upgrade to Lv 2 / 3', FACILITY_UPGRADE.map((u) => `${u.laurels} Laurels + ${u.count}× grade-${u.grade} refined of each of its two families`).join(' / ')],
@@ -358,9 +357,9 @@ function places(): string {
 }
 function facilities(): string {
   const family = (id: string | null) => (id ? ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id : '—')
-  return table(['Place', 'Job', 'Profession', 'Makes', 'Upgraded with'], FACILITIES.map((f) => [
-    placeById(f.id)?.name ?? f.id, cap(f.kind), f.profession ? cap(f.profession) : '—',
-    f.kind === 'gather' ? family(f.family) : f.kind === 'refine' ? (f.profession === 'farming' ? 'Farming refined items' : 'Gathering refined items') : f.kind === 'cook' ? 'Dishes' : 'Gear',
+  const makes = { gather: '', refine: 'Refined items', craft: 'Gear', cut: 'Star Gems' } as const
+  return table(['Place', 'Job', 'Makes', 'Upgraded with'], FACILITIES.map((f) => [
+    placeById(f.id)?.name ?? f.id, cap(f.kind), f.kind === 'gather' ? family(f.family) : makes[f.kind],
     f.upgradeFamilies.map(family).join(' + '),
   ]))
 }
@@ -449,7 +448,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
   const blocks: Record<string, () => string> = {
     classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
-    families, items, dishes, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
+    families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
     'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }

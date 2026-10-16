@@ -1,12 +1,14 @@
-// Save v20: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v20 (D124):
+// Save v21: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v21 (D144):
+// one profession, Craft Level, and Star Gems for Extra Stats; more facility slots. v20 (D124):
 // armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106): the Halls of Heroes, their
 // Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset
 // for every older save.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
-// docs/design/pacing.md (professions, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
-// mastery (S5, D57); dishes and each Uma's Sun-and-planets map (S6, D58); gear, lockers and what's equipped (S7, D59).
-import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL, professionExpToNext, PROFESSIONS, type Profession } from '../economy/pacing'
+// docs/design/pacing.md (Craft Level, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
+// mastery (S5, D57); Star Gems and each Uma's Sun-and-planets map (S6, D58, D144); gear, lockers and what's equipped (S7,
+// D59).
+import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL } from '../economy/pacing'
 import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
 import {
   ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
@@ -14,7 +16,7 @@ import {
 } from '../economy/ranks'
 import { RPG_CLASSES } from '../rpg/kinds'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
-import { isDishId, isStarNode } from '../economy/dish-id'
+import { isGemId, isStarNode } from '../economy/stars'
 import {
   GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isAccessory, isAccessorySlot, isArmor, slotOf, type GearSlot,
 } from '../economy/gear-id'
@@ -30,8 +32,8 @@ import {
 } from '../rpg/rules'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 20
-/** Umas marked as farming targets (D100). */
+export const SAVE_SCHEMA_VERSION = 21
+/** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 5
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
@@ -77,11 +79,11 @@ export interface OwnedUma {
   classId: RpgClass | null
   /** Every class she has set up: weapons, side skills, equipped skills (D86). */
   classes: Partial<Record<RpgClass, ClassLoadout>>
-  /** Farming & Cooking and Gathering & Crafting, 1–50 each (design §4). */
-  professions: Record<Profession, ProfessionLevel>
+  /** Her Craft Level, 1–50 (D144): gathering, refining, crafting and cutting. */
+  craft: ProfessionLevel
   /** Class Ranks (1–50), Weapon and Armor Ranks (1–10), earned by fighting (D102). */
   ranks: Ranks
-  /** Her Sun-and-planets map: nodes unlocked by eating, and the ones active now (S6, design §10). */
+  /** Her Sun-and-planets map: nodes opened by setting Star Gems, and the ones active now (S6, design §10). */
   stars: Stars
   /** Gear bound to her (her locker) and what she wears: one piece per weapon type and one per armor slot (S7, D103). */
   gear: UmaGear
@@ -122,11 +124,11 @@ export interface TierWorld {
   items: Record<string, number>
   /** Facilities that have been used or upgraded, by place id; absent ones are level 1 and idle. */
   facilities: Record<string, Facility>
-  /** Cooked dishes waiting to be eaten, by dish id (S6). */
-  dishes: Record<string, number>
+  /** Cut Star Gems waiting to be set, by gem id (D144). */
+  gems: Record<string, number>
   /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. */
   gear: Record<string, number>
-  /** Up to five owned Umas whose gear and dishes the facilities plan for (D100). */
+  /** Up to five owned Umas whose gear and gems the facilities plan for (D100). */
   targets: string[]
   /** The Halls of Heroes' seats (D106): an Uma is a Hero in one seat at most, or a Learner in two at most, never both. */
   heroes: Partial<Record<HeroLimitId, HeroSeat>>
@@ -183,8 +185,7 @@ export function defaultParties(): Party[] {
 }
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
-export const newProfessions = (): Record<Profession, ProfessionLevel> => ({ farming: { level: 1, exp: 0 }, gathering: { level: 1, exp: 0 } })
-export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, professions: newProfessions(), ranks: newRanks(),
+export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: {} }, bonds: {} })
 
 /** The world's state (D66). */
@@ -199,7 +200,7 @@ export interface WorldState {
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, dishes: {}, gear: {}, targets: [], heroes: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, gems: {}, gear: {}, targets: [], heroes: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -253,16 +254,11 @@ function parseWallet(value: unknown, path: string): Wallet {
   }
 }
 
-function parseProfessions(value: unknown, path: string): Record<Profession, ProfessionLevel> {
-  const o = object(value, path, PROFESSIONS)
-  const out = newProfessions()
-  for (const p of PROFESSIONS) {
-    const v = object(o[p], `${path}.${p}`, ['level', 'exp'])
-    const level = count(v.level, `${path}.${p}.level`)
-    if (level < 1 || level > PROFESSION_MAX_LEVEL) throw new SaveParseError(`${path}.${p}.level`, `expected 1–${PROFESSION_MAX_LEVEL}`)
-    out[p] = { level, exp: count(v.exp, `${path}.${p}.exp`) }
-  }
-  return out
+function parseCraft(value: unknown, path: string): ProfessionLevel {
+  const v = object(value, path, ['level', 'exp'])
+  const level = count(v.level, `${path}.level`)
+  if (level < 1 || level > PROFESSION_MAX_LEVEL) throw new SaveParseError(`${path}.level`, `expected 1–${PROFESSION_MAX_LEVEL}`)
+  return { level, exp: count(v.exp, `${path}.exp`) }
 }
 
 function parseItems(value: unknown, path: string): Record<string, number> {
@@ -298,7 +294,7 @@ function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<
   if (typeof j.outfitId !== 'string' || !umas[j.outfitId]) throw new SaveParseError(`${path}.outfitId`, 'expected an owned outfit')
   if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
   if ((kind === 'gather' || kind === 'refine') && !isItemId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
-  if (kind === 'cook' && !isDishId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown dish')
+  if (kind === 'cut' && !isGemId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gem')
   if (kind === 'craft' && !gearById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gear')
   const n = count(j.count, `${path}.count`)
   if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
@@ -388,15 +384,15 @@ function parseGearStock(value: unknown, path: string): Record<string, number> {
   return gear
 }
 
-function parseDishes(value: unknown, path: string): Record<string, number> {
+function parseGems(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
-  const dishes: Record<string, number> = {}
+  const gems: Record<string, number> = {}
   for (const [id, n] of Object.entries(value)) {
-    if (!isDishId(id)) throw new SaveParseError(`${path}.${id}`, 'unknown dish')
+    if (!isGemId(id)) throw new SaveParseError(`${path}.${id}`, 'unknown gem')
     const c = count(n, `${path}.${id}`)
-    if (c > 0) dishes[id] = c
+    if (c > 0) gems[id] = c
   }
-  return dishes
+  return gems
 }
 
 function parseTrack(value: unknown, path: string, max: number, toNext: (rank: number) => number): RankTrack {
@@ -491,12 +487,12 @@ function parseUmas(value: unknown, path: string, tier: number): Record<string, O
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
-    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'professions', 'ranks', 'stars', 'gear', 'bonds'])
+    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'craft', 'ranks', 'stars', 'gear', 'bonds'])
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const ranks = parseRanks(u.ranks, `${at}.ranks`)
     const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null, classes: {},
-      professions: parseProfessions(u.professions, `${at}.professions`), ranks, stars: parseStars(u.stars, `${at}.stars`, level),
+      craft: parseCraft(u.craft, `${at}.craft`), ranks, stars: parseStars(u.stars, `${at}.stars`, level),
       gear: parseUmaGear(u.gear, `${at}.gear`, ranks), bonds: parseBonds(u.bonds, `${at}.bonds`) }
     if (u.classId !== null && !RPG_CLASSES.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
     owned.classId = u.classId as RpgClass | null
@@ -625,15 +621,15 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v18 are migrated to v19's shape first (migrations.ts), so the parse below reads only v19.
+  // v10–v20 are migrated to v21's shape first (migrations.ts), so the parse below reads only v21.
   const value = migrate(raw, version)
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'dishes', 'gear', 'targets', 'heroes'])
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'gems', 'gear', 'targets', 'heroes'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
     items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
-    dishes: parseDishes(w.dishes, `${path}.dishes`), gear: parseGearStock(w.gear, `${path}.gear`),
+    gems: parseGems(w.gems, `${path}.gems`), gear: parseGearStock(w.gear, `${path}.gear`),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
   }
 }
@@ -650,8 +646,8 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v19 save and always returns v19. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
- * (D106) and anything older than v10 starts over (D69). */
+/** Parses a v1–v21 save and always returns v21. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+ * (D106), v20 moves to one profession and Star Gems (D144) and anything older than v10 starts over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

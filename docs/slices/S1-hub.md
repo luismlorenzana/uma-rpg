@@ -1,5 +1,7 @@
 # S1 — Hub and foundation
 
+> **D144 (2026-10-16):** the Farmlands page is gone; the Hub has three pages ([after the farm](../design/after-the-farm.md)).
+
 > **Status: spec for owner review, 2026-10-10.** Tasks: [docs/tasks/](../tasks/README.md). Design: game design §9
 > (Hub), §2 (tier worlds), §3 (collection).
 

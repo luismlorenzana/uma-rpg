@@ -3,10 +3,10 @@
 A personal, never-distributed party RPG inspired by *Umamusume: Pretty Derby* and Octopath Traveler, played on the
 owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
-- a four-page Hub of farms, mines and halls;
+- a three-page Hub of the Wilds, halls and town;
 - passive professions;
 - per-Uma leveling with five classes and forty skill trees;
-- cooking, crafting and Extra Stats;
+- crafting, Star Gems and Extra Stats;
 - a world map of five continents and turn-based party battles with Breaks, waves and Limit Breaks.
 
 ## Status

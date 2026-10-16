@@ -150,16 +150,16 @@ export const sell = (shelf: Shelf, id: string, quantity: number) => edit(import(
 /** Reads Manuals for one Uma's bar: 1,000 Marks for 1,000 EXP each (D102). */
 export const readManual = (outfitId: string, ref: RankRef, count: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.readManuals(s, outfitId, ref, count, now))
 
-/** She eats a dish: one node unlocks on her map (S6). Returns the node. */
-export async function eat(outfitId: string, dishId: string): Promise<string> {
-  const { eatDish } = await import('@rpg/domain/kitchen')
+/** She sets a Star Gem: one node opens on her map (D144). Returns the node. */
+export async function setStarGem(outfitId: string, gemId: string): Promise<string> {
+  const { setGem } = await import('@rpg/domain/observatory')
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
-  const r = eatDish(save, outfitId, dishId, nowIso())
+  const r = setGem(save, outfitId, gemId, nowIso())
   await commit(r.save)
   return r.node
 }
-export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/kitchen'), (d, s, now) => d.setActiveNodes(s, outfitId, nodes, now))
+export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/observatory'), (d, s, now) => d.setActiveNodes(s, outfitId, nodes, now))
 export const wear = (outfitId: string, gearId: string) => edit(import('@rpg/domain/forge'), (d, s, now) => d.equipGear(s, outfitId, gearId, now))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/domain/forge'), (d, s, now) => d.unequipGear(s, outfitId, slot, now))
 /** Puts an armor kind in one of her five armor slots: its Training piece (null) or a crafted one (D103). */
@@ -168,7 +168,7 @@ export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKin
 /** Puts an accessory in one of her two accessory slots, or empties it (null) (D124). */
 export const wearAccessoryPiece = (outfitId: string, slot: AccessorySlot, gearId: string | null) =>
   edit(import('@rpg/domain/forge'), (d, s, now) => d.wearAccessory(s, outfitId, slot, gearId, now))
-/** Marks or unmarks an Uma as a farming target (D100). */
+/** Marks or unmarks an Uma as a target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now) => d.setTarget(s, outfitId, on, now))
 /** The Halls of Heroes (D106): seat or swap a Hero (null empties the seat), and add or remove a Learner. */
 export const appointHero = (seat: string, outfitId: string | null) => edit(import('@rpg/domain/heroes'), (d, s, now) => d.setHero(s, seat, outfitId, now))

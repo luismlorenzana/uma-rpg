@@ -1,7 +1,7 @@
 // What finished in a time window, for push notifications (QoL, D63): every job end in each slot's chain, judged by the
 // real collect rules, so a queue that stopped on short inputs never announces jobs that didn't start.
-import { dishById } from '../economy/dishes'
 import { gearById } from '../economy/gear'
+import { gemById } from '../economy/gems'
 import { jobEndsAt, jobFinished, queueTimeline, type Job } from '../economy/jobs'
 import { placeById } from '../hub/places'
 import { itemById } from '../items/catalog'
@@ -54,7 +54,7 @@ export function readySlots(save: Save, now: string, tier = TIER_ONE): number {
 }
 
 function outputName(output: string): string {
-  return itemById(output)?.name ?? dishById(output)?.name ?? gearById(output)?.name ?? output
+  return itemById(output)?.name ?? gemById(output)?.name ?? gearById(output)?.name ?? output
 }
 
 export interface Notice { title: string; body: string; tag: string; url: string }

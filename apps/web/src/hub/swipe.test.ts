@@ -10,8 +10,8 @@ describe('hub swipes', () => {
   })
 
   it('stops at the first and last pages', () => {
-    expect(neighbourPage('farmlands', -1)).toBeNull()
-    expect(neighbourPage('farmlands', 1)).toBe('wilds')
+    expect(neighbourPage('wilds', -1)).toBeNull()
+    expect(neighbourPage('wilds', 1)).toBe('learning')
     expect(neighbourPage('town', 1)).toBeNull()
     expect(neighbourPage('town', -1)).toBe('learning')
   })

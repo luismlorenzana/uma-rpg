@@ -7,10 +7,11 @@ const MAP_H = 500
 const MIN_GAP = 44
 
 describe('place registry', () => {
-  it('has 34 visible places (the S1 spec, with the four armories merged into an Armory and a Jeweler, D70) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(34)
+  it('has 25 visible places on three pages (the Wilds with the Lapidary, D144) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(25)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([10, 10, 7, 7])
+    expect(HUB_PAGES).toEqual(['wilds', 'learning', 'town'])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([11, 7, 7])
   })
 
   it('keeps every place on a page at least 44 pt apart on the smallest phone', () => {
@@ -32,15 +33,6 @@ describe('place registry', () => {
     }
   })
 
-  it('mirrors Farmlands and Wilds site for site, at the same positions', () => {
-    for (const p of placesOn('farmlands')) {
-      const twin = PLACES.find((q) => q.id === p.mirrorOf)
-      expect(twin?.page, p.id).toBe('wilds')
-      expect(twin?.mirrorOf).toBe(p.id)
-      expect(twin?.at).toEqual(p.at)
-    }
-  })
-
   it('opens every place in a known slice, with S1 live only for the Stable, Scenario Gate and Account', () => {
     for (const p of PLACES) expect(SLICES).toContain(p.opensIn)
     expect(PLACES.filter((p) => isOpen(p, 'S1')).map((p) => p.id).sort()).toEqual(['account', 'scenario-gate', 'stable'])
@@ -48,7 +40,7 @@ describe('place registry', () => {
 
   it('resolves a place only on its own page', () => {
     expect(placeOnPage('wilds', 'mine')?.name).toBe('Mine')
-    expect(placeOnPage('farmlands', 'mine')).toBeUndefined()
+    expect(placeOnPage('learning', 'mine')).toBeUndefined()
     expect(placeOnPage('town', 'nowhere')).toBeUndefined()
   })
 })

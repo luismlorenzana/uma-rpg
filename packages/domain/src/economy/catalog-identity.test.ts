@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { DISHES } from './dishes'
-import { isDishId } from './dish-id'
+import { GEMS } from './gems'
+import { isGemId } from './stars'
 import { EQUIP_TYPES, gearById } from './gear'
 import { gearIdentity } from './gear-id'
 
-describe('light cooking and equipment ids (H16)', () => {
-  it('recognizes exactly the 100 authored dish recipes', () => {
-    const ids = new Set(DISHES.map((d) => d.id))
+describe('light Star Gem and equipment ids (H16)', () => {
+  it('recognizes exactly the 100 Star Gems', () => {
+    const ids = new Set(GEMS.map((g) => g.id))
     expect(ids.size).toBe(100)
-    for (const id of ids) expect(isDishId(id), id).toBe(true)
-    for (const id of ['dish-grains-0', 'dish-grains-11', 'dish-grains-01', 'duo-hp-mp-3', 'duo-hp-def-4', 'feast-5', 'feast-04', 'unknown']) {
-      expect(isDishId(id), id).toBe(false)
+    for (const id of ids) expect(isGemId(id), id).toBe(true)
+    for (const id of ['gem-hp-0', 'gem-hp-11', 'gem-hp-01', 'gem-hp-mp-3', 'gem-hp-def-4', 'gem-sun-5', 'gem-sun-04', 'unknown']) {
+      expect(isGemId(id), id).toBe(false)
     }
   })
   it('matches every type × grade, preserves readable zero-padded grades, and rejects bad ids (D124)', () => {

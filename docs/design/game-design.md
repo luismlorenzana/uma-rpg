@@ -4,6 +4,9 @@
 > This page records intent and the decisions behind the game. [The manual](../game/README.md) describes the running
 > game and generates its lists from code (D92). The [decision log](../decisions.md) is append-only.
 > Future-tier rules below are plans, not features. Only unanswered owner choices are marked as proposals.
+> **D144 removed the farm** (Farmlands, Farm Level, the Pantry, the Kitchen and dishes; uma-racer owns it now). Its
+> sections below are history: one profession, Craft Level, and Star Gems cut at the Lapidary replace them
+> ([after the farm](after-the-farm.md)).
 
 ## 1. What the game is
 
@@ -173,7 +176,7 @@ materials, one-for-one (D19, D55).
 
 Kitchen dishes unlock Extra Stats; Forge gear supplies equipment points and Orb kinds (D58, D86).
 Cooking uses refined ingredients plus stat-specific Cooking Tokens. Forging uses refined materials only (D94).
-Recipes and grade gates are in [kitchen](kitchen.md), [forge](forge.md) and the [materials manual](../game/materials.md).
+Recipes and grade gates are in [after the farm](after-the-farm.md), [forge](forge.md) and the [materials manual](../game/materials.md).
 
 ### 8.5 Equal time and family demand
 
@@ -205,7 +208,7 @@ Player text stays short; helpful explanations sit behind a help button, never in
 Each Uma has 100 nodes: eighty moons, sixteen bridges and four Sun nodes (D58).
 Eating unlocks the lowest node the dish can reach. Active capacity grows with Uma Level; swaps are free outside
 fights. One total point is split over a node's effects. The generated dish list and current point values are in
-[materials](../game/materials.md#dishes) and [Extra Stats](../game/loops.md#extra-stats-and-gear).
+[materials](../game/materials.md#star-gems) and [Extra Stats](../game/loops.md#extra-stats-and-gear).
 
 ## 11. Laurels and the Exchange
 

@@ -28,6 +28,7 @@ export function placeAnchor(at: { x: number; y: number }, grid: HubGrid): { x: n
   return { x: (col + 0.5) * grid.tile, y: (row - 2) * grid.tile + BUILDING.anchorY * grid.scale }
 }
 
-/** Places drawn with another place's sprite until they get their own (D70 merged four armories into these two). */
-const BUILDING_ART: Readonly<Record<string, string>> = { armory: 'knights-bastion', jeweler: 'arcane-armory' }
+/** Places drawn with another place's sprite until they get their own (D70 merged four armories into these two; the
+ * Lapidary, D144, waits for H29's building). */
+const BUILDING_ART: Readonly<Record<string, string>> = { armory: 'knights-bastion', jeweler: 'arcane-armory', lapidary: 'arcane-armory' }
 export const buildingFrame = (placeId: string): string => BUILDING_ART[placeId] ?? placeId

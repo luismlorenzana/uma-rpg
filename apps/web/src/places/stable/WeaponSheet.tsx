@@ -17,7 +17,7 @@ import { outputView } from '../../items/outputs'
 import { hold, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
 import { ArmorMark } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
-import { pointText } from '../observatory/ObservatoryPage'
+import { pointText } from '../../items/planets'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
 export function effectLines(a: AccessoryEffects): string[] {

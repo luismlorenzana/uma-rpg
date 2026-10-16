@@ -1,15 +1,15 @@
 // Timed jobs (design §8.6, D55): an Uma in a facility slot makes `count` items one after another, each taking `msEach`
 // of real time, while the app is closed. Everything is computed from the start time; nothing ticks in the save.
-import { ITEM_IDENTITIES as ITEM_FAMILIES, type ItemFamilyIdentity as ItemFamily } from '../items/identity'
-import type { Profession } from './pacing'
+import { ITEM_IDENTITIES as ITEM_FAMILIES } from '../items/identity'
 
-export type JobKind = 'gather' | 'refine' | 'cook' | 'craft'
-export const JOB_KINDS: readonly JobKind[] = ['gather', 'refine', 'cook', 'craft']
+/** Gathering at a site, refining at the Workbench, crafting gear at the Forge, cutting Star Gems at the Lapidary. */
+export type JobKind = 'gather' | 'refine' | 'craft' | 'cut'
+export const JOB_KINDS: readonly JobKind[] = ['gather', 'refine', 'craft', 'cut']
 
 export interface Job {
   kind: JobKind
   outfitId: string
-  /** What it makes: an item id, a dish id or a gear piece. */
+  /** What it makes: an item id, a gear piece or a Star Gem. */
   output: string
   count: number
   /** Outputs already moved to the Warehouse (or ranks already granted). */
@@ -19,7 +19,7 @@ export interface Job {
   msEach: number
   /** Profession EXP per output. */
   expEach: number
-  /** Inputs reserved for each output (refining, cooking, crafting). They come back for outputs never made. */
+  /** Inputs reserved for each output (refining, crafting, cutting). They come back for outputs never made. */
   inputs: Record<string, number>
   /** Up to three jobs queued after this one for the same Uma, each planned when queued (QoL, D62). */
   queue: QueuedJob[]
@@ -65,30 +65,27 @@ export const jobProgress = (job: Job, now: string): number =>
 export interface FacilitySpec {
   id: string
   kind: JobKind
-  /** The profession its jobs raise. */
-  profession: Profession | null
   /** The site's item family (gathering sites only). */
   family: string | null
   /** The two families whose refined items upgrade it. */
   upgradeFamilies: readonly [string, string]
 }
 
-const mirrorOf = (family: ItemFamily): ItemFamily => ITEM_FAMILIES.find((f) => f.effect === family.effect && f.side !== family.side)!
-/** Buildings take blocks and planks; sites take their own family and its mirror on the other side. */
+/** A site's partner: the family its own is paired with in gear recipes (D125, D144). */
+const PARTNER: Readonly<Record<string, string>> = {
+  ores: 'crystals', crystals: 'ores', woods: 'essences', essences: 'woods', 'hides-scales': 'bones-horns', 'bones-horns': 'hides-scales',
+  stones: 'fibers', fibers: 'stones',
+}
+/** Buildings take blocks and planks; sites take their own family and its partner. */
 const BUILDING: readonly [string, string] = ['stones', 'woods']
 
 const SPECS: FacilitySpec[] = [
-  ...ITEM_FAMILIES.map((f): FacilitySpec => ({
-    id: f.site, kind: 'gather', profession: f.side === 'farming' ? 'farming' : 'gathering', family: f.id, upgradeFamilies: [f.id, mirrorOf(f).id],
-  })),
-  { id: 'pantry', kind: 'refine', profession: 'farming', family: null, upgradeFamilies: BUILDING },
-  { id: 'workbench', kind: 'refine', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
-  { id: 'kitchen', kind: 'cook', profession: 'farming', family: null, upgradeFamilies: BUILDING },
-  { id: 'forge', kind: 'craft', profession: 'gathering', family: null, upgradeFamilies: BUILDING },
+  ...ITEM_FAMILIES.map((f): FacilitySpec => ({ id: f.site, kind: 'gather', family: f.id, upgradeFamilies: [f.id, PARTNER[f.id]!] })),
+  { id: 'workbench', kind: 'refine', family: null, upgradeFamilies: BUILDING },
+  { id: 'forge', kind: 'craft', family: null, upgradeFamilies: BUILDING },
+  { id: 'lapidary', kind: 'cut', family: null, upgradeFamilies: BUILDING },
 ]
 const SPEC_BY_ID = new Map(SPECS.map((s) => [s.id, s]))
 export const FACILITIES: readonly FacilitySpec[] = SPECS
 export const facilitySpec = (placeId: string): FacilitySpec | undefined => SPEC_BY_ID.get(placeId)
-/** The profession side a refining or making station serves. */
-export const stationSide = (placeId: string): 'farming' | 'gathering' | null => facilitySpec(placeId)?.profession ?? null
 

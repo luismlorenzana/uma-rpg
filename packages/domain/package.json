@@ -29,9 +29,9 @@
       "require": { "types": "./dist/cjs/save/exchange.d.ts", "default": "./dist/cjs/save/exchange.js" },
       "default": { "types": "./src/save/exchange.ts", "default": "./src/save/exchange.ts" }
     },
-    "./kitchen": {
-      "require": { "types": "./dist/cjs/save/kitchen.d.ts", "default": "./dist/cjs/save/kitchen.js" },
-      "default": { "types": "./src/save/kitchen.ts", "default": "./src/save/kitchen.ts" }
+    "./observatory": {
+      "require": { "types": "./dist/cjs/save/observatory.d.ts", "default": "./dist/cjs/save/observatory.js" },
+      "default": { "types": "./src/save/observatory.ts", "default": "./src/save/observatory.ts" }
     },
     "./forge": {
       "require": { "types": "./dist/cjs/save/forge.d.ts", "default": "./dist/cjs/save/forge.js" },

@@ -1,15 +1,15 @@
 // An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
-// her Farm and Craft Levels and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks;
-// first, as it changes most), Battle (her RPG stats), Gear (equipment, Weapon and Armor Ranks, Extra Stats), Work (professions and
-// jobs) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
+// her Craft Level and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks; first, as it
+// changes most), Battle (her RPG stats), Gear (equipment, Weapon and Armor Ranks, Extra Stats), Work (Craft Level and her
+// job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
 // racing profile.
 import { STATS } from '@luismlorenzana/uma-data'
 import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
-  PROFESSION_LABEL, PROFESSION_MAX_LEVEL, PROFESSION_SHORT, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, SURFACE_PROFESSION, umaBattleSheet, umaPoints, umaProfile, workOf, ACCESSORY_KINDS, accessoryTrack,
-  type OwnedUma, type Place, type Profession, type RosterOutfit, type TierWorld,
+  CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, workOf, ACCESSORY_KINDS, accessoryTrack,
+  type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -26,7 +26,7 @@ import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, LockIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { RankCells, RankRow } from '../../ui/RankBars'
-import { pointText } from '../observatory/ObservatoryPage'
+import { pointText } from '../../items/planets'
 import { GearCard } from './GearCard'
 import { SkillsPage } from './SkillsPage'
 
@@ -126,8 +126,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   )
 }
 
-/** Art, name, the big Uma Level with its EXP and the class she fights as, then Farm and Craft Levels and what she's up to. */
-/** Marks her as a farming target: the facilities list what maxing her takes (D100). */
+/** Art, name, the big Uma Level with its EXP and the class she fights as, then her Craft Level and what she's up to. */
+/** Marks her as a target: the facilities list what maxing her takes (D100). */
 function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
   const [error, setError] = useState<string | null>(null)
   return (
@@ -174,14 +174,12 @@ function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterVie
         </div>
       </div>
       {owned && (
-        <div className="grid grid-cols-3 gap-2">
-          {(['farming', 'gathering'] as const).map((p) => (
-            <div key={p} className={`rounded-md p-2 ${p === 'farming' ? 'bg-[#2c3a26]' : 'bg-[#3a3026]'}`}>
-              <p className="text-[11px] font-semibold text-ink-soft">{PROFESSION_LABEL[p]}</p>
-              <p className="font-display text-xl font-bold leading-tight">{owned.professions[p].level}</p>
-              <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.professions[p].level)} open</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-md bg-[#3a3026] p-2">
+            <p className="text-[11px] font-semibold text-ink-soft">{CRAFT_LABEL}</p>
+            <p className="font-display text-xl font-bold leading-tight">{owned.craft.level}</p>
+            <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.craft.level)} open</p>
+          </div>
           <button type="button" className="rounded-md bg-raised p-2 text-left active:bg-white/5"
             onClick={() => (work ? navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })
               : navigate(party ? `/town/party-hall/${party.party + 1}` : '/town/party-hall', { state: { fromHub: true } }))}>
@@ -399,7 +397,7 @@ function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
   )
 }
 
-// --- Work: Farm Level and Craft Level, and her job -----------------------------------------------------------------
+// --- Work: Craft Level and her job ---------------------------------------------------------------------------------
 
 function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
@@ -418,19 +416,18 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
           <span className="shrink-0 text-[12px] text-ink-soft">{jobFinished(work.job, now) >= work.job.count ? 'Done' : formatDuration(jobEndsAt(work.job) - Date.parse(now))}</span>
         </button>
       )}
-      {(['farming', 'gathering'] as const).map((p) => {
-        const prof = uma.professions[p]
+      {[uma.craft].map((prof) => {
         const next = prof.level < PROFESSION_MAX_LEVEL ? professionExpToNext(prof.level) : null
         return (
-          <section key={p} className="rounded-md bg-raised p-3">
+          <section key="craft" className="rounded-md bg-raised p-3">
             <div className="flex items-baseline justify-between">
-              <p className="text-[14px] font-semibold">{PROFESSION_LABEL[p]} <span className="font-display text-lg">{prof.level}</span></p>
+              <p className="text-[14px] font-semibold">{CRAFT_LABEL} <span className="font-display text-lg">{prof.level}</span></p>
               <span className="text-[11px] text-ink-faint">10 gathered in {formatDuration(10 * itemMinutes(prof.level) * MINUTE)}</span>
             </div>
             <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />
             <p className="mt-1 text-[11px] text-ink-faint">
               {next ? `${prof.exp.toLocaleString('en-US')} / ${next.toLocaleString('en-US')} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
-              {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${PROFESSION_SHORT[p]} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
+              {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${CRAFT_SHORT} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
             </p>
           </section>
         )
@@ -457,7 +454,6 @@ function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit })
   ]
   const [style, styleGrade] = best(outfit.aptitudes.strategy)
   const [distance, distanceGrade] = best(outfit.aptitudes.distance)
-  const [surface, surfaceGrade] = best(outfit.aptitudes.surface)
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -477,7 +473,6 @@ function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit })
         <div className="divide-y divide-hairline rounded-md bg-raised">
           <Row label="Learns fastest" value={STYLE_CLASSES[style].join(' / ')} note={`${KEY_LABELS[style]} ${styleGrade}`} />
           <Row label="Masters fastest" value={DISTANCE_GEAR[distance].gear} note={`${KEY_LABELS[distance]} ${distanceGrade}`} />
-          <Row label="Works fastest at" value={SURFACE_PROFESSION[surface]} note={`${KEY_LABELS[surface]} ${surfaceGrade}`} />
         </div>
       </section>
       <section>

@@ -1,5 +1,5 @@
 // The Stable's remembered controls (device only): ownership, facets, sort and view. Search isn't remembered.
-import { DEFAULT_ROSTER_QUERY, EMPTY_FACETS, type RosterQuery } from '@rpg/domain'
+import { DEFAULT_ROSTER_QUERY, EMPTY_FACETS, SORT_LABELS, type RosterQuery } from '@rpg/domain'
 
 export type StableView = 'grid' | 'list'
 
@@ -16,7 +16,9 @@ export function loadPrefs(): StablePrefs {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Partial<StablePrefs> | null
     if (!raw?.query) return DEFAULT_PREFS
-    return { query: { ...DEFAULT_PREFS.query, ...raw.query, facets: { ...EMPTY_FACETS, ...raw.query.facets } }, view: raw.view === 'list' ? 'list' : 'grid' }
+    // A sort that no longer exists (one D144 retired) falls back to the default.
+    const sort = raw.query.sort && raw.query.sort.key in SORT_LABELS ? raw.query.sort : DEFAULT_PREFS.query.sort
+    return { query: { ...DEFAULT_PREFS.query, ...raw.query, sort, facets: { ...EMPTY_FACETS, ...raw.query.facets } }, view: raw.view === 'list' ? 'list' : 'grid' }
   } catch {
     return DEFAULT_PREFS
   }

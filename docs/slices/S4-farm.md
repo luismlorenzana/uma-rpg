@@ -1,7 +1,9 @@
 # S4 — Farmlands and Wilds
 
+> **Superseded by D144 (2026-10-16):** the farm side of this slice is gone; the Wilds remain ([after the farm](../design/after-the-farm.md)).
+
 > **Status: built and deploying, 2026-10-10** (the owner asked for S4–S7 straight through). Design:
-> [farm.md](../design/farm.md), [pacing.md](../design/pacing.md), [items.md](../design/items.md), D54–D56.
+> farm.md (deleted by D144), [pacing.md](../design/pacing.md), [items.md](../design/items.md), D54–D56.
 
 ## Goal
 

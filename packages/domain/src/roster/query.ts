@@ -5,7 +5,7 @@ import { matchesSearch, type RosterOutfit } from '../master/roster'
 import type { OwnedUma } from '../save/save'
 
 export type Ownership = 'all' | 'owned' | 'locked'
-export type RosterSortKey = 'release' | 'name' | 'rarity' | 'statTotal' | 'level' | 'farm' | 'craft' | 'classRank'
+export type RosterSortKey = 'release' | 'name' | 'rarity' | 'statTotal' | 'level' | 'craft' | 'classRank'
 export type SortDirection = 'asc' | 'desc'
 
 export interface RosterFacets {
@@ -50,7 +50,6 @@ export const SORT_LABELS: Record<RosterSortKey, string> = {
   rarity: 'Rarity',
   statTotal: 'Total base stats',
   level: 'Uma level',
-  farm: 'Farm Level',
   craft: 'Craft Level',
   classRank: 'Top class rank',
 }
@@ -92,10 +91,8 @@ function compare(a: RosterEntry, b: RosterEntry, key: RosterSortKey): number {
       return (a.owned?.level ?? 0) - (b.owned?.level ?? 0)
     case 'release':
       return a.outfit.releasedJp.localeCompare(b.outfit.releasedJp)
-    case 'farm':
-      return (a.owned?.professions.farming.level ?? 0) - (b.owned?.professions.farming.level ?? 0)
     case 'craft':
-      return (a.owned?.professions.gathering.level ?? 0) - (b.owned?.professions.gathering.level ?? 0)
+      return (a.owned?.craft.level ?? 0) - (b.owned?.craft.level ?? 0)
     case 'classRank': {
       const top = (e: RosterEntry) => (e.owned ? Math.max(1, ...Object.values(e.owned.ranks.classes).map((t) => t.rank)) : 0)
       return top(a) - top(b)

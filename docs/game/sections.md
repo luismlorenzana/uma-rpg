@@ -15,8 +15,8 @@ A global toast offers "Update ready · Restart" when a new build is out.
 
 ## The Hub
 
-Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`): **Farmlands**, **Wilds**,
-**Learning** and **Town**. Each page is a pixel-art map (`hub/scene/HubScene.ts`, Phaser) fitted to the screen.
+Three pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`): **Wilds**, **Learning** and **Town**
+(D144). Each page is a pixel-art map (`hub/scene/HubScene.ts`, Phaser) fitted to the screen.
 
 - Places are DOM buttons over the map, each with:
   - a name pill;
@@ -28,35 +28,21 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 - **Routes:** `/` returns to the last page you viewed. Every screen is a place (D31), with no other top-level routes.
 
 <!-- live:places -->
-### Farmlands (`farmlands`)
-
-| Place | Id | Kind | Uma slots | What it is |
-|---|---|---|---|---|
-| Fields | `fields` | farm-site | 2 | Grows grains while you're away, for the HP stat. |
-| Orchard | `orchard` | farm-site | 2 | Grows fruits while you're away, for the MP stat. |
-| Fishery | `fishery` | farm-site | 2 | Grows fish while you're away, for the ATK stat. |
-| Herb Garden | `herb-garden` | farm-site | 2 | Grows herbs & spices while you're away, for the M.ATK stat. |
-| Vegetable Garden | `vegetable-garden` | farm-site | 2 | Grows vegetables while you're away, for the DEF stat. |
-| Mushroom Cave | `mushroom-cave` | farm-site | 2 | Grows mushrooms while you're away, for the M.DEF stat. |
-| Sugar Grove | `sugar-grove` | farm-site | 2 | Grows sweets while you're away, for the Speed stat. |
-| Nut Grove | `nut-grove` | farm-site | 2 | Grows nuts & seeds while you're away, for the Limit Break charge stat. |
-| Pantry | `pantry` | station | 2 | Refines raw ingredients, one into one: wheat into flour, fruit into preserves. |
-| Kitchen | `kitchen` | station | 2 | Cooks dishes that grow Extra Stats. |
-
 ### Wilds (`wilds`)
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Monster Den | `monster-den` | gather-site | 2 | Gathers hides & scales while you're away, for the HP stat. |
-| Ley Spring | `ley-spring` | gather-site | 2 | Gathers essences while you're away, for the MP stat. |
-| Mine | `mine` | gather-site | 2 | Gathers ores while you're away, for the ATK stat. |
-| Crystal Cavern | `crystal-cavern` | gather-site | 2 | Gathers crystals while you're away, for the M.ATK stat. |
-| Quarry | `quarry` | gather-site | 2 | Gathers stones while you're away, for the DEF stat. |
-| Meadow | `meadow` | gather-site | 2 | Gathers fibers while you're away, for the M.DEF stat. |
-| Forest | `forest` | gather-site | 2 | Gathers woods while you're away, for the Speed stat. |
-| Fossil Dig | `fossil-dig` | gather-site | 2 | Gathers bones & horns while you're away, for the Limit Break charge stat. |
-| Workbench | `workbench` | station | 2 | Refines raw materials, one into one: ore into ingots, logs into planks. |
-| Forge | `forge` | station | 2 | Crafts weapons, armor and accessories. |
+| Monster Den | `monster-den` | gather-site | 3 | Gathers hides & scales while you're away, for the HP stat. |
+| Ley Spring | `ley-spring` | gather-site | 3 | Gathers essences while you're away, for the MP stat. |
+| Mine | `mine` | gather-site | 3 | Gathers ores while you're away, for the ATK stat. |
+| Crystal Cavern | `crystal-cavern` | gather-site | 3 | Gathers crystals while you're away, for the M.ATK stat. |
+| Quarry | `quarry` | gather-site | 3 | Gathers stones while you're away, for the DEF stat. |
+| Meadow | `meadow` | gather-site | 3 | Gathers fibers while you're away, for the M.DEF stat. |
+| Forest | `forest` | gather-site | 3 | Gathers woods while you're away, for the Speed stat. |
+| Fossil Dig | `fossil-dig` | gather-site | 3 | Gathers bones & horns while you're away, for the Limit Break charge stat. |
+| Workbench | `workbench` | station | 3 | Refines raw materials, one into one: ore into ingots, logs into planks. |
+| Forge | `forge` | station | 3 | Crafts weapons, armor and accessories. |
+| Lapidary | `lapidary` | station | 3 | Cuts Star Gems that open nodes on an Uma’s Extra Stats map. |
 
 ### Learning (`learning`)
 
@@ -77,48 +63,38 @@ Four pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`):
 | Stable | `stable` | town | — | Every Uma outfit, locked or yours. Unlock Tickets open new ones. |
 | Party Hall | `party-hall` | town | — | Twenty parties of five. |
 | Scenario Gate | `scenario-gate` | town | — | The world map: five continents of regions to clear. |
-| Warehouse | `warehouse` | town | — | Every item you own: ingredients, materials, dishes and gear. |
+| Warehouse | `warehouse` | town | — | Every item you own: materials, Star Gems and gear. |
 | Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
 | Tier Finale | `tier-finale` | town | — | The tier's final event, and promotion to the next tier. |
 <!-- /live -->
 
-Farmlands and Wilds mirror each other site for site:
-- Each farm site has a gathering twin that feeds the same stat.
-- The Pantry mirrors the Workbench, and the Kitchen mirrors the Forge.
+The Wilds hold every facility: eight sites in two columns, and the Workbench, the Lapidary and the Forge across the
+middle row, the Lapidary on the road between them (D144).
 
 ### Facilities
 
-Every site and station is a facility: Uma slots, a level, jobs ([loops](loops.md#professions)). The halls seat Heroes
+Every site and station is a facility: Uma slots, a level, jobs ([loops](loops.md#craft-level)). The halls seat Heroes
 instead ([Halls of Heroes](heroes.md)).
 
 <!-- live:facilities -->
-| Place | Job | Profession | Makes | Upgraded with |
-|---|---|---|---|---|
-| Fields | Gather | Farming | Grains | Grains + Hides & Scales |
-| Orchard | Gather | Farming | Fruits | Fruits + Essences |
-| Fishery | Gather | Farming | Fish | Fish + Ores |
-| Herb Garden | Gather | Farming | Herbs & Spices | Herbs & Spices + Crystals |
-| Vegetable Garden | Gather | Farming | Vegetables | Vegetables + Stones |
-| Mushroom Cave | Gather | Farming | Mushrooms | Mushrooms + Fibers |
-| Sugar Grove | Gather | Farming | Sweets | Sweets + Woods |
-| Nut Grove | Gather | Farming | Nuts & Seeds | Nuts & Seeds + Bones & Horns |
-| Monster Den | Gather | Gathering | Hides & Scales | Hides & Scales + Grains |
-| Ley Spring | Gather | Gathering | Essences | Essences + Fruits |
-| Mine | Gather | Gathering | Ores | Ores + Fish |
-| Crystal Cavern | Gather | Gathering | Crystals | Crystals + Herbs & Spices |
-| Quarry | Gather | Gathering | Stones | Stones + Vegetables |
-| Meadow | Gather | Gathering | Fibers | Fibers + Mushrooms |
-| Forest | Gather | Gathering | Woods | Woods + Sweets |
-| Fossil Dig | Gather | Gathering | Bones & Horns | Bones & Horns + Nuts & Seeds |
-| Pantry | Refine | Farming | Farming refined items | Stones + Woods |
-| Workbench | Refine | Gathering | Gathering refined items | Stones + Woods |
-| Kitchen | Cook | Farming | Dishes | Stones + Woods |
-| Forge | Craft | Gathering | Gear | Stones + Woods |
+| Place | Job | Makes | Upgraded with |
+|---|---|---|---|
+| Monster Den | Gather | Hides & Scales | Hides & Scales + Bones & Horns |
+| Ley Spring | Gather | Essences | Essences + Woods |
+| Mine | Gather | Ores | Ores + Crystals |
+| Crystal Cavern | Gather | Crystals | Crystals + Ores |
+| Quarry | Gather | Stones | Stones + Fibers |
+| Meadow | Gather | Fibers | Fibers + Stones |
+| Forest | Gather | Woods | Woods + Essences |
+| Fossil Dig | Gather | Bones & Horns | Bones & Horns + Hides & Scales |
+| Workbench | Refine | Refined items | Stones + Woods |
+| Forge | Craft | Gear | Stones + Woods |
+| Lapidary | Cut | Star Gems | Stones + Woods |
 <!-- /live -->
 
-**The facility page** (`places/work/FacilityPage.tsx`), for the 16 sites, the Pantry, the Workbench, the Kitchen and
-the Forge:
+**The facility page** (`places/work/FacilityPage.tsx`), for the eight sites, the Workbench, the Forge and the
+Lapidary:
 - **Header:** level, slots and **Upgrade**.
 - **For your targets** (D100, D126): what the targets still need from this facility, lowest grade first.
   - **Each line:** the total need, how many are in the Warehouse and how many are coming, then how many are short.
@@ -133,11 +109,13 @@ the Forge:
   - Recall;
   - a queue of up to three.
 - **Assigning:** pick an Uma (free ones first, then the highest level here and its EXP; the level and her time per
-  item show on the right), then what to make, then how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Pantry and
-  Workbench (D139).
-- **Kitchen:** tabs for Dishes, Duo, Feasts and "Can cook now".
-- **Forge:** a type picker in eight rows of five (Arms, Tomes, Physical and Magical armor, Arms and Element Orbs,
-  Talismans, Amulets), then grade (D124).
+  item show on the right), then what to make, then how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
+- **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
+  Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
+  type with no materials in stock is dimmed.
+- **Lapidary:** tabs for Moons (eight planets × ten grades), Bridges and Sun, each gem an icon. Grades above her Craft
+  Level are locked, gems without materials are dimmed, and a dot marks those the targets need. The picked gem shows the
+  node it opens, what that node gives and its materials.
 
 **The Learning page** holds the five Halls of Heroes (D106), one page shared by all five (`places/halls/HallPage.tsx`).
 Each shows its four seats: the seat's Limit Break with its kinds, its Hero large on the left, and her Learners below with
@@ -153,9 +131,9 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 - **Roster:**
   - All, Owned and Locked tabs, with counts.
   - Search, and a Filters sheet: rarity; surface, distance or style A+; sex; New 24h; Free now.
-  - Eight sorts, grid or list. These choices are remembered per device.
+  - Seven sorts, grid or list. These choices are remembered per device.
 - **An Uma's profile:**
-  - **Header:** Uma Level and EXP, a class chip, Farm and Craft Levels, and a Working or Party card.
+  - **Header:** Uma Level and EXP, a class chip, her Craft Level, and a Working or Party card.
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
@@ -220,7 +198,7 @@ Routes: `/town/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent`
 ### Warehouse
 
 Shelf tabs:
-- Farm, Craft, Dishes and Gear;
+- Materials (by family), Star Gems and Gear;
 - a grade filter (G1–G10);
 - a stock sheet with Sell ×1, 10 or All.
 
@@ -234,8 +212,9 @@ Shelf tabs:
 ### Observatory
 
 - An Uma picker.
-- Her Sun-and-planets map: tap a node to switch it on or off, up to her active limit.
-- Effect totals, and an **Eat** list of dishes ([loops](loops.md#extra-stats-and-gear)).
+- Her Sun-and-planets map: tap a node to switch it on or off, up to her active limit. A locked node names the Star Gem
+  that opens it.
+- Effect totals, and a **Set** list of the Star Gems she can set now ([loops](loops.md#extra-stats-and-gear)).
 
 ### Account
 

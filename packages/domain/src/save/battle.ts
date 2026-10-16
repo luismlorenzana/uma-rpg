@@ -24,7 +24,7 @@ import {
   ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, WEAPON_LABEL, weaponExpShares,
   withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
-import { starPoints } from '../economy/dishes'
+import { starPoints } from '../economy/stars'
 import { addPoints, applyPoints, type Points } from '../economy/bonus'
 import { BATTLE_HEAL_SCALE, BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'

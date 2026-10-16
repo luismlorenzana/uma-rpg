@@ -17,37 +17,8 @@ const shadow = (g: G, x: number, y: number, w: number) => {
   g.fillEllipse(x, y + 16, w, 9)
 }
 
-function plot(g: G, x: number, y: number, soil = 0x6e5032) {
-  shadow(g, x, y, 60)
-  g.fillStyle(0x4a3420, 1)
-  g.fillRoundedRect(x - 30, y - 12, 60, 30, 6)
-  g.fillStyle(soil, 1)
-  g.fillRoundedRect(x - 28, y - 14, 56, 28, 6)
-}
 
-function rows(g: G, x: number, y: number, color: number, dots = false) {
-  for (let i = 0; i < 3; i++) {
-    const ry = y - 8 + i * 8
-    g.fillStyle(0x5a3f26, 1)
-    g.fillRect(x - 24, ry + 2, 48, 3)
-    g.fillStyle(color, 1)
-    if (dots) for (let k = 0; k < 6; k++) g.fillCircle(x - 20 + k * 8, ry, 2.6)
-    else g.fillRect(x - 24, ry - 2, 48, 3)
-  }
-}
 
-function tree(g: G, x: number, y: number, canopy: number, fruit?: number, r = 10) {
-  g.fillStyle(0x5b3b22, 1)
-  g.fillRect(x - 2, y, 4, 10)
-  g.fillStyle(canopy, 1)
-  g.fillCircle(x, y - 4, r)
-  g.fillStyle(0xffffff, 0.12)
-  g.fillCircle(x - r / 3, y - 4 - r / 3, r / 2.2)
-  if (fruit !== undefined) {
-    g.fillStyle(fruit, 1)
-    for (const [dx, dy] of [[-5, -6], [4, -2], [-1, 2], [5, -9]]) g.fillCircle(x + (dx ?? 0), y + (dy ?? 0), 1.8)
-  }
-}
 
 function pine(g: G, x: number, y: number, color: number, h = 22) {
   g.fillStyle(0x4a2f1c, 1)
@@ -123,17 +94,6 @@ function shed(g: G, x: number, y: number, roof: number, metal: number) {
 }
 
 const DRAW: Record<string, Draw> = {
-  // Farmlands
-  fields: (g, x, y) => { plot(g, x, y); rows(g, x, y, 0xe4c45a) },
-  orchard: (g, x, y) => { shadow(g, x, y, 62); tree(g, x - 16, y + 2, 0x4f8f3a, 0xe0483a); tree(g, x + 14, y + 4, 0x56953f, 0xf09a3a); tree(g, x - 1, y - 6, 0x4a8636, 0xe0483a) },
-  fishery: (g, x, y) => { shadow(g, x, y, 64); g.fillStyle(0x6b5a3a, 1); g.fillEllipse(x, y + 2, 64, 34); g.fillStyle(0x2f6fa8, 1); g.fillEllipse(x, y + 2, 56, 28); g.fillStyle(0x6cb4e8, 0.5); g.fillEllipse(x - 8, y - 2, 24, 8); g.fillStyle(0x7a5530, 1); g.fillRect(x + 14, y - 14, 14, 4) },
-  'herb-garden': (g, x, y) => { plot(g, x, y, 0x5c4a30); rows(g, x, y, 0x7ccf6a, true) },
-  'vegetable-garden': (g, x, y) => { plot(g, x, y); rows(g, x, y, 0xf08a2a, true) },
-  'mushroom-cave': (g, x, y) => { mound(g, x, y, 0x55525a); g.fillStyle(0x15131a, 1); g.fillEllipse(x, y + 8, 26, 22); for (const [dx, c] of [[-22, 0xd8483a], [20, 0xe6d2b0], [-14, 0xb07ae0]] as const) { g.fillStyle(0xeee0c8, 1); g.fillRect(x + dx - 1, y + 10, 3, 6); g.fillStyle(c, 1); g.fillEllipse(x + dx, y + 10, 10, 6) } },
-  'sugar-grove': (g, x, y) => { shadow(g, x, y, 62); for (let i = 0; i < 4; i++) { g.fillStyle(0x8e5ab0, 1); g.fillRect(x + 12 + i * 4, y - 18, 3, 34) } for (const dx of [-22, -6]) { g.fillStyle(0xe6b43a, 1); g.fillRoundedRect(x + dx - 7, y - 4, 14, 18, 3); g.fillStyle(0x8a5a14, 1); g.fillRect(x + dx - 7, y + 2, 14, 2); g.fillRect(x + dx - 7, y + 8, 14, 2) } },
-  'nut-grove': (g, x, y) => { shadow(g, x, y, 62); tree(g, x - 14, y + 2, 0x7b8a3a, 0x8a5a2a, 11); tree(g, x + 14, y + 0, 0x6f7f34, 0x8a5a2a, 12) },
-  pantry: (g, x, y) => house(g, x, y, 0xcfb894, 0x3f6fa8),
-  kitchen: (g, x, y) => house(g, x, y, 0xd8c09a, 0xb4482e, true),
   // Wilds
   'monster-den': (g, x, y) => { mound(g, x, y, 0x4a4236); g.fillStyle(0x0d0b0a, 1); g.fillEllipse(x, y + 6, 30, 24); g.fillStyle(0xf2d23a, 1); g.fillCircle(x - 5, y + 4, 2); g.fillCircle(x + 5, y + 4, 2) },
   'ley-spring': (g, x, y) => { shadow(g, x, y, 60); g.fillStyle(0x6c6878, 1); g.fillEllipse(x, y + 2, 58, 32); g.fillStyle(0x2ad0c8, 1); g.fillEllipse(x, y + 2, 46, 22) },
@@ -145,6 +105,7 @@ const DRAW: Record<string, Draw> = {
   'fossil-dig': (g, x, y) => { shadow(g, x, y, 62); g.fillStyle(0x8a6a44, 1); g.fillEllipse(x, y + 4, 58, 30); g.fillStyle(0x5a4228, 1); g.fillEllipse(x, y + 6, 40, 18); g.fillStyle(0xeee4cc, 1); g.fillRect(x - 10, y + 4, 20, 4); g.fillCircle(x - 11, y + 3, 3); g.fillCircle(x - 11, y + 9, 3); g.fillCircle(x + 11, y + 3, 3); g.fillCircle(x + 11, y + 9, 3) },
   workbench: (g, x, y) => house(g, x, y, 0xb8a080, 0x5a6a7a),
   forge: (g, x, y) => { house(g, x, y, 0x6a5a52, 0x3a3434, true); g.fillStyle(0xff8a2a, 0.9); g.fillRect(x - 4, y + 7, 8, 11) },
+  lapidary: (g, x, y) => { house(g, x, y, 0xc8c4d8, 0x4a4a78); g.fillStyle(0x70d8f0, 1); g.fillTriangle(x - 6, y + 4, x + 6, y + 4, x, y - 6); g.fillTriangle(x - 6, y + 4, x + 6, y + 4, x, y + 12) },
   // Learning District
   'brawler-dojo': (g, x, y) => hall(g, x, y, 0xd8c8a8, 0x7a2a22, 0xd8483a),
   'mage-tower': (g, x, y) => tower(g, x, y, 0x8a84a8, 0x5a3a9a),
@@ -176,19 +137,16 @@ export function drawMarker(g: G, id: string, x: number, y: number): Ambient[] {
   }
   draw(g, x, y)
   switch (id) {
-    case 'fishery':
-      return [{ kind: 'shimmer', x, y: y + 2, w: 40, color: 0xbfe6ff }]
     case 'ley-spring':
       return [{ kind: 'glow', x, y: y + 2, r: 18, color: 0x7ff6ee }, { kind: 'shimmer', x, y: y + 2, w: 30, color: 0xdffffb }]
-    case 'fields':
-      return [{ kind: 'sway', x, y: y - 8, w: 48, color: 0xf2dc7a }, { kind: 'sway', x, y: y, w: 48, color: 0xf2dc7a }]
-    case 'kitchen':
     case 'forge':
       return [{ kind: 'smoke', x: x + 14, y: y - 22 }]
     case 'summoner-circle':
       return [{ kind: 'glow', x, y: y + 4, r: 16, color: 0xb08aff }]
     case 'crystal-cavern':
       return [{ kind: 'glow', x, y: y + 2, r: 14, color: 0x9fd8ff }]
+    case 'lapidary':
+      return [{ kind: 'glow', x, y: y + 4, r: 10, color: 0x9fe8ff }]
     default:
       return []
   }

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-12; save v17, engine v7.** The full running-system reference is
+> **Status: current, 2026-10-16; save v21, engine v13.** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -21,11 +21,11 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v17** (`save/save.ts`), not the old v7/v8 snapshot:
+**Schema v21** (`save/save.ts`), not the old v7/v8 snapshot:
 - `account`: trainer name and timestamps.
-- `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, dishes, unbound gear and facilities.
-- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout), professions, ranks, Extra
-  Stats and bound gear. There are no active `build`/`builds` keys (D86).
+- `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, Star Gems, unbound gear, facilities, targets and Hall of Heroes seats.
+- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout), her Craft Level, ranks,
+  Extra Stats, bound gear and Bonds. There are no active `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
   runs retired in v11 (D72).
 - Wallet shortcuts are `timeTickets` and `sweepTickets` (D74); tokens live in item stock.
@@ -40,9 +40,13 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v14 per-class loadouts, renamed/refunded gear | D86 |
 | v15 Crafting converts to Mastery Tokens; Forge inputs release reserved tokens | D94 |
 | v16 profession EXP moves to the longer curve without losing earned work | D96 |
-| v17 farming targets, none to start | D100 |
+| v17 targets, none to start | D100 |
+| v18 ranks earned by fighting, five armor slots, Marks, no tokens, a progress reset | D102–D105 |
+| v19 the Halls of Heroes and Bonds | D106 |
+| v20 armor without accents, a feet slot, two accessory slots | D124 |
+| v21 one profession (the higher level), Star Gems, only known items and facilities, more slots | D144 |
 
-`parseSave` accepts v1–v17 and returns v17; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v21 and returns v21; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in
@@ -101,12 +105,12 @@ Phaser (Hub and battle stage), Firebase, master data parsing and each place page
 
 - The save parser, Hub state readers and small id/gate validators stay in the entry. Item identities are an id-only
   snapshot; `items/identity.test.ts` compares every field to the authored catalog. Update that snapshot when changing
-  item ids, families or sites. Skill, dish and gear identities share exact grammar and constants with their catalogs,
+  item ids, families or sites. Skill, Star Gem and gear identities share exact grammar and constants with their catalogs,
   with exhaustive parity tests.
 - Device reads use `parseSaveAsync`: migrations load only for old versions, and the battle engine loads only when a
   save contains a frozen fight. Every pending fight is replayed before the promise returns. There is no unchecked
   intermediate save. The API keeps the synchronous, equally strict `parseSave` contract.
-- Gameplay commands dynamically import the domain's `battle`, `work`, `exchange`, `kitchen` and `forge` entry points.
+- Gameplay commands dynamically import the domain's `battle`, `work`, `exchange`, `observatory` and `forge` entry points.
   They read the latest save after loading, so overlapping cold commands cannot overwrite one another's changes.
   Skill definitions, the world generator and full recipes load with their screens, not with an idle Hub.
 - Dexie initializes on the existing asynchronous device-I/O path. Its separate 32.49 KB gzip chunk is still required

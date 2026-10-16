@@ -1,8 +1,8 @@
-// Farming targets (D100, D126; docs/design/gear-and-targets.md §2): up to five Umas the facilities plan for. For each,
-// everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the dish of every Extra
-// Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top level
-// first, and only what is still short flows down: pieces and dishes to refined items, refined items to raw ones.
-import { DISHES, dishById, nodeGrade, nodesFor, STAR_NODES } from '../economy/dishes'
+// Targets (D100, D126, D144; docs/design/gear-and-targets.md §2): up to five Umas the facilities plan for. For each,
+// everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the Star Gem of every
+// Extra Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top
+// level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones.
+import { gemById, nodeGem, STAR_NODES } from '../economy/gems'
 import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
 import { facilitySpec } from '../economy/jobs'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
@@ -29,7 +29,7 @@ export function setTarget(save: Save, outfitId: string, on: boolean, now: string
  * still make; `short`: what still has to be started. A facility lists a line while `need > have`.
  */
 export interface TargetNeed {
-  /** An item, dish or gear piece id. */
+  /** An item, gear piece or Star Gem id. */
   key: string
   /** An id to draw its icon with. */
   icon: string
@@ -40,11 +40,7 @@ export interface TargetNeed {
   coming: number
   short: number
 }
-export interface TargetPlan { gear: TargetNeed[]; dishes: TargetNeed[]; refined: TargetNeed[]; raw: TargetNeed[] }
-
-/** The dish that opens each node at exactly its grade: a planet dish its moon, a Duo its bridge, a Feast its Sun node. */
-const NODE_DISH = new Map<string, string>()
-for (const dish of DISHES) for (const node of nodesFor(dish)) if (nodeGrade(node) === dish.grade) NODE_DISH.set(node, dish.id)
+export interface TargetPlan { gear: TargetNeed[]; gems: TargetNeed[]; refined: TargetNeed[]; raw: TargetNeed[] }
 
 /** The gear types an Uma climbs (D124): her class's five weapons, each armor slot's kind, and the type in each accessory
  * slot (an empty one plans nothing: nothing says which she wants). */
@@ -57,24 +53,22 @@ function gearTypes(uma: OwnedUma, classId: RpgClass): EquipType[] {
   return types
 }
 
-/** Everything maxing one Uma still takes: every grade above the best she has bound on each track, up to 10, and a dish
- * for every Extra Stats node she hasn't opened. */
+/** Everything maxing one Uma still takes: every grade above the best she has bound on each track, up to 10, and a Star
+ * Gem for every Extra Stats node she hasn't opened. */
 export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, number> {
   const demand = new Map<string, number>()
   const add = (id: string) => demand.set(id, (demand.get(id) ?? 0) + 1)
   for (const type of gearTypes(uma, classId)) {
     for (let g = boundGrade(uma, gearTrackOf(type)) + 1; g <= GEAR_MAX_RANK; g++) add(gearId(type, g))
   }
-  for (const node of STAR_NODES) if (!uma.stars.unlocked.includes(node)) add(NODE_DISH.get(node)!)
+  for (const node of STAR_NODES) if (!uma.stars.unlocked.includes(node)) add(nodeGem(node))
   return demand
 }
 
-/** One item's recipe, per unit: a piece's or a dish's refined inputs, a refined item's raw one; a raw item has none. */
+/** One item's recipe, per unit: a piece's or a gem's refined inputs, a refined item's raw one; a raw item has none. */
 function recipeOf(id: string): Readonly<Record<string, number>> | null {
-  const piece = gearById(id)
-  if (piece) return piece.inputs
-  const dish = dishById(id)
-  if (dish) return Object.fromEntries(Object.entries(dish.inputs).filter(([input]) => itemById(input)))
+  const made = gearById(id) ?? gemById(id)
+  if (made) return made.inputs
   const item = itemById(id)
   return item?.refined ? { [item.pair]: 1 } : null
 }
@@ -113,34 +107,33 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
     for (const [key, n] of targetDemand(uma, activeClassOf(id))) demand.set(key, (demand.get(key) ?? 0) + n)
   }
   const { coming, held } = jobSupply(world)
-  const owned = (id: string) => (gearById(id) ? world.gear[id] : dishById(id) ? world.dishes[id] : world.items[id]) ?? 0
+  const owned = (id: string) => (gearById(id) ? world.gear[id] : gemById(id) ? world.gems[id] : world.items[id]) ?? 0
   const plan = planRequirements({
     demand, recipe: recipeOf,
     supply: (id) => ({ onHand: Math.max(0, owned(id) - (held.get(id) ?? 0)), coming: coming.get(id) ?? 0 }),
   })
   const line = (r: Requirement): TargetNeed => {
-    const piece = gearById(r.id), dish = dishById(r.id), item = itemById(r.id)
-    const name = piece ? EQUIP_LABEL[piece.type] : dish?.name ?? item?.name ?? r.id
-    return { key: r.id, icon: r.id, name, grade: piece?.grade ?? dish?.grade ?? item?.grade ?? 0, need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
+    const piece = gearById(r.id), gem = gemById(r.id), item = itemById(r.id)
+    const name = piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
+    return { key: r.id, icon: r.id, name, grade: piece?.grade ?? gem?.grade ?? item?.grade ?? 0, need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
   }
   const lines = [...plan.values()].filter((r) => r.gross > 0).map(line)
   const byGrade = (a: TargetNeed, b: TargetNeed) => a.grade - b.grade || a.name.localeCompare(b.name)
   const pick = (test: (key: string) => boolean) => lines.filter((n) => test(n.key)).sort(byGrade)
   return {
     gear: pick((k) => !!gearById(k)),
-    dishes: pick((k) => !!dishById(k)),
+    gems: pick((k) => !!gemById(k)),
     refined: pick((k) => !!itemById(k)?.refined),
     raw: pick((k) => { const i = itemById(k); return !!i && !i.refined }),
   }
 }
 
-/** The lines a facility makes: a site its family's raw items, the Pantry or Workbench its side's refined items, the
- * Kitchen dishes, the Forge gear. Each stays while the Warehouse holds fewer than the targets need. */
+/** The lines a facility makes: a site its family's raw items, the Workbench refined items, the Forge gear, the Lapidary
+ * Star Gems. Each stays while the Warehouse holds fewer than the targets need. */
 export function facilityTargets(plan: TargetPlan, placeId: string): TargetNeed[] {
   const spec = facilitySpec(placeId)
   if (!spec) return []
   const lines = spec.kind === 'gather' ? plan.raw.filter((n) => itemById(n.key)?.family === spec.family)
-    : spec.kind === 'refine' ? plan.refined.filter((n) => itemById(n.key)?.side === spec.profession)
-      : spec.kind === 'cook' ? plan.dishes : spec.kind === 'craft' ? plan.gear : []
+    : spec.kind === 'refine' ? plan.refined : spec.kind === 'craft' ? plan.gear : spec.kind === 'cut' ? plan.gems : []
   return lines.filter((n) => n.need > n.have)
 }

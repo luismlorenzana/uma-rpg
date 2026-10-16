@@ -1,6 +1,8 @@
 # S6 — Kitchen and Extra Stats
 
-> **Status: built and deploying, 2026-10-10.** Design: [kitchen.md](../design/kitchen.md), game design §8.4 and §10,
+> **Superseded by D144 (2026-10-16):** dishes and the Kitchen are gone; Star Gems cut at the Lapidary open Extra Stats ([after the farm](../design/after-the-farm.md)).
+
+> **Status: built and deploying, 2026-10-10.** Design: kitchen.md (deleted by D144), game design §8.4 and §10,
 > D58.
 
 ## Goal

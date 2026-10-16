@@ -64,10 +64,10 @@ describe('gear (S7, D124, D125)', () => {
 })
 
 describe('the Forge and equipping (S7)', () => {
-  it('crafts with Gathering & Crafting into the gear stock', () => {
+  it('crafts with Craft Level into the gear stock', () => {
     let save = edit(umas('101'), (w) => ({ ...w, items: { 'pine-plank': 2, 'mist-infusion': 2 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1', 2)!
-    expect(plan).toMatchObject({ block: null, profession: 'gathering', msEach: makeMinutes(1) * MINUTE })
+    expect(plan).toMatchObject({ block: null, msEach: makeMinutes(1) * MINUTE })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2', 1)!.block).toBe('Needs Craft Lv6')
     save = startJob(save, 'forge', 0, smith, 'greatsword-g1', 2, at(0))
     save = collectJob(save, 'forge', 0, at(2 * plan.msEach)).save

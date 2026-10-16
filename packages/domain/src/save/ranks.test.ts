@@ -102,6 +102,7 @@ describe('save v18: the progress reset (D105)', () => {
     uma.classes = { brawler: { weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: ['brawler-greatsword.1a'] } }
     uma.stars = { unlocked: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1', 'moon:mp:2'], active: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1', 'moon:mp:2'] }
     uma.professions = { farming: { level: 7, exp: 3 }, gathering: { level: 1, exp: 0 } }
+    delete uma.craft
     uma.gear = { locker: ['greatsword-g1-atk', 'greatsword-g1-hp', 'mail-g2-def', 'ring-g1-hp', 'orb-fire-g1-mp'],
       equipped: { greatsword: 'greatsword-g1-atk', armor: 'mail-g2-def', accessory: 'orb-fire-g1-mp' } }
     delete uma.gear.kinds
@@ -109,6 +110,8 @@ describe('save v18: the progress reset (D105)', () => {
       const u = w.umas[id]
       u.ranks = { classes: { brawler: 1, mage: 1, spellblade: 1, cleric: 1, summoner: 1 }, weapons: { brawler: 1, mage: 1, spellblade: 1, cleric: 1, summoner: 1 }, armor: 1, accessory: 1 }
       delete u.gear.kinds
+      u.professions = { gathering: u.craft }
+      delete u.craft
     }
     w.items = { 'token-mastery-1': 3, 'token-cook-hp-1': 2, 'wheat-flour': 1 }
     w.gear = { 'plate-g1-atk': 2, 'charm-g1-hp': 1, 'tome-ice-g1-mp': 1 }
@@ -130,7 +133,8 @@ describe('save v18: the progress reset (D105)', () => {
     expect(save.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {}, accessories: {} }, bonds: {} })
     expect(uma.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: [], loadout: null })
-    expect(uma.professions.farming).toEqual({ level: 7, exp: 3 })
+    // v21 (D144) keeps the higher of her two levels as her Craft Level.
+    expect(uma.craft).toEqual({ level: 7, exp: 3 })
     expect(uma.stars).toEqual({ unlocked: expect.arrayContaining(['moon:hp:1']), active: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1'] })
     // Gear renamed: weapons and Orbs lose accents (a duplicate gives its materials back), Mail becomes a Cuirass, a Ring
     // gives its materials back; only grade-1 pieces stay on.
@@ -139,7 +143,8 @@ describe('save v18: the progress reset (D105)', () => {
       kinds: {} })
     expect(w.gear).toEqual({ 'cuirass-g1': 2, 'tome-ice-g1': 1 })
     expect(Object.keys(w.items).some((id) => id.startsWith('token-'))).toBe(false)
-    expect(w.items['wheat-flour']).toBe(1)
+    // v21 (D144) drops items the catalog no longer has.
+    expect(w.items['wheat-flour']).toBeUndefined()
     expect(w.items['copper-ingot']).toBe(2) // the duplicate Greatsword's and the Ring's
     expect(w.items['cut-quartz']).toBe(1 + 2) // the Ring's, and the Ring job's reserved input for its two pieces
     // The world map and Springs start over; Laurels, targets and parties stay; Marks start at 0.
@@ -148,10 +153,11 @@ describe('save v18: the progress reset (D105)', () => {
     expect(w.wallet).toMatchObject({ laurels: 500, gearMarks: 0, classMarks: 0 })
     expect(w.targets).toEqual(['101'])
     expect(w.parties[0]!.slots).toEqual(IDS)
-    // Training ends, a Ring's Forge job ends, a dish needs no token.
+    // Training ends and a Ring's Forge job ends; v21 (D144) drops places that are no longer facilities and gives the
+    // rest their new slots.
     expect(w.facilities['brawler-dojo']).toBeUndefined()
-    expect(w.facilities.forge!.jobs[0]).toBeNull()
-    expect(w.facilities.kitchen!.jobs[0]!.inputs).toEqual({ 'wheat-flour': 1 })
+    expect(w.facilities.forge!.jobs).toEqual([null, null, null])
+    expect(w.facilities.kitchen).toBeUndefined()
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 })

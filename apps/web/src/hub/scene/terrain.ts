@@ -9,7 +9,6 @@ import { placeCell } from '../grid'
 export const N = 1, E = 2, S = 4, W = 8
 
 export const PROPS: Readonly<Record<HubPage, readonly { id: string; tall: boolean }[]>> = {
-  farmlands: [{ id: 'bush', tall: false }, { id: 'flowers-a', tall: false }, { id: 'flowers-b', tall: false }, { id: 'hay-bale', tall: false }, { id: 'tree', tall: true }, { id: 'rock', tall: false }],
   wilds: [{ id: 'pine', tall: true }, { id: 'boulder', tall: false }, { id: 'rock', tall: false }, { id: 'grass-tuft', tall: false }, { id: 'mushrooms', tall: false }, { id: 'log', tall: false }],
   learning: [{ id: 'lamp', tall: true }, { id: 'hedge', tall: false }, { id: 'bench', tall: false }, { id: 'banner', tall: true }, { id: 'flower-bed', tall: false }],
   town: [{ id: 'lamp', tall: true }, { id: 'barrel', tall: false }, { id: 'crate', tall: false }, { id: 'flower-pot', tall: false }, { id: 'bench', tall: false }, { id: 'tree', tall: true }],

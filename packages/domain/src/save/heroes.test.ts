@@ -29,7 +29,7 @@ describe('Halls of Heroes (D106)', () => {
     expect(HERO_LIMIT_IDS).toHaveLength(20)
     expect(heroLimitsOf('cleric').map((l) => l.id)).toEqual(['cleric-1', 'cleric-2', 'cleric-3', 'cleric-4'])
     expect(hallClass(HERO_HALLS.spellblade)).toBe('spellblade')
-    expect(hallClass('pantry')).toBeNull()
+    expect(hallClass('workbench')).toBeNull()
     expect([0, 1, 5, 10, 12].map(bondCapacity)).toEqual([0.5, 0.55, 0.75, 1, 1])
   })
 

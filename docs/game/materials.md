@@ -1,168 +1,37 @@
-# Materials, dishes and gear
+# Materials, Star Gems and gear
 
-Everything an Uma gathers, refines, cooks or crafts. Lists are generated from `packages/domain/src/items/` and
-`economy/` (`dishes.ts`, `gear.ts`). There are no tokens (D105). How the jobs work is in
-[loops](loops.md#professions).
+Everything an Uma gathers, refines, crafts or cuts. Lists are generated from `packages/domain/src/items/` and
+`economy/` (`gems.ts`, `gear.ts`). There are no tokens (D105). How the jobs work is in
+[loops](loops.md#craft-level).
 
 ## Families
 
-Sixteen families on two sides:
-- **Farming** (Farmlands page) feeds the Kitchen.
-- **Gathering** (Wilds page) feeds the Forge.
-
-Each family feeds one of eight stats, has one site, and has ten grades. Every raw item refines one-for-one into its
-refined form, at the Pantry (farming) or the Workbench (gathering), in a quarter of the time it took to gather (D101).
+Eight families, all on the Wilds page (D144), feed the Forge and the Lapidary alike. Each feeds one of eight stats, has
+one site, and has ten grades. Every raw item refines one-for-one into its refined form at the Workbench, in a quarter of
+the time it took to gather (D101).
 
 <!-- live:families -->
-| Family | Id | Side | Feeds | Site | Refined at |
-|---|---|---|---|---|---|
-| Grains | `grains` | Farming | HP | Fields | Pantry |
-| Fruits | `fruits` | Farming | MP | Orchard | Pantry |
-| Fish | `fish` | Farming | ATK | Fishery | Pantry |
-| Herbs & Spices | `herbs-spices` | Farming | M.ATK | Herb Garden | Pantry |
-| Vegetables | `vegetables` | Farming | DEF | Vegetable Garden | Pantry |
-| Mushrooms | `mushrooms` | Farming | M.DEF | Mushroom Cave | Pantry |
-| Sweets | `sweets` | Farming | Speed | Sugar Grove | Pantry |
-| Nuts & Seeds | `nuts-seeds` | Farming | Limit Break charge | Nut Grove | Pantry |
-| Hides & Scales | `hides-scales` | Gathering | HP | Monster Den | Workbench |
-| Essences | `essences` | Gathering | MP | Ley Spring | Workbench |
-| Ores | `ores` | Gathering | ATK | Mine | Workbench |
-| Crystals | `crystals` | Gathering | M.ATK | Crystal Cavern | Workbench |
-| Stones | `stones` | Gathering | DEF | Quarry | Workbench |
-| Fibers | `fibers` | Gathering | M.DEF | Meadow | Workbench |
-| Woods | `woods` | Gathering | Speed | Forest | Workbench |
-| Bones & Horns | `bones-horns` | Gathering | Limit Break charge | Fossil Dig | Workbench |
+| Family | Id | Feeds | Site |
+|---|---|---|---|
+| Hides & Scales | `hides-scales` | HP | Monster Den |
+| Essences | `essences` | MP | Ley Spring |
+| Ores | `ores` | ATK | Mine |
+| Crystals | `crystals` | M.ATK | Crystal Cavern |
+| Stones | `stones` | DEF | Quarry |
+| Fibers | `fibers` | M.DEF | Meadow |
+| Woods | `woods` | Speed | Forest |
+| Bones & Horns | `bones-horns` | Limit Break charge | Fossil Dig |
 <!-- /live -->
 
-**Symmetry (D86):** every gathering family is used alike by gear, and every farming family alike by dishes, so no site
-sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
+**Symmetry (D86, D144):** every family is used alike by gear and alike by Star Gems, so no site sits idle and none is a
+bottleneck. `economy/materials.test.ts` checks it.
 
 ## Items by family
 
 <!-- live:items -->
-### Grains (`grains`, HP, Fields)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Wheat (`wheat`) | Wheat Flour (`wheat-flour`) | 1 |
-| 2 | Oats (`oats`) | Rolled Oats (`rolled-oats`) | 6 |
-| 3 | Barley (`barley`) | Pearl Barley (`pearl-barley`) | 11 |
-| 4 | Rice (`rice`) | Polished Rice (`polished-rice`) | 16 |
-| 5 | Corn (`corn`) | Cornmeal (`cornmeal`) | 21 |
-| 6 | Rye (`rye`) | Rye Flour (`rye-flour`) | 26 |
-| 7 | Buckwheat (`buckwheat`) | Buckwheat Flour (`buckwheat-flour`) | 31 |
-| 8 | Wild Rice (`wild-rice`) | Hulled Wild Rice (`hulled-wild-rice`) | 36 |
-| 9 | Moonrice (`moonrice`) | Moonrice Flour (`moonrice-flour`) | 41 |
-| 10 | Sunwheat (`sunwheat`) | Sunwheat Flour (`sunwheat-flour`) | 46 |
-
-### Fruits (`fruits`, MP, Orchard)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Apple (`apple`) | Apple Preserve (`apple-preserve`) | 1 |
-| 2 | Pear (`pear`) | Pear Preserve (`pear-preserve`) | 6 |
-| 3 | Peach (`peach`) | Peach Preserve (`peach-preserve`) | 11 |
-| 4 | Plum (`plum`) | Plum Preserve (`plum-preserve`) | 16 |
-| 5 | Orange (`orange`) | Orange Marmalade (`orange-marmalade`) | 21 |
-| 6 | Grape (`grape`) | Grape Jelly (`grape-jelly`) | 26 |
-| 7 | Mango (`mango`) | Mango Pulp (`mango-pulp`) | 31 |
-| 8 | Pomegranate (`pomegranate`) | Pomegranate Molasses (`pomegranate-molasses`) | 36 |
-| 9 | Starpeach (`starpeach`) | Starpeach Nectar (`starpeach-nectar`) | 41 |
-| 10 | Golden Apple (`golden-apple`) | Golden Apple Preserve (`golden-apple-preserve`) | 46 |
-
-### Fish (`fish`, ATK, Fishery)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 |
-| 2 | Trout (`trout`) | Trout Fillet (`trout-fillet`) | 6 |
-| 3 | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 11 |
-| 4 | Mackerel (`mackerel`) | Mackerel Fillet (`mackerel-fillet`) | 16 |
-| 5 | Salmon (`salmon`) | Salmon Fillet (`salmon-fillet`) | 21 |
-| 6 | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 26 |
-| 7 | Eel (`eel`) | Eel Fillet (`eel-fillet`) | 31 |
-| 8 | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 36 |
-| 9 | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 41 |
-| 10 | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 46 |
-
-### Herbs & Spices (`herbs-spices`, M.ATK, Herb Garden)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Basil (`basil`) | Dried Basil (`dried-basil`) | 1 |
-| 2 | Mint (`mint`) | Dried Mint (`dried-mint`) | 6 |
-| 3 | Rosemary (`rosemary`) | Dried Rosemary (`dried-rosemary`) | 11 |
-| 4 | Thyme (`thyme`) | Dried Thyme (`dried-thyme`) | 16 |
-| 5 | Ginger (`ginger`) | Ground Ginger (`ground-ginger`) | 21 |
-| 6 | Peppercorn (`peppercorn`) | Ground Pepper (`ground-pepper`) | 26 |
-| 7 | Cinnamon (`cinnamon`) | Ground Cinnamon (`ground-cinnamon`) | 31 |
-| 8 | Saffron (`saffron`) | Saffron Threads (`saffron-threads`) | 36 |
-| 9 | Mandrake (`mandrake`) | Mandrake Powder (`mandrake-powder`) | 41 |
-| 10 | Phoenix Pepper (`phoenix-pepper`) | Phoenix Spice (`phoenix-spice`) | 46 |
-
-### Vegetables (`vegetables`, DEF, Vegetable Garden)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 |
-| 2 | Potato (`potato`) | Diced Potato (`diced-potato`) | 6 |
-| 3 | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 11 |
-| 4 | Onion (`onion`) | Diced Onion (`diced-onion`) | 16 |
-| 5 | Tomato (`tomato`) | Tomato Purée (`tomato-puree`) | 21 |
-| 6 | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 26 |
-| 7 | Eggplant (`eggplant`) | Sliced Eggplant (`sliced-eggplant`) | 31 |
-| 8 | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 36 |
-| 9 | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 41 |
-| 10 | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 46 |
-
-### Mushrooms (`mushrooms`, M.DEF, Mushroom Cave)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Button Mushroom (`button-mushroom`) | Dried Button Mushroom (`dried-button-mushroom`) | 1 |
-| 2 | Shiitake (`shiitake`) | Dried Shiitake (`dried-shiitake`) | 6 |
-| 3 | Oyster Mushroom (`oyster-mushroom`) | Dried Oyster Mushroom (`dried-oyster-mushroom`) | 11 |
-| 4 | Enoki (`enoki`) | Dried Enoki (`dried-enoki`) | 16 |
-| 5 | Chanterelle (`chanterelle`) | Dried Chanterelle (`dried-chanterelle`) | 21 |
-| 6 | Porcini (`porcini`) | Dried Porcini (`dried-porcini`) | 26 |
-| 7 | Morel (`morel`) | Dried Morel (`dried-morel`) | 31 |
-| 8 | Truffle (`truffle`) | Shaved Truffle (`shaved-truffle`) | 36 |
-| 9 | Glowcap (`glowcap`) | Glowcap Powder (`glowcap-powder`) | 41 |
-| 10 | King Reishi (`king-reishi`) | Reishi Powder (`reishi-powder`) | 46 |
-
-### Sweets (`sweets`, Speed, Sugar Grove)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Honeycomb (`honeycomb`) | Honey (`honey`) | 1 |
-| 2 | Sugarcane (`sugarcane`) | Cane Sugar (`cane-sugar`) | 6 |
-| 3 | Sugar Beet (`sugar-beet`) | Beet Sugar (`beet-sugar`) | 11 |
-| 4 | Maple Sap (`maple-sap`) | Maple Syrup (`maple-syrup`) | 16 |
-| 5 | Cacao Pod (`cacao-pod`) | Chocolate (`chocolate`) | 21 |
-| 6 | Vanilla Pod (`vanilla-pod`) | Vanilla Extract (`vanilla-extract`) | 26 |
-| 7 | Agave Heart (`agave-heart`) | Agave Syrup (`agave-syrup`) | 31 |
-| 8 | Palm Sap (`palm-sap`) | Palm Sugar (`palm-sugar`) | 36 |
-| 9 | Fairy Honeycomb (`fairy-honeycomb`) | Fairy Honey (`fairy-honey`) | 41 |
-| 10 | Ambrosia Blossom (`ambrosia-blossom`) | Ambrosia (`ambrosia`) | 46 |
-
-### Nuts & Seeds (`nuts-seeds`, Limit Break charge, Nut Grove)
-
-| Grade | Raw | Refined | Unlocks at profession Lv |
-|---|---|---|---|
-| 1 | Peanut (`peanut`) | Peanut Butter (`peanut-butter`) | 1 |
-| 2 | Sunflower Seed (`sunflower-seed`) | Sunflower Oil (`sunflower-oil`) | 6 |
-| 3 | Sesame (`sesame`) | Sesame Paste (`sesame-paste`) | 11 |
-| 4 | Walnut (`walnut`) | Walnut Paste (`walnut-paste`) | 16 |
-| 5 | Chestnut (`chestnut`) | Chestnut Paste (`chestnut-paste`) | 21 |
-| 6 | Almond (`almond`) | Almond Paste (`almond-paste`) | 26 |
-| 7 | Pistachio (`pistachio`) | Pistachio Paste (`pistachio-paste`) | 31 |
-| 8 | Macadamia (`macadamia`) | Macadamia Butter (`macadamia-butter`) | 36 |
-| 9 | Thundernut (`thundernut`) | Thundernut Oil (`thundernut-oil`) | 41 |
-| 10 | Worldseed (`worldseed`) | Worldseed Oil (`worldseed-oil`) | 46 |
-
 ### Hides & Scales (`hides-scales`, HP, Monster Den)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Puffbun Pelt (`puffbun-pelt`) | Puffbun Leather (`puffbun-leather`) | 1 |
 | 2 | Boarling Hide (`boarling-hide`) | Boarling Leather (`boarling-leather`) | 6 |
@@ -177,7 +46,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Essences (`essences`, MP, Ley Spring)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Mist Essence (`mist-essence`) | Mist Infusion (`mist-infusion`) | 1 |
 | 2 | Dew Essence (`dew-essence`) | Dew Infusion (`dew-infusion`) | 6 |
@@ -192,7 +61,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Ores (`ores`, ATK, Mine)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 |
 | 2 | Tin Ore (`tin-ore`) | Tin Ingot (`tin-ingot`) | 6 |
@@ -207,7 +76,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Crystals (`crystals`, M.ATK, Crystal Cavern)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 |
 | 2 | Amethyst (`amethyst`) | Cut Amethyst (`cut-amethyst`) | 6 |
@@ -222,7 +91,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Stones (`stones`, DEF, Quarry)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Limestone (`limestone`) | Limestone Block (`limestone-block`) | 1 |
 | 2 | Sandstone (`sandstone`) | Sandstone Block (`sandstone-block`) | 6 |
@@ -237,7 +106,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Fibers (`fibers`, M.DEF, Meadow)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Flax (`flax`) | Linen (`linen`) | 1 |
 | 2 | Jute (`jute`) | Burlap (`burlap`) | 6 |
@@ -252,7 +121,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Woods (`woods`, Speed, Forest)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 |
 | 2 | Birch Log (`birch-log`) | Birch Plank (`birch-plank`) | 6 |
@@ -267,7 +136,7 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 
 ### Bones & Horns (`bones-horns`, Limit Break charge, Fossil Dig)
 
-| Grade | Raw | Refined | Unlocks at profession Lv |
+| Grade | Raw | Refined | Unlocks at Craft Lv |
 |---|---|---|---|
 | 1 | Seashell (`seashell`) | Shell Carving (`shell-carving`) | 1 |
 | 2 | Ammonite (`ammonite`) | Ammonite Carving (`ammonite-carving`) | 6 |
@@ -281,122 +150,125 @@ sits idle and none is a bottleneck. `economy/materials.test.ts` checks it.
 | 10 | Unicorn Horn (`unicorn-horn`) | Unicorn Carving (`unicorn-carving`) | 46 |
 <!-- /live -->
 
-## Dishes
+## Star Gems
 
-Cooked at the Kitchen from refined farming items only (no token since D105). Eating a dish unlocks nodes on the Uma's
-Observatory map, her Extra Stats ([loops](loops.md#extra-stats-and-gear)).
+Cut at the Lapidary from refined items (D144). Setting one opens a node on the Uma's Observatory map, her Extra Stats
+([loops](loops.md#extra-stats-and-gear)). There are 100, one for each node:
 
 | Kind | What it is |
 |---|---|
-| **Planet** | One family's dish per grade. It feeds that family's stat |
-| **Duo** | A pair of neighboring stats, at grades 3 and 7 |
-| **Feast** | All eight stats, at grades 4, 6, 8 and 10 |
+| **Moon** | Eight stats × ten grades. One refined item of the stat's family at the gem's grade; a half-grade side from another family from grade 4, and a second from grade 8 |
+| **Bridge** | A pair of neighbouring stats, at grades 3 and 7: one refined item of each family, plus a side at grade 7 |
+| **Sun** | All eight stats, at grades 4, 6, 8 and 10: one refined item of every family |
 
-From grade 4 on, dishes add side ingredients from other families, so every family stays in demand.
+A gem is named for its grade's stone on the Crystal Cavern's ladder and its stat's virtue: HP Vigor, MP Spirit, ATK
+Strength, M.ATK Sorcery, DEF Fortitude, M.DEF Resolve, Speed Swiftness, Limit Valor. So "Garnet of Strength" is ATK's
+grade 4. Maxing one Uma's map takes 232 refined items, 29 of each family. Its icon is its grade's cut crystal with a
+badge in its planets' colours, until it has art of its own (H29).
 
-<!-- live:dishes -->
-| Dish | Id | Kind | Grade | Feeds | Ingredients |
+<!-- live:gems -->
+| Star Gem | Id | Kind | Grade | Feeds | Materials |
 |---|---|---|---|---|---|
-| Wheat Bread | `dish-grains-1` | Planet | 1 | HP | Wheat Flour |
-| Oats Bread | `dish-grains-2` | Planet | 2 | HP | Rolled Oats |
-| Barley Bread | `dish-grains-3` | Planet | 3 | HP | Pearl Barley |
-| Rice Bread | `dish-grains-4` | Planet | 4 | HP | Polished Rice, Pear Preserve |
-| Corn Bread | `dish-grains-5` | Planet | 5 | HP | Cornmeal, Peach Preserve |
-| Rye Bread | `dish-grains-6` | Planet | 6 | HP | Rye Flour, Peach Preserve |
-| Buckwheat Bread | `dish-grains-7` | Planet | 7 | HP | Buckwheat Flour, Plum Preserve |
-| Wild Rice Bread | `dish-grains-8` | Planet | 8 | HP | Hulled Wild Rice, Plum Preserve, Dried Thyme |
-| Moonrice Bread | `dish-grains-9` | Planet | 9 | HP | Moonrice Flour, Orange Marmalade, Ground Ginger |
-| Sunwheat Bread | `dish-grains-10` | Planet | 10 | HP | Sunwheat Flour, Orange Marmalade, Ground Ginger |
-| Apple Tart | `dish-fruits-1` | Planet | 1 | MP | Apple Preserve |
-| Pear Tart | `dish-fruits-2` | Planet | 2 | MP | Pear Preserve |
-| Peach Tart | `dish-fruits-3` | Planet | 3 | MP | Peach Preserve |
-| Plum Tart | `dish-fruits-4` | Planet | 4 | MP | Plum Preserve, Trout Fillet |
-| Orange Tart | `dish-fruits-5` | Planet | 5 | MP | Orange Marmalade, Sardine Fillet |
-| Grape Tart | `dish-fruits-6` | Planet | 6 | MP | Grape Jelly, Sardine Fillet |
-| Mango Tart | `dish-fruits-7` | Planet | 7 | MP | Mango Pulp, Mackerel Fillet |
-| Pomegranate Tart | `dish-fruits-8` | Planet | 8 | MP | Pomegranate Molasses, Mackerel Fillet, Diced Onion |
-| Starpeach Tart | `dish-fruits-9` | Planet | 9 | MP | Starpeach Nectar, Salmon Fillet, Tomato Purée |
-| Golden Apple Tart | `dish-fruits-10` | Planet | 10 | MP | Golden Apple Preserve, Salmon Fillet, Tomato Purée |
-| Carp Grill | `dish-fish-1` | Planet | 1 | ATK | Carp Fillet |
-| Trout Grill | `dish-fish-2` | Planet | 2 | ATK | Trout Fillet |
-| Sardine Grill | `dish-fish-3` | Planet | 3 | ATK | Sardine Fillet |
-| Mackerel Grill | `dish-fish-4` | Planet | 4 | ATK | Mackerel Fillet, Dried Mint |
-| Salmon Grill | `dish-fish-5` | Planet | 5 | ATK | Salmon Fillet, Dried Rosemary |
-| Sea Bream Grill | `dish-fish-6` | Planet | 6 | ATK | Sea Bream Fillet, Dried Rosemary |
-| Eel Grill | `dish-fish-7` | Planet | 7 | ATK | Eel Fillet, Dried Thyme |
-| Tuna Grill | `dish-fish-8` | Planet | 8 | ATK | Tuna Fillet, Dried Thyme, Dried Enoki |
-| Silverfin Grill | `dish-fish-9` | Planet | 9 | ATK | Silverfin Fillet, Ground Ginger, Dried Chanterelle |
-| Rainbow Koi Grill | `dish-fish-10` | Planet | 10 | ATK | Rainbow Koi Fillet, Ground Ginger, Dried Chanterelle |
-| Basil Curry | `dish-herbs-spices-1` | Planet | 1 | M.ATK | Dried Basil |
-| Mint Curry | `dish-herbs-spices-2` | Planet | 2 | M.ATK | Dried Mint |
-| Rosemary Curry | `dish-herbs-spices-3` | Planet | 3 | M.ATK | Dried Rosemary |
-| Thyme Curry | `dish-herbs-spices-4` | Planet | 4 | M.ATK | Dried Thyme, Diced Potato |
-| Ginger Curry | `dish-herbs-spices-5` | Planet | 5 | M.ATK | Ground Ginger, Shredded Cabbage |
-| Peppercorn Curry | `dish-herbs-spices-6` | Planet | 6 | M.ATK | Ground Pepper, Shredded Cabbage |
-| Cinnamon Curry | `dish-herbs-spices-7` | Planet | 7 | M.ATK | Ground Cinnamon, Diced Onion |
-| Saffron Curry | `dish-herbs-spices-8` | Planet | 8 | M.ATK | Saffron Threads, Diced Onion, Maple Syrup |
-| Mandrake Curry | `dish-herbs-spices-9` | Planet | 9 | M.ATK | Mandrake Powder, Tomato Purée, Chocolate |
-| Phoenix Pepper Curry | `dish-herbs-spices-10` | Planet | 10 | M.ATK | Phoenix Spice, Tomato Purée, Chocolate |
-| Carrot Salad | `dish-vegetables-1` | Planet | 1 | DEF | Chopped Carrot |
-| Potato Salad | `dish-vegetables-2` | Planet | 2 | DEF | Diced Potato |
-| Cabbage Salad | `dish-vegetables-3` | Planet | 3 | DEF | Shredded Cabbage |
-| Onion Salad | `dish-vegetables-4` | Planet | 4 | DEF | Diced Onion, Dried Shiitake |
-| Tomato Salad | `dish-vegetables-5` | Planet | 5 | DEF | Tomato Purée, Dried Oyster Mushroom |
-| Bell Pepper Salad | `dish-vegetables-6` | Planet | 6 | DEF | Sliced Bell Pepper, Dried Oyster Mushroom |
-| Eggplant Salad | `dish-vegetables-7` | Planet | 7 | DEF | Sliced Eggplant, Dried Enoki |
-| Asparagus Salad | `dish-vegetables-8` | Planet | 8 | DEF | Trimmed Asparagus, Dried Enoki, Walnut Paste |
-| Golden Carrot Salad | `dish-vegetables-9` | Planet | 9 | DEF | Golden Carrot Purée, Dried Chanterelle, Chestnut Paste |
-| Emperor Pumpkin Salad | `dish-vegetables-10` | Planet | 10 | DEF | Pumpkin Purée, Dried Chanterelle, Chestnut Paste |
-| Button Mushroom Soup | `dish-mushrooms-1` | Planet | 1 | M.DEF | Dried Button Mushroom |
-| Shiitake Soup | `dish-mushrooms-2` | Planet | 2 | M.DEF | Dried Shiitake |
-| Oyster Mushroom Soup | `dish-mushrooms-3` | Planet | 3 | M.DEF | Dried Oyster Mushroom |
-| Enoki Soup | `dish-mushrooms-4` | Planet | 4 | M.DEF | Dried Enoki, Cane Sugar |
-| Chanterelle Soup | `dish-mushrooms-5` | Planet | 5 | M.DEF | Dried Chanterelle, Beet Sugar |
-| Porcini Soup | `dish-mushrooms-6` | Planet | 6 | M.DEF | Dried Porcini, Beet Sugar |
-| Morel Soup | `dish-mushrooms-7` | Planet | 7 | M.DEF | Dried Morel, Maple Syrup |
-| Truffle Soup | `dish-mushrooms-8` | Planet | 8 | M.DEF | Shaved Truffle, Maple Syrup, Polished Rice |
-| Glowcap Soup | `dish-mushrooms-9` | Planet | 9 | M.DEF | Glowcap Powder, Chocolate, Cornmeal |
-| King Reishi Soup | `dish-mushrooms-10` | Planet | 10 | M.DEF | Reishi Powder, Chocolate, Cornmeal |
-| Honeycomb Cake | `dish-sweets-1` | Planet | 1 | Speed | Honey |
-| Sugarcane Cake | `dish-sweets-2` | Planet | 2 | Speed | Cane Sugar |
-| Sugar Beet Cake | `dish-sweets-3` | Planet | 3 | Speed | Beet Sugar |
-| Maple Sap Cake | `dish-sweets-4` | Planet | 4 | Speed | Maple Syrup, Sunflower Oil |
-| Cacao Pod Cake | `dish-sweets-5` | Planet | 5 | Speed | Chocolate, Sesame Paste |
-| Vanilla Pod Cake | `dish-sweets-6` | Planet | 6 | Speed | Vanilla Extract, Sesame Paste |
-| Agave Heart Cake | `dish-sweets-7` | Planet | 7 | Speed | Agave Syrup, Walnut Paste |
-| Palm Sap Cake | `dish-sweets-8` | Planet | 8 | Speed | Palm Sugar, Walnut Paste, Plum Preserve |
-| Fairy Honeycomb Cake | `dish-sweets-9` | Planet | 9 | Speed | Fairy Honey, Chestnut Paste, Orange Marmalade |
-| Ambrosia Blossom Cake | `dish-sweets-10` | Planet | 10 | Speed | Ambrosia, Chestnut Paste, Orange Marmalade |
-| Peanut Cookies | `dish-nuts-seeds-1` | Planet | 1 | Limit Break charge | Peanut Butter |
-| Sunflower Seed Cookies | `dish-nuts-seeds-2` | Planet | 2 | Limit Break charge | Sunflower Oil |
-| Sesame Cookies | `dish-nuts-seeds-3` | Planet | 3 | Limit Break charge | Sesame Paste |
-| Walnut Cookies | `dish-nuts-seeds-4` | Planet | 4 | Limit Break charge | Walnut Paste, Rolled Oats |
-| Chestnut Cookies | `dish-nuts-seeds-5` | Planet | 5 | Limit Break charge | Chestnut Paste, Pearl Barley |
-| Almond Cookies | `dish-nuts-seeds-6` | Planet | 6 | Limit Break charge | Almond Paste, Pearl Barley |
-| Pistachio Cookies | `dish-nuts-seeds-7` | Planet | 7 | Limit Break charge | Pistachio Paste, Polished Rice |
-| Macadamia Cookies | `dish-nuts-seeds-8` | Planet | 8 | Limit Break charge | Macadamia Butter, Polished Rice, Mackerel Fillet |
-| Thundernut Cookies | `dish-nuts-seeds-9` | Planet | 9 | Limit Break charge | Thundernut Oil, Cornmeal, Salmon Fillet |
-| Worldseed Cookies | `dish-nuts-seeds-10` | Planet | 10 | Limit Break charge | Worldseed Oil, Cornmeal, Salmon Fillet |
-| Grain & Garden Platter | `duo-hp-def-3` | Duo | 3 | HP, DEF | Pearl Barley, Shredded Cabbage |
-| Grain & Garden Platter Deluxe | `duo-hp-def-7` | Duo | 7 | HP, DEF | Buckwheat Flour, Sliced Eggplant, Plum Preserve |
-| Garden & Mushroom Platter | `duo-def-mdef-3` | Duo | 3 | DEF, M.DEF | Shredded Cabbage, Dried Oyster Mushroom |
-| Garden & Mushroom Platter Deluxe | `duo-def-mdef-7` | Duo | 7 | DEF, M.DEF | Sliced Eggplant, Dried Morel, Dried Enoki |
-| Mushroom & Fruit Platter | `duo-mdef-mp-3` | Duo | 3 | M.DEF, MP | Dried Oyster Mushroom, Peach Preserve |
-| Mushroom & Fruit Platter Deluxe | `duo-mdef-mp-7` | Duo | 7 | M.DEF, MP | Dried Morel, Mango Pulp, Maple Syrup |
-| Fruit & Herb Platter | `duo-mp-matk-3` | Duo | 3 | MP, M.ATK | Peach Preserve, Dried Rosemary |
-| Fruit & Herb Platter Deluxe | `duo-mp-matk-7` | Duo | 7 | MP, M.ATK | Mango Pulp, Ground Cinnamon, Mackerel Fillet |
-| Herb & Fish Platter | `duo-matk-atk-3` | Duo | 3 | M.ATK, ATK | Dried Rosemary, Sardine Fillet |
-| Herb & Fish Platter Deluxe | `duo-matk-atk-7` | Duo | 7 | M.ATK, ATK | Ground Cinnamon, Eel Fillet, Diced Onion |
-| Fish & Honey Platter | `duo-atk-speed-3` | Duo | 3 | ATK, Speed | Sardine Fillet, Beet Sugar |
-| Fish & Honey Platter Deluxe | `duo-atk-speed-7` | Duo | 7 | ATK, Speed | Eel Fillet, Agave Syrup, Dried Thyme |
-| Honey & Nut Platter | `duo-speed-limit-3` | Duo | 3 | Speed, Limit Break charge | Beet Sugar, Sesame Paste |
-| Honey & Nut Platter Deluxe | `duo-speed-limit-7` | Duo | 7 | Speed, Limit Break charge | Agave Syrup, Pistachio Paste, Walnut Paste |
-| Nut & Grain Platter | `duo-limit-hp-3` | Duo | 3 | Limit Break charge, HP | Sesame Paste, Pearl Barley |
-| Nut & Grain Platter Deluxe | `duo-limit-hp-7` | Duo | 7 | Limit Break charge, HP | Pistachio Paste, Buckwheat Flour, Polished Rice |
-| Spring Feast | `feast-4` | Feast | 4 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Polished Rice, Plum Preserve, Mackerel Fillet, Dried Thyme, Diced Onion, Dried Enoki, Maple Syrup, Walnut Paste |
-| Summer Feast | `feast-6` | Feast | 6 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Rye Flour, Grape Jelly, Sea Bream Fillet, Ground Pepper, Sliced Bell Pepper, Dried Porcini, Vanilla Extract, Almond Paste |
-| Harvest Feast | `feast-8` | Feast | 8 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Hulled Wild Rice, Pomegranate Molasses, Tuna Fillet, Saffron Threads, Trimmed Asparagus, Shaved Truffle, Palm Sugar, Macadamia Butter |
-| Grand Feast | `feast-10` | Feast | 10 | HP, MP, ATK, M.ATK, DEF, M.DEF, Speed, Limit Break charge | Sunwheat Flour, Golden Apple Preserve, Rainbow Koi Fillet, Phoenix Spice, Pumpkin Purée, Reishi Powder, Ambrosia, Worldseed Oil |
+| Quartz of Vigor | `gem-hp-1` | Moon | 1 | HP | Puffbun Leather |
+| Amethyst of Vigor | `gem-hp-2` | Moon | 2 | HP | Boarling Leather |
+| Citrine of Vigor | `gem-hp-3` | Moon | 3 | HP | Wolfkin Leather |
+| Garnet of Vigor | `gem-hp-4` | Moon | 4 | HP | Lizard Leather, Dew Infusion |
+| Emerald of Vigor | `gem-hp-5` | Moon | 5 | HP | Ironback Leather, Breeze Infusion |
+| Sapphire of Vigor | `gem-hp-6` | Moon | 6 | HP | Basilisk Leather, Breeze Infusion |
+| Ruby of Vigor | `gem-hp-7` | Moon | 7 | HP | Manticore Leather, Ember Infusion |
+| Diamond of Vigor | `gem-hp-8` | Moon | 8 | HP | Behemoth Leather, Ember Infusion, Cut Garnet |
+| Starstone of Vigor | `gem-hp-9` | Moon | 9 | HP | Wyvern Leather, Tide Infusion, Cut Emerald |
+| Philosopher's Stone of Vigor | `gem-hp-10` | Moon | 10 | HP | Dragonhide, Tide Infusion, Cut Emerald |
+| Quartz of Spirit | `gem-mp-1` | Moon | 1 | MP | Mist Infusion |
+| Amethyst of Spirit | `gem-mp-2` | Moon | 2 | MP | Dew Infusion |
+| Citrine of Spirit | `gem-mp-3` | Moon | 3 | MP | Breeze Infusion |
+| Garnet of Spirit | `gem-mp-4` | Moon | 4 | MP | Ember Infusion, Tin Ingot |
+| Emerald of Spirit | `gem-mp-5` | Moon | 5 | MP | Tide Infusion, Iron Ingot |
+| Sapphire of Spirit | `gem-mp-6` | Moon | 6 | MP | Spark Infusion, Iron Ingot |
+| Ruby of Spirit | `gem-mp-7` | Moon | 7 | MP | Glimmer Infusion, Silver Ingot |
+| Diamond of Spirit | `gem-mp-8` | Moon | 8 | MP | Shadow Infusion, Silver Ingot, Granite Block |
+| Starstone of Spirit | `gem-mp-9` | Moon | 9 | MP | Aether Infusion, Cobalt Ingot, Basalt Block |
+| Philosopher's Stone of Spirit | `gem-mp-10` | Moon | 10 | MP | Prismatic Infusion, Cobalt Ingot, Basalt Block |
+| Quartz of Strength | `gem-atk-1` | Moon | 1 | ATK | Copper Ingot |
+| Amethyst of Strength | `gem-atk-2` | Moon | 2 | ATK | Tin Ingot |
+| Citrine of Strength | `gem-atk-3` | Moon | 3 | ATK | Iron Ingot |
+| Garnet of Strength | `gem-atk-4` | Moon | 4 | ATK | Silver Ingot, Cut Amethyst |
+| Emerald of Strength | `gem-atk-5` | Moon | 5 | ATK | Cobalt Ingot, Cut Citrine |
+| Sapphire of Strength | `gem-atk-6` | Moon | 6 | ATK | Gold Ingot, Cut Citrine |
+| Ruby of Strength | `gem-atk-7` | Moon | 7 | ATK | Platinum Ingot, Cut Garnet |
+| Diamond of Strength | `gem-atk-8` | Moon | 8 | ATK | Titanium Ingot, Cut Garnet, Cotton Cloth |
+| Starstone of Strength | `gem-atk-9` | Moon | 9 | ATK | Mythril Ingot, Cut Emerald, Wool Cloth |
+| Philosopher's Stone of Strength | `gem-atk-10` | Moon | 10 | ATK | Orichalcum Ingot, Cut Emerald, Wool Cloth |
+| Quartz of Sorcery | `gem-matk-1` | Moon | 1 | M.ATK | Cut Quartz |
+| Amethyst of Sorcery | `gem-matk-2` | Moon | 2 | M.ATK | Cut Amethyst |
+| Citrine of Sorcery | `gem-matk-3` | Moon | 3 | M.ATK | Cut Citrine |
+| Garnet of Sorcery | `gem-matk-4` | Moon | 4 | M.ATK | Cut Garnet, Sandstone Block |
+| Emerald of Sorcery | `gem-matk-5` | Moon | 5 | M.ATK | Cut Emerald, Slate Block |
+| Sapphire of Sorcery | `gem-matk-6` | Moon | 6 | M.ATK | Cut Sapphire, Slate Block |
+| Ruby of Sorcery | `gem-matk-7` | Moon | 7 | M.ATK | Cut Ruby, Granite Block |
+| Diamond of Sorcery | `gem-matk-8` | Moon | 8 | M.ATK | Cut Diamond, Granite Block, Maple Plank |
+| Starstone of Sorcery | `gem-matk-9` | Moon | 9 | M.ATK | Cut Starstone, Basalt Block, Oak Plank |
+| Philosopher's Stone of Sorcery | `gem-matk-10` | Moon | 10 | M.ATK | Cut Philosopher's Stone, Basalt Block, Oak Plank |
+| Quartz of Fortitude | `gem-def-1` | Moon | 1 | DEF | Limestone Block |
+| Amethyst of Fortitude | `gem-def-2` | Moon | 2 | DEF | Sandstone Block |
+| Citrine of Fortitude | `gem-def-3` | Moon | 3 | DEF | Slate Block |
+| Garnet of Fortitude | `gem-def-4` | Moon | 4 | DEF | Granite Block, Burlap |
+| Emerald of Fortitude | `gem-def-5` | Moon | 5 | DEF | Basalt Block, Hemp Cloth |
+| Sapphire of Fortitude | `gem-def-6` | Moon | 6 | DEF | Marble Block, Hemp Cloth |
+| Ruby of Fortitude | `gem-def-7` | Moon | 7 | DEF | Obsidian Block, Cotton Cloth |
+| Diamond of Fortitude | `gem-def-8` | Moon | 8 | DEF | Jade Block, Cotton Cloth, Bone Carving |
+| Starstone of Fortitude | `gem-def-9` | Moon | 9 | DEF | Runestone Block, Wool Cloth, Tusk Carving |
+| Philosopher's Stone of Fortitude | `gem-def-10` | Moon | 10 | DEF | Meteorite Block, Wool Cloth, Tusk Carving |
+| Quartz of Resolve | `gem-mdef-1` | Moon | 1 | M.DEF | Linen |
+| Amethyst of Resolve | `gem-mdef-2` | Moon | 2 | M.DEF | Burlap |
+| Citrine of Resolve | `gem-mdef-3` | Moon | 3 | M.DEF | Hemp Cloth |
+| Garnet of Resolve | `gem-mdef-4` | Moon | 4 | M.DEF | Cotton Cloth, Birch Plank |
+| Emerald of Resolve | `gem-mdef-5` | Moon | 5 | M.DEF | Wool Cloth, Cedar Plank |
+| Sapphire of Resolve | `gem-mdef-6` | Moon | 6 | M.DEF | Alpaca Cloth, Cedar Plank |
+| Ruby of Resolve | `gem-mdef-7` | Moon | 7 | M.DEF | Cashmere Cloth, Maple Plank |
+| Diamond of Resolve | `gem-mdef-8` | Moon | 8 | M.DEF | Silk, Maple Plank, Lizard Leather |
+| Starstone of Resolve | `gem-mdef-9` | Moon | 9 | M.DEF | Moonsilk, Oak Plank, Ironback Leather |
+| Philosopher's Stone of Resolve | `gem-mdef-10` | Moon | 10 | M.DEF | Cloudweave, Oak Plank, Ironback Leather |
+| Quartz of Swiftness | `gem-speed-1` | Moon | 1 | Speed | Pine Plank |
+| Amethyst of Swiftness | `gem-speed-2` | Moon | 2 | Speed | Birch Plank |
+| Citrine of Swiftness | `gem-speed-3` | Moon | 3 | Speed | Cedar Plank |
+| Garnet of Swiftness | `gem-speed-4` | Moon | 4 | Speed | Maple Plank, Ammonite Carving |
+| Emerald of Swiftness | `gem-speed-5` | Moon | 5 | Speed | Oak Plank, Trilobite Carving |
+| Sapphire of Swiftness | `gem-speed-6` | Moon | 6 | Speed | Cherry Plank, Trilobite Carving |
+| Ruby of Swiftness | `gem-speed-7` | Moon | 7 | Speed | Mahogany Plank, Bone Carving |
+| Diamond of Swiftness | `gem-speed-8` | Moon | 8 | Speed | Ebony Plank, Bone Carving, Ember Infusion |
+| Starstone of Swiftness | `gem-speed-9` | Moon | 9 | Speed | Elderwood Plank, Tusk Carving, Tide Infusion |
+| Philosopher's Stone of Swiftness | `gem-speed-10` | Moon | 10 | Speed | Yggdrasil Plank, Tusk Carving, Tide Infusion |
+| Quartz of Valor | `gem-limit-1` | Moon | 1 | Limit Break charge | Shell Carving |
+| Amethyst of Valor | `gem-limit-2` | Moon | 2 | Limit Break charge | Ammonite Carving |
+| Citrine of Valor | `gem-limit-3` | Moon | 3 | Limit Break charge | Trilobite Carving |
+| Garnet of Valor | `gem-limit-4` | Moon | 4 | Limit Break charge | Bone Carving, Boarling Leather |
+| Emerald of Valor | `gem-limit-5` | Moon | 5 | Limit Break charge | Tusk Carving, Wolfkin Leather |
+| Sapphire of Valor | `gem-limit-6` | Moon | 6 | Limit Break charge | Fang Carving, Wolfkin Leather |
+| Ruby of Valor | `gem-limit-7` | Moon | 7 | Limit Break charge | Claw Carving, Lizard Leather |
+| Diamond of Valor | `gem-limit-8` | Moon | 8 | Limit Break charge | Tooth Carving, Lizard Leather, Silver Ingot |
+| Starstone of Valor | `gem-limit-9` | Moon | 9 | Limit Break charge | Titan Carving, Ironback Leather, Cobalt Ingot |
+| Philosopher's Stone of Valor | `gem-limit-10` | Moon | 10 | Limit Break charge | Unicorn Carving, Ironback Leather, Cobalt Ingot |
+| Citrine of Vigor & Fortitude | `gem-hp-def-3` | Bridge | 3 | HP, DEF | Wolfkin Leather, Slate Block |
+| Ruby of Vigor & Fortitude | `gem-hp-def-7` | Bridge | 7 | HP, DEF | Manticore Leather, Obsidian Block, Ember Infusion |
+| Citrine of Fortitude & Resolve | `gem-def-mdef-3` | Bridge | 3 | DEF, M.DEF | Slate Block, Hemp Cloth |
+| Ruby of Fortitude & Resolve | `gem-def-mdef-7` | Bridge | 7 | DEF, M.DEF | Obsidian Block, Cashmere Cloth, Cotton Cloth |
+| Citrine of Resolve & Spirit | `gem-mdef-mp-3` | Bridge | 3 | M.DEF, MP | Hemp Cloth, Breeze Infusion |
+| Ruby of Resolve & Spirit | `gem-mdef-mp-7` | Bridge | 7 | M.DEF, MP | Cashmere Cloth, Glimmer Infusion, Maple Plank |
+| Citrine of Spirit & Sorcery | `gem-mp-matk-3` | Bridge | 3 | MP, M.ATK | Breeze Infusion, Cut Citrine |
+| Ruby of Spirit & Sorcery | `gem-mp-matk-7` | Bridge | 7 | MP, M.ATK | Glimmer Infusion, Cut Ruby, Silver Ingot |
+| Citrine of Sorcery & Strength | `gem-matk-atk-3` | Bridge | 3 | M.ATK, ATK | Cut Citrine, Iron Ingot |
+| Ruby of Sorcery & Strength | `gem-matk-atk-7` | Bridge | 7 | M.ATK, ATK | Cut Ruby, Platinum Ingot, Granite Block |
+| Citrine of Strength & Swiftness | `gem-atk-speed-3` | Bridge | 3 | ATK, Speed | Iron Ingot, Cedar Plank |
+| Ruby of Strength & Swiftness | `gem-atk-speed-7` | Bridge | 7 | ATK, Speed | Platinum Ingot, Mahogany Plank, Cut Garnet |
+| Citrine of Swiftness & Valor | `gem-speed-limit-3` | Bridge | 3 | Speed, Limit Break charge | Cedar Plank, Trilobite Carving |
+| Ruby of Swiftness & Valor | `gem-speed-limit-7` | Bridge | 7 | Speed, Limit Break charge | Mahogany Plank, Claw Carving, Bone Carving |
+| Citrine of Valor & Vigor | `gem-limit-hp-3` | Bridge | 3 | Limit Break charge, HP | Trilobite Carving, Wolfkin Leather |
+| Ruby of Valor & Vigor | `gem-limit-hp-7` | Bridge | 7 | Limit Break charge, HP | Claw Carving, Manticore Leather, Lizard Leather |
+| Garnet of the Sun | `gem-sun-4` | Sun | 4 | All eight | Lizard Leather, Ember Infusion, Silver Ingot, Cut Garnet, Granite Block, Cotton Cloth, Maple Plank, Bone Carving |
+| Sapphire of the Sun | `gem-sun-6` | Sun | 6 | All eight | Basilisk Leather, Spark Infusion, Gold Ingot, Cut Sapphire, Marble Block, Alpaca Cloth, Cherry Plank, Fang Carving |
+| Diamond of the Sun | `gem-sun-8` | Sun | 8 | All eight | Behemoth Leather, Shadow Infusion, Titanium Ingot, Cut Diamond, Jade Block, Silk, Ebony Plank, Tooth Carving |
+| Philosopher's Stone of the Sun | `gem-sun-10` | Sun | 10 | All eight | Dragonhide, Prismatic Infusion, Orichalcum Ingot, Cut Philosopher's Stone, Meteorite Block, Cloudweave, Yggdrasil Plank, Unicorn Carving |
 <!-- /live -->
 
 ## Gear
@@ -415,13 +287,13 @@ pairs in turn, starting at its own place among the types (the table below lists 
 Uma's gear uses all eight Wilds families about equally, whatever her class, armor half or accessories: 24–26 refined
 items of each, or 28–32 with two accessories. Spread a roster's Wilds workers evenly and nothing piles up.
 
-Maxing one Uma's twelve tracks takes 240 refined items, about what her 100 Extra Stats dishes take (232). The Uma's Craft
+Maxing one Uma's twelve tracks takes 240 refined items, about what her 100 Star Gems take (232). The Uma's Craft
 Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade>`; pieces carry no accent.
 
 **What a piece does (D104, D124):**
-- **A weapon's Might:** +4 a grade to the offense of hits made with that weapon.
-- **Armor:** ATK (physical) or M.ATK (magical) +⌈grade ÷ 2⌉, and its slot's defensive stat +grade. Head DEF, body HP,
-  legs MP, arms MDEF, feet Speed.
+- **A weapon's Might:** its grade's value added to the offense of hits made with that weapon (D142, D143).
+- **Armor:** ATK (physical) or M.ATK (magical) +⌈grade ÷ 2⌉, and its slot's defensive stat +2 a grade (D141). Head DEF,
+  body HP, legs MP, arms MDEF, feet Speed.
 - **An Orb:** its kind on every hit, for weaknesses only.
 - **A Talisman or an Amulet:** the small effect in the table below ([combat](combat.md#damage)).
 

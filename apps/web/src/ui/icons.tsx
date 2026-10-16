@@ -88,7 +88,7 @@ export function BackIcon(props: IconProps) {
   )
 }
 
-/** A farming target (D100): a crosshair. */
+/** A target (D100): a crosshair. */
 export function TargetIcon(props: IconProps) {
   return (
     <Svg {...props}>

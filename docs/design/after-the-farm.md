@@ -1,10 +1,23 @@
 # After the farm: one profession, and Star Gems for Extra Stats
 
-> **Status: proposal for the owner, 2026-10-16. Nothing here is built yet.** The owner asked to remove the farm
-> completely: Farm Level, ingredients, refining them, and dishes. uma-racer now owns the farm and reuses its buildings
-> and art, so nothing is lost by deleting it here. This page decides what replaces the farm's job in the game. Each
-> section ends with a recommendation, and §9 lists the build. Data loss is fine: the save migration drops what goes,
-> and nothing new is backed up.
+> **Status: built, 2026-10-16 (D144).** The owner approved every recommendation below and kept the names Wilds and
+> Craft Level. §0 lists what the build added or settled; the rest is the proposal as approved. The farm is gone:
+> Farm Level, ingredients, refining them, and dishes. uma-racer owns the farm now and reuses its buildings and art.
+
+## 0. As built
+
+- **Everything in §2–§8**, as written, on save v21 and with no farm id left in the code. The only mentions left are the
+  migration tests' old-save fixtures, which have to spell the shape they migrate.
+- **The Wilds map:** the Lapidary stands on the road between the Workbench and the Forge, and those two moved out to the
+  row's ends (x 0.22 and 0.78). Placed higher, it cut a site's road to the trunk on some phone sizes.
+- **The Forge's picker** is icons only (the owner, with D144): its 40 types in four rows of ten, physical then magical
+  in each, then the grade chips and the picked piece's name, effect and recipe. It takes about a quarter of the height
+  the labelled chips did. A type with no materials in stock is dimmed.
+- **The Lapidary's picker** works the same way: Moons (eight planets × ten grades), Bridges and Sun tabs, a dot on gems
+  the targets need, and the node a gem opens and what it gives.
+- **Art:** Star Gems borrow the cut-crystal icons with a planet badge, and the Lapidary borrows the Arcane Armory's
+  building. [H29](../handoff/tasks/H29-star-gem-and-lapidary-art.md) asks ChatGPT for their own art.
+- **Splash cut-ins** hold about 1.5 s now (shipped first, separately).
 
 ## 1. What the farm does today
 
@@ -21,8 +34,8 @@ The game has two halves, mirrored site for site:
 | Per Uma, maxed | 100 dishes from 232 refined items | 12 gear tracks from 240 refined items |
 | Facility slots | 10 facilities, 2 / 3 / 3 slots by level: up to 30 | The same: up to 30 |
 
-You called the Wilds side "the Mine". In the game it's the Wilds page, worked by Craft Level, and the Mine is one of its
-eight sites (Ores). This page keeps those names.
+The owner called the Wilds side "the Mine". In the game it's the Wilds page, worked by Craft Level, and the Mine is one
+of its eight sites (Ores). Those names stay (owner, 2026-10-16).
 
 ## 2. Extra Stats: keep them (recommended) or remove them
 
@@ -34,7 +47,7 @@ eight sites (Ores). This page keeps those names.
 | Work | Per Uma, the Wilds make about twice what they do today (472 refined items, not 240). That fits the owner's play, many Umas working at once, if the Wilds get more slots (§5) | Per Uma, half the work of today. The Wilds' current slots fit it |
 | Code | Swaps dishes for gems: the map, nodes and points don't change | Deletes the Observatory, nodes, points and the targets' dish lines |
 
-**Recommendation: keep Extra Stats.** They're a fifth of a built Uma's power and the only build choice outside her class.
+**Recommendation (approved): keep Extra Stats.** They're a fifth of a built Uma's power and the only build choice outside her class.
 Combat balance assumes them, and nodes already opened survive. The farm's work moves to the Wilds instead of vanishing:
 "shifting all the effort into the Mine".
 
@@ -73,7 +86,7 @@ node opens it, exactly as eating a dish did.
 - **Targets (D100):** the Lapidary lists a gem for each node a target hasn't opened, as the Kitchen listed dishes. The
   Workbench and sites list what those gems need.
 
-**Recommendation: build it as above.** It's the smallest change that keeps everything Extra Stats do. The map, the
+**Recommendation (approved): build it as above.** It's the smallest change that keeps everything Extra Stats do. The map, the
 points and the balance don't move, and the recipes are the dishes' structure on families that already exist.
 
 ## 4. One profession: Craft Level
@@ -103,13 +116,13 @@ slots each at level 3), and they make both halves of every Uma's power.
   Essences, Hides & Scales with Bones & Horns, Stones with Fibers.
 - **The map:** five pips fit under a building's name (22 px each, in the 128 px label).
 
-**Recommendation: 3 / 4 / 5 slots.** Without it, the work an Uma's power takes doubles on one half of the slots.
+**Recommendation (approved): 3 / 4 / 5 slots.** Without it, the work an Uma's power takes doubles on one half of the slots.
 
 ## 6. Everything else that changes
 
 | Area | After |
 |---|---|
-| The Hub | Three pages: **Wilds**, Learning, Town. Wilds is the first. The Lapidary takes the Wilds map's middle |
+| The Hub | Three pages: **Wilds**, Learning, Town. Wilds is the first. The Lapidary takes the Wilds map's middle row (§0) |
 | The Warehouse | Shelves **Materials** (raw and refined), **Star Gems** and **Gear**, with the grade filter |
 | The Exchange | Sells Wilds raw items only, by the same continent grades. Selling pays the same: a gem like a dish, 6 + 6g |
 | The profile | Header and Work tab show Craft Level only. "Works fastest at" goes: aptitude hasn't set job speed since D139 |
@@ -166,7 +179,7 @@ Every reference goes, not only the screens: about 60 files.
 - **Stays, not the farm:** the targets feature (D100) and the capital Finals route "Kitchen Fire", which is a fight's
   flavor text.
 
-## 9. The build, once approved
+## 9. The build
 
 1. **Domain:** gems and the Lapidary, one profession, the slots, then delete the farm. The migration and its test come
    with it. Every test, the symmetry test included, passes on the Wilds alone.

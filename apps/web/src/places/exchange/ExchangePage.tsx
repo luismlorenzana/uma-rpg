@@ -3,7 +3,7 @@
 // clear, D79). Marks banked past max ranks buy Manuals: EXP for one bar of one Uma (D102).
 import {
   ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
-  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type ItemSide, type RankRef, type RosterOutfit, type TierWorld,
+  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type RankRef, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_LABEL, WEAPON_LABEL } from '../../battle/labels'
@@ -23,7 +23,6 @@ export default function ExchangePage() {
 
 function Exchange({ view }: { view: MasterView }) {
   const world = useWorld()
-  const [side, setSide] = useState<ItemSide>('farming')
   const [reading, setReading] = useState(false)
   const [buying, setBuying] = useState<{ kind: 'item'; id: string; price: number; name: string } | { kind: 'time' | 'sweep'; price: number; name: string } | null>(null)
   if (!world) return null
@@ -55,15 +54,9 @@ function Exchange({ view }: { view: MasterView }) {
           <p className="text-[13px] text-ink-soft">Nothing in stock yet: win a stage on a continent to stock its grades.</p>
         ) : (
           <>
-            <div className="mb-2 grid grid-cols-2 rounded-sm bg-sunken p-1" role="tablist" aria-label="Side">
-              {(['farming', 'gathering'] as const).map((s) => (
-                <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)}
-                  className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>{s === 'farming' ? 'Ingredients' : 'Materials'}</button>
-              ))}
-            </div>
             <p className="mb-2 text-[12px] text-ink-faint">Grades {stocked.join(', ')} in stock.</p>
             <div className="grid grid-cols-2 gap-1.5">
-              {ITEM_FAMILIES.filter((f) => f.side === side).flatMap((f) => f.raw.filter((i) => stocked.includes(i.grade))).map((i) => (
+              {ITEM_FAMILIES.flatMap((f) => f.raw.filter((i) => stocked.includes(i.grade))).map((i) => (
                 <button key={i.id} type="button" onClick={() => setBuying({ kind: 'item', id: i.id, price: rawItemPrice(i.grade), name: i.name })}
                   className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left">
                   <ItemIcon id={i.id} size={32} />

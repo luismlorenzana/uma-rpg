@@ -1,7 +1,8 @@
 # The core loop: fights feed the Hub
 
-> **Status: built through D96, 2026-10-12.** Current currencies, rewards and jobs are generated in
-> [the game-loop manual](../game/loops.md) and [materials](../game/materials.md). This page explains why they connect.
+> **Status: history, built through D96, 2026-10-12.** Tokens are gone (D105) and the farm's Kitchen with them (D144:
+> [after the farm](after-the-farm.md)). Current currencies, rewards and jobs are generated in
+> [the game-loop manual](../game/loops.md) and [materials](../game/materials.md). This page explains why they connected.
 
 ## The loop
 

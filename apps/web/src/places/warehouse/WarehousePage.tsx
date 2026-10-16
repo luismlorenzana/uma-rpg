@@ -1,6 +1,6 @@
-// The Warehouse (S4–S7): every item, dish and unbound piece of gear you own. Ingredients and materials filter by grade;
-// anything can be sold for a few Laurels (far below its Exchange price).
-import { dishById, EFFECT_LABEL, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type ItemSide, type Shelf } from '@rpg/domain'
+// The Warehouse (S4–S7, D144): every material, Star Gem and unbound piece of gear you own, filtered by grade; anything
+// can be sold for a few Laurels (far below its Exchange price).
+import { EFFECT_LABEL, gemById, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type Shelf } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -8,21 +8,22 @@ import { sell, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 
-type Tab = ItemSide | 'dishes' | 'gear'
+type Tab = 'materials' | 'gems' | 'gear'
+const TAB_LABEL: Readonly<Record<Tab, string>> = { materials: 'Materials', gems: 'Star Gems', gear: 'Gear' }
 
 export default function WarehousePage() {
   const world = useWorld()
-  const [side, setSide] = useState<Tab>('farming')
+  const [side, setSide] = useState<Tab>('materials')
   const [grade, setGrade] = useState<number | null>(null)
   const [open, setOpen] = useState<{ shelf: Shelf; id: string } | null>(null)
   if (!world) return null
   const total = Object.values(world.items).reduce((a, n) => a + n, 0)
-  const list = (shelf: 'dishes' | 'gear') => {
+  const list = (shelf: 'gems' | 'gear') => {
     const stock = world[shelf]
     return (
       <ul className="space-y-1.5 p-3">
         {Object.keys(stock).length === 0 && (
-          <li className="text-[13px] text-ink-faint">{shelf === 'gear' ? 'No gear yet' : 'No dishes yet'}</li>
+          <li className="text-[13px] text-ink-faint">{shelf === 'gear' ? 'No gear yet' : 'No Star Gems yet: the Lapidary cuts them'}</li>
         )}
         {Object.entries(stock).filter(([id]) => grade === null || outputView(id).grade === grade).map(([id, n]) => (
           <li key={id}>
@@ -39,11 +40,11 @@ export default function WarehousePage() {
   return (
     <div>
       <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
-        <div className="grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
-          {(['farming', 'gathering', 'dishes', 'gear'] as const).map((s) => (
-            <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)} aria-label={s === 'farming' ? 'Farm items: ingredients' : s === 'gathering' ? 'Craft items: materials' : undefined}
+        <div className="grid grid-cols-3 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
+          {(['materials', 'gems', 'gear'] as const).map((s) => (
+            <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)}
               className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-              {s === 'farming' ? 'Farm' : s === 'gathering' ? 'Craft' : s === 'dishes' ? 'Dishes' : 'Gear'}
+              {TAB_LABEL[s]}
             </button>
           ))}
         </div>
@@ -55,13 +56,13 @@ export default function WarehousePage() {
             </button>
           ))}
         </div>
-        <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.dishes).reduce((a, b) => a + b, 0)} dishes · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear</p>
+        <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.gems).reduce((a, b) => a + b, 0)} Star Gems · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear</p>
       </div>
       {side === 'gear' && list('gear')}
-      {side === 'dishes' && list('dishes')}
-      {(side === 'farming' || side === 'gathering') && (
+      {side === 'gems' && list('gems')}
+      {side === 'materials' && (
         <div className="space-y-3 p-3">
-          {ITEM_FAMILIES.filter((f) => f.side === side).map((f) => {
+          {ITEM_FAMILIES.map((f) => {
             const owned = [...f.raw, ...f.refined].filter((i) => (world.items[i.id] ?? 0) > 0 && (grade === null || i.grade === grade))
             return (
               <section key={f.id} className="rounded-md bg-panel p-2.5">
@@ -94,7 +95,7 @@ export default function WarehousePage() {
 function StockSheet({ shelf, id, have, onClose }: { shelf: Shelf; id: string; have: number; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const item = shelf === 'items' ? itemById(id) : null
-  const dish = shelf === 'dishes' ? dishById(id) : null
+  const gem = shelf === 'gems' ? gemById(id) : null
   const view = outputView(id)
   const price = sellPrice(shelf, id)
   const sellN = (n: number) => sell(shelf, id, n).then(() => (n >= have ? onClose() : setError(null)), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t sell.'))
@@ -104,7 +105,7 @@ function StockSheet({ shelf, id, have, onClose }: { shelf: Shelf; id: string; ha
         <ItemIcon id={view.icon} size={64} />
         <div className="text-[14px]">
           {item && <p>Grade {item.grade} · {item.refined ? 'refined' : 'raw'} · {EFFECT_LABEL[item.effect]}</p>}
-          {dish && <p>Grade {dish.grade} dish · feeds {dish.effects.length === 8 ? 'all eight' : dish.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}</p>}
+          {gem && <p>Grade {gem.grade} Star Gem · feeds {gem.kind === 'sun' ? 'all eight' : gem.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}</p>}
           {shelf === 'gear' && <p>Grade {view.grade} gear · unbound</p>}
           <p className="text-ink-soft">{have} in stock</p>
           {item && <p className="text-ink-soft">{item.refined ? `Refined from ${itemById(item.pair)?.name}` : `Refines into ${itemById(item.pair)?.name}`}</p>}

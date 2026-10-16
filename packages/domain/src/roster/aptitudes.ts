@@ -1,5 +1,5 @@
 // What an Uma's original aptitudes do in uma-rpg (design §4.1): running style → class training speed, distance → gear
-// mastery speed, surface → profession speed. A takes half the time of G.
+// mastery speed. A takes half the time of G. Surface no longer sets job speed (D139).
 import { APTITUDE_GRADES, type Aptitudes, type AptitudeGrade } from '@luismlorenzana/uma-data'
 
 export const STYLE_CLASSES: Record<keyof Aptitudes['strategy'], string[]> = {
@@ -15,11 +15,6 @@ export const DISTANCE_GEAR: Record<keyof Aptitudes['distance'], { armory: string
   mile: { armory: 'Armory', gear: 'Armor Level (Armory)' },
   medium: { armory: 'Armory', gear: 'Armor Level (Armory)' },
   long: { armory: 'Armory', gear: 'Armor Level (Armory)' },
-}
-
-export const SURFACE_PROFESSION: Record<keyof Aptitudes['surface'], string> = {
-  turf: 'Farm work (Farm Level)',
-  dirt: 'Wilds and Forge work (Craft Level)',
 }
 
 export const KEY_LABELS: Record<string, string> = {

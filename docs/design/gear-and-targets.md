@@ -50,12 +50,12 @@ in four kinds:
 
 ### 1.3 Recipes and material balance (D125)
 
-Maxing one Uma must cost about as much in base materials for gear as for dishes:
-- **Dishes, today:** the 100 Extra Stats nodes take 232 refined items, so 232 raw.
+Maxing one Uma must cost about as much in base materials for gear as for her Extra Stats:
+- **Extra Stats:** the 100 nodes take 232 refined items, so 232 raw (dishes then, Star Gems since D144).
 - **Gear, before:** 12 tracks (5 weapons, 5 armor, 2 accessories) × 10 grades × 4 refined each = 480 raw. Twice as
   much.
 - **Gear, now:** a piece takes **2 refined items** of its grade from its half: 120 pieces × 2 = **240 raw**, level with
-  dishes.
+  Extra Stats.
 
 Which two families each group takes, so every family is used at every grade:
 
@@ -93,11 +93,10 @@ Flag an Uma, and:
   - her class's five weapons;
   - her five armor slots' kinds;
   - her two accessories.
-- **The Kitchen** lists every dish her Extra Stats still need.
+- **The Lapidary** lists every Star Gem her Extra Stats still need (D144; the Kitchen's dishes before).
 - **Each line shows the total her targets need.** It stays until the Warehouse holds that many, then disappears.
-- **The Workbench and Pantry** list the refined items those lines still need; **the farms and mines** list the raw
-  items those need.
-- **Cascade:** when anything above is covered (in stock, being made, bound or eaten), everything below it for that
+- **The Workbench** lists the refined items those lines still need; **the sites** list the raw items those need.
+- **Cascade:** when anything above is covered (in stock, being made, bound or set), everything below it for that
   line drops too.
 - **More targets** add up.
 
@@ -115,8 +114,8 @@ The planner is the standard MRP netting pass, split into two layers:
 - a **demand layer** (`save/targets.ts`) that turns targets into end products.
 
 ```text
-targets ─▶ demand (pieces, dishes) ─▶ requirements engine ─▶ per item: gross, on hand, coming, net
-                                          ▲ recipes (piece/dish → refined, refined → raw)
+targets ─▶ demand (pieces, gems) ─▶ requirements engine ─▶ per item: gross, on hand, coming, net
+                                          ▲ recipes (piece/gem → refined, refined → raw)
                                           ▲ supply from jobs: coming outputs, inputs held for queued jobs
 ```
 
@@ -126,7 +125,7 @@ targets ─▶ demand (pieces, dishes) ─▶ requirements engine ─▶ per ite
 - `on hand`: the Warehouse count minus what queued jobs hold for themselves.
 - `coming`: what running and queued jobs will still make. A queued job counts only if its inputs are on hand.
 - `net = max(0, gross − on hand − coming)`: what still has to be started. This, not `gross`, flows down to the
-  ingredients, which is why everything below a covered line disappears.
+  materials, which is why everything below a covered line disappears.
 
 **What a facility shows:**
 - Every item it makes whose `gross` is above `on hand`, with need, have and coming.
@@ -138,6 +137,6 @@ targets ─▶ demand (pieces, dishes) ─▶ requirements engine ─▶ per ite
   - her class's five weapons;
   - each armor slot's current kind;
   - each accessory slot's type (an empty accessory slot plans nothing: there's no way to know which she wants).
-- **Dishes:** the dish of every Extra Stats node she hasn't opened (D119 order).
+- **Star Gems:** the gem of every Extra Stats node she hasn't opened (D119 order, D144).
 
 **Cost:** a few hundred map operations per render, pure and memoised per world.

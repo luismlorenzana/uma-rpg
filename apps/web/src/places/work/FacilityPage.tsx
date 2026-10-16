@@ -1,14 +1,15 @@
-// A working facility (S4, S6; D55, D58): the 16 sites gather raw items, the Pantry and Workbench refine them 1 → 1, and
-// the Kitchen cooks dishes and the Forge crafts gear (S7, D59). Each slot holds one Uma's job: what she makes, how many, how far along. Collect pays the
-// output and her profession EXP.
+// A working facility (S4, S6, S7; D55, D58, D59, D144): the eight Wilds sites gather raw items, the Workbench refines them
+// 1 → 1, the Forge crafts gear and the Lapidary cuts Star Gems. Each slot holds one Uma's job: what she makes, how many,
+// how far along. Collect pays the output and her Craft EXP.
 import {
-  activeClass, availabilityBlock, DISHES, facilityTargets, targetPlan, type TargetNeed, dishById, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gradeUnlockLevel, ITEM_FAMILIES,
-  itemById, itemMinutes, jobEndsAt, jobFinished, jobProgress, makeMinutes, maxJobCount, MINUTE, planJob, PROFESSION_LABEL, PROFESSION_SHORT, REFINE_BATCHES, refineMinutes, SaveRuleError,
-  stockName, upgradeCost, type Job, type Profession, type RosterOutfit, type TierWorld,
+  activeClass, availabilityBlock, BRIDGES, CRAFT_LABEL, CRAFT_SHORT, facilityTargets, targetPlan, type TargetNeed, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
+  itemById, itemMinutes, jobEndsAt, jobFinished, jobProgress, makeMinutes, maxJobCount, MINUTE, planJob, REFINE_BATCHES, refineMinutes, SaveRuleError,
+  stockName, upgradeCost, type Gem, type GemKind, type Job, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
+import { nodeLabel, nodeValue, PLANET_COLOR, PLANET_SHORT } from '../../items/planets'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
 import { collect, collectAndRepeat, collectEverything, cutTime, queueWork, recall, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
@@ -24,21 +25,16 @@ import { TimeCut } from './TimeCut'
 
 
 /** A facility's title and its help: what it makes and what it raises. */
-function describe(placeId: string): { title: string; help: string[]; profession: Profession } {
+function describe(placeId: string): { title: string; help: string[] } {
   const spec = facilitySpec(placeId)!
   const family = spec.family ? familyById(spec.family) : null
-  const level = (p: Profession) => `Each job raises her ${PROFESSION_LABEL[p]}; grade g opens at ${PROFESSION_LABEL[p]} 5g − 4.`
-  if (family) {
-    const verb = spec.profession === 'farming' ? 'Grows' : 'Gathers'
-    return { title: family.name, profession: spec.profession!,
-      help: [`${verb} ${family.name.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, ten grades.`, level(spec.profession!)] }
-  }
-  if (spec.kind === 'cook') return { title: 'Cooking', profession: 'farming',
-    help: ['Cooks dishes from refined ingredients and Cooking Tokens. Eating a dish unlocks a node on her Extra Stats map.', level('farming')] }
-  if (spec.kind === 'craft') return { title: 'Crafting', profession: 'gathering',
-    help: ['Crafts weapons, armor, Rings, Charms and Orbs: four refined items of the grade, one from each of the type\'s families. The accent picks the stat it adds.', level('gathering')] }
-  return { title: 'Refining', profession: spec.profession!,
-    help: [`Refines raw ${spec.profession === 'farming' ? 'ingredients' : 'materials'}, one into one, in a quarter of the time it took to gather.`, level(spec.profession!)] }
+  const level = `Each job raises her ${CRAFT_LABEL}; grade g opens at ${CRAFT_LABEL} 5g − 4.`
+  if (family) return { title: family.name, help: [`Gathers ${family.name.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, ten grades.`, level] }
+  if (spec.kind === 'craft') return { title: 'Crafting',
+    help: ['Crafts weapons, armor and accessories: two refined items of the grade, from two of the eight families.', level] }
+  if (spec.kind === 'cut') return { title: 'Cutting',
+    help: ['Cuts Star Gems from refined materials. Setting one at the Observatory opens a node on her Extra Stats map: a moon gem its planet\'s moon, a bridge gem the bridge between two planets, a Sun gem a Sun node.', level] }
+  return { title: 'Refining', help: ['Refines raw materials, one into one, in a quarter of the time it took to gather.', level] }
 }
 
 export default function FacilityPage({ place }: PageProps) {
@@ -107,10 +103,10 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
         ))}
       </ul>
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
-      {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} want={want} wanted={wanted}
+      {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} want={want} wanted={wanted}
         onClose={() => setAssign(null)} onStart={(outfit, output, count) => startWork(placeId, assign, outfit, output, count).then(() => setAssign(null))} />}
       {queueing !== null && facility.jobs[queueing] && (
-        <AssignSheet view={view} world={world} placeId={placeId} profession={info.profession} wanted={wanted} onClose={() => setQueueing(null)}
+        <AssignSheet view={view} world={world} placeId={placeId} wanted={wanted} onClose={() => setQueueing(null)}
           fixed={view.roster.find((o) => o.outfitId === facility.jobs[queueing]!.outfitId)}
           onStart={(outfit, output, count) => queueWork(placeId, queueing, outfit, output, count).then(() => setQueueing(null))} />
       )}
@@ -205,8 +201,8 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
 
 /** Pick an Uma, then what she makes, then how many. With `fixed`, she's queueing another job: no Uma to pick, and no
  * stock cap, since its inputs are taken when it starts. */
-function AssignSheet({ view, world, placeId, profession, fixed, want = null, wanted, onClose, onStart }: {
-  view: MasterView; world: TierWorld; placeId: string; profession: Profession; fixed?: RosterOutfit; onClose: () => void
+function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose, onStart }: {
+  view: MasterView; world: TierWorld; placeId: string; fixed?: RosterOutfit; onClose: () => void
   /** A target's line to start with, once she's chosen; and every line the targets need, to badge (D100). */
   want?: string | null; wanted?: ReadonlyMap<string, number>
   onStart: (outfit: RosterOutfit, output: string, count: number) => Promise<void>
@@ -217,23 +213,16 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   const [output, setOutput] = useState<string | null>(null)
   const [count, setCount] = useState(1)
   const [error, setError] = useState<string | null>(null)
-  const [dishKind, setDishKind] = useState<'planet' | 'duo' | 'feast'>('planet')
-  const [readyOnly, setReadyOnly] = useState(false)
   // Free Umas first, then the highest level here (it sets her speed, D139), then the most EXP into it.
   const owned = view.roster.filter((o) => world.umas[o.outfitId])
-    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.professions[profession] }))
+    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.craft }))
     .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp || a.o.name.localeCompare(b.o.name))
   const options = outfit
-    ? spec.kind === 'gather'
-      ? familyById(spec.family!)!.raw.map((i) => i.id)
-      : spec.kind === 'cook'
-        ? DISHES.filter((d) => d.kind === dishKind).map((d) => d.id)
-        : ITEM_FAMILIES.filter((f) => f.side === profession).flatMap((f) => f.refined.map((i) => i.id))
+    ? spec.kind === 'gather' ? familyById(spec.family!)!.raw.map((i) => i.id) : ITEM_FAMILIES.flatMap((f) => f.refined.map((i) => i.id))
     : []
   const plan = outfit && output ? planJob(world, placeId, outfit, output, queueing ? 0 : count) : null
-  // How many the Warehouse covers: refining needs the raw item, cooking every ingredient.
-  const makeable = (inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
-  const stock = plan && !queueing && (spec.kind === 'refine' || spec.kind === 'cook' || spec.kind === 'craft') ? makeable(plan.inputs) : Infinity
+  // How many the Warehouse covers: refining needs the raw item, crafting and cutting every material.
+  const stock = plan && !queueing && spec.kind !== 'gather' ? makeable(world, plan.inputs) : Infinity
   // Her level sets the time, the same for every grade (D139); the facility's level speeds it.
   const eachMs = (level: number) => (spec.kind === 'refine' ? refineMinutes(level) : spec.kind === 'gather' ? itemMinutes(level) : makeMinutes(level)) * MINUTE /
     FACILITY_SPEED[facilityOf(world, placeId).level - 1]!
@@ -265,7 +254,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
                   </span>
                   <span className="shrink-0 text-center leading-none">
                     <span className="block font-display text-[20px] font-bold">{prof.level}</span>
-                    <span className="block text-[10px] text-ink-faint">{PROFESSION_SHORT[profession]} Lv</span>
+                    <span className="block text-[10px] text-ink-faint">{CRAFT_SHORT} Lv</span>
                   </span>
                 </button>
               </li>
@@ -274,32 +263,18 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
         </ul>
       )}
       {outfit && !output && spec.kind === 'craft' && (
-        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.professions.gathering.level} queueing={queueing} onPick={(id) => { setOutput(id); setCount(1) }} />
+        <CraftPicker world={world} level={world.umas[outfit.outfitId]!.craft.level} queueing={queueing} onPick={(id) => { setOutput(id); setCount(1) }} />
       )}
-      {outfit && !output && spec.kind === 'cook' && (
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {(['planet', 'duo', 'feast'] as const).map((k) => (
-            <button key={k} type="button" onClick={() => setDishKind(k)}
-              className={`min-h-9 rounded-full px-3 text-[12px] font-semibold ${dishKind === k ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'}`}>
-              {k === 'planet' ? 'Dishes' : k === 'duo' ? 'Duo dishes' : 'Feasts'}
-            </button>
-          ))}
-          <button type="button" aria-pressed={readyOnly} onClick={() => setReadyOnly((v) => !v)}
-            className={`min-h-9 rounded-full px-3 text-[12px] font-semibold ${readyOnly ? 'bg-success text-white' : 'bg-raised text-ink-soft'}`}>Can cook now</button>
-        </div>
+      {outfit && !output && spec.kind === 'cut' && (
+        <GemPicker world={world} level={world.umas[outfit.outfitId]!.craft.level} queueing={queueing} wanted={wanted} onPick={(id) => { setOutput(id); setCount(1) }} />
       )}
-      {outfit && !output && spec.kind !== 'craft' && (
+      {outfit && !output && (spec.kind === 'gather' || spec.kind === 'refine') && (
         <div className="grid grid-cols-2 gap-1.5">
-          {options.filter((id) => {
-            if (!readyOnly || spec.kind !== 'cook') return true
-            const p = planJob(world, placeId, outfit, id, 1)
-            return !!p && !p.block
-          }).map((id) => {
+          {options.map((id) => {
             const out = outputView(id)
             const p = planJob(world, placeId, outfit, id, 1)
-            const locked = world.umas[outfit.outfitId]!.professions[profession].level < gradeUnlockLevel(out.grade)
-            const have = spec.kind === 'refine' || spec.kind === 'cook' ? (p ? makeable(p.inputs) : 0) : null
-            const dish = dishById(id)
+            const locked = world.umas[outfit.outfitId]!.craft.level < gradeUnlockLevel(out.grade)
+            const have = spec.kind === 'refine' ? (p ? makeable(world, p.inputs) : 0) : null
             return (
               <button key={id} type="button" disabled={locked || (!queueing && have !== null && have < 1)} onClick={() => { setOutput(id); setCount(1) }}
                 className="flex items-center gap-2 rounded-sm bg-raised p-2 text-left disabled:opacity-40">
@@ -308,8 +283,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
                   <span className="block truncate text-[12px] font-semibold">{out.name}</span>
                   <span className="block truncate text-[11px] text-ink-soft">
                     {wanted?.get(id) ? <span className="font-semibold text-accent">Target ×{wanted.get(id)} · </span> : null}
-                    {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} ${dish ? 'to cook' : 'to refine'}` : `${formatDuration(p?.msEach ?? 0)} each`}
-                    {dish ? ` · ${dish.effects.length === 8 ? 'all' : dish.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}` : ''}
+                    {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} to refine` : `${formatDuration(p?.msEach ?? 0)} each`}
                   </span>
                 </span>
               </button>
@@ -342,7 +316,7 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
             ))}
           </div>
           <p className="text-[12px] text-ink-soft">
-            {Math.min(count, max)} items · {formatDuration(plan.msEach * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {PROFESSION_SHORT[profession]} EXP
+            {Math.min(count, max)} items · {formatDuration(plan.msEach * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {CRAFT_SHORT} EXP
           </p>
           <button type="button" onClick={() => setOutput(null)} className="text-[13px] text-ink-soft underline">Choose another item</button>
         </div>
@@ -352,56 +326,123 @@ function AssignSheet({ view, world, placeId, profession, fixed, want = null, wan
   )
 }
 
-/** The Forge's picker: a type and a grade (her Craft Level opens them). Its types in eight rows of five (D124): weapons,
- * armor and accessories, each physical and magical. */
-const FORGE_GROUPS: readonly (readonly [string, readonly EquipType[]])[] = [
-  ['Arms', EQUIP_TYPES.filter((t) => ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t))],
-  ['Tomes', EQUIP_TYPES.filter((t) => t.startsWith('tome-'))],
-  ['Physical', ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']],
-  ['Magical', ['circlet', 'robe', 'leggings', 'bracers', 'slippers']],
-  ['Arms Orbs', ['orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana']],
-  ['Element Orbs', ['orb-fire', 'orb-ice', 'orb-lightning', 'orb-light', 'orb-dark']],
-  ['Talismans', EQUIP_TYPES.filter((t) => t.startsWith('talisman-'))],
-  ['Amulets', EQUIP_TYPES.filter((t) => t.startsWith('amulet-'))],
+/** How many the Warehouse covers of a recipe. */
+const makeable = (world: TierWorld, inputs: Record<string, number>) => Math.min(...Object.entries(inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
+
+/** The Forge's picker: a type and a grade (her Craft Level opens them). Its 40 types as icons only, four rows of ten
+ * (D124, D144): weapons, armor, Orbs, then Talismans and Amulets, each row physical then magical. The picked type's
+ * name and recipe show below. */
+const FORGE_ROWS: readonly (readonly EquipType[])[] = [
+  [...EQUIP_TYPES.filter((t) => ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t)), ...EQUIP_TYPES.filter((t) => t.startsWith('tome-'))],
+  ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots', 'circlet', 'robe', 'leggings', 'bracers', 'slippers'],
+  ['orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana', 'orb-fire', 'orb-ice', 'orb-lightning', 'orb-light', 'orb-dark'],
+  [...EQUIP_TYPES.filter((t) => t.startsWith('talisman-')), ...EQUIP_TYPES.filter((t) => t.startsWith('amulet-'))],
 ]
+
+/** One square icon button of a picker grid. */
+function IconPick({ id, on, dim, disabled, label, badge, onClick }: { id: string; on: boolean; dim?: boolean; disabled?: boolean; label: string; badge?: boolean; onClick: () => void }) {
+  return (
+    <button type="button" disabled={disabled} onClick={onClick} aria-label={label} aria-pressed={on} title={label}
+      className={`relative flex aspect-square items-center justify-center rounded-xs ${on ? 'bg-accent/25 ring-2 ring-accent' : 'bg-raised'} ${dim ? 'opacity-45' : ''} disabled:opacity-25`}>
+      <ItemIcon id={id} size={28} />
+      {badge && <span className="absolute right-0.5 top-0.5 size-1.5 rounded-full bg-accent" />}
+    </button>
+  )
+}
+
+/** The grade chips 1–10 a Craft Level opens. */
+function GradeChips({ level, grade, onPick }: { level: number; grade: number; onPick: (g: number) => void }) {
+  return (
+    <div className="grid grid-cols-10 gap-0.5">{Array.from({ length: 10 }, (_, i) => i + 1).map((g) => (
+      <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => onPick(g)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Craft Lv${gradeUnlockLevel(g)}` : ''}`}
+        className={`min-h-8 rounded-full text-[12px] font-semibold ${g === grade ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'} disabled:opacity-35`}>{g}</button>
+    ))}</div>
+  )
+}
+
+/** The picked recipe: its name, what it does, its materials and Next. */
+function RecipeCard({ world, id, line, queueing, onPick }: { world: TierWorld; id: string; line: string; queueing: boolean; onPick: (id: string, have: number) => void }) {
+  const made = gearById(id) ?? gemById(id)!
+  const have = makeable(world, made.inputs)
+  return (
+    <div className="rounded-sm bg-raised p-2.5">
+      <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(id).icon} size={28} /> {made.name} · G{made.grade}</p>
+      <p className="mt-0.5 text-[12px] text-ink-soft">{line}</p>
+      <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
+        {Object.entries(made.inputs).map(([input, n]) => (
+          <li key={input} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={input} size={18} /> {stockName(input)} ×{n} <span className="text-ink-faint">({world.items[input] ?? 0})</span></li>
+        ))}
+      </ul>
+      <button type="button" disabled={have < 1 && !queueing} onClick={() => onPick(id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
+        {have < 1 ? (queueing ? 'Next · none in stock yet' : 'Not enough materials') : `Next · ${have} possible`}
+      </button>
+    </div>
+  )
+}
 
 function CraftPicker({ world, level, queueing, onPick }: { world: TierWorld; level: number; queueing: boolean; onPick: (id: string, have: number) => void }) {
   const [type, setType] = useState<EquipType>('greatsword')
   const [grade, setGrade] = useState(1)
-  const piece = gearById(gearId(type, grade))!
-  const have = Math.min(...Object.entries(piece.inputs).map(([id, n]) => Math.floor((world.items[id] ?? 0) / n)))
-  const chip = (on: boolean) => `min-h-9 rounded-full px-2.5 text-[12px] font-semibold ${on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'} disabled:opacity-35`
+  const id = gearId(type, grade)
   return (
-    <div className="space-y-3">
-      <div>
-        <p className="text-micro mb-1">Type</p>
-        <div className="space-y-1">
-          {FORGE_GROUPS.map(([label, types]) => (
-            <div key={label} className="flex flex-wrap items-center gap-1">
-              <span className="w-20 shrink-0 text-[11px] text-ink-faint">{label}</span>
-              {types.map((t) => <button key={t} type="button" onClick={() => setType(t)} className={chip(t === type)}>{EQUIP_LABEL[t].replace(/ (Tome|Orb|Talisman|Amulet)$/, '')}</button>)}
+    <div className="space-y-2.5">
+      <div className="space-y-1" role="group" aria-label="Type">
+        {FORGE_ROWS.map((row, r) => (
+          <div key={r} className="grid grid-cols-10 gap-0.5">
+            {row.map((t, i) => (
+              <span key={t} className={i === 5 ? 'border-l border-hairline pl-0.5' : ''}>
+                <IconPick id={gearId(t, grade)} on={t === type} label={EQUIP_LABEL[t]} dim={!queueing && makeable(world, gearById(gearId(t, grade))!.inputs) < 1} onClick={() => setType(t)} />
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+      <GradeChips level={level} grade={grade} onPick={setGrade} />
+      <RecipeCard world={world} id={id} line={pieceLine(id)} queueing={queueing} onPick={onPick} />
+    </div>
+  )
+}
+
+/** The Lapidary's picker (D144): the 100 Star Gems as icons, moons by planet and grade, bridges by pair, then the Sun's
+ * four. A gem she can't cut now is dimmed; one her targets need has a dot. */
+const GEM_TABS: readonly (readonly [GemKind, string])[] = [['moon', 'Moons'], ['bridge', 'Bridges'], ['sun', 'Sun']]
+
+function GemPicker({ world, level, queueing, wanted, onPick }: {
+  world: TierWorld; level: number; queueing: boolean; wanted?: ReadonlyMap<string, number>; onPick: (id: string, have: number) => void
+}) {
+  const [kind, setKind] = useState<GemKind>('moon')
+  const [picked, setPicked] = useState('gem-hp-1')
+  const gem = gemById(picked)!
+  const of = (test: (g: Gem) => boolean) => GEMS.filter(test)
+  const rows: { key: string; label: string; color: string; gems: Gem[] }[] = kind === 'moon'
+    ? ITEM_EFFECTS.map((e) => ({ key: e, label: PLANET_SHORT[e], color: PLANET_COLOR[e], gems: of((g) => g.kind === 'moon' && g.effects[0] === e) }))
+    : kind === 'bridge'
+      ? BRIDGES.map(([a, b]) => ({ key: `${a}-${b}`, label: `${PLANET_SHORT[a]}·${PLANET_SHORT[b]}`, color: PLANET_COLOR[a], gems: of((g) => g.kind === 'bridge' && g.effects[0] === a && g.effects[1] === b) }))
+      : [{ key: 'sun', label: 'Sun', color: '#f5c542', gems: of((g) => g.kind === 'sun') }]
+  const node = gemNodes(gem).at(-1)!
+  const pick = (g: Gem) => setPicked(g.id)
+  return (
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-3 rounded-sm bg-sunken p-1" role="tablist" aria-label="Kind">
+        {GEM_TABS.map(([k, label]) => (
+          <button key={k} type="button" role="tab" aria-selected={kind === k} onClick={() => { setKind(k); setPicked(of((g) => g.kind === k)[0]!.id) }}
+            className={`min-h-9 rounded-xs text-[13px] font-semibold ${kind === k ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>{label}</button>
+        ))}
+      </div>
+      <div className={kind === 'bridge' ? 'grid grid-cols-2 gap-x-3 gap-y-1' : 'space-y-1'} role="group" aria-label="Star Gem">
+        {rows.map((row) => (
+          <div key={row.key} className="flex items-center gap-1">
+            <span className="w-12 shrink-0 text-[10.5px] font-semibold" style={{ color: row.color }}>{row.label}</span>
+            <div className={`grid gap-0.5 ${kind === 'moon' ? 'flex-1 grid-cols-10' : kind === 'bridge' ? 'grid-cols-[repeat(2,2.25rem)]' : 'grid-cols-[repeat(4,2.25rem)]'}`}>
+              {row.gems.map((g) => (
+                <IconPick key={g.id} id={g.id} on={g.id === picked} label={`${g.name}, grade ${g.grade}`} disabled={level < gradeUnlockLevel(g.grade)}
+                  dim={!queueing && makeable(world, g.inputs) < 1} badge={!!wanted?.get(g.id)} onClick={() => pick(g)} />
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-      <div>
-        <p className="text-micro mb-1">Grade</p>
-        <div className="flex flex-wrap gap-1">{Array.from({ length: 10 }, (_, i) => i + 1).map((g) => (
-          <button key={g} type="button" disabled={level < gradeUnlockLevel(g)} onClick={() => setGrade(g)} className={chip(g === grade)} aria-label={`Grade ${g}${level < gradeUnlockLevel(g) ? `, needs Craft Lv${gradeUnlockLevel(g)}` : ''}`}>{g}</button>
-        ))}</div>
-      </div>
-      <div className="rounded-sm bg-raised p-2.5">
-        <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={outputView(piece.id).icon} size={28} /> {piece.name}</p>
-        <p className="mt-0.5 text-[12px] text-ink-soft">{pieceLine(piece.id)}</p>
-        <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
-          {Object.entries(piece.inputs).map(([id, n]) => (
-            <li key={id} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1"><ItemIcon id={id} size={18} /> {stockName(id)} ×{n} <span className="text-ink-faint">({world.items[id] ?? 0})</span></li>
-          ))}
-        </ul>
-        <button type="button" disabled={have < 1 && !queueing} onClick={() => onPick(piece.id, have)} className="mt-2 min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-          {have < 1 ? (queueing ? 'Next · none in stock yet' : 'Not enough materials') : `Next · ${have} possible`}
-        </button>
-      </div>
+      <RecipeCard world={world} id={gem.id} line={`Opens ${nodeLabel(node)} · ${nodeValue(node)}${wanted?.get(gem.id) ? ` · Target ×${wanted.get(gem.id)}` : ''}`} queueing={queueing} onPick={onPick} />
     </div>
   )
 }

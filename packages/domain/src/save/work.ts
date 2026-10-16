@@ -1,12 +1,12 @@
-// Facility work over the save (S4, D55): put an Uma in a slot to gather or refine, collect what she has made (with her
-// profession EXP), recall her, rush a job with tickets, and upgrade a facility. Pure, like every rule.
+// Facility work over the save (S4, D55, D144): put an Uma in a slot to gather, refine, craft or cut, collect what she has
+// made (with her Craft EXP), recall her, rush a job with tickets, and upgrade a facility. Pure, like every rule.
 import { facilitySpec, jobEndsAt, jobFinished, type Facility, type Job } from '../economy/jobs'
 import {
   jobExp, makeMinutes, maxJobCount, refineMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MINUTE,
-  PROFESSION_MAX_LEVEL, professionExpToNext, TIME_TICKET_SPAN, timeTicketsToFinish, type Profession,
+  PROFESSION_MAX_LEVEL, professionExpToNext, TIME_TICKET_SPAN, timeTicketsToFinish,
 } from '../economy/pacing'
 import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
-import { dishById } from '../economy/dishes'
+import { gemById } from '../economy/gems'
 import { gearById } from '../economy/gear'
 import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
 import { stockName } from '../economy/stock'
@@ -25,7 +25,7 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Profession EXP in: levels up, banking EXP at Lv50. */
+/** Craft EXP in: levels up, banking EXP at Lv50. */
 export function grantProfessionExp(p: ProfessionLevel, exp: number): ProfessionLevel {
   let { level } = p
   let bank = p.exp + Math.max(0, Math.floor(exp))
@@ -44,7 +44,6 @@ export interface JobPlan {
   output: { id: string; name: string; grade: number }
   /** The raw or refined item, when it makes one. */
   item: ItemDef | null
-  profession: Profession
   /** Real milliseconds per item for this Uma here. */
   msEach: number
   expEach: number
@@ -54,28 +53,26 @@ export interface JobPlan {
   block: string | null
 }
 
-/** What a gather, refine or cook job would be: its speed for this Uma, its EXP, inputs and anything stopping it. */
+/** What a gather, refine, craft or cut job would be: its speed for this Uma, its EXP, inputs and anything stopping it. */
 export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count = 1): JobPlan | null {
   const spec = facilitySpec(placeId)
-  if (spec?.kind === 'cook') return planCooking(world, placeId, outfit, output, count)
-  if (spec?.kind === 'craft') return planCrafting(world, placeId, outfit, output, count)
+  if (spec?.kind === 'craft' || spec?.kind === 'cut') return planMaking(world, placeId, outfit, output, count)
   const item = itemById(output)
   const uma = world.umas[outfit.outfitId]
-  if (!spec || !item || !uma || !spec.profession || (spec.kind !== 'gather' && spec.kind !== 'refine')) return null
-  const profession = spec.profession
+  if (!spec || !item || !uma) return null
   const facility = facilityOf(world, placeId)
-  // Her profession level sets the time, whatever the grade (D139); EXP follows the job's own minutes (2 a minute), so a
+  // Her Craft Level sets the time, whatever the grade (D139); EXP follows the job's own minutes (2 a minute), so a
   // faster job pays less per item and the same per hour (D101).
-  const level = uma.professions[profession].level
+  const level = uma.craft.level
   const minutes = spec.kind === 'refine' ? refineMinutes(level) : itemMinutes(level)
   const msEach = msFor(minutes, facility.level)
   const inputs: Record<string, number> = spec.kind === 'refine' ? { [item.pair]: 1 } : {}
   let block: string | null = null
   if (spec.kind === 'gather' && (item.refined || item.family !== spec.family)) block = 'Not made here'
-  else if (spec.kind === 'refine' && (!item.refined || item.side !== profession)) block = 'Not refined here'
-  else if (uma.professions[profession].level < gradeUnlockLevel(item.grade)) block = `Needs ${profession === 'farming' ? 'Farm' : 'Craft'} Lv${gradeUnlockLevel(item.grade)}`
+  else if (spec.kind === 'refine' && !item.refined) block = 'Not refined here'
+  else if (level < gradeUnlockLevel(item.grade)) block = `Needs Craft Lv${gradeUnlockLevel(item.grade)}`
   else if (spec.kind === 'refine' && (world.items[item.pair] ?? 0) < count) block = `Needs ${count} ${itemById(item.pair)?.name ?? item.pair}`
-  return { output: { id: item.id, name: item.name, grade: item.grade }, item, profession, msEach, expEach: jobExp(minutes), inputs, block }
+  return { output: { id: item.id, name: item.name, grade: item.grade }, item, msEach, expEach: jobExp(minutes), inputs, block }
 }
 
 /** Why the Warehouse can't cover `count` sets of these inputs, or null. */
@@ -86,28 +83,16 @@ export function inputsBlock(world: TierWorld, inputs: Record<string, number>, co
   return null
 }
 
-/** A piece of gear at the Forge (S7): Gathering & Crafting, three items' time, its materials. */
-function planCrafting(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
-  const piece = gearById(output)
+/** A piece of gear at the Forge (S7) or a Star Gem at the Lapidary (D144): two items' time, its refined materials. */
+function planMaking(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
+  const made = facilitySpec(placeId)!.kind === 'craft' ? gearById(output) : gemById(output)
   const uma = world.umas[outfit.outfitId]
-  if (!piece || !uma) return null
+  if (!made || !uma) return null
   const facility = facilityOf(world, placeId)
-  const minutes = makeMinutes(uma.professions.gathering.level)
+  const minutes = makeMinutes(uma.craft.level)
   const msEach = msFor(minutes, facility.level)
-  const block = uma.professions.gathering.level < gradeUnlockLevel(piece.grade) ? `Needs Craft Lv${gradeUnlockLevel(piece.grade)}` : inputsBlock(world, piece.inputs, count)
-  return { output: { id: piece.id, name: piece.name, grade: piece.grade }, item: null, profession: 'gathering', msEach, expEach: jobExp(minutes), inputs: piece.inputs, block }
-}
-
-/** A dish at the Kitchen (S6): Farming & Cooking, three items' time, its recipe's refined ingredients. */
-function planCooking(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
-  const dish = dishById(output)
-  const uma = world.umas[outfit.outfitId]
-  if (!dish || !uma) return null
-  const facility = facilityOf(world, placeId)
-  const minutes = makeMinutes(uma.professions.farming.level)
-  const msEach = msFor(minutes, facility.level)
-  const block = uma.professions.farming.level < gradeUnlockLevel(dish.grade) ? `Needs Farm Lv${gradeUnlockLevel(dish.grade)}` : inputsBlock(world, dish.inputs, count)
-  return { output: { id: dish.id, name: dish.name, grade: dish.grade }, item: null, profession: 'farming', msEach, expEach: jobExp(minutes), inputs: dish.inputs, block }
+  const block = uma.craft.level < gradeUnlockLevel(made.grade) ? `Needs Craft Lv${gradeUnlockLevel(made.grade)}` : inputsBlock(world, made.inputs, count)
+  return { output: { id: made.id, name: made.name, grade: made.grade }, item: null, msEach, expEach: jobExp(minutes), inputs: made.inputs, block }
 }
 
 /** Why this Uma can't take a job now, or null: she works one job at a time. Fighting doesn't stop her (D119). */
@@ -193,16 +178,15 @@ function collectOne(world: TierWorld, placeId: string, slot: number, job: Job, n
   const spec = facilitySpec(placeId)!
   const done = finished >= job.count
   if (ready <= 0) return { world: done ? setJob(world, placeId, slot, null) : world, got: { items: 0, exp: 0, levelsUp: 0, done } }
-  let next: TierWorld = job.kind === 'cook' ? { ...world, dishes: give(world.dishes, job.output, ready) }
-    : job.kind === 'craft' ? { ...world, gear: give(world.gear, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
+  let next: TierWorld = spec.kind === 'cut' ? { ...world, gems: give(world.gems, job.output, ready) }
+    : spec.kind === 'craft' ? { ...world, gear: give(world.gear, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
   let levelsUp = 0
   const exp = ready * job.expEach
   const uma = next.umas[job.outfitId]
-  if (uma && spec.profession) {
-    const before = uma.professions[spec.profession]
-    const after = grantProfessionExp(before, exp)
-    levelsUp = after.level - before.level
-    next = { ...next, umas: { ...next.umas, [job.outfitId]: { ...uma, professions: { ...uma.professions, [spec.profession]: after } } } }
+  if (uma) {
+    const after = grantProfessionExp(uma.craft, exp)
+    levelsUp = after.level - uma.craft.level
+    next = { ...next, umas: { ...next.umas, [job.outfitId]: { ...uma, craft: after } } }
   }
   next = setJob(next, placeId, slot, done ? null : { ...job, collected: finished })
   return { world: next, got: { items: ready, exp, levelsUp, done } }
@@ -234,7 +218,7 @@ export function collectAll(save: Save, now: string, placeIds?: readonly string[]
 
 /**
  * Queues another job after the slot's current one, for the same Uma: same kind of work, planned now (speed fixed with
- * her profession level and today's facility level), inputs taken when it starts.
+ * her Craft Level and today's facility level), inputs taken when it starts.
  */
 export function queueJob(save: Save, placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)

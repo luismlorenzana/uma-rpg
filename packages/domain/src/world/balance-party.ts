@@ -11,7 +11,7 @@ import {
   type RpgClass, type RpgNodeRef, type RpgProfile,
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
-import { starPoints } from '../economy/dishes'
+import { starPoints } from '../economy/stars'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
 import { ARMOR_SLOT_KINDS, ARMOR_SLOTS } from '../economy/ranks'
@@ -32,7 +32,7 @@ const KIT: Readonly<Record<RpgClass, { magical: readonly boolean[]; accessories:
   summoner: { magical: [true, true, true, true, true], accessories: ['amulet-spring', 'amulet-veil'], stats: ['matk', 'hp', 'def', 'mdef'] },
 }
 
-/** Her active Extra Stats nodes: the moons her level and the dish grades allow, the best first, across her kit's stats. */
+/** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats. */
 export function onCurveStars(classId: RpgClass, level: number): string[] {
   const grade = onCurveGrade(level)
   const slots = 5 + Math.floor(level / 2)

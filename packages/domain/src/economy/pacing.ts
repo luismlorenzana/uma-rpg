@@ -6,13 +6,11 @@ export const HOUR = 60 * MINUTE
 
 // --- Professions (design §4, §8.5) ----------------------------------------------------------------------------------
 
-/** The two verticals, shown as **Farm Level** (farming, refining food, cooking) and **Craft Level** (gathering,
- * refining materials, crafting), D60. They share one curve (parity, §8.5). */
-export const PROFESSIONS = ['farming', 'gathering'] as const
-export type Profession = typeof PROFESSIONS[number]
-export const PROFESSION_LABEL: Readonly<Record<Profession, string>> = { farming: 'Farm Level', gathering: 'Craft Level' }
-/** Short names, as in "Farm Lv 6". */
-export const PROFESSION_SHORT: Readonly<Record<Profession, string>> = { farming: 'Farm', gathering: 'Craft' }
+/** Each Uma's one profession (D60, D144): **Craft Level**, raised by every job at the Wilds sites, the Workbench, the Forge
+ * and the Lapidary. */
+export const CRAFT_LABEL = 'Craft Level'
+/** The short name, as in "Craft Lv 6". */
+export const CRAFT_SHORT = 'Craft'
 export const PROFESSION_MAX_LEVEL = 50
 
 /** EXP from level L to L+1 (D96): 12 hours of work at Lv1, an eighth of an hour more each level, 18 at Lv49. Lv46
@@ -34,30 +32,30 @@ export const itemMinutes = (level: number): number => {
   const l = Math.min(PROFESSION_MAX_LEVEL, Math.max(1, Math.floor(level)))
   return GATHER_MINUTES.atFirst - ((GATHER_MINUTES.atFirst - GATHER_MINUTES.atMax) * (l - 1)) / (PROFESSION_MAX_LEVEL - 1)
 }
-/** Refining takes a quarter of gathering's time (D101), so one Pantry or Workbench keeps up with its eight sites. Like
+/** Refining takes a quarter of gathering's time (D101), so the Workbench keeps up with the eight sites. Like
  * every job it pays EXP for its own minutes only, so an hour of refining levels exactly as fast as an hour of gathering. */
 export const REFINE_SHARE = 0.25
 /** Minutes to refine one item at a profession level: 13½ at Lv1, 9 at Lv50. */
 export const refineMinutes = (level: number): number => itemMinutes(level) * REFINE_SHARE
-/** Minutes to cook a dish or craft a piece of gear at a profession level: two items' worth (S6, S7, D65). */
+/** Minutes to craft a piece of gear or cut a Star Gem at a Craft Level: two items' worth (S7, D65, D144). */
 export const makeMinutes = (level: number): number => 2 * itemMinutes(level)
 /** Profession EXP a job pays per item: 2 a minute of its time at her level, before a facility's speed (D96, D139). */
 export const jobExp = (minutes: number): number => Math.round(minutes * EXP_PER_MINUTE)
 
-/** Gathering, cooking and crafting make 1–10 items a job (D65). */
+/** Gathering, crafting and cutting make 1–10 items a job (D65). */
 export const MAX_JOB_COUNT = 10
 /** Refining, at a quarter of the time, comes in these batches (D139): a ×40 refine takes as long as a 10-item gather. */
 export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
 /** The most items one new job of a kind makes. */
-export const maxJobCount = (kind: 'gather' | 'refine' | 'cook' | 'craft'): number => (kind === 'refine' ? REFINE_BATCHES.at(-1)! : MAX_JOB_COUNT)
+export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number => (kind === 'refine' ? REFINE_BATCHES.at(-1)! : MAX_JOB_COUNT)
 /** Saves from before D65 may hold jobs of up to 50. */
 export const MAX_SAVED_JOB_COUNT = 50
 
 // --- Facilities (§9) -------------------------------------------------------------------------------------------
 
 export const FACILITY_MAX_LEVEL = 3
-/** Uma slots and speed by facility level: 2 slots, then 3, then 3 working a quarter faster. */
-export const FACILITY_SLOTS = [2, 3, 3] as const
+/** Uma slots and speed by facility level: 3 slots, then 4, then 5 working a quarter faster (D144; 2, 3, 3 before). */
+export const FACILITY_SLOTS = [3, 4, 5] as const
 export const FACILITY_SPEED = [1, 1, 1.25] as const
 /** Upgrading to level 2 or 3: Laurels plus refined items of the grade named, from the facility's two families. */
 export const FACILITY_UPGRADE = [

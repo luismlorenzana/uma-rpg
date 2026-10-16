@@ -236,6 +236,9 @@ describe('save parsing', () => {
       delete uma.classes
       uma.build = null
       uma.builds = { 'axe-bow': { tree: ['axe.ice.1'], loadout: ['axe.ice.1'], familiar: 'greatsword' } }
+      // Before v21 an Uma had professions, not a Craft Level (D144).
+      uma.professions = { gathering: uma.craft }
+      delete uma.craft
     }
     old.tierWorlds['1'].umas['102'].build = 'axe-bow'
     old.tierWorlds['1'].world.run.battle.input.version = 5

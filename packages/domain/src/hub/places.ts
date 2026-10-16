@@ -1,17 +1,16 @@
-// The place registry (D33): every place on the Hub's four pages, one source for the map, the hit targets, the global
-// menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
+// The place registry (D33, D144): every place on the Hub's three pages, one source for the map, the hit targets, the
+// global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
 
-export const HUB_PAGES = ['farmlands', 'wilds', 'learning', 'town'] as const
+export const HUB_PAGES = ['wilds', 'learning', 'town'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
 
 export const HUB_PAGE_NAMES: Record<HubPage, string> = {
-  farmlands: 'Farmlands',
   wilds: 'Wilds',
   learning: 'Learning',
   town: 'Town',
 }
 
-export type PlaceKind = 'farm-site' | 'gather-site' | 'station' | 'class-hall' | 'armory' | 'town'
+export type PlaceKind = 'gather-site' | 'station' | 'class-hall' | 'armory' | 'town'
 
 export const SLICES = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'] as const
 export type SliceId = (typeof SLICES)[number]
@@ -21,9 +20,9 @@ export const SLICE_GOALS: Record<SliceId, string> = {
   S1: 'The Hub and foundation',
   S2: 'Collection and parties: unlock Umas, build parties',
   S3: 'Battles and leveling: fight chapters, level Umas, earn Shards and Laurels',
-  S4: 'Farmlands and Wilds: timed jobs, professions, refining and the Exchange',
+  S4: 'The Wilds: timed jobs, Craft Level, refining and the Exchange',
   S5: 'Learning District: class ranks, Weapon, Armor and Accessory Levels',
-  S6: 'Kitchen and Extra Stats: cooking and the Sun-and-planets map',
+  S6: 'Extra Stats: Star Gems and the Sun-and-planets map',
   S7: 'Forge and equipment: crafting and bound gear',
   S8: 'Tier Finale and promotion into Tier 2',
 }
@@ -42,17 +41,16 @@ export interface Place {
   opensIn: SliceId
   /** Center on the page map, as fractions of its width and height. */
   at: { x: number; y: number }
-  /** The place's twin on the mirrored page (Farmlands ↔ Wilds, D-design §9). */
-  mirrorOf?: string
   /** Reachable by URL and menu, but not drawn on the map (the Account). */
   hidden?: boolean
 }
 
-/** Farmlands and Wilds share one layout, site for site. Index = position. */
-const MIRROR_LAYOUT: readonly { x: number; y: number }[] = [
+/** The Wilds' layout: eight sites in two columns, the Workbench and the Forge in the middle row with the Lapidary between
+ * them. Index = position. */
+const WILDS_LAYOUT: readonly { x: number; y: number }[] = [
   { x: 0.24, y: 0.1 }, { x: 0.74, y: 0.12 },
   { x: 0.2, y: 0.3 }, { x: 0.76, y: 0.32 },
-  { x: 0.3, y: 0.51 }, { x: 0.7, y: 0.51 },
+  { x: 0.22, y: 0.51 }, { x: 0.78, y: 0.51 },
   { x: 0.22, y: 0.71 }, { x: 0.78, y: 0.7 },
   { x: 0.26, y: 0.9 }, { x: 0.74, y: 0.9 },
 ]
@@ -65,17 +63,6 @@ interface SiteSpec {
   firstItems: string
 }
 
-const FARM_SITES: SiteSpec[] = [
-  { id: 'fields', name: 'Fields', family: 'Grains', effect: 'HP', firstItems: 'Wheat, Oats, Barley…' },
-  { id: 'orchard', name: 'Orchard', family: 'Fruits', effect: 'MP', firstItems: 'Apple, Pear, Peach…' },
-  { id: 'fishery', name: 'Fishery', family: 'Fish', effect: 'ATK', firstItems: 'Carp, Trout, Sardine…' },
-  { id: 'herb-garden', name: 'Herb Garden', family: 'Herbs & Spices', effect: 'M.ATK', firstItems: 'Basil, Mint, Rosemary…' },
-  { id: 'vegetable-garden', name: 'Vegetable Garden', family: 'Vegetables', effect: 'DEF', firstItems: 'Carrot, Potato, Cabbage…' },
-  { id: 'mushroom-cave', name: 'Mushroom Cave', family: 'Mushrooms', effect: 'M.DEF', firstItems: 'Button Mushroom, Shiitake…' },
-  { id: 'sugar-grove', name: 'Sugar Grove', family: 'Sweets', effect: 'Speed', firstItems: 'Honeycomb, Sugarcane…' },
-  { id: 'nut-grove', name: 'Nut Grove', family: 'Nuts & Seeds', effect: 'Limit Break charge', firstItems: 'Peanut, Sunflower Seed…' },
-]
-
 const GATHER_SITES: SiteSpec[] = [
   { id: 'monster-den', name: 'Monster Den', family: 'Hides & Scales', effect: 'HP', firstItems: 'Puffbun Pelt, Boarling Hide…' },
   { id: 'ley-spring', name: 'Ley Spring', family: 'Essences', effect: 'MP', firstItems: 'Mist Essence, Dew Essence…' },
@@ -87,54 +74,46 @@ const GATHER_SITES: SiteSpec[] = [
   { id: 'fossil-dig', name: 'Fossil Dig', family: 'Bones & Horns', effect: 'Limit Break charge', firstItems: 'Seashell, Ammonite…' },
 ]
 
-/** Map positions for each side: sites take the outer slots, the two stations the middle row. */
+/** Map positions: sites take the outer slots, the Workbench and the Forge the middle row's ends. */
 const SITE_SLOTS = [0, 1, 2, 3, 6, 7, 8, 9] as const
 const STATION_SLOTS = [4, 5] as const
+/** Uma slots at facility level 1 (pacing.ts `FACILITY_SLOTS`; this module stays free of the economy). */
+const FIRST_SLOTS = 3
 
-function sites(page: HubPage, kind: PlaceKind, specs: SiteSpec[], mirrors: SiteSpec[], verb: string): Place[] {
+function sites(specs: SiteSpec[]): Place[] {
   return specs.map((s, i) => ({
     id: s.id,
-    page,
-    kind,
+    page: 'wilds',
+    kind: 'gather-site',
     name: s.name,
-    blurb: `${verb} ${s.family.toLowerCase()} while you're away, for the ${s.effect} stat.`,
-    details: [`Produces ${s.family}: ${s.firstItems}`, `Effect family: ${s.effect}`, 'Two Uma slots; more with upgrades'],
-    slots: 2,
+    blurb: `Gathers ${s.family.toLowerCase()} while you're away, for the ${s.effect} stat.`,
+    details: [`Produces ${s.family}: ${s.firstItems}`, `Effect family: ${s.effect}`, 'Three Uma slots; more with upgrades'],
+    slots: FIRST_SLOTS,
     opensIn: 'S4',
-    at: MIRROR_LAYOUT[SITE_SLOTS[i] ?? 0] ?? { x: 0.5, y: 0.5 },
-    mirrorOf: mirrors[i]?.id,
+    at: WILDS_LAYOUT[SITE_SLOTS[i] ?? 0] ?? { x: 0.5, y: 0.5 },
   }))
 }
 
-const FARMLANDS: Place[] = [
-  ...sites('farmlands', 'farm-site', FARM_SITES, GATHER_SITES, 'Grows'),
-  {
-    id: 'pantry', page: 'farmlands', kind: 'station', name: 'Pantry', opensIn: 'S4', slots: 2, mirrorOf: 'workbench',
-    blurb: 'Refines raw ingredients, one into one: wheat into flour, fruit into preserves.',
-    details: ['Refines every farming family', 'Raises Farm Level'],
-    at: MIRROR_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
-  },
-  {
-    id: 'kitchen', page: 'farmlands', kind: 'station', name: 'Kitchen', opensIn: 'S6', slots: 2, mirrorOf: 'forge',
-    blurb: 'Cooks dishes that grow Extra Stats.',
-    details: ['Dishes, Duo dishes and Feasts', 'Feeds the Observatory’s Sun-and-planets map'],
-    at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
-  },
-]
-
 const WILDS: Place[] = [
-  ...sites('wilds', 'gather-site', GATHER_SITES, FARM_SITES, 'Gathers'),
+  ...sites(GATHER_SITES),
   {
-    id: 'workbench', page: 'wilds', kind: 'station', name: 'Workbench', opensIn: 'S4', slots: 2, mirrorOf: 'pantry',
+    id: 'workbench', page: 'wilds', kind: 'station', name: 'Workbench', opensIn: 'S4', slots: FIRST_SLOTS,
     blurb: 'Refines raw materials, one into one: ore into ingots, logs into planks.',
-    details: ['Refines every gathering family', 'Raises Craft Level'],
-    at: MIRROR_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
+    details: ['Refines every Wilds family', 'Raises Craft Level'],
+    at: WILDS_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
   },
   {
-    id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: 2, mirrorOf: 'kitchen',
+    id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: FIRST_SLOTS,
     blurb: 'Crafts weapons, armor and accessories.',
-    details: ['Four refined items of the grade; Craft Level sets the grades she can make', 'Weapons, armor and Orbs in ten grades'],
-    at: MIRROR_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
+    details: ['Two refined items of the grade; Craft Level sets the grades she can make', 'Weapons, armor and accessories in ten grades'],
+    at: WILDS_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
+  },
+  {
+    id: 'lapidary', page: 'wilds', kind: 'station', name: 'Lapidary', opensIn: 'S6', slots: FIRST_SLOTS,
+    blurb: 'Cuts Star Gems that open nodes on an Uma’s Extra Stats map.',
+    details: ['Moon, bridge and Sun gems in ten grades, from refined Wilds items', 'Set them at the Observatory'],
+    // On the trunk road between the Workbench and the Forge, a row below the upper sites' roads so it never cuts one.
+    at: { x: 0.5, y: 0.5 },
   },
 ]
 
@@ -174,8 +153,8 @@ const TOWN: Place[] = [
   },
   {
     id: 'warehouse', page: 'town', kind: 'town', name: 'Warehouse', opensIn: 'S4', slots: 0, at: { x: 0.24, y: 0.6 },
-    blurb: 'Every item you own: ingredients, materials, dishes and gear.',
-    details: ['160 raw and 160 refined items across 16 families', 'Filled by the sites, the Pantry, the Workbench and the Exchange'],
+    blurb: 'Every item you own: materials, Star Gems and gear.',
+    details: ['80 raw and 80 refined items across 8 families', 'Filled by the sites, the Workbench, the Forge, the Lapidary and the Exchange'],
   },
   {
     id: 'exchange', page: 'town', kind: 'town', name: 'Exchange', opensIn: 'S4', slots: 0, at: { x: 0.76, y: 0.6 },
@@ -185,7 +164,7 @@ const TOWN: Place[] = [
   {
     id: 'observatory', page: 'town', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.25, y: 0.86 },
     blurb: "Each Uma's Extra Stats map: a Sun, eight planets and their moons.",
-    details: ['100 nodes per Uma per tier', 'Dishes unlock nodes; level sets how many are active'],
+    details: ['100 nodes per Uma per tier', 'Star Gems open nodes; level sets how many are active'],
   },
   {
     id: 'tier-finale', page: 'town', kind: 'town', name: 'Tier Finale', opensIn: 'S8', slots: 0, at: { x: 0.75, y: 0.86 },
@@ -199,7 +178,7 @@ const TOWN: Place[] = [
   },
 ]
 
-export const PLACES: readonly Place[] = [...FARMLANDS, ...WILDS, ...LEARNING, ...TOWN]
+export const PLACES: readonly Place[] = [...WILDS, ...LEARNING, ...TOWN]
 
 const BY_ID = new Map(PLACES.map((p) => [p.id, p]))
 

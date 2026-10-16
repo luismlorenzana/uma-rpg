@@ -11,9 +11,9 @@ specified. The world map (D72) changed the frame: a tier is now a world of five 
 
 **Q7** (`docs/open-questions.md`): a third profession vertical, and in which tier?
 
-**Recommendation:** let Tier 2 introduce it as its new mechanic. The two existing verticals are Farming + Cooking
-and Gathering + Crafting (§8), so Tier 2 could add a third, for example Fishing + Alchemy, with its own families
-feeding new recipes. Tier 3's mechanic stays open until Tier 2 is played.
+**Recommendation:** let Tier 2 introduce it as its new mechanic. Since D144 there is one vertical, Craft Level
+(gathering, refining, crafting and cutting Star Gems), so Tier 2 could add a second with its own families feeding new
+recipes. Tier 3's mechanic stays open until Tier 2 is played.
 
 ## Then (Claude, with the owner)
 

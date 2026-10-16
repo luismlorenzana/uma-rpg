@@ -1,6 +1,7 @@
 // Legacy migrations are needed only for old saves, not every current-save boot (H16).
-import { PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
-import { ITEM_IDENTITIES as ITEM_FAMILIES } from '../items/identity'
+import { FACILITY_SLOTS, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
+import { facilitySpec } from '../economy/jobs'
+import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
 import { gearById } from '../economy/gear'
 
 /** Class ranks topped out at 5 from v13 to v17 (D77). */
@@ -178,8 +179,8 @@ function toV15(world: Record<string, unknown>): Record<string, unknown> {
 /** EXP from level L to L+1 before D96, kept to carry levels over. */
 const OLD_PROFESSION_EXP = (level: number): number => 20 + 6 * level
 /**
- * v15 → v16 (D96): the profession curve is ten times longer. Jobs still pay the same EXP per minute of work, so every Farm
- * and Craft Level carries its EXP over whole and lands at the level that work earns on the new curve.
+ * v15 → v16 (D96): the profession curve is ten times longer. Jobs still pay the same EXP per minute of work, so every
+ * profession level carries its EXP over whole and lands at the level that work earns on the new curve.
  */
 function toV16(world: Record<string, unknown>): Record<string, unknown> {
   const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>
@@ -206,7 +207,45 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v16 = version < 16 && isRecord(v15) ? toV16(v15) : v15
   const v18 = version < 18 && isRecord(v16) ? toV18(v16, version) : v16
   const v19 = version < 19 && isRecord(v18) ? toV19(v18) : v18
-  return version < 20 && isRecord(v19) ? toV20(v19) : v19
+  const v20 = version < 20 && isRecord(v19) ? toV20(v19) : v19
+  return version < 21 && isRecord(v20) ? toV21(v20) : v20
+}
+
+// --- v20 → v21 (D144) -------------------------------------------------------------------------------------------------
+
+/** A v21 tier world's keys, apart from the new Star Gem shelf. */
+const V21_KEYS = ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'gear', 'targets', 'heroes']
+/** Only ids the item catalog still knows; anything malformed is left for the strict parse to reject. */
+const knownItems = (items: unknown): unknown => (isRecord(items) ? Object.fromEntries(Object.entries(items).filter(([id]) => isItemId(id))) : items)
+/**
+ * One profession and Star Gems (D144). Each Uma's Craft Level is the higher of her two profession levels, with its EXP.
+ * Only items the catalog still knows and places that are still facilities stay, with their levels and jobs, and each
+ * facility gains the slots its level now has; any other shelf goes and the Star Gem shelf starts empty. Opened Extra
+ * Stats nodes stay. Nothing here names what was dropped.
+ */
+function toV21(world: Record<string, unknown>): Record<string, unknown> {
+  const w: Record<string, unknown> = { ...Object.fromEntries(V21_KEYS.filter((k) => k in world).map((k) => [k, world[k]])), items: knownItems(world.items), gems: {} }
+  if (isRecord(w.umas)) {
+    w.umas = Object.fromEntries(Object.entries(w.umas).map(([id, raw]) => {
+      if (!isRecord(raw) || !('professions' in raw)) return [id, raw]
+      const { professions, ...uma } = raw
+      const levels = (isRecord(professions) ? Object.values(professions) : [])
+        .filter((p): p is { level: number; exp: number } => isRecord(p) && typeof p.level === 'number' && typeof p.exp === 'number')
+      const craft = levels.reduce<{ level: number; exp: number } | undefined>((best, p) => (!best || p.level > best.level || (p.level === best.level && p.exp > best.exp) ? p : best), undefined)
+      return [id, craft ? { ...uma, craft: { level: craft.level, exp: craft.exp } } : uma]
+    }))
+  }
+  if (isRecord(w.facilities)) {
+    w.facilities = Object.fromEntries(Object.entries(w.facilities).filter(([place]) => facilitySpec(place)).map(([place, raw]) => {
+      if (!isRecord(raw) || !Array.isArray(raw.jobs) || typeof raw.level !== 'number') return [place, raw]
+      const jobs = raw.jobs.map((job: unknown) => (isRecord(job)
+        ? { ...job, inputs: knownItems(job.inputs), queue: Array.isArray(job.queue) ? job.queue.map((q: unknown) => (isRecord(q) ? { ...q, inputs: knownItems(q.inputs) } : q)) : job.queue }
+        : job))
+      const slots = FACILITY_SLOTS[raw.level - 1] ?? jobs.length
+      return [place, { ...raw, jobs: [...jobs, ...Array.from({ length: Math.max(0, slots - jobs.length) }, () => null)] }]
+    }))
+  }
+  return w
 }
 
 // --- v18 → v19 (D106) --------------------------------------------------------------------------------------------------
@@ -269,8 +308,8 @@ function armorSlotOf(id: string): { slot: string; kind: string } | null {
 /**
  * v17 → v18 (D102–D105), and the owner's progress reset with it: every stage win, the open fight and Spring uses go;
  * every Uma is back to Lv 1 with every Class, Weapon and Armor Rank at 1, no learned side skills and skills chosen for
- * her. Kept: unlocked Umas and parties, each Uma's class and weapon slots, Farm and Craft Levels, opened Extra Stats nodes
- * (five active, Lv 1's slots), items, dishes, facilities and their jobs, Laurels and tickets, targets. Tokens go; gear is
+ * her. Kept: unlocked Umas and parties, each Uma's class and weapon slots, profession levels, opened Extra Stats nodes
+ * (five active, Lv 1's slots), items and every shelf, facilities and their jobs, Laurels and tickets, targets. Tokens go; gear is
  * renamed (Rings and Charms give their materials back); training jobs end; Marks start at 0.
  */
 function toV18(world: Record<string, unknown>, version: number): Record<string, unknown> {
@@ -330,7 +369,7 @@ function toV18(world: Record<string, unknown>, version: number): Record<string, 
       }
     }
   }
-  // Facilities: the training halls stop being facilities; Forge jobs make renamed pieces; dishes need no token.
+  // Facilities: the training halls stop being facilities; Forge jobs make renamed pieces; no job takes a token.
   if (isRecord(w.facilities)) {
     for (const hall of TRAINING_HALLS) delete w.facilities[hall]
     for (const f of Object.values(w.facilities)) {

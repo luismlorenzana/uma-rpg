@@ -26,9 +26,9 @@ const KEY = 'rpg.lastPage'
 export function lastPage(): HubPage {
   try {
     const value = localStorage.getItem(KEY)
-    return (HUB_PAGES as readonly string[]).includes(value ?? '') ? (value as HubPage) : 'farmlands'
+    return (HUB_PAGES as readonly string[]).includes(value ?? '') ? (value as HubPage) : 'wilds'
   } catch {
-    return 'farmlands'
+    return 'wilds'
   }
 }
 
@@ -36,6 +36,6 @@ export function rememberPage(page: HubPage): void {
   try {
     localStorage.setItem(KEY, page)
   } catch {
-    // Storage blocked: the Hub just opens on Farmlands next time.
+    // Storage blocked: the Hub just opens on the Wilds next time.
   }
 }

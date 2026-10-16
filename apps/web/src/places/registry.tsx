@@ -50,12 +50,12 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   },
 }
 
-// Every gathering site and refining station shares one page (S4).
+// Every site and station shares one page (S4).
 const FacilityPage = lazy(() => import('./work/FacilityPage'))
 const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ default: m.FacilityPeek })))
 // Every working facility shares one page (S4).
 for (const f of FACILITIES) {
-  if (f.kind === 'gather' || f.kind === 'refine' || f.kind === 'cook' || f.kind === 'craft') PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
+  PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
 }
 
 // The five Halls of Heroes share one page (D106).

@@ -14,8 +14,8 @@ is no promotion yet, and the Tier Finale is a locked place.
    Shards ─► Tickets                                      Exchange: raw items, tickets, Manuals
                                                                   │
                                                                   ▼
-                                            gather ─► refine ─► cook (dishes ─► Extra Stats)
-                                                              └─► craft (weapons, armor, Orbs)
+                                            gather ─► refine ─► cut (Star Gems ─► Extra Stats)
+                                                              └─► craft (weapons, armor, accessories)
                                     └────────► a stronger party fights higher levels
 ```
 
@@ -34,7 +34,7 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 ## Leveling
 
 <!-- live:levels -->
-| Level | Uma EXP to next | Profession EXP to next |
+| Level | Uma EXP to next | Craft EXP to next |
 |---|---|---|
 | 1 | 136 | 1440 |
 | 8 | 248 | 1545 |
@@ -44,7 +44,7 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 | 36 | 696 | 1965 |
 | 43 | 808 | 2070 |
 
-Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × her own EXP to next level, −10% per level she's above the foes (down to 10%), never more than 100%. Shards at Lv 10, 20, 30, 40, 50. Profession EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
+Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × her own EXP to next level, −10% per level she's above the foes (down to 10%), never more than 100%. Shards at Lv 10, 20, 30, 40, 50. Craft EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
 <!-- /live -->
 
 - Level cap 50. At Lv 50 EXP keeps banking; nothing spends it yet (it's planned for promotion).
@@ -143,36 +143,31 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 A Time Ticket takes 30 minutes off a running job. A Manual costs 1,000 Marks, not Laurels.
 <!-- /live -->
 
-Selling pays 2 + 2g for a raw item, 4 + 4g refined, and 6 + 6g for a dish or unbound gear. Bound
+Selling pays 2 + 2g for a raw item, 4 + 4g refined, and 6 + 6g for a Star Gem or unbound gear. Bound
 gear can't be sold. The Exchange stocks raw grades 2n−1 and 2n once a stage on continent n has been won, up to 99 per
 purchase.
 
-## Professions
+## Craft Level
 
-Two professions with one curve, raised by jobs at the facilities ([sections](sections.md#facilities)):
+Each Uma has one profession, **Craft Level** (save key `craft`, D144), raised by every job at the Wilds: the eight
+sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilities)).
 
-| Profession | Save key | Facilities |
-|---|---|---|
-| **Farm Level** | `farming` | The eight farm sites, the Pantry, the Kitchen |
-| **Craft Level** | `gathering` | The eight Wilds sites, the Workbench, the Forge |
-
-- **Grades:** grade k opens at profession Lv 5k − 4 (1, 6, 11 … 46).
-- **Speed (D139):** set by the profession level alone, the same for every grade and every Uma. Aptitude doesn't
-  matter.
+- **Grades:** grade k opens at Craft Lv 5k − 4 (1, 6, 11 … 46), for gathering, refining, crafting and cutting alike.
+- **Speed (D139):** set by her Craft Level alone, the same for every grade and every Uma. Aptitude doesn't matter.
   - Gathering one item takes 54 minutes at Lv1, falling evenly to 36 at Lv50, so ten take 9 hours at Lv1 and 6 at Lv50.
     Umas of the same level finish together.
   - A new grade comes at the speed its level gives: G10 (Lv46) is already near the floor.
-  - Refining takes a quarter of that (D101); cooking and crafting take twice that.
+  - Refining takes a quarter of that (D101); crafting and cutting take twice that.
   - A level-3 facility works a quarter faster.
 - **Pace (D96):** a level takes 12 hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Working without a
   break, an Uma gains about 2 levels a day early on and reaches Lv50 in about a month (24 days at a level-3 facility).
   Batch size doesn't change it: EXP is paid per minute of work.
 - **A job:**
   - An Uma makes its outputs one after another, and takes up a slot until it's done or recalled.
-  - **Batches (D139):** gathering, cooking and crafting make 1–10; refining makes ×1, ×4, ×8, ×20 or ×40, so a ×40
+  - **Batches (D139):** gathering, crafting and cutting make 1–10; refining makes ×1, ×4, ×8, ×20 or ×40, so a ×40
     refine takes as long as a 10-item gather.
   - Inputs are reserved at the start.
-  - Profession EXP is 2 per minute of the job at her level, before the facility's speed, so every job levels at the
+  - Craft EXP is 2 per minute of the job at her level, before the facility's speed, so every job levels at the
     same rate per hour.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma. If the Warehouse can't cover the
   next one, the queue drops.
@@ -183,31 +178,32 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
   takes from it:
   - **The Forge:** every grade above the best she has bound, up to 10, on her class's five weapons, her five armor
     slots' kinds and the type in each accessory slot (an empty one plans nothing).
-  - **The Kitchen:** a dish for each Extra Stats node she hasn't opened.
-  - **The Pantry, Workbench and sites:** the refined and raw items those still need.
+  - **The Lapidary:** a Star Gem for each Extra Stats node she hasn't opened.
+  - **The Workbench and sites:** the refined and raw items those still need.
   - **Each line** shows the total need, what's in the Warehouse and what's coming. It stays until the Warehouse holds
     enough, then goes.
-  - **Cascade:** only what's still short (not in stock, not being made) reaches the ingredients, so when a line is
+  - **Cascade:** only what's still short (not in stock, not being made) reaches the materials, so when a line is
     covered every line below it for that need goes too.
   - **Stock held by queued jobs** isn't counted as free, and a queued job counts as coming only if its inputs are in
     the Warehouse.
-  - **Leaving the list:** a piece she binds or a dish she eats drops off. Several targets add up.
+  - **Leaving the list:** a piece she binds or a gem she sets drops off. Several targets add up.
   ([design](../design/gear-and-targets.md))
 - **Upgrades:**
-  - Facilities level 1–3: more slots, then speed.
+  - Facilities level 1–3: 3, 4, then 5 slots, and speed at level 3 (D144).
   - The cost is Laurels plus refined items of the facility's two families. A site's two families are its own and its
-    mirror on the other side; buildings take Stones and Woods.
+    gear-recipe partner (Ores and Crystals, Woods and Essences, Hides & Scales and Bones & Horns, Stones and Fibers);
+    buildings take Stones and Woods.
 
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| Gather one item | any grade, by profession level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
+| Gather one item | any grade, by Craft Level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
 | Refine one item | a quarter of that: 13.5 min at Lv1, 9 min at Lv50 |
-| Cook or craft one | twice a gather: 108 min at Lv1, 72 min at Lv50 |
-| Profession EXP | 2 per minute of the job at her level, before the facility's speed |
-| Outputs per job | gathering, cooking and crafting 1–10; refining ×1, ×4, ×8, ×20, ×40 |
+| Craft or cut one | twice a gather: 108 min at Lv1, 72 min at Lv50 |
+| Craft EXP | 2 per minute of the job at her level, before the facility's speed |
+| Outputs per job | gathering, crafting and cutting 1–10; refining ×1, ×4, ×8, ×20, ×40 |
 | Jobs queued after it | 3 |
-| Facility levels | 1–3: 2, 3, 3 Uma slots; speed ×1, ×1, ×1.25 |
+| Facility levels | 1–3: 3, 4, 5 Uma slots; speed ×1, ×1, ×1.25 |
 | Upgrade to Lv 2 / 3 | 150 Laurels + 1× grade-2 refined of each of its two families / 500 Laurels + 2× grade-5 refined of each of its two families |
 | Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |
 <!-- /live -->
@@ -216,16 +212,16 @@ Two professions with one curve, raised by jobs at the facilities ([sections](sec
 
 **Extra Stats** (the Observatory):
 - Each Uma has a map of 100 nodes: 80 moons, 16 bridges and 4 Sun nodes.
-- **Eating a dish** opens the node of its own grade and uses the dish up. Nodes open in order (D119): a dish waits until
-  every lower node of its track is open, and a grade she has eaten is spent, so the Observatory lists only the dishes
-  she can eat now:
-  - a planet dish of grade n opens moon n of its stat;
-  - Duo dishes open bridges;
-  - Feasts open Sun nodes.
+- **Setting a Star Gem** (D144) opens the node of its own grade and uses the gem up. The Lapidary cuts them
+  ([materials](materials.md#star-gems)). Nodes open in order (D119): a gem waits until every lower node of its track
+  is open, and a grade she has set is spent, so the Observatory lists only the gems she can set now:
+  - a moon gem of grade n opens moon n of its stat;
+  - bridge gems (grades 3 and 7) open bridges;
+  - Sun gems (grades 4, 6, 8 and 10) open Sun nodes.
 - **Active nodes:** 5 + ⌊level ÷ 2⌋ at a time (5 at Lv 1, 30 at Lv 50), changed freely.
 - **Points, worth the node's grade (D141):** a moon of grade g gives g points to its stat (moon 7: 7), a bridge g ÷ 2 to
   each of its two, a Sun node g ÷ 8 to all eight. A full track of ten moons is 55 points; since D139 every grade takes the
-  same farm time, so a higher grade pays in what it gives.
+  same time to cut, so a higher grade pays in what it gives.
 - **What a point does (D104, flat):**
   - ATK, MATK, DEF, MDEF or MP: +1. HP: +5.
   - Speed: 0.6% evasion (up to 50%).

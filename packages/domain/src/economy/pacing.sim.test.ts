@@ -77,8 +77,7 @@ describe('H14 pacing economy ledger', () => {
       expect(Object.values(fullSet(grade)).reduce((a, b) => a + b, 0)).toBe(12 * 2)
       expect(Object.keys(fullSet(grade)).some((id) => id.startsWith('token-'))).toBe(false)
     }
-    expect(freshWorker(result.rows, 'farming')).toEqual(freshWorker(result.rows, 'gathering'))
-    expect(freshWorker(result.rows, 'farming').profession.level).toBe(1)
+    expect(freshWorker(result.rows).profession.level).toBe(1)
     expect(itemMinutes(1)).toBe(54)
     expect(FACILITY_SPEED[0]).toBe(1)
   })

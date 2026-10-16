@@ -23,7 +23,6 @@ interface Palette {
 }
 
 export const PALETTES: Record<HubPage, Palette> = {
-  farmlands: { ground: [0x3f6b3a, 0x44723e, 0x3b6536, 0x416e3b], feature: 0x7a6444, background: '#2c4a28' },
   wilds: { ground: [0x4d4a3c, 0x55513f, 0x48463a, 0x504c3e], feature: 0x2f6fa8, background: '#34322a' },
   learning: { ground: [0x3f3f52, 0x45455a, 0x3b3b4d, 0x42425a], feature: 0x56546e, background: '#2c2c3a' },
   town: { ground: [0x5a4636, 0x614b3a, 0x553f31, 0x5d4838], feature: 0x76604a, background: '#3e3026' },
@@ -175,7 +174,7 @@ export class HubScene extends Phaser.Scene {
   private drawFeatures(g: Phaser.GameObjects.Graphics, page: HubPage, places: Place[], w: number, h: number): void {
     const palette = PALETTES[page]
     g.fillStyle(palette.feature, page === 'wilds' ? 0.9 : 0.55)
-    if (page === 'farmlands' || page === 'town') {
+    if (page === 'town') {
       // A dirt road down the middle and one across, linking the places.
       g.fillRect(w / 2 - 9, 0, 18, h)
       g.fillRect(0, h * 0.51 - 8, w, 16)

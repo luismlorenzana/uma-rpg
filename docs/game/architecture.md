@@ -38,12 +38,12 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v20, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs), `kitchen.ts`, `forge.ts`, `targets.ts` (farming targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
+| `save/` | The save (`save.ts`: schema v21, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
 | `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v13, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
-| `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `dishes.ts`, `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
-| `items/` | The 16 families and 320 items |
-| `hub/places.ts` | Every place on the four Hub pages |
+| `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
+| `items/` | The 8 families and 160 items |
+| `hub/places.ts` | Every place on the three Hub pages |
 | `master/`, `roster/` | Master data to the game's roster: outfits, aptitudes, filters |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
@@ -71,7 +71,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 - **Master data** (`master/master.ts`):
   - `@luismlorenzana/uma-data`'s release client reads through the API proxy (`/api/master/`).
   - It loads characters, outfits, scenarios and the art index once a session; skills load only when needed.
-- **Original art:** `@luismlorenzana/uma-art` atlases (items, dishes, gear, buildings, tiles) are bundled by Vite.
+- **Original art:** `@luismlorenzana/uma-art` atlases (items, gear, buildings, tiles) are bundled by Vite.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API
@@ -98,7 +98,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v20** (`save/save.ts`).
+- **Schema v21** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -107,21 +107,23 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - **v13:** class ranks capped at 5.
   - **v14:** the class rework (weapons renamed and refunded, open fight closed).
   - **v15:** Crafting Tokens become Mastery Tokens (D94).
-  - **v16:** Farm and Craft Levels move to the longer curve, keeping the EXP earned (D96).
-  - **v17:** farming targets, none to start (D100).
+  - **v16:** profession levels move to the longer curve, keeping the EXP earned (D96).
+  - **v17:** targets, none to start (D100).
   - **v18:** ranks earned by fighting, five armor slots, Marks, no tokens; every older save starts its progress over
     (D102–D105).
   - **v19:** the Halls of Heroes' seats and each Uma's Bonds, both empty; 5 Unlock Tickets (D106).
   - **v20:** armor without accents (one of each piece kept), a feet slot, two accessory slots, Accessory Ranks (D124).
+  - **v21:** one profession, Craft Level, at the higher of her two levels; Star Gems; only items and facilities the game
+    still has, each facility with its level's new slots; opened nodes kept (D144).
 
 ```
 Save { schemaVersion, account { trainerName, createdAt, updatedAt }, tierWorlds: { "1": TierWorld } }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, gearMarks, classMarks },
   umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5] }],
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
-  items, facilities, dishes, gear, targets, heroes: { <seat>: { hero, learners[≤10] } } }
+  items, facilities, gems, gear, targets, heroes: { <seat>: { hero, learners[≤10] } } }
 OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons, tree, loadout } },
-  professions { farming, gathering }, ranks { classes, weapons, armors, accessories: { <id>: { rank, exp } } },
+  craft { level, exp }, ranks { classes, weapons, armors, accessories: { <id>: { rank, exp } } },
   stars { unlocked, active }, gear { locker, equipped, kinds }, bonds { <seat>: { level, exp } } }
 ```
 

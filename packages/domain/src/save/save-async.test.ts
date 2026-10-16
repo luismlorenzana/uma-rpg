@@ -3,7 +3,7 @@ import { autoAction } from '../rpg/battle/auto'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import { rpgDefaultWeapons } from '../rpg/rules'
 import { RPG_CLASSES } from '../rpg/kinds'
-import { DISHES } from '../economy/dishes'
+import { GEMS } from '../economy/gems'
 import { EQUIP_TYPES } from '../economy/gear'
 import { ITEMS } from '../items/catalog'
 import { regionChapter, worldContinent } from '../world/world'
@@ -39,10 +39,10 @@ describe('asynchronous strict save parsing (H16)', () => {
     let s = party()
     worldOf(s).items = Object.fromEntries(ITEMS.map((i) => [i.id, 10]))
     const workers: WorkOutfit[] = [...outfits.values()]
-    s = startJob(s, 'fields', 0, workers[0]!, 'wheat', 2, NOW)
-    s = queueJob(s, 'fields', 0, workers[0]!, 'wheat', 2, NOW)
-    s = startJob(s, 'pantry', 0, workers[1]!, 'wheat-flour', 1, NOW)
-    s = startJob(s, 'kitchen', 0, workers[2]!, DISHES[0]!.id, 1, NOW)
+    s = startJob(s, 'mine', 0, workers[0]!, 'copper-ore', 2, NOW)
+    s = queueJob(s, 'mine', 0, workers[0]!, 'copper-ore', 2, NOW)
+    s = startJob(s, 'workbench', 0, workers[1]!, 'copper-ingot', 1, NOW)
+    s = startJob(s, 'lapidary', 0, workers[2]!, GEMS[0]!.id, 1, NOW)
     s = startJob(s, 'forge', 0, workers[3]!, 'greatsword-g1', 1, NOW)
     s = queueJob(s, 'forge', 0, workers[3]!, 'helm-g1', 1, NOW)
     expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
@@ -52,7 +52,7 @@ describe('asynchronous strict save parsing (H16)', () => {
   it('matches the synchronous parser for a current save containing every catalog id and all class loadouts', async () => {
     const s = party(), w = worldOf(s)
     w.items = Object.fromEntries(ITEMS.map((i) => [i.id, 1]))
-    w.dishes = Object.fromEntries(DISHES.map((d) => [d.id, 1]))
+    w.gems = Object.fromEntries(GEMS.map((g) => [g.id, 1]))
     w.gear = Object.fromEntries(EQUIP_TYPES.map((t) => [`${t}-g1`, 1]))
     for (const u of Object.values(w.umas)) for (const classId of RPG_CLASSES) {
       u.level = 45
@@ -82,7 +82,12 @@ describe('asynchronous strict save parsing (H16)', () => {
       }
       if (version >= 10 && version < 14) w.gear = { 'mage-staff-g2-mp': 2, 'spear-g1-atk': 1 }
       if (version >= 10 && version < 15) w.items = { 'token-craft-hp-1': 2 }
-      if (version < 16) w.umas['9000000']!.professions.farming = { level: 12, exp: 9 }
+      // Before v21 an Uma had professions, not a Craft Level (D144).
+      for (const u of Object.values(w.umas)) {
+        const old = u as unknown as Record<string, unknown>
+        old.professions = { gathering: version < 16 && old === (w.umas['9000000'] as unknown) ? { level: 12, exp: 9 } : old.craft }
+        delete old.craft
+      }
       if (version < 17) delete (w as unknown as Record<string, unknown>).targets
       expect(await parseSaveAsync(raw), `v${version}`).toEqual(parseSave(raw))
     }
@@ -119,12 +124,13 @@ describe('asynchronous strict save parsing (H16)', () => {
     const gear = rawOf(base); worldOf(gear).umas['9000000']!.gear = { locker: ['lance-g10'], equipped: { lance: 'lance-g10' }, kinds: {} }; invalids.push(gear)
     const tree = rawOf(base); worldOf(tree).umas['9000000']!.classes.brawler = { weapons: rpgDefaultWeapons('brawler'), tree: ['brawler-greatsword.5a'], loadout: null }; invalids.push(tree)
     const items = rawOf(base); worldOf(items).items.unknown = 1; invalids.push(items)
-    const dish = rawOf(base); worldOf(dish).dishes['feast-5'] = 1; invalids.push(dish)
+    const gem = rawOf(base); worldOf(gem).gems['gem-sun-5'] = 1; invalids.push(gem)
     for (const s of invalids) {
       expect(() => parseSave(s)).toThrow(SaveParseError)
       await expect(parseSaveAsync(s)).rejects.toThrow(SaveParseError)
     }
     const older = rawOf(base) as unknown as Record<string, unknown>; older.schemaVersion = 15
+    for (const u of Object.values(worldOf(older as unknown as Save).umas) as unknown as Record<string, unknown>[]) { u.professions = { gathering: u.craft }; delete u.craft }
     const before = JSON.stringify(older)
     await parseSaveAsync(older)
     expect(JSON.stringify(older)).toBe(before)

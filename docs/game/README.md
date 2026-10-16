@@ -9,13 +9,13 @@ code as it runs on https://uma-rpg.web.app. Specs, plans and history live elsewh
 |---|---|
 | [Architecture](architecture.md) | Repos, packages, the web app, the API, the save, private content, deploy, local setup |
 | [Dependencies](dependencies.md) | Tooling, every package and version, cloud services, uma-platform packages |
-| [Game loops](loops.md) | Collection, leveling, ranks (Class, Weapon, Armor) and Marks, Laurels, currencies, professions, Extra Stats and gear, Springs and Sweeps |
+| [Game loops](loops.md) | Collection, leveling, ranks (Class, Weapon, Armor) and Marks, Laurels, currencies, Craft Level, Extra Stats and gear, Springs and Sweeps |
 | [Game sections](sections.md) | Every Hub page and place, every screen, the global UI |
 | [Combat](combat.md) | Rounds, actions, the damage formula, weaknesses and Breaks, statuses, Limit Breaks, foes, constants |
 | [Classes and weapons](classes.md) | The five classes, ten weapons, weapon and armor slots, skill depths, points and slots, the four bars |
 | [Skill trees](skill-trees.md) | All 40 trees, every node with its cost, MP and effect |
 | [Halls of Heroes](heroes.md) | Heroes, Learners, Bonds and the twenty unique Limit Breaks |
-| [Materials](materials.md) | The 16 families and 320 items, dishes, the 28 gear types and their recipes |
+| [Materials](materials.md) | The 8 families and 160 items, the 100 Star Gems, the 40 gear types and their recipes |
 | [The world map](maps.md) | Biomes, signatures, formations and waves, continents and regions, faces |
 
 Looking for one thing? Search this folder first (`rg -n "Spring" docs/game`). Each page names the code it describes.

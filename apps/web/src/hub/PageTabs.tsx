@@ -4,7 +4,7 @@ import { MenuIcon } from '../ui/icons'
 import { useNow } from '../ui/useNow'
 import { readyPlaces } from './PlaceTargets'
 
-const DOT: Record<HubPage, string> = { farmlands: '#7cc46a', wilds: '#c49a6a', learning: '#a99be0', town: '#e0b25c' }
+const DOT: Record<HubPage, string> = { wilds: '#c49a6a', learning: '#a99be0', town: '#e0b25c' }
 
 export function PageTabs({ page, onPage, onMenu }: { page: HubPage; onPage: (page: HubPage) => void; onMenu: () => void }) {
   const world = useWorld()
