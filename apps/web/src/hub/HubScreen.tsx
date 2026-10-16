@@ -97,7 +97,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   useEffect(() => rememberPage(page), [page])
 
   return (
-    <div className="game-surface flex h-dvh flex-col bg-page">
+    <div className="game-surface fixed inset-0 flex flex-col bg-page">
       <AccountBar onOpenAccount={() => nav.open({ page: 'town', id: 'account' })} />
       <main
         className="relative min-h-0 flex-1"

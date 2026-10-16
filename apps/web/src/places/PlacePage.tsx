@@ -13,7 +13,7 @@ export function PlacePage({ place, rest }: { place: Place; rest: string }) {
   const Page = ui.Page
   const Counter = ui.Counter
   return (
-    <div className="flex h-dvh flex-col bg-page">
+    <div className="fixed inset-0 flex flex-col bg-page">
       <header className="pt-safe z-20 border-b border-hairline bg-panel/95 backdrop-blur">
         <div className="flex min-h-13 items-center gap-1 px-1.5">
           <button

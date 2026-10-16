@@ -10,7 +10,7 @@ import { TicketIcon } from '../ui/icons'
 
 function Splash() {
   return (
-    <div className="flex h-dvh items-center justify-center bg-page">
+    <div className="fixed inset-0 flex items-center justify-center bg-page">
       <p className="font-display text-2xl font-bold text-accent">Uma RPG</p>
     </div>
   )
@@ -18,7 +18,7 @@ function Splash() {
 
 function SignIn({ onSignIn }: { onSignIn: () => void }) {
   return (
-    <div className="pt-safe pb-safe flex h-dvh flex-col items-center justify-center gap-6 bg-page px-8 text-center">
+    <div className="pt-safe pb-safe fixed inset-0 flex flex-col items-center justify-center gap-6 bg-page px-8 text-center">
       <div>
         <p className="font-display text-4xl font-bold text-accent">Uma RPG</p>
         <p className="mt-2 text-ink-soft">A party RPG for one trainer.</p>
@@ -35,7 +35,7 @@ function FirstLaunch() {
   const valid = normalizeTrainerName(name) !== null
   return (
     <form
-      className="pt-safe pb-safe flex h-dvh flex-col items-center justify-center gap-5 bg-page px-8"
+      className="pt-safe pb-safe fixed inset-0 flex flex-col items-center justify-center gap-5 bg-page px-8"
       onSubmit={(e) => {
         e.preventDefault()
         if (valid) void createAccount(name)
@@ -80,7 +80,7 @@ export function Root() {
   // Never run a production build signed out: every API call would fail (the S1 incident, D42).
   if (import.meta.env.PROD && !firebaseEnabled)
     return (
-      <div className="flex h-dvh items-center justify-center bg-page p-8 text-center text-ink-soft">This build is missing its sign-in configuration.</div>
+      <div className="fixed inset-0 flex items-center justify-center bg-page p-8 text-center text-ink-soft">This build is missing its sign-in configuration.</div>
     )
   if (!auth.ready) return <Splash />
   if (auth.authRequired && !auth.user) return <SignIn onSignIn={() => void auth.signIn()} />

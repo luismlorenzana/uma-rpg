@@ -14,12 +14,18 @@ Exchange sheets. Every button and footer should remain reachable without horizon
 
 1. **Phone only — install.** In Safari open the live game, tap Share → Add to Home Screen, then open Uma RPG from its
    icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator.
+   **iPhone 15, 393×852 (H30):** the frame and tab bar reach the bottom; no empty band below the bar. Only the home
+   indicator inset sits below its row. Place pages scroll inside the frame.
 2. **Phone only — sign in.** Tap **Sign in with Google** with the owner's account. On a new save, enter a trainer name
    and tap **Enter the Hub**: expect an empty Stable and 20 Unlock Tickets. On an existing save, expect your saved Hub.
 3. Tap the account bar, edit **Trainer name** and tap **Save**; reopen Account. Expect the name to persist and the
    **App build** to identify the release. **Phone only:** if **Update ready** appears, tap **Restart to update** and
    confirm the new build and your save after reopening.
-4. Tap **Town → Stable → Enter Stable**. Tap **Filters → Front → Show**, **Sort → Name**, then **List**. Expect Front A+
+4. Tap **Town → Stable → Enter Stable**. On the first H30 load, expect **Uma level**, highest first; after that your
+   chosen controls persist. Owned Umas stay before locked with either arrow direction. The Party Hall slot picker,
+   Observatory tabs and Exchange's Manuals picker also open highest-level first; a direct Observatory link keeps its
+   selected Uma. Work pickers remain free first, then Craft Level.
+   Tap **Filters → Front → Show**, **Sort → Name**, then **List**. Expect Front A+
    outfits in name order. Remove the **Front A** chip; expect the full list again.
 5. Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**, and repeat until you own at least five.
    Expect one Ticket spent per unlock, an owned profile with Lv1, and the **Owned** count increased.

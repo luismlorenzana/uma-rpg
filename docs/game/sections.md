@@ -17,6 +17,8 @@ A global toast offers "Update ready · Restart" when a new build is out.
 
 Three pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`): **Wilds**, **Learning** and **Town**
 (D144). Each page is a pixel-art map (`hub/scene/HubScene.ts`, Phaser) fitted to the screen.
+The app uses a fixed edge-to-edge frame, with the bottom tab bar's safe-area padding under the home indicator (H30).
+Place pages scroll inside that frame; the document behind them does not set the screen height.
 
 - Places are DOM buttons over the map, each with:
   - a name pill;
@@ -131,7 +133,8 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 - **Roster:**
   - All, Owned and Locked tabs, with counts.
   - Search, and a Filters sheet: rarity; surface, distance or style A+; sex; New 24h; Free now.
-  - Seven sorts, grid or list. These choices are remembered per device.
+  - Seven sorts, grid or list. Opens on **Uma Level, highest first**; owned Umas stay before locked in either direction.
+    Level ties use newest release, then name. These choices are remembered per device; H30 resets the old default once.
 - **An Uma's profile:**
   - **Header:** Uma Level and EXP, a class chip, her Craft Level, and a Working or Party card.
   - **Tabs:**
@@ -163,7 +166,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 
 Routes: `/town/party-hall` and `:n` (1–20).
 - The list shows 20 parties of five. Working members fight like the rest (D119).
-- **The editor:** rename the party, or tap a slot to pick an Uma.
+- **The editor:** rename the party, or tap a slot to pick an Uma, highest Uma Level first (newest release, then name for ties).
 - **A filled slot:** Swap, View profile, Recall from her job, Remove.
 
 ### Scenario Gate
@@ -206,12 +209,12 @@ Shelf tabs:
 
 - Your Laurels and ticket counts.
 - **Buy:** Time Tickets, Sweep Tickets, and raw items of the grades your continents unlock.
-- **Manuals** (D102): pick an Uma, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
+- **Manuals** (D102): pick an Uma, highest Uma Level first, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
   1,000 Gear or Class Marks into 1,000 EXP on it.
 
 ### Observatory
 
-- An Uma picker.
+- Uma tabs, highest Uma Level first (newest release, then name for ties). Opens on the Uma named in its route, else the highest.
 - Her Sun-and-planets map: tap a node to switch it on or off, up to her active limit. A locked node names the Star Gem
   that opens it.
 - Effect totals, and a **Set** list of the Star Gems she can set now ([loops](loops.md#extra-stats-and-gear)).
