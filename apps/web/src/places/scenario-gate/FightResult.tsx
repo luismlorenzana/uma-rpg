@@ -1,5 +1,5 @@
 // What a fight paid (D51, D102): EXP and levels for all five with every bar she filled (her class, five weapons, five
-// armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Shards at Lv10/20/30/40/50 and any Ticket they made.
+// armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Uma Shards at Lv10/20/30/40/50 and any Ticket they made.
 import {
   BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
   type RpgClass,
@@ -22,7 +22,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
   const win = result.outcome === 'victory'
   const node = chapter.nodes.find((n) => n.id === result.nodeId)
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-page">
+    <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
       <div className="pt-safe min-h-0 flex-1 overflow-y-auto p-4">
         <p className="text-[12px] text-ink-faint">{chapter.title} · {node?.name}</p>
         <h1 className={`font-display text-4xl font-extrabold ${win ? 'text-accent' : 'text-ink-soft'}`}>{win ? 'Victory!' : 'Defeated'}</h1>
@@ -35,8 +35,8 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
           <>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {result.laurels > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-laurel"><LaurelIcon size={18} />+{result.laurels} Laurels</span>}
-              {result.shards > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-shard"><ShardIcon size={18} />+{result.shards} Shard{result.shards > 1 ? 's' : ''}</span>}
-              {result.tickets > 0 && <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-semibold text-ticket"><TicketIcon size={18} />+{result.tickets} Unlock Ticket{result.tickets > 1 ? 's' : ''}!</span>}
+              {result.shards > 0 && <span className="flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 font-semibold text-shard"><ShardIcon size={18} />+{result.shards} Uma Shard{result.shards > 1 ? 's' : ''}</span>}
+              {result.tickets > 0 && <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-semibold text-ticket"><TicketIcon size={18} />+{result.tickets} Uma Ticket{result.tickets > 1 ? 's' : ''}!</span>}
             </div>
             {(result.gearMarks > 0 || result.classMarks > 0) && (
               <p className="mt-2 text-[12px] font-semibold text-ink-soft">
@@ -61,7 +61,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                         </p>
                         <p className={up ? 'font-semibold text-accent' : 'text-ink-soft'}>
                           {up ? `Level up! Lv ${m.beforeLevel} → ${m.afterLevel}` : `Lv ${m.afterLevel}`}
-                          {m.shards > 0 ? ' · +1 Shard' : ''}
+                          {m.shards > 0 ? ' · +1 Uma Shard' : ''}
                         </p>
                         <Bar className="mt-0.5" value={next ? m.afterExp : 1} max={next || 1} tone="exp" />
                       </div>

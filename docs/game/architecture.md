@@ -7,7 +7,8 @@ production value and is the place to change them.
 
 ```
  iPhone (Home Screen PWA)
-   └─ apps/web  React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie; Phaser 4 for the Hub and battles
+   └─ apps/web  React 19 + Vite 7 + Tailwind 4 + Zustand + Dexie; Phaser 4 for the Hub and battles;
+                uma-kit for the theme, shell and Hub map
         │  /api/*  (Firebase Hosting rewrites to Cloud Run)
         ▼
    apps/api  NestJS 11 on Cloud Run `rpg-api`
@@ -43,7 +44,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 8 families and 160 items |
-| `hub/places.ts` | Every place on the three Hub pages |
+| `hub/places.ts` | Every place on the four Hub pages, and Town Hall's plaza |
 | `master/`, `roster/` | Master data to the game's roster: outfits, aptitudes, filters |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
@@ -51,7 +52,8 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 - **Routing** (`app/router.tsx`):
   - `/` goes to the last page.
-  - `/:page` is the Hub, and `?peek=:id` adds a quick look.
+  - `/:page` is the Hub. `?peek=:id` adds a quick look, `?sheet=menu` the menu and `?sheet=featured` the featured
+    Uma's sheet.
   - `/:page/:placeId/*` is a place's full page.
 - **Loading:** the place screens are lazy chunks (`places/registry.tsx`). Phaser and Firebase load only when needed.
 - **Store** (`save/game.ts`):
@@ -72,6 +74,14 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - `@luismlorenzana/uma-data`'s release client reads through the API proxy (`/api/master/`).
   - It loads characters, outfits, scenarios and the art index once a session; skills load only when needed.
 - **Original art:** `@luismlorenzana/uma-art` atlases (items, gear, buildings, tiles) are bundled by Vite.
+- **The shared app** (`@luismlorenzana/uma-kit`, uma-platform P48, D147) is the same package as uma-racer's:
+  - the theme, light and dark under one set of names;
+  - the primitives (icons, marks, sheets, tabs, buttons);
+  - the shell (frame, top and bottom bars, menu, side panel, place header);
+  - the Hub map (terrain, scene, place buttons, pips, swipe).
+
+  uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
+  the appearance and Motion. `hub/` holds this game's bars, plaza and Hub screen.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API
@@ -103,7 +113,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
   - **v11:** the world map.
-  - **v12:** Time Tickets.
+  - **v12:** Speed Tickets.
   - **v13:** class ranks capped at 5.
   - **v14:** the class rework (weapons renamed and refunded, open fight closed).
   - **v15:** Crafting Tokens become Mastery Tokens (D94).
@@ -111,7 +121,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - **v17:** targets, none to start (D100).
   - **v18:** ranks earned by fighting, five armor slots, Marks, no tokens; every older save starts its progress over
     (D102–D105).
-  - **v19:** the Halls of Heroes' seats and each Uma's Bonds, both empty; 5 Unlock Tickets (D106).
+  - **v19:** the Halls of Heroes' seats and each Uma's Bonds, both empty; 5 Uma Tickets (D106).
   - **v20:** armor without accents (one of each piece kept), a feet slot, two accessory slots, Accessory Ranks (D124).
   - **v21:** one profession, Craft Level, at the higher of her two levels; Star Gems; only items and facilities the game
     still has, each facility with its level's new slots; opened nodes kept (D144).

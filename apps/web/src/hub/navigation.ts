@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from 'react-router'
 export interface NavState {
   /** This entry was pushed from the Hub: back pops it. */
   fromHub?: boolean
+  /** uma-kit's word for the same (D147): links in the bars and the map push with it. */
+  back?: boolean
   /** This entry was pushed from inside a place page: back pops to the place. */
   fromPlace?: boolean
 }
@@ -26,16 +28,16 @@ export function useHubNavigation() {
   const location = useLocation()
   const state = (location.state as NavState | null) ?? {}
   /** Opens a place's quick look over its Hub page. */
-  const peek = useCallback((place: PlaceRef) => navigate(peekPath(place), { state: { fromHub: true } satisfies NavState }), [navigate])
+  const peek = useCallback((place: PlaceRef) => navigate(peekPath(place), { state: { fromHub: true, back: true } satisfies NavState }), [navigate])
   /** From a quick look: replace it with the full page, so back returns to the Hub, not the panel. */
   const enter = useCallback(
-    (place: PlaceRef) => navigate(pagePath(place), { replace: state.fromHub === true, state: { fromHub: true } satisfies NavState }),
-    [navigate, state.fromHub],
+    (place: PlaceRef) => navigate(pagePath(place), { replace: state.fromHub === true || state.back === true, state: { fromHub: true, back: true } satisfies NavState }),
+    [navigate, state.fromHub, state.back],
   )
   /** Opens a full page straight from the Hub (the account bar). */
-  const open = useCallback((place: PlaceRef) => navigate(pagePath(place), { state: { fromHub: true } satisfies NavState }), [navigate])
+  const open = useCallback((place: PlaceRef) => navigate(pagePath(place), { state: { fromHub: true, back: true } satisfies NavState }), [navigate])
   /** Back to the Hub page: pop when we came from it, otherwise replace (deep link). */
-  const toHub = useCallback((page: HubPage) => (state.fromHub ? navigate(-1) : navigate(`/${page}`, { replace: true })), [navigate, state.fromHub])
+  const toHub = useCallback((page: HubPage) => (state.fromHub || state.back ? navigate(-1) : navigate(`/${page}`, { replace: true })), [navigate, state.fromHub, state.back])
   /** Inside a place: go to a sub-view, or back up to the place's root. */
   const sub = useCallback((place: PlaceRef, rest: string) => navigate(pagePath(place, rest), { state: { fromPlace: true } satisfies NavState }), [navigate])
   const subBack = useCallback((place: PlaceRef) => (state.fromPlace ? navigate(-1) : navigate(pagePath(place), { replace: true })), [navigate, state.fromPlace])

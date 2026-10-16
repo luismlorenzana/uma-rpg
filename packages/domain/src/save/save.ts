@@ -3,7 +3,7 @@
 // armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106): the Halls of Heroes, their
 // Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset
 // for every older save.
-// Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Unlock Tickets, D40),
+// Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Uma Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (Craft Level, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); Star Gems and each Uma's Sun-and-planets map (S6, D58, D144); gear, lockers and what's equipped (S7,
@@ -42,7 +42,7 @@ export const PARTY_COUNT = 20
 export const PARTY_SIZE = 5
 export const PARTY_NAME_MAX = 24
 export const MAX_UMA_LEVEL = 50
-/** Five Shards make one Unlock Ticket (D5, converted automatically: D47). */
+/** Five Uma Shards make one Uma Ticket (D5, converted automatically: D47). */
 export const SHARDS_PER_TICKET = 5
 
 export interface Wallet {

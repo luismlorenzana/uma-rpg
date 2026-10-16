@@ -133,7 +133,7 @@ describe('fights (D52, D66)', () => {
     expect(worldRun(worldOf(retreat(save, T(6)))).battle).toBeNull()
   })
 
-  it('pays a win: EXP to all five, their Class, Weapon and Armor bars, Laurels (triple on a first clear, a quarter on a replay), and a Shard at Lv10', () => {
+  it('pays a win: EXP to all five, their Class, Weapon and Armor bars, Laurels (triple on a first clear, a quarter on a replay), and an Uma Shard at Lv10', () => {
     const fought = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4)))
     expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: S1, laurels: 30, shards: 0, firstClear: true })
     expect(fought.result!.members).toHaveLength(5)
@@ -156,7 +156,7 @@ describe('fights (D52, D66)', () => {
     expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
     expect(world.items).toEqual({})
 
-    // Lv9 Umas one fight short of Lv10: each earns a Shard, and five Shards make a Ticket.
+    // Lv9 Umas one fight short of Lv10: each earns an Uma Shard, and five Uma Shards make a Ticket.
     let ready = withParty()
     const w = worldOf(ready)
     const umas = Object.fromEntries(Object.entries(w.umas).map(([id, u]) => [id, { ...u, level: 9, exp: 270 }]))

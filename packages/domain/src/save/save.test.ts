@@ -5,7 +5,7 @@ const NOW = '2026-10-10T12:00:00.000Z'
 const LATER = '2026-10-10T13:00:00.000Z'
 
 describe('save', () => {
-  it('starts Tier 1 with 20 Unlock Tickets and nothing else', () => {
+  it('starts Tier 1 with 20 Uma Tickets and nothing else', () => {
     const save = newSave('  Luis  ', NOW)
     expect(save.account.trainerName).toBe('Luis')
     expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })

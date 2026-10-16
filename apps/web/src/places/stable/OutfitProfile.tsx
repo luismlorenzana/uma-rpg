@@ -175,7 +175,7 @@ function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterVie
       </div>
       {owned && (
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-md bg-[#3a3026] p-2">
+          <div className="rounded-md bg-raised p-2">
             <p className="text-[11px] font-semibold text-ink-soft">{CRAFT_LABEL}</p>
             <p className="font-display text-xl font-bold leading-tight">{owned.craft.level}</p>
             <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.craft.level)} open</p>
@@ -205,7 +205,7 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
         <TicketIcon size={20} /> Unlock · 1 Ticket
       </button>
       <p className="text-center text-[12px] text-ink-faint">
-        {tickets > 0 ? `${tickets} Unlock Tickets left` : 'No Unlock Tickets left'}
+        {tickets > 0 ? `${tickets} Uma Tickets left` : 'No Uma Tickets left'}
       </p>
       {confirming && (
         <BottomSheet title={`Unlock ${outfit.name}?`} onClose={() => setConfirming(false)} footer={
@@ -219,7 +219,7 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
             <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={64} />
             <div className="text-[14px]">
               <p className="font-semibold">{outfit.title ?? outfit.name}</p>
-              <p className="text-ink-soft">{tickets} → {tickets - 1} Unlock Tickets. Unlocking is final.</p>
+              <p className="text-ink-soft">{tickets} → {tickets - 1} Uma Tickets. Unlocking is final.</p>
             </div>
           </div>
           {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}

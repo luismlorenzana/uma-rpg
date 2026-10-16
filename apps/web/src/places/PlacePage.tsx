@@ -1,40 +1,36 @@
-// A place's full page (D43): header with ← (back to the Hub, or up from a sub-view), the name and an optional counter.
-import { CURRENT_SLICE, isOpen, type Place } from '@rpg/domain'
+// A place's page (D43, D147): uma-kit's place header (Back, the name, an optional counter and (i) with its blurb) over a
+// scrolling body, inside the shell's bars. Back pops to where the page was opened from, or goes up: a sub-view to its
+// place, a place to its page.
+import { CURRENT_SLICE, HUB_PAGE_NAMES, isOpen, type Place } from '@rpg/domain'
+import { PlaceHeader, peekPath, useLeave } from '@luismlorenzana/uma-kit/shell'
 import { Suspense } from 'react'
 import { Navigate } from 'react-router'
-import { useHubNavigation, peekPath } from '../hub/navigation'
-import { BackIcon } from '../ui/icons'
 import { PLACE_UI } from './registry'
 
 export function PlacePage({ place, rest }: { place: Place; rest: string }) {
   const ui = PLACE_UI[place.id]
-  const nav = useHubNavigation()
-  if (!ui?.Page || !isOpen(place, CURRENT_SLICE)) return <Navigate to={peekPath(place)} replace />
+  const leave = useLeave()
+  if (!ui?.Page || !isOpen(place, CURRENT_SLICE)) return <Navigate to={peekPath(place.page, place.id)} replace />
   const Page = ui.Page
   const Counter = ui.Counter
+  const up = rest ? `/${place.page}/${place.id}` : `/${place.page}`
   return (
-    <div className="fixed inset-0 flex flex-col bg-page">
-      <header className="pt-safe z-20 border-b border-hairline bg-panel/95 backdrop-blur">
-        <div className="flex min-h-13 items-center gap-1 px-1.5">
-          <button
-            type="button"
-            onClick={() => (rest ? nav.subBack(place) : nav.toHub(place.page))}
-            className="flex size-11 items-center justify-center rounded-full text-ink-soft"
-            aria-label={rest ? `Back to ${place.name}` : 'Back to the Hub'}
-          >
-            <BackIcon />
-          </button>
-          <h1 className="min-w-0 flex-1 truncate text-lg">{place.name}</h1>
-          {Counter && (
-            <Suspense fallback={null}>
-              <div className="pr-2">
-                <Counter />
-              </div>
-            </Suspense>
-          )}
-        </div>
-      </header>
-      <main className="pb-safe min-h-0 flex-1 overflow-y-auto overscroll-contain">
+    <div className="absolute inset-0 flex flex-col" data-place-page={place.id}>
+      <PlaceHeader
+        title={place.name}
+        onBack={() => leave(up)}
+        about={<p>{place.blurb}</p>}
+        words={{ back: rest ? `Back to ${place.name}` : `Back to ${HUB_PAGE_NAMES[place.page]}`, about: `About ${place.name}` }}
+      >
+        {Counter && (
+          <Suspense fallback={null}>
+            <div className="pr-1">
+              <Counter />
+            </div>
+          </Suspense>
+        )}
+      </PlaceHeader>
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <Suspense fallback={<p className="p-4 text-ink-soft">Loading…</p>}>
           <Page place={place} rest={rest} />
         </Suspense>

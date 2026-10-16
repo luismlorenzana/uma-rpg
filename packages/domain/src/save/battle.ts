@@ -302,7 +302,7 @@ export interface FightResult {
   members: MemberGain[]
   laurels: number
   shards: number
-  /** Unlock Tickets the Shards completed. */
+  /** Uma Tickets the Uma Shards completed. */
   tickets: number
   /** Marks banked from EXP past max ranks (D102). */
   gearMarks: number
@@ -313,7 +313,7 @@ export interface FightResult {
 
 /** One bar a member filled: which, how much EXP, and the track before and after. */
 export interface RankGain { ref: RankRef; exp: number; before: RankTrack; after: RankTrack }
-/** What a won fight paid one member: Uma EXP and levels, Shards, her Class, Weapon and Armor bars (D102), and her Bonds
+/** What a won fight paid one member: Uma EXP and levels, Uma Shards, her Class, Weapon and Armor bars (D102), and her Bonds
  * with the Heroes she learns under (D106). */
 export interface MemberGain {
   outfitId: string; exp: number; beforeLevel: number; afterLevel: number; afterExp: number; shards: number
@@ -349,7 +349,7 @@ export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: numbe
 }
 
 /**
- * Closes a finished fight. A win pays every entrant (KO'd included) EXP, a Shard at Lv10/20/30/40/50 in Tier 1, the
+ * Closes a finished fight. A win pays every entrant (KO'd included) EXP, an Uma Shard at Lv10/20/30/40/50 in Tier 1, the
  * world Laurels (triple on a stage's first clear) and tokens; a stage already cleared pays a quarter of all of it (D79).
  * MP carries. A loss leaves the run as it was before.
  */
@@ -383,7 +383,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
  * below her, times `share` on a replay, D79) and with it fills her bars: 2E to the class she fought as, 5E over her five
  * weapons (double for each she used), E to each of her five armor kinds and E to the kind of each accessory she wears
  * (D124). EXP past a max rank banks at half rate as
- * Marks. A Learner's Bonds fill too (D106). A Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
+ * Marks. A Learner's Bonds fill too (D106). An Uma Shard at Lv10/20/30/40/50 in Tier 1 (five make a Ticket), and the world's Laurels. Shared by fights and Sweeps.
  */
 export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
   tier = TIER_ONE, share = 1): { world: TierWorld; members: MemberGain[]; shards: number; tickets: number; laurels: number; gearMarks: number; classMarks: number } {

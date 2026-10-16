@@ -81,7 +81,8 @@ export default defineConfig(({ mode }) => {
     }),
   ],
   resolve: {
-    dedupe: ['react', 'react-dom'],
+    // uma-kit's peers resolve to this app's copies (also when the kit is linked from uma-platform).
+    dedupe: ['react', 'react-dom', 'react-router', 'motion', 'phaser'],
   },
   server: {
     port: 5174,

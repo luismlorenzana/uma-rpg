@@ -73,14 +73,14 @@ export const FIRST_CLEAR_LAURELS = 3
 export const LATE_LAURELS = { fromLevel: 41, factor: 4 } as const
 /** Laurels per won fight, times the chapter's tier (D51 numbers, set by this model). */
 export const BATTLE_LAURELS = { fight: 10, 'sub-boss': 25, vanguard: 30, boss: 50 } as const
-/** Exchange prices. A raw item costs about two fights per base hour of gathering (D65); a Time Ticket takes 30 minutes
+/** Exchange prices. A raw item costs about two fights per base hour of gathering (D65); a Speed Ticket takes 30 minutes
  * off any job or training (D74), at the same rate as before: an hour costs about two fights. */
 export const rawItemPrice = (grade: number): number => 10 + 10 * grade
 export const TIME_TICKET_PRICE = 10
 export const SWEEP_TICKET_PRICE = 15
-/** A Time Ticket cuts this much from a running job or training (D74). */
+/** A Speed Ticket cuts this much from a running job or training (D74). */
 export const TIME_TICKET_SPAN = 30 * MINUTE
-/** Time Tickets that finish a job with this much time left. */
+/** Speed Tickets that finish a job with this much time left. */
 export const timeTicketsToFinish = (remainingMs: number): number => Math.max(1, Math.ceil(remainingMs / TIME_TICKET_SPAN))
 /** Reaching a chapter stocks its grade pair at the Exchange: chapter n of a tier, grades 2n − 1 and 2n. */
 export const chapterGrades = (orderInTier: number): readonly [number, number] => [2 * orderInTier - 1, 2 * orderInTier]

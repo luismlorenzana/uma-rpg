@@ -7,11 +7,12 @@ const MAP_H = 500
 const MIN_GAP = 44
 
 describe('place registry', () => {
-  it('has 25 visible places on three pages (the Wilds with the Lapidary, D144) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(25)
+  it('has 23 visible places on four pages in the bar\'s order (D147) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(23)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
-    expect(HUB_PAGES).toEqual(['wilds', 'learning', 'town'])
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([11, 7, 7])
+    expect(HUB_PAGES).toEqual(['town', 'learning', 'battle', 'wilds'])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 2, 11])
+    expect(PLACES.filter((p) => p.direct).map((p) => p.id)).toEqual(['scenario-gate'])
   })
 
   it('keeps every place on a page at least 44 pt apart on the smallest phone', () => {
@@ -41,6 +42,7 @@ describe('place registry', () => {
   it('resolves a place only on its own page', () => {
     expect(placeOnPage('wilds', 'mine')?.name).toBe('Mine')
     expect(placeOnPage('learning', 'mine')).toBeUndefined()
+    expect(placeOnPage('battle', 'scenario-gate')?.name).toBe('Scenario Gate')
     expect(placeOnPage('town', 'nowhere')).toBeUndefined()
   })
 })

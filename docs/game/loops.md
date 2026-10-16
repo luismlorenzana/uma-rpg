@@ -7,11 +7,11 @@ is no promotion yet, and the Tier Finale is a locked place.
 ## The loop
 
 ```
- Unlock Umas ─► build parties ─► fight on the world map ─► Uma EXP, Class, Weapon and Armor EXP, Laurels, Shards
+ Unlock Umas ─► build parties ─► fight on the world map ─► Uma EXP, Class, Weapon and Armor EXP, Laurels, Uma Shards
        ▲                                                          │
        │            ┌────── ranks (deeper skills, higher grades) ◄┤── Marks past a max rank ─► Manuals
        │            ▼                                             ▼
-   Shards ─► Tickets                                      Exchange: raw items, tickets, Manuals
+   Uma Shards ─► Tickets                                      Exchange: raw items, tickets, Manuals
                                                                   │
                                                                   ▼
                                             gather ─► refine ─► cut (Star Gems ─► Extra Stats)
@@ -23,8 +23,8 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 
 ## Collection and parties
 
-- **Start:** 20 Unlock Tickets and no Umas. One Ticket unlocks one outfit, for good.
-- **Shards:** an Uma earns one at Lv 10, 20, 30, 40 and 50 (Tier 1), from fights and Sweeps alike. Five Shards make a
+- **Start:** 20 Uma Tickets and no Umas. One Ticket unlocks one outfit, for good.
+- **Uma Shards:** an Uma earns one at Lv 10, 20, 30, 40 and 50 (Tier 1), from fights and Sweeps alike. Five Uma Shards make a
   Ticket automatically, so every Uma who reaches Lv 50 pays back one Ticket. Tickets have no other source or use.
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
@@ -44,7 +44,7 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 | 36 | 696 | 1965 |
 | 43 | 808 | 2070 |
 
-Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × her own EXP to next level, −10% per level she's above the foes (down to 10%), never more than 100%. Shards at Lv 10, 20, 30, 40, 50. Craft EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
+Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight × her own EXP to next level, −10% per level she's above the foes (down to 10%), never more than 100%. Uma Shards at Lv 10, 20, 30, 40, 50. Craft EXP to next: 1,425 + 15 × level; jobs pay 2 EXP per base minute of work, so a level takes 12 base hours at Lv1 and 18 at Lv49.
 <!-- /live -->
 
 - Level cap 50. At Lv 50 EXP keeps banking; nothing spends it yet (it's planned for promotion).
@@ -123,10 +123,10 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 | Currency | Earned | Spent |
 |---|---|---|
 | Laurels | Fights and Sweeps; selling stock | The Exchange; facility upgrades |
-| Time Tickets | The Exchange | 30 minutes off a running job (or "Finish": one per 30 minutes left) |
+| Speed Tickets | The Exchange | 30 minutes off a running job (or "Finish": one per 30 minutes left) |
 | Sweep Tickets | The Exchange | One Sweep of a cleared regular stage |
-| Unlock Tickets | 20 at the start; 5 Shards each | Unlocking an outfit |
-| Shards | Lv 10, 20, 30, 40, 50 | Turned into Tickets automatically |
+| Uma Tickets | 20 at the start; 5 Uma Shards each | Unlocking an outfit |
+| Uma Shards | Lv 10, 20, 30, 40, 50 | Turned into Tickets automatically |
 | Gear Marks | Weapon and Armor EXP past Rank 10, at half rate | Weapon and Armor Manuals |
 | Class Marks | Class EXP past Rank 50, at half rate | Class Manuals |
 
@@ -137,10 +137,10 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 | Raw item, grade 4 | 50 |
 | Raw item, grade 7 | 80 |
 | Raw item, grade 10 | 110 |
-| Time Ticket | 10 |
+| Speed Ticket | 10 |
 | Sweep Ticket | 15 |
 
-A Time Ticket takes 30 minutes off a running job. A Manual costs 1,000 Marks, not Laurels.
+A Speed Ticket takes 30 minutes off a running job. A Manual costs 1,000 Marks, not Laurels.
 <!-- /live -->
 
 Selling pays 2 + 2g for a raw item, 4 + 4g refined, and 6 + 6g for a Star Gem or unbound gear. Bound

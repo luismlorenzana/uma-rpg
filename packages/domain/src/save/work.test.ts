@@ -133,12 +133,12 @@ describe('job EXP (D96, D101)', () => {
   })
 })
 
-describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
-  it('takes 30 minutes off a job per Time Ticket, never past done', () => {
+describe('Speed Tickets, upgrades and the Exchange (S4, D74)', () => {
+  it('takes 30 minutes off a job per Speed Ticket, never past done', () => {
     let save = startJob(withUmas('102'), 'monster-den', 0, plain, 'puffbun-pelt', 3, at(0)) // 54 minutes each at Lv1
     const job = facilityOf(worldOf(save), 'monster-den').jobs[0]!
     expect(ticketsToFinish(job, at(0))).toBe(6)
-    expect(() => cutJobTime(save, 'monster-den', 0, 1, at(0))).toThrow(/1 Time Ticket/)
+    expect(() => cutJobTime(save, 'monster-den', 0, 1, at(0))).toThrow(/1 Speed Ticket/)
     save = buyTickets(give(save, {}, 70), 'time', 7, at(0))
     expect(() => cutJobTime(save, 'monster-den', 0, 7, at(0))).toThrow(/1–6/)
     save = cutJobTime(save, 'monster-den', 0, 2, at(0))
@@ -148,7 +148,7 @@ describe('Time Tickets, upgrades and the Exchange (S4, D74)', () => {
     expect(worldOf(save).wallet).toMatchObject({ laurels: 0, timeTickets: 1 })
   })
 
-  it('turns each Rush Ticket of a v11 save into two Time Tickets', () => {
+  it('turns each Rush Ticket of a v11 save into two Speed Tickets', () => {
     const old = JSON.parse(JSON.stringify(withUmas('101')))
     old.schemaVersion = 11
     // Before v14 an Uma had builds, not classes (D86).

@@ -8,6 +8,7 @@ import { useAuth } from '../../auth/AuthProvider'
 import { useMaster } from '../../master/master'
 import { NotificationsCard } from '../../push/NotificationsCard'
 import { renameAccount, resetGame, useGame } from '../../save/game'
+import { setAppearance, Tabs, UiMark, useAppearance, type Appearance } from '@luismlorenzana/uma-kit/ui'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -71,9 +72,9 @@ export default function AccountPage() {
         <h3 className="text-micro mb-1">Tier 1 wallet</h3>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { icon: <TicketIcon size={22} />, value: wallet?.unlockTickets ?? 0, label: 'Unlock Tickets' },
-            { icon: <ShardIcon size={20} />, value: wallet?.shards ?? 0, label: 'Shards' },
-            { icon: <LaurelIcon size={22} />, value: wallet?.laurels ?? 0, label: 'Laurels' },
+            { icon: <UiMark mark="currency/uma-ticket" scale={2} fallback={<TicketIcon size={22} />} />, value: wallet?.unlockTickets ?? 0, label: 'Uma Tickets' },
+            { icon: <ShardIcon size={20} />, value: wallet?.shards ?? 0, label: 'Uma Shards' },
+            { icon: <UiMark mark="currency/laurel" scale={2} fallback={<LaurelIcon size={22} />} />, value: wallet?.laurels ?? 0, label: 'Laurels' },
           ].map((c) => (
             <div key={c.label} className="flex flex-col items-center gap-1 rounded-md bg-raised p-2.5">
               {c.icon}
@@ -83,6 +84,8 @@ export default function AccountPage() {
           ))}
         </div>
       </section>
+
+      <AppearanceCard />
 
       <NotificationsCard />
 
@@ -114,5 +117,23 @@ export default function AccountPage() {
         </button>
       )}
     </div>
+  )
+}
+
+const APPEARANCE_OPTIONS: readonly { value: Appearance; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]
+
+/** Light, dark or the phone's choice (D147), on this device: the same switch as uma-racer's. */
+function AppearanceCard() {
+  const appearance = useAppearance()
+  return (
+    <section>
+      <h3 className="text-micro mb-1">Appearance</h3>
+      <Tabs label="Appearance" options={APPEARANCE_OPTIONS} value={appearance} onChange={setAppearance} />
+      <p className="mt-1.5 text-[12px] text-ink-faint">System follows the phone’s light or dark setting. Saved on this device.</p>
+    </section>
   )
 }

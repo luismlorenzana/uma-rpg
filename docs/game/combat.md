@@ -289,7 +289,7 @@ unchanged.
 
 ## Rewards
 
-A win pays every entrant, including those knocked out: EXP, Laurels, tokens, and Shards at milestone levels. A loss or
+A win pays every entrant, including those knocked out: EXP, Laurels, tokens, and Uma Shards at milestone levels. A loss or
 giving up pays nothing and leaves MP as it was before the fight. Numbers are in [loops](loops.md#laurels-exp-and-tokens).
 
 ## Constants

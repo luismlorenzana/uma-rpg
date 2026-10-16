@@ -32,7 +32,7 @@ describe('collection rules', () => {
     expect((err as SaveRuleError).reason).toBe('no-ticket')
   })
 
-  it('turns every five Shards into a Ticket', () => {
+  it('turns every five Uma Shards into a Ticket', () => {
     expect(addShards(newWallet(0), 4)).toEqual({ ...newWallet(0), shards: 4 })
     expect(addShards({ ...newWallet(0), shards: 3 }, 4)).toEqual({ ...newWallet(1), shards: 2 })
     expect(addShards({ ...newWallet(2), laurels: 7 }, 10)).toEqual({ ...newWallet(4), laurels: 7 })

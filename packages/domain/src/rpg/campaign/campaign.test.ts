@@ -78,7 +78,7 @@ describe('rewards (D51)', () => {
     expect(ura.nodes.filter((n) => n.kind === 'sub-boss').map(rpgRewardKind)).toEqual(['sub-boss', 'sub-boss', 'sub-boss', 'vanguard', 'vanguard', 'vanguard'])
   })
 
-  it('pays Laurels by kind and tier, and a Shard at Lv10, 20, 30, 40 and 50', () => {
+  it('pays Laurels by kind and tier, and an Uma Shard at Lv10, 20, 30, 40 and 50', () => {
     expect([rpgBattleLaurels('fight', 1), rpgBattleLaurels('boss', 1), rpgBattleLaurels('boss', 2)]).toEqual([10, 50, 100])
     expect([rpgShardsBetween(9, 10), rpgShardsBetween(10, 11), rpgShardsBetween(8, 31), rpgShardsBetween(49, 50)]).toEqual([1, 0, 3, 1])
   })

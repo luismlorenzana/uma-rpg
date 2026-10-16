@@ -45,7 +45,7 @@ function FirstLaunch() {
         <p className="font-display text-3xl font-bold">Welcome, trainer</p>
         <p className="mt-2 text-ink-soft">Your stable starts empty. Tier 1 opens with</p>
         <p className="mt-1 flex items-center justify-center gap-1.5 font-display text-lg font-bold text-ticket">
-          <TicketIcon size={24} /> {STARTING_UNLOCK_TICKETS} Unlock Tickets
+          <TicketIcon size={24} /> {STARTING_UNLOCK_TICKETS} Uma Tickets
         </p>
       </div>
       <label className="w-full max-w-xs">

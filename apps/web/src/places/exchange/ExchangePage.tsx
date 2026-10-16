@@ -1,4 +1,4 @@
-// The Exchange (S4, design §11): Laurels from battles buy raw items of the continents you've reached, Time Tickets
+// The Exchange (S4, design §11): Laurels from battles buy raw items of the continents you've reached, Speed Tickets
 // (30 minutes off any job, D74) and Sweep Tickets (replay a beaten regular stage at once, for a quarter of its first
 // clear, D79). Marks banked past max ranks buy Manuals: EXP for one bar of one Uma (D102).
 import {
@@ -36,8 +36,8 @@ function Exchange({ view }: { view: MasterView }) {
       <section>
         <h3 className="text-micro mb-1.5">Tickets</h3>
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => setBuying({ kind: 'time', price: TIME_TICKET_PRICE, name: 'Time Ticket' })} className="rounded-md bg-raised p-3 text-left">
-            <p className="font-semibold">Time Ticket</p>
+          <button type="button" onClick={() => setBuying({ kind: 'time', price: TIME_TICKET_PRICE, name: 'Speed Ticket' })} className="rounded-md bg-raised p-3 text-left">
+            <p className="font-semibold">Speed Ticket</p>
             <p className="text-[12px] text-ink-soft">30 minutes off any job</p>
             <p className="mt-1 flex items-center gap-1 text-[13px] font-semibold text-laurel"><LaurelIcon size={16} /> {TIME_TICKET_PRICE}</p>
           </button>

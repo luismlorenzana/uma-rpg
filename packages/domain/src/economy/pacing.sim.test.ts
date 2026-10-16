@@ -23,7 +23,7 @@ describe('H14 pacing economy ledger', () => {
     expect(frontierRegion(51, new Set())).toBeUndefined()
   })
 
-  it('levels five fresh Umas to 50, pays Shards, banks every reward and stays deterministic', () => {
+  it('levels five fresh Umas to 50, pays Uma Shards, banks every reward and stays deterministic', () => {
     const world = worldOf(result.save)
     expect(ids.map((id) => world.umas[id]!.level)).toEqual(Array(PARTY_SIZE).fill(MAX_UMA_LEVEL))
     expect(world.wallet.unlockTickets).toBe(STARTING_UNLOCK_TICKETS) // five unlocks, five Lv50 replacement tickets

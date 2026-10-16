@@ -35,7 +35,7 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 |---|---|
 | v10 progress reset, keeping unlocks and parties | D69 |
 | v11 world progress replaces chapter runs | D72 |
-| v12 Rush converts to Time Tickets | D74 |
+| v12 Rush converts to Speed Tickets | D74 |
 | v13 ranks cap at 5 | D77 |
 | v14 per-class loadouts, renamed/refunded gear | D86 |
 | v15 Crafting converts to Mastery Tokens; Forge inputs release reserved tokens | D94 |
@@ -76,7 +76,8 @@ Every place page is lazy. The generated [section map](../game/sections.md) lists
 Phaser is presentation only. Canvas effects may draw transient damage/WEAK/BREAK text; DOM carries lasting numbers,
 controls and accessible names (D33, D53). Six to eight foes use two rows and new-wave actors are keyed by foe id
 (D91). Auto shares its policy with the battle simulator; speed uses playback clocks (D89).
-The Hub stamps code-drawn art from uma-art; DOM anchors share its grid (D64). Opening an overlay pauses its scene,
+The shell and the Hub map come from `@luismlorenzana/uma-kit`, shared with uma-racer (D147): the Hub stamps
+code-drawn art from uma-art, and DOM anchors share its grid (D64). Opening an overlay pauses its scene,
 not the game loop (D39). Screen labels stay short, with explanations behind `HelpButton` (D95).
 
 Jobs derive progress from timestamps, not interval counters. Queues start at the previous job's finish and pay only
@@ -97,6 +98,7 @@ Bucket paths, endpoints, caching, local directories and deploy stages are in
 ## Budgets
 
 Main JS ≤ 230 KB gzip (D56). H16 reduced the production entry from 195.96 to 133.15 KB gzip (measured when it merged onto main `888aeb2`).
+D147 (uma-kit's shell and Motion's sheets) raised it to about 161 KB gzip.
 `scripts/check-size.mjs`, run by the web build, measures the HTML entry and all its static JS dependencies from
 Vite's manifest. Both must fit the budget; putting code in an eagerly imported vendor chunk cannot hide it.
 Phaser (Hub and battle stage), Firebase, master data parsing and each place page remain lazy chunks.

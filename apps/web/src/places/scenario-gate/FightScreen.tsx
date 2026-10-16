@@ -160,7 +160,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
   if (!live || !shown) {
     return (
-      <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-page p-6 text-center">
+      <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-page p-6 text-center">
         <p>No fight is open.</p>
         <button type="button" onClick={onMap} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink">Back to the map</button>
       </div>
@@ -266,7 +266,8 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   const waves = battleWaveCount(state.input)
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-page">
+    // The fight stays dark in both modes, as uma-racer's race stage does (D147).
+    <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
       <header className="pt-safe z-20 flex min-h-13 items-center gap-1 border-b border-hairline bg-panel/95 px-1.5">
         <button type="button" onClick={onMap} disabled={busy} className="flex size-11 items-center justify-center rounded-full text-ink-soft" aria-label="Back to the map (the fight stays open)">
           <BackIcon />

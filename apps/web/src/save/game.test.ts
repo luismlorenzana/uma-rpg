@@ -46,7 +46,7 @@ describe('game store', () => {
     await boot('u1')
     expect(useGame.getState().save!.tierWorlds['1']).toEqual(world)
   })
-  it('asks for a trainer name on a fresh device with an empty server, then saves 20 Unlock Tickets', async () => {
+  it('asks for a trainer name on a fresh device with an empty server, then saves 20 Uma Tickets', async () => {
     await boot('u1')
     expect(useGame.getState().status).toBe('first-launch')
     await createAccount('Luis')

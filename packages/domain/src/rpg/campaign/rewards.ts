@@ -46,7 +46,7 @@ export function rpgBattleLaurels(kind: RpgRewardKind, tier: number): number {
   return RPG_BATTLE_LAURELS[kind] * Math.max(1, tier)
 }
 
-/** Shards for going from one level to another (Tier 1 only). */
+/** Uma Shards for going from one level to another (Tier 1 only). */
 export function rpgShardsBetween(before: number, after: number): number {
   return RPG_SHARD_LEVELS.filter((level) => before < level && after >= level).length
 }

@@ -255,13 +255,13 @@ export function recallJob(save: Save, placeId: string, slot: number, now: string
   return withWorld(save, tier, world, now)
 }
 
-/** Time Tickets that would finish a running job now: one per started 30 minutes left (D74). */
+/** Speed Tickets that would finish a running job now: one per started 30 minutes left (D74). */
 export function ticketsToFinish(job: Job, now: string): number {
   return timeTicketsToFinish(Math.max(0, jobEndsAt(job) - Date.parse(now)))
 }
 
 /**
- * Spends Time Tickets on a running job or training: each takes 30 minutes off (D74), never past done. The items it
+ * Spends Speed Tickets on a running job or training: each takes 30 minutes off (D74), never past done. The items it
  * finishes are collected as usual.
  */
 export function cutJobTime(save: Save, placeId: string, slot: number, tickets: number, now: string, tier = TIER_ONE): Save {
@@ -270,8 +270,8 @@ export function cutJobTime(save: Save, placeId: string, slot: number, tickets: n
   if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
   if (jobFinished(job, now) >= job.count) throw new SaveRuleError('bad-job', 'already finished')
   const needed = ticketsToFinish(job, now)
-  if (!Number.isInteger(tickets) || tickets < 1 || tickets > needed) throw new SaveRuleError('bad-count', `use 1–${needed} Time Tickets here`)
-  if (world.wallet.timeTickets < tickets) throw new SaveRuleError('no-ticket', `needs ${tickets} Time Ticket${tickets > 1 ? 's' : ''}`)
+  if (!Number.isInteger(tickets) || tickets < 1 || tickets > needed) throw new SaveRuleError('bad-count', `use 1–${needed} Speed Tickets here`)
+  if (world.wallet.timeTickets < tickets) throw new SaveRuleError('no-ticket', `needs ${tickets} Speed Ticket${tickets > 1 ? 's' : ''}`)
   const left = jobEndsAt(job) - Date.parse(now)
   const startedAt = new Date(Date.parse(job.startedAt) - Math.min(left, tickets * TIME_TICKET_SPAN)).toISOString()
   const next = setJob({ ...world, wallet: { ...world.wallet, timeTickets: world.wallet.timeTickets - tickets } }, placeId, slot, { ...job, startedAt })

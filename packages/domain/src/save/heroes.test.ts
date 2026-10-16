@@ -130,7 +130,7 @@ describe('Halls of Heroes (D106)', () => {
     expect(worldOf(s).umas['101']!.bonds['brawler-1']).toEqual({ level: 0, exp: 6 })
   })
 
-  it('opens the halls on a v18 save with five more Unlock Tickets', () => {
+  it('opens the halls on a v18 save with five more Uma Tickets', () => {
     const raw = JSON.parse(JSON.stringify(stable()))
     raw.schemaVersion = 18
     const w = raw.tierWorlds['1']

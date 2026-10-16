@@ -250,7 +250,7 @@ function toV21(world: Record<string, unknown>): Record<string, unknown> {
 
 // --- v18 → v19 (D106) --------------------------------------------------------------------------------------------------
 
-/** The Halls of Heroes open empty and nobody has a Bond yet; the owner's five Unlock Tickets for them (D106). */
+/** The Halls of Heroes open empty and nobody has a Bond yet; the owner's five Uma Tickets for them (D106). */
 export const V19_UNLOCK_TICKETS = 5
 function toV19(world: Record<string, unknown>): Record<string, unknown> {
   const umas = isRecord(world.umas) ? Object.fromEntries(Object.entries(world.umas).map(([id, u]) => [id, isRecord(u) ? { ...u, bonds: {} } : u])) : world.umas
@@ -401,7 +401,7 @@ function toV18(world: Record<string, unknown>, version: number): Record<string, 
     springs: {},
   }
   delete w.runs
-  // Wallet: v11's Rush Tickets were two Time Tickets each (D74); Marks start at 0.
+  // Wallet: v11's Rush Tickets were two Speed Tickets each (D74); Marks start at 0.
   const wallet = (isRecord(w.wallet) ? w.wallet : (w.wallet = {})) as Record<string, unknown>
   if ('rushTickets' in wallet) { wallet.timeTickets = 2 * (typeof wallet.rushTickets === 'number' ? wallet.rushTickets : 0); delete wallet.rushTickets }
   wallet.gearMarks = 0

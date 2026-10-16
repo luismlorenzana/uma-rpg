@@ -2,7 +2,7 @@ import atlasUrl from '@luismlorenzana/uma-art/world/atlas.png?url'
 import atlasIndex from '@luismlorenzana/uma-art/world/atlas.json'
 import compactUrl from '@luismlorenzana/uma-art/world/stages-compact.png?url'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { artScale, hubDpr } from '../../../hub/grid'
+import { artScale, hubDpr } from '@luismlorenzana/uma-kit/hub'
 import { frames } from './visuals'
 import type { MapLayout, MapSpot } from './layout'
 

@@ -5,7 +5,7 @@ Use this script for a release, in order, on the [live game](https://uma-rpg.web.
 
 Use your existing save; do not reset it. Start with five free Umas, an Uma at Lv5+ for side skills, and enough Laurels,
 raw/refined grade-1 items, Promotion and Mastery Tokens for the jobs below. Earn missing stock in fights or
-gather it; the Exchange trades tokens. Jobs can finish while you are away, or with the Time Tickets in step 39 (do
+gather it; the Exchange trades tokens. Jobs can finish while you are away, or with the Speed Tickets in step 39 (do
 that step early if needed). Keep one regular stage's first-clear rewards to compare with its replay and Sweep.
 
 **Phone only** means an installed iPhone app or production service is required; local auth-off previews cannot check
@@ -16,8 +16,11 @@ Exchange sheets. Every button and footer should remain reachable without horizon
    icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator.
    **iPhone 15, 393×852 (H30):** the frame and tab bar reach the bottom; no empty band below the bar. Only the home
    indicator inset sits below its row. Place pages scroll inside the frame.
+   **Shell (D147):** the top bar shows your initial with the Tier crest, then Laurels, Speed Tickets and Uma Tickets
+   `N · s/5`. The bottom bar reads Town Hall · Learning · Battle (raised) · Wilds · Menu. In **Account → Appearance**,
+   Light and Dark switch the whole app at once and System follows the phone; a fight stays dark either way.
 2. **Phone only — sign in.** Tap **Sign in with Google** with the owner's account. On a new save, enter a trainer name
-   and tap **Enter the Hub**: expect an empty Stable and 20 Unlock Tickets. On an existing save, expect your saved Hub.
+   and tap **Enter the Hub**: expect an empty Stable and 20 Uma Tickets. On an existing save, expect your saved Hub.
 3. Tap the account bar, edit **Trainer name** and tap **Save**; reopen Account. Expect the name to persist and the
    **App build** to identify the release. **Phone only:** if **Update ready** appears, tap **Restart to update** and
    confirm the new build and your save after reopening.
@@ -82,7 +85,7 @@ Exchange sheets. Every button and footer should remain reachable without horizon
     read its rules; expect them in a sheet. (D79, D91, D95)
 27. Return to the continent and tap **Spring** with some MP spent. Expect the active party's MP refilled and a
     recharge countdown of about two hours. It is disabled during an open fight or its recharge. (D72)
-28. The Hub has three pages: **Wilds**, Learning and Town. At **Wilds → Monster Den**, assign a free Uma, choose a
+28. The Hub has four pages: Town Hall, Learning, Battle and **Wilds**. At **Wilds → Monster Den**, assign a free Uma, choose a
     grade-1 output, **×1 → Start**. Repeat at **Wilds → Mine** with another Uma. Expect both timers and progress rings
     on the Hub, three slots each; higher grades show their Craft Level gate. (D144)
 29. Open Party Hall with a working member. Expect **Busy**; her party cannot start a fight. Recall her from her slot
@@ -111,7 +114,7 @@ Exchange sheets. Every button and footer should remain reachable without horizon
 38. At **Exchange → Tokens**, open a band-1 token and tap **×1** in Sell twice, then buy one different kind in that band.
     Expect +40 then −40 Laurels, with stock changed. Check **Warehouse → Tokens** can sell one for 20 Laurels too;
     Mastery, Promotion and Cooking are the current kinds. (D80, D94)
-39. Buy **Time Tickets** at the Exchange (10 Laurels each). On a running gather/refine/craft/cut job and a training
+39. Buy **Speed Tickets** at the Exchange (10 Laurels each). On a running gather/refine/craft/cut job and a training
     job, tap **−30m**: expect one Ticket spent and 30 minutes removed. Let the countdown refresh, then tap **Finish · N**
     when more than one Ticket is needed (use **−30m** for the last one). Expect N Tickets spent, **Done**, and
     **Collect/Rank up** still required to receive the output. (D74)

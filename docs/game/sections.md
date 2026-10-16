@@ -8,28 +8,65 @@ Every screen and what you do there. The place list is generated from `packages/d
 The gates, in order (`apps/web/src/app/Root.tsx`):
 1. Splash.
 2. "Sign in with Google" (Firebase).
-3. On first launch: pick a trainer name, then 20 Unlock Tickets.
+3. On first launch: pick a trainer name, then 20 Uma Tickets.
 4. The Hub.
 
 A global toast offers "Update ready · Restart" when a new build is out.
 
 ## The Hub
 
-Three pages you switch by tab or by swiping (`hub/PageTabs.tsx`, `hub/swipe.ts`): **Wilds**, **Learning** and **Town**
-(D144). Each page is a pixel-art map (`hub/scene/HubScene.ts`, Phaser) fitted to the screen.
-The app uses a fixed edge-to-edge frame, with the bottom tab bar's safe-area padding under the home indicator (H30).
-Place pages scroll inside that frame; the document behind them does not set the screen height.
+Four pages, in the bottom bar's order: **Town Hall**, **Learning**, **Battle** and **Wilds** (D147). Tap a tab or swipe
+sideways to the next page. Each page is a pixel-art map fitted to the screen (uma-kit's Hub scene, Phaser).
 
-- Places are DOM buttons over the map, each with:
+The app runs in uma-kit's shell, the same as uma-racer's (`hub/Shell.tsx`, D147):
+- a fixed full-screen frame;
+- the account bar on top;
+- the bottom bar floating in the thumb zone, lifted clear of the home indicator.
+
+Place pages open between the two bars and scroll inside them. A fight hides both bars.
+
+- Places are buttons over the map, each with:
   - a name pill;
   - slot pips showing the working Umas' faces in progress rings;
   - a "Ready" badge.
+- **Town Hall's plaza:** the featured Uma stands on the road. She is the one picked on this device, or else the highest
+  Uma Level. Tap her for Fight, Profile or "Feature another" (`?sheet=featured`).
 - A floating **Collect all · N ready** button collects every finished job.
-- **Taps:** a place opens its **quick look** (`/:page?peek=:id`). Its **Enter** button opens the full page
-  (`/:page/:placeId/*`) in a side overlay.
-- **Routes:** `/` returns to the last page you viewed. Every screen is a place (D31), with no other top-level routes.
+- **Taps:** a place opens its **quick look** in the side panel (`/:page?peek=:id`). Its **Enter** button opens the
+  place's page (`/:page/:placeId/*`). The Scenario Gate skips the quick look and opens its page at once.
+- **Routes:**
+  - `/` returns to the last page you viewed.
+  - Every screen is a place (D31), with no other top-level routes.
+  - A link to a place under another page, such as an old link or a push, moves to the place's own page.
 
 <!-- live:places -->
+### Town Hall (`town`)
+
+| Place | Id | Kind | Uma slots | What it is |
+|---|---|---|---|---|
+| Stable | `stable` | town | — | Every Uma outfit, locked or yours. Uma Tickets open new ones. |
+| Party Hall | `party-hall` | town | — | Twenty parties of five. |
+| Warehouse | `warehouse` | town | — | Every item you own: materials, Star Gems and gear. |
+| Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
+
+### Learning (`learning`)
+
+| Place | Id | Kind | Uma slots | What it is |
+|---|---|---|---|---|
+| Brawler Dojo | `brawler-dojo` | class-hall | 4 | The Brawler Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Mage Tower | `mage-tower` | class-hall | 4 | The Mage Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
+
+### Battle (`battle`)
+
+| Place | Id | Kind | Uma slots | What it is |
+|---|---|---|---|---|
+| Scenario Gate | `scenario-gate` | battle | — | The world map: five continents of regions to clear. |
+| Tier Finale | `tier-finale` | battle | — | The tier's final event, and promotion to the next tier. |
+
 ### Wilds (`wilds`)
 
 | Place | Id | Kind | Uma slots | What it is |
@@ -45,34 +82,12 @@ Place pages scroll inside that frame; the document behind them does not set the 
 | Workbench | `workbench` | station | 3 | Refines raw materials, one into one: ore into ingots, logs into planks. |
 | Forge | `forge` | station | 3 | Crafts weapons, armor and accessories. |
 | Lapidary | `lapidary` | station | 3 | Cuts Star Gems that open nodes on an Uma’s Extra Stats map. |
-
-### Learning (`learning`)
-
-| Place | Id | Kind | Uma slots | What it is |
-|---|---|---|---|---|
-| Brawler Dojo | `brawler-dojo` | class-hall | 4 | The Brawler Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Mage Tower | `mage-tower` | class-hall | 4 | The Mage Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Armory | `armory` | armory | — | Arms and armor on display. |
-| Jeweler | `jeweler` | armory | — | Orbs and fine settings. |
-
-### Town (`town`)
-
-| Place | Id | Kind | Uma slots | What it is |
-|---|---|---|---|---|
-| Stable | `stable` | town | — | Every Uma outfit, locked or yours. Unlock Tickets open new ones. |
-| Party Hall | `party-hall` | town | — | Twenty parties of five. |
-| Scenario Gate | `scenario-gate` | town | — | The world map: five continents of regions to clear. |
-| Warehouse | `warehouse` | town | — | Every item you own: materials, Star Gems and gear. |
-| Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
-| Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
-| Tier Finale | `tier-finale` | town | — | The tier's final event, and promotion to the next tier. |
 <!-- /live -->
 
 The Wilds hold every facility: eight sites in two columns, and the Workbench, the Lapidary and the Forge across the
-middle row, the Lapidary on the road between them (D144).
+middle row, the Lapidary on the road between them (D144). Town Hall keeps its four places in the corners around the
+plaza. The Battle page holds the Scenario Gate and the Tier Finale. It is drawn with the Town tiles until its own tile
+page arrives (H31).
 
 ### Facilities
 
@@ -107,7 +122,7 @@ Lapidary:
 - **Each job card:**
   - Collect;
   - Repeat ×N;
-  - −30m and Finish (Time Tickets);
+  - −30m and Finish (Speed Tickets);
   - Recall;
   - a queue of up to three.
 - **Assigning:** pick an Uma (free ones first, then the highest level here and its EXP; the level and her time per
@@ -122,7 +137,7 @@ Lapidary:
 **The Learning page** holds the five Halls of Heroes (D106), one page shared by all five (`places/halls/HallPage.tsx`).
 Each shows its four seats: the seat's Limit Break with its kinds, its Hero large on the left, and her Learners below with
 their Bond Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty the seat, `+` to add a Learner, and a
-Learner to see her Bond or send her away. The Armory and Jeweler stay closed. See [Halls of Heroes](heroes.md).
+Learner to see her Bond or send her away. The Observatory stands below the halls. See [Halls of Heroes](heroes.md).
 
 ## Town
 
@@ -171,7 +186,7 @@ Routes: `/town/party-hall` and `:n` (1–20).
 
 ### Scenario Gate
 
-Routes: `/town/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent` and `fight`. The world map ([maps](maps.md)).
+Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent` and `fight`. The world map ([maps](maps.md)).
 
 - **On every screen:**
   - the **active party bar**: swap the party, see each Uma's MP;
@@ -194,7 +209,7 @@ Routes: `/town/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent`
     open; "Give up").
   - **Stage:** foes on top, in two rows from six; the party below.
   - **Controls:** a weapon row, then **Attack**, **Skills** and **Guard**, and the **Limit Break** sheet.
-- **Result:** Victory or Defeated, Laurels, Marks, Shards and Tickets; for each Uma her EXP and level bar, her Class Rank
+- **Result:** Victory or Defeated, Laurels, Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar, her Class Rank
   bar, and five Weapon and five Armor Rank cells, each glowing on a rank-up (D102). Then "Fight again" or back to the
   map.
 
@@ -208,7 +223,7 @@ Shelf tabs:
 ### Exchange
 
 - Your Laurels and ticket counts.
-- **Buy:** Time Tickets, Sweep Tickets, and raw items of the grades your continents unlock.
+- **Buy:** Speed Tickets, Sweep Tickets, and raw items of the grades your continents unlock.
 - **Manuals** (D102): pick an Uma, highest Uma Level first, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
   1,000 Gear or Class Marks into 1,000 EXP on it.
 
@@ -223,7 +238,8 @@ Shelf tabs:
 
 Reached from the account bar.
 - Rename your trainer.
-- **Tier 1 wallet:** Tickets, Shards and Laurels.
+- **Tier 1 wallet:** Uma Tickets, Uma Shards and Laurels.
+- **Appearance:** System, Light or Dark, kept on this device (D147).
 - Notifications.
 - **Info rows:** cloud save, game data version, app build.
 - Sign out.
@@ -234,13 +250,18 @@ A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't bu
 
 ## Global UI
 
-- **Account bar** (top):
-  - your initial and name, and a Tier 1 chip;
-  - Offline or Sync paused, when it applies;
-  - Tickets, Shards and Laurels.
-- **Menu sheet** (☰): every place by page (locked ones show a lock), and the Account.
-- **Overlays:** full place pages slide in from the right at 88% width. They close with ✕, a swipe right, a backdrop tap,
-  Escape or back. Bottom sheets are used for everything else (`ui/BottomSheet.tsx`).
+- **Account bar** (top, `hub/Bars.tsx`):
+  - your initial with the Tier 1 crest, which opens the Account;
+  - three chips: **Laurels**, **Speed Tickets**, and **Uma Tickets** with the Uma Shards toward the next (`N · s/5`).
+    Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
+  - Offline or Sync paused, when it applies.
+- **Bottom bar:** Town Hall · Learning · **Battle** (raised, in the middle) · Wilds · Menu. The Wilds tab counts the jobs
+  ready to collect.
+- **Menu sheet** (`?sheet=menu`): every place by page, with a lock on locked ones, and the Account.
+- **Side panel:** a quick look slides in from the right. It closes with ✕, a swipe right, a backdrop tap, Escape or back.
+- **Place pages:** they fill the space between the bars, and Back returns to where you opened them from. Bottom sheets
+  are used for everything else (uma-kit's `Sheet`).
+- **Appearance:** light or dark follows the phone unless the Account sets one. Fights stay dark either way.
 - **Push notifications** (`apps/web/src/push/`, server `apps/api/src/push/`):
   - A server tick every five minutes sends "Work done" or "N jobs done".
   - Tapping one opens the place.

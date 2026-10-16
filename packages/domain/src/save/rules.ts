@@ -1,5 +1,5 @@
 // Collection and party rules (S2): pure functions over the save that return a new save or throw SaveRuleError.
-// Design: game-design.md §3 (unlocks, D44 final), §6 (parties, one per Uma: D46), D47 (Shards → Tickets).
+// Design: game-design.md §3 (unlocks, D44 final), §6 (parties, one per Uma: D46), D47 (Uma Shards → Tickets).
 import { workOf } from './status'
 import { newOwnedUma, normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SHARDS_PER_TICKET, type Party, type Save, type TierWorld, type Wallet } from './save'
 
@@ -28,11 +28,11 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Spends one Unlock Ticket on an outfit; final once committed (D44). */
+/** Spends one Uma Ticket on an outfit; final once committed (D44). */
 export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (world.umas[outfitId]) throw new SaveRuleError('already-owned', 'already unlocked')
-  if (world.wallet.unlockTickets < 1) throw new SaveRuleError('no-ticket', 'no Unlock Tickets left')
+  if (world.wallet.unlockTickets < 1) throw new SaveRuleError('no-ticket', 'no Uma Tickets left')
   return withWorld(save, tier, {
     ...world,
     wallet: { ...world.wallet, unlockTickets: world.wallet.unlockTickets - 1 },
@@ -78,7 +78,7 @@ export function renameParty(save: Save, party: number, name: string, now: string
   return withWorld(save, tier, { ...world, parties }, now)
 }
 
-/** Adds Shards; every five become an Unlock Ticket at once (D47). */
+/** Adds Uma Shards; every five become an Uma Ticket at once (D47). */
 export function addShards(wallet: Wallet, shards: number): Wallet {
   const total = wallet.shards + Math.max(0, Math.floor(shards))
   return { ...wallet, unlockTickets: wallet.unlockTickets + Math.floor(total / SHARDS_PER_TICKET), shards: total % SHARDS_PER_TICKET }

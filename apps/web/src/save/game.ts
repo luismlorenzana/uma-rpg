@@ -82,7 +82,7 @@ export async function renameAccount(trainerName: string): Promise<void> {
   await commit(renameTrainer(save, trainerName, nowIso()))
 }
 
-/** Spends one Unlock Ticket (final, D44). Throws SaveRuleError when it can't. */
+/** Spends one Uma Ticket (final, D44). Throws SaveRuleError when it can't. */
 export async function unlock(outfitId: string): Promise<void> {
   const { save } = useGame.getState()
   if (save) await commit(unlockUma(save, outfitId, nowIso()))
@@ -137,7 +137,7 @@ export async function fightAction(region: RpgCampaignChapter, action: BattleActi
 export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
   edit(import('@rpg/domain/work'), (d, s, now) => d.startJob(s, placeId, slot, outfit, output, count, now))
 export const recall = (placeId: string, slot: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.recallJob(s, placeId, slot, now))
-/** Spends Time Tickets on a job, 30 minutes each (D74). */
+/** Spends Speed Tickets on a job, 30 minutes each (D74). */
 export const cutTime = (placeId: string, slot: number, tickets: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.cutJobTime(s, placeId, slot, tickets, now))
 /** Queues another job after the slot's current one, same Uma (QoL, D62). */
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
