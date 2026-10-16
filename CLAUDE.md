@@ -9,6 +9,9 @@
 - The RPG rules being ported live in uma-racer on `origin/main`: `packages/domain/src/rpg/`, `apps/web/src/screens/rpg/`,
   `apps/web/src/ui/rpg/`, `apps/api/src/save/rpg-*`. The local uma-racer checkout may sit on an old branch.
 - Shared changes (master data schema, shared packages, original art) happen in a uma-platform session.
+- **One game or both:** [docs/change-protocol.md](docs/change-protocol.md). Changes to anything uma-kit draws (frame, bars,
+  menu, side panel, sheets, Hub map, theme) go through uma-platform as a "Both apps:" request and a kit release, never a
+  fork here.
 - **Original-game content never goes in git.**
 - The owner prefers **no open questions**: decide with a recommendation when a sensible default exists, and log it.
 - **Claude commits and pushes to `main`** in Conventional Commits style (owner, 2026-10-10). Delegated agents use a branch and a pull request. Check `git status` before every commit: no original-game content.
