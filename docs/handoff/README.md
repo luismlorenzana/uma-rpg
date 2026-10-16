@@ -10,13 +10,12 @@
 | # | Task | Who | Size | Needs |
 |---|---|---|---|---|
 | **Now** | | | | |
-| [H31](tasks/H31-laurel-mark-and-battle-tiles.md) | Art for Phase A: a Laurel mark and the Battle tile page | ChatGPT, Claude releases | S–M | — |
 | [H13](tasks/H13-w4-field-effects.md) | W4: field effects and home ground | Claude | M | — |
 | **Parked by the owner** | | | | |
 | [H23](tasks/H23-tier-finale-and-promotion.md) | S8: Tier Finale and promotion | The owner decides, Claude builds | L | Q6 |
 | [H24](tasks/H24-tier-2-3-design.md) | Tier 2 and 3 design | The owner and Claude | M | Q7, H23 |
 
-**For ChatGPT, in order:** H31. H08, H10, H11 and H28–H30 are complete.
+**For ChatGPT:** no open packets. H08, H10, H11 and H28–H31 are complete.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes. **Combat** was rebalanced by D140–D141 ([combat balance](../design/combat-balance.md)); its next pass comes
@@ -30,7 +29,8 @@
   `@luismlorenzana/uma-kit`, planned in uma-platform's
   [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). This game's Phase 0
   is complete (H30). Phase A is done here (D147): this game runs on uma-kit 0.1.2, and uma-racer's session moves
-  uma-racer. Phase A's art is H31, a Laurel mark and the Battle tile page; Claude pins the uma-art release.
+  uma-racer. H31's Laurel mark and Battle tile page are published in **uma-art 2.9.0** (platform P49); Claude owns
+  the game's version pin and art adoption. No game wiring was part of H31.
 
 ## Removed on 2026-10-12
 
