@@ -25,6 +25,9 @@
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
 - **Other repos** (uma-racer phase 3, uma-puzzle phase 4) are in uma-platform's `docs/roadmap.md` and uma-racer's
   `docs/rearchitecture/`, not here.
+- **Sibling apps** (proposal, 2026-10-16): one shell, Hub and Uma album shared with uma-racer, in uma-platform's
+  [`docs/sibling/`](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/README.md). It waits on the
+  owner; its Phase 0 (the iPhone band, the Uma Level sort rule) touches this repo.
 
 ## Removed on 2026-10-12
 
