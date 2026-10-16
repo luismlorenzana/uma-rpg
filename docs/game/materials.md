@@ -477,6 +477,6 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 | Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
 | Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 30% of magical damage taken |
 
-A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 7, 12, 18, 26, 34, 45, 55, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 2 (5 at grade 10, D142), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
+A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 8, 12, 19, 26, 35, 45, 57, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
 <!-- /live -->
 

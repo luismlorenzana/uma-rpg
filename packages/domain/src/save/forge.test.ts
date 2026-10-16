@@ -41,14 +41,14 @@ describe('gear (S7, D124, D125)', () => {
     // D141: the slot's defensive stat is +2 a grade.
     expect(gearPoints(gearById('helm-g4')!)).toMatchObject({ atk: 2, def: 8, matk: 0 })
     expect(gearPoints(gearById('robe-g4')!)).toMatchObject({ matk: 2, hp: 8, atk: 0 })
-    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 1, mp: 6 })
+    expect(gearPoints(gearById('leggings-g3')!)).toMatchObject({ matk: 2, mp: 6 })
     expect(gearPoints(gearById('gauntlets-g10')!)).toMatchObject({ atk: 5, mdef: 20 })
-    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 2, speed: 10 })
-    // D142: armor's offense starts at grade 2.
-    expect(gearPoints(gearById('helm-g1')!)).toMatchObject({ atk: 0, def: 2 })
+    expect(gearPoints(gearById('slippers-g5')!)).toMatchObject({ matk: 3, speed: 10 })
+    // D143: armor's offense starts at grade 1 again.
+    expect(gearPoints(gearById('helm-g1')!)).toMatchObject({ atk: 1, def: 2 })
     expect(Object.values(gearPoints(gearById('orb-fire-g4')!)).every((n) => n === 0)).toBe(true)
     // Might by grade (D142), counting only the weapons in her class's slots.
-    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 7 })
+    expect(equippedMight({ lance: 'lance-g3', 'tome-fire': 'tome-fire-g2' }, ['greatsword', 'axe', 'lance', 'bow', 'katana'])).toEqual({ lance: 8 })
     expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 4 })
     expect(equippedMight({ bow: 'bow-g10' }, ['bow'] as never)).toEqual({ bow: 68 })
     expect(equippedPoints({ head: 'helm-g2', lance: 'lance-g3' })).toMatchObject({ def: 4, atk: 1, hp: 0 })
@@ -166,7 +166,7 @@ describe('the Forge and equipping (S7)', () => {
       gear: { 'greatsword-g1': 1, 'lance-g1': 1, 'helm-g1': 1, 'robe-g1': 1, 'boots-g1': 1, 'orb-fire-g1': 1, 'talisman-bulwark-g1': 1 } }))
     for (const g of ['greatsword-g1', 'lance-g1', 'helm-g1', 'robe-g1', 'boots-g1', 'orb-fire-g1', 'talisman-bulwark-g1']) save = equipGear(save, '101', g, at(0))
     const uma = worldOf(save).umas['101']!
-    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 0, matk: 0, def: 2, hp: 2, speed: 2 })
+    expect(umaPoints(uma, 'brawler')).toMatchObject({ atk: 2, matk: 1, def: 2, hp: 2, speed: 2 })
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, at(0)) })
     const ura = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])
     const outfits = new Map(['101', '102', '103', '104', '105'].map((id) => [id, { ...smith, outfitId: id }]))
@@ -178,8 +178,7 @@ describe('the Forge and equipping (S7)', () => {
     expect(ally).not.toHaveProperty('orb')
     expect(ally).not.toHaveProperty('regen')
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
-    // Grade-1 armor adds no offense (D142): her ATK is her own.
-    expect(ally.stats.atk).toBe(bare.atk)
+    expect(ally.stats.atk).toBe(bare.atk + 2)
   })
 })
 

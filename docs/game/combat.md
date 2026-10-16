@@ -71,8 +71,8 @@ For each part of each hit:
 
 1. **Base:** `offense² ÷ (offense + defense) × power` (D141). Offense is ATK for Arms kinds and MATK for elements;
    defense the target's DEF or MDEF. The same ratio gives the same share at every level, and it is never zero.
-   **Might**: the weapon a hit is made with adds its grade's Might to offense (D142, engine v13): 1, 4, 7, 12, 18, 26,
-   34, 45, 55, 68 for grades 1–10, about 6% × g at the level its grade opens. (v12 fights took Might as +6% a grade on
+   **Might**: the weapon a hit is made with adds its grade's Might to offense (D142, engine v13): 1, 4, 8, 12, 19, 26,
+   35, 45, 57, 68 for grades 1–10, about 6% × g at the level its grade opens. (v12 fights took Might as +6% a grade on
    the hit; before v12, `max(offense × 0.2, offense − defense × 0.5)`, with Might +4 a grade added to offense.)
 2. **Weak hit:** ×1.3 when the hit's kind is on the foe's weakness lists, or it's Light or Dark against a Hexed foe. An
    Uma's **Orb** adds its kind to every hit for this check, without extra damage.
@@ -114,18 +114,18 @@ Extra Stats; HP about 276 and 928.
 
 ### Where damage comes from
 
-Measured on the balance simulation's on-curve Brawler at each level (D142). Offense adds up; a hit doesn't, since it is
-offense² ÷ (offense + defense), so each source is shown alone on top of her level stat, and all together. Skill depth,
-opened by Class Rank, multiplies whatever offense she has.
+Measured on the balance simulation's on-curve Brawler at each level (D142, D143). Offense adds up; a hit doesn't, since
+it is offense² ÷ (offense + defense), so each source is shown as what her hit loses without it (the other two kept),
+and all three against her level stat alone. Skill depth, opened by Class Rank, multiplies whatever offense she has.
 
 <!-- live:damage-sources -->
-| Level | Gear grade, skill depth | Uma stats (level) | Extra Stats | Weapon Might | Armor | Offense | Hit: + Extra Stats | Hit: + weapon | Hit: + armor | Hit: all three | Skill depth vs depth 1 |
+| Level | Gear grade, skill depth | Uma stats (level) | Extra Stats | Weapon Might | Armor | Offense | Hit without Extra Stats | Hit without the weapon | Hit without armor | All three vs her stats alone | Skill depth vs depth 1 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Lv 1 | G1, 1 | 24 (92%) | 1 (4%) | 1 (4%) | 0 (0%) | 26 | ×1.06 | ×1.06 | ×1.00 | ×1.12 | ×1.00 |
-| Lv 10 | G2, 2 | 41 (77%) | 3 (6%) | 4 (8%) | 5 (9%) | 53 | ×1.11 | ×1.14 | ×1.18 | ×1.43 | ×1.38 |
-| Lv 25 | G5, 3 | 68 (61%) | 15 (14%) | 18 (16%) | 10 (9%) | 111 | ×1.34 | ×1.41 | ×1.23 | ×2.02 | ×1.81 |
-| Lv 40 | G8, 5 | 95 (49%) | 35 (18%) | 45 (23%) | 20 (10%) | 195 | ×1.63 | ×1.82 | ×1.35 | ×2.96 | ×2.87 |
-| Lv 50 | G10, 5 | 113 (44%) | 52 (20%) | 68 (26%) | 25 (10%) | 258 | ×1.84 | ×2.13 | ×1.39 | ×3.62 | ×2.87 |
+| Lv 1 | G1, 1 | 24 (77%) | 1 (3%) | 1 (3%) | 5 (16%) | 31 | −4% | −4% | −22% | ×1.43 | ×1.00 |
+| Lv 10 | G2, 2 | 41 (77%) | 3 (6%) | 4 (8%) | 5 (9%) | 53 | −8% | −10% | −13% | ×1.43 | ×1.38 |
+| Lv 25 | G5, 3 | 68 (58%) | 15 (13%) | 19 (16%) | 15 (13%) | 117 | −17% | −22% | −17% | ×2.18 | ×1.81 |
+| Lv 40 | G8, 5 | 95 (49%) | 35 (18%) | 45 (23%) | 20 (10%) | 195 | −25% | −32% | −14% | ×2.96 | ×2.87 |
+| Lv 50 | G10, 5 | 113 (44%) | 52 (20%) | 68 (26%) | 25 (10%) | 258 | −28% | −37% | −14% | ×3.62 | ×2.87 |
 
 A regular foe's 100% physical hit, as a share of her HP:
 

@@ -2,7 +2,7 @@
 // refined items of its grade (D125), one from each half of the Wilds, the pair rotating with the grade so every Uma
 // uses all eight families alike (D139). Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
 // What a piece does, all flat (D104, D124): a weapon's Might (+4 a grade) adds to the offense of hits made with it; an
-// armor piece adds ATK (physical) or M.ATK (magical), ⌊g/2⌋, and its slot's defensive stat, 2g; an Orb adds its kind to
+// armor piece adds ATK (physical) or M.ATK (magical), ⌈g/2⌉, and its slot's defensive stat, 2g; an Orb adds its kind to
 // every hit for weaknesses only; a Talisman or an Amulet gives one small defensive effect.
 import { ITEM_FAMILIES, type ItemFamily } from '../items/catalog'
 import { isRpgTome, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
@@ -61,11 +61,11 @@ export function gearById(id: string): GearPiece | undefined {
  * +6% at grade 1 on Lv 1, +60% at grade 10 on Lv 46. Being flat, a grade worn ahead of its level is worth much more, and
  * one kept long after less. Index 0 is the Training weapon.
  */
-export const MIGHT_BY_GRADE = [0, 1, 4, 7, 12, 18, 26, 34, 45, 55, 68] as const
+export const MIGHT_BY_GRADE = [0, 1, 4, 8, 12, 19, 26, 35, 45, 57, 68] as const
 export const mightOf = (grade: number): number => MIGHT_BY_GRADE[Math.max(0, Math.min(10, grade))]!
-/** An armor piece's offense, ⌊g/2⌋ ATK or M.ATK, from grade 2 so the weapon stays the bigger lever early (D142); its
+/** An armor piece's offense, ⌈g/2⌉ ATK or M.ATK, from grade 1 (D143 restores it after D142 started it at grade 2); its
  * slot's defensive stat is +2 a grade (D141). */
-export const armorOffense = (grade: number): number => Math.floor(grade / 2)
+export const armorOffense = (grade: number): number => Math.ceil(grade / 2)
 export const ARMOR_DEFENSE_PER_GRADE = 2
 
 /** The defensive effects of Talismans and Amulets (D124, D141), per grade, per mille. Regen and the two shields are shares

@@ -198,8 +198,8 @@ function foeRoles(): string {
 /**
  * Where an on-curve Uma's damage comes from, and what cuts the damage she takes (D142): the balance simulation's Brawler
  * (`world/balance-party.ts`, gear of the grade her level opens and her level's Extra Stats nodes) against a regular
- * striker of her level. Offense adds up; damage doesn't (offense² ÷ (offense + defense)), so each source is shown alone
- * on top of her level stat, and all together.
+ * striker of her level. Offense adds up; damage doesn't (offense² ÷ (offense + defense)), so each source is shown as
+ * what her hit would lose without it, with the other two kept, and all three against her level stat alone.
  */
 function damageSources(): string {
   const offense: Cell[][] = []
@@ -213,10 +213,10 @@ function damageSources(): string {
     const total = own + armor + extra + might
     const hit = (o: number) => (o * o) / (o + foe.stats.pdef)
     const part = (n: number) => `${n} (${Math.round((100 * n) / total)}%)`
-    const times = (o: number) => `×${(hit(o) / hit(own)).toFixed(2)}`
+    const lose = (n: number) => `−${Math.round(100 * (1 - hit(total - n) / hit(total)))}%`
     const depth = rpgOpenDepth(level)
     offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(armor), total,
-      times(own + extra), times(own + might), times(own + armor), times(total), `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
+      lose(extra), lose(might), lose(armor), `×${(hit(total) / hit(own)).toFixed(2)}`, `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
     // What a regular foe's 100% physical hit takes of her HP, as each defensive source joins.
     const share = (u: typeof bare, cut = 0) => {
       const o = foe.stats.atk
@@ -227,7 +227,7 @@ function damageSources(): string {
     taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(bare, built.guard ?? 0), share(built, built.guard ?? 0)])
   }
   return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Armor', 'Offense',
-    'Hit: + Extra Stats', 'Hit: + weapon', 'Hit: + armor', 'Hit: all three', 'Skill depth vs depth 1'], offense) +
+    'Hit without Extra Stats', 'Hit without the weapon', 'Hit without armor', 'All three vs her stats alone', 'Skill depth vs depth 1'], offense) +
     '\n\nA regular foe\'s 100% physical hit, as a share of her HP:\n\n' +
     table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', '+ Iron Talisman', 'All (on curve)'], taken) +
     '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears a Vampire and an Iron Talisman.'
@@ -292,7 +292,7 @@ function gear(): string {
   return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families, grades 1–4 (then again from grade 5)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
     EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
     [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
-  ])) + `\n\nA weapon's Might adds to the offense of the hits made with it, by grade: ${MIGHT_BY_GRADE.slice(1).join(', ')} (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 2 (${armorOffense(10)} at grade 10, D142), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
+  ])) + `\n\nA weapon's Might adds to the offense of the hits made with it, by grade: ${MIGHT_BY_GRADE.slice(1).join(', ')} (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (${armorOffense(10)} at grade 10), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
     `An Uma wears two accessories of different types.`
 }
 

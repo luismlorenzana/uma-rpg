@@ -207,7 +207,7 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
     ({ label, value: String(boosted.stats[k]), gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] })
   const weapons = classOf(uma, classId).weapons
   const might = equippedMight(uma.gear.equipped, weapons)
-  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}%`).join(' · ')
+  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ')
   const a = equippedAccessories(uma.gear.equipped)
   // Regen and the two shields are shares of her max HP (D141): the sheet shows both.
   const hp = boosted.stats.hp

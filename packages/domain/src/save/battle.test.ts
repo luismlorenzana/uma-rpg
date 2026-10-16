@@ -271,6 +271,12 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     const row = (label: string) => sheet.flatMap((g) => g.rows).find((r) => r.label === label)!
     expect(row('HP Regen').value).toBe('0 a round')
     expect(row('Might').value).toBe('None')
+    // Might is a flat number on its weapon's hits (D142), and armor adds its offense from grade 1 (D143).
+    const geared = { ...uma, gear: { ...uma.gear, equipped: { greatsword: 'greatsword-g1', head: 'helm-g1' } } }
+    const gearedRow = (label: string) => umaBattleSheet(o101, geared).flatMap((g) => g.rows).find((r) => r.label === label)!
+    expect(gearedRow('Might').value).toBe('Greatsword +1')
+    expect(gearedRow('ATK').gear).toBe(1)
+    expect(gearedRow('DEF').gear).toBe(2)
     expect(Number(row('ATK').value)).toBeGreaterThan(0)
   })
 })
