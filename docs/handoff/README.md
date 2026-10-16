@@ -20,6 +20,8 @@
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes. **Combat** was rebalanced by D140–D141 ([combat balance](../design/combat-balance.md)); its next pass comes
   from the owner's play.
+- **The farm goes** ([after the farm](../design/after-the-farm.md)): a proposal waiting on the owner. Extra Stats stay,
+  fed by Star Gems cut at a new Wilds station, with one profession and more Wilds slots. Claude builds it once approved.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
 - **Other repos** (uma-racer phase 3, uma-puzzle phase 4) are in uma-platform's `docs/roadmap.md` and uma-racer's
   `docs/rearchitecture/`, not here.
