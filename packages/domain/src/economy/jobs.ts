@@ -1,64 +1,10 @@
-// Timed jobs (design §8.6, D55): an Uma in a facility slot makes `count` items one after another, each taking `msEach`
-// of real time, while the app is closed. Everything is computed from the start time; nothing ticks in the save.
+// The facilities (design §8.6, D55, D144): which places hold work, what kind each does and what upgrades it. The jobs
+// themselves run in the shared engine (SC3, `save/work.ts`).
 import { ITEM_IDENTITIES as ITEM_FAMILIES } from '../items/identity'
 
 /** Gathering at a site, refining at the Workbench, crafting gear at the Forge, cutting Star Gems at the Lapidary. */
 export type JobKind = 'gather' | 'refine' | 'craft' | 'cut'
 export const JOB_KINDS: readonly JobKind[] = ['gather', 'refine', 'craft', 'cut']
-
-export interface Job {
-  kind: JobKind
-  outfitId: string
-  /** What it makes: an item id, a gear piece or a Star Gem. */
-  output: string
-  count: number
-  /** Outputs already moved to the Warehouse (or ranks already granted). */
-  collected: number
-  startedAt: string
-  /** Real milliseconds per output, fixed when the job starts (her profession level and the facility speed included). */
-  msEach: number
-  /** Profession EXP per output. */
-  expEach: number
-  /** Inputs reserved for each output (refining, crafting, cutting). They come back for outputs never made. */
-  inputs: Record<string, number>
-  /** Up to three jobs queued after this one for the same Uma, each planned when queued (QoL, D62). */
-  queue: QueuedJob[]
-}
-
-/** A queued job: what it makes and how, fixed when it was queued; its inputs are taken when it starts. */
-export interface QueuedJob { output: string; count: number; msEach: number; expEach: number; inputs: Record<string, number> }
-export const MAX_QUEUE = 3
-
-export interface Facility {
-  level: number
-  /** One entry per Uma slot. */
-  jobs: (Job | null)[]
-}
-
-const at = (iso: string): number => Date.parse(iso)
-
-/** Outputs finished by `now`, collected or not. */
-export function jobFinished(job: Job, now: string): number {
-  const elapsed = at(now) - at(job.startedAt)
-  return Math.max(0, Math.min(job.count, Math.floor(elapsed / job.msEach)))
-}
-export const jobReady = (job: Job, now: string): number => jobFinished(job, now) - job.collected
-export const jobEndsAt = (job: Job): number => at(job.startedAt) + job.count * job.msEach
-export const jobComplete = (job: Job, now: string): boolean => jobFinished(job, now) >= job.count
-/** When each queued job starts and ends, if each starts the moment the one before ends (and the Warehouse covers it). */
-export function queueTimeline(job: Job): { startsAt: number; endsAt: number }[] {
-  let t = jobEndsAt(job)
-  return job.queue.map((q) => {
-    const startsAt = t
-    t += q.count * q.msEach
-    return { startsAt, endsAt: t }
-  })
-}
-/** When the slot's whole chain, queue included, ends. */
-export const chainEndsAt = (job: Job): number => queueTimeline(job).at(-1)?.endsAt ?? jobEndsAt(job)
-/** Progress through the whole job, 0–1. */
-export const jobProgress = (job: Job, now: string): number =>
-  Math.max(0, Math.min(1, (at(now) - at(job.startedAt)) / (job.count * job.msEach)))
 
 // --- Which places are facilities -------------------------------------------------------------------------------
 

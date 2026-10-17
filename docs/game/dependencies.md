@@ -35,7 +35,7 @@ are listed by hand below.
 
 **@rpg/domain** (`packages/domain/package.json`)
 
-- Runtime: `@luismlorenzana/uma-data` 1.0.0
+- Runtime: `@luismlorenzana/uma-data` 1.0.0, `@luismlorenzana/uma-work` 0.1.0
 - Dev: `typescript` ~5.9.3, `vitest` ^3.2.7
 <!-- /live -->
 

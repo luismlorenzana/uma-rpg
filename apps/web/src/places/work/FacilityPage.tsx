@@ -1,10 +1,11 @@
 // A working facility (S4, S6, S7; D55, D58, D59, D144): the eight Wilds sites gather raw items, the Workbench refines them
 // 1 → 1, the Forge crafts gear and the Lapidary cuts Star Gems. Each slot holds one Uma's job: what she makes, how many,
-// how far along. Collect pays the output and her Craft EXP.
+// how far along. Collect pays the output and her Craft EXP. The jobs run in the shared engine (SC3); this page reads them
+// through the domain's slot view until SC4's screens.
 import {
-  activeClass, availabilityBlock, BRIDGES, CRAFT_LABEL, CRAFT_SHORT, facilityTargets, targetPlan, type TargetNeed, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityOf, facilitySpec, familyById, FACILITY_SLOTS, FACILITY_SPEED, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
-  itemById, itemMinutes, jobEndsAt, jobFinished, jobProgress, makeMinutes, maxJobCount, MINUTE, planJob, REFINE_BATCHES, refineMinutes, SaveRuleError,
-  stockName, upgradeCost, type Gem, type GemKind, type Job, type RosterOutfit, type TierWorld,
+  activeClass, availabilityBlock, BRIDGES, CRAFT_LABEL, CRAFT_SHORT, facilityTargets, targetPlan, type TargetNeed, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, type EquipType, facilityLevel, facilitySpec, facilityView, familyById, FACILITY_SLOTS, FACILITY_SPEED, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
+  itemById, itemMinutes, makeMinutes, maxJobCount, MINUTE, planJob, REFINE_BATCHES, refineMinutes, SaveRuleError,
+  stockName, upgradeCost, type Gem, type GemKind, type RosterOutfit, type SlotJob, type StoppedQueue, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -12,7 +13,7 @@ import { outputView } from '../../items/outputs'
 import { nodeLabel, nodeValue, PLANET_COLOR, PLANET_SHORT } from '../../items/planets'
 import { AtlasSprite } from '../../master/art'
 import type { MasterView } from '../../master/master'
-import { collect, collectAndRepeat, collectEverything, cutTime, queueWork, recall, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
+import { collect, collectEverything, cutTime, dismissWork, queueWork, recall, repeatWork, restartWork, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, TargetIcon } from '../../ui/icons'
@@ -50,14 +51,14 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   const [upgrading, setUpgrading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   if (!world) return null
-  const facility = facilityOf(world, placeId)
+  const facility = facilityView(world, placeId, now)
   const info = describe(placeId)
   // What the targets still need from here (D100), and the first free slot to start one in.
   const classOf = (id: string) => { const o = view.roster.find((r) => r.outfitId === id); return o ? activeClass(o, world.umas[id]!) : 'brawler' }
   const targets = world.targets.length > 0 ? facilityTargets(targetPlan(world, classOf), placeId) : null
   const wanted = new Map((targets ?? []).map((n) => [n.key, n.short]))
   const free = facility.jobs.findIndex((j) => j === null)
-  const ready = facility.jobs.some((j) => j && (jobFinished(j, now) > j.collected || jobFinished(j, now) >= j.count))
+  const ready = facility.ready
   const run = (op: () => Promise<unknown>) => {
     setMessage(null)
     op().catch((err: unknown) => setMessage(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -90,7 +91,7 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
           <li key={slot}>
             {job ? (
               <JobCard view={view} job={job} now={now} placeId={placeId} onCollect={() => run(() => collect(placeId, slot))}
-                onRepeat={() => { const o = view.roster.find((r) => r.outfitId === job.outfitId); if (o) run(() => collectAndRepeat(placeId, slot, o)) }}
+                onRepeat={() => run(() => repeatWork(job.outfitId))}
                 onCut={(n) => run(() => cutTime(placeId, slot, n))} onRecall={() => run(() => recall(placeId, slot))} timeTickets={world.wallet.timeTickets}
                 onQueue={() => setQueueing(slot)} onUnqueue={(i) => run(() => unqueueWork(placeId, slot, i))} />
             ) : (
@@ -102,11 +103,14 @@ function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
           </li>
         ))}
       </ul>
+      {facility.stopped.map((q) => (
+        <StoppedCard key={q.outfitId} view={view} queue={q} onRestart={() => run(() => restartWork(q.outfitId))} onDismiss={() => run(() => dismissWork(q.outfitId))} />
+      ))}
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
-      {assign !== null && <AssignSheet view={view} world={world} placeId={placeId} want={want} wanted={wanted}
+      {assign !== null && <AssignSheet view={view} world={world} now={now} placeId={placeId} want={want} wanted={wanted}
         onClose={() => setAssign(null)} onStart={(outfit, output, count) => startWork(placeId, assign, outfit, output, count).then(() => setAssign(null))} />}
       {queueing !== null && facility.jobs[queueing] && (
-        <AssignSheet view={view} world={world} placeId={placeId} wanted={wanted} onClose={() => setQueueing(null)}
+        <AssignSheet view={view} world={world} now={now} placeId={placeId} wanted={wanted} onClose={() => setQueueing(null)}
           fixed={view.roster.find((o) => o.outfitId === facility.jobs[queueing]!.outfitId)}
           onStart={(outfit, output, count) => queueWork(placeId, queueing, outfit, output, count).then(() => setQueueing(null))} />
       )}
@@ -152,16 +156,37 @@ function TargetsCard({ lines, canStart, onPick }: { lines: TargetNeed[]; canStar
   )
 }
 
+/** A queue that couldn't start (SC3): what stopped it, then Restart or Dismiss. */
+function StoppedCard({ view, queue, onRestart, onDismiss }: { view: MasterView; queue: StoppedQueue; onRestart: () => void; onDismiss: () => void }) {
+  const outfit = view.roster.find((o) => o.outfitId === queue.outfitId)
+  const first = queue.requests[0]!
+  return (
+    <div className="rounded-md border border-hairline-strong p-3">
+      <div className="flex items-center gap-3">
+        <AtlasSprite art={view.art} family="outfit-icons" frameKey={queue.outfitId} size={36} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-semibold">{outfit?.name ?? queue.outfitId} · queue stopped</p>
+          <p className="truncate text-[12px] text-ink-soft">{outputView(first.item).name} ×{first.count}{queue.requests.length > 1 ? ` +${queue.requests.length - 1}` : ''} · {queue.why}</p>
+        </div>
+      </div>
+      <div className="mt-2 flex gap-2">
+        <button type="button" onClick={onRestart} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink">Restart</button>
+        <button type="button" onClick={onDismiss} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft">Dismiss</button>
+      </div>
+    </div>
+  )
+}
+
 function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, onCut, onRecall, onQueue, onUnqueue }: {
-  view: MasterView; job: Job; now: string; placeId: string; timeTickets: number; onCollect: () => void; onRepeat: () => void; onCut: (n: number) => void; onRecall: () => void
+  view: MasterView; job: SlotJob; now: string; placeId: string; timeTickets: number; onCollect: () => void; onRepeat: () => void; onCut: (n: number) => void; onRecall: () => void
   onQueue: () => void; onUnqueue: (index: number) => void
 }) {
   const item = outputView(job.output)
   const outfit = view.roster.find((o) => o.outfitId === job.outfitId)
-  const finished = jobFinished(job, now)
-  const readyCount = finished - job.collected
-  const done = finished >= job.count
-  const left = jobEndsAt(job) - Date.parse(now)
+  const finished = job.finished
+  const readyCount = job.ready
+  const done = job.done
+  const left = job.endsAt - Date.parse(now)
   return (
     <div className="rounded-md bg-raised p-3">
       <div className="flex items-center gap-3">
@@ -176,7 +201,7 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
         <span className="shrink-0 text-right text-[12px] text-ink-soft">{done ? 'Done' : formatDuration(left)}<br />{finished}/{job.count}</span>
       </div>
       <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-white/10">
-        <span className="block h-full rounded-full bg-accent" style={{ width: `${jobProgress(job, now) * 100}%` }} />
+        <span className="block h-full rounded-full bg-accent" style={{ width: `${job.progress * 100}%` }} />
       </span>
       <div className="mt-2 flex gap-2">
         <button type="button" disabled={readyCount <= 0 && !done} onClick={onCollect} className="min-h-10 flex-1 rounded-sm bg-accent text-[13px] font-bold text-accent-ink disabled:opacity-35">
@@ -187,7 +212,7 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
             Repeat ×{job.count}
           </button>
         )}
-        <TimeCut job={job} now={now} tickets={timeTickets} onCut={onCut} />
+        <TimeCut job={job} tickets={timeTickets} onCut={onCut} />
         <button type="button" onClick={onRecall} className="min-h-10 rounded-sm bg-panel px-3 text-[13px] text-ink-soft" aria-label={`Recall ${outfit?.name ?? ''} from ${placeId}`}>
           Recall
         </button>
@@ -201,8 +226,8 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
 
 /** Pick an Uma, then what she makes, then how many. With `fixed`, she's queueing another job: no Uma to pick, and no
  * stock cap, since its inputs are taken when it starts. */
-function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose, onStart }: {
-  view: MasterView; world: TierWorld; placeId: string; fixed?: RosterOutfit; onClose: () => void
+function AssignSheet({ view, world, now, placeId, fixed, want = null, wanted, onClose, onStart }: {
+  view: MasterView; world: TierWorld; now: string; placeId: string; fixed?: RosterOutfit; onClose: () => void
   /** A target's line to start with, once she's chosen; and every line the targets need, to badge (D100). */
   want?: string | null; wanted?: ReadonlyMap<string, number>
   onStart: (outfit: RosterOutfit, output: string, count: number) => Promise<void>
@@ -215,7 +240,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
   const [error, setError] = useState<string | null>(null)
   // Free Umas first, then the highest level here (it sets her speed, D139), then the most EXP into it.
   const owned = view.roster.filter((o) => world.umas[o.outfitId])
-    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId), prof: world.umas[o.outfitId]!.craft }))
+    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId, now), prof: world.umas[o.outfitId]!.craft }))
     .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp || a.o.name.localeCompare(b.o.name))
   const options = outfit
     ? spec.kind === 'gather' ? familyById(spec.family!)!.raw.map((i) => i.id) : ITEM_FAMILIES.flatMap((f) => f.refined.map((i) => i.id))
@@ -225,7 +250,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
   const stock = plan && !queueing && spec.kind !== 'gather' ? makeable(world, plan.inputs) : Infinity
   // Her level sets the time, the same for every grade (D139); the facility's level speeds it.
   const eachMs = (level: number) => (spec.kind === 'refine' ? refineMinutes(level) : spec.kind === 'gather' ? itemMinutes(level) : makeMinutes(level)) * MINUTE /
-    FACILITY_SPEED[facilityOf(world, placeId).level - 1]!
+    FACILITY_SPEED[facilityLevel(world, placeId) - 1]!
   const most = maxJobCount(spec.kind)
   const max = Math.max(1, Math.min(most, stock))
   // Refining comes in batches of ×1, ×4, ×8, ×20 and ×40 (D139); the rest makes 1–10.
@@ -237,7 +262,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
         setError(null)
         onStart(outfit, output, Math.min(count, max)).catch((err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t start.'))
       }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-        {plan.block ?? `${queueing ? 'Queue' : 'Start'} · ${formatDuration(plan.msEach * Math.min(count, max))}`}
+        {plan.block ?? `${queueing ? 'Queue' : 'Start'} · ${formatDuration(plan.itemMs * Math.min(count, max))}`}
       </button>
     ) : undefined}>
       {!outfit && (
@@ -283,7 +308,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
                   <span className="block truncate text-[12px] font-semibold">{out.name}</span>
                   <span className="block truncate text-[11px] text-ink-soft">
                     {wanted?.get(id) ? <span className="font-semibold text-accent">Target ×{wanted.get(id)} · </span> : null}
-                    {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} to refine` : `${formatDuration(p?.msEach ?? 0)} each`}
+                    {locked ? `Lv${gradeUnlockLevel(out.grade)}` : have !== null ? `${have} to refine` : `${formatDuration(p?.itemMs ?? 0)} each`}
                   </span>
                 </span>
               </button>
@@ -297,7 +322,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
             <ItemIcon id={outputView(output).icon} size={48} />
             <div className="text-[14px]">
               <p className="font-semibold">{plan.output.name} · grade {plan.output.grade}</p>
-              <p className="text-ink-soft">{formatDuration(plan.msEach)} each · {plan.expEach} EXP each</p>
+              <p className="text-ink-soft">{formatDuration(plan.itemMs)} each · {plan.expEach} EXP each</p>
             </div>
           </div>
           {Object.keys(plan.inputs).length > 0 && (
@@ -316,7 +341,7 @@ function AssignSheet({ view, world, placeId, fixed, want = null, wanted, onClose
             ))}
           </div>
           <p className="text-[12px] text-ink-soft">
-            {Math.min(count, max)} items · {formatDuration(plan.msEach * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {CRAFT_SHORT} EXP
+            {Math.min(count, max)} items · {formatDuration(plan.itemMs * Math.min(count, max))} · {plan.expEach * Math.min(count, max)} {CRAFT_SHORT} EXP
           </p>
           <button type="button" onClick={() => setOutput(null)} className="text-[13px] text-ink-soft underline">Choose another item</button>
         </div>
@@ -449,10 +474,9 @@ function GemPicker({ world, level, queueing, wanted, onPick }: {
 
 function UpgradeSheet({ world, placeId, onClose, onUpgrade }: { world: TierWorld; placeId: string; onClose: () => void; onUpgrade: () => Promise<void> }) {
   const cost = upgradeCost(world, placeId)
-  const facility = facilityOf(world, placeId)
   const [error, setError] = useState<string | null>(null)
   if (!cost) return null
-  const next = facility.level + 1
+  const next = facilityLevel(world, placeId) + 1
   const enough = world.wallet.laurels >= cost.laurels && Object.entries(cost.items).every(([id, n]) => (world.items[id] ?? 0) >= n)
   return (
     <BottomSheet title={`Upgrade to level ${next}`} onClose={onClose} footer={
@@ -479,9 +503,9 @@ export function FacilityPeek({ place }: PeekProps) {
   const world = useWorld()
   const now = useNow()
   if (!world) return null
-  const facility = facilityOf(world, place.id)
+  const facility = facilityView(world, place.id, now)
   const info = describe(place.id)
-  const ready = facility.jobs.some((j) => j && (jobFinished(j, now) > j.collected || jobFinished(j, now) >= j.count))
+  const ready = facility.ready
   return (
     <div className="space-y-3 p-4">
       <p className="text-[12px] text-ink-soft">{info.title} · level {facility.level}</p>
@@ -491,8 +515,8 @@ export function FacilityPeek({ place }: PeekProps) {
             {job ? (
               <>
                 <ItemIcon id={outputView(job.output).icon} size={24} />
-                <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {jobFinished(job, now)}/{job.count}{job.queue.length > 0 ? ` +${job.queue.length}` : ''}</span>
-                <span className="text-ink-soft">{jobFinished(job, now) >= job.count ? 'Done' : formatDuration(jobEndsAt(job) - Date.parse(now))}</span>
+                <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {job.finished}/{job.count}{job.queue.length > 0 ? ` +${job.queue.length}` : ''}</span>
+                <span className="text-ink-soft">{job.done ? 'Done' : formatDuration(job.endsAt - Date.parse(now))}</span>
               </>
             ) : <span className="text-ink-faint">Slot {i + 1} · free</span>}
           </li>

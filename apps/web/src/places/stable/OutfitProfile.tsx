@@ -6,9 +6,9 @@
 import { STATS } from '@luismlorenzana/uma-data'
 import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
-  highestGrade, ITEM_EFFECTS, jobEndsAt, jobFinished, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
+  highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, workOf, ACCESSORY_KINDS, accessoryTrack,
+  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -145,7 +145,7 @@ function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterVie
   const navigate = useNavigate()
   const now = useNow(30_000)
   const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
-  const work = owned && world ? workOf(world, outfit.outfitId) : null
+  const work = owned && world ? slotJobOf(world, outfit.outfitId, now) : null
   const party = owned && world ? partyOf(world, outfit.outfitId) : null
   const fighting = owned && world ? isInFight(world, outfit.outfitId) : false
   return (
@@ -186,7 +186,7 @@ function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterVie
             <p className="text-[11px] font-semibold text-ink-soft">{work ? 'Working' : fighting ? 'Fighting' : 'Party'}</p>
             <p className="truncate text-[13px] font-semibold text-accent">{work ? placeById(work.placeId)?.name : party ? world?.parties[party.party]?.name : 'None · add'}</p>
             <p className="truncate text-[10.5px] text-ink-faint">
-              {work ? (jobFinished(work.job, now) >= work.job.count ? 'Done · collect' : formatDuration(jobEndsAt(work.job) - Date.parse(now))) : fighting ? 'Open fight' : 'Free'}
+              {work ? (work.done ? 'Done · collect' : formatDuration(work.endsAt - Date.parse(now))) : fighting ? 'Open fight' : 'Free'}
             </p>
           </button>
         </div>
@@ -402,8 +402,8 @@ function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
 function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
   const now = useNow()
-  const work = workOf(world, outfit.outfitId)
-  const out = work ? outputView(work.job.output) : null
+  const work = slotJobOf(world, outfit.outfitId, now)
+  const out = work ? outputView(work.output) : null
   return (
     <div className="space-y-3">
       {work && (
@@ -411,9 +411,9 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
           {out?.icon ? <ItemIcon id={out.icon} size={36} /> : <span className="size-9" />}
           <span className="min-w-0 flex-1">
             <span className="block text-[11px] text-ink-faint">Working at {placeById(work.placeId)?.name}</span>
-            <span className="block truncate text-[14px] font-semibold">{out?.name} · {jobFinished(work.job, now)}/{work.job.count}</span>
+            <span className="block truncate text-[14px] font-semibold">{out?.name} · {work.finished}/{work.count}</span>
           </span>
-          <span className="shrink-0 text-[12px] text-ink-soft">{jobFinished(work.job, now) >= work.job.count ? 'Done' : formatDuration(jobEndsAt(work.job) - Date.parse(now))}</span>
+          <span className="shrink-0 text-[12px] text-ink-soft">{work.done ? 'Done' : formatDuration(work.endsAt - Date.parse(now))}</span>
         </button>
       )}
       {[uma.craft].map((prof) => {

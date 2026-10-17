@@ -18,32 +18,74 @@
       }
     },
     "./battle": {
-      "require": { "types": "./dist/cjs/save/battle.d.ts", "default": "./dist/cjs/save/battle.js" },
-      "default": { "types": "./src/save/battle.ts", "default": "./src/save/battle.ts" }
+      "require": {
+        "types": "./dist/cjs/save/battle.d.ts",
+        "default": "./dist/cjs/save/battle.js"
+      },
+      "default": {
+        "types": "./src/save/battle.ts",
+        "default": "./src/save/battle.ts"
+      }
     },
     "./work": {
-      "require": { "types": "./dist/cjs/save/work.d.ts", "default": "./dist/cjs/save/work.js" },
-      "default": { "types": "./src/save/work.ts", "default": "./src/save/work.ts" }
+      "require": {
+        "types": "./dist/cjs/save/work.d.ts",
+        "default": "./dist/cjs/save/work.js"
+      },
+      "default": {
+        "types": "./src/save/work.ts",
+        "default": "./src/save/work.ts"
+      }
     },
     "./exchange": {
-      "require": { "types": "./dist/cjs/save/exchange.d.ts", "default": "./dist/cjs/save/exchange.js" },
-      "default": { "types": "./src/save/exchange.ts", "default": "./src/save/exchange.ts" }
+      "require": {
+        "types": "./dist/cjs/save/exchange.d.ts",
+        "default": "./dist/cjs/save/exchange.js"
+      },
+      "default": {
+        "types": "./src/save/exchange.ts",
+        "default": "./src/save/exchange.ts"
+      }
     },
     "./observatory": {
-      "require": { "types": "./dist/cjs/save/observatory.d.ts", "default": "./dist/cjs/save/observatory.js" },
-      "default": { "types": "./src/save/observatory.ts", "default": "./src/save/observatory.ts" }
+      "require": {
+        "types": "./dist/cjs/save/observatory.d.ts",
+        "default": "./dist/cjs/save/observatory.js"
+      },
+      "default": {
+        "types": "./src/save/observatory.ts",
+        "default": "./src/save/observatory.ts"
+      }
     },
     "./forge": {
-      "require": { "types": "./dist/cjs/save/forge.d.ts", "default": "./dist/cjs/save/forge.js" },
-      "default": { "types": "./src/save/forge.ts", "default": "./src/save/forge.ts" }
+      "require": {
+        "types": "./dist/cjs/save/forge.d.ts",
+        "default": "./dist/cjs/save/forge.js"
+      },
+      "default": {
+        "types": "./src/save/forge.ts",
+        "default": "./src/save/forge.ts"
+      }
     },
     "./targets": {
-      "require": { "types": "./dist/cjs/save/targets.d.ts", "default": "./dist/cjs/save/targets.js" },
-      "default": { "types": "./src/save/targets.ts", "default": "./src/save/targets.ts" }
+      "require": {
+        "types": "./dist/cjs/save/targets.d.ts",
+        "default": "./dist/cjs/save/targets.js"
+      },
+      "default": {
+        "types": "./src/save/targets.ts",
+        "default": "./src/save/targets.ts"
+      }
     },
     "./heroes": {
-      "require": { "types": "./dist/cjs/save/heroes.d.ts", "default": "./dist/cjs/save/heroes.js" },
-      "default": { "types": "./src/save/heroes.ts", "default": "./src/save/heroes.ts" }
+      "require": {
+        "types": "./dist/cjs/save/heroes.d.ts",
+        "default": "./dist/cjs/save/heroes.js"
+      },
+      "default": {
+        "types": "./src/save/heroes.ts",
+        "default": "./src/save/heroes.ts"
+      }
     }
   },
   "scripts": {
@@ -53,7 +95,8 @@
     "docs:update": "UPDATE_DOCS=1 vitest run src/docs"
   },
   "dependencies": {
-    "@luismlorenzana/uma-data": "1.0.0"
+    "@luismlorenzana/uma-data": "1.0.0",
+    "@luismlorenzana/uma-work": "0.1.0"
   },
   "devDependencies": {
     "typescript": "~5.9.3",

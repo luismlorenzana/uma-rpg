@@ -124,10 +124,12 @@ Lapidary:
 - **Collect everything ready.**
 - **Each job card:**
   - Collect;
-  - Repeat ×N;
+  - Repeat ×N (collects, then starts the same again);
   - −30m and Finish (Speed Tickets);
   - Recall;
   - a queue of up to three.
+- **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
+  **Dismiss**.
 - **Assigning:** pick an Uma (free ones first, then the highest level here and its EXP; the level and her time per
   item show on the right), then what to make, then how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
 - **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,

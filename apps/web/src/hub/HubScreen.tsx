@@ -2,8 +2,8 @@
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
 import {
-  CURRENT_SLICE, facilityOf, facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen,
-  jobFinished, jobProgress, placeById, placeOnPage, placesOn, type HubPage, type Place, type TierWorld,
+  CURRENT_SLICE, facilitySpec, facilityView, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen,
+  placeById, placeOnPage, placesOn, type HubPage, type Place, type TierWorld,
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
@@ -64,10 +64,9 @@ function pipsOf(place: Place, world: TierWorld | null, now: string, art: ArtInde
     })
   }
   if (!world || !facilitySpec(place.id)) return Array.from({ length: place.slots }, (): PipModel => ({ state: 'free' }))
-  return facilityOf(world, place.id).jobs.map((job): PipModel => {
+  return facilityView(world, place.id, now).jobs.map((job): PipModel => {
     if (!job) return { state: 'free' }
-    const ready = jobFinished(job, now) >= job.count
-    return { state: ready ? 'ready' : 'busy', progress: jobProgress(job, now), queued: job.queue.length, face: face(job.outfitId) }
+    return { state: job.done ? 'ready' : 'busy', progress: job.progress, queued: job.queue.length, face: face(job.outfitId) }
   })
 }
 

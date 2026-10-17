@@ -1,51 +1,89 @@
-// Facility work over the save (S4, D55, D144): put an Uma in a slot to gather, refine, craft or cut, collect what she has
-// made (with her Craft EXP), recall her, rush a job with tickets, and upgrade a facility. Pure, like every rule.
-import { facilitySpec, jobEndsAt, jobFinished, type Facility, type Job } from '../economy/jobs'
+// Facility work over the save (S4, D55, D144, SC3): put an Uma in a slot to gather, refine, craft or cut, queue up to
+// three more behind her, collect what she has made (with her Craft EXP), recall her, speed her up with tickets, repeat
+// her last job, restart or dismiss a queue that stopped, and upgrade a facility. Every rule runs in the shared engine,
+// `@luismlorenzana/uma-work`, through uma-rpg's kinds and hooks (`work/env.ts`); these are thin `Save` wrappers, plus a
+// read-only view of each facility's slots for today's screens until SC4's.
 import {
-  jobExp, makeMinutes, maxJobCount, refineMinutes, FACILITY_MAX_LEVEL, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, itemMinutes, MINUTE,
-  PROFESSION_MAX_LEVEL, professionExpToNext, TIME_TICKET_SPAN, timeTicketsToFinish,
-} from '../economy/pacing'
-import { familyById, gradeUnlockLevel, itemById, type ItemDef } from '../items/catalog'
-import { gemById } from '../economy/gems'
-import { gearById } from '../economy/gear'
-import { MAX_QUEUE, type QueuedJob } from '../economy/jobs'
+  chainTimes, collect, endsAt, finishedCount, isRefusal, kindRules, MAX_QUEUE, progress, queue, recall, remainingMs, settle, slotHolder, slotsOf,
+  speedUp, start, statusOf, ticketsToFinish, upgrade, withRow, type Entry, type ItemQty, type OpResult, type Refusal, type SlotRef, type WorkRow,
+} from '@luismlorenzana/uma-work'
+import { facilitySpec, type JobKind } from '../economy/jobs'
+import { FACILITY_SPEED, grantProfessionExp } from '../economy/pacing'
 import { stockName } from '../economy/stock'
-import { workOf } from './status'
-import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import type { OwnedUma, ProfessionLevel, Save, TierWorld } from './save'
-import { facilityOf } from './facility'
-export { facilityOf } from './facility'
+import { gearById } from '../economy/gear'
+import { gemById } from '../economy/gems'
+import { itemById, type ItemDef } from '../items/catalog'
+import { RPG_BUILDINGS, RPG_WORK_ENV, type CraftGain } from '../work/env'
+import type { RpgWorkRequest } from '../work/request'
+import { SaveRuleError, TIER_ONE, worldOf, type SaveRuleReason } from './rules'
+import type { OwnedUma, Save, TierWorld } from './save'
+
+export { grantProfessionExp, MAX_QUEUE }
+export type { RpgWorkRequest }
 
 /** What work needs from an outfit's master data (a `RosterOutfit` fits). Aptitudes no longer set job speed (D139). */
 export interface WorkOutfit {
   outfitId: string
 }
 
+const env = RPG_WORK_ENV
+const msOf = (now: string): number => Date.parse(now)
+
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Craft EXP in: levels up, banking EXP at Lv50. */
-export function grantProfessionExp(p: ProfessionLevel, exp: number): ProfessionLevel {
-  let { level } = p
-  let bank = p.exp + Math.max(0, Math.floor(exp))
-  while (level < PROFESSION_MAX_LEVEL && bank >= professionExpToNext(level)) {
-    bank -= professionExpToNext(level)
-    level += 1
-  }
-  return { level, exp: bank }
+// --- Refusals, in the words the screens have always shown -------------------------------------------------------------
+
+const REASON: Readonly<Record<string, SaveRuleReason>> = {
+  'slot-taken': 'bad-slot', busy: 'busy', count: 'bad-count', short: 'no-items', 'queue-full': 'bad-count', tickets: 'no-ticket', money: 'no-laurels',
+  'unknown-worker': 'not-owned',
 }
 
-/** Real milliseconds per item: a job's minutes at her level, sped up by the facility's level. */
-const msFor = (minutes: number, facilityLevel: number): number => Math.max(1000, Math.round((minutes * MINUTE) / FACILITY_SPEED[facilityLevel - 1]!))
+const outputName = (id: string): string => itemById(id)?.name ?? gemById(id)?.name ?? gearById(id)?.name ?? stockName(id)
+
+/** A refusal's sentence for a screen: names for ids, a duration for a time, uma-rpg's own words for the level gate. */
+export function refusalText(refusal: Refusal, now: number): string {
+  const data = refusal.data ?? {}
+  if (refusal.code === 'grade') return `Needs Craft Lv${data.level}`
+  if (refusal.code === 'money') return `Needs ${data.n} Laurels`
+  if (refusal.code === 'tickets') return `Needs ${data.n} Speed Ticket${data.n === 1 ? '' : 's'}`
+  return refusal.message.replace(/\{(\w+)\}/g, (_, key: string) => {
+    if (key === 'uma') return 'She'
+    if (key === 'item') return outputName(String(data.item))
+    if (key === 'time') return `${Math.max(1, Math.ceil((Number(data.time) - now) / 60_000))} min`
+    return String(data[key] ?? '')
+  })
+}
+
+function done<R>(result: OpResult<R, TierWorld>, now: number): { state: TierWorld; receipt: R } {
+  if (isRefusal(result)) throw new SaveRuleError(REASON[result.code] ?? 'bad-job', refusalText(result, now))
+  return result
+}
+
+const slotRef = (placeId: string, slot: number): SlotRef => ({ building: placeId, slot })
+const requestFor = (placeId: string, output: string, count: number): RpgWorkRequest => {
+  const spec = facilitySpec(placeId)
+  if (!spec) throw new SaveRuleError('bad-job', 'nothing to make here')
+  return { kind: spec.kind, item: output, count }
+}
+
+/** Who holds a slot, or a refusal to act there. */
+function holderOf(world: TierWorld, placeId: string, slot: number): string {
+  const holder = slotHolder(world, slotRef(placeId, slot))
+  if (!holder) throw new SaveRuleError('bad-slot', 'nothing working there')
+  return holder
+}
+
+// --- Planning, for the pickers -----------------------------------------------------------------------------------
 
 export interface JobPlan {
   /** What it makes: its name and grade. */
   output: { id: string; name: string; grade: number }
   /** The raw or refined item, when it makes one. */
   item: ItemDef | null
-  /** Real milliseconds per item for this Uma here. */
-  msEach: number
+  /** Real milliseconds per item for this Uma here, at the facility's level now. */
+  itemMs: number
   expEach: number
   /** Inputs per item. */
   inputs: Record<string, number>
@@ -53,26 +91,27 @@ export interface JobPlan {
   block: string | null
 }
 
-/** What a gather, refine, craft or cut job would be: its speed for this Uma, its EXP, inputs and anything stopping it. */
+/** A facility's level: 1 until upgraded. */
+export const facilityLevel = (world: TierWorld, placeId: string): number => world.buildings[placeId]?.level ?? 1
+
+/** What a gather, refine, craft or cut job would be: its time for this Uma, its EXP, inputs and anything stopping it.
+ * `count` 0 plans a queued job, whose inputs are taken only when it starts. */
 export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count = 1): JobPlan | null {
   const spec = facilitySpec(placeId)
-  if (spec?.kind === 'craft' || spec?.kind === 'cut') return planMaking(world, placeId, outfit, output, count)
-  const item = itemById(output)
-  const uma = world.umas[outfit.outfitId]
-  if (!spec || !item || !uma) return null
-  const facility = facilityOf(world, placeId)
-  // Her Craft Level sets the time, whatever the grade (D139); EXP follows the job's own minutes (2 a minute), so a
-  // faster job pays less per item and the same per hour (D101).
-  const level = uma.craft.level
-  const minutes = spec.kind === 'refine' ? refineMinutes(level) : itemMinutes(level)
-  const msEach = msFor(minutes, facility.level)
-  const inputs: Record<string, number> = spec.kind === 'refine' ? { [item.pair]: 1 } : {}
-  let block: string | null = null
-  if (spec.kind === 'gather' && (item.refined || item.family !== spec.family)) block = 'Not made here'
-  else if (spec.kind === 'refine' && !item.refined) block = 'Not refined here'
-  else if (level < gradeUnlockLevel(item.grade)) block = `Needs Craft Lv${gradeUnlockLevel(item.grade)}`
-  else if (spec.kind === 'refine' && (world.items[item.pair] ?? 0) < count) block = `Needs ${count} ${itemById(item.pair)?.name ?? item.pair}`
-  return { output: { id: item.id, name: item.name, grade: item.grade }, item, msEach, expEach: jobExp(minutes), inputs, block }
+  const made = itemById(output) ?? gearById(output) ?? gemById(output)
+  if (!spec || !made || !world.umas[outfit.outfitId]) return null
+  const request = requestFor(placeId, output, 1)
+  const context = { slot: slotRef(placeId, 0), speed: FACILITY_SPEED[facilityLevel(world, placeId) - 1]!, earlier: [] }
+  const kind = kindRules(env, spec.kind)!
+  // Its time and EXP even behind the grade gate (a picker shows a locked grade's time); the gate becomes the block.
+  const items = kind.plan(world, outfit.outfitId, request, 0, { ...context, env: { ...env, exp: { ...env.exp, gradeOpen: () => true } } })
+  const gate = kind.plan(world, outfit.outfitId, request, 0, { ...context, env })
+  const base = { output: { id: made.id, name: made.name, grade: made.grade }, item: itemById(output) ?? null }
+  if (isRefusal(items)) return { ...base, itemMs: 0, expEach: 0, inputs: {}, block: refusalText(items, 0) }
+  const first = items[0]!
+  const inputs = Object.fromEntries(first.inputs.map((q) => [q.item, q.qty]))
+  const block = isRefusal(gate) ? refusalText(gate, 0) : count > 0 ? inputsBlock(world, inputs, count) : null
+  return { ...base, itemMs: first.seconds * 1000, expEach: first.exp, inputs, block }
 }
 
 /** Why the Warehouse can't cover `count` sets of these inputs, or null. */
@@ -83,227 +122,247 @@ export function inputsBlock(world: TierWorld, inputs: Record<string, number>, co
   return null
 }
 
-/** A piece of gear at the Forge (S7) or a Star Gem at the Lapidary (D144): two items' time, its refined materials. */
-function planMaking(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count: number): JobPlan | null {
-  const made = facilitySpec(placeId)!.kind === 'craft' ? gearById(output) : gemById(output)
-  const uma = world.umas[outfit.outfitId]
-  if (!made || !uma) return null
-  const facility = facilityOf(world, placeId)
-  const minutes = makeMinutes(uma.craft.level)
-  const msEach = msFor(minutes, facility.level)
-  const block = uma.craft.level < gradeUnlockLevel(made.grade) ? `Needs Craft Lv${gradeUnlockLevel(made.grade)}` : inputsBlock(world, made.inputs, count)
-  return { output: { id: made.id, name: made.name, grade: made.grade }, item: null, msEach, expEach: jobExp(minutes), inputs: made.inputs, block }
-}
-
-/** Why this Uma can't take a job now, or null: she works one job at a time. Fighting doesn't stop her (D119). */
-export function availabilityBlock(world: TierWorld, outfitId: string): string | null {
+/** Why this Uma can't take a job now, or null: she works one job at a time; a finished one is collected as she starts.
+ * Fighting doesn't stop her (D119). */
+export function availabilityBlock(world: TierWorld, outfitId: string, now: string): string | null {
   if (!world.umas[outfitId]) return 'Not unlocked'
-  if (workOf(world, outfitId)) return 'Already working'
-  return null
+  const settled = settle(world, msOf(now), env).state
+  return statusOf(settled.work[outfitId], msOf(now)) === 'working' ? 'Already working' : null
 }
 
-function setJob(world: TierWorld, placeId: string, slot: number, job: Job | null): TierWorld {
-  const facility = facilityOf(world, placeId)
-  const jobs = facility.jobs.map((j, i) => (i === slot ? job : j))
-  return { ...world, facilities: { ...world.facilities, [placeId]: { ...facility, jobs } } }
-}
+// --- Operations ----------------------------------------------------------------------------------------------------
 
-function take(items: Record<string, number>, id: string, n: number): Record<string, number> {
-  const have = items[id] ?? 0
-  if (have < n) throw new SaveRuleError('no-items', `needs ${n} ${itemById(id)?.name ?? id}`)
-  const next = { ...items }
-  if (have === n) delete next[id]
-  else next[id] = have - n
-  return next
-}
-const give = (items: Record<string, number>, id: string, n: number): Record<string, number> => (n > 0 ? { ...items, [id]: (items[id] ?? 0) + n } : items)
-
-/** Starts a gather or refine job: `count` items, made one after another; a refine job reserves its inputs now. */
+/** Starts a job in a free slot: `count` items, made one after another; its inputs are reserved now. A Ready Uma's
+ * finished work is collected first. */
 export function startJob(save: Save, placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  const facility = facilityOf(world, placeId)
-  if (!Number.isInteger(slot) || slot < 0 || slot >= facility.jobs.length) throw new SaveRuleError('bad-slot', `slot ${slot} doesn't exist`)
-  if (facility.jobs[slot]) throw new SaveRuleError('bad-slot', 'that slot is busy')
-  const most = maxJobCount(facilitySpec(placeId)?.kind ?? 'gather')
-  if (!Number.isInteger(count) || count < 1 || count > most) throw new SaveRuleError('bad-count', `make 1–${most} at a time`)
-  const busy = availabilityBlock(world, outfit.outfitId)
-  if (busy) throw new SaveRuleError('busy', busy)
-  const plan = planJob(world, placeId, outfit, output, count)
-  if (!plan) throw new SaveRuleError('bad-job', 'nothing to make here')
-  if (plan.block) throw new SaveRuleError('bad-job', plan.block)
-  let items = world.items
-  for (const [id, n] of Object.entries(plan.inputs)) items = take(items, id, n * count)
-  const job: Job = { kind: facilitySpec(placeId)!.kind, outfitId: outfit.outfitId, output, count, collected: 0, startedAt: now, msEach: plan.msEach,
-    expEach: plan.expEach, inputs: plan.inputs, queue: [] }
-  return withWorld(save, tier, setJob({ ...world, items }, placeId, slot, job), now)
+  if (!slotsOf(world, placeId, RPG_BUILDINGS).some((s) => s.slot === slot)) throw new SaveRuleError('bad-slot', `slot ${slot} doesn't exist`)
+  const { state } = done(start(world, { outfitId: outfit.outfitId, slot: slotRef(placeId, slot), request: requestFor(placeId, output, count) }, msOf(now), env), msOf(now))
+  return withWorld(save, tier, state, now)
 }
 
 export interface Collected { items: number; exp: number; levelsUp: number; done: boolean }
 
-/**
- * Collects a job; when it's finished and has a queue, its next job starts at the moment it finished (inputs taken
- * then), and so on down the queue as far as `now` reaches, so a chain catches up however late it's collected.
- */
-function collectIn(world: TierWorld, placeId: string, slot: number, now: string): { world: TierWorld; got: Collected } {
-  const job = facilityOf(world, placeId).jobs[slot]
-  if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
-  if (job.queue.length > 0 && jobFinished(job, now) >= job.count) {
-    const endedAt = new Date(jobEndsAt(job)).toISOString()
-    const first = collectOne(world, placeId, slot, job, endedAt)
-    const [next, ...rest] = job.queue
-    const started = startQueued(first.world, placeId, slot, job, next!, rest, endedAt)
-    if (!started) return { world: first.world, got: first.got }
-    const more = collectIn(started, placeId, slot, now)
-    return { world: more.world, got: { items: first.got.items + more.got.items, exp: first.got.exp + more.got.exp, levelsUp: first.got.levelsUp + more.got.levelsUp,
-      done: more.got.done } }
-  }
-  return collectOne(world, placeId, slot, job, now)
+function collectFrom(world: TierWorld, outfitId: string, now: number): { world: TierWorld; got: Collected } {
+  const { state, receipt } = collect(world, { outfitId }, now, env)
+  const levelsUp = (receipt.expDetail as CraftGain | null)?.levelsUp ?? 0
+  return { world: state, got: { items: receipt.outputs.length, exp: receipt.exp, levelsUp, done: receipt.freed } }
 }
 
-/** Starts a queued job in a freed slot, or returns null (and drops the queue) when the Warehouse can't cover it. */
-function startQueued(world: TierWorld, placeId: string, slot: number, prev: Job, next: QueuedJob, rest: QueuedJob[], at: string): TierWorld | null {
-  let items = world.items
-  for (const [id, n] of Object.entries(next.inputs)) {
-    if ((items[id] ?? 0) < n * next.count) return null
-    items = take(items, id, n * next.count)
-  }
-  const job: Job = { kind: prev.kind, outfitId: prev.outfitId, output: next.output, count: next.count, collected: 0, startedAt: at, msEach: next.msEach,
-    expEach: next.expEach, inputs: next.inputs, queue: rest }
-  return setJob({ ...world, items }, placeId, slot, job)
-}
-
-function collectOne(world: TierWorld, placeId: string, slot: number, job: Job, now: string): { world: TierWorld; got: Collected } {
-  const finished = jobFinished(job, now)
-  const ready = finished - job.collected
-  const spec = facilitySpec(placeId)!
-  const done = finished >= job.count
-  if (ready <= 0) return { world: done ? setJob(world, placeId, slot, null) : world, got: { items: 0, exp: 0, levelsUp: 0, done } }
-  let next: TierWorld = spec.kind === 'cut' ? { ...world, gems: give(world.gems, job.output, ready) }
-    : spec.kind === 'craft' ? { ...world, gear: give(world.gear, job.output, ready) } : { ...world, items: give(world.items, job.output, ready) }
-  let levelsUp = 0
-  const exp = ready * job.expEach
-  const uma = next.umas[job.outfitId]
-  if (uma) {
-    const after = grantProfessionExp(uma.craft, exp)
-    levelsUp = after.level - uma.craft.level
-    next = { ...next, umas: { ...next.umas, [job.outfitId]: { ...uma, craft: after } } }
-  }
-  next = setJob(next, placeId, slot, done ? null : { ...job, collected: finished })
-  return { world: next, got: { items: ready, exp, levelsUp, done } }
-}
-
-/** Moves what a job has made to the Warehouse and pays her EXP; a finished job frees the slot. */
+/** Collects everything the slot's Uma has finished, with her Craft EXP; when she's done, the slot frees. A queue keeps
+ * going on its own: each entry started the moment the one before ended. */
 export function collectJob(save: Save, placeId: string, slot: number, now: string, tier = TIER_ONE): { save: Save; got: Collected } {
-  const { world, got } = collectIn(worldOf(save, tier), placeId, slot, now)
-  return { save: withWorld(save, tier, world, now), got }
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const { world: next, got } = collectFrom(world, holderOf(world, placeId, slot), msOf(now))
+  return { save: withWorld(save, tier, next, now), got }
 }
 
-/** Collects every job with something ready, on the given places (all by default). */
+/** Collects every Uma with something finished, on the given places (all by default). */
 export function collectAll(save: Save, now: string, placeIds?: readonly string[], tier = TIER_ONE): { save: Save; items: number; levelsUp: number } {
-  let world = worldOf(save, tier)
+  let world = settle(worldOf(save, tier), msOf(now), env).state
   let items = 0
   let levelsUp = 0
-  for (const [placeId, f] of Object.entries(world.facilities)) {
-    if (placeIds && !placeIds.includes(placeId)) continue
-    f.jobs.forEach((job, slot) => {
-      if (!job || (jobFinished(job, now) - job.collected <= 0 && jobFinished(job, now) < job.count)) return
-      const r = collectIn(world, placeId, slot, now)
-      world = r.world
-      items += r.got.items
-      levelsUp += r.got.levelsUp
-    })
+  for (const row of Object.values(world.work)) {
+    if (!row.slot || (placeIds && !placeIds.includes(row.slot.building)) || readyItems(row, msOf(now)) === 0) continue
+    const r = collectFrom(world, row.outfitId, msOf(now))
+    world = r.world
+    items += r.got.items
+    levelsUp += r.got.levelsUp
   }
   return { save: withWorld(save, tier, world, now), items, levelsUp }
 }
 
-/**
- * Queues another job after the slot's current one, for the same Uma: same kind of work, planned now (speed fixed with
- * her Craft Level and today's facility level), inputs taken when it starts.
- */
+/** Queues another job behind the slot's running one, for the same Uma at the same place; it takes its inputs when it
+ * starts, the moment the one before ends. */
 export function queueJob(save: Save, placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number, now: string, tier = TIER_ONE): Save {
-  const world = worldOf(save, tier)
-  const job = facilityOf(world, placeId).jobs[slot]
-  if (!job || job.outfitId !== outfit.outfitId) throw new SaveRuleError('bad-slot', 'queue behind her own job')
-  if (job.queue.length >= MAX_QUEUE) throw new SaveRuleError('bad-count', `at most ${MAX_QUEUE} queued`)
-  const most = maxJobCount(facilitySpec(placeId)?.kind ?? 'gather')
-  if (!Number.isInteger(count) || count < 1 || count > most) throw new SaveRuleError('bad-count', `make 1–${most} at a time`)
-  const plan = planJob(world, placeId, outfit, output, 0)
-  if (!plan) throw new SaveRuleError('bad-job', 'nothing to make here')
-  // Planned for zero items, only a grade gate can block it; inputs are checked when it starts.
-  if (plan.block) throw new SaveRuleError('bad-job', plan.block)
-  const entry: QueuedJob = { output, count, msEach: plan.msEach, expEach: plan.expEach, inputs: plan.inputs }
-  return withWorld(save, tier, setJob(world, placeId, slot, { ...job, queue: [...job.queue, entry] }), now)
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  if (holderOf(world, placeId, slot) !== outfit.outfitId) throw new SaveRuleError('bad-slot', 'queue behind her own job')
+  const add = { request: requestFor(placeId, output, count), building: placeId }
+  return withWorld(save, tier, done(queue(world, { outfitId: outfit.outfitId, add }, msOf(now), env), msOf(now)).state, now)
 }
 
 export function unqueueJob(save: Save, placeId: string, slot: number, index: number, now: string, tier = TIER_ONE): Save {
-  const world = worldOf(save, tier)
-  const job = facilityOf(world, placeId).jobs[slot]
-  if (!job || !job.queue[index]) throw new SaveRuleError('bad-slot', 'nothing queued there')
-  return withWorld(save, tier, setJob(world, placeId, slot, { ...job, queue: job.queue.filter((_, i) => i !== index) }), now)
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const outfitId = holderOf(world, placeId, slot)
+  if (!world.work[outfitId]?.queue[index]) throw new SaveRuleError('bad-slot', 'nothing queued there')
+  return withWorld(save, tier, done(queue(world, { outfitId, remove: index }, msOf(now), env), msOf(now)).state, now)
 }
 
-/** Ends a job early: collects what's made; inputs for items never made come back; the item in progress is lost. */
+/** Ends her work early: collects what's made; inputs for items never made come back; the item in progress is lost; her
+ * queue drops and Repeat forgets her last job. */
 export function recallJob(save: Save, placeId: string, slot: number, now: string, tier = TIER_ONE): Save {
-  const job = facilityOf(worldOf(save, tier), placeId).jobs[slot]
-  if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
-  // A recall drops the queue first, so nothing queued starts (or takes inputs) on the way out.
-  const collected = collectIn(setJob(worldOf(save, tier), placeId, slot, { ...job, queue: [] }), placeId, slot, now)
-  let world = collected.world
-  const unmade = job.count - jobFinished(job, now)
-  for (const [id, n] of Object.entries(job.inputs)) world = { ...world, items: give(world.items, id, n * unmade) }
-  if (facilityOf(world, placeId).jobs[slot]) world = setJob(world, placeId, slot, null)
-  return withWorld(save, tier, world, now)
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  return withWorld(save, tier, recall(world, { outfitId: holderOf(world, placeId, slot) }, msOf(now), env).state, now)
 }
 
-/** Speed Tickets that would finish a running job now: one per started 30 minutes left (D74). */
-export function ticketsToFinish(job: Job, now: string): number {
-  return timeTicketsToFinish(Math.max(0, jobEndsAt(job) - Date.parse(now)))
-}
-
-/**
- * Spends Speed Tickets on a running job or training: each takes 30 minutes off (D74), never past done. The items it
- * finishes are collected as usual.
- */
+/** Spends Speed Tickets on the slot's running job: each takes 30 minutes off (D74), never past done, and never more
+ * than finish it. */
 export function cutJobTime(save: Save, placeId: string, slot: number, tickets: number, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const outfitId = holderOf(world, placeId, slot)
+  const running = world.work[outfitId]!.entries.at(-1)!
+  if (!Number.isInteger(tickets) || tickets < 1) throw new SaveRuleError('bad-count', 'use at least one Speed Ticket')
+  return withWorld(save, tier, done(speedUp(world, { outfitId, startedAt: running.startedAt, tickets }, msOf(now), env), msOf(now)).state, now)
+}
+
+/** The first free slot of a facility, or null. */
+function freeSlot(world: TierWorld, placeId: string): number | null {
+  return slotsOf(world, placeId, RPG_BUILDINGS).find((s) => slotHolder(world, s) === undefined)?.slot ?? null
+}
+
+/** Her slot again if it's free or hers, else another free one at the same place. */
+function slotFor(world: TierWorld, outfitId: string, slot: SlotRef): number | null {
+  const holder = slotHolder(world, slot)
+  const exists = slotsOf(world, slot.building, RPG_BUILDINGS).some((s) => s.slot === slot.slot)
+  return exists && (holder === undefined || holder === outfitId) ? slot.slot : freeSlot(world, slot.building)
+}
+
+/** Starts her last finished job again where she did it (another free slot there if hers is taken). A Ready Uma's own
+ * finished entry counts as her last job: Collect and Repeat in one step. */
+export function repeatJob(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const row = world.work[outfitId]
+  const finished = row && statusOf(row, msOf(now)) === 'ready' ? row.entries.at(-1) : undefined
+  const job = finished && row?.slot ? { slot: row.slot, request: finished.request } : row?.last
+  if (!job) throw new SaveRuleError('bad-job', 'nothing to repeat')
+  const slot = slotFor(world, outfitId, job.slot)
+  if (slot === null) throw new SaveRuleError('bad-slot', 'no free slot there')
+  return startJob(withWorld(save, tier, world, now), job.slot.building, slot, { outfitId }, job.request.item, job.request.count, now, tier)
+}
+
+/** Restarts a queue that stopped: its first job starts now where it would have (another free slot there if that one is
+ * taken), and the rest queue behind it. */
+export function restartStopped(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const dropped = world.work[outfitId]?.dropped
+  if (!dropped) throw new SaveRuleError('bad-job', 'nothing stopped')
+  const [first, ...rest] = dropped.requests
+  const place = dropped.slot.building
+  const slot = slotFor(world, outfitId, dropped.slot)
+  if (slot === null) throw new SaveRuleError('bad-slot', 'no free slot there')
+  let next = startJob(withWorld(save, tier, world, now), place, slot, { outfitId }, first!.item, first!.count, now, tier)
+  for (const request of rest) next = queueJob(next, place, slot, { outfitId }, request.item, request.count, now, tier)
+  return next
+}
+
+/** Forgets a queue that stopped. */
+export function dismissStopped(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  const job = facilityOf(world, placeId).jobs[slot]
-  if (!job) throw new SaveRuleError('bad-slot', 'nothing working there')
-  if (jobFinished(job, now) >= job.count) throw new SaveRuleError('bad-job', 'already finished')
-  const needed = ticketsToFinish(job, now)
-  if (!Number.isInteger(tickets) || tickets < 1 || tickets > needed) throw new SaveRuleError('bad-count', `use 1–${needed} Speed Tickets here`)
-  if (world.wallet.timeTickets < tickets) throw new SaveRuleError('no-ticket', `needs ${tickets} Speed Ticket${tickets > 1 ? 's' : ''}`)
-  const left = jobEndsAt(job) - Date.parse(now)
-  const startedAt = new Date(Date.parse(job.startedAt) - Math.min(left, tickets * TIME_TICKET_SPAN)).toISOString()
-  const next = setJob({ ...world, wallet: { ...world.wallet, timeTickets: world.wallet.timeTickets - tickets } }, placeId, slot, { ...job, startedAt })
-  return withWorld(save, tier, next, now)
+  const row = world.work[outfitId]
+  if (!row?.dropped) return save
+  return withWorld(save, tier, withRow(world, { ...row, dropped: null }), now)
 }
 
 /** What the next level costs: Laurels plus refined items of the facility's two families, or null at the top. */
 export function upgradeCost(world: TierWorld, placeId: string): { laurels: number; items: Record<string, number> } | null {
-  const spec = facilitySpec(placeId)
-  const facility = facilityOf(world, placeId)
-  const step = FACILITY_UPGRADE[facility.level - 1]
-  if (!spec || !step || facility.level >= FACILITY_MAX_LEVEL) return null
-  const items: Record<string, number> = {}
-  for (const familyId of spec.upgradeFamilies) {
-    const refined = familyById(familyId)?.refined[step.grade - 1]
-    if (refined) items[refined.id] = step.count
-  }
-  return { laurels: step.laurels, items }
+  const level = facilityLevel(world, placeId)
+  if (!facilitySpec(placeId) || level >= RPG_BUILDINGS.maxLevel(placeId)) return null
+  const cost = RPG_BUILDINGS.upgradeCost(placeId, level + 1)
+  return { laurels: cost.money, items: Object.fromEntries(cost.items.map((q: ItemQty) => [q.item, q.qty])) }
 }
 
 export function upgradeFacility(save: Save, placeId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  const cost = upgradeCost(world, placeId)
-  if (!cost) throw new SaveRuleError('bad-job', 'already at the top level')
-  if (world.wallet.laurels < cost.laurels) throw new SaveRuleError('no-laurels', `needs ${cost.laurels} Laurels`)
-  let items = world.items
-  for (const [id, n] of Object.entries(cost.items)) items = take(items, id, n)
-  const facility = facilityOf(world, placeId)
-  const level = facility.level + 1
-  const jobs = Array.from({ length: FACILITY_SLOTS[level - 1]! }, (_, i) => facility.jobs[i] ?? null)
-  const next: TierWorld = { ...world, items, wallet: { ...world.wallet, laurels: world.wallet.laurels - cost.laurels }, facilities: { ...world.facilities, [placeId]: { level, jobs } } }
-  return withWorld(save, tier, next, now)
+  if (!upgradeCost(world, placeId)) throw new SaveRuleError('bad-job', 'already at the top level')
+  return withWorld(save, tier, done(upgrade(world, { building: placeId }, msOf(now), env), msOf(now)).state, now)
+}
+
+// --- Reading a facility for today's screens (until SC4's) -------------------------------------------------------------
+
+/** Finished items she hasn't collected, across her entries. */
+export function readyItems(row: WorkRow<RpgWorkRequest> | undefined, now: number): number {
+  return (row?.entries ?? []).reduce((n, e) => n + finishedCount(e, now) - e.collected, 0)
+}
+
+/** One slot's job as the cards read it: her running (or last) entry, what's ready across her entries, and her queue's
+ * times. */
+export interface SlotJob {
+  outfitId: string
+  kind: JobKind
+  output: string
+  count: number
+  /** Items of that entry finished by now. */
+  finished: number
+  /** Finished items not yet collected, across her entries. */
+  ready: number
+  /** Everything finished: Collect frees her. */
+  done: boolean
+  startedAt: number
+  endsAt: number
+  progress: number
+  /** Speed Tickets that would finish the running entry; 0 once done. */
+  ticketsToFinish: number
+  queue: { output: string; count: number; startsAt: number; endsAt: number }[]
+}
+
+/** A queue that couldn't start, waiting to be restarted or dismissed. */
+export interface StoppedQueue {
+  outfitId: string
+  requests: readonly RpgWorkRequest[]
+  /** What the Warehouse lacked for the first one, or the reason it was refused. */
+  why: string
+}
+
+export interface FacilityView {
+  level: number
+  /** One per slot at its level: the job in it, or null. */
+  jobs: (SlotJob | null)[]
+  stopped: StoppedQueue[]
+  /** Something here to collect. */
+  ready: boolean
+}
+
+function slotJob(world: TierWorld, row: WorkRow<RpgWorkRequest>, now: number): SlotJob {
+  const last: Entry<RpgWorkRequest> = row.entries.at(-1)!
+  const status = statusOf(row, now)
+  // A queued job's times, planned now: it will start when the one before it ends.
+  const queuedSeconds = row.queue.map((request) => {
+    const items = kindRules(env, request.kind)!.plan(world, row.outfitId, request, now, { slot: row.slot!, speed: last.speed, earlier: [], env })
+    return isRefusal(items) ? [] : items.map((i) => i.seconds)
+  })
+  const times = chainTimes(row, queuedSeconds)
+  return {
+    outfitId: row.outfitId, kind: last.request.kind, output: last.request.item, count: last.request.count,
+    finished: finishedCount(last, now), ready: readyItems(row, now), done: status === 'ready',
+    startedAt: last.startedAt, endsAt: endsAt(last), progress: progress(last, now),
+    ticketsToFinish: status === 'ready' ? 0 : ticketsToFinish(remainingMs(last, now)),
+    queue: row.queue.map((q, i) => ({ output: q.item, count: q.count, startsAt: times.queued[i]?.startsAt ?? 0, endsAt: times.queued[i]?.endsAt ?? 0 })),
+  }
+}
+
+/** Every slot of a facility at `now`, its queues settled first. */
+export function facilityView(world: TierWorld, placeId: string, now: string): FacilityView {
+  const t = msOf(now)
+  const settled = settle(world, t, env).state
+  const slots = slotsOf(settled, placeId, RPG_BUILDINGS)
+  const jobs = slots.map((slot) => {
+    const holder = slotHolder(settled, slot)
+    return holder ? slotJob(settled, settled.work[holder]!, t) : null
+  })
+  const stopped = Object.values(settled.work).filter((row) => row.dropped?.slot.building === placeId).map((row) => ({
+    outfitId: row.outfitId, requests: row.dropped!.requests,
+    why: row.dropped!.refused ? refusalText(row.dropped!.refused, t) : row.dropped!.short.map((q) => `short ${q.qty} ${outputName(q.item)}`).join(', '),
+  }))
+  return { level: facilityLevel(settled, placeId), jobs, stopped, ready: jobs.some((j) => j && (j.ready > 0 || j.done)) }
+}
+
+/** Her job at `now`, wherever she works, or null. */
+export function slotJobOf(world: TierWorld, outfitId: string, now: string): (SlotJob & { placeId: string; slot: number }) | null {
+  const settled = settle(world, msOf(now), env).state
+  const row = settled.work[outfitId]
+  if (!row?.slot || row.entries.length === 0) return null
+  return { ...slotJob(settled, row, msOf(now)), placeId: row.slot.building, slot: row.slot.slot }
+}
+
+/** Places with something to collect at `now`, and how many of their slots have it. */
+export function readyWork(world: TierWorld, now: string): Map<string, number> {
+  const settled = settle(world, msOf(now), env).state
+  const out = new Map<string, number>()
+  for (const row of Object.values(settled.work)) {
+    if (!row.slot || row.entries.length === 0) continue
+    if (readyItems(row, msOf(now)) > 0 || statusOf(row, msOf(now)) === 'ready') out.set(row.slot.building, (out.get(row.slot.building) ?? 0) + 1)
+  }
+  return out
 }
 
 export type { OwnedUma }

@@ -9,8 +9,7 @@ import { MAX_UMA_LEVEL, newSave, PARTY_SIZE, type Save, type TierWorld } from '.
 import { grantProfessionExp, planJob, type WorkOutfit } from '../save/work'
 import { regionChapter, stagePay, worldContinent, WORLD_LEVELS, type WorldRegion } from '../world/world'
 import { gearById, gearId } from './gear'
-import { jobComplete, jobEndsAt, jobFinished, type Job } from './jobs'
-import { LATE_LAURELS, MAX_JOB_COUNT, MINUTE, REPLAY_SHARE } from './pacing'
+import { LATE_LAURELS, MINUTE, REPLAY_SHARE } from './pacing'
 
 export const EPOCH = Date.parse('2026-10-12T00:00:00.000Z')
 export const at = (ms: number) => new Date(EPOCH + ms).toISOString()
@@ -113,24 +112,19 @@ export function capacity(world: TierWorld, grade: number, minutes: number): numb
   const leveled = { ...world, umas: { ...world.umas, [worker.outfitId]: { ...uma, craft: { level: gradeUnlockLevel(grade), exp: 0 } } } }
   const plan = planJob(leveled, family.site, worker, family.raw[grade - 1]!.id)!
   if (plan.block) throw new Error(plan.block)
-  return minutes * MINUTE / plan.msEach
+  return minutes * MINUTE / plan.itemMs
 }
 
-/** Fresh workers continuously gather grade 1 in parallel with fights (not the fighting Umas in a real save).
- * Keep partial-output time between band boundaries; use timestamp completion and the live profession EXP curve. */
+/** Fresh workers continuously gather grade 1 in parallel with fights (not the fighting Umas in a real save): back-to-back
+ * jobs planned at her first level, so an item ends every `itemMs` (the engine's timestamps). Partial-output time carries
+ * between band boundaries; the live profession EXP curve levels her. */
 export function freshWorker(rows: Band[]) {
   const world = worldOf(freshParty()), family = ITEM_FAMILIES[0]!
   const plan = planJob(world, family.site, worker, family.raw[0]!.id)!
-  let time = 0, finished = 0, completedBefore = 0, profession = { level: 1, exp: 0 }
-  let job: Job = { kind: 'gather', outfitId: worker.outfitId, output: plan.output.id, count: MAX_JOB_COUNT, collected: 0,
-    startedAt: at(0), msEach: plan.msEach, expEach: plan.expEach, inputs: {}, queue: [] }
+  let time = 0, finished = 0, profession = { level: 1, exp: 0 }
   const production = rows.map((row) => {
     time += row.milliseconds
-    while (jobComplete(job, at(time))) {
-      completedBefore += job.count
-      job = { ...job, startedAt: new Date(jobEndsAt(job)).toISOString() }
-    }
-    const completed = completedBefore + jobFinished(job, at(time)), made = completed - finished
+    const completed = Math.floor(time / plan.itemMs), made = completed - finished
     profession = grantProfessionExp(profession, made * plan.expEach)
     finished = completed
     return made

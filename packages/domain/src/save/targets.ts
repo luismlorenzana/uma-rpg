@@ -2,11 +2,11 @@
 // everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the Star Gem of every
 // Extra Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top
 // level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones.
+import { planRequirements, type Requirement } from '@luismlorenzana/uma-work'
 import { gemById, nodeGem, STAR_NODES } from '../economy/gems'
 import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
 import { facilitySpec } from '../economy/jobs'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
-import { planRequirements, type Requirement } from '../economy/requirements'
 import { itemById } from '../items/catalog'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
@@ -74,25 +74,23 @@ function recipeOf(id: string): Readonly<Record<string, number>> | null {
 }
 
 /**
- * What the jobs will bring and hold. Running jobs bring what they haven't handed over yet (their inputs were taken at
- * start). A queued job holds its inputs from the Warehouse when it would start; it counts as coming only if the
- * Warehouse can cover them, since a job it can't start brings nothing.
+ * What the jobs will bring and hold (SC3). Started entries bring what they haven't handed over yet (their inputs left
+ * the Warehouse when they started). A queued request takes its inputs from the Warehouse when it starts; it counts as
+ * coming only if the Warehouse can cover them, since a job that can't start brings nothing.
  */
 export function jobSupply(world: TierWorld): { coming: Map<string, number>; held: Map<string, number> } {
   const coming = new Map<string, number>()
   const held = new Map<string, number>()
   const add = (into: Map<string, number>, id: string, n: number) => into.set(id, (into.get(id) ?? 0) + n)
   const stock = (id: string) => (world.items[id] ?? 0) - (held.get(id) ?? 0)
-  for (const placeId of Object.keys(world.facilities).sort()) {
-    for (const job of world.facilities[placeId]!.jobs) {
-      if (!job) continue
-      add(coming, job.output, job.count - job.collected)
-      for (const q of job.queue) {
-        const needs = Object.entries(q.inputs).map(([id, n]) => [id, n * q.count] as const)
-        if (needs.some(([id, n]) => stock(id) < n)) continue
-        for (const [id, n] of needs) add(held, id, n)
-        add(coming, q.output, q.count)
-      }
+  for (const outfitId of Object.keys(world.work).sort()) {
+    const row = world.work[outfitId]!
+    for (const entry of row.entries) add(coming, entry.request.item, entry.request.count - entry.collected)
+    for (const q of row.queue) {
+      const needs = Object.entries(recipeOf(q.item) ?? {}).map(([id, n]) => [id, n * q.count] as const)
+      if (needs.some(([id, n]) => stock(id) < n)) continue
+      for (const [id, n] of needs) add(held, id, n)
+      add(coming, q.item, q.count)
     }
   }
   return { coming, held }

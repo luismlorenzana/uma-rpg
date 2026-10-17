@@ -153,11 +153,10 @@ describe('save v18: the progress reset (D105)', () => {
     expect(w.wallet).toMatchObject({ laurels: 500, gearMarks: 0, classMarks: 0 })
     expect(w.targets).toEqual(['101'])
     expect(w.parties[0]!.slots).toEqual(IDS)
-    // Training ends and a Ring's Forge job ends; v21 (D144) drops places that are no longer facilities and gives the
-    // rest their new slots.
-    expect(w.facilities['brawler-dojo']).toBeUndefined()
-    expect(w.facilities.forge!.jobs).toEqual([null, null, null])
-    expect(w.facilities.kitchen).toBeUndefined()
+    // Training ends and a Ring's Forge job ends; v21 (D144) drops places that are no longer facilities; v22 (SC3) keeps
+    // only levels above 1, and no work.
+    expect(w.buildings).toEqual({})
+    expect(w.work).toEqual({})
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 })

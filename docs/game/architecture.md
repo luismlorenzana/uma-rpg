@@ -39,8 +39,9 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v21, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
+| `save/` | The save (`save.ts`: schema v22, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs on the shared engine, and the slot view the screens read), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
 | `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v13, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
+| `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `request.ts` (a job's request), `kinds/` (`gather.ts`, `refine.ts`, `craft.ts`, `cut.ts`: plan and pay), `env.ts` (facilities as buildings, Speed Tickets, Craft Level, Laurels) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 8 families and 160 items |
@@ -74,6 +75,9 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - `@luismlorenzana/uma-data`'s release client reads through the API proxy (`/api/master/`).
   - It loads characters, outfits, scenarios and the art index once a session; skills load only when needed.
 - **Original art:** `@luismlorenzana/uma-art` atlases (items, gear, buildings, tiles) are bundled by Vite.
+- **The work engine** (`@luismlorenzana/uma-work`, uma-platform P53, SC3) runs every job: slots, reserving, the clock,
+  queues, collect, recall, Speed Tickets and upgrades. It's pure TypeScript in ESM and CommonJS, so the API runs the same
+  rules when it accepts a save.
 - **The shared app** (`@luismlorenzana/uma-kit`, uma-platform P48, D147) is the same package as uma-racer's:
   - the theme, light and dark under one set of names;
   - the primitives (icons, marks, sheets, tabs, buttons);
@@ -108,7 +112,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v21** (`save/save.ts`).
+- **Schema v22** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -125,13 +129,20 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - **v20:** armor without accents (one of each piece kept), a feet slot, two accessory slots, Accessory Ranks (D124).
   - **v21:** one profession, Craft Level, at the higher of her two levels; Star Gems; only items and facilities the game
     still has, each facility with its level's new slots; opened nodes kept (D144).
+  - **v22:** work moves to per-Uma rows on `@luismlorenzana/uma-work`; each facility keeps its level; every running job
+    finishes into its shelf with its Craft EXP, queued jobs drop, and every Uma starts free (SC3).
 
 ```
 Save { schemaVersion, account { trainerName, createdAt, updatedAt }, tierWorlds: { "1": TierWorld } }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, gearMarks, classMarks },
   umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5] }],
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
-  items, facilities, gems, gear, targets, heroes: { <seat>: { hero, learners[≤10] } } }
+  items, buildings: { <placeId>: { level } }, work: { <outfitId>: WorkRow }, gems, gear, targets,
+  heroes: { <seat>: { hero, learners[≤10] } } }
+WorkRow { outfitId, slot { building, slot } | null, entries [Entry], queue [≤3 requests], last { slot, request } | null,
+  dropped { at, slot, requests, short, refused } | null }
+Entry { request { kind, item, count }, seconds[], inputs[], outputs[], exp[], startedAt, acceleratedMs, collected, speed,
+  fromQueue }   (times in milliseconds)
 OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons, tree, loadout } },
   craft { level, exp }, ranks { classes, weapons, armors, accessories: { <id>: { rank, exp } } },
   stars { unlocked, active }, gear { locker, equipped, kinds }, bonds { <seat>: { level, exp } } }

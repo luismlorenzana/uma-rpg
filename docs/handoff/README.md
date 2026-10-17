@@ -18,8 +18,7 @@
 | [SB5](tasks/SB5-rpg-battle-busts.md) | Busts on the battle stage, no chibis | Either | S | — | Ready |
 | [SB4](tasks/SB4-rpg-album.md) | The Stable, six pickers and every small Uma on the kit album, with faces | Either | L | SB3 (SB1 for faces) | Waiting |
 | **Phase C: one work system** | | | | | |
-| [SC3](tasks/SC3-rpg-on-uma-work.md) | Work on `@luismlorenzana/uma-work`: kinds, save v22, the API | Claude | L | SC1 | Waiting |
-| [SC4](tasks/SC4-rpg-work-screens.md) | The Wilds on `uma-kit/work`'s screens | Either | M | SC2, SC3 | Waiting |
+| [SC4](tasks/SC4-rpg-work-screens.md) | The Wilds on `uma-kit/work`'s screens | Either | M | SC2 (SC3 done) | Waiting |
 | **Phase D: places, profile and getting in** | | | | | |
 | [SD3](tasks/SD3-rpg-places.md) | Getting in, Account, Warehouse, Exchange and the profile frame on the kit; the API's guard from `uma-server` | Either | M | SD1, SD2 | Waiting |
 | **Phase E: platform plumbing** | | | | | |
@@ -41,6 +40,7 @@ there.
 
 | Id | Task | Commit |
 |---|---|---|
+| SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | see `git log --grep SC3` |
 
 ## Archived on 2026-10-16 (D151)
 

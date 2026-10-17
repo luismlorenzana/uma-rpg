@@ -19,6 +19,17 @@ export const PROFESSION_MAX_LEVEL = 50
  * (D139). */
 export const professionExpToNext = (level: number): number => 1425 + 15 * level
 
+/** Craft EXP in: levels up, banking EXP at Lv50. */
+export function grantProfessionExp(p: { level: number; exp: number }, exp: number): { level: number; exp: number } {
+  let { level } = p
+  let bank = p.exp + Math.max(0, Math.floor(exp))
+  while (level < PROFESSION_MAX_LEVEL && bank >= professionExpToNext(level)) {
+    bank -= professionExpToNext(level)
+    level += 1
+  }
+  return { level, exp: bank }
+}
+
 /** Profession EXP per minute of work at her level: every job pays for its time, whatever it makes (§8.5). */
 export const EXP_PER_MINUTE = 2
 
@@ -48,8 +59,6 @@ export const MAX_JOB_COUNT = 10
 export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
 /** The most items one new job of a kind makes. */
 export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number => (kind === 'refine' ? REFINE_BATCHES.at(-1)! : MAX_JOB_COUNT)
-/** Saves from before D65 may hold jobs of up to 50. */
-export const MAX_SAVED_JOB_COUNT = 50
 
 // --- Facilities (§9) -------------------------------------------------------------------------------------------
 

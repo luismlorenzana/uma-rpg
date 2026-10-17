@@ -1,5 +1,6 @@
-// Save v21: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v21 (D144):
-// one profession, Craft Level, and Star Gems for Extra Stats; more facility slots. v20 (D124):
+// Save v22: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v22 (SC3):
+// work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row, and facilities keep only
+// their levels. v21 (D144): one profession, Craft Level, and Star Gems for Extra Stats; more facility slots. v20 (D124):
 // armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106): the Halls of Heroes, their
 // Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset
 // for every older save.
@@ -8,8 +9,10 @@
 // docs/design/pacing.md (Craft Level, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
 // mastery (S5, D57); Star Gems and each Uma's Sun-and-planets map (S6, D58, D144); gear, lockers and what's equipped (S7,
 // D59).
-import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, MAX_SAVED_JOB_COUNT, PROFESSION_MAX_LEVEL } from '../economy/pacing'
-import { facilitySpec, JOB_KINDS, MAX_QUEUE, type Facility, type Job, type QueuedJob } from '../economy/jobs'
+import type { DroppedQueue, Entry, ItemQty, LastWork, Refusal, SlotRef, WorkOutput, WorkRow, WorkState } from '@luismlorenzana/uma-work'
+import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL } from '../economy/pacing'
+import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
+import type { RpgWorkRequest } from '../work/request'
 import {
   ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
   WEAPON_TYPES, type AccessoryKind, type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
@@ -32,7 +35,7 @@ import {
 } from '../rpg/rules'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 21
+export const SAVE_SCHEMA_VERSION = 22
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 5
 export const STARTING_UNLOCK_TICKETS = 20
@@ -111,7 +114,7 @@ export interface Party {
   slots: (string | null)[]
 }
 
-export interface TierWorld {
+export interface TierWorld extends WorkState<RpgWorkRequest> {
   createdAt: string
   wallet: Wallet
   /** Owned outfits by outfit id. */
@@ -120,10 +123,13 @@ export interface TierWorld {
   parties: Party[]
   /** The world map's progress (D66): the active party, wins per stage, MP per Uma, the open fight, Spring uses. */
   world: WorldState
-  /** The Warehouse: raw and refined items by id. */
+  /** The Warehouse: raw and refined items by id, free to use (a job's inputs leave it when the job starts). */
   items: Record<string, number>
-  /** Facilities that have been used or upgraded, by place id; absent ones are level 1 and idle. */
-  facilities: Record<string, Facility>
+  /** Facilities above level 1, by place id (SC3). */
+  buildings: Record<string, { level: number }>
+  /** Each Uma's work, by outfit id (SC3): her started entries, up to three queued, her last job for Repeat and a queue
+   * that couldn't start. Absent when she has none of these. */
+  work: Record<string, WorkRow<RpgWorkRequest>>
   /** Cut Star Gems waiting to be set, by gem id (D144). */
   gems: Record<string, number>
   /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. */
@@ -200,7 +206,7 @@ export interface WorldState {
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, facilities: {}, gems: {}, gear: {}, targets: [], heroes: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {} }
 }
 
 export function newSave(trainerName: string, now: string): Save {
@@ -272,62 +278,147 @@ function parseItems(value: unknown, path: string): Record<string, number> {
   return items
 }
 
-const JOB_KEYS = ['kind', 'outfitId', 'output', 'count', 'collected', 'startedAt', 'msEach', 'expEach', 'inputs'] as const
+// --- Work (SC3): the shared engine's rows, parsed strictly ----------------------------------------------------------
 
-function parseQueue(value: unknown, path: string): QueuedJob[] {
-  if (!Array.isArray(value) || value.length > MAX_QUEUE) throw new SaveParseError(path, `expected at most ${MAX_QUEUE} queued jobs`)
-  return value.map((raw: unknown, i: number) => {
-    const at = `${path}.${i}`
-    const q = object(raw, at, ['output', 'count', 'msEach', 'expEach', 'inputs'])
-    if (typeof q.output !== 'string' || q.output.length < 1 || q.output.length > 80) throw new SaveParseError(`${at}.output`, 'expected an id')
-    const n = count(q.count, `${at}.count`)
-    if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${at}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
-    const msEach = count(q.msEach, `${at}.msEach`)
-    if (msEach < 1) throw new SaveParseError(`${at}.msEach`, 'expected a positive duration')
-    return { output: q.output, count: n, msEach, expEach: count(q.expEach, `${at}.expEach`), inputs: parseItems(q.inputs, `${at}.inputs`) }
+/** A whole number of milliseconds since the epoch. */
+function ms(value: unknown, path: string): number {
+  return count(value, path)
+}
+
+function positive(value: unknown, path: string): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) throw new SaveParseError(path, 'expected a positive number')
+  return value
+}
+
+function list(value: unknown, path: string, min: number, max: number): unknown[] {
+  if (!Array.isArray(value) || value.length < min || value.length > max) throw new SaveParseError(path, `expected ${min}–${max} entries`)
+  return value
+}
+
+/** Whether `id` is something a kind makes: an item at a site or the Workbench, gear at the Forge, a gem at the Lapidary. */
+const madeBy = (kind: JobKind, id: string): boolean => (kind === 'craft' ? !!gearById(id) : kind === 'cut' ? isGemId(id) : isItemId(id))
+
+function parseRequest(value: unknown, path: string, kind?: JobKind): RpgWorkRequest {
+  const r = object(value, path, ['kind', 'item', 'count'])
+  if (!JOB_KINDS.includes(r.kind as JobKind) || (kind && r.kind !== kind)) throw new SaveParseError(`${path}.kind`, kind ? `expected ${kind}` : 'unknown kind')
+  const k = r.kind as JobKind
+  if (typeof r.item !== 'string' || !madeBy(k, r.item)) throw new SaveParseError(`${path}.item`, 'not made by this kind')
+  const n = count(r.count, `${path}.count`)
+  if (n < 1 || n > maxJobCount(k)) throw new SaveParseError(`${path}.count`, `expected 1–${maxJobCount(k)}`)
+  return { kind: k, item: r.item, count: n }
+}
+
+function parseSlot(value: unknown, path: string): SlotRef {
+  const o = object(value, path, ['building', 'slot'])
+  if (typeof o.building !== 'string' || !facilitySpec(o.building)) throw new SaveParseError(`${path}.building`, 'not a facility')
+  const slot = count(o.slot, `${path}.slot`)
+  if (slot >= FACILITY_SLOTS[FACILITY_SLOTS.length - 1]!) throw new SaveParseError(`${path}.slot`, 'no such slot')
+  return { building: o.building, slot }
+}
+
+const kindAt = (slot: SlotRef): JobKind => facilitySpec(slot.building)!.kind
+
+function parseQty(value: unknown, path: string): ItemQty {
+  const o = object(value, path, ['item', 'qty'])
+  if (typeof o.item !== 'string' || !isItemId(o.item)) throw new SaveParseError(`${path}.item`, 'unknown item')
+  const qty = count(o.qty, `${path}.qty`)
+  if (qty < 1) throw new SaveParseError(`${path}.qty`, 'expected at least 1')
+  return { item: o.item, qty }
+}
+
+const ENTRY_KEYS = ['request', 'seconds', 'inputs', 'outputs', 'exp', 'startedAt', 'acceleratedMs', 'collected', 'speed', 'fromQueue'] as const
+
+function parseEntry(value: unknown, path: string, kind: JobKind): Entry<RpgWorkRequest> {
+  const e = object(value, path, ENTRY_KEYS)
+  const request = parseRequest(e.request, `${path}.request`, kind)
+  const n = request.count
+  const each = <T>(raw: unknown, key: string, parse: (v: unknown, at: string) => T): T[] => list(raw, `${path}.${key}`, n, n).map((v, i) => parse(v, `${path}.${key}.${i}`))
+  const seconds = each(e.seconds, 'seconds', positive)
+  const inputs = each(e.inputs, 'inputs', (v, at) => list(v, at, 0, 8).map((q, j) => parseQty(q, `${at}.${j}`)))
+  const outputs = each(e.outputs, 'outputs', (v, at): WorkOutput => {
+    const o = object(v, at, ['item'])
+    if (o.item !== request.item) throw new SaveParseError(`${at}.item`, 'expected the request\'s item')
+    return { item: request.item }
   })
+  const exp = each(e.exp, 'exp', count)
+  const collected = count(e.collected, `${path}.collected`)
+  if (collected > n) throw new SaveParseError(`${path}.collected`, 'more than the entry makes')
+  if (typeof e.fromQueue !== 'boolean') throw new SaveParseError(`${path}.fromQueue`, 'expected true or false')
+  return { request, seconds, inputs, outputs, exp, startedAt: ms(e.startedAt, `${path}.startedAt`), acceleratedMs: count(e.acceleratedMs, `${path}.acceleratedMs`),
+    collected, speed: positive(e.speed, `${path}.speed`), fromQueue: e.fromQueue }
 }
 
-function parseJob(value: unknown, path: string, kind: Job['kind'], umas: Record<string, OwnedUma>): Job {
-  const j = object(value, path, [...JOB_KEYS, 'queue'])
-  if (j.kind !== kind || !JOB_KINDS.includes(j.kind as Job['kind'])) throw new SaveParseError(`${path}.kind`, `expected ${kind}`)
-  if (typeof j.outfitId !== 'string' || !umas[j.outfitId]) throw new SaveParseError(`${path}.outfitId`, 'expected an owned outfit')
-  if (typeof j.output !== 'string' || j.output.length < 1 || j.output.length > 80) throw new SaveParseError(`${path}.output`, 'expected an id')
-  if ((kind === 'gather' || kind === 'refine') && !isItemId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown item')
-  if (kind === 'cut' && !isGemId(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gem')
-  if (kind === 'craft' && !gearById(j.output)) throw new SaveParseError(`${path}.output`, 'unknown gear')
-  const n = count(j.count, `${path}.count`)
-  if (n < 1 || n > MAX_SAVED_JOB_COUNT) throw new SaveParseError(`${path}.count`, `expected 1–${MAX_SAVED_JOB_COUNT}`)
-  const collected = count(j.collected, `${path}.collected`)
-  if (collected > n) throw new SaveParseError(`${path}.collected`, 'more than the job makes')
-  const msEach = count(j.msEach, `${path}.msEach`)
-  if (msEach < 1) throw new SaveParseError(`${path}.msEach`, 'expected a positive duration')
-  const inputs = parseItems(j.inputs, `${path}.inputs`)
-  return { kind, outfitId: j.outfitId, output: j.output, count: n, collected, startedAt: timestamp(j.startedAt, `${path}.startedAt`), msEach,
-    expEach: count(j.expEach, `${path}.expEach`), inputs, queue: parseQueue(j.queue, `${path}.queue`) }
+function parseRefusal(value: unknown, path: string): Refusal | null {
+  if (value === null) return null
+  const o = object(value, path, ['refused', 'code', 'message', 'data'])
+  if (o.refused !== true || typeof o.code !== 'string' || typeof o.message !== 'string') throw new SaveParseError(path, 'expected a refusal')
+  if (o.data === undefined) return { refused: true, code: o.code, message: o.message }
+  const data = object(o.data, `${path}.data`, Object.keys((o.data as Obj | null) ?? {}))
+  if (Object.values(data).some((v) => typeof v !== 'string' && typeof v !== 'number')) throw new SaveParseError(`${path}.data`, 'expected strings and numbers')
+  return { refused: true, code: o.code, message: o.message, data: data as Record<string, string | number> }
 }
 
-function parseFacilities(value: unknown, path: string, umas: Record<string, OwnedUma>): Record<string, Facility> {
+function parseDropped(value: unknown, path: string): DroppedQueue<RpgWorkRequest> | null {
+  if (value === null) return null
+  const d = object(value, path, ['at', 'slot', 'requests', 'short', 'refused'])
+  const slot = parseSlot(d.slot, `${path}.slot`)
+  return {
+    at: ms(d.at, `${path}.at`), slot,
+    requests: list(d.requests, `${path}.requests`, 1, MAX_QUEUED + 1).map((r, i) => parseRequest(r, `${path}.requests.${i}`, kindAt(slot))),
+    short: list(d.short, `${path}.short`, 0, 8).map((q, i) => parseQty(q, `${path}.short.${i}`)),
+    refused: parseRefusal(d.refused, `${path}.refused`),
+  }
+}
+
+function parseLast(value: unknown, path: string): LastWork<RpgWorkRequest> | null {
+  if (value === null) return null
+  const l = object(value, path, ['slot', 'request'])
+  const slot = parseSlot(l.slot, `${path}.slot`)
+  return { slot, request: parseRequest(l.request, `${path}.request`, kindAt(slot)) }
+}
+
+/** Up to three requests wait behind the running one (the engine's MAX_QUEUE). */
+const MAX_QUEUED = 3
+/** The most started entries a row can hold: one running and its queue's finished ones waiting for Collect. */
+const MAX_ENTRIES = MAX_QUEUED + 1
+
+function parseBuildings(value: unknown, path: string): Record<string, { level: number }> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
-  const out: Record<string, Facility> = {}
-  const working = new Set<string>()
+  const out: Record<string, { level: number }> = {}
+  for (const [id, raw] of Object.entries(value)) {
+    if (!facilitySpec(id)) throw new SaveParseError(`${path}.${id}`, 'not a facility')
+    const level = count(object(raw, `${path}.${id}`, ['level']).level, `${path}.${id}.level`)
+    if (level < 1 || level > FACILITY_MAX_LEVEL) throw new SaveParseError(`${path}.${id}.level`, `expected 1–${FACILITY_MAX_LEVEL}`)
+    out[id] = { level }
+  }
+  return out
+}
+
+function parseWork(value: unknown, path: string, umas: Record<string, OwnedUma>, buildings: Record<string, { level: number }>): Record<string, WorkRow<RpgWorkRequest>> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const out: Record<string, WorkRow<RpgWorkRequest>> = {}
+  const held = new Set<string>()
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
-    const spec = facilitySpec(id)
-    if (!spec) throw new SaveParseError(at, 'not a facility')
-    const f = object(raw, at, ['level', 'jobs'])
-    const level = count(f.level, `${at}.level`)
-    if (level < 1 || level > FACILITY_MAX_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${FACILITY_MAX_LEVEL}`)
-    const slots = FACILITY_SLOTS[level - 1]!
-    if (!Array.isArray(f.jobs) || f.jobs.length !== slots) throw new SaveParseError(`${at}.jobs`, `expected ${slots} slots`)
-    const jobs = f.jobs.map((job: unknown, i: number) => {
-      if (job === null) return null
-      const parsed = parseJob(job, `${at}.jobs.${i}`, spec.kind, umas)
-      if (working.has(parsed.outfitId)) throw new SaveParseError(`${at}.jobs.${i}.outfitId`, 'already working elsewhere')
-      working.add(parsed.outfitId)
-      return parsed
-    })
-    out[id] = { level, jobs }
+    if (!umas[id]) throw new SaveParseError(at, 'expected an owned outfit')
+    const r = object(raw, at, ['outfitId', 'slot', 'entries', 'queue', 'last', 'dropped'])
+    if (r.outfitId !== id) throw new SaveParseError(`${at}.outfitId`, 'expected its own key')
+    const slot = r.slot === null ? null : parseSlot(r.slot, `${at}.slot`)
+    const entries = list(r.entries, `${at}.entries`, 0, MAX_ENTRIES)
+    const queue = list(r.queue, `${at}.queue`, 0, MAX_QUEUED)
+    if (!slot && (entries.length > 0 || queue.length > 0)) throw new SaveParseError(`${at}.slot`, 'work needs a slot')
+    if (slot && entries.length > 0) {
+      const key = `${slot.building}:${slot.slot}`
+      if (held.has(key)) throw new SaveParseError(`${at}.slot`, 'already held')
+      if (slot.slot >= FACILITY_SLOTS[(buildings[slot.building]?.level ?? 1) - 1]!) throw new SaveParseError(`${at}.slot`, 'no such slot at its level')
+      held.add(key)
+    }
+    out[id] = {
+      outfitId: id, slot,
+      entries: entries.map((e, i) => parseEntry(e, `${at}.entries.${i}`, kindAt(slot!))),
+      queue: queue.map((q, i) => parseRequest(q, `${at}.queue.${i}`, kindAt(slot!))),
+      last: parseLast(r.last, `${at}.last`), dropped: parseDropped(r.dropped, `${at}.dropped`),
+    }
   }
   return out
 }
@@ -621,14 +712,15 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v20 are migrated to v21's shape first (migrations.ts), so the parse below reads only v21.
+  // v10–v21 are migrated to v22's shape first (migrations.ts), so the parse below reads only v22.
   const value = migrate(raw, version)
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'facilities', 'gems', 'gear', 'targets', 'heroes'])
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
+  const buildings = parseBuildings(w.buildings, `${path}.buildings`)
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
-    items: parseItems(w.items, `${path}.items`), facilities: parseFacilities(w.facilities, `${path}.facilities`, umas),
+    items: parseItems(w.items, `${path}.items`), buildings, work: parseWork(w.work, `${path}.work`, umas, buildings),
     gems: parseGems(w.gems, `${path}.gems`), gear: parseGearStock(w.gear, `${path}.gear`),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
   }
@@ -646,8 +738,9 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v21 save and always returns v21. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
- * (D106), v20 moves to one profession and Star Gems (D144) and anything older than v10 starts over (D69). */
+/** Parses a v1–v22 save and always returns v22. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+ * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3) and anything older than v10
+ * starts over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

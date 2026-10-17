@@ -82,8 +82,13 @@ describe('asynchronous strict save parsing (H16)', () => {
       }
       if (version >= 10 && version < 14) w.gear = { 'mage-staff-g2-mp': 2, 'spear-g1-atk': 1 }
       if (version >= 10 && version < 15) w.items = { 'token-craft-hp-1': 2 }
+      // Before v22 facilities held the jobs (SC3).
+      if (version < 22) {
+        const old = w as unknown as Record<string, unknown>
+        delete old.buildings; delete old.work; old.facilities = {}
+      }
       // Before v21 an Uma had professions, not a Craft Level (D144).
-      for (const u of Object.values(w.umas)) {
+      if (version < 21) for (const u of Object.values(w.umas)) {
         const old = u as unknown as Record<string, unknown>
         old.professions = { gathering: version < 16 && old === (w.umas['9000000'] as unknown) ? { level: 12, exp: 9 } : old.craft }
         delete old.craft

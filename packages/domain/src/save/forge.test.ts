@@ -67,10 +67,10 @@ describe('the Forge and equipping (S7)', () => {
   it('crafts with Craft Level into the gear stock', () => {
     let save = edit(umas('101'), (w) => ({ ...w, items: { 'pine-plank': 2, 'mist-infusion': 2 } }))
     const plan = planJob(worldOf(save), 'forge', smith, 'greatsword-g1', 2)!
-    expect(plan).toMatchObject({ block: null, msEach: makeMinutes(1) * MINUTE })
+    expect(plan).toMatchObject({ block: null, itemMs: makeMinutes(1) * MINUTE })
     expect(planJob(worldOf(save), 'forge', smith, 'greatsword-g2', 1)!.block).toBe('Needs Craft Lv6')
     save = startJob(save, 'forge', 0, smith, 'greatsword-g1', 2, at(0))
-    save = collectJob(save, 'forge', 0, at(2 * plan.msEach)).save
+    save = collectJob(save, 'forge', 0, at(2 * plan.itemMs)).save
     expect(worldOf(save).gear).toEqual({ 'greatsword-g1': 2 })
     expect(worldOf(save).items).toEqual({})
   })
@@ -252,9 +252,8 @@ describe('save v20: gear symmetry (D124, D125)', () => {
     expect(after.gear).toEqual({ locker: ['helm-g2', 'helm-g1', 'orb-katana-g1'], equipped: { head: 'helm-g2', 'accessory-1': 'orb-katana-g1' }, kinds: { head: 'helm' } })
     expect(after.ranks.armors).toEqual({ helm: r5, greaves: { rank: 3, exp: 7 }, leggings: r5, boots: { rank: 3, exp: 7 }, slippers: r5 })
     expect(after.ranks.accessories).toEqual({ 'arms-orb': { rank: 2, exp: 1 } })
-    expect(worldOf(save).gear).toEqual({ 'cuirass-g1': 3, 'lance-g1': 1 })
-    const job = worldOf(save).facilities.forge!.jobs[0]!
-    expect(job.output).toBe('helm-g1')
-    expect(job.queue[0]).toMatchObject({ output: 'robe-g1', inputs: gearById('robe-g1')!.inputs })
+    // The running Forge job, renamed to its accentless piece, finishes into the gear stock at v22 (SC3); its queue drops.
+    expect(worldOf(save).gear).toEqual({ 'cuirass-g1': 3, 'lance-g1': 1, 'helm-g1': 1 })
+    expect(worldOf(save).work).toEqual({})
   })
 })

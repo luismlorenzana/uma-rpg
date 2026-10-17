@@ -10,7 +10,8 @@ import {
   accessoryEffects, accessoryKindOf, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
   MIGHT_BY_GRADE, mightOf, recipeFamilies, slotOf, type EquipType,
 } from '../economy/gear'
-import { MAX_QUEUE, FACILITIES } from '../economy/jobs'
+import { MAX_QUEUE } from '@luismlorenzana/uma-work'
+import { FACILITIES } from '../economy/jobs'
 import {
   ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
   gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,

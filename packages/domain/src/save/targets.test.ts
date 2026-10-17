@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { planRequirements } from '@luismlorenzana/uma-work'
 import { gearById } from '../economy/gear'
-import { planRequirements } from '../economy/requirements'
 import { familyById } from '../items/catalog'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save, type TierWorld } from './save'
 import { equipGear } from './forge'
 import { setGem } from './observatory'
 import { facilityTargets, jobSupply, setTarget, targetPlan } from './targets'
-import { startJob } from './work'
+import { queueJob, startJob } from './work'
 
 const T0 = Date.parse('2026-10-14T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -100,9 +100,9 @@ describe('targets (D100, D126, D144)', () => {
     let save = umas('101', '102', '103')
     for (const id of ['101', '102', '103']) save = setTarget(save, id, true, at(1))
     const leatherId = hides().refined[0]!.id, peltId = hides().raw[0]!.id
-    const job = { kind: 'refine' as const, outfitId: '101', output: leatherId, count: 1, collected: 0, startedAt: at(2), msEach: 1000, expEach: 1,
-      inputs: { [peltId]: 1 }, queue: [{ output: leatherId, count: 1, msEach: 1000, expEach: 1, inputs: { [peltId]: 1 } }] }
-    save = withWorld(save, (w) => ({ ...w, items: { [peltId]: 1 }, facilities: { workbench: { level: 1, jobs: [job, null, null] } } }))
+    save = withWorld(save, (w) => ({ ...w, items: { [peltId]: 2 } }))
+    save = startJob(save, 'workbench', 0, { outfitId: '101' }, leatherId, 1, at(2))
+    save = queueJob(save, 'workbench', 0, { outfitId: '101' }, leatherId, 1, at(2))
     const { coming, held } = jobSupply(worldOf(save))
     expect(held.get(peltId)).toBe(1)
     expect(coming.get(leatherId)).toBe(2)

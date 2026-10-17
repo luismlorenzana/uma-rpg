@@ -28,7 +28,7 @@ Fights are active play. Everything else is jobs that run in real time, offline i
   Ticket automatically, so every Uma who reaches Lv 50 pays back one Ticket. Tickets have no other source or use.
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
-  needs all five slots filled and nobody working.
+  needs all five slots filled; Umas at work fight too (D119).
 - **Classes:** switching is free. A new Uma starts in her running style's class ([classes](classes.md)).
 
 ## Leveling
@@ -163,17 +163,27 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
   break, an Uma gains about 2 levels a day early on and reaches Lv50 in about a month (24 days at a level-3 facility).
   Batch size doesn't change it: EXP is paid per minute of work.
 - **A job:**
-  - An Uma makes its outputs one after another, and takes up a slot until it's done or recalled.
+  - An Uma makes its outputs one after another. Her work is her own row (SC3): she holds one slot from the moment a job
+    starts until Collect frees her or she's recalled, so she works in one place at most. Starting a job on an Uma whose
+    work is finished collects it first.
+  - Every job runs in the shared work engine, `@luismlorenzana/uma-work`, the same code as uma-racer's; this game
+    supplies its kinds (gather, refine, craft, cut), its facilities and its Craft Level.
   - **Batches (D139):** gathering, crafting and cutting make 1–10; refining makes ×1, ×4, ×8, ×20 or ×40, so a ×40
     refine takes as long as a 10-item gather.
   - Inputs are reserved at the start.
   - Craft EXP is 2 per minute of the job at her level, before the facility's speed, so every job levels at the
     same rate per hour.
-- **Queues:** up to three more jobs wait behind the current one, for the same Uma. If the Warehouse can't cover the
-  next one, the queue drops.
+- **Queues:** up to three more jobs wait behind the current one, for the same Uma at the same place. Each starts the
+  moment the one before ends and takes its inputs then, so a chain catches up however late it's collected. If the
+  Warehouse can't cover the next one, the queue **stops**: it waits on the facility's page to be restarted (its first
+  job starts now) or dismissed (SC3).
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when
   ([sections](sections.md#global-ui)).
-- **Recall:** pays what's finished and returns the inputs of everything unfinished. Only the time is lost.
+- **Recall:** pays what's finished and returns the inputs of everything unfinished, the item in progress included. The
+  queue drops and Repeat forgets her last job. Only the time is lost.
+- **Repeat (SC3):** starts her last job again where she did it, or in another free slot there if hers is taken; on an
+  Uma whose work is finished it collects first.
+- **Speed Tickets** never spend more than finish the job: asking for more spends only what's needed.
 - **Targets (D100, D126):** mark up to five Umas on their profile. Every facility then lists what maxing them still
   takes from it:
   - **The Forge:** every grade above the best she has bound, up to 10, on her class's five weapons, her five armor

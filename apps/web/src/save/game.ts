@@ -198,16 +198,11 @@ export async function collectEverything(placeIds?: readonly string[]): Promise<{
   return { items: r.items, levelsUp: r.levelsUp }
 }
 
-/** Collects a finished job and starts the same one again with the same Uma (if the Warehouse covers its inputs). */
-export async function collectAndRepeat(placeId: string, slot: number, outfit: WorkOutfit): Promise<void> {
-  const { collectJob, startJob } = await import('@rpg/domain/work')
-  const { save } = useGame.getState()
-  const job = save?.tierWorlds['1']?.facilities[placeId]?.jobs[slot]
-  if (!save || !job) return
-  const now = nowIso()
-  const collected = collectJob(save, placeId, slot, now).save
-  await commit(startJob(collected, placeId, slot, outfit, job.output, job.count, now))
-}
+/** Starts her last job again where she did it, collecting first when she's ready (SC3). */
+export const repeatWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.repeatJob(s, outfitId, now))
+/** A queue that couldn't start (SC3): start it again now, or forget it. */
+export const restartWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.restartStopped(s, outfitId, now))
+export const dismissWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.dismissStopped(s, outfitId, now))
 
 /** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
 export async function sweep(region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>, times = 1): Promise<FightResult & { swept: number }> {

@@ -10,7 +10,7 @@ import { startFight, umaProfile } from './battle'
 import { extraStatPoints, gemBlock, nodeFromGem, setActiveNodes, setGem } from './observatory'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
-import { collectJob, facilityOf, grantProfessionExp, planJob, startJob } from './work'
+import { collectJob, facilityView, grantProfessionExp, planJob, startJob } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -61,15 +61,15 @@ describe('cutting and setting (D144)', () => {
   it('cuts at the Lapidary with Craft Level, reserving the recipe, and puts gems on their own shelf', () => {
     let save = stock(withUma(), { 'mist-infusion': 2 })
     const plan = planJob(worldOf(save), 'lapidary', cutter, 'gem-mp-1', 2)!
-    expect(plan.msEach).toBe(makeMinutes(1) * MINUTE)
+    expect(plan.itemMs).toBe(makeMinutes(1) * MINUTE)
     expect(plan.block).toBeNull()
     expect(planJob(worldOf(save), 'lapidary', cutter, 'gem-mp-2', 1)!.block).toBe('Needs Craft Lv6')
     save = startJob(save, 'lapidary', 0, cutter, 'gem-mp-1', 2, at(0))
     expect(worldOf(save).items).toEqual({}) // two gems: one Mist Infusion each
-    save = collectJob(save, 'lapidary', 0, at(2 * plan.msEach)).save
+    save = collectJob(save, 'lapidary', 0, at(2 * plan.itemMs)).save
     expect(worldOf(save).gems).toEqual({ 'gem-mp-1': 2 })
     expect(worldOf(save).umas['101']!.craft).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 2 * makeMinutes(1) * 2))
-    expect(facilityOf(worldOf(save), 'lapidary').jobs[0]).toBeNull()
+    expect(facilityView(worldOf(save), 'lapidary', at(2 * plan.itemMs)).jobs[0]).toBeNull()
   })
 
   it('sets a gem for its own grade\'s node once the lower ones are open, switches it on while slots last (D119)', () => {
@@ -147,13 +147,14 @@ describe('save v21: one profession and Star Gems (D144)', () => {
     w.facilities = { fields: { level: 1, jobs: [job('102', 'wheat'), null] }, mine: { level: 2, jobs: [job('101', 'copper-ore'), null, null] } }
     const save = parseSave(old)
     const world = worldOf(save)
-    expect(world.umas['101']!.craft).toEqual({ level: 30, exp: 5 })
+    // Her mine job's two ores and their 2 EXP land at v22 (SC3), when running jobs finish into the Warehouse.
+    expect(world.umas['101']!.craft).toEqual({ level: 30, exp: 7 })
     expect(world.umas['102']!.craft).toEqual({ level: 12, exp: 1 })
     expect(world.umas['101']!.stars).toEqual({ unlocked: ['moon:hp:1'], active: ['moon:hp:1'] })
-    expect(world.items).toEqual({ 'copper-ore': 2 })
+    expect(world.items).toEqual({ 'copper-ore': 4 })
     expect(world.gems).toEqual({})
-    expect(Object.keys(world.facilities)).toEqual(['mine'])
-    expect(facilityOf(world, 'mine').jobs).toEqual([expect.objectContaining({ outfitId: '101' }), null, null, null])
+    expect(world.buildings).toEqual({ mine: { level: 2 } })
+    expect(world.work).toEqual({})
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 })

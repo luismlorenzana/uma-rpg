@@ -1,5 +1,5 @@
 // Legacy migrations are needed only for old saves, not every current-save boot (H16).
-import { FACILITY_SLOTS, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
+import { FACILITY_SLOTS, grantProfessionExp, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
 import { facilitySpec } from '../economy/jobs'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
 import { gearById } from '../economy/gear'
@@ -208,7 +208,45 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v18 = version < 18 && isRecord(v16) ? toV18(v16, version) : v16
   const v19 = version < 19 && isRecord(v18) ? toV19(v18) : v18
   const v20 = version < 20 && isRecord(v19) ? toV20(v19) : v19
-  return version < 21 && isRecord(v20) ? toV21(v20) : v20
+  const v21 = version < 21 && isRecord(v20) ? toV21(v20) : v20
+  return version < 22 && isRecord(v21) ? toV22(v21) : v21
+}
+
+// --- v21 → v22 (SC3) -------------------------------------------------------------------------------------------------
+
+/**
+ * Work moves to the shared engine's per-Uma rows (SC3). Each facility's level moves to `buildings` (above level 1).
+ * Every job finishes into the Warehouse: what it hadn't handed over yet goes to its shelf (items, the gear stock or the
+ * Star Gems) and pays its Craft EXP, as if collected now. Queued jobs are dropped; they had taken nothing. Every Uma
+ * starts Free, with no last job. The owner accepted losing in-flight time (SC3). Anything malformed is left for the strict
+ * parse to reject.
+ */
+function toV22(world: Record<string, unknown>): Record<string, unknown> {
+  const { facilities, ...rest } = world
+  const w: Record<string, unknown> = { ...rest, buildings: {}, work: {} }
+  if (!isRecord(facilities)) return w
+  const buildings: Record<string, { level: number }> = {}
+  const shelves: Record<string, Record<string, unknown>> = {
+    items: isRecord(w.items) ? { ...w.items } : {}, gear: isRecord(w.gear) ? { ...w.gear } : {}, gems: isRecord(w.gems) ? { ...w.gems } : {},
+  }
+  const umas = isRecord(w.umas) ? { ...w.umas } : {}
+  for (const [place, raw] of Object.entries(facilities)) {
+    if (!isRecord(raw)) continue
+    if (typeof raw.level === 'number' && raw.level > 1) buildings[place] = { level: raw.level }
+    if (!Array.isArray(raw.jobs)) continue
+    for (const job of raw.jobs) {
+      if (!isRecord(job) || typeof job.output !== 'string' || typeof job.count !== 'number' || typeof job.collected !== 'number') continue
+      const left = Math.max(0, job.count - job.collected)
+      if (left === 0) continue
+      const shelf = shelves[job.kind === 'craft' ? 'gear' : job.kind === 'cut' ? 'gems' : 'items']!
+      shelf[job.output] = (typeof shelf[job.output] === 'number' ? (shelf[job.output] as number) : 0) + left
+      const uma = typeof job.outfitId === 'string' ? umas[job.outfitId] : undefined
+      if (isRecord(uma) && isRecord(uma.craft) && typeof uma.craft.level === 'number' && typeof uma.craft.exp === 'number' && typeof job.expEach === 'number') {
+        umas[job.outfitId as string] = { ...uma, craft: grantProfessionExp({ level: uma.craft.level, exp: uma.craft.exp }, left * job.expEach) }
+      }
+    }
+  }
+  return { ...w, ...shelves, umas, buildings }
 }
 
 // --- v20 → v21 (D144) -------------------------------------------------------------------------------------------------
