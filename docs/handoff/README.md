@@ -40,7 +40,7 @@ there.
 
 | Id | Task | Commit |
 |---|---|---|
-| SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | see `git log --grep SC3` |
+| SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | `6063b95` |
 
 ## Archived on 2026-10-16 (D151)
 
