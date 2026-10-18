@@ -158,7 +158,7 @@ describe('capital Finals (H15)', () => {
       }
     }
     expect(wins).toBeGreaterThanOrEqual(27)
-  })
+  }, 20_000) // 30 full battles: 4.5 s on CI beside the other simulation files.
 
   it('saves and reloads capital fights, opens the champion after settlement and banks the correct first/replay rewards', () => {
     const ids = capitalStageIds(synthetic.id, 1)
@@ -188,5 +188,5 @@ describe('capital Finals (H15)', () => {
     expect(replay.result!.members.every((m) => m.exp <= Math.ceil(first.result!.members[0]!.exp / 4))).toBe(true)
     expect(worldOf(replay.save).wallet.laurels).toBe(75 + 150 + 19)
     expect(worldRun(worldOf(replay.save)).wins[ids.vanguard]).toBe(2)
-  })
+  }, 20_000) // Full fight replays and save validation exceeded 5 s on the production runner.
 })
