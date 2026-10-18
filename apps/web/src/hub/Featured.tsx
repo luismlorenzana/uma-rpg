@@ -6,7 +6,9 @@ import { CROWD_SPOTS, type Plaza } from '@luismlorenzana/uma-kit/hub'
 import { readPref, Sheet, subscribePrefs, writePref } from '@luismlorenzana/uma-kit/ui'
 import { useMemo, useSyncExternalStore } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import { AtlasSprite, imagePath, useArtUrl } from '../master/art'
+import { AlbumGrid, UmaBust, UmaChibi } from '@luismlorenzana/uma-kit/album'
+import { byLevel as levelOrder } from '@luismlorenzana/uma-kit/roster'
+import { albumRows } from '../album/rows'
 import { useMaster } from '../master/master'
 import { useWorld } from '../save/game'
 
@@ -17,7 +19,10 @@ const FIGURE = 44
 /** Owned Umas, highest Uma Level first, then newest release, then name. */
 function byLevel(world: TierWorld, roster: readonly RosterOutfit[]): RosterOutfit[] {
   return roster.filter((o) => world.umas[o.outfitId])
-    .sort((a, b) => world.umas[b.outfitId]!.level - world.umas[a.outfitId]!.level || b.releasedJp.localeCompare(a.releasedJp) || a.name.localeCompare(b.name))
+    .sort((a, b) => levelOrder(
+      { id: a.outfitId, name: a.name, releasedAt: a.releasedJp, level: world.umas[a.outfitId]!.level },
+      { id: b.outfitId, name: b.name, releasedAt: b.releasedJp, level: world.umas[b.outfitId]!.level },
+    ))
 }
 
 /** The plaza's Umas: the featured one first, then the active party's others, then the highest levels, five at most. */
@@ -61,22 +66,6 @@ export function useCrowd(): RosterOutfit[] {
   return useMemo(() => (world && master.status === 'ready' ? crowdOf(world, master.view.roster, chosen) : []), [world, master, chosen])
 }
 
-function UmaArt({ outfitId, size }: { outfitId: string; size: number }) {
-  const master = useMaster()
-  const art = master.status === 'ready' ? master.view.art : null
-  const chibi = useArtUrl(imagePath(art, 'outfit-chibis', `${outfitId}-a`))
-  if (chibi) return <img src={chibi} alt="" width={size} height={size} className="object-contain drop-shadow-md" style={{ width: size, height: size }} />
-  // An outfit without a chibi stands as a round token of its icon, about a chibi's head and body high.
-  const token = Math.round(size * 0.82)
-  return (
-    <span className="flex items-end justify-center" style={{ width: size, height: size }}>
-      <span className="block overflow-hidden rounded-full shadow-2 ring-2 ring-panel" style={{ width: token, height: token }}>
-        <AtlasSprite art={art} family="outfit-icons" frameKey={outfitId} size={token} />
-      </span>
-    </span>
-  )
-}
-
 /** The plaza on the map: each Uma a small chibi linking to her sheet. */
 export function plaza(crowd: readonly RosterOutfit[], sheetTo: (outfitId: string) => string): Plaza | undefined {
   if (crowd.length === 0) return undefined
@@ -87,7 +76,7 @@ export function plaza(crowd: readonly RosterOutfit[], sheetTo: (outfitId: string
       node: (
         <Link to={sheetTo(o.outfitId)} state={{ back: true }} aria-label={`${o.name}${i === 0 ? ', featured' : ''}: Fight, Profile or feature another`}
           className="block rounded-md p-0.5 active:bg-ink/10">
-          <UmaArt outfitId={o.outfitId} size={FIGURE} />
+          <UmaChibi outfitId={o.outfitId} size={FIGURE} label={o.name} className="size-11 bg-transparent" />
         </Link>
       ),
     })),
@@ -103,13 +92,13 @@ export function FeaturedSheet({ open, onClose }: { open: boolean; onClose: () =>
   const featured = owned.find((o) => o.outfitId === chosen) ?? owned[0] ?? null
   // The Uma tapped on the plaza, else the featured one.
   const shown = owned.find((o) => o.outfitId === search.get('uma')) ?? featured
-  const art = master.status === 'ready' ? master.view.art : null
+  const rows = master.status === 'ready' ? albumRows(master.view, world).filter(row => row.uma).sort(levelOrder) : []
   return (
     <Sheet open={open} onClose={onClose} title={shown?.name ?? 'No Umas yet'}>
       {shown !== null && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <UmaArt outfitId={shown.outfitId} size={64} />
+            <UmaBust outfitId={shown.outfitId} size={64} label={shown.name} className="size-16 shrink-0 rounded-md" />
             <p className="text-[13px] text-ink-soft">Lv {world?.umas[shown.outfitId]?.level ?? 1}{shown.title ? ` · ${shown.title}` : ''}</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -118,17 +107,7 @@ export function FeaturedSheet({ open, onClose }: { open: boolean; onClose: () =>
           </div>
           <section>
             <h3 className="text-micro mb-1.5">Feature another</h3>
-            <ul className="grid grid-cols-5 gap-1.5">
-              {owned.map((o) => (
-                <li key={o.outfitId}>
-                  <button type="button" onClick={() => writePref(KEY, o.outfitId)} aria-label={`Feature ${o.name}`} aria-pressed={o.outfitId === featured?.outfitId}
-                    className={`relative block w-full rounded-sm p-0.5 ${o.outfitId === featured?.outfitId ? 'ring-2 ring-accent' : ''}`}>
-                    <AtlasSprite art={art} family="outfit-icons" frameKey={o.outfitId} size={56} className="w-full rounded-sm" />
-                    <span className="font-display absolute right-1 bottom-1 rounded-full bg-scrim/80 px-1 text-[10px] leading-4 text-ink-on-dark">Lv {world?.umas[o.outfitId]?.level}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <AlbumGrid rows={rows} view="icons" selected={row => row.id === featured?.outfitId} onOpen={row => writePref(KEY, row.id)} />
           </section>
         </div>
       )}

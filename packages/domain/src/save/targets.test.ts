@@ -32,14 +32,40 @@ describe('the requirements engine (D126)', () => {
 })
 
 describe('targets (D100, D126, D144)', () => {
-  it('marks up to five owned Umas, and keeps them in the save', () => {
-    let save = umas('101', '102', '103', '104', '105', '106')
-    for (const id of ['101', '102', '103', '104', '105']) save = setTarget(save, id, true, at(1))
-    expect(() => setTarget(save, '106', true, at(2))).toThrow(/5 targets at most/)
-    expect(() => setTarget(save, '999', true, at(2))).toThrow(/owned/)
-    save = setTarget(setTarget(save, '103', false, at(3)), '106', true, at(3))
-    expect(worldOf(save).targets).toEqual(['101', '102', '104', '105', '106'])
+  it('marks ten owned Umas, persists them, and refuses an eleventh without changing the save', () => {
+    const ids = Array.from({ length: 11 }, (_, i) => String(101 + i))
+    let save = umas(...ids)
+    for (const id of ids.slice(0, 10)) save = setTarget(save, id, true, at(1))
+    expect(worldOf(save).targets).toEqual(ids.slice(0, 10))
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    const before = JSON.stringify(save)
+    expect(() => setTarget(save, '111', true, at(2))).toThrow(/10 targets at most/)
+    expect(JSON.stringify(save)).toBe(before)
+    expect(() => setTarget(save, '999', true, at(2))).toThrow(/owned/)
+    // Marking an existing target again still fits; removing one frees a place for another.
+    save = setTarget(save, '110', true, at(3))
+    save = setTarget(setTarget(save, '103', false, at(3)), '111', true, at(3))
+    expect(worldOf(save).targets).toEqual([...ids.slice(0, 10).filter(id => id !== '103'), '111'])
+    expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    const invalid = { ...save, tierWorlds: { '1': { ...worldOf(save), targets: ids } } }
+    expect(() => parseSave(invalid)).toThrow(/targets/)
+  })
+
+  it('keeps existing five-target saves and plans gear, gems and materials for all ten', () => {
+    const ids = Array.from({ length: 10 }, (_, i) => String(101 + i))
+    let save = umas(...ids)
+    const single = targetPlan(worldOf(setTarget(save, ids[0]!, true, at(1))), brawler)
+    for (const id of ids.slice(0, 5)) save = setTarget(save, id, true, at(1))
+    save = parseSave(JSON.parse(JSON.stringify(save)))
+    expect(worldOf(save).targets).toEqual(ids.slice(0, 5))
+    for (const id of ids.slice(5)) save = setTarget(save, id, true, at(2))
+    const plan = targetPlan(worldOf(save), brawler)
+    for (const family of ['gear', 'gems', 'refined', 'raw'] as const) {
+      expect(plan[family]).toHaveLength(single[family].length)
+      for (const line of single[family]) expect(plan[family].find(n => n.key === line.key)).toMatchObject({ need: line.need * 10, short: line.short * 10 })
+    }
+    expect(facilityTargets(plan, 'forest').length).toBeGreaterThan(0)
+    expect(facilityTargets(plan, 'forge').every(line => line.need === 10)).toBe(true)
   })
 
   it('plans every track she climbs all the way to grade 10, and every Star Gem her Extra Stats still need', () => {

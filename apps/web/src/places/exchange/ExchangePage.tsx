@@ -5,13 +5,15 @@
 import { ExchangeRows, type ExchangeRow } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
-  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, byUmaLevel, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
-  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type RankRef, type RosterOutfit, type TierWorld,
+  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
+  TIME_TICKET_PRICE, stockedGrades, SWEEP_TICKET_PRICE, WEAPON_TYPES, type RankRef, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_LABEL, WEAPON_LABEL } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
-import { AtlasSprite } from '../../master/art'
+import { formatLevel } from '@luismlorenzana/uma-kit/roster'
+import { albumRows, lockedReason } from '../../album/rows'
+import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
 import { buyItem, buyTicket, readManual, useWorld } from '../../save/game'
 import { RankRow } from '../../ui/RankBars'
@@ -82,17 +84,15 @@ function Exchange({ view }: { view: MasterView }) {
           <span className="text-ink-faint">›</span>
         </button>
       </section>
-      {reading && <ManualSheet world={world} roster={view.roster} art={view.art} onClose={() => setReading(false)} />}
+      {reading && <ManualSheet world={world} view={view} onClose={() => setReading(false)} />}
     </div>
   )
 }
 
 /** Reads Manuals: pick an Uma, one of her bars, how many (D102). */
-function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster: readonly RosterOutfit[]; art: MasterView['art']; onClose: () => void }) {
+function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterView; onClose: () => void }) {
   const [outfitId, setOutfitId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const owned = roster.filter((o) => world.umas[o.outfitId])
-    .map(outfit => ({ outfit, owned: world.umas[outfit.outfitId]! })).sort(byUmaLevel).map(e => e.outfit)
   const uma = outfitId ? world.umas[outfitId] : null
   const read = (ref: RankRef, n: number) => readManual(outfitId!, ref, n).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t read it.'))
   const bar = (ref: RankRef, label: string) => {
@@ -109,22 +109,10 @@ function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster
       </li>
     )
   }
+  if (!uma) return <PickerStep title="Read a Manual" rows={albumRows(view, world)} disabled={lockedReason}
+    describe={row => `${formatLevel(row.level)} · ${row.base.title ?? ''}`} onPick={setOutfitId} onClose={onClose} />
   return (
-    <BottomSheet title={uma ? 'Which bar?' : 'Read a Manual'} onClose={onClose}>
-      {!uma ? (
-        <ul className="space-y-1.5">
-          {owned.length === 0 && <li className="text-[14px] text-ink-soft">No Umas yet</li>}
-          {owned.map((o) => (
-            <li key={o.outfitId}>
-              <button type="button" onClick={() => setOutfitId(o.outfitId)} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left">
-                <AtlasSprite art={art} family="outfit-icons" frameKey={o.outfitId} size={36} />
-                <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{o.name}</span>
-                <span className="text-[12px] text-ink-faint">Lv {world.umas[o.outfitId]!.level}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
+    <BottomSheet title="Which bar?" onClose={onClose}>
         <div className="space-y-3">
           <p className="text-[12px] text-ink-soft">Gear Marks {world.wallet.gearMarks.toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</p>
           <section><h4 className="text-micro mb-1">Classes</h4><ul className="space-y-1">{RPG_CLASSES.map((c) => bar({ kind: 'class', id: c }, CLASS_LABEL[c]))}</ul></section>
@@ -134,7 +122,6 @@ function ManualSheet({ world, roster, art, onClose }: { world: TierWorld; roster
           <button type="button" onClick={() => setOutfitId(null)} className="text-[13px] text-ink-soft underline">Choose another Uma</button>
           {error && <p className="text-[13px] text-danger">{error}</p>}
         </div>
-      )}
     </BottomSheet>
   )
 }

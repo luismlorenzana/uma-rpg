@@ -4,14 +4,17 @@ import { isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeN
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
-import { AtlasSprite } from '../../master/art'
+import { FaceTile } from '@luismlorenzana/uma-kit/album'
+import { formatLevel } from '@luismlorenzana/uma-kit/roster'
+import { partyOf, isInFight } from '@rpg/domain'
+import { albumRows, lockedReason } from '../../album/rows'
+import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
 import { nameParty, recall, setSlot, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
-import { UmaPicker } from './UmaPicker'
 
 export default function PartyHallPage({ place, rest }: PageProps) {
   const world = useWorld()
@@ -34,7 +37,7 @@ function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: Ti
   if (!outfitId) return <span className="flex items-center justify-center rounded-sm border border-dashed border-hairline-strong text-ink-faint" style={{ width: size, height: size }}>+</span>
   return (
     <span className="relative" style={{ width: size, height: size }}>
-      <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfitId} size={size} />
+      <FaceTile outfitId={outfitId} size={size} label={view.roster.find(o => o.outfitId === outfitId)?.name ?? 'Uma'} round />
       <span className="absolute bottom-0 left-0 rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {world.umas[outfitId]?.level ?? 1}</span>
     </span>
   )
@@ -121,10 +124,14 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
       {error && <p className="text-[13px] text-danger">{error}</p>}
 
       {picking !== null && (
-        <UmaPicker
-          view={view}
-          world={world}
-          partyIndex={index}
+        <PickerStep title="Choose an Uma" rows={albumRows(view, world)}
+          disabled={row => lockedReason(row)
+            ?? (partyOf(world, row.id)?.party === index ? 'In this party' : null)
+            ?? (isInFight(world, row.id) || party.slots.some(id => id !== null && isInFight(world, id)) ? 'In a fight' : null)}
+          describe={row => {
+            const at = partyOf(world, row.id)
+            return at ? `Moves from ${world.parties[at.party]?.name}` : `${formatLevel(row.level)} · ${row.base.title ?? ''}`
+          }}
           onClose={() => setPicking(null)}
           onPick={(id) => {
             void run(setSlot(index, picking, id))

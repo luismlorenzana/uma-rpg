@@ -184,7 +184,7 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 - **Repeat (SC3):** starts her last job again where she did it, or in another free slot there if hers is taken; on an
   Uma whose work is finished it collects first.
 - **Speed Tickets** never spend more than finish the job: asking for more spends only what's needed.
-- **Targets (D100, D126):** mark up to five Umas on their profile. Every facility then lists what maxing them still
+- **Targets:** mark up to ten Umas total on their profiles. Every facility then lists what maxing them still
   takes from it:
   - **The Forge:** every grade above the best she has bound, up to 10, on her class's five weapons, her five armor
     slots' kinds and the type in each accessory slot (an empty one plans nothing).

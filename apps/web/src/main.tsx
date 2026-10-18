@@ -9,6 +9,8 @@ import uiUrl from '@luismlorenzana/uma-art/ui/atlas.png?url'
 import { AuthProvider, idToken } from '@luismlorenzana/uma-kit/auth'
 import { watchAppUpdates } from '@luismlorenzana/uma-kit/places'
 import { configureKit, initAppearance, KitArtProvider, MotionRoot, type KitArt } from '@luismlorenzana/uma-kit/ui'
+import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
+import { ALBUM_ART } from './master/album-art'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
@@ -40,7 +42,9 @@ createRoot(root).render(
     <MotionRoot>
       <KitArtProvider art={ART}>
         <AuthProvider config={FIREBASE}>
-          <RouterProvider router={router} />
+          <AlbumArtProvider art={ALBUM_ART}>
+            <RouterProvider router={router} />
+          </AlbumArtProvider>
         </AuthProvider>
       </KitArtProvider>
     </MotionRoot>

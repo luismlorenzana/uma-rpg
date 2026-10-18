@@ -2,12 +2,14 @@
 // Only the small sets load up front; the 2.5 MB skill set loads when a profile first needs it.
 import { buildChapters, buildRoster, type ChapterInfo, type RosterOutfit } from '@rpg/domain'
 import type { ArtIndex, ReleaseClient, ReleaseManifest, Skill } from '@luismlorenzana/uma-data'
+import { outfitRowBase, type OutfitRowBase } from '@luismlorenzana/uma-kit/roster'
 import { useSyncExternalStore } from 'react'
 import { authHeaders } from '../api/client'
 
 export interface MasterView {
   manifest: ReleaseManifest
   roster: RosterOutfit[]
+  album: ReadonlyMap<string, OutfitRowBase>
   chapters: ChapterInfo[]
   art: ArtIndex | null
 }
@@ -49,7 +51,9 @@ function loadMaster(): void {
         c.set(manifest, 'scenarios'),
         c.art(manifest),
       ])
-      set({ status: 'ready', view: { manifest, roster: buildRoster({ characters, outfits }), chapters: buildChapters(scenarios), art } })
+      const byCharacter = new Map(characters.map(c => [c.id, c]))
+      const album = new Map(outfits.map(o => [String(o.id), outfitRowBase(o, byCharacter.get(o.characterId))]))
+      set({ status: 'ready', view: { manifest, roster: buildRoster({ characters, outfits }), album, chapters: buildChapters(scenarios), art } })
     } catch (err) {
       const offline = typeof navigator !== 'undefined' && navigator.onLine === false
       set({ status: 'error', offline, message: err instanceof Error ? err.message : String(err) })

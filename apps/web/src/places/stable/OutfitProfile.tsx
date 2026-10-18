@@ -16,6 +16,7 @@ import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { seeStableOutfit } from '../../album/preferences'
 import { Bar, CLASS_LABEL, kindLabel, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
@@ -73,6 +74,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   const nav = useHubNavigation()
   const world = useWorld()
   const outfit = view.roster.find((o) => o.outfitId === outfitId)
+  useEffect(() => seeStableOutfit(view.roster.map(o => o.outfitId), outfitId), [view, outfitId])
   const owned = world?.umas[outfitId] ?? null
   const bust = useArtUrl(outfit ? imagePath(view.art, 'outfit-busts', outfit.outfitId) ?? imagePath(view.art, 'outfit-portraits', outfit.outfitId) : null)
   const [tab, setTabState] = useState<Tab>(storedTab)

@@ -46,7 +46,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 8 families and 160 items |
 | `hub/places.ts` | Every place on the four Hub pages, and Town Hall's plaza |
-| `master/`, `roster/` | Master data to the game's roster: outfits, aptitudes, filters |
+| `master/`, `roster/` | Master data to the game's roster, RPG aptitude labels and stat totals. Album queries/order live in uma-kit |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
 ## Web app
@@ -86,10 +86,15 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - the shell (frame, top and bottom bars, menu, side panel, place header);
   - the Hub map (terrain, scene, place buttons, pips, swipe);
   - since SD3, getting in (`/auth`) and the frames of the Account, the Warehouse, the Exchange and the profile
-    (`/places`), each filled with this game's content and words.
+    (`/places`), each filled with this game's content and words;
+  - the album engine and device preferences (`/roster`), plus art tiles, album chrome, virtual grid and Uma picker
+    (`/album`, 0.7.1). The Stable, six picker contexts and plaza chooser use these components, not local copies.
 
   uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
-  the appearance and Motion. `hub/` holds this game's bars, plaza and Hub screen.
+  the appearance and Motion, and `AlbumArtProvider` over this game's authenticated content loader. Faces use
+  uma-data 1.1.0's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their own families.
+  `album/` holds RPG row values, schema, eligibility and the one-time old preference migration. `hub/` holds this
+  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v22 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API

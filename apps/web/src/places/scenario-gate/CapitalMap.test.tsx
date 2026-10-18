@@ -1,3 +1,4 @@
+import { outfitRowBase } from '@luismlorenzana/uma-kit/roster'
 import { buildMemoryRelease, syntheticMasterData } from '@luismlorenzana/uma-data/testing'
 import { buildChapters, buildRoster, capitalId, capitalStageIds, newSave, placeById, worldOf } from '@rpg/domain'
 import { act } from 'react'
@@ -22,7 +23,7 @@ async function campaignFixture() {
     franchise: 'priconne', tier: tiers[i % 4]!, face: { path: `enemies/c${i}-face.00000000.webp`, width: 32, height: 32 },
     art: { path: `enemies/c${i}-art.00000000.webp`, width: 32, height: 48 } }))
   const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])) }
-  return buildCampaign({ manifest: release.manifest, roster: buildRoster(data), chapters: buildChapters(data.scenarios), art: null }, cast)
+  return buildCampaign({ manifest: release.manifest, roster: buildRoster(data), album: new Map(data.outfits.map(o => [String(o.id), outfitRowBase(o, data.characters.find(c => c.id === o.characterId))])), chapters: buildChapters(data.scenarios), art: null }, cast)
 }
 
 describe('capital routes and shared stage sheets', () => {
