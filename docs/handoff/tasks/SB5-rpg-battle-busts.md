@@ -48,7 +48,7 @@ Chibis stay only on Town Hall's plaza (D150).
    - `docs/game/sections.md` § Fight → Stage: "the party below, as busts".
    - `docs/game/combat.md`, if it names chibis.
    - Log a D-decision (the owner's instruction).
-5. **Check it** in the iOS Simulator's Home Screen app:
+5. **Check it** locally, in the game's dev server (a desktop browser at phone width; no iOS Simulator, P60):
    - a fight with five allies: the busts are framed and none is cut off;
    - a win's hop;
    - a knockout;
@@ -59,7 +59,7 @@ Chibis stay only on Town Hall's plaza (D150).
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; the main JS is under budget.
 - [ ] `grep -rn "outfit-chibis" apps/web/src/places/scenario-gate apps/web/src/battle` finds nothing.
-- [ ] The Simulator check was done and described. The docs and the D-decision are in, and it's deployed (green
+- [ ] The local check was done and described. The docs and the D-decision are in, and it's deployed (green
       `gh run watch`, `/api/health` shows the commit).
 
 ## Deliver

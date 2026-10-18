@@ -39,7 +39,7 @@ own copies for them.
    - `docs/game/architecture.md` (Master data, Original art, API);
    - run `pnpm docs:update`;
    - log a D-decision.
-4. **Check it** in the iOS Simulator's Home Screen app:
+4. **Check it** locally, in the game's dev server (a desktop browser at phone width; no iOS Simulator, P60):
    - the Stable's faces and icons;
    - a battle's enemy art;
    - art comes back after a restart while offline (Cache Storage).
@@ -48,7 +48,7 @@ own copies for them.
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; the main JS is under budget.
 - [ ] `apps/api/src/master/` and `apps/api/src/content/` hold no proxy code of their own.
-- [ ] The Simulator check was done. The docs and D-decision are in. Deployed and green.
+- [ ] The local check was done. The docs and D-decision are in. Deployed and green.
 
 ## Deliver
 

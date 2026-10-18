@@ -49,7 +49,7 @@ Both games then show a job the same way, with the same words.
    - `docs/game/sections.md` § Facilities and the Hub's quick look;
    - run `pnpm docs:update`;
    - log a D-decision.
-6. **Check it** in the iOS Simulator's Home Screen app, light and dark, at every Wilds place:
+6. **Check it** locally, in the game's dev server (a desktop browser at phone width; no iOS Simulator, P60), at every Wilds place:
    - assign an Uma (the order, the reasons);
    - pick what and how many;
    - queue 3, collect, repeat, speed up, finish, recall (the preview);
@@ -62,7 +62,7 @@ Both games then show a job the same way, with the same words.
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; the main JS is under budget.
 - [ ] `QueueList.tsx`, `TimeCut.tsx` and the job cards are gone.
-- [ ] The Simulator check in step 6 was done and described. The docs and D-decision are in. Deployed and green.
+- [ ] The local check in step 6 was done and described. The docs and D-decision are in. Deployed and green.
 
 ## Deliver
 

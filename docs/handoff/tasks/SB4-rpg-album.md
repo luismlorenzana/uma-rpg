@@ -83,7 +83,7 @@ views and the New badge.
    - `docs/game/architecture.md`: the album comes from the kit.
    - Run `pnpm docs:update`.
    - Log a D-decision (fetch `main` first for the number).
-8. **Check it** in the iOS Simulator's Home Screen app, light and dark:
+8. **Check it** locally, in the game's dev server (a desktop browser at phone width; no iOS Simulator, P60):
    - the Stable at 5 columns;
    - search, filters, sorts, saved views, New;
    - each of the six pickers opens with the right order and reasons;
@@ -93,7 +93,7 @@ views and the New badge.
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass, and the main JS stays under the 230 KB budget (the build prints it).
 - [ ] No Uma list or picker in `apps/web/src` is hand-built. Grep for the old components: they're gone.
-- [ ] The Simulator check in step 8 was done and described.
+- [ ] The local check in step 8 was done and described.
 - [ ] The docs and D-decision are in. Deployed: `gh run watch` is green and `/api/health` reports the commit.
 
 ## Deliver
