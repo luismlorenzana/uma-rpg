@@ -1,6 +1,6 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-18, after SB4.** The open work is the sibling apps plan, phases B to E (uma-platform P48,
+> **Status: 2026-10-18, after SB5.** The open work is the sibling apps plan, phases B to E (uma-platform P48,
 > [phases](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/phases.md)). Unrelated packets were
 > archived by the owner's call (D151). Each task is a self-contained packet in [tasks/](tasks/).
 > - Start a worker, Claude or ChatGPT, with uma-platform's
@@ -14,14 +14,12 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| **Phase B: one Uma album** | | | | | |
-| [SB5](tasks/SB5-rpg-battle-busts.md) | Busts on the battle stage, no chibis | Either | S | — | Ready |
 | **Phase C: one work system** | | | | | |
 | [SC4](tasks/SC4-rpg-work-screens.md) | The Wilds on `uma-kit/work`'s screens | Either | M | SC2 (SC3 done) | Waiting |
 | **Phase E: platform plumbing** | | | | | |
 | [SE3](tasks/SE3-rpg-content.md) | Master data and art through `uma-kit/content` and `uma-server/content` | Either | S | SE2 | Waiting |
 
-**Ready now:** SB5. The [program queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md)
+**Phase B is done.** The [program queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md)
 tracks the other packets' released dependencies.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
@@ -30,7 +28,8 @@ tracks the other packets' released dependencies.
 - **Sibling apps so far:**
   - **Phase 0:** H30 (D146).
   - **Phase A:** uma-kit (D147–D150), and H31's art in uma-art 2.9.0 (D148).
-  - **Phase B:** SB4, the shared Stable and six picker contexts, faces and saved views (D154).
+  - **Phase B:** SB4, the shared Stable and six picker contexts, faces and saved views (D154); SB5, framed battle
+    busts with no chibis (D156).
   - **Phase C:** SC3, work on uma-work (D152).
   - **Phase D:** SD3, getting in and the places on uma-kit and uma-server (D153).
 
@@ -40,6 +39,7 @@ tracks the other packets' released dependencies.
 
 | Id | Task | Commit |
 |---|---|---|
+| SB5 | Party busts in spaced, solid bordered cards; slower breath, victory hop/glow, no fight chibi requests (D156). Locally validated and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39167185219) | `11e39f9` |
 | SB4 | Shared Stable, all six Uma picker contexts and plaza chooser, outfit faces, saved views and New (D154); ten target Umas (D155). Locally validated and deployed | `b205b52` (CI timeout repair `21b4fa9`) |
 | SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | `6063b95` |
 | SD3 | Getting in, Account, Warehouse, Exchange and the profile frame on uma-kit 0.7.0; the API's guard from uma-server 0.2.0 (D153) | `3ea66a4` |
