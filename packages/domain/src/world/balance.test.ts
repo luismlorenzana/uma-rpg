@@ -119,7 +119,7 @@ describe('world balance', () => {
         }
       }
     }
-  })
+  }, 20_000) // ~0.6 s alone; over 4 s on CI's shared runner, next to the default 5 s
 
   it('sets each weapon grade’s Might to about 6% a grade of an on-curve Uma’s hit at the level it opens (D142)', () => {
     for (let g = 1; g <= 10; g++) {
