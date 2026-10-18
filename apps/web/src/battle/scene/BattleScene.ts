@@ -1,4 +1,4 @@
-// The battle stage (D53, D81, H10): portraits, chibis, pixel impacts and persistent Summoner familiars.
+// The battle stage (D53, D81, H10, SB5): busts, pixel impacts and persistent Summoner familiars.
 // Procedural impacts remain a fallback; shield breaks and Limit Break cut-ins retain their effects.
 // Playback never decides anything; the engine already did. The DOM overlay carries every lasting number and control,
 // and the canvas only draws effect text (damage numbers, BREAK).
@@ -10,7 +10,7 @@ import { stageLayout, type Box } from '../stage-layout'
 import { backgroundLayout } from './background-layout'
 import { PixelEffects } from './pixel-effects'
 
-export interface StageAlly { id: string; idle: HTMLImageElement | null; cheer: HTMLImageElement | null; bust: HTMLImageElement | null }
+export interface StageAlly { id: string; bust: HTMLImageElement | null }
 export interface StageEnemy {
   id: string; rank: EnemyRank; art: HTMLImageElement | null; color: string
   /** Her 16:9 splash (D135), for a Key enemy, Sub-boss or Boss: it cuts in on her moves, her break, phase two and her
@@ -37,7 +37,7 @@ const KIND_COLOR: Readonly<Record<RpgDamageKind, number>> = {
   greatsword: 0xffffff, lance: 0xffffff, axe: 0xffffff, bow: 0xffffff, katana: 0xffffff,
 }
 
-interface Actor { id: string; side: 'ally' | 'enemy'; sprite: Phaser.GameObjects.Image; shadow: Phaser.GameObjects.Ellipse; box: Box; index: number; scaleY: number; idle: Phaser.Tweens.Tween | null }
+interface Actor { id: string; side: 'ally' | 'enemy'; sprite: Phaser.GameObjects.Image; frame: Phaser.GameObjects.Rectangle | null; shadow: Phaser.GameObjects.Ellipse; box: Box; index: number; scaleY: number; idle: Phaser.Tweens.Tween | null }
 
 export class BattleScene extends Phaser.Scene {
   private setup!: StageSetup
@@ -105,7 +105,7 @@ export class BattleScene extends Phaser.Scene {
     this.setup = setup
     this.dpr = dpr
     this.cssSize = { w: cssW, h: cssH }
-    for (const a of setup.allies) this.addTexture(`ally-${a.id}`, a.idle).addTexture(`cheer-${a.id}`, a.cheer).addTexture(`bust-${a.id}`, a.bust)
+    for (const a of setup.allies) this.addTexture(`bust-${a.id}`, a.bust)
     for (const e of setup.enemies) this.addTexture(`foe-${e.id}`, e.art).addTexture(`splash-${e.id}`, e.splash ?? null)
     for (const h of setup.heroes ?? []) this.addTexture(`bust-${h.id}`, h.bust)
     this.drawBackground()
@@ -113,7 +113,7 @@ export class BattleScene extends Phaser.Scene {
     this.actors.clear()
     if (!this.field.length) this.field = [...setup.field]
     const layout = this.layoutFoes()
-    setup.allies.forEach((a, i) => this.addActor(a.id, 'ally', `ally-${a.id}`, layout.allies[i]!, i))
+    setup.allies.forEach((a, i) => this.addActor(a.id, 'ally', `bust-${a.id}`, layout.allies[i]!, i))
   }
 
   /** Lays out and adds the foes on the field; returns the stage layout for the party too. */
@@ -177,22 +177,24 @@ export class BattleScene extends Phaser.Scene {
     const cx = (box.x + box.w / 2) * d
     const bottom = (box.y + box.h) * d
     const shadow = this.add.ellipse(cx, bottom - 2 * d, box.w * 0.7 * d, box.w * 0.16 * d, 0x000000, 0.35)
+    const frame = side === 'ally' ? this.add.rectangle(cx, bottom, box.w * d, box.h * d, 0x17232f, 1)
+      .setOrigin(0.5, 1).setStrokeStyle(d, 0x526273, 1) : null
     // No art for this one (a new outfit, say): an invisible stand-in keeps the effects aimed; the DOM shows her icon.
     const missing = !this.textures.exists(key)
-    const sprite = this.add.image(cx, bottom, missing ? '__DEFAULT' : key).setOrigin(0.5, 1)
-    this.fit(sprite, box, side)
+    const sprite = this.add.image(cx, bottom - (frame ? 3 * d : 0), missing ? '__DEFAULT' : key).setOrigin(0.5, 1)
+    this.fit(sprite, frame ? { ...box, w: box.w - 6, h: box.h - 6 } : box)
     if (missing) sprite.setVisible(false)
-    this.layer.add([shadow, sprite])
-    const actor: Actor = { id, side, sprite, shadow, box, index, scaleY: sprite.scaleY, idle: null }
+    this.layer.add([shadow, ...(frame ? [frame] : []), sprite])
+    const actor: Actor = { id, side, sprite, frame, shadow, box, index, scaleY: sprite.scaleY, idle: null }
     this.actors.set(id, actor)
     this.startIdle(actor)
   }
 
-  /** Fills the box; a foe's portrait keeps its own shape inside it (franchise packs differ, D76), feet on the floor. */
-  private fit(sprite: Phaser.GameObjects.Image, box: Box, side: 'ally' | 'enemy'): void {
+  /** Fits either portrait inside its box without stretching, anchored at the bottom centre. */
+  private fit(sprite: Phaser.GameObjects.Image, box: Box): void {
     const d = this.dpr
     const { width, height } = sprite.frame
-    if (side === 'ally' || width <= 1 || height <= 1) {
+    if (width <= 1 || height <= 1) {
       sprite.setDisplaySize(box.w * d, box.h * d)
       return
     }
@@ -204,8 +206,8 @@ export class BattleScene extends Phaser.Scene {
   private startIdle(actor: Actor): void {
     if (this.setup.reducedMotion || actor.idle) return
     actor.sprite.scaleY = actor.scaleY
-    actor.idle = this.tweens.add({ targets: actor.sprite, scaleY: actor.scaleY * (actor.side === 'ally' ? 1.03 : 1.012),
-      duration: (actor.side === 'ally' ? 820 : 1500) + actor.index * 80, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: actor.index * 110 })
+    actor.idle = this.tweens.add({ targets: actor.sprite, scaleY: actor.scaleY * (actor.side === 'ally' ? 1.015 : 1.012),
+      duration: (actor.side === 'ally' ? 1600 : 1500) + actor.index * 80, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: actor.index * 110 })
   }
 
   /** Brings every unit's look in line with the state: knocked out, broken, or standing. */
@@ -217,6 +219,7 @@ export class BattleScene extends Phaser.Scene {
       if (!actor) continue
       const base = this.basePos(actor)
       actor.sprite.setPosition(base.x, base.y)
+      actor.frame?.setPosition(base.x, base.y + 3 * this.dpr).setAlpha(unit.hp <= 0 ? 0.5 : 1)
       actor.sprite.clearTint()
       if (unit.hp <= 0) {
         actor.idle?.stop()
@@ -235,7 +238,7 @@ export class BattleScene extends Phaser.Scene {
 
   private basePos(actor: Actor): { x: number; y: number } {
     const d = this.dpr
-    return { x: (actor.box.x + actor.box.w / 2) * d, y: (actor.box.y + actor.box.h) * d }
+    return { x: (actor.box.x + actor.box.w / 2) * d, y: (actor.box.y + actor.box.h - (actor.frame ? 3 : 0)) * d }
   }
 
   private center(id: string): { x: number; y: number } {
@@ -282,6 +285,10 @@ export class BattleScene extends Phaser.Scene {
     for (const actor of this.actors.values()) {
       const base = this.basePos(actor)
       this.tweens.killTweensOf(actor.sprite)
+      if (actor.frame) {
+        this.tweens.killTweensOf(actor.frame)
+        actor.frame.setPosition(base.x, base.y + 3 * this.dpr)
+      }
       actor.sprite.setPosition(base.x, base.y)
       actor.sprite.scaleY = actor.scaleY
       actor.idle = null
@@ -368,8 +375,7 @@ export class BattleScene extends Phaser.Scene {
     if (!target) return
     const d = this.dpr
     if (actor && !tick && actor.id !== target.id) {
-      const base = this.basePos(actor)
-      this.tweens.add({ targets: actor.sprite, y: base.y + (actor.side === 'ally' ? -18 : 14) * d, duration: 110, yoyo: true, ease: 'Quad.easeOut' })
+      this.tweens.add({ targets: [actor.sprite, ...(actor.frame ? [actor.frame] : [])], y: `+=${(actor.side === 'ally' ? -18 : 14) * d}`, duration: 110, yoyo: true, ease: 'Quad.easeOut' })
       await this.wait(110)
       if (this.skipping) return
     }
@@ -382,7 +388,8 @@ export class BattleScene extends Phaser.Scene {
     }
     this.flash(targetId, 0xffffff)
     const base = this.basePos(target)
-    this.tweens.add({ targets: target.sprite, x: base.x + 6 * d, duration: 40, yoyo: true, repeat: 2, onComplete: () => target.sprite.setX(base.x) })
+    this.tweens.add({ targets: [target.sprite, ...(target.frame ? [target.frame] : [])], x: base.x + 6 * d, duration: 40, yoyo: true, repeat: 2,
+      onComplete: () => { target.sprite.setX(base.x); target.frame?.setX(base.x) } })
     this.number(targetId, String(amount), target.side === 'ally' ? '#ff8f8f' : weak ? '#ffd84d' : '#ffffff', weak ? 1.15 : 1, weak ? 'WEAK' : undefined)
     await this.wait(tick ? 260 : 300)
   }
@@ -542,6 +549,7 @@ export class BattleScene extends Phaser.Scene {
     } else {
       this.tweens.add({ targets: actor.sprite, alpha: 0.35, duration: 300 })
       actor.sprite.setTint(0x777777)
+      if (actor.frame) this.tweens.add({ targets: actor.frame, alpha: 0.5, duration: 300 })
     }
     this.tweens.add({ targets: actor.shadow, alpha: 0.1, duration: 300 })
     await this.wait(380)
@@ -637,16 +645,23 @@ export class BattleScene extends Phaser.Scene {
     for (const actor of this.actors.values()) {
       if (actor.side !== 'ally' || actor.sprite.alpha < 0.5) continue
       if (label === 'victory') {
-        const key = `cheer-${actor.id}`
         actor.idle?.stop()
         actor.idle = null
-        if (this.textures.exists(key)) actor.sprite.setTexture(key).setDisplaySize(actor.box.w * d, actor.box.h * d)
-        this.tweens.add({ targets: actor.sprite, y: actor.sprite.y - 16 * d, duration: 180, yoyo: true, repeat: 1, ease: 'Quad.easeOut', delay: Phaser.Math.Between(0, 160) })
+        actor.sprite.scaleY = actor.scaleY
+        const delay = actor.index * 40
+        // A short additive copy lights the bust, and follows the same single hop. It belongs to fx so skip clears it.
+        const glow = this.add.image(actor.sprite.x, actor.sprite.y, actor.sprite.texture.key).setOrigin(0.5, 1)
+          .setDisplaySize(actor.sprite.displayWidth, actor.sprite.displayHeight).setTint(0xffe6a6)
+          .setBlendMode(Phaser.BlendModes.ADD).setAlpha(0)
+        glow.setVisible(actor.sprite.visible)
+        this.fx.add(glow)
+        this.tweens.add({ targets: glow, alpha: { from: 0.45, to: 0 }, duration: 420, delay, onComplete: () => glow.destroy() })
+        this.tweens.add({ targets: [actor.sprite, glow, ...(actor.frame ? [actor.frame] : [])], y: `-=${8 * d}`, duration: 180, yoyo: true, ease: 'Quad.easeOut', delay })
       } else {
         actor.sprite.setTint(0x8a8a8a)
       }
     }
-    // Long enough for the cheer's two hops (up to 880 ms with its stagger) before the result screen.
-    await this.wait(900)
+    // All five portraits finish their hop and glow before the result screen.
+    await this.wait(700)
   }
 }

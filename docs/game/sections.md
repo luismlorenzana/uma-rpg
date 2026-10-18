@@ -231,7 +231,8 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 - **Fight** (`FightScreen.tsx`, Phaser stage `battle/scene/BattleScene.ts`):
   - **Header:** wave chip (W2/3), round, **Auto**, **speed** (1×, 2×, 4×) and a menu ("Back to the map" keeps the fight
     open; "Give up").
-  - **Stage:** foes on top, in two rows from six; the party below.
+  - **Stage:** foes on top, in two rows from six; the party below, as busts in spaced, bordered cards with solid dark
+    backgrounds.
   - **Controls:** a weapon row, then **Attack**, **Skills** and **Guard**, and the **Limit Break** sheet.
 - **Result:** Victory or Defeated, Laurels, Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar, her Class Rank
   bar, and five Weapon and five Armor Rank cells, each glowing on a rank-up (D102). Then "Fight again" or back to the
