@@ -2,6 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { ENEMY_INFO_HEIGHT, stageLayout } from './stage-layout'
 
 describe('stage layout', () => {
+  it('leaves at least 8 px between five bust cards while retaining 44 pt targets at both phone widths', () => {
+    for (const width of [375, 390]) for (const height of [320, 430, 560]) {
+      const l = stageLayout(width, height, Array(8).fill('regular'), 5)
+      l.allies.forEach((box, i) => {
+        expect(box.w).toBeGreaterThanOrEqual(44); expect(box.h).toBeGreaterThanOrEqual(44)
+        expect(box.x).toBeGreaterThanOrEqual(4); expect(box.x + box.w).toBeLessThanOrEqual(width - 4)
+        expect(box.y + box.h).toBe(l.allyInfo[i]!.y)
+        if (i) expect(box.x - (l.allies[i - 1]!.x + l.allies[i - 1]!.w)).toBeGreaterThanOrEqual(8)
+      })
+    }
+  })
   it('stands up to five foes in one row on the floor line', () => {
     const l = stageLayout(390, 560, ['regular', 'regular', 'boss', 'regular', 'regular'], 5)
     expect(l.enemies).toHaveLength(5)

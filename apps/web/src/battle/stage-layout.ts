@@ -42,7 +42,8 @@ export function stageLayout(width: number, height: number, ranks: readonly Enemy
   })
   const allySlot = width / Math.max(1, allyCount)
   const top = enemyBottom + ENEMY_INFO_HEIGHT + 8
-  const size = Math.min(allySlot * 1.05, height - top - ALLY_INFO_HEIGHT)
+  // Five framed busts: 4 px at the outer edges, 8 px between cards, including on the smaller phone.
+  const size = Math.min(allySlot - 8, height - top - ALLY_INFO_HEIGHT)
   const allies: Box[] = []
   const allyInfo: Box[] = []
   for (let i = 0; i < allyCount; i++) {

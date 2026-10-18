@@ -38,7 +38,7 @@ const maybe = (url: Promise<string> | null): Promise<HTMLImageElement | null> =>
 /** A cut-in's stripe by tier: Key enemies teal, Sub-bosses violet, Bosses red. */
 const SPLASH_ACCENT: Readonly<Record<string, number>> = { regular: 0xc9d2dd, key: 0x4fd1c5, subboss: 0xb07cff, boss: 0xff4d5e }
 
-/** Loads the stage art: chibis (idle and cheer) and busts for the party, verticals (and splashes) for the rivals.
+/** Loads the stage art: busts for the party, verticals (and splashes) for the rivals.
  * Missing art is fine. */
 function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: BattleState | null, reducedMotion: boolean): StageSetup | null {
   const [setup, setSetup] = useState<StageSetup | null>(null)
@@ -47,16 +47,14 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
     if (!state) return
     let live = true
     const art = campaign.view.art
-    const path = (family: 'outfit-chibis' | 'outfit-busts', k: string) => {
-      const p = imagePath(art, family, k)
+    const bust = (id: string) => {
+      const p = imagePath(art, 'outfit-busts', id)
       return p ? artUrl(p) : null
     }
     void Promise.all([
       Promise.all(state.input.allies.map(async (a) => ({
         id: a.id,
-        idle: await maybe(path('outfit-chibis', `${a.id}-a`)),
-        cheer: await maybe(path('outfit-chibis', `${a.id}-b`)),
-        bust: await maybe(path('outfit-busts', a.id)),
+        bust: await maybe(bust(a.id)),
       }))),
       // Every wave's rivals load up front, so the next wave steps in without a wait (W3).
       Promise.all([state.input.enemies, ...(state.input.waves ?? [])].flat().map(async (e) => {
@@ -69,7 +67,7 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
       // The Heroes behind the party's inherited Limit Breaks, for the cut-in (D106).
       Promise.all([...new Set(state.input.allies.flatMap((a) => (a.inherits ?? []).map((i) => i.from)))]
         .filter((id) => !state.input.allies.some((a) => a.id === id))
-        .map(async (id) => ({ id, bust: await maybe(path('outfit-busts', id)) }))),
+        .map(async (id) => ({ id, bust: await maybe(bust(id)) }))),
     ]).then(([allies, enemies, heroes]) => {
       const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
       const biome = campaign.regionInfo(chapter.id)?.biome ?? 'ruins'
@@ -383,7 +381,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 className="absolute flex items-end justify-center"
                 style={{ left: box.x, top: box.y, width: box.w, height: box.h }}
               >
-                {setup && !setup.allies.find((x) => x.id === unit.id)?.idle && (
+                {setup && !setup.allies.find((x) => x.id === unit.id)?.bust && (
                   <AtlasSprite art={campaign.view.art} family="outfit-icons" frameKey={unit.id} size={Math.round(box.w * 0.62)} className={`mb-1 rounded-full ${unit.hp <= 0 ? 'opacity-35 grayscale' : ''}`} />
                 )}
               </button>
