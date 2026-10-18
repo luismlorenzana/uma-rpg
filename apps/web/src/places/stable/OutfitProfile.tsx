@@ -2,7 +2,7 @@
 // her Craft Level and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks; first, as it
 // changes most), Battle (her RPG stats), Gear (equipment, Weapon and Armor Ranks, Extra Stats), Work (Craft Level and her
 // job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
-// racing profile.
+// racing profile. The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56, SD3).
 import { STATS } from '@luismlorenzana/uma-data'
 import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
@@ -11,6 +11,9 @@ import {
   rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
+import { formatLevel } from '@luismlorenzana/uma-kit/roster'
+import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
+import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Bar, CLASS_LABEL, kindLabel, WeaponGlyph } from '../../battle/labels'
@@ -21,9 +24,8 @@ import { outputView } from '../../items/outputs'
 import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import { loadSkills, type MasterView } from '../../master/master'
 import { markTarget, unlock, useWorld } from '../../save/game'
-import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
-import { BackIcon, LockIcon, TargetIcon, TicketIcon } from '../../ui/icons'
+import { BackIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import { RankCells, RankRow } from '../../ui/RankBars'
 import { pointText } from '../../items/planets'
@@ -93,40 +95,41 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   }
   const shown: Tab = owned ? tab : 'racing'
   return (
-    <div className="space-y-3 p-4">
-      <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
-        <BackIcon size={18} /> All outfits
-      </button>
-      <Header view={view} outfit={outfit} owned={owned} world={world} bust={bust} onClass={() => setTab('skills')} />
-      {owned && world ? (
-        <>
-          <div className="sticky top-0 z-10 -mx-4 bg-page/95 px-4 py-1.5 backdrop-blur">
-            <div className="grid grid-cols-5 rounded-sm bg-sunken p-1" role="tablist" aria-label="Profile">
-              {TABS.map((t) => (
-                <button key={t} type="button" role="tab" aria-selected={shown === t} onClick={() => setTab(t)}
-                  className={`min-h-10 rounded-xs text-[12.5px] font-semibold ${shown === t ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-                  {TAB_LABEL[t]}
-                </button>
-              ))}
-            </div>
-          </div>
-          {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
-          {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
-          {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
-          {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
-          {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
-        </>
-      ) : (
-        <>
-          <UnlockBox view={view} outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />
-          <RacingTab view={view} outfit={outfit} />
-        </>
-      )}
+    <div>
+      <div className="px-4 pt-2">
+        <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
+          <BackIcon size={18} /> All outfits
+        </button>
+      </div>
+      {/* The kit's frame (uma-platform P56, SD3): portrait, name, level and chips, this game's summary, then its tabs. */}
+      <ProfileFrame<Tab>
+        portrait={bust ? <img src={bust} alt="" className="size-full object-cover object-top" /> : <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={112} />}
+        name={outfit.name}
+        title={outfit.title}
+        level={owned ? <>{formatLevel(owned.level)}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></> : undefined}
+        chips={<p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>}
+        corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
+        locked={!owned}
+        summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} onClass={() => setTab('skills')} />
+          : <UnlockBox outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />}
+        tabs={owned && world ? TABS.map((t) => ({ key: t, label: TAB_LABEL[t] })) : undefined}
+        tab={owned && world ? shown : undefined}
+        onTab={setTab}
+      >
+        {owned && world ? (
+          <>
+            {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
+            {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
+            {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
+            {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
+            {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
+          </>
+        ) : <RacingTab view={view} outfit={outfit} />}
+      </ProfileFrame>
     </div>
   )
 }
 
-/** Art, name, the big Uma Level with its EXP and the class she fights as, then her Craft Level and what she's up to. */
 /** Marks her as a target: the facilities list what maxing her takes (D100). */
 function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
   const [error, setError] = useState<string | null>(null)
@@ -141,63 +144,44 @@ function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
   )
 }
 
-function Header({ view, outfit, owned, world, bust, onClass }: { view: MasterView; outfit: RosterOutfit; owned: OwnedUma | null; world: TierWorld | null; bust: string | null; onClass: () => void }) {
+/** Under the header: her Uma EXP and the class she fights as, then her Craft Level and what she's up to. */
+function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; onClass: () => void }) {
   const navigate = useNavigate()
   const now = useNow(30_000)
-  const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
-  const work = owned && world ? slotJobOf(world, outfit.outfitId, now) : null
-  const party = owned && world ? partyOf(world, outfit.outfitId) : null
-  const fighting = owned && world ? isInFight(world, outfit.outfitId) : false
+  const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
+  const work = slotJobOf(world, outfit.outfitId, now)
+  const party = partyOf(world, outfit.outfitId)
+  const fighting = isInFight(world, outfit.outfitId)
   return (
     <section className="space-y-3">
-      <div className="flex items-end gap-3">
-        <div className="relative size-28 shrink-0 overflow-hidden rounded-md bg-raised">
-          {bust ? <img src={bust} alt="" className={`size-full object-cover object-top ${owned ? '' : 'opacity-70 saturate-50'}`} />
-            : <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={112} />}
-          {!owned && <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[11px] text-locked"><LockIcon size={11} /> Locked</span>}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
-            {owned && world && <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} />}
-          </div>
-          <h3 className="text-xl leading-tight">{outfit.name}</h3>
-          {outfit.title && <p className="truncate text-[13px] text-ink-soft">{outfit.title}</p>}
-          {owned && (
-            <div className="mt-1.5">
-              <p className="font-display text-[26px] font-extrabold leading-none">Lv {owned.level}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></p>
-              <Bar className="mt-1.5" value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
-              <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
-              <ClassChip outfit={outfit} uma={owned} onClick={onClass} />
-            </div>
-          )}
-        </div>
+      <div>
+        <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
+        <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
+        <ClassChip outfit={outfit} uma={owned} onClick={onClass} />
       </div>
-      {owned && (
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-md bg-raised p-2">
-            <p className="text-[11px] font-semibold text-ink-soft">{CRAFT_LABEL}</p>
-            <p className="font-display text-xl font-bold leading-tight">{owned.craft.level}</p>
-            <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.craft.level)} open</p>
-          </div>
-          <button type="button" className="rounded-md bg-raised p-2 text-left active:bg-white/5"
-            onClick={() => (work ? navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })
-              : navigate(party ? `/town/party-hall/${party.party + 1}` : '/town/party-hall', { state: { fromHub: true } }))}>
-            <p className="text-[11px] font-semibold text-ink-soft">{work ? 'Working' : fighting ? 'Fighting' : 'Party'}</p>
-            <p className="truncate text-[13px] font-semibold text-accent">{work ? placeById(work.placeId)?.name : party ? world?.parties[party.party]?.name : 'None · add'}</p>
-            <p className="truncate text-[10.5px] text-ink-faint">
-              {work ? (work.done ? 'Done · collect' : formatDuration(work.endsAt - Date.parse(now))) : fighting ? 'Open fight' : 'Free'}
-            </p>
-          </button>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-md bg-raised p-2">
+          <p className="text-[11px] font-semibold text-ink-soft">{CRAFT_LABEL}</p>
+          <p className="font-display text-xl font-bold leading-tight">{owned.craft.level}</p>
+          <p className="text-[10.5px] text-ink-faint">Grade {highestGrade(owned.craft.level)} open</p>
         </div>
-      )}
+        <button type="button" className="rounded-md bg-raised p-2 text-left active:bg-white/5"
+          onClick={() => (work ? navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })
+            : navigate(party ? `/town/party-hall/${party.party + 1}` : '/town/party-hall', { state: { fromHub: true } }))}>
+          <p className="text-[11px] font-semibold text-ink-soft">{work ? 'Working' : fighting ? 'Fighting' : 'Party'}</p>
+          <p className="truncate text-[13px] font-semibold text-accent">{work ? placeById(work.placeId)?.name : party ? world.parties[party.party]?.name : 'None · add'}</p>
+          <p className="truncate text-[10.5px] text-ink-faint">
+            {work ? (work.done ? 'Done · collect' : formatDuration(work.endsAt - Date.parse(now))) : fighting ? 'Open fight' : 'Free'}
+          </p>
+        </button>
+      </div>
     </section>
   )
 }
 
-function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: RosterOutfit; tickets: number }) {
+/** A locked outfit: Unlock for an Uma Ticket, through the kit's confirm (SD3). */
+function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number }) {
   const [confirming, setConfirming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   return (
     <section className="space-y-1.5">
       <button type="button" disabled={tickets < 1} onClick={() => setConfirming(true)}
@@ -207,24 +191,11 @@ function UnlockBox({ view, outfit, tickets }: { view: MasterView; outfit: Roster
       <p className="text-center text-[12px] text-ink-faint">
         {tickets > 0 ? `${tickets} Uma Tickets left` : 'No Uma Tickets left'}
       </p>
-      {confirming && (
-        <BottomSheet title={`Unlock ${outfit.name}?`} onClose={() => setConfirming(false)} footer={
-          <div className="flex gap-2">
-            <button type="button" onClick={() => setConfirming(false)} className="min-h-12 flex-1 rounded-sm border border-hairline-strong font-semibold text-ink-soft">Not now</button>
-            <button type="button" onClick={() => unlock(outfit.outfitId).then(() => { setConfirming(false); setError(null) }, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Could not unlock.'))}
-              className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink">Unlock for 1 Ticket</button>
-          </div>
-        }>
-          <div className="flex items-center gap-3">
-            <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={64} />
-            <div className="text-[14px]">
-              <p className="font-semibold">{outfit.title ?? outfit.name}</p>
-              <p className="text-ink-soft">{tickets} → {tickets - 1} Uma Tickets. Unlocking is final.</p>
-            </div>
-          </div>
-          {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}
-        </BottomSheet>
-      )}
+      <UnlockConfirm open={confirming} onClose={() => setConfirming(false)} name={outfit.title ?? outfit.name} tickets={tickets}
+        ticketMark={<UiMark mark="currency/uma-ticket" fallback={<TicketIcon size={16} />} />}
+        onConfirm={() => unlock(outfit.outfitId).then(() => setConfirming(false), (err: unknown) => {
+          throw new Error(err instanceof SaveRuleError ? err.message : 'Could not unlock.')
+        })} />
     </section>
   )
 }

@@ -1,139 +1,44 @@
-// The Account (S1): trainer name, tier world, wallet, versions and sign-out. A hidden Town place (D31).
+// The Account (S1, SD3): the kit's frame (uma-platform P56) with this game's content: the trainer name, the Tier 1
+// wallet, Appearance, push notifications, the info rows and sign-out. A hidden Town place (D31).
+import { useAuth } from '@luismlorenzana/uma-kit/auth'
+import { AccountPage as AccountFrame } from '@luismlorenzana/uma-kit/places'
+import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
-import { useState } from 'react'
 import { APP_BUILD_ID } from '../../app/build'
-import { useAppUpdate } from '../../app/UpdateNotice'
-import { appUpdateLifecycle } from '../../app/update-lifecycle'
-import { useAuth } from '../../auth/AuthProvider'
 import { useMaster } from '../../master/master'
 import { NotificationsCard } from '../../push/NotificationsCard'
 import { renameAccount, resetGame, useGame } from '../../save/game'
-import { setAppearance, Tabs, UiMark, useAppearance, type Appearance } from '@luismlorenzana/uma-kit/ui'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-hairline py-2.5 text-[14px] last:border-0">
-      <span className="text-ink-soft">{label}</span>
-      <span className="text-right font-semibold">{children}</span>
-    </div>
-  )
-}
 
 export default function AccountPage() {
   const save = useGame((s) => s.save)
   const sync = useGame((s) => s.sync)
   const lastSyncedAt = useGame((s) => s.lastSyncedAt)
   const master = useMaster()
-  const update = useAppUpdate()
   const auth = useAuth()
-  const [name, setName] = useState(save?.account.trainerName ?? '')
-  const [saved, setSaved] = useState(false)
   if (!save) return null
   const wallet = save.tierWorlds['1']?.wallet
-  const valid = normalizeTrainerName(name) !== null
-  const changed = normalizeTrainerName(name) !== save.account.trainerName
+  const cloud = sync === 'synced' && lastSyncedAt ? `Synced ${new Date(lastSyncedAt).toLocaleTimeString()}`
+    : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline' : sync === 'error' ? 'Paused' : '—'
   return (
-    <div className="space-y-5 p-4">
-      <form
-        className="space-y-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!valid || !changed) return
-          void renameAccount(name).then(() => {
-            setName(normalizeTrainerName(name) ?? name)
-            setSaved(true)
-          })
-        }}
-      >
-        <label htmlFor="trainer-name" className="text-micro">
-          Trainer name
-        </label>
-        <div className="flex gap-2">
-          <input
-            id="trainer-name"
-            value={name}
-            maxLength={TRAINER_NAME_MAX + 8}
-            onChange={(e) => {
-              setName(e.target.value)
-              setSaved(false)
-            }}
-            className="min-h-11 min-w-0 flex-1 rounded-sm bg-sunken px-3 text-ink outline-none ring-accent focus:ring-2"
-            aria-invalid={!valid}
-          />
-          <button type="submit" disabled={!valid || !changed} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink disabled:opacity-40">
-            Save
-          </button>
-        </div>
-        <p className="text-[12px] text-ink-faint">{!valid ? `1–${TRAINER_NAME_MAX} characters.` : saved ? 'Saved.' : ' '}</p>
-      </form>
-
-      <section>
-        <h3 className="text-micro mb-1">Tier 1 wallet</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { icon: <UiMark mark="currency/uma-ticket" scale={2} fallback={<TicketIcon size={22} />} />, value: wallet?.unlockTickets ?? 0, label: 'Uma Tickets' },
-            { icon: <ShardIcon size={20} />, value: wallet?.shards ?? 0, label: 'Uma Shards' },
-            { icon: <UiMark mark="currency/laurel" scale={2} fallback={<LaurelIcon size={22} />} />, value: wallet?.laurels ?? 0, label: 'Laurels' },
-          ].map((c) => (
-            <div key={c.label} className="flex flex-col items-center gap-1 rounded-md bg-raised p-2.5">
-              {c.icon}
-              <span className="font-display text-lg font-bold">{c.value}</span>
-              <span className="text-[11px] text-ink-soft">{c.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <AppearanceCard />
-
-      <NotificationsCard />
-
-      <section>
-        <Row label="Tier world">Tier 1</Row>
-        <Row label="Trainer since">{new Date(save.account.createdAt).toLocaleDateString()}</Row>
-        <Row label="Umas unlocked">{Object.keys(save.tierWorlds['1']?.umas ?? {}).length} / {master.status === 'ready' ? master.view.roster.length : '…'}</Row>
-        <Row label="Cloud save">{sync === 'synced' && lastSyncedAt ? `Synced ${new Date(lastSyncedAt).toLocaleTimeString()}` : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline' : sync === 'error' ? 'Paused' : '—'}</Row>
-        <Row label="Game data">{master.status === 'ready' ? master.view.manifest.version : master.status === 'error' ? 'Not loaded' : 'Loading…'}</Row>
-        <Row label="App build">{APP_BUILD_ID}</Row>
-      </section>
-
-      {update.status !== 'current' && (
-        <button type="button" onClick={() => appUpdateLifecycle.requestRestart()} className="min-h-11 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">
-          Update ready — Restart
-        </button>
-      )}
-
-      {auth.authRequired && (
-        <button
-          type="button"
-          onClick={() => {
-            resetGame()
-            void auth.signOut()
-          }}
-          className="min-h-11 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft"
-        >
-          Sign out
-        </button>
-      )}
-    </div>
-  )
-}
-
-const APPEARANCE_OPTIONS: readonly { value: Appearance; label: string }[] = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-]
-
-/** Light, dark or the phone's choice (D147), on this device: the same switch as uma-racer's. */
-function AppearanceCard() {
-  const appearance = useAppearance()
-  return (
-    <section>
-      <h3 className="text-micro mb-1">Appearance</h3>
-      <Tabs label="Appearance" options={APPEARANCE_OPTIONS} value={appearance} onChange={setAppearance} />
-      <p className="mt-1.5 text-[12px] text-ink-faint">System follows the phone’s light or dark setting. Saved on this device.</p>
-    </section>
+    <AccountFrame
+      words={{ name: 'Trainer name', wallet: 'Tier 1 wallet' }}
+      rename={{ value: save.account.trainerName, maxLength: TRAINER_NAME_MAX, normalize: normalizeTrainerName, onSave: renameAccount }}
+      wallet={[
+        { icon: <UiMark mark="currency/uma-ticket" scale={2} fallback={<TicketIcon size={22} />} />, value: wallet?.unlockTickets ?? 0, label: 'Uma Tickets' },
+        { icon: <span className="flex h-8 items-center"><ShardIcon size={20} /></span>, value: wallet?.shards ?? 0, label: 'Uma Shards' },
+        { icon: <UiMark mark="currency/laurel" scale={2} fallback={<LaurelIcon size={22} />} />, value: wallet?.laurels ?? 0, label: 'Laurels' },
+      ]}
+      notifications={<NotificationsCard />}
+      info={[
+        { label: 'Tier world', value: 'Tier 1' },
+        { label: 'Trainer since', value: new Date(save.account.createdAt).toLocaleDateString() },
+        { label: 'Umas unlocked', value: `${Object.keys(save.tierWorlds['1']?.umas ?? {}).length} / ${master.status === 'ready' ? master.view.roster.length : '…'}` },
+        { label: 'Cloud save', value: cloud },
+        { label: 'Game data', value: master.status === 'ready' ? master.view.manifest.version : master.status === 'error' ? 'Not loaded' : 'Loading…' },
+        { label: 'App build', value: APP_BUILD_ID },
+      ]}
+      onSignOut={auth.authRequired ? async () => { resetGame(); await auth.signOut() } : undefined}
+    />
   )
 }

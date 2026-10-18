@@ -1,12 +1,10 @@
-import { Controller, Get, Inject, NotFoundException, Param, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get, Inject, NotFoundException, Param, Res } from '@nestjs/common'
 import type { Response } from 'express'
-import { AuthGuard } from '../auth/auth.guard'
 import { cacheControlFor, contentTypeFor, safeMasterPath, type MasterSource } from './master-source'
 
 export const MASTER_SOURCE = Symbol('MASTER_SOURCE')
 
 // Serves uma-platform master data releases to the signed-in owner only (architecture §2.2, P6).
-@UseGuards(AuthGuard)
 @Controller('master')
 export class MasterController {
   constructor(@Inject(MASTER_SOURCE) private readonly source: MasterSource) {}

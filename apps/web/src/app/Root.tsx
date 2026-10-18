@@ -1,36 +1,17 @@
-// Gates before the Hub: auth ready → signed in → save booted (or first launch). Nothing here waits on the network
-// once a device save exists (D32).
+// Getting in (SD3): the kit's gates (uma-platform P56): splash → sign-in → boot → first launch → start page, with this
+// game's boot (the device save, else the server's), its first launch (a trainer name, then 20 Uma Tickets) and its start
+// page (the last Hub page). Nothing here waits on the network once a device save exists (D32).
+import { useAuth } from '@luismlorenzana/uma-kit/auth'
+import { BootGates, UpdateNotice } from '@luismlorenzana/uma-kit/places'
 import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
-import { useAuth } from '../auth/AuthProvider'
-import { firebaseEnabled } from '../auth/firebase'
+import { lastPage } from '../hub/start'
 import { boot, createAccount, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
+import { signInEnabled } from './firebase-config'
 
-function Splash() {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-page">
-      <p className="font-display text-2xl font-bold text-accent">Uma RPG</p>
-    </div>
-  )
-}
-
-function SignIn({ onSignIn }: { onSignIn: () => void }) {
-  return (
-    <div className="pt-safe pb-safe fixed inset-0 flex flex-col items-center justify-center gap-6 bg-page px-8 text-center">
-      <div>
-        <p className="font-display text-4xl font-bold text-accent">Uma RPG</p>
-        <p className="mt-2 text-ink-soft">A party RPG for one trainer.</p>
-      </div>
-      <button type="button" onClick={onSignIn} className="min-h-12 w-full max-w-xs rounded-sm bg-accent font-display text-base font-bold text-accent-ink">
-        Sign in with Google
-      </button>
-    </div>
-  )
-}
-
-function FirstLaunch() {
+function FirstLaunch({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState(DEFAULT_TRAINER_NAME)
   const valid = normalizeTrainerName(name) !== null
   return (
@@ -38,7 +19,7 @@ function FirstLaunch() {
       className="pt-safe pb-safe fixed inset-0 flex flex-col items-center justify-center gap-5 bg-page px-8"
       onSubmit={(e) => {
         e.preventDefault()
-        if (valid) void createAccount(name)
+        if (valid) void createAccount(name).then(onDone)
       }}
     >
       <div className="text-center">
@@ -66,25 +47,29 @@ function FirstLaunch() {
   )
 }
 
+/** The game's boot for the gates: opens the device save (or the server's) and says whether a first launch is due. */
+async function bootFor({ uid }: { uid: string }): Promise<{ firstLaunch: boolean }> {
+  await boot(uid)
+  return { firstLaunch: useGame.getState().status === 'first-launch' }
+}
+
 export function Root() {
   const auth = useAuth()
-  const status = useGame((s) => s.status)
-  const uid = auth.user?.uid
-
-  useEffect(() => {
-    if (auth.ready && uid) void boot(uid)
-  }, [auth.ready, uid])
 
   useEffect(() => startSyncTriggers(), [])
 
   // Never run a production build signed out: every API call would fail (the S1 incident, D42).
-  if (import.meta.env.PROD && !firebaseEnabled)
+  if (import.meta.env.PROD && !signInEnabled)
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-page p-8 text-center text-ink-soft">This build is missing its sign-in configuration.</div>
     )
-  if (!auth.ready) return <Splash />
-  if (auth.authRequired && !auth.user) return <SignIn onSignIn={() => void auth.signIn()} />
-  if (status === 'idle' || status === 'booting') return <Splash />
-  if (status === 'first-launch') return <FirstLaunch />
-  return <Outlet />
+  return (
+    <>
+      <UpdateNotice />
+      <BootGates auth={auth} boot={bootFor} firstLaunch={(done) => <FirstLaunch onDone={done} />} startPath={() => `/${lastPage()}`}
+        words={{ name: 'Uma RPG', tagline: 'A party RPG for one trainer.' }}>
+        <Outlet />
+      </BootGates>
+    </>
+  )
 }

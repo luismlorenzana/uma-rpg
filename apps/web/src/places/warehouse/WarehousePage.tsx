@@ -1,129 +1,63 @@
-// The Warehouse (S4–S7, D144): every material, Star Gem and unbound piece of gear you own, filtered by grade; anything
-// can be sold for a few Laurels (far below its Exchange price).
+// The Warehouse (S4–S7, D144, SD3): the kit's shelves (uma-platform P56) with this game's three: every material, Star
+// Gem and unbound piece of gear you own, by grade; anything can be sold for a few Laurels (far below its Exchange price).
+import { ShelfView, type Price, type ShelfItem } from '@luismlorenzana/uma-kit/places'
+import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { EFFECT_LABEL, gemById, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type Shelf } from '@rpg/domain'
-import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { sell, useWorld } from '../../save/game'
-import { BottomSheet } from '../../ui/BottomSheet'
 import { LaurelIcon } from '../../ui/icons'
 
-type Tab = 'materials' | 'gems' | 'gear'
-const TAB_LABEL: Readonly<Record<Tab, string>> = { materials: 'Materials', gems: 'Star Gems', gear: 'Gear' }
+const SHELVES: readonly { key: Shelf; label: string }[] = [{ key: 'items', label: 'Materials' }, { key: 'gems', label: 'Star Gems' }, { key: 'gear', label: 'Gear' }]
+/** The order materials show in: family by family, raw then refined, grade by grade. */
+const MATERIAL_ORDER = ITEM_FAMILIES.flatMap((f) => [...f.raw, ...f.refined].map((i) => i.id))
+
+interface Stock extends ShelfItem { shelf: Shelf; icon: string }
+
+const LAUREL = <UiMark mark="currency/laurel" fallback={<LaurelIcon size={14} />} />
 
 export default function WarehousePage() {
   const world = useWorld()
-  const [side, setSide] = useState<Tab>('materials')
-  const [grade, setGrade] = useState<number | null>(null)
-  const [open, setOpen] = useState<{ shelf: Shelf; id: string } | null>(null)
   if (!world) return null
-  const total = Object.values(world.items).reduce((a, n) => a + n, 0)
-  const list = (shelf: 'gems' | 'gear') => {
-    const stock = world[shelf]
-    return (
-      <ul className="space-y-1.5 p-3">
-        {Object.keys(stock).length === 0 && (
-          <li className="text-[13px] text-ink-faint">{shelf === 'gear' ? 'No gear yet' : 'No Star Gems yet: the Lapidary cuts them'}</li>
-        )}
-        {Object.entries(stock).filter(([id]) => grade === null || outputView(id).grade === grade).map(([id, n]) => (
-          <li key={id}>
-            <button type="button" onClick={() => setOpen({ shelf, id })} className="flex w-full items-center gap-2 rounded-sm bg-panel p-2 text-left text-[13px]">
-              <ItemIcon id={outputView(id).icon} size={32} />
-              <span className="min-w-0 flex-1 truncate font-semibold">{outputView(id).name} · G{outputView(id).grade}</span>
-              <span className="text-ink-soft">×{n}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    )
+  const stock = (shelf: Shelf, id: string, n: number): Stock => {
+    const view = outputView(id)
+    const item = shelf === 'items' ? itemById(id) : undefined
+    return { id, shelf, name: view.name, icon: view.icon, grade: view.grade, count: n,
+      // "Highest" keeps the top grade of each family's raw and refined lines, each gem line and each gear type.
+      group: item ? `${item.family}-${item.refined ? 'refined' : 'raw'}` : id.replace(/-\d+$|-g\d+$/, '') }
   }
+  const items: Stock[] = [
+    ...MATERIAL_ORDER.filter((id) => (world.items[id] ?? 0) > 0).map((id) => stock('items', id, world.items[id]!)),
+    ...Object.entries(world.gems).filter(([, n]) => n > 0).map(([id, n]) => stock('gems', id, n)),
+    ...Object.entries(world.gear).filter(([, n]) => n > 0).map(([id, n]) => stock('gear', id, n)),
+  ]
+  const total = (shelf: Shelf) => items.filter((i) => i.shelf === shelf).reduce((a, i) => a + i.count, 0)
+  const price = (i: Stock): Price | null => { const amount = sellPrice(i.shelf, i.id); return amount > 0 ? { mark: LAUREL, amount } : null }
   return (
-    <div>
-      <div className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
-        <div className="grid grid-cols-3 rounded-sm bg-sunken p-1" role="tablist" aria-label="Shelf">
-          {(['materials', 'gems', 'gear'] as const).map((s) => (
-            <button key={s} type="button" role="tab" aria-selected={side === s} onClick={() => setSide(s)}
-              className={`min-h-10 rounded-xs text-[13px] font-semibold ${side === s ? 'bg-raised text-ink shadow-2' : 'text-ink-faint'}`}>
-              {TAB_LABEL[s]}
-            </button>
-          ))}
-        </div>
-        <div className="-mx-3 flex gap-1 overflow-x-auto px-3" role="tablist" aria-label="Grade">
-          {[null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((g) => (
-            <button key={g ?? 'all'} type="button" role="tab" aria-selected={grade === g} onClick={() => setGrade(g)}
-              className={`min-h-8 shrink-0 rounded-full px-2.5 text-[12px] font-semibold ${grade === g ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-soft'}`}>
-              {g === null ? 'All grades' : `G${g}`}
-            </button>
-          ))}
-        </div>
-        <p className="text-[12px] text-ink-faint">{total} items · {Object.values(world.gems).reduce((a, b) => a + b, 0)} Star Gems · {Object.values(world.gear).reduce((a, b) => a + b, 0)} unbound gear</p>
-      </div>
-      {side === 'gear' && list('gear')}
-      {side === 'gems' && list('gems')}
-      {side === 'materials' && (
-        <div className="space-y-3 p-3">
-          {ITEM_FAMILIES.map((f) => {
-            const owned = [...f.raw, ...f.refined].filter((i) => (world.items[i.id] ?? 0) > 0 && (grade === null || i.grade === grade))
-            return (
-              <section key={f.id} className="rounded-md bg-panel p-2.5">
-                <h3 className="mb-1.5 flex items-baseline justify-between text-[13px] font-semibold">
-                  <span>{f.name}</span>
-                  <span className="text-[11px] font-normal text-ink-faint">{EFFECT_LABEL[f.effect]}</span>
-                </h3>
-                {owned.length === 0 ? (
-                  <p className="text-[12px] text-ink-faint">None{grade ? ` at grade ${grade}` : ' yet'}</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {owned.map((i) => (
-                      <button key={i.id} type="button" onClick={() => setOpen({ shelf: 'items', id: i.id })} className="relative rounded-sm bg-raised p-1" aria-label={`${i.name}: ${world.items[i.id]}`}>
-                        <ItemIcon id={i.id} size={40} />
-                        <span className="absolute bottom-0 right-0.5 font-display text-[11px] font-bold [text-shadow:0_1px_2px_#000]">{world.items[i.id]}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </section>
-            )
-          })}
-        </div>
-      )}
-      {open && <StockSheet shelf={open.shelf} id={open.id} have={world[open.shelf][open.id] ?? 0} onClose={() => setOpen(null)} />}
-    </div>
+    <ShelfView<Stock>
+      shelves={SHELVES}
+      items={items}
+      renderItem={(i, size) => <ItemIcon id={i.icon} size={size} />}
+      header={<p className="text-[12px] text-ink-faint">{total('items')} items · {total('gems')} Star Gems · {total('gear')} unbound gear</p>}
+      details={(i) => <StockDetails item={i} />}
+      price={price}
+      onSell={(i, qty) => sell(i.shelf, i.id, qty).then(() => undefined, (err: unknown) => {
+        throw new Error(err instanceof SaveRuleError ? err.message : 'Couldn’t sell.')
+      })}
+    />
   )
 }
 
-function StockSheet({ shelf, id, have, onClose }: { shelf: Shelf; id: string; have: number; onClose: () => void }) {
-  const [error, setError] = useState<string | null>(null)
+/** What a stock sheet says about its item: grade and kind, and what it refines from or into. */
+function StockDetails({ item: { shelf, id } }: { item: Stock }) {
   const item = shelf === 'items' ? itemById(id) : null
   const gem = shelf === 'gems' ? gemById(id) : null
-  const view = outputView(id)
-  const price = sellPrice(shelf, id)
-  const sellN = (n: number) => sell(shelf, id, n).then(() => (n >= have ? onClose() : setError(null)), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t sell.'))
   return (
-    <BottomSheet title={view.name} onClose={onClose}>
-      <div className="flex items-center gap-3">
-        <ItemIcon id={view.icon} size={64} />
-        <div className="text-[14px]">
-          {item && <p>Grade {item.grade} · {item.refined ? 'refined' : 'raw'} · {EFFECT_LABEL[item.effect]}</p>}
-          {gem && <p>Grade {gem.grade} Star Gem · feeds {gem.kind === 'sun' ? 'all eight' : gem.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}</p>}
-          {shelf === 'gear' && <p>Grade {view.grade} gear · unbound</p>}
-          <p className="text-ink-soft">{have} in stock</p>
-          {item && <p className="text-ink-soft">{item.refined ? `Refined from ${itemById(item.pair)?.name}` : `Refines into ${itemById(item.pair)?.name}`}</p>}
-        </div>
-      </div>
-      {have > 0 && price > 0 && (
-        <div className="mt-4">
-          <p className="mb-1.5 flex items-center gap-1 text-[12px] text-ink-soft">Sell for <LaurelIcon size={14} /> {price} each</p>
-          <div className="grid grid-cols-3 gap-2">
-            {[1, 10, have].filter((n, i, a) => n <= have && a.indexOf(n) === i).map((n) => (
-              <button key={n} type="button" onClick={() => void sellN(n)} className="min-h-11 rounded-sm bg-raised text-[13px] font-semibold">
-                {n === have && n > 1 ? `All ${n}` : `×${n}`} · {price * n}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      {error && <p className="mt-2 text-[13px] text-danger">{error}</p>}
-    </BottomSheet>
+    <div className="text-[14px]">
+      {item && <p>Grade {item.grade} · {item.refined ? 'refined' : 'raw'} · {EFFECT_LABEL[item.effect]}</p>}
+      {item && <p className="text-ink-soft">{item.refined ? `Refined from ${itemById(item.pair)?.name}` : `Refines into ${itemById(item.pair)?.name}`}</p>}
+      {gem && <p>Grade {gem.grade} Star Gem · feeds {gem.kind === 'sun' ? 'all eight' : gem.effects.map((e) => EFFECT_LABEL[e]).join(' + ')}</p>}
+      {shelf === 'gear' && <p>Grade {outputView(id).grade} gear · unbound</p>}
+    </div>
   )
 }

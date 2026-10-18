@@ -1,9 +1,8 @@
-import { BadRequestException, Body, ConflictException, Controller, Get, Inject, Put, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, ConflictException, Controller, Get, Inject, Put } from '@nestjs/common'
 import { parseSavePut, SaveParseError, type SaveEnvelope } from '@rpg/domain'
-import { AuthGuard, CurrentUid } from '../auth/auth.guard'
+import { CurrentUid } from '@luismlorenzana/uma-server/auth'
 import { RevisionConflict, SAVE_REPOSITORY, type SaveRepository } from './save.repository'
 
-@UseGuards(AuthGuard)
 @Controller('save')
 export class SaveController {
   constructor(@Inject(SAVE_REPOSITORY) private readonly saves: SaveRepository) {}

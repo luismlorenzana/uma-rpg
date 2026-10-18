@@ -5,13 +5,14 @@ Every screen and what you do there. The place list is generated from `packages/d
 
 ## Getting in
 
-The gates, in order (`apps/web/src/app/Root.tsx`):
+The gates, in order: uma-kit's `BootGates` (uma-platform P56, SD3) with this game's steps (`apps/web/src/app/Root.tsx`):
 1. Splash.
-2. "Sign in with Google" (Firebase).
-3. On first launch: pick a trainer name, then 20 Uma Tickets.
-4. The Hub.
+2. "Sign in with Google" (Firebase, through `uma-kit/auth`); after a failed redirect it says "Sign-in didn't finish".
+3. The boot: the device save, else the server's. If it fails, a retry.
+4. On first launch: pick a trainer name, then 20 Uma Tickets.
+5. The start page: the last Hub page viewed on this device, when the app opened at `/`.
 
-A global toast offers "Update ready · Restart" when a new build is out.
+The kit's toast offers "Update ready · Restart" when a new build is out.
 
 ## The Hub
 
@@ -156,7 +157,9 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - Seven sorts, grid or list. Opens on **Uma Level, highest first**; owned Umas stay before locked in either direction.
     Level ties use newest release, then name. These choices are remembered per device; H30 resets the old default once.
 - **An Uma's profile:**
-  - **Header:** Uma Level and EXP, a class chip, her Craft Level, and a Working or Party card.
+  - **Header** (the kit's `ProfileFrame`, SD3): her bust, rarity, name, title and Uma Level, a target toggle; then
+    her EXP, a class chip, her Craft Level, and a Working or Party card. A locked one shows Unlock, confirmed in the
+    kit's `UnlockConfirm` (Uma Tickets N → N − 1).
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
@@ -220,15 +223,16 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 
 ### Warehouse
 
-Shelf tabs:
-- Materials (by family), Star Gems and Gear;
-- a grade filter (G1–G10);
-- a stock sheet with Sell ×1, 10 or All.
+The kit's `ShelfView` (SD3) with this game's shelves:
+- Materials (family by family, raw then refined), Star Gems and Gear, as icons with counts;
+- grade chips: every grade, the highest of each line, or one grade;
+- a stock sheet with what it is, and Sell ×1, 10 or All for Laurels.
 
 ### Exchange
 
 - Your Laurels and ticket counts.
-- **Buy:** Speed Tickets, Sweep Tickets, and raw items of the grades your continents unlock.
+- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and raw items of the grades your continents
+  unlock. A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
 - **Manuals** (D102): pick an Uma, highest Uma Level first, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
   1,000 Gear or Class Marks into 1,000 EXP on it.
 
@@ -241,7 +245,7 @@ Shelf tabs:
 
 ### Account
 
-Reached from the account bar.
+Reached from the account bar. The kit's `AccountPage` (SD3) with this game's content:
 - Rename your trainer.
 - **Tier 1 wallet:** Uma Tickets, Uma Shards and Laurels.
 - **Appearance:** System, Light or Dark, kept on this device (D147).

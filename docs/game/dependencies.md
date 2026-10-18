@@ -25,12 +25,12 @@ are listed by hand below.
 
 **@rpg/web** (`apps/web/package.json`)
 
-- Runtime: `@luismlorenzana/uma-art` 2.9.0, `@luismlorenzana/uma-data` 1.0.0, `@luismlorenzana/uma-kit` 0.3.0, `@rpg/domain` workspace:*, `dexie` ^4.4.6, `firebase` ^12.19.0, `motion` ^12.43.0, `phaser` 4.2.1, `react` ^19.3.0, `react-dom` ^19.3.0, `react-router` ^7.18.3, `workbox-window` ^7.4.0, `zustand` ^5.0.15
+- Runtime: `@luismlorenzana/uma-art` 2.9.0, `@luismlorenzana/uma-data` 1.0.0, `@luismlorenzana/uma-kit` 0.7.0, `@rpg/domain` workspace:*, `dexie` ^4.4.6, `firebase` ^12.19.0, `motion` ^12.43.0, `phaser` 4.2.1, `react` ^19.3.0, `react-dom` ^19.3.0, `react-router` ^7.18.3, `workbox-window` ^7.4.0, `zustand` ^5.0.15
 - Dev: `@fontsource-variable/inter` ^5.3.0, `@fontsource-variable/outfit` ^5.3.0, `@tailwindcss/vite` ^4.3.3, `@testing-library/react` ^16.3.3, `@types/node` ^22.20.2, `@types/react` ^19.3.0, `@types/react-dom` ^19.3.0, `@vitejs/plugin-react` ^5.2.0, `fake-indexeddb` ^6.2.5, `jsdom` ^26.1.0, `tailwindcss` ^4.3.3, `typescript` ~5.9.3, `vite` ^7.3.6, `vite-plugin-pwa` ^1.3.0, `vitest` ^3.2.7
 
 **@rpg/api** (`apps/api/package.json`)
 
-- Runtime: `@google-cloud/storage` ^7.22.0, `@luismlorenzana/uma-data` 1.0.0, `@nestjs/common` ^11.2.4, `@nestjs/config` ^4.0.4, `@nestjs/core` ^11.2.4, `@nestjs/platform-express` ^11.2.4, `@rpg/domain` workspace:*, `firebase-admin` ^13.10.0, `google-auth-library` ^11.2.0, `reflect-metadata` ^0.2.2, `rxjs` ^7.8.2, `web-push` ^3.6.7
+- Runtime: `@google-cloud/storage` ^7.22.0, `@luismlorenzana/uma-data` 1.0.0, `@luismlorenzana/uma-server` 0.2.0, `@nestjs/common` ^11.2.4, `@nestjs/config` ^4.0.4, `@nestjs/core` ^11.2.4, `@nestjs/platform-express` ^11.2.4, `@rpg/domain` workspace:*, `firebase-admin` ^13.10.0, `google-auth-library` ^11.2.0, `reflect-metadata` ^0.2.2, `rxjs` ^7.8.2, `web-push` ^3.6.7
 - Dev: `@nestjs/cli` ^11.0.24, `@types/express` ^5.0.6, `@types/node` ^22.20.2, `@types/web-push` ^3.6.4, `typescript` ~5.9.3, `vitest` ^3.2.7
 
 **@rpg/domain** (`packages/domain/package.json`)

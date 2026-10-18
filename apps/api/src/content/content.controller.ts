@@ -1,13 +1,11 @@
-import { Controller, Get, Inject, NotFoundException, Param, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get, Inject, NotFoundException, Param, Res } from '@nestjs/common'
 import type { Response } from 'express'
-import { AuthGuard } from '../auth/auth.guard'
 import { contentTypeFor, type MasterSource } from '../master/master-source'
 import { contentCacheControl, safeContentPath } from './content-source'
 
 export const CONTENT_SOURCE = Symbol('CONTENT_SOURCE')
 
 // Serves uma-rpg's private content (the PriConne cast, D50) to the signed-in owner only.
-@UseGuards(AuthGuard)
 @Controller('content')
 export class ContentController {
   constructor(@Inject(CONTENT_SOURCE) private readonly source: MasterSource) {}

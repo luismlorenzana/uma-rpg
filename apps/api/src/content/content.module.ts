@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { AuthGuard } from '../auth/auth.guard'
 import { BucketMasterSource, type MasterSource } from '../master/master-source'
 import { DirectoryContentSource } from './content-source'
 import { CONTENT_SOURCE, ContentController } from './content.controller'
@@ -9,7 +8,6 @@ import { CONTENT_SOURCE, ContentController } from './content.controller'
 @Module({
   controllers: [ContentController],
   providers: [
-    AuthGuard,
     {
       provide: CONTENT_SOURCE,
       inject: [ConfigService],

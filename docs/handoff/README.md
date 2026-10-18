@@ -19,12 +19,10 @@
 | [SB4](tasks/SB4-rpg-album.md) | The Stable, six pickers and every small Uma on the kit album, with faces | Either | L | SB3 (SB1 for faces) | Waiting |
 | **Phase C: one work system** | | | | | |
 | [SC4](tasks/SC4-rpg-work-screens.md) | The Wilds on `uma-kit/work`'s screens | Either | M | SC2 (SC3 done) | Waiting |
-| **Phase D: places, profile and getting in** | | | | | |
-| [SD3](tasks/SD3-rpg-places.md) | Getting in, Account, Warehouse, Exchange and the profile frame on the kit; the API's guard from `uma-server` | Either | M | SD1, SD2 | Waiting |
 | **Phase E: platform plumbing** | | | | | |
 | [SE3](tasks/SE3-rpg-content.md) | Master data and art through `uma-kit/content` and `uma-server/content` | Either | S | SE2 | Waiting |
 
-**Ready now:** SB5. The rest wait on uma-platform's packets (SB1–SB3, SC1–SC2, SD1–SD2, SE2), which run in parallel
+**Ready now:** SB5. The rest wait on uma-platform's packets (SB1–SB3, SC2, SE2), which run in parallel
 there.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
@@ -33,14 +31,17 @@ there.
 - **Sibling apps so far:**
   - **Phase 0:** H30 (D146).
   - **Phase A:** uma-kit (D147–D150), and H31's art in uma-art 2.9.0 (D148).
+  - **Phase C:** SC3, work on uma-work (D152).
+  - **Phase D:** SD3, getting in and the places on uma-kit and uma-server (D153).
 
-  This game runs on uma-kit 0.3.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
+  This game runs on uma-kit 0.7.0, uma-work 0.1.0 and uma-server 0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done
 
 | Id | Task | Commit |
 |---|---|---|
 | SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | `6063b95` |
+| SD3 | Getting in, Account, Warehouse, Exchange and the profile frame on uma-kit 0.7.0; the API's guard from uma-server 0.2.0 (D153) | see `git log --grep SD3` |
 
 ## Archived on 2026-10-16 (D151)
 

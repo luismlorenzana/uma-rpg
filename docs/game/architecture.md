@@ -70,7 +70,9 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - Updates are prompted ("Update ready · Restart"), never forced mid-action.
   - The service worker precaches the app, Phaser included, and caches master data and enemy art by URL hash.
   - `push-sw.js` shows notifications and sets the app badge.
-- **Auth:** Firebase Google sign-in with a redirect. The ID token goes to the API as `Authorization: Bearer`.
+- **Getting in** (SD3): `uma-kit/auth`'s `AuthProvider` (Firebase Google sign-in with a redirect, loaded on demand,
+  with this game's config from `app/firebase-config.ts`) and `uma-kit/places`' `BootGates` and `UpdateNotice`. The ID
+  token goes to the API as `Authorization: Bearer`.
 - **Master data** (`master/master.ts`):
   - `@luismlorenzana/uma-data`'s release client reads through the API proxy (`/api/master/`).
   - It loads characters, outfits, scenarios and the art index once a session; skills load only when needed.
@@ -82,7 +84,9 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - the theme, light and dark under one set of names;
   - the primitives (icons, marks, sheets, tabs, buttons);
   - the shell (frame, top and bottom bars, menu, side panel, place header);
-  - the Hub map (terrain, scene, place buttons, pips, swipe).
+  - the Hub map (terrain, scene, place buttons, pips, swipe);
+  - since SD3, getting in (`/auth`) and the frames of the Account, the Warehouse, the Exchange and the profile
+    (`/places`), each filled with this game's content and words.
 
   uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
   the appearance and Motion. `hub/` holds this game's bars, plaza and Hub screen.
@@ -94,15 +98,16 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Endpoint | Guard | What |
 |---|---|---|
-| `GET /api/health` | none | `{ ok, build, uptime }` |
+| `GET /api/health` | none (`@Public()`) | `{ ok, build, uptime }` |
 | `GET /api/save` · `PUT /api/save` | auth | The save envelope `{ revision, save }`. A PUT carries `baseRevision`: 400 on a parse error, 409 with the current save when stale |
 | `GET /api/master/*` | auth | Master data release files, manifests and channels, from the bucket |
 | `GET /api/content/*` | auth | `enemies.json` and its allowlisted, hash-named `enemies/*.webp` images |
 | `GET /api/push/key` · `PUT`/`DELETE /api/push/subscription` · `POST /api/push/test` | auth | Web Push |
-| `POST /api/push/tick` | Cloud Scheduler OIDC | Sends "work done" pushes since the last tick |
+| `POST /api/push/tick` | Cloud Scheduler OIDC (`@Public()` to the shared guard) | Sends "work done" pushes since the last tick |
 
-- **Auth:** Firebase Admin verifies the token, and the email must equal `ALLOWED_EMAIL`, a one-player allowlist.
-  `AUTH_MODE=disabled` (local) acts as `local-dev`.
+- **Auth** (SD3): the shared guard from `@luismlorenzana/uma-server/auth` (uma-platform P54) guards every route.
+  Firebase Admin verifies the token (401 without one or with a bad one), and the email must equal `ALLOWED_EMAIL`, a
+  one-player allowlist (403 for anyone else). `AUTH_MODE=disabled` (local) acts as `local-dev`.
 - **Storage:**
   - Production uses Firestore: `saves/{uid}` is written in a transaction, and a schema bump first backs the old save up
     to `saveBackups/{uid}-v{n}`. `push/{uid}` holds push subscriptions.
