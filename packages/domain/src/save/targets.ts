@@ -1,4 +1,4 @@
-// Targets (D100, D126, D144; docs/design/gear-and-targets.md §2): up to five Umas the facilities plan for. For each,
+// Targets (D100, D126, D144; docs/design/gear-and-targets.md §2): up to ten Umas the facilities plan for. For each,
 // everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the Star Gem of every
 // Extra Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top
 // level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones.
@@ -14,7 +14,7 @@ import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
-/** Marks or unmarks an owned Uma as a target, five at most. */
+/** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (!world.umas[outfitId]) throw new SaveRuleError('not-owned', 'only owned Umas can be targets')

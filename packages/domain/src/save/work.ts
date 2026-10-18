@@ -122,6 +122,13 @@ export function inputsBlock(world: TierWorld, inputs: Record<string, number>, co
   return null
 }
 
+/** Free workers at this time. Settle once for the whole album; finished work frees its Uma (D119). */
+export function availableWorkers(world: TierWorld, now: string): ReadonlySet<string> {
+  const ms = msOf(now)
+  const settled = settle(world, ms, env).state
+  return new Set(Object.keys(world.umas).filter(id => statusOf(settled.work[id], ms) !== 'working'))
+}
+
 /** Why this Uma can't take a job now, or null: she works one job at a time; a finished one is collected as she starts.
  * Fighting doesn't stop her (D119). */
 export function availabilityBlock(world: TierWorld, outfitId: string, now: string): string | null {

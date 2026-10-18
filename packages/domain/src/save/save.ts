@@ -37,7 +37,7 @@ import { migrateWorld } from './migrations'
 
 export const SAVE_SCHEMA_VERSION = 22
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
-export const MAX_TARGETS = 5
+export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'

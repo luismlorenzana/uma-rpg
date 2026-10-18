@@ -88,7 +88,7 @@ Queued Forge jobs re-cost to the new recipe. Running ones keep what they already
 
 ### 2.1 What the owner expects
 
-Flag an Uma, and:
+Flag up to ten Umas total (owner, 2026-10-17), and:
 - **The Forge** lists every piece she still needs on every track she uses, all the way to grade 10:
   - her class's five weapons;
   - her five armor slots' kinds;

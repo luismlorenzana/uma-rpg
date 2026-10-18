@@ -95,7 +95,7 @@
     "docs:update": "UPDATE_DOCS=1 vitest run src/docs"
   },
   "dependencies": {
-    "@luismlorenzana/uma-data": "1.0.0",
+    "@luismlorenzana/uma-data": "1.1.0",
     "@luismlorenzana/uma-work": "0.1.0"
   },
   "devDependencies": {

@@ -11,7 +11,10 @@ import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { nodeLabel, nodeValue, PLANET_COLOR, PLANET_SHORT } from '../../items/planets'
-import { AtlasSprite } from '../../master/art'
+import { FaceTile } from '@luismlorenzana/uma-kit/album'
+import { workOrder } from '@luismlorenzana/uma-kit/roster'
+import { PickerStep } from '../../album/PickerStep'
+import { albumRows, lockedReason } from '../../album/rows'
 import type { MasterView } from '../../master/master'
 import { collect, collectEverything, cutTime, dismissWork, queueWork, recall, repeatWork, restartWork, startWork, unqueueWork, upgrade, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
@@ -163,7 +166,7 @@ function StoppedCard({ view, queue, onRestart, onDismiss }: { view: MasterView; 
   return (
     <div className="rounded-md border border-hairline-strong p-3">
       <div className="flex items-center gap-3">
-        <AtlasSprite art={view.art} family="outfit-icons" frameKey={queue.outfitId} size={36} />
+        <span className="w-9 shrink-0"><FaceTile outfitId={queue.outfitId} size={36} label={outfit?.name ?? 'Uma'} round /></span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-semibold">{outfit?.name ?? queue.outfitId} · queue stopped</p>
           <p className="truncate text-[12px] text-ink-soft">{outputView(first.item).name} ×{first.count}{queue.requests.length > 1 ? ` +${queue.requests.length - 1}` : ''} · {queue.why}</p>
@@ -190,7 +193,7 @@ function JobCard({ view, job, now, placeId, timeTickets, onCollect, onRepeat, on
   return (
     <div className="rounded-md bg-raised p-3">
       <div className="flex items-center gap-3">
-        <AtlasSprite art={view.art} family="outfit-icons" frameKey={job.outfitId} size={44} />
+        <span className="w-11 shrink-0"><FaceTile outfitId={job.outfitId} size={44} label={outfit?.name ?? 'Uma'} round /></span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14px] font-semibold">{outfit?.name ?? job.outfitId}</p>
           <p className="flex items-center gap-1 text-[12px] text-ink-soft">
@@ -238,10 +241,6 @@ function AssignSheet({ view, world, now, placeId, fixed, want = null, wanted, on
   const [output, setOutput] = useState<string | null>(null)
   const [count, setCount] = useState(1)
   const [error, setError] = useState<string | null>(null)
-  // Free Umas first, then the highest level here (it sets her speed, D139), then the most EXP into it.
-  const owned = view.roster.filter((o) => world.umas[o.outfitId])
-    .map((o) => ({ o, block: availabilityBlock(world, o.outfitId, now), prof: world.umas[o.outfitId]!.craft }))
-    .sort((a, b) => Number(!!a.block) - Number(!!b.block) || b.prof.level - a.prof.level || b.prof.exp - a.prof.exp || a.o.name.localeCompare(b.o.name))
   const options = outfit
     ? spec.kind === 'gather' ? familyById(spec.family!)!.raw.map((i) => i.id) : ITEM_FAMILIES.flatMap((f) => f.refined.map((i) => i.id))
     : []
@@ -256,6 +255,13 @@ function AssignSheet({ view, world, now, placeId, fixed, want = null, wanted, on
   // Refining comes in batches of ×1, ×4, ×8, ×20 and ×40 (D139); the rest makes 1–10.
   const sizes: readonly number[] = spec.kind === 'refine' ? REFINE_BATCHES : [1, 2, 3, 5, 10]
   const title = !outfit ? 'Who works here?' : !output ? (queueing ? 'Queue: what next?' : 'What does she make?') : 'How many?'
+  if (!outfit) return <PickerStep title="Who works here?" rows={albumRows(view, world, [], now)} order={workOrder}
+    words={{ level: 'Craft Level' }} disabled={row => lockedReason(row) ?? availabilityBlock(world, row.id, now)}
+    describe={row => row.uma ? `Craft Level ${row.workLevel} · ${formatDuration(eachMs(row.workLevel ?? 1))} each` : 'Locked'}
+    onClose={onClose} onPick={id => {
+      setOutfit(view.roster.find(o => o.outfitId === id)!)
+      if (want) { setOutput(want); setCount(Math.min(most, wanted?.get(want) ?? 1)) }
+    }} />
   return (
     <BottomSheet title={title} onClose={onClose} footer={outfit && output && plan ? (
       <button type="button" disabled={!!plan.block} onClick={() => {
@@ -265,28 +271,6 @@ function AssignSheet({ view, world, now, placeId, fixed, want = null, wanted, on
         {plan.block ?? `${queueing ? 'Queue' : 'Start'} · ${formatDuration(plan.itemMs * Math.min(count, max))}`}
       </button>
     ) : undefined}>
-      {!outfit && (
-        <ul className="space-y-1.5">
-          {owned.length === 0 && <li className="text-[14px] text-ink-soft">Unlock Umas at the Stable first.</li>}
-          {owned.map(({ o, block, prof }) => {
-            return (
-              <li key={o.outfitId}>
-                <button type="button" disabled={!!block} onClick={() => { setOutfit(o); if (want) { setOutput(want); setCount(Math.min(most, wanted?.get(want) ?? 1)) } }} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left disabled:opacity-45">
-                  <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-semibold">{o.name}</span>
-                    <span className="block text-[12px] text-ink-soft">{block ?? `${formatDuration(eachMs(prof.level))} each at her level`}</span>
-                  </span>
-                  <span className="shrink-0 text-center leading-none">
-                    <span className="block font-display text-[20px] font-bold">{prof.level}</span>
-                    <span className="block text-[10px] text-ink-faint">{CRAFT_SHORT} Lv</span>
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      )}
       {outfit && !output && spec.kind === 'craft' && (
         <CraftPicker world={world} level={world.umas[outfit.outfitId]!.craft.level} queueing={queueing} onPick={(id) => { setOutput(id); setCount(1) }} />
       )}
@@ -514,6 +498,7 @@ export function FacilityPeek({ place }: PeekProps) {
           <li key={i} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-[13px]">
             {job ? (
               <>
+                <span className="w-7 shrink-0"><FaceTile outfitId={job.outfitId} size={28} label="Worker" round /></span>
                 <ItemIcon id={outputView(job.output).icon} size={24} />
                 <span className="min-w-0 flex-1 truncate">{outputView(job.output).name} {job.finished}/{job.count}{job.queue.length > 0 ? ` +${job.queue.length}` : ''}</span>
                 <span className="text-ink-soft">{job.done ? 'Done' : formatDuration(job.endsAt - Date.parse(now))}</span>

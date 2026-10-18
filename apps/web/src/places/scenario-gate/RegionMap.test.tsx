@@ -1,3 +1,4 @@
+import { outfitRowBase } from '@luismlorenzana/uma-kit/roster'
 import { buildMemoryRelease, syntheticMasterData } from '@luismlorenzana/uma-data/testing'
 import { buildChapters, buildRoster, newSave, placeById, setPartySlot, startFight, unlockUma, useSpring, worldOf } from '@rpg/domain'
 import { act } from 'react'
@@ -33,7 +34,7 @@ async function fixture() {
     franchise: 'priconne', tier: tiers[i % 4]!, face: { path: `enemies/c${i}-face.00000000.webp`, width: 32, height: 32 },
     art: { path: `enemies/c${i}-art.00000000.webp`, width: 32, height: 48 } }))
   const cast: Cast = { members, byId: new Map(members.map((m) => [m.id, m])) }
-  const campaign = buildCampaign({ manifest: release.manifest, roster: buildRoster(data), chapters: buildChapters(data.scenarios), art: null }, cast)
+  const campaign = buildCampaign({ manifest: release.manifest, roster: buildRoster(data), album: new Map(data.outfits.map(o => [String(o.id), outfitRowBase(o, data.characters.find(c => c.id === o.characterId))])), chapters: buildChapters(data.scenarios), art: null }, cast)
   const id = String(data.outfits[0]!.id)
   save = newSave('Test', NOW)
   data.outfits.forEach((o, i) => { save = setPartySlot(unlockUma(save, String(o.id), NOW), 0, i, String(o.id), NOW) })

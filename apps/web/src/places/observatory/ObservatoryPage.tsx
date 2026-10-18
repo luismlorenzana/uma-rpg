@@ -1,13 +1,16 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, byUmaLevel, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
+  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { nodeLabel, nodeValue, PLANET_COLOR as COLOR, PLANET_SHORT as SHORT, pointText } from '../../items/planets'
-import { AtlasSprite } from '../../master/art'
+import { FaceTile } from '@luismlorenzana/uma-kit/album'
+import { byLevel, formatLevel } from '@luismlorenzana/uma-kit/roster'
+import { albumRows, lockedReason } from '../../album/rows'
+import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
 import { activate, setStarGem, useWorld } from '../../save/game'
 import { MasterGate } from '../MasterGate'
@@ -19,12 +22,13 @@ export default function ObservatoryPage({ rest }: PageProps) {
 
 function Observatory({ view, initial }: { view: MasterView; initial: string | null }) {
   const world = useWorld()
-  const owned = view.roster.filter((o) => world?.umas[o.outfitId])
-    .map(outfit => ({ outfit, owned: world!.umas[outfit.outfitId]! })).sort(byUmaLevel).map(e => e.outfit)
+  const rows = albumRows(view, world)
+  const owned = rows.filter(row => row.uma).sort(byLevel)
+  const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<string | null>(initial)
   const [message, setMessage] = useState<string | null>(null)
   if (!world) return null
-  const id = picked && world.umas[picked] ? picked : owned[0]?.outfitId ?? null
+  const id = picked && world.umas[picked] ? picked : owned[0]?.id ?? null
   if (!id) return <p className="p-4 text-ink-soft">Unlock an Uma first.</p>
   const uma = world.umas[id]!
   const slots = activeNodeSlots(uma.level)
@@ -44,16 +48,15 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
   const settable = Object.entries(world.gems).filter(([g]) => nodeFromGem(uma, g))
   return (
     <div className="space-y-3 p-3">
-      <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1" role="tablist" aria-label="Uma">
-        {owned.map((o) => (
-          <button key={o.outfitId} type="button" role="tab" aria-selected={o.outfitId === id} onClick={() => setPicked(o.outfitId)}
-            className={`shrink-0 rounded-md p-0.5 ${o.outfitId === id ? 'ring-2 ring-accent' : 'opacity-70'}`} aria-label={o.name}>
-            <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={44} />
-          </button>
-        ))}
-      </div>
+      <button type="button" onClick={() => setPicking(true)} aria-label="Choose an Uma" className="flex min-h-12 items-center gap-3 rounded-md bg-raised p-2">
+        <span className="w-11"><FaceTile outfitId={id} size={44} label={owned.find(row => row.id === id)?.name ?? 'Uma'} round /></span>
+        <span>Choose an Uma</span>
+      </button>
+      {picking && <PickerStep title="Observatory Uma" rows={rows} disabled={lockedReason}
+        describe={row => `${formatLevel(row.level)} · ${row.base.title ?? ''}`}
+        onClose={() => setPicking(false)} onPick={id => { setPicked(id); setPicking(false) }} />}
       <div className="flex items-baseline justify-between">
-        <h2 className="truncate font-display text-lg font-bold">{owned.find((o) => o.outfitId === id)?.name}</h2>
+        <h2 className="truncate font-display text-lg font-bold">{owned.find(o => o.id === id)?.name}</h2>
         <span className="shrink-0 text-[13px] text-ink-soft">Active {uma.stars.active.length}/{slots} · {uma.stars.unlocked.length}/100 open</span>
       </div>
       <StarMap uma={uma} onToggle={toggle} />

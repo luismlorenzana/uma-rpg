@@ -8,11 +8,9 @@ import {
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
 import { useReducedMotionSetting } from '@luismlorenzana/uma-kit/ui'
-import type { ArtIndex } from '@luismlorenzana/uma-data'
+import { FaceTile } from '@luismlorenzana/uma-kit/album'
 import { Suspense, useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
-import { AtlasSprite } from '../master/art'
-import { useMaster } from '../master/master'
 import { PlacePage } from '../places/PlacePage'
 import { PlacePreview } from '../places/PlacePreview'
 import { PLACE_UI } from '../places/registry'
@@ -53,9 +51,9 @@ export function PlaceRoute() {
 }
 
 /** A place's slot pips: workers' faces ringed by their job's progress, a hall's four Heroes, or free dots. */
-function pipsOf(place: Place, world: TierWorld | null, now: string, art: ArtIndex | null): PipModel[] | undefined {
+function pipsOf(place: Place, world: TierWorld | null, now: string): PipModel[] | undefined {
   if (place.slots === 0 || !isOpen(place, CURRENT_SLICE)) return undefined
-  const face = (outfitId: string) => <AtlasSprite art={art} family="outfit-icons" frameKey={outfitId} size={16} className="rounded-full" />
+  const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={16} label="Assigned Uma" round />
   const hall = hallClass(place.id)
   if (hall && world) {
     return HERO_LIMIT_IDS.filter((id) => heroLimitClass(id) === hall).map((id): PipModel => {
@@ -97,8 +95,6 @@ function CollectAll({ world, now }: { world: TierWorld | null; now: string }) {
 function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const world = useWorld()
   const now = useNow(15_000)
-  const master = useMaster()
-  const art = master.status === 'ready' ? master.view.art : null
   const [params] = useSearchParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -119,7 +115,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
       label: !open ? `${place.name}, not open yet` : isReady ? `${place.name}, ready to collect` : place.name,
       ready: isReady ? 'Ready' : undefined,
       locked: !open,
-      pips: pipsOf(place, world, now, art),
+      pips: pipsOf(place, world, now),
     }
   })
   const covered = peek !== undefined || params.get('sheet') !== null

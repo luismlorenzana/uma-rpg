@@ -131,8 +131,9 @@ Lapidary:
   - a queue of up to three.
 - **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
   **Dismiss**.
-- **Assigning:** pick an Uma (free ones first, then the highest level here and its EXP; the level and her time per
-  item show on the right), then what to make, then how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
+- **Assigning:** the shared Uma picker opens free Umas first, then highest Craft Level, Uma Level, newest release and
+  name. Each shows her Craft Level and time per item; locked Umas and workers show why they can't start. Fighting
+  does not block work (D119). Then pick what to make and how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
 - **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
   Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
   type with no materials in stock is dimmed.
@@ -145,6 +146,10 @@ Each shows its four seats: the seat's Limit Break with its kinds, its Hero large
 their Bond Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty the seat, `+` to add a Learner, and a
 Learner to see her Bond or send her away. The Observatory stands below the halls. See [Halls of Heroes](heroes.md).
 
+Hero and Learner choices use the shared Uma picker, highest Uma Level first, then newest release and name. Ineligible
+Umas remain visible with their reason: locked, already seated, already a Hero or Learner, or a seat/parent limit.
+Small seats and Learners use faces; the large Hero portrait uses a bust. Eligibility and Bonds still come from the RPG.
+
 ## Town
 
 ### Stable
@@ -153,9 +158,15 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 
 - **Roster:**
   - All, Owned and Locked tabs, with counts.
-  - Search, and a Filters sheet: rarity; surface, distance or style A+; sex; New 24h; Free now.
-  - Seven sorts, grid or list. Opens on **Uma Level, highest first**; owned Umas stay before locked in either direction.
-    Level ties use newest release, then name. These choices are remembered per device; H30 resets the old default once.
+  - Shared album views: **five columns of faces** by default, three columns of bust cards, or a one-column list.
+  - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class.
+  - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
+    Class Rank. Owned Umas stay before locked in either direction. Level ties use newest release, then name.
+  - Corner badges: class top left, working top right and target bottom left.
+  - Device preferences remember the query and view, plus up to **20 saved views**. The old Stable view and sort move
+    over once, then their v2 key is removed. Nothing is added to the game save.
+  - **New** means an outfit added since this device's first album visit, not seen yet. Opening its profile clears
+    the badge; today's catalogue is marked seen on the first visit.
 - **An Uma's profile:**
   - **Header** (the kit's `ProfileFrame`, SD3): her bust, rarity, name, title and Uma Level, a target toggle; then
     her EXP, a class chip, her Craft Level, and a Working or Party card. A locked one shows Unlock, confirmed in the
@@ -167,7 +178,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
       Accessory Rank cells;
     - Work;
     - Racing.
-  - **Mark target** (D100): up to five Umas; a target shows a crosshair in the Stable grid.
+  - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
   - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
     - **Offense:** ATK, M.ATK, each weapon's Might, Orbs;
     - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
@@ -189,7 +200,10 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 
 Routes: `/town/party-hall` and `:n` (1–20).
 - The list shows 20 parties of five. Working members fight like the rest (D119).
-- **The editor:** rename the party, or tap a slot to pick an Uma, highest Uma Level first (newest release, then name for ties).
+- **The editor:** rename the party, or tap a slot for the shared Uma picker, highest Uma Level first (newest release,
+  then name for ties). Locked Umas, current members and Umas in an open fight show a disabled reason. A member of
+  another party remains selectable and moves here (D46). Working does not stop her fighting (D119).
+- Party slots show round outfit faces.
 - **A filled slot:** Swap, View profile, Recall from her job, Remove.
 
 ### Scenario Gate
@@ -197,7 +211,9 @@ Routes: `/town/party-hall` and `:n` (1–20).
 Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent` and `fight`. The world map ([maps](maps.md)).
 
 - **On every screen:**
-  - the **active party bar**: swap the party, see each Uma's MP;
+  - the **active party bar**: swap the whole party through the shared picker, see each Uma's face and MP. A party
+    uses its highest-level member's face and level for ordering; partial parties stay selectable, empty ones stay
+    hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party Hall;
   - **Resume the open fight**, when there is one.
 - **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.
   The maps climb from low levels at the bottom, opening at the frontier. Biome icons also appear in the lists.
@@ -233,12 +249,14 @@ The kit's `ShelfView` (SD3) with this game's shelves:
 - Your Laurels and ticket counts.
 - **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and raw items of the grades your continents
   unlock. A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
-- **Manuals** (D102): pick an Uma, highest Uma Level first, then one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
+- **Manuals** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working Umas
+  remain selectable. Then pick one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
   1,000 Gear or Class Marks into 1,000 EXP on it.
 
 ### Observatory
 
-- Uma tabs, highest Uma Level first (newest release, then name for ties). Opens on the Uma named in its route, else the highest.
+- A face and Choose an Uma open the shared picker, highest Uma Level first (newest release, then name for ties),
+  with locked Umas disabled. Opens on the Uma named in its route, else the highest; working Umas remain selectable.
 - Her Sun-and-planets map: tap a node to switch it on or off, up to her active limit. A locked node names the Star Gem
   that opens it.
 - Effect totals, and a **Set** list of the Star Gems she can set now ([loops](loops.md#extra-stats-and-gear)).

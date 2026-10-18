@@ -1,4 +1,5 @@
-import { AtlasSprite } from '../../master/art'
+import { AlbumGrid } from '@luismlorenzana/uma-kit/album'
+import { albumRows } from '../../album/rows'
 import { useWorld } from '../../save/game'
 import { MasterGate } from '../MasterGate'
 import { TicketIcon } from '../../ui/icons'
@@ -9,7 +10,9 @@ export default function StablePeek() {
   const owned = Object.entries(world?.umas ?? {}).sort(([, a], [, b]) => b.unlockedAt.localeCompare(a.unlockedAt))
   return (
     <MasterGate>
-      {(view) => (
+      {(view) => {
+        const rows = new Map(albumRows(view, world).map(row => [row.id, row]))
+        return (
         <div className="space-y-4 p-4">
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md bg-raised p-3">
@@ -28,15 +31,12 @@ export default function StablePeek() {
           {owned.length > 0 && (
             <section>
               <h3 className="text-micro mb-2">Latest unlocks</h3>
-              <div className="flex gap-2">
-                {owned.slice(0, 4).map(([id]) => (
-                  <AtlasSprite key={id} art={view.art} family="outfit-icons" frameKey={id} size={56} />
-                ))}
-              </div>
+              <AlbumGrid view="icons" rows={owned.slice(0, 4).flatMap(([id]) => rows.has(id) ? [rows.get(id)!] : [])} />
             </section>
           )}
         </div>
-      )}
+        )
+      }}
     </MasterGate>
   )
 }

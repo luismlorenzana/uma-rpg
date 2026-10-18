@@ -3,11 +3,14 @@
 // 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most.
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, hallClass, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds, heroLimitsOf, learnerBlock,
-  LEARNER_MAX_PARENTS, parentsOf, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId, type RosterOutfit, type TierWorld,
+  LEARNER_MAX_PARENTS, parentsOf, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { Bar, CLASS_LABEL, KindMark } from '../../battle/labels'
-import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
+import { FaceTile, UmaBust } from '@luismlorenzana/uma-kit/album'
+import { formatLevel } from '@luismlorenzana/uma-kit/roster'
+import { albumRows, lockedReason } from '../../album/rows'
+import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
 import { addLearner, appointHero, removeLearner, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
@@ -22,14 +25,6 @@ export default function HallPage({ place }: PageProps) {
 /** A Limit Break's kinds as tiny icons. */
 export function LimitKinds({ limit, size = 14 }: { limit: HeroLimit; size?: number }) {
   return <span className="flex flex-wrap items-center gap-1">{heroLimitKinds(limit).map((k) => <KindMark key={k} kind={k} size={size} />)}</span>
-}
-
-/** A Hero's bust, cropped to her head and shoulders; her round icon until it loads. */
-function HeroPortrait({ view, outfitId }: { view: MasterView; outfitId: string }) {
-  const bust = useArtUrl(imagePath(view.art, 'outfit-busts', outfitId) ?? imagePath(view.art, 'outfit-portraits', outfitId))
-  return bust
-    ? <img src={bust} alt="" className="size-full object-cover object-top" />
-    : <span className="flex size-full items-center justify-center"><AtlasSprite art={view.art} family="outfit-icons" frameKey={outfitId} size={64} /></span>
 }
 
 type Pick = { seat: HeroLimitId; role: 'hero' | 'learner' }
@@ -75,7 +70,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
               <button type="button" onClick={() => (seat ? setHeroOpen(limit.id) : setPick({ seat: limit.id, role: 'hero' }))}
                 aria-label={seat ? `Hero: ${hero?.name ?? seat.hero}` : 'Choose a Hero'}
                 className={`h-24 w-20 shrink-0 overflow-hidden rounded-sm ${seat ? 'bg-panel ring-2 ring-[#ffd84d]/70' : 'border border-dashed border-hairline-strong'}`}>
-                {seat ? <HeroPortrait view={view} outfitId={seat.hero} /> : <span className="flex size-full flex-col items-center justify-center text-ink-faint"><span className="text-2xl">+</span><span className="text-[11px]">Hero</span></span>}
+                {seat ? <UmaBust outfitId={seat.hero} size={80} label={hero?.name ?? 'Hero'} className="size-full" /> : <span className="flex size-full flex-col items-center justify-center text-ink-faint"><span className="text-2xl">+</span><span className="text-[11px]">Hero</span></span>}
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-micro">Seat {i + 1} · Limit Break</p>
@@ -95,7 +90,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
                       <li key={id}>
                         <button type="button" onClick={() => setLearner({ seat: limit.id, outfitId: id })} aria-label={`${outfit(id)?.name ?? id}, Bond ${bond.level}`}
                           className="flex w-full flex-col items-center rounded-sm bg-panel px-0.5 pb-1 pt-1">
-                          <AtlasSprite art={view.art} family="outfit-icons" frameKey={id} size={40} />
+                          <span className="w-10"><FaceTile outfitId={id} size={40} label={outfit(id)?.name ?? 'Learner'} round /></span>
                           <span className="mt-0.5 text-[10.5px] font-semibold leading-3">Bond {bond.level}</span>
                           <Bar className="mt-0.5 h-1 w-10" value={bond.level >= BOND_MAX_LEVEL ? 1 : bond.exp} max={bond.level >= BOND_MAX_LEVEL ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
                         </button>
@@ -116,7 +111,13 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
       })}
 
       {pick && (
-        <UmaPicker view={view} world={world} pick={pick} onClose={() => setPick(null)}
+        <PickerStep rows={albumRows(view, world)} title={`${pick.role === 'hero' ? 'Hero' : 'Learner'} for ${heroLimit(pick.seat).name}`}
+          disabled={row => lockedReason(row)
+            ?? (world.heroes[pick.seat]?.hero === row.id ? 'Already seated here' : null)
+            ?? (pick.role === 'hero' ? heroBlock(world, pick.seat, row.id) : learnerBlock(world, pick.seat, row.id))}
+          describe={row => `${formatLevel(row.level)} · ${row.classId ? CLASS_LABEL[row.classId] : row.base.title ?? ''}`}
+          renderChips={row => row.uma && pick.role === 'learner' ? <span className="text-[10px] text-ink-soft">Bond {bondOf(row.uma, pick.seat).level} · {parentsOf(world, row.id).length}/{LEARNER_MAX_PARENTS} Heroes</span> : undefined}
+          onClose={() => setPick(null)}
           onPick={(id) => run(() => (pick.role === 'hero' ? appointHero(pick.seat, id) : addLearner(pick.seat, id)), () => { setPick(null); setHeroOpen(null) })} />
       )}
 
@@ -152,7 +153,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
           <BottomSheet title={outfit(learner.outfitId)?.name ?? learner.outfitId} onClose={() => setLearner(null)}>
             <div className="space-y-2.5">
               <div className="flex items-center gap-3">
-                <AtlasSprite art={view.art} family="outfit-icons" frameKey={learner.outfitId} size={48} />
+                <span className="w-12 shrink-0"><FaceTile outfitId={learner.outfitId} size={48} label={outfit(learner.outfitId)?.name ?? 'Learner'} round /></span>
                 <div className="min-w-0 flex-1 text-[13px]">
                   <p className="font-semibold">Bond {bond.level}/{BOND_MAX_LEVEL} · {Math.round(bondCapacity(bond.level) * 100)}% strength</p>
                   <Bar className="mt-1" value={bond.level >= BOND_MAX_LEVEL ? 1 : bond.exp} max={bond.level >= BOND_MAX_LEVEL ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
@@ -170,47 +171,6 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
   )
 }
 
-/** Owned Umas who may take the seat: never a Hero elsewhere; a Learner never one with two Heroes already. Highest level first. */
-function UmaPicker({ view, world, pick, onClose, onPick }: { view: MasterView; world: TierWorld; pick: Pick; onClose: () => void; onPick: (id: string) => void }) {
-  const [query, setQuery] = useState('')
-  const q = query.trim().toLowerCase()
-  const block = (id: string) => (pick.role === 'hero' ? heroBlock(world, pick.seat, id) : learnerBlock(world, pick.seat, id))
-  const rows = view.roster
-    .filter((o: RosterOutfit) => world.umas[o.outfitId] && world.heroes[pick.seat]?.hero !== o.outfitId && !block(o.outfitId))
-    .filter((o) => !q || o.name.toLowerCase().includes(q) || (o.title ?? '').toLowerCase().includes(q))
-    .map((o) => ({ o, uma: world.umas[o.outfitId]! }))
-    .sort((a, b) => b.uma.level - a.uma.level || a.o.name.localeCompare(b.o.name))
-  return (
-    <BottomSheet title={pick.role === 'hero' ? `Hero for ${heroLimit(pick.seat).name}` : `Learner for ${heroLimit(pick.seat).name}`} onClose={onClose}>
-      <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name" aria-label="Search by name"
-        className="mb-2 min-h-11 w-full rounded-sm bg-sunken px-3 text-[14px]" />
-      <ul className="space-y-1.5">
-        {rows.length === 0 && <li className="text-[14px] text-ink-soft">Nobody can take this seat.</li>}
-        {rows.map(({ o, uma }) => {
-          const parents = parentsOf(world, o.outfitId)
-          const bond = bondOf(uma, pick.seat)
-          return (
-            <li key={o.outfitId}>
-              <button type="button" onClick={() => onPick(o.outfitId)} className="flex w-full items-center gap-3 rounded-sm bg-raised p-2 text-left">
-                <AtlasSprite art={view.art} family="outfit-icons" frameKey={o.outfitId} size={40} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[14px] font-semibold">{o.name}</span>
-                  <span className="block truncate text-[12px] text-ink-soft">
-                    Lv {uma.level}{uma.classId ? ` · ${CLASS_LABEL[uma.classId]}` : ''}
-                    {pick.role === 'learner' && parents.length ? ` · learns under ${heroLimit(parents[0]!).name}` : ''}
-                    {pick.role === 'learner' && (bond.level || bond.exp) ? ` · Bond ${bond.level} here` : ''}
-                  </span>
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-      <p className="mt-2 text-[11px] text-ink-faint">{pick.role === 'hero' ? 'Hidden: Heroes of other seats, and Learners.' : `Hidden: Heroes, and Learners who have ${LEARNER_MAX_PARENTS} Heroes.`}</p>
-    </BottomSheet>
-  )
-}
-
 export function HallPeek({ place }: PeekProps) {
   const world = useWorld()
   const classId = hallClass(place.id)
@@ -223,7 +183,7 @@ export function HallPeek({ place }: PeekProps) {
             const seat = world.heroes[limit.id]
             return (
               <div key={limit.id} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-[13px]">
-                {seat ? <AtlasSprite art={view.art} family="outfit-icons" frameKey={seat.hero} size={28} /> : <span className="size-7 rounded-full border border-dashed border-hairline-strong" />}
+                {seat ? <span className="w-7 shrink-0"><FaceTile outfitId={seat.hero} size={28} label={view.roster.find(o => o.outfitId === seat.hero)?.name ?? 'Hero'} round /></span> : <span className="size-7 rounded-full border border-dashed border-hairline-strong" />}
                 <span className="min-w-0 flex-1 truncate font-semibold">{limit.name}</span>
                 <span className="text-ink-soft">{seat ? `${seat.learners.length}/${HERO_MAX_LEARNERS}` : 'Open'}</span>
               </div>
