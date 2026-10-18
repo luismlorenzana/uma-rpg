@@ -41,7 +41,7 @@ there.
 | Id | Task | Commit |
 |---|---|---|
 | SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | `6063b95` |
-| SD3 | Getting in, Account, Warehouse, Exchange and the profile frame on uma-kit 0.7.0; the API's guard from uma-server 0.2.0 (D153) | see `git log --grep SD3` |
+| SD3 | Getting in, Account, Warehouse, Exchange and the profile frame on uma-kit 0.7.0; the API's guard from uma-server 0.2.0 (D153) | `3ea66a4` |
 
 ## Archived on 2026-10-16 (D151)
 
