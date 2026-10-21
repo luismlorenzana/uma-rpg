@@ -1,6 +1,10 @@
 # Classes v2: six classes, clear damage identities, accessories that specialize
 
-> **Proposal, 2026-10-21, for the owner to decide.**
+> **Approved 2026-10-21 (D160), with three owner changes; not built yet.** The changes:
+> - the Summoner is the Spell Blade's mirror (§3.2);
+> - the one healer in a party heals and shields at twice today's shares (§3.3);
+> - accessories are one damage slot and one support slot, with flat Orbs (§6).
+>
 > - The second of three linked docs, with [tiers](tiers.md) and [the Rift](rift.md).
 > - It's a combat change: a new engine version (v14), checked with the balance simulation before it ships. Fights from
 >   v6–v13 replay as they were.
@@ -89,30 +93,37 @@ Damage is shown as physical / magical, in percent.
 
 **Her Limit Breaks** (the Spell Blade Salle) become multi-hit too: §5.
 
-### 3.2 Summoner: no support, 70/30 magic, areas
+### 3.2 Summoner: the Spell Blade's mirror (owner, 2026-10-21)
 
-**Every support effect leaves her summon lines:**
-- Light's mend and its regen;
-- Blizzard's Barrier;
-- Dark's drain;
-- Greatsword's Aegis;
-- Axe's Enfeeble;
-- Lance's revive.
+The Summoner is the Spell Blade turned inside out: same turn, same numbers, the other channel leading, and the area
+identity where the Spell Blade has multi-hit. They balance as a pair.
 
-They move to the Paladin and the Cleric (§4.3).
+| | Spell Blade | Summoner |
+|---|---|---|
+| Slots | 3 Arms + 2 Tomes | 3 Tomes + 2 Arms |
+| Armor | Physical | Magical |
+| An act | A pair: **Arms half ×0.63** + **Tome half ×0.27** | A pair: **Tome summon ×0.63** + **Arms summon ×0.27** |
+| MP | The halves' sum, ×0.5 a half | The same |
+| Split | 70% physical / 30% magical | 70% magical / 30% physical |
+| Stat leans | ATK ×1.1, M.ATK ×0.95 | M.ATK ×1.1, ATK ×0.95 |
+| Identity | **Multi-hit:** her Arms half lands as two hits on its foe (3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded) when her next pair comes |
+| Limit Break power | 2.2× | 2.2× |
+| Her hall's Limit Breaks | Multi-hit | Areas |
+| Support | None | **None** |
 
-**Every line now strikes.** Each summon's arrival hit keeps its weapon's shape: Fire one foe, Blizzard every foe, and
-so on.
+**The Summoner loses all support.** Light's mend, Blizzard's Barrier, Dark's drain, Greatsword's Aegis, Axe's
+Enfeeble and Lance's revive leave her lines, and move to the Paladin and the Cleric (§4). Every line now strikes. Its
+summons keep their weapon's shape on arrival.
 
-**The area identity:** a lingering summon's **farewell strike reaches every foe**, at its linger share (×0.3, or ×0.4
-when Bonded), the same per foe as today's single target. Every summon after the first therefore touches the whole field.
+**Only the Tome half lingers.** The Arms summon strikes once and leaves. The pair then mirrors the Spell Blade's
+exactly:
+- the leading half carries the identity;
+- the trailing half is a plain hit of the other channel.
 
-**Hand:** the power hand goes from ×0.6 to **×0.7**. With no support, her turns are all damage.
-
-**The split:**
-- three Tome slots, magic armor (M.ATK up), and Arms summons from a lower ATK;
-- stat leans: M.ATK ×1.1, ATK ×0.9;
-- the target is 70/30 ± 5 on Auto.
+**Balance as a pair.**
+- On a single shielded foe, the Spell Blade's three chips an act Break sooner.
+- Against three or more foes, the Summoner's farewell strikes touch the whole field.
+- **Over a whole fight, their damage per turn stays within ±5% of each other** (§9).
 
 ### 3.3 Paladin and Cleric
 
@@ -132,6 +143,17 @@ They're the same class in two halves:
 - the **Cleric**, with **3 Tomes**, gives more mends, buffs and cleanses.
 
 The split itself makes one a shielder and the other a healer.
+
+**One healer a party: twice the shares (owner, 2026-10-21).**
+- Today a party could carry a Cleric *and* a Summoner sharing support. In v2 a party has **one** Paladin or Cleric,
+  so her mends and Barriers carry the whole party.
+- **Every mend and Barrier share doubles:**
+  - one Uma: 28%, 32%, 36%, 40%, 44% by depth;
+  - every Uma: still ×0.4 of that, so 11–18%.
+- **The Barrier cap** rises from 40% to **60%** of max HP, so a doubled Barrier isn't wasted.
+- **What stays the same:** revives (25%), the cleanse (one status), and her damage hand (×0.5).
+- The simulation checks the doubled numbers against foe damage (§9): one healer must keep an on-curve party through a
+  front's boss without an Uma falling more than once.
 
 **Scaling.** Heal, from Guts, retires from combat. Every mend, Barrier and revive is
 `target's max HP × depth share × (1 + offense ÷ 300)`, where offense is the **Paladin's ATK** or the **Cleric's M.ATK**
@@ -184,7 +206,7 @@ with them, so nobody's progress is lost.
 | Brawler | 2× |
 | Mage | 2.4× |
 | Spell Blade | 2× → **2.2×** |
-| Summoner | 1.8× → **2×**, because her support is gone |
+| Summoner | 1.8× → **2.2×**, the Spell Blade's mirror |
 | Paladin | 1.5× |
 | Cleric | 1.5× |
 
@@ -200,22 +222,38 @@ with them, so nobody's progress is lost.
 
 ## 6. Accessories
 
-### 6.1 Orbs: +% damage to one kind
+### 6.1 One damage slot, one support slot (owner, 2026-10-21)
 
-- **New:** an Orb adds **+2% damage a grade** to hits of its kind: a G10 Fire Orb is +20% to Fire hits. It applies
-  after the weakness multiplier and before statuses.
-- **Gone:** an Orb no longer adds its kind to hits for weaknesses or locks.
-- **Why:** weakness coverage then comes only from weapons, and from inherited Limit Breaks (C3). A party has to be
-  *built* for a front, which is what the owner wants the Rift to ask.
-- **Specializing:** two Orbs of two kinds, such as Fire and Lightning, make a two-element specialist. Two Orbs of the
-  same kind stay disallowed: the slots already require different types.
+The owner's aim: balance should make an Uma pick **one damage accessory and one support accessory**. The slots now say
+so:
 
-**C4, Orb steps:** recommendation: **2% a grade**, the owner's suggestion, so +20% at G10. The simulation checks that a
-G10 Orb is worth about a grade of weapon Might on that kind, and no more.
+| Slot | Holds | Choices |
+|---|---|---|
+| **Damage** | One Orb | 5 Arms Orbs, 5 Elemental Orbs |
+| **Support** | One Talisman or Amulet | 5 Talismans (physical), 5 Amulets (magical) |
 
-### 6.2 The other ten
+All twenty types stay. Accessory Ranks stay four kinds: Arms Orb, Elemental Orb, Talisman, Amulet.
 
-The owner asked for twenty accessory types, and they stay twenty. What changes is their value and their role.
+### 6.2 Orbs: flat damage to one kind
+
+- **New: an Orb adds half its grade's weapon Might** to the offense of hits of its kind:
+
+  | Grade | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | Offense added | 1 | 2 | 4 | 6 | 10 | 13 | 18 | 23 | 29 | 34 |
+
+  It's flat, like weapons. It goes through the same `offense² ÷ (offense + defense)` formula, so it's worth about **+18%
+  on that kind's hits at Lv 50**, and less early.
+- **Why flat, not a percentage:** it scales the way weapons do, by grade and level. It doesn't multiply with every other
+  bonus, so the balance stays readable. A G10 Orb is worth about half a G10 weapon on its own kind.
+- **Gone:** an Orb no longer adds its kind to hits for weaknesses or locks. Weakness coverage then comes only from
+  weapons and inherited Limit Breaks (C3), so a party has to be *built* for a front.
+- **One Orb only:** with one damage slot, an Uma specializes in **one** kind. That's the choice: her best weapon's
+  kind, or the kind her front's foes are weak to.
+
+### 6.3 The support accessories
+
+They take the support slot. Their values are rebalanced so each is a real choice for some Uma.
 
 | Accessory | Today (per grade) | At G10 | Role after v2 | Change |
 |---|---|---|---|---|
@@ -230,18 +268,18 @@ The owner asked for twenty accessory types, and they stay twenty. What changes i
 | Ward Amulet | A magical damage cut, 1.5% | 15% | Arcane front | — |
 | Mirror Amulet | Magical damage returned, 3% | 30% | Cleric, Arcane front | — |
 
-**The rule the simulation enforces:** in each family (offense Orbs, physical defense, magical defense), no accessory
-at G10 is worth less than 60% of the best one, measured as each one's effect on a front's win rate on Auto. The values
-in the table are the starting point.
+**The rule the simulation enforces:** among the ten support accessories, none at G10 is worth less than 60% of the
+best, measured as its effect on a front's win rate on Auto. The values in the table are the starting point.
 
-**C5, accessory slots:** recommendation: **two in Tier 1**, as now. [Tiers](tiers.md) Option A adds a third in Tier 3.
+**C5, slots by tier:** one damage and one support in Tiers 1 and 2. [Tiers](tiers.md) Option A adds a third slot in
+Tier 3; it's designed with Tier 3.
 
 ## 7. Quality of life
 
 - **Starting armor by class:** a new Uma's five armor slots start in her class's armor. Magical for Mage, Summoner and
   Cleric, physical for the rest. Existing Umas keep theirs. This needs nothing else and can ship now.
 - **Equipment presets.** Each class gets a **standard preset**: its default weapon spread, its armor kind in all five
-  slots, and two suggested accessory types. On her profile, "Use the standard preset" applies the weapons and armor
+  slots, and a suggested Orb and support accessory. On her profile, "Use the standard preset" applies the weapons and armor
   kinds she can wear, plus the best crafted pieces in stock she's ranked for.
   - **C6:** recommendation: **one standard preset per class, applied on tap.** Custom saved presets can come later if
     the owner wants them.
@@ -255,8 +293,12 @@ in the table are the starting point.
 
 ## 8. Engine v14 and the save
 
-- **Engine v14** carries the new hands, the Spell Blade's double Arms hit, the Summoner's farewell areas, the
-  healers' scaling and new effects, Orbs as % damage, and Guts into HP (C1).
+- **Engine v14** carries:
+  - the new hands: the Spell Blade's double Arms hit, and the Summoner's mirrored pair and farewell areas;
+  - the healers' ATK and M.ATK scaling, their doubled shares and the 60% Barrier cap, and their new effects;
+  - flat Orbs in a typed damage slot;
+  - Guts into HP (C1);
+  - the Rift's ward trait ([the Rift](rift.md) §5).
 - **Old fights replay:** v6–v13 fights, including an open one at migration, replay on their own engine.
 - **Save (v24, after the tiers doc's v23):**
   - the class id `cleric` stays the Cleric, and `paladin` is new;
@@ -275,19 +317,24 @@ in the table are the starting point.
 | Spell Blade's damage, on Auto, against regular formations | 70% physical ± 5 |
 | Summoner's damage, on Auto | 70% magical ± 5 |
 | Paladin vs Cleric: healing plus Barrier absorbed per fight, on curve | Within ±10% of each other |
+| Spell Blade vs Summoner, damage per turn over a whole fight | Within ±5% (the mirror) |
+| One healer, doubled shares | Keeps an on-curve party through a front boss with no Uma falling twice |
 | Spell Blade vs Brawler, against shielded single foes | Spell Blade Breaks a sub-boss at least 1 round sooner; Brawler deals ≥ 10% more after the Break |
 | Summoner vs Mage's Blizzard, against 3+ foes | Summoner ≥ Mage over a whole wave, by the farewell strikes |
 | Today's campaign, on-curve party of each shape | Win rates within 3 points of v13 (no campaign rebalance) |
 | The Rift's fronts | Set in [the Rift](rift.md) §11 |
 
-## 10. Owner calls
+## 10. Owner calls: decided 2026-10-21 (D160)
 
-| Call | Question | Recommendation |
-|---|---|---|
-| **C1** | Where Guts goes once Heal retires | Into HP: +1 HP a point |
-| **C2** | The Paladin's hall name | The Paladin Bastion |
-| **C3** | Inherited Limit Breaks' offense | The higher of her ATK and M.ATK; kinds still decide weaknesses |
-| **C4** | Orb steps | 2% a grade, +20% at G10 |
-| **C5** | Accessory slots | Two in Tier 1; a third in Tier 3 |
-| **C6** | Presets | One standard preset per class, applied on tap |
-| **C7** | Split the Cleric into Paladin and Cleric | **Yes**: it solves the hybrid problem, mirrors the damage hybrids, and gives the Rift's physical and magical fronts each a healer |
+| Call | Decision |
+|---|---|
+| **C1** | Guts feeds HP: +1 HP a point |
+| **C2** | The Paladin's hall is the Paladin Bastion |
+| **C3** | Inherited Limit Breaks use the higher of her ATK and M.ATK; kinds still decide weaknesses |
+| **C4** | **Changed by the owner:** Orbs are flat, half a weapon's Might at their grade (§6.2), not a percentage |
+| **C5** | One damage slot and one support slot in Tiers 1–2; a third slot comes with Tier 3 |
+| **C6** | One standard preset per class, applied on tap |
+| **C7** | The Cleric splits into Paladin and Cleric |
+| **C8** | **The owner's:** one healer a party, so mend and Barrier shares double and the Barrier cap is 60% (§3.3) |
+| **C9** | **The owner's:** the Summoner mirrors the Spell Blade, as a pair with the Tome summon leading (§3.2) |
+| **C10** | **The owner's:** accessory slots are typed, one damage (an Orb) and one support (a Talisman or Amulet) (§6.1) |

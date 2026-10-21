@@ -1,6 +1,6 @@
 # Tiers: separate worlds, promotion, and what each tier adds
 
-> **Proposal, 2026-10-21, for the owner to decide.**
+> **Approved 2026-10-21 (D159): every call as recommended; not built yet.**
 > - This is the first of three linked design docs. The others are [classes v2](classes-v2.md) and
 >   [the Rift](rift.md), the end-of-tier event.
 > - It replaces H24's planned `tiers.md`, and settles the Tier Finale questions Q6 and Q7 when the owner approves it.
@@ -230,7 +230,7 @@ Until then, Tier 3 Umas play its four continents, and nobody leaves Tier 3.
 
 Items 1 and 2 can start as soon as T1, T2 and T5 are decided. Items 3 and 4 follow their own docs.
 
-## 9. Owner calls
+## 9. Owner calls: decided 2026-10-21 (D159), all as recommended
 
 | Call | Question | Recommendation |
 |---|---|---|

@@ -1,6 +1,6 @@
 # The Rift: the end-of-tier event and promotion
 
-> **Proposal, 2026-10-21, for the owner to decide.**
+> **Approved 2026-10-21 (D161): every call as recommended; not built yet.**
 > - The third of three linked docs, after [tiers](tiers.md) (what promotion does) and [classes v2](classes-v2.md) (the
 >   classes the fronts are built around).
 > - It replaces the parked Tier Finale (H23, Q6) and its Gauntlet, Raid and Siege options.
@@ -235,7 +235,7 @@ Today's `stageFaces` picks within one franchise per region, so this is new code.
 | A run's length, at the owner's pace | About 2–3 weeks: 52 fights, the retries, and Echo time to raise new classes |
 | Echo pacing | A Lv 50 Uma raises a fresh class to Rank 30 in about 40 Echo wins |
 
-## 12. Owner calls
+## 12. Owner calls: decided 2026-10-21 (D161), all as recommended
 
 | Call | Question | Recommendation |
 |---|---|---|
