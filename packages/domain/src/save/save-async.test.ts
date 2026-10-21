@@ -11,6 +11,7 @@ import { chooseClass, openFightOf, startFight, worldRun, type BattleOutfit } fro
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, parseSaveAsync, SAVE_SCHEMA_VERSION, SaveParseError, type Save } from './save'
 import { queueJob, startJob, type WorkOutfit } from './work'
+import { riftSave } from './rift.fixture'
 
 const NOW = '2026-10-12T12:00:00.000Z'
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
@@ -82,6 +83,12 @@ describe('asynchronous strict save parsing (H16)', () => {
       }
       if (version >= 10 && version < 14) w.gear = { 'mage-staff-g2-mp': 2, 'spear-g1-atk': 1 }
       if (version >= 10 && version < 15) w.items = { 'token-craft-hp-1': 2 }
+      // Before v23 there was no Rift, and the account held only its name and times (D163).
+      if (version < 23) {
+        delete (w as unknown as Record<string, unknown>).rift
+        const account = s.account as unknown as Record<string, unknown>
+        delete account.achievements; delete account.history
+      }
       // Before v22 facilities held the jobs (SC3).
       if (version < 22) {
         const old = w as unknown as Record<string, unknown>
@@ -96,6 +103,15 @@ describe('asynchronous strict save parsing (H16)', () => {
       if (version < 17) delete (w as unknown as Record<string, unknown>).targets
       expect(await parseSaveAsync(raw), `v${version}`).toEqual(parseSave(raw))
     }
+  })
+
+  it('matches the synchronous parser for a v23 save with the Rift in use, and refuses its broken references alike', async () => {
+    const s = riftSave()
+    expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
+    expect(await parseSaveAsync(rawOf(s))).toEqual(s)
+    const open = rawOf(s); open.account.history['201']![0]!.run = 't1-r2'
+    expect(() => parseSave(open)).toThrow(SaveParseError)
+    await expect(parseSaveAsync(open)).rejects.toThrow(/hasn't ascended/)
   })
 
   it('replays frozen v8 waves and actions before returning, with identical v6 compatibility', async () => {

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-16; save v21, engine v13.** The full running-system reference is
+> **Status: current, 2026-10-21; save v23, engine v13.** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -21,9 +21,10 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v21** (`save/save.ts`), not the old v7/v8 snapshot:
-- `account`: trainer name and timestamps.
-- `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, Star Gems, unbound gear, facilities, targets and Hall of Heroes seats.
+**Schema v23** (`save/save.ts`), not the old v7/v8 snapshot:
+- `account`: trainer name, timestamps, achievements and each Uma's tier history, shared by every tier (D159).
+- `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, Star Gems, unbound gear, building
+  levels, per-Uma work rows (SC3), targets, Hall of Heroes seats and its Rift: runs and Echo wins (D161).
 - An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout), her Craft Level, ranks,
   Extra Stats, bound gear and Bonds. There are no active `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
@@ -45,8 +46,10 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v19 the Halls of Heroes and Bonds | D106 |
 | v20 armor without accents, a feet slot, two accessory slots | D124 |
 | v21 one profession (the higher level), Star Gems, only known items and facilities, more slots | D144 |
+| v22 work on `@luismlorenzana/uma-work` per-Uma rows; running jobs finish into stock, queues drop | SC3, D152 |
+| v23 empty account achievements and tier history, and an empty Rift in each world | D163 |
 
-`parseSave` accepts v1–v21 and returns v21; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v23 and returns v23; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in

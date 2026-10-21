@@ -11,7 +11,7 @@ import {
 import { startFight, type BattleOutfit } from './battle'
 import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, SaveParseError, type Save } from './save'
+import { newSave, parseSave, SAVE_SCHEMA_VERSION, SaveParseError, type Save } from './save'
 import { isBusy } from './rules'
 import {
   availabilityBlock, collectAll, collectJob, cutJobTime, dismissStopped, grantProfessionExp, planJob, queueJob, recallJob, refusalText, repeatJob, restartStopped,
@@ -312,9 +312,9 @@ describe('the v22 migration (SC3)', () => {
     expect(world.umas['102']!.craft).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 4 * 27))
     expect(world.umas['103']!.craft).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 216))
     expect(['101', '102', '103'].map((id) => availabilityBlock(world, id, at(0)))).toEqual([null, null, null])
-    // The migrated save round-trips as v22.
+    // The migrated save round-trips at the current version.
     const migrated = parseSave(v21())
-    expect(migrated.schemaVersion).toBe(22)
+    expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(parseSave(JSON.parse(JSON.stringify(migrated)))).toEqual(migrated)
   })
 

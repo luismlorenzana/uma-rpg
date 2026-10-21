@@ -186,6 +186,8 @@ rift: {
   echoes: { [front]: { [difficulty]: wonAt } },
 }
 ```
+Built in v23 (H37) with `null` for unset times and run ids `t<tier>-r<n>`.
+
 Account: `achievements`. Each fight replays on its engine, as world fights do.
 
 ## 9. Faces: cross-franchise, bosses first

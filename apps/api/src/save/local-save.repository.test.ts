@@ -1,4 +1,4 @@
-import { mkdtemp } from 'node:fs/promises'
+import { mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { newSave, renameTrainer, SAVE_SCHEMA_VERSION as V } from '@rpg/domain'
@@ -30,5 +30,20 @@ describe('local save repository', () => {
     await expect(repo.put('u', 1, newSave('Old app', NOW), V - 1)).rejects.toBeInstanceOf(RevisionConflict)
     expect((await repo.load('u')).save?.account.trainerName).toBe('Luis')
     expect((await repo.put('u', 1, newSave('New app', NOW), V)).revision).toBe(2)
+  })
+
+  it('loads a stored v22 row as v23, with empty achievements, history and Rift (D163)', async () => {
+    const file = join(await mkdtemp(join(tmpdir(), 'rpg-save-')), 'save.json')
+    const v22 = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
+    v22.schemaVersion = 22
+    delete v22.account.achievements
+    delete v22.account.history
+    delete v22.tierWorlds['1'].rift
+    await writeFile(file, JSON.stringify({ u: { revision: 4, save: v22 } }))
+    const loaded = await new LocalSaveRepository(file).load('u')
+    expect(loaded.revision).toBe(4)
+    expect(loaded.save?.schemaVersion).toBe(23)
+    expect(loaded.save?.account).toMatchObject({ achievements: {}, history: {} })
+    expect(loaded.save?.tierWorlds['1']?.rift).toEqual({ runs: [], echoes: {} })
   })
 })

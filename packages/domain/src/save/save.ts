@@ -1,9 +1,10 @@
-// Save v22: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v22 (SC3):
-// work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row, and facilities keep only
-// their levels. v21 (D144): one profession, Craft Level, and Star Gems for Extra Stats; more facility slots. v20 (D124):
-// armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106): the Halls of Heroes, their
-// Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no tokens, and a progress reset
-// for every older save.
+// Save v23: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v23 (D163):
+// the account's achievements and each Uma's tier history, and each world's Rift, all empty until the Rift writes them
+// (D159, D161). v22 (SC3): work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row,
+// and facilities keep only their levels. v21 (D144): one profession, Craft Level, and Star Gems for Extra Stats; more
+// facility slots. v20 (D124): armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106):
+// the Halls of Heroes, their Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no
+// tokens, and a progress reset for every older save.
 // Design: docs/design/game-design.md §2.2 (tier worlds), §3 (collection: 20 starting Uma Tickets, D40),
 // §6 (parties: 20, D41; one party per Uma, D46); docs/design/class-rework.md (per-class loadouts, D86);
 // docs/design/pacing.md (Craft Level, the Warehouse, facilities and their jobs, tickets: D55); class ranks and gear
@@ -33,9 +34,10 @@ import {
   isRpgWeapon, RPG_CLASS_ARMOR, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
   type RpgWeapon,
 } from '../rpg/rules'
+import { ECHO_LEVELS, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftRunId, type EchoLevel, type RiftFront, type RiftRun, type RiftState } from '../rift/state'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 22
+export const SAVE_SCHEMA_VERSION = 23
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
@@ -139,13 +141,24 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   targets: string[]
   /** The Halls of Heroes' seats (D106): an Uma is a Hero in one seat at most, or a Learner in two at most, never both. */
   heroes: Partial<Record<HeroLimitId, HeroSeat>>
+  /** This tier's Rift (D161): its runs, oldest first, and its Echo wins. */
+  rift: RiftState
 }
+
+/** An achievement earned (D161): when, and the run it came from (null when no single run earned it, as the Bestiary). */
+export interface Achievement { at: string; run: string | null }
+/** One promotion of an Uma (D159): the tier she reached, when, and the run of the tier below she ascended with. */
+export interface TierHistoryEntry { tier: number; at: string; run: string }
 
 export interface Account {
   trainerName: string
   createdAt: string
   /** Bumped on every change; the newer one wins a sync conflict (D32). */
   updatedAt: string
+  /** Shared by every tier, by achievement id (D159). */
+  achievements: Record<string, Achievement>
+  /** Each Uma's climb, by outfit id: one entry per promotion, oldest first (D159). */
+  history: Record<string, TierHistoryEntry[]>
 }
 
 export interface Save {
@@ -213,13 +226,14 @@ export interface WorldState {
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
-  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {} }
+  return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
+    rift: newRiftState() }
 }
 
 export function newSave(trainerName: string, now: string): Save {
   return {
     schemaVersion: SAVE_SCHEMA_VERSION,
-    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now },
+    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now, achievements: {}, history: {} },
     tierWorlds: { '1': newTierWorld(now, STARTING_UNLOCK_TICKETS) },
   }
 }
@@ -719,9 +733,9 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v21 are migrated to v22's shape first (migrations.ts), so the parse below reads only v22.
+  // v10–v22 are migrated to v23's shape first (migrations.ts), so the parse below reads only v23.
   const value = migrate(raw, version)
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes'])
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes', 'rift'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
   const buildings = parseBuildings(w.buildings, `${path}.buildings`)
   return {
@@ -730,6 +744,7 @@ function parseTierWorld(raw: unknown, path: string, version: number, tier: numbe
     items: parseItems(w.items, `${path}.items`), buildings, work: parseWork(w.work, `${path}.work`, umas, buildings),
     gems: parseGems(w.gems, `${path}.gems`), gear: parseGearStock(w.gear, `${path}.gear`),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
+    rift: parseRift(w.rift, `${path}.rift`, tier, umas),
   }
 }
 
@@ -739,15 +754,152 @@ function parseTargets(value: unknown, path: string, umas: Record<string, OwnedUm
   return [...list]
 }
 
+// --- The Rift and the account's records (v23: D159, D161) -------------------------------------------------------------
+
+const MAX_RIFT_RUNS = 1000
+const MAX_ACHIEVEMENTS = 200
+const MAX_PROMOTIONS = 10
+const ACHIEVEMENT_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/
+const ACHIEVEMENT_ID_MAX = 48
+/** A run id, `t<tier>-r<n>`: its tier and its place in that world's runs. */
+const RUN_ID = /^t([1-9]\d{0,11})-r([1-9]\d{0,11})$/
+
+const before = (a: string, b: string): boolean => Date.parse(a) < Date.parse(b)
+
+function parseRiftRun(value: unknown, path: string, id: string): RiftRun {
+  const r = object(value, path, ['id', 'roster', 'startedAt', 'fronts', 'convergence', 'wonAt', 'ascendedAt'])
+  if (r.id !== id) throw new SaveParseError(`${path}.id`, `expected ${id}`)
+  const roster = ids(r.roster, `${path}.roster`, RIFT_ROSTER)
+  if (roster.length !== RIFT_ROSTER) throw new SaveParseError(`${path}.roster`, `expected ${RIFT_ROSTER} outfit ids`)
+  if (roster.some((o) => !OUTFIT_ID.test(o))) throw new SaveParseError(`${path}.roster`, 'outfit ids are positive integers')
+  const startedAt = timestamp(r.startedAt, `${path}.startedAt`)
+  const f = object(r.fronts, `${path}.fronts`, RIFT_FRONTS)
+  const fronts = {} as Record<RiftFront, number>
+  for (const front of RIFT_FRONTS) {
+    const cleared = count(f[front], `${path}.fronts.${front}`)
+    if (cleared > RIFT_STAGES) throw new SaveParseError(`${path}.fronts.${front}`, `expected 0–${RIFT_STAGES}`)
+    fronts[front] = cleared
+  }
+  const attempts = count(object(r.convergence, `${path}.convergence`, ['attempts']).attempts, `${path}.convergence.attempts`)
+  const wonAt = r.wonAt === null ? null : timestamp(r.wonAt, `${path}.wonAt`)
+  if (wonAt !== null) {
+    if (RIFT_FRONTS.some((front) => fronts[front] < RIFT_STAGES)) throw new SaveParseError(`${path}.wonAt`, 'every front must be sealed first')
+    if (attempts < 1) throw new SaveParseError(`${path}.wonAt`, 'the Convergence was never attempted')
+    if (before(wonAt, startedAt)) throw new SaveParseError(`${path}.wonAt`, 'before the run started')
+  }
+  const ascendedAt = r.ascendedAt === null ? null : timestamp(r.ascendedAt, `${path}.ascendedAt`)
+  if (ascendedAt !== null) {
+    if (wonAt === null) throw new SaveParseError(`${path}.ascendedAt`, 'the run must be won first')
+    if (before(ascendedAt, wonAt)) throw new SaveParseError(`${path}.ascendedAt`, 'before the run was won')
+  }
+  return { id, roster: [...roster], startedAt, fronts, convergence: { attempts }, wonAt, ascendedAt }
+}
+
+function parseEchoes(value: unknown, path: string): RiftState['echoes'] {
+  const echoes: RiftState['echoes'] = {}
+  for (const [front, raw] of Object.entries(object(value, path, RIFT_FRONTS))) {
+    const won: Partial<Record<EchoLevel, string>> = {}
+    for (const [level, when] of Object.entries(object(raw, `${path}.${front}`, ECHO_LEVELS))) won[level as EchoLevel] = timestamp(when, `${path}.${front}.${level}`)
+    echoes[front as RiftFront] = won
+  }
+  return echoes
+}
+
+/** A tier's Rift (D161): its runs in order, `t<tier>-r<n>`. Only the last may be open (not ascended): a tier runs one Rift
+ * at a time, and a won run waits for Ascend (R7, R9). An open run's roster is owned here; an ascended one's moved up. */
+function parseRift(value: unknown, path: string, tier: number, umas: Record<string, OwnedUma>): RiftState {
+  const r = object(value, path, ['runs', 'echoes'])
+  const runs = list(r.runs, `${path}.runs`, 0, MAX_RIFT_RUNS).map((run, i) => parseRiftRun(run, `${path}.runs.${i}`, riftRunId(tier, i + 1)))
+  runs.forEach((run, i) => {
+    if (run.ascendedAt !== null) return
+    if (i < runs.length - 1) throw new SaveParseError(`${path}.runs.${i}.ascendedAt`, 'only the last run may be open')
+    const stray = run.roster.find((id) => !umas[id])
+    if (stray) throw new SaveParseError(`${path}.runs.${i}.roster`, `outfit ${stray} isn't owned in this world`)
+  })
+  return { runs, echoes: parseEchoes(r.echoes, `${path}.echoes`) }
+}
+
+function runId(value: unknown, path: string): string {
+  if (typeof value !== 'string' || !RUN_ID.test(value)) throw new SaveParseError(path, 'expected a run id')
+  return value
+}
+
+/** The run an id names, with its tier, if that world holds it. */
+function riftRunOf(worlds: Record<string, TierWorld>, id: string): { tier: number; run: RiftRun } | undefined {
+  const m = RUN_ID.exec(id)
+  if (!m) return undefined
+  const run = worlds[m[1]!]?.rift.runs[Number(m[2]) - 1]
+  return run ? { tier: Number(m[1]), run } : undefined
+}
+
+/** The account's achievements (D161), by kebab-case id. Whether each run exists is checked once every world is parsed. */
+function parseAchievements(value: unknown, path: string): Record<string, Achievement> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const entries = Object.entries(value)
+  if (entries.length > MAX_ACHIEVEMENTS) throw new SaveParseError(path, `expected at most ${MAX_ACHIEVEMENTS}`)
+  const out: Record<string, Achievement> = {}
+  for (const [id, raw] of entries) {
+    const at = `${path}.${id}`
+    if (id.length > ACHIEVEMENT_ID_MAX || !ACHIEVEMENT_ID.test(id)) throw new SaveParseError(at, `achievement ids are kebab-case, 1–${ACHIEVEMENT_ID_MAX} characters`)
+    const a = object(raw, at, ['at', 'run'])
+    out[id] = { at: timestamp(a.at, `${at}.at`), run: a.run === null ? null : runId(a.run, `${at}.run`) }
+  }
+  return out
+}
+
+/** Each Uma's climb (D159): 1–10 promotions, tiers climbing from 2, times never going back. Each entry's run and the
+ * world she lives in are checked once every world is parsed. */
+function parseHistory(value: unknown, path: string): Record<string, TierHistoryEntry[]> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const out: Record<string, TierHistoryEntry[]> = {}
+  for (const [id, raw] of Object.entries(value)) {
+    const at = `${path}.${id}`
+    if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
+    const entries: TierHistoryEntry[] = []
+    list(raw, at, 1, MAX_PROMOTIONS).forEach((e, i) => {
+      const ep = `${at}.${i}`
+      const h = object(e, ep, ['tier', 'at', 'run'])
+      const tier = count(h.tier, `${ep}.tier`)
+      if (tier < 2) throw new SaveParseError(`${ep}.tier`, 'expected 2 or more')
+      const prev = entries.at(-1)
+      if (prev && tier <= prev.tier) throw new SaveParseError(`${ep}.tier`, 'expected above the entry before')
+      const when = timestamp(h.at, `${ep}.at`)
+      if (prev && before(when, prev.at)) throw new SaveParseError(`${ep}.at`, 'before the entry before')
+      entries.push({ tier, at: when, run: runId(h.run, `${ep}.run`) })
+    })
+    out[id] = entries
+  }
+  return out
+}
+
+/** The account's references into the worlds: each achievement's run exists, and each promotion names an ascended run of
+ * the tier below with her on its roster, her last one reaching the world she lives in. */
+function checkAccountRefs(account: Account, worlds: Record<string, TierWorld>, path: string): void {
+  for (const [id, a] of Object.entries(account.achievements)) {
+    if (a.run !== null && !riftRunOf(worlds, a.run)) throw new SaveParseError(`${path}.achievements.${id}.run`, `no run ${a.run}`)
+  }
+  for (const [id, entries] of Object.entries(account.history)) {
+    entries.forEach((e, i) => {
+      const at = `${path}.history.${id}.${i}.run`
+      const found = riftRunOf(worlds, e.run)
+      if (!found || found.tier !== e.tier - 1) throw new SaveParseError(at, `expected a Tier ${e.tier - 1} run`)
+      if (found.run.ascendedAt === null) throw new SaveParseError(at, `run ${e.run} hasn't ascended`)
+      if (!found.run.roster.includes(id)) throw new SaveParseError(at, `outfit ${id} isn't on run ${e.run}'s roster`)
+    })
+    const last = entries.at(-1)!
+    if (!worlds[String(last.tier)]?.umas[id]) throw new SaveParseError(`${path}.history.${id}`, `expected her in Tier ${last.tier}, where she last promoted to`)
+  }
+}
+
 /** The raw `schemaVersion` of a stored or sent save, or 0 when it has none. */
 export function schemaVersionOf(value: unknown): number {
   const v = (value as { schemaVersion?: unknown } | null)?.schemaVersion
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v22 save and always returns v22. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
- * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3) and anything older than v10
- * starts over (D69). */
+/** Parses a v1–v23 save and always returns v23. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+ * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
+ * tier history and Rift (D163) and anything older than v10 starts over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }
@@ -772,10 +924,17 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
   if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > SAVE_SCHEMA_VERSION) {
     throw new SaveParseError(`${path}.schemaVersion`, `expected 1–${SAVE_SCHEMA_VERSION}`)
   }
-  const a = object(o.account, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt'])
+  // Before v23 the account held only its name and times: it gains empty achievements and history (D163). The account has
+  // no migration chain, so this step lives here and migrations.ts stays world-only.
+  const rawAccount = version < 23 && typeof o.account === 'object' && o.account !== null && !Array.isArray(o.account)
+    ? { ...o.account, achievements: {}, history: {} } : o.account
+  const a = object(rawAccount, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history'])
   const trainerName = typeof a.trainerName === 'string' ? normalizeTrainerName(a.trainerName) : null
   if (!trainerName || trainerName !== a.trainerName) throw new SaveParseError(`${path}.account.trainerName`, `must be 1–${TRAINER_NAME_MAX} trimmed characters`)
-  const account: Account = { trainerName, createdAt: timestamp(a.createdAt, `${path}.account.createdAt`), updatedAt: timestamp(a.updatedAt, `${path}.account.updatedAt`) }
+  const account: Account = {
+    trainerName, createdAt: timestamp(a.createdAt, `${path}.account.createdAt`), updatedAt: timestamp(a.updatedAt, `${path}.account.updatedAt`),
+    achievements: parseAchievements(a.achievements, `${path}.account.achievements`), history: parseHistory(a.history, `${path}.account.history`),
+  }
   const worlds = object(o.tierWorlds, `${path}.tierWorlds`, Object.keys((o.tierWorlds as Obj | null) ?? {}))
   const tierWorlds: Record<string, TierWorld> = {}
   for (const [key, world] of Object.entries(worlds)) {
@@ -784,6 +943,7 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
     tierWorlds[key] = parseTierWorld(world, at, version, Number(key), check, migrate)
   }
   if (!tierWorlds['1']) throw new SaveParseError(`${path}.tierWorlds`, 'tier 1 is required')
+  checkAccountRefs(account, tierWorlds, `${path}.account`)
   return { schemaVersion: SAVE_SCHEMA_VERSION, account, tierWorlds }
 }
 

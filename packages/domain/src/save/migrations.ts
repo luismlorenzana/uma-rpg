@@ -209,7 +209,19 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v19 = version < 19 && isRecord(v18) ? toV19(v18) : v18
   const v20 = version < 20 && isRecord(v19) ? toV20(v19) : v19
   const v21 = version < 21 && isRecord(v20) ? toV21(v20) : v20
-  return version < 22 && isRecord(v21) ? toV22(v21) : v21
+  const v22 = version < 22 && isRecord(v21) ? toV22(v21) : v21
+  return version < 23 && isRecord(v22) ? toV23(v22) : v22
+}
+
+// --- v22 → v23 (D163) ------------------------------------------------------------------------------------------------
+
+/**
+ * Each tier world gains its Rift (D161), with no runs and no Echo wins. Written as a literal, not `newRiftState()`: a
+ * migration step is frozen history, and this file never imports `save.ts`. It overwrites, so a current save relabelled
+ * as an older one still parses. The account's new fields are added in `parseSaveChecked`.
+ */
+function toV23(world: Record<string, unknown>): Record<string, unknown> {
+  return { ...world, rift: { runs: [], echoes: {} } }
 }
 
 // --- v21 → v22 (SC3) -------------------------------------------------------------------------------------------------
