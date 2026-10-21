@@ -2,13 +2,14 @@
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
 import {
-  CURRENT_SLICE, facilitySpec, facilityView, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen,
+  CURRENT_SLICE, facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen, RPG_WORK_ENV,
   placeById, placeOnPage, placesOn, type HubPage, type Place, type TierWorld,
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
 import { useReducedMotionSetting } from '@luismlorenzana/uma-kit/ui'
 import { FaceTile } from '@luismlorenzana/uma-kit/album'
+import { workView } from '@luismlorenzana/uma-kit/work'
 import { Suspense, useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
 import { PlacePage } from '../places/PlacePage'
@@ -62,9 +63,9 @@ function pipsOf(place: Place, world: TierWorld | null, now: string): PipModel[] 
     })
   }
   if (!world || !facilitySpec(place.id)) return Array.from({ length: place.slots }, (): PipModel => ({ state: 'free' }))
-  return facilityView(world, place.id, now).jobs.map((job): PipModel => {
-    if (!job) return { state: 'free' }
-    return { state: job.done ? 'ready' : 'busy', progress: job.progress, queued: job.queue.length, face: face(job.outfitId) }
+  return workView(world, Date.parse(now), RPG_WORK_ENV).cards(place.id).map((card): PipModel => {
+    if (card.kind === 'free') return { state: 'free' }
+    return { state: card.running ? 'busy' : 'ready', progress: card.progress, queued: card.queue.length, face: face(card.outfitId) }
   })
 }
 

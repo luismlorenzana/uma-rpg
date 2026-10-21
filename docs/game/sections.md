@@ -38,6 +38,8 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 - A floating **Collect all · N ready** button collects every finished job.
 - **Taps:** a place opens its **quick look** in the side panel (`/:page?peek=:id`). Its **Enter** button opens the
   place's page (`/:page/:placeId/*`). The Scenario Gate skips the quick look and opens its page at once.
+  A facility's quick look uses its compact live slot rows: start, collect, repeat and stopped-queue recovery stay two
+  or three taps from the map.
 - **Routes:**
   - `/` returns to the last page you viewed.
   - Every screen is a place (D31), with no other top-level routes.
@@ -116,24 +118,17 @@ instead ([Halls of Heroes](heroes.md)).
 
 **The facility page** (`places/work/FacilityPage.tsx`), for the eight sites, the Workbench, the Forge and the
 Lapidary:
-- **Header:** level, slots and **Upgrade**.
-- **For your targets** (D100, D126): what the targets still need from this facility, lowest grade first.
-  - **Each line:** the total need, how many are in the Warehouse and how many are coming, then how many are short.
-    "On the way" when jobs already cover it.
-  - **Tapping a short line** starts it in a free slot.
-  - **Badges:** the item picker badges every line the targets need ("Target ×3").
-- **Collect everything ready.**
-- **Each job card:**
-  - Collect;
-  - Repeat ×N (collects, then starts the same again);
-  - −30m and Finish (Speed Tickets);
-  - Recall;
-  - a queue of up to three.
+- **Shared facility header:** level, used slots, total slots, speed, **Upgrade**, and **Collect here** when work is ready.
+- **One shared slot row per slot:** a free row starts a job; a working row shows its Uma, item, progress and queue.
+  Ready work has **Collect** and **Repeat**. A running row has **Speed up** (−30m or Finish), **Queue next**, queue
+  ordering and removal, and **Recall** with a preview of what is paid, returned or lost.
+- **For your targets** (D100, D126): a horizontal strip of what the targets still need here. A badge is the short
+  count, a check means work already covers it, and tapping a short item opens that job in a free slot.
 - **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
   **Dismiss**.
-- **Assigning:** the shared Uma picker opens free Umas first, then highest Craft Level, Uma Level, newest release and
-  name. Each shows her Craft Level and time per item; locked Umas and workers show why they can't start. Fighting
-  does not block work (D119). Then pick what to make and how many: 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
+- **The shared job sheet:** Who → What → How many. Its Uma picker opens free Umas first, then highest Craft Level, Uma
+  Level, newest release and name. Locked Umas and workers show why they cannot start. Fighting does not block work
+  (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
 - **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
   Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
   type with no materials in stock is dimmed.

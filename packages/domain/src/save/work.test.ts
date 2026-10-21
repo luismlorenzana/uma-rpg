@@ -2,15 +2,22 @@ import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { EXP_PER_MINUTE, FACILITY_SPEED, HOUR, itemMinutes, jobExp, makeMinutes, MINUTE, professionExpToNext, PROFESSION_MAX_LEVEL, REFINE_BATCHES, refineMinutes } from '../economy/pacing'
 import { ITEM_FAMILIES } from '../items/catalog'
+import { RPG_BUILDINGS, RPG_WORK_ENV } from '../work/env'
+import type { RpgWorkRequest } from '../work/request'
+import {
+  chainTimes, endsAt, finishedCount, isRefusal, kindRules, progress, remainingMs, settle, slotHolder, slotsOf, statusOf,
+  ticketsToFinish, type Entry, type WorkRow,
+} from '@luismlorenzana/uma-work'
 import { startFight, type BattleOutfit } from './battle'
 import { buyRawItem, buyTickets, stockedGrades, sweepBlock, sweepFight } from './exchange'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { isBusy } from './rules'
 import {
-  availabilityBlock, collectAll, collectJob, cutJobTime, dismissStopped, facilityView, grantProfessionExp, planJob, queueJob, recallJob, repeatJob, restartStopped,
+  availabilityBlock, collectAll, collectJob, cutJobTime, dismissStopped, grantProfessionExp, planJob, queueJob, recallJob, refusalText, repeatJob, restartStopped,
   startJob, unqueueJob, upgradeCost, upgradeFacility, type WorkOutfit,
 } from './work'
+import { stockName } from '../economy/stock'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -33,6 +40,37 @@ function withUmas(...ids: string[]): Save {
 const give = (save: Save, items: Record<string, number>, laurels = 0): Save => {
   const w = worldOf(save)
   return { ...save, tierWorlds: { '1': { ...w, items: { ...w.items, ...items }, wallet: { ...w.wallet, laurels: w.wallet.laurels + laurels } } } }
+}
+
+/** Engine readings used by the rules tests after SC4 removed the old product-screen adapter. */
+function facilityView(world: ReturnType<typeof worldOf>, placeId: string, nowIso: string) {
+  const now = Date.parse(nowIso)
+  const settled = settle(world, now, RPG_WORK_ENV).state
+  const readyItems = (row: WorkRow<RpgWorkRequest>) => row.entries.reduce((n, entry) => n + finishedCount(entry, now) - entry.collected, 0)
+  const jobs = slotsOf(settled, placeId, RPG_BUILDINGS).map((slot) => {
+    const outfitId = slotHolder(settled, slot)
+    if (!outfitId) return null
+    const row = settled.work[outfitId] as WorkRow<RpgWorkRequest>
+    const last: Entry<RpgWorkRequest> = row.entries.at(-1)!
+    const queuedSeconds = row.queue.map((request) => {
+      const made = kindRules(RPG_WORK_ENV, request.kind)!.plan(settled, outfitId, request, now, { slot: row.slot!, speed: last.speed, earlier: [], env: RPG_WORK_ENV })
+      return isRefusal(made) ? [] : made.map((item) => item.seconds)
+    })
+    const times = chainTimes(row, queuedSeconds)
+    const status = statusOf(row, now)
+    return {
+      outfitId, count: last.request.count, finished: finishedCount(last, now), ready: readyItems(row),
+      done: status === 'ready', startedAt: last.startedAt, endsAt: endsAt(last), progress: progress(last, now),
+      ticketsToFinish: status === 'ready' ? 0 : ticketsToFinish(remainingMs(last, now)),
+      queue: row.queue.map((request, index) => ({ output: request.item, count: request.count, startsAt: times.queued[index]?.startsAt ?? 0, endsAt: times.queued[index]?.endsAt ?? 0 })),
+    }
+  })
+  const stopped = Object.values(settled.work).filter((row) => row.dropped?.slot.building === placeId).map((row) => ({
+    outfitId: row.outfitId,
+    requests: row.dropped!.requests,
+    why: row.dropped!.refused ? refusalText(row.dropped!.refused, now) : row.dropped!.short.map((item) => `short ${item.qty} ${stockName(item.item)}`).join(', '),
+  }))
+  return { level: settled.buildings[placeId]?.level ?? 1, jobs, stopped }
 }
 
 describe('gathering (S4)', () => {

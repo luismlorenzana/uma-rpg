@@ -1,7 +1,7 @@
 // The game store and its sync engine (D32): the save lives on the device (Dexie) and in a Zustand store; every change
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
-  type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type Shelf, type WorkOutfit, type GearSlot,
+  type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
   newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
@@ -143,6 +143,8 @@ export const cutTime = (placeId: string, slot: number, tickets: number) => edit(
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
   edit(import('@rpg/domain/work'), (d, s, now) => d.queueJob(s, placeId, slot, outfit, output, count, now))
 export const unqueueWork = (placeId: string, slot: number, index: number) => edit(import('@rpg/domain/work'), (d, s, now) => d.unqueueJob(s, placeId, slot, index, now))
+export const editWorkQueue = (input: RpgQueueInput) =>
+  edit(import('@rpg/domain/work'), (d, s, now) => d.editWorkerQueue(s, input, now))
 export const upgrade = (placeId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.upgradeFacility(s, placeId, now))
 export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyRawItem(s, itemId, quantity, stocked, now))
 export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now) => d.buyTickets(s, kind, quantity, now))
@@ -203,6 +205,20 @@ export const repeatWork = (outfitId: string) => edit(import('@rpg/domain/work'),
 /** A queue that couldn't start (SC3): start it again now, or forget it. */
 export const restartWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.restartStopped(s, outfitId, now))
 export const dismissWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.dismissStopped(s, outfitId, now))
+/** Shared work screens address an Uma and preserve the exact entry identity for late speed-up taps. */
+export const collectWorker = async (outfitId: string): Promise<{ items: number; levelsUp: number }> => {
+  const { collectWorker: collectOne } = await import('@rpg/domain/work')
+  const { save } = useGame.getState()
+  if (!save) return { items: 0, levelsUp: 0 }
+  const r = collectOne(save, outfitId, nowIso())
+  await commit(r.save)
+  return r.got
+}
+export const recallWorker = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now) => d.recallWorker(s, outfitId, now))
+export const speedWorker = (outfitId: string, startedAt: number, tickets: number) =>
+  edit(import('@rpg/domain/work'), (d, s, now) => d.speedWorker(s, outfitId, startedAt, tickets, now))
+export const finishWorker = (outfitId: string, startedAt: number) =>
+  edit(import('@rpg/domain/work'), (d, s, now) => d.finishWorker(s, outfitId, startedAt, now))
 
 /** Sweeps a beaten fight up to `times` times; returns the summed result and how many it did. */
 export async function sweep(region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>, times = 1): Promise<FightResult & { swept: number }> {

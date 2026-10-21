@@ -10,7 +10,9 @@ import { AuthProvider, idToken } from '@luismlorenzana/uma-kit/auth'
 import { watchAppUpdates } from '@luismlorenzana/uma-kit/places'
 import { configureKit, initAppearance, KitArtProvider, MotionRoot, type KitArt } from '@luismlorenzana/uma-kit/ui'
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
+import { WorkArtProvider } from '@luismlorenzana/uma-kit/work'
 import { ALBUM_ART } from './master/album-art'
+import { ItemIcon } from './items/ItemIcon'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
@@ -43,7 +45,9 @@ createRoot(root).render(
       <KitArtProvider art={ART}>
         <AuthProvider config={FIREBASE}>
           <AlbumArtProvider art={ALBUM_ART}>
-            <RouterProvider router={router} />
+            <WorkArtProvider art={{ Item: ItemIcon }}>
+              <RouterProvider router={router} />
+            </WorkArtProvider>
           </AlbumArtProvider>
         </AuthProvider>
       </KitArtProvider>

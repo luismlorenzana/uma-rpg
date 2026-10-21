@@ -10,7 +10,7 @@ import { startFight, umaProfile } from './battle'
 import { extraStatPoints, gemBlock, nodeFromGem, setActiveNodes, setGem } from './observatory'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
-import { collectJob, facilityView, grantProfessionExp, planJob, startJob } from './work'
+import { collectJob, grantProfessionExp, planJob, startJob } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -69,7 +69,7 @@ describe('cutting and setting (D144)', () => {
     save = collectJob(save, 'lapidary', 0, at(2 * plan.itemMs)).save
     expect(worldOf(save).gems).toEqual({ 'gem-mp-1': 2 })
     expect(worldOf(save).umas['101']!.craft).toEqual(grantProfessionExp({ level: 1, exp: 0 }, 2 * makeMinutes(1) * 2))
-    expect(facilityView(worldOf(save), 'lapidary', at(2 * plan.itemMs)).jobs[0]).toBeNull()
+    expect(worldOf(save).work['101']?.slot ?? null).toBeNull()
   })
 
   it('sets a gem for its own grade\'s node once the lower ones are open, switches it on while slots last (D119)', () => {
