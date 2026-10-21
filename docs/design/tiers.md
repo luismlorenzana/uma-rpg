@@ -211,6 +211,8 @@ owner's Umas have spent side points.
 | Paladin | Templar · Guardian | Barrier-heavy · damage-taking guard |
 | Cleric | Bishop · Oracle | Party mends · buffs and cleanse |
 
+Designed in [Tier 2's advanced classes](tier2-classes.md) (H39, calls A1–A10).
+
 ## 7. Tier 3 and Q8
 
 Tier 3 has four scenarios in master data today.
