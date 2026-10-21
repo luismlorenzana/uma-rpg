@@ -22,7 +22,7 @@
 | [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | In progress (this session) |
 | [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
 | H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
-| [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | In progress (this session) |
+| H38 | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Done (uma-platform `e3da022`, uma-art 2.11.0) |
 
 **Write now** (design docs for Tier 2, each with owner calls; no code):
 
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H38 | The Rift's art in uma-art 2.11.0: the `rift` building (place 41, `page: battle`), four 16px `front/*` crests and eleven 24px `achievement/*` badges, append-only (uma-platform P66). The Rift page pins the release and points the `tier-finale` place at `rift` | uma-platform `e3da022` (release `4125858`) |
 | H39 | Doc: [Tier 2's advanced classes](../design/tier2-classes.md), proposal for the owner with calls A1–A10 (Q14). Twelve passives within classes v2's slots, hands and 70/30, each pair winning a different Rift front; Duelist becomes Blademaster and three summons are renamed; Hero LB+ for anyone at Bond 10 with 24 drafted effects; skill MP ×1.7 in Tier 2 instead of ×tier | `9cc1831` |
 | H42 | The second profession, a proposal with calls V1–V8 (Q13): Lore Level, Relics and Glyphs, Scrolls and Seals for weapon arts and set steps, raw items for the ring gems. Its three facilities stand on the Battle page's free sides: the kit's grid math shows a second Wilds trio row can't fit | `250f2ce` |
 | H37 | Save v23: the account's achievements and each Uma's tier history, and each world's Rift (runs, Echo wins), all empty for existing saves and strictly parsed (D163). The owner's save upgrades on its next sync, with a `saveBackups/{uid}-v22` copy kept. Locally validated (a stored v22 row synced back as v23) and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39695592399) | `215fc93` |
