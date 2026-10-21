@@ -1,11 +1,11 @@
 // Facility work over the save (S4, D55, D144, SC3): put an Uma in a slot to gather, refine, craft or cut, queue up to
 // three more behind her, collect what she has made (with her Craft EXP), recall her, speed her up with tickets, repeat
 // her last job, restart or dismiss a queue that stopped, and upgrade a facility. Every rule runs in the shared engine,
-// `@luismlorenzana/uma-work`, through uma-rpg's kinds and hooks (`work/env.ts`); these are thin `Save` wrappers, plus a
-// read-only view of each facility's slots for today's screens until SC4's.
+// `@luismlorenzana/uma-work`, through uma-rpg's kinds and hooks (`work/env.ts`); these are thin `Save` wrappers plus
+// the small derived readings still used outside the shared SC4 facility screens.
 import {
-  chainTimes, collect, endsAt, finishedCount, isRefusal, kindRules, MAX_QUEUE, progress, queue, recall, remainingMs, settle, slotHolder, slotsOf,
-  speedUp, start, statusOf, ticketsToFinish, upgrade, withRow, type Entry, type ItemQty, type OpResult, type Refusal, type SlotRef, type WorkRow,
+  chainTimes, collect, endsAt, finish as finishNow, finishedCount, isRefusal, kindRules, MAX_QUEUE, progress, queue, recall, remainingMs, settle, slotHolder, slotsOf,
+  speedUp, start, statusOf, ticketsToFinish, upgrade, withRow, workRefusal, type Entry, type ItemQty, type OpResult, type QueueInput, type Refusal, type SlotRef, type WorkRow,
 } from '@luismlorenzana/uma-work'
 import { facilitySpec, type JobKind } from '../economy/jobs'
 import { FACILITY_SPEED, grantProfessionExp } from '../economy/pacing'
@@ -20,6 +20,7 @@ import type { OwnedUma, Save, TierWorld } from './save'
 
 export { grantProfessionExp, MAX_QUEUE }
 export type { RpgWorkRequest }
+export type RpgQueueInput = QueueInput<RpgWorkRequest>
 
 /** What work needs from an outfit's master data (a `RosterOutfit` fits). Aptitudes no longer set job speed (D139). */
 export interface WorkOutfit {
@@ -164,6 +165,13 @@ export function collectJob(save: Save, placeId: string, slot: number, now: strin
   return { save: withWorld(save, tier, next, now), got }
 }
 
+/** Collects one Uma's ready work. The shared work screen addresses rows by Uma, not by a duplicated slot view. */
+export function collectWorker(save: Save, outfitId: string, now: string, tier = TIER_ONE): { save: Save; got: Collected } {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  const { world: next, got } = collectFrom(world, outfitId, msOf(now))
+  return { save: withWorld(save, tier, next, now), got }
+}
+
 /** Collects every Uma with something finished, on the given places (all by default). */
 export function collectAll(save: Save, now: string, placeIds?: readonly string[], tier = TIER_ONE): { save: Save; items: number; levelsUp: number } {
   let world = settle(worldOf(save, tier), msOf(now), env).state
@@ -195,11 +203,23 @@ export function unqueueJob(save: Save, placeId: string, slot: number, index: num
   return withWorld(save, tier, done(queue(world, { outfitId, remove: index }, msOf(now), env), msOf(now)).state, now)
 }
 
+/** Applies the kit's add, remove or move queue edit without translating it through a screen-specific card model. */
+export function editWorkerQueue(save: Save, input: QueueInput<RpgWorkRequest>, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  return withWorld(save, tier, done(queue(world, input, msOf(now), env), msOf(now)).state, now)
+}
+
 /** Ends her work early: collects what's made; inputs for items never made come back; the item in progress is lost; her
  * queue drops and Repeat forgets her last job. */
 export function recallJob(save: Save, placeId: string, slot: number, now: string, tier = TIER_ONE): Save {
   const world = settle(worldOf(save, tier), msOf(now), env).state
   return withWorld(save, tier, recall(world, { outfitId: holderOf(world, placeId, slot) }, msOf(now), env).state, now)
+}
+
+/** Recalls one Uma's work. */
+export function recallWorker(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  return withWorld(save, tier, recall(world, { outfitId }, msOf(now), env).state, now)
 }
 
 /** Spends Speed Tickets on the slot's running job: each takes 30 minutes off (D74), never past done, and never more
@@ -212,6 +232,18 @@ export function cutJobTime(save: Save, placeId: string, slot: number, tickets: n
   return withWorld(save, tier, done(speedUp(world, { outfitId, startedAt: running.startedAt, tickets }, msOf(now), env), msOf(now)).state, now)
 }
 
+/** Speeds the exact entry the screen showed, so a late tap cannot spend tickets on its successor. */
+export function speedWorker(save: Save, outfitId: string, startedAt: number, tickets: number, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  return withWorld(save, tier, done(speedUp(world, { outfitId, startedAt, tickets }, msOf(now), env), msOf(now)).state, now)
+}
+
+/** Finishes the exact entry the screen showed with the engine's calculated Speed Ticket cost. */
+export function finishWorker(save: Save, outfitId: string, startedAt: number, now: string, tier = TIER_ONE): Save {
+  const world = settle(worldOf(save, tier), msOf(now), env).state
+  return withWorld(save, tier, done(finishNow(world, { outfitId, startedAt }, msOf(now), env), msOf(now)).state, now)
+}
+
 /** The first free slot of a facility, or null. */
 function freeSlot(world: TierWorld, placeId: string): number | null {
   return slotsOf(world, placeId, RPG_BUILDINGS).find((s) => slotHolder(world, s) === undefined)?.slot ?? null
@@ -222,6 +254,25 @@ function slotFor(world: TierWorld, outfitId: string, slot: SlotRef): number | nu
   const holder = slotHolder(world, slot)
   const exists = slotsOf(world, slot.building, RPG_BUILDINGS).some((s) => s.slot === slot.slot)
   return exists && (holder === undefined || holder === outfitId) ? slot.slot : freeSlot(world, slot.building)
+}
+
+/** Pure preview of the game's complete stopped-queue restart, including its alternate-slot rule and all queued jobs. */
+export function checkRestartStopped(world: TierWorld, outfitId: string, now: number): Refusal | null {
+  let settled = settle(world, now, env).state
+  const dropped = settled.work[outfitId]?.dropped
+  if (!dropped?.requests[0]) return null
+  const slot = slotFor(settled, outfitId, dropped.slot)
+  if (slot === null) return workRefusal('slot-taken')
+  const place = dropped.slot.building
+  const first = start(settled, { outfitId, slot: slotRef(place, slot), request: dropped.requests[0] }, now, env)
+  if (isRefusal(first)) return first
+  settled = first.state
+  for (const request of dropped.requests.slice(1)) {
+    const next = queue(settled, { outfitId, add: { request, building: place } }, now, env)
+    if (isRefusal(next)) return next
+    settled = next.state
+  }
+  return null
 }
 
 /** Starts her last finished job again where she did it (another free slot there if hers is taken). A Ready Uma's own
@@ -274,7 +325,7 @@ export function upgradeFacility(save: Save, placeId: string, now: string, tier =
   return withWorld(save, tier, done(upgrade(world, { building: placeId }, msOf(now), env), msOf(now)).state, now)
 }
 
-// --- Reading a facility for today's screens (until SC4's) -------------------------------------------------------------
+// --- Small derived readings used outside the shared facility screens --------------------------------------------------
 
 /** Finished items she hasn't collected, across her entries. */
 export function readyItems(row: WorkRow<RpgWorkRequest> | undefined, now: number): number {
@@ -303,22 +354,6 @@ export interface SlotJob {
 }
 
 /** A queue that couldn't start, waiting to be restarted or dismissed. */
-export interface StoppedQueue {
-  outfitId: string
-  requests: readonly RpgWorkRequest[]
-  /** What the Warehouse lacked for the first one, or the reason it was refused. */
-  why: string
-}
-
-export interface FacilityView {
-  level: number
-  /** One per slot at its level: the job in it, or null. */
-  jobs: (SlotJob | null)[]
-  stopped: StoppedQueue[]
-  /** Something here to collect. */
-  ready: boolean
-}
-
 function slotJob(world: TierWorld, row: WorkRow<RpgWorkRequest>, now: number): SlotJob {
   const last: Entry<RpgWorkRequest> = row.entries.at(-1)!
   const status = statusOf(row, now)
@@ -335,22 +370,6 @@ function slotJob(world: TierWorld, row: WorkRow<RpgWorkRequest>, now: number): S
     ticketsToFinish: status === 'ready' ? 0 : ticketsToFinish(remainingMs(last, now)),
     queue: row.queue.map((q, i) => ({ output: q.item, count: q.count, startsAt: times.queued[i]?.startsAt ?? 0, endsAt: times.queued[i]?.endsAt ?? 0 })),
   }
-}
-
-/** Every slot of a facility at `now`, its queues settled first. */
-export function facilityView(world: TierWorld, placeId: string, now: string): FacilityView {
-  const t = msOf(now)
-  const settled = settle(world, t, env).state
-  const slots = slotsOf(settled, placeId, RPG_BUILDINGS)
-  const jobs = slots.map((slot) => {
-    const holder = slotHolder(settled, slot)
-    return holder ? slotJob(settled, settled.work[holder]!, t) : null
-  })
-  const stopped = Object.values(settled.work).filter((row) => row.dropped?.slot.building === placeId).map((row) => ({
-    outfitId: row.outfitId, requests: row.dropped!.requests,
-    why: row.dropped!.refused ? refusalText(row.dropped!.refused, t) : row.dropped!.short.map((q) => `short ${q.qty} ${outputName(q.item)}`).join(', '),
-  }))
-  return { level: facilityLevel(settled, placeId), jobs, stopped, ready: jobs.some((j) => j && (j.ready > 0 || j.done)) }
 }
 
 /** Her job at `now`, wherever she works, or null. */

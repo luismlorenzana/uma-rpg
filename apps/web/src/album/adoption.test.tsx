@@ -1,4 +1,5 @@
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
+import { WorkArtProvider } from '@luismlorenzana/uma-kit/work'
 import { configureKit, MotionRoot } from '@luismlorenzana/uma-kit/ui'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { domAnimation } from 'motion/react'
@@ -36,7 +37,7 @@ beforeEach(async () => {
 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 function show(node: ReactNode) {
-  return render(<MemoryRouter><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E' }}>{node}</AlbumArtProvider></MotionRoot></MemoryRouter>)
+  return render(<MemoryRouter><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E' }}><WorkArtProvider art={{ Item: ({ id }) => <span>{id}</span> }}>{node}</WorkArtProvider></AlbumArtProvider></MotionRoot></MemoryRouter>)
 }
 const page = (id: string, rest = '') => ({ place: placeById(id)!, rest })
 const dialog = () => screen.getByRole('dialog')
@@ -69,14 +70,16 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     await waitFor(() => expect(calls.slot).toHaveBeenCalledWith(0, 1, '81003'))
   })
 
-  it('facility choice uses Craft order and advances to What, rather than cancelling the job sheet', async () => {
+  it('facility choice uses Craft order inside the shared who → what → how many sheet', async () => {
     show(<FacilityPage {...page('monster-den')} />)
-    fireEvent.click(screen.getByRole('button', { name: /Slot 1 · assign an Uma/ }))
-    const buttons = within(dialog()).getAllByRole('button').filter(button => ['Aster', 'Beryl', 'Cinder', 'Dune', 'Ember'].includes(button.getAttribute('aria-label') ?? ''))
+    fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
+    fireEvent.click(within(dialog()).getByRole('button', { name: 'Choose an Uma' }))
+    const picker = await screen.findByRole('dialog', { name: 'Choose an Uma' })
+    const buttons = within(picker).getAllByRole('button').filter(button => ['Aster', 'Beryl', 'Cinder', 'Dune', 'Ember'].includes(button.getAttribute('aria-label') ?? ''))
     expect(buttons.map(button => button.getAttribute('aria-label'))).toEqual(['Aster', 'Cinder', 'Dune', 'Beryl', 'Ember'])
-    fireEvent.click(within(dialog()).getByRole('button', { name: 'Aster' }))
-    await screen.findByRole('dialog', { name: 'What does she make?' })
-    expect(screen.queryByRole('dialog', { name: 'Who works here?' })).toBeNull()
+    fireEvent.click(within(picker).getByRole('button', { name: 'Aster' }))
+    expect(await screen.findByRole('region', { name: 'What' })).toBeDefined()
+    expect(screen.getByRole('radiogroup', { name: 'How many' })).toBeDefined()
   })
 
   it('Observatory honors its explicit Uma route and changes her through the shared picker', async () => {
