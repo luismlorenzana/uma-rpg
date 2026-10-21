@@ -28,7 +28,7 @@
 
 | Id | Doc | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H39](tasks/H39-doc-tier2-classes.md) | Tier 2's advanced classes (`tier2-classes.md`, calls A1–A9) | Claude | M | — | In progress (this session) |
+| H39 | Tier 2's advanced classes ([`tier2-classes.md`](../design/tier2-classes.md), calls A1–A10) | Claude | M | — | Done (`9cc1831`) |
 | [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | In progress (this session) |
 | H41 | The Extra Stats outer ring ([`extra-stats-tier2.md`](../design/extra-stats-tier2.md), calls X1–X8) | Claude | M | — | Done (`d15b84d`) |
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H39 | Doc: [Tier 2's advanced classes](../design/tier2-classes.md), proposal for the owner with calls A1–A10 (Q14). Twelve passives within classes v2's slots, hands and 70/30, each pair winning a different Rift front; Duelist becomes Blademaster and three summons are renamed; Hero LB+ for anyone at Bond 10 with 24 drafted effects; skill MP ×1.7 in Tier 2 instead of ×tier | `9cc1831` |
 | H42 | The second profession, a proposal with calls V1–V8 (Q13): Lore Level, Relics and Glyphs, Scrolls and Seals for weapon arts and set steps, raw items for the ring gems. Its three facilities stand on the Battle page's free sides: the kit's grid math shows a second Wilds trio row can't fit | `250f2ce` |
 | H37 | Save v23: the account's achievements and each Uma's tier history, and each world's Rift (runs, Echo wins), all empty for existing saves and strictly parsed (D163). The owner's save upgrades on its next sync, with a `saveBackups/{uid}-v22` copy kept. Locally validated (a stored v22 row synced back as v23) and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39695592399) | `215fc93` |
 | H32 | New Mages, Summoners and Clerics unlock in magic armor through one class → armor table, `RPG_CLASS_ARMOR`; existing Umas keep theirs (D162). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39695099232) | `b535754` |
