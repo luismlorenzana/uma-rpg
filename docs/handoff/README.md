@@ -1,6 +1,6 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-18, after SB5.** The open work is the sibling apps plan, phases B to E (uma-platform P48,
+> **Status: 2026-10-21, after SC4.** The open work is the sibling apps plan, phases B to E (uma-platform P48,
 > [phases](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/phases.md)). Unrelated packets were
 > archived by the owner's call (D151). Each task is a self-contained packet in [tasks/](tasks/).
 > - Start a worker, Claude or ChatGPT, with uma-platform's
@@ -14,8 +14,6 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| **Phase C: one work system** | | | | | |
-| [SC4](tasks/SC4-rpg-work-screens.md) | The Wilds on `uma-kit/work`'s screens | Either | M | SC2 (SC3 done) | Waiting |
 | **Phase E: platform plumbing** | | | | | |
 | [SE3](tasks/SE3-rpg-content.md) | Master data and art through `uma-kit/content` and `uma-server/content` | Either | S | SE2 | Waiting |
 
@@ -39,6 +37,7 @@ tracks the other packets' released dependencies.
 
 | Id | Task | Commit |
 |---|---|---|
+| SC4 | All 11 Wilds facilities and quick looks on `uma-kit/work`'s shared rows, sheets, targets and stopped queues (D157). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39590331919) | `c8bded0` |
 | SB5 | Party busts in spaced, solid bordered cards; slower breath, victory hop/glow, no fight chibi requests (D156). Locally validated and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39167185219) | `11e39f9` |
 | SB4 | Shared Stable, all six Uma picker contexts and plaza chooser, outfit faces, saved views and New (D154); ten target Umas (D155). Locally validated and deployed | `b205b52` (CI timeout repair `21b4fa9`) |
 | SC3 | Work on `@luismlorenzana/uma-work` 0.1.0: four kinds, save v22, Repeat and stopped queues (D152) | `6063b95` |
