@@ -170,6 +170,8 @@ there (D5). A tier's Rift can be run again by its next 20 Lv 50 Umas.
 | **Professions** | Craft Level (today) | **A second vertical** (Q7), with its own families feeding the weapon arts and set bonuses | Its own doc |
 | **The Rift** | Tier 1's ([the Rift](rift.md)) | Tier 2's: harder fronts that test weapon arts and the outer ring | Tier 3's |
 
+The Extra Stats outer ring is designed in [Extra Stats in Tier 2](extra-stats-tier2.md) (H41, calls X1–X8).
+
 **What it costs.** Tier 1's simplification reuses today's content: the cores already exist. The side forks become
 Tier 2 content instead of being thrown away. New content is:
 - the twelve advanced classes and their passives;
