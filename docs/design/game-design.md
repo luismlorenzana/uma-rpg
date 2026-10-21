@@ -41,6 +41,9 @@ the fifth. This is still an owner choice, not current behavior ([open questions]
 
 ### 2.2 Tier worlds
 
+> **[Proposed 2026-10-21]** [tiers.md](tiers.md) proposes separate worlds per tier with a Tier shifter, what promotion
+> moves and resets, and depth that grows by tier. Owner calls T1–T9.
+
 The planned tier model keeps an independent roster, Hub, facilities, stock and progression in each world (D3, D15).
 Promotion moves one Uma to the next tier; the old world and its other Umas stay.
 
@@ -54,6 +57,9 @@ Promotion moves one Uma to the next tier; the old world and its other Umas stay.
 Tier 2 has no outfit unlocks; promotion is its planned entry. Later mechanics are not implemented.
 
 ### 2.3 Promotion and the Tier Finale
+
+> **[Proposed 2026-10-21]** [rift.md](rift.md) replaces the Tier Finale with the Rift: four composition fronts and a
+> Convergence, run by twenty Lv 50 Umas who ascend together. Owner calls R1–R9.
 
 Every tier is intended to end with a harder event that tests more of the roster (D4).
 
