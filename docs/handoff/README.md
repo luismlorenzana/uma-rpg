@@ -22,7 +22,7 @@
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
 | [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Ready |
 | [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
-| [H37](tasks/H37-save-v23.md) | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | In progress (this session) |
+| H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
 | [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | In progress (this session) |
 
 **Write now** (design docs for Tier 2, each with owner calls; no code):
@@ -35,7 +35,7 @@
 | [H42](tasks/H42-doc-second-profession.md) | The second profession (`second-profession.md`, calls V1–V8) | Claude | M | — | In progress (this session) |
 | [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | In progress (this session) |
 
-**Ready now, in parallel:** H33, H34, H35, H37, H38 and H39–H43. H36 follows H35.
+**Ready now, in parallel:** H33, H34, H35, H38 and H39–H43. H36 follows H35.
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
@@ -60,6 +60,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H37 | Save v23: the account's achievements and each Uma's tier history, and each world's Rift (runs, Echo wins), all empty for existing saves and strictly parsed (D163). The owner's save upgrades on its next sync, with a `saveBackups/{uid}-v22` copy kept. Locally validated (a stored v22 row synced back as v23) and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39695592399) | `215fc93` |
 | H32 | New Mages, Summoners and Clerics unlock in magic armor through one class → armor table, `RPG_CLASS_ARMOR`; existing Umas keep theirs (D162). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39695099232) | `b535754` |
 | SE3 | Master data, release art and private enemy content through `uma-kit/content` and `uma-server/content` (D158). Locally validated and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39633132807) | `18dbd4b` |
 | SC4 | All 11 Wilds facilities and quick looks on `uma-kit/work`'s shared rows, sheets, targets and stopped queues (D157). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39590331919) | `c8bded0` |
