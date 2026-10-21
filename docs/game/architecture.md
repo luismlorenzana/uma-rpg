@@ -29,7 +29,7 @@ production value and is the place to change them.
 |---|---|---|---|
 | `@rpg/domain` | `packages/domain` | Save schema and parsers, battle engine, classes and skills, world generator, economy, items, place registry, master data adapter | `tsc` → `dist/cjs` (CommonJS for the API); Vite and Vitest read the TypeScript source |
 | `@rpg/web` | `apps/web` | The game | `tsc --noEmit && vite build` → `apps/web/dist` |
-| `@rpg/api` | `apps/api` | Save, master data and content proxy, push | `nest build` → `dist/main.js`, shipped as a Docker image |
+| `@rpg/api` | `apps/api` | Save, shared master-data and content routes, push | `nest build` → `dist/main.js`, shipped as a Docker image |
 | enemy scripts | `scripts/enemies/` | Build and publish the three locked franchise packs | `content/enemies-release/` (gitignored) |
 
 pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`, and tests are Vitest. Commands are in
@@ -68,15 +68,19 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     launch.
 - **PWA** (`vite.config.ts`, vite-plugin-pwa):
   - Updates are prompted ("Update ready · Restart"), never forced mid-action.
-  - The service worker precaches the app, Phaser included, and caches master data and enemy art by URL hash.
+  - The service worker precaches the app, Phaser included, and keeps its existing URL caches for master data and enemy
+    art. `uma-kit/content` also verifies release hashes and keeps release and hash-named enemy bytes in Cache Storage.
   - `push-sw.js` shows notifications and sets the app badge.
 - **Getting in** (SD3): `uma-kit/auth`'s `AuthProvider` (Firebase Google sign-in with a redirect, loaded on demand,
   with this game's config from `app/firebase-config.ts`) and `uma-kit/places`' `BootGates` and `UpdateNotice`. The ID
   token goes to the API as `Authorization: Bearer`.
 - **Master data** (`master/master.ts`):
-  - `@luismlorenzana/uma-data`'s release client reads through the API proxy (`/api/master/`).
-  - It loads characters, outfits, scenarios and the art index once a session; skills load only when needed.
-- **Original art:** `@luismlorenzana/uma-art` atlases (items, gear, buildings, tiles) are bundled by Vite.
+  - One `ContentProvider` and content client from `@luismlorenzana/uma-kit/content` read the uma-data release through
+    `/api/master/`; `master.ts` only adapts that release to this game's `MasterView`.
+  - Characters, outfits, scenarios and the art index load once a session; skills load only when needed.
+- **Original art:** `@luismlorenzana/uma-art` atlases (items, gear, buildings, tiles) are bundled by Vite. Private
+  outfit art from uma-data and the enemy pack's faces, verticals and splashes load through that same authenticated
+  content client, with blob URLs in memory and hash-checked Cache Storage copies where applicable.
 - **The work engine** (`@luismlorenzana/uma-work`, uma-platform P53, SC3) runs every job: slots, reserving, the clock,
   queues, collect, recall, Speed Tickets and upgrades. It's pure TypeScript in ESM and CommonJS, so the API runs the same
   rules when it accepts a save.
@@ -88,10 +92,11 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - since SD3, getting in (`/auth`) and the frames of the Account, the Warehouse, the Exchange and the profile
     (`/places`), each filled with this game's content and words;
   - the album engine and device preferences (`/roster`), plus art tiles, album chrome, virtual grid and Uma picker
-    (`/album`, 0.7.1). The Stable, six picker contexts and plaza chooser use these components, not local copies.
+    (`/album`), and the shared Wilds work screens (`/work`, 0.9.1). The Stable, six picker contexts, plaza chooser and
+    facility screens use these components, not local copies.
 
   uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
-  the appearance and Motion, and `AlbumArtProvider` over this game's authenticated content loader. Faces use
+  the appearance and Motion, the shared `ContentProvider`, and `AlbumArtProvider`. Faces use
   uma-data 1.1.0's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their own families.
   `album/` holds RPG row values, schema, eligibility and the one-time old preference migration. `hub/` holds this
   game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v22 stay game-owned.
@@ -113,6 +118,10 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 - **Auth** (SD3): the shared guard from `@luismlorenzana/uma-server/auth` (uma-platform P54) guards every route.
   Firebase Admin verifies the token (401 without one or with a bad one), and the email must equal `ALLOWED_EMAIL`, a
   one-player allowlist (403 for anyone else). `AUTH_MODE=disabled` (local) acts as `local-dev`.
+- **Content routes** (SE3): `ReleaseProxyModule` and `PrivatePackModule` from
+  `@luismlorenzana/uma-server/content` serve the same `/api/master/*` and `/api/content/*` routes from the same env
+  vars. The game's private allowlist remains `enemies.json` plus hash-named WebP face, art and splash files; the shared
+  modules own traversal checks, content types, cache headers, local-folder sources and bucket reads.
 - **Storage:**
   - Production uses Firestore: `saves/{uid}` is written in a transaction, and a schema bump first backs the old save up
     to `saveBackups/{uid}-v{n}`. `push/{uid}` holds push subscriptions.

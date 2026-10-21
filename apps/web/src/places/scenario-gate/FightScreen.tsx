@@ -6,6 +6,7 @@ import {
   autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, biomeById, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
   type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
+import { AtlasSprite, imagePath } from '@luismlorenzana/uma-kit/content'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import {
@@ -20,7 +21,7 @@ import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
 import { stageLayout } from '../../battle/stage-layout'
 import { castArtUrl } from '../../content/cast'
-import { artUrl, AtlasSprite, imagePath } from '../../master/art'
+import { CONTENT } from '../../content/client'
 import { fightAction, leaveFight, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon, MenuIcon } from '../../ui/icons'
@@ -49,7 +50,7 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
     const art = campaign.view.art
     const bust = (id: string) => {
       const p = imagePath(art, 'outfit-busts', id)
-      return p ? artUrl(p) : null
+      return p ? CONTENT.artUrl(p) : null
     }
     void Promise.all([
       Promise.all(state.input.allies.map(async (a) => ({

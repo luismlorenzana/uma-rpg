@@ -4,6 +4,7 @@
 // job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
 // racing profile. The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56, SD3).
 import { STATS } from '@luismlorenzana/uma-data'
+import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
@@ -22,7 +23,6 @@ import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
-import { AtlasSprite, imagePath, useArtUrl } from '../../master/art'
 import { loadSkills, type MasterView } from '../../master/master'
 import { markTarget, unlock, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'

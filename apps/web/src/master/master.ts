@@ -1,10 +1,10 @@
-// Master data in the app (T005): the latest release (schema major 1) through the API, loaded once per session.
+// This game's adapter from uma-kit's shared release client to the RPG's MasterView (SE3).
 // Only the small sets load up front; the 2.5 MB skill set loads when a profile first needs it.
 import { buildChapters, buildRoster, type ChapterInfo, type RosterOutfit } from '@rpg/domain'
-import type { ArtIndex, ReleaseClient, ReleaseManifest, Skill } from '@luismlorenzana/uma-data'
+import type { ArtIndex, ReleaseManifest, Skill } from '@luismlorenzana/uma-data'
 import { outfitRowBase, type OutfitRowBase } from '@luismlorenzana/uma-kit/roster'
 import { useSyncExternalStore } from 'react'
-import { authHeaders } from '../api/client'
+import { CONTENT } from '../content/client'
 
 export interface MasterView {
   manifest: ReleaseManifest
@@ -21,7 +21,6 @@ export type MasterState =
 
 let state: MasterState = { status: 'idle' }
 const listeners = new Set<() => void>()
-let clientPromise: Promise<ReleaseClient> | null = null
 let skillsPromise: Promise<Map<number, Skill>> | null = null
 
 function set(next: MasterState): void {
@@ -29,22 +28,12 @@ function set(next: MasterState): void {
   for (const listener of listeners) listener()
 }
 
-function client(): Promise<ReleaseClient> {
-  clientPromise ??= import('@luismlorenzana/uma-data').then(({ createFetchSource, createReleaseClient }) =>
-    createReleaseClient({
-      source: createFetchSource({ baseUrl: `${location.origin}/api/master/`, init: async () => ({ headers: await authHeaders() }) }),
-    }),
-  )
-  return clientPromise
-}
-
 function loadMaster(): void {
   if (state.status === 'loading' || state.status === 'ready') return
   set({ status: 'loading' })
   void (async () => {
     try {
-      const c = await client()
-      const manifest = await c.manifest()
+      const [c, manifest] = await Promise.all([CONTENT.release(), CONTENT.manifest()])
       const [characters, outfits, scenarios, art] = await Promise.all([
         c.set(manifest, 'characters'),
         c.set(manifest, 'outfits'),
@@ -63,7 +52,7 @@ function loadMaster(): void {
 
 /** The skill set, by id. Loaded on first use and kept for the session. */
 export function loadSkills(manifest: ReleaseManifest): Promise<Map<number, Skill>> {
-  skillsPromise ??= client()
+  skillsPromise ??= CONTENT.release()
     .then((c) => c.set(manifest, 'skills'))
     .then((skills) => new Map(skills.map((s) => [s.id, s])))
   skillsPromise.catch(() => {
@@ -88,6 +77,7 @@ export function useMaster(): MasterState {
 /** Retries a failed load (for example after coming back online). */
 export function retryMaster(): void {
   if (state.status === 'error') {
+    CONTENT.refresh()
     set({ status: 'idle' })
     loadMaster()
   }

@@ -1,7 +1,7 @@
-// SB4 uses this game's authenticated/cached loader; kit components never fetch the private release themselves.
+// The RPG maps album kinds to uma-data families; uma-kit/content owns authenticated, cached loading (SE3).
 import type { AlbumArt, UmaArtKind } from '@luismlorenzana/uma-kit/album'
+import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import type { ArtIndex, ImageFamily } from '@luismlorenzana/uma-data'
-import { AtlasSprite, imagePath, useArtUrl } from './art'
 import { useMaster } from './master'
 
 const FAMILY: Record<UmaArtKind, ImageFamily | null> = { face: 'outfit-faces', bust: 'outfit-busts', chibi: 'outfit-chibis', icon: null }

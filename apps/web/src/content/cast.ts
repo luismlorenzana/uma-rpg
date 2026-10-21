@@ -1,9 +1,10 @@
 // The enemy roster (D135): the three franchises' units, each with a face, a vertical (`art`) and, above Regular, a splash;
-// served by /api/content to the signed-in owner as enemies.json and loaded once a session. Images are hash-named, so
-// their blob URLs are kept for the session and the service worker caches the bytes.
+// served by /api/content to the signed-in owner as enemies.json and loaded once a session. uma-kit/content owns the
+// authenticated requests plus the in-memory and Cache Storage copies of hash-named images (SE3).
 import { isEnemyTier, isFranchise, type EnemyTier, type Franchise, type RosterMember } from '@rpg/domain'
+import { contentProblem } from '@luismlorenzana/uma-kit/content'
 import { useSyncExternalStore } from 'react'
-import { authHeaders } from '../api/client'
+import { CONTENT } from './client'
 
 export interface CastImage { path: string; width: number; height: number }
 export interface CastMember extends RosterMember {
@@ -53,13 +54,11 @@ function loadCast(): void {
   set({ status: 'loading' })
   void (async () => {
     try {
-      const res = await fetch('/api/content/enemies.json', { headers: await authHeaders() })
-      if (res.status === 404) throw new Error('The enemies haven’t been published yet.')
-      if (!res.ok) throw new Error(`enemies ${res.status}`)
-      const members = parseRoster(await res.json())
+      const bytes = await CONTENT.pack('enemies.json')
+      const members = parseRoster(JSON.parse(new TextDecoder().decode(bytes)))
       set({ status: 'ready', cast: { members, byId: new Map(members.map((m) => [m.id, m])) } })
     } catch (err) {
-      set({ status: 'error', message: err instanceof Error ? err.message : String(err) })
+      set({ status: 'error', message: contentProblem(err) === 'missing' ? 'The enemies haven’t been published yet.' : err instanceof Error ? err.message : String(err) })
     }
   })()
 }
@@ -84,19 +83,5 @@ export function useCast(): CastState {
   return snapshot
 }
 
-const blobUrls = new Map<string, Promise<string>>()
-
 /** A blob URL for an enemy image (`enemies/<unit>-<role>.<hash>.webp`). */
-export function castArtUrl(path: string): Promise<string> {
-  let url = blobUrls.get(path)
-  if (!url) {
-    url = (async () => {
-      const res = await fetch(`/api/content/${path}`, { headers: await authHeaders() })
-      if (!res.ok) throw new Error(`enemy image ${res.status}`)
-      return URL.createObjectURL(await res.blob())
-    })()
-    url.catch(() => blobUrls.delete(path))
-    blobUrls.set(path, url)
-  }
-  return url
-}
+export const castArtUrl = (path: string): Promise<string> => CONTENT.packUrl(path)
