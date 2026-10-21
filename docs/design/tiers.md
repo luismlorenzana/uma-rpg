@@ -172,6 +172,8 @@ there (D5). A tier's Rift can be run again by its next 20 Lv 50 Umas.
 
 The Extra Stats outer ring is designed in [Extra Stats in Tier 2](extra-stats-tier2.md) (H41, calls X1–X8).
 
+The second vertical is designed in [the second profession](second-profession.md) (H42, calls V1–V8).
+
 **What it costs.** Tier 1's simplification reuses today's content: the cores already exist. The side forks become
 Tier 2 content instead of being thrown away. New content is:
 - the twelve advanced classes and their passives;
