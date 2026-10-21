@@ -8,7 +8,7 @@
 >   packet: "Take H35".
 > - Workers decide what a packet leaves open, record it, and flag their own packets done: delete the packet and add a
 >   Done row below (D35).
-> - **The owner dispatches.** No session starts or assigns a packet on its own.
+> - **The owner dispatches.** On 2026-10-21 the owner had Claude's main session dispatch all twelve to its worker agents, in waves, and review each.
 
 ## This repo's packets
 
@@ -16,23 +16,23 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H32](tasks/H32-magic-armor-at-unlock.md) | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Ready |
+| [H32](tasks/H32-magic-armor-at-unlock.md) | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | In progress (this session) |
 | [H33](tasks/H33-class-presets.md) | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Waiting |
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
 | [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Ready |
 | [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
-| [H37](tasks/H37-save-v23.md) | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Ready |
-| [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Ready |
+| [H37](tasks/H37-save-v23.md) | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | In progress (this session) |
+| [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | In progress (this session) |
 
 **Write now** (design docs for Tier 2, each with owner calls; no code):
 
 | Id | Doc | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H39](tasks/H39-doc-tier2-classes.md) | Tier 2's advanced classes (`tier2-classes.md`, calls A1–A9) | Claude | M | — | Ready |
-| [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | Ready |
-| [H41](tasks/H41-doc-outer-ring.md) | The Extra Stats outer ring (`extra-stats-tier2.md`, calls X1–X8) | Claude | M | — | Ready |
-| [H42](tasks/H42-doc-second-profession.md) | The second profession (`second-profession.md`, calls V1–V8) | Claude | M | — | Ready |
-| [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | Ready |
+| [H39](tasks/H39-doc-tier2-classes.md) | Tier 2's advanced classes (`tier2-classes.md`, calls A1–A9) | Claude | M | — | In progress (this session) |
+| [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | In progress (this session) |
+| [H41](tasks/H41-doc-outer-ring.md) | The Extra Stats outer ring (`extra-stats-tier2.md`, calls X1–X8) | Claude | M | — | In progress (this session) |
+| [H42](tasks/H42-doc-second-profession.md) | The second profession (`second-profession.md`, calls V1–V8) | Claude | M | — | In progress (this session) |
+| [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | In progress (this session) |
 
 **Ready now, in parallel:** H32, H34, H35, H37, H38 and H39–H43. H33 follows H32; H36 follows H35.
 
