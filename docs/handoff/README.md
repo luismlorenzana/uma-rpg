@@ -1,35 +1,59 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-21, after SE3.** This repo has finished its sibling-app packets through Phase E (uma-platform P48,
-> [phases](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/phases.md)). Unrelated packets were
-> archived by the owner's call (D151). Each task is a self-contained packet in [tasks/](tasks/).
+> **Status: 2026-10-21, after D161.** The open work is the approved tiers, classes v2 and the Rift
+> ([tiers](../design/tiers.md), [classes v2](../design/classes-v2.md), [the Rift](../design/rift.md); D159–D161).
+> Each task is a self-contained packet in [tasks/](tasks/).
 > - Start a worker, Claude or ChatGPT, with uma-platform's
->   [master prompt](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/master-prompt.md).
-> - The whole program, across uma-platform, uma-rpg and uma-racer, is uma-platform's
->   [queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md).
-> - Workers flag their own packets done: delete the packet, add a Done row below, and set its State in uma-platform's
->   queue (D35).
+>   [master prompt](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/master-prompt.md). Name the
+>   packet: "Take H35".
+> - Workers decide what a packet leaves open, record it, and flag their own packets done: delete the packet and add a
+>   Done row below (D35).
+> - **The owner dispatches.** No session starts or assigns a packet on its own.
 
 ## This repo's packets
 
-No open packets.
+**Build now** (approved designs; checks are local, the owner checks screen edges on the phone, P60):
 
-**Phases B–E are done here.** The [program queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md)
-tracks the other packets' released dependencies.
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H32](tasks/H32-magic-armor-at-unlock.md) | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Ready |
+| [H33](tasks/H33-class-presets.md) | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Waiting |
+| [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
+| [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Ready |
+| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
+| [H37](tasks/H37-save-v23.md) | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Ready |
+| [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Ready |
 
+**Write now** (design docs for Tier 2, each with owner calls; no code):
+
+| Id | Doc | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H39](tasks/H39-doc-tier2-classes.md) | Tier 2's advanced classes (`tier2-classes.md`, calls A1–A9) | Claude | M | — | Ready |
+| [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | Ready |
+| [H41](tasks/H41-doc-outer-ring.md) | The Extra Stats outer ring (`extra-stats-tier2.md`, calls X1–X8) | Claude | M | — | Ready |
+| [H42](tasks/H42-doc-second-profession.md) | The second profession (`second-profession.md`, calls V1–V8) | Claude | M | — | Ready |
+| [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | Ready |
+
+**Ready now, in parallel:** H32, H34, H35, H37, H38 and H39–H43. H33 follows H32; H36 follows H35.
+
+**Overlaps to know:**
+- **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
+- **uma-kit releases:** H34 and H36 each ship a kit minor. Fetch `main` and take the next version.
+- **Doc pairs:** H39 and H40 share engine v15, and H41, H42 and H43 cross-reference each other. Each doc matches the
+  others that already exist.
+
+**Next, packets to write after these:**
+- **Classes v2, engine v14** (C1–C7: Paladin and Cleric, Spell Blade, Summoner, the halls, accessories, the ward,
+  balance and release), plus a small art packet for the Paladin's class emblem and the Paladin Bastion building.
+- **Tier 1 simplification** (D1).
+- **The Rift:** generator, run rules and Ascend, achievements, page, balance (E1–E5).
+
+**Also:**
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
-  retunes. Combat was rebalanced by D140–D141 ([combat balance](../design/combat-balance.md)).
+  retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Sibling apps so far:**
-  - **Phase 0:** H30 (D146).
-  - **Phase A:** uma-kit (D147–D150), and H31's art in uma-art 2.9.0 (D148).
-  - **Phase B:** SB4, the shared Stable and six picker contexts, faces and saved views (D154); SB5, framed battle
-    busts with no chibis (D156).
-  - **Phase C:** SC3, work on uma-work (D152); SC4, the shared Wilds work screens (D157).
-  - **Phase D:** SD3, getting in and the places on uma-kit and uma-server (D153).
-  - **Phase E:** SE3, shared authenticated master data, release art and private content plumbing (D158).
-
-  This game runs on uma-kit 0.9.1, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
+- **Versions:** this game runs on uma-kit 0.9.1, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+  protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done
 
