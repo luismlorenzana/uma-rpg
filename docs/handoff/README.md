@@ -16,6 +16,7 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
+| H41 | Doc: [Extra Stats in Tier 2, the outer ring](../design/extra-stats-tier2.md), proposal for the owner with calls X1–X8 (Q12). Recommends the Halo, a grade-5 and grade-10 pair per kind, one specialty slot, flat values (half a weapon's Might at its grade, like an Orb) and twenty ring gems at the Lapidary | `d15b84d` |
 | H32 | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Done (`b535754`) |
 | [H33](tasks/H33-class-presets.md) | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Ready |
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
@@ -30,7 +31,7 @@
 |---|---|---|---|---|---|
 | [H39](tasks/H39-doc-tier2-classes.md) | Tier 2's advanced classes (`tier2-classes.md`, calls A1–A9) | Claude | M | — | In progress (this session) |
 | [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | In progress (this session) |
-| [H41](tasks/H41-doc-outer-ring.md) | The Extra Stats outer ring (`extra-stats-tier2.md`, calls X1–X8) | Claude | M | — | In progress (this session) |
+| H41 | The Extra Stats outer ring ([`extra-stats-tier2.md`](../design/extra-stats-tier2.md), calls X1–X8) | Claude | M | — | Done (`d15b84d`) |
 | [H42](tasks/H42-doc-second-profession.md) | The second profession (`second-profession.md`, calls V1–V8) | Claude | M | — | In progress (this session) |
 | [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | In progress (this session) |
 
