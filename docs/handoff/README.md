@@ -1,6 +1,6 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-21, after SC4.** The open work is the sibling apps plan, phases B to E (uma-platform P48,
+> **Status: 2026-10-21, after SE3.** This repo has finished its sibling-app packets through Phase E (uma-platform P48,
 > [phases](https://github.com/luismlorenzana/uma-platform/blob/main/docs/sibling/phases.md)). Unrelated packets were
 > archived by the owner's call (D151). Each task is a self-contained packet in [tasks/](tasks/).
 > - Start a worker, Claude or ChatGPT, with uma-platform's
@@ -12,12 +12,9 @@
 
 ## This repo's packets
 
-| Id | Task | Who | Size | Needs | State |
-|---|---|---|---|---|---|
-| **Phase E: platform plumbing** | | | | | |
-| [SE3](tasks/SE3-rpg-content.md) | Master data and art through `uma-kit/content` and `uma-server/content` | Either | S | SE2 | Waiting |
+No open packets.
 
-**Phase B is done.** The [program queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md)
+**Phases B–E are done here.** The [program queue](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/README.md)
 tracks the other packets' released dependencies.
 
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
@@ -28,15 +25,17 @@ tracks the other packets' released dependencies.
   - **Phase A:** uma-kit (D147–D150), and H31's art in uma-art 2.9.0 (D148).
   - **Phase B:** SB4, the shared Stable and six picker contexts, faces and saved views (D154); SB5, framed battle
     busts with no chibis (D156).
-  - **Phase C:** SC3, work on uma-work (D152).
+  - **Phase C:** SC3, work on uma-work (D152); SC4, the shared Wilds work screens (D157).
   - **Phase D:** SD3, getting in and the places on uma-kit and uma-server (D153).
+  - **Phase E:** SE3, shared authenticated master data, release art and private content plumbing (D158).
 
-  This game runs on uma-kit 0.7.1, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
+  This game runs on uma-kit 0.9.1, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done
 
 | Id | Task | Commit |
 |---|---|---|
+| SE3 | Master data, release art and private enemy content through `uma-kit/content` and `uma-server/content` (D158). Locally validated and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39633132807) | `18dbd4b` |
 | SC4 | All 11 Wilds facilities and quick looks on `uma-kit/work`'s shared rows, sheets, targets and stopped queues (D157). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39590331919) | `c8bded0` |
 | SB5 | Party busts in spaced, solid bordered cards; slower breath, victory hop/glow, no fight chibi requests (D156). Locally validated and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39167185219) | `11e39f9` |
 | SB4 | Shared Stable, all six Uma picker contexts and plaza chooser, outfit faces, saved views and New (D154); ten target Umas (D155). Locally validated and deployed | `b205b52` (CI timeout repair `21b4fa9`) |
