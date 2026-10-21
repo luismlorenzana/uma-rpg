@@ -16,11 +16,10 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H41 | Doc: [Extra Stats in Tier 2, the outer ring](../design/extra-stats-tier2.md), proposal for the owner with calls X1–X8 (Q12). Recommends the Halo, a grade-5 and grade-10 pair per kind, one specialty slot, flat values (half a weapon's Might at its grade, like an Orb) and twenty ring gems at the Lapidary | `d15b84d` |
 | H32 | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Done (`b535754`) |
 | [H33](tasks/H33-class-presets.md) | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Ready |
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
-| [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Ready |
+| [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | In progress (this session) |
 | [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
 | H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
 | [H38](tasks/H38-rift-art.md) | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | In progress (this session) |
