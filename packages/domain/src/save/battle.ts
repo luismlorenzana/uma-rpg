@@ -53,9 +53,14 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
 
 // --- Classes (D86) ---------------------------------------------------------------------------------------------------
 
-/** The class she fights as: the chosen one, or her best running style's. */
+/** The class she starts in, at unlock and until she picks one: her best running style's (ties: front, pace, late, end). */
+export function startingClass(outfit: Pick<BattleOutfit, 'aptitudes'>): RpgClass {
+  return rpgDefaultClass(best(outfit.aptitudes.strategy)[0])
+}
+
+/** The class she fights as: the chosen one, or her starting class. */
 export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>): RpgClass {
-  return uma.classId ?? rpgDefaultClass(best(outfit.aptitudes.strategy)[0])
+  return uma.classId ?? startingClass(outfit)
 }
 
 /** Her setup for a class: what she saved, or its default five weapons with nothing learned and skills chosen for her. */

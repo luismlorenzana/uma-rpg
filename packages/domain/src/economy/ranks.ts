@@ -27,6 +27,8 @@ export type ArmorPiece = ArmorKind
 export const isArmorKind = (v: unknown): v is ArmorKind => (ARMOR_KINDS as readonly unknown[]).includes(v)
 export const armorSlotOf = (kind: ArmorKind): ArmorSlot => ARMOR_SLOTS.find((s) => (ARMOR_SLOT_KINDS[s] as readonly string[]).includes(kind))!
 export const isMagicalArmor = (kind: ArmorKind): boolean => ARMOR_SLOT_KINDS[armorSlotOf(kind)][1] === kind
+/** A slot's physical or magical piece. */
+export const armorKindFor = (slot: ArmorSlot, half: 'physical' | 'magical'): ArmorKind => ARMOR_SLOT_KINDS[slot][half === 'magical' ? 1 : 0]
 /** Each slot's defensive stat, +1 a grade on either of its pieces (D124). */
 export const ARMOR_SLOT_STAT = { head: 'def', body: 'hp', legs: 'mp', arms: 'mdef', feet: 'speed' } as const satisfies Record<ArmorSlot, string>
 

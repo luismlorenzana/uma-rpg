@@ -5,7 +5,7 @@ import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
   actInFight, activeClass, chooseClass, classOf, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, setClassWeapons,
-  settleFight, startFight, umaBattleSheet, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
+  settleFight, startFight, startingClass, umaBattleSheet, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
@@ -67,6 +67,8 @@ describe('classes (D86)', () => {
     const uma = worldOf(save).umas['102']!
     expect(activeClass(OUTFITS.get('102')!, uma)).toBe('mage')
     expect(activeClass(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('summoner')
+    // Her starting class, the one her armor follows at unlock (D160 §7).
+    expect((['front', 'pace', 'late', 'end'] as const).map((s) => startingClass(outfit('x', s)))).toEqual(['brawler', 'mage', 'cleric', 'summoner'])
     const switched = chooseClass(save, '102', 'cleric', T(3))
     expect(activeClass(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('cleric')
     const profile = umaProfile(o101, worldOf(save).umas['101']!, 1)

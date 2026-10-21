@@ -304,7 +304,8 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 - **Wearing a grade:** grade k needs her Weapon Rank for that weapon, her Armor Rank for that armor kind, or her
   Accessory Rank for the accessory's kind, at k or more ([classes](classes.md#ranks-and-levels)).
 - **Training pieces:** every Uma holds a grade-0 Training piece of each weapon and armor kind, with no stats. It fills a
-  slot until she binds that kind's grade 1, and isn't offered after (D98, D124).
+  slot until she binds that kind's grade 1, and isn't offered after (D98, D124). A new Uma's armor slots hold her
+  starting class's Training pieces: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or Summoner (D162).
 
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |

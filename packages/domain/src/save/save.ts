@@ -14,7 +14,7 @@ import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL }
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
 import type { RpgWorkRequest } from '../work/request'
 import {
-  ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
+  ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, armorKindFor, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
   WEAPON_TYPES, type AccessoryKind, type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { RPG_CLASSES } from '../rpg/kinds'
@@ -30,7 +30,7 @@ import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
 import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
-  isRpgWeapon, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
+  isRpgWeapon, RPG_CLASS_ARMOR, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
   type RpgWeapon,
 } from '../rpg/rules'
 import { migrateWorld } from './migrations'
@@ -99,11 +99,12 @@ export interface BondTrack { level: number; exp: number }
 /** A Hall of Heroes seat (D106): its Hero and up to ten Learners, keyed by the seat's Limit Break. An empty seat is absent. */
 export interface HeroSeat { hero: string; learners: string[] }
 
-/** `kinds`: which armor kind each armor slot holds (absent: the physical one). An empty armor slot holds the kind's Training
+/** `kinds`: which armor kind each armor slot holds (absent: the physical one). A new Uma of a magical starting class has
+ * all five set to the magical kind; a physical one has none (D160 §7). An empty armor slot holds the kind's Training
  * piece, grade 0, as an empty weapon slot holds a Training weapon (D98, D103); an empty accessory slot holds nothing.
  * `equipped` keys: her weapons, her five armor slots and her two accessory slots (D124). */
 export interface UmaGear { locker: string[]; equipped: Partial<Record<GearSlot, string>>; kinds: Partial<Record<ArmorSlot, ArmorKind>> }
-/** The armor kind a slot holds now. */
+/** The armor kind a slot holds now: absent means physical (a new Mage, Cleric or Summoner has all five set magical). */
 export const slotKind = (gear: Pick<UmaGear, 'kinds'>, slot: ArmorSlot): ArmorKind => gear.kinds[slot] ?? ARMOR_SLOT_KINDS[slot][0]
 
 export interface Stars { unlocked: string[]; active: string[] }
@@ -191,8 +192,14 @@ export function defaultParties(): Party[] {
 }
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
-export const newOwnedUma = (now: string): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
-  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: {} }, bonds: {} })
+/** A new Uma's armor kinds (D160 §7): all five magical for a magical starting class, none set (physical) otherwise. */
+export function startingArmorKinds(classId?: RpgClass): UmaGear['kinds'] {
+  if (!classId || RPG_CLASS_ARMOR[classId] !== 'magical') return {}
+  return Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, 'magical')]))
+}
+/** A just-unlocked Uma; `startClass` (her starting class) sets her armor kinds, and without it she starts all-physical. */
+export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
+  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {} })
 
 /** The world's state (D66). */
 export interface WorldState {

@@ -29,7 +29,8 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
-- **Classes:** switching is free. A new Uma starts in her running style's class ([classes](classes.md)).
+- **Classes:** switching is free. A new Uma starts in her running style's class and in its armor, magical for a Mage,
+  Cleric or Summoner (D162, [classes](classes.md)).
 
 ## Leveling
 

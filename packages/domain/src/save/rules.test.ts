@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION } from './save'
-import { addShards, isPartyFull, partyOf, renameParty, SaveRuleError, setPartySlot, unlockUma, worldOf } from './rules'
+import { ARMOR_SLOTS } from '../economy/ranks'
+import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass } from '../rpg/rules'
+import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION, slotKind } from './save'
+import { addShards, isPartyFull, partyOf, renameParty, SaveRuleError, setPartySlot, TIER_ONE, unlockUma, worldOf } from './rules'
 
 const T0 = '2026-10-10T12:00:00.000Z'
 const T1 = '2026-10-10T13:00:00.000Z'
@@ -30,6 +32,31 @@ describe('collection rules', () => {
     })()
     expect(err).toBeInstanceOf(SaveRuleError)
     expect((err as SaveRuleError).reason).toBe('no-ticket')
+  })
+
+  it('starts a new Mage, Summoner or Cleric in magical armor and a Brawler or Spell Blade in physical (D160)', () => {
+    const MAGICAL = ['circlet', 'robe', 'leggings', 'bracers', 'slippers']
+    const PHYSICAL = ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']
+    const want: Record<RpgClass, string[]> = { brawler: PHYSICAL, mage: MAGICAL, spellblade: PHYSICAL, cleric: MAGICAL, summoner: MAGICAL }
+    const before = unlocked('100101')
+    for (const c of RPG_CLASSES) {
+      const save = unlockUma(before, '100201', T1, TIER_ONE, c)
+      const world = worldOf(save)
+      const uma = world.umas['100201']!
+      expect(ARMOR_SLOTS.map((s) => slotKind(uma.gear, s))).toEqual(want[c])
+      // A physical start writes nothing: an absent kind is already physical.
+      expect(Object.keys(uma.gear.kinds)).toHaveLength(want[c] === MAGICAL ? 5 : 0)
+      expect(uma.classId).toBeNull()
+      // The Umas already owned are untouched.
+      expect(world.umas['100101']).toBe(worldOf(before).umas['100101'])
+      expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    }
+    // Without a starting class (tests, the pacing sim) she starts all-physical, as before.
+    expect(worldOf(unlockUma(before, '100201', T1)).umas['100201']!.gear.kinds).toEqual({})
+  })
+
+  it('gives magical armor to exactly the Mage, Summoner and Cleric (D160 §7)', () => {
+    expect(RPG_CLASSES.filter((c) => RPG_CLASS_ARMOR[c] === 'magical').sort()).toEqual(['cleric', 'mage', 'summoner'])
   })
 
   it('turns every five Uma Shards into a Ticket', () => {

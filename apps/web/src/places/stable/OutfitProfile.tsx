@@ -195,7 +195,7 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
       </p>
       <UnlockConfirm open={confirming} onClose={() => setConfirming(false)} name={outfit.title ?? outfit.name} tickets={tickets}
         ticketMark={<UiMark mark="currency/uma-ticket" fallback={<TicketIcon size={16} />} />}
-        onConfirm={() => unlock(outfit.outfitId).then(() => setConfirming(false), (err: unknown) => {
+        onConfirm={() => unlock(outfit).then(() => setConfirming(false), (err: unknown) => {
           throw new Error(err instanceof SaveRuleError ? err.message : 'Could not unlock.')
         })} />
     </section>

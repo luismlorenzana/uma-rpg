@@ -24,6 +24,11 @@ vi.mock('../api/client', async () => {
 const { boot, buyTicket, createAccount, nameParty, pickClass, renameAccount, resetGame, setSlot, syncNow, unlock, useGame } = await import('./game')
 const { db } = await import('./db')
 
+/** An invented outfit whose best running style is `best`. */
+const outfit = (outfitId: string, best: 'front' | 'pace' | 'late' | 'end' = 'front') => ({
+  outfitId, aptitudes: { strategy: { front: 'G', pace: 'G', late: 'G', end: 'G', [best]: 'A' } as const },
+})
+
 beforeEach(async () => {
   resetGame()
   server.envelope = { revision: 0, save: null }
@@ -35,7 +40,7 @@ describe('game store', () => {
   it('reads the latest save after lazy rules load, so concurrent cold actions preserve both changes', async () => {
     await boot('u1')
     await createAccount('Test')
-    await unlock('9000000')
+    await unlock(outfit('9000000'))
     const save = useGame.getState().save!
     useGame.setState({ save: { ...save, tierWorlds: { '1': { ...save.tierWorlds['1']!, wallet: { ...save.tierWorlds['1']!.wallet, laurels: 100 } } } } })
     await Promise.all([pickClass('9000000', 'mage'), buyTicket('time', 1)])
@@ -95,8 +100,8 @@ describe('game store', () => {
   it('unlocks Umas for tickets and builds parties, and all of it syncs (S2)', async () => {
     await boot('u1')
     await createAccount('Luis')
-    await unlock('100101')
-    await unlock('100201')
+    await unlock(outfit('100101'))
+    await unlock(outfit('100201', 'pace'))
     await setSlot(0, 0, '100101')
     await setSlot(0, 1, '100201')
     await setSlot(4, 2, '100101') // moves her from Party 1 to Party 5
@@ -107,7 +112,10 @@ describe('game store', () => {
     expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
     expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null] })
-    await expect(unlock('100101')).rejects.toThrow(/already/)
+    // A pace outfit starts as a Mage, in five magical kinds; a front one in physical (D160 §7).
+    expect(world?.umas['100201']?.gear.kinds).toEqual({ head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' })
+    expect(world?.umas['100101']?.gear.kinds).toEqual({})
+    await expect(unlock(outfit('100101'))).rejects.toThrow(/already/)
   })
 
   it('migrates a v1 device save when it boots', async () => {

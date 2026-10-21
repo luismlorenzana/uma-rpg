@@ -69,6 +69,17 @@ export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>>
   spellblade: ['arms', 'arms', 'arms', 'tome', 'tome'],
   cleric: ['any', 'any', 'any', 'any', 'any'],
 }
+/**
+ * Which half of each armor slot a class starts in (classes v2 §7, D160): a new Uma's five slots all hold her starting
+ * class's kind. Magical for the Tome-led classes, physical for the rest.
+ */
+export const RPG_CLASS_ARMOR: Readonly<Record<RpgClass, 'physical' | 'magical'>> = {
+  brawler: 'physical',
+  mage: 'magical',
+  spellblade: 'physical',
+  cleric: 'magical',
+  summoner: 'magical',
+}
 /** Whether a class picks its weapons (Summoner, Spell Blade, Cleric) or wields a fixed five. */
 export const rpgPicksWeapons = (classId: RpgClass): boolean => classId !== 'brawler' && classId !== 'mage'
 /** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */

@@ -29,7 +29,7 @@ import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
-  isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
+  isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
@@ -79,14 +79,14 @@ function slots(c: RpgClass): string {
 // --- Classes and skills ---------------------------------------------------------------------------------------------
 
 function classes(): string {
-  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal)', 'Limit Break power', 'Starts as'],
+  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal)', 'Limit Break power', 'Starts as', 'Starting armor'],
     RPG_CLASSES.map((c) => {
       const h = rpgHand({ classId: c })
       const s = RPG_CLASS_STATS[c]
       const special = h.pair ? 'Every act is an Arms half and a Tome half' : h.linger ? `A summon lingers and acts again at ${h.linger}; most summon lines also mend, shield, drain, bless or revive`
         : c === 'cleric' ? 'Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier' : '—'
       return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, `${x(h.power)}, ${x(h.mp)}`, special,
-        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp, s.heal].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c]]
+        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp, s.heal].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c], cap(RPG_CLASS_ARMOR[c])]
     }))
 }
 

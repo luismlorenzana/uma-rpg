@@ -39,19 +39,20 @@ Brawler, Mage and Spell Blade are pure offense; Cleric and Summoner share their 
 | Bow, Katana | Slinger … Sagittarius; Ronin … Sword Spirit | Strike |
 
 <!-- live:classes -->
-| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal) | Limit Break power | Starts as |
-|---|---|---|---|---|---|---|---|
-| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 ×0.8 | 2× her open depth | Front runners |
-| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 ×1 | 2.4× her open depth | Pace chasers |
-| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 ×0.9 | 2× her open depth | — |
-| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 ×1.3 | 1.5× her open depth | Late surgers |
-| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3; most summon lines also mend, shield, drain, bless or revive | ×1 ×1 ×1 ×1 ×1 ×1.1 ×1.2 | 1.8× her open depth | End closers |
+| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal) | Limit Break power | Starts as | Starting armor |
+|---|---|---|---|---|---|---|---|---|
+| Brawler | 5 Arms | 5 | ×1, ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 ×0.8 | 2× her open depth | Front runners | Physical |
+| Mage | 5 Tomes | 5 | ×1, ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 ×1 | 2.4× her open depth | Pace chasers | Magical |
+| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.45, ×0.5 | Every act is an Arms half and a Tome half | ×1 ×1.05 ×1.05 ×1 ×1 ×1 ×0.9 | 2× her open depth | — | Physical |
+| Cleric | Any 5 | 10 | ×0.5, ×0.6 | Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 ×1.3 | 1.5× her open depth | Late surgers | Magical |
+| Summoner | 3 Tomes + 2 Arms | 10 | ×0.6, ×0.7 | A summon lingers and acts again at 0.3; most summon lines also mend, shield, drain, bless or revive | ×1 ×1 ×1 ×1 ×1 ×1.1 ×1.2 | 1.8× her open depth | End closers | Magical |
 <!-- /live -->
 
 **Hand:** the share of full power and full MP her acts use. A Brawler's Attack is 1.0. A Spell Blade's two halves are
 0.45 each, so she lands 0.9 a turn across two kinds.
 
-**Starts as:** a new Uma begins in the class of her best running style. Spell Blade is never a default.
+**Starts as:** a new Uma begins in the class of her best running style, and in that class's armor: magical for a Mage,
+a Cleric or a Summoner, physical for a Brawler (D162). Umas unlocked before keep theirs. Spell Blade is never a default.
 
 ## Weapons
 
@@ -82,7 +83,8 @@ Brawler's and a Mage's slots are fixed to their five. A new Uma's slots hold her
 weapons, so she starts with the depth-1 cores of those trees.
 
 **Armor slots (D103, D124)** mirror them: head, body, legs, arms and feet, each holding its physical or its magical
-piece, with a Training piece of each kind until she binds a crafted one ([materials](materials.md#gear)).
+piece, with a Training piece of each kind until she binds a crafted one ([materials](materials.md#gear)). A new Uma's
+five start in her starting class's half ([starts as](#the-five-classes)).
 
 **Two accessory slots (D124)** hold any two accessories of different types:
 - **Orbs** (offense): an Arms Orb or an Elemental Orb adds its kind to every hit, for weaknesses only, with no damage of

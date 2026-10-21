@@ -1,5 +1,6 @@
 // Collection and party rules (S2): pure functions over the save that return a new save or throw SaveRuleError.
 // Design: game-design.md §3 (unlocks, D44 final), §6 (parties, one per Uma: D46), D47 (Uma Shards → Tickets).
+import type { RpgClass } from '../rpg/rules'
 import { workOf } from './status'
 import { newOwnedUma, normalizeName, PARTY_COUNT, PARTY_NAME_MAX, PARTY_SIZE, SHARDS_PER_TICKET, type Party, type Save, type TierWorld, type Wallet } from './save'
 
@@ -28,15 +29,18 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
-/** Spends one Uma Ticket on an outfit; final once committed (D44). */
-export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
+/**
+ * Spends one Uma Ticket on an outfit; final once committed (D44). `startClass` is her starting class, which picks her
+ * armor kinds (D160 §7); without it she starts all-physical.
+ */
+export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE, startClass?: RpgClass): Save {
   const world = worldOf(save, tier)
   if (world.umas[outfitId]) throw new SaveRuleError('already-owned', 'already unlocked')
   if (world.wallet.unlockTickets < 1) throw new SaveRuleError('no-ticket', 'no Uma Tickets left')
   return withWorld(save, tier, {
     ...world,
     wallet: { ...world.wallet, unlockTickets: world.wallet.unlockTickets - 1 },
-    umas: { ...world.umas, [outfitId]: newOwnedUma(now) },
+    umas: { ...world.umas, [outfitId]: newOwnedUma(now, startClass) },
   }, now)
 }
 

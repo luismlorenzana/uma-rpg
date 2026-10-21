@@ -2,7 +2,7 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, renameParty, renameTrainer, setPartySlot, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  newSave, renameParty, renameTrainer, setPartySlot, startingClass, TIER_ONE, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
 import { create } from 'zustand'
@@ -82,10 +82,10 @@ export async function renameAccount(trainerName: string): Promise<void> {
   await commit(renameTrainer(save, trainerName, nowIso()))
 }
 
-/** Spends one Uma Ticket (final, D44). Throws SaveRuleError when it can't. */
-export async function unlock(outfitId: string): Promise<void> {
+/** Spends one Uma Ticket (final, D44); she starts in her starting class's armor (D160 §7). Throws SaveRuleError when it can't. */
+export async function unlock(outfit: Pick<BattleOutfit, 'outfitId' | 'aptitudes'>): Promise<void> {
   const { save } = useGame.getState()
-  if (save) await commit(unlockUma(save, outfitId, nowIso()))
+  if (save) await commit(unlockUma(save, outfit.outfitId, nowIso(), TIER_ONE, startingClass(outfit)))
 }
 
 /** Puts an owned Uma in a party slot, moving her from any other (D46); null empties the slot. */
