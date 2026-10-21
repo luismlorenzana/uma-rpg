@@ -2,12 +2,12 @@
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
 import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
 import { formatLevels } from '../../battle/labels'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
-import { AtlasSprite } from '../../master/art'
 import { beginFight, drinkAtSpring, useWorld } from '../../save/game'
 import { LockIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'

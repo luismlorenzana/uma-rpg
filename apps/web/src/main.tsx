@@ -7,6 +7,7 @@ import tilesUrl from '@luismlorenzana/uma-art/tiles/atlas.png?url'
 import uiIndex from '@luismlorenzana/uma-art/ui/atlas.json'
 import uiUrl from '@luismlorenzana/uma-art/ui/atlas.png?url'
 import { AuthProvider, idToken } from '@luismlorenzana/uma-kit/auth'
+import { ContentProvider } from '@luismlorenzana/uma-kit/content'
 import { watchAppUpdates } from '@luismlorenzana/uma-kit/places'
 import { configureKit, initAppearance, KitArtProvider, MotionRoot, type KitArt } from '@luismlorenzana/uma-kit/ui'
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
@@ -20,6 +21,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { setTokenProvider } from './api/client'
 import { FIREBASE } from './app/firebase-config'
 import { router } from './app/router'
+import { CONTENT } from './content/client'
 import { clearBadgeOnOpen } from './push/push'
 
 // uma-kit (D147): this game's device keys, the phone's appearance (or Account's choice), and uma-art for the bars and map.
@@ -44,11 +46,13 @@ createRoot(root).render(
     <MotionRoot>
       <KitArtProvider art={ART}>
         <AuthProvider config={FIREBASE}>
-          <AlbumArtProvider art={ALBUM_ART}>
-            <WorkArtProvider art={{ Item: ItemIcon }}>
-              <RouterProvider router={router} />
-            </WorkArtProvider>
-          </AlbumArtProvider>
+          <ContentProvider client={CONTENT}>
+            <AlbumArtProvider art={ALBUM_ART}>
+              <WorkArtProvider art={{ Item: ItemIcon }}>
+                <RouterProvider router={router} />
+              </WorkArtProvider>
+            </AlbumArtProvider>
+          </ContentProvider>
         </AuthProvider>
       </KitArtProvider>
     </MotionRoot>

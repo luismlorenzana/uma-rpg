@@ -1,9 +1,9 @@
+import { resolve } from 'node:path'
 import { AuthModule, authMode } from '@luismlorenzana/uma-server/auth'
+import { PrivatePackModule, ReleaseProxyModule } from '@luismlorenzana/uma-server/content'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ContentModule } from './content/content.module'
 import { HealthController } from './health.controller'
-import { MasterModule } from './master/master.module'
 import { PushModule } from './push/push.module'
 import { SaveModule } from './save/save.module'
 
@@ -17,7 +17,18 @@ import { SaveModule } from './save/save.module'
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({ mode: authMode(config.get<string>('AUTH_MODE')), allowedEmail: config.get<string>('ALLOWED_EMAIL') ?? '' }),
     }),
-    SaveModule, MasterModule, ContentModule, PushModule,
+    ReleaseProxyModule.forRoot({
+      route: 'master',
+      bucket: process.env.MASTER_BUCKET,
+      dir: resolve(process.cwd(), process.env.MASTER_DIR ?? '../../../uma-platform/content/release'),
+    }),
+    PrivatePackModule.forRoot({
+      route: 'content',
+      bucket: process.env.CONTENT_BUCKET,
+      dir: resolve(process.cwd(), process.env.CONTENT_DIR ?? '../../content/enemies-release'),
+      allow: ['enemies.json', /enemies\/[a-z0-9]+(-[a-z0-9]+)*-(face|art|splash)\.[a-f0-9]{8}\.webp/],
+    }),
+    SaveModule, PushModule,
   ],
   controllers: [HealthController],
 })

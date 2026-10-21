@@ -4,9 +4,9 @@ import {
   BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
   type RpgClass,
 } from '@rpg/domain'
+import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { Bar, CLASS_LABEL } from '../../battle/labels'
 import type { Campaign } from '../../battle/campaign'
-import { AtlasSprite } from '../../master/art'
 import { RankCells, RankRow, type RankCell } from '../../ui/RankBars'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
