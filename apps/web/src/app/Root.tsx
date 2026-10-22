@@ -1,12 +1,14 @@
 // Getting in (SD3): the kit's gates (uma-platform P56): splash → sign-in → boot → first launch → start page, with this
 // game's boot (the device save, else the server's), its first launch (a trainer name, then 20 Uma Tickets) and its start
-// page (the last Hub page). Nothing here waits on the network once a device save exists (D32).
+// page (the last Hub page). Nothing here waits on the network once a device save exists (D32). The tier switch's veil
+// (H36) sits here, outside the shell that remounts per tier.
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { BootGates, UpdateNotice } from '@luismlorenzana/uma-kit/places'
 import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { lastPage } from '../hub/start'
+import { TierVeil } from '../hub/TierVeil'
 import { boot, createAccount, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
 import { signInEnabled } from './firebase-config'
@@ -71,6 +73,7 @@ export function Root() {
         words={{ name: 'Uma RPG', tagline: 'A party RPG for one trainer.' }}>
         <Outlet />
       </BootGates>
+      <TierVeil />
     </>
   )
 }

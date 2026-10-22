@@ -293,6 +293,30 @@ Each tier is its own world, with its own Stable, parties, world map, Wilds, Ware
 D159). The account, its achievements and each Uma's tier history are shared.
 - **One world on screen at a time:** the active tier (`save/game.ts`, H35). Every screen reads its world and every
   action writes to it. Today only Tier 1 exists, until the Rift promotes Umas.
+- **The tiers** (`TIERS`, `save/rules.ts`): three, as master data has, each with tiers.md §6's name and a look:
+
+<!-- live:tiers -->
+| Tier | Name | Look |
+|---|---|---|
+| 1 | Apprentice | Day |
+| 2 | Adept | Dusk |
+| 3 | Master | Night |
+<!-- /live -->
+
+- **The Tier sheet** (`?sheet=tier`, `hub/TierSheet.tsx`, H36): the top bar's crest opens it over the current page, and
+  Back or ✕ closes it. One card per tier, 1 to 3:
+  - a tier with a world shows its crest, "Tier n · Name", its Uma count ("No Umas yet", "1 Uma", "12 Umas") and its
+    Rift ("The Rift isn’t open yet" until the Rift is built). The active tier's card has an accent border, and tapping
+    it just closes the sheet;
+  - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier n−1 Rift".
+    Today that's Tiers 2 and 3.
+- **Picking another tier** fades a veil in the page colour over the screen (120 ms), switches the active tier and lands
+  on that tier's Town Hall in place of the sheet's entry, then fades the veil out (260 ms) once the new world has drawn
+  (`hub/TierVeil.tsx`, rendered outside the shell so it survives the remount). Under reduced motion the switch is
+  immediate, with no veil.
+- **The looks** (uma-kit's `tint`): Tier 1 is day, the theme as it is. Tier 2 is dusk, an amber accent and a warm wash
+  over the Hub map; Tier 3 is night, a violet accent and a deep blue wash. Only the accent changes, in light and dark:
+  the bars' disc and marker, buttons, borders and sheets follow it. Fights keep their own dark stage.
 - **Where the app opens:** a `?tier=n` link's tier, else the tier last viewed on this device (`rpg.tier`), else the
   highest tier whose world has an Uma, else Tier 1. Only a tier the save has a world for.
 - **Switching** remounts the whole app on the new world, as a different app instance would: the bars, every place and
@@ -308,14 +332,15 @@ D159). The account, its achievements and each Uma's tier history are shared.
 ## Global UI
 
 - **Account bar** (top, `hub/Bars.tsx`):
-  - your initial with the active tier's crest, which opens the Account;
+  - your initial, which opens the Account, with the active tier's crest beside it, which opens the Tier sheet;
   - the active world's chips: **Laurels**, **Speed Tickets**, and in Tier 1 **Uma Tickets** with the Uma Shards toward
     the next (`N · s/5`). Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
   - Offline or Sync paused, when it applies.
 - **Bottom bar:** Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked to the bottom edge
-  (D149). Battle is a gold disc rising out of the bar. The active tab has a gold marker on the bar's top edge and a
-  filled icon. The Wilds tab counts the active world's jobs ready to collect.
+  (D149). Battle is a disc in the tier's accent (gold in Tier 1) rising out of the bar. The active tab has a marker in
+  the tier's accent on the bar's top edge and a filled icon. The Wilds tab counts the active world's jobs ready to collect.
 - **Menu sheet** (`?sheet=menu`): every place by page, with a lock on locked ones, and the Account.
+- **Tier sheet** (`?sheet=tier`): one card per tier, opened by the top bar's crest (see [Tiers](#tiers)).
 - **Side panel:** a quick look slides in from the right. It closes with ✕, a swipe right, a backdrop tap, Escape or back.
 - **Place pages:** they fill the space between the bars, and Back returns to where you opened them from. Bottom sheets
   are used for everything else (uma-kit's `Sheet`).

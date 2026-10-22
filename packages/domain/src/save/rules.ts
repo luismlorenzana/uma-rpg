@@ -22,6 +22,26 @@ export const TIER_ONE = '1'
 /** A tier number as the save's world key: 2 → "2" (H35). The app counts tiers in numbers; the save keys them by string. */
 export const tierKey = (tier: number): string => String(tier)
 
+/** A tier's look (H36, tiers.md T2): its tint over the theme. The same strings as uma-kit's `Tint`; the domain never
+ * imports the kit. */
+export type TierLook = 'day' | 'dusk' | 'night'
+
+export interface TierInfo {
+  readonly tier: number
+  readonly name: string
+  readonly look: TierLook
+}
+
+/** The tiers, 1 to 3: master data has three and uma-art three crests. Names from tiers.md §6 (Option A, D159). */
+export const TIERS: readonly TierInfo[] = [
+  { tier: 1, name: 'Apprentice', look: 'day' },
+  { tier: 2, name: 'Adept', look: 'dusk' },
+  { tier: 3, name: 'Master', look: 'night' },
+]
+
+/** A tier's look; a tier past the list keeps the last one's. */
+export const tierLook = (tier: number): TierLook => (TIERS.find((t) => t.tier === tier) ?? TIERS.at(-1)!).look
+
 /** The tiers that have a world in the save, lowest first. Tier 1 always does. */
 export function savedTiers(save: Pick<Save, 'tierWorlds'>): number[] {
   return Object.keys(save.tierWorlds).map(Number).sort((a, b) => a - b)

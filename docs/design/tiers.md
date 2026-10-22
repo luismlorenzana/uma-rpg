@@ -6,7 +6,7 @@
 > - It replaces H24's planned `tiers.md`, and settles the Tier Finale questions Q6 and Q7 when the owner approves it.
 > - **Owner calls** are marked **T1**, **T2** and so on, each with a recommendation. Nothing here is built until the
 >   owner decides. [§9](#9-owner-calls) lists every call.
-> - §8 item 1 built in H35 (D165), except the Tier shifter (H36).
+> - §8 item 1 built in H35 (D165) and H36 (D167): the Tier shifter on the crest, with the T2 looks.
 
 ## 1. What the owner asked for
 

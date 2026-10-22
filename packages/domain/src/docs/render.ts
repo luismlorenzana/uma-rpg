@@ -33,6 +33,7 @@ import {
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { classPreset } from '../save/presets'
+import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
@@ -443,6 +444,12 @@ function world(): string {
   ])
 }
 
+// --- Tiers ----------------------------------------------------------------------------------------------------------
+
+function tiers(): string {
+  return table(['Tier', 'Name', 'Look'], TIERS.map((t) => [t.tier, t.name, cap(t.look)]))
+}
+
 // --- Dependencies ---------------------------------------------------------------------------------------------------
 
 export interface PackageJson { name: string; dependencies?: Record<string, string>; devDependencies?: Record<string, string> }
@@ -459,7 +466,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
     classes, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
+    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }
   return blocks[key]?.() ?? null

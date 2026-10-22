@@ -104,7 +104,8 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 - **The shared app** (`@luismlorenzana/uma-kit`, uma-platform P48, D147) is the same package as uma-racer's:
   - the theme, light and dark under one set of names;
   - the primitives (icons, marks, sheets, tabs, buttons);
-  - the shell (frame, top and bottom bars, menu, side panel, place header);
+  - the shell (frame, top and bottom bars, menu, side panel, place header), with the crest's tier shifter and the tier
+    tints since 0.12.0 (H36);
   - the Hub map (terrain, scene, place buttons, pips, swipe);
   - since SD3, getting in (`/auth`) and the frames of the Account, the Warehouse, the Exchange and the profile
     (`/places`), each filled with this game's content and words;
