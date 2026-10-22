@@ -144,6 +144,9 @@ front.
 | **Bestiary** | Defeat every boss and sub-boss of the three packs, counted across every run and tier | Optional title |
 | **Crossover** | A champion fight won by a party with all six classes represented across the roster | Optional title |
 
+Crossover, for today's five classes: one party of five different classes wins a champion (H49, D172). With classes v2's
+Paladin it reads "five different classes of the six".
+
 Achievements are **account-level** ([tiers](tiers.md) §3): earned once, shown in the Account, with the date and the
 run. Each Uma of a winning run keeps the run's shared achievements in her history.
 

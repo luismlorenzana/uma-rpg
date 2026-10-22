@@ -1,23 +1,35 @@
 import atlas from '@luismlorenzana/uma-art/ui/atlas.json'
 import atlasUrl from '@luismlorenzana/uma-art/ui/atlas.png?url'
-import type { BattleStatus, RpgClass } from '@rpg/domain'
+import { achievementDef, FRONT_NAME, type BattleStatus, type RiftFront, type RpgClass } from '@rpg/domain'
 import type { CSSProperties } from 'react'
 import { STATUS_LABEL } from './labels'
 
 const frames: Readonly<Record<string, { x: number; y: number; w: number; h: number }>> = atlas.frames
-/** Native 24/12 CSS-pixel sizes: no fractional sprite scaling at phone widths. */
-function PixelIcon({ frame }: { frame: string }) {
+export type PixelScale = 1 | 2 | 4
+/** A `ui` frame at its native CSS-pixel size (24/16/12) or a whole-number scale: never fractional at phone widths.
+ * Decorative unless it's given a label. */
+function PixelIcon({ frame, scale = 1, className = '', label }: { frame: string; scale?: PixelScale; className?: string; label?: string }) {
   const f = frames[frame]
   if (!f) return null
-  return <span aria-hidden="true" className="inline-block shrink-0 bg-no-repeat align-middle" style={{
-    width: f.w, height: f.h, backgroundImage: `url(${atlasUrl})`,
-    backgroundSize: `${atlas.width}px ${atlas.height}px`, backgroundPosition: `-${f.x}px -${f.y}px`,
+  const named = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true }
+  return <span {...named} className={`inline-block shrink-0 bg-no-repeat align-middle ${className}`} style={{
+    width: f.w * scale, height: f.h * scale, backgroundImage: `url(${atlasUrl})`,
+    backgroundSize: `${atlas.width * scale}px ${atlas.height * scale}px`, backgroundPosition: `-${f.x * scale}px -${f.y * scale}px`,
     imageRendering: 'pixelated',
   }} />
 }
 /** Decorative beside the full class name, not a replacement for it. */
 export function ClassEmblem({ classId }: { classId: RpgClass }) {
   return <PixelIcon frame={'class/' + classId} />
+}
+/** A Rift front's 16 px crest (uma-art 2.11.0), named "Iron front". */
+export function FrontCrest({ front, scale = 1 }: { front: RiftFront; scale?: PixelScale }) {
+  return <PixelIcon frame={'front/' + front} scale={scale} label={`${FRONT_NAME[front]} front`} />
+}
+/** An achievement's 24 px badge (uma-art 2.11.0). Decorative: its row or card names it. `dim`: not earned yet. */
+export function AchievementBadge({ id, scale = 1, dim = false }: { id: string; scale?: PixelScale; dim?: boolean }) {
+  const def = achievementDef(id)
+  return def ? <PixelIcon frame={def.badge} scale={scale} className={dim ? 'opacity-40' : ''} /> : null
 }
 export function StatusGlyph({ status }: { status: keyof typeof STATUS_LABEL }) {
   return <PixelIcon frame={'status/' + status} />

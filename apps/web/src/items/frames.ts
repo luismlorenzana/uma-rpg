@@ -5,7 +5,8 @@ import { gearById, GEM_IDENTITIES, ITEM_FAMILIES, itemById, type EquipType, type
 export const ATLAS_CELL = 32
 export type Sheet = 'items' | 'gear' | 'gems'
 export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
-  items: { w: 320, h: 1056 },
+  // uma-art 2.10.0 appends uma-racer's tonics at y = 1056; no frame of ours moves.
+  items: { w: 320, h: 1088 },
   gear: { w: 320, h: 1472 },
   gems: { w: 320, h: 320 },
 }

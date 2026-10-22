@@ -279,6 +279,10 @@ Reached from the account bar. The kit's `AccountPage` (SD3) with this game's con
   Tickets in a tier above 1.
 - **Appearance:** System, Light or Dark, kept on this device (D147).
 - Notifications.
+- **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "n of N", then the earned
+  ones, newest first, each with its badge, name and "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest
+  in catalog order, badge dimmed, with how each is earned. It lists Tier 1's seals and Rift Conquered, every other
+  world's, and the nine titles; a seal reads "Iron Seal · Tier 1", and Untouched shows its front's crest beside it.
 - **Info rows:** the tier world on screen, trainer since, Umas unlocked in every world, cloud save, game data version,
   app build.
 - Sign out.

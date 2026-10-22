@@ -286,3 +286,42 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 - **Working and fighting (D119)** never block each other: an Uma at a job fights, and one in the open fight takes jobs.
 - **One open fight** in the whole world. While it's open, its Umas can't change parties, and the active
   party, Springs and Sweeps are locked. The fight is stored as its input plus every action ([combat](combat.md)).
+
+## Achievements
+
+The Rift pays achievements instead of EXP ([the Rift](../design/rift.md) §7, D172). They're the account's, not a
+world's: each is earned once, in any tier, and the Account lists them with the date and the run they came from.
+- **Required:** each tier's four front seals and Rift Conquered, the ones that gate Ascend (R8). A front's champion
+  (stage 12) seals it; the Convergence's last fight conquers the Rift.
+- **Titles:** the other nine, earned once per account in any tier, each with its run. The Bestiary counts the boss and
+  sub-boss faces defeated in Rift fights across every run and tier, so it names no run.
+- **How a fight earns them** (`achievementsEarned`, `rift/achievements.ts`): every won Rift fight earns each one whose
+  rule holds and the account lacks, in catalog order. Iron Will, Arcane Purity and Untouched read what the front's won
+  fights in the run showed (magic dealt, physical damage dealt, an Uma knocked out); Swift Convergence the attempt's
+  four fights; Crossover one party of five different classes winning a champion fight (a front's stage 12 or any
+  Convergence fight). Until the Rift's run rules call it, no fight earns one.
+- **The cut-in:** each new one plays over the fight's result, one at a time, until Continue.
+
+<!-- live:achievements -->
+| Name | How | Kind |
+|---|---|---|
+| Iron Seal · Tier 1 | Win the Iron front’s champion | Required |
+| Arcane Seal · Tier 1 | Win the Arcane front’s champion | Required |
+| Duel Seal · Tier 1 | Win the Duel front’s champion | Required |
+| Horde Seal · Tier 1 | Win the Horde front’s champion | Required |
+| Rift Conquered · Tier 1 | Win the Convergence | Required; unlocks Ascend |
+| Iron Seal · Tier 2 | Win the Iron front’s champion | Required |
+| Arcane Seal · Tier 2 | Win the Arcane front’s champion | Required |
+| Duel Seal · Tier 2 | Win the Duel front’s champion | Required |
+| Horde Seal · Tier 2 | Win the Horde front’s champion | Required |
+| Rift Conquered · Tier 2 | Win the Convergence | Required; unlocks Ascend |
+| Iron Will | Seal Iron with no magic dealt | Title |
+| Arcane Purity | Seal Arcane with no physical damage | Title |
+| Untouched · Iron | Seal Iron with no Uma knocked out | Title |
+| Untouched · Arcane | Seal Arcane with no Uma knocked out | Title |
+| Untouched · Duel | Seal Duel with no Uma knocked out | Title |
+| Untouched · Horde | Seal Horde with no Uma knocked out | Title |
+| Swift Convergence | Win the Convergence, every fight under 8 rounds | Title |
+| Bestiary | Defeat every boss and sub-boss | Title |
+| Crossover | Win a champion with five classes in one party | Title |
+<!-- /live -->

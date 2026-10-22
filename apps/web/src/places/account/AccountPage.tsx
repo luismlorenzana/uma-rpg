@@ -1,9 +1,11 @@
 // The Account (S1, SD3): the kit's frame (uma-platform P56) with this game's content: the trainer name, the active
-// tier's wallet (H35), Appearance, push notifications, the info rows and sign-out. A hidden Town place (D31).
+// tier's wallet (H35), Appearance, push notifications, the achievements (H49), the info rows and sign-out. A hidden Town
+// place (D31).
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { AccountPage as AccountFrame } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
+import { AchievementList } from '../../achievements/AchievementList'
 import { APP_BUILD_ID } from '../../app/build'
 import { useMaster } from '../../master/master'
 import { NotificationsCard } from '../../push/NotificationsCard'
@@ -37,6 +39,7 @@ export default function AccountPage() {
       rename={{ value: save.account.trainerName, maxLength: TRAINER_NAME_MAX, normalize: normalizeTrainerName, onSave: renameAccount }}
       wallet={shown}
       notifications={<NotificationsCard />}
+      sections={<AchievementList save={save} />}
       info={[
         { label: 'Tier world', value: `Tier ${tier}` },
         { label: 'Trainer since', value: new Date(save.account.createdAt).toLocaleDateString() },

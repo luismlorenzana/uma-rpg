@@ -23,6 +23,8 @@ export * from './economy/stock'
 export * from './items/catalog'
 export * from './rpg'
 export * from './rift/state'
+// The achievement catalog's words and art (H49); its earning rules reach the app through the Rift's own subpath.
+export { ACHIEVEMENTS, achievementDef, FRONT_NAME, type AchievementDef, type AchievementGrant } from './rift/achievements'
 export * from './hub/places'
 export * from './master/roster'
 export * from './roster/stats'

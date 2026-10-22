@@ -32,6 +32,7 @@ import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
+import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
 import { classPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
@@ -453,6 +454,13 @@ function tiers(): string {
   return table(['Tier', 'Name', 'Look'], TIERS.map((t) => [t.tier, t.name, cap(t.look)]))
 }
 
+// --- Achievements ---------------------------------------------------------------------------------------------------
+
+const ACHIEVEMENT_KIND: Readonly<Record<AchievementDef['kind'], string>> = { seal: 'Required', conquered: 'Required; unlocks Ascend', title: 'Title' }
+function achievements(): string {
+  return table(['Name', 'How', 'Kind'], ACHIEVEMENTS.map((a) => [a.tier === null ? a.name : `${a.name} · Tier ${a.tier}`, a.how, ACHIEVEMENT_KIND[a.kind]]))
+}
+
 // --- Dependencies ---------------------------------------------------------------------------------------------------
 
 export interface PackageJson { name: string; dependencies?: Record<string, string>; devDependencies?: Record<string, string> }
@@ -469,7 +477,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
     classes, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, dependencies: () => dependencies(context.packages),
+    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }
   return blocks[key]?.() ?? null
