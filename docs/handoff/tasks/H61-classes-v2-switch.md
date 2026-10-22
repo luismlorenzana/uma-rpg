@@ -127,3 +127,16 @@ deployed build before this one can put a Paladin in a fight or show one; this on
 - H59's Done row in `docs/handoff/README.md` lists the screens whose words go into `sections.md`.
 - The Rift's guidance shows the five-class parties until H60's generation-aware `RIFT_FRONT_SPECS` lands; with it, the
   page names the Paladin with no further work. Check it after the flip.
+
+## Notes from H60 (2026-10-22, D186)
+
+- H60's numbers are all v15 values, so the flip carries them: the hybrids' hands, the farewell ×0.85, the Paladin's and
+  the Cleric's support numbers, v2's supports, and the Rift's v15 override (`riftTuning(15)`, `RIFT_TUNING_V15`).
+  `RIFT_FRONT_SPECS` turns to v2's guidance by itself (`riftParty`).
+- `docs/render.ts`'s Rift block (`riftFronts`, 518–553) reads `RIFT_TUNING` for its offense line, Arcane's scale and
+  the Echo numbers while `riftShape` follows the live engine: read `riftTuning()` there at the switch and name the
+  champion scales (`champions`) and the Duel's and Horde's numbers, so `rift-fronts` says what v15 plays.
+- With the switch on, `rift/balance.test.ts`, `rift/balance-v15.test.ts` and `world/balance.test.ts` pass as they are
+  (their defaults become v15). `rift/generate.test.ts` pins `version` 14 (lines 27–29) and `RIFT_TUNING.convergence`
+  (138): read the live version and `riftTuning()`.
+- classes-v2.md §9 and rift.md §11 carry H60's measured columns; the manual's Rift and combat pages take those numbers.
