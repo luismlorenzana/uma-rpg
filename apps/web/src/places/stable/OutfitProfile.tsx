@@ -4,15 +4,15 @@
 // Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
 // the Unlock flow and her racing profile; an outfit another tier's world owns says where she lives, and a later tier
 // sends unlocks to Tier 1 (H35, D5). The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56,
-// SD3).
+// SD3). "Can upgrade" (H34) dots the Skills and Gear tabs, greens the class chip's points and counts Extra Stats.
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgTreePointsEarned, rpgTreePointsSpent, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
-  type OwnedUma, type Place, type RosterOutfit, type TierWorld,
+  rpgExpToNext, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
+  type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
@@ -20,6 +20,7 @@ import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { seeStableOutfit } from '../../album/preferences'
+import { umaUpgrades } from '../../album/upgrades'
 import { Bar, CLASS_LABEL, kindLabel, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
@@ -41,6 +42,11 @@ const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#
 const TABS = ['skills', 'battle', 'gear', 'work', 'racing'] as const
 type Tab = (typeof TABS)[number]
 const TAB_LABEL: Record<Tab, string> = { skills: 'Skills', battle: 'Battle', gear: 'Gear', work: 'Work', racing: 'Racing' }
+/** A tab's "Can upgrade" dot (H34): Skills while a side skill can be learned, Gear while a piece or Extra Stats can. */
+function tabDot(t: Tab, up: UmaUpgrades | null): { dot?: boolean; dotLabel?: string } {
+  const on = !!up && (t === 'skills' ? up.points > 0 : t === 'gear' ? up.gear > 0 || up.stars > 0 : false)
+  return on ? { dot: true, dotLabel: `${TAB_LABEL[t]}, can upgrade` } : {}
+}
 const TAB_KEY = 'rpg.profile.tab.v2'
 
 function storedTab(): Tab {
@@ -101,6 +107,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
     )
   }
   const shown: Tab = owned ? tab : 'racing'
+  const upgrades = owned && world ? umaUpgrades(world, outfit, tier) : null
   return (
     <div>
       <div className="px-4 pt-2">
@@ -117,11 +124,11 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         chips={<p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>}
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
-        summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} onClass={() => setTab('skills')} />
+        summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} points={upgrades?.points ?? 0} onClass={() => setTab('skills')} />
           : home !== null ? <ElsewhereNote text={`In Tier ${home}`} />
           : tier > 1 ? <ElsewhereNote text="Unlocked in Tier 1" />
           : <UnlockBox outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />}
-        tabs={owned && world ? TABS.map((t) => ({ key: t, label: TAB_LABEL[t] })) : undefined}
+        tabs={owned && world ? TABS.map((t) => ({ key: t, label: TAB_LABEL[t], ...tabDot(t, upgrades) })) : undefined}
         tab={owned && world ? shown : undefined}
         onTab={setTab}
       >
@@ -129,7 +136,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
           <>
             {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
             {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
-            {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} />}
+            {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} />}
             {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
             {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
           </>
@@ -154,7 +161,7 @@ function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
 }
 
 /** Under the header: her Uma EXP and the class she fights as, then her Craft Level and what she's up to. */
-function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; onClass: () => void }) {
+function Summary({ outfit, owned, world, points, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; points: number; onClass: () => void }) {
   const navigate = useNavigate()
   const now = useNow(30_000)
   const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
@@ -166,7 +173,7 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
       <div>
         <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
         <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
-        <ClassChip outfit={outfit} uma={owned} onClick={onClass} />
+        <ClassChip outfit={outfit} uma={owned} points={points} onClick={onClass} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-md bg-raised p-2">
@@ -283,13 +290,12 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
 
 // --- Skills: class, weapons, trees (D86), then every class's rank ------------------------------------------------
 
-/** The class she fights as and its five weapons, under her level: one tap to the Skills tab. */
-function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
-  const tier = useActiveTier()
+/** The class she fights as and its five weapons, under her level: one tap to the Skills tab. `points` are her unspent side
+ * points while a side skill can be learned now (H34), else 0, so the green pill means "spend them". */
+function ClassChip({ outfit, uma, points, onClick }: { outfit: RosterOutfit; uma: OwnedUma; points: number; onClick: () => void }) {
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
   const rank = classRankOf(uma.ranks, classId)
-  const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier, id })))
   return (
     <button type="button" onClick={onClick} className="mt-1.5 flex min-h-11 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
       <ClassEmblem classId={classId} />
@@ -300,7 +306,7 @@ function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedU
           <span className="inline-flex gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
         </span>
       </span>
-      {points > 0 && <span className="shrink-0 rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">{points} pts</span>}
+      {points > 0 && <span className="shrink-0 rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{points} pts</span>}
       <span className="shrink-0 text-ink-faint">›</span>
     </button>
   )
@@ -357,16 +363,20 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
 
 // --- Gear: the standard preset (D164), what she wears, Weapon and Armor Ranks (D102), Extra Stats ----------------------
 
-function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
+function GearTab({ outfit, uma, world, upgrades }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; upgrades: UmaUpgrades | null }) {
   const navigate = useNavigate()
   const points = umaPoints(uma, activeClass(outfit, uma))
+  const ready = [upgrades?.gems ? `${upgrades.gems} to set` : '', upgrades?.freeNodes ? `${upgrades.freeNodes} free` : ''].filter(Boolean).join(' · ')
   return (
     <div className="space-y-3">
       <PresetButton outfit={outfit} uma={uma} world={world} />
-      <GearCard outfit={outfit} uma={uma} world={world} />
+      <GearCard outfit={outfit} uma={uma} world={world} marked={upgrades?.gearSlots} />
       <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
-        <span className="flex items-center justify-between">
-          <span className="text-[14px] font-semibold">Extra Stats</span>
+        <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+          <span className="flex items-center gap-1.5">
+            <span className="text-[14px] font-semibold">Extra Stats</span>
+            {ready && <span className="rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{ready}</span>}
+          </span>
           <span className="text-[12px] text-ink-soft">{uma.stars.active.length}/{activeNodeSlots(uma.level)} active · {uma.stars.unlocked.length}/100 · map ›</span>
         </span>
         <span className="mt-1 block text-[11px] text-ink-faint">

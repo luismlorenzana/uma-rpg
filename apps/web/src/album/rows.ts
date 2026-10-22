@@ -1,6 +1,6 @@
 // RPG data and eligibility over the kit's neutral album rows. No list/query implementation lives here.
-import { type AlbumPrefsSchema, type AlbumQuery, type FacetDef, type SortDef, type OutfitRowBase, runAlbumQuery } from '@luismlorenzana/uma-kit/roster'
-import { activeClass, availableWorkers, KEY_LABELS, RPG_CLASSES, statTotal, type OwnedUma, type RosterOutfit, type TierWorld } from '@rpg/domain'
+import { type AlbumPreset, type AlbumPrefsSchema, type AlbumQuery, type FacetDef, type SortDef, type OutfitRowBase, runAlbumQuery } from '@luismlorenzana/uma-kit/roster'
+import { activeClass, availableWorkers, KEY_LABELS, RPG_CLASSES, statTotal, type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades } from '@rpg/domain'
 import { CLASS_LABEL } from '../battle/labels'
 import type { MasterView } from '../master/master'
 import type { UmaPickerRow } from '@luismlorenzana/uma-kit/album'
@@ -12,6 +12,8 @@ export interface RpgUmaRow extends UmaPickerRow {
   classId: typeof RPG_CLASSES[number] | null
   isNew: boolean
   busy: boolean
+  /** What she can upgrade now (H34): filled by `withUpgrades` on the Stable only, null elsewhere. */
+  upgrades: UmaUpgrades | null
 }
 
 const enumFacet = (key: string, label: string, options: readonly string[], group = 'Aptitudes'): FacetDef => ({
@@ -27,6 +29,11 @@ export const STABLE_FACETS: readonly FacetDef[] = [
   { key: 'new', label: 'New', group: 'Collection', kind: 'boolean' },
   { key: 'free', label: 'Free now', group: 'Collection', kind: 'boolean' },
   { key: 'class', label: 'Class', group: 'RPG', kind: 'enum', options: RPG_CLASSES.map(value => ({ value, label: CLASS_LABEL[value] })) },
+  { key: 'upgrade', label: 'Can upgrade', group: 'RPG', kind: 'boolean' },
+]
+/** The Filters sheet's quick picks (H34): "Can upgrade" turns that facet on. */
+export const STABLE_PRESETS: readonly AlbumPreset[] = [
+  { key: 'upgrade', label: 'Can upgrade', apply: q => ({ ...q, filters: { ...q.filters, upgrade: true } }) },
 ]
 export const STABLE_SORTS: readonly SortDef[] = [
   { key: 'level', label: 'Uma Level', defaultDirection: 'desc' },
@@ -67,11 +74,11 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
       search: `${base.name} ${base.title ?? ''} ${foldSearch(`${base.name} ${base.title ?? ''}`)}`.toLowerCase(),
       facets: { ownership: uma ? ['owned'] : ['locked'], rarity: [String(base.rarity)],
         surface: top(base.aptitudes.surface), distance: top(base.aptitudes.distance), strategy: top(base.aptitudes.strategy),
-        sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [] },
+        sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [], upgrade: false },
       sorts: { level: uma?.level ?? null, release: base.releasedAt, name: base.name, rarity: base.rarity,
         statTotal: statTotal(outfit), craft: uma?.craft.level ?? null,
         classRank: uma ? Math.max(1, ...Object.values(uma.ranks.classes).map(track => track.rank)) : null },
-      outfit, base, uma, classId, isNew, busy,
+      outfit, base, uma, classId, isNew, busy, upgrades: null,
     }]
   })
 }

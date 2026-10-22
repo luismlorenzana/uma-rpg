@@ -2,18 +2,21 @@
 // she fights as, the weapons in its five slots (a Brawler's and a Mage's kinds are fixed; Summoner, Spell Blade and
 // Cleric choose), then her skills. Each weapon in a slot opens its tree; she holds a Training weapon of every kind until
 // she wears a crafted one. A depth's core skill comes free once her class rank and level open it, and side skills cost
-// points. Skills are chosen for her until she picks her own.
+// points. Skills are chosen for her until she picks her own. A weapon slot that can take a better piece now shows the
+// "Can upgrade" mark (H34).
 import {
   activeClass, classOf, classRankOf, classTrack, gearById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
   rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
   SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
+import { umaUpgrades } from '../../album/upgrades'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem, StatusGlyph } from '../../battle/pixel-icons'
 import { equip, learn, pickClass, unlearn, useActiveTier, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { RankRow } from '../../ui/RankBars'
+import { UpgradeMark } from '../../ui/UpgradeMark'
 import { WeaponSheet } from './WeaponSheet'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
@@ -36,6 +39,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(profile.tree)
   const slots = rpgActiveSlots(uma.level)
   const learned = new Set(setup.tree)
+  const better = umaUpgrades(world, outfit, tier)?.gearSlots ?? []
   const run = (op: () => Promise<void>) => {
     setError(null)
     op().catch((err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -80,9 +84,12 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           <div className="grid grid-cols-5 gap-1" aria-label="Weapon slots">
             {weapons.map((w, i) => {
               const piece = uma.gear.equipped[w] ? gearById(uma.gear.equipped[w]!) : undefined
+              const mark = better.includes(w)
               return (
-                <button key={`${i}-${w}`} type="button" onClick={() => setSlotPick(i)} aria-label={`Weapon ${i + 1}: ${piece ? piece.name : `Training ${WEAPON_LABEL[w]}`}`}
-                  className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-raised px-0.5 text-center">
+                <button key={`${i}-${w}`} type="button" onClick={() => setSlotPick(i)}
+                  aria-label={`Weapon ${i + 1}: ${piece ? piece.name : `Training ${WEAPON_LABEL[w]}`}${mark ? ', can upgrade' : ''}`}
+                  className="relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-raised px-0.5 text-center">
+                  {mark && <UpgradeMark size={14} className="absolute top-1 right-1" />}
                   <WeaponGlyph weapon={w} size={18} />
                   <span className="w-full truncate text-[10.5px] font-semibold leading-tight">{WEAPON_LABEL[w].replace(' Tome', '')}</span>
                   <span className={`text-[9.5px] leading-none ${piece ? 'font-semibold text-accent' : 'text-ink-faint'}`}>{piece ? `G${piece.grade}` : 'Training'}</span>

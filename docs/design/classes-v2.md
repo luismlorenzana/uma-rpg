@@ -298,7 +298,7 @@ Tier 3; it's designed with Tier 3.
   - **C6:** recommendation: **one standard preset per class, applied on tap.** Custom saved presets can come later if
     the owner wants them.
   - It ships now for five classes and grows to six with v2.
-- **"Can upgrade" highlights.** A badge on the Stable tile and the profile when an Uma:
+- **"Can upgrade" highlights.** Built (H34, D166). A badge on the Stable tile and the profile when an Uma:
   - has unspent side points;
   - can wear a better weapon, armor piece or accessory in stock;
   - has an Extra Stats gem she can set, or a free active node.

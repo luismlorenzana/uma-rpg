@@ -155,14 +155,21 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 - **Roster:**
   - All, Owned and Locked tabs, with counts.
   - Shared album views: **five columns of faces** by default, three columns of bust cards, or a one-column list.
-  - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class.
+  - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class; can
+    upgrade. "Can upgrade" is also the sheet's quick pick.
   - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
     Class Rank. Owned Umas stay before locked in either direction. Level ties use newest release, then name.
-  - Corner badges: class top left, working top right and target bottom left.
+  - Corner badges: class top left, working top right, target bottom left, and bottom right New, or a green mark when
+    she can upgrade.
   - Device preferences remember the query and view, plus up to **20 saved views**. The old Stable view and sort move
     over once, then their v2 key is removed. Nothing is added to the game save.
   - **New** means an outfit added since this device's first album visit, not seen yet. Opening its profile clears
     the badge; today's catalogue is marked seen on the first visit.
+  - **Can upgrade** (H34): one tap makes her stronger now, as her active class. Crafting doesn't count.
+    - Gear: a better piece she can wear, in stock or her own, for one of her five weapons, an armor slot's kind, a
+      worn accessory, or an empty accessory slot.
+    - Points: her unspent side points, while a side skill of her five trees can be learned.
+    - Extra Stats: a Star Gem in stock she can set, or an open node she can switch on.
 - **An Uma's profile:**
   - **Header** (the kit's `ProfileFrame`, SD3): her bust, rarity, name, title and Uma Level, a target toggle; then
     her EXP, a class chip, her Craft Level, and a Working or Party card. A locked one shows Unlock, confirmed in the
@@ -175,6 +182,9 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     - Work;
     - Racing.
   - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
+  - **Can upgrade marks:** a green dot on Skills while she has side points to spend, and on Gear while a piece or Extra
+    Stats can be upgraded. The class chip's "N pts" shows in green only then. On the Gear tab, each slot that can take
+    a better piece has the green mark, and Extra Stats has a green "N to set · N free" pill.
   - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
     - **Offense:** ATK, M.ATK, each weapon's Might, Orbs;
     - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
@@ -186,10 +196,10 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - A locked outfit shows **Unlock · 1 Ticket**. An outfit another tier's world owns shows "In Tier n" instead, and in a
     tier above 1 an outfit nobody owns shows "Unlocked in Tier 1" (D5).
 - **Skills page:**
-  - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
-    (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon the slot takes; Spell Blade,
-    Cleric and Summoner can change the weapon, Brawler and Mage only the piece (D98). Each armor slot's sheet picks its
-    physical or magical kind and the piece (D103).
+  - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade, with the green
+    mark when it can take a better piece. A slot's sheet (shared with the Gear tab) lists her Training weapon and
+    crafted pieces of each weapon the slot takes; Spell Blade, Cleric and Summoner can change the weapon, Brawler and
+    Mage only the piece (D98). Each armor slot's sheet picks its physical or magical kind and the piece (D103).
   - The class's **Class Rank** bar, and the depths it opens (D102).
   - Browse her 5 or 10 **trees**, learn and forget side skills, and **equip** skills, or leave it on auto.
 

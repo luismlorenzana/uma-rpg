@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { heroLimitsOf, placeById } from '@rpg/domain'
+import { heroLimitsOf, placeById, withTrack } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { buildCampaign } from '../battle/campaign'
 import { FeaturedSheet } from '../hub/Featured'
@@ -58,6 +58,20 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     fireEvent.change(await screen.findByRole('textbox', { name: 'Name this view' }), { target: { value: 'Cinder list' } })
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(JSON.parse(localStorage.getItem('rpg.album:stable')!).views[0]).toMatchObject({ name: 'Cinder list', query: { search: 'Cinder', view: 'list' } })
+  })
+
+  it('marks an Uma who can upgrade on the Stable tile, and the Can upgrade quick pick shows only her', async () => {
+    // Every fixture Uma is a Brawler: Class Rank 5 lets 81001 alone learn a depth-1 side skill.
+    const aster = fixture.world.umas['81001']!
+    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...aster, ranks: withTrack(aster.ranks, { kind: 'class', id: 'brawler' }, { rank: 5, exp: 0 }) } } }
+    show(<StablePage {...page('stable')} />)
+    expect(within(screen.getByRole('button', { name: 'Aster, Lv 3' })).getByRole('img', { name: 'Can upgrade' })).toBeDefined()
+    expect(within(screen.getByRole('button', { name: 'Beryl, Lv 20' })).queryByRole('img', { name: 'Can upgrade' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Filters' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Can upgrade' }))
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Beryl, Lv 20' })).toBeNull())
+    expect(screen.getByRole('button', { name: 'Aster, Lv 3' })).toBeDefined()
+    expect(screen.queryByRole('button', { name: 'Cinder, Lv 20' })).toBeNull()
   })
 
   it('party slots show disabled current members and locked Umas, then pass the exact slot/id to RPG rules', async () => {

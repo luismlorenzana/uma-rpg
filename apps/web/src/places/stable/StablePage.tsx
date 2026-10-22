@@ -3,13 +3,15 @@ import { AlbumChrome, AlbumGrid, useAlbumPrefs } from '@luismlorenzana/uma-kit/a
 import { emptyStateHint } from '@luismlorenzana/uma-kit/roster'
 import { bestAptitudeLine, type RosterOutfit } from '@rpg/domain'
 import { useMemo, useState } from 'react'
-import { albumRows, stableResult, STABLE_FACETS, STABLE_SCHEMA, STABLE_SORTS } from '../../album/rows'
+import { albumRows, stableResult, STABLE_FACETS, STABLE_PRESETS, STABLE_SCHEMA, STABLE_SORTS } from '../../album/rows'
+import { withUpgrades } from '../../album/upgrades'
 import { prepareStablePrefs } from '../../album/preferences'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
-import { useAlbumScope, useWorld } from '../../save/game'
+import { useActiveTier, useAlbumScope, useWorld } from '../../save/game'
 import { BackIcon, TargetIcon } from '../../ui/icons'
+import { UpgradeMark } from '../../ui/UpgradeMark'
 import { useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
@@ -39,6 +41,7 @@ function SkillsRoute({ outfit, place }: { outfit: RosterOutfit; place: PageProps
 export function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }) {
   const world = useWorld()
   const scope = useAlbumScope()
+  const tier = useActiveTier()
   const now = useNow(30_000)
   const nav = useHubNavigation()
   const [schema] = useState(() => {
@@ -46,14 +49,15 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
     return STABLE_SCHEMA
   })
   const prefs = useAlbumPrefs('stable', schema)
-  const rows = useMemo(() => albumRows(view, world, prefs.seen, now, scope), [view, world, prefs.seen, now, scope])
+  // "Can upgrade" (H34) is memoized per world, so the 30-second rerun only rebuilds the rows.
+  const rows = useMemo(() => withUpgrades(albumRows(view, world, prefs.seen, now, scope), world, tier), [view, world, prefs.seen, now, scope, tier])
   const result = stableResult(rows, prefs.query)
   const ownership = prefs.query.filters.ownership
   const tab = Array.isArray(ownership) && ownership.length === 1 && (ownership[0] === 'owned' || ownership[0] === 'locked') ? ownership[0] : 'all'
   const counts = result.counts.ownership ?? {}
   return <div className="p-4">
     <AlbumChrome title="Stable" completion={`${Object.keys(world?.umas ?? {}).length}/${rows.length} owned`}
-      facets={STABLE_FACETS} sorts={STABLE_SORTS} query={prefs.query} counts={result.counts} total={result.total}
+      facets={STABLE_FACETS} sorts={STABLE_SORTS} presets={STABLE_PRESETS} query={prefs.query} counts={result.counts} total={result.total}
       tabs={{ value: tab, counts: { all: (counts.owned ?? 0) + (counts.locked ?? 0), owned: counts.owned ?? 0, locked: counts.locked ?? 0 },
         onChange: value => {
           const filters = { ...prefs.query.filters }
@@ -72,7 +76,8 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
           topLeft: row.classId ? <ClassEmblem classId={row.classId} /> : undefined,
           topRight: row.busy ? <span className="rounded-full bg-panel px-1 text-[9px] font-bold" aria-label="Working">W</span> : undefined,
           bottomLeft: world?.targets.includes(row.id) ? <span className="text-accent" aria-label="Target"><TargetIcon size={14} /></span> : undefined,
-          bottomRight: row.isNew ? <span className="rounded-full bg-accent px-1 text-[8px] font-bold text-accent-ink">NEW</span> : undefined,
+          bottomRight: row.isNew ? <span className="rounded-full bg-accent px-1 text-[8px] font-bold text-accent-ink">NEW</span>
+            : row.upgrades?.any ? <UpgradeMark /> : undefined,
         })}
         renderChips={row => <span className="min-w-0 text-[10px] text-ink-soft">
           <span className="block truncate">{row.base.title ?? '★'.repeat(row.base.rarity)}</span>
