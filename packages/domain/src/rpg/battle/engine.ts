@@ -32,6 +32,9 @@ export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
  * the engine. Older versions still replay; v15 is accepted, dark, until H61 flips it. */
 export { BATTLE_ENGINE_VERSION, RPG_V2_ENGINE, rpgV2 } from './caps'
+// v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
+import { BATTLE_FAREWELL_FACTOR } from './skills'
+import { rpgV2 } from './caps'
 const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
@@ -919,8 +922,30 @@ function halfOf(ally: BattleAlly, h: BattleHalf | undefined, version: number): H
   return h.weapon && ally.weapons.includes(h.weapon) ? { kind: 'attack', weapon: h.weapon } : null
 }
 const halfIsTome = (h: Half): boolean => isRpgTome(h.kind === 'attack' ? h.weapon : h.skill.node.weapon)
+/** An Attack as a skill: one hit of her weapon's kind at full power, on one foe (and for Auto's scoring). */
+export const battleAttackDef = (weapon: RpgWeapon): RpgSkillDef =>
+  ({ target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(weapon), share: 1 }] }], mp: 0, primary: rpgWeaponKind(weapon) })
 
-/** A Summoner's lingering summon acts again, then leaves (D86). */
+/**
+ * v15 (D183, classes-v2 §3.1): a Spell Blade's Arms half gains one hit, the total unchanged: its hits and a copy of its
+ * last, every one × P ÷ (P + last), P being the hits' total (an Attack lands as two hits at half its power; n equal hits
+ * as n + 1 at n ÷ (n + 1)). A per-hit rider rides the extra hit too; `focus`, `splash` and `other` are untouched. For the
+ * screens and the guard rail as well as the engine.
+ */
+export function battleExtraHit<T extends Pick<RpgSkillDef, 'hits'>>(def: T): T {
+  const last = def.hits.at(-1)
+  if (!last) return def
+  const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
+  const k = total / (total + last.power)
+  return { ...def, hits: [...def.hits, last].map((hit) => ({ ...hit, power: hit.power * k })) }
+}
+
+/**
+ * A Summoner's lingering summon acts again, then leaves (D86). v6–v14: before the half that summons, it re-casts its
+ * skill at its linger share. v15, her farewell (D183, classes-v2 §3.2): at the start of her pair, before either half, it
+ * strikes each living foe once: one hit of its kind at its linger share × its hits' power (an every-foe summon's per-foe
+ * power) × `BATTLE_FAREWELL_FACTOR`. No riders, statuses or support, never intercepted; a weak hit chips as any hit.
+ */
 function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: BattleUnit, cues: BattleCue[]): void {
   const index = s.summons.findIndex((x) => x.allyId === actor.id)
   if (index < 0) return
@@ -929,6 +954,12 @@ function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: Bat
   const foes = living(s, 'enemy')
   if (!node || !foes.length) return
   cues.push({ kind: 'summon', actorId: actor.id, targetId: target.id, label: node.name })
+  if (rpgV2(s.engineVersion)) {
+    const { hits, primary } = node.skill
+    const hit: RpgHit = { power: hits.reduce((sum, h) => sum + h.power, 0), parts: [{ kind: primary, share: 1 }] }
+    for (const foe of foes) strike(s, actor, foe, hit, summon!.scale * BATTLE_FAREWELL_FACTOR, cues, false)
+    return
+  }
   // Its farewell strike mends or shields at its linger share too (v12); a revive or a blessing doesn't repeat.
   cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', orbsOf(ally), summon!.scale)
 }
@@ -936,21 +967,21 @@ function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): v
   s.summons = [...s.summons.filter((x) => x.allyId !== allyId), { allyId, ref: { tier: ref.tier, id: ref.id }, scale }]
 }
 
-/** Resolves one half of her act at her hand's power. */
+/** Resolves one half of her act at its power: a skill, or an Attack as a one-hit cast of its weapon's kind. v6–v14: a
+ * summon lingers its previous one first, then stays. From v15 (D183) no half lingers (her farewell came before the pair),
+ * a Spell Blade's Arms half gains one hit, and only a Tome-half summon stays. */
 function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: BattleUnit, half: Half, scale: number, cues: BattleCue[], salt: string): void {
   const foes = living(s, 'enemy')
   if (!foes.length || actor.hp <= 0) return
   const tapped = target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!
-  if (half.kind === 'attack') {
-    strike(s, actor, tapped, { power: 1, parts: [{ kind: rpgWeaponKind(half.weapon), share: 1 }] }, scale, cues, true, { orbs: orbsOf(ally) })
-    return
-  }
-  const def = half.skill.def
-  if (def.summon) linger(s, actor, ally, tapped, cues)
+  const v2 = rpgV2(s.engineVersion), tome = halfIsTome(half)
+  const base = half.kind === 'skill' ? half.skill.def : battleAttackDef(half.weapon)
+  const def = v2 && !tome && ally.classId === 'spellblade' ? battleExtraHit(base) : base
+  if (def.summon && !v2) linger(s, actor, ally, tapped, cues)
   const now = tapped.hp > 0 ? tapped : living(s, 'enemy').sort(byHpShare(s))[0]
   if (!now) return
   cast(s, actor, now, def, scale, cues, salt, orbsOf(ally))
-  if (def.summon) stay(s, actor.id, half.skill.ref, def.summon.linger)
+  if (half.kind === 'skill' && def.summon && (!v2 || tome)) stay(s, actor.id, half.skill.ref, def.summon.linger)
 }
 
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
@@ -968,6 +999,10 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
   const ally = allyOf(s, actor.id)!
   const hand = rpgHand(ally, s.engineVersion)
   const cues: BattleCue[] = []
+  // v15 (D183): a Summoner who falls takes her lingering summon with her, so a revive brings back no farewell. Swept as
+  // each act begins, since a revive only ever comes from an act.
+  const hands15 = rpgV2(s.engineVersion)
+  if (hands15) s.summons = s.summons.filter((x) => unit(s, x.allyId)!.hp > 0)
   let charge: 'attack' | 'skill' | null = null
   if (action.kind === 'guard') {
     if (target.side !== 'ally' || target.id === actor.id) return invalid(previous, 'invalid-target')
@@ -1002,7 +1037,7 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     if (!first) return invalid(previous, 'invalid-skill')
     const halves: Half[] = [first]
     if (hand.pair) {
-      // A Spell Blade's act is one Arms half and one Tome half (D86).
+      // A Spell Blade's act is one Arms half and one Tome half (D86); from v15 a Summoner's too (D183).
       const second = halfOf(ally, action.pair, s.engineVersion)
       if (!second || halfIsTome(second) === halfIsTome(first)) return invalid(previous, 'invalid-skill')
       halves.push(second)
@@ -1010,7 +1045,14 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     const mp = halves.reduce((sum, h) => sum + (h.kind === 'skill' ? h.skill.mp : 0), 0)
     if (actor.mp < mp) return invalid(previous, 'insufficient-mp')
     actor.mp -= mp
-    halves.forEach((h, i) => resolveHalf(s, actor, ally, target, h, hand.power, cues, i ? 'pair' : 'random'))
+    if (hands15) {
+      // v15 (D183): the leading half (the stronger hand: a Spell Blade's Arms, a Summoner's Tome) resolves first, whatever
+      // order the action names, after her lingering summon's farewell.
+      if (halfIsTome(halves[0]!) !== hand.tome > hand.arms) halves.reverse()
+      linger(s, actor, ally, target, cues)
+    }
+    // Each half at its own power (D179): `arms` or `tome`, both her `power` before v15.
+    halves.forEach((h, i) => resolveHalf(s, actor, ally, target, h, halfIsTome(h) ? hand.tome : hand.arms, cues, i ? 'pair' : 'random'))
     charge = halves.some((h) => h.kind === 'skill') ? 'skill' : 'attack'
   }
   if (charge) actor.limit = Math.min(BATTLE_LIMIT_MAX, actor.limit + battleLimitGain(charge))

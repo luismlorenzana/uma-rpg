@@ -270,7 +270,9 @@ const SUMMONS: Readonly<Record<RpgWeapon, readonly string[]>> = {
   'tome-lightning': ['Spark Sprites', 'Thunderbird', 'Storm Roc', 'Thunder Kirin', 'Raijin'],
   'tome-light': ['Cherub', 'Mending Angel', 'Seraph Choir', 'Dominion Host', "Heaven's Legion"],
   'tome-dark': ['Leech Imp', 'Night Bat', 'Vampire Knight', 'Blood Countess', 'Abyssal Overlord'],
-  greatsword: ['Squire', 'Shield Knight', 'Paladin', 'Aegis Champion', 'Sword Saint'],
+  // From v15 "Paladin" is a class, so her depth-3 knight is the Knight Captain (tier2-classes §5.7, D183): the live
+  // generation's name, as names are presentation; the id stays `summoner-greatsword.3`.
+  greatsword: ['Squire', 'Shield Knight', rpgV2() ? 'Knight Captain' : 'Paladin', 'Aegis Champion', 'Sword Saint'],
   axe: ['Brigand', 'Berserker', 'Axe Ogre', 'Minotaur Chief', 'Jotun Warlord'],
   lance: ['Pikeman', 'Dragoon', 'Lance Knight', 'Valkyrie', 'Valkyrie Queen'],
   bow: ['Slinger', 'Archer', 'Ranger', 'Sylph Archer', 'Sagittarius'],

@@ -1,8 +1,8 @@
 // Deterministic ally auto-battle policy (H02): prefer a ready Limit Break, otherwise choose the strongest affordable
 // skill or Attack for the living foes. This is intentionally a small policy, not another battle engine.
 import { rpgNode, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
-import { isRpgTome, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
-import { applyBattleAction, battleActorSkill, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
+import { isRpgTome, rpgHand, type RpgHand, type RpgNodeRef, type RpgWeapon } from '../rules'
+import { applyBattleAction, battleActorSkill, battleAttackDef, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
 import { BATTLE_WARD_FACTOR, battleChannel } from './skills'
 import type { BattleAction, BattleAlly, BattleChannel, BattleHalf, BattleState, BattleUnit } from './types'
@@ -39,10 +39,6 @@ function supportScore(state: BattleState, actorId: string, def: RpgSkillDef, dep
   const full = sup.share > 0 ? sup.share : 0.2
   return (value / full) * 1.5 * RPG_SKILL_POWER[Math.max(0, Math.min(4, depth - 1))]!
 }
-
-const attackDef = (weapon: RpgWeapon): RpgSkillDef => ({
-  target: 'one', hits: [{ power: 1, parts: [{ kind: rpgWeaponKind(weapon), share: 1 }] }], mp: 0, primary: rpgWeaponKind(weapon),
-})
 
 /** The Limit Break to fire: a Hero's own (D106); from v10 a Learner's strongest Bond (D112); before, her class's first,
  * else her first Hero's. */
@@ -88,7 +84,7 @@ function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes:
   }
   for (const foe of foes) {
     for (const weapon of actor.weapons.filter((candidate) => tome === null || isRpgTome(candidate) === tome)) {
-      consider({ half: { weapon }, mp: 0, foe, score: score(state, attackDef(weapon), foe, foes) })
+      consider({ half: { weapon }, mp: 0, foe, score: score(state, battleAttackDef(weapon), foe, foes) })
     }
     for (const ref of actor.loadout) {
       const skill = battleActorSkill(state, unit.id, ref)
@@ -99,26 +95,35 @@ function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes:
   return pick
 }
 
+/** A pair class's leading half: the stronger hand (a Spell Blade's Arms; from v15 a Summoner's Tome, D183). */
+const tomeLeads = (hand: RpgHand): boolean => hand.pair && hand.tome > hand.arms
+
+/** Her best act: one half, or for a pair class (her hand's `pair`) her best leading half, then her best other half
+ * within the MP left, named lead first (D86; from v15 the Summoner too, D183). */
 function bestAction(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes: readonly BattleUnit[]): BattleAction | null {
-  if (actor.classId !== 'spellblade') {
+  const hand = rpgHand(actor, state.engineVersion)
+  if (!hand.pair) {
     const pick = bestHalf(state, actor, unit, foes, null, unit.mp)
     if (!pick) return null
     return pick.half.skill
       ? { kind: 'skill', actorId: unit.id, targetId: pick.foe.id, skill: pick.half.skill }
       : { kind: 'attack', actorId: unit.id, targetId: pick.foe.id, weapon: pick.half.weapon }
   }
-  const arms = bestHalf(state, actor, unit, foes, false, unit.mp)
-  const tome = arms ? bestHalf(state, actor, unit, foes, true, unit.mp - arms.mp) : null
-  if (!arms || !tome) return null
-  return arms.half.skill
-    ? { kind: 'skill', actorId: unit.id, targetId: arms.foe.id, skill: arms.half.skill, pair: tome.half }
-    : { kind: 'attack', actorId: unit.id, targetId: arms.foe.id, weapon: arms.half.weapon, pair: tome.half }
+  const tome = tomeLeads(hand)
+  const lead = bestHalf(state, actor, unit, foes, tome, unit.mp)
+  const other = lead ? bestHalf(state, actor, unit, foes, !tome, unit.mp - lead.mp) : null
+  if (!lead || !other) return null
+  return lead.half.skill
+    ? { kind: 'skill', actorId: unit.id, targetId: lead.foe.id, skill: lead.half.skill, pair: other.half }
+    : { kind: 'attack', actorId: unit.id, targetId: lead.foe.id, weapon: lead.half.weapon, pair: other.half }
 }
 
-function firstAttack(actor: BattleAlly, targetId: string): BattleAction {
+/** An Attack with her first weapon; a pair class (from v15 the Summoner too, D183) pairs it with her first weapon of the
+ * other kind, and the engine resolves the leading one first. */
+function firstAttack(state: BattleState, actor: BattleAlly, targetId: string): BattleAction {
   const weapon = actor.weapons[0]
   const action: BattleAction = { kind: 'attack', actorId: actor.id, targetId, ...(weapon ? { weapon } : {}) }
-  if (actor.classId !== 'spellblade' || !weapon) return action
+  if (!rpgHand(actor, state.engineVersion).pair || !weapon) return action
   const pair = actor.weapons.find((candidate) => isRpgTome(candidate) !== isRpgTome(weapon))
   return pair ? { ...action, pair: { weapon: pair } } : action
 }
@@ -138,7 +143,7 @@ export function autoAction(state: BattleState, actorId: string): BattleAction {
   const chosen = limitAction(state, actor, unit, foes) ?? bestAction(state, actor, unit, foes)
   if (chosen && accepted(state, chosen)) return chosen
 
-  const attack = firstAttack(actor, foes[0]!.id)
+  const attack = firstAttack(state, actor, foes[0]!.id)
   if (accepted(state, attack)) return attack
 
   const friend = state.units.find((candidate) => candidate.side === 'ally' && candidate.hp > 0 && candidate.id !== actorId)

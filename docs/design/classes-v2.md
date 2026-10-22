@@ -75,6 +75,9 @@ Damage is shown as physical / magical, in percent.
 
 ### 3.1 Spell Blade: 70/30 and multi-hit
 
+Built in H55 (D183), live from H61: each half at its own hand, her Arms half resolving first and gaining one hit
+(`battleExtraHit`). Her own best act on the guard rail chips 11: the Bow flurry's 5 + 1 hits with the Light flurry's 5.
+
 **The act stays a pair, reweighted:**
 - the **Arms half** goes from ×0.45 to **×0.63**;
 - the **Tome half** goes from ×0.45 to **×0.27**;
@@ -108,6 +111,11 @@ Damage is shown as physical / magical, in percent.
 **Her Limit Breaks** (the Spell Blade Salle) become multi-hit too: §5.
 
 ### 3.2 Summoner: the Spell Blade's mirror (owner, 2026-10-21)
+
+Built in H55 (D183), live from H61: her pair, Tome half first; the farewell, one strike on each living foe at the linger
+share × the summon's hits' power × `BATTLE_FAREWELL_FACTOR` (1, H60 tunes it), before her next pair; and the Greatsword
+line's depth-3 "Knight Captain". Her own best act on the guard rail chips 11: a lingering Light Pack's farewell, then
+Light Pack and Bow Pack.
 
 The Summoner is the Spell Blade turned inside out: same turn, same numbers, the other channel leading, and the area
 identity where the Spell Blade has multi-hit. They balance as a pair.

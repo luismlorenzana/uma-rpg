@@ -9,6 +9,8 @@ export const BATTLE_WEAK = 1.3
 export const BATTLE_UNBROKEN_FACTOR = 0.5
 /** v14 (D169): the Rift's ward. A hit of the channel a foe wards deals this share, on top of the unbroken halving. */
 export const BATTLE_WARD_FACTOR = 0.5
+/** v15 (D183): a lingering summon's farewell strike on every foe, × its linger share × its hits' power. */
+export const BATTLE_FAREWELL_FACTOR = 1
 export const BATTLE_DEFENSE_SHARE = 0.5
 export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5
