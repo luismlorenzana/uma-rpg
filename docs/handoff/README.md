@@ -19,8 +19,8 @@
 | H32 | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Done (`b535754`) |
 | H33 | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Done (`9823201`) |
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
-| [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | In progress (this session) |
-| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
+| H35 | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Done (`061cdac`) |
+| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Ready |
 | H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
 | H38 | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Done (uma-platform `e3da022`, uma-art 2.11.0) |
 
@@ -34,7 +34,7 @@
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
 | H43 | Tier 2's world and its Rift ([`tier2-world.md`](../design/tier2-world.md), calls Z1–Z10) | Claude | M | — | Done (`91ee4e7`) |
 
-**In progress:** H35 (tier switching). **Next:** H36 after H35; H34 after H35 (H33 has landed).
+**Ready now:** H36 and H34 (H33 and H35 have landed).
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H35 | Every screen, action and push on the active tier's world (D165): `activeTier` in the store (`rpg.tier`), `useActiveTier()` and `setActiveTier(tier): boolean`, the shell remounted under `key={activeTier}`, `?tier=` links, one Uma in one world (unlock and parser refusals, the album's scope), Uma Tickets in Tier 1 only, the world map on the tier's continents, and one push per tier world. Tier 1 alone plays as before. Locally validated at both phone widths on Tier 1 and a synthetic two-tier save, and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39698646406) | `061cdac` |
 | H41 | Doc: [the Extra Stats outer ring, "the Halo"](../design/extra-stats-tier2.md), calls X1–X8 (Q12) | `d15b84d` |
 | H43 | Doc: [Tier 2's world and its Rift](../design/tier2-world.md), proposal for the owner with calls Z1–Z10 (Q16). Today a freshly ascended party wins none of `w6`'s opening stages (scratch simulation); the foe budget restarts at the tier's Lv 1 with its build part scaled to her lifetime stats, plus one Tier 2 term for the toolbox. New leans and pack table for `w6`–`w10`, shields +1, skill MP ×1.7 with H39's A10, tier levels on screen, Laurels ×2 with the regions' tier fixed, a first-week ledger (T5 stands), one added test per Rift front, the Twilight Rift biome renamed | `91ee4e7` |
 | H33 | A standard preset per class, "Use the standard preset" at the top of the Gear tab: the default spread, the class's armor half, an Orb in accessory 1 and a support in accessory 2, with her best pieces or the stock's next grades her ranks allow; binding asks first in a sheet (D164). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39697022175) | `9823201` |
