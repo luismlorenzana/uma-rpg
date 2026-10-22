@@ -128,6 +128,15 @@ run, so the chain shows the faces the fights will have. `CastFace` moves from `R
 2. **Hub:** HubScreen, PlacePage, PlacePreview and MenuSheet on `placeOpen`/`placeLock`; the `rift` frame.
 3. **`battle/fight-source.ts`**, the `FightScreen<R>` refactor, `campaignFightSource`, `CastFace`; the world map's
    `FightRoute` passes its source. The world map's fights must look and play exactly as before.
+   **The Rift's foe traits on screen** (engine v14, D169; H44 left these for you):
+   - `describeCue` in `battle/battle-view.ts` adds ` · warded` to a hit whose `label` is `'Warded'`, the way it adds
+     ` · guarded` for `'Intercepted'`. Test it in `battle-view.test.ts`.
+   - The foe button's `aria-label` in `FightScreen.tsx` says "acts three times" for `thrice` (in place of "acts twice")
+     and "wards physical" or "wards magical" for `ward`.
+   - Wherever a foe list shows the "Acts twice" badge (`RegionMap.tsx`, and `StageSheet.tsx`'s foes), show "Acts three
+     times" for `thrice` and a "Wards Arms" or "Wards Tomes" badge for `ward`, in the same style. On the fight screen, a
+     warded foe carries a small mark beside her element (the front's `FrontCrest` from H49 is fine), so the player
+     learns which channel to bring before the hit cues teach it.
 4. **`places/rift/`:** `RiftPage.tsx` (routes, behind `CampaignGate`), `RiftPeek.tsx` (status, the fronts' counts),
    `FrontChain.tsx`, `StageSheet.tsx`, `ConvergenceView.tsx`, `SignUp.tsx`, `EchoSheet.tsx`, `AscendSheet.tsx`,
    `RiftFightRoute.tsx`, `RiftResult.tsx`, and pure helpers in `rift-view.ts` (`riftRefLabel`, the eligible parties for
