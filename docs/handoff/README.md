@@ -41,13 +41,13 @@
 | H44 | Engine v14: the ward, a thrice-acting Duel champion, mixed lock sets (Rift-only foe traits); docs renumbered (classes v2 → v15) | Claude | M | — | Done (`36bdb04`) |
 | H45 | Tier 2 is playable from Lv 1 (tier2-world Z3, Z8), Tier 1 unchanged | Claude | M | — | Done (`16f9cb2`) |
 | H46 | Save v24: the account's defeated faces, the open Rift fight, run traces and the Convergence | Claude | M | — | Done (`39f0c26`) |
-| [H47](tasks/H47-rift-generator.md) | The Rift generator: fronts, stages, champions, Convergence, Echoes, the cross-pack picker | Claude | L | H44, H46 | Ready (H44 `36bdb04`: `ward`, `thrice`, `mixedLocks`, D169; H46 `39f0c26`: `RiftFightRef`, `riftRefKey`, `account.defeated`, D171) |
-| [H49](tasks/H49-achievements.md) | Achievements: catalog, earning rules, the Account's list, the cut-in (pins uma-art 2.11.0) | Either | M | H46 | Ready (H46 `39f0c26`: `ACHIEVEMENT_IDS` and the `achievementsEarned` stub, D171) |
+| [H47](tasks/H47-rift-generator.md) | The Rift generator: fronts, stages, champions, Convergence, Echoes, the cross-pack picker | Claude | L | H44, H46 | In progress (this session) |
+| [H49](tasks/H49-achievements.md) | Achievements: catalog, earning rules, the Account's list, the cut-in (pins uma-art 2.11.0) | Either | M | H46 | In progress (this session) |
 | [H48](tasks/H48-rift-run-rules-ascend.md) | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | Waiting |
 | [H50](tasks/H50-rift-page.md) | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | Waiting |
 | [H51](tasks/H51-rift-balance.md) | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | Waiting |
 
-**Waves:** 1) H44, H45, H46 → 2) H47, H49 → 3) H48 → 4) H50, H51.
+**Waves:** 1) H44, H45, H46 (done) → 2) H47, H49 → 3) H48 → 4) H50, H51.
 
 **All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v15 (with the Paladin's art), the Tier 1 simplification, and the Rift.
 
