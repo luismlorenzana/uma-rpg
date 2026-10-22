@@ -107,8 +107,9 @@ Bucket paths, endpoints, caching, local directories and deploy stages are in
 Main JS ≤ 230 KB gzip (D56). H16 reduced the production entry from 195.96 to 133.15 KB gzip (measured when it merged onto main `888aeb2`).
 D147 (uma-kit's shell and Motion's sheets) raised it to about 161 KB gzip.
 `scripts/check-size.mjs`, run by the web build, measures the HTML entry and all its static JS dependencies from
-Vite's manifest. Both must fit the budget; putting code in an eagerly imported vendor chunk cannot hide it.
-Phaser (Hub and battle stage), Firebase, master data parsing and each place page remain lazy chunks.
+Vite's manifest. Both must fit the budget; putting code in an eagerly imported vendor chunk cannot hide it. It also
+fails when the initial JS renders a module that must load on demand (H62, below).
+Phaser (Hub and battle stage), Firebase, master data parsing, each place page and the fight engine remain lazy chunks.
 
 ### Boot and lazy domain boundaries (H16)
 
@@ -128,3 +129,32 @@ Phaser (Hub and battle stage), Firebase, master data parsing and each place page
 - The service worker precaches every built JS chunk; a cold, uncached network pass is also required when changing
   these boundaries. The H16 pass used 375×667, synthetic master data and rivals, all 34 open places, four Hub pages,
   five continents, a region, profile tabs and a saved-fight reload under Fast 4G proxy shaping.
+
+### The fight on demand (H62, D184)
+
+By classes v2 the engine had crept back into the entry: the store's `import('@rpg/domain/battle')` resolves to the same
+module the root index re-exports, and the Hub read `startingClass`, `activeClass` and `classOf` from it, so every export
+of `save/battle.ts`, and through it the engine, rendered in the main chunk. H62 took main JS from 226.48 to 200.54 KB
+gzip locally (227.31 on CI after H56).
+
+- **What loads on demand:** the engine (`rpg/battle/engine.ts`, `limit.ts`, `skills.ts`: the `engine` chunk, about
+  11.7 KB gzip), Auto (`auto.ts`, in the `FightScreen` chunk, 11 KB), the world map's fight rules (`save/battle.ts`,
+  `rpg/campaign/run.ts`, `world/world.ts`: the `battle` chunk, 8 KB) and the skill catalog with the Halls' Limit Break
+  table (`rpg/catalog.ts`, `rpg/heroes.ts`: a shared chunk named after `heroes`, 6.3 KB). The world map, the Rift, the
+  Stable, the Halls and the Exchange import them statically, so they arrive with their page.
+- **What stays in the entry:** an Uma's class (`save/class.ts`: `startingClass`, `activeClass`, `classOf`, which
+  `save/battle.ts` re-exports), the skill depth tables (`RPG_SKILL_POWER`, `RPG_SKILL_MP` in `rpg/node-identity.ts`,
+  which the catalog re-exports), the engine's types and caps, the save parser, and the work and forge rules (the Hub
+  reads them, so their dynamic imports don't split; a later trim, not a fight).
+- **The subpaths:** `@rpg/domain/engine` (`rpg/battle/index.ts`: the engine, Limit Breaks, Auto, their types; CJS
+  `dist/cjs/rpg/battle/index.js`) is the only way to the engine's functions; the root index keeps its types, skill
+  numbers and caps. `@rpg/domain/battle` holds the world map's fight rules, which the store's actions (`beginFight`,
+  `fightAction`, `leaveFight`, `sweep`, the class and Spring actions) load on first use. The API keeps the synchronous
+  `parseSave` through the CJS build.
+- **Prefetch:** once the Hub has painted, `battle/prefetch.ts` loads `@rpg/domain/battle` and the fight screen while the
+  browser is idle (a 500 ms timeout on Safari), so neither the world map nor a fight waits for them. A save with an open
+  fight loads the engine at boot through `parseSaveAsync`, as before.
+- **The guard:** `vite.config.ts`'s `chunkModules` writes `dist/.vite/chunks.json` (each chunk's rendered modules; never
+  deployed or precached), and `scripts/check-size.mjs` fails the build when the initial JS renders any of
+  `LAZY_MODULES`: the engine, Auto, Limit Breaks, the catalog, the Limit Break table and `save/battle.ts`. A screen in
+  the entry (the Hub, the bars, `battle/labels.tsx`, the album rows, the store) must not import them; a lazy page may.

@@ -10,6 +10,9 @@ export interface RpgNodeIdentity {
 export const rpgClassWeapons = (classId: RpgClass): readonly RpgWeapon[] =>
   classId === 'brawler' ? RPG_WEAPON_KINDS : classId === 'mage' ? RPG_TOMES : RPG_WEAPONS
 export const rpgTreeOf = (classId: RpgClass, weapon: RpgWeapon): RpgTreeId => `${classId}-${weapon}`
+/** Single-target total power by depth, and the full-turn MP by depth (6 + 4 × depth). */
+export const RPG_SKILL_POWER = [1.6, 2.2, 2.9, 3.7, 4.6] as const
+export const RPG_SKILL_MP = [10, 14, 18, 22, 26] as const
 /** Side skills open at Uma Lv 5, 15, 25, 35 and 45 (D73); cores use the class rank (D77). */
 export const rpgSideNodeLevel = (depth: number): number => 10 * depth - 5
 

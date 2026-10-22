@@ -4,9 +4,10 @@
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52). It plays a source (H50): the world
 // map's open fight, or the Rift's.
 import {
-  autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, biomeById, isRpgTome, replayBattle, SaveRuleError, type BattleAction, type BattleCue,
-  type BattleEnemy, type BattleState, type BattleUnit, type Biome, type EnemyRank, type RpgNodeRef, type RpgWeapon,
+  biomeById, isRpgTome, SaveRuleError, type BattleAction, type BattleCue, type BattleEnemy, type BattleState, type BattleUnit, type Biome,
+  type EnemyRank, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
+import { autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, replayBattle } from '@rpg/domain/engine'
 import { AtlasSprite, imagePath } from '@luismlorenzana/uma-kit/content'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'

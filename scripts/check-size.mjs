@@ -5,6 +5,17 @@ import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 
 export const MAIN_JS_BUDGET = 230_000
+// H62: the fight engine, the skill catalog and the Limit Break table it reads, and the world map's fight rules load on
+// demand. The build's chunk map (apps/web/vite.config.ts, `chunkModules`) says what each chunk renders; none of these
+// may render in the initial JS.
+export const LAZY_MODULES = [
+  'packages/domain/src/rpg/battle/engine.ts',
+  'packages/domain/src/rpg/battle/auto.ts',
+  'packages/domain/src/rpg/battle/limit.ts',
+  'packages/domain/src/rpg/heroes.ts',
+  'packages/domain/src/rpg/catalog.ts',
+  'packages/domain/src/save/battle.ts',
+]
 export function entrySrc(html) {
   const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => /\btype\s*=\s*["']module["']/i.test(tag))
   const sources = scripts.flatMap(([tag]) => {
@@ -21,7 +32,16 @@ function assetPath(distDir, source) {
   return file
 }
 
-export async function checkSize(distDir, budget = MAIN_JS_BUDGET) {
+/** The lazy modules a static chunk renders, from `.vite/chunks.json` (chunk file → module paths). */
+export function lazyInInitial(chunks, files, lazy = LAZY_MODULES) {
+  return files.flatMap((file) => {
+    const modules = chunks[file]
+    if (!Array.isArray(modules)) throw new Error(`Chunk map is missing ${file}`)
+    return modules.filter((id) => lazy.some((path) => id === path || id.endsWith(`/${path}`))).map((id) => `${id} (${file})`)
+  })
+}
+
+export async function checkSize(distDir, budget = MAIN_JS_BUDGET, lazy = LAZY_MODULES) {
   const html = await readFile(resolve(distDir, 'index.html'), 'utf8')
   const src = entrySrc(html), entry = src.replace(/^\//, '')
   const manifest = JSON.parse(await readFile(resolve(distDir, '.vite/manifest.json'), 'utf8'))
@@ -42,7 +62,15 @@ export async function checkSize(distDir, budget = MAIN_JS_BUDGET) {
   const mainGzip = sizes.find((s) => s.file === entry).gzip
   const initialGzip = sizes.reduce((sum, s) => sum + s.gzip, 0)
   if (mainGzip > budget || initialGzip > budget) throw new Error(`Initial JS ${initialGzip} bytes gzip (main ${mainGzip}) exceeds ${budget}`)
-  return { entry, mainGzip, initialGzip, files: sizes }
+  let chunks
+  try {
+    chunks = JSON.parse(await readFile(resolve(distDir, '.vite/chunks.json'), 'utf8'))
+  } catch {
+    throw new Error('Missing .vite/chunks.json (the chunkModules plugin in apps/web/vite.config.ts)')
+  }
+  const leaked = lazyInInitial(chunks, files, lazy)
+  if (leaked.length > 0) throw new Error(`Initial JS renders modules that load on demand (H62): ${leaked.join(', ')}`)
+  return { entry, mainGzip, initialGzip, files: sizes, lazy: lazy.length }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -50,6 +78,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const result = await checkSize(resolve(process.argv[2] ?? 'dist'))
     console.log(`Main JS: ${(result.mainGzip / 1000).toFixed(2)} KB gzip / ${MAIN_JS_BUDGET / 1000} KB budget`)
     console.log(`Initial JS: ${(result.initialGzip / 1000).toFixed(2)} KB gzip across ${result.files.length} static chunk(s)`)
+    console.log(`On demand: none of ${result.lazy} lazy modules (the fight engine, catalog, Limit Breaks, fight rules) in it`)
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
     process.exitCode = 1

@@ -10,11 +10,12 @@ import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from
 import { useReducedMotionSetting } from '@luismlorenzana/uma-kit/ui'
 import { FaceTile } from '@luismlorenzana/uma-kit/album'
 import { workView } from '@luismlorenzana/uma-kit/work'
-import { Suspense, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
 import { PlacePage } from '../places/PlacePage'
 import { PlacePreview } from '../places/PlacePreview'
 import { PLACE_UI } from '../places/registry'
+import { prefetchFight } from '../battle/prefetch'
 import { collectEverything, useActiveTier, useWorld } from '../save/game'
 import { useNow } from '../ui/useNow'
 import { plaza, sheetFor, useCrowd } from './Featured'
@@ -105,6 +106,8 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const crowd = useCrowd()
   const ready = readyPlaces(world, now)
   const ground = useMemo(() => pageGround(page), [page])
+  // The fight's code is lazy (H62): fetch it once the Hub has painted.
+  useEffect(prefetchFight, [])
   const places = placesOn(page).map((place): HubMapPlace => {
     const open = placeOpen(place, world, tier)
     const lock = placeLock(place, world, tier)

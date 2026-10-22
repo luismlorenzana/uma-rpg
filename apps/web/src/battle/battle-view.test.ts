@@ -1,4 +1,5 @@
-import { BATTLE_LIMIT_MAX, createBattle, projectRpgStats, rpgFoe, type BattleAlly, type BattleInput, type BattleState, type RpgClass, type RpgWeapon } from '@rpg/domain'
+import { BATTLE_LIMIT_MAX, projectRpgStats, rpgFoe, type BattleAlly, type BattleInput, type BattleState, type RpgClass, type RpgWeapon } from '@rpg/domain'
+import { createBattle } from '@rpg/domain/engine'
 import { describe, expect, it } from 'vitest'
 import { describeCue, limitMode, limitOptions, limitReady } from './battle-view'
 

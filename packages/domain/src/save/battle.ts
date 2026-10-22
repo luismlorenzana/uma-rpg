@@ -3,8 +3,6 @@
 // accessories' kinds (D124). Pure
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
 // docs/design/class-rework.md, docs/design/progression.md.
-import type { Aptitudes } from '@luismlorenzana/uma-data'
-import { best } from '../roster/aptitudes'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
@@ -17,7 +15,7 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
+  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout,
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import {
@@ -31,16 +29,12 @@ import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { rpgIsHealer } from '../rpg/kinds'
+import { activeClass, classOf, type BattleOutfit } from './class'
 
-/** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
-export interface BattleOutfit {
-  outfitId: string
-  baseStats: Record<'speed' | 'stamina' | 'power' | 'guts' | 'wit', number>
-  growthRatePercents: Record<'speed' | 'stamina' | 'power' | 'guts' | 'wit', number>
-  aptitudes: Pick<Aptitudes, 'strategy'>
-}
+// An Uma's class (H62): in `save/class.ts`, so the main bundle reads it without this module and the engine.
+export { activeClass, classOf, startingClass, styleClass, type BattleOutfit, type StartingOutfit } from './class'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
@@ -54,23 +48,6 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
 
 // --- Classes (D86) ---------------------------------------------------------------------------------------------------
 
-/** Her best running style's class (ties: front, pace, late, end): what an Uma who never picked fights as. */
-export const styleClass = (outfit: Pick<BattleOutfit, 'aptitudes'>): RpgClass => rpgDefaultClass(best(outfit.aptitudes.strategy)[0])
-
-/** What `startingClass` reads: her aptitudes, and her base stats (an outfit always has them; without, her style's class). */
-export type StartingOutfit = Pick<BattleOutfit, 'aptitudes'> & { baseStats?: Pick<BattleOutfit['baseStats'], 'power' | 'wit'> }
-/** The class she starts in at unlock: her style's, except that from classes v2 a Late surger whose base Power beats her
- * base Wit starts as a Paladin (§3.3, D180; ties stay Cleric). The save writes that start as her class. */
-export function startingClass(outfit: StartingOutfit, engine: number = BATTLE_ENGINE_VERSION): RpgClass {
-  const style = styleClass(outfit), stats = outfit.baseStats
-  return style === 'cleric' && rpgV2(engine) && !!stats && stats.power > stats.wit ? 'paladin' : style
-}
-
-/** The class she fights as: the chosen one, or her style's, so no Uma who never picked changes class at the switch. */
-export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>): RpgClass {
-  return uma.classId ?? styleClass(outfit)
-}
-
 /** What `healerBlock` says. */
 export const ONE_HEALER = 'One healer a party'
 /** Why these Umas can't fight together, or null: from classes v2, at most one of them fights as a healer, a Paladin or a
@@ -83,10 +60,6 @@ export function healerBlock(world: Pick<TierWorld, 'umas'>, ids: readonly string
   })
   return healers.length > 1 ? ONE_HEALER : null
 }
-
-/** Her setup for a class: what she saved, or its default five weapons with nothing learned and skills chosen for her. */
-export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass): ClassLoadout =>
-  uma.classes[classId] ?? { weapons: rpgDefaultWeapons(classId), tree: [], loadout: null }
 
 /** Her battle profile as a class (the active one by default); its Class Rank opens the depths (D102). */
 export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {

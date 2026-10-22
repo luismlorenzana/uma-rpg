@@ -3,9 +3,11 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { checkSize, entrySrc } from './check-size.mjs'
+import { checkSize, entrySrc, LAZY_MODULES, lazyInInitial } from './check-size.mjs'
 
-async function fixture(fn, { entry = 'assets/main.js', imports = [], extra = {} } = {}) {
+const ENGINE = '../../packages/domain/src/rpg/battle/engine.ts'
+
+async function fixture(fn, { entry = 'assets/main.js', imports = [], extra = {}, chunks } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'rpg-size-test-'))
   try {
     await mkdir(join(root, '.vite'))
@@ -17,6 +19,8 @@ async function fixture(fn, { entry = 'assets/main.js', imports = [], extra = {} 
     await writeFile(join(root, 'assets/main.js'), 'console.log("boot")')
     await writeFile(join(root, 'assets/phaser.js'), noise(300_000))
     for (const node of Object.values(extra)) if (node.file.startsWith('assets/')) await writeFile(join(root, node.file), noise(240_000))
+    const map = chunks ?? Object.fromEntries([entry, 'assets/phaser.js', ...Object.values(extra).map((n) => n.file)].map((f) => [f, ['src/main.tsx']]))
+    if (chunks !== null) await writeFile(join(root, '.vite/chunks.json'), JSON.stringify(map))
     await fn(root)
   } finally { await rm(root, { recursive: true, force: true }) } // Only this freshly created fixture directory.
 }
@@ -46,4 +50,24 @@ test('counts static imports so a small entry cannot hide oversized initial vendo
 test('refuses traversal and missing static manifest nodes', async () => {
   await fixture(async (root) => { await assert.rejects(checkSize(root), /Unsafe JS/) }, { entry: '../escape.js' })
   await fixture(async (root) => { await assert.rejects(checkSize(root), /Missing static chunk/) }, { imports: ['missing'] })
+})
+test('refuses the fight engine in the entry, and allows it in a lazy chunk (H62)', async () => {
+  await fixture(async (root) => { await assert.rejects(checkSize(root), /load on demand.*engine\.ts \(assets\/main\.js\)/) },
+    { chunks: { 'assets/main.js': ['src/main.tsx', ENGINE], 'assets/phaser.js': [] } })
+  await fixture(async (root) => { assert.equal((await checkSize(root)).files.length, 1) },
+    { chunks: { 'assets/main.js': ['src/main.tsx'], 'assets/phaser.js': [ENGINE] } })
+})
+test('refuses a lazy module in a static import, and a build without its chunk map', async () => {
+  const small = { file: 'assets/vendor.js' }
+  await fixture(async (root) => {
+    await writeFile(join(root, 'assets/vendor.js'), 'export const x = 1')
+    await assert.rejects(checkSize(root), /save\/battle\.ts \(assets\/vendor\.js\)/)
+  }, { imports: ['vendor'], extra: { vendor: small }, chunks: { 'assets/main.js': [], 'assets/vendor.js': ['../../packages/domain/src/save/battle.ts'] } })
+  await fixture(async (root) => { await assert.rejects(checkSize(root), /Missing \.vite\/chunks\.json/) }, { chunks: null })
+})
+test('matches whole module paths only', () => {
+  assert.deepEqual(lazyInInitial({ a: ['../../packages/domain/src/rpg/battle/engine-v15.test.ts', 'x/save/battle.tsx'] }, ['a']), [])
+  assert.equal(lazyInInitial({ a: [ENGINE] }, ['a']).length, 1)
+  assert.throws(() => lazyInInitial({}, ['a']), /missing a/)
+  assert.ok(LAZY_MODULES.includes('packages/domain/src/rpg/battle/engine.ts'))
 })

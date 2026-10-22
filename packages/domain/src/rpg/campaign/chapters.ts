@@ -2,7 +2,7 @@
 // (design §2.1, docs/design/battles.md). Ported from uma-racer and re-cut to ten levels a chapter (D48). Layout and
 // numbers are code; the private PriConne cast only supplies the faces (names and portraits, D50).
 import { RPG_DEPTH_GATES, RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgElementWeakness, type RpgElement } from '../rules'
-import { RPG_SKILL_POWER } from '../catalog'
+import { RPG_SKILL_POWER } from '../node-identity'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../battle/types'
 import { RPG_FOE_ROLES, RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from './enemies'
 import { rpgFinals, type RpgFinalsRoute } from './finals'

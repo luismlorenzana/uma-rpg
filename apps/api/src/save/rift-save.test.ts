@@ -4,9 +4,9 @@ import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
-  autoAction, battleActionsLeft, newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, type BattleOutfit, type RiftFightRef, type RosterMember,
-  type Save,
+  newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, type BattleOutfit, type RiftFightRef, type RosterMember, type Save,
 } from '@rpg/domain'
+import { autoAction, battleActionsLeft } from '@rpg/domain/engine'
 import { actInRiftFight, ascend, beginConvergence, riftBattleStep, signUpRift, startRiftFight } from '@rpg/domain/rift'
 import { describe, expect, it } from 'vitest'
 import { LocalSaveRepository } from './local-save.repository'

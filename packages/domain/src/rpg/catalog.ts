@@ -7,13 +7,11 @@ import {
   isRpgTome, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
-import { rpgTreeOf } from './node-identity'
+import { RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
 import { BATTLE_REGEN_ROUNDS, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
-
-/** Single-target total power by depth, and the full-turn MP by depth (6 + 4 × depth). */
-export const RPG_SKILL_POWER = [1.6, 2.2, 2.9, 3.7, 4.6] as const
-export const RPG_SKILL_MP = [10, 14, 18, 22, 26] as const
+// The depth tables live with the node identities (H62): the world's foes read them without building this catalog.
+export { RPG_SKILL_MP, RPG_SKILL_POWER } from './node-identity'
 /** Every-foe skills deal this share of single-target power to each foe; random multi-hits get a small bonus. */
 export const RPG_AOE_SHARE = 0.55
 export const RPG_RANDOM_BONUS = 1.05

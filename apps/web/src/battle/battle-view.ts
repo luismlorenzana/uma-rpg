@@ -1,10 +1,11 @@
 // Read-only projections of the engine for the fight screen: legal choices, previews and cue text. Ported from uma-racer,
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half.
-import { BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill,
-  battleHasLimit, battleLimitPlan, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
-  type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleLimitChoice, type BattleSkill, type BattleState,
+import { BATTLE_LIMIT_MAX, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
+  type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
+import { BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleHasLimit, battleLimitPlan,
+  type BattleLimitChoice } from '@rpg/domain/engine'
 
 import { skillKinds, WEAPON_LABEL } from './labels'
 

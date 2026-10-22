@@ -1,10 +1,34 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { join, relative, sep } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { loadEnv } from 'vite'
+import { loadEnv, type Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const buildId = (process.env.VITE_APP_BUILD_ID ?? process.env.GITHUB_SHA ?? 'local').slice(0, 12)
+
+/** Writes which source modules each chunk renders to dist/.vite/chunks.json (never deployed or precached), so the build's
+ * size check can refuse a lazy module, like the fight engine, in the initial JS (H62, scripts/check-size.mjs). */
+function chunkModules(): Plugin {
+  let root = ''
+  return {
+    name: 'rpg-chunk-modules',
+    apply: 'build',
+    configResolved(config) { root = config.root },
+    writeBundle(options, bundle) {
+      const chunks: Record<string, string[]> = {}
+      for (const output of Object.values(bundle)) {
+        if (output.type !== 'chunk') continue
+        chunks[output.fileName] = Object.entries(output.modules).filter(([id, m]) => m.renderedLength > 0 && !id.startsWith('\0'))
+          .map(([id]) => relative(root, id.split('?')[0]!).split(sep).join('/'))
+      }
+      const dir = join(options.dir ?? join(root, 'dist'), '.vite')
+      mkdirSync(dir, { recursive: true })
+      writeFileSync(join(dir, 'chunks.json'), `${JSON.stringify(chunks, null, 1)}\n`)
+    },
+  }
+}
 
 export default defineConfig(({ mode }) => {
   // A production build without the Firebase web config would run signed out and every API call would get a 401.
@@ -21,6 +45,7 @@ export default defineConfig(({ mode }) => {
   plugins: [
     react(),
     tailwindcss(),
+    chunkModules(),
     VitePWA({
       registerType: 'prompt',
       injectRegister: null,

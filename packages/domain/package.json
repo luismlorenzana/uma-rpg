@@ -27,6 +27,16 @@
         "default": "./src/save/battle.ts"
       }
     },
+    "./engine": {
+      "require": {
+        "types": "./dist/cjs/rpg/battle/index.d.ts",
+        "default": "./dist/cjs/rpg/battle/index.js"
+      },
+      "default": {
+        "types": "./src/rpg/battle/index.ts",
+        "default": "./src/rpg/battle/index.ts"
+      }
+    },
     "./work": {
       "require": {
         "types": "./dist/cjs/save/work.d.ts",
