@@ -2,7 +2,7 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, renameParty, renameTrainer, setPartySlot, startingClass, TIER_ONE, unlockUma, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  newSave, renameParty, renameTrainer, setPartySlot, startingClass, TIER_ONE, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
 } from '@rpg/domain'
 import { create } from 'zustand'
@@ -170,6 +170,13 @@ export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKin
 /** Puts an accessory in one of her two accessory slots, or empties it (null) (D124). */
 export const wearAccessoryPiece = (outfitId: string, slot: AccessorySlot, gearId: string | null) =>
   edit(import('@rpg/domain/forge'), (d, s, now) => d.wearAccessory(s, outfitId, slot, gearId, now))
+/** Puts on a class's standard preset (H33, D164): weapons, armor and accessories, binding what it takes from the stock. */
+export async function wearPreset(outfitId: string, classId: RpgClass): Promise<void> {
+  const { save } = useGame.getState()
+  if (!save) return
+  const next = wearClassPreset(save, outfitId, classId, nowIso())
+  if (next !== save) await commit(next)
+}
 /** Marks or unmarks an Uma as a target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now) => d.setTarget(s, outfitId, on, now))
 /** The Halls of Heroes (D106): seat or swap a Hero (null empties the seat), and add or remove a Learner. */

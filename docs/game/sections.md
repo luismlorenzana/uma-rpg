@@ -169,8 +169,8 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
-    - Gear: five weapon slots, five armor slots, two accessory slots, the Extra Stats link, and Weapon, Armor and
-      Accessory Rank cells;
+    - Gear: the standard preset, five weapon slots, five armor slots, two accessory slots, the Extra Stats link, and
+      Weapon, Armor and Accessory Rank cells;
     - Work;
     - Racing.
   - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.

@@ -1,8 +1,9 @@
 // An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
 // her Craft Level and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks; first, as it
-// changes most), Battle (her RPG stats), Gear (equipment, Weapon and Armor Ranks, Extra Stats), Work (Craft Level and her
-// job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows the Unlock flow and her
-// racing profile. The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56, SD3).
+// changes most), Battle (her RPG stats), Gear (the standard preset, equipment, Weapon and Armor Ranks, Extra Stats),
+// Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
+// the Unlock flow and her racing profile. The header, the tabs and the unlock confirm are the kit's frame
+// (uma-platform P56, SD3).
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
@@ -31,6 +32,7 @@ import { formatDuration, useNow } from '../../ui/useNow'
 import { RankCells, RankRow } from '../../ui/RankBars'
 import { pointText } from '../../items/planets'
 import { GearCard } from './GearCard'
+import { PresetButton } from './PresetButton'
 import { SkillsPage } from './SkillsPage'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
@@ -341,13 +343,14 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
   )
 }
 
-// --- Gear: what she wears, Weapon and Armor Ranks (D102), Extra Stats -------------------------------------------------
+// --- Gear: the standard preset (D164), what she wears, Weapon and Armor Ranks (D102), Extra Stats ----------------------
 
 function GearTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const navigate = useNavigate()
   const points = umaPoints(uma, activeClass(outfit, uma))
   return (
     <div className="space-y-3">
+      <PresetButton outfit={outfit} uma={uma} world={world} />
       <GearCard outfit={outfit} uma={uma} world={world} />
       <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
         <span className="flex items-center justify-between">

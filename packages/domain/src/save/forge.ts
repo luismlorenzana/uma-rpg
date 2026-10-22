@@ -15,7 +15,7 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
 }
 
 /** Every piece bound to her: her locker and what she wears. */
-const ownGear = (uma: OwnedUma): string[] => [...new Set([...uma.gear.locker, ...Object.values(uma.gear.equipped)])]
+export const ownGear = (uma: OwnedUma): string[] => [...new Set([...uma.gear.locker, ...Object.values(uma.gear.equipped)])]
 
 /** The highest grade she has bound on a track (D119): 0, her Training piece, when none. */
 export function boundGrade(uma: OwnedUma, track: string): number {

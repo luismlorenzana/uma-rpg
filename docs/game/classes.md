@@ -9,7 +9,7 @@ The names remain available to accessibility tools.
 
 Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots, hands, stat leans, learning rules),
 `catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks), `economy/ranks.ts`
-(ranks).
+(ranks), `save/presets.ts` (standard presets).
 
 ## The five classes
 
@@ -90,6 +90,22 @@ five start in her starting class's half ([starts as](#the-five-classes)).
 - **Orbs** (offense): an Arms Orb or an Elemental Orb adds its kind to every hit, for weaknesses only, with no damage of
   its own.
 - **Talismans** (physical defense) and **Amulets** (magical defense): one small effect each.
+
+**Standard preset (D164).** Each class has one, applied on tap from her profile's Gear tab ("Use the standard preset",
+for her active class): its default weapon spread, its armor half in all five slots, an Orb in accessory 1 and a support
+accessory in accessory 2. The Orb adds a kind her spread lacks, and the support is the one the balance simulation plays
+with. It wears the best she can: her own pieces, or the stock's next grades her ranks allow, else Training pieces
+([loops](loops.md#extra-stats-and-gear)). Her learned and equipped skills stay.
+
+<!-- live:presets -->
+| Class | Weapons | Armor | Orb, accessory 1 | Support, accessory 2 |
+|---|---|---|---|---|
+| Brawler | Greatsword, Axe, Lance, Bow, Katana | Physical | Fire Orb | Vampire Talisman |
+| Mage | Fire Tome, Blizzard Tome, Thunder Tome, Light Tome, Dark Tome | Magical | Greatsword Orb | Siphon Amulet |
+| Spell Blade | Greatsword, Lance, Katana, Fire Tome, Thunder Tome | Physical | Dark Orb | Vampire Talisman |
+| Cleric | Greatsword, Axe, Bow, Fire Tome, Light Tome | Magical | Ice Orb | Spring Amulet |
+| Summoner | Fire Tome, Blizzard Tome, Thunder Tome, Greatsword, Lance | Magical | Axe Orb | Spring Amulet |
+<!-- /live -->
 
 ## Skills: depths, points and slots
 

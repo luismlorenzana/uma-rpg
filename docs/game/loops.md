@@ -261,6 +261,18 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
   From the stock she can bind only the grade above the best she has on that track (her Training piece is grade 0), so
   grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
   and the stock above it.
+- **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
+  ([classes](classes.md#weapons)): the class's five default weapons, its armor half in all five slots, its Orb in
+  accessory 1 and its support in accessory 2.
+  - **What it wears:** on each of those types, her best own piece her rank allows. Then **the climb**: from her best
+    grade, it binds each next grade while the stock has it and her rank allows it, and wears the top, as tapping a sheet
+    grade by grade does. With nothing, a weapon or armor slot holds its Training piece; an accessory slot keeps what it
+    holds, unless the other slot now takes that type, and then it empties.
+  - **What it never binds:** a grade above her rank, armor of the other half, other accessory types or weapons outside
+    the spread. Pieces on her other weapons stay on (they serve her other classes); armor of the other half goes back to
+    her locker. Her learned and equipped skills stay; one outside the new trees isn't used.
+  - **Binding asks first:** when it would bind from the stock, a sheet lists those pieces ("Binds to her for good").
+    With nothing to change, the button reads "Standard preset on".
 
 ## Springs, replays and Sweeps
 

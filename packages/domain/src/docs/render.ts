@@ -32,6 +32,7 @@ import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
+import { classPreset } from '../save/presets'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
@@ -88,6 +89,14 @@ function classes(): string {
       return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, `${x(h.power)}, ${x(h.mp)}`, special,
         [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp, s.heal].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c], cap(RPG_CLASS_ARMOR[c])]
     }))
+}
+
+/** Each class's standard preset (H33, D164). */
+function presets(): string {
+  return table(['Class', 'Weapons', 'Armor', 'Orb, accessory 1', 'Support, accessory 2'], RPG_CLASSES.map((c) => {
+    const p = classPreset(c)
+    return [CLASS_NAME[c], p.weapons.map(weaponName).join(', '), cap(p.armor), EQUIP_LABEL[p.orb], EQUIP_LABEL[p.support]]
+  }))
 }
 
 function weapons(): string {
@@ -447,7 +456,7 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 /** Every block a doc may embed, by key. */
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
-    classes, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
+    classes, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
     'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, dependencies: () => dependencies(context.packages),
