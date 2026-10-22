@@ -80,11 +80,20 @@ Damage is shown as physical / magical, in percent.
 - the **Tome half** goes from ×0.45 to **×0.27**;
 - 0.9 a turn in all, the same as today.
 
-**Multi-hit: her Arms half lands as two hits,** each half its power.
-- The total doesn't change, but each weak hit chips a shield point, so a Spell Blade chips **three points an act**:
-  two Arms hits and one Tome hit.
+**Multi-hit: her Arms half gains one extra hit** (clarified 2026-10-21 after H40's review).
+- The extra hit is added to the half as a whole, not to each of its hits. Its power is split evenly across all of
+  them, so the total doesn't change:
+  - **an Attack** (one hit) lands as two, each half its power;
+  - **a skill of n hits** lands as n + 1;
+  - a Bow skill's 6 hits at depth 5 become 7, not 12.
+- **Each weak hit chips a shield point.** With an Attack, a Spell Blade chips **three points an act**: two Arms hits
+  and one Tome hit.
 - That makes her the physical front's shield breaker, the multi-hit identity the owner wanted.
 - Her own skills already target one foe; they keep that.
+- **The guard rail:**
+  - no single Uma should Break a Duel boss (shield 10–12) in one act;
+  - the v14 simulation checks her best single act against the Duel shield;
+  - if it reaches it, the shield rises, not her identity.
 
 **Stat leans:**
 - ATK ×1.05 → **×1.1**, and M.ATK ×1.05 → **×0.95**.
@@ -106,7 +115,7 @@ identity where the Spell Blade has multi-hit. They balance as a pair.
 | MP | The halves' sum, ×0.5 a half | The same |
 | Split | 70% physical / 30% magical | 70% magical / 30% physical |
 | Stat leans | ATK ×1.1, M.ATK ×0.95 | M.ATK ×1.1, ATK ×0.95 |
-| Identity | **Multi-hit:** her Arms half lands as two hits on its foe (3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded) when her next pair comes |
+| Identity | **Multi-hit:** her Arms half gains one extra hit (an Attack lands as two: 3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded) when her next pair comes |
 | Limit Break power | 2.2× | 2.2× |
 | Her hall's Limit Breaks | Multi-hit | Areas |
 | Support | None | **None** |
