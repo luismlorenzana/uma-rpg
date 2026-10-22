@@ -175,6 +175,7 @@ function FacilityBody({ view, world, now, placeId }: { view: MasterView; world: 
         initialJob={() => initialJob(placeId)}
         sizeRule={spec.kind === 'refine' ? { mode: 'count', sizes: REFINE_BATCHES } : { mode: 'count' }}
         sizePlacement="before-what"
+        preserveCountOnJobChange
         disabled={lockedReason}
         picker={{ order: workOrder, renderBadges: (row) => row.uma ? {
           bottomRight: <span aria-label={`Craft Level ${row.workLevel}`} className="rounded-tl-sm bg-black/75 px-1 font-display text-[9px] font-bold leading-3.5">C{row.workLevel}</span>,
@@ -207,35 +208,87 @@ function WhatPicker({ selection, placeId, world, wanted, queueing }: {
   const level = selection.outfitId ? world.umas[selection.outfitId]?.craft.level ?? 1 : 1
   if (spec.kind === 'craft') return <ForgePicker world={world} level={level} job={selection.job} queueing={queueing} onPick={selection.onChange} />
   if (spec.kind === 'cut') return <GemPicker world={world} level={level} job={selection.job} queueing={queueing} wanted={wanted} onPick={selection.onChange} />
-  const options = spec.kind === 'gather'
-    ? familyById(spec.family!)!.raw.map((item) => item.id)
-    : ITEM_FAMILIES.flatMap((family) => family.refined.map((item) => item.id))
+  if (spec.kind === 'refine') return <RefinePicker job={selection.job} level={level} world={world} queueing={queueing} wanted={wanted} onPick={selection.onChange} />
+  const options = familyById(spec.family!)!.raw.map((item) => item.id)
   return <ItemChoices ids={options} job={selection.job} level={level} world={world} queueing={queueing} wanted={wanted} onPick={selection.onChange} />
+}
+
+function ItemChoice({ id, selected, locked, dimmed, wanted, label, onPick }: {
+  id: string; selected: boolean; locked: boolean; dimmed: boolean; wanted: number; label?: string; onPick: () => void
+}) {
+  const item = itemById(id)!
+  const name = label ?? item.name
+  return (
+    <button type="button" disabled={locked} onClick={onPick} aria-pressed={selected} title={name}
+      aria-label={`${name}, grade ${item.grade}${locked ? `, needs Craft Lv ${gradeUnlockLevel(item.grade)}` : ''}`}
+      data-item-choice={id} data-item-family={label ? item.family : undefined}
+      className={`relative flex ${label ? 'min-h-18' : 'min-h-16'} flex-col items-center justify-center gap-0.5 rounded-sm border px-1 py-1.5 ${selected ? 'border-accent bg-accent-wash ring-1 ring-accent' : 'border-transparent bg-raised'} ${dimmed ? 'opacity-45' : ''} disabled:opacity-30`}>
+      <ItemIcon id={id} size={32} />
+      {label && <span className="line-clamp-2 min-h-[22px] w-full text-center text-[9px] font-semibold leading-[11px]">{label}</span>}
+      {!label && <span className="absolute bottom-1 right-1 rounded-xs bg-panel/90 px-1 text-[9px] font-bold leading-3.5 text-ink-soft">G{item.grade}</span>}
+      {wanted > 0 && <span className="absolute right-1 top-1 size-2 rounded-full bg-accent" aria-label={`Target ×${wanted}`} />}
+    </button>
+  )
+}
+
+function ItemSummary({ world, id }: { world: TierWorld; id: string }) {
+  const item = itemById(id)
+  if (!item) return null
+  return (
+    <div className="rounded-sm bg-raised p-2.5" data-selected-item={id}>
+      <p className="flex items-center gap-2 text-[14px] font-semibold">
+        <ItemIcon id={id} size={32} />
+        <span className="min-w-0 flex-1 truncate">{item.name} · G{item.grade}</span>
+        <span className="text-[12px] font-normal text-ink-faint">Have {world.items[id] ?? 0}</span>
+      </p>
+      {item.refined && (
+        <p className="mt-1.5 flex w-fit items-center gap-1 rounded-sm bg-panel px-2 py-1 text-[12px]">
+          <ItemIcon id={item.pair} size={18} />{stockName(item.pair)} ×1 <span className="text-ink-faint">({world.items[item.pair] ?? 0})</span>
+        </p>
+      )}
+    </div>
+  )
+}
+
+function RefinePicker({ job, level, world, queueing, wanted, onPick }: {
+  job: string | null; level: number; world: TierWorld; queueing: boolean
+  wanted: ReadonlyMap<string, number>; onPick: (id: string) => void
+}) {
+  const picked = itemById(job ?? '')?.refined ? itemById(job ?? '')! : ITEM_FAMILIES[0]!.refined[0]!
+  const chooseFamily = (family: (typeof ITEM_FAMILIES)[number]) => onPick(family.refined[picked.grade - 1]!.id)
+  const chooseGrade = (grade: number) => onPick(familyById(picked.family)!.refined[grade - 1]!.id)
+  return (
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Material family">
+        {ITEM_FAMILIES.map((family) => {
+          const item = family.refined[picked.grade - 1]!
+          return <ItemChoice key={family.id} id={item.id} selected={family.id === picked.family}
+            locked={level < gradeUnlockLevel(item.grade)} dimmed={!queueing && makeable(world, { [item.pair]: 1 }) < 1}
+            wanted={wanted.get(item.id) ?? 0} label={family.name} onPick={() => chooseFamily(family)} />
+        })}
+      </div>
+      <GradeChips level={level} grade={picked.grade} onPick={chooseGrade} />
+      <ItemSummary world={world} id={picked.id} />
+    </div>
+  )
 }
 
 function ItemChoices({ ids, job, level, world, queueing, wanted, onPick }: {
   ids: readonly string[]; job: string | null; level: number; world: TierWorld; queueing: boolean
   wanted: ReadonlyMap<string, number>; onPick: (id: string) => void
 }) {
+  const picked = ids.includes(job ?? '') ? job! : ids[0]!
   return (
-    <div className="grid grid-cols-2 gap-1.5">
-      {ids.map((id) => {
-        const out = outputView(id)
-        const made = itemById(id)!
-        const locked = level < gradeUnlockLevel(out.grade)
-        const short = made.refined && makeable(world, { [made.pair]: 1 }) < 1
-        return (
-          <button key={id} type="button" disabled={locked} onClick={() => onPick(id)} aria-pressed={job === id}
-            className={`relative flex min-h-12 items-center gap-2 rounded-sm border p-2 text-left ${job === id ? 'border-accent bg-accent-wash' : 'border-transparent bg-raised'} ${short && !queueing ? 'opacity-45' : ''} disabled:opacity-30`}>
-            <ItemIcon id={id} size={32} />
-            <span className="min-w-0">
-              <span className="block truncate text-[12px] font-semibold">{out.name}</span>
-              <span className="block text-[11px] text-ink-soft">{locked ? `Craft Lv ${gradeUnlockLevel(out.grade)}` : `Grade ${out.grade}`}</span>
-            </span>
-            {!!wanted.get(id) && <span className="absolute right-1 top-1 size-2 rounded-full bg-accent" aria-label={`Target ×${wanted.get(id)}`} />}
-          </button>
-        )
-      })}
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-4 gap-1.5">
+        {ids.map((id) => {
+          const item = itemById(id)!
+          return <ItemChoice key={id} id={id} selected={picked === id} locked={level < gradeUnlockLevel(item.grade)}
+            dimmed={!queueing && item.refined && makeable(world, { [item.pair]: 1 }) < 1}
+            wanted={wanted.get(id) ?? 0} onPick={() => onPick(id)} />
+        })}
+      </div>
+      <ItemSummary world={world} id={picked} />
     </div>
   )
 }

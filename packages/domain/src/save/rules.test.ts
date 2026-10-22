@@ -74,6 +74,7 @@ describe('party rules', () => {
     expect(world.parties).toHaveLength(PARTY_COUNT)
     expect(world.parties[19]?.name).toBe('Party 20')
     expect(world.parties.every((p) => p.slots.length === 5 && p.slots.every((s) => s === null))).toBe(true)
+    expect(world.parties.every((p) => p.lead === null)).toBe(true)
   })
 
   it('adds owned Umas, moves them between parties and slots, and removes them', () => {
@@ -111,16 +112,21 @@ describe('party rules', () => {
     expect(isPartyFull(worldOf(save).parties[1]!)).toBe(false)
   })
 
-  it('uses slot 1 as the lead and swaps another member into it without changing membership', () => {
+  it('stores the lead independently without moving the party slots', () => {
     let save = unlocked('100101', '100201', '100301')
     save = setPartySlot(save, 0, 1, '100101', T1)
     save = setPartySlot(save, 0, 3, '100201', T1)
     expect(partyLead(worldOf(save).parties[0]!)).toBe('100101')
 
     const led = setPartyLead(save, 0, '100201', T1)
-    expect(worldOf(led).parties[0]!.slots).toEqual(['100201', '100101', null, null, null])
+    expect(worldOf(led).parties[0]!.slots).toEqual([null, '100101', null, '100201', null])
+    expect(worldOf(led).parties[0]!.lead).toBe('100201')
     expect(partyLead(worldOf(led).parties[0]!)).toBe('100201')
     expect(() => setPartyLead(led, 0, '100301', T1)).toThrow(/party member/)
+
+    const removed = setPartySlot(led, 0, 3, null, T1)
+    expect(worldOf(removed).parties[0]!.lead).toBeNull()
+    expect(partyLead(worldOf(removed).parties[0]!)).toBe('100101')
   })
 })
 
@@ -146,6 +152,9 @@ describe('save v2 parsing', () => {
     const unowned = JSON.parse(JSON.stringify(save))
     unowned.tierWorlds['1'].parties[1].slots[0] = '555'
     expect(() => parseSave(unowned)).toThrow(SaveParseError)
+    const badLead = JSON.parse(JSON.stringify(save))
+    badLead.tierWorlds['1'].parties[0].lead = '555'
+    expect(() => parseSave(badLead)).toThrow(/member of this party/)
     const level = JSON.parse(JSON.stringify(save))
     level.tierWorlds['1'].umas['100101'].level = 51
     expect(() => parseSave(level)).toThrow(/level/)

@@ -41,9 +41,9 @@ import {
   CONVERGENCE_FIGHTS, ECHO_LEVELS, isAchievementId, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, RIFT_TRACES, riftRunId, type EchoLevel, type RiftAttempt,
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
 } from '../rift/state'
-import { migrateWorld } from './migrations'
+import { migrateWorld, toV26 } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 25
+export const SAVE_SCHEMA_VERSION = 26
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
@@ -121,6 +121,8 @@ export interface Party {
   name: string
   /** Five slots of owned outfit ids (`RosterOutfit.outfitId`), or null. */
   slots: (string | null)[]
+  /** The member whose face represents this party. Null falls back to its first occupied slot. */
+  lead: string | null
 }
 
 export interface TierWorld extends WorkState<RpgWorkRequest> {
@@ -210,7 +212,7 @@ export function normalizeTrainerName(raw: string): string | null {
 }
 
 export function defaultParties(): Party[] {
-  return Array.from({ length: PARTY_COUNT }, (_, i) => ({ name: `Party ${i + 1}`, slots: Array.from({ length: PARTY_SIZE }, () => null) }))
+  return Array.from({ length: PARTY_COUNT }, (_, i) => ({ name: `Party ${i + 1}`, slots: Array.from({ length: PARTY_SIZE }, () => null), lead: null }))
 }
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
@@ -635,7 +637,7 @@ function parseParties(value: unknown, path: string, umas: Record<string, OwnedUm
   const seen = new Set<string>()
   return value.map((raw, i) => {
     const at = `${path}.${i}`
-    const p = object(raw, at, ['name', 'slots'])
+    const p = object(raw, at, ['name', 'slots', 'lead'])
     const name = typeof p.name === 'string' ? normalizeName(p.name, PARTY_NAME_MAX) : null
     if (!name || name !== p.name) throw new SaveParseError(`${at}.name`, `must be 1–${PARTY_NAME_MAX} trimmed characters`)
     if (!Array.isArray(p.slots) || p.slots.length !== PARTY_SIZE) throw new SaveParseError(`${at}.slots`, `expected ${PARTY_SIZE} slots`)
@@ -646,7 +648,10 @@ function parseParties(value: unknown, path: string, umas: Record<string, OwnedUm
       seen.add(slot)
       return slot
     })
-    return { name, slots }
+    if (p.lead !== null && (typeof p.lead !== 'string' || !slots.includes(p.lead))) {
+      throw new SaveParseError(`${at}.lead`, 'expected null or a member of this party')
+    }
+    return { name, slots, lead: p.lead as string | null }
   })
 }
 
@@ -744,14 +749,14 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
   const tickets = ((typeof w.wallet === 'object' && w.wallet !== null ? w.wallet : {}) as Obj).unlockTickets
   return {
     ...newTierWorld(createdAt, typeof tickets === 'number' && Number.isSafeInteger(tickets) && tickets >= 0 ? tickets : 0),
-    umas, parties: w.parties === undefined ? defaultParties() : parseParties(w.parties, `${path}.parties`, umas),
+    umas, parties: w.parties === undefined ? defaultParties() : parseParties((toV26({ parties: w.parties }) as Obj).parties, `${path}.parties`, umas),
   }
 }
 
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v23 are migrated to v24's shape first (migrations.ts), so the parse below reads only v24.
+  // v10–v25 are migrated to the current shape first (migrations.ts), so the parse below reads only v26.
   const value = migrate(raw, version)
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes', 'rift'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)

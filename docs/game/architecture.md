@@ -117,7 +117,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   the appearance and Motion, the shared `ContentProvider`, and `AlbumArtProvider`. Faces use
   uma-data 1.1.0's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their own families.
   `album/` holds RPG row values, schema, eligibility and the one-time old preference migration. `hub/` holds this
-  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v25 stay game-owned.
+  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v26 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API
@@ -180,13 +180,15 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     Heroes, Learners and Bonds; accessory 1 holds an Orb and accessory 2 a Talisman or an Amulet, a second piece of one
     group staying in her locker. Classes, parties, open fights (their v14 inputs replay on v14) and runs don't move. The
     API backs the stored v24 save up to `saveBackups/{uid}-v24` on the first v25 write (D69).
+  - **v26:** each party gains `lead`. The migration names its first occupied slot, preserving the face used by v25,
+    while later lead changes leave all five slots in place (D190).
 
 ```
 Save { schemaVersion, account, tierWorlds: { "1": TierWorld } }
 account { trainerName, createdAt, updatedAt, achievements { <id>: { at, run | null } },
   history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at } }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, gearMarks, classMarks },
-  umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5] }],
+  umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5], lead | null }],
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
   items, buildings: { <placeId>: { level } }, work: { <outfitId>: WorkRow }, gems, gear, targets,
   heroes: { <seat>: { hero, learners[≤10] } },

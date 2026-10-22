@@ -1,7 +1,7 @@
 // Save v25's migration (H58): `toV25` as written dark, chained by H61 (D188): a v24 save parses as v25 through it.
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
-import { migrateWorld, toV25 } from './migrations'
+import { migrateWorld, toV25, toV26 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
 import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save } from './v25.fixture'
 
@@ -10,17 +10,17 @@ const migrate = (w: TierWorld): TierWorld => toV25(w as unknown as Record<string
 const umaOf = (w: TierWorld, id: string): OwnedUma => w.umas[id]!
 
 describe('save v25’s migration (H58, chained in H61)', () => {
-  it('is chained: the save is v25, a v24 world runs through toV25 and a v25 world passes the chain untouched', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(25)
+  it('stays chained before v26: a v24 world runs through both later steps and a v25 world only gains its lead', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(26)
     const raw = world()
-    expect(migrateWorld(raw, 24)).toEqual(migrate(world()))
-    expect(migrateWorld(raw, 25)).toBe(raw)
-    // A v24 save parses as v25, exactly as its worlds run through toV25 do.
+    expect(migrateWorld(raw, 24)).toEqual(toV26(migrate(world()) as unknown as Record<string, unknown>))
+    expect(migrateWorld(raw, 25)).toEqual(toV26(raw as unknown as Record<string, unknown>))
+    // A v24 save parses through v25 and v26.
     const save = v24Save()
     expect(save.schemaVersion).toBe(24)
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(25)
-    expect(parsed).toEqual(parseSave(migrated(save, toV25)))
+    expect(parsed.schemaVersion).toBe(26)
+    expect(parsed).toEqual(parseSave(migrated(save, (w) => toV26(toV25(w)))))
     expect(Object.keys(parsed.tierWorlds['1']!.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
   })
 

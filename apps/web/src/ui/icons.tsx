@@ -88,6 +88,15 @@ export function BackIcon(props: IconProps) {
   )
 }
 
+export function FlagIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M7 21V3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 4h10l-2.5 3L18 10H8V4Z" fill="currentColor" stroke="currentColor" strokeLinejoin="round" />
+    </Svg>
+  )
+}
+
 /** A target (D100): a crosshair. */
 export function TargetIcon(props: IconProps) {
   return (

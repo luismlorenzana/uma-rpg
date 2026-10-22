@@ -10,11 +10,10 @@ import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { albumRows } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import { CLASS_LABEL } from '../../battle/labels'
-import { ClassEmblem } from '../../battle/pixel-icons'
 import type { MasterView } from '../../master/master'
 import { leadParty, nameParty, recall, setSlot, useAlbumScope, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
-import { BackIcon } from '../../ui/icons'
+import { BackIcon, FlagIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 import { healerNote } from './healer-note'
@@ -41,17 +40,33 @@ export default function PartyHallPage({ place, rest }: PageProps) {
   )
 }
 
-function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: TierWorld; outfitId: string | null; size: number }) {
+function PartyPortrait({ view, outfitId, size, lead = false }: { view: MasterView; outfitId: string | null; size: number; lead?: boolean }) {
   if (!outfitId) return <span className="flex items-center justify-center rounded-sm border border-dashed border-hairline-strong text-ink-faint" style={{ width: size, height: size }}>+</span>
+  const outfit = view.roster.find(o => o.outfitId === outfitId)
+  return (
+    <span className={`relative block rounded-full ${lead ? 'ring-2 ring-accent ring-offset-2 ring-offset-panel' : ''}`} style={{ width: size, height: size }} data-party-lead={lead || undefined}>
+      <FaceTile outfitId={outfitId} size={size} label={outfit?.name ?? 'Uma'} round />
+      {lead && (
+        <span role="img" aria-label="Party lead" className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-accent text-accent-ink shadow-2">
+          <FlagIcon size={11} />
+        </span>
+      )}
+    </span>
+  )
+}
+
+function PartySlot({ view, world, outfitId, lead }: { view: MasterView; world: TierWorld; outfitId: string | null; lead: boolean }) {
+  if (!outfitId) return <PartyPortrait view={view} outfitId={null} size={56} />
   const outfit = view.roster.find(o => o.outfitId === outfitId)
   const uma = world.umas[outfitId]
   const classId = outfit && uma ? activeClass(outfit, uma) : null
   return (
-    <span className="relative" style={{ width: size, height: size }}>
-      <FaceTile outfitId={outfitId} size={size} label={outfit?.name ?? 'Uma'} round badges={{
-        bottomLeft: <span className="rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {uma?.level ?? 1}</span>,
-        bottomRight: classId ? <span role="img" aria-label={CLASS_LABEL[classId]} title={CLASS_LABEL[classId]} className="rounded-tl-sm bg-black/70"><ClassEmblem classId={classId} /></span> : undefined,
-      }} />
+    <span className="flex min-w-0 flex-col items-center gap-1">
+      <PartyPortrait view={view} outfitId={outfitId} size={56} lead={lead} />
+      <span className="w-full min-w-0 text-center leading-none">
+        <span className="block text-[10px] font-bold text-ink-soft">{formatLevel(uma?.level ?? 1)}</span>
+        <span className="mt-0.5 block truncate text-[9px] font-semibold text-ink-faint">{classId ? CLASS_LABEL[classId] : ''}</span>
+      </span>
     </span>
   )
 }
@@ -75,7 +90,7 @@ function PartyList({ view, world, place }: { view: MasterView; world: TierWorld;
           </span>
           <span className="grid grid-cols-5 gap-1.5">
             {party.slots.map((s, k) => (
-              <SlotIcon key={k} view={view} world={world} outfitId={s} size={56} />
+              <PartySlot key={k} view={view} world={world} outfitId={s} lead={s !== null && s === partyLead(party)} />
             ))}
           </span>
           <HealerNote note={healerNote(world, party, outfits)} className="mt-1.5" />
@@ -124,7 +139,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
           return (
             <li key={slot}>
               <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
-                <SlotIcon view={view} world={world} outfitId={outfitId} size={56} />
+                <PartyPortrait view={view} outfitId={outfitId} size={56} lead={outfitId !== null && outfitId === lead} />
                 <span className="min-w-0 flex-1">
                   {outfit ? (
                     <>

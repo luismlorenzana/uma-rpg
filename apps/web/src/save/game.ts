@@ -133,7 +133,7 @@ export async function setSlot(party: number, slot: number, outfitId: string | nu
   if (save) await commit(setPartySlot(save, party, slot, outfitId, nowIso(), activeKey()))
 }
 
-/** Makes an existing party member its lead; the lead occupies slot 1 and represents the party in fight pickers. */
+/** Makes an existing party member its lead without changing slot order; she represents it in fight pickers. */
 export async function leadParty(party: number, outfitId: string): Promise<void> {
   const { save } = useGame.getState()
   if (save) await commit(setPartyLead(save, party, outfitId, nowIso(), activeKey()))
