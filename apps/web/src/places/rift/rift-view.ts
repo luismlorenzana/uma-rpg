@@ -1,10 +1,12 @@
 // The Rift page's pure helpers (H50): fight labels, which world parties can take a fight, the Convergence's coverage, the
-// Ascend sheet's numbers and the result screen's lines. Lazy, with the page.
+// Ascend sheet's numbers, the result screen's lines and the finale's faces (H52). Lazy, with the page.
 import {
   activeClass, CONVERGENCE_FIGHTS, FRONT_NAME, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, type BattleEnemy, type BattleOutfit,
-  type EnemyTier, type RiftFightRef, type RiftFront, type RiftRun, type RpgClass, type TierWorld,
+  type EnemyTier, type RiftFightRef, type RiftFront, type RiftRun, type RosterMember, type RpgClass, type TierWorld,
 } from '@rpg/domain'
-import { ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, type RiftFightResult } from '@rpg/domain/rift'
+import {
+  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, type RiftContext, type RiftFightPlan, type RiftFightResult,
+} from '@rpg/domain/rift'
 import { CLASS_LABEL } from '../../battle/labels'
 
 /** A fight's name on its screen: "Stage 5", "Champion", "Fight 2 of 4", "Lv 55". */
@@ -173,4 +175,18 @@ export function stageLeaders(plan: { enemies: readonly BattleEnemy[]; waves?: re
 export function planSize(plan: { enemies: readonly BattleEnemy[]; waves?: readonly (readonly BattleEnemy[])[] }): { waves: number; foes: number } {
   const waves = [plan.enemies, ...(plan.waves ?? [])]
   return { waves: waves.length, foes: waves.reduce((n, w) => n + w.length, 0) }
+}
+
+/** The fights whose champions the finale shows (H52): each front's champion, Iron to Horde, then the Convergence's four. */
+export function riftFinalePlans(ctx: RiftContext): RiftFightPlan[] {
+  return [...RIFT_FRONTS.map((front) => riftFight(ctx, { kind: 'front', front, stage: RIFT_STAGES })), ...riftConvergence(ctx)]
+}
+
+/** The finale's faces (H52): every boss-faced foe of these fights, in order, each once; a face the roster lacks is skipped. */
+export function riftFinaleFaces(plans: readonly Pick<RiftFightPlan, 'enemies' | 'waves'>[], roster: ReadonlyMap<string, Pick<RosterMember, 'tier'>>): string[] {
+  const faces = new Set<string>()
+  for (const plan of plans) {
+    for (const foe of [plan.enemies, ...(plan.waves ?? [])].flat()) if (roster.get(foe.castId)?.tier === 'boss') faces.add(foe.castId)
+  }
+  return [...faces]
 }

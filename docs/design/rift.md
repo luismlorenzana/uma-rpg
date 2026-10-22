@@ -152,6 +152,11 @@ would be won).
 
 **The finale:** after the Horde fight, a last cut-in of every champion of the run. **The run is won.**
 
+**Built in H52 (D177):** `apps/web/src/places/rift/RiftFinale.tsx`, played on the result of the win that wins the run,
+before the achievement cut-ins. It shows every boss face of the four fronts' champions and the Convergence's four fights,
+each once (14 with the locked packs), revealed one after another. The manual's
+[sections](../game/sections.md#the-rift) has the screen.
+
 ## 7. Rewards: achievements, not EXP
 
 **Front and Convergence fights pay no EXP, Laurels or Marks.** They pay achievements:

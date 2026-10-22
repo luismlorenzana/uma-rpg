@@ -330,6 +330,10 @@ The end-of-tier event ([loops](loops.md#the-rift), [the Rift](../design/rift.md)
   "The Rift is won!" or "The attempt is over"; an Echo's rank bars and Marks, with no EXP line. Buttons: "Next stage"
   (the same five again while one party holds them, else the stage's sheet), "Retry", "Next: Arcane", "Fight again" or
   "Sweep again", and "Back to the Rift". An achievement earned plays its cut-in first, one at a time.
+- **The finale** (H52): on the win that wins the run, before its achievements' cut-ins, a dark cut-in: "Tier 1", "The
+  Rift is won", the champions' faces four to a row, revealed one after another (at rest under reduced motion), "Twenty
+  Umas, four fronts, 14 champions" and Continue. The faces are every boss face of the four fronts' champions, Iron to
+  Horde, then of the Convergence's four fights, each once: the faces the run fought.
 - **Ascend** (a sheet): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their gear
   returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", and the reason
   when it can't yet. Ascend runs behind the tier veil and lands on the new tier's Town Hall.

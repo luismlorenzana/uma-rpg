@@ -1,8 +1,11 @@
-import { newOwnedUma, newSave, type BattleOutfit, type RiftRun, type RpgClass, type TierWorld } from '@rpg/domain'
+import {
+  newOwnedUma, newSave, type BattleEnemy, type BattleOutfit, type EnemyTier, type Franchise, type RiftRun, type RosterMember, type RpgClass,
+  type TierWorld,
+} from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import {
-  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceMatch, levelPartyBlock, partyGuidance, partyHolding, riftHome,
-  riftRefLabel, riftRefTitle, suggestConvergence,
+  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceMatch, levelPartyBlock, partyGuidance, partyHolding, riftFinaleFaces,
+  riftFinalePlans, riftHome, riftRefLabel, riftRefTitle, suggestConvergence,
 } from './rift-view'
 
 const NOW = '2026-10-22T12:00:00.000Z'
@@ -119,5 +122,41 @@ describe('the Ascend sheet', () => {
       'Their gear returns to Tier 1’s stock',
       'Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks',
     ])
+  })
+})
+
+describe('the finale’s faces (H52)', () => {
+  const foe = (castId: string) => ({ castId }) as BattleEnemy
+  const tiers = (pairs: [string, EnemyTier][]) => new Map(pairs.map(([id, tier]) => [id, { tier }]))
+
+  it('takes every boss face in order, each once, skipping faces the roster lacks', () => {
+    const roster = tiers([['b1', 'boss'], ['b2', 'boss'], ['b3', 'boss'], ['b4', 'boss'], ['s1', 'subboss'], ['k1', 'key'], ['r1', 'regular']])
+    const plans = [
+      { enemies: [foe('b2'), foe('b1')] },
+      { enemies: [foe('r1'), foe('k1')], waves: [[foe('s1')], [foe('b3'), foe('b1')]] },
+      { enemies: [foe('gone'), foe('b2'), foe('b4')] },
+    ]
+    expect(riftFinaleFaces(plans, roster)).toEqual(['b2', 'b1', 'b3', 'b4'])
+    expect(riftFinaleFaces(plans, tiers([['b3', 'boss'], ['b1', 'subboss']]))).toEqual(['b3'])
+    expect(riftFinaleFaces([], roster)).toEqual([])
+  })
+
+  it('shows the run’s four champions, then its Convergence, as the fights draw them', () => {
+    /** An invented roster: twenty bosses, sub-bosses, keys and regulars a pack (a run draws 46 boss faces). */
+    const roster: RosterMember[] = (['azurlane', 'nikke', 'priconne'] as Franchise[]).flatMap((franchise) =>
+      (['boss', 'subboss', 'key', 'regular'] as EnemyTier[]).flatMap((tier) =>
+        Array.from({ length: 20 }, (_, i) => ({ id: `${franchise}-${tier}-${i + 1}`, name: `${franchise} ${tier} ${i + 1}`, franchise, tier }))))
+    const plans = riftFinalePlans({ tier: 1, runId: 't1-r1', roster, defeated: new Set() })
+    expect(plans.map((p) => p.ref)).toEqual([
+      { kind: 'front', front: 'iron', stage: 12 }, { kind: 'front', front: 'arcane', stage: 12 },
+      { kind: 'front', front: 'duel', stage: 12 }, { kind: 'front', front: 'horde', stage: 12 },
+      { kind: 'convergence', fight: 0 }, { kind: 'convergence', fight: 1 }, { kind: 'convergence', fight: 2 }, { kind: 'convergence', fight: 3 },
+    ])
+    const byId = new Map(roster.map((m) => [m.id, m]))
+    const faces = riftFinaleFaces(plans, byId)
+    const bosses = plans.flatMap((p) => [p.enemies, ...(p.waves ?? [])].flat()).map((e) => e.castId).filter((id) => byId.get(id)?.tier === 'boss')
+    expect(faces).toEqual([...new Set(bosses)])
+    // Two champions on Iron, Arcane and the Horde, one on the Duel, twice over: no face repeats while unused ones remain.
+    expect(faces).toHaveLength(14)
   })
 })

@@ -8,7 +8,7 @@ import { riftResultView } from './rift-view'
 import { againRef } from './RiftFightRoute'
 import { RiftResult } from './RiftResult'
 
-const campaign = { view: { art: null }, outfits: new Map(), name: (id: string) => `Uma ${id}` } as unknown as Campaign
+const campaign = { view: { art: null }, outfits: new Map(), cast: { byId: new Map() }, name: (id: string) => `Uma ${id}` } as unknown as Campaign
 const base = { rounds: 6, members: [], gearMarks: 0, classMarks: 0, cleared: null, attempt: null, runWon: false, earned: [] }
 const front = (stage: number, outcome: 'victory' | 'loss', cleared: number | null): RiftFightResult =>
   ({ ...base, outcome, ref: { kind: 'front', front: 'iron', stage }, cleared })
@@ -116,5 +116,45 @@ describe('the Rift result', () => {
   it('shows no cut-in when nothing was earned', () => {
     show(front(5, 'victory', 5))
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+})
+
+describe('the Rift’s finale on the result (H52)', () => {
+  const finale = { tier: 1, faces: ['b1', 'b2'] }
+  const won = { ...convergence(3, 'victory', 4, true), earned: [{ id: 't1-rift-conquered', run: 't1-r1' }, { id: 'swift-convergence', run: 't1-r1' }] }
+  const show = (result: RiftFightResult) =>
+    render(<MotionRoot features={domMax}><RiftResult campaign={campaign} result={result} finale={finale} onAgain={vi.fn()} onBack={vi.fn()} /></MotionRoot>)
+  const label = () => screen.queryByRole('dialog')?.getAttribute('aria-label') ?? null
+  const go = () => act(() => { fireEvent.click(screen.getByRole('button', { name: 'Continue' })) })
+
+  it('plays the finale first on the win that wins the run, then each achievement, then the result', () => {
+    show(won)
+    expect(label()).toBe('The Rift is won')
+    expect(document.querySelectorAll('[data-finale-face]')).toHaveLength(2)
+    go()
+    expect(label()).toBe('Achievement earned: Rift Conquered · Tier 1')
+    go()
+    expect(label()).toBe('Achievement earned: Swift Convergence')
+    go()
+    expect(label()).toBeNull()
+    expect(document.querySelector('[data-rift-result]')!.textContent).toContain('The Rift is won!')
+  })
+
+  it('goes from the finale straight to the result when nothing was earned', () => {
+    show({ ...won, earned: [] })
+    expect(label()).toBe('The Rift is won')
+    go()
+    expect(label()).toBeNull()
+  })
+
+  it('plays no finale on any other result', () => {
+    show({ ...convergence(2, 'victory', 3), earned: [] })
+    expect(label()).toBeNull()
+    cleanup()
+    show({ ...front(12, 'victory', 12), earned: [{ id: 't1-seal-iron', run: 't1-r1' }] })
+    expect(label()).toBe('Achievement earned: Iron Seal · Tier 1')
+    cleanup()
+    show({ ...convergence(3, 'loss', null), earned: [] })
+    expect(label()).toBeNull()
   })
 })

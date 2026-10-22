@@ -1,6 +1,6 @@
 // The open Rift fight (H50): the shared fight screen on the Rift's source (the Twilight Rift's backdrop, foes read by their
 // face), then the Rift's result. "Next stage" and "Retry" reuse the five who fought when one party still holds them;
-// otherwise they open the stage's sheet to pick a party.
+// otherwise they open the stage's sheet to pick a party. The win that wins the run brings the finale's faces (H52).
 import { RIFT_STAGES, SaveRuleError, type RiftFightRef } from '@rpg/domain'
 import type { RiftFightResult } from '@rpg/domain/rift'
 import { useMemo, useRef, useState } from 'react'
@@ -11,9 +11,9 @@ import { pagePath } from '../../hub/navigation'
 import { beginRiftFight, retreatRift, riftFightAction } from '../../save/game'
 import type { PageProps } from '../registry'
 import { FightScreen } from '../scenario-gate/FightScreen'
-import { partyHolding, riftHome, riftRefLabel, riftRefTitle } from './rift-view'
+import { partyHolding, riftFinaleFaces, riftFinalePlans, riftHome, riftRefLabel, riftRefTitle } from './rift-view'
 import { RiftResult } from './RiftResult'
-import { useRift } from './use-rift'
+import { useRift, useRunContext } from './use-rift'
 
 /** The fight that follows a result's "again" button: the next stage after a front win, the same fight after a loss, the
  * Convergence's next fight, or the same Echo. Null when there's none. */
@@ -28,9 +28,11 @@ export function againRef(result: RiftFightResult): RiftFightRef | null {
 }
 
 export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
-  const { world } = useRift()
+  const view = useRift()
+  const { world } = view
+  const ctx = useRunContext(campaign, view)
   const navigate = useNavigate()
-  const [ended, setEnded] = useState<{ result: RiftFightResult; five: string[] } | null>(null)
+  const [ended, setEnded] = useState<{ result: RiftFightResult; five: string[]; finale: { tier: number; faces: string[] } | null } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const rank = useMemo(() => faceRank(campaign.cast.byId), [campaign.cast.byId])
   const battle = world?.rift.battle ?? null
@@ -58,7 +60,8 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
         setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.')
       }
     }
-    return <RiftResult campaign={campaign} result={ended.result} error={error} onAgain={() => void again()} onBack={() => home(ended.result.ref)} />
+    return <RiftResult campaign={campaign} result={ended.result} error={error} finale={ended.finale} onAgain={() => void again()}
+      onBack={() => home(ended.result.ref)} />
   }
   if (!fight) {
     return (
@@ -73,5 +76,7 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
     act: (action) => riftFightAction(action, campaign.cast.members), leave: retreatRift,
   }
   return <FightScreen key={fight.battleId} campaign={campaign} source={source} onMap={() => home(fight.ref)}
-    onEnd={(result) => setEnded({ result, five: fight.five })} />
+    onEnd={(result) => setEnded({ result, five: fight.five,
+      // The run's own context: the faces it fought, fixed when it started.
+      finale: result.runWon && ctx ? { tier: view.tier, faces: riftFinaleFaces(riftFinalePlans(ctx), campaign.cast.byId) } : null })} />
 }

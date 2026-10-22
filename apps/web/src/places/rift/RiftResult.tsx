@@ -1,5 +1,6 @@
 // The Rift's result (H50): Victory or Defeated and the rounds; a front's stage or seal, the Convergence's fight, or an
-// Echo's rank bars and Marks (no EXP: Echoes pay ranks only, R6). An achievement earned plays its cut-in first (H49).
+// Echo's rank bars and Marks (no EXP: Echoes pay ranks only, R6). An achievement earned plays its cut-in first (H49); on
+// the win that wins the run, the finale plays before it (H52).
 import { RIFT_FRONTS, type RankGain, type RpgClass } from '@rpg/domain'
 import type { RiftFightResult } from '@rpg/domain/rift'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
@@ -10,8 +11,9 @@ import { CLASS_LABEL } from '../../battle/labels'
 import { FrontCrest } from '../../battle/pixel-icons'
 import { RankCells, RankRow, type RankCell } from '../../ui/RankBars'
 import { riftRefTitle, riftResultView } from './rift-view'
+import { RiftFinale } from './RiftFinale'
 
-export function RiftResult({ campaign, result, onAgain, onBack, againLabel, error }: {
+export function RiftResult({ campaign, result, onAgain, onBack, againLabel, error, finale }: {
   campaign: Campaign
   result: RiftFightResult
   onAgain: () => void
@@ -19,10 +21,13 @@ export function RiftResult({ campaign, result, onAgain, onBack, againLabel, erro
   /** Overrides the "again" button's words (a Sweep's ticket count). */
   againLabel?: string
   error?: string | null
+  /** The run's champions, for the finale on the win that wins the run. */
+  finale?: { tier: number; faces: readonly string[] } | null
 }) {
-  const [cutIn, setCutIn] = useState(result.earned.length > 0)
-  const view = riftResultView(result)
   const win = result.outcome === 'victory'
+  const cutIns = result.earned.length > 0
+  const [step, setStep] = useState<'finale' | 'cut-in' | null>(() => (win && result.runWon && finale ? 'finale' : cutIns ? 'cut-in' : null))
+  const view = riftResultView(result)
   const { ref } = result
   const front = ref.kind === 'convergence' ? RIFT_FRONTS[ref.fight]! : ref.front
   return (
@@ -69,7 +74,8 @@ export function RiftResult({ campaign, result, onAgain, onBack, againLabel, erro
           <button type="button" onClick={onBack} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">{view.back}</button>
         </div>
       </div>
-      {cutIn && <AchievementCutIn grants={result.earned} onDone={() => setCutIn(false)} />}
+      {step === 'finale' && finale && <RiftFinale campaign={campaign} tier={finale.tier} faces={finale.faces} onDone={() => setStep(cutIns ? 'cut-in' : null)} />}
+      {step === 'cut-in' && <AchievementCutIn grants={result.earned} onDone={() => setStep(null)} />}
     </>
   )
 }
