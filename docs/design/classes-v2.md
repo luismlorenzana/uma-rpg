@@ -95,6 +95,10 @@ Damage is shown as physical / magical, in percent.
   - the v15 simulation checks every class's best single act, with weapon arts and passives under their shared cap, the
     Summoner's first ([weapon arts](weapon-arts.md) §6);
   - if one reaches the shield, the Duel shield rises, not the class's identity.
+  - **Checked for today's five classes in H51 (D176):** best act 12 against shield 10, so the Duel's shields rose to
+    13–15. The 12 is a Limit Break of twelve weak hits that any Uma can learn: Chaos Rain's twelve bolts, or Rimefang
+    Waltz's six two-kind cuts. Each class's own acts top out at 10: the Spell Blade's Bow flurry with her Light flurry,
+    and the Summoner's summon with her last one lingering. Classes v2 (engine v15) checks again with its own hands.
 
 **Stat leans:**
 - ATK ×1.05 → **×1.1**, and M.ATK ×1.05 → **×0.95**.

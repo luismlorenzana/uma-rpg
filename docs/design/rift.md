@@ -95,10 +95,10 @@ Tier sheet's Rift line is live. The screens are in the manual's [sections](../ga
 
 | Front | Foes | Weak to | Ward | Asks for | Today's party |
 |---|---|---|---|---|---|
-| **Iron** | Mixed formations, mostly sub-bosses and bosses | **1–3 Arms kinds only** | Elements ×0.5, even when Broken | Physical damage that covers several Arms kinds, and multi-hit to chip shields | 2 Brawler, 2 Spell Blade, Paladin |
+| **Iron** | Mixed formations, mostly sub-bosses and bosses | **1 Arms kind only** (H51; drafted 1–3) | Elements ×0.5, even when Broken | Physical damage that covers several Arms kinds, and multi-hit to chip shields | 2 Brawler, 2 Spell Blade, Paladin |
 | **Arcane** | The same | **1–2 elements only** | Arms ×0.5 | Elemental coverage, areas against the guards | 2 Mage, 2 Summoner, Cleric |
-| **Duel** | **One** boss a fight. She acts twice, three times at the champion. Shield 10–12 | 1–2 Arms **and** 1–2 elements | None | Single-target burst in both channels; locks broken by both | 2 Brawler, 2 Mage, a healer |
-| **Horde** | **4–6 foes a wave**, three waves, each foe weak to its own Arms + element pair. Shields 3–4 | Mixed, per foe | None | Areas and multi-hit, so every foe is chipped | 2 Spell Blade, 2 Summoner, a healer |
+| **Duel** | **One** boss a fight. She acts twice, three times at the champion. Shield 13–15 (H51; drafted 10–12) | 1–2 Arms **and** 1–2 elements | None | Single-target burst in both channels; locks broken by both | 2 Brawler, 2 Mage, a healer |
+| **Horde** | **4–6 foes a wave**, three waves, each foe weak to its own Arms + element pair. Shields 3 | Mixed, per foe | None | Areas and multi-hit, so every foe is chipped | 2 Spell Blade, 2 Summoner, a healer |
 
 **Ward (R5).** On the Iron and Arcane fronts, damage from the wrong channel is halved again, **on top of** the unbroken
 halving. Off-composition parties can still win, slowly.
@@ -109,9 +109,9 @@ halving. Off-composition parties can still win, slowly.
 
 | Stages | Fight |
 |---|---|
-| 1–4 | A sub-boss with two key escorts |
-| 5–8 | Two sub-bosses, or a boss with sub-boss guards |
-| 9–11 | A boss with guards; three waves |
+| 1–4 | A sub-boss with a key escort (H51; drafted two) |
+| 5–8 | Two sub-bosses, or a boss with a sub-boss guard |
+| 9–11 | A boss with a guard; three waves, the first two a lone foe each (H51; drafted trios) |
 | 12 | **The front's champion:** two bosses from two different franchises, together |
 
 That's 48 front fights and 4 in the Convergence: **52 fights a run, before retries.** Clearing stage 12 **seals** the
@@ -119,7 +119,10 @@ front.
 
 **Levels:**
 - Rift foes start at the tier's Lv 50 and climb, by stage, to Lv 50 + 10% offense and HP at the champion.
-- The Convergence adds 10% again.
+- The Convergence's fights are their champions' shapes at strength ×0.92, below the champions' ×1.1 (H51; drafted
+  +10% again, ×1.21): an attempt must win all four in a row, so each is about 80–95% for the attempt to be a coin flip.
+- Rift foes hit harder than the world's, by a share of offense per shape (H51), and Arcane's have ×1.5 HP and ×1.3
+  offense over Iron's, since Arcane's casters clear the shared shape far faster than Iron's Arms today.
 - The build budget assumes on-curve Lv 50 Umas, G10 gear and full Extra Stats.
 
 **Locks:**
@@ -130,9 +133,15 @@ front.
 the manual's [Rift's foes](../game/combat.md#the-rifts-foes). The Lv 55 Echo is the Lv 50 shape at ×1.22, since a tier
 stops at Lv 50.
 
+**Tuned in H51 (D176):** every number against §11 with the balance simulation (`rift/balance.test.ts`, `SIM=1`). The
+measured results are in §11. The Duel's shields rose to 13–15 for [classes v2](classes-v2.md) §3.1's guard rail: today's
+best single act removes 12 points, a Limit Break any Uma can learn.
+
 ## 6. The Convergence
 
-**Four fights in a row:** Iron, Arcane, Duel, Horde, at their champion's strength plus 10%.
+**Four fights in a row:** Iron, Arcane, Duel, Horde, each its front's champion at strength ×0.92, the champion's own
+being ×1.1 (H51; drafted at the champion's strength plus 10%: with the champions at 60–70%, fewer than 6% of attempts
+would be won).
 
 **The owner assigns a party to each before starting.** Each party fights once, so all twenty Umas take part.
 
@@ -236,8 +245,12 @@ Today's `stageFaces` picks within one franchise per region, so this is new code.
 
 **Built in H47 (D173):** one allocation per run walks its 52 fights in order and gives each slot a pack by a smooth
 40 / 37 / 23 round-robin per face tier, then that pack's first face not yet used in the run, undefeated ones first. An
-Echo allocates its one fight alone, with no preference. The starting shapes hold 38 boss and 106 sub-boss slots a run,
-so sub-bosses fill in two runs and bosses in four (H51 may move which tier a slot draws).
+Echo allocates its one fight alone, with no preference. The starting shapes held 38 boss and 106 sub-boss slots a run,
+so sub-bosses filled in two runs and bosses in four.
+
+**Since H51 (D176):** a boss leads the last wave of every Horde fight (from stage 9 before), and Iron's and Arcane's
+fights have one escort, one guard and lone opening foes. A run holds 46 boss and 64 sub-boss slots, so every boss and
+every sub-boss has been met after three runs.
 
 **Splashes and cut-ins** work as today: key, sub-boss and boss splashes, and the champion's red stripe.
 
@@ -253,17 +266,54 @@ so sub-bosses fill in two runs and bosses in four (H51 may move which tier a slo
 | The Rift page: fronts and their chains, the Convergence assignment, Echoes, the run's roster, Ascend | `apps/web/src/places/rift/` | L |
 | Achievements: rules, the Account's list, cut-ins on earning one | domain + web | M |
 | **Art** (a ChatGPT packet, uma-art): the Rift building for the Battle page, four front crests, achievement badges in uma-art's `ui` atlas | uma-platform | M |
-| The balance simulation: fronts by composition, Echo pacing | `world/balance` | M |
+| The balance simulation: fronts by composition, Echo pacing | `rift/balance.test.ts` (H51), on `world/balance-party.ts` and `world/balance-play.ts` | M |
 
 ## 11. Balance targets
 
-| Target | Value |
-|---|---|
-| The right party, on-curve with the matching classes, first try on Auto | ≥ 80% a front stage; 60–70% a champion |
-| The wrong party (all-magic on Iron, all-physical on Arcane) | ≤ 30% a stage, ≤ 10% a champion |
-| The Convergence, right parties | About 50% an attempt |
-| A run's length, at the owner's pace | About 2–3 weeks: 52 fights, the retries, and Echo time to raise new classes |
-| Echo pacing | A Lv 50 Uma raises a fresh class to Rank 30 in about 40 Echo wins |
+| Target | Value | Measured (H51, D176) |
+|---|---|---|
+| The right party, on-curve with the matching classes, first try on Auto | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 96%, 98%, 87%; Arcane 100%, 100%, 99%; Duel 100%; Horde 98%, 91%, 94%. Champions: Iron 61%, Arcane 64%, Duel 68%, Horde 67% |
+| The wrong party (all-magic on Iron, all-physical on Arcane) | ≤ 30% a stage, ≤ 10% a champion | On Arcane, Iron's party: 0–1% a stage, 0% the champion. On Iron, Arcane's party: 60%, 98%, 89% a stage (**missed**, below), 7% the champion |
+| The Convergence, right parties | About 50% an attempt | 51% (49 of 96); its fights 76%, 91%, 79%, 99% |
+| The Duel's guard rail ([classes v2](classes-v2.md) §3.1) | Every class's best single act < the Duel's lowest shield | 12 against 13 (shields 13–15; drafted 10–12, which 12 broke) |
+| A run's length, at the owner's pace | About 2–3 weeks: 52 fights, the retries, and Echo time to raise new classes | About 58 fights on Auto: 52 for the 48 stages and 6 for the Convergence's two attempts, plus Echo time |
+| Echo pacing | A Lv 50 Uma raises a fresh class to Rank 30 in about 40 Echo wins | 9 wins at Lv 50 and 55, 17 at Lv 45 (R6's 2×); Rank 50 in 20 and 40 (below) |
+| Echoes, how hard (drafted in H51) | Lv 45 ≥ 80% with one Uma re-specced; Lv 50 ≥ 80% and Lv 55 about 50% on curve | Lv 45: 100% on every front. Lv 50: 99–100%. Lv 55: Iron 98%, Arcane 100%, Duel 100%, Horde 36% (below) |
+| The Bestiary (§9) | Two or three runs | Three runs, for the bosses and the sub-bosses |
+
+**How it was measured** (`rift/balance.test.ts`, `SIM=1`): each front's guided party (D168), on curve at Lv 50 (gear, Extra
+Stats, an inherited Limit Break), first try on Auto, 96 fights a stage over three runs and 32 seeds. The wrong party
+on Iron is Arcane's guided party, and Iron's on Arcane. Before H51 every guided party won every fight it was given, the
+wrong ones nearly as often (Iron's wrong party 100% everywhere), the Convergence 96% of attempts, and a Limit Break
+broke a Duel shield of 10 in one act.
+
+**Skills move a champion by about 20 points.** The balance party equips each weapon's deepest core and side skill, and
+Auto, which scores by power, swings the side skills' single heavy hits. A save fights with the game's default loadout
+until the player picks (each weapon's two deepest cores, more hits to chip shields). With it the same parties win the
+champions 91% (Iron), 46% (Arcane), 79% (Duel) and 84% (Horde), and 66% of Convergence attempts; the stages stay
+93–100%. That is the skill allocation §1 asked to matter: multi-hit cores against Iron's shields, the casters' heavy
+sides against Arcane's champions.
+
+**Iron's wrong party, the one miss.** With today's five classes, Arcane's party isn't all-magic on Iron:
+- its Summoners carry two Arms each and its Cleric three, and Auto, ward-aware, fights Iron with them;
+- its Barriers and mends outlast Iron's one Cleric;
+- its Mages hit hard enough that the ward's ×0.5 leaves them close to the Brawlers.
+
+One Arms weakness a foe, one guard, lone opening foes and a champion shield of 16 widen the gap: stages 1–4 fall from
+100% to 60%, and the champion from 100% to 7%. Every setting that pushed it under 30% a stage pushed Iron's own party
+under 80% too. Classes v2 (the Spell Blade's 70/30 and multi-hit, the Paladin) is where Iron's own party gains; the
+fronts are retuned then (D168).
+
+**Echo pace and R6.** At 2× a stage, a fresh class reaches Rank 30 in 9 Lv 50 wins and Rank 50 in 20, not the drafted 40
+to Rank 30. H51 keeps 2× (D176). The Rift's parties need re-specs: no Uma starts as a Spell Blade, and the Convergence
+fields four of each class at once. At 2× a re-specced Uma opens every skill depth (Rank 40) in 14 Lv 50 wins, and a
+party with one re-specced member wins the Lv 50 Echoes every time. A pay that met the draft (×0.45) would make Rank 40
+take 59 wins, about the whole run's 58 fights for each re-spec. The one number the owner may still change is
+`ECHO_RANK_PAY` in `save/rift.ts`: at 1×, Rank 30 takes 17 wins at Lv 50 and 33 at Lv 45.
+
+**The Lv 55 Echo.** Lv 55 is the Lv 50 Echo at ×1.22, and it pays as Lv 50 (D174), so it's an optional hard step. One
+multiplier can't put all four near 50%: Arcane's and the Duel's stage-8 shapes stay at 100% even at ×1.35, where Iron
+falls to 22% and the Horde to 0%. It stays at ×1.22, five levels' worth.
 
 ## 12. Owner calls: decided 2026-10-21 (D161), all as recommended
 

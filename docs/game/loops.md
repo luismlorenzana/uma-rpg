@@ -315,6 +315,10 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   a run. A win fills each Uma's [rank bars](#ranks) at twice a stage's rule, E being a regular stage's EXP at the Echo's
   level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past a max rank it
   banks as Marks. No Uma EXP, Laurels, Shards or Bonds.
+  - **The pace** (H51, D176): a fresh class reaches Rank 30 in about 9 Echo wins at Lv 50 or 55 and 17 at Lv 45, and
+    Rank 50 in 20 (40 at Lv 45). At Lv 50 a weapon she fights with reaches Rank 8 in 14 to 16 wins, or 22 Sweeps.
+  - **How hard:** a party with one Uma at Class Rank 1 wins the Lv 45 Echoes, and an on-curve party the Lv 50 ones.
+    Lv 55 is the hard step, hardest on the Horde.
 - **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win,
   her five weapons sharing evenly. They record no faces and earn no achievements.
 - **Ascend:** once the run is won, its twenty move up a tier together, in one step: no Rift or world-map fight open,

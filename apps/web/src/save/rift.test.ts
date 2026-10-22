@@ -8,6 +8,7 @@ describe('@rpg/domain/rift', () => {
     expectTypeOf<RiftFightPlan['level']>().toEqualTypeOf<number>()
     expectTypeOf<RiftContext['runId']>().toEqualTypeOf<string | null>()
     const rift = await import('@rpg/domain/rift')
-    expect(rift.riftStrength({ kind: 'convergence', fight: 0 })).toBe(1.21)
+    const t = rift.RIFT_TUNING
+    expect(rift.riftStrength({ kind: 'convergence', fight: 0 })).toBe(Math.round((1 + t.climb) * (1 + t.convergence) * 1e4) / 1e4)
   })
 })

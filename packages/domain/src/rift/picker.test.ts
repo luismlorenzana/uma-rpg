@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { EnemyTier, Franchise, RosterMember } from '../world/roster'
 import { riftChain, riftConvergence, riftFight, type RiftContext, type RiftFightPlan } from './generate'
-import { RIFT_FRANCHISE_WEIGHTS, RIFT_RUN_FIGHTS, riftEchoFaces, riftRunFaces } from './picker'
+import { riftShape, type RiftFace } from './fronts'
+import { RIFT_FRANCHISE_WEIGHTS, RIFT_RUN_FIGHTS, riftEchoFaces, riftRunFaces, riftShapeOf } from './picker'
 import { packRoster } from './roster.fixture'
 import { RIFT_FRONTS, riftRefKey } from './state'
 
@@ -23,7 +24,10 @@ describe('the Rift\'s faces (H47)', () => {
     }
     const faces = runFaces(roster, 't1-r1')
     const count = (tier: EnemyTier) => faces.filter((id) => tierOf(id) === tier).length
-    expect([count('boss'), count('subboss')]).toEqual([38, 106])
+    // Every slot takes a face of its own tier, as many as the shapes hold (46 boss and 64 sub-boss slots since H51).
+    const slots = RIFT_RUN_FIGHTS.flatMap((ref) => { const { front, stage } = riftShapeOf(ref); return riftShape(front, stage).flat() })
+    const want = (face: RiftFace) => slots.filter((s) => s.face === face).length
+    expect([count('boss'), count('subboss'), count('key')]).toEqual([want('boss'), want('subboss'), want('key')])
   })
 
   it('never repeats a boss or sub-boss face in a run while unused ones remain', () => {
@@ -59,7 +63,7 @@ describe('the Rift\'s faces (H47)', () => {
 
   it('uses every boss not yet defeated before a defeated one', () => {
     const bosses = roster.filter((m) => m.tier === 'boss').map((m) => m.id).sort()
-    // Half defeated: a run's 38 boss slots take only undefeated ones.
+    // Half defeated: a run's boss slots (46) take only undefeated ones.
     const half = new Set(bosses.filter((_, i) => i % 2 === 0))
     expect(runFaces(roster, 't1-r3', half).filter((id) => tierOf(id) === 'boss').some((id) => half.has(id))).toBe(false)
     // All but 15 defeated: the run's first 15 bosses are exactly those 15.
@@ -83,8 +87,10 @@ describe('the Rift\'s faces (H47)', () => {
     const plan = riftFight({ tier: 1, runId: 't1-r1', roster: noKeys, defeated: new Set() }, { kind: 'front', front: 'horde', stage: 1 })
     for (const e of [plan.enemies, ...(plan.waves ?? [])].flat()) expect(['subboss', 'boss']).toContain(tierOf(e.castId))
     const plain = [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }]
-    expect(riftFight({ tier: 1, runId: 't1-r1', roster: plain, defeated: new Set() }, { kind: 'front', front: 'iron', stage: 1 }).enemies.map((e) => e.castId).sort())
-      .toEqual(['a', 'b', 'c'])
+    const ids = riftFight({ tier: 1, runId: 't1-r1', roster: plain, defeated: new Set() }, { kind: 'front', front: 'iron', stage: 1 }).enemies.map((e) => e.castId)
+    expect(ids).toHaveLength(riftShape('iron', 1).flat().length)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const id of ids) expect(['a', 'b', 'c']).toContain(id)
   })
 
   it('keeps an Echo\'s faces whatever the account has defeated', () => {

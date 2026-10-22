@@ -35,7 +35,7 @@ describe('the Rift generator (H47)', () => {
     for (const plan of [...riftChain(ctx(), 'iron'), riftConvergence(ctx())[0]!]) {
       for (const e of foes(plan)) {
         expect(e.weaknesses.elements).toEqual([])
-        expect(e.weaknesses.weapons).toHaveLength({ regular: 3, 'sub-boss': 2, boss: 1 }[e.rank])
+        expect(e.weaknesses.weapons).toHaveLength(RIFT_TUNING.weak.iron[e.rank])
         expect(e.ward).toBe('magical')
         expect(e.mixedLocks).toBeUndefined()
       }
@@ -48,7 +48,7 @@ describe('the Rift generator (H47)', () => {
     for (const plan of [...riftChain(ctx(), 'arcane'), riftConvergence(ctx())[1]!]) {
       for (const e of foes(plan)) {
         expect(e.weaknesses.weapons).toEqual([])
-        expect(e.weaknesses.elements).toHaveLength(e.rank === 'boss' ? 1 : 2)
+        expect(e.weaknesses.elements).toHaveLength(RIFT_TUNING.weak.arcane[e.rank])
         expect(e.ward).toBe('physical')
       }
     }
@@ -66,9 +66,9 @@ describe('the Rift generator (H47)', () => {
       expect(e.rank).toBe('boss')
       expect(e.mixedLocks).toBe(true)
       expect(e.ward).toBeUndefined()
-      expect(e.shield).toBe(stage <= 4 ? 10 : stage <= 8 ? 11 : 12)
-      expect(e.weaknesses.weapons).toHaveLength(stage <= 6 ? 2 : 1)
-      expect(e.weaknesses.elements).toHaveLength(stage <= 6 ? 2 : 1)
+      expect(e.shield).toBe(RIFT_TUNING.duel.shields[i]!)
+      expect(e.weaknesses.weapons).toHaveLength(RIFT_TUNING.weak.duel.weapons[i]!)
+      expect(e.weaknesses.elements).toHaveLength(RIFT_TUNING.weak.duel.elements[i]!)
       if (stage < 12) expect([e.twice, e.thrice]).toEqual([true, undefined])
       else expect([e.twice, e.thrice]).toEqual([undefined, true])
     })
@@ -83,14 +83,14 @@ describe('the Rift generator (H47)', () => {
       const list = waves(plan)
       expect(list).toHaveLength(3)
       for (const [w, wave] of list.entries()) {
-        expect(wave).toHaveLength(stage <= 4 ? 4 : stage <= 8 ? 5 : 6)
+        expect(wave).toHaveLength(RIFT_TUNING.horde.counts[i]!)
         const pairs = wave.map((e) => `${e.weaknesses.weapons.join()}+${e.weaknesses.elements.join()}`)
         expect(new Set(pairs).size).toBe(wave.length)
         const leaders = w === 2 && stage === 12 ? 2 : 1
         wave.forEach((e, k) => {
           expect(e.rank).toBe('regular')
           expect([e.weaknesses.weapons.length, e.weaknesses.elements.length]).toEqual([1, 1])
-          expect(e.shield).toBe(k < leaders ? 6 : stage <= 6 ? 3 : 4)
+          expect(e.shield).toBe(k < leaders ? RIFT_TUNING.horde.leaderShield : RIFT_TUNING.horde.shields[i]!)
           expect(e.ward).toBeUndefined()
         })
       }
@@ -135,7 +135,7 @@ describe('the Rift generator (H47)', () => {
   it('climbs in strength to the champion, the Convergence and the Lv 55 Echo', () => {
     expect(riftStrength({ kind: 'front', front: 'iron', stage: 1 })).toBe(1)
     expect(riftStrength({ kind: 'front', front: 'horde', stage: 12 })).toBe(1.1)
-    expect(riftStrength({ kind: 'convergence', fight: 3 })).toBe(1.21)
+    expect(riftStrength({ kind: 'convergence', fight: 3 })).toBe(Math.round((1 + RIFT_TUNING.climb) * (1 + RIFT_TUNING.convergence) * 1e4) / 1e4)
     expect(riftStrength({ kind: 'echo', front: 'duel', level: '55' })).toBe(RIFT_TUNING.echo55)
     expect(riftStrength({ kind: 'echo', front: 'duel', level: '45' })).toBe(1)
     const [six, eight] = [6, 8].map((stage) => riftFight(ctx(), { kind: 'front', front: 'iron', stage }))

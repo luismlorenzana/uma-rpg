@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RIFT_TUNING } from '../rift/fronts'
 import { riftFight } from '../rift/generate'
 import { RIFT_TRACES, type RiftFightRef } from '../rift/state'
 import { createBattle, replayBattle } from '../rpg/battle/engine'
@@ -132,8 +133,8 @@ describe('front fights (§4–§5, R4)', () => {
   it('a win clears the stage, merges its traces, and records each boss and sub-boss face first defeated', () => {
     const started = startRiftFight(signedUp(), IRON1, 0, OUTFITS, ROSTER, T(2))
     const foes = world1(started).rift.battle!.input.enemies
-    // Stage 1 is a sub-boss captain and two key guards (D173): only the captain's face is recorded.
-    expect(foes.map((f) => tierOf(f.castId)).sort()).toEqual(['key', 'key', 'subboss'])
+    // Stage 1 is a sub-boss captain and her key guards (D173; one since H51): only the captain's face is recorded.
+    expect(foes.map((f) => tierOf(f.castId)).sort()).toEqual([...Array<string>(RIFT_TUNING.escort.guards).fill('key'), 'subboss'])
     const captain = foes.find((f) => tierOf(f.castId) === 'subboss')!.castId
     const won = play(weaken(started))
     expect(won.result).toMatchObject({ outcome: 'victory', ref: IRON1, members: [], gearMarks: 0, classMarks: 0, cleared: 1, attempt: null, runWon: false })

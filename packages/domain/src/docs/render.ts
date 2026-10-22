@@ -533,6 +533,9 @@ function riftFronts(): string {
     `×${riftStrength({ kind: 'front', front: 'iron', stage: 12 })} at the champion; a Convergence fight is its front's champion at ×${riftStrength({ kind: 'convergence', fight: 0 })}. ` +
     `An Echo is its front's stage ${t.echoStage} at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×${t.echo55}. ` +
     `Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. ` +
+    `Rift foes hit harder than the world's: offense ×${t.escort.captain.offense} at stages 1–4, ×${t.elites.offense} for stages 5 and 7's sub-bosses, ` +
+    `×${t.boss.offense} for a boss and her guard, ×${t.openers.offense} for an opening foe, ×${t.champion.offense} for a champion, ` +
+    `×${t.duel.offense} on the Duel and ×${t.horde.offense} on the Horde. Arcane's foes have ×${t.scale.arcane.hp} HP and ×${t.scale.arcane.offense} offense over Iron's. ` +
     `A run's ${RIFT_RUN_FIGHTS.length} fights hold ${slots.filter((s) => s.face === 'boss').length} boss, ${slots.filter((s) => s.face === 'subboss').length} sub-boss ` +
     `and ${slots.filter((s) => s.face === 'key').length} key face slots.`
 }
