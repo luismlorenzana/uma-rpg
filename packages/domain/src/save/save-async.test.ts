@@ -11,7 +11,7 @@ import { chooseClass, openFightOf, startFight, worldRun, type BattleOutfit } fro
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, newTierWorld, parseSave, parseSaveAsync, SAVE_SCHEMA_VERSION, SaveParseError, type Save } from './save'
 import { queueJob, startJob, type WorkOutfit } from './work'
-import { riftSave } from './rift.fixture'
+import { convergenceSave, riftSave } from './rift.fixture'
 
 const NOW = '2026-10-12T12:00:00.000Z'
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
@@ -83,6 +83,13 @@ describe('asynchronous strict save parsing (H16)', () => {
       }
       if (version >= 10 && version < 14) w.gear = { 'mage-staff-g2-mp': 2, 'spear-g1-atk': 1 }
       if (version >= 10 && version < 15) w.items = { 'token-craft-hp-1': 2 }
+      // Before v24 the account had no defeated faces, the Rift no fight or count, and a run no traces or open attempt (D171).
+      if (version < 24) {
+        const rift = (w as unknown as { rift: Record<string, unknown> & { runs: Record<string, any>[] } }).rift
+        delete rift.battle; delete rift.battles
+        for (const run of rift.runs) { delete run.traces; delete run.convergence.open }
+        delete (s.account as unknown as Record<string, unknown>).defeated
+      }
       // Before v23 there was no Rift, and the account held only its name and times (D163).
       if (version < 23) {
         delete (w as unknown as Record<string, unknown>).rift
@@ -105,13 +112,31 @@ describe('asynchronous strict save parsing (H16)', () => {
     }
   })
 
-  it('matches the synchronous parser for a v23 save with the Rift in use, and refuses its broken references alike', async () => {
+  it('matches the synchronous parser for a v24 save with the Rift in use, and refuses its broken references alike', async () => {
     const s = riftSave()
     expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
     expect(await parseSaveAsync(rawOf(s))).toEqual(s)
     const open = rawOf(s); open.account.history['201']![0]!.run = 't1-r2'
     expect(() => parseSave(open)).toThrow(SaveParseError)
     await expect(parseSaveAsync(open)).rejects.toThrow(/hasn't ascended/)
+  })
+
+  it('replays the open Rift fight after the lazy engine import, front or Convergence, and refuses what the engine refuses', async () => {
+    for (const s of [riftSave(), convergenceSave()]) {
+      expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
+      expect(await parseSaveAsync(rawOf(s))).toEqual(s)
+    }
+    // Only the replay can tell: 101 has already acted this round, and the seed is out of range.
+    const acted = rawOf(riftSave()); acted.tierWorlds['1']!.rift.battle!.actions.push({ kind: 'guard', actorId: '101', targetId: '101' })
+    const seed = rawOf(convergenceSave()); seed.tierWorlds['1']!.rift.battle!.input.seed = -1
+    for (const [raw, message] of [[acted, /rift\.battle\.actions: an action was refused/], [seed, /rift\.battle\.input: /]] as const) {
+      expect(() => parseSave(raw)).toThrow(message)
+      await expect(parseSaveAsync(raw)).rejects.toThrow(message)
+    }
+    // The cross-checks run before the replay and read the unchecked input safely.
+    const broken = rawOf(riftSave()); (broken.tierWorlds['1']!.rift.battle!.input as unknown as Record<string, unknown>).allies = 'five'
+    expect(() => parseSave(broken)).toThrow(SaveParseError)
+    await expect(parseSaveAsync(broken)).rejects.toThrow(SaveParseError)
   })
 
   it('replays frozen v8 waves and actions before returning, with identical v6 compatibility', async () => {

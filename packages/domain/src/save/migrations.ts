@@ -210,7 +210,25 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v20 = version < 20 && isRecord(v19) ? toV20(v19) : v19
   const v21 = version < 21 && isRecord(v20) ? toV21(v20) : v20
   const v22 = version < 22 && isRecord(v21) ? toV22(v21) : v21
-  return version < 23 && isRecord(v22) ? toV23(v22) : v22
+  const v23 = version < 23 && isRecord(v22) ? toV23(v22) : v22
+  return version < 24 && isRecord(v23) ? toV24(v23) : v23
+}
+
+// --- v23 → v24 (D171) ------------------------------------------------------------------------------------------------
+
+/**
+ * Each world's Rift gains no open fight and a fight count of 0, and each run gains no traces and no open Convergence
+ * attempt, keeping its attempts. Written as literals, not from `rift/state.ts`: a migration step is frozen history. It
+ * overwrites, so a current save relabelled as an older one still parses; anything malformed (a Rift or run that isn't an
+ * object, unknown keys) is left for the strict parse. The account's `defeated` is added in `parseSaveChecked`.
+ */
+function toV24(world: Record<string, unknown>): Record<string, unknown> {
+  const rift = world.rift
+  if (!isRecord(rift)) return world
+  const runs = Array.isArray(rift.runs)
+    ? rift.runs.map((run: unknown) => (isRecord(run) ? { ...run, traces: {}, convergence: isRecord(run.convergence) ? { ...run.convergence, open: null } : run.convergence } : run))
+    : rift.runs
+  return { ...world, rift: { ...rift, runs, battle: null, battles: 0 } }
 }
 
 // --- v22 → v23 (D163) ------------------------------------------------------------------------------------------------

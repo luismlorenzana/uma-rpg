@@ -186,7 +186,9 @@ rift: {
   echoes: { [front]: { [difficulty]: wonAt } },
 }
 ```
-Built in v23 (H37) with `null` for unset times and run ids `t<tier>-r<n>`.
+Built in v23 (H37) with `null` for unset times and run ids `t<tier>-r<n>`. v24 (H46) adds the open Rift fight, the fight
+count, each run's traces and open attempt, and the account's defeated faces (D171; the shape is in the
+[manual](../game/architecture.md#the-save)).
 
 Account: `achievements`. Each fight replays on its engine, as world fights do.
 

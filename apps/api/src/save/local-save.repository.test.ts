@@ -32,18 +32,33 @@ describe('local save repository', () => {
     expect((await repo.put('u', 1, newSave('New app', NOW), V)).revision).toBe(2)
   })
 
-  it('loads a stored v22 row as v23, with empty achievements, history and Rift (D163)', async () => {
+  it('loads a stored v22 row as current, with empty achievements, history, defeated faces and Rift (D163, D171)', async () => {
     const file = join(await mkdtemp(join(tmpdir(), 'rpg-save-')), 'save.json')
     const v22 = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
     v22.schemaVersion = 22
     delete v22.account.achievements
     delete v22.account.history
+    delete v22.account.defeated
     delete v22.tierWorlds['1'].rift
     await writeFile(file, JSON.stringify({ u: { revision: 4, save: v22 } }))
     const loaded = await new LocalSaveRepository(file).load('u')
     expect(loaded.revision).toBe(4)
-    expect(loaded.save?.schemaVersion).toBe(23)
-    expect(loaded.save?.account).toMatchObject({ achievements: {}, history: {} })
-    expect(loaded.save?.tierWorlds['1']?.rift).toEqual({ runs: [], echoes: {} })
+    expect(loaded.save?.schemaVersion).toBe(V)
+    expect(loaded.save?.account).toMatchObject({ achievements: {}, history: {}, defeated: {} })
+    expect(loaded.save?.tierWorlds['1']?.rift).toEqual({ runs: [], echoes: {}, battle: null, battles: 0 })
+  })
+
+  it('loads a stored v23 row as current (v24 added no defeated faces and no Rift fight, D171)', async () => {
+    const file = join(await mkdtemp(join(tmpdir(), 'rpg-save-')), 'save.json')
+    const v23 = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
+    v23.schemaVersion = 23
+    delete v23.account.defeated
+    v23.tierWorlds['1'].rift = { runs: [], echoes: {} }
+    await writeFile(file, JSON.stringify({ u: { revision: 7, save: v23 } }))
+    const loaded = await new LocalSaveRepository(file).load('u')
+    expect(loaded.revision).toBe(7)
+    expect(loaded.save?.schemaVersion).toBe(V)
+    expect(loaded.save?.account).toMatchObject({ achievements: {}, history: {}, defeated: {} })
+    expect(loaded.save?.tierWorlds['1']?.rift).toEqual({ runs: [], echoes: {}, battle: null, battles: 0 })
   })
 })

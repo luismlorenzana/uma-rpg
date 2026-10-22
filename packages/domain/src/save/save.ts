@@ -1,6 +1,7 @@
-// Save v23: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v23 (D163):
-// the account's achievements and each Uma's tier history, and each world's Rift, all empty until the Rift writes them
-// (D159, D161). v22 (SC3): work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row,
+// Save v24: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v24 (D171):
+// the account's defeated Rift faces, each world's open Rift fight and fight count, and each run's traces and open
+// Convergence attempt, all empty until the Rift's run rules write them. v23 (D163): the account's achievements and each
+// Uma's tier history, and each world's Rift (D159, D161). v22 (SC3): work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row,
 // and facilities keep only their levels. v21 (D144): one profession, Craft Level, and Star Gems for Extra Stats; more
 // facility slots. v20 (D124): armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106):
 // the Halls of Heroes, their Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no
@@ -28,16 +29,20 @@ import { activeNodeSlots } from '../economy/pacing'
 import { isItemId } from '../items/identity'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
+import { BATTLE_MAX_ROUNDS } from '../rpg/battle/caps'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
 import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
   isRpgWeapon, RPG_CLASS_ARMOR, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
   type RpgWeapon,
 } from '../rpg/rules'
-import { ECHO_LEVELS, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftRunId, type EchoLevel, type RiftFront, type RiftRun, type RiftState } from '../rift/state'
+import {
+  CONVERGENCE_FIGHTS, ECHO_LEVELS, isAchievementId, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, RIFT_TRACES, riftRunId, type EchoLevel, type RiftAttempt,
+  type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
+} from '../rift/state'
 import { migrateWorld } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 23
+export const SAVE_SCHEMA_VERSION = 24
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
@@ -159,6 +164,9 @@ export interface Account {
   achievements: Record<string, Achievement>
   /** Each Uma's climb, by outfit id: one entry per promotion, oldest first (D159). */
   history: Record<string, TierHistoryEntry[]>
+  /** The boss and sub-boss faces this account has defeated in Rift fights only (D168), by cast id: when first (D171). The
+   * Bestiary counts them, and a run's picker prefers the faces not defeated before it started. */
+  defeated: Record<string, string>
 }
 
 export interface Save {
@@ -233,7 +241,7 @@ export function newTierWorld(now: string, unlockTickets: number): TierWorld {
 export function newSave(trainerName: string, now: string): Save {
   return {
     schemaVersion: SAVE_SCHEMA_VERSION,
-    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now, achievements: {}, history: {} },
+    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { '1': newTierWorld(now, STARTING_UNLOCK_TICKETS) },
   }
 }
@@ -669,19 +677,25 @@ function checkReplay(replay: typeof replayBattle, input: BattleInput, actions: B
   if (step.error) throw new SaveParseError(`${path}.actions`, `an action was refused: ${step.error}`)
 }
 
+/** A fight's actions, each of a known kind with only its kind's keys; whether the engine accepts them is `check`'s job. */
+function parseActions(value: unknown, path: string): BattleAction[] {
+  if (!Array.isArray(value) || value.length > RPG_MAX_BATTLE_ACTIONS) throw new SaveParseError(path, 'expected a list of actions')
+  value.forEach((a: unknown, i: number) => {
+    const kind = (a as { kind?: unknown } | null)?.kind
+    if (typeof kind !== 'string' || !(kind in ACTION_KEYS)) throw new SaveParseError(`${path}.${i}`, 'unknown action')
+    object(a, `${path}.${i}`, ACTION_KEYS[kind as BattleAction['kind']])
+  })
+  return value as BattleAction[]
+}
+
 function parseBattle(value: unknown, path: string, check: CheckBattle): RpgRunBattle {
   const b = object(value, path, ['battleId', 'nodeId', 'startedAt', 'input', 'actions'])
   if (typeof b.battleId !== 'string' || !NODE_ID.test(b.battleId)) throw new SaveParseError(`${path}.battleId`, 'bad id')
   if (typeof b.nodeId !== 'string' || !NODE_ID.test(b.nodeId)) throw new SaveParseError(`${path}.nodeId`, 'bad id')
-  if (!Array.isArray(b.actions) || b.actions.length > RPG_MAX_BATTLE_ACTIONS) throw new SaveParseError(`${path}.actions`, 'expected a list of actions')
-  b.actions.forEach((a: unknown, i: number) => {
-    const kind = (a as { kind?: unknown } | null)?.kind
-    if (typeof kind !== 'string' || !(kind in ACTION_KEYS)) throw new SaveParseError(`${path}.actions.${i}`, 'unknown action')
-    object(a, `${path}.actions.${i}`, ACTION_KEYS[kind as BattleAction['kind']])
-  })
+  const actions = parseActions(b.actions, `${path}.actions`)
   // The fight must replay cleanly: the engine validates the input and every action (D52).
-  check(b.input as BattleInput, b.actions as BattleAction[], path)
-  return { battleId: b.battleId, nodeId: b.nodeId, startedAt: timestamp(b.startedAt, `${path}.startedAt`), input: b.input as BattleInput, actions: b.actions as BattleAction[] }
+  check(b.input as BattleInput, actions, path)
+  return { battleId: b.battleId, nodeId: b.nodeId, startedAt: timestamp(b.startedAt, `${path}.startedAt`), input: b.input as BattleInput, actions }
 }
 
 const SPRING_ID = /^w\d{1,2}-spring\d{1,2}$/
@@ -733,7 +747,7 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v22 are migrated to v23's shape first (migrations.ts), so the parse below reads only v23.
+  // v10–v23 are migrated to v24's shape first (migrations.ts), so the parse below reads only v24.
   const value = migrate(raw, version)
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes', 'rift'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
@@ -744,7 +758,7 @@ function parseTierWorld(raw: unknown, path: string, version: number, tier: numbe
     items: parseItems(w.items, `${path}.items`), buildings, work: parseWork(w.work, `${path}.work`, umas, buildings),
     gems: parseGems(w.gems, `${path}.gems`), gear: parseGearStock(w.gear, `${path}.gear`),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
-    rift: parseRift(w.rift, `${path}.rift`, tier, umas),
+    rift: parseRift(w.rift, `${path}.rift`, tier, umas, check),
   }
 }
 
@@ -754,7 +768,7 @@ function parseTargets(value: unknown, path: string, umas: Record<string, OwnedUm
   return [...list]
 }
 
-// --- The Rift and the account's records (v23: D159, D161) -------------------------------------------------------------
+// --- The Rift and the account's records (v23: D159, D161; v24: D171) -------------------------------------------------
 
 const MAX_RIFT_RUNS = 1000
 const MAX_ACHIEVEMENTS = 200
@@ -763,11 +777,51 @@ const ACHIEVEMENT_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/
 const ACHIEVEMENT_ID_MAX = 48
 /** A run id, `t<tier>-r<n>`: its tier and its place in that world's runs. */
 const RUN_ID = /^t([1-9]\d{0,11})-r([1-9]\d{0,11})$/
+/** A Rift fight's id, `rift:t<tier>:<n>`: its tier and its place in that world's Rift fights. */
+const RIFT_BATTLE_ID = /^rift:t([1-9]\d{0,11}):([1-9]\d{0,11})$/
+/** Every boss and sub-boss of the three packs (271) fits, with room for more packs. */
+const MAX_DEFEATED = 2000
+/** A cast id: the engine's id shape (`SAFE_ID` in `rpg/battle/engine.ts`, which the parser doesn't load). */
+const CAST_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 
 const before = (a: string, b: string): boolean => Date.parse(a) < Date.parse(b)
 
+/** An open Convergence attempt (§6): the run's twenty in four parties of five, and the rounds of each fight won so far. */
+function parseAttempt(value: unknown, path: string, roster: readonly string[]): RiftAttempt {
+  const a = object(value, path, ['parties', 'rounds'])
+  const parties = list(a.parties, `${path}.parties`, CONVERGENCE_FIGHTS, CONVERGENCE_FIGHTS).map((raw, i) => {
+    const party = ids(raw, `${path}.parties.${i}`, PARTY_SIZE)
+    if (party.length !== PARTY_SIZE) throw new SaveParseError(`${path}.parties.${i}`, `expected ${PARTY_SIZE} outfit ids`)
+    return [...party]
+  })
+  const all = parties.flat()
+  if (new Set(all).size !== all.length) throw new SaveParseError(`${path}.parties`, 'an Uma in two parties')
+  const off = all.find((id) => !roster.includes(id))
+  if (off !== undefined) throw new SaveParseError(`${path}.parties`, `outfit ${off} isn't on the run's roster`)
+  const rounds = list(a.rounds, `${path}.rounds`, 0, CONVERGENCE_FIGHTS - 1).map((raw, i) => {
+    const n = count(raw, `${path}.rounds.${i}`)
+    if (n < 1 || n > BATTLE_MAX_ROUNDS) throw new SaveParseError(`${path}.rounds.${i}`, `expected 1–${BATTLE_MAX_ROUNDS}`)
+    return n
+  })
+  return { parties, rounds }
+}
+
+/** A run's traces by front (§7): distinct, in `RIFT_TRACES` order, and only on a front with a stage cleared. */
+function parseTraces(value: unknown, path: string, fronts: Record<RiftFront, number>): RiftRun['traces'] {
+  const traces: RiftRun['traces'] = {}
+  for (const [front, raw] of Object.entries(object(value, path, RIFT_FRONTS))) {
+    const at = `${path}.${front}`
+    if (!Array.isArray(raw) || raw.some((t) => !RIFT_TRACES.includes(t as RiftTrace))) throw new SaveParseError(at, `expected a list of ${RIFT_TRACES.join(', ')}`)
+    const order = raw.map((t) => RIFT_TRACES.indexOf(t as RiftTrace))
+    if (order.some((n, i) => i > 0 && n <= order[i - 1]!)) throw new SaveParseError(at, `expected distinct traces in the order ${RIFT_TRACES.join(', ')}`)
+    if (fronts[front as RiftFront] < 1) throw new SaveParseError(at, 'no stage of this front is cleared')
+    traces[front as RiftFront] = [...raw] as RiftTrace[]
+  }
+  return traces
+}
+
 function parseRiftRun(value: unknown, path: string, id: string): RiftRun {
-  const r = object(value, path, ['id', 'roster', 'startedAt', 'fronts', 'convergence', 'wonAt', 'ascendedAt'])
+  const r = object(value, path, ['id', 'roster', 'startedAt', 'fronts', 'convergence', 'traces', 'wonAt', 'ascendedAt'])
   if (r.id !== id) throw new SaveParseError(`${path}.id`, `expected ${id}`)
   const roster = ids(r.roster, `${path}.roster`, RIFT_ROSTER)
   if (roster.length !== RIFT_ROSTER) throw new SaveParseError(`${path}.roster`, `expected ${RIFT_ROSTER} outfit ids`)
@@ -780,7 +834,8 @@ function parseRiftRun(value: unknown, path: string, id: string): RiftRun {
     if (cleared > RIFT_STAGES) throw new SaveParseError(`${path}.fronts.${front}`, `expected 0–${RIFT_STAGES}`)
     fronts[front] = cleared
   }
-  const attempts = count(object(r.convergence, `${path}.convergence`, ['attempts']).attempts, `${path}.convergence.attempts`)
+  const c = object(r.convergence, `${path}.convergence`, ['attempts', 'open'])
+  const attempts = count(c.attempts, `${path}.convergence.attempts`)
   const wonAt = r.wonAt === null ? null : timestamp(r.wonAt, `${path}.wonAt`)
   if (wonAt !== null) {
     if (RIFT_FRONTS.some((front) => fronts[front] < RIFT_STAGES)) throw new SaveParseError(`${path}.wonAt`, 'every front must be sealed first')
@@ -792,7 +847,15 @@ function parseRiftRun(value: unknown, path: string, id: string): RiftRun {
     if (wonAt === null) throw new SaveParseError(`${path}.ascendedAt`, 'the run must be won first')
     if (before(ascendedAt, wonAt)) throw new SaveParseError(`${path}.ascendedAt`, 'before the run was won')
   }
-  return { id, roster: [...roster], startedAt, fronts, convergence: { attempts }, wonAt, ascendedAt }
+  // An attempt opens once every front is sealed, is counted when it starts, and closes when it's lost or wins the run.
+  const open = c.open === null ? null : parseAttempt(c.open, `${path}.convergence.open`, roster)
+  if (open) {
+    if (RIFT_FRONTS.some((front) => fronts[front] < RIFT_STAGES)) throw new SaveParseError(`${path}.convergence.open`, 'every front must be sealed first')
+    if (attempts < 1) throw new SaveParseError(`${path}.convergence.open`, 'expected the attempt counted in attempts')
+    if (wonAt !== null) throw new SaveParseError(`${path}.convergence.open`, 'the run is already won')
+  }
+  const traces = parseTraces(r.traces, `${path}.traces`, fronts)
+  return { id, roster: [...roster], startedAt, fronts, convergence: { attempts, open }, traces, wonAt, ascendedAt }
 }
 
 function parseEchoes(value: unknown, path: string): RiftState['echoes'] {
@@ -805,10 +868,81 @@ function parseEchoes(value: unknown, path: string): RiftState['echoes'] {
   return echoes
 }
 
+const REF_KEYS: Record<RiftFightRef['kind'], readonly string[]> = {
+  front: ['kind', 'front', 'stage'], convergence: ['kind', 'fight'], echo: ['kind', 'front', 'level'],
+}
+
+/** Which Rift fight: exactly one of the three shapes. */
+function parseRiftRef(value: unknown, path: string): RiftFightRef {
+  const kind = (value as { kind?: unknown } | null)?.kind
+  if (typeof kind !== 'string' || !(kind in REF_KEYS)) {
+    object(value, path, ['kind', 'front', 'stage', 'fight', 'level'])
+    throw new SaveParseError(`${path}.kind`, 'expected front, convergence or echo')
+  }
+  const r = object(value, path, REF_KEYS[kind as RiftFightRef['kind']])
+  const front = (): RiftFront => {
+    if (!RIFT_FRONTS.includes(r.front as RiftFront)) throw new SaveParseError(`${path}.front`, `expected ${RIFT_FRONTS.join(', ')}`)
+    return r.front as RiftFront
+  }
+  if (kind === 'front') {
+    const f = front(), stage = count(r.stage, `${path}.stage`)
+    if (stage < 1 || stage > RIFT_STAGES) throw new SaveParseError(`${path}.stage`, `expected 1–${RIFT_STAGES}`)
+    return { kind, front: f, stage }
+  }
+  if (kind === 'convergence') {
+    const fight = count(r.fight, `${path}.fight`)
+    if (fight >= CONVERGENCE_FIGHTS) throw new SaveParseError(`${path}.fight`, `expected 0–${CONVERGENCE_FIGHTS - 1}`)
+    return { kind, fight }
+  }
+  const f = front()
+  if (!ECHO_LEVELS.includes(r.level as EchoLevel)) throw new SaveParseError(`${path}.level`, `expected ${ECHO_LEVELS.join(', ')}`)
+  return { kind: 'echo', front: f, level: r.level as EchoLevel }
+}
+
+/** The open Rift fight (D52): `rift:t<tier>:<n>` with n up to the world's count, and a fight that replays cleanly. */
+function parseRiftBattle(value: unknown, path: string, tier: number, battles: number, check: CheckBattle): RiftBattle {
+  const b = object(value, path, ['battleId', 'ref', 'startedAt', 'input', 'actions'])
+  const m = typeof b.battleId === 'string' ? RIFT_BATTLE_ID.exec(b.battleId) : null
+  if (!m || Number(m[1]) !== tier || Number(m[2]) > battles) throw new SaveParseError(`${path}.battleId`, `expected rift:t${tier}:<n>, n from 1 to ${battles}`)
+  const ref = parseRiftRef(b.ref, `${path}.ref`)
+  const actions = parseActions(b.actions, `${path}.actions`)
+  check(b.input as BattleInput, actions, path)
+  return { battleId: b.battleId as string, ref, startedAt: timestamp(b.startedAt, `${path}.startedAt`), input: b.input as BattleInput, actions }
+}
+
+/** Who fights the open Rift fight: Umas owned here; for a front, its next stage on the open run, by that run's roster;
+ * for the Convergence, the open attempt's next fight, by that fight's party. Ally ids are read defensively: in the
+ * browser, the replay that validates the input runs after this (`parseSaveAsync`). */
+function checkRiftFight(battle: RiftBattle, path: string, runs: readonly RiftRun[], umas: Record<string, OwnedUma>): void {
+  const raw = (battle.input as { allies?: unknown } | null)?.allies
+  const allies = (Array.isArray(raw) ? raw : []).map((a: unknown) => (a as { id?: unknown } | null)?.id)
+  allies.forEach((id, i) => {
+    if (typeof id !== 'string' || !umas[id]) throw new SaveParseError(`${path}.input.allies.${i}`, `outfit ${String(id)} isn't owned in this world`)
+  })
+  const { ref } = battle
+  if (ref.kind === 'echo') return
+  const last = runs.at(-1)
+  const run = last && last.wonAt === null ? last : undefined
+  if (!run) throw new SaveParseError(`${path}.ref`, 'no open run')
+  if (ref.kind === 'front') {
+    const cleared = run.fronts[ref.front]
+    if (ref.stage !== cleared + 1) throw new SaveParseError(`${path}.ref.stage`, cleared === RIFT_STAGES ? `${ref.front} is sealed` : `expected stage ${cleared + 1} of ${ref.front}`)
+    const off = allies.findIndex((id) => !run.roster.includes(id as string))
+    if (off >= 0) throw new SaveParseError(`${path}.input.allies.${off}`, `outfit ${String(allies[off])} isn't on run ${run.id}'s roster`)
+    return
+  }
+  const attempt = run.convergence.open
+  if (!attempt) throw new SaveParseError(`${path}.ref`, 'no open Convergence attempt')
+  if (ref.fight !== attempt.rounds.length) throw new SaveParseError(`${path}.ref.fight`, `expected fight ${attempt.rounds.length}`)
+  const party = attempt.parties[ref.fight]!
+  if (allies.length !== party.length || party.some((id) => !allies.includes(id))) throw new SaveParseError(`${path}.input.allies`, `expected the attempt's party ${ref.fight}`)
+}
+
 /** A tier's Rift (D161): its runs in order, `t<tier>-r<n>`. Only the last may be open (not ascended): a tier runs one Rift
- * at a time, and a won run waits for Ascend (R7, R9). An open run's roster is owned here; an ascended one's moved up. */
-function parseRift(value: unknown, path: string, tier: number, umas: Record<string, OwnedUma>): RiftState {
-  const r = object(value, path, ['runs', 'echoes'])
+ * at a time, and a won run waits for Ascend (R7, R9). An open run's roster is owned here; an ascended one's moved up.
+ * At most one Rift fight is open, and `battles` counts every one started (D171). */
+function parseRift(value: unknown, path: string, tier: number, umas: Record<string, OwnedUma>, check: CheckBattle): RiftState {
+  const r = object(value, path, ['runs', 'echoes', 'battle', 'battles'])
   const runs = list(r.runs, `${path}.runs`, 0, MAX_RIFT_RUNS).map((run, i) => parseRiftRun(run, `${path}.runs.${i}`, riftRunId(tier, i + 1)))
   runs.forEach((run, i) => {
     if (run.ascendedAt !== null) return
@@ -816,7 +950,24 @@ function parseRift(value: unknown, path: string, tier: number, umas: Record<stri
     const stray = run.roster.find((id) => !umas[id])
     if (stray) throw new SaveParseError(`${path}.runs.${i}.roster`, `outfit ${stray} isn't owned in this world`)
   })
-  return { runs, echoes: parseEchoes(r.echoes, `${path}.echoes`) }
+  const echoes = parseEchoes(r.echoes, `${path}.echoes`)
+  const battles = count(r.battles, `${path}.battles`)
+  const battle = r.battle === null ? null : parseRiftBattle(r.battle, `${path}.battle`, tier, battles, check)
+  if (battle) checkRiftFight(battle, `${path}.battle`, runs, umas)
+  return { runs, echoes, battle, battles }
+}
+
+/** The account's defeated faces (D171): a cast id → when this account first defeated her in a Rift fight. */
+function parseDefeated(value: unknown, path: string): Record<string, string> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const entries = Object.entries(value)
+  if (entries.length > MAX_DEFEATED) throw new SaveParseError(path, `expected at most ${MAX_DEFEATED}`)
+  const out: Record<string, string> = {}
+  for (const [id, at] of entries) {
+    if (!CAST_ID.test(id)) throw new SaveParseError(`${path}.${id}`, 'not a cast id')
+    out[id] = timestamp(at, `${path}.${id}`)
+  }
+  return out
 }
 
 function runId(value: unknown, path: string): string {
@@ -832,7 +983,8 @@ function riftRunOf(worlds: Record<string, TierWorld>, id: string): { tier: numbe
   return run ? { tier: Number(m[1]), run } : undefined
 }
 
-/** The account's achievements (D161), by kebab-case id. Whether each run exists is checked once every world is parsed. */
+/** The account's achievements (D161), by kebab-case id from the catalog (`ACHIEVEMENT_IDS`, D171). Whether each run
+ * exists is checked once every world is parsed. */
 function parseAchievements(value: unknown, path: string): Record<string, Achievement> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const entries = Object.entries(value)
@@ -841,6 +993,7 @@ function parseAchievements(value: unknown, path: string): Record<string, Achieve
   for (const [id, raw] of entries) {
     const at = `${path}.${id}`
     if (id.length > ACHIEVEMENT_ID_MAX || !ACHIEVEMENT_ID.test(id)) throw new SaveParseError(at, `achievement ids are kebab-case, 1–${ACHIEVEMENT_ID_MAX} characters`)
+    if (!isAchievementId(id)) throw new SaveParseError(at, 'not in the achievement catalog')
     const a = object(raw, at, ['at', 'run'])
     out[id] = { at: timestamp(a.at, `${at}.at`), run: a.run === null ? null : runId(a.run, `${at}.run`) }
   }
@@ -909,9 +1062,10 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v23 save and always returns v23. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+/** Parses a v1–v24 save and always returns v24. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
  * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
- * tier history and Rift (D163) and anything older than v10 starts over (D69). */
+ * tier history and Rift (D163), v23 gains no defeated faces, no open Rift fight, and empty traces and Convergence attempts
+ * (D171) and anything older than v10 starts over (D69). */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }
@@ -936,16 +1090,18 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
   if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > SAVE_SCHEMA_VERSION) {
     throw new SaveParseError(`${path}.schemaVersion`, `expected 1–${SAVE_SCHEMA_VERSION}`)
   }
-  // Before v23 the account held only its name and times: it gains empty achievements and history (D163). The account has
-  // no migration chain, so this step lives here and migrations.ts stays world-only.
-  const rawAccount = version < 23 && typeof o.account === 'object' && o.account !== null && !Array.isArray(o.account)
-    ? { ...o.account, achievements: {}, history: {} } : o.account
-  const a = object(rawAccount, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history'])
+  // Before v23 the account held only its name and times: it gains empty achievements and history (D163); before v24 it
+  // gains no defeated faces (D171). The account has no migration chain, so these steps live here and migrations.ts stays
+  // world-only. Like the world steps, they overwrite.
+  const rawAccount = version < 24 && typeof o.account === 'object' && o.account !== null && !Array.isArray(o.account)
+    ? { ...o.account, ...(version < 23 ? { achievements: {}, history: {} } : {}), defeated: {} } : o.account
+  const a = object(rawAccount, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated'])
   const trainerName = typeof a.trainerName === 'string' ? normalizeTrainerName(a.trainerName) : null
   if (!trainerName || trainerName !== a.trainerName) throw new SaveParseError(`${path}.account.trainerName`, `must be 1–${TRAINER_NAME_MAX} trimmed characters`)
   const account: Account = {
     trainerName, createdAt: timestamp(a.createdAt, `${path}.account.createdAt`), updatedAt: timestamp(a.updatedAt, `${path}.account.updatedAt`),
     achievements: parseAchievements(a.achievements, `${path}.account.achievements`), history: parseHistory(a.history, `${path}.account.history`),
+    defeated: parseDefeated(a.defeated, `${path}.account.defeated`),
   }
   const worlds = object(o.tierWorlds, `${path}.tierWorlds`, Object.keys((o.tierWorlds as Obj | null) ?? {}))
   const tierWorlds: Record<string, TierWorld> = {}
