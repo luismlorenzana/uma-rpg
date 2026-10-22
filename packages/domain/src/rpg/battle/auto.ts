@@ -30,11 +30,13 @@ function wardedShare(def: RpgSkillDef, channel: BattleChannel): number {
   return all > 0 ? warded / all : 0
 }
 /** v12 (D141): what a skill's support is worth beside its hits. A support that restores or shields its whole share is
- * worth 1.5 casts of its depth's damage, so a Cleric or Summoner mends the hurt and shields the threatened. */
+ * worth 1.5 casts of its depth's damage, so a Cleric or Summoner mends the hurt and shields the threatened. From v15 the
+ * healers' `support15` (classes v2 §3.3), its Barrier on every Uma, Aegis and Regen valued by `battleSupportValue`. */
 function supportScore(state: BattleState, actorId: string, def: RpgSkillDef, depth: number): number {
-  const value = battleSupportValue(state, actorId, def.support)
-  if (!value || !def.support) return 0
-  const full = def.support.share > 0 ? def.support.share : 0.2
+  const sup = state.engineVersion >= 15 ? def.support15 : def.support
+  const value = battleSupportValue(state, actorId, sup)
+  if (!value || !sup) return 0
+  const full = sup.share > 0 ? sup.share : 0.2
   return (value / full) * 1.5 * RPG_SKILL_POWER[Math.max(0, Math.min(4, depth - 1))]!
 }
 

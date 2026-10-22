@@ -18,8 +18,8 @@ import {
 } from '../rules'
 import {
   BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BREATHER, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT, BATTLE_COVER_CAP,
-  BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_HEAL_SCALE, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
-  BATTLE_RALLY_SHARE, BATTLE_REVIVE_SHARE,
+  BATTLE_COVER_CAP_V15, BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE, BATTLE_MAX_ROUNDS,
+  BATTLE_MIN_OFFENSE_SHARE, BATTLE_RALLY_SHARE, BATTLE_REGEN_ROUNDS, BATTLE_REGEN_SHARE, BATTLE_REVIVE_SHARE,
   BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
   BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
 } from './skills'
@@ -197,7 +197,8 @@ function validateInput(input: BattleInput): void {
 function clone(s: BattleState): BattleState {
   return { ...s, units: s.units.map((u) => ({ ...u, statuses: u.statuses.map((x) => ({ ...x })),
     ...(u.rally ? { rally: { ...u.rally } } : {}), ...(u.charging ? { charging: { ...u.charging, locks: [...u.charging.locks] } } : {}) })),
-    acted: [...s.acted], summons: s.summons.map((x) => ({ ...x, ref: { ...x.ref } })), intents: s.intents.map((i) => ({ ...i })) }
+    acted: [...s.acted], summons: s.summons.map((x) => ({ ...x, ref: { ...x.ref } })), intents: s.intents.map((i) => ({ ...i })),
+    ...(s.regens ? { regens: s.regens.map((r) => ({ ...r })) } : {}) }
 }
 const movesOf = (s: BattleState, u: BattleUnit): BattleEnemyMove[] => {
   const e = enemyOf(s, u.id)!
@@ -299,8 +300,9 @@ export function battleHitIsWeak(enemy: BattleEnemy, foe: BattleUnit | null, kind
     (!!foe && stacks(foe, 'hex') > 0 && (kind === 'light' || kind === 'dark'))
 }
 
-/** `orbs`: the attacker's Orb kinds, which make a hit weak too (D86, D124), with no damage of their own. */
-interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[] }
+/** `orbs`: the attacker's Orb kinds, which make a hit weak too (D86, D124), with no damage of their own. `best` (v15, C3):
+ * a Learner's inherited Limit Break hits with the higher of her ATK and M.ATK; its kinds still pick Might and weaknesses. */
+interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[]; best?: boolean }
 /** One part's final amount; shared by live play, previews and the simulator. `warded`: the foe's ward cut it (v14). */
 export function battleDamage(s: BattleState, attacker: BattleUnit, defender: BattleUnit, channel: BattleChannel,
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean; warded: boolean } {
@@ -311,7 +313,7 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   const ratio = s.engineVersion >= 12
   const percent = s.engineVersion === 12
   const might = attacker.side === 'ally' && kind !== null ? allyOf(s, attacker.id)?.might?.[kind] ?? 0 : 0
-  const offense = (channel === 'physical' ? atk.atk : atk.matk) + (percent ? 0 : might)
+  const offense = (options.best ? Math.max(atk.atk, atk.matk) : channel === 'physical' ? atk.atk : atk.matk) + (percent ? 0 : might)
   const defense = channel === 'physical' ? def.pdef : def.mdef
   // From v12: offense² ÷ (offense + defense), so the same ratio gives the same share at every level and never zero.
   let amount = ratio ? (offense > 0 ? (offense * offense) / (offense + defense) : 0) * power * (percent ? 1 + might / 100 : 1)
@@ -355,10 +357,17 @@ export function battleIntentDamage(s: BattleState, intent: BattleIntent): { targ
   return targets.map((t) => ({ targetId: t.id, amount: battleDamage(s, actor, t, move.channel, (move.power * share) / 100, move.element, { area: move.target === 'all' }).amount }))
 }
 
-// --- v12 support (D141): mends, Barriers, revives, Rally, locks ------------------------------------------------------
+// --- v12 support (D141): mends, Barriers, revives, Rally, locks; v15's one healer (classes v2 §3.3, §4) ---------------
 
-/** Her Heal raises what her mends and Barriers give: ×(1 + Heal ÷ 300). Heal comes from Guts (`dexterity`). */
-const healOf = (s: BattleState, actorId: string): number => 1 + (allyOf(s, actorId)?.stats.dexterity ?? 0) / BATTLE_HEAL_SCALE
+/** What raises her mends, Barriers and revives: to v14 her Heal, ×(1 + Heal ÷ 300), Heal from Guts (`dexterity`). From
+ * v15 (§3.3) her offense instead, ×(1 + it ÷ 300): the Paladin's ATK, the Cleric's M.ATK, anyone else's higher of the two
+ * (a hall's healing Limit Break). Her fight stats hold her base, Extra Stats and armor; weapon Might is apart. */
+function healOf(s: BattleState, actorId: string): number {
+  const a = allyOf(s, actorId)
+  if (s.engineVersion < 15) return 1 + (a?.stats.dexterity ?? 0) / BATTLE_HEAL_SCALE
+  const offense = !a ? 0 : a.classId === 'paladin' ? a.stats.atk : a.classId === 'cleric' ? a.stats.matk : Math.max(a.stats.atk, a.stats.matk)
+  return 1 + offense / BATTLE_HEAL_OFFENSE_SCALE
+}
 /** The Uma who most needs a mend: the lowest share of HP among the living. */
 const mostHurt = (s: BattleState): BattleUnit | undefined => [...living(s, 'ally')].sort(byHpShare(s))[0]
 /** What the shown moves would deal her this round, less the Barrier she has. */
@@ -377,30 +386,48 @@ function mostThreatened(s: BattleState): BattleUnit | undefined {
     .sort((a, b) => b.t - a.t || byHpShare(s)(a.u, b.u))
   return scored[0]?.u ?? mostHurt(s)
 }
+type Reach = NonNullable<RpgSupport['mend'] | RpgSupport['shield']>
+/** The Umas a mend or Barrier reaches: every Uma standing, the most hurt, or the one the shown moves threaten most. */
+function reach(s: BattleState, how: Reach): BattleUnit[] {
+  if (how === 'all') return living(s, 'ally')
+  const u = how === 'hurt' ? mostHurt(s) : mostThreatened(s)
+  return u ? [u] : []
+}
+/** One Uma's mend or Barrier: `share` of her max HP × `boost`, and ×0.4 when it reaches every Uma. */
+const portion = (s: BattleState, u: BattleUnit, how: Reach, share: number, boost: number): number =>
+  maxHp(s, u.id) * share * boost * (how === 'all' ? RPG_SUPPORT_ALL : 1)
 function heal(s: BattleState, actorId: string, target: BattleUnit, amount: number, cues: BattleCue[], label?: string): void {
   const healed = Math.min(Math.round(amount), maxHp(s, target.id) - target.hp)
   if (healed <= 0 || target.hp <= 0) return
   target.hp += healed
   cues.push({ kind: 'heal', actorId, targetId: target.id, amount: healed, ...(label ? { label } : {}) })
 }
-/** A skill's Barrier: it absorbs any damage first, up to 40% of her max HP, until the end of the round. */
+/** A skill's Barrier: it absorbs any damage first, up to 40% of her max HP (60% from v15, C8), until the end of the round. */
 function cover(s: BattleState, actorId: string, target: BattleUnit, amount: number, cues: BattleCue[]): void {
   const now = target.cover ?? 0
-  const next = Math.min(Math.round(maxHp(s, target.id) * BATTLE_COVER_CAP), now + Math.round(amount))
+  const next = Math.min(Math.round(maxHp(s, target.id) * (s.engineVersion >= 15 ? BATTLE_COVER_CAP_V15 : BATTLE_COVER_CAP)), now + Math.round(amount))
   if (next > now) { target.cover = next; cues.push({ kind: 'cover', actorId, targetId: target.id, amount: next }) }
 }
 const FOE_AILMENTS: readonly RpgStatusKind[] = ['burn', 'mark', 'weaken', 'slow']
-/** A skill's support after its hits (D141). `linger` < 1 is a lingering summon (at a round's end, or its farewell
- * strike): it only mends, shields and drains, at that share. `dealt` is what the skill's hits took off foes. */
-function support(s: BattleState, actor: BattleUnit, sup: RpgSupport, dealt: number, cues: BattleCue[], linger = 1): void {
-  const boost = healOf(s, actor.id) * linger
-  const each = (u: BattleUnit) => maxHp(s, u.id) * sup.share * boost
-  if (sup.mend === 'all') for (const u of living(s, 'ally')) heal(s, actor.id, u, each(u) * RPG_SUPPORT_ALL, cues)
-  else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) heal(s, actor.id, u, each(u), cues) }
-  if (sup.shield === 'all') for (const u of living(s, 'ally')) cover(s, actor.id, u, each(u) * RPG_SUPPORT_ALL, cues)
-  else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) cover(s, actor.id, u, each(u), cues) }
+const bless = (s: BattleState, actor: BattleUnit, u: BattleUnit, status: 'aegis', stacks: number, cues: BattleCue[]): void => {
+  addStatus(u, status, stacks)
+  cues.push({ kind: 'status', actorId: actor.id, targetId: u.id, label: status, amount: stacks })
+}
+/** A skill's support after its hits (D141). To v14 a `scale` under 1 is a lingering summon (at a round's end, or its
+ * farewell strike): it only mends, shields and drains, at that share. From v15 it is a Limit Break's strength (a Learner's
+ * capacity), which scales the shares alone: its cleanse and revive still land. `dealt` is what the skill's hits took off foes. */
+function support(s: BattleState, actor: BattleUnit, sup: RpgSupport, dealt: number, cues: BattleCue[], scale = 1): void {
+  const boost = healOf(s, actor.id) * scale
+  if (sup.mend) for (const u of reach(s, sup.mend)) heal(s, actor.id, u, portion(s, u, sup.mend, sup.share, boost), cues)
+  if (sup.shield) {
+    for (const u of reach(s, sup.shield)) {
+      cover(s, actor.id, u, portion(s, u, sup.shield, sup.shieldShare ?? sup.share, boost), cues)
+      // v15: the Paladin's Greatsword blows give Aegis to each Uma their Barrier reaches.
+      if (sup.aegis) bless(s, actor, u, 'aegis', sup.aegis, cues)
+    }
+  }
   if (sup.drain && dealt > 0) { const u = mostHurt(s); if (u) heal(s, actor.id, u, dealt * sup.drain, cues, 'Drain') }
-  if (linger < 1) return
+  if (scale < 1 && s.engineVersion < 15) return
   if (sup.cleanse) {
     for (const u of living(s, 'ally')) {
       const ailment = FOE_AILMENTS.find((k) => stacks(u, k) > 0)
@@ -420,12 +447,22 @@ function support(s: BattleState, actor: BattleUnit, sup: RpgSupport, dealt: numb
       cues.push({ kind: 'heal', actorId: actor.id, targetId: fallen.id, amount: fallen.hp, label: 'Revived' })
     }
   }
-  if (sup.bless) {
-    for (const u of living(s, 'ally')) {
-      addStatus(u, sup.bless.status, sup.bless.stacks)
-      cues.push({ kind: 'status', actorId: actor.id, targetId: u.id, label: sup.bless.status, amount: sup.bless.stacks })
-    }
+  if (sup.bless) for (const u of living(s, 'ally')) bless(s, actor, u, sup.bless.status, sup.bless.stacks, cues)
+  // v15: a Cleric's Light spell leaves Regen, replacing her last (§4).
+  if (sup.regen && sup.mend) {
+    s.regens = [...(s.regens ?? []).filter((r) => r.allyId !== actor.id),
+      { allyId: actor.id, mend: sup.mend, share: sup.share * scale * BATTLE_REGEN_SHARE, rounds: BATTLE_REGEN_ROUNDS }]
   }
+}
+/** v15 (§4): at a round's end each Regen mends again, at its Cleric's scaling, for its round ends left; it ends if she has
+ * fallen. Foes strike only between the Umas' turns and a round's end, so a fallen Cleric's Regen never outlives her. */
+function regenerate(s: BattleState, cues: BattleCue[]): void {
+  s.regens &&= s.regens.filter((r) => {
+    if (!(unit(s, r.allyId)!.hp > 0)) return false
+    const boost = healOf(s, r.allyId)
+    for (const u of reach(s, r.mend)) heal(s, r.allyId, u, portion(s, u, r.mend, r.share, boost), cues, 'Regen')
+    return --r.rounds > 0
+  })
 }
 /** What a support would do now, in shares of max HP restored or shielded across the party, plus 1 for a revive and 0.3
  * for a status: for Auto and the simulator (D141). It follows the same targets the support would take. */
@@ -439,11 +476,14 @@ export function battleSupportValue(s: BattleState, actorId: string, sup: RpgSupp
   let value = 0
   if (sup.mend === 'all') for (const u of living(s, 'ally')) value += Math.min(missing(u), sup.share * boost * RPG_SUPPORT_ALL)
   else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) value += Math.min(missing(u), sup.share * boost) }
-  if (sup.shield === 'all') for (const u of living(s, 'ally')) value += Math.min(threat(u), sup.share * boost * RPG_SUPPORT_ALL)
-  else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) value += Math.min(threat(u), sup.share * boost) }
+  // v15: Regen repeats that mend twice at 0.3, valued at half weight, since the hurt may not need it.
+  if (sup.regen) value *= 1 + BATTLE_REGEN_SHARE * BATTLE_REGEN_ROUNDS / 2
+  const shield = sup.shieldShare ?? sup.share
+  if (sup.shield === 'all') for (const u of living(s, 'ally')) value += Math.min(threat(u), shield * boost * RPG_SUPPORT_ALL)
+  else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) value += Math.min(threat(u), shield * boost) }
   if (sup.revive && s.units.some((u) => u.side === 'ally' && u.hp <= 0 && !u.revived)) value += 1
   if (sup.cleanse && living(s, 'ally').some((u) => FOE_AILMENTS.some((k) => stacks(u, k) > 0))) value += 0.1
-  if (sup.bless || sup.curse) value += 0.05
+  if (sup.bless || sup.curse || sup.aegis) value += 0.05
   return value
 }
 /** v12: a foe Broken or defeated gives back every Rally she left (D141). */
@@ -562,12 +602,13 @@ function drain(s: BattleState, actor: BattleUnit, channel: BattleChannel, amount
 }
 
 /** Damage from a foe to an ally: a Barrier absorbs first (v11: a Barrier physical damage, a Veil magical damage), and a
- * Thorn Talisman or a Mirror Amulet returns a share of it to the foe (D124). */
+ * Thorn Talisman or a Mirror Amulet returns a share of it to the foe (D124): of what she took, and from v15 (§6.3) a
+ * guard's of the whole hit she intercepted, before her guard halved it. */
 function harm(s: BattleState, actor: BattleUnit, target: BattleUnit, move: BattleEnemyMove, cues: BattleCue[], intercept: boolean): void {
   const receiver = intercept ? guardOf(s, target) : target
   const result = battleDamage(s, actor, receiver, move.channel, move.power / 100, move.element, { area: move.target === 'all' })
   let amount = receiver !== target ? Math.max(1, Math.round(result.amount * BATTLE_GUARD_FACTOR)) : result.amount
-  const taken = amount
+  const taken = s.engineVersion >= 15 ? result.amount : amount
   const v11 = s.input.version >= 11
   // v12 (D141): a skill's Barrier absorbs any damage first.
   const covered = Math.min(receiver.cover ?? 0, amount)
@@ -732,10 +773,11 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (mp > 0) { u.mp += mp; cues.push({ kind: 'mp', actorId: u.id, targetId: u.id, amount: mp }) }
   }
   if (s.engineVersion >= 12) {
-    // A skill's Barrier lasts the round it was raised in, against the moves shown (D141); then a lingering summon that
-    // mends mends again, at its linger share.
+    // A skill's Barrier lasts the round it was raised in, against the moves shown (D141); then to v14 a lingering summon
+    // that mends mends again, at its linger share, and from v15 each Cleric's Regen does instead (§4).
     for (const u of living(s, 'ally')) if (u.cover) u.cover = 0
-    for (const summon of s.summons) {
+    if (s.engineVersion >= 15) regenerate(s, cues)
+    else for (const summon of s.summons) {
       const owner = unit(s, summon.allyId)
       const sup = rpgNode(summon.ref.id)?.skill.support
       if (owner && owner.hp > 0 && sup?.mend) support(s, owner, { share: sup.share, mend: sup.mend }, 0, cues, summon.scale)
@@ -785,11 +827,11 @@ function randomFoe(s: BattleState, actorId: string, hit: number, salt = 'random'
 
 interface CastLog { tapped: BattleUnit; struck: BattleUnit[]; hitFoes: BattleUnit[]; weak: boolean }
 
-/** Resolves a skill's hits, extras, riders and status. */
+/** Resolves a skill's hits, extras, riders and status, then its support at `supportScale`. `best`: C3's higher offense. */
 function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSkillDef, scale: number, cues: BattleCue[], salt = 'random',
-  orbs?: readonly RpgDamageKind[], supportScale = 1): CastLog {
+  orbs?: readonly RpgDamageKind[], supportScale = 1, best = false): CastLog {
   const log: CastLog = { tapped, struck: [], hitFoes: [], weak: false }
-  const options: HitOptions = { special: def.special, orbs }
+  const options: HitOptions = { special: def.special, orbs, best }
   const from = cues.length
   const note = (foe: BattleUnit, _hit: RpgHit, weak: boolean) => {
     if (!log.struck.includes(foe)) log.struck.push(foe)
@@ -831,18 +873,23 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
       cues.push({ kind: 'status', actorId: actor.id, targetId: foe.id, label: def.rider.status })
     }
   }
-  if (def.allies) for (const friend of living(s, 'ally')) addBarrier(s, friend, maxHp(s, friend.id) * BATTLE_BARRIER_PERCENT * def.allies.stacks, actor.id, cues)
+  // From v15 the Summoner has no support (§3.2): her Light capstone raises no Barrier.
+  if (def.allies && s.engineVersion < 15) {
+    for (const friend of living(s, 'ally')) addBarrier(s, friend, maxHp(s, friend.id) * BATTLE_BARRIER_PERCENT * def.allies.stacks, actor.id, cues)
+  }
   if (def.status) applyStatus(s, actor, def.status, log, cues)
-  if (def.support && s.engineVersion >= 12 && actor.side === 'ally') {
+  // The generation's support: v12–v14's `support`, or from v15 the healers' `support15` (§3.3).
+  const sup = s.engineVersion >= 15 ? def.support15 : def.support
+  if (sup && s.engineVersion >= 12 && actor.side === 'ally') {
     // v12 (D141): her support after the hits. A curse lands on every foe struck; a drain heals from what the hits dealt.
-    const curse = def.support.curse
+    const curse = sup.curse
     if (curse) for (const foe of log.struck) if (foe.hp > 0) {
       addStatus(foe, curse.status, curse.stacks)
       cues.push({ kind: 'status', actorId: actor.id, targetId: foe.id, label: curse.status, amount: curse.stacks })
     }
     const dealt = cues.slice(from).reduce((n, c) => n + (c.kind === 'hit' && c.actorId === actor.id && c.targetId !== actor.id &&
       unit(s, c.targetId)?.side === 'enemy' ? c.amount : 0), 0)
-    support(s, actor, def.support, dealt, cues, supportScale)
+    support(s, actor, sup, dealt, cues, supportScale)
   }
   return log
 }
@@ -938,7 +985,9 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     plan.casts.forEach((c, i) => {
       const foes = living(s, 'enemy')
       if (!foes.length || actor.hp <= 0) return
-      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random', orbsOf(ally))
+      // Its support works at its strength (only v15's halls have any), and from v15 a Learner's hits at her higher offense (C3).
+      cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, c.def, c.scale, cues, i ? `limit${i}` : 'random', orbsOf(ally),
+        c.scale, s.engineVersion >= 15 && !!plan.from)
     })
     if (plan.linger) stay(s, actor.id, plan.linger.ref, plan.linger.scale)
   } else {

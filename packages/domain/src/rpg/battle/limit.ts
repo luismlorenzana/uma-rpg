@@ -30,7 +30,7 @@ const round = (n: number) => Math.round(n * 1000) / 1000
 const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
 
 /** A hero Limit Break at `capacity` of her class's Limit Break power (D106, D107), both by the fight's generation (D179);
- * null for a seat whose generation has no Limit Break yet. */
+ * null for a seat its generation lacks. A Learner's names its Hero (`from`): from v15 it hits with her higher offense (C3). */
 function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: number, version: number, from?: string): BattleLimitPlan | null {
   const limit = heroLimitFor(id, version)
   if (!limit) return null

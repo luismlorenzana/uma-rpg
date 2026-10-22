@@ -1,28 +1,39 @@
 // Halls of Heroes (D106, D107): each class's hall seats four Heroes, and each seat teaches one unique Limit Break. A Hero
 // always uses her seat's Limit Break at full strength; a Learner under her inherits it at half, plus 5% a Bond Level, and
-// keeps its shape: its weapons and elements (worn or not), its hits and its statuses.
-import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, type RpgSkillDef } from './catalog'
+// keeps its shape: its weapons and elements (worn or not), its hits and its statuses. Classes v2 (engine v15, §5) adds the
+// Paladin Bastion: 24 Limit Breaks, read by generation like every class rule (D179).
+import { rpgV2 } from './battle/caps'
+import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, type RpgSkillDef, type RpgSupport } from './catalog'
 import type { RpgClass, RpgDamageKind } from './kinds'
 import type { HeroLimitId } from './hero-id'
 export * from './hero-id'
 
 /**
  * Her Limit Break's power in single-target casts at her depth, by the class she fights as: what her class's own Limit
- * Break deals (D311, D86). A Hero's Limit Break at 100% matches it; at Bond 0 it is half, about one turn's damage.
+ * Break deals (D311, D86). A Hero's Limit Break at 100% matches it; at Bond 0 it is half, about one turn's damage. From
+ * v15 (§5) the hybrids' rise to 2.2×.
  */
-export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8, paladin: 1.5 }
+const POWER_V1: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8, paladin: 1.5 }
+const POWER_V2: Readonly<Record<RpgClass, number>> = { ...POWER_V1, spellblade: 2.2, summoner: 2.2 }
+/** The live generation's powers (the manual's tables); the engine reads `heroLimitPower(classId, version)`. */
+export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = rpgV2() ? POWER_V2 : POWER_V1
+/** v15: the share of a hall Limit Break's mend or Barrier, 1.5× the doubled depth-5 share as its power is 1.5× (§5); ×0.4
+ * on every Uma, × the caster's ATK or M.ATK scaling and the cast's strength. */
+export const HERO_LIMIT_SUPPORT_SHARE = 0.66
 
 /** One hit: its kinds (two fuse into one hit, half each) and its share of the Limit Break's power. */
 export interface HeroHit { kinds: readonly RpgDamageKind[]; share: number }
 /**
  * One cast of a hero Limit Break. `one`: every hit on the tapped foe; `all`: every foe takes each hit (at the area share);
  * `random`: each hit on a random foe. `splash` then hits every other foe once. A cast with no hits only casts its status.
+ * `support` (v15's halls): a mend, Barrier, cleanse or revive after its hits, at the cast's strength.
  */
 export interface HeroCast {
   target: 'one' | 'all' | 'random'
   hits: readonly HeroHit[]
   splash?: HeroHit
   status?: RpgSkillDef['status']
+  support?: RpgSupport
 }
 export interface HeroLimit { id: HeroLimitId; classId: RpgClass; name: string; blurb: string; casts: readonly HeroCast[] }
 
@@ -82,18 +93,42 @@ const LIMITS: readonly HeroLimit[] = [
     casts: [{ target: 'one', hits: cycle(8, 'katana', 'dark', 'bow', 'light') }] },
 ]
 
-const BY_ID = new Map(LIMITS.map((l) => [l.id, l]))
-export const HERO_LIMITS: readonly HeroLimit[] = LIMITS
-export const heroLimit = (id: HeroLimitId): HeroLimit => BY_ID.get(id)!
-/**
- * A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Today's table
- * for every version until H56 fills v15's, so a Paladin seat has none yet (undefined) and her plan is refused.
- */
-export const heroLimitFor = (id: HeroLimitId, _version: number): HeroLimit | undefined => BY_ID.get(id)
-/** Her class's Limit Break power in an engine's generation (D179): today's table for every version until H56 fills v15's. */
-export const heroLimitPower = (classId: RpgClass, _version: number): number => HERO_LIMIT_POWER[classId]
-/** A seat's Limit Breaks by class, in seat order. */
-export const heroLimitsOf = (classId: RpgClass): HeroLimit[] => LIMITS.filter((l) => l.classId === classId)
+/** v15 (classes v2 §5): the six halls' 24. The Chapel's seats 3–4 move to the Paladin Bastion's 1–2, and both halls gain
+ * two: Tome-led in the Chapel, Arms-led in the Bastion, each mending, shielding or reviving. Sunfire Edge cleaves three
+ * times and Moon Fox strikes random foes. */
+const BY_V1 = new Map(LIMITS.map((l) => [l.id, l]))
+const heal = (support: Omit<RpgSupport, 'share'>): RpgSupport => ({ share: HERO_LIMIT_SUPPORT_SHARE, ...support })
+const moved = (from: HeroLimitId, id: HeroLimitId): HeroLimit => ({ ...BY_V1.get(from)!, id, classId: 'paladin' })
+const NEW: readonly HeroLimit[] = [
+  { id: 'spellblade-1', classId: 'spellblade', name: 'Sunfire Edge', blurb: 'Three Greatsword-and-Fire cleaves on one foe; its flames splash every other foe',
+    casts: [{ target: 'one', hits: Array.from({ length: 3 }, () => fused('greatsword', 'fire', 0.7 / 3)), splash: one('fire', 0.3) }] },
+  { id: 'cleric-3', classId: 'cleric', name: 'Dawn Hymn', blurb: 'Fire on every foe, then a mend on every ally',
+    casts: [{ target: 'all', hits: [one('fire', 1)], support: heal({ mend: 'all' }) }] },
+  { id: 'cleric-4', classId: 'cleric', name: 'Frost Sanctuary', blurb: 'Ice on every foe, then a cleanse and a Barrier on every ally',
+    casts: [{ target: 'all', hits: [one('ice', 1)], support: heal({ shield: 'all', cleanse: true }) }] },
+  { id: 'summoner-4', classId: 'summoner', name: 'Moon Fox', blurb: 'Eight strikes at random foes: Katana, Dark, Bow and Light in turn',
+    casts: [{ target: 'random', hits: cycle(8, 'katana', 'dark', 'bow', 'light') }] },
+  moved('cleric-3', 'paladin-1'),
+  moved('cleric-4', 'paladin-2'),
+  { id: 'paladin-3', classId: 'paladin', name: 'Rampart Charge', blurb: 'One Greatsword charge on one foe, then a Barrier on every ally',
+    casts: [{ target: 'one', hits: [one('greatsword', 1)], support: heal({ shield: 'all' }) }] },
+  { id: 'paladin-4', classId: 'paladin', name: 'Valkyrie Lances', blurb: 'Four Lance hits at random foes, then the first fallen ally rises',
+    casts: [{ target: 'random', hits: cycle(4, 'lance'), support: { share: 0, revive: true } }] },
+]
+/** A replaced seat keeps its place in the Map, and the Bastion's four come last: seat order, as `ALL_HERO_LIMIT_IDS`. */
+const BY_V2 = new Map([...LIMITS, ...NEW].map((l) => [l.id, l]))
+const LIVE = rpgV2() ? BY_V2 : BY_V1
+/** The live generation's Limit Breaks, in seat order: today's 20 until the switch (H61), the six halls' 24 after. Screens
+ * and the manual read these; the engine reads `heroLimitFor(id, version)`. */
+export const HERO_LIMITS: readonly HeroLimit[] = [...LIVE.values()]
+export const heroLimit = (id: HeroLimitId): HeroLimit => LIVE.get(id)!
+/** A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Undefined only
+ * for a seat its generation lacks (a Paladin seat before v15, which the engine refuses). */
+export const heroLimitFor = (id: HeroLimitId, version: number): HeroLimit | undefined => (rpgV2(version) ? BY_V2 : BY_V1).get(id)
+/** Her class's Limit Break power in an engine's generation (D179): the hybrids' 2.2× from v15 (§5). */
+export const heroLimitPower = (classId: RpgClass, version: number): number => (rpgV2(version) ? POWER_V2 : POWER_V1)[classId]
+/** A seat's Limit Breaks by class, in seat order, in the live generation. */
+export const heroLimitsOf = (classId: RpgClass): HeroLimit[] => HERO_LIMITS.filter((l) => l.classId === classId)
 /** Every kind a Limit Break deals, in the order it first deals them. */
 export function heroLimitKinds(limit: HeroLimit): RpgDamageKind[] {
   const kinds: RpgDamageKind[] = []
@@ -112,6 +147,7 @@ export function heroLimitSkills(limit: HeroLimit, total: number): RpgSkillDef[] 
   return limit.casts.map((c) => {
     const factor = c.target === 'all' ? RPG_AOE_SHARE : c.target === 'random' ? RPG_RANDOM_BONUS : 1
     return { target: c.target, hits: c.hits.map((h) => hit(h, factor)), mp: 0, primary: c.hits[0]?.kinds[0] ?? primary,
-      ...(c.splash ? { splash: hit(c.splash, RPG_AOE_SHARE) } : {}), ...(c.status ? { status: c.status } : {}) }
+      ...(c.splash ? { splash: hit(c.splash, RPG_AOE_SHARE) } : {}), ...(c.status ? { status: c.status } : {}),
+      ...(c.support ? { support15: c.support } : {}) }
   })
 }

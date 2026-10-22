@@ -127,7 +127,7 @@ describe('class rules by generation (D179)', () => {
 })
 
 describe('the Paladin as an identity (D179)', () => {
-  it('has hero seats from v15: 24 in all, 20 live; the Paladin Bastion; her power; today’s Limit Breaks for every version', () => {
+  it('has hero seats from v15: 24 in all, 20 live; the Paladin Bastion; her power; today’s Limit Breaks live and in v14', () => {
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(24)
     expect(HERO_LIMIT_IDS).toEqual(ALL_HERO_LIMIT_IDS.slice(0, 20))
     expect([isHeroLimitId('paladin-1'), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([false, false, true])
@@ -135,9 +135,10 @@ describe('the Paladin as an identity (D179)', () => {
     expect(HERO_HALLS.paladin).toBe('paladin-bastion')
     expect(hallClass('paladin-bastion')).toBe('paladin')
     expect(HERO_LIMIT_POWER.paladin).toBe(1.5)
-    for (const c of RPG_ALL_CLASSES) expect([heroLimitPower(c, V1), heroLimitPower(c, V2)]).toEqual([HERO_LIMIT_POWER[c], HERO_LIMIT_POWER[c]])
-    for (const l of HERO_LIMITS) expect([heroLimitFor(l.id, V1), heroLimitFor(l.id, V2)]).toEqual([heroLimit(l.id), heroLimit(l.id)])
-    expect(heroLimitFor('paladin-1', V2)).toBeUndefined()
+    // v15's table and powers (H56) are `rpg/battle/halls-v15.test.ts`'s.
+    for (const c of RPG_ALL_CLASSES) expect(heroLimitPower(c, V1)).toBe(HERO_LIMIT_POWER[c])
+    for (const l of HERO_LIMITS) expect(heroLimitFor(l.id, V1)).toEqual(heroLimit(l.id))
+    expect(heroLimitFor('paladin-1', V1)).toBeUndefined()
     expect(HERO_LIMITS).toHaveLength(20)
   })
 
@@ -156,14 +157,16 @@ describe('the Paladin as an identity (D179)', () => {
     expect(rpgNode('paladin-greatsword.1a')?.classId).toBe('paladin')
   })
 
-  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, Heavy Devotion, Valkyrie’s Oath, no support', () => {
+  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, Heavy Devotion, Valkyrie’s Oath, no v14 support', () => {
     for (const n of RPG_ALL_NODES.filter((x) => x.classId === 'paladin')) {
       const twin = rpgNode(n.id.replace('paladin-', 'cleric-'))!
-      const { support, ...kit } = twin.skill
+      // Both have v15's support (H56, `rpg/battle/healers-v15.test.ts`); only the Cleric has v14's.
+      const { support, support15: _, ...kit } = twin.skill
+      const { support15, ...own } = n.skill
       expect(support, twin.id).toBeDefined()
-      expect(n.skill.support, n.id).toBeUndefined()
+      expect([n.skill.support, support15 && 'v15'], n.id).toEqual([undefined, 'v15'])
       const to = n.weapon === 'axe' && n.depth === 4 ? 'foes' : kit.status!.to
-      expect(n.skill, n.id).toEqual({ ...kit, status: { ...kit.status!, to } })
+      expect(own, n.id).toEqual({ ...kit, status: { ...kit.status!, to } })
       const name = n.id === 'paladin-tome-light.3b' ? 'Heavy Devotion' : n.id === 'paladin-lance.4b' ? "Valkyrie's Oath" : twin.name
       expect(n.name, n.id).toBe(name)
     }

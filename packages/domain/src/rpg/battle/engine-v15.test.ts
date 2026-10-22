@@ -84,7 +84,7 @@ describe('battle engine v15: classes v2, dark (D179)', () => {
     expect(() => createBattle(input(party(member('a4', 'cleric', 15))))).not.toThrow()
   })
 
-  it('takes a Paladin seat only from v15, and plans no Limit Break for it until H56', () => {
+  it('takes a Paladin seat only from v15, and fires its Limit Break there (H56)', () => {
     const v14 = party(member('a4', 'cleric', 14), 14)
     const seated = (allies: BattleAlly[], extra: Partial<BattleAlly>) => allies.map((a) => (a.id === 'a1' ? { ...a, ...extra } : a))
     expect(() => createBattle(input(seated(v14, { hero: 'paladin-1' }), 14))).toThrow(/Invalid battle ally/)
@@ -92,11 +92,11 @@ describe('battle engine v15: classes v2, dark (D179)', () => {
     expect(() => createBattle(input(seated(v14, { hero: 'brawler-1' }), 14))).not.toThrow()
     const v15 = seated(party(paladin()), { hero: 'paladin-1' })
     const s = createBattle(input(v15)).state
-    expect(battleLimitPlan(v15[0]!, { hero: 'paladin-1' }, 15)).toBeNull()
-    // With a full gauge, Auto acts instead.
+    expect(battleLimitPlan(v15[0]!, { hero: 'paladin-1' }, 15)?.name).toBe('Archangel’s Verdict')
+    // With a full gauge, Auto fires it.
     s.units.find((u) => u.id === 'a1')!.limit = 12
     const action = autoAction(s, 'a1')
-    expect(action.kind).not.toBe('limit')
+    expect(action.kind).toBe('limit')
     expect(applyBattleAction(s, action).error).toBeUndefined()
   })
 

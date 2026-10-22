@@ -171,8 +171,14 @@ export interface BattleState {
   summons: BattleSummon[]
   intents: BattleIntent[]
   outcome: 'active' | 'victory' | 'loss'
+  /** v15 (classes v2 §4): each Cleric's Regen, left by her last Light spell (her next one replaces it). Not a status: it
+   * keeps its caster and her share. Set by the first Regen and absent before, so older states hash as they did. */
+  regens?: BattleRegen[]
 }
 export interface BattleSummon { allyId: string; ref: RpgNodeRef; scale: number }
+/** A Regen: at the end of each of `rounds` more round ends, a mend on the most hurt Uma (`hurt`) or every Uma (`all`)
+ * at `share` of max HP (its spell's share × its strength × `BATTLE_REGEN_SHARE`), × her scaling then. It ends if she falls. */
+export interface BattleRegen { allyId: string; mend: 'hurt' | 'all'; share: number; rounds: number }
 /** One half of a Spell Blade's act: a skill, or an Attack with a weapon. */
 export interface BattleHalf { skill?: RpgNodeRef; weapon?: RpgWeapon }
 export type BattleAction =

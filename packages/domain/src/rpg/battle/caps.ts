@@ -29,3 +29,5 @@ export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine
 /** v15 (D179): a healer's mends, Barriers and revives grow ×(1 + ATK or M.ATK ÷ this). Here so the profile reads it without
  * the engine; H56 uses it, H60 tunes it. */
 export const BATTLE_HEAL_OFFENSE_SCALE = 300
+/** v15 (classes v2 §4): the round ends a Cleric's Regen mends at, the round she casts her Light spell and the next. */
+export const BATTLE_REGEN_ROUNDS = 2

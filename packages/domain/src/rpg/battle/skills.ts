@@ -30,7 +30,12 @@ export const BATTLE_COVER_CAP = 0.4
 export const BATTLE_RALLY_SHARE = 0.3
 export const BATTLE_BREATHER = 0.1
 export const BATTLE_REVIVE_SHARE = 0.25
-export { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE } from './caps'
+/** v15 (classes v2 §3.3, C8): one healer carries the party, so a skill Barrier may reach 60% of max HP. */
+export const BATTLE_COVER_CAP_V15 = 0.6
+/** v15 (§4): a Cleric's Light spell leaves Regen, its mend repeating at this share of itself at the end of the round she
+ * casts it and of the next (`BATTLE_REGEN_ROUNDS`, in `caps.ts` so the node summaries read it without the engine). */
+export const BATTLE_REGEN_SHARE = 0.3
+export { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE, BATTLE_REGEN_ROUNDS } from './caps'
 
 export const battleChannel = (kind: RpgDamageKind | null): BattleChannel => kind !== null && rpgPhysical(kind) ? 'physical' : 'magical'
 /** The element that a foe of this element is weak to. */

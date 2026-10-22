@@ -8,6 +8,7 @@ import {
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
 import { rpgTreeOf } from './node-identity'
+import { BATTLE_REGEN_ROUNDS, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 
 /** Single-target total power by depth, and the full-turn MP by depth (6 + 4 × depth). */
@@ -19,6 +20,8 @@ export const RPG_RANDOM_BONUS = 1.05
 /** v12 (D141): a mend's or a Barrier's share of the target's max HP by depth, before her Heal; on every Uma it is ×0.4. */
 export const RPG_SUPPORT_SHARE = [0.14, 0.16, 0.18, 0.2, 0.22] as const
 export const RPG_SUPPORT_ALL = 0.4
+/** v15 (classes v2 §3.3, C8): one healer a party, so her shares double; before her ATK or M.ATK, ×0.4 on every Uma. */
+export const RPG_SUPPORT_SHARE_V15 = [0.28, 0.32, 0.36, 0.4, 0.44] as const
 export interface RpgPart { kind: RpgDamageKind; share: number }
 export interface RpgHit { power: number; parts: RpgPart[] }
 export type RpgSkillTarget = 'one' | 'all' | 'random'
@@ -48,11 +51,14 @@ export interface RpgSkillDef {
   summon?: { linger: number }
   /** v12 (D141): what it does for the party besides its hits. Older engines ignore it, so old fights replay unchanged. */
   support?: RpgSupport
+  /** v15 (classes v2 §3.3, §4): the healers' support, read from v15 instead of `support` (which v15 never reads). Only
+   * Cleric and Paladin nodes and the halls' healing Limit Breaks have one: from v15 the Summoner only strikes. */
+  support15?: RpgSupport
 }
 /**
- * A skill's support (combat-balance.md §6.2). `share` is of the target's max HP, raised by her Heal. A mend heals the
- * most-hurt Uma or every Uma; a Barrier shields the Uma the shown moves threaten most, or every Uma. A lingering summon
- * that mends mends again at each round's end, at its linger share.
+ * A skill's support (combat-balance.md §6.2). `share` is of the target's max HP, raised by her Heal (from v15 by her ATK
+ * or M.ATK). A mend heals the most-hurt Uma or every Uma; a Barrier shields the Uma the shown moves threaten most, or
+ * every Uma. To v14 a lingering summon that mends mends again at each round's end, at its linger share.
  */
 export interface RpgSupport {
   share: number
@@ -67,6 +73,12 @@ export interface RpgSupport {
   /** A status on every Uma, or on every foe it hits. */
   bless?: { status: 'aegis'; stacks: number }
   curse?: { status: 'enfeeble'; stacks: number }
+  /** v15: the Barrier's own share, when it isn't the mend's (the Paladin's Blizzard: 0.35 of it, on every Uma). */
+  shieldShare?: number
+  /** v15: Aegis stacks on each Uma the Barrier reaches (the Paladin's Greatsword). */
+  aegis?: number
+  /** v15: the mend lingers as Regen (the Cleric's Light): `BATTLE_REGEN_SHARE` of it at the next two round ends. */
+  regen?: boolean
 }
 export interface RpgNode {
   id: string
@@ -103,11 +115,15 @@ function describe(skill: RpgSkillDef): string {
   const parts = [`${per} · ${n} hit${n === 1 ? '' : 's'} · ${round(total)}`]
   if (skill.status) parts.push(`${STATUS_TEXT[skill.status.key]} ${skill.status.stacks} ${skill.status.to === 'allies' ? 'on every ally' : skill.status.to === 'foes' ? 'on every foe' : 'on the foe'}`)
   if (skill.summon) parts.push(`lingers at ${skill.summon.linger}`)
-  const sup = skill.support
+  // The live generation's support (D179): the summaries move at the switch.
+  const sup = rpgV2() ? skill.support15 : skill.support
   if (sup) {
-    const pct = `${Math.round(sup.share * 100)}%`
-    if (sup.mend) parts.push(sup.mend === 'all' ? `heals every ally ${pct}` : `heals the most hurt ${pct}`)
-    if (sup.shield) parts.push(sup.shield === 'all' ? `Barrier ${pct} on every ally` : `Barrier ${pct} on the most threatened`)
+    const pct = (n: number) => `${Math.round(n * 100)}%`
+    if (sup.mend) parts.push(sup.mend === 'all' ? `heals every ally ${pct(sup.share)}` : `heals the most hurt ${pct(sup.share)}`)
+    if (sup.regen) parts.push(`Regen ${BATTLE_REGEN_ROUNDS} rounds`)
+    const shield = pct(sup.shieldShare ?? sup.share)
+    if (sup.shield) parts.push(sup.shield === 'all' ? `Barrier ${shield} on every ally` : `Barrier ${shield} on the most threatened`)
+    if (sup.aegis) parts.push(`Aegis ${sup.aegis} on the Barriered`)
     if (sup.cleanse) parts.push('cleanses')
     if (sup.revive) parts.push('revives the fallen')
     if (sup.drain) parts.push(`heals ${Math.round(sup.drain * 100)}% of its damage`)
@@ -354,20 +370,33 @@ const CLERIC_NAMES: Readonly<Record<RpgWeapon, readonly string[]>> = {
 }
 const CLERIC_STACKS = [1, 1, 2, 2, 3]
 /** Her spells mend and cleanse, her blows put up a Barrier (D141): on the one who needs it, on everyone at depth 5. The
- * Light tree's depth-3 side B is Rebirth: it also raises the fallen. */
-function clericSupport(weapon: RpgWeapon, d: number, rebirth = false): RpgSupport {
-  const share = at(RPG_SUPPORT_SHARE, d)
-  return isRpgTome(weapon)
-    ? { share, mend: d === 5 ? 'all' : 'hurt', cleanse: true, ...(rebirth ? { revive: true } : {}) }
-    : { share, shield: d === 5 ? 'all' : 'threatened' }
+ * Light tree's depth-3 side B is Rebirth: it also raises the fallen. `shares`: v12–v14's, or v15's doubled ones. */
+function clericSupport(weapon: RpgWeapon, d: number, revive = false, shares: readonly number[] = RPG_SUPPORT_SHARE): RpgSupport {
+  const sup: RpgSupport = isRpgTome(weapon) ? { share: at(shares, d), mend: d === 5 ? 'all' : 'hurt', cleanse: true }
+    : { share: at(shares, d), shield: d === 5 ? 'all' : 'threatened' }
+  if (revive) sup.revive = true
+  return sup
+}
+/** v15 (classes v2 §3.3, §4): both healers' kit at the doubled shares, and each one's half of the Summoner's old support.
+ * The Paladin's Blizzard spells also shield every Uma at 0.35 of their share, and her Greatsword blows give Aegis to each
+ * Uma they shield (2 at depth 5); the Cleric's Light spells leave Regen and her Dark spells drain 30%. `revive`: the
+ * Cleric's Rebirth, or the Paladin's Valkyrie's Oath. */
+function healerSupport(weapon: RpgWeapon, d: number, revive: boolean, paladin: boolean): RpgSupport {
+  const sup = clericSupport(weapon, d, revive, RPG_SUPPORT_SHARE_V15)
+  if (paladin && weapon === 'tome-ice') Object.assign(sup, { shield: 'all', shieldShare: round(0.35 * sup.share) })
+  if (paladin && weapon === 'greatsword') sup.aegis = d === 5 ? 2 : 1
+  if (!paladin && weapon === 'tome-light') sup.regen = true
+  if (!paladin && weapon === 'tome-dark') sup.drain = 0.3
+  return sup
 }
 /** A Cleric's skill, or with `paladin` the Paladin's (D179): the same hits, status, stacks, turns and MP, her Axe's status
- * on every foe from depth 4, and no `support` (v12–v14's field; H56 gives both healers v15's kit). */
-function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0, rebirth = false, paladin = false): RpgSkillDef {
+ * on every foe from depth 4, and no `support` (v12–v14's field: the Paladin has only v15's, `support15`). */
+function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0, revive = false, paladin = false): RpgSkillDef {
   const kind = rpgWeaponKind(weapon)
   const to = isRpgTome(weapon) ? 'allies' : d === 5 || (paladin && weapon === 'axe' && d >= 4) ? 'foes' : 'foe'
   return { target: 'one', hits: pure(1, power(d), kind), mp: mp(d) + extraMp, primary: kind,
-    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to }, ...(paladin ? {} : { support: clericSupport(weapon, d, rebirth) }) }
+    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to },
+    ...(paladin ? {} : { support: clericSupport(weapon, d, revive) }), support15: healerSupport(weapon, d, revive, paladin) }
 }
 /** The one side skill that isn't Lasting or Heavy: the Light tree's depth-3 B, Rebirth (D141). */
 export const RPG_REBIRTH_NODE = 'cleric-tome-light.3b'
@@ -382,14 +411,14 @@ for (const weapon of RPG_WEAPONS) {
 // --- Paladin (classes v2, engine v15, D179): the Cleric's kit and names, her other half ---------------------------------
 
 /** The Paladin's one side skill not named Lasting or Heavy: the Lance tree's depth-4 B, Valkyrie's Oath, in the Heavy
- * shape (H56 gives it its revive). Her Light 3B is Heavy Devotion, since Rebirth stays the Cleric's. */
+ * shape, whose v15 support also revives (§4). Her Light 3B is Heavy Devotion, since Rebirth stays the Cleric's. */
 export const RPG_VALKYRIE_OATH_NODE = 'paladin-lance.4b'
 for (const weapon of RPG_WEAPONS) {
   const names = CLERIC_NAMES[weapon]
   const b = names.map((n, i) => (weapon === 'lance' && i === 3 ? "Valkyrie's Oath" : `Heavy ${n}`))
   addTree({ classId: 'paladin', weapon, names, a: names.map((n) => `Lasting ${n}`), b,
     core: (d) => cleric(weapon, d, 2, 0, 0, false, true), sideA: (d) => cleric(weapon, d, 3, 0, 2, false, true),
-    sideB: (d) => cleric(weapon, d, 2, 1, 4, false, true) })
+    sideB: (d) => cleric(weapon, d, 2, 1, 4, weapon === 'lance' && d === 4, true) })
 }
 
 /** Every node of every generation (750, D179): `rpgNode` finds any of them, the Paladin's included. */

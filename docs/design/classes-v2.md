@@ -181,6 +181,11 @@ The split itself makes one a shielder and the other a healer.
 (base, Extra Stats and armor; not weapon Might). An on-curve Lv 50 healer is about ×1.6, close to today's Heal-based
 multiplier. The simulation sets the divisor.
 
+Built in H56 (D181), live from H61: from engine v15 the healers' nodes carry `support15` (`RPG_SUPPORT_SHARE_V15`
+28–44%, ×0.4 on every Uma), the engine reads it instead of `support`, scales every mend, Barrier and revive by
+`BATTLE_HEAL_OFFENSE_SCALE` from her ATK or M.ATK (anyone else's higher of the two), and caps a Barrier at
+`BATTLE_COVER_CAP_V15` (60%). Heal is never read from v15.
+
 **C1, where does Guts go?** It has no other combat use today. Recommendation: **into HP**,
 `HP = 100 + 5 × Stamina + 2 × Power + 1 × Guts`. Outfits with high Guts get a little sturdier, and no stat is dead.
 
@@ -201,6 +206,14 @@ style's (`styleClass`), so nobody changes class at the switch.
 | Dark: drain, 30% of damage heals the most hurt | **Cleric** | Her Dark spells drain at 30% |
 
 Rebirth stays the Cleric's. Each healer now has one revive.
+
+Built in H56 (D181), live from H61: the Paladin's Blizzard `shieldShare` (0.35 of the share, on every Uma), her
+Greatsword `aegis` (1, or 2 at depth 5, on each Uma its Barrier reaches), her Axe on every foe from depth 4 and
+Valkyrie's Oath's revive (25% × her ATK scaling, once per Uma); the Cleric's Light `regen` (a `BattleState.regens` entry,
+`BATTLE_REGEN_SHARE` 0.3 of its mend at the end of the cast's round and the next, "Regen" heals, replaced by her next
+Light spell, gone if she falls) and her Dark `drain` (30%). From v15 a Summoner's summons carry no support, her Light
+capstone raises no Barrier and a lingering summon no longer mends. A Thorn or Mirror guard returns her share of the
+whole hit she intercepts (§6.3).
 
 ## 5. Limit Breaks and inheritance
 
@@ -242,6 +255,12 @@ with them, so nobody's progress is lost.
   physical-weak boss on the Iron front. That's the composition puzzle the Rift wants.
 - **Strength:** 50% at Bond 0, +5% a level, 100% at Bond 10. It stays as it is: Bonds already pace well (two Heroes
   fully bonded by about Lv 23).
+
+Built in H56 (D181), live from H61: `heroLimitFor(id, 15)` gives the 24 (the Chapel's seats 3–4 Dawn Hymn and Frost
+Sanctuary, the Bastion's Archangel's Verdict, Archdemon's Pact, Rampart Charge and Valkyrie Lances; Sunfire Edge's three
+cleaves, Moon Fox's random strikes) and `heroLimitPower(classId, 15)` the 2.2× hybrids. A hall Limit Break's mend or
+Barrier is `HERO_LIMIT_SUPPORT_SHARE` (0.66) × 0.4 on every Uma, at the cast's strength; its cleanse and revive land
+at any strength. C3: a Learner's inherited hits use her higher offense from v15; a Hero's own keep each kind's.
 
 ## 6. Accessories
 
