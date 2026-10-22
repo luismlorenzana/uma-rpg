@@ -116,6 +116,10 @@ front.
 - Charged moves take locks only from the front's weakness kinds.
 - On the Duel front, a lock set is always mixed: at least one Arms kind and one element.
 
+**Built in H47 (D173):** shapes and numbers in `rift/fronts.ts`'s `RIFT_TUNING`, tuned in H51. Each stage's foes are in
+the manual's [Rift's foes](../game/combat.md#the-rifts-foes). The Lv 55 Echo is the Lv 50 shape at ×1.22, since a tier
+stops at Lv 50.
+
 ## 6. The Convergence
 
 **Four fights in a row:** Iron, Arcane, Duel, Horde, at their champion's strength plus 10%.
@@ -216,6 +220,11 @@ Today's `stageFaces` picks within one franchise per region, so this is new code.
 - The picker prefers faces this account **hasn't defeated yet**, so the Bestiary fills over two or three runs, and the
   owner meets every boss.
 - Weaknesses come from the front, not the face.
+
+**Built in H47 (D173):** one allocation per run walks its 52 fights in order and gives each slot a pack by a smooth
+40 / 37 / 23 round-robin per face tier, then that pack's first face not yet used in the run, undefeated ones first. An
+Echo allocates its one fight alone, with no preference. The starting shapes hold 38 boss and 106 sub-boss slots a run,
+so sub-bosses fill in two runs and bosses in four (H51 may move which tier a slot draws).
 
 **Splashes and cut-ins** work as today: key, sub-boss and boss splashes, and the champion's red stripe.
 

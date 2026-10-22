@@ -33,6 +33,10 @@ import {
   RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
+import { RIFT_FRONT_SPECS, riftShape, RIFT_TUNING, type RiftSlot } from '../rift/fronts'
+import { riftStrength } from '../rift/generate'
+import { RIFT_RUN_FIGHTS, riftShapeOf } from '../rift/picker'
+import { RIFT_FRONTS } from '../rift/state'
 import { classPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
@@ -448,6 +452,90 @@ function world(): string {
   ])
 }
 
+// --- The Rift -------------------------------------------------------------------------------------------------------
+
+/** Runs of equal neighbours, as `[value, count]`. */
+function runs<T>(list: readonly T[]): [T, number][] {
+  const out: [T, number][] = []
+  for (const v of list) {
+    const last = out[out.length - 1]
+    if (last && last[0] === v) last[1] += 1
+    else out.push([v, 1])
+  }
+  return out
+}
+/** Stage numbers as ranges: `1–6`, `5, 7`, `12`. */
+function stageList(stages: readonly number[]): string {
+  const parts: string[] = []
+  for (let i = 0; i < stages.length;) {
+    let j = i
+    while (j + 1 < stages.length && stages[j + 1] === stages[j]! + 1) j += 1
+    parts.push(j > i + 1 ? `${stages[i]}–${stages[j]}` : j === i + 1 ? `${stages[i]}, ${stages[j]}` : `${stages[i]}`)
+    i = j + 1
+  }
+  return parts.join(', ')
+}
+type Front = (typeof RIFT_FRONTS)[number]
+/** One wave: `a boss (acts 2, shield 8) + 2 sub-boss-faced guards (shield 3)`. */
+function riftWave(wave: readonly RiftSlot[]): string {
+  const faced = { boss: 'boss-faced', subboss: 'sub-boss-faced', key: 'key' } as const
+  const noun = (s: RiftSlot): string => (s.rank !== 'regular' ? s.rank
+    : `${faced[s.face]} ${s.role === 'guard' ? 'guard' : s.role === 'captain' || s.role === 'champion' ? 'leader' : 'foe'}`)
+  const groups = runs(wave.map((s) => JSON.stringify([noun(s), `${s.acts > 1 ? `acts ${s.acts}, ` : ''}shield ${s.shield}`, !!s.pair])))
+  return groups.map(([key, n]) => {
+    const [name, traits, pair] = JSON.parse(key) as [string, string, boolean]
+    const many = `${n} ${name.endsWith('boss') ? `${name}es` : `${name}s`}${pair ? ' from two packs' : ''}`
+    return `${n > 1 ? many : `a ${name}`} (${traits})`
+  }).join(' + ')
+}
+/** A band of a front's stages; stages that differ are listed apart (`5, 7: …; 6, 8: …`). */
+function riftBand(front: Front, from: number, to: number): string {
+  const stage = (n: number): string => {
+    const waves = riftShape(front, n).map(riftWave)
+    const groups = runs(waves)
+    if (waves.length === 1) return waves[0]!
+    if (groups.length === 1) return `${waves.length} waves, each ${waves[0]}`
+    let at = 1
+    return groups.map(([w, k]) => { const s = `${k > 1 ? `waves ${at}–${at + k - 1}` : `wave ${at}`}: ${w}`; at += k; return s }).join('; ')
+  }
+  const groups = new Map<string, number[]>()
+  for (let n = from; n <= to; n += 1) groups.set(stage(n), [...(groups.get(stage(n)) ?? []), n])
+  return cap(groups.size === 1 ? [...groups.keys()][0]! : [...groups].map(([d, stages]) => `${stageList(stages)}: ${d}`).join('; '))
+}
+/** The Rift's fronts (D173): what each is weak to and wards, its stages from `riftShape`, its party; then levels and strength. */
+function riftFronts(): string {
+  const t = RIFT_TUNING
+  const byRank = (counts: Readonly<Record<'regular' | 'sub-boss' | 'boss', number>>, kinds: string): string => {
+    const groups = new Map<number, string[]>()
+    for (const [names, n] of [[['key', 'regular'], counts.regular], [['sub-boss'], counts['sub-boss']], [['boss'], counts.boss]] as const) {
+      groups.set(n, [...(groups.get(n) ?? []), ...names])
+    }
+    const list = (names: readonly string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} or ${names.at(-1)}` : names[0])
+    return `${kinds} only: ${[...groups].map(([n, names]) => `${n} for a ${list(names)}`).join(', ')}; a champion pair's differ`
+  }
+  const perStage = (list: readonly number[]): string => {
+    let at = 1
+    return runs(list).map(([n, k]) => { const s = `${n} at stages ${stageList(Array.from({ length: k }, (_, i) => at + i))}`; at += k; return s }).join(', ')
+  }
+  const weak: Readonly<Record<Front, string>> = {
+    iron: byRank(t.weak.iron, 'Arms'), arcane: byRank(t.weak.arcane, 'Elements'),
+    duel: `Arms (${perStage(t.weak.duel.weapons)}) and elements (${perStage(t.weak.duel.elements)}); locks mixed`,
+    horde: 'One Arms kind and one element each, no two foes of a wave alike',
+  }
+  const slots = RIFT_RUN_FIGHTS.flatMap((ref) => { const { front, stage } = riftShapeOf(ref); return riftShape(front, stage).flat() })
+  const party = (f: Front): string => runs(RIFT_FRONT_SPECS[f].party.map((c) => CLASS_NAME[c])).map(([c, n]) => (n > 1 ? `${n} ${c}` : c)).join(', ')
+  return table(['Front', 'Weak to', 'Ward', 'Stages 1–4', '5–8', '9–11', 'Champion (12)', 'Party'], RIFT_FRONTS.map((f) => {
+    const spec = RIFT_FRONT_SPECS[f]
+    return [spec.name, weak[f], spec.ward ? `${spec.ward === 'magical' ? 'Elements' : 'Arms'} ×${K.BATTLE_WARD_FACTOR}` : '—',
+      riftBand(f, 1, 4), riftBand(f, 5, 8), riftBand(f, 9, 11), riftBand(f, 12, 12), party(f)]
+  })) + `\n\nFront and Convergence foes stand at tier Lv ${t.level}. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + ${t.climb} × (n − 1) ÷ 11), ` +
+    `×${riftStrength({ kind: 'front', front: 'iron', stage: 12 })} at the champion; a Convergence fight is its front's champion at ×${riftStrength({ kind: 'convergence', fight: 0 })}. ` +
+    `An Echo is its front's stage ${t.echoStage} at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×${t.echo55}. ` +
+    `Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. ` +
+    `A run's ${RIFT_RUN_FIGHTS.length} fights hold ${slots.filter((s) => s.face === 'boss').length} boss, ${slots.filter((s) => s.face === 'subboss').length} sub-boss ` +
+    `and ${slots.filter((s) => s.face === 'key').length} key face slots.`
+}
+
 // --- Tiers ----------------------------------------------------------------------------------------------------------
 
 function tiers(): string {
@@ -477,7 +565,8 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
     classes, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, dependencies: () => dependencies(context.packages),
+    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts,
+    dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }
   return blocks[key]?.() ?? null

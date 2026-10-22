@@ -86,6 +86,16 @@
         "types": "./src/save/heroes.ts",
         "default": "./src/save/heroes.ts"
       }
+    },
+    "./rift": {
+      "require": {
+        "types": "./dist/cjs/rift/index.d.ts",
+        "default": "./dist/cjs/rift/index.js"
+      },
+      "default": {
+        "types": "./src/rift/index.ts",
+        "default": "./src/rift/index.ts"
+      }
     }
   },
   "scripts": {

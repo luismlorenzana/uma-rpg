@@ -9,7 +9,8 @@ generated (see [README](README.md#how-these-docs-stay-true)); the rest is writte
 engine.
 
 Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `auto.ts`, `types.ts`), foes in
-`rpg/campaign/enemies.ts`, stages in `world/world.ts`, the screen in `apps/web/src/places/scenario-gate/FightScreen.tsx`.
+`rpg/campaign/enemies.ts`, stages in `world/world.ts`, the Rift's fights in `rift/` (`fronts.ts`, `picker.ts`,
+`generate.ts`), the screen in `apps/web/src/places/scenario-gate/FightScreen.tsx`.
 
 ## A fight at a glance
 
@@ -306,6 +307,46 @@ unchanged.
 | Formations | A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's |
 | Shields | Regular 2 (by formation), sub-boss 6, boss 8 |
 <!-- /live -->
+
+## The Rift's foes
+
+The Rift's fights are generated and none is on the world map ([the Rift](../design/rift.md) §5–§9, D173). A run has
+four fronts of twelve stages and the Convergence's four fights; the twelve Echoes stand apart. Each fight is built from
+its front, its stage and the run. A retry meets the same foes, weaknesses and faces with a fresh seed.
+
+**The fronts.** Weaknesses come from the front, never the face. A charged move draws its locks from them, so locks are
+always the front's kinds.
+- **Iron:** weak to Arms only. Its foes **ward** elements: an Uma's magical hits deal ×0.5 again, Broken or not (v14).
+- **Arcane:** weak to elements only, warding Arms.
+- **Duel:** one boss weak to both. She acts twice, three times at the champion, and her lock sets are mixed (Arms,
+  element, Arms…).
+- **Horde:** three waves of 4 to 6 foes, each weak to one Arms kind and one element, no two foes of a wave alike.
+- Each foe's own element, the one her moves carry, is one she isn't weak to.
+
+<!-- live:rift-fronts -->
+| Front | Weak to | Ward | Stages 1–4 | 5–8 | 9–11 | Champion (12) | Party |
+|---|---|---|---|---|---|---|---|
+| Iron | Arms only: 3 for a key or regular, 2 for a sub-boss, 1 for a boss; a champion pair's differ | Elements ×0.5 | A sub-boss (acts 2, shield 6) + 2 key guards (shield 3) | 5, 7: 2 sub-bosses (shield 6); 6, 8: a boss (acts 2, shield 8) + 2 sub-boss-faced guards (shield 3) | Waves 1–2: 3 sub-boss-faced foes (shield 3); wave 3: a boss (acts 2, shield 8) + 2 sub-boss-faced guards (shield 3) | 2 bosses from two packs (shield 8) | 2 Brawler, 2 Spell Blade, Cleric |
+| Arcane | Elements only: 2 for a key, regular or sub-boss, 1 for a boss; a champion pair's differ | Arms ×0.5 | A sub-boss (acts 2, shield 6) + 2 key guards (shield 3) | 5, 7: 2 sub-bosses (shield 6); 6, 8: a boss (acts 2, shield 8) + 2 sub-boss-faced guards (shield 3) | Waves 1–2: 3 sub-boss-faced foes (shield 3); wave 3: a boss (acts 2, shield 8) + 2 sub-boss-faced guards (shield 3) | 2 bosses from two packs (shield 8) | 2 Mage, 2 Summoner, Cleric |
+| Duel | Arms (2 at stages 1–6, 1 at stages 7–12) and elements (2 at stages 1–6, 1 at stages 7–12); locks mixed | — | A boss (acts 2, shield 10) | A boss (acts 2, shield 11) | A boss (acts 2, shield 12) | A boss (acts 3, shield 12) | 2 Brawler, 2 Mage, Cleric |
+| Horde | One Arms kind and one element each, no two foes of a wave alike | — | 3 waves, each a sub-boss-faced leader (shield 6) + 3 key foes (shield 3) | 5, 6: 3 waves, each a sub-boss-faced leader (shield 6) + 4 key foes (shield 3); 7, 8: 3 waves, each a sub-boss-faced leader (shield 6) + 4 key foes (shield 4) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 4); wave 3: a boss-faced leader (shield 6) + 5 key foes (shield 4) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 4); wave 3: 2 boss-faced leaders from two packs (shield 6) + 4 key foes (shield 4) | 2 Spell Blade, 2 Summoner, Cleric |
+
+Front and Convergence foes stand at tier Lv 50. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + 0.1 × (n − 1) ÷ 11), ×1.1 at the champion; a Convergence fight is its front's champion at ×1.21. An Echo is its front's stage 8 at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×1.22. Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. A run's 52 fights hold 38 boss, 106 sub-boss and 173 key face slots.
+<!-- /live -->
+
+**Levels.** The level a Rift fight shows is a tier level: 50 for the fronts and the Convergence, and 45, 50 or 55 for an
+Echo. Its foes' own levels are lifetime (Tier 2's Lv 50 is 100). A tier stops at Lv 50, so the Lv 55 Echo is the Lv 50
+one made stronger.
+
+**The Convergence and the Echoes.** Convergence fight i is front i's champion (Iron, Arcane, Duel, Horde), stronger
+again, with its own faces and weaknesses. An Echo is its front's stage 8 at its level; Echoes don't belong to a run.
+
+**Faces** come from all three packs, one allocation per run (`rift/picker.ts`):
+- Azur Lane, NIKKE and PriConne take about 40 / 37 / 23 of each face tier's slots, by a smooth round-robin;
+- faces the account hadn't defeated when the run started come first (`account.defeated`, Rift fights only, D171);
+- no face repeats in a run while unused ones of its tier remain, and never within a fight;
+- a champion pair's two bosses come from two packs;
+- an Echo's faces are its own and never move as the Bestiary fills.
 
 ## Rewards
 
