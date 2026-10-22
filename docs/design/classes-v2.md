@@ -1,6 +1,8 @@
 # Classes v2: six classes, clear damage identities, accessories that specialize
 
-> **Approved 2026-10-21 (D160), with three owner changes; not built yet.** The changes:
+> **Built and live (H53–H61, D178–D188).** Approved 2026-10-21 (D160), with three owner changes; engine v15 and save
+> v25 went live together in H61 (D188), and the manual ([classes](../game/classes.md), [combat](../game/combat.md))
+> describes the game as it plays. The changes:
 > - the Summoner is the Spell Blade's mirror (§3.2);
 > - the one healer in a party heals and shields at twice today's shares (§3.3);
 > - accessories are one damage slot and one support slot, with flat Orbs (§6).
@@ -386,7 +388,9 @@ Tier 3; it's designed with Tier 3.
 ## 8. Engine v15 and the save
 
 Built in H53 (D179): the Paladin as a class id, the one switch, class rules by generation and engine v15's validation,
-dark until H61.
+dark until H61. **Live from H61 (D188):** `BATTLE_ENGINE_VERSION` 15, `SAVE_SCHEMA_VERSION` 25 and `toV25` chained, in
+one commit; new fights start on v15, a save becomes v25 on its next parse (the API keeps `saveBackups/{uid}-v24` on the
+first v25 write, D69), and an open v14 fight replays and settles on v14.
 
 - **Engine v15** carries:
   - the new hands: the Spell Blade's double Arms hit, and the Summoner's mirrored pair and farewell areas;

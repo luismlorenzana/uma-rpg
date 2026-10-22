@@ -1,4 +1,4 @@
-// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
+// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3) and live since H61 (D188): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
 // Paladin Bastion, two new Limit Breaks in each of those halls, Sunfire Edge and Moon Fox reshaped, the hybrids' power at
 // 2.2×, a Limit Break's support at its strength, and a Learner's inherited hits at her higher offense.
 import { createHash } from 'node:crypto'
@@ -64,7 +64,7 @@ describe('the six halls’ table (H56, §5)', () => {
     expect(table(14)).toHaveLength(20)
     expect(sha(table(14))).toBe('72cb9b8facbc49012c92684942f1c9ae')
     expect(sha(table(14).map((l) => heroLimitSkills(l, 10)))).toBe('6f6d2c3e98ed23205d012a1319da59a8')
-    expect(table(14)).toEqual(HERO_LIMITS)
+    expect(table(15)).toEqual(HERO_LIMITS)
     expect(table(15).map((l) => l.id)).toEqual(ALL_HERO_LIMIT_IDS)
     expect(Object.fromEntries(table(15).map((l) => [l.id, l.name]))).toEqual({
       'brawler-1': 'Arsenal Rush', 'brawler-2': 'Iaido Cleave', 'brawler-3': 'Spear and Arrow Storm', 'brawler-4': 'Earthsplitter',
@@ -80,13 +80,14 @@ describe('the six halls’ table (H56, §5)', () => {
     for (const l of table(14)) if (!changed.includes(l.id)) expect(heroLimitFor(l.id, 15), l.id).toBe(l)
   })
 
-  it('moves Archangel’s Verdict and Archdemon’s Pact to the Bastion’s seats 1–2; the live table stays today’s', () => {
+  it('moves Archangel’s Verdict and Archdemon’s Pact to the Bastion’s seats 1–2; the live table is v15’s', () => {
     expect(heroLimitFor('cleric-3', 14)!.name).toBe('Archangel’s Verdict')
     expect(heroLimitFor('cleric-3', 15)!.name).toBe('Dawn Hymn')
     expect(heroLimitFor('paladin-1', 15)).toEqual({ ...heroLimitFor('cleric-3', 14)!, id: 'paladin-1', classId: 'paladin' })
     expect(heroLimitFor('paladin-2', 15)).toEqual({ ...heroLimitFor('cleric-4', 14)!, id: 'paladin-2', classId: 'paladin' })
     expect(heroLimitFor('paladin-1', 14)).toBeUndefined()
-    expect(heroLimit('cleric-3').name).toBe('Archangel’s Verdict')
+    expect(heroLimit('cleric-3').name).toBe('Dawn Hymn')
+    expect(heroLimit('paladin-1').name).toBe('Archangel’s Verdict')
   })
 
   it('raises the hybrids’ power to 2.2× from v15', () => {

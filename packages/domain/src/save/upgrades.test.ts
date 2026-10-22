@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ACCESSORY_TYPES, EQUIP_TYPES, gearId, gearIdentity, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
+import { accessoryFits, ACCESSORY_TYPES, EQUIP_TYPES, gearId, gearIdentity, isOrb, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { ACCESSORY_KINDS, ACCESSORY_SLOTS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, newRanks, WEAPON_TYPES, type ArmorKind, type Ranks } from '../economy/ranks'
 import { GEM_IDENTITIES, STAR_NODES } from '../economy/stars'
 import { rpgDefaultWeapons, rpgProfileTrees, type RpgClass } from '../rpg/rules'
@@ -56,12 +56,13 @@ describe('can upgrade (H34)', () => {
     expect(up(world({ gear: gearOf(['helm-g1'], {}, { head: 'circlet' }) })).gear).toBe(0)
   })
 
-  it('counts an empty accessory slot she can fill, never with the other slot\'s type', () => {
-    expect(up(world({}, { 'talisman-vital-g1': 4 })).gearSlots).toEqual(['accessory-1'])
-    expect(up(world({}, { 'talisman-vital-g1': 1, 'amulet-spring-g1': 1 })).gearSlots).toEqual(['accessory-1', 'accessory-2'])
-    const vital = gearOf([], { 'accessory-1': 'talisman-vital-g1' })
+  it('counts an empty accessory slot she can fill with its type: an Orb the Damage slot, a support the Support slot (C10)', () => {
+    expect(up(world({}, { 'talisman-vital-g1': 4 })).gearSlots).toEqual(['accessory-2'])
+    expect(up(world({}, { 'talisman-vital-g1': 1, 'amulet-spring-g1': 1 })).gearSlots).toEqual(['accessory-2'])
+    expect(up(world({}, { 'talisman-vital-g1': 1, 'orb-fire-g1': 1 })).gearSlots).toEqual(['accessory-1', 'accessory-2'])
+    const vital = gearOf([], { 'accessory-2': 'talisman-vital-g1' })
     expect(up(world({ gear: vital }, { 'talisman-vital-g1': 1, 'talisman-vital-g2': 1 })).gear).toBe(0)
-    expect(up(world({ gear: vital, ranks: ranks({ accessories: { talisman: 2 } }) }, { 'talisman-vital-g2': 1 })).gearSlots).toEqual(['accessory-1'])
+    expect(up(world({ gear: vital, ranks: ranks({ accessories: { talisman: 2 } }) }, { 'talisman-vital-g2': 1 })).gearSlots).toEqual(['accessory-2'])
     expect(up(world({ gear: gearOf(['orb-fire-g1'], { 'accessory-2': 'talisman-vital-g1' }) })).gearSlots).toEqual(['accessory-1'])
     expect(up(world({ gear: gearOf([], { 'accessory-2': 'talisman-vital-g1' }) }, { 'orb-axe-g2': 1 })).gear).toBe(0)
   })
@@ -85,9 +86,11 @@ describe('can upgrade (H34)', () => {
         const slot = ARMOR_SLOTS.find((s) => kinds[s] === type)
         if (slot && rand(2)) equipped[slot] = id
       }
+      // Classes v2's typed slots: an Orb in accessory 1, a Talisman or an Amulet in accessory 2.
       const accessories = locker.filter((id) => isAccessory(gearIdentity(id)!.type))
-      if (accessories[0] && rand(2)) equipped['accessory-1'] = accessories[0]
-      if (accessories[1] && gearIdentity(accessories[1])!.type !== gearIdentity(accessories[0]!)!.type && rand(2)) equipped['accessory-2'] = accessories[1]
+      const orb = accessories.find((id) => isOrb(gearIdentity(id)!.type)), support = accessories.find((id) => !isOrb(gearIdentity(id)!.type))
+      if (orb && rand(2)) equipped['accessory-1'] = orb
+      if (support && rand(2)) equipped['accessory-2'] = support
       const w = world({ ranks: r, gear: gearOf(locker, equipped, kinds) }, stock)
       const uma = w.umas['101']!
       const worn = (slot: GearSlot) => (uma.gear.equipped[slot] ? grade(uma.gear.equipped[slot]!) : 0)
@@ -96,11 +99,9 @@ describe('can upgrade (H34)', () => {
       const expected: GearSlot[] = classOf(uma, 'brawler').weapons.filter((t) => ready((p) => p === t, worn(t)))
       for (const slot of ARMOR_SLOTS) if (ready((p) => p === slotKind(uma.gear, slot), worn(slot))) expected.push(slot)
       const typeIn = (slot: GearSlot) => (uma.gear.equipped[slot] ? gearIdentity(uma.gear.equipped[slot]!)!.type : undefined)
-      const empty = ACCESSORY_SLOTS.filter((s) => !typeIn(s))
-      const fillTypes = ACCESSORY_TYPES.filter((t) => !ACCESSORY_SLOTS.some((s) => typeIn(s) === t) && ready((p) => p === t, 0)).length
       for (const slot of ACCESSORY_SLOTS) {
         const type = typeIn(slot)
-        if (type ? ready((p) => p === type, worn(slot)) : empty.indexOf(slot) < fillTypes) expected.push(slot)
+        if (type ? ready((p) => p === type, worn(slot)) : ACCESSORY_TYPES.some((t) => accessoryFits(slot, t) && ready((p) => p === t, 0))) expected.push(slot)
       }
       expect(up(w).gearSlots, `trial ${trial}`).toEqual(expected)
     }

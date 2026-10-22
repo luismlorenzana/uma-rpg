@@ -1,5 +1,5 @@
-// Classes v2's accessories, built dark (H57, classes-v2.md §6): flat Orbs, the retuned supports and the typed slots, each
-// read by the generation. v1 (engine 14, the live game until H61) must stay today's, byte for byte.
+// Classes v2's accessories, built dark (H57, classes-v2.md §6) and live since H61 (D188): flat Orbs, the retuned supports
+// and the typed slots, each read by the generation. v1 (engine 14, the live game until H61) stays as it was, byte for byte.
 import { describe, expect, it } from 'vitest'
 import {
   ACCESSORY_TYPES, accessoryEffects, accessoryFits, accessorySlotFor, CHARM_PER_GRADE, charmEffect, charmPerGrade, EQUIP_TYPES, equippedAccessories,
@@ -8,7 +8,7 @@ import {
 } from './gear'
 import { ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS } from './ranks'
 
-/** Today's effects of one accessory, written out from D124 and D141 so a change to v1 shows here. */
+/** v1's effects of one accessory, written out from D124 and D141 so a change to v1 shows here. */
 function todays(type: AccessoryType, g: number): AccessoryEffects {
   const out = noAccessoryEffects()
   if (isOrb(type)) { out.orbs.push(orbKind(type)); return out }
@@ -55,18 +55,19 @@ describe('the support accessories (classes v2 §6.3)', () => {
   })
 })
 
-describe('v1 accessories stay today’s (D124, D141)', () => {
-  it('gives every one of the twenty types today’s effects at every grade, live and at engine 14', () => {
+describe('v1 accessories stay as they were (D124, D141); the live ones are v2’s', () => {
+  it('gives every one of the twenty types v1’s effects at every grade at engine 14, and v2’s live', () => {
     expect(ACCESSORY_TYPES).toHaveLength(20)
     for (const type of ACCESSORY_TYPES) {
       for (let g = 1; g <= 10; g++) {
         expect(accessoryEffects(piece(type, g), 14), `${type} G${g}`).toEqual(todays(type, g))
-        expect(accessoryEffects(piece(type, g)), `${type} G${g}`).toEqual(todays(type, g))
+        expect(accessoryEffects(piece(type, g)), `${type} G${g}`).toEqual(accessoryEffects(piece(type, g), 15))
       }
     }
-    expect(accessoryEffects(piece('orb-fire', 10))).not.toHaveProperty('orbMight')
-    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'orb-fire-g4' })).toEqual({ ...noAccessoryEffects(), orbs: ['lance', 'fire'] })
-    expect(CHARM_PER_GRADE).toEqual({ vital: 5, vampire: 20, bulwark: 20, iron: 15, thorn: 30, spring: 1, siphon: 5, veil: 20, ward: 15, mirror: 30 })
+    expect(accessoryEffects(piece('orb-fire', 10), 14)).not.toHaveProperty('orbMight')
+    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'orb-fire-g4' }, 14)).toEqual({ ...noAccessoryEffects(), orbs: ['lance', 'fire'] })
+    expect(CHARM_PER_GRADE).toEqual(charmPerGrade(15))
+    expect(charmPerGrade(14)).toEqual({ vital: 5, vampire: 20, bulwark: 20, iron: 15, thorn: 30, spring: 1, siphon: 5, veil: 20, ward: 15, mirror: 30 })
   })
 })
 
@@ -74,7 +75,7 @@ describe('typed accessory slots (classes v2 §6.1, C10)', () => {
   it('puts an Orb in the Damage slot and a Talisman or an Amulet in the Support slot from v15; either before', () => {
     for (const type of ACCESSORY_TYPES) {
       expect(accessorySlotFor(type, 14), type).toBeNull()
-      expect(accessorySlotFor(type), type).toBeNull()
+      expect(accessorySlotFor(type), type).toBe(accessorySlotFor(type, 15))
       expect(accessorySlotFor(type, 15), type).toBe(isOrb(type) ? 'accessory-1' : 'accessory-2')
       for (const slot of ACCESSORY_SLOTS) {
         expect(accessoryFits(slot, type, 14), `${type} ${slot}`).toBe(true)
@@ -86,7 +87,7 @@ describe('typed accessory slots (classes v2 §6.1, C10)', () => {
     }
   })
 
-  it('names the slots by the live generation: today’s "Accessory 1" and "Accessory 2"', () => {
-    expect(ACCESSORY_SLOT_LABEL).toEqual({ 'accessory-1': 'Accessory 1', 'accessory-2': 'Accessory 2' })
+  it('names the slots by the live generation: "Damage" and "Support" (v1 had "Accessory 1" and "Accessory 2")', () => {
+    expect(ACCESSORY_SLOT_LABEL).toEqual({ 'accessory-1': 'Damage', 'accessory-2': 'Support' })
   })
 })

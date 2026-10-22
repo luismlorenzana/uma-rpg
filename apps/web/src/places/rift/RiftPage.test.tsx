@@ -70,7 +70,7 @@ describe('the Rift (H50)', () => {
     expect(document.querySelector('[data-rift-status]')!.textContent).toBe('Tier 1 · Run 1 · 1 of 4 fronts sealed')
     expect(signUp()).toBeNull()
     expect(fronts()).toEqual(['Iron front, 5/12', 'Arcane front, Sealed', 'Duel front, 0/12', 'Horde front, 3/12', 'Convergence, Seal all four fronts'])
-    expect(document.querySelector('[data-rift-fronts]')!.textContent).toContain('2 Brawler · 2 Spell Blade · Cleric')
+    expect(document.querySelector('[data-rift-fronts]')!.textContent).toContain('2 Brawler · 2 Spell Blade · Paladin')
     expect(screen.getByRole('button', { name: 'Roster' })).not.toBeNull()
   })
 

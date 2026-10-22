@@ -1,5 +1,5 @@
 // Every fight's allies by the fight's generation (H57, classes-v2.md §6.2, C1, C4): from v15 an Orb's flat offense joins
-// her Might on its kind, no Orb kinds are sent, and her HP takes Guts; a v14 build stays today's.
+// her Might on its kind, no Orb kinds are sent, and her HP takes Guts (live since H61, D188); a v14 build stays v1's.
 import { describe, expect, it } from 'vitest'
 import { equippedAccessories, orbOffense } from '../../economy/gear'
 import { createBattle } from '../battle/engine'
@@ -72,11 +72,11 @@ describe('a fight’s allies in classes v2 (H57)', () => {
   })
 })
 
-describe('a fight’s allies in classes v1 stay today’s', () => {
-  it('sends Orb kinds, keeps Might to her weapons and her stats v14’s', () => {
+describe('a fight’s allies in classes v1 stay as they were', () => {
+  it('sends Orb kinds, keeps Might to her weapons and her stats v14’s; the live default is v15’s', () => {
     const p = party(14)
     const allies = rpgPartyAllies(p, mpOf(14), 14)
-    expect(rpgPartyAllies(p, mpOf(14))).toEqual(allies)
+    expect(rpgPartyAllies(party(15), mpOf(15))).toEqual(rpgPartyAllies(party(15), mpOf(15), 15))
     expect(allies.map((a) => a.orbs)).toEqual([['greatsword'], ['lance'], undefined, ['fire'], ['axe']])
     expect(allies.map((a) => a.might)).toEqual([{ greatsword: 12, axe: 8 }, { fire: 4 }, undefined, undefined, undefined])
     allies.forEach((a, i) => expect(a.stats, a.id).toEqual(projectRpgStats(p[i]!.profile, 14)))

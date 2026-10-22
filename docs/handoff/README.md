@@ -95,7 +95,7 @@ The five docs' calls wait on the owner (Q12–Q16).
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Versions:** this game runs on uma-kit 0.12.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+- **Versions:** this game runs on uma-kit 0.12.0, uma-art 2.12.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
   protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done

@@ -8,19 +8,20 @@ import { battleDamage } from './engine'
 import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
-import { HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills } from '../heroes'
+import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills, isHeroLimitId } from '../heroes'
 import type { BattleAlly, BattleCue, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
 import { balanceParty, balanceStage } from '../../world/balance-party'
 import { regionChapter, worldContinent } from '../../world/world'
 
 // Invented outfits only; no private Uma or cast content. At Lv4 depth 1 is open, so every tree's depth-1 core is known.
+// These fights are v6–v14's, so their allies are classes v1's (engine 14), whatever the live generation is (H61).
 function profile(id: string, classId: RpgClass, weapons: RpgWeapon[], sides: string[] = [], level = 4): RpgProfile {
   const p: RpgProfile = { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRates: { speed: 0.05, stamina: 0.05, power: 0.05, guts: 0.05, wit: 0.05 }, classId, weapons, tier: 1, level, exp: 0, tree: [], legacy: [], classRank: level }
   return sides.reduce(learnRpgNode, p)
 }
 function ally(p: RpgProfile, loadout: string[], mp?: number, orb?: RpgDamageKind): BattleAlly {
-  const stats = projectRpgStats(p)
+  const stats = projectRpgStats(p, 14)
   return { id: p.outfitId, classId: p.classId, weapons: p.weapons, tier: p.tier, level: p.level, stats, tree: p.tree, legacy: p.legacy,
     loadout: loadout.map((id) => ({ tier: 1, id })), mp: mp ?? stats.mp, ...(orb ? { orb } : {}) }
 }
@@ -96,7 +97,7 @@ describe('battle engine v6: one act a turn, ten kinds, Orbs (D86)', () => {
     expect(hits(step, 'f1').map((c) => c.kind === 'hit' && c.element)).toEqual(['greatsword', 'lightning', 'lightning'])
     expect(shieldOf(step.state, 'f1')).toBe(3) // two weak Lightning hits
     expect(unitOf(s, 'a3').mp - unitOf(step.state, 'a3').mp).toBe(Math.round(10 * 0.5) * 2)
-    expect(rpgHand({ classId: 'spellblade' }).power).toBe(0.45)
+    expect(rpgHand({ classId: 'spellblade' }, 14).power).toBe(0.45)
   })
 
   it('a summon lingers, then acts again at 0.3 when she next summons, and leaves', () => {
@@ -374,7 +375,9 @@ describe('battle engine v9: Heroes and inherited Limit Breaks (D106, D107)', () 
   })
 
   it('casts every one of the twenty, statuses included', () => {
-    for (const id of HERO_LIMIT_IDS) {
+    const twenty = ALL_HERO_LIMIT_IDS.filter((id) => isHeroLimitId(id, 9))
+    expect(twenty).toHaveLength(20)
+    for (const id of twenty) {
       const step = applyBattleAction(ready(createBattle(v9(team({ hero: id }), tough())).state), { kind: 'limit', actorId: 'a1', targetId: 'f1' })
       expect(step.error, id).toBeUndefined()
       expect(dealt(step), id).toBeGreaterThan(0)
@@ -857,7 +860,7 @@ describe('battle engine v14: the Rift’s ward, a third act and mixed locks (D16
     }
     for (let order = 1; order <= 5; order++) {
       const node = regionChapter(worldContinent({ name: 'Sim', order }).regions[0]!, cast).nodes.filter((n) => n.kind !== 'camp').at(-1)!
-      const input = balanceStage(node, 9000 + order, balanceParty(node.level, { gear: true, stars: true, heroes: true }))
+      const input = balanceStage(node, 9000 + order, balanceParty(node.level, { gear: true, stars: true, heroes: true, engine: 14 }), 14)
       expect(input.version).toBe(14)
       const now = play(input)
       expect(now).toEqual(play({ ...input, version: 13 }))

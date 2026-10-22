@@ -2,7 +2,7 @@
 // site sits idle and none is a bottleneck.
 import { describe, expect, it } from 'vitest'
 import { ITEM_FAMILIES, itemById } from '../items/catalog'
-import { RPG_CLASSES, rpgDefaultWeapons } from '../rpg/rules'
+import { RPG_CLASSES, rpgDefaultWeapons, rpgIsHealer } from '../rpg/rules'
 import { EQUIP_TYPES, recipeFamilies, gearById, type EquipType } from './gear'
 import { GEMS } from './gems'
 
@@ -18,7 +18,9 @@ describe('materials (D86)', () => {
       }
       const counts = Object.values(used), key = `${classId} ${armor[0]} +${accessories.length}`
       expect(counts.every((n) => n > 0), key).toBe(true)
-      expect(Math.max(...counts) - Math.min(...counts), key).toBeLessThanOrEqual(4)
+      // Classes v2's healers' spreads (D179: the Paladin's Greatsword, Axe, Lance, Blizzard and Fire; the Cleric's Light,
+      // Dark, Thunder, Katana and Bow) lean two units further than the rest's four (H61, D188).
+      expect(Math.max(...counts) - Math.min(...counts), key).toBeLessThanOrEqual(rpgIsHealer(classId) ? 6 : 4)
     }
     // Every recipe is two refined items of its own grade, one from each half, and nothing else (D94, D125, D139).
     for (const type of EQUIP_TYPES) for (let g = 1; g <= 10; g++) {

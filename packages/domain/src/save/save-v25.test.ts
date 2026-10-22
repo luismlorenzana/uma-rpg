@@ -1,7 +1,7 @@
-// Save v25 with the switch on (H58): a v24 world `toV25` produced parses under classes v2's live lists (six classes, 24
-// seats, v2's weapon slots), and its open v14 fights replay; the same world unmigrated doesn't. `caps.ts` is mocked to 15
-// in this file of its own, as H61's switch will make it.
-import { describe, expect, it, vi } from 'vitest'
+// Save v25 with the switch on (H58; live since H61, D188): a v24 world `toV25` produced parses under classes v2's live
+// lists (six classes, 24 seats, v2's weapon slots), and its open v14 fights replay; the same world unmigrated, labelled
+// v25, doesn't. The chain itself (a v24 save parsed as v25) is `migrations-v25.test.ts`'s.
+import { describe, expect, it } from 'vitest'
 import { replayV14 } from '../rpg/battle/v14-replays.fixture'
 import { HERO_LIMIT_IDS } from '../rpg/hero-id'
 import { RPG_ALL_CLASSES, RPG_CLASSES } from '../rpg/kinds'
@@ -10,10 +10,6 @@ import { toV25 } from './migrations'
 import { parseSave, SaveParseError } from './save'
 import { migrated, v14Replay, v24Save, V25_RIFT_FIGHT, V25_WORLD_FIGHT } from './v25.fixture'
 
-vi.mock('../rpg/battle/caps', async (importOriginal) => {
-  const caps = await importOriginal<typeof import('../rpg/battle/caps')>()
-  return { ...caps, BATTLE_ENGINE_VERSION: 15, rpgV2: (engine: number = 15) => engine >= caps.RPG_V2_ENGINE }
-})
 
 /** Every Uma of the fixture as a Late surger: the class of one who never picked is her style's, the Cleric. */
 const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(Array.from({ length: 20 }, (_, i) => `${100 + i}`).map((id) => [id, {
@@ -63,8 +59,9 @@ describe('save v25 with the switch on (H58)', () => {
     }
   })
 
-  it('refuses the same world unmigrated, on the Cleric’s weapons', () => {
-    expect(() => parseSave(JSON.parse(JSON.stringify(v24Save())))).toThrow(SaveParseError)
-    expect(() => parseSave(JSON.parse(JSON.stringify(v24Save())))).toThrow(/umas\.103\.classes\.cleric\.weapons: not five weapons a cleric can wield/)
+  it('refuses the same world unmigrated (labelled v25, so the chain skips it), on the Cleric’s weapons', () => {
+    const unmigrated = { ...JSON.parse(JSON.stringify(v24Save())), schemaVersion: 25 }
+    expect(() => parseSave(unmigrated)).toThrow(SaveParseError)
+    expect(() => parseSave(unmigrated)).toThrow(/umas\.103\.classes\.cleric\.weapons: not five weapons a cleric can wield/)
   })
 })

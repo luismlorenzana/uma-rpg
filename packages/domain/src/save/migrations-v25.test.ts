@@ -1,21 +1,27 @@
-// Save v25's migration (H58): `toV25` as written, dark. H61 chains it; until then the live save is v24 and untouched.
+// Save v25's migration (H58): `toV25` as written dark, chained by H61 (D188): a v24 save parses as v25 through it.
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
 import { migrateWorld, toV25 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
-import { CLERIC_LOADOUT, CLERIC_TREE, v24Save } from './v25.fixture'
+import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save } from './v25.fixture'
 
 const world = (): TierWorld => JSON.parse(JSON.stringify(v24Save().tierWorlds['1'])) as TierWorld
 const migrate = (w: TierWorld): TierWorld => toV25(w as unknown as Record<string, unknown>) as unknown as TierWorld
 const umaOf = (w: TierWorld, id: string): OwnedUma => w.umas[id]!
 
-describe('save v25’s migration, dark (H58)', () => {
-  it('isn’t chained yet: the save is still v24 and a v24 world passes the chain untouched', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(24)
+describe('save v25’s migration (H58, chained in H61)', () => {
+  it('is chained: the save is v25, a v24 world runs through toV25 and a v25 world passes the chain untouched', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(25)
     const raw = world()
-    expect(migrateWorld(raw, 24)).toBe(raw)
-    // The fixture is a valid v24 save today.
-    expect(() => parseSave(JSON.parse(JSON.stringify(v24Save())))).not.toThrow()
+    expect(migrateWorld(raw, 24)).toEqual(migrate(world()))
+    expect(migrateWorld(raw, 25)).toBe(raw)
+    // A v24 save parses as v25, exactly as its worlds run through toV25 do.
+    const save = v24Save()
+    expect(save.schemaVersion).toBe(24)
+    const parsed = parseSave(JSON.parse(JSON.stringify(save)))
+    expect(parsed.schemaVersion).toBe(25)
+    expect(parsed).toEqual(parseSave(migrated(save, toV25)))
+    expect(Object.keys(parsed.tierWorlds['1']!.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
   })
 
   it('makes a Cleric’s four Arms and a Fire Tome three Tomes and two Arms, and copies her to the Paladin the other way round', () => {

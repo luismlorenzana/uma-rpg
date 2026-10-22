@@ -63,8 +63,9 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 | Brawler Dojo | `brawler-dojo` | class-hall | 4 | The Brawler Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
 | Mage Tower | `mage-tower` | class-hall | 4 | The Mage Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
 | Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
 | Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Paladin Bastion | `paladin-bastion` | class-hall | 4 | The Paladin Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
 
 ### Battle (`battle`)
@@ -141,10 +142,13 @@ Lapidary:
   Level are locked, gems without materials are dimmed, and a dot marks those the targets need. The picked gem shows the
   node it opens, what that node gives and its materials.
 
-**The Learning page** holds the five Halls of Heroes (D106), one page shared by all five (`places/halls/HallPage.tsx`).
-Each shows its four seats: the seat's Limit Break with its kinds, its Hero large on the left, and her Learners below with
-their Bond Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty the seat, `+` to add a Learner, and a
-Learner to see her Bond or send her away. The Observatory stands below the halls. See [Halls of Heroes](heroes.md).
+**The Learning page** holds the six Halls of Heroes (D106; classes v2, H59), one page shared by all six
+(`places/halls/HallPage.tsx`). The mirrors face each other across the road: Brawler Dojo and Mage Tower, Spell Blade
+Salle and Summoner Circle, the **Paladin Bastion** (a stone keep with a blue banner) and the Cleric Chapel; the
+Observatory stands below. Each hall shows its four seats: the seat's Limit Break with its kinds, its Hero large on the
+left, and her Learners below with their Bond Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty
+the seat, `+` to add a Learner, and a Learner to see her Bond or send her away. Its help says a Learner's inherited
+hits use the higher of her ATK and M.ATK. See [Halls of Heroes](heroes.md).
 
 Hero and Learner choices use the shared Uma picker, highest Uma Level first, then newest release and name. Ineligible
 Umas remain visible with their reason: locked, already seated, already a Hero or Learner, or a seat/parent limit.
@@ -171,7 +175,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     the badge; today's catalogue is marked seen on the first visit.
   - **Can upgrade** (H34): one tap makes her stronger now, as her active class. Crafting doesn't count.
     - Gear: a better piece she can wear, in stock or her own, for one of her five weapons, an armor slot's kind, a
-      worn accessory, or an empty accessory slot.
+      worn accessory, or an empty Damage or Support slot that a piece of its type can fill.
     - Points: her unspent side points, while a side skill of her five trees can be learned.
     - Extra Stats: a Star Gem in stock she can set, or an open node she can switch on.
 - **An Uma's profile:**
@@ -181,8 +185,11 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
-    - Gear: the standard preset, five weapon slots, five armor slots, two accessory slots, the Extra Stats link, and
-      Weapon, Armor and Accessory Rank cells;
+    - Gear: the standard preset ("Cleric · Magical armor · Light Orb · Spring Amulet"), five weapon slots, five armor
+      slots, the **Damage** and **Support** accessory slots, the Extra Stats link, and Weapon, Armor and Accessory
+      Rank cells. Damage shows her Orb and what it adds ("Emerald Fire Orb · G5", "+10 Fire offense"); its sheet lists
+      Orbs only, with the same line ("Ice Orb · G3 · +4 Ice offense"), or "No Orbs yet". Support's sheet lists
+      Talismans and Amulets only, or "No Talismans or Amulets yet";
     - Work;
     - Racing.
   - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
@@ -190,20 +197,27 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     Stats can be upgraded. The class chip's "N pts" shows in green only then. On the Gear tab, each slot that can take
     a better piece has the green mark, and Extra Stats has a green "N to set · N free" pill.
   - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
-    - **Offense:** ATK, M.ATK, each weapon's Might, Orbs;
+    - **Offense:** ATK, M.ATK, each weapon's Might, her Orb ("Fire Orb +10", or "None");
     - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
-    - **Sustain:** HP, HP Regen, Lifesteal, MP, MP Regen, MP Steal;
+    - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), HP Regen,
+      Lifesteal, MP, MP Regen, MP Steal;
     - **Other:** the Limit Break head start.
+
+    Its help names Guts in HP, the Damage slot's Orb as offense, the Support slot's effect, and the healers' ATK and
+    M.ATK.
 
     The six core stats show their total, then in brackets what gear adds (blue) and what active Extra Stats add
     (green) (D99). Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
   - A locked outfit shows **Unlock · 1 Ticket**. An outfit another tier's world owns shows "In Tier n" instead, and in a
     tier above 1 an outfit nobody owns shows "Unlocked in Tier 1" (D5).
 - **Skills page:**
-  - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade, with the green
-    mark when it can take a better piece. A slot's sheet (shared with the Gear tab) lists her Training weapon and
-    crafted pieces of each weapon the slot takes; Spell Blade, Cleric and Summoner can change the weapon, Brawler and
-    Mage only the piece (D98). Each armor slot's sheet picks its physical or magical kind and the piece (D103).
+  - Pick the **active class**, six in two rows of three, each with its emblem and Class Rank, and the **weapons in its
+    five slots**, each shown as Training or its grade, with the green mark when it can take a better piece. A slot's
+    sheet (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon the slot takes; Spell
+    Blade, Summoner, Paladin and Cleric can change the weapon within the slot's kind, Brawler and Mage only the piece
+    (D98). Each armor slot's sheet picks its physical or magical kind and the piece (D103).
+  - The class help adds "A party fights with one healer at most: a Paladin or a Cleric." A Late surger's profile reads
+    "Learns fastest: Paladin / Cleric".
   - The class's **Class Rank** bar, and the depths it opens (D102).
   - Browse her 5 or 10 **trees**, learn and forget side skills, and **equip** skills, or leave it on auto.
 
@@ -216,6 +230,9 @@ Routes: `/town/party-hall` and `:n` (1–20).
   another party remains selectable and moves here (D46). Working does not stop her fighting (D119).
 - Party slots show round outfit faces.
 - **A filled slot:** Swap, View profile, Recall from her job, Remove.
+- **One healer a party:** a party with two healers (Paladins or Clerics) shows "One healer a party" in the warning
+  colour, on its card in the list and under the editor's slots. Picking Umas is never refused; the note goes once one
+  of them fights as a damage class.
 
 ### Scenario Gate
 
@@ -224,7 +241,8 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 - **On every screen:**
   - the **active party bar**: swap the whole party through the shared picker, see each Uma's face and MP. A party
     uses its highest-level member's face and level for ordering; partial parties stay selectable, empty ones stay
-    hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party Hall;
+    hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party
+    Hall. A party with two healers shows "One healer a party" beside it;
   - **Resume the open fight**, when there is one.
 - **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.
   The maps climb from low levels at the bottom, opening at the frontier. Biome icons also appear in the lists.
@@ -239,14 +257,24 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
   - its level range, then twelve stages, each with its level, locked, open or cleared, its waves, ★ boss or ♛ elite.
   - **The stage sheet:**
     - foes by wave, elements, weaknesses, shields, "Acts twice";
-    - **Fight**: the first clear pays triple, replays pay a quarter;
+    - **Fight**: the first clear pays triple, replays pay a quarter. With two healers in the active party the button
+      reads "One healer a party", disabled;
     - **Sweep** ×1, 5, 10 or All.
 - **Fight** (`FightScreen.tsx`, Phaser stage `battle/scene/BattleScene.ts`):
   - **Header:** wave chip (W2/3), round, **Auto**, **speed** (1×, 2×, 4×) and a menu ("Back to the map" keeps the fight
     open; "Give up").
   - **Stage:** foes on top, in two rows from six; the party below, as busts in spaced, bordered cards with solid dark
     backgrounds.
-  - **Controls:** a weapon row, then **Attack**, **Skills** and **Guard**, and the **Limit Break** sheet.
+  - **Controls:** a weapon row, then **Attack**, **Skills** and **Guard**, and the **Limit Break** sheet. The line
+    above says what a tap on a rival does:
+    - a Spell Blade or a Summoner picks a pair, and the line names both halves, a Summoner's Tome half first ("Tap a
+      rival: Snow Sentinel + Shield Knight · 16 MP", "Tap a rival: Fire Tome Attack + Greatsword Attack");
+    - the Skills sheet counts a Spell Blade's extra hit on her Arms skills ("2 hits" for a one-hit cleave) and lists a
+      healer's support ("heals the most hurt, Regen 2 rounds, cleanses, revives the fallen");
+    - a lingering summon's farewell reads "<Uma>'s Snow Sentinel strikes every foe", then its hits land on each foe;
+      a Cleric's Regen reads "<Uma> +90 HP · Regen".
+
+    A fight keeps its own rules: one started before classes v2 still plays a one-half Summoner and v14's support.
 - **Result:** Victory or Defeated, Laurels, Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar, her Class Rank
   bar, and five Weapon and five Armor Rank cells, each glowing on a rank-up (D102). Then "Fight again" or back to the
   map.
@@ -266,7 +294,7 @@ The kit's `ShelfView` (SD3) with this game's shelves:
 - **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and raw items of the grades your continents
   unlock. A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
 - **Manuals** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working Umas
-  remain selectable. Then pick one of her bars (five classes, ten weapons, ten armor kinds); each Manual turns
+  remain selectable. Then pick one of her bars (six classes, ten weapons, ten armor kinds); each Manual turns
   1,000 Gear or Class Marks into 1,000 EXP on it.
 
 ### Observatory
@@ -303,7 +331,7 @@ The end-of-tier event ([loops](loops.md#the-rift), [the Rift](../design/rift.md)
   - "Tier 1 · Run 1 · 2 of 4 fronts sealed" (or the Lv 50 count), and "Resume the open fight" when a Rift fight is open;
   - no run: **Sign up twenty**, disabled with "12 of 20 at Lv 50" until twenty are;
   - a run: the four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · 2 Spell Blade ·
-    Cleric") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", or "Fight 2 of
+    Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", or "Fight 2 of
     4 · Arcane");
   - a won run: **Ascend to Tier 2**;
   - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, a ✓ on each won;
@@ -315,8 +343,8 @@ The end-of-tier event ([loops](loops.md#the-rift), [the Rift](../design/rift.md)
   twelve stages ("Stage 1" to "Champion"), each with its level, waves and foes and its leaders' faces: cleared ✓, the
   next ringed (the page opens on it), the rest locked. Any stage opens its **stage sheet**: the foes by wave as the
   fight will have them (face, elements, Boss or Elite by face, "Acts twice" or "Acts three times", shield, weaknesses,
-  the ward); on the next stage a party of the roster (the best fit for the front's guidance first; others disabled
-  with the reason) and **Fight**.
+  the ward); on the next stage a party of the roster (the best fit for the front's guidance first, never one with two
+  healers; others disabled with the reason, "One healer a party" among them) and **Fight**.
 - **The Convergence:** four slots, Iron, Arcane, Duel and Horde, each with its fight's "Foes" and a party (suggested
   by the fronts' guidance); **Begin** when the four cover the twenty (else "Missing: …"), which starts the attempt and
   its first fight. With an attempt on: its four parties, "Won · 6 rounds" or "Next", **Fight: Arcane** and "End this

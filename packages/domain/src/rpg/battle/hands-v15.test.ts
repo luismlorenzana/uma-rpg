@@ -1,6 +1,6 @@
-// Engine v15's hands, built dark (H55, D183; classes-v2 §3.1–§3.2): each half at its own power, the leading half first,
-// the Spell Blade's extra Arms hit, and the Summoner's mirrored pair with her lingering Tome summon's farewell on every
-// foe. Nothing starts a v15 fight until H61; v6–v14 act as before, which `v14-replays*.test.ts` prove.
+// Engine v15's hands, built dark (H55, D183; classes-v2 §3.1–§3.2) and live since H61 (D188): each half at its own power,
+// the leading half first, the Spell Blade's extra Arms hit, and the Summoner's mirrored pair with her lingering Tome
+// summon's farewell on every foe. v6–v14 act as before, which `v14-replays.test.ts` proves.
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { RPG_ALL_NODES, rpgNode, type RpgSkillDef } from '../catalog'
@@ -269,9 +269,10 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(ok(down, pair('tome-fire', 'bow')).cues.some((c) => c.kind === 'summon')).toBe(false)
   })
 
-  it('names the Greatsword line’s depth-3 summon by the live generation: still "Paladin" until the switch', () => {
+  it('names the Greatsword line’s depth-3 summon the Knight Captain, "Paladin" being a class since the switch', () => {
     expect(['summoner-greatsword.3', 'summoner-greatsword.3a', 'summoner-greatsword.3b'].map((id) => rpgNode(id)!.name))
-      .toEqual(['Paladin', 'Paladin Pack', 'Bonded Paladin'])
+      .toEqual(['Knight Captain', 'Knight Captain Pack', 'Bonded Knight Captain'])
+    expect(rpgNode('summoner-greatsword.4')!.name).toBe('Aegis Champion')
   })
 
   // H56 moved every support to `support15`, which no Summoner node has (D181); H55 landed second and turns this on.

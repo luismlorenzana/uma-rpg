@@ -93,12 +93,12 @@ Tier sheet's Rift line is live. The screens are in the manual's [sections](../ga
 
 ## 5. The four fronts
 
-| Front | Foes | Weak to | Ward | Asks for | Today's party |
+| Front | Foes | Weak to | Ward | Asks for | The party (classes v2's guidance, live since H61) |
 |---|---|---|---|---|---|
 | **Iron** | Mixed formations, mostly sub-bosses and bosses | **1 Arms kind only** (H51; drafted 1–3) | Elements ×0.5, even when Broken | Physical damage that covers several Arms kinds, and multi-hit to chip shields | 2 Brawler, 2 Spell Blade, Paladin |
 | **Arcane** | The same | **1–2 elements only** | Arms ×0.5 | Elemental coverage, areas against the guards | 2 Mage, 2 Summoner, Cleric |
-| **Duel** | **One** boss a fight. She acts twice, three times at the champion. Shield 13–15 (H51; drafted 10–12) | 1–2 Arms **and** 1–2 elements | None | Single-target burst in both channels; locks broken by both | 2 Brawler, 2 Mage, a healer |
-| **Horde** | **4–6 foes a wave**, three waves, each foe weak to its own Arms + element pair. Shields 3 | Mixed, per foe | None | Areas and multi-hit, so every foe is chipped | 2 Spell Blade, 2 Summoner, a healer |
+| **Duel** | **One** boss a fight. She acts twice, three times at the champion. Shield 13–15 (H51; drafted 10–12) | 1–2 Arms **and** 1–2 elements | None | Single-target burst in both channels; locks broken by both | 2 Brawler, 2 Mage, Paladin |
+| **Horde** | **4–6 foes a wave**, three waves, each foe weak to its own Arms + element pair. Shields 3 | Mixed, per foe | None | Areas and multi-hit, so every foe is chipped | 2 Spell Blade, 2 Summoner, Cleric |
 
 **Ward (R5).** On the Iron and Arcane fronts, damage from the wrong channel is halved again, **on top of** the unbroken
 halving. Off-composition parties can still win, slowly.
@@ -143,7 +143,8 @@ with classes v2's parties (§11): Iron's and Arcane's shields double (a captain 
 each front may scale its own champion (Iron ×1.2 HP and offense, H63's for the hybrids' mirror, H60's ×1.17; Arcane ×0.92
 offense; the Horde ×1.05), and so its Convergence fight; the Duel's boss ×1.1 HP and ×2.3 offense (were 1 and 1.65); the Horde's offense ×4.4 (4.6); the
 Convergence at strength ×0.902 (`convergence` −0.18). Faces, ranks and counts are the same, so a run's faces don't move,
-and a fight started on v14 keeps v14's foes. The guidance becomes v2's at the switch (`riftParty`, D178 point 5).
+and a fight started on v14 keeps v14's foes. **Live since H61 (D188):** new Rift fights start on engine v15 with these
+numbers, and the page's guidance and suggestions are v2's (`riftParty`, D178 point 5; the table above).
 
 ## 6. The Convergence
 
@@ -332,9 +333,9 @@ take 59 wins, about the whole run's 58 fights for each re-spec. The one number t
 multiplier can't put all four near 50%: Arcane's and the Duel's stage-8 shapes stay at 100% even at ×1.35, where Iron
 falls to 22% and the Horde to 0%. It stays at ×1.22, five levels' worth.
 
-### Classes v2 (engine v15, H60, D186; re-measured for the hybrids' mirror, H63, D187)
+### Classes v2 (engine v15, H60, D186; re-measured for the hybrids' mirror, H63, D187; live since H61, D188)
 
-The same tables with classes v2's guided parties (D178 point 5: Iron 2 Brawler, 2 Spell Blade, Paladin; Arcane 2 Mage,
+These are the Rift's numbers as it plays: the same tables with classes v2's guided parties (D178 point 5: Iron 2 Brawler, 2 Spell Blade, Paladin; Arcane 2 Mage,
 2 Summoner, Cleric; Duel 2 Brawler, 2 Mage, Paladin; Horde 2 Spell Blade, 2 Summoner, Cleric) on curve at Lv 50 as v2
 Umas (`balanceMember(…, { engine: 15 })`), first try on Auto, 96 fights a stage, on the v15 numbers of §5 and classes
 v2's tuned classes ([classes v2](classes-v2.md) §9). H63's mirror (stronger Spell Blades, a lighter Summoner) took Iron's

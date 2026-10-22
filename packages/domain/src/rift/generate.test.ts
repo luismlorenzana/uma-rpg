@@ -3,7 +3,7 @@ import { BATTLE_ENGINE_VERSION, createBattle } from '../rpg/battle/engine'
 import type { BattleEnemy } from '../rpg/battle/types'
 import { balanceParty } from '../world/balance-party'
 import type { RosterMember } from '../world/roster'
-import { RIFT_FRONT_SPECS, RIFT_TUNING, riftShape } from './fronts'
+import { RIFT_FRONT_SPECS, RIFT_TUNING, riftShape, riftTuning } from './fronts'
 import { defeatedBefore, riftBattleInput, riftChain, riftConvergence, riftFight, riftSeed, riftStrength, type RiftContext, type RiftFightPlan } from './generate'
 import { riftShapeOf } from './picker'
 import { packRoster } from './roster.fixture'
@@ -26,7 +26,7 @@ describe('the Rift generator (H47)', () => {
     expect(plans).toHaveLength(64)
     plans.forEach((plan, i) => {
       const input = riftBattleInput(plan, allies, riftSeed(`rift:t${tier}:${i + 1}`))
-      expect(input.version).toBe(14)
+      expect(input.version).toBe(BATTLE_ENGINE_VERSION)
       expect(() => createBattle(input), plan.name).not.toThrow()
     })
   })
@@ -135,8 +135,11 @@ describe('the Rift generator (H47)', () => {
   it('climbs in strength to the champion, the Convergence and the Lv 55 Echo', () => {
     expect(riftStrength({ kind: 'front', front: 'iron', stage: 1 })).toBe(1)
     expect(riftStrength({ kind: 'front', front: 'horde', stage: 12 })).toBe(1.1)
-    expect(riftStrength({ kind: 'convergence', fight: 3 })).toBe(Math.round((1 + RIFT_TUNING.climb) * (1 + RIFT_TUNING.convergence) * 1e4) / 1e4)
-    expect(riftStrength({ kind: 'echo', front: 'duel', level: '55' })).toBe(RIFT_TUNING.echo55)
+    // The live tuning: v15's override since H61 (H60, D186).
+    const live = riftTuning()
+    expect(live).toBe(riftTuning(BATTLE_ENGINE_VERSION))
+    expect(riftStrength({ kind: 'convergence', fight: 3 })).toBe(Math.round((1 + live.climb) * (1 + live.convergence) * 1e4) / 1e4)
+    expect(riftStrength({ kind: 'echo', front: 'duel', level: '55' })).toBe(live.echo55)
     expect(riftStrength({ kind: 'echo', front: 'duel', level: '45' })).toBe(1)
     const [six, eight] = [6, 8].map((stage) => riftFight(ctx(), { kind: 'front', front: 'iron', stage }))
     const ratio = eight!.strength / six!.strength

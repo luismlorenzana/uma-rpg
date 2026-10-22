@@ -51,9 +51,10 @@ function autoplay(save: Save): { save: Save; result: ReturnType<typeof actInFigh
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)!
     const foe = state.units.filter((u) => u.side === 'enemy' && u.hp > 0).sort((a, b) => a.shield - b.shield || a.hp - b.hp)[0]!
     const source = state.input.allies.find((a) => a.id === ally.id)!
-    // A Spell Blade's act pairs an Arms Attack with a Tome Attack (D86).
-    const action: BattleAction = source.classId === 'spellblade'
-      ? { kind: 'attack', actorId: ally.id, targetId: foe.id, weapon: source.weapons[0], pair: { weapon: source.weapons.find((w) => w.startsWith('tome-')) } }
+    // A Spell Blade's act pairs an Arms Attack with a Tome Attack (D86), and from v15 a Summoner's too (D183).
+    const first = source.weapons[0]!
+    const action: BattleAction = source.classId === 'spellblade' || source.classId === 'summoner'
+      ? { kind: 'attack', actorId: ally.id, targetId: foe.id, weapon: first, pair: { weapon: source.weapons.find((w) => w.startsWith('tome-') !== first.startsWith('tome-')) } }
       : { kind: 'attack', actorId: ally.id, targetId: foe.id }
     const acted = actInFight(s, ura, action, T(100 + n))
     s = acted.save
@@ -75,9 +76,12 @@ describe('classes (D86)', () => {
     const profile = umaProfile(o101, worldOf(save).umas['101']!, 1)
     expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], level: 1, tree: [] })
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
-    // A Cleric picks any five; a Summoner three Tomes and two Arms; a Brawler's five are fixed.
-    const picked = setClassWeapons(save, '101', 'cleric', ['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'], T(4))
-    expect(classOf(worldOf(picked).umas['101']!, 'cleric').weapons).toEqual(['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'])
+    // A Cleric and a Summoner pick three Tomes and two Arms, a Paladin three Arms and two Tomes (classes v2); a Brawler's five
+    // are fixed.
+    const picked = setClassWeapons(save, '101', 'cleric', ['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'], T(4))
+    expect(classOf(worldOf(picked).umas['101']!, 'cleric').weapons).toEqual(['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'])
+    expect(() => setClassWeapons(save, '101', 'cleric', ['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'paladin', ['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'], T(4))).toThrow(/slots/)
     expect(() => setClassWeapons(save, '101', 'summoner', ['katana', 'bow', 'axe', 'tome-ice', 'tome-dark'], T(4))).toThrow(/slots/)
     expect(() => setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'axe', 'lance', 'tome-dark'], T(4))).toThrow(/slots/)
   })
@@ -271,9 +275,12 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     const sheet = umaBattleSheet(o101, uma)
     expect(sheet.map((g) => g.title)).toEqual(['Offense', 'Defense', 'Sustain', 'Other'])
     const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
-    for (const label of ['ATK', 'M.ATK', 'Might', 'Orbs', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
-      'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'Heal', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen',
+    for (const label of ['ATK', 'M.ATK', 'Might', 'Orb', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
+      'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen',
       'MP Steal', 'Limit Break head start']) expect(labels).toContain(label)
+    // Classes v2: one flat Orb, and no Heal (a healer's Mends come from her ATK or M.ATK, `accessories-v2.test.ts`).
+    expect(labels).not.toContain('Orbs')
+    expect(labels).not.toContain('Heal')
     const row = (label: string) => sheet.flatMap((g) => g.rows).find((r) => r.label === label)!
     expect(row('HP Regen').value).toBe('0 a round')
     expect(row('Might').value).toBe('None')

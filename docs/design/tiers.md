@@ -167,7 +167,7 @@ there (D5). A tier's Rift can be run again by its next 20 Lv 50 Umas.
 | **Equipped skills** | 3, and +1 at Lv 10, 20, 30 and 40 (7 at most) | 3, and +1 a Lv 5 step (10 at most, today's) | 10, and one master slot |
 | **Weapons** | Crafted grades 1–10 with Might. **Nothing else:** a weapon is its tree and its Might | **Weapon arts:** each weapon kind gets a small three-node tree, opened by Weapon Rank, that changes its shape (one more hit, a wider area share, Break +1 shield) | **Awakening:** a grade-10 weapon takes one awakened effect, crafted at the Forge |
 | **Armor** | Physical or magical per slot, grades 1–10 (today) | The same, plus **set bonuses** for a full physical or full magical suit | Unchanged |
-| **Accessories** | Two slots. **Orbs are +% damage of their kind** ([classes v2](classes-v2.md) §6) | The same | A third slot |
+| **Accessories** | Two slots, one Damage (a flat Orb) and one Support ([classes v2](classes-v2.md) §6) | The same | A third slot |
 | **Extra Stats** | The eight stat planets, 100 nodes (today) | **An outer ring:** one node pair per damage kind (+% damage of that weapon kind or element), so an Uma can specialize, opened with Tier 2 Star Gems | **Class constellations:** a few nodes per master class |
 | **Limit Breaks** | The Halls of Heroes (today) | The same halls, plus Hero LB+ at Bond 10: the Limit Break gains its seat's extra effect | Unchanged |
 | **Professions** | Craft Level (today) | **A second vertical** (Q7), with its own families feeding the weapon arts and set bonuses | Its own doc |

@@ -18,11 +18,11 @@ const outfit = (id: string): BattleOutfit => ({
   aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } },
 })
 const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(ids(101, 40).map((id) => [id, outfit(id)]))
-/** The guided parties, Iron's to Horde's (D168): parties 0–3 hold the twenty in those classes. */
+/** The guided parties, Iron's to Horde's (classes v2's, D178 point 5): parties 0–3 hold the twenty in those classes. */
 const GUIDED: RpgClass[][] = [
-  ['brawler', 'brawler', 'spellblade', 'spellblade', 'cleric'],
+  ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'],
   ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
-  ['brawler', 'brawler', 'mage', 'mage', 'cleric'],
+  ['brawler', 'brawler', 'mage', 'mage', 'paladin'],
   ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
 ]
 
@@ -60,10 +60,10 @@ describe('the Rift’s labels (H50)', () => {
     expect(riftHome({ kind: 'echo', front: 'iron', level: '50' })).toBe('')
   })
 
-  it('reads each front’s party guidance', () => {
-    expect(partyGuidance('iron')).toBe('2 Brawler · 2 Spell Blade · Cleric')
+  it('reads each front’s party guidance: classes v2’s, live since H61', () => {
+    expect(partyGuidance('iron')).toBe('2 Brawler · 2 Spell Blade · Paladin')
     expect(partyGuidance('arcane')).toBe('2 Mage · 2 Summoner · Cleric')
-    expect(partyGuidance('duel')).toBe('2 Brawler · 2 Mage · Cleric')
+    expect(partyGuidance('duel')).toBe('2 Brawler · 2 Mage · Paladin')
     expect(partyGuidance('horde')).toBe('2 Spell Blade · 2 Summoner · Cleric')
   })
 })
@@ -88,7 +88,8 @@ describe('which parties can fight', () => {
   it('suggests the party that fits a front’s guidance, and one each for the Convergence', () => {
     const { world, run } = fixture()
     expect(guidanceMatch(GUIDED[0]!, 'iron')).toBe(5)
-    expect(guidanceMatch(GUIDED[1]!, 'iron')).toBe(1)
+    expect(guidanceMatch(GUIDED[1]!, 'iron')).toBe(0)
+    expect(guidanceMatch(GUIDED[3]!, 'arcane')).toBe(3)
     expect(bestParty(world, 'iron', OUTFITS, (i) => frontPartyBlock(world, run, i))).toBe(1)
     expect(bestParty(world, 'horde', OUTFITS, (i) => frontPartyBlock(world, run, i))).toBe(0)
     expect(bestParty(world, 'iron', OUTFITS, () => 'No')).toBeNull()

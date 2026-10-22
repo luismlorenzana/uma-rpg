@@ -1,6 +1,6 @@
-// Classes v2's accessories over the save, built dark (H57, classes-v2.md §6, §7): the typed slots when she equips, the six
-// standard presets, "Can upgrade" for an empty typed slot, and the battle sheet's Orb and Mends rows. v2 cases pass engine
-// 15; the live game (engine 14) is checked alongside, unchanged.
+// Classes v2's accessories over the save, built dark (H57, classes-v2.md §6, §7) and live since H61 (D188): the typed slots
+// when she equips, the six standard presets, "Can upgrade" for an empty typed slot, and the battle sheet's Orb and Mends
+// rows. v2 cases pass engine 15, and the live game's defaults are checked to be the same; v1's (engine 14) alongside.
 import { describe, expect, it } from 'vitest'
 import { orbKind } from '../economy/gear-id'
 import { BATTLE_HEAL_OFFENSE_SCALE } from '../rpg/battle/caps'
@@ -57,13 +57,13 @@ describe('typed slots when she equips (classes v2 §6.1, C10)', () => {
     expect(refusal(() => equipGear(save, '101', 'talisman-vital-g1', T(1), '1', 'accessory-1', 15))).toBe('bad-loadout: The Damage slot takes an Orb')
   })
 
-  it('leaves v1 as today: either slot takes any accessory, the first free one by default', () => {
-    let save = brawler({ 'talisman-vital-g1': 1, 'orb-lance-g1': 1 })
-    save = equipGear(save, '101', 'talisman-vital-g1', T(1))
-    expect(accessories(save)).toEqual({ 'accessory-1': 'talisman-vital-g1', 'accessory-2': undefined })
-    save = wearAccessory(save, '101', 'accessory-2', 'orb-lance-g1', T(2), '1', 14)
-    expect(accessories(save)).toEqual({ 'accessory-1': 'talisman-vital-g1', 'accessory-2': 'orb-lance-g1' })
-    roundTrips(save)
+  it('types the live slots, where v1 let either slot take any accessory, the first free one by default', () => {
+    const stock = brawler({ 'talisman-vital-g1': 1, 'orb-lance-g1': 1 })
+    expect(accessories(equipGear(stock, '101', 'talisman-vital-g1', T(1)))).toEqual({ 'accessory-1': undefined, 'accessory-2': 'talisman-vital-g1' })
+    let v1 = equipGear(stock, '101', 'talisman-vital-g1', T(1), '1', undefined, 14)
+    expect(accessories(v1)).toEqual({ 'accessory-1': 'talisman-vital-g1', 'accessory-2': undefined })
+    v1 = wearAccessory(v1, '101', 'accessory-2', 'orb-lance-g1', T(2), '1', 14)
+    expect(accessories(v1)).toEqual({ 'accessory-1': 'talisman-vital-g1', 'accessory-2': 'orb-lance-g1' })
   })
 })
 
@@ -82,8 +82,8 @@ describe('six standard presets (classes v2 §7, C6)', () => {
       expect(orbKind(p.orb), c).toBe(rpgWeaponKind(p.weapons[0]!))
       // v1's support, but where v2 lists its own.
       expect(p.support, c).toBe(CLASS_PRESET_SUPPORT_V2[c] ?? CLASS_PRESET_ACCESSORIES[c].support)
-      // The live preset is today's.
-      expect(classPreset(c), c).toEqual(classPreset(c, 14))
+      // The live preset is v2's.
+      expect(classPreset(c), c).toEqual(classPreset(c, 15))
     }
     expect(classPreset('cleric', 15).weapons).toEqual(['tome-light', 'tome-dark', 'tome-lightning', 'katana', 'bow'])
   })
@@ -91,9 +91,10 @@ describe('six standard presets (classes v2 §7, C6)', () => {
   it('binds and wears a Paladin’s: her spread, physical armor, a Greatsword Orb and a Thorn Talisman', () => {
     const kit = ['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire', 'helm', 'cuirass', 'greaves', 'gauntlets', 'boots', 'orb-greatsword', 'talisman-thorn']
     const save = brawler(Object.fromEntries(kit.map((t) => [`${t}-g1`, 1])))
-    // Before the switch the Paladin isn't a class the game offers.
-    expect(refusal(() => classPresetPlan(worldOf(save), '101', 'paladin'))).toBe('bad-class: no class paladin')
+    // Classes v1 had no Paladin; the live game has.
+    expect(refusal(() => classPresetPlan(worldOf(save), '101', 'paladin', 14))).toBe('bad-class: no class paladin')
     const plan = classPresetPlan(worldOf(save), '101', 'paladin', 15)
+    expect(classPresetPlan(worldOf(save), '101', 'paladin')).toEqual(plan)
     expect(plan.weapons).toEqual(['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire'])
     expect(plan.kinds).toEqual({ head: 'helm', body: 'cuirass', legs: 'greaves', arms: 'gauntlets', feet: 'boots' })
     expect([...plan.binds].sort()).toEqual(kit.map((t) => `${t}-g1`).sort())
@@ -122,7 +123,7 @@ describe('"Can upgrade" with typed slots (classes v2 §7, H34)', () => {
     expect(slots(brawler({ 'amulet-spring-g1': 1 }), 14)).toEqual(['accessory-1'])
     expect(slots(brawler({ 'orb-axe-g1': 1, 'amulet-spring-g1': 1 }), 15)).toEqual(['accessory-1', 'accessory-2'])
     expect(slots(brawler({ 'orb-axe-g1': 2 }), 15)).toEqual(['accessory-1'])
-    expect(upgradesFor(worldOf(brawler({ 'orb-axe-g1': 2 })), '101', 'brawler')).toEqual(upgradesFor(worldOf(brawler({ 'orb-axe-g1': 2 })), '101', 'brawler', 1, 14))
+    expect(upgradesFor(worldOf(brawler({ 'orb-axe-g1': 2 })), '101', 'brawler')).toEqual(upgradesFor(worldOf(brawler({ 'orb-axe-g1': 2 })), '101', 'brawler', 1, 15))
   })
 })
 
@@ -150,11 +151,12 @@ describe('the battle sheet in classes v2 (§3.3, §6.2)', () => {
     expect(row(save, 'cleric', 'Heal', 15)).toBeUndefined()
   })
 
-  it('stays today’s in v1: Orb kinds and Heal', () => {
-    expect(row(save, 'brawler', 'Orbs')?.value).toBe('Fire')
-    expect(row(save, 'brawler', 'Heal')?.value).toMatch(/^\d+ \(mends ×\d\.\d\d\)$/)
-    expect(row(save, 'brawler', 'Orb')).toBeUndefined()
-    expect(row(save, 'cleric', 'Mends')).toBeUndefined()
-    expect(rows(save, 'brawler')).toEqual(rows(save, 'brawler', 14))
+  it('is v2’s live, and v1’s at engine 14: Orb kinds and Heal', () => {
+    expect(row(save, 'brawler', 'Orbs', 14)?.value).toBe('Fire')
+    expect(row(save, 'brawler', 'Heal', 14)?.value).toMatch(/^\d+ \(mends ×\d\.\d\d\)$/)
+    expect(row(save, 'brawler', 'Orb', 14)).toBeUndefined()
+    expect(row(save, 'cleric', 'Mends', 14)).toBeUndefined()
+    expect(rows(save, 'brawler')).toEqual(rows(save, 'brawler', 15))
+    expect(rows(save, 'cleric')).toEqual(rows(save, 'cleric', 15))
   })
 })

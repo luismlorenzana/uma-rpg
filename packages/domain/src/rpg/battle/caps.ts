@@ -11,8 +11,9 @@ export const BATTLE_HEAL_SCALE = 300
 
 // --- The one switch (H53, D179) ----------------------------------------------------------------------------------------
 //
-// Classes v2 (docs/design/classes-v2.md, D160) is engine v15, built dark: every v2 rule answers by generation, and H61
-// turns the whole of it on by changing BATTLE_ENGINE_VERSION alone (with save v25). The pattern every v2 rule follows:
+// Classes v2 (docs/design/classes-v2.md, D160) is engine v15, built dark in H53–H60 and live since H61 (D188): every v2
+// rule answers by generation, and H61 turned the whole of it on by changing BATTLE_ENGINE_VERSION alone (with save v25).
+// The pattern every v2 rule follows:
 // - a rule outside the engine takes an `engine` argument that defaults to BATTLE_ENGINE_VERSION, so the live game
 //   (profiles, the save, the screens) follows the switch: `rpgHand(profile, engine = BATTLE_ENGINE_VERSION)`;
 // - the engine never relies on that default: every rules call it makes passes the fight's own version
@@ -21,7 +22,7 @@ export const BATTLE_HEAL_SCALE = 300
 // `rpg/battle/v14-replays*.test.ts` proves it: v14 fights replay byte for byte under the live switch and with it at 15.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 14
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 15
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */

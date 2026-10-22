@@ -1,17 +1,12 @@
-// Classes v2's typed accessory slots with the one switch at 15 (H57, C10): a save's `accessory-1` holds an Orb or nothing,
-// its `accessory-2` a Talisman, an Amulet or nothing, and the live rules (labels, equipping) follow. `caps.ts` is mocked in
-// this file of its own, as in `v14-replays-live15.test.ts`; H61's switch makes this the live case.
-import { describe, expect, it, vi } from 'vitest'
+// Classes v2's typed accessory slots, live since H61 (H57, C10; D188): a save's `accessory-1` holds an Orb or nothing, its
+// `accessory-2` a Talisman, an Amulet or nothing, and the live rules (labels, equipping) follow.
+import { describe, expect, it } from 'vitest'
 import { ACCESSORY_SLOT_LABEL } from '../economy/ranks'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { equipGear, wearAccessory } from './forge'
 import { unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type Save } from './save'
 
-vi.mock('../rpg/battle/caps', async (importOriginal) => {
-  const caps = await importOriginal<typeof import('../rpg/battle/caps')>()
-  return { ...caps, BATTLE_ENGINE_VERSION: 15, rpgV2: (engine: number = 15) => engine >= caps.RPG_V2_ENGINE }
-})
 
 const T = (n: number) => `2026-10-22T12:00:${String(n).padStart(2, '0')}.000Z`
 /** Uma 101, a Brawler, with these pieces hers and worn. */

@@ -23,9 +23,14 @@ const outfits = new Map<string, BattleOutfit>(RPG_CLASSES.map((_, i) => {
     growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 0, wit: 0 },
     aptitudes: { strategy: { front: 'A', pace: 'B', late: 'C', end: 'D' } } }]
 }))
+/** One Uma of each class; the first five in party 0, so the Paladin waits outside it (one healer a party, classes v2). */
 function party(): Save {
   let s = newSave('Parser test', NOW)
-  ;[...outfits.keys()].forEach((id, i) => { s = chooseClass(setPartySlot(unlockUma(s, id, NOW), 0, i, id, NOW), id, RPG_CLASSES[i]!, NOW) })
+  ;[...outfits.keys()].forEach((id, i) => {
+    s = unlockUma(s, id, NOW)
+    if (i < 5) s = setPartySlot(s, 0, i, id, NOW)
+    s = chooseClass(s, id, RPG_CLASSES[i]!, NOW)
+  })
   return s
 }
 function frozen(): Save {

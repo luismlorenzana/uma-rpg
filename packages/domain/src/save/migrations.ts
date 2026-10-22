@@ -211,10 +211,11 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v21 = version < 21 && isRecord(v20) ? toV21(v20) : v20
   const v22 = version < 22 && isRecord(v21) ? toV22(v21) : v21
   const v23 = version < 23 && isRecord(v22) ? toV23(v22) : v22
-  return version < 24 && isRecord(v23) ? toV24(v23) : v23
+  const v24 = version < 24 && isRecord(v23) ? toV24(v23) : v23
+  return version < 25 && isRecord(v24) ? toV25(v24) : v24
 }
 
-// --- v24 → v25 (D180): classes v2's Paladin. Written in H58, dark; H61 chains it with SAVE_SCHEMA_VERSION 25 -----------
+// --- v24 → v25 (D180): classes v2's Paladin. Written in H58, chained by H61 with SAVE_SCHEMA_VERSION 25 (D188) ----------
 
 /** Classes v2's Arms and its two healers' default spreads (D179), as literals: a migration step is frozen history. */
 const V25_ARMS = ['greatsword', 'axe', 'lance', 'bow', 'katana']
@@ -293,9 +294,8 @@ function v25Uma(raw: unknown): unknown {
 }
 
 /**
- * v24 → v25 (D180, classes-v2.md §5, §6.1, §8): the Paladin joins and nobody loses progress. Exported and tested, but
- * **not chained** until H61 sets `SAVE_SCHEMA_VERSION` to 25 and adds it to `migrateWorld` in the same commit as the
- * switch: chained now, it would migrate every live save. Per Uma:
+ * v24 → v25 (D180, classes-v2.md §5, §6.1, §8): the Paladin joins and nobody loses progress. Written dark in H58 and
+ * chained by H61 (D188) with `SAVE_SCHEMA_VERSION` 25, in the switch's commit. Per Uma:
  * 1. with Cleric progress and no Paladin entry yet, her Cleric Class Rank is copied to the Paladin, and her Cleric setup
  *    becomes the Paladin's: the tree renamed `cleric-` → `paladin-` (same depths, sides and costs: Rebirth becomes Heavy
  *    Devotion, Heavy Transfix Valkyrie's Oath), the weapons of 3, and her loadout renamed (null stays null) keeping her

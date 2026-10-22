@@ -8,7 +8,8 @@ describe('@rpg/domain/rift', () => {
     expectTypeOf<RiftFightPlan['level']>().toEqualTypeOf<number>()
     expectTypeOf<RiftContext['runId']>().toEqualTypeOf<string | null>()
     const rift = await import('@rpg/domain/rift')
-    const t = rift.RIFT_TUNING
+    // The live tuning: v15's override since H61 (H60, D186).
+    const t = rift.riftTuning()
     expect(rift.riftStrength({ kind: 'convergence', fight: 0 })).toBe(Math.round((1 + t.climb) * (1 + t.convergence) * 1e4) / 1e4)
   })
 })

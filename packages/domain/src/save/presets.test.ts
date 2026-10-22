@@ -34,12 +34,13 @@ const refusal = (fn: () => unknown): string | null => {
 }
 
 describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
-  it('has a row for every class: its default spread, its armor half, an Orb for a kind it lacks and a support', () => {
+  // Classes v1's presets (engine 14), kept to document the old game; v2's six are `accessories-v2.test.ts`'s (H57).
+  it('had a v1 row for every class: its default spread, its armor half, an Orb for a kind it lacks and a support', () => {
     expect(Object.keys(CLASS_PRESET_ACCESSORIES).sort()).toEqual([...RPG_ALL_CLASSES].sort())
     const partner = (k: RpgDamageKind): RpgDamageKind => { const pair = RPG_KIND_PAIRS.find((p) => (p as readonly string[]).includes(k))!; return pair[0] === k ? pair[1] : pair[0] }
     for (const c of RPG_ALL_CLASSES) {
-      const p = classPreset(c)
-      expect(validRpgWeapons(c, p.weapons), c).toBe(true)
+      const p = classPreset(c, 14)
+      expect(validRpgWeapons(c, p.weapons, 14), c).toBe(true)
       expect(p.armor).toBe(RPG_CLASS_ARMOR[c])
       expect(isOrb(p.orb), c).toBe(true)
       const kinds = p.weapons.map(rpgWeaponKind)
@@ -48,7 +49,7 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
       expect(orbKind(p.orb), c).toBe(kinds.map(partner).find((k) => !kinds.includes(k)))
       expect(isTalisman(p.support) || isAmulet(p.support), c).toBe(true)
     }
-    expect(classPreset('mage')).toEqual({ classId: 'mage', weapons: ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'], armor: 'magical', orb: 'orb-greatsword', support: 'amulet-siphon' })
+    expect(classPreset('mage', 14)).toEqual({ classId: 'mage', weapons: ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'], armor: 'magical', orb: 'orb-greatsword', support: 'amulet-siphon' })
   })
 
   it('is what a new Uma already wears (H32)', () => {
@@ -128,31 +129,26 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     roundTrips(save)
   })
 
-  it('wears the Orb in accessory 1 and the support in accessory 2, never two of a type', () => {
-    // An Orb from the stock goes to accessory 1.
-    let save = stocked(unlocked(), { 'orb-fire-g1': 1 })
-    expect(plan(save, '101', 'brawler')).toMatchObject({ binds: ['orb-fire-g1'], wear: { 'accessory-1': 'orb-fire-g1' }, changes: 1 })
+  it('wears the Orb in the Damage slot and the support in the Support slot (classes v2, C10)', () => {
+    // A Greatsword Orb from the stock goes to accessory 1, the Damage slot.
+    let save = stocked(unlocked(), { 'orb-greatsword-g1': 1 })
+    expect(plan(save, '101', 'brawler')).toMatchObject({ binds: ['orb-greatsword-g1'], wear: { 'accessory-1': 'orb-greatsword-g1' }, changes: 1 })
     save = wearClassPreset(save, '101', 'brawler', T(1))
-    expect(worldOf(save).umas['101']!.gear.equipped).toEqual({ 'accessory-1': 'orb-fire-g1' })
+    expect(worldOf(save).umas['101']!.gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1' })
     expect(worldOf(save).gear).toEqual({})
-    // A Vampire Talisman she wore in accessory 1 moves to accessory 2; with no Orb, accessory 1 empties.
-    const moved = wearing(unlocked(), '101', { 'accessory-1': 'talisman-vampire-g1' })
-    const p = plan(moved, '101', 'brawler')
-    expect(p.wear).toMatchObject({ 'accessory-1': null, 'accessory-2': 'talisman-vampire-g1' })
-    expect(p).toMatchObject({ binds: [], changes: 2 })
-    const after = wearClassPreset(moved, '101', 'brawler', T(1))
-    expect(worldOf(after).umas['101']!.gear.equipped).toEqual({ 'accessory-2': 'talisman-vampire-g1' })
+    roundTrips(save)
+    // An Orb of another kind she wears gives way to her preset's; her Vampire Talisman binds into accessory 2, the Support slot.
+    const other = stocked(wearing(unlocked(), '101', { 'accessory-1': 'orb-fire-g1' }), { 'orb-greatsword-g1': 1, 'talisman-vampire-g1': 1, 'amulet-ward-g1': 1 })
+    const p = plan(other, '101', 'brawler')
+    expect(p).toMatchObject({ binds: ['orb-greatsword-g1', 'talisman-vampire-g1'], wear: { 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-vampire-g1' }, changes: 2 })
+    const after = wearClassPreset(other, '101', 'brawler', T(1))
+    expect(worldOf(after).umas['101']!.gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-vampire-g1' })
+    expect(worldOf(after).umas['101']!.gear.locker).toEqual(expect.arrayContaining(['orb-fire-g1']))
+    expect(worldOf(after).gear).toEqual({ 'amulet-ward-g1': 1 })
     roundTrips(after)
-    // With no Orb to wear, accessory 1 keeps a piece of another type; the support binds from the stock beside it.
-    const kept = stocked(wearing(unlocked(), '101', { 'accessory-1': 'talisman-iron-g1' }), { 'talisman-vampire-g1': 1, 'amulet-ward-g1': 1 })
-    const k = plan(kept, '101', 'brawler')
-    expect(k.wear).not.toHaveProperty('accessory-1')
-    expect(k).toMatchObject({ binds: ['talisman-vampire-g1'], wear: { 'accessory-2': 'talisman-vampire-g1' }, changes: 1 })
-    expect(worldOf(wearClassPreset(kept, '101', 'brawler', T(1))).umas['101']!.gear.equipped)
-      .toEqual({ 'accessory-1': 'talisman-iron-g1', 'accessory-2': 'talisman-vampire-g1' })
-    // An Orb she wore in accessory 2 moves to accessory 1, and accessory 2 empties with no support to wear.
-    const swapped = wearing(unlocked(), '101', { 'accessory-2': 'orb-fire-g1' })
-    expect(plan(swapped, '101', 'brawler').wear).toMatchObject({ 'accessory-1': 'orb-fire-g1', 'accessory-2': null })
+    // With no Orb of her kind to wear, her own Orb stays on.
+    const kept = stocked(wearing(unlocked(), '101', { 'accessory-1': 'orb-fire-g1' }), { 'talisman-vampire-g1': 1 })
+    expect(plan(kept, '101', 'brawler').wear).not.toHaveProperty('accessory-1')
   })
 
   it('applies to the world only when something changes, and refuses an Uma not owned or an unknown class', () => {
@@ -161,7 +157,9 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     expect(applyClassPreset(world, '101', 'brawler')).toBe(world)
     expect(applyClassPreset(world, '101', 'mage')).not.toBe(world)
     expect(refusal(() => wearClassPreset(save, '999', 'mage', T(1)))).toBe('not-owned')
-    expect(refusal(() => wearClassPreset(save, '101', 'paladin' as RpgClass, T(1)))).toBe('bad-class')
-    expect(refusal(() => classPresetPlan(world, '101', 'paladin' as RpgClass))).toBe('bad-class')
+    expect(refusal(() => wearClassPreset(save, '101', 'bard' as RpgClass, T(1)))).toBe('bad-class')
+    expect(refusal(() => classPresetPlan(world, '101', 'bard' as RpgClass))).toBe('bad-class')
+    // Classes v1 had no Paladin.
+    expect(refusal(() => classPresetPlan(world, '101', 'paladin', 14))).toBe('bad-class')
   })
 })

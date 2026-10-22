@@ -1,6 +1,6 @@
-// One healer a party and the Paladin's start with the switch on (H58, classes v2 C8 and §3.3). `caps.ts` is mocked to 15
-// in this file of its own, as H61's switch will make it; `starting-class-v2.test.ts` holds the same rules switched off.
-import { describe, expect, it, vi } from 'vitest'
+// One healer a party and the Paladin's start with the switch on (H58, classes v2 C8 and §3.3), the live game since H61
+// (D188); `starting-class-v2.test.ts` holds the same rules at engine 14.
+import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, startingClass, type BattleOutfit } from './battle'
 import { beginConvergence, convergenceBlock, riftFightBlock, signUpRift, startRiftFight, sweepEcho } from './rift'
@@ -8,10 +8,6 @@ import { OUTFITS as RIFT_OUTFITS, riftWorldSave, ROSTER, T, TWENTY } from './rif
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, type Save, type TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (importOriginal) => {
-  const caps = await importOriginal<typeof import('../rpg/battle/caps')>()
-  return { ...caps, BATTLE_ENGINE_VERSION: 15, rpgV2: (engine: number = 15) => engine >= caps.RPG_V2_ENGINE }
-})
 
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
 const ura = regionChapter(worldContinent({ name: 'URA Finale', order: 1 }).regions[0]!, cast)

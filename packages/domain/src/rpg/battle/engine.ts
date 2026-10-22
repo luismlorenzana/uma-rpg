@@ -1,4 +1,4 @@
-// Deterministic campaign battle reducer, engine v7 (W3, D91; classes D86, docs/design/class-rework.md; Limit Breaks D311).
+// Deterministic campaign battle reducer, engine v15 (W3, D91; classes D86, docs/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
@@ -8,7 +8,7 @@
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
-// v15 classes v2 (D179), dark until H61: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs.
+// v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
@@ -30,7 +30,7 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
- * the engine. Older versions still replay; v15 is accepted, dark, until H61 flips it. */
+ * the engine. Older versions still replay; v15 is live since H61 (D188). */
 export { BATTLE_ENGINE_VERSION, RPG_V2_ENGINE, rpgV2 } from './caps'
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'

@@ -71,10 +71,12 @@ export function v24Save(): Save {
     battles: 5,
   }
   save.account.updatedAt = T2
+  // Labelled v24, as a save written before H61 is (the type names the live version): parsing it runs the chain's `toV25`.
+  ;(save as { schemaVersion: number }).schemaVersion = 24
   return save
 }
 
-/** A save's worlds as JSON, each run through `step`, still labelled v24: what H61's chain will hand the parser. */
+/** A save's worlds as JSON, each run through `step`, still labelled v24: what the chain hands the parser since H61. */
 export function migrated(save: Save, step: (world: Record<string, unknown>) => Record<string, unknown>): unknown {
   const raw = JSON.parse(JSON.stringify(save)) as { tierWorlds: Record<string, Record<string, unknown>> }
   return { ...raw, tierWorlds: Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, step(w)])) }

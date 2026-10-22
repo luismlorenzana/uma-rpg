@@ -30,7 +30,8 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
 - **Classes:** switching is free. A new Uma starts in her running style's class and in its armor, magical for a Mage,
-  Cleric or Summoner (D162, [classes](classes.md)).
+  Cleric or Summoner (D162, [classes](classes.md)); a Late surger whose Power beats her Wit starts as a Paladin (D180).
+  A party fights with one healer, a Paladin or a Cleric, at most.
 
 ## Leveling
 
@@ -91,7 +92,7 @@ Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, C
 <!-- /live -->
 
 - **What a win pays,** for `E` Uma EXP: her class 2E; her five slotted weapons share 5E, two parts for each weapon she
-  used that fight (an attack, a skill, a Spell Blade half, a Limit Break), one part for the rest; each of her five armor
+  used that fight (an attack, a skill, a Spell Blade's or a Summoner's half, a Limit Break), one part for the rest; each of her five armor
   slots' kinds E. A Sweep shares weapon EXP evenly.
 - **No caps between bars:** a Lv 1 Uma can wear a grade-10 weapon if its rank allows.
 - **A campaign** (about 120 first clears) takes one Uma to Lv 50, two classes to Rank 50, and five weapons and five
@@ -244,7 +245,7 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 - **Slots (D124):**
   - her class's five weapon slots;
   - five armor slots (head, body, legs, arms, feet), each holding its physical or its magical piece;
-  - two accessory slots, holding two accessories of different types.
+  - two accessory slots: **Damage** for an Orb, **Support** for a Talisman or an Amulet (classes v2, C10).
 
   An empty weapon or armor slot holds the Training piece of its kind (grade 0, no stats); an empty accessory slot holds
   nothing.
@@ -254,8 +255,8 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
     on-curve Uma's hits; worn ahead of its level it is worth more, kept long after less.
   - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉ (D143), and its slot's defensive stat +2g (D141). Head DEF, body HP, legs MP,
     arms MDEF, feet Speed.
-  - An Orb adds its kind to every hit, for weaknesses. A Talisman or an Amulet gives one defensive effect, a share of
-    her own numbers so it keeps its worth at every level ([combat](combat.md#damage), D141).
+  - An Orb adds offense to her hits of its kind, half a weapon's Might at its grade (C4). A Talisman or an Amulet gives
+    one effect, a share of her own numbers so it keeps its worth at every level ([combat](combat.md#damage), D141).
 - **Wearing a grade:** grade g needs her Weapon Rank (for a weapon), Armor Rank (for its kind) or Accessory Rank (for
   the accessory's kind) ≥ g.
 - **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.
@@ -264,12 +265,12 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
   grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
   and the stock above it.
 - **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
-  ([classes](classes.md#weapons)): the class's five default weapons, its armor half in all five slots, its Orb in
-  accessory 1 and its support in accessory 2.
+  ([classes](classes.md#weapons)): the class's five default weapons, its armor half in all five slots, its Orb in the
+  Damage slot and its support in the Support slot.
   - **What it wears:** on each of those types, her best own piece her rank allows. Then **the climb**: from her best
     grade, it binds each next grade while the stock has it and her rank allows it, and wears the top, as tapping a sheet
-    grade by grade does. With nothing, a weapon or armor slot holds its Training piece; an accessory slot keeps what it
-    holds, unless the other slot now takes that type, and then it empties.
+    grade by grade does. With nothing, a weapon or armor slot holds its Training piece, and an accessory slot keeps
+    what it holds.
   - **What it never binds:** a grade above her rank, armor of the other half, other accessory types or weapons outside
     the spread. Pieces on her other weapons stay on (they serve her other classes); armor of the other half goes back to
     her locker. Her learned and equipped skills stay; one outside the new trees isn't used.
@@ -299,6 +300,10 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   can be cancelled.
 - **The roster lock:** front and Convergence fights take only the twenty. Between fights, arrange them into any of the
   world's parties, and change their classes, skills and gear freely.
+- **The guidance** (classes v2, D178, H60): Iron 2 Brawler, 2 Spell Blade and a Paladin; Arcane 2 Mage, 2 Summoner and
+  a Cleric; Duel 2 Brawler, 2 Mage and a Paladin; Horde 2 Spell Blade, 2 Summoner and a Cleric. The page suggests the
+  party that fits a front best, and one for each of the Convergence's slots, never one with two healers. A front,
+  Echo or Convergence fight takes one healer at most, as the world map does.
 - **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
   in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
   world's twenty parties, full, all five on the roster. Its 12th stage seals the front.

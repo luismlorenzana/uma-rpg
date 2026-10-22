@@ -1,13 +1,26 @@
-// v6–v14 fights replay exactly, whatever classes v2 builds (H53, D179): the frozen fixture's v14 fights, replayed under the
-// live engine. Its twin, `v14-replays-live15.test.ts`, replays them with the switch mocked to 15.
+// v6–v14 fights replay exactly, whatever classes v2 builds (H53, D179): the frozen fixture's v14 fights, generated on the
+// engine before classes v2, replayed under the live engine. Since H61 (D188) the live switch is 15, so every class rule's
+// default reads classes v2: a rules call in the engine that leaned on its default instead of the fight's version would
+// move them. (Until H61 a twin file replayed them with `caps.ts` mocked to 15; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
-import { replayBattle } from './engine'
+import { HERO_LIMIT_IDS } from '../hero-id'
+import { RPG_ALL_CLASSES, RPG_CLASSES, rpgHand } from '../rules'
+import { BATTLE_ENGINE_VERSION, replayBattle, rpgV2 } from './engine'
 import { loadV14Replays, regenerateV14Replays, replayV14 } from './v14-replays.fixture'
 
 const replays = process.env.UPDATE_V14 ? regenerateV14Replays() : loadV14Replays()
 
 describe('the frozen v14 replays (H53)', () => {
+  it('runs with classes v2 live (H61)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(15)
+    expect(rpgV2()).toBe(true)
+    expect(RPG_CLASSES).toEqual(RPG_ALL_CLASSES)
+    expect(HERO_LIMIT_IDS).toHaveLength(24)
+    expect(rpgHand({ classId: 'spellblade' })).toMatchObject({ arms: 0.72, tome: 0.44 })
+  })
+
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {
+    expect(r.input.version).toBe(14)
     expect(replayV14(r.input, r.actions)).toEqual({ outcome: r.outcome, rounds: r.rounds, hash: r.hash, cues: r.cues, cueDigest: r.cueDigest })
   })
 

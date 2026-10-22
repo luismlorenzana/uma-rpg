@@ -285,8 +285,9 @@ Crafted at the Forge (D124, D125): 40 types in ten grades, five physical and fiv
 **Recipes (D125, D139):** two refined items of the grade, one from each half of the Wilds, as one of four pairs:
 Ores + Crystals, Woods + Essences, Hides & Scales + Bones & Horns, Stones + Fibers. A type's grades walk through the
 pairs in turn, starting at its own place among the types (the table below lists each type's first four). So every
-Uma's gear uses all eight Wilds families about equally, whatever her class, armor half or accessories: 24–26 refined
-items of each, or 28–32 with two accessories. Spread a roster's Wilds workers evenly and nothing piles up.
+Uma's gear uses all eight Wilds families about equally, whatever her class, armor half or accessories: 23–27 refined
+items of each, or 27–33 with two accessories (the Paladin's and the Cleric's spreads lean the most; the others stay
+within 24–26 and 28–32). Spread a roster's Wilds workers evenly and nothing piles up.
 
 Maxing one Uma's twelve tracks takes 240 refined items, about what her 100 Star Gems take (232). The Uma's Craft
 Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade>`; pieces carry no accent.
@@ -295,17 +296,18 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 - **A weapon's Might:** its grade's value added to the offense of hits made with that weapon (D142, D143).
 - **Armor:** ATK (physical) or M.ATK (magical) +⌈grade ÷ 2⌉, and its slot's defensive stat +2 a grade (D141). Head DEF,
   body HP, legs MP, arms MDEF, feet Speed.
-- **An Orb:** its kind on every hit, for weaknesses only.
-- **A Talisman or an Amulet:** the small effect in the table below ([combat](combat.md#damage)).
+- **An Orb:** offense on her hits of its kind, half a weapon's Might at its grade (classes v2, C4).
+- **A Talisman or an Amulet:** the effect in the table below ([combat](combat.md#damage)).
 
 **Slots and wearing:**
-- **Slots:** five weapon slots (her class's), five armor slots (head, body, legs, arms, feet) and two accessory slots
-  (any two different types).
+- **Slots:** five weapon slots (her class's), five armor slots (head, body, legs, arms, feet) and two accessory slots,
+  Damage for an Orb and Support for a Talisman or an Amulet (C10).
 - **Wearing a grade:** grade k needs her Weapon Rank for that weapon, her Armor Rank for that armor kind, or her
   Accessory Rank for the accessory's kind, at k or more ([classes](classes.md#ranks-and-levels)).
 - **Training pieces:** every Uma holds a grade-0 Training piece of each weapon and armor kind, with no stats. It fills a
   slot until she binds that kind's grade 1, and isn't offered after (D98, D124). A new Uma's armor slots hold her
-  starting class's Training pieces: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or Summoner (D162).
+  starting class's Training pieces: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or Summoner, the
+  physical ones for a Brawler or a Paladin (D162).
 
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |
@@ -330,27 +332,27 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 | Leggings | `leggings-g<grade>` | Legs | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | MP +20, M.ATK +5 |
 | Bracers | `bracers-g<grade>` | Arms | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | M.ATK +5, M.DEF +20 |
 | Slippers | `slippers-g<grade>` | Feet | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, Speed +20 |
-| Greatsword Orb | `orb-greatsword-g<grade>` | Accessory (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Its kind on every hit, for weaknesses |
-| Axe Orb | `orb-axe-g<grade>` | Accessory (Arms Orb) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Its kind on every hit, for weaknesses |
-| Lance Orb | `orb-lance-g<grade>` | Accessory (Arms Orb) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Its kind on every hit, for weaknesses |
-| Bow Orb | `orb-bow-g<grade>` | Accessory (Arms Orb) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Katana Orb | `orb-katana-g<grade>` | Accessory (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Its kind on every hit, for weaknesses |
-| Fire Orb | `orb-fire-g<grade>` | Accessory (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Its kind on every hit, for weaknesses |
-| Ice Orb | `orb-ice-g<grade>` | Accessory (Elemental Orb) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Its kind on every hit, for weaknesses |
-| Lightning Orb | `orb-lightning-g<grade>` | Accessory (Elemental Orb) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Its kind on every hit, for weaknesses |
-| Light Orb | `orb-light-g<grade>` | Accessory (Elemental Orb) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Its kind on every hit, for weaknesses |
-| Dark Orb | `orb-dark-g<grade>` | Accessory (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Its kind on every hit, for weaknesses |
-| Vital Talisman | `talisman-vital-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | heals 5% of her HP a round |
-| Vampire Talisman | `talisman-vampire-g<grade>` | Accessory (Talisman) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | heals 20% of physical damage dealt |
-| Bulwark Talisman | `talisman-bulwark-g<grade>` | Accessory (Talisman) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | a shield of 20% of her HP against physical damage |
-| Iron Talisman | `talisman-iron-g<grade>` | Accessory (Talisman) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | 15% less physical damage taken |
-| Thorn Talisman | `talisman-thorn-g<grade>` | Accessory (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | returns 30% of physical damage taken |
-| Spring Amulet | `amulet-spring-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | restores 10 MP a round |
-| Siphon Amulet | `amulet-siphon-g<grade>` | Accessory (Amulet) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | restores MP as 5% of magical damage dealt |
-| Veil Amulet | `amulet-veil-g<grade>` | Accessory (Amulet) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | a shield of 20% of her HP against magical damage |
-| Ward Amulet | `amulet-ward-g<grade>` | Accessory (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
-| Mirror Amulet | `amulet-mirror-g<grade>` | Accessory (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 30% of magical damage taken |
+| Greatsword Orb | `orb-greatsword-g<grade>` | Damage (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
+| Axe Orb | `orb-axe-g<grade>` | Damage (Arms Orb) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
+| Lance Orb | `orb-lance-g<grade>` | Damage (Arms Orb) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | +34 offense on its kind's hits |
+| Bow Orb | `orb-bow-g<grade>` | Damage (Arms Orb) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | +34 offense on its kind's hits |
+| Katana Orb | `orb-katana-g<grade>` | Damage (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
+| Fire Orb | `orb-fire-g<grade>` | Damage (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
+| Ice Orb | `orb-ice-g<grade>` | Damage (Elemental Orb) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | +34 offense on its kind's hits |
+| Lightning Orb | `orb-lightning-g<grade>` | Damage (Elemental Orb) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | +34 offense on its kind's hits |
+| Light Orb | `orb-light-g<grade>` | Damage (Elemental Orb) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
+| Dark Orb | `orb-dark-g<grade>` | Damage (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
+| Vital Talisman | `talisman-vital-g<grade>` | Support (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | heals 10% of her HP a round |
+| Vampire Talisman | `talisman-vampire-g<grade>` | Support (Talisman) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | heals 20% of physical damage dealt |
+| Bulwark Talisman | `talisman-bulwark-g<grade>` | Support (Talisman) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | a shield of 20% of her HP against physical damage |
+| Iron Talisman | `talisman-iron-g<grade>` | Support (Talisman) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | 15% less physical damage taken |
+| Thorn Talisman | `talisman-thorn-g<grade>` | Support (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | returns 50% of physical damage taken |
+| Spring Amulet | `amulet-spring-g<grade>` | Support (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | restores 10 MP a round |
+| Siphon Amulet | `amulet-siphon-g<grade>` | Support (Amulet) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | restores MP as 8% of magical damage dealt |
+| Veil Amulet | `amulet-veil-g<grade>` | Support (Amulet) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | a shield of 20% of her HP against magical damage |
+| Ward Amulet | `amulet-ward-g<grade>` | Support (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
+| Mirror Amulet | `amulet-mirror-g<grade>` | Support (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 50% of magical damage taken |
 
-A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 8, 12, 19, 26, 35, 45, 57, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears two accessories of different types.
+A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 8, 12, 19, 26, 35, 45, 57, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears an Orb in her Damage slot and a Talisman or an Amulet in her Support slot. An Orb adds to the offense of her hits of its kind, by grade: 1, 2, 4, 6, 10, 13, 18, 23, 29, 34, half a weapon's Might; it no longer adds its kind for weaknesses.
 <!-- /live -->
 

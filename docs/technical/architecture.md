@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-21; save v24, engine v14.** The full running-system reference is
+> **Status: current, 2026-10-22; save v25, engine v15 (classes v2, H61, D188).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -21,15 +21,16 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v24** (`save/save.ts`), not the old v7/v8 snapshot:
+**Schema v25** (`save/save.ts`), not the old v7/v8 snapshot:
 - `account`: trainer name, timestamps, achievements, each Uma's tier history and the boss and sub-boss faces defeated
   in Rift fights, shared by every tier (D159, D171).
 - `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, items, Star Gems, unbound gear, building
   levels, per-Uma work rows (SC3), targets, Hall of Heroes seats and its Rift: runs (with each front's traces and the
   open Convergence attempt), Echo wins, the open Rift fight (replayed like the world map's) and its fight count (D161,
   D171).
-- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout), her Craft Level, ranks,
-  Extra Stats, bound gear and Bonds. There are no active `build`/`builds` keys (D86).
+- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout) for six classes, her Craft
+  Level, ranks, Extra Stats, bound gear (a Damage and a Support accessory slot) and Bonds. There are no active
+  `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
   runs retired in v11 (D72).
 - Wallet shortcuts are `timeTickets` and `sweepTickets` (D74); tokens live in item stock.
@@ -52,8 +53,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v22 work on `@luismlorenzana/uma-work` per-Uma rows; running jobs finish into stock, queues drop | SC3, D152 |
 | v23 empty account achievements and tier history, and an empty Rift in each world | D163 |
 | v24 no defeated faces, no open Rift fight (count 0), and each run without traces or an open Convergence attempt | D171 |
+| v25 classes v2: Cleric progress copied to the Paladin, v2's weapon slots, the Chapel's seats 3–4 to the Bastion, typed accessory slots | D180, D188 |
 
-`parseSave` accepts v1–v24 and returns v24; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v25 and returns v25; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in
@@ -64,8 +66,8 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v14 (D141, D142, D169), every older version replaying as it was |
-| `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, forty trees and learning rules |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v15 (classes v2, D179–D188), every older version replaying as it was; `caps.ts` holds the switch |
+| `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules |
 | `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97) |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
 | `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |

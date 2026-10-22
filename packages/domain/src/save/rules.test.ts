@@ -35,7 +35,7 @@ describe('collection rules', () => {
     expect((err as SaveRuleError).reason).toBe('no-ticket')
   })
 
-  it('starts a new Mage, Summoner or Cleric in magical armor and a Brawler or Spell Blade in physical (D160)', () => {
+  it('starts a new Mage, Summoner or Cleric in magical armor and a Brawler, Spell Blade or Paladin in physical (D160, D180)', () => {
     const MAGICAL = ['circlet', 'robe', 'leggings', 'bracers', 'slippers']
     const PHYSICAL = ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']
     const want: Record<RpgClass, string[]> = { brawler: PHYSICAL, mage: MAGICAL, spellblade: PHYSICAL, cleric: MAGICAL, summoner: MAGICAL, paladin: PHYSICAL }
@@ -47,7 +47,8 @@ describe('collection rules', () => {
       expect(ARMOR_SLOTS.map((s) => slotKind(uma.gear, s))).toEqual(want[c])
       // A physical start writes nothing: an absent kind is already physical.
       expect(Object.keys(uma.gear.kinds)).toHaveLength(want[c] === MAGICAL ? 5 : 0)
-      expect(uma.classId).toBeNull()
+      // A Paladin start is written as her class (D180); every other start stays her style's.
+      expect(uma.classId).toBe(c === 'paladin' ? 'paladin' : null)
       // The Umas already owned are untouched.
       expect(world.umas['100101']).toBe(worldOf(before).umas['100101'])
       expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)

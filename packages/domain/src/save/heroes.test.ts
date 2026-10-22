@@ -26,9 +26,10 @@ function stable(): Save {
 const round = (s: Save) => expect(parseSave(JSON.parse(JSON.stringify(s)))).toEqual(s)
 
 describe('Halls of Heroes (D106)', () => {
-  it('has five halls of four seats, one unique Limit Break each', () => {
-    expect(HERO_LIMIT_IDS).toHaveLength(20)
+  it('has six halls of four seats, one unique Limit Break each (classes v2, D181)', () => {
+    expect(HERO_LIMIT_IDS).toHaveLength(24)
     expect(heroLimitsOf('cleric').map((l) => l.id)).toEqual(['cleric-1', 'cleric-2', 'cleric-3', 'cleric-4'])
+    expect(heroLimitsOf('paladin').map((l) => l.id)).toEqual(['paladin-1', 'paladin-2', 'paladin-3', 'paladin-4'])
     expect(hallClass(HERO_HALLS.spellblade)).toBe('spellblade')
     expect(hallClass('workbench')).toBeNull()
     expect([0, 1, 5, 10, 12].map(bondCapacity)).toEqual([0.5, 0.55, 0.75, 1, 1])

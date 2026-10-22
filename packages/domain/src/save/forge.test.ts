@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
-import { equippedAccessories, equippedMight, equippedPoints, gearById, gearPoints, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
+import { equippedAccessories, equippedMight, equippedPoints, gearById, gearPoints, orbOffense, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
 import { accessoryFightFields } from '../economy/gear-id'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeHitShare } from '../rpg/campaign/enemies'
@@ -53,13 +53,14 @@ describe('gear (S7, D124, D125)', () => {
     expect(equippedMight({ 'tome-fire': 'tome-fire-g2' }, ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'])).toEqual({ fire: 4 })
     expect(equippedMight({ bow: 'bow-g10' }, ['bow'] as never)).toEqual({ bow: 68 })
     expect(equippedPoints({ head: 'helm-g2', lance: 'lance-g3' })).toMatchObject({ def: 4, atk: 1, hp: 0 })
-    // A Bulwark's shield is 2% of her max HP a grade (per mille here), made into HP when a fight starts.
-    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'talisman-bulwark-g3' })).toMatchObject({ orbs: ['lance'], barrier: 60, veil: 0 })
-    expect(accessoryFightFields(equippedAccessories({ 'accessory-1': 'talisman-vital-g10', 'accessory-2': 'amulet-spring-g4' }), 1000))
+    // Classes v1's accessories (engine 14; v2's are `economy/accessories-v2.test.ts`'s): an Orb's kind on every hit, and a
+    // Bulwark's shield 2% of her max HP a grade (per mille here), made into HP when a fight starts.
+    expect(equippedAccessories({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'talisman-bulwark-g3' }, 14)).toMatchObject({ orbs: ['lance'], barrier: 60, veil: 0 })
+    expect(accessoryFightFields(equippedAccessories({ 'accessory-1': 'talisman-vital-g10', 'accessory-2': 'amulet-spring-g4' }, 14), 1000))
       .toEqual({ regen: 50, mpRegen: 4 })
-    expect(equippedAccessories({ 'accessory-1': 'amulet-spring-g3', 'accessory-2': 'talisman-vampire-g10' })).toMatchObject({ mpRegen: 3, lifesteal: 200 })
-    expect(equippedAccessories({ 'accessory-1': 'amulet-siphon-g10', 'accessory-2': 'amulet-ward-g4' })).toMatchObject({ mpSteal: 50, resist: 60 })
-    expect(equippedAccessories({ 'accessory-1': 'talisman-thorn-g2', 'accessory-2': 'amulet-mirror-g3' })).toMatchObject({ thorns: 60, mirror: 90 })
+    expect(equippedAccessories({ 'accessory-1': 'amulet-spring-g3', 'accessory-2': 'talisman-vampire-g10' }, 14)).toMatchObject({ mpRegen: 3, lifesteal: 200 })
+    expect(equippedAccessories({ 'accessory-1': 'amulet-siphon-g10', 'accessory-2': 'amulet-ward-g4' }, 14)).toMatchObject({ mpSteal: 50, resist: 60 })
+    expect(equippedAccessories({ 'accessory-1': 'talisman-thorn-g2', 'accessory-2': 'amulet-mirror-g3' }, 14)).toMatchObject({ thorns: 60, mirror: 90 })
     expect(equippedAccessories({})).toMatchObject({ orbs: [], barrier: 0, regen: 0 })
   })
 })
@@ -142,27 +143,27 @@ describe('the Forge and equipping (S7)', () => {
     expect(() => parseSave(wrong)).toThrow(/not the kind this slot holds/)
   })
 
-  it('wears two accessories of different types, in either slot; an empty slot holds nothing (D124)', () => {
+  it('wears an Orb in the Damage slot and a Talisman or an Amulet in the Support slot; an empty slot holds nothing (D124, C10)', () => {
     let save = edit(umas('101'), (w) => ({ ...w, gear: { 'orb-fire-g1': 2, 'talisman-vital-g1': 1, 'amulet-veil-g1': 1 } }))
     const gear = () => worldOf(save).umas['101']!.gear
-    save = equipGear(save, '101', 'orb-fire-g1', at(0))
-    save = equipGear(save, '101', 'talisman-vital-g1', at(1))
+    save = equipGear(save, '101', 'talisman-vital-g1', at(0))
+    save = equipGear(save, '101', 'orb-fire-g1', at(1))
     expect(gear().equipped).toEqual({ 'accessory-1': 'orb-fire-g1', 'accessory-2': 'talisman-vital-g1' })
-    // Swapping the second slot to an Amulet keeps the Talisman in her locker; the first can't take a second Fire Orb's type.
+    // Swapping the Support slot to an Amulet keeps the Talisman in her locker; it can't take an Orb.
     save = wearAccessory(save, '101', 'accessory-2', 'amulet-veil-g1', at(2))
     expect(gear().equipped['accessory-2']).toBe('amulet-veil-g1')
     expect(gear().locker).toContain('talisman-vital-g1')
     save = wearAccessory(save, '101', 'accessory-1', null, at(3))
     expect(gear().equipped).toEqual({ 'accessory-2': 'amulet-veil-g1' })
     save = wearAccessory(save, '101', 'accessory-1', 'orb-fire-g1', at(4))
-    expect(() => wearAccessory(save, '101', 'accessory-2', 'orb-fire-g1', at(5))).toThrow(/already wears one/)
+    expect(() => wearAccessory(save, '101', 'accessory-2', 'orb-fire-g1', at(5))).toThrow(/The Support slot takes a Talisman or an Amulet/)
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     const twice = JSON.parse(JSON.stringify(save))
     twice.tierWorlds['1'].umas['101'].gear.equipped['accessory-2'] = 'orb-fire-g1'
-    expect(() => parseSave(twice)).toThrow(/same type/)
+    expect(() => parseSave(twice)).toThrow(/accessory-2: expected a piece from her locker for this slot/)
   })
 
-  it('brings what she wears into her fights: Might, armor points, Orb kinds and accessory effects (engine v11)', () => {
+  it('brings what she wears into her fights: Might, armor points, her Orb’s offense and accessory effects (engine v11, v15)', () => {
     let save = edit(umas('101', '102', '103', '104', '105'), (w) => ({ ...w,
       gear: { 'greatsword-g1': 1, 'lance-g1': 1, 'helm-g1': 1, 'robe-g1': 1, 'boots-g1': 1, 'orb-fire-g1': 1, 'talisman-bulwark-g1': 1 } }))
     for (const g of ['greatsword-g1', 'lance-g1', 'helm-g1', 'robe-g1', 'boots-g1', 'orb-fire-g1', 'talisman-bulwark-g1']) save = equipGear(save, '101', g, at(0))
@@ -175,8 +176,10 @@ describe('the Forge and equipping (S7)', () => {
     const ally = input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
     expect(input.version).toBe(BATTLE_ENGINE_VERSION)
-    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 1, lance: 1 }, barrier: Math.round(ally.stats.hp * 0.02), orbs: ['fire'], evasion: 12 })
+    // A flat Orb adds its offense to her Might of its kind, a kind she doesn't wield too (classes v2 §6.2).
+    expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 1, lance: 1, fire: orbOffense(1) }, barrier: Math.round(ally.stats.hp * 0.02), evasion: 12 })
     expect(ally).not.toHaveProperty('orb')
+    expect(ally).not.toHaveProperty('orbs')
     expect(ally).not.toHaveProperty('regen')
     expect(ally.stats.atk).toBe(applyPoints(bare, umaPoints(uma, 'brawler')).stats.atk)
     expect(ally.stats.atk).toBe(bare.atk + 2)

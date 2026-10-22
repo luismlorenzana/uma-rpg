@@ -12,7 +12,7 @@ import {
 } from '../economy/gear'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
 import { FACILITIES } from '../economy/jobs'
-import { rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_REGEN_ROUNDS, rpgV2 } from '../rpg/battle/caps'
 import {
   ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
   gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,
@@ -22,19 +22,22 @@ import { EFFECT_LABEL, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES, itemById }
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
 import * as K from '../rpg/battle/skills'
 import {
-  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitKinds,
-  LEARNER_MAX_PARENTS,
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS,
+  HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower, LEARNER_MAX_PARENTS, type HeroCast, type HeroLimitId,
 } from '../rpg/heroes'
-import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
+import {
+  RPG_CLERIC_STATUS, RPG_NODES, RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE,
+  RPG_SUPPORT_SHARE_V15, rpgSideNodeLevel, rpgTreeOf, type RpgNode,
+} from '../rpg/catalog'
 import { rpgBattleExp, RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeTierBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
-  RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
+  RPG_TIER_MAX_LEVEL, RPG_WEAPONS, rpgClasses, rpgClassWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
-import { RIFT_FRONT_SPECS, riftShape, RIFT_TUNING, type RiftSlot } from '../rift/fronts'
+import { RIFT_FRONT_SPECS, riftShape, riftTuning, type RiftSlot } from '../rift/fronts'
 import { riftStrength } from '../rift/generate'
 import { RIFT_RUN_FIGHTS, riftShapeOf } from '../rift/picker'
 import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER, RIFT_STAGES, RIFT_TIERS } from '../rift/state'
@@ -80,7 +83,8 @@ const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
   paladin: 'none: she came with engine v15',
 }
 const STARTS_AS: Readonly<Record<RpgClass, string>> = {
-  brawler: 'Front runners', mage: 'Pace chasers', spellblade: '—', cleric: 'Late surgers', summoner: 'End closers', paladin: 'Late surgers, Power over Wit',
+  brawler: 'Front runners', mage: 'Pace chasers', spellblade: '—', cleric: 'Late surgers, Wit at or over Power', summoner: 'End closers',
+  paladin: 'Late surgers, Power over Wit',
 }
 
 function slots(c: RpgClass): string {
@@ -92,15 +96,31 @@ function slots(c: RpgClass): string {
 
 // --- Classes and skills ---------------------------------------------------------------------------------------------
 
+/** Her hand (D179): one power for a single-half class, each half's for a pair class (classes v2: H55, H60). */
+function handOf(c: RpgClass): string {
+  const h = rpgHand({ classId: c })
+  return h.pair ? `${x(h.arms)} Arms, ${x(h.tome)} Tome; MP ${x(h.mp)} a half` : `${x(h.power)}, MP ${x(h.mp)}`
+}
+/** What sets each class apart in classes v2 (§3, §4), with the live numbers. */
+function special(c: RpgClass): string {
+  const h = rpgHand({ classId: c })
+  switch (c) {
+    case 'spellblade': return 'Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit'
+    case 'summoner': return `Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, ` +
+      `it strikes every foe at ${h.linger} × ${K.BATTLE_FAREWELL_FACTOR}. No support`
+    case 'paladin': return 'Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
+      'Blizzard spells Barrier every Uma, Greatsword blows give Aegis'
+    case 'cleric': return 'Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
+      'Light spells leave Regen, Dark spells drain'
+    default: return '—'
+  }
+}
 function classes(): string {
-  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP, Heal)', 'Limit Break power', 'Starts as', 'Starting armor'],
+  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break power', 'Starts as', 'Starting armor'],
     RPG_CLASSES.map((c) => {
-      const h = rpgHand({ classId: c })
       const s = RPG_CLASS_STATS[c]
-      const special = h.pair ? 'Every act is an Arms half and a Tome half' : h.linger ? `A summon lingers and acts again at ${h.linger}; most summon lines also mend, shield, drain, bless or revive`
-        : c === 'cleric' ? 'Each skill carries a status; her spells mend and cleanse, her blows raise a Barrier' : '—'
-      return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, `${x(h.power)}, ${x(h.mp)}`, special,
-        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp, s.heal].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c], cap(RPG_CLASS_ARMOR[c])]
+      return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, handOf(c), special(c),
+        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, STARTS_AS[c], cap(RPG_CLASS_ARMOR[c])]
     }))
 }
 
@@ -114,7 +134,7 @@ function presets(): string {
 }
 
 function weapons(): string {
-  return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Cleric status', 'Classes'], RPG_WEAPONS.map((w) => {
+  return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Healer status', 'Classes'], RPG_WEAPONS.map((w) => {
     const kind = rpgWeaponKind(w)
     return [weaponName(w), `\`${w}\``, cap(kind), isRpgTome(w) ? 'Magical' : 'Physical', SHAPE[kind]!, statusName(RPG_CLERIC_STATUS[w]),
       RPG_CLASSES.filter((c) => rpgClassWeapons(c).includes(w)).map((c) => CLASS_NAME[c]).join(', ')]
@@ -140,7 +160,8 @@ function skillTrees(): string {
   const out: string[] = []
   for (const c of RPG_CLASSES) {
     const hand = rpgHand({ classId: c })
-    out.push(`### ${CLASS_NAME[c]}`, '', `${rpgClassWeapons(c).length} trees. Powers below are before her hand (${x(hand.power)}); MP is hers (${x(hand.mp)}).`, '')
+    const before = hand.pair ? `${x(hand.arms)} on Arms, ${x(hand.tome)} on Tomes` : x(hand.power)
+    out.push(`### ${CLASS_NAME[c]}`, '', `${rpgClassWeapons(c).length} trees. Powers below are before her hand (${before}); MP is hers (${x(hand.mp)}).`, '')
     for (const w of rpgClassWeapons(c)) {
       const tree = rpgTreeOf(c, w)
       out.push(`#### ${CLASS_NAME[c]} · ${weaponName(w)} (\`${tree}\`)`, '')
@@ -153,27 +174,40 @@ function skillTrees(): string {
 
 /** D112: Limit Breaks only from the Halls of Heroes; the classes' own replay in older fights. */
 function limits(): string {
+  const v1 = rpgClasses(14)
+  const v14 = (id: HeroLimitId) => heroLimitFor(id, 14)!.name
   return `**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a ` +
     `Learner uses either of her Heroes', at ${bondCapacity(0) * 100}% plus 5% a Bond Level (${bondCapacity(BOND_MAX_LEVEL) * 100}% at ` +
-    `Bond ${BOND_MAX_LEVEL}). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is ` +
+    `Bond ${BOND_MAX_LEVEL}), her inherited hits at the higher of her ATK and M.ATK while their kinds still decide weaknesses ` +
+    `and locks (v15, C3). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is ` +
     `worth her class's power below, in single-target casts at her open depth:\n\n` +
     table(['Class', 'Limit Break power'], RPG_CLASSES.map((c) => [CLASS_NAME[c], `${HERO_LIMIT_POWER[c]}×`])) + '\n\n' +
+    `A Limit Break that mends or raises a Barrier does it at ${pct(HERO_LIMIT_SUPPORT_SHARE)} of each Uma's max HP ×${RPG_SUPPORT_ALL}, × her ` +
+    `healing scale and the cast's strength; its cleanse and its revive land at any strength. ` +
     `The gauge fills to ${BATTLE_LIMIT_MAX}: +${BATTLE_LIMIT_CHARGE.attack} for an Attack, +${BATTLE_LIMIT_CHARGE.skill} for a skill. A Limit Break costs no MP and takes her turn. ` +
-    `Fights from engines v6–v9 replay with the classes' retired Limit Breaks: ` +
-    RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${RETIRED_LIMIT_OF[c]}`).join('; ') + '.'
+    `Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 ${v14('cleric-3')} and ${v14('cleric-4')}, ` +
+    `${v14('spellblade-1')} in one cleave, ${v14('summoner-4')} on one foe, ` +
+    v1.filter((c) => heroLimitPower(c, 14) !== heroLimitPower(c, 15)).map((c) => `the ${CLASS_NAME[c]} at ${heroLimitPower(c, 14)}×`).join(' and ') +
+    `, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: ` +
+    v1.map((c) => `${CLASS_NAME[c]} ${RETIRED_LIMIT_OF[c]}`).join('; ') + '.'
 }
 
 /** The Halls of Heroes (D106, D107): every seat's Limit Break, and the Bond numbers. */
 function heroes(): string {
   const hall = (c: RpgClass) => placeById(HERO_HALLS[c])?.name ?? c
   const shape = (target: string) => (target === 'all' ? 'every foe' : target === 'random' ? 'random foes' : 'one foe')
+  const support = (c: HeroCast): string[] => {
+    const s = c.support
+    return s ? [s.mend ? 'a mend on every ally' : '', s.shield ? 'a Barrier on every ally' : '', s.cleanse ? 'a cleanse' : '', s.revive ? 'the first fallen rises' : ''] : []
+  }
   return table(['Hall', 'Seat', 'Limit Break', 'Kinds', 'What it does', 'Casts'], HERO_LIMITS.map((l) => [
     `${hall(l.classId)} (${CLASS_NAME[l.classId]})`, l.id.slice(l.id.lastIndexOf('-') + 1), l.name, heroLimitKinds(l).join(', '), l.blurb,
     l.casts.map((c) => [c.hits.length ? `${c.hits.length} hit${c.hits.length === 1 ? '' : 's'} on ${shape(c.target)}` : '', c.splash ? 'splash' : '',
-      c.status ? `${c.status.key} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '']
+      c.status ? `${c.status.key} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '',
+      ...support(c)]
       .filter(Boolean).join(' + ')).join('; '),
   ])) + '\n\n' + table(['Setting', 'Value'], [
-    ['Seats', `4 per hall, ${HERO_LIMITS.length} in all; a Hero sits in one seat`],
+    ['Seats', `4 per hall, ${RPG_CLASSES.length} halls, ${HERO_LIMITS.length} in all; a Hero sits in one seat`],
     ['Learners', `${HERO_MAX_LEARNERS} per Hero; ${LEARNER_MAX_PARENTS} Heroes per Learner; a Hero is never a Learner`],
     ['Power at 100%', `her own class's Limit Break, in single-target casts at her open depth: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${HERO_LIMIT_POWER[c]}×`).join(', ')}`],
     ['Learner strength', `${bondCapacity(0) * 100}% at Bond 0, +5% a Bond Level, ${bondCapacity(BOND_MAX_LEVEL) * 100}% at Bond ${BOND_MAX_LEVEL}`],
@@ -199,11 +233,20 @@ function battleConstants(): string {
     ['`BATTLE_CLARITY_PERCENT`', K.BATTLE_CLARITY_PERCENT, 'Max MP restored per Clarity stack'],
     ['`BATTLE_BARRIER_PERCENT`', K.BATTLE_BARRIER_PERCENT, 'Barrier per stack of a summon\'s rider, as a share of max HP'],
     ['`BATTLE_BARRIER_CAP`', K.BATTLE_BARRIER_CAP, 'Before v12: Barrier cap, as a share of max HP'],
-    ['`BATTLE_COVER_CAP`', K.BATTLE_COVER_CAP, 'v12: a skill Barrier\'s cap, as a share of max HP; it lasts the round'],
-    ['`RPG_SUPPORT_SHARE`', RPG_SUPPORT_SHARE.join(', '), 'v12: a mend\'s or Barrier\'s share of the target\'s max HP, by depth'],
-    ['`RPG_SUPPORT_ALL`', RPG_SUPPORT_ALL, 'v12: that share on every Uma, at depth 5 and for summons'],
-    ['`BATTLE_HEAL_SCALE`', K.BATTLE_HEAL_SCALE, 'v12: her Heal raises mends and Barriers ×(1 + Heal ÷ this)'],
-    ['`BATTLE_REVIVE_SHARE`', K.BATTLE_REVIVE_SHARE, 'v12: a revive\'s share of max HP, before her Heal'],
+    ['`BATTLE_COVER_CAP`', K.BATTLE_COVER_CAP, 'v12–v14: a skill Barrier\'s cap, as a share of max HP; it lasts the round'],
+    ['`BATTLE_COVER_CAP_V15`', K.BATTLE_COVER_CAP_V15, 'v15: the same cap, for one healer\'s doubled Barriers'],
+    ['`RPG_SUPPORT_SHARE`', RPG_SUPPORT_SHARE.join(', '), 'v12–v14: a mend\'s or Barrier\'s share of the target\'s max HP, by depth'],
+    ['`RPG_SUPPORT_SHARE_V15`', RPG_SUPPORT_SHARE_V15.join(', '), 'v15: the same shares for the Paladin and the Cleric, doubled (one healer a party)'],
+    ['`RPG_SUPPORT_ALL`', RPG_SUPPORT_ALL, 'v12: that share on every Uma, at depth 5, for summons (to v14) and Limit Breaks (v15)'],
+    ['`BATTLE_HEAL_SCALE`', K.BATTLE_HEAL_SCALE, 'v12–v14: her Heal raises mends and Barriers ×(1 + Heal ÷ this)'],
+    ['`BATTLE_HEAL_OFFENSE_SCALE`', BATTLE_HEAL_OFFENSE_SCALE, 'v15: mends, Barriers and revives ×(1 + offense ÷ this): a Paladin\'s ATK, a Cleric\'s M.ATK, anyone else\'s higher'],
+    ['`BATTLE_REVIVE_SHARE`', K.BATTLE_REVIVE_SHARE, 'v12: a revive\'s share of max HP, before her healing scale'],
+    ['`RPG_PALADIN_SHIELD_SHARE`', RPG_PALADIN_SHIELD_SHARE, `v15: a Paladin's Blizzard spell also Barriers every Uma at this share of its share (×${RPG_SUPPORT_ALL} on every Uma)`],
+    ['`RPG_PALADIN_AEGIS`', RPG_PALADIN_AEGIS, 'v15: Aegis stacks a Paladin\'s Greatsword blow gives each Uma her Barrier reaches'],
+    ['`BATTLE_REGEN_SHARE`', K.BATTLE_REGEN_SHARE, 'v15: a Cleric\'s Regen mends this share of her Light spell\'s mend'],
+    ['`BATTLE_REGEN_ROUNDS`', BATTLE_REGEN_ROUNDS, 'v15: the round ends a Regen mends at: the spell\'s round and the next'],
+    ['`BATTLE_FAREWELL_FACTOR`', K.BATTLE_FAREWELL_FACTOR, 'v15: a lingering Tome summon\'s farewell strike on each foe, × its linger share × its hits\' power'],
+    ['`HERO_LIMIT_SUPPORT_SHARE`', HERO_LIMIT_SUPPORT_SHARE, `v15: a hall Limit Break's mend or Barrier, as a share of max HP, ×${RPG_SUPPORT_ALL} on every Uma`],
     ['`BATTLE_RALLY_SHARE`', K.BATTLE_RALLY_SHARE, 'v12: share of a foe hit she can Rally back'],
     ['`BATTLE_BREATHER`', K.BATTLE_BREATHER, 'v12: share of max HP every Uma recovers when a new wave enters'],
     ['`BATTLE_LIMIT_MAX`', BATTLE_LIMIT_MAX, 'Limit Break gauge'],
@@ -234,14 +277,15 @@ function damageSources(): string {
     const foe = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
     const bare = balanceMember('brawler', 0, level), geared = balanceMember('brawler', 0, level, { gear: true })
     const built = balanceMember('brawler', 0, level, { gear: true, stars: true })
-    const own = bare.stats.atk, armor = geared.stats.atk - own, extra = built.stats.atk - geared.stats.atk, might = mightOf(grade)
-    const total = own + armor + extra + might
+    // Her standard preset's Greatsword Orb (classes v2, C4) adds its offense to her Greatsword hits, beside the weapon's Might.
+    const own = bare.stats.atk, armor = geared.stats.atk - own, extra = built.stats.atk - geared.stats.atk, might = mightOf(grade), orb = orbOffense(grade)
+    const total = own + armor + extra + might + orb
     const hit = (o: number) => (o * o) / (o + foe.stats.pdef)
     const part = (n: number) => `${n} (${Math.round((100 * n) / total)}%)`
     const lose = (n: number) => `−${Math.round(100 * (1 - hit(total - n) / hit(total)))}%`
     const depth = rpgOpenDepth(level)
-    offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(armor), total,
-      lose(extra), lose(might), lose(armor), `×${(hit(total) / hit(own)).toFixed(2)}`, `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
+    offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(orb), part(armor), total,
+      lose(extra), lose(might), lose(orb), lose(armor), `×${(hit(total) / hit(own)).toFixed(2)}`, `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
     // What a regular foe's 100% physical hit takes of her HP, as each defensive source joins.
     const share = (u: typeof bare, cut = 0) => {
       const o = foe.stats.atk
@@ -249,13 +293,16 @@ function damageSources(): string {
     }
     const armorOnly = { ...bare, stats: { ...bare.stats, hp: geared.stats.hp, pdef: geared.stats.pdef } }
     const starsOnly = { ...bare, stats: { ...bare.stats, hp: bare.stats.hp + built.stats.hp - geared.stats.hp, pdef: bare.stats.pdef + built.stats.pdef - geared.stats.pdef } }
-    taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(bare, built.guard ?? 0), share(built, built.guard ?? 0)])
+    // Her Support slot holds a Vampire Talisman; an Iron Talisman there instead cuts what she takes.
+    const iron = balanceMember('brawler', 0, level, { gear: true, stars: true, support: 'talisman-iron' }).guard ?? 0
+    taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(built, built.guard ?? 0), share(built, iron)])
   }
-  return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Armor', 'Offense',
-    'Hit without Extra Stats', 'Hit without the weapon', 'Hit without armor', 'All three vs her stats alone', 'Skill depth vs depth 1'], offense) +
+  return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Orb', 'Armor', 'Offense',
+    'Hit without Extra Stats', 'Hit without the weapon', 'Hit without the Orb', 'Hit without armor', 'All four vs her stats alone', 'Skill depth vs depth 1'], offense) +
     '\n\nA regular foe\'s 100% physical hit, as a share of her HP:\n\n' +
-    table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', '+ Iron Talisman', 'All (on curve)'], taken) +
-    '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears a Vampire and an Iron Talisman.'
+    table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', 'All (on curve)', 'With an Iron Talisman'], taken) +
+    '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears her standard preset\'s ' +
+    'Greatsword Orb (its offense on her Greatsword hits) and Vampire Talisman; the last column puts an Iron Talisman in her Support slot.'
 }
 
 function foeScaling(): string {
@@ -517,7 +564,8 @@ function riftBand(front: Front, from: number, to: number): string {
 }
 /** The Rift's fronts (D173): what each is weak to and wards, its stages from `riftShape`, its party; then levels and strength. */
 function riftFronts(): string {
-  const t = RIFT_TUNING
+  // The live engine's numbers: classes v2's override since H61 (H60, D186).
+  const t = riftTuning()
   const byRank = (counts: Readonly<Record<'regular' | 'sub-boss' | 'boss', number>>, kinds: string): string => {
     const groups = new Map<number, string[]>()
     for (const [names, n] of [[['key', 'regular'], counts.regular], [['sub-boss'], counts['sub-boss']], [['boss'], counts.boss]] as const) {
@@ -547,7 +595,11 @@ function riftFronts(): string {
     `Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. ` +
     `Rift foes hit harder than the world's: offense ×${t.escort.captain.offense} at stages 1–4, ×${t.elites.offense} for stages 5 and 7's sub-bosses, ` +
     `×${t.boss.offense} for a boss and her guard, ×${t.openers.offense} for an opening foe, ×${t.champion.offense} for a champion, ` +
-    `×${t.duel.offense} on the Duel and ×${t.horde.offense} on the Horde. Arcane's foes have ×${t.scale.arcane.hp} HP and ×${t.scale.arcane.offense} offense over Iron's. ` +
+    `×${t.duel.offense} on the Duel (her HP ×${t.duel.hp}) and ×${t.horde.offense} on the Horde. Arcane's foes have ×${t.scale.arcane.hp} HP and ×${t.scale.arcane.offense} offense over Iron's. ` +
+    (t.champions ? `Champions, and so the Convergence's fights, scale again by front: ${RIFT_FRONTS.filter((f) => t.champions![f]).map((f) => {
+      const c = t.champions![f]!
+      return `${RIFT_FRONT_SPECS[f].name} ${c.hp === c.offense ? `×${c.hp} HP and offense` : c.hp === 1 ? `×${c.offense} offense` : `×${c.hp} HP and ×${c.offense} offense`}`
+    }).join(', ')}. ` : '') +
     `A run's ${RIFT_RUN_FIGHTS.length} fights hold ${slots.filter((s) => s.face === 'boss').length} boss, ${slots.filter((s) => s.face === 'subboss').length} sub-boss ` +
     `and ${slots.filter((s) => s.face === 'key').length} key face slots.`
 }

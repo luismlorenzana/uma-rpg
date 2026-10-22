@@ -1,9 +1,9 @@
-// Campaign battle vocabulary, engine v14 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// Campaign battle vocabulary, engine v15 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
 // Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
 // D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5;
-// v15 classes v2, D179, built dark until H61: the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md).
+// v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md).
 // Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'

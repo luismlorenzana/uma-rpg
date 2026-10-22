@@ -13,15 +13,19 @@ async function renderIcons(content: React.ReactNode, check: (host: HTMLElement) 
   finally { await act(async () => root.unmount()); host.remove(); vi.unstubAllGlobals() }
 }
 describe('class emblems and status glyphs', () => {
-  it('keeps all five full class names alongside decorative, native-size emblems', async () => {
+  it('keeps all six full class names alongside decorative, native-size emblems (classes v2, H61)', async () => {
+    const frames: Record<string, { x: number; y: number }> = atlas.frames
+    expect(RPG_CLASSES).toHaveLength(6)
     await renderIcons(<>{RPG_CLASSES.map((c) => <button key={c}><ClassEmblem classId={c} />{CLASS_LABEL[c]}</button>)}</>, (host) => {
       expect([...host.querySelectorAll('button')].map((b) => b.textContent)).toEqual(RPG_CLASSES.map((c) => CLASS_LABEL[c]))
       const emblems = host.querySelectorAll<HTMLElement>('[aria-hidden="true"]')
-      expect(emblems).toHaveLength(5)
+      expect(emblems).toHaveLength(6)
       for (const [i, e] of [...emblems].entries()) {
+        const f = frames[`class/${RPG_CLASSES[i]}`]!
         expect(e.style.width).toBe('24px'); expect(e.style.height).toBe('24px')
         expect(e.style.backgroundSize).toBe(`${atlas.width}px ${atlas.height}px`)
-        expect(e.style.backgroundPosition).toBe(`${-i * 24}px 0px`)
+        // The first five sit in a row; the Paladin's came later, in uma-art 2.12.0 (H54).
+        expect(e.style.backgroundPosition).toBe(i < 5 ? `${-i * 24}px 0px` : `${-f.x}px ${-f.y}px`)
         expect(e.style.imageRendering).toBe('pixelated')
       }
     })
