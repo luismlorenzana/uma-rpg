@@ -34,7 +34,7 @@
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
 | H43 | Tier 2's world and its Rift ([`tier2-world.md`](../design/tier2-world.md), calls Z1–Z10) | Claude | M | — | Done (`91ee4e7`) |
 
-**Ready now:** none in Build now (H33 to H36 have landed).
+**All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v14 (with the Paladin's art), the Tier 1 simplification, and the Rift.
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
