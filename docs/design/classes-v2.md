@@ -90,10 +90,11 @@ Damage is shown as physical / magical, in percent.
   and one Tome hit.
 - That makes her the physical front's shield breaker, the multi-hit identity the owner wanted.
 - Her own skills already target one foe; they keep that.
-- **The guard rail:**
+- **The guard rail, for every class:**
   - no single Uma should Break a Duel boss (shield 10–12) in one act;
-  - the v14 simulation checks her best single act against the Duel shield;
-  - if it reaches it, the shield rises, not her identity.
+  - the v14 simulation checks every class's best single act, with weapon arts and passives under their shared cap, the
+    Summoner's first ([weapon arts](weapon-arts.md) §6);
+  - if one reaches the shield, the Duel shield rises, not the class's identity.
 
 **Stat leans:**
 - ATK ×1.05 → **×1.1**, and M.ATK ×1.05 → **×0.95**.
@@ -123,6 +124,10 @@ identity where the Spell Blade has multi-hit. They balance as a pair.
 **The Summoner loses all support.** Light's mend, Blizzard's Barrier, Dark's drain, Greatsword's Aegis, Axe's
 Enfeeble and Lance's revive leave her lines, and move to the Paladin and the Cleric (§4). Every line now strikes. Its
 summons keep their weapon's shape on arrival.
+
+**The farewell is one strike on each foe,** whatever the summon's hit count (clarified 2026-10-21 after H40's review).
+A five-hit Light summon arrives with five hits on its target. Its farewell is one strike on each foe at the linger
+share, not five.
 
 **Only the Tome half lingers.** The Arms summon strikes once and leaves. The pair then mirrors the Spell Blade's
 exactly:
