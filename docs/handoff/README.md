@@ -34,6 +34,21 @@
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
 | H43 | Tier 2's world and its Rift ([`tier2-world.md`](../design/tier2-world.md), calls Z1–Z10) | Claude | M | — | Done (`91ee4e7`) |
 
+**The Rift build** (2026-10-21; the owner asked for the Rift now, built by this session's workers in waves):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H44](tasks/H44-engine-v14-ward.md) | Engine v14: the ward, a thrice-acting Duel champion, mixed lock sets (Rift-only foe traits); docs renumbered (classes v2 → v15) | Claude | M | — | In progress (this session) |
+| [H45](tasks/H45-tier2-from-lv1.md) | Tier 2 is playable from Lv 1 (tier2-world Z3, Z8), Tier 1 unchanged | Claude | M | — | In progress (this session) |
+| [H46](tasks/H46-save-v24.md) | Save v24: the account's defeated faces, the open Rift fight, run traces and the Convergence | Claude | M | — | In progress (this session) |
+| [H47](tasks/H47-rift-generator.md) | The Rift generator: fronts, stages, champions, Convergence, Echoes, the cross-pack picker | Claude | L | H44, H46 | Waiting |
+| [H49](tasks/H49-achievements.md) | Achievements: catalog, earning rules, the Account's list, the cut-in (pins uma-art 2.11.0) | Either | M | H46 | Waiting |
+| [H48](tasks/H48-rift-run-rules-ascend.md) | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | Waiting |
+| [H50](tasks/H50-rift-page.md) | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | Waiting |
+| [H51](tasks/H51-rift-balance.md) | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | Waiting |
+
+**Waves:** 1) H44, H45, H46 → 2) H47, H49 → 3) H48 → 4) H50, H51.
+
 **All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v14 (with the Paladin's art), the Tier 1 simplification, and the Rift.
 
 **Overlaps to know:**
