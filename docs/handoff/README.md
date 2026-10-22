@@ -44,8 +44,8 @@
 | H47 | The Rift generator: fronts, stages, champions, Convergence, Echoes, the cross-pack picker | Claude | L | H44, H46 | Done (`45169b7`) |
 | H49 | Achievements: catalog, earning rules, the Account's list, the cut-in (pins uma-art 2.11.0) | Either | M | H46 | Done (`5dbb9ef`) |
 | H48 | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | Done (`0ae25e5`) |
-| [H50](tasks/H50-rift-page.md) | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | Ready (H48 `0ae25e5`, D174: every name in the packet's list is in `@rpg/domain/rift` with the packet's signature, except `sweepEcho(save, front, level, party, times, outfits, now, tier?)`, which takes `outfits`; also `cancelRiftBlock`, `bankedMarks`, and `ascendBlock(save, tier, name?)` to name the working Umas. H49 `5dbb9ef`: `AchievementCutIn({ grants, onDone })`, `FrontCrest`, `AchievementBadge`, `achievementDef`, uma-art 2.11.0 pinned, D172) |
-| [H51](tasks/H51-rift-balance.md) | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | Ready (H48 `0ae25e5`, D174: `ECHO_RANK_PAY`, `fillRanks(uma, entrant, exp, scale)`, `echoFoeLevel(tier, level)`, `riftTraces`; a Lv 50 Uma's Echo E is 325, so 1,300 Class EXP a win at Lv 50 and 55, 652 at Lv 45. H47 `45169b7`, D173: `RIFT_TUNING`, `riftShape`, the synthetic `packRoster()` in `rift/roster.fixture.ts`; bosses fill the Bestiary in four runs at the starting shapes) |
+| [H50](tasks/H50-rift-page.md) | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | In progress (this session) |
+| [H51](tasks/H51-rift-balance.md) | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | In progress (this session) |
 
 **Waves:** 1) H44, H45, H46 (done) → 2) H47, H49 (done) → 3) H48 (done) → 4) H50, H51.
 
