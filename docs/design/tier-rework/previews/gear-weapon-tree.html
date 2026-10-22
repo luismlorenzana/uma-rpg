@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weapon Tree</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* This preview's own pieces. */
+  section { scroll-margin-top: 12px; }
+  .lead { margin: 0 0 8px; }
+  .strip { display: flex; align-items: center; gap: 0; padding: 4px 2px 8px; width: max-content; }
+  .strip .node { min-width: 50px; padding: 5px 6px; }
+  .strip .node b { display: block; font-size: 12px; color: var(--ink); }
+  .strip .node span { display: block; font-weight: 500; color: var(--ink-faint); font-size: 10px; }
+  .forknode { border-color: var(--accent); background: var(--accent-wash); border-style: dashed; }
+  .hedge { width: 10px; height: 2px; background: var(--hairline-strong); flex: none; }
+  .branches { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .branches.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form { border: 1.5px solid var(--hairline-strong); border-radius: 10px; padding: 8px; background: var(--raised); }
+  .form.t2 { border-color: var(--t2); }
+  .form.t3 { border-color: var(--t3); }
+  .form h4 { margin: 0 0 2px; font-size: 14px; }
+  .form .what { font-size: 12px; color: var(--ink-soft); margin: 0 0 6px; }
+  .form .gem { font-size: 11px; color: var(--ink-faint); }
+  .form .then { margin-top: 6px; font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--hairline); padding-top: 4px; }
+  .forksvg { display: block; width: 100%; height: 22px; }
+  .forksvg line { stroke: var(--ink-faint); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .origin { display: flex; justify-content: center; }
+  .origin .node { max-width: none; }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--sunken); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .note b { color: var(--ink); }
+  ul.tight { margin: 6px 0 0; padding-left: 18px; }
+  ul.tight li { margin: 2px 0; font-size: 13px; }
+  /* The overview diagram. */
+  svg.tree-svg { display: block; width: 100%; height: auto; }
+  .tree-svg .band { fill: var(--sunken); }
+  .tree-svg .band-label { fill: var(--ink-soft); font: 700 10px system-ui, sans-serif; letter-spacing: .06em; }
+  .tree-svg .n rect { fill: var(--raised); stroke: var(--hairline-strong); stroke-width: 1.5; }
+  .tree-svg .n.t1 rect { stroke: var(--t1); }
+  .tree-svg .n.t2 rect { stroke: var(--t2); }
+  .tree-svg .n.t3 rect { stroke: var(--t3); }
+  .tree-svg .n .title { fill: var(--ink); font: 700 12px system-ui, sans-serif; }
+  .tree-svg .n .sub { fill: var(--ink-soft); font: 500 10px system-ui, sans-serif; }
+  .tree-svg .e { stroke: var(--ink-faint); stroke-width: 1.5; fill: none; }
+  .tree-svg .e.late { stroke-dasharray: 3 3; }
+  .tree-svg .elabel { fill: var(--ink-faint); font: 600 9px system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Weapon tree</h1>
+  <p class="lead">Every weapon kind's progression, Tier 1 to 3 (<a href="../gear.md">gear.md</a> §3–§6). Tier 1 is a line.
+    Each later tier adds one fork at G5. Forms carry through promotion; grades restart at G0.</p>
+  <nav class="tabs">
+    <a href="#overview">Overview</a><a href="#t1">Tier 1</a><a href="#t2">Tier 2</a><a href="#t3">Tier 3</a>
+    <a href="#forms">Forms</a><a href="#classes">By class</a>
+  </nav>
+
+  <section id="overview">
+    <h2>The whole tree</h2>
+    <div class="card">
+      <svg class="tree-svg" viewBox="0 0 358 292" role="img" aria-label="Base weapon in Tier 1; it forks into Dual or Pure in Tier 2; Dual forks into Prism or Tempered and Pure into Tempered or Keen in Tier 3.">
+        <rect class="band" x="0" y="0" width="358" height="76" rx="8"/>
+        <rect class="band" x="0" y="90" width="358" height="84" rx="8"/>
+        <rect class="band" x="0" y="188" width="358" height="104" rx="8"/>
+        <text class="band-label" x="8" y="14">TIER 1</text><text class="band-label" x="350" y="14" text-anchor="end">A LINE</text>
+        <text class="band-label" x="8" y="104">TIER 2</text><text class="band-label" x="350" y="104" text-anchor="end">FORK AT G5</text>
+        <text class="band-label" x="8" y="202">TIER 3</text><text class="band-label" x="243" y="202" text-anchor="middle">FORK AT G5</text>
+
+        <path class="e" d="M179 64 C179 92, 104 92, 104 120"/>
+        <path class="e" d="M179 64 C179 92, 254 92, 254 120"/>
+        <path class="e" d="M104 160 C104 196, 58 196, 58 222"/>
+        <path class="e" d="M104 160 C104 196, 179 196, 179 222"/>
+        <path class="e" d="M254 160 C254 196, 179 196, 179 222"/>
+        <path class="e" d="M254 160 C254 196, 300 196, 300 222"/>
+
+        <g class="n t1"><rect x="117" y="24" width="124" height="40" rx="9"/>
+          <text class="title" x="179" y="41" text-anchor="middle">Base weapon</text>
+          <text class="sub" x="179" y="56" text-anchor="middle">1 kind · G0–G10 · Might</text></g>
+
+        <g class="n t2"><rect x="49" y="120" width="110" height="40" rx="9"/>
+          <text class="title" x="104" y="137" text-anchor="middle">Dual</text>
+          <text class="sub" x="104" y="152" text-anchor="middle">+ a second kind</text></g>
+        <g class="n t2"><rect x="199" y="120" width="110" height="40" rx="9"/>
+          <text class="title" x="254" y="137" text-anchor="middle">Pure</text>
+          <text class="sub" x="254" y="152" text-anchor="middle">weak hits ×1.5</text></g>
+
+        <g class="n t3"><rect x="6" y="222" width="104" height="44" rx="9"/>
+          <text class="title" x="58" y="240" text-anchor="middle">Prism</text>
+          <text class="sub" x="58" y="256" text-anchor="middle">3 kinds · ×1.3</text></g>
+        <g class="n t3"><rect x="127" y="222" width="104" height="44" rx="9"/>
+          <text class="title" x="179" y="240" text-anchor="middle">Tempered</text>
+          <text class="sub" x="179" y="256" text-anchor="middle">2 kinds · ×1.5</text></g>
+        <g class="n t3"><rect x="248" y="222" width="104" height="44" rx="9"/>
+          <text class="title" x="300" y="240" text-anchor="middle">Keen</text>
+          <text class="sub" x="300" y="256" text-anchor="middle">1 kind · ×1.7</text></g>
+
+        <text class="elabel" x="58" y="282" text-anchor="middle">broadest</text>
+        <text class="elabel" x="300" y="282" text-anchor="middle">deepest</text>
+      </svg>
+      <p class="legend" style="margin:6px 0 0">A weapon takes one step a tier. One that never reached G5 in Tier 2 takes Dual or Pure in Tier 3.
+        Every kind follows this tree: five Arms, five Tomes.</p>
+    </div>
+  </section>
+
+  <section id="t1">
+    <h2><span class="tier t1">Tier 1</span> A line, no branches</h2>
+    <div class="card">
+      <h3 style="margin-top:0">Greatsword, G0 to G10</h3>
+      <div class="scroll">
+        <div class="strip" aria-label="Grades G0 to G10 with Might and the Uma Level each needs">
+          <div class="node"><b>G0</b><span>base</span><span>Might 0</span></div><div class="hedge"></div>
+          <div class="node"><b>G1</b><span>Lv 1</span><span>+1</span></div><div class="hedge"></div>
+          <div class="node"><b>G2</b><span>Lv 6</span><span>+4</span></div><div class="hedge"></div>
+          <div class="node"><b>G3</b><span>Lv 11</span><span>+8</span></div><div class="hedge"></div>
+          <div class="node"><b>G4</b><span>Lv 16</span><span>+12</span></div><div class="hedge"></div>
+          <div class="node"><b>G5</b><span>Lv 21</span><span>+19</span></div><div class="hedge"></div>
+          <div class="node"><b>G6</b><span>Lv 26</span><span>+26</span></div><div class="hedge"></div>
+          <div class="node"><b>G7</b><span>Lv 31</span><span>+35</span></div><div class="hedge"></div>
+          <div class="node"><b>G8</b><span>Lv 36</span><span>+45</span></div><div class="hedge"></div>
+          <div class="node"><b>G9</b><span>Lv 41</span><span>+57</span></div><div class="hedge"></div>
+          <div class="node core"><b>G10</b><span>Lv 46</span><span>+68</span></div>
+        </div>
+      </div>
+      <p class="legend" style="margin:2px 0 0">Scroll the line. Each step spends 1 Weapon Gem of that grade, once she has the level.</p>
+      <ul class="tight">
+        <li><b>One kind:</b> the weapon opens its tree, and its hits carry its kind for weaknesses.</li>
+        <li><b>Might</b> adds to the offense of its own hits. Nothing else changes.</li>
+        <li><b>No choices</b> but which three weapons her class slots.</li>
+      </ul>
+      <div class="note"><b>Today it takes</b> a crafted piece per grade, bound in order, worn up to a Weapon Rank earned by
+        using it. <b>Proposed:</b> the weapon is hers at G0; a gem raises it; her Uma Level is the only gate.</div>
+    </div>
+  </section>
+
+  <section id="t2">
+    <h2><span class="tier t2">Tier 2</span> The first fork</h2>
+    <div class="card">
+      <h3 style="margin-top:0">G0–G4 as she arrived</h3>
+      <div class="scroll">
+        <div class="strip">
+          <div class="node"><b>G0</b><span>base</span><span>0</span></div><div class="hedge"></div>
+          <div class="node"><b>G1</b><span>Lv 1</span><span>+1</span></div><div class="hedge"></div>
+          <div class="node"><b>G2</b><span>Lv 6</span><span>+4</span></div><div class="hedge"></div>
+          <div class="node"><b>G3</b><span>Lv 11</span><span>+8</span></div><div class="hedge"></div>
+          <div class="node"><b>G4</b><span>Lv 16</span><span>+12</span></div>
+        </div>
+      </div>
+      <div class="edge"></div>
+      <div class="origin"><div class="node forknode">G5 · Lv 21 · Might +19<br><span class="muted">the fork: a Dual Gem or a Pure Gem</span></div></div>
+      <svg class="forksvg" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="0" x2="25" y2="22"/><line x1="50" y1="0" x2="75" y2="22"/>
+      </svg>
+      <div class="branches">
+        <div class="form t2">
+          <h4>Dual</h4>
+          <p class="what">+ a second kind, picked when it evolves. Its hits count as both kinds for weaknesses and locks.</p>
+          <div class="gem">Takes 1 Dual Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Greatsword</span><span class="chip magic">Ice</span></div>
+          <div class="then">G6–G10: Might +26 … +68</div>
+        </div>
+        <div class="form t2">
+          <h4>Pure</h4>
+          <p class="what">A harder weakness: its weak hits deal ×1.5 instead of ×1.3.</p>
+          <div class="gem">Takes 1 Pure Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Lance</span><span class="chip">Weak ×1.5</span></div>
+          <div class="then">G6–G10: Might +26 … +68</div>
+        </div>
+      </div>
+      <ul class="tight">
+        <li><b>A second kind is coverage,</b> not a second channel: a Greatsword + Ice hit stays physical, with the Greatsword's Might.</li>
+        <li><b>One weak hit</b> still removes one point and breaks one lock, whichever kind matched.</li>
+        <li><b>Breaks stay the skill trees' job:</b> no form removes an extra shield point; Break +1 is a Tier 2 skill pick.</li>
+        <li><b>Re-forging</b> takes another fork gem; the grade stays.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="t3">
+    <h2><span class="tier t3">Tier 3</span> The second fork</h2>
+    <p class="lead">At Tier 3 G5 each weapon takes the next step from the form it arrived with. Three origins, every branch:</p>
+
+    <div class="card">
+      <h3 style="margin-top:0">Arrived as Dual</h3>
+      <div class="origin"><div class="node">Dual · Greatsword + Ice<br><span class="muted">G0–G4, then the G5 fork</span></div></div>
+      <svg class="forksvg" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="0" x2="25" y2="22"/><line x1="50" y1="0" x2="75" y2="22"/>
+      </svg>
+      <div class="branches">
+        <div class="form t3">
+          <h4>Prism</h4>
+          <p class="what">A third kind. Three kinds, weak hits ×1.3.</p>
+          <div class="gem">Prism Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Greatsword</span><span class="chip magic">Ice</span><span class="chip phys">Axe</span></div>
+        </div>
+        <div class="form t3">
+          <h4>Tempered</h4>
+          <p class="what">Keeps its two kinds; its weak hits ×1.5.</p>
+          <div class="gem">Tempered Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Greatsword</span><span class="chip magic">Ice</span><span class="chip">Weak ×1.5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Arrived as Pure</h3>
+      <div class="origin"><div class="node">Pure · Lance<br><span class="muted">G0–G4, then the G5 fork</span></div></div>
+      <svg class="forksvg" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="0" x2="25" y2="22"/><line x1="50" y1="0" x2="75" y2="22"/>
+      </svg>
+      <div class="branches">
+        <div class="form t3">
+          <h4>Tempered</h4>
+          <p class="what">Keeps its ×1.5 and gains a second kind, picked now.</p>
+          <div class="gem">Tempered Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Lance</span><span class="chip magic">Fire</span><span class="chip">Weak ×1.5</span></div>
+        </div>
+        <div class="form t3">
+          <h4>Keen</h4>
+          <p class="what">One kind; its weak hits deal ×1.7.</p>
+          <div class="gem">Keen Gem</div>
+          <div class="row" style="margin-top:6px"><span class="chip phys">Lance</span><span class="chip">Weak ×1.7</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Arrived as Base (never reached G5 in Tier 2)</h3>
+      <div class="origin"><div class="node">Base · Bow<br><span class="muted">G0–G4, then the G5 fork</span></div></div>
+      <svg class="forksvg" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="0" x2="25" y2="22"/><line x1="50" y1="0" x2="75" y2="22"/>
+      </svg>
+      <div class="branches">
+        <div class="form t2"><h4>Dual</h4><p class="what">The Tier 2 step, a tier late.</p><div class="gem">Dual Gem</div></div>
+        <div class="form t2"><h4>Pure</h4><p class="what">The Tier 2 step, a tier late.</p><div class="gem">Pure Gem</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="forms">
+    <h2>Every form</h2>
+    <div class="card">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Form</th><th>Kinds</th><th>Weak hit</th></tr></thead>
+          <tbody>
+            <tr><td><b>Base</b><br><span class="legend">Tier 1</span></td><td>1</td><td>×1.3</td></tr>
+            <tr><td><b>Dual</b><br><span class="legend">Tier 2</span></td><td>2</td><td>×1.3</td></tr>
+            <tr><td><b>Pure</b><br><span class="legend">Tier 2</span></td><td>1</td><td>×1.5</td></tr>
+            <tr><td><b>Prism</b><br><span class="legend">Tier 3, from Dual</span></td><td>3</td><td>×1.3</td></tr>
+            <tr><td><b>Tempered</b><br><span class="legend">Tier 3, from Dual or Pure</span></td><td>2</td><td>×1.5</td></tr>
+            <tr><td><b>Keen</b><br><span class="legend">Tier 3, from Pure</span></td><td>1</td><td>×1.7</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="legend" style="margin:8px 0 0">Each fork gem shares its form's name. Every form keeps the Might of its grade. A weapon's kinds are all different. Limits: three weapons for good, one fork a tier, a weak hit at most ×1.7. Breaks stay the trees'.</p>
+    </div>
+  </section>
+
+  <section id="classes">
+    <h2>By class: which extra kinds count</h2>
+    <div class="card">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Class</th><th>Extra kinds that count</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Brawler<br><span class="legend">3 Arms</span></td><td><span class="chip phys">Arms only</span></td><td>Axe → Dual Axe + Lance</td></tr>
+            <tr><td>Mage<br><span class="legend">3 Tomes</span></td><td><span class="chip magic">Elements only</span></td><td>Fire Tome → Dual Fire + Lightning</td></tr>
+            <tr><td>Spell Blade<br><span class="legend">2 Arms, 1 Tome</span></td><td>Any of ten</td><td>Greatsword → Dual Greatsword + Ice</td></tr>
+            <tr><td>Paladin<br><span class="legend">2 Arms, 1 Tome</span></td><td>Any of ten</td><td>Greatsword → Pure, then Tempered + Fire</td></tr>
+            <tr><td>Summoner<br><span class="legend">2 Tomes, 1 Arms</span></td><td>Any of ten</td><td>Fire Tome → Dual Fire + Katana</td></tr>
+            <tr><td>Cleric<br><span class="legend">2 Tomes, 1 Arms</span></td><td>Any of ten</td><td>Light Tome → Pure, then Keen</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">A weapon is shared by every class that slots it, so the rule reads at the class.
+        <b>A Greatsword + Ice held by a Brawler hits as a plain Greatsword</b>; its sheet says "Ice: not as a Brawler".
+        Slot splits are classes.md's to set; these are the draft.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">The ten kinds</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Arms</th><th>Tome</th><th>Shape they share</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip phys">Greatsword</span></td><td><span class="chip magic">Fire</span></td><td>One foe, heavy</td></tr>
+            <tr><td><span class="chip phys">Axe</span></td><td><span class="chip magic">Ice</span></td><td>Every foe</td></tr>
+            <tr><td><span class="chip phys">Lance</span></td><td><span class="chip magic">Lightning</span></td><td>Random foes</td></tr>
+            <tr><td><span class="chip phys">Bow</span></td><td><span class="chip magic">Light</span></td><td>One foe, many hits</td></tr>
+            <tr><td><span class="chip phys">Katana</span></td><td><span class="chip magic">Dark</span></td><td>Twice: the foe and one other</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="legend" style="margin:8px 0 0">Shape comes from the weapon's tree, never from its extra kinds. A Dual Greatsword + Ice still strikes one foe, heavy.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill trees by tier</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+
+  /* --- skills-* previews: the tree drawing ------------------------------------------------------------------------- */
+  :root { --line: var(--hairline-strong); }
+  nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+  .panel { display: none; } .panel.show { display: block; }
+  .lvl { display: flex; justify-content: center; }
+  .n { position: relative; width: 100%; max-width: 160px; padding: 5px 6px; border-radius: 9px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); text-align: center; font-size: 11px; line-height: 1.25; color: var(--ink); }
+  .n b { display: block; font-weight: 700; overflow-wrap: anywhere; }
+  .n small { display: block; color: var(--ink-soft); font-size: 10px; }
+  .n em { display: block; font-style: normal; color: var(--ink-faint); font-size: 9.5px; margin-top: 1px; }
+  .n .tag { display: block; font-size: 9px; font-weight: 800; letter-spacing: .03em; color: var(--ink-soft); text-transform: uppercase; margin-bottom: 1px; }
+  .n.on { border-color: var(--accent); background: var(--accent-wash); }
+  .n.on .tag { color: var(--accent-strong); }
+  .n.off { border-style: dashed; background: transparent; opacity: .62; }
+  .n.lock { opacity: .5; }
+  .n.x { border-color: var(--magic); }
+  .n.x .tag { color: var(--magic); }
+  .n.tip { padding: 4px 2px; font-size: 10px; }
+  .n.cap { border-width: 2px; }
+  .n.root { max-width: none; text-align: left; padding: 8px 10px; display: grid; gap: 4px; }
+  .nb { position: absolute; top: -7px; right: -3px; font-size: 9px; font-weight: 800; padding: 0 4px; border-radius: 5px; line-height: 14px; color: #fff; }
+  .nb.t2 { background: var(--t2); } .nb.t3 { background: var(--t3); }
+  .v { width: 2px; height: 10px; background: var(--line); margin: 0 auto; flex: none; }
+  .v.on { background: var(--accent); }
+  .v.off { width: 0; background: none; border-left: 2px dashed var(--line); }
+  .split, .join { position: relative; height: 10px; width: 100%; flex: none; }
+  .split::before { content: ""; position: absolute; left: calc(50% - 1px); top: 0; width: 2px; height: 5px; background: var(--line); }
+  .split::after { content: ""; position: absolute; top: 4px; height: 2px; left: 25%; right: 25%; background: var(--line); }
+  .split.s3::after { left: 16.667%; right: 16.667%; }
+  .join::before { content: ""; position: absolute; top: 4px; height: 2px; left: 25%; right: 25%; background: var(--line); }
+  .join::after { content: ""; position: absolute; left: calc(50% - 1px); top: 5px; width: 2px; height: 5px; background: var(--line); }
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .cols.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .col { display: flex; flex-direction: column; align-items: center; padding: 0 3px; min-width: 0; }
+  .col > .v:first-child, .col > .v.stub { height: 5px; }
+  /* Three branches: equal node heights keep the tip forks on one line. */
+  .cols.c3 > .col > .n:not(.tip):not(.cap) { min-height: 62px; display: flex; flex-direction: column; justify-content: center; }
+  .fk { width: fit-content; margin: 0 auto; font-size: 9.5px; font-weight: 700; color: var(--accent-strong); background: var(--accent-wash);
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+  .tree-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .tree-h b { font-size: 14px; }
+  .glyph { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; font-size: 10px; font-weight: 800;
+    background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .glyph.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .glyph.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .note { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; }
+  .tips { font-size: 11px; color: var(--ink-soft); margin: 8px 0 0; padding: 6px 8px; background: var(--sunken); border-radius: 8px; }
+  .tips b { color: var(--ink); }
+  .lg { display: flex; gap: 6px 10px; flex-wrap: wrap; font-size: 11px; color: var(--ink-soft); }
+  .lg span { display: inline-flex; align-items: center; gap: 4px; }
+  .sw { display: inline-block; width: 16px; height: 11px; border-radius: 3px; border: 1.5px solid var(--hairline-strong); background: var(--raised); }
+  .sw.on { border-color: var(--accent); background: var(--accent-wash); }
+  .sw.off { border-style: dashed; background: transparent; }
+  .sw.lock { opacity: .5; }
+  .sw.x { border-color: var(--magic); }
+  td.c { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Skill trees by tier</h1>
+  <p>One class, the Brawler, with classes.md's three default weapons (Greatsword, Lance, Axe), as today and at Tiers 1, 2 and 3; then the hybrids' and a healer's trees at Tier 2. From <b>skill-trees.md</b> in the Tier rework.</p>
+
+  <div class="card">
+    <div class="lg">
+      <span><i class="sw on"></i>hers</span>
+      <span><i class="sw off"></i>a branch she doesn't hold</span>
+      <span><i class="sw lock"></i>not open yet</span>
+      <span><i class="sw x"></i>a hybrid's crossover</span>
+      <span><span class="tier t2" style="font-size:9px;padding:0 4px">T2</span> <span class="tier t3" style="font-size:9px;padding:0 4px">T3</span> new at that tier</span>
+    </div>
+    <p class="note" style="margin-top:6px">Every node is free. A fork holds one branch (two in Tier 3), swaps are free outside a fight, and Class Rank opens every depth: 1, 10, 20, 30, 40, and 50 in Tier 3.</p>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <a href="#today" data-tab="today">Today</a>
+    <a href="#t1" data-tab="t1" class="on">Tier 1</a>
+    <a href="#t2" data-tab="t2">Tier 2</a>
+    <a href="#t3" data-tab="t3">Tier 3</a>
+    <a href="#hy" data-tab="hy">Hybrids, healer (T2)</a>
+  </nav>
+
+  <!-- ============================================================== TODAY -->
+  <section class="panel" id="today">
+    <div class="card">
+      <div class="row"><span class="chip">5 trees</span><span class="chip">15 nodes a tree</span><span class="chip">25 forks</span><span class="chip">50 points vs 75 to fill</span></div>
+      <p class="note">Cores are free; a side costs its depth in side points, one point a Class Rank. The core line never branches: every depth is a row with two variants beside it.</p>
+    </div>
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">GS</span> Greatsword, as the Skills page lists it</b></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Depth</th><th>Core · free</th><th>Side A</th><th>Side B</th></tr></thead>
+          <tbody>
+            <tr><td class="c">1 · CR 1</td><td>Heavy Slash</td><td>Crush<br><span class="muted">1 pt · CR 5</span></td><td>Twin Slash<br><span class="muted">1 pt · CR 5</span></td></tr>
+            <tr><td class="c">2 · CR 10</td><td>Cleave</td><td>Bone Crush<br><span class="muted">2 pts · CR 15</span></td><td>Double Cleave<br><span class="muted">2 pts · CR 15</span></td></tr>
+            <tr><td class="c">3 · CR 20</td><td>Sunder</td><td>Rampart Breaker<br><span class="muted">3 pts · CR 25</span></td><td>Triple Sunder<br><span class="muted">3 pts · CR 25</span></td></tr>
+            <tr><td class="c">4 · CR 30</td><td>Rend</td><td>Cataclysm<br><span class="muted">4 pts · CR 35</span></td><td>Rending Combo<br><span class="muted">4 pts · CR 35</span></td></tr>
+            <tr><td class="c">5 · CR 40</td><td>Meteor Strike</td><td>Worldbreaker<br><span class="muted">5 pts · CR 45</span></td><td>Meteor Combo<br><span class="muted">5 pts · CR 45</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">… and the same again for Axe, Lance, Bow and Katana. Side A here is the core with one hit, +15% power and +2 MP; side B one hit more at 92%: numbers more than options. The new core at each depth is free, its variant costs points.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== TIER 1 -->
+  <section class="panel show" id="t1">
+    <div class="card">
+      <div class="row"><span class="tier t1">Tier 1</span><span class="chip">3 trees</span><span class="chip">8 nodes a tree</span><span class="chip">1 pick a tree</span><span class="chip">no points</span></div>
+      <p class="note">An Uma at Class Rank 34: depths 1–4 open, depth 5 at Class Rank 40. She holds 15 skills; equipped 3 → 7 by Uma Level.</p>
+    </div>
+
+    <div class="card">
+      <div class="n root on">
+        <div class="row" style="gap:6px"><span class="glyph">Br</span><b style="display:inline">Brawler</b><span class="chip phys">all physical</span></div>
+        <small style="text-align:left">One heavy act a turn. The root holds what belongs to the class, not a weapon.</small>
+        <small style="text-align:left;color:var(--info)">Template slot · Opening: her first skill each fight costs no MP <span class="muted">(an example; variance.md writes them)</span></small>
+      </div>
+    </div>
+
+    <!-- Greatsword T1: holds A -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">GS</span> Greatsword</b><span class="chip">holds A</span></div>
+      <div class="lvl"><div class="n on"><b>Heavy Slash</b><small>one foe · 1 hit</small><em>CR 1 · 10 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Cleave</b><small>one foe · 1 hit</small><em>CR 10 · 14 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one · free</div>
+      <div class="split"></div>
+      <div class="cols">
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">A · Core</span><b>Sunder</b><small>one foe · 2 hits</small><em>CR 20 · 18 MP</em></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Rend</b><small>one foe · 2 hits</small><em>CR 30 · 22 MP</em></div>
+          <div class="v"></div>
+          <div class="n on lock"><b>Meteor Strike</b><small>one foe · 3 hits · Armor Break 2</small><em>CR 40 · 26 MP</em></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Combo</span><b>Triple Sunder</b><small>one foe · 3 hits</small><em>CR 20 · 18 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Rending Combo</b><small>one foe · 3 hits</small><em>CR 30 · 22 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off lock"><b>Meteor Combo</b><small>one foe · 4 hits</small><em>CR 40 · 26 MP</em></div>
+        </div>
+      </div>
+      <p class="note">B, Combo: one more hit at a little less power, so she Breaks shields sooner.</p>
+    </div>
+
+    <!-- Lance T1: holds A -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">Ln</span> Lance</b><span class="chip">holds A</span></div>
+      <div class="lvl"><div class="n on"><b>Thrust Flurry</b><small>random foes · 2 hits</small><em>CR 1 · 10 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Lance Barrage</b><small>random foes · 2 hits</small><em>CR 10 · 14 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one · free</div>
+      <div class="split"></div>
+      <div class="cols">
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">A · Core</span><b>Spiral Barrage</b><small>random foes · 4 hits</small><em>CR 20 · 18 MP</em></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Dragon Dive</b><small>random foes · 4 hits</small><em>CR 30 · 22 MP</em></div>
+          <div class="v"></div>
+          <div class="n on lock"><b>Heaven's Rain</b><small>random foes · 6 hits · Armor Break 1</small><em>CR 40 · 26 MP</em></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Impale</span><b>Skewer</b><small>one foe · 2 hits</small><em>CR 20 · 20 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Dragon Fang</b><small>one foe · 2 hits</small><em>CR 30 · 24 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off lock"><b>Gungnir</b><small>one foe · 3 hits</small><em>CR 40 · 28 MP</em></div>
+        </div>
+      </div>
+      <p class="note">B, Impale: fewer, heavier hits on the foe she taps, instead of random foes. Every Tier 1 node exists today: the trunk is cores 1–2, A cores 3–5, B one side line's 3–5.</p>
+    </div>
+
+    <!-- Axe T1: holds B -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">AX</span> Axe</b><span class="chip">holds B</span></div>
+      <div class="lvl"><div class="n on"><b>Sweep</b><small>every foe · 1 hit</small><em>CR 1 · 14 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Whirl</b><small>every foe · 1 hit</small><em>CR 10 · 18 MP</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one · free</div>
+      <div class="split"></div>
+      <div class="cols">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Cyclone</b><small>every foe · 2 hits</small><em>CR 20 · 22 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Quake</b><small>every foe · 2 hits</small><em>CR 30 · 26 MP</em></div>
+          <div class="v off"></div>
+          <div class="n off lock"><b>Maelstrom</b><small>every foe · 3 hits · Armor Break 1</small><em>CR 40 · 30 MP</em></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">B · Reap</span><b>Headsman's Cyclone</b><small>every foe, then her target</small><em>CR 20 · 24 MP</em></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Guillotine Quake</b><small>every foe, then her target</small><em>CR 30 · 28 MP</em></div>
+          <div class="v"></div>
+          <div class="n on lock"><b>Executioner's Storm</b><small>every foe · 3 hits, then her target</small><em>CR 40 · 32 MP</em></div>
+        </div>
+      </div>
+      <p class="note">B, Reap: a little less on every foe, and one more hit on the foe she taps.</p>
+    </div>
+
+  </section>
+
+  <!-- ============================================================== TIER 2 -->
+  <section class="panel" id="t2">
+    <div class="card">
+      <div class="row"><span class="tier t2">Tier 2</span><span class="chip">3 branches</span><span class="chip">tip: Power or Break</span><span class="chip">14 nodes a tree</span><span class="chip">2 picks a tree</span></div>
+      <p class="note">A Tier 2 Uma at Class Rank 50: everything open. She still holds 5 skills a tree; equipped 3 → 10.</p>
+    </div>
+
+    <div class="card">
+      <div class="n root on">
+        <div class="row" style="gap:6px"><span class="glyph">Br</span><b style="display:inline">Berserker</b><span class="chip">Brawler line</span><span class="tier t2" style="font-size:10px;padding:0 5px">T2</span></div>
+        <small style="text-align:left">Passive, picked at Ascend: her Axe hits her target at full power <span class="muted">(tier2-classes A5; classes.md decides)</span></small>
+        <small style="text-align:left;color:var(--info)">Template slot · Opening: her first skill each fight costs no MP</small>
+      </div>
+    </div>
+
+    <!-- Greatsword T2: A + Power -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">GS</span> Greatsword</b><span class="chip">A · Power</span></div>
+      <div class="lvl"><div class="n on"><b>Heavy Slash</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Cleave</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">A · Core</span><b>Sunder</b><small>2 hits</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Rend</b><small>2 hits</small></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Combo</span><b>Triple Sunder</b><small>3 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Rending Combo</b><small>3 hits</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">C · Crush</span><b>Rampart Breaker</b><small>1 heavy hit</small><span class="nb t2">T2</span></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Cataclysm</b><small>1 heavy hit</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tips"><b>Tips, depth 5, Class Rank 40.</b> Power is Tier 1's tip; Break is the same skill, whose first weak hit on a foe takes one more shield point (once an act, under the chip cap). A: Meteor Strike · Breaking Meteor Strike. B: Meteor Combo · Breaking Meteor Combo. C: Worldbreaker · Breaking Worldbreaker. <span style="color:var(--info)">An Uma whose signature kind is the Greatsword gets a third tip here, her template's (variance.md).</span></div>
+    </div>
+
+    <!-- Lance T2: C + Power -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">Ln</span> Lance</b><span class="chip">C · Power</span></div>
+      <div class="lvl"><div class="n on"><b>Thrust Flurry</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Lance Barrage</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Spiral Barrage</b><small>random · 4 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Dragon Dive</b><small>random · 4 hits</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Impale</span><b>Skewer</b><small>one foe · 2 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Dragon Fang</b><small>one foe · 2 hits</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">C · Scatter</span><b>Storm of Spears</b><small>random · 6 hits</small><span class="nb t2">T2</span></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Dragon Swarm</b><small>random · 6 hits</small></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tips"><b>Tips.</b> A: Heaven's Rain · Breaking Heaven's Rain. B: Gungnir · Breaking Gungnir. C: <b>Thousand Spears</b> (hers) · Breaking Thousand Spears.</div>
+    </div>
+
+    <!-- Axe T2: B + Break -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">AX</span> Axe</b><span class="chip">B · Break</span></div>
+      <div class="lvl"><div class="n on"><b>Sweep</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Whirl</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Cyclone</b><small>every foe</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Quake</b><small>every foe</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">B · Reap</span><b>Headsman's Cyclone</b><small>every foe + target</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Guillotine Quake</b><small>every foe + target</small></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">C · Tempest</span><b>Grand Cyclone</b><small>every foe · 3 hits</small><span class="nb t2">T2</span></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Aftershock</b><small>every foe · 3 hits</small></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b><span class="nb t2">T2</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tips"><b>Tips.</b> A: Maelstrom · Breaking Maelstrom. B: Executioner's Storm · <b>Breaking Executioner's Storm</b> (hers). C: Tempest · Breaking Tempest.</div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================== TIER 3 -->
+  <section class="panel" id="t3">
+    <div class="card">
+      <div class="row"><span class="tier t3">Tier 3</span><span class="chip">depth 6 at Class Rank 50</span><span class="chip">holds two of three</span><span class="chip">17 nodes a tree</span><span class="chip">3 picks a tree</span></div>
+      <p class="note">A Tier 3 Uma at Class Rank 50. She holds 10 skills a tree, 30 in all; equipped 10 and a master slot. Auto picks between her two branches each turn.</p>
+    </div>
+
+    <div class="card">
+      <div class="n root on">
+        <div class="row" style="gap:6px"><span class="glyph">Br</span><b style="display:inline">Master class</b><span class="chip">Brawler line</span><span class="tier t3" style="font-size:10px;padding:0 5px">T3</span></div>
+        <small style="text-align:left">Its mechanic, at the root <span class="muted">(its own doc, after Tier 2 is played)</span></small>
+        <small style="text-align:left;color:var(--info)">Template slot · Opening: her first skill each fight costs no MP</small>
+      </div>
+    </div>
+
+    <!-- Greatsword T3: A + C held -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">GS</span> Greatsword</b><span class="chip">A and C</span></div>
+      <div class="lvl"><div class="n on"><b>Heavy Slash</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Cleave</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold two of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">A · Core</span><b>Sunder</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Rend</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Starfall Strike</b><small>one foe · 4 hits</small><em>CR 50 · 30 MP</em><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Combo</span><b>Triple Sunder</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Rending Combo</b></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n off cap"><b>Starfall Combo</b><small>one foe · 5 hits</small><em>CR 50</em><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">C · Crush</span><b>Rampart Breaker</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Cataclysm</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Skysplitter</b><small>one foe · 1 huge hit</small><em>CR 50 · 32 MP</em><span class="nb t3">T3</span></div>
+        </div>
+      </div>
+      <p class="note">Two answers in one tree: Sunder's line hits often, Crush's line once and hard after the Break. Depth 6 is the depth tables' next step (power 5.6, 30 MP).</p>
+    </div>
+
+    <!-- Lance T3: A + B held -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">Ln</span> Lance</b><span class="chip">A and B</span></div>
+      <div class="lvl"><div class="n on"><b>Thrust Flurry</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Lance Barrage</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold two of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">A · Core</span><b>Spiral Barrage</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Dragon Dive</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Heaven's Deluge</b><small>random · 7 hits</small><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">B · Impale</span><b>Skewer</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Dragon Fang</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Godspear</b><small>one foe · 3 heavy hits</small><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">C · Scatter</span><b>Storm of Spears</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Dragon Swarm</b></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n off cap"><b>Endless Spears</b><small>random · 9 hits</small><span class="nb t3">T3</span></div>
+        </div>
+      </div>
+      <p class="note">Capstone names are placeholders, ours: the implementation names them.</p>
+    </div>
+
+    <!-- Axe T3: B + C held -->
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">AX</span> Axe</b><span class="chip">B and C</span></div>
+      <div class="lvl"><div class="n on"><b>Sweep</b><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Whirl</b><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold two of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Cyclone</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Quake</b></div>
+          <div class="v off"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n off cap"><b>World Maelstrom</b><small>every foe · 3 hits</small><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">B · Reap</span><b>Headsman's Cyclone</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Guillotine Quake</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Reaper's Gale</b><small>every foe + target</small><span class="nb t3">T3</span></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">C · Tempest</span><b>Grand Cyclone</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Aftershock</b></div>
+          <div class="v on"></div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col"><div class="v on"></div><div class="n on tip"><b>Power</b></div></div>
+            <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+          </div>
+          <div class="join"></div>
+          <div class="n on cap"><b>Endless Tempest</b><small>every foe · 5 hits</small><span class="nb t3">T3</span></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================== HYBRIDS -->
+  <section class="panel" id="hy">
+    <div class="card">
+      <div class="row"><span class="tier t2">Tier 2</span><span class="chip">Q17's crossovers</span><span class="chip">branch C</span></div>
+      <p class="note">A crossover is branch C on the trees of her <b>leading half</b>: the Spell Blade's Arms, the Summoner's Tomes. It reaches toward the mirror's identity, not its level. Weapons are classes.md's defaults. Tips (Power or Break) fork as on every tree; left out here.</p>
+    </div>
+
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph">AX</span> Spell Blade · Axe</b><span class="chip phys">leading half</span></div>
+      <div class="lvl"><div class="n on"><b>Rune Hew</b><small>one foe · 2 hits</small><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Arcane Hew</b><small>one foe · 2 hits</small><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Mystic Hew</b><small>3 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Astral Hew</b><small>3 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Celestial Hew</b><small>3 hits</small></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Rapid</span><b>Rapid Mystic Hew</b><small>4 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Rapid Astral Hew</b><small>4 hits</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Rapid Celestial Hew</b><small>4 hits</small></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on x"><span class="tag">C · Sweep</span><b>Sweeping Mystic Hew</b><small>every foe at 0.55</small><span class="nb t2">T2</span></div>
+          <div class="v on"></div>
+          <div class="n on x"><b>Sweeping Astral Hew</b><small>every foe · 2 hits</small></div>
+          <div class="v on"></div>
+          <div class="n on x"><b>Sweeping Celestial Hew</b><small>every foe · 2 hits</small></div>
+        </div>
+      </div>
+      <p class="note">Q17 exactly: today her Axe strikes one foe. Hit counts include her blade’s extra hit; Sweep reaches every foe at the area share and gives up that extra hit. Her Bow takes Sweep too; her Tome tree’s C is Focused (one hit fewer, harder).</p>
+    </div>
+
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph magic">Bz</span> Summoner · Blizzard Tome</b><span class="chip magic">leading half</span></div>
+      <div class="lvl"><div class="n on"><b>Frost Sprites</b><small>every foe · lingers</small><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Snow Sentinel</b><small>every foe · lingers</small><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Ice Golem</b><small>farewell on every foe</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Frost Titan</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Winter Queen</b><small>Enfeeble</small></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">B · Bonded</span><b>Bonded Ice Golem</b><small>lingers at 0.4</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Bonded Frost Titan</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Bonded Winter Queen</b></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on x"><span class="tag">C · Hunt</span><b>Hunting Ice Golem</b><small>farewell: 3 strikes on its target</small><span class="nb t2">T2</span></div>
+          <div class="v on"></div>
+          <div class="n on x"><b>Hunting Frost Titan</b></div>
+          <div class="v on"></div>
+          <div class="n on x"><b>Hunting Winter Queen</b></div>
+        </div>
+      </div>
+      <p class="note">Hunt: her lingering summon’s farewell strikes its own target three times instead of every foe once. Her Thunder takes Hunt too; her Arms tree’s C is Mighty (one hit fewer, ×1.1).</p>
+    </div>
+
+    <div class="card">
+      <div class="tree-h"><b><span class="glyph heal">Ln</span> Paladin · Lance</b><span class="chip heal">healer</span></div>
+      <div class="lvl"><div class="n on"><b>Pierce Mind</b><small>Mind Break · Barrier</small><em>CR 1</em></div></div>
+      <div class="v on"></div>
+      <div class="lvl"><div class="n on"><b>Puncture</b><small>Mind Break · Barrier</small><em>CR 10</em></div></div>
+      <div class="v on"></div>
+      <div class="fk">Class Rank 20 · hold one of three</div>
+      <div class="split s3"></div>
+      <div class="cols c3">
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">A · Core</span><b>Impale</b><small>Barrier on the most threatened</small></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Transfix</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Mindspike</b><small>Barrier on every Uma</small></div>
+        </div>
+        <div class="col">
+          <div class="v on"></div>
+          <div class="n on"><span class="tag">B · Potent</span><b>Potent Impale</b><small>+1 stack</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Valkyrie's Oath</b><small>revives the fallen</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Potent Mindspike</b></div>
+        </div>
+        <div class="col">
+          <div class="v off"></div>
+          <div class="n off"><span class="tag">C · Wide</span><b>Wide Impale</b><small>Barrier on every Uma ×0.4</small><span class="nb t2">T2</span></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Wide Transfix</b></div>
+          <div class="v off"></div>
+          <div class="n off"><b>Wide Mindspike</b></div>
+        </div>
+      </div>
+      <p class="note">Healers’ B carries today’s revives (Valkyrie’s Oath here, the Cleric’s Rebirth on her Light tree), so Tier 1 keeps them. Wide is Tier 2’s: one Uma at full share, or every Uma at 0.4.</p>
+    </div>
+
+  </section>
+</main>
+<script>
+  // Tier tabs: show one panel at a time.
+  const tabs = document.querySelectorAll('nav.tabs a');
+  function show(id) {
+    tabs.forEach((a) => a.classList.toggle('on', a.dataset.tab === id));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('show', p.id === id));
+  }
+  tabs.forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.tab); history.replaceState(null, '', '#' + a.dataset.tab); }));
+  const start = location.hash.slice(1);
+  if (['today', 't1', 't2', 't3', 'hy'].includes(start)) show(start);
+</script>
+</body>
+</html>

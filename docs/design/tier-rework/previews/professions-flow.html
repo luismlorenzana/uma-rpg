@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Professions Flow</title>
+<!-- Tier rework preview for docs/design/tier-rework/professions.md. Self-contained; the first <style> block is
+     _template.html's, unchanged. Invented names only. -->
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+
+<style>
+  :root {
+    --tr-1: #e34948; --tr-2: #eda100; --tr-3: #1baf7a; --tr-4: #e87ba4; --tr-5: #2a78d6;
+    --ground: color-mix(in srgb, var(--heal) 9%, var(--panel)); --road: var(--raised);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --tr-1: #e05a50; --tr-2: #c4940a; --tr-3: #1fa877; --tr-4: #da74ae; --tr-5: #4f8fe8;
+      --ground: color-mix(in srgb, var(--heal) 7%, var(--sunken)); --road: var(--raised); }
+  }
+  .t1c { fill: var(--tr-1); background: var(--tr-1); } .t2c { fill: var(--tr-2); background: var(--tr-2); }
+  .t3c { fill: var(--tr-3); background: var(--tr-3); } .t4c { fill: var(--tr-4); background: var(--tr-4); }
+  .t5c { fill: var(--tr-5); background: var(--tr-5); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .lede { margin: -4px 0 12px; }
+  .kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+  .kv dt { color: var(--ink-soft); } .kv dd { margin: 0; color: var(--ink); font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.num, th.num { text-align: right; }
+  .note { font-size: 12px; color: var(--ink-faint); margin: 6px 0 0; }
+  .yardrow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+  .yardrow:last-child { border-bottom: 0; }
+  .yardrow .name { font-weight: 700; color: var(--ink); font-size: 13px; }
+  .yardrow .sub { font-size: 12px; color: var(--ink-soft); }
+  .yardrow .amt { margin-left: auto; text-align: right; font-weight: 700; font-size: 13px; color: var(--ink);
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .yardrow .amt small { display: block; font-weight: 500; color: var(--ink-faint); font-size: 11px; }
+  .arrow { text-align: center; color: var(--ink-soft); font-size: 13px; margin: -4px 0 8px; }
+  .arrow b { color: var(--ink); }
+  svg text { font-family: system-ui, -apple-system, 'Inter', sans-serif; }
+  .svg-ink { fill: var(--ink); } .svg-soft { fill: var(--ink-soft); } .svg-faint { fill: var(--ink-faint); }
+  .svg-panel { fill: var(--panel); stroke: var(--hairline-strong); }
+  .svg-ground { fill: var(--ground); } .svg-road { fill: var(--road); stroke: var(--hairline); }
+  .svg-roof { fill: var(--ink); opacity: .55; }
+  .ring-t2 { stroke: var(--t2); stroke-width: 2.5; } .ring-t3 { stroke: var(--t3); stroke-width: 2.5; }
+  .pip-free { fill: var(--ink); opacity: .35; }
+  .pip-more { fill: var(--sunken); stroke: var(--hairline-strong); }
+  .slots { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+  .bar { height: 14px; border-radius: 4px; }
+  .barrow { display: grid; grid-template-columns: 112px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; padding: 3px 0; }
+  .barrow .lbl { color: var(--ink); font-weight: 600; }
+  .barrow .val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stack { display: flex; gap: 2px; height: 18px; }
+  .stack span { display: block; height: 100%; }
+  .stack span:first-child { border-radius: 4px 0 0 4px; } .stack span:last-child { border-radius: 0 4px 4px 0; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 8px; }
+  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
+</style>
+</head>
+<body>
+<main>
+<h1>From the yards to what she wears</h1>
+<p class="lede">Gathering → processing → making → her slots, for one Uma maxed at grade 10 (roster average). From <b>professions.md §5.2–§5.5, §6, §7</b>. Amounts are refined items unless they say pieces.</p>
+<nav class="tabs"><a href="#t1">Tier 1</a><a href="#t2">Tier 2</a><a href="#t3">Tier 3</a><a href="#today">Today vs Tier 1</a></nav>
+<h2 id="t1"><span class="tier t1">Tier 1</span> 20 item types, one trade an Uma</h2>
+<div class="card"><h3 style="margin-top:0">1 · Gather: two types a yard</h3>
+<div class="yardrow"><i class="dot t1c"></i><div><div class="name">Mine · Mining</div><div class="sub">Copper Ore (grades 1–5, Craft Lv 1) · Iron Ore (6–10, Lv 26)</div></div><div class="amt">105<small>a maxed Uma</small></div></div>
+<div class="yardrow"><i class="dot t2c"></i><div><div class="name">Lumber Camp · Wood Chopping</div><div class="sub">Pine Log (grades 1–5, Craft Lv 1) · Oak Log (6–10, Lv 26)</div></div><div class="amt">95<small>a maxed Uma</small></div></div>
+<div class="yardrow"><i class="dot t3c"></i><div><div class="name">Fields · Farming</div><div class="sub">Flax (grades 1–5, Craft Lv 1) · Cotton (6–10, Lv 26)</div></div><div class="amt">95<small>a maxed Uma</small></div></div>
+<div class="yardrow"><i class="dot t4c"></i><div><div class="name">Fishery · Fishing</div><div class="sub">Seashell (grades 1–5, Craft Lv 1) · Pearl (6–10, Lv 26)</div></div><div class="amt">95<small>a maxed Uma</small></div></div>
+<div class="yardrow"><i class="dot t5c"></i><div><div class="name">Hunting Grounds · Gem Hunting</div><div class="sub">Quartz (grades 1–5, Craft Lv 1) · Garnet (6–10, Lv 26)</div></div><div class="amt">95<small>a maxed Uma</small></div></div>
+<p class="note">485 raw items, the same for every class.</p></div>
+<div class="arrow">↓ <b>Workbench</b> (healers’ trade): 485 refines, one for one, a quarter of a gather each ↓</div>
+<div class="card"><h3 style="margin-top:0">2 · Where the refined items go</h3><svg viewBox="0 0 390 470" width="100%" role="img" aria-label="Where a maxed Uma’s 485 refined items go, from five gathering yards to four making yards"><rect class="t1c" x="98" y="15.0" width="8" height="84.0" rx="2"><title>Ingots: 105 refined per Uma</title></rect><text class="svg-ink" x="92" y="55.0" font-size="11.5" font-weight="700" text-anchor="end">Ingots</text><text class="svg-soft" x="92" y="68.0" font-size="10.5" text-anchor="end">105</text><rect class="t2c" x="98" y="112.0" width="8" height="76.0" rx="2"><title>Planks: 95 refined per Uma</title></rect><text class="svg-ink" x="92" y="148.0" font-size="11.5" font-weight="700" text-anchor="end">Planks</text><text class="svg-soft" x="92" y="161.0" font-size="10.5" text-anchor="end">95</text><rect class="t3c" x="98" y="201.0" width="8" height="76.0" rx="2"><title>Cloth: 95 refined per Uma</title></rect><text class="svg-ink" x="92" y="237.0" font-size="11.5" font-weight="700" text-anchor="end">Cloth</text><text class="svg-soft" x="92" y="250.0" font-size="10.5" text-anchor="end">95</text><rect class="t4c" x="98" y="290.0" width="8" height="76.0" rx="2"><title>Shells: 95 refined per Uma</title></rect><text class="svg-ink" x="92" y="326.0" font-size="11.5" font-weight="700" text-anchor="end">Shells</text><text class="svg-soft" x="92" y="339.0" font-size="10.5" text-anchor="end">95</text><rect class="t5c" x="98" y="379.0" width="8" height="76.0" rx="2"><title>Gems: 95 refined per Uma</title></rect><text class="svg-ink" x="92" y="415.0" font-size="11.5" font-weight="700" text-anchor="end">Gems</text><text class="svg-soft" x="92" y="428.0" font-size="10.5" text-anchor="end">95</text><rect class="t1c" x="284" y="15.0" width="8" height="96.0" rx="2"><title>Forge: 120 refined per Uma</title></rect><text class="svg-ink" x="298" y="61.0" font-size="11.5" font-weight="700">Forge</text><text class="svg-soft" x="298" y="74.0" font-size="10.5">120</text><rect class="t2c" x="284" y="128.3" width="8" height="100.0" rx="2"><title>Armorer: 125 refined per Uma</title></rect><text class="svg-ink" x="298" y="176.3" font-size="11.5" font-weight="700">Armorer</text><text class="svg-soft" x="298" y="189.3" font-size="10.5">125</text><rect class="t4c" x="284" y="245.7" width="8" height="96.0" rx="2"><title>Charm Shop: 120 refined per Uma</title></rect><text class="svg-ink" x="298" y="291.7" font-size="11.5" font-weight="700">Charm Shop</text><text class="svg-soft" x="298" y="304.7" font-size="10.5">120</text><rect class="t5c" x="284" y="359.0" width="8" height="96.0" rx="2"><title>Lapidary: 120 refined per Uma</title></rect><text class="svg-ink" x="298" y="405.0" font-size="11.5" font-weight="700">Lapidary</text><text class="svg-soft" x="298" y="418.0" font-size="10.5">120</text><path class="t1c" d="M106,15.0 C195.0,15.0 195.0,15.0 284,15.0 L284,63.0 C195.0,63.0 195.0,63.0 106,63.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Ingots → Forge: 60 refined per Uma</title></path><path class="t1c" d="M106,63.0 C195.0,63.0 195.0,128.3 284,128.3 L284,148.3 C195.0,148.3 195.0,83.0 106,83.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Ingots → Armorer: 25 refined per Uma</title></path><path class="t1c" d="M106,83.0 C195.0,83.0 195.0,359.0 284,359.0 L284,375.0 C195.0,375.0 195.0,99.0 106,99.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Ingots → Lapidary: 20 refined per Uma</title></path><path class="t2c" d="M106,112.0 C195.0,112.0 195.0,63.0 284,63.0 L284,111.0 C195.0,111.0 195.0,160.0 106,160.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Planks → Forge: 60 refined per Uma</title></path><path class="t2c" d="M106,160.0 C195.0,160.0 195.0,148.3 284,148.3 L284,168.3 C195.0,168.3 195.0,180.0 106,180.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Planks → Armorer: 25 refined per Uma</title></path><path class="t2c" d="M106,180.0 C195.0,180.0 195.0,375.0 284,375.0 L284,383.0 C195.0,383.0 195.0,188.0 106,188.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Planks → Lapidary: 10 refined per Uma</title></path><path class="t3c" d="M106,201.0 C195.0,201.0 195.0,168.3 284,168.3 L284,188.3 C195.0,188.3 195.0,221.0 106,221.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Cloth → Armorer: 25 refined per Uma</title></path><path class="t3c" d="M106,221.0 C195.0,221.0 195.0,245.7 284,245.7 L284,293.7 C195.0,293.7 195.0,269.0 106,269.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Cloth → Charm Shop: 60 refined per Uma</title></path><path class="t3c" d="M106,269.0 C195.0,269.0 195.0,383.0 284,383.0 L284,391.0 C195.0,391.0 195.0,277.0 106,277.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Cloth → Lapidary: 10 refined per Uma</title></path><path class="t4c" d="M106,290.0 C195.0,290.0 195.0,188.3 284,188.3 L284,208.3 C195.0,208.3 195.0,310.0 106,310.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Shells → Armorer: 25 refined per Uma</title></path><path class="t4c" d="M106,310.0 C195.0,310.0 195.0,293.7 284,293.7 L284,341.7 C195.0,341.7 195.0,358.0 106,358.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Shells → Charm Shop: 60 refined per Uma</title></path><path class="t4c" d="M106,358.0 C195.0,358.0 195.0,391.0 284,391.0 L284,399.0 C195.0,399.0 195.0,366.0 106,366.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Shells → Lapidary: 10 refined per Uma</title></path><path class="t5c" d="M106,379.0 C195.0,379.0 195.0,208.3 284,208.3 L284,228.3 C195.0,228.3 195.0,399.0 106,399.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Gems → Armorer: 25 refined per Uma</title></path><path class="t5c" d="M106,399.0 C195.0,399.0 195.0,399.0 284,399.0 L284,455.0 C195.0,455.0 195.0,455.0 106,455.0 Z" style="opacity:.42;stroke:var(--panel);stroke-width:1"><title>Gems → Lapidary: 70 refined per Uma</title></path></svg><p class="note">Band width is refined items per Uma; hover a band for its number. Each making yard takes about 120: a quarter. Each gathering yard gives 95–105: about a fifth.</p></div>
+<div class="arrow">↓ make: one gather’s time per refined item in the piece ↓</div>
+<div class="card"><h3 style="margin-top:0">3 · Make (items: gear.md and extra-stats.md)</h3>
+<div class="yardrow"><i class="dot t1c"></i><div><div class="name">Forge · Weapon Crafting</div><div class="sub">30 Weapon Gems, one a weapon a grade: 2 Ingot + 2 Plank</div></div><div class="amt">30<small>120 refined</small></div></div>
+<div class="yardrow"><i class="dot t2c"></i><div><div class="name">Armorer · Armor Crafting</div><div class="sub">50 Armor Fittings, any slot, either half. Grades 1–5: 1 Cloth + 1 Shell. 6–10: 1 Ingot + 1 Plank + 1 Gem</div></div><div class="amt">50<small>125 refined</small></div></div>
+<div class="yardrow"><i class="dot t4c"></i><div><div class="name">Charm Shop · Accessory Crafting</div><div class="sub">10 Accessory Settings, one a grade: 6 Cloth + 6 Shell</div></div><div class="amt">10<small>120 refined</small></div></div>
+<div class="yardrow"><i class="dot t5c"></i><div><div class="name">Lapidary · Jewel Crafting</div><div class="sub">20 Moon Jewels (I–V on four moons): 3 Gem + 1 Ingot. 5 Planet Jewels: 2 each of Gem, Plank, Cloth, Shell</div></div><div class="amt">25<small>120 refined</small></div></div>
+<p class="note">Grades 1–5 use the low types (Copper, Pine, Linen, Shell Carving, Cut Quartz); 6–10 the high ones (Iron, Oak, Cotton Cloth, Polished Pearl, Cut Garnet). Every class needs the same items, so a party is five times this.</p></div>
+<div class="arrow">↓ bind, raise and set ↓</div>
+<div class="card"><h3 style="margin-top:0">4 · What she wears (the Tier 1 template)</h3><div style="margin-bottom:8px"><div class="tag">3 weapons: grade 0 → 10, a Weapon Gem a step</div><div class="slots" style="margin-top:4px"><div class="slot">W1<br>×10</div><div class="slot">W2<br>×10</div><div class="slot">W3<br>×10</div></div></div><div style="margin-bottom:8px"><div class="tag">5 armor slots, grades 1–10: a fitting a step</div><div class="slots" style="margin-top:4px"><div class="slot">Head</div><div class="slot">Body</div><div class="slot">Legs</div><div class="slot">Arms</div><div class="slot">Feet</div></div></div><div style="margin-bottom:8px"><div class="tag">1 accessory slot, grades 1–10: a setting a step</div><div class="slots" style="margin-top:4px"><div class="slot">Acc<br>×10</div></div></div><div style="margin-bottom:8px"><div class="tag">Extra Stats: 25 jewels</div><div class="slots" style="margin-top:4px"><div class="slot">Planet<br>I–V</div><div class="slot">Moons<br>4 × 5</div></div></div><dl class="kv" style="margin-top:8px"><dt>Pieces</dt><dd>115</dd><dt>Materials</dt><dd>485 raw → 485 refined</dd><dt>Work</dt><dd>822 h at Craft Lv 25 (657 hut hours at ×1.25)</dd><dt>Today</dt><dd>220 pieces, 472 refined, 776 h</dd></dl></div>
+<h2 id="t2"><span class="tier t2">Tier 2</span> one more pair, a secondary profession</h2>
+<div class="card"><h3 style="margin-top:0">1 · Gather: the base pair stays, the Tier 2 pair joins</h3><div class="scroll"><table><thead><tr><th>Yard</th><th>Base pair</th><th>Tier 2 pair</th></tr></thead><tbody><tr><td style="border-left:4px solid var(--tr-1)"><b>Mine</b></td><td>Copper · Iron</td><td>Silver · Mythril</td></tr><tr><td style="border-left:4px solid var(--tr-2)"><b>Lumber Camp</b></td><td>Pine · Oak</td><td>Cedar · Elderwood</td></tr><tr><td style="border-left:4px solid var(--tr-3)"><b>Fields</b></td><td>Flax · Cotton</td><td>Wool · Silk Cocoon</td></tr><tr><td style="border-left:4px solid var(--tr-4)"><b>Fishery</b></td><td>Seashell · Pearl</td><td>Coral · Black Pearl</td></tr><tr><td style="border-left:4px solid var(--tr-5)"><b>Hunting Grounds</b></td><td>Quartz · Garnet</td><td>Sapphire · Diamond</td></tr></tbody></table></div><p class="note">Each with its refined form (Silver Ingot, Cedar Plank, Wool Cloth, Coral Carving, Cut Sapphire …). Low from Craft Lv 1, high from Lv 26. Only the yard’s own trade gathers its Tier 2 pair.</p></div>
+<div class="arrow">↓ <b>Workbench</b>: about 510 refines a maxed Uma ↓</div>
+<div class="card"><h3 style="margin-top:0">2 · Make: Tier 1’s recipes, plus Tier 2’s new pieces</h3><div class="yardrow"><i class="dot t1c"></i><div><div class="name">Forge</div><div class="sub">27 Weapon Gems; 3 fork gems (Dual or Pure, at G5): the G5 recipe plus one of each Tier 2 pair</div></div><div class="amt">30<small>120 + 15</small></div></div><div class="yardrow"><i class="dot t2c"></i><div><div class="name">Armorer</div><div class="sub">50 Armor Fittings, as in Tier 1</div></div><div class="amt">50<small>125</small></div></div><div class="yardrow"><i class="dot t4c"></i><div><div class="name">Charm Shop</div><div class="sub">20 settings for two slots, each now 6 refined</div></div><div class="amt">20<small>120</small></div></div><div class="yardrow"><i class="dot t5c"></i><div><div class="name">Lapidary</div><div class="sub">Shared jewels, resized to about 120; Halo Jewels I–II: the Moon recipe plus one of each Tier 2 pair</div></div><div class="amt">+2<small>120 + 10</small></div></div><p class="note">Tier 2 pairs per Uma: 25 (5 new pieces × one of each). The budget is a tenth more work, 48; whatever the other docs add fits inside it or its recipe shrinks.</p></div>
+<div class="card"><h3 style="margin-top:0">3 · Who can work where: an Uma of the Mine trade, secondary Fishery</h3><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Mine (her trade)</div><div class="sub">Copper, Iron, Silver, Mythril</div></div></div><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Forge (her trade)</div><div class="sub">Makes everything the Forge makes, base and new pieces</div></div></div><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Fishery (her secondary)</div><div class="sub">Seashell, Pearl; not Coral, Black Pearl</div></div></div><div class="yardrow"><b style="width:16px;color:var(--danger)">✗</b><div><div class="name">Every other yard</div><div class="sub">“Another trade”</div></div></div><p class="note">Picked once a tier on her profile’s Work tab, free; changing costs 1,000 Laurels. Gathering only. Base items are about 95% of Tier 2’s gathering, so the secondary moves most of the work where it’s short.</p></div>
+<div class="card"><dl class="kv"><dt>Huts</dt><dd>60 (6 a yard)</dd><dt>Item types</dt><dd>20 raw, 20 refined</dd><dt>One Uma maxed</dt><dd>about 510 refined, 864 h (691 hut hours)</dd><dt>A run of 20</dt><dd>28.8 days nonstop; today about four weeks</dd></dl></div>
+<h2 id="t3"><span class="tier t3">Tier 3</span> one more pair; the secondary reaches deeper</h2>
+<div class="card"><h3 style="margin-top:0">1 · Gather</h3><div class="scroll"><table><thead><tr><th>Yard</th><th>Base pair</th><th>Tier 2 pair</th><th>Tier 3 pair</th></tr></thead><tbody><tr><td style="border-left:4px solid var(--tr-1)"><b>Mine</b></td><td>Copper · Iron</td><td>Silver · Mythril</td><td>Titanium · Orichalcum</td></tr><tr><td style="border-left:4px solid var(--tr-2)"><b>Lumber Camp</b></td><td>Pine · Oak</td><td>Cedar · Elderwood</td><td>Ebony · Yggdrasil Branch</td></tr><tr><td style="border-left:4px solid var(--tr-3)"><b>Fields</b></td><td>Flax · Cotton</td><td>Wool · Silk Cocoon</td><td>Moonsilk Cocoon · Cloudfleece</td></tr><tr><td style="border-left:4px solid var(--tr-4)"><b>Fishery</b></td><td>Seashell · Pearl</td><td>Coral · Black Pearl</td><td>Leviathan Scale · Abyss Pearl</td></tr><tr><td style="border-left:4px solid var(--tr-5)"><b>Hunting Grounds</b></td><td>Quartz · Garnet</td><td>Sapphire · Diamond</td><td>Starstone · Philosopher’s Stone</td></tr></tbody></table></div></div>
+<div class="card"><h3 style="margin-top:0">2 · Make</h3><p style="margin:0">Tier 1’s recipes. Tier 3’s fork gems (Prism, Tempered, Keen) take one of each Tier 3 pair; the Halo Jewels keep the Tier 2 pairs. Settings are 4 refined (three slots). About 25 tier-pair items per Uma again.</p></div>
+<div class="card"><h3 style="margin-top:0">3 · Who can work where: the same Uma in Tier 3</h3><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Mine (her trade)</div><div class="sub">Copper, Iron, Silver, Mythril, Titanium, Orichalcum</div></div></div><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Forge (her trade)</div><div class="sub">Makes everything the Forge makes, base and new pieces</div></div></div><div class="yardrow"><b style="width:16px;color:var(--success)">✓</b><div><div class="name">Fishery (her secondary)</div><div class="sub">Seashell, Pearl and Coral, Black Pearl; not Leviathan Scale, Abyss Pearl</div></div></div><div class="yardrow"><b style="width:16px;color:var(--danger)">✗</b><div><div class="name">Every other yard</div><div class="sub">“Another trade”</div></div></div><p class="note">The secondary trails her main profession by one tier.</p></div>
+<div class="card"><dl class="kv"><dt>Huts</dt><dd>80 (8 a yard)</dd><dt>Item types</dt><dd>30 raw, 30 refined</dd><dt>One Uma maxed</dt><dd>about 510 refined, 864 h (691 hut hours)</dd><dt>A run of 20</dt><dd>28.8 days nonstop</dd></dl></div>
+<h2 id="today">Tier 1: today and proposed</h2>
+<div class="card scroll"><table><thead><tr><th></th><th>Today</th><th>Proposed</th></tr></thead><tbody><tr><th>Places on the Wilds</th><td>11 facilities</td><td><b>10 yards</b></td></tr><tr><th>Buildings, slots</th><td>11 buildings, 33 slots (55 at level 3)</td><td><b>40 huts, 40 slots</b></td></tr><tr><th>Upgrades</th><td>22</td><td><b>None</b></td></tr><tr><th>Gathered items</th><td>80</td><td><b>10</b></td></tr><tr><th>Refined items</th><td>80</td><td><b>10</b></td></tr><tr><th>Things to make</th><td>400 gear pieces, 100 Star Gems</td><td><b>40: three items × 10 grades; Planet and Moon Jewels I–V</b></td></tr><tr><th>Recipe rule</th><td>Pairs rotating by type and grade; gem side items</td><td><b>One fixed set an item; low types for grades 1–5, high for 6–10</b></td></tr><tr><th>Job kinds the player sees</th><td>4: gather, refine, craft, cut</td><td><b>3: gather, process, make</b></td></tr><tr><th>Where an Uma can work</th><td>Any of 11</td><td><b>Her 2 yards</b></td></tr><tr><th>Choices when gathering</th><td>10 grades</td><td><b>2 (1 before Craft Lv 26)</b></td></tr><tr><th>Choices when refining</th><td>80</td><td><b>10</b></td></tr><tr><th>One Uma maxed</th><td>472 raw, 220 pieces, 776 h</td><td><b>485 raw, 115 pieces, 822 h</b></td></tr><tr><th>Added</th><td>—</td><td><b>Trades; the low/high choice</b></td></tr></tbody></table><p class="note">The items are gear.md’s (Weapon Gem, Armor Fittings, Accessory Setting) and extra-stats.md’s (Planet and Moon Jewels).</p></div>
+</main>
+</body>
+</html>

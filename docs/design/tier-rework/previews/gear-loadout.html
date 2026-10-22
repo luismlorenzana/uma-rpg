@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gear Tab by Tier</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* This preview's own pieces. */
+  section { scroll-margin-top: 12px; }
+  .lead { margin: 0 0 8px; }
+  .profile { display: flex; gap: 12px; align-items: center; }
+  .bust { width: 56px; height: 56px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    font: 800 20px ui-rounded, system-ui, sans-serif; color: var(--accent-ink);
+    background: linear-gradient(160deg, var(--accent) 0%, var(--accent-wash) 100%); border: 2px solid var(--panel);
+    box-shadow: 0 0 0 1px var(--hairline-strong); }
+  .who b { font-size: 16px; display: block; }
+  .who span { font-size: 12px; color: var(--ink-faint); }
+  .ptabs { display: flex; gap: 14px; margin: 12px 0 2px; border-bottom: 1px solid var(--hairline); font-size: 13px; font-weight: 600; color: var(--ink-faint); }
+  .ptabs span { padding: 6px 0; }
+  .ptabs .on { color: var(--ink); border-bottom: 2px solid var(--accent); }
+  .preset { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--raised);
+    border-radius: 10px; padding: 8px 10px; margin: 10px 0 4px; font-size: 12px; color: var(--ink-soft); }
+  .btn { font: 700 12px system-ui, sans-serif; border: 0; border-radius: 999px; padding: 6px 10px; white-space: nowrap;
+    background: var(--accent); color: var(--accent-ink); }
+  .btn.ghost { background: var(--sunken); color: var(--ink); }
+  .gear-row { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+  .gear-row:last-child { border-bottom: 0; }
+  .gear-row .info { flex: 1; min-width: 0; }
+  .gear-row .name { font-weight: 700; font-size: 14px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .gear-row .eff { font-size: 12px; color: var(--ink-soft); }
+  .gear-row .kinds { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+  .gear-row .kinds .chip { font-size: 11px; padding: 1px 6px; }
+  .slot.p { border-color: var(--phys); color: var(--phys); }
+  .slot.m { border-color: var(--magic); color: var(--magic); }
+  .slot.a { border-color: var(--heal); color: var(--heal); }
+  .slot.o { border-color: var(--accent); color: var(--accent-strong); }
+  .g { font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 6px; background: var(--sunken); color: var(--ink); }
+  .form-tag { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--hairline-strong); color: var(--ink-soft); }
+  .form-tag.t2 { border-color: var(--t2); color: var(--t2); }
+  .form-tag.t3 { border-color: var(--t3); color: var(--t3); }
+  .pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 8px; white-space: nowrap; flex: none; text-align: center; }
+  .pill.up { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .pill.wait { background: var(--sunken); color: var(--ink-faint); }
+  .pill.need { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
+  .pill.fork { background: var(--accent-wash); color: var(--accent-strong); border: 1px dashed var(--accent); }
+  .off { text-decoration: line-through; opacity: .55; }
+  .new { font-size: 10px; font-weight: 800; letter-spacing: .04em; color: var(--success); text-transform: uppercase; }
+  .group-h { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 2px; }
+  .group-h h3 { margin: 0; }
+  .group-h span { font-size: 11px; color: var(--ink-faint); }
+  .sheet { border: 1.5px solid var(--accent); border-radius: 14px 14px 10px 10px; padding: 12px; background: var(--panel); }
+  .sheet .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: -4px auto 8px; }
+  .choice { border: 1.5px solid var(--hairline-strong); border-radius: 10px; padding: 8px 10px; margin-top: 8px; background: var(--raised); }
+  .choice.on { border-color: var(--t2); }
+  .choice b { font-size: 14px; }
+  .choice p { margin: 2px 0 6px; font-size: 12px; }
+  .kind-pick { display: flex; gap: 4px; flex-wrap: wrap; }
+  .kind-pick .chip { font-size: 11px; }
+  .kind-pick .chip.sel { outline: 2px solid var(--t2); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--sunken); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .note b { color: var(--ink); }
+  .cmp td:nth-child(2) { color: var(--ink-faint); }
+  .cmp td:nth-child(3) { font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Gear tab, Tier 1 to 3</h1>
+  <p class="lead">One Uma, a front runner at the mile, played as a Spell Blade in each tier (<a href="../gear.md">gear.md</a> §3–§5).
+    Every slot shows its grade, what it adds, and whether it can go up now.</p>
+  <nav class="tabs">
+    <a href="#count">Today vs Tier 1</a><a href="#t1">Tier 1</a><a href="#t2">Tier 2</a><a href="#t3">Tier 3</a>
+  </nav>
+
+  <section id="count">
+    <div class="card">
+      <h3 style="margin-top:0">What the tab asks of a Tier 1 player</h3>
+      <div class="scroll">
+        <table class="cmp">
+          <thead><tr><th></th><th>Today</th><th>Tier 1</th></tr></thead>
+          <tbody>
+            <tr><td>Slots</td><td>12 (5 · 5 · 2)</td><td>9 (3 · 5 · 1)</td></tr>
+            <tr><td>Rank bars for gear</td><td>24</td><td>0</td></tr>
+            <tr><td>Item types to craft</td><td>400</td><td>30</td></tr>
+            <tr><td>Items to max her</td><td>120, bound in order</td><td>90 upgrades</td></tr>
+            <tr><td>The one gate</td><td>Weapon, Armor, Accessory Rank</td><td>Uma Level 5g − 4</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="legend" style="margin:8px 0 0">Pills: <span class="pill up">▲ G5</span> she can go up now ·
+        <span class="pill need">Needs gem</span> none in stock · <span class="pill wait">G6 at Lv 26</span> her level first ·
+        <span class="pill fork">Fork</span> pick a form.</p>
+    </div>
+  </section>
+
+  <!-- ===================== TIER 1 ===================== -->
+  <section id="t1">
+    <h2><span class="tier t1">Tier 1</span> Lv 23 · grades up to G5</h2>
+    <div class="card">
+      <div class="profile">
+        <div class="bust">A</div>
+        <div class="who"><b>Uma A</b><span>Front runner · mile · Tier 1 Lv 23</span>
+          <div class="row" style="margin-top:4px"><span class="chip phys">Spell Blade</span><span class="chip">Craft Lv 18</span></div></div>
+      </div>
+      <div class="ptabs"><span>Skills</span><span>Battle</span><span class="on">Gear</span><span>Work</span><span>Racing</span></div>
+
+      <div class="preset"><span>Spell Blade · physical armor · Vampire Talisman</span><button class="btn">Upgrade 3</button></div>
+
+      <div class="group-h"><h3>Weapons</h3><span>3 · Might on its own hits</span></div>
+      <div class="gear-row"><div class="slot p">GS</div>
+        <div class="info"><div class="name">Greatsword <span class="g">G5</span></div>
+          <div class="eff">Might +19 · one foe, heavy</div></div>
+        <span class="pill wait">G6 at Lv 26</span></div>
+      <div class="gear-row"><div class="slot p">LN</div>
+        <div class="info"><div class="name">Lance <span class="g">G4</span></div>
+          <div class="eff">Might +12 · random foes</div></div>
+        <span class="pill up">▲ G5</span></div>
+      <div class="gear-row"><div class="slot m">FT</div>
+        <div class="info"><div class="name">Fire Tome <span class="g">G4</span></div>
+          <div class="eff">Might +12 · one foe, heavy</div></div>
+        <span class="pill need">Needs gem</span></div>
+
+      <div class="group-h"><h3>Armor</h3><span>5 · physical, her class's half</span></div>
+      <div class="gear-row"><div class="slot p">HD</div>
+        <div class="info"><div class="name">Helm <span class="g">G5</span></div><div class="eff">ATK +3 · DEF +10</div></div>
+        <span class="pill wait">G6 at Lv 26</span></div>
+      <div class="gear-row"><div class="slot p">BD</div>
+        <div class="info"><div class="name">Cuirass <span class="g">G5</span></div><div class="eff">ATK +3 · HP +50</div></div>
+        <span class="pill wait">G6 at Lv 26</span></div>
+      <div class="gear-row"><div class="slot p">LG</div>
+        <div class="info"><div class="name">Greaves <span class="g">G4</span></div><div class="eff">ATK +2 · MP +8</div></div>
+        <span class="pill up">▲ G5</span></div>
+      <div class="gear-row"><div class="slot p">AR</div>
+        <div class="info"><div class="name">Gauntlets <span class="g">G4</span></div><div class="eff">ATK +2 · M.DEF +8</div></div>
+        <span class="pill up">▲ G5</span></div>
+      <div class="gear-row"><div class="slot p">FE</div>
+        <div class="info"><div class="name">Boots <span class="g">G4</span></div><div class="eff">ATK +2 · Speed +8 (4.8% evasion)</div></div>
+        <span class="pill need">Needs fittings</span></div>
+
+      <div class="group-h"><h3>Accessory</h3><span>1 · Support</span></div>
+      <div class="gear-row"><div class="slot a">SP</div>
+        <div class="info"><div class="name">Vampire Talisman <span class="g">G5</span></div>
+          <div class="eff">Heals 10% of the physical damage she deals · type swaps freely</div></div>
+        <span class="pill wait">G6 at Lv 26</span></div>
+    </div>
+    <div class="note"><b>Gone from Tier 1:</b> two more weapon slots, the Damage slot (Orb), Weapon, Armor and Accessory
+      Rank bars, binding, the locker and Training pieces. <b>"Upgrade 3"</b> spends the three items she can use now
+      and lists them first.</div>
+  </section>
+
+  <!-- ===================== TIER 2 ===================== -->
+  <section id="t2">
+    <h2><span class="tier t2">Tier 2</span> Lv 34 · grades up to G7</h2>
+    <div class="card">
+      <div class="profile">
+        <div class="bust">A</div>
+        <div class="who"><b>Uma A</b><span>Front runner · mile · Tier 2 Lv 34</span>
+          <div class="row" style="margin-top:4px"><span class="chip phys">Spell Blade</span><span class="chip">Craft Lv 26</span></div></div>
+      </div>
+      <div class="ptabs"><span>Skills</span><span>Battle</span><span class="on">Gear</span><span>Work</span><span>Racing</span></div>
+
+      <div class="preset"><span>Spell Blade · mixed armor · Vampire · Greatsword Orb</span><button class="btn">Upgrade 1</button></div>
+
+      <div class="group-h"><h3>Weapons</h3><span>3 · forms from G5</span></div>
+      <div class="gear-row"><div class="slot p">GS</div>
+        <div class="info"><div class="name">Greatsword <span class="g">G7</span> <span class="form-tag t2">Dual</span></div>
+          <div class="eff">Might +35 · one foe, heavy</div>
+          <div class="kinds"><span class="chip phys">Greatsword</span><span class="chip magic">Ice</span></div></div>
+        <span class="pill wait">G8 at Lv 36</span></div>
+      <div class="gear-row"><div class="slot p">LN</div>
+        <div class="info"><div class="name">Lance <span class="g">G6</span> <span class="form-tag t2">Pure</span></div>
+          <div class="eff">Might +26 · weak hits ×1.5</div></div>
+        <span class="pill up">▲ G7</span></div>
+      <div class="gear-row"><div class="slot m">FT</div>
+        <div class="info"><div class="name">Fire Tome <span class="g">G4</span></div>
+          <div class="eff">Might +12 · G5 is its fork</div></div>
+        <span class="pill fork">Fork</span></div>
+
+      <div class="group-h"><h3>Armor</h3><span>5 · half per piece <span class="new">new</span></span></div>
+      <div class="gear-row"><div class="slot p">HD</div>
+        <div class="info"><div class="name">Helm <span class="g">G7</span></div><div class="eff">ATK +4 · DEF +14</div></div>
+        <span class="pill wait">G8 at Lv 36</span></div>
+      <div class="gear-row"><div class="slot p">BD</div>
+        <div class="info"><div class="name">Cuirass <span class="g">G7</span></div><div class="eff">ATK +4 · HP +70</div></div>
+        <span class="pill wait">G8 at Lv 36</span></div>
+      <div class="gear-row"><div class="slot m">LG</div>
+        <div class="info"><div class="name">Leggings <span class="g">G6</span> <span class="chip magic" style="font-size:10px;padding:0 6px">magical</span></div>
+          <div class="eff">M.ATK +3 · MP +12 · for her Tome half</div></div>
+        <span class="pill need">Needs fittings</span></div>
+      <div class="gear-row"><div class="slot p">AR</div>
+        <div class="info"><div class="name">Gauntlets <span class="g">G6</span></div><div class="eff">ATK +3 · M.DEF +12</div></div>
+        <span class="pill need">Needs fittings</span></div>
+      <div class="gear-row"><div class="slot p">FE</div>
+        <div class="info"><div class="name">Boots <span class="g">G6</span></div><div class="eff">ATK +3 · Speed +12</div></div>
+        <span class="pill need">Needs fittings</span></div>
+
+      <div class="group-h"><h3>Accessories</h3><span>2 · Support, Damage <span class="new">new</span></span></div>
+      <div class="gear-row"><div class="slot a">SP</div>
+        <div class="info"><div class="name">Vampire Talisman <span class="g">G7</span></div>
+          <div class="eff">Heals 14% of the physical damage she deals</div></div>
+        <span class="pill wait">G8 at Lv 36</span></div>
+      <div class="gear-row"><div class="slot o">DM</div>
+        <div class="info"><div class="name">Greatsword Orb <span class="g">G6</span></div>
+          <div class="eff">+13 offense on Greatsword hits · kind swaps freely</div></div>
+        <span class="pill need">Needs setting</span></div>
+    </div>
+
+    <h3>The Fire Tome's sheet at its fork</h3>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="row" style="justify-content:space-between"><b>Fire Tome · G4 → G5</b><span class="muted" style="font-size:12px">Lv 21 ✓</span></div>
+      <p style="margin:4px 0 0;font-size:12px">G5 picks its form. The grade's Might (+19) comes either way.</p>
+      <div class="choice on">
+        <div class="row" style="justify-content:space-between"><b>Dual</b><span class="muted" style="font-size:12px">1 Dual Gem · have 2</span></div>
+        <p>A second kind. Its hits count as both for weaknesses and locks; they stay magical.</p>
+        <div class="kind-pick">
+          <span class="chip phys">Greatsword</span><span class="chip phys">Axe</span><span class="chip phys">Lance</span>
+          <span class="chip phys">Bow</span><span class="chip phys sel">Katana</span>
+          <span class="chip magic">Ice</span><span class="chip magic">Lightning</span><span class="chip magic">Light</span><span class="chip magic">Dark</span>
+        </div>
+        <p class="legend" style="margin:6px 0 0">All nine count for a Spell Blade. As a Mage, an Arms kind wouldn't.</p>
+      </div>
+      <div class="choice">
+        <div class="row" style="justify-content:space-between"><b>Pure</b><span class="muted" style="font-size:12px">1 Pure Gem · have 1</span></div>
+        <p>A harder weakness: its weak hits deal ×1.5 instead of ×1.3.</p>
+      </div>
+      <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn ghost">Cancel</button><button class="btn">Evolve to Dual + Katana</button></div>
+    </div>
+    <div class="note"><b>New in Tier 2:</b> weapon forms at G5, the Damage slot, armor halves per piece. Her forms will
+      carry to Tier 3; her grades start again at G0 there.</div>
+  </section>
+
+  <!-- ===================== TIER 3 ===================== -->
+  <section id="t3">
+    <h2><span class="tier t3">Tier 3</span> Lv 47 · grades up to G10</h2>
+    <div class="card">
+      <div class="profile">
+        <div class="bust">A</div>
+        <div class="who"><b>Uma A</b><span>Front runner · mile · Tier 3 Lv 47</span>
+          <div class="row" style="margin-top:4px"><span class="chip phys">Spell Blade</span><span class="chip">Craft Lv 40</span></div></div>
+      </div>
+      <div class="ptabs"><span>Skills</span><span>Battle</span><span class="on">Gear</span><span>Work</span><span>Racing</span></div>
+
+      <div class="preset"><span>Spell Blade · mixed armor · Vampire · Orb · Bulwark</span><button class="btn">Upgrade 2</button></div>
+
+      <div class="group-h"><h3>Weapons</h3><span>3 · second forms</span></div>
+      <div class="gear-row"><div class="slot p">GS</div>
+        <div class="info"><div class="name">Greatsword <span class="g">G10</span> <span class="form-tag t3">Tempered</span></div>
+          <div class="eff">Might +68 · weak hits ×1.5</div>
+          <div class="kinds"><span class="chip phys">Greatsword</span><span class="chip magic">Ice</span></div></div>
+        <span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot p">LN</div>
+        <div class="info"><div class="name">Lance <span class="g">G10</span> <span class="form-tag t3">Keen</span></div>
+          <div class="eff">Might +68 · weak hits ×1.7</div></div>
+        <span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot m">FT</div>
+        <div class="info"><div class="name">Fire Tome <span class="g">G9</span> <span class="form-tag t3">Prism</span></div>
+          <div class="eff">Might +57 · one foe, heavy</div>
+          <div class="kinds"><span class="chip magic">Fire</span><span class="chip phys">Katana</span><span class="chip phys">Axe</span></div></div>
+        <span class="pill up">▲ G10</span></div>
+
+      <div class="group-h"><h3>Armor</h3><span>5 · unchanged from Tier 2</span></div>
+      <div class="gear-row"><div class="slot p">HD</div>
+        <div class="info"><div class="name">Helm <span class="g">G10</span></div><div class="eff">ATK +5 · DEF +20</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot p">BD</div>
+        <div class="info"><div class="name">Cuirass <span class="g">G10</span></div><div class="eff">ATK +5 · HP +100</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot m">LG</div>
+        <div class="info"><div class="name">Leggings <span class="g">G10</span></div><div class="eff">M.ATK +5 · MP +20</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot p">AR</div>
+        <div class="info"><div class="name">Gauntlets <span class="g">G9</span></div><div class="eff">ATK +5 · M.DEF +18</div></div><span class="pill up">▲ G10</span></div>
+      <div class="gear-row"><div class="slot p">FE</div>
+        <div class="info"><div class="name">Boots <span class="g">G9</span></div><div class="eff">ATK +5 · Speed +18</div></div><span class="pill need">Needs fittings</span></div>
+
+      <div class="group-h"><h3>Accessories</h3><span>3 · a second Support <span class="new">new</span></span></div>
+      <div class="gear-row"><div class="slot a">SP</div>
+        <div class="info"><div class="name">Vampire Talisman <span class="g">G10</span></div>
+          <div class="eff">Heals 20% of the physical damage she deals</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot o">DM</div>
+        <div class="info"><div class="name">Greatsword Orb <span class="g">G10</span></div>
+          <div class="eff">+34 offense on Greatsword hits</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot a">S2</div>
+        <div class="info"><div class="name">Bulwark Talisman <span class="g">G9</span></div>
+          <div class="eff">A shield of 18% of her HP against physical damage, from the start of a fight</div></div>
+        <span class="pill need">Needs setting</span></div>
+    </div>
+
+    <h3>The same Uma as a Brawler</h3>
+    <div class="card">
+      <div class="gear-row"><div class="slot p">GS</div>
+        <div class="info"><div class="name">Greatsword <span class="g">G10</span> <span class="form-tag t3">Tempered</span></div>
+          <div class="eff">Might +68 · weak hits ×1.5</div>
+          <div class="kinds"><span class="chip phys">Greatsword</span><span class="chip magic off">Ice</span><span class="legend">not as a Brawler</span></div></div>
+        <span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot p">LN</div>
+        <div class="info"><div class="name">Lance <span class="g">G10</span> <span class="form-tag t3">Keen</span></div>
+          <div class="eff">Might +68 · weak hits ×1.7</div></div><span class="pill wait">Max</span></div>
+      <div class="gear-row"><div class="slot p">AX</div>
+        <div class="info"><div class="name">Axe <span class="g">G0</span> <span class="form-tag">Base</span></div>
+          <div class="eff">Never raised: no Might yet · every foe</div></div><span class="pill up">▲ G1</span></div>
+      <div class="note">Weapons are hers per kind, shared by every class. As a Brawler her Fire Tome isn't slotted, and the
+        Greatsword's Ice doesn't count: Brawler physical only. Her armor turns physical; its grades stay.</div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

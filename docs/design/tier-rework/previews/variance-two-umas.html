@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Two Front Runners</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* This preview's own pieces. */
+  main.wide { max-width: 860px; }
+  .pair { display: grid; gap: var(--gap); grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair > .card { margin-bottom: 0; }
+  .head { display: flex; gap: 10px; align-items: center; }
+  .bust { width: 44px; height: 44px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center;
+    font: 700 16px ui-rounded, system-ui, sans-serif; color: var(--ink-soft); flex: none; }
+  .name { font: 700 16px/1.2 ui-rounded, system-ui, sans-serif; }
+  .star { color: var(--accent-strong); }
+  .chip.tpl { background: var(--accent-wash); color: var(--accent-strong); border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+  .chip.big { font-size: 14px; padding: 4px 12px; }
+  .chip.on { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.off { color: var(--locked); }
+  .apt { display: grid; grid-template-columns: 64px 1fr; gap: 4px 8px; align-items: center; font-size: 12px; }
+  .apt > b { color: var(--ink-soft); font-weight: 600; }
+  .g { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; font-size: 11px; font-weight: 800; margin-left: 2px; }
+  .g.A { background: var(--accent); color: var(--accent-ink); } .g.B { background: var(--sunken); color: var(--ink); } .g.C { background: var(--sunken); color: var(--ink-faint); }
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; font-size: 11px; }
+  .stats div { background: var(--raised); border-radius: 8px; padding: 4px 0; }
+  .stats b { display: block; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .stats .up b::after { content: attr(data-g); display: block; font-size: 10px; color: var(--success); font-weight: 700; }
+  .steps { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 8px; align-items: baseline; font-size: 13px; }
+  .steps .n { color: var(--ink-faint); font-weight: 700; }
+  .steps .why { grid-column: 2 / -1; font-size: 12px; color: var(--ink-faint); margin-top: -4px; }
+  .rootplate { border: 1.5px solid var(--accent); background: var(--accent-wash); border-radius: 12px; padding: 8px 10px; font-size: 13px; }
+  .rootplate .line { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .rootplate .sub { font-size: 12px; color: var(--ink-soft); }
+  .node.tipt { border-color: var(--accent-strong); background: var(--accent-wash); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .moon { display: grid; grid-template-columns: 112px 1fr; gap: 10px; align-items: center; }
+  .moon svg { width: 112px; height: 112px; }
+  .m-disc { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 2; }
+  .m-orbit { fill: none; stroke: var(--hairline-strong); stroke-dasharray: 3 4; }
+  .m-lead { fill: var(--phys); } .m-knack { fill: var(--info); }
+  .m-star { fill: var(--accent-strong); font: 700 18px system-ui; }
+  .m-num { fill: #fff; font: 700 9px system-ui; }
+  .nodes { font-size: 12px; display: grid; gap: 6px; }
+  .nodes div { display: grid; grid-template-columns: 1fr auto; gap: 0 6px; }
+  .nodes .sub { grid-column: 1 / -1; color: var(--ink-faint); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+  .dot.lead { background: var(--phys); } .dot.knack { background: var(--info); }
+  .asmage { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; font-size: 13px; align-items: center; }
+  .diff td:first-child { color: var(--ink-soft); white-space: nowrap; }
+  .same { color: var(--ink-faint); }
+  .differ { font-weight: 700; color: var(--accent-strong); }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Two front runners, long distance</h1>
+  <p>Two invented Umas with the same broad racing profile get different templates, and what each gets in skills and
+    Extra Stats. Belongs to <code>tier-rework/variance.md</code> §5.1. Tier 1, with Tier 2's tip.</p>
+
+  <div class="pair">
+    <section class="card">
+      <div class="head">
+        <div class="bust">A</div>
+        <div>
+          <div class="name">Uma A</div>
+          <div class="row" style="margin-top:2px"><span class="tier t1">Tier 1</span><span class="chip phys">Brawler</span></div>
+        </div>
+      </div>
+
+      <h3>Racing profile</h3>
+      <div class="apt">
+        <b>Style</b><div class="row"><span class="chip">Front<span class="g A">A</span></span><span class="chip">Pace<span class="g C">C</span></span></div>
+        <b>Distance</b><div class="row"><span class="chip">Medium<span class="g A">A</span></span><span class="chip">Long<span class="g A">A</span></span></div>
+        <b>Surface</b><div class="row"><span class="chip">Turf<span class="g A">A</span></span></div>
+      </div>
+      <div class="stats" style="margin-top:8px"><div>Spd<b>92</b></div><div class="up">Sta<b data-g="+20%">104</b></div><div>Pow<b>88</b></div><div class="up">Gut<b data-g="+10%">80</b></div><div>Wit<b>86</b></div></div>
+
+      <h3>Reading</h3>
+      <div class="steps">
+        <span class="n">1</span><span>Calling</span><span class="chip phys">Brawler</span>
+        <span class="why">Front A is her best style</span>
+        <span class="n">2</span><span>Stride</span><span class="chip">Stayer</span>
+        <span class="why">Medium and Long both A: Long is the longest</span>
+        <span class="n">3</span><span>Knack</span><span class="chip">Tireless</span>
+        <span class="why">Stamina +20% is her top growth</span>
+      </div>
+      <div class="row" style="margin-top:10px"><span class="chip tpl big"><span class="star">★</span> Tireless Ironhide</span></div>
+
+      <h3>Her Flourish · the Brawler's root</h3>
+      <div class="rootplate">
+        <div class="line"><b>Brawler</b><span class="muted">Hand ×1</span></div>
+        <div class="line" style="margin-top:4px"><span><span class="star">★</span> <b>Ironhide · Second wind</b></span><span class="chip on">On</span></div>
+        <div class="sub">From the fight's third round, 3% of her max MP back a round</div>
+      </div>
+      <p class="legend" style="margin:6px 0 0">Free, on as a Brawler, every tier. MP only: no hit lands harder.</p>
+
+      <h3>Tier 2 · her signature tip</h3>
+      <div class="tree">
+        <div class="tier-row"><div class="node core">Brawler · Bow<br><span class="muted">depth 4, her branch</span></div></div>
+        <div class="edge"></div>
+        <div class="tier-row"><div class="node">Power</div><div class="node">Break</div><div class="node tipt"><span class="star">★</span> Long haul</div></div>
+      </div>
+      <p class="legend" style="margin:6px 0 0">The tip fork's third option: the tip skill also puts a Barrier on her.</p>
+
+      <h3>Her moon</h3>
+      <div class="moon">
+        <svg viewBox="0 0 112 112" role="img" aria-label="Her moon, two nodes">
+          <circle class="m-orbit" cx="56" cy="56" r="44"/>
+          <circle class="m-disc" cx="56" cy="56" r="24"/>
+          <text class="m-star" x="56" y="62" text-anchor="middle">★</text>
+          <circle class="m-knack" cx="56" cy="12" r="9"/><text class="m-num" x="56" y="15" text-anchor="middle">I</text>
+          <circle class="m-lead" cx="56" cy="100" r="9"/><text class="m-num" x="56" y="103" text-anchor="middle">II</text>
+        </svg>
+        <div class="nodes">
+          <div><span><span class="dot knack"></span><b>I · HP</b></span><span>+20 HP</span><span class="sub">Lv 16, Moon Gem II. Every class</span></div>
+          <div><span><span class="dot lead"></span><b>II · ATK</b></span><span>+8 ATK</span><span class="sub">Lv 36, Moon Gem IV. Classes that hit with ATK</span></div>
+        </div>
+      </div>
+
+      <h3>If she runs as a Mage</h3>
+      <div class="asmage">
+        <span>Flourish</span><span class="chip off">Not her calling</span>
+        <span>Moon II · ATK</span><span class="chip off">No effect as Mage</span>
+        <span>Moon I · HP +20</span><span class="chip on">Active</span>
+      </div>
+    </section>
+    <section class="card">
+      <div class="head">
+        <div class="bust">B</div>
+        <div>
+          <div class="name">Uma B</div>
+          <div class="row" style="margin-top:2px"><span class="tier t1">Tier 1</span><span class="chip phys">Brawler</span></div>
+        </div>
+      </div>
+
+      <h3>Racing profile</h3>
+      <div class="apt">
+        <b>Style</b><div class="row"><span class="chip">Front<span class="g A">A</span></span><span class="chip">Pace<span class="g A">A</span></span></div>
+        <b>Distance</b><div class="row"><span class="chip">Medium<span class="g B">B</span></span><span class="chip">Long<span class="g A">A</span></span></div>
+        <b>Surface</b><div class="row"><span class="chip">Turf<span class="g A">A</span></span></div>
+      </div>
+      <div class="stats" style="margin-top:8px"><div class="up">Spd<b data-g="+10%">106</b></div><div>Sta<b>84</b></div><div class="up">Pow<b data-g="+10%">90</b></div><div>Gut<b>82</b></div><div class="up">Wit<b data-g="+10%">88</b></div></div>
+
+      <h3>Reading</h3>
+      <div class="steps">
+        <span class="n">1</span><span>Calling</span><span class="chip phys">Brawler</span>
+        <span class="why">Front and Pace tie at A: Front comes first</span>
+        <span class="n">2</span><span>Stride</span><span class="chip">Stayer</span>
+        <span class="why">Long A is her best distance</span>
+        <span class="n">3</span><span>Knack</span><span class="chip">Fleet</span>
+        <span class="why">Speed, Power, Wit tie at +10%: Speed 106 is the highest base</span>
+      </div>
+      <div class="row" style="margin-top:10px"><span class="chip tpl big"><span class="star">★</span> Fleet Ironhide</span></div>
+
+      <h3>Her Flourish · the Brawler's root</h3>
+      <div class="rootplate">
+        <div class="line"><b>Brawler</b><span class="muted">Hand ×1</span></div>
+        <div class="line" style="margin-top:4px"><span><span class="star">★</span> <b>Ironhide · Second wind</b></span><span class="chip on">On</span></div>
+        <div class="sub">From the fight's third round, 3% of her max MP back a round</div>
+      </div>
+      <p class="legend" style="margin:6px 0 0">The same Flourish: same calling, same stride.</p>
+
+      <h3>Tier 2 · her signature tip</h3>
+      <div class="tree">
+        <div class="tier-row"><div class="node core">Brawler · Bow<br><span class="muted">depth 4, her branch</span></div></div>
+        <div class="edge"></div>
+        <div class="tier-row"><div class="node">Power</div><div class="node">Break</div><div class="node tipt"><span class="star">★</span> Long haul</div></div>
+      </div>
+      <p class="legend" style="margin:6px 0 0">The tip fork's third option: the tip skill also puts a Barrier on her.</p>
+
+      <h3>Her moon</h3>
+      <div class="moon">
+        <svg viewBox="0 0 112 112" role="img" aria-label="Her moon, two nodes">
+          <circle class="m-orbit" cx="56" cy="56" r="44"/>
+          <circle class="m-disc" cx="56" cy="56" r="24"/>
+          <text class="m-star" x="56" y="62" text-anchor="middle">★</text>
+          <circle class="m-knack" cx="56" cy="12" r="9"/><text class="m-num" x="56" y="15" text-anchor="middle">I</text>
+          <circle class="m-lead" cx="56" cy="100" r="9"/><text class="m-num" x="56" y="103" text-anchor="middle">II</text>
+        </svg>
+        <div class="nodes">
+          <div><span><span class="dot knack"></span><b>I · Speed</b></span><span>+2.4% evasion</span><span class="sub">Lv 16, Moon Gem II. Every class</span></div>
+          <div><span><span class="dot lead"></span><b>II · ATK</b></span><span>+8 ATK</span><span class="sub">Lv 36, Moon Gem IV. Classes that hit with ATK</span></div>
+        </div>
+      </div>
+
+      <h3>If she runs as a Mage</h3>
+      <div class="asmage">
+        <span>Flourish</span><span class="chip off">Not her calling</span>
+        <span>Moon II · ATK</span><span class="chip off">No effect as Mage</span>
+        <span>Moon I · evasion +2.4%</span><span class="chip on">Active</span>
+      </div>
+    </section>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="card">
+    <div class="scroll"><table class="diff">
+      <tr><th></th><th>Uma A</th><th>Uma B</th></tr>
+      <tr><td>Template</td><td class="differ">Tireless Ironhide</td><td class="differ">Fleet Ironhide</td></tr>
+      <tr><td>Calling</td><td class="same">Brawler</td><td class="same">Brawler</td></tr>
+      <tr><td>Flourish</td><td class="same">Second wind (MP)</td><td class="same">Second wind (MP)</td></tr>
+      <tr><td>Tier 2 tip</td><td class="same">Long haul, Bow</td><td class="same">Long haul, Bow</td></tr>
+      <tr><td>Moon II</td><td class="same">ATK +8</td><td class="same">ATK +8</td></tr>
+      <tr><td>Moon I</td><td class="differ">HP +20</td><td class="differ">Evasion +2.4%</td></tr>
+      <tr><td>As a Mage</td><td>HP +20 only</td><td>Evasion +2.4% only</td></tr>
+    </table></div>
+    <p class="legend" style="margin:8px 0 0">Matched, ATK +8 is about 3–4% of a Brawler's offense: a nudge, not a must.
+      A third front runner at Mile with Speed growth would be a <b>Fleet Charger</b>: Opening, and a Katana tip in Tier 2.
+      Today's 15 front-running stayers spread over four templates.</p>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profile skills tab</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+
+  /* --- skills-* previews: the tree drawing --------------------------------------------------------------------------- */
+  :root { --line: var(--hairline-strong); }
+  nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+  .panel { display: none; } .panel.show { display: block; }
+  .n { position: relative; width: 100%; max-width: 170px; padding: 5px 6px; border-radius: 9px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); text-align: center; font-size: 11px; line-height: 1.25; color: var(--ink); margin: 0 auto; }
+  .n b { display: block; font-weight: 700; overflow-wrap: anywhere; }
+  .n small { display: block; color: var(--ink-soft); font-size: 10px; }
+  .n em { display: block; font-style: normal; color: var(--ink-faint); font-size: 9.5px; margin-top: 1px; }
+  .n .tag { display: block; font-size: 9px; font-weight: 800; letter-spacing: .03em; color: var(--ink-soft); text-transform: uppercase; margin-bottom: 1px; }
+  .n.on { border-color: var(--accent); background: var(--accent-wash); }
+  .n.on .tag { color: var(--accent-strong); }
+  .n.off { border-style: dashed; background: transparent; opacity: .62; }
+  .n.lock { opacity: .5; }
+  .n.tip { padding: 4px 2px; font-size: 10px; }
+  .n.eq::after { content: "Equipped"; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); font-size: 8.5px; font-weight: 800;
+    background: var(--accent); color: var(--accent-ink); border-radius: 5px; padding: 0 4px; line-height: 13px; }
+  .n.eq { margin-bottom: 5px; }
+  .n.tip.eq::after { content: "Eq"; }
+  .nb { position: absolute; top: -7px; right: -3px; font-size: 9px; font-weight: 800; padding: 0 4px; border-radius: 5px; line-height: 14px; color: #fff; }
+  .nb.t2 { background: var(--t2); } .nb.t3 { background: var(--t3); }
+  .v { width: 2px; height: 10px; background: var(--line); margin: 0 auto; flex: none; }
+  .v.on { background: var(--accent); }
+  .v.off { width: 0; background: none; border-left: 2px dashed var(--line); }
+  .split, .join { position: relative; height: 10px; width: 100%; flex: none; }
+  .split::before { content: ""; position: absolute; left: calc(50% - 1px); top: 0; width: 2px; height: 5px; background: var(--line); }
+  .split::after { content: ""; position: absolute; top: 4px; height: 2px; left: 25%; right: 25%; background: var(--line); }
+  .split.s3::after { left: 16.667%; right: 16.667%; }
+  .join::before { content: ""; position: absolute; top: 4px; height: 2px; left: 25%; right: 25%; background: var(--line); }
+  .join::after { content: ""; position: absolute; left: calc(50% - 1px); top: 5px; width: 2px; height: 5px; background: var(--line); }
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .cols.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .col { display: flex; flex-direction: column; align-items: center; padding: 0 3px; min-width: 0; }
+  .col > .v:first-child { height: 5px; }
+  .cols.c3 > .col > .n.head { min-height: 64px; display: flex; flex-direction: column; justify-content: center; }
+  .fk { width: fit-content; margin: 0 auto; font-size: 9.5px; font-weight: 700; color: var(--accent-strong); background: var(--accent-wash);
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+
+  /* --- the app screen ------------------------------------------------------------------------------------------------ */
+  .screen { background: var(--page); border: 1px solid var(--hairline-strong); border-radius: 18px; overflow: hidden; }
+  .pf { background: var(--panel); padding: 12px 12px 0; }
+  .pf-top { display: flex; gap: 12px; align-items: center; }
+  .bust { width: 64px; height: 64px; border-radius: 14px; flex: none; display: grid; place-items: center; font: 800 22px/1 ui-rounded, system-ui;
+    color: var(--ink-faint); background: repeating-linear-gradient(135deg, var(--sunken) 0 6px, var(--raised) 6px 12px); border: 1px solid var(--hairline-strong); }
+  .pf-name { font: 700 18px/1.2 ui-rounded, system-ui, sans-serif; }
+  .pf-sub { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .ptabs { display: flex; margin-top: 10px; border-top: 1px solid var(--hairline); }
+  .ptabs span { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink-soft); padding: 10px 0 9px; border-bottom: 2px solid transparent; }
+  .ptabs span.on { color: var(--ink); border-bottom-color: var(--accent); }
+  .body { padding: 4px 12px 14px; }
+  .body h3 { font-size: 11px; margin: 12px 0 5px; }
+  .cgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .cb { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; border-radius: 8px; background: var(--raised); font-size: 11px; font-weight: 600; }
+  .cb i { font-style: normal; font-size: 10px; color: var(--ink-faint); }
+  .cb.on { background: var(--accent); color: var(--accent-ink); }
+  .cb.on i { color: color-mix(in srgb, var(--accent-ink) 75%, transparent); }
+  .em { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 9px; font-weight: 800; color: #fff; background: var(--phys); }
+  .em.magic { background: var(--magic); } .em.heal { background: var(--heal); }
+  .wgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .wb { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; border-radius: 8px; background: var(--raised); font-size: 11px; font-weight: 600; }
+  .wb i { font-style: normal; font-size: 10px; color: var(--ink-faint); }
+  .wb i.g { color: var(--accent-strong); font-weight: 700; }
+  .glyph { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; font-size: 10px; font-weight: 800;
+    background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .rank { background: var(--raised); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .rank .top { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; }
+  .bar { height: 6px; border-radius: 3px; background: var(--sunken); margin: 5px 0 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .rank small { font-size: 11px; color: var(--ink-faint); }
+  .rootp { background: var(--panel); border: 1.5px solid var(--accent); border-radius: 10px; padding: 8px 10px; display: grid; gap: 3px; }
+  .rootp .hd { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; }
+  .rootp small { font-size: 11px; color: var(--ink-soft); display: block; }
+  .rootp small.tp { color: var(--info); }
+  .rootp small.ps { color: var(--ink); }
+  .stem { width: 2px; height: 10px; background: var(--accent); margin: 0 auto; }
+  .wtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; background: var(--sunken); border-radius: 9px; padding: 3px; }
+  .wt { position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 6px 2px; border-radius: 7px; font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+  .wt.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px var(--hairline-strong); }
+  .wt svg { flex: none; }
+  .dot { position: absolute; top: 4px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+  .treebox { background: var(--panel); border-radius: 10px; padding: 10px 6px 12px; margin-top: 6px; }
+  .hint { font-size: 11px; color: var(--ink-faint); margin: 6px 2px 0; }
+  .eqrow { display: flex; flex-wrap: wrap; gap: 5px; }
+  .eqc { display: inline-flex; align-items: center; gap: 4px; padding: 5px 9px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-strong); font-size: 11.5px; font-weight: 700; }
+  .eqc.master { background: transparent; border: 1.5px dashed var(--t3); color: var(--t3); }
+  .pill { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--raised); color: var(--ink-soft); }
+  .sheet { background: var(--panel); border-radius: 16px 16px 12px 12px; padding: 8px 12px 12px; box-shadow: 0 -2px 12px var(--hairline-strong); margin-top: 10px; }
+  .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 8px; }
+  .sheet .t { font-weight: 700; font-size: 14px; }
+  .sheet ul { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 5px; }
+  .sheet li { background: var(--raised); border-radius: 8px; padding: 6px 8px; font-size: 12px; color: var(--ink); }
+  .sheet li span { display: block; font-size: 11px; color: var(--ink-soft); }
+  .btn { display: block; width: 100%; text-align: center; padding: 10px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; }
+  .sheet small { display: block; font-size: 11px; color: var(--ink-faint); margin-top: 6px; }
+  .between { justify-content: space-between; }
+  .cap-line { font-size: 11px; color: var(--ink-faint); text-align: center; margin: 6px 0 0; }
+  .note { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The profile's Skills tab</h1>
+  <p>An Uma's profile on a phone, Skills tab, as each tier would show it: her class, three weapons, Class Rank, then her tree, drawn as a tree. From <b>skill-trees.md</b> §5.</p>
+  <nav class="tabs" role="tablist">
+    <a href="#t1" data-tab="t1" class="on">Tier 1</a>
+    <a href="#t2" data-tab="t2">Tier 2</a>
+    <a href="#t3" data-tab="t3">Tier 3</a>
+  </nav>
+
+  <!-- ================================================================================================== TIER 1 -->
+  <section class="panel show" id="t1">
+    <div class="screen">
+      <div class="pf">
+        <div class="pf-top">
+          <div class="bust">A</div>
+          <div>
+            <div class="pf-name">Uma A</div>
+            <div class="pf-sub">a front runner, mile</div>
+            <div class="row" style="gap:5px"><span class="tier t1">Lv 24</span><span class="chip phys"><span class="em" style="width:16px;height:16px;font-size:8px">Br</span>Brawler</span><span class="chip">Craft Lv 12</span></div>
+          </div>
+        </div>
+        <div class="ptabs"><span class="on">Skills</span><span>Battle</span><span>Gear</span><span>Work</span><span>Racing</span></div>
+      </div>
+      <div class="body">
+        <h3>Class</h3>
+        <div class="cgrid">
+          <div class="cb on"><span class="em">Br</span>Brawler<i>Rank 34</i></div>
+          <div class="cb"><span class="em magic">Ma</span>Mage<i>Rank 4</i></div>
+          <div class="cb"><span class="em">SB</span>Spell Blade<i>Rank 1</i></div>
+          <div class="cb"><span class="em magic">Su</span>Summoner<i>Rank 1</i></div>
+          <div class="cb"><span class="em heal">Pa</span>Paladin<i>Rank 2</i></div>
+          <div class="cb"><span class="em heal">Cl</span>Cleric<i>Rank 1</i></div>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="wgrid">
+          <div class="wb"><span class="glyph">GS</span>Greatsword<i class="g">G5</i></div>
+          <div class="wb"><span class="glyph">Ln</span>Lance<i>G0</i></div>
+          <div class="wb"><span class="glyph">AX</span>Axe<i class="g">G4</i></div>
+        </div>
+        <div class="rank">
+          <div class="top"><span>Brawler</span><span>Class Rank 34</span></div>
+          <div class="bar"><i style="width:40%"></i></div>
+          <small>Depths 1–4 open · depth 5 at Class Rank 40</small>
+        </div>
+
+        <h3>Her tree</h3>
+        <div class="rootp">
+          <div class="hd"><span class="em">Br</span>Brawler <span class="chip phys" style="font-size:10px">all physical</span></div>
+          <small>One heavy act a turn.</small>
+          <small class="tp">★ Flourish, as her calling · Opening: her first skill each fight costs no MP (variance.md)</small>
+        </div>
+        <div class="stem"></div>
+        <div class="wtabs" role="tablist">
+          <div class="wt on"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7L5 16" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7l7 9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Greatsword</div>
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7L5 16" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7l7 9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Lance<span class="dot" title="New fork, not seen yet"></span></div>
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7l7 9" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7L5 16" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Axe</div>
+        </div>
+
+        <div class="treebox">
+          <div class="n on eq"><b>Heavy Slash</b><small>one foe · 1 hit · 10 MP</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Cleave</b><small>one foe · 1 hit · 14 MP</small></div>
+          <div class="v on"></div>
+          <div class="fk">Class Rank 20 · hold one · free</div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col">
+              <div class="v on"></div>
+              <div class="n on eq"><span class="tag">A · Core</span><b>Sunder</b><small>one foe · 2 hits · 18 MP</small></div>
+              <div class="v on"></div>
+              <div class="n on eq"><b>Rend</b><small>one foe · 2 hits · 22 MP</small></div>
+              <div class="v"></div>
+              <div class="n on lock"><b>Meteor Strike</b><small>3 hits · Armor Break 2</small><em>Class Rank 40</em></div>
+            </div>
+            <div class="col">
+              <div class="v off"></div>
+              <div class="n off"><span class="tag">B · Combo</span><b>Triple Sunder</b><small>one foe · 3 hits · 18 MP</small></div>
+              <div class="v off"></div>
+              <div class="n off"><b>Rending Combo</b><small>one foe · 3 hits · 22 MP</small></div>
+              <div class="v off"></div>
+              <div class="n off lock"><b>Meteor Combo</b><small>4 hits</small><em>Class Rank 40</em></div>
+            </div>
+          </div>
+        </div>
+        <p class="hint">Tap a branch head to take it; tap a skill to see it and equip it. The green dot: Lance's fork opened and she hasn't looked yet.</p>
+
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="t">Combo · Greatsword</div>
+          <div style="font-size:12px;color:var(--ink-soft)">One more hit on every skill, a little less power: Breaks shields sooner.</div>
+          <ul>
+            <li>Triple Sunder<span>Depth 3 · one foe · 3 hits · 18 MP</span></li>
+            <li>Rending Combo<span>Depth 4 · one foe · 3 hits · 22 MP</span></li>
+            <li>Meteor Combo<span>Depth 5 · opens at Class Rank 40 · one foe · 4 hits</span></li>
+          </ul>
+          <div class="btn">Take this branch · free</div>
+          <small>Swap back any time outside a fight. Her equipped Sunder and Rend become Triple Sunder and Rending Combo.</small>
+        </div>
+
+        <div class="row between" style="margin-top:6px"><h3 style="margin-bottom:5px">Equipped · 5/5 · chosen for her</h3></div>
+        <div class="eqrow">
+          <span class="eqc">Rend</span><span class="eqc">Guillotine Quake</span><span class="eqc">Dragon Dive</span><span class="eqc">Sunder</span><span class="eqc">Heavy Slash</span>
+        </div>
+        <span class="pill">Auto</span>
+      </div>
+    </div>
+    <p class="note">She holds 15 skills (five a tree) and equips 3 → 7 by Uma Level. No points, no Learn buttons: every node on her path is hers as its depth opens.</p>
+  </section>
+
+  <!-- ================================================================================================== TIER 2 -->
+  <section class="panel" id="t2">
+    <div class="screen">
+      <div class="pf">
+        <div class="pf-top">
+          <div class="bust">B</div>
+          <div>
+            <div class="pf-name">Uma B</div>
+            <div class="pf-sub">a late surger, long distance</div>
+            <div class="row" style="gap:5px"><span class="tier t2">Lv 38</span><span class="chip phys"><span class="em" style="width:16px;height:16px;font-size:8px">Br</span>Brawler</span><span class="chip">Craft Lv 20</span></div>
+          </div>
+        </div>
+        <div class="ptabs"><span class="on">Skills</span><span>Battle</span><span>Gear</span><span>Work</span><span>Racing</span></div>
+      </div>
+      <div class="body">
+        <h3>Class</h3>
+        <div class="row between" style="background:var(--raised);border-radius:8px;padding:7px 10px;font-size:12px">
+          <span><b>Brawler</b> <span class="muted">· Berserker</span></span><span class="muted">specialization: classes.md</span>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="wgrid">
+          <div class="wb"><span class="glyph">GS</span>Greatsword<i class="g">G7</i></div>
+          <div class="wb"><span class="glyph">Ln</span>Lance<i class="g">G6</i></div>
+          <div class="wb"><span class="glyph">AX</span>Axe<i class="g">G8</i></div>
+        </div>
+        <div class="rank">
+          <div class="top"><span>Brawler</span><span>Class Rank 44</span></div>
+          <div class="bar"><i style="width:88%"></i></div>
+          <small>Every depth open</small>
+        </div>
+
+        <h3>Her tree</h3>
+        <div class="rootp">
+          <div class="hd"><span class="em">Br</span>Brawler <span class="tier t2" style="font-size:10px;padding:0 5px">T2</span></div>
+          <small class="ps">Specialization · Berserker: her Axe hits her target at full power.</small>
+          <small class="tp">★ Flourish · Second wind; her signature tip waits at one tree's tip fork (variance.md)</small>
+        </div>
+        <div class="stem"></div>
+        <div class="wtabs" role="tablist">
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7L4 16" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7v9M12 7l8 9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Greatsword</div>
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7l8 9" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7L4 16M12 7v9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Lance</div>
+          <div class="wt on"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v15" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7L4 16M12 7l8 9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Axe</div>
+        </div>
+
+        <div class="treebox">
+          <div class="n on"><b>Sweep</b><small>every foe · 1 hit</small></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Whirl</b><small>every foe · 1 hit</small></div>
+          <div class="v on"></div>
+          <div class="fk">Class Rank 20 · hold one of three</div>
+          <div class="split s3"></div>
+          <div class="cols c3">
+            <div class="col">
+              <div class="v off"></div>
+              <div class="n off head"><span class="tag">A · Core</span><b>Cyclone</b><em>then Quake, Maelstrom</em></div>
+            </div>
+            <div class="col">
+              <div class="v on"></div>
+              <div class="n on head eq"><span class="tag">B · Reap</span><b>Headsman's Cyclone</b><small>every foe + target</small></div>
+            </div>
+            <div class="col">
+              <div class="v off"></div>
+              <div class="n off head"><span class="tag">C · Tempest</span><b>Grand Cyclone</b><em>then Aftershock, Tempest</em><span class="nb t2">T2</span></div>
+            </div>
+          </div>
+          <div class="v on"></div>
+          <div class="n on eq"><b>Guillotine Quake</b><small>every foe, then her target · 28 MP</small></div>
+          <div class="v on"></div>
+          <div class="fk">Class Rank 40 · the tip · hold one</div>
+          <div class="split"></div>
+          <div class="cols">
+            <div class="col">
+              <div class="v off"></div>
+              <div class="n off"><span class="tag">Power</span><b>Executioner's Storm</b><small>every foe · 3 hits + target</small></div>
+            </div>
+            <div class="col">
+              <div class="v on"></div>
+              <div class="n on eq"><span class="tag">Break</span><b>Breaking Executioner's Storm</b><small>+1 shield point on a weak hit</small><span class="nb t2">T2</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="hint">Branches she doesn't hold stop at their head, so her path keeps the width for its tip fork.</p>
+
+        <div class="row between" style="margin-top:6px"><h3 style="margin-bottom:5px">Equipped · 9/9</h3></div>
+        <div class="eqrow">
+          <span class="eqc">Breaking Executioner's Storm</span><span class="eqc">Guillotine Quake</span><span class="eqc">Headsman's Cyclone</span><span class="eqc">Meteor Strike</span><span class="eqc">Rend</span><span class="eqc">Thousand Spears</span><span class="eqc">Dragon Swarm</span><span class="eqc">Heavy Slash</span><span class="eqc">Whirl</span>
+        </div>
+        <span class="pill">Back to auto</span>
+      </div>
+    </div>
+    <p class="note">Tier 2: a third branch at every fork, a Power or Break tip on every branch, and her specialization at the root. She still holds 15 skills; equipped 3 → 10.</p>
+  </section>
+
+  <!-- ================================================================================================== TIER 3 -->
+  <section class="panel" id="t3">
+    <div class="screen">
+      <div class="pf">
+        <div class="pf-top">
+          <div class="bust">C</div>
+          <div>
+            <div class="pf-name">Uma C</div>
+            <div class="pf-sub">a pace chaser, medium</div>
+            <div class="row" style="gap:5px"><span class="tier t3">Lv 50</span><span class="chip phys"><span class="em" style="width:16px;height:16px;font-size:8px">Br</span>Brawler</span><span class="chip">Craft Lv 34</span></div>
+          </div>
+        </div>
+        <div class="ptabs"><span class="on">Skills</span><span>Battle</span><span>Gear</span><span>Work</span><span>Racing</span></div>
+      </div>
+      <div class="body">
+        <h3>Class</h3>
+        <div class="row between" style="background:var(--raised);border-radius:8px;padding:7px 10px;font-size:12px">
+          <span><b>Brawler</b> <span class="muted">· Berserker · mastery</span></span><span class="muted">classes.md</span>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="wgrid">
+          <div class="wb"><span class="glyph">GS</span>Greatsword<i class="g">G10</i></div>
+          <div class="wb"><span class="glyph">Ln</span>Lance<i class="g">G9</i></div>
+          <div class="wb"><span class="glyph">AX</span>Axe<i class="g">G9</i></div>
+        </div>
+        <div class="rank">
+          <div class="top"><span>Brawler</span><span>Class Rank 50</span></div>
+          <div class="bar"><i style="width:100%"></i></div>
+          <small>Every depth open, depth 6 included</small>
+        </div>
+
+        <h3>Her tree</h3>
+        <div class="rootp">
+          <div class="hd"><span class="em">Br</span>Brawler <span class="tier t3" style="font-size:10px;padding:0 5px">T3</span></div>
+          <small class="ps">Mastery · its mechanic, one line (designed with Tier 3, classes.md CL12).</small>
+          <small>Specialization · Berserker: her Axe hits her target at full power.</small>
+          <small class="tp">★ Flourish · Even pace; her signature tip at both tip forks of one tree (variance.md)</small>
+        </div>
+        <div class="stem"></div>
+        <div class="wtabs" role="tablist">
+          <div class="wt on"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7L4 16M12 7l8 9" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7v9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Greatsword</div>
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7L4 16M12 7v9" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7l8 9" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Lance</div>
+          <div class="wt"><svg viewBox="0 0 24 18" width="20" height="15" aria-hidden="true"><path d="M12 1v6M12 7v9M12 7l8 9" style="stroke:var(--accent)" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 7L4 16" style="stroke:var(--line)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Axe</div>
+        </div>
+
+        <div class="treebox">
+          <div class="n on"><b>Heavy Slash</b></div>
+          <div class="v on"></div>
+          <div class="n on"><b>Cleave</b></div>
+          <div class="v on"></div>
+          <div class="fk">Class Rank 20 · hold two of three</div>
+          <div class="split s3"></div>
+          <div class="cols c3">
+            <div class="col">
+              <div class="v on"></div>
+              <div class="n on head"><span class="tag">A · Core</span><b>Sunder</b></div>
+              <div class="v on"></div>
+              <div class="n on eq"><b>Rend</b></div>
+              <div class="v on"></div>
+              <div class="split"></div>
+              <div class="cols">
+                <div class="col"><div class="v on"></div><div class="n on tip eq"><b>Power</b></div></div>
+                <div class="col"><div class="v off"></div><div class="n off tip"><b>Break</b></div></div>
+              </div>
+              <div class="join"></div>
+              <div class="n on eq"><b>Starfall Strike</b><small>4 hits · 30 MP</small><span class="nb t3">T3</span></div>
+            </div>
+            <div class="col">
+              <div class="v off"></div>
+              <div class="n off head"><span class="tag">B · Combo</span><b>Triple Sunder</b><em>then Rending Combo, …</em></div>
+            </div>
+            <div class="col">
+              <div class="v on"></div>
+              <div class="n on head"><span class="tag">C · Crush</span><b>Rampart Breaker</b></div>
+              <div class="v on"></div>
+              <div class="n on eq"><b>Cataclysm</b></div>
+              <div class="v on"></div>
+              <div class="split"></div>
+              <div class="cols">
+                <div class="col"><div class="v off"></div><div class="n off tip"><b>Power</b></div></div>
+                <div class="col"><div class="v on"></div><div class="n on tip eq"><b>Break</b></div></div>
+              </div>
+              <div class="join"></div>
+              <div class="n on eq"><b>Skysplitter</b><small>1 huge hit · 32 MP</small><span class="nb t3">T3</span></div>
+            </div>
+          </div>
+          <p class="cap-line">Depth 6 · Class Rank 50 · a capstone on each branch she holds</p>
+        </div>
+        <p class="hint">Two branches held: Auto picks Sunder's line against a crowd of shields and Crush's line on a Broken boss.</p>
+
+        <div class="row between" style="margin-top:6px"><h3 style="margin-bottom:5px">Equipped · 11/11</h3></div>
+        <div class="eqrow">
+          <span class="eqc">Starfall Strike</span><span class="eqc">Skysplitter</span><span class="eqc">Meteor Strike</span><span class="eqc">Breaking Worldbreaker</span><span class="eqc">Rend</span><span class="eqc">Cataclysm</span><span class="eqc">Heaven's Deluge</span><span class="eqc">Godspear</span><span class="eqc">Reaper's Gale</span><span class="eqc">Endless Tempest</span><span class="eqc master">Master slot</span>
+        </div>
+        <span class="pill">Back to auto</span>
+      </div>
+    </div>
+    <p class="note">Tier 3: depth 6, two branches held at every fork, and her mastery at the root. She holds 30 skills; equipped 10 and a master slot.</p>
+  </section>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin-top:0">Retired from today's Skills tab</h3>
+    <p class="note" style="margin-top:0">"N points for side skills" · "Learn · n pts" · "Swap out · refund" · the class chip's "N pts" pill and the points dot (the weapon slots' upgrade marks stay) · the 10-tab tree strip: she sees her three weapons' trees.</p>
+  </div>
+</main>
+<script>
+  const tabs = document.querySelectorAll('nav.tabs a');
+  function show(id) {
+    tabs.forEach((a) => a.classList.toggle('on', a.dataset.tab === id));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('show', p.id === id));
+  }
+  tabs.forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.tab); history.replaceState(null, '', '#' + a.dataset.tab); }));
+  const start = location.hash.slice(1);
+  if (['t1', 't2', 't3'].includes(start)) show(start);
+</script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Extra Stats maps</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* Extra Stats previews: one colour per body. Light steps are darker than the dark-mode ones (today's Observatory). */
+  :root {
+    --c-planet: #b9831a; --c-atk: #c9621c; --c-matk: #8752d0; --c-hp: #c9443e; --c-guard: #1f8a7a;
+    --c-limit: #a8459f; --c-speed: #2b7bb9; --c-halo: #c99020; --c-tpl: #5a6b84; --c-mp: #3f7fdc;
+    --c-def: #6f8299; --c-mdef: #1f8a7a; --series-today: #5a6b84; --series-new: #b87f18;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --c-planet: #d6a23e; --c-atk: #ff9a4d; --c-matk: #c48bff; --c-hp: #e8706a; --c-guard: #5fd3c0;
+      --c-limit: #f0b8ff; --c-speed: #6ec6ff; --c-halo: #e8b65a; --c-tpl: #a6b3c2; --c-mp: #6aa8ff;
+      --c-def: #9fb4cc; --c-mdef: #5fd3c0; --series-today: #a6b3c2; --series-new: #d6a23e;
+    }
+  }
+  section { scroll-margin-top: 8px; }
+  .map { display: block; width: 100%; max-width: 360px; margin: 0 auto; background: var(--sunken); border-radius: 10px; }
+  .map .orbit { fill: none; stroke: var(--hairline-strong); stroke-width: 1; }
+  .map .body { fill: color-mix(in srgb, var(--c) 22%, transparent); stroke: var(--c); stroke-width: 1.5; }
+  .map .node { fill: var(--c); stroke: var(--sunken); stroke-width: 2; }
+  .map .node.locked { fill: var(--sunken); stroke: color-mix(in srgb, var(--c) 45%, transparent); stroke-width: 1.2; }
+  .map .node.next { fill: var(--sunken); stroke: var(--accent); stroke-width: 2.5; }
+  .map .dim { opacity: .45; }
+  .map .halo { fill: none; stroke: var(--c-halo); stroke-width: 2; opacity: .8; }
+  .map .newring { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .map .tplbody { stroke-dasharray: 3 2; }
+  .map .lbl { fill: var(--ink); font: 700 9px system-ui, -apple-system, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .map .lbl.small { font-size: 7.5px; }
+  .map .lbl.soft { fill: var(--ink-soft); font-weight: 600; }
+  .map .num { fill: #1b1406; font: 700 7px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .b-planet { --c: var(--c-planet); } .b-atk { --c: var(--c-atk); } .b-matk { --c: var(--c-matk); } .b-hp { --c: var(--c-hp); }
+  .b-guard { --c: var(--c-guard); } .b-limit { --c: var(--c-limit); } .b-speed { --c: var(--c-speed); } .b-halo { --c: var(--c-halo); }
+  .b-tpl { --c: var(--c-tpl); } .b-mp { --c: var(--c-mp); } .b-def { --c: var(--c-def); } .b-mdef { --c: var(--c-mdef); }
+  .nm { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .nm + small { display: block; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
+  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
+  .chip.new { background: var(--accent-wash); color: var(--accent-strong); }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; text-align: center; font-size: 11px; }
+  .stat-grid span { background: var(--raised); border-radius: 6px; padding: 4px 2px; }
+  .stat-grid b { display: block; font-size: 12px; }
+  .stat-grid i { font-style: normal; color: var(--success); font-weight: 700; }
+  .setrow { display: flex; align-items: center; gap: 8px; background: var(--raised); border-radius: 8px; padding: 8px; margin-top: 6px; }
+  .jewelicon { width: 32px; height: 32px; border-radius: 8px; flex: none; display: grid; place-items: center; font: 700 10px system-ui; color: #1b1406; }
+  .setrow .txt { flex: 1; min-width: 0; }
+  .setrow .txt b { display: block; font-size: 13px; }
+  .setrow .txt small { display: block; font-size: 11px; color: var(--ink-soft); }
+  .btn { flex: none; border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: 12px; background: var(--accent); color: var(--accent-ink); }
+  .btn.off { background: var(--sunken); color: var(--ink-faint); }
+  .face { width: 44px; height: 44px; border-radius: 50%; background: var(--raised); border: 1px solid var(--hairline-strong); display: grid; place-items: center; font-weight: 700; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.up { color: var(--success); font-weight: 600; }
+  .chart { display: block; width: 100%; }
+  .chart .gridline { stroke: var(--hairline); stroke-width: 1; }
+  .chart .axis { fill: var(--ink-faint); font: 10px system-ui, sans-serif; }
+  .chart .end { fill: var(--ink); font: 600 10px system-ui, sans-serif; }
+  .chart .s-today { fill: none; stroke: var(--series-today); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .s-new { fill: none; stroke: var(--series-new); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .dot-today { fill: var(--series-today); stroke: var(--panel); stroke-width: 2; }
+  .chart .dot-new { fill: var(--series-new); stroke: var(--panel); stroke-width: 2; }
+  .chart .cross { stroke: var(--hairline-strong); stroke-width: 1; }
+  .key { display: inline-block; width: 14px; height: 2px; border-radius: 1px; vertical-align: middle; margin-right: 5px; }
+  .chartwrap { position: relative; }
+  .tip { position: absolute; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--hairline-strong);
+    border-radius: 8px; padding: 6px 8px; font-size: 12px; box-shadow: 0 2px 8px rgb(0 0 0 / .12); white-space: nowrap; }
+  .tip .muted { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+<h1>Extra Stats: the map by tier</h1>
+<p>The planet, its moons and every node at Tier 1, 2 and 3 (<a href="../extra-stats.md">extra-stats.md</a>). A node opens with its jewel at its level, and every open node counts.</p>
+<nav class="tabs"><a href="#t1">Tier 1</a><a href="#t2">Tier 2</a><a href="#t3">Tier 3</a><a href="#today">Today</a><a href="#screen">The screen</a></nav>
+
+<section id="t1">
+<h2><span class="tier t1">Tier 1</span> One planet, four moons</h2>
+<div class="card">
+<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Tier 1 map: the planet with five nodes, four moons with five nodes each, and a small template moon">
+<circle class="orbit" cx="180" cy="180" r="118"/>
+<g class="b-planet">
+<circle class="body" cx="180" cy="180" r="28"/>
+<text class="lbl" x="180" y="176">Planet</text>
+<text class="lbl small soft" x="180" y="188">every stat</text>
+<circle class="node open" cx="180" cy="134" r="8"/>
+<text class="num" x="180" y="134">I</text>
+<circle class="node open" cx="223.7" cy="165.8" r="8"/>
+<text class="num" x="223.7" y="165.8">II</text>
+<circle class="node open" cx="207" cy="217.2" r="8"/>
+<text class="num" x="207" y="217.2">III</text>
+<circle class="node open" cx="153" cy="217.2" r="8"/>
+<text class="num" x="153" y="217.2">IV</text>
+<circle class="node open" cx="136.3" cy="165.8" r="8"/>
+<text class="num" x="136.3" y="165.8">V</text>
+</g>
+<g class="b-atk">
+<circle class="body" cx="180" cy="62" r="17"/>
+<text class="lbl" x="180" y="62">ATK</text>
+<circle class="node open" cx="153.2" cy="46.5" r="6"/>
+<circle class="node open" cx="164.5" cy="35.2" r="6"/>
+<circle class="node open" cx="180" cy="31" r="6"/>
+<circle class="node open" cx="195.5" cy="35.2" r="6"/>
+<circle class="node open" cx="206.8" cy="46.5" r="6"/>
+</g>
+<g class="b-matk">
+<circle class="body" cx="298" cy="180" r="17"/>
+<text class="lbl" x="298" y="180">M.ATK</text>
+<circle class="node open" cx="313.5" cy="153.2" r="6"/>
+<circle class="node open" cx="324.8" cy="164.5" r="6"/>
+<circle class="node open" cx="329" cy="180" r="6"/>
+<circle class="node open" cx="324.8" cy="195.5" r="6"/>
+<circle class="node open" cx="313.5" cy="206.8" r="6"/>
+</g>
+<g class="b-hp">
+<circle class="body" cx="180" cy="298" r="17"/>
+<text class="lbl" x="180" y="298">HP</text>
+<circle class="node open" cx="206.8" cy="313.5" r="6"/>
+<circle class="node open" cx="195.5" cy="324.8" r="6"/>
+<circle class="node open" cx="180" cy="329" r="6"/>
+<circle class="node open" cx="164.5" cy="324.8" r="6"/>
+<circle class="node open" cx="153.2" cy="313.5" r="6"/>
+</g>
+<g class="b-guard">
+<circle class="body" cx="62" cy="180" r="17"/>
+<text class="lbl small" x="62" y="175.5">DEF</text><text class="lbl small" x="62" y="184.5">M.DEF</text>
+<circle class="node open" cx="46.5" cy="206.8" r="6"/>
+<circle class="node open" cx="35.2" cy="195.5" r="6"/>
+<circle class="node open" cx="31" cy="180" r="6"/>
+<circle class="node open" cx="35.2" cy="164.5" r="6"/>
+<circle class="node open" cx="46.5" cy="153.2" r="6"/>
+</g>
+<g class="b-tpl">
+<circle class="body tplbody" cx="96.6" cy="96.6" r="11"/>
+<text class="lbl small" x="96.6" y="96.6">★</text>
+<circle class="node open" cx="77" cy="89.1" r="5.5"/>
+<circle class="node open" cx="89.1" cy="77" r="5.5"/>
+</g>
+</svg>
+<div class="legend-row"><span class="b-planet"><i class="sw"></i>Planet: every stat</span><span class="b-atk"><i class="sw"></i>Strength: ATK</span><span class="b-matk"><i class="sw"></i>Sorcery: M.ATK</span><span class="b-hp"><i class="sw"></i>Vigor: HP</span><span class="b-guard"><i class="sw"></i>Guard: DEF, M.DEF</span><span class="b-tpl"><i class="sw"></i>Her moon: her template’s lead and knack</span></div>
+</div>
+<div class="card"><div class="row">
+<span class="chip">25 nodes</span><span class="chip">2 jewel kinds · 10 items</span><span class="chip">No active slots</span><span class="chip">6 stats</span>
+</div><p style="margin:8px 0 0">Something opens every five levels: the planet on Lv 1, 11, 21, 31, 41, the moons on Lv 6, 16, 26, 36, 46.</p></div>
+<h3>Nodes</h3>
+<div class="card scroll"><table>
+<thead><tr><th>Lv</th><th>Opens</th><th>Gives</th><th class="num">Total</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td><span class="nm b-planet"><i class="sw"></i>Planet I</span></td><td>+1 to every stat</td><td class="num">+1</td></tr>
+<tr><td class="num">6</td><td><span class="nm b-def"><i class="sw"></i>Moons I</span></td><td>+2 to its stat</td><td class="num">+3</td></tr>
+<tr><td class="num">11</td><td><span class="nm b-planet"><i class="sw"></i>Planet II</span></td><td>+2 to every stat</td><td class="num">+5</td></tr>
+<tr><td class="num">16</td><td><span class="nm b-def"><i class="sw"></i>Moons II</span></td><td>+4 · her moon’s knack</td><td class="num">+9</td></tr>
+<tr><td class="num">21</td><td><span class="nm b-planet"><i class="sw"></i>Planet III</span></td><td>+4 to every stat</td><td class="num">+13</td></tr>
+<tr><td class="num">26</td><td><span class="nm b-def"><i class="sw"></i>Moons III</span></td><td>+6 · her moon’s lead</td><td class="num">+19</td></tr>
+<tr><td class="num">31</td><td><span class="nm b-planet"><i class="sw"></i>Planet IV</span></td><td>+6 to every stat</td><td class="num">+25</td></tr>
+<tr><td class="num">36</td><td><span class="nm b-def"><i class="sw"></i>Moons IV</span></td><td>+8 to its stat</td><td class="num">+33</td></tr>
+<tr><td class="num">41</td><td><span class="nm b-planet"><i class="sw"></i>Planet V</span></td><td>+8 to every stat</td><td class="num">+41</td></tr>
+<tr><td class="num">46</td><td><span class="nm b-def"><i class="sw"></i>Moons V</span></td><td>+10 to its stat</td><td class="num">+51</td></tr>
+</tbody></table>
+<p class="legend">Total: a stat with its moon. Moons: Strength (ATK), Sorcery (M.ATK), Vigor (HP, +5 a point), Guard (each point to DEF and M.DEF). Planet in all +21, a moon +30. Her moon’s lead counts only in classes of its channel.</p></div>
+<h3>Jewels</h3>
+<div class="card scroll"><table>
+<thead><tr><th>Jewel</th><th>Opens</th><th class="num">Craftable from Lv</th></tr></thead>
+<tbody>
+<tr><td>Planet Jewel I–V</td><td>Planet I–V</td><td class="num">1, 11, 21, 31, 41</td></tr>
+<tr><td>Moon Jewel I–V</td><td>Node I–V of any moon</td><td class="num">6, 16, 26, 36, 46</td></tr>
+</tbody></table>
+<p class="legend">Per Uma: 20 jewels (one offense moon) or 25 (all four), plus 2 for her moon. Today: 100 Star Gems. “Gem” stays the weapons’ word (gear.md).</p></div>
+</section>
+
+<section id="t2">
+<h2><span class="tier t2">Tier 2</span> + the Halo and the Valor moon</h2>
+<div class="card">
+<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Tier 2 map: the Tier 1 map plus a Halo ring round the planet with two nodes and a Valor moon with two nodes">
+<circle class="orbit" cx="180" cy="180" r="118"/>
+<g class="b-halo">
+<circle class="halo" cx="180" cy="180" r="68"/>
+<circle class="newring" cx="180" cy="180" r="74"/>
+<circle class="node open" cx="211.9" cy="120" r="6.5"/>
+<circle class="node open" cx="240" cy="148.1" r="6.5"/>
+<text class="lbl small soft" x="219.6" y="140.4">Halo</text>
+</g>
+<g class="b-planet">
+<circle class="body" cx="180" cy="180" r="28"/>
+<text class="lbl" x="180" y="176">Planet</text>
+<text class="lbl small soft" x="180" y="188">every stat</text>
+<circle class="node open" cx="180" cy="134" r="8"/>
+<text class="num" x="180" y="134">I</text>
+<circle class="node open" cx="223.7" cy="165.8" r="8"/>
+<text class="num" x="223.7" y="165.8">II</text>
+<circle class="node open" cx="207" cy="217.2" r="8"/>
+<text class="num" x="207" y="217.2">III</text>
+<circle class="node open" cx="153" cy="217.2" r="8"/>
+<text class="num" x="153" y="217.2">IV</text>
+<circle class="node open" cx="136.3" cy="165.8" r="8"/>
+<text class="num" x="136.3" y="165.8">V</text>
+</g>
+<g class="b-atk">
+<circle class="body" cx="180" cy="62" r="17"/>
+<text class="lbl" x="180" y="62">ATK</text>
+<circle class="node open" cx="153.2" cy="46.5" r="6"/>
+<circle class="node open" cx="164.5" cy="35.2" r="6"/>
+<circle class="node open" cx="180" cy="31" r="6"/>
+<circle class="node open" cx="195.5" cy="35.2" r="6"/>
+<circle class="node open" cx="206.8" cy="46.5" r="6"/>
+</g>
+<g class="b-matk">
+<circle class="body" cx="298" cy="180" r="17"/>
+<text class="lbl" x="298" y="180">M.ATK</text>
+<circle class="node open" cx="313.5" cy="153.2" r="6"/>
+<circle class="node open" cx="324.8" cy="164.5" r="6"/>
+<circle class="node open" cx="329" cy="180" r="6"/>
+<circle class="node open" cx="324.8" cy="195.5" r="6"/>
+<circle class="node open" cx="313.5" cy="206.8" r="6"/>
+</g>
+<g class="b-hp">
+<circle class="body" cx="180" cy="298" r="17"/>
+<text class="lbl" x="180" y="298">HP</text>
+<circle class="node open" cx="206.8" cy="313.5" r="6"/>
+<circle class="node open" cx="195.5" cy="324.8" r="6"/>
+<circle class="node open" cx="180" cy="329" r="6"/>
+<circle class="node open" cx="164.5" cy="324.8" r="6"/>
+<circle class="node open" cx="153.2" cy="313.5" r="6"/>
+</g>
+<g class="b-guard">
+<circle class="body" cx="62" cy="180" r="17"/>
+<text class="lbl small" x="62" y="175.5">DEF</text><text class="lbl small" x="62" y="184.5">M.DEF</text>
+<circle class="node open" cx="46.5" cy="206.8" r="6"/>
+<circle class="node open" cx="35.2" cy="195.5" r="6"/>
+<circle class="node open" cx="31" cy="180" r="6"/>
+<circle class="node open" cx="35.2" cy="164.5" r="6"/>
+<circle class="node open" cx="46.5" cy="153.2" r="6"/>
+</g>
+<g class="b-tpl">
+<circle class="body tplbody" cx="96.6" cy="96.6" r="11"/>
+<text class="lbl small" x="96.6" y="96.6">★</text>
+<circle class="node open" cx="75.7" cy="94.4" r="5.5"/>
+<circle class="node open" cx="78.8" cy="85.5" r="5.5"/>
+<circle class="node open" cx="85.5" cy="78.8" r="5.5"/>
+<circle class="node open" cx="94.4" cy="75.7" r="5.5"/>
+</g>
+<g class="b-limit">
+<circle class="body" cx="263.4" cy="263.4" r="11"/>
+<text class="lbl small" x="263.4" y="263.4">LB</text>
+<circle class="node open" cx="283" cy="270.9" r="5.5"/>
+<circle class="node open" cx="270.9" cy="283" r="5.5"/>
+<circle class="newring" cx="263.4" cy="263.4" r="34"/>
+</g>
+</svg>
+<div class="legend-row"><span class="b-halo"><i class="sw"></i>Halo: one damage kind</span><span class="b-limit"><i class="sw"></i>Valor: Limit start</span></div>
+<p class="legend" style="margin:8px 0 0">Dashed gold rings mark what's new. The core is Tier 1's, rebuilt in the Tier 2 world. Her moon grows to 4 nodes.</p>
+</div>
+<div class="card scroll"><table>
+<thead><tr><th>New</th><th>I</th><th>II</th><th>Jewel</th></tr></thead>
+<tbody>
+<tr><td><span class="nm b-halo"><i class="sw"></i>Halo</span><small class="muted">kind: free pick</small></td><td>+10 offense on that kind<br><small class="muted">Lv 21</small></td><td>+24 more (+34)<br><small class="muted">Lv 46</small></td><td>Halo Jewel I, II</td></tr>
+<tr><td><span class="nm b-limit"><i class="sw"></i>Valor</span></td><td>Limit start +2<br><small class="muted">Lv 16</small></td><td>+2 more (+4 of 12)<br><small class="muted">Lv 36</small></td><td>Moon Jewel II, IV</td></tr>
+</tbody></table></div>
+<div class="card"><div class="row"><span class="chip">29 nodes</span><span class="chip">3 jewel kinds · 12 items</span><span class="chip new">Halo · Katana +34</span></div>
+<p style="margin:8px 0 0">The Halo's kind changes freely outside fights. With a Katana Orb (+34) it stops at +68, a second G10 weapon's Might.</p></div>
+</section>
+
+<section id="t3">
+<h2><span class="tier t3">Tier 3</span> + a second Halo kind and the Swiftness moon</h2>
+<div class="card">
+<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Tier 3 map: the Tier 2 map plus two more Halo nodes for a second kind and a Swiftness moon with two nodes">
+<circle class="orbit" cx="180" cy="180" r="118"/>
+<g class="b-halo">
+<circle class="halo" cx="180" cy="180" r="68"/>
+<circle class="node open" cx="211.9" cy="120" r="6.5"/>
+<circle class="node open" cx="240" cy="148.1" r="6.5"/>
+<circle class="node open" cx="148.1" cy="240" r="6.5"/>
+<circle class="newring" cx="131.9" cy="228.1" r="24"/>
+<circle class="node open" cx="120" cy="211.9" r="6.5"/>
+<text class="lbl small soft" x="219.6" y="140.4">Halo</text>
+</g>
+<g class="b-planet">
+<circle class="body" cx="180" cy="180" r="28"/>
+<text class="lbl" x="180" y="176">Planet</text>
+<text class="lbl small soft" x="180" y="188">every stat</text>
+<circle class="node open" cx="180" cy="134" r="8"/>
+<text class="num" x="180" y="134">I</text>
+<circle class="node open" cx="223.7" cy="165.8" r="8"/>
+<text class="num" x="223.7" y="165.8">II</text>
+<circle class="node open" cx="207" cy="217.2" r="8"/>
+<text class="num" x="207" y="217.2">III</text>
+<circle class="node open" cx="153" cy="217.2" r="8"/>
+<text class="num" x="153" y="217.2">IV</text>
+<circle class="node open" cx="136.3" cy="165.8" r="8"/>
+<text class="num" x="136.3" y="165.8">V</text>
+</g>
+<g class="b-atk">
+<circle class="body" cx="180" cy="62" r="17"/>
+<text class="lbl" x="180" y="62">ATK</text>
+<circle class="node open" cx="153.2" cy="46.5" r="6"/>
+<circle class="node open" cx="164.5" cy="35.2" r="6"/>
+<circle class="node open" cx="180" cy="31" r="6"/>
+<circle class="node open" cx="195.5" cy="35.2" r="6"/>
+<circle class="node open" cx="206.8" cy="46.5" r="6"/>
+</g>
+<g class="b-matk">
+<circle class="body" cx="298" cy="180" r="17"/>
+<text class="lbl" x="298" y="180">M.ATK</text>
+<circle class="node open" cx="313.5" cy="153.2" r="6"/>
+<circle class="node open" cx="324.8" cy="164.5" r="6"/>
+<circle class="node open" cx="329" cy="180" r="6"/>
+<circle class="node open" cx="324.8" cy="195.5" r="6"/>
+<circle class="node open" cx="313.5" cy="206.8" r="6"/>
+</g>
+<g class="b-hp">
+<circle class="body" cx="180" cy="298" r="17"/>
+<text class="lbl" x="180" y="298">HP</text>
+<circle class="node open" cx="206.8" cy="313.5" r="6"/>
+<circle class="node open" cx="195.5" cy="324.8" r="6"/>
+<circle class="node open" cx="180" cy="329" r="6"/>
+<circle class="node open" cx="164.5" cy="324.8" r="6"/>
+<circle class="node open" cx="153.2" cy="313.5" r="6"/>
+</g>
+<g class="b-guard">
+<circle class="body" cx="62" cy="180" r="17"/>
+<text class="lbl small" x="62" y="175.5">DEF</text><text class="lbl small" x="62" y="184.5">M.DEF</text>
+<circle class="node open" cx="46.5" cy="206.8" r="6"/>
+<circle class="node open" cx="35.2" cy="195.5" r="6"/>
+<circle class="node open" cx="31" cy="180" r="6"/>
+<circle class="node open" cx="35.2" cy="164.5" r="6"/>
+<circle class="node open" cx="46.5" cy="153.2" r="6"/>
+</g>
+<g class="b-tpl">
+<circle class="body tplbody" cx="96.6" cy="96.6" r="11"/>
+<text class="lbl small" x="96.6" y="96.6">★</text>
+<circle class="node open" cx="76.9" cy="103.8" r="5.5"/>
+<circle class="node open" cx="75.7" cy="94.4" r="5.5"/>
+<circle class="node open" cx="78.8" cy="85.5" r="5.5"/>
+<circle class="node open" cx="85.5" cy="78.8" r="5.5"/>
+<circle class="node open" cx="94.4" cy="75.7" r="5.5"/>
+<circle class="node open" cx="103.8" cy="76.9" r="5.5"/>
+</g>
+<g class="b-limit">
+<circle class="body" cx="263.4" cy="263.4" r="11"/>
+<text class="lbl small" x="263.4" y="263.4">LB</text>
+<circle class="node open" cx="283" cy="270.9" r="5.5"/>
+<circle class="node open" cx="270.9" cy="283" r="5.5"/>
+</g>
+<g class="b-speed">
+<circle class="body" cx="96.6" cy="263.4" r="11"/>
+<text class="lbl small" x="96.6" y="263.4">EVA</text>
+<circle class="node open" cx="89.1" cy="283" r="5.5"/>
+<circle class="node open" cx="77" cy="270.9" r="5.5"/>
+<circle class="newring" cx="96.6" cy="263.4" r="34"/>
+</g>
+</svg>
+<div class="legend-row"><span class="b-halo"><i class="sw"></i>Halo: two kinds</span><span class="b-speed"><i class="sw"></i>Swiftness: evasion</span></div>
+</div>
+<div class="card scroll"><table>
+<thead><tr><th>New</th><th>First</th><th>Second</th><th>Jewel</th></tr></thead>
+<tbody>
+<tr><td><span class="nm b-halo"><i class="sw"></i>Halo III–IV</span><small class="muted">a second kind</small></td><td>+10<br><small class="muted">Lv 21</small></td><td>+24 more (+34)<br><small class="muted">Lv 46</small></td><td>Halo Jewel I, II</td></tr>
+<tr><td><span class="nm b-speed"><i class="sw"></i>Swiftness</span></td><td>+3% evasion<br><small class="muted">Lv 16</small></td><td>+3% more (6%)<br><small class="muted">Lv 36</small></td><td>Moon Jewel II, IV</td></tr>
+</tbody></table></div>
+<div class="card"><div class="row"><span class="chip">33 nodes</span><span class="chip">3 jewel kinds · 12 items</span><span class="chip new">Katana +34</span><span class="chip new">Fire +34</span></div>
+<p style="margin:8px 0 0">A hybrid can tune both halves; a pure class two of her three weapons. No class constellations: the map stays class-free.</p></div>
+</section>
+
+<section id="today">
+<h2>Today, for comparison</h2>
+<div class="card">
+<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Today's map: a Sun, eight planets, ten moons each and two bridges between neighbours">
+<circle class="orbit" cx="180" cy="180" r="118"/>
+<g class="b-planet"><circle class="body" cx="180" cy="180" r="22"/>
+<circle class="node" cx="187.8" cy="187.8" r="4.5"/>
+<circle class="node" cx="172.2" cy="187.8" r="4.5"/>
+<circle class="node" cx="172.2" cy="172.2" r="4.5"/>
+<circle class="node" cx="187.8" cy="172.2" r="4.5"/>
+</g>
+<g class="b-hp">
+<circle class="node" cx="215.0" cy="76.5" r="4"/>
+<circle class="node" cx="228.4" cy="82.1" r="4"/>
+<circle class="body" cx="180" cy="62" r="15"/><text class="lbl small" x="180" y="62">HP</text>
+<circle class="node" cx="153" cy="61.6" r="3.4"/>
+<circle class="node" cx="154.7" cy="52.5" r="3.4"/>
+<circle class="node" cx="159.5" cy="44.5" r="3.4"/>
+<circle class="node" cx="166.6" cy="38.5" r="3.4"/>
+<circle class="node" cx="175.4" cy="35.4" r="3.4"/>
+<circle class="node" cx="184.6" cy="35.4" r="3.4"/>
+<circle class="node" cx="193.4" cy="38.5" r="3.4"/>
+<circle class="node" cx="200.5" cy="44.5" r="3.4"/>
+<circle class="node" cx="205.3" cy="52.5" r="3.4"/>
+<circle class="node" cx="207" cy="61.6" r="3.4"/>
+</g>
+<g class="b-def">
+<circle class="node" cx="277.9" cy="131.6" r="4"/>
+<circle class="node" cx="283.5" cy="145.0" r="4"/>
+<circle class="body" cx="263.4" cy="96.6" r="15"/><text class="lbl small" x="263.4" y="96.6">DEF</text>
+<circle class="node" cx="244.6" cy="77.2" r="3.4"/>
+<circle class="node" cx="252.3" cy="72" r="3.4"/>
+<circle class="node" cx="261.3" cy="69.7" r="3.4"/>
+<circle class="node" cx="270.5" cy="70.6" r="3.4"/>
+<circle class="node" cx="278.9" cy="74.5" r="3.4"/>
+<circle class="node" cx="285.5" cy="81.1" r="3.4"/>
+<circle class="node" cx="289.4" cy="89.5" r="3.4"/>
+<circle class="node" cx="290.3" cy="98.7" r="3.4"/>
+<circle class="node" cx="288" cy="107.7" r="3.4"/>
+<circle class="node" cx="282.8" cy="115.4" r="3.4"/>
+</g>
+<g class="b-mdef">
+<circle class="node" cx="283.5" cy="215.0" r="4"/>
+<circle class="node" cx="277.9" cy="228.4" r="4"/>
+<circle class="body" cx="298" cy="180" r="15"/><text class="lbl small" x="298" y="180">MDEF</text>
+<circle class="node" cx="298.4" cy="153" r="3.4"/>
+<circle class="node" cx="307.5" cy="154.7" r="3.4"/>
+<circle class="node" cx="315.5" cy="159.5" r="3.4"/>
+<circle class="node" cx="321.5" cy="166.6" r="3.4"/>
+<circle class="node" cx="324.6" cy="175.4" r="3.4"/>
+<circle class="node" cx="324.6" cy="184.6" r="3.4"/>
+<circle class="node" cx="321.5" cy="193.4" r="3.4"/>
+<circle class="node" cx="315.5" cy="200.5" r="3.4"/>
+<circle class="node" cx="307.5" cy="205.3" r="3.4"/>
+<circle class="node" cx="298.4" cy="207" r="3.4"/>
+</g>
+<g class="b-mp">
+<circle class="node" cx="228.4" cy="277.9" r="4"/>
+<circle class="node" cx="215.0" cy="283.5" r="4"/>
+<circle class="body" cx="263.4" cy="263.4" r="15"/><text class="lbl small" x="263.4" y="263.4">MP</text>
+<circle class="node" cx="282.8" cy="244.6" r="3.4"/>
+<circle class="node" cx="288" cy="252.3" r="3.4"/>
+<circle class="node" cx="290.3" cy="261.3" r="3.4"/>
+<circle class="node" cx="289.4" cy="270.5" r="3.4"/>
+<circle class="node" cx="285.5" cy="278.9" r="3.4"/>
+<circle class="node" cx="278.9" cy="285.5" r="3.4"/>
+<circle class="node" cx="270.5" cy="289.4" r="3.4"/>
+<circle class="node" cx="261.3" cy="290.3" r="3.4"/>
+<circle class="node" cx="252.3" cy="288" r="3.4"/>
+<circle class="node" cx="244.6" cy="282.8" r="3.4"/>
+</g>
+<g class="b-matk">
+<circle class="node" cx="145.0" cy="283.5" r="4"/>
+<circle class="node" cx="131.6" cy="277.9" r="4"/>
+<circle class="body" cx="180" cy="298" r="15"/><text class="lbl small" x="180" y="298">MATK</text>
+<circle class="node" cx="207" cy="298.4" r="3.4"/>
+<circle class="node" cx="205.3" cy="307.5" r="3.4"/>
+<circle class="node" cx="200.5" cy="315.5" r="3.4"/>
+<circle class="node" cx="193.4" cy="321.5" r="3.4"/>
+<circle class="node" cx="184.6" cy="324.6" r="3.4"/>
+<circle class="node" cx="175.4" cy="324.6" r="3.4"/>
+<circle class="node" cx="166.6" cy="321.5" r="3.4"/>
+<circle class="node" cx="159.5" cy="315.5" r="3.4"/>
+<circle class="node" cx="154.7" cy="307.5" r="3.4"/>
+<circle class="node" cx="153" cy="298.4" r="3.4"/>
+</g>
+<g class="b-atk">
+<circle class="node" cx="82.1" cy="228.4" r="4"/>
+<circle class="node" cx="76.5" cy="215.0" r="4"/>
+<circle class="body" cx="96.6" cy="263.4" r="15"/><text class="lbl small" x="96.6" y="263.4">ATK</text>
+<circle class="node" cx="115.4" cy="282.8" r="3.4"/>
+<circle class="node" cx="107.7" cy="288" r="3.4"/>
+<circle class="node" cx="98.7" cy="290.3" r="3.4"/>
+<circle class="node" cx="89.5" cy="289.4" r="3.4"/>
+<circle class="node" cx="81.1" cy="285.5" r="3.4"/>
+<circle class="node" cx="74.5" cy="278.9" r="3.4"/>
+<circle class="node" cx="70.6" cy="270.5" r="3.4"/>
+<circle class="node" cx="69.7" cy="261.3" r="3.4"/>
+<circle class="node" cx="72" cy="252.3" r="3.4"/>
+<circle class="node" cx="77.2" cy="244.6" r="3.4"/>
+</g>
+<g class="b-speed">
+<circle class="node" cx="76.5" cy="145.0" r="4"/>
+<circle class="node" cx="82.1" cy="131.6" r="4"/>
+<circle class="body" cx="62" cy="180" r="15"/><text class="lbl small" x="62" y="180">SPD</text>
+<circle class="node" cx="61.6" cy="207" r="3.4"/>
+<circle class="node" cx="52.5" cy="205.3" r="3.4"/>
+<circle class="node" cx="44.5" cy="200.5" r="3.4"/>
+<circle class="node" cx="38.5" cy="193.4" r="3.4"/>
+<circle class="node" cx="35.4" cy="184.6" r="3.4"/>
+<circle class="node" cx="35.4" cy="175.4" r="3.4"/>
+<circle class="node" cx="38.5" cy="166.6" r="3.4"/>
+<circle class="node" cx="44.5" cy="159.5" r="3.4"/>
+<circle class="node" cx="52.5" cy="154.7" r="3.4"/>
+<circle class="node" cx="61.6" cy="153" r="3.4"/>
+</g>
+<g class="b-limit">
+<circle class="node" cx="131.6" cy="82.1" r="4"/>
+<circle class="node" cx="145.0" cy="76.5" r="4"/>
+<circle class="body" cx="96.6" cy="96.6" r="15"/><text class="lbl small" x="96.6" y="96.6">LB</text>
+<circle class="node" cx="77.2" cy="115.4" r="3.4"/>
+<circle class="node" cx="72" cy="107.7" r="3.4"/>
+<circle class="node" cx="69.7" cy="98.7" r="3.4"/>
+<circle class="node" cx="70.6" cy="89.5" r="3.4"/>
+<circle class="node" cx="74.5" cy="81.1" r="3.4"/>
+<circle class="node" cx="81.1" cy="74.5" r="3.4"/>
+<circle class="node" cx="89.5" cy="70.6" r="3.4"/>
+<circle class="node" cx="98.7" cy="69.7" r="3.4"/>
+<circle class="node" cx="107.7" cy="72" r="3.4"/>
+<circle class="node" cx="115.4" cy="77.2" r="3.4"/>
+</g>
+</svg>
+<div class="legend-row"><span class="b-planet"><i class="sw"></i>Sun: 4 nodes</span><span class="b-hp"><i class="sw"></i>8 planets × 10 moons</span><span class="b-def"><i class="sw"></i>16 bridges</span></div>
+</div>
+<div class="card scroll"><table>
+<thead><tr><th></th><th>Today</th><th>Tier 1, proposed</th></tr></thead>
+<tbody>
+<tr><td>Bodies</td><td>A Sun, 8 planets</td><td>1 planet, 4 moons</td></tr>
+<tr><td>Nodes</td><td>100</td><td>25</td></tr>
+<tr><td>Stats</td><td>8</td><td>6</td></tr>
+<tr><td>Items</td><td>100 Star Gems (3 kinds)</td><td>10 jewels (2 kinds)</td></tr>
+<tr><td>Items per Uma</td><td>100</td><td>20–25 (+2)</td></tr>
+<tr><td>Active slots</td><td>5 → 30, by hand</td><td>None</td></tr>
+<tr><td>Gate</td><td>Gem, in order</td><td>Jewel, in order, her level</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="screen">
+<h2>The Observatory, Tier 1</h2>
+<p>Uma A, Lv 32, a Brawler. She skipped Sorcery until a spare Moon Jewel I came along.</p>
+<div class="card">
+<div class="row"><span class="face">A</span><div style="flex:1;min-width:0"><b>Uma A</b><br><small class="muted">Lv 32 · Brawler</small></div><span class="chip">Open 13 of 25 · ★ 2</span></div>
+<div style="height:10px"></div>
+<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Uma A at Lv 32: planet I to IV open, Strength, Vigor and Guard I to III open, Sorcery dimmed with node I ready to set">
+<circle class="orbit" cx="180" cy="180" r="118"/>
+<g class="b-planet">
+<circle class="body" cx="180" cy="180" r="28"/>
+<text class="lbl" x="180" y="176">Planet</text>
+<text class="lbl small soft" x="180" y="188">every stat</text>
+<circle class="node open" cx="180" cy="134" r="8"/>
+<text class="num" x="180" y="134">I</text>
+<circle class="node open" cx="223.7" cy="165.8" r="8"/>
+<text class="num" x="223.7" y="165.8">II</text>
+<circle class="node open" cx="207" cy="217.2" r="8"/>
+<text class="num" x="207" y="217.2">III</text>
+<circle class="node open" cx="153" cy="217.2" r="8"/>
+<text class="num" x="153" y="217.2">IV</text>
+<circle class="node locked" cx="136.3" cy="165.8" r="8"/>
+<text class="lbl small soft" x="136.3" y="165.8" style="font-size:6.5px">V</text>
+</g>
+<g class="b-atk">
+<circle class="body" cx="180" cy="62" r="17"/>
+<text class="lbl" x="180" y="62">ATK</text>
+<circle class="node open" cx="153.2" cy="46.5" r="6"/>
+<circle class="node open" cx="164.5" cy="35.2" r="6"/>
+<circle class="node open" cx="180" cy="31" r="6"/>
+<circle class="node locked" cx="195.5" cy="35.2" r="6"/>
+<circle class="node locked" cx="206.8" cy="46.5" r="6"/>
+</g>
+<g class="b-matk dim">
+<circle class="body" cx="298" cy="180" r="17"/>
+<text class="lbl" x="298" y="180">M.ATK</text>
+<circle class="node next" cx="313.5" cy="153.2" r="6"/>
+<circle class="node locked" cx="324.8" cy="164.5" r="6"/>
+<circle class="node locked" cx="329" cy="180" r="6"/>
+<circle class="node locked" cx="324.8" cy="195.5" r="6"/>
+<circle class="node locked" cx="313.5" cy="206.8" r="6"/>
+</g>
+<g class="b-hp">
+<circle class="body" cx="180" cy="298" r="17"/>
+<text class="lbl" x="180" y="298">HP</text>
+<circle class="node open" cx="206.8" cy="313.5" r="6"/>
+<circle class="node open" cx="195.5" cy="324.8" r="6"/>
+<circle class="node open" cx="180" cy="329" r="6"/>
+<circle class="node locked" cx="164.5" cy="324.8" r="6"/>
+<circle class="node locked" cx="153.2" cy="313.5" r="6"/>
+</g>
+<g class="b-guard">
+<circle class="body" cx="62" cy="180" r="17"/>
+<text class="lbl small" x="62" y="175.5">DEF</text><text class="lbl small" x="62" y="184.5">M.DEF</text>
+<circle class="node open" cx="46.5" cy="206.8" r="6"/>
+<circle class="node open" cx="35.2" cy="195.5" r="6"/>
+<circle class="node open" cx="31" cy="180" r="6"/>
+<circle class="node locked" cx="35.2" cy="164.5" r="6"/>
+<circle class="node locked" cx="46.5" cy="153.2" r="6"/>
+</g>
+<g class="b-tpl">
+<circle class="body tplbody" cx="96.6" cy="96.6" r="11"/>
+<text class="lbl small" x="96.6" y="96.6">★</text>
+<circle class="node open" cx="77" cy="89.1" r="5.5"/>
+<circle class="node open" cx="89.1" cy="77" r="5.5"/>
+</g>
+</svg>
+<div style="height:10px"></div>
+<div class="stat-grid">
+<span><b>HP</b><i>+145</i></span><span><b>MP</b><i>+13</i></span><span><b>ATK</b><i>+31</i></span>
+<span><b>M.ATK</b><i>+13</i></span><span><b>DEF</b><i>+25</i></span><span><b>M.DEF</b><i>+25</i></span>
+</div>
+<h3>Set</h3>
+<div class="setrow"><span class="jewelicon" style="background:var(--c-def)">I</span><span class="txt"><b>Moon Jewel I ×1</b><small>Opens Sorcery I · +2 M.ATK · her class doesn't use it</small></span><span class="btn">Set</span></div>
+<div class="setrow"><span class="jewelicon" style="background:var(--c-def)">IV</span><span class="txt"><b>Moon Jewel IV ×3</b><small>Opens at Lv 36</small></span><span class="btn off">Lv 36</span></div>
+<div class="setrow"><span class="jewelicon" style="background:var(--c-planet)">V</span><span class="txt"><b>Planet Jewel V ×1</b><small>Opens at Lv 41</small></span><span class="btn off">Lv 41</span></div>
+</div>
+<p class="legend">Filled: open. Gold ring: she can set it now. Outline: locked. ★ Her moon (dashed), “Ironhide’s moon” from variance.md: its ATK lead (+6) counts while she plays a Brawler, its HP knack (+20 HP) in every class.</p>
+</section>
+</main>
+
+</body>
+</html>

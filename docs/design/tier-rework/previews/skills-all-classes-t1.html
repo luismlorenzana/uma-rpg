@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Every class at Tier 1</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+
+  /* --- skills-* previews: a sideways mini tree (trunk, fork, two branches) ------------------------------------------ */
+  :root { --line: var(--hairline-strong); }
+  .mt { margin-top: 12px; }
+  .mt:first-of-type { margin-top: 6px; }
+  .mt-h { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .mt-h .muted { font-weight: 500; font-size: 11px; }
+  .mt-h .chip.st { margin-left: auto; font-size: 10px; padding: 1px 7px; color: var(--ink-soft); }
+  .mt-g { display: grid; grid-template-columns: 82px 14px minmax(0, 1fr); grid-template-rows: 1fr 1fr; row-gap: 6px; }
+  .mt-trunk { grid-row: 1 / 3; grid-column: 1; align-self: center; }
+  .mt-fork { grid-row: 1 / 3; grid-column: 2; position: relative; }
+  .mt-fork::before { content: ""; position: absolute; left: 0; width: 50%; top: calc(50% - 1px); height: 2px; background: var(--line); }
+  .mt-fork::after { content: ""; position: absolute; left: 50%; right: 0; top: 25%; bottom: 25%; border: 2px solid var(--line); border-right: 0; }
+  .mt-a { grid-row: 1; grid-column: 3; } .mt-b { grid-row: 2; grid-column: 3; }
+  .n { position: relative; padding: 5px 7px; border-radius: 9px; background: var(--raised); border: 1.5px solid var(--hairline-strong);
+    font-size: 11px; line-height: 1.25; color: var(--ink); }
+  .n b { display: block; font-weight: 700; }
+  .n small { display: block; color: var(--ink-soft); font-size: 10px; margin-top: 1px; }
+  .n em { display: block; font-style: normal; color: var(--ink-faint); font-size: 9.5px; }
+  .n .tag { display: block; font-size: 9px; font-weight: 800; letter-spacing: .03em; color: var(--ink-soft); text-transform: uppercase; margin-bottom: 1px; }
+  .mt-trunk.n { text-align: center; }
+  .n.on { border-color: var(--accent); background: var(--accent-wash); }
+  .n.on .tag { color: var(--accent-strong); }
+  .n.rv { box-shadow: inset 3px 0 0 var(--heal); }
+  .glyph { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; font-size: 10px; font-weight: 800;
+    background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .glyph.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .glyph.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .cls-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .cls-h h2 { margin: 0; }
+  .note { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; }
+  td.n0 { font-weight: 700; color: var(--ink); }
+  td b { color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Every class at Tier 1</h1>
+  <p>Each class's three trees, compact: a trunk (depths 1–2, Class Rank 1 and 10), one fork at depth 3 (Class Rank 20), and two branches of three skills (depths 3–5, Class Rank 20, 30, 40). Every node is free; A is the default. From <b>skill-trees.md</b>.</p>
+
+  <div class="card">
+    <h3 style="margin-top:0">Tier 1, one class: today and proposed</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th></th><th>Today</th><th>T7 (not built)</th><th>Proposed</th></tr></thead>
+        <tbody>
+          <tr><td class="n0">Trees</td><td>5 or 10</td><td>5 or 10</td><td><b>3</b></td></tr>
+          <tr><td class="n0">Nodes</td><td>75 or 150</td><td>25 or 50</td><td><b>24</b></td></tr>
+          <tr><td class="n0">Gates</td><td>10</td><td>5</td><td><b>5</b></td></tr>
+          <tr><td class="n0">Picks</td><td>25 forks</td><td>0</td><td><b>3, with defaults</b></td></tr>
+          <tr><td class="n0">Currency</td><td>side points, 50 vs 75</td><td>none</td><td><b>none</b></td></tr>
+          <tr><td class="n0">Skills held</td><td>up to 50</td><td>25</td><td><b>15</b></td></tr>
+          <tr><td class="n0">Equipped</td><td>3 → 10</td><td>3 → 7</td><td><b>3 → 7</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">"5 or 10": a Brawler or a Mage sees 5 trees; the others see all 10, 5 usable. Every Tier 1 node below exists in today's catalog.</p>
+  </div>
+
+  <div class="card">
+    <div class="row" style="font-size:12px;color:var(--ink-soft)">
+      <span class="n on" style="padding:1px 8px">A · default</span><span class="n" style="padding:1px 8px">B · the lean</span><span class="n rv" style="padding:1px 8px">a revive</span>
+    </div>
+    <p class="note">Weapons are <b>classes.md</b>'s defaults (CL4), one per strike: Heavy, Flurry, Area. A branch never changes a weapon's strike. The Brawler's and the Mage's lean follows the weapon kind; the other classes lean the same way on every tree.</p>
+  </div>
+
+<!-- The six classes, on classes.md CL4's default weapons (Heavy, Flurry, Area). -->
+  <div class="card">
+    <div class="cls-h"><h2>Brawler</h2><div class="row"><span class="chip phys">physical</span><span class="chip">3 Arms</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">GS</span>Greatsword <span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Heavy Slash</b><b>Cleave</b><em>one foe, heavy</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Sunder → Rend → Meteor Strike</b><small>one foe, 2–3 hits · Armor Break 2 at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Combo</span><b>Triple Sunder → Rending Combo → Meteor Combo</b><small>one hit more: Breaks sooner</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">Ln</span>Lance <span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Thrust Flurry</b><b>Lance Barrage</b><em>random foes</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Spiral Barrage → Dragon Dive → Heaven's Rain</b><small>random foes, 4–6 hits · Armor Break at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Impale</span><b>Skewer → Dragon Fang → Gungnir</b><small>one foe, fewer and heavier hits</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">AX</span>Axe <span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Sweep</b><b>Whirl</b><em>every foe</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Cyclone → Quake → Maelstrom</b><small>every foe</small></div>
+        <div class="mt-b n"><span class="tag">B · Reap</span><b>Headsman's Cyclone → Guillotine Quake → Executioner's Storm</b><small>every foe, then a hit on her target</small></div>
+      </div>
+    </div>
+    <p class="note">Her other kinds, if she picks them: Katana B Draw (one hit that ignores the shield’s halving), Bow B Rain (a splash on every other foe).</p>
+  </div>
+
+  <div class="card">
+    <div class="cls-h"><h2>Mage</h2><div class="row"><span class="chip magic">magical</span><span class="chip">3 Tomes</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Fi</span>Fire Tome <span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Fire</b><b>Fira</b><em>one foe, heavy</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Firaga → Firaja → Flare Star</b><small>one foe · Burn at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Wave</span><b>Firaga Wave → Firaja Wave → Flare Wave</b><small>every foe</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Th</span>Thunder Tome <span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Thunder</b><b>Thundara</b><em>random foes</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Thundaga → Thundaja → Judgment Storm</b><small>random foes · Shock at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Bolt</span><b>Thundaga Bolt → Thundaja Bolt → Judgment Bolt</b><small>one foe</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Bz</span>Blizzard Tome <span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Blizzard</b><b>Blizzara</b><em>every foe</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Blizzaga → Blizzaja → Absolute Zero</b><small>every foe · Enfeeble at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Spike</span><b>Blizzaga Spike → Blizzaja Spike → Zero Spike</b><small>one foe, heavy</small></div>
+      </div>
+    </div>
+    <p class="note">Her other kinds: Dark B Pierce (one hit that ignores the shield’s halving), Light B Cascade (every foe, two hits).</p>
+  </div>
+
+  <div class="card">
+    <div class="cls-h"><h2>Spell Blade</h2><div class="row"><span class="chip phys">70 / 30</span><span class="chip">2 Arms + 1 Tome</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Dk</span>Dark Tome <span class="muted">· Tome half</span><span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Rune Shade</b><b>Arcane Shade</b><em>one foe, twice</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Mystic → Astral → Celestial Shade</b><small>one foe · more on a wounded foe at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Rapid</span><b>Rapid Mystic → Rapid Astral → Rapid Celestial Shade</b><small>one hit more</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">BW</span>Bow <span class="muted">· Arms half</span><span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Rune Shot</b><b>Arcane Shot</b><em>one foe, many hits</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Mystic → Astral → Celestial Shot</b><small>one foe, 4–5 hits with her extra</small></div>
+        <div class="mt-b n"><span class="tag">B · Rapid</span><b>Rapid Mystic → Rapid Astral → Rapid Celestial Shot</b><small>one hit more: Breaks sooner</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">AX</span>Axe <span class="muted">· Arms half</span><span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Rune Hew</b><b>Arcane Hew</b><em>one foe</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Mystic → Astral → Celestial Hew</b><small>one foe, 3 hits with her extra</small></div>
+        <div class="mt-b n"><span class="tag">B · Rapid</span><b>Rapid Mystic → Rapid Astral → Rapid Celestial Hew</b><small>one hit more</small></div>
+      </div>
+    </div>
+    <p class="note">Her lean goes deeper into her identity: more hits, sooner Breaks. Today these are the "… Flurry" sides, renamed (SK14). Tier 2 adds her crossover, Sweep, on her Arms trees: her Axe then reaches every foe.</p>
+  </div>
+
+  <div class="card">
+    <div class="cls-h"><h2>Summoner</h2><div class="row"><span class="chip magic">30 / 70</span><span class="chip">1 Arms + 2 Tomes</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph">Kt</span>Katana <span class="muted">· strikes once</span><span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Ronin</b><b>Samurai</b><em>one foe, two hits</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Kensei → Blade Shogun → Sword Spirit</b><small>one foe, two hits · more on a Broken foe at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Pack</span><b>Kensei Pack → Blade Shogun Pack → Sword Spirit Pack</b><small>one hit more on arrival</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Th</span>Thunder Tome <span class="muted">· lingers</span><span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Spark Sprites</b><b>Thunderbird</b><em>random foes, lingers</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Storm Roc → Thunder Kirin → Raijin</b><small>lingers at 0.3 · farewell on every foe</small></div>
+        <div class="mt-b n"><span class="tag">B · Bonded</span><b>Bonded Storm Roc → Bonded Thunder Kirin → Bonded Raijin</b><small>lingers at 0.4: a stronger farewell</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph magic">Bz</span>Blizzard Tome <span class="muted">· lingers</span><span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Frost Sprites</b><b>Snow Sentinel</b><em>every foe, lingers</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Ice Golem → Frost Titan → Winter Queen</b><small>every foe · lingers at 0.3</small></div>
+        <div class="mt-b n"><span class="tag">B · Bonded</span><b>Bonded Ice Golem → Bonded Frost Titan → Bonded Winter Queen</b><small>lingers at 0.4</small></div>
+      </div>
+    </div>
+    <p class="note">Only her Tome summons linger, so her Arms tree leans to Pack, not Bonded. Tier 2 adds her crossover, Hunt, on her Tome trees.</p>
+  </div>
+
+  <div class="card">
+    <div class="cls-h"><h2>Paladin</h2><div class="row"><span class="chip heal">healer, from ATK</span><span class="chip">2 Arms + 1 Tome</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">GS</span>Greatsword <span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Breach</b><b>Sunder Armor</b><em>Armor Break · Barrier · Aegis</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Rupture → Ravage → Ruin</b><small>Barrier on the Uma in danger; every Uma at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Potent</span><b>Potent Rupture → Potent Ravage → Potent Ruin</b><small>one more Armor Break stack, more MP</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">Ln</span>Lance <span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Pierce Mind</b><b>Puncture</b><em>Mind Break · Barrier</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Impale → Transfix → Mindspike</b><small>Mind Break on the foe · Barrier</small></div>
+        <div class="mt-b n rv"><span class="tag">B · Potent</span><b>Potent Impale → Valkyrie's Oath → Potent Mindspike</b><small>one more stack · <b style="display:inline;color:var(--heal)">revives the fallen</b> at depth 4</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">Bz</span>Blizzard Tome <span class="muted">· Tome half</span><span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Ward</b><b>Guard</b><em>Aegis · mend · Barrier on all</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Bulwark → Fortress → Sanctum</b><small>Aegis on every Uma · mends · Barriers every Uma</small></div>
+        <div class="mt-b n"><span class="tag">B · Potent</span><b>Potent Bulwark → Potent Fortress → Potent Sanctum</b><small>one more Aegis stack, more MP</small></div>
+      </div>
+    </div>
+    <p class="note">Her revive sits on her Lance’s B. Today these are the "Heavy …" sides, renamed (SK14). Tier 2 adds Wide: support on every Uma from depth 3.</p>
+  </div>
+
+  <div class="card">
+    <div class="cls-h"><h2>Cleric</h2><div class="row"><span class="chip heal">healer, from M.ATK</span><span class="chip">1 Arms + 2 Tomes</span></div></div>
+
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">Dk</span>Dark Tome <span class="chip st">Heavy</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Calm</b><b>Focus</b><em>Clarity · mend · drain</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Clarity → Insight → Enlightenment</b><small>Clarity on every Uma · mends · drains</small></div>
+        <div class="mt-b n"><span class="tag">B · Potent</span><b>Potent Clarity → Potent Insight → Potent Enlightenment</b><small>one more Clarity stack, more MP</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">Lt</span>Light Tome <span class="chip st">Flurry</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Grace</b><b>Faith</b><em>Faith · mend · Regen</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Devotion → Piety → Benediction</b><small>mends the most hurt, Regen, cleanse; every Uma at the tip</small></div>
+        <div class="mt-b n rv"><span class="tag">B · Potent</span><b>Rebirth → Potent Piety → Potent Benediction</b><small>one more Faith stack · <b style="display:inline;color:var(--heal)">Rebirth revives</b> at depth 3</small></div>
+      </div>
+    </div>
+    <div class="mt">
+      <div class="mt-h"><span class="glyph heal">AX</span>Axe <span class="muted">· Arms half</span><span class="chip st">Area</span></div>
+      <div class="mt-g">
+        <div class="mt-trunk n on"><b>Hack</b><b>Hamstring</b><em>Enfeeble · Barrier</em></div>
+        <div class="mt-fork"></div>
+        <div class="mt-a n on"><span class="tag">A · Core</span><b>Maim → Cripple → Unmake</b><small>Enfeeble on the foe · Barrier on the Uma in danger; every foe at the tip</small></div>
+        <div class="mt-b n"><span class="tag">B · Potent</span><b>Potent Maim → Potent Cripple → Potent Unmake</b><small>one more Enfeeble stack, more MP</small></div>
+      </div>
+    </div>
+    <p class="note">Her revive, Rebirth, opens her Light’s B branch. Tier 2 adds Wide: support on every Uma from depth 3.</p>
+  </div>
+
+</main>
+</body>
+</html>

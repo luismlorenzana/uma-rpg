@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tier 1 strikes</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* This preview's own pieces. */
+  .chip.strike { background: var(--panel); border: 1.5px solid var(--hairline-strong); color: var(--ink); }
+  .chip.s-heavy { border-color: var(--accent); }
+  .chip.s-flurry { border-color: var(--info); }
+  .chip.s-area { border-color: var(--success); }
+  .strike-card { border-left: 4px solid var(--hairline-strong); padding: 6px 0 8px 10px; margin-bottom: 8px; }
+  .strike-card.s-heavy { border-left-color: var(--accent); }
+  .strike-card.s-flurry { border-left-color: var(--info); }
+  .strike-card.s-area { border-left-color: var(--success); }
+  .sc-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .sc-head b { font-size: 15px; }
+  .sc-head .muted { font-size: 12px; }
+  .note { font-size: 12px; color: var(--ink-faint); margin: 8px 0 0; }
+  .foe { border-radius: 10px; background: var(--sunken); padding: 10px; margin-bottom: 8px; }
+  .foe.old { opacity: .7; }
+  .foe-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+  .foe-weak { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+  .foe-weak .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--ink-soft); }
+  .foe-weak .kinds { font-size: 12px; }
+  td .a { color: var(--phys); font-weight: 600; } td .t { color: var(--magic); font-weight: 600; }
+  .biomes td { font-size: 12px; }
+  .sig { display: inline-flex; align-items: center; gap: 4px; margin: 0 8px 4px 0; white-space: nowrap; }
+  .tierline { display: grid; grid-template-columns: 56px 1fr; gap: 8px; align-items: start; padding: 8px 0;
+    border-bottom: 1px solid var(--hairline); font-size: 13px; }
+  .tierline:last-of-type { border-bottom: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tier 1's strikes</h1>
+  <p>For <b>classes.md</b> §2.2–§2.3. Tier 1 foes are weak to one <b>strike</b>, not to a list of kinds. Every class
+    holds one weapon of each strike, so every Uma always has a weak weapon.</p>
+  <nav class="tabs"><a href="#three">The three</a><a href="#foe">A foe</a><a href="#rule">The rule</a><a href="#cover">Coverage</a><a href="#biomes">Biomes</a><a href="#tiers">By tier</a></nav>
+
+  <h2 id="three">The three strikes</h2>
+  <div class="card">
+    <div class="strike-card s-heavy"><div class="sc-head"><b>Heavy</b><span class="muted">few strong hits</span></div>
+      <div class="row"><span class="chip phys">Greatsword</span><span class="chip phys">Katana</span><span class="chip magic">Fire</span><span class="chip magic">Dark</span></div></div>
+    <div class="strike-card s-flurry"><div class="sc-head"><b>Flurry</b><span class="muted">many hits</span></div>
+      <div class="row"><span class="chip phys">Lance</span><span class="chip phys">Bow</span><span class="chip magic">Thunder</span><span class="chip magic">Light</span></div></div>
+    <div class="strike-card s-area"><div class="sc-head"><b>Area</b><span class="muted">every foe</span></div>
+      <div class="row"><span class="chip phys">Axe</span><span class="chip magic">Blizzard</span></div></div>
+    <p class="note">Each kind keeps its shape from today: Greatsword and Fire one foe hard, Katana and Dark twice; Lance
+      and Thunder random foes, Bow and Light one foe many times; Axe and Blizzard every foe. The ten kinds stay; Tier 1
+      groups them in three.</p>
+  </div>
+
+  <h2 id="foe">A foe's card</h2>
+  <div class="card">
+    <div class="foe">
+      <div class="foe-top"><b>Rival · Volcano pair</b><span class="muted">Fire · shield ●●●●●●</span></div>
+      <div class="foe-weak"><span class="lbl">Weak</span><span class="chip strike s-flurry">Flurry</span>
+        <span class="muted kinds">Lance · Bow · Thunder · Light</span></div>
+    </div>
+    <div class="foe old">
+      <div class="foe-top"><b>The same foe today</b><span class="muted">Fire · shield ●●●●</span></div>
+      <div class="foe-weak"><span class="lbl">Weak</span><span class="chip phys">Axe</span><span class="chip phys">Katana</span><span class="chip magic">Thunder</span><span class="chip magic">Light</span></div>
+    </div>
+    <p class="note">Today: two Arms drawn at random and the ring's elements, read icon by icon. Tier 1: one badge, and each
+      Uma knows which of her three weapons answers it. (The shield count is the draft: a Flurry-weak foe ×1.5.)</p>
+  </div>
+
+  <h2 id="rule">The rule</h2>
+  <div class="card">
+    <p style="margin-top:0">A foe is weak to the strike of the element that beats hers: the ring stays (Fire &gt; Ice &gt;
+      Lightning &gt; Fire, Light ⇄ Dark), read one level up. The Thunder Tome deals Lightning, the Blizzard Tome Ice.</p>
+    <div class="scroll"><table><tbody><tr><td><b>Fire foe</b></td><td>Lightning beats Fire</td><td><span class="chip strike s-flurry">Flurry</span></td></tr><tr><td><b>Ice foe</b></td><td>Fire beats Ice</td><td><span class="chip strike s-heavy">Heavy</span></td></tr><tr><td><b>Lightning foe</b></td><td>Ice beats Lightning</td><td><span class="chip strike s-area">Area</span></td></tr><tr><td><b>Light foe</b></td><td>Dark beats Light</td><td><span class="chip strike s-heavy">Heavy</span></td></tr><tr><td><b>Dark foe</b></td><td>Light beats Dark</td><td><span class="chip strike s-flurry">Flurry</span></td></tr></tbody></table></div>
+    <p class="note"><b>Two elements:</b> read her first one. If one of her own elements is in that strike, she's weak to
+      the strike none of hers is in: a Fire + Lightning foe is weak to Area. Her own element is never weak, so every kind of
+      the strike chips her.</p>
+    <h3>Charged moves</h3>
+    <p class="note" style="margin-top:0">A lock breaks to a weak act: each Uma whose act lands a weak hit breaks one. "Charging · 3
+      locks" asks three weak acts. On the Duel they alternate an Arms act and a Tome act.</p>
+  </div>
+
+  <h2 id="cover">Coverage, class by class</h2>
+  <div class="card">
+    <div class="scroll"><table>
+      <thead><tr><th>Class</th><th>Heavy</th><th>Flurry</th><th>Area</th></tr></thead>
+      <tbody>
+        <tr><td><b>Brawler</b></td><td><span class="a">Greatsword</span></td><td><span class="a">Lance</span></td><td><span class="a">Axe</span></td></tr>
+        <tr><td><b>Mage</b></td><td><span class="t">Fire</span></td><td><span class="t">Thunder</span></td><td><span class="t">Blizzard</span></td></tr>
+        <tr><td><b>Spell Blade</b></td><td><span class="t">Dark</span></td><td><span class="a">Bow</span></td><td><span class="a">Axe</span></td></tr>
+        <tr><td><b>Summoner</b></td><td><span class="a">Katana</span></td><td><span class="t">Thunder</span></td><td><span class="t">Blizzard</span></td></tr>
+        <tr><td><b>Paladin</b></td><td><span class="a">Greatsword</span></td><td><span class="a">Lance</span></td><td><span class="t">Blizzard</span></td></tr>
+        <tr><td><b>Cleric</b></td><td><span class="t">Dark</span></td><td><span class="t">Light</span></td><td><span class="a">Axe</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Every cell is filled, and a pick only swaps a kind inside its strike, so no pick can empty one. Arms in
+      orange, Tomes in blue.</p>
+  </div>
+
+  <h2 id="biomes">The world's biomes</h2>
+  <div class="card">
+    <p style="margin-top:0">Each signature's strike, by the rule. A stage's foes share one signature, so a stage reads one
+      strike a wave. Signatures: Heavy 15, Flurry 15, Area 18.</p>
+    <div class="scroll"><table class="biomes"><thead><tr><th>Biome</th><th>Signatures → strike</th></tr></thead><tbody><tr><td><b>Meadow</b><br><span class="muted">squad, duo, trio</span></td><td><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Forest</b><br><span class="muted">squad, trio, swarm</span></td><td><span class="sig">Lightning <span class="chip strike s-area">Area</span></span><span class="sig">Light <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Dark <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Coast</b><br><span class="muted">trio, squad</span></td><td><span class="sig">Ice + Lightning <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Swamp</b><br><span class="muted">squad, trio</span></td><td><span class="sig">Lightning + Dark <span class="chip strike s-area">Area</span></span><span class="sig">Dark <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Jungle</b><br><span class="muted">swarm, squad</span></td><td><span class="sig">Fire + Lightning <span class="chip strike s-area">Area</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Desert</b><br><span class="muted">trio, duo</span></td><td><span class="sig">Fire + Light <span class="chip strike s-area">Area</span></span><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Light <span class="chip strike s-heavy">Heavy</span></span></td></tr><tr><td><b>Canyon</b><br><span class="muted">duo, solo, trio</span></td><td><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span><span class="sig">Fire + Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Volcano</b><br><span class="muted">solo, duo</span></td><td><span class="sig">Fire + Dark <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Fire + Light <span class="chip strike s-area">Area</span></span><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Geyser Basin</b><br><span class="muted">trio, squad</span></td><td><span class="sig">Fire + Ice <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Tundra</b><br><span class="muted">squad, trio</span></td><td><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Ice + Dark <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Glacier</b><br><span class="muted">solo, duo</span></td><td><span class="sig">Ice + Light <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span></td></tr><tr><td><b>Storm Peaks</b><br><span class="muted">trio, squad</span></td><td><span class="sig">Ice + Lightning <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Highlands</b><br><span class="muted">duo, trio</span></td><td><span class="sig">Lightning + Light <span class="chip strike s-area">Area</span></span><span class="sig">Light <span class="chip strike s-heavy">Heavy</span></span></td></tr><tr><td><b>Sky Isles</b><br><span class="muted">trio, duo</span></td><td><span class="sig">Fire + Light <span class="chip strike s-area">Area</span></span><span class="sig">Ice + Light <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Lightning + Light <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Underworld</b><br><span class="muted">swarm, squad</span></td><td><span class="sig">Fire + Dark <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Ice + Dark <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Lightning + Dark <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Haunted Moor</b><br><span class="muted">swarm, squad</span></td><td><span class="sig">Dark <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Ice + Dark <span class="chip strike s-flurry">Flurry</span></span></td></tr><tr><td><b>Crystal Caverns</b><br><span class="muted">squad, trio</span></td><td><span class="sig">Ice + Light <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Light <span class="chip strike s-heavy">Heavy</span></span></td></tr><tr><td><b>Ancient Ruins</b><br><span class="muted">escort, trio</span></td><td><span class="sig">Light + Dark <span class="chip strike s-area">Area</span></span><span class="sig">Fire <span class="chip strike s-flurry">Flurry</span></span><span class="sig">Ice <span class="chip strike s-heavy">Heavy</span></span><span class="sig">Lightning <span class="chip strike s-area">Area</span></span></td></tr><tr><td><b>Twilight Rift</b><br><span class="muted">solo</span></td><td><span class="sig">Light + Dark <span class="chip strike s-area">Area</span></span></td></tr></tbody></table></div>
+    <p class="note">Drafts the simulation sets: a Flurry-weak foe's shield ×1.5 (Flurry chips about twice as fast); an
+      Area-weak foe in a crowd (squad, swarm) +1 shield.</p>
+  </div>
+
+  <h2 id="tiers">By tier: the strike stays, the kinds narrow</h2>
+  <div class="card">
+    <div class="tierline"><span class="tier t1">Tier 1</span><div><b>Weak to a strike</b><br><span class="muted">A Fire foe: Lance, Bow, Thunder, Light</span></div></div>
+    <div class="tierline"><span class="tier t2">Tier 2</span><div><b>Two kinds of it: the ring's element and one Arm</b><br><span class="muted">A Fire foe: Thunder and Bow</span></div></div>
+    <div class="tierline"><span class="tier t3">Tier 3</span><div><b>One kind of it</b><br><span class="muted">A Fire foe: Thunder</span></div></div>
+    <p class="note">Each Uma still holds one weapon a strike, so she always knows which slot to look at; later tiers ask
+      which kind sits there. An Area foe stays weak to both Axe and Blizzard: each channel has one Area kind.</p>
+  </div>
+</main>
+</body>
+</html>

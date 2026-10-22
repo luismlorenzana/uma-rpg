@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Professions Demand</title>
+<!-- Tier rework preview for docs/design/tier-rework/professions.md. Self-contained; the first <style> block is
+     _template.html's, unchanged. Invented names only. -->
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+
+<style>
+  :root {
+    --tr-1: #e34948; --tr-2: #eda100; --tr-3: #1baf7a; --tr-4: #e87ba4; --tr-5: #2a78d6;
+    --ground: color-mix(in srgb, var(--heal) 9%, var(--panel)); --road: var(--raised);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --tr-1: #e05a50; --tr-2: #c4940a; --tr-3: #1fa877; --tr-4: #da74ae; --tr-5: #4f8fe8;
+      --ground: color-mix(in srgb, var(--heal) 7%, var(--sunken)); --road: var(--raised); }
+  }
+  .t1c { fill: var(--tr-1); background: var(--tr-1); } .t2c { fill: var(--tr-2); background: var(--tr-2); }
+  .t3c { fill: var(--tr-3); background: var(--tr-3); } .t4c { fill: var(--tr-4); background: var(--tr-4); }
+  .t5c { fill: var(--tr-5); background: var(--tr-5); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .lede { margin: -4px 0 12px; }
+  .kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+  .kv dt { color: var(--ink-soft); } .kv dd { margin: 0; color: var(--ink); font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.num, th.num { text-align: right; }
+  .note { font-size: 12px; color: var(--ink-faint); margin: 6px 0 0; }
+  .yardrow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+  .yardrow:last-child { border-bottom: 0; }
+  .yardrow .name { font-weight: 700; color: var(--ink); font-size: 13px; }
+  .yardrow .sub { font-size: 12px; color: var(--ink-soft); }
+  .yardrow .amt { margin-left: auto; text-align: right; font-weight: 700; font-size: 13px; color: var(--ink);
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .yardrow .amt small { display: block; font-weight: 500; color: var(--ink-faint); font-size: 11px; }
+  .arrow { text-align: center; color: var(--ink-soft); font-size: 13px; margin: -4px 0 8px; }
+  .arrow b { color: var(--ink); }
+  svg text { font-family: system-ui, -apple-system, 'Inter', sans-serif; }
+  .svg-ink { fill: var(--ink); } .svg-soft { fill: var(--ink-soft); } .svg-faint { fill: var(--ink-faint); }
+  .svg-panel { fill: var(--panel); stroke: var(--hairline-strong); }
+  .svg-ground { fill: var(--ground); } .svg-road { fill: var(--road); stroke: var(--hairline); }
+  .svg-roof { fill: var(--ink); opacity: .55; }
+  .ring-t2 { stroke: var(--t2); stroke-width: 2.5; } .ring-t3 { stroke: var(--t3); stroke-width: 2.5; }
+  .pip-free { fill: var(--ink); opacity: .35; }
+  .pip-more { fill: var(--sunken); stroke: var(--hairline-strong); }
+  .slots { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+  .bar { height: 14px; border-radius: 4px; }
+  .barrow { display: grid; grid-template-columns: 112px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; padding: 3px 0; }
+  .barrow .lbl { color: var(--ink); font-weight: 600; }
+  .barrow .val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stack { display: flex; gap: 2px; height: 18px; }
+  .stack span { display: block; height: 100%; }
+  .stack span:first-child { border-radius: 4px 0 0 4px; } .stack span:last-child { border-radius: 0 4px 4px 0; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 8px; }
+  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Demand against supply</h1>
+<p class="lede">What one Uma, a party and a roster need from the ten yards, against what a hut makes. From <b>professions.md §5.5 and §11</b>. The counts are gear.md’s and extra-stats.md’s drafts: when they move, the sizes move and the balance holds.</p>
+<nav class="tabs"><a href="#uma">One Uma</a><a href="#trades">Trades</a><a href="#parties">Parties</a><a href="#supply">A hut</a><a href="#rosters">Rosters</a><a href="#craft">Craft Level</a></nav>
+<h2 id="uma">One Uma, maxed</h2>
+<div class="card scroll"><table><thead><tr><th>Tier 1 need</th><th class="num">Pieces</th><th>At</th><th class="num">Refined</th></tr></thead><tbody><tr><td>3 weapons: a Weapon Gem a step, 0 → 10</td><td class="num">30</td><td>Forge</td><td class="num">120<br><span class="muted">4 each</span></td></tr><tr><td>5 armor slots: Armor Fittings, grades 1–10</td><td class="num">50</td><td>Armorer</td><td class="num">125<br><span class="muted">2 low, 3 high</span></td></tr><tr><td>1 accessory slot: a Setting a grade</td><td class="num">10</td><td>Charm Shop</td><td class="num">120<br><span class="muted">12 each</span></td></tr><tr><td>Jewels: Planet I–V, Moon I–V on four moons</td><td class="num">25</td><td>Lapidary</td><td class="num">120<br><span class="muted">8 and 4</span></td></tr><tr><td>Process every raw item</td><td class="num">—</td><td>Workbench</td><td class="num">485</td></tr><tr><th>Total</th><th class="num">115</th><th></th><th class="num">485</th></tr></tbody></table><p class="note">Every class needs the same items: a Weapon Gem raises any weapon, a fitting any slot of either half, a setting any type.</p></div>
+<div class="card scroll"><table><thead><tr><th>Tier</th><th class="num">Base pair</th><th class="num">Tier pairs</th><th class="num">Refined</th><th class="num">Hours, Lv 25</th><th class="num">Hut hours ×1.25</th></tr></thead><tbody><tr><td><span class="tier t1">1</span></td><td class="num">485</td><td class="num">—</td><td class="num">485</td><td class="num">822</td><td class="num">657</td></tr><tr><td><span class="tier t2">2</span></td><td class="num">485</td><td class="num">25</td><td class="num">510</td><td class="num">864</td><td class="num">691</td></tr><tr><td><span class="tier t3">3</span></td><td class="num">485</td><td class="num">25</td><td class="num">510</td><td class="num">864</td><td class="num">691</td></tr><tr><td class="muted">Today, Tier 1</td><td class="num muted">472</td><td class="num muted">—</td><td class="num muted">472</td><td class="num muted">776</td><td class="num muted">621</td></tr><tr><td class="muted">Today, Tier 2</td><td class="num muted">472</td><td class="num muted">38 Lore raw</td><td class="num muted">—</td><td class="num muted">838</td><td class="num muted">670</td></tr></tbody></table><p class="note">Hours: a gather 45 min at Craft Lv 25, a process 11, a make one gather per refined item in it. Tier pairs: 5 new pieces (3 fork gems, 2 Halo Jewels) × one of each pair; the budget is 48, a tenth more.</p></div>
+<h2 id="trades">What each trade carries, per Uma</h2>
+<div class="card"><p style="margin:0 0 6px">Share of one Uma’s 822 hours. A fifth is 20%; the scale ends at 25%.</p><div class="barrow" title="Physical: 169 h, 20.6%"><div class="lbl">Physical<br><span class="muted" style="font-weight:500">Mine · Forge</span></div><div><div class="bar t1c" style="width:82.4%"></div></div><div class="val">20.6%</div></div><div class="barrow" title="Physical hybrid: 166 h, 20.2%"><div class="lbl">Physical hybrid<br><span class="muted" style="font-weight:500">Lumber · Armorer</span></div><div><div class="bar t2c" style="width:80.8%"></div></div><div class="val">20.2%</div></div><div class="barrow" title="Healer: 163 h, 19.8%"><div class="lbl">Healer<br><span class="muted" style="font-weight:500">Fields · Workbench</span></div><div><div class="bar t3c" style="width:79.2%"></div></div><div class="val">19.8%</div></div><div class="barrow" title="Magical hybrid: 162 h, 19.7%"><div class="lbl">Magical hybrid<br><span class="muted" style="font-weight:500">Fishery · Charm Shop</span></div><div><div class="bar t4c" style="width:78.8%"></div></div><div class="val">19.7%</div></div><div class="barrow" title="Magical: 162 h, 19.7%"><div class="lbl">Magical<br><span class="muted" style="font-weight:500">Hunting · Lapidary</span></div><div><div class="bar t5c" style="width:78.8%"></div></div><div class="val">19.7%</div></div></div>
+<div class="card scroll"><table><thead><tr><th>Trade</th><th class="num">Gathers</th><th class="num">Makes</th><th class="num">Hours</th><th class="num">Share</th></tr></thead><tbody><tr><td style="border-left:4px solid var(--tr-1)">Physical<br><span class="muted">Mine · Forge</span></td><td class="num">105</td><td class="num">120</td><td class="num">169</td><td class="num">20.6%</td></tr><tr><td style="border-left:4px solid var(--tr-2)">Physical hybrid<br><span class="muted">Lumber · Armorer</span></td><td class="num">95</td><td class="num">125</td><td class="num">166</td><td class="num">20.2%</td></tr><tr><td style="border-left:4px solid var(--tr-3)">Healer<br><span class="muted">Fields · Workbench</span></td><td class="num">95</td><td class="num">485*</td><td class="num">163</td><td class="num">19.8%</td></tr><tr><td style="border-left:4px solid var(--tr-4)">Magical hybrid<br><span class="muted">Fishery · Charm Shop</span></td><td class="num">95</td><td class="num">120</td><td class="num">162</td><td class="num">19.7%</td></tr><tr><td style="border-left:4px solid var(--tr-5)">Magical<br><span class="muted">Hunting · Lapidary</span></td><td class="num">95</td><td class="num">120</td><td class="num">162</td><td class="num">19.7%</td></tr></tbody></table><p class="note">Each making yard uses about a quarter of the refined items, the Workbench processes all of them at a quarter of the time, and each gathering yard gives about a fifth. So every trade is about a fifth of the work. *The Workbench’s 485 are refines, a quarter of a gather each.</p></div>
+<h2 id="parties">Raw items by yard, Tier 1</h2>
+<div class="card"><p style="margin:0">One bar per group, split by gathering yard. The Mine gives a little more (ingots go into weapons, heavy armor and moon jewels); the rest give the same.</p><div class="legend-row"><span><i class="dot t1c"></i>Mine (Mining)</span><span><i class="dot t2c"></i>Lumber (Wood Chopping)</span><span><i class="dot t3c"></i>Fields (Farming)</span><span><i class="dot t4c"></i>Fishery (Fishing)</span><span><i class="dot t5c"></i>Hunting (Gem Hunting)</span></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">Any Uma, any class <span class="muted" style="font-weight:500">· 485</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 105 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 95 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 95 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 95 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 95 (20%)"></span></div></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">A party of five <span class="muted" style="font-weight:500">· 2,425</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 525 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 475 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 475 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 475 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 475 (20%)"></span></div></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">A Rift run’s twenty <span class="muted" style="font-weight:500">· 9,700</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 2100 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 1900 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 1900 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 1900 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 1900 (20%)"></span></div></div></div>
+<div class="card scroll"><table><thead><tr><th>Who</th><th class="num">Mine</th><th class="num">Lumber</th><th class="num">Fields</th><th class="num">Fishery</th><th class="num">Hunting</th></tr></thead><tbody><tr><td>Any Uma, any class</td><td class="num">105</td><td class="num">95</td><td class="num">95</td><td class="num">95</td><td class="num">95</td></tr><tr><td>A party of five</td><td class="num">525</td><td class="num">475</td><td class="num">475</td><td class="num">475</td><td class="num">475</td></tr><tr><td>A Rift run’s twenty</td><td class="num">2,100</td><td class="num">1,900</td><td class="num">1,900</td><td class="num">1,900</td><td class="num">1,900</td></tr></tbody></table><p class="note">Today any Uma can gather any family. Here a yard is its trade’s alone, so the demand on each must be even: it is, for every class and party.</p></div>
+<h2 id="supply">What one Uma makes in one hut</h2>
+<div class="card scroll"><table><thead><tr><th>Craft Lv</th><th class="num">Gathers a day</th><th class="num">Processes a day</th><th class="num">Weapon Gem or Moon Jewel</th><th class="num">A fitting</th><th class="num">A setting</th><th class="num">A Planet Jewel</th></tr></thead><tbody><tr><td>1</td><td class="num">33</td><td class="num">133</td><td class="num">2.9 h</td><td class="num">1.4 / 2.2 h</td><td class="num">8.6 h</td><td class="num">5.8 h</td></tr><tr><td>25</td><td class="num">40</td><td class="num">159</td><td class="num">2.4 h</td><td class="num">1.2 / 1.8 h</td><td class="num">7.2 h</td><td class="num">4.8 h</td></tr><tr><td>50</td><td class="num">50</td><td class="num">200</td><td class="num">1.9 h</td><td class="num">1.0 / 1.4 h</td><td class="num">5.8 h</td><td class="num">3.8 h</td></tr></tbody></table><p class="note">Every hut works at today’s level-3 speed, ×1.25. A fitting is 2 refined at grades 1–5 and 3 at 6–10. A job is 1–10 pieces (processing ×1 to ×40), so one setting runs overnight.</p></div>
+<h2 id="rosters">Rosters at the owner’s pace</h2>
+<div class="card scroll"><table><thead><tr><th></th><th class="num"><span class="tier t1">Tier 1</span></th><th class="num"><span class="tier t2">Tier 2</span></th><th class="num"><span class="tier t3">Tier 3</span></th></tr></thead><tbody><tr><td>Workers</td><td class="num">40 (8 a trade)</td><td class="num">20, one run</td><td class="num">20</td></tr><tr><td>Huts</td><td class="num">40</td><td class="num">60</td><td class="num">80</td></tr><tr><td>One Uma maxed, hut hours</td><td class="num">657</td><td class="num">691</td><td class="num">691</td></tr><tr><td>Maxed Umas a day</td><td class="num">1.3</td><td class="num">0.7</td><td class="num">0.7</td></tr><tr><td>A party’s next grade</td><td class="num">9 h</td><td class="num">17 h</td><td class="num">17 h</td></tr><tr><td>A party maxed</td><td class="num">about 4 days</td><td class="num">7.2 days</td><td class="num">7.2 days</td></tr><tr><td>A run of twenty maxed</td><td class="num">about 16 days</td><td class="num">28.8 days</td><td class="num">28.8 days</td></tr><tr><td class="muted">Today, same workers</td><td class="num muted">12.9 days</td><td class="num muted">about 28</td><td class="num muted">—</td></tr></tbody></table><p class="note">Tier 1: 40 workers fill the 40 huts; each trade’s four making huts set the pace, the Armorer’s most. Tiers 2 and 3: the run’s twenty are the limit, not the huts.</p></div>
+<div class="card"><dl class="kv"><dt>The fighting party</dt><dd>waits on Craft Level, not on volume: its next grade is 9 roster hours away</dd><dt>A short trade</dt><dd>buys raw items at the Exchange (low 30, high 80 Laurels); from Tier 2, secondaries help</dd><dt>Against today</dt><dd>40 huts do about 18% less than 40 workers in today’s 55 slots, only when the whole roster gears at once</dd></dl></div>
+<h2 id="craft">When grades open</h2>
+<div class="card scroll"><table><thead><tr><th>Opens</th><th class="num">Craft Lv</th><th class="num">Day, nonstop</th><th class="num">Today</th></tr></thead><tbody><tr><td>Grade 2</td><td class="num">6</td><td class="num">2.0</td><td class="num">2.6</td></tr><tr><td>Grade 6, the high types</td><td class="num">26</td><td class="num">11.2</td><td class="num">13.5</td></tr><tr><td>Grade 10</td><td class="num">46</td><td class="num">22.1</td><td class="num">24.3</td></tr><tr><td>Lv 50</td><td class="num">50</td><td class="num">24.5</td><td class="num">26.7</td></tr></tbody></table><p class="note">Craft Level’s curve, 2 EXP a minute and the gate 5g − 4 are today’s. Huts work ×1.25 from day 1; today’s facilities reach level 3 about day 11. The 6% more work per Uma takes some of the two days back.</p></div>
+</main>
+</body>
+</html>
