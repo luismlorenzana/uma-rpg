@@ -65,10 +65,10 @@ one switch and turned on by H61; the build decisions are logged by H53):
 |---|---|---|---|---|---|
 | H53 | Engine v15 foundation: the Paladin as a class id, the one switch, class rules by generation, v15 accepted dark; v14 replays pinned | Claude | M | — | Done (`20343a4`) |
 | H54 | **Art:** the Paladin's class emblem in uma-art 2.12.0; the Bastion reuses the `knights-bastion` keep | Claude | S | — | Done (uma-platform `8c5c359`, uma-art 2.12.0) |
-| [H55](tasks/H55-engine-v15-hands.md) | Engine v15: the hybrids' hands, the Spell Blade's extra Arms hit and the Summoner's mirrored pair and farewell (dark) | Claude | M | H53 | Ready |
-| [H56](tasks/H56-engine-v15-healers-halls.md) | Engine v15: the healers (ATK or M.ATK scaling, doubled shares, 60% cap, Regen, the Paladin's kit) and the six halls' 24 Limit Breaks, C3 (dark) | Claude | L | H53 | Ready |
-| [H57](tasks/H57-accessories-v2.md) | Accessories v2: flat Orbs, typed Damage and Support slots, retuned supports, six presets (dark) | Either | M | H53 | Ready |
-| [H58](tasks/H58-save-v25-paladin.md) | Save v25 (dark): the Paladin's migration, one healer a party, the Paladin's start | Claude | M | H53 | Ready |
+| [H55](tasks/H55-engine-v15-hands.md) | Engine v15: the hybrids' hands, the Spell Blade's extra Arms hit and the Summoner's mirrored pair and farewell (dark) | Claude | M | H53 | In progress (this session) |
+| [H56](tasks/H56-engine-v15-healers-halls.md) | Engine v15: the healers (ATK or M.ATK scaling, doubled shares, 60% cap, Regen, the Paladin's kit) and the six halls' 24 Limit Breaks, C3 (dark) | Claude | L | H53 | In progress (this session) |
+| [H57](tasks/H57-accessories-v2.md) | Accessories v2: flat Orbs, typed Damage and Support slots, retuned supports, six presets (dark) | Either | M | H53 | In progress (this session) |
+| [H58](tasks/H58-save-v25-paladin.md) | Save v25 (dark): the Paladin's migration, one healer a party, the Paladin's start | Claude | M | H53 | In progress (this session) |
 | [H59](tasks/H59-classes-v2-screens.md) | The classes v2 screens, inert until the switch: the Paladin, the Bastion, typed slots, the Summoner's pair, one healer (pins uma-art 2.12.0) | Either | L | H54, H55, H56, H57, H58 | Waiting |
 | [H60](tasks/H60-classes-v2-balance.md) | Classes v2 balance: §9's targets, the campaign, the Rift re-measured with v2 parties (Iron's wrong party), v15 knobs first (dark) | Claude | L | H55, H56, H57 | Waiting |
 | [H61](tasks/H61-classes-v2-switch.md) | The switch: engine v15, save v25 and the Paladin go live; the manual rewritten | Claude | M | H59, H60 | Waiting |
