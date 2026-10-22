@@ -18,9 +18,9 @@
 |---|---|---|---|---|---|
 | H32 | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Done (`b535754`) |
 | H33 | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Done (`9823201`) |
-| [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
+| [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | In progress (this session) |
 | H35 | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Done (`061cdac`) |
-| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Ready |
+| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | In progress (this session) |
 | H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
 | H38 | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Done (uma-platform `e3da022`, uma-art 2.11.0) |
 
