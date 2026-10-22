@@ -52,7 +52,8 @@ deployed build before this one can put a Paladin in a fight or show one; this on
   projection) are small and document the old game. No cleanup packet.
 - **The migration runs as `toV25` was tested.** An open world-map or Rift fight at migration replays and settles on v14
   (a one-half Summoner, a Cleric's Heal); the next fight is v15. A party left with two Clerics shows "One healer a party"
-  until one of them changes class.
+  until one of them changes to a damage class (a Paladin is a healer too, D178; H59 found the packet's earlier wording
+  wrong).
 - **The manual says what the game now plays,** in the manual's short style, with the live blocks regenerated. Engine
   v14's behaviour stays only where an old fight still uses it ("Fights from v6–v14 replay with …", as the `limits` block
   does for v6–v9).
@@ -117,3 +118,12 @@ deployed build before this one can put a Paladin in a fight or show one; this on
 - **Flag it done:** after the merge, a `docs(handoff): H61 done, classes v2 is live (D…)` commit deletes this file, sets
   H61 to Done with a Done row, and replaces the "Classes v2 build" status with one line, as "The Rift is built and live"
   does.
+
+## Notes from H59 (main session, 2026-10-22)
+
+- Two existing tests pin the live game and must be updated in the switch commit: `hub/places.test.ts` (23 places,
+  `[4, 6, 2, 11]`, the Rift as the only `frame`) and `battle/pixel-icons.test.tsx` (five emblems). Every H59 test passes
+  with the switch on.
+- H59's Done row in `docs/handoff/README.md` lists the screens whose words go into `sections.md`.
+- The Rift's guidance shows the five-class parties until H60's generation-aware `RIFT_FRONT_SPECS` lands; with it, the
+  page names the Paladin with no further work. Check it after the flip.
