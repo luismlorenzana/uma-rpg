@@ -24,8 +24,11 @@ No rule writes a save here (H48), and nothing shows on screen (H50). The numbers
   `WORLD_TUNING.bossHp` 0.5 for a region boss) and offense by `formationOffense(share)`; ids run `foe1`, `foe2` … across
   every wave; `ELITE_ASSISTANTS` (183), `TWIN_BOSS_HP` 0.55 (185), `WORLD_FORMATIONS` (86–93), `WORLD_ESCORT` (99).
 - **`rpg/campaign/enemies.ts`:** `rpgFoe(input)` (99–124): roles, ranks (`sub-boss` ×3.5 and `boss` ×5.5 HP, times
-  `reach`), the build budget, `RPG_FOE_TUNING.subBossShield` 6 and `bossShield` 8. H45 makes the budget read the tier
-  level; in Tier 1 nothing changes, so this packet doesn't depend on it.
+  `reach`), the build budget, `RPG_FOE_TUNING.subBossShield` 6 and `bossShield` 8. **H45 landed (`16f9cb2`, D170):**
+  `rpgFoe` now reads `rpgFoeTierBudget(lifetime, rate)` and the hit share at `rpgFoeCurveLevel(lifetime)` (the tier
+  level, 1–50) itself, so just pass the lifetime level. Never pass a lifetime past a tier's top: Tier 1 lifetime 55
+  wraps to tier Lv 5 (hence `echo55` below). `stageWaves` uses `rpgFoeCurveLevel` for the regular-foe HP step and
+  acting twice; use the same helper.
 - **`rpg/campaign/chapters.ts`:** `rpgTierLevel` (65), `rpgChapterReach` (119).
 - **`world/roster.ts`:** `Franchise`, `EnemyTier` (`regular | key | subboss | boss`), `RosterMember`, `EnemyRoster`,
   `stageFaces` (50–75: sorted by id, hashed by slot, never repeating within a stage, borrowing when a tier is empty).
@@ -100,7 +103,7 @@ export const RIFT_FRANCHISE_WEIGHTS: Readonly<Record<Franchise, number>>        
   1.10 at the champion, `climb` 0.1); a Convergence fight `(1 + climb) × (1 + convergence)` = 1.21; Echoes 1, and
   `echo55` at Lv 55.
 - Non-regular ranks take `reach: rpgChapterReach(lifetime)` as the world's do. A regular-rank slot's HP also takes the
-  regular-foe HP step at the tier level, `1 + WORLD_TUNING.regularHpPerLevel × (ℓ − 1)` (ℓ from `rpgTierLevel`), as
+  regular-foe HP step at the tier level, `1 + WORLD_TUNING.regularHpPerLevel × (ℓ − 1)` (ℓ from `rpgFoeCurveLevel`), as
   `stageWaves` does after H45.
 
 **Shapes**, per rift.md §5's table. A slot is `{ face: 'boss' | 'subboss' | 'key'; rank; role; hp; offense; shield;
