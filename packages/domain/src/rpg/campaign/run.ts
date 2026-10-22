@@ -51,6 +51,23 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
+/** The party as the engine takes it (D104, D124, D106): each member's boosted stats, Might, accessory effects and Hero
+ * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). */
+export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number): BattleInput['allies'] {
+  return party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
+    const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
+    const a = accessories ?? noAccessoryEffects()
+    // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
+    const effects = accessoryFightFields(a, boosted.stats.hp)
+    return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
+      tree: profile.tree, legacy: profile.legacy, loadout, ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
+      classRank: profile.classRank,
+      ...(might && Object.keys(might).length ? { might } : {}), ...effects,
+      ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
+      ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }
+  })
+}
+
 /** Freezes the party (with its carried MP) and the node's foes, every wave, into a new fight (engine v11: two accessories
  * and their effects, D124; v10 Limit Breaks only from the Halls of Heroes, D112; v9 Heroes and Learners, D106; v8 Class Ranks, Might, Barrier and Regen, D102–D104; up to eight foes a wave since v7, W3). */
 export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, nodeId: string,
@@ -63,18 +80,7 @@ export function rpgBeginRunBattle(chapter: RpgCampaignChapter, run: RpgRun, node
   const battleId = battleIdOf(run)
   const input: BattleInput = {
     version: BATTLE_ENGINE_VERSION, seed: seedOf(battleId),
-    allies: party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
-      const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
-      const a = accessories ?? noAccessoryEffects()
-      // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
-      const effects = accessoryFightFields(a, boosted.stats.hp)
-      return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
-        tree: profile.tree, legacy: profile.legacy, loadout, ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: rpgCarriedMp(run, profile, points),
-        classRank: profile.classRank,
-        ...(might && Object.keys(might).length ? { might } : {}), ...effects,
-        ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
-        ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }
-    }),
+    allies: rpgPartyAllies(party, (profile, points) => rpgCarriedMp(run, profile, points)),
     enemies: node.enemies,
     ...(node.waves?.length ? { waves: node.waves } : {}),
   }
@@ -88,7 +94,7 @@ export function rpgRunBattleStep(run: RpgRun): BattleStep | null {
 }
 
 /** What the player reads when the engine refuses an action. */
-const REFUSED: Readonly<Record<NonNullable<BattleStep['error']>, string>> = {
+export const RPG_REFUSED: Readonly<Record<NonNullable<BattleStep['error']>, string>> = {
   terminal: 'The fight is over', 'invalid-actor': 'She can’t act now', 'already-acted': 'She has already acted this round',
   'invalid-target': 'Pick another target', 'invalid-skill': 'She can’t use that now', 'insufficient-mp': 'Not enough MP',
   'invalid-state': 'That didn’t work', 'limit-not-ready': 'Her Limit Break isn’t ready',
@@ -102,7 +108,7 @@ export function rpgActInRun(run: RpgRun, action: BattleAction, now: string): { r
   if (current.state.outcome !== 'active') throw new Error('The fight is over')
   if (battle.actions.length >= RPG_MAX_BATTLE_ACTIONS) throw new Error('Too many actions')
   const step = applyBattleAction(current.state, action)
-  if (step.error) throw new Error(REFUSED[step.error])
+  if (step.error) throw new Error(RPG_REFUSED[step.error])
   return { run: { ...run, battle: { ...battle, actions: [...battle.actions, action] }, updatedAt: now }, step }
 }
 

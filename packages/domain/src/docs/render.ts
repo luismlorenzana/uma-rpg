@@ -25,7 +25,7 @@ import {
   LEARNER_MAX_PARENTS,
 } from '../rpg/heroes'
 import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
-import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
+import { rpgBattleExp, RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeTierBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
@@ -36,7 +36,8 @@ import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
 import { RIFT_FRONT_SPECS, riftShape, RIFT_TUNING, type RiftSlot } from '../rift/fronts'
 import { riftStrength } from '../rift/generate'
 import { RIFT_RUN_FIGHTS, riftShapeOf } from '../rift/picker'
-import { RIFT_FRONTS } from '../rift/state'
+import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER, RIFT_STAGES, RIFT_TIERS } from '../rift/state'
+import { ASCEND_PURSE, BANKED_EXP_PER_MARK, BANKED_MARKS_CAP, ECHO_RANK_PAY, echoFoeLevel } from '../save/rift'
 import { classPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
@@ -536,6 +537,21 @@ function riftFronts(): string {
     `and ${slots.filter((s) => s.face === 'key').length} key face slots.`
 }
 
+/** The Rift's run rules (H48, D174): opening, the roster, fronts, the Convergence, Echo pay and the Ascension purse. */
+function riftRules(): string {
+  const n = (v: number) => v.toLocaleString('en-US')
+  const echoE = (level: (typeof ECHO_LEVELS)[number]) => rpgBattleExp('fight', echoFoeLevel(1, level), RPG_TIER_MAX_LEVEL)
+  return table(['Rule', 'Value'], [
+    ['The Rift opens', `${RIFT_OPEN_AT} Lv ${RPG_TIER_MAX_LEVEL} Umas in the tier's world (Tiers ${RIFT_TIERS.join(' and ')})`],
+    ['A run', `${RIFT_ROSTER} Lv ${RPG_TIER_MAX_LEVEL} Umas; ${RIFT_FRONTS.length} fronts of ${RIFT_STAGES} stages, then the Convergence's ${CONVERGENCE_FIGHTS} fights`],
+    ['Echoes', `Each front at Lv ${ECHO_LEVELS.join(', ')}`],
+    ['Echo pay', `×${ECHO_RANK_PAY} a stage's Class, Weapon, Armor and Accessory Rank EXP; no Uma EXP, Laurels, Shards or Bonds`],
+    ['Class EXP an Echo win, Lv 50 Uma', ECHO_LEVELS.map((l) => `Lv ${l}: ${n(ECHO_RANK_PAY * CLASS_EXP_SHARE * echoE(l))}`).join(' · ')],
+    ['Ascension purse, per Uma', `${n(ASCEND_PURSE.laurels)} Laurels and ${ASCEND_PURSE.speedTickets} Speed Tickets (${n(ASCEND_PURSE.laurels * RIFT_ROSTER)} and ${ASCEND_PURSE.speedTickets * RIFT_ROSTER} a run)`],
+    ['Banked EXP on Ascend, per Uma', `1 Class Mark per ${BANKED_EXP_PER_MARK} EXP, ${n(BANKED_MARKS_CAP)} at most`],
+  ])
+}
+
 // --- Tiers ----------------------------------------------------------------------------------------------------------
 
 function tiers(): string {
@@ -565,7 +581,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
     classes, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts,
+    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules,
     dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ${RPG_SIDE_POINTS_PER_LEVEL} side point per Class Rank, per class.`,
   }

@@ -1,6 +1,7 @@
-// `@rpg/domain/rift` (D173): the Rift's generator and its achievement hook, a lazy subpath the main bundle never loads.
-// The save shape and small constants stay in the main index (`rift/state.ts`); the run rules (H48) join this barrel.
+// `@rpg/domain/rift` (D173): the Rift's generator, its achievement hook and its run rules (H48), a lazy subpath the main
+// bundle never loads. The save shape, small constants and selectors stay in the main index (`rift/state.ts`).
 export * from './achievements'
 export * from './fronts'
 export * from './generate'
 export * from './picker'
+export * from '../save/rift'

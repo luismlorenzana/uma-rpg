@@ -1,7 +1,8 @@
-// The Rift's save shape, constants and achievement ids (D161; save v23, D163; save v24, D171). Its generator and run
-// rules come with the Rift (docs/design/rift.md §10); until then nothing writes a run. In the main bundle: types and
-// small constants only.
+// The Rift's save shape, constants, achievement ids and three selectors (D161; save v23, D163; save v24, D171; H48). Its
+// generator (H47) and run rules (H48, `save/rift.ts`) live behind the lazy `@rpg/domain/rift`. In the main bundle: types,
+// small constants and the selectors the Hub, the Tier sheet and the quick look read.
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
+import { RPG_TIER_MAX_LEVEL } from '../rpg/rules'
 
 /** The four fronts (rift.md §5). */
 export const RIFT_FRONTS = ['iron', 'arcane', 'duel', 'horde'] as const
@@ -60,6 +61,22 @@ export interface RiftState {
 }
 
 export const newRiftState = (): RiftState => ({ runs: [], echoes: {}, battle: null, battles: 0 })
+
+/** The Lv 50 Umas a world needs for its Rift to open (rift.md §4): its fronts, Echoes and sign-up. */
+export const RIFT_OPEN_AT = 5
+/** Her world's Umas at the tier's top level, Lv 50. */
+export function riftLevel50s(world: { umas: Readonly<Record<string, { level: number }>> }): number {
+  return Object.values(world.umas).filter((u) => u.level >= RPG_TIER_MAX_LEVEL).length
+}
+/** Whether this tier's Rift is open: a tier that runs one (`RIFT_TIERS`) and five Lv 50 Umas in its world. */
+export function riftOpen(world: { umas: Readonly<Record<string, { level: number }>> }, tier: number): boolean {
+  return (RIFT_TIERS as readonly number[]).includes(tier) && riftLevel50s(world) >= RIFT_OPEN_AT
+}
+/** The world's current run: its last, until it ascends (won or not), else null. */
+export function openRiftRun(rift: Pick<RiftState, 'runs'>): RiftRun | null {
+  const last = rift.runs.at(-1)
+  return last && last.ascendedAt === null ? last : null
+}
 export const riftRunId = (tier: number, n: number): string => `t${tier}-r${n}`
 /** `rift:t<tier>:<n>`, n counting this world's Rift fights from 1. */
 export const riftBattleId = (tier: number, n: number): string => `rift:t${tier}:${n}`

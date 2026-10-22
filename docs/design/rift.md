@@ -81,6 +81,10 @@ A **run** needs **twenty Lv 50 Umas**.
 - A retry draws a fresh seed with the same foes and weaknesses.
 - HP and MP are full at the start of each front fight (R4).
 
+**Built in H48 (D174):** the run rules in `save/rift.ts` (`@rpg/domain/rift`): opening, sign-up and an untouched run's
+cancel, the roster lock, one open Rift fight a world beside the world map's, fronts and seals, the Convergence's
+attempts, and Ascend ([tiers](tiers.md) §5). The manual's [Rift](../game/loops.md#the-rift) has the rules as played.
+
 ## 5. The four fronts
 
 | Front | Foes | Weak to | Ward | Asks for | Today's party |
@@ -177,6 +181,9 @@ where she catches up, outside the promotion fights. They're also the "Lv 50 cont
 
 **R6, Echo availability:** recommendation: **all four, always.** The alternative is one front a day, rotating, which
 adds pull but blocks a re-spec until the right day.
+
+**Built in H48 (D174):** Echo pay is a regular stage's EXP at the Echo's level for her, times two on her Class, Weapon,
+Armor and Accessory bars; Sweeps of a won Echo pay as wins, weapons even.
 
 **The save** (in v23, [tiers](tiers.md) §4), on each tier world:
 ```

@@ -7,6 +7,8 @@
 > - **Owner calls** are marked **T1**, **T2** and so on, each with a recommendation. Nothing here is built until the
 >   owner decides. [§9](#9-owner-calls) lists every call.
 > - §8 item 1 built in H35 (D165) and H36 (D167): the Tier shifter on the crest, with the T2 looks.
+> - §5 built in H48 (D174): Ascend in `save/rift.ts`, T3 and T5 as recommended; under T4 a Hero's emptied seat sends its
+>   Learners away, as emptying a seat does today.
 
 ## 1. What the owner asked for
 

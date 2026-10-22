@@ -284,8 +284,61 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 - **Sweeps:** a cleared regular stage (1–10), paid like a replay, for one Sweep Ticket, 1–99 at a time. Each needs the
   active party full, and no open fight. MP isn't touched.
 - **Working and fighting (D119)** never block each other: an Uma at a job fights, and one in the open fight takes jobs.
-- **One open fight** in the whole world. While it's open, its Umas can't change parties, and the active
-  party, Springs and Sweeps are locked. The fight is stored as its input plus every action ([combat](combat.md)).
+- **One open fight** on the whole world map. While it's open, its Umas can't change parties, and the active
+  party, Springs and Sweeps are locked. The fight is stored as its input plus every action ([combat](combat.md)). The
+  Rift has its own open fight ([below](#the-rift)).
+
+## The Rift
+
+The end-of-tier event ([the Rift](../design/rift.md), D161, D168; its run rules and Ascend in H48, D174). Its foes are
+in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rpg/domain/rift`.
+- **Opening:** a world's Rift opens once it has five Lv 50 Umas, in Tiers 1 and 2 (Tier 3's waits for its fifth
+  scenario). Echoes and sign-up need it open.
+- **Sign-up and the roster:** twenty different Lv 50 Umas of this world sign up as a run's roster. A world runs one
+  Rift at a time, until its run ascends. An untouched run (no stage cleared, no Convergence attempt, no Rift fight open)
+  can be cancelled.
+- **The roster lock:** front and Convergence fights take only the twenty. Between fights, arrange them into any of the
+  world's parties, and change their classes, skills and gear freely.
+- **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
+  in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
+  world's twenty parties, full, all five on the roster. Its 12th stage seals the front.
+- **Retries:** free and unlimited. Every Rift fight starts with HP and MP full (the world map's carried MP stays
+  there), and a retry draws a fresh seed against the same foes.
+- **One open Rift fight** a world, beside the world map's; neither blocks the other. Leaving it pays nothing.
+- **The Convergence:** with every front sealed, assign four different full parties, Iron's, Arcane's, Duel's and
+  Horde's, that are exactly the twenty. The attempt freezes them and counts. Its four fights go in order; a loss, or
+  leaving a fight, ends the attempt, and the next one starts from the first fight. An attempt can also be ended between
+  fights. The fourth win wins the run.
+- **What they pay:** front and Convergence fights pay [achievements](#achievements) only: no EXP, Laurels, Marks or
+  Bonds. Every won Rift fight records the boss and sub-boss faces it defeated, with the time of the first defeat.
+- **Echoes:** each front at Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without
+  a run. A win fills each Uma's [rank bars](#ranks) at twice a stage's rule, E being a regular stage's EXP at the Echo's
+  level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past a max rank it
+  banks as Marks. No Uma EXP, Laurels, Shards or Bonds.
+- **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win,
+  her five weapons sharing evenly. They record no faces and earn no achievements.
+- **Ascend:** once the run is won, its twenty move up a tier together, in one step: no Rift or world-map fight open,
+  and none of them at work ("Recall or collect").
+  - **They leave** the old world's Stable, parties, targets, carried MP, Hall seats and work. A Hero's seat empties and
+    its Learners leave it. Every piece of gear they owned goes back to the old world's stock; Star Gems set on their
+    maps are gone.
+  - **They arrive** at Lv 1 with Class Rank 1 everywhere, no skills, Training gear, an empty Extra Stats map, Craft Lv 1
+    and no Bonds. Each keeps her class and her armor halves.
+  - **The new world** gets the purse and their banked EXP as Class Marks (below). A party whose five all ascend moves,
+    with its name, into its first empty party; the rest fill the next empty parties, five at a time.
+  - Each Uma's history records the climb. The tier's next twenty Lv 50 Umas can run its Rift again.
+
+<!-- live:rift-rules -->
+| Rule | Value |
+|---|---|
+| The Rift opens | 5 Lv 50 Umas in the tier's world (Tiers 1 and 2) |
+| A run | 20 Lv 50 Umas; 4 fronts of 12 stages, then the Convergence's 4 fights |
+| Echoes | Each front at Lv 45, 50, 55 |
+| Echo pay | ×2 a stage's Class, Weapon, Armor and Accessory Rank EXP; no Uma EXP, Laurels, Shards or Bonds |
+| Class EXP an Echo win, Lv 50 Uma | Lv 45: 652 · Lv 50: 1,300 · Lv 55: 1,300 |
+| Ascension purse, per Uma | 1,000 Laurels and 5 Speed Tickets (20,000 and 100 a run) |
+| Banked EXP on Ascend, per Uma | 1 Class Mark per 10 EXP, 2,000 at most |
+<!-- /live -->
 
 ## Achievements
 
@@ -299,7 +352,7 @@ world's: each is earned once, in any tier, and the Account lists them with the d
   rule holds and the account lacks, in catalog order. Iron Will, Arcane Purity and Untouched read what the front's won
   fights in the run showed (magic dealt, physical damage dealt, an Uma knocked out); Swift Convergence the attempt's
   four fights; Crossover one party of five different classes winning a champion fight (a front's stage 12 or any
-  Convergence fight). Until the Rift's run rules call it, no fight earns one.
+  Convergence fight). The run rules ask on every won Rift fight, Echoes included; Sweeps earn none.
 - **The cut-in:** each new one plays over the fight's result, one at a time, until Continue.
 
 <!-- live:achievements -->

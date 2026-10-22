@@ -779,8 +779,8 @@ const ACHIEVEMENT_ID_MAX = 48
 const RUN_ID = /^t([1-9]\d{0,11})-r([1-9]\d{0,11})$/
 /** A Rift fight's id, `rift:t<tier>:<n>`: its tier and its place in that world's Rift fights. */
 const RIFT_BATTLE_ID = /^rift:t([1-9]\d{0,11}):([1-9]\d{0,11})$/
-/** Every boss and sub-boss of the three packs (271) fits, with room for more packs. */
-const MAX_DEFEATED = 2000
+/** The account's defeated faces at most: every boss and sub-boss of the three packs (271) fits, with room for more packs. */
+export const MAX_DEFEATED = 2000
 /** A cast id: the engine's id shape (`SAFE_ID` in `rpg/battle/engine.ts`, which the parser doesn't load). */
 const CAST_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 

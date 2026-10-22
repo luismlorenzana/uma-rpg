@@ -272,6 +272,20 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
   return withWorld(save, tier, { ...world, world: { ...world.world, run: { ...world.world.run, mp, updatedAt: now }, springs: { ...world.world.springs, [springId]: now } } }, now)
 }
 
+/** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
+ * her accessories and her Hero seat or inherited Limit Breaks. Working Umas fight too (D119). */
+export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE): RpgPartyMember[] {
+  return ids.map((id) => {
+    const outfit = outfits.get(id)
+    if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
+    const uma = ownedOf(world, id)
+    const classId = activeClass(outfit, uma)
+    return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
+      points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
+      accessories: equippedAccessories(uma.gear.equipped), ...heroFields(world, id) }
+  })
+}
+
 /** Starts a fight on a region's stage with the active party's five members as their active classes. */
 export function startFight(save: Save, region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>,
   now: string, tier = TIER_ONE): Save {
@@ -281,16 +295,7 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
   if (!slots) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
   if (slots.some((s) => s === null) || slots.length !== PARTY_SIZE) throw new SaveRuleError('cannot-fight', 'a fight needs a full party of five')
   if (openFightOf(world)) throw new SaveRuleError('cannot-fight', 'a fight is already open')
-  // Working Umas fight too (D119): a job never keeps her out of a fight.
-  const members: RpgPartyMember[] = (slots as string[]).map((id) => {
-    const outfit = outfits.get(id)
-    if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
-    const uma = ownedOf(world, id)
-    const classId = activeClass(outfit, uma)
-    return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
-      accessories: equippedAccessories(uma.gear.equipped), ...heroFields(world, id) }
-  })
+  const members = partyMembers(world, slots as string[], outfits, tier)
   try {
     return withRun(save, rpgBeginRunBattle(region, { ...worldRun(world), party }, nodeId, members, now), now, tier)
   } catch (err) {
@@ -383,6 +388,41 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   return { save: withWorld(save, tier, next, now), result }
 }
 
+/** Her bars after a win worth `exp` Uma EXP, and the Marks that passed their caps. */
+export interface RankFill { ranks: Ranks; gains: RankGain[]; gearMarks: number; classMarks: number }
+
+/**
+ * Fills her bars for a win worth `exp` Uma EXP (D102, D124), each times `scale` (an Echo pays 2×, R6): 2E to the class she
+ * fought as, 5E over her five weapons (double for each she used), E to each of her five armor kinds and E to the kind of
+ * each accessory she wears. EXP past a max rank banks at half rate as Marks: Class Marks from her class, Gear Marks from
+ * the rest. Her level, EXP and Bonds are the caller's.
+ */
+export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'weapons' | 'used'>, exp: number, scale = 1): RankFill {
+  let ranks: Ranks = uma.ranks
+  let gearMarks = 0, classMarks = 0
+  const gains: RankGain[] = []
+  const fill = (ref: RankRef, stage: number) => {
+    const amount = stage * scale
+    if (amount <= 0) return
+    const before = trackOf(ranks, ref)
+    const r = grantTrack(before, ref.kind, amount)
+    ranks = withTrack(ranks, ref, r.track)
+    const marks = Math.floor(r.overflow * MARKS_SHARE)
+    if (ref.kind === 'class') classMarks += marks
+    else gearMarks += marks
+    gains.push({ ref, exp: amount, before, after: r.track })
+  }
+  fill({ kind: 'class', id: entrant.classId }, CLASS_EXP_SHARE * exp)
+  for (const [w, n] of Object.entries(weaponExpShares(entrant.weapons, entrant.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
+  for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
+  // Each accessory she wears fills its kind's Accessory Rank (D124).
+  for (const slot of ACCESSORY_SLOTS) {
+    const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+    if (piece && isAccessory(piece.type)) fill({ kind: 'accessory', id: accessoryKindOf(piece.type) }, ACCESSORY_EXP_SHARE * exp)
+  }
+  return { ranks, gains, gearMarks, classMarks }
+}
+
 /**
  * Pays a won fight to its entrants (D102). Each earns her Uma EXP `E` (a share of her own level, less when the foes are
  * below her, times `share` on a replay, D79) and with it fills her bars: 2E to the class she fought as, 5E over her five
@@ -401,30 +441,13 @@ export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind
     const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * share))
     const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
     const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
-    let ranks: Ranks = uma.ranks
-    const gains: RankGain[] = []
-    const fill = (ref: RankRef, amount: number) => {
-      if (amount <= 0) return
-      const before = trackOf(ranks, ref)
-      const r = grantTrack(before, ref.kind, amount)
-      ranks = withTrack(ranks, ref, r.track)
-      const marks = Math.floor(r.overflow * MARKS_SHARE)
-      if (ref.kind === 'class') classMarks += marks
-      else gearMarks += marks
-      gains.push({ ref, exp: amount, before, after: r.track })
-    }
-    fill({ kind: 'class', id: e.classId }, CLASS_EXP_SHARE * exp)
-    for (const [w, n] of Object.entries(weaponExpShares(e.weapons, e.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
-    for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
-    // Each accessory she wears fills its kind's Accessory Rank (D124).
-    for (const slot of ACCESSORY_SLOTS) {
-      const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
-      if (piece && isAccessory(piece.type)) fill({ kind: 'accessory', id: accessoryKindOf(piece.type) }, ACCESSORY_EXP_SHARE * exp)
-    }
+    const filled = fillRanks(uma, e, exp)
+    gearMarks += filled.gearMarks
+    classMarks += filled.classMarks
     // Bonds (D106) pay by the stage alone: every won fight counts, replays and Sweeps too.
-    const bonded = payBonds(world, e.outfitId, { ...uma, level: gained.level, exp: gained.exp, ranks }, kind)
+    const bonded = payBonds(world, e.outfitId, { ...uma, level: gained.level, exp: gained.exp, ranks: filled.ranks }, kind)
     umas[e.outfitId] = bonded.uma
-    members.push({ outfitId: e.outfitId, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got, ranks: gains,
+    members.push({ outfitId: e.outfitId, exp, beforeLevel: uma.level, afterLevel: gained.level, afterExp: gained.exp, shards: got, ranks: filled.gains,
       bonds: bonded.gains })
     shards += got
   }

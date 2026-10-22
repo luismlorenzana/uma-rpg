@@ -64,8 +64,8 @@ export function sweepBlock(world: TierWorld, chapter: RpgCampaignChapter, nodeId
   return null
 }
 
-/** One member's bars over several wins: first before, last after, EXP added up. */
-function mergeGains(all: readonly MemberGain[]): MemberGain {
+/** One member's bars over several wins: first before, last after, EXP added up (stage and Echo Sweeps). */
+export function mergeGains(all: readonly MemberGain[]): MemberGain {
   const last = all[all.length - 1]!
   const ranks: RankGain[] = []
   for (const m of all) {
