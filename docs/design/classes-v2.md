@@ -79,9 +79,10 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
 (`battleExtraHit`). Her own best act on the guard rail chips 11: the Bow flurry's 5 + 1 hits with the Light flurry's 5.
 
 **The act stays a pair, reweighted:**
-- the **Arms half** goes from ×0.45 to **×0.63**;
-- the **Tome half** goes from ×0.45 to **×0.27**;
-- 0.9 a turn in all, the same as today.
+- the **Arms half** goes from ×0.45 to **×0.68** (drafted ×0.63);
+- the **Tome half** goes from ×0.45 to **×0.32** (drafted ×0.27);
+- 1.0 a turn in all (drafted 0.9, today's). H60 (D186) set the hands with the simulation: at 0.63 + 0.27 she was the
+  weakest damage class by a quarter, and 0.68 + 0.32 keeps her at 72% physical.
 
 **Multi-hit: her Arms half gains one extra hit** (clarified 2026-10-21 after H40's review).
 - The extra hit is added to the half as a whole, not to each of its hits. Its power is split evenly across all of
@@ -102,6 +103,10 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
     13–15. The 12 is a Limit Break of twelve weak hits that any Uma can learn: Chaos Rain's twelve bolts, or Rimefang
     Waltz's six two-kind cuts. Each class's own acts top out at 10: the Spell Blade's Bow flurry with her Light flurry,
     and the Summoner's summon with her last one lingering. Classes v2 (engine v15) checks again with its own hands.
+  - **Checked for classes v2 in H60 (D186):** each class's own best act chips 11 (the Spell Blade's Bow flurry, 5 + 1
+    hits, with her Light flurry's 5; the Summoner's Lance and Lightning Packs with an Ember Sprites farewell), the
+    Brawler 8, the Mage 6, the healers 5, and the best of the 24 Limit Breaks still 12 (Chaos Rain), all under the
+    Duel's 13. The hands moved power, not hits, so the Duel's shields stay 13–15.
 
 **Stat leans:**
 - ATK ×1.05 → **×1.1**, and M.ATK ×1.05 → **×0.95**.
@@ -113,9 +118,10 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
 ### 3.2 Summoner: the Spell Blade's mirror (owner, 2026-10-21)
 
 Built in H55 (D183), live from H61: her pair, Tome half first; the farewell, one strike on each living foe at the linger
-share × the summon's hits' power × `BATTLE_FAREWELL_FACTOR` (1, H60 tunes it), before her next pair; and the Greatsword
+share × the summon's hits' power × `BATTLE_FAREWELL_FACTOR` (0.85 since H60), before her next pair; and the Greatsword
 line's depth-3 "Knight Captain". Her own best act on the guard rail chips 11: a lingering Light Pack's farewell, then
-Light Pack and Bow Pack.
+Light Pack and Bow Pack. H60 (D186) set `BATTLE_FAREWELL_FACTOR` to 0.85 and her hands to 0.58 + 0.32 (drafted 0.63 +
+0.27); §9 has why.
 
 The Summoner is the Spell Blade turned inside out: same turn, same numbers, the other channel leading, and the area
 identity where the Spell Blade has multi-hit. They balance as a pair.
@@ -124,11 +130,11 @@ identity where the Spell Blade has multi-hit. They balance as a pair.
 |---|---|---|
 | Slots | 3 Arms + 2 Tomes | 3 Tomes + 2 Arms |
 | Armor | Physical | Magical |
-| An act | A pair: **Arms half ×0.63** + **Tome half ×0.27** | A pair: **Tome summon ×0.63** + **Arms summon ×0.27** |
+| An act | A pair: **Arms half ×0.68** + **Tome half ×0.32** (H60; drafted 0.63 + 0.27) | A pair: **Tome summon ×0.58** + **Arms summon ×0.32** (H60; drafted 0.63 + 0.27) |
 | MP | The halves' sum, ×0.5 a half | The same |
 | Split | 70% physical / 30% magical | 70% magical / 30% physical |
 | Stat leans | ATK ×1.1, M.ATK ×0.95 | M.ATK ×1.1, ATK ×0.95 |
-| Identity | **Multi-hit:** her Arms half gains one extra hit (an Attack lands as two: 3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded) when her next pair comes |
+| Identity | **Multi-hit:** her Arms half gains one extra hit (an Attack lands as two: 3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded), × 0.85 (H60), when her next pair comes |
 | Limit Break power | 2.2× | 2.2× |
 | Her hall's Limit Breaks | Multi-hit | Areas |
 | Support | None | **None** |
@@ -206,19 +212,20 @@ style's (`styleClass`), so nobody changes class at the switch.
 
 | Summoner line (today) | Moves to | As |
 |---|---|---|
-| Blizzard: a Barrier on every Uma (×0.35) | **Paladin** | Her Blizzard Tome spells raise a Barrier on every Uma at that share, alongside their mend |
-| Greatsword: Aegis on every Uma | **Paladin** | Her Greatsword blows give Aegis 1 to the Uma they Barrier (2 at depth 5) |
+| Blizzard: a Barrier on every Uma (×0.35) | **Paladin** | Her Blizzard Tome spells raise a Barrier on every Uma at ×0.5 of their share (H60; drafted ×0.35), alongside their mend |
+| Greatsword: Aegis on every Uma | **Paladin** | Her Greatsword blows give Aegis 1 to the Uma they Barrier (H60: at every depth; drafted 2 at depth 5) |
 | Axe: Enfeeble every foe hit | **Paladin** | Her Axe blows Enfeeble **every** foe from depth 4. A Cleric's Axe stays one foe |
 | Lance: Valkyries revive (depth 4–5) | **Paladin** | Her Lance tree's depth-4 side B becomes "Valkyrie's Oath": a revive at 25%, once per Uma per fight |
-| Light: mends every Uma, and again each round while it lingers | **Cleric** | Her Light spells leave **Regen**: the mend repeats at ×0.3 at the round's end, for two rounds |
+| Light: mends every Uma, and again each round while it lingers | **Cleric** | Her Light spells leave **Regen**: the mend repeats at ×0.2 (H60; drafted ×0.3) at the round's end, for two rounds |
 | Dark: drain, 30% of damage heals the most hurt | **Cleric** | Her Dark spells drain at 30% |
 
 Rebirth stays the Cleric's. Each healer now has one revive.
 
-Built in H56 (D181), live from H61: the Paladin's Blizzard `shieldShare` (0.35 of the share, on every Uma), her
-Greatsword `aegis` (1, or 2 at depth 5, on each Uma its Barrier reaches), her Axe on every foe from depth 4 and
+Built in H56 (D181), live from H61: the Paladin's Blizzard `shieldShare` (`RPG_PALADIN_SHIELD_SHARE` of the share, on
+every Uma: 0.35, 0.5 since H60), her Greatsword `aegis` (`RPG_PALADIN_AEGIS` on each Uma its Barrier reaches: 1, or 2 at
+depth 5, 1 at every depth since H60), her Axe on every foe from depth 4 and
 Valkyrie's Oath's revive (25% × her ATK scaling, once per Uma); the Cleric's Light `regen` (a `BattleState.regens` entry,
-`BATTLE_REGEN_SHARE` 0.3 of its mend at the end of the cast's round and the next, "Regen" heals, replaced by her next
+`BATTLE_REGEN_SHARE` of its mend (0.3, 0.2 since H60) at the end of the cast's round and the next, "Regen" heals, replaced by her next
 Light spell, gone if she falls) and her Dark `drain` (30%). From v15 a Summoner's summons carry no support, her Light
 capstone raises no Barrier and a lingering summon no longer mends. A Thorn or Mirror guard returns her share of the
 whole hit she intercepts (§6.3).
@@ -315,22 +322,31 @@ They take the support slot. Their values are rebalanced so each is a real choice
 
 | Accessory | Today (per grade) | At G10 | Role after v2 | Change |
 |---|---|---|---|---|
-| Vital Talisman | 0.5% max HP regen a round | 5% | Sustain for tanks | 0.6% → 6% |
+| Vital Talisman | 0.5% max HP regen a round | 5% | Sustain for tanks | 1% → 10% (H60; drafted 0.6%) |
 | Vampire Talisman | Lifesteal 2% of physical damage | 20% | Brawler and Spell Blade sustain | — |
 | Bulwark Talisman | A physical shield, 2% max HP | 20% | Opening shield | — |
 | Iron Talisman | A physical damage cut, 1.5% | 15% | Iron front | — |
-| Thorn Talisman | Physical damage returned, 3% | 30% | Paladin, guarding | Also returns guarded hits |
+| Thorn Talisman | Physical damage returned, 3% | 30% | Paladin, guarding | 5% → 50% (H60), and returns guarded hits |
 | Spring Amulet | +1 MP a round | 10 | Caster sustain | — |
 | Siphon Amulet | MP from magical damage, 0.5% | 5% | Mage and Summoner sustain | 0.8% → 8% (too weak today) |
 | Veil Amulet | A magical shield, 2% max HP | 20% | Opening shield | — |
 | Ward Amulet | A magical damage cut, 1.5% | 15% | Arcane front | — |
-| Mirror Amulet | Magical damage returned, 3% | 30% | Cleric, Arcane front | — |
+| Mirror Amulet | Magical damage returned, 3% | 30% | Cleric, Arcane front | 5% → 50% (H60) |
 
 **The rule the simulation enforces:** among the ten support accessories, none at G10 is worth less than 60% of the
 best, measured as its effect on a front's win rate on Auto. The values in the table are the starting point.
 
 Built in H57 (D182), live from H61: `charmPerGrade(engine)`, per effect and per mille a grade, with Vital 6 and Siphon
-8 in v2; H60 measures the rule and retunes there. The Thorn's guarded hits are the engine's (H56).
+8 in v2. The Thorn's guarded hits are the engine's (H56).
+
+**Measured in H60 (D186):** each of the ten at G10 in every guided member's Support slot, on each front's stage 8 and
+champion (144 fights each), against an empty slot; its gain on its best front, of the best's (the Spring Amulet's 17
+points on Iron's champion, whose balance party runs short of MP). After raising Vital to 10, Thorn and Mirror to 50
+(their gains were 6, 7 and 8 points): Thorn 73%, Vital 62%, Iron 62%, Bulwark 60%, Ward 60%, Mirror 54%, Veil 42%,
+Vampire 25%, Siphon 19%. A gain's own noise is about 4 points. **Kept closest, and why:** Vampire and Siphon are
+sustain, and a Rift fight starts at full HP and MP; Siphon at 8% already refunds a Mage's casts, and Vampire heals only
+from physical hits, so a front's win rate can't show them. Raising them would move the world map's MP economy, which
+§9 says not to rebalance. Mirror and Veil sit within that noise of the line.
 
 **C5, slots by tier:** one damage and one support in Tiers 1 and 2. [Tiers](tiers.md) Option A adds a third slot in
 Tier 3; it's designed with Tier 3.
@@ -390,17 +406,38 @@ dark until H61.
 
 ## 9. Balance targets (the simulation, `SIM=1`)
 
-| Target | Value |
-|---|---|
-| Spell Blade's damage, on Auto, against regular formations | 70% physical ± 5 |
-| Summoner's damage, on Auto | 70% magical ± 5 |
-| Paladin vs Cleric: healing plus Barrier absorbed per fight, on curve | Within ±10% of each other |
-| Spell Blade vs Summoner, damage per turn over a whole fight | Within ±5% (the mirror) |
-| One healer, doubled shares | Keeps an on-curve party through a front boss with no Uma falling twice |
-| Spell Blade vs Brawler, against shielded single foes | Spell Blade Breaks a sub-boss at least 1 round sooner; Brawler deals ≥ 10% more after the Break |
-| Summoner vs Mage's Blizzard, against 3+ foes | Summoner ≥ Mage over a whole wave, by the farewell strikes |
-| Today's campaign, on-curve party of each shape | Win rates within 3 points of v13 (no campaign rebalance) |
-| The Rift's fronts | Set in [the Rift](rift.md) §11 |
+| Target | Value | Measured (H60, D186) |
+|---|---|---|
+| Spell Blade's damage, on Auto, against regular formations | 70% physical ± 5 | **72%** (76% without her Limit Break), the world's regular stages at Lv 30 and 50 |
+| Summoner's damage, on Auto | 70% magical ± 5 | **84%, missed** (below). Her farewells are 22% of it |
+| Paladin vs Cleric: healing plus Barrier absorbed per fight, on curve | Within ±10% of each other | **Met, at the line:** the Paladin's is 90% of the Cleric's a fight and 93% a round, on the world's Lv 50 bosses and each front's stage 8 and champion with each healer. Her party takes less to heal (Aegis, Enfeeble) and ends sooner |
+| Spell Blade vs Summoner, damage per turn over a whole fight | Within ±5% (the mirror) | **Missed: the Summoner 118%** over the four fronts' stages 1–11 (the Horde's party, both in it) and the world's Lv 50 stages. One foe (the Duel) 101%; the world 117%; the Horde 144%; her warded front (Iron) 83%, the Spell Blade's (Arcane) 158% |
+| One healer, doubled shares | Keeps an on-curve party through a front boss with no Uma falling twice | **Met:** no won fight at stages 6, 8 or 12 of any front had an Uma fall twice |
+| Spell Blade vs Brawler, against shielded single foes | Spell Blade Breaks a sub-boss at least 1 round sooner; Brawler deals ≥ 10% more after the Break | **Met:** five Spell Blades Break Iron's stage 1–4 captain (shield 16) in 2.9 rounds, every time; five Brawlers in 5.5 (16 of 40 at all); after the Break the Brawlers deal 942 an act, the Spell Blades 349 |
+| Summoner vs Mage's Blizzard, against 3+ foes | Summoner ≥ Mage over a whole wave, by the farewell strikes | **Met by damage, 101%:** five Summoners deal 1,005 an act while 3+ Horde foes stand, five Mages 991. The Mages clear a first wave sooner (2.6 rounds to 3.0) |
+| Today's campaign, on-curve party of each shape | Win rates within 3 points of v13 (no campaign rebalance) | **Met: 0 points.** Every party wins every stage at Tier 1 Lv 10–50 and Tier 2 Lv 10, as on v14; fights end a round or two sooner |
+| The Rift's fronts | Set in [the Rift](rift.md) §11 | Met but Iron's wrong party at stages ([the Rift](rift.md) §11) |
+
+**How it was measured** (`rift/balance-v15.test.ts`, `SIM=1`, with `SIM_ENGINE=15` on `rift/balance.test.ts` and
+`world/balance.test.ts`): engine v15 with explicit v15 inputs, never the switch. The balance party and the Rift's v2 guided
+parties are `balanceMember(…, { engine: 15 })`: her v2 spread, leans and HP, her class's armor, H57's preset (an Orb and a
+support at G10), today's Extra Stats, and her class's first seat in the v15 halls. First try on Auto, on curve.
+
+**What H60 changed** (all v15 only): the Spell Blade's hands 0.63 + 0.27 → 0.68 + 0.32; the Summoner's 0.63 + 0.27 →
+0.58 + 0.32; `BATTLE_FAREWELL_FACTOR` 1 → 0.85; the Paladin's Blizzard Barrier on every Uma ×0.35 → ×0.5 of its share and
+her Greatsword Aegis 1, 2 at depth 5 → 1; the Cleric's Regen 0.3 → 0.2; the supports (§6.3); and the Rift's v15 numbers
+([the Rift](rift.md) §11).
+
+**The two misses, kept closest:**
+- **The Summoner's split.** Her farewell, all magic, is her area identity and §9's wave target; her kit raises M.ATK
+  only (magic armor, M.ATK Extra Stats, a Fire Orb), so her own pair leans 78% magical even at 0.58 + 0.32. Within the
+  hands' ±0.05 no setting brings her under 82% without her farewell falling below a Mage's waves. Mirroring the Spell
+  Blade's Extra Stats (M.ATK and ATK) takes about 4 points more; the packet kept today's.
+- **The mirror.** On one foe the two are level (101%). The Summoner's summons reach every foe and her farewell strikes
+  each, so the more foes, the more she leads: 117% on the world's formations and 144% on the Horde, which every setting
+  that kept her waves level with a Mage's left above 110%. The Spell Blade was the weakest damage class (74% of a
+  Brawler a turn at 0.63 + 0.27), so she gained 0.05 on each hand rather than the Summoner losing more. Her worth is
+  the Break: her party's foes are Broken sooner, which her own damage a turn doesn't count.
 
 ## 10. Owner calls: decided 2026-10-21 (D160)
 

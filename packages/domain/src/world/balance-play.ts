@@ -3,13 +3,15 @@
 // H51). Test support only: nothing in the game imports it.
 import { autoAction } from '../rpg/battle/auto'
 import { applyBattleAction, battleActionsLeft, createBattle } from '../rpg/battle/engine'
-import type { BattleInput, BattleState } from '../rpg/battle/types'
+import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 
 export interface Played { won: boolean; rounds: number; hpLeft: number; lowest: number; kos: number; focus: number; mp: Record<string, number> }
+/** Sees each action as it's played (H60's measurements): the state before it, the action and its step. */
+export type PlayObserver = (before: BattleState, action: BattleAction, step: BattleStep) => void
 
 /** Plays a fight with the shared Auto policy, and reads how it went: HP left, the lowest any Uma fell, knockouts, and the
- * share of the damage the most-hit Uma took. */
-export function play(input: BattleInput): Played {
+ * share of the damage the most-hit Uma took. `observe` sees every action. */
+export function play(input: BattleInput, observe?: PlayObserver): Played {
   let state: BattleState = createBattle(input).state
   const taken: Record<string, number> = {}
   const allyIds = new Set(input.allies.map((a) => a.id))
@@ -18,7 +20,9 @@ export function play(input: BattleInput): Played {
   for (let n = 0; n < 800 && state.outcome === 'active'; n++) {
     const ally = state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(state, u.id) > 0)
     if (!ally) break
-    const step = applyBattleAction(state, autoAction(state, ally.id))
+    const action = autoAction(state, ally.id)
+    const step = applyBattleAction(state, action)
+    observe?.(state, action, step)
     for (const c of step.cues) {
       if (c.kind === 'hit' && allyIds.has(c.targetId) && c.actorId !== c.targetId) taken[c.targetId] = (taken[c.targetId] ?? 0) + c.amount
       if (c.kind === 'ko' && allyIds.has(c.targetId)) kos++

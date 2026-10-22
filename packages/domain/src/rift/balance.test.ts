@@ -1,175 +1,24 @@
 // The Rift's balance simulation (rift.md §11, H51): on-curve Lv 50 parties built through the game's own rules
-// (`world/balance-party.ts`) play the Rift's fights on Auto (`world/balance-play.ts`, the shared policy, engine v14).
-// The full tables: `SIM=1 npx vitest run src/rift/balance.test.ts`; `SIM_FRONTS=iron,duel` and `SIM_SEEDS=4` narrow
-// them while tuning. The always-on checks are small and use fixed seeds.
+// (`world/balance-party.ts`) play the Rift's fights on Auto (`world/balance-play.ts`, the shared policy), with the shared
+// support in `rift/balance-sim.ts`. The full tables: `SIM=1 npx vitest run src/rift/balance.test.ts`; `SIM_FRONTS=iron,duel`
+// and `SIM_SEEDS=4` narrow them while tuning, and `SIM_ENGINE=15` plays them on classes v2 with v2's guided parties (H60).
+// The always-on checks are small and use fixed seeds; classes v2's are in `rift/balance-v15.test.ts`.
 import { describe, expect, it } from 'vitest'
-import { applyBattleAction, createBattle } from '../rpg/battle/engine'
-import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
-import type { BattleAction, BattleAlly, BattleEnemy, BattleHalf, BattleState } from '../rpg/battle/types'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
+import type { BattleAlly } from '../rpg/battle/types'
 import { rpgBattleExp } from '../rpg/campaign/rewards'
-import { RPG_NODES, type RpgNode } from '../rpg/catalog'
-import { HERO_LIMIT_IDS, type HeroLimitId } from '../rpg/hero-id'
-import { RPG_CLASSES, RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, isRpgTome, rpgAutoLoadout, rpgClassTrees, rpgDefaultWeapons, validRpgWeapons,
-  type RpgClass, type RpgNodeRef, type RpgWeapon } from '../rpg/rules'
+import { RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgClasses, rpgDefaultWeapons } from '../rpg/rules'
 import { CLASS_EXP_SHARE, classExpToNext, grantTrack, weaponExpShares, type RankTrack } from '../economy/ranks'
 import { echoFoeLevel, ECHO_RANK_PAY } from '../save/rift'
-import { balanceMember, type BalanceOptions } from '../world/balance-party'
-import { play, type Played } from '../world/balance-play'
-import { RIFT_FRONT_SPECS, RIFT_TUNING } from './fronts'
-import { riftBattleInput, riftConvergence, riftFight, riftSeed, type RiftContext, type RiftFightPlan } from './generate'
+import {
+  add, cell, ctx, duelShields, empty, fight, frontStages, GROUPS, guardRail, guided, merge, pct, planOf, rate, roster, RUNS, seedsOf,
+  withDefaultLoadout, WRONG,
+} from './balance-sim'
+import { riftConvergence, riftSeed } from './generate'
 import { RIFT_RUN_FIGHTS, riftRunFaces } from './picker'
-import { packRoster } from './roster.fixture'
-import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_STAGES, riftRefKey, type EchoLevel, type RiftFront } from './state'
+import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, riftRefKey, type EchoLevel, type RiftFront } from './state'
 
-const ON_CURVE: BalanceOptions = { gear: true, stars: true, heroes: true }
-const roster = packRoster()
 const tierOf = new Map(roster.map((m) => [m.id, m.tier]))
-/** Three runs, so a stage's weaknesses and faces vary as they do between runs. */
-const RUNS = ['t1-r1', 't1-r2', 't1-r3'] as const
-const ctx = (runId: string | null): RiftContext => ({ tier: 1, runId, roster, defeated: new Set() })
-
-/** A front's guided party (D168): its five classes, on curve at Lv 50; `respec` puts one member at Class Rank 1 (a
- * fresh class, the same gear), as an Uma who has just switched. */
-const guided = (front: RiftFront, respec?: number): BattleAlly[] =>
-  RIFT_FRONT_SPECS[front].party.map((c, i) => balanceMember(c, i, RPG_TIER_MAX_LEVEL, i === respec ? { ...ON_CURVE, classRank: 1 } : ON_CURVE))
-/** The same Uma with the game's default loadout (`rpgAutoLoadout`: each weapon's deepest open cores), as a save fights
- * before the player picks her skills. The balance party equips each weapon's deepest core and side skill instead. */
-const withDefaultLoadout = (a: BattleAlly): BattleAlly => ({ ...a, loadout: rpgAutoLoadout({ outfitId: a.id, classId: a.classId, weapons: a.weapons,
-  tier: a.tier, level: a.level, exp: 0, tree: [], legacy: [], classRank: a.classRank ?? a.level,
-  baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 }, growthRates: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 } }) })
-/** The wrong party for a front (H51): all-magic on Iron, all-physical on Arcane; the Duel and the Horde swap. */
-const WRONG: Readonly<Record<RiftFront, RiftFront>> = { iron: 'arcane', arcane: 'iron', duel: 'horde', horde: 'duel' }
-
-const seedsOf = (n: number): number[] => Array.from({ length: n }, (_, i) => riftSeed(`sim:${i}`))
-const fight = (plan: RiftFightPlan, allies: BattleAlly[], seed: number): Played => play(riftBattleInput(plan, allies, seed))
-
-interface Bucket { n: number; wins: number; rounds: number; hp: number; lowest: number; kos: number }
-const empty = (): Bucket => ({ n: 0, wins: 0, rounds: 0, hp: 0, lowest: 0, kos: 0 })
-const add = (b: Bucket, r: Played): void => { b.n++; b.wins += r.won ? 1 : 0; b.rounds += r.rounds; b.hp += r.hpLeft; b.lowest += r.lowest; b.kos += r.kos }
-const pct = (x: number) => `${Math.round(100 * x)}%`
-const rate = (b: Bucket) => (b.n ? b.wins / b.n : 0)
-const cell = (b: Bucket) => b.n ? `${pct(rate(b))} ${(b.rounds / b.n).toFixed(1)}r hp ${pct(b.hp / b.n)} low ${pct(b.lowest / b.n)} ko ${(b.kos / b.n).toFixed(1)}` : '—'
-
-const GROUPS = [[1, 4], [5, 8], [9, 11], [12, 12]] as const
-
-/** A front's stages played by a party: a bucket per stage, over every run and seed. */
-function frontStages(front: RiftFront, allies: BattleAlly[], seeds: readonly number[]): Bucket[] {
-  return Array.from({ length: RIFT_STAGES }, (_, i) => {
-    const b = empty()
-    for (const runId of RUNS) {
-      const plan = riftFight(ctx(runId), { kind: 'front', front, stage: i + 1 })
-      for (const seed of seeds) add(b, fight(plan, allies, seed))
-    }
-    return b
-  })
-}
-const merge = (list: readonly Bucket[]): Bucket => list.reduce((m, b) => ({ n: m.n + b.n, wins: m.wins + b.wins, rounds: m.rounds + b.rounds,
-  hp: m.hp + b.hp, lowest: m.lowest + b.lowest, kos: m.kos + b.kos }), empty())
-
-// --- The Duel guard rail (classes-v2 §3.1) ----------------------------------------------------------------------------
-
-/** A fresh Duel boss weak to every kind (the worst case), her shield at the engine's cap so one act's points all show, and
- * HP no act can take. */
-function railBoss(): BattleEnemy {
-  const boss = riftFight(ctx('t1-r1'), { kind: 'front', front: 'duel', stage: 1 }).enemies[0]!
-  return { ...boss, shield: 20, stats: { ...boss.stats, hp: 10_000_000 }, weaknesses: { weapons: [...RPG_WEAPON_KINDS], elements: [...RPG_ELEMENTS] } }
-}
-/** Her five weapons with `need` among them, kept to her class's slots. */
-function weaponsWith(classId: RpgClass, base: readonly RpgWeapon[], need: readonly RpgWeapon[]): RpgWeapon[] | null {
-  const out = [...base]
-  for (const w of need) {
-    if (out.includes(w)) continue
-    const i = out.findIndex((x) => !need.includes(x) && (classId === 'cleric' || isRpgTome(x) === isRpgTome(w)))
-    if (i < 0) return null
-    out[i] = w
-  }
-  return validRpgWeapons(classId, out) ? out : null
-}
-/** Her on-curve self with these skills learned and equipped, and the weapons they need. */
-function withSkills(base: BattleAlly, nodes: readonly RpgNode[]): BattleAlly | null {
-  const weapons = weaponsWith(base.classId, base.weapons, nodes.map((n) => n.weapon))
-  if (!weapons) return null
-  const refs: RpgNodeRef[] = nodes.map((n) => ({ tier: 1, id: n.id }))
-  return { ...base, weapons, tree: refs.filter((_, k) => nodes[k]!.variant !== null), loadout: refs, mp: base.stats.mp }
-}
-/** The shield points one act removes from the rail boss, or null when the engine refuses the act. `linger` presets her
- * own lingering summon (a Summoner's earlier act), `limit` a full gauge. */
-function railChips(ally: BattleAlly, action: (id: string, target: string) => BattleAction, setup?: (s: BattleState) => void): number | null {
-  const others = (['brawler', 'mage', 'cleric', 'summoner'] as const).map((c, i) => balanceMember(c, i + 1, 50, ON_CURVE))
-  let state: BattleState
-  try {
-    state = createBattle({ version: 14, seed: 7, allies: [{ ...ally, id: '100' }, ...others], enemies: [railBoss()] }).state
-  } catch { return null }
-  setup?.(state)
-  const before = state.units.find((u) => u.side === 'enemy')!.shield
-  const step = applyBattleAction(state, action('100', state.units.find((u) => u.side === 'enemy')!.id))
-  if (step.error) return null
-  return before - step.state.units.find((u) => u.side === 'enemy')!.shield
-}
-
-interface RailAct { chips: number; act: string }
-interface Rail { classId: RpgClass; own: RailAct; limit: RailAct }
-const best = (list: readonly RailAct[]): RailAct => list.reduce((a, b) => (b.chips > a.chips ? b : a), { chips: 0, act: '—' })
-
-/**
- * Every class's best single act against the rail boss (H51): every Attack and every skill of her class's trees (any
- * depth, either side, each with the weapons it needs; a Spell Blade's two halves, an Arms half and a Tome half, each
- * measured beside a one-hit Attack and the best of each added), a Summoner's summon with her own best summon lingering,
- * and every Limit Break she could carry with a full gauge: any of the twenty, since any Uma may learn under any Hero
- * (D106), at full strength. No buffs from others.
- */
-function guardRail(classId: RpgClass): Rail {
-  const base = balanceMember(classId, 0, 50, ON_CURVE)
-  const nodes = RPG_NODES.filter((n) => rpgClassTrees(classId).includes(n.tree))
-  const pair = classId === 'spellblade'
-  const acts: (RailAct & { tome: boolean })[] = []
-  // A Spell Blade's half is measured beside the other half's one-hit Attack (one point on the rail boss), taken off.
-  const partner = (ally: BattleAlly, tome: boolean): BattleHalf | undefined => pair ? { weapon: ally.weapons.find((w) => isRpgTome(w) !== tome)! } : undefined
-  const less = pair ? 1 : 0
-  for (const weapon of [...new Set([...base.weapons, ...nodes.map((n) => n.weapon)])]) {
-    const ally = withSkills(base, [])
-    const armed = ally && weaponsWith(classId, ally.weapons, [weapon])
-    if (!ally || !armed) continue
-    const a = { ...ally, weapons: armed }
-    const chips = railChips(a, (id, target) => ({ kind: 'attack', actorId: id, targetId: target, weapon, ...(pair ? { pair: partner(a, isRpgTome(weapon))! } : {}) }))
-    if (chips !== null) acts.push({ chips: chips - less, act: `Attack (${weapon})`, tome: isRpgTome(weapon) })
-  }
-  for (const node of nodes) {
-    const ally = withSkills(base, [node])
-    if (!ally) continue
-    const skill = { tier: 1, id: node.id }
-    const chips = railChips(ally, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill, ...(pair ? { pair: partner(ally, isRpgTome(node.weapon))! } : {}) }))
-    if (chips !== null) acts.push({ chips: chips - less, act: node.name, tome: isRpgTome(node.weapon) })
-  }
-  let own: RailAct
-  if (pair) {
-    const arms = best(acts.filter((a) => !a.tome)), tome = best(acts.filter((a) => a.tome))
-    own = { chips: arms.chips + tome.chips, act: `${arms.act} + ${tome.act}` }
-  } else own = best(acts)
-  if (classId === 'summoner') {
-    // Her own earlier summon lingers and strikes again first: the best lingering one, beside each summon she casts.
-    const summons = nodes.filter((n) => n.skill.summon)
-    const lingerOf = (l: RpgNode) => (s: BattleState) => { s.summons = [{ allyId: '100', ref: { tier: 1, id: l.id }, scale: l.skill.summon!.linger }] }
-    const probe = summons[0]!
-    const plain = railChips(withSkills(base, [probe])!, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill: { tier: 1, id: probe.id } }))!
-    const linger = summons.reduce((m, l) => {
-      const c = railChips(withSkills(base, [probe])!, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill: { tier: 1, id: probe.id } }), lingerOf(l))! - plain
-      return c > m.chips ? { chips: c, node: l } : m
-    }, { chips: -1, node: probe })
-    for (const n of summons) {
-      const chips = railChips(withSkills(base, [n])!, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill: { tier: 1, id: n.id } }), lingerOf(linger.node))
-      if (chips !== null && chips > own.chips) own = { chips, act: `${n.name} (${linger.node.name} lingering)` }
-    }
-  }
-  const limits: RailAct[] = HERO_LIMIT_IDS.map((hero: HeroLimitId) => {
-    const ally: BattleAlly = { ...base, hero, inherits: undefined }
-    const { inherits: _, ...plain } = ally
-    const chips = railChips(plain, (id, target) => ({ kind: 'limit', actorId: id, targetId: target }), (s) => { s.units.find((u) => u.id === '100')!.limit = BATTLE_LIMIT_MAX })
-    return { chips: chips ?? 0, act: `Limit Break ${hero}` }
-  })
-  return { classId, own, limit: best(limits) }
-}
-const duelShields = (): number[] => [...RIFT_TUNING.duel.shields]
 
 // --- Echo pacing (rift.md §8, R6) ---------------------------------------------------------------------------------------
 
@@ -218,12 +67,12 @@ function bestiaryRuns(): { boss: number; subboss: number; slots: { boss: number;
 
 describe('the Rift\'s balance (H51)', () => {
   it('lets Iron\'s guided party win Iron\'s stage 1', () => {
-    const plan = riftFight(ctx('t1-r1'), { kind: 'front', front: 'iron', stage: 1 })
+    const plan = planOf('t1-r1', { kind: 'front', front: 'iron', stage: 1 })
     expect(fight(plan, guided('iron'), riftSeed('rift:t1:1')).won).toBe(true)
   })
 
   it('has Arcane\'s guided party (all magic) lose Iron\'s champion', () => {
-    const plan = riftFight(ctx('t1-r1'), { kind: 'front', front: 'iron', stage: 12 })
+    const plan = planOf('t1-r1', { kind: 'front', front: 'iron', stage: 12 })
     expect(fight(plan, guided('arcane'), riftSeed('rift:t1:1')).won).toBe(false)
   })
 
@@ -246,22 +95,24 @@ describe('the Rift\'s balance (H51)', () => {
   it.skipIf(!process.env.SIM)('prints the Rift\'s tables: fronts, the Convergence, the guard rail, Echoes, the Bestiary and a run', async () => {
     // Yields between long loops, so Vitest's worker keeps answering its runner.
     const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
+    const engine = Number(process.env.SIM_ENGINE ?? BATTLE_ENGINE_VERSION)
+    const party = (front: RiftFront, respec?: number): BattleAlly[] => guided(front, engine, respec)
     const fronts = (process.env.SIM_FRONTS?.split(',') ?? RIFT_FRONTS) as RiftFront[]
     const seeds = seedsOf(Number(process.env.SIM_SEEDS ?? 8))
-    const rows: string[] = [`${RUNS.length} runs × ${seeds.length} seeds a stage; on-curve Lv 50, first try on Auto`, '',
+    const rows: string[] = [`${RUNS.length} runs × ${seeds.length} seeds a stage; on-curve Lv 50, first try on Auto, engine v${engine}`, '',
       'front | party | stages 1–4 | 5–8 | 9–11 | champion']
     const firstTry: Partial<Record<RiftFront, number[]>> = {}
     for (const front of fronts) {
-      for (const [label, party] of [['right', front], ['wrong', WRONG[front]]] as const) {
-        const stages = frontStages(front, guided(party), seeds)
+      for (const [label, partyOf] of [['right', front], ['wrong', WRONG[front]]] as const) {
+        const stages = frontStages(front, party(partyOf), seeds, engine)
         await tick()
         if (label === 'right') firstTry[front] = stages.map(rate)
-        rows.push(`${front} | ${label} (${party}'s) | ${GROUPS.map(([a, z]) => cell(merge(stages.slice(a - 1, z)))).join(' | ')}`)
+        rows.push(`${front} | ${label} (${partyOf}'s) | ${GROUPS.map(([a, z]) => cell(merge(stages.slice(a - 1, z)))).join(' | ')}`)
       }
     }
     // The same guided parties with the game's default loadout, for the record: what a save fights with before she picks.
     for (const front of fronts) {
-      const stages = frontStages(front, guided(front).map(withDefaultLoadout), seeds)
+      const stages = frontStages(front, party(front).map(withDefaultLoadout), seeds, engine)
       await tick()
       rows.push(`${front} | right, default loadout | ${GROUPS.map(([a, z]) => cell(merge(stages.slice(a - 1, z)))).join(' | ')}`)
     }
@@ -270,10 +121,10 @@ describe('the Rift\'s balance (H51)', () => {
       const conv = Array.from({ length: CONVERGENCE_FIGHTS }, empty)
       let attempts = 0, won = 0
       for (const runId of RUNS) {
-        const plans = riftConvergence(ctx(runId))
+        const plans = riftConvergence(ctx(runId), engine)
         for (const seed of seeds) {
           attempts++
-          const results = plans.map((plan, i) => fight(plan, guided(RIFT_FRONTS[i]!).map(loadout), riftSeed(`${seed}:${i}`)))
+          const results = plans.map((plan, i) => fight(plan, party(RIFT_FRONTS[i]!).map(loadout), riftSeed(`${seed}:${i}`), engine))
           results.forEach((r, i) => add(conv[i]!, r))
           if (results.every((r) => r.won)) won++
         }
@@ -286,9 +137,9 @@ describe('the Rift\'s balance (H51)', () => {
     rows.push('', 'Convergence | Iron | Arcane | Duel | Horde | attempt', `fights | ${conv.map(cell).join(' | ')} | ${pct(won / attempts)} (${won}/${attempts}; product ${pct(product)})`,
       `default loadouts | ${byDefault.conv.map(cell).join(' | ')} | ${pct(byDefault.won / byDefault.attempts)} (${byDefault.won}/${byDefault.attempts})`)
     // The guard rail.
-    rows.push('', `class | best own act | best Limit Break | Duel shields ${duelShields().join(', ')}`)
-    for (const classId of RPG_CLASSES) {
-      const rail = guardRail(classId)
+    rows.push('', `class | best own act | best Limit Break | Duel shields ${duelShields(engine).join(', ')}`)
+    for (const classId of rpgClasses(engine)) {
+      const rail = guardRail(classId, engine)
       rows.push(`${classId} | ${rail.own.chips}: ${rail.own.act} | ${rail.limit.chips}: ${rail.limit.act}`)
     }
     // Echo pacing: the pay rule, then the win rates.
@@ -301,11 +152,11 @@ describe('the Rift\'s balance (H51)', () => {
     for (const front of fronts) {
       for (const [label, respec] of [['on curve', undefined], ['one re-specced', 0]] as const) {
         await tick()
-        const allies = guided(front, respec)
+        const allies = party(front, respec)
         const cells = ECHO_LEVELS.map((level) => {
           const b = empty()
-          const plan = riftFight(ctx(null), { kind: 'echo', front, level })
-          for (const seed of seeds) for (const salt of RUNS) add(b, fight(plan, allies, riftSeed(`${salt}:${seed}`)))
+          const plan = planOf(null, { kind: 'echo', front, level }, engine)
+          for (const seed of seeds) for (const salt of RUNS) add(b, fight(plan, allies, riftSeed(`${salt}:${seed}`), engine))
           return cell(b)
         })
         rows.push(`${front} | ${label} | ${cells.join(' | ')}`)

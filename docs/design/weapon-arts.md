@@ -49,9 +49,11 @@ columns are approved, not built.
 
 - **Hands (v15):**
   - Brawler and Mage ×1.
-  - Spell Blade: an Arms half ×0.63 that gains one extra hit, its power split evenly (an Attack lands as two, a skill
-    of n hits as n + 1; classes v2 §3.1), and a Tome half ×0.27. The table gives her skills' own hits, before that one.
-  - Summoner: a Tome summon ×0.63, whose farewell strike reaches every foe at ×0.3, and an Arms summon ×0.27.
+  - Spell Blade: an Arms half ×0.68 that gains one extra hit, its power split evenly (an Attack lands as two, a skill
+    of n hits as n + 1; classes v2 §3.1), and a Tome half ×0.32 (H60, D186). The table gives her skills' own hits,
+    before that one.
+  - Summoner: a Tome summon ×0.58, whose farewell strike reaches every foe at ×0.3 × 0.85, and an Arms summon ×0.32
+    (H60, D186).
   - Paladin and Cleric: ×0.5, plus support.
 - **Side skills reshape some of these.** A Mage's Fire Wave reaches every foe. Her Spike and Bolt sides hit one foe.
 - **The Attack** is one hit on one foe, at power 1.0 × her hand, with any of her weapons.

@@ -18,7 +18,7 @@ describe('the frozen v14 replays with the switch at 15 (H53)', () => {
     expect(rpgV2()).toBe(true)
     expect(RPG_CLASSES).toEqual(RPG_ALL_CLASSES)
     expect(HERO_LIMIT_IDS).toHaveLength(24)
-    expect(rpgHand({ classId: 'spellblade' })).toMatchObject({ arms: 0.63, tome: 0.27 })
+    expect(rpgHand({ classId: 'spellblade' })).toMatchObject({ arms: 0.68, tome: 0.32 })
   })
 
   it.each(loadV14Replays().map((r) => [r.name, r] as const))('%s replays byte for byte', (_, r) => {

@@ -46,8 +46,8 @@ Engine v15, not built yet.
 |---|---|---|---|---|---|---|---|
 | Brawler | 5 Arms | Physical | ×1 power, ×1 MP | 100 / 0 | 1.15, 1.1, 0.9, 1.1, 0.9, 0.8 | 2× | Front runners |
 | Mage | 5 Tomes | Magical | ×1, ×1 | 0 / 100 | 0.9, 0.9, 1.15, 0.9, 1.1, 1.3 | 2.4× | Pace chasers |
-| Spell Blade | 3 Arms + 2 Tomes | Physical | A pair: an Arms half ×0.63, landing as two hits, and a Tome half ×0.27; ×0.5 MP a half | 70 / 30 | 1, 1.1, 0.95, 1, 1, 1 | 2.2× | Never |
-| Summoner | 3 Tomes + 2 Arms | Magical | A pair: a Tome summon ×0.63 that lingers (its farewell strike reaches every foe at ×0.3, ×0.4 Bonded) and an Arms summon ×0.27; ×0.5 MP a half | 30 / 70 | 1, 0.95, 1.1, 1, 1, 1.1 | 2.2× | End closers |
+| Spell Blade | 3 Arms + 2 Tomes | Physical | A pair: an Arms half ×0.68, landing as two hits, and a Tome half ×0.32 (H60); ×0.5 MP a half | 70 / 30 | 1, 1.1, 0.95, 1, 1, 1 | 2.2× | Never |
+| Summoner | 3 Tomes + 2 Arms | Magical | A pair: a Tome summon ×0.58 that lingers (its farewell strike reaches every foe at ×0.3, ×0.4 Bonded, × 0.85) and an Arms summon ×0.32 (H60); ×0.5 MP a half | 30 / 70 | 1, 0.95, 1.1, 1, 1, 1.1 | 2.2× | End closers |
 | Paladin | 3 Arms + 2 Tomes | Physical | ×0.5, ×0.6. Heals and shields from ATK | Half-hand damage | 1, 1, 0.8, 1.15, 1, 1.3 (assumed) | 1.5× | Late surgers whose Power beats their Wit |
 | Cleric | 3 Tomes + 2 Arms | Magical | ×0.5, ×0.6. Heals and shields from M.ATK | Half-hand damage | 1, 0.8, 1, 1, 1.15, 1.3 | 1.5× | Other late surgers |
 

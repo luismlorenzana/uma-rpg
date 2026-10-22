@@ -45,10 +45,10 @@ describe('a fight’s allies in classes v2 (H57)', () => {
       { axe: 1 },
     ])
     expect(allies[0]!.might!.greatsword).toBe(46)
-    // The support effects arrive as before, at v2's values: Siphon 8% at grade 10.
+    // The support effects arrive as before, at v2's values: Siphon 8% at grade 10, Thorn 5% a grade (H60).
     expect(allies[0]).toMatchObject({ lifesteal: 80 })
     expect(allies[1]).toMatchObject({ mpSteal: 80 })
-    expect(allies[3]).toMatchObject({ thorns: 60 })
+    expect(allies[3]).toMatchObject({ thorns: 100 })
   })
 
   it('projects her stats by v2’s rules: HP with Guts, and MP to match', () => {

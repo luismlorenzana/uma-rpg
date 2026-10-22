@@ -108,7 +108,7 @@ describe('class rules by generation (D179)', () => {
     expect(projectRpgStats({ ...at50, classId: 'cleric' })).toEqual(projectRpgStats({ ...at50, classId: 'cleric' }, V1))
   })
 
-  it('gives the hands: today’s in v1 for all five, with each half at her power; the v2 hybrids’ 0.63 and 0.27', () => {
+  it('gives the hands: today’s in v1 for all five, with each half at her power; the v2 hybrids’ (H60: 0.68 and 0.32, 0.58 and 0.32)', () => {
     const today = {
       brawler: { power: 1, mp: 1, linger: 0, pair: false }, mage: { power: 1, mp: 1, linger: 0, pair: false },
       spellblade: { power: 0.45, mp: 0.5, linger: 0, pair: true }, cleric: { power: 0.5, mp: 0.6, linger: 0, pair: false },
@@ -119,8 +119,8 @@ describe('class rules by generation (D179)', () => {
       expect(rpgHand({ classId: c }, V1), c).toEqual({ ...t, arms: t.power, tome: t.power })
       expect(rpgHand({ classId: c }), c).toEqual(rpgHand({ classId: c }, V1))
     }
-    expect(rpgHand({ classId: 'spellblade' }, V2)).toEqual({ power: 0.63, arms: 0.63, tome: 0.27, mp: 0.5, linger: 0, pair: true })
-    expect(rpgHand({ classId: 'summoner' }, V2)).toEqual({ power: 0.63, arms: 0.27, tome: 0.63, mp: 0.5, linger: 0.3, pair: true })
+    expect(rpgHand({ classId: 'spellblade' }, V2)).toEqual({ power: 0.68, arms: 0.68, tome: 0.32, mp: 0.5, linger: 0, pair: true })
+    expect(rpgHand({ classId: 'summoner' }, V2)).toEqual({ power: 0.58, arms: 0.32, tome: 0.58, mp: 0.5, linger: 0.3, pair: true })
     for (const c of ['paladin', 'cleric'] as const) expect(rpgHand({ classId: c }, V2), c).toEqual({ power: 0.5, arms: 0.5, tome: 0.5, mp: 0.6, linger: 0, pair: false })
     for (const c of ['brawler', 'mage'] as const) expect(rpgHand({ classId: c }, V2), c).toEqual(rpgHand({ classId: c }, V1))
   })

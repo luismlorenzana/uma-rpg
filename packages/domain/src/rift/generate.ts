@@ -8,7 +8,7 @@ import { RPG_FOE_ROLES, rpgFoe, rpgFoeCurveLevel } from '../rpg/campaign/enemies
 import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
 import { WORLD_TUNING } from '../world/world'
-import { RIFT_FRONT_SPECS, riftShape, RIFT_TUNING, type RiftSlot } from './fronts'
+import { RIFT_FRONT_SPECS, riftShape, riftTuning, type RiftSlot, type RiftTuning } from './fronts'
 import { riftEchoFaces, riftRunFaces, riftShapeOf } from './picker'
 import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_STAGES, riftRefKey, type RiftFightRef, type RiftFront } from './state'
 
@@ -57,10 +57,10 @@ function checkRef(ref: RiftFightRef): void {
 }
 
 /** A fight's strength (§5): front stage n 1 + climb × (n − 1) ÷ 11, a Convergence fight (1 + climb) × (1 + convergence),
- * an Echo 1, or `echo55` at Lv 55. Rounded to four places. */
-export function riftStrength(ref: RiftFightRef): number {
+ * an Echo 1, or `echo55` at Lv 55, in an engine's tuning (H60). Rounded to four places. */
+export function riftStrength(ref: RiftFightRef, engine: number = BATTLE_ENGINE_VERSION): number {
   checkRef(ref)
-  const t = RIFT_TUNING
+  const t = riftTuning(engine)
   const strength = ref.kind === 'front' ? 1 + (t.climb * (ref.stage - 1)) / (RIFT_STAGES - 1)
     : ref.kind === 'convergence' ? (1 + t.climb) * (1 + t.convergence)
     : ref.level === '55' ? t.echo55 : 1
@@ -72,8 +72,9 @@ const canonical = <T extends string>(list: readonly T[], all: readonly T[]): T[]
 
 /** One wave's weaknesses (§5), from the front, never the face: Iron Arms only and Arcane elements only, by rank, a pair's
  * differing; the Duel both, by stage; the Horde one of each, dealt from the 25 pairs so no two foes of a wave share one. */
-function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot[], keyOf: (k: number) => string): BattleWeaknesses[] {
-  const t = RIFT_TUNING.weak
+function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot[], keyOf: (k: number) => string,
+  tuning: RiftTuning): BattleWeaknesses[] {
+  const t = tuning.weak
   const taken = new Set<string>()
   const deal = RPG_WEAPON_KINDS.flatMap((w) => RPG_ELEMENTS.map((e) => [w, e] as const))
   /** `count` kinds of `all` by the slot's seed; a pair's later foe takes kinds her partners don't have first. */
@@ -107,16 +108,18 @@ function check(ctx: RiftContext, ref: RiftFightRef): void {
 /**
  * Any Rift fight (D173): its front stage's shape (`riftShape`; a Convergence fight its front's champion, an Echo stage
  * `echoStage`) at the tier's Lv 50 (an Echo at 45 or 50, Lv 55 being Lv 50 at `echo55`), at its strength, with the
- * front's weaknesses and traits and the run's faces. Throws a `RangeError` for a fight out of range, a front or
- * Convergence fight without a run, or an empty roster.
+ * front's weaknesses and traits and the run's faces, in an engine's tuning (`riftTuning`, H60; the live one by default, as
+ * a fight starts on it). Throws a `RangeError` for a fight out of range, a front or Convergence fight without a run, or an
+ * empty roster.
  */
-export function riftFight(ctx: RiftContext, ref: RiftFightRef): RiftFightPlan {
+export function riftFight(ctx: RiftContext, ref: RiftFightRef, engine: number = BATTLE_ENGINE_VERSION): RiftFightPlan {
   check(ctx, ref)
   const { front, stage } = riftShapeOf(ref)
   const spec = RIFT_FRONT_SPECS[front]
-  const shown = ref.kind === 'echo' ? Number(ref.level) : RIFT_TUNING.level
+  const tuning = riftTuning(engine)
+  const shown = ref.kind === 'echo' ? Number(ref.level) : tuning.level
   const lifetime = RPG_TIER_MAX_LEVEL * (ctx.tier - 1) + Math.min(shown, RPG_TIER_MAX_LEVEL)
-  const strength = riftStrength(ref)
+  const strength = riftStrength(ref, engine)
   const faces = ref.kind === 'echo' ? riftEchoFaces(ctx.roster, ctx.tier, ref)
     : riftRunFaces(ctx.roster, ctx.tier, ctx.runId!, ctx.defeated).get(riftRefKey(ref))!
   const prefix = `${ctx.tier}:${ref.kind === 'echo' ? 'echo' : ctx.runId}:${riftRefKey(ref)}`
@@ -125,9 +128,9 @@ export function riftFight(ctx: RiftContext, ref: RiftFightRef): RiftFightPlan {
   // A regular's HP takes the world's regular-foe step at the tier level (Z3, D170), as `stageWaves` does.
   const step = 1 + WORLD_TUNING.regularHpPerLevel * (rpgFoeCurveLevel(lifetime) - 1)
   let next = 0
-  const waves = riftShape(front, stage).map((wave) => {
+  const waves = riftShape(front, stage, engine).map((wave) => {
     const first = next
-    const weak = waveWeaknesses(front, stage, wave, (k) => keyOf(first + k))
+    const weak = waveWeaknesses(front, stage, wave, (k) => keyOf(first + k), tuning)
     return wave.map((slot, k): BattleEnemy => {
       const n = next++
       const key = keyOf(n)
@@ -153,17 +156,19 @@ export function riftFight(ctx: RiftContext, ref: RiftFightRef): RiftFightPlan {
 }
 
 /** A front's twelve stages, in order. */
-export function riftChain(ctx: RiftContext, front: RiftFront): RiftFightPlan[] {
+export function riftChain(ctx: RiftContext, front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): RiftFightPlan[] {
   if (!isFront(front)) throw new RangeError(`Unknown Rift front: ${String(front)}`)
-  return Array.from({ length: RIFT_STAGES }, (_, i) => riftFight(ctx, { kind: 'front', front, stage: i + 1 }))
+  return Array.from({ length: RIFT_STAGES }, (_, i) => riftFight(ctx, { kind: 'front', front, stage: i + 1 }, engine))
 }
 
 /** The Convergence's four fights, in `RIFT_FRONTS` order. */
-export function riftConvergence(ctx: RiftContext): RiftFightPlan[] {
-  return Array.from({ length: CONVERGENCE_FIGHTS }, (_, fight) => riftFight(ctx, { kind: 'convergence', fight }))
+export function riftConvergence(ctx: RiftContext, engine: number = BATTLE_ENGINE_VERSION): RiftFightPlan[] {
+  return Array.from({ length: CONVERGENCE_FIGHTS }, (_, fight) => riftFight(ctx, { kind: 'convergence', fight }, engine))
 }
 
-/** A Rift fight's frozen input on today's engine: the allies as built (H48 with full MP), the plan's waves. */
-export function riftBattleInput(plan: RiftFightPlan, allies: readonly BattleAlly[], seed: number): BattleInput {
-  return { version: BATTLE_ENGINE_VERSION, seed, allies: [...allies], enemies: plan.enemies, ...(plan.waves ? { waves: plan.waves } : {}) }
+/** A Rift fight's frozen input on the live engine (or `version`, for the balance simulation, H60; its plan from
+ * `riftFight` on the same engine): the allies as built (H48 with full MP), the plan's waves. */
+export function riftBattleInput(plan: RiftFightPlan, allies: readonly BattleAlly[], seed: number,
+  version: BattleInput['version'] = BATTLE_ENGINE_VERSION): BattleInput {
+  return { version, seed, allies: [...allies], enemies: plan.enemies, ...(plan.waves ? { waves: plan.waves } : {}) }
 }

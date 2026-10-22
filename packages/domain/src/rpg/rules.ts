@@ -172,9 +172,11 @@ const HANDS_V1: Readonly<Record<RpgClass, RpgHand>> = {
   brawler: hand(1, 1, 1, 1), mage: hand(1, 1, 1, 1), spellblade: hand(0.45, 0.45, 0.45, 0.5, 0, true),
   cleric: hand(0.5, 0.5, 0.5, 0.6), summoner: hand(0.6, 0.6, 0.6, 0.7, 0.3), paladin: hand(0.5, 0.5, 0.5, 0.6),
 }
-/** Classes v2 (§3.1–§3.3): the Spell Blade 70/30 with her Arms half leading, the Summoner her mirror. */
+/** Classes v2 (§3.1–§3.3): the Spell Blade 70/30 with her Arms half leading, the Summoner her mirror. H60 (D186) set them
+ * with the balance simulation: the Spell Blade 0.68 + 0.32, the weakest damage class at 0.63 + 0.27; the Summoner
+ * 0.58 + 0.32, a step from her 86% magical toward 70/30. */
 const handsOf = byGeneration(HANDS_V1, {
-  ...HANDS_V1, spellblade: hand(0.63, 0.63, 0.27, 0.5, 0, true), summoner: hand(0.63, 0.27, 0.63, 0.5, 0.3, true),
+  ...HANDS_V1, spellblade: hand(0.68, 0.68, 0.32, 0.5, 0, true), summoner: hand(0.58, 0.32, 0.58, 0.5, 0.3, true),
 })
 export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
   return { ...handsOf(engine)[p.classId] }

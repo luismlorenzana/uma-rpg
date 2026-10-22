@@ -9,8 +9,9 @@ export const BATTLE_WEAK = 1.3
 export const BATTLE_UNBROKEN_FACTOR = 0.5
 /** v14 (D169): the Rift's ward. A hit of the channel a foe wards deals this share, on top of the unbroken halving. */
 export const BATTLE_WARD_FACTOR = 0.5
-/** v15 (D183): a lingering summon's farewell strike on every foe, × its linger share × its hits' power. */
-export const BATTLE_FAREWELL_FACTOR = 1
+/** v15 (D183): a lingering summon's farewell strike on every foe, × its linger share × its hits' power. H60 (D186): 0.85,
+ * so her areas still match a Mage's over a wave while her damage a turn comes nearer the Spell Blade's. */
+export const BATTLE_FAREWELL_FACTOR = 0.85
 export const BATTLE_DEFENSE_SHARE = 0.5
 export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5
@@ -35,8 +36,9 @@ export const BATTLE_REVIVE_SHARE = 0.25
 /** v15 (classes v2 §3.3, C8): one healer carries the party, so a skill Barrier may reach 60% of max HP. */
 export const BATTLE_COVER_CAP_V15 = 0.6
 /** v15 (§4): a Cleric's Light spell leaves Regen, its mend repeating at this share of itself at the end of the round she
- * casts it and of the next (`BATTLE_REGEN_ROUNDS`, in `caps.ts` so the node summaries read it without the engine). */
-export const BATTLE_REGEN_SHARE = 0.3
+ * casts it and of the next (`BATTLE_REGEN_ROUNDS`, in `caps.ts` so the node summaries read it without the engine). H60
+ * (D186): 0.2, was 0.3, so the Paladin's healing and Barriers per round sit within 10% of hers. */
+export const BATTLE_REGEN_SHARE = 0.2
 export { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE, BATTLE_REGEN_ROUNDS } from './caps'
 
 export const battleChannel = (kind: RpgDamageKind | null): BattleChannel => kind !== null && rpgPhysical(kind) ? 'physical' : 'magical'

@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { regionChapter, worldContinent } from '../../world/world'
-import { RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, RPG_SUPPORT_SHARE_V15 } from '../catalog'
+import { RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, RPG_SUPPORT_SHARE_V15 } from '../catalog'
 import { learnRpgNode, projectRpgStats, rpgDefaultWeapons, type RpgClass, type RpgProfile, type RpgWeapon } from '../rules'
 import { autoAction } from './auto'
 import { applyBattleAction, battleActionsLeft, battleDamage, createBattle } from './engine'
@@ -173,7 +173,7 @@ describe('engine v15: the Summoner keeps no support (H56, §3.2)', () => {
 })
 
 describe('engine v15: the Paladin’s half of the old support (H56, §4)', () => {
-  it('mends the most hurt with a Blizzard spell and Barriers every Uma at 0.35 of its share', () => {
+  it('mends the most hurt with a Blizzard spell and Barriers every Uma at the Paladin’s shield share of its share', () => {
     const paladin = member('a4', 'paladin', 15, { loadout: ['paladin-tome-ice.1'] })
     const s = hurt(fight(party(paladin, 15), 15), 'a1')
     const cues = act(s, skill('a4', 'paladin-tome-ice.1')).cues
@@ -181,19 +181,19 @@ describe('engine v15: the Paladin’s half of the old support (H56, §4)', () =>
     expect(ofKind(cues, 'heal', 'a4')).toEqual([{ kind: 'heal', actorId: 'a4', targetId: 'a1', amount: Math.round(maxHpOf(s, 'a1') * 0.28 * b) }])
     const covers = ofKind(cues, 'cover', 'a4')
     expect(covers.map((c) => c.targetId)).toEqual(['a1', 'a2', 'a3', 'a4', 'a5'])
-    for (const c of covers) expect(c.amount, c.targetId).toBe(Math.round(maxHpOf(s, c.targetId) * 0.098 * b * RPG_SUPPORT_ALL))
+    for (const c of covers) expect(c.amount, c.targetId).toBe(Math.round(maxHpOf(s, c.targetId) * Math.round(RPG_PALADIN_SHIELD_SHARE * 0.28 * 1000) / 1000 * b * RPG_SUPPORT_ALL))
   })
 
-  it('gives Aegis 1 with a Greatsword blow to the Uma it shields, and Aegis 2 to every Uma at depth 5', () => {
+  it('gives Aegis with a Greatsword blow to the Uma it shields, and to every Uma at depth 5 (H60: 1 stack at every depth)', () => {
     const one = member('a4', 'paladin', 15, { loadout: ['paladin-greatsword.1'] })
     const step = act(fight(party(one, 15), 15), skill('a4', 'paladin-greatsword.1'))
     const [cover] = ofKind(step.cues, 'cover', 'a4')
     const aegis = (s: BattleState, id: string) => unitOf(s, id).statuses.find((x) => x.kind === 'aegis')?.stacks ?? 0
     expect(step.state.units.filter((u) => u.side === 'ally').map((u) => [u.id, aegis(step.state, u.id)]))
-      .toEqual(['a1', 'a2', 'a3', 'a4', 'a5'].map((id) => [id, id === cover!.targetId ? 1 : 0]))
+      .toEqual(['a1', 'a2', 'a3', 'a4', 'a5'].map((id) => [id, id === cover!.targetId ? RPG_PALADIN_AEGIS : 0]))
     const five = member('a4', 'paladin', 15, { level: 40, loadout: ['paladin-greatsword.5'] })
     const deep = act(fight(party(five, 15, 40), 15), skill('a4', 'paladin-greatsword.5'))
-    for (const id of ['a1', 'a2', 'a3', 'a4', 'a5']) expect(aegis(deep.state, id), id).toBe(2)
+    for (const id of ['a1', 'a2', 'a3', 'a4', 'a5']) expect(aegis(deep.state, id), id).toBe(RPG_PALADIN_AEGIS)
     // A Cleric's Greatsword only shields.
     const cleric = member('a4', 'cleric', 15, { weapons: ['tome-light', 'tome-dark', 'tome-fire', 'greatsword', 'bow'], loadout: ['cleric-greatsword.1'] })
     const plain = act(fight(party(cleric, 15), 15), skill('a4', 'cleric-greatsword.1'))

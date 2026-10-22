@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { RPG_ALL_NODES, rpgNode, type RpgSkillDef } from '../catalog'
-import { learnRpgNode, projectRpgStats, rpgDefaultWeapons, type RpgClass, type RpgProfile, type RpgWeapon } from '../rules'
+import { learnRpgNode, projectRpgStats, rpgDefaultWeapons, rpgHand, type RpgClass, type RpgProfile, type RpgWeapon } from '../rules'
 import { regionChapter, worldContinent } from '../../world/world'
 import { autoAction } from './auto'
 import { applyBattleAction, battleActionsLeft, battleDamage, battleExtraHit, createBattle } from './engine'
@@ -12,6 +12,8 @@ import { BATTLE_FAREWELL_FACTOR } from './skills'
 import type { BattleAction, BattleAlly, BattleCue, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
 
 type Version = 14 | 15
+/** The v15 hybrids' hands (H60 set them: D186). */
+const SB = rpgHand({ classId: 'spellblade' }, 15), SU = rpgHand({ classId: 'summoner' }, 15)
 /** An invented Uma of a class, built by the fight's generation: her spread, her stats, her side skills and loadout. */
 function member(id: string, classId: RpgClass, version: Version, options: { sides?: string[]; loadout?: string[]; weapons?: RpgWeapon[]; level?: number } = {}): BattleAlly {
   const level = options.level ?? 20
@@ -68,7 +70,7 @@ const ref = (id: string) => ({ tier: 1, id })
 const total = (def: Pick<RpgSkillDef, 'hits'>) => def.hits.reduce((sum, h) => sum + h.power, 0)
 
 describe('engine v15: the Spell Blade, 70/30 with an extra Arms hit (classes-v2 §3.1, D183)', () => {
-  it('lands an Attack pair as two Arms hits and one Tome hit: three shield points, at 0.63 and 0.27 of v14’s 0.45', () => {
+  it('lands an Attack pair as two Arms hits and one Tome hit: three shield points, at her v15 Arms and Tome hands of v14’s 0.45', () => {
     // The same Uma, stats and all, in a v14 fight and a v15 fight; her offense high so rounding stays small.
     const a3 = (version: Version) => { const a = blade(version); return { ...a, stats: { ...a.stats, atk: 2000, matk: 2000 } } }
     const pair: BattleAction = { kind: 'attack', actorId: 'a3', targetId: 'f1', weapon: 'greatsword', pair: { weapon: 'tome-fire' } }
@@ -80,10 +82,10 @@ describe('engine v15: the Spell Blade, 70/30 with an extra Arms hit (classes-v2 
     expect(v15.cues.flatMap((c) => (c.kind === 'shield' ? [c.amount] : []))).toEqual([9, 8, 7])
     expect(unitOf(v15.state, 'f1').shield).toBe(7)
     const sum = (cues: Hit[], element: string) => cues.filter((c) => c.element === element).reduce((n, c) => n + c.amount, 0)
-    expect(sum(hitsOf(v15.cues, 'a3'), 'greatsword') / sum(hitsOf(v14.cues, 'a3'), 'greatsword')).toBeCloseTo(0.63 / 0.45, 2)
-    expect(sum(hitsOf(v15.cues, 'a3'), 'fire') / sum(hitsOf(v14.cues, 'a3'), 'fire')).toBeCloseTo(0.27 / 0.45, 2)
+    expect(sum(hitsOf(v15.cues, 'a3'), 'greatsword') / sum(hitsOf(v14.cues, 'a3'), 'greatsword')).toBeCloseTo(SB.arms / 0.45, 2)
+    expect(sum(hitsOf(v15.cues, 'a3'), 'fire') / sum(hitsOf(v14.cues, 'a3'), 'fire')).toBeCloseTo(SB.tome / 0.45, 2)
     // Each Arms hit is exactly half the Attack's power at her Arms hand.
-    const each = battleDamage(s15, unitOf(s15, 'a3'), unitOf(s15, 'f1'), 'physical', 0.5 * 1 * 0.63, 'greatsword').amount
+    const each = battleDamage(s15, unitOf(s15, 'a3'), unitOf(s15, 'f1'), 'physical', 0.5 * 1 * SB.arms, 'greatsword').amount
     expect(hitsOf(v15.cues, 'a3').slice(0, 2).map((c) => c.amount)).toEqual([each, each])
   })
 
@@ -94,7 +96,7 @@ describe('engine v15: the Spell Blade, 70/30 with an extra Arms hit (classes-v2 
     const step = ok(s, { kind: 'skill', actorId: 'a3', targetId: 'f1', skill: ref('spellblade-lance.1'), pair: { skill: ref('spellblade-tome-fire.1') } })
     const hits = hitsOf(step.cues, 'a3')
     expect(hits.map((c) => c.element)).toEqual([...Array(lance.hits.length + 1).fill('lance'), ...Array(fire.hits.length).fill('fire')])
-    const whole = battleDamage(s, unitOf(s, 'a3'), unitOf(s, 'f1'), 'physical', total(lance) * 0.63, 'lance').amount
+    const whole = battleDamage(s, unitOf(s, 'a3'), unitOf(s, 'f1'), 'physical', total(lance) * SB.arms, 'lance').amount
     const arms = hits.filter((c) => c.element === 'lance').reduce((n, c) => n + c.amount, 0)
     expect(Math.abs(arms - whole)).toBeLessThanOrEqual(lance.hits.length + 1)
   })
@@ -164,7 +166,7 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(unitOf(s, 'a5').mp - unitOf(step.state, 'a5').mp).toBe(mp('summoner-tome-fire.1') + mp('summoner-greatsword.1'))
   })
 
-  it('casts her Tome summon first at 0.63, then her Arms summon at 0.27, and only the Tome summon lingers', () => {
+  it('casts her Tome summon first at her Tome hand, then her Arms summon at her Arms hand, and only the Tome summon lingers', () => {
     const s = s0()
     // Named Arms first: the Tome half still leads.
     const step = ok(s, pair('summoner-greatsword.1', 'summoner-tome-fire.1'))
@@ -173,8 +175,8 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(hits.map((c) => c.element)).toEqual(['fire', 'greatsword'])
     const a5 = unitOf(s, 'a5'), f1 = unitOf(s, 'f1')
     const fire = rpgNode('summoner-tome-fire.1')!.skill.hits[0]!.power, sword = rpgNode('summoner-greatsword.1')!.skill.hits[0]!.power
-    expect(hits[0]!.amount).toBe(battleDamage(s, a5, f1, 'magical', fire * 1 * 0.63, 'fire').amount)
-    expect(hits[1]!.amount).toBe(battleDamage(s, a5, f1, 'physical', sword * 1 * 0.27, 'greatsword').amount)
+    expect(hits[0]!.amount).toBe(battleDamage(s, a5, f1, 'magical', fire * 1 * SU.tome, 'fire').amount)
+    expect(hits[1]!.amount).toBe(battleDamage(s, a5, f1, 'physical', sword * 1 * SU.arms, 'greatsword').amount)
     expect(step.state.summons).toEqual([{ allyId: 'a5', ref: ref('summoner-tome-fire.1'), scale: 0.3 }])
     expect(ok(s, pair('summoner-tome-fire.1', 'summoner-greatsword.1')).cues).toEqual(step.cues)
   })

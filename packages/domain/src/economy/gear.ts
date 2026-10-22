@@ -87,8 +87,8 @@ export const ORB_OFFENSE_BY_GRADE: readonly number[] = MIGHT_BY_GRADE.map((_, g)
 export type CharmPerGrade = Readonly<Record<TalismanEffect | AmuletEffect, number>>
 const CHARM_V1: CharmPerGrade = { vital: 5, vampire: 20, bulwark: 20, iron: 15, thorn: 30, spring: 1, siphon: 5, veil: 20, ward: 15, mirror: 30 }
 /** Classes v2 (§6.3, H57): the Vital Talisman 0.6% a grade and the Siphon Amulet 0.8%, so every support is a real pick.
- * H60 may retune any of them. */
-const CHARM_V2: CharmPerGrade = { ...CHARM_V1, vital: 6, siphon: 8 }
+ * H60 (D186), by each one's gain on a Rift front's win rate: Vital 1% a grade, Thorn and Mirror 5%. */
+const CHARM_V2: CharmPerGrade = { ...CHARM_V1, vital: 10, thorn: 50, siphon: 8, mirror: 50 }
 export const charmPerGrade = (engine: number = BATTLE_ENGINE_VERSION): CharmPerGrade => (rpgV2(engine) ? CHARM_V2 : CHARM_V1)
 /** The live generation's values. */
 export const CHARM_PER_GRADE = charmPerGrade()

@@ -377,14 +377,19 @@ function clericSupport(weapon: RpgWeapon, d: number, revive = false, shares: rea
   if (revive) sup.revive = true
   return sup
 }
+/** v15 (classes v2 §4): the Paladin's Blizzard spells also shield every Uma at this share of their share (H60, D186: 0.5,
+ * was 0.35), and her Greatsword blows give each Uma they shield Aegis this many stacks at every depth (H60: 1, was 2 at
+ * depth 5). Healing and Barriers per round then sit within 10% of the Cleric's. */
+export const RPG_PALADIN_SHIELD_SHARE = 0.5
+export const RPG_PALADIN_AEGIS = 1
 /** v15 (classes v2 §3.3, §4): both healers' kit at the doubled shares, and each one's half of the Summoner's old support.
- * The Paladin's Blizzard spells also shield every Uma at 0.35 of their share, and her Greatsword blows give Aegis to each
- * Uma they shield (2 at depth 5); the Cleric's Light spells leave Regen and her Dark spells drain 30%. `revive`: the
- * Cleric's Rebirth, or the Paladin's Valkyrie's Oath. */
+ * The Paladin's Blizzard spells also shield every Uma (`RPG_PALADIN_SHIELD_SHARE` of their share), and her Greatsword
+ * blows give Aegis to each Uma they shield (`RPG_PALADIN_AEGIS`); the Cleric's Light spells leave Regen and her Dark
+ * spells drain 30%. `revive`: the Cleric's Rebirth, or the Paladin's Valkyrie's Oath. */
 function healerSupport(weapon: RpgWeapon, d: number, revive: boolean, paladin: boolean): RpgSupport {
   const sup = clericSupport(weapon, d, revive, RPG_SUPPORT_SHARE_V15)
-  if (paladin && weapon === 'tome-ice') Object.assign(sup, { shield: 'all', shieldShare: round(0.35 * sup.share) })
-  if (paladin && weapon === 'greatsword') sup.aegis = d === 5 ? 2 : 1
+  if (paladin && weapon === 'tome-ice') Object.assign(sup, { shield: 'all', shieldShare: round(RPG_PALADIN_SHIELD_SHARE * sup.share) })
+  if (paladin && weapon === 'greatsword') sup.aegis = RPG_PALADIN_AEGIS
   if (!paladin && weapon === 'tome-light') sup.regen = true
   if (!paladin && weapon === 'tome-dark') sup.drain = 0.3
   return sup

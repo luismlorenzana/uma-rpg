@@ -2,6 +2,7 @@
 // stage, and every number the generator reads, in one table (`RIFT_TUNING`) that the balance pass (H51) tunes against
 // §11's targets. Which ranks a stage holds is §5's and stays; its counts, shares, shields and acts are tuning. Lazy: only
 // `@rpg/domain/rift` loads it.
+import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
 import type { BattleChannel, EnemyRank } from '../rpg/battle/types'
 import type { RpgFoeRole } from '../rpg/campaign/enemies'
 import type { RpgClass } from '../rpg/rules'
@@ -13,18 +14,39 @@ export interface RiftFrontSpec {
   name: 'Iron' | 'Arcane' | 'Duel' | 'Horde'
   /** The channel its foes ward (H44): Iron magical, Arcane physical; null on Duel and Horde. */
   ward: BattleChannel | null
-  /** Today's party guidance (D168, point 2), five classes; retuned with classes v2. */
+  /** The party guidance, five classes: classes v1's (D168, point 2) or v2's (D178, point 5), by `riftParty`. */
   party: readonly RpgClass[]
 }
 
-/** §5's fronts: Iron's foes are weak to Arms only and ward elements, Arcane's the reverse; the Duel is one boss weak to
- * both, the Horde many foes each weak to her own pair. */
-export const RIFT_FRONT_SPECS: Readonly<Record<RiftFront, RiftFrontSpec>> = {
-  iron: { front: 'iron', name: 'Iron', ward: 'magical', party: ['brawler', 'brawler', 'spellblade', 'spellblade', 'cleric'] },
-  arcane: { front: 'arcane', name: 'Arcane', ward: 'physical', party: ['mage', 'mage', 'summoner', 'summoner', 'cleric'] },
-  duel: { front: 'duel', name: 'Duel', ward: null, party: ['brawler', 'brawler', 'mage', 'mage', 'cleric'] },
-  horde: { front: 'horde', name: 'Horde', ward: null, party: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'] },
+const PARTY_V1: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
+  iron: ['brawler', 'brawler', 'spellblade', 'spellblade', 'cleric'],
+  arcane: ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
+  duel: ['brawler', 'brawler', 'mage', 'mage', 'cleric'],
+  horde: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
 }
+/** Classes v2's guidance (D178, point 5; H60 measured both healers on the Duel and the Horde and kept these): one healer
+ * a party, the Paladin with the Arms-led parties, the Cleric with the Tome-led. */
+const PARTY_V2: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
+  iron: ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'],
+  arcane: ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
+  duel: ['brawler', 'brawler', 'mage', 'mage', 'paladin'],
+  horde: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
+}
+/** A front's guided party in an engine's class generation (H60): the balance simulation asks by version, the screens
+ * read the live one through `RIFT_FRONT_SPECS`. */
+export const riftParty = (front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] =>
+  (rpgV2(engine) ? PARTY_V2 : PARTY_V1)[front]
+
+/** §5's fronts in an engine's generation: Iron's foes are weak to Arms only and ward elements, Arcane's the reverse; the
+ * Duel is one boss weak to both, the Horde many foes each weak to her own pair. */
+export const riftFrontSpecs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RiftFront, RiftFrontSpec>> => ({
+  iron: { front: 'iron', name: 'Iron', ward: 'magical', party: riftParty('iron', engine) },
+  arcane: { front: 'arcane', name: 'Arcane', ward: 'physical', party: riftParty('arcane', engine) },
+  duel: { front: 'duel', name: 'Duel', ward: null, party: riftParty('duel', engine) },
+  horde: { front: 'horde', name: 'Horde', ward: null, party: riftParty('horde', engine) },
+})
+/** The live generation's fronts: today's guidance until the switch (H61), classes v2's after. */
+export const RIFT_FRONT_SPECS: Readonly<Record<RiftFront, RiftFrontSpec>> = riftFrontSpecs()
 
 /** The face tier a slot draws from the enemy roster (rift.md §9). */
 export type RiftFace = 'boss' | 'subboss' | 'key'
@@ -91,6 +113,34 @@ export const RIFT_TUNING = {
   },
 } as const
 
+type Widen<T> = T extends number ? number : T extends string ? T : { readonly [K in keyof T]: Widen<T[K]> }
+/** `RIFT_TUNING`'s shape with its numbers free, so a generation's override is one. */
+export type RiftTuning = Widen<typeof RIFT_TUNING> & {
+  /** v15: a front's champion (stage 12, and so its Convergence fight) at this HP and offense over its front's shape. */
+  champions?: Partial<Record<RiftFront, { hp: number; offense: number }>>
+}
+
+/** Classes v2's Rift (H60, D186; rift.md §5, §11): `RIFT_TUNING` with what classes v2's parties' measurements moved:
+ * Iron's and Arcane's shields doubled, Arcane's scale, each front's champion, the Duel, the Horde's offense and the
+ * Convergence. */
+const RIFT_TUNING_V15: RiftTuning = {
+  ...RIFT_TUNING,
+  scale: { iron: { hp: 1, offense: 1 }, arcane: { hp: 1.2, offense: 1.1 } },
+  champions: { iron: { hp: 1.17, offense: 1.17 }, arcane: { hp: 1, offense: 0.92 }, horde: { hp: 1.05, offense: 1.05 } },
+  escort: { ...RIFT_TUNING.escort, captain: { ...RIFT_TUNING.escort.captain, shield: 16 }, guard: { ...RIFT_TUNING.escort.guard, shield: 8 } },
+  elites: { ...RIFT_TUNING.elites, shield: 16 },
+  boss: { ...RIFT_TUNING.boss, shield: 16, guard: { ...RIFT_TUNING.boss.guard, shield: 12 } },
+  openers: { ...RIFT_TUNING.openers, shield: 12 },
+  duel: { ...RIFT_TUNING.duel, hp: 1.1, offense: 2.3 },
+  horde: { ...RIFT_TUNING.horde, offense: 4.4 },
+  convergence: -0.18,
+}
+
+/** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, read through the
+ * fight's version so a fight started before the switch keeps its generation's foes. Faces, ranks and counts are the
+ * same in both, so the run's face allocation (`picker.ts`) holds for either. */
+export const riftTuning = (engine: number = BATTLE_ENGINE_VERSION): RiftTuning => (rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
+
 /** One foe of a Rift stage, before faces, weaknesses and levels. */
 export interface RiftSlot {
   face: RiftFace
@@ -107,6 +157,7 @@ export interface RiftSlot {
   pair?: true
 }
 
+const actsOf = (n: number): RiftSlot['acts'] => n as RiftSlot['acts']
 const times = (n: number, slot: () => RiftSlot): RiftSlot[] => Array.from({ length: n }, slot)
 const valid = (front: RiftFront, stage: number): boolean =>
   RIFT_FRONTS.includes(front) && Number.isInteger(stage) && stage >= 1 && stage <= RIFT_STAGES
@@ -114,21 +165,20 @@ const valid = (front: RiftFront, stage: number): boolean =>
 /** Iron's and Arcane's stages (§5): 1–4 a sub-boss and her key guards; 5 and 7 two sub-bosses; 6 and 8 a boss and her
  * sub-boss-faced guards; 9–11 two opening waves of sub-boss-faced foes, then the boss and her guards; 12 two bosses. The
  * counts are `RIFT_TUNING`'s. */
-function wardShape(stage: number): RiftSlot[][] {
-  const t = RIFT_TUNING
+function wardShape(stage: number, t: RiftTuning): RiftSlot[][] {
   const bossWave = (): RiftSlot[] => [
-    { face: t.boss.face, rank: 'boss', role: 'champion', hp: t.boss.hp, offense: t.boss.offense, shield: t.boss.shield, acts: t.boss.acts },
+    { face: t.boss.face, rank: 'boss', role: 'champion', hp: t.boss.hp, offense: t.boss.offense, shield: t.boss.shield, acts: actsOf(t.boss.acts) },
     ...times(t.boss.guards, () => ({ face: t.boss.guard.face, rank: 'regular', role: 'guard', hp: t.boss.guard.hp, offense: t.boss.guard.offense, shield: t.boss.guard.shield, acts: 1 })),
   ]
   if (stage <= 4) {
     const c = t.escort.captain, g = t.escort.guard
-    return [[{ face: c.face, rank: 'sub-boss', role: 'captain', hp: c.hp, offense: c.offense, shield: c.shield, acts: c.acts },
+    return [[{ face: c.face, rank: 'sub-boss', role: 'captain', hp: c.hp, offense: c.offense, shield: c.shield, acts: actsOf(c.acts) },
       ...times(t.escort.guards, () => ({ face: g.face, rank: 'regular', role: 'guard', hp: g.hp, offense: g.offense, shield: g.shield, acts: 1 }))]]
   }
   if (stage <= 8) {
     if (stage % 2 === 1) {
       const e = t.elites
-      return [times(e.count, () => ({ face: e.face, rank: 'sub-boss', role: 'captain', hp: e.hp, offense: e.offense, shield: e.shield, acts: e.acts }))]
+      return [times(e.count, () => ({ face: e.face, rank: 'sub-boss', role: 'captain', hp: e.hp, offense: e.offense, shield: e.shield, acts: actsOf(e.acts) }))]
     }
     return [bossWave()]
   }
@@ -140,20 +190,20 @@ function wardShape(stage: number): RiftSlot[][] {
     return [...Array.from({ length: o.waves }, opener), bossWave()]
   }
   const c = t.champion
-  return [times(c.count, () => ({ face: c.face, rank: 'boss', role: 'champion', hp: c.hp, offense: c.offense, shield: c.shield, acts: c.acts, pair: true }))]
+  return [times(c.count, () => ({ face: c.face, rank: 'boss', role: 'champion', hp: c.hp, offense: c.offense, shield: c.shield, acts: actsOf(c.acts), pair: true }))]
 }
 
 /** The Duel (§5): one boss a fight, acting twice, three times at the champion; her shield rises by band. */
-function duelShape(stage: number): RiftSlot[][] {
-  const d = RIFT_TUNING.duel
+function duelShape(stage: number, t: RiftTuning): RiftSlot[][] {
+  const d = t.duel
   return [[{ face: d.face, rank: 'boss', role: 'champion', hp: d.hp, offense: d.offense, shield: d.shields[stage - 1]!,
-    acts: stage === RIFT_STAGES ? d.championActs : d.acts }]]
+    acts: actsOf(stage === RIFT_STAGES ? d.championActs : d.acts) }]]
 }
 
 /** The Horde (§5): three waves of a leader and keys, every foe regular rank; a boss leads the last wave from stage
  * `bossFrom`, and two bosses from different packs the champion's. */
-function hordeShape(stage: number): RiftSlot[][] {
-  const h = RIFT_TUNING.horde
+function hordeShape(stage: number, t: RiftTuning): RiftSlot[][] {
+  const h = t.horde
   const count = h.counts[stage - 1]!
   const shield = h.shields[stage - 1]!
   return Array.from({ length: h.waves }, (_, w) => {
@@ -170,16 +220,22 @@ function hordeShape(stage: number): RiftSlot[][] {
   })
 }
 
-/** A front stage's foes, wave by wave (§5's table, D173): exported for the balance pass and the manual. Throws a
- * `RangeError` for an unknown front or a stage outside 1–12. */
-export function riftShape(front: RiftFront, stage: number): RiftSlot[][] {
+/** A front stage's foes, wave by wave (§5's table, D173), in an engine's tuning (`riftTuning`, H60): exported for the
+ * balance pass and the manual. Throws a `RangeError` for an unknown front or a stage outside 1–12. */
+export function riftShape(front: RiftFront, stage: number, engine: number = BATTLE_ENGINE_VERSION): RiftSlot[][] {
   if (!valid(front, stage)) throw new RangeError(`Unknown Rift stage: ${String(front)} ${stage}`)
-  switch (front) {
-    case 'iron': case 'arcane': {
-      const { hp, offense } = RIFT_TUNING.scale[front]
-      return wardShape(stage).map((wave) => wave.map((slot) => ({ ...slot, hp: slot.hp * hp, offense: slot.offense * offense })))
+  const t = riftTuning(engine)
+  const shape = ((): RiftSlot[][] => {
+    switch (front) {
+      case 'iron': case 'arcane': {
+        const { hp, offense } = t.scale[front]
+        return wardShape(stage, t).map((wave) => wave.map((slot) => ({ ...slot, hp: slot.hp * hp, offense: slot.offense * offense })))
+      }
+      case 'duel': return duelShape(stage, t)
+      case 'horde': return hordeShape(stage, t)
     }
-    case 'duel': return duelShape(stage)
-    case 'horde': return hordeShape(stage)
-  }
+  })()
+  // v15: a front's own champion scale (its Convergence fight, the same shape, too).
+  const c = stage === RIFT_STAGES ? t.champions?.[front] : undefined
+  return c ? shape.map((wave) => wave.map((slot) => ({ ...slot, hp: slot.hp * c.hp, offense: slot.offense * c.offense }))) : shape
 }

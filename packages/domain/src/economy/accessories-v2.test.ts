@@ -42,13 +42,14 @@ describe('flat Orbs (classes v2 §6.2, C4)', () => {
 })
 
 describe('the support accessories (classes v2 §6.3)', () => {
-  it('raises the Vital Talisman to 6% and the Siphon Amulet to 8% at grade 10, and keeps the other eight', () => {
-    expect(accessoryEffects(piece('talisman-vital', 10), 15).regen).toBe(60)
+  it('sets v2\'s supports at grade 10 (H57, retuned by H60): Vital 10%, Siphon 8%, Thorn and Mirror 50%; the other six as v1', () => {
+    expect(accessoryEffects(piece('talisman-vital', 10), 15).regen).toBe(100)
     expect(accessoryEffects(piece('amulet-siphon', 10), 15).mpSteal).toBe(80)
     expect(accessoryEffects(piece('talisman-vital', 10), 14).regen).toBe(50)
     expect(accessoryEffects(piece('amulet-siphon', 10), 14).mpSteal).toBe(50)
-    expect(charmPerGrade(15)).toEqual({ ...charmPerGrade(14), vital: 6, siphon: 8 })
-    for (const type of ACCESSORY_TYPES.filter((t) => !isOrb(t) && t !== 'talisman-vital' && t !== 'amulet-siphon')) {
+    expect(charmPerGrade(15)).toEqual({ ...charmPerGrade(14), vital: 10, siphon: 8, thorn: 50, mirror: 50 })
+    const moved = ['talisman-vital', 'amulet-siphon', 'talisman-thorn', 'amulet-mirror']
+    for (const type of ACCESSORY_TYPES.filter((t) => !isOrb(t) && !moved.includes(t))) {
       expect(accessoryEffects(piece(type, 10), 15), type).toEqual(accessoryEffects(piece(type, 10), 14))
     }
   })
