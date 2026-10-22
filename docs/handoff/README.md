@@ -72,10 +72,11 @@ one switch and turned on by H61; the build decisions are logged by H53):
 | H58 | Save v25 (dark): the Paladin's migration, one healer a party, the Paladin's start | Claude | M | H53 | Done (`c4f7745`) |
 | H59 | The classes v2 screens, inert until the switch: the Paladin, the Bastion, typed slots, the Summoner's pair, one healer (pins uma-art 2.12.0) | Either | L | H54, H55, H56, H57, H58, H62 | Done (`e9feef1`) |
 | H60 | Classes v2 balance: §9's targets, the campaign, the Rift re-measured with v2 parties (Iron's wrong party), v15 knobs first (dark) | Claude | L | H55, H56, H57 | Done (`9de82ae`) |
-| [H61](tasks/H61-classes-v2-switch.md) | The switch: engine v15, save v25 and the Paladin go live; the manual rewritten | Claude | M | H59, H60 | In progress (this session) |
+| [H61](tasks/H61-classes-v2-switch.md) | The switch: engine v15, save v25 and the Paladin go live; the manual rewritten | Claude | M | H59, H60, H63 | In progress (this session; pushes after H63) |
 | H62 | The fight engine leaves the main bundle (227.3 KB of 230 after H56), so H59 and later fit | Claude | M | — | Done (`21e6be4`) |
+| [H63](tasks/H63-hybrid-mirror.md) | The hybrids' mirror: Spell Blade and Summoner deal equivalent damage, 70/30 each way (owner, 2026-10-22); v15 only, before the switch | Claude | S–M | H60 | In progress (this session) |
 
-**Waves:** 1) H53, H54 (both done) → 2) H55, H56, H57, H58, H62 (done) → 3) H59, H60 (done) → 4) H61.
+**Waves:** 1) H53, H54 (both done) → 2) H55, H56, H57, H58, H62 (done) → 3) H59, H60 (done) → 4) H63 → H61.
 
 The five docs' calls wait on the owner (Q12–Q16).
 
