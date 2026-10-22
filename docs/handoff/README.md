@@ -17,7 +17,7 @@
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H32 | Mage, Cleric and Summoner unlock in magic armor (one class → armor table) | Either | S | — | Done (`b535754`) |
-| [H33](tasks/H33-class-presets.md) | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Ready |
+| H33 | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Done (`9823201`) |
 | [H34](tasks/H34-upgrade-badges.md) | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Ready |
 | [H35](tasks/H35-active-tier.md) | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | In progress (this session) |
 | [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Waiting |
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H33 | A standard preset per class, "Use the standard preset" at the top of the Gear tab: the default spread, the class's armor half, an Orb in accessory 1 and a support in accessory 2, with her best pieces or the stock's next grades her ranks allow; binding asks first in a sheet (D164). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39697022175) | `9823201` |
 | H40 | Doc: [weapon arts and armor sets](../design/weapon-arts.md), proposal for the owner with calls E1–E9 (Q15). A core at Weapon Rank 4 and an A damage / B Break +1 fork at rank 8 for each weapon kind: thirty nodes from eight shape effects in mirrored Arm and element pairs. Set bonuses for a full physical suit (max HP) or magical suit (skill MP) in three steps. Nodes cost H42's Lore Scrolls, steps its Seals; the chip cap is H39's shared one, per foe. Flags the Duel shield against v14's multi-hit acts | `919b361` |
 | H38 | The Rift's art in uma-art 2.11.0: the `rift` building (place 41, `page: battle`), four 16px `front/*` crests and eleven 24px `achievement/*` badges, append-only (uma-platform P66). The Rift page pins the release and points the `tier-finale` place at `rift` | uma-platform `e3da022` (release `4125858`) |
 | H39 | Doc: [Tier 2's advanced classes](../design/tier2-classes.md), proposal for the owner with calls A1–A10 (Q14). Twelve passives within classes v2's slots, hands and 70/30, each pair winning a different Rift front; Duelist becomes Blademaster and three summons are renamed; Hero LB+ for anyone at Bond 10 with 24 drafted effects; skill MP ×1.7 in Tier 2 instead of ×tier | `9cc1831` |
