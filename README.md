@@ -5,7 +5,7 @@ owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
 - a three-page Hub of the Wilds, halls and town;
 - passive professions;
-- per-Uma leveling with five classes and forty skill trees;
+- per-Uma leveling with six classes and fifty skill trees, one healer a party (classes v2);
 - crafting, Star Gems and Extra Stats;
 - a world map of five continents and turn-based party battles with Breaks, waves and Limit Breaks.
 
