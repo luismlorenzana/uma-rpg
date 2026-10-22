@@ -43,7 +43,7 @@
 | H46 | Save v24: the account's defeated faces, the open Rift fight, run traces and the Convergence | Claude | M | — | Done (`39f0c26`) |
 | H47 | The Rift generator: fronts, stages, champions, Convergence, Echoes, the cross-pack picker | Claude | L | H44, H46 | Done (`45169b7`) |
 | H49 | Achievements: catalog, earning rules, the Account's list, the cut-in (pins uma-art 2.11.0) | Either | M | H46 | Done (`5dbb9ef`) |
-| [H48](tasks/H48-rift-run-rules-ascend.md) | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | Ready (H45, H46 and H47 done; H47 `45169b7`, D173: `@rpg/domain/rift` with `riftFight`, `riftBattleInput`, `riftSeed`, `defeatedBefore`, `RIFT_FRONT_SPECS`; add `export * from '../save/rift'` to `rift/index.ts`) |
+| [H48](tasks/H48-rift-run-rules-ascend.md) | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | In progress (this session) |
 | [H50](tasks/H50-rift-page.md) | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | Waiting on H48 (H49 `5dbb9ef`: `AchievementCutIn({ grants, onDone })`, `FrontCrest`, `AchievementBadge`, `achievementDef`, uma-art 2.11.0 pinned, D172) |
 | [H51](tasks/H51-rift-balance.md) | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | Waiting on H48 (H47 `45169b7`, D173: `RIFT_TUNING`, `riftShape`, the synthetic `packRoster()` in `rift/roster.fixture.ts`; bosses fill the Bestiary in four runs at the starting shapes) |
 

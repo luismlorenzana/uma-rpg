@@ -137,6 +137,12 @@ run, so the chain shows the faces the fights will have. `CastFace` moves from `R
      times" for `thrice` and a "Wards Arms" or "Wards Tomes" badge for `ward`, in the same style. On the fight screen, a
      warded foe carries a small mark beside her element (the front's `FrontCrest` from H49 is fine), so the player
      learns which channel to bring before the hit cues teach it.
+   - **A Rift foe looks like her face, not her rank** (main session, after H47's D173): the Horde's leaders are regular
+     rank so the HP budget works, but a boss- or sub-boss-faced leader must still read as one. On a Rift fight, the
+     stage layout's size (`stageLayout`'s ranks), the Boss/Elite tag, the cut-in's stripe and splash, and the foe
+     lists take the face's tier from the roster (`RosterMember.tier`: `boss` → boss, `subboss` → sub-boss), falling
+     back to `enemy.rank`. Put the mapping in `fight-source.ts` (the Rift source supplies it; the campaign source keeps
+     `rank`), so world-map fights don't change. Test it with a Horde stage-9 plan.
 4. **`places/rift/`:** `RiftPage.tsx` (routes, behind `CampaignGate`), `RiftPeek.tsx` (status, the fronts' counts),
    `FrontChain.tsx`, `StageSheet.tsx`, `ConvergenceView.tsx`, `SignUp.tsx`, `EchoSheet.tsx`, `AscendSheet.tsx`,
    `RiftFightRoute.tsx`, `RiftResult.tsx`, and pure helpers in `rift-view.ts` (`riftRefLabel`, the eligible parties for
