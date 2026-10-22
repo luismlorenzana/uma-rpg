@@ -49,7 +49,8 @@ columns are approved, not built.
 
 - **Hands (v14):**
   - Brawler and Mage ×1.
-  - Spell Blade: an Arms half ×0.63 that lands as two hits, and a Tome half ×0.27.
+  - Spell Blade: an Arms half ×0.63 that gains one extra hit, its power split evenly (an Attack lands as two, a skill
+    of n hits as n + 1; classes v2 §3.1), and a Tome half ×0.27. The table gives her skills' own hits, before that one.
   - Summoner: a Tome summon ×0.63, whose farewell strike reaches every foe at ×0.3, and an Arms summon ×0.27.
   - Paladin and Cleric: ×0.5, plus support.
 - **Side skills reshape some of these.** A Mage's Fire Wave reaches every foe. Her Spike and Bolt sides hit one foe.
@@ -97,7 +98,7 @@ values instead: half a weapon's Might at the node's grade, as an Orb gives.
 | | State |
 |---|---|
 | **Engine v13** (built) | Five classes. Might by grade. Armor offense from grade 1. Two accessory slots, any types. Orbs add their kind for weaknesses |
-| **Engine v14** (approved, D160) | Six classes. The Spell Blade's double Arms hit and the Summoner's mirrored pair with farewell areas. Healers' ATK and M.ATK scaling. Flat Orbs in a typed slot. Guts into HP. The Rift's ward |
+| **Engine v14** (approved, D160) | Six classes. The Spell Blade's extra Arms hit and the Summoner's mirrored pair with farewell areas. Healers' ATK and M.ATK scaling. Flat Orbs in a typed slot. Guts into HP. The Rift's ward |
 | **Engine v15** (this doc and H39) | Weapon arts and set bonuses. Advanced class passives and skill MP ×1.7 in Tier 2 (H39, A10) |
 
 ## 3. One job per lever
@@ -339,19 +340,19 @@ the simulation. The eight effects and the mirrored pairs are the shape to approv
 
 ## 6. Interactions
 
-**The Spell Blade's double Arms hit** (D160 §3.1):
-- **The reading assumed here:** D160 says her Arms half "lands as two hits, each half its power". This doc assumes v14
-  splits each hit of her Arms half in two. That gives the three chips an act D160 counts for an Attack pair.
-- **An art's added hit comes after the split, once.** It's never split, and B's +1 is one point, not two.
+**The Spell Blade's extra Arms hit** (classes v2 §3.1, clarified):
+- **Her Arms half gains one extra hit,** for the half as a whole, with its power split evenly. An Attack lands as two
+  hits, a skill of n hits as n + 1.
+- **An art's added hit comes on top, once.** It isn't her extra hit and never adds another, and B's +1 is one point.
 - **Her chips an act** with each Arms art, on a lone foe, every hit weak, her depth-5 core:
 
-  | Arms weapon | Core hits | Split (v14) | With the core | With A | With B |
+  | Arms weapon | Core hits | With her extra hit (v14) | With the core | With A | With B |
   |---|---|---|---|---|---|
-  | Greatsword | 2 | 4 | 4 | 4 | 5 |
-  | Axe | 2 | 4 | 4 | 4 | 5 |
-  | Lance | 3 | 6 | 6 | 6 | 7 |
-  | Bow | 4 | 8 | 8 | 8 | 9 |
-  | Katana | 2 | 4 | 4 | 4 | 5 |
+  | Greatsword | 2 | 3 | 3 | 3 | 4 |
+  | Axe | 2 | 3 | 3 | 3 | 4 |
+  | Lance | 3 | 4 | 4 | 4 | 5 |
+  | Bow | 4 | 5 | 5 | 5 | 6 |
+  | Katana | 2 | 3 | 3 | 3 | 4 |
 
   Her Tome half adds its own 2–4. With two foes or more, Return Edge, Shockwave or Ricochet can also take one point from
   each other foe they reach, under that foe's cap.
@@ -403,17 +404,22 @@ the simulation. The eight effects and the mirrored pairs are the shape to approv
 1. **The Duel can fall to one act before any art.** On a lone foe, depth 5, every hit weak, the best single acts
    already chip:
 
-   | Class | Best act | Points | With B |
+   | Class | Best act | Points | With arts and passives (the shared cap) |
    |---|---|---|---|
    | Brawler | Thousand Spears: 8 random hits | 8 | 9 |
    | Mage | Holy: 6 hits | 6 | 7 |
-   | Spell Blade (v14) | Bow Flurry (5 hits, split to 10) and Light Flurry (5) | 15 | 16 |
+   | Spell Blade (v14) | Bow Flurry (5 hits, and her extra hit: 6) and Light Flurry (5) | 11 | 12 |
    | Summoner (v14) | Light Pack and Bow Pack (5 each), plus a Light Pack's farewell (5) | 15 | 16 |
    | Paladin, Cleric | A Bow blow: 1 hit and Shatter 3–4 | 4–5 | 5–6 |
 
-   A Duel boss with shield 10–12 (rift.md §5) can fall to one Spell Blade's or Summoner's act. Arts add one at most,
-   so they don't decide it. **Recommendation:** v14's simulation sets either the Duel shield or the split above the
-   best single act. Splitting only her Attack and one-hit halves is one way. H43's Tier 2 fronts take the same number.
+   - **The worst single act is the Summoner's: 15 points, 16 with B.** It assumes v14's farewell recasts every hit of
+     the summon, as today's linger does. If her farewell is one strike, her act is 11, 12 with B.
+   - **The Spell Blade's, under the clarified extra hit, is 11, 12 with B or the Blademaster's +1.** It no longer
+     reaches 16, but it still meets a shield of 10–12.
+   - **Arts add one at most** (E6), so they don't decide it. A Cleric's Breaker charge, outside the cap, can add more.
+   - **Classes v2's guard rail** (§3.1) already has v14's simulation check the Spell Blade's best act against the Duel
+     shield, and raise the shield if it's reached. **Recommendation:** the same check runs on every class, the
+     Summoner's first, with E6's one counted. H43's Tier 2 Duel takes the same number.
 2. **The Horde depends on its weakness spread.** An every-foe skill chips each weak foe once a hit: a depth-5 Axe
    Breaks every Axe-weak shield-3 foe alone. Arts and passives add at most one point a foe. The "no one Uma Breaks a
    whole wave" target rests on each foe's own Arms and element pair (rift.md §5), not on arts.
