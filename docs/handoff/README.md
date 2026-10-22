@@ -32,7 +32,7 @@
 | H40 | Weapon arts and armor sets ([`weapon-arts.md`](../design/weapon-arts.md), calls E1–E9) | Claude | M | — | Done (`919b361`) |
 | H41 | The Extra Stats outer ring ([`extra-stats-tier2.md`](../design/extra-stats-tier2.md), calls X1–X8) | Claude | M | — | Done (`d15b84d`) |
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
-| [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | In progress (this session) |
+| H43 | Tier 2's world and its Rift ([`tier2-world.md`](../design/tier2-world.md), calls Z1–Z10) | Claude | M | — | Done (`91ee4e7`) |
 
 **Ready now, in parallel:** H33, H34, H35, H38 and H39–H43. H36 follows H35.
 
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H43 | Doc: [Tier 2's world and its Rift](../design/tier2-world.md), proposal for the owner with calls Z1–Z10 (Q16). Today a freshly ascended party wins none of `w6`'s opening stages (scratch simulation); the foe budget restarts at the tier's Lv 1 with its build part scaled to her lifetime stats, plus one Tier 2 term for the toolbox. New leans and pack table for `w6`–`w10`, shields +1, skill MP ×1.7 with H39's A10, tier levels on screen, Laurels ×2 with the regions' tier fixed, a first-week ledger (T5 stands), one added test per Rift front, the Twilight Rift biome renamed | `91ee4e7` |
 | H33 | A standard preset per class, "Use the standard preset" at the top of the Gear tab: the default spread, the class's armor half, an Orb in accessory 1 and a support in accessory 2, with her best pieces or the stock's next grades her ranks allow; binding asks first in a sheet (D164). Locally validated at both phone widths and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39697022175) | `9823201` |
 | H40 | Doc: [weapon arts and armor sets](../design/weapon-arts.md), proposal for the owner with calls E1–E9 (Q15). A core at Weapon Rank 4 and an A damage / B Break +1 fork at rank 8 for each weapon kind: thirty nodes from eight shape effects in mirrored Arm and element pairs. Set bonuses for a full physical suit (max HP) or magical suit (skill MP) in three steps. Nodes cost H42's Lore Scrolls, steps its Seals; the chip cap is H39's shared one, per foe. Flags the Duel shield against v14's multi-hit acts | `919b361` |
 | H38 | The Rift's art in uma-art 2.11.0: the `rift` building (place 41, `page: battle`), four 16px `front/*` crests and eleven 24px `achievement/*` badges, append-only (uma-platform P66). The Rift page pins the release and points the `tier-finale` place at `rift` | uma-platform `e3da022` (release `4125858`) |
