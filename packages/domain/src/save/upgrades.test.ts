@@ -145,7 +145,9 @@ describe('can upgrade (H34)', () => {
     expect(up(world())).toEqual({ gearSlots: [], gear: 0, points: 0, gems: 0, freeNodes: 0, stars: 0, any: false })
   })
 
-  it('computes 268 Umas against a full stock in under 100 ms', () => {
+  // A guard against an accidental quadratic blowup, not a micro-benchmark: about 20 ms locally, and shared CI runners can be
+  // several times slower (104 ms once against the old 100 ms bound).
+  it('computes 268 Umas against a full stock in well under half a second', () => {
     const gear = Object.fromEntries(EQUIP_TYPES.flatMap((t) => Array.from({ length: 10 }, (_, g) => [gearId(t, g + 1), 2])))
     const gems = Object.fromEntries(GEM_IDENTITIES.map((g) => [g.id, 2]))
     expect(Object.keys(gear)).toHaveLength(400)
@@ -159,7 +161,7 @@ describe('can upgrade (H34)', () => {
     const start = performance.now()
     let marked = 0
     for (const id of Object.keys(umas)) if (upgradesFor(w, id, 'brawler')!.any) marked++
-    expect(performance.now() - start).toBeLessThan(100)
+    expect(performance.now() - start).toBeLessThan(400)
     expect(marked).toBe(268)
   })
 })
