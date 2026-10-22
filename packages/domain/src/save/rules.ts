@@ -88,6 +88,28 @@ export function partyOf(world: TierWorld, outfitId: string): { party: number; sl
   return null
 }
 
+/** The member whose face represents a party. Slot 1 is the explicit lead; old and partial parties fall back safely. */
+export function partyLead(party: Party): string | null {
+  return party.slots[0] ?? party.slots.find((id): id is string => id !== null) ?? null
+}
+
+/** Makes an existing member the lead by swapping her into slot 1. This keeps the save shape and every member intact. */
+export function setPartyLead(save: Save, party: number, outfitId: string, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const target = world.parties[party]
+  if (!Number.isInteger(party) || !target) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
+  const slot = target.slots.indexOf(outfitId)
+  if (slot < 0) throw new SaveRuleError('not-owned', 'only a party member can lead it')
+  if (world.world.run.party === party && world.world.run.battle !== null) throw new SaveRuleError('in-fight', 'finish or leave the open fight first')
+  if (slot === 0) return save
+  const slots = [...target.slots]
+  const previousLead = slots[0] ?? null
+  slots[0] = outfitId
+  slots[slot] = previousLead
+  const parties = world.parties.map((row, index) => index === party ? { ...row, slots } : row)
+  return withWorld(save, tier, { ...world, parties }, now)
+}
+
 /**
  * Puts an owned Uma into a party slot (or empties it with null). She leaves any other slot she held: one party per Uma
  * (D46). Whoever was in the target slot is simply removed.

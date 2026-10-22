@@ -74,7 +74,6 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
         onOpen={row => { prefs.see([row.id]); nav.sub(place, `outfit/${row.id}`) }}
         renderBadges={row => ({
           topLeft: row.classId ? <ClassEmblem classId={row.classId} /> : undefined,
-          topRight: row.busy ? <span className="rounded-full bg-panel px-1 text-[9px] font-bold" aria-label="Working">W</span> : undefined,
           bottomLeft: world?.targets.includes(row.id) ? <span className="text-accent" aria-label="Target"><TargetIcon size={14} /></span> : undefined,
           bottomRight: row.isNew ? <span className="rounded-full bg-accent px-1 text-[8px] font-bold text-accent-ink">NEW</span>
             : row.upgrades?.any ? <UpgradeMark /> : undefined,

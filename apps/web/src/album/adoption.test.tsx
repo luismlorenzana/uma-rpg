@@ -19,9 +19,9 @@ import { ActivePartyBar } from '../places/scenario-gate/ActiveParty'
 import { albumFixture } from './testing'
 
 let fixture: Awaited<ReturnType<typeof albumFixture>>
-const calls = vi.hoisted(() => ({ slot: vi.fn(async () => {}), hero: vi.fn(async () => {}), learner: vi.fn(async () => {}), party: vi.fn(async () => {}) }))
+const calls = vi.hoisted(() => ({ slot: vi.fn(async () => {}), lead: vi.fn(async () => {}), hero: vi.fn(async () => {}), learner: vi.fn(async () => {}), party: vi.fn(async () => {}) }))
 vi.mock('../save/game', async importOriginal => ({ ...await importOriginal<typeof import('../save/game')>(),
-  useWorld: () => fixture.world, setSlot: calls.slot, appointHero: calls.hero, addLearner: calls.learner, chooseActiveParty: calls.party,
+  useWorld: () => fixture.world, setSlot: calls.slot, leadParty: calls.lead, appointHero: calls.hero, addLearner: calls.learner, chooseActiveParty: calls.party,
 }))
 vi.mock('../master/master', async importOriginal => ({ ...await importOriginal<typeof import('../master/master')>(),
   useMaster: () => ({ status: 'ready', view: fixture.view }),
@@ -74,26 +74,48 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     expect(screen.queryByRole('button', { name: 'Cinder, Lv 20' })).toBeNull()
   })
 
-  it('party slots show disabled current members and locked Umas, then pass the exact slot/id to RPG rules', async () => {
+  it('party slots hide locked Umas, dim movable members and pass the exact slot/id to RPG rules', async () => {
     fixture.world.parties[0]!.slots[0] = '81001'
+    fixture.world.parties[1]!.slots[0] = '81003'
     show(<PartyHallPage {...page('party-hall', '1')} />)
+    expect(screen.getByRole('img', { name: 'Brawler' })).toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: /Slot 2 · add an Uma/ }))
     expect(within(dialog()).getByRole('button', { name: 'Aster. In this party' }).hasAttribute('disabled')).toBe(true)
-    expect(within(dialog()).getByRole('button', { name: 'Fable. Locked' }).hasAttribute('disabled')).toBe(true)
-    fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
+    expect(within(dialog()).queryByRole('button', { name: /Fable/ })).toBeNull()
+    const cinder = within(dialog()).getByRole('button', { name: 'Cinder' })
+    expect(cinder.hasAttribute('disabled')).toBe(false)
+    expect(cinder.dataset.dimmed).toBe('true')
+    expect(within(dialog()).getByRole('button', { name: 'Dune' }).dataset.dimmed).toBeUndefined()
+    fireEvent.click(cinder)
     await waitFor(() => expect(calls.slot).toHaveBeenCalledWith(0, 1, '81003'))
   })
 
-  it('facility choice uses Craft order inside the shared who → what → how many sheet', async () => {
+  it('lets a party member become the lead used by party choices', async () => {
+    fixture.world.parties[0]!.slots = ['81001', '81004', null, null, null]
+    show(<PartyHallPage {...page('party-hall', '1')} />)
+    fireEvent.click(screen.getByRole('button', { name: /Dune/ }))
+    fireEvent.click(within(dialog()).getByRole('button', { name: 'Make party lead' }))
+    await waitFor(() => expect(calls.lead).toHaveBeenCalledWith(0, '81004'))
+  })
+
+  it('facility choice shows Craft Levels and keeps How many above the long item grid', async () => {
     show(<FacilityPage {...page('monster-den')} />)
     fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Choose an Uma' }))
     const picker = await screen.findByRole('dialog', { name: 'Choose an Uma' })
     const buttons = within(picker).getAllByRole('button').filter(button => ['Aster', 'Beryl', 'Cinder', 'Dune', 'Ember'].includes(button.getAttribute('aria-label') ?? ''))
     expect(buttons.map(button => button.getAttribute('aria-label'))).toEqual(['Aster', 'Cinder', 'Dune', 'Beryl', 'Ember'])
+    expect(within(within(picker).getByRole('button', { name: 'Aster' })).getByLabelText('Craft Level 12')).toBeDefined()
     fireEvent.click(within(picker).getByRole('button', { name: 'Aster' }))
-    expect(await screen.findByRole('region', { name: 'What' })).toBeDefined()
-    expect(screen.getByRole('radiogroup', { name: 'How many' })).toBeDefined()
+    const what = await screen.findByRole('region', { name: 'What' })
+    const count = screen.getByRole('radiogroup', { name: 'How many' })
+    expect(count.compareDocumentPosition(what) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
+  })
+
+  it('shows grades on the Farm wishlist icons', () => {
+    fixture.world.targets = ['81001']
+    const ui = show(<FacilityPage {...page('monster-den')} />)
+    expect(ui.container.querySelector('[data-kit="targets-strip"] [data-grade]')).not.toBeNull()
   })
 
   it('Observatory honors its explicit Uma route and changes her through the shared picker', async () => {

@@ -51,7 +51,7 @@ describe('SB4 RPG album adapters', () => {
     world.parties[2]!.slots = ['missing', null, null, null, null]
     const rows = activePartyRows(view, world).sort(byLevel)
     expect(rows.map(row => [row.id, row.partyIndex, row.members.length])).toEqual([
-      ['81003', 0, 2], ['81002', 1, 1], ['missing', 2, 1],
+      ['81001', 0, 2], ['81002', 1, 1], ['missing', 2, 1],
     ])
     expect(world.parties[0]!.slots).toEqual(['81001', '81003', null, null, null])
   })

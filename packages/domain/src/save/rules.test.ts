@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ARMOR_SLOTS } from '../economy/ranks'
 import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass } from '../rpg/rules'
 import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION, slotKind } from './save'
-import { addShards, isPartyFull, ownerTier, partyOf, renameParty, savedTiers, SaveRuleError, setPartySlot, TIER_ONE, tierKey, unlockUma, worldOf } from './rules'
+import { addShards, isPartyFull, ownerTier, partyLead, partyOf, renameParty, savedTiers, SaveRuleError, setPartyLead, setPartySlot, TIER_ONE, tierKey, unlockUma, worldOf } from './rules'
 import { TIER2_LAURELS, TIER2_UMAS, withTierTwo } from './tiers.fixture'
 
 const T0 = '2026-10-10T12:00:00.000Z'
@@ -109,6 +109,18 @@ describe('party rules', () => {
     for (let i = 0; i < 5; i++) save = setPartySlot(save, 0, i, String(i + 1), T1)
     expect(isPartyFull(worldOf(save).parties[0]!)).toBe(true)
     expect(isPartyFull(worldOf(save).parties[1]!)).toBe(false)
+  })
+
+  it('uses slot 1 as the lead and swaps another member into it without changing membership', () => {
+    let save = unlocked('100101', '100201', '100301')
+    save = setPartySlot(save, 0, 1, '100101', T1)
+    save = setPartySlot(save, 0, 3, '100201', T1)
+    expect(partyLead(worldOf(save).parties[0]!)).toBe('100101')
+
+    const led = setPartyLead(save, 0, '100201', T1)
+    expect(worldOf(led).parties[0]!.slots).toEqual(['100201', '100101', null, null, null])
+    expect(partyLead(worldOf(led).parties[0]!)).toBe('100201')
+    expect(() => setPartyLead(led, 0, '100301', T1)).toThrow(/party member/)
   })
 })
 

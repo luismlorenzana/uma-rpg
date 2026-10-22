@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
 } from '@rpg/domain'
 import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
@@ -131,6 +131,12 @@ export async function unlock(outfit: Pick<BattleOutfit, 'outfitId'> & StartingOu
 export async function setSlot(party: number, slot: number, outfitId: string | null): Promise<void> {
   const { save } = useGame.getState()
   if (save) await commit(setPartySlot(save, party, slot, outfitId, nowIso(), activeKey()))
+}
+
+/** Makes an existing party member its lead; the lead occupies slot 1 and represents the party in fight pickers. */
+export async function leadParty(party: number, outfitId: string): Promise<void> {
+  const { save } = useGame.getState()
+  if (save) await commit(setPartyLead(save, party, outfitId, nowIso(), activeKey()))
 }
 
 export async function nameParty(party: number, name: string): Promise<void> {
