@@ -212,7 +212,22 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v22 = version < 22 && isRecord(v21) ? toV22(v21) : v21
   const v23 = version < 23 && isRecord(v22) ? toV23(v22) : v22
   const v24 = version < 24 && isRecord(v23) ? toV24(v23) : v23
-  return version < 25 && isRecord(v24) ? toV25(v24) : v24
+  const v25 = version < 25 && isRecord(v24) ? toV25(v24) : v24
+  return version < 26 && isRecord(v25) ? toV26(v25) : v25
+}
+
+// --- v25 → v26 (D190): an independent party lead ---------------------------------------------------------------
+
+/**
+ * A party's lead stops being encoded by slot 1. Existing saves keep the face they showed before the change by naming
+ * their first occupied slot. Empty parties and malformed rows are left for the strict parser. The step is idempotent.
+ */
+export function toV26(world: Record<string, unknown>): Record<string, unknown> {
+  if (!Array.isArray(world.parties)) return world
+  return { ...world, parties: world.parties.map((party) => {
+    if (!isRecord(party) || 'lead' in party || !Array.isArray(party.slots)) return party
+    return { ...party, lead: party.slots.find((id): id is string => typeof id === 'string') ?? null }
+  }) }
 }
 
 // --- v24 → v25 (D180): classes v2's Paladin. Written in H58, chained by H61 with SAVE_SCHEMA_VERSION 25 (D188) ----------

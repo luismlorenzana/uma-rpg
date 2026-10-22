@@ -112,7 +112,7 @@ describe('game store', () => {
     expect(world?.wallet.unlockTickets).toBe(18)
     expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
-    expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null] })
+    expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null], lead: null })
     // A pace outfit starts as a Mage, in five magical kinds; a front one in physical (D160 §7).
     expect(world?.umas['100201']?.gear.kinds).toEqual({ head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' })
     expect(world?.umas['100101']?.gear.kinds).toEqual({})

@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { heroLimitsOf, placeById, withTrack } from '@rpg/domain'
+import { heroLimitsOf, ITEM_FAMILIES, placeById, withTrack } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { buildCampaign } from '../battle/campaign'
 import { FeaturedSheet } from '../hub/Featured'
@@ -78,7 +78,7 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     fixture.world.parties[0]!.slots[0] = '81001'
     fixture.world.parties[1]!.slots[0] = '81003'
     show(<PartyHallPage {...page('party-hall', '1')} />)
-    expect(screen.getByRole('img', { name: 'Brawler' })).toBeDefined()
+    expect(screen.getByText((_, element) => element?.textContent === 'Lead · Brawler')).toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: /Slot 2 · add an Uma/ }))
     expect(within(dialog()).getByRole('button', { name: 'Aster. In this party' }).hasAttribute('disabled')).toBe(true)
     expect(within(dialog()).queryByRole('button', { name: /Fable/ })).toBeNull()
@@ -98,6 +98,18 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     await waitFor(() => expect(calls.lead).toHaveBeenCalledWith(0, '81004'))
   })
 
+  it('marks a lead without covering faces or changing her chosen slot', () => {
+    fixture.world.parties[0]!.slots = ['81001', '81004', null, null, null]
+    fixture.world.parties[0]!.lead = '81004'
+    show(<PartyHallPage {...page('party-hall')} />)
+    const card = screen.getByText('Party 1').closest('button')!
+    expect(within(card).getByRole('img', { name: 'Party lead' })).toBeDefined()
+    expect(within(card).getByText('Lv 3')).toBeDefined()
+    expect(within(card).getByText('Lv 8')).toBeDefined()
+    expect(card.querySelectorAll('[data-party-lead]')).toHaveLength(1)
+    expect(fixture.world.parties[0]!.slots).toEqual(['81001', '81004', null, null, null])
+  })
+
   it('facility choice shows Craft Levels and keeps How many above the long item grid', async () => {
     show(<FacilityPage {...page('monster-den')} />)
     fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
@@ -110,6 +122,25 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     const what = await screen.findByRole('region', { name: 'What' })
     const count = screen.getByRole('radiogroup', { name: 'How many' })
     expect(count.compareDocumentPosition(what) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
+  })
+
+  it('compresses the Workbench to family and grade choices and keeps the chosen quantity while either changes', async () => {
+    for (const family of ITEM_FAMILIES) {
+      for (const raw of family.raw) fixture.world.items[raw.id] = 100
+    }
+    show(<FacilityPage {...page('workbench')} />)
+    fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
+    const sheet = dialog()
+    const twenty = within(sheet).getByRole('radio', { name: /^×20,/ })
+    fireEvent.click(twenty)
+    expect(twenty.getAttribute('aria-checked')).toBe('true')
+    const families = sheet.querySelectorAll('[data-item-family]')
+    expect(families).toHaveLength(8)
+    fireEvent.click(families[1]!)
+    expect(within(sheet).getByRole('radio', { name: /^×20,/ }).getAttribute('aria-checked')).toBe('true')
+    fireEvent.click(within(sheet).getByRole('button', { name: /^Grade 2/ }))
+    expect(within(sheet).getByRole('radio', { name: /^×20,/ }).getAttribute('aria-checked')).toBe('true')
+    expect(sheet.querySelector('[data-selected-item]')).not.toBeNull()
   })
 
   it('shows grades on the Farm wishlist icons', () => {

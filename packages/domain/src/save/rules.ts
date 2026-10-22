@@ -88,12 +88,14 @@ export function partyOf(world: TierWorld, outfitId: string): { party: number; sl
   return null
 }
 
-/** The member whose face represents a party. Slot 1 is the explicit lead; old and partial parties fall back safely. */
+/** The member whose face represents a party. A party without an explicit lead falls back to its first member. */
 export function partyLead(party: Party): string | null {
-  return party.slots[0] ?? party.slots.find((id): id is string => id !== null) ?? null
+  return party.lead !== null && party.slots.includes(party.lead)
+    ? party.lead
+    : party.slots.find((id): id is string => id !== null) ?? null
 }
 
-/** Makes an existing member the lead by swapping her into slot 1. This keeps the save shape and every member intact. */
+/** Makes an existing member the lead without changing the party's chosen slot order. */
 export function setPartyLead(save: Save, party: number, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const target = world.parties[party]
@@ -101,12 +103,8 @@ export function setPartyLead(save: Save, party: number, outfitId: string, now: s
   const slot = target.slots.indexOf(outfitId)
   if (slot < 0) throw new SaveRuleError('not-owned', 'only a party member can lead it')
   if (world.world.run.party === party && world.world.run.battle !== null) throw new SaveRuleError('in-fight', 'finish or leave the open fight first')
-  if (slot === 0) return save
-  const slots = [...target.slots]
-  const previousLead = slots[0] ?? null
-  slots[0] = outfitId
-  slots[slot] = previousLead
-  const parties = world.parties.map((row, index) => index === party ? { ...row, slots } : row)
+  if (target.lead === outfitId) return save
+  const parties = world.parties.map((row, index) => index === party ? { ...row, lead: outfitId } : row)
   return withWorld(save, tier, { ...world, parties }, now)
 }
 
@@ -123,10 +121,17 @@ export function setPartySlot(save: Save, party: number, slot: number, outfitId: 
   const fighting = (p: number) => world.world.run.party === p && world.world.run.battle !== null
   const from = outfitId === null ? null : partyOf(world, outfitId)
   if (fighting(party) || (from && fighting(from.party))) throw new SaveRuleError('in-fight', 'finish or leave the open fight first')
-  const parties: Party[] = world.parties.map((p) => ({ ...p, slots: p.slots.map((s) => (outfitId !== null && s === outfitId ? null : s)) }))
+  const keepsLead = outfitId !== null && from?.party === party && world.parties[party]?.lead === outfitId
+  const parties: Party[] = world.parties.map((p) => {
+    const slots = p.slots.map((s) => (outfitId !== null && s === outfitId ? null : s))
+    return { ...p, slots, lead: p.lead !== null && slots.includes(p.lead) ? p.lead : null }
+  })
   const target = parties[party]
   if (!target) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
+  const displaced = target.slots[slot]
   target.slots[slot] = outfitId
+  if (target.lead === displaced) target.lead = null
+  if (keepsLead) target.lead = outfitId
   return withWorld(save, tier, { ...world, parties }, now)
 }
 

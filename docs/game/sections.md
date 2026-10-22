@@ -132,10 +132,13 @@ Lapidary:
   a badge is the short count, a check means work already covers it, and tapping a short item opens that job in a free slot.
 - **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
   **Dismiss**.
-- **The shared job sheet:** Who → How many → What, so the amount stays above long item and grade grids. Its Uma picker
+- **The shared job sheet:** Who → How many → What. A chosen amount stays selected while What changes (and clamps if a
+  recipe allows less). Its Uma picker
   puts Craft Level on each face and opens free Umas first, then highest Craft Level, Uma Level, newest release and name.
   Locked Umas and workers show why they cannot start. Fighting does not block work
   (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
+- **Workbench:** eight material families in four columns, ten grade chips and one selected-recipe card. Family or grade
+  changes do not reset How many. Gathering sites use the same compact G-badged item tiles for their ten grades.
 - **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
   Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
   type with no materials in stock is dimmed.
@@ -225,14 +228,15 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 ### Party Hall
 
 Routes: `/town/party-hall` and `:n` (1–20).
-- The list shows 20 parties of five. Each face shows Uma Level and class. Working members fight like the rest (D119).
+- The list shows 20 parties of five. Faces stay clear; Uma Level and class sit beneath each one. The chosen lead has a
+  thin accent ring and flag. Working members fight like the rest (D119).
 - **The editor:** rename the party, or tap a slot for the shared Uma picker, highest Uma Level first (newest release,
   then name for ties). Unowned Umas are hidden. Current members and Umas in an open fight show a disabled reason; all
   party members are gray, while a free Uma is full colour. A member of another party remains selectable and moves here
   (D46). Working does not stop her fighting (D119).
 - Party slots show round outfit faces.
-- **A filled slot:** Make party lead, Swap, View profile, Recall from her job, Remove. The lead occupies the first slot;
-  existing partial parties fall back to their first member until a lead is picked.
+- **A filled slot:** Make party lead, Swap, View profile, Recall from her job, Remove. Lead is independent of slot order:
+  choosing her never moves anybody. A party without one falls back to its first member.
 - **One healer a party:** a party with two healers (Paladins or Clerics) shows "One healer a party" in the warning
   colour, on its card in the list and under the editor's slots. Picking Umas is never refused; the note goes once one
   of them fights as a damage class.

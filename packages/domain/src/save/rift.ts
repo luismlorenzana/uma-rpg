@@ -483,10 +483,11 @@ function emptyParties(parties: readonly Party[], leaving: ReadonlySet<string>): 
   const moved: Party[] = []
   const next = parties.map((p, i): Party => {
     if (p.slots.length === PARTY_SIZE && p.slots.every((s) => s !== null && leaving.has(s))) {
-      moved.push({ name: p.name, slots: [...p.slots] })
-      return { name: `Party ${i + 1}`, slots: p.slots.map(() => null) }
+      moved.push({ name: p.name, slots: [...p.slots], lead: p.lead })
+      return { name: `Party ${i + 1}`, slots: p.slots.map(() => null), lead: null }
     }
-    return { ...p, slots: p.slots.map((s) => (s !== null && leaving.has(s) ? null : s)) }
+    const slots = p.slots.map((s) => (s !== null && leaving.has(s) ? null : s))
+    return { ...p, slots, lead: p.lead !== null && slots.includes(p.lead) ? p.lead : null }
   })
   return { parties: next, moved }
 }
@@ -500,14 +501,14 @@ function seatArrivals(parties: readonly Party[], moved: readonly Party[], roster
   for (const party of moved) {
     const at = free()
     if (at < 0) break
-    next[at] = { name: party.name, slots: [...party.slots] }
+    next[at] = { name: party.name, slots: [...party.slots], lead: party.lead }
     for (const id of party.slots) placed.add(id!)
   }
   const rest = roster.filter((id) => !placed.has(id))
   for (let i = 0; i < rest.length; i += PARTY_SIZE) {
     const at = free()
     if (at < 0) break
-    next[at] = { ...next[at]!, slots: Array.from({ length: PARTY_SIZE }, (_, k) => rest[i + k] ?? null) }
+    next[at] = { ...next[at]!, slots: Array.from({ length: PARTY_SIZE }, (_, k) => rest[i + k] ?? null), lead: null }
   }
   return next
 }

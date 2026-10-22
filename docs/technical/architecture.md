@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-22; save v25, engine v15 (classes v2, H61, D188).** The full running-system reference is
+> **Status: current, 2026-10-22; save v26, engine v15 (independent party leads, D190).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
