@@ -1,6 +1,7 @@
 # The Rift: the end-of-tier event and promotion
 
-> **Approved 2026-10-21 (D161): every call as recommended; not built yet.**
+> **Approved 2026-10-21 (D161): every call as recommended. Built and live: H44–H52 (D168–D177), retuned for classes v2
+> in H60 and H63 (D186, D187).**
 > - The third of three linked docs, after [tiers](tiers.md) (what promotion does) and [classes v2](classes-v2.md) (the
 >   classes the fronts are built around).
 > - It replaces the parked Tier Finale (H23, Q6) and its Gauntlet, Raid and Siege options.
