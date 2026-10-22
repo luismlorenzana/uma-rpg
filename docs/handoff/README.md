@@ -70,7 +70,7 @@ one switch and turned on by H61; the build decisions are logged by H53):
 | H57 | Accessories v2: flat Orbs, typed Damage and Support slots, retuned supports, six presets (dark) | Either | M | H53 | Done (`fefb589`) |
 | H58 | Save v25 (dark): the Paladin's migration, one healer a party, the Paladin's start | Claude | M | H53 | Done (`c4f7745`) |
 | [H59](tasks/H59-classes-v2-screens.md) | The classes v2 screens, inert until the switch: the Paladin, the Bastion, typed slots, the Summoner's pair, one healer (pins uma-art 2.12.0) | Either | L | H54, H55, H56, H57, H58, H62 | Waiting (H54–H58 landed; H62 to come) |
-| [H60](tasks/H60-classes-v2-balance.md) | Classes v2 balance: §9's targets, the campaign, the Rift re-measured with v2 parties (Iron's wrong party), v15 knobs first (dark) | Claude | L | H55, H56, H57 | Ready (H55, H56, H57 landed) |
+| [H60](tasks/H60-classes-v2-balance.md) | Classes v2 balance: §9's targets, the campaign, the Rift re-measured with v2 parties (Iron's wrong party), v15 knobs first (dark) | Claude | L | H55, H56, H57 | In progress (this session) |
 | [H61](tasks/H61-classes-v2-switch.md) | The switch: engine v15, save v25 and the Paladin go live; the manual rewritten | Claude | M | H59, H60 | Waiting |
 | [H62](tasks/H62-lazy-engine.md) | The fight engine leaves the main bundle (227.3 KB of 230 after H56), so H59 and later fit | Claude | M | — | In progress (this session) |
 
