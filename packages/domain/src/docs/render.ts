@@ -7,13 +7,14 @@ import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILIT
 import { markdown as pacingSimulation } from '../economy/pacing.sim'
 import { GEMS } from '../economy/gems'
 import {
-  accessoryEffects, accessoryKindOf, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear, isOrb, isWeapon,
-  MIGHT_BY_GRADE, mightOf, recipeFamilies, slotOf, type EquipType,
+  accessoryEffects, accessoryKindOf, accessorySlotFor, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear,
+  isOrb, isWeapon, MIGHT_BY_GRADE, mightOf, ORB_OFFENSE_BY_GRADE, orbOffense, recipeFamilies, slotOf, type EquipType,
 } from '../economy/gear'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
 import { FACILITIES } from '../economy/jobs'
+import { rpgV2 } from '../rpg/battle/caps'
 import {
-  ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
+  ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
   gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,
 } from '../economy/ranks'
 import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
@@ -103,9 +104,10 @@ function classes(): string {
     }))
 }
 
-/** Each class's standard preset (H33, D164). */
+/** Each class's standard preset (H33, D164), in the live generation (classes v2: H57). */
 function presets(): string {
-  return table(['Class', 'Weapons', 'Armor', 'Orb, accessory 1', 'Support, accessory 2'], RPG_CLASSES.map((c) => {
+  const slots = rpgV2() ? ['Orb, Damage slot', 'Support, Support slot'] : ['Orb, accessory 1', 'Support, accessory 2']
+  return table(['Class', 'Weapons', 'Armor', ...slots], RPG_CLASSES.map((c) => {
     const p = classPreset(c)
     return [CLASS_NAME[c], p.weapons.map(weaponName).join(', '), cap(p.armor), EQUIP_LABEL[p.orb], EQUIP_LABEL[p.support]]
   }))
@@ -294,8 +296,11 @@ function gems(): string {
     g.kind === 'sun' ? 'All eight' : g.effects.map((e) => EFFECT_LABEL[e]).join(', '), inputs(g.inputs)]))
 }
 function gear(): string {
+  // The live generation's: classes v2 types the accessory slots and makes Orbs flat offense (H57).
+  const v2 = rpgV2()
   const family = (id: string) => ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id
-  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon' : isAccessory(t) ? `Accessory (${ACCESSORY_LABEL[accessoryKindOf(t)]})`
+  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon'
+    : isAccessory(t) ? `${v2 ? ACCESSORY_SLOT_LABEL[accessorySlotFor(t)!] : 'Accessory'} (${ACCESSORY_LABEL[accessoryKindOf(t)]})`
     : ARMOR_SLOT_LABEL[slotOf(t) as keyof typeof ARMOR_SLOT_LABEL])
   const g10 = (t: EquipType) => gearById(gearId(t, 10))!
   const effect = (t: EquipType): string => {
@@ -308,7 +313,7 @@ function gear(): string {
   }
   const does = (t: EquipType) => {
     if (isWeapon(t)) return `Might +${mightOf(10)} on its hits`
-    if (isOrb(t)) return 'Its kind on every hit, for weaknesses'
+    if (isOrb(t)) return v2 ? `+${orbOffense(10)} offense on its kind's hits` : 'Its kind on every hit, for weaknesses'
     if (isAccessory(t)) return effect(t)
     const p = gearPoints(g10(t))
     return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} +${p[e]}`).join(', ')
@@ -317,7 +322,9 @@ function gear(): string {
     EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
     [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
   ])) + `\n\nA weapon's Might adds to the offense of the hits made with it, by grade: ${MIGHT_BY_GRADE.slice(1).join(', ')} (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (${armorOffense(10)} at grade 10), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
-    `An Uma wears two accessories of different types.`
+    (v2 ? `An Uma wears an Orb in her Damage slot and a Talisman or an Amulet in her Support slot. An Orb adds to the offense of her ` +
+      `hits of its kind, by grade: ${ORB_OFFENSE_BY_GRADE.slice(1).join(', ')}, half a weapon's Might; it no longer adds its kind for weaknesses.`
+      : `An Uma wears two accessories of different types.`)
 }
 
 function ranks(): string {

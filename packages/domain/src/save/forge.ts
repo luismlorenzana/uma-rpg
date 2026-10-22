@@ -1,11 +1,13 @@
 // Equipping over the save (S7, design §7, D59, D103, D124): a piece from the gear stock binds to the Uma who equips it and
 // stays in her locker for good; she swaps freely among her own pieces. Her Weapon, Armor or Accessory Rank lets her wear
 // its grade (D102). An empty weapon or armor slot holds the Training piece of its kind; an empty accessory slot holds
-// nothing, and her two accessories are of different types. She binds each track's grades in order, one above the best she
-// has (D119), so a sheet offers her best pieces and the stock above them.
+// nothing, and her two accessories are of different types (classes v2: an Orb in the Damage slot, a Talisman or an Amulet
+// in the Support slot, H57). She binds each track's grades in order, one above the best she has (D119), so a sheet offers
+// her best pieces and the stock above them.
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { ACCESSORY_SLOTS, ARMOR_SLOT_KINDS, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import {
-  gearById, gearLevel, gearLevelName, gearTrackOf, isAccessory, isArmor, isWeapon, slotOf, type GearPiece, type GearSlot,
+  accessorySlotFor, gearById, gearLevel, gearLevelName, gearTrackOf, isAccessory, isArmor, isWeapon, slotOf, type GearPiece, type GearSlot,
 } from '../economy/gear'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import type { OwnedUma, Save, TierWorld } from './save'
@@ -61,15 +63,21 @@ export function gearChoices(uma: OwnedUma, stock: Readonly<Record<string, number
 const freeAccessorySlot = (uma: OwnedUma): AccessorySlot => ACCESSORY_SLOTS.find((s) => !uma.gear.equipped[s]) ?? ACCESSORY_SLOTS[0]
 
 /** Puts a piece on her: from her locker, or from the stock (binding it to her for good). An armor piece also sets its
- * slot's kind; an accessory goes in `accessorySlot` (D124), never beside another of its type. */
-export function equipGear(save: Save, outfitId: string, gearId: string, now: string, tier = TIER_ONE, accessorySlot?: AccessorySlot): Save {
+ * slot's kind; an accessory goes in `accessorySlot` (D124), never beside another of its type. Classes v2 (C10, H57): an
+ * accessory goes in its type's slot, and naming the other one is refused. */
+export function equipGear(save: Save, outfitId: string, gearId: string, now: string, tier = TIER_ONE, accessorySlot?: AccessorySlot,
+  engine: number = BATTLE_ENGINE_VERSION): Save {
   const world = worldOf(save, tier)
   const uma = world.umas[outfitId]
   const piece = gearById(gearId)
   if (!uma || !piece) throw new SaveRuleError('bad-job', 'nothing to equip')
   const block = equipBlock(uma, gearId)
   if (block) throw new SaveRuleError('bad-job', block)
-  const slot: GearSlot = isAccessory(piece.type) ? accessorySlot ?? freeAccessorySlot(uma) : slotOf(piece.type)
+  const typed = isAccessory(piece.type) && accessorySlotFor(piece.type, engine)
+  if (typed && accessorySlot && accessorySlot !== typed) {
+    throw new SaveRuleError('bad-loadout', typed === 'accessory-1' ? 'The Support slot takes a Talisman or an Amulet' : 'The Damage slot takes an Orb')
+  }
+  const slot: GearSlot = isAccessory(piece.type) ? typed || accessorySlot || freeAccessorySlot(uma) : slotOf(piece.type)
   if (isAccessory(piece.type)) {
     const other = ACCESSORY_SLOTS.find((s) => s !== slot)!
     const there = uma.gear.equipped[other] ? gearById(uma.gear.equipped[other]!) : undefined
@@ -117,15 +125,17 @@ export function wearArmor(save: Save, outfitId: string, slot: ArmorSlot, kind: A
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...uma.gear, equipped, kinds: { ...uma.gear.kinds, [slot]: kind } } } } }, now)
 }
 
-/** Puts an accessory in one of her two accessory slots (D124), or empties the slot (null); a removed one stays hers. */
-export function wearAccessory(save: Save, outfitId: string, slot: AccessorySlot, gearId: string | null, now: string, tier = TIER_ONE): Save {
+/** Puts an accessory in one of her two accessory slots (D124), or empties the slot (null); a removed one stays hers.
+ * Classes v2 (H57): only into its type's slot. */
+export function wearAccessory(save: Save, outfitId: string, slot: AccessorySlot, gearId: string | null, now: string, tier = TIER_ONE,
+  engine: number = BATTLE_ENGINE_VERSION): Save {
   const world = worldOf(save, tier)
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'not unlocked')
   if (gearId !== null) {
     const piece = gearById(gearId)
     if (!piece || !isAccessory(piece.type)) throw new SaveRuleError('bad-loadout', 'that isn’t an accessory')
-    return equipGear(save, outfitId, gearId, now, tier, slot)
+    return equipGear(save, outfitId, gearId, now, tier, slot, engine)
   }
   return unequipGear(save, outfitId, slot, now, tier)
 }

@@ -5,8 +5,9 @@ import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
   actInFight, activeClass, chooseClass, classOf, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, setClassWeapons,
-  settleFight, startFight, startingClass, umaBattleSheet, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
+  settleFight, startFight, startingClass, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
+import { umaBattleSheet } from './sheet'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
 import { newOwnedUma, newSave, newWorldState, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'

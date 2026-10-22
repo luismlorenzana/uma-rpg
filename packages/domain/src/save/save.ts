@@ -23,7 +23,7 @@ import { RPG_CLASSES } from '../rpg/kinds'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
 import { isGemId, isStarNode } from '../economy/stars'
 import {
-  GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isAccessory, isAccessorySlot, isArmor, slotOf, type GearSlot,
+  accessoryFits, GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isAccessory, isAccessorySlot, isArmor, slotOf, type GearSlot,
 } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { isItemId } from '../items/identity'
@@ -483,7 +483,9 @@ function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGear {
   const equipped: Partial<Record<GearSlot, string>> = {}
   for (const [slot, id] of Object.entries(slots)) {
     const piece = typeof id === 'string' ? gearById(id) : undefined
-    const fits = !!piece && (isAccessorySlot(slot as GearSlot) ? isAccessory(piece.type) : !isAccessory(piece.type) && slotOf(piece.type) === slot)
+    // An accessory slot takes any accessory, or from classes v2 its type's: an Orb in `accessory-1`, a support in `accessory-2` (H57).
+    const s = slot as GearSlot
+    const fits = !!piece && (isAccessorySlot(s) ? accessoryFits(s, piece.type) : !isAccessory(piece.type) && slotOf(piece.type) === slot)
     if (!piece || !locker.includes(id as string) || !fits) throw new SaveParseError(`${path}.equipped.${slot}`, 'expected a piece from her locker for this slot')
     if (isArmor(piece.type) && piece.type !== slotKind({ kinds }, slot as ArmorSlot)) throw new SaveParseError(`${path}.equipped.${slot}`, 'not the kind this slot holds')
     if (gearLevel(ranks, piece.type) < piece.grade) throw new SaveParseError(`${path}.equipped.${slot}`, `needs ${gearLevelName(piece.type)} ${piece.grade}`)

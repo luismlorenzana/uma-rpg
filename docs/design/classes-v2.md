@@ -276,6 +276,11 @@ so:
 
 All twenty types stay. Accessory Ranks stay four kinds: Arms Orb, Elemental Orb, Talisman, Amulet.
 
+Built in H57 (D182), live from H61: the slot keys stay `accessory-1` (Damage) and `accessory-2` (Support), so no save
+renames; `accessorySlotFor` and `accessoryFits` say which type goes where, `ACCESSORY_SLOT_LABEL` reads "Damage" and
+"Support" from the switch, equipping refuses the other slot ("The Damage slot takes an Orb", "The Support slot takes a
+Talisman or an Amulet"), and a save's slots parse by type. H58's `toV25` sorts existing accessories into them.
+
 ### 6.2 Orbs: flat damage to one kind
 
 - **New: an Orb adds half its grade's weapon Might** to the offense of hits of its kind:
@@ -292,6 +297,9 @@ All twenty types stay. Accessory Ranks stay four kinds: Arms Orb, Elemental Orb,
   weapons and inherited Limit Breaks (C3), so a party has to be *built* for a front.
 - **One Orb only:** with one damage slot, an Uma specializes in **one** kind. That's the choice: her best weapon's
   kind, or the kind her front's foes are weak to.
+- Built in H57 (D182), live from H61: `orbOffense(grade)` (⌈Might ÷ 2⌉); a v2 Orb's effect is `orbMight`, which
+  `rpgPartyAllies` adds to her Might of that kind (a kind she doesn't wield too, for inherited Limit Breaks), so a v15
+  fight carries no `orbs`. Her battle sheet shows "Fire Orb +34".
 
 ### 6.3 The support accessories
 
@@ -313,6 +321,9 @@ They take the support slot. Their values are rebalanced so each is a real choice
 **The rule the simulation enforces:** among the ten support accessories, none at G10 is worth less than 60% of the
 best, measured as its effect on a front's win rate on Auto. The values in the table are the starting point.
 
+Built in H57 (D182), live from H61: `charmPerGrade(engine)`, per effect and per mille a grade, with Vital 6 and Siphon
+8 in v2; H60 measures the rule and retunes there. The Thorn's guarded hits are the engine's (H56).
+
 **C5, slots by tier:** one damage and one support in Tiers 1 and 2. [Tiers](tiers.md) Option A adds a third slot in
 Tier 3; it's designed with Tier 3.
 
@@ -325,7 +336,10 @@ Tier 3; it's designed with Tier 3.
   kinds she can wear, plus the best crafted pieces in stock she's ranked for.
   - **C6:** recommendation: **one standard preset per class, applied on tap.** Custom saved presets can come later if
     the owner wants them.
-  - It ships now for five classes and grows to six with v2.
+  - It ships now for five classes and grows to six with v2. Built in H57 (D182), live from H61: `classPreset(classId,
+    engine)` gives v2's spread, the Orb of her spread's first weapon's kind (a flat Orb strengthens her leading damage)
+    and v1's support but the Summoner's Siphon: Brawler and Spell Blade Greatsword Orb + Vampire Talisman, Mage and
+    Summoner Fire Orb + Siphon Amulet, Paladin Greatsword Orb + Thorn Talisman, Cleric Light Orb + Spring Amulet.
 - **"Can upgrade" highlights.** Built (H34, D166). A badge on the Stable tile and the profile when an Uma:
   - has unspent side points;
   - can wear a better weapon, armor piece or accessory in stock;

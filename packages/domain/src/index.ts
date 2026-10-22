@@ -2,6 +2,7 @@
 export * from './save/save'
 export * from './save/rules'
 export * from './save/battle'
+export * from './save/sheet'
 export * from './save/status'
 export * from './save/work'
 export * from './save/exchange'

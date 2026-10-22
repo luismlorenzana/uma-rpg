@@ -17,16 +17,15 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, projectRpgStats, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
+  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgDefaultClass, rpgDefaultWeapons,
   rpgPicksWeapons, rpgUsableLoadout, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import {
-  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, WEAPON_LABEL, weaponExpShares,
+  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares,
   withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
-import { addPoints, applyPoints, type Points } from '../economy/bonus'
-import { BATTLE_HEAL_SCALE, BATTLE_LIMIT_MAX } from '../rpg/battle/caps'
+import { addPoints, type Points } from '../economy/bonus'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
 import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
@@ -219,40 +218,6 @@ export function umaWeaponMight(uma: OwnedUma, classId: RpgClass): { atk: number;
   return { atk: average(weapons.filter((w) => !isRpgTome(w))), matk: average(weapons.filter(isRpgTome)) }
 }
 
-/** One line of her battle sheet: the total, and for the six core stats what gear and Extra Stats add. */
-export interface SheetRow { label: string; value: string; gear?: number; extra?: number }
-export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
-const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
-const permille = (n: number) => `${Math.round(n) / 10}%`
-/** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0). */
-export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma), tier = 1): SheetGroup[] {
-  const base = projectRpgStats(umaProfile(outfit, uma, tier, classId))
-  const parts = umaPointParts(uma, classId)
-  const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
-  const geared = applyPoints(base, parts.gear).stats
-  const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>
-    ({ label, value: String(boosted.stats[k]), gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] })
-  const weapons = classOf(uma, classId).weapons
-  const might = equippedMight(uma.gear.equipped, weapons)
-  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ')
-  const a = equippedAccessories(uma.gear.equipped)
-  // Regen and the two shields are shares of her max HP (D141): the sheet shows both.
-  const hp = boosted.stats.hp
-  const ofHp = (permilleOfHp: number, suffix = '') => permilleOfHp ? `${Math.max(1, Math.round((hp * permilleOfHp) / 1000))}${suffix} (${permille(permilleOfHp)})` : `0${suffix}`
-  return [
-    { title: 'Offense', rows: [core('ATK', 'atk'), core('M.ATK', 'matk'), { label: 'Might', value: mightText || 'None' },
-      { label: 'Orbs', value: a.orbs.map(KIND_NAME).join(', ') || 'None' }] },
-    { title: 'Defense', rows: [core('DEF', 'pdef'), core('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) },
-      { label: 'Physical damage cut', value: permille(a.guard) }, { label: 'Magical damage cut', value: permille(a.resist) },
-      { label: 'Bulwark (physical) at the start', value: ofHp(a.barrier) }, { label: 'Veil (magical) at the start', value: ofHp(a.veil) },
-      { label: 'Thorns', value: permille(a.thorns) }, { label: 'Mirror', value: permille(a.mirror) }] },
-    { title: 'Sustain', rows: [core('HP', 'hp'), { label: 'Heal', value: `${base.dexterity} (mends ×${(1 + base.dexterity / BATTLE_HEAL_SCALE).toFixed(2)})` },
-      { label: 'HP Regen', value: ofHp(a.regen, ' a round') }, { label: 'Lifesteal', value: permille(a.lifesteal) },
-      core('MP', 'mp'), { label: 'MP Regen', value: `${a.mpRegen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) }] },
-    { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
-  ]
-}
-
 // --- The world's fights (D66): one world-wide run, the active party, Springs ------------------------------------------
 
 /** The world's run: wins per stage, MP per Uma (absent is full) and the open fight, whichever party fights it. */
@@ -295,8 +260,9 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
 }
 
 /** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
- * her accessories and her Hero seat or inherited Limit Breaks. Working Umas fight too (D119). */
-export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE): RpgPartyMember[] {
+ * her accessories (the fight's generation's, H57) and her Hero seat or inherited Limit Breaks. Working Umas fight too (D119). */
+export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE,
+  engine: number = BATTLE_ENGINE_VERSION): RpgPartyMember[] {
   return ids.map((id) => {
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
@@ -304,7 +270,7 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const classId = activeClass(outfit, uma)
     return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
       points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
-      accessories: equippedAccessories(uma.gear.equipped), ...heroFields(world, id) }
+      accessories: equippedAccessories(uma.gear.equipped, engine), ...heroFields(world, id) }
   })
 }
 

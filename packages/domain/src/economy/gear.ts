@@ -3,14 +3,16 @@
 // uses all eight families alike (D139). Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
 // What a piece does, all flat (D104, D124): a weapon's Might (+4 a grade) adds to the offense of hits made with it; an
 // armor piece adds ATK (physical) or M.ATK (magical), ⌈g/2⌉, and its slot's defensive stat, 2g; an Orb adds its kind to
-// every hit for weaknesses only; a Talisman or an Amulet gives one small defensive effect.
+// every hit for weaknesses only (classes v2: flat offense on its kind's hits, H57); a Talisman or an Amulet gives one small
+// defensive effect.
 import { ITEM_FAMILIES, type ItemFamily } from '../items/catalog'
+import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
 import { isRpgTome, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { addPoints, noPoints, type Points } from './bonus'
 import { ACCESSORY_SLOTS, ARMOR_SLOT_STAT, ARMOR_SLOTS, armorSlotOf, isMagicalAccessory, isMagicalArmor } from './ranks'
 import {
   accessoryKindOf, charmEffect, EQUIP_LABEL, EQUIP_TYPES, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
-  type AccessoryEffects, type AccessoryType, type EquipType, type GearSlot,
+  type AccessoryEffects, type AccessoryType, type AmuletEffect, type EquipType, type GearSlot, type TalismanEffect,
 } from './gear-id'
 export * from './gear-id'
 
@@ -68,37 +70,39 @@ export const mightOf = (grade: number): number => MIGHT_BY_GRADE[Math.max(0, Mat
 export const armorOffense = (grade: number): number => Math.ceil(grade / 2)
 export const ARMOR_DEFENSE_PER_GRADE = 2
 
-/** The defensive effects of Talismans and Amulets (D124, D141), per grade, per mille. Regen and the two shields are shares
- * of her max HP, made into HP when a fight starts, so they keep their worth at every level. */
-export const CHARM_PER_GRADE = {
-  /** Max HP healed each round (Vital): 5% at grade 10. Spring restores 1 MP a grade each round. */
-  regen: 5, mpRegen: 1,
-  /** Share of physical damage she deals healed back (Vampire), of magical damage restored as MP (Siphon). */
-  lifesteal: 20, mpSteal: 5,
-  /** A shield of max HP against physical damage (Bulwark) or magical damage (Veil), at the start of each fight. */
-  shield: 20,
-  /** Share of physical (Iron) or magical (Ward) damage she doesn't take. */
-  guard: 15,
-  /** Share of physical (Thorn) or magical (Mirror) damage she takes that's returned to its attacker. */
-  thorns: 30,
-} as const
+/** Classes v2 (C4, H57): an Orb adds this to the offense of its kind's hits, half its grade's Might rounded up (+34 at
+ * grade 10: 1, 2, 4, 6, 10, 13, 18, 23, 29, 34). Flat like Might, so it scales by grade and level and never multiplies
+ * with other bonuses. */
+export const orbOffense = (grade: number): number => Math.ceil(mightOf(grade) / 2)
+export const ORB_OFFENSE_BY_GRADE: readonly number[] = MIGHT_BY_GRADE.map((_, g) => orbOffense(g))
 
-/** One accessory's effect, added into `into`. */
-function addAccessory(into: AccessoryEffects, type: AccessoryType, g: number): void {
-  if (isOrb(type)) { into.orbs.push(orbKind(type)); return }
-  const c = CHARM_PER_GRADE
-  switch (charmEffect(type)) {
-    case 'vital': into.regen += c.regen * g; break
-    case 'vampire': into.lifesteal += c.lifesteal * g; break
-    case 'bulwark': into.barrier += c.shield * g; break
-    case 'iron': into.guard += c.guard * g; break
-    case 'thorn': into.thorns += c.thorns * g; break
-    case 'spring': into.mpRegen += c.mpRegen * g; break
-    case 'siphon': into.mpSteal += c.mpSteal * g; break
-    case 'veil': into.veil += c.shield * g; break
-    case 'ward': into.resist += c.guard * g; break
-    case 'mirror': into.mirror += c.thorns * g; break
-  }
+/**
+ * The defensive effects of Talismans and Amulets (D124, D141), per grade, per mille, by effect: Vital heals a share of
+ * her max HP each round (5% at grade 10), Spring restores 1 MP a grade each round; Vampire heals a share of the physical
+ * damage she deals, Siphon restores MP as a share of the magical; Bulwark and Veil shield a share of her max HP against
+ * physical or magical damage at the start of each fight; Iron and Ward cut physical or magical damage taken; Thorn and
+ * Mirror return a share of it to its attacker. Regen and the shields are made into HP when a fight starts, so they keep
+ * their worth at every level.
+ */
+export type CharmPerGrade = Readonly<Record<TalismanEffect | AmuletEffect, number>>
+const CHARM_V1: CharmPerGrade = { vital: 5, vampire: 20, bulwark: 20, iron: 15, thorn: 30, spring: 1, siphon: 5, veil: 20, ward: 15, mirror: 30 }
+/** Classes v2 (§6.3, H57): the Vital Talisman 0.6% a grade and the Siphon Amulet 0.8%, so every support is a real pick.
+ * H60 may retune any of them. */
+const CHARM_V2: CharmPerGrade = { ...CHARM_V1, vital: 6, siphon: 8 }
+export const charmPerGrade = (engine: number = BATTLE_ENGINE_VERSION): CharmPerGrade => (rpgV2(engine) ? CHARM_V2 : CHARM_V1)
+/** The live generation's values. */
+export const CHARM_PER_GRADE = charmPerGrade()
+/** The fight field each effect adds to. */
+const CHARM_FIELD = {
+  vital: 'regen', vampire: 'lifesteal', bulwark: 'barrier', iron: 'guard', thorn: 'thorns', spring: 'mpRegen', siphon: 'mpSteal', veil: 'veil', ward: 'resist', mirror: 'mirror',
+} as const satisfies Record<TalismanEffect | AmuletEffect, keyof AccessoryEffects>
+
+/** One accessory's effect, added into `into`: an Orb's kind (v1) or its flat offense on that kind (v2, `orbMight`; she
+ * never wears two Orbs of one kind). */
+function addAccessory(into: AccessoryEffects, type: AccessoryType, g: number, engine: number): void {
+  if (!isOrb(type)) into[CHARM_FIELD[charmEffect(type)]] += charmPerGrade(engine)[charmEffect(type)] * g
+  else if (rpgV2(engine)) into.orbMight = { ...into.orbMight, [orbKind(type)]: orbOffense(g) }
+  else into.orbs.push(orbKind(type))
 }
 
 /** A piece's stat points: armor gives its offense and its slot's defensive stat; weapons and accessories give none. */
@@ -125,19 +129,19 @@ export function equippedMight(equipped: Partial<Record<GearSlot, string>>, weapo
   }
   return out
 }
-/** What her two accessories do (D124). */
-export function equippedAccessories(equipped: Partial<Record<GearSlot, string>>): AccessoryEffects {
+/** What her two accessories do (D124), in an engine's generation: v1 her Orbs' kinds, v2 their offense (H57). */
+export function equippedAccessories(equipped: Partial<Record<GearSlot, string>>, engine: number = BATTLE_ENGINE_VERSION): AccessoryEffects {
   const out = noAccessoryEffects()
   for (const slot of ACCESSORY_SLOTS) {
     const piece = pieceOf(equipped, slot)
-    if (piece && isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade)
+    if (piece && isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade, engine)
   }
   return out
 }
 /** One accessory's effects alone, for its line on a sheet. */
-export function accessoryEffects(piece: GearPiece): AccessoryEffects {
+export function accessoryEffects(piece: GearPiece, engine: number = BATTLE_ENGINE_VERSION): AccessoryEffects {
   const out = noAccessoryEffects()
-  if (isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade)
+  if (isAccessory(piece.type)) addAccessory(out, piece.type, piece.grade, engine)
   return out
 }
 

@@ -6,7 +6,8 @@
 // class's unspent side points, while a side skill of her five trees can be learned. Extra Stats: gem kinds she can set
 // (the Observatory's rule, `nodeFromGem`) and free active slots she could fill. Pure and cheap: lookups by id, no scan
 // of the stock per slot, so the Stable can ask it for every Uma.
-import { ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
+import { accessoryFits, ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, classRankOf } from '../economy/ranks'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
@@ -80,9 +81,9 @@ function canLearnSide(uma: OwnedUma, classId: RpgClass, tier: number, unspent: n
 
 /**
  * What she can upgrade now, as the class `classId` (the caller passes her active class, as for `targetPlan`, since the
- * domain has no master data). Null for an Uma this world doesn't own.
+ * domain has no master data). Null for an Uma this world doesn't own. Accessory slots follow the engine's generation (H57).
  */
-export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, tier = 1): UmaUpgrades | null {
+export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, tier = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
   const uma = world.umas[outfitId]
   if (!uma) return null
   const bound = boundGrades(uma)
@@ -101,17 +102,15 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
     const piece = pieceOf(equipped[slot])
     return { slot, piece: piece && isAccessory(piece.type) ? piece : null }
   })
-  const empty = accessories.filter((a) => !a.piece)
-  // An empty slot takes any accessory type ready now except the other slot's: two empty slots count at most once a type.
+  // An empty slot takes a type ready now that fits it (v1 any; classes v2 an Orb in the Damage slot, a Talisman or an Amulet
+  // in the Support slot, H57) other than the other slot's: two empty slots count at most once a type.
   const taken = accessories.find((a) => a.piece)?.piece?.type
-  let ready = 0
-  for (const type of ACCESSORY_TYPES) {
-    if (ready >= empty.length) break
-    if (type !== taken && better(uma, world.gear, bound, type, 0)) ready++
-  }
-  const fillable = new Set(empty.slice(0, ready).map((a) => a.slot))
+  const counted = new Set<EquipType>()
   for (const { slot, piece } of accessories) {
-    if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fillable.has(slot)) gearSlots.push(slot)
+    const fill = piece ? undefined
+      : ACCESSORY_TYPES.find((t) => t !== taken && !counted.has(t) && accessoryFits(slot, t, engine) && better(uma, world.gear, bound, t, 0))
+    if (fill) counted.add(fill)
+    if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
   }
 
   const rank = classRankOf(uma.ranks, classId)

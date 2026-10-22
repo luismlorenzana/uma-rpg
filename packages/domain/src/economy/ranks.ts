@@ -2,6 +2,7 @@
 // Weapon Rank for each of the ten weapons, an Armor Rank for each of the ten armor kinds and an Accessory Rank for each of
 // the four accessory kinds (1–10, D124). Winning fights fills them; past a max rank, EXP banks at half rate as Marks for
 // the whole world. Nothing is trained and no token is spent.
+import { rpgV2 } from '../rpg/battle/caps'
 import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_TOMES, RPG_WEAPONS, type RpgClass, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 
 export const CLASS_MAX_RANK = 50
@@ -32,7 +33,8 @@ export const armorKindFor = (slot: ArmorSlot, half: 'physical' | 'magical'): Arm
 /** Each slot's defensive stat, +1 a grade on either of its pieces (D124). */
 export const ARMOR_SLOT_STAT = { head: 'def', body: 'hp', legs: 'mp', arms: 'mdef', feet: 'speed' } as const satisfies Record<ArmorSlot, string>
 
-/** Her two accessory slots (D124): any two different accessory types. */
+/** Her two accessory slots (D124): any two different accessory types. Classes v2 (C10, H57) types them by the same keys,
+ * so no save renames: `accessory-1` is the Damage slot (an Orb), `accessory-2` the Support slot (a Talisman or an Amulet). */
 export const ACCESSORY_SLOTS = ['accessory-1', 'accessory-2'] as const
 export type AccessorySlot = typeof ACCESSORY_SLOTS[number]
 /** The four accessory kinds: offense (Orbs) and defense (Talismans, Amulets), physical and magical. */
@@ -54,7 +56,9 @@ export const ARMOR_SLOT_LABEL: Readonly<Record<ArmorSlot, string>> = { head: 'He
 export const ACCESSORY_LABEL: Readonly<Record<AccessoryKind, string>> = {
   'arms-orb': 'Arms Orb', 'elemental-orb': 'Elemental Orb', talisman: 'Talisman', amulet: 'Amulet',
 }
-export const ACCESSORY_SLOT_LABEL: Readonly<Record<AccessorySlot, string>> = { 'accessory-1': 'Accessory 1', 'accessory-2': 'Accessory 2' }
+/** The live generation's slot names: "Accessory 1" and "Accessory 2", or classes v2's "Damage" and "Support" (H57). */
+export const ACCESSORY_SLOT_LABEL: Readonly<Record<AccessorySlot, string>> = rpgV2()
+  ? { 'accessory-1': 'Damage', 'accessory-2': 'Support' } : { 'accessory-1': 'Accessory 1', 'accessory-2': 'Accessory 2' }
 
 // --- Tracks and curves ------------------------------------------------------------------------------------------------
 

@@ -5,17 +5,18 @@
 // the other half, other accessory types or weapons outside the spread. Pure, like the rest of the save rules.
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, armorKindFor, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import { gearId, gearIdentity, gearLevel, type AmuletType, type EquipType, type GearSlot, type OrbType, type TalismanType } from '../economy/gear-id'
-import { RPG_CLASS_ARMOR, RPG_CLASSES, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
+import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { RPG_CLASS_ARMOR, rpgClasses, rpgDefaultWeapons, rpgWeaponKind, type RpgClass, type RpgWeapon } from '../rpg/rules'
 import { classOf } from './battle'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
 /**
- * Each class's suggested accessories. The Orb (accessory 1) adds a kind her default spread lacks: the shape partner
- * (`RPG_KIND_PAIRS`) of her first weapon whose partner she doesn't wield, since today an Orb only adds its kind for
+ * Each class's suggested accessories in classes v1. The Orb (accessory 1) adds a kind her default spread lacks: the shape
+ * partner (`RPG_KIND_PAIRS`) of her first weapon whose partner she doesn't wield, since a v1 Orb only adds its kind for
  * weaknesses. The support (accessory 2) is the first of the balance simulation's kit, so the preset is what the game is
- * tuned with. `Record<RpgClass, …>` makes v2's Paladin a compile error until her row is added.
+ * tuned with.
  */
 export const CLASS_PRESET_ACCESSORIES: Readonly<Record<RpgClass, { orb: OrbType; support: TalismanType | AmuletType }>> = {
   brawler: { orb: 'orb-fire', support: 'talisman-vampire' },
@@ -23,9 +24,17 @@ export const CLASS_PRESET_ACCESSORIES: Readonly<Record<RpgClass, { orb: OrbType;
   spellblade: { orb: 'orb-dark', support: 'talisman-vampire' },
   cleric: { orb: 'orb-ice', support: 'amulet-spring' },
   summoner: { orb: 'orb-axe', support: 'amulet-spring' },
-  // Classes v2's Paladin (D179), on the rule above until H57 sets v2's; no list shows her before the switch.
+  // Classes v2's Paladin (D179), on the rule above for the type; no v1 list shows her.
   paladin: { orb: 'orb-lightning', support: 'talisman-thorn' },
 }
+/**
+ * Classes v2's preset accessories (C6, H57). The Orb, for the Damage slot, is her default spread's first weapon's kind: a
+ * flat Orb strengthens her leading damage. The support, for the Support slot, is the first of the balance simulation's
+ * v2 kit, picked by §6.3's roles: Vampire for Brawler and Spell Blade, Siphon for Mage and Summoner, Thorn for the guarding
+ * Paladin, Spring for the Cleric's casts. That is v1's support but the Summoner's, so this lists only where v2 differs;
+ * H60 adds a row here when it changes a kit's support.
+ */
+export const CLASS_PRESET_SUPPORT_V2: Readonly<Partial<Record<RpgClass, TalismanType | AmuletType>>> = { summoner: 'amulet-siphon' }
 
 /** A class's standard preset: weapons from `rpgDefaultWeapons`, armor from `RPG_CLASS_ARMOR`, accessories from the table. */
 export interface ClassPreset {
@@ -35,8 +44,12 @@ export interface ClassPreset {
   orb: OrbType
   support: TalismanType | AmuletType
 }
-export function classPreset(classId: RpgClass): ClassPreset {
-  return { classId, weapons: rpgDefaultWeapons(classId), armor: RPG_CLASS_ARMOR[classId], ...CLASS_PRESET_ACCESSORIES[classId] }
+/** A class's standard preset in an engine's generation (v2: H57). */
+export function classPreset(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): ClassPreset {
+  const weapons = rpgDefaultWeapons(classId, engine)
+  const v1 = CLASS_PRESET_ACCESSORIES[classId]
+  return { classId, weapons, armor: RPG_CLASS_ARMOR[classId], ...(rpgV2(engine)
+    ? { orb: `orb-${rpgWeaponKind(weapons[0]!)}`, support: CLASS_PRESET_SUPPORT_V2[classId] ?? v1.support } : v1) }
 }
 
 /** What applying a preset does to her. */
@@ -73,12 +86,12 @@ function bestReachable(uma: OwnedUma, stock: Readonly<Record<string, number>>, t
   return { id: binds[binds.length - 1] ?? best?.id ?? null, binds }
 }
 
-/** What her class's standard preset would do to her (pure). Throws `not-owned` or `bad-class`. */
-export function classPresetPlan(world: TierWorld, outfitId: string, classId: RpgClass): PresetPlan {
+/** What her class's standard preset would do to her (pure), in an engine's generation. Throws `not-owned` or `bad-class`. */
+export function classPresetPlan(world: TierWorld, outfitId: string, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): PresetPlan {
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'not unlocked')
-  if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
-  const preset = classPreset(classId)
+  if (!rpgClasses(engine).includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
+  const preset = classPreset(classId, engine)
   const worn = (slot: GearSlot): string | null => uma.gear.equipped[slot] ?? null
   const binds: string[] = []
   const take = (type: EquipType): string | null => {
@@ -116,8 +129,8 @@ export function classPresetPlan(world: TierWorld, outfitId: string, classId: Rpg
 
 /** Her world with the preset applied: the class's weapons (only when they change), bound pieces from the stock into her
  * locker, what she wears and all five armor kinds. The same world when nothing would change. */
-export function applyClassPreset(world: TierWorld, outfitId: string, classId: RpgClass): TierWorld {
-  const plan = classPresetPlan(world, outfitId, classId)
+export function applyClassPreset(world: TierWorld, outfitId: string, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): TierWorld {
+  const plan = classPresetPlan(world, outfitId, classId, engine)
   if (plan.changes === 0) return world
   const uma = world.umas[outfitId]!
   let gear = world.gear
@@ -140,9 +153,10 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
 }
 
 /** Puts on her class's standard preset; the same save when nothing would change. */
-export function wearClassPreset(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE): Save {
+export function wearClassPreset(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE,
+  engine: number = BATTLE_ENGINE_VERSION): Save {
   const world = worldOf(save, tier)
-  const next = applyClassPreset(world, outfitId, classId)
+  const next = applyClassPreset(world, outfitId, classId, engine)
   if (next === world) return save
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: next } }
 }

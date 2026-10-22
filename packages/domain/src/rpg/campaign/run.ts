@@ -1,7 +1,7 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
-import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle } from '../battle/engine'
+import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, rpgV2 } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { accessoryFightFields, noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
@@ -40,10 +40,12 @@ export interface RpgPartyMember {
 
 export const rpgMemberLevel = (profile: Pick<RpgProfile, 'tier' | 'level'>): number => rpgLifetimeLevels(profile.tier, profile.level) + 1
 
-export function rpgCarriedMp(run: Pick<RpgRun, 'mp'>, profile: RpgProfile, points?: Points): number {
-  const max = applyPoints(projectRpgStats(profile), points ?? noPoints()).stats.mp
+export function rpgCarriedMp(run: Pick<RpgRun, 'mp'>, profile: RpgProfile, points?: Points, engine: number = BATTLE_ENGINE_VERSION): number {
+  const max = applyPoints(projectRpgStats(profile, engine), points ?? noPoints()).stats.mp
   return Math.min(max, run.mp[profile.outfitId] ?? max)
 }
+
+type Might = NonNullable<RpgPartyMember['might']>
 
 function seedOf(text: string): number {
   let h = 0x811c9dc5
@@ -52,15 +54,22 @@ function seedOf(text: string): number {
 }
 
 /** The party as the engine takes it (D104, D124, D106): each member's boosted stats, Might, accessory effects and Hero
- * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). */
-export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number): BattleInput['allies'] {
-  return party.map(({ profile, loadout, points, might, accessories, hero, inherits }) => {
-    const boosted = applyPoints(projectRpgStats(profile), points ?? noPoints())
+ * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). Built by the fight's
+ * generation: classes v2 (H57) projects her stats by v2's rules (HP with Guts) and sends no Orb kinds, her Orb's offense
+ * joining her Might instead. */
+export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number,
+  engine: number = BATTLE_ENGINE_VERSION): BattleInput['allies'] {
+  const v2 = rpgV2(engine)
+  return party.map(({ profile, loadout, points, might: weapons, accessories, hero, inherits }) => {
+    const boosted = applyPoints(projectRpgStats(profile, engine), points ?? noPoints())
     const a = accessories ?? noAccessoryEffects()
     // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
     const effects = accessoryFightFields(a, boosted.stats.hp)
+    // v2 (C4): her Orb's offense joins her Might on its kind, even a kind she doesn't wield (her inherited Limit Breaks).
+    const might = v2 && a.orbMight
+      ? Object.entries(a.orbMight).reduce<Might>((m, [k, n]) => ({ ...m, [k]: (m[k as keyof Might] ?? 0) + n }), { ...weapons }) : weapons
     return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
-      tree: profile.tree, legacy: profile.legacy, loadout, ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
+      tree: profile.tree, legacy: profile.legacy, loadout, ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
       classRank: profile.classRank,
       ...(might && Object.keys(might).length ? { might } : {}), ...effects,
       ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),

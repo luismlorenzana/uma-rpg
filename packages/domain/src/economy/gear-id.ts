@@ -2,13 +2,15 @@
 // D124: forty types, every one by grade only (`lance-g3`, `helm-g3`, `talisman-vital-g3`): ten weapons, ten armor pieces
 // (five slots, physical or magical) and twenty accessories (five Arms Orbs, five Elemental Orbs, five Talismans, five
 // Amulets). A weapon is worn up to its Weapon Rank, armor up to its Armor Rank, an accessory up to its kind's Accessory Rank.
+import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
 import { RPG_DAMAGE_KINDS, type RpgDamageKind } from '../rpg/kinds'
 import {
   accessoryTrack, ACCESSORY_LABEL, ACCESSORY_SLOTS, ARMOR_LABEL, ARMOR_PIECES, ARMOR_SLOTS, armorSlotOf, armorTrack, WEAPON_LABEL, WEAPON_TYPES,
   weaponTrack, type AccessoryKind, type AccessorySlot, type ArmorPiece, type ArmorSlot, type Ranks, type WeaponType,
 } from './ranks'
 
-/** Orbs (D86): offensive accessories, adding their kind to every hit for weaknesses only. */
+/** Orbs (D86): offensive accessories, adding their kind to every hit for weaknesses only; from classes v2 (C4, H57) flat
+ * offense on their kind's hits instead (`orbOffense`). */
 export type OrbType = `orb-${RpgDamageKind}`
 export const ORB_TYPES: readonly OrbType[] = RPG_DAMAGE_KINDS.map((k) => `orb-${k}` as OrbType)
 /** Talismans and Amulets (D124): defensive accessories, physical and magical. */
@@ -55,7 +57,14 @@ export function accessoryKindOf(t: AccessoryType): AccessoryKind {
   if (isAmulet(t)) return 'amulet'
   return (['fire', 'ice', 'lightning', 'light', 'dark'] as readonly string[]).includes(orbKind(t)) ? 'elemental-orb' : 'arms-orb'
 }
-/** Where a weapon or armor piece goes; accessories go in either accessory slot, so they have none of their own. */
+/** The slot an accessory goes in. v1: null, either slot (D124). Classes v2 (C10, H57): by type, an Orb in the Damage slot
+ * (`accessory-1`), a Talisman or an Amulet in the Support slot (`accessory-2`). */
+export const accessorySlotFor = (type: AccessoryType, engine: number = BATTLE_ENGINE_VERSION): AccessorySlot | null =>
+  rpgV2(engine) ? (isOrb(type) ? 'accessory-1' : 'accessory-2') : null
+/** Whether an accessory slot takes this type: v1 any accessory, v2 its type's slot. */
+export const accessoryFits = (slot: AccessorySlot, type: EquipType, engine: number = BATTLE_ENGINE_VERSION): boolean =>
+  isAccessory(type) && (accessorySlotFor(type, engine) ?? slot) === slot
+/** Where a weapon or armor piece goes; accessories go in an accessory slot (`accessorySlotFor`). */
 export const slotOf = (t: WeaponType | ArmorPiece): WeaponType | ArmorSlot => (isWeapon(t) ? t : armorSlotOf(t))
 
 /** The grade of this type she may wear: her Weapon Rank, Armor Rank or Accessory Rank for it (D102, D124). */
@@ -85,7 +94,11 @@ export function gearIdentity(id: string): GearIdentity | undefined {
  * not in gear.ts, so a fight can be built without the recipes. Every effect is per mille except `mpRegen` (MP a round);
  * `regen`, `barrier` and `veil` are shares of her max HP (D141), made into HP by `accessoryFightFields`. */
 export interface AccessoryEffects {
+  /** v1: her Orbs' kinds, added to every hit for weaknesses and locks. Empty in classes v2. */
   orbs: RpgDamageKind[]
+  /** Classes v2 (C4, H57): her Orb's flat offense on its kind's hits, added to her Might of that kind. Only with an Orb, and
+   * never in v1. */
+  orbMight?: Partial<Record<RpgDamageKind, number>>
   barrier: number; veil: number; regen: number; mpRegen: number; lifesteal: number; mpSteal: number
   guard: number; resist: number; thorns: number; mirror: number
 }
