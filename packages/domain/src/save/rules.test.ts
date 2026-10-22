@@ -38,7 +38,7 @@ describe('collection rules', () => {
   it('starts a new Mage, Summoner or Cleric in magical armor and a Brawler or Spell Blade in physical (D160)', () => {
     const MAGICAL = ['circlet', 'robe', 'leggings', 'bracers', 'slippers']
     const PHYSICAL = ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']
-    const want: Record<RpgClass, string[]> = { brawler: PHYSICAL, mage: MAGICAL, spellblade: PHYSICAL, cleric: MAGICAL, summoner: MAGICAL }
+    const want: Record<RpgClass, string[]> = { brawler: PHYSICAL, mage: MAGICAL, spellblade: PHYSICAL, cleric: MAGICAL, summoner: MAGICAL, paladin: PHYSICAL }
     const before = unlocked('100101')
     for (const c of RPG_CLASSES) {
       const save = unlockUma(before, '100201', T1, TIER_ONE, c)

@@ -1,6 +1,8 @@
-// RPG vocabulary (D86, docs/design/class-rework.md): ten weapons, ten damage kinds, five classes. Arms deal their own
-// kind; a Tome deals its element. Every kind has one shape in every class: Greatsword and Fire hit one foe hard, Axe
-// and Ice every foe, Lance and Lightning random foes, Bow and Light one foe many times, Katana and Dark twice.
+// RPG vocabulary (D86, docs/design/class-rework.md): ten weapons, ten damage kinds, five classes (six from classes v2,
+// D179). Arms deal their own kind; a Tome deals its element. Every kind has one shape in every class: Greatsword and Fire
+// hit one foe hard, Axe and Ice every foe, Lance and Lightning random foes, Bow and Light one foe many times, Katana and
+// Dark twice.
+import { BATTLE_ENGINE_VERSION, rpgV2 } from './battle/caps'
 
 /** Elements that can be weaknesses. Fire > Ice > Lightning > Fire; Light ↔ Dark. */
 export const RPG_ELEMENTS = ['fire', 'ice', 'lightning', 'light', 'dark'] as const
@@ -16,8 +18,21 @@ export type RpgWeapon = typeof RPG_WEAPONS[number]
 /** The ten kinds a hit can carry and a foe can be weak to. */
 export type RpgDamageKind = RpgWeaponKind | RpgElement
 export const RPG_DAMAGE_KINDS: readonly RpgDamageKind[] = [...RPG_WEAPON_KINDS, ...RPG_ELEMENTS]
-export const RPG_CLASSES = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner'] as const
-export type RpgClass = typeof RPG_CLASSES[number]
+/** Every class of every generation (D179): classes v2 (engine v15) adds the Paladin, last, so no list's order moves. Ids,
+ * trees, nodes and hero seats cover all six; what the game shows reads the live `RPG_CLASSES`. */
+export const RPG_ALL_CLASSES = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin'] as const
+export type RpgClass = typeof RPG_ALL_CLASSES[number]
+const RPG_V1_CLASSES: readonly RpgClass[] = RPG_ALL_CLASSES.filter((c) => c !== 'paladin')
+/** The classes of an engine's generation: classes v1's five to v14, all six from v15 (D179). */
+export function rpgClasses(engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] {
+  return rpgV2(engine) ? RPG_ALL_CLASSES : RPG_V1_CLASSES
+}
+/** The live classes: the five until the switch (H61), the six after. Every list, picker and parser reads this. */
+export const RPG_CLASSES: readonly RpgClass[] = rpgClasses()
+/** Classes v2's healers (C7, C8): at most one fights in a party. */
+export const RPG_HEALERS: readonly RpgClass[] = ['paladin', 'cleric']
+/** A healer of this generation: only from v15, since a v1 Cleric shares the support with the Summoner (D179). */
+export const rpgIsHealer = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): boolean => rpgV2(engine) && RPG_HEALERS.includes(classId)
 /** A class's tree for one weapon: `brawler-greatsword`, `mage-tome-fire`. */
 export type RpgTreeId = `${RpgClass}-${RpgWeapon}`
 

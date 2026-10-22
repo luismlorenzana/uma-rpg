@@ -10,7 +10,7 @@ export * from './hero-id'
  * Her Limit Break's power in single-target casts at her depth, by the class she fights as: what her class's own Limit
  * Break deals (D311, D86). A Hero's Limit Break at 100% matches it; at Bond 0 it is half, about one turn's damage.
  */
-export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8 }
+export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8, paladin: 1.5 }
 
 /** One hit: its kinds (two fuse into one hit, half each) and its share of the Limit Break's power. */
 export interface HeroHit { kinds: readonly RpgDamageKind[]; share: number }
@@ -85,6 +85,13 @@ const LIMITS: readonly HeroLimit[] = [
 const BY_ID = new Map(LIMITS.map((l) => [l.id, l]))
 export const HERO_LIMITS: readonly HeroLimit[] = LIMITS
 export const heroLimit = (id: HeroLimitId): HeroLimit => BY_ID.get(id)!
+/**
+ * A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Today's table
+ * for every version until H56 fills v15's, so a Paladin seat has none yet (undefined) and her plan is refused.
+ */
+export const heroLimitFor = (id: HeroLimitId, _version: number): HeroLimit | undefined => BY_ID.get(id)
+/** Her class's Limit Break power in an engine's generation (D179): today's table for every version until H56 fills v15's. */
+export const heroLimitPower = (classId: RpgClass, _version: number): number => HERO_LIMIT_POWER[classId]
 /** A seat's Limit Breaks by class, in seat order. */
 export const heroLimitsOf = (classId: RpgClass): HeroLimit[] => LIMITS.filter((l) => l.classId === classId)
 /** Every kind a Limit Break deals, in the order it first deals them. */

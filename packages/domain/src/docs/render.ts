@@ -57,7 +57,9 @@ const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
 const x = (n: number) => `×${n}`
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-const CLASS_NAME: Readonly<Record<RpgClass, string>> = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner' }
+const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
+}
 const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]
 const itemName = (id: string) => itemById(id)?.name ?? id
 const inputs = (list: Record<string, number>) => Object.entries(list).map(([id, n]) => `${n > 1 ? `${n}× ` : ''}${itemName(id)}`).join(', ')
@@ -74,8 +76,11 @@ const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
   spellblade: `${BATTLE_LIMIT_NAMES.arts}: an Arms skill and a Tome skill, both at full power (no half)`,
   cleric: `${BATTLE_LIMIT_NAMES.cleric}: a hit with each of her five weapons (${BATTLE_LIMIT_POWER.cleric}× in all), each status at 3 stacks`,
   summoner: `${BATTLE_LIMIT_NAMES.grand}: one summon at twice her strength that lingers at twice its share`,
+  paladin: 'none: she came with engine v15',
 }
-const STARTS_AS: Readonly<Record<RpgClass, string>> = { brawler: 'Front runners', mage: 'Pace chasers', spellblade: '—', cleric: 'Late surgers', summoner: 'End closers' }
+const STARTS_AS: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Front runners', mage: 'Pace chasers', spellblade: '—', cleric: 'Late surgers', summoner: 'End closers', paladin: 'Late surgers, Power over Wit',
+}
 
 function slots(c: RpgClass): string {
   const s = RPG_CLASS_SLOTS[c]

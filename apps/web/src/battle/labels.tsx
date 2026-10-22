@@ -12,13 +12,17 @@ export const WEAPON_LABEL: Readonly<Record<RpgWeapon, string>> = {
   ...WEAPON_KIND_LABEL, 'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
 }
 const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' }
-export const CLASS_LABEL: Readonly<Record<RpgClass, string>> = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner' }
+export const CLASS_LABEL: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
+}
 export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = {
   brawler: 'Pure physical damage: all five Arms, one heavy action a turn. An Elemental Orb adds an element to every hit.',
   mage: 'Pure magic: all five Tomes, one full cast a turn. An Arms Orb adds a weapon kind to every cast.',
   spellblade: 'Three Arms and two Tomes: every act is a blade and a spell, each at half strength.',
   cleric: 'Any five weapons: her blows weaken the foe they hit, her spells bless the whole party.',
   summoner: 'Three Tomes and two Arms: each summon strikes, stays, and strikes again when the next one comes.',
+  // Classes v2 (D179): no list shows her until the switch (H61); H59 rewrites all six.
+  paladin: 'Three Arms and two Tomes: her blows shield the threatened, her spells bless the whole party.',
 }
 /** What each slot holds, for the class's weapon pickers. */
 export const SLOT_LABEL = { arms: 'Arm', tome: 'Tome', any: 'Weapon' } as const

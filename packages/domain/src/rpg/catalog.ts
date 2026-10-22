@@ -4,7 +4,7 @@
 // at each. Each kind keeps one shape in every class: Greatsword and Fire hit one foe hard, Axe and Ice every foe, Lance
 // and Lightning random foes, Bow and Light one foe many times, Katana and Dark twice.
 import {
-  isRpgTome, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
+  isRpgTome, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
 import { rpgTreeOf } from './node-identity'
@@ -361,11 +361,13 @@ function clericSupport(weapon: RpgWeapon, d: number, rebirth = false): RpgSuppor
     ? { share, mend: d === 5 ? 'all' : 'hurt', cleanse: true, ...(rebirth ? { revive: true } : {}) }
     : { share, shield: d === 5 ? 'all' : 'threatened' }
 }
-function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0, rebirth = false): RpgSkillDef {
+/** A Cleric's skill, or with `paladin` the Paladin's (D179): the same hits, status, stacks, turns and MP, her Axe's status
+ * on every foe from depth 4, and no `support` (v12–v14's field; H56 gives both healers v15's kit). */
+function cleric(weapon: RpgWeapon, d: number, turns = 2, more = 0, extraMp = 0, rebirth = false, paladin = false): RpgSkillDef {
   const kind = rpgWeaponKind(weapon)
-  const to = isRpgTome(weapon) ? 'allies' : d === 5 ? 'foes' : 'foe'
+  const to = isRpgTome(weapon) ? 'allies' : d === 5 || (paladin && weapon === 'axe' && d >= 4) ? 'foes' : 'foe'
   return { target: 'one', hits: pure(1, power(d), kind), mp: mp(d) + extraMp, primary: kind,
-    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to }, support: clericSupport(weapon, d, rebirth) }
+    status: { key: RPG_CLERIC_STATUS[weapon], stacks: at(CLERIC_STACKS, d) + more, turns, to }, ...(paladin ? {} : { support: clericSupport(weapon, d, rebirth) }) }
 }
 /** The one side skill that isn't Lasting or Heavy: the Light tree's depth-3 B, Rebirth (D141). */
 export const RPG_REBIRTH_NODE = 'cleric-tome-light.3b'
@@ -377,7 +379,23 @@ for (const weapon of RPG_WEAPONS) {
     sideB: (d) => cleric(weapon, d, 2, 1, 4, weapon === 'tome-light' && d === 3) })
 }
 
-export const RPG_NODES: readonly RpgNode[] = NODES
+// --- Paladin (classes v2, engine v15, D179): the Cleric's kit and names, her other half ---------------------------------
+
+/** The Paladin's one side skill not named Lasting or Heavy: the Lance tree's depth-4 B, Valkyrie's Oath, in the Heavy
+ * shape (H56 gives it its revive). Her Light 3B is Heavy Devotion, since Rebirth stays the Cleric's. */
+export const RPG_VALKYRIE_OATH_NODE = 'paladin-lance.4b'
+for (const weapon of RPG_WEAPONS) {
+  const names = CLERIC_NAMES[weapon]
+  const b = names.map((n, i) => (weapon === 'lance' && i === 3 ? "Valkyrie's Oath" : `Heavy ${n}`))
+  addTree({ classId: 'paladin', weapon, names, a: names.map((n) => `Lasting ${n}`), b,
+    core: (d) => cleric(weapon, d, 2, 0, 0, false, true), sideA: (d) => cleric(weapon, d, 3, 0, 2, false, true),
+    sideB: (d) => cleric(weapon, d, 2, 1, 4, false, true) })
+}
+
+/** Every node of every generation (750, D179): `rpgNode` finds any of them, the Paladin's included. */
+export const RPG_ALL_NODES: readonly RpgNode[] = NODES
+/** The live generation's nodes: the five classes' 600 until the switch (H61), all 750 after. */
+export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.includes(n.classId))
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)
 export const rpgTreeNodes = (tree: RpgTreeId): RpgNode[] => NODES.filter((n) => n.tree === tree)

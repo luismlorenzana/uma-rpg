@@ -30,6 +30,8 @@ const KIT: Readonly<Record<RpgClass, { magical: readonly boolean[]; accessories:
   spellblade: { magical: [false, false, false, true, true], accessories: ['talisman-vampire', 'amulet-spring'], stats: ['atk', 'matk', 'hp', 'def'] },
   cleric: { magical: [true, true, true, true, true], accessories: ['amulet-spring', 'talisman-vital'], stats: ['matk', 'hp', 'mdef', 'def'] },
   summoner: { magical: [true, true, true, true, true], accessories: ['amulet-spring', 'amulet-veil'], stats: ['matk', 'hp', 'def', 'mdef'] },
+  // Classes v2's Paladin (D179), until H60 sets v2's kits.
+  paladin: { magical: [false, false, false, false, false], accessories: ['talisman-thorn', 'talisman-vital'], stats: ['atk', 'hp', 'def', 'mdef'] },
 }
 
 /** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats. */

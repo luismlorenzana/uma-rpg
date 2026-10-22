@@ -311,6 +311,9 @@ Tier 3; it's designed with Tier 3.
 
 ## 8. Engine v15 and the save
 
+Built in H53 (D179): the Paladin as a class id, the one switch, class rules by generation and engine v15's validation,
+dark until H61.
+
 - **Engine v15** carries:
   - the new hands: the Spell Blade's double Arms hit, and the Summoner's mirrored pair and farewell areas;
   - the healers' ATK and M.ATK scaling, their doubled shares and the 60% Barrier cap, and their new effects;

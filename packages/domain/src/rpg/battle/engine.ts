@@ -7,12 +7,13 @@
 // v11 two accessories (D124); v12 the combat balance rework (D141, docs/design/combat-balance.md): a ratio damage formula,
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
-// foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry.
-// Older fights replay unchanged.
+// foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
+// v15 classes v2 (D179), dark until H61: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs.
+// Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
-  isRpgDamageKind, isRpgTome, RPG_CLASSES, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgHand, rpgNodeKey,
+  isRpgDamageKind, isRpgTome, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
   rpgWeaponKind, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
@@ -28,9 +29,10 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
   BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit } from './types'
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
-/** The engine new fights start on; older versions still replay. */
-export const BATTLE_ENGINE_VERSION = 14
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14] as const
+/** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
+ * the engine. Older versions still replay; v15 is accepted, dark, until H61 flips it. */
+export { BATTLE_ENGINE_VERSION, RPG_V2_ENGINE, rpgV2 } from './caps'
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -107,16 +109,17 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
 }
 
 /** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
- * weapons' Might, her armor's Barrier and Regen (D102, D104). */
+ * weapons' Might, her armor's Barrier and Regen (D102, D104). Her class and weapons by the fight's generation (D179): a
+ * Paladin only from v15. */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
-  if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a)) return false
+  if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a, version)) return false
   if (!validCharms(a, version)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
   if (v8 && (!safeInt(a.classRank, 1, 50) || a.maxDepth !== undefined || (a.barrier !== undefined && !safeInt(a.barrier, 0, 100_000)) ||
     (a.regen !== undefined && !safeInt(a.regen, 0, 10_000)) || (a.might !== undefined && (typeof a.might !== 'object' || a.might === null ||
     !Object.entries(a.might).every(([k, n]) => isRpgDamageKind(k) && safeInt(n, 0, 1_000)))))) return false
-  if (!SAFE_ID.test(a.id) || !RPG_CLASSES.includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons) ||
+  if (!SAFE_ID.test(a.id) || !rpgClasses(version).includes(a.classId) || !Array.isArray(a.weapons) || !validRpgWeapons(a.classId, a.weapons, version) ||
     !safeInt(a.tier, 1, 1_000_000) || !safeInt(a.level, 1, 50) || !validStats(a.stats as unknown as Record<string, unknown>, ALLY_STATS) ||
     !safeInt(a.mp, 0, a.stats.mp) || (a.orb !== undefined && !isRpgDamageKind(a.orb)) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
     (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
@@ -125,25 +128,28 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   if (!validRpgTree({ ...a, classRank: battleClassRank(a) }) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
-    a.loadout.every((ref) => battleSkillFor(a, ref) !== null)
+    a.loadout.every((ref) => battleSkillFor(a, ref, version) !== null)
 }
-/** v11 (D124): two Orbs' kinds instead of one, and the accessories' defensive effects, each within its bounds. */
+/** v11 (D124): two Orbs' kinds instead of one, and the accessories' defensive effects, each within its bounds. From v15
+ * (D179) no Orb kinds: an Orb's flat offense arrives in `might` (H57). */
 function validCharms(a: BattleAlly, version: BattleInput['version']): boolean {
   const shares = [a.lifesteal, a.mpSteal, a.guard, a.resist, a.thorns, a.mirror]
   if (version < 11) return a.orbs === undefined && a.veil === undefined && a.mpRegen === undefined && shares.every((v) => v === undefined)
+  if (version >= 15 && a.orbs !== undefined) return false
   return a.orb === undefined && (a.orbs === undefined || (Array.isArray(a.orbs) && a.orbs.length <= 2 && a.orbs.every(isRpgDamageKind) &&
     new Set(a.orbs).size === a.orbs.length)) && (a.veil === undefined || safeInt(a.veil, 0, 100_000)) &&
     (a.mpRegen === undefined || safeInt(a.mpRegen, 0, 10_000)) && shares.every((v) => v === undefined || safeInt(v, 0, 1000))
 }
 /** The kinds her Orbs add to every hit: v11's two, or older fights' one. */
 const orbsOf = (a: BattleAlly): readonly RpgDamageKind[] | undefined => a.orbs ?? (a.orb ? [a.orb] : undefined)
-/** v9 (D106): a Hero has her seat and no Heroes of her own; a Learner at most two different seats, each with a Bond Level. */
-function validHeroes(a: BattleAlly): boolean {
-  if (a.hero !== undefined && (!isHeroLimitId(a.hero) || a.inherits !== undefined)) return false
+/** v9 (D106): a Hero has her seat and no Heroes of her own; a Learner at most two different seats, each with a Bond Level.
+ * Seats of the fight's generation: a Paladin seat only from v15 (D179). */
+function validHeroes(a: BattleAlly, version: BattleInput['version']): boolean {
+  if (a.hero !== undefined && (!isHeroLimitId(a.hero, version) || a.inherits !== undefined)) return false
   if (a.inherits === undefined) return true
   return Array.isArray(a.inherits) && a.inherits.length >= 1 && a.inherits.length <= LEARNER_MAX_PARENTS &&
     new Set(a.inherits.map((i) => i?.limit)).size === a.inherits.length &&
-    a.inherits.every((i) => !!i && typeof i === 'object' && Object.keys(i).length === 3 && isHeroLimitId(i.limit) &&
+    a.inherits.every((i) => !!i && typeof i === 'object' && Object.keys(i).length === 3 && isHeroLimitId(i.limit, version) &&
       safeInt(i.bond, 0, BOND_MAX_LEVEL) && typeof i.from === 'string' && SAFE_ID.test(i.from) && i.from !== a.id)
 }
 function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
@@ -167,7 +173,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -183,6 +189,8 @@ function validateInput(input: BattleInput): void {
   const ids = [...input.allies.map((a) => a.id), ...foes.map((e) => e.id)]
   if (new Set(ids).size !== ids.length) throw new RangeError('Duplicate battle unit')
   if (!input.allies.every((a) => validAlly(a, input.version))) throw new RangeError('Invalid battle ally')
+  // v15 (D179, C8): one healer a party, a Paladin or a Cleric. The game checks it where a party fights; this is the backstop.
+  if (input.allies.filter((a) => rpgIsHealer(a.classId, input.version)).length > 1) throw new RangeError('Invalid battle party')
   if (!foes.every((e) => validEnemy(e, input.version))) throw new RangeError('Invalid battle enemy')
 }
 
@@ -766,7 +774,7 @@ function invalid(s: BattleState, error: BattleError): BattleStep { return { stat
 /** Skill the actor may use: learned, slotted and in her class trees. */
 export function battleActorSkill(s: BattleState, actorId: string, ref: { tier: number; id: string }): BattleSkill | null {
   const a = allyOf(s, actorId)
-  return a ? battleSkillFor(a, ref) : null
+  return a ? battleSkillFor(a, ref, s.engineVersion) : null
 }
 
 /** Random-target hits are seeded by the fight, round, actor, action and hit (and a Limit Break's cast), so a replay lands the same hits. */
@@ -858,9 +866,9 @@ function applyStatus(s: BattleState, actor: BattleUnit, status: NonNullable<RpgS
 
 /** One part of an act: an Attack with a weapon, or a known, equipped skill. */
 type Half = { kind: 'attack'; weapon: RpgWeapon } | { kind: 'skill'; skill: BattleSkill }
-function halfOf(ally: BattleAlly, h: BattleHalf | undefined): Half | null {
+function halfOf(ally: BattleAlly, h: BattleHalf | undefined, version: number): Half | null {
   if (!h || typeof h !== 'object') return null
-  if (h.skill) { const k = battleSkillFor(ally, h.skill); return k ? { kind: 'skill', skill: k } : null }
+  if (h.skill) { const k = battleSkillFor(ally, h.skill, version); return k ? { kind: 'skill', skill: k } : null }
   return h.weapon && ally.weapons.includes(h.weapon) ? { kind: 'attack', weapon: h.weapon } : null
 }
 const halfIsTome = (h: Half): boolean => isRpgTome(h.kind === 'attack' ? h.weapon : h.skill.node.weapon)
@@ -911,7 +919,7 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
   const actor = unit(s, actorUnit.id)!
   const target = unit(s, targetUnit.id)!
   const ally = allyOf(s, actor.id)!
-  const hand = rpgHand(ally)
+  const hand = rpgHand(ally, s.engineVersion)
   const cues: BattleCue[] = []
   let charge: 'attack' | 'skill' | null = null
   if (action.kind === 'guard') {
@@ -940,13 +948,13 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
       const weapon = action.weapon ?? ally.weapons[0]!
       first = ally.weapons.includes(weapon) ? { kind: 'attack', weapon } : null
     } else {
-      first = action.skill && typeof action.skill === 'object' ? halfOf(ally, { skill: action.skill }) : null
+      first = action.skill && typeof action.skill === 'object' ? halfOf(ally, { skill: action.skill }, s.engineVersion) : null
     }
     if (!first) return invalid(previous, 'invalid-skill')
     const halves: Half[] = [first]
     if (hand.pair) {
       // A Spell Blade's act is one Arms half and one Tome half (D86).
-      const second = halfOf(ally, action.pair)
+      const second = halfOf(ally, action.pair, s.engineVersion)
       if (!second || halfIsTome(second) === halfIsTome(first)) return invalid(previous, 'invalid-skill')
       halves.push(second)
     } else if (action.pair !== undefined) return invalid(previous, 'invalid-skill')

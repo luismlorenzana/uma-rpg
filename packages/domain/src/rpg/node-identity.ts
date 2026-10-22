@@ -1,5 +1,5 @@
 // Save/profile validation needs ids and gates, not skill names, hit definitions or the full generated catalog (H16).
-import { isRpgWeapon, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon } from './kinds'
+import { isRpgWeapon, RPG_ALL_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon } from './kinds'
 
 export interface RpgNodeIdentity {
   id: string; tree: RpgTreeId; classId: RpgClass; weapon: RpgWeapon; depth: number; variant: 'a' | 'b' | null
@@ -13,13 +13,14 @@ export const rpgTreeOf = (classId: RpgClass, weapon: RpgWeapon): RpgTreeId => `$
 /** Side skills open at Uma Lv 5, 15, 25, 35 and 45 (D73); cores use the class rank (D77). */
 export const rpgSideNodeLevel = (depth: number): number => 10 * depth - 5
 
-/** The catalog's exact grammar: 40 class/weapon trees × five depths × core/A/B, with no aliases or zero padding. */
+/** The catalog's exact grammar: 50 class/weapon trees × five depths × core/A/B, with no aliases or zero padding. Every
+ * generation's classes (D179): the save refuses a Paladin's keys before the switch through the live `RPG_CLASSES`. */
 export function rpgNodeIdentity(id: string): RpgNodeIdentity | undefined {
   if (typeof id !== 'string') return undefined
   const match = /^([a-z]+)-([a-z-]+)\.([1-5])([ab])?$/.exec(id)
   if (!match) return undefined
   const classId = match[1] as RpgClass, weapon = match[2] as RpgWeapon
-  if (!RPG_CLASSES.includes(classId) || !isRpgWeapon(weapon) || !rpgClassWeapons(classId).includes(weapon)) return undefined
+  if (!RPG_ALL_CLASSES.includes(classId) || !isRpgWeapon(weapon) || !rpgClassWeapons(classId).includes(weapon)) return undefined
   const depth = Number(match[3])
   return { id, tree: rpgTreeOf(classId, weapon), classId, weapon, depth, variant: (match[4] as 'a' | 'b' | undefined) ?? null, cost: depth }
 }

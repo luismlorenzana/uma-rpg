@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { isAmulet, isOrb, isTalisman, orbKind } from '../economy/gear-id'
 import { withTrack, type ArmorKind, type RankRef } from '../economy/ranks'
-import { RPG_CLASS_ARMOR, RPG_CLASSES, RPG_KIND_PAIRS, rpgWeaponKind, validRpgWeapons, type RpgClass, type RpgDamageKind } from '../rpg/rules'
+import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, RPG_KIND_PAIRS, rpgWeaponKind, validRpgWeapons, type RpgClass, type RpgDamageKind } from '../rpg/rules'
 import { chooseClass, classOf, equipSkills, learnSkill, setClassWeapons, startingClass, type BattleOutfit } from './battle'
 import { applyClassPreset, CLASS_PRESET_ACCESSORIES, classPreset, classPresetPlan, wearClassPreset } from './presets'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
@@ -35,9 +35,9 @@ const refusal = (fn: () => unknown): string | null => {
 
 describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
   it('has a row for every class: its default spread, its armor half, an Orb for a kind it lacks and a support', () => {
-    expect(Object.keys(CLASS_PRESET_ACCESSORIES).sort()).toEqual([...RPG_CLASSES].sort())
+    expect(Object.keys(CLASS_PRESET_ACCESSORIES).sort()).toEqual([...RPG_ALL_CLASSES].sort())
     const partner = (k: RpgDamageKind): RpgDamageKind => { const pair = RPG_KIND_PAIRS.find((p) => (p as readonly string[]).includes(k))!; return pair[0] === k ? pair[1] : pair[0] }
-    for (const c of RPG_CLASSES) {
+    for (const c of RPG_ALL_CLASSES) {
       const p = classPreset(c)
       expect(validRpgWeapons(c, p.weapons), c).toBe(true)
       expect(p.armor).toBe(RPG_CLASS_ARMOR[c])

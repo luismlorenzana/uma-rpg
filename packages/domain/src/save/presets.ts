@@ -23,6 +23,8 @@ export const CLASS_PRESET_ACCESSORIES: Readonly<Record<RpgClass, { orb: OrbType;
   spellblade: { orb: 'orb-dark', support: 'talisman-vampire' },
   cleric: { orb: 'orb-ice', support: 'amulet-spring' },
   summoner: { orb: 'orb-axe', support: 'amulet-spring' },
+  // Classes v2's Paladin (D179), on the rule above until H57 sets v2's; no list shows her before the switch.
+  paladin: { orb: 'orb-lightning', support: 'talisman-thorn' },
 }
 
 /** A class's standard preset: weapons from `rpgDefaultWeapons`, armor from `RPG_CLASS_ARMOR`, accessories from the table. */

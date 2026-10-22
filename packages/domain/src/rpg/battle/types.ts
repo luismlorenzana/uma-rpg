@@ -2,7 +2,8 @@
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
 // Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
-// D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5).
+// D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5;
+// v15 classes v2, D179, built dark until H61: the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md).
 // Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -23,7 +24,7 @@ export interface BattleAlly {
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
   loadout: RpgNodeRef[]
-  /** The kind her Orb adds to every hit, for weaknesses only (D86). */
+  /** The kind her Orb adds to every hit, for weaknesses only (D86). Refused from v15 (D179). */
   orb?: RpgDamageKind
   /** MP carried into this fight from the run; HP always starts full. */
   mp: number
@@ -32,14 +33,16 @@ export interface BattleAlly {
   /** Her Class Rank (v8, D102): it opens her trees' depths and sets her Limit Break's depth. */
   classRank?: number
   /** Might by damage kind (v8, D104): added to the offense of hits made with that weapon (a grade × 4 to v11; D142's
-   * table from v13). In v12 alone (D141) a percent: the hits made with that weapon deal this much more. */
+   * table from v13). In v12 alone (D141) a percent: the hits made with that weapon deal this much more. From v15 it also
+   * carries her Orb's offense on its kind (H57). */
   might?: Partial<Record<RpgDamageKind, number>>
   /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
    * absorbing physical damage only). */
   barrier?: number
   /** HP she regains at the end of each round (v8: magical armor; v11: a Vital Talisman). */
   regen?: number
-  /** v11 (D124): the kinds of the Orbs she wears, two at most; each makes her hits weak as `orb` did. Replaces `orb`. */
+  /** v11 (D124): the kinds of the Orbs she wears, two at most; each makes her hits weak as `orb` did. Replaces `orb`.
+   * Refused from v15 (D179): an Orb's flat offense arrives in `might`, and it no longer adds kinds. */
   orbs?: RpgDamageKind[]
   /** v11: a Veil absorbing magical damage, from the start of the fight (Veil Amulet). */
   veil?: number
@@ -113,7 +116,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -156,7 +159,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

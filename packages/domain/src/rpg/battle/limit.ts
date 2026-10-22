@@ -1,7 +1,7 @@
 // Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
 // and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
 import { RPG_SKILL_POWER, RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
-import { bondCapacity, HERO_LIMIT_POWER, heroLimit, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
+import { bondCapacity, heroLimitFor, heroLimitPower, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
 import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
@@ -29,10 +29,12 @@ export interface BattleLimitPlan {
 const round = (n: number) => Math.round(n * 1000) / 1000
 const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
 
-/** A hero Limit Break at `capacity` of her class's Limit Break power (D106, D107). */
-function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: number, from?: string): BattleLimitPlan {
-  const limit = heroLimit(id)
-  return { name: limit.name, casts: heroLimitSkills(limit, HERO_LIMIT_POWER[ally.classId] * level).map((def) => ({ def, scale: capacity })),
+/** A hero Limit Break at `capacity` of her class's Limit Break power (D106, D107), both by the fight's generation (D179);
+ * null for a seat whose generation has no Limit Break yet. */
+function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: number, version: number, from?: string): BattleLimitPlan | null {
+  const limit = heroLimitFor(id, version)
+  if (!limit) return null
+  return { name: limit.name, casts: heroLimitSkills(limit, heroLimitPower(ally.classId, version) * level).map((def) => ({ def, scale: capacity })),
     capacity, ...(from ? { from } : {}) }
 }
 
@@ -41,18 +43,19 @@ export const battleHasLimit = (ally: Pick<BattleAlly, 'hero' | 'inherits'>, vers
   version < 10 || !!ally.hero || !!ally.inherits?.length
 
 /** The casts this Limit Break makes, or null when the choice names something she can't use. `version` is the fight's
- * engine version: v10 has no class Limit Breaks (D112), older fights replay with theirs. */
+ * engine version: v10 has no class Limit Breaks (D112), older fights replay with theirs; every class rule reads its
+ * generation (D179). */
 export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice, version = 10): BattleLimitPlan | null {
-  const hand = rpgHand(ally)
+  const hand = rpgHand(ally, version)
   // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level.
   const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.classRank ?? ally.level)) - 1]!
-  const known = (ref: unknown) => ref && typeof ref === 'object' ? battleSkillFor(ally, ref as RpgNodeRef) : null
+  const known = (ref: unknown) => ref && typeof ref === 'object' ? battleSkillFor(ally, ref as RpgNodeRef, version) : null
   const { skill, skills, weapon, hero } = choice
   // v9 (D106): a Hero has only her seat's Limit Break, at 100%; a Learner may name one she inherits, at 50% + 5% a Bond.
-  if (ally.hero) return skill || skills || weapon || (hero !== undefined && hero !== ally.hero) ? null : heroPlan(ally, ally.hero, level, 1)
+  if (ally.hero) return skill || skills || weapon || (hero !== undefined && hero !== ally.hero) ? null : heroPlan(ally, ally.hero, level, 1, version)
   if (hero !== undefined) {
-    const from = isHeroLimitId(hero) && !skill && !skills && !weapon ? ally.inherits?.find((i) => i.limit === hero) : undefined
-    return from ? heroPlan(ally, from.limit, level, bondCapacity(from.bond), from.from) : null
+    const from = isHeroLimitId(hero, version) && !skill && !skills && !weapon ? ally.inherits?.find((i) => i.limit === hero) : undefined
+    return from ? heroPlan(ally, from.limit, level, bondCapacity(from.bond), version, from.from) : null
   }
   if (version >= 10) return null
   switch (ally.classId) {
@@ -95,6 +98,8 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice, ver
       if (!k?.def.summon) return null
       return { name: BATTLE_LIMIT_NAMES.grand, casts: [{ def: k.def, scale: 2 * hand.power }], linger: { ref: k.ref, scale: 2 * k.def.summon.linger } }
     }
+    // She came with engine v15, long after the classes' own Limit Breaks retired (D112, D179).
+    case 'paladin': return null
   }
 }
 

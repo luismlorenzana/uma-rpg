@@ -1,7 +1,11 @@
 // An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
 // wields five weapons and has a tree per weapon; its Class Rank opens the depths and pays the points for side skills
 // (D102), her Uma Level her stats and skill slots, and a hand per class scales power and MP.
+// Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/design/classes-v2.md) from v15. Each
+// takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game follows
+// the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live generation's.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
+import { BATTLE_ENGINE_VERSION, rpgV2 } from './battle/caps'
 import { rpgClassWeapons, rpgNodeIdentity as rpgNode, rpgSideNodeLevel, rpgTreeOf, type RpgNodeIdentity as RpgNode } from './node-identity'
 import {
   isRpgTome, isRpgWeapon, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon,
@@ -52,7 +56,8 @@ export interface RpgCoreStats extends Stats {
   pdef: number
   mdef: number
   /** Her Heal (D141): Guts × her class's heal lean. Mends and Barriers grow ×(1 + Heal ÷ 300). Kept under its old name so
-   * frozen fights still parse. */
+   * frozen fights still parse. From v15 (D179) it is 0: Heal retires, and a healer's mends scale from her ATK or M.ATK
+   * (`BATTLE_HEAL_OFFENSE_SCALE`). */
   dexterity: number
   hp: number
   mp: number
@@ -60,15 +65,28 @@ export interface RpgCoreStats extends Stats {
 
 // --- Classes and weapons (D86) -----------------------------------------------------------------------------------------
 
+// Each class rule's generations are rows of data (D179). A Paladin row in a v1 table holds her v2 values: the type needs
+// it, and no v1 fight or save has a Paladin.
+const byGeneration = <T>(v1: T, v2: T) => (engine: number): T => (rpgV2(engine) ? v2 : v1)
+
 /** What each of a class's five slots holds. Brawler and Mage wield all of their five; the others choose. */
 export type RpgSlotKind = 'arms' | 'tome' | 'any'
-export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = {
+const ARMS_LED: readonly RpgSlotKind[] = ['arms', 'arms', 'arms', 'tome', 'tome']
+const TOME_LED: readonly RpgSlotKind[] = ['tome', 'tome', 'tome', 'arms', 'arms']
+const SLOTS_V1: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = {
   brawler: ['arms', 'arms', 'arms', 'arms', 'arms'],
   mage: ['tome', 'tome', 'tome', 'tome', 'tome'],
-  summoner: ['tome', 'tome', 'tome', 'arms', 'arms'],
-  spellblade: ['arms', 'arms', 'arms', 'tome', 'tome'],
+  summoner: TOME_LED,
+  spellblade: ARMS_LED,
   cleric: ['any', 'any', 'any', 'any', 'any'],
+  paladin: ARMS_LED,
 }
+/** Classes v2 (§3): the Cleric 3 Tomes + 2 Arms, the Paladin her mirror. */
+const slotsOf = byGeneration(SLOTS_V1, { ...SLOTS_V1, cleric: TOME_LED })
+/** A class's five slots in an engine's generation. */
+export const rpgClassSlots = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): readonly RpgSlotKind[] => slotsOf(engine)[classId]
+/** The live generation's slots. */
+export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = slotsOf(BATTLE_ENGINE_VERSION)
 /**
  * Which half of each armor slot a class starts in (classes v2 §7, D160): a new Uma's five slots all hold her starting
  * class's kind. Magical for the Tome-led classes, physical for the rest.
@@ -79,58 +97,87 @@ export const RPG_CLASS_ARMOR: Readonly<Record<RpgClass, 'physical' | 'magical'>>
   spellblade: 'physical',
   cleric: 'magical',
   summoner: 'magical',
+  paladin: 'physical',
 }
-/** Whether a class picks its weapons (Summoner, Spell Blade, Cleric) or wields a fixed five. */
+/** Whether a class picks its weapons (Summoner, Spell Blade, Cleric, Paladin) or wields a fixed five. */
 export const rpgPicksWeapons = (classId: RpgClass): boolean => classId !== 'brawler' && classId !== 'mage'
-/** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */
-export function rpgDefaultWeapons(classId: RpgClass): RpgWeapon[] {
-  return ({
-    brawler: [...RPG_WEAPON_KINDS], mage: [...RPG_TOMES],
-    summoner: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'],
-    spellblade: ['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'],
-    cleric: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'],
-  } as Record<RpgClass, RpgWeapon[]>)[classId]
+const WEAPONS_V1: Readonly<Record<RpgClass, readonly RpgWeapon[]>> = {
+  brawler: RPG_WEAPON_KINDS, mage: RPG_TOMES,
+  summoner: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'],
+  spellblade: ['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'],
+  cleric: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'],
+  paladin: ['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire'],
 }
-/** Five different weapons, as many Tomes and Arms as the class's slots say. */
-export function validRpgWeapons(classId: RpgClass, weapons: readonly RpgWeapon[]): boolean {
+/** Classes v2 (D179): the Cleric's Light, Dark and Thunder Tomes with Katana and Bow serve the Arcane party's shields, as
+ * the Paladin's Greatsword, Axe and Lance with Blizzard and Fire Tomes serve the physical one. */
+const weaponsOf = byGeneration(WEAPONS_V1, { ...WEAPONS_V1, cleric: ['tome-light', 'tome-dark', 'tome-lightning', 'katana', 'bow'] })
+/** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */
+export function rpgDefaultWeapons(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): RpgWeapon[] {
+  return [...weaponsOf(engine)[classId]]
+}
+/** Five different weapons, as many Tomes and Arms as the class's slots say in this engine's generation. */
+export function validRpgWeapons(classId: RpgClass, weapons: readonly RpgWeapon[], engine: number = BATTLE_ENGINE_VERSION): boolean {
   if (!Array.isArray(weapons) || weapons.length !== RPG_WEAPON_SLOTS || new Set(weapons).size !== weapons.length) return false
   if (!weapons.every((w) => isRpgWeapon(w) && rpgClassWeapons(classId).includes(w))) return false
-  const slots = RPG_CLASS_SLOTS[classId]
+  const slots = rpgClassSlots(classId, engine)
   const tomes = weapons.filter(isRpgTome).length
   const want = slots.filter((k) => k === 'tome').length
   return slots.includes('any') || tomes === want
 }
 
-/** The class an Uma starts in: her best running style's (front Brawler, pace Mage, late Cleric, end Summoner). */
+/** The class an Uma starts in: her best running style's (front Brawler, pace Mage, late Cleric, end Summoner). Classes v2's
+ * Paladin start, a Late surger whose Power beats her Wit, is the save's at unlock (H58). */
 export function rpgDefaultClass(style: 'front' | 'pace' | 'late' | 'end'): RpgClass {
   return ({ front: 'brawler', pace: 'mage', late: 'cleric', end: 'summoner' } as const)[style]
 }
 
-/** Each class leans the shared projection. */
-export const RPG_CLASS_STATS: Readonly<Record<RpgClass, { hp: number; atk: number; matk: number; pdef: number; mdef: number; mp: number; heal: number }>> = {
+/** How a class leans the shared projection. */
+export interface RpgClassLean { hp: number; atk: number; matk: number; pdef: number; mdef: number; mp: number; heal: number }
+const STATS_V1: Readonly<Record<RpgClass, RpgClassLean>> = {
   brawler: { hp: 1.15, atk: 1.1, matk: 0.9, pdef: 1.1, mdef: 0.9, mp: 0.8, heal: 0.8 },
   mage: { hp: 0.9, atk: 0.9, matk: 1.15, pdef: 0.9, mdef: 1.1, mp: 1.3, heal: 1 },
   spellblade: { hp: 1, atk: 1.05, matk: 1.05, pdef: 1, mdef: 1, mp: 1, heal: 0.9 },
   cleric: { hp: 1, atk: 0.8, matk: 1, pdef: 1, mdef: 1.15, mp: 1.3, heal: 1.3 },
   summoner: { hp: 1, atk: 1, matk: 1, pdef: 1, mdef: 1, mp: 1.1, heal: 1.2 },
+  paladin: { hp: 1, atk: 1, matk: 0.8, pdef: 1.15, mdef: 1, mp: 1.3, heal: 0 },
 }
+/** Classes v2 (§3.1–§3.3): the hybrids' mirrored leans, the Paladin the Cleric's mirror, and Heal retired. */
+const statsOf = byGeneration(STATS_V1, {
+  brawler: { ...STATS_V1.brawler, heal: 0 },
+  mage: { ...STATS_V1.mage, heal: 0 },
+  spellblade: { ...STATS_V1.spellblade, atk: 1.1, matk: 0.95, heal: 0 },
+  cleric: { ...STATS_V1.cleric, heal: 0 },
+  summoner: { ...STATS_V1.summoner, atk: 0.95, matk: 1.1, mp: 1, heal: 0 },
+  paladin: STATS_V1.paladin,
+})
+/** A class's lean in an engine's generation. */
+export const rpgClassStats = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): RpgClassLean => statsOf(engine)[classId]
+/** The live generation's leans. */
+export const RPG_CLASS_STATS: Readonly<Record<RpgClass, RpgClassLean>> = statsOf(BATTLE_ENGINE_VERSION)
 
 /** Every tree of a class (5 or 10), and the ones her weapons make usable. */
 export const rpgClassTrees = (classId: RpgClass): RpgTreeId[] => rpgClassWeapons(classId).map((w) => rpgTreeOf(classId, w))
 export const rpgProfileTrees = (p: Pick<RpgProfile, 'classId' | 'weapons'>): RpgTreeId[] => p.weapons.map((w) => rpgTreeOf(p.classId, w))
 
 /**
- * How a class acts (D86): once a turn for everyone. `power` and `mp` scale every skill and the Attack; a Summoner's
- * summon lingers at `linger`; a Spell Blade's act is a `pair`, one Arms half and one Tome half.
+ * How a class acts (D86): once a turn for everyone. `arms` and `tome` are the power of a skill or Attack of that half
+ * (D179) and `mp` scales every skill's MP. `power` is a one-half class's power, or a pair class's leading half (in v1
+ * each half's: there `arms` = `tome` = `power`). A Summoner's summon lingers at `linger`. A `pair` class acts with one
+ * Arms half and one Tome half: the Spell Blade, and from v15 the Summoner too, her Tome half leading.
  */
-export interface RpgHand { power: number; mp: number; linger: number; pair: boolean }
-export function rpgHand(p: Pick<RpgProfile, 'classId'>): RpgHand {
-  switch (p.classId) {
-    case 'summoner': return { power: 0.6, mp: 0.7, linger: 0.3, pair: false }
-    case 'spellblade': return { power: 0.45, mp: 0.5, linger: 0, pair: true }
-    case 'cleric': return { power: 0.5, mp: 0.6, linger: 0, pair: false }
-    default: return { power: 1, mp: 1, linger: 0, pair: false }
-  }
+export interface RpgHand { power: number; arms: number; tome: number; mp: number; linger: number; pair: boolean }
+const hand = (power: number, arms: number, tome: number, mp: number, linger = 0, pair = false): RpgHand =>
+  ({ power, arms, tome, mp, linger, pair })
+const HANDS_V1: Readonly<Record<RpgClass, RpgHand>> = {
+  brawler: hand(1, 1, 1, 1), mage: hand(1, 1, 1, 1), spellblade: hand(0.45, 0.45, 0.45, 0.5, 0, true),
+  cleric: hand(0.5, 0.5, 0.5, 0.6), summoner: hand(0.6, 0.6, 0.6, 0.7, 0.3), paladin: hand(0.5, 0.5, 0.5, 0.6),
+}
+/** Classes v2 (§3.1–§3.3): the Spell Blade 70/30 with her Arms half leading, the Summoner her mirror. */
+const handsOf = byGeneration(HANDS_V1, {
+  ...HANDS_V1, spellblade: hand(0.63, 0.63, 0.27, 0.5, 0, true), summoner: hand(0.63, 0.27, 0.63, 0.5, 0.3, true),
+})
+export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
+  return { ...handsOf(engine)[p.classId] }
 }
 
 // --- Levels and stats --------------------------------------------------------------------------------------------------
@@ -168,11 +215,15 @@ export function rpgLifetimeLevels(tier: number, level: number): number {
   return lifetime
 }
 
-export function projectRpgStats(profile: Pick<RpgProfile, 'baseStats' | 'growthRates' | 'tier' | 'level' | 'classId'>): RpgCoreStats {
+/** HP a point of Guts adds (classes v2 C1, D179): none in v1, 1 from v15, where Heal retires. */
+const gutsHp = byGeneration(0, 1)
+
+export function projectRpgStats(profile: Pick<RpgProfile, 'baseStats' | 'growthRates' | 'tier' | 'level' | 'classId'>,
+  engine: number = BATTLE_ENGINE_VERSION): RpgCoreStats {
   const lifetime = rpgLifetimeLevels(profile.tier, profile.level)
   const base = checkedStats(profile.baseStats, 'base stats')
   const growth = checkedStats(profile.growthRates, 'growth rates', true)
-  const lean = RPG_CLASS_STATS[profile.classId]
+  const lean = statsOf(engine)[profile.classId]
   if (!lean) throw new RangeError('Invalid RPG class')
   const core = {} as Stats
   for (const key of STATS) {
@@ -181,8 +232,8 @@ export function projectRpgStats(profile: Pick<RpgProfile, 'baseStats' | 'growthR
     core[key] = projected
   }
   // Campaign MP: a pool worth a few skills that carries between fights; Wit buys more casts. HP stays under a thousand
-  // at Lv 50 (D104: 5 × Stamina, was 6 ×).
-  const hp = Math.round((100 + 5 * core.stamina + 2 * core.power) * lean.hp)
+  // at Lv 50 (D104: 5 × Stamina, was 6 ×); from v15 Guts adds to it (C1). Her Heal is 0 from v15, as its lean is.
+  const hp = Math.round((100 + 5 * core.stamina + 2 * core.power + gutsHp(engine) * core.guts) * lean.hp)
   const mp = Math.round((20 + 1.5 * core.wit) * lean.mp)
   requireSafe(hp, 'projected HP')
   requireSafe(mp, 'projected MP')
