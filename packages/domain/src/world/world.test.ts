@@ -3,7 +3,9 @@ import { BIOMES, signatureWeaknesses } from './biomes'
 import { bandFranchise, capitalFranchise, ENEMY_TIERS, FRANCHISES, stageFaces, type RosterMember } from './roster'
 import { grantRpgExp } from '../rpg/rules'
 import { rpgBattleExp, rpgRewardKind } from '../rpg/campaign/rewards'
-import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, WORLD_BOSS_TWICE_FROM, worldContinent } from './world'
+import { rpgFoe } from '../rpg/campaign/enemies'
+import { stageLaurels } from '../save/battle'
+import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, WORLD_BOSS_TWICE_FROM, WORLD_FORMATIONS, WORLD_TUNING, worldContinent } from './world'
 
 const cast = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 
@@ -149,5 +151,44 @@ describe('the world map (D66, D71)', () => {
     expect(stageFaces([], 'priconne', 'x')('boss', 0)).toBeNull()
     const blank = regionChapter(worldContinent({ name: 'URA', order: 1 }).regions[0]!, []).nodes[1]!.enemies
     expect(blank.every((f) => f.castId === '')).toBe(true)
+  })
+})
+
+describe('Tier 2 regions (tier2-world Z3, Z8; H45)', () => {
+  const w1 = worldContinent({ name: 'T1', order: 1 })
+  const w6 = worldContinent({ name: 'T2', order: 6 })
+
+  it('take their tier from the continent, so a w6 first clear pays twice a w1 one', () => {
+    const t1 = regionChapter(w1.regions[0]!, cast), t2 = regionChapter(w6.regions[0]!, cast)
+    expect([t1.tier, t2.tier]).toEqual([1, 2])
+    const first = (chapter: typeof t1) => { const node = chapter.nodes[1]!; return stageLaurels(rpgRewardKind(node), chapter.tier, true, node.level) }
+    expect(first(t2)).toBe(2 * first(t1))
+    expect(first(t1)).toBeGreaterThan(0)
+  })
+
+  it('make an elite and a lone boss act twice from tier Lv 10, not lifetime 10', () => {
+    for (const [region, top, twice] of [[w6.regions.find((r) => r.row === 0)!, 55, false], [w6.regions.find((r) => r.row === 5)!, 60, true]] as const) {
+      const stages = regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp')
+      const elite = stages[10]!, boss = stages[11]!
+      expect([elite.level, boss.level]).toEqual([top, top])
+      expect(elite.enemies[0]!.rank).toBe('sub-boss')
+      expect(elite.enemies[0]!.twice ?? false, `${region.id} elite`).toBe(twice)
+      const champion = [boss.enemies, ...(boss.waves ?? [])].flat().find((f) => f.rank === 'boss')!
+      expect(champion.twice ?? false, `${region.id} boss`).toBe(twice)
+    }
+  })
+
+  it('step a regular foe’s HP from her tier level: ×1 at Tier 2 Lv 1, ×1.175 at Lv 6', () => {
+    // A foe's role shows in her first move.
+    const roleOf = { strike: 'striker', bolt: 'caster', bash: 'guard', cut: 'skirmisher' } as const
+    for (const [region, tough] of [[w6.regions.find((r) => r.row === 0)!, 1], [w6.regions.find((r) => r.row === 5)!, 1 + WORLD_TUNING.regularHpPerLevel * 5]] as const) {
+      const pair = regionChapter(region, cast).nodes[1]!
+      expect(pair.name).toBe('Pair')
+      for (const foe of pair.enemies) {
+        const base = rpgFoe({ id: 'f', castId: '', element: foe.element, role: roleOf[foe.moves[0]!.id as keyof typeof roleOf], rank: 'regular',
+          level: pair.level, shield: 4, weaknesses: { weapons: [], elements: [] } })
+        expect(foe.stats.hp, foe.id).toBe(Math.round(base.stats.hp * (WORLD_FORMATIONS.duo.budget / 2) * tough))
+      }
+    }
   })
 })

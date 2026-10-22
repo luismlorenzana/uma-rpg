@@ -45,14 +45,21 @@ function play(input: BattleInput): Played {
 type Kind = 'fight' | 'sub-boss' | 'boss'
 interface Bucket { n: number; wins: number; rounds: number; hp: number; lowest: number; kos: number; focus: number }
 const empty = (): Bucket => ({ n: 0, wins: 0, rounds: 0, hp: 0, lowest: 0, kos: 0, focus: 0 })
-const regionsAt = (level: number) => worldContinent({ name: 'Sim', order: Math.ceil(level / 10) }).regions.filter((r) => r.level <= level && level <= r.levelTop)
+/** A tier level's lifetime level: Tier 2 Lv 1 is 51. */
+const lifetimeOf = (level: number, tier = 1) => 50 * (tier - 1) + level
+/** The regions holding a tier level, on its continent of that tier: Tier 2 Lv 1–10 is `w6`. */
+const regionsAt = (level: number, tier = 1) => {
+  const lifetime = lifetimeOf(level, tier)
+  return worldContinent({ name: 'Sim', order: 5 * (tier - 1) + Math.ceil(level / 10) }).regions.filter((r) => r.level <= lifetime && lifetime <= r.levelTop)
+}
 
-/** Every stage at a level across a continent's regions, by stage kind. */
+/** Every stage at a tier level across a continent's regions, by stage kind; `options.tier` picks the tier (H45). */
 export function simulate(level: number, options: BalanceOptions): Record<Kind, Bucket> {
   const party = balanceParty(level, options)
+  const lifetime = lifetimeOf(level, options.tier)
   const out: Record<Kind, Bucket> = { fight: empty(), 'sub-boss': empty(), boss: empty() }
-  for (const region of regionsAt(level)) {
-    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp' && n.level === level).forEach((node, i) => {
+  for (const region of regionsAt(level, options.tier)) {
+    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp' && n.level === lifetime).forEach((node, i) => {
       const r = play(balanceStage(node, 1000 + i, party))
       const b = out[node.kind as Kind]
       b.n++; b.wins += r.won ? 1 : 0; b.rounds += r.rounds; b.hp += r.hpLeft; b.lowest += r.lowest; b.kos += r.kos; b.focus += r.focus
@@ -87,6 +94,8 @@ function run(level: number, options: BalanceOptions): { cleared: number[]; mpLef
 
 const ON_CURVE: BalanceOptions = { gear: true, stars: true, heroes: true }
 const GEARED: BalanceOptions = { gear: true, heroes: true }
+/** A freshly ascended party (tiers §5): Tier 2 Lv 1, Training gear, an empty Extra Stats map, no Heroes, Class Rank 1. */
+const FRESH_T2: BalanceOptions = { tier: 2, classRank: 1 }
 const pct = (x: number) => `${Math.round(100 * x)}%`
 const cell = (b: Bucket) => b.n ? `${pct(b.wins / b.n)} ${(b.rounds / b.n).toFixed(1)}r hp ${pct(b.hp / b.n)} low ${pct(b.lowest / b.n)} ko ${(b.kos / b.n).toFixed(1)} focus ${pct(b.focus / b.n)}` : '—'
 
@@ -144,12 +153,25 @@ describe('world balance', () => {
     for (const node of opening) expect(play(balanceStage(node, 7, party)).won, node.id).toBe(true)
   })
 
+  it('lets a freshly ascended Tier 2 party win w6’s Meadow’s opening pairs (Z3, H45)', () => {
+    // Tier 2 Lv 1 with lifetime 51's stats, Training gear, no Extra Stats, no Heroes, Class Rank 1 (tiers §5).
+    const party = balanceParty(1, FRESH_T2)
+    const meadow = regionChapter(worldContinent({ name: 'Sim', order: 6 }).regions[0]!, cast)
+    const opening = meadow.nodes.filter((n: RpgMapNode) => n.kind === 'fight').slice(0, 2)
+    expect(opening.map((n) => n.level)).toEqual([51, 51])
+    for (const node of opening) expect(play(balanceStage(node, 7, party)).won, node.id).toBe(true)
+  })
+
   it.skipIf(!process.env.SIM)('prints win rates by level: bare, geared (no Extra Stats) and on curve', () => {
     const rows: string[] = ['level | party | regular | elite | boss']
     // `SIM_LEVELS=5,25,50` narrows the table while tuning.
     const levels = process.env.SIM_LEVELS ? process.env.SIM_LEVELS.split(',').map(Number) : [1, 5, 10, 15, 20, 25, 30, 40, 50]
+    // Tier 2 (H45): a freshly ascended party on `w6`'s 40 opening stages (rows 1–5, stages 1–2, lifetime 51), then Tier 2
+    // on curve beside Tier 1 at each tier level.
+    const fresh = simulate(1, FRESH_T2)
+    rows.push(`T2 Lv1 | fresh, ${fresh.fight.n} stages | ${cell(fresh.fight)} | ${cell(fresh['sub-boss'])} | ${cell(fresh.boss)}`)
     for (const level of levels) {
-      for (const [label, options] of [['bare', {}], ['geared', GEARED], ['on curve', ON_CURVE]] as const) {
+      for (const [label, options] of [['bare', {}], ['geared', GEARED], ['on curve', ON_CURVE], ['T2 on curve', { ...ON_CURVE, tier: 2 }]] as const) {
         const r = simulate(level, options)
         rows.push(`Lv${level} | ${label} | ${cell(r.fight)} | ${cell(r['sub-boss'])} | ${cell(r.boss)}`)
       }

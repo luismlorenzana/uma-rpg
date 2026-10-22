@@ -267,10 +267,12 @@ Shown with Fire; a foe uses her own element, and a dual-element foe her second e
 <!-- /live -->
 
 Captains and champions change tactics below 50% HP (their phase-two moves); a charged move she is gathering or landing
-carries over. From Lv 10 a lone region boss and an elite's sub-boss act twice (D141). The Rift's Duel champion **acts
-three times** a round (v14): her second move comes with every foe's second and her third after them all, and neither
-starts a charge. Foe faces come from the region's
-franchise and each slot's tier, from a private file; see [maps](maps.md#faces).
+carries over. From tier Lv 10 a lone region boss and an elite's sub-boss act twice (D141). The Rift's Duel champion
+**acts three times** a round (v14): her second move comes with every foe's second and her third after them all, and
+neither starts a charge. A foe's level is lifetime (Tier 2 Lv 1 is 51), and so is the reference stat her HP and defense
+grow from, but the build budget, the hit-share ramp and the world's per-level HP step restart at each tier's Lv 1, as a
+freshly ascended party's build does (D170). Foe faces come from the region's franchise and each slot's tier, from a
+private file; see [maps](maps.md#faces).
 
 ### Splash cut-ins
 
@@ -293,14 +295,14 @@ unchanged.
 <!-- live:foe-scaling -->
 | Setting | Value |
 |---|---|
-| HP | (40 + 4.2 × reference stat) × role × rank |
-| Offense | Set so a 100% hit takes a share of an average Uma's HP at her level (20% at Lv 1, 28% from Lv 10), × the offense budget, × role |
+| HP | (40 + 4.2 × reference stat) × role × rank; the reference stat is an average Uma's at the foe's lifetime level |
+| Offense | Set so a 100% hit takes a share of an average Uma's HP at her level (20% at tier Lv 1, 28% from tier Lv 10), × the offense budget, × role |
 | Sub-boss and boss HP | ×3.5 and ×5.5, times the party's reachable skill depth |
-| Build budget | What a built party's gear and Extra Stats call for: HP and defense ×(1 + 0.035 × (L − 1)² ÷ 49), ××2.72 at Lv 50; offense ××1.49 at Lv 50 |
-| World: regular foes | +3.5% HP per level |
-| World: elites | +0% HP per level |
+| Build budget | What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + 0.035 × (ℓ − 1)² ÷ 49), ×2.72 at Lv 50; offense ×1.49 at Lv 50. It restarts at each tier's Lv 1; its build part scales by her stats' growth: ×1.96 HP and defense, ×1.27 offense at Tier 2 Lv 50 |
+| World: regular foes | +3.5% HP per tier level |
+| World: elites | +0% HP per tier level |
 | World: region bosses | ×0.5 a champion's HP |
-| Acting twice | From Lv 10: a lone region boss and an elite's sub-boss; a lone elite always |
+| Acting twice | From tier Lv 10: a lone region boss and an elite's sub-boss; a lone elite always |
 | Formations | A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's |
 | Shields | Regular 2 (by formation), sub-boss 6, boss 8 |
 <!-- /live -->

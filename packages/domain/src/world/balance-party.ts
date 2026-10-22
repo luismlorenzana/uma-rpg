@@ -42,13 +42,16 @@ export function onCurveStars(classId: RpgClass, level: number): string[] {
   return nodes
 }
 
-export interface BalanceOptions { gear?: boolean; stars?: boolean; heroes?: boolean; classRank?: number }
+/** `tier` (default 1) builds her in that tier at `level`, her tier level (H45): her stats are her lifetime level's, while her
+ * grade, Extra Stats, slots and Bond read the tier level, as a player's restart at Ascend. */
+export interface BalanceOptions { gear?: boolean; stars?: boolean; heroes?: boolean; classRank?: number; tier?: number }
 
 /** An average outfit of a class at a level: side skills learned deepest first, the deepest skills equipped one weapon at a
  * time, and, on curve, her gear, Extra Stats and an inherited Limit Break. */
 export function balanceMember(classId: RpgClass, i: number, level: number, options: BalanceOptions = {}): BattleAlly {
+  const tier = options.tier ?? 1
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId), tier: 1, level, exp: 0,
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId), tier, level, exp: 0,
     tree: [], legacy: [], classRank: options.classRank ?? level }
   for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
   const known = rpgLearnedSkills(profile).sort((a, b) => rpgNode(b.id)!.depth - rpgNode(a.id)!.depth)
@@ -75,7 +78,7 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23).
   const bond = Math.min(10, Math.floor(level / 2.3))
   const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined
-  return { id: profile.outfitId, classId, weapons: profile.weapons, tier: 1, level, stats: boosted.stats, tree: profile.tree, legacy: [],
+  return { id: profile.outfitId, classId, weapons: profile.weapons, tier, level, stats: boosted.stats, tree: profile.tree, legacy: [],
     loadout, mp: boosted.stats.mp, classRank: profile.classRank, ...(Object.keys(might).length ? { might } : {}), ...effects,
     ...(a.orbs.length ? { orbs: [...a.orbs] } : {}), ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}),
     ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}), ...(inherits ? { inherits } : {}) }

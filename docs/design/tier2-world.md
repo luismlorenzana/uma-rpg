@@ -1,6 +1,8 @@
 # Tier 2's world and its Rift
 
 > **Proposal, 2026-10-21, for the owner to decide; not built.**
+> - **Z3 and Z8 built in H45 (D170),** decided by the main session for the owner so Ascend lands in a playable Tier 2;
+>   the other calls wait (Q16). §2's "today" and §5's "today" rows describe the code before it.
 > - One of five Tier 2 docs that follow [tiers](tiers.md) Option A (D159): [advanced classes](tier2-classes.md) (H39),
 >   [weapon arts and armor sets](weapon-arts.md) (H40), [the outer ring](extra-stats-tier2.md) (H41),
 >   [the second profession](second-profession.md) (H42) and this one (H43).

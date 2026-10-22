@@ -3,9 +3,10 @@
 // cover its first five levels, half its last five, so a party crosses a continent in two regions. Generated from
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
+import { chapterFor } from '../master/roster'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
 import { rpgChapterReach, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
-import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
+import { RPG_FOE_TUNING, rpgFoe, rpgFoeCurveLevel, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
 import { BIOMES, biomeById, signatureWeaknesses, type Biome, type BiomeDef, type Formation } from './biomes'
 import { bandFranchise, stageFaces, type EnemyRoster, type EnemyTier, type RosterMember } from './roster'
@@ -68,14 +69,14 @@ export function worldContinent(source: ContinentSource): WorldContinent {
 
 /**
  * World tuning (D75, D141), set against the balance simulation (`SIM=1 npx vitest run src/world/balance.test.ts`). Skills
- * grow with depth faster than the foe curve, so foes gain HP per level on top of it (a regular foe ×2.7 HP by Lv50); a
- * region boss is a fraction of a chapter champion (one of forty per continent). Offense needs no world step: the foe
- * curve sets it from the share of an Uma's HP a hit takes (D141).
+ * grow with depth faster than the foe curve, so foes gain HP per tier level on top of it (a regular foe ×2.7 HP by tier
+ * Lv 50; the step restarts at each tier's Lv 1, Z3, D170); a region boss is a fraction of a chapter champion (one of forty
+ * per continent). Offense needs no world step: the foe curve sets it from the share of an Uma's HP a hit takes (D141).
  */
 export const WORLD_TUNING = {
   regularHpPerLevel: 0.035, eliteHpPerLevel: 0, bossHp: 0.5,
 } as const
-/** A lone region boss and an elite's sub-boss act twice from this level (D141). */
+/** A lone region boss and an elite's sub-boss act twice from this tier level (D141; tier level since Z3, D170). */
 export const WORLD_BOSS_TWICE_FROM = 10
 
 
@@ -154,10 +155,13 @@ export const stageLevel = (region: Pick<WorldRegion, 'level' | 'levelTop'>, stag
 export const TWIN_BOSS_ROW = WORLD_ROWS - 1
 
 /** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. Its foes wear the
- * faces of its franchise's units (D135), from `roster`. */
-export function regionChapter(region: WorldRegion, roster: EnemyRoster, tier = 1): RpgCampaignChapter {
+ * faces of its franchise's units (D135), from `roster`. Its tier is its continent's (Z8, D170): a `w6` region pays Tier 2's
+ * Laurels wherever it's built. */
+export function regionChapter(region: WorldRegion, roster: EnemyRoster): RpgCampaignChapter {
   const biome = biomeById(region.biome)
-  const franchise = bandFranchise(Number(region.continentId.slice(1)), region.row)
+  const order = Number(region.continentId.slice(1))
+  const { tier } = chapterFor(order)
+  const franchise = bandFranchise(order, region.row)
   const plan = stagePlan(biome, region.id)
   const reach = rpgChapterReach(Math.floor((region.level - 1) / WORLD_LEVELS) * WORLD_LEVELS + 1)
   const ids = Array.from({ length: WORLD_STAGES }, (_, i) => `${region.id}-s${i + 1}`)
@@ -203,7 +207,9 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
     return { weapons: weapons.slice(0, w), elements: [...answers, ...extra] }
   }
   const role = (slot: number): RpgFoeRole => pick(biome.roles, `${stageId}:${slot}:role`)
-  const above = level - 1
+  // The regular-foe HP step and acting twice read the tier level, as the foe curve does (Z3, D170).
+  const curve = rpgFoeCurveLevel(level)
+  const above = curve - 1
   let next = 0
   const foe = (signature: readonly RpgElement[], rank: EnemyRank, r: RpgFoeRole, hp: number, shield: number, tier: EnemyTier, twice = false,
     offense = 1): BattleEnemy => {
@@ -232,15 +238,15 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
   const sigs = biome.signatures
   const after = (signature: readonly RpgElement[]) => sigs[(sigs.indexOf(signature) + 1) % sigs.length]!
   if (kind === 'sub-boss') {
-    // The sub-boss acts twice a round beside her assistants from Lv 10 (D141: foes act more, each move answerable).
-    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss', level >= WORLD_BOSS_TWICE_FROM),
+    // The sub-boss acts twice a round beside her assistants from tier Lv 10 (D141: foes act more, each move answerable).
+    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss', curve >= WORLD_BOSS_TWICE_FROM),
       ...Array.from({ length: ELITE_ASSISTANTS.count }, () => foe(plan.signature, 'regular', 'guard', ELITE_ASSISTANTS.hp, ELITE_ASSISTANTS.shield, 'key'))]]
   }
   if (kind === 'boss') {
     // Two lighter waves of sub-bosses on the biome's other signatures lead to the boss (or two) and her sub-boss guards.
     const share = WAVE_HP[BOSS_WAVES]!
-    // A lone boss acts twice from Lv 10 (D141), so a fresh party's first bosses stay within reach; twin bosses once each.
-    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss', !twin && level >= WORLD_BOSS_TWICE_FROM)
+    // A lone boss acts twice from tier Lv 10 (D141), so a fresh party's first bosses stay within reach; twin bosses once each.
+    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss', !twin && curve >= WORLD_BOSS_TWICE_FROM)
     const guard = () => foe(plan.signature, 'regular', 'guard', 0.8, 2, 'subboss')
     return [formation(biome.formations[0]!, after(plan.signature), share, 0, 'subboss'), formation('trio', after(after(plan.signature)), share, 1, 'subboss'),
       twin ? [champion(TWIN_BOSS_HP), champion(TWIN_BOSS_HP), guard()] : [champion(1), guard(), guard()]]

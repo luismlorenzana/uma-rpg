@@ -116,6 +116,8 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 - **First clear** of a stage pays its Laurels ×3. **Later wins** pay a quarter of the first clear: every kind of EXP
   and Laurels. Sweeps count as wins.
 - **Lv 41–50** stages pay their Laurels ×4 (D82).
+- **Laurels × tier:** the table is Tier 1's; a stage pays its tier's multiple, so Tier 2's regions and capitals pay
+  twice. A region's tier is its continent's: `w6`–`w10` are Tier 2 (D170).
 - A loss, or giving up, pays nothing and costs nothing (MP is as it was before the fight).
 - There are no tokens (D105).
 

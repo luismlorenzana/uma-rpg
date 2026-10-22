@@ -26,7 +26,7 @@ import {
 } from '../rpg/heroes'
 import { RPG_CLERIC_STATUS, RPG_NODES, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, rpgSideNodeLevel, rpgTreeOf, type RpgNode } from '../rpg/catalog'
 import { RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
-import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
+import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeTierBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES, RPG_SIDE_POINTS_PER_LEVEL,
@@ -247,15 +247,17 @@ function damageSources(): string {
 
 function foeScaling(): string {
   const t = RPG_FOE_TUNING
+  const r2 = (n: number) => Math.round(n * 100) / 100
+  const top = RPG_TIER_MAX_LEVEL
   return table(['Setting', 'Value'], [
-    ['HP', `(${t.hpBase} + ${t.hpPerStat} × reference stat) × role × rank`],
-    ['Offense', `Set so a 100% hit takes a share of an average Uma's HP at her level (${pct(t.hitShareStart)} at Lv 1, ${pct(t.hitShare)} from Lv ${t.hitShareFull}), × the offense budget, × role`],
+    ['HP', `(${t.hpBase} + ${t.hpPerStat} × reference stat) × role × rank; the reference stat is an average Uma's at the foe's lifetime level`],
+    ['Offense', `Set so a 100% hit takes a share of an average Uma's HP at her level (${pct(t.hitShareStart)} at tier Lv 1, ${pct(t.hitShare)} from tier Lv ${t.hitShareFull}), × the offense budget, × role`],
     ['Sub-boss and boss HP', `×${t.subBossHp} and ×${t.bossHp}, times the party's reachable skill depth`],
-    ['Build budget', `What a built party's gear and Extra Stats call for: HP and defense ×(1 + ${t.budgetPerLevel} × (L − 1)² ÷ 49), ×${x(Math.round(rpgFoeBudget(50, t.budgetPerLevel) * 100) / 100)} at Lv 50; offense ×${x(Math.round(rpgFoeBudget(50, t.offenseBudgetPerLevel) * 100) / 100)} at Lv 50`],
-    ['World: regular foes', `+${pct(WORLD_TUNING.regularHpPerLevel)} HP per level`],
-    ['World: elites', `+${pct(WORLD_TUNING.eliteHpPerLevel)} HP per level`],
+    ['Build budget', `What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + ${t.budgetPerLevel} × (ℓ − 1)² ÷ 49), ${x(r2(rpgFoeBudget(top, t.budgetPerLevel)))} at Lv ${top}; offense ${x(r2(rpgFoeBudget(top, t.offenseBudgetPerLevel)))} at Lv ${top}. It restarts at each tier's Lv 1; its build part scales by her stats' growth: ${x(r2(rpgFoeTierBudget(2 * top, t.budgetPerLevel)))} HP and defense, ${x(r2(rpgFoeTierBudget(2 * top, t.offenseBudgetPerLevel)))} offense at Tier 2 Lv ${top}`],
+    ['World: regular foes', `+${pct(WORLD_TUNING.regularHpPerLevel)} HP per tier level`],
+    ['World: elites', `+${pct(WORLD_TUNING.eliteHpPerLevel)} HP per tier level`],
     ['World: region bosses', `${x(WORLD_TUNING.bossHp)} a champion's HP`],
-    ['Acting twice', `From Lv ${WORLD_BOSS_TWICE_FROM}: a lone region boss and an elite's sub-boss; a lone elite always`],
+    ['Acting twice', `From tier Lv ${WORLD_BOSS_TWICE_FROM}: a lone region boss and an elite's sub-boss; a lone elite always`],
     ['Formations', `A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's`],
     ['Shields', `Regular ${t.regularShield} (by formation), sub-boss ${t.subBossShield}, boss ${t.bossShield}`],
   ])

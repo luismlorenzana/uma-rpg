@@ -41,7 +41,7 @@ export function buildCampaign(view: MasterView, cast: Cast, tier = 1): Campaign 
     const capital = capitals.get(id)
     if (!info && !capital) return null
     let chapter = built.get(id)
-    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster, tier)))
+    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
     return chapter
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
