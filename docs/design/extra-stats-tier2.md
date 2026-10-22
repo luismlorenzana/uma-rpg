@@ -43,7 +43,7 @@ The ring was approved as a percentage before C4 made the Orbs flat. So this doc 
 - Names: the grade's stone and the stat's virtue ("Garnet of Strength"). Grade 5 is Emerald, grade 10 Philosopher's
   Stone.
 
-**Orbs after v14** (classes v2, approved, not built):
+**Orbs after v15** (classes v2, approved, not built):
 - One damage slot holds one Orb. It adds half its grade's weapon Might to its kind's offense: +10 at G5, +34 at G10.
 - That's about +18–20% on that kind's hits at Tier 1 Lv 50. It no longer adds its kind for weaknesses.
 
@@ -163,7 +163,7 @@ balance party builds her:
 | With a G10 Orb on the same kind (§6) | +31%: exactly +68 offense, a second G10 weapon's Might | +39% |
 | Against her G10 weapon's own Might (+41%) | Under it at every grade. At grade 5, Orb + node 1 is +20 offense against the G5 weapon's +19 | Under it at Tier 2 Lv 50 by about 2 points. Over it at Tier 2 Lv 21: +15.7% against +15.4% |
 | On screen | "+34", the same unit as Might and the Orb | "+20%" beside offense numbers: a second unit |
-| Fight code | No new rule. The ring's offense joins the per-kind offense frozen into `BattleAlly.might`, as the weapon's does. No engine version of its own | A per-kind multiplier on `BattleAlly` and a step in `battleDamage`: engine v15, with H39 and H40 |
+| Fight code | No new rule. The ring's offense joins the per-kind offense frozen into `BattleAlly.might`, as the weapon's does. No engine version of its own | A per-kind multiplier on `BattleAlly` and a step in `battleDamage`: engine v16, with H39 and H40 |
 | Later tiers | Worth less as lifetime stats grow, like Might and Orbs | Worth the same at every level |
 | One job per lever ([H40](weapon-arts.md)) | Shares "flat offense to one kind" with the Orb; they differ by source, gear or Extra Stats | A job of its own: "% damage by kind" |
 | The sibling docs | Two lines change (below) | No change |
@@ -340,9 +340,9 @@ specialty while she has a ring node open.
 |---|---|---|
 | Ring ids and rules: twenty nodes, twenty gem ids, D119's order on each pair, Tier 2 and later only, the specialty | `economy/stars.ts`; `save/observatory.ts` (`setGem`, `gemBlock`, a new `setSpecialty`) | S |
 | Recipes and names | `economy/gems.ts` | S |
-| Save: the specialty on `OwnedUma.stars`, ring nodes in `unlocked`, ring gems in the world's stock; strict parsing refuses them in a Tier 1 world. The next save version after v24, taken when Tier 2 content is built | `save/save.ts` and its parser | S |
+| Save: the specialty on `OwnedUma.stars`, ring nodes in `unlocked`, ring gems in the world's stock; strict parsing refuses them in a Tier 1 world. The next save version after v25, taken when Tier 2 content is built | `save/save.ts` and its parser | S |
 | Fights, flat: the ring's offense joins the per-kind offense frozen into `BattleAlly.might` at the fight's start. No engine rule | `save/battle.ts` (`startFight`), and the Rift's fight start | S |
-| Fights, percent (only if X3 picks it): a per-kind multiplier on `BattleAlly` and a step in `battleDamage`, in engine v15 with H39's and H40's changes | `rpg/battle/` | M |
+| Fights, percent (only if X3 picks it): a per-kind multiplier on `BattleAlly` and a step in `battleDamage`, in engine v16 with H39's and H40's changes | `rpg/battle/` | M |
 | The Battle tab's line, targets, the badge | `umaBattleSheet` in `save/battle.ts`; `save/targets.ts`; H34's badge rule | S |
 | The Observatory: the outer orbit, the header, the specialty row | `places/observatory/ObservatoryPage.tsx`, `items/planets.ts` | M |
 | The Lapidary's Halo tab | `places/work/FacilityPage.tsx` (`GemPicker`) | S |

@@ -40,7 +40,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | Folder | What |
 |---|---|
 | `save/` | The save (`save.ts`: schema v23, parsing, migrations) and its rules: `battle.ts` (classes, fights, rewards, Springs), `work.ts` (jobs on the shared engine, and the slot view the screens read), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `presets.ts` (each class's standard equipment preset), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text) |
-| `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v13, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
+| `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the twenty hero Limit Breaks, Bonds), `battle/` (engine v14, limits, auto), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `rift/` | `state.ts`: the Rift's save shape and constants; its rules come with the Rift |
 | `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `request.ts` (a job's request), `kinds/` (`gather.ts`, `refine.ts`, `craft.ts`, `cut.ts`: plan and pay), `env.ts` (facilities as buildings, Speed Tickets, Craft Level, Laurels) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |

@@ -1,4 +1,4 @@
-// Battle numbers and skill lookup, engine v6–v12 (D86, D102, D141; docs/design/class-rework.md, combat-balance.md).
+// Battle numbers and skill lookup, engine v6–v14 (D86, D102, D141, D169; docs/design/class-rework.md, combat-balance.md).
 import { rpgNode, type RpgNode, type RpgSkillDef } from '../catalog'
 import { RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
@@ -6,6 +6,8 @@ import type { BattleAlly, BattleChannel } from './types'
 /** Octopath Traveler: a weakness hit ×1.3, a broken foe ×2 — here as ×0.5 before the break and ×1 after. */
 export const BATTLE_WEAK = 1.3
 export const BATTLE_UNBROKEN_FACTOR = 0.5
+/** v14 (D169): the Rift's ward. A hit of the channel a foe wards deals this share, on top of the unbroken halving. */
+export const BATTLE_WARD_FACTOR = 0.5
 export const BATTLE_DEFENSE_SHARE = 0.5
 export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5

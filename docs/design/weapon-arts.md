@@ -4,8 +4,8 @@
 > - Tier 2 content under [tiers](tiers.md) Option A (D159, T6), the doc its §8 item 5 asks for. Its siblings:
 >   [Tier 2's advanced classes](tier2-classes.md) (H39), [the outer ring](extra-stats-tier2.md) (H41),
 >   [the second profession](second-profession.md) (H42) and [Tier 2's world](tier2-world.md) (H43).
-> - It builds on [classes v2](classes-v2.md) (D160, engine v14) and [the Rift](rift.md) (D161). Neither is built yet.
-> - **Engine v15**, shared with [H39](tier2-classes.md), with H39's shared cap on extra shield points (§4.6). Arts and
+> - It builds on [classes v2](classes-v2.md) (D160, engine v15) and [the Rift](rift.md) (D161). Neither is built yet.
+> - **Engine v16**, shared with [H39](tier2-classes.md), with H39's shared cap on extra shield points (§4.6). Arts and
 >   set steps spend H42's Scrolls and Seals (§10.4).
 > - **Owner calls** are marked **E1**, **E2** and so on, each with a recommendation. [§13](#13-owner-calls) lists them.
 > - **Every number is a draft** for the balance simulation (`SIM=1`).
@@ -34,7 +34,7 @@
 Each Arm and its element share a shape (D86, `RPG_KIND_PAIRS`). Hits are the core skill's at depths 1–5. Classes v2's
 columns are approved, not built.
 
-| Weapon (kind) | Shape | Brawler (Arms) or Mage (Tomes) | Spell Blade (v14) | Summoner (v14), on arrival | Paladin, Cleric (v14) |
+| Weapon (kind) | Shape | Brawler (Arms) or Mage (Tomes) | Spell Blade (v15) | Summoner (v15), on arrival | Paladin, Cleric (v15) |
 |---|---|---|---|---|---|
 | Greatsword | One foe, heavy | One foe, 1·1·2·2·3 hits | One foe, 1·1·1·2·2 | One foe, 1·1·2·2·3 | One foe, 1 hit |
 | Axe | Every foe | Every foe at 0.55, 1·1·2·2·3 | One foe, 1·1·2·2·2 | Every foe, 1·1·2·2·3 | One foe, 1 hit |
@@ -47,7 +47,7 @@ columns are approved, not built.
 | Light Tome | One foe, many hits | One foe, 2·2·4·4·6 | One foe, 2·2·3·3·4 | One foe, 2·2·3·3·4 | One foe, 1 hit |
 | Dark Tome | Twice | One foe, 2 | One foe, 2 | One foe, 2 | One foe, 1 hit |
 
-- **Hands (v14):**
+- **Hands (v15):**
   - Brawler and Mage ×1.
   - Spell Blade: an Arms half ×0.63 that gains one extra hit, its power split evenly (an Attack lands as two, a skill
     of n hits as n + 1; classes v2 §3.1), and a Tome half ×0.27. The table gives her skills' own hits, before that one.
@@ -66,7 +66,7 @@ columns are approved, not built.
 | Grade | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Might | 1 | 4 | 8 | 12 | 19 | 26 | 35 | 45 | 57 | 68 |
-| Orb, v14 (half of Might) | 1 | 2 | 4 | 6 | 10 | 13 | 18 | 23 | 29 | 34 |
+| Orb, v15 (half of Might) | 1 | 2 | 4 | 6 | 10 | 13 | 18 | 23 | 29 | 34 |
 
 **Weapon Rank** (D102):
 - 1–10, per weapon, shared by every class.
@@ -98,8 +98,9 @@ values instead: half a weapon's Might at the node's grade, as an Orb gives.
 | | State |
 |---|---|
 | **Engine v13** (built) | Five classes. Might by grade. Armor offense from grade 1. Two accessory slots, any types. Orbs add their kind for weaknesses |
-| **Engine v14** (approved, D160) | Six classes. The Spell Blade's extra Arms hit and the Summoner's mirrored pair with farewell areas. Healers' ATK and M.ATK scaling. Flat Orbs in a typed slot. Guts into HP. The Rift's ward |
-| **Engine v15** (this doc and H39) | Weapon arts and set bonuses. Advanced class passives and skill MP ×1.7 in Tier 2 (H39, A10) |
+| **Engine v14** (built, H44, D169) | The Rift's foe traits, on Rift foes only: the ward, a third act, mixed lock sets. Campaign fights play as on v13 |
+| **Engine v15** (approved, D160) | Six classes. The Spell Blade's extra Arms hit and the Summoner's mirrored pair with farewell areas. Healers' ATK and M.ATK scaling. Flat Orbs in a typed slot. Guts into HP |
+| **Engine v16** (this doc and H39) | Weapon arts and set bonuses. Advanced class passives and skill MP ×1.7 in Tier 2 (H39, A10) |
 
 ## 3. One job per lever
 
@@ -346,7 +347,7 @@ the simulation. The eight effects and the mirrored pairs are the shape to approv
 - **An art's added hit comes on top, once.** It isn't her extra hit and never adds another, and B's +1 is one point.
 - **Her chips an act** with each Arms art, on a lone foe, every hit weak, her depth-5 core:
 
-  | Arms weapon | Core hits | With her extra hit (v14) | With the core | With A | With B |
+  | Arms weapon | Core hits | With her extra hit (v15) | With the core | With A | With B |
   |---|---|---|---|---|---|
   | Greatsword | 2 | 3 | 3 | 3 | 4 |
   | Axe | 2 | 3 | 3 | 3 | 4 |
@@ -400,7 +401,7 @@ the simulation. The eight effects and the mirrored pairs are the shape to approv
 - **Arts don't touch farewells,** so the Conjurer's stronger farewells and arts never meet.
 - A hit a passive adds is a hit, as here.
 
-**Flags for v14 and H43:**
+**Flags for v15 and H43:**
 1. **The Duel can fall to one act before any art.** On a lone foe, depth 5, every hit weak, the best single acts
    already chip:
 
@@ -408,16 +409,16 @@ the simulation. The eight effects and the mirrored pairs are the shape to approv
    |---|---|---|---|
    | Brawler | Thousand Spears: 8 random hits | 8 | 9 |
    | Mage | Holy: 6 hits | 6 | 7 |
-   | Spell Blade (v14) | Bow Flurry (5 hits, and her extra hit: 6) and Light Flurry (5) | 11 | 12 |
-   | Summoner (v14) | Light Pack and Bow Pack (5 each), plus a Light Pack's farewell (5) | 15 | 16 |
+   | Spell Blade (v15) | Bow Flurry (5 hits, and her extra hit: 6) and Light Flurry (5) | 11 | 12 |
+   | Summoner (v15) | Light Pack and Bow Pack (5 each), plus a Light Pack's farewell (5) | 15 | 16 |
    | Paladin, Cleric | A Bow blow: 1 hit and Shatter 3–4 | 4–5 | 5–6 |
 
-   - **The worst single act is the Summoner's: 15 points, 16 with B.** It assumes v14's farewell recasts every hit of
+   - **The worst single act is the Summoner's: 15 points, 16 with B.** It assumes v15's farewell recasts every hit of
      the summon, as today's linger does. If her farewell is one strike, her act is 11, 12 with B.
    - **The Spell Blade's, under the clarified extra hit, is 11, 12 with B or the Blademaster's +1.** It no longer
      reaches 16, but it still meets a shield of 10–12.
    - **Arts add one at most** (E6), so they don't decide it. A Cleric's Breaker charge, outside the cap, can add more.
-   - **Classes v2's guard rail** (§3.1) already has v14's simulation check the Spell Blade's best act against the Duel
+   - **Classes v2's guard rail** (§3.1) already has v15's simulation check the Spell Blade's best act against the Duel
      shield, and raise the shield if it's reached. **Recommendation:** the same check runs on every class, the
      Summoner's first, with E6's one counted. H43's Tier 2 Duel takes the same number.
 2. **The Horde depends on its weakness spread.** An every-foe skill chips each weak foe once a hit: a depth-5 Axe
@@ -510,7 +511,7 @@ fronts:
 
 ## 10. The build
 
-### 10.1 Engine v15
+### 10.1 Engine v16
 
 **What freezes into `BattleAlly`:**
 - `arts?: Partial<Record<RpgWeapon, { fork?: 'a' | 'b' }>>`. A key means her core is learned; `fork` is the active
@@ -527,7 +528,7 @@ fronts:
 | Off for farewells and Limit Breaks | `linger` and the Limit Break path call `cast` with no art |
 | B's +1 and the cap | `strike` and `chip`. One counter per foe for the act, shared with H39's passives and reset once an act in `applyBattleAction`, so a pair shares it. An added or moved hit chips a foe only while that foe's counter is free |
 
-v6–v14 fights replay unchanged: arts are off below v15.
+v6–v15 fights replay unchanged: arts are off below v16.
 
 ### 10.2 Auto
 
@@ -549,7 +550,7 @@ v6–v14 fights replay unchanged: arts are off below v15.
 
 ### 10.3 Save
 
-- **The first save version after v24,** shared with H39's and the other Tier 2 docs when Tier 2 content is built. The
+- **The first save version after v25,** shared with H39's and the other Tier 2 docs when Tier 2 content is built. The
   build packet picks the number; Tier 2's docs pick none.
 - **On `OwnedUma`, per Uma per world:**
   - `arts?: Partial<Record<RpgWeapon, { learned: ('core' | 'a' | 'b')[]; side: 'a' | 'b' | null }>>`;
@@ -633,7 +634,7 @@ None. Text and the existing weapon icons carry it.
 | Piece | Where | Size |
 |---|---|---|
 | Thirty nodes and two set bonuses, as data and one-line text | `rpg/arts.ts` (new) | S |
-| Engine v15: shape scaling, follow-ups, splash, cross, Broken share, the draw, Ricochet, B and the cap, the MP cut, farewells and Limit Breaks off | `rpg/battle/` | M |
+| Engine v16: shape scaling, follow-ups, splash, cross, Broken share, the draw, Ricochet, B and the cap, the MP cut, farewells and Limit Breaks off | `rpg/battle/` | M |
 | Freezing `arts` and `set`, and set HP into stats | `save/battle.ts`, `world/balance-party.ts` | S |
 | Save: learned nodes, sides, steps; learn, pick and activate rules; parsing | `save/save.ts`, `save/arts.ts` | S–M |
 | Auto's art weights | `battle/auto.ts` | S |
@@ -671,7 +672,7 @@ None. Text and the existing weapon icons carry it.
 
 **Watch in the simulation:**
 - **The mirror.** The Summoner gains the area and random cores on arrival, and the Spell Blade's single-target halves
-  don't. If she pulls ahead of ±5%, trim the area and random cores before touching v14's hands.
+  don't. If she pulls ahead of ±5%, trim the area and random cores before touching v15's hands.
 - **The Duel's shield** (§6, flag 1).
 - **The MP cut** against H39's A10 factor for Tier 2's skill MP (§7).
 

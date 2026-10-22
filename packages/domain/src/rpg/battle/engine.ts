@@ -6,8 +6,9 @@
 // (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112);
 // v11 two accessories (D124); v12 the combat balance rework (D141, docs/design/combat-balance.md): a ratio damage formula,
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
-// strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules. Older fights
-// replay unchanged.
+// strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
+// foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry.
+// Older fights replay unchanged.
 import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
@@ -19,7 +20,7 @@ import {
   BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_HEAL_SCALE, BATTLE_MAX_ROUNDS, BATTLE_MIN_OFFENSE_SHARE,
   BATTLE_RALLY_SHARE, BATTLE_REVIVE_SHARE,
   BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
-  BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
+  BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
 } from './skills'
 import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
@@ -28,8 +29,8 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on; older versions still replay. */
-export const BATTLE_ENGINE_VERSION = 13
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13] as const
+export const BATTLE_ENGINE_VERSION = 14
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -149,6 +150,11 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
   const w = e.weaknesses
   if (e.element2 !== undefined && (version < 7 || !RPG_ELEMENTS.includes(e.element2) || e.element2 === e.element)) return false
   if (e.twice !== undefined && (version < 7 || typeof e.twice !== 'boolean')) return false
+  // v14 (D169): the Rift's traits. A ward names a channel; a foe acts twice or three times, never both.
+  if (e.ward !== undefined && (version < 14 || (e.ward !== 'physical' && e.ward !== 'magical'))) return false
+  if (e.thrice !== undefined && (version < 14 || typeof e.thrice !== 'boolean')) return false
+  if (e.mixedLocks !== undefined && (version < 14 || typeof e.mixedLocks !== 'boolean')) return false
+  if (e.twice && e.thrice) return false
   const set = <T>(list: unknown, all: readonly T[]) => Array.isArray(list) && list.length <= all.length &&
     list.every((k) => all.includes(k as T)) && new Set(list).size === list.length
   return SAFE_ID.test(e.id) && SAFE_ID.test(e.castId) && RPG_ELEMENTS.includes(e.element) &&
@@ -161,7 +167,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -206,8 +212,9 @@ function chooseTarget(s: BattleState, e: BattleEnemy, m: BattleEnemyMove, turn =
   if (m.target === 'lowest-hp') return [...allies].sort(byHpShare(s))[0]?.id ?? ''
   return allies[hashNumber(`${s.input.seed}:${s.round}:${e.id}${turn ? `:turn${turn}` : ''}:target`) % allies.length]?.id ?? ''
 }
-/** A foe's move for this round; `turn` 1 is a twice-acting foe's second (v7). From v12 (D141) a charged move announced
- * last round lands now at the Uma it named, and a foe charges only on her first move, never two rounds running. */
+/** A foe's move for this round; `turn` 1 is a twice-acting foe's second (v7), `turn` 2 a thrice-acting foe's third (v14).
+ * From v12 (D141) a charged move announced last round lands now at the Uma it named, and a foe charges only on her first
+ * move, never two rounds running. */
 function intentFor(s: BattleState, u: BattleUnit, turn = 0): BattleIntent {
   const e = enemyOf(s, u.id)!
   if (s.engineVersion >= 12 && turn === 0 && u.charging && u.charging.round === s.round - 1) {
@@ -221,27 +228,37 @@ function intentFor(s: BattleState, u: BattleUnit, turn = 0): BattleIntent {
   const move = moves[hashNumber(`${s.input.seed}:${s.round}:${e.id}:phase${u.phase}${turn ? `:turn${turn}` : ''}:move`) % moves.length]!
   return { enemyId: e.id, moveId: move.id, targetId: chooseTarget(s, e, move, turn) }
 }
-/** v12: a charged move just shown arms its locks, drawn by the fight's seed from her weaknesses (D141). */
+/** v12: a charged move just shown arms its locks, drawn by the fight's seed from her weaknesses (D141). v14 (D169): a
+ * foe with mixed locks, weak to both channels, draws lock k from her Arms kinds when k is even and her elements when odd. */
 function armCharges(s: BattleState): void {
   if (s.engineVersion < 12) return
   for (const intent of s.intents) {
     const u = unit(s, intent.enemyId)
     const move = u ? moveById(s, u, intent.moveId) : undefined
     if (!u || !move?.charge || u.charging || u.charged === s.round) continue
-    const w = enemyOf(s, u.id)!.weaknesses
+    const e = enemyOf(s, u.id)!
+    const w = e.weaknesses
     const kinds: RpgDamageKind[] = [...w.weapons, ...w.elements]
-    const locks = Array.from({ length: move.charge }, (_, k) => kinds[hashNumber(`${s.input.seed}:${s.round}:${u.id}:lock${k}`) % kinds.length]!)
+    const mixed = s.engineVersion >= 14 && !!e.mixedLocks && w.weapons.length > 0 && w.elements.length > 0
+    const pool = (k: number): readonly RpgDamageKind[] => (!mixed ? kinds : k % 2 === 0 ? w.weapons : w.elements)
+    const locks = Array.from({ length: move.charge }, (_, k) => {
+      const from = pool(k)
+      return from[hashNumber(`${s.input.seed}:${s.round}:${u.id}:lock${k}`) % from.length]!
+    })
     u.charging = { moveId: move.id, locks, total: move.charge, round: s.round, targetId: intent.targetId }
   }
 }
 /** v12: whether this shown move is a charge being gathered this round (it lands next round). */
 const gathering = (s: BattleState, u: BattleUnit, move: BattleEnemyMove): boolean =>
   !!move.charge && u.charging?.moveId === move.id && u.charging.round === s.round
-/** Every living foe's move by initiative; foes that act twice add a second move after everyone's first. */
+/** Every living foe's move by initiative; foes that act twice add a second move after everyone's first, and from v14 a
+ * foe that acts three times a second with them and a third after every second (D169). */
 function intentsFor(s: BattleState): BattleIntent[] {
   const order = living(s, 'enemy').sort((a, b) => enemyOf(s, b.id)!.stats.initiative - enemyOf(s, a.id)!.stats.initiative ||
     a.id.localeCompare(b.id))
-  return [...order.map((u) => intentFor(s, u)), ...order.filter((u) => enemyOf(s, u.id)!.twice).map((u) => intentFor(s, u, 1))]
+  const thrice = (u: BattleUnit) => s.engineVersion >= 14 && !!enemyOf(s, u.id)!.thrice
+  return [...order.map((u) => intentFor(s, u)), ...order.filter((u) => enemyOf(s, u.id)!.twice || thrice(u)).map((u) => intentFor(s, u, 1)),
+    ...order.filter(thrice).map((u) => intentFor(s, u, 2))]
 }
 function reveal(s: BattleState): BattleCue[] {
   return s.intents.map((i) => {
@@ -276,9 +293,9 @@ export function battleHitIsWeak(enemy: BattleEnemy, foe: BattleUnit | null, kind
 
 /** `orbs`: the attacker's Orb kinds, which make a hit weak too (D86, D124), with no damage of their own. */
 interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[] }
-/** One part's final amount; shared by live play, previews and the simulator. */
+/** One part's final amount; shared by live play, previews and the simulator. `warded`: the foe's ward cut it (v14). */
 export function battleDamage(s: BattleState, attacker: BattleUnit, defender: BattleUnit, channel: BattleChannel,
-  power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean } {
+  power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean; warded: boolean } {
   const atk = allyOf(s, attacker.id)?.stats ?? enemyOf(s, attacker.id)!.stats
   const def = allyOf(s, defender.id)?.stats ?? enemyOf(s, defender.id)!.stats
   // The weapon a hit is made with adds its Might to offense (v8, D104; from v13 by D142's table); v12 alone took Might as
@@ -306,12 +323,15 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   if (foe && options.special === 'vs-broken' && battleBroken(defender)) amount *= 1.3
   if (foe && options.special === 'vs-wounded' && defender.hp * 2 < foe.stats.hp) amount *= 1.3
   if (foe && !battleBroken(defender) && options.special !== 'pierce') amount *= BATTLE_UNBROKEN_FACTOR
+  // v14 (D169): the Rift's ward halves an ally's hit of the channel she wards again, Broken or not, `pierce` or not.
+  const warded = s.engineVersion >= 14 && !!foe && attacker.side === 'ally' && foe.ward === channel
+  if (warded) amount *= BATTLE_WARD_FACTOR
   const evasion = defender.side === 'ally' ? allyOf(s, defender.id)?.evasion ?? 0 : 0
   if (evasion > 0) amount *= 1 - evasion / 1000
   // v11: an Iron Talisman or a Ward Amulet cuts the damage she takes of its channel (D124).
   const cut = defender.side === 'ally' ? (physical ? allyOf(s, defender.id)?.guard : allyOf(s, defender.id)?.resist) ?? 0 : 0
   if (cut > 0) amount *= 1 - cut / 1000
-  return { amount: Math.max(1, Math.round(amount)), weak }
+  return { amount: Math.max(1, Math.round(amount)), weak, warded }
 }
 
 /** What a foe's shown move would deal to each Uma it aims at, before Barriers and guards: one number per target, for
@@ -499,7 +519,7 @@ function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgH
     const amount = receiver !== target ? Math.max(1, Math.round(result.amount * BATTLE_GUARD_FACTOR)) : result.amount
     receiver.hp = Math.max(0, receiver.hp - amount)
     cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel, element: part.kind, weak: result.weak,
-      label: receiver !== target ? 'Intercepted' : undefined })
+      label: receiver !== target ? 'Intercepted' : result.warded ? 'Warded' : undefined })
     if (actor.side === 'ally') drain(s, actor, channel, amount, cues)
     if (receiver.side === 'enemy') popLocks(s, actor, receiver, [part.kind, ...(options.orbs ?? [])], cues)
     if (receiver.hp === 0) {

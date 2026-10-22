@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-21; save v23, engine v13.** The full running-system reference is
+> **Status: current, 2026-10-21; save v23, engine v14.** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -60,7 +60,7 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v13 (D141, D142), every older version replaying as it was |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v14 (D141, D142, D169), every older version replaying as it was |
 | `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, forty trees and learning rules |
 | `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97) |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |

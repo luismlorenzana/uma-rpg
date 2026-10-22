@@ -236,7 +236,7 @@ Until then, Tier 3 Umas play its four continents, and nobody leaves Tier 3.
    - the push tick across tiers, and `?tier=` links;
    - the Tier shifter (with a kit option), with Tiers 2 and 3 locked.
 2. **Save v23:** account achievements and history, and the Rift state slot.
-3. **[Classes v2](classes-v2.md)** (engine v14).
+3. **[Classes v2](classes-v2.md)** (engine v15).
 4. **[The Rift](rift.md)** and promotion (§5).
 5. **Tier 2's content** (Option A), as its own docs: advanced classes, weapon arts, the outer ring, the second vertical.
 

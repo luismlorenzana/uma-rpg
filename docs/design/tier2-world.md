@@ -455,7 +455,7 @@ stage to +10% at the champion, and +10% again in the Convergence (rift §5). Lik
 
 - **Why Arcane splits its weakness:** one element for a whole stage would reward the specialty alone and punish the
   Sage, whose passive pays for a new element each cast. Two, split between leaders and guards, asks for both.
-- **The Duel's shield** is Tier 1's as v14's simulation sets it, above the best single act
+- **The Duel's shield** is Tier 1's as v15's simulation sets it, above the best single act
   ([weapon arts](weapon-arts.md) §6, flag 1; classes v2 §3.1's guard rail), plus Z2's one. Rift §5 drafts 10–12, so
   11–13 in Tier 2 until the simulation moves it.
 
@@ -464,7 +464,7 @@ stage to +10% at the champion, and +10% again in the Convergence (rift §5). Lik
 | Requirement | How Tier 2's fronts meet it |
 |---|---|
 | The fork pick matters stage by stage | Rift §5's stage mix stays: escorts and guards (stages 1–11) where A sides spread damage, lone bosses and the champion where B Breaks first. The Duel leans B; from stage 9, where she acts three times, A's Break-window damage decides |
-| Duel shields above the best single act plus E6's one | The Duel's shield above, set by v14's simulation and carried over with Z2's +1 |
+| Duel shields above the best single act plus E6's one | The Duel's shield above, set by v15's simulation and carried over with Z2's +1 |
 | Horde weaknesses spread | Each foe keeps its own Arms and element pair (rift §5), and no two foes of a wave share one: 25 pairs for at most 7 foes |
 | Charged moves keep locks from the front's weakness kinds | Unchanged (rift §5) |
 | Wards stay | Unchanged: no art or added test changes a hit's channel |
@@ -517,7 +517,7 @@ regions on every continent's map, and "the Tier 2 Rift" on the Battle page.
 | Foe formulas on tier level: both budgets and the regular-foe HP step, the build part scaled to her stats, the hit-share ramp per tier, bosses twice from tier Lv 10 | `rpg/campaign/enemies.ts`, `world/world.ts` | M |
 | The Tier 2 term (Z4) | `RPG_FOE_TUNING` | S |
 | Shields +1 in Tier 2 worlds | `world/world.ts` (`stageWaves`), `world/capital.ts` | S |
-| The MP factor (Z5), in engine v15 with H39's and H40's changes. No Tier 2 fight exists before it, so nothing replays differently | `rpg/battle/skills.ts` (`battleSkillFor`) | S |
+| The MP factor (Z5), in engine v16 with H39's and H40's changes. No Tier 2 fight exists before it, so nothing replays differently | `rpg/battle/skills.ts` (`battleSkillFor`) | S |
 | Screens: tier levels on regions, stages, capitals and the continent list; the world map builds the active tier's continents (after H35) | `apps/web/src/battle/` | S–M |
 | The Tier 2 Rift: each front's added test, at Tier 2 Lv 50 on Z4's budget | `packages/domain/src/rift/`, with the Rift generator | M |
 | Twilight Vale | `world/biomes.ts` | S |

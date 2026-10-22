@@ -93,7 +93,7 @@ A **run** needs **twenty Lv 50 Umas**.
 **Ward (R5).** On the Iron and Arcane fronts, damage from the wrong channel is halved again, **on top of** the unbroken
 halving. Off-composition parties can still win, slowly.
 - This is a soft wall. A hard immunity would make the fronts puzzles with one answer.
-- It's a new foe trait in engine v14 ([classes v2](classes-v2.md) §8).
+- It's a foe trait in engine v14 (H44, D169), shipped ahead of classes v2 (engine v15, [classes v2](classes-v2.md) §8).
 
 **Each front's stages** (R3, the length):
 
@@ -219,7 +219,8 @@ Today's `stageFaces` picks within one franchise per region, so this is new code.
 | Piece | Where | Size |
 |---|---|---|
 | The tier foundation and save v23 | [tiers](tiers.md) §8 | M |
-| Classes v2 and engine v14, including the **ward** trait | [classes v2](classes-v2.md) | L |
+| The ward, a third act and mixed locks (engine v14, H44) | `rpg/battle/` | M |
+| Classes v2 (engine v15) | [classes v2](classes-v2.md) | L |
 | **The Rift generator:** fronts, stage chains, champions, the Convergence, Echoes, the cross-franchise picker that prefers new faces, levels and locks | `packages/domain/src/rift/` | L |
 | The run rules: sign-up, the roster lock, fights, seals, attempts, ascend (with [tiers](tiers.md) §5) | `save/rift.ts` | M |
 | The Rift page: fronts and their chains, the Convergence assignment, Echoes, the run's roster, Ascend | `apps/web/src/places/rift/` | L |

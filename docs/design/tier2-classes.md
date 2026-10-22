@@ -4,7 +4,7 @@
 > - One of five Tier 2 docs that follow [tiers](tiers.md) Option A (D159): this one (H39),
 >   [weapon arts and armor sets](weapon-arts.md) (H40), [Extra Stats in Tier 2](extra-stats-tier2.md) (H41),
 >   [the second profession](second-profession.md) (H42) and [Tier 2's world and its Rift](tier2-world.md) (H43).
-> - It builds on [classes v2](classes-v2.md) (D160: six classes, engine v14, save v24) and [the Rift](rift.md) §4
+> - It builds on [classes v2](classes-v2.md) (D160: six classes, engine v15, save v25) and [the Rift](rift.md) §4
 >   (Ascend).
 > - **Owner calls** are marked **A1**, **A2** and so on, each with a recommendation. [§11](#11-owner-calls) lists them
 >   all.
@@ -40,7 +40,7 @@ loop.
 
 ### 2.1 The six classes, as classes v2 approves them
 
-Engine v14, not built yet.
+Engine v15, not built yet.
 
 | Class | Slots | Armor | Hand: an act | Split (phys / mag) | Leans: HP, ATK, M.ATK, DEF, M.DEF, MP | Limit Break | Starts as |
 |---|---|---|---|---|---|---|---|
@@ -54,13 +54,13 @@ Engine v14, not built yet.
 - **Heal retires** (C1): Guts feeds HP, and mends and Barriers scale with the healer's ATK or M.ATK.
 - **One healer a party** (C8): every mend and Barrier share doubles (28–44% by depth, ×0.4 on every Uma), and a
   Barrier holds up to 60% of max HP.
-- **The Paladin's leans** aren't set in classes v2. This doc assumes the Cleric's, mirrored, and follows v14's numbers
+- **The Paladin's leans** aren't set in classes v2. This doc assumes the Cleric's, mirrored, and follows v15's numbers
   once they're built.
 
 ### 2.2 The trees
 
 - **One tree per class and weapon.** Brawler and Mage have 5; the four others have all 10, and the five weapons in her
-  slots decide which are usable. After v14 that's **50 trees** (the Paladin adds 10).
+  slots decide which are usable. After v15 that's **50 trees** (the Paladin adds 10).
 - **Five depths,** each a **core** skill and two **sides,** A and B (a fork):
   - cores are free and open at Class Rank 1, 10, 20, 30 and 40;
   - sides open at Class Rank 5, 15, 25, 35 and 45 (`10d − 5`), and cost their depth in points;
@@ -81,7 +81,7 @@ Engine v14, not built yet.
 
 ### 2.4 The halls
 
-- **Six halls × four seats = 24 Limit Breaks** after v14: the Brawler Dojo, Mage Tower, Spell Blade Salle, Summoner
+- **Six halls × four seats = 24 Limit Breaks** after v15: the Brawler Dojo, Mage Tower, Spell Blade Salle, Summoner
   Circle, Cleric Chapel and Paladin Bastion.
 - A Hero uses her seat's Limit Break at 100%. A Learner uses either Hero's at 50%, +5% a Bond Level (100% at Bond 10).
 - A Hero earns Bond with her own seat (D112).
@@ -92,9 +92,9 @@ Engine v14, not built yet.
 
 | | Engine | Save | Classes |
 |---|---|---|---|
-| **Built** | v13 | v23 (H37: achievements, tier history, the Rift's slot) | Five: Brawler, Mage, Spell Blade, Cleric, Summoner |
-| **Approved, not built** | v14 ([classes v2](classes-v2.md)) | v24 | Six |
-| **This doc** | v15 | The first after v24 | Twelve, in Tier 2 |
+| **Built** | v14 (H44: the Rift's ward, a third act, mixed locks) | v23 (H37: achievements, tier history, the Rift's slot) | Five: Brawler, Mage, Spell Blade, Cleric, Summoner |
+| **Approved, not built** | v15 ([classes v2](classes-v2.md)) | v25 | Six |
+| **This doc** | v16 | The first after v25 | Twelve, in Tier 2 |
 
 ## 3. Rules every advanced class keeps
 
@@ -126,7 +126,7 @@ the engine's `battleSupportValue`.
 **Hero LB+ follows the same rules** (§7).
 
 **Shared with H40.** [Weapon arts](weapon-arts.md) isn't on `main` as this is written. This doc assumes:
-- one engine version, v15, for both docs;
+- one engine version, v16, for both docs;
 - the new extra chips, from passives here and weapon arts there, share one cap: one extra shield point from a foe in an
   act, whatever the source. Today's Breaker charge and Shatter stay as they are;
 - raises to the same number add. Where a weapon art and a passive both raise a hit count or a share, they add.
@@ -275,7 +275,7 @@ blur her into the Summoner. Her identity goes in her Tome half instead, at a pow
 | Where it applies | Arms-weak foes: on Iron, where her Tome half is never weak, 2 chips an act become 3. The party already chips most shields in a round or two, so the measure is the earlier Break's damage: about +10% on Iron | Several foes sharing an element weakness: each is chipped, and takes 0.04 of a turn. About +10% on the Horde, mostly in earlier Breaks |
 | Elsewhere | Foes weak to no Arm she wields: 0 | One foe, or Arms-only weaknesses: 0 |
 | Leans | 1, 1.1, 0.95, **1.05**, **0.95**, 1 | 1, 1.1, 0.95, **0.95**, **1.05**, 1 |
-| Hand · Limit Break | v14's pair · 2.2× | v14's pair · 2.2× |
+| Hand · Limit Break | v15's pair · 2.2× | v15's pair · 2.2× |
 | Best front | **Iron** | **Horde** |
 | Auto | An Arms half that lands weak on a shielded foe scores as one more hit | Her Tome half's `score` adds 0.15 of its power for each other living foe weak to its element |
 
@@ -298,7 +298,7 @@ allowed. Nothing she does mends, shields or buffs an Uma, and Enfeeble stays the
 | Where it applies | Three foes or more: +10% at three foes, +12% at five | A focused foe, with magic hitting her: about +12% of her value, counting the curse's whole worth to the party as hers |
 | Elsewhere | One foe: +5% | Physical parties, and fights with no focus: under +5% |
 | Leans | 1, 0.95, 1.1, **1.05**, **0.95**, 1.1 | 1, 0.95, 1.1, **0.95**, **1.05**, 1.1 |
-| Hand · Limit Break | v14's pair · 2.2× | v14's pair · 2.2× |
+| Hand · Limit Break | v15's pair · 2.2× | v15's pair · 2.2× |
 | Best front | **Horde** | **Arcane:** a sub-boss with escorts, all-magic party |
 | Auto | Nothing new to choose: every summon brings its farewell | A Light or Dark summon on a foe without Mind Break gets the status premium (+0.5) a Cleric's skill gets |
 
@@ -360,10 +360,10 @@ and the Rift's words:
 | **Berserker** (the class) | The Axe summon at depth 2 | Rename the summon **Marauder** (and its sides "Marauder Pack", "Bonded Marauder") |
 | **Warlord** (the class) | The Axe summon at depth 5, "Jotun Warlord" | Rename the summon **Jotun King** |
 | **Duelist** (T8) | The Rift's **Duel** front: she would serve Iron and the Horde, never the Duel | Rename the class **Blademaster** |
-| **Paladin** (the v14 class), found by the same check | The Greatsword summon at depth 3 | Rename the summon **Knight Captain**, in the classes v2 build |
+| **Paladin** (the v15 class), found by the same check | The Greatsword summon at depth 3 | Rename the summon **Knight Captain**, in the classes v2 build |
 
 **Why rename summons, not classes.** The class names are the owner's (T8) and show on every screen. A summon is one
-string in `SUMMONS`, and v14 already reworks those lines.
+string in `SUMMONS`, and v15 already reworks those lines.
 
 **Near misses kept:**
 - **Rune Knight** and the Spell Blade's depth-1 "Rune" skills (Rune Cleave …): they're her own trees, so the echo
@@ -452,7 +452,7 @@ gates become Lv 10, 20, 30 and 40 (7). `rpgActiveSlots` takes the tier.
 
 **A10:** recommendation: **replace ×tier with the bar's own growth,** `1 + 0.7 × (tier − 1)`: ×1, ×1.7 and ×2.4 for
 Tiers 1–3. Tier 3's bar grows ×2.4 by the same reckoning. The simulation sets the factor from the on-curve bar, flat
-MP from Extra Stats and armor included. It ships in engine v15, and v6–v14 fights keep ×tier.
+MP from Extra Stats and armor included. It ships in engine v16, and v6–v15 fights keep ×tier.
 
 ## 7. Limit Breaks
 
@@ -474,9 +474,9 @@ Tier 2 and later only, with the 24 effects of §7.2 as drafts.**
 
 ### 7.2 The 24 extra effects
 
-The halls are classes v2's six (§5 there). "New" marks a seat classes v2 adds; its name comes with the v14 build.
+The halls are classes v2's six (§5 there). "New" marks a seat classes v2 adds; its name comes with the v15 build.
 
-| Hall | Seat | Limit Break (v14) | LB+ | Worth (draft) |
+| Hall | Seat | Limit Break (v15) | LB+ | Worth (draft) |
 |---|---|---|---|---|
 | Brawler Dojo | 1 | Arsenal Rush: a blow with every Arm, one foe | A sixth blow, at the same share, with the first Arm the foe is weak to | +20% |
 | | 2 | Iaido Cleave: a Greatsword cleave, then two Katana draws | A third Katana draw | +25% |
@@ -493,7 +493,7 @@ The halls are classes v2's six (§5 there). "New" marks a seat classes v2 adds; 
 | Summoner Circle | 1 | Cinder Wyrm: a Greatsword-and-Fire bite, then Fire breath on every foe | Its breath reaches each foe at 0.7 of its power, from 0.55 | +15–20% |
 | | 2 | Frost Behemoth: two Axe-and-Ice stomps on every foe | Its stomps reach each foe at 0.66 of their power, from 0.55 | +20% |
 | | 3 | Thunderbird: six Lance and Lightning dives at random foes | A seventh dive | +17% |
-| | 4 | Moon Fox: eight strikes at random foes (v14) | A ninth strike, at twice a strike's share | +25% |
+| | 4 | Moon Fox: eight strikes at random foes (v15) | A ninth strike, at twice a strike's share | +25% |
 | Cleric Chapel | 1 | Choir of Angels: Light on every foe twice, then Aegis 2 on every Uma | Aegis 3, from 2 | ≈ +20% |
 | | 2 | Legion of Demons: Hex on every foe, then eight Dark claws | Its claws drain: 30% of their damage heals the most hurt Uma | ≈ +20% |
 | | 3 (new) | A Fire-and-Light mend on every Uma, with a Fire hit on every foe | Its mend repeats once at the round's end, at ×0.3 (Regen) | ≈ +20% |
@@ -517,7 +517,7 @@ A second change to the same number would make the halls hard to read.
 
 **Code** (`packages/domain/src/rpg/`):
 - **One class table** carrying `base` and `tier` for each id, and `rpgBaseClass(id)`:
-  - the six base ids (v14) are `tier: 1`, their own base;
+  - the six base ids (v15) are `tier: 1`, their own base;
   - the twelve advanced ids are `tier: 2`: `warlord`, `berserker`, `sage`, `sorcerer`, `blademaster`, `runeknight`,
     `conjurer`, `warlock`, `templar`, `guardian`, `bishop`, `oracle`;
   - `kinds.ts` splits `RpgBaseClass` from `RpgClass`. `RpgTreeId`, `HeroLimitId` and `HERO_HALLS` stay on the base
@@ -531,7 +531,7 @@ A second change to the same number would make the halls hard to read.
 - **Tier rules:** side forks and their points by tier (Tier 1 cores only, T7), and `rpgActiveSlots(tier, level)`.
 - **LB+:** each `HeroLimit` gains its `plus` effect, and `heroLimitSkills` takes it.
 
-**Engine v15**, the first after v14, shared with [weapon arts](weapon-arts.md) (H40):
+**Engine v16**, the first after v15, shared with [weapon arts](weapon-arts.md) (H40):
 - `BattleAlly.classId` may be an advanced id. It is validated by tier: base ids in Tier 1, advanced ids in Tier 2.
 - **Frozen into `BattleAlly`:**
   - `passive`: her class's passive id. It's frozen apart from the class, so a Tier 3 master can carry one;
@@ -541,9 +541,9 @@ A second change to the same number would make the halls hard to read.
   round's end.
 - **Skill MP:** the tier factor of A10.
 - The passives live in `strike`, `chip`, `cast`, `resolveHalf`, `linger` and `support`, and Auto's rules in `auto.ts`
-  (§5). Fights from v6–v14 replay on their own engines.
+  (§5). Fights from v6–v15 replay on their own engines.
 
-**Save:** the first version after v24, shared with the other Tier 2 docs when Tier 2 content is built:
+**Save:** the first version after v25, shared with the other Tier 2 docs when Tier 2 content is built:
 - **class ids are per world.** A Tier 1 world accepts the six base ids, a Tier 2 world the twelve advanced ids, in
   `classId`, `classes` and `ranks.classes`;
 - **validation goes by tier:** a loadout's weapons by its base's slots, its sides by its base's trees, as Tier 2 refs;
@@ -578,7 +578,7 @@ Nothing here changes what uma-kit draws. If a screen needs a kit change, it goes
 **Legacy refs (A9):**
 - **retire** `RpgProfile.legacy`, `RPG_MAX_LEGACY_SLOTS` and their branches in `rpgLearnedSkills` and
   `rpgUsableLoadout`;
-- `BattleAlly.legacy` stays readable for v6–v14 fights (it was always empty) and leaves v15's input.
+- `BattleAlly.legacy` stays readable for v6–v15 fights (it was always empty) and leaves v16's input.
 
 **A9:** recommendation: **no Tier 1 skill carries (D159). Retire the unused `legacy` refs in this build.**
 
@@ -589,11 +589,11 @@ Nothing here changes what uma-kit draws. If a screen needs a kit change, it goes
 | Class entries: ids, base, tier, names, leans | 12 | `kinds.ts`, `rules.ts` | S |
 | Passives: engine rules and Auto's scoring | 12 | `battle/engine.ts`, `battle/auto.ts` | M |
 | LB+ effects: data and the plus step | 24 | `heroes.ts`, `battle/limit.ts` | M |
-| Side nodes reused: 50 trees × 5 depths × A and B, after v14. Opened by tier; none new | 500 | `rules.ts` | S |
+| Side nodes reused: 50 trees × 5 depths × A and B, after v15. Opened by tier; none new | 500 | `rules.ts` | S |
 | New skills | 0: no passive needs one | — | — |
 | Renames: three summons (§5.7) | 3 | `catalog.ts` | S |
 | Class emblems: a ChatGPT uma-art packet | 12 | uma-platform | S–M |
-| Engine v15: class ids by tier, the frozen passive and Hero Bond, skill MP | — | `rpg/battle/` | M |
+| Engine v16: class ids by tier, the frozen passive and Hero Bond, skill MP | — | `rpg/battle/` | M |
 | Save: class ids per world, validation by tier, the Ascend pick | — | `save/` (and `save/rift.ts`) | S–M |
 | Screens: the class picker, the Ascend sheet, the profile, the halls' LB+ line, the Limit Break menu | 5 | `apps/web/src/` | M |
 | The simulation: Tier 2 parties, passives on the four fronts, LB+ | — | `world/balance-party.ts`, `world/balance.test.ts` | M |
@@ -639,4 +639,4 @@ doc's.
 | **A7** | Who gets Hero LB+ | Anyone at Bond 10 with the seat: the Hero with her own seat, or a Learner with her Hero. Tier 2 and later only, with §7.2's 24 effects as drafts |
 | **A8** | Limit Break power of an advanced class | Its base class's (D160) |
 | **A9** | Tier 1 skills in Tier 2 | None carry (D159). Retire the unused `legacy` refs when building |
-| **A10** | Skill MP in Tier 2 | Replace ×tier with the MP bar's growth, `1 + 0.7 × (tier − 1)`: ×1.7 in Tier 2 and ×2.4 in Tier 3, set by the simulation. Engine v15 |
+| **A10** | Skill MP in Tier 2 | Replace ×tier with the MP bar's growth, `1 + 0.7 × (tier − 1)`: ×1.7 in Tier 2 and ×2.4 in Tier 3, set by the simulation. Engine v16 |

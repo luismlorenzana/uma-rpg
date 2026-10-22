@@ -6,6 +6,7 @@ import { accessoryFightFields } from '../economy/gear-id'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeHitShare } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/engine'
 import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile } from './battle'
 import { rpgProfileTrees } from '../rpg/rules'
 import { boundGrade, equipBlock, equipGear, gearChoices, unequipGear, wearAccessory, wearArmor } from './forge'
@@ -173,7 +174,7 @@ describe('the Forge and equipping (S7)', () => {
     const input = worldOf(startFight(save, ura, 'w1-1-1-s1', outfits, at(0))).world.run.battle!.input
     const ally = input.allies[0]!
     const bare = projectRpgStats(umaProfile(smith, uma, 1, 'brawler'))
-    expect(input.version).toBe(13)
+    expect(input.version).toBe(BATTLE_ENGINE_VERSION)
     expect(ally).toMatchObject({ classRank: 1, might: { greatsword: 1, lance: 1 }, barrier: Math.round(ally.stats.hp * 0.02), orbs: ['fire'], evasion: 12 })
     expect(ally).not.toHaveProperty('orb')
     expect(ally).not.toHaveProperty('regen')

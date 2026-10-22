@@ -1,7 +1,8 @@
-// Campaign battle vocabulary, engine v11 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// Campaign battle vocabulary, engine v14 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
-// Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md).
+// Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
+// D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5).
 // Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -91,6 +92,16 @@ export interface BattleEnemy {
   element2?: RpgElement
   /** Acts twice a round (v7): solo elites, so they stay threatening alone. */
   twice?: boolean
+  /** v14 (D169): the Rift's ward, the channel she wards (Iron and Arcane fronts). An ally's hit of that channel deals
+   * `BATTLE_WARD_FACTOR` of its damage, Broken or not, `pierce` or not. A trait of the foe, not the "Ward" status
+   * (`RpgStatusKind` 'ward', a foe's guard-up buff). */
+  ward?: BattleChannel
+  /** v14 (D169): the Rift's Duel champion acts three times a round; her third move comes after every foe's second, and
+   * like a second it never starts a charge. Never with `twice`. */
+  thrice?: boolean
+  /** v14 (D169): the Rift's Duel lock sets. Weak to an Arms kind and an element, her charged moves' locks alternate, an
+   * Arms kind first; weak to one channel only, she draws as any foe. */
+  mixedLocks?: boolean
   rank: EnemyRank
   /** Lifetime level (Tier 1 Lv1 is 1, Tier 2 Lv1 is 51). */
   level: number
@@ -102,7 +113,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -145,7 +156,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

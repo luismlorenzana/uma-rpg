@@ -1,9 +1,10 @@
 # Combat
 
-How a fight works today: engine v13 (D142: Might as fixed values by grade again; D141, [combat balance](../design/combat-balance.md): a ratio damage formula,
+How a fight works today: engine v14 (D169: the Rift's foe traits, the ward, a third act and mixed locks, which no campaign
+foe carries; D142: Might as fixed values by grade again; D141, [combat balance](../design/combat-balance.md): a ratio damage formula,
 Might as a share, Cleric and Summoner support, Rally, charged foe moves with locks, Steel after a Break, a breather
 between waves; D124: two accessories; D112: Limit Breaks only from the Halls of Heroes; D106: Heroes and inherited Limit
-Breaks; D104: Class Ranks; v6–v12 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
+Breaks; D104: Class Ranks; v6–v13 fights still replay as they were). Every number below comes from the code. The tables between `live` markers are
 generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the
 engine.
 
@@ -19,7 +20,7 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `
      its target (the most it deals to anyone, for a move on everyone), before Barriers and guards (D140).
   2. Each living Uma acts **once**, in any order the player picks.
   3. When all have acted, the foes act in initiative order. A foe that **acts twice** takes her second move after every
-     foe's first.
+     foe's first; a Rift champion that **acts three times** (v14) takes her third after every second.
   4. The round ends: Burn ticks, statuses count down, Breaks expire, skill Barriers lapse (v12), and a lingering summon
      that mends mends again.
 - **Win:** every foe of the last wave falls. **Lose:** every Uma falls, or the fight passes 40 rounds per wave.
@@ -84,7 +85,8 @@ For each part of each hit:
 3. **Statuses** (table below) raise or cut it.
 4. **Specials:** `vs-broken` ×1.3 on a broken foe, `vs-wounded` ×1.3 below half HP. `pierce` ignores the unbroken
    halving.
-5. **Unbroken foes take ×0.5.** Breaking them is how damage lands.
+5. **Unbroken foes take ×0.5.** Breaking them is how damage lands. A Rift foe's **ward** (v14) takes ×0.5 again from
+   the channel she wards, Broken or not ([below](#weaknesses-shields-and-breaks)).
 6. An Uma's **evasion** (Speed Extra Stats, up to 50%) cuts what she takes.
 7. A guard intercepting a hit takes half of it. Damage is at least 1.
 8. **A skill's Barrier** (v12) absorbs any damage first. It lasts until the end of the round it was raised in.
@@ -156,6 +158,12 @@ The Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF
 - **v12 (D141):** a Break also strips her buffs (Power-up, Ward), cancels a charged move and gives back the party's
   Rally from her. Back up, she is **Steeled**: her shield can't be chipped until she has made a move, so a party can't
   hold a foe down Break after Break. Her shield badge shows it.
+- **The ward (v14, the Rift):** an Iron or Arcane front foe wards one channel, elements on the Iron front and Arms kinds
+  on the Arcane ([the Rift](../design/rift.md) §5). An Uma's hit of the warded channel deals ×0.5 again, on top of the
+  unbroken halving: a quarter of a Broken hit while her shield stands, and still half once she's Broken. `pierce`
+  skips the unbroken halving, not the ward. Foes' hits are never warded. Auto weighs it: a skill or Attack loses half
+  the share of its power in the warded channel, so the party reaches for the other channel first. It's a trait of the
+  foe, not the Ward status below.
 - Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**. A dual-element
   foe is weak to what beats either element, minus her own; a light+dark foe answers to weapons only.
 
@@ -217,7 +225,10 @@ below half HP), the champion's Cataclysm and Apocalypse (below half HP).
 - **Locks:** every hit of a lock's kind breaks one (an Orb's kind counts, as for weaknesses). The move lands the next
   round at its power × the locks left ÷ all of them.
 - **Cancelled** when every lock breaks or when she is Broken; the splash cuts in again with "Cancelled!".
-- She doesn't charge two rounds running, and a foe that acts twice charges only with her first move.
+- She doesn't charge two rounds running, and a foe that acts twice (or three times) charges only with her first move.
+- **Mixed locks (v14, the Rift's Duel front):** when she is weak to an Arms kind and an element, her locks alternate, an
+  Arms kind first (Arms, element, Arms, …), so a set always needs both channels. Weak to one channel only, she draws as
+  any foe.
 
 ## Limit Breaks
 
@@ -256,7 +267,9 @@ Shown with Fire; a foe uses her own element, and a dual-element foe her second e
 <!-- /live -->
 
 Captains and champions change tactics below 50% HP (their phase-two moves); a charged move she is gathering or landing
-carries over. From Lv 10 a lone region boss and an elite's sub-boss act twice (D141). Foe faces come from the region's
+carries over. From Lv 10 a lone region boss and an elite's sub-boss act twice (D141). The Rift's Duel champion **acts
+three times** a round (v14): her second move comes with every foe's second and her third after them all, and neither
+starts a charge. Foe faces come from the region's
 franchise and each slot's tier, from a private file; see [maps](maps.md#faces).
 
 ### Splash cut-ins
@@ -304,6 +317,7 @@ giving up pays nothing and leaves MP as it was before the fight. Numbers are in 
 |---|---|---|
 | `BATTLE_WEAK` | 1.3 | Damage multiplier of a weak hit |
 | `BATTLE_UNBROKEN_FACTOR` | 0.5 | Damage a foe takes while its shield stands |
+| `BATTLE_WARD_FACTOR` | 0.5 | v14: damage a Rift foe takes from the channel she wards, on top of the unbroken halving |
 | `BATTLE_DEFENSE_SHARE` | 0.5 | Before v12: share of defense subtracted from offense |
 | `BATTLE_MIN_OFFENSE_SHARE` | 0.2 | Before v12: a hit keeps at least this share of offense |
 | `BATTLE_GUARD_FACTOR` | 0.5 | Damage a guarding ally takes for the one she covers |

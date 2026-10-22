@@ -49,17 +49,17 @@
 
 **Waves:** 1) H44, H45, H46 → 2) H47, H49 → 3) H48 → 4) H50, H51.
 
-**All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v14 (with the Paladin's art), the Tier 1 simplification, and the Rift.
+**All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v15 (with the Paladin's art), the Tier 1 simplification, and the Rift.
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
 - **uma-kit releases:** H34 and H36 each ship a kit minor. Fetch `main` and take the next version.
-- **Doc pairs:** H39 and H40 share engine v15, and H41, H42 and H43 cross-reference each other. Each doc matches the
+- **Doc pairs:** H39 and H40 share engine v16, and H41, H42 and H43 cross-reference each other. Each doc matches the
   others that already exist.
 
 **Next, packets to write after these:**
-- **Classes v2, engine v14** (C1–C7: Paladin and Cleric, Spell Blade, Summoner, the halls, accessories, the ward,
-  balance and release), plus a small art packet for the Paladin's class emblem and the Paladin Bastion building.
+- **Classes v2, engine v15** (C1–C7: Paladin and Cleric, Spell Blade, Summoner, the halls, accessories, balance and
+  release), plus a small art packet for the Paladin's class emblem and the Paladin Bastion building.
 - **Tier 1 simplification** (D1).
 - **The Rift:** generator, run rules and Ascend, achievements, page, balance (E1–E5).
 

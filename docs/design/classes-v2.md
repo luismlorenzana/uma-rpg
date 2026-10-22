@@ -6,8 +6,8 @@
 > - accessories are one damage slot and one support slot, with flat Orbs (§6).
 >
 > - The second of three linked docs, with [tiers](tiers.md) and [the Rift](rift.md).
-> - It's a combat change: a new engine version (v14), checked with the balance simulation before it ships. Fights from
->   v6–v13 replay as they were.
+> - It's a combat change: a new engine version (v15), checked with the balance simulation before it ships. Fights from
+>   v6–v14 replay as they were. The Rift's ward shipped first, in engine v14 (H44, D169).
 > - **Owner calls** are marked **C1**, **C2** and so on, with recommendations. [§10](#10-owner-calls) lists them all.
 > - **Every number is a draft** until the simulation sets it.
 
@@ -92,7 +92,7 @@ Damage is shown as physical / magical, in percent.
 - Her own skills already target one foe; they keep that.
 - **The guard rail, for every class:**
   - no single Uma should Break a Duel boss (shield 10–12) in one act;
-  - the v14 simulation checks every class's best single act, with weapon arts and passives under their shared cap, the
+  - the v15 simulation checks every class's best single act, with weapon arts and passives under their shared cap, the
     Summoner's first ([weapon arts](weapon-arts.md) §6);
   - if one reaches the shield, the Duel shield rises, not the class's identity.
 
@@ -305,16 +305,17 @@ Tier 3; it's designed with Tier 3.
 
   This is independent of v2 and can ship now.
 
-## 8. Engine v14 and the save
+## 8. Engine v15 and the save
 
-- **Engine v14** carries:
+- **Engine v15** carries:
   - the new hands: the Spell Blade's double Arms hit, and the Summoner's mirrored pair and farewell areas;
   - the healers' ATK and M.ATK scaling, their doubled shares and the 60% Barrier cap, and their new effects;
   - flat Orbs in a typed damage slot;
-  - Guts into HP (C1);
-  - the Rift's ward trait ([the Rift](rift.md) §5).
-- **Old fights replay:** v6–v13 fights, including an open one at migration, replay on their own engine.
-- **Save (v24, after the tiers doc's v23):**
+  - Guts into HP (C1).
+- **The Rift's ward shipped first, in engine v14 (H44, D169)**, with the Duel champion's third act and mixed lock sets
+  ([the Rift](rift.md) §5), so the Rift runs on today's five classes.
+- **Old fights replay:** v6–v14 fights, including an open one at migration, replay on their own engine.
+- **Save (v25, after the Rift's v24):**
   - the class id `cleric` stays the Cleric, and `paladin` is new;
   - **every Uma's Cleric progress is copied to the Paladin:** the same Class Rank, the same trees learned, a loadout
     re-picked from her Arms skills. Nobody loses progress;

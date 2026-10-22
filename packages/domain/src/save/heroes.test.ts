@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, hallClass, HERO_HALLS, HERO_LIMIT_IDS, heroLimitsOf } from '../rpg/heroes'
 import { regionChapter, worldContinent } from '../world/world'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/engine'
 import { startFight, type BattleOutfit } from './battle'
 import { sweepFight } from './exchange'
 import { addLearner, grantBond, heroBlock, heroFields, learnerBlock, parentsOf, removeLearner, setHero } from './heroes'
@@ -92,7 +93,7 @@ describe('Halls of Heroes (D106)', () => {
     w.umas['101'] = { ...w.umas['101']!, bonds: { 'mage-2': { level: 3, exp: 5 } } }
     expect(heroFields(w, '101')).toEqual({ inherits: [{ limit: 'brawler-1', bond: 0, from: '201' }, { limit: 'mage-2', bond: 3, from: '202' }] })
     const input = worldOf(startFight(s, ura, ura.nodes[1]!.id, OUTFITS, T(5))).world.run.battle!.input
-    expect(input.version).toBe(13)
+    expect(input.version).toBe(BATTLE_ENGINE_VERSION)
     expect(input.allies.find((a) => a.id === '101')).toMatchObject({ inherits: [{ limit: 'brawler-1', bond: 0 }, { limit: 'mage-2', bond: 3 }] })
     expect(input.allies.find((a) => a.id === '102')).toMatchObject({ hero: 'cleric-4' })
     expect(input.allies.find((a) => a.id === '103')).not.toHaveProperty('hero')

@@ -4,15 +4,30 @@ import { rpgNode, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
 import { isRpgTome, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { applyBattleAction, battleActorSkill, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
-import type { BattleAction, BattleAlly, BattleHalf, BattleState, BattleUnit } from './types'
+import { BATTLE_WARD_FACTOR, battleChannel } from './skills'
+import type { BattleAction, BattleAlly, BattleChannel, BattleHalf, BattleState, BattleUnit } from './types'
 
-/** How good a skill or Attack is against a foe now: power, weakness, every-foe reach and a small status premium. */
+/** How good a skill or Attack is against a foe now: power, weakness, every-foe reach and a small status premium. From
+ * v14 (D169) a foe's ward discounts it by the share of its power in the channel she wards, so a party prefers the other
+ * channel and still acts when it has only the warded one. */
 function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: readonly BattleUnit[]): number {
   const enemy = battleFoe(state, foe.id)!
   const weak = def.hits.some((hit) => hit.parts.some((part) => battleHitIsWeak(enemy, foe, part.kind)))
   const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
-  return total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) /
+  const raw = total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) /
     (foe.shield > 0 ? 1 : 0.6) + (def.status ? 0.5 : 0)
+  if (state.engineVersion < 14 || !enemy.ward) return raw
+  return raw * (1 - wardedShare(def, enemy.ward) * (1 - BATTLE_WARD_FACTOR))
+}
+/** The share of a skill's hit power, part by part, in a channel. */
+function wardedShare(def: RpgSkillDef, channel: BattleChannel): number {
+  let all = 0, warded = 0
+  for (const hit of def.hits) for (const part of hit.parts) {
+    const power = hit.power * part.share
+    all += power
+    if (battleChannel(part.kind) === channel) warded += power
+  }
+  return all > 0 ? warded / all : 0
 }
 /** v12 (D141): what a skill's support is worth beside its hits. A support that restores or shields its whole share is
  * worth 1.5 casts of its depth's damage, so a Cleric or Summoner mends the hurt and shields the threatened. */

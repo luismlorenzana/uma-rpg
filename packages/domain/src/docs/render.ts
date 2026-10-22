@@ -172,6 +172,7 @@ function battleConstants(): string {
   const rows: Cell[][] = [
     ['`BATTLE_WEAK`', K.BATTLE_WEAK, 'Damage multiplier of a weak hit'],
     ['`BATTLE_UNBROKEN_FACTOR`', K.BATTLE_UNBROKEN_FACTOR, 'Damage a foe takes while its shield stands'],
+    ['`BATTLE_WARD_FACTOR`', K.BATTLE_WARD_FACTOR, 'v14: damage a Rift foe takes from the channel she wards, on top of the unbroken halving'],
     ['`BATTLE_DEFENSE_SHARE`', K.BATTLE_DEFENSE_SHARE, 'Before v12: share of defense subtracted from offense'],
     ['`BATTLE_MIN_OFFENSE_SHARE`', K.BATTLE_MIN_OFFENSE_SHARE, 'Before v12: a hit keeps at least this share of offense'],
     ['`BATTLE_GUARD_FACTOR`', K.BATTLE_GUARD_FACTOR, 'Damage a guarding ally takes for the one she covers'],

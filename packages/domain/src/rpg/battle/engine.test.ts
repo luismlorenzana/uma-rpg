@@ -3,13 +3,15 @@ import { learnRpgNode, projectRpgStats, rpgHand, type RpgClass, type RpgDamageKi
 import { rpgFoe } from '../campaign/enemies'
 import { BATTLE_LIMIT_MAX, applyBattleAction, battleActionsLeft, battleBroken, battleIntentDamage, battleLimitGain, battleStateHash, createBattle, replayBattle,
   type BattleAction } from './index'
-import { BATTLE_UNBROKEN_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
+import { BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleWeakness } from './skills'
 import { battleDamage } from './engine'
 import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
 import { HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills } from '../heroes'
-import type { BattleAlly, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
+import type { BattleAlly, BattleCue, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
+import { balanceParty, balanceStage } from '../../world/balance-party'
+import { regionChapter, worldContinent } from '../../world/world'
 
 // Invented outfits only; no private Uma or cast content. At Lv4 depth 1 is open, so every tree's depth-1 core is known.
 function profile(id: string, classId: RpgClass, weapons: RpgWeapon[], sides: string[] = [], level = 4): RpgProfile {
@@ -721,5 +723,145 @@ describe('battle engine v12: the combat balance rework (D141)', () => {
     unitOf(s, 'a1').hp = 5
     const action = autoAction(s, 'a4')
     expect(action).toMatchObject({ kind: 'skill', skill: { id: 'cleric-tome-fire.1' } })
+  })
+})
+
+describe('battle engine v14: the Rift’s ward, a third act and mixed locks (D169)', () => {
+  const team = (allies = party()): BattleAlly[] => allies.map((a) => ({ ...a, classRank: a.level }))
+  const v14 = (enemies: BattleEnemy[], allies = team(), seed = 4242): BattleInput => ({ version: 14, seed, allies, enemies })
+  /** A foe weak to the Greatsword and Fire, with a deep shield, and any Rift trait. */
+  const rift = (extra: Partial<BattleEnemy> = {}): BattleEnemy => ({ ...foe('f1', 'ice', ['greatsword'], ['fire'], 9), ...extra })
+  const first = (step: BattleStep, target = 'f1') => hits(step, target)[0] as Extract<BattleCue, { kind: 'hit' }>
+  /** Everyone guards, so the round ends and the foes act. */
+  const endRound = (s: BattleState): BattleState => {
+    const ids = s.input.allies.map((a) => a.id)
+    ids.forEach((id, i) => { if (battleActionsLeft(s, id) > 0) s = act(s, { kind: 'guard', actorId: id, targetId: ids[(i + 1) % ids.length]! }) })
+    return s
+  }
+
+  it('wards a channel: an ally’s hit of it deals half again, Broken or not, pierce or not; the other channel and foes’ hits are untouched', () => {
+    // Strong hits on a deep pool of HP, so rounding stays small beside the amounts.
+    const strong = (allies: BattleAlly[]) => allies.map((a) => ({ ...a, stats: { ...a.stats, atk: 400, matk: 400 } }))
+    const start = (ward?: BattleEnemy['ward'], allies = team()) => {
+      const f = rift(ward ? { ward } : {})
+      return createBattle(v14([{ ...f, stats: { ...f.stats, hp: 100_000 } }], strong(allies))).state
+    }
+    const spell = (s: BattleState) => applyBattleAction(s, { kind: 'attack', actorId: 'a2', targetId: 'f1', weapon: 'tome-ice' })
+    const halved = (warded: number, plain: number) => expect(Math.abs(warded - plain * BATTLE_WARD_FACTOR)).toBeLessThanOrEqual(1)
+    // Unbroken: a magical hit on a magical ward deals half (a quarter of a Broken hit, with the unbroken halving).
+    halved(first(spell(start('magical'))).amount, first(spell(start())).amount)
+    expect(first(spell(start('magical'))).label).toBe('Warded')
+    expect(first(spell(start())).label).toBeUndefined()
+    // Broken: still half.
+    const broken = (ward?: BattleEnemy['ward']) => { const s = start(ward); unitOf(s, 'f1').brokenAt = 1; unitOf(s, 'f1').shield = 0; return s }
+    halved(first(spell(broken('magical'))).amount, first(spell(broken())).amount)
+    expect(first(spell(broken())).amount).toBeGreaterThan(first(spell(start())).amount)
+    // The other channel: a physical hit on a magical ward is unchanged, and on a physical ward it is halved.
+    const swing = (s: BattleState) => first(applyBattleAction(s, { kind: 'attack', actorId: 'a1', targetId: 'f1', weapon: 'lance' }))
+    expect(swing(start('magical'))).toEqual(swing(start()))
+    halved(swing(start('physical')).amount, swing(start()).amount)
+    // A pierce skill skips the unbroken halving, not the ward.
+    const mage = team(party().map((a) => (a.id === 'a2' ? ally(profile('a2', 'mage', TOMES, ['mage-tome-dark.1a'], 5), ['mage-tome-dark.1a']) : a)))
+    const pierce = (ward?: BattleEnemy['ward']) =>
+      first(applyBattleAction(start(ward, mage), { kind: 'skill', actorId: 'a2', targetId: 'f1', skill: skill('mage-tome-dark.1a') }))
+    expect(pierce().amount).toBeGreaterThan(first(spell(start())).amount)
+    halved(pierce('magical').amount, pierce().amount)
+    expect(pierce('magical').label).toBe('Warded')
+    // A foe's hit on an Uma is never warded.
+    const foeHit = (state: BattleState) => battleDamage(state, unitOf(state, 'f1'), unitOf(state, 'a2'), 'magical', 1, 'ice')
+    expect(foeHit(start('magical'))).toEqual(foeHit(start()))
+    expect(foeHit(start('magical')).warded).toBe(false)
+  })
+
+  it('takes the traits only from v14, a ward only as a channel, and never twice with thrice', () => {
+    const v13 = (e: BattleEnemy): BattleInput => ({ ...v14([e]), version: 13 })
+    expect(() => createBattle(v13(rift({ ward: 'magical' })))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v13(rift({ thrice: true })))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v13(rift({ mixedLocks: true })))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v14([rift({ ward: 'fire' as never })]))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v14([rift({ thrice: 1 as never })]))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v14([rift({ twice: true, thrice: true })]))).toThrow(/Invalid battle enemy/)
+    expect(() => createBattle(v14([rift({ ward: 'physical', thrice: true, mixedLocks: true })]))).not.toThrow()
+    expect(() => createBattle(v13(rift()))).not.toThrow()
+  })
+
+  it('lets a thrice-acting foe move three times a round, her third after every second, never starting a charge after her first', () => {
+    const s = createBattle(v14([rift({ thrice: true }), { ...foe('f2', 'fire'), twice: true }, foe('f3', 'dark')])).state
+    const order = s.intents.map((i) => i.enemyId)
+    expect(order.filter((id) => id === 'f1')).toHaveLength(3)
+    expect(order).toHaveLength(6)
+    // Everyone's first, then the seconds (hers among them), then her third.
+    expect(new Set(order.slice(0, 3))).toEqual(new Set(['f1', 'f2', 'f3']))
+    expect(new Set(order.slice(3, 5))).toEqual(new Set(['f1', 'f2']))
+    expect(order[5]).toBe('f1')
+    // Her second and third moves never start a charge, over many rounds and seeds.
+    const moves: BattleEnemy['moves'] = [
+      { id: 'nuke', kind: 'damage', channel: 'physical', element: null, power: 20, target: 'all', label: 'Nuke', charge: 2 },
+      { id: 'hit', kind: 'damage', channel: 'physical', element: null, power: 5, target: 'front', label: 'Hit' },
+    ]
+    let charged = 0
+    for (let seed = 1; seed <= 12; seed++) {
+      let state = createBattle(v14([rift({ thrice: true, moves, phaseTwo: undefined })], team(), seed)).state
+      for (let r = 0; r < 4 && state.outcome === 'active'; r++) {
+        const mine = state.intents.filter((i) => i.enemyId === 'f1')
+        expect(mine).toHaveLength(3)
+        expect(mine.slice(1).every((i) => i.moveId !== 'nuke')).toBe(true)
+        if (unitOf(state, 'f1').charging?.round === state.round) charged++
+        state = endRound(state)
+      }
+    }
+    expect(charged).toBeGreaterThan(0)
+  })
+
+  it('alternates a mixed lock set, an Arms kind first; weak to one channel, she draws as before', () => {
+    const nuke = (charge: number): BattleEnemy['moves'] =>
+      [{ id: 'nuke', kind: 'damage', channel: 'physical', element: null, power: 20, target: 'all', label: 'Nuke', charge }]
+    const locks = (e: BattleEnemy, version: 13 | 14 = 14) => unitOf(createBattle({ ...v14([e]), version }).state, 'f1').charging?.locks
+    const mixed = rift({ weaknesses: { weapons: ['axe'], elements: ['fire'] }, moves: nuke(3), phaseTwo: undefined })
+    expect(locks({ ...mixed, mixedLocks: true })).toEqual(['axe', 'fire', 'axe'])
+    // Without the trait, the draw is v13's.
+    const wide = rift({ weaknesses: { weapons: ['axe', 'bow', 'katana'], elements: ['fire', 'ice'] }, moves: nuke(4), phaseTwo: undefined })
+    expect(locks(wide)).toEqual(locks(wide, 13))
+    const arms = (k: string) => (['axe', 'bow', 'katana'] as string[]).includes(k)
+    expect(locks({ ...wide, mixedLocks: true })!.map(arms)).toEqual([true, false, true, false])
+    // Weapons only: the same locks with or without the trait.
+    const physical = rift({ weaknesses: { weapons: ['axe', 'bow'], elements: [] }, moves: nuke(4), phaseTwo: undefined })
+    expect(locks({ ...physical, mixedLocks: true })).toEqual(locks(physical, 13))
+  })
+
+  it('lets Auto prefer the unwarded channel, and still act with only the warded one', () => {
+    // A Cleric with no skills equipped: her five Attacks score the same on a foe weak to none of them.
+    const allies = team(party().map((a) => (a.id === 'a4' ? { ...a, loadout: [] } : a)))
+    const plain = rift({ weaknesses: { weapons: ['katana'], elements: ['ice'] } })
+    const pick = (ward?: BattleEnemy['ward']) => autoAction(createBattle(v14([{ ...plain, ...(ward ? { ward } : {}) }], allies)).state, 'a4')
+    expect(pick()).toMatchObject({ kind: 'attack', weapon: 'greatsword' })
+    expect(pick('physical')).toMatchObject({ kind: 'attack', weapon: 'tome-fire' })
+    expect(pick('magical')).toMatchObject({ kind: 'attack', weapon: 'greatsword' })
+    // A Mage has only magic: on a magical ward she still acts.
+    expect(autoAction(createBattle(v14([{ ...plain, ward: 'magical' }], allies)).state, 'a2').kind).not.toBe('guard')
+  })
+
+  it('plays a campaign stage on v14 exactly as on v13, on every continent', () => {
+    const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
+    const play = (input: BattleInput) => {
+      let step = createBattle(input)
+      const cues = [...step.cues]
+      for (let n = 0; n < 800 && step.state.outcome === 'active'; n++) {
+        const actor = step.state.units.find((u) => u.side === 'ally' && u.hp > 0 && battleActionsLeft(step.state, u.id) > 0)
+        if (!actor) break
+        step = applyBattleAction(step.state, autoAction(step.state, actor.id))
+        expect(step.error).toBeUndefined()
+        cues.push(...step.cues)
+      }
+      return { cues, units: step.state.units, outcome: step.state.outcome, round: step.state.round }
+    }
+    for (let order = 1; order <= 5; order++) {
+      const node = regionChapter(worldContinent({ name: 'Sim', order }).regions[0]!, cast).nodes.filter((n) => n.kind !== 'camp').at(-1)!
+      const input = balanceStage(node, 9000 + order, balanceParty(node.level, { gear: true, stars: true, heroes: true }))
+      expect(input.version).toBe(14)
+      const now = play(input)
+      expect(now).toEqual(play({ ...input, version: 13 }))
+      expect(now.cues.some((c) => c.kind === 'hit' && c.label === 'Warded')).toBe(false)
+    }
   })
 })
