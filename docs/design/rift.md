@@ -140,8 +140,8 @@ best single act removes 12 points, a Limit Break any Uma can learn.
 **Classes v2 (H60, D186):** from engine v15 the generator reads `riftTuning(15)`, an override of `RIFT_TUNING` measured
 with classes v2's parties (§11): Iron's and Arcane's shields double (a captain and a boss 16, her key guard 8, the elites
 16, a boss's guard and the opening foes 12); Arcane's foes take ×1.2 HP and ×1.1 offense over Iron's (were ×1.5 and ×1.3);
-each front may scale its own champion (Iron ×1.17 HP and offense, Arcane ×0.92 offense, the Horde ×1.05), and so its
-Convergence fight; the Duel's boss ×1.1 HP and ×2.3 offense (were 1 and 1.65); the Horde's offense ×4.4 (4.6); the
+each front may scale its own champion (Iron ×1.2 HP and offense, H63's for the hybrids' mirror, H60's ×1.17; Arcane ×0.92
+offense; the Horde ×1.05), and so its Convergence fight; the Duel's boss ×1.1 HP and ×2.3 offense (were 1 and 1.65); the Horde's offense ×4.4 (4.6); the
 Convergence at strength ×0.902 (`convergence` −0.18). Faces, ranks and counts are the same, so a run's faces don't move,
 and a fight started on v14 keeps v14's foes. The guidance becomes v2's at the switch (`riftParty`, D178 point 5).
 
@@ -332,21 +332,22 @@ take 59 wins, about the whole run's 58 fights for each re-spec. The one number t
 multiplier can't put all four near 50%: Arcane's and the Duel's stage-8 shapes stay at 100% even at ×1.35, where Iron
 falls to 22% and the Horde to 0%. It stays at ×1.22, five levels' worth.
 
-### Classes v2 (engine v15, H60, D186)
+### Classes v2 (engine v15, H60, D186; re-measured for the hybrids' mirror, H63, D187)
 
 The same tables with classes v2's guided parties (D178 point 5: Iron 2 Brawler, 2 Spell Blade, Paladin; Arcane 2 Mage,
 2 Summoner, Cleric; Duel 2 Brawler, 2 Mage, Paladin; Horde 2 Spell Blade, 2 Summoner, Cleric) on curve at Lv 50 as v2
 Umas (`balanceMember(…, { engine: 15 })`), first try on Auto, 96 fights a stage, on the v15 numbers of §5 and classes
-v2's tuned classes ([classes v2](classes-v2.md) §9).
+v2's tuned classes ([classes v2](classes-v2.md) §9). H63's mirror (stronger Spell Blades, a lighter Summoner) took Iron's
+champion from 66% to 75%; its champion scale went ×1.17 → ×1.2 (§5) and every number below is H63's, H60's in brackets.
 
-| Target | Value | Measured with classes v2 (H60, D186) |
+| Target | Value | Measured with classes v2 (H63, D187; H60's in brackets) |
 |---|---|---|
-| The right party | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 100%, 100%, 95%; Arcane 91%, 99%, 96%; Duel 99%, 97%, 97%; Horde 100%, 88%, 98%. Champions: Iron 66%, Arcane 66%, Duel 61%, Horde 67% |
-| The wrong party | ≤ 30% a stage, ≤ 10% a champion | On Arcane, Iron's party: 0%, 5%, 0% a stage, 0% the champion. On Iron, Arcane's party: 38%, 86%, 60% a stage (**missed**, below), 0% the champion |
-| The Convergence, right parties | About 50% an attempt | 53% (51 of 96); its fights 100%, 100%, 53%, 100% |
+| The right party | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 100%, 100%, 98% [95%]; Arcane 89%, 98%, 96% [91%, 99%, 96%]; Duel 99%, 97%, 97%; Horde 100%, 85%, 97% [100%, 88%, 98%]. Champions: Iron 66%, Arcane 64% [66%], Duel 61%, Horde 70% [67%] |
+| The wrong party | ≤ 30% a stage, ≤ 10% a champion | On Arcane, Iron's party: 0%, 8%, 0% a stage [0%, 5%, 0%], 0% the champion. On Iron, Arcane's party: 40%, 84%, 56% a stage [38%, 86%, 60%] (**missed**, below), 0% the champion |
+| The Convergence, right parties | About 50% an attempt | 52% (50 of 96) [53%]; its fights 100%, 99%, 53%, 98% |
 | The Duel's guard rail | Every class's best single act < the Duel's lowest shield | 11 against 13: each class's own acts 5–11, the best Limit Break 12 (shields 13–15, unchanged) |
-| A run's length | About 2–3 weeks | About 58 fights on Auto: 52 for the 48 stages and 7 for the Convergence's two attempts |
-| Echoes, how hard | Lv 45 ≥ 80% re-specced; Lv 50 ≥ 80%, Lv 55 about 50% | Lv 45: 99–100%. Lv 50: 94–100%. Lv 55: Iron 100%, Arcane 43%, Duel 100%, Horde 34% (as H51's, one multiplier) |
+| A run's length | About 2–3 weeks | About 59 fights on Auto [58]: 52 for the 48 stages and 7 for the Convergence's two attempts |
+| Echoes, how hard | Lv 45 ≥ 80% re-specced; Lv 50 ≥ 80%, Lv 55 about 50% | Lv 45: 99–100%. Lv 50: 91–100% [94–100%]. Lv 55: Iron 100%, Arcane 35% [43%], Duel 100%, Horde 28% [34%] (as H51's, one multiplier) |
 | The Bestiary | Two or three runs | Three runs (unchanged) |
 
 On v14's numbers, with classes v2 as H55–H58 built it (before H60's tuning), the v2 parties won Iron's and the Duel's
@@ -358,13 +359,14 @@ Paladin) and Arcane's weaker at its champion (the Summoner heals no more).
 21%; the Horde's with its Cleric 67%, with a Paladin 71% but stage 8 96% to 83%. The guidance stays the Paladin on the
 Duel and the Cleric on the Horde.
 
-**The default loadout, for the record:** Iron 100%, 100%, 100%, champion 95%; Arcane 95%, 100%, 99%, 53%; Duel 100%, 98%,
-95%, 61%; Horde 100%, 99%, 100%, 82%; the Convergence 60%.
+**The default loadout, for the record (H63):** Iron 100%, 100%, 100%, champion 95%; Arcane 95%, 100%, 98%, 48%; Duel 100%,
+98%, 95%, 61%; Horde 100%, 99%, 99%, 80%; the Convergence 59%.
 
 **Iron's wrong party with classes v2, still the one miss.** Classes v2 widened the gap: Arcane's party now loses Iron's
 champion every time and stages 1–4 more often than not, where on v14 it won 60% of them. Doubled shields favour the
 multi-hit Spell Blades over casters who rarely hit Iron's one Arms weakness. It still wins stages 5–8 (two sub-bosses, or
-a boss and her guard) 86% and 9–11 60%: the Mages' damage through the ward and the Cleric's mends carry the long fights.
+a boss and her guard) 84% and 9–11 56% (H63; H60 86% and 60%): the Mages' damage through the ward and the Cleric's
+mends carry the long fights.
 Every setting that pushed those under 30% pushed Iron's own stages 9–11 under 80% (×1.5 HP: Iron's own 53% at 9–11 to
 the wrong party's 58%; ×2: 4% to 14%), because the balance party's core-and-side loadout chips shields slowly. With the
 game's default loadout Iron's party wins every Iron stage and 95% of the champions, so in play the gap is wider than the

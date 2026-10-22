@@ -9,9 +9,10 @@ export const BATTLE_WEAK = 1.3
 export const BATTLE_UNBROKEN_FACTOR = 0.5
 /** v14 (D169): the Rift's ward. A hit of the channel a foe wards deals this share, on top of the unbroken halving. */
 export const BATTLE_WARD_FACTOR = 0.5
-/** v15 (D183): a lingering summon's farewell strike on every foe, × its linger share × its hits' power. H60 (D186): 0.85,
- * so her areas still match a Mage's over a wave while her damage a turn comes nearer the Spell Blade's. */
-export const BATTLE_FAREWELL_FACTOR = 0.85
+/** v15 (D183): a lingering summon's farewell strike on every foe, × its linger share × its hits' power. H63 (the mirror):
+ * 0.1 (H60's 0.85). It still reaches every foe and chips each weak one's shield, while her damage stays the Spell Blade's
+ * mirror: 70% magical, level with her on the world's stages, and within 15% of her on the Horde. */
+export const BATTLE_FAREWELL_FACTOR = 0.1
 export const BATTLE_DEFENSE_SHARE = 0.5
 export const BATTLE_MIN_OFFENSE_SHARE = 0.2
 export const BATTLE_GUARD_FACTOR = 0.5

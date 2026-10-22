@@ -105,7 +105,7 @@ describe('battle engine v15: classes v2, dark (D179)', () => {
     const power = (version: 14 | 15, id: string) => battleActorSkill(blade(version), 'a3', { tier: 1, id })?.power
     expect(power(14, 'spellblade-greatsword.1')).toBe(0.45)
     expect(power(14, 'spellblade-tome-fire.1')).toBe(0.45)
-    expect(power(15, 'spellblade-greatsword.1')).toBe(0.68)
-    expect(power(15, 'spellblade-tome-fire.1')).toBe(0.32)
+    expect(power(15, 'spellblade-greatsword.1')).toBe(0.72)
+    expect(power(15, 'spellblade-tome-fire.1')).toBe(0.44)
   })
 })

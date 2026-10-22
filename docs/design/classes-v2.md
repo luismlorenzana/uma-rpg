@@ -79,10 +79,11 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
 (`battleExtraHit`). Her own best act on the guard rail chips 11: the Bow flurry's 5 + 1 hits with the Light flurry's 5.
 
 **The act stays a pair, reweighted:**
-- the **Arms half** goes from ×0.45 to **×0.68** (drafted ×0.63);
-- the **Tome half** goes from ×0.45 to **×0.32** (drafted ×0.27);
-- 1.0 a turn in all (drafted 0.9, today's). H60 (D186) set the hands with the simulation: at 0.63 + 0.27 she was the
-  weakest damage class by a quarter, and 0.68 + 0.32 keeps her at 72% physical.
+- the **Arms half** goes from ×0.45 to **×0.72** (drafted ×0.63, H60 ×0.68);
+- the **Tome half** goes from ×0.45 to **×0.44** (drafted ×0.27, H60 ×0.32);
+- 1.16 a turn in all (drafted 0.9, today's). H60 (D186) set 0.68 + 0.32: at 0.63 + 0.27 she was the weakest damage
+  class by a quarter. H63 (D187) set 0.72 + 0.44 for the owner's mirror (§3.2): level with the Summoner on the world's
+  stages, 68% physical.
 
 **Multi-hit: her Arms half gains one extra hit** (clarified 2026-10-21 after H40's review).
 - The extra hit is added to the half as a whole, not to each of its hits. Its power is split evenly across all of
@@ -106,7 +107,8 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
   - **Checked for classes v2 in H60 (D186):** each class's own best act chips 11 (the Spell Blade's Bow flurry, 5 + 1
     hits, with her Light flurry's 5; the Summoner's Lance and Lightning Packs with an Ember Sprites farewell), the
     Brawler 8, the Mage 6, the healers 5, and the best of the 24 Limit Breaks still 12 (Chaos Rain), all under the
-    Duel's 13. The hands moved power, not hits, so the Duel's shields stay 13–15.
+    Duel's 13. The hands moved power, not hits, so the Duel's shields stay 13–15. H63's hands and farewell (D187)
+    measure the same.
 
 **Stat leans:**
 - ATK ×1.05 → **×1.1**, and M.ATK ×1.05 → **×0.95**.
@@ -118,23 +120,25 @@ Built in H55 (D183), live from H61: each half at its own hand, her Arms half res
 ### 3.2 Summoner: the Spell Blade's mirror (owner, 2026-10-21)
 
 Built in H55 (D183), live from H61: her pair, Tome half first; the farewell, one strike on each living foe at the linger
-share × the summon's hits' power × `BATTLE_FAREWELL_FACTOR` (0.85 since H60), before her next pair; and the Greatsword
+share × the summon's hits' power × `BATTLE_FAREWELL_FACTOR` (0.1 since H63), before her next pair; and the Greatsword
 line's depth-3 "Knight Captain". Her own best act on the guard rail chips 11: a lingering Light Pack's farewell, then
-Light Pack and Bow Pack. H60 (D186) set `BATTLE_FAREWELL_FACTOR` to 0.85 and her hands to 0.58 + 0.32 (drafted 0.63 +
-0.27); §9 has why.
+Light Pack and Bow Pack. H63 (D187) set her hands to 0.58 + 0.56 and `BATTLE_FAREWELL_FACTOR` to 0.1 for the owner's
+mirror (H60, D186, had 0.58 + 0.32 and 0.85; drafted 0.63 + 0.27 and 1); §9 has why.
 
-The Summoner is the Spell Blade turned inside out: same turn, same numbers, the other channel leading, and the area
-identity where the Spell Blade has multi-hit. They balance as a pair.
+The Summoner is the Spell Blade turned inside out: same turn, same damage, the other channel leading, and the area
+identity where the Spell Blade has multi-hit. They balance as a pair. **The same damage, not the same hand numbers**
+(H63): her Tome summons carry her areas (Blizzard on every foe, Thunder at random) and her kit is all magic, so her Arms
+summon sits near her Tome summon to land 70/30; her Tome stays the stronger hand, so it still leads.
 
 | | Spell Blade | Summoner |
 |---|---|---|
 | Slots | 3 Arms + 2 Tomes | 3 Tomes + 2 Arms |
 | Armor | Physical | Magical |
-| An act | A pair: **Arms half ×0.68** + **Tome half ×0.32** (H60; drafted 0.63 + 0.27) | A pair: **Tome summon ×0.58** + **Arms summon ×0.32** (H60; drafted 0.63 + 0.27) |
+| An act | A pair: **Arms half ×0.72** + **Tome half ×0.44**, 1.16 (H63; H60 0.68 + 0.32) | A pair: **Tome summon ×0.58** + **Arms summon ×0.56**, 1.14 and her farewell (H63; H60 0.58 + 0.32) |
 | MP | The halves' sum, ×0.5 a half | The same |
 | Split | 70% physical / 30% magical | 70% magical / 30% physical |
 | Stat leans | ATK ×1.1, M.ATK ×0.95 | M.ATK ×1.1, ATK ×0.95 |
-| Identity | **Multi-hit:** her Arms half gains one extra hit (an Attack lands as two: 3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded), × 0.85 (H60), when her next pair comes |
+| Identity | **Multi-hit:** her Arms half gains one extra hit (an Attack lands as two: 3 shield chips an act) | **Areas:** her Tome summon **lingers**, and its farewell strike reaches **every foe** at ×0.3 (×0.4 Bonded), × 0.1 (H63; H60 0.85), when her next pair comes: a light strike that chips each weak foe's shield |
 | Limit Break power | 2.2× | 2.2× |
 | Her hall's Limit Breaks | Multi-hit | Areas |
 | Support | None | **None** |
@@ -154,8 +158,10 @@ exactly:
 
 **Balance as a pair.**
 - On a single shielded foe, the Spell Blade's three chips an act Break sooner.
-- Against three or more foes, the Summoner's farewell strikes touch the whole field.
-- **Over a whole fight, their damage per turn stays within ±5% of each other** (§9).
+- Against three or more foes, the Summoner's areas and farewell strikes touch the whole field.
+- **Over a whole fight, their damage per turn stays within ±5% of each other** on the world's stages (the owner's
+  mirror, 2026-10-22; §9). By context within ±15% on one foe and on the Horde; the ward tilts Iron to the Spell Blade
+  and Arcane to the Summoner, never past ±25%.
 
 ### 3.3 Paladin and Cleric
 
@@ -406,38 +412,56 @@ dark until H61.
 
 ## 9. Balance targets (the simulation, `SIM=1`)
 
-| Target | Value | Measured (H60, D186) |
+| Target | Value | Measured (H63, D187; H60's in brackets) |
 |---|---|---|
-| Spell Blade's damage, on Auto, against regular formations | 70% physical ± 5 | **72%** (76% without her Limit Break), the world's regular stages at Lv 30 and 50 |
-| Summoner's damage, on Auto | 70% magical ± 5 | **84%, missed** (below). Her farewells are 22% of it |
-| Paladin vs Cleric: healing plus Barrier absorbed per fight, on curve | Within ±10% of each other | **Met, at the line:** the Paladin's is 90% of the Cleric's a fight and 93% a round, on the world's Lv 50 bosses and each front's stage 8 and champion with each healer. Her party takes less to heal (Aegis, Enfeeble) and ends sooner |
-| Spell Blade vs Summoner, damage per turn over a whole fight | Within ±5% (the mirror) | **Missed: the Summoner 118%** over the four fronts' stages 1–11 (the Horde's party, both in it) and the world's Lv 50 stages. One foe (the Duel) 101%; the world 117%; the Horde 144%; her warded front (Iron) 83%, the Spell Blade's (Arcane) 158% |
-| One healer, doubled shares | Keeps an on-curve party through a front boss with no Uma falling twice | **Met:** no won fight at stages 6, 8 or 12 of any front had an Uma fall twice |
-| Spell Blade vs Brawler, against shielded single foes | Spell Blade Breaks a sub-boss at least 1 round sooner; Brawler deals ≥ 10% more after the Break | **Met:** five Spell Blades Break Iron's stage 1–4 captain (shield 16) in 2.9 rounds, every time; five Brawlers in 5.5 (16 of 40 at all); after the Break the Brawlers deal 942 an act, the Spell Blades 349 |
-| Summoner vs Mage's Blizzard, against 3+ foes | Summoner ≥ Mage over a whole wave, by the farewell strikes | **Met by damage, 101%:** five Summoners deal 1,005 an act while 3+ Horde foes stand, five Mages 991. The Mages clear a first wave sooner (2.6 rounds to 3.0) |
+| **The mirror** (owner, 2026-10-22): Summoner ÷ Spell Blade, damage a turn on the world's regular stages | Within ±5% at Lv 30 and at Lv 50 | **Met: 97% at Lv 30** (334 to 344 a turn; [111%]) **and 98% at Lv 50** (949 to 970; [114%]); 99% over every Lv 50 stage, bosses too (887 to 896; [117%]) |
+| Spell Blade's damage, on Auto, against regular formations | 70% physical ± 5, all her damage | **68%** (71–72% without her Limit Break) [72%], the world's regular stages at Lv 30 and 50 |
+| Summoner's damage, on Auto | 70% magical ± 5, her farewells included | **72%** [84%, missed]. Her farewells are 3% of it [22%] |
+| The mirror by context (H63), both in the Horde's party on each front's stages 1–11 | Within ±15% on one foe (the Duel) and on the Horde; the ward tilts Iron to the Spell Blade and Arcane to the Summoner, none past ±25% | **Met:** the Duel 88% [101%], **the Horde 114%, at the line** [144%], Iron 77% [83%], Arcane 122% [158%] |
+| Their level (H63) | Both near each other, about 880–920 a turn at world Lv 50, a little below the pure classes | **Met:** the Spell Blade 896 [825], the Summoner 887 [969] over every Lv 50 stage; the Brawler 1,037, the Mage 1,137, the Cleric 413 |
+| Paladin vs Cleric: healing plus Barrier absorbed per fight, on curve | Within ±10% of each other | **Met:** the Paladin's is 94% of the Cleric's a fight and 96% a round [90%, 93%], on the world's Lv 50 bosses and each front's stage 8 and champion with each healer. Her party takes less to heal (Aegis, Enfeeble) and ends sooner |
+| One healer, doubled shares | Keeps an on-curve party through a front boss with no Uma falling twice | **Met:** no won fight at stages 6, 8 or 12 of any front had an Uma fall twice (96 fights a stage) |
+| Spell Blade vs Brawler, against shielded single foes | Spell Blade Breaks a sub-boss at least 1 round sooner; Brawler deals ≥ 10% more after the Break | **Met:** five Spell Blades Break Iron's stage 1–4 captain (shield 16) in 2.9 rounds, every time; five Brawlers in 5.5 (16 of 40 at all), five Summoners in 4.8 (16 of 40); after the Break the Brawlers deal 942 an act, the Spell Blades 373 [349] |
+| ~~Summoner vs Mage's Blizzard, against 3+ foes~~ | **Retired (owner, 2026-10-22; H63, D187):** the mirror supersedes it | For the record: five Summoners deal 886 an act while 3+ Horde foes stand, five Mages 991 (90%) [1,005 and 991]; the Mages clear a first wave in 2.6 rounds, the Summoners 3.2 |
 | Today's campaign, on-curve party of each shape | Win rates within 3 points of v13 (no campaign rebalance) | **Met: 0 points.** Every party wins every stage at Tier 1 Lv 10–50 and Tier 2 Lv 10, as on v14; fights end a round or two sooner |
-| The Rift's fronts | Set in [the Rift](rift.md) §11 | Met but Iron's wrong party at stages ([the Rift](rift.md) §11) |
+| The Rift's fronts | Set in [the Rift](rift.md) §11 | Met but Iron's wrong party at stages ([the Rift](rift.md) §11), with Iron's champion ×1.2 (H60 ×1.17) |
 
 **How it was measured** (`rift/balance-v15.test.ts`, `SIM=1`, with `SIM_ENGINE=15` on `rift/balance.test.ts` and
 `world/balance.test.ts`): engine v15 with explicit v15 inputs, never the switch. The balance party and the Rift's v2 guided
 parties are `balanceMember(…, { engine: 15 })`: her v2 spread, leans and HP, her class's armor, H57's preset (an Orb and a
-support at G10), today's Extra Stats, and her class's first seat in the v15 halls. First try on Auto, on curve.
+support at G10), today's Extra Stats, and her class's first seat in the v15 halls. First try on Auto, on curve. H63's
+numbers are `SIM_SEEDS=32` (the world's stages 16 seeds each, the fronts 96 fights a stage), where the table asserts
+the mirror's targets; two always-on tests pin them on one seed of the same fights.
 
 **What H60 changed** (all v15 only): the Spell Blade's hands 0.63 + 0.27 → 0.68 + 0.32; the Summoner's 0.63 + 0.27 →
 0.58 + 0.32; `BATTLE_FAREWELL_FACTOR` 1 → 0.85; the Paladin's Blizzard Barrier on every Uma ×0.35 → ×0.5 of its share and
 her Greatsword Aegis 1, 2 at depth 5 → 1; the Cleric's Regen 0.3 → 0.2; the supports (§6.3); and the Rift's v15 numbers
 ([the Rift](rift.md) §11).
 
-**The two misses, kept closest:**
-- **The Summoner's split.** Her farewell, all magic, is her area identity and §9's wave target; her kit raises M.ATK
-  only (magic armor, M.ATK Extra Stats, a Fire Orb), so her own pair leans 78% magical even at 0.58 + 0.32. Within the
-  hands' ±0.05 no setting brings her under 82% without her farewell falling below a Mage's waves. Mirroring the Spell
-  Blade's Extra Stats (M.ATK and ATK) takes about 4 points more; the packet kept today's.
-- **The mirror.** On one foe the two are level (101%). The Summoner's summons reach every foe and her farewell strikes
-  each, so the more foes, the more she leads: 117% on the world's formations and 144% on the Horde, which every setting
-  that kept her waves level with a Mage's left above 110%. The Spell Blade was the weakest damage class (74% of a
-  Brawler a turn at 0.63 + 0.27), so she gained 0.05 on each hand rather than the Summoner losing more. Her worth is
-  the Break: her party's foes are Broken sooner, which her own damage a turn doesn't count.
+**What H63 changed for the owner's mirror** (2026-10-22, all v15 only, D187):
+- **The Summoner's farewell, `BATTLE_FAREWELL_FACTOR` 0.85 → 0.1.** Her 84% magical came from it: all magic, on every
+  foe, 22% of her damage. It stays her identity in reach, one strike on every foe that chips each weak one's shield, but
+  its damage is 3% of hers. Every point of farewell also widened her lead where foes are many (the Horde) and on Arcane.
+- **The Summoner's hands, Tome 0.58 + Arms 0.32 → 0.58 + 0.56** (1.14 a turn, her farewell on top). Her Tome summons
+  carry her areas (Blizzard on every foe, Thunder at random) and her kit raises M.ATK only, so a magic hand is worth
+  about twice an Arms hand to her: 70/30 in damage needs her two hands near level. Her Tome stays the stronger hand, so
+  it still leads her pair (the engine and Auto lead with the stronger hand; an Arms-led Summoner measured differently).
+- **The Spell Blade's hands, Arms 0.68 + Tome 0.32 → 0.72 + 0.44** (1.16 a turn): she rises to meet the Summoner near
+  the middle of 825 and 969, 68% physical, which also narrows the ward's tilt on Iron and Arcane.
+- **Leans unchanged** (still each other's mirror): moving the Summoner's ATK lean moved her split two points at most.
+- **The Rift:** Iron's champion ×1.17 → ×1.2 (`riftTuning(15)`), since the stronger Spell Blades took Iron's party from
+  66% to 75% at its champion; back to 66%. Every other §11 number held.
+
+**The calls H63 made** (the packet's priority order: the mirror, the splits, the contexts, the level):
+- **The Horde, at the line.** The Summoner's Tome summons reach every foe and the Spell Blade's halves strike one, so
+  her ratio on the Horde runs about 1.3 times her ratio on one foe and 1.17 times the world's, and did with no farewell
+  at all (measured). The world at ±5% (the first target) and the Horde at ±15% meet only in a narrow band: the world at
+  97–98%, the Horde 114%. Below it the world's Lv 30 falls under 95%; above it the Horde passes 115%.
+- **The ward's fronts.** At 70/30 each, the ward halves most of the Spell Blade's damage on Arcane and the Summoner's on
+  Iron: about 77% and 122%, inside ±25% but not ±15%, which the packet allows.
+- **The world's regular stages** are measured at Lv 30 and at Lv 50 apart (each within ±5%), and every Lv 50 stage with
+  bosses as well; the level (the fourth target) on every Lv 50 stage, as H60's table reported it.
+- **§9's "Summoner ≥ Mage's Blizzard on 3+ foes" is retired** (the owner's ruling): her waves are 90% of a Mage's.
 
 ## 10. Owner calls: decided 2026-10-21 (D160)
 

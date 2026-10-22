@@ -122,11 +122,11 @@ export type RiftTuning = Widen<typeof RIFT_TUNING> & {
 
 /** Classes v2's Rift (H60, D186; rift.md §5, §11): `RIFT_TUNING` with what classes v2's parties' measurements moved:
  * Iron's and Arcane's shields doubled, Arcane's scale, each front's champion, the Duel, the Horde's offense and the
- * Convergence. */
+ * Convergence. H63 (D187): Iron's champion ×1.2 (H60 ×1.17), for the mirror's stronger Spell Blades. */
 const RIFT_TUNING_V15: RiftTuning = {
   ...RIFT_TUNING,
   scale: { iron: { hp: 1, offense: 1 }, arcane: { hp: 1.2, offense: 1.1 } },
-  champions: { iron: { hp: 1.17, offense: 1.17 }, arcane: { hp: 1, offense: 0.92 }, horde: { hp: 1.05, offense: 1.05 } },
+  champions: { iron: { hp: 1.2, offense: 1.2 }, arcane: { hp: 1, offense: 0.92 }, horde: { hp: 1.05, offense: 1.05 } },
   escort: { ...RIFT_TUNING.escort, captain: { ...RIFT_TUNING.escort.captain, shield: 16 }, guard: { ...RIFT_TUNING.escort.guard, shield: 8 } },
   elites: { ...RIFT_TUNING.elites, shield: 16 },
   boss: { ...RIFT_TUNING.boss, shield: 16, guard: { ...RIFT_TUNING.boss.guard, shield: 12 } },

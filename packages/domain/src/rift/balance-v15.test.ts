@@ -1,7 +1,8 @@
-// Classes v2's balance (classes-v2.md §9, H60): engine v15 measured with explicit v15 inputs (never the switch), on the
-// shared balance party (`world/balance-party.ts`, `engine: 15`) and the Rift's v2 guided parties (`riftParty(front, 15)`).
-// The always-on checks are small, on fixed seeds. The targets' tables: `SIM=1 npx vitest run src/rift/balance-v15.test.ts`
-// (`SIM_SEEDS=4` and `SIM_TARGETS=1,4,7` narrow them while tuning). The Rift's own tables with v2 parties are
+// Classes v2's balance (classes-v2.md §9, H60; the hybrids' mirror, H63): engine v15 measured with explicit v15 inputs
+// (never the switch), on the shared balance party (`world/balance-party.ts`, `engine: 15`) and the Rift's v2 guided parties
+// (`riftParty(front, 15)`). The always-on checks are small, on fixed seeds (the mirror's on one seed of its table's fights).
+// The targets' tables: `SIM=1 npx vitest run src/rift/balance-v15.test.ts` (`SIM_SEEDS=4` and `SIM_TARGETS=1,4,7` narrow
+// them while tuning); at `SIM_SEEDS=32` targets 1, 2 and 4 assert H63's mirror once printed. The Rift's own tables are
 // `SIM_ENGINE=15` on `rift/balance.test.ts`; the campaign's are `SIM_ENGINE=15` on `world/balance.test.ts`.
 import { describe, expect, it } from 'vitest'
 import { AMULET_TYPES, TALISMAN_TYPES } from '../economy/gear-id'
@@ -106,6 +107,17 @@ function playFront(front: RiftFront, stages: readonly number[], allies: BattleAl
 const range = (a: number, z: number): number[] => Array.from({ length: z - a + 1 }, (_, i) => a + i)
 const f1 = (x: number) => x.toFixed(1)
 
+// --- H63: the hybrids' mirror -----------------------------------------------------------------------------------------------
+
+/** The Summoner's damage a turn ÷ the Spell Blade's, in one tally of fights both played. */
+const mirrorOf = (t: Tallies): number => perTurn(t.summoner) / perTurn(t.spellblade)
+/** The owner's mirror (classes-v2 §3.2): level within ±5% on the world's regular stages, each 70/30 her way ± 5. */
+const MIRROR = 0.05
+const SPLIT = 0.05
+/** By context, both in the Horde's party: ±15% on one foe (the Duel) and on the Horde; the ward tilts Iron to the Spell
+ * Blade and Arcane to the Summoner, so those two may reach ±25%, none past it. */
+const CONTEXT: Readonly<Record<RiftFront, number>> = { duel: 0.15, horde: 0.15, iron: 0.25, arcane: 0.25 }
+
 // --- Target 6: the Spell Blade breaks, the Brawler hits the Broken ----------------------------------------------------------
 
 /** Five of one class against a stage's captain (the first foe): rounds to her first Break (the fight's last round when she
@@ -180,13 +192,28 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
     }
   }, 30_000)
 
-  it('lands the Spell Blade within 70% physical ± 5 on one fixed fight', () => {
-    const into: Tallies = {}
-    const node = worldStages(50, ['fight'])[0]!
-    const allies = worldParty(50)
-    play(balanceStage(node, 1000, allies, VERSION), tallyOf(allies, into))
-    expect(Math.abs(physicalShare(into.spellblade!).all - 0.7)).toBeLessThanOrEqual(0.05)
-  })
+  // H63, the hybrids' mirror (classes-v2 §3.2, §9): the owner's rule, on one seed of the SIM table's fights.
+  it('keeps the hybrids a mirror on the world\'s regular stages: level damage a turn, each 70/30 her way (H63)', () => {
+    const levels = [30, 50].map((level) => {
+      const into: Tallies = {}
+      const allies = worldParty(level)
+      playWorld(level, ['fight'], allies, 1, tallyOf(allies, into))
+      return into
+    })
+    levels.forEach((t, k) => expect(Math.abs(mirrorOf(t) - 1), `Lv ${k ? 50 : 30}`).toBeLessThanOrEqual(MIRROR))
+    const [blade, summoner] = (['spellblade', 'summoner'] as const).map((c) => mergeTallies(levels.map((t) => t[c])))
+    expect(Math.abs(physicalShare(blade!).all - 0.7)).toBeLessThanOrEqual(SPLIT)
+    expect(Math.abs(1 - physicalShare(summoner!).all - 0.7)).toBeLessThanOrEqual(SPLIT)
+  }, 30_000)
+
+  it('keeps the Summoner near the Spell Blade by context: one foe and the Horde, and the warded fronts (H63)', () => {
+    const both = guided('horde', V15)
+    for (const front of RIFT_FRONTS) {
+      const into: Tallies = {}
+      playFront(front, range(1, 11), both, seedsOf(1), tallyOf(both, into))
+      expect(Math.abs(mirrorOf(into) - 1), front).toBeLessThanOrEqual(CONTEXT[front])
+    }
+  }, 60_000)
 
   it.skipIf(!process.env.SIM)('prints classes v2\'s targets (§9)', async () => {
     const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
@@ -196,9 +223,15 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
     const worldSeeds = Math.max(1, Math.round(n / 2))
     const rows: string[] = [`engine v15; fronts ${RUNS.length} runs × ${seeds.length} seeds a stage, world stages × ${worldSeeds} seeds; on curve, first try on Auto`]
 
+    // What the table asserts once it has printed (H63's targets), at the delivery's `SIM_SEEDS=32` or more: fewer seeds are
+    // for tuning, and the world's few stages move a point or two.
+    const checks: (() => void)[] = []
+
     if (want.has(1) || want.has(2) || want.has(4)) {
-      // 1–2: the hybrids' splits on the world's regular stages at Lv 30 and 50. 4: damage a turn, fronts 1–11 and Lv 50.
-      rows.push('', 'Targets 1–2: hybrids\' damage, world regular stages | physical (all) | physical (skills) | farewells | damage a turn')
+      // H63's mirror (classes-v2 §3.2): 1, damage a turn level within ±5% on the world's regular stages at Lv 30 and 50;
+      // 2, each 70/30 her way ± 5 over all her damage, farewells included. 4 (by context, H63's 3 and 4): both in one
+      // party, the Horde's guided party on every front's stages 1–11, and the balance party on all of the world's Lv 50.
+      rows.push('', 'Targets 1–2 (H63\'s 1–2): hybrids\' damage, world regular stages | physical (all) | physical (skills) | farewells | damage a turn')
       const world: Record<number, Tallies> = {}
       for (const level of [30, 50]) {
         const into: Tallies = {}
@@ -209,18 +242,24 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
           const t = into[c]!, s = physicalShare(t)
           rows.push(`Lv ${level} ${c} | ${pct(s.all)} | ${pct(s.skills)} | ${pct(t.farewell / Math.max(1, damage(t)))} | ${f1(perTurn(t))}`)
         }
+        rows.push(`Lv ${level} Summoner ÷ Spell Blade | | | | ${pct(mirrorOf(into))}`)
+        checks.push(() => expect(Math.abs(mirrorOf(into) - 1), `the mirror at Lv ${level}`).toBeLessThanOrEqual(MIRROR))
         await tick()
       }
       const both: Tallies = { spellblade: mergeTallies([world[30]!.spellblade, world[50]!.spellblade]), summoner: mergeTallies([world[30]!.summoner, world[50]!.summoner]) }
-      rows.push(`Lv 30 + 50 | Spell Blade ${pct(physicalShare(both.spellblade!).all)} physical; Summoner ${pct(1 - physicalShare(both.summoner!).all)} magical`)
+      const blade = physicalShare(both.spellblade!).all, summoner = 1 - physicalShare(both.summoner!).all
+      rows.push(`Lv 30 + 50 | Spell Blade ${pct(blade)} physical; Summoner ${pct(summoner)} magical`)
+      checks.push(() => expect(Math.abs(blade - 0.7), 'the Spell Blade\'s split').toBeLessThanOrEqual(SPLIT))
+      checks.push(() => expect(Math.abs(summoner - 0.7), 'the Summoner\'s split').toBeLessThanOrEqual(SPLIT))
       if (want.has(4)) {
         // Like for like: both in one party on the same fights, the Horde's guided party (two of each) on every front's
         // stages 1–11, and the balance party on the world's Lv 50 stages.
-        rows.push('', 'Target 4: damage a turn, both in one party | Spell Blade | Summoner | Summoner ÷ Spell Blade')
+        rows.push('', 'Target 4 (H63\'s 3–4): damage a turn, both in one party | Spell Blade | Summoner | Summoner ÷ Spell Blade')
         const fronts: Record<RiftFront, Tallies> = { iron: {}, arcane: {}, duel: {}, horde: {} }
         const both = guided('horde', V15)
         for (const front of RIFT_FRONTS) {
           playFront(front, range(1, 11), both, seeds, tallyOf(both, fronts[front]))
+          checks.push(() => expect(Math.abs(mirrorOf(fronts[front]) - 1), front).toBeLessThanOrEqual(CONTEXT[front]))
           await tick()
         }
         const w50: Tallies = {}
@@ -235,6 +274,7 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
         rows.push(`World Lv 50's damage a turn: ${RPG_ALL_CLASSES.filter((c) => w50[c]).map((c) => `${c} ${f1(perTurn(w50[c]))}`).join(', ')}`)
         rows.push(`Splits: Spell Blade ${RIFT_FRONTS.map((f) => `${f} ${pct(physicalShare(fronts[f].spellblade!).all)}`).join(', ')} physical; ` +
           `Summoner ${RIFT_FRONTS.map((f) => `${f} ${pct(1 - physicalShare(fronts[f].summoner!).all)}`).join(', ')} magical`)
+        checks.push(() => expect(Math.abs(mirrorOf(w50) - 1), 'the world\'s Lv 50, every stage').toBeLessThanOrEqual(MIRROR))
       }
     }
 
@@ -292,10 +332,11 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
     }
 
     if (want.has(6)) {
-      // 6: five Spell Blades or five Brawlers against Iron's stage 1–4 captain, weak to an Arm both carry.
+      // 6: five Spell Blades, Brawlers or Summoners against Iron's stage 1–4 captain, weak to a Spell Blade Arm (the Summoner
+      // carries two of the three; H63: the Spell Blade still Breaks sooner than her mirror).
       rows.push('', 'Target 6: five of a class on Iron 1–4, captain weak to a Spell Blade Arm | fights (Breaks) | rounds to Break (none: the fight\'s last) | damage an act after it')
       const shared = new Set(['greatsword', 'lance', 'katana'])
-      for (const c of ['spellblade', 'brawler'] as const) {
+      for (const c of ['spellblade', 'brawler', 'summoner'] as const) {
         const allies = partyOf([c, c, c, c, c], V15)
         let fights = 0, rounds = 0, broke = 0, after = 0, acts = 0
         for (const stage of range(1, 4)) for (const runId of RUNS) {
@@ -314,8 +355,9 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
     }
 
     if (want.has(7)) {
-      // 7: five Summoners or five Mages through the Horde's waves of 4–6.
-      rows.push('', 'Target 7: five of a class on Horde 1–11 | damage an act while 3+ foes stand | rounds to clear wave 1')
+      // 7: five Summoners or five Mages through the Horde's waves of 4–6. Retired as a target by the owner's mirror (H63),
+      // printed for the record.
+      rows.push('', 'Target 7 (retired, H63): five of a class on Horde 1–11 | damage an act while 3+ foes stand | rounds to clear wave 1')
       for (const c of ['summoner', 'mage'] as const) {
         const allies = partyOf([c, c, c, c, c], V15)
         let dealt = 0, acts = 0, first = 0, cleared = 0
@@ -370,5 +412,6 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
       }
     }
     console.log(rows.join('\n'))
+    if (n >= 32) for (const check of checks) check()
   }, 3_600_000)
 })
