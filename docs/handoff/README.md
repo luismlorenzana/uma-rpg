@@ -20,7 +20,7 @@
 | H33 | A standard equipment preset per class, applied from the Gear tab | Either | S–M | H32 | Done (`9823201`) |
 | H34 | "Can upgrade" badges: Stable tile, filter, profile tabs (with a small kit step) | Either | M | — | Done (`2f8e018`) |
 | H35 | Tier switching: every screen, action and push on the active tier's world | Claude | M | — | Done (`061cdac`) |
-| [H36](tasks/H36-tier-shifter.md) | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | In progress (this session) |
+| H36 | The Tier shifter on the top bar's crest, and the dusk/night tints (kit options first) | Either | S–M | H35 (the kit part can start now) | Done (`b2ba687`, uma-kit 0.12.0) |
 | H37 | Save v23: achievements, tier history, the Rift's slot | Claude | S | — | Done (`215fc93`) |
 | H38 | **Art:** the Rift building, four front crests, achievement badges (uma-art) | ChatGPT | M | — | Done (uma-platform `e3da022`, uma-art 2.11.0) |
 
@@ -34,7 +34,7 @@
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
 | H43 | Tier 2's world and its Rift ([`tier2-world.md`](../design/tier2-world.md), calls Z1–Z10) | Claude | M | — | Done (`91ee4e7`) |
 
-**Ready now:** H36 and H34 (H33 and H35 have landed).
+**Ready now:** none in Build now (H33 to H36 have landed).
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H36 | The Tier shifter and a look per tier (D167) on uma-kit 0.12.0 (uma-platform `6872da5` and `5b1f006`, P68): the crest is a link of its own to the Tiers sheet (one card per tier: counts and the Rift line where a world exists, locks otherwise), a page-coloured veil over the switch to that tier's Town Hall (none under reduced motion), and Tier 2 dusk and Tier 3 night tints; Tier 1 is unchanged. Locally validated at both phone widths in light and dark, Tier 1's bar pixel-identical, a scratch two-tier save switching both ways, uma-racer's checks on the kit build, and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39701626855) | `b2ba687` |
 | H34 | "Can upgrade" badges (D166): one pure selector, `upgradesFor` in `save/upgrades.ts`, counts what one tap fixes as her active class (a better piece in stock or her own, side points while a side skill can be learned, Star Gems to set and free active slots), memoized per world. A green mark on Stable tiles (New still wins), a "Can upgrade" facet and quick pick, green dots on the profile's Skills and Gear tabs, a green "N pts" chip, marks on gear rows and weapon slots, and an Extra Stats "N to set · N free" pill. Kit step: `ProfileTab.dot`/`dotLabel` in uma-kit 0.11.0 (uma-platform P67; uma-racer's checks pass on it). Locally validated at both phone widths in light and dark, and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39701280998) | `2f8e018` (kit uma-platform `c2fc305`, release `dd35af5`) |
 | H35 | Every screen, action and push on the active tier's world (D165): `activeTier` in the store (`rpg.tier`), `useActiveTier()` and `setActiveTier(tier): boolean`, the shell remounted under `key={activeTier}`, `?tier=` links, one Uma in one world (unlock and parser refusals, the album's scope), Uma Tickets in Tier 1 only, the world map on the tier's continents, and one push per tier world. Tier 1 alone plays as before. Locally validated at both phone widths on Tier 1 and a synthetic two-tier save, and [deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/39698646406) | `061cdac` |
 | H41 | Doc: [the Extra Stats outer ring, "the Halo"](../design/extra-stats-tier2.md), calls X1–X8 (Q12) | `d15b84d` |
