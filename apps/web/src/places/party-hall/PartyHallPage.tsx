@@ -1,17 +1,18 @@
 // The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
 // member can be recalled from her job here, and fights either way (D119). From classes v2 a party with two healers
 // carries the "One healer a party" note (H59); editing it is never refused.
-import { isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
+import { activeClass, isInFight, isPartyFull, partyLead, partyOf, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
 import { FaceTile } from '@luismlorenzana/uma-kit/album'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
-import { partyOf, isInFight } from '@rpg/domain'
-import { albumRows, lockedReason } from '../../album/rows'
+import { albumRows } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
+import { CLASS_LABEL } from '../../battle/labels'
+import { ClassEmblem } from '../../battle/pixel-icons'
 import type { MasterView } from '../../master/master'
-import { nameParty, recall, setSlot, useAlbumScope, useWorld } from '../../save/game'
+import { leadParty, nameParty, recall, setSlot, useAlbumScope, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
@@ -42,10 +43,15 @@ export default function PartyHallPage({ place, rest }: PageProps) {
 
 function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: TierWorld; outfitId: string | null; size: number }) {
   if (!outfitId) return <span className="flex items-center justify-center rounded-sm border border-dashed border-hairline-strong text-ink-faint" style={{ width: size, height: size }}>+</span>
+  const outfit = view.roster.find(o => o.outfitId === outfitId)
+  const uma = world.umas[outfitId]
+  const classId = outfit && uma ? activeClass(outfit, uma) : null
   return (
     <span className="relative" style={{ width: size, height: size }}>
-      <FaceTile outfitId={outfitId} size={size} label={view.roster.find(o => o.outfitId === outfitId)?.name ?? 'Uma'} round />
-      <span className="absolute bottom-0 left-0 rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {world.umas[outfitId]?.level ?? 1}</span>
+      <FaceTile outfitId={outfitId} size={size} label={outfit?.name ?? 'Uma'} round badges={{
+        bottomLeft: <span className="rounded-tr-sm bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {uma?.level ?? 1}</span>,
+        bottomRight: classId ? <span role="img" aria-label={CLASS_LABEL[classId]} title={CLASS_LABEL[classId]} className="rounded-tl-sm bg-black/70"><ClassEmblem classId={classId} /></span> : undefined,
+      }} />
     </span>
   )
 }
@@ -91,6 +97,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
   const valid = normalizeName(name, PARTY_NAME_MAX) !== null
   const run = (p: Promise<void>) => p.then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Could not save.'))
   const byId = new Map(view.roster.map((o) => [o.outfitId, o]))
+  const lead = partyLead(party)
 
   return (
     <div className="space-y-4 p-4">
@@ -112,6 +119,8 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
       <ul className="space-y-2">
         {party.slots.map((outfitId, slot) => {
           const outfit = outfitId ? byId.get(outfitId) : undefined
+          const uma = outfitId ? world.umas[outfitId] : undefined
+          const classId = outfit && uma ? activeClass(outfit, uma) : null
           return (
             <li key={slot}>
               <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
@@ -120,7 +129,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
                   {outfit ? (
                     <>
                       <span className="block truncate text-[14px] font-semibold">{outfit.name}</span>
-                      <span className="block truncate text-[11px] text-ink-faint">{outfit.title}</span>
+                      <span className="block truncate text-[11px] text-ink-faint">{outfitId === lead ? 'Lead · ' : ''}{classId ? CLASS_LABEL[classId] : outfit.title}</span>
                     </>
                   ) : (
                     <span className="text-[14px] text-ink-faint">Slot {slot + 1} · add an Uma</span>
@@ -135,13 +144,13 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
       {error && <p className="text-[13px] text-danger">{error}</p>}
 
       {picking !== null && (
-        <PickerStep title="Choose an Uma" rows={albumRows(view, world, [], undefined, scope)}
-          disabled={row => lockedReason(row)
-            ?? (partyOf(world, row.id)?.party === index ? 'In this party' : null)
+        <PickerStep title="Choose an Uma" rows={albumRows(view, world, [], undefined, scope).filter(row => row.uma !== null)}
+          dimmed={row => partyOf(world, row.id) !== null}
+          disabled={row => (partyOf(world, row.id)?.party === index ? 'In this party' : null)
             ?? (isInFight(world, row.id) || party.slots.some(id => id !== null && isInFight(world, id)) ? 'In a fight' : null)}
           describe={row => {
             const at = partyOf(world, row.id)
-            return at ? `Moves from ${world.parties[at.party]?.name}` : `${formatLevel(row.level)} · ${row.base.title ?? ''}`
+            return at ? `Moves from ${world.parties[at.party]?.name}` : `${formatLevel(row.level)} · ${row.classId ? CLASS_LABEL[row.classId] : ''}`
           }}
           onClose={() => setPicking(null)}
           onPick={(id) => {
@@ -153,6 +162,13 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
       {acting !== null && party.slots[acting] && (
         <BottomSheet title={byId.get(party.slots[acting] ?? '')?.name ?? 'Uma'} onClose={() => setActing(null)}>
           <div className="space-y-2">
+            {party.slots[acting] === lead ? (
+              <button type="button" disabled className="min-h-12 w-full rounded-sm bg-raised font-semibold opacity-55">Party lead</button>
+            ) : (
+              <button type="button" onClick={() => { void run(leadParty(index, party.slots[acting]!)); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
+                Make party lead
+              </button>
+            )}
             <button type="button" onClick={() => { setPicking(acting); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
               Swap with another Uma
             </button>

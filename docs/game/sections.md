@@ -128,12 +128,13 @@ Lapidary:
 - **One shared slot row per slot:** a free row starts a job; a working row shows its Uma, item, progress and queue.
   Ready work has **Collect** and **Repeat**. A running row has **Speed up** (−30m or Finish), **Queue next**, queue
   ordering and removal, and **Recall** with a preview of what is paid, returned or lost.
-- **For your targets** (D100, D126): a horizontal strip of what the targets still need here. A badge is the short
-  count, a check means work already covers it, and tapping a short item opens that job in a free slot.
+- **For your targets** (D100, D126): a horizontal strip of what the targets still need here. Each icon names its grade,
+  a badge is the short count, a check means work already covers it, and tapping a short item opens that job in a free slot.
 - **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
   **Dismiss**.
-- **The shared job sheet:** Who → What → How many. Its Uma picker opens free Umas first, then highest Craft Level, Uma
-  Level, newest release and name. Locked Umas and workers show why they cannot start. Fighting does not block work
+- **The shared job sheet:** Who → How many → What, so the amount stays above long item and grade grids. Its Uma picker
+  puts Craft Level on each face and opens free Umas first, then highest Craft Level, Uma Level, newest release and name.
+  Locked Umas and workers show why they cannot start. Fighting does not block work
   (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
 - **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
   Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
@@ -167,7 +168,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     upgrade. "Can upgrade" is also the sheet's quick pick.
   - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
     Class Rank. Owned Umas stay before locked in either direction. Level ties use newest release, then name.
-  - Corner badges: class top left, working top right, target bottom left, and bottom right New, or a green mark when
+  - Corner badges: class top left, target bottom left, and bottom right New, or a green mark when
     she can upgrade.
   - Device preferences remember the query and view, plus up to **20 saved views**. The old Stable view and sort move
     over once, then their v2 key is removed. Nothing is added to the game save.
@@ -224,12 +225,14 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 ### Party Hall
 
 Routes: `/town/party-hall` and `:n` (1–20).
-- The list shows 20 parties of five. Working members fight like the rest (D119).
+- The list shows 20 parties of five. Each face shows Uma Level and class. Working members fight like the rest (D119).
 - **The editor:** rename the party, or tap a slot for the shared Uma picker, highest Uma Level first (newest release,
-  then name for ties). Locked Umas, current members and Umas in an open fight show a disabled reason. A member of
-  another party remains selectable and moves here (D46). Working does not stop her fighting (D119).
+  then name for ties). Unowned Umas are hidden. Current members and Umas in an open fight show a disabled reason; all
+  party members are gray, while a free Uma is full colour. A member of another party remains selectable and moves here
+  (D46). Working does not stop her fighting (D119).
 - Party slots show round outfit faces.
-- **A filled slot:** Swap, View profile, Recall from her job, Remove.
+- **A filled slot:** Make party lead, Swap, View profile, Recall from her job, Remove. The lead occupies the first slot;
+  existing partial parties fall back to their first member until a lead is picked.
 - **One healer a party:** a party with two healers (Paladins or Clerics) shows "One healer a party" in the warning
   colour, on its card in the list and under the editor's slots. Picking Umas is never refused; the note goes once one
   of them fights as a damage class.
@@ -240,8 +243,8 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 
 - **On every screen:**
   - the **active party bar**: swap the whole party through the shared picker, see each Uma's face and MP. A party
-    uses its highest-level member's face and level for ordering; partial parties stay selectable, empty ones stay
-    hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party
+    uses its chosen lead's face and its highest member's level for ordering; partial parties stay selectable, empty ones
+    stay hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party
     Hall. A party with two healers shows "One healer a party" beside it;
   - **Resume the open fight**, when there is one.
 - **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.

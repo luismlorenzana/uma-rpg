@@ -158,6 +158,7 @@ function FacilityBody({ view, world, now, placeId }: { view: MasterView; world: 
       <TargetsStrip targets={targets.map((target) => ({
         id: target.key,
         item: target.icon,
+        grade: target.grade,
         short: target.short,
         label: `${target.name}, grade ${target.grade}. Need ${target.need}, have ${target.have}${target.coming ? `, ${target.coming} coming` : ''}`,
         onPick: free && target.short > 0 ? () => openJob(jobQuery({ job: target.key, count: target.short, slot: free.slot.slot })) : undefined,
@@ -173,8 +174,11 @@ function FacilityBody({ view, world, now, placeId }: { view: MasterView; world: 
         request={(job, count): RpgWorkRequest => ({ kind: spec.kind, item: job, count })}
         initialJob={() => initialJob(placeId)}
         sizeRule={spec.kind === 'refine' ? { mode: 'count', sizes: REFINE_BATCHES } : { mode: 'count' }}
+        sizePlacement="before-what"
         disabled={lockedReason}
-        picker={{ order: workOrder, describe: (row) => row.uma ? `Craft Lv ${row.workLevel}` : 'Locked' }}
+        picker={{ order: workOrder, renderBadges: (row) => row.uma ? {
+          bottomRight: <span aria-label={`Craft Level ${row.workLevel}`} className="rounded-tl-sm bg-black/75 px-1 font-display text-[9px] font-bold leading-3.5">C{row.workLevel}</span>,
+        } : undefined }}
         renderWhat={(selection) => <WhatPicker selection={selection} placeId={placeId} world={world} wanted={wanted} queueing={query?.queue === true} />}
         renderPreview={(_, selection) => <PreviewLine job={selection.job} />}
         onClose={closeJob}
