@@ -135,7 +135,7 @@ Phaser (Hub and battle stage), Firebase, master data parsing, each place page an
 By classes v2 the engine had crept back into the entry: the store's `import('@rpg/domain/battle')` resolves to the same
 module the root index re-exports, and the Hub read `startingClass`, `activeClass` and `classOf` from it, so every export
 of `save/battle.ts`, and through it the engine, rendered in the main chunk. H62 took main JS from 226.48 to 200.54 KB
-gzip locally (227.31 on CI after H56).
+gzip locally, and from 227.33 to 201.20 KB on CI.
 
 - **What loads on demand:** the engine (`rpg/battle/engine.ts`, `limit.ts`, `skills.ts`: the `engine` chunk, about
   11.7 KB gzip), Auto (`auto.ts`, in the `FightScreen` chunk, 11 KB), the world map's fight rules (`save/battle.ts`,

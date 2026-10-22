@@ -103,7 +103,11 @@ deployed game shows **nothing new** until H61 flips the switch. You preview them
 - **The manual** stays as it is (it describes the deployed game); H61 rewrites it from what you built. Note in your
   delivery each screen whose words H61 must carry into `sections.md`.
 - **Main JS:** `hub/places.ts` and anything `labels.tsx` brings are in the main bundle; the Stable, Halls, Party Hall,
-  fight and Rift pages are lazy. Keep v2 strings in the lazy pages where you can; say the number.
+  fight and Rift pages are lazy. Keep v2 strings in the lazy pages where you can; say the number. Since H62 (D184) the
+  engine's functions come from `@rpg/domain/engine`, the world map's fight rules from `@rpg/domain/battle` (the store's
+  actions are unchanged), and the web build fails if the main bundle renders the engine, Auto, Limit Breaks, the skill
+  catalog, the Limit Break table or `save/battle.ts`: the Hub, `labels.tsx`, the album rows and the store must not
+  import them (an Uma's class is in `save/class.ts`, which they may).
 
 ## Do
 
