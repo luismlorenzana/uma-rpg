@@ -29,7 +29,7 @@
 | Id | Doc | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H39 | Tier 2's advanced classes ([`tier2-classes.md`](../design/tier2-classes.md), calls A1–A10) | Claude | M | — | Done (`9cc1831`) |
-| [H40](tasks/H40-doc-weapon-arts.md) | Weapon arts and armor sets (`weapon-arts.md`, calls E1–E9) | Claude | M | — | In progress (this session) |
+| H40 | Weapon arts and armor sets ([`weapon-arts.md`](../design/weapon-arts.md), calls E1–E9) | Claude | M | — | Done (`919b361`) |
 | H41 | The Extra Stats outer ring ([`extra-stats-tier2.md`](../design/extra-stats-tier2.md), calls X1–X8) | Claude | M | — | Done (`d15b84d`) |
 | H42 | The second profession ([`second-profession.md`](../design/second-profession.md), calls V1–V8) | Claude | M | — | Done (`250f2ce`) |
 | [H43](tasks/H43-doc-tier2-world.md) | Tier 2's world and its Rift, including the ascended party's starting difficulty (`tier2-world.md`, calls Z1–Z10) | Claude | M | — | In progress (this session) |
@@ -59,6 +59,7 @@
 
 | Id | Task | Commit |
 |---|---|---|
+| H40 | Doc: [weapon arts and armor sets](../design/weapon-arts.md), proposal for the owner with calls E1–E9 (Q15). A core at Weapon Rank 4 and an A damage / B Break +1 fork at rank 8 for each weapon kind: thirty nodes from eight shape effects in mirrored Arm and element pairs. Set bonuses for a full physical suit (max HP) or magical suit (skill MP) in three steps. Nodes cost H42's Lore Scrolls, steps its Seals; the chip cap is H39's shared one, per foe. Flags the Duel shield against v14's multi-hit acts | `919b361` |
 | H38 | The Rift's art in uma-art 2.11.0: the `rift` building (place 41, `page: battle`), four 16px `front/*` crests and eleven 24px `achievement/*` badges, append-only (uma-platform P66). The Rift page pins the release and points the `tier-finale` place at `rift` | uma-platform `e3da022` (release `4125858`) |
 | H39 | Doc: [Tier 2's advanced classes](../design/tier2-classes.md), proposal for the owner with calls A1–A10 (Q14). Twelve passives within classes v2's slots, hands and 70/30, each pair winning a different Rift front; Duelist becomes Blademaster and three summons are renamed; Hero LB+ for anyone at Bond 10 with 24 drafted effects; skill MP ×1.7 in Tier 2 instead of ×tier | `9cc1831` |
 | H42 | The second profession, a proposal with calls V1–V8 (Q13): Lore Level, Relics and Glyphs, Scrolls and Seals for weapon arts and set steps, raw items for the ring gems. Its three facilities stand on the Battle page's free sides: the kit's grid math shows a second Wilds trio row can't fit | `250f2ce` |
