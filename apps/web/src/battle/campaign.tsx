@@ -1,16 +1,19 @@
-// The campaign in the app: Tier 1's world map (D66: five continents, one per scenario, of generated regions) with the
-// enemy roster's faces (D135), and the outfits' battle data. Pages render through CampaignGate once master data and the
-// roster are loaded.
+// The campaign in the app: the active tier's world map (D66: five continents, one per scenario, of generated regions;
+// ids w6–w10 in Tier 2, H35) with the enemy roster's faces (D135), and the outfits' battle data. Pages render through
+// CampaignGate once master data and the roster are loaded.
 import { biomeById, capitalChapter, capitalId, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
 import { MasterGate } from '../places/MasterGate'
+import { useActiveTier } from '../save/game'
 
 export interface Campaign {
   view: MasterView
   cast: Cast
-  /** Tier 1's continents in release order. */
+  /** The tier whose world map this is. */
+  tier: number
+  /** The tier's continents in release order (four for a partial tier, T9). */
   continents: WorldContinent[]
   /** A region or capital's stages as a small chapter for the battle rules (built on first use). */
   region: (id: string) => RpgCampaignChapter | null
@@ -24,11 +27,12 @@ export interface Campaign {
   name: (id: string, castId?: string) => string
 }
 
-const cache = new WeakMap<MasterView, WeakMap<Cast, Campaign>>()
+/** One campaign per master data, cast and tier. */
+const cache = new WeakMap<MasterView, WeakMap<Cast, Map<number, Campaign>>>()
 
-export function buildCampaign(view: MasterView, cast: Cast): Campaign {
+export function buildCampaign(view: MasterView, cast: Cast, tier = 1): Campaign {
   const roster: EnemyRoster = cast.members.map((m) => ({ id: m.id, name: m.name, franchise: m.franchise, tier: m.tier }))
-  const continents = view.chapters.filter((c) => c.tier === 1).sort((a, b) => a.order - b.order).map((c) => worldContinent({ name: c.name, order: c.order }))
+  const continents = view.chapters.filter((c) => c.tier === tier).sort((a, b) => a.order - b.order).map((c) => worldContinent({ name: c.name, order: c.order }))
   const regions = new Map(continents.flatMap((c) => c.regions.map((r) => [r.id, r] as const)))
   const capitals = new Map(continents.map((c) => [capitalId(c.id), c] as const))
   const built = new Map<string, RpgCampaignChapter>()
@@ -37,30 +41,36 @@ export function buildCampaign(view: MasterView, cast: Cast): Campaign {
     const capital = capitals.get(id)
     if (!info && !capital) return null
     let chapter = built.get(id)
-    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
+    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster, tier)))
     return chapter
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return {
-    view, cast, continents, outfits, region,
+    view, cast, tier, continents, outfits, region,
     regionInfo: (id) => regions.get(id) ?? null,
     stageRegion: (stageId) => region(stageRegionId(stageId)),
     color: (id) => {
       const r = regions.get(id), capital = capitals.get(id)
-      return r ? biomeById(r.biome).color : view.chapters.find((c) => c.tier === 1 && c.order === capital?.order)?.color ?? '#3a4a66'
+      return r ? biomeById(r.biome).color : view.chapters.find((c) => c.tier === tier && c.order === capital?.order)?.color ?? '#3a4a66'
     },
     name: (id, castId) => (castId ? cast.byId.get(castId)?.name ?? castId : outfits.get(id)?.name ?? id),
   }
 }
 
+/** The cached campaign of a master data, cast and tier. */
+export function campaignOf(view: MasterView, cast: Cast, tier: number): Campaign {
+  let byCast = cache.get(view)
+  if (!byCast) cache.set(view, (byCast = new WeakMap()))
+  let byTier = byCast.get(cast)
+  if (!byTier) byCast.set(cast, (byTier = new Map()))
+  let campaign = byTier.get(tier)
+  if (!campaign) byTier.set(tier, (campaign = buildCampaign(view, cast, tier)))
+  return campaign
+}
+
 function useCampaignOf(view: MasterView, cast: Cast): Campaign {
-  return useMemo(() => {
-    let byCast = cache.get(view)
-    if (!byCast) cache.set(view, (byCast = new WeakMap()))
-    let campaign = byCast.get(cast)
-    if (!campaign) byCast.set(cast, (campaign = buildCampaign(view, cast)))
-    return campaign
-  }, [view, cast])
+  const tier = useActiveTier()
+  return useMemo(() => campaignOf(view, cast, tier), [view, cast, tier])
 }
 
 function CastGate({ view, children }: { view: MasterView; children: (campaign: Campaign) => ReactNode }) {

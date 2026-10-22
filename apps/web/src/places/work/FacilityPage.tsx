@@ -20,7 +20,7 @@ import { nodeLabel, nodeValue, PLANET_COLOR, PLANET_SHORT } from '../../items/pl
 import type { MasterView } from '../../master/master'
 import {
   collectEverything, collectWorker, dismissWork, editWorkQueue, finishWorker, recallWorker, repeatWork, restartWork,
-  speedWorker, startWork, upgrade, useWorld,
+  speedWorker, startWork, upgrade, useAlbumScope, useWorld,
 } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon } from '../../ui/icons'
@@ -110,7 +110,7 @@ function FacilityBody({ view, world, now, placeId }: { view: MasterView; world: 
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const query = readJobQuery(params)
-  const rows = albumRows(view, world, [], now)
+  const rows = albumRows(view, world, [], now, useAlbumScope())
   const classOf = (id: string) => {
     const outfit = view.roster.find((row) => row.outfitId === id)
     return outfit && world.umas[id] ? activeClass(outfit, world.umas[id]) : 'brawler'

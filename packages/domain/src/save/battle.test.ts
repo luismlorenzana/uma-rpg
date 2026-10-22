@@ -284,4 +284,11 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     expect(gearedRow('DEF').gear).toBe(2)
     expect(Number(row('ATK').value)).toBeGreaterThan(0)
   })
+
+  it('reads her tier: the same Uma Level projects higher stats in Tier 2 (lifetime level, H35)', () => {
+    const uma = worldOf(withParty()).umas['101']!
+    const value = (tier: number, label: string) => Number(umaBattleSheet(o101, uma, 'brawler', tier).flatMap((g) => g.rows).find((r) => r.label === label)!.value)
+    for (const label of ['ATK', 'M.ATK', 'DEF', 'M.DEF', 'HP', 'MP']) expect(value(2, label), label).toBeGreaterThan(value(1, label))
+    expect(umaBattleSheet(o101, uma, 'brawler')).toEqual(umaBattleSheet(o101, uma, 'brawler', 1))
+  })
 })

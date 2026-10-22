@@ -1,5 +1,6 @@
 // What finished in a time window, for push notifications (QoL, D63, SC3): every entry that ended in it, read from the
 // work rows settled to the window's end, so a queue that stopped on short inputs never announces jobs that didn't start.
+// Every tier world announces its own news, and each link carries `?tier=` to open that world (H35).
 import { endsAt, settle } from '@luismlorenzana/uma-work'
 import { gearById } from '../economy/gear'
 import { gemById } from '../economy/gems'
@@ -7,7 +8,7 @@ import type { JobKind } from '../economy/jobs'
 import { placeById } from '../hub/places'
 import { itemById } from '../items/catalog'
 import { RPG_WORK_ENV } from '../work/env'
-import { TIER_ONE, worldOf } from './rules'
+import { savedTiers, tierKey, TIER_ONE, worldOf } from './rules'
 import type { Save } from './save'
 import { readyWork } from './work'
 
@@ -39,9 +40,14 @@ export function finishesBetween(save: Save, from: number, to: number, tier = TIE
   return out.sort((a, b) => a.at - b.at)
 }
 
-/** Slots with something to collect at `now`: the app badge. */
+/** Slots with something to collect at `now` in one tier world. */
 export function readySlots(save: Save, now: string, tier = TIER_ONE): number {
   return [...readyWork(worldOf(save, tier), now).values()].reduce((a, b) => a + b, 0)
+}
+
+/** Slots with something to collect at `now` in every tier world: the app badge. */
+export function readyEverywhere(save: Save, now: string): number {
+  return savedTiers(save).reduce((n, tier) => n + readySlots(save, now, tierKey(tier)), 0)
 }
 
 function outputName(output: string): string {
@@ -50,17 +56,28 @@ function outputName(output: string): string {
 
 export interface Notice { title: string; body: string; tag: string; url: string }
 
-/** One notification for the slots that went idle (a queue moving on to its next job needs nothing from you, D65):
- * one names itself; several are listed. */
-export function finishNotice(all: readonly Finish[]): Notice | null {
+/** One notification for the slots of a tier world that went idle (a queue moving on to its next job needs nothing from
+ * you, D65): one names itself; several are listed. Its link opens that tier (`?tier=n`), and `named` puts the tier in the
+ * title when the save has several worlds. */
+export function finishNotice(all: readonly Finish[], tier = 1, named = false): Notice | null {
   const finishes = all.filter((f) => f.idle)
   if (finishes.length === 0) return null
   const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${outputName(f.output)} ×${f.count}`
+  const title = (text: string) => (named ? `Tier ${tier} · ${text}` : text)
+  const tag = (text: string) => (tier > 1 ? `t${tier}-${text}` : text)
+  const link = (path: string) => `${path}?tier=${tier}`
   if (finishes.length === 1) {
     const f = finishes[0]!
     const place = placeById(f.placeId)
-    return { title: 'Work done', body: line(f), tag: `slot-${f.placeId}-${f.slot}`, url: place ? `/${place.page}/${place.id}` : '/' }
+    return { title: title('Work done'), body: line(f), tag: tag(`slot-${f.placeId}-${f.slot}`), url: link(place ? `/${place.page}/${place.id}` : '/') }
   }
   const shown = finishes.slice(-4).map(line)
-  return { title: `${finishes.length} jobs done`, body: [...shown, ...(finishes.length > 4 ? [`and ${finishes.length - 4} more`] : [])].join('\n'), tag: 'work', url: '/' }
+  return { title: title(`${finishes.length} jobs done`), body: [...shown, ...(finishes.length > 4 ? [`and ${finishes.length - 4} more`] : [])].join('\n'),
+    tag: tag('work'), url: link('/') }
+}
+
+/** One notice per tier world with news in (from, to], lowest tier first, each titled with its tier when there are several. */
+export function tierNotices(save: Save, from: number, to: number): Notice[] {
+  const tiers = savedTiers(save)
+  return tiers.flatMap((tier) => finishNotice(finishesBetween(save, from, to, tierKey(tier)), tier, tiers.length > 1) ?? [])
 }

@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { ARMOR_SLOTS } from '../economy/ranks'
 import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass } from '../rpg/rules'
 import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION, slotKind } from './save'
-import { addShards, isPartyFull, partyOf, renameParty, SaveRuleError, setPartySlot, TIER_ONE, unlockUma, worldOf } from './rules'
+import { addShards, isPartyFull, ownerTier, partyOf, renameParty, savedTiers, SaveRuleError, setPartySlot, TIER_ONE, tierKey, unlockUma, worldOf } from './rules'
+import { TIER2_LAURELS, TIER2_UMAS, withTierTwo } from './tiers.fixture'
 
 const T0 = '2026-10-10T12:00:00.000Z'
 const T1 = '2026-10-10T13:00:00.000Z'
@@ -138,5 +139,39 @@ describe('save v2 parsing', () => {
     const short = JSON.parse(JSON.stringify(save))
     short.tierWorlds['1'].parties.pop()
     expect(() => parseSave(short)).toThrow(/20 parties/)
+  })
+})
+
+describe('one Uma, one tier world (H35, D159 §3)', () => {
+  const twoTiers = () => withTierTwo(unlocked('100101', '100201'), T1)
+
+  it('lists the saved tiers lowest first, and keys them as strings', () => {
+    expect(savedTiers(newSave('Luis', T0))).toEqual([1])
+    expect(savedTiers(twoTiers())).toEqual([1, 2])
+    expect(tierKey(2)).toBe('2')
+    expect(worldOf(twoTiers(), tierKey(2)).wallet.laurels).toBe(TIER2_LAURELS)
+  })
+
+  it('knows which world each Uma lives in', () => {
+    const save = twoTiers()
+    expect(ownerTier(save, '100101')).toBe(1)
+    expect(ownerTier(save, TIER2_UMAS[0])).toBe(2)
+    expect(ownerTier(save, '999999')).toBeNull()
+  })
+
+  it('refuses to unlock in Tier 1 an outfit Tier 2 owns', () => {
+    const save = twoTiers()
+    expect(() => unlockUma(save, TIER2_UMAS[0], T1)).toThrow(/already in Tier 2/)
+    expect(() => unlockUma(save, '100101', T1)).toThrow(/already unlocked/)
+    expect(Object.keys(worldOf(unlockUma(save, '100301', T1)).umas)).toContain('100301')
+  })
+
+  it('parses a two-tier save, and refuses an outfit owned in two worlds', () => {
+    const save = twoTiers()
+    expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    const twice = JSON.parse(JSON.stringify(save))
+    twice.tierWorlds['2'].umas['100101'] = twice.tierWorlds['1'].umas['100101']
+    expect(() => parseSave(twice)).toThrow(SaveParseError)
+    expect(() => parseSave(twice)).toThrow(/lives in one tier world/)
   })
 })

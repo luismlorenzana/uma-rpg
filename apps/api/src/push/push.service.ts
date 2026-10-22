@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { finishesBetween, finishNotice, readySlots } from '@rpg/domain'
+import { readyEverywhere, tierNotices } from '@rpg/domain'
 import { SAVE_REPOSITORY, type SaveRepository } from '../save/save.repository'
 import { PUSH_REPOSITORY, type PushRepository, type Subscription } from './push.repository'
 import { PushSender } from './push.sender'
@@ -41,18 +41,22 @@ export class PushService {
     return kept.length
   }
 
-  /** Cloud Scheduler's tick: announce what finished since each account's last check. */
+  /** Cloud Scheduler's tick: announce what finished since each account's last check, one notification per tier world with
+   * news (H35), each with the badge of every world's ready slots. `sent` counts notifications. */
   async tick(now = Date.now()): Promise<{ accounts: number; sent: number }> {
     let sent = 0
     const records = await this.records.all()
     for (const record of records) {
       const { save } = await this.saves.load(record.uid)
       const from = Math.max(record.checkedAt, now - LOOKBACK_MS)
-      const notice = save ? finishNotice(finishesBetween(save, from, now)) : null
+      const notices = save ? tierNotices(save, from, now) : []
       let subscriptions = record.subscriptions
-      if (notice && save) {
-        subscriptions = await this.deliver(record.uid, subscriptions, { ...notice, badge: readySlots(save, new Date(now).toISOString()) })
-        sent++
+      if (notices.length > 0 && save) {
+        const badge = readyEverywhere(save, new Date(now).toISOString())
+        for (const notice of notices) {
+          subscriptions = await this.deliver(record.uid, subscriptions, { ...notice, badge })
+          sent++
+        }
       }
       await this.records.put({ ...record, subscriptions, checkedAt: now })
     }

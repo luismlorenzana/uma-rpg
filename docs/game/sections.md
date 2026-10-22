@@ -10,7 +10,8 @@ The gates, in order: uma-kit's `BootGates` (uma-platform P56, SD3) with this gam
 2. "Sign in with Google" (Firebase, through `uma-kit/auth`); after a failed redirect it says "Sign-in didn't finish".
 3. The boot: the device save, else the server's. If it fails, a retry.
 4. On first launch: pick a trainer name, then 20 Uma Tickets.
-5. The start page: the last Hub page viewed on this device, when the app opened at `/`.
+5. The start page: the last Hub page viewed on this device, when the app opened at `/`. The boot also picks the tier
+   on screen ([Tiers](#tiers)).
 
 The kit's toast offers "Update ready · Restart" when a new build is out.
 
@@ -182,7 +183,8 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
 
     The six core stats show their total, then in brackets what gear adds (blue) and what active Extra Stats add
     (green) (D99). Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
-  - A locked outfit shows **Unlock · 1 Ticket**.
+  - A locked outfit shows **Unlock · 1 Ticket**. An outfit another tier's world owns shows "In Tier n" instead, and in a
+    tier above 1 an outfit nobody owns shows "Unlocked in Tier 1" (D5).
 - **Skills page:**
   - Pick the **active class** and the **weapons in its five slots**, each shown as Training or its grade. A slot's sheet
     (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon the slot takes; Spell Blade,
@@ -212,7 +214,9 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
   - **Resume the open fight**, when there is one.
 - **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.
   The maps climb from low levels at the bottom, opening at the frontier. Biome icons also appear in the lists.
-- **World:** five islands for the Tier 1 continents with stages cleared; higher tiers locked.
+- **World:** five islands for the active tier's continents with stages cleared, under "Tier n · five continents" (in
+  words: "four" for a partial tier). Levels read in their tier: "Lv 1–10" in Tier 1, "T2 Lv 1–10" in Tier 2. The tiers
+  above with no world yet are locked.
 - **Continent:**
   - ten rows of four regions under two headings, the continent's first five levels and its last five (D97);
   - **Spring** buttons between rows, ready or dry;
@@ -261,33 +265,54 @@ The kit's `ShelfView` (SD3) with this game's shelves:
 
 Reached from the account bar. The kit's `AccountPage` (SD3) with this game's content:
 - Rename your trainer.
-- **Tier 1 wallet:** Uma Tickets, Uma Shards and Laurels.
+- **Tier n wallet**, the active tier's: Uma Tickets, Uma Shards and Laurels in Tier 1; Laurels, Speed Tickets and Sweep
+  Tickets in a tier above 1.
 - **Appearance:** System, Light or Dark, kept on this device (D147).
 - Notifications.
-- **Info rows:** cloud save, game data version, app build.
+- **Info rows:** the tier world on screen, trainer since, Umas unlocked in every world, cloud save, game data version,
+  app build.
 - Sign out.
 
 ### Tier Finale
 
 A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't built.
 
+## Tiers
+
+Each tier is its own world, with its own Stable, parties, world map, Wilds, Warehouse, wallet and halls ([tiers](../design/tiers.md),
+D159). The account, its achievements and each Uma's tier history are shared.
+- **One world on screen at a time:** the active tier (`save/game.ts`, H35). Every screen reads its world and every
+  action writes to it. Today only Tier 1 exists, until the Rift promotes Umas.
+- **Where the app opens:** a `?tier=n` link's tier, else the tier last viewed on this device (`rpg.tier`), else the
+  highest tier whose world has an Uma, else Tier 1. Only a tier the save has a world for.
+- **Switching** remounts the whole app on the new world, as a different app instance would: the bars, every place and
+  the Hub's map start fresh. Nothing from one tier's screens survives into another's.
+- **Links:** routes are the same in every tier. A link from outside carries `?tier=n` (a push notification's always
+  does); the app switches to that tier when it has a world, then drops the param.
+- **One Uma, one world:** an Uma lives in one tier world, and the save refuses an outfit two worlds own. A tier's lists
+  and pickers show only its own Umas. Tier 1 also lists the outfits nobody owns, to unlock (D5); unlocking refuses an
+  outfit another world owns.
+- **Uma Tickets are Tier 1's** (D5): in a tier above 1 the top bar, the Stable's counter and its quick look show none.
+- **The featured Uma** on Town Hall's plaza is remembered per tier.
+
 ## Global UI
 
 - **Account bar** (top, `hub/Bars.tsx`):
-  - your initial with the Tier 1 crest, which opens the Account;
-  - three chips: **Laurels**, **Speed Tickets**, and **Uma Tickets** with the Uma Shards toward the next (`N · s/5`).
-    Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
+  - your initial with the active tier's crest, which opens the Account;
+  - the active world's chips: **Laurels**, **Speed Tickets**, and in Tier 1 **Uma Tickets** with the Uma Shards toward
+    the next (`N · s/5`). Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
   - Offline or Sync paused, when it applies.
 - **Bottom bar:** Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked to the bottom edge
   (D149). Battle is a gold disc rising out of the bar. The active tab has a gold marker on the bar's top edge and a
-  filled icon. The Wilds tab counts the jobs ready to collect.
+  filled icon. The Wilds tab counts the active world's jobs ready to collect.
 - **Menu sheet** (`?sheet=menu`): every place by page, with a lock on locked ones, and the Account.
 - **Side panel:** a quick look slides in from the right. It closes with ✕, a swipe right, a backdrop tap, Escape or back.
 - **Place pages:** they fill the space between the bars, and Back returns to where you opened them from. Bottom sheets
   are used for everything else (uma-kit's `Sheet`).
 - **Appearance:** light or dark follows the phone unless the Account sets one. Fights stay dark either way.
 - **Push notifications** (`apps/web/src/push/`, server `apps/api/src/push/`):
-  - A server tick every five minutes sends "Work done" or "N jobs done".
-  - Tapping one opens the place.
-  - The app badge counts ready slots.
+  - A server tick every five minutes sends "Work done" or "N jobs done": one notification per tier world with news,
+    titled with its tier ("Tier 2 · Work done") when the save has several worlds.
+  - Tapping one opens the place on its tier (`?tier=n`).
+  - The app badge counts ready slots in every tier.
   - They need the Home Screen app on iOS.

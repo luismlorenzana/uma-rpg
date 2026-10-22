@@ -15,7 +15,7 @@ import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { albumRows, lockedReason } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
-import { buyItem, buyTicket, readManual, useWorld } from '../../save/game'
+import { buyItem, buyTicket, readManual, useAlbumScope, useWorld } from '../../save/game'
 import { RankRow } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
@@ -91,6 +91,7 @@ function Exchange({ view }: { view: MasterView }) {
 
 /** Reads Manuals: pick an Uma, one of her bars, how many (D102). */
 function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterView; onClose: () => void }) {
+  const scope = useAlbumScope()
   const [outfitId, setOutfitId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const uma = outfitId ? world.umas[outfitId] : null
@@ -109,7 +110,7 @@ function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterV
       </li>
     )
   }
-  if (!uma) return <PickerStep title="Read a Manual" rows={albumRows(view, world)} disabled={lockedReason}
+  if (!uma) return <PickerStep title="Read a Manual" rows={albumRows(view, world, [], undefined, scope)} disabled={lockedReason}
     describe={row => `${formatLevel(row.level)} · ${row.base.title ?? ''}`} onPick={setOutfitId} onClose={onClose} />
   return (
     <BottomSheet title="Which bar?" onClose={onClose}>

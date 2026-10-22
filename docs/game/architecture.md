@@ -57,6 +57,10 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   - `/:page` is the Hub. `?peek=:id` adds a quick look, `?sheet=menu` the menu and `?sheet=featured` the featured
     Uma's sheet.
   - `/:page/:placeId/*` is a place's full page.
+  - Every route renders inside `hub/TierShell.tsx`, which keys the shell by the active tier (H35).
+  - `?tier=n` on any route (a push notification's link) opens that tier when the save has its world, then the shell
+    drops the param with a replace, keeping the entry's state. An invalid tier or one without a world is ignored. Routes
+    are the same in every tier.
 - **Loading:** the place screens are lazy chunks (`places/registry.tsx`). Phaser and Firebase load only when needed.
 - **Store** (`save/game.ts`):
   - One Zustand store holds the save.
@@ -67,6 +71,18 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     retries up to 3 times. When both sides changed, the save with the newer `account.updatedAt` wins whole.
   - **Boot:** use the device copy at once and sync behind it; with no device copy, fetch the server's or start first
     launch.
+  - **The active tier** (H35, `save/tier.ts`): `activeTier` picks the tier world every screen reads (`useWorld()`) and
+    every action writes. It's remembered on the device as `rpg.tier`, written on every change, boot included.
+    - The boot opens on the `?tier=` the app was opened with, else the remembered tier, else the highest tier whose
+      world has an Uma, else Tier 1, always one the save has a world for. A first launch is Tier 1.
+    - `setActiveTier(tier)` switches and remembers; it returns false and changes nothing for a tier with no world. It
+      never navigates. `useActiveTier()` reads it.
+    - An action takes the tier on screen when it's called, so a switch while its rules load never moves its write.
+    - A sync that adopts a save without the active tier's world falls back to the start rule.
+    - Switching tiers remounts the whole shell (`<Shell key={activeTier} />`): the bars, every place, the Hub's Phaser
+      scene and every component cache. Module caches keyed by world carry the tier, such as `battle/campaign.tsx`'s
+      campaigns.
+    - The album lists the active world's Umas, and in Tier 1 also the outfits no world owns (`useAlbumScope()`).
 - **PWA** (`vite.config.ts`, vite-plugin-pwa):
   - Updates are prompted ("Update ready · Restart"), never forced mid-action.
   - The service worker precaches the app, Phaser included, and keeps its existing URL caches for master data and enemy
@@ -114,8 +130,11 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | `GET /api/master/*` | auth | Master data release files, manifests and channels, from the bucket |
 | `GET /api/content/*` | auth | `enemies.json` and its allowlisted, hash-named `enemies/*.webp` images |
 | `GET /api/push/key` · `PUT`/`DELETE /api/push/subscription` · `POST /api/push/test` | auth | Web Push |
-| `POST /api/push/tick` | Cloud Scheduler OIDC (`@Public()` to the shared guard) | Sends "work done" pushes since the last tick |
+| `POST /api/push/tick` | Cloud Scheduler OIDC (`@Public()` to the shared guard) | Sends "work done" pushes since the last tick, one per tier world with news (H35) |
 
+- **Push tick** (`push/push.service.ts`): it reads every tier world of each save (`tierNotices`). Each world with news
+  sends one notification, linking with `?tier=n` and titled with its tier when the save has several worlds. Each carries
+  the badge of every world's ready slots (`readyEverywhere`), and `sent` counts notifications.
 - **Auth** (SD3): the shared guard from `@luismlorenzana/uma-server/auth` (uma-platform P54) guards every route.
   Firebase Admin verifies the token (401 without one or with a bad one), and the email must equal `ALLOWED_EMAIL`, a
   one-player allowlist (403 for anyone else). `AUTH_MODE=disabled` (local) acts as `local-dev`.

@@ -9,7 +9,7 @@ import { ITEMS } from '../items/catalog'
 import { regionChapter, worldContinent } from '../world/world'
 import { chooseClass, openFightOf, startFight, worldRun, type BattleOutfit } from './battle'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, parseSaveAsync, SAVE_SCHEMA_VERSION, SaveParseError, type Save } from './save'
+import { newSave, newTierWorld, parseSave, parseSaveAsync, SAVE_SCHEMA_VERSION, SaveParseError, type Save } from './save'
 import { queueJob, startJob, type WorkOutfit } from './work'
 import { riftSave } from './rift.fixture'
 
@@ -132,7 +132,9 @@ describe('asynchronous strict save parsing (H16)', () => {
     const invalids = [rawOf(frozen()), rawOf(frozen()), rawOf(frozen())]
     openFightOf(worldOf(invalids[0]!))!.battle!.input.allies.pop()
     openFightOf(worldOf(invalids[1]!))!.battle!.actions = [{ kind: 'attack', actorId: 'not-owned', targetId: 'foe1' }]
+    // Tier 2 holds the fight and Tier 1 is empty, so its Umas live in one world and the bad seed stays the only fault (H35).
     invalids[2]!.tierWorlds['2'] = rawOf(frozen()).tierWorlds['1']!
+    invalids[2]!.tierWorlds['1'] = newTierWorld(NOW, 0)
     invalids[2]!.tierWorlds['2']!.world.run.battle!.input.seed = -1
     for (const s of invalids) {
       expect(() => parseSave(s)).toThrow(SaveParseError)

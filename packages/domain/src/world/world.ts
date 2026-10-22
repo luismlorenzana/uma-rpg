@@ -4,7 +4,7 @@
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
-import { rpgChapterReach, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
+import { rpgChapterReach, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { RPG_FOE_TUNING, rpgFoe, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
 import { BIOMES, biomeById, signatureWeaknesses, type Biome, type BiomeDef, type Formation } from './biomes'
@@ -173,7 +173,10 @@ export function regionChapter(region: WorldRegion, roster: EnemyRoster, tier = 1
       element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies: enemies!,
       ...(waves.length ? { waves } : {}), exits: ids[i + 1] ? [ids[i + 1]!] : [] })
   })
-  return { id: region.id, order: 0, tier, title: `${region.name} · Lv ${region.level}–${region.levelTop}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
+  // Lifetime levels read in their tier: "Lv 1–5" in Tier 1, "T2 Lv 1–5" in Tier 2 (H35).
+  const from = rpgTierLevel(region.level), to = rpgTierLevel(region.levelTop)
+  const levels = `${from.tier === 1 ? '' : `T${from.tier} `}Lv ${from.level}–${to.level}`
+  return { id: region.id, order: 0, tier, title: `${region.name} · ${levels}`, levelStart: region.level, rows: WORLD_STAGES + 1, nodes }
 }
 
 /** An elite's assistants (D135): two Key enemies at a guard's share, beside the sub-boss. */

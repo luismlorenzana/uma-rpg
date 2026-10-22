@@ -1,14 +1,14 @@
-// The Scenario Gate opens the world map (D66, D97): five continents, one per scenario of the tier, each ten levels of
+// The Scenario Gate opens the active tier's world map (D66, D97, H35): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
-import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
-import { formatLevels } from '../../battle/labels'
+import { formatLevel, formatLevels } from '../../battle/labels'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
-import { beginFight, drinkAtSpring, useWorld } from '../../save/game'
+import { beginFight, drinkAtSpring, useGame, useWorld } from '../../save/game'
 import { LockIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import type { PageProps } from '../registry'
@@ -45,6 +45,10 @@ export default function ScenarioGatePage({ place, rest }: PageProps) {
   )
 }
 
+/** A count of continents in words: "five", or "four" for a partial tier (T9). */
+const COUNT_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+const continentCount = (n: number) => `${COUNT_WORDS[n] ?? n} continent${n === 1 ? '' : 's'}`
+
 /** Stages won per region id, from the world's run. */
 function clearedByRegion(wins: Record<string, number>): Map<string, number> {
   const out = new Map<string, number>()
@@ -69,13 +73,15 @@ function ResumeFight({ place }: { place: PageProps['place'] }) {
 
 function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
   const world = useWorld()
+  const worlds = useGame((s) => s.save?.tierWorlds)
   const nav = useHubNavigation()
   const [view, setView] = useMapView()
   const wins = world ? worldRun(world).wins : undefined
   const layout = useMemo(() => worldLayout(campaign.continents, { wins: wins ?? {} }), [campaign.continents, wins])
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
-  const later = [...new Set(campaign.view.chapters.filter((c) => c.tier > 1).map((c) => c.tier))]
+  // Locks: the tiers above this one that have no world yet (one opens with its first promotion).
+  const later = [...new Set(campaign.view.chapters.filter((c) => c.tier > campaign.tier).map((c) => c.tier))].filter((t) => !worlds?.[tierKey(t)])
   return (
     <div>
       <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
@@ -86,17 +92,17 @@ function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['p
       </div>
       {view === 'map' ? <MapCanvas layout={layout} focusKey="world" focusId={campaign.continents[0]?.id}
         onSpot={(spot) => nav.sub(place, `c/${spot.id}`)} describe={(spot) => {
-          const c = campaign.continents.find((c) => c.id === spot.id)!, info = campaign.view.chapters.find((ch) => ch.tier === 1 && ch.order === c.order)
+          const c = campaign.continents.find((c) => c.id === spot.id)!, info = campaign.view.chapters.find((ch) => ch.tier === campaign.tier && ch.order === c.order)
           const won = c.regions.reduce((n, r) => n + clearedIn(r.id, { wins: wins! }), 0)
-          return { label: `${c.name}, Lv ${c.levelStart}–${c.levelStart + 9}, ${won} of 480 cleared`, content: <span className="absolute inset-x-0 bottom-0 flex items-center gap-1 rounded-sm bg-page/90 p-1 text-left">
+          return { label: `${c.name}, ${formatLevels(c.levelStart, c.levelStart + 9)}, ${won} of 480 cleared`, content: <span className="absolute inset-x-0 bottom-0 flex items-center gap-1 rounded-sm bg-page/90 p-1 text-left">
             {info && campaign.view.art && <AtlasSprite art={campaign.view.art} family="scenario-icons" frameKey={String(info.scenarioId)} size={24} />}
-            <span className="min-w-0"><span className="block text-[10px] font-bold">{c.name}</span><span className="block text-[10px] text-ink-soft">Lv {c.levelStart}–{c.levelStart + 9} · {won}/480</span></span>
+            <span className="min-w-0"><span className="block text-[10px] font-bold">{c.name}</span><span className="block text-[10px] text-ink-soft">{formatLevels(c.levelStart, c.levelStart + 9)} · {won}/480</span></span>
           </span> }
         }} /> : <section className="p-3">
-        <h3 className="text-micro mb-2">Tier 1 · five continents</h3>
+        <h3 className="text-micro mb-2">Tier {campaign.tier} · {continentCount(campaign.continents.length)}</h3>
         <ul className="space-y-2">
           {campaign.continents.map((c) => {
-            const info = campaign.view.chapters.find((x) => x.tier === 1 && x.order === c.order)
+            const info = campaign.view.chapters.find((x) => x.tier === campaign.tier && x.order === c.order)
             const won = c.regions.reduce((n, r) => n + (cleared.get(r.id) ?? 0), 0)
             return (
               <li key={c.id}>
@@ -104,7 +110,7 @@ function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['p
                   {info && <AtlasSprite art={campaign.view.art} family="scenario-icons" frameKey={String(info.scenarioId)} size={44} label={`${c.name} crest`} />}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-display font-bold">{c.name}</p>
-                    <p className="text-[12px] text-ink-soft">Lv {c.levelStart}–{c.levelStart + 9} · {won}/{c.regions.length * 12} stages cleared</p>
+                    <p className="text-[12px] text-ink-soft">{formatLevels(c.levelStart, c.levelStart + 9)} · {won}/{c.regions.length * 12} stages cleared</p>
                   </div>
                 </button>
               </li>
@@ -141,7 +147,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
       <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="truncate font-display text-lg font-bold">{continent.name}</h2>
-          <span className="shrink-0 text-[12px] text-ink-soft">Lv {continent.levelStart}–{continent.levelStart + 9}</span>
+          <span className="shrink-0 text-[12px] text-ink-soft">{formatLevels(continent.levelStart, continent.levelStart + 9)}</span>
         </div>
         <MapViewSwitch view={view} onChange={setView} />
         <ActivePartyBar campaign={campaign} />
@@ -154,7 +160,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           else if (spot.kind === 'capital') nav.sub(place, `capital/${continent.id}`)
           else void drinkAtSpring(spot.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))
         }} describe={(spot) => {
-          if (spot.kind === 'capital') return { label: `${continent.name}, Capital, Lv ${continent.levelStart + 9}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">Capital · {wonFinals}/6</span> }
+          if (spot.kind === 'capital') return { label: `${continent.name}, Capital, ${formatLevel(continent.levelStart + 9)}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">Capital · {wonFinals}/6</span> }
           if (spot.kind === 'spring') {
             const ready = springReadyAt(world, spot.id, now)
             return { label: ready ? `Spring, recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'Spring, refill party MP', disabled: !!ready || !!openFightOf(world) }
@@ -202,7 +208,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
         })}
         <button type="button" onClick={() => nav.sub(place, `capital/${continent.id}`)}
           className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md border border-accent/50 bg-raised p-3 text-left">
-          <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · Lv {continent.levelStart + 9}</span></span>
+          <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · {formatLevel(continent.levelStart + 9)}</span></span>
           <span className="text-[12px] text-ink-soft">{wonFinals}/6</span>
         </button>
       </div>}

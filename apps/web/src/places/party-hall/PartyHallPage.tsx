@@ -10,7 +10,7 @@ import { partyOf, isInFight } from '@rpg/domain'
 import { albumRows, lockedReason } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
-import { nameParty, recall, setSlot, useWorld } from '../../save/game'
+import { nameParty, recall, setSlot, useAlbumScope, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
@@ -71,6 +71,7 @@ function PartyList({ view, world, place }: { view: MasterView; world: TierWorld;
 }
 
 function PartyEditor({ view, world, index, place }: { view: MasterView; world: TierWorld; index: number; place: Place }) {
+  const scope = useAlbumScope()
   const navigate = useNavigate()
   const nav = useHubNavigation()
   const party = world.parties[index] as Party
@@ -124,7 +125,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
       {error && <p className="text-[13px] text-danger">{error}</p>}
 
       {picking !== null && (
-        <PickerStep title="Choose an Uma" rows={albumRows(view, world)}
+        <PickerStep title="Choose an Uma" rows={albumRows(view, world, [], undefined, scope)}
           disabled={row => lockedReason(row)
             ?? (partyOf(world, row.id)?.party === index ? 'In this party' : null)
             ?? (isInFight(world, row.id) || party.slots.some(id => id !== null && isInFight(world, id)) ? 'In a fight' : null)}

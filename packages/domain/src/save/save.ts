@@ -872,6 +872,18 @@ function parseHistory(value: unknown, path: string): Record<string, TierHistoryE
   return out
 }
 
+/** An Uma lives in one tier world (D159 §3, H35): no outfit is owned by two. */
+function checkOneWorld(worlds: Record<string, TierWorld>, path: string): void {
+  const home = new Map<string, string>()
+  for (const key of Object.keys(worlds).sort((a, b) => Number(a) - Number(b))) {
+    for (const id of Object.keys(worlds[key]!.umas)) {
+      const first = home.get(id)
+      if (first !== undefined) throw new SaveParseError(`${path}.${key}.umas.${id}`, `she lives in one tier world, and Tier ${first} already owns her`)
+      home.set(id, key)
+    }
+  }
+}
+
 /** The account's references into the worlds: each achievement's run exists, and each promotion names an ascended run of
  * the tier below with her on its roster, her last one reaching the world she lives in. */
 function checkAccountRefs(account: Account, worlds: Record<string, TierWorld>, path: string): void {
@@ -943,6 +955,7 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
     tierWorlds[key] = parseTierWorld(world, at, version, Number(key), check, migrate)
   }
   if (!tierWorlds['1']) throw new SaveParseError(`${path}.tierWorlds`, 'tier 1 is required')
+  checkOneWorld(tierWorlds, `${path}.tierWorlds`)
   checkAccountRefs(account, tierWorlds, `${path}.account`)
   return { schemaVersion: SAVE_SCHEMA_VERSION, account, tierWorlds }
 }

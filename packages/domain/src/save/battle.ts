@@ -202,9 +202,9 @@ export interface SheetRow { label: string; value: string; gear?: number; extra?:
 export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
 const permille = (n: number) => `${Math.round(n) / 10}%`
-/** Every battle stat she has with her active class, each always listed, 0 included (combat-balance.md §6.0). */
-export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma)): SheetGroup[] {
-  const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
+/** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0). */
+export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma), tier = 1): SheetGroup[] {
+  const base = projectRpgStats(umaProfile(outfit, uma, tier, classId))
   const parts = umaPointParts(uma, classId)
   const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
   const geared = applyPoints(base, parts.gear).stats

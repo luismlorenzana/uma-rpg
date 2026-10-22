@@ -47,9 +47,10 @@ function FirstLaunch({ onDone }: { onDone: () => void }) {
   )
 }
 
-/** The game's boot for the gates: opens the device save (or the server's) and says whether a first launch is due. */
+/** The game's boot for the gates: opens the device save (or the server's) on the asked tier (a `?tier=` link, H35), and
+ * says whether a first launch is due. */
 async function bootFor({ uid }: { uid: string }): Promise<{ firstLaunch: boolean }> {
-  await boot(uid)
+  await boot(uid, new URLSearchParams(window.location.search).get('tier'))
   return { firstLaunch: useGame.getState().status === 'first-launch' }
 }
 

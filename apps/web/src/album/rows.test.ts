@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { byLevel, workOrder } from '@luismlorenzana/uma-kit/roster'
-import { availabilityBlock, availableWorkers, startJob, worldOf } from '@rpg/domain'
+import { availabilityBlock, availableWorkers, newOwnedUma, newTierWorld, startJob, worldOf } from '@rpg/domain'
 import { activePartyRows } from './party-rows'
-import { albumRows, stableResult, STABLE_SCHEMA, STABLE_SORTS } from './rows'
+import { albumRows, stableResult, STABLE_SCHEMA, STABLE_SORTS, TIER_ONE_SCOPE } from './rows'
 import { albumFixture, NOW } from './testing'
 
 describe('SB4 RPG album adapters', () => {
@@ -54,5 +54,29 @@ describe('SB4 RPG album adapters', () => {
       ['81003', 0, 2], ['81002', 1, 1], ['missing', 2, 1],
     ])
     expect(world.parties[0]!.slots).toEqual(['81001', '81003', null, null, null])
+  })
+})
+
+describe('one Uma, one tier world in the album (H35)', () => {
+  it('keeps today’s rows by default: every owned Uma, then the catalogue to unlock', async () => {
+    const { view, world } = await albumFixture()
+    const rows = albumRows(view, world, [], NOW)
+    expect(rows.map(row => row.id)).toEqual(['81001', '81002', '81003', '81004', '81005', '81006'])
+    expect(albumRows(view, world, [], NOW, TIER_ONE_SCOPE)).toEqual(rows)
+    expect(albumRows(view, world, [], NOW, { tier: 1, elsewhere: new Set() })).toEqual(rows)
+  })
+
+  it('drops from Tier 1 an outfit another tier’s world owns', async () => {
+    const { view, world } = await albumFixture()
+    const rows = albumRows(view, world, [], NOW, { tier: 1, elsewhere: new Set(['81006']) })
+    expect(rows.map(row => row.id)).toEqual(['81001', '81002', '81003', '81004', '81005'])
+  })
+
+  it('lists only Tier 2’s own Umas in Tier 2, with no catalogue to unlock', async () => {
+    const { view, world } = await albumFixture()
+    const tier2 = { ...newTierWorld(NOW, 0), umas: { '81006': newOwnedUma(NOW) } }
+    const rows = albumRows(view, tier2, [], NOW, { tier: 2, elsewhere: new Set(Object.keys(world.umas)) })
+    expect(rows.map(row => [row.id, row.uma !== null])).toEqual([['81006', true]])
+    expect(albumRows(view, newTierWorld(NOW, 0), [], NOW, { tier: 2, elsewhere: new Set() })).toEqual([])
   })
 })

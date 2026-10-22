@@ -11,13 +11,14 @@ import {
 import { useState } from 'react'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem, StatusGlyph } from '../../battle/pixel-icons'
-import { equip, learn, pickClass, unlearn, useWorld } from '../../save/game'
+import { equip, learn, pickClass, unlearn, useActiveTier, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { RankRow } from '../../ui/RankBars'
 import { WeaponSheet } from './WeaponSheet'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
   const world = useWorld()
+  const tier = useActiveTier()
   const uma = world?.umas[outfit.outfitId]
   const [treeIndex, setTreeIndex] = useState(0)
   const [slotPick, setSlotPick] = useState<number | null>(null)
@@ -25,11 +26,11 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   if (!uma) return <p className="p-4 text-ink-soft">Unlock her first.</p>
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
-  const profile = umaProfile(outfit, uma, 1, classId)
+  const profile = umaProfile(outfit, uma, tier, classId)
   const weapons = setup.weapons
   const treeWeapons = [...weapons, ...rpgClassWeapons(classId).filter((w) => !weapons.includes(w))]
   const weapon = treeWeapons[Math.min(treeIndex, treeWeapons.length - 1)]!
-  const equipped = umaLoadout(outfit, uma, 1, classId).map((r) => r.id)
+  const equipped = umaLoadout(outfit, uma, tier, classId).map((r) => r.id)
   const auto = setup.loadout === null
   const rank = classRankOf(uma.ranks, classId)
   const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(profile.tree)

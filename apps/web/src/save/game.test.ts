@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto'
-import { newSave, SAVE_SCHEMA_VERSION, type Save, type SaveEnvelope } from '@rpg/domain'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { newOwnedUma, newSave, newTierWorld, SAVE_SCHEMA_VERSION, unlockUma, type Save, type SaveEnvelope } from '@rpg/domain'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // An in-memory server with the API's revision rules.
 const server: { envelope: SaveEnvelope; puts: number } = { envelope: { revision: 0, save: null }, puts: 0 }
@@ -21,7 +22,7 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, buyTicket, createAccount, nameParty, pickClass, renameAccount, resetGame, setSlot, syncNow, unlock, useGame } = await import('./game')
+const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
 const { db } = await import('./db')
 
 /** An invented outfit whose best running style is `best`. */
@@ -131,5 +132,79 @@ describe('game store', () => {
     const save = useGame.getState().save
     expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
+  })
+})
+
+describe('the active tier (H35)', () => {
+  const NOW = '2026-10-21T12:00:00.000Z'
+  /** Tier 1 with Uma 101, and a synthetic Tier 2 world (no promotion exists yet) with 201 and 202 and 5,000 Laurels. */
+  const twoTiers = (): Save => {
+    const save = unlockUma(newSave('Luis', NOW), '101', NOW)
+    const world = newTierWorld(NOW, 0)
+    return { ...save, tierWorlds: { ...save.tierWorlds,
+      '2': { ...world, wallet: { ...world.wallet, laurels: 5000 }, umas: { '201': newOwnedUma(NOW), '202': newOwnedUma(NOW) } } } }
+  }
+  const tier = (key: string) => useGame.getState().save!.tierWorlds[key]!
+
+  beforeEach(() => {
+    const rows = new Map<string, string>()
+    vi.stubGlobal('localStorage', { getItem: (key: string) => rows.get(key) ?? null, setItem: (key: string, value: string) => rows.set(key, value) })
+    server.envelope = { revision: 1, save: twoTiers() }
+  })
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('opens the highest tier with Umas when nothing is remembered, and an asked tier first, remembering it', async () => {
+    await boot('u1')
+    expect(useGame.getState().activeTier).toBe(2)
+    expect(localStorage.getItem('rpg.tier')).toBe('2')
+    resetGame()
+    await boot('u1', '1')
+    expect(useGame.getState().activeTier).toBe(1)
+    expect(localStorage.getItem('rpg.tier')).toBe('1')
+    resetGame()
+    await boot('u1')
+    expect(useGame.getState().activeTier).toBe(1)
+  })
+
+  it('switches only to a tier the save has a world for', async () => {
+    await boot('u1', '1')
+    expect(setActiveTier(7)).toBe(false)
+    expect(setActiveTier(1.5)).toBe(false)
+    expect(useGame.getState().activeTier).toBe(1)
+    expect(setActiveTier(2)).toBe(true)
+    expect(localStorage.getItem('rpg.tier')).toBe('2')
+  })
+
+  it('reads and writes only the active world', async () => {
+    await boot('u1', '1')
+    const before = structuredClone(tier('1'))
+    expect(renderHook(() => useWorld()).result.current).toBe(tier('1'))
+    setActiveTier(2)
+    expect(renderHook(() => useWorld()).result.current).toBe(tier('2'))
+    await buyTicket('time', 1)
+    await pickClass('201', 'mage')
+    await markTarget('202', true)
+    expect(tier('2').wallet).toMatchObject({ laurels: 4990, timeTickets: 1 })
+    expect(tier('2').umas['201']!.classId).toBe('mage')
+    expect(tier('2').targets).toEqual(['202'])
+    expect(tier('1')).toEqual(before)
+  })
+
+  it('writes an action to the tier it was called on, even after a switch before its rules load', async () => {
+    await boot('u1', '1')
+    const before = structuredClone(tier('2'))
+    const pending = pickClass('101', 'mage')
+    expect(setActiveTier(2)).toBe(true)
+    await pending
+    expect(tier('1').umas['101']!.classId).toBe('mage')
+    expect(tier('2')).toEqual(before)
+  })
+
+  it('falls back to the start rule when a sync adopts a save without the active world', async () => {
+    await boot('u1')
+    expect(useGame.getState().activeTier).toBe(2)
+    server.envelope = { revision: 2, save: unlockUma(newSave('Luis', NOW), '101', NOW) }
+    await syncNow()
+    expect(useGame.getState()).toMatchObject({ revision: 2, activeTier: 1 })
   })
 })

@@ -12,7 +12,7 @@ import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { albumRows, lockedReason } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
-import { addLearner, appointHero, removeLearner, useWorld } from '../../save/game'
+import { addLearner, appointHero, removeLearner, useAlbumScope, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { MasterGate } from '../MasterGate'
@@ -31,6 +31,7 @@ type Pick = { seat: HeroLimitId; role: 'hero' | 'learner' }
 
 function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
   const world = useWorld()
+  const scope = useAlbumScope()
   const [pick, setPick] = useState<Pick | null>(null)
   const [heroOpen, setHeroOpen] = useState<HeroLimitId | null>(null)
   const [learner, setLearner] = useState<{ seat: HeroLimitId; outfitId: string } | null>(null)
@@ -111,7 +112,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
       })}
 
       {pick && (
-        <PickerStep rows={albumRows(view, world)} title={`${pick.role === 'hero' ? 'Hero' : 'Learner'} for ${heroLimit(pick.seat).name}`}
+        <PickerStep rows={albumRows(view, world, [], undefined, scope)} title={`${pick.role === 'hero' ? 'Hero' : 'Learner'} for ${heroLimit(pick.seat).name}`}
           disabled={row => lockedReason(row)
             ?? (world.heroes[pick.seat]?.hero === row.id ? 'Already seated here' : null)
             ?? (pick.role === 'hero' ? heroBlock(world, pick.seat, row.id) : learnerBlock(world, pick.seat, row.id))}

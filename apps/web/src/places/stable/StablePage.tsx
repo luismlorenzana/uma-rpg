@@ -8,7 +8,7 @@ import { prepareStablePrefs } from '../../album/preferences'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
-import { useWorld } from '../../save/game'
+import { useAlbumScope, useWorld } from '../../save/game'
 import { BackIcon, TargetIcon } from '../../ui/icons'
 import { useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
@@ -38,6 +38,7 @@ function SkillsRoute({ outfit, place }: { outfit: RosterOutfit; place: PageProps
 
 export function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }) {
   const world = useWorld()
+  const scope = useAlbumScope()
   const now = useNow(30_000)
   const nav = useHubNavigation()
   const [schema] = useState(() => {
@@ -45,7 +46,7 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
     return STABLE_SCHEMA
   })
   const prefs = useAlbumPrefs('stable', schema)
-  const rows = useMemo(() => albumRows(view, world, prefs.seen, now), [view, world, prefs.seen, now])
+  const rows = useMemo(() => albumRows(view, world, prefs.seen, now, scope), [view, world, prefs.seen, now, scope])
   const result = stableResult(rows, prefs.query)
   const ownership = prefs.query.filters.ownership
   const tab = Array.isArray(ownership) && ownership.length === 1 && (ownership[0] === 'owned' || ownership[0] === 'locked') ? ownership[0] : 'all'

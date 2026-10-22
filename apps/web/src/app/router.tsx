@@ -1,8 +1,8 @@
 // Every screen is a place on the Hub (D31, D43): /:page (+ ?peek=, ?sheet=) and /:page/:placeId/*, inside the shell's bars
-// (D147). Nothing else is a route.
+// (D147), keyed by the active tier (H35; `?tier=` switches it). Nothing else is a route.
 import { createBrowserRouter, Navigate } from 'react-router'
 import { HubRoute, PlaceRoute } from '../hub/HubScreen'
-import { Shell } from '../hub/Shell'
+import { TierShell } from '../hub/TierShell'
 import { lastPage } from '../hub/start'
 import { Root } from './Root'
 
@@ -16,7 +16,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <RedirectToLastPage /> },
       {
-        element: <Shell />,
+        element: <TierShell />,
         children: [
           { path: ':page', element: <HubRoute /> },
           { path: ':page/:placeId/*', element: <PlaceRoute /> },

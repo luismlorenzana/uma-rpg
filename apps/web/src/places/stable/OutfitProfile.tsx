@@ -2,8 +2,9 @@
 // her Craft Level and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks; first, as it
 // changes most), Battle (her RPG stats), Gear (the standard preset, equipment, Weapon and Armor Ranks, Extra Stats),
 // Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
-// the Unlock flow and her racing profile. The header, the tabs and the unlock confirm are the kit's frame
-// (uma-platform P56, SD3).
+// the Unlock flow and her racing profile; an outfit another tier's world owns says where she lives, and a later tier
+// sends unlocks to Tier 1 (H35, D5). The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56,
+// SD3).
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
@@ -25,7 +26,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { loadSkills, type MasterView } from '../../master/master'
-import { markTarget, unlock, useWorld } from '../../save/game'
+import { markTarget, unlock, useActiveTier, useOwnerTier, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
@@ -75,6 +76,8 @@ function Row({ label, value, note }: { label: string; value: React.ReactNode; no
 export function OutfitProfile({ view, outfitId, place }: { view: MasterView; outfitId: string; place: Place }) {
   const nav = useHubNavigation()
   const world = useWorld()
+  const tier = useActiveTier()
+  const home = useOwnerTier(outfitId)
   const outfit = view.roster.find((o) => o.outfitId === outfitId)
   useEffect(() => seeStableOutfit(view.roster.map(o => o.outfitId), outfitId), [view, outfitId])
   const owned = world?.umas[outfitId] ?? null
@@ -115,6 +118,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
         summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} onClass={() => setTab('skills')} />
+          : home !== null ? <ElsewhereNote text={`In Tier ${home}`} />
+          : tier > 1 ? <ElsewhereNote text="Unlocked in Tier 1" />
           : <UnlockBox outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />}
         tabs={owned && world ? TABS.map((t) => ({ key: t, label: TAB_LABEL[t] })) : undefined}
         tab={owned && world ? shown : undefined}
@@ -184,6 +189,11 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
 }
 
 /** A locked outfit: Unlock for an Uma Ticket, through the kit's confirm (SD3). */
+/** An outfit this world doesn't own: where she lives, or where Umas are unlocked (D5). */
+function ElsewhereNote({ text }: { text: string }) {
+  return <p className="flex min-h-12 items-center justify-center rounded-sm bg-raised text-center font-display text-base font-bold text-ink-soft">{text}</p>
+}
+
 function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number }) {
   const [confirming, setConfirming] = useState(false)
   return (
@@ -207,11 +217,12 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
 // --- Battle: her RPG stats as she fights now ---------------------------------------------------------------------
 
 function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
+  const tier = useActiveTier()
   const classId = activeClass(outfit, uma)
-  const base = projectRpgStats(umaProfile(outfit, uma, 1, classId))
+  const base = projectRpgStats(umaProfile(outfit, uma, tier, classId))
   // Every battle stat, always listed (combat-balance.md §6.0): the domain builds the sheet, so a rule change shows here.
-  const sheet = umaBattleSheet(outfit, uma, classId)
-  const equipped = umaLoadout(outfit, uma, 1, classId)
+  const sheet = umaBattleSheet(outfit, uma, classId, tier)
+  const equipped = umaLoadout(outfit, uma, tier, classId)
   const party = partyOf(world, outfit.outfitId)
   return (
     <div className="space-y-3">
@@ -274,10 +285,11 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
 
 /** The class she fights as and its five weapons, under her level: one tap to the Skills tab. */
 function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
+  const tier = useActiveTier()
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
   const rank = classRankOf(uma.ranks, classId)
-  const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier: 1, id })))
+  const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(setup.tree.map((id) => ({ tier, id })))
   return (
     <button type="button" onClick={onClick} className="mt-1.5 flex min-h-11 w-full items-center gap-1.5 rounded-sm bg-raised px-2 text-left text-[12.5px] font-semibold">
       <ClassEmblem classId={classId} />

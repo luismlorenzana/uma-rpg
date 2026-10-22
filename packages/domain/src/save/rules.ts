@@ -19,6 +19,19 @@ export class SaveRuleError extends Error {
 
 export const TIER_ONE = '1'
 
+/** A tier number as the save's world key: 2 → "2" (H35). The app counts tiers in numbers; the save keys them by string. */
+export const tierKey = (tier: number): string => String(tier)
+
+/** The tiers that have a world in the save, lowest first. Tier 1 always does. */
+export function savedTiers(save: Pick<Save, 'tierWorlds'>): number[] {
+  return Object.keys(save.tierWorlds).map(Number).sort((a, b) => a - b)
+}
+
+/** The tier whose world she lives in, or null when no world owns her. An Uma lives in one tier world (D159 §3). */
+export function ownerTier(save: Pick<Save, 'tierWorlds'>, outfitId: string): number | null {
+  return savedTiers(save).find((tier) => save.tierWorlds[tierKey(tier)]?.umas[outfitId]) ?? null
+}
+
 export function worldOf(save: Save, tier = TIER_ONE): TierWorld {
   const world = save.tierWorlds[tier]
   if (!world) throw new SaveRuleError('no-world', `no Tier ${tier} world`)
@@ -31,11 +44,12 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
 
 /**
  * Spends one Uma Ticket on an outfit; final once committed (D44). `startClass` is her starting class, which picks her
- * armor kinds (D160 §7); without it she starts all-physical.
+ * armor kinds (D160 §7); without it she starts all-physical. An outfit any world owns is refused: she lives in one (§3).
  */
 export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE, startClass?: RpgClass): Save {
   const world = worldOf(save, tier)
-  if (world.umas[outfitId]) throw new SaveRuleError('already-owned', 'already unlocked')
+  const home = ownerTier(save, outfitId)
+  if (home !== null) throw new SaveRuleError('already-owned', home === Number(tier) ? 'already unlocked' : `already in Tier ${home}`)
   if (world.wallet.unlockTickets < 1) throw new SaveRuleError('no-ticket', 'no Uma Tickets left')
   return withWorld(save, tier, {
     ...world,

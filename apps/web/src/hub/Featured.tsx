@@ -1,6 +1,7 @@
 // Town Hall's plaza (D147, D150, uma-racer's plaza on uma-kit's crowd): up to five small chibis standing on the road.
-// The featured Uma (the one chosen on this device, else the highest Uma Level) is in front; the active party's other
-// members stand round her, then the next highest levels. Tapping one opens her sheet: Fight, Profile, or feature another.
+// The featured Uma (the one chosen on this device for the active tier, else the highest Uma Level) is in front; the active
+// party's other members stand round her, then the next highest levels. Tapping one opens her sheet: Fight, Profile, or
+// feature another.
 import { TOWN_PLAZA, type RosterOutfit, type TierWorld } from '@rpg/domain'
 import { CROWD_SPOTS, type Plaza } from '@luismlorenzana/uma-kit/hub'
 import { readPref, Sheet, subscribePrefs, writePref } from '@luismlorenzana/uma-kit/ui'
@@ -10,9 +11,10 @@ import { AlbumGrid, UmaBust, UmaChibi } from '@luismlorenzana/uma-kit/album'
 import { byLevel as levelOrder } from '@luismlorenzana/uma-kit/roster'
 import { albumRows } from '../album/rows'
 import { useMaster } from '../master/master'
-import { useWorld } from '../save/game'
+import { useActiveTier, useAlbumScope, useWorld } from '../save/game'
 
-const KEY = 'rpg.featured'
+/** Each tier remembers its own featured Uma (H35): Tier 1 keeps the first key. */
+export const featuredKey = (tier: number): string => (tier === 1 ? 'rpg.featured' : `rpg.featured.t${tier}`)
 /** How tall a plaza chibi stands, in CSS px. */
 const FIGURE = 44
 
@@ -56,7 +58,8 @@ export function withoutSheet(where: Where): string {
 }
 
 function useChosen(): string | null {
-  return useSyncExternalStore(subscribePrefs, () => readPref(KEY), () => null)
+  const key = featuredKey(useActiveTier())
+  return useSyncExternalStore(subscribePrefs, () => readPref(key), () => null)
 }
 
 export function useCrowd(): RosterOutfit[] {
@@ -87,12 +90,14 @@ export function FeaturedSheet({ open, onClose }: { open: boolean; onClose: () =>
   const world = useWorld()
   const master = useMaster()
   const chosen = useChosen()
+  const key = featuredKey(useActiveTier())
+  const scope = useAlbumScope()
   const [search] = useSearchParams()
   const owned = world && master.status === 'ready' ? byLevel(world, master.view.roster) : []
   const featured = owned.find((o) => o.outfitId === chosen) ?? owned[0] ?? null
   // The Uma tapped on the plaza, else the featured one.
   const shown = owned.find((o) => o.outfitId === search.get('uma')) ?? featured
-  const rows = master.status === 'ready' ? albumRows(master.view, world).filter(row => row.uma).sort(levelOrder) : []
+  const rows = master.status === 'ready' ? albumRows(master.view, world, [], undefined, scope).filter(row => row.uma).sort(levelOrder) : []
   return (
     <Sheet open={open} onClose={onClose} title={shown?.name ?? 'No Umas yet'}>
       {shown !== null && (
@@ -107,7 +112,7 @@ export function FeaturedSheet({ open, onClose }: { open: boolean; onClose: () =>
           </div>
           <section>
             <h3 className="text-micro mb-1.5">Feature another</h3>
-            <AlbumGrid rows={rows} view="icons" selected={row => row.id === featured?.outfitId} onOpen={row => writePref(KEY, row.id)} />
+            <AlbumGrid rows={rows} view="icons" selected={row => row.id === featured?.outfitId} onOpen={row => writePref(key, row.id)} />
           </section>
         </div>
       )}

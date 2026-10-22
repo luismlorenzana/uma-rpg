@@ -12,7 +12,7 @@ import { byLevel, formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { albumRows, lockedReason } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
-import { activate, setStarGem, useWorld } from '../../save/game'
+import { activate, setStarGem, useAlbumScope, useWorld } from '../../save/game'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 
@@ -22,7 +22,7 @@ export default function ObservatoryPage({ rest }: PageProps) {
 
 function Observatory({ view, initial }: { view: MasterView; initial: string | null }) {
   const world = useWorld()
-  const rows = albumRows(view, world)
+  const rows = albumRows(view, world, [], undefined, useAlbumScope())
   const owned = rows.filter(row => row.uma).sort(byLevel)
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<string | null>(initial)

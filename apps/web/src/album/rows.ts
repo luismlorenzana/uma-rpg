@@ -43,17 +43,25 @@ export const STABLE_SCHEMA: AlbumPrefsSchema = {
 }
 export const foldSearch = (text: string): string => text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
 
-export function albumRows(view: MasterView, world: TierWorld | null, seen: readonly string[] = [], now = new Date().toISOString()): RpgUmaRow[] {
+/** Who a tier's album lists (H35): its world's Umas, and in Tier 1 the catalogue no world owns yet (D5). `elsewhere` is
+ * every outfit another tier's world owns. */
+export interface AlbumScope { tier: number; elsewhere: ReadonlySet<string> }
+export const TIER_ONE_SCOPE: AlbumScope = { tier: 1, elsewhere: new Set() }
+
+export function albumRows(view: MasterView, world: TierWorld | null, seen: readonly string[] = [], now = new Date().toISOString(),
+  scope: AlbumScope = TIER_ONE_SCOPE): RpgUmaRow[] {
   const known = new Set(seen)
   const available = world ? availableWorkers(world, now) : new Set<string>()
-  return view.roster.map(outfit => {
+  return view.roster.flatMap(outfit => {
     const base = view.album.get(outfit.outfitId)!
     const uma = world?.umas[base.id] ?? null
+    // An Uma lives in one world: another tier's Uma is in no list here, and only Tier 1 shows the locked catalogue.
+    if (!uma && (scope.tier !== 1 || scope.elsewhere.has(base.id))) return []
     const busy = uma !== null && !available.has(base.id)
     const classId = uma ? activeClass(outfit, uma) : null
     const isNew = !known.has(base.id)
     const top = (grades: Record<string, string>) => Object.keys(grades).filter(k => grades[k] === 'A' || grades[k] === 'S')
-    return {
+    return [{
       id: base.id, name: base.name, releasedAt: base.releasedAt, level: uma?.level ?? null,
       free: uma !== null && !busy, workLevel: uma?.craft.level ?? null,
       search: `${base.name} ${base.title ?? ''} ${foldSearch(`${base.name} ${base.title ?? ''}`)}`.toLowerCase(),
@@ -64,7 +72,7 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
         statTotal: statTotal(outfit), craft: uma?.craft.level ?? null,
         classRank: uma ? Math.max(1, ...Object.values(uma.ranks.classes).map(track => track.rank)) : null },
       outfit, base, uma, classId, isNew, busy,
-    }
+    }]
   })
 }
 
