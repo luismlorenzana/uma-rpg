@@ -46,10 +46,18 @@
 | H48 | Run rules and Ascend: sign-up, roster, fights, seals, Convergence, Echo pay, promotion | Claude | L | H45, H46, H47 | Done (`0ae25e5`) |
 | H50 | The Rift page with its art: fronts, stages, Convergence, Echoes, sign-up, Ascend; FightScreen takes a source | Either | L | H47, H48, H49 | Done (`4fc7d26`) |
 | H51 | The Rift's balance: compositions, the Duel guard rail, the Convergence, Echo pacing | Claude | M–L | H47, H48 | Done (`aa1406d`) |
+| [H52](tasks/H52-rift-finale.md) | The Rift's finale: a last cut-in of every champion of the run (rift.md §6, left out of H50) | Either | S | H50 | In progress (this session) |
 
-**Waves:** 1) H44, H45, H46 (done) → 2) H47, H49 (done) → 3) H48 (done) → 4) H50, H51 (done).
+**Waves:** 1) H44, H45, H46 (done) → 2) H47, H49 (done) → 3) H48 (done) → 4) H50, H51 (done) → 5) H52.
 
-**All twelve are done (2026-10-21).** The five docs' calls wait on the owner (Q12–Q16). Next packets to write: classes v2 and engine v15 (with the Paladin's art), the Tier 1 simplification, and the Rift.
+**The Rift is live (2026-10-22, H44–H51; H52 adds its finale).** H51's measured results are in rift.md §11 (D176).
+Left for later, logged:
+- Iron's wrong party still wins Iron's stages (its champion holds at 7%): recheck when classes v2 lands.
+- The Lv 55 Echo is only hard on the Horde; it pays as Lv 50, so it stays.
+- uma-kit's `PlaceMenu` reads a locked place as "not open yet" to screen readers (no reason field); batch an optional
+  `lockedReason` with the next "Both apps:" kit change rather than a release of its own.
+
+The five docs' calls wait on the owner (Q12–Q16).
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
@@ -61,7 +69,6 @@
 - **Classes v2, engine v15** (C1–C7: Paladin and Cleric, Spell Blade, Summoner, the halls, accessories, balance and
   release), plus a small art packet for the Paladin's class emblem and the Paladin Bastion building.
 - **Tier 1 simplification** (D1).
-- **The Rift:** generator, run rules and Ascend, achievements, page, balance (E1–E5).
 
 **Also:**
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
