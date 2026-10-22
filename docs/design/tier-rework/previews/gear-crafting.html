@@ -112,20 +112,20 @@
 <main>
   <h1>Gear crafting by tier</h1>
   <p class="lead">What the three gear crafting lines make, what each item does and what it takes (<a href="../gear.md">gear.md</a> §8).
-    Inputs are <b>shapes</b>: by gathering line and grade. <a href="../professions.md">professions.md</a> owns the families,
-    buildings and final amounts.</p>
+    Recipes and amounts are <a href="../professions.md">professions.md</a>'s (PR8): one fixed set an item, the low
+    types for grades 1–5 and the high types for 6–10.</p>
   <nav class="tabs">
     <a href="#flow">The flow</a><a href="#t1">Tier 1</a><a href="#t2">Tier 2</a><a href="#t3">Tier 3</a>
-    <a href="#demand">One Uma's demand</a><a href="#symmetry">Symmetry</a><a href="#today">Today</a>
+    <a href="#demand">One Uma's demand</a><a href="#recipes">Recipes</a><a href="#today">Today</a>
   </nav>
 
   <section id="flow">
     <h2>From the Wilds to her slots</h2>
     <div class="card">
       <div class="flow">
-        <div class="node">Five gathering lines <small>Farming · Fishing · Mining<br>Wood Chopping · Gem Hunting</small></div>
+        <div class="node">Five gathering professions <small>Farming · Fishing · Mining<br>Wood Chopping · Hunting</small></div>
         <div class="edge"></div>
-        <div class="node">Material Processing <small>raw → processed, one for one</small></div>
+        <div class="node">Material Processing <small>raw → refined, one for one</small></div>
         <div class="edge"></div>
         <div class="three">
           <div class="node">Weapon Crafting<small>Weapon Gems</small></div>
@@ -148,8 +148,8 @@
         <div class="head"><b>Weapon Gem</b><span>Weapon Crafting · G1–G10</span></div>
         <dl>
           <dt>Raises</dt><dd>Any weapon one grade: G4 → G5 takes a G5 gem</dd>
-          <dt>Takes</dt><dd>3 processed items of grade g, one from each line in the grade's triple</dd>
-          <dt>One Uma</dt><dd>30 (3 weapons × 10)</dd>
+          <dt>Takes</dt><dd>4 refined: 2 Copper Ingot + 2 Pine Plank (G1–G5); 2 Iron Ingot + 2 Oak Plank (G6–G10)</dd>
+          <dt>One Uma</dt><dd>30 (3 weapons × 10) · 120 refined</dd>
         </dl>
         <div class="icons"><span class="ico w">1</span><span class="ico w">2</span><span class="ico w">3</span><span class="ico w">4</span><span class="ico w">5</span><span class="ico w">6</span><span class="ico w">7</span><span class="ico w">8</span><span class="ico w">9</span><span class="ico w">10</span></div>
       </div>
@@ -157,8 +157,8 @@
         <div class="head"><b>Armor Fittings</b><span>Armor Crafting · G1–G10</span></div>
         <dl>
           <dt>Raises</dt><dd>Any armor slot one grade, physical or magical</dd>
-          <dt>Takes</dt><dd>2 processed items of grade g, one from each line in the grade's pair</dd>
-          <dt>One Uma</dt><dd>50 (5 slots × 10)</dd>
+          <dt>Takes</dt><dd>2 refined at G1–G5: 1 Linen + 1 Shell Carving. 3 at G6–G10: 1 Iron Ingot + 1 Oak Plank + 1 Cut Garnet</dd>
+          <dt>One Uma</dt><dd>50 (5 slots × 10) · 125 refined</dd>
         </dl>
         <div class="icons"><span class="ico a">1</span><span class="ico a">2</span><span class="ico a">3</span><span class="ico a">4</span><span class="ico a">5</span><span class="ico a">6</span><span class="ico a">7</span><span class="ico a">8</span><span class="ico a">9</span><span class="ico a">10</span></div>
       </div>
@@ -166,10 +166,12 @@
         <div class="head"><b>Accessory Setting</b><span>Accessory Crafting · G1–G10</span></div>
         <dl>
           <dt>Raises</dt><dd>Her accessory slot one grade, whatever Talisman or Amulet it holds</dd>
-          <dt>Takes</dt><dd>3 processed items of grade g, a triple</dd>
-          <dt>One Uma</dt><dd>10 (1 slot × 10)</dd>
+          <dt>Takes</dt><dd>12 refined: 6 Linen + 6 Shell Carving (G1–G5); 6 Cotton Cloth + 6 Polished Pearl (G6–G10)</dd>
+          <dt>One Uma</dt><dd>10 (1 slot × 10) · 120 refined</dd>
         </dl>
         <div class="icons"><span class="ico s">1</span><span class="ico s">2</span><span class="ico s">3</span><span class="ico s">4</span><span class="ico s">5</span><span class="ico s">6</span><span class="ico s">7</span><span class="ico s">8</span><span class="ico s">9</span><span class="ico s">10</span></div>
+        <p class="legend" style="margin:6px 0 0">One slot carries a whole grade of the suit's work, so the Charm Shop is as busy as the
+          Armorer. A setting shrinks as slots grow: 6 in Tier 2, 4 in Tier 3.</p>
       </div>
       <h3>Gates</h3>
       <div class="scroll">
@@ -181,7 +183,7 @@
           </tbody>
         </table>
       </div>
-      <p class="legend" style="margin:8px 0 0">Made at: the crafter's level, today's Craft Level rule (5g − 4); professions.md may move it to each profession's own level. Used at: the wearer's Uma Level.</p>
+      <p class="legend" style="margin:8px 0 0">Made at: the crafter's Craft Level, today's rule (5g − 4); the high types open at Craft Lv 26. Used at: the wearer's Uma Level.</p>
     </div>
   </section>
 
@@ -189,24 +191,25 @@
   <section id="t2">
     <h2><span class="tier t2">Tier 2</span> + two fork gems, + a slot's Settings</h2>
     <div class="card">
-      <p style="margin:0 0 4px">Tier 2's world makes its own items from its own materials. The three lines repeat; two things change:</p>
+      <p style="margin:0 0 4px">Tier 2's world makes its own items from its own materials. Tier 1's recipes repeat; two things change:</p>
       <div class="product t2">
         <div class="head"><b>Dual Gem · Pure Gem</b><span>Weapon Crafting · G5 only</span></div>
         <dl>
           <dt>Raises</dt><dd>A weapon's G5 step, and picks its form: Dual (a second kind) or Pure (weak hits ×1.5)</dd>
-          <dt>Takes</dt><dd>The Weapon Gem G5 shape (3 processed) + 1 Tier 2 material, from Tier 2's new building or the secondary profession</dd>
-          <dt>One Uma</dt><dd>3, one a weapon (another re-forges)</dd>
+          <dt>Takes</dt><dd>The Weapon Gem G5 recipe (4 refined) + one refined item of each Tier 2 pair (5): 9</dd>
+          <dt>One Uma</dt><dd>3, one a weapon (another re-forges) · 27 refined, 15 of them Tier 2 pair items</dd>
         </dl>
         <div class="icons"><span class="ico w">1</span><span class="ico w">2</span><span class="ico w">3</span><span class="ico w">4</span><span class="ico w x">5</span><span class="ico w">6</span><span class="ico w">7</span><span class="ico w">8</span><span class="ico w">9</span><span class="ico w">10</span><span class="ico f">D</span><span class="ico f">P</span></div>
-        <p class="legend" style="margin:6px 0 0">No plain G5 Weapon Gem from Tier 2: the fork gem is the G5 step.</p>
+        <p class="legend" style="margin:6px 0 0">No plain G5 Weapon Gem from Tier 2: the fork gem is the G5 step. Tier 2 pairs: Silver
+          Ingot or Mythril, Cedar or Elderwood, Wool or Silk, Coral or Black Pearl, Cut Sapphire or Cut Diamond.</p>
       </div>
       <div class="product">
-        <div class="head"><b>Accessory Setting</b><span>2 slots now</span></div>
-        <dl><dt>One Uma</dt><dd>20: Support and the new Damage slot (an Orb), 10 each</dd></dl>
+        <div class="head"><b>Accessory Setting</b><span>2 slots now · 6 refined</span></div>
+        <dl><dt>One Uma</dt><dd>20: Support and the new Damage slot (an Orb), 10 each · 120 refined</dd></dl>
       </div>
       <div class="product">
         <div class="head"><b>Armor Fittings</b><span>unchanged</span></div>
-        <dl><dt>One Uma</dt><dd>50</dd></dl>
+        <dl><dt>One Uma</dt><dd>50 · 125 refined</dd></dl>
       </div>
     </div>
   </section>
@@ -219,15 +222,15 @@
         <div class="head"><b>Prism · Tempered · Keen Gem</b><span>Weapon Crafting · G5 only</span></div>
         <dl>
           <dt>Raises</dt><dd>A weapon's Tier 3 G5 step: Dual → Prism or Tempered; Pure → Tempered or Keen</dd>
-          <dt>Takes</dt><dd>The G5 shape + 1 Tier 3 material</dd>
-          <dt>Also</dt><dd>Dual and Pure Gems, for weapons that never reached G5 in Tier 2</dd>
-          <dt>One Uma</dt><dd>3, one a weapon</dd>
+          <dt>Takes</dt><dd>The Weapon Gem G5 recipe (4) + one refined item of each Tier 3 pair (5): 9</dd>
+          <dt>Also</dt><dd>Dual and Pure Gems, the same recipe, for weapons that arrive as Base</dd>
+          <dt>One Uma</dt><dd>3, one a weapon · 27 refined, 15 of them Tier 3 pair items</dd>
         </dl>
         <div class="icons"><span class="ico f">Pr</span><span class="ico f">Te</span><span class="ico f">Ke</span><span class="ico f">D</span><span class="ico f">P</span></div>
       </div>
       <div class="product">
-        <div class="head"><b>Accessory Setting</b><span>3 slots now</span></div>
-        <dl><dt>One Uma</dt><dd>30: Support, Damage and a second Support</dd></dl>
+        <div class="head"><b>Accessory Setting</b><span>3 slots now · 4 refined</span></div>
+        <dl><dt>One Uma</dt><dd>30: Support, Damage and a second Support · 120 refined</dd></dl>
       </div>
     </div>
   </section>
@@ -244,62 +247,36 @@
             <tr><td>Armor Fittings</td><td class="num">50</td><td class="num">50</td><td class="num">50</td></tr>
             <tr><td>Accessory Settings</td><td class="num">10</td><td class="num">20</td><td class="num">30</td></tr>
             <tr class="total"><td>Items</td><td class="num">90</td><td class="num">100</td><td class="num">110</td></tr>
-            <tr><td>Processed items, draft amounts</td><td class="num">220</td><td class="num">250</td><td class="num">280</td></tr>
-            <tr><td>Tier materials (fork gems)</td><td class="num">—</td><td class="num">3</td><td class="num">3</td></tr>
+            <tr><td>Refined items</td><td class="num">365</td><td class="num">380</td><td class="num">380</td></tr>
+            <tr><td>Tier pair items (in the fork gems)</td><td class="num">—</td><td class="num">15</td><td class="num">15</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="legend" style="margin:8px 0 0">Draft amounts: a gem 3, fittings 2, a setting 3, a fork gem 3 + 1. A party of five takes five times
-        the column. Today one Tier 1 Uma takes 240 refined items; professions.md tunes the amounts to keep that order.</p>
+      <p class="legend" style="margin:8px 0 0">Refined: the Forge 120 (Tier 2–3: 108 + 27), the Armorer 125, the Charm Shop 120.
+        With Extra Stats' jewels (120), one Tier 1 Uma takes 485 refined items, against today's 472; her own moon adds 8 (493).
+        A party of five takes five times the column.</p>
     </div>
   </section>
 
-  <section id="symmetry">
-    <h2>Symmetry: every line used alike</h2>
+  <section id="recipes">
+    <h2>One fixed set an item</h2>
     <div class="card">
-      <p style="margin:0 0 6px">As D139 does today, a product's grades walk through the line sets in turn. Five lines make ten
-        pairs and ten triples, so ten grades use each set once and every line equally.</p>
-      <h3>Weapon Gem: a triple a grade</h3>
+      <p style="margin:0 0 6px">Each item has one recipe for grades 1–5 (the low types, Craft Lv 1) and one for 6–10 (the high
+        types, Craft Lv 26). No rotation: anyone can say what an item takes.</p>
       <div class="scroll">
-        <table class="sym">
-          <thead><tr><th>Grade</th><th>Farming</th><th>Fishing</th><th>Mining</th><th>Wood</th><th>Gems</th></tr></thead>
+        <table>
+          <thead><tr><th>Item</th><th>Grades 1–5</th><th>Grades 6–10</th><th class="num">Refined a piece</th></tr></thead>
           <tbody>
-            <tr><td>G1</td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td><td></td></tr>
-            <tr><td>G2</td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td><td></td></tr>
-            <tr><td>G3</td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td><td></td><td class="c"><span class="dot"></span></td></tr>
-            <tr><td>G4</td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td></tr>
-            <tr><td>G5</td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td></tr>
-            <tr><td>G6</td><td class="c"><span class="dot"></span></td><td></td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td></tr>
-            <tr><td>G7</td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td></tr>
-            <tr><td>G8</td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td></tr>
-            <tr><td>G9</td><td></td><td class="c"><span class="dot"></span></td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td></tr>
-            <tr><td>G10</td><td></td><td></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td></tr>
-            <tr class="total"><td>Uses</td><td class="c">6</td><td class="c">6</td><td class="c">6</td><td class="c">6</td><td class="c">6</td></tr>
+            <tr><td>Weapon Gem</td><td>2 Copper Ingot, 2 Pine Plank</td><td>2 Iron Ingot, 2 Oak Plank</td><td class="num">4</td></tr>
+            <tr><td>Armor Fittings</td><td>1 Linen, 1 Shell Carving</td><td>1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet</td><td class="num">2 · 3</td></tr>
+            <tr><td>Accessory Setting</td><td>6 Linen, 6 Shell Carving</td><td>6 Cotton Cloth, 6 Polished Pearl</td><td class="num">12 · 6 · 4</td></tr>
+            <tr><td>Fork gem (G5)</td><td colspan="2">The Weapon Gem G5 recipe + one refined item of each of the tier's five pairs</td><td class="num">9</td></tr>
           </tbody>
         </table>
       </div>
-      <h3>Armor Fittings: a pair a grade</h3>
-      <div class="scroll">
-        <table class="sym">
-          <thead><tr><th>Grade</th><th>Farming</th><th>Fishing</th><th>Mining</th><th>Wood</th><th>Gems</th></tr></thead>
-          <tbody>
-            <tr><td>G1</td><td class="c"><span class="dot b"></span></td><td class="c"><span class="dot b"></span></td><td></td><td></td><td></td></tr>
-            <tr><td>G2</td><td class="c"><span class="dot b"></span></td><td></td><td class="c"><span class="dot b"></span></td><td></td><td></td></tr>
-            <tr><td>G3</td><td class="c"><span class="dot b"></span></td><td></td><td></td><td class="c"><span class="dot b"></span></td><td></td></tr>
-            <tr><td>G4</td><td class="c"><span class="dot b"></span></td><td></td><td></td><td></td><td class="c"><span class="dot b"></span></td></tr>
-            <tr><td>G5</td><td></td><td class="c"><span class="dot b"></span></td><td class="c"><span class="dot b"></span></td><td></td><td></td></tr>
-            <tr><td>G6</td><td></td><td class="c"><span class="dot b"></span></td><td></td><td class="c"><span class="dot b"></span></td><td></td></tr>
-            <tr><td>G7</td><td></td><td class="c"><span class="dot b"></span></td><td></td><td></td><td class="c"><span class="dot b"></span></td></tr>
-            <tr><td>G8</td><td></td><td></td><td class="c"><span class="dot b"></span></td><td class="c"><span class="dot b"></span></td><td></td></tr>
-            <tr><td>G9</td><td></td><td></td><td class="c"><span class="dot b"></span></td><td></td><td class="c"><span class="dot b"></span></td></tr>
-            <tr><td>G10</td><td></td><td></td><td></td><td class="c"><span class="dot b"></span></td><td class="c"><span class="dot b"></span></td></tr>
-            <tr class="total"><td>Uses</td><td class="c">4</td><td class="c">4</td><td class="c">4</td><td class="c">4</td><td class="c">4</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="legend" style="margin:8px 0 0">Settings use the triples starting at G6's (so G1 takes Weapon Gem G6's set), so two lines
-        never ask the same three at the same grade. The line names are the brief's; professions.md maps each to its two
-        Tier 1 material types.</p>
+      <p class="legend" style="margin:8px 0 0">Settings: 12 with one accessory slot (Tier 1), 6 with two, 4 with three, so the Charm
+        Shop stays near 120 refined per Uma. Weapons take ingots and planks; light armor cloth and shells, heavy armor iron,
+        oak and a cut stone; accessories cloth and pearls. Every class needs the same items.</p>
     </div>
   </section>
 
@@ -311,15 +288,16 @@
           <thead><tr><th></th><th>Today (the Forge)</th><th>Tier 1</th></tr></thead>
           <tbody>
             <tr><td>Item types</td><td>40 types × 10 grades = 400</td><td>3 lines × 10 grades = 30</td></tr>
-            <tr><td>A recipe</td><td>2 refined items of the grade, a rotating pair of 8 families</td><td>2–3 processed items of the grade, a rotating pair or triple of 5 lines</td></tr>
-            <tr><td>To max one Uma</td><td>120 pieces · 240 refined</td><td>90 items · about 220 processed</td></tr>
+            <tr><td>A recipe</td><td>2 refined items of the grade, a rotating pair of 8 families</td><td>One fixed set an item: 4, 2–3 or 12 refined items</td></tr>
+            <tr><td>To max one Uma</td><td>120 pieces · 240 refined</td><td>90 items · 365 refined</td></tr>
             <tr><td>Where it goes</td><td>Stock, then bound to her for good, in order</td><td>Used up on her Gear tab</td></tr>
             <tr><td>Wearing gate</td><td>Weapon, Armor or Accessory Rank</td><td>Her Uma Level</td></tr>
           </tbody>
         </table>
       </div>
       <div class="note"><b>On the switch:</b> every crafted piece, in stock or bound, is deleted, and its 2 raw items come back
-        (a fully geared Lv 50 Uma: 240). Running Forge jobs are recalled. The owner recrafts by hand.</div>
+        as today's ids, then convert by professions.md's table (a fully geared Lv 50 Uma: 240). Running Forge jobs are
+        recalled. The owner recrafts by hand.</div>
     </div>
   </section>
 </main>

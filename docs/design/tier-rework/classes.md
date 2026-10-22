@@ -1,8 +1,10 @@
 # Classes: the Tier rework
 
-> **Fan-out draft, 2026-10-22. Nothing here is built.** One of six category docs ([the brief](README.md)), for the
-> cross-reference pass and then the owner's review, which starts with this category. Calls are **CL1–CL15**
-> ([§11](#11-decisions)); every one has a recommendation.
+> **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs ([the brief](README.md)),
+> for the owner's review, which starts with this category. Calls are **CL1–CL15** ([§11](#11-decisions)); every one has
+> a recommendation. The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed CL5 (the mirror's
+> re-check with full Extra Stats maps), CL13 (the start is her calling, all eight rows) and CL14 (her trade follows her
+> calling), and the save rows for armor.
 >
 > Previews (390 px first, light and dark):
 > [composition](previews/classes-composition.html) · [strikes](previews/classes-strikes.html) ·
@@ -159,6 +161,12 @@ not the slot count:
   is close to today's 3 : 2 spread, so the split should stay inside 70/30 ± 5. The simulation re-measures it, and the
   mirror (±5%), on the Tier 1 template with [extra-stats.md](extra-stats.md)'s map. **The knob, if either misses, is the
   hands**, as in H63.
+- **Full Extra Stats maps move the mirror (simulation item for implementation).** Every open node counts (ES5), so a
+  hybrid opens all four moons: the **Summoner gains ATK for her Arms half** (about +10–15% damage a turn, extra-stats'
+  hand estimate) and the **Spell Blade gains M.DEF**. Today's four-stat kits left those out, and H63 tuned the mirror
+  without them. The Tier 1 packet re-runs the mirror on the full template (three weapons, one Support, the full map):
+  **target H63's, equal damage a turn within ±5% and 70/30 ± 5 each way**. If the Summoner pulls ahead, the Summoner's
+  Arms hand (×0.56) comes down first; the map is never the knob (it's class-free, ES1).
 - **The healers:** two weapons of their lead channel and one of the other, so the split classes v2 meant gets sharper:
   the Paladin's two Arms give Barriers and debuffs, her one Tome mends; the Cleric's two Tomes mend and buff, her one Arm
   Barriers. Paladin vs Cleric sustain stays within ±10% (classes v2 §9), re-measured.
@@ -178,9 +186,12 @@ default.
 - **One accessory (CL7):** the **Support** slot (10 Talismans and Amulets). It carries a role and the MP economy (the
   Mage's Siphon, the Paladin's Thorn). **No Orb in Tier 1:** the Orb specializes in a kind, and kinds matter from
   Tier 2 (§3.1), where it arrives with them.
-- **Starting class (CL13):** today's rule, plus [variance.md](variance.md)'s calling: a Pace chaser whose base Power
-  beats her Wit starts as a **Spell Blade**, as a Late surger's does as a Paladin (D180). New unlocks only. Every class
-  then has starters.
+- **Starting class (CL13):** **her calling**, [variance.md](variance.md)'s eight rows (U4, U8): today's style rule and
+  D180, plus three new rows. A Pace chaser whose base Power beats her Wit starts as a **Spell Blade**; one whose best
+  distance is Sprint starts as a **Brawler**; a Wit-led closer (Wit at or over Power, A in two of Pace, Late, End) starts
+  as a **Summoner**. New unlocks only. Every class has starters, and each fight type lands at 17–23% of today's 270
+  outfits, which [professions.md](professions.md) PR1's trades rely on. *Changed in cross-reference: CL13 adopted only
+  the Spell Blade row.*
 
 ### 2.8 Tier 1's complexity, today and proposed
 
@@ -298,13 +309,14 @@ The six at Tier 1:
 | Standard preset | 5 weapons, armor, Orb, support | 3 weapons, armor, support | + Orb |
 | Limit Break power | Brawler 2×, Mage 2.4×, hybrids 2.2×, healers 1.5× | Unchanged | Unchanged; LB+ is the halls' |
 | Class Rank | Per class; opens depths | Unchanged | Unchanged |
-| Starting class | Running style; Late splits Paladin / Cleric | + Pace splits Spell Blade / Mage (her calling) | Ascend keeps her class |
+| Starting class | Running style; Late splits Paladin / Cleric | Her calling (variance U4's eight rows): every class has starters | Ascend keeps her class |
 | Uma Template ([variance.md](variance.md)) | — | Her Flourish works only in her calling; her moon's lead only in classes of its channel | The same |
 | Extra Stats ([extra-stats.md](extra-stats.md)) | Which nodes she picks | The map is class-free; her class decides which offense moons count | The same |
 | Rift fronts | Guided party by class; ward by channel | The same, on strikes | Each tier's Rift |
 | Specialization, mastery | — | — | One of two (Tier 2); a mastery (Tier 3) |
 | Gear ranks | Weapon Rank per kind she slots, Armor Rank per half she wears | None: [gear.md](gear.md) gates grades by Uma Level | — |
-| Professions ([professions.md](professions.md)) | — | **None** (CL14): the fight types name the gathering professions' themes; her active class moves no job | The same |
+| What a class switch costs | A rank per new kind, from fights or Manuals | **Only weapons she hasn't raised.** She owns every kind; armor and accessory grades sit on the slot. From the defaults a second class shares 0–2 of her three weapons: 10–30 Weapon Gems to bring level (a Brawler turning Paladin raises only a Blizzard Tome) | The same in her tier; promotion resets every grade anyway |
+| Professions ([professions.md](professions.md)) | — | **None** (CL14): her trade follows her **calling's** fight type (PR1), never her active class; a switch moves no job | The same |
 
 ## 7. Provides
 
@@ -328,18 +340,18 @@ The six at Tier 1:
 | [skill-trees.md](skill-trees.md) | One tree per class and kind; the tree's root holds the specialization and the mastery; Q17's crossovers in its Tier 2 branches; the Tier 1 shape and its gates are its own |
 | [professions.md](professions.md) | Fight types map to gathering professions by theme and demand only. Its demand math reads §5's counts |
 | [variance.md](variance.md) | A calling per Uma by rule; templates never lock a class or change a lean |
-| [extra-stats.md](extra-stats.md) | A class-free map; the mirror's re-check is this doc's, through the hands |
-| The engine | Tier 1's lock rule, three-weapon validation and one accessory ship in the rework's engine version (v16 if it's next); the strike rule is the generator's, with no engine change. v6–v15 fights replay as they were |
+| [extra-stats.md](extra-stats.md) | A class-free map; the mirror's re-check is this doc's, through the hands: a simulation item for the Tier 1 packet (§2.5), with full maps |
+| The engine | Tier 1's lock rule and the loadout checks (three weapons, one a strike within the class's Arms count; the tier's accessory count) ship in **engine v16**, the Tier 1 rework's ([README §9](README.md#9-engine-save-and-refund)); the strike rule and the shields are the generator's, with no engine change. v6–v15 fights replay as they were |
 
 ## 9. Save impact
 
 | Data | What happens |
 |---|---|
-| Each Uma's weapon slots, per class (5 → 3) | **Converted.** The class's default strike plan; in each strike she keeps the weapon she had slotted of that strike and channel (her highest grade first), else the default. Two of today's five leave her slots. Nothing she owns is deleted here; gear.md converts the pieces |
+| Each Uma's weapon slots, per class (5 → 3) | **Converted.** The class's default strike plan; in each strike she keeps the kind she had slotted of that strike and channel (her highest old grade first), else the default. Two of today's five leave her slots. Gear.md then resets every weapon to G0 and refunds the pieces (GE15) |
 | Equipped skills, per class | Skills of trees she no longer slots drop out; the auto loadout fills the gaps |
 | Learned side skills | Kept as today when a weapon leaves a slot; their fate is [skill-trees.md](skill-trees.md)'s |
 | The Damage accessory slot, Tier 1 worlds | **Emptied:** the Orb goes back to stock. A Tier 1 Orb has no use in Tier 1 and can't cross tiers, so **every Tier 1 Orb is listed for the refund** (with gear.md's list) |
-| Armor | Each slot wears her class's half; pieces of the other half stay hers. Nothing deleted |
+| Armor | Each slot wears her class's half; the slot holds the grade ([gear.md](gear.md) GE9). Every crafted piece, either half, is deleted and refunded by gear.md (GE15). *Changed in cross-reference: this row kept the pieces* |
 | Presets | Computed, never stored |
 | Tier 2 worlds | The same weapon conversion. No specialization is stored until picked: the default is derived by A6's rule |
 | Class ids, Class Ranks, Hero seats and Bonds | Unchanged |
@@ -362,12 +374,14 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 - **Locks** (CL8): Auto cancels a charged move as often as today, ±5 points.
 - **Win rates:** every on-curve party shape (the default party, each front's guided party, five of one class) wins
   every Tier 1 stage, within 3 points of today's table (classes v2 §9).
-- **The hybrids and healers:** 70/30 ± 5, the mirror ±5% and Paladin vs Cleric ±10%, re-measured (§2.5); the Rift's
-  §11 targets and the Duel's guard rail too. The strikes lower the best single act (the Spell Blade's Bow and Light
-  flurries no longer pair by default), so the Duel's shields may come down.
-- **Gearing:** 9 pieces in Tier 1, from 12. [professions.md](professions.md)'s demand math sets the materials so the time
-  to gear an Uma on curve holds. (If gear ranks stayed, a win's weapon EXP would become E a slot, 3E, keeping each
-  weapon's pace; gear.md drops them.)
+- **The hybrids and healers:** 70/30 ± 5, the mirror ±5% and Paladin vs Cleric ±10%, re-measured (§2.5) on full Extra
+  Stats maps (the Summoner's new ATK, the Spell Blade's new M.DEF); the Rift's §11 targets and the Duel's guard rail
+  too. The strikes lower the best single act (the Spell Blade's Bow and Light flurries no longer pair by default), so the
+  Duel's shields may come down.
+- **Gearing:** 9 pieces in Tier 1, from 12. [professions.md](professions.md)'s demand math sets the materials: one Uma
+  maxed is 485 refined items (365 gear, 120 jewels; 493 with her own moon) against today's 472, so the time to gear an
+  Uma on curve holds. (If gear ranks stayed, a win's weapon EXP would become E a slot, 3E, keeping each weapon's pace;
+  gear.md drops them.)
 - **Tier 2:** the specializations' worth (+8–15% where they apply, ≤ 5% elsewhere, tier2-classes §10) and the Orb are
   priced into Tier 2's build budget, as planned.
 
@@ -379,7 +393,7 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CL2** Tier 1 foe weaknesses | **One strike a foe**, by the ring read one level up (§2.2); every Tier 1 foe, the Rift's fronts on their channel | By channel (five Brawlers can't touch a magic-weak foe, and weapon choice disappears); a small kind set per continent (re-picks every continent); kinds with coverage forced by the generator (breaks on the first re-pick) | One badge to read, every Uma always has an answer, and the ring survives for Tier 2 |
 | **CL3** What "balanced" means | **Three tests:** every member chips every world foe; each front's guided party has ≥ 3 members chipping each of its foes; the five types hold all ten kinds | "At least one member chips" (too weak: one Paladin chipping a boss) | Checkable by script before a fight; win rates stay the simulation's |
 | **CL4** Default weapons | **§2.4's table:** the hybrids' Heavy in their minor channel, the healers' Area in theirs | Each class's first three of today's five (Iron and Arcane uneven, Katana and Light lost) | Iron and Arcane become exact mirrors; all ten kinds in the five types; most of each class's v2 specials kept |
-| **CL5** The hybrids' pair on 2 + 1 | **Hands unchanged** (0.72 + 0.44, 0.58 + 0.56); the simulation re-checks 70/30 ± 5 and the mirror ±5%, with the hands as the knob | New hands now | One act is one pair whatever the slots; a draft number now would only be guessed |
+| **CL5** The hybrids' pair on 2 + 1 | **Hands unchanged** (0.72 + 0.44, 0.58 + 0.56); the Tier 1 packet's simulation re-checks 70/30 ± 5 and the mirror ±5% **on full Extra Stats maps** (the Summoner's ATK, about +10–15% a turn by hand; the Spell Blade's M.DEF), with the hands as the knob, the Summoner's Arms hand first. *Changed in cross-reference: the full-map item added* | New hands now | One act is one pair whatever the slots; a draft number now would only be guessed |
 | **CL6** Template per tier | **Weapons 3 · 3 · 3; armor 5 · 5 · 5; accessories 1 · 2 · 3** (Support; + Damage; + Support, with gear.md). Tier 1 armor in her class's half | A sixth armor piece or a fourth weapon later | Depth comes from gear's forms, the trees and Extra Stats, not from more slots |
 | **CL7** Tier 1's one accessory | **The Support slot**; the Orb arrives in Tier 2 | The Damage slot; a free slot | Support carries a role and the MP economy; an Orb specializes in a kind, which matters once kinds do |
 | **CL8** Charged moves in Tier 1 | **A lock breaks to a weak act,** one an Uma; the Duel alternates Arms and Tome acts | Kinds drawn from her strike (a lock nobody in the party holds) | Every party can answer; the count stays a read |
@@ -387,6 +401,6 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CL10** Weaknesses after Tier 1 | **The strike stays; the kinds narrow:** two in Tier 2 (the ring's element and an Arm), one in Tier 3; for tier2-world.md | Today's random lists in Tier 2 | The same mental model in every tier; picks and gear's extra kinds get a job |
 | **CL11** Tier 2's advanced classes | **Specializations:** the six stay, each gains one of two passives (tier2-classes' twelve, as written), swapped freely, no lean change, no new ids | Twelve classes as tier2-classes writes them; drop them | Keeps the promotion feel and the content without twelve tables, emblems and an Ascend pick |
 | **CL12** Tier 3 | **A mastery per class (six)** and a second Support slot; designed with Tier 3 | A master per specialization (twelve) | Later tiers stay simpler than the proposal they replace |
-| **CL13** Starting class | **Today's rule plus the calling:** a Pace chaser with Power over Wit starts as a Spell Blade | Today's (no Spell Blade starts) | Every class has starters; variance.md's calling and the start agree |
-| **CL14** Class and professions | **No effect:** a class switch moves no job; fight types only name the professions' themes | An active-class job bonus | Switching is free, and work shouldn't change when a party does |
+| **CL13** Starting class | **Her calling** ([variance.md](variance.md) U4, U8): today's rule and D180, plus a Pace chaser with Power over Wit → Spell Blade, a Pace sprinter with Power over Wit → Brawler, a Wit-led closer → Summoner. New unlocks only. *Changed in cross-reference: only the Spell Blade row was adopted* | Today's (no Spell Blade starts); the Spell Blade row alone (the start and the calling disagree for up to 47 of 270 Umas) | Every class has starters; one signal, not two; each fight type at 17–23%, as PR1's trades need |
+| **CL14** Class and professions | **No effect:** a class switch moves no job; her trade follows her calling's fight type ([professions.md](professions.md) PR1). *Changed in cross-reference: wording, from "fight types only name the professions' themes"* | An active-class job bonus | Switching is free, and work shouldn't change when a party does |
 | **CL15** The strikes' names | **Heavy, Flurry, Area** | Impact, Barrage, Sweep ("Sweep" is the Sweep Ticket's word) | Plain words. "Heavy" and "Flurry" also start or end some skill names (the healers' "Heavy …" sides, the Spell Blade's "… Flurry"); skill-trees.md keeps or renames them with the trees |

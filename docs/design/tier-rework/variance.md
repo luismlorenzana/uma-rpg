@@ -1,8 +1,11 @@
 # Uma Variance: Uma Templates
 
-> **Fan-out draft, 2026-10-22. Nothing here is built.** One category of [the Tier rework](README.md), reviewed last.
-> Calls **U1–U16**, each with a recommendation ([§15](#15-decisions)). No open questions. It fills the slots
-> [skill-trees.md](skill-trees.md) (SK11) and [extra-stats.md](extra-stats.md) (ES12) left for it.
+> **Cross-referenced draft, 2026-10-22. Nothing here is built.** One category of [the Tier rework](README.md), reviewed
+> last. Calls **U1–U16**, each with a recommendation ([§15](#15-decisions)). No open questions. It fills the slots
+> [skill-trees.md](skill-trees.md) (SK11) and [extra-stats.md](extra-stats.md) (ES12) left for it. The cross-reference
+> pass ([README §7](README.md#7-cross-reference-log)) changed no U call: classes.md adopted the whole calling as the
+> start (CL13), extra-stats.md adopted this doc's two moon nodes in every tier (ES12), and the items are **jewels**
+> (Moon Jewel II, IV), not gems.
 
 Previews: [the catalog](previews/variance-templates.html) · [two front runners, long distance](previews/variance-two-umas.html) ·
 [her profile at Tier 1, 2 and 3](previews/variance-profile.html).
@@ -154,21 +157,21 @@ Speed growth is a **Fleet Charger**: Opening, and a Katana tip in Tier 2.
 ## 6. Per tier
 
 The template never changes: the same name, calling, stride and knack in every tier. Each tier rebuilds her nodes with
-that tier's trees and gems (promotion resets both, [tiers](../tiers.md#5-promotion-what-moves-what-resets-what-stays)).
+that tier's trees and jewels (promotion resets both, [tiers](../tiers.md#5-promotion-what-moves-what-resets-what-stays)).
 
 | | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
-| Calling | Her start; a star on the class picker | Her calling and the classes that grow from it | The same |
+| Calling | Her start; a star on the class picker | The same class, whichever specialization she holds | The same |
 | Flourish | At the root, on as her calling | The same | The same |
 | Signature tip | — | **New:** a third option at the tip fork of her signature kind's tree | At both tip forks of that tree (she holds two branches) |
-| Her moon | I knack +4 (Lv 16), II lead +8 (Lv 36) | The same, Tier 2's gems | The same, Tier 3's gems |
+| Her moon | I knack +4 (Lv 16), II lead +8 (Lv 36) | The same, Tier 2's jewels | The same, Tier 3's jewels |
 | Matched damage | About +5% at most | The same (the tip is a sidegrade) | The same |
 
 ## 7. Skill trees: the Flourish and the signature tip
 
 **The Flourish** fills [skill-trees.md](skill-trees.md#6-slots-for-other-categories)'s root template slot:
 - **What:** one class-wide passive, her stride's MP twist ([§4](#4-the-catalog)). Named by type: "Ironhide · Second wind".
-- **When:** on while she fights as her calling (and its later-tier classes). Free, no pick, every tier.
+- **When:** on while she fights as her calling, in either specialization. Free, no pick, every tier.
 - **Why MP:** it changes how often she can cast, not how hard a cast hits, so the foe budget doesn't see it. It echoes
   racing stamina: a dash spends early, a stayer has some left at the end.
 
@@ -181,16 +184,17 @@ that tier's trees and gems (promotion resets both, [tiers](../tiers.md#5-promoti
 
 ## 8. Extra Stats: her moon
 
-It fills [extra-stats.md](extra-stats.md#the-template-moon)'s template moon (ES12), with two nodes each tier:
+It fills [extra-stats.md](extra-stats.md#her-moon)'s template moon (ES12), with two nodes each tier:
 
-| Node | Opens | Gives | Gem | Counts |
+| Node | Opens | Gives | Jewel | Counts |
 |---|---|---|---|---|
-| **I, knack** | Lv 16 | +4 points to her knack's stat | Moon Gem II | In every class |
-| **II, lead** | Lv 36 | +8 to ATK or M.ATK, her calling's channel | Moon Gem IV | In any class that hits (or mends) with it |
+| **I, knack** | Lv 16 | +4 points to her knack's stat | Moon Jewel II | In every class |
+| **II, lead** | Lv 36 | +8 to ATK or M.ATK, her calling's channel | Moon Jewel IV | In any class that hits (or mends) with it |
 
 - Named after her template ("Ironhide's moon"), drawn with a star on its own small orbit.
 - A node her class can't use stays open and reads "No effect as Mage", as a shared moon her class doesn't use does.
-- +12 points a tier in all, ES12's cap.
+- +12 points a tier in all (+16 for a Mighty knack, whose +4 goes to DEF and M.DEF each, as Guard), the same in every
+  tier: the template's later-tier depth is the signature tip, not a bigger moon. Ids `template:1–2` (ES12).
 
 ## 9. Fit: what ships when
 
@@ -202,8 +206,8 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 | The catalog, the profile's template, the Stable's Calling filter | First Variance packet | Nothing: no engine or save change |
 | New Umas start in their calling | Same packet | classes.md's call (U8) |
 | Her moon, every tier | After Extra Stats' map ships | ES12's slot; points freeze at a fight's start, so no engine change |
-| The Flourish, every tier | After Skill trees' Tier 1 trees ship | SK11's root slot; the three MP twists in the rework's engine version |
-| The signature tip | With Tier 2's trees | SK11's tip slot, SK3's tip numbers |
+| The Flourish, every tier | With Skill trees' Tier 1 trees | SK11's root slot; the three MP twists in engine v16, the Tier 1 rework's |
+| The signature tip | With Tier 2's trees | SK11's tip slot, SK3's tip numbers; engine v17 |
 
 ## 10. How the player sees it
 
@@ -226,7 +230,7 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 | [skill-trees.md](skill-trees.md) | **The root template slot's content:** the Flourish, three MP twists (Opening, Even pace, Second wind), on as her calling, every tier. **The template tip's content,** Tier 2 on: one sidegrade by stride (Breakaway, Spread, Long haul) at the tip fork of her calling's tree of her signature kind, by stride and leading half (Katana · Dark, Greatsword · Fire, Bow · Light) |
 | [extra-stats.md](extra-stats.md) | **The template moon's content:** node I her knack (+4 to evasion, HP, DEF and M.DEF, Limit or MP), counting in every class; node II her lead (+8 ATK or M.ATK), counting in the classes of that channel. Ids `template:1–2` |
 | [classes.md](classes.md) | **A calling per Uma** (one of six), by [§5](#5-the-assignment-rule)'s rule. Recommend new Umas start in it (CL13, D162/D180 extended): besides a Pace chaser with Power over Wit starting as a Spell Blade, a Pace sprinter with Power over Wit starts as a Brawler and a Wit-led closer (A in two of Pace, Late, End) as a Summoner. A star on the picker. A row for "what class selection affects": her Flourish and tip work only in her calling; her moon's lead only in classes of its channel |
-| [professions.md](professions.md) | **Her fight type**, her calling's, for PR1's trade: physical 61, physical hybrid 56, magical 46, magical hybrid 46, healer 61 Umas today (22.6 / 20.7 / 17.0 / 17.0 / 22.6%). Nothing else: no speed, yield or level effect. Demand: one Moon Gem II and one Moon Gem IV an Uma per tier, as ES12 counts |
+| [professions.md](professions.md) | **Her fight type**, her calling's, for PR1's trade: physical 61, physical hybrid 56, magical 46, magical hybrid 46, healer 61 Umas today (22.6 / 20.7 / 17.0 / 17.0 / 22.6%). Nothing else: no speed, yield or level effect. Demand: one Moon Jewel II and one Moon Jewel IV an Uma per tier, as ES12 counts |
 | [gear.md](gear.md) | Nothing. The signature kind is a tree she may slot, not an item |
 | Cross-reference | Rows for `character-tiers.html` and `progression.html`: Tier 1 "Template: calling star, Flourish, moon (2 nodes)"; Tier 2 "+ signature tip"; Tier 3 "tip at both forks" |
 
@@ -235,11 +239,11 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 | From | What | If not |
 |---|---|---|
 | [classes.md](classes.md) | Six classes, their channels and leading halves (brief §2) | — |
-| [classes.md](classes.md) | New Umas start in their calling (U8; CL13 adopts the Spell Blade part) | The calling shows apart from the start, and an Uma may start in a class that isn't her calling |
+| [classes.md](classes.md) | New Umas start in their calling (U8). *Reconciled: CL13 adopts all eight rows* | — |
 | [professions.md](professions.md) | PR1 takes her trade from her calling's fight type. Its 18–22% target is met within a point and a half (17.0–22.6%), where starting classes give 0–53% | Professions' own fallback rule names the trade; the calling stays as it is |
 | [skill-trees.md](skill-trees.md) | SK11's two slots as written: the root's free class-wide node every tier, and a free third option at one tip fork from Tier 2 | — |
-| [extra-stats.md](extra-stats.md) | ES12's moon (Lv 16 +4, Lv 36 +8, Moon Gems II and IV), **with one change: its two nodes name two stats with two scopes** (I her knack in every class, II her lead in her channel's classes), not one stat for the template's classes | One stat: node I gives her lead too, and the knack moves to the Flourish's name only, so two front-running stayers would no longer differ in play |
-| [extra-stats.md](extra-stats.md) | Node I may give evasion or Limit in Tier 1, though ES6 keeps them off the shared map (the engine and the Battle tab have both) | Fleet takes ATK and M.ATK +2 each; Gritty takes HP +20 |
+| [extra-stats.md](extra-stats.md) | ES12's moon (Lv 16 +4, Lv 36 +8, Moon Jewels II and IV): two nodes with two scopes (I her knack in every class, II her lead in her channel's classes), the same two in every tier. *Reconciled: ES12 adopts it* | — |
+| [extra-stats.md](extra-stats.md) | Node I may give evasion or Limit in Tier 1, though ES6 keeps them off the shared map (the engine and the Battle tab have both). *Reconciled: ES6 names her knack as their Tier 1 home* | — |
 | [gear.md](gear.md) | Any three weapons fit a class's slots within its Arms and Tome split, so she can slot her signature kind | The tip falls back to her calling's first default weapon |
 | [README §2](README.md#2-the-shared-frame-every-doc-starts-from) | Tiers 1–3, six classes, five fight types, master data by stable id | — |
 
@@ -252,7 +256,7 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 - **The signature tip:** a pick stored like every tip pick (skill-trees' save), default Power.
 - **Starting class:** a new unlock whose calling differs from her style's class has it written as her class, as a
   Paladin start is (D180). Owned Umas don't change.
-- **Engine:** the three MP twists need the rework's engine version; older fights replay at their own.
+- **Engine:** the three MP twists need engine v16 (the signature tips v17); older fights replay at their own.
 - **Deleted or converted:** nothing; no refund. Code retired: `STYLE_CLASSES`, `DISTANCE_GEAR`, `learningTime`.
 
 ## 14. Balance and pacing
@@ -271,7 +275,7 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
   the Rift's fronts inside [rift.md §11](../rift.md)'s bands; the hybrids' mirror within ±5% with both matched; the
   Springs test with dry-MP input for the three twists. The twists' numbers are tuned there, never the foes.
 - **Pacing:** no change to EXP, ranks, Laurels, tickets or any job's time ([pacing](../pacing.md)). Jewel Crafting
-  makes two more Moon Gems an Uma per tier, as ES12 already counts.
+  makes two more Moon Jewels an Uma per tier, as ES12 counts (8 refined: professions.md's 493 per Uma).
 
 ## 15. Decisions
 

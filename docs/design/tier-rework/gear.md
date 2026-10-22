@@ -1,9 +1,11 @@
 # Gear: weapons, armor and accessories
 
-> **Tier rework, fan-out draft, 2026-10-22. Nothing here is built.** One of six category docs ([the brief](README.md)).
-> The cross-reference pass reconciles its [Assumes](#11-assumes) with the other docs' Provides; the owner reviews it
-> second, after Classes. Every number is a draft for the balance simulation (`SIM=1`). Calls are **GE1**, **GE2** …,
-> each with a recommendation ([§14](#14-decisions)).
+> **Tier rework, cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs
+> ([the brief](README.md)); the owner reviews it second, after Classes. Every number is a draft for the balance
+> simulation (`SIM=1`). Calls are **GE1**, **GE2** …, each with a recommendation ([§14](#14-decisions)). The
+> cross-reference pass ([README §7](README.md#7-cross-reference-log)) replaced §8's draft amounts with
+> [professions.md](professions.md)'s recipes (it owns amounts), named the vocabulary (gems, jewels, stones), stated what a
+> class switch costs, and moved Tier 2's engine changes to Tier 2's own version (v17). No GE call changed.
 >
 > Previews: [the weapon tree](previews/gear-weapon-tree.html) · [the Gear tab at Tier 1, 2 and 3](previews/gear-loadout.html)
 > · [crafting by tier](previews/gear-crafting.html).
@@ -62,8 +64,14 @@ EXP that gated it is replaced by her Uma Level, which moves at the same pace.
 
 ### 3.1 Weapons
 
-- **Three slots a class** ([classes.md](classes.md) picks which kinds and the defaults). Each slot holds one of her ten
-  weapons. A weapon's grade is hers in every class that holds it, as Weapon Rank is today.
+- **Three slots a class, one per strike** ([classes.md](classes.md) CL1: Heavy, Flurry, Area, within the class's Arms
+  count; CL4 the defaults). Each slot holds one of her ten weapons of the slot's strike. A weapon's grade is hers in every
+  class that holds it, as Weapon Rank is today.
+- **What a class switch costs:** only the weapons she hasn't raised. Armor and accessory grades sit on the slot (§3.2,
+  §3.3), so they follow her. From the defaults a second class shares 0–2 of her three weapons: 10 to 30 Weapon Gems to
+  bring it level with her first (a Brawler turning Paladin raises one Blizzard Tome; a Brawler turning Mage, three
+  Tomes). A pick inside the new class's strikes can reuse a raised weapon. [Professions](professions.md)' demand counts
+  one class's three; a second class's weapons are extra, as a second class's pieces are today.
 - **G0 is today's Training weapon:** it opens its tree and adds no Might.
 - **Upgrading** is on the weapon's sheet: "G4 → G5 · 1 Weapon Gem G5", once the Warehouse has the gem and she is
   Lv 21. One tap spends it. "Up to G7" climbs several grades at once and lists the gems first.
@@ -107,6 +115,7 @@ Per Uma, in Tier 1:
 | Gear currencies | Gear Marks, Weapon and Armor Manuals | **None** |
 | Item types the crafting stations make | 400: 40 types × 10 grades | **30:** 3 lines × 10 grades |
 | Items to max her loadout | 120 pieces, each bound in order, for good | **90 upgrades:** 30 gems, 50 fittings, 10 settings |
+| Refined items they take | 240 | **365** ([professions.md](professions.md) §5.5; with jewels 485, against today's 472) |
 | Choices a class asks | A weapon per slot (four classes), an armor half × 5, an Orb's kind (10), a support (10) | A weapon per slot ([classes.md](classes.md)), a support (10) |
 | Rules to learn | Binding for good, in-order binding, rank gates, Training pieces, typed accessory slots, locker vs stock | **One:** an item raises a slot one grade, up to Lv 5g − 4 |
 
@@ -125,6 +134,9 @@ Per Uma, in Tier 1:
 - **A second kind is coverage, not a second channel.** The hit keeps the weapon's channel, offense and Might: a
   Greatsword + Fire hit is a physical hit that counts as Fire against a Fire-weak foe. A weak hit still removes one
   point and breaks one lock, whichever of its kinds matched. An Orb adds to a hit that carries its kind.
+- **A Dual keeps its slot's strike** ([classes.md](classes.md) CL1): it stays in its first kind's slot, with that tree's
+  shape. Its second kind may sit in any strike: a Greatsword + Ice is a Heavy weapon that also answers an Ice-weak
+  (Area) foe in Tier 2 and 3, where foes are weak to kinds of their strike (CL10).
 - **The extra kind counts only in a class that wields its channel** (§7): a Brawler's weapons take Arms kinds, a Mage's
   elements, the four between either. The sheet lists the kinds that count for her active class first.
 - **Breaks stay the trees' job.** No form removes an extra shield point: Pure changes how hard a weak hit lands, not
@@ -237,43 +249,46 @@ parent; a weapon's kinds are all different; a weak hit at most ×1.7; no form to
 
 ## 8. Crafting: what is made and what it takes
 
-This is the interface for [professions.md](professions.md), which owns materials, families, buildings and amounts.
-Recipes here are **shapes**: inputs by material line and grade.
+This is the interface for [professions.md](professions.md), which owns materials, families, buildings, recipes and
+amounts. Gear owns the products: what each is, what it raises and how many one Uma needs.
 
 | Product | Made by | Grades | Raises | Per Uma per tier |
 |---|---|---|---|---|
-| **Weapon Gem** | Weapon Crafting | G1–G10 (no G5 from Tier 2) | One weapon one grade | 30 (Tier 1); 27 in Tiers 2–3 |
+| **Weapon Gem** | Weapon Crafting (the Forge) | G1–G10 (no G5 from Tier 2) | One weapon one grade | 30 (Tier 1); 27 in Tiers 2–3 |
 | **Dual Gem**, **Pure Gem** | Weapon Crafting | G5, from Tier 2 | A weapon's G5 step, and its form | 3 in Tier 2 (one a weapon) |
-| **Prism Gem**, **Tempered Gem**, **Keen Gem** | Weapon Crafting | G5, Tier 3 | The same, Tier 3's forms | 3 in Tier 3 |
-| **Armor Fittings** | Armor Crafting | G1–G10 | One armor slot one grade, either half | 50 |
-| **Accessory Setting** | Accessory Crafting | G1–G10 | One accessory slot one grade, any type | 10 · 20 · 30 (one a slot a grade) |
+| **Prism Gem**, **Tempered Gem**, **Keen Gem** | Weapon Crafting | G5, Tier 3 | The same, Tier 3's forms (Dual and Pure Gems too, for a weapon arriving as Base) | 3 in Tier 3 |
+| **Armor Fittings** | Armor Crafting (the Armorer) | G1–G10 | One armor slot one grade, either half | 50 |
+| **Accessory Setting** | Accessory Crafting (the Charm Shop) | G1–G10 | One accessory slot one grade, any type | 10 · 20 · 30 (one a slot a grade) |
 
-**Draft shapes:**
+**Recipes ([professions.md](professions.md) §5.3, PR8):** one fixed set an item; grades 1–5 take each line's low type,
+6–10 its high type.
 
-| Product | Inputs at grade g | Draft amount (professions.md decides) |
-|---|---|---|
-| Weapon Gem | Processed items of grade g, one from each line in the grade's set | 3 items: a triple of gathering lines |
-| Fork gem | The Weapon Gem G5 shape, plus 1 of its tier's new material (Tier 2's or Tier 3's new building, or the secondary profession) | 3 + 1 |
-| Armor Fittings | Processed items of grade g, one from each line in the grade's pair | 2 items |
-| Accessory Setting | The same | 3 items: a triple |
+| Product | Refined items a piece | Grades 1–5 | Grades 6–10 |
+|---|---|---|---|
+| Weapon Gem | 4 | 2 Copper Ingot, 2 Pine Plank | 2 Iron Ingot, 2 Oak Plank |
+| Fork gem | 4 + 5 | The Weapon Gem G5 recipe, plus one refined item of each of its tier's five pairs | — |
+| Armor Fittings | 2 low, 3 high | 1 Linen, 1 Shell Carving | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet |
+| Accessory Setting | 12 · 6 · 4 (by the tier's slot count) | 6 Linen, 6 Shell Carving (Tier 1) | 6 Cotton Cloth, 6 Polished Pearl (Tier 1) |
 
-- **Symmetry, as D139 does today:** a product's grades walk through the line sets in turn, each product starting at its
-  own place. With five gathering lines there are ten pairs and ten triples, so a product's ten grades use every pair
-  (or triple) once, and every line equally: four times across its pairs, six across its triples. Nothing sits idle
-  whatever her class.
-- **One Tier 1 Uma** with the draft amounts: 90 + 100 + 30 = **220 processed items**, against **240** refined items
-  today. Professions sets the final amounts; the target is about today's.
-- **Gates:** the crafter's profession level opens grade g (today: Craft Lv 5g − 4); the wearer's Uma Level opens its
-  use (Lv 5g − 4).
+- **One Tier 1 Uma:** 120 + 125 + 120 = **365 refined items** for gear (Tiers 2 and 3: 380, of which 15 are the tier's
+  pairs), against **240** today. With Extra Stats' jewels (120) she is **485**, against today's **472**: gear grows,
+  jewels shrink, the Uma's total holds. *Changed in cross-reference: this doc drafted rotating pairs and triples at about
+  220 for gear; professions' fixed sets keep each making trade at a fifth of the work.*
+- **Gates:** the crafter's Craft Level opens grade g (Lv 5g − 4, today's rule); the wearer's Uma Level opens its use
+  (Lv 5g − 4).
 - **Every tier makes its own,** from its own world's materials. The item ids may be shared, since each world has its
   own Warehouse.
-- **Names:** "gem" is the owner's word for the weapon line. The other lines keep other words (raw gems from Gem
-  Hunting, Extra Stats' jewels), so "Weapon Gem" is never short for anything else (GE12).
+- **Names (GE12):** "gem" is the owner's word for the weapon line, and **only** the weapon line uses it: Weapon Gems and
+  the five fork gems. The hunt gathers **stones** (Quartz, Garnet …), Extra Stats' items are **jewels**, today's Star
+  Gems retire. So "Weapon Gem" is never short for anything else ([README §2](README.md#2-the-shared-frame-every-doc-starts-from)'s
+  glossary).
 
 ## 9. Promotion
 
 - **Forms carry; grades reset.** She arrives in the new tier with her ten weapons in their forms at G0, her armor and
-  accessory slots at G0, and Tier 1's slot counts for the new tier.
+  accessory slots at G0, and the new tier's slot counts (accessories 2, then 3).
+- **Re-picking is free at promotion:** every grade starts again, so a new tier is the cheapest moment to change which
+  three kinds she slots (her Tier 2 signature tip, [variance.md](variance.md), may ask for one).
 - **What she used up stays in the old world:** each upgrade item she consumed goes back to the old world's Warehouse,
   as her bound pieces go back to its stock today (D15). The Umas still in that tier can use them.
 - **A Tier 3 weapon's next fork depends on where it ended Tier 2** (§5.1).
@@ -282,12 +297,12 @@ Recipes here are **shapes**: inputs by material line and grade.
 
 | To | What |
 |---|---|
-| **Classes** | Slot counts: 3 weapons in every tier; 5 armor; accessories 1 · 2 · 3. One gate for every grade: Lv 5g − 4. Weapons owned per kind and shared by every class. The channel rule (§7). Armor halves: by class in Tier 1, mixed per piece for the four between from Tier 2. The standard preset sets her class's three weapons, armor half and support, and climbs grades with stock items after asking |
+| **Classes** | Slot counts: 3 weapons in every tier; 5 armor; accessories 1 · 2 · 3. One gate for every grade: Lv 5g − 4. Weapons owned per kind and shared by every class; a class switch costs only the kinds she hasn't raised (§3.1). The channel rule (§7). A Dual keeps its slot's strike. Armor halves: by class in Tier 1, mixed per piece for the four between from Tier 2. The standard preset sets her class's three weapons, armor half and support, and climbs grades with stock items after asking |
 | **Skill trees** | Weapons carry kinds; a weapon's kind opens its tree; an extra kind opens none. A weapon's weak multiplier (×1.3, ×1.5, ×1.7 by form) is gear's; Break +1 and every other shield chip stay the trees'. Shape stays in the trees: if the trees want weapon arts' shape effects (one more hit, a wider share), they can take them as nodes |
-| **Professions** | §8: the five products, grades, counts per Uma per tier, draft shapes and amounts, the symmetry rule, the gates. Fork gems take one new material in Tiers 2 and 3. One Uma's gear demand: 90 items in Tier 1, 100 in Tier 2, 110 in Tier 3 |
+| **Professions** | §8: the five products, grades, counts per Uma per tier, the gates. Fork gems take one of each of the tier's pairs in Tiers 2 and 3. One Uma's gear demand: 90 items in Tier 1, 100 in Tier 2, 110 in Tier 3 (365, 380, 380 refined on professions' recipes) |
 | **Extra Stats** | No gear item adds a stat node or a kind outside weapons. The Orb returns in Tier 2: if Extra Stats adds a kind specialty there, Orb and specialty together stay within a G10 weapon's Might (X7's bound) |
 | **Variance** | Gear has no template-only pieces or hooks; templates act through trees and Extra Stats |
-| **The engine** | Tier 1 needs no new rule: three weapons and one accessory are loadout facts. Tier 2's forms need v16: a hit's extra kinds for weaknesses and locks (the v1 Orb path, scoped to the weapon), and a weak multiplier per weapon in place of the one constant (`BATTLE_WEAK`) |
+| **The engine** | Tier 1 needs no new damage rule: three weapons and one accessory are loadout facts, which engine v16's input checks accept (with [classes.md](classes.md)' lock rule; [README §9](README.md#9-engine-save-and-refund)). Tier 2's forms need **Tier 2's engine version (v17)**: a hit's extra kinds for weaknesses and locks (the v1 Orb path, scoped to the weapon), and a weak multiplier per weapon in place of the one constant (`BATTLE_WEAK`). *Changed in cross-reference: forms were "v16"; v16 is Tier 1's* |
 | **Screens** | The Gear tab: three weapons, five armor slots, 1–3 accessories, each with its grade and an Upgrade pill ([preview](previews/gear-loadout.html)). The targets planner lists every grade above her current one on her class's three weapons, five slots and accessory slots; an unchosen fork plans nothing, as an empty accessory slot does today |
 
 ## 11. Assumes
@@ -297,8 +312,8 @@ Recipes here are **shapes**: inputs by material line and grade.
 | **The brief, §2** | Add to the class template: **accessories 1 · 2 · 3 by tier**, and **no gear ranks: Uma Level gates every grade**. Weapons stay 3 and kinds stay as they are, as §2 says |
 | **Classes** | Weapon splits drawn here: Brawler 3 Arms, Mage 3 Tomes, Spell Blade and Paladin 2 Arms + 1 Tome, Summoner and Cleric 2 Tomes + 1 Arms; classes.md picks the kinds and defaults. Today's starting armor halves. Tier 1's foe weaknesses are reworked so three-weapon parties cover them (coverage comes from weapons only) |
 | **Skill trees** | Trees stay per class × weapon kind. No node adds a kind. Break +1 lives only in the trees (the Tier 2 tip fork), under its one cap. Weapon Rank retires: "the grade she can wear" is her Uma Level's gate (GE2) |
-| **Professions** | Weapon, Armor and Accessory Crafting make §8's lines; Material Processing makes the processed items; Tiers 2 and 3 add a material the fork gems take; amounts are set so one Tier 1 Uma's gear costs about today's 240 refined items |
-| **Extra Stats** | Its items are not called "gems" ("jewels" fits Jewel Crafting), so the Warehouse never shows two kinds of gem |
+| **Professions** | Weapon, Armor and Accessory Crafting make §8's lines; Material Processing makes the refined items; Tiers 2 and 3 add pairs the fork gems take. *Reconciled:* professions' recipes set gear at 365 refined per Tier 1 Uma (today's gear 240), so the Uma's total with jewels, 485, stays near today's 472 |
+| **Extra Stats** | Its items are not called "gems" ("jewels" fits Jewel Crafting), and the hunt's items are stones, so the Warehouse never shows two kinds of gem. *Reconciled* (README §2's glossary) |
 | **Pacing and balance** | Flat Might in every tier (D170, Z3). The balance simulation re-prices Tier 1's foe budget for an on-curve build without an Orb, and Tier 2's term (Z4) for forms and the Orb in place of weapon arts and sets |
 | **The Rift** | Echoes pay Class EXP at 2× and no gear EXP (R6 loses its gear half). Its fronts are re-measured with three weapons and Tier 1's one accessory |
 | **Art** | Three ten-grade icon rows (gems, fittings, settings) and five fork gems, drawn in uma-platform. Slots keep today's gear art: a Greatsword at G7 shows the Greatsword's grade-7 icon |
@@ -310,7 +325,7 @@ recrafting by hand (GE15).
 
 | Save data | Today | After | Refund |
 |---|---|---|---|
-| `world.gear` (crafted pieces in stock) | Ids `<type>-g<grade>` | Deleted | Each piece's recipe: 2 refined items, returned as their 2 raw items |
+| `world.gear` (crafted pieces in stock) | Ids `<type>-g<grade>` | Deleted | Each piece's recipe: 2 refined items, returned as their 2 raw items in today's ids, then converted by [professions.md](professions.md)' table (§10) |
 | `uma.gear.locker` and `equipped` (bound pieces) | Her pieces | Deleted; every weapon, armor and accessory slot at G0 | The same, per piece |
 | Forge jobs (`craft` rows, running or queued) | Gear outputs | Recalled: unfinished inputs back, as Recall does; finished outputs refunded as above | — |
 | `uma.ranks.weapons`, `armors`, `accessories` | 24 tracks | Deleted | None: the new gate is her Uma Level |
@@ -322,8 +337,9 @@ recrafting by hand (GE15).
 | Tier 2 or 3 worlds, if any | The same data | The same treatment | The same |
 | Stored fights | Frozen inputs | Unchanged: they replay as they were | — |
 
-**Volume:** a fully geared Lv 50 Uma holds 120 pieces, so 240 raw items come back, about what the new line asks of
-her (220 processed items in the draft).
+**Volume:** a fully geared Lv 50 Uma holds 120 pieces, so 240 raw items come back against the 365 her new gear takes.
+With her Star Gems' refund ([extra-stats.md](extra-stats.md) ES14, about 232 raw items for a full map) she gets back
+about 472, against the 485 (493 with her own moon) the reworked Tier 1 asks: the refund rebuilds her, by hand.
 
 ## 13. Pacing
 
@@ -334,7 +350,7 @@ The rate of progression holds (the brief, §2):
 | **Time to level** | 120 + 16 × level EXP, about three fights a level | Unchanged | Nothing in gear touches Uma EXP |
 | **EXP per win** | Uma E, Class 2E, weapons 5E, armor E a kind, accessories E a kind | Uma E, Class 2E | Gear EXP fed only gear ranks and Gear Marks, both gone |
 | **When a grade is worn** | Rank g, at about Lv 5g − 4 for a weapon used every fight | Lv 5g − 4 | Same gate, by level |
-| **Crafting to gear one Uma on curve** | 120 pieces, 240 refined items | 90 items, about 220 processed | Professions sets the amounts (§8) |
+| **Crafting to gear one Uma on curve** | 120 pieces, 240 refined items (472 with Star Gems) | 90 items, 365 refined (485 with jewels) | Professions sets the amounts (§8); the Uma's total holds within 3% |
 | **Weapon and armor power on curve** | Might and armor by grade | The same tables | — |
 | **Accessories on curve** | Orb + support | Tier 1 support; Tier 2 + Orb; Tier 3 + support | Tier 1's foe budget loses the Orb's term in the simulation: a −16% hit on her Orb's kind at Lv 50, −4% at Lv 1 ([combat](../../game/combat.md#where-damage-comes-from)) |
 | **A newly slotted weapon** | Needs its rank: fights, or Manuals | Any grade her level allows, if the stock has the gems | Class switching gets cheaper; the Rift's fronts ask for it |

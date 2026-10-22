@@ -1,7 +1,9 @@
 # Skill trees: the Tier rework
 
-> **Fan-out draft, 2026-10-22. Nothing here is built or decided.** One of the six category docs of
-> [the Tier rework](README.md).
+> **Cross-referenced draft, 2026-10-22. Nothing here is built or decided.** One of the six category docs of
+> [the Tier rework](README.md). The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed no SK
+> call: it checked the strike words (SK14), the template slots (SK11, filled by variance.md as reconciled) and the
+> engine versions (§9: Tier 1's trees need none of their own; Tier 2's nodes ship in v17).
 > - **Previews:** [trees by tier](previews/skills-trees-by-tier.html) (the Brawler at Today, Tier 1, 2 and 3, and the
 >   hybrids' crossovers), [every class at Tier 1](previews/skills-all-classes-t1.html),
 >   [the profile's Skills tab](previews/skills-profile.html).
@@ -340,9 +342,10 @@ learned only Cataclysm (`brawler-greatsword.4a`) holds the core line, and Catacl
 - **Every world converts,** Tier 2's included (Umas who ascended through the Rift, H48). A world uses its tier's shape
   once that tier's content ships, and Tier 1's until then.
 - **Retired nodes stay in the catalog's full list** (`RPG_ALL_NODES`) so old fights replay; they leave every tree.
-  Tier 1 needs no engine version. Tier 2's new nodes (Sweep, Hunt, Mighty, Wide, the Break tips) and Tier 3's capstones
-  ship with their tier's engine.
-- **One save version** carries the conversion. The API is unchanged.
+  Tier 1's trees need no engine change of their own (they ride engine v16, the Tier 1 rework's, with the classes' lock
+  rule and the Flourish). Tier 2's new nodes (Sweep, Hunt, Mighty, Wide, the Break tips, the signature tips) ship in
+  **v17** with Tier 2's toolbox, and Tier 3's capstones with Tier 3's ([README §9](README.md#9-engine-save-and-refund)).
+- **One save version** carries the conversion: **v26**, the Tier 1 rework's single migration. The API is unchanged.
 - **Code that retires:** the side points (`RPG_SIDE_POINTS_PER_LEVEL`, `rpgTreePointsEarned`, `rpgTreePointsSpent`),
   the side gates (`rpgSideNodeLevel`) and D166's points count.
 

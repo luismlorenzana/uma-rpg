@@ -1,8 +1,11 @@
 # Extra Stats: a planet and its moons
 
-> **Fan-out draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs ([brief](README.md)). It
-> replaces today's 100-node map from Tier 1 on, and absorbs [the Halo](../extra-stats-tier2.md) (H41, Q12) into Tier 2.
-> Calls are **ES1–ES16**, each with a recommendation ([Decisions](#decisions)). Numbers are drafts for the simulation.
+> **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs ([brief](README.md)).
+> It replaces today's 100-node map from Tier 1 on, and absorbs [the Halo](../extra-stats-tier2.md) (H41, Q12) into
+> Tier 2. Calls are **ES1–ES16**, each with a recommendation ([Decisions](#decisions)). Numbers are drafts for the
+> simulation. The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed ES12: her moon is
+> [variance.md](variance.md)'s two nodes in every tier (it owns template-only nodes; this doc keeps the map's rules for
+> them), and the Lapidary's numbers are [professions.md](professions.md)' final recipes.
 >
 > Previews: [the map at each tier](previews/extra-stats-maps.html) · [what it gives, against today](previews/extra-stats-budget.html).
 
@@ -42,7 +45,7 @@ The Observatory, as built ([loops](../../game/loops.md#extra-stats-and-gear),
 |---|---|---|---|
 | **The core** (every tier, rebuilt) | Planet I–V and four moons I–V: Strength, Sorcery, Vigor, Guard | The same | The same |
 | **New this tier** | — | **The Halo** (one damage kind, 2 nodes) and **the Valor moon** (Limit start, 2 nodes) | The Halo's **second kind** (2 nodes) and **the Swiftness moon** (evasion, 2 nodes) |
-| [Her moon](#her-moon) ([variance](variance.md)) | 2 nodes | 4 | 6 |
+| [Her moon](#her-moon) ([variance](variance.md)) | 2 nodes | 2, rebuilt | 2, rebuilt |
 | Shared nodes | **25** | 29 | 33 |
 | Jewel kinds | **2:** Planet, Moon (10 items) | 3: + Halo (12 items) | 3 (12 items) |
 | Active slots | **None: every open node counts** | None | None |
@@ -149,7 +152,7 @@ The core again, rebuilt in the Tier 2 world at the same values per tier level, p
 IV. It answers Q9 (keep Limit), where Limit Breaks matter more.
 
 **Jewels:** Planet, Moon and **Halo** (I–II): 12 items. Per Uma: 29 with every moon (24 for one offense), plus her
-moon's 4.
+moon's 2.
 
 ### Tier 3: a second Halo kind and the Swiftness moon
 
@@ -159,7 +162,7 @@ The core and Tier 2's bodies again, plus:
   kind still stop at +68.
 - **The Swiftness moon:** +3% evasion at Lv 16, +3% more at Lv 36, with Moon Jewels II and IV.
 
-No new jewel kind. Per Uma: 33 with every moon (28 for one offense), plus her moon's 6.
+No new jewel kind. Per Uma: 33 with every moon (28 for one offense), plus her moon's 2.
 
 **Class constellations** (tiers §6's Tier 3 row) are dropped (ES10): the shared map stays class-free, so a class
 switch never changes what it gives, and class identity belongs to [classes](classes.md) and
@@ -168,33 +171,38 @@ switch never changes what it gives, and class identity belongs to [classes](clas
 ### Her moon
 
 [Variance](variance.md) §8 gives each Uma **a moon of her own**, named for her template ("Ironhide's moon"), on its
-own small orbit, starred. This doc holds its slot (ES12):
-- **Two tracks, lead and knack, one node each per tier reached:** 2 nodes in Tier 1, 4 in Tier 2, 6 in Tier 3.
+own small orbit, starred. Variance owns what's on it (template-only nodes, [README §3](README.md#3-who-owns-what));
+this doc holds its slot and the map's rules for it (ES12):
+- **Two nodes, the same in every tier,** rebuilt with the map at each promotion:
 
-  | Track | Tier 1 | + Tier 2 | + Tier 3 |
-  |---|---|---|---|
-  | Knack: HP, MP, DEF and M.DEF (half each), Speed or Limit, in every class | Grade 4 · Lv 16 · +4 | Grade 6 · Lv 26 · +6 | Grade 8 · Lv 36 · +8 |
-  | Lead: ATK or M.ATK, only in classes of that channel | Grade 6 · Lv 26 · +6 | Grade 8 · Lv 36 · +8 | Grade 10 · Lv 46 · +10 |
+  | Node | Grade · opens | Gives | Jewel | Counts |
+  |---|---|---|---|---|
+  | **I, knack** | 4 · Lv 16 | +4 to her knack's stat: HP (+20 HP), MP, DEF and M.DEF (+4 each, as Guard), Speed (+2.4% evasion) or Limit | Moon Jewel II | In every class |
+  | **II, lead** | 8 · Lv 36 | +8 ATK or M.ATK, her calling's channel | Moon Jewel IV | In the classes of that channel |
 
 - **Worth a moon node of its grade (×1).** Variance drafted ×1.5 inside an active cap; with every node counting, its
   own fallback is ×1.
-- **Jewels:** the Moon Jewel of the grade (II–V). No new kind.
+- **Jewels:** Moon Jewels II and IV, every tier. No new kind.
 - **Out of channel:** a lead node her class can't use stays open and reads "No effect as Mage".
-- **Outside the foe budget**, like today's off-curve nodes, within variance's ≤ +5% for a matched Uma: +6 ATK and +4 of
-  her knack in Tier 1.
-- Its knack is Tier 1's only Extra Stats home for Speed and Limit.
+- **Outside the foe budget**, like today's off-curve nodes, within variance's ≤ +5% for a matched Uma: +8 ATK and +4 of
+  her knack, in every tier (+8 is 2.7% of an on-curve Tier 1 Lv 50 Brawler's offense, 1.7% of a Tier 3 one's).
+- Its knack is Tier 1's only Extra Stats home for Speed and Limit (ES6 keeps them off the shared map, not off hers).
+- *Changed in cross-reference:* this slot grew to 4 and 6 nodes (lead +6 at Lv 26 in Tier 1) and split a Mighty knack
+  half and half. Variance's two nodes win: it owns template-only nodes, the template's depth per tier comes from the
+  signature tip, and a growing moon would push Tier 3 past [professions.md](professions.md)' tenth-more work budget
+  (PR10) and to the edge of variance's +5% (U12).
 
 ## Provides
 
 | To | What |
 |---|---|
 | [Professions](professions.md) | **Jewel kinds and grades per tier** (drafts): Tier 1 Planet Jewel I–V and Moon Jewel I–V; Tier 2 + Halo Jewel I–II; Tier 3 no new kind. A jewel for a node of level ℓ is craftable from profession Lv ℓ (5g − 4) |
-| Professions | **Demand per Uma, per tier:** Planet Jewel one of each grade. Moon Jewel I, III, V three or four each (one a moon); II and IV the same, plus one per small moon (Valor from Tier 2, Swiftness from Tier 3). Her moon adds Moon Jewels II and III in Tier 1, + III and IV in Tier 2, + IV and V in Tier 3. Halo Jewel I and II one each per Halo kind. Shared totals: 20–25, 24–29, 28–33; her moon 2, 4, 6 |
-| Professions | **The Lapidary's budget stays professions.md's:** 120 refined items per Uma in Tier 1, +12 a tier. It assumed 30 jewels (10 planet, 20 moon); at 25 (+2 hers), its own rule rescales a jewel to about 4–5 refined items |
-| [Variance](variance.md) | **Her moon's slot:** lead and knack tracks as variance §6 draws them, at Lv 5g − 4; ×1 a moon node of the grade (no cap); Moon Jewels; ids `lead:1–3`, `knack:1–3` |
+| Professions | **Demand per Uma, per tier:** Planet Jewel one of each grade. Moon Jewel I, III, V three or four each (one a moon); II and IV the same, plus one per small moon (Valor from Tier 2, Swiftness from Tier 3). Her moon adds one Moon Jewel II and one IV in every tier. Halo Jewel I and II one each per Halo kind. Shared totals: 20–25, 24–29, 28–33; her moon 2, 2, 2 |
+| Professions | **The Lapidary's budget is professions.md's** (PR8): a Planet Jewel 8 refined items, a Moon Jewel 4, so 25 jewels are 120 per Uma in Tier 1 (her moon's 2 add 8). Tiers 2 and 3 resize the shared jewels to stay near 120, and the Halo Jewels add their tier pairs: 130, then 140 |
+| [Variance](variance.md) | **Her moon's slot:** variance's two nodes (knack, lead) at Lv 5g − 4; ×1 a moon node of the grade (no cap); Moon Jewels II and IV; ids `template:1–2` |
 | [Classes](classes.md) | The shared map is class-free. A class uses the planet, Vigor, Guard and the offense moon(s) of its channels |
 | [Gear](gear.md) | The Halo is flat offense to one kind from Tier 2, bounded with the Orb at a G10 weapon's Might (+68), as gear.md asks |
-| Cross-reference | The rows for `character-tiers.html` and `progression.html`: Tier 1 "Planet and 4 moons, 25 nodes"; Tier 2 "+ Halo (1 kind), + Valor"; Tier 3 "+ Halo's 2nd kind, + Swiftness"; her moon 2 · 4 · 6 |
+| Cross-reference | The rows for `character-tiers.html` and `progression.html`: Tier 1 "Planet and 4 moons, 25 nodes"; Tier 2 "+ Halo (1 kind), + Valor"; Tier 3 "+ Halo's 2nd kind, + Swiftness"; her moon 2 in every tier |
 
 ## Assumes
 
@@ -205,8 +213,8 @@ own small orbit, starred. This doc holds its slot (ES12):
 | [Professions](professions.md) | Jewel Crafting, at the Lapidary, makes the jewels above on today's 5g − 4 gate, within its Lapidary budget per Uma | — |
 | [Gear](gear.md) | As drafted: Orbs flat at half a weapon's Might, back in Tier 2 (the Halo's bound); feet armor keeps evasion; Lv 5g − 4 gates every grade | Without feet evasion, Tier 1's only evasion is a Fleet knack: acceptable |
 | [Classes](classes.md) | The ten damage kinds stay. **H63's mirror is re-checked** with full maps: the Summoner's Arms half gains ATK (about +10–15% damage a turn, a hand estimate) and the Spell Blade gains M.DEF. The knob is the hybrids' hands | — |
-| [Variance](variance.md) | Her moon as §6 and §8 draw it, at ×1 (its own no-cap fallback); Limit and Speed knacks keep their units | Her moon isn't drawn; nothing else changes |
-| Tier 2's world (H43, Z4) | The Halo, Valor and Swiftness sit in each tier's toolbox term (Z4's draft for Tier 2: +15% HP and defense, +10% offense by Lv 50). The cross-reference sets that term with the other docs' tools. Her moon stays outside every budget | — |
+| [Variance](variance.md) | Her moon as §6 and §8 draw it (two nodes a tier, *reconciled*), at ×1 (its own no-cap fallback); Limit and Speed knacks keep their units | Her moon isn't drawn; nothing else changes |
+| Tier 2's world (H43, Z4) | The Halo, Valor and Swiftness sit in each tier's toolbox term (Z4's draft for Tier 2: +15% HP and defense, +10% offense by Lv 50). The cross-reference keeps Z4's one term and lists its tools ([README §8](README.md#8-what-the-rework-supersedes): the specializations, forms, the Orb, branch C and the Break tips, the Halo, Valor); Tier 2's simulation prices it. Her moon stays outside every budget | — |
 
 ## Save impact
 
@@ -220,10 +228,11 @@ own small orbit, starred. This doc holds its slot (ES12):
 inputs (`gems.ts`), each refined item its raw one (1:1). Recommendation (ES14): nothing converts; the refund returns
 the raw items, as the brief leans.
 
-**New** (the next save version after v25, whichever the rework takes):
-- `stars: { open: string[], halo: (RpgDamageKind | null)[] }`: no `active`; `halo` holds 0, 1 or 2 kinds by tier.
+**New** (save **v26**, the Tier 1 rework's migration; the Halo's field joins with Tier 2's toolbox, v27):
+- `stars: { open: string[], halo: (RpgDamageKind | null)[] }`: no `active`; `halo` holds 0, 1 or 2 kinds by tier
+  (always empty until v27).
 - **Node ids, fresh so none reads as today's:** `planet:1–5`; `strength:`, `sorcery:`, `vigor:`, `guard:1–5`;
-  `valor:1–2`, `swiftness:1–2`; `halo:<kind slot 1–2>:<1–2>`; her moon `lead:1–3`, `knack:1–3`.
+  `valor:1–2`, `swiftness:1–2`; `halo:<kind slot 1–2>:<1–2>`; her moon `template:1` (knack) and `template:2` (lead).
 - **Jewel ids:** `jewel-planet-1–5`, `jewel-moon-1–5`, `jewel-halo-1–2`, in each world's stock (today's `gems` record,
   renamed or kept). No collision with any gem id.
 - **Strict parsing** refuses a body the world's tier doesn't have (a Halo node in Tier 1).
@@ -270,7 +279,7 @@ outside, as in Tier 1.
 | Her stats 204, core 51, G10 Might 68, Orb 34, armor 25 | 382 (today: 383) |
 | + Halo +34, on her Halo kind's hits | 416, about +15% a hit (H41's measure) |
 
-**Crafting:** 20–33 shared jewels per Uma (plus her moon's 2–6) instead of 100 Star Gems. Professions sizes each jewel
+**Crafting:** 20–33 shared jewels per Uma (plus her moon's 2) instead of 100 Star Gems. Professions sizes each jewel
 to its Lapidary budget, so the time to build an Uma on curve keeps today's order.
 
 ## Decisions
@@ -288,7 +297,7 @@ to its Lapidary budget, so the time to build an Uma on curve keeps today's order
 | **ES9** Tier 2's Limit | The Valor moon: Limit start +2 (Lv 16), +2 more (Lv 36) | Drop Limit from the shared map | Q9's recommendation, kept small |
 | **ES10** Tier 3's growth | The Halo's second kind (Halo III–IV) and the Swiftness moon (+3%, +3%) | Class constellations (tiers §6): 6 × 3 nodes tied to class | The shared map stays class-free; class identity is the class and tree docs' |
 | **ES11** The core across tiers | The same planet and moons, same values per tier level, rebuilt each tier | A core that grows by tier: D170's budget scaling rewritten | Z3 holds unchanged; new tiers add tools, not stat inflation |
-| **ES12** Template-only nodes | Her moon, as variance draws it: lead and knack tracks, one node each per tier reached, ×1 a moon node of the grade, Moon Jewels | On the planet or the shared moons (mixes everyone's with hers); ×1.5 (needs a cap) | Personal, small, outside the budget, and easy to leave out |
+| **ES12** Template-only nodes | Her moon, as variance draws it: **two nodes in every tier**, I knack (Lv 16, +4, every class) and II lead (Lv 36, +8, her calling's channel), ×1 a moon node of the grade, Moon Jewels II and IV, ids `template:1–2`. *Changed in cross-reference: from lead and knack tracks growing 2 · 4 · 6 (variance owns template-only nodes)* | On the planet or the shared moons (mixes everyone's with hers); ×1.5 (needs a cap); a moon that grows each tier (Tier 3 past the work budget and at the +5% edge) | Personal, small, outside the budget, and easy to leave out |
 | **ES13** The foe budget | Unchanged rates; `onCurveStars` becomes "every node her level opens on her class's bodies" | Re-fit the budget to the new map | The core matches today's curve within 2 points |
 | **ES14** Old maps and gems | Delete every node and Star Gem; refund raw materials; no conversion | Convert old moons to new by grade | Different shapes; a partial conversion would confuse more than a clean rebuild |
 | **ES15** Names and art | The Planet; Strength, Sorcery, Vigor, Guard; Valor, Swiftness; the Halo; her moon by her template. "Planet Jewel III", "Moon Jewel II", "Halo Jewel I". Today's gem icons reused | "Gems" (gear.md keeps the word for weapons, GE12); today's stone names ("Citrine of the Planet") | Roman numerals match the nodes they open; no new art |

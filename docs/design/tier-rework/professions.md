@@ -1,10 +1,14 @@
 # Professions: five trades, ten yards, four huts each
 
-> **Fan-out draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs ([the brief](README.md)). It
-> answers the owner's Professions points, starts from the brief's §2 frame, and lists what it needs from the other
-> docs under [Assumes](#9-assumes). It makes the items [gear.md](gear.md) (GE12) and [extra-stats.md](extra-stats.md)
-> (ES7) drafted, and takes each Uma's fight type from [variance.md](variance.md)'s Calling. Calls are numbered **PR1**,
-> **PR2** … with a recommendation each ([Decisions](#12-decisions)).
+> **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs
+> ([the brief](README.md)). It answers the owner's Professions points, starts from the brief's §2 frame, and lists what
+> it needs from the other docs under [Assumes](#9-assumes). It makes the items [gear.md](gear.md) (GE12) and
+> [extra-stats.md](extra-stats.md) (ES7) drafted, and takes each Uma's fight type from [variance.md](variance.md)'s
+> Calling. Calls are numbered **PR1**, **PR2** … with a recommendation each ([Decisions](#12-decisions)). The
+> cross-reference pass ([README §7](README.md#7-cross-reference-log)) kept every amount here (gear.md adopted them),
+> renamed Gem Hunting to **Hunting** (its items are stones; "gem" is the weapon line's word), dropped the second
+> fallback trade rule for variance's calling rule, added her own moon's two jewels, and corrected Tier 3's new pieces
+> (35 items, not 25).
 >
 > **Previews:** [the Wilds map at Tier 1, 2 and 3](previews/professions-map.html) ·
 > [gathering → processing → making → what she wears](previews/professions-flow.html) ·
@@ -36,7 +40,7 @@ looks this way.
 | Slots | 3 / 4 / 5 by facility level: 33 at level 1, 55 at level 3. Level 3 works ×1.25. 22 upgrades in all |
 | Materials | 8 families × 10 grades: 80 raw, 80 refined. Grade g opens at Craft Lv 5g − 4 |
 | Products | 40 gear types × 10 grades; 100 Star Gems |
-| Recipes | Gear: two refined items of its grade, the family pair rotating with type and grade (D139). Gems: a stat's family plus side items |
+| Recipes | Gear: two refined items of its grade, the family pair rotating with type and grade (D139). Star Gems: a stat's family plus side items |
 | Times | A gather 54 min at Lv 1 to 36 at Lv 50; a refine a quarter; a craft or cut two gathers |
 | One Uma maxed | 472 raw, 472 refined, 220 products, about 776 hours of work at Lv 25's speed |
 
@@ -52,7 +56,7 @@ Battle page. This doc replaces it (PR12).
 | **Huts** (one Uma each) | 4 a yard: **40** | 6 a yard: **60** | 8 a yard: **80** |
 | **Material pairs a gathering profession** | 1 (the base pair): **2 types** | 2: 4 types | 3: 6 types |
 | **Item types gathered and refined** | 10 raw, 10 refined | 20, 20 | 30, 30 |
-| **One Uma maxed** | 485 refined, 822 h | About 510, 864 h | About 510, 864 h |
+| **One Uma maxed** | 485 refined, 822 h (493, 835 h with her own moon) | 510, 864 h (518, 878 h) | 520, 881 h (528, 895 h) |
 | **Level** | Craft Level, one per Uma, today's curve | The same | The same |
 
 Hours are work at Craft Lv 25's speed before a building's speed, as today's 776 is.
@@ -68,9 +72,12 @@ trade's two yards (in Tier 1). She picks which one by what's short. One **Craft 
 | **Physical hybrid** | Spell Blade | **Lumber Camp**: Wood Chopping | **Armorer**: Armor Crafting | 4 saw sheds · 4 benches |
 | **Healer** | Paladin, Cleric | **Fields**: Farming | **Workbench**: Material Processing | 4 plots · 4 mills |
 | **Magical hybrid** | Summoner | **Fishery**: Fishing | **Charm Shop**: Accessory Crafting | 4 jetties · 4 tables |
-| **Magical** | Mage | **Hunting Grounds**: Gem Hunting | **Lapidary**: Jewel Crafting | 4 lodges · 4 wheels |
+| **Magical** | Mage | **Hunting Grounds**: Hunting | **Lapidary**: Jewel Crafting | 4 lodges · 4 wheels |
 
-Gem Hunting is the owner's "fighting for gems": she fights wild beasts for the gems they carry.
+Hunting is the owner's "fighting for gems": she fights wild beasts for the **stones** they carry (Quartz, Garnet …),
+cut at the Workbench and set as jewels at the Lapidary. *Changed in cross-reference: "Gem Hunting". "Gem" is only the
+weapon line's word (gear GE12), so the hunt's items are stones and the profession is plain Hunting, like its four
+neighbours.*
 
 **What "tied to a fight type" means (PR1).** Her trade comes from her **Calling**, the fight type of her Uma Template
 ([variance.md](variance.md) §5), set by rule when she's unlocked. It never follows a class switch, and her active class
@@ -82,18 +89,10 @@ moves no job ([classes.md](classes.md) CL14).
 | Her starting class (running style) | Simple, already in the code (D162, D180) | Master data's 270 outfits split 17% front, 53% pace, 24% late, 5% end. The Summoner's trade would get one Uma in twenty, and no Uma starts as a Spell Blade |
 | **Her Calling** (recommended) | Assigned by rule from master data: 22.6 / 20.7 / 17.0 / 17.0 / 22.6% today (physical, physical hybrid, magical, magical hybrid, healer). She can still be any class | Needs variance.md's rule |
 
-**If templates aren't adopted,** this rule lives here instead, read from her racing profile by stable id. It splits
-the 270 outfits 22.6 / 20.7 / 20.4 / 18.5 / 17.8%:
-
-| Her best running style (ties: front, pace, late, end) | And | Trade |
-|---|---|---|
-| Front runner | — | Physical |
-| Pace chaser, base Power over Wit | Best distance Sprint (the shorter on a tie) | Physical |
-| Pace chaser, base Power over Wit | Any other | Physical hybrid |
-| Late surger, base Power over Wit | — | Healer |
-| Late surger, Wit at or over Power; End closer | — | Magical hybrid |
-| Pace chaser, Wit at or over Power | Best distance Mile | Magical hybrid |
-| Pace chaser, Wit at or over Power | Any other | Magical |
+**One rule, wherever it ships.** The calling is variance.md U4's eight rows, one pure function of master data by stable
+id (`umaTemplate`). If Professions ships before the rest of Variance, that function ships with it (variance §9) and the
+trade reads it; no second rule. *Changed in cross-reference: this section drafted its own fallback rule (no Cleric
+callings, a different split), which would have given one Uma two fight types.*
 
 ## 5. Tier 1
 
@@ -135,7 +134,7 @@ one refined, as today. **Twenty item types** in all, 18 of them today's ids.
 | Wood Chopping | Pine Log → Pine Plank | Oak Log → Oak Plank | 95 |
 | Farming | Flax → Linen | Cotton → Cotton Cloth | 95 |
 | Fishing | Seashell → Shell Carving | **Pearl → Polished Pearl** (new ids) | 95 |
-| Gem Hunting | Quartz → Cut Quartz | Garnet → Cut Garnet | 95 |
+| Hunting | Quartz → Cut Quartz | Garnet → Cut Garnet | 95 |
 
 Ten grades stay where they matter: on the items an Uma uses (gear.md's grades, extra-stats.md's jewels), gated at
 Craft Lv 5g − 4 to make.
@@ -155,7 +154,7 @@ quarter of the refined items**, and each recipe is one fixed set: grades 1–5 t
 | Refine | Workbench | 1 raw | Every low type | Every high type |
 
 - **Easy to say:** weapons take ingots and planks; light armor cloth and shells, heavy armor iron, oak and a garnet;
-  accessories cloth and pearls; jewels gems on a metal mount, the planet a bit of everything.
+  accessories cloth and pearls; jewels cut stones on a metal mount, the planet a bit of everything.
 - **Every class needs the same items** (gear.md: a Weapon Gem raises any weapon, a fitting any slot of either half, a
   setting any type), so every Uma needs the same materials, and a party is five times one Uma. No class leans on a yard.
 - **The accessory is the big piece.** Tier 1 has one accessory and five armor slots. For the Charm Shop's trade to be as
@@ -191,6 +190,12 @@ Numbers are in the [demand preview](previews/professions-demand.html).
 | 1 accessory slot, grades 1–10: a Setting a step (gear.md) | 10 | Charm Shop | 12 | 120 |
 | Extra Stats: Planet Jewel I–V, Moon Jewel I–V on four moons (extra-stats.md) | 25 | Lapidary | 8 or 4 | 120 |
 | **Total** | **115 pieces** | | | **485**, from 485 raw and 485 refines |
+| + her own moon (variance.md, ES12): Moon Jewels II and IV | 2 | Lapidary | 4 | 8: **493**, about 835 h |
+
+- **Her moon** sits outside the shared demand, as it sits outside the foe budget: every Uma has one, and its two jewels
+  add 6 Hunting and 2 Mining gathers and 8 Lapidary refined items. With it the trades span 19.4–20.6% of the work.
+- **A second class** adds only the weapons she hasn't raised (gear.md §3.1): up to 30 more Weapon Gems, 120 refined.
+  Armor and the accessory follow her slots, so they cost nothing again.
 
 **What each trade carries** (hours at Lv 25's speed):
 
@@ -232,12 +237,12 @@ Numbers are in the [demand preview](previews/professions-demand.html).
 | Gathered items | 80 | **10** |
 | Refined items | 80 | **10** |
 | Things to make | 400 gear pieces, 100 Star Gems | **40**: Weapon Gem, Armor Fittings and Accessory Setting × 10 grades; Planet and Moon Jewels I–V |
-| Recipe rule | Four family pairs rotating by type and grade; gems with side items | **One fixed set an item**; low types for grades 1–5, high for 6–10 |
+| Recipe rule | Four family pairs rotating by type and grade; Star Gems with side items | **One fixed set an item**; low types for grades 1–5, high for 6–10 |
 | Job kinds | 4 (gather, refine, craft, cut) | 4 in the engine; the player sees gather, process, make |
 | Where an Uma can work | Any of 11 | **Her 2 yards** |
 | Choices when gathering | 10 grades | 2 (1 before Craft Lv 26) |
 | Choices when refining | 80 | 10 |
-| Per Uma, maxed | 472 raw, 472 refined, 220 pieces, 776 h | 485, 485, 115, 822 h |
+| Per Uma, maxed | 472 raw, 472 refined, 220 pieces, 776 h | 485, 485, 115, 822 h (493 and 835 h with her moon's 2 jewels) |
 | **Added** | — | Trades; the low/high choice |
 
 ### 5.7 Around the yards
@@ -265,7 +270,7 @@ Numbers are in the [demand preview](previews/professions-demand.html).
 | **Main profession** | Only her own trade's gathering yard gives her the Tier 2 pair: her main profession "reaches its higher tier" |
 | **Secondary profession** | One other gathering profession, picked on her profile's Work tab, once per tier, free. She gathers its **base pair**, at her Craft Level's speed and gates. Changing it costs 1,000 Laurels. Gathering only: making stays her trade's |
 | **The Exchange** | The base pair as in Tier 1; the Tier 2 pair's low type after a win on continent 2, high after continent 4. Same prices |
-| **One Uma maxed** | About 510 refined, **864 h** |
+| **One Uma maxed** | 510 refined, **864 h** (518, 878 h with her moon) |
 
 The secondary is where Tier 2 softens the trade split: base items are about 95% of the gathering, and any Uma can
 help one more profession with them. A run of twenty arrives with about four Umas a trade; each picks a secondary where
@@ -277,9 +282,9 @@ her world is short.
 |---|---|
 | **Huts** | Two more a yard: **8** (80), drawn 4 × 2: four 24 px tiles, inside a yard's 112 px. Pips: three faces and "+5" |
 | **Materials** | The **Tier 3 pair**: Titanium Ore / Orichalcum Ore, Ebony Log / Yggdrasil Branch, Moonsilk Cocoon / Cloudfleece, Leviathan Scale / Abyss Pearl, Starstone / Philosopher's Stone |
-| **New pieces** | gear.md's Tier 3 fork gems (Prism, Tempered, Keen) take one of each Tier 3 pair; the Halo Jewels keep the Tier 2 pairs. About 25 items per Uma again. Settings 4 (three slots) |
+| **New pieces** | gear.md's Tier 3 fork gems (Prism, Tempered, Keen, and Dual or Pure for a weapon arriving as Base: 3 an Uma) take one of each Tier 3 pair; the Halo Jewels (I–II for each of her two kinds: 4) keep the Tier 2 pairs. **35 items per Uma**, inside the 48 budget. Settings 4 (three slots). *Changed in cross-reference: "about 25" counted one Halo kind* |
 | **Secondary** | Reaches one tier behind her main: its base pair **and its Tier 2 pair** |
-| **One Uma maxed** | About 510 refined, **864 h** |
+| **One Uma maxed** | 520 refined, **881 h** (528, 895 h with her moon) |
 
 The rule for every later tier: one more pair per gathering profession, two more huts per yard, the tier's new pieces
 from that tier's pairs within a tenth more work, and the secondary trailing the main profession by one tier.
@@ -294,31 +299,33 @@ from that tier's pairs within a tenth more work, and the secondary trailing the 
 | Everyone | The material catalog per tier (§5.2, §6, §7); the budget for a tier's new pieces (a tenth more work, from that tier's pairs) |
 | The cross-reference pass | The Wilds map (§5.1) and the per-tier demand table for `progression.html` |
 | The refund | The conversion table from today's 160 items (§10) |
-| Pacing | Per Uma: 822 / 864 / 864 hours; the roster and run figures (§11) |
+| Pacing | Per Uma: 822 / 864 / 881 hours (835 / 878 / 895 with her moon); the roster and run figures (§11) |
 
 ## 9. Assumes
 
 | From | What this doc assumes | If it differs |
 |---|---|---|
 | **gear.md** (GE12) | Per Uma per tier: 30 Weapon Gems (27 + 3 fork gems from Tier 2), 50 Armor Fittings, Accessory Settings 10 · 20 · 30. One item of a line fits any weapon, slot or type | Sizes rescale so the Forge, the Armorer and the Charm Shop each stay near **120 refined per Uma** |
-| **gear.md** (§8's draft) | **Reconcile:** gear.md drafted rotating pairs and triples at about today's 240 refined for gear. Here gear takes 365 and jewels 120: the trades need each making yard at a quarter. The Uma's total, 485, is today's 472 | If gear stays at 240, the three gear trades idle a fifth of the time and an Uma's total drops to 360, a quarter under today's; PR8's alternative |
+| **gear.md** (§8) | **Reconciled:** gear.md drafted rotating pairs and triples at about 220 refined for gear; it now takes these recipes. Gear takes 365 and jewels 120: each making yard at a quarter. The Uma's total, 485, is today's 472 | — |
 | **classes.md** (CL14, §5) | 3 weapons, 5 armor slots, accessories 1 · 2 · 3; a class switch moves no job | — |
-| **extra-stats.md** (ES7) | Tier 1: 5 Planet and 20 Moon Jewels per Uma (four moons). Tier 2 adds Halo Jewels I–II. Her template moon's 2 more (variance.md) add 8 refined | Jewel sizes rescale to keep the Lapidary near 120 per Uma |
-| **variance.md** (U4) | Her Calling names one fight type; today's split is 17.0–22.6% per fight type | The fallback rule (§4) applies |
+| **extra-stats.md** (ES7, ES12) | Tier 1: 5 Planet and 20 Moon Jewels per Uma (four moons). Tier 2 adds Halo Jewels I–II (one kind), Tier 3 a second kind (I–II again). Her template moon's 2 (Moon Jewels II and IV, every tier; *reconciled*) add 8 refined | Jewel sizes rescale to keep the Lapidary near 120 per Uma |
+| **variance.md** (U4) | Her Calling names one fight type; today's split is 17.0–22.6% per fight type | U4's rule ships with this packet alone (§4); no second rule |
 | **Tier 2 and 3 additions** (all docs) | A tier's new pieces cost at most a tenth more work per Uma (48 refined), from that tier's pairs | Their recipes shrink to fit: the rate holds |
 | **The kit** (uma-platform) | A "Both apps:" option to draw a place as n one-tile huts; uma-art's ten hut tiles; icons for Pearl and Polished Pearl (and the Fishing pairs of Tiers 2 and 3) | Interim frames and badges, as D144 did |
 | **The brief's §2** | One addition: "an Uma works one **trade**, the gathering and the making profession of her fight type, on one Craft Level" | — |
 
 ## 10. Save impact
 
-The save version is the next free one at build time. Every world gets the same migration.
+Save **v26**, the Tier 1 rework's single migration ([README §9](README.md#9-engine-save-and-refund)): the gear and Star
+Gem refunds come back as today's ids, so this conversion must run in the same step. Every world gets the same
+migration. `OwnedUma.secondary` (Tier 2+) joins with Tier 2's toolbox, v27.
 
 | Today in the save | After | For the refund |
 |---|---|---|
 | `items`: 80 raw, 80 refined | **Converted one for one** by family and grade band (table below): raw to raw, refined to refined | Nothing lost |
 | `buildings`: 11 facilities' levels | Dropped: yards have no levels | Each paid upgrade back: its Laurels, and its refined items converted |
 | `work`: rows, queues, Repeat | Settled, collected and recalled: finished items paid with their Craft EXP, unfinished inputs returned, then converted. Queues and Repeat drop | Only time in progress is lost |
-| `gems` and `gear` in stock, bound gear, set gems | Deleted by gear.md (GE15) and extra-stats.md (ES14) | Their raw items come back as today's ids, then convert by the table |
+| `gems` (Star Gems) and `gear` in stock, bound gear, set Star Gems | Deleted by gear.md (GE15) and extra-stats.md (ES14) | Their raw items come back as today's ids, then convert by the table |
 | `OwnedUma.craft` | **Kept** | — |
 | `OwnedUma.secondary` | New, Tier 2+ worlds only, empty until picked | — |
 | `targets` | Kept; their lines recompute from the new recipes | — |
@@ -332,7 +339,7 @@ The save version is the next free one at build time. Every world gets the same m
 | Woods (Forest) | Wood Chopping | Pine Log / Pine Plank | Oak Log / Oak Plank |
 | Fibers (Meadow) | Farming | Flax / Linen | Cotton / Cotton Cloth |
 | Essences (Ley Spring), Bones & Horns (Fossil Dig) | Fishing | Seashell / Shell Carving | Pearl / Polished Pearl |
-| Crystals (Crystal Cavern), Hides & Scales (Monster Den) | Gem Hunting | Quartz / Cut Quartz | Garnet / Cut Garnet |
+| Crystals (Crystal Cavern), Hides & Scales (Monster Den) | Hunting | Quartz / Cut Quartz | Garnet / Cut Garnet |
 
 Of today's 160 ids, 18 stay as Tier 1's pairs and 32 come back as Tier 2's and 3's (Silver Ore, Cedar Log, Wool,
 Sapphire …). The other 110 leave the code; old-save fixtures keep them, as D144's did. Stock is converted by this
@@ -344,7 +351,7 @@ empty.
 **Unchanged:** Craft Level's curve (D96), 2 EXP a minute, the gate 5g − 4, gather minutes, refining at a quarter.
 
 **Per Uma:** 822 hours at Lv 25's speed against today's 776 (+6%), or 657 hut hours at ×1.25 against today's 621 at
-level 3.
+level 3. Her own moon's two jewels make it 835 hours (+8%).
 
 **Craft Level comes about two days sooner.** Today's facilities work ×1 until level 3, which needs grade-5 refined
 items: about day 11. Huts work ×1.25 from day 1:
@@ -364,9 +371,9 @@ it back.
 | | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
 | Workers, huts | 40, 40 | 20 (one run), 60 | 20, 80 |
-| One Uma maxed (hut hours) | 657 | 691 | 691 |
-| A party maxed | About 4 days | 7.2 days | 7.2 days |
-| A run of twenty maxed | About 16 days of all 40 huts | 28.8 days | 28.8 days |
+| One Uma maxed (hut hours) | 657 | 691 | 705 |
+| A party maxed | About 4 days | 7.2 days | 7.3 days |
+| A run of twenty maxed | About 16 days of all 40 huts | 28.8 days | 29.4 days |
 | Today | 40 workers: 12.9 days | About four weeks ([Tier 2's world](../tier2-world.md) §11) | — |
 
 - **Tier 1:** the fighting party's next grade waits on Craft Level, not on volume, as today. Forty huts work about
@@ -379,14 +386,14 @@ it back.
 
 | Call | Recommendation | Alternatives | Why |
 |---|---|---|---|
-| **PR1** What ties a profession to a fight type | Her **Calling's** fight type (variance.md), fixed in her world; never her class. If templates aren't adopted, §4's rule | Her current class; her starting class | Class switches are free, so following them means nothing. Starting classes split 17 / 53 / 24 / 5% and starve two trades |
+| **PR1** What ties a profession to a fight type | Her **Calling's** fight type (variance.md U4), fixed in her world; never her class. If Professions ships first, U4's rule ships with it. *Changed in cross-reference: the separate fallback rule dropped* | Her current class; her starting class | Class switches are free, so following them means nothing. Starting classes split 17 / 53 / 24 / 5% and starve two trades |
 | **PR2** One profession or two per Uma | One **trade**: her fight type's gathering and making professions, on **one Craft Level** | One of ten per Uma; two levels | Ten buckets skew worse and idle yards. One level is today's, with nothing new to track |
 | **PR3** The pairings | Physical: Mine · Forge. Physical hybrid: Lumber Camp · Armorer. Healer: Fields · Workbench. Magical hybrid: Fishery · Charm Shop. Magical: Hunting Grounds · Lapidary | Any other matching | Each reads as one craft; the rows mirror the Learning page, physical at the top |
 | **PR4** What a building is | A **hut for one Uma**: 4 a profession in Tier 1 (40), 6 in Tier 2, 8 in Tier 3. No upgrades; every hut works ×1.25 | Two Umas a hut (80 slots; two rows of pips break the map); keep facility levels | The owner's four buildings, one pip each, and 22 upgrade decisions gone. ×1.25 keeps today's level-3 rate |
 | **PR5** The map | Ten yards in today's ten side spots, **one row a trade**, gathering left, making right | Forty places (fifteen fit at 390 px); a fifth Hub page (the bar is full, D147) | It's today's measured layout, and an Uma's two yards sit side by side |
 | **PR6** Drawing huts | A "Both apps:" kit option: a place drawn as n one-tile huts; **ten hut tiles** in uma-art | Thirty yard frames (ten yards × three tiers) | Lean art; one option serves uma-racer's plots too |
 | **PR7** Materials | **Two types a gathering profession**: low (grades 1–5, Lv 1) and high (6–10, Lv 26); refining one for one | Ten grades each (today's 160 items); one type each | The owner's two types; grades still matter on the items |
-| **PR8** Recipes | **One fixed set an item** (§5.3), sized so each making yard uses about a quarter of the refined and each gathering yard about a fifth: every trade 19.7–20.6% of the work | gear.md's rotating pairs and triples (about 240 refined of gear) | Rotation balances, but no one can say what an item takes. At 240 the three gear trades idle a fifth of the time, and an Uma costs a quarter less than today |
+| **PR8** Recipes | **One fixed set an item** (§5.3), sized so each making yard uses about a quarter of the refined and each gathering yard about a fifth: every trade 19.7–20.6% of the work | gear.md's rotating pairs and triples (about 220 refined of gear; gear.md now adopts these) | Rotation balances, but no one can say what an item takes. At 240 the three gear trades idle a fifth of the time, and an Uma costs a quarter less than today |
 | **PR9** Make time | **One gather's time per refined item** in the piece | Today's flat two gathers | It's today's rule for today's two-item recipes; bigger pieces take longer, so trades stay even |
 | **PR10** How tiers grow | **One more pair a gathering profession and two more huts a yard** each tier; a tier's new pieces take their base recipe plus one of each of its pairs, within a tenth more work; base recipes never change | Re-split the ten grades over more types each tier | Tier 1's recipes stay true forever, depth arrives with the tier, and the rate holds |
 | **PR11** Secondary profession | From Tier 2: one other **gathering** profession's base pair, picked once a tier, free; changing costs 1,000 Laurels. In Tier 3 it reaches that profession's Tier 2 pair | Set by rule; free changes; a making secondary | It's the owner's idea, and it lets the player fix a short trade. Free changes would undo the trades |

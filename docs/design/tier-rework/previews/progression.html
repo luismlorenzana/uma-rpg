@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Progression by Tier</title>
+<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
+     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.locked { color: var(--locked); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
+  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
+  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tier-row { display: flex; gap: 10px; justify-content: center; }
+  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
+    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
+  .node.core { border-color: var(--accent); background: var(--accent-wash); }
+  .node.pick { border-style: dashed; }
+  .node.locked { opacity: .45; }
+  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  /* This preview's own pieces. */
+
+  .lead { margin: 0 0 8px; }
+  .mx { min-width: 760px; }
+  .mx th, .mx td { font-size: 12px; }
+  .mx td:first-child, .mx th:first-child { position: sticky; left: 0; background: var(--panel); z-index: 1;
+    min-width: 118px; max-width: 128px; font-weight: 700; color: var(--ink); box-shadow: 1px 0 0 var(--hairline); }
+  .mx tr.cat td { background: var(--sunken); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--ink-soft); font-weight: 800; padding-top: 8px; }
+  .mx tr.cat td:first-child { background: var(--sunken); }
+  .mx td.today { color: var(--ink-faint); }
+  .mx td.add { color: var(--ink); }
+  .mx td.add b { color: var(--accent-strong); }
+  .mx th.t1c { border-bottom: 3px solid var(--t1); } .mx th.t2c { border-bottom: 3px solid var(--t2); }
+  .mx th.t3c { border-bottom: 3px solid var(--t3); }
+  .hint { font-size: 11px; color: var(--ink-faint); margin: 0 0 6px; }
+  .adds { display: grid; gap: 8px; }
+  .addcard { border-left: 4px solid var(--t1); }
+  .addcard.t2 { border-left-color: var(--t2); } .addcard.t3 { border-left-color: var(--t3); }
+  .addcard ul { margin: 6px 0 0; padding-left: 18px; }
+  .addcard li { margin: 2px 0; font-size: 13px; }
+  .addcard li b { color: var(--ink); }
+  .addcard .sum { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+  .cx { min-width: 0; }
+  .cx td, .cx th { padding: 6px 5px; }
+  .cx td:last-child, .cx th:last-child { text-align: right; }
+  .cx td, .cx th { font-size: 11.5px; }
+  .cx td:first-child { color: var(--ink); font-weight: 600; }
+  .cx td.was { color: var(--ink-faint); }
+  .cx td.now { color: var(--ink); font-weight: 700; }
+  .cx td.chg { color: var(--success); font-weight: 700; }
+  .cx td.chg.up { color: var(--warning); }
+  .cx tr.cat td { background: var(--sunken); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--ink-soft); font-weight: 800; text-align: left; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .dm td, .dm th { font-size: 12px; }
+  .dm tr.total td { font-weight: 800; color: var(--ink); border-top: 1.5px solid var(--hairline-strong); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--sunken); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .note b { color: var(--ink); }
+
+</style>
+</head>
+<body>
+<main>
+<h1>Every category, every tier</h1>
+<p class="lead">What each tier adds per category, with counts, and Tier 1 today against the proposal. The cross-reference view of the Tier rework (<a href="../README.md">README</a> §2.2); one Uma's page is <a href="character-tiers.html">character-tiers</a>.</p>
+<nav class="tabs"><a href="#matrix">Category × tier</a><a href="#adds">What a tier adds</a><a href="#complexity">Tier 1 today vs proposed</a><a href="#demand">One Uma's demand</a></nav>
+<section id="matrix"><h2>Category × tier</h2><div class="card"><p class="hint">Scroll sideways inside the box; the first column stays. Gold: what that tier adds.</p><div class="scroll"><table class="mx"><thead><tr><th></th><th>Today (every tier)</th><th class="t1c">Tier 1</th><th class="t2c">Tier 2</th><th class="t3c">Tier 3</th></tr></thead><tbody><tr class="cat"><td>Classes</td><td colspan="4"></td></tr><tr><td>Class choice</td><td class="today">6 classes, free switching</td><td class="add">6 classes, free switching</td><td class="add">+ <b>a specialization</b>, one of two (12 passives)</td><td class="add">+ <b>a mastery</b> (6, one a class)</td></tr><tr><td>Starting class</td><td class="today">Running style (Spell Blade never)</td><td class="add">Her <b>calling</b>: 8 rows, every class has starters</td><td class="add">Kept through promotion</td><td class="add">Kept</td></tr><tr><td>Foes weak to</td><td class="today">2–5 kinds, half drawn at random</td><td class="add"><b>1 strike</b>: Heavy, Flurry or Area</td><td class="add"><b>2 kinds</b> of their strike</td><td class="add"><b>1 kind</b> of their strike</td></tr><tr><td>Charged-move locks</td><td class="today">Kinds to match</td><td class="add">Weak acts to count</td><td class="add">Kinds again; a Dual's count</td><td class="add">Kinds</td></tr><tr class="cat"><td>Gear</td><td colspan="4"></td></tr><tr><td>Weapon slots</td><td class="today">5 (5 + 0 or 3 + 2)</td><td class="add"><b>3</b>, one per strike</td><td class="add">3</td><td class="add">3</td></tr><tr><td>Weapon forms</td><td class="today">— (weapon arts proposed)</td><td class="add">Base: 1 kind, G0–G10</td><td class="add">+ G5 fork: <b>Dual</b> or <b>Pure</b></td><td class="add">+ G5 fork: <b>Prism</b>, <b>Tempered</b> or <b>Keen</b></td></tr><tr><td>A weak hit</td><td class="today">×1.3</td><td class="add">×1.3</td><td class="add">×1.3, or ×1.5 (Pure)</td><td class="add">Up to ×1.7 (Keen)</td></tr><tr><td>Armor</td><td class="today">5, a half per piece (32 suits)</td><td class="add">5, her class's half</td><td class="add">5, per piece for the four between</td><td class="add">The same</td></tr><tr><td>Accessories</td><td class="today">2: an Orb and a support</td><td class="add"><b>1</b>: Support</td><td class="add"><b>2</b>: + Damage (an Orb)</td><td class="add"><b>3</b>: + a second Support</td></tr><tr><td>What gates a grade</td><td class="today">24 rank bars, Gear Marks, Manuals</td><td class="add">Uma Lv 5g − 4</td><td class="add">The same</td><td class="add">The same</td></tr><tr><td>Items to max one Uma</td><td class="today">120 pieces, bound in order</td><td class="add">90 upgrades</td><td class="add">100 (3 fork gems)</td><td class="add">110 (3 fork gems)</td></tr><tr class="cat"><td>Skill trees</td><td colspan="4"></td></tr><tr><td>Trees she uses</td><td class="today">5 (of 5 or 10)</td><td class="add">3</td><td class="add">3</td><td class="add">3</td></tr><tr><td>Nodes a tree</td><td class="today">15</td><td class="add">8: trunk, fork, 2 branches</td><td class="add">14: + branch C, tip forks</td><td class="add">17: + depth 6 capstones</td></tr><tr><td>Picks a class</td><td class="today">25 forks + 50 points</td><td class="add"><b>3</b>, each with a default</td><td class="add"><b>6</b></td><td class="add"><b>9</b>: two branches held</td></tr><tr><td>Skills held · equipped</td><td class="today">Up to 50 · 3 → 10</td><td class="add">15 · 3 → 7</td><td class="add">15 · 3 → 10</td><td class="add">30 · 10 + a master slot</td></tr><tr><td>Skill currency</td><td class="today">Side points</td><td class="add">None</td><td class="add">None</td><td class="add">None</td></tr><tr><td>Her tree's root</td><td class="today">—</td><td class="add">Class, ★ Flourish</td><td class="add">+ specialization</td><td class="add">+ mastery</td></tr><tr class="cat"><td>Extra Stats</td><td colspan="4"></td></tr><tr><td>Bodies</td><td class="today">A Sun and 8 planets</td><td class="add">1 planet, 4 moons</td><td class="add">+ <b>the Halo</b> (1 kind), <b>Valor</b></td><td class="add">+ the Halo's 2nd kind, <b>Swiftness</b></td></tr><tr><td>Shared nodes</td><td class="today">100</td><td class="add">25</td><td class="add">29</td><td class="add">33</td></tr><tr><td>Her moon</td><td class="today">—</td><td class="add">2 nodes</td><td class="add">2, rebuilt</td><td class="add">2, rebuilt</td></tr><tr><td>Nodes that count</td><td class="today">5 → 30, chosen by hand</td><td class="add">Every open node</td><td class="add">Every open node</td><td class="add">Every open node</td></tr><tr><td>Jewels: kinds · per Uma</td><td class="today">3 · 100 Star Gems</td><td class="add">2 · 20–25 (+2 hers)</td><td class="add">3 · 24–29 (+2)</td><td class="add">3 · 28–33 (+2)</td></tr><tr class="cat"><td>Professions</td><td colspan="4"></td></tr><tr><td>Places on the Wilds</td><td class="today">11 facilities</td><td class="add">10 yards, one a profession</td><td class="add">10</td><td class="add">10</td></tr><tr><td>Buildings</td><td class="today">33–55 slots, 22 upgrades</td><td class="add"><b>40 huts</b>, 4 a yard, no upgrades</td><td class="add"><b>60</b>, 6 a yard</td><td class="add"><b>80</b>, 8 a yard</td></tr><tr><td>Material types</td><td class="today">160 (80 raw, 80 refined)</td><td class="add">20: 1 pair a profession</td><td class="add">40: + a Tier 2 pair</td><td class="add">60: + a Tier 3 pair</td></tr><tr><td>Where an Uma works</td><td class="today">Any of 11</td><td class="add">Her trade's 2 yards</td><td class="add">+ a <b>secondary</b>'s gathering (base pair)</td><td class="add">Secondary + its Tier 2 pair</td></tr><tr><td>Things to make</td><td class="today">400 gear, 100 Star Gems</td><td class="add">40</td><td class="add">+ Dual, Pure Gems; Halo Jewels</td><td class="add">+ Prism, Tempered, Keen Gems</td></tr><tr><td>One Uma maxed</td><td class="today">472 refined, 776 h</td><td class="add">485 (493 with her moon), 822 h</td><td class="add">510 (518), 864 h</td><td class="add">520 (528), 881 h</td></tr><tr class="cat"><td>Uma Variance</td><td colspan="4"></td></tr><tr><td>Her template</td><td class="today">—</td><td class="add">Calling, stride, knack: ★ Flourish, her moon</td><td class="add">+ <b>signature tip</b> (a third tip option)</td><td class="add">Tip at both of the tree's forks</td></tr><tr><td>Choices it asks</td><td class="today">—</td><td class="add">None</td><td class="add">1 tip option</td><td class="add">The same</td></tr><tr><td>Matched edge</td><td class="today">—</td><td class="add">About +5% at most</td><td class="add">The same</td><td class="add">The same</td></tr></tbody></table></div></div></section>
+<section id="adds"><h2>What each tier adds</h2><div class="adds">
+<div class="card addcard"><b><span class="tier t1">Tier 1</span> The base</b><ul>
+<li><b>Classes:</b> six, three weapon slots one per strike; foes weak to one strike</li>
+<li><b>Gear:</b> 3 weapons, 5 armor, 1 Support, each G0–G10; one item a grade</li>
+<li><b>Skill trees:</b> 3 trees, one free pick each</li>
+<li><b>Extra Stats:</b> a planet and four moons, 25 nodes, all counting</li>
+<li><b>Professions:</b> one trade, two yards, two material types each</li>
+<li><b>Variance:</b> calling, Flourish, her moon (2 nodes)</li></ul>
+<div class="sum"><span class="chip">Picks: 3 trees + a weapon a strike + a support</span><span class="chip">0 currencies</span></div></div>
+<div class="card addcard t2"><b><span class="tier t2">Tier 2</span> One more choice in every category</b><ul>
+<li><b>Classes:</b> a specialization (1 of 2); foes weak to 2 kinds of their strike</li>
+<li><b>Gear:</b> a G5 fork a weapon (Dual or Pure); the Damage slot; armor halves per piece</li>
+<li><b>Skill trees:</b> branch C and a tip fork on every tree (+3 picks)</li>
+<li><b>Extra Stats:</b> the Halo (one kind, a free setting) and Valor (+4 nodes)</li>
+<li><b>Professions:</b> +2 huts a yard, a Tier 2 pair, a secondary gathering profession</li>
+<li><b>Variance:</b> the signature tip</li></ul>
+<div class="sum"><span class="chip">+1 class pick</span><span class="chip">+3 forms</span><span class="chip">+3 tree picks</span><span class="chip">+1 Halo kind</span><span class="chip">+1 secondary</span></div></div>
+<div class="card addcard t3"><b><span class="tier t3">Tier 3</span> Depth on the same frame</b><ul>
+<li><b>Classes:</b> a mastery; foes weak to 1 kind of their strike</li>
+<li><b>Gear:</b> a second fork a weapon (Prism, Tempered, Keen); a second Support</li>
+<li><b>Skill trees:</b> depth 6; two branches held (+3 picks)</li>
+<li><b>Extra Stats:</b> the Halo's second kind and Swiftness (+4 nodes)</li>
+<li><b>Professions:</b> +2 huts a yard, a Tier 3 pair; the secondary reaches its Tier 2 pair</li>
+<li><b>Variance:</b> the tip at both forks of her signature tree</li></ul>
+<div class="sum"><span class="chip">+3 forms</span><span class="chip">+3 tree picks</span><span class="chip">+1 Support</span><span class="chip">+1 Halo kind</span></div></div>
+</div></section>
+<section id="complexity"><h2>Tier 1: today vs proposed</h2><div class="card"><div class="scroll"><table class="cx"><thead><tr><th>A Tier 1 player faces</th><th>Today</th><th>Proposed</th><th>Change</th></tr></thead><tbody><tr class="cat"><td colspan="4">Classes</td></tr><tr><td>Weapons a class holds</td><td class="was">5</td><td class="now">3</td><td class="chg">−2</td></tr><tr><td>Weapon spreads to choose from</td><td class="was">Brawler, Mage 1; others 100</td><td class="now">Brawler, Mage 4; others 12</td><td class="chg">−88</td></tr><tr><td>Rules for what a foe is weak to</td><td class="was">5</td><td class="now">1</td><td class="chg">−4</td></tr><tr><td>Weak marks on a foe's card</td><td class="was">2–5 kinds</td><td class="now">1 strike</td><td class="chg">−1 to −4</td></tr><tr><td>Armor choices</td><td class="was">5 halves, 32 suits</td><td class="now">None</td><td class="chg">−32</td></tr><tr><td>Loadouts a class can wear</td><td class="was">Brawler 3,200; others 320,000</td><td class="now">Brawler 40; others 120</td><td class="chg">÷ 80 to ÷ 2,700</td></tr><tr class="cat"><td colspan="4">Gear</td></tr><tr><td>Gear slots</td><td class="was">12</td><td class="now">9</td><td class="chg">−3</td></tr><tr><td>Gear rank bars</td><td class="was">24</td><td class="now">0</td><td class="chg">−24</td></tr><tr><td>Gear currencies</td><td class="was">3: Gear Marks, Weapon and Armor Manuals</td><td class="now">0</td><td class="chg">−3</td></tr><tr><td>Item types the stations make</td><td class="was">400</td><td class="now">30</td><td class="chg">−370</td></tr><tr><td>Items to max her loadout</td><td class="was">120 pieces, bound in order</td><td class="now">90 upgrades</td><td class="chg">−30</td></tr><tr><td>Rules to learn</td><td class="was">6</td><td class="now">1: an item raises a slot a grade, up to Lv 5g − 4</td><td class="chg">−5</td></tr><tr class="cat"><td colspan="4">Skill trees</td></tr><tr><td>Trees on the page</td><td class="was">5 or 10</td><td class="now">3</td><td class="chg">−2 to −7</td></tr><tr><td>Nodes on the page</td><td class="was">75 or 150</td><td class="now">24</td><td class="chg">−51 to −126</td></tr><tr><td>Picks</td><td class="was">25 forks, each A, B or neither</td><td class="now">3, each with a default</td><td class="chg">−22</td></tr><tr><td>A currency</td><td class="was">Side points: 50 against 75</td><td class="now">None</td><td class="chg">−1</td></tr><tr><td>Skills she can hold</td><td class="was">50</td><td class="now">15</td><td class="chg">−35</td></tr><tr class="cat"><td colspan="4">Extra Stats</td></tr><tr><td>Bodies</td><td class="was">9: a Sun, 8 planets</td><td class="now">5: a planet, 4 moons (+ hers)</td><td class="chg">−4</td></tr><tr><td>Nodes</td><td class="was">100</td><td class="now">25 (+2 hers)</td><td class="chg">−75</td></tr><tr><td>Stats on the shared map</td><td class="was">8</td><td class="now">6</td><td class="chg">−2</td></tr><tr><td>Item kinds · items</td><td class="was">3 · 100</td><td class="now">2 · 10</td><td class="chg">−90 items</td></tr><tr><td>Active slots</td><td class="was">5 → 30, re-chosen every 2 levels</td><td class="now">None</td><td class="chg">−1 chore</td></tr><tr class="cat"><td colspan="4">Professions</td></tr><tr><td>Places to work</td><td class="was">11, any Uma anywhere</td><td class="now">10; an Uma works her 2</td><td class="chg">−9 a Uma</td></tr><tr><td>Building upgrades</td><td class="was">22</td><td class="now">0</td><td class="chg">−22</td></tr><tr><td>Gathered · refined types</td><td class="was">80 · 80</td><td class="now">10 · 10</td><td class="chg">−140</td></tr><tr><td>Things to make</td><td class="was">500</td><td class="now">40</td><td class="chg">−460</td></tr><tr><td>Choices when refining</td><td class="was">80</td><td class="now">10</td><td class="chg">−70</td></tr><tr><td>Added</td><td class="was">—</td><td class="now">Her trade; the low or high type</td><td class="chg up">+2</td></tr><tr class="cat"><td colspan="4">Uma Variance</td></tr><tr><td>A template</td><td class="was">—</td><td class="now">1, derived: no choices, 3 nodes she reads</td><td class="chg up">+1</td></tr><tr class="cat"><td colspan="4">One Uma, maxed</td></tr><tr><td>Refined items</td><td class="was">472</td><td class="now">485 (493 with her moon)</td><td class="chg up">+3% (+4%)</td></tr><tr><td>Hours at Craft Lv 25 speed</td><td class="was">776</td><td class="now">822 (835)</td><td class="chg up">+6% (+8%)</td></tr></tbody></table></div><p class="legend" style="margin:8px 0 0">Per class or per Uma, from each doc's "today and proposed" table: classes §2.8, gear §3.4, skill trees §4, Extra Stats' Tier 1 table, professions §5.6. Amber: what grows on purpose.</p></div></section>
+<section id="demand"><h2>One Uma's demand, per tier</h2><div class="card"><div class="scroll"><table class="dm"><thead><tr><th>One Uma maxed</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr></thead><tbody>
+<tr><td>Weapon Gems · refined</td><td class="num">30 · 120</td><td class="num">27 · 108</td><td class="num">27 · 108</td></tr>
+<tr><td>Fork gems · refined</td><td class="num">—</td><td class="num">3 · 27</td><td class="num">3 · 27</td></tr>
+<tr><td>Armor Fittings · refined</td><td class="num">50 · 125</td><td class="num">50 · 125</td><td class="num">50 · 125</td></tr>
+<tr><td>Accessory Settings · refined</td><td class="num">10 · 120</td><td class="num">20 · 120</td><td class="num">30 · 120</td></tr>
+<tr><td>Planet and Moon Jewels · refined</td><td class="num">25 · 120</td><td class="num">27 · 120</td><td class="num">29 · 120</td></tr>
+<tr><td>Halo Jewels · tier-pair items</td><td class="num">—</td><td class="num">2 · 10</td><td class="num">4 · 20</td></tr>
+<tr class="total"><td>Shared: pieces · refined</td><td class="num">115 · 485</td><td class="num">129 · 510</td><td class="num">143 · 520</td></tr>
+<tr><td>Her moon: Moon Jewels II, IV</td><td class="num">2 · 8</td><td class="num">2 · 8</td><td class="num">2 · 8</td></tr>
+<tr><td>Hours at Craft Lv 25 speed (with her moon)</td><td class="num">822 (835)</td><td class="num">864 (878)</td><td class="num">881 (895)</td></tr>
+</tbody></table></div><div class="note"><b>Today:</b> 220 pieces, 472 refined (240 for gear, 232 for Star Gems), 776 h. Gear grows, jewels shrink, the Uma's total holds; each later tier adds at most a tenth more work (professions PR10).</div></div></section>
+<p class="legend">Numbers are the docs' drafts as reconciled. Engine v16 and save v26 carry Tier 1; Tier 2's toolbox is v17 and v27 (README §9).</p>
+</main>
+</body>
+</html>
