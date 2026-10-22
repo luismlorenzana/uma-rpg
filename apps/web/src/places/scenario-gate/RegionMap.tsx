@@ -1,7 +1,7 @@
 // A region (D66, D97): one biome climbing five levels, its twelve stages on a path. Stages open in order and stay open for replays;
 // progress is the world's, whichever party won. Tap a stage for its rivals, then fight with the active party.
 import {
-  biomeById, openFightOf, rpgNodeStatus, SaveRuleError, springReadyAt, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
+  biomeById, healerBlock, openFightOf, rpgNodeStatus, SaveRuleError, springReadyAt, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
   type RpgMapNode, type RpgNodeStatus,
 } from '@rpg/domain'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -61,6 +61,8 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   if (!world) return null
   const run = worldRun(world)
   const fightOpen = openFightOf(world)
+  // Classes v2 (C8): the active party fights with one healer at most; the button says why it can't (H59).
+  const healers = healerBlock(world, (world.parties[world.world.activeParty]?.slots ?? []).filter((s): s is string => s !== null), campaign.outfits)
   const springLabel = readyAt ? `Spring, recharges in ${formatDuration(Date.parse(readyAt) - Date.parse(now))}` : 'Spring, refill party MP'
   const drink = async () => {
     if (!spring) return
@@ -151,9 +153,9 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
       {open && (
         <BottomSheet title={open.name} onClose={() => { setOpen(null); setError(null) }} footer={
           <div className="flex gap-2">
-            <button type="button" disabled={status(open.id) === 'locked' || !!fightOpen?.battle} onClick={() => void fight(open)}
+            <button type="button" disabled={status(open.id) === 'locked' || !!fightOpen?.battle || !!healers} onClick={() => void fight(open)}
               className="min-h-12 flex-[2] rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
-              {status(open.id) === 'locked' ? 'Locked' : fightOpen?.battle ? 'Fight open' : status(open.id) === 'cleared' ? 'Fight again' : 'Fight'}
+              {status(open.id) === 'locked' ? 'Locked' : fightOpen?.battle ? 'Fight open' : healers ?? (status(open.id) === 'cleared' ? 'Fight again' : 'Fight')}
             </button>
             {open.kind === 'fight' && status(open.id) === 'cleared' && (
               <button type="button" disabled={!!sweepBlock(world, region, open.id)} onClick={() => setSweepFor(open.id)}

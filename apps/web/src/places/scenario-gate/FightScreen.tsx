@@ -1,6 +1,7 @@
 // A fight (S3, D53, D86): the Phaser stage shows the rivals and the party and plays every action; the DOM on top carries
 // taps, bars, shields, weaknesses and commands. Pick one of her five weapons to attack with, or a skill, then tap a
-// rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
+// rival; a Spell Blade picks an Arms half and a Tome half, and from v15 a Summoner too, her Tome half first (the fight's
+// own version decides, H59). Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52). It plays a source (H50): the world
 // map's open fight, or the Rift's.
 import {
@@ -12,12 +13,12 @@ import { AtlasSprite, imagePath } from '@luismlorenzana/uma-kit/content'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import {
-  actionFor, describeCue, followCue, halfIsTome, limitMode, limitNow, limitOptions, limitReady, pairMode, pairOf, previewTarget, skillChoices,
+  actionFor, describeCue, followCue, halfIsTome, limitMode, limitNow, limitOptions, limitReady, pairing, pairMode, pairOf, previewTarget, skillChoices,
   type BattleMode, type SkillChoice,
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
 import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
-import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, supportText, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, ElementGlyph, extraHit, KindMark, ShieldBadge, skillKinds, supportOf, supportText, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import type { FightSource } from '../../battle/fight-source'
 import { StatusChips, WardMark } from '../../battle/pixel-icons'
 import type { StageSetup } from '../../battle/scene/BattleScene'
@@ -174,15 +175,18 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
   const ally = actor ? state.input.allies.find((a) => a.id === actor.id)! : null
   const choices = actor ? skillChoices(state, actor.id) : []
   const playing = cue !== null
-  const paired = ally?.classId === 'spellblade'
-  const pair = ally && paired ? pairOf(mode, ally) : null
+  // A pair class's act (D86, D183): the Spell Blade's, and in a v15 fight the Summoner's, the leading half first.
+  const pairs = ally ? pairing(state, ally) : null
+  const paired = pairs !== null
+  const tomeFirst = !!pairs?.tomeFirst
+  const pair = ally && paired ? pairOf(mode, ally, tomeFirst) : null
   const skill = mode.kind === 'skill' ? choices.find((c) => c.ref.id === mode.ref.id) ?? null : null
   const halfName = (h: { skill?: RpgNodeRef; weapon?: RpgWeapon }) =>
     h.skill ? choices.find((c) => c.ref.id === h.skill!.id)?.skill.label ?? '?' : h.weapon ? `${WEAPON_LABEL[h.weapon]} Attack` : '?'
   const pairMp = pair ? [pair.arms, pair.tome].reduce((n, h) => n + (h.skill ? choices.find((c) => c.ref.id === h.skill!.id)?.skill.mp ?? 0 : 0), 0) : 0
-  /** The mode an act uses: a Spell Blade's always carries both halves. */
-  const effective: BattleMode = pair && (mode.kind === 'attack' || mode.kind === 'skill') ? pairMode(pair) : mode
-  /** The weapon an Attack uses now: hers, or for a Spell Blade whichever half is an Attack. */
+  /** The mode an act uses: a pair class's always carries both halves. */
+  const effective: BattleMode = pair && (mode.kind === 'attack' || mode.kind === 'skill') ? pairMode(pair, tomeFirst) : mode
+  /** The weapon an Attack uses now: hers, or for a pair class whichever half is an Attack. */
   const attackWeapon = (w: RpgWeapon) => (pair ? (isRpgTome(w) ? pair.tome.weapon === w : pair.arms.weapon === w)
     : mode.kind === 'attack' && (mode.weapon ?? ally?.weapons[0]) === w)
 
@@ -243,21 +247,21 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
   }
   const pickSkill = (choice: SkillChoice) => {
     stopAuto()
-    if (pair) setMode(pairMode(isRpgTome(choice.skill.node.weapon) ? { ...pair, tome: { skill: choice.ref } } : { ...pair, arms: { skill: choice.ref } }))
+    if (pair) setMode(pairMode(isRpgTome(choice.skill.node.weapon) ? { ...pair, tome: { skill: choice.ref } } : { ...pair, arms: { skill: choice.ref } }, tomeFirst))
     else setMode({ kind: 'skill', ref: choice.ref })
     setSheet(null)
   }
   const pickWeapon = (w: RpgWeapon) => {
     stopAuto()
-    if (pair) setMode(pairMode(isRpgTome(w) ? { ...pair, tome: { weapon: w } } : { ...pair, arms: { weapon: w } }))
+    if (pair) setMode(pairMode(isRpgTome(w) ? { ...pair, tome: { weapon: w } } : { ...pair, arms: { weapon: w } }, tomeFirst))
     else setMode({ kind: 'attack', weapon: w })
   }
 
-  const hint = error ?? (cue ? describeCue(cue, name)
+  const hint = error ?? (cue ? describeCue(cue, name, state.engineVersion)
     : prefs.auto ? `Auto · ${prefs.speed}×${actor ? ` · ${name(actor.id)}` : ''}`
     : mode.kind === 'guard' ? `Tap an ally for ${name(actor?.id ?? '')} to guard`
     : mode.kind === 'limit' ? `Tap a rival: LIMIT BREAK · ${mode.name}`
-    : pair ? `Tap a rival: ${halfName(pair.arms)} + ${halfName(pair.tome)}${pairMp ? ` · ${pairMp} MP` : ''}`
+    : pair ? `Tap a rival: ${tomeFirst ? `${halfName(pair.tome)} + ${halfName(pair.arms)}` : `${halfName(pair.arms)} + ${halfName(pair.tome)}`}${pairMp ? ` · ${pairMp} MP` : ''}`
     : skill ? `Tap a rival: ${skill.skill.label} · ${skill.skill.mp} MP`
     : actor && ally ? `${name(actor.id)}: tap a rival to attack with her ${WEAPON_LABEL[mode.kind === 'attack' && mode.weapon ? mode.weapon : ally.weapons[0]!]}` : '')
 
@@ -425,7 +429,7 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
           {hint}
         </p>
         {ally && (
-          <div className="mb-2 grid grid-cols-5 gap-1.5" aria-label={paired ? 'Attack weapons: one Arm and one Tome' : 'Attack weapon'}>
+          <div className="mb-2 grid grid-cols-5 gap-1.5" aria-label={paired ? `Attack weapons: ${tomeFirst ? 'one Tome and one Arm' : 'one Arm and one Tome'}` : 'Attack weapon'}>
             {ally.weapons.map((w) => {
               const on = attackWeapon(w)
               return (
@@ -448,7 +452,7 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
               onClick={() => {
                 stopAuto()
                 if (kind === 'skill') setSheet('skills')
-                else setMode(kind === 'attack' ? (ally && paired ? pairMode(pairOf({ kind: 'attack' }, ally)) : { kind }) : { kind: 'guard' })
+                else setMode(kind === 'attack' ? (ally && paired ? pairMode(pairOf({ kind: 'attack' }, ally, tomeFirst), tomeFirst) : { kind }) : { kind: 'guard' })
               }}
               className={`min-h-12 rounded-sm border font-display text-[15px] font-bold disabled:opacity-40 ${mode.kind === kind ? 'border-accent bg-accent/15 text-accent' : 'border-hairline-strong bg-raised'}`}
             >
@@ -468,6 +472,9 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
                 return u.hp > 0 && kinds.some((k) => (w.elements as string[]).includes(k) || (w.weapons as string[]).includes(k))
               })
               const def = choice.skill.def
+              // From v15 a Spell Blade's Arms skill lands one hit more (D183); its support is the fight's generation's.
+              const hits = def.hits.length + (ally && extraHit(ally.classId, def, state.engineVersion) ? 1 : 0)
+              const support = supportText(supportOf(def, state.engineVersion), state.engineVersion)
               return (
                 <li key={choice.ref.id}>
                   <button type="button" disabled={!choice.affordable} onClick={() => pickSkill(choice)}
@@ -475,8 +482,8 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
                     <span className="min-w-0">
                       <span className="flex items-center gap-1 font-semibold"><WeaponGlyph weapon={choice.skill.node.weapon} size={14} />{kinds.map((k) => <KindMark key={k} kind={k} size={14} />)}{choice.skill.label}</span>
                       <span className="block text-[11px] text-ink-soft">
-                        {def.target === 'all' ? 'All rivals' : def.target === 'random' ? `${def.hits.length} hits on random rivals` : def.hits.length > 1 ? `${def.hits.length} hits` : 'One rival'}
-                        {state.engineVersion >= 12 && supportText(def.support) ? ` · ${supportText(def.support)}` : ''}
+                        {def.target === 'all' ? 'All rivals' : def.target === 'random' ? `${hits} hits on random rivals` : hits > 1 ? `${hits} hits` : 'One rival'}
+                        {support ? ` · ${support}` : ''}
                         {weak.length ? ` · weak: ${weak.map((u) => name(u.id)).join(', ')}` : ''}
                       </span>
                     </span>

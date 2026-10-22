@@ -1,7 +1,8 @@
 // Read-only projections of the engine for the fight screen: legal choices, previews and cue text. Ported from uma-racer,
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
-// an Arms half with a Tome half.
-import { BATTLE_LIMIT_MAX, bondCapacity, heroLimit, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgWeaponKind,
+// an Arms half with a Tome half (from v15 a Summoner's too, her Tome half leading, D183). Everything reads the fight's
+// own engine version, so an open v14 fight shows v14's rules whatever the live generation (H59).
+import { BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgV2, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 import { BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleHasLimit, battleLimitPlan,
@@ -23,20 +24,32 @@ export function skillChoices(state: BattleState, actorId: string): SkillChoice[]
   })
 }
 
-/** A Spell Blade's act: an Arms half and a Tome half, each a skill or an Attack (D86). */
+/** A pair class's act: an Arms half and a Tome half, each a skill or an Attack (D86). */
 export interface Pair { arms: BattleHalf; tome: BattleHalf }
+/** How she acts in this fight: alone, or in a pair led by her stronger half (the half the engine resolves first). A Spell
+ * Blade's pair leads with its Arms half; from v15 a Summoner's with its Tome half (D183); v6–v14 have only the Spell
+ * Blade's. */
+export function pairing(state: Pick<BattleState, 'engineVersion'>, ally: Pick<BattleAlly, 'classId'>): { tomeFirst: boolean } | null {
+  const hand = rpgHand(ally, state.engineVersion)
+  return hand.pair ? { tomeFirst: hand.tome > hand.arms } : null
+}
 const defaultPair = (ally: Pick<BattleAlly, 'weapons'>): Pair => ({
   arms: { weapon: ally.weapons.find((w) => !isRpgTome(w)) }, tome: { weapon: ally.weapons.find(isRpgTome) },
 })
-/** The pair a mode holds, so a pick can change one half. */
-export function pairOf(mode: BattleMode, ally: Pick<BattleAlly, 'weapons'>): Pair {
+/** The pair a mode holds, so a pick can change one half. The mode names the leading half (`tomeFirst`: the Tome), its
+ * `pair` the other. */
+export function pairOf(mode: BattleMode, ally: Pick<BattleAlly, 'weapons'>, tomeFirst = false): Pair {
   const base = defaultPair(ally)
-  if (mode.kind === 'attack') return { arms: { weapon: mode.weapon ?? base.arms.weapon }, tome: mode.pair ?? base.tome }
-  if (mode.kind === 'skill') return { arms: { skill: mode.ref }, tome: mode.pair ?? base.tome }
+  const lead = tomeFirst ? 'tome' : 'arms', other = tomeFirst ? 'arms' : 'tome'
+  if (mode.kind === 'attack') return { ...base, [lead]: { weapon: mode.weapon ?? base[lead].weapon }, [other]: mode.pair ?? base[other] }
+  if (mode.kind === 'skill') return { ...base, [lead]: { skill: mode.ref }, [other]: mode.pair ?? base[other] }
   return base
 }
-export const pairMode = (pair: Pair): BattleMode =>
-  pair.arms.skill ? { kind: 'skill', ref: pair.arms.skill, pair: pair.tome } : { kind: 'attack', weapon: pair.arms.weapon, pair: pair.tome }
+/** The mode of a pair, its leading half first. */
+export function pairMode(pair: Pair, tomeFirst = false): BattleMode {
+  const lead = tomeFirst ? pair.tome : pair.arms, other = tomeFirst ? pair.arms : pair.tome
+  return lead.skill ? { kind: 'skill', ref: lead.skill, pair: other } : { kind: 'attack', weapon: lead.weapon, pair: other }
+}
 /** Whether a half is a Tome's: its weapon, or its skill's weapon. */
 export const halfIsTome = (half: BattleHalf, choices: readonly SkillChoice[]): boolean =>
   half.weapon ? isRpgTome(half.weapon) : isRpgTome(choices.find((c) => c.ref.id === half.skill?.id)?.skill.node.weapon ?? 'greatsword')
@@ -79,9 +92,10 @@ export interface LimitOption {
   key: string; name: string; detail: string; choice: BattleLimitChoice; kinds: RpgDamageKind[]
   face?: string; strength?: number; instant?: boolean
 }
-const heroOption = (limit: HeroLimitId, face: string, strength: number): LimitOption => {
-  const def = heroLimit(limit)
-  return { key: `hero:${limit}`, name: def.name, detail: def.blurb, choice: { hero: limit }, kinds: heroLimitKinds(def), face, strength, instant: true }
+/** A Hall's Limit Break as the fight's own table has it (D181: v15's 24, v10–v14's 20), or none. */
+const heroOption = (version: number, limit: HeroLimitId, face: string, strength: number): LimitOption[] => {
+  const def = heroLimitFor(limit, version)
+  return def ? [{ key: `hero:${limit}`, name: def.name, detail: def.blurb, choice: { hero: limit }, kinds: heroLimitKinds(def), face, strength, instant: true }] : []
 }
 /** The Limit Break menu. From v10 (D112) only the Halls of Heroes give them: a Hero has her seat's, a Learner her Heroes'.
  * Older fights replay with their class's: a fixed one, or one per equipped skill, a Spell Blade picking an Arms and a Tome
@@ -89,8 +103,8 @@ const heroOption = (limit: HeroLimitId, face: string, strength: number): LimitOp
 export function limitOptions(state: BattleState, actorId: string): { pick: 1 | 2; options: LimitOption[] } {
   const ally = state.input.allies.find((a) => a.id === actorId)
   if (!ally) return { pick: 1, options: [] }
-  if (ally.hero) return { pick: 1, options: [heroOption(ally.hero, ally.id, 1)] }
-  const inherited = (ally.inherits ?? []).map((i) => heroOption(i.limit, i.from, bondCapacity(i.bond)))
+  if (ally.hero) return { pick: 1, options: heroOption(state.engineVersion, ally.hero, ally.id, 1) }
+  const inherited = (ally.inherits ?? []).flatMap((i) => heroOption(state.engineVersion, i.limit, i.from, bondCapacity(i.bond)))
   if (state.engineVersion >= 10) return { pick: 1, options: inherited }
   const own = classOptions(state, ally)
   return { pick: own.pick, options: [...own.options, ...inherited] }
@@ -117,7 +131,8 @@ export function limitMode(state: BattleState, actorId: string, choice: BattleLim
   return plan ? { kind: 'limit', name: plan.name, ...choice } : null
 }
 
-export function describeCue(cue: BattleCue, name: (id: string) => string): string {
+/** A cue in words, in its fight's version (`engine`): from v15 a lingering summon's farewell strikes every foe (D183). */
+export function describeCue(cue: BattleCue, name: (id: string) => string, engine?: number): string {
   switch (cue.kind) {
     case 'hit': return cue.label === 'Burn' ? `${name(cue.targetId)} burns for ${cue.amount}`
       : `${name(cue.actorId)} → ${name(cue.targetId)}: ${cue.amount}${cue.weak ? ' · WEAK' : ''}${cue.label === 'Intercepted' ? ' · guarded' : cue.label === 'Warded' ? ' · warded' : cue.label?.startsWith('Barrier') ? ` · ${cue.label}` : ''}`
@@ -131,7 +146,7 @@ export function describeCue(cue: BattleCue, name: (id: string) => string): strin
     case 'skip': return `${name(cue.actorId)} is ${cue.label?.toLowerCase()} and loses its turn`
     case 'mp': return `${name(cue.targetId)} +${cue.amount} MP`
     case 'limit': return `${name(cue.actorId)}: LIMIT BREAK · ${cue.label}${cue.from ? `, from ${name(cue.from)}` : ''}!`
-    case 'summon': return `${name(cue.actorId)}’s ${cue.label} strikes again`
+    case 'summon': return `${name(cue.actorId)}’s ${cue.label} ${rpgV2(engine) ? 'strikes every foe' : 'strikes again'}`
     case 'wave': return `${cue.label}: the next foes arrive`
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`
     case 'move': return `${name(cue.actorId)}: ${cue.label}`

@@ -1,5 +1,6 @@
 // The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
-// member can be recalled from her job here, and fights either way (D119).
+// member can be recalled from her job here, and fights either way (D119). From classes v2 a party with two healers
+// carries the "One healer a party" note (H59); editing it is never refused.
 import { isPartyFull, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -15,6 +16,12 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
+import { healerNote } from './healer-note'
+
+/** A party's one-healer note, in the warning colour. */
+function HealerNote({ note, className = '' }: { note: string | null; className?: string }) {
+  return note ? <span className={`block text-[12px] font-semibold text-warning ${className}`}>{note}</span> : null
+}
 
 export default function PartyHallPage({ place, rest }: PageProps) {
   const world = useWorld()
@@ -46,6 +53,7 @@ function SlotIcon({ view, world, outfitId, size }: { view: MasterView; world: Ti
 function PartyList({ view, world, place }: { view: MasterView; world: TierWorld; place: Place }) {
   const nav = useHubNavigation()
   const owned = Object.keys(world.umas).length
+  const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return (
     <div className="space-y-2 p-3">
       {owned === 0 && (
@@ -64,6 +72,7 @@ function PartyList({ view, world, place }: { view: MasterView; world: TierWorld;
               <SlotIcon key={k} view={view} world={world} outfitId={s} size={56} />
             ))}
           </span>
+          <HealerNote note={healerNote(world, party, outfits)} className="mt-1.5" />
         </button>
       ))}
     </div>
@@ -122,6 +131,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
           )
         })}
       </ul>
+      <HealerNote note={healerNote(world, party, byId)} className="text-[13px]" />
       {error && <p className="text-[13px] text-danger">{error}</p>}
 
       {picking !== null && (

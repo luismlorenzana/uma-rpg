@@ -1,7 +1,7 @@
 // The Rift page's pure helpers (H50): fight labels, which world parties can take a fight, the Convergence's coverage, the
 // Ascend sheet's numbers, the result screen's lines and the finale's faces (H52). Lazy, with the page.
 import {
-  activeClass, CONVERGENCE_FIGHTS, FRONT_NAME, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, type BattleEnemy, type BattleOutfit,
+  activeClass, CONVERGENCE_FIGHTS, FRONT_NAME, healerBlock, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, type BattleEnemy, type BattleOutfit,
   type EnemyTier, type RiftFightRef, type RiftFront, type RiftRun, type RosterMember, type RpgClass, type TierWorld,
 } from '@rpg/domain'
 import {
@@ -80,23 +80,26 @@ export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly
   })
 }
 
-/** The open party that best fits a front's guidance (ties to the lower index), or null when none can fight. */
+/** The open party that best fits a front's guidance (ties to the lower index), or null when none can fight. From classes
+ * v2 it never proposes a party with two healers (`healerBlock`, H59); `engine` defaults to the live generation. */
 export function bestParty(world: Pick<TierWorld, 'parties' | 'umas'>, front: RiftFront, outfits: ReadonlyMap<string, BattleOutfit>,
-  block: (index: number) => string | null, taken: ReadonlySet<number> = new Set()): number | null {
+  block: (index: number) => string | null, taken: ReadonlySet<number> = new Set(), engine?: number): number | null {
   let best: number | null = null, score = -1
   for (let i = 0; i < world.parties.length; i += 1) {
-    if (taken.has(i) || block(i) !== null) continue
+    if (taken.has(i) || block(i) !== null || healerBlock(world, fullParty(world, i) ?? [], outfits, engine) !== null) continue
     const s = guidanceMatch(partyClassesOf(world, fullParty(world, i)!, outfits), front)
     if (s > score) { best = i; score = s }
   }
   return best
 }
 
-/** The Convergence's opening assignment: for each front in order, the best-fitting party of the roster not yet taken. */
-export function suggestConvergence(world: Pick<TierWorld, 'parties' | 'umas'>, run: Pick<RiftRun, 'roster'>, outfits: ReadonlyMap<string, BattleOutfit>): (number | null)[] {
+/** The Convergence's opening assignment: for each front in order, the best-fitting party of the roster not yet taken (from
+ * classes v2, none with two healers). */
+export function suggestConvergence(world: Pick<TierWorld, 'parties' | 'umas'>, run: Pick<RiftRun, 'roster'>, outfits: ReadonlyMap<string, BattleOutfit>,
+  engine?: number): (number | null)[] {
   const taken = new Set<number>()
   return RIFT_FRONTS.map((front) => {
-    const pick = bestParty(world, front, outfits, (i) => frontPartyBlock(world, run, i), taken)
+    const pick = bestParty(world, front, outfits, (i) => frontPartyBlock(world, run, i), taken, engine)
     if (pick !== null) taken.add(pick)
     return pick
   })

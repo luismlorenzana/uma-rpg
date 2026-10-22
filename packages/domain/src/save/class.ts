@@ -1,11 +1,13 @@
-// An Uma's class over the save (D86, D180): the class she starts in, fights as, and her setup for each. Kept out of
-// `save/battle.ts` so the main bundle can read them without loading the fight rules and the engine, which only the
-// lazy `@rpg/domain/battle` subpath reaches (H62). `save/battle.ts` re-exports all of it. Pure.
+// An Uma's class over the save (D86, D180): the class she starts in, fights as, her setup for each, and one healer a
+// party (H59). Kept out of `save/battle.ts` so the main bundle and the party screens can read them without loading the
+// fight rules and the engine, which only the lazy `@rpg/domain/battle` subpath reaches (H62). `save/battle.ts`
+// re-exports all of it. Pure.
 import type { Aptitudes } from '@luismlorenzana/uma-data'
 import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { rpgIsHealer } from '../rpg/kinds'
 import { rpgDefaultClass, rpgDefaultWeapons, type RpgClass } from '../rpg/rules'
 import { best } from '../roster/aptitudes'
-import type { ClassLoadout, OwnedUma } from './save'
+import type { ClassLoadout, OwnedUma, TierWorld } from './save'
 
 /** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
 export interface BattleOutfit {
@@ -35,3 +37,16 @@ export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>
 /** Her setup for a class: what she saved, or its default five weapons with nothing learned and skills chosen for her. */
 export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass): ClassLoadout =>
   uma.classes[classId] ?? { weapons: rpgDefaultWeapons(classId), tree: [], loadout: null }
+
+/** What `healerBlock` says. */
+export const ONE_HEALER = 'One healer a party'
+/** Why these Umas can't fight together, or null: from classes v2, at most one of them fights as a healer, a Paladin or a
+ * Cleric (C8, D178). Checked where a party fights, never on party edits or class switches; the party screens show it. */
+export function healerBlock(world: Pick<TierWorld, 'umas'>, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>,
+  engine: number = BATTLE_ENGINE_VERSION): string | null {
+  const healers = ids.filter((id) => {
+    const outfit = outfits.get(id), uma = world.umas[id]
+    return !!outfit && !!uma && rpgIsHealer(activeClass(outfit, uma), engine)
+  })
+  return healers.length > 1 ? ONE_HEALER : null
+}

@@ -1,7 +1,10 @@
-import { BATTLE_LIMIT_MAX, projectRpgStats, rpgFoe, type BattleAlly, type BattleInput, type BattleState, type RpgClass, type RpgWeapon } from '@rpg/domain'
-import { createBattle } from '@rpg/domain/engine'
+import {
+  BATTLE_LIMIT_MAX, isRpgTome, projectRpgStats, rpgDefaultWeapons, rpgFoe, type BattleAlly, type BattleInput, type BattleState, type RpgClass,
+  type RpgWeapon,
+} from '@rpg/domain'
+import { applyBattleAction, createBattle } from '@rpg/domain/engine'
 import { describe, expect, it } from 'vitest'
-import { describeCue, limitMode, limitOptions, limitReady } from './battle-view'
+import { actionFor, describeCue, limitMode, limitOptions, limitReady, pairing, pairMode, pairOf } from './battle-view'
 
 // Invented outfits only. Depth-1 cores at Class Rank 4.
 const ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana']
@@ -54,5 +57,73 @@ describe('the hit line (D169)', () => {
     expect(hit('Intercepted')).toBe('Ally → Foe: 40 · guarded')
     expect(describeCue({ kind: 'hit', actorId: 'a1', targetId: 'f1', amount: 12, channel: 'physical', element: 'bow', weak: true, label: 'Warded' }, name))
       .toBe('Ally → Foe: 12 · WEAK · warded')
+  })
+})
+
+describe('the hybrids\' pairs by the fight\'s version (H59, D183)', () => {
+  const ref = (id: string) => ({ tier: 1, id })
+  /** A fight with a Summoner (s1) and a Spell Blade (b1) on each generation's default weapons. */
+  function hybrids(version: BattleInput['version']): BattleState {
+    const allies = [
+      ally('s1', 'summoner', rpgDefaultWeapons('summoner', version), ['summoner-tome-fire.1', 'summoner-greatsword.1']),
+      ally('b1', 'spellblade', rpgDefaultWeapons('spellblade', version), ['spellblade-greatsword.1', 'spellblade-tome-fire.1']),
+      ally('a3', 'brawler', ARMS, ['brawler-axe.1']),
+      ally('a4', 'mage', TOMES, ['mage-tome-ice.1']),
+      ally('a5', 'brawler', ARMS, ['brawler-lance.1']),
+    ]
+    const foes = ['f1', 'f2'].map((id) => rpgFoe({ id, castId: `cast-${id}`, element: 'dark', role: 'striker', rank: 'regular', level: 4, shield: 3, weaknesses: { weapons: ['bow'], elements: ['light'] } }))
+    return createBattle({ version, seed: 1, allies, enemies: foes }).state
+  }
+  const allyOf = (state: BattleState, id: string) => state.input.allies.find((a) => a.id === id)!
+
+  it('leads a v15 Summoner\'s pair with a Tome half, and the engine takes it', () => {
+    const state = hybrids(15)
+    const summoner = allyOf(state, 's1')
+    expect(pairing(state, summoner)).toEqual({ tomeFirst: true })
+    const attack = pairMode(pairOf({ kind: 'attack' }, summoner, true), true)
+    expect(attack).toMatchObject({ kind: 'attack', weapon: 'tome-fire', pair: { weapon: 'greatsword' } })
+    expect(applyBattleAction(state, actionFor(attack, 's1', 'f1')).error).toBeUndefined()
+    const skills = pairMode({ tome: { skill: ref('summoner-tome-fire.1') }, arms: { skill: ref('summoner-greatsword.1') } }, true)
+    expect(skills).toMatchObject({ kind: 'skill', ref: { id: 'summoner-tome-fire.1' }, pair: { skill: { id: 'summoner-greatsword.1' } } })
+    expect(pairOf(skills, summoner, true)).toEqual({ tome: { skill: ref('summoner-tome-fire.1') }, arms: { skill: ref('summoner-greatsword.1') } })
+    const step = applyBattleAction(state, actionFor(skills, 's1', 'f1'))
+    expect(step.error).toBeUndefined()
+    // Her Tome summon lands first, as the screen shows it.
+    const first = step.cues.find((c) => c.kind === 'hit' && c.actorId === 's1')
+    expect(first && 'element' in first && first.element).toBe('fire')
+    // One half alone is no act of hers any more.
+    expect(applyBattleAction(state, actionFor({ kind: 'skill', ref: ref('summoner-tome-fire.1') }, 's1', 'f1')).error).toBe('invalid-skill')
+  })
+
+  it('keeps a v14 Summoner to her one half, and every Spell Blade\'s pair Arms first', () => {
+    const old = hybrids(14)
+    expect(pairing(old, allyOf(old, 's1'))).toBeNull()
+    expect(applyBattleAction(old, actionFor({ kind: 'skill', ref: ref('summoner-tome-fire.1') }, 's1', 'f1')).error).toBeUndefined()
+    for (const state of [old, hybrids(15)]) {
+      const blade = allyOf(state, 'b1')
+      expect(pairing(state, blade)).toEqual({ tomeFirst: false })
+      const mode = pairMode(pairOf({ kind: 'attack' }, blade), false)
+      expect(mode.kind === 'attack' && !isRpgTome(mode.weapon!) && isRpgTome(mode.pair!.weapon!)).toBe(true)
+      expect(applyBattleAction(state, actionFor(mode, 'b1', 'f1')).error).toBeUndefined()
+    }
+  })
+
+  it('says a v15 farewell strikes every foe, and a v14 summon strikes again', () => {
+    const name = (id: string) => ({ s1: 'Sum' })[id] ?? id
+    const cue = { kind: 'summon', actorId: 's1', targetId: 'f1', label: 'Ember Sprites' } as const
+    expect(describeCue(cue, name, 15)).toBe('Sum’s Ember Sprites strikes every foe')
+    expect(describeCue(cue, name, 14)).toBe('Sum’s Ember Sprites strikes again')
+    expect(describeCue({ kind: 'heal', actorId: 'c1', targetId: 's1', amount: 12, label: 'Regen' }, name, 15)).toBe('Sum +12 HP · Regen')
+  })
+})
+
+describe('the Limit Break menu reads the fight\'s table (H59, D181)', () => {
+  it('names a v14 fight\'s cleric-3 Archangel\'s Verdict and a v15 one\'s Dawn Hymn', () => {
+    for (const [version, name] of [[14, 'Archangel’s Verdict'], [15, 'Dawn Hymn']] as const) {
+      const hero = fight(version, { hero: 'cleric-3' })
+      expect(limitOptions(hero, 'a1').options.map((o) => o.name)).toEqual([name])
+      const learner = fight(version, { inherits: [{ limit: 'cleric-3', bond: 10, from: 'h1' }] })
+      expect(limitOptions(learner, 'a1').options).toMatchObject([{ name, face: 'h1', strength: 1 }])
+    }
   })
 })

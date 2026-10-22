@@ -95,6 +95,23 @@ describe('which parties can fight', () => {
     expect(suggestConvergence(world, run, OUTFITS)).toEqual([1, 2, 3, 0])
   })
 
+  it('never suggests a party with two healers in classes v2 (H59)', () => {
+    const world = newSave('Rift view', NOW).tierWorlds['1']!
+    const parties: RpgClass[][] = [['brawler', 'brawler', 'spellblade', 'cleric', 'cleric'], ['brawler', 'mage', 'mage', 'mage', 'cleric']]
+    parties.forEach((classes, p) => classes.forEach((classId, k) => {
+      const id = `${201 + p * 5 + k}`
+      world.umas[id] = { ...newOwnedUma(NOW), level: 50, classId }
+      world.parties[p]!.slots[k] = id
+    }))
+    const outfits = new Map(ids(201, 10).map((id) => [id, outfit(id)]))
+    const open = (i: number) => (world.parties[i]!.slots.every((s) => s !== null) ? null : 'Needs five')
+    expect(bestParty(world, 'iron', outfits, open, new Set(), 14)).toBe(0)
+    expect(bestParty(world, 'iron', outfits, open, new Set(), 15)).toBe(1)
+    const run = { roster: ids(201, 10) }
+    expect(suggestConvergence(world, run, outfits, 14)).toContain(0)
+    expect(suggestConvergence(world, run, outfits, 15)).not.toContain(0)
+  })
+
   it('names the roster’s Umas the Convergence’s four parties leave out', () => {
     const { world, run } = fixture()
     expect(convergenceMissing(world, run, [0, 1, 2, 3])).toEqual([])

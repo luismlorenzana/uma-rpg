@@ -54,6 +54,20 @@ describe('class emblems and status glyphs', () => {
   })
 })
 
+describe('the Paladin\'s emblem (uma-art 2.12.0, H54)', () => {
+  it('finds class/paladin on the pinned ui sheet at 24×24 and draws it at native size', async () => {
+    const frames: Record<string, { x: number; y: number; w: number; h: number }> = atlas.frames
+    const paladin = frames['class/paladin']!
+    expect(paladin).toMatchObject({ w: 24, h: 24 })
+    await renderIcons(<ClassEmblem classId="paladin" />, (host) => {
+      const e = host.querySelector<HTMLElement>('[aria-hidden="true"]')!
+      expect(e.style.width).toBe('24px'); expect(e.style.height).toBe('24px')
+      expect(e.style.backgroundPosition).toBe(`${-paladin.x}px ${-paladin.y}px`)
+      expect(e.style.imageRendering).toBe('pixelated')
+    })
+  })
+})
+
 describe('the Rift\'s crests and badges (uma-art 2.11.0)', () => {
   const frames: Record<string, { x: number; y: number; w: number; h: number }> = atlas.frames
   it('finds every catalog badge and front crest on the pinned ui sheet', () => {

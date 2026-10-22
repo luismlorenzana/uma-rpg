@@ -1,23 +1,26 @@
 // One of a class's five weapon slots (D98), one of her five armor slots (D103, D124) or one of her two accessory slots:
-// the weapon she holds there opens its skill tree; armor adds its stats; an accessory its kind or a defensive effect.
+// the weapon she holds there opens its skill tree; armor adds its stats; an accessory its kind or a defensive effect (from
+// classes v2 the slots are typed, Damage for an Orb's flat offense and Support for a Talisman or an Amulet, H59).
 // Every Uma holds a Training weapon and armor piece of each kind (grade 0, no stats), shown only until she binds its
 // grade 1. A Summoner, Spell Blade or Cleric chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's
 // slots keep theirs. She binds each kind's grades in order (D119): the sheet shows her best piece and the stock above it,
 // never the grades she has spent.
 import {
-  ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, ACCESSORY_TYPES, accessoryEffects, accessoryKindOf, ARMOR_LABEL,
-  ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory,
-  isMagicalArmor, isOrb, isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, SaveRuleError, slotKind,
-  type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld,
+  ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
+  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory, isMagicalArmor, isOrb, isRpgTome,
+  isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
+  type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
+  type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
-import { SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { kindLabel, SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { hold, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
 import { ArmorMark } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../../items/planets'
+import { accessorySheetTypes, noAccessories } from './accessory-slots'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
 export function effectLines(a: AccessoryEffects): string[] {
@@ -31,13 +34,17 @@ export function effectLines(a: AccessoryEffects): string[] {
   ].filter((x): x is string => !!x)
 }
 
-/** What a piece does, in one line: a weapon's Might, armor's stats, an Orb's kind, an accessory's effect (D104, D124). */
-export function pieceLine(id: string): string {
+/** What a piece does, in one line: a weapon's Might, armor's stats, an Orb's kind (classes v2: its flat offense, "+34 Fire
+ * offense"), an accessory's effect (D104, D124, D182). */
+export function pieceLine(id: string, engine: number = BATTLE_ENGINE_VERSION): string {
   const piece = gearById(id)
   if (!piece) return ''
   if (isWeapon(piece.type)) return `Might +${mightOf(piece.grade)} on its hits`
-  if (isOrb(piece.type)) return 'Its kind on every hit, for weaknesses'
-  if (isAccessory(piece.type)) return effectLines(accessoryEffects(piece)).join(' · ')
+  if (isOrb(piece.type)) {
+    if (!rpgV2(engine)) return 'Its kind on every hit, for weaknesses'
+    return Object.entries(accessoryEffects(piece, engine).orbMight ?? {}).map(([kind, n]) => `+${n} ${kindLabel(kind as RpgDamageKind)} offense`).join(' · ')
+  }
+  if (isAccessory(piece.type)) return effectLines(accessoryEffects(piece, engine)).join(' · ')
   const p = gearPoints(piece)
   return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, p[e])}`).join(' · ')
 }
@@ -173,8 +180,8 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
   )
 }
 
-/** One of her two accessory slots (D124): any accessory she has bound or the stock holds, grouped by kind, except the type
- * she wears in the other slot. An empty slot holds nothing. */
+/** One of her two accessory slots (D124): any accessory it takes that she has bound or the stock holds, grouped by kind,
+ * except the type she wears in the other slot. An empty slot holds nothing. */
 export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: AccessorySlot; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const here = uma.gear.equipped[slot] ?? null
@@ -182,10 +189,8 @@ export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfit
   const otherType = uma.gear.equipped[other] ? gearById(uma.gear.equipped[other]!)?.type : undefined
   const choose = (id: string | null) =>
     wearAccessoryPiece(outfitId, slot, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
-  const groups = ACCESSORY_KINDS.map((kind) => ({
-    kind,
-    types: ACCESSORY_TYPES.filter((t) => accessoryKindOf(t) === kind && t !== otherType)
-      .map((t) => ({ t, pieces: gearChoices(uma, world.gear, (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
+  const groups = accessorySheetTypes(slot, otherType).map(({ kind, types }) => ({
+    kind, types: types.map((t) => ({ t, pieces: gearChoices(uma, world.gear, (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
   })).filter((g) => g.types.length > 0)
   return (
     <BottomSheet title={ACCESSORY_SLOT_LABEL[slot]} onClose={onClose}>
@@ -195,7 +200,7 @@ export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfit
             Take it off (it stays hers)
           </button>
         )}
-        {groups.length === 0 && <p className="text-[13px] text-ink-soft">No accessories yet: the Forge makes them.</p>}
+        {groups.length === 0 && <p className="text-[13px] text-ink-soft">{noAccessories(slot)}</p>}
         {groups.map(({ kind, types }) => (
           <section key={kind}>
             <h4 className="text-micro mb-1">{ACCESSORY_LABEL[kind]}</h4>

@@ -2,6 +2,7 @@
 // Learning · Battle · Wilds, the sibling apps' Home · Grow · Play · Work), one source for the map, the hit targets, the
 // global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
+import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -132,18 +133,36 @@ function hall(id: string, name: string, cls: string, at: { x: number; y: number 
     details: ['A Hero always uses her seat’s Limit Break, at full strength.', 'Learners inherit it at 50%, plus 5% a Bond Level.'] }
 }
 
-const LEARNING: Place[] = [
-  hall('brawler-dojo', 'Brawler Dojo', 'Brawler', { x: 0.24, y: 0.1 }),
-  hall('mage-tower', 'Mage Tower', 'Mage', { x: 0.76, y: 0.11 }),
-  hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', { x: 0.22, y: 0.33 }),
-  hall('cleric-chapel', 'Cleric Chapel', 'Cleric', { x: 0.78, y: 0.33 }),
-  hall('summoner-circle', 'Summoner Circle', 'Summoner', { x: 0.5, y: 0.56 }),
-  {
-    id: 'observatory', page: 'learning', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.5, y: 0.84 },
-    blurb: "Each Uma's Extra Stats map: a Sun, eight planets and their moons.",
-    details: ['100 nodes per Uma per tier', 'Star Gems open nodes; level sets how many are active'],
-  },
-]
+const OBSERVATORY: Place = {
+  id: 'observatory', page: 'learning', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.5, y: 0.84 },
+  blurb: "Each Uma's Extra Stats map: a Sun, eight planets and their moons.",
+  details: ['100 nodes per Uma per tier', 'Star Gems open nodes; level sets how many are active'],
+}
+
+/** The Learning page by generation (D178, H59). Classes v1: the five halls as they stand. Classes v2 adds the Paladin
+ * Bastion (uma-art's `knights-bastion` keep) and pairs the mirrors across the trunk road: physical-led halls on the left,
+ * magic-led on the right (Brawler and Mage, Spell Blade and Summoner, Paladin and Cleric), the Observatory below. */
+export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
+  if (!rpgV2(engine)) {
+    return [
+      hall('brawler-dojo', 'Brawler Dojo', 'Brawler', { x: 0.24, y: 0.1 }),
+      hall('mage-tower', 'Mage Tower', 'Mage', { x: 0.76, y: 0.11 }),
+      hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', { x: 0.22, y: 0.33 }),
+      hall('cleric-chapel', 'Cleric Chapel', 'Cleric', { x: 0.78, y: 0.33 }),
+      hall('summoner-circle', 'Summoner Circle', 'Summoner', { x: 0.5, y: 0.56 }),
+      OBSERVATORY,
+    ]
+  }
+  return [
+    hall('brawler-dojo', 'Brawler Dojo', 'Brawler', { x: 0.24, y: 0.1 }),
+    hall('mage-tower', 'Mage Tower', 'Mage', { x: 0.76, y: 0.11 }),
+    hall('spell-blade-salle', 'Spell Blade Salle', 'Spell Blade', { x: 0.22, y: 0.33 }),
+    hall('summoner-circle', 'Summoner Circle', 'Summoner', { x: 0.78, y: 0.33 }),
+    { ...hall('paladin-bastion', 'Paladin Bastion', 'Paladin', { x: 0.24, y: 0.56 }), frame: 'knights-bastion' },
+    hall('cleric-chapel', 'Cleric Chapel', 'Cleric', { x: 0.76, y: 0.56 }),
+    OBSERVATORY,
+  ]
+}
 
 /** Town Hall (D147): the four corners as uma-racer's, and its plaza (`TOWN_PLAZA`) where the featured Uma stands. */
 const TOWN: Place[] = [
@@ -192,7 +211,7 @@ const BATTLE: Place[] = [
   },
 ]
 
-export const PLACES: readonly Place[] = [...TOWN, ...LEARNING, ...BATTLE, ...WILDS]
+export const PLACES: readonly Place[] = [...TOWN, ...learningPlaces(), ...BATTLE, ...WILDS]
 
 const BY_ID = new Map(PLACES.map((p) => [p.id, p]))
 

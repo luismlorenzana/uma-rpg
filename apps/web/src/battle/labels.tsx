@@ -1,8 +1,10 @@
 // Battle vocabulary for the UI: labels, element and weapon glyphs (inline SVG, ported from uma-racer), bars and the
-// break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes).
+// break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes; six from classes
+// v2, whose lines follow the generation, H59). In the main bundle: never import the engine here (H62).
 import {
-  isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, type BattleWeaknesses, type RpgClass, type RpgDamageKind,
-  type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgSupport, type RpgWeapon, type RpgWeaponKind,
+  BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, rpgV2, type BattleWeaknesses,
+  type RpgClass, type RpgDamageKind, type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgSupport,
+  type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
 
 const WEAPON_KIND_LABEL: Readonly<Record<RpgWeaponKind, string>> = {
@@ -15,15 +17,28 @@ const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice:
 export const CLASS_LABEL: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
 }
-export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = {
+const BLURBS_V1: Readonly<Record<RpgClass, string>> = {
   brawler: 'Pure physical damage: all five Arms, one heavy action a turn. An Elemental Orb adds an element to every hit.',
   mage: 'Pure magic: all five Tomes, one full cast a turn. An Arms Orb adds a weapon kind to every cast.',
   spellblade: 'Three Arms and two Tomes: every act is a blade and a spell, each at half strength.',
   cleric: 'Any five weapons: her blows weaken the foe they hit, her spells bless the whole party.',
   summoner: 'Three Tomes and two Arms: each summon strikes, stays, and strikes again when the next one comes.',
-  // Classes v2 (D179): no list shows her until the switch (H61); H59 rewrites all six.
+  // No v1 list shows her (D179).
   paladin: 'Three Arms and two Tomes: her blows shield the threatened, her spells bless the whole party.',
 }
+/** Classes v2 (H59, classes-v2 §3). */
+const BLURBS_V2: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Five Arms, one heavy act a turn.',
+  mage: 'Five Tomes, one full cast a turn.',
+  spellblade: 'Three Arms and two Tomes: a blade and a spell each turn, the blade striking twice.',
+  summoner: 'Three Tomes and two Arms: a Tome summon that lingers and strikes every foe as it leaves, and an Arms summon.',
+  paladin: 'Three Arms and two Tomes: Barriers and Aegis on the party, from her ATK.',
+  cleric: 'Three Tomes and two Arms: mends, Regen and cleanses for the party, from her M.ATK.',
+}
+/** Each class in one line, by generation. */
+export const classBlurbs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RpgClass, string>> => (rpgV2(engine) ? BLURBS_V2 : BLURBS_V1)
+/** The live generation's lines. */
+export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = classBlurbs()
 /** What each slot holds, for the class's weapon pickers. */
 export const SLOT_LABEL = { arms: 'Arm', tome: 'Tome', any: 'Weapon' } as const
 /** The grade-0 weapon every Uma holds of each kind (D98): no stats, it opens the tree. */
@@ -39,17 +54,30 @@ export const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind)
 export const skillKinds = (skill: RpgSkillDef): RpgDamageKind[] =>
   [...new Set([...skill.hits, ...(skill.focus ?? []), ...(skill.splash ? [skill.splash] : []), ...(skill.other ?? [])].flatMap((h) => h.parts.map((p) => p.kind)))]
 
-/** A skill as this Uma casts it: targets, hits, power after her hand, and MP. */
-export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: RpgSkillDef): string {
-  const hand = rpgHand(profile)
+/** Whether a skill is cast as a Tome half: its kind is its Tome's element (an Arms skill's is its weapon kind). */
+const tomeSkill = (skill: Pick<RpgSkillDef, 'primary'>): boolean => isRpgElement(skill.primary)
+/** Classes v2 (D183): a Spell Blade's Arms half lands one hit more, its total unchanged (the engine's `battleExtraHit`). */
+export const extraHit = (classId: RpgClass, skill: Pick<RpgSkillDef, 'primary'>, engine: number = BATTLE_ENGINE_VERSION): boolean =>
+  rpgV2(engine) && classId === 'spellblade' && !tomeSkill(skill)
+/** A skill's support in an engine's generation (D141, D181): none before v12, `support` to v14, the healers' `support15`. */
+export const supportOf = (skill: Pick<RpgSkillDef, 'support' | 'support15'>, engine: number = BATTLE_ENGINE_VERSION): RpgSupport | undefined =>
+  rpgV2(engine) ? skill.support15 : engine >= 12 ? skill.support : undefined
+
+/** A skill as this Uma casts it: targets, hits, power after her hand (its half's, D179), and MP; by generation. */
+export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: RpgSkillDef, engine: number = BATTLE_ENGINE_VERSION): string {
+  const hand = rpgHand(profile, engine)
+  const v2 = rpgV2(engine), tome = tomeSkill(skill)
   const per = skill.target === 'all' ? 'every foe' : skill.target === 'random' ? 'random foes' : 'one foe'
-  const total = skill.hits.reduce((sum, h) => sum + h.power, 0) * hand.power
+  const hits = skill.hits.length + (extraHit(profile.classId, skill, engine) ? 1 : 0)
+  const total = skill.hits.reduce((sum, h) => sum + h.power, 0) * (tome ? hand.tome : hand.arms)
   const mp = Math.max(1, Math.round(skill.mp * hand.mp)) * profile.tier
+  // From v2 only a Tome summon stays, and its farewell strikes every foe (D183).
+  const summon = !skill.summon ? '' : !v2 ? ` · lingers ${skill.summon.linger}×` : tome ? ' · lingers, then strikes every foe' : ' · strikes once'
   const extra = skill.status ? ` · ${STATUS_LABEL[skill.status.key]} ${skill.status.stacks}${skill.status.to === 'allies' ? ' to all' : skill.status.to === 'foes' ? ' on all foes' : ''}`
-    : skill.summon ? ` · lingers ${skill.summon.linger}×` : ''
+    : summon
   // Its support (D141): what it does for the party besides its hits.
-  const support = supportText(skill.support)
-  return `${per} · ${skill.hits.length} hit${skill.hits.length === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}${support ? ` · ${support}` : ''}`
+  const support = supportText(supportOf(skill, engine), engine)
+  return `${per} · ${hits} hit${hits === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}${support ? ` · ${support}` : ''}`
 }
 export const STATUS_LABEL: Readonly<Record<RpgStatusKind | NonNullable<RpgSkillDef['status']>['key'], string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -109,13 +137,17 @@ export function KindMark({ kind, size = 16 }: { kind: RpgDamageKind; size?: numb
   if (isRpgElement(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex"><ElementGlyph element={kind} size={size} /></span>
   return null
 }
-/** A skill's support in a few words (D141): "heals the most hurt", "Barrier on every ally"… or '' for none. */
-export function supportText(sup: RpgSupport | undefined): string {
+/** A skill's support in a few words (D141): "heals the most hurt", "Barrier on every ally"… or '' for none. Classes v2's
+ * parts (D181) only come in `support15`; its drain names its share. */
+export function supportText(sup: RpgSupport | undefined, engine: number = BATTLE_ENGINE_VERSION): string {
   if (!sup) return ''
   return [
     sup.mend === 'hurt' ? 'heals the most hurt' : sup.mend === 'all' ? 'heals every ally' : '',
+    sup.regen ? `Regen ${BATTLE_REGEN_ROUNDS} rounds` : '',
     sup.shield === 'threatened' ? 'Barrier on the most threatened' : sup.shield === 'all' ? 'Barrier on every ally' : '',
-    sup.cleanse ? 'cleanses' : '', sup.revive ? 'revives the fallen' : '', sup.drain ? 'drains HP' : '',
+    sup.aegis ? 'Aegis on the Barriered' : '',
+    sup.cleanse ? 'cleanses' : '', sup.revive ? 'revives the fallen' : '',
+    sup.drain ? (rpgV2(engine) ? `drains ${Math.round(sup.drain * 100)}%` : 'drains HP') : '',
     sup.bless ? 'Aegis on every ally' : '', sup.curse ? 'Enfeebles the foes it hits' : '',
   ].filter(Boolean).join(', ')
 }

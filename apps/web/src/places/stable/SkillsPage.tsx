@@ -7,7 +7,7 @@
 import {
   activeClass, classOf, classRankOf, classTrack, gearById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
   rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
-  SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
+  rpgV2, SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { umaUpgrades } from '../../album/upgrades'
@@ -63,13 +63,15 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           <HelpButton title="Classes and skills">
             <p>{CLASS_BLURB[classId]}</p>
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
+            {rpgV2() && <p>A party fights with one healer at most: a Paladin or a Cleric.</p>}
             <p>Each weapon in her five slots opens its skill tree. She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>
             <p>Her Class Rank rises as she wins fights in this class. Core skills come free: depths open at Class Rank 1, 10, 20, 30 and 40. Each rank gives a point for side skills, which open at Class Rank 5, 15, 25, 35 and 45. Take one side of each fork; swap whenever you like.</p>
             <p>Her Uma Level sets how many skills she can equip.</p>
             <p>Until you equip skills yourself, each weapon's deepest skill is equipped for her.</p>
           </HelpButton>
         </div>
-        <div className="grid grid-cols-5 gap-1" role="radiogroup" aria-label="Class">
+        {/* Classes v2's six in two rows of three (H59): six in a row leaves "Summoner" no room at 375 pt. */}
+        <div className={`grid gap-1 ${RPG_CLASSES.length > 5 ? 'grid-cols-3' : 'grid-cols-5'}`} role="radiogroup" aria-label="Class">
           {RPG_CLASSES.map((c) => (
             <button key={c} type="button" role="radio" aria-checked={c === classId} onClick={() => switchTo(c)}
               className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-center ${c === classId ? 'bg-accent text-accent-ink' : 'bg-raised text-ink'}`}>

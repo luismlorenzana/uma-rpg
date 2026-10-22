@@ -30,11 +30,11 @@ import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, type ClassLoadout, type OwnedU
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
-import { rpgIsHealer } from '../rpg/kinds'
-import { activeClass, classOf, type BattleOutfit } from './class'
+import { activeClass, classOf, healerBlock, type BattleOutfit } from './class'
 
-// An Uma's class (H62): in `save/class.ts`, so the main bundle reads it without this module and the engine.
-export { activeClass, classOf, startingClass, styleClass, type BattleOutfit, type StartingOutfit } from './class'
+// An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
+// without this module and the engine.
+export { activeClass, classOf, healerBlock, ONE_HEALER, startingClass, styleClass, type BattleOutfit, type StartingOutfit } from './class'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
@@ -47,19 +47,6 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
 }
 
 // --- Classes (D86) ---------------------------------------------------------------------------------------------------
-
-/** What `healerBlock` says. */
-export const ONE_HEALER = 'One healer a party'
-/** Why these Umas can't fight together, or null: from classes v2, at most one of them fights as a healer, a Paladin or a
- * Cleric (C8, D178). Checked where a party fights, never on party edits or class switches. */
-export function healerBlock(world: Pick<TierWorld, 'umas'>, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>,
-  engine: number = BATTLE_ENGINE_VERSION): string | null {
-  const healers = ids.filter((id) => {
-    const outfit = outfits.get(id), uma = world.umas[id]
-    return !!outfit && !!uma && rpgIsHealer(activeClass(outfit, uma), engine)
-  })
-  return healers.length > 1 ? ONE_HEALER : null
-}
 
 /** Her battle profile as a class (the active one by default); its Class Rank opens the depths (D102). */
 export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {

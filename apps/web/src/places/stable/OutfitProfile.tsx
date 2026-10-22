@@ -11,7 +11,7 @@ import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
+  rpgExpToNext, rpgV2, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -249,9 +249,13 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
                 <span className="text-shard">Gear</span>
                 <span className="text-success">Extra Stats</span>
                 <HelpButton title="Battle stats">
-                  <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, Stamina and Power HP, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
+                  {/* Classes v2 (H59): Guts into HP, flat Orbs in the Damage slot, healers from ATK or M.ATK. */}
+                  <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, {rpgV2() ? 'Stamina, Power and Guts HP' : 'Stamina and Power HP'}, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
                   <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green). Armor adds up: physical pieces ATK, magical pieces M.ATK, and each slot its defensive stat.</p>
-                  <p>Might is each weapon's own: it counts only for hits made with that weapon. Her two accessories add an Orb's kind to her hits, or a defensive effect. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+                  {rpgV2() ? <>
+                    <p>Might is each weapon's own: it counts only for hits made with that weapon. Her Damage slot's Orb adds offense to every hit of its kind; her Support slot's Talisman or Amulet a defensive effect.</p>
+                    <p>A Paladin's mends and Barriers grow with her ATK, a Cleric's with her M.ATK. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
+                  </> : <p>Might is each weapon's own: it counts only for hits made with that weapon. Her two accessories add an Orb's kind to her hits, or a defensive effect. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>}
                 </HelpButton>
               </>
             )}

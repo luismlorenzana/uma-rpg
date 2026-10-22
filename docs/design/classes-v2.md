@@ -354,6 +354,12 @@ Tier 3; it's designed with Tier 3.
   - has an Extra Stats gem she can set, or a free active node.
 
   This is independent of v2 and can ship now.
+- **The screens.** Screens built in H59 (D185), live from H61: the Paladin in every class list with her emblem (uma-art
+  2.12.0) and preset; the Learning page's six halls, the mirrors across the road and the Paladin Bastion on the
+  `knights-bastion` keep; the Gear tab's Damage and Support rows and sheets, an Orb reading "+34 Fire offense"; the
+  Summoner's pair (Tome half first), her farewell and the Spell Blade's extra hit on the fight screen, by the fight's own
+  version; the healers' Regen and `support15` lines; "One healer a party" in the Party Hall, on the world map's fight
+  button and in the Rift's suggestions; v2 class blurbs and help text.
 
 ## 8. Engine v15 and the save
 

@@ -3,7 +3,7 @@
 // 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most.
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, hallClass, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds, heroLimitsOf, learnerBlock,
-  LEARNER_MAX_PARENTS, parentsOf, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId,
+  LEARNER_MAX_PARENTS, parentsOf, rpgV2, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { Bar, CLASS_LABEL, KindMark } from '../../battle/labels'
@@ -52,7 +52,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
             <p>Limit Breaks come only from the Halls of Heroes. Each seat teaches its own; its Hero always uses it, at full strength: about twice a turn’s damage.</p>
             <p>Up to {HERO_MAX_LEARNERS} Learners sit under each Hero, and a Learner under {LEARNER_MAX_PARENTS} Heroes at most. In a fight she may use
               either Hero’s Limit Break, at 50% plus 5% a Bond Level (100% at Bond {BOND_MAX_LEVEL}), with all its weapons, elements,
-              hits and statuses, even ones she doesn’t carry. An Uma who is neither a Hero nor a Learner has no Limit Break.</p>
+              hits and statuses, even ones she doesn’t carry{rpgV2() ? ', its hits at the higher of her ATK and M.ATK' : ''}. An Uma who is neither a Hero nor a Learner has no Limit Break.</p>
             <p>Every won fight raises a Learner’s Bond with each of her Heroes, and a Hero’s Bond with her own seat: a stage {BOND_EXP_PER_WIN.fight}, an elite or a
               boss {BOND_EXP_PER_WIN.boss}, {BOND_EXP_TO_NEXT} a level. A Bond stays when she leaves, so a Hero taken out of her seat and put back as its
               Learner starts at the Bond she earned.</p>

@@ -1,7 +1,7 @@
 // The active party (D66): the five who fight, swappable from any world screen outside a fight. Each Uma shows her level
-// and the MP she carries between stages (Springs refill it).
+// and the MP she carries between stages (Springs refill it). From classes v2 it says when it fields two healers (H59).
 import {
-  activeClass, applyPoints, classOf, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
+  activeClass, applyPoints, classOf, healerBlock, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
   rpgTreePointsSpent, SaveRuleError, umaPoints, umaProfile, worldRun,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -28,6 +28,8 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
   const members = party.slots.filter((s): s is string => s !== null)
   const run = worldRun(world)
   const fighting = !!openFightOf(world)
+  // Classes v2 (C8, H59): one healer a party, or the world map's fights refuse it.
+  const healers = healerBlock(world, members, campaign.outfits)
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-2">
@@ -35,7 +37,8 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           {party.name} <span className="font-normal text-ink-faint">· swap</span>
         </button>
         <button type="button" onClick={() => navigate(pagePath({ page: 'town', id: 'party-hall' }), { state: { fromPlace: true } })} className="min-h-11 px-2 text-[12px] text-ink-soft">Edit parties</button>
-        {!isPartyFull(party) && <span className="text-[11px] text-danger">A fight needs five</span>}
+        {!isPartyFull(party) ? <span className="text-[11px] text-danger">A fight needs five</span>
+          : healers && <span className="text-[11px] font-semibold text-warning">{healers}</span>}
       </div>
       <div className="flex gap-1">
         {members.map((id) => {

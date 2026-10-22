@@ -1,10 +1,29 @@
 import { describe, expect, it } from 'vitest'
-import { CURRENT_SLICE, HUB_PAGES, PLACES, SLICES, isOpen, placeById, placeLock, placeOnPage, placeOpen, placesOn } from './places'
+import { rpgV2 } from '../rpg/battle/caps'
+import { HERO_HALLS } from '../rpg/hero-id'
+import { CURRENT_SLICE, HUB_PAGES, PLACES, SLICES, isOpen, learningPlaces, placeById, placeLock, placeOnPage, placeOpen, placesOn, type Place } from './places'
 
 // Smallest supported phone (375×667): the map area is about 375 × 500 pt after the bars.
 const MAP_W = 375
 const MAP_H = 500
 const MIN_GAP = 44
+
+/** Every pair of places on one map at least 1.5 × 44 pt apart on the smallest phone, each well inside the edges. */
+function expectSpaced(places: readonly Place[]): void {
+  for (const a of places)
+    for (const b of places) {
+      if (a === b) continue
+      const dx = (a.at.x - b.at.x) * MAP_W
+      const dy = (a.at.y - b.at.y) * MAP_H
+      expect(Math.hypot(dx, dy), `${a.id} ↔ ${b.id}`).toBeGreaterThanOrEqual(MIN_GAP * 1.5)
+    }
+  for (const p of places) {
+    expect(p.at.x).toBeGreaterThan(0.1)
+    expect(p.at.x).toBeLessThan(0.9)
+    expect(p.at.y).toBeGreaterThan(0.05)
+    expect(p.at.y).toBeLessThan(0.95)
+  }
+}
 
 describe('place registry', () => {
   it('has 23 visible places on four pages in the bar\'s order (D147) plus the hidden Account', () => {
@@ -16,22 +35,7 @@ describe('place registry', () => {
   })
 
   it('keeps every place on a page at least 44 pt apart on the smallest phone', () => {
-    for (const page of HUB_PAGES) {
-      const places = placesOn(page)
-      for (const a of places)
-        for (const b of places) {
-          if (a === b) continue
-          const dx = (a.at.x - b.at.x) * MAP_W
-          const dy = (a.at.y - b.at.y) * MAP_H
-          expect(Math.hypot(dx, dy), `${a.id} ↔ ${b.id}`).toBeGreaterThanOrEqual(MIN_GAP * 1.5)
-        }
-      for (const p of places) {
-        expect(p.at.x).toBeGreaterThan(0.1)
-        expect(p.at.x).toBeLessThan(0.9)
-        expect(p.at.y).toBeGreaterThan(0.05)
-        expect(p.at.y).toBeLessThan(0.95)
-      }
-    }
+    for (const page of HUB_PAGES) expectSpaced(placesOn(page))
   })
 
   it('opens every place in a known slice, with S1 live only for the Stable, Scenario Gate and Account', () => {
@@ -44,6 +48,41 @@ describe('place registry', () => {
     expect(placeOnPage('learning', 'mine')).toBeUndefined()
     expect(placeOnPage('battle', 'scenario-gate')?.name).toBe('Scenario Gate')
     expect(placeOnPage('town', 'nowhere')).toBeUndefined()
+  })
+})
+
+describe('the Learning page by generation (H59, D178)', () => {
+  const spots = (list: readonly Place[]) => list.map((p) => [p.id, p.at.x, p.at.y, p.frame ?? null])
+
+  it('is today\'s list in classes v1, and the live generation\'s on the map', () => {
+    expect(spots(learningPlaces(14))).toEqual([
+      ['brawler-dojo', 0.24, 0.1, null], ['mage-tower', 0.76, 0.11, null], ['spell-blade-salle', 0.22, 0.33, null],
+      ['cleric-chapel', 0.78, 0.33, null], ['summoner-circle', 0.5, 0.56, null], ['observatory', 0.5, 0.84, null],
+    ])
+    expect(placesOn('learning')).toEqual(learningPlaces())
+    expect(placeById('paladin-bastion')?.frame).toBe(rpgV2() ? 'knights-bastion' : undefined)
+  })
+
+  it('pairs the six halls across the road in classes v2, the Bastion on the knights-bastion keep', () => {
+    const v2 = learningPlaces(15)
+    expect(spots(v2)).toEqual([
+      ['brawler-dojo', 0.24, 0.1, null], ['mage-tower', 0.76, 0.11, null],
+      ['spell-blade-salle', 0.22, 0.33, null], ['summoner-circle', 0.78, 0.33, null],
+      ['paladin-bastion', 0.24, 0.56, 'knights-bastion'], ['cleric-chapel', 0.76, 0.56, null],
+      ['observatory', 0.5, 0.84, null],
+    ])
+    expect(v2.find((p) => p.id === 'paladin-bastion')).toMatchObject({
+      page: 'learning', kind: 'class-hall', name: 'Paladin Bastion', slots: 4, opensIn: 'S7',
+      blurb: 'The Paladin Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners.',
+    })
+    expect(v2.filter((p) => p.kind === 'class-hall').map((p) => p.id).sort()).toEqual(Object.values(HERO_HALLS).sort())
+    expect(v2.every((p) => p.page === 'learning' && !p.hidden)).toBe(true)
+    expectSpaced(v2)
+    // The places a v1 page holds keep every field but their spot.
+    for (const p of learningPlaces(14)) {
+      const moved = v2.find((q) => q.id === p.id)!
+      expect({ ...moved, at: p.at }).toEqual(p)
+    }
   })
 })
 
