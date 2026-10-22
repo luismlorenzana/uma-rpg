@@ -58,6 +58,23 @@ Left for later, logged:
 - uma-kit's `PlaceMenu` reads a locked place as "not open yet" to screen readers (no reason field); batch an optional
   `lockedReason` with the next "Both apps:" kit change rather than a release of its own.
 
+**Classes v2 build** (2026-10-22; [classes v2](../design/classes-v2.md), D160, engine v15 and save v25, built dark behind
+one switch and turned on by H61; the build decisions are logged by H53):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H53 | Engine v15 foundation: the Paladin as a class id, the one switch, class rules by generation, v15 accepted dark; v14 replays pinned | Claude | M | — | Ready |
+| H54 | **Art:** the Paladin's class emblem in uma-art 2.12.0; the Bastion reuses the `knights-bastion` keep | Claude | S | — | Ready |
+| H55 | Engine v15: the hybrids' hands, the Spell Blade's extra Arms hit and the Summoner's mirrored pair and farewell (dark) | Claude | M | H53 | Waiting |
+| H56 | Engine v15: the healers (ATK or M.ATK scaling, doubled shares, 60% cap, Regen, the Paladin's kit) and the six halls' 24 Limit Breaks, C3 (dark) | Claude | L | H53 | Waiting |
+| H57 | Accessories v2: flat Orbs, typed Damage and Support slots, retuned supports, six presets (dark) | Either | M | H53 | Waiting |
+| H58 | Save v25 (dark): the Paladin's migration, one healer a party, the Paladin's start | Claude | M | H53 | Waiting |
+| H59 | The classes v2 screens, inert until the switch: the Paladin, the Bastion, typed slots, the Summoner's pair, one healer (pins uma-art 2.12.0) | Either | L | H54, H55, H56, H57, H58 | Waiting |
+| H60 | Classes v2 balance: §9's targets, the campaign, the Rift re-measured with v2 parties (Iron's wrong party), v15 knobs first (dark) | Claude | L | H55, H56, H57 | Waiting |
+| H61 | The switch: engine v15, save v25 and the Paladin go live; the manual rewritten | Claude | M | H59, H60 | Waiting |
+
+**Waves:** 1) H53, H54 → 2) H55, H56, H57, H58 → 3) H59, H60 → 4) H61.
+
 The five docs' calls wait on the owner (Q12–Q16).
 
 **Overlaps to know:**
