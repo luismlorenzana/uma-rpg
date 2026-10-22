@@ -119,7 +119,7 @@ export function limitMode(state: BattleState, actorId: string, choice: BattleLim
 export function describeCue(cue: BattleCue, name: (id: string) => string): string {
   switch (cue.kind) {
     case 'hit': return cue.label === 'Burn' ? `${name(cue.targetId)} burns for ${cue.amount}`
-      : `${name(cue.actorId)} → ${name(cue.targetId)}: ${cue.amount}${cue.weak ? ' · WEAK' : ''}${cue.label === 'Intercepted' ? ' · guarded' : cue.label?.startsWith('Barrier') ? ` · ${cue.label}` : ''}`
+      : `${name(cue.actorId)} → ${name(cue.targetId)}: ${cue.amount}${cue.weak ? ' · WEAK' : ''}${cue.label === 'Intercepted' ? ' · guarded' : cue.label === 'Warded' ? ' · warded' : cue.label?.startsWith('Barrier') ? ` · ${cue.label}` : ''}`
     case 'shield': return `${name(cue.targetId)} shield ${cue.amount}`
     case 'break': return `${name(cue.targetId)} BREAK!`
     case 'recover': return `${name(cue.targetId)} recovers its shield`

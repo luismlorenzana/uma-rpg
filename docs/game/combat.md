@@ -10,7 +10,8 @@ engine.
 
 Code: `packages/domain/src/rpg/battle/` (`engine.ts`, `skills.ts`, `limit.ts`, `auto.ts`, `types.ts`), foes in
 `rpg/campaign/enemies.ts`, stages in `world/world.ts`, the Rift's fights in `rift/` (`fronts.ts`, `picker.ts`,
-`generate.ts`), the screen in `apps/web/src/places/scenario-gate/FightScreen.tsx`.
+`generate.ts`), the screen in `apps/web/src/places/scenario-gate/FightScreen.tsx`, which the world map and the Rift share
+through a fight source (`battle/fight-source.ts`, H50).
 
 ## A fight at a glance
 
@@ -164,7 +165,8 @@ The Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF
   unbroken halving: a quarter of a Broken hit while her shield stands, and still half once she's Broken. `pierce`
   skips the unbroken halving, not the ward. Foes' hits are never warded. Auto weighs it: a skill or Attack loses half
   the share of its power in the warded channel, so the party reaches for the other channel first. It's a trait of the
-  foe, not the Ward status below.
+  foe, not the Ward status below. On screen (H50): a warded foe carries her front's crest beside her element (Iron's
+  for elements, Arcane's for Arms), the hit line reads "· warded", and foe lists show "Wards Tomes" or "Wards Arms".
 - Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**. A dual-element
   foe is weak to what beats either element, minus her own; a light+dark foe answers to weapons only.
 
@@ -322,6 +324,9 @@ always the front's kinds.
   element, Arms…).
 - **Horde:** three waves of 4 to 6 foes, each weak to one Arms kind and one element, no two foes of a wave alike.
 - Each foe's own element, the one her moves carry, is one she isn't weak to.
+- **On screen she reads as her face** (H50): a boss- or sub-boss-faced foe stands at that size on the stage and is
+  tagged Boss or Elite in lists, whatever her rank, so the Horde's regular-rank leaders still look like leaders. A
+  champion who acts three times says so ("Acts three times").
 
 <!-- live:rift-fronts -->
 | Front | Weak to | Ward | Stages 1–4 | 5–8 | 9–11 | Champion (12) | Party |

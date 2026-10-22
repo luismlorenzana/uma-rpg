@@ -1,6 +1,6 @@
 import atlas from '@luismlorenzana/uma-art/ui/atlas.json'
 import atlasUrl from '@luismlorenzana/uma-art/ui/atlas.png?url'
-import { achievementDef, FRONT_NAME, type BattleStatus, type RiftFront, type RpgClass } from '@rpg/domain'
+import { achievementDef, FRONT_NAME, type BattleChannel, type BattleStatus, type RiftFront, type RpgClass } from '@rpg/domain'
 import type { CSSProperties } from 'react'
 import { STATUS_LABEL } from './labels'
 
@@ -25,6 +25,11 @@ export function ClassEmblem({ classId }: { classId: RpgClass }) {
 /** A Rift front's 16 px crest (uma-art 2.11.0), named "Iron front". */
 export function FrontCrest({ front, scale = 1 }: { front: RiftFront; scale?: PixelScale }) {
   return <PixelIcon frame={'front/' + front} scale={scale} label={`${FRONT_NAME[front]} front`} />
+}
+/** A warded foe's mark on the fight screen (H50): the crest of the front whose foes ward that channel (Iron wards magic,
+ * Arcane physical), so the player brings the other channel before the hit cues teach it. */
+export function WardMark({ ward }: { ward: BattleChannel }) {
+  return <PixelIcon frame={ward === 'magical' ? 'front/iron' : 'front/arcane'} label={ward === 'magical' ? 'Wards magic' : 'Wards physical'} />
 }
 /** An achievement's 24 px badge (uma-art 2.11.0). Decorative: its row or card names it. `dim`: not earned yet. */
 export function AchievementBadge({ id, scale = 1, dim = false }: { id: string; scale?: PixelScale; dim?: boolean }) {

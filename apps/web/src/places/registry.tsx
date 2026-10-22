@@ -35,6 +35,10 @@ export const PLACE_UI: Record<string, PlaceUi> = {
     Page: lazy(() => import('./scenario-gate/ScenarioGatePage')),
     Counter: lazy(() => import('./scenario-gate/LaurelCounter')),
   },
+  'tier-finale': {
+    Peek: lazy(() => import('./rift/RiftPeek')),
+    Page: lazy(() => import('./rift/RiftPage')),
+  },
   account: {
     Page: lazy(() => import('./account/AccountPage')),
   },

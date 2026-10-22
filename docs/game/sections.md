@@ -72,7 +72,7 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
 | Scenario Gate | `scenario-gate` | battle | — | The world map: five continents of regions to clear. |
-| Tier Finale | `tier-finale` | battle | — | The tier's final event, and promotion to the next tier. |
+| The Rift | `tier-finale` | battle | — | Twenty Lv 50 Umas seal four fronts, then ascend together. |
 
 ### Wilds (`wilds`)
 
@@ -93,8 +93,12 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 
 The Wilds hold every facility: eight sites in two columns, and the Workbench, the Lapidary and the Forge across the
 middle row, the Lapidary on the road between them (D144). Town Hall keeps its four places in the corners around the
-plaza. The Battle page holds the Scenario Gate and the Tier Finale on a drill ground of its own, with flagstone roads,
-banners, weapon racks, training dummies and torches (H31, D148).
+plaza. The Battle page holds the Scenario Gate and the Rift on a drill ground of its own, with flagstone roads,
+banners, weapon racks, training dummies and torches (H31, D148). The Rift draws uma-art's `rift` building (its place keeps
+the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
+- **A place can wait on its world** (`placeOpen` and `placeLock`, `hub/places.ts`): the Rift opens with five Lv 50 Umas
+  in Tiers 1 and 2. Shut, its building carries a lock, its quick look says "Opens at five Lv 50 Umas · 3/5" (or "No
+  Rift in this tier yet" in Tier 3), it has no Enter, the menu locks it, and a link to its page goes to the quick look.
 
 ### Facilities
 
@@ -246,6 +250,8 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 - **Result:** Victory or Defeated, Laurels, Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar, her Class Rank
   bar, and five Weapon and five Armor Rank cells, each glowing on a rank-up (D102). Then "Fight again" or back to the
   map.
+- The fight screen plays a **fight source** (`battle/fight-source.ts`, H50): the world map's is its open fight, the
+  region's title and biome, and foes sized by rank; the Rift hands it its own ([The Rift](#the-rift)).
 
 ### Warehouse
 
@@ -287,16 +293,53 @@ Reached from the account bar. The kit's `AccountPage` (SD3) with this game's con
   app build.
 - Sign out.
 
-### Tier Finale
+### The Rift
 
-A locked place (a lock on the map and in the menu). Promotion to Tier 2 isn't built.
+The end-of-tier event ([loops](loops.md#the-rift), [the Rift](../design/rift.md), H50). Routes: `/battle/tier-finale`,
+`front/:front` (and `front/:front/:stage`, its sheet open), `convergence`, `signup` and `fight`. Screens in
+`apps/web/src/places/rift/`. Open once the tier's world has five Lv 50 Umas.
+- **Quick look:** the Rift's line, the Lv 50 count, or the run's four fronts ("5/12", "Sealed").
+- **The Rift:**
+  - "Tier 1 · Run 1 · 2 of 4 fronts sealed" (or the Lv 50 count), and "Resume the open fight" when a Rift fight is open;
+  - no run: **Sign up twenty**, disabled with "12 of 20 at Lv 50" until twenty are;
+  - a run: the four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · 2 Spell Blade ·
+    Cleric") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", or "Fight 2 of
+    4 · Arcane");
+  - a won run: **Ascend to Tier 2**;
+  - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, a ✓ on each won;
+  - **Roster:** the run's twenty faces, with "Cancel sign-up" while the run is untouched.
+- **Sign up twenty:** "Four parties" (the party picker, up to four, parties of five Lv 50 Umas) or "Twenty Umas" (the
+  shared Uma picker, twenty, Lv 50 only), then a sheet of the twenty faces: "They fight this Rift together until it
+  ends." · Sign up.
+- **A front's chain:** its crest and count, its ward ("Wards Tomes" on Iron, "Wards Arms" on Arcane) and guidance, then
+  twelve stages ("Stage 1" to "Champion"), each with its level, waves and foes and its leaders' faces: cleared ✓, the
+  next ringed (the page opens on it), the rest locked. Any stage opens its **stage sheet**: the foes by wave as the
+  fight will have them (face, elements, Boss or Elite by face, "Acts twice" or "Acts three times", shield, weaknesses,
+  the ward); on the next stage a party of the roster (the best fit for the front's guidance first; others disabled
+  with the reason) and **Fight**.
+- **The Convergence:** four slots, Iron, Arcane, Duel and Horde, each with its fight's "Foes" and a party (suggested
+  by the fronts' guidance); **Begin** when the four cover the twenty (else "Missing: …"), which starts the attempt and
+  its first fight. With an attempt on: its four parties, "Won · 6 rounds" or "Next", **Fight: Arcane** and "End this
+  attempt" (confirmed).
+- **An Echo's sheet:** the front and level, its foes, a party of five Lv 50 Umas and **Fight**; once won, **Sweep ×1**
+  and **Sweep ×5** with the Sweep Ticket count. A Sweep's result shows like a win.
+- **Fight:** the shared fight screen on the Twilight Rift's backdrop, titled "Iron front · Stage 5", "Convergence ·
+  Fight 2 of 4" or "Echo · Iron · Lv 55". Foes stand and are tagged by their face ([combat](combat.md#the-rifts-foes));
+  a warded foe carries her front's crest. Back and the menu return to the Rift ("Give up" ends a Convergence attempt).
+- **Result:** Victory or Defeated and the rounds; then "Stage 5 cleared · 5/12" or "Iron sealed", "Fight 2 of 4 won",
+  "The Rift is won!" or "The attempt is over"; an Echo's rank bars and Marks, with no EXP line. Buttons: "Next stage"
+  (the same five again while one party holds them, else the stage's sheet), "Retry", "Next: Arcane", "Fight again" or
+  "Sweep again", and "Back to the Rift". An achievement earned plays its cut-in first, one at a time.
+- **Ascend** (a sheet): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their gear
+  returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", and the reason
+  when it can't yet. Ascend runs behind the tier veil and lands on the new tier's Town Hall.
 
 ## Tiers
 
 Each tier is its own world, with its own Stable, parties, world map, Wilds, Warehouse, wallet and halls ([tiers](../design/tiers.md),
 D159). The account, its achievements and each Uma's tier history are shared.
 - **One world on screen at a time:** the active tier (`save/game.ts`, H35). Every screen reads its world and every
-  action writes to it. Today only Tier 1 exists, until the Rift promotes Umas.
+  action writes to it. A tier's world exists once the Rift below it has ascended Umas.
 - **The tiers** (`TIERS`, `save/rules.ts`): three, as master data has, each with tiers.md §6's name and a look:
 
 <!-- live:tiers -->
@@ -310,10 +353,11 @@ D159). The account, its achievements and each Uma's tier history are shared.
 - **The Tier sheet** (`?sheet=tier`, `hub/TierSheet.tsx`, H36): the top bar's crest opens it over the current page, and
   Back or ✕ closes it. One card per tier, 1 to 3:
   - a tier with a world shows its crest, "Tier n · Name", its Uma count ("No Umas yet", "1 Uma", "12 Umas") and its
-    Rift ("The Rift isn’t open yet" until the Rift is built). The active tier's card has an accent border, and tapping
-    it just closes the sheet;
-  - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier n−1 Rift".
-    Today that's Tiers 2 and 3.
+    Rift (`riftLine`): "No Rift in this tier yet" (Tier 3), "The Rift opens at five Lv 50 Umas", "The Rift is open",
+    "Rift run · 2 of 4 fronts sealed" or "Rift won · ready to ascend". The active tier's card has an accent border, and
+    tapping it just closes the sheet;
+  - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier n−1 Rift"
+    (Tiers 2 and 3 until a Rift ascends).
 - **Picking another tier** fades a veil in the page colour over the screen (120 ms), switches the active tier and lands
   on that tier's Town Hall in place of the sheet's entry, then fades the veil out (260 ms) once the new world has drawn
   (`hub/TierVeil.tsx`, rendered outside the shell so it survives the remount). Under reduced motion the switch is

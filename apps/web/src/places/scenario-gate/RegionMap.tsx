@@ -6,8 +6,9 @@ import {
 } from '@rpg/domain'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Campaign } from '../../battle/campaign'
-import { ElementGlyph, formatLevel, formatLevels, WeaknessIcons } from '../../battle/labels'
-import { castArtUrl } from '../../content/cast'
+import { CastFace } from '../../battle/CastFace'
+import { FoeRow } from '../../battle/FoeRow'
+import { ElementGlyph, formatLevel, formatLevels } from '../../battle/labels'
 import { useHubNavigation } from '../../hub/navigation'
 import { beginFight, drinkAtSpring, sweep, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
@@ -20,25 +21,6 @@ import { regionLayout, springForRegion } from './map/layout'
 import { BiomeIcon, MapCanvas } from './map/MapCanvas'
 import { MapViewSwitch, useMapView } from './map/MapView'
 import { FightResult } from './FightResult'
-
-/** A foe's round face: her face icon, else full-body art zoomed onto the head (D81), else the bust's top. */
-function CastFace({ campaign, castId, size }: { campaign: Campaign; castId: string; size: number }) {
-  const [url, setUrl] = useState<string | null>(null)
-  const member = campaign.cast.byId.get(castId)
-  const image = member?.face
-  useEffect(() => {
-    let live = true
-    if (image) void castArtUrl(image.path).then((u) => live && setUrl(u), () => undefined)
-    return () => {
-      live = false
-    }
-  }, [image])
-  return (
-    <span className="relative block shrink-0 overflow-hidden rounded-full bg-raised" style={{ width: size, height: size, background: member?.color }}>
-      {url && <img src={url} alt="" className="size-full object-cover" />}
-    </span>
-  )
-}
 
 /** The elements a stage's foes carry: one, or a pair. */
 const signatureOf = (n: RpgMapNode): RpgElement[] => (n.note ? (n.note.split(' + ') as RpgElement[]) : n.element ? [n.element] : [])
@@ -190,21 +172,7 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
             <section key={w} className="mb-2">
               {all.length > 1 && <h3 className="text-micro mb-1">Wave {w + 1}</h3>}
               <ul className="space-y-1.5">
-                {wave.map((e) => (
-                  <li key={e.id} className="flex items-center gap-2 rounded-sm bg-raised p-2">
-                    <CastFace campaign={campaign} castId={e.castId} size={40} />
-                    <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-1 text-[13px] font-semibold">
-                        <ElementGlyph element={e.element} size={14} />
-                        {e.element2 && <ElementGlyph element={e.element2} size={14} />}
-                        <span className="truncate">{campaign.name(e.id, e.castId)}</span>
-                        {e.rank !== 'regular' && <span className="rounded-xs bg-accent/20 px-1 text-[10px] text-accent">{e.rank === 'boss' ? 'Boss' : 'Elite'}</span>}
-                        {e.twice && <span className="rounded-xs bg-danger/20 px-1 text-[10px] text-danger">Acts twice</span>}
-                      </p>
-                      <p className="flex items-center gap-1 text-[11px] text-ink-soft">Shield {e.shield} · weak <WeaknessIcons weaknesses={e.weaknesses} size={12} /></p>
-                    </div>
-                  </li>
-                ))}
+                {wave.map((e) => <FoeRow key={e.id} campaign={campaign} enemy={e} rank={e.rank} />)}
               </ul>
             </section>
           ))}

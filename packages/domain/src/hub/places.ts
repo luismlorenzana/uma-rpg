@@ -1,6 +1,7 @@
 // The place registry (D33, D144, D147): every place on the Hub's four pages, in the bottom bar's order (Town Hall ·
 // Learning · Battle · Wilds, the sibling apps' Home · Grow · Play · Work), one source for the map, the hit targets, the
 // global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
+import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -26,7 +27,7 @@ export const SLICE_GOALS: Record<SliceId, string> = {
   S5: 'Learning District: class ranks, Weapon, Armor and Accessory Levels',
   S6: 'Extra Stats: Star Gems and the Sun-and-planets map',
   S7: 'Forge and equipment: crafting and bound gear',
-  S8: 'Tier Finale and promotion into Tier 2',
+  S8: 'The Rift and promotion into Tier 2',
 }
 
 export interface Place {
@@ -47,6 +48,8 @@ export interface Place {
   hidden?: boolean
   /** A tap on the map opens its page at once, with no side panel (the Scenario Gate, D147). */
   direct?: boolean
+  /** The uma-art building frame, when it isn't the id (the Rift's `rift`, H50). */
+  frame?: string
 }
 
 /** The Wilds' layout: eight sites in two columns, the Workbench and the Forge in the middle row with the Lapidary between
@@ -174,7 +177,8 @@ const TOWN: Place[] = [
 /** Where the featured Uma stands on Town Hall's road, kept clear of props (D147). */
 export const TOWN_PLAZA = { x: 0.5, y: 0.45 } as const
 
-/** Battle (D147), the raised centre tab: the world map, straight from the map, and the Tier Finale. */
+/** Battle (D147), the raised centre tab: the world map, straight from the map, and the Rift (H50; the id is the Tier
+ * Finale's, so saves, links and the menu don't move). */
 const BATTLE: Place[] = [
   {
     id: 'scenario-gate', page: 'battle', kind: 'battle', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.3 }, direct: true,
@@ -182,9 +186,9 @@ const BATTLE: Place[] = [
     details: ['Tier 1: five continents of 40 regions', 'Fight rivals with a party of five: EXP, Uma Shards and Laurels'],
   },
   {
-    id: 'tier-finale', page: 'battle', kind: 'battle', name: 'Tier Finale', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.72 },
-    blurb: "The tier's final event, and promotion to the next tier.",
-    details: ['Harder fights or party switching', 'Promotion moves her to Tier 2 at Lv1'],
+    id: 'tier-finale', page: 'battle', kind: 'battle', name: 'The Rift', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.72 }, frame: 'rift',
+    blurb: 'Twenty Lv 50 Umas seal four fronts, then ascend together.',
+    details: ['Four fronts of twelve stages, then the Convergence', 'Echoes: repeatable fights for Class and gear ranks', 'Ascend: all twenty move up a tier'],
   },
 ]
 
@@ -216,4 +220,23 @@ export function isOpen(place: Place, current: SliceId): boolean {
 }
 
 /** The slice the deployed build implements. */
-export const CURRENT_SLICE: SliceId = 'S7'
+export const CURRENT_SLICE: SliceId = 'S8'
+
+/** The Rift's place id (the Tier Finale's, kept). */
+const RIFT_PLACE = 'tier-finale'
+const COUNT_WORDS: readonly string[] = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+
+/** Whether a place is open in this tier's world (H50): built in this slice, and the Rift only when the world has five Lv 50
+ * Umas in a tier that runs one (`riftOpen`). No world (before boot) keeps the Rift shut. */
+export function placeOpen(place: Place, world: { umas: Readonly<Record<string, { level: number }>> } | null, tier: number): boolean {
+  if (!isOpen(place, CURRENT_SLICE)) return false
+  return place.id !== RIFT_PLACE || (world !== null && riftOpen(world, tier))
+}
+
+/** Why a place is shut, in a few words, or null when it's open: the Rift waits on its world, the rest on their slice. */
+export function placeLock(place: Place, world: { umas: Readonly<Record<string, { level: number }>> } | null, tier: number): string | null {
+  if (placeOpen(place, world, tier)) return null
+  if (place.id !== RIFT_PLACE || !isOpen(place, CURRENT_SLICE)) return 'Not open yet'
+  return (RIFT_TIERS as readonly number[]).includes(tier) ? `Opens at ${COUNT_WORDS[RIFT_OPEN_AT] ?? RIFT_OPEN_AT} Lv 50 Umas` : 'No Rift in this tier yet'
+}
+

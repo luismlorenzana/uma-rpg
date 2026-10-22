@@ -24,30 +24,45 @@ const subscribe = (listener: () => void) => {
   return () => { listeners.delete(listener) }
 }
 
-/** Puts tier `tier`'s world on screen on its Town Hall: behind the veil, or at once under reduced motion. */
-export function switchTier(tier: number, { navigate, reducedMotion }: { navigate: NavigateFunction; reducedMotion: boolean }): void {
+/**
+ * Puts tier `tier`'s world on screen on its Town Hall: behind the veil, or at once under reduced motion. `before` runs
+ * once the veil is up, before the switch (Ascend, which creates that world, H50): if it fails, the veil lifts, nothing
+ * switches, and the returned promise rejects with its error.
+ */
+export function switchTier(tier: number, { navigate, reducedMotion, before }: {
+  navigate: NavigateFunction; reducedMotion: boolean; before?: () => Promise<unknown>
+}): Promise<void> {
   // A second tap while the veil is up changes nothing.
-  if (veiled) return
+  if (veiled) return Promise.resolve()
   const go = () => {
     if (setActiveTier(tier)) void navigate('/town', { replace: true })
   }
   if (reducedMotion) {
+    if (before) return before().then(go)
     go()
-    return
+    return Promise.resolve()
   }
   setVeiled(true)
-  window.setTimeout(() => {
-    go()
-    // The remounted shell commits, then paints once, before the veil lifts.
-    requestAnimationFrame(() => requestAnimationFrame(() => setVeiled(false)))
-  }, FADE_IN)
+  return new Promise((resolve, reject) => {
+    window.setTimeout(() => {
+      void (before ? before() : Promise.resolve()).then(() => {
+        go()
+        // The remounted shell commits, then paints once, before the veil lifts.
+        requestAnimationFrame(() => requestAnimationFrame(() => setVeiled(false)))
+        resolve()
+      }, (err: unknown) => {
+        setVeiled(false)
+        reject(err)
+      })
+    }, FADE_IN)
+  })
 }
 
 /** `switchTier` with this screen's router and the motion setting. */
-export function useSwitchTier(): (tier: number) => void {
+export function useSwitchTier(): (tier: number, before?: () => Promise<unknown>) => Promise<void> {
   const navigate = useNavigate()
   const reducedMotion = useReducedMotionSetting()
-  return useCallback((tier: number) => switchTier(tier, { navigate, reducedMotion }), [navigate, reducedMotion])
+  return useCallback((tier: number, before?: () => Promise<unknown>) => switchTier(tier, { navigate, reducedMotion, before }), [navigate, reducedMotion])
 }
 
 export function TierVeil() {

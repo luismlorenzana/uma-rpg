@@ -1,10 +1,11 @@
 // A fight (S3, D53, D86): the Phaser stage shows the rivals and the party and plays every action; the DOM on top carries
 // taps, bars, shields, weaknesses and commands. Pick one of her five weapons to attack with, or a skill, then tap a
 // rival; a Spell Blade picks an Arms half and a Tome half. Weak hits chip shields; a Break leaves the rival open for two
-// rounds. Every action is saved as it's taken, so a fight survives a reload (D52).
+// rounds. Every action is saved as it's taken, so a fight survives a reload (D52). It plays a source (H50): the world
+// map's open fight, or the Rift's.
 import {
-  autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, biomeById, isRpgTome, openFightOf, rpgRunBattleStep, SaveRuleError, type BattleAction, type BattleCue, type BattleState,
-  type BattleUnit, type FightResult, type RpgCampaignChapter, type RpgNodeRef, type RpgWeapon,
+  autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, biomeById, isRpgTome, replayBattle, SaveRuleError, type BattleAction, type BattleCue,
+  type BattleEnemy, type BattleState, type BattleUnit, type Biome, type EnemyRank, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { AtlasSprite, imagePath } from '@luismlorenzana/uma-kit/content'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -16,13 +17,13 @@ import {
 import { BattleStage } from '../../battle/BattleStage'
 import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
 import { Bar, ElementGlyph, KindMark, ShieldBadge, skillKinds, supportText, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
-import { StatusChips } from '../../battle/pixel-icons'
+import type { FightSource } from '../../battle/fight-source'
+import { StatusChips, WardMark } from '../../battle/pixel-icons'
 import type { StageSetup } from '../../battle/scene/BattleScene'
 import type { BattleGame } from '../../battle/scene/createBattleGame'
 import { stageLayout } from '../../battle/stage-layout'
 import { castArtUrl } from '../../content/cast'
 import { CONTENT } from '../../content/client'
-import { fightAction, leaveFight, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon, MenuIcon } from '../../ui/icons'
 
@@ -41,7 +42,7 @@ const SPLASH_ACCENT: Readonly<Record<string, number>> = { regular: 0xc9d2dd, key
 
 /** Loads the stage art: busts for the party, verticals (and splashes) for the rivals.
  * Missing art is fine. */
-function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: BattleState | null, reducedMotion: boolean): StageSetup | null {
+function useStageSetup(campaign: Campaign, biome: Biome, rank: (enemy: BattleEnemy) => EnemyRank, state: BattleState | null, reducedMotion: boolean): StageSetup | null {
   const [setup, setSetup] = useState<StageSetup | null>(null)
   const key = state ? `${state.input.seed}` : ''
   useEffect(() => {
@@ -62,7 +63,7 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         const member = campaign.cast.byId.get(e.castId)
         // A Key enemy, Sub-boss or Boss brings her splash for the cut-ins (D135); Regulars have none.
         const splash = member?.splash && member.tier !== 'regular' ? member.splash : null
-        return { id: e.id, rank: e.rank, color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null),
+        return { id: e.id, rank: rank(e), color: member?.color ?? '#888888', art: await maybe(member ? castArtUrl(member.art.path) : null),
           splash: await maybe(splash ? castArtUrl(splash.path) : null), accent: member ? SPLASH_ACCENT[member.tier] : undefined }
       })),
       // The Heroes behind the party's inherited Limit Breaks, for the cut-in (D106).
@@ -71,7 +72,6 @@ function useStageSetup(campaign: Campaign, chapter: RpgCampaignChapter, state: B
         .map(async (id) => ({ id, bust: await maybe(bust(id)) }))),
     ]).then(([allies, enemies, heroes]) => {
       const field = state.units.filter((u) => u.side === 'enemy').map((u) => u.id)
-      const biome = campaign.regionInfo(chapter.id)?.biome ?? 'ruins'
       if (live) setSetup({ allies, enemies, field, biome, color: biomeById(biome).color, reducedMotion, heroes })
     })
     return () => {
@@ -100,18 +100,19 @@ function useSize(ref: React.RefObject<HTMLElement | null>): { w: number; h: numb
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 const AUTO_DELAY_MS = 180
 
-export function FightScreen({ campaign, chapter, onEnd, onMap }: {
+/** A foe's ward, in the words of her button's label. */
+const WARD_WORDS = { physical: 'wards physical', magical: 'wards magical' } as const
+
+export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
   campaign: Campaign
-  chapter: RpgCampaignChapter
-  onEnd: (result: FightResult, nodeId: string) => void
+  source: FightSource<R>
+  onEnd: (result: R) => void
   onMap: () => void
 }) {
-  const world = useWorld()
-  const run = world ? openFightOf(world) : null
-  const [live, setLive] = useState<BattleState | null>(() => (run?.battle ? rpgRunBattleStep(run)?.state ?? null : null))
+  const [live, setLive] = useState<BattleState | null>(() => (source.battle ? replayBattle(source.battle.input, source.battle.actions).state : null))
   const [shown, setShown] = useState<BattleState | null>(live)
-  const nodeId = useRef(run?.battle?.nodeId ?? '')
-  const node = chapter.nodes.find((n) => n.id === nodeId.current)
+  // The header and the stage are the fight's as it opened: a source rebuilt after the last action no longer has it.
+  const [opened] = useState(() => ({ title: source.title, name: source.name, biome: source.biome, back: source.back, rank: source.rank }))
   const [actorId, setActorId] = useState<string | null>(null)
   const [mode, setMode] = useState<BattleMode>({ kind: 'attack' })
   const [sheet, setSheet] = useState<'skills' | 'menu' | { limit: string } | null>(null)
@@ -123,7 +124,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
   const [stageReady, setStageReady] = useState(false)
   const game = useRef<BattleGame | null>(null)
   const actRef = useRef<(action: BattleAction) => Promise<void>>(async () => undefined)
-  const setup = useStageSetup(campaign, chapter, live, reduced())
+  const setup = useStageSetup(campaign, opened.biome, opened.rank, live, reduced())
   const stageRef = useRef<HTMLDivElement>(null)
   const size = useSize(stageRef)
   const onGame = useCallback((g: BattleGame | null) => {
@@ -161,7 +162,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
     return (
       <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-page p-6 text-center">
         <p>No fight is open.</p>
-        <button type="button" onClick={onMap} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink">Back to the map</button>
+        <button type="button" onClick={onMap} className="min-h-11 rounded-sm bg-accent px-4 font-display font-bold text-accent-ink">{opened.back}</button>
       </div>
     )
   }
@@ -189,7 +190,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
     setBusy(true)
     setError(null)
     try {
-      const { step, result } = await fightAction(chapter, action)
+      const { step, result } = await source.act(action)
       setLive(step.state)
       setMode({ kind: 'attack' })
       setActorId(battleActionsLeft(step.state, action.actorId) > 0 ? action.actorId : null)
@@ -209,7 +210,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       }
       setCue(null)
       setShown(step.state)
-      if (result) onEnd(result, nodeId.current)
+      if (result) onEnd(result)
     } catch (err) {
       setError(err instanceof SaveRuleError || err instanceof Error ? err.message : 'That action didn’t work.')
       // A failed action hands control back, or Auto would resend it the moment `busy` clears.
@@ -261,19 +262,19 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
 
   const enemies = shown.units.filter((u) => u.side === 'enemy')
   const allies = shown.units.filter((u) => u.side === 'ally')
-  const layout = size.w > 0 ? stageLayout(size.w, size.h, enemies.map((u) => battleFoe(state, u.id)!.rank), allies.length) : null
+  const layout = size.w > 0 ? stageLayout(size.w, size.h, enemies.map((u) => opened.rank(battleFoe(state, u.id)!)), allies.length) : null
   const waves = battleWaveCount(state.input)
 
   return (
     // The fight stays dark in both modes, as uma-racer's race stage does (D147).
     <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
       <header className="pt-safe z-20 flex min-h-13 items-center gap-1 border-b border-hairline bg-panel/95 px-1.5">
-        <button type="button" onClick={onMap} disabled={busy} className="flex size-11 items-center justify-center rounded-full text-ink-soft" aria-label="Back to the map (the fight stays open)">
+        <button type="button" onClick={onMap} disabled={busy} className="flex size-11 items-center justify-center rounded-full text-ink-soft" aria-label={`${opened.back} (the fight stays open)`}>
           <BackIcon />
         </button>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] text-ink-faint">{chapter.title}</p>
-          <h1 className="truncate text-[15px] leading-tight">{node?.name ?? 'Fight'}</h1>
+          <p className="truncate text-[11px] text-ink-faint">{opened.title}</p>
+          <h1 className="truncate text-[15px] leading-tight">{opened.name}</h1>
         </div>
         {waves > 1 && <span className="rounded-full bg-[#8fd3ff]/15 px-2 py-1 text-[11px] font-bold text-[#8fd3ff]" aria-label={`Wave ${(shown.wave ?? 0) + 1} of ${waves}`}>W{(shown.wave ?? 0) + 1}/{waves}</span>}
         <span className="rounded-full bg-sunken px-2 py-1 text-[11px] font-bold">Round {state.round}</span>
@@ -314,7 +315,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                   e.stopPropagation()
                   tapEnemy(unit)
                 }}
-                aria-label={`${name(unit.id)}, ${enemy.element}${enemy.element2 ? ` and ${enemy.element2}` : ''}${enemy.twice ? ', acts twice' : ''}, HP ${unit.hp} of ${enemy.stats.hp}, ${broken ? 'broken' : `shield ${unit.shield}`}`}
+                aria-label={`${name(unit.id)}, ${enemy.element}${enemy.element2 ? ` and ${enemy.element2}` : ''}${enemy.thrice ? ', acts three times' : enemy.twice ? ', acts twice' : ''}${enemy.ward ? `, ${WARD_WORDS[enemy.ward]}` : ''}, HP ${unit.hp} of ${enemy.stats.hp}, ${broken ? 'broken' : `shield ${unit.shield}`}`}
                 className="absolute rounded-md"
                 style={{ left: box.x, top: box.y, width: box.w, height: box.h }}
               >
@@ -330,6 +331,7 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
                 <p className="flex max-w-full items-center gap-0.5 text-[11px] font-semibold leading-tight">
                   <ElementGlyph element={enemy.element} size={12} />
                   {enemy.element2 && <ElementGlyph element={enemy.element2} size={12} />}
+                  {enemy.ward && <WardMark ward={enemy.ward} />}
                   <span className="truncate">{name(unit.id)}</span>
                 </p>
                 <Bar className="w-full max-w-24" value={unit.hp} max={enemy.stats.hp} />
@@ -541,8 +543,8 @@ export function FightScreen({ campaign, chapter, onEnd, onMap }: {
       {sheet === 'menu' && (
         <BottomSheet title="Fight" onClose={() => setSheet(null)}>
           <div className="space-y-2">
-            <button type="button" onClick={onMap} className="flex min-h-12 w-full items-center justify-center rounded-sm bg-raised font-semibold">Back to the map</button>
-            <button type="button" onClick={() => void leaveFight().then(onMap)} className="flex min-h-12 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold text-ink-soft">
+            <button type="button" onClick={onMap} className="flex min-h-12 w-full items-center justify-center rounded-sm bg-raised font-semibold">{opened.back}</button>
+            <button type="button" onClick={() => void source.leave().then(onMap)} className="flex min-h-12 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold text-ink-soft">
               Give up
             </button>
           </div>

@@ -1,8 +1,8 @@
 # Game loops
 
 What the player does, what it pays and what it costs. Numbers come from the code: generated tables between `live`
-markers, the rest checked against `packages/domain/src/economy/`, `save/` and `rpg/`. Only Tier 1 exists today. There
-is no promotion yet, and the Tier Finale is a locked place.
+markers, the rest checked against `packages/domain/src/economy/`, `save/` and `rpg/`. A tier's next world opens when
+the Rift below it ascends twenty Umas ([the Rift](#the-rift); the page is in [sections](sections.md#the-rift)).
 
 ## The loop
 

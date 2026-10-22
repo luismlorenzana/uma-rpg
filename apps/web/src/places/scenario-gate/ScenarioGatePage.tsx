@@ -6,6 +6,7 @@ import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
+import { campaignFightSource } from '../../battle/fight-source'
 import { formatLevel, formatLevels } from '../../battle/labels'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
 import { beginFight, drinkAtSpring, useGame, useWorld } from '../../save/game'
@@ -243,5 +244,6 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
       </>
     )
   }
-  return <FightScreen key={fight?.battleId ?? 'none'} campaign={campaign} chapter={region} onMap={toRegion} onEnd={(result, nodeId) => setEnded({ result, nodeId })} />
+  return <FightScreen key={fight?.battleId ?? 'none'} campaign={campaign} source={campaignFightSource(world, region, campaign.regionInfo(region.id))} onMap={toRegion}
+    onEnd={(result) => setEnded({ result, nodeId: result.nodeId })} />
 }

@@ -1,4 +1,4 @@
-import { newOwnedUma, newSave, newTierWorld, tierLook, TIERS, unlockUma, type Save } from '@rpg/domain'
+import { newOwnedUma, newSave, newTierWorld, tierLook, TIERS, unlockUma, type RiftRun, type Save, type TierWorld } from '@rpg/domain'
 import { MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { domMax } from 'motion/react'
@@ -7,7 +7,7 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetGame, setActiveTier, useGame } from '../save/game'
 import { RpgAccountBar } from './Bars'
-import { tierCards, TierSheet } from './TierSheet'
+import { riftLine, tierCards, TierSheet } from './TierSheet'
 import { TierVeil } from './TierVeil'
 
 // The switch's store call is H35's, tested there; here it only has to be called with the picked tier.
@@ -24,7 +24,7 @@ vi.mock('@luismlorenzana/uma-kit/shell', async (importOriginal) => ({
 }))
 
 const NOW = '2026-10-21T12:00:00.000Z'
-const RIFT = 'The Rift isn’t open yet'
+const RIFT = 'The Rift opens at five Lv 50 Umas'
 /** Tier 1 with one Uma; Tier 2 a synthetic world holding two (no promotion exists yet). */
 function twoTiers(): Save {
   const save = unlockUma(newSave('Luis', NOW), '101', NOW)
@@ -95,6 +95,28 @@ describe('the tier cards (H36)', () => {
   it('gives each tier its look', () => {
     expect(TIERS.map((t) => [t.tier, t.look])).toEqual([[1, 'day'], [2, 'dusk'], [3, 'night']])
     expect([1, 2, 3].map(tierLook)).toEqual(['day', 'dusk', 'night'])
+  })
+})
+
+describe('the Rift line (H50)', () => {
+  /** A world with `n` Lv 50 Umas and, when given, one run. */
+  function world(n: number, run?: Partial<RiftRun>): TierWorld {
+    const w = newTierWorld(NOW, 0)
+    for (let i = 0; i < n; i += 1) w.umas[`${100 + i}`] = { ...newOwnedUma(NOW), level: 50 }
+    if (run) w.rift.runs.push({ id: 't1-r1', roster: [], startedAt: NOW, fronts: { iron: 0, arcane: 0, duel: 0, horde: 0 },
+      convergence: { attempts: 0, open: null }, traces: {}, wonAt: null, ascendedAt: null, ...run })
+    return w
+  }
+
+  it('reads each state of a tier’s Rift', () => {
+    expect(riftLine(world(25), 3)).toBe('No Rift in this tier yet')
+    expect(riftLine(world(4), 1)).toBe('The Rift opens at five Lv 50 Umas')
+    expect(riftLine(world(5), 1)).toBe('The Rift is open')
+    expect(riftLine(world(5), 2)).toBe('The Rift is open')
+    expect(riftLine(world(20, { fronts: { iron: 12, arcane: 5, duel: 12, horde: 0 } }), 1)).toBe('Rift run · 2 of 4 fronts sealed')
+    expect(riftLine(world(20, { fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 }, wonAt: NOW }), 1)).toBe('Rift won · ready to ascend')
+    // After the twenty ascend, the tier's Rift is open again for its next twenty (R9).
+    expect(riftLine(world(5, { wonAt: NOW, ascendedAt: NOW }), 1)).toBe('The Rift is open')
   })
 })
 

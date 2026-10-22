@@ -4,8 +4,9 @@
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
   newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartySlot, startingClass, tierKey, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
-  type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld,
+  type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
 } from '@rpg/domain'
+import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import type { AlbumScope } from '../album/rows'
@@ -171,6 +172,57 @@ export async function fightAction(region: RpgCampaignChapter, action: BattleActi
   const acted = actInFight(save, region, action, nowIso(), tier)
   await commit(acted.save)
   return { step: acted.step, result: acted.result }
+}
+
+// --- The Rift (H50) -----------------------------------------------------------------------------------------------
+// Every rule is lazy (`@rpg/domain/rift`); `roster` is the enemy cast (`campaign.cast.members`), which the generator draws
+// faces from.
+
+/** Signs twenty Lv 50 Umas up as a run's roster. */
+export const signUpForRift = (roster: readonly string[]) => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.signUpRift(s, roster, now, t))
+/** Cancels an untouched run. */
+export const cancelRiftSignUp = () => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.cancelRiftRun(s, now, t))
+/** Opens a Rift fight: a front stage or an Echo by world party `party`, a Convergence fight by its attempt's party (null). */
+export const beginRiftFight = (ref: RiftFightRef, party: number | null, outfits: ReadonlyMap<string, BattleOutfit>, roster: EnemyRoster) =>
+  edit(import('@rpg/domain/rift'), (d, s, now, t) => d.startRiftFight(s, ref, party, outfits, roster, now, t))
+/** Begins a Convergence attempt with four world parties: Iron's, Arcane's, Duel's and Horde's. */
+export const startConvergence = (parties: readonly number[]) => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.beginConvergence(s, parties, now, t))
+/** Ends the open attempt between fights. */
+export const endConvergence = () => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.abandonConvergence(s, now, t))
+/** Leaves the open Rift fight (a Convergence fight's attempt ends with it). */
+export const retreatRift = () => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.leaveRiftFight(s, now, t))
+
+/** One action in the open Rift fight; when it ends the fight, it's settled in the same save. */
+export async function riftFightAction(action: BattleAction, roster: EnemyRoster): Promise<{ step: BattleStep; result: RiftFightResult | null }> {
+  const tier = activeKey()
+  const { actInRiftFight } = await import('@rpg/domain/rift')
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const acted = actInRiftFight(save, action, roster, nowIso(), tier)
+  await commit(acted.save)
+  return { step: acted.step, result: acted.result }
+}
+
+/** Sweeps a won Echo up to `times` times with world party `party`; returns the summed result. */
+export async function sweepEchoes(front: RiftFront, level: EchoLevel, party: number, times: number, outfits: ReadonlyMap<string, BattleOutfit>): Promise<RiftFightResult> {
+  const tier = activeKey()
+  const { sweepEcho } = await import('@rpg/domain/rift')
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const r = sweepEcho(save, front, level, party, times, outfits, nowIso(), tier)
+  await commit(r.save)
+  return r.result
+}
+
+/** Ascends the won run's twenty to the next tier. It doesn't switch tiers: the caller does, behind the veil. */
+export async function ascendRun(): Promise<AscendSummary> {
+  const tier = activeKey()
+  const { ascend } = await import('@rpg/domain/rift')
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const r = ascend(save, nowIso(), tier)
+  await commit(r.save)
+  return r.summary
 }
 
 // --- Work and the Exchange (S4) ----------------------------------------------------------------------------------

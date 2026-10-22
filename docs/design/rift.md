@@ -85,6 +85,12 @@ A **run** needs **twenty Lv 50 Umas**.
 cancel, the roster lock, one open Rift fight a world beside the world map's, fronts and seals, the Convergence's
 attempts, and Ascend ([tiers](tiers.md) §5). The manual's [Rift](../game/loops.md#the-rift) has the rules as played.
 
+**Built in H50 (D175):** the page, `apps/web/src/places/rift/`, on the Battle page's `tier-finale` place, now "The Rift"
+with uma-art's `rift` building, open once the world has five Lv 50 Umas (`placeOpen`). It has sign-up, the fronts'
+chains and stage sheets, the Convergence's assignment, Echoes and Sweeps, the roster and Ascend. Its fights play on the
+shared fight screen through a fight source, foes read by their face, and the result plays the achievement cut-in. The
+Tier sheet's Rift line is live. The screens are in the manual's [sections](../game/sections.md#the-rift).
+
 ## 5. The four fronts
 
 | Front | Foes | Weak to | Ward | Asks for | Today's party |

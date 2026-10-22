@@ -2,8 +2,8 @@
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
 import {
-  CURRENT_SLICE, facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, isOpen, RPG_WORK_ENV,
-  placeById, placeOnPage, placesOn, type HubPage, type Place, type TierWorld,
+  facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, RPG_WORK_ENV,
+  placeById, placeLock, placeOnPage, placeOpen, placesOn, type HubPage, type Place, type TierWorld,
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
@@ -15,7 +15,7 @@ import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from '
 import { PlacePage } from '../places/PlacePage'
 import { PlacePreview } from '../places/PlacePreview'
 import { PLACE_UI } from '../places/registry'
-import { collectEverything, useWorld } from '../save/game'
+import { collectEverything, useActiveTier, useWorld } from '../save/game'
 import { useNow } from '../ui/useNow'
 import { plaza, sheetFor, useCrowd } from './Featured'
 import { pageGround } from './grounds'
@@ -52,8 +52,8 @@ export function PlaceRoute() {
 }
 
 /** A place's slot pips: workers' faces ringed by their job's progress, a hall's four Heroes, or free dots. */
-function pipsOf(place: Place, world: TierWorld | null, now: string): PipModel[] | undefined {
-  if (place.slots === 0 || !isOpen(place, CURRENT_SLICE)) return undefined
+function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string): PipModel[] | undefined {
+  if (place.slots === 0 || !placeOpen(place, world, tier)) return undefined
   const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={16} label="Assigned Uma" round />
   const hall = hallClass(place.id)
   if (hall && world) {
@@ -95,6 +95,7 @@ function CollectAll({ world, now }: { world: TierWorld | null; now: string }) {
 
 function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const world = useWorld()
+  const tier = useActiveTier()
   const now = useNow(15_000)
   const [params] = useSearchParams()
   const location = useLocation()
@@ -105,22 +106,23 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const ready = readyPlaces(world, now)
   const ground = useMemo(() => pageGround(page), [page])
   const places = placesOn(page).map((place): HubMapPlace => {
-    const open = isOpen(place, CURRENT_SLICE)
+    const open = placeOpen(place, world, tier)
+    const lock = placeLock(place, world, tier)
     const isReady = open && ready.has(place.id)
     return {
       id: place.id,
       name: place.name,
-      frame: place.id,
+      frame: place.frame ?? place.id,
       at: place.at,
       to: place.direct && open ? `/${place.page}/${place.id}` : peekPath(place.page, place.id),
-      label: !open ? `${place.name}, not open yet` : isReady ? `${place.name}, ready to collect` : place.name,
+      label: lock ? `${place.name}, ${lock.charAt(0).toLowerCase()}${lock.slice(1)}` : isReady ? `${place.name}, ready to collect` : place.name,
       ready: isReady ? 'Ready' : undefined,
       locked: !open,
-      pips: pipsOf(place, world, now),
+      pips: pipsOf(place, world, tier, now),
     }
   })
   const covered = peek !== undefined || params.get('sheet') !== null
-  const enterable = peek !== undefined && PLACE_UI[peek.id]?.Page !== undefined && isOpen(peek, CURRENT_SLICE)
+  const enterable = peek !== undefined && PLACE_UI[peek.id]?.Page !== undefined && placeOpen(peek, world, tier)
   return (
     <>
       <HubMap
@@ -144,7 +146,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
           title={peek.name}
           about={<p>{peek.blurb}</p>}
           onClose={() => leave(withParam(location, 'peek', null))}
-          enter={enterable ? { to: `/${peek.page}/${peek.id}`, label: `Enter ${peek.name}`, state: { back: navState(location).back } } : undefined}
+          enter={enterable ? { to: `/${peek.page}/${peek.id}`, label: `Enter ${peek.name.replace(/^The /, 'the ')}`, state: { back: navState(location).back } } : undefined}
           words={{ close: 'Close', about: `About ${peek.name}`, backTo: `Back to ${HUB_PAGE_NAMES[page]}` }}
           focusKey={`[data-place="${peek.id}"]`}
         >

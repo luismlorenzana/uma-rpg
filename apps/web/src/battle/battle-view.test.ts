@@ -1,6 +1,6 @@
 import { BATTLE_LIMIT_MAX, createBattle, projectRpgStats, rpgFoe, type BattleAlly, type BattleInput, type BattleState, type RpgClass, type RpgWeapon } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { limitMode, limitOptions, limitReady } from './battle-view'
+import { describeCue, limitMode, limitOptions, limitReady } from './battle-view'
 
 // Invented outfits only. Depth-1 cores at Class Rank 4.
 const ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana']
@@ -40,5 +40,18 @@ describe('the Limit Break menu (D106, D112)', () => {
     expect(limitReady(fight(10, { hero: 'cleric-1' }), 'a1')).toBe(true)
     expect(limitReady(fight(9, {}), 'a1')).toBe(true)
     expect(limitOptions(fight(9, {}), 'a1').options[0]).toMatchObject({ name: 'Heavy Slash' })
+  })
+})
+
+describe('the hit line (D169)', () => {
+  const name = (id: string) => ({ a1: 'Ally', f1: 'Foe' })[id] ?? id
+  const hit = (label?: string) => describeCue({ kind: 'hit', actorId: 'a1', targetId: 'f1', amount: 40, channel: 'magical', element: 'fire', weak: false, ...(label ? { label } : {}) }, name)
+
+  it('names a warded hit, as it names a guarded one', () => {
+    expect(hit()).toBe('Ally → Foe: 40')
+    expect(hit('Warded')).toBe('Ally → Foe: 40 · warded')
+    expect(hit('Intercepted')).toBe('Ally → Foe: 40 · guarded')
+    expect(describeCue({ kind: 'hit', actorId: 'a1', targetId: 'f1', amount: 12, channel: 'physical', element: 'bow', weak: true, label: 'Warded' }, name))
+      .toBe('Ally → Foe: 12 · WEAK · warded')
   })
 })
