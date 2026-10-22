@@ -176,6 +176,9 @@ The second vertical is designed in [the second profession](second-profession.md)
 
 Weapon arts and set bonuses are designed in [weapon arts and armor sets](weapon-arts.md) (H40, calls E1–E9).
 
+Tier 2's continents, foe budget, rewards and Rift fronts are designed in [Tier 2's world and its Rift](tier2-world.md)
+(H43, calls Z1–Z10).
+
 **What it costs.** Tier 1's simplification reuses today's content: the cores already exist. The side forks become
 Tier 2 content instead of being thrown away. New content is:
 - the twelve advanced classes and their passives;
