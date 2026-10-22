@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartySlot, startingClass, tierKey, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
 } from '@rpg/domain'
 import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
@@ -122,7 +122,7 @@ export async function renameAccount(trainerName: string): Promise<void> {
 }
 
 /** Spends one Uma Ticket (final, D44); she starts in her starting class's armor (D160 §7). Throws SaveRuleError when it can't. */
-export async function unlock(outfit: Pick<BattleOutfit, 'outfitId' | 'aptitudes'>): Promise<void> {
+export async function unlock(outfit: Pick<BattleOutfit, 'outfitId'> & StartingOutfit): Promise<void> {
   const { save } = useGame.getState()
   if (save) await commit(unlockUma(save, outfit.outfitId, nowIso(), activeKey(), startingClass(outfit)))
 }
@@ -186,7 +186,8 @@ export const cancelRiftSignUp = () => edit(import('@rpg/domain/rift'), (d, s, no
 export const beginRiftFight = (ref: RiftFightRef, party: number | null, outfits: ReadonlyMap<string, BattleOutfit>, roster: EnemyRoster) =>
   edit(import('@rpg/domain/rift'), (d, s, now, t) => d.startRiftFight(s, ref, party, outfits, roster, now, t))
 /** Begins a Convergence attempt with four world parties: Iron's, Arcane's, Duel's and Horde's. */
-export const startConvergence = (parties: readonly number[]) => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.beginConvergence(s, parties, now, t))
+export const startConvergence = (parties: readonly number[], outfits: ReadonlyMap<string, BattleOutfit>) =>
+  edit(import('@rpg/domain/rift'), (d, s, now, t) => d.beginConvergence(s, parties, now, t, outfits))
 /** Ends the open attempt between fights. */
 export const endConvergence = () => edit(import('@rpg/domain/rift'), (d, s, now, t) => d.abandonConvergence(s, now, t))
 /** Leaves the open Rift fight (a Convergence fight's attempt ends with it). */

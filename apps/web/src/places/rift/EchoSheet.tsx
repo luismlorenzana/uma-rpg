@@ -28,7 +28,7 @@ export function EchoSheet({ campaign, place, front, level, onClose }: {
   const won = !!world.rift.echoes[front]?.[level]
   const open = world.rift.battle !== null
   const tickets = world.wallet.sweepTickets
-  const block = riftFightBlock(save, ref, party, key)
+  const block = riftFightBlock(save, ref, party, key, campaign.outfits)
   const sweepBlock = party === null ? 'Pick a party' : sweepEchoBlock(save, front, level, party, key)
   const fight = async () => {
     setError(null)

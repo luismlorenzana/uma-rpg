@@ -218,8 +218,9 @@ export function startingArmorKinds(classId?: RpgClass): UmaGear['kinds'] {
   if (!classId || RPG_CLASS_ARMOR[classId] !== 'magical') return {}
   return Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, 'magical')]))
 }
-/** A just-unlocked Uma; `startClass` (her starting class) sets her armor kinds, and without it she starts all-physical. */
-export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
+/** A just-unlocked Uma; `startClass` (her starting class) sets her armor kinds, and without it she starts all-physical.
+ * Her class stays null (her style's), except a Paladin start (classes v2, D180), the one start her style can't name. */
+export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: startClass === 'paladin' ? 'paladin' : null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {} })
 
 /** The world's state (D66). */

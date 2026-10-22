@@ -172,6 +172,9 @@ The split itself makes one a shielder and the other a healer.
 - **What stays the same:** revives (25%), the cleanse (one status), and her damage hand (×0.5).
 - The simulation checks the doubled numbers against foe damage (§9): one healer must keep an on-curve party through a
   front's boss without an Uma falling more than once.
+- Built in H58 (D180), live from H61: `healerBlock` ("One healer a party") where a party fights: the world map's fight,
+  a Rift front or Echo fight, a Convergence fight and the Convergence's begin. Party edits, class switches and Sweeps
+  are never refused.
 
 **Scaling.** Heal, from Guts, retires from combat. Every mend, Barrier and revive is
 `target's max HP × depth share × (1 + offense ÷ 300)`, where offense is the **Paladin's ATK** or the **Cleric's M.ATK**
@@ -182,7 +185,9 @@ multiplier. The simulation sets the divisor.
 `HP = 100 + 5 × Stamina + 2 × Power + 1 × Guts`. Outfits with high Guts get a little sturdier, and no stat is dead.
 
 **Starting class.** A new Uma who would start as a Cleric today (her best style, Late surgers) starts as a **Paladin if
-her Power beats her Wit**, else as a Cleric.
+her Power beats her Wit**, else as a Cleric. Built in H58 (D180), live from H61: `startingClass` compares her base Power
+and Wit (a tie stays Cleric), and the save writes a Paladin start as her class. An Uma who never picked a class keeps her
+style's (`styleClass`), so nobody changes class at the switch.
 
 ## 4. What the healers take over from the Summoner
 
@@ -329,7 +334,11 @@ dark until H61.
   - a Cleric's weapon slots move from "any five" to 3 Tomes + 2 Arms, keeping the ones she had where they fit and
     filling the rest from the defaults; the Paladin's are set the other way round;
   - Summoner loadouts are unchanged, since the same skills now only strike;
-  - the Chapel's seats 3–4 become the Bastion's seats 1–2, with their Heroes, Learners and Bonds.
+  - the Chapel's seats 3–4 become the Bastion's seats 1–2, with their Heroes, Learners and Bonds;
+  - the two accessories land in their typed slots: an Orb in the Damage slot, a Talisman or an Amulet in the Support
+    slot, and a second piece of one group stays in her locker.
+  - Built in H58 (D180) as `toV25` in `save/migrations.ts`, written and tested but not chained; live from H61, which
+    chains it with `SAVE_SCHEMA_VERSION` 25 in the switch's commit.
 - **Docs:** the manual's classes, combat, heroes and skill trees pages, and the live blocks.
 
 ## 9. Balance targets (the simulation, `SIM=1`)

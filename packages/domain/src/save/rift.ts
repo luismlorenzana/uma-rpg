@@ -15,7 +15,7 @@ import { rpgBattleExp } from '../rpg/campaign/rewards'
 import { RPG_MAX_BATTLE_ACTIONS, rpgCarriedMp, rpgMemberLevel, rpgPartyAllies, RPG_REFUSED } from '../rpg/campaign/run'
 import { RPG_TIER_MAX_LEVEL } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
-import { activeClass, classOf, fillRanks, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain } from './battle'
+import { activeClass, classOf, fillRanks, healerBlock, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain } from './battle'
 import { MAX_PURCHASE, mergeGains } from './exchange'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, TIERS, tierKey, worldOf } from './rules'
@@ -168,17 +168,21 @@ export function riftContextFor(save: Save, ref: RiftFightRef, roster: EnemyRoste
 /**
  * Why this fight can't start, or null. One Rift fight a world at a time, beside the world map's. A front takes its next
  * stage only, by a full world party (`party` 0–19) of the run's roster; a Convergence fight is the open attempt's next,
- * by its frozen party (`party` is ignored); an Echo needs the Rift open and a full party of Lv 50 Umas.
+ * by its frozen party (`party` is ignored); an Echo needs the Rift open and a full party of Lv 50 Umas. Given `outfits`,
+ * the party also fields one healer at most (classes v2, `healerBlock`).
  */
-export function riftFightBlock(save: Save, ref: RiftFightRef, party: number | null, tier = TIER_ONE): string | null {
+export function riftFightBlock(save: Save, ref: RiftFightRef, party: number | null, tier = TIER_ONE, outfits?: ReadonlyMap<string, BattleOutfit>):
+  string | null {
   const world = save.tierWorlds[tier]
   if (!world) return 'No such tier'
   const clean = cleanRef(ref)
   if (!clean) return 'No such fight'
   if (world.rift.battle) return 'Finish the open Rift fight first'
+  const healers = (ids: readonly string[]) => (outfits ? healerBlock(world, ids, outfits) : null)
+  const worldParty = (each: (id: string) => string | null) => partyBlock(world, party, each) ?? healers(world.parties[party!]!.slots as string[])
   if (clean.kind === 'echo') {
     if (!riftOpen(world, Number(tier))) return openWords(Number(tier))
-    return partyBlock(world, party, (id) => (atTop(world, id) ? null : 'Needs five Lv 50 Umas'))
+    return worldParty((id) => (atTop(world, id) ? null : 'Needs five Lv 50 Umas'))
   }
   const run = fightingRun(world)
   if (!run) return 'Sign up a run first'
@@ -186,13 +190,13 @@ export function riftFightBlock(save: Save, ref: RiftFightRef, party: number | nu
     const cleared = run.fronts[clean.front]
     if (cleared >= RIFT_STAGES) return `${RIFT_FRONT_SPECS[clean.front].name} is sealed`
     if (clean.stage !== cleared + 1) return `Stage ${cleared + 1} is next`
-    return partyBlock(world, party, (id) => (run.roster.includes(id) ? null : 'Only the run’s twenty fight here'))
+    return worldParty((id) => (run.roster.includes(id) ? null : 'Only the run’s twenty fight here'))
   }
   const attempt = run.convergence.open
   if (!attempt) return 'Begin an attempt first'
   if (clean.fight !== attempt.rounds.length) return `Fight ${attempt.rounds.length + 1} is next`
   if (attempt.parties[clean.fight]!.some((id) => !world.umas[id])) return 'Only this tier’s Umas'
-  return null
+  return healers(attempt.parties[clean.fight]!)
 }
 
 /**
@@ -202,7 +206,7 @@ export function riftFightBlock(save: Save, ref: RiftFightRef, party: number | nu
  */
 export function startRiftFight(save: Save, ref: RiftFightRef, party: number | null, outfits: ReadonlyMap<string, BattleOutfit>, roster: EnemyRoster,
   now: string, tier = TIER_ONE): Save {
-  const block = riftFightBlock(save, ref, party, tier)
+  const block = riftFightBlock(save, ref, party, tier, outfits)
   if (block) throw new SaveRuleError('cannot-fight', block)
   const world = worldOf(save, tier)
   const clean = cleanRef(ref)!
@@ -339,8 +343,10 @@ function settleRiftFight(save: Save, battle: RiftBattle, state: BattleState, ros
 // --- The Convergence (§6) --------------------------------------------------------------------------------------------
 
 /** Why these four world parties (Iron's, Arcane's, Duel's and Horde's, in that order) can't begin an attempt, or null:
- * every front sealed, no attempt open, four different full parties whose twenty are exactly the run's roster. */
-export function convergenceBlock(save: Save, parties: readonly number[], tier = TIER_ONE): string | null {
+ * every front sealed, no attempt open, four different full parties whose twenty are exactly the run's roster, and, given
+ * `outfits`, one healer at most in each (classes v2, `healerBlock`), so an attempt never begins with a party that can't
+ * fight. */
+export function convergenceBlock(save: Save, parties: readonly number[], tier = TIER_ONE, outfits?: ReadonlyMap<string, BattleOutfit>): string | null {
   const world = save.tierWorlds[tier]
   if (!world) return 'No such tier'
   const run = fightingRun(world)
@@ -355,12 +361,14 @@ export function convergenceBlock(save: Save, parties: readonly number[], tier = 
   }
   const members = parties.flatMap((p) => world.parties[p]!.slots as string[])
   if (members.some((id) => !run.roster.includes(id)) || run.roster.some((id) => !members.includes(id))) return 'The four parties must be the run’s twenty'
-  return null
+  const healers = outfits ? parties.map((p) => healerBlock(world, world.parties[p]!.slots as string[], outfits)) : []
+  return healers.find((block) => block !== null) ?? null
 }
 
-/** Begins a Convergence attempt: the four parties' members are frozen for its four fights, and the attempt counts. */
-export function beginConvergence(save: Save, parties: readonly number[], now: string, tier = TIER_ONE): Save {
-  const block = convergenceBlock(save, parties, tier)
+/** Begins a Convergence attempt: the four parties' members are frozen for its four fights, and the attempt counts. The
+ * game passes `outfits`, so each party's healers are checked (`convergenceBlock`). */
+export function beginConvergence(save: Save, parties: readonly number[], now: string, tier = TIER_ONE, outfits?: ReadonlyMap<string, BattleOutfit>): Save {
+  const block = convergenceBlock(save, parties, tier, outfits)
   if (block) throw new SaveRuleError('bad-party', block)
   const world = worldOf(save, tier)
   const run = fightingRun(world)!

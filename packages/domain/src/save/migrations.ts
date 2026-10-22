@@ -214,6 +214,112 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   return version < 24 && isRecord(v23) ? toV24(v23) : v23
 }
 
+// --- v24 → v25 (D180): classes v2's Paladin. Written in H58, dark; H61 chains it with SAVE_SCHEMA_VERSION 25 -----------
+
+/** Classes v2's Arms and its two healers' default spreads (D179), as literals: a migration step is frozen history. */
+const V25_ARMS = ['greatsword', 'axe', 'lance', 'bow', 'katana']
+const V25_CLERIC = { tome: ['tome-light', 'tome-dark', 'tome-lightning'], arms: ['katana', 'bow'] }
+const V25_PALADIN = { arms: ['greatsword', 'axe', 'lance'], tome: ['tome-ice', 'tome-fire'] }
+/** The Cleric Chapel's seats 3 and 4 (Archangel's Verdict, Archdemon's Pact) become the Paladin Bastion's 1 and 2. */
+const V25_SEATS = [['cleric-3', 'paladin-1'], ['cleric-4', 'paladin-2']] as const
+const V25_PALADIN_NODE = /^paladin-([a-z-]+)\.[1-5][ab]?$/
+
+/** `want` of her weapons of one kind, in her order, then the spread's of that kind in its order, skipping ones she has. */
+function v25Pick(hers: readonly string[], want: number, spread: readonly string[]): string[] {
+  const out = hers.slice(0, want)
+  for (const w of spread) if (out.length < want && !out.includes(w)) out.push(w)
+  return out
+}
+/** A Cleric's "any five" as classes v2's slots: the Cleric's Tome ×3 + Arms ×2, or the Paladin's Arms ×3 + Tome ×2. */
+function v25Weapons(weapons: readonly string[], lead: 'tome' | 'arms'): string[] {
+  const tomes = weapons.filter((w) => TOMES.includes(w)), arms = weapons.filter((w) => V25_ARMS.includes(w))
+  return lead === 'tome'
+    ? [...v25Pick(tomes, 3, V25_CLERIC.tome), ...v25Pick(arms, 2, V25_CLERIC.arms)]
+    : [...v25Pick(arms, 3, V25_PALADIN.arms), ...v25Pick(tomes, 2, V25_PALADIN.tome)]
+}
+const toPaladin = (id: unknown): unknown => (typeof id === 'string' && id.startsWith('cleric-') ? `paladin-${id.slice('cleric-'.length)}` : id)
+const paladinWeaponOf = (id: unknown): string => (typeof id === 'string' ? V25_PALADIN_NODE.exec(id)?.[1] ?? '' : '')
+/** A seat's or Bond's key moves from the Chapel to the Bastion when the Bastion's is free. */
+function v25Seats(byId: Record<string, unknown>): Record<string, unknown> {
+  const out = { ...byId }
+  for (const [from, to] of V25_SEATS) if (from in out && !(to in out)) { out[to] = out[from]; delete out[from] }
+  return out
+}
+const isOrbId = (id: unknown): boolean => typeof id === 'string' && id.startsWith('orb-')
+const isSupportId = (id: unknown): boolean => typeof id === 'string' && (id.startsWith('talisman-') || id.startsWith('amulet-'))
+/** Accessory 1 becomes the Damage slot (an Orb) and accessory 2 the Support slot (a Talisman or an Amulet): each takes
+ * its own slot's piece first, else the other slot's. A second piece of one group stays in her locker, unworn. */
+function v25Accessories(equipped: Record<string, unknown>): Record<string, unknown> {
+  const a1 = equipped['accessory-1'], a2 = equipped['accessory-2']
+  if ([a1, a2].some((id) => id !== undefined && !isOrbId(id) && !isSupportId(id))) return equipped
+  const damage = isOrbId(a1) ? a1 : isOrbId(a2) ? a2 : undefined
+  const support = isSupportId(a2) ? a2 : isSupportId(a1) ? a1 : undefined
+  const out = { ...equipped }
+  delete out['accessory-1']
+  delete out['accessory-2']
+  return { ...out, ...(damage === undefined ? {} : { 'accessory-1': damage }), ...(support === undefined ? {} : { 'accessory-2': support }) }
+}
+
+/** One Uma's steps 1–5 of `toV25`. */
+function v25Uma(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw
+  const uma: Record<string, unknown> = { ...raw }
+  const ranks = isRecord(uma.ranks) ? uma.ranks : undefined
+  const tracks = ranks && isRecord(ranks.classes) ? ranks.classes : undefined
+  const classes = isRecord(uma.classes) ? uma.classes : undefined
+  const cleric = classes && isRecord(classes.cleric) ? classes.cleric : undefined
+  // 1. The Paladin from the Cleric, once: her Class Rank, and her trees, weapons and loadout as below.
+  const paladinFresh = tracks?.paladin === undefined && classes?.paladin === undefined
+  if (paladinFresh && tracks?.cleric !== undefined) uma.ranks = { ...ranks, classes: { ...tracks, paladin: isRecord(tracks.cleric) ? { ...tracks.cleric } : tracks.cleric } }
+  const weapons = Array.isArray(cleric?.weapons) && cleric.weapons.every((w) => TOMES.includes(w as string) || V25_ARMS.includes(w as string))
+    ? (cleric.weapons as string[]) : undefined
+  if (classes && cleric && weapons) {
+    // 2. The Cleric's slots; 3. the Paladin's, from the Cleric's weapons before 2.
+    const next: Record<string, unknown> = { ...classes, cleric: { ...cleric, weapons: v25Weapons(weapons, 'tome') } }
+    if (paladinFresh) {
+      const held = v25Weapons(weapons, 'arms')
+      const kept = Array.isArray(cleric.loadout) ? cleric.loadout.map(toPaladin).filter((id) => held.includes(paladinWeaponOf(id))) : null
+      next.paladin = {
+        weapons: held, tree: Array.isArray(cleric.tree) ? cleric.tree.map(toPaladin) : cleric.tree,
+        loadout: kept && [...kept.filter((id) => V25_ARMS.includes(paladinWeaponOf(id))), ...kept.filter((id) => TOMES.includes(paladinWeaponOf(id)))],
+      }
+    }
+    uma.classes = next
+  }
+  // 4. Her Bonds with the moving seats; 5. her accessories in their typed slots.
+  if (isRecord(uma.bonds)) uma.bonds = v25Seats(uma.bonds)
+  if (isRecord(uma.gear) && isRecord(uma.gear.equipped)) uma.gear = { ...uma.gear, equipped: v25Accessories(uma.gear.equipped) }
+  return uma
+}
+
+/**
+ * v24 → v25 (D180, classes-v2.md §5, §6.1, §8): the Paladin joins and nobody loses progress. Exported and tested, but
+ * **not chained** until H61 sets `SAVE_SCHEMA_VERSION` to 25 and adds it to `migrateWorld` in the same commit as the
+ * switch: chained now, it would migrate every live save. Per Uma:
+ * 1. with Cleric progress and no Paladin entry yet, her Cleric Class Rank is copied to the Paladin, and her Cleric setup
+ *    becomes the Paladin's: the tree renamed `cleric-` → `paladin-` (same depths, sides and costs: Rebirth becomes Heavy
+ *    Devotion, Heavy Transfix Valkyrie's Oath), the weapons of 3, and her loadout renamed (null stays null) keeping her
+ *    Paladin weapons' skills, Arms first, then Tomes, each in her order;
+ * 2. the Cleric's "any five" become Tome ×3 + Arms ×2: her Tomes (first three), then her Arms (first two), in her order,
+ *    gaps filled from v2's Cleric spread (Light, Dark, Thunder; Katana, Bow), skipping ones she has;
+ * 3. the Paladin's, the other way round from her old Cleric weapons: Arms ×3, then Tome ×2, from v2's Paladin spread
+ *    (Greatsword, Axe, Lance; Blizzard, Fire);
+ * 4. her Bonds with `cleric-3` and `cleric-4` move to `paladin-1` and `paladin-2` when those are empty;
+ * 5. accessory 1 holds an Orb (hers in 1, else in 2) and accessory 2 a Talisman or Amulet (hers in 2, else in 1); a
+ *    second piece of one group stays bound in her locker, unworn.
+ * Per world, seats `cleric-3` and `cleric-4` move with their Hero and Learners to `paladin-1` and `paladin-2` when those
+ * are empty. Nothing else moves: active classes, parties, the open world-map and Rift fights (v14 inputs replay on v14),
+ * Rift runs and attempts, wallets and other ranks. Literals only, like every step; idempotent, so a v25 save relabelled
+ * older still parses; anything malformed is left for the strict parse.
+ */
+export function toV25(world: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...world,
+    ...(isRecord(world.umas) ? { umas: Object.fromEntries(Object.entries(world.umas).map(([id, uma]) => [id, v25Uma(uma)])) } : {}),
+    ...(isRecord(world.heroes) ? { heroes: v25Seats(world.heroes) } : {}),
+  }
+}
+
 // --- v23 → v24 (D171) ------------------------------------------------------------------------------------------------
 
 /**

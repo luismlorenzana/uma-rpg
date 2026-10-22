@@ -51,7 +51,7 @@ export function ConvergenceView({ campaign, place }: { campaign: Campaign; place
   const begin = async () => {
     setError(null)
     try {
-      await startConvergence(parties as number[])
+      await startConvergence(parties as number[], campaign.outfits)
     } catch (err) {
       setError(err instanceof SaveRuleError ? err.message : 'The attempt couldn’t begin.')
       return
@@ -59,7 +59,7 @@ export function ConvergenceView({ campaign, place }: { campaign: Campaign; place
     await fight(0)
   }
   const chosen = parties.every((p) => p !== null)
-  const block = !sealed ? 'Seal all four fronts first' : chosen ? convergenceBlock(save, parties as number[], key) : 'Pick four parties'
+  const block = !sealed ? 'Seal all four fronts first' : chosen ? convergenceBlock(save, parties as number[], key, campaign.outfits) : 'Pick four parties'
   const missing = sealed && chosen ? convergenceMissing(world, run, parties) : []
   /** A party picked in another slot can't take this one too. */
   const slotBlock = (slot: number) => (i: number) => {

@@ -1,11 +1,13 @@
 // What an Uma's original aptitudes do in uma-rpg (design §4.1): running style → class training speed, distance → gear
 // mastery speed. A takes half the time of G. Surface no longer sets job speed (D139).
 import { APTITUDE_GRADES, type Aptitudes, type AptitudeGrade } from '@luismlorenzana/uma-data'
+import { rpgV2 } from '../rpg/battle/caps'
 
+/** The live generation's: from classes v2 a Late surger starts as a Paladin or a Cleric (§3.3, D180). */
 export const STYLE_CLASSES: Record<keyof Aptitudes['strategy'], string[]> = {
   front: ['Brawler'],
   pace: ['Mage', 'Spell Blade'],
-  late: ['Cleric'],
+  late: rpgV2() ? ['Paladin', 'Cleric'] : ['Cleric'],
   end: ['Summoner'],
 }
 

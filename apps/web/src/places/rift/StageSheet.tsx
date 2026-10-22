@@ -49,7 +49,7 @@ export function StageSheet({ campaign, place, front, plan, status, onClose }: {
   const [error, setError] = useState<string | null>(null)
   if (!save || !world || !run) return null
   const open = world.rift.battle !== null
-  const block = status === 'next' ? riftFightBlock(save, plan.ref, party, key) : null
+  const block = status === 'next' ? riftFightBlock(save, plan.ref, party, key, campaign.outfits) : null
   const fight = async () => {
     setError(null)
     try {
