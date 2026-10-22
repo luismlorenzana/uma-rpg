@@ -174,6 +174,8 @@ The Extra Stats outer ring is designed in [Extra Stats in Tier 2](extra-stats-ti
 
 The second vertical is designed in [the second profession](second-profession.md) (H42, calls V1–V8).
 
+Weapon arts and set bonuses are designed in [weapon arts and armor sets](weapon-arts.md) (H40, calls E1–E9).
+
 **What it costs.** Tier 1's simplification reuses today's content: the cores already exist. The side forks become
 Tier 2 content instead of being thrown away. New content is:
 - the twelve advanced classes and their passives;
