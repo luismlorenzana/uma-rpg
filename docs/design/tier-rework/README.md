@@ -148,6 +148,24 @@ One word, one meaning, in every doc and preview.
 | **Planet · moons · Halo · Valor · Swiftness** | Extra Stats bodies: every core stat · Strength, Sorcery, Vigor, Guard · one damage kind · Limit start · evasion | — |
 | **Orb · Support** | The Damage slot (Tier 2+) · the Talisman or Amulet slot | — |
 
+### 2.5 The stat budget (SB1, working rule, 2026-10-23)
+
+The owner's worry: stat growth across tiers mustn't drift out of balance. [stats-by-tier](previews/stats-by-tier.html)
+shows the drafts' problem: gear and Extra Stats give the **same values in every tier** while her level keeps growing, so
+the build's share of a stat falls (a Summoner's offense 57% → 43%, HP 28% → 14%, MP 20% → 9% from Tier 1 to Tier 3).
+
+**The rule every standalone doc writes to:** the build keeps **the same share of every stat at each tier's Lv 50**.
+Every flat build value (weapon Might, armor, the Orb, the Halo, Extra Stats nodes, template nodes) is written as its
+**Tier 1 value × the tier's multiplier**, the growth of an average Uma's base stats: **Tier 1 ×1, Tier 2 ×1.8, Tier 3
+×2.6** (base core stat 104.5 → 187 → 269.5 at lifetime Lv 50, 100, 150). The foes' build budget (H45's
+`rpgFoeTierBudget`, which today scales the build *down* at higher lifetime levels because it assumes flat values) moves
+to the same multiplier.
+- **Why:** balance is then one curve, set once in Tier 1 and carried by one number per tier; a source's share is the
+  same at every tier, so nothing drifts.
+- **The alternative,** flat values (the drafts): the build matters less each tier and every tier needs its own tuning.
+- **Docs write values as "T1 value × tier"** so either choice is a one-line change. The overall stat balancing pass
+  (§5, after the standalone docs) sets the final numbers by simulation.
+
 ## 3. Who owns what
 
 | Doc | Owns | Main interfaces |
@@ -168,7 +186,10 @@ the owning doc wins unless that breaks an owner point (§7).
 
 - In [`previews/`](previews/), one self-contained HTML file per view, no external scripts, fonts or images; each copies
   the style block from [`previews/_template.html`](previews/_template.html) (the game's own colours, light and dark).
-- Phone width first (390 px); wide tables scroll inside their own box, never the page.
+- **Full desktop pages** (the owner, 2026-10-22): roadmaps, charts, diagrams and drawn trees over walls of tables, with a
+  "Show the numbers" table under each chart and hover detail. The style reference is
+  [progression.html](previews/progression.html) (copy its style block); [stats-by-tier](previews/stats-by-tier.html)
+  is the second example. The first round's phone-width previews are superseded by the standalone docs' pages.
 - **Nothing from the original games:** no real Uma names, skill names or art. Invented names ("Uma A", "a front
   runner, long distance") and our own words.
 
@@ -187,9 +208,19 @@ the owning doc wins unless that breaks an owner point (§7).
 1. **Fan-out:** the six docs and their previews, written in parallel from §2's drafts. *Done.*
 2. **Cross-reference:** one pass reconciled every doc's "Assumes" against the others' "Provides", fixed the shared
    numbers in §2, and built the two views that need every category. *Done: §7–§9.*
-3. **Review, one category at a time** with the owner, in this order: the frame → Classes → Gear → Skill trees → Extra
-   Stats → Professions → Variance (§10). Each review ends with its decisions logged as D-rows.
-4. **Implementation packets** per decided category, landing behind engine v16's switch, with the refund (§9).
+3. **Standalone docs, detailed, one at a time** (the owner, 2026-10-23), each authored, then reviewed by the owner, its
+   decisions logged as D-rows. They absorb the first-round docs, which stay as history:
+   1. [class-progression.md](class-progression.md): the six classes, class templates per tier, equippable weapons,
+      the class trees (skill trees) per tier, Class Rank, specializations and masteries, foe weaknesses, the calling
+      pick. Absorbs classes.md and skill-trees.md.
+   2. **weapon-progression.md:** weapons per tier, weapon trees (forms), armor and accessories, material requirements.
+      Absorbs gear.md.
+   3. **extra-stats-progression.md:** the planet, moons and later bodies drawn, everything each grants per tier, jewels.
+      Absorbs extra-stats.md.
+   4. **profession-progression.md:** the professions, places, material types, recipes and amounts. Absorbs
+      professions.md.
+4. **Then:** the overall stat balancing (by simulation, on §2.5's rule); Uma Templates folded into the standalone docs
+   (variance.md); then implementation packets behind engine v16's switch, with the refund (§9).
 
 ## 6. Status
 
