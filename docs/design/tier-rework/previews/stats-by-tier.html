@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Max Stats by Tier</title>
+<!-- The Tier rework: an Uma's maximum stats at each tier's Lv 50 and where every point comes from. Computed from the
+     game's own formulas (rpg/rules.ts projectRpgStats, the v2 class leans, economy/gear.ts armor and Might) and the
+     rework's numbers (gear.md, extra-stats.md, variance.md). Generated; the numbers live in the DATA block below. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+
+<style>
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 6px; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .toggle { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 999px; overflow: hidden; margin-left: auto; }
+  .toggle button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border: 0; background: var(--panel); color: var(--ink-soft); cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--ink); }
+  .sheet { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .stat { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .stat .k { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .stat .v { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 2px; margin-top: 6px; font-size: 13px; align-items: baseline; }
+  .stat .v span:nth-child(odd) { color: var(--ink-faint); font-size: 11px; font-weight: 600; }
+  .stat .v b { font-size: 16px; }
+  .stat .x { font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+  .head-row { display: flex; align-items: center; gap: 12px; }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  @media (max-width: 1100px) { .sheet { grid-template-columns: repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Max stats by tier, and where every point comes from</h1>
+  <p class="lead">An Uma's full sheet at each tier's Lv 50, fully built: every gear slot at G10, every Extra Stats node open,
+    her template matched to her class. Each stat is split by source, in points and as a share. Pick a class.</p>
+  <div class="pills" id="classes"></div>
+  <div class="note"><b>Assumed Uma:</b> the balance simulation's average outfit (base 110 in every race stat, +10% growth in
+    Speed, Stamina and Power), at lifetime Lv 50, 100 and 150. <b>Formulas:</b> HP = 100 + 5 Stamina + 2 Power + Guts;
+    MP = 20 + 1.5 Wit; ATK and M.ATK from Speed; DEF from Power; M.DEF from Power and Wit; each × her class's lean.
+    <b>Build:</b> armor G10 (+20 DEF, +100 HP, +20 MP, +20 M.DEF, +25 to her half's offense, 12% evasion); the planet
+    (+21 to all six; HP points ×5); her class's moons (+30, Vigor +150 HP; a Brawler or Mage skips the other offense moon);
+    her template's lead node (+8 to her channel). <b>Offense on her lead kind</b> adds the weapon's Might (+68 at G10), and
+    from Tier 2 the Orb (+34) and the Halo (+34) on that same kind.</div>
+
+  <section id="sheet-sec">
+    <h2>The sheet at Lv 50</h2>
+    <p class="sub" id="sheet-sub"></p>
+    <div class="sheet" id="sheet"></div>
+  </section>
+
+  <section id="sources">
+    <div class="head-row"><h2>Where each stat comes from</h2>
+      <div class="toggle" role="group" aria-label="Show points or shares"><button id="v-pts" aria-pressed="true">Points</button><button id="v-pct" aria-pressed="false">Share</button></div></div>
+    <p class="sub">Three bars per stat: Tier 1, Tier 2, Tier 3. Hover any segment for its parts.</p>
+    <div class="panel">
+      <div class="chart-legend" id="src-legend"></div>
+      <div id="src-chart"></div>
+      <details><summary>Show the numbers</summary><div id="src-table"></div></details>
+    </div>
+  </section>
+
+  <section id="share">
+    <h2>How much of her comes from the build</h2>
+    <p class="sub">The share of each stat that gear, Extra Stats and her template give, per tier. Her level grows with every
+      tier while the build repeats the same values, so its share falls.</p>
+    <div class="multiples" id="share-multiples" style="grid-template-columns: repeat(7, 1fr)"></div>
+    <div class="callout" id="callout"></div>
+  </section>
+
+  <section id="all">
+    <h2>Every class, every tier</h2>
+    <p class="sub">The totals at Lv 50. Offense is on her lead kind (ATK or M.ATK plus Might, Orb and Halo).</p>
+    <div class="panel" style="overflow-x:auto"><table id="all-table"></table></div>
+    <p class="foot">Not on the sheet: Limit start +4 from Tier 2's Valor moon; evasion 12% from feet armor, 18% in Tier 3 with
+      Swiftness; her knack node (+4 to one stat, or +20 HP), which varies by template.</p>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const DATA = {"brawler":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":140,"armor":100,"planet":105,"moons":150,"template":0},"total":1427},"mp":{"parts":{"level":166,"lean":-34,"armor":20,"planet":21,"moons":0,"template":0},"total":173},"atk":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8},"total":200},"matk":{"parts":{"level":105,"lean":-10,"armor":0,"planet":21,"moons":0,"template":0},"total":116},"pdef":{"parts":{"level":105,"lean":11,"armor":20,"planet":21,"moons":30,"template":0},"total":187},"mdef":{"parts":{"level":101,"lean":-10,"armor":20,"planet":21,"moons":30,"template":0},"total":162},"offense":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":268}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":237,"armor":100,"planet":105,"moons":150,"template":0},"total":2173},"mp":{"parts":{"level":278,"lean":-56,"armor":20,"planet":21,"moons":0,"template":0},"total":263},"atk":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8},"total":290},"matk":{"parts":{"level":187,"lean":-19,"armor":0,"planet":21,"moons":0,"template":0},"total":189},"pdef":{"parts":{"level":187,"lean":19,"armor":20,"planet":21,"moons":30,"template":0},"total":277},"mdef":{"parts":{"level":180,"lean":-18,"armor":20,"planet":21,"moons":30,"template":0},"total":233},"offense":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":426}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":336,"armor":100,"planet":105,"moons":150,"template":0},"total":2928},"mp":{"parts":{"level":391,"lean":-79,"armor":20,"planet":21,"moons":0,"template":0},"total":353},"atk":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8},"total":381},"matk":{"parts":{"level":270,"lean":-27,"armor":0,"planet":21,"moons":0,"template":0},"total":264},"pdef":{"parts":{"level":270,"lean":27,"armor":20,"planet":21,"moons":30,"template":0},"total":368},"mdef":{"parts":{"level":259,"lean":-26,"armor":20,"planet":21,"moons":30,"template":0},"total":304},"offense":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":517}}}},"mage":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":-93,"armor":100,"planet":105,"moons":150,"template":0},"total":1194},"mp":{"parts":{"level":166,"lean":49,"armor":20,"planet":21,"moons":0,"template":0},"total":256},"atk":{"parts":{"level":105,"lean":-10,"armor":0,"planet":21,"moons":0,"template":0},"total":116},"matk":{"parts":{"level":105,"lean":16,"armor":25,"planet":21,"moons":30,"template":8},"total":205},"pdef":{"parts":{"level":105,"lean":-10,"armor":20,"planet":21,"moons":30,"template":0},"total":166},"mdef":{"parts":{"level":101,"lean":10,"armor":20,"planet":21,"moons":30,"template":0},"total":182},"offense":{"parts":{"level":105,"lean":16,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":273}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":-158,"armor":100,"planet":105,"moons":150,"template":0},"total":1778},"mp":{"parts":{"level":278,"lean":83,"armor":20,"planet":21,"moons":0,"template":0},"total":402},"atk":{"parts":{"level":187,"lean":-19,"armor":0,"planet":21,"moons":0,"template":0},"total":189},"matk":{"parts":{"level":187,"lean":28,"armor":25,"planet":21,"moons":30,"template":8},"total":299},"pdef":{"parts":{"level":187,"lean":-19,"armor":20,"planet":21,"moons":30,"template":0},"total":239},"mdef":{"parts":{"level":180,"lean":17,"armor":20,"planet":21,"moons":30,"template":0},"total":268},"offense":{"parts":{"level":187,"lean":28,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":435}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":-224,"armor":100,"planet":105,"moons":150,"template":0},"total":2368},"mp":{"parts":{"level":391,"lean":117,"armor":20,"planet":21,"moons":0,"template":0},"total":549},"atk":{"parts":{"level":270,"lean":-27,"armor":0,"planet":21,"moons":0,"template":0},"total":264},"matk":{"parts":{"level":270,"lean":41,"armor":25,"planet":21,"moons":30,"template":8},"total":395},"pdef":{"parts":{"level":270,"lean":-27,"armor":20,"planet":21,"moons":30,"template":0},"total":314},"mdef":{"parts":{"level":259,"lean":25,"armor":20,"planet":21,"moons":30,"template":0},"total":355},"offense":{"parts":{"level":270,"lean":41,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":531}}}},"spellblade":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1287},"mp":{"parts":{"level":166,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":207},"atk":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8},"total":200},"matk":{"parts":{"level":105,"lean":-5,"armor":0,"planet":21,"moons":30,"template":0},"total":151},"pdef":{"parts":{"level":105,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":176},"mdef":{"parts":{"level":101,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":172},"offense":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":268}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1936},"mp":{"parts":{"level":278,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":319},"atk":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8},"total":290},"matk":{"parts":{"level":187,"lean":-9,"armor":0,"planet":21,"moons":30,"template":0},"total":229},"pdef":{"parts":{"level":187,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":258},"mdef":{"parts":{"level":180,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":251},"offense":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":426}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":2592},"mp":{"parts":{"level":391,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":432},"atk":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8},"total":381},"matk":{"parts":{"level":270,"lean":-13,"armor":0,"planet":21,"moons":30,"template":0},"total":308},"pdef":{"parts":{"level":270,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":341},"mdef":{"parts":{"level":259,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":330},"offense":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":517}}}},"summoner":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1287},"mp":{"parts":{"level":166,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":207},"atk":{"parts":{"level":105,"lean":-5,"armor":0,"planet":21,"moons":30,"template":0},"total":151},"matk":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8},"total":200},"pdef":{"parts":{"level":105,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":176},"mdef":{"parts":{"level":101,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":172},"offense":{"parts":{"level":105,"lean":11,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":268}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1936},"mp":{"parts":{"level":278,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":319},"atk":{"parts":{"level":187,"lean":-9,"armor":0,"planet":21,"moons":30,"template":0},"total":229},"matk":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8},"total":290},"pdef":{"parts":{"level":187,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":258},"mdef":{"parts":{"level":180,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":251},"offense":{"parts":{"level":187,"lean":19,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":426}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":2592},"mp":{"parts":{"level":391,"lean":0,"armor":20,"planet":21,"moons":0,"template":0},"total":432},"atk":{"parts":{"level":270,"lean":-13,"armor":0,"planet":21,"moons":30,"template":0},"total":308},"matk":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8},"total":381},"pdef":{"parts":{"level":270,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":341},"mdef":{"parts":{"level":259,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":330},"offense":{"parts":{"level":270,"lean":27,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":517}}}},"paladin":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1287},"mp":{"parts":{"level":166,"lean":49,"armor":20,"planet":21,"moons":0,"template":0},"total":256},"atk":{"parts":{"level":105,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":189},"matk":{"parts":{"level":105,"lean":-21,"armor":0,"planet":21,"moons":30,"template":0},"total":135},"pdef":{"parts":{"level":105,"lean":16,"armor":20,"planet":21,"moons":30,"template":0},"total":192},"mdef":{"parts":{"level":101,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":172},"offense":{"parts":{"level":105,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":257}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1936},"mp":{"parts":{"level":278,"lean":83,"armor":20,"planet":21,"moons":0,"template":0},"total":402},"atk":{"parts":{"level":187,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":271},"matk":{"parts":{"level":187,"lean":-37,"armor":0,"planet":21,"moons":30,"template":0},"total":201},"pdef":{"parts":{"level":187,"lean":28,"armor":20,"planet":21,"moons":30,"template":0},"total":286},"mdef":{"parts":{"level":180,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":251},"offense":{"parts":{"level":187,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":407}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":2592},"mp":{"parts":{"level":391,"lean":117,"armor":20,"planet":21,"moons":0,"template":0},"total":549},"atk":{"parts":{"level":270,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":354},"matk":{"parts":{"level":270,"lean":-54,"armor":0,"planet":21,"moons":30,"template":0},"total":267},"pdef":{"parts":{"level":270,"lean":41,"armor":20,"planet":21,"moons":30,"template":0},"total":382},"mdef":{"parts":{"level":259,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":330},"offense":{"parts":{"level":270,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":490}}}},"cleric":{"1":{"stats":{"hp":{"parts":{"level":932,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1287},"mp":{"parts":{"level":166,"lean":49,"armor":20,"planet":21,"moons":0,"template":0},"total":256},"atk":{"parts":{"level":105,"lean":-21,"armor":0,"planet":21,"moons":30,"template":0},"total":135},"matk":{"parts":{"level":105,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":189},"pdef":{"parts":{"level":105,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":176},"mdef":{"parts":{"level":101,"lean":15,"armor":20,"planet":21,"moons":30,"template":0},"total":187},"offense":{"parts":{"level":105,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":0,"halo":0},"total":257}}},"2":{"stats":{"hp":{"parts":{"level":1581,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":1936},"mp":{"parts":{"level":278,"lean":83,"armor":20,"planet":21,"moons":0,"template":0},"total":402},"atk":{"parts":{"level":187,"lean":-37,"armor":0,"planet":21,"moons":30,"template":0},"total":201},"matk":{"parts":{"level":187,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":271},"pdef":{"parts":{"level":187,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":258},"mdef":{"parts":{"level":180,"lean":26,"armor":20,"planet":21,"moons":30,"template":0},"total":277},"offense":{"parts":{"level":187,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":407}}},"3":{"stats":{"hp":{"parts":{"level":2237,"lean":0,"armor":100,"planet":105,"moons":150,"template":0},"total":2592},"mp":{"parts":{"level":391,"lean":117,"armor":20,"planet":21,"moons":0,"template":0},"total":549},"atk":{"parts":{"level":270,"lean":-54,"armor":0,"planet":21,"moons":30,"template":0},"total":267},"matk":{"parts":{"level":270,"lean":0,"armor":25,"planet":21,"moons":30,"template":8},"total":354},"pdef":{"parts":{"level":270,"lean":0,"armor":20,"planet":21,"moons":30,"template":0},"total":341},"mdef":{"parts":{"level":259,"lean":38,"armor":20,"planet":21,"moons":30,"template":0},"total":368},"offense":{"parts":{"level":270,"lean":0,"armor":25,"planet":21,"moons":30,"template":8,"might":68,"orb":34,"halo":34},"total":490}}}}};
+const CLASSES = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
+const STATS = [['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['matk', 'M.ATK'], ['pdef', 'DEF'], ['mdef', 'M.DEF'], ['offense', 'Offense, lead kind']];
+// Sources, in stacking order. Colour follows the entity (the progression page's categories); level is neutral.
+const SRC = [
+  ['level', 'Level', 'var(--neutral)', (p) => p.level + Math.min(0, p.lean), (p) => `Her level: ${p.level}${p.lean < 0 ? ` · class lean ${p.lean}` : ''}`],
+  ['lean', 'Class lean', 'var(--c1)', (p) => Math.max(0, p.lean), (p) => `Her class's lean: +${p.lean}`],
+  ['gear', 'Gear', 'var(--c2)', (p) => p.armor + (p.might || 0) + (p.orb || 0), (p) => [p.armor && `Armor +${p.armor}`, p.might && `Weapon Might +${p.might}`, p.orb && `Orb +${p.orb}`].filter(Boolean).join(' · ')],
+  ['stars', 'Extra Stats', 'var(--c4)', (p) => p.planet + p.moons + (p.halo || 0), (p) => [`Planet +${p.planet}`, p.moons && `Moons +${p.moons}`, p.halo && `Halo +${p.halo}`].filter(Boolean).join(' · ')],
+  ['tmpl', 'Her template', 'var(--c6)', (p) => p.template, (p) => `Her moon's lead node +${p.template}`],
+];
+let cls = 'brawler', view = 'pts';
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.min(x + 14, innerWidth - w - 10) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY)); el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+const fmt = (n) => n.toLocaleString('en-US');
+const name = (c) => CLASSES.find((x) => x[0] === c)[1];
+const buildOf = (p) => p.armor + (p.might || 0) + (p.orb || 0) + p.planet + p.moons + (p.halo || 0) + p.template + Math.max(0, p.lean) * 0;
+
+document.getElementById('classes').innerHTML = CLASSES.map(([id, n]) => `<button data-c="${id}" aria-pressed="${id === cls}">${n}</button>`).join('');
+document.querySelectorAll('#classes button').forEach((b) => b.addEventListener('click', () => { cls = b.dataset.c; render(); }));
+document.getElementById('v-pts').addEventListener('click', () => { view = 'pts'; render(); });
+document.getElementById('v-pct').addEventListener('click', () => { view = 'pct'; render(); });
+document.getElementById('src-legend').innerHTML = SRC.map(([, n, c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('') + '<span class="muted">A lean below 1 sits inside Level (see its tooltip)</span>';
+
+function render() {
+  document.querySelectorAll('#classes button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.c === cls));
+  document.getElementById('v-pts').setAttribute('aria-pressed', view === 'pts'); document.getElementById('v-pct').setAttribute('aria-pressed', view === 'pct');
+  const D = DATA[cls];
+  document.getElementById('sheet-sub').textContent = `${name(cls)}, fully built, at the end of each tier. The small line is how much the stat grows from Tier 1 to Tier 3.`;
+  document.getElementById('sheet').innerHTML = STATS.map(([k, label]) => {
+    const t = [1, 2, 3].map((n) => D[n].stats[k].total);
+    return `<div class="stat"><div class="k">${label}</div><div class="v"><span>T1</span><b>${fmt(t[0])}</b><span>T2</span><b>${fmt(t[1])}</b><span>T3</span><b>${fmt(t[2])}</b></div><div class="x">×${(t[2] / t[0]).toFixed(2)} from Tier 1</div></div>`;
+  }).join('');
+
+  // Stacked horizontal bars: per stat a group of three tier bars.
+  const W = 1240, labelW = 150, tierW = 40, valW = 70, rowH = 22, gap = 3, groupGap = 16, x0 = labelW + tierW;
+  const iw = W - x0 - valW, groups = STATS.length, H = groups * (3 * (rowH + gap) + groupGap) + 10;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${name(cls)}: each stat by source, per tier">`;
+  let y = 4;
+  const rows = [];
+  STATS.forEach(([k, label], gi) => {
+    const max = Math.max(...[1, 2, 3].map((n) => D[n].stats[k].total));
+    s += `<text class="val-text" x="0" y="${y + (3 * (rowH + gap)) / 2 + 4}" style="font-size:13px">${label}</text>`;
+    [1, 2, 3].forEach((n) => {
+      const st = D[n].stats[k], p = st.parts, total = st.total;
+      const scale = view === 'pct' ? iw / total : iw / max;
+      s += `<text class="axis-text" x="${labelW}" y="${y + rowH / 2 + 4}">T${n}</text>`;
+      let x = x0;
+      const segs = SRC.map(([id, n2, color, val, desc]) => [id, n2, color, val(p), desc(p)]).filter((z) => z[3] > 0);
+      segs.forEach(([id, n2, color, v, desc], si) => {
+        const w = v * scale, last = si === segs.length - 1, r = last ? Math.min(4, w) : 0, ww = Math.max(0, w - (last ? 0 : 2));
+        const pct = Math.round((v / total) * 100);
+        s += `<path class="mark" d="M${x},${y} H${x + ww - r} Q${x + ww},${y} ${x + ww},${y + r} V${y + rowH - r} Q${x + ww},${y + rowH} ${x + ww - r},${y + rowH} H${x} Z" fill="${color}" data-t="${label} · Tier ${n} · ${n2}: ${fmt(v)} (${pct}%)" data-d="${desc}"></path>`;
+        const lbl = view === 'pct' ? `${pct}%` : fmt(v);
+        if (ww > lbl.length * 7 + 10) s += `<text x="${x + ww / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:600;fill:${id === 'level' ? 'var(--ink)' : id === 'stars' ? '#101a24' : '#fff'};pointer-events:none">${lbl}</text>`;
+        x += w;
+      });
+      s += `<text class="val-text" x="${view === 'pct' ? x0 + iw + 8 : x + 8}" y="${y + rowH / 2 + 4}">${fmt(total)}</text>`;
+      rows.push([label, n, p, total]);
+      y += rowH + gap;
+    });
+    y += groupGap;
+  });
+  document.getElementById('src-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#src-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('src-table').innerHTML = `<table><tr><th>Stat</th><th>Tier</th><th class="num">Level</th><th class="num">Class lean</th><th class="num">Armor</th><th class="num">Might</th><th class="num">Orb</th><th class="num">Planet</th><th class="num">Moons</th><th class="num">Halo</th><th class="num">Template</th><th class="num">Total</th><th class="num">Build share</th></tr>` +
+    rows.map(([l, n, p, t]) => { const b = p.armor + (p.might || 0) + (p.orb || 0) + p.planet + p.moons + (p.halo || 0) + p.template; return `<tr><td>${l}</td><td>T${n}</td><td class="num">${p.level}</td><td class="num">${p.lean > 0 ? '+' : ''}${p.lean}</td><td class="num">${p.armor}</td><td class="num">${p.might || 0}</td><td class="num">${p.orb || 0}</td><td class="num">${p.planet}</td><td class="num">${p.moons}</td><td class="num">${p.halo || 0}</td><td class="num">${p.template}</td><td class="num"><b>${fmt(t)}</b></td><td class="num">${Math.round((b / t) * 100)}%</td></tr>`; }).join('') + '</table>';
+
+  // Build share small multiples: one measure, three ordered tiers, one hue.
+  document.getElementById('share-multiples').innerHTML = STATS.map(([k, label]) => {
+    const vals = [1, 2, 3].map((n) => { const p = D[n].stats[k].parts, t = D[n].stats[k].total; return Math.round(((p.armor + (p.might || 0) + (p.orb || 0) + p.planet + p.moons + (p.halo || 0) + p.template) / t) * 100); });
+    const W2 = 150, H2 = 130, pad = { l: 6, r: 6, t: 20, b: 20 }, bw = 22, step = (W2 - pad.l - pad.r) / 3, ih = H2 - pad.t - pad.b;
+    let m = `<svg viewBox="0 0 ${W2} ${H2}" width="100%" role="img" aria-label="${label}: build share ${vals.map((v, i) => 'T' + (i + 1) + ' ' + v + '%').join(', ')}"><line x1="${pad.l}" x2="${W2 - pad.r}" y1="${H2 - pad.b}" y2="${H2 - pad.b}" stroke="var(--axis)"/>`;
+    vals.forEach((v, i) => { const x = pad.l + step * i + (step - bw) / 2, bh = (v / 70) * ih, yy = H2 - pad.b - bh, r = Math.min(4, bh);
+      m += `<path d="M${x},${H2 - pad.b} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${H2 - pad.b} Z" fill="var(--accent)"/><text class="val-text" x="${x + bw / 2}" y="${yy - 5}" text-anchor="middle">${v}%</text><text class="axis-text" x="${x + bw / 2}" y="${H2 - 5}" text-anchor="middle">T${i + 1}</text>`; });
+    return `<div class="mini"><h3>${label}</h3>${m}</svg></div>`;
+  }).join('');
+  const off = [1, 3].map((n) => { const p = D[n].stats.offense.parts, t = D[n].stats.offense.total; return Math.round(((p.armor + p.might + p.orb + p.planet + p.moons + p.halo + p.template) / t) * 100); });
+  const hp = [1, 3].map((n) => { const p = D[n].stats.hp.parts, t = D[n].stats.hp.total; return Math.round(((p.armor + p.planet + p.moons + p.template) / t) * 100); });
+  document.getElementById('callout').innerHTML = `<b>What this shows for a ${name(cls)}</b>The build is ${off[0]}% of her offense at Tier 1 and ${off[1]}% at Tier 3, and ${hp[0]}% → ${hp[1]}% of her HP. Gear and Extra Stats give the same values in every tier (gear.md GE3, extra-stats.md ES11) while her level keeps growing, so by Tier 3 most of every stat is level. Weapons, the Orb and the Halo hold offense's share up; defenses and HP lean almost entirely on level. If the build should matter as much in Tier 3 as in Tier 1, its values would need to grow with the tier.`;
+
+  // All classes table
+  document.getElementById('all-table').innerHTML = `<thead><tr><th>Class</th><th>Tier</th>${STATS.map(([, l]) => `<th class="num">${l}</th>`).join('')}</tr></thead><tbody>` +
+    CLASSES.map(([c, n]) => [1, 2, 3].map((t) => `<tr${c === cls ? ' style="background:var(--raised)"' : ''}><td>${t === 1 ? `<b>${n}</b>` : ''}</td><td>T${t}</td>${STATS.map(([k]) => `<td class="num">${fmt(DATA[c][t].stats[k].total)}</td>`).join('')}</tr>`).join('')).join('') + '</tbody>';
+}
+render();
+</script>
+</body>
+</html>
