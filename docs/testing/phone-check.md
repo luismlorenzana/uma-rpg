@@ -14,6 +14,8 @@ Exchange sheets. Every button and footer should remain reachable without horizon
 
 1. **Phone only — install.** In Safari open the live game, tap Share → Add to Home Screen, then open Uma RPG from its
    icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator.
+   After a status-bar metadata change, remove the existing Home Screen app first: iOS freezes that metadata when it is
+   installed. Expect an opaque status bar with no blur over the top bar.
    **iPhone 15, 393×852 (D149):** the bottom bar is docked to the screen's bottom edge, with no empty band below it.
    Its panel runs under the home indicator, and its tabs sit just above it. Place pages, the side panel and sheets
    reach the bottom too. Place pages scroll inside the frame.

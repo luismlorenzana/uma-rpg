@@ -85,6 +85,9 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     - The album lists the active world's Umas, and in Tier 1 also the outfits no world owns (`useAlbumScope()`).
 - **PWA** (`vite.config.ts`, vite-plugin-pwa):
   - Updates are prompted ("Update ready · Restart"), never forced mid-action.
+  - The installed iOS app uses the opaque default status bar. `viewport-fit=cover` still exposes the bottom safe area for
+    the Home indicator, while keeping game content out of iOS 27's forced translucent top-edge blur. Changing this
+    install-time setting requires removing and adding the Home Screen app again.
   - The service worker precaches the app, Phaser included, and keeps its existing URL caches for master data and enemy
     art. `uma-kit/content` also verifies release hashes and keeps release and hash-named enemy bytes in Cache Storage.
   - `push-sw.js` shows notifications and sets the app badge.
