@@ -204,7 +204,7 @@
 
   <section id="pace">
     <h2>Pace holds</h2>
-    <p class="sub">The rate of progression stays: one Uma's work is within a tenth of today's in every tier, and the stats she earns
+    <p class="sub">The rate of progression stays: one Uma's work is within a tenth of today's in Tier 1, each later tier adds less than a tenth more, and the stats she earns
       from Extra Stats track today's curve level by level, so the foes' budget doesn't move.</p>
     <div class="grid2">
       <div class="panel"><h3>One Uma, fully built: refined items</h3><p class="muted" style="font-size:12px">Hours at today's Craft Lv 25 speed at the bar's end; her template moon included.</p>
@@ -245,7 +245,7 @@ const TIERS = [
       gear: [['3 weapons · 5 armor · 1 Support', 'All at G0. One crafted item raises one slot one grade; the gate is her Uma Level (GE1, GE2, GE11).']],
       skills: [['3 trees, no points', 'One tree per weapon slot. Every node is free; a fork\'s branches are exclusive, swapped freely outside fights (SK1, SK2).']],
       stats: [['1 planet + 4 moons, 25 nodes', 'Planet: all six core stats. Moons: Strength, Sorcery, Vigor, Guard. Every open node counts (ES1–ES5).']],
-      prof: [['Her trade: 2 yards', 'One gathering and one making profession by her fight type; 4 huts a yard, 40 on the map; 2 material types a gathering profession (PR1–PR7).']],
+      prof: [['Her trade: 2 places', 'One gathering and one making profession by her fight type. Ten places on the Wilds, each a building uma-art already has, 4 work slots each (40); 2 material types a gathering profession, all existing icons (PR1–PR7).']],
       var: [['Her template', 'Calling, stride and knack, read from her racing profile. The Flourish (an MP twist) sits at her trees\' root (U2, U9).']],
     },
     notes: { gear: 'G1–G10, a grade every 5 levels', skills: 'Depths D1–D5 by Class Rank', stats: 'Planet every 10 levels, moons between' },
@@ -264,7 +264,7 @@ const TIERS = [
         ['+ Armor halves per piece', 'The four classes between Brawler and Mage mix physical and magical per piece (GE9).']],
       skills: [['Trees carry over', 'The same three trees; picks from Tier 1 carry. Equipped slots 3 → 10.']],
       stats: [['+ Halo, + Valor moon', 'The same core map, rebuilt in the new world, plus two new bodies (ES8, ES9).']],
-      prof: [['+2 huts a yard (60)', 'A Tier 2 material pair per gathering profession (PR10).'], ['+ A secondary profession', 'Gathers one other profession\'s base pair; picked once per tier, 1,000 Laurels to change (PR11).']],
+      prof: [['+ A Tier 2 material pair', 'Each gathering profession adds a low and a high type, today\'s ids; the ten places and their 40 slots stay (PR10).'], ['+ A secondary profession', 'Gathers one other profession\'s base pair; picked once per tier, 1,000 Laurels to change (PR11).']],
       var: [['Template carries', 'The same calling, stride and knack; the Flourish stays.']],
     },
     notes: { gear: 'Grades restart at G0; forms carry', skills: 'Same depths', stats: 'Same cadence' },
@@ -287,7 +287,7 @@ const TIERS = [
       gear: [['+ Second Support slot', 'A different Talisman or Amulet from the first (GE11).']],
       skills: [['Trees carry over', 'Equipped: 10 and a master slot.']],
       stats: [['+ Halo\'s 2nd kind, + Swiftness', 'A second Halo kind and the Swiftness moon (ES10).']],
-      prof: [['+2 huts a yard (80)', 'A Tier 3 material pair per gathering profession (PR10).'], ['Secondary reaches Tier 2 pair', 'Her secondary profession can gather its Tier 2 pair too (PR11).']],
+      prof: [['+ A Tier 3 material pair', 'Each gathering profession adds a third pair, today\'s ids; the map stays as it is (PR10).'], ['Secondary reaches Tier 2 pair', 'Her secondary profession can gather its Tier 2 pair too (PR11).']],
       var: [['Template carries', 'Calling, Flourish, her moon.']],
     },
     notes: { gear: 'Grades restart; forms carry', skills: 'Depths D1–D6', stats: 'Same cadence' },
@@ -323,7 +323,7 @@ const h = (tag, attrs = {}, html = '') => { const e = document.createElement(tag
 const KPIS = [
   ['skills', 'Skill nodes on a class\'s page', '75–150', '24', '−68% or more'],
   ['gear', 'Item types to craft', '500', '40', 'gear 400 → 30, jewels 100 → 10'],
-  ['prof', 'Material types', '160', '20', '2 per gathering profession'],
+  ['prof', 'Material types', '160', '20', '2 per gathering profession, today\'s icons'],
   ['stats', 'Extra Stats nodes', '100', '25', 'every open node counts'],
   ['gear', 'Gear rank bars and currencies', '24 + 3', '0', 'one gate: Uma Lv 5g − 4'],
   [null, 'One Uma\'s work, fully built', '776 h', '835 h', '+8%: the pace holds'],
@@ -380,7 +380,7 @@ const MULTI = [
   ['skills', 'Nodes in a tree', 'per weapon tree', [15, 8, 14, 17]],
   ['skills', 'Tree picks', 'per class (today: forks)', [25, 3, 6, 9]],
   ['stats', 'Extra Stats nodes', 'shared map', [100, 25, 29, 33]],
-  ['prof', 'Huts on the Wilds', 'today: 33–55 facility slots', [55, 40, 60, 80], '33–55'],
+  ['prof', 'Work slots on the Wilds', '10 places, one building each (today 11 facilities)', [55, 40, 40, 40], '33–55'],
   ['prof', 'Material types', 'raw and refined', [160, 20, 40, 60]],
 ];
 const COLS = ['Today', 'T1', 'T2', 'T3'];
@@ -548,10 +548,11 @@ const MX = [
     ['Jewels: kinds · per Uma', '3 · 100 Star Gems', '2 · 20–25 (+2 hers)', '3 · 24–29 (+2)', '3 · 28–33 (+2)'],
   ]],
   ['prof', [
-    ['Places on the Wilds', '11 facilities', '10 yards, one a profession', '10', '10'],
-    ['Buildings', '33–55 slots, 22 upgrades', '<b>40 huts</b>, 4 a yard, no upgrades', '<b>60</b>, 6 a yard', '<b>80</b>, 8 a yard'],
-    ['Material types', '160 (80 raw, 80 refined)', '20: a pair a profession', '40: + a Tier 2 pair', '60: + a Tier 3 pair'],
-    ['Where an Uma works', 'Any of 11', 'Her trade\'s 2 yards', '+ a <b>secondary</b>\'s gathering (base pair)', 'Secondary + its Tier 2 pair'],
+    ['Places on the Wilds', '11 facilities', '10 places, one a profession, each an existing building', '10', '10'],
+    ['Work slots', '33–55 slots, 22 upgrades', '<b>40</b>, 4 a place, no upgrades', '40', '40'],
+    ['Material types', '160 (80 raw, 80 refined)', '20: a pair a profession, today\'s icons', '40: + a Tier 2 pair', '60: + a Tier 3 pair'],
+    ['New art', '—', 'None: existing frames and icons', 'None', 'None'],
+    ['Where an Uma works', 'Any of 11', 'Her trade\'s 2 places', '+ a <b>secondary</b>\'s gathering (base pair)', 'Secondary + its Tier 2 pair'],
     ['One Uma maxed', '472 refined, 776 h', '485 (493 with her moon), 822 h', '510 (518), 864 h', '520 (528), 881 h'],
   ]],
   ['var', [

@@ -2,147 +2,439 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Professions Demand</title>
-<!-- Tier rework preview for docs/design/tier-rework/professions.md. Self-contained; the first <style> block is
-     _template.html's, unchanged. Invented names only. -->
-<!-- The Tier rework's preview template. Copy this whole <style> block into each preview; keep files self-contained.
-     Colours are uma-kit's theme tokens (uma-platform/packages/kit/theme.css): light is uma-racer's, dark is uma-rpg's. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Professions Demand and Supply</title>
+<!-- Professions after the owner's first review (professions.md §5.5, §6, §11): what one Uma, a party and the roster
+     need against what a slot supplies, per tier, as charts. Every number is computed here from the doc's model (gather
+     minutes, the recipes' totals, the calling's split, four slots a place), so each "Show the numbers" table is the
+     chart's own data. Style block: progression.html's. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
     --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
-    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
-    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
-    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
-    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
-    --radius: 12px; --gap: 12px;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
       --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
-      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
-      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
-      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--page); color: var(--ink);
-    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
-  main { max-width: 430px; margin: 0 auto; padding: 16px; }
-  main.wide { max-width: 1100px; }
-  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
-  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
-  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
-  p, li { color: var(--ink-soft); }
-  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
-    box-shadow: 0 1px 0 var(--hairline-strong); }
-  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .grid { display: grid; gap: 8px; }
-  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
-    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
-  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
-  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
-  .chip.locked { color: var(--locked); }
-  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
-  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
-  .slot { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong);
-    display: grid; place-items: center; font-size: 11px; font-weight: 700; text-align: center; }
-  .slot.empty { border-style: dashed; color: var(--ink-faint); background: transparent; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
   .muted { color: var(--ink-faint); }
-  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
-  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
-  /* Trees: nodes are .node inside .tree columns; .edge draws a connector. */
-  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
-  .tier-row { display: flex; gap: 10px; justify-content: center; }
-  .node { min-width: 64px; max-width: 120px; padding: 6px 8px; border-radius: 10px; background: var(--raised);
-    border: 1.5px solid var(--hairline-strong); font-size: 11px; font-weight: 600; text-align: center; }
-  .node.core { border-color: var(--accent); background: var(--accent-wash); }
-  .node.pick { border-style: dashed; }
-  .node.locked { opacity: .45; }
-  .edge { width: 2px; height: 14px; background: var(--hairline-strong); margin: 0 auto; }
-  .legend { font-size: 12px; color: var(--ink-faint); }
-  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
-  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
-</style>
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
 
-<style>
-  :root {
-    --tr-1: #e34948; --tr-2: #eda100; --tr-3: #1baf7a; --tr-4: #e87ba4; --tr-5: #2a78d6;
-    --ground: color-mix(in srgb, var(--heal) 9%, var(--panel)); --road: var(--raised);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --tr-1: #e05a50; --tr-2: #c4940a; --tr-3: #1fa877; --tr-4: #da74ae; --tr-5: #4f8fe8;
-      --ground: color-mix(in srgb, var(--heal) 7%, var(--sunken)); --road: var(--raised); }
-  }
-  .t1c { fill: var(--tr-1); background: var(--tr-1); } .t2c { fill: var(--tr-2); background: var(--tr-2); }
-  .t3c { fill: var(--tr-3); background: var(--tr-3); } .t4c { fill: var(--tr-4); background: var(--tr-4); }
-  .t5c { fill: var(--tr-5); background: var(--tr-5); }
-  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
-  .lede { margin: -4px 0 12px; }
-  .kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
-  .kv dt { color: var(--ink-soft); } .kv dd { margin: 0; color: var(--ink); font-weight: 600; }
-  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  td.num, th.num { text-align: right; }
-  .note { font-size: 12px; color: var(--ink-faint); margin: 6px 0 0; }
-  .yardrow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
-  .yardrow:last-child { border-bottom: 0; }
-  .yardrow .name { font-weight: 700; color: var(--ink); font-size: 13px; }
-  .yardrow .sub { font-size: 12px; color: var(--ink-soft); }
-  .yardrow .amt { margin-left: auto; text-align: right; font-weight: 700; font-size: 13px; color: var(--ink);
-    font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .yardrow .amt small { display: block; font-weight: 500; color: var(--ink-faint); font-size: 11px; }
-  .arrow { text-align: center; color: var(--ink-soft); font-size: 13px; margin: -4px 0 8px; }
-  .arrow b { color: var(--ink); }
-  svg text { font-family: system-ui, -apple-system, 'Inter', sans-serif; }
-  .svg-ink { fill: var(--ink); } .svg-soft { fill: var(--ink-soft); } .svg-faint { fill: var(--ink-faint); }
-  .svg-panel { fill: var(--panel); stroke: var(--hairline-strong); }
-  .svg-ground { fill: var(--ground); } .svg-road { fill: var(--road); stroke: var(--hairline); }
-  .svg-roof { fill: var(--ink); opacity: .55; }
-  .ring-t2 { stroke: var(--t2); stroke-width: 2.5; } .ring-t3 { stroke: var(--t3); stroke-width: 2.5; }
-  .pip-free { fill: var(--ink); opacity: .35; }
-  .pip-more { fill: var(--sunken); stroke: var(--hairline-strong); }
-  .slots { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
-  .bar { height: 14px; border-radius: 4px; }
-  .barrow { display: grid; grid-template-columns: 112px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; padding: 3px 0; }
-  .barrow .lbl { color: var(--ink); font-weight: 600; }
-  .barrow .val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .stack { display: flex; gap: 2px; height: 18px; }
-  .stack span { display: block; height: 100%; }
-  .stack span:first-child { border-radius: 4px 0 0 4px; } .stack span:last-child { border-radius: 0 4px 4px 0; }
-  .legend-row { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 8px; }
-  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+
+  /* ---- This page */
+  :root { --tr-phys: var(--c2); --tr-physh: var(--c4); --tr-heal: var(--c3); --tr-magh: var(--c5); --tr-mag: var(--c1); }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .ann { fill: var(--ink-soft); font-size: 11px; }
+  .ref { stroke: var(--ink-faint); stroke-dasharray: 4 4; }
+  .bandref { fill: var(--accent-wash); }
+  .callout { background: var(--accent-wash); border-radius: 12px; padding: 14px 18px; border-left: 5px solid var(--accent); margin-top: 16px; font-size: 13px; }
+  .callout b { color: var(--ink); }
 </style>
 </head>
 <body>
 <main>
-<h1>Demand against supply</h1>
-<p class="lede">What one Uma, a party and a roster need from the ten yards, against what a hut makes. From <b>professions.md §5.5 and §11</b>. The counts are gear.md’s and extra-stats.md’s drafts: when they move, the sizes move and the balance holds.</p>
-<nav class="tabs"><a href="#uma">One Uma</a><a href="#trades">Trades</a><a href="#parties">Parties</a><a href="#supply">A hut</a><a href="#rosters">Rosters</a><a href="#craft">Craft Level</a></nav>
-<h2 id="uma">One Uma, maxed</h2>
-<div class="card scroll"><table><thead><tr><th>Tier 1 need</th><th class="num">Pieces</th><th>At</th><th class="num">Refined</th></tr></thead><tbody><tr><td>3 weapons: a Weapon Gem a step, 0 → 10</td><td class="num">30</td><td>Forge</td><td class="num">120<br><span class="muted">4 each</span></td></tr><tr><td>5 armor slots: Armor Fittings, grades 1–10</td><td class="num">50</td><td>Armorer</td><td class="num">125<br><span class="muted">2 low, 3 high</span></td></tr><tr><td>1 accessory slot: a Setting a grade</td><td class="num">10</td><td>Charm Shop</td><td class="num">120<br><span class="muted">12 each</span></td></tr><tr><td>Jewels: Planet I–V, Moon I–V on four moons</td><td class="num">25</td><td>Lapidary</td><td class="num">120<br><span class="muted">8 and 4</span></td></tr><tr><td>Process every raw item</td><td class="num">—</td><td>Workbench</td><td class="num">485</td></tr><tr><th>Total</th><th class="num">115</th><th></th><th class="num">485</th></tr><tr><td>Her own moon (variance.md): Moon Jewel II and IV</td><td class="num">+2</td><td>Lapidary</td><td class="num">+8<br><span class="muted">493 with it</span></td></tr></tbody></table><p class="note">Every class needs the same items: a Weapon Gem raises any weapon, a fitting any slot of either half, a setting any type.</p></div>
-<div class="card scroll"><table><thead><tr><th>Tier</th><th class="num">Base pair</th><th class="num">Tier pairs</th><th class="num">Refined</th><th class="num">Hours, Lv 25</th><th class="num">Hut hours ×1.25</th></tr></thead><tbody><tr><td><span class="tier t1">1</span></td><td class="num">485</td><td class="num">—</td><td class="num">485</td><td class="num">822</td><td class="num">657</td></tr><tr><td><span class="tier t2">2</span></td><td class="num">485</td><td class="num">25</td><td class="num">510</td><td class="num">864</td><td class="num">691</td></tr><tr><td><span class="tier t3">3</span></td><td class="num">485</td><td class="num">35</td><td class="num">520</td><td class="num">881</td><td class="num">705</td></tr><tr><td class="muted">Today, Tier 1</td><td class="num muted">472</td><td class="num muted">—</td><td class="num muted">472</td><td class="num muted">776</td><td class="num muted">621</td></tr><tr><td class="muted">Today, Tier 2</td><td class="num muted">472</td><td class="num muted">38 Lore raw</td><td class="num muted">—</td><td class="num muted">838</td><td class="num muted">670</td></tr></tbody></table><p class="note">Hours: a gather 45 min at Craft Lv 25, a process 11, a make one gather per refined item in it. Tier pairs: Tier 2's 5 new pieces (3 fork gems, 2 Halo Jewels) and Tier 3's 7 (3 fork gems, 4 Halo Jewels for two kinds) × one of each pair; the budget is 48, a tenth more. Her own moon adds 2 Moon Jewels a tier outside these rows: +8 refined, about 14 h (493 / 518 / 528 refined).</p></div>
-<h2 id="trades">What each trade carries, per Uma</h2>
-<div class="card"><p style="margin:0 0 6px">Share of one Uma’s 822 hours. A fifth is 20%; the scale ends at 25%.</p><div class="barrow" title="Physical: 169 h, 20.6%"><div class="lbl">Physical<br><span class="muted" style="font-weight:500">Mine · Forge</span></div><div><div class="bar t1c" style="width:82.4%"></div></div><div class="val">20.6%</div></div><div class="barrow" title="Physical hybrid: 166 h, 20.2%"><div class="lbl">Physical hybrid<br><span class="muted" style="font-weight:500">Lumber · Armorer</span></div><div><div class="bar t2c" style="width:80.8%"></div></div><div class="val">20.2%</div></div><div class="barrow" title="Healer: 163 h, 19.8%"><div class="lbl">Healer<br><span class="muted" style="font-weight:500">Fields · Workbench</span></div><div><div class="bar t3c" style="width:79.2%"></div></div><div class="val">19.8%</div></div><div class="barrow" title="Magical hybrid: 162 h, 19.7%"><div class="lbl">Magical hybrid<br><span class="muted" style="font-weight:500">Fishery · Charm Shop</span></div><div><div class="bar t4c" style="width:78.8%"></div></div><div class="val">19.7%</div></div><div class="barrow" title="Magical: 162 h, 19.7%"><div class="lbl">Magical<br><span class="muted" style="font-weight:500">Hunting · Lapidary</span></div><div><div class="bar t5c" style="width:78.8%"></div></div><div class="val">19.7%</div></div></div>
-<div class="card scroll"><table><thead><tr><th>Trade</th><th class="num">Gathers</th><th class="num">Makes</th><th class="num">Hours</th><th class="num">Share</th></tr></thead><tbody><tr><td style="border-left:4px solid var(--tr-1)">Physical<br><span class="muted">Mine · Forge</span></td><td class="num">105</td><td class="num">120</td><td class="num">169</td><td class="num">20.6%</td></tr><tr><td style="border-left:4px solid var(--tr-2)">Physical hybrid<br><span class="muted">Lumber · Armorer</span></td><td class="num">95</td><td class="num">125</td><td class="num">166</td><td class="num">20.2%</td></tr><tr><td style="border-left:4px solid var(--tr-3)">Healer<br><span class="muted">Fields · Workbench</span></td><td class="num">95</td><td class="num">485*</td><td class="num">163</td><td class="num">19.8%</td></tr><tr><td style="border-left:4px solid var(--tr-4)">Magical hybrid<br><span class="muted">Fishery · Charm Shop</span></td><td class="num">95</td><td class="num">120</td><td class="num">162</td><td class="num">19.7%</td></tr><tr><td style="border-left:4px solid var(--tr-5)">Magical<br><span class="muted">Hunting · Lapidary</span></td><td class="num">95</td><td class="num">120</td><td class="num">162</td><td class="num">19.7%</td></tr></tbody></table><p class="note">Each making yard uses about a quarter of the refined items, the Workbench processes all of them at a quarter of the time, and each gathering yard gives about a fifth. So every trade is about a fifth of the work. *The Workbench’s 485 are refines, a quarter of a gather each.</p></div>
-<h2 id="parties">Raw items by yard, Tier 1</h2>
-<div class="card"><p style="margin:0">One bar per group, split by gathering yard. The Mine gives a little more (ingots go into weapons, heavy armor and moon jewels); the rest give the same.</p><div class="legend-row"><span><i class="dot t1c"></i>Mine (Mining)</span><span><i class="dot t2c"></i>Lumber (Wood Chopping)</span><span><i class="dot t3c"></i>Fields (Farming)</span><span><i class="dot t4c"></i>Fishery (Fishing)</span><span><i class="dot t5c"></i>Hunting Grounds (Hunting)</span></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">Any Uma, any class <span class="muted" style="font-weight:500">· 485</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 105 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 95 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 95 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 95 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 95 (20%)"></span></div></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">A party of five <span class="muted" style="font-weight:500">· 2,425</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 525 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 475 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 475 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 475 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 475 (20%)"></span></div></div><div style="margin:8px 0"><div style="font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px">A Rift run’s twenty <span class="muted" style="font-weight:500">· 9,700</span></div><div class="stack"><span class="t1c" style="width:21.6%" title="Mine: 2100 (22%)"></span><span class="t2c" style="width:19.6%" title="Lumber: 1900 (20%)"></span><span class="t3c" style="width:19.6%" title="Fields: 1900 (20%)"></span><span class="t4c" style="width:19.6%" title="Fishery: 1900 (20%)"></span><span class="t5c" style="width:19.6%" title="Hunting: 1900 (20%)"></span></div></div></div>
-<div class="card scroll"><table><thead><tr><th>Who</th><th class="num">Mine</th><th class="num">Lumber</th><th class="num">Fields</th><th class="num">Fishery</th><th class="num">Hunting</th></tr></thead><tbody><tr><td>Any Uma, any class</td><td class="num">105</td><td class="num">95</td><td class="num">95</td><td class="num">95</td><td class="num">95</td></tr><tr><td>A party of five</td><td class="num">525</td><td class="num">475</td><td class="num">475</td><td class="num">475</td><td class="num">475</td></tr><tr><td>A Rift run’s twenty</td><td class="num">2,100</td><td class="num">1,900</td><td class="num">1,900</td><td class="num">1,900</td><td class="num">1,900</td></tr></tbody></table><p class="note">Today any Uma can gather any family. Here a yard is its trade’s alone, so the demand on each must be even: it is, for every class and party.</p></div>
-<h2 id="supply">What one Uma makes in one hut</h2>
-<div class="card scroll"><table><thead><tr><th>Craft Lv</th><th class="num">Gathers a day</th><th class="num">Processes a day</th><th class="num">Weapon Gem or Moon Jewel</th><th class="num">A fitting</th><th class="num">A setting</th><th class="num">A Planet Jewel</th></tr></thead><tbody><tr><td>1</td><td class="num">33</td><td class="num">133</td><td class="num">2.9 h</td><td class="num">1.4 / 2.2 h</td><td class="num">8.6 h</td><td class="num">5.8 h</td></tr><tr><td>25</td><td class="num">40</td><td class="num">159</td><td class="num">2.4 h</td><td class="num">1.2 / 1.8 h</td><td class="num">7.2 h</td><td class="num">4.8 h</td></tr><tr><td>50</td><td class="num">50</td><td class="num">200</td><td class="num">1.9 h</td><td class="num">1.0 / 1.4 h</td><td class="num">5.8 h</td><td class="num">3.8 h</td></tr></tbody></table><p class="note">Every hut works at today’s level-3 speed, ×1.25. A fitting is 2 refined at grades 1–5 and 3 at 6–10. A job is 1–10 pieces (processing ×1 to ×40), so one setting runs overnight.</p></div>
-<h2 id="rosters">Rosters at the owner’s pace</h2>
-<div class="card scroll"><table><thead><tr><th></th><th class="num"><span class="tier t1">Tier 1</span></th><th class="num"><span class="tier t2">Tier 2</span></th><th class="num"><span class="tier t3">Tier 3</span></th></tr></thead><tbody><tr><td>Workers</td><td class="num">40 (8 a trade)</td><td class="num">20, one run</td><td class="num">20</td></tr><tr><td>Huts</td><td class="num">40</td><td class="num">60</td><td class="num">80</td></tr><tr><td>One Uma maxed, hut hours</td><td class="num">657</td><td class="num">691</td><td class="num">705</td></tr><tr><td>Maxed Umas a day</td><td class="num">1.3</td><td class="num">0.7</td><td class="num">0.7</td></tr><tr><td>A party’s next grade</td><td class="num">9 h</td><td class="num">17 h</td><td class="num">18 h</td></tr><tr><td>A party maxed</td><td class="num">about 4 days</td><td class="num">7.2 days</td><td class="num">7.3 days</td></tr><tr><td>A run of twenty maxed</td><td class="num">about 16 days</td><td class="num">28.8 days</td><td class="num">29.4 days</td></tr><tr><td class="muted">Today, same workers</td><td class="num muted">12.9 days</td><td class="num muted">about 28</td><td class="num muted">—</td></tr></tbody></table><p class="note">Tier 1: 40 workers fill the 40 huts; each trade’s four making huts set the pace, the Armorer’s most. Tiers 2 and 3: the run’s twenty are the limit, not the huts.</p></div>
-<div class="card"><dl class="kv"><dt>The fighting party</dt><dd>waits on Craft Level, not on volume: its next grade is 9 roster hours away</dd><dt>A short trade</dt><dd>buys raw items at the Exchange (low 30, high 80 Laurels); from Tier 2, secondaries help</dd><dt>Against today</dt><dd>40 huts do about 18% less than 40 workers in today’s 55 slots, only when the whole roster gears at once</dd></dl></div>
-<h2 id="craft">When grades open</h2>
-<div class="card scroll"><table><thead><tr><th>Opens</th><th class="num">Craft Lv</th><th class="num">Day, nonstop</th><th class="num">Today</th></tr></thead><tbody><tr><td>Grade 2</td><td class="num">6</td><td class="num">2.0</td><td class="num">2.6</td></tr><tr><td>Grade 6, the high types</td><td class="num">26</td><td class="num">11.2</td><td class="num">13.5</td></tr><tr><td>Grade 10</td><td class="num">46</td><td class="num">22.1</td><td class="num">24.3</td></tr><tr><td>Lv 50</td><td class="num">50</td><td class="num">24.5</td><td class="num">26.7</td></tr></tbody></table><p class="note">Craft Level’s curve, 2 EXP a minute and the gate 5g − 4 are today’s. Huts work ×1.25 from day 1; today’s facilities reach level 3 about day 11. The 6% more work per Uma takes some of the two days back.</p></div>
+  <h1>Demand against supply</h1>
+  <p class="lead">What one maxed Uma, a party and the roster need from the ten places, against what one Uma in one slot makes, in every tier.
+    The structure the owner's review chose (ten places, four slots each, 40 in every tier) leaves the demand as it was: 485 refined items
+    a Uma in Tier 1 (493 with her own moon) against today's 472. From <a href="../professions.md">professions.md</a> §5.5, §6 and §11.</p>
+
+  <nav class="top"><a href="#uma">One Uma</a><a href="#share">Trades</a><a href="#supply">One slot</a><a href="#roster">Party and roster</a>
+    <a href="#secondary">The secondary</a><a href="#craft">Craft Level</a></nav>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section id="uma">
+    <h2>One Uma, maxed: Tier 1 near today, each later tier within a tenth more</h2>
+    <p class="sub">Hours of work at Craft Lv 25's speed (before a slot's ×1.25), her own moon included, split by the trade that does it.
+      Today's bar is split by job. The dashed line is Tier 1 plus a tenth, the budget for a tier's new pieces.</p>
+    <div class="panel"><div class="chart-legend" id="uma-legend"></div><div id="uma-chart"></div>
+      <details><summary>Show the numbers</summary><div id="uma-table"></div></details></div>
+  </section>
+
+  <section id="share">
+    <h2>Each trade carries about a fifth</h2>
+    <p class="sub">One trade's share of one Uma's hours, per tier, her moon included. The band is 18–22%. The Forge's trade rises from Tier 2
+      with the fork gems; nothing leaves the band.</p>
+    <div class="panel"><div class="chart-legend" id="share-legend"></div><div id="share-chart"></div>
+      <details><summary>Show the numbers</summary><div id="share-table"></div></details></div>
+  </section>
+
+  <section id="supply">
+    <h2>Supply: one Uma in one slot</h2>
+    <p class="sub">Every slot works ×1.25 from day one (no upgrades). Speed follows her Craft Level alone, as today (D139). Through the whole
+      chain one refined item takes 81 slot-minutes at Craft Lv 25: 0.74 items an Uma-hour, 657 Uma-hours for one maxed Uma (668 with her moon).</p>
+    <div class="grid2">
+      <div class="panel"><h3>Items a day, by Craft Level</h3><div class="chart-legend" id="sup-legend"></div><div id="sup-chart"></div>
+        <details><summary>Show the numbers</summary><div id="sup-table"></div></details></div>
+      <div class="panel"><h3>Hours a piece, at Craft Lv 1, 25 and 50</h3><div class="chart-legend" id="piece-legend"></div><div id="piece-chart"></div>
+        <details><summary>Show the numbers</summary><div id="piece-table"></div></details></div>
+    </div>
+  </section>
+
+  <section id="roster">
+    <h2>A party and the roster</h2>
+    <p class="sub">Days of the whole roster's work to max a party of five and a Rift run of twenty. Tier 1: 40 Umas at the calling's split
+      (22.6 / 20.7 / 22.6 / 17.0 / 17.0%), four slots a place. Tiers 2 and 3: one run's twenty Umas, with secondaries. Today: 40 Umas, any
+      Uma anywhere, level-3 facilities. The dashed lines are when Craft Level opens grade 10 for an Uma working nonstop: gear never waits
+      on volume first.</p>
+    <div class="grid2">
+      <div class="panel"><h3>Days to max</h3><div class="chart-legend" id="days-legend"></div><div id="days-chart"></div>
+        <details><summary>Show the numbers</summary><div id="days-table"></div></details></div>
+      <div class="panel"><h3>Maxed Umas a day, by roster size (Tier 1)</h3><div class="chart-legend" id="rate-legend"></div><div id="rate-chart"></div>
+        <details><summary>Show the numbers</summary><div id="rate-table"></div></details></div>
+    </div>
+    <div class="callout"><b>Corrected after the owner's review:</b> the draft compared against "today, 12.9 days" for a run of twenty. That counted
+      the roster's hours and missed today's real wall, the Forge's five slots: 120 crafts an Uma at two gathers each, 0.83 maxed Umas a day
+      whatever the roster's size, 24 days for a run. The four making places spread that work: about 17 days.</div>
+  </section>
+
+  <section id="secondary">
+    <h2>Why Tier 2 keeps the secondary profession</h2>
+    <p class="sub">A Tier 2 world starts with one run's twenty Umas: three or four in each of the magical trades. Bars are the days each trade
+      would take to max the run alone; the line is the run with secondaries, when the other trades' spare Umas gather the short trades'
+      base pairs (their making stays their own).</p>
+    <div class="grid2">
+      <div class="panel"><h3>Tier 2, a run of twenty</h3><div id="sec2-chart"></div>
+        <details><summary>Show the numbers</summary><div id="sec2-table"></div></details></div>
+      <div class="panel"><h3>Tier 3, a run of twenty</h3><div id="sec3-chart"></div>
+        <details><summary>Show the numbers</summary><div id="sec3-table"></div></details></div>
+    </div>
+  </section>
+
+  <section id="craft">
+    <h2>Craft Level comes about two days sooner</h2>
+    <p class="sub">Every slot works ×1.25 from day one; today's facilities wait for level 3 (about day 11). An Uma working nonstop, her Craft
+      Level by day. The curve itself (D96) doesn't change.</p>
+    <div class="panel"><div class="chart-legend" id="cl-legend"></div><div id="cl-chart"></div>
+      <details><summary>Show the numbers</summary><div id="cl-table"></div></details></div>
+  </section>
+  <p class="foot" style="margin-top:28px">Model: a gather takes 54 minutes at Craft Lv 1, falling evenly to 36 at Lv 50; a process a quarter; a piece one gather
+    per refined item in it; Craft EXP and the curve as today. Demand: gear.md (GE12) and extra-stats.md (ES7, ES12) pieces on professions.md's
+    recipes (PR8). The places and their art: <a href="professions-map.html">the map</a>; the chain: <a href="professions-flow.html">the flow</a>.</p>
 </main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const h = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; };
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  const place = (x, y) => { const w = tip.offsetWidth, hh = tip.offsetHeight; tip.style.left = Math.min(x + 14, innerWidth - w - 10) + 'px'; tip.style.top = (y + 16 + hh > innerHeight ? y - hh - 12 : y + 16) + 'px'; };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY));
+  el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); });
+  el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+const tips = (root) => root.querySelectorAll('[data-t]').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+const f1 = (x) => (Math.round(x * 10) / 10).toFixed(1), f0 = (x) => String(Math.round(x));
+
+// ---- The model (professions.md §5.4, §5.5, §11)
+const g = (lv) => 54 - (18 * (lv - 1)) / 49, G = g(25), PR = G / 4, SP = 1.25;
+const TR = [
+  { id: 'phys', name: 'Physical', at: 'Mine · Forge', c: 'var(--tr-phys)', share: 0.226 },
+  { id: 'physh', name: 'Physical hybrid', at: 'Forest · Armorer', c: 'var(--tr-physh)', share: 0.207 },
+  { id: 'heal', name: 'Healer', at: 'Fields · Workbench', c: 'var(--tr-heal)', share: 0.226 },
+  { id: 'magh', name: 'Magical hybrid', at: 'Fishery · Charm Shop', c: 'var(--tr-magh)', share: 0.17 },
+  { id: 'mag', name: 'Magical', at: 'Monster Den · Lapidary', c: 'var(--tr-mag)', share: 0.17 },
+];
+const GATH = { 1: [105, 95, 95, 95, 95], 2: [110, 100, 100, 100, 100], 3: [112, 102, 102, 102, 102] }, MOON_G = [2, 0, 0, 0, 6];
+const MAKE = { 1: [120, 125, 485, 120, 120], 2: [135, 125, 510, 120, 130], 3: [135, 125, 520, 120, 140] }, MOON_M = [0, 0, 8, 0, 8];
+const PAIR = { 1: 0, 2: 5, 3: 7 };
+function trades(t, moon = true) {
+  return TR.map((tr, i) => { const ga = GATH[t][i] + (moon ? MOON_G[i] : 0), mk = MAKE[t][i] + (moon ? MOON_M[i] : 0);
+    const gh = (ga * G) / 60, mh = (mk * (i === 2 ? PR : G)) / 60; return { ...tr, ga, mk, gh, mh, h: gh + mh }; });
+}
+const total = (t, moon = true) => trades(t, moon).reduce((a, r) => a + r.h, 0);
+const refined = (t, moon = true) => MAKE[t][2] + (moon ? 8 : 0);
+// Today: 472 raw and refined, 120 crafts and 100 cuts at two gathers each; five slots a facility at level 3, any Uma anywhere.
+const TODAY = { gather: (472 * G) / 60, refine: (472 * PR) / 60, craft: (120 * 2 * G) / 60, cut: (100 * 2 * G) / 60 };
+TODAY.h = TODAY.gather + TODAY.refine + TODAY.craft + TODAY.cut;
+const todayRate = (W) => Math.min((Math.min(W, 55) * 24) / (TODAY.h / SP), (5 * 24) / (TODAY.craft / SP), (5 * 24) / (TODAY.cut / SP), (5 * 24) / (TODAY.refine / SP), (5 * 24) / (TODAY.gather / 8 / SP));
+function rate1(W, slots = 4) {
+  return Math.min(...trades(1).map((r) => { const w = W * r.share, gs = r.gh / SP, ms = r.mh / SP; return Math.min((w * 24) / (gs + ms), (slots * 24) / gs, (slots * 24) / ms); }));
+}
+function run(t, n, W = 20, sec = true) {
+  const rs = trades(t), all = (n * total(t)) / SP / (W * 24);
+  const alone = rs.map((r) => (n * r.h) / SP / (W * r.share * 24));
+  const making = rs.map((r) => (n * (r.mh + (PAIR[t] * G) / 60)) / SP / (W * r.share * 24));
+  return { alone, bal: all, making, days: sec ? Math.max(all, ...making) : Math.max(...alone) };
+}
+
+// ---- KPIs
+const KPIS = [
+  ['One Uma, Tier 1', '472 →', `${refined(1, false)}`, `refined; ${refined(1)} with her moon`],
+  ['Hours, Tier 1', `${f0(TODAY.h)} →`, f0(total(1)), `+${f0((total(1) / TODAY.h - 1) * 100)}%, her moon in`],
+  ['Tier 2 · Tier 3', `+${f0((total(2) / total(1) - 1) * 100)}% ·`, `+${f0((total(3) / total(1) - 1) * 100)}%`, 'over Tier 1; the budget is +10%'],
+  ['A party, Tier 1', `${f1(5 / todayRate(40))} d →`, `${f1(5 / rate1(40))} d`, 'the roster\'s work, 40 Umas'],
+  ['A run of twenty, Tier 1', `${f0(20 / todayRate(40))} d →`, `${f0(20 / rate1(40))} d`, 'today the Forge binds'],
+  ['A run, Tier 2', `${f0(run(2, 20, 20, false).days)} d →`, `${f0(run(2, 20).days)} d`, 'without → with secondaries'],
+];
+document.getElementById('kpis').append(...KPIS.map(([l, w, n, d]) => h('div', { class: 'kpi' }, `<div class="label"><span class="sw" style="background:var(--c5)"></span>${l}</div><div class="value"><span class="was">${w}</span> ${n}</div><div class="delta">${d}</div>`)));
+
+// ---- One Uma: stacked horizontal bars
+(function () {
+  const rows = [
+    { l: 'Today', sub: '472 refined', segs: [['Gather', TODAY.gather, 'var(--neutral-strong)'], ['Refine', TODAY.refine, 'var(--neutral)'], ['Craft (Forge)', TODAY.craft, 'var(--neutral-strong)'], ['Cut (Lapidary)', TODAY.cut, 'var(--neutral)']] },
+    ...[1, 2, 3].map((t) => ({ l: `Tier ${t}`, sub: `${refined(t)} refined`, segs: trades(t).map((r) => [`${r.name} (${r.at})`, r.h, r.c]) })),
+  ];
+  const W = 1180, rowH = 46, pad = { l: 120, r: 120, t: 10, b: 26 }, H = pad.t + pad.b + rowH * rows.length, max = 1000;
+  const x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="One maxed Uma's hours: today ${f0(TODAY.h)}, Tier 1 ${f0(total(1))}, Tier 2 ${f0(total(2))}, Tier 3 ${f0(total(3))}">`;
+  for (let v = 0; v <= max; v += 100) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(v)}" y="${H - 8}" text-anchor="middle">${v} h</text>`;
+  const budget = total(1) * 1.1;
+  s += `<line class="ref" x1="${x(budget)}" x2="${x(budget)}" y1="${pad.t}" y2="${H - pad.b}"/><text class="ann" x="${x(budget) + 4}" y="${pad.t + 10}">Tier 1 + a tenth: ${f0(budget)} h</text>`;
+  rows.forEach((r, i) => {
+    const y = pad.t + i * rowH + 12, bh = 22; let acc = 0;
+    s += `<text class="val-soft" x="${pad.l - 12}" y="${y + 11}" text-anchor="end" style="fill:var(--ink);font-weight:650">${r.l}</text><text class="axis-text" x="${pad.l - 12}" y="${y + 24}" text-anchor="end">${r.sub}</text>`;
+    r.segs.forEach(([n, v, c]) => { const x0 = x(acc); acc += v; s += `<rect class="mark" x="${x0}" y="${y}" width="${Math.max(1, x(acc) - x0 - 1.5)}" height="${bh}" fill="${c}" data-t="${r.l} · ${n}" data-d="${f0(v)} h (${f1((v / r.segs.reduce((a, q) => a + q[1], 0)) * 100)}%)"></rect>`; });
+    s += `<text class="val-text" x="${x(acc) + 8}" y="${y + 16}">${f0(acc)} h</text>`;
+  });
+  document.getElementById('uma-chart').innerHTML = s + '</svg>'; tips(document.getElementById('uma-chart'));
+  document.getElementById('uma-legend').innerHTML = TR.map((t) => `<span><span class="sw" style="background:${t.c}"></span>${t.name}: ${t.at}</span>`).join('') + '<span><span class="sw" style="background:var(--neutral-strong)"></span>Today, by job</span>';
+  document.getElementById('uma-table').innerHTML = `<table><tr><th></th><th class="num">Refined</th>${TR.map((t) => `<th class="num">${t.name}</th>`).join('')}<th class="num">Hours</th><th class="num">vs today</th></tr>` +
+    `<tr><td>Today</td><td class="num">472</td><td colspan="5" class="muted">Gather ${f0(TODAY.gather)} · refine ${f0(TODAY.refine)} · craft ${f0(TODAY.craft)} · cut ${f0(TODAY.cut)}</td><td class="num">${f0(TODAY.h)}</td><td class="num">—</td></tr>` +
+    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">${refined(t)} <span class="muted">(${refined(t, false)})</span></td>${trades(t).map((r) => `<td class="num">${f0(r.h)}</td>`).join('')}<td class="num"><b>${f0(total(t))}</b> <span class="muted">(${f0(total(t, false))})</span></td><td class="num">+${f0((total(t) / TODAY.h - 1) * 100)}%</td></tr>`).join('') +
+    `</table><p class="foot">Her moon included; in brackets without it. Gathers and makes per trade: Tier 1 ${trades(1).map((r) => `${r.ga}/${r.mk}`).join(', ')} (the Workbench's makes are processes).</p>`;
+})();
+
+// ---- Shares: dot plot
+(function () {
+  const W = 1180, rowH = 40, pad = { l: 220, r: 40, t: 24, b: 30 }, H = pad.t + pad.b + rowH * TR.length, lo = 16, hi = 24;
+  const x = (v) => pad.l + ((v - lo) / (hi - lo)) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Each trade's share of one Uma's hours, by tier">`;
+  s += `<rect class="bandref" x="${x(18)}" y="${pad.t - 6}" width="${x(22) - x(18)}" height="${H - pad.t - pad.b + 12}"/>`;
+  for (let v = lo; v <= hi; v += 1) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${pad.t - 6}" y2="${H - pad.b + 6}" stroke="${v === 20 ? 'var(--axis)' : 'var(--grid)'}"/><text class="axis-text" x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+  TR.forEach((tr, i) => {
+    const y = pad.t + i * rowH + rowH / 2;
+    s += `<text class="val-soft" x="${pad.l - 14}" y="${y + 4}" text-anchor="end" style="fill:var(--ink);font-weight:650">${tr.name}</text><text class="axis-text" x="${pad.l - 14}" y="${y + 17}" text-anchor="end">${tr.at}</text>`;
+    const vals = [1, 2, 3].map((t) => (trades(t)[i].h / total(t)) * 100);
+    s += `<line x1="${x(Math.min(...vals))}" x2="${x(Math.max(...vals))}" y1="${y}" y2="${y}" stroke="${tr.c}" stroke-width="2"/>`;
+    vals.forEach((v, k) => { s += `<circle class="mark" cx="${x(v)}" cy="${y}" r="7" fill="var(--t${k + 1})" stroke="var(--panel)" stroke-width="2" data-t="${tr.name} · Tier ${k + 1}" data-d="${f1(v)}% of ${f0(total(k + 1))} h"></circle>`; });
+  });
+  document.getElementById('share-chart').innerHTML = s + '</svg>'; tips(document.getElementById('share-chart'));
+  document.getElementById('share-legend').innerHTML = [1, 2, 3].map((t) => `<span><span class="sw" style="background:var(--t${t});border-radius:50%"></span>Tier ${t}</span>`).join('') + '<span><span class="sw" style="background:var(--accent-wash);border:1px solid var(--accent)"></span>18–22%</span>';
+  document.getElementById('share-table').innerHTML = `<table><tr><th>Trade</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>${TR.map((tr, i) => `<tr><td>${tr.name}: ${tr.at}</td>${[1, 2, 3].map((t) => `<td class="num">${f1((trades(t)[i].h / total(t)) * 100)}% · ${f0(trades(t)[i].h)} h</td>`).join('')}</tr>`).join('')}</table>`;
+})();
+
+// ---- Supply: items a day by Craft Level (lines) and hours a piece (grouped bars)
+(function () {
+  const LV = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+  const ga = (lv) => (1440 * SP) / g(lv), pr = (lv) => (4 * 1440 * SP) / g(lv), ch = (lv) => (1440 * SP) / (g(lv) * 2.25);
+  const W = 560, H = 260, pad = { l: 44, r: 118, t: 14, b: 30 }, x = (lv) => pad.l + ((lv - 1) / 49) * (W - pad.l - pad.r), y = (v) => H - pad.b - (v / 220) * (H - pad.t - pad.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Items a day by Craft Level">`;
+  [0, 50, 100, 150, 200].forEach((v) => (s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`));
+  [1, 10, 20, 30, 40, 50].forEach((lv) => (s += `<text class="axis-text" x="${x(lv)}" y="${H - 8}" text-anchor="middle">Lv ${lv}</text>`));
+  const SER = [['Processes a day', pr, 'var(--tr-heal)'], ['Gathers a day', ga, 'var(--tr-phys)'], ['Refined items a day, the whole chain', ch, 'var(--tr-mag)']];
+  SER.forEach(([n, fn, c]) => {
+    s += `<path d="${LV.map((lv, i) => `${i ? 'L' : 'M'}${x(lv)},${y(fn(lv))}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/>`;
+    LV.forEach((lv) => (s += `<circle class="mark" cx="${x(lv)}" cy="${y(fn(lv))}" r="3.5" fill="${c}" stroke="var(--panel)" stroke-width="1.5" data-t="${n} · Craft Lv ${lv}" data-d="${f1(fn(lv))} a day in one slot"></circle>`));
+    s += `<text class="val-soft" x="${x(50) + 8}" y="${y(fn(50)) + 4}">${f0(fn(50))} · ${n.split(',')[0].replace(' a day', '')}</text>`;
+  });
+  document.getElementById('sup-chart').innerHTML = s + '</svg>'; tips(document.getElementById('sup-chart'));
+  document.getElementById('sup-legend').innerHTML = SER.map(([n, , c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('');
+  document.getElementById('sup-table').innerHTML = `<table><tr><th>Craft Lv</th>${LV.map((l) => `<th class="num">${l}</th>`).join('')}</tr>${SER.map(([n, fn]) => `<tr><td>${n}</td>${LV.map((l) => `<td class="num">${f0(fn(l))}</td>`).join('')}</tr>`).join('')}</table><p class="foot">The whole chain: a gather, a process and a make for each refined item (2.25 gathers' time).</p>`;
+  // pieces
+  const PCS = [['Weapon Gem, Moon Jewel', 4], ['Armor Fittings, low', 2], ['Armor Fittings, high', 3], ['Accessory Setting, Tier 1', 12], ['Setting, Tier 2', 6], ['Setting, Tier 3', 4], ['Planet Jewel', 8], ['Fork gem, Halo Jewel', 9]];
+  const LVS = [[1, 'var(--neutral)'], [25, 'var(--neutral-strong)'], [50, 'var(--accent)']];
+  const W2 = 560, rowH = 26, p2 = { l: 170, r: 50, t: 6, b: 26 }, H2 = p2.t + p2.b + rowH * PCS.length, max = 9;
+  const x2 = (v) => p2.l + (v / max) * (W2 - p2.l - p2.r);
+  let s2 = `<svg viewBox="0 0 ${W2} ${H2}" width="100%" role="img" aria-label="Hours a piece">`;
+  for (let v = 0; v <= max; v += 1) s2 += `<line x1="${x2(v)}" x2="${x2(v)}" y1="${p2.t}" y2="${H2 - p2.b}" stroke="var(--grid)"/>${v % 2 === 0 ? `<text class="axis-text" x="${x2(v)}" y="${H2 - 8}" text-anchor="middle">${v} h</text>` : ''}`;
+  PCS.forEach(([n, k], i) => {
+    const y0 = p2.t + i * rowH + 3; s2 += `<text class="axis-text" x="${p2.l - 10}" y="${y0 + 14}" text-anchor="end" style="fill:var(--ink)">${n} · ${k}</text>`;
+    LVS.forEach(([lv, c], j) => { const v = (k * g(lv)) / SP / 60; s2 += `<rect class="mark" x="${x2(0)}" y="${y0 + j * 7}" width="${x2(v) - x2(0)}" height="6" rx="2" fill="${c}" data-t="${n} at Craft Lv ${lv}" data-d="${f1(v)} h in one slot (${k} refined)"></rect>`; });
+    s2 += `<text class="val-soft" x="${x2((k * g(1)) / SP / 60) + 6}" y="${y0 + 14}">${f1((k * g(25)) / SP / 60)} h at Lv 25</text>`;
+  });
+  document.getElementById('piece-chart').innerHTML = s2 + '</svg>'; tips(document.getElementById('piece-chart'));
+  document.getElementById('piece-legend').innerHTML = LVS.map(([lv, c]) => `<span><span class="sw" style="background:${c}"></span>Craft Lv ${lv}</span>`).join('');
+  document.getElementById('piece-table').innerHTML = `<table><tr><th>Piece</th><th class="num">Refined</th>${LVS.map(([lv]) => `<th class="num">Lv ${lv}</th>`).join('')}</tr>${PCS.map(([n, k]) => `<tr><td>${n}</td><td class="num">${k}</td>${LVS.map(([lv]) => `<td class="num">${f1((k * g(lv)) / SP / 60)} h</td>`).join('')}</tr>`).join('')}</table>`;
+})();
+
+// ---- Party and roster
+(function () {
+  const ROWS = [
+    { l: 'Today, Tier 1', p: 5 / todayRate(40), r: 20 / todayRate(40), c: 'var(--neutral)', wall: 24.3, note: 'the Forge\'s five slots bind', short: '40 Umas, Forge-bound' },
+    { l: 'Tier 1', p: 5 / rate1(40), r: 20 / rate1(40), c: 'var(--t1)', wall: 22.1, note: 'the two thinnest trades bind', short: '40 Umas, 40 slots' },
+    { l: 'Tier 2', p: run(2, 5).days, r: run(2, 20).days, c: 'var(--t2)', wall: null, note: '20 Umas, with secondaries', short: '20 Umas, secondaries' },
+    { l: 'Tier 3', p: run(3, 5).days, r: run(3, 20).days, c: 'var(--t3)', wall: null, note: '20 Umas, with secondaries', short: '20 Umas, secondaries' },
+  ];
+  const W = 560, rowH = 58, pad = { l: 132, r: 30, t: 22, b: 28 }, H = pad.t + pad.b + rowH * ROWS.length, max = 40;
+  const x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Days to max a party and a run of twenty">`;
+  for (let v = 0; v <= max; v += 5) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(v)}" y="${H - 8}" text-anchor="middle">${v} d</text>`;
+  s += `<line class="ref" x1="${x(28)}" x2="${x(28)}" y1="${pad.t}" y2="${H - pad.b}"/><text class="ann" x="${x(28) - 4}" y="${pad.t - 8}" text-anchor="end">Tier 2 today: about four weeks</text>`;
+  ROWS.forEach((r, i) => {
+    const y = pad.t + i * rowH + 6;
+    s += `<text class="val-soft" x="${pad.l - 10}" y="${y + 14}" text-anchor="end" style="fill:var(--ink);font-weight:650">${r.l}</text><text class="axis-text" x="${pad.l - 10}" y="${y + 28}" text-anchor="end" style="font-size:10px">${r.short}</text>`;
+    s += `<rect class="mark" x="${x(0)}" y="${y}" width="${x(r.p) - x(0)}" height="16" rx="3" fill="${r.c}" data-t="${r.l} · a party of five" data-d="${f1(r.p)} days of the roster's work; ${r.note}"></rect><text class="val-text" x="${x(r.p) + 6}" y="${y + 13}">${f1(r.p)} · party</text>`;
+    s += `<rect class="mark" x="${x(0)}" y="${y + 20}" width="${x(r.r) - x(0)}" height="16" rx="3" fill="${r.c}" opacity=".55" data-t="${r.l} · a run of twenty" data-d="${f1(r.r)} days; ${r.note}"></rect><text class="val-soft" x="${x(r.r) + 6}" y="${y + 33}">${f1(r.r)} · run of twenty</text>`;
+    if (r.wall) s += `<line class="ref" x1="${x(r.wall)}" x2="${x(r.wall)}" y1="${y - 4}" y2="${y + 40}" style="stroke:var(--ink-soft)"/><text class="ann" x="${x(r.wall) + 4}" y="${y + 47}" style="font-size:10px">G10 opens, day ${r.wall}</text>`;
+  });
+  document.getElementById('days-chart').innerHTML = s + '</svg>'; tips(document.getElementById('days-chart'));
+  document.getElementById('days-legend').innerHTML = '<span><span class="sw" style="background:var(--ink-soft)"></span>A party of five</span><span><span class="sw" style="background:var(--ink-soft);opacity:.55"></span>A run of twenty</span><span class="muted">Dashed: grade 10 opens (Craft Lv 46) for an Uma working nonstop</span>';
+  document.getElementById('days-table').innerHTML = `<table><tr><th></th><th class="num">A party</th><th class="num">A run of twenty</th><th>What binds</th></tr>${ROWS.map((r) => `<tr><td>${r.l}</td><td class="num">${f1(r.p)} d</td><td class="num">${f1(r.r)} d</td><td>${r.note}</td></tr>`).join('')}<tr><td>Tier 2, no secondaries</td><td class="num">${f1(run(2, 5, 20, false).days)} d</td><td class="num">${f1(run(2, 20, 20, false).days)} d</td><td>the magical trade's 3.4 Umas</td></tr></table>`;
+  // rate by roster size
+  const NS = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80];
+  const W2 = 560, H2 = 260, p2 = { l: 44, r: 150, t: 14, b: 30 }, x2 = (n) => p2.l + ((n - 10) / 70) * (W2 - p2.l - p2.r), y2 = (v) => H2 - p2.b - (v / 1.6) * (H2 - p2.t - p2.b);
+  let s2 = `<svg viewBox="0 0 ${W2} ${H2}" width="100%" role="img" aria-label="Maxed Umas a day by roster size, today and Tier 1">`;
+  [0, 0.4, 0.8, 1.2, 1.6].forEach((v) => (s2 += `<line x1="${p2.l}" x2="${W2 - p2.r}" y1="${y2(v)}" y2="${y2(v)}" stroke="var(--grid)"/><text class="axis-text" x="${p2.l - 8}" y="${y2(v) + 4}" text-anchor="end">${v.toFixed(1)}</text>`));
+  [10, 20, 30, 40, 50, 60, 70, 80].forEach((n) => (s2 += `<text class="axis-text" x="${x2(n)}" y="${H2 - 8}" text-anchor="middle">${n}</text>`));
+  const SER = [['Today', todayRate, 'var(--neutral-strong)', 'the Forge: 0.83'], ['Tier 1, four slots a place', (n) => rate1(n), 'var(--accent)', 'four slots: ' + rate1(80).toFixed(2)]];
+  SER.forEach(([n, fn, c, end]) => {
+    s2 += `<path d="${NS.map((v, i) => `${i ? 'L' : 'M'}${x2(v)},${y2(fn(v))}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round"/>`;
+    NS.forEach((v) => (s2 += `<circle class="mark" cx="${x2(v)}" cy="${y2(fn(v))}" r="3.5" fill="${c}" stroke="var(--panel)" stroke-width="1.5" data-t="${n} · ${v} Umas" data-d="${fn(v).toFixed(2)} maxed Umas a day"></circle>`));
+    s2 += `<text class="val-soft" x="${x2(80) + 8}" y="${y2(fn(80)) + 4}">${n.split(',')[0]}: ${end}</text>`;
+  });
+  s2 += `<line class="ref" x1="${x2(40)}" x2="${x2(40)}" y1="${p2.t}" y2="${H2 - p2.b}"/><text class="ann" x="${x2(40) + 4}" y="${p2.t + 10}">40 Umas</text>`;
+  document.getElementById('rate-chart').innerHTML = s2 + '</svg>'; tips(document.getElementById('rate-chart'));
+  document.getElementById('rate-legend').innerHTML = SER.map(([n, , c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('') + '<span class="muted">Roster size along the bottom</span>';
+  document.getElementById('rate-table').innerHTML = `<table><tr><th>Umas</th>${NS.map((n) => `<th class="num">${n}</th>`).join('')}</tr>${SER.map(([n, fn]) => `<tr><td>${n}</td>${NS.map((v) => `<td class="num">${fn(v).toFixed(2)}</td>`).join('')}</tr>`).join('')}</table><p class="foot">Tier 1: each trade's Umas at the calling's split, its two places four slots each; the slowest trade sets the pace. Below about 50 Umas the two thinnest trades' workers bind; above, the Lapidary's and the Armorer's four slots.</p>`;
+})();
+
+// ---- The secondary: per-trade days alone vs the balanced run
+[2, 3].forEach((t) => {
+  const R = run(t, 20, 20, true), N = run(t, 20, 20, false);
+  const W = 560, rowH = 34, pad = { l: 130, r: 70, t: 22, b: 28 }, H = pad.t + pad.b + rowH * TR.length, max = 40;
+  const x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Tier ${t}: days for each trade alone, and the run with secondaries">`;
+  for (let v = 0; v <= max; v += 5) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(v)}" y="${H - 8}" text-anchor="middle">${v} d</text>`;
+  TR.forEach((tr, i) => {
+    const y = pad.t + i * rowH + 7, v = R.alone[i];
+    s += `<text class="val-soft" x="${pad.l - 10}" y="${y + 13}" text-anchor="end" style="fill:var(--ink)">${tr.name} · ${f1(20 * tr.share)}</text>`;
+    s += `<rect class="mark" x="${x(0)}" y="${y}" width="${x(v) - x(0)}" height="18" rx="3" fill="${tr.c}" data-t="${tr.name}, alone" data-d="${f1(v)} days for its ${f1(20 * tr.share)} Umas to do its whole share; its making alone ${f1(R.making[i])} days"></rect><text class="val-soft" x="${x(v) + 6}" y="${y + 13}">${f1(v)}</text>`;
+  });
+  s += `<line x1="${x(R.days)}" x2="${x(R.days)}" y1="${pad.t - 6}" y2="${H - pad.b}" stroke="var(--accent)" stroke-width="2.5"/><text class="ann" x="${x(R.days) + 5}" y="${pad.t - 8}" style="fill:var(--ink);font-weight:650">With secondaries: ${f1(R.days)} days</text>`;
+  document.getElementById(`sec${t}-chart`).innerHTML = s + '</svg>'; tips(document.getElementById(`sec${t}-chart`));
+  document.getElementById(`sec${t}-table`).innerHTML = `<table><tr><th>Trade</th><th class="num">Umas of 20</th><th class="num">Alone</th><th class="num">Its making (+ its tier pairs)</th></tr>${TR.map((tr, i) => `<tr><td>${tr.name}</td><td class="num">${f1(20 * tr.share)}</td><td class="num">${f1(R.alone[i])} d</td><td class="num">${f1(R.making[i])} d</td></tr>`).join('')}<tr><td><b>The run</b></td><td></td><td class="num">${f1(N.days)} d without</td><td class="num"><b>${f1(R.days)} d with secondaries</b> (all hours ÷ 20 Umas)</td></tr></table>`;
+});
+
+// ---- Craft Level by day
+(function () {
+  const NEW = [[0, 1], [2.0, 6], [11.2, 26], [22.1, 46], [24.5, 50]], OLD = [[0, 1], [2.6, 6], [13.5, 26], [24.3, 46], [26.7, 50]];
+  const W = 1180, H = 260, pad = { l: 50, r: 160, t: 14, b: 30 }, x = (d) => pad.l + (d / 28) * (W - pad.l - pad.r), y = (lv) => H - pad.b - ((lv - 1) / 49) * (H - pad.t - pad.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Craft Level by day, today and proposed">`;
+  [[6, 'Grade 2'], [26, 'Grade 6: the high types'], [46, 'Grade 10'], [50, 'Lv 50']].forEach(([lv, n]) => (s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(lv)}" y2="${y(lv)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(lv) + 4}" text-anchor="end">Lv ${lv}</text><text class="ann" x="${W - pad.r + 8}" y="${y(lv) + 4}">${n}</text>`));
+  for (let d = 0; d <= 28; d += 4) s += `<text class="axis-text" x="${x(d)}" y="${H - 8}" text-anchor="middle">day ${d}</text>`;
+  [['Today (×1 until level 3, about day 11)', OLD, 'var(--neutral-strong)'], ['Proposed (×1.25 from day 1)', NEW, 'var(--accent)']].forEach(([n, pts, c]) => {
+    s += `<path d="${pts.map(([d, lv], i) => `${i ? 'L' : 'M'}${x(d)},${y(lv)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.4"/>`;
+    pts.slice(1).forEach(([d, lv]) => (s += `<circle class="mark" cx="${x(d)}" cy="${y(lv)}" r="4.5" fill="${c}" stroke="var(--panel)" stroke-width="2" data-t="${n}" data-d="Craft Lv ${lv} on day ${d}"></circle>`));
+  });
+  document.getElementById('cl-chart').innerHTML = s + '</svg>'; tips(document.getElementById('cl-chart'));
+  document.getElementById('cl-legend').innerHTML = '<span><span class="sw" style="background:var(--neutral-strong)"></span>Today: ×1 until level 3 (about day 11)</span><span><span class="sw" style="background:var(--accent)"></span>Proposed: every slot ×1.25 from day 1</span>';
+  document.getElementById('cl-table').innerHTML = `<table><tr><th>When</th><th class="num">Craft Lv</th><th class="num">Day, proposed</th><th class="num">Day, today</th></tr>${[['Grade 2', 1], ['Grade 6, the high types', 2], ['Grade 10', 3], ['Lv 50', 4]].map(([n, i]) => `<tr><td>${n}</td><td class="num">${NEW[i][1]}</td><td class="num">${NEW[i][0]}</td><td class="num">${OLD[i][0]}</td></tr>`).join('')}</table>`;
+})();
+</script>
 </body>
 </html>

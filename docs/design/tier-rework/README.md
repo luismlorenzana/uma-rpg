@@ -61,8 +61,9 @@ drafts are in git history.
 - **Professions** (PR1–PR4, PR7): ten professions, five **gathering** (Farming, Fishing, Mining, Wood Chopping,
   **Hunting**) and five **making** (Material Processing, Weapon Crafting, Armor Crafting, Accessory Crafting, Jewel
   Crafting). An Uma works one **trade**, her calling's gathering and making pair, on one Craft Level. Each profession
-  is a **yard** of **huts**, one Uma each: 4 · 6 · 8 by tier. Each gathering profession adds one material **pair** a
-  tier (a low and a high type).
+  is **one place** on the Wilds, an uma-art building that exists today, with **four work slots**: ten places and 40
+  slots in every tier. Each gathering profession adds one material **pair** a tier (a low and a high type), every
+  type an existing item icon: no new art (PR4–PR7, after the owner's review).
 - **Uma Templates** (U2–U4): ours, assigned **by rule** from master data (running style, distance, growth rates, read
   by stable id), never a hand-written list of real Umas. 90 templates; each gives a **Flourish** (her calling's root
   node), a **signature tip** from Tier 2 and **her moon** (two nodes).
@@ -92,9 +93,9 @@ Drawn in [progression.html](previews/progression.html); one Uma's page in [chara
 | **Her moon** | — | 2 nodes | 2 | 2 |
 | **Jewel kinds · items** | 3 · 100 Star Gems | 2 · 10 | 3 · 12 | 3 · 12 |
 | **Template** | — | Calling, Flourish, moon | + signature tip | Tip at both forks |
-| **Huts** | 33–55 slots in 11 facilities | 40 (4 a yard) | 60 | 80 |
+| **Work places · slots** | 11 facilities · 33–55 slots | 10 places, existing buildings · 40 (4 a place) | 10 · 40 | 10 · 40 |
 | **Pairs a gathering profession** | 8 families × 10 grades | 1 (2 types) | 2 | 3 |
-| **Where an Uma works** | Any of 11 | Her trade's 2 yards | + a secondary's gathering | Secondary reaches its Tier 2 pair |
+| **Where an Uma works** | Any of 11 | Her trade's 2 places | + a secondary's gathering | Secondary reaches its Tier 2 pair |
 | **One Uma maxed, refined** | 472 | 485 (493 with her moon) | 510 (518) | 520 (528) |
 | **Hours, Craft Lv 25 speed** | 776 | 822 (835) | 864 (878) | 881 (895) |
 
@@ -110,7 +111,7 @@ Drawn in [progression.html](previews/progression.html); one Uma's page in [chara
 | Armor Fittings | Armorer | 2 (grades 1–5), 3 (6–10) | 50 · 125 | 50 · 125 | 50 · 125 |
 | Accessory Setting | Charm Shop | 12 · 6 · 4 by slot count | 10 · 120 | 20 · 120 | 30 · 120 |
 | Planet and Moon Jewels (shared) | Lapidary | Planet 8, Moon 4, resized from Tier 2 | 25 · 120 | 27 · 120 | 29 · 120 |
-| Halo Jewel I–II | Lapidary | Moon recipe + one of each Tier 2 pair | — | 2 · 10 more | 4 · 20 more |
+| Halo Jewel I–II | Lapidary | Moon recipe + one of each pair of the kind's tier (Tier 3's second kind: Tier 3's pairs) | — | 2 · 10 more | 4 · 20 more |
 | **Shared total** | | | **115 · 485** | **129 · 510** | **143 · 520** |
 | Her moon: Moon Jewels II and IV | Lapidary | 4 | 2 · 8 | 2 · 8 | 2 · 8 |
 
@@ -138,7 +139,7 @@ One word, one meaning, in every doc and preview.
 | **Stone** | What Hunting gathers: Quartz, Garnet (Tier 1), Sapphire, Diamond (Tier 2), Starstone, Philosopher's Stone (Tier 3); refined, **Cut Quartz** and so on | A gem or a jewel |
 | **Raw · refined item** | Gathered · processed one for one at the Workbench (the job is "process") | "Processed item" |
 | **Profession · trade** | One of the ten · her calling's gathering and making pair | — |
-| **Yard · hut** | A profession's place on the Wilds · one Uma's building in it | A facility with levels |
+| **Place · slot** | A profession's one building on the Wilds · one Uma's work in it, shown as a pip | A facility with levels; a hut or a yard (retired with the owner's review) |
 | **Pair** | A gathering profession's low (grades 1–5) and high (6–10) type for one tier | — |
 | **Secondary** | From Tier 2, one other gathering profession's base pair | Today's "second profession" (Lore) |
 | **Trunk · fork · branch · tip · capstone · root** | Depths 1–2 · the depth-3 choice · A, B, C · depth 5 · depth 6 · her class plate | Side nodes, side points (retired) |
@@ -198,7 +199,7 @@ the owning doc wins unless that breaks an owner point (§7).
 | gear.md | Cross-referenced: §8's amounts are professions'; no GE call changed |
 | skill-trees.md | Cross-referenced: no SK call changed |
 | extra-stats.md | Cross-referenced: ES12 changed |
-| professions.md | Cross-referenced: PR1 changed; Tier 3's numbers corrected |
+| professions.md | Cross-referenced: PR1 changed; Tier 3's numbers corrected. **Revised after the owner's first review (2026-10-22):** PR3–PR7, PR10, PR14 changed (PR-R1) |
 | variance.md | Cross-referenced: no U call changed |
 | Cross-reference | **Done, 2026-10-22.** Next: the owner's review (§10) |
 
@@ -225,6 +226,7 @@ row in a category doc says "Changed in cross-reference".
 | **XR14** | **"Tier 2 classes"** in variance.md and its preview | **Specializations:** the same six classes; her Flourish works in either specialization of her calling | CL11 |
 | **XR15** | **Tier 2's toolbox term** (Z4) was priced on advanced classes, weapon arts, sets and the outer ring | **One term, as Z4 says, with the rework's tools:** the specializations, forms, the Orb's return, branch C and the Break tips, the Halo, Valor; Tier 2's simulation prices it (v17) | Keeps D170's restart-and-scale; only the tools change |
 | **XR16** | **Gear Marks, Manuals, the Rift's gear EXP** | **Gear Marks become Class Marks one for one (GE15); gear Manuals go; the Rift's echoes pay Class EXP only** (gear §11) | Nothing earned is lost; nothing feeds a retired bar |
+| **PR-R1** | **The owner's review of Professions (2026-10-22):** "way too much for how many structures to keep track of" (10 yards of 4 · 6 · 8 one-Uma huts: 40 · 60 · 80), and "fully reuse" the farm's and the Wilds' art | **One existing building per profession, four work slots inside** (professions §0, option A of three): 10 places and 40 slots in every tier; each place an uma-art building (`mine`, `forest`, `fields`, `fishery`, `monster-den`, `workbench`, `forge`, `lancers-barracks` for the Armorer, `arcane-armory` for the Charm Shop, `lapidary`), each material an item icon that exists (Fishing's high type is Ammonite, not a new Pearl). Tiers add a material pair, never a building or slot. No kit change, no new art. The demand doesn't move (485 · 510 · 520 refined, 493 · 518 · 528 with her moon); Tier 3's second Halo kind takes the Tier 3 pairs, which had no use. **Corrected:** today's roster is Forge-bound (a run of twenty, 24 days), the rework's about 17 | Ten structures instead of 40–80, one job a page, one row of pips; five lodges (B) save five places but put two jobs on a page. With the huts gone, the twenty materials are most of what's left to track, the same in every option |
 
 **Checked, no conflict:** the six classes' default weapons in every doc and preview (CL4); the revives on the
 Paladin's Lance and the Cleric's Light (SK6 needs CL4 to keep them, and it does); accessories 1 · 2 · 3 in classes,
@@ -426,24 +428,25 @@ Tier 1, the Skills tab.
 | ES15 | Names: the Planet, the moons, Planet, Moon and Halo Jewels; today's icons |
 | ES16 | Targets plan her class's bodies; "can upgrade" counts jewels she can set now |
 
-**5. Professions**: 15 calls, PR1–PR15. [professions.md](professions.md), previews: the Wilds map, the flow, demand.
+**5. Professions**: 15 calls, PR1–PR15. [professions.md](professions.md), previews: the Wilds map and the options,
+the flow, demand. Revised after the owner's first review (PR-R1): the rows marked ◆ changed.
 
 | Call | One line |
 |---|---|
 | PR1 ✱ | Her trade follows her calling's fight type; one rule (U4) |
 | PR2 | One trade an Uma: a gathering and a making profession, one Craft Level |
-| PR3 | Mine · Forge, Lumber Camp · Armorer, Fields · Workbench, Fishery · Charm Shop, Hunting Grounds · Lapidary |
-| PR4 | A building is a hut for one Uma: 4 · 6 · 8 a yard, no upgrades, ×1.25 |
-| PR5 | Ten yards in today's ten side spots, one row a trade |
-| PR6 | Huts drawn by a kit option and ten hut tiles |
-| PR7 | Two material types a gathering profession: low for grades 1–5, high for 6–10 |
+| PR3 ◆ | Mine · Forge, Forest · Armorer, Fields · Workbench, Fishery · Charm Shop, Monster Den · Lapidary |
+| PR4 ◆ | A profession is one existing building with four work slots: 40 in every tier, no upgrades, ×1.25 (option A of three) |
+| PR5 ◆ | Ten places in today's ten side spots, one row a trade, one row of pips |
+| PR6 ◆ | Reuse only: ten existing building frames, sixty existing item icons; no kit change, no new art |
+| PR7 ◆ | Two material types a gathering profession, low for grades 1–5, high for 6–10, all today's ids (Fishing's high: Ammonite) |
 | PR8 | One fixed recipe an item; each trade about a fifth of the work (gear adopts it) |
 | PR9 | Make time: one gather's time a refined item in the piece |
-| PR10 | Each tier: one more pair, two more huts, new pieces within a tenth more work |
+| PR10 ◆ | Each tier: one more pair and new pieces within a tenth more work; places and slots stay |
 | PR11 | A secondary gathering profession from Tier 2 |
 | PR12 | Today's second-profession proposal (Q13) replaced |
 | PR13 | The Exchange sells every type, by pair |
-| PR14 | Old saves: stock converted, work collected, upgrades refunded, Craft Level kept |
+| PR14 ◆ | Old saves: stock converted, work collected, upgrades refunded, Craft Level kept; six place ids kept, five removed, four new |
 | PR15 | A Trade filter in the Stable |
 
 **6. Variance**: 16 calls, U1–U16. [variance.md](variance.md), previews: the catalog, two front runners, her profile.

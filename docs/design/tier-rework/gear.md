@@ -268,7 +268,7 @@ amounts. Gear owns the products: what each is, what it raises and how many one U
 | Weapon Gem | 4 | 2 Copper Ingot, 2 Pine Plank | 2 Iron Ingot, 2 Oak Plank |
 | Fork gem | 4 + 5 | The Weapon Gem G5 recipe, plus one refined item of each of its tier's five pairs | — |
 | Armor Fittings | 2 low, 3 high | 1 Linen, 1 Shell Carving | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet |
-| Accessory Setting | 12 · 6 · 4 (by the tier's slot count) | 6 Linen, 6 Shell Carving (Tier 1) | 6 Cotton Cloth, 6 Polished Pearl (Tier 1) |
+| Accessory Setting | 12 · 6 · 4 (by the tier's slot count) | 6 Linen, 6 Shell Carving (Tier 1) | 6 Cotton Cloth, 6 Ammonite Carving (Tier 1) |
 
 - **One Tier 1 Uma:** 120 + 125 + 120 = **365 refined items** for gear (Tiers 2 and 3: 380, of which 15 are the tier's
   pairs), against **240** today. With Extra Stats' jewels (120) she is **485**, against today's **472**: gear grows,
