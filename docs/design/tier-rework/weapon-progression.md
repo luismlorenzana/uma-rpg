@@ -1,5 +1,7 @@
 # Weapon Progression: weapons, armor, accessories and what they cost, Tier 1 to Tier 3
 
+> **Approved by the owner, 2026-10-24 (D193): every call WP1–WP34 as written, with his notes applied (the refund reworked as tickets for time in the Profession review; accessories channel-neutral).** Changes from here are follow-ups logged against it.
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The second standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.2). It absorbs [gear.md](gear.md), which stays as
 > history, and adopts the research note's direction ([weapon-research.md](weapon-research.md), WR1–WR6). Calls are

@@ -319,7 +319,7 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 | Doc | State |
 |---|---|
 | **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20) |
-| **weapon-progression.md** | Authored 2026-10-24 (WP1–WP30). **Cross-checked:** WP12, WP13, WP25, WP26, WP27 changed, WP7 worded with CP12, **WP31 new** (the damage stack). **Revised after the owner's review 2026-10-24; for review (second).** WP32–WP34 new (the partner table, the signature accessory, accessory forms); WP1, WP6, WP7, WP9, WP11–WP13, WP18–WP23, WP25, WP27–WP31 changed; WP8, WP24, WP26 re-checked; armor kept (WP14–WP16) |
+| **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral) |
 | **extra-stats-progression.md** | Authored 2026-10-24 (EP1–EP22). **Cross-checked:** no call changed; its sheet, groups, Halo preset and save numbers aligned. **Follow-ups to the weapon review:** the Halo's preset wording and the offense column (XC19, XC20), no call changed. **For review, third** |
 | **profession-progression.md** | Authored 2026-10-24 (PP1–PP23). **Cross-checked:** no call changed; weapon-progression adopted its recipes, amounts and refund. **Follow-up to the weapon review:** wording only, no amount moved (XC21). **For review, fourth** |
 | weapon-research.md | Input (WR1–WR6), decided as WP1–WP12 |
