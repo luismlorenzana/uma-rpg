@@ -137,6 +137,7 @@
     --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
     --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
     --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+    --grp-ring: #c0622f; --grp-ld: #5b52c8;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -145,6 +146,7 @@
       --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
       --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
       --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+      --grp-ring: #e5824f; --grp-ld: #9a90f2;
     }
   }
   .grid2 > *, .multiples > * { min-width: 0; }
@@ -295,8 +297,11 @@
 
   <section id="world">
     <h2>The world: twins by biome</h2>
-    <p class="sub">Every biome's signatures and the twins they answer to in Tier 1 (a pair signature's two leads can differ), and how its
-      regulars lean in Tier 2: the share weak to an Arm (casters, skirmishers) against an element (strikers, guards).</p>
+    <p class="sub">Every biome's signatures and the twins they answer to in Tier 1 (a pair signature's two leads can differ), how its
+      regulars lean in Tier 2: the share weak to an Arm (casters, skirmishers) against an element (strikers, guards), and which Tier 2
+      focus it rewards (the owner's second pass): the share of its signatures that answer to the ring's twins (Ring) against the Light and
+      Dark twins. A Ring region suits the default party, a Light/Dark one the Light/Dark lean
+      (<a href="class-templates.html#focus">the party builder</a>).</p>
     <div class="panel"><h3>Twin sets across the 48 signatures</h3><div id="freq-chart"></div>
       <details><summary>Show the numbers</summary><div id="freq-table"></div></details></div>
     <div class="panel" style="margin-top:14px;overflow-x:auto"><table class="bt" id="biome-table"></table></div>
@@ -527,9 +532,13 @@ const FREQ = [...TWINS.map((t) => [t.id, t.el, t.c]), ['twilight', 'Twilight', '
 
 // ---- Biome table
 const ARMW = (roles) => roles.filter((r) => r === 'caster' || r === 'skirmisher').length / roles.length;
-document.getElementById('biome-table').innerHTML = `<thead><tr><th>Biome</th><th>Signatures → Tier 1 twins</th><th>Roles</th><th>Tier 2 regulars: Arm-weak · element-weak</th></tr></thead><tbody>${BIOMES.map((b) => { const a = ARMW(b.r);
+/** The share of a biome's signatures whose Tier 1 twins are the ring's (Fire, Ice, Lightning): which Tier 2 focus it rewards (§7.2, CP41). */
+const RINGW = (b) => b.s.reduce((t, sg) => t + sg.a.filter((x) => ['fire', 'ice', 'ltn'].includes(x)).length / sg.a.length, 0) / b.s.length;
+const leanOf = (r) => (r >= 0.66 ? 'Ring' : r <= 0.34 ? 'Light/Dark' : 'Even');
+document.getElementById('biome-table').innerHTML = `<thead><tr><th>Biome</th><th>Signatures → Tier 1 twins</th><th>Roles</th><th>Tier 2 regulars: Arm-weak · element-weak</th><th>Tier 2 focus it rewards: Ring · Light/Dark</th></tr></thead><tbody>${BIOMES.map((b) => { const a = ARMW(b.r), r = RINGW(b);
   return `<tr><td><b>${b.n}</b></td><td>${b.s.map((sg) => `<span class="sig"><span class="e">${sg.e.map((e) => EL[e]).join(' + ')} →</span>${[...new Set(sg.a)].map((t) => twinChips(t)).join('<span class="e">or</span>')}</span>`).join('')}</td><td>${b.r.join(', ')}</td>
-    <td><span style="display:inline-flex;align-items:center;gap:8px"><span class="lean"><i style="width:${a * 100}%;background:var(--arms)"></i><i style="width:${(1 - a) * 100}%;background:var(--tomes)"></i></span>${Math.round(a * 100)}% · ${Math.round((1 - a) * 100)}%</span></td></tr>`; }).join('')}</tbody>`;
+    <td><span style="display:inline-flex;align-items:center;gap:8px"><span class="lean"><i style="width:${a * 100}%;background:var(--arms)"></i><i style="width:${(1 - a) * 100}%;background:var(--tomes)"></i></span>${Math.round(a * 100)}% · ${Math.round((1 - a) * 100)}%</span></td>
+    <td><span style="display:inline-flex;align-items:center;gap:8px"><span class="lean"><i style="width:${r * 100}%;background:var(--grp-ring)"></i><i style="width:${(1 - r) * 100}%;background:var(--grp-ld)"></i></span><b>${leanOf(r)}</b> ${Math.round(r * 100)}%</span></td></tr>`; }).join('')}</tbody>`;
 bindKinds();
 
 // ---- Alternatives

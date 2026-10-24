@@ -137,6 +137,7 @@
     --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
     --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
     --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+    --grp-ring: #c0622f; --grp-ld: #5b52c8;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -145,6 +146,7 @@
       --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
       --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
       --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+      --grp-ring: #e5824f; --grp-ld: #9a90f2;
     }
   }
   .grid2 > *, .multiples > * { min-width: 0; }
@@ -223,6 +225,7 @@
   .wcard .cap { font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
   .wcard .ks { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
   .wcard .what { font-size: 12px; color: var(--ink-soft); }
+  .wcard .badge { align-self: flex-start; }
   .bbtn { display: flex; gap: 4px; flex-wrap: wrap; }
   .bbtn button { font: 600 11px system-ui, sans-serif; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink-soft); cursor: pointer; }
   .bbtn button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
@@ -239,41 +242,101 @@
   .opt b { color: var(--ink); font-size: 14px; } .opt .v { align-self: flex-start; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 5px; }
   .opt .v.yes { background: var(--c3); color: #fff; } .opt .v.no { background: var(--sunken); color: var(--ink-soft); }
   .opt.rec { outline: 2px solid var(--c3); }
-  @media (max-width: 1100px) { .tgrid { grid-template-columns: 1fr; } .tgrid .colhead { display: none; } .statsheet { grid-template-columns: repeat(4, 1fr); } .grow { grid-template-columns: 1fr 1fr; } .opts { grid-template-columns: 1fr 1fr; } }
+  .gtag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: var(--gc); border: 1.5px solid var(--gc); border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+  .gtag::before, .gdot { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gc); display: inline-block; flex: none; }
+  .k.boost { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
+  .revset { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: 11px; color: var(--ink-soft); margin-top: 4px; }
+  .revset .k { font-size: 10.5px; padding: 0 5px; }
+  .gcard { border-top: 4px solid var(--gc); display: flex; flex-direction: column; gap: 8px; }
+  .grow2 { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .grow2 .lab { font-size: 10.5px; font-weight: 800; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; width: 52px; }
+  .fcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .fcard { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); border-left: 5px solid var(--cc); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .fcard .fh { display: flex; align-items: center; gap: 8px; } .fcard .fh b { font-size: 15px; } .fcard .fh .muted { font-size: 12px; }
+  .fb { border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: color-mix(in srgb, var(--gc) 6%, var(--panel)); }
+  .fbh { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .fbn { font-size: 10.5px; font-weight: 800; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .fset { display: flex; gap: 8px; flex-wrap: wrap; padding: 2px; }
+  .pbwrap { display: flex; flex-direction: column; gap: 10px; }
+  #pb-members { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+  .pbm { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+  .pbn { width: 96px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+  .pbm button { font: 600 12px system-ui, sans-serif; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pbm button::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gc); }
+  .pbm button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pbt { margin-top: 8px; } .pbt td.c { vertical-align: top; min-width: 40px; padding: 4px; background: var(--raised); }
+  .pip { display: inline-block; font-size: 10px; font-weight: 800; border-radius: 5px; padding: 0 4px; margin: 1px 0; border: 1.5px solid var(--cc); color: var(--cc); }
+  .pip.on { background: var(--cc); color: var(--on-k); }
+  .pbsum { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; margin-top: 8px; }
+  .okc { color: var(--c3); } .noc { color: var(--h0t); }
+  .bz { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 5px; border: 1.5px solid var(--kc); font-size: 11.5px; font-weight: 700; }
+  .pmx td.mcell { padding: 3px; } .quad { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; min-width: 150px; }
+  .pmx th { font-size: 12px; }
+  .q { font: 700 11.5px system-ui, sans-serif; border: 0; border-radius: 5px; padding: 4px 6px; cursor: pointer; }
+  .q.cur { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .q:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  @media (max-width: 1100px) { .tgrid { grid-template-columns: 1fr; } .tgrid .colhead { display: none; } .statsheet { grid-template-columns: repeat(4, 1fr); } .grow { grid-template-columns: 1fr 1fr; } .opts { grid-template-columns: 1fr 1fr; } .fcards { grid-template-columns: 1fr 1fr; } #pb-members { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <main>
   <h1>Class templates, weapons and stats</h1>
   <p class="lead">Every class's template sheet at Tier 1, 2 and 3: its three weapon slots, five armor pieces and one to three
-    accessories, drawn with the standard preset in them. Then which weapons fit which slot, what a class switch costs, and each
-    class's Lv 50 sheet under the stat budget rule (SB1). Revised after the owner's review (2026-10-24): the owner's defaults, what grows
-    on her three weapons tier by tier (Prism dropped), and her template's affinity. From <a href="../class-progression.md">class-progression.md</a> §3, §5, §6.9, §9.
+    accessory slots, drawn with the standard preset in them. Then <b>Tier 2's weapon-group focus</b>: every class's default and reverse
+    sets and the party pairings (the owner's second pass); what grows on her three weapons (redrawn to the research note: Pure or Dual of
+    its own channel, one Dual an Uma); which weapons fit which slot, what a class switch costs, her template's affinity, and each class's
+    Lv 50 sheet under the stat budget rule (SB1). Revised after the owner's review and his second pass (2026-10-24). From
+    <a href="../class-progression.md">class-progression.md</a> §3, §5, §6.9, §7.2, §9.
     The other pages: <a href="class-overview.html">overview</a> · <a href="class-trees.html">tree viewer</a> ·
     <a href="class-weaknesses.html">foe weaknesses</a>.</p>
-  <nav class="top"><a href="#sheets">Template sheets</a><a href="#grows">What grows on her weapons</a><a href="#matrix">Equippable weapons</a><a href="#switch">Switch cost</a><a href="#affinity">Template affinity</a><a href="#stats">Lv 50 stats (SB1)</a></nav>
+  <nav class="top"><a href="#sheets">Template sheets</a><a href="#focus">Tier 2 focus and pairings</a><a href="#grows">What grows on her weapons</a><a href="#matrix">Equippable weapons</a><a href="#switch">Switch cost</a><a href="#affinity">Template affinity</a><a href="#stats">Lv 50 stats (SB1)</a></nav>
   <div class="kpis" id="kpis"></div>
 
   <section id="sheets">
     <h2>The template sheet, per class and tier</h2>
-    <p class="sub">Rows are classes, columns tiers. Weapon slots show their channel and the preset's weapon; armor shows the half
-      each piece wears (from Tier 2 the four classes between mix per piece: the split tiles); accessories grow 1 · 2 · 3. Dashed
-      is new that tier. Hover any slot.</p>
+    <p class="sub">Rows are classes, columns tiers. Weapon slots show their channel and the preset's weapon (from Tier 2, branch 1's set;
+      branch 2's reverse set below it); armor shows the half each piece wears (from Tier 2 the four classes between mix per piece: the
+      split tiles); <b>accessory slots grow 1 · 2 · 3, damage-oriented</b>: the owner is redesigning them in weapon-progression.md, so
+      the slots are drawn, not filled. Dashed is new that tier. Hover any slot.</p>
     <div class="pills" id="cls-pills"></div>
     <div class="tgrid" id="tgrid"></div>
+  </section>
+
+  <section id="focus">
+    <h2>Tier 2: the class branch is a weapon-group focus</h2>
+    <p class="sub">The owner's second pass (2026-10-24): "I still don't like the class specializations in later tiers, feels like almost
+      nothing changes." His model: the Brawler's branch 1 adds damage on her main Arms, branch 2 only on the secondary ones; the Mage the same
+      with her Tomes; reverse options for every other class, "so in my party comps I would bring one party with an Elemental Mage and a regular
+      Summoner, but in another party a Light/Dark Mage and an Elemental Summoner." Each branch is now a <b>focus</b>: <b>+15% damage</b> on its
+      group's kinds, its own <b>set</b> of three weapons (one tap; free at Ascend), and three class skills. From
+      <a href="../class-progression.md#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41">§7.2</a> (CP38–CP41).</p>
+    <div class="grid2" id="fc-groups"></div>
+    <h3 style="margin-top:18px">Every class's two branches</h3>
+    <p class="muted" style="font-size:12px;margin-bottom:8px">Branch 1 is her default group (the owner's defaults, none changed); branch 2 the reverse. A gold ring marks a weapon the focus boosts; the other is off-focus, kept for a reason (reach, the party's only Katana, a healer's revive or Aegis).</p>
+    <div class="fcards" id="fc-cards"></div>
+    <div class="panel" style="margin-top:16px"><div class="head-row"><h3>Build a party</h3><div class="pills" id="pb-presets" style="margin:0"></div></div>
+        <p class="muted" style="font-size:12px;margin:4px 0 8px">Pick each member's branch and the healer, or a party the doc draws. Cells: who holds each kind (filled: boosted by her focus).</p>
+        <div class="pbwrap"><div id="pb-members"></div><div id="pb-out" style="overflow-x:auto"></div></div></div>
+    <div>
+      <div class="panel" style="margin-top:14px"><h3>The pairing table</h3>
+        <p class="muted" style="font-size:12px;margin:4px 0 8px">Kinds held, of ten, for every mix of the two pairs' branches, with each healer (G Guardian, T Templar, B Bishop, O Oracle). Click a cell to load it.</p>
+        <div id="pb-matrix" style="overflow-x:auto"></div>
+        <div class="chart-legend" style="margin-top:8px"><span class="scale"><i class="h0"></i>6–8<i class="h1"></i>9<i class="h4"></i>10 kinds</span></div>
+        <p class="foot">5 of 16 pair states hold all ten with any healer, 4 more with the right one. Counts are on one kind a weapon (a Dual's second kind not counted).</p></div>
+    </div>
+    <details><summary>Show the numbers</summary><div id="fc-table"></div></details>
   </section>
 
   <section id="grows">
     <h2>What grows on her three weapons, tier by tier</h2>
     <p class="sub">The owner (2026-10-24): "do the DPS classes unlock specialized hits on the 3 weapons, or more weapon damage types in later
-      tiers?" Both, each with one home: <b>kinds grow on the weapon</b> (a Dual branch, two kinds at most), <b>specialized hits grow in the
-      trees</b> and in the Specialized branch, and flat offense in the Orb and the Halo. Pick a class; in Tier 2 click a weapon's branch, and
-      Tier 3 deepens the one she chose. From <a href="../class-progression.md#35-what-grows-on-her-three-weapons-tier-by-tier-cp33">§3.5</a>.</p>
-    <div class="callout" style="margin:0 0 14px"><b>Owner, 2026-10-24: Prism dropped; designed in weapon-progression.md.</b>Three kinds on one weapon "could
-      trivialize the weakness concept". From Tier 2 each weapon takes one branch at G5: <strong>Specialized</strong> (more damage on its own kind),
-      <strong>Dual</strong> (one more kind, coverage only, never more than two) or <strong>a third branch</strong> still to be designed; Tier 3 deepens the
-      chosen branch and never stacks kinds. The first round's forms (Dual or Pure; Prism, Tempered or Keen) are history:
-      <a href="../gear.md#41-weapons-the-first-fork">gear.md §4.1, §5.1</a>, <a href="gear-weapon-tree.html">the first-round weapon tree</a>.</div>
+      tiers?" Both, each with one home: <b>kinds grow on the weapon</b> (a Dual of its own channel, two kinds at most), <b>how hard a weak hit
+      lands grows on the weapon too</b> (Pure, then Keen), <b>specialized hits grow in the trees</b>, and a percentage on a group in her class
+      branch's focus. Pick a class; in Tier 2 click a weapon's branch (one Dual in her slots), in Tier 3 deepen it (two two-kind weapons, the
+      Brawler and the Mage one). From <a href="../class-progression.md#35-what-grows-on-her-three-weapons-tier-by-tier-cp33">§3.5</a>.</p>
+    <div class="callout" style="margin:0 0 14px"><b>Redrawn to the research note (second pass).</b>Its two flags on this page and §3.5: a Brawler drawn
+      with all five Arms in Tier 2 and cross-channel Duals (a Katana + Dark Tome). Now, as <a href="../weapon-research.md">WR2–WR5</a> recommend
+      (weapon-progression.md decides): at G5 <strong>Pure</strong> (weak ×1.5) or <strong>Dual</strong> (a second kind <strong>of its own channel</strong>), no third
+      branch; <strong>one Dual in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good</strong>; Tier 3 deepens Pure to Keen (×1.7) or
+      Tempered, Dual to Tempered. Prism stays dropped (owner, 2026-10-24).</div>
     <div class="pills" id="gr-pills"></div>
     <div class="grows" id="grows-rows"></div>
     <div class="panel" style="margin-top:14px"><details><summary>Show the numbers</summary><div id="gr-table"></div></details></div>
@@ -284,7 +347,7 @@
       <div class="toggle" role="group" aria-label="Tier"><button data-t="1" aria-pressed="true">Tier 1</button><button data-t="2" aria-pressed="false">Tier 2</button><button data-t="3" aria-pressed="false">Tier 3</button></div></div>
     <p class="sub">Each row is one slot of one class; each column a kind. A filled cell is the default (the number is the slot), a
       tinted cell fits. Any three different kinds of the slots' channels fit, in every tier. From Tier 2 a weapon's Dual branch may add
-      a kind: the last column says which second kinds count for that class (GE7; the branches are weapon-progression.md's).</p>
+      a kind: the last column says which (always of the weapon's own channel, WR3) and how many two-kind weapons her slots hold (WR4).</p>
     <div class="panel" style="overflow-x:auto"><table class="mx" id="mx"></table>
       <details><summary>Show the numbers</summary><div id="mx-table"></div></details></div>
   </section>
@@ -308,7 +371,9 @@
     <p class="sub">The owner asked for a proposal that "won't explode across the 3 tiers", maybe "% damage bonuses for specific weapon types".
       The call (CP36): each Uma Template names one <b>twin set</b>, an Arm and its element, and she deals <b>+6% damage with those two
       kinds</b>, every tier, in any class. From Tier 2 her ★ signature tip sits on her affinity kind's tree; the Flourish stays at the root.
-      Which set a template names is the Uma Templates pass's (draft: her stride's pair). From <a href="../class-progression.md#69-her-template-on-the-trees-affinity-cp36">§6.9</a>.</p>
+      Which set a template names is the Uma Templates pass's (draft: her stride's pair). From <a href="../class-progression.md#69-her-template-on-the-trees-affinity-cp36">§6.9</a>.
+      <b>Second pass: kept as it is</b>; the owner finds Uma uniqueness "still pretty weak, but let's not overcomplicate until we see Uma uniqueness
+      on all other classes", so the Uma Templates pass revisits it.</p>
     <div class="opts" id="af-opts"></div>
     <div class="grid2" style="margin-top:14px">
       <div class="panel"><h3>Kinds one weapon can carry</h3><p class="muted" style="font-size:12px">A template that adds a kind stacks on the Dual branch; with the first round's Prism it reached four. The owner's line: two.</p>
@@ -326,7 +391,9 @@
       <div class="toggle" role="group" aria-label="Points or share"><button id="v-pts" aria-pressed="true">Points</button><button id="v-pct" aria-pressed="false">Share</button></div></div>
     <p class="sub">The simulation's average Uma, fully built, at each tier's Lv 50, with every flat build value × 1, × 1.8, × 2.6
       (README §2.5). Level and lean are hers; gear, Extra Stats and her template are the build. Offense is on her lead kind:
-      Might, and from Tier 2 the Orb and the Halo.</p>
+      Might, and from Tier 2 an accessory and the Halo. The accessory value is a placeholder (the first round's Orb) until
+      weapon-progression.md sets the redesigned, damage-oriented accessories; the focus (+15%) and the affinity (+6%) are percentages
+      on damage, outside this sheet.</p>
     <div class="pills" id="st-pills"></div>
     <div class="statsheet" id="statsheet"></div>
     <div class="panel" style="margin-top:14px"><div class="chart-legend" id="st-legend"></div><div id="st-chart"></div>
@@ -368,7 +435,7 @@ const C = Object.fromEntries(CLASSES.map((c) => [c.id, c]));
 /** The channels of a class's three slots, the lead channel first. */
 const slotsOf = (c) => (c.arms >= 2 ? ['a', 'a', 'a'].map((x, i) => (i < c.arms ? 'a' : 't')) : ['t', 't', 't'].map((x, i) => (i < 3 - c.arms ? 't' : 'a')));
 const kchip = (id, o = {}) => { const k = K[id]; const t = TW[k.twin];
-  return `<span class="k ${k.ch === 'a' ? 'arm' : 'tome'}${k.twin === 'ltn' && k.ch === 't' ? ' ltn' : ''}${o.dim ? ' dim' : ''}" style="--kc:${t.c}" data-kind="${id}">${o.long ? k.weapon : k.kind}</span>`; };
+  return `<span class="k ${k.ch === 'a' ? 'arm' : 'tome'}${k.twin === 'ltn' && k.ch === 't' ? ' ltn' : ''}${o.dim ? ' dim' : ''}${o.boost ? ' boost' : ''}" style="--kc:${t.c}" data-kind="${id}">${o.long ? k.weapon : k.kind}</span>`; };
 const chan = (ch) => ch === 'a' ? '<span class="ch a">Arms</span>' : '<span class="ch t">Tome</span>';
 /** Who in a list of class ids answers a twin set (holds its Arm or its Tome), on defaults. */
 const answersTwin = (members, twin) => members.filter((m) => C[m].def.includes(TW[twin].arm) || C[m].def.includes(TW[twin].tome));
@@ -393,33 +460,42 @@ function bindKinds(root = document) {
 const SB1 = {"brawler":{"1":{"hp":[932,140,100,105,150,0,0,0,0,1427],"mp":[166,-34,20,21,0,0,0,0,0,173],"atk":[105,11,25,21,30,8,0,0,0,200],"matk":[105,-10,0,21,0,0,0,0,0,116],"pdef":[105,11,20,21,30,0,0,0,0,187],"mdef":[101,-10,20,21,30,0,0,0,0,162],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,237,180,189,270,0,0,0,0,2173],"mp":[278,-56,36,38,0,0,0,0,0,263],"atk":[187,19,45,38,54,14,0,0,0,290],"matk":[187,-19,0,38,0,0,0,0,0,189],"pdef":[187,19,36,38,54,0,0,0,0,277],"mdef":[180,-18,36,38,54,0,0,0,0,233],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,336,260,273,390,0,0,0,0,2928],"mp":[391,-79,52,55,0,0,0,0,0,353],"atk":[270,27,65,55,78,21,0,0,0,381],"matk":[270,-27,0,55,0,0,0,0,0,264],"pdef":[270,27,52,55,78,0,0,0,0,368],"mdef":[259,-26,52,55,78,0,0,0,0,304],"offense":[270,27,65,55,78,21,177,88,88,517]}},"mage":{"1":{"hp":[932,-93,100,105,150,0,0,0,0,1194],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,-10,0,21,0,0,0,0,0,116],"matk":[105,16,25,21,30,8,0,0,0,205],"pdef":[105,-10,20,21,30,0,0,0,0,166],"mdef":[101,10,20,21,30,0,0,0,0,182],"offense":[105,16,25,21,30,8,68,0,0,273]},"2":{"hp":[1581,-158,180,189,270,0,0,0,0,1778],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,-19,0,38,0,0,0,0,0,189],"matk":[187,28,45,38,54,14,0,0,0,299],"pdef":[187,-19,36,38,54,0,0,0,0,239],"mdef":[180,17,36,38,54,0,0,0,0,268],"offense":[187,28,45,38,54,14,122,61,61,435]},"3":{"hp":[2237,-224,260,273,390,0,0,0,0,2368],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,-27,0,55,0,0,0,0,0,264],"matk":[270,41,65,55,78,21,0,0,0,395],"pdef":[270,-27,52,55,78,0,0,0,0,314],"mdef":[259,25,52,55,78,0,0,0,0,355],"offense":[270,41,65,55,78,21,177,88,88,531]}},"spellblade":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,0,20,21,0,0,0,0,0,207],"atk":[105,11,25,21,30,8,0,0,0,200],"matk":[105,-5,0,21,30,0,0,0,0,151],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,0,36,38,0,0,0,0,0,319],"atk":[187,19,45,38,54,14,0,0,0,290],"matk":[187,-9,0,38,54,0,0,0,0,229],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,0,52,55,0,0,0,0,0,432],"atk":[270,27,65,55,78,21,0,0,0,381],"matk":[270,-13,0,55,78,0,0,0,0,308],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,27,65,55,78,21,177,88,88,517]}},"summoner":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,0,20,21,0,0,0,0,0,207],"atk":[105,-5,0,21,30,0,0,0,0,151],"matk":[105,11,25,21,30,8,0,0,0,200],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,0,36,38,0,0,0,0,0,319],"atk":[187,-9,0,38,54,0,0,0,0,229],"matk":[187,19,45,38,54,14,0,0,0,290],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,0,52,55,0,0,0,0,0,432],"atk":[270,-13,0,55,78,0,0,0,0,308],"matk":[270,27,65,55,78,21,0,0,0,381],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,27,65,55,78,21,177,88,88,517]}},"paladin":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,0,25,21,30,8,0,0,0,189],"matk":[105,-21,0,21,30,0,0,0,0,135],"pdef":[105,16,20,21,30,0,0,0,0,192],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,0,25,21,30,8,68,0,0,257]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,0,45,38,54,14,0,0,0,271],"matk":[187,-37,0,38,54,0,0,0,0,201],"pdef":[187,28,36,38,54,0,0,0,0,286],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,0,45,38,54,14,122,61,61,407]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,0,65,55,78,21,0,0,0,354],"matk":[270,-54,0,55,78,0,0,0,0,267],"pdef":[270,41,52,55,78,0,0,0,0,382],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,0,65,55,78,21,177,88,88,490]}},"cleric":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,-21,0,21,30,0,0,0,0,135],"matk":[105,0,25,21,30,8,0,0,0,189],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,15,20,21,30,0,0,0,0,187],"offense":[105,0,25,21,30,8,68,0,0,257]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,-37,0,38,54,0,0,0,0,201],"matk":[187,0,45,38,54,14,0,0,0,271],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,26,36,38,54,0,0,0,0,277],"offense":[187,0,45,38,54,14,122,61,61,407]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,-54,0,55,78,0,0,0,0,267],"matk":[270,0,65,55,78,21,0,0,0,354],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,38,52,55,78,0,0,0,0,368],"offense":[270,0,65,55,78,21,177,88,88,490]}}};
 document.getElementById('kpis').innerHTML = [
   ['Weapon slots a class', '5', '3', 'in every tier'], ['Armor halves to choose, Tier 1', '32 suits', '0', 'her class\'s half'],
-  ['Accessory slots', '2', '1 · 2 · 3', 'Support; + Orb; + Support'], ['Loadouts a class can wear, Tier 1', '320,000', '500', 'Brawler and Mage 100'],
+  ['Accessory slots', '2', '1 · 2 · 3', 'damage-oriented (weapon-progression.md)'], ['Tier 2 sets a class', '—', '2', 'default and reverse: +15% focus'],
   ['A class switch costs', 'ranks', '0–30 gems', 'only unraised weapons'], ['Build values by tier', 'flat', '×1 · 1.8 · 2.6', 'SB1'],
 ].map(([l, w, n, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value"><span class="was">${w} →</span> ${n}</div><div class="delta">${d}</div></div>`).join('');
 
 // ---- Template sheets
-const SUP = { brawler: ['Vampire Talisman', 'Iron Talisman'], mage: ['Siphon Amulet', 'Veil Amulet'], spellblade: ['Vampire Talisman', 'Bulwark Talisman'],
-  summoner: ['Siphon Amulet', 'Spring Amulet'], paladin: ['Thorn Talisman', 'Iron Talisman'], cleric: ['Spring Amulet', 'Ward Amulet'] };
-const SPEC = { brawler: ['Warlord', 'Berserker', 'Speed ≥ Stamina'], mage: ['Sage', 'Sorcerer', 'Wit ≥ Speed'], spellblade: ['Blademaster', 'Rune Knight', 'Power ≥ Wit'],
-  summoner: ['Conjurer', 'Warlock', 'Power ≥ Wit'], paladin: ['Templar', 'Guardian', 'Speed ≥ Stamina'], cleric: ['Bishop', 'Oracle', 'Speed ≥ Wit'] };
-const CAPS = { brawler: ['Warlord\'s Reckoning', 'Unbound Fury'], mage: ['Total Convergence', 'Annihilation'], spellblade: ['Thousand Cuts', 'Rune Deluge'],
-  summoner: ['Host of Farewells', 'Final Pact'], paladin: ['Dawnshield', 'Steadfast Vow'], cleric: ['Mercy Chorus', 'Revelation'] };
+// Tier 2's class branches (§7.2, CP38–CP40): the two weapon groups, and each class's branch 1 (default) and branch 2 (reverse).
+const GROUPS = {
+  ring: { name: 'Ring', kinds: ['greatsword', 'axe', 'lance', 'tome-fire', 'tome-ice', 'tome-lightning'], c: 'var(--grp-ring)', words: 'The owner\'s main Arms and elemental Tomes: the Fire, Ice and Lightning twins', sigs: '31.5 of the world\'s 48 signatures (66%)' },
+  ld: { name: 'Light/Dark', kinds: ['bow', 'katana', 'tome-light', 'tome-dark'], c: 'var(--grp-ld)', words: 'The owner\'s secondary Arms and Light/Dark Tomes: the Light and Dark twins (and Twilight)', sigs: '16.5 of 48 (34%)' },
+};
+const grpOf = (kind) => (GROUPS.ring.kinds.includes(kind) ? 'ring' : 'ld');
+const BR2 = {
+  brawler: [{ n: 'Berserker', g: 'ring', set: ['greatsword', 'axe', 'lance'], cap: 'Unbound Fury', flip: 'Weight and reach: a heavy blow, every foe, random thrusts' }, { n: 'Warlord', g: 'ld', set: ['bow', 'katana', 'axe'], cap: 'Warlord\'s Reckoning', flip: 'Precision: many arrows, the Katana\'s payoff on a Broken foe; the Axe kept for reach' }],
+  mage: [{ n: 'Sage', g: 'ring', set: ['tome-fire', 'tome-ice', 'tome-lightning'], cap: 'Total Convergence', flip: 'The ring\'s rotation: a nuke, every foe, random bolts' }, { n: 'Sorcerer', g: 'ld', set: ['tome-light', 'tome-dark', 'tome-ice'], cap: 'Annihilation', flip: 'Single-target finishers; the Blizzard kept for reach' }],
+  spellblade: [{ n: 'Rune Knight', g: 'ring', set: ['katana', 'lance', 'tome-lightning'], cap: 'Rune Deluge', flip: 'Lance and Thunder: both halves weak on Fire foes; the Katana the party\'s only one' }, { n: 'Blademaster', g: 'ld', set: ['katana', 'bow', 'tome-dark'], cap: 'Eclipse Cut', flip: 'Katana and Dark: both halves weak on Light foes; cuts through shields' }],
+  summoner: [{ n: 'Warlock', g: 'ld', set: ['tome-dark', 'tome-light', 'bow'], cap: 'Final Pact', flip: 'Light and Dark summons, curses; Bow and Light her twin pair' }, { n: 'Conjurer', g: 'ring', set: ['tome-fire', 'tome-lightning', 'greatsword'], cap: 'Host of Farewells', flip: 'Elemental summons, bigger farewells; Fire and Greatsword her twin pair' }],
+  paladin: [{ n: 'Guardian', g: 'ring', set: ['greatsword', 'axe', 'tome-light'], cap: 'Steadfast Vow', flip: 'Armor Break, Enfeeble, Aegis; the Light Tome her revive' }, { n: 'Templar', g: 'ld', set: ['bow', 'katana', 'tome-light'], cap: 'Dawnshield', flip: 'Shatter, Hex (a foe weak to Light and Dark), Faith' }],
+  cleric: [{ n: 'Bishop', g: 'ld', set: ['tome-light', 'tome-ice', 'bow'], cap: 'Mercy Chorus', flip: 'Regen, Rebirth, Shatter; the Blizzard her Aegis' }, { n: 'Oracle', g: 'ring', set: ['tome-light', 'tome-fire', 'greatsword'], cap: 'Revelation', flip: 'Brave, Armor Break, Breaker; the Light Tome her Rebirth' }],
+};
+const SPEC = Object.fromEntries(Object.entries(BR2).map(([k, v]) => [k, [v[0].n, v[1].n]]));
+const CAPS = Object.fromEntries(Object.entries(BR2).map(([k, v]) => [k, [v[0].cap, v[1].cap]]));
 const MAST = { brawler: 'Unstoppable', mage: 'Resonance', spellblade: 'Spellbind', summoner: 'Menagerie', paladin: 'Last Stand', cleric: 'Overflow' };
 const PIECES = [['Head', 'DEF'], ['Body', 'HP'], ['Legs', 'MP'], ['Arms', 'M.DEF'], ['Feet', 'Speed (evasion)']];
 const TIERC = ['var(--t1)', 'var(--t2)', 'var(--t3)'];
 let showCls = 'all';
 function sheet(c, t) {
-  const s = slotsOf(c), half = c.arms >= 2 ? 'p' : 'm', mix = t > 1 && c.id !== 'brawler' && c.id !== 'mage';
-  const w = s.map((ch, i) => `<div class="slot w" data-t="${c.name} · weapon slot ${i + 1} (${ch === 'a' ? 'Arms' : 'Tome'})" data-d="Holds any ${ch === 'a' ? 'Arm' : 'Tome'}, a different kind from her other two. Preset: ${K[c.def[i]].weapon}.${t === 2 ? ' At G5 the weapon takes a branch: Specialized, Dual (two kinds at most) or a third to design; the slot keeps its channel.' : t === 3 ? ' Her weapon\'s branch deepens; never more than two kinds.' : ''}"><span class="cap">${ch === 'a' ? 'Arms' : 'Tome'} · ${i + 1}</span>${kchip(c.def[i], { long: true })}</div>`).join('');
+  const s = slotsOf(c), half = c.arms >= 2 ? 'p' : 'm', mix = t > 1 && c.id !== 'brawler' && c.id !== 'mage', B = BR2[c.id];
+  const w = s.map((ch, i) => `<div class="slot w" data-t="${c.name} · weapon slot ${i + 1} (${ch === 'a' ? 'Arms' : 'Tome'})" data-d="Holds any ${ch === 'a' ? 'Arm' : 'Tome'}, a different kind from her other two. Preset: ${K[c.def[i]].weapon}${t > 1 ? ` (branch 1, ${B[0].n}); branch 2's set puts ${K[B[1].set[i]].weapon} here` : ''}.${t === 2 ? ' At G5 the weapon becomes Pure (weak ×1.5) or Dual (a second kind of its own channel); one Dual in her slots.' : t === 3 ? ` Pure deepens to Keen or Tempered, Dual to Tempered; ${c.id === 'brawler' || c.id === 'mage' ? 'one two-kind weapon for good' : 'two two-kind weapons'}; never three kinds.` : ''}"><span class="cap">${ch === 'a' ? 'Arms' : 'Tome'} · ${i + 1}</span>${kchip(c.def[i], { long: true })}</div>`).join('');
+  const rev = t > 1 ? `<div class="revset"><span class="gdot" style="--gc:${GROUPS[B[1].g].c}"></span>Branch 2's set: ${B[1].set.map((k) => kchip(k)).join('')}</div>` : '';
   const a = PIECES.map(([p, st]) => `<div class="ap ${mix ? 'x' : half}" data-t="${c.name} · ${p}" data-d="${mix ? 'Physical or magical, per piece (the preset dresses her class\'s half)' : half === 'p' ? 'Physical: +ATK' : 'Magical: +M.ATK'}, and +${st} by grade. The slot holds the grade, so changing half never loses one.">${p}<small>${mix ? 'P / M' : half === 'p' ? 'Phys' : 'Mag'}</small></div>`).join('');
-  const acc = [`<div class="slot" data-t="Support" data-d="One of 5 Talismans or 5 Amulets, swapped freely; the slot holds the grade. Preset: ${SUP[c.id][0]}."><span class="cap">Support</span><span style="font-size:12px;font-weight:600">${SUP[c.id][0]}</span></div>`];
-  if (t >= 2) acc.push(`<div class="slot${t === 2 ? ' new' : ''}" data-t="Damage (an Orb)" data-d="An Orb of any of the ten kinds: offense on her hits of that kind (half a weapon's Might at its grade, × the tier under SB1). Preset: the kind of her first slot, ${K[c.def[0]].weapon}."><span class="cap">Damage</span><span style="font-size:12px;font-weight:600">${K[c.def[0]].kind} Orb</span></div>`);
-  if (t >= 3) acc.push(`<div class="slot new" data-t="Second Support" data-d="A different Talisman or Amulet from the first. Preset: ${SUP[c.id][1]}."><span class="cap">Support 2</span><span style="font-size:12px;font-weight:600">${SUP[c.id][1]}</span></div>`);
-  const choice = t === 1 ? `Class: <b>${c.name}</b>, no further choice` : t === 2 ? `Class branch: <b>${SPEC[c.id][0]}</b> or <b>${SPEC[c.id][1]}</b>, a passive + 3 class skills <span class="muted">(Ascend preselects ${SPEC[c.id][0]} if ${SPEC[c.id][2]})</span>` : `${SPEC[c.id][0]} or ${SPEC[c.id][1]}, + capstone (${CAPS[c.id][0]} · ${CAPS[c.id][1]}) and <b>${MAST[c.id]}</b>`;
+  const acc = [1, 2, 3].slice(0, t).map((n) => `<div class="slot${n === t && t > 1 ? ' new' : ''}" data-t="Accessory slot ${n}" data-d="Damage-oriented: the owner is redesigning accessories in weapon-progression.md (elemental and physical damage, multi-element ones early in Tier 1, a set that adds a follow-up hit on basic Attacks); the defensive and MP-regen ones go. The slot holds the grade. Preset: weapon-progression.md's accessory for ${n === 1 ? `her first slot's kind (${K[c.def[0]].weapon})` : 'her set, her first slot\'s kind first'}."><span class="cap">Accessory ${n}</span><span style="font-size:11.5px;font-weight:600;color:var(--ink-soft)">damage</span></div>`);
+  const choice = t === 1 ? `Class: <b>${c.name}</b>, no further choice` : t === 2 ? `Class branch: <b>${B[0].n}</b> (${GROUPS[B[0].g].name}, preselected) or <b>${B[1].n}</b> (${GROUPS[B[1].g].name}): focus +15%, her set, 3 class skills` : `${B[0].n} or ${B[1].n}, + capstone (${B[0].cap} · ${B[1].cap}) and <b>${MAST[c.id]}</b>`;
   const trees = ['3 trees · 3 picks · 8 nodes a tree', '3 trees + class tree · 7 picks · 14 nodes a tree', '3 trees + class tree · 10 picks · 17 nodes a tree'][t - 1];
   const eq = ['15 held · 3 → 7 equipped', '18 held · 3 → 10 equipped', '34 held · 10 + a master slot'][t - 1];
-  return `<div class="tcard" style="--tc:${TIERC[t - 1]}"><div class="grp"><span>Weapons</span><div class="slots">${w}</div></div>
-    <div class="grp"><span>Armor</span><div class="armor">${a}</div></div><div class="grp"><span>Accessories</span><div class="slots">${acc.join('')}</div></div>
+  return `<div class="tcard" style="--tc:${TIERC[t - 1]}"><div class="grp"><span>Weapons</span><div class="slots">${w}</div>${rev}</div>
+    <div class="grp"><span>Armor</span><div class="armor">${a}</div></div><div class="grp"><span>Accessory slots</span><div class="slots">${acc.join('')}</div></div>
     <div class="tline">${choice}</div><div class="tline">${trees} · ${eq}</div></div>`;
 }
 function renderSheets() {
@@ -435,19 +511,19 @@ renderSheets();
 
 // ---- Equippable matrix
 let mxTier = 1;
-const EXTRA = { brawler: 'Arms kinds only', mage: 'Elements only' };
+const CAP3 = (id) => (id === 'brawler' || id === 'mage' ? 'one two-kind weapon, for good' : 'two two-kind weapons');
 function renderMx() {
   document.querySelectorAll('#matrix .toggle button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === mxTier));
-  let s = `<tr><th class="l">Class</th><th class="l">Slot</th>${KINDS.map((k) => `<th>${kchip(k.id)}</th>`).join('')}<th class="l">${mxTier === 1 ? 'Branches' : 'A second kind that counts'}</th></tr>`; const rows = [];
+  let s = `<tr><th class="l">Class</th><th class="l">Slot</th>${KINDS.map((k) => `<th>${kchip(k.id)}</th>`).join('')}<th class="l">${mxTier === 1 ? 'Branches' : 'A Dual\'s second kind (WR3) · her cap (WR4)'}</th></tr>`; const rows = [];
   CLASSES.forEach((c) => slotsOf(c).forEach((ch, i) => {
     s += `<tr class="${i === 0 ? 'first' : ''}"><td class="l">${i === 0 ? `<b>${c.name}</b>` : ''}</td><td class="l">${i + 1} · ${ch === 'a' ? 'Arms' : 'Tome'}</td>`;
     KINDS.forEach((k) => { const fits = k.ch === ch, def = c.def[i] === k.id, kc = TW[k.twin].c;
       s += `<td class="cell${def ? ' def' : fits ? ' fit' : ''}" style="--kc:${kc}" data-t="${c.name} · slot ${i + 1} · ${k.weapon}" data-d="${def ? 'The default (preset).' : fits ? 'Fits: a kind of the slot\'s channel, if not in her other slots.' : `Doesn't fit: this slot takes ${ch === 'a' ? 'Arms' : 'Tomes'}.`}">${def ? i + 1 : fits ? '○' : ''}</td>`; });
-    s += `<td class="l" style="font-size:12px;color:var(--ink-soft)">${i === 0 ? (mxTier === 1 ? 'One kind a weapon' : (EXTRA[c.id] || 'Any of the ten') + (mxTier === 3 ? '; her branch deepens, still two at most' : '; a Dual adds one')) : ''}</td></tr>`;
+    s += `<td class="l" style="font-size:12px;color:var(--ink-soft)">${mxTier === 1 ? (i === 0 ? 'One kind a weapon' : '') : `${ch === 'a' ? 'Another Arm' : 'Another element'}${i === 0 ? ` · ${mxTier === 2 ? 'one Dual in her slots' : CAP3(c.id)}` : ''}`}</td></tr>`;
     rows.push([c.name, i + 1, ch === 'a' ? 'Arms' : 'Tome', K[c.def[i]].weapon, KINDS.filter((k) => k.ch === ch).map((k) => k.weapon).join(', ')]); }));
   document.getElementById('mx').innerHTML = s;
   document.querySelectorAll('#mx td.cell').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d)); bindKinds(document.getElementById('mx'));
-  document.getElementById('mx-table').innerHTML = `<table><tr><th>Class</th><th class="num">Slot</th><th>Channel</th><th>Default</th><th>Fits</th></tr>${rows.map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table><p class="foot">Spreads a class can choose: Brawler and Mage 10, the others 50. A Dual's second kind: Brawler Arms only, Mage elements only, the four between any (GE7); two kinds a weapon at most (owner, 2026-10-24).</p>`;
+  document.getElementById('mx-table').innerHTML = `<table><tr><th>Class</th><th class="num">Slot</th><th>Channel</th><th>Default</th><th>Fits</th></tr>${rows.map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table><p class="foot">Spreads a class can choose: Brawler and Mage 10, the others 50. A Dual's second kind is of the weapon's own channel in every class (WR3; GE7's class check retires); one two-kind weapon in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good (WR4); two kinds a weapon at most (owner, 2026-10-24).</p>`;
 }
 document.querySelectorAll('#matrix .toggle button').forEach((b) => b.addEventListener('click', () => { mxTier = +b.dataset.t; renderMx(); }));
 renderMx();
@@ -468,56 +544,142 @@ renderMx();
   bindKinds(document.getElementById('sw-pairs'));
 })();
 
-// ---- What grows on her three weapons (§3.5, CP33; the owner's branches, Prism dropped)
-// Per class: each default slot's example branch in Tier 2 and the second kind a Dual would take (GE7: Brawler Arms, Mage elements).
+// ---- What grows on her three weapons (§3.5, CP33; redrawn to the research note's WR2–WR5, second pass)
+// Per class: each default slot's second kind if it goes Dual or Tempered (always of its own channel, WR3), and the drawn picks:
+// Tier 2 one Dual; Tier 3 two two-kind weapons for the four between, the Brawler and the Mage one for good (WR4).
 const GROW = {
-  brawler: { br: ['spec', 'dual', 'dual'], dual: ['bow', 'katana', 'bow'] },
-  mage: { br: ['spec', 'dual', 'dual'], dual: ['tome-dark', 'tome-dark', 'tome-light'] },
-  spellblade: { br: ['dual', 'spec', 'dual'], dual: ['tome-dark', 'tome-fire', 'tome-fire'] },
-  summoner: { br: ['spec', 'dual', 'dual'], dual: ['tome-fire', 'tome-ice', 'greatsword'] },
-  paladin: { br: ['spec', 'dual', 'dual'], dual: ['tome-lightning', 'katana', 'tome-lightning'] },
-  cleric: { br: ['spec', 'dual', 'dual'], dual: ['tome-fire', 'tome-fire', 'katana'] },
+  brawler: { second: ['bow', 'katana', 'bow'], t2: ['pure', 'dual', 'pure'], t3: ['keen', 'tempered', 'keen'] },
+  mage: { second: ['tome-dark', 'tome-light', 'tome-light'], t2: ['dual', 'pure', 'pure'], t3: ['tempered', 'keen', 'keen'] },
+  spellblade: { second: ['bow', 'greatsword', 'tome-fire'], t2: ['dual', 'pure', 'pure'], t3: ['tempered', 'keen', 'tempered'] },
+  summoner: { second: ['tome-fire', 'tome-ice', 'greatsword'], t2: ['dual', 'pure', 'pure'], t3: ['tempered', 'keen', 'tempered'] },
+  paladin: { second: ['lance', 'katana', 'tome-lightning'], t2: ['pure', 'dual', 'pure'], t3: ['keen', 'tempered', 'tempered'] },
+  cleric: { second: ['tome-dark', 'tome-fire', 'katana'], t2: ['pure', 'dual', 'pure'], t3: ['keen', 'tempered', 'tempered'] },
 };
-const BR = { spec: ['Specialized', 'sp', 'More damage on its own kind (e.g. weak hits ×1.5, not ×1.3)'], dual: ['Dual', 'du', 'One more kind: coverage only; never more than two'], third: ['A third branch', 'tb', 'To be designed in weapon-progression.md'] };
-const DEEP = { spec: 'Deepened: its own kind harder still (Tier 3\'s number is weapon-progression.md\'s)', dual: 'Deepened: its two kinds, stronger; never a third kind', third: 'Deepened, as weapon-progression.md designs it' };
-let grCls = 'brawler'; const grPick = {};
+const BR = { pure: ['Pure', 'sp', 'One kind, weak hits ×1.5 (was "Specialized")'], dual: ['Dual', 'du', 'A second kind of its own channel, weak ×1.3'],
+  keen: ['Keen', 'sp', 'One kind, weak hits ×1.7'], tempered: ['Tempered', 'du', 'Two kinds of its channel, both weak ×1.5'] };
+const cap3 = (id) => (id === 'brawler' || id === 'mage' ? 1 : 2);
+let grCls = 'brawler', grMsg = ''; const grPick = {};
 const twinsOf = (ks) => [...new Set(ks.map((k) => TW[K[k].twin].el))].join(', ');
 function renderGrows() {
   document.getElementById('gr-pills').innerHTML = '<span class="lbl">Class</span>' + CLASSES.map((c) => `<button data-c="${c.id}" aria-pressed="${grCls === c.id}"><span class="cdot" style="--cc:${c.c}"></span>${c.name}</button>`).join('');
-  document.querySelectorAll('#gr-pills button').forEach((b) => b.addEventListener('click', () => { grCls = b.dataset.c; renderGrows(); }));
-  const c = C[grCls], G = GROW[grCls], pick = (grPick[grCls] ||= [...G.br]), sp = SPEC[grCls];
-  const kindsAt = (i, t) => t === 1 || pick[i] !== 'dual' ? [c.def[i]] : [c.def[i], G.dual[i]];
+  document.querySelectorAll('#gr-pills button').forEach((b) => b.addEventListener('click', () => { grCls = b.dataset.c; grMsg = ''; renderGrows(); }));
+  const c = C[grCls], G = GROW[grCls], pk = (grPick[grCls] ||= { t2: [...G.t2], t3: [...G.t3] }), B = BR2[grCls];
+  const two = (i, t) => (t === 2 ? pk.t2[i] === 'dual' : t === 3 ? pk.t2[i] === 'dual' || pk.t3[i] === 'tempered' : false);
+  const kindsAt = (i, t) => (two(i, t) ? [c.def[i], G.second[i]] : [c.def[i]]);
   const rows = [];
   const tierRow = (t) => {
-    const head = `<div class="th" style="--tc:${TIERC[t - 1]}"><b>Tier ${t}</b><span>${['One kind a weapon', 'A branch at G5', 'Her branch deepens'][t - 1]}</span></div>`;
-    const cards = c.def.map((k, i) => { const ks = kindsAt(i, t), b = pick[i];
-      let body;
-      if (t === 1) body = `<span class="badge">Base</span><div class="what">One kind, weak ×1.3; its grade's Might.</div>`;
-      else if (t === 2) body = `<div class="bbtn">${Object.entries(BR).map(([id, [n]]) => `<button data-i="${i}" data-b="${id}" aria-pressed="${b === id}"${id === 'third' ? ' class="tbd"' : ''}>${n}</button>`).join('')}</div><div class="what">${BR[b][2]}${b === 'dual' ? `: + ${K[G.dual[i]].weapon}` : ''}.</div>`;
-      else body = `<span class="badge ${BR[b][1]}">${BR[b][0]}, deepened</span><div class="what">${DEEP[b]}.</div>`;
-      rows.push([`Tier ${t}`, `Slot ${i + 1}`, t === 1 ? 'Base' : BR[b][0] + (t === 3 ? ', deepened' : ''), ks.map((x) => K[x].weapon).join(' + '), twinsOf(ks)]);
+    const held = new Set(c.def.flatMap((k, i) => kindsAt(i, t))).size;
+    const head = `<div class="th" style="--tc:${TIERC[t - 1]}"><b>Tier ${t}</b><span>${['One kind a weapon', 'A branch at G5: one Dual', `Deepens: ${cap3(grCls) === 1 ? 'one two-kind weapon' : 'two two-kind weapons'}`][t - 1]}</span><span><b>${held}</b> kinds she holds</span></div>`;
+    const cards = c.def.map((k, i) => { const ks = kindsAt(i, t);
+      let body, name;
+      if (t === 1) { name = 'Base'; body = `<span class="badge">Base</span><div class="what">One kind, weak ×1.3; its grade's Might.</div>`; }
+      else if (t === 2) { const b = pk.t2[i]; name = BR[b][0];
+        body = `<div class="bbtn">${['pure', 'dual'].map((id) => `<button data-t="2" data-i="${i}" data-b="${id}" aria-pressed="${b === id}">${BR[id][0]}${id === 'dual' ? ` + ${K[G.second[i]].kind}` : ''}</button>`).join('')}</div><div class="what">${BR[b][2]}${b === 'dual' ? `: + ${K[G.second[i]].weapon}` : ''}.</div>`; }
+      else { const was = pk.t2[i]; const b = was === 'dual' ? 'tempered' : pk.t3[i]; name = BR[b][0];
+        body = was === 'dual' ? `<span class="badge du">Dual → Tempered</span><div class="what">${BR.tempered[2]}.</div>`
+          : `<div class="bbtn">${['keen', 'tempered'].map((id) => `<button data-t="3" data-i="${i}" data-b="${id}" aria-pressed="${b === id}">Pure → ${BR[id][0]}${id === 'tempered' ? ` + ${K[G.second[i]].kind}` : ''}</button>`).join('')}</div><div class="what">${BR[b][2]}.</div>`; }
+      rows.push([`Tier ${t}`, `Slot ${i + 1}`, name, ks.map((x) => K[x].weapon).join(' + '), twinsOf(ks)]);
       return `<div class="wcard" style="--tc:${TIERC[t - 1]}"><span class="cap">Slot ${i + 1} · ${K[k].ch === 'a' ? 'Arms' : 'Tome'}</span><div class="ks">${ks.map((x) => kchip(x, { long: true })).join('<span class="muted">+</span>')}</div>${body}<div class="what" style="font-size:11px">Answers: ${twinsOf(ks)} twins</div></div>`; }).join('');
     const also = [
       ['Trees', 'Trunk; A or B a tree; <b>Skill Ranks</b> every 2 Class Ranks', '+ branch C; every tip <b>Power or Break</b>', '+ capstones (D6); two branches held'],
-      ['Class', '—', `<b>${sp[0]}</b> or <b>${sp[1]}</b>: a passive + 3 class skills, cast through any of these weapons`, `+ ${CAPS[grCls].join(' or ')} and ${MAST[grCls]}`],
-      ['Flat offense', '—', `<b>Orb</b>: ${K[c.def[0]].kind} (preset) · <b>Halo</b>: one kind`, '+ the Halo\'s second kind'],
+      ['Class', '—', `<b>${B[0].n}</b> (${GROUPS[B[0].g].name}) or <b>${B[1].n}</b> (${GROUPS[B[1].g].name}): <b>focus +15%</b>, her set, 3 class skills`, `+ ${B[0].cap} or ${B[1].cap} and ${MAST[grCls]}`],
+      ['Damage on a kind', 'Her accessory (damage-oriented)', '+ a second accessory · <b>Halo</b>: one kind', '+ a third accessory · the Halo\'s second kind'],
       ['Template', 'Affinity +6% on one twin set', '+ ★ signature tip on her affinity kind\'s tree', 'Tip at both forks'],
     ].map(([n, ...v]) => `<div><span class="lab">${n}</span>${v[t - 1]}</div>`).join('');
     return `<div class="grow">${head}${cards}<div class="also">${also}</div></div>`;
   };
-  document.getElementById('grows-rows').innerHTML = [1, 2, 3].map(tierRow).join('');
-  document.querySelectorAll('#grows-rows .bbtn button').forEach((b) => b.addEventListener('click', () => { pick[+b.dataset.i] = b.dataset.b; renderGrows(); }));
+  document.getElementById('grows-rows').innerHTML = [1, 2, 3].map(tierRow).join('') + (grMsg ? `<div class="note">${grMsg}</div>` : '');
+  document.querySelectorAll('#grows-rows .bbtn button').forEach((b) => b.addEventListener('click', () => { const i = +b.dataset.i, t = +b.dataset.t, id = b.dataset.b; grMsg = '';
+    if (t === 2) { if (id === 'dual') { const j = pk.t2.indexOf('dual'); if (j >= 0 && j !== i) { pk.t2[j] = 'pure'; grMsg = `One Dual in her slots in Tier 2 (WR4): slot ${j + 1} went back to Pure.`; } } pk.t2[i] = id; }
+    else { const count = [0, 1, 2].filter((x) => x !== i && (pk.t2[x] === 'dual' || pk.t3[x] === 'tempered')).length;
+      if (id === 'tempered' && count >= cap3(grCls)) grMsg = `${cap3(grCls) === 1 ? `The ${c.name} keeps one two-kind weapon for good` : 'Two two-kind weapons in her slots in Tier 3'} (WR4): deepen another to Keen first.`; else pk.t3[i] = id; }
+    // a slot that was Dual in Tier 2 is Tempered in Tier 3; keep Tier 3's count within the cap
+    [0, 1, 2].forEach((x) => { if (pk.t2[x] === 'dual') pk.t3[x] = 'tempered'; });
+    while ([0, 1, 2].filter((x) => pk.t3[x] === 'tempered').length > cap3(grCls)) { const x = [0, 1, 2].find((y) => pk.t3[y] === 'tempered' && pk.t2[y] !== 'dual'); if (x === undefined) break; pk.t3[x] = 'keen'; }
+    renderGrows(); }));
   bindKinds(document.getElementById('grows-rows'));
   document.getElementById('gr-table').innerHTML = `<table><tr><th>What grows</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>
-    <tr><td>The weapon's branch</td><td>Base: one kind, weak ×1.3</td><td>At G5: Specialized (more damage on its kind) · Dual (+1 kind, two at most) · a third, to design</td><td>Her branch deepens; never a third kind</td></tr>
+    <tr><td>The weapon's branch</td><td>Base: one kind, weak ×1.3</td><td>At G5: Pure (weak ×1.5) or Dual (+1 kind of its channel, weak ×1.3); one Dual in her slots</td><td>Pure → Keen (×1.7) or Tempered (both ×1.5); Dual → Tempered; two two-kind weapons (Brawler, Mage one)</td></tr>
+    <tr><td>Kinds she holds, at most</td><td>3</td><td>4</td><td>5 (Brawler, Mage 4)</td></tr>
     <tr><td>Its power</td><td>Its grade's Might, G0–G10</td><td>× 1.8 (SB1)</td><td>× 2.6</td></tr>
-    <tr><td>Flat offense on a kind</td><td>—</td><td>The Orb (half a weapon's Might on its kind) · the Halo (+10, then +34)</td><td>The Halo's second kind</td></tr>
+    <tr><td>Damage on a kind</td><td>Her accessory (damage-oriented)</td><td>+ a second accessory · the Halo (+10, then +34)</td><td>+ a third accessory · the Halo's second kind</td></tr>
     <tr><td>Its tree's hits</td><td>Trunk; fork A or B; Skill Ranks</td><td>+ branch C; Power or Break tip</td><td>+ capstones; two branches held</td></tr>
-    <tr><td>Her class's skills</td><td>—</td><td>Class branch: 3 skills through any weapon</td><td>+ the branch capstone</td></tr>
+    <tr><td>Her class branch</td><td>—</td><td>A focus (+15% on Ring or Light/Dark kinds), her set, 3 class skills</td><td>+ the branch capstone and the mastery</td></tr>
     <tr><td>Her template</td><td>Affinity +6%</td><td>+ signature tip</td><td>Tip at both forks</td></tr></table>
     <table style="margin-top:10px"><tr><th>Tier</th><th>Slot</th><th>${C[grCls].name}'s branch (this view)</th><th>Kinds</th><th>Twin sets answered</th></tr>${rows.map((r) => `<tr>${r.map((v) => `<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
 }
 renderGrows();
+
+// ---- Tier 2's focus: groups, every class's two branches, the party builder and the pairing table (§7.2, CP38–CP41)
+const ABBR = { brawler: 'Br', mage: 'Ma', spellblade: 'SB', summoner: 'Su', paladin: 'Pa', cleric: 'Cl' };
+const HEALERS = [['paladin', 0, 'G', 'Guardian'], ['paladin', 1, 'T', 'Templar'], ['cleric', 0, 'B', 'Bishop'], ['cleric', 1, 'O', 'Oracle']];
+const DPS = ['brawler', 'spellblade', 'mage', 'summoner'];
+const PRESETS = [
+  ['The defaults', { brawler: 0, spellblade: 0, mage: 0, summoner: 0, h: 0 }, '"An Elemental Mage and a regular Summoner": every class on branch 1'],
+  ['The owner\'s swap', { brawler: 0, spellblade: 1, mage: 1, summoner: 1, h: 0 }, '"A Light/Dark Mage and an Elemental Summoner", the Spell Blade swapped with them'],
+  ['Light/Dark lean', { brawler: 1, spellblade: 0, mage: 1, summoner: 0, h: 3 }, 'Three Light/Dark members, for the Light/Dark regions'],
+];
+const REGIONS = { ring: 'the ring\'s regions: Meadow, Coast, Jungle, Canyon, Geyser Basin, Storm Peaks (all Ring), Volcano, Tundra, Glacier, Ancient Ruins', even: 'the even regions (Desert, Sky Isles, Underworld), and anywhere', ld: 'the Light/Dark regions: Forest, Swamp, Highlands, Haunted Moor, Crystal Caverns, Twilight Rift' };
+let party = { ...PRESETS[0][1] };
+const memberList = (pt) => [...DPS.map((id) => [id, pt[id]]), [HEALERS[pt.h][0], HEALERS[pt.h][1]]];
+function coverage(pt) {
+  const m = memberList(pt).map(([id, b]) => ({ id, b, br: BR2[id][b], set: BR2[id][b].set }));
+  const byKind = Object.fromEntries(KINDS.map((k) => [k.id, m.filter((x) => x.set.includes(k.id)).map((x) => ({ ...x, boost: GROUPS[x.br.g].kinds.includes(k.id) }))]));
+  const held = KINDS.filter((k) => byKind[k.id].length).length;
+  const boosted = TWINS.map((tw) => m.filter((x) => [tw.arm, tw.tome].some((k) => x.set.includes(k) && GROUPS[x.br.g].kinds.includes(k))).length);
+  const ldDps = DPS.filter((id) => BR2[id][pt[id]].g === 'ld').length;
+  return { m, byKind, held, boosted, lean: ldDps >= 3 ? 'ld' : ldDps <= 1 ? 'ring' : 'even' };
+}
+(function groups() {
+  document.getElementById('fc-groups').innerHTML = ['ring', 'ld'].map((g) => { const G = GROUPS[g];
+    return `<div class="panel gcard" style="--gc:${G.c}"><div class="head-row"><span class="gtag">${G.name}</span><span class="muted" style="font-size:12px">${G.words}</span></div>
+      <div class="grow2"><span class="lab">Arms</span>${G.kinds.filter((k) => K[k].ch === 'a').map((k) => kchip(k, { long: true })).join('')}</div>
+      <div class="grow2"><span class="lab">Tomes</span>${G.kinds.filter((k) => K[k].ch === 't').map((k) => kchip(k, { long: true })).join('')}</div>
+      <div class="muted" style="font-size:12px">Its focus: <b style="color:var(--ink)">+15% damage</b> on hits of these kinds (a healer's mends and Barriers too). Answers ${G.sigs} in Tier 1.</div></div>`; }).join('');
+  bindKinds(document.getElementById('fc-groups'));
+})();
+(function cards() {
+  const rows = [];
+  document.getElementById('fc-cards').innerHTML = CLASSES.map((c) => `<div class="fcard" style="--cc:${c.c}"><div class="fh"><span class="cdot" style="--cc:${c.c}"></span><b>${c.name}</b><span class="muted">${c.type}</span></div>${BR2[c.id].map((br, i) => { const G = GROUPS[br.g];
+    rows.push([c.name, i === 0 ? 'Branch 1 (default)' : 'Branch 2 (reverse)', br.n, G.name, br.set.map((k) => K[k].weapon + (G.kinds.includes(k) ? '' : ' (off-focus)')).join(', '), br.flip]);
+    return `<div class="fb" style="--gc:${G.c}"><div class="fbh"><span class="fbn">${i === 0 ? 'Branch 1 · default' : 'Branch 2 · reverse'}</span><b>${br.n}</b><span class="gtag">${G.name} +15%</span></div>
+      <div class="fset">${br.set.map((k) => kchip(k, { long: true, boost: G.kinds.includes(k) })).join('')}</div><div class="muted" style="font-size:11.5px">${br.flip}</div></div>`; }).join('')}</div>`).join('');
+  bindKinds(document.getElementById('fc-cards'));
+  document.getElementById('fc-table').innerHTML = `<table><tr><th>Class</th><th>Branch</th><th>Name</th><th>Focus</th><th>Set</th><th>What flips</th></tr>${rows.map((r) => `<tr>${r.map((v) => `<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
+})();
+function renderParty() {
+  document.getElementById('pb-presets').innerHTML = PRESETS.map(([n, pt], i) => `<button data-p="${i}" aria-pressed="${Object.keys(pt).every((k) => party[k] === pt[k])}">${n}</button>`).join('');
+  document.querySelectorAll('#pb-presets button').forEach((b) => b.addEventListener('click', () => { party = { ...PRESETS[+b.dataset.p][1] }; renderParty(); }));
+  document.getElementById('pb-members').innerHTML = DPS.map((id) => `<div class="pbm"><span class="pbn"><span class="cdot" style="--cc:${C[id].c}"></span>${C[id].name}</span>${BR2[id].map((br, i) => `<button data-m="${id}" data-b="${i}" aria-pressed="${party[id] === i}" style="--gc:${GROUPS[br.g].c}">${br.n} · ${GROUPS[br.g].name}</button>`).join('')}</div>`).join('') +
+    `<div class="pbm"><span class="pbn"><span class="cdot" style="--cc:var(--cl-paladin)"></span>Healer</span>${HEALERS.map(([id, b, , n], i) => `<button data-h="${i}" aria-pressed="${party.h === i}" style="--gc:${GROUPS[BR2[id][b].g].c}">${n} ${C[id].name} · ${GROUPS[BR2[id][b].g].name}</button>`).join('')}</div>`;
+  document.querySelectorAll('#pb-members button[data-m]').forEach((b) => b.addEventListener('click', () => { party[b.dataset.m] = +b.dataset.b; renderParty(); }));
+  document.querySelectorAll('#pb-members button[data-h]').forEach((b) => b.addEventListener('click', () => { party.h = +b.dataset.h; renderParty(); }));
+  const cv = coverage(party), pre = PRESETS.find(([, pt]) => Object.keys(pt).every((k) => party[k] === pt[k]));
+  let t = `<table class="heat pbt"><tr><th></th>${KINDS.map((k) => `<th>${kchip(k.id)}</th>`).join('')}</tr><tr><th style="text-align:right">Who</th>${KINDS.map((k) => { const w = cv.byKind[k.id];
+    return `<td class="c ${w.length ? '' : 'h0'}" data-t="${k.weapon}: ${w.length ? `${w.length} hold it` : 'nobody holds it'}" data-d="${w.length ? w.map((x) => `${C[x.id].name} (${x.br.n}${x.boost ? ', +15%' : ', off-focus'})`).join('<br>') : 'Swap a member to the set that holds it, or bring the healer the pairing table names.'}">${w.length ? w.map((x) => `<span class="pip${x.boost ? ' on' : ''}" style="--cc:${C[x.id].c}">${ABBR[x.id]}</span>`).join('') : '—'}</td>`; }).join('')}</tr></table>`;
+  t += `<div class="pbsum"><div><b class="${cv.held === 10 ? 'okc' : 'noc'}">${cv.held} of 10 kinds</b>${cv.held < 10 ? ` · missing ${KINDS.filter((k) => !cv.byKind[k.id].length).map((k) => k.weapon).join(', ')}` : ''}</div>
+    <div>Boosted answers (members whose focus kind answers each twin set): ${TWINS.map((tw, i) => `<span class="bz" style="--kc:${tw.c}">${tw.el} ${cv.boosted[i]}</span>`).join('')}</div>
+    <div class="muted">Best on ${REGIONS[cv.lean]}.${pre ? ` ${pre[2]}.` : ''}</div></div>`;
+  document.getElementById('pb-out').innerHTML = t;
+  document.querySelectorAll('#pb-out td.c').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d)); bindKinds(document.getElementById('pb-out'));
+  renderMatrix();
+}
+function renderMatrix() {
+  const PH = [[0, 0, 'Ring · Ring', 'defaults'], [0, 1, 'Ring · Light/Dark', ''], [1, 0, 'Light/Dark · Ring', ''], [1, 1, 'Light/Dark · Light/Dark', '']];
+  const MG = [[0, 0, 'Ring · Light/Dark', 'defaults: "an Elemental Mage and a regular Summoner"'], [1, 1, 'Light/Dark · Ring', '"a Light/Dark Mage and an Elemental Summoner"'], [0, 1, 'Ring · Ring', ''], [1, 0, 'Light/Dark · Light/Dark', '']];
+  let s = `<table class="heat pmx"><tr><th style="text-align:right">Brawler · Spell Blade ↓<br>Mage · Summoner →</th>${MG.map(([, , n, d]) => `<th>${n}${d ? `<div class="muted" style="font-weight:500;font-size:10.5px">${d}</div>` : ''}</th>`).join('')}</tr>`; const rows = [];
+  PH.forEach(([br, sb, pn, pd]) => { s += `<tr><th style="text-align:right;white-space:nowrap">${pn}${pd ? `<div class="muted" style="font-weight:500;font-size:10.5px">${pd}</div>` : ''}</th>`;
+    MG.forEach(([ma, su, mn]) => { const cells = HEALERS.map((hh, i) => { const pt = { brawler: br, spellblade: sb, mage: ma, summoner: su, h: i }, cv = coverage(pt); return [hh[2], cv.held, pt]; });
+      const cur = cells.findIndex(([, , pt]) => Object.keys(pt).every((k) => party[k] === pt[k]));
+      s += `<td class="mcell"><div class="quad">${cells.map(([l, n, pt], i) => `<button class="q ${n === 10 ? 'h4' : n === 9 ? 'h1' : 'h0'}${cur === i ? ' cur' : ''}" data-pt='${JSON.stringify(pt)}' data-t="${pn} · ${mn} · ${HEALERS[i][3]}" data-d="${n} of 10 kinds">${l} ${n}</button>`).join('')}</div></td>`;
+      rows.push([pn, mn, ...cells.map(([, n]) => n)]); });
+    s += '</tr>'; });
+  document.getElementById('pb-matrix').innerHTML = s + '</table>';
+  document.querySelectorAll('#pb-matrix .q').forEach((q) => { bindTip(q, q.dataset.t, q.dataset.d); q.addEventListener('click', () => { party = JSON.parse(q.dataset.pt); tip.style.opacity = 0; renderParty(); }); });
+  document.getElementById('fc-table').querySelector('.pm')?.remove();
+  document.getElementById('fc-table').insertAdjacentHTML('beforeend', `<table class="pm" style="margin-top:10px"><tr><th>Brawler · Spell Blade</th><th>Mage · Summoner</th><th class="num">Guardian</th><th class="num">Templar</th><th class="num">Bishop</th><th class="num">Oracle</th></tr>${rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td>${r.slice(2).map((v) => `<td class="num">${v}</td>`).join('')}</tr>`).join('')}</table>`);
+}
+renderParty();
 
 // ---- Template affinity (§6.9, CP36)
 const OPTS = [
@@ -567,7 +729,7 @@ const STATS = [['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['matk', 'M.ATK'], ['
 const SRC = [
   ['level', 'Level', 'var(--neutral)', (p) => p[0] + Math.min(0, p[1]), (p) => `Her level: ${p[0]}${p[1] < 0 ? ` · class lean ${p[1]}` : ''}`],
   ['lean', 'Class lean', 'var(--c1)', (p) => Math.max(0, p[1]), (p) => `Her class's lean: +${p[1]}`],
-  ['gear', 'Gear', 'var(--c2)', (p) => p[2] + p[6] + p[7], (p) => [p[2] && `Armor +${p[2]}`, p[6] && `Weapon Might +${p[6]}`, p[7] && `Orb +${p[7]}`].filter(Boolean).join(' · ')],
+  ['gear', 'Gear', 'var(--c2)', (p) => p[2] + p[6] + p[7], (p) => [p[2] && `Armor +${p[2]}`, p[6] && `Weapon Might +${p[6]}`, p[7] && `An accessory +${p[7]} (a placeholder: the first round's Orb)`].filter(Boolean).join(' · ')],
   ['stars', 'Extra Stats', 'var(--c4)', (p) => p[3] + p[4] + p[8], (p) => [`Planet +${p[3]}`, p[4] && `Moons +${p[4]}`, p[8] && `Halo +${p[8]}`].filter(Boolean).join(' · ')],
   ['tmpl', 'Her template', 'var(--c6)', (p) => p[5], (p) => `Her moon's lead node +${p[5]}`],
 ];
@@ -595,7 +757,7 @@ function renderStats() {
       s += `<text class="val-text" x="${stView === 'pct' ? x0 + iw + 8 : x + 8}" y="${y + rowH / 2 + 4}">${fmt(tt)}</text>`; rows.push([l, n, p, tt]); y += rowH + gap; }); y += gg; });
   document.getElementById('st-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#st-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('st-table').innerHTML = `<table><tr><th>Stat</th><th>Tier</th><th class="num">Level</th><th class="num">Lean</th><th class="num">Armor</th><th class="num">Might</th><th class="num">Orb</th><th class="num">Planet</th><th class="num">Moons</th><th class="num">Halo</th><th class="num">Template</th><th class="num">Total, SB1</th><th class="num">Total, flat</th><th class="num">Build share</th></tr>` +
+  document.getElementById('st-table').innerHTML = `<table><tr><th>Stat</th><th>Tier</th><th class="num">Level</th><th class="num">Lean</th><th class="num">Armor</th><th class="num">Might</th><th class="num">Accessory</th><th class="num">Planet</th><th class="num">Moons</th><th class="num">Halo</th><th class="num">Template</th><th class="num">Total, SB1</th><th class="num">Total, flat</th><th class="num">Build share</th></tr>` +
     rows.map(([l, n, p, tt]) => `<tr><td>${l}</td><td>T${n}</td><td class="num">${p[0]}</td><td class="num">${p[1] > 0 ? '+' : ''}${p[1]}</td><td class="num">${p[2]}</td><td class="num">${p[6]}</td><td class="num">${p[7]}</td><td class="num">${p[3]}</td><td class="num">${p[4]}</td><td class="num">${p[8]}</td><td class="num">${p[5]}</td><td class="num"><b>${fmt(tt)}</b></td><td class="num">${fmt(p[9])}</td><td class="num">${Math.round(build(p) / tt * 100)}%</td></tr>`).join('') + '</table>';
   // shares: flat vs SB1
   const M = [1, 1.8, 2.6]; const shRows = [];
@@ -608,7 +770,7 @@ function renderStats() {
       m += `<rect x="${x}" y="${yy}" width="${bw}" height="${bh}" rx="3" fill="${col}"/><text class="val-soft" x="${x + bw / 2}" y="${yy - 4}" text-anchor="middle" style="font-size:9.5px">${v}</text>`; });
       m += `<text class="axis-text" x="${cx}" y="${H2 - 5}" text-anchor="middle">T${i + 1}</text>`; });
     return `<div class="mini"><h3>${l}</h3>${m}</svg></div>`; }).join('');
-  document.getElementById('share-table').innerHTML = `<table><tr><th>Stat</th><th class="num">Flat T1</th><th class="num">Flat T2</th><th class="num">Flat T3</th><th class="num">SB1 T1</th><th class="num">SB1 T2</th><th class="num">SB1 T3</th></tr>${shRows.map(([l, f, s2]) => `<tr><td>${l}</td>${f.map((v) => `<td class="num">${v}%</td>`).join('')}${s2.map((v) => `<td class="num">${v}%</td>`).join('')}</tr>`).join('')}</table><p class="foot">Offense rises in Tier 2 under both because the Orb and the Halo arrive there.</p>`;
+  document.getElementById('share-table').innerHTML = `<table><tr><th>Stat</th><th class="num">Flat T1</th><th class="num">Flat T2</th><th class="num">Flat T3</th><th class="num">SB1 T1</th><th class="num">SB1 T2</th><th class="num">SB1 T3</th></tr>${shRows.map(([l, f, s2]) => `<tr><td>${l}</td>${f.map((v) => `<td class="num">${v}%</td>`).join('')}${s2.map((v) => `<td class="num">${v}%</td>`).join('')}</tr>`).join('')}</table><p class="foot">Offense rises in Tier 2 under both because an accessory's offense (a placeholder) and the Halo arrive there.</p>`;
 }
 document.getElementById('v-pts').addEventListener('click', () => { stView = 'pts'; renderStats(); });
 document.getElementById('v-pct').addEventListener('click', () => { stView = 'pct'; renderStats(); });

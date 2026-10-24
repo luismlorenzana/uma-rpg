@@ -244,8 +244,9 @@
   <h1>Class Progression: the six classes</h1>
   <p class="lead">Who the six classes are, how they make a party, and what picking one changes, from Tier 1 to Tier 3. The ten
     weapon kinds are the damage types (the owner, 2026-10-23); a class holds three, by its Arms count, and the defaults are the
-    owner's (2026-10-24). Revised after the owner's first review: the campaign and the Rift side by side, class branches, Skill
-    Ranks, what later tiers hold. Numbers are the standalone doc's (<a href="../class-progression.md">class-progression.md</a>). The other pages:
+    owner's (2026-10-24). Revised after the owner's first review (the campaign and the Rift side by side, class branches, Skill
+    Ranks, what later tiers hold) and his second pass: Tier 2's class branch is now a <b>weapon-group focus</b> (Ring or Light/Dark,
+    +15%, a default or reverse set), with the party pairings on the <a href="class-templates.html#focus">templates page</a>. Numbers are the standalone doc's (<a href="../class-progression.md">class-progression.md</a>). The other pages:
     <a href="class-templates.html">template sheets</a> · <a href="class-trees.html">the tree viewer</a> ·
     <a href="class-weaknesses.html">foe weaknesses</a>.</p>
   <nav class="top">
@@ -257,7 +258,7 @@
     <div class="theme" style="--tc: var(--t1)"><span class="n">Tier 1 · Apprentice</span><b>Six classes, three weapons each</b>
       <p>Slots follow the class's Arms count; the owner's defaults. Foes are weak to two kinds, twins. One fork a tree, no points; every skill ranks up every 2 Class Ranks. A one-time calling pick for Pace and Late Umas.</p></div>
     <div class="theme" style="--tc: var(--t2)"><span class="n">Tier 2 · Adept</span><b>+ a class branch</b>
-      <p>One of two specializations a class: its passive and three class skills. Branch C and the Power or Break tip; each weapon a branch at G5. Regular foes narrow to one kind; bosses keep two.</p></div>
+      <p>One of two a class: a weapon-group focus (Ring or Light/Dark, +15% on its kinds), her default or reverse set, three class skills. Branch C and the Power or Break tip; each weapon Pure or Dual at G5. Regular foes narrow to one kind; bosses keep two.</p></div>
     <div class="theme" style="--tc: var(--t3)"><span class="n">Tier 3 · Master</span><b>+ its capstone and a mastery</b>
       <p>The branch's capstone and the class's mechanic at Class Rank 50. Two weapon-tree branches held, depth 6 capstones, the master slot. Sub-bosses narrow too; bosses keep two.</p></div>
   </div>
@@ -297,6 +298,11 @@
       <p class="muted" style="font-size:12px">From Tier 2 a regular is weak to one kind; Iron's foes to one Arm (elements warded), Arcane's to elements (Arms warded). Single kinds need one answer in the campaign, two on Iron and Arcane.</p>
       <div id="heat-kinds" style="overflow-x:auto;margin-top:6px"></div></div>
     <div class="chart-legend" style="margin-top:10px"><span class="scale"><i class="h0"></i>0<i class="h1"></i>1<i class="h2"></i>2<i class="h3"></i>3<i class="h4"></i>4<i class="h5"></i>5 members answer</span></div>
+    <div class="callout"><b>From Tier 2, each member also picks a focus (the owner's second pass).</b>Branch 1 keeps her default set, branch 2
+      swaps to her reverse set, +15% on its group: Ring (Greatsword, Axe, Lance · Fire, Ice, Lightning) or Light/Dark (Bow, Katana · Light,
+      Dark). The defaults above ("an Elemental Mage and a regular Summoner") hold all ten kinds with either healer; "a Light/Dark Mage and an
+      Elemental Summoner", with the Spell Blade swapped too, holds all ten as well. Five of the sixteen pair mixes hold all ten with any
+      healer, four more with the right one: <a href="class-templates.html#focus">the party builder and the pairing table</a>.</div>
     <details><summary>Show the numbers</summary><div id="shape-table"></div></details>
   </section>
 
@@ -422,7 +428,7 @@ document.getElementById('cards').innerHTML = CLASSES.map((c) => { const i = INFO
     <div class="row"><span class="lab">${c.type === 'Healer' ? 'Slot split' : 'Damage split'}</span><span style="flex:1"><span class="split"><i style="width:${c.split[0]}%;background:var(--arms)"></i><i style="width:${c.split[1]}%;background:var(--tomes)"></i></span></span><span style="font-size:12px;color:var(--ink-soft);width:52px;text-align:right">${c.split[0]} / ${c.split[1]}</span></div>
     <div class="row"><span class="lab">Hand</span>${i.hand}</div>
     <div class="row"><span class="lab">Limit Break</span>${i.lb} her open depth</div>
-    <div class="row"><span class="lab">Class branch</span><span>${{ brawler: 'Warlord or Berserker', mage: 'Sage or Sorcerer', spellblade: 'Blademaster or Rune Knight', summoner: 'Conjurer or Warlock', paladin: 'Templar or Guardian', cleric: 'Bishop or Oracle' }[c.id]} <span class="muted">· Tier 2: a passive + 3 skills</span></span></div>
+    <div class="row"><span class="lab">Class branch</span><span>${{ brawler: 'Berserker (Ring) or Warlord (Light/Dark)', mage: 'Sage (Ring) or Sorcerer (Light/Dark)', spellblade: 'Rune Knight (Ring) or Blademaster (Light/Dark)', summoner: 'Warlock (Light/Dark) or Conjurer (Ring)', paladin: 'Guardian (Ring) or Templar (Light/Dark)', cleric: 'Bishop (Light/Dark) or Oracle (Ring)' }[c.id]} <span class="muted">· Tier 2: a focus +15%, her set, 3 skills</span></span></div>
     <div class="row"><span class="lab">Mastery</span><span>${{ brawler: 'Unstoppable', mage: 'Resonance', spellblade: 'Spellbind', summoner: 'Menagerie', paladin: 'Last Stand', cleric: 'Overflow' }[c.id]} <span class="muted">· Tier 3, with the capstone</span></span></div>
     <p>${i.role}</p><p style="font-size:12px;color:var(--ink-faint)">Called: ${i.called}</p></div>`; }).join('');
 
@@ -491,11 +497,11 @@ renderShapes();
 // ---- Later tiers at a glance (the doc's §0 box)
 const DOC = '../class-progression.md';
 const LATER = [
-  ['Class branches', 'One of two a class: a passive and three class skills at Class Rank 20, 30, 40; all twelve written', 'The branch capstone and the class mastery at Class Rank 50', `${DOC}#72-class-branches-tier-2-cp26-cp34`, 'class-trees.html', 'tree viewer'],
+  ['Class branches', 'Second pass: a weapon-group focus, Ring or Light/Dark, +15% on its kinds; her default or reverse set; three class skills at Class Rank 20, 30, 40; party pairings drawn', 'The branch capstone and the class mastery at Class Rank 50', `${DOC}#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41`, 'class-templates.html#focus', 'pairings', true],
   ['Weapon trees', 'Branch C joins the fork; every tip forks Power or Break', 'Depth 6 capstones; two branches held; the master slot', `${DOC}#63-tier-2-branch-c-and-the-tip-fork-cp19`, 'class-trees.html', 'tree viewer'],
-  ['Weapon branches', 'At G5: Specialized (more damage on its kind), Dual (one more kind) or a third to design', 'Her branch deepens; two kinds a weapon at most. Owner: Prism dropped', `${DOC}#35-what-grows-on-her-three-weapons-tier-by-tier-cp33`, 'class-templates.html#grows', 'templates', true],
+  ['Weapon branches', 'At G5: Pure (weak ×1.5) or Dual (a second kind of its own channel); one Dual in her slots', 'Pure → Keen or Tempered, Dual → Tempered; two two-kind weapons (Brawler, Mage one). Owner: Prism dropped', `${DOC}#35-what-grows-on-her-three-weapons-tier-by-tier-cp33`, 'class-templates.html#grows', 'templates', true],
   ['Skill Ranks', 'Every skill, Rank 1–5, one every 2 Class Ranks (Tier 1 on)', 'The same; capstones open whole', `${DOC}#skill-ranks-cp32`, 'class-trees.html', 'slider'],
-  ['Accessories', 'The Damage slot: an Orb, offense on one kind', 'A second Support', '../gear.md#43-accessories-the-damage-slot', 'class-templates.html#sheets', 'sheets'],
+  ['Accessories', 'A second slot, damage-oriented (the owner\'s redesign, weapon-progression.md)', 'A third', `${DOC}#51-the-template-cp10`, 'class-templates.html#sheets', 'sheets', true],
   ['Armor', 'The four classes between mix halves per piece', 'The same', '../gear.md#42-armor', 'class-templates.html#sheets', 'sheets'],
   ['Extra Stats', 'The Halo (+10 → +34 on one kind); the Valor moon', 'The Halo\'s second kind; the Swiftness moon', '../extra-stats.md#tier-2-the-halo-and-the-valor-moon', 'extra-stats-maps.html', 'the map'],
   ['Her template', 'The signature tip on her affinity kind\'s tree; the affinity (+6%) every tier', 'The tip at both of its forks', `${DOC}#69-her-template-on-the-trees-affinity-cp36`, 'class-templates.html#affinity', 'affinity'],
@@ -535,17 +541,17 @@ document.getElementById('types-legend').innerHTML = FT.map(([n, c]) => `<span><s
 
 // ---- What a class changes
 const AFF = [
-  ['Weapons and channel', '3 slots: 3 + 0, 2 + 1, 1 + 2, 0 + 3', 'The same; a form\'s extra kind counts only in a class that wields its channel', '5 slots'],
+  ['Weapons and channel', '3 slots: 3 + 0, 2 + 1, 1 + 2, 0 + 3', 'The same; her branch\'s set (default or reverse); a Dual\'s second kind of its own channel, one Dual (two in Tier 3)', '5 slots'],
   ['Trees she uses', 'Her three weapons\' trees of this class (every class\'s are its own)', 'Deeper: branch C and tips; capstones; + her class tree', '5 of 5 or 10'],
   ['Hand', 'Power, MP, the pair, the extra hit, the farewell, the half hand', 'Unchanged', 'The same'],
   ['Stat leans', 'Per class', 'Unchanged: no specialization moves them', 'The same'],
   ['Healing and its stat', 'Paladin ATK, Cleric M.ATK; one healer a party', 'Unchanged', 'The same'],
   ['Armor', 'Her class\'s half', 'Per piece for the four between', 'Per piece'],
-  ['Accessories', '1 Support, any type', '+ an Orb of any kind; + a second Support', '2'],
-  ['Standard preset', 'Her 3 weapons, the half, a Support', '+ the Orb of her first slot; + a second Support', '5 weapons, half, Orb, support'],
+  ['Accessories', '1 slot, damage-oriented (weapon-progression.md)', '2, then 3', '2'],
+  ['Standard preset', 'Her 3 weapons, the half, an accessory for her first slot\'s kind', 'Her branch\'s set; an accessory a slot', '5 weapons, half, Orb, support'],
   ['Limit Break power', 'Brawler 2×, Mage 2.4×, hybrids 2.2×, healers 1.5×', 'Unchanged; LB+ is the halls\'', 'The same'],
   ['Class Rank', 'Per class; opens depths 1–5 and <b>ranks every skill</b>, every 2 Class Ranks', '+ depth 6 in Tier 3', 'Depths and side points'],
-  ['Class branch · mastery', '—', 'One of two branches: a passive and three class skills (Tier 2) · its capstone and the mastery (Tier 3)', '—'],
+  ['Class branch · mastery', '—', 'One of two branches: a <b>focus</b> (Ring or Light/Dark, +15%), her set and three class skills (Tier 2) · its capstone and the mastery (Tier 3)', '—'],
   ['Which foes she answers', 'The twins of her three kinds: 34–66% of foes on defaults; her Heroes\' Limit Breaks reach the rest', 'Single kinds for regulars; picks and Dual branches widen it', 'Nearly all'],
   ['Her template', 'Flourish only as her calling; her moon\'s lead only in its channel; <b>her affinity in any class</b>', '+ her signature tip on her affinity kind\'s tree, as her calling', '—'],
   ['The Rift', 'A guided build per path: composition and weapons', 'The same', 'Guided compositions'],
