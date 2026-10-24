@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessory Catalog</title>
+<!-- The Tier rework's Weapon Progression (weapon-progression.md §5): the accessory redesign. The ten defensive and MP
+     supports retire; four damage families (Pendants, Bells, Orbs, Insignias) unlock by tier; one of each family at most;
+     the kind cap; the viability model; the presets. Numbers are the doc's model (§5.4, §5.7). No external scripts, fonts
+     or images. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+<style>
+  /* Class Progression pages: the kit's tokens above, plus the ten kinds (twins share a hue: an Arm is drawn outlined,
+     its twin Tome filled), the two channels, the six classes and a sequential scale for coverage counts. */
+  :root {
+    --arms: #9a6a3a; --tomes: #4a62c4;
+    --k-fire: #d9582f; --k-ice: #2f80cc; --k-ltn: #b58700; --k-light: #16917f; --k-dark: #7350c6;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
+    --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+    --grp-ring: #c0622f; --grp-ld: #5b52c8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --arms: #c18b56; --tomes: #7b8ff0;
+      --k-fire: #f0764e; --k-ice: #5aa2ec; --k-ltn: #e0b12e; --k-light: #35bba6; --k-dark: #9f84ec;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
+      --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+      --grp-ring: #e5824f; --grp-ld: #9a90f2;
+    }
+  }
+  .grid2 > *, .multiples > * { min-width: 0; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 6px; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
+  .k { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 650; line-height: 1.5;
+    white-space: nowrap; border: 1.5px solid var(--kc); cursor: default; }
+  .k.arm { color: var(--kc); background: transparent; }
+  .k.tome { background: var(--kc); color: var(--on-k); }
+  .k.tome.ltn { color: #1b1300; }
+  .k.dim { opacity: .35; }
+  .cdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--cc); }
+  .ch { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 1px 7px; border-radius: 5px; }
+  .ch.a { color: var(--arms); border: 1.5px solid var(--arms); }
+  .ch.t { color: var(--on-k); background: var(--tomes); border: 1.5px solid var(--tomes); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .heat { border-collapse: separate; border-spacing: 3px; width: auto; }
+  .heat th, .heat td { border: 0; padding: 6px 8px; font-size: 12px; }
+  .heat td.c { text-align: center; font-weight: 700; min-width: 44px; border-radius: 6px; font-variant-numeric: tabular-nums; cursor: default; }
+  .heat td.c:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .h0 { background: var(--h0); color: var(--h0t); } .h1 { background: var(--h1); color: var(--hlt); } .h2 { background: var(--h2); color: var(--hlt); }
+  .h3 { background: var(--h3); color: var(--hdt); } .h4 { background: var(--h4); color: #fff; } .h5 { background: var(--h5); color: #fff; }
+  .hna { background: transparent; color: var(--ink-faint); font-weight: 500 !important; }
+  .scale { display: inline-flex; gap: 3px; align-items: center; font-size: 11px; color: var(--ink-soft); }
+  .scale i { width: 22px; height: 14px; border-radius: 4px; display: inline-block; }
+  button.linkish { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; padding: 0; }
+</style>
+<style>
+  .controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin-top: 14px; }
+  .controls .pills { margin: 0; }
+  .gsel { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+  .gsel input[type=range] { width: 280px; accent-color: var(--accent); }
+  .retired { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .rcard { background: var(--panel); border-radius: 12px; padding: 10px 12px; box-shadow: 0 1px 0 var(--hairline-strong); font-size: 12px; color: var(--ink-soft); }
+  .rcard b { display: block; color: var(--ink-faint); text-decoration: line-through; font-size: 13.5px; }
+  .rcard .why { margin-top: 4px; }
+  .rcard.mp { border-left: 4px solid var(--c2); }
+  .fams { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .fam { background: var(--panel); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 5px solid var(--fc); }
+  .fam.locked { opacity: .5; }
+  .fam h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .fam .tag { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--raised); color: var(--ink-soft); }
+  .fam .what { font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 8px; }
+  .mem { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .mem .nmk { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .mem .val { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .mem .ks { display: flex; gap: 3px; flex-wrap: wrap; }
+  .mem .ks .k { font-size: 10.5px; padding: 0 5px; }
+  .slots3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .scol { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .scol .sl { display: flex; gap: 8px; margin-top: 8px; }
+  .scol .sl i { flex: 1; height: 54px; border-radius: 10px; border: 2px dashed var(--hairline-strong); display: grid; place-items: center; font-style: normal; font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .scol .fb { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .fbadge { font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; color: var(--on-k); background: var(--fc); }
+  .fbadge.new { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--fc); }
+  .vtab td, .vtab th { font-size: 12.5px; }
+  .vtab td.c { text-align: center; font-weight: 700; border-radius: 6px; font-variant-numeric: tabular-nums; cursor: default; }
+  .vtab td.c small { display: block; font-weight: 500; font-size: 10.5px; opacity: .8; }
+  .vtab { border-collapse: separate; border-spacing: 3px; }
+  .vtab tr.first td { border-top: 2px solid var(--hairline-strong); }
+  .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  @media (max-width: 1100px) { .retired { grid-template-columns: repeat(3, 1fr); } .fams { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Accessories: every one deals damage</h1>
+  <p class="lead">The owner (2026-10-24): defensive accessories are never picked over damage, and MP regen is always picked, so <b>all ten
+    supports retire</b> and armor takes their defense. Four damage families replace them, unlocked <b>multi-element first, focused damage
+    later</b>: <b>Pendants</b> and <b>Bells</b> in Tier 1, <b>Orbs</b> in Tier 2, <b>Insignias</b> in Tier 3, one slot a tier and one of each
+    family at most. Below, each family's best member against the best, by class and context. From
+    <a href="../weapon-progression.md">weapon-progression.md</a> §5; the other pages: <a href="weapon-trees.html">weapon trees</a> ·
+    <a href="weapon-armor.html">armor</a> · <a href="weapon-materials.html">materials</a>.</p>
+  <nav class="top">
+    <a href="#retired">What retires</a><a href="#catalog">The catalog</a><a href="#grades">Values by grade</a>
+    <a href="#slots">Slots and the kind cap</a><a href="#viability">Viability</a><a href="#bylevel">By level</a><a href="#presets">Presets</a>
+  </nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="retired">
+    <h2>What retires</h2>
+    <p class="sub">All ten, in every tier. Their defensive worth moves into armor (one support's worth: a regular's hit 20% → 18.7% of her HP);
+      MP comes from her level, armor's legs and her template's MP twists, and the Bell makes her free Attack worth taking.</p>
+    <div class="retired" id="retired-cards"></div>
+  </section>
+
+  <section id="catalog">
+    <h2>The catalog, by tier</h2>
+    <p class="sub">Pick a tier and a grade: every accessory with what it adds there. Flat values (Pendants, Orbs) are Tier 1's × 1.8 and × 2.6;
+      a Bell's power and an Insignia's percentage are shares and stay. The slot holds the grade; the type swaps freely among the unlocked families.</p>
+    <div class="controls"><div class="pills" id="tier"></div>
+      <label class="gsel" for="grade">Grade <input type="range" id="grade" min="1" max="10" value="10"><b id="gval">G10</b> <span class="muted" id="glv"></span></label></div>
+    <div class="fams" id="fams"></div>
+  </section>
+
+  <section id="grades">
+    <h2>Values by grade</h2>
+    <p class="sub">A Pendant spreads 1.2 Orbs of offense over its kinds (0.4 an Orb on each of three, 0.6 on each of two); a Bell's follow-up
+      grows 0.1 a grade to a full Attack; Onslaught 2% a grade, Slayer 1.5%.</p>
+    <div class="multiples" id="grade-minis" style="grid-template-columns: repeat(5, minmax(0, 1fr))"></div>
+    <div class="panel" style="margin-top:12px"><details><summary>Show the numbers</summary><div id="grade-table"></div></details></div>
+  </section>
+
+  <section id="slots">
+    <h2>Slots, families and the kind cap</h2>
+    <p class="sub">1 · 2 · 3 slots, untyped. <b>One accessory of each family at most,</b> so every tier keeps a choice of family: one of two, two of
+      three, three of four. Flat offense on one kind (Orbs, Pendants and the Halo together) stops at a G10 weapon's Might × tier.</p>
+    <div class="slots3" id="slots3"></div>
+    <div class="panel" style="margin-top:12px"><h3>The kind cap, a Tier 2 Greatsword</h3><div class="chart-legend" id="cap-legend"></div><div id="cap-chart"></div>
+      <details><summary>Show the numbers</summary><div id="cap-table"></div></details></div>
+  </section>
+
+  <section id="viability">
+    <div class="head-row"><h2>Viability: every accessory a real choice</h2><div class="pills" id="vtier" style="margin:0 0 0 auto"></div></div>
+    <p class="sub">Damage each family's best member adds, at G10 and Lv 50 (the same share in every tier under SB1), on the owner's defaults. The
+      colour is its share of the best <b>unlocked</b> family in that row; hover for the member. Pick a tier to see what she can wear there.</p>
+    <div class="panel" style="overflow-x:auto"><div class="chart-legend" id="via-legend"></div><table class="vtab" id="via"></table>
+      <details><summary>Show the numbers</summary><div id="via-table"></div></details></div>
+    <div class="callout"><b>What it shows</b>Every family is someone's best: Pendants left on all region long (four classes), the Bell for the Brawler
+      in the campaign and in long fights, the Orb when she tunes to a region or a front and on waves, Slayer on bosses, Onslaught close behind on waves.
+      In the campaign left alone the Pendant, the Orb and Onslaught sit within 6.1–7.5% for the damage classes. The Bell is a niche on purpose for the
+      healers and the Summoner, whose acts are skills; for the hybrids its worth is also in chips, which these numbers leave out.</div>
+    <div class="note"><b>The model:</b> a flat point is worth its place in offense² ÷ (offense + defense) (foe defense about 190: +34 on her lead kind is +18%);
+      her damage split by kind from the 48 signatures; her Attack share of acts by her MP (Brawler 30%, Mage 20%, hybrids 25%, healers 12%; × 1.7 in long
+      fights, × 0.6 on waves); a skill averages 4.7 single-target units at Lv 50. Contexts: <b>Campaign</b>, one accessory left on all region long;
+      <b>Tuned</b>, swapped for a region or a Rift front (75% of her damage on her best kind); <b>Long fight</b>, a boss or the Duel, MP runs dry;
+      <b>Waves</b>, the Horde's regulars. Drafts for the simulation.</div>
+  </section>
+
+  <section id="bylevel">
+    <h2>By level: the choice moves through the tier</h2>
+    <p class="sub">A Brawler in the campaign, Tier 1, her accessory at her level's grade. The Bell leads while MP is tightest (Lv 6–31); the Pendant
+      catches it at G8; they tie at Lv 50. The Orb (Tier 2's, for reference) left alone trails both; tuned to a front it leads.</p>
+    <div class="panel"><div class="chart-legend" id="lv-legend"></div><div id="lv-chart"></div>
+      <details><summary>Show the numbers</summary><div id="lv-table"></div></details></div>
+  </section>
+
+  <section id="presets">
+    <h2>Presets, by class and tier</h2>
+    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks. The Orb is her first weapon slot's kind
+      (CP11).</p>
+    <div class="panel" style="overflow-x:auto"><table id="presets-table"></table></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const ACC = {"1": {"orb": [0, 1, 2, 4, 6, 10, 13, 18, 23, 29, 34], "band2": [0, 1, 1, 2, 4, 6, 8, 11, 14, 17, 20], "band3": [0, 1, 1, 2, 2, 4, 5, 7, 9, 12, 14], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}, "2": {"orb": [0, 2, 4, 7, 11, 18, 23, 32, 41, 52, 61], "band2": [0, 2, 2, 4, 7, 11, 14, 20, 25, 31, 36], "band3": [0, 2, 2, 4, 4, 7, 9, 13, 16, 22, 25], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}, "3": {"orb": [0, 3, 5, 10, 16, 26, 34, 47, 60, 75, 88], "band2": [0, 3, 3, 5, 10, 16, 21, 29, 36, 44, 52], "band3": [0, 3, 3, 5, 5, 10, 13, 18, 23, 31, 36], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}};
+const VIA = {"campaign": {"brawler": {"band": [7.4, "Main Arms Pendant"], "chaser": [7.5, "greatsword"], "orb": [6.3, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "mage": {"band": [7.3, "Elemental Pendant"], "chaser": [4.5, "fire"], "orb": [6.1, "fire"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "spellblade": {"band": [7.3, "Lightning Twin Pendant"], "chaser": [3.9, "katana"], "orb": [6.9, "lightning"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "summoner": {"band": [7.5, "Arcane Pendant"], "chaser": [2.9, "dark"], "orb": [6.6, "dark"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "paladin": {"band": [5.7, "Main Arms Pendant"], "chaser": [2.6, "greatsword"], "orb": [7.0, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "cleric": {"band": [6.4, "Light Twin Pendant"], "chaser": [2.7, "ice"], "orb": [8.2, "ice"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}}, "tuned": {"brawler": {"band": [8.0, "Fire Twin Pendant"], "chaser": [8.4, "greatsword"], "orb": [13.7, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "mage": {"band": [7.8, "Fire Twin Pendant"], "chaser": [5.1, "fire"], "orb": [13.4, "fire"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "spellblade": {"band": [9.4, "Lightning Twin Pendant"], "chaser": [4.1, "katana"], "orb": [13.7, "katana"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "summoner": {"band": [9.4, "Arcane Pendant"], "chaser": [3.1, "dark"], "orb": [13.7, "dark"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "paladin": {"band": [8.4, "Arcane Pendant"], "chaser": [2.8, "greatsword"], "orb": [14.4, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "cleric": {"band": [9.6, "Light Twin Pendant"], "chaser": [2.8, "light"], "orb": [14.4, "light"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}}, "long": {"brawler": {"band": [8.0, "Fire Twin Pendant"], "chaser": [18.1, "greatsword"], "orb": [13.7, "greatsword"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "mage": {"band": [7.8, "Fire Twin Pendant"], "chaser": [9.9, "fire"], "orb": [13.4, "fire"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "spellblade": {"band": [9.4, "Lightning Twin Pendant"], "chaser": [8.4, "katana"], "orb": [13.7, "katana"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "summoner": {"band": [9.4, "Arcane Pendant"], "chaser": [6.3, "dark"], "orb": [13.7, "dark"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "paladin": {"band": [8.4, "Arcane Pendant"], "chaser": [5.2, "greatsword"], "orb": [14.4, "greatsword"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "cleric": {"band": [9.6, "Light Twin Pendant"], "chaser": [5.2, "light"], "orb": [14.4, "light"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}}, "waves": {"brawler": {"band": [7.4, "Main Arms Pendant"], "chaser": [4.5, "greatsword"], "orb": [9.1, "greatsword"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "mage": {"band": [7.3, "Elemental Pendant"], "chaser": [2.8, "fire"], "orb": [8.9, "fire"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "spellblade": {"band": [8.2, "Lightning Twin Pendant"], "chaser": [2.2, "katana"], "orb": [9.1, "katana"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "summoner": {"band": [8.2, "Arcane Pendant"], "chaser": [1.7, "dark"], "orb": [9.1, "dark"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "paladin": {"band": [6.1, "Main Arms Pendant"], "chaser": [1.6, "greatsword"], "orb": [9.6, "greatsword"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "cleric": {"band": [7.9, "Light Twin Pendant"], "chaser": [1.6, "light"], "orb": [9.6, "light"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}}};
+const BYLEVEL = [{"lv": 1, "g": 1, "power": 1.48, "attack": 0.4, "pendant": 4.4, "bell": 2.8, "orbSet": 1.5, "orbTuned": 3.3}, {"lv": 6, "g": 2, "power": 2.03, "attack": 0.4, "pendant": 3.2, "bell": 4.4, "orbSet": 2.2, "orbTuned": 4.8}, {"lv": 11, "g": 3, "power": 2.19, "attack": 0.4, "pendant": 4.8, "bell": 6.2, "orbSet": 3.3, "orbTuned": 7.2}, {"lv": 16, "g": 4, "power": 2.82, "attack": 0.4, "pendant": 3.5, "bell": 6.8, "orbSet": 3.6, "orbTuned": 7.9}, {"lv": 21, "g": 5, "power": 3.42, "attack": 0.35, "pendant": 5.5, "bell": 6.1, "orbSet": 4.7, "orbTuned": 10.3}, {"lv": 26, "g": 6, "power": 3.78, "attack": 0.35, "pendant": 5.6, "bell": 6.7, "orbSet": 5.0, "orbTuned": 11.0}, {"lv": 31, "g": 7, "power": 4.48, "attack": 0.35, "pendant": 6.5, "bell": 6.7, "orbSet": 5.8, "orbTuned": 12.6}, {"lv": 36, "g": 8, "power": 4.7, "attack": 0.3, "pendant": 7.1, "bell": 5.9, "orbSet": 6.3, "orbTuned": 13.7}, {"lv": 41, "g": 9, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 6.7, "orbSet": 6.9, "orbTuned": 14.9}, {"lv": 46, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 7.4, "orbSet": 7.0, "orbTuned": 15.2}, {"lv": 50, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 7.4, "bell": 7.4, "orbSet": 6.3, "orbTuned": 13.7}];
+const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
+const LV = (g) => 5 * g - 4;
+const KINDS = { greatsword: ['Greatsword', 'arms', 'fire'], axe: ['Axe', 'arms', 'ice'], lance: ['Lance', 'arms', 'ltn'], bow: ['Bow', 'arms', 'light'], katana: ['Katana', 'arms', 'dark'],
+  fire: ['Fire', 'tome', 'fire'], ice: ['Ice', 'tome', 'ice'], lightning: ['Lightning', 'tome', 'ltn'], light: ['Light', 'tome', 'light'], dark: ['Dark', 'tome', 'dark'] };
+const chip = (id) => { const [n, ch, c] = KINDS[id]; return `<span class="k ${ch === 'arms' ? 'arm' : 'tome'} ${c}" style="--kc:var(--k-${c})">${n}</span>`; };
+const FAM = {
+  pendant: { name: 'Pendants', c: 'var(--c3)', tier: 1, what: 'Flat offense on each of its kinds\' hits: 0.4 of an Orb on three kinds, 0.6 on two.' },
+  bell: { name: 'Bells', c: 'var(--c5)', tier: 1, what: 'When she Attacks, her weapon of its kind strikes once more: one hit, × her hand. Its kind must be one she holds.' },
+  orb: { name: 'Orbs', c: 'var(--c1)', tier: 2, what: 'Flat offense on one kind\'s hits: half a weapon\'s Might (today\'s).' },
+  insignia: { name: 'Insignias', c: 'var(--c2)', tier: 3, what: 'A percentage by timing: her first act each wave, or her hits on sub-bosses and bosses.' },
+};
+const PENDANTS = [['Main Arms Pendant', ['greatsword', 'axe', 'lance']], ['Secondary Arms Pendant', ['bow', 'katana']], ['Elemental Pendant', ['fire', 'ice', 'lightning']], ['Arcane Pendant', ['light', 'dark']],
+  ['Fire Twin Pendant', ['greatsword', 'fire']], ['Ice Twin Pendant', ['axe', 'ice']], ['Lightning Twin Pendant', ['lance', 'lightning']], ['Light Twin Pendant', ['bow', 'light']], ['Dark Twin Pendant', ['katana', 'dark']]];
+const KORDER = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'fire', 'ice', 'lightning', 'light', 'dark'];
+const INSIG = [['Onslaught Insignia', 'Her first act in each wave', 'vanguard'], ['Slayer Insignia', 'Her hits on a sub-boss or a boss', 'reckoning']];
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY)); el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+
+const KPI = [['Slots', '1 · 2 · 3', 'Tier 1 · 2 · 3, untyped'], ['Families she can wear', '2 · 3 · 4', 'one of each at most'], ['Members unlocked', '19 · 29 · 31', '9 Pendants, 10 Bells; + 10 Orbs; + 2 Insignias'],
+  ['Defensive or MP accessories', '0', 'today 10 (5 Talismans, 5 Amulets)'], ['The kind cap', '+68 · +122 · +177', 'Orbs, Pendants and the Halo on one kind'], ['A Bell at G10', '1.0 × hand', 'a full Attack, once an act']];
+document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:20px">${v}</div><div class="delta">${d}</div></div>`).join('');
+
+// Retired
+const RET = [['Iron Talisman', 'Cut physical damage 15%', 'Never picked over damage (owner)'], ['Ward Amulet', 'Cut magical damage 15%', 'Never picked over damage (owner)'],
+  ['Bulwark Talisman', 'A 20% HP shield, physical', 'Defense: armor carries it'], ['Veil Amulet', 'A 20% HP shield, magical', 'Defense: armor carries it'],
+  ['Thorn Talisman', 'Return 50% of physical damage', 'Defense dressed as offense'], ['Mirror Amulet', 'Return 50% of magical damage', 'Defense dressed as offense'],
+  ['Vital Talisman', 'Regen 10% HP a round', 'Sustain: the healer\'s job (one a party)'], ['Vampire Talisman', 'Heal 20% of physical damage dealt', 'Sustain, not damage'],
+  ['Spring Amulet', '10 MP a round', '"Too broken; I would always wear one" (owner)', 1], ['Siphon Amulet', '8% of magical damage back as MP', 'At G10 a deep cast refunds more than it costs', 1]];
+document.getElementById('retired-cards').innerHTML = RET.map(([n, d, w, mp]) => `<div class="rcard${mp ? ' mp' : ''}"><b>${n}</b>${d} at G10<div class="why">${w}</div></div>`).join('');
+
+// Catalog
+let tier = 1, grade = 10;
+document.getElementById('tier').innerHTML = '<span class="lbl">Tier</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
+document.querySelectorAll('#tier button').forEach((b) => b.addEventListener('click', () => { tier = +b.dataset.t; renderCat(); }));
+document.getElementById('grade').addEventListener('input', (e) => { grade = +e.target.value; renderCat(); });
+function renderCat() {
+  document.querySelectorAll('#tier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === tier));
+  document.getElementById('gval').textContent = 'G' + grade; document.getElementById('glv').textContent = `worn at Uma Lv ${LV(grade)}`;
+  const A = ACC[tier];
+  const card = (id, members) => {
+    const f = FAM[id], locked = tier < f.tier;
+    return `<div class="fam${locked ? ' locked' : ''}" style="--fc:${f.c}"><h3>${f.name} <span class="tag">${locked ? 'Unlocks in Tier ' + f.tier : 'Tier ' + f.tier + ' on'}</span></h3><div class="what">${f.what}</div>${members}</div>`;
+  };
+  const pend = PENDANTS.map(([n, ks]) => { const v = (ks.length === 3 ? A.band3 : A.band2)[grade]; return `<div class="mem"><div class="nmk">${n}<div class="ks">${ks.map(chip).join('')}</div></div><span class="val">+${v} each</span></div>`; }).join('');
+  const bells = KORDER.map((k) => `<div class="mem"><div class="nmk">${KINDS[k][0]} Bell</div><span class="val">${A.chaser[grade].toFixed(1)} × hand</span></div>`).join('');
+  const orbs = KORDER.map((k) => `<div class="mem"><div class="nmk">${KINDS[k][0]} Orb</div><span class="val">+${A.orb[grade]}</span></div>`).join('');
+  const ins = INSIG.map(([n, d, key]) => `<div class="mem"><div class="nmk">${n}<span class="muted" style="font-size:11.5px">${d}</span></div><span class="val">+${A[key][grade]}%</span></div>`).join('');
+  document.getElementById('fams').innerHTML = card('pendant', pend) + card('bell', bells) + card('orb', orbs) + card('insignia', ins);
+}
+renderCat();
+
+// Values by grade minis
+(function () {
+  const P = [
+    ['Pendant, each of three kinds', (t) => ACC[t].band3, '', true], ['Pendant, each of two kinds', (t) => ACC[t].band2, '', true],
+    ['Orb, one kind', (t) => ACC[t].orb, '', true], ['Bell power', 'bell', '', false], ['Insignias', 'ins', '', false],
+  ];
+  document.getElementById('grade-minis').innerHTML = P.map(([title, fn, , flat], i) => {
+    const W = 300, H = 180, pad = { l: 34, r: 30, t: 14, b: 22 };
+    const x = (g) => pad.l + (g / 10) * (W - pad.l - pad.r);
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${title} by grade">`;
+    if (flat) {
+      const max = Math.max(...[1, 2, 3].map((t) => fn(t)[10])) * 1.1, y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+      [0, 0.5, 1].forEach((f) => { const v = Math.round(max / 1.1 * f); s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+      [1, 2, 3].forEach((t) => { const a = fn(t); s += `<path d="${a.map((v, g) => (g ? 'L' : 'M') + x(g) + ',' + y(v)).join(' ')}" fill="none" stroke="${TIERC[t]}" stroke-width="2.5"/>`;
+        a.forEach((v, g) => { if (g) s += `<circle class="mark" cx="${x(g)}" cy="${y(v)}" r="3.5" fill="${TIERC[t]}" stroke="var(--panel)" data-t="${title} · Tier ${t} · G${g}" data-d="+${v} offense${t < (title.startsWith('Orb') ? 2 : 1) ? ' (reference: Orbs unlock in Tier 2)' : ''}"/>`; });
+        s += `<text class="val-text" x="${x(10) + 5}" y="${y(a[10]) + 4}" style="font-size:11px">${a[10]}</text>`; });
+    } else {
+      const y = (v) => H - pad.b - (v / 22) * (H - pad.t - pad.b), yb = (v) => H - pad.b - (v / 1.1) * (H - pad.t - pad.b);
+      if (fn === 'bell') [0, 0.5, 1].forEach((v) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${yb(v)}" y2="${yb(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${yb(v) + 4}" text-anchor="end">${v}</text>`; });
+      else [0, 10, 20].forEach((v) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`; });
+      (fn === 'bell' ? [['chaser', 'var(--c5)', (v) => yb(v), (v) => v.toFixed(1) + ' × her hand', 'Bell']] : [['vanguard', 'var(--c2)', y, (v) => '+' + v + '%', 'Onslaught'], ['reckoning', 'var(--accent)', y, (v) => '+' + v + '%', 'Slayer']]).forEach(([k, c, yy, f, n]) => {
+        const a = ACC[1][k]; s += `<path d="${a.map((v, g) => (g ? 'L' : 'M') + x(g) + ',' + yy(v)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
+        a.forEach((v, g) => { if (g) s += `<circle class="mark" cx="${x(g)}" cy="${yy(v)}" r="3.5" fill="${c}" stroke="var(--panel)" data-t="${n} · G${g} (every tier)" data-d="${f(v)}"/>`; });
+        s += `<text class="val-text" x="${x(10) + 5}" y="${yy(a[10]) + 4 + (k === 'reckoning' ? 10 : 0)}" style="font-size:10.5px">${n === 'Bell' ? '1.0' : n}</text>`; });
+    }
+    s += [0, 5, 10].map((g) => `<text class="axis-text" x="${x(g)}" y="${H - 6}" text-anchor="middle">G${g}</text>`).join('');
+    return `<div class="mini"><h3>${title}</h3><div class="cat">${flat ? 'Flat offense · Tier 1, 2, 3 (× 1, × 1.8, × 2.6)' : fn === 'bell' ? 'A follow-up\'s power (an Attack = 1.0) · every tier' : 'Onslaught, Slayer · % · every tier'}</div>${s}</svg></div>`;
+  }).join('');
+  document.querySelectorAll('#grade-minis .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  const row = (n, a, f) => `<tr><td>${n}</td>${a.slice(1).map((v) => `<td class="num">${f ? f(v) : v}</td>`).join('')}</tr>`;
+  let t = `<table><tr><th>Value</th>${Array.from({ length: 10 }, (_, i) => `<th class="num">G${i + 1}</th>`).join('')}</tr>`;
+  [1, 2, 3].forEach((tt) => { t += row(`Pendant, three kinds, Tier ${tt}`, ACC[tt].band3) + row(`Pendant, two kinds, Tier ${tt}`, ACC[tt].band2) + row(`Orb, Tier ${tt}${tt === 1 ? ' (reference)' : ''}`, ACC[tt].orb); });
+  t += row('Bell power (× her hand), every tier', ACC[1].chaser, (v) => v.toFixed(1)) + row('Onslaught Insignia, every tier', ACC[1].vanguard, (v) => '+' + v + '%') + row('Slayer Insignia, every tier', ACC[1].reckoning, (v) => '+' + v + '%') + `<tr><td>Uma Lv to wear</td>${Array.from({ length: 10 }, (_, i) => `<td class="num">${LV(i + 1)}</td>`).join('')}</tr></table>`;
+  document.getElementById('grade-table').innerHTML = t;
+})();
+
+// Slots and the cap
+(function () {
+  const cols = [[1, ['pendant', 'bell'], []], [2, ['pendant', 'bell', 'orb'], ['orb']], [3, ['pendant', 'bell', 'orb', 'insignia'], ['insignia']]];
+  document.getElementById('slots3').innerHTML = cols.map(([t, fams, nw]) => `<div class="scol" style="--tc:${TIERC[t]}"><h3>Tier ${t}: ${t} slot${t > 1 ? 's' : ''}</h3><div class="sl">${Array.from({ length: t }, (_, i) => `<i>Slot ${i + 1}</i>`).join('')}</div>` +
+    `<div class="fb">${fams.map((f) => `<span class="fbadge${nw.includes(f) ? ' new' : ''}" style="--fc:${FAM[f].c}">${FAM[f].name}${nw.includes(f) ? ' · new' : ''}</span>`).join('')}</div>` +
+    `<div class="muted" style="font-size:12px;margin-top:8px">${['One of two families: a Pendant or a Bell.', 'Two of three: a Pendant, a Bell or an Orb, different families.', 'Three of four: one of each, minus one.'][t - 1]}</div></div>`).join('');
+  document.getElementById('cap-legend').innerHTML = '<span><span class="sw" style="background:var(--c1)"></span>Greatsword Orb +61</span><span><span class="sw" style="background:var(--c4)"></span>The Halo, two nodes +61 (Extra Stats)</span><span><span class="sw" style="background:var(--c3)"></span>Main Arms Pendant +25</span>';
+  const W = 1180, H = 120, pad = { l: 190, r: 30 }, max = 160, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The kind cap on a Tier 2 Greatsword">`;
+  const rows = [['On her Greatsword', [[61, 'var(--c1)', 'Greatsword Orb'], [61, 'var(--c4)', 'The Halo'], [25, 'var(--c3)', 'Main Arms Pendant']], 20], ['On her Axe and Lance', [[25, 'var(--c3)', 'Main Arms Pendant']], 70]];
+  rows.forEach(([lbl, segs, yy]) => {
+    s += `<text class="val-soft" x="${pad.l - 12}" y="${yy + 19}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${lbl}</text>`;
+    let acc = 0;
+    segs.forEach(([v, c, n]) => {
+      const over = acc + v > 122 ? Math.max(0, acc + v - 122) : 0, inside = v - over;
+      if (inside > 0) s += `<rect class="mark" x="${x(acc)}" y="${yy}" width="${x(acc + inside) - x(acc) - 2}" height="28" rx="4" fill="${c}" data-t="${n}" data-d="+${v}${over ? `: only +${inside} counts (capped)` : ''}"/>`;
+      if (over > 0) s += `<rect class="mark" x="${x(acc + inside)}" y="${yy}" width="${x(acc + v) - x(acc + inside) - 2}" height="28" rx="4" fill="none" stroke="${c}" stroke-dasharray="4 3" data-t="${n}, past the cap" data-d="+${over} adds nothing on this kind: point the Pendant (or the Halo) at her other kinds"/>`;
+      acc += v;
+    });
+    s += `<text class="val-text" x="${x(Math.min(acc, 160)) + 8}" y="${yy + 19}">+${Math.min(acc, 122)}${acc > 122 ? ' (capped)' : ''}</text>`;
+  });
+  s += `<line x1="${x(122)}" x2="${x(122)}" y1="10" y2="${H - 6}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${x(122) + 4}" y="${H - 6}" class="axis-text" style="fill:var(--ink)">cap +122 (G10 Might × 1.8)</text>`;
+  document.getElementById('cap-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#cap-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('cap-table').innerHTML = '<table><tr><th>Tier</th><th class="num">Cap a kind</th><th class="num">Orb G10</th><th class="num">Halo (two nodes)</th><th class="num">Pendant G10, three · two kinds</th></tr>' +
+    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">+${[68, 122, 177][t - 1]}</td><td class="num">${t === 1 ? '—' : '+' + ACC[t].orb[10]}</td><td class="num">${t === 1 ? '—' : '+' + [0, 61, 88][t - 1]}</td><td class="num">+${ACC[t].band3[10]} · +${ACC[t].band2[10]}</td></tr>`).join('') + '</table>';
+})();
+
+// Viability
+const CL = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
+const CTX = [['campaign', 'Campaign, set and forget'], ['tuned', 'Tuned'], ['long', 'Long fight'], ['waves', 'Waves']];
+const COLS = [['band', 'Pendant', 1], ['chaser', 'Bell', 1], ['orb', 'Orb', 2], ['vanguard', 'Onslaught', 3], ['reckoning', 'Slayer', 3]];
+let vtier = 3;
+document.getElementById('vtier').innerHTML = '<span class="lbl">Unlocked in</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
+document.querySelectorAll('#vtier button').forEach((b) => b.addEventListener('click', () => { vtier = +b.dataset.t; renderVia(); }));
+document.getElementById('via-legend').innerHTML = '<span class="scale"><i class="h5"></i>the best</span><span class="scale"><i class="h4"></i>≥ 85%</span><span class="scale"><i class="h3"></i>≥ 70%</span><span class="scale"><i class="h2"></i>≥ 50%</span><span class="scale"><i class="h1"></i>≥ 25%</span><span class="scale"><i class="h0"></i>below</span><span class="muted">Grey: not unlocked in this tier.</span>';
+const memberName = (k, m, c) => k === 'band' ? m : k === 'chaser' ? (KINDS[m] ? KINDS[m][0] + ' Bell' : m) : k === 'orb' ? KINDS[m][0] + ' Orb' : m;
+function renderVia() {
+  document.querySelectorAll('#vtier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === vtier));
+  let h = `<tr><th>Class</th><th>Context</th>${COLS.map(([, n, t]) => `<th style="text-align:center">${n}<br><span class="muted" style="font-weight:500;font-size:11px">Tier ${t} on</span></th>`).join('')}</tr>`;
+  CL.forEach(([c, cn]) => CTX.forEach(([x, xn], i) => {
+    const row = VIA[x][c];
+    const best = Math.max(...COLS.filter(([, , t]) => t <= vtier).map(([k]) => row[k][0]));
+    h += `<tr class="${i === 0 ? 'first' : ''}"><td>${i === 0 ? `<span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${cn}</b>` : ''}</td><td class="muted">${xn}</td>` + COLS.map(([k, n, t]) => {
+      const [v, m] = row[k];
+      if (t > vtier) return `<td class="c hna">—<small>Tier ${t}</small></td>`;
+      const f = best ? v / best : 0, cls = f >= 0.999 ? 'h5' : f >= 0.85 ? 'h4' : f >= 0.7 ? 'h3' : f >= 0.5 ? 'h2' : f >= 0.25 ? 'h1' : 'h0';
+      return `<td class="c ${cls}" data-t="${cn} · ${xn} · ${n}" data-d="${memberName(k, m, c)}: +${v}% damage (${Math.round(f * 100)}% of the best unlocked here)">+${v}%<small>${Math.round(f * 100)}%</small></td>`;
+    }).join('') + '</tr>';
+  }));
+  document.getElementById('via').innerHTML = h;
+  document.querySelectorAll('#via td.c').forEach((m) => { if (m.dataset.t) bindTip(m, m.dataset.t, m.dataset.d); });
+  document.getElementById('via-table').innerHTML = `<table><tr><th>Class</th><th>Context</th>${COLS.map(([, n]) => `<th>${n}: best member</th>`).join('')}</tr>` +
+    CL.map(([c, cn]) => CTX.map(([x, xn]) => `<tr><td>${cn}</td><td>${xn}</td>${COLS.map(([k]) => `<td>${VIA[x][c][k][0]}% · ${memberName(k, VIA[x][c][k][1], c)}</td>`).join('')}</tr>`).join('')).join('') + '</table>';
+}
+renderVia();
+
+// By level
+(function () {
+  const S = [['pendant', 'Main Arms Pendant (Tier 1)', 'var(--c3)', ''], ['bell', 'Greatsword Bell (Tier 1)', 'var(--c5)', ''], ['orbSet', 'Greatsword Orb, left on (Tier 2 ref.)', 'var(--c1)', '6 4'], ['orbTuned', 'Greatsword Orb, tuned (Tier 2 ref.)', 'var(--c1)', '']];
+  document.getElementById('lv-legend').innerHTML = S.map(([, n, c, d]) => `<span><svg width="26" height="8" aria-hidden="true"><line x1="0" x2="26" y1="4" y2="4" stroke="${c}" stroke-width="2.5" ${d ? `stroke-dasharray="${d}"` : ''}/></svg>${n}</span>`).join('');
+  const W = 1180, H = 300, pad = { l: 44, r: 200, t: 16, b: 30 }, max = 17;
+  const x = (lv) => pad.l + ((lv - 1) / 49) * (W - pad.l - pad.r), y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Accessory value by level, a Brawler in Tier 1">`;
+  [0, 5, 10, 15].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">${g}%</text>`; });
+  BYLEVEL.forEach((r) => { s += `<text class="axis-text" x="${x(r.lv)}" y="${H - 8}" text-anchor="middle">Lv ${r.lv} · G${r.g}</text>`; });
+  const last = BYLEVEL[BYLEVEL.length - 1];
+  const labs = S.map(([k, n, c]) => ({ k, n, c, y: y(last[k]) + 4 })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 15) labs[i].y = labs[i - 1].y + 15;
+  S.forEach(([k, n, c, d]) => {
+    s += `<path d="${BYLEVEL.map((r, i) => (i ? 'L' : 'M') + x(r.lv) + ',' + y(r[k])).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" ${d ? `stroke-dasharray="${d}"` : ''}/>`;
+    BYLEVEL.forEach((r) => { s += `<circle class="mark" cx="${x(r.lv)}" cy="${y(r[k])}" r="4" fill="${c}" stroke="var(--panel)" stroke-width="1.5" data-t="Lv ${r.lv} · G${r.g} · ${n}" data-d="+${r[k]}% damage · her Attack ${Math.round(r.attack * 100)}% of acts · skills at ${r.power}"/>`; });
+  });
+  labs.forEach((l) => { s += `<text class="val-text" x="${x(50) + 10}" y="${l.y}" style="font-size:11.5px;fill:${l.c}">${l.n.split(' (')[0]}: ${last[l.k]}%</text>`; });
+  document.getElementById('lv-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#lv-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('lv-table').innerHTML = `<table><tr><th class="num">Lv</th><th class="num">Grade</th><th class="num">Skill power</th><th class="num">Attack share</th><th class="num">Pendant</th><th class="num">Bell</th><th class="num">Orb, left on</th><th class="num">Orb, tuned</th></tr>` +
+    BYLEVEL.map((r) => `<tr><td class="num">${r.lv}</td><td class="num">G${r.g}</td><td class="num">${r.power}</td><td class="num">${Math.round(r.attack * 100)}%</td><td class="num">${r.pendant}%</td><td class="num">${r.bell}%</td><td class="num">${r.orbSet}%</td><td class="num">${r.orbTuned}%</td></tr>`).join('') + '</table>';
+})();
+
+// Presets
+(function () {
+  const PR = [['brawler', 'Brawler', 'Greatsword Bell', 'Greatsword Orb', 'Main Arms Pendant'], ['mage', 'Mage', 'Elemental Pendant', 'Fire Orb', 'Onslaught Insignia'],
+    ['spellblade', 'Spell Blade', 'Lightning Twin Pendant', 'Katana Orb', 'Onslaught Insignia'], ['summoner', 'Summoner', 'Arcane Pendant', 'Dark Orb', 'Onslaught Insignia'],
+    ['paladin', 'Paladin', 'Main Arms Pendant', 'Greatsword Orb', 'Onslaught Insignia'], ['cleric', 'Cleric', 'Light Twin Pendant', 'Light Orb', 'Onslaught Insignia']];
+  const fc = (n) => n.includes('Bell') ? FAM.bell.c : n.includes('Orb') ? FAM.orb.c : n.includes('Insignia') ? FAM.insignia.c : FAM.pendant.c;
+  const b = (n) => `<span class="fbadge" style="--fc:${fc(n)}">${n}</span>`;
+  document.getElementById('presets-table').innerHTML = `<tr><th>Class</th><th>Tier 1</th><th>Tier 2 adds</th><th>Tier 3 adds</th></tr>` +
+    PR.map(([c, n, a, o, i]) => `<tr><td><span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${n}</b></td><td>${b(a)}</td><td>${b(o)}</td><td>${b(i)}</td></tr>`).join('');
+})();
+</script>
+</body>
+</html>

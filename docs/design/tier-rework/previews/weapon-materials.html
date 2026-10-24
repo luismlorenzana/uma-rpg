@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gear Materials</title>
+<!-- The Tier rework's Weapon Progression (weapon-progression.md §6): what is crafted for weapons, armor and accessories,
+     every recipe by grade and tier, where each material comes from, and one Uma's totals per tier. Material names and ids
+     are professions.md's (§0.3, §5.2), every one an existing item. No external scripts, fonts or images. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+<style>
+  /* Class Progression pages: the kit's tokens above, plus the ten kinds (twins share a hue: an Arm is drawn outlined,
+     its twin Tome filled), the two channels, the six classes and a sequential scale for coverage counts. */
+  :root {
+    --arms: #9a6a3a; --tomes: #4a62c4;
+    --k-fire: #d9582f; --k-ice: #2f80cc; --k-ltn: #b58700; --k-light: #16917f; --k-dark: #7350c6;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
+    --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+    --grp-ring: #c0622f; --grp-ld: #5b52c8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --arms: #c18b56; --tomes: #7b8ff0;
+      --k-fire: #f0764e; --k-ice: #5aa2ec; --k-ltn: #e0b12e; --k-light: #35bba6; --k-dark: #9f84ec;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
+      --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+      --grp-ring: #e5824f; --grp-ld: #9a90f2;
+    }
+  }
+  .grid2 > *, .multiples > * { min-width: 0; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 6px; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
+  .k { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 650; line-height: 1.5;
+    white-space: nowrap; border: 1.5px solid var(--kc); cursor: default; }
+  .k.arm { color: var(--kc); background: transparent; }
+  .k.tome { background: var(--kc); color: var(--on-k); }
+  .k.tome.ltn { color: #1b1300; }
+  .k.dim { opacity: .35; }
+  .cdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--cc); }
+  .ch { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 1px 7px; border-radius: 5px; }
+  .ch.a { color: var(--arms); border: 1.5px solid var(--arms); }
+  .ch.t { color: var(--on-k); background: var(--tomes); border: 1.5px solid var(--tomes); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .heat { border-collapse: separate; border-spacing: 3px; width: auto; }
+  .heat th, .heat td { border: 0; padding: 6px 8px; font-size: 12px; }
+  .heat td.c { text-align: center; font-weight: 700; min-width: 44px; border-radius: 6px; font-variant-numeric: tabular-nums; cursor: default; }
+  .heat td.c:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .h0 { background: var(--h0); color: var(--h0t); } .h1 { background: var(--h1); color: var(--hlt); } .h2 { background: var(--h2); color: var(--hlt); }
+  .h3 { background: var(--h3); color: var(--hdt); } .h4 { background: var(--h4); color: #fff; } .h5 { background: var(--h5); color: #fff; }
+  .hna { background: transparent; color: var(--ink-faint); font-weight: 500 !important; }
+  .scale { display: inline-flex; gap: 3px; align-items: center; font-size: 11px; color: var(--ink-soft); }
+  .scale i { width: 22px; height: 14px; border-radius: 4px; display: inline-block; }
+  button.linkish { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; padding: 0; }
+</style>
+<style>
+  :root { --pr-mining: var(--c2); --pr-wood: var(--c4); --pr-farming: var(--c3); --pr-fishing: var(--c5); --pr-hunting: var(--c1); }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin-top: 14px; }
+  .controls .pills { margin: 0; }
+  .rtab { border-collapse: separate; border-spacing: 3px; width: 100%; table-layout: fixed; }
+  .rtab th, .rtab td { font-size: 11.5px; padding: 6px 5px; border: 0; vertical-align: top; }
+  .rtab th:first-child { width: 150px; }
+  .rtab td { background: var(--raised); border-radius: 8px; }
+  .rtab td.na { background: transparent; color: var(--ink-faint); text-align: center; }
+  .rtab td .sum { display: block; font-weight: 700; color: var(--ink-soft); font-size: 10.5px; margin-bottom: 3px; }
+  .mat { display: flex; align-items: center; gap: 4px; line-height: 1.35; margin: 1px 0; }
+  .mat i { width: 8px; height: 8px; border-radius: 2px; flex: none; background: var(--pc); }
+  .mat.new { font-weight: 700; }
+  .item b { display: block; font-size: 12.5px; }
+  .item span { color: var(--ink-faint); font-size: 11px; }
+  .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .plegend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0; }
+  .plegend span { display: inline-flex; align-items: center; gap: 6px; }
+  @media (max-width: 1100px) { .rtab th:first-child { width: 110px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Gear materials: every recipe and one Uma's totals</h1>
+  <p class="lead">Four things are crafted for gear: <b>Weapon Gems</b> and, from Tier 2, one <b>Branch Gem</b> a weapon at the Forge, <b>Armor
+    Fittings</b> at the Armorer and <b>Accessory Settings</b> at the Charm Shop. Each has one recipe a grade band, the low type of a pair for
+    grades 1–5 and the high type for 6–10; a tier's new pair goes only into its new piece. One Uma's gear stays at 365 · 380 · 380 refined items.
+    From <a href="../weapon-progression.md">weapon-progression.md</a> §6; profession-progression.md owns supply and reads this as its interface.
+    The other pages: <a href="weapon-trees.html">weapon trees</a> · <a href="weapon-armor.html">armor</a> · <a href="weapon-accessories.html">accessories</a>.</p>
+  <nav class="top">
+    <a href="#recipes">Every recipe</a><a href="#flow">Where it comes from</a><a href="#totals">One Uma's totals</a>
+    <a href="#profs">By profession</a><a href="#interface">The interface</a>
+  </nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="recipes">
+    <div class="head-row"><h2>Every recipe, by grade and tier</h2><div class="pills" id="tier" style="margin:0 0 0 auto"></div></div>
+    <p class="sub">Each cell is one item of that grade: its refined materials (a raw item each, refined one for one at the Workbench). Made at
+      Craft Lv 5g − 4, worn at Uma Lv 5g − 4. Bold is the tier's new pair. From Tier 2 a weapon's G5 step takes a Branch Gem instead of a Weapon Gem.</p>
+    <div class="plegend" id="plegend"></div>
+    <div class="panel" style="padding:12px 14px"><table class="rtab" id="rtab"></table>
+      <details><summary>Show the numbers</summary><div id="rtab-num"></div></details></div>
+  </section>
+
+  <section id="flow">
+    <h2>Where it comes from</h2>
+    <p class="sub">One Uma's gear for the tier picked above: each refined material's units into each item. Mining and Wood Chopping feed the Forge;
+      Farming and Fishing the Charm Shop and light armor; heavy armor takes iron, oak and a garnet. Hunting's stones go mostly to jewels.</p>
+    <div class="panel"><div id="flow-chart"></div>
+      <details><summary>Show the numbers</summary><div id="flow-table"></div></details></div>
+  </section>
+
+  <section id="totals">
+    <h2>One Uma's totals, per tier</h2>
+    <p class="sub">Pieces and refined items for one Uma, one class, fully geared; jewels (Extra Stats, extra-stats-progression.md's) beside them for
+      her whole total. The redesign changes no count: armor's values and the accessory families don't change what she crafts.</p>
+    <div class="grid2">
+      <div class="panel"><h3>By item</h3><div class="chart-legend" id="item-legend"></div><div id="item-chart"></div>
+        <details><summary>Show the numbers</summary><div id="item-table"></div></details></div>
+      <div class="panel"><h3>Gear by material</h3><div class="chart-legend" id="mat-legend"></div><div id="mat-chart"></div>
+        <details><summary>Show the numbers</summary><div id="mat-table"></div></details></div>
+    </div>
+  </section>
+
+  <section id="profs">
+    <h2>By profession</h2>
+    <p class="sub">Gathering per Uma by profession: gear alone for each tier, and Tier 1 with the jewels, where every gathering profession lands near a
+      fifth (Mining 105, the others 95), as professions.md drew.</p>
+    <div class="panel"><div class="chart-legend" id="prof-legend"></div><div id="prof-chart"></div>
+      <details><summary>Show the numbers</summary><div id="prof-table"></div></details></div>
+  </section>
+
+  <section id="interface">
+    <h2>The interface for profession-progression</h2>
+    <p class="sub">profession-progression.md reads this table and may resize any row. If it does, the pieces (what she needs) stay and the refined per
+      piece moves, within PR10's tenth more a tier. Make time stays PR9's: one gather's time per refined item (a Branch Gem, 9).</p>
+    <div class="panel" style="overflow-x:auto"><table id="iface"></table></div>
+    <div class="callout"><b>What stands whatever the recipes</b>This doc owns the four products, <b>one Branch Gem item a tier</b> (the branch picked when
+      it is used, not a Pure, Dual, Keen or Tempered Gem each), the pieces per Uma (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30) and the gates.
+      profession-progression.md owns which materials fill each grade and how many. Its parallel draft (2026-10-24) already puts a tier's new pair
+      into fixed grades (G5 and G10; G4 and G9 take Tier 2's in Tier 3) and makes the branch gem a G5 Weapon Gem in the tier's metal and wood
+      (4 refined): 503 · 521 an Uma in Tiers 2 and 3. Where the two differ, its amounts win.</div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const MATS = {"1": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 120, "armor": 125, "setting": 120}, "by_prof": {"mining": 85, "wood": 85, "farming": 85, "fishing": 85, "hunting": 25}}, "2": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Silver Ingot": 3, "Cedar Plank": 3, "Wool Cloth": 3, "Trilobite Carving": 3, "Cut Sapphire": 3, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 108, "armor": 125, "setting": 120, "branch": 27}, "by_prof": {"mining": 88, "wood": 88, "farming": 88, "fishing": 88, "hunting": 28}}, "3": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Titanium Ingot": 3, "Ebony Plank": 3, "Moonsilk": 3, "Aether Infusion": 3, "Cut Starstone": 3, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 108, "armor": 125, "setting": 120, "branch": 27}, "by_prof": {"mining": 88, "wood": 88, "farming": 88, "fishing": 88, "hunting": 28}}};
+const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
+const PROF = { mining: ['Mining', 'Mine', 'var(--pr-mining)'], wood: ['Wood Chopping', 'Forest', 'var(--pr-wood)'], farming: ['Farming', 'Fields', 'var(--pr-farming)'], fishing: ['Fishing', 'Fishery', 'var(--pr-fishing)'], hunting: ['Hunting', 'Monster Den', 'var(--pr-hunting)'] };
+const MAT = {
+  'Copper Ingot': ['mining', 'copper-ingot', 1], 'Iron Ingot': ['mining', 'iron-ingot', 1], 'Pine Plank': ['wood', 'pine-plank', 1], 'Oak Plank': ['wood', 'oak-plank', 1],
+  'Linen': ['farming', 'linen', 1], 'Cotton Cloth': ['farming', 'cotton-cloth', 1], 'Shell Carving': ['fishing', 'shell-carving', 1], 'Ammonite Carving': ['fishing', 'ammonite-carving', 1],
+  'Cut Quartz': ['hunting', 'cut-quartz', 1], 'Cut Garnet': ['hunting', 'cut-garnet', 1],
+  'Silver Ingot': ['mining', 'silver-ingot', 2], 'Cedar Plank': ['wood', 'cedar-plank', 2], 'Wool Cloth': ['farming', 'wool-cloth', 2], 'Trilobite Carving': ['fishing', 'trilobite-carving', 2], 'Cut Sapphire': ['hunting', 'cut-sapphire', 2],
+  'Titanium Ingot': ['mining', 'titanium-ingot', 3], 'Ebony Plank': ['wood', 'ebony-plank', 3], 'Moonsilk': ['farming', 'moonsilk', 3], 'Aether Infusion': ['fishing', 'aether-infusion', 3], 'Cut Starstone': ['hunting', 'cut-starstone', 3],
+};
+const PAIR = { 2: ['Silver Ingot', 'Cedar Plank', 'Wool Cloth', 'Trilobite Carving', 'Cut Sapphire'], 3: ['Titanium Ingot', 'Ebony Plank', 'Moonsilk', 'Aether Infusion', 'Cut Starstone'] };
+function recipe(item, g, t) {
+  if (item === 'weapon') { if (t >= 2 && g === 5) return null; return g <= 5 ? { 'Copper Ingot': 2, 'Pine Plank': 2 } : { 'Iron Ingot': 2, 'Oak Plank': 2 }; }
+  if (item === 'branch') { if (t === 1 || g !== 5) return null; const r = { 'Copper Ingot': 2, 'Pine Plank': 2 }; PAIR[t].forEach((m) => (r[m] = 1)); return r; }
+  if (item === 'armor') return g <= 5 ? { 'Linen': 1, 'Shell Carving': 1 } : { 'Iron Ingot': 1, 'Oak Plank': 1, 'Cut Garnet': 1 };
+  if (item === 'setting') { const n = { 1: 6, 2: 3, 3: 2 }[t]; return g <= 5 ? { 'Linen': n, 'Shell Carving': n } : { 'Cotton Cloth': n, 'Ammonite Carving': n }; }
+}
+const ITEMS = [['weapon', 'Weapon Gem', 'Forge · a weapon one grade', 3], ['branch', 'Branch Gem', 'Forge · a weapon\'s G5 step, Tier 2 on', 3], ['armor', 'Armor Fittings', 'Armorer · an armor slot one grade', 5], ['setting', 'Accessory Setting', 'Charm Shop · an accessory slot one grade', 0]];
+const IC = { weapon: 'var(--c2)', branch: 'var(--accent)', armor: 'var(--c4)', setting: 'var(--c5)', jewels: 'var(--neutral)' };
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY)); el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+const JEWELS = { 1: 120, 2: 130, 3: 140 };
+const PIECES = { 1: { weapon: 30, branch: 0, armor: 50, setting: 10 }, 2: { weapon: 27, branch: 3, armor: 50, setting: 20 }, 3: { weapon: 27, branch: 3, armor: 50, setting: 30 } };
+
+const KPI = [['One Uma\'s gear, refined', '365 · 380 · 380', 'Tier 1 · 2 · 3; today 240'], ['Gear items to max her', '90 · 100 · 110', 'today 120 pieces, bound in order'], ['One Uma in all, with jewels', '485 · 510 · 520', '+8 for her moon; today 472'],
+  ['Products', '3 → 4', '+ the Branch Gem from Tier 2 (one item, not five)'], ['Materials in her gear', '9 · 14 · 14', 'Tier 1\'s pairs, + one tier pair\'s low types'], ['Hours, one Uma (with jewels)', '822 · 864 · 881', 'Craft Lv 25 speed; today 776']];
+document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="delta">${d}</div></div>`).join('');
+document.getElementById('plegend').innerHTML = Object.values(PROF).map(([n, p, c]) => `<span><span class="sw" style="background:${c}"></span>${n} (${p})</span>`).join('');
+
+let tier = 1;
+document.getElementById('tier').innerHTML = '<span class="lbl">Tier</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
+document.querySelectorAll('#tier button').forEach((b) => b.addEventListener('click', () => { tier = +b.dataset.t; render(); }));
+const matHtml = (r) => Object.entries(r).map(([m, n]) => `<div class="mat${MAT[m][2] > 1 ? ' new' : ''}" style="--pc:${PROF[MAT[m][0]][2]}"><i></i>${n} ${m}</div>`).join('');
+function render() {
+  document.querySelectorAll('#tier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === tier));
+  let h = `<tr><th></th>${Array.from({ length: 10 }, (_, i) => `<th style="text-align:center">G${i + 1}<br><span class="muted" style="font-weight:500">Lv ${5 * (i + 1) - 4}</span></th>`).join('')}</tr>`;
+  const num = [];
+  ITEMS.forEach(([id, n, d, per]) => {
+    if (id === 'branch' && tier === 1) return;
+    h += `<tr><th class="item"><b style="color:${IC[id]}">${n}</b><span>${d}</span></th>` + Array.from({ length: 10 }, (_, i) => {
+      const g = i + 1, r = recipe(id, g, tier);
+      if (!r) return `<td class="na">${id === 'weapon' ? 'Branch Gem' : '—'}</td>`;
+      num.push([n, g, Object.entries(r).map(([m, k]) => `${k} ${m}`).join(', '), sum(r)]);
+      return `<td class="mark" data-t="${n} G${g} · Tier ${tier}" data-d="${Object.entries(r).map(([m, k]) => `${k} ${m} (${PROF[MAT[m][0]][0]}; id ${MAT[m][1]})`).join('<br>')}<br>${sum(r)} refined · made in ${sum(r)} gathers' time · Craft Lv ${5 * g - 4}"><span class="sum">${sum(r)} refined</span>${matHtml(r)}</td>`;
+    }).join('') + '</tr>';
+  });
+  document.getElementById('rtab').innerHTML = h;
+  document.querySelectorAll('#rtab td.mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('rtab-num').innerHTML = `<table><tr><th>Item</th><th class="num">Grade</th><th>Recipe</th><th class="num">Refined</th></tr>${num.map(([n, g, r, s]) => `<tr><td>${n}</td><td class="num">G${g}</td><td>${r}</td><td class="num">${s}</td></tr>`).join('')}</table>`;
+  renderFlow();
+}
+
+function flowUnits(t) {
+  const out = {}; // [mat][item] = units
+  for (let g = 1; g <= 10; g++) ITEMS.forEach(([id]) => {
+    const r = recipe(id, g, t); if (!r) return;
+    const n = id === 'weapon' || id === 'branch' ? 3 : id === 'armor' ? 5 : t;
+    Object.entries(r).forEach(([m, k]) => { out[m] = out[m] || {}; out[m][id] = (out[m][id] || 0) + k * n; });
+  });
+  return out;
+}
+function renderFlow() {
+  const U = flowUnits(tier);
+  const mats = Object.keys(U).sort((a, b) => Object.keys(PROF).indexOf(MAT[a][0]) - Object.keys(PROF).indexOf(MAT[b][0]) || MAT[a][2] - MAT[b][2]);
+  const items = ITEMS.filter(([id]) => !(id === 'branch' && tier === 1));
+  const W = 1180, H = 470, gap = 6, xL = 230, xR = 900, nodeW = 14, scale = (H - 20 - gap * mats.length) / 380;
+  let y = 10, s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Materials into items, one Uma, Tier ${tier}">`;
+  const mPos = {}, iPos = {};
+  mats.forEach((m) => { const v = sum(U[m]); mPos[m] = { y, h: v * scale, off: 0 }; y += v * scale + gap; });
+  const itemTot = Object.fromEntries(items.map(([id]) => [id, mats.reduce((a, m) => a + (U[m][id] || 0), 0)]));
+  const igap = (H - 20 - items.reduce((a, [id]) => a + itemTot[id] * scale, 0)) / Math.max(1, items.length - 1);
+  y = 10; items.forEach(([id]) => { iPos[id] = { y, h: itemTot[id] * scale, off: 0 }; y += itemTot[id] * scale + igap; });
+  mats.forEach((m) => items.forEach(([id, n]) => {
+    const v = U[m][id]; if (!v) return;
+    const h = v * scale, a = mPos[m], b = iPos[id];
+    const y1 = a.y + a.off + h / 2, y2 = b.y + b.off + h / 2; a.off += h; b.off += h;
+    const c = PROF[MAT[m][0]][2], mx = (xL + nodeW + xR) / 2;
+    s += `<path class="mark" d="M${xL + nodeW},${y1} C${mx},${y1} ${mx},${y2} ${xR},${y2}" fill="none" stroke="${c}" stroke-opacity=".45" stroke-width="${Math.max(1, h)}" data-t="${m} → ${n}" data-d="${v} a Uma in Tier ${tier}"/>`;
+  }));
+  mats.forEach((m) => { const p = mPos[m], c = PROF[MAT[m][0]][2]; s += `<rect x="${xL}" y="${p.y}" width="${nodeW}" height="${Math.max(2, p.h)}" fill="${c}" rx="2"/><text class="val-soft" x="${xL - 8}" y="${p.y + p.h / 2 + 4}" text-anchor="end" style="fill:var(--ink);font-size:12px;${MAT[m][2] > 1 ? 'font-weight:700' : ''}">${m} · ${sum(U[m])}</text>`; });
+  items.forEach(([id, n]) => { const p = iPos[id]; s += `<rect x="${xR}" y="${p.y}" width="${nodeW}" height="${Math.max(2, p.h)}" fill="${IC[id]}" rx="2"/><text class="val-text" x="${xR + nodeW + 10}" y="${p.y + p.h / 2 - 2}" style="font-size:13px">${n}</text><text class="val-soft" x="${xR + nodeW + 10}" y="${p.y + p.h / 2 + 14}">${PIECES[tier][id]} pieces · ${itemTot[id]} refined</text>`; });
+  document.getElementById('flow-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#flow-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('flow-table').innerHTML = `<table><tr><th>Material</th><th>Profession</th>${items.map(([, n]) => `<th class="num">${n}</th>`).join('')}<th class="num">Total</th></tr>` +
+    mats.map((m) => `<tr><td>${m} (<code>${MAT[m][1]}</code>)</td><td>${PROF[MAT[m][0]][0]}</td>${items.map(([id]) => `<td class="num">${U[m][id] || ''}</td>`).join('')}<td class="num"><b>${sum(U[m])}</b></td></tr>`).join('') +
+    `<tr><td><b>In all</b></td><td></td>${items.map(([id]) => `<td class="num"><b>${itemTot[id]}</b></td>`).join('')}<td class="num"><b>${mats.reduce((a, m) => a + sum(U[m]), 0)}</b></td></tr></table>`;
+}
+render();
+
+// Totals by item (stacked) and by material (stacked by profession)
+(function () {
+  const order = ['weapon', 'branch', 'armor', 'setting', 'jewels'];
+  const names = { weapon: 'Weapon Gems', branch: 'Branch Gems', armor: 'Armor Fittings', setting: 'Accessory Settings', jewels: 'Jewels (Extra Stats)' };
+  document.getElementById('item-legend').innerHTML = order.map((k) => `<span><span class="sw" style="background:${IC[k]}"></span>${names[k]}</span>`).join('');
+  const W = 580, H = 220, pad = { l: 56, r: 50, t: 10, b: 24 }, max = 540, rowH = 54;
+  const x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="One Uma's refined items by item and tier">`;
+  [0, 100, 200, 300, 400, 500].forEach((g) => { s += `<line x1="${x(g)}" x2="${x(g)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(g)}" y="${H - 8}" text-anchor="middle">${g}</text>`; });
+  const rows = [];
+  [1, 2, 3].forEach((t, i) => {
+    const y = pad.t + 10 + i * (rowH + 8); let acc = 0;
+    const v = { ...MATS[t].by_item, jewels: JEWELS[t] };
+    s += `<text class="val-text" x="${pad.l - 8}" y="${y + rowH / 2 + 4}" text-anchor="end">Tier ${t}</text>`;
+    order.forEach((k) => { const n = v[k] || 0; if (!n) return; s += `<rect class="mark" x="${x(acc)}" y="${y}" width="${x(acc + n) - x(acc) - 1.5}" height="${rowH}" fill="${IC[k]}" rx="3" data-t="Tier ${t} · ${names[k]}" data-d="${k === 'jewels' ? 'Planet, Moon and Halo Jewels: extra-stats-progression.md\'s' : PIECES[t][k] + ' pieces'} · ${n} refined"/>`; if (x(acc + n) - x(acc) > 30) s += `<text x="${(x(acc) + x(acc + n)) / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#101a24;pointer-events:none">${n}</text>`; acc += n; });
+    s += `<text class="val-text" x="${x(acc) + 6}" y="${y + rowH / 2 + 4}">${acc}</text>`;
+    rows.push([t, v, acc]);
+  });
+  document.getElementById('item-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#item-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('item-table').innerHTML = `<table><tr><th>Tier</th>${order.map((k) => `<th class="num">${names[k]}</th>`).join('')}<th class="num">Gear</th><th class="num">One Uma</th><th class="num">+ her moon</th></tr>` +
+    rows.map(([t, v, a]) => `<tr><td>Tier ${t}</td>${order.map((k) => `<td class="num">${k === 'jewels' ? v[k] : (PIECES[t][k] || 0) + ' · ' + (v[k] || 0)}</td>`).join('')}<td class="num"><b>${a - v.jewels}</b></td><td class="num"><b>${a}</b></td><td class="num">${a + 8}</td></tr>`).join('') + '</table><p class="foot">Cells are pieces · refined items. Jewels as professions.md and the cross-reference counted them (120, 130, 140), now extra-stats-progression.md\'s.</p>';
+})();
+(function () {
+  const profOrder = Object.keys(PROF);
+  document.getElementById('mat-legend').innerHTML = profOrder.map((p) => `<span><span class="sw" style="background:${PROF[p][2]}"></span>${PROF[p][0]}</span>`).join('') + '<span class="muted">Lighter: the low type; bold outline: the tier\'s pair</span>';
+  const W = 580, H = 220, pad = { l: 56, r: 50, t: 10, b: 24 }, max = 420, rowH = 54;
+  const x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="One Uma's gear by material and tier">`;
+  [0, 100, 200, 300, 400].forEach((g) => { s += `<line x1="${x(g)}" x2="${x(g)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(g)}" y="${H - 8}" text-anchor="middle">${g}</text>`; });
+  const rows = [];
+  [1, 2, 3].forEach((t, i) => {
+    const y = pad.t + 10 + i * (rowH + 8); let acc = 0;
+    const tot = MATS[t].total;
+    const ms = Object.keys(tot).sort((a, b) => profOrder.indexOf(MAT[a][0]) - profOrder.indexOf(MAT[b][0]) || MAT[a][2] - MAT[b][2] || (/(Copper|Pine|Linen|Shell|Quartz)/.test(a) ? -1 : 1));
+    s += `<text class="val-text" x="${pad.l - 8}" y="${y + rowH / 2 + 4}" text-anchor="end">Tier ${t}</text>`;
+    ms.forEach((m) => { const n = tot[m], c = PROF[MAT[m][0]][2], low = /(Copper|Pine|Linen|Shell|Quartz)/.test(m), pair = MAT[m][2] > 1;
+      s += `<rect class="mark" x="${x(acc)}" y="${y}" width="${Math.max(1, x(acc + n) - x(acc) - 1.5)}" height="${rowH}" fill="${low ? `color-mix(in srgb, ${c} 55%, var(--panel))` : c}" ${pair ? 'stroke="var(--ink)" stroke-width="1.5"' : ''} rx="2" data-t="Tier ${t} · ${m}" data-d="${n} refined (${PROF[MAT[m][0]][0]})"/>`; acc += n; });
+    s += `<text class="val-text" x="${x(acc) + 6}" y="${y + rowH / 2 + 4}">${acc}</text>`;
+    rows.push([t, tot]);
+  });
+  document.getElementById('mat-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#mat-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  const allM = Object.keys(MAT).filter((m) => [1, 2, 3].some((t) => MATS[t].total[m]));
+  document.getElementById('mat-table').innerHTML = `<table><tr><th>Material</th><th>Profession</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>` +
+    allM.map((m) => `<tr><td>${m}</td><td>${PROF[MAT[m][0]][0]}</td>${[1, 2, 3].map((t) => `<td class="num">${MATS[t].total[m] || '—'}</td>`).join('')}</tr>`).join('') +
+    `<tr><td><b>Gear in all</b></td><td></td>${[1, 2, 3].map((t) => `<td class="num"><b>${sum(MATS[t].total)}</b></td>`).join('')}</tr></table>`;
+})();
+
+// By profession
+(function () {
+  const profOrder = Object.keys(PROF);
+  const JEW1 = { mining: 20, wood: 10, farming: 10, fishing: 10, hunting: 70 };
+  const S = [['g1', 'Tier 1 gear', 'var(--t1)'], ['g2', 'Tier 2 gear', 'var(--t2)'], ['g3', 'Tier 3 gear', 'var(--t3)'], ['j1', 'Tier 1 with jewels', 'var(--neutral-strong)']];
+  document.getElementById('prof-legend').innerHTML = S.map(([, n, c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('');
+  const W = 1180, H = 260, pad = { l: 44, r: 16, t: 20, b: 34 }, max = 120, gw = (W - pad.l - pad.r) / 5, bw = 44;
+  const y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Gathering per Uma by profession">`;
+  [0, 25, 50, 75, 100].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">${g}</text>`; });
+  const rows = [];
+  profOrder.forEach((p, i) => {
+    const cx = pad.l + gw * i + gw / 2;
+    const v = { g1: MATS[1].by_prof[p], g2: MATS[2].by_prof[p], g3: MATS[3].by_prof[p], j1: MATS[1].by_prof[p] + JEW1[p] };
+    S.forEach(([k, n, c], j) => { const x = cx - 2 * bw - 6 + j * (bw + 4), yy = y(v[k]), r = 4;
+      s += `<path class="mark" d="M${x},${H - pad.b} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${H - pad.b} Z" fill="${c}" data-t="${PROF[p][0]} · ${n}" data-d="${v[k]} gathered per Uma"></path><text class="val-text" x="${x + bw / 2}" y="${yy - 5}" text-anchor="middle" style="font-size:11px">${v[k]}</text>`; });
+    s += `<text class="axis-text" x="${cx}" y="${H - 10}" text-anchor="middle" style="font-size:12.5px;fill:${PROF[p][2]};font-weight:700">${PROF[p][0]}</text>`;
+    rows.push([PROF[p][0], v]);
+  });
+  document.getElementById('prof-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#prof-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('prof-table').innerHTML = `<table><tr><th>Profession</th><th class="num">Tier 1 gear</th><th class="num">Tier 2 gear</th><th class="num">Tier 3 gear</th><th class="num">Tier 1 with jewels</th></tr>` +
+    rows.map(([n, v]) => `<tr><td>${n}</td><td class="num">${v.g1}</td><td class="num">${v.g2}</td><td class="num">${v.g3}</td><td class="num">${v.j1}</td></tr>`).join('') + '</table>';
+})();
+
+// Interface table
+(function () {
+  const rows = [
+    ['<code>weapon-gem-g{1–10}</code>', '1', '1–10', 30, 4, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>', '2 <code>iron-ingot</code>, 2 <code>oak-plank</code>'],
+    ['<code>weapon-gem-g{1–4, 6–10}</code>', '2, 3', 'not 5', 27, 4, 'as Tier 1', 'as Tier 1'],
+    ['<code>branch-gem</code>', '2', '5', 3, 9, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>, 1 each <code>silver-ingot</code>, <code>cedar-plank</code>, <code>wool-cloth</code>, <code>trilobite-carving</code>, <code>cut-sapphire</code>', '—'],
+    ['<code>branch-gem</code>', '3', '5', 3, 9, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>, 1 each <code>titanium-ingot</code>, <code>ebony-plank</code>, <code>moonsilk</code>, <code>aether-infusion</code>, <code>cut-starstone</code>', '—'],
+    ['<code>armor-fittings-g{1–10}</code>', '1–3', '1–10', 50, '2 · 3', '1 <code>linen</code>, 1 <code>shell-carving</code>', '1 <code>iron-ingot</code>, 1 <code>oak-plank</code>, 1 <code>cut-garnet</code>'],
+    ['<code>accessory-setting-g{1–10}</code>', '1', '1–10', 10, 12, '6 <code>linen</code>, 6 <code>shell-carving</code>', '6 <code>cotton-cloth</code>, 6 <code>ammonite-carving</code>'],
+    ['<code>accessory-setting-g{1–10}</code>', '2', '1–10', 20, 6, '3 · 3', '3 · 3'],
+    ['<code>accessory-setting-g{1–10}</code>', '3', '1–10', 30, 4, '2 · 2', '2 · 2'],
+  ];
+  document.getElementById('iface').innerHTML = `<tr><th>Item id (draft)</th><th>Tier</th><th>Grades</th><th class="num">Pieces a Uma</th><th class="num">Refined each</th><th>Low band (G1–G5)</th><th>High band (G6–G10)</th></tr>` +
+    rows.map((r) => `<tr>${r.map((c, i) => `<td${i === 3 || i === 4 ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('');
+})();
+</script>
+</body>
+</html>

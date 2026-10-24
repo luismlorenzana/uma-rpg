@@ -1,5 +1,7 @@
 # Extra Stats: a planet and its moons
 
+> **Superseded by [extra-stats-progression.md](extra-stats-progression.md) (2026-10-24); kept as history.**
+
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs ([brief](README.md)).
 > It replaces today's 100-node map from Tier 1 on, and absorbs [the Halo](../extra-stats-tier2.md) (H41, Q12) into
 > Tier 2. Calls are **ES1–ES16**, each with a recommendation ([Decisions](#decisions)). Numbers are drafts for the

@@ -1,5 +1,7 @@
 # Professions: five trades, ten places, art we already have
 
+Superseded by [profession-progression.md](profession-progression.md) (2026-10-24); kept as history.
+
 > **Revised after the owner's first review, 2026-10-22. Nothing here is built.** One of the six Tier rework docs
 > ([the brief](README.md)). It answers the owner's Professions points, starts from the brief's §2 frame, and lists what
 > it needs from the other docs under [Assumes](#9-assumes). It makes the items [gear.md](gear.md) (GE12) and

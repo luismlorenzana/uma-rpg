@@ -1,5 +1,7 @@
 # Gear: weapons, armor and accessories
 
+> **Superseded by [weapon-progression.md](weapon-progression.md) (2026-10-24); kept as history.**
+
 > **Tier rework, cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs
 > ([the brief](README.md)); the owner reviews it second, after Classes. Every number is a draft for the balance
 > simulation (`SIM=1`). Calls are **GE1**, **GE2** …, each with a recommendation ([§14](#14-decisions)). The
