@@ -495,6 +495,8 @@ grade); `swiftness:1–2`, `halo:3–4`.
 
 ### 9.4 The refund
 
+> **Owner direction (2026-10-24, the weapon review): the raw-material refund is not the main approach.** Every Craft Level (the work levels, and today's farm and craft levels in old saves) **resets to 1**, and the player is **granted tickets for the time it took to reach those levels**; deleted crafted gear and Star Gems are compensated the same way rather than item by item. Worked out fully in the Profession review; the table below is the first draft it replaces.
+
 The owner's lean (WP27, EP21, PP20): every raw item back, recrafted by hand. Computed from the save alone: every deleted
 item names its raw inputs, and **the count is paid in Tier 1's demand mix** (the shares one Uma's 485 take), so what
 comes back rebuilds what went.
