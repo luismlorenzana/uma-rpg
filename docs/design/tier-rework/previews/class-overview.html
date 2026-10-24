@@ -216,29 +216,50 @@
   .flow div:first-child { border-radius: 12px 0 0 12px; padding-left: 14px; } .flow div:last-child { border-radius: 0 12px 12px 0; }
   .flow div b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
   .flow div + div::before { content: ''; position: absolute; left: -9px; top: 50%; width: 16px; height: 16px; background: var(--panel); transform: translateY(-50%) rotate(45deg); border-right: 1px solid var(--hairline-strong); border-top: 1px solid var(--hairline-strong); }
-  @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } .shapes { grid-template-columns: repeat(3, 1fr); } .sheet { grid-template-columns: 1fr; } }
+  .ctx { display: grid; grid-template-columns: 1.12fr 1.5fr; gap: 16px; align-items: start; }
+  .ctx .heat td.c { min-width: 34px; }
+  .ctx .heat th { font-size: 11.5px; }
+  .ctx > * { min-width: 0; }
+  .ctxh { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ctag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #1b1300; padding: 2px 8px; border-radius: 6px; }
+  .scards { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .scards.two { grid-template-columns: 1fr 1fr; }
+  .scard { background: var(--raised); border-radius: 12px; padding: 10px 12px; }
+  .scard b { font-size: 13px; display: block; } .scard .where { font-size: 11px; color: var(--ink-faint); margin: 1px 0 6px; }
+  .mem { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 2px 0; }
+  .mem .pip { width: 24px; height: 24px; font-size: 9.5px; }
+  .mem.re .pip { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
+  .mem .k { font-size: 11px; padding: 0 6px; }
+  .later { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .lcard { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); display: flex; flex-direction: column; gap: 6px; }
+  .lcard b { font-size: 14px; } .lcard .row2 { display: grid; grid-template-columns: 54px 1fr; gap: 6px; font-size: 12.5px; align-items: baseline; }
+  .lcard .row2 span:first-child { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 5px; color: #1b1300; text-align: center; }
+  .lcard a { font-size: 12px; color: var(--ink-soft); }
+  .lcard.owner { border: 1.5px dashed var(--accent); }
+  @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } .shapes { grid-template-columns: repeat(3, 1fr); } .sheet { grid-template-columns: 1fr; } .ctx { grid-template-columns: 1fr; } .later { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
 <main>
   <h1>Class Progression: the six classes</h1>
   <p class="lead">Who the six classes are, how they make a party, and what picking one changes, from Tier 1 to Tier 3. The ten
-    weapon kinds are the damage types (the owner, 2026-10-23); a class holds three, by its Arms count. Numbers are the
-    standalone doc's (<a href="../class-progression.md">class-progression.md</a>). The other pages:
+    weapon kinds are the damage types (the owner, 2026-10-23); a class holds three, by its Arms count, and the defaults are the
+    owner's (2026-10-24). Revised after the owner's first review: the campaign and the Rift side by side, class branches, Skill
+    Ranks, what later tiers hold. Numbers are the standalone doc's (<a href="../class-progression.md">class-progression.md</a>). The other pages:
     <a href="class-templates.html">template sheets</a> · <a href="class-trees.html">the tree viewer</a> ·
     <a href="class-weaknesses.html">foe weaknesses</a>.</p>
   <nav class="top">
-    <a href="#classes">The six classes</a><a href="#split">Channels</a><a href="#shapes">Party shapes</a>
-    <a href="#types">Fight types</a><a href="#affects">What a class changes</a><a href="#calling">The calling pick</a>
+    <a href="#classes">The six classes</a><a href="#split">Channels</a><a href="#shapes">Campaign and Rift</a>
+    <a href="#later">Later tiers</a><a href="#types">Fight types</a><a href="#affects">What a class changes</a><a href="#calling">The calling pick</a>
   </nav>
   <div class="kpis" id="kpis"></div>
   <div class="themes">
     <div class="theme" style="--tc: var(--t1)"><span class="n">Tier 1 · Apprentice</span><b>Six classes, three weapons each</b>
-      <p>Slots follow the class's Arms count. Foes are weak to two kinds, twins. One fork a tree, no points. A one-time calling pick for Pace and Late Umas.</p></div>
-    <div class="theme" style="--tc: var(--t2)"><span class="n">Tier 2 · Adept</span><b>+ a specialization</b>
-      <p>One of two passives a class, swapped freely. Branch C and the Power or Break tip. Regular foes narrow to one kind; bosses keep two.</p></div>
-    <div class="theme" style="--tc: var(--t3)"><span class="n">Tier 3 · Master</span><b>+ a mastery</b>
-      <p>One mechanic a class. Two branches held, depth 6 capstones, the master slot. Sub-bosses narrow too; bosses keep two.</p></div>
+      <p>Slots follow the class's Arms count; the owner's defaults. Foes are weak to two kinds, twins. One fork a tree, no points; every skill ranks up every 2 Class Ranks. A one-time calling pick for Pace and Late Umas.</p></div>
+    <div class="theme" style="--tc: var(--t2)"><span class="n">Tier 2 · Adept</span><b>+ a class branch</b>
+      <p>One of two specializations a class: its passive and three class skills. Branch C and the Power or Break tip; each weapon a branch at G5. Regular foes narrow to one kind; bosses keep two.</p></div>
+    <div class="theme" style="--tc: var(--t3)"><span class="n">Tier 3 · Master</span><b>+ its capstone and a mastery</b>
+      <p>The branch's capstone and the class's mechanic at Class Rank 50. Two weapon-tree branches held, depth 6 capstones, the master slot. Sub-bosses narrow too; bosses keep two.</p></div>
   </div>
 
   <section id="classes">
@@ -258,19 +279,33 @@
   </section>
 
   <section id="shapes">
-    <h2>Party shapes and what they answer</h2>
-    <p class="sub">One healer a party; everything else is free. The default party is one of each fight type; the four Rift parties
-      are the fronts' guidance (rift §5). Each cell counts the members whose default weapons answer a Tier 1 foe's twins
-      (her Arm or her element): two or more everywhere. Hover a cell for who.</p>
-    <div class="shapes" id="shape-cards"></div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="panel"><h3>Twins: the world, the Duel, the Horde</h3><p class="muted" style="font-size:12px">A Tier 1 foe is weak to one twin set: an Arm and its twin element.</p>
-        <div id="heat-twins" style="overflow-x:auto"></div></div>
-      <div class="panel"><h3>One kind: Iron and Arcane</h3><p class="muted" style="font-size:12px">Iron's foes are weak to one Arm (elements warded); Arcane's to elements (Arms warded).</p>
-        <div id="heat-kinds" style="overflow-x:auto"></div></div>
+    <h2>Party shapes: the campaign and the Rift</h2>
+    <p class="sub">The owner's distinction (2026-10-24). <b>The campaign</b> (Lv 1–50) is balanced parties: one of each fight type on
+      the defaults holds every element and damage type, foes keep today's stats and stay element-focused. <b>The Rift</b> is where
+      specialized parties come in, rebuilt and re-specced per path: each path's guided build is its composition and every member's
+      three weapons (gold ring: re-specced). Cells count the members who answer a Tier 1 foe's twins (her Arm or her element).</p>
+    <div class="ctx">
+      <div class="panel ctxp"><div class="ctxh"><span class="ctag" style="background:var(--t1)">Campaign</span><h3>The world, Lv 1–50: balanced</h3></div>
+        <p class="muted" style="font-size:12px;margin:2px 0 10px">Five fight types, either healer, on defaults. Two answers or more on every twin set.</p>
+        <div class="scards" id="camp-cards"></div><div id="heat-camp" style="overflow-x:auto;margin-top:12px"></div></div>
+      <div class="panel ctxp"><div class="ctxh"><span class="ctag" style="background:var(--t3);color:#fff">Rift</span><h3>The paths: specialized, rebuilt per path</h3>
+        <div class="pills" id="rift-mode" style="margin:0 0 0 auto"></div></div>
+        <p class="muted" style="font-size:12px;margin:2px 0 10px" id="rift-note"></p>
+        <div class="scards two" id="rift-cards"></div><div id="heat-rift" style="overflow-x:auto;margin-top:12px"></div></div>
     </div>
+    <div class="panel" style="margin-top:14px"><h3>One kind a foe: Tier 2 and 3 regulars, Iron and Arcane, Tier 2's Horde keys</h3>
+      <p class="muted" style="font-size:12px">From Tier 2 a regular is weak to one kind; Iron's foes to one Arm (elements warded), Arcane's to elements (Arms warded). Single kinds need one answer in the campaign, two on Iron and Arcane.</p>
+      <div id="heat-kinds" style="overflow-x:auto;margin-top:6px"></div></div>
     <div class="chart-legend" style="margin-top:10px"><span class="scale"><i class="h0"></i>0<i class="h1"></i>1<i class="h2"></i>2<i class="h3"></i>3<i class="h4"></i>4<i class="h5"></i>5 members answer</span></div>
     <details><summary>Show the numbers</summary><div id="shape-table"></div></details>
+  </section>
+
+  <section id="later">
+    <h2>Later tiers at a glance: what is authored</h2>
+    <p class="sub">The owner (2026-10-24): "let me know what you have authored for later tiers." Every piece below is written, as a draft
+      its tier's simulation prices; the link goes to where. Weapon growth is the owner's new frame: Prism dropped, branches designed in
+      weapon-progression.md.</p>
+    <div class="later" id="later-grid"></div>
   </section>
 
   <section id="types">
@@ -310,7 +345,7 @@
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3).
+// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3: the owner's, 2026-10-24).
 const TWINS = [
   { id: 'fire', el: 'Fire', arm: 'greatsword', tome: 'tome-fire', c: 'var(--k-fire)' },
   { id: 'ice', el: 'Ice', arm: 'axe', tome: 'tome-ice', c: 'var(--k-ice)' },
@@ -327,12 +362,12 @@ const KINDS = [
 const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
 const TW = Object.fromEntries(TWINS.map((t) => [t.id, t]));
 const CLASSES = [
-  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'katana'], c: 'var(--cl-brawler)', split: [100, 0] },
-  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-lightning', 'tome-light'], c: 'var(--cl-mage)', split: [0, 100] },
-  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['lance', 'bow', 'tome-dark'], c: 'var(--cl-spellblade)', split: [70, 30] },
-  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-ice', 'tome-dark', 'greatsword'], c: 'var(--cl-summoner)', split: [30, 70] },
-  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'lance', 'tome-ice'], c: 'var(--cl-paladin)', split: [67, 33] },
-  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-dark', 'axe'], c: 'var(--cl-cleric)', split: [33, 67] },
+  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'lance'], c: 'var(--cl-brawler)', split: [100, 0] },
+  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-ice', 'tome-lightning'], c: 'var(--cl-mage)', split: [0, 100] },
+  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['katana', 'lance', 'tome-lightning'], c: 'var(--cl-spellblade)', split: [70, 30] },
+  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-dark', 'tome-light', 'bow'], c: 'var(--cl-summoner)', split: [30, 70] },
+  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'axe', 'tome-light'], c: 'var(--cl-paladin)', split: [67, 33] },
+  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-ice', 'bow'], c: 'var(--cl-cleric)', split: [33, 67] },
 ];
 const C = Object.fromEntries(CLASSES.map((c) => [c.id, c]));
 /** The channels of a class's three slots, the lead channel first. */
@@ -364,21 +399,21 @@ function bindKinds(root = document) {
 const KPIS = [
   ['Weapon slots a class', '5', '3', 'by her class\'s Arms count'],
   ['Rules for a foe\'s weakness', '5', '1', 'her twins: an Arm and its element'],
-  ['Weak marks on a foe', '2–5', '2', 'one Arm, one element (Tier 1)'],
   ['Picks a class, Tier 1', '25 + pts', '3', 'one fork a tree, no points'],
-  ['Kinds the five types hold', '—', '10/10', 'on defaults, with either healer'],
-  ['Fewest answers to a Tier 1 foe', '—', '2', 'default and guided parties'],
+  ['Steps between depth gates', 'points', '4 ranks', 'Skill Ranks, every 2 Class Ranks'],
+  ['Kinds the five types hold', '—', '10/10', 'owner\'s defaults, either healer'],
+  ['Fewest answers to a Tier 1 foe', '—', '2', 'campaign party; Rift guided builds'],
 ];
 document.getElementById('kpis').innerHTML = KPIS.map(([l, was, now, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value"><span class="was">${was} →</span> ${now}</div><div class="delta">${d}</div></div>`).join('');
 
 // ---- Class cards
 const INFO = {
   brawler: { hand: '×1, MP ×1', lb: '2×', role: 'Raw physical burst: one foe hard, or a crowd with her Axe.', called: 'Front runners; Pace sprinters with Power over Wit' },
-  mage: { hand: '×1, MP ×1', lb: '2.4×', role: 'Raw magic and the element ring: a nuke, random bolts, a many-hit spell.', called: 'Pace chasers, Wit at or over Power, or picked' },
-  spellblade: { hand: 'Arms ×0.72 + Tome ×0.44', lb: '2.2×', role: 'The shield chipper: every act a blade and a spell, the blade landing one extra hit.', called: 'Pace chasers, Power over Wit, or picked' },
-  summoner: { hand: 'Tome ×0.58 + Arms ×0.56', lb: '2.2×', role: 'Crowds: her Tome summon lingers and strikes every foe in farewell. No support.', called: 'End closers; Wit-led closers' },
-  paladin: { hand: '×0.5, MP ×0.6', lb: '1.5×', role: 'Healer from ATK: Barriers, Aegis, debuffs, Valkyrie\'s Oath raises the fallen.', called: 'Late surgers, Power over Wit, or picked' },
-  cleric: { hand: '×0.5, MP ×0.6', lb: '1.5×', role: 'Healer from M.ATK: mends, Regen, drain, Rebirth raises the fallen.', called: 'Late surgers, Wit at or over Power, or picked' },
+  mage: { hand: '×1, MP ×1', lb: '2.4×', role: 'Raw magic on the element ring: a nuke, every foe, random bolts.', called: 'Pace chasers, Wit at or over Power, or picked' },
+  spellblade: { hand: 'Arms ×0.72 + Tome ×0.44', lb: '2.2×', role: 'The shield chipper: every act a blade and a spell; her Lance and Thunder are twins, so both halves land weak on a Fire foe.', called: 'Pace chasers, Power over Wit, or picked' },
+  summoner: { hand: 'Tome ×0.58 + Arms ×0.56', lb: '2.2×', role: 'Crowds: her Tome summon lingers and strikes every foe in farewell; her Bow and Light are twins. No support.', called: 'End closers; Wit-led closers' },
+  paladin: { hand: '×0.5, MP ×0.6', lb: '1.5×', role: 'Healer from ATK: Barriers, Aegis, Enfeeble; Valkyrie\'s Oath, now on her Light tree, raises the fallen.', called: 'Late surgers, Power over Wit, or picked' },
+  cleric: { hand: '×0.5, MP ×0.6', lb: '1.5×', role: 'Healer from M.ATK: mends, Regen, Aegis, Shatter; Rebirth raises the fallen.', called: 'Late surgers, Wit at or over Power, or picked' },
 };
 document.getElementById('cards').innerHTML = CLASSES.map((c) => { const i = INFO[c.id], s = slotsOf(c);
   return `<div class="ccard" style="--cc:${c.c}"><div class="top"><b>${c.name}</b><span class="type">${c.type}</span></div>
@@ -387,7 +422,8 @@ document.getElementById('cards').innerHTML = CLASSES.map((c) => { const i = INFO
     <div class="row"><span class="lab">${c.type === 'Healer' ? 'Slot split' : 'Damage split'}</span><span style="flex:1"><span class="split"><i style="width:${c.split[0]}%;background:var(--arms)"></i><i style="width:${c.split[1]}%;background:var(--tomes)"></i></span></span><span style="font-size:12px;color:var(--ink-soft);width:52px;text-align:right">${c.split[0]} / ${c.split[1]}</span></div>
     <div class="row"><span class="lab">Hand</span>${i.hand}</div>
     <div class="row"><span class="lab">Limit Break</span>${i.lb} her open depth</div>
-    <div class="row"><span class="lab">Tier 2 · 3</span>${{ brawler: 'Warlord or Berserker · Unstoppable', mage: 'Sage or Sorcerer · Resonance', spellblade: 'Blademaster or Rune Knight · Spellbind', summoner: 'Conjurer or Warlock · Menagerie', paladin: 'Templar or Guardian · Last Stand', cleric: 'Bishop or Oracle · Overflow' }[c.id]}</div>
+    <div class="row"><span class="lab">Class branch</span><span>${{ brawler: 'Warlord or Berserker', mage: 'Sage or Sorcerer', spellblade: 'Blademaster or Rune Knight', summoner: 'Conjurer or Warlock', paladin: 'Templar or Guardian', cleric: 'Bishop or Oracle' }[c.id]} <span class="muted">· Tier 2: a passive + 3 skills</span></span></div>
+    <div class="row"><span class="lab">Mastery</span><span>${{ brawler: 'Unstoppable', mage: 'Resonance', spellblade: 'Spellbind', summoner: 'Menagerie', paladin: 'Last Stand', cleric: 'Overflow' }[c.id]} <span class="muted">· Tier 3, with the capstone</span></span></div>
     <p>${i.role}</p><p style="font-size:12px;color:var(--ink-faint)">Called: ${i.called}</p></div>`; }).join('');
 
 // ---- Channel split chart
@@ -405,36 +441,72 @@ document.getElementById('cards').innerHTML = CLASSES.map((c) => { const i = INFO
   document.getElementById('split-table').innerHTML = `<table><tr><th>Class</th><th class="num">Arms slots</th><th class="num">Tome slots</th><th class="num">Arms %</th><th class="num">Tomes %</th><th>Measured as</th></tr>${CLASSES.map((c) => `<tr><td>${c.name}</td><td class="num">${c.arms}</td><td class="num">${3 - c.arms}</td><td class="num">${c.split[0]}</td><td class="num">${c.split[1]}</td><td>${c.type === 'Healer' ? 'Slots' : 'Damage a turn (H63)'}</td></tr>`).join('')}</table>`;
 })();
 
-// ---- Party shapes and coverage
-const SHAPES = [
-  { id: 'defc', name: 'Default · Cleric', where: 'The world: one of each fight type', m: ['brawler', 'mage', 'spellblade', 'summoner', 'cleric'], by: 'twins' },
-  { id: 'defp', name: 'Default · Paladin', where: 'The same, the other healer', m: ['brawler', 'mage', 'spellblade', 'summoner', 'paladin'], by: 'twins' },
-  { id: 'iron', name: 'Iron', where: 'Rift: Arms only, elements warded', m: ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'], by: 'arms' },
-  { id: 'arcane', name: 'Arcane', where: 'Rift: elements only, Arms warded', m: ['mage', 'mage', 'summoner', 'summoner', 'cleric'], by: 'tomes' },
-  { id: 'duel', name: 'Duel', where: 'Rift: one boss, both channels', m: ['brawler', 'brawler', 'mage', 'mage', 'paladin'], by: 'twins' },
-  { id: 'horde', name: 'Horde', where: 'Rift: waves of 4–6', m: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'], by: 'twins' },
+// ---- Party shapes: the campaign (defaults) and the Rift (guided builds, CP7)
+const M = (c, w) => ({ c, w: w || C[c].def, re: !!w });
+const CAMP = [
+  { id: 'defc', name: 'Default · Cleric', where: 'One of each fight type', m: [M('brawler'), M('mage'), M('spellblade'), M('summoner'), M('cleric')] },
+  { id: 'defp', name: 'Default · Paladin', where: 'The same, the other healer', m: [M('brawler'), M('mage'), M('spellblade'), M('summoner'), M('paladin')] },
+];
+const RIFT = [
+  { id: 'iron', name: 'Iron', where: 'Arms only, elements warded ×0.5', by: 'a', m: [M('brawler'), M('brawler', ['bow', 'katana', 'axe']), M('spellblade'), M('spellblade', ['bow', 'greatsword', 'tome-fire']), M('paladin')] },
+  { id: 'arcane', name: 'Arcane', where: 'Elements only, Arms warded ×0.5', by: 't', m: [M('mage'), M('mage'), M('summoner'), M('summoner'), M('cleric')] },
+  { id: 'duel', name: 'Duel', where: 'One boss, both channels', by: 'tw', m: [M('brawler'), M('brawler', ['bow', 'katana', 'lance']), M('mage'), M('mage', ['tome-light', 'tome-dark', 'tome-lightning']), M('paladin')] },
+  { id: 'horde', name: 'Horde', where: 'Waves of 4–6', by: 'tw', m: [M('spellblade'), M('spellblade', ['greatsword', 'axe', 'tome-fire']), M('summoner'), M('summoner', ['tome-ice', 'tome-fire', 'lance']), M('cleric')] },
 ];
 const ABBR = { brawler: 'Br', mage: 'Ma', spellblade: 'SB', summoner: 'Su', paladin: 'Pa', cleric: 'Cl' };
-document.getElementById('shape-cards').innerHTML = SHAPES.map((sh) => `<div class="shape"><b>${sh.name}</b><div class="where">${sh.where}</div><div class="pips">${sh.m.map((m) => `<span class="pip" style="--cc:${C[m].c}" data-c="${m}">${ABBR[m]}</span>`).join('')}</div></div>`).join('');
-document.querySelectorAll('.pip').forEach((p) => { const c = C[p.dataset.c]; bindTip(p, c.name, `Defaults: ${c.def.map((k) => K[k].weapon).join(', ')}`); });
-const who = (list) => { const n = {}; list.forEach((m) => (n[m] = (n[m] || 0) + 1)); return Object.entries(n).map(([m, k]) => `${k > 1 ? k + ' ' : ''}${C[m].name}${k > 1 ? 's' : ''}`).join(', ') || 'nobody'; };
-const twinCols = [...TWINS.map((t) => ({ id: t.id, label: `${t.el}`, sub: `${K[t.arm].weapon} · ${K[t.tome].weapon}`, test: (m) => C[m].def.includes(t.arm) || C[m].def.includes(t.tome) })),
-  { id: 'twilight', label: 'Twilight', sub: 'Bow · Katana', test: (m) => C[m].def.includes('bow') || C[m].def.includes('katana') }];
-const rowsTw = SHAPES.filter((s) => s.by === 'twins');
-let ht = `<table class="heat"><tr><th></th>${twinCols.map((c) => `<th style="text-align:center">${c.label}<div class="muted" style="font-weight:500;font-size:11px">${c.sub}</div></th>`).join('')}</tr>`;
-const numRows = [];
-rowsTw.forEach((sh) => { ht += `<tr><th style="text-align:right">${sh.name}</th>`; twinCols.forEach((col) => { const rift = sh.id === 'duel' && col.id === 'twilight';
-  if (rift) { ht += '<td class="c hna">—</td>'; numRows.push([sh.name, col.label, '—', 'The Rift draws a twin set']); return; }
-  const a = sh.m.filter(col.test); ht += `<td class="c ${heatClass(a.length)}" data-t="${sh.name} · ${col.label} (${col.sub})" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; numRows.push([sh.name, col.label, a.length, who(a)]); }); ht += '</tr>'; });
-document.getElementById('heat-twins').innerHTML = ht + '</table>';
-const kindCols = KINDS;
-let hk = `<table class="heat"><tr><th></th>${kindCols.map((k) => `<th style="text-align:center">${kchip(k.id)}</th>`).join('')}</tr>`;
-SHAPES.filter((s) => s.by !== 'twins').forEach((sh) => { hk += `<tr><th style="text-align:right">${sh.name}</th>`; kindCols.forEach((k) => {
-  const inCh = (sh.by === 'arms') === (k.ch === 'a'); if (!inCh) { hk += '<td class="c hna">·</td>'; return; }
-  const a = sh.m.filter((m) => C[m].def.includes(k.id)); hk += `<td class="c ${heatClass(a.length)}" data-t="${sh.name} · ${k.weapon}" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; numRows.push([sh.name, k.weapon, a.length, who(a)]); }); hk += '</tr>'; });
-document.getElementById('heat-kinds').innerHTML = hk + '</table>';
-document.querySelectorAll('.heat td.c[data-t]').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d));
-document.getElementById('shape-table').innerHTML = `<table><tr><th>Shape</th><th>Twin set or kind</th><th class="num">Members who answer</th><th>Who</th></tr>${numRows.map(([a, b, n, w]) => `<tr><td>${a}</td><td>${b}</td><td class="num">${n}</td><td>${w}</td></tr>`).join('')}</table>`;
+let riftMode = 'build';
+const members = (sh) => riftMode === 'build' || !RIFT.includes(sh) ? sh.m : sh.m.map((x) => M(x.c));
+const who = (list) => { const n = {}; list.forEach((x) => { const k = C[x.c].name + (x.re ? ' (re-specced)' : ''); n[k] = (n[k] || 0) + 1; }); return Object.entries(n).map(([m, k]) => `${k > 1 ? k + ' × ' : ''}${m}`).join(', ') || 'nobody'; };
+const twinCols = [...TWINS.map((t) => ({ id: t.id, label: t.el, sub: `${K[t.arm].kind} · ${K[t.tome].kind}`, test: (x) => x.w.includes(t.arm) || x.w.includes(t.tome) })),
+  { id: 'twilight', label: 'Twilight', sub: 'Bow · Katana', test: (x) => x.w.includes('bow') || x.w.includes('katana') }];
+const card = (sh, rift) => `<div class="scard"><b>${sh.name}</b><div class="where">${sh.where}</div>${members(sh).map((x) => `<div class="mem${x.re ? ' re' : ''}"><span class="pip" style="--cc:${C[x.c].c}" data-c="${x.c}" data-re="${x.re ? 1 : ''}">${ABBR[x.c]}</span>${x.w.map((k) => kchip(k)).join('')}</div>`).join('')}</div>`;
+function heatTwins(rows, rift) {
+  let s = `<table class="heat"><tr><th></th>${twinCols.map((c) => `<th style="text-align:center">${c.label}<div class="muted" style="font-weight:500;font-size:10.5px">${c.sub}</div></th>`).join('')}</tr>`; const out = [];
+  rows.forEach((sh) => { s += `<tr><th style="text-align:right;white-space:nowrap">${sh.name}</th>`; twinCols.forEach((col) => {
+    if (rift && col.id === 'twilight') { s += '<td class="c hna" data-t="' + sh.name + ' · Twilight" data-d="The Rift draws the five twin sets, never Twilight">—</td>'; out.push([sh.name, col.label, '—', 'The Rift draws the five twin sets']); return; }
+    const a = members(sh).filter(col.test); s += `<td class="c ${heatClass(a.length)}" data-t="${sh.name} · ${col.label} (${col.sub})" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; out.push([sh.name, col.label, a.length, who(a)]); }); s += '</tr>'; });
+  return [s + '</table>', out];
+}
+function renderShapes() {
+  document.getElementById('camp-cards').innerHTML = CAMP.map((sh) => card(sh)).join('');
+  document.getElementById('rift-mode').innerHTML = [['build', 'Guided builds'], ['def', 'On defaults']].map(([id, n]) => `<button data-m="${id}" aria-pressed="${riftMode === id}">${n}</button>`).join('');
+  document.querySelectorAll('#rift-mode button').forEach((b) => b.addEventListener('click', () => { riftMode = b.dataset.m; renderShapes(); }));
+  document.getElementById('rift-note').textContent = riftMode === 'build' ? 'The guidance hands each path a build; the second copy of a class takes the kinds the first lacks (gold ring). Every cell two or more.' : 'The same compositions on defaults: two copies of a class repeat their three kinds, so the Duel holds no Katana or Dark and the Horde no Fire. Red cells: why the Rift re-specs.';
+  document.getElementById('rift-cards').innerHTML = RIFT.map((sh) => card(sh, true)).join('');
+  const [hc, oc] = heatTwins(CAMP), [hr, or] = heatTwins(RIFT.filter((s) => s.by === 'tw'), true);
+  document.getElementById('heat-camp').innerHTML = hc; document.getElementById('heat-rift').innerHTML = hr;
+  const kr = [{ sh: CAMP[0], label: 'Campaign · Cleric (Tiers 2–3)' }, { sh: CAMP[1], label: 'Campaign · Paladin (Tiers 2–3)' }, { sh: RIFT[0], label: 'Iron', only: 'a' }, { sh: RIFT[1], label: 'Arcane', only: 't' }, { sh: RIFT[3], label: 'Horde (Tier 2 keys)' }];
+  let hk = `<table class="heat"><tr><th></th>${KINDS.map((k) => `<th style="text-align:center">${kchip(k.id)}</th>`).join('')}</tr>`; const ok = [];
+  kr.forEach(({ sh, label, only }) => { hk += `<tr><th style="text-align:right;white-space:nowrap">${label}</th>`; KINDS.forEach((k) => {
+    if (only && k.ch !== only) { hk += '<td class="c hna">·</td>'; return; }
+    const a = members(sh).filter((x) => x.w.includes(k.id)); hk += `<td class="c ${heatClass(a.length)}" data-t="${label} · ${k.weapon}" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; ok.push([label, k.weapon, a.length, who(a)]); }); hk += '</tr>'; });
+  document.getElementById('heat-kinds').innerHTML = hk + '</table>';
+  document.querySelectorAll('#shapes td.c[data-t]').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d));
+  document.querySelectorAll('#shapes .pip').forEach((p) => { const c = C[p.dataset.c]; bindTip(p, c.name + (p.dataset.re ? ' · re-specced' : ''), p.dataset.re ? 'The guided build swaps her weapons for this path (free between fights; she owns every kind).' : `On defaults: ${c.def.map((k) => K[k].weapon).join(', ')}`); });
+  bindKinds(document.getElementById('shapes'));
+  document.getElementById('shape-table').innerHTML = `<p class="foot">Rift: ${riftMode === 'build' ? 'guided builds' : 'compositions on defaults'}.</p><table><tr><th>Shape</th><th>Twin set or kind</th><th class="num">Members who answer</th><th>Who</th></tr>${[...oc, ...or, ...ok].map(([a, b, n, w]) => `<tr><td>${a}</td><td>${b}</td><td class="num">${n}</td><td>${w}</td></tr>`).join('')}</table>`;
+}
+renderShapes();
+
+// ---- Later tiers at a glance (the doc's §0 box)
+const DOC = '../class-progression.md';
+const LATER = [
+  ['Class branches', 'One of two a class: a passive and three class skills at Class Rank 20, 30, 40; all twelve written', 'The branch capstone and the class mastery at Class Rank 50', `${DOC}#72-class-branches-tier-2-cp26-cp34`, 'class-trees.html', 'tree viewer'],
+  ['Weapon trees', 'Branch C joins the fork; every tip forks Power or Break', 'Depth 6 capstones; two branches held; the master slot', `${DOC}#63-tier-2-branch-c-and-the-tip-fork-cp19`, 'class-trees.html', 'tree viewer'],
+  ['Weapon branches', 'At G5: Specialized (more damage on its kind), Dual (one more kind) or a third to design', 'Her branch deepens; two kinds a weapon at most. Owner: Prism dropped', `${DOC}#35-what-grows-on-her-three-weapons-tier-by-tier-cp33`, 'class-templates.html#grows', 'templates', true],
+  ['Skill Ranks', 'Every skill, Rank 1–5, one every 2 Class Ranks (Tier 1 on)', 'The same; capstones open whole', `${DOC}#skill-ranks-cp32`, 'class-trees.html', 'slider'],
+  ['Accessories', 'The Damage slot: an Orb, offense on one kind', 'A second Support', '../gear.md#43-accessories-the-damage-slot', 'class-templates.html#sheets', 'sheets'],
+  ['Armor', 'The four classes between mix halves per piece', 'The same', '../gear.md#42-armor', 'class-templates.html#sheets', 'sheets'],
+  ['Extra Stats', 'The Halo (+10 → +34 on one kind); the Valor moon', 'The Halo\'s second kind; the Swiftness moon', '../extra-stats.md#tier-2-the-halo-and-the-valor-moon', 'extra-stats-maps.html', 'the map'],
+  ['Her template', 'The signature tip on her affinity kind\'s tree; the affinity (+6%) every tier', 'The tip at both of its forks', `${DOC}#69-her-template-on-the-trees-affinity-cp36`, 'class-templates.html#affinity', 'affinity'],
+  ['Limit Breaks', 'LB+ at Bond 10: 24 extra effects', 'Kept', `${DOC}#8-halls-of-heroes-and-limit-breaks-cp28-cp35`, 'class-weaknesses.html#lb', 'coverage'],
+  ['Foes', 'Regulars weak to one kind; shields +1', 'Sub-bosses one kind too; bosses keep two', `${DOC}#42-tiers-2-and-3-the-list-narrows-by-rank-cp6`, 'class-weaknesses.html#tiers', 'by rank'],
+  ['The Rift', 'Each path\'s guided build; Arcane one element a foe; Horde keys one kind', 'The same rules, narrower', `${DOC}#43-the-rifts-fronts-cp7`, 'class-weaknesses.html#rift', 'fronts'],
+  ['Skill MP', '×1.7', '×2.4', `${DOC}#66-new-nodes-by-rule`, 'class-trees.html', 'tree viewer'],
+];
+document.getElementById('later-grid').innerHTML = LATER.map(([n, a, b, doc, page, pl, owner]) => `<div class="lcard${owner ? ' owner' : ''}"><b>${n}</b>
+  <div class="row2"><span style="background:var(--t2)">Tier 2</span><span>${a}</span></div><div class="row2"><span style="background:var(--t3);color:#fff">Tier 3</span><span>${b}</span></div>
+  <span><a href="${doc}">In the doc</a> · <a href="${page}">On the page: ${pl}</a></span></div>`).join('');
 
 // ---- Fight types
 const FT = [['Physical', 'var(--cl-brawler)'], ['Physical hybrid', 'var(--cl-spellblade)'], ['Magical', 'var(--cl-mage)'], ['Magical hybrid', 'var(--cl-summoner)'], ['Healer', 'var(--cl-paladin)']];
@@ -464,7 +536,7 @@ document.getElementById('types-legend').innerHTML = FT.map(([n, c]) => `<span><s
 // ---- What a class changes
 const AFF = [
   ['Weapons and channel', '3 slots: 3 + 0, 2 + 1, 1 + 2, 0 + 3', 'The same; a form\'s extra kind counts only in a class that wields its channel', '5 slots'],
-  ['Trees she uses', 'Her three weapons\' trees of this class', 'Deeper: branch C and tips; capstones', '5 of 5 or 10'],
+  ['Trees she uses', 'Her three weapons\' trees of this class (every class\'s are its own)', 'Deeper: branch C and tips; capstones; + her class tree', '5 of 5 or 10'],
   ['Hand', 'Power, MP, the pair, the extra hit, the farewell, the half hand', 'Unchanged', 'The same'],
   ['Stat leans', 'Per class', 'Unchanged: no specialization moves them', 'The same'],
   ['Healing and its stat', 'Paladin ATK, Cleric M.ATK; one healer a party', 'Unchanged', 'The same'],
@@ -472,10 +544,11 @@ const AFF = [
   ['Accessories', '1 Support, any type', '+ an Orb of any kind; + a second Support', '2'],
   ['Standard preset', 'Her 3 weapons, the half, a Support', '+ the Orb of her first slot; + a second Support', '5 weapons, half, Orb, support'],
   ['Limit Break power', 'Brawler 2×, Mage 2.4×, hybrids 2.2×, healers 1.5×', 'Unchanged; LB+ is the halls\'', 'The same'],
-  ['Class Rank', 'Per class; opens depths 1–5', '+ depth 6 in Tier 3', 'Depths and side points'],
-  ['Specialization · mastery', '—', 'One of two (Tier 2) · a mastery (Tier 3)', '—'],
-  ['Which foes she answers', 'The twins of her three kinds: 53–67% of foes on defaults', 'Single kinds for regulars; picks and Duals widen it', 'Nearly all'],
-  ['Her template', 'Flourish only as her calling; her moon\'s lead only in its channel', '+ her signature tip only as her calling', '—'],
+  ['Class Rank', 'Per class; opens depths 1–5 and <b>ranks every skill</b>, every 2 Class Ranks', '+ depth 6 in Tier 3', 'Depths and side points'],
+  ['Class branch · mastery', '—', 'One of two branches: a passive and three class skills (Tier 2) · its capstone and the mastery (Tier 3)', '—'],
+  ['Which foes she answers', 'The twins of her three kinds: 34–66% of foes on defaults; her Heroes\' Limit Breaks reach the rest', 'Single kinds for regulars; picks and Dual branches widen it', 'Nearly all'],
+  ['Her template', 'Flourish only as her calling; her moon\'s lead only in its channel; <b>her affinity in any class</b>', '+ her signature tip on her affinity kind\'s tree, as her calling', '—'],
+  ['The Rift', 'A guided build per path: composition and weapons', 'The same', 'Guided compositions'],
   ['Extra Stats', 'The map is class-free; her class decides which offense moon counts', 'The same; the Halo\'s kind is a free setting', 'Which nodes she picks'],
   ['What a switch costs', 'Only the weapons she hasn\'t raised: 0–30 Weapon Gems', 'The same in her tier', 'Ranks per new kind'],
   ['Professions', '<b>None</b>: her trade follows her calling (and her pick)', 'The same', '—'],
@@ -483,8 +556,8 @@ const AFF = [
 document.getElementById('affects-table').innerHTML = `<thead><tr><th style="width:190px"></th><th class="t" style="--tc:var(--t1)">Tier 1</th><th class="t" style="--tc:var(--t2)">Tiers 2 and 3</th><th>Today</th></tr></thead><tbody>${AFF.map(([d, a, b, t]) => `<tr><td><b>${d}</b></td><td>${a}</td><td>${b}</td><td class="today">${t}</td></tr>`).join('')}</tbody>`;
 
 // ---- Calling pick sheets
-const TPL = { spellblade: ['Spellfencer', 'ATK', 'her Arms kind\'s tree (Greatsword)'], mage: ['Spellwright', 'M.ATK', 'her Tome kind\'s tree (Fire)'],
-  paladin: ['Stalwart', 'ATK', 'her Arms kind\'s tree (Bow)'], cleric: ['Pilgrim', 'M.ATK', 'her Tome kind\'s tree (Light)'] };
+const TPL = { spellblade: ['Spellfencer', 'ATK', 'her Greatsword tree (affinity: the Fire twins)'], mage: ['Spellwright', 'M.ATK', 'her Fire Tome tree (affinity: the Fire twins)'],
+  paladin: ['Stalwart', 'ATK', 'her Bow tree (affinity: the Light twins)'], cleric: ['Pilgrim', 'M.ATK', 'her Light Tome tree (affinity: the Light twins)'] };
 const TRADE = { spellblade: ['Forest · Armorer', 3], mage: ['Monster Den · Lapidary', 6], paladin: ['Fields · Workbench', 5], cleric: ['Fields · Workbench', 5] };
 const UMAS = [
   { name: 'Uma A', init: 'A', line: 'Pace A · Medium A · turf', pw: 96, wit: 88, pair: ['spellblade', 'mage'], stride: 'Middle' },

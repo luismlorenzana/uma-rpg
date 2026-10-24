@@ -197,7 +197,17 @@
   .bt .sig .e { color: var(--ink-soft); font-size: 12px; }
   .lean { display: flex; height: 10px; border-radius: 5px; overflow: hidden; width: 140px; background: var(--sunken); }
   .lean i { display: block; height: 100%; }
-  @media (max-width: 1100px) { .ringwrap { grid-template-columns: 1fr; } .tg { grid-template-columns: 1fr; } }
+  .lbgrid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; align-items: start; }
+  .lbgrid > * { min-width: 0; }
+  .lbm td, .lbm th { font-size: 12px; padding: 4px 6px; }
+  .lbm td.c { min-width: 34px; vertical-align: middle; }
+  .lbdot { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: var(--on-k); font-size: 12px; font-weight: 800; }
+  .lbm td { vertical-align: middle; }
+  .lbm tr.chg td.l0 { box-shadow: inset 4px 0 0 var(--accent); }
+  .lbm td.l0 { white-space: nowrap; }
+  .lbm .ks { display: flex; gap: 3px; flex-wrap: wrap; }
+  .lbm .ks .k { font-size: 10.5px; padding: 0 5px; }
+  @media (max-width: 1100px) { .ringwrap { grid-template-columns: 1fr; } .tg { grid-template-columns: 1fr; } .lbgrid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -205,10 +215,11 @@
   <h1>Foe weaknesses, by kind and by tier</h1>
   <p class="lead">The ten weapon kinds are the weakness types (the owner, 2026-10-23). A Tier 1 foe is weak to her <b>twins</b>: the
     element that beats hers on the ring, and that element's twin Arm. Later tiers narrow the list by rank; bosses keep both in
-    every tier. Every default and guided party answers every Tier 1 foe at least twice. From
+    every tier. On the owner's defaults (2026-10-24) the campaign's default party answers every Tier 1 foe at least twice, and each Rift path's
+    guided build answers its own foes twice. Limit Breaks reach what her weapons don't. From
     <a href="../class-progression.md">class-progression.md</a> §4. The other pages: <a href="class-overview.html">overview</a> ·
     <a href="class-templates.html">templates</a> · <a href="class-trees.html">tree viewer</a>.</p>
-  <nav class="top"><a href="#ring">The ring and the twins</a><a href="#tiers">By tier and rank</a><a href="#rift">The Rift's fronts</a><a href="#coverage">Coverage</a><a href="#answer">Per class</a><a href="#world">The world</a><a href="#alts">Alternatives</a></nav>
+  <nav class="top"><a href="#ring">The ring and the twins</a><a href="#tiers">By tier and rank</a><a href="#rift">The Rift's fronts</a><a href="#coverage">Coverage</a><a href="#answer">Per class</a><a href="#lb">Limit Breaks</a><a href="#world">The world</a><a href="#alts">Alternatives</a></nav>
   <div class="kpis" id="kpis"></div>
 
   <section id="ring">
@@ -237,16 +248,19 @@
 
   <section id="rift">
     <h2>The Rift's fronts</h2>
-    <p class="sub">The fronts draw by the run's seed, from the front, never the face. Today's counts and wards stay in Tier 1; the
-      Duel's and the Horde's draws become twins, so the guided parties always hold an answer.</p>
+    <p class="sub">The Rift is where specialized parties come in (the owner, 2026-10-24): each path is fought by a party rebuilt and
+      re-specced for it. The fronts draw by the run's seed, from the front, never the face; today's counts and wards stay in Tier 1; the
+      Duel's and the Horde's draws become twins. The guidance hands each path a <b>guided build</b>: its composition and every member's
+      weapons, the second copy of a class taking the kinds the first lacks.</p>
     <div class="panel" style="overflow-x:auto"><table class="matrix" id="rift-table"></table></div>
   </section>
 
   <section id="coverage">
     <h2>Coverage: who answers what</h2>
-    <p class="sub">Members whose default weapons answer each set (an Arm or the element of the twins; one kind for the single-kind rows).
-      Tier 1's tests ask for two or more everywhere: every cell meets it. Tier 2's single kinds are answered by the default party on
-      defaults; the Horde's keys ask for a pick or a Dual (red: nobody on defaults). Hover a cell for who.</p>
+    <p class="sub">Members whose weapons answer each set (an Arm or the element of the twins; one kind for the single-kind rows): the
+      campaign's default party on the owner's defaults, the Rift's paths on their guided builds. Tier 1's tests ask for two or more on every
+      twin set; single kinds for one in the campaign and two on Iron and Arcane. Every cell meets its test. Counts never use a weapon's second
+      kind (a Dual), so they hold whatever branches she takes. Hover a cell for who.</p>
     <div class="panel"><h3>Tier 1: twins</h3><div id="cov-twins" style="overflow-x:auto;margin-top:6px"></div></div>
     <div class="panel" style="margin-top:14px"><h3>One kind a foe: Iron and Arcane (every tier), and Tier 2's regulars</h3><div id="cov-kinds" style="overflow-x:auto;margin-top:6px"></div></div>
     <div class="chart-legend" style="margin-top:10px"><span class="scale"><i class="h0"></i>0<i class="h1"></i>1<i class="h2"></i>2<i class="h3"></i>3<i class="h4"></i>4<i class="h5"></i>5 members answer</span></div>
@@ -256,8 +270,27 @@
   <section id="answer">
     <h2>Per class: how many Tier 1 foes she answers alone</h2>
     <p class="sub">The share of the world's signatures whose twins one Uma's default weapons hold. Today's five weapons answer nearly
-      every foe; three answer about 60%, which is why a party matters and why the simulation re-sets shields (§4.4).</p>
+      every foe; on the owner's defaults three answer 34–66% (the pure classes hold the ring, the hybrids one twin set in both channels,
+      so both halves land weak on it). That is why a party matters, why her Heroes' Limit Breaks matter, and why the simulation re-sets
+      shields (§4.4).</p>
     <div class="panel"><div id="ans-chart"></div><details><summary>Show the numbers</summary><div id="ans-table"></div></details></div>
+  </section>
+
+  <section id="lb">
+    <h2>Limit Breaks as coverage</h2>
+    <p class="sub">The owner (2026-10-24): "a small section for Unique Skills; maybe rework them a little for their damage types." The halls'
+      24 Limit Breaks, each seat's own: their kinds decide weaknesses and locks whatever she wields, and an inherited one hits with her
+      higher offense (C3), so a Learner's two Heroes are the deliberate way to reach a kind outside her three weapons. Two seats change kind
+      (CP35), so every hall spreads over the twin sets. (If the owner meant each Uma's racing unique skill: the Uma Templates pass.)</p>
+    <div class="btnrow" id="lb-mode" style="margin-bottom:10px"></div>
+    <div class="lbgrid">
+      <div class="panel" style="overflow-x:auto"><h3>The 24 and the twin sets they answer</h3><table class="heat lbm" id="lb-table"></table></div>
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="panel" style="overflow-x:auto"><h3>Each hall's spread</h3><p class="muted" style="font-size:12px">Seats in the hall that answer each twin set.</p><div id="lb-halls"></div></div>
+        <div class="panel" style="overflow-x:auto"><h3>Her defaults, and the seats that close the gap</h3><p class="muted" style="font-size:12px">The twin sets her three default weapons miss, and the seats whose one Limit Break answers all of them.</p><table id="lb-class"></table></div>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div id="lb-num"></div></details>
   </section>
 
   <section id="world">
@@ -276,7 +309,7 @@
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3).
+// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3: the owner's, 2026-10-24).
 const TWINS = [
   { id: 'fire', el: 'Fire', arm: 'greatsword', tome: 'tome-fire', c: 'var(--k-fire)' },
   { id: 'ice', el: 'Ice', arm: 'axe', tome: 'tome-ice', c: 'var(--k-ice)' },
@@ -293,12 +326,12 @@ const KINDS = [
 const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
 const TW = Object.fromEntries(TWINS.map((t) => [t.id, t]));
 const CLASSES = [
-  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'katana'], c: 'var(--cl-brawler)', split: [100, 0] },
-  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-lightning', 'tome-light'], c: 'var(--cl-mage)', split: [0, 100] },
-  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['lance', 'bow', 'tome-dark'], c: 'var(--cl-spellblade)', split: [70, 30] },
-  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-ice', 'tome-dark', 'greatsword'], c: 'var(--cl-summoner)', split: [30, 70] },
-  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'lance', 'tome-ice'], c: 'var(--cl-paladin)', split: [67, 33] },
-  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-dark', 'axe'], c: 'var(--cl-cleric)', split: [33, 67] },
+  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'lance'], c: 'var(--cl-brawler)', split: [100, 0] },
+  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-ice', 'tome-lightning'], c: 'var(--cl-mage)', split: [0, 100] },
+  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['katana', 'lance', 'tome-lightning'], c: 'var(--cl-spellblade)', split: [70, 30] },
+  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-dark', 'tome-light', 'bow'], c: 'var(--cl-summoner)', split: [30, 70] },
+  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'axe', 'tome-light'], c: 'var(--cl-paladin)', split: [67, 33] },
+  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-ice', 'bow'], c: 'var(--cl-cleric)', split: [33, 67] },
 ];
 const C = Object.fromEntries(CLASSES.map((c) => [c.id, c]));
 /** The channels of a class's three slots, the lead channel first. */
@@ -334,8 +367,8 @@ const twinChips = (t) => t === 'twilight' ? kchip('bow') + kchip('katana') : kch
 const twinName = (t) => t === 'twilight' ? 'Twilight: Bow, Katana' : `${TW[t].el}: ${K[TW[t].arm].weapon}, ${K[TW[t].tome].weapon}`;
 document.getElementById('kpis').innerHTML = [
   ['Rules for a foe\'s weakness', '5', '1', 'her twins'], ['Weak marks on a Tier 1 foe', '2–5', '2', 'an Arm and its element'],
-  ['Weakness sets, Tier 1', 'random', '6', 'five twin sets and Twilight'], ['Fewest answers, default and guided parties', '—', '2', 'every Tier 1 foe'],
-  ['Foes one Uma answers alone', '~all', '~60%', 'three weapons: a party matters'], ['Bosses, every tier', '1–3 Arms + elements', '2', 'one Arm, one element'],
+  ['Weakness sets, Tier 1', 'random', '6', 'five twin sets and Twilight'], ['Fewest answers to a Tier 1 foe', '—', '2', 'campaign party; Rift builds'],
+  ['Foes one Uma answers alone', '~all', '34–66%', 'the owner\'s defaults: a party matters'], ['Bosses, every tier', '1–3 Arms + elements', '2', 'one Arm, one element'],
 ].map(([l, w, n, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value"><span class="was">${w} →</span> ${n}</div><div class="delta">${d}</div></div>`).join('');
 
 // ---- Ring
@@ -387,34 +420,81 @@ document.getElementById('tg-table').innerHTML = `<table><tr><th>A Fire foe</th><
 
 // ---- Rift
 const RIFT = [
-  ['Iron', 'Elements ×0.5', 'One Arm a foe (today\'s)', 'The same', 'The same', '2 Brawler, 2 Spell Blade, Paladin'],
-  ['Arcane', 'Arms ×0.5', 'Two elements a foe, one for a boss (today\'s)', '<b>One element a foe</b>', 'The same', '2 Mage, 2 Summoner, Cleric'],
-  ['Duel', '—', 'The boss\'s <b>twins</b>: two sets at stages 1–6, one at 7–12; locks mixed', 'One twin set', 'One twin set', '2 Brawler, 2 Mage, Paladin'],
-  ['Horde', '—', 'Each foe a <b>twin set</b>; a wave repeats none until all five are used', 'Keys <b>one kind</b> (by role); leaders their twins', 'Keys and sub-boss leaders one kind; boss leaders twins', '2 Spell Blade, 2 Summoner, Cleric'],
+  ['Iron', 'Elements ×0.5', 'One Arm a foe (today\'s)', 'The same', 'The same', '2 Brawler, 2 Spell Blade, Paladin; <b>Brawler 2: Bow, Katana, Axe</b> · <b>Spell Blade 2: Bow, Greatsword, Fire</b>'],
+  ['Arcane', 'Arms ×0.5', 'Two elements a foe, one for a boss (today\'s)', '<b>One element a foe</b>', 'The same', '2 Mage, 2 Summoner, Cleric, on defaults'],
+  ['Duel', '—', 'The boss\'s <b>twins</b>: two sets at stages 1–6, one at 7–12; locks mixed', 'One twin set', 'One twin set', '2 Brawler, 2 Mage, Paladin; <b>Brawler 2: Bow, Katana, Lance</b> · <b>Mage 2: Light, Dark, Thunder</b>'],
+  ['Horde', '—', 'Each foe a <b>twin set</b>; a wave repeats none until all five are used', 'Keys <b>one kind</b> (by role); leaders their twins', 'Keys and sub-boss leaders one kind; boss leaders twins', '2 Spell Blade, 2 Summoner, Cleric; <b>Spell Blade 2: Greatsword, Axe, Fire</b> · <b>Summoner 2: Blizzard, Fire, Lance</b>'],
 ];
-document.getElementById('rift-table').innerHTML = `<thead><tr><th>Front</th><th>Ward</th><th class="t" style="--tc:var(--t1)">Tier 1</th><th class="t" style="--tc:var(--t2)">Tier 2</th><th class="t" style="--tc:var(--t3)">Tier 3</th><th>Guided party</th></tr></thead><tbody>${RIFT.map((r) => `<tr><td><b>${r[0]}</b></td>${r.slice(1).map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+document.getElementById('rift-table').innerHTML = `<thead><tr><th>Front</th><th>Ward</th><th class="t" style="--tc:var(--t1)">Tier 1</th><th class="t" style="--tc:var(--t2)">Tier 2</th><th class="t" style="--tc:var(--t3)">Tier 3</th><th>Guided build (re-specced members in bold)</th></tr></thead><tbody>${RIFT.map((r) => `<tr><td><b>${r[0]}</b></td>${r.slice(1).map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
 
-// ---- Coverage
+// ---- Coverage: the campaign on the owner's defaults, the Rift on its guided builds (CP4, CP7)
+const M = (c, w) => ({ c, w: w || C[c].def, re: !!w });
 const P = {
-  'Default · Cleric': ['brawler', 'mage', 'spellblade', 'summoner', 'cleric'], 'Default · Paladin': ['brawler', 'mage', 'spellblade', 'summoner', 'paladin'],
-  Duel: ['brawler', 'brawler', 'mage', 'mage', 'paladin'], Horde: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
-  Iron: ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'], Arcane: ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
+  'Campaign · Cleric': [M('brawler'), M('mage'), M('spellblade'), M('summoner'), M('cleric')],
+  'Campaign · Paladin': [M('brawler'), M('mage'), M('spellblade'), M('summoner'), M('paladin')],
+  'Duel build': [M('brawler'), M('brawler', ['bow', 'katana', 'lance']), M('mage'), M('mage', ['tome-light', 'tome-dark', 'tome-lightning']), M('paladin')],
+  'Horde build': [M('spellblade'), M('spellblade', ['greatsword', 'axe', 'tome-fire']), M('summoner'), M('summoner', ['tome-ice', 'tome-fire', 'lance']), M('cleric')],
+  'Iron build': [M('brawler'), M('brawler', ['bow', 'katana', 'axe']), M('spellblade'), M('spellblade', ['bow', 'greatsword', 'tome-fire']), M('paladin')],
+  'Arcane, on defaults': [M('mage'), M('mage'), M('summoner'), M('summoner'), M('cleric')],
 };
-const who = (list) => { const n = {}; list.forEach((m) => (n[m] = (n[m] || 0) + 1)); return Object.entries(n).map(([m, k]) => `${k > 1 ? k + ' ' : ''}${C[m].name}${k > 1 ? 's' : ''}`).join(', ') || 'nobody on defaults'; };
+const who = (list) => { const n = {}; list.forEach((x) => { const k = C[x.c].name + (x.re ? ' (re-specced)' : ''); n[k] = (n[k] || 0) + 1; }); return Object.entries(n).map(([m, k]) => `${k > 1 ? k + ' × ' : ''}${m}`).join(', ') || 'nobody'; };
 const covRows = [];
-const sets = [...TWINS.map((t) => [t.id, `${t.el}`, `${K[t.arm].weapon} · ${K[t.tome].weapon}`, (m) => C[m].def.includes(t.arm) || C[m].def.includes(t.tome)]), ['twilight', 'Twilight', 'Bow · Katana', (m) => C[m].def.includes('bow') || C[m].def.includes('katana')]];
+const sets = [...TWINS.map((t) => [t.id, `${t.el}`, `${K[t.arm].weapon} · ${K[t.tome].weapon}`, (x) => x.w.includes(t.arm) || x.w.includes(t.tome)]), ['twilight', 'Twilight', 'Bow · Katana', (x) => x.w.includes('bow') || x.w.includes('katana')]];
 let ct = `<table class="heat"><tr><th></th>${sets.map(([, l, s]) => `<th style="text-align:center">${l}<div class="muted" style="font-weight:500;font-size:11px">${s}</div></th>`).join('')}</tr>`;
-['Default · Cleric', 'Default · Paladin', 'Duel', 'Horde'].forEach((r) => { ct += `<tr><th style="text-align:right">${r}</th>`; sets.forEach(([id, l, s, f]) => {
-  if (r === 'Duel' && id === 'twilight') { ct += '<td class="c hna">—</td>'; return; } const a = P[r].filter(f);
+['Campaign · Cleric', 'Campaign · Paladin', 'Duel build', 'Horde build'].forEach((r) => { ct += `<tr><th style="text-align:right">${r}</th>`; sets.forEach(([id, l, s, f]) => {
+  if (r.endsWith('build') && id === 'twilight') { ct += '<td class="c hna">—</td>'; return; } const a = P[r].filter(f);
   ct += `<td class="c ${heatClass(a.length)}" data-t="${r} · ${l} (${s})" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; covRows.push(['Tier 1', r, `${l} (${s})`, a.length, who(a)]); }); ct += '</tr>'; });
-document.getElementById('cov-twins').innerHTML = ct + '</table>';
+document.getElementById('cov-twins').innerHTML = ct + '</table><p class="foot">The Rift draws the five twin sets, never Twilight (—).</p>';
 let ck = `<table class="heat"><tr><th></th>${KINDS.map((k) => `<th style="text-align:center">${kchip(k.id)}</th>`).join('')}</tr>`;
-[['Iron (every tier)', 'Iron', 'a'], ['Arcane (from Tier 2)', 'Arcane', 't'], ['Tier 2 regular · Default · Cleric', 'Default · Cleric', null], ['Tier 2 regular · Default · Paladin', 'Default · Paladin', null], ['Tier 2 Horde key', 'Horde', null]].forEach(([label, key, only]) => {
+[['Iron build (every tier)', 'Iron build', 'a'], ['Arcane (from Tier 2)', 'Arcane, on defaults', 't'], ['Tier 2 regular · Campaign · Cleric', 'Campaign · Cleric', null], ['Tier 2 regular · Campaign · Paladin', 'Campaign · Paladin', null], ['Tier 2 Horde key · Horde build', 'Horde build', null]].forEach(([label, key, only]) => {
   ck += `<tr><th style="text-align:right">${label}</th>`; KINDS.forEach((k) => { if (only && k.ch !== only) { ck += '<td class="c hna">·</td>'; return; }
-    const a = P[key].filter((m) => C[m].def.includes(k.id)); ck += `<td class="c ${heatClass(a.length)}" data-t="${label} · ${k.weapon}" data-d="${a.length ? `${a.length} answer: ${who(a)}` : 'Nobody on defaults: a pick or a Dual covers it'}">${a.length}</td>`; covRows.push([label.includes('Tier 2') ? 'Tier 2' : 'Every tier', label, k.weapon, a.length, who(a)]); }); ck += '</tr>'; });
+    const a = P[key].filter((x) => x.w.includes(k.id)); ck += `<td class="c ${heatClass(a.length)}" data-t="${label} · ${k.weapon}" data-d="${a.length ? `${a.length} answer: ${who(a)}` : 'Nobody: a pick or a Dual covers it'}">${a.length}</td>`; covRows.push([label.includes('Tier 2') ? 'Tier 2' : 'Every tier', label, k.weapon, a.length, who(a)]); }); ck += '</tr>'; });
 document.getElementById('cov-kinds').innerHTML = ck + '</table>';
 document.querySelectorAll('#coverage td.c[data-t]').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d));
 document.getElementById('cov-table').innerHTML = `<table><tr><th>When</th><th>Party</th><th>Set or kind</th><th class="num">Members</th><th>Who</th></tr>${covRows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table>`;
+
+// ---- Limit Breaks as coverage (§8, CP35)
+const LB = [
+  ['Brawler Dojo', 1, 'Arsenal Rush', ['greatsword', 'axe', 'lance', 'bow', 'katana']], ['Brawler Dojo', 2, 'Iaido Cleave', ['greatsword', 'katana']],
+  ['Brawler Dojo', 3, 'Spear and Arrow Storm', ['lance', 'bow']], ['Brawler Dojo', 4, 'Earthsplitter', ['axe']],
+  ['Mage Tower', 1, 'Elemental Cascade', ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark']], ['Mage Tower', 2, 'Twilight Eclipse', ['tome-light', 'tome-dark']],
+  ['Mage Tower', 3, 'Trinity Storm', ['tome-fire', 'tome-ice', 'tome-lightning']], ['Mage Tower', 4, 'Chaos Rain', ['tome-light', 'tome-dark']],
+  ['Spell Blade Salle', 1, 'Sunfire Edge', ['greatsword', 'tome-fire']], ['Spell Blade Salle', 2, 'Rimefang Waltz', ['katana', 'tome-ice']],
+  ['Spell Blade Salle', 3, 'Thunder Javelin', ['lance', 'tome-lightning']], ['Spell Blade Salle', 4, 'Eclipse Volley', ['bow', 'tome-light', 'tome-dark']],
+  ['Summoner Circle', 1, 'Cinder Wyrm', ['greatsword', 'tome-fire']], ['Summoner Circle', 2, 'Frost Behemoth', ['axe', 'tome-ice']],
+  ['Summoner Circle', 3, 'Thunderbird', ['lance', 'tome-lightning']], ['Summoner Circle', 4, 'Moon Fox', ['katana', 'tome-dark', 'bow', 'tome-light']],
+  ['Paladin Bastion', 1, 'Archangel\'s Verdict', ['greatsword', 'tome-light']], ['Paladin Bastion', 2, 'Archdemon\'s Pact', ['katana', 'tome-dark']],
+  ['Paladin Bastion', 3, 'Rampart Charge', ['axe'], ['greatsword'], 'One Axe charge on one foe, then a Barrier on every ally (today: a Greatsword charge). The Bastion answered Fire twice and Ice never'],
+  ['Paladin Bastion', 4, 'Valkyrie Lances', ['lance']],
+  ['Cleric Chapel', 1, 'Choir of Angels', ['tome-light', 'tome-lightning'], ['tome-light'], 'Light on every foe, then Lightning on every foe, then Aegis 2 (today: Light twice). The Chapel had no Lightning'],
+  ['Cleric Chapel', 2, 'Legion of Demons', ['tome-dark']], ['Cleric Chapel', 3, 'Dawn Hymn', ['tome-fire']], ['Cleric Chapel', 4, 'Frost Sanctuary', ['tome-ice']],
+];
+const LSETS = [...TWINS.map((tw) => [tw.id, tw.el, [tw.arm, tw.tome], tw.c]), ['twilight', 'Twilight', ['bow', 'katana'], 'var(--neutral-strong)']];
+let lbMode = 'new';
+const kindsOf = (l) => (lbMode === 'old' && l[4] ? l[4] : l[3]);
+const answers = (ks) => LSETS.filter(([, , pair]) => pair.some((k) => ks.includes(k))).map((s) => s[0]);
+function renderLB() {
+  document.getElementById('lb-mode').innerHTML = [['new', 'Proposed (CP35)'], ['old', 'Today']].map(([id, n]) => `<button data-m="${id}" aria-pressed="${lbMode === id}">${n}</button>`).join('');
+  document.querySelectorAll('#lb-mode button').forEach((b) => b.addEventListener('click', () => { lbMode = b.dataset.m; renderLB(); }));
+  let s = `<tr><th class="l0">Hall · seat</th><th>Limit Break</th><th>Kinds</th>${LSETS.map(([, n]) => `<th style="text-align:center">${n}</th>`).join('')}</tr>`; const num = [];
+  LB.forEach((l, i) => { const ks = kindsOf(l), a = answers(ks), chg = !!l[4];
+    s += `<tr class="${chg ? 'chg' : ''}"><td class="l0">${l[1] === 1 ? `<b>${l[0]}</b> · ` : ''}${l[1]}</td><td${chg ? ` data-t="${l[2]} · ${lbMode === 'new' ? 'proposed' : 'today'}" data-d="${l[5]}"` : ''}>${chg ? '<b>' + l[2] + '</b>' : l[2]}</td><td><span class="ks">${ks.map((k) => kchip(k)).join('')}</span></td>`;
+    LSETS.forEach(([id, n, , col]) => { const on = a.includes(id); s += `<td class="c hna" data-t="${l[2]} · ${n}" data-d="${on ? `Answers a foe weak to the ${n} ${id === 'twilight' ? 'set (Bow, Katana)' : 'twins'}` : 'No'}">${on ? `<span class="lbdot" style="background:${col}">✓</span>` : '·'}</td>`; });
+    s += '</tr>'; num.push([l[0], l[1], l[2], ks.map((k) => K[k].weapon).join(', '), a.map((x) => LSETS.find((z) => z[0] === x)[1]).join(', '), chg ? 'Changed (CP35)' : '']); });
+  document.getElementById('lb-table').innerHTML = s;
+  const halls = [...new Set(LB.map((l) => l[0]))];
+  let hs = `<table class="heat"><tr><th></th>${LSETS.map(([, n]) => `<th style="text-align:center">${n}</th>`).join('')}</tr>`;
+  halls.forEach((hn) => { hs += `<tr><th style="text-align:right;white-space:nowrap">${hn}</th>`; LSETS.forEach(([id, n]) => { const seats = LB.filter((l) => l[0] === hn && answers(kindsOf(l)).includes(id));
+    hs += `<td class="c ${heatClass(seats.length)}" data-t="${hn} · ${n}" data-d="${seats.length ? seats.map((l) => l[2]).join(', ') : 'No seat'}">${seats.length}</td>`; }); hs += '</tr>'; });
+  document.getElementById('lb-halls').innerHTML = hs + '</table>';
+  let cs = `<tr><th>Class</th><th>Her defaults miss</th><th>One seat closes all</th></tr>`;
+  CLASSES.forEach((c) => { const has = answers(c.def), miss = LSETS.map((x) => x[0]).filter((x) => !has.includes(x)), close = LB.filter((l) => miss.every((m) => answers(kindsOf(l)).includes(m)));
+    cs += `<tr><td><span class="cdot" style="--cc:${c.c}"></span> ${c.name}</td><td>${miss.map((m) => LSETS.find((z) => z[0] === m)[1]).join(', ')}</td><td>${close.map((l) => l[2]).join(', ') || '—'}</td></tr>`; });
+  document.getElementById('lb-class').innerHTML = cs;
+  document.querySelectorAll('#lb [data-t]').forEach((el) => bindTip(el, el.dataset.t, el.dataset.d)); bindKinds(document.getElementById('lb'));
+  document.getElementById('lb-num').innerHTML = `<table><tr><th>Hall</th><th class="num">Seat</th><th>Limit Break</th><th>Kinds</th><th>Twin sets answered</th><th></th></tr>${num.map((r) => `<tr>${r.map((v, i) => `<td${i === 1 ? ' class="num"' : ''}>${v}</td>`).join('')}</tr>`).join('')}</table>`;
+}
+renderLB();
 
 // ---- Frequency of twin sets over the 48 signatures (a pair's two leads count half each)
 const freq = { fire: 0, ice: 0, ltn: 0, light: 0, dark: 0, twilight: 0 };

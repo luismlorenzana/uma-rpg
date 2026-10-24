@@ -37,7 +37,9 @@ drafts are in git history.
 - **Tiers:** 1–3, 50 levels each; one Uma lives in one tier (D159, tiers.md §3); promotion through the Rift stays.
 - **Classes:** the six of classes v2 (D160, live since H61): Brawler, Mage, Spell Blade, Summoner, Paladin, Cleric, in
   every tier. Their identities stay: Brawler all physical, Mage all magical, the hybrids 70/30 each way as a mirror,
-  one healer a party. Tier 2 adds a **specialization** (one of two a class), Tier 3 a **mastery** (CL11, CL12).
+  one healer a party. Tier 2 adds a **class branch** (one of two specializations a class: its passive and three class
+  skills), Tier 3 the branch's capstone and a **mastery** ([class-progression.md](class-progression.md) CP26, CP27,
+  CP34; changed after the owner's review, 2026-10-24).
 - **Five fight types:** **physical** (Brawler), **magical** (Mage), **physical hybrid** (Spell Blade), **magical
   hybrid** (Summoner), **healer** (Paladin or Cleric).
 - **The calling** (variance U4): each Uma's fight type by one rule from master data (eight rows, by stable id). It sets
@@ -48,15 +50,19 @@ drafts are in git history.
 - **No strikes** (owner, 2026-10-23; [class-progression.md](class-progression.md) CP2, CP5): the ten kinds stay the damage
   and weakness types; each weapon's own shape (a Bow's many hits, an Axe's reach) is the small variety. A class's three
   weapon slots follow its Arms count only: Brawler 3, Spell Blade and Paladin 2, Summoner and Cleric 1, Mage 0. Tier 1
-  foes are weak to two kinds, one Arm and its twin element (CP5).
+  foes are weak to two kinds, one Arm and its twin element (CP5). **The owner's defaults** (2026-10-24, CP3): Brawler
+  Greatsword, Axe, Lance; Mage Fire, Blizzard, Thunder; Spell Blade Katana, Lance, Thunder; Summoner Dark, Light, Bow;
+  Paladin Greatsword, Axe, Light; Cleric Light, Blizzard, Bow. The campaign is balanced parties; the Rift's paths are
+  specialized, with guided builds (CP4, CP7).
 - **The class template** (CL6): **3 weapons, 5 armor pieces, accessories 1 · 2 · 3** (Support; + Damage, an Orb; + a
-  second Support). Weapons stay at 3 for good; depth comes from forms, trees and Extra Stats.
+  second Support). Weapons stay at 3 for good; depth comes from weapon branches, trees and Extra Stats.
 - **Grades, one rule for every piece** (GE1, GE2): she owns every weapon kind, five armor slots and her accessory
   slots at **G0**; a crafted item raises one a grade, up to **G10**. Grade g is **made** at Craft Lv 5g − 4 and **worn**
   at Uma Lv 5g − 4. No gear ranks. A class switch costs only the weapons she hasn't raised.
 - **Skill trees** (SK1–SK4): one tree per weapon slot, three a class, under a class root. **No skill points at any
   tier.** Class Rank opens depths at 1, 10, 20, 30, 40 (and 50 in Tier 3); a fork's branches are free and exclusive,
-  branch A the default.
+  branch A the default. **Skill Ranks** (CP32, the owner's review): every skill ranks 1–5 by itself, one rank every 2
+  Class Ranks, balance-neutral over each depth.
 - **Extra Stats** (ES1–ES5): one planet and four moons (Strength, Sorcery, Vigor, Guard), five nodes each; **every open
   node counts**; a node opens with its jewel, in order, at Uma Lv 5g − 4. The core is rebuilt the same each tier.
 - **Professions** (PR1–PR4, PR7): ten professions, five **gathering** (Farming, Fishing, Mining, Wood Chopping,
@@ -67,7 +73,9 @@ drafts are in git history.
   type an existing item icon: no new art (PR4–PR7, after the owner's review).
 - **Uma Templates** (U2–U4): ours, assigned **by rule** from master data (running style, distance, growth rates, read
   by stable id), never a hand-written list of real Umas. 90 templates; each gives a **Flourish** (her calling's root
-  node), a **signature tip** from Tier 2 and **her moon** (two nodes).
+  node), a **signature tip** from Tier 2 (on her affinity kind's tree), **her moon** (two nodes) and an **affinity**:
+  +6% damage with one twin set's two kinds, every tier, any class (class-progression CP36; which set is the Uma
+  Templates pass's).
 - **Pacing:** the time to level, the EXP and rewards per fight, and the time to gear an Uma on curve keep today's order
   ([pacing.md](../pacing.md)). One Uma maxed costs 485 refined items against today's 472 (§2.3).
 - **Versions** (§9): **engine v16 and save v26 are the Tier 1 rework**, every category, live together. Tier 2's toolbox
@@ -79,21 +87,22 @@ Drawn in [progression.html](previews/progression.html); one Uma's page in [chara
 
 | | Today (every tier) | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|
-| **Class choice** | 6 classes | 6 classes | + a specialization, one of two | + a mastery |
+| **Class choice** | 6 classes | 6 classes | + a class branch, one of two: a passive and three class skills | + its capstone and a mastery |
 | **Weapon slots** | 5 | 3, by her class's Arms count | 3 | 3 |
 | **Foes weak to** | 2–5 kinds, half at random | 2: one Arm and its twin element | Regulars 1; sub-bosses and bosses 2 | Regulars and sub-bosses 1; bosses 2 |
-| **Weapon forms** | — | Base: 1 kind | G5 fork: Dual or Pure | G5 fork: Prism, Tempered or Keen |
+| **Weapon branches** (owner, 2026-10-24: Prism dropped) | — | Base: 1 kind | G5 branch: Specialized, Dual or a third (weapon-progression.md) | Her branch deepens; two kinds a weapon at most |
 | **Armor** | 5, a half per piece | 5, her class's half | 5, per piece for the four between | The same |
 | **Accessories** | 2: Damage, Support | 1: Support | 2: + Damage (Orb) | 3: + Support |
 | **Gear gate** | 24 rank bars | Uma Lv 5g − 4 | The same | The same |
 | **Trees she uses** | 5 | 3 | 3 | 3 |
 | **Nodes a tree** | 15 | 8 | 14 | 17 |
-| **Picks a class** | 25 forks and a 50-point budget | 3 | 6 | 9 |
-| **Skills held · equipped** | Up to 50 · 3 → 10 | 15 · 3 → 7 | 15 · 3 → 10 | 30 · 10 and a master slot |
+| **Picks a class** | 25 forks and a 50-point budget | 3 | 7 (+ her class branch) | 10 |
+| **Skills held · equipped** | Up to 50 · 3 → 10 | 15 · 3 → 7 | 18 · 3 → 10 | 34 · 10 and a master slot |
+| **Skill Ranks** | — | 1–5 on every skill, +1 every 2 Class Ranks | The same | The same |
 | **Extra Stats nodes** | 100, 5 → 30 active | 25, all count | 29: + Halo (1 kind), Valor | 33: + Halo's 2nd kind, Swiftness |
 | **Her moon** | — | 2 nodes | 2 | 2 |
 | **Jewel kinds · items** | 3 · 100 Star Gems | 2 · 10 | 3 · 12 | 3 · 12 |
-| **Template** | — | Calling, Flourish, moon | + signature tip | Tip at both forks |
+| **Template** | — | Calling, Flourish, moon, affinity | + signature tip | Tip at both forks |
 | **Work places · slots** | 11 facilities · 33–55 slots | 10 places, existing buildings · 40 (4 a place) | 10 · 40 | 10 · 40 |
 | **Pairs a gathering profession** | 8 families × 10 grades | 1 (2 types) | 2 | 3 |
 | **Where an Uma works** | Any of 11 | Her trade's 2 places | + a secondary's gathering | Secondary reaches its Tier 2 pair |
@@ -108,7 +117,7 @@ Drawn in [progression.html](previews/progression.html); one Uma's page in [chara
 | Item | Made at | Refined a piece | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
 | Weapon Gem (G1–G10) | Forge | 4 | 30 · 120 | 27 · 108 | 27 · 108 |
-| Fork gem (G5): Dual, Pure; then Prism, Tempered, Keen | Forge | 4 + one of each tier pair (5) | — | 3 · 27 | 3 · 27 |
+| Fork gem (G5): Dual, Pure; then Prism, Tempered, Keen (first round; the owner dropped Prism, 2026-10-24: weapon-progression.md renames and recounts) | Forge | 4 + one of each tier pair (5) | — | 3 · 27 | 3 · 27 |
 | Armor Fittings | Armorer | 2 (grades 1–5), 3 (6–10) | 50 · 125 | 50 · 125 | 50 · 125 |
 | Accessory Setting | Charm Shop | 12 · 6 · 4 by slot count | 10 · 120 | 20 · 120 | 30 · 120 |
 | Planet and Moon Jewels (shared) | Lapidary | Planet 8, Moon 4, resized from Tier 2 | 25 · 120 | 27 · 120 | 29 · 120 |
@@ -133,8 +142,8 @@ One word, one meaning, in every doc and preview.
 | **Uma Template** | "{knack word} {type}", e.g. "Tireless Ironhide" | A class template |
 | **Class template** | A class's slots per tier: 3 weapons, 5 armor, 1 · 2 · 3 accessories | — |
 | **Grade** | G0–G10 on a weapon, an armor slot or an accessory slot | "Weapon Rank" (retired) |
-| **Form** | A weapon's shape of kinds and weak multiplier: Base, Dual, Pure (Tier 2), Prism, Tempered, Keen (Tier 3) | — |
-| **Gem** | Only the Forge's weapon items: **Weapon Gem** and the five fork gems (Dual, Pure, Prism, Tempered, Keen Gem) | Anything gathered; anything for Extra Stats. Today's Star Gems retire |
+| **Weapon branch** (was "form") | A weapon's growth from Tier 2's G5: **Specialized** (more damage on its kind), **Dual** (a second kind) or a third to design, deepened in Tier 3; two kinds a weapon at most (owner, 2026-10-24: Prism dropped) | A tree's branch |
+| **Gem** | Only the Forge's weapon items: **Weapon Gem** and the fork gems, one per weapon branch (first round: Dual, Pure, Prism, Tempered, Keen Gem; weapon-progression.md renames them, Prism dropped) | Anything gathered; anything for Extra Stats. Today's Star Gems retire |
 | **Armor Fittings**, **Accessory Setting** | The Armorer's and the Charm Shop's grade items | — |
 | **Jewel** | Only the Lapidary's Extra Stats items: **Planet**, **Moon** and **Halo Jewels** | A gem |
 | **Stone** | What Hunting gathers: Quartz, Garnet (Tier 1), Sapphire, Diamond (Tier 2), Starstone, Philosopher's Stone (Tier 3); refined, **Cut Quartz** and so on | A gem or a jewel |
@@ -143,8 +152,11 @@ One word, one meaning, in every doc and preview.
 | **Place · slot** | A profession's one building on the Wilds · one Uma's work in it, shown as a pip | A facility with levels; a hut or a yard (retired with the owner's review) |
 | **Pair** | A gathering profession's low (grades 1–5) and high (6–10) type for one tier | — |
 | **Secondary** | From Tier 2, one other gathering profession's base pair | Today's "second profession" (Lore) |
-| **Trunk · fork · branch · tip · capstone · root** | Depths 1–2 · the depth-3 choice · A, B, C · depth 5 · depth 6 · her class plate | Side nodes, side points (retired) |
-| **Specialization · mastery** | A class's Tier 2 passive (one of two) · its Tier 3 mechanic | An advanced class |
+| **Trunk · fork · branch · tip · capstone · root** | Depths 1–2 · the depth-3 choice · A, B, C · depth 5 · depth 6 · her class plate | Side nodes, side points (retired). "Branch" alone is a tree's; the others are a **class branch** and a **weapon branch** |
+| **Class branch · class skill · mastery** | A class's Tier 2 specialization on her class tree, one of two: its passive and three class skills · a skill of that branch, cast through the weapon she picks · the class's Tier 3 mechanic, opening with the branch's capstone | An advanced class |
+| **Skill Rank** | A held skill's rank, 1–5, one every 2 Class Ranks (×0.95 → ×1.05) | Class Rank |
+| **Affinity** | Her template's twin set: +6% damage with its two kinds | A damage kind |
+| **Guided build** | A Rift path's composition and every member's three weapons | The campaign's defaults |
 | **Flourish · signature tip · her moon** | Her template's root node · its Tier 2+ tip option · her own two-node moon | — |
 | **Planet · moons · Halo · Valor · Swiftness** | Extra Stats bodies: every core stat · Strength, Sorcery, Vigor, Guard · one damage kind · Limit start · evasion | — |
 | **Orb · Support** | The Damage slot (Tier 2+) · the Talisman or Amulet slot | — |
@@ -228,9 +240,9 @@ the owning doc wins unless that breaks an owner point (§7).
 
 | Doc | State |
 |---|---|
-| **class-progression.md** | **Authored 2026-10-23, for the owner's review** (CP1–CP31; strikes dropped). Supersedes classes.md and skill-trees.md |
+| **class-progression.md** | Authored 2026-10-23. **Revised after owner review 2026-10-24** (CP1–CP37): the owner's defaults (CP3); the campaign balanced and the Rift's guided builds (CP4, CP7); Skill Ranks (CP32); weapon growth as branches, Prism dropped (CP33); class branches, twelve written (CP26, CP34); the mastery as the branch's crown (CP27); two Limit Breaks' kinds (CP35); the template's affinity (CP36); the Paladin's revive on her Light tree (CP37). Supersedes classes.md and skill-trees.md |
 | classes.md | History: superseded by class-progression.md |
-| gear.md | Cross-referenced: §8's amounts are professions'; no GE call changed |
+| gear.md | Cross-referenced: §8's amounts are professions'; no GE call changed. **Owner, 2026-10-24: Prism dropped;** its Tier 2 and 3 forms (§4.1, §5.1, §6) are first-round history, replaced by weapon branches (Specialized, Dual, a third) that weapon-progression.md designs |
 | skill-trees.md | History: superseded by class-progression.md |
 | extra-stats.md | Cross-referenced: ES12 changed |
 | professions.md | Cross-referenced: PR1 changed; Tier 3's numbers corrected. **Revised after the owner's first review (2026-10-22):** PR3–PR7, PR10, PR14 changed (PR-R1) |
