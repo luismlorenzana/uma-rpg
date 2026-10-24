@@ -308,7 +308,7 @@ const PL = {
 TRADES.forEach((t) => { PL[t.g].trade = t; PL[t.m].trade = t; PL[t.g].gprof = t.prof; });
 const ORDER = ['mine', 'forge', 'forest', 'armorer', 'fields', 'workbench', 'fishery', 'charm-shop', 'monster-den', 'lapidary'];
 const MAKES = {
-  forge: ['Weapon Gem G1–G10 (30 an Uma)', 'Weapon Gem G1–G4, G6–G10 (27) + a Branch Gem at G5 (3: Pure or Dual)', 'Weapon Gem (27) + a Branch Gem at G5 (3: Keen or Tempered)'],
+  forge: ['Weapon Gem G1–G10 (30 an Uma)', 'Weapon Gem G1–G4, G6–G10 (27) + a Branch Gem at G5 (3: Pure or Dual)', 'Weapon Gem (27) + a Branch Gem at G5 (3: Keen, Tempered or Evolved)'],
   armorer: ['Armor Fittings G1–G10 (50)', 'Armor Fittings (50)', 'Armor Fittings (50)'],
   workbench: ['Every refined item: 485 an Uma, 10 types', '503 an Uma, 20 types', '521 an Uma, 30 types'],
   'charm-shop': ['Accessory Setting G1–G10, 12 refined (10)', 'Settings of 6 for two slots (20)', 'Settings of 4 for three slots (30)'],
@@ -391,7 +391,7 @@ const G = 36.15, P = 9.04; // minutes in a slot at Craft Lv 25 (×1.25)
 const TRACES = [
   { v: 'wg', t: 'Weapon Gem G3 · Tier 1', line: 'weapon', tier: 1, g: 3, raises: 'Raises one weapon G2 → G3 (Uma Lv 11)' },
   { v: 'wg10', t: 'Weapon Gem G10 · Tier 2', line: 'weapon', tier: 2, g: 10, raises: 'Raises one weapon G9 → G10 (Uma Lv 46): her best grade, in Tier 2\'s Titanium and Ebony' },
-  { v: 'branch', t: 'Branch Gem (G5) · Tier 3', line: 'weapon', tier: 3, g: 5, raises: 'A weapon\'s G5 step: a Pure weapon turns Keen or Tempered, picked when used' },
+  { v: 'branch', t: 'Branch Gem (G5) · Tier 3', line: 'weapon', tier: 3, g: 5, raises: 'A weapon\'s G5 step: a Pure weapon turns Keen or Tempered, a Dual one Tempered or Evolved, picked when used' },
   { v: 'fit', t: 'Armor Fittings G6 · Tier 1', line: 'fittings', tier: 1, g: 6, raises: 'Raises one armor slot G5 → G6, either half' },
   { v: 'set', t: 'Accessory Setting G5 · Tier 2', line: 'setting', tier: 2, g: 5, raises: 'Raises one of her two accessory slots G4 → G5, any type' },
   { v: 'moon', t: 'Moon Jewel V · Tier 3', line: 'moon', tier: 3, g: 10, raises: 'Opens node V of any moon (Uma Lv 46)' },

@@ -320,7 +320,7 @@ const PL = {
 TRADES.forEach((t) => { PL[t.g].trade = t; PL[t.m].trade = t; PL[t.g].gprof = t.prof; });
 const ORDER = ['mine', 'forge', 'forest', 'armorer', 'fields', 'workbench', 'fishery', 'charm-shop', 'monster-den', 'lapidary'];
 const MAKES = {
-  forge: ['Weapon Gem G1–G10 (30 an Uma)', 'Weapon Gem G1–G4, G6–G10 (27) + a Branch Gem at G5 (3: Pure or Dual)', 'Weapon Gem (27) + a Branch Gem at G5 (3: Keen or Tempered)'],
+  forge: ['Weapon Gem G1–G10 (30 an Uma)', 'Weapon Gem G1–G4, G6–G10 (27) + a Branch Gem at G5 (3: Pure or Dual)', 'Weapon Gem (27) + a Branch Gem at G5 (3: Keen, Tempered or Evolved)'],
   armorer: ['Armor Fittings G1–G10 (50)', 'Armor Fittings (50)', 'Armor Fittings (50)'],
   workbench: ['Every refined item: 485 an Uma, 10 types', '503 an Uma, 20 types', '521 an Uma, 30 types'],
   'charm-shop': ['Accessory Setting G1–G10, 12 refined (10)', 'Settings of 6 for two slots (20)', 'Settings of 4 for three slots (30)'],
@@ -397,7 +397,7 @@ function drawLadder() {
 function cell(r, t, name) {
   const n = r.items.reduce((a, [, v]) => a + v, 0);
   const branch = line === 'weapon' && r.g === 5 && t >= 2;
-  const body = r.items.map(([id, k]) => `${k} ${NM(id)}`).join(', ') + `<br>${n} refined · made of Tier ${r.mt}'s ${r.g <= 5 ? 'low' : 'high'} types${r.mt === t && t > 1 ? ': her main trade\'s work' : r.mt === 2 && t === 3 ? ': main trade or a secondary' : ''}.` + (branch ? `<br>The weapon's Branch Gem: ${t === 2 ? 'Pure or Dual' : 'Keen or Tempered'}, picked when used.` : '');
+  const body = r.items.map(([id, k]) => `${k} ${NM(id)}`).join(', ') + `<br>${n} refined · made of Tier ${r.mt}'s ${r.g <= 5 ? 'low' : 'high'} types${r.mt === t && t > 1 ? ': her main trade\'s work' : r.mt === 2 && t === 3 ? ': main trade or a secondary' : ''}.` + (branch ? `<br>The weapon's Branch Gem: ${t === 2 ? 'Pure or Dual' : 'Keen, Tempered or Evolved'}, picked when used.` : '');
   return `<div class="g hit${branch ? ' branch' : ''}" style="--mt:var(--mt${r.mt})" ${tt(branch ? `Branch Gem (G5), Tier ${t}` : name + ' · Tier ' + t, body)}><div class="gn">${branch ? 'Branch' : n + ' refined'}</div>${r.items.map(([id, k]) => `<span class="it">${ico(id, 0.75)}${k}</span>`).join('')}</div>`;
 }
 pills($('#line-pills'), 'Item', LINES, line, (v) => { line = v; drawLadder(); });

@@ -24,6 +24,12 @@
 > XC1–XC16). Nothing here changed: weapon-progression.md adopted this doc's recipes, amounts and refund mix (its §6,
 > WP26), and the save numbers are **v27** (Tier 1) and **v28** (Tier 2) everywhere (§14).
 >
+> **Follow-up to the weapon review, 2026-10-24** ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC21): wording
+> only. weapon-progression.md's revision opens **all four accessory families in every tier** (base forms, then
+> branches from a slot's G5, which are forms of the slot and need no item, WP34) and forks Tier 3's Dual line, so the
+> Tier 3 Branch Gem reads **"Keen, Tempered or Evolved"** (the owner's points, §0, §3.5, §6.3, §9.1–§9.2, §13). **No amount moves:** Accessory
+> Settings 10 · 20 · 30 an Uma, 120 refined a tier; the Branch Gem 3 a tier; one Uma **485 · 503 · 521**.
+>
 > **Values** follow SB1 ([README §2.5](README.md#25-the-stat-budget-sb1-working-rule-2026-10-23)) in the docs that own
 > them. This doc's numbers are counts of items and hours, which SB1 doesn't touch.
 >
@@ -51,7 +57,7 @@
 | First review: "all assets still exist, fully reuse them and only author a small set" | [§3.3](#33-the-catalog-every-type-every-tier-pp7-pp8), [§4.1](#41-ten-places-pp4-pp6) (PP6): ten existing building frames, sixty existing item icons, nothing to draw |
 | **This doc (2026-10-24): "including mat types and profession types"** | **[§2](#2-profession-types) profession types; [§3](#3-material-types) material types** |
 | SB1 (2026-10-23): build values × 1 / 1.8 / 2.6; do recipe amounts scale with the tier too? | [§6.4](#64-sb1-amounts-dont-scale-with-the-tier-pp11) (PP11): **no**; one Uma's work stays within a tenth of Tier 1's in every tier |
-| 2026-10-24, decided elsewhere: accessories damage-oriented, slots 1 · 2 · 3; armor carries all defense; weapons Pure or Dual, then Keen or Tempered; Extra Stats' Halo, Valor, Swiftness | [§3.5](#35-what-the-making-places-make), [§6](#6-the-recipe-book): the Charm Shop's Settings by slot count, the Branch Gem at G5, the jewels; cross-checked in [§13](#13-assumes) |
+| 2026-10-24, decided elsewhere: accessories damage-oriented, slots 1 · 2 · 3; armor carries all defense; weapons Pure or Dual, then Keen, Tempered or Evolved; Extra Stats' Halo, Valor, Swiftness | [§3.5](#35-what-the-making-places-make), [§6](#6-the-recipe-book): the Charm Shop's Settings by slot count, the Branch Gem at G5, the jewels; cross-checked in [§13](#13-assumes) |
 | The refund: the owner leans to refunding every raw material | [§14](#14-save-impact) (PP19, PP20) |
 
 ## 0. At a glance
@@ -66,7 +72,7 @@
 | **Material types a gathering profession** | One family of 10 grades (8 families) | **2:** a low and a high type | **4:** + Tier 2's pair | **6:** + Tier 3's pair |
 | **Item ids, raw and refined** | 160 | **20** | 40 | 60 |
 | **Which material a grade takes** | Its family's grade; two families a piece, rotating | **Grades 1–5 the low type, 6–10 the high type** | **G5 and G10 from Tier 2's pair** (the ladder) | **G4 and G9 Tier 2's, G5 and G10 Tier 3's** |
-| **Things made** | 40 gear types × 10 grades; 100 Star Gems | Weapon Gem, Armor Fittings, Accessory Setting G1–G10; Planet and Moon Jewels I–V | + the G5 **Branch Gem** (its branch, Pure or Dual, picked when used); Halo Jewels I–II | + Halo Jewels III–IV; the Branch Gem in Tier 3's materials (Keen or Tempered) |
+| **Things made** | 40 gear types × 10 grades; 100 Star Gems | Weapon Gem, Armor Fittings, Accessory Setting G1–G10; Planet and Moon Jewels I–V | + the G5 **Branch Gem** (its branch, Pure or Dual, picked when used); Halo Jewels I–II | + Halo Jewels III–IV; the Branch Gem in Tier 3's materials (Keen, Tempered or Evolved) |
 | **Recipes** | Two refined items, the family pair rotating with type and grade | **One fixed set an item** | The same amounts; the band tops on Tier 2's types | The same amounts |
 | **One Uma maxed: refined · pieces · hours** | 472 · 220 · 776 h | **485 · 115 · 822 h** | 503 · 129 · 852 h | 521 · 143 · 883 h |
 | **With her own moon** | — | 493, 835 h | 511, 866 h | 529, 896 h |
@@ -87,7 +93,7 @@ volume with every slot it can fill busy; the fighting party's next grade waits o
 | **Materials** | Each gathering profession adds its Tier 2 pair: Silver, Titanium · Mahogany, Ebony · Wool, Silk Cocoon · Trilobite, Tide Essence · Sapphire, Diamond | Tier 3's: Mythril, Orichalcum · Elderwood, Yggdrasil Branch · Moonsilk Cocoon, Cloudfleece · Aether, Prismatic Essence · Starstone, Philosopher's Stone | [§3.3](#33-the-catalog-every-type-every-tier-pp7-pp8) |
 | **The ladder** | G5 and G10 of every line are made of Tier 2's pair | G4 and G9 of Tier 2's, G5 and G10 of Tier 3's | [§3.4](#34-the-ladder-a-grade-decides-its-material-pp9) |
 | **Her work** | Her trade, all of it; a **secondary**'s base work | + the secondary's Tier 2 work | [§2.3](#23-the-secondary-tier-2-on-pp14-pp15) |
-| **New pieces** | The G5 **Branch Gem** on each weapon (Pure or Dual, picked when used); **Halo Jewels I–II**; Valor's two Moon Jewels | The Branch Gem again, in Tier 3's materials (Keen or Tempered); **Halo Jewels III–IV**; Swiftness's two Moon Jewels | [§6.3](#63-the-tiers-new-pieces) |
+| **New pieces** | The G5 **Branch Gem** on each weapon (Pure or Dual, picked when used); **Halo Jewels I–II**; Valor's two Moon Jewels | The Branch Gem again, in Tier 3's materials (Keen, Tempered or Evolved); **Halo Jewels III–IV**; Swiftness's two Moon Jewels | [§6.3](#63-the-tiers-new-pieces) |
 | **Accessories** | Two slots: 20 Settings of 6 refined | Three: 30 of 4 | [§6.1](#61-the-base-recipes-pp10) |
 | **The Exchange** | Tier 2's pair after continents 2 and 4; prices × 2 | × 3 | [§10](#10-the-exchange-pp17) |
 | **What stays** | Places, slots, the map, every amount, Craft Level's curve and gates | The same | [§4](#4-places-the-wilds-at-each-tier), [§5](#5-jobs-gates-and-times) |
@@ -300,9 +306,9 @@ The items are weapon-progression.md's and extra-stats-progression.md's; their re
 | Item | Place | Grades | Per Uma: Tier 1 · 2 · 3 | Raises or opens | Owner |
 |---|---|---|---|---|---|
 | **Weapon Gem** | Forge | G1–G10; from Tier 2 not G5 | 30 · 27 · 27 | One weapon one grade | weapon-progression.md |
-| **Branch Gem** | Forge | G5, from Tier 2 | — · 3 · 3 (one a weapon) | A weapon's G5 step; its branch picked when used: Pure or Dual (Tier 2), Keen or Tempered (Tier 3; Pure or Dual for a weapon arriving as Base) | weapon-progression WP10, WP26 |
+| **Branch Gem** | Forge | G5, from Tier 2 | — · 3 · 3 (one a weapon) | A weapon's G5 step; its branch picked when used: Pure or Dual (Tier 2), Keen, Tempered or Evolved (Tier 3: Pure → Keen or Tempered, Dual → Tempered or Evolved; Pure or Dual for a weapon arriving as Base) | weapon-progression WP10, WP26 |
 | **Armor Fittings** | Armorer | G1–G10 | 50 · 50 · 50 | One armor slot one grade, either half | weapon-progression.md |
-| **Accessory Setting** | Charm Shop | G1–G10 | 10 · 20 · 30 (one a slot a grade) | One accessory slot one grade, any type | weapon-progression.md |
+| **Accessory Setting** | Charm Shop | G1–G10 | 10 · 20 · 30 (one a slot a grade) | One accessory slot one grade, any family and form: all four families in every tier (base forms, then branches from the slot's G5; no item for a form) | weapon-progression.md |
 | **Planet Jewel I–V** | Lapidary | 1, 3, 5, 7, 9 | 5 · 5 · 5 | Planet I–V | extra-stats-progression EP17 |
 | **Moon Jewel I–V** | Lapidary | 2, 4, 6, 8, 10 | 20 · 22 · 24 (four moons; + Valor's II and IV; + Swiftness's) | A node of any moon | EP17 |
 | **Halo Jewel I–II** | Lapidary | 5, 10 | — · 2 · 2 | Halo I, II (her first kind) | EP17 |
@@ -311,7 +317,7 @@ The items are weapon-progression.md's and extra-stats-progression.md's; their re
 | **Pieces an Uma** (her moon apart) | | | **115 · 129 · 143** | | |
 
 - **One of a line fits any of its slots:** a Weapon Gem raises any weapon, a Fittings any armor slot of either half, a
-  Setting any accessory slot and type, a Moon Jewel any moon (picked when set). So every Uma needs the same items and a
+  Setting any accessory slot, family and form, a Moon Jewel any moon (picked when set). So every Uma needs the same items and a
   party is five times one Uma, whatever the classes.
 - **A Brawler or a Mage** skips her other offense moon (EP: 20 · 24 · 28 jewels, 100 · 118 · 136 refined). The counts
   here are every moon (the Uma maxed in any class); a default party (a Brawler and a Mage in five) takes 560 refined
@@ -530,7 +536,7 @@ The [flow page](previews/prof-flow.html) draws every recipe with its icons, by t
 | 2 | **Branch Gem**, a weapon's G5 step; Pure or Dual picked when used | 3 (one a weapon) | 2 Silver Ingot, 2 Mahogany Plank | The Forge's Brawlers (Tier 2's own pair) |
 | 2 | **Halo Jewel I, II** | 1 each | One of each of Tier 2's low, then high types | The Lapidary's Mages |
 | 2 | **Valor I, II**: Moon Jewels II and IV | 1 each | The Moon Jewel's, by the ladder (base types in Tier 2) | Mages, or Jewel Crafting secondaries |
-| 3 | **Branch Gem**: Pure → Keen or Tempered, Dual → Tempered; a weapon arriving as Base takes Pure or Dual | 3 | 2 Mythril Ingot, 2 Elderwood Plank | Brawlers |
+| 3 | **Branch Gem**: Pure → Keen or Tempered, Dual → Tempered or Evolved; a weapon arriving as Base takes Pure or Dual | 3 | 2 Mythril Ingot, 2 Elderwood Plank | Brawlers |
 | 3 | **Halo Jewel III, IV** | 1 each | One of each of Tier 3's low, then high types | Mages |
 | 3 | Halo Jewel I, II (rebuilt) | 1 each | Tier 2's | Mages, or Jewel Crafting secondaries |
 | 3 | **Swiftness I, II**: Moon Jewels II and IV; Valor's again | 1 each | The ladder's (Moon Jewel II on Tier 2's pair, IV on the base pair) | Mages, or Jewel Crafting secondaries (Tier 2's work is theirs in Tier 3) |
@@ -727,7 +733,7 @@ Sapphire and Diamond (and the open shop lets anyone cut them).
   Tier 2's** (§3.4).
 - **The secondary reaches its Tier 2 work:** Tier 2's pair, the G4 and G9 pieces and Tier 2's own pieces (Halo Jewels
   I–II).
-- **New pieces:** three Branch Gems (Keen or Tempered); Halo Jewels III–IV; Swiftness's two Moon Jewels; a third accessory slot
+- **New pieces:** three Branch Gems (Keen, Tempered or Evolved); Halo Jewels III–IV; Swiftness's two Moon Jewels; a third accessory slot
   (Settings of 4).
 
 ### 9.2 One Uma's demand
@@ -735,7 +741,7 @@ Sapphire and Diamond (and the open shop lets anyone cut them).
 | Her need | Pieces | At | Refined |
 |---|---|---|---|
 | 3 weapons: Weapon Gems G1–G4, G6–G10 | 27 | Forge | 108 |
-| Their G5 Branch Gems (Keen or Tempered) | 3 | Forge | 12 |
+| Their G5 Branch Gems (Keen, Tempered or Evolved) | 3 | Forge | 12 |
 | 5 armor slots: Armor Fittings | 50 | Armorer | 125 |
 | 3 accessory slots: Settings of 4 | 30 | Charm Shop | 120 |
 | Planet Jewel I–V | 5 | Lapidary | 40 |
@@ -830,7 +836,7 @@ Drawn in the [demand page](previews/prof-demand.html).
 
 | From | What this doc assumes | If it differs |
 |---|---|---|
-| **[weapon-progression.md](weapon-progression.md)** (WP10, WP19, WP26, §6) | Its items and counts, adopted as written: Weapon Gem 30 · 27 · 27; **one Branch Gem line** at G5, 3 a tier from Tier 2, its branch picked when used (WP10); Armor Fittings 50, armor carrying all defense; **accessories in four families** (Pendants, Bells; + Orbs; + Insignias), **1 · 2 · 3 untyped slots, one Accessory Setting a slot a grade** (10 · 20 · 30), any type; one item of a line fits any weapon, slot or type | **Agrees since the cross-check (2026-10-24):** WP §6 now shows this doc's recipes (the ladder, the Branch Gem at 4 in its tier's pair, PP8's names), gear 365 in every tier and the whole Uma 485 · 503 · 521; WP §11 pays the refund in Tier 1's demand mix (PP20) and numbers the save v27. Before it, WP's draft had the first round's catalog, a Branch Gem of 9 and 365 · 380 · 380 |
+| **[weapon-progression.md](weapon-progression.md)** (WP10, WP19, WP26, §6) | Its items and counts, adopted as written: Weapon Gem 30 · 27 · 27; **one Branch Gem line** at G5, 3 a tier from Tier 2, its branch picked when used (WP10); Armor Fittings 50, armor carrying all defense; **accessories in four families, all four in every tier** (base forms, then branches; *follow-up to the weapon review, 2026-10-24*), **1 · 2 · 3 untyped slots, one Accessory Setting a slot a grade** (10 · 20 · 30), any family and form; one item of a line fits any weapon, slot or type | **Agrees since the cross-check (2026-10-24):** WP §6 now shows this doc's recipes (the ladder, the Branch Gem at 4 in its tier's pair, PP8's names), gear 365 in every tier and the whole Uma 485 · 503 · 521; WP §11 pays the refund in Tier 1's demand mix (PP20) and numbers the save v27. Before it, WP's draft had the first round's catalog, a Branch Gem of 9 and 365 · 380 · 380. **Re-checked after the owner's weapon review (2026-10-24):** no amount moves (WP §6.4's box): the accessory branches are forms opened by the slot's G5 Setting, no new item; the Branch Gem stays 3 a tier (a Dual's partner is fixed, so the gem carries only the branch); gear 365 and the Uma 485 · 503 · 521 hold |
 | **[extra-stats-progression.md](extra-stats-progression.md#11-jewels)** (EP17, EP18; re-checked 2026-10-24, 15:27) | Jewel kinds, grades and counts: 25 · 29 · 33 every moon (20 · 24 · 28 her class's), her moon's 2; Planet 8, Moon 4, **Halo 5** (one of each of its tier's types); the Lapidary **120 · 138 · 156** | **Agrees:** EP §11.2 now follows the ladder (PP9) and the catalog (PP8), and EP §11.3 states the whole Uma at 485 · 503 · 521. Nothing to reconcile |
 | **class-progression.md** (CP29–CP30, CP38–CP41) | The calling and its pick name the trade; the class branch's reverse set is a second set of weapons, not more items an Uma | — |
 | **variance.md** (U4) | One rule names her calling; today's split 17.0–22.6% | — |

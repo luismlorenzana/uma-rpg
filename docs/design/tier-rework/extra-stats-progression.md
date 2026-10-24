@@ -19,6 +19,13 @@
 > place on a hit is [weapon-progression's damage stack](weapon-progression.md#24-the-damage-stack-everything-on-one-hit-wp31)
 > (WP31); **save v27 and v28** (§15).
 >
+> **Follow-ups to the weapon review, 2026-10-24** ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC19–XC20; no
+> call changed). weapon-progression.md, revised after the owner's review, opens every accessory family in every tier and
+> re-dresses the presets (WP25): **the Halo's preset reads "her first slot"** whatever the Orb preset's kind, which may now
+> sit on her Dual (§4.1, §13); **§8.2's offense column and §8.3's offense share** follow the new presets (the Halo still
+> on her lead kind; a Pendant form beside it for most classes); the Orb is there from Tier 1 (§14). Each spot says
+> "Follow-up to the weapon review, 2026-10-24".
+>
 > **The owner's context, 2026-10-24, decided elsewhere and kept here:** accessories become damage-oriented (defensive
 > and MP-regen ones go; defense lives in armor; weapon-progression.md); weapons grow by Pure or Dual branches
 > ([weapon-research.md](weapon-research.md)), and Extra Stats never adds a kind; class specializations become
@@ -230,10 +237,12 @@ A ring round the Planet, tuned to **one damage kind** she picks. H41's idea (X1,
   a Dual's second kind decides weaknesses and locks only, so no branch doubles a bonus. Weaknesses, locks and shields
   never read the Halo.
 - **The kind is a setting, free to change outside fights,** and may be empty. Two nodes, two jewels; matching a
-  front's weakness is a tap. **The preset** is the Orb preset's kind, her first slot (CP11, WP25): Brawler Greatsword,
+  front's weakness is a tap. **The preset** is her first slot (CP11, WP25): Brawler Greatsword,
   Mage Fire, Spell Blade Katana, Summoner Dark, Paladin Greatsword, Cleric Light; on a class branch 2's reverse set
   (CP40), that set's first slot: Warlord Bow, Sorcerer Light, Blademaster Katana, Conjurer Fire, Templar Bow, Oracle
-  Light (*cross-check, 2026-10-24*).
+  Light (*cross-check, 2026-10-24*). *Follow-up to the weapon review, 2026-10-24: it read "the Orb preset's kind, her
+  first slot"; the presets' single-kind forms (a Great Orb, a Twin Orb, a Great Bell) now sit on her Dual or her other
+  kinds, so the Halo's preset is her first slot whatever the Orb's.*
 - **The bound with the Orb (X7, with SB1):** on one kind, Orb + Halo ≤ a G10 weapon's Might × tier: **122 in Tier 2**
   (Orb 61 + Halo 61), **177 in Tier 3** (88 + 88). weapon-progression.md extends it to its Pendants as the **kind cap**
   (WP24): every flat offense on one kind together, so a Pendant on a capped kind adds nothing ("Greatsword: +122,
@@ -357,32 +366,35 @@ Her full sheet at each tier's Lv 50 (the balance simulation's average outfit, ba
 Power, from [stats-by-tier](previews/stats-by-tier.html)), fully built: armor G10 at weapon-progression.md's values
 (WP15: HP +150, DEF and M.DEF +40, MP +30, +25 offense on her half), every Extra Stats node her class uses, **without
 her moon**, every flat build value × tier. Offense is her lead kind: her ATK or M.ATK
-plus Might (68 · 122 · 177), her preset's accessories on that kind (WP25: a Tier 1 Pendant, +14 or +20, on the
-Mage's, Summoner's, Paladin's and Cleric's lead kind; from Tier 2 the Orb, 61 · 88) and the Halo (61 · 88), under the kind
-cap (122 · 177). In brackets, Extra Stats' part. *Cross-check (2026-10-24): the presets' Pendants added; the same
-sheet as [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1) and
-[weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50).*
+plus Might (68 · 122 · 177), her preset's accessories on that kind (WP25: Tier 1 the Pendant's +14 for the Mage, the
+Spell Blade and the Paladin; Tier 2 a Channel Pendant +49 for the Mage and the Cleric, a Great Pendant +31 for the
+Paladin; Tier 3 their step, +75 or +49, the Spell Blade's and the Summoner's Great Pendant +49 too) and the Halo (61 · 88),
+under the kind cap (122 · 177). In brackets, Extra Stats' part. *Cross-check (2026-10-24): the presets' Pendants added;
+the same sheet as [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1) and
+[weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50). Follow-up to the weapon review, 2026-10-24: the
+offense column follows WP25's new presets (the first draft's Orb filled the cap on her lead kind: 587 · 849 for a
+Brawler); no Extra Stats value moved.*
 
 | Class | Tier | HP | MP | ATK | M.ATK | DEF | M.DEF | Offense, lead kind |
 |---|---|---|---|---|---|---|---|---|
 | **Brawler** | 1 | 1,477 (255) | 213 (51) | 192 (51) | 116 (21) | 207 (51) | 182 (51) | 260 (51) |
-| | 2 | 2,548 (460) | 368 (92) | 343 (92) | 206 (38) | 370 (92) | 326 (92) | 587 (153) |
-| | 3 | 3,628 (665) | 523 (133) | 495 (133) | 298 (55) | 534 (133) | 470 (133) | 849 (221) |
+| | 2 | 2,548 (460) | 368 (92) | 343 (92) | 206 (38) | 370 (92) | 326 (92) | 526 (153) |
+| | 3 | 3,628 (665) | 523 (133) | 495 (133) | 298 (55) | 534 (133) | 470 (133) | 760 (221) |
 | **Mage** | 1 | 1,244 (255) | 296 (51) | 116 (21) | 197 (51) | 186 (51) | 202 (51) | 279 (51) |
-| | 2 | 2,153 (460) | 507 (92) | 206 (38) | 352 (92) | 332 (92) | 361 (92) | 596 (153) |
-| | 3 | 3,068 (665) | 719 (133) | 298 (55) | 509 (133) | 480 (133) | 521 (133) | 863 (221) |
-| **Spell Blade** | 1 | 1,337 (255) | 247 (51) | 192 (51) | 151 (51) | 196 (51) | 192 (51) | 260 (51) |
-| | 2 | 2,311 (460) | 424 (92) | 343 (92) | 270 (92) | 351 (92) | 344 (92) | 587 (153) |
-| | 3 | 3,292 (665) | 602 (133) | 495 (133) | 390 (133) | 507 (133) | 496 (133) | 848 (221) |
-| **Summoner** | 1 | 1,337 (255) | 247 (51) | 151 (51) | 192 (51) | 196 (51) | 192 (51) | 280 (51) |
-| | 2 | 2,311 (460) | 424 (92) | 270 (92) | 343 (92) | 351 (92) | 344 (92) | 587 (153) |
-| | 3 | 3,292 (665) | 602 (133) | 390 (133) | 495 (133) | 507 (133) | 496 (133) | 849 (221) |
+| | 2 | 2,153 (460) | 507 (92) | 206 (38) | 352 (92) | 332 (92) | 361 (92) | 584 (153) |
+| | 3 | 3,068 (665) | 719 (133) | 298 (55) | 509 (133) | 480 (133) | 521 (133) | 849 (221) |
+| **Spell Blade** | 1 | 1,337 (255) | 247 (51) | 192 (51) | 151 (51) | 196 (51) | 192 (51) | 274 (51) |
+| | 2 | 2,311 (460) | 424 (92) | 343 (92) | 270 (92) | 351 (92) | 344 (92) | 526 (153) |
+| | 3 | 3,292 (665) | 602 (133) | 495 (133) | 390 (133) | 507 (133) | 496 (133) | 809 (221) |
+| **Summoner** | 1 | 1,337 (255) | 247 (51) | 151 (51) | 192 (51) | 196 (51) | 192 (51) | 260 (51) |
+| | 2 | 2,311 (460) | 424 (92) | 270 (92) | 343 (92) | 351 (92) | 344 (92) | 526 (153) |
+| | 3 | 3,292 (665) | 602 (133) | 390 (133) | 495 (133) | 507 (133) | 496 (133) | 809 (221) |
 | **Paladin** | 1 | 1,337 (255) | 296 (51) | 181 (51) | 135 (51) | 212 (51) | 192 (51) | 263 (51) |
-| | 2 | 2,311 (460) | 507 (92) | 324 (92) | 242 (92) | 379 (92) | 344 (92) | 568 (153) |
-| | 3 | 3,292 (665) | 719 (133) | 468 (133) | 349 (133) | 548 (133) | 496 (133) | 822 (221) |
-| **Cleric** | 1 | 1,337 (255) | 296 (51) | 135 (51) | 181 (51) | 196 (51) | 207 (51) | 269 (51) |
-| | 2 | 2,311 (460) | 507 (92) | 242 (92) | 324 (92) | 351 (92) | 370 (92) | 568 (153) |
-| | 3 | 3,292 (665) | 719 (133) | 349 (133) | 468 (133) | 507 (133) | 534 (133) | 822 (221) |
+| | 2 | 2,311 (460) | 507 (92) | 324 (92) | 242 (92) | 379 (92) | 344 (92) | 538 (153) |
+| | 3 | 3,292 (665) | 719 (133) | 468 (133) | 349 (133) | 548 (133) | 496 (133) | 782 (221) |
+| **Cleric** | 1 | 1,337 (255) | 296 (51) | 135 (51) | 181 (51) | 196 (51) | 207 (51) | 249 (51) |
+| | 2 | 2,311 (460) | 507 (92) | 242 (92) | 324 (92) | 351 (92) | 370 (92) | 556 (153) |
+| | 3 | 3,292 (665) | 719 (133) | 349 (133) | 468 (133) | 507 (133) | 534 (133) | 808 (221) |
 
 - **One sheet since the cross-check (2026-10-24):** [weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50)
   took Vigor's MP (+30 × tier) and this doc's per-node rounding; [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1)
@@ -406,15 +418,17 @@ it halves by Tier 3 (the flat column). Selected rows; every class and stat is on
 | Mage M.ATK | 26% | 26% | 26% | 26% → 13% |
 | Spell Blade M.ATK | 34% | 34% | 34% | 34% → 17% |
 | Cleric MP | 17% | 18% | 18% | 17% → 9% |
-| **Offense, lead kind** (with the Halo) | 20% | **26%** | 26% | 20% → 17% |
+| **Offense, lead kind** (with the Halo), a Brawler | 20% | **29%** | 29% | 20% → 18% |
 
 - **Every class, every core stat:** Extra Stats' share moves **at most 1.5 points** from Tier 1 to Tier 3 (Brawler 1.5;
   Spell Blade, Summoner 1.4; Mage, Paladin, Cleric 1.3). With flat values it falls by **12.7 to 18.7 points**.
 - **Why not exactly flat:** her HP grows a little slower than her other stats (her HP level part × 1.70 and × 2.40,
   her core stats' × 1.78 and × 2.57), so the build's share of HP edges up a point. The overall balancing pass sets the
   final multipliers (README §2.5); a single number per tier moves every node together.
-- **Offense rises once, in Tier 2,** because the Halo arrives (20% → 26%); then holds. The whole build's share of her
-  lead offense: 55% → 65% → 65% (a Brawler), the same step class-progression §9 shows for the Orb and the Halo.
+- **Offense rises once, in Tier 2,** because the Halo arrives (20% → 29%, a Brawler); then holds. The whole build's
+  share of her lead offense: 55% → 61% → 61% (a Brawler), the same step class-progression §9 shows for the Halo.
+  *Follow-up to the weapon review, 2026-10-24: with WP25's new presets the Orb no longer sits on her lead kind (were
+  26% and 65%); every core stat's row is unchanged.*
 
 ## 9. Defense and sustain, now that accessories deal damage
 
@@ -614,7 +628,7 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 | To | What |
 |---|---|
 | **README §2** | Tier 1 "the Planet and four moons, 25 nodes, every open node counts"; Tier 2 "+ the Halo (one kind), + Valor: 29"; Tier 3 "+ the Halo's second kind, + Swiftness: 33"; her moon 2 in every tier; values × 1 / 1.8 / 2.6. Jewel kinds · items 2 · 10, 3 · 12, **3 · 14**; §2.3's jewel rows **25 · 120, 29 · 138, 33 · 156** (every moon), her moon 2 · 8; §9.5 item 5 "MP **+51** in the Springs test" |
-| **weapon-progression.md** | **The Halo** is flat offense on one kind's hits (two from Tier 3), never a kind and never a heal: Tier 1 values +10 and +34, × 1.8 and × 2.6 (+18 · +61 in Tier 2, +26 · +88 in Tier 3). **The bound** Orb + Halo ≤ 68 × tier on one kind (122, 177), so the Orb at G10 is at most 34 × tier. **Defense:** Extra Stats keeps Guard (+30 × tier to each defense), Vigor (+150 HP × tier) and the Planet (+21 × tier): alone they hold an on-curve Uma at the budget's 28% a hit (Lv 10–50); armor's support's worth (WP15) is the margin over it, and no value is raised on both sides. Sheets with WP15's armor: §8.2. **Sustain:** Vigor's MP (+30 × tier) and the Planet's (+21 × tier) replace the Spring and Siphon Amulets' MP; the Springs test's knobs in order: legs' MP, Vigor's MP rate, the Flourish's twists. **Evasion:** feet armor keeps 12% at G10; Swiftness adds 6% in Tier 3 (cap 50%). **The Halo's preset** is the Orb preset's kind (her first slot); Tier 3's second, her second slot. **The Halo reads a hit's own kind** (its §3.9 rule) and sits under the kind cap (WP24: Orbs, Pendants and the Halo ≤ 68 × tier on one kind). **Pure's and Keen's multipliers** apply after the flat offense: the full order is weapon-progression's damage stack (WP31, §2.4), the Halo in its step 1 |
+| **weapon-progression.md** | **The Halo** is flat offense on one kind's hits (two from Tier 3), never a kind and never a heal: Tier 1 values +10 and +34, × 1.8 and × 2.6 (+18 · +61 in Tier 2, +26 · +88 in Tier 3). **The bound** Orb + Halo ≤ 68 × tier on one kind (122, 177), so the Orb at G10 is at most 34 × tier. **Defense:** Extra Stats keeps Guard (+30 × tier to each defense), Vigor (+150 HP × tier) and the Planet (+21 × tier): alone they hold an on-curve Uma at the budget's 28% a hit (Lv 10–50); armor's support's worth (WP15) is the margin over it, and no value is raised on both sides. Sheets with WP15's armor: §8.2. **Sustain:** Vigor's MP (+30 × tier) and the Planet's (+21 × tier) replace the Spring and Siphon Amulets' MP; the Springs test's knobs in order: legs' MP, Vigor's MP rate, the Flourish's twists. **Evasion:** feet armor keeps 12% at G10; Swiftness adds 6% in Tier 3 (cap 50%). **The Halo's preset** is her first slot; Tier 3's second, her second slot (*follow-up to the weapon review, 2026-10-24: it read "the Orb preset's kind (her first slot)"*). **The Halo reads a hit's own kind** (its §3.9 rule) and sits under the kind cap (WP24: Orbs, Pendants and the Halo ≤ 68 × tier on one kind). **Pure's and Keen's multipliers** apply after the flat offense: the full order is weapon-progression's damage stack (WP31, §2.4), the Halo in its step 1 |
 | **profession-progression.md** | **Jewel kinds and grades** (§11.1): Planet I–V (1, 3, 5, 7, 9), Moon I–V (2, 4, 6, 8, 10), Halo I–II (5, 10, Tier 2), Halo III–IV (5, 10, Tier 3); grade g made at Craft Lv 5g − 4. **Counts an Uma** (§11.3): 25 · 29 · 33 every moon, 20 · 24 · 28 her class's, + her moon's Moon Jewels II and IV every tier. **Recipes** (§11.2): Moon 4 (3 Hunting stones + 1 Mining ingot), Planet 8 (2 each of Hunting, Wood Chopping, Farming, Fishing), Halo 5 (one of each of its tier's five pairs, low for I and III, high for II and IV, kept by the tier that brought it), the same amounts in every tier; **the types by grade are its ladder (PP9) and catalog (PP8)**, which §11.2 follows. **Lapidary an Uma: 120 · 138 · 156 refined** (+8); by profession in §11.3. The whole Uma 485 · 503 · 521 (its numbers), every tier inside PR10's tenth |
 | **class-progression.md** (its final pass; *taken in the cross-check, 2026-10-24*) | A class-free map: her class decides which offense moon counts (the Brawler and the Mage skip one). **§9's MP column + 30 × tier** (Vigor); §9's offense without her moon's lead (−8 × tier) if CP36's note is taken. The Halo's picker groups kinds as her class branch names them (EP10). The hybrids' mirror on full maps is the hands' (CP9) |
 | **Uma Templates pass** | Her moon's slot (§6): two nodes, Lv 16 and 36, Moon Jewels II and IV, × tier, outside the budget, ids `template:1–2`; knack units (Speed, Limit) don't scale; CP36's note recorded (node II to her calling channel's defense) |
@@ -627,7 +641,7 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 |---|---|---|
 | README §2, tiers §5 (D15) | Tiers 1–3 of 50 levels; the map empties at promotion and is rebuilt in the new world | A carried map breaks the budget's restart (D170) |
 | SB1 (README §2.5) | Every flat build value × 1, 1.8, 2.6; the foes' build budget moves to the same multiplier | Flat values: Extra Stats' share falls by up to 18.7 points by Tier 3 (§8.3); every value here is "Tier 1 value × tier", a one-line change |
-| weapon-progression.md | Accessories damage-oriented: no defensive Support and no MP regen in any tier (as its draft has it); **armor takes one support's worth** (WP15: HP +15, DEF +4, M.DEF +4, MP +3 a grade, × tier) and keeps feet evasion (12% at G10); the Orb flat, half a weapon's Might, back in Tier 2, × tier; the kind cap (WP24) is X7 extended; a hit reads its own kind | If a defensive Support stays, it stays outside the budget, as today; if the Spring stays, Vigor's MP is still the pool (the Springs test re-runs); if armor keeps today's values, §8.2's HP, DEF, M.DEF and MP drop by that support's worth and Extra Stats still meets the budget alone. If feet evasion goes, Tier 1's only evasion is a Fleet knack: acceptable |
+| weapon-progression.md | Accessories damage-oriented: no defensive Support and no MP regen in any tier (as its draft has it); **armor takes one support's worth** (WP15: HP +15, DEF +4, M.DEF +4, MP +3 a grade, × tier) and keeps feet evasion (12% at G10); the Orb flat, half a weapon's Might, × tier, from Tier 1 (every family in every tier; *follow-up to the weapon review, 2026-10-24*: was "back in Tier 2"); the kind cap (WP24) is X7 extended; a hit reads its own kind | If a defensive Support stays, it stays outside the budget, as today; if the Spring stays, Vigor's MP is still the pool (the Springs test re-runs); if armor keeps today's values, §8.2's HP, DEF, M.DEF and MP drop by that support's worth and Extra Stats still meets the budget alone. If feet evasion goes, Tier 1's only evasion is a Fleet knack: acceptable |
 | profession-progression.md | Jewel Crafting at the Lapidary on the 5g − 4 gate; the material catalog of professions §0.3 (every type above exists); a tier's pairs low from Craft Lv 1, high from Lv 26 | It owns the amounts (PR8): if it resizes, the counts and kinds here stand |
 | class-progression.md | Six classes, their channels and leans (§2.2); the presets (CP11) name the Halo's; class branches become weapon-group focus, named there | — |
 | Uma Templates pass | Fills her moon's two nodes (variance U10 as drafted, CP36's note) | The slot stays empty; nothing else moves |
