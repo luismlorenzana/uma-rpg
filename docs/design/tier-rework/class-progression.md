@@ -1,10 +1,13 @@
 # Class Progression: the six classes from Tier 1 to Tier 3
 
+> **Approved by the owner, 2026-10-24 (D192): every call CP1–CP43 as written, CP42's Pierce included.** "A fine enough
+> state for now." Changes from here are follow-ups logged against it.
+>
 > **Authored 2026-10-23; revised after the owner's first review and again after his second pass, both 2026-10-24.
 > Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.1). It absorbs
 > [classes.md](classes.md) and [skill-trees.md](skill-trees.md), which stay as history, and supersedes every CL and SK
 > call ([§16](#16-decisions) maps each one). Calls are **CP1–CP43**, each with a recommendation. No open questions;
-> one proposal waits on the owner's word (CP42, the Spell Blade's branch B).
+> CP42 (the Spell Blade's branch B, Pierce) approved with the rest.
 >
 > **The owner's second pass, 2026-10-24** ("I still don't like the class specializations in later tiers, feels like
 > almost nothing changes"), six points ([the table](#the-owners-points)): **Tier 2's class branch is now a weapon-group

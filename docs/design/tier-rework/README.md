@@ -297,7 +297,7 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 
 | Doc | State |
 |---|---|
-| **class-progression.md** | Authored 2026-10-23; revised after the owner's review and second pass, 2026-10-24 (CP1–CP43). **Cross-checked 2026-10-24:** CP8, CP10, CP11, CP12, CP31 changed; CP38 carries the owner's group names. **For review, first.** CP42 (the Spell Blade's branch B, Pierce) is a recommendation awaiting his word, like every call |
+| **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day |
 | **weapon-progression.md** | Authored 2026-10-24 (WP1–WP30). **Cross-checked:** WP12, WP13, WP25, WP26, WP27 changed, WP7 worded with CP12, **WP31 new** (the damage stack). **For review, second** |
 | **extra-stats-progression.md** | Authored 2026-10-24 (EP1–EP22). **Cross-checked:** no call changed; its sheet, groups, Halo preset and save numbers aligned. **For review, third** |
 | **profession-progression.md** | Authored 2026-10-24 (PP1–PP23). **Cross-checked:** no call changed; weapon-progression adopted its recipes, amounts and refund. **For review, fourth** |
