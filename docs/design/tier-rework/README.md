@@ -45,9 +45,10 @@ drafts are in git history.
   physical hybrid 20.7%, magical 17.0%, magical hybrid 17.0%, healer 22.6%.
 - **Weapon kinds:** five Arms (Greatsword, Axe, Lance, Bow, Katana) and five Tomes (Fire, Blizzard, Thunder, Light,
   Dark Tome, dealing Fire, Ice, Lightning, Light, Dark). **Weapons carry kinds; trees carry shape** (GE4, SK5).
-- **The strikes** (CL1, CL2, CL15): every kind belongs to one. **Heavy**: Greatsword, Katana, Fire, Dark. **Flurry**:
-  Lance, Bow, Thunder, Light. **Area**: Axe, Blizzard. A class's three weapon slots are one of each, within its Arms
-  count: Brawler 3, Spell Blade and Paladin 2, Summoner and Cleric 1, Mage 0.
+- **No strikes** (owner, 2026-10-23; [class-progression.md](class-progression.md) CP2, CP5): the ten kinds stay the damage
+  and weakness types; each weapon's own shape (a Bow's many hits, an Axe's reach) is the small variety. A class's three
+  weapon slots follow its Arms count only: Brawler 3, Spell Blade and Paladin 2, Summoner and Cleric 1, Mage 0. Tier 1
+  foes are weak to two kinds, one Arm and its twin element (CP5).
 - **The class template** (CL6): **3 weapons, 5 armor pieces, accessories 1 · 2 · 3** (Support; + Damage, an Orb; + a
   second Support). Weapons stay at 3 for good; depth comes from forms, trees and Extra Stats.
 - **Grades, one rule for every piece** (GE1, GE2): she owns every weapon kind, five armor slots and her accessory
@@ -79,8 +80,8 @@ Drawn in [progression.html](previews/progression.html); one Uma's page in [chara
 | | Today (every tier) | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|
 | **Class choice** | 6 classes | 6 classes | + a specialization, one of two | + a mastery |
-| **Weapon slots** | 5 | 3, one per strike | 3 | 3 |
-| **Foes weak to** | 2–5 kinds, half at random | 1 strike | 2 kinds of it | 1 kind of it |
+| **Weapon slots** | 5 | 3, by her class's Arms count | 3 | 3 |
+| **Foes weak to** | 2–5 kinds, half at random | 2: one Arm and its twin element | Regulars 1; sub-bosses and bosses 2 | Regulars and sub-bosses 1; bosses 2 |
 | **Weapon forms** | — | Base: 1 kind | G5 fork: Dual or Pure | G5 fork: Prism, Tempered or Keen |
 | **Armor** | 5, a half per piece | 5, her class's half | 5, per piece for the four between | The same |
 | **Accessories** | 2: Damage, Support | 1: Support | 2: + Damage (Orb) | 3: + Support |
@@ -126,7 +127,7 @@ One word, one meaning, in every doc and preview.
 |---|---|---|
 | **Kind** | One of the ten weapon kinds; a Tome's kind is named by its element in kind lists (Fire, Ice, Lightning, Light, Dark) | A strike or a channel |
 | **Channel** | Arms (physical, ATK) or Tomes (magical, M.ATK) | — |
-| **Strike** | **Heavy**, **Flurry** or **Area**: a set of kinds by shape; a weapon slot's type; a Tier 1 foe's weakness | A skill or branch name (SK14 renamed the two side lines that used them) |
+| ~~**Strike**~~ | Dropped by the owner, 2026-10-23: the ten kinds are the damage and weakness types | — |
 | **Fight type** | Physical, magical, physical hybrid, magical hybrid, healer | — |
 | **Calling** | Her fight type and class by U4's rule; with **stride** and **knack**, her template's three readings | Her active class |
 | **Uma Template** | "{knack word} {type}", e.g. "Tireless Ironhide" | A class template |
@@ -196,7 +197,8 @@ the owning doc wins unless that breaks an owner point (§7).
 | View | Previews |
 |---|---|
 | **Every category** | [The Uma's detail page at Tier 1, 2 and 3](previews/character-tiers.html) · [every category × every tier](previews/progression.html) |
-| Classes | [composition](previews/classes-composition.html) · [strikes](previews/classes-strikes.html) · [template sheets](previews/classes-template-sheets.html) · [trees](previews/classes-trees.html) |
+| **Class Progression** | [overview, composition, the calling pick](previews/class-overview.html) · [templates and weapons](previews/class-templates.html) · [the tree viewer](previews/class-trees.html) · [foe weaknesses](previews/class-weaknesses.html) |
+| Classes (first round, history) | [composition](previews/classes-composition.html) · [strikes](previews/classes-strikes.html) · [template sheets](previews/classes-template-sheets.html) · [trees](previews/classes-trees.html) |
 | Gear | [weapon tree](previews/gear-weapon-tree.html) · [the Gear tab by tier](previews/gear-loadout.html) · [crafting by tier](previews/gear-crafting.html) |
 | Skill trees | [trees by tier](previews/skills-trees-by-tier.html) · [every class at Tier 1](previews/skills-all-classes-t1.html) · [the Skills tab](previews/skills-profile.html) |
 | Extra Stats | [the map by tier](previews/extra-stats-maps.html) · [what it gives](previews/extra-stats-budget.html) |
@@ -210,7 +212,7 @@ the owning doc wins unless that breaks an owner point (§7).
    numbers in §2, and built the two views that need every category. *Done: §7–§9.*
 3. **Standalone docs, detailed, one at a time** (the owner, 2026-10-23), each authored, then reviewed by the owner, its
    decisions logged as D-rows. They absorb the first-round docs, which stay as history:
-   1. [class-progression.md](class-progression.md): the six classes, class templates per tier, equippable weapons,
+   1. [class-progression.md](class-progression.md) (*authored, for review*): the six classes, class templates per tier, equippable weapons,
       the class trees (skill trees) per tier, Class Rank, specializations and masteries, foe weaknesses, the calling
       pick. Absorbs classes.md and skill-trees.md.
    2. **weapon-progression.md:** weapons per tier, weapon trees (forms), armor and accessories, material requirements.
@@ -226,9 +228,10 @@ the owning doc wins unless that breaks an owner point (§7).
 
 | Doc | State |
 |---|---|
-| classes.md | Cross-referenced: CL5, CL13, CL14 changed |
+| **class-progression.md** | **Authored 2026-10-23, for the owner's review** (CP1–CP31; strikes dropped). Supersedes classes.md and skill-trees.md |
+| classes.md | History: superseded by class-progression.md |
 | gear.md | Cross-referenced: §8's amounts are professions'; no GE call changed |
-| skill-trees.md | Cross-referenced: no SK call changed |
+| skill-trees.md | History: superseded by class-progression.md |
 | extra-stats.md | Cross-referenced: ES12 changed |
 | professions.md | Cross-referenced: PR1 changed; Tier 3's numbers corrected. **Revised after the owner's first review (2026-10-22):** PR3–PR7, PR10, PR14 changed (PR-R1) |
 | variance.md | Cross-referenced: no U call changed |
@@ -298,10 +301,10 @@ frozen inputs.
 
 | Change | From | Kind |
 |---|---|---|
-| Input checks per tier: three weapons, one per strike, within the class's Arms count; Tier 1's one accessory, a Support | CL1, CL7, GE11 | Validation |
+| Input checks per tier: three weapons within the class's Arms count; Tier 1's one accessory, a Support | CL1, CL7, GE11 | Validation |
 | Locks in Tier 1: each Uma whose act lands a weak hit breaks one; the Duel alternates a weak Arms act and a weak Tome act | CL8 | Rule |
 | The Flourish's three MP twists: Opening (her first skill each fight free), Even pace (skills −25% MP), Second wind (3% max MP a round from round 3), on as her calling | U9 | Rule |
-| No engine change: strike weaknesses (a strike is its kinds), shields by strike, the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start), Might and armor by grade | CL2, CL9, SK6, ES, GE3 | Generator, data |
+| No engine change: weaknesses by kind (the generator's twins, CP5), the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start), Might and armor by grade | CL2, CL9, SK6, ES, GE3 | Generator, data |
 
 ### 9.2 Engine v17: Tier 2's toolbox
 
@@ -313,14 +316,14 @@ frozen inputs.
 | Branch C nodes (Sweep, Hunt, Mighty, Wide; the Brawler's and Mage's third lines exist) and the Break tips (one more shield point on a weak hit, once an act, under E6's cap) | SK7, SK9 |
 | The twelve specializations' passives | CL11 |
 | The signature tips: Breakaway, Spread, Long haul | U16 |
-| Tier 2 foes weak to two kinds of their strike | CL10 (generator only) |
+| Tier 2 and 3 weakness counts by rank (CP6) | CP6 (generator only) |
 | **Tier 3, later:** depth 6 capstones, two branches held, the masteries | SK8, CL12 |
 
 ### 9.3 Save v26: one migration, every world
 
 | Data | Change | From |
 |---|---|---|
-| `classes[id].weapons` | 5 → 3, by strike: she keeps the kind she had in each strike and channel, else the default | CL save |
+| `classes[id].weapons` | 5 → 3: the class's new defaults (CP3); her per-tree picks stay | class-progression §14 |
 | `uma.gear` (`locker`, `equipped`, `kinds`) | Replaced by grades: one per weapon kind (10), per armor slot (5) with its half, per accessory slot with its type; all G0 | GE1, GE9, GE11 |
 | `world.gear`, Forge jobs | Deleted, refunded; jobs collected or recalled | GE15 |
 | `uma.ranks.weapons`, `armors`, `accessories` | Deleted | GE2 |
@@ -363,7 +366,7 @@ reworked Tier 1 asks (493 with her moon).
    through the foe budget (CL §10, GE §13, SK §10, ES13).
 2. **The mirror on full maps:** Spell Blade and Summoner damage a turn within ±5%, each 70/30 ± 5; Paladin vs Cleric
    ±10% (XR5, CL5).
-3. **Strikes:** shields to the first Break within ±0.5 rounds (CL9); Auto cancels charged moves as today ±5 points
+3. **Weaknesses by kind:** shields to the first Break within ±0.5 rounds of today's (CP8); Auto cancels charged moves as today ±5 points
    (CL8); the fronts inside rift.md §11's bands; no single Uma Breaks a Duel boss in one act.
 4. **Branches:** a B branch +10–20% in its context; any mix within ±5 points of all-A (SK §10).
 5. **Extra Stats:** MP +21 in the Springs test (ES13).
@@ -377,7 +380,7 @@ One category at a time; each ends with its D-rows. The cross-reference changed t
 costs only unraised weapons · **XR10** v16 / v26 is the Tier 1 rework, v17 / v27 Tier 2's · **the refund** (§9.4: every
 raw item back, recrafted by hand). The other XR rows land inside the categories below.
 
-**1. Classes**: 15 calls, CL1–CL15. [classes.md](classes.md), previews: composition, strikes, template sheets, trees.
+**1. Classes**: *superseded by [class-progression.md](class-progression.md)'s CP1–CP31 (2026-10-23), which maps every CL and SK call (its §16).* The first round's list, as history: 15 calls, CL1–CL15. [classes.md](classes.md).
 
 | Call | One line |
 |---|---|

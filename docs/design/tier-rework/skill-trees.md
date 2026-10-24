@@ -1,5 +1,8 @@
 # Skill trees: the Tier rework
 
+> **Superseded by [class-progression.md](class-progression.md) (2026-10-23); kept as history.** The owner dropped
+> the strikes the same day: the ten kinds stay the damage and weakness types.
+
 > **Cross-referenced draft, 2026-10-22. Nothing here is built or decided.** One of the six category docs of
 > [the Tier rework](README.md). The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed no SK
 > call: it checked the strike words (SK14), the template slots (SK11, filled by variance.md as reconciled) and the

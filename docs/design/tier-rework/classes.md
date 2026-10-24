@@ -1,5 +1,8 @@
 # Classes: the Tier rework
 
+> **Superseded by [class-progression.md](class-progression.md) (2026-10-23); kept as history.** The owner dropped
+> the strikes the same day: the ten kinds stay the damage and weakness types.
+
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs ([the brief](README.md)),
 > for the owner's review, which starts with this category. Calls are **CL1–CL15** ([§11](#11-decisions)); every one has
 > a recommendation. The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed CL5 (the mirror's

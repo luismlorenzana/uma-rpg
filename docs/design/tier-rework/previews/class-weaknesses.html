@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foe Weaknesses by Tier</title>
+<!-- The Tier rework's Class Progression (class-progression.md 4): foe weaknesses by kind. Tier 1 twins (the ring's element and its twin Arm), narrowing by rank in Tiers 2 and 3, the Rift's fronts, coverage for the default and guided parties, and every biome (world/biomes.ts, generated). No external scripts, fonts or images. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+<style>
+  /* Class Progression pages: the kit's tokens above, plus the ten kinds (twins share a hue: an Arm is drawn outlined,
+     its twin Tome filled), the two channels, the six classes and a sequential scale for coverage counts. */
+  :root {
+    --arms: #9a6a3a; --tomes: #4a62c4;
+    --k-fire: #d9582f; --k-ice: #2f80cc; --k-ltn: #b58700; --k-light: #16917f; --k-dark: #7350c6;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
+    --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --arms: #c18b56; --tomes: #7b8ff0;
+      --k-fire: #f0764e; --k-ice: #5aa2ec; --k-ltn: #e0b12e; --k-light: #35bba6; --k-dark: #9f84ec;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
+      --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+    }
+  }
+  .grid2 > *, .multiples > * { min-width: 0; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 6px; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
+  .k { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 650; line-height: 1.5;
+    white-space: nowrap; border: 1.5px solid var(--kc); cursor: default; }
+  .k.arm { color: var(--kc); background: transparent; }
+  .k.tome { background: var(--kc); color: var(--on-k); }
+  .k.tome.ltn { color: #1b1300; }
+  .k.dim { opacity: .35; }
+  .cdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--cc); }
+  .ch { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 1px 7px; border-radius: 5px; }
+  .ch.a { color: var(--arms); border: 1.5px solid var(--arms); }
+  .ch.t { color: var(--on-k); background: var(--tomes); border: 1.5px solid var(--tomes); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .heat { border-collapse: separate; border-spacing: 3px; width: auto; }
+  .heat th, .heat td { border: 0; padding: 6px 8px; font-size: 12px; }
+  .heat td.c { text-align: center; font-weight: 700; min-width: 44px; border-radius: 6px; font-variant-numeric: tabular-nums; cursor: default; }
+  .heat td.c:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .h0 { background: var(--h0); color: var(--h0t); } .h1 { background: var(--h1); color: var(--hlt); } .h2 { background: var(--h2); color: var(--hlt); }
+  .h3 { background: var(--h3); color: var(--hdt); } .h4 { background: var(--h4); color: #fff; } .h5 { background: var(--h5); color: #fff; }
+  .hna { background: transparent; color: var(--ink-faint); font-weight: 500 !important; }
+  .scale { display: inline-flex; gap: 3px; align-items: center; font-size: 11px; color: var(--ink-soft); }
+  .scale i { width: 22px; height: 14px; border-radius: 4px; display: inline-block; }
+  button.linkish { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; padding: 0; }
+</style>
+<style>
+  .ringwrap { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: stretch; }
+  .foecard { background: var(--raised); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .foecard .big { font-size: 18px; font-weight: 750; } .foecard .rule { font-size: 13px; color: var(--ink-soft); }
+  .foecard .weak { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-weight: 700; }
+  .foecard .weak .k { font-size: 14px; padding: 3px 10px; }
+  .tg { display: grid; grid-template-columns: 210px repeat(3, 1fr); gap: 8px; }
+  .tg .hd { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); border-bottom: 4px solid var(--tc); padding-bottom: 4px; }
+  .tg .rh { font-weight: 650; font-size: 13px; display: flex; flex-direction: column; justify-content: center; } .tg .rh span { font-size: 11.5px; color: var(--ink-faint); font-weight: 500; }
+  .fc { background: var(--panel); border-radius: 10px; padding: 10px 12px; box-shadow: 0 1px 0 var(--hairline-strong); display: flex; flex-direction: column; gap: 6px; min-height: 64px; }
+  .fc .ks { display: flex; gap: 6px; flex-wrap: wrap; } .fc .why { font-size: 11.5px; color: var(--ink-soft); }
+  .fc.narrow { border-left: 4px solid var(--accent); }
+  .btnrow { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btnrow button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .btnrow button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .bt td, .bt th { font-size: 12.5px; }
+  .bt .sig { display: inline-flex; gap: 4px; align-items: center; margin: 2px 10px 2px 0; white-space: nowrap; }
+  .bt .sig .e { color: var(--ink-soft); font-size: 12px; }
+  .lean { display: flex; height: 10px; border-radius: 5px; overflow: hidden; width: 140px; background: var(--sunken); }
+  .lean i { display: block; height: 100%; }
+  @media (max-width: 1100px) { .ringwrap { grid-template-columns: 1fr; } .tg { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Foe weaknesses, by kind and by tier</h1>
+  <p class="lead">The ten weapon kinds are the weakness types (the owner, 2026-10-23). A Tier 1 foe is weak to her <b>twins</b>: the
+    element that beats hers on the ring, and that element's twin Arm. Later tiers narrow the list by rank; bosses keep both in
+    every tier. Every default and guided party answers every Tier 1 foe at least twice. From
+    <a href="../class-progression.md">class-progression.md</a> §4. The other pages: <a href="class-overview.html">overview</a> ·
+    <a href="class-templates.html">templates</a> · <a href="class-trees.html">tree viewer</a>.</p>
+  <nav class="top"><a href="#ring">The ring and the twins</a><a href="#tiers">By tier and rank</a><a href="#rift">The Rift's fronts</a><a href="#coverage">Coverage</a><a href="#answer">Per class</a><a href="#world">The world</a><a href="#alts">Alternatives</a></nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="ring">
+    <h2>The ring and the twins</h2>
+    <p class="sub">Twins are an Arm and the element that share a shape in the catalog (D86). The ring is today's: Fire beats Ice,
+      Ice beats Lightning, Lightning beats Fire; Light and Dark beat each other. Pick a foe's element: she is weak to what beats
+      it, and to its twin Arm.</p>
+    <div class="ringwrap">
+      <div class="panel"><div class="btnrow" id="foes"></div><div id="ringsvg" style="margin-top:8px"></div></div>
+      <div class="panel" style="display:flex;flex-direction:column;gap:12px"><div class="foecard" id="foecard"></div>
+        <div class="note" style="margin:0"><b>Two elements:</b> she reads her lead element first (a pair signature's lead alternates by slot); if
+          its answer is one of her own, her second. <b>Light and Dark together</b> answer to no element: she is weak to the Arms of her own
+          two, the Bow and the Katana (Twilight), as today's Light + Dark foes break on weapons alone.</div>
+        <details><summary>Show the numbers</summary><div id="ring-table"></div></details></div>
+    </div>
+  </section>
+
+  <section id="tiers">
+    <h2>By tier and rank: the list narrows</h2>
+    <p class="sub">A Fire foe at each rank and tier. Regulars narrow to one kind in Tier 2 (the channel her weaker defense guards:
+      strikers and guards her element, casters and skirmishers her Arm), sub-bosses in Tier 3; bosses keep both, so every Uma can
+      always answer a boss. Gold edge: narrowed this tier.</p>
+    <div class="tg" id="tg"></div>
+    <details><summary>Show the numbers</summary><div id="tg-table"></div></details>
+  </section>
+
+  <section id="rift">
+    <h2>The Rift's fronts</h2>
+    <p class="sub">The fronts draw by the run's seed, from the front, never the face. Today's counts and wards stay in Tier 1; the
+      Duel's and the Horde's draws become twins, so the guided parties always hold an answer.</p>
+    <div class="panel" style="overflow-x:auto"><table class="matrix" id="rift-table"></table></div>
+  </section>
+
+  <section id="coverage">
+    <h2>Coverage: who answers what</h2>
+    <p class="sub">Members whose default weapons answer each set (an Arm or the element of the twins; one kind for the single-kind rows).
+      Tier 1's tests ask for two or more everywhere: every cell meets it. Tier 2's single kinds are answered by the default party on
+      defaults; the Horde's keys ask for a pick or a Dual (red: nobody on defaults). Hover a cell for who.</p>
+    <div class="panel"><h3>Tier 1: twins</h3><div id="cov-twins" style="overflow-x:auto;margin-top:6px"></div></div>
+    <div class="panel" style="margin-top:14px"><h3>One kind a foe: Iron and Arcane (every tier), and Tier 2's regulars</h3><div id="cov-kinds" style="overflow-x:auto;margin-top:6px"></div></div>
+    <div class="chart-legend" style="margin-top:10px"><span class="scale"><i class="h0"></i>0<i class="h1"></i>1<i class="h2"></i>2<i class="h3"></i>3<i class="h4"></i>4<i class="h5"></i>5 members answer</span></div>
+    <details><summary>Show the numbers</summary><div id="cov-table"></div></details>
+  </section>
+
+  <section id="answer">
+    <h2>Per class: how many Tier 1 foes she answers alone</h2>
+    <p class="sub">The share of the world's signatures whose twins one Uma's default weapons hold. Today's five weapons answer nearly
+      every foe; three answer about 60%, which is why a party matters and why the simulation re-sets shields (§4.4).</p>
+    <div class="panel"><div id="ans-chart"></div><details><summary>Show the numbers</summary><div id="ans-table"></div></details></div>
+  </section>
+
+  <section id="world">
+    <h2>The world: twins by biome</h2>
+    <p class="sub">Every biome's signatures and the twins they answer to in Tier 1 (a pair signature's two leads can differ), and how its
+      regulars lean in Tier 2: the share weak to an Arm (casters, skirmishers) against an element (strikers, guards).</p>
+    <div class="panel"><h3>Twin sets across the 48 signatures</h3><div id="freq-chart"></div>
+      <details><summary>Show the numbers</summary><div id="freq-table"></div></details></div>
+    <div class="panel" style="margin-top:14px;overflow-x:auto"><table class="bt" id="biome-table"></table></div>
+  </section>
+
+  <section id="alts">
+    <h2>Alternatives considered</h2>
+    <div class="panel" style="overflow-x:auto"><table id="alt-table"></table></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3).
+const TWINS = [
+  { id: 'fire', el: 'Fire', arm: 'greatsword', tome: 'tome-fire', c: 'var(--k-fire)' },
+  { id: 'ice', el: 'Ice', arm: 'axe', tome: 'tome-ice', c: 'var(--k-ice)' },
+  { id: 'ltn', el: 'Lightning', arm: 'lance', tome: 'tome-lightning', c: 'var(--k-ltn)' },
+  { id: 'light', el: 'Light', arm: 'bow', tome: 'tome-light', c: 'var(--k-light)' },
+  { id: 'dark', el: 'Dark', arm: 'katana', tome: 'tome-dark', c: 'var(--k-dark)' },
+];
+const KINDS = [
+  ['greatsword', 'Greatsword', 'Greatsword', 'a', 'fire'], ['axe', 'Axe', 'Axe', 'a', 'ice'], ['lance', 'Lance', 'Lance', 'a', 'ltn'],
+  ['bow', 'Bow', 'Bow', 'a', 'light'], ['katana', 'Katana', 'Katana', 'a', 'dark'],
+  ['tome-fire', 'Fire', 'Fire Tome', 't', 'fire'], ['tome-ice', 'Ice', 'Blizzard Tome', 't', 'ice'], ['tome-lightning', 'Lightning', 'Thunder Tome', 't', 'ltn'],
+  ['tome-light', 'Light', 'Light Tome', 't', 'light'], ['tome-dark', 'Dark', 'Dark Tome', 't', 'dark'],
+].map(([id, kind, weapon, ch, twin]) => ({ id, kind, weapon, ch, twin }));
+const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
+const TW = Object.fromEntries(TWINS.map((t) => [t.id, t]));
+const CLASSES = [
+  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'katana'], c: 'var(--cl-brawler)', split: [100, 0] },
+  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-lightning', 'tome-light'], c: 'var(--cl-mage)', split: [0, 100] },
+  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['lance', 'bow', 'tome-dark'], c: 'var(--cl-spellblade)', split: [70, 30] },
+  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-ice', 'tome-dark', 'greatsword'], c: 'var(--cl-summoner)', split: [30, 70] },
+  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'lance', 'tome-ice'], c: 'var(--cl-paladin)', split: [67, 33] },
+  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-dark', 'axe'], c: 'var(--cl-cleric)', split: [33, 67] },
+];
+const C = Object.fromEntries(CLASSES.map((c) => [c.id, c]));
+/** The channels of a class's three slots, the lead channel first. */
+const slotsOf = (c) => (c.arms >= 2 ? ['a', 'a', 'a'].map((x, i) => (i < c.arms ? 'a' : 't')) : ['t', 't', 't'].map((x, i) => (i < 3 - c.arms ? 't' : 'a')));
+const kchip = (id, o = {}) => { const k = K[id]; const t = TW[k.twin];
+  return `<span class="k ${k.ch === 'a' ? 'arm' : 'tome'}${k.twin === 'ltn' && k.ch === 't' ? ' ltn' : ''}${o.dim ? ' dim' : ''}" style="--kc:${t.c}" data-kind="${id}">${o.long ? k.weapon : k.kind}</span>`; };
+const chan = (ch) => ch === 'a' ? '<span class="ch a">Arms</span>' : '<span class="ch t">Tome</span>';
+/** Who in a list of class ids answers a twin set (holds its Arm or its Tome), on defaults. */
+const answersTwin = (members, twin) => members.filter((m) => C[m].def.includes(TW[twin].arm) || C[m].def.includes(TW[twin].tome));
+const answersKind = (members, kind) => members.filter((m) => C[m].def.includes(kind));
+const heatClass = (n) => 'h' + Math.max(0, Math.min(5, n));
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY)); el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+const h = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; };
+/** Kind chips explain themselves on hover. */
+function bindKinds(root = document) {
+  root.querySelectorAll('.k[data-kind]').forEach((el) => { if (el.dataset.bound) return; el.dataset.bound = 1; const k = K[el.dataset.kind], t = TW[k.twin];
+    bindTip(el, k.weapon, `${k.ch === 'a' ? 'An Arm (physical, ATK)' : `A Tome (magical, M.ATK), dealing ${k.kind}`}. Twin of the ${k.ch === 'a' ? (t.el === 'Ice' ? 'Blizzard' : t.el === 'Lightning' ? 'Thunder' : t.el) + ' Tome' : K[t.arm].weapon}: a foe ${t.el === 'Ice' ? 'of Lightning' : t.el === 'Fire' ? 'of Ice' : t.el === 'Lightning' ? 'of Fire' : t.el === 'Light' ? 'of Dark' : 'of Light'} is weak to both in Tier 1.`); });
+}
+
+const BIOMES = [{"n":"Meadow","r":["striker","caster","skirmisher","guard"],"s":[{"e":["fire"],"a":["ltn"]},{"e":["ice"],"a":["fire"]},{"e":["lightning"],"a":["ice"]}]},{"n":"Forest","r":["skirmisher","striker"],"s":[{"e":["lightning"],"a":["ice"]},{"e":["light"],"a":["dark"]},{"e":["dark"],"a":["light"]}]},{"n":"Coast","r":["caster","skirmisher"],"s":[{"e":["ice","lightning"],"a":["fire","fire"]},{"e":["ice"],"a":["fire"]},{"e":["lightning"],"a":["ice"]}]},{"n":"Swamp","r":["caster","skirmisher"],"s":[{"e":["lightning","dark"],"a":["ice","light"]},{"e":["dark"],"a":["light"]}]},{"n":"Jungle","r":["skirmisher","striker"],"s":[{"e":["fire","lightning"],"a":["ice","ice"]},{"e":["lightning"],"a":["ice"]}]},{"n":"Desert","r":["guard","striker"],"s":[{"e":["fire","light"],"a":["ltn","dark"]},{"e":["fire"],"a":["ltn"]},{"e":["light"],"a":["dark"]}]},{"n":"Canyon","r":["striker"],"s":[{"e":["fire"],"a":["ltn"]},{"e":["lightning"],"a":["ice"]},{"e":["fire","lightning"],"a":["ice","ice"]}]},{"n":"Volcano","r":["striker","caster"],"s":[{"e":["fire","dark"],"a":["ltn","light"]},{"e":["fire","light"],"a":["ltn","dark"]},{"e":["fire"],"a":["ltn"]}]},{"n":"Geyser Basin","r":["caster"],"s":[{"e":["fire","ice"],"a":["ltn","ltn"]},{"e":["ice"],"a":["fire"]},{"e":["fire"],"a":["ltn"]}]},{"n":"Tundra","r":["guard","striker"],"s":[{"e":["ice"],"a":["fire"]},{"e":["ice","dark"],"a":["fire","light"]}]},{"n":"Glacier","r":["guard"],"s":[{"e":["ice","light"],"a":["fire","dark"]},{"e":["ice"],"a":["fire"]}]},{"n":"Storm Peaks","r":["skirmisher"],"s":[{"e":["ice","lightning"],"a":["fire","fire"]},{"e":["lightning"],"a":["ice"]}]},{"n":"Highlands","r":["caster"],"s":[{"e":["lightning","light"],"a":["ice","dark"]},{"e":["light"],"a":["dark"]}]},{"n":"Sky Isles","r":["caster"],"s":[{"e":["fire","light"],"a":["ltn","dark"]},{"e":["ice","light"],"a":["fire","dark"]},{"e":["lightning","light"],"a":["ice","dark"]}]},{"n":"Underworld","r":["striker","caster","skirmisher"],"s":[{"e":["fire","dark"],"a":["ltn","light"]},{"e":["ice","dark"],"a":["fire","light"]},{"e":["lightning","dark"],"a":["ice","light"]}]},{"n":"Haunted Moor","r":["skirmisher","caster"],"s":[{"e":["dark"],"a":["light"]},{"e":["ice","dark"],"a":["fire","light"]}]},{"n":"Crystal Caverns","r":["guard","caster"],"s":[{"e":["ice","light"],"a":["fire","dark"]},{"e":["light"],"a":["dark"]}]},{"n":"Ancient Ruins","r":["guard"],"s":[{"e":["light","dark"],"a":["twilight","twilight"]},{"e":["fire"],"a":["ltn"]},{"e":["ice"],"a":["fire"]},{"e":["lightning"],"a":["ice"]}]},{"n":"Twilight Rift","r":["striker","caster"],"s":[{"e":["light","dark"],"a":["twilight","twilight"]}]}];
+const EL = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' };
+const BEATS = { fire: 'lightning', ice: 'fire', lightning: 'ice', light: 'dark', dark: 'light' }; // foe element -> the element she is weak to
+const ELTWIN = { fire: 'fire', ice: 'ice', lightning: 'ltn', light: 'light', dark: 'dark' };
+const twinChips = (t) => t === 'twilight' ? kchip('bow') + kchip('katana') : kchip(TW[t].arm) + kchip(TW[t].tome);
+const twinName = (t) => t === 'twilight' ? 'Twilight: Bow, Katana' : `${TW[t].el}: ${K[TW[t].arm].weapon}, ${K[TW[t].tome].weapon}`;
+document.getElementById('kpis').innerHTML = [
+  ['Rules for a foe\'s weakness', '5', '1', 'her twins'], ['Weak marks on a Tier 1 foe', '2–5', '2', 'an Arm and its element'],
+  ['Weakness sets, Tier 1', 'random', '6', 'five twin sets and Twilight'], ['Fewest answers, default and guided parties', '—', '2', 'every Tier 1 foe'],
+  ['Foes one Uma answers alone', '~all', '~60%', 'three weapons: a party matters'], ['Bosses, every tier', '1–3 Arms + elements', '2', 'one Arm, one element'],
+].map(([l, w, n, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value"><span class="was">${w} →</span> ${n}</div><div class="delta">${d}</div></div>`).join('');
+
+// ---- Ring
+let foe = 'fire';
+const FOES = [['fire', 'Fire foe'], ['ice', 'Ice foe'], ['lightning', 'Lightning foe'], ['light', 'Light foe'], ['dark', 'Dark foe'], ['twilight', 'Light + Dark foe']];
+function ring() {
+  document.getElementById('foes').innerHTML = FOES.map(([id, n]) => `<button data-f="${id}" aria-pressed="${foe === id}">${n}</button>`).join('');
+  document.querySelectorAll('#foes button').forEach((b) => b.addEventListener('click', () => { foe = b.dataset.f; ring(); }));
+  const ans = foe === 'twilight' ? null : BEATS[foe], hit = (e) => ans === e, mine = (e) => foe === e || (foe === 'twilight' && (e === 'light' || e === 'dark'));
+  const P = { fire: [190, 70], ice: [300, 250], lightning: [80, 250], light: [520, 90], dark: [520, 240] };
+  const W = 700, H = 330; let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The element ring and each element's twin Arm"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--neutral-strong)"/></marker></defs>`;
+  const arrow = (a, b, two) => { const [x1, y1] = P[a], [x2, y2] = P[b], dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, r = 36;
+    return `<line x1="${x1 + ux * r}" y1="${y1 + uy * r}" x2="${x2 - ux * r}" y2="${y2 - uy * r}" stroke="var(--neutral-strong)" stroke-width="1.6" marker-end="url(#ar)"${two ? ' marker-start="url(#ar)"' : ''}/>`; };
+  s += arrow('fire', 'ice') + arrow('ice', 'lightning') + arrow('lightning', 'fire') + arrow('light', 'dark', true);
+  s += `<text class="axis-text" x="190" y="300" text-anchor="middle">Fire beats Ice, Ice beats Lightning, Lightning beats Fire</text><text class="axis-text" x="520" y="300" text-anchor="middle">Light and Dark beat each other</text>`;
+  Object.entries(P).forEach(([e, [x, y]]) => { const t = TW[ELTWIN[e]], on = hit(e), me = mine(e), arm = K[t.arm];
+    s += `<g class="mark" data-e="${e}" style="opacity:${ans && !on && !me ? 0.45 : 1}"><circle cx="${x}" cy="${y}" r="34" fill="${t.c}" stroke="${on ? 'var(--ink)' : 'var(--panel)'}" stroke-width="${on ? 4 : 2}"/>`;
+    s += `<text x="${x}" y="${y + 4}" text-anchor="middle" style="font-size:13px;font-weight:800;fill:${e === 'lightning' ? '#1b1300' : 'var(--on-k)'}">${EL[e]}</text>`;
+    const ax = x + 44, ay = y - 13; s += `<rect x="${ax}" y="${ay}" width="${arm.weapon.length * 7.2 + 18}" height="26" rx="7" fill="var(--panel)" stroke="${t.c}" stroke-width="${on || (foe === 'twilight' && (e === 'light' || e === 'dark')) ? 3 : 1.6}"/><text x="${ax + 9}" y="${ay + 17}" style="font-size:12.5px;font-weight:700;fill:${t.c}">${arm.weapon}</text>`;
+    if (me) s += `<text x="${x}" y="${y - 42}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--ink-soft)">her element</text>`;
+    if (on) s += `<text x="${x}" y="${y - 42}" text-anchor="middle" style="font-size:11px;font-weight:800;fill:var(--ink)">weak to</text>`;
+    s += '</g>'; });
+  document.getElementById('ringsvg').innerHTML = s + '</svg>';
+  document.querySelectorAll('#ringsvg .mark').forEach((g) => { const e = g.dataset.e, t = TW[ELTWIN[e]]; bindTip(g, `${EL[e]} and its twin, the ${K[t.arm].weapon}`, `A ${Object.keys(BEATS).find((k) => BEATS[k] === e) ? EL[Object.keys(BEATS).find((k) => BEATS[k] === e)] : ''} foe is weak to both in Tier 1.`); });
+  const tw = foe === 'twilight' ? 'twilight' : ELTWIN[ans];
+  document.getElementById('foecard').innerHTML = `<div class="big">${FOES.find((f) => f[0] === foe)[1]}</div><div class="weak">Weak: ${twinChips(tw)}</div>
+    <div class="rule">${foe === 'twilight' ? 'No element answers Light + Dark: the Arms of her own two, the Bow (Light\'s twin) and the Katana (Dark\'s).' : `${EL[ans]} beats ${EL[foe]}; its twin Arm is the ${K[TW[ELTWIN[ans]].arm].weapon}. One Arm, one element: every channel has an answer.`}</div>
+    <div class="rule">In Tier 2 a regular keeps one of the two; in Tier 3 a sub-boss too. A boss keeps both.</div>`;
+  bindKinds(document.getElementById('foecard'));
+  document.getElementById('ring-table').innerHTML = `<table><tr><th>Her element</th><th>Weak to (element)</th><th>Its twin Arm</th></tr>${['fire', 'ice', 'lightning', 'light', 'dark'].map((e) => `<tr><td>${EL[e]}</td><td>${EL[BEATS[e]]} (${K[TW[ELTWIN[BEATS[e]]].tome].weapon})</td><td>${K[TW[ELTWIN[BEATS[e]]].arm].weapon}</td></tr>`).join('')}<tr><td>Light + Dark</td><td>—</td><td>Bow and Katana</td></tr></table>`;
+}
+ring();
+
+// ---- Tier × rank grid
+const ROWS = [
+  ['Regular: striker or guard', 'DEF above M.DEF', ['ltn2', 'tome-lightning', 'tome-lightning'], [0, 1, 0]],
+  ['Regular: caster or skirmisher', 'DEF at or below M.DEF', ['ltn2', 'lance', 'lance'], [0, 1, 0]],
+  ['Sub-boss (a guard)', 'Elites and Rift sub-bosses', ['ltn2', 'ltn2', 'tome-lightning'], [0, 0, 1]],
+  ['Boss', 'Every tier', ['ltn2', 'ltn2', 'ltn2'], [0, 0, 0]],
+];
+const WHY = { ltn2: 'Her twins: Lightning beats Fire; its twin is the Lance', 'tome-lightning': 'One kind: her element, the channel her weaker defense guards', lance: 'One kind: her Arm, the channel her weaker defense guards' };
+let g = '<div></div>' + ['Tier 1', 'Tier 2', 'Tier 3'].map((t, i) => `<div class="hd" style="--tc:var(--t${i + 1})">${t}</div>`).join('');
+const tgRows = [];
+ROWS.forEach(([r, sub, cells, nar]) => { g += `<div class="rh">${r}<span>${sub}</span></div>`;
+  cells.forEach((cell, i) => { g += `<div class="fc${nar[i] ? ' narrow' : ''}"><div class="ks">${cell === 'ltn2' ? kchip('lance') + kchip('tome-lightning') : kchip(cell)}</div><div class="why">${WHY[cell]}</div></div>`;
+    tgRows.push([r, i + 1, cell === 'ltn2' ? 'Lance, Lightning' : K[cell].weapon]); }); });
+document.getElementById('tg').innerHTML = g;
+document.getElementById('tg-table').innerHTML = `<table><tr><th>A Fire foe</th><th class="num">Tier</th><th>Weak to</th></tr>${tgRows.map(([r, t, k]) => `<tr><td>${r}</td><td class="num">${t}</td><td>${k}</td></tr>`).join('')}</table><p class="foot">Every signature works the same way with its own twins. A Light + Dark foe keeps the Arm of her lead element when she narrows.</p>`;
+
+// ---- Rift
+const RIFT = [
+  ['Iron', 'Elements ×0.5', 'One Arm a foe (today\'s)', 'The same', 'The same', '2 Brawler, 2 Spell Blade, Paladin'],
+  ['Arcane', 'Arms ×0.5', 'Two elements a foe, one for a boss (today\'s)', '<b>One element a foe</b>', 'The same', '2 Mage, 2 Summoner, Cleric'],
+  ['Duel', '—', 'The boss\'s <b>twins</b>: two sets at stages 1–6, one at 7–12; locks mixed', 'One twin set', 'One twin set', '2 Brawler, 2 Mage, Paladin'],
+  ['Horde', '—', 'Each foe a <b>twin set</b>; a wave repeats none until all five are used', 'Keys <b>one kind</b> (by role); leaders their twins', 'Keys and sub-boss leaders one kind; boss leaders twins', '2 Spell Blade, 2 Summoner, Cleric'],
+];
+document.getElementById('rift-table').innerHTML = `<thead><tr><th>Front</th><th>Ward</th><th class="t" style="--tc:var(--t1)">Tier 1</th><th class="t" style="--tc:var(--t2)">Tier 2</th><th class="t" style="--tc:var(--t3)">Tier 3</th><th>Guided party</th></tr></thead><tbody>${RIFT.map((r) => `<tr><td><b>${r[0]}</b></td>${r.slice(1).map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+
+// ---- Coverage
+const P = {
+  'Default · Cleric': ['brawler', 'mage', 'spellblade', 'summoner', 'cleric'], 'Default · Paladin': ['brawler', 'mage', 'spellblade', 'summoner', 'paladin'],
+  Duel: ['brawler', 'brawler', 'mage', 'mage', 'paladin'], Horde: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
+  Iron: ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'], Arcane: ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
+};
+const who = (list) => { const n = {}; list.forEach((m) => (n[m] = (n[m] || 0) + 1)); return Object.entries(n).map(([m, k]) => `${k > 1 ? k + ' ' : ''}${C[m].name}${k > 1 ? 's' : ''}`).join(', ') || 'nobody on defaults'; };
+const covRows = [];
+const sets = [...TWINS.map((t) => [t.id, `${t.el}`, `${K[t.arm].weapon} · ${K[t.tome].weapon}`, (m) => C[m].def.includes(t.arm) || C[m].def.includes(t.tome)]), ['twilight', 'Twilight', 'Bow · Katana', (m) => C[m].def.includes('bow') || C[m].def.includes('katana')]];
+let ct = `<table class="heat"><tr><th></th>${sets.map(([, l, s]) => `<th style="text-align:center">${l}<div class="muted" style="font-weight:500;font-size:11px">${s}</div></th>`).join('')}</tr>`;
+['Default · Cleric', 'Default · Paladin', 'Duel', 'Horde'].forEach((r) => { ct += `<tr><th style="text-align:right">${r}</th>`; sets.forEach(([id, l, s, f]) => {
+  if (r === 'Duel' && id === 'twilight') { ct += '<td class="c hna">—</td>'; return; } const a = P[r].filter(f);
+  ct += `<td class="c ${heatClass(a.length)}" data-t="${r} · ${l} (${s})" data-d="${a.length} answer: ${who(a)}">${a.length}</td>`; covRows.push(['Tier 1', r, `${l} (${s})`, a.length, who(a)]); }); ct += '</tr>'; });
+document.getElementById('cov-twins').innerHTML = ct + '</table>';
+let ck = `<table class="heat"><tr><th></th>${KINDS.map((k) => `<th style="text-align:center">${kchip(k.id)}</th>`).join('')}</tr>`;
+[['Iron (every tier)', 'Iron', 'a'], ['Arcane (from Tier 2)', 'Arcane', 't'], ['Tier 2 regular · Default · Cleric', 'Default · Cleric', null], ['Tier 2 regular · Default · Paladin', 'Default · Paladin', null], ['Tier 2 Horde key', 'Horde', null]].forEach(([label, key, only]) => {
+  ck += `<tr><th style="text-align:right">${label}</th>`; KINDS.forEach((k) => { if (only && k.ch !== only) { ck += '<td class="c hna">·</td>'; return; }
+    const a = P[key].filter((m) => C[m].def.includes(k.id)); ck += `<td class="c ${heatClass(a.length)}" data-t="${label} · ${k.weapon}" data-d="${a.length ? `${a.length} answer: ${who(a)}` : 'Nobody on defaults: a pick or a Dual covers it'}">${a.length}</td>`; covRows.push([label.includes('Tier 2') ? 'Tier 2' : 'Every tier', label, k.weapon, a.length, who(a)]); }); ck += '</tr>'; });
+document.getElementById('cov-kinds').innerHTML = ck + '</table>';
+document.querySelectorAll('#coverage td.c[data-t]').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d));
+document.getElementById('cov-table').innerHTML = `<table><tr><th>When</th><th>Party</th><th>Set or kind</th><th class="num">Members</th><th>Who</th></tr>${covRows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table>`;
+
+// ---- Frequency of twin sets over the 48 signatures (a pair's two leads count half each)
+const freq = { fire: 0, ice: 0, ltn: 0, light: 0, dark: 0, twilight: 0 };
+BIOMES.forEach((b) => b.s.forEach((sg) => sg.a.forEach((a) => (freq[a] += 1 / sg.a.length))));
+const FREQ = [...TWINS.map((t) => [t.id, t.el, t.c]), ['twilight', 'Twilight', 'var(--neutral-strong)']];
+(function () {
+  const W = 1180, rowH = 34, pad = { l: 260, r: 60, t: 6, b: 24 }, H = pad.t + pad.b + rowH * FREQ.length, iw = W - pad.l - pad.r, max = 12;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Signatures answered by each twin set">`;
+  [0, 3, 6, 9, 12].forEach((g2) => { const x = pad.l + iw * g2 / max; s += `<line x1="${x}" x2="${x}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x}" y="${H - 6}" text-anchor="middle">${g2}</text>`; });
+  FREQ.forEach(([id, l, col], i) => { const v = freq[id], y = pad.t + i * rowH + 8, w = iw * v / max;
+    s += `<text class="val-soft" x="${pad.l - 12}" y="${y + 13}" text-anchor="end" style="fill:var(--ink)">${twinName(id)}</text><rect class="mark" x="${pad.l}" y="${y}" width="${w}" height="18" rx="3" fill="${col}" data-t="${twinName(id)}" data-d="${v} of 48 signatures (${Math.round(v / 48 * 100)}%)"/><text class="val-text" x="${pad.l + w + 8}" y="${y + 13}">${v}</text>`; });
+  document.getElementById('freq-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#freq-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('freq-table').innerHTML = `<table><tr><th>Twin set</th><th class="num">Signatures</th><th class="num">Share</th></tr>${FREQ.map(([id]) => `<tr><td>${twinName(id)}</td><td class="num">${freq[id]}</td><td class="num">${Math.round(freq[id] / 48 * 100)}%</td></tr>`).join('')}</table>`;
+})();
+
+// ---- Per class answer share
+(function () {
+  const rows = CLASSES.map((c) => { const sets2 = FREQ.map(([id]) => id).filter((id) => id === 'twilight' ? c.def.includes('bow') || c.def.includes('katana') : c.def.includes(TW[id].arm) || c.def.includes(TW[id].tome));
+    const v = sets2.reduce((a, id) => a + freq[id], 0); return [c, v, sets2]; }).sort((a, b) => b[1] - a[1]);
+  const W = 1180, rowH = 34, pad = { l: 140, r: 80, t: 6, b: 24 }, H = pad.t + pad.b + rowH * rows.length, iw = W - pad.l - pad.r;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Share of Tier 1 foes each class answers on defaults">`;
+  [0, 25, 50, 75, 100].forEach((g2) => { const x = pad.l + iw * g2 / 100; s += `<line x1="${x}" x2="${x}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x}" y="${H - 6}" text-anchor="middle">${g2}%</text>`; });
+  rows.forEach(([c, v, sets2], i) => { const pc = Math.round(v / 48 * 100), y = pad.t + i * rowH + 8, w = iw * pc / 100;
+    s += `<text class="val-soft" x="${pad.l - 12}" y="${y + 13}" text-anchor="end" style="fill:var(--ink);font-weight:600">${c.name}</text><rect class="mark" x="${pad.l}" y="${y}" width="${w}" height="18" rx="3" fill="${c.c}" data-t="${c.name}: ${pc}%" data-d="Defaults ${c.def.map((k) => K[k].weapon).join(', ')} answer: ${sets2.map(twinName).join('; ')}"/><text class="val-text" x="${pad.l + w + 8}" y="${y + 13}">${pc}%</text>`; });
+  document.getElementById('ans-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#ans-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('ans-table').innerHTML = `<table><tr><th>Class</th><th>Defaults</th><th>Twin sets answered</th><th class="num">Signatures</th><th class="num">Share</th></tr>${rows.map(([c, v, s2]) => `<tr><td>${c.name}</td><td>${c.def.map((k) => K[k].weapon).join(', ')}</td><td>${s2.map(twinName).join('; ')}</td><td class="num">${v}</td><td class="num">${Math.round(v / 48 * 100)}%</td></tr>`).join('')}</table>`;
+})();
+
+// ---- Biome table
+const ARMW = (roles) => roles.filter((r) => r === 'caster' || r === 'skirmisher').length / roles.length;
+document.getElementById('biome-table').innerHTML = `<thead><tr><th>Biome</th><th>Signatures → Tier 1 twins</th><th>Roles</th><th>Tier 2 regulars: Arm-weak · element-weak</th></tr></thead><tbody>${BIOMES.map((b) => { const a = ARMW(b.r);
+  return `<tr><td><b>${b.n}</b></td><td>${b.s.map((sg) => `<span class="sig"><span class="e">${sg.e.map((e) => EL[e]).join(' + ')} →</span>${[...new Set(sg.a)].map((t) => twinChips(t)).join('<span class="e">or</span>')}</span>`).join('')}</td><td>${b.r.join(', ')}</td>
+    <td><span style="display:inline-flex;align-items:center;gap:8px"><span class="lean"><i style="width:${a * 100}%;background:var(--arms)"></i><i style="width:${(1 - a) * 100}%;background:var(--tomes)"></i></span>${Math.round(a * 100)}% · ${Math.round((1 - a) * 100)}%</span></td></tr>`; }).join('')}</tbody>`;
+bindKinds();
+
+// ---- Alternatives
+const ALTS = [
+  ['<b>Twins, narrowing by rank</b> (recommended)', 'One Arm and its twin element', 'Regulars to one (Tier 2), sub-bosses too (Tier 3); bosses keep both', 'One rule, two icons, an answer in each channel; the forms get a job'],
+  ['One kind a foe from Tier 1', 'One kind, by role', 'The same', 'A kind sits in one to three of five default members: Tier 1 can\'t promise two answers'],
+  ['The ring\'s element and a drawn Arm', 'Two, the Arm by seed', 'The same', 'The Arm reads from nothing; the Duel party can draw Bow + Dark and hold neither'],
+  ['Twins in every tier', 'Twins', 'Twins', 'Tier 2 and 3 add nothing to plan; Dual, Pure and Keen lose their job'],
+  ['Strikes, 3 → 6 → 10', 'A strike (Heavy, Flurry, Area)', 'Strike × channel, then a kind', 'Withdrawn by the owner, 2026-10-23'],
+  ['Today\'s lists', '2–5 kinds, half drawn at random', '—', 'The complexity the rework removes'],
+];
+document.getElementById('alt-table').innerHTML = `<tr><th>Model</th><th>Tier 1</th><th>Tiers 2–3</th><th>Why (not)</th></tr>${ALTS.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}`;
+</script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class Templates and Weapons</title>
+<!-- The Tier rework's Class Progression (class-progression.md 3, 5, 9): every class's template sheet at Tier 1, 2 and 3, the equippable-weapons matrix, the class-switch cost and the Lv 50 sheets under SB1 (stats-by-tier's DATA with every flat build value x1, x1.8, x2.6). No external scripts, fonts or images. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+<style>
+  /* Class Progression pages: the kit's tokens above, plus the ten kinds (twins share a hue: an Arm is drawn outlined,
+     its twin Tome filled), the two channels, the six classes and a sequential scale for coverage counts. */
+  :root {
+    --arms: #9a6a3a; --tomes: #4a62c4;
+    --k-fire: #d9582f; --k-ice: #2f80cc; --k-ltn: #b58700; --k-light: #16917f; --k-dark: #7350c6;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --h0: #f6e6e3; --h1: #f5e2bd; --h2: #ecc46e; --h3: #d39a2b; --h4: #a8731a; --h5: #7d5410;
+    --h0t: #9b3a2a; --hlt: #3a2a08; --hdt: #ffffff; --on-k: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --arms: #c18b56; --tomes: #7b8ff0;
+      --k-fire: #f0764e; --k-ice: #5aa2ec; --k-ltn: #e0b12e; --k-light: #35bba6; --k-dark: #9f84ec;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --h0: #3a1f1c; --h1: #3b2f17; --h2: #5c4618; --h3: #8a6519; --h4: #b8851f; --h5: #e0ac40;
+      --h0t: #f0a090; --hlt: #f3e3c3; --hdt: #1b1300; --on-k: #0f1620;
+    }
+  }
+  .grid2 > *, .multiples > * { min-width: 0; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 6px; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
+  .k { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 650; line-height: 1.5;
+    white-space: nowrap; border: 1.5px solid var(--kc); cursor: default; }
+  .k.arm { color: var(--kc); background: transparent; }
+  .k.tome { background: var(--kc); color: var(--on-k); }
+  .k.tome.ltn { color: #1b1300; }
+  .k.dim { opacity: .35; }
+  .cdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--cc); }
+  .ch { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; padding: 1px 7px; border-radius: 5px; }
+  .ch.a { color: var(--arms); border: 1.5px solid var(--arms); }
+  .ch.t { color: var(--on-k); background: var(--tomes); border: 1.5px solid var(--tomes); }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .heat { border-collapse: separate; border-spacing: 3px; width: auto; }
+  .heat th, .heat td { border: 0; padding: 6px 8px; font-size: 12px; }
+  .heat td.c { text-align: center; font-weight: 700; min-width: 44px; border-radius: 6px; font-variant-numeric: tabular-nums; cursor: default; }
+  .heat td.c:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .h0 { background: var(--h0); color: var(--h0t); } .h1 { background: var(--h1); color: var(--hlt); } .h2 { background: var(--h2); color: var(--hlt); }
+  .h3 { background: var(--h3); color: var(--hdt); } .h4 { background: var(--h4); color: #fff; } .h5 { background: var(--h5); color: #fff; }
+  .hna { background: transparent; color: var(--ink-faint); font-weight: 500 !important; }
+  .scale { display: inline-flex; gap: 3px; align-items: center; font-size: 11px; color: var(--ink-soft); }
+  .scale i { width: 22px; height: 14px; border-radius: 4px; display: inline-block; }
+  button.linkish { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; padding: 0; }
+</style>
+<style>
+  .tgrid { display: grid; grid-template-columns: 150px repeat(3, 1fr); gap: 12px; align-items: stretch; }
+  .tgrid .rowhead { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 8px 4px; }
+  .tgrid .rowhead b { font-size: 16px; display: flex; align-items: center; gap: 8px; } .tgrid .rowhead span { font-size: 12px; color: var(--ink-soft); }
+  .tgrid .colhead { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); padding: 0 4px 4px; border-bottom: 4px solid var(--tc); }
+  .tcard { background: var(--panel); border-radius: 12px; box-shadow: 0 1px 0 var(--hairline-strong); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border-top: 4px solid var(--tc); }
+  .tcard .grp { display: flex; flex-direction: column; gap: 4px; }
+  .tcard .grp > span { font-size: 10.5px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; }
+  .slots { display: flex; gap: 6px; flex-wrap: wrap; }
+  .slot { border: 1.5px solid var(--hairline-strong); border-radius: 9px; padding: 5px 6px; display: flex; flex-direction: column; gap: 3px; background: var(--raised); min-width: 0; cursor: default; }
+  .slot.w { flex: 1 1 0; } .slot .k { align-self: flex-start; font-size: 11.5px; padding: 1px 6px; }
+  .slot .cap { font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .slot.new { border-style: dashed; border-color: var(--accent); }
+  .armor { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .ap { border-radius: 7px; height: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; cursor: default; border: 1.5px solid var(--hairline-strong); }
+  .ap.p { background: color-mix(in srgb, var(--arms) 22%, var(--panel)); color: var(--ink); }
+  .ap.m { background: color-mix(in srgb, var(--tomes) 22%, var(--panel)); color: var(--ink); }
+  .ap.x { background: linear-gradient(135deg, color-mix(in srgb, var(--arms) 22%, var(--panel)) 50%, color-mix(in srgb, var(--tomes) 22%, var(--panel)) 50%); color: var(--ink); }
+  .ap small { font-weight: 600; color: var(--ink-soft); font-size: 9.5px; }
+  .tline { font-size: 12px; color: var(--ink-soft); } .tline b { color: var(--ink); }
+  .mx { border-collapse: separate; border-spacing: 2px; }
+  .mx th, .mx td { border: 0; padding: 5px 6px; font-size: 12px; text-align: center; }
+  .mx td.l, .mx th.l { text-align: left; }
+  .mx td.cell { width: 74px; border-radius: 6px; background: var(--raised); color: var(--ink-faint); cursor: default; }
+  .mx td.cell.fit { background: color-mix(in srgb, var(--kc) 14%, var(--panel)); color: var(--ink-soft); }
+  .mx td.cell.def { background: var(--kc); color: var(--on-k); font-weight: 800; }
+  .mx tr.first td { border-top: 2px solid var(--hairline-strong); }
+  .toggle { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 999px; overflow: hidden; }
+  .toggle button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border: 0; background: var(--panel); color: var(--ink-soft); cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--ink); }
+  .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .statsheet { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .stat { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .stat .k2 { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .stat .v { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 2px; margin-top: 6px; font-size: 13px; align-items: baseline; }
+  .stat .v span:nth-child(odd) { color: var(--ink-faint); font-size: 11px; font-weight: 600; }
+  .stat .v b { font-size: 16px; } .stat .x { font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+  @media (max-width: 1100px) { .tgrid { grid-template-columns: 1fr; } .tgrid .colhead { display: none; } .statsheet { grid-template-columns: repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Class templates, weapons and stats</h1>
+  <p class="lead">Every class's template sheet at Tier 1, 2 and 3: its three weapon slots, five armor pieces and one to three
+    accessories, drawn with the standard preset in them. Then which weapons fit which slot, what a class switch costs, and each
+    class's Lv 50 sheet under the stat budget rule (SB1). From <a href="../class-progression.md">class-progression.md</a> §3, §5, §9.
+    The other pages: <a href="class-overview.html">overview</a> · <a href="class-trees.html">tree viewer</a> ·
+    <a href="class-weaknesses.html">foe weaknesses</a>.</p>
+  <nav class="top"><a href="#sheets">Template sheets</a><a href="#matrix">Equippable weapons</a><a href="#switch">Switch cost</a><a href="#stats">Lv 50 stats (SB1)</a></nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="sheets">
+    <h2>The template sheet, per class and tier</h2>
+    <p class="sub">Rows are classes, columns tiers. Weapon slots show their channel and the preset's weapon; armor shows the half
+      each piece wears (from Tier 2 the four classes between mix per piece: the split tiles); accessories grow 1 · 2 · 3. Dashed
+      is new that tier. Hover any slot.</p>
+    <div class="pills" id="cls-pills"></div>
+    <div class="tgrid" id="tgrid"></div>
+  </section>
+
+  <section id="matrix">
+    <div class="head-row"><h2>Equippable weapons</h2>
+      <div class="toggle" role="group" aria-label="Tier"><button data-t="1" aria-pressed="true">Tier 1</button><button data-t="2" aria-pressed="false">Tier 2</button><button data-t="3" aria-pressed="false">Tier 3</button></div></div>
+    <p class="sub">Each row is one slot of one class; each column a kind. A filled cell is the default (the number is the slot), a
+      tinted cell fits. Any three different kinds of the slots' channels fit, in every tier. From Tier 2 a weapon's form may add
+      a kind: the last column says which extra kinds count for that class (GE7; forms are the weapons doc's).</p>
+    <div class="panel" style="overflow-x:auto"><table class="mx" id="mx"></table>
+      <details><summary>Show the numbers</summary><div id="mx-table"></div></details></div>
+  </section>
+
+  <section id="switch">
+    <h2>What a class switch costs, from the defaults</h2>
+    <p class="sub">She owns every kind; armor and accessory grades sit on the slot. A switch costs only the new class's weapons she
+      hasn't raised: 10 Weapon Gems each to bring one from G0 to G10. Cells count the new class's defaults she would still
+      have to raise, from the row class's defaults fully raised.</p>
+    <div class="grid2">
+      <div class="panel"><div id="sw-heat" style="overflow-x:auto"></div>
+        <div class="chart-legend" style="margin-top:8px"><span class="scale"><i class="h1"></i>1<i class="h2"></i>2<i class="h3"></i>3 weapons to raise</span></div></div>
+      <div class="panel"><h3>Shared defaults</h3><p class="muted" style="font-size:12px;margin-bottom:6px">The five fight types' defaults are the ten kinds once each: a roster that raised one Uma of each type raised every kind.</p>
+        <div id="sw-pairs"></div></div>
+    </div>
+    <details><summary>Show the numbers</summary><div id="sw-table"></div></details>
+  </section>
+
+  <section id="stats">
+    <div class="head-row"><h2>Lv 50 stats under SB1</h2>
+      <div class="toggle" role="group" aria-label="Points or share"><button id="v-pts" aria-pressed="true">Points</button><button id="v-pct" aria-pressed="false">Share</button></div></div>
+    <p class="sub">The simulation's average Uma, fully built, at each tier's Lv 50, with every flat build value × 1, × 1.8, × 2.6
+      (README §2.5). Level and lean are hers; gear, Extra Stats and her template are the build. Offense is on her lead kind:
+      Might, and from Tier 2 the Orb and the Halo.</p>
+    <div class="pills" id="st-pills"></div>
+    <div class="statsheet" id="statsheet"></div>
+    <div class="panel" style="margin-top:14px"><div class="chart-legend" id="st-legend"></div><div id="st-chart"></div>
+      <details><summary>Show the numbers</summary><div id="st-table"></div></details></div>
+    <div class="panel" style="margin-top:14px"><h3>The build's share of each stat: flat drafts against SB1</h3>
+      <p class="muted" style="font-size:12px">Flat values (the first round's drafts) let her level swallow the build; SB1 holds each share from tier to tier.</p>
+      <div class="chart-legend"><span><span class="sw" style="background:var(--neutral-strong)"></span>Flat drafts</span><span><span class="sw" style="background:var(--accent)"></span>SB1</span></div>
+      <div class="multiples" id="share" style="grid-template-columns: repeat(7, 1fr)"></div>
+      <details><summary>Show the numbers</summary><div id="share-table"></div></details></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+// Shared data for the Class Progression pages (class-progression.md). Kinds, twins, classes and their defaults (CP3).
+const TWINS = [
+  { id: 'fire', el: 'Fire', arm: 'greatsword', tome: 'tome-fire', c: 'var(--k-fire)' },
+  { id: 'ice', el: 'Ice', arm: 'axe', tome: 'tome-ice', c: 'var(--k-ice)' },
+  { id: 'ltn', el: 'Lightning', arm: 'lance', tome: 'tome-lightning', c: 'var(--k-ltn)' },
+  { id: 'light', el: 'Light', arm: 'bow', tome: 'tome-light', c: 'var(--k-light)' },
+  { id: 'dark', el: 'Dark', arm: 'katana', tome: 'tome-dark', c: 'var(--k-dark)' },
+];
+const KINDS = [
+  ['greatsword', 'Greatsword', 'Greatsword', 'a', 'fire'], ['axe', 'Axe', 'Axe', 'a', 'ice'], ['lance', 'Lance', 'Lance', 'a', 'ltn'],
+  ['bow', 'Bow', 'Bow', 'a', 'light'], ['katana', 'Katana', 'Katana', 'a', 'dark'],
+  ['tome-fire', 'Fire', 'Fire Tome', 't', 'fire'], ['tome-ice', 'Ice', 'Blizzard Tome', 't', 'ice'], ['tome-lightning', 'Lightning', 'Thunder Tome', 't', 'ltn'],
+  ['tome-light', 'Light', 'Light Tome', 't', 'light'], ['tome-dark', 'Dark', 'Dark Tome', 't', 'dark'],
+].map(([id, kind, weapon, ch, twin]) => ({ id, kind, weapon, ch, twin }));
+const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
+const TW = Object.fromEntries(TWINS.map((t) => [t.id, t]));
+const CLASSES = [
+  { id: 'brawler', name: 'Brawler', type: 'Physical', arms: 3, def: ['greatsword', 'axe', 'katana'], c: 'var(--cl-brawler)', split: [100, 0] },
+  { id: 'mage', name: 'Mage', type: 'Magical', arms: 0, def: ['tome-fire', 'tome-lightning', 'tome-light'], c: 'var(--cl-mage)', split: [0, 100] },
+  { id: 'spellblade', name: 'Spell Blade', type: 'Physical hybrid', arms: 2, def: ['lance', 'bow', 'tome-dark'], c: 'var(--cl-spellblade)', split: [70, 30] },
+  { id: 'summoner', name: 'Summoner', type: 'Magical hybrid', arms: 1, def: ['tome-ice', 'tome-dark', 'greatsword'], c: 'var(--cl-summoner)', split: [30, 70] },
+  { id: 'paladin', name: 'Paladin', type: 'Healer', arms: 2, def: ['greatsword', 'lance', 'tome-ice'], c: 'var(--cl-paladin)', split: [67, 33] },
+  { id: 'cleric', name: 'Cleric', type: 'Healer', arms: 1, def: ['tome-light', 'tome-dark', 'axe'], c: 'var(--cl-cleric)', split: [33, 67] },
+];
+const C = Object.fromEntries(CLASSES.map((c) => [c.id, c]));
+/** The channels of a class's three slots, the lead channel first. */
+const slotsOf = (c) => (c.arms >= 2 ? ['a', 'a', 'a'].map((x, i) => (i < c.arms ? 'a' : 't')) : ['t', 't', 't'].map((x, i) => (i < 3 - c.arms ? 't' : 'a')));
+const kchip = (id, o = {}) => { const k = K[id]; const t = TW[k.twin];
+  return `<span class="k ${k.ch === 'a' ? 'arm' : 'tome'}${k.twin === 'ltn' && k.ch === 't' ? ' ltn' : ''}${o.dim ? ' dim' : ''}" style="--kc:${t.c}" data-kind="${id}">${o.long ? k.weapon : k.kind}</span>`; };
+const chan = (ch) => ch === 'a' ? '<span class="ch a">Arms</span>' : '<span class="ch t">Tome</span>';
+/** Who in a list of class ids answers a twin set (holds its Arm or its Tome), on defaults. */
+const answersTwin = (members, twin) => members.filter((m) => C[m].def.includes(TW[twin].arm) || C[m].def.includes(TW[twin].tome));
+const answersKind = (members, kind) => members.filter((m) => C[m].def.includes(kind));
+const heatClass = (n) => 'h' + Math.max(0, Math.min(5, n));
+const tip = document.getElementById('tip');
+function bindTip(el, title, body) {
+  el.setAttribute('tabindex', '0');
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY)); el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+const h = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; };
+/** Kind chips explain themselves on hover. */
+function bindKinds(root = document) {
+  root.querySelectorAll('.k[data-kind]').forEach((el) => { if (el.dataset.bound) return; el.dataset.bound = 1; const k = K[el.dataset.kind], t = TW[k.twin];
+    bindTip(el, k.weapon, `${k.ch === 'a' ? 'An Arm (physical, ATK)' : `A Tome (magical, M.ATK), dealing ${k.kind}`}. Twin of the ${k.ch === 'a' ? (t.el === 'Ice' ? 'Blizzard' : t.el === 'Lightning' ? 'Thunder' : t.el) + ' Tome' : K[t.arm].weapon}: a foe ${t.el === 'Ice' ? 'of Lightning' : t.el === 'Fire' ? 'of Ice' : t.el === 'Lightning' ? 'of Fire' : t.el === 'Light' ? 'of Dark' : 'of Light'} is weak to both in Tier 1.`); });
+}
+
+const SB1 = {"brawler":{"1":{"hp":[932,140,100,105,150,0,0,0,0,1427],"mp":[166,-34,20,21,0,0,0,0,0,173],"atk":[105,11,25,21,30,8,0,0,0,200],"matk":[105,-10,0,21,0,0,0,0,0,116],"pdef":[105,11,20,21,30,0,0,0,0,187],"mdef":[101,-10,20,21,30,0,0,0,0,162],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,237,180,189,270,0,0,0,0,2173],"mp":[278,-56,36,38,0,0,0,0,0,263],"atk":[187,19,45,38,54,14,0,0,0,290],"matk":[187,-19,0,38,0,0,0,0,0,189],"pdef":[187,19,36,38,54,0,0,0,0,277],"mdef":[180,-18,36,38,54,0,0,0,0,233],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,336,260,273,390,0,0,0,0,2928],"mp":[391,-79,52,55,0,0,0,0,0,353],"atk":[270,27,65,55,78,21,0,0,0,381],"matk":[270,-27,0,55,0,0,0,0,0,264],"pdef":[270,27,52,55,78,0,0,0,0,368],"mdef":[259,-26,52,55,78,0,0,0,0,304],"offense":[270,27,65,55,78,21,177,88,88,517]}},"mage":{"1":{"hp":[932,-93,100,105,150,0,0,0,0,1194],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,-10,0,21,0,0,0,0,0,116],"matk":[105,16,25,21,30,8,0,0,0,205],"pdef":[105,-10,20,21,30,0,0,0,0,166],"mdef":[101,10,20,21,30,0,0,0,0,182],"offense":[105,16,25,21,30,8,68,0,0,273]},"2":{"hp":[1581,-158,180,189,270,0,0,0,0,1778],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,-19,0,38,0,0,0,0,0,189],"matk":[187,28,45,38,54,14,0,0,0,299],"pdef":[187,-19,36,38,54,0,0,0,0,239],"mdef":[180,17,36,38,54,0,0,0,0,268],"offense":[187,28,45,38,54,14,122,61,61,435]},"3":{"hp":[2237,-224,260,273,390,0,0,0,0,2368],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,-27,0,55,0,0,0,0,0,264],"matk":[270,41,65,55,78,21,0,0,0,395],"pdef":[270,-27,52,55,78,0,0,0,0,314],"mdef":[259,25,52,55,78,0,0,0,0,355],"offense":[270,41,65,55,78,21,177,88,88,531]}},"spellblade":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,0,20,21,0,0,0,0,0,207],"atk":[105,11,25,21,30,8,0,0,0,200],"matk":[105,-5,0,21,30,0,0,0,0,151],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,0,36,38,0,0,0,0,0,319],"atk":[187,19,45,38,54,14,0,0,0,290],"matk":[187,-9,0,38,54,0,0,0,0,229],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,0,52,55,0,0,0,0,0,432],"atk":[270,27,65,55,78,21,0,0,0,381],"matk":[270,-13,0,55,78,0,0,0,0,308],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,27,65,55,78,21,177,88,88,517]}},"summoner":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,0,20,21,0,0,0,0,0,207],"atk":[105,-5,0,21,30,0,0,0,0,151],"matk":[105,11,25,21,30,8,0,0,0,200],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,11,25,21,30,8,68,0,0,268]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,0,36,38,0,0,0,0,0,319],"atk":[187,-9,0,38,54,0,0,0,0,229],"matk":[187,19,45,38,54,14,0,0,0,290],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,19,45,38,54,14,122,61,61,426]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,0,52,55,0,0,0,0,0,432],"atk":[270,-13,0,55,78,0,0,0,0,308],"matk":[270,27,65,55,78,21,0,0,0,381],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,27,65,55,78,21,177,88,88,517]}},"paladin":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,0,25,21,30,8,0,0,0,189],"matk":[105,-21,0,21,30,0,0,0,0,135],"pdef":[105,16,20,21,30,0,0,0,0,192],"mdef":[101,0,20,21,30,0,0,0,0,172],"offense":[105,0,25,21,30,8,68,0,0,257]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,0,45,38,54,14,0,0,0,271],"matk":[187,-37,0,38,54,0,0,0,0,201],"pdef":[187,28,36,38,54,0,0,0,0,286],"mdef":[180,0,36,38,54,0,0,0,0,251],"offense":[187,0,45,38,54,14,122,61,61,407]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,0,65,55,78,21,0,0,0,354],"matk":[270,-54,0,55,78,0,0,0,0,267],"pdef":[270,41,52,55,78,0,0,0,0,382],"mdef":[259,0,52,55,78,0,0,0,0,330],"offense":[270,0,65,55,78,21,177,88,88,490]}},"cleric":{"1":{"hp":[932,0,100,105,150,0,0,0,0,1287],"mp":[166,49,20,21,0,0,0,0,0,256],"atk":[105,-21,0,21,30,0,0,0,0,135],"matk":[105,0,25,21,30,8,0,0,0,189],"pdef":[105,0,20,21,30,0,0,0,0,176],"mdef":[101,15,20,21,30,0,0,0,0,187],"offense":[105,0,25,21,30,8,68,0,0,257]},"2":{"hp":[1581,0,180,189,270,0,0,0,0,1936],"mp":[278,83,36,38,0,0,0,0,0,402],"atk":[187,-37,0,38,54,0,0,0,0,201],"matk":[187,0,45,38,54,14,0,0,0,271],"pdef":[187,0,36,38,54,0,0,0,0,258],"mdef":[180,26,36,38,54,0,0,0,0,277],"offense":[187,0,45,38,54,14,122,61,61,407]},"3":{"hp":[2237,0,260,273,390,0,0,0,0,2592],"mp":[391,117,52,55,0,0,0,0,0,549],"atk":[270,-54,0,55,78,0,0,0,0,267],"matk":[270,0,65,55,78,21,0,0,0,354],"pdef":[270,0,52,55,78,0,0,0,0,341],"mdef":[259,38,52,55,78,0,0,0,0,368],"offense":[270,0,65,55,78,21,177,88,88,490]}}};
+document.getElementById('kpis').innerHTML = [
+  ['Weapon slots a class', '5', '3', 'in every tier'], ['Armor halves to choose, Tier 1', '32 suits', '0', 'her class\'s half'],
+  ['Accessory slots', '2', '1 · 2 · 3', 'Support; + Orb; + Support'], ['Loadouts a class can wear, Tier 1', '320,000', '500', 'Brawler and Mage 100'],
+  ['A class switch costs', 'ranks', '0–30 gems', 'only unraised weapons'], ['Build values by tier', 'flat', '×1 · 1.8 · 2.6', 'SB1'],
+].map(([l, w, n, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value"><span class="was">${w} →</span> ${n}</div><div class="delta">${d}</div></div>`).join('');
+
+// ---- Template sheets
+const SUP = { brawler: ['Vampire Talisman', 'Iron Talisman'], mage: ['Siphon Amulet', 'Veil Amulet'], spellblade: ['Vampire Talisman', 'Bulwark Talisman'],
+  summoner: ['Siphon Amulet', 'Spring Amulet'], paladin: ['Thorn Talisman', 'Iron Talisman'], cleric: ['Spring Amulet', 'Ward Amulet'] };
+const SPEC = { brawler: ['Warlord', 'Berserker', 'Speed ≥ Stamina'], mage: ['Sage', 'Sorcerer', 'Wit ≥ Speed'], spellblade: ['Blademaster', 'Rune Knight', 'Power ≥ Wit'],
+  summoner: ['Conjurer', 'Warlock', 'Power ≥ Wit'], paladin: ['Templar', 'Guardian', 'Speed ≥ Stamina'], cleric: ['Bishop', 'Oracle', 'Speed ≥ Wit'] };
+const MAST = { brawler: 'Unstoppable', mage: 'Resonance', spellblade: 'Spellbind', summoner: 'Menagerie', paladin: 'Last Stand', cleric: 'Overflow' };
+const PIECES = [['Head', 'DEF'], ['Body', 'HP'], ['Legs', 'MP'], ['Arms', 'M.DEF'], ['Feet', 'Speed (evasion)']];
+const TIERC = ['var(--t1)', 'var(--t2)', 'var(--t3)'];
+let showCls = 'all';
+function sheet(c, t) {
+  const s = slotsOf(c), half = c.arms >= 2 ? 'p' : 'm', mix = t > 1 && c.id !== 'brawler' && c.id !== 'mage';
+  const w = s.map((ch, i) => `<div class="slot w" data-t="${c.name} · weapon slot ${i + 1} (${ch === 'a' ? 'Arms' : 'Tome'})" data-d="Holds any ${ch === 'a' ? 'Arm' : 'Tome'}, a different kind from her other two. Preset: ${K[c.def[i]].weapon}.${t > 1 ? ' From G5 the weapon takes a form (weapons doc); the slot keeps its channel.' : ''}"><span class="cap">${ch === 'a' ? 'Arms' : 'Tome'} · ${i + 1}</span>${kchip(c.def[i], { long: true })}</div>`).join('');
+  const a = PIECES.map(([p, st]) => `<div class="ap ${mix ? 'x' : half}" data-t="${c.name} · ${p}" data-d="${mix ? 'Physical or magical, per piece (the preset dresses her class\'s half)' : half === 'p' ? 'Physical: +ATK' : 'Magical: +M.ATK'}, and +${st} by grade. The slot holds the grade, so changing half never loses one.">${p}<small>${mix ? 'P / M' : half === 'p' ? 'Phys' : 'Mag'}</small></div>`).join('');
+  const acc = [`<div class="slot" data-t="Support" data-d="One of 5 Talismans or 5 Amulets, swapped freely; the slot holds the grade. Preset: ${SUP[c.id][0]}."><span class="cap">Support</span><span style="font-size:12px;font-weight:600">${SUP[c.id][0]}</span></div>`];
+  if (t >= 2) acc.push(`<div class="slot${t === 2 ? ' new' : ''}" data-t="Damage (an Orb)" data-d="An Orb of any of the ten kinds: offense on her hits of that kind (half a weapon's Might at its grade, × the tier under SB1). Preset: the kind of her first slot, ${K[c.def[0]].weapon}."><span class="cap">Damage</span><span style="font-size:12px;font-weight:600">${K[c.def[0]].kind} Orb</span></div>`);
+  if (t >= 3) acc.push(`<div class="slot new" data-t="Second Support" data-d="A different Talisman or Amulet from the first. Preset: ${SUP[c.id][1]}."><span class="cap">Support 2</span><span style="font-size:12px;font-weight:600">${SUP[c.id][1]}</span></div>`);
+  const choice = t === 1 ? `Class: <b>${c.name}</b>, no further choice` : t === 2 ? `<b>${SPEC[c.id][0]}</b> or <b>${SPEC[c.id][1]}</b> <span class="muted">(Ascend preselects ${SPEC[c.id][0]} if ${SPEC[c.id][2]})</span>` : `${SPEC[c.id][0]} or ${SPEC[c.id][1]}, + <b>${MAST[c.id]}</b>`;
+  const trees = ['3 trees · 3 picks · 8 nodes a tree', '3 trees · 6 picks · 14 nodes a tree', '3 trees · 9 picks · 17 nodes a tree'][t - 1];
+  const eq = ['15 held · 3 → 7 equipped', '15 held · 3 → 10 equipped', '30 held · 10 + a master slot'][t - 1];
+  return `<div class="tcard" style="--tc:${TIERC[t - 1]}"><div class="grp"><span>Weapons</span><div class="slots">${w}</div></div>
+    <div class="grp"><span>Armor</span><div class="armor">${a}</div></div><div class="grp"><span>Accessories</span><div class="slots">${acc.join('')}</div></div>
+    <div class="tline">${choice}</div><div class="tline">${trees} · ${eq}</div></div>`;
+}
+function renderSheets() {
+  document.getElementById('cls-pills').innerHTML = '<span class="lbl">Show</span>' + [['all', 'All six'], ...CLASSES.map((c) => [c.id, c.name])].map(([id, n]) => `<button data-c="${id}" aria-pressed="${showCls === id}">${id === 'all' ? '' : `<span class="cdot" style="--cc:${C[id].c}"></span>`}${n}</button>`).join('');
+  document.querySelectorAll('#cls-pills button').forEach((b) => b.addEventListener('click', () => { showCls = b.dataset.c; renderSheets(); }));
+  let g = '<div></div>' + ['Tier 1 · Apprentice', 'Tier 2 · Adept', 'Tier 3 · Master'].map((t, i) => `<div class="colhead" style="--tc:${TIERC[i]}">${t}</div>`).join('');
+  CLASSES.filter((c) => showCls === 'all' || c.id === showCls).forEach((c) => {
+    g += `<div class="rowhead"><b><span class="cdot" style="--cc:${c.c}"></span>${c.name}</b><span>${c.type} · ${c.arms} Arms + ${3 - c.arms} Tome${3 - c.arms === 1 ? '' : 's'}</span></div>` + [1, 2, 3].map((t) => sheet(c, t)).join(''); });
+  document.getElementById('tgrid').innerHTML = g;
+  document.querySelectorAll('#tgrid [data-t]').forEach((el) => bindTip(el, el.dataset.t, el.dataset.d)); bindKinds(document.getElementById('tgrid'));
+}
+renderSheets();
+
+// ---- Equippable matrix
+let mxTier = 1;
+const EXTRA = { brawler: 'Arms kinds only', mage: 'Elements only' };
+function renderMx() {
+  document.querySelectorAll('#matrix .toggle button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === mxTier));
+  let s = `<tr><th class="l">Class</th><th class="l">Slot</th>${KINDS.map((k) => `<th>${kchip(k.id)}</th>`).join('')}<th class="l">${mxTier === 1 ? 'Forms' : 'Extra kinds that count'}</th></tr>`; const rows = [];
+  CLASSES.forEach((c) => slotsOf(c).forEach((ch, i) => {
+    s += `<tr class="${i === 0 ? 'first' : ''}"><td class="l">${i === 0 ? `<b>${c.name}</b>` : ''}</td><td class="l">${i + 1} · ${ch === 'a' ? 'Arms' : 'Tome'}</td>`;
+    KINDS.forEach((k) => { const fits = k.ch === ch, def = c.def[i] === k.id, kc = TW[k.twin].c;
+      s += `<td class="cell${def ? ' def' : fits ? ' fit' : ''}" style="--kc:${kc}" data-t="${c.name} · slot ${i + 1} · ${k.weapon}" data-d="${def ? 'The default (preset).' : fits ? 'Fits: a kind of the slot\'s channel, if not in her other slots.' : `Doesn't fit: this slot takes ${ch === 'a' ? 'Arms' : 'Tomes'}.`}">${def ? i + 1 : fits ? '○' : ''}</td>`; });
+    s += `<td class="l" style="font-size:12px;color:var(--ink-soft)">${i === 0 ? (mxTier === 1 ? 'One kind a weapon' : (EXTRA[c.id] || 'Any of the ten') + (mxTier === 3 ? '; Prism up to three kinds' : '; a Dual adds one')) : ''}</td></tr>`;
+    rows.push([c.name, i + 1, ch === 'a' ? 'Arms' : 'Tome', K[c.def[i]].weapon, KINDS.filter((k) => k.ch === ch).map((k) => k.weapon).join(', ')]); }));
+  document.getElementById('mx').innerHTML = s;
+  document.querySelectorAll('#mx td.cell').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d)); bindKinds(document.getElementById('mx'));
+  document.getElementById('mx-table').innerHTML = `<table><tr><th>Class</th><th class="num">Slot</th><th>Channel</th><th>Default</th><th>Fits</th></tr>${rows.map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table><p class="foot">Spreads a class can choose: Brawler and Mage 10, the others 50. Extra kinds from forms: Brawler Arms only, Mage elements only, the four between any (GE7).</p>`;
+}
+document.querySelectorAll('#matrix .toggle button').forEach((b) => b.addEventListener('click', () => { mxTier = +b.dataset.t; renderMx(); }));
+renderMx();
+
+// ---- Switch cost
+(function () {
+  let s = `<table class="heat"><tr><th class="l" style="text-align:right">From ↓ to →</th>${CLASSES.map((c) => `<th><span class="cdot" style="--cc:${c.c}"></span> ${c.name}</th>`).join('')}</tr>`; const rows = [];
+  CLASSES.forEach((a) => { s += `<tr><th style="text-align:right">${a.name}</th>`; CLASSES.forEach((b) => {
+    if (a === b) { s += '<td class="c hna">—</td>'; return; }
+    const need = b.def.filter((k) => !a.def.includes(k)), shared = b.def.filter((k) => a.def.includes(k));
+    s += `<td class="c ${heatClass(need.length)}" data-t="${a.name} → ${b.name}: ${need.length * 10} Weapon Gems" data-d="Shared: ${shared.map((k) => K[k].weapon).join(', ') || 'none'}. To raise: ${need.map((k) => K[k].weapon).join(', ')}.">${need.length * 10}</td>`;
+    rows.push([a.name, b.name, shared.map((k) => K[k].weapon).join(', ') || '—', need.map((k) => K[k].weapon).join(', '), need.length * 10]); }); s += '</tr>'; });
+  document.getElementById('sw-heat').innerHTML = s + '</table>';
+  document.querySelectorAll('#sw-heat td.c[data-t]').forEach((td) => bindTip(td, td.dataset.t, td.dataset.d));
+  const kinds = KINDS.map((k) => [k, CLASSES.filter((c) => c.def.includes(k.id))]);
+  document.getElementById('sw-pairs').innerHTML = `<table><tr><th>Kind</th><th>Default in</th></tr>${kinds.map(([k, cs]) => `<tr><td>${kchip(k.id, { long: true })}</td><td>${cs.map((c) => `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px"><span class="cdot" style="--cc:${c.c}"></span>${c.name}</span>`).join('')}</td></tr>`).join('')}</table>`;
+  document.getElementById('sw-table').innerHTML = `<table><tr><th>From</th><th>To</th><th>Shared</th><th>To raise</th><th class="num">Weapon Gems</th></tr>${rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="num">${r[4]}</td></tr>`).join('')}</table>`;
+  bindKinds(document.getElementById('sw-pairs'));
+})();
+
+// ---- Stats under SB1
+const STATS = [['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['matk', 'M.ATK'], ['pdef', 'DEF'], ['mdef', 'M.DEF'], ['offense', 'Offense, lead kind']];
+// parts: level, lean, armor, planet, moons, template, might, orb, halo, flatTotal
+const SRC = [
+  ['level', 'Level', 'var(--neutral)', (p) => p[0] + Math.min(0, p[1]), (p) => `Her level: ${p[0]}${p[1] < 0 ? ` · class lean ${p[1]}` : ''}`],
+  ['lean', 'Class lean', 'var(--c1)', (p) => Math.max(0, p[1]), (p) => `Her class's lean: +${p[1]}`],
+  ['gear', 'Gear', 'var(--c2)', (p) => p[2] + p[6] + p[7], (p) => [p[2] && `Armor +${p[2]}`, p[6] && `Weapon Might +${p[6]}`, p[7] && `Orb +${p[7]}`].filter(Boolean).join(' · ')],
+  ['stars', 'Extra Stats', 'var(--c4)', (p) => p[3] + p[4] + p[8], (p) => [`Planet +${p[3]}`, p[4] && `Moons +${p[4]}`, p[8] && `Halo +${p[8]}`].filter(Boolean).join(' · ')],
+  ['tmpl', 'Her template', 'var(--c6)', (p) => p[5], (p) => `Her moon's lead node +${p[5]}`],
+];
+const total = (p) => p.slice(0, 9).reduce((a, b) => a + b, 0), build = (p) => p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8];
+let stCls = 'brawler', stView = 'pts';
+const fmt = (n) => n.toLocaleString('en-US');
+document.getElementById('st-legend').innerHTML = SRC.map(([, n, c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('') + '<span class="muted">A lean below 1 sits inside Level (see its tooltip)</span>';
+function renderStats() {
+  document.getElementById('st-pills').innerHTML = CLASSES.map((c) => `<button data-c="${c.id}" aria-pressed="${stCls === c.id}"><span class="cdot" style="--cc:${c.c}"></span>${c.name}</button>`).join('');
+  document.querySelectorAll('#st-pills button').forEach((b) => b.addEventListener('click', () => { stCls = b.dataset.c; renderStats(); }));
+  document.getElementById('v-pts').setAttribute('aria-pressed', stView === 'pts'); document.getElementById('v-pct').setAttribute('aria-pressed', stView === 'pct');
+  const D = SB1[stCls];
+  document.getElementById('statsheet').innerHTML = STATS.map(([k, l]) => { const t = [1, 2, 3].map((n) => total(D[n][k]));
+    return `<div class="stat"><div class="k2">${l}</div><div class="v"><span>T1</span><b>${fmt(t[0])}</b><span>T2</span><b>${fmt(t[1])}</b><span>T3</span><b>${fmt(t[2])}</b></div><div class="x">×${(t[2] / t[0]).toFixed(2)} from Tier 1 · flat drafts ${fmt(D[3][k][9])}</div></div>`; }).join('');
+  const W = 1240, labelW = 150, tierW = 40, valW = 70, rowH = 22, gap = 3, gg = 16, x0 = labelW + tierW, iw = W - x0 - valW, H = STATS.length * (3 * (rowH + gap) + gg) + 6;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${C[stCls].name}: each stat by source, per tier, under SB1">`; let y = 4; const rows = [];
+  STATS.forEach(([k, l]) => { const max = Math.max(...[1, 2, 3].map((n) => total(D[n][k])));
+    s += `<text class="val-text" x="0" y="${y + (3 * (rowH + gap)) / 2 + 4}" style="font-size:13px">${l}</text>`;
+    [1, 2, 3].forEach((n) => { const p = D[n][k], tt = total(p), scale = stView === 'pct' ? iw / tt : iw / max; let x = x0;
+      s += `<text class="axis-text" x="${labelW}" y="${y + rowH / 2 + 4}">T${n}</text>`;
+      const segs = SRC.map(([id, nm, col, val, desc]) => [id, nm, col, val(p), desc(p)]).filter((z) => z[3] > 0);
+      segs.forEach(([id, nm, col, v, desc], si) => { const w = v * scale, last = si === segs.length - 1, r = last ? Math.min(4, w) : 0, ww = Math.max(0, w - (last ? 0 : 2)), pc = Math.round(v / tt * 100);
+        s += `<path class="mark" d="M${x},${y} H${x + ww - r} Q${x + ww},${y} ${x + ww},${y + r} V${y + rowH - r} Q${x + ww},${y + rowH} ${x + ww - r},${y + rowH} H${x} Z" fill="${col}" data-t="${l} · Tier ${n} · ${nm}: ${fmt(v)} (${pc}%)" data-d="${desc}"></path>`;
+        const lbl = stView === 'pct' ? pc + '%' : fmt(v); if (ww > lbl.length * 7 + 10) s += `<text x="${x + ww / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:600;fill:${id === 'level' ? 'var(--ink)' : id === 'stars' ? '#101a24' : '#fff'};pointer-events:none">${lbl}</text>`; x += w; });
+      s += `<text class="val-text" x="${stView === 'pct' ? x0 + iw + 8 : x + 8}" y="${y + rowH / 2 + 4}">${fmt(tt)}</text>`; rows.push([l, n, p, tt]); y += rowH + gap; }); y += gg; });
+  document.getElementById('st-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#st-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('st-table').innerHTML = `<table><tr><th>Stat</th><th>Tier</th><th class="num">Level</th><th class="num">Lean</th><th class="num">Armor</th><th class="num">Might</th><th class="num">Orb</th><th class="num">Planet</th><th class="num">Moons</th><th class="num">Halo</th><th class="num">Template</th><th class="num">Total, SB1</th><th class="num">Total, flat</th><th class="num">Build share</th></tr>` +
+    rows.map(([l, n, p, tt]) => `<tr><td>${l}</td><td>T${n}</td><td class="num">${p[0]}</td><td class="num">${p[1] > 0 ? '+' : ''}${p[1]}</td><td class="num">${p[2]}</td><td class="num">${p[6]}</td><td class="num">${p[7]}</td><td class="num">${p[3]}</td><td class="num">${p[4]}</td><td class="num">${p[8]}</td><td class="num">${p[5]}</td><td class="num"><b>${fmt(tt)}</b></td><td class="num">${fmt(p[9])}</td><td class="num">${Math.round(build(p) / tt * 100)}%</td></tr>`).join('') + '</table>';
+  // shares: flat vs SB1
+  const M = [1, 1.8, 2.6]; const shRows = [];
+  document.getElementById('share').innerHTML = STATS.map(([k, l]) => { const sb = [1, 2, 3].map((n) => Math.round(build(D[n][k]) / total(D[n][k]) * 100));
+    const fl = [1, 2, 3].map((n) => { const p = D[n][k], b = Math.round(build(p) / M[n - 1]), tt = p[9]; return Math.round(b / tt * 100); });
+    shRows.push([l, fl, sb]);
+    const W2 = 170, H2 = 130, pad = { l: 6, r: 6, t: 20, b: 20 }, bw = 14, step = (W2 - pad.l - pad.r) / 3, ih = H2 - pad.t - pad.b;
+    let m = `<svg viewBox="0 0 ${W2} ${H2}" width="100%" role="img" aria-label="${l}: build share flat ${fl.join(', ')}%, SB1 ${sb.join(', ')}%"><line x1="${pad.l}" x2="${W2 - pad.r}" y1="${H2 - pad.b}" y2="${H2 - pad.b}" stroke="var(--axis)"/>`;
+    [0, 1, 2].forEach((i) => { const cx = pad.l + step * i + step / 2; [[fl[i], 'var(--neutral-strong)', -bw - 1], [sb[i], 'var(--accent)', 1]].forEach(([v, col, off]) => { const bh = v / 75 * ih, yy = H2 - pad.b - bh, x = cx + off;
+      m += `<rect x="${x}" y="${yy}" width="${bw}" height="${bh}" rx="3" fill="${col}"/><text class="val-soft" x="${x + bw / 2}" y="${yy - 4}" text-anchor="middle" style="font-size:9.5px">${v}</text>`; });
+      m += `<text class="axis-text" x="${cx}" y="${H2 - 5}" text-anchor="middle">T${i + 1}</text>`; });
+    return `<div class="mini"><h3>${l}</h3>${m}</svg></div>`; }).join('');
+  document.getElementById('share-table').innerHTML = `<table><tr><th>Stat</th><th class="num">Flat T1</th><th class="num">Flat T2</th><th class="num">Flat T3</th><th class="num">SB1 T1</th><th class="num">SB1 T2</th><th class="num">SB1 T3</th></tr>${shRows.map(([l, f, s2]) => `<tr><td>${l}</td>${f.map((v) => `<td class="num">${v}%</td>`).join('')}${s2.map((v) => `<td class="num">${v}%</td>`).join('')}</tr>`).join('')}</table><p class="foot">Offense rises in Tier 2 under both because the Orb and the Halo arrive there.</p>`;
+}
+document.getElementById('v-pts').addEventListener('click', () => { stView = 'pts'; renderStats(); });
+document.getElementById('v-pct').addEventListener('click', () => { stView = 'pct'; renderStats(); });
+renderStats();
+bindKinds();
+</script>
+</body>
+</html>
