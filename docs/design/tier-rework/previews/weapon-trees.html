@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Weapon Tree Viewer</title>
 <!-- The Tier rework's Weapon Progression (weapon-progression.md §3): every kind's weapon tree at Tier 1, 2 and 3, its
-     branches, Might, gates and items, the second-kind options and what each answers, and the coverage numbers that keep
-     weaknesses a puzzle. Numbers are the doc's (§3.1–§3.8). No external scripts, fonts or images. -->
+     branches, Might, gates and items, each weapon's two fixed partners (the owner's review, 2026-10-24: Dual partners
+     fixed, Tier 3 Tempered or Evolved), the partner map, all ten trees, every set's legal Duals, and the coverage numbers
+     that keep weaknesses a puzzle. Numbers are the doc's (§3.1–§3.8). No external scripts, fonts or images. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -214,34 +215,52 @@
   .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--ink); }
   @media (max-width: 1100px) { .vgrid { grid-template-columns: 1fr; } .builds { grid-template-columns: 1fr 1fr; } }
 </style>
+<style>
+  :root { --ev: #2f9e9e; }
+  @media (prefers-color-scheme: dark) { :root { --ev: #48c2c2; } }
+  .pgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .pgrid .panel h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pgrid .panel .cat { font-size: 12px; color: var(--ink-soft); margin: 2px 0 6px; }
+  .ten { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .tcard { background: var(--panel); border-radius: 12px; padding: 10px 10px 6px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .tcard h3 { display: flex; align-items: center; gap: 6px; font-size: 13px; flex-wrap: wrap; }
+  .tcard .pp { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .leaf { cursor: default; }
+  .leaf:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
+  .edge { cursor: default; }
+  .partner-line { font-size: 13px; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .partner-line b { color: var(--ink); }
+  @media (max-width: 1100px) { .ten { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pgrid { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 <main>
   <h1>Weapon trees, every kind and tier</h1>
   <p class="lead">Weapons own <b>which kinds</b> she hits with and <b>how hard a weak hit lands</b>, never a hit's shape. Tier 1 is a
-    straight line; at Tier 2's G5 a weapon becomes <b>Pure</b> or <b>Dual</b>; Tier 3 deepens it to <b>Keen</b> or <b>Tempered</b>. Pick a
-    kind and a tier: every grade with its Might, gate and item (hover), the branches, the second-kind options and what each
-    answers, and the caps. Below, the numbers that keep weaknesses a puzzle. From <a href="../weapon-progression.md">weapon-progression.md</a>
-    §3; the other pages: <a href="weapon-armor.html">armor</a> · <a href="weapon-accessories.html">accessories</a> ·
-    <a href="weapon-materials.html">materials</a>.</p>
+    straight line; at Tier 2's G5 a weapon becomes <b>Pure</b> or <b>Dual</b> with its <b>fixed partner</b>; in Tier 3 both lines fork again,
+    Pure to <b>Keen</b> or <b>Tempered</b>, Dual to <b>Tempered</b> or <b>Evolved</b>. The owner's review (2026-10-24) fixed the partners and
+    gave the Dual line its Tier 3 fork. Pick a kind and a tier: every grade with its Might, gate and item (hover), both partners, and the
+    caps. Below, all ten trees, the partner map, and the numbers that keep weaknesses a puzzle. From
+    <a href="../weapon-progression.md">weapon-progression.md</a> §3; the other pages: <a href="weapon-armor.html">armor</a> ·
+    <a href="weapon-accessories.html">accessories</a> · <a href="weapon-materials.html">materials</a>.</p>
 
   <nav class="top">
-    <a href="#viewer">Tree viewer</a><a href="#coverage">Coverage</a><a href="#holders">Who holds each kind</a>
-    <a href="#bosses">Bosses</a><a href="#builds">Every class's weapons</a><a href="#might">Might by tier</a>
+    <a href="#viewer">Tree viewer</a><a href="#partners">Partner map</a><a href="#allten">All ten trees</a><a href="#sets">Every set can branch</a>
+    <a href="#coverage">Coverage</a><a href="#holders">Who holds each kind</a><a href="#bosses">Bosses</a><a href="#builds">Every class's weapons</a><a href="#might">Might by tier</a>
   </nav>
 
   <div class="kpis" id="kpis"></div>
 
   <section id="viewer">
     <h2>The tree viewer</h2>
-    <p class="sub">Every kind follows the same tree; the kind decides what each branch answers. A dashed node is the G5 step, which
-      takes a Branch Gem from Tier 2. In Tier 3 the branch she arrived with decides her options.</p>
+    <p class="sub">Every kind follows the same tree; its two partners decide what the two-kind branches answer. A dashed node is the G5
+      step, which takes a Branch Gem from Tier 2. In Tier 3 the branch she arrived with decides her fork.</p>
     <div class="controls">
       <div class="pills" id="kind"></div>
     </div>
     <div class="controls">
       <div class="pills" id="tier"></div>
-      <label class="secsel" id="secwrap">Second kind (Dual, Tempered) <select id="sec"></select></label>
+      <span class="partner-line" id="partner-line"></span>
     </div>
     <div class="vgrid">
       <div class="panel tree"><div id="tree"></div>
@@ -252,11 +271,36 @@
     </div>
   </section>
 
+  <section id="partners">
+    <h2>The partner map</h2>
+    <p class="sub">Each weapon has two partners for life, both of its own channel and of the <b>other weapon group</b>: a solid line is its
+      Tier 2 partner (a Dual's and a Tempered's second kind), a dashed one its Tier 3 partner (an Evolved's). The owner fixed the six Ring
+      weapons' (left); the four Light/Dark weapons' are authored (right). Hover a line for why.</p>
+    <div class="pgrid" id="pmap"></div>
+    <div class="panel" style="margin-top:12px"><details><summary>Show the numbers</summary><div id="pmap-table"></div></details></div>
+  </section>
+
+  <section id="allten">
+    <h2>All ten trees, leaf by leaf</h2>
+    <p class="sub">Tier 2's fork (Pure or Dual) and Tier 3's two forks for each kind, with its partners named. Every two-kind leaf bridges
+      the two weapon groups; no leaf holds three kinds. Hover a leaf for its multiplier and what it answers.</p>
+    <div class="ten" id="ten"></div>
+    <div class="legend3" id="ten-legend" style="margin-top:12px"></div>
+  </section>
+
+  <section id="sets">
+    <h2>Every set can branch</h2>
+    <p class="sub">Her slotted kinds stay all different, partners included, so a weapon whose partner she already slots can't be Dual in
+      that set. The partners were picked so every class's default and reverse set keeps a legal Dual in Tier 2, and the four classes between
+      keep two two-kind weapons in Tier 3 (a mirror of an owner's pair would lock the Rune Knight, the Bishop or the Sorcerer out).</p>
+    <div class="panel"><table id="sets-table"></table></div>
+  </section>
+
   <section id="coverage">
     <h2>Coverage: weaknesses stay a puzzle</h2>
     <p class="sub">How many members of the campaign's default party answer a regular foe, weighted by the world's 48 signatures. Tier 1
-      foes are weak to a twin set; from Tier 2 a regular is weak to one kind of it. <b>The rule: never above Tier 1's line.</b> The
-      recommended caps land there; free or uncapped Duals would not.</p>
+      foes are weak to a twin set; from Tier 2 a regular is weak to one kind of it. <b>The rule: never above Tier 1's line.</b> With the
+      fixed partners and the caps the party lands at 2.0 and 2.30; without the count cap it would pass Tier 1.</p>
     <div class="panel"><div class="chart-legend" id="cov-legend"></div><div id="cov-chart"></div>
       <details><summary>Show the numbers</summary><div id="cov-table"></div></details></div>
   </section>
@@ -264,16 +308,16 @@
   <section id="holders">
     <div class="head-row"><h2>Who holds each kind</h2>
       <div class="toggle" role="group" aria-label="Healer"><button data-h="cleric" aria-pressed="true">With a Cleric</button><button data-h="paladin" aria-pressed="false">With a Paladin</button></div></div>
-    <p class="sub">Members of the default party holding each kind, on the recommended picks. Tier 1 leaves five kinds with one holder; each
-      member's one Dual in Tier 2 fills exactly those five, so every kind has two; Tier 3's second two-kind weapons add a third to some.</p>
+    <p class="sub">Members of the default party holding each kind, on the recommended picks. With a Cleric, Tier 1 leaves five kinds with one
+      holder and each member's one Dual fills exactly those five; Tier 3's second two-kind weapons add a third to some.</p>
     <div class="panel" style="overflow-x:auto"><table class="heat" id="hold"></table>
       <details><summary>Show the numbers</summary><div id="hold-table"></div></details></div>
   </section>
 
   <section id="bosses">
     <h2>Bosses keep their twins, so their shields grow with their answers</h2>
-    <p class="sub">Regulars narrow to one kind from Tier 2; bosses keep both twins, so every Dual widens the party's reach on them. The
-      draft scales a boss's shield with her answers, which keeps rounds to the first Break (shield ÷ answers) level across the tiers.</p>
+    <p class="sub">Regulars narrow to one kind from Tier 2; bosses keep both twins, so every two-kind weapon widens the party's reach on them.
+      class-progression's shields (CP8: 6 · 8 · 9) keep a shield per answer within ±0.5 of Tier 1's, so the rounds to the first Break hold.</p>
     <div class="grid2">
       <div class="panel"><h3>Answers a boss, and the shield draft</h3><div class="chart-legend" id="boss-legend"></div><div id="boss-chart"></div>
         <details><summary>Show the numbers</summary><div id="boss-table"></div></details></div>
@@ -284,9 +328,10 @@
 
   <section id="builds">
     <div class="head-row"><h2>Every class's three weapons, by tier</h2>
-      <div class="toggle" role="group" aria-label="Healer"><button data-b="cleric" aria-pressed="true">With a Cleric</button><button data-b="paladin" aria-pressed="false">With a Paladin</button></div></div>
-    <p class="sub">The recommended picks for the campaign's default party (§3.8). One two-kind weapon each in Tier 2; a second for the four
-      between in Tier 3; the Brawler and the Mage keep one. Any pick within the caps is legal; the Rift's guided builds re-spec on top.</p>
+      <div class="toggle" role="group" aria-label="Party"><button data-b="cleric" aria-pressed="true">Defaults, a Cleric</button><button data-b="paladin" aria-pressed="false">Defaults, a Paladin</button><button data-b="reverse" aria-pressed="false">Reverse sets (branch 2)</button></div></div>
+    <p class="sub">The recommended picks (§3.8): one two-kind weapon each in Tier 2; a second for the four between in Tier 3; the Brawler and
+      the Mage keep one. Any pick within the caps is legal; the Rift's guided builds re-spec on top. Branch 2's reverse sets are each Uma's
+      best alone.</p>
     <div class="builds" id="build-cards"></div>
     <div class="panel" style="margin-top:12px"><details><summary>Show the numbers</summary><div id="build-table"></div></details></div>
   </section>
@@ -303,30 +348,47 @@
 
 <script>
 const KINDS = [
-  { id: 'greatsword', name: 'Greatsword', ch: 'arms', c: 'fire', set: 'fire', group: 'Ring (main Arms)', w2: 5.5 },
-  { id: 'axe', name: 'Axe', ch: 'arms', c: 'ice', set: 'ice', group: 'Ring (main Arms)', w2: 5.5 },
-  { id: 'lance', name: 'Lance', ch: 'arms', c: 'ltn', set: 'lightning', group: 'Ring (main Arms)', w2: 4.75 },
-  { id: 'bow', name: 'Bow', ch: 'arms', c: 'light', set: 'light', group: 'Light/Dark (secondary Arms)', w2: 4.25 },
-  { id: 'katana', name: 'Katana', ch: 'arms', c: 'dark', set: 'dark', group: 'Light/Dark (secondary Arms)', w2: 5 },
-  { id: 'fire', name: 'Fire Tome', short: 'Fire', ch: 'tome', c: 'fire', set: 'fire', group: 'Ring (elemental Tomes)', w2: 5.5 },
-  { id: 'ice', name: 'Blizzard Tome', short: 'Ice', ch: 'tome', c: 'ice', set: 'ice', group: 'Ring (elemental Tomes)', w2: 5.5 },
-  { id: 'lightning', name: 'Thunder Tome', short: 'Lightning', ch: 'tome', c: 'ltn', set: 'lightning', group: 'Ring (elemental Tomes)', w2: 4.75 },
-  { id: 'light', name: 'Light Tome', short: 'Light', ch: 'tome', c: 'light', set: 'light', group: 'Light/Dark (arcane Tomes)', w2: 3.25 },
-  { id: 'dark', name: 'Dark Tome', short: 'Dark', ch: 'tome', c: 'dark', set: 'dark', group: 'Light/Dark (arcane Tomes)', w2: 4 },
+  { id: 'greatsword', name: 'Greatsword', ch: 'arms', c: 'fire', set: 'fire', group: 'Ring', w2: 5.5 },
+  { id: 'axe', name: 'Axe', ch: 'arms', c: 'ice', set: 'ice', group: 'Ring', w2: 5.5 },
+  { id: 'lance', name: 'Lance', ch: 'arms', c: 'ltn', set: 'lightning', group: 'Ring', w2: 4.75 },
+  { id: 'bow', name: 'Bow', ch: 'arms', c: 'light', set: 'light', group: 'Light/Dark', w2: 4.25 },
+  { id: 'katana', name: 'Katana', ch: 'arms', c: 'dark', set: 'dark', group: 'Light/Dark', w2: 5 },
+  { id: 'fire', name: 'Fire Tome', short: 'Fire', ch: 'tome', c: 'fire', set: 'fire', group: 'Ring', w2: 5.5 },
+  { id: 'ice', name: 'Blizzard Tome', short: 'Ice', ch: 'tome', c: 'ice', set: 'ice', group: 'Ring', w2: 5.5 },
+  { id: 'lightning', name: 'Thunder Tome', short: 'Lightning', ch: 'tome', c: 'ltn', set: 'lightning', group: 'Ring', w2: 4.75 },
+  { id: 'light', name: 'Light Tome', short: 'Light', ch: 'tome', c: 'light', set: 'light', group: 'Light/Dark', w2: 3.25 },
+  { id: 'dark', name: 'Dark Tome', short: 'Dark', ch: 'tome', c: 'dark', set: 'dark', group: 'Light/Dark', w2: 4 },
 ];
 const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
 const SETS = { fire: { n: 'Fire', w: 11, foe: 'Ice', arm: 'greatsword' }, ice: { n: 'Ice', w: 11, foe: 'Lightning', arm: 'axe' },
   lightning: { n: 'Lightning', w: 9.5, foe: 'Fire', arm: 'lance' }, light: { n: 'Light', w: 6.5, foe: 'Dark', arm: 'bow' }, dark: { n: 'Dark', w: 8, foe: 'Light', arm: 'katana' } };
+const TWINS = { fire: ['greatsword', 'fire'], ice: ['axe', 'ice'], lightning: ['lance', 'lightning'], light: ['bow', 'light'], dark: ['katana', 'dark'], twilight: ['bow', 'katana'] };
+const TW = { fire: 11, ice: 11, lightning: 9.5, light: 6.5, dark: 8, twilight: 2 };
 const T1W = (id) => SETS[K[id].set].w + (id === 'bow' || id === 'katana' ? 2 : 0);
+// The partner table (WP32): the owner's six Ring rows, the four authored Light/Dark rows.
+const P1 = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 'light', lightning: 'light', bow: 'greatsword', katana: 'axe', light: 'fire', dark: 'ice' };
+const P2 = { greatsword: 'katana', axe: 'katana', lance: 'bow', fire: 'light', ice: 'dark', lightning: 'dark', bow: 'lance', katana: 'lance', light: 'lightning', dark: 'lightning' };
+const WHY = {
+  bow: ['Twin logic: the Light twins Dual into the Fire twins in both channels (Bow + Greatsword, Light + Fire). Coverage: the Greatsword is one of the five kinds the default party holds once.', 'The Lightning twins, the one Ring set no Tier 2 reverse partner reaches, are Tier 3\'s evolution.'],
+  katana: ['The Dark twins Dual into the Ice twins in both channels. Coverage: the Axe is the party\'s third single-held Ring kind. Katana + Lance (the mirror of the owner\'s Lance + Katana) would lock the Rune Knight, who slots both.', 'The Lightning twins, Tier 3\'s evolution for all four.'],
+  light: ['Twin logic, as the Bow: the Light twins into the Fire twins. Coverage: the Fire Tome is held once by the default party. Light + Ice (a mirror) would lock the Bishop and the Sorcerer, who slot both.', 'The Lightning twins, Tier 3\'s evolution.'],
+  dark: ['The Dark twins into the Ice twins, as the Katana. Dark + Fire (a mirror) would leave the Ice twins without a reverse partner.', 'The Lightning twins, Tier 3\'s evolution.'],
+};
 const MIGHT = {"1": [0, 1, 4, 8, 12, 19, 26, 35, 45, 57, 68], "2": [0, 2, 7, 14, 22, 34, 47, 63, 81, 103, 122], "3": [0, 3, 10, 21, 31, 49, 68, 91, 117, 148, 177]};
-const WEAK = { base: 1.3, pure: 1.5, dual: 1.3, keen: 1.7, tempered: 1.5 };
-const BR = { base: ['Base', 'var(--neutral-strong)'], pure: ['Pure', 'var(--c1)'], dual: ['Dual', 'var(--c2)'], keen: ['Keen', 'var(--c3)'], tempered: ['Tempered', 'var(--c5)'] };
+const WEAK = { base: 1.3, pure: 1.5, dual: 1.3, keen: 1.7, tempered: 1.5, evolved: 1.5 };
+const BR = { base: ['Base', 'var(--neutral-strong)'], pure: ['Pure', 'var(--c1)'], dual: ['Dual', 'var(--c2)'], keen: ['Keen', 'var(--c3)'], tempered: ['Tempered', 'var(--c5)'], evolved: ['Evolved', 'var(--ev)'] };
+const secondOf = (br, k) => (br === 'dual' || br === 'tempered') ? P1[k] : br === 'evolved' ? P2[k] : null;
 const LV = (g) => 5 * g - 4;
 const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
 const nm = (id) => K[id].short || K[id].name;
-const fmt = (n) => (Math.round(n * 100) / 100).toString();
 const chip = (id, label) => `<span class="k ${K[id].ch === 'arms' ? 'arm' : 'tome'} ${K[id].c}" style="--kc:var(--k-${K[id].c})">${label || K[id].name}</span>`;
 const chB = (ch) => ch === 'arms' ? '<span class="ch a">Arms</span>' : '<span class="ch t">Tome</span>';
+const NAMES = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' };
+const COLS = { brawler: 'var(--cl-brawler)', mage: 'var(--cl-mage)', spellblade: 'var(--cl-spellblade)', summoner: 'var(--cl-summoner)', paladin: 'var(--cl-paladin)', cleric: 'var(--cl-cleric)' };
+const DEF = { brawler: ['greatsword', 'axe', 'lance'], mage: ['fire', 'ice', 'lightning'], spellblade: ['katana', 'lance', 'lightning'], summoner: ['dark', 'light', 'bow'], paladin: ['greatsword', 'axe', 'light'], cleric: ['light', 'ice', 'bow'] };
+const REV = { brawler: ['bow', 'katana', 'axe'], mage: ['light', 'dark', 'ice'], spellblade: ['katana', 'bow', 'dark'], summoner: ['fire', 'lightning', 'greatsword'], paladin: ['bow', 'katana', 'light'], cleric: ['light', 'fire', 'greatsword'] };
+const BRANCH2 = { brawler: ['Berserker', 'Warlord'], mage: ['Sage', 'Sorcerer'], spellblade: ['Rune Knight', 'Blademaster'], summoner: ['Warlock', 'Conjurer'], paladin: ['Guardian', 'Templar'], cleric: ['Bishop', 'Oracle'] };
+const PURE_CLASS = new Set(['brawler', 'mage']);
 
 const tip = document.getElementById('tip');
 function bindTip(el, title, body) {
@@ -337,27 +399,25 @@ function bindTip(el, title, body) {
   el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
 }
+const answers = (id) => `${SETS[K[id].set].n} twins${id === 'bow' || id === 'katana' ? ' and Twilight' : ''}; ${K[id].w2} of 48 regulars from Tier 2`;
 
 // ---- KPIs
 const KPI = [
-  ['Answers a regular (party)', '2.47 · 2.0 · 2.34', 'Tier 1 · 2 · 3: never above Tier 1'],
+  ['Answers a regular (party)', '2.47 · 2.0 · 2.30', 'Tier 1 · 2 · 3: never above Tier 1'],
   ['A weak hit, at most', '×1.3 · ×1.5 · ×1.7', 'Base · Pure · Keen'],
   ['Two-kind weapons in her slots', '0 · 1 · 2', 'Brawler and Mage: 1 for good'],
   ['Kinds she holds, at most', '3 · 4 · 5', 'never all five of a channel'],
-  ['Might at G10', '68 · 122 · 177', 'Tier 1 × 1, × 1.8, × 2.6'],
+  ['Partners a weapon', '2, fixed', 'Tier 2 (Dual, Tempered) · Tier 3 (Evolved)'],
   ['Branch Gems an Uma', '0 · 3 · 3', 'one item a tier, branch picked when used'],
 ];
 document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="delta">${d}</div></div>`).join('');
 
-// ---- Viewer state
-let kind = 'greatsword', tier = 2, second = null;
-const otherSame = (id) => KINDS.filter((k) => k.ch === K[id].ch && k.id !== id);
-const bestSecond = (id) => otherSame(id).slice().sort((a, b) => b.w2 - a.w2)[0].id;
+// ---- Viewer
+let kind = 'greatsword', tier = 3;
 document.getElementById('kind').innerHTML = '<span class="lbl">Kind</span>' + KINDS.map((k) => `<button data-k="${k.id}" aria-pressed="false"><span aria-hidden="true" style="width:10px;height:10px;border-radius:50%;display:inline-block;border:2px solid var(--k-${k.c});background:${k.ch === 'tome' ? 'var(--k-' + k.c + ')' : 'transparent'}"></span>${k.name}</button>`).join('');
 document.getElementById('tier').innerHTML = '<span class="lbl">Tier</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
-document.querySelectorAll('#kind button').forEach((b) => b.addEventListener('click', () => { kind = b.dataset.k; second = null; render(); }));
+document.querySelectorAll('#kind button').forEach((b) => b.addEventListener('click', () => { kind = b.dataset.k; render(); }));
 document.querySelectorAll('#tier button').forEach((b) => b.addEventListener('click', () => { tier = +b.dataset.t; render(); }));
-document.getElementById('sec').addEventListener('change', (e) => { second = e.target.value; render(); });
 document.getElementById('tree-legend').innerHTML = Object.entries(BR).map(([id, [n, c]]) => `<span><i style="--bc:${c}"></i>${n} · weak ×${WEAK[id]}</span>`).join('') +
   '<span><i style="--bc:var(--accent);border-style:dashed;background:transparent"></i>G5: a Branch Gem (Tier 2 on)</span><span class="muted">Hover a grade for its gate, item, Might, multiplier and kinds.</span>';
 
@@ -366,22 +426,24 @@ function layout(t) {
   if (t === 2) return { H: 210, blocks: [{ title: 'Arrives Base', sub: 'every Tier 1 weapon', y: 105 }],
     rows: [{ y: 105, br: 'base', from: 0, to: 4, lin: 'base' }, { y: 45, br: 'pure', from: 5, to: 10, lin: 'base' }, { y: 165, br: 'dual', from: 5, to: 10, lin: 'base' }],
     links: [[105, 45, 'pure'], [105, 165, 'dual']] };
-  return { H: 520, blocks: [{ title: 'Arrives Pure', sub: 'Keen or Tempered', y: 100 }, { title: 'Arrives Dual', sub: 'Tempered', y: 270 }, { title: 'Arrives Base', sub: 'the Tier 2 step, late', y: 420 }],
-    rows: [{ y: 100, br: 'pure', from: 0, to: 4, lin: 'pure' }, { y: 42, br: 'keen', from: 5, to: 10, lin: 'pure' }, { y: 158, br: 'tempered', from: 5, to: 10, lin: 'pure' },
-      { y: 270, br: 'dual', from: 0, to: 4, lin: 'dual' }, { y: 270, br: 'tempered', from: 5, to: 10, lin: 'dual' },
-      { y: 420, br: 'base', from: 0, to: 4, lin: 'base' }, { y: 362, br: 'pure', from: 5, to: 10, lin: 'base' }, { y: 478, br: 'dual', from: 5, to: 10, lin: 'base' }],
-    links: [[100, 42, 'keen'], [100, 158, 'tempered'], [270, 270, 'tempered'], [420, 362, 'pure'], [420, 478, 'dual']] };
+  return { H: 560, blocks: [{ title: 'Arrives Pure', sub: 'Keen or Tempered', y: 95 }, { title: 'Arrives Dual', sub: 'Tempered or Evolved', y: 280 }, { title: 'Arrives Base', sub: 'the Tier 2 step, late', y: 465 }],
+    rows: [{ y: 95, br: 'pure', from: 0, to: 4, lin: 'pure' }, { y: 40, br: 'keen', from: 5, to: 10, lin: 'pure' }, { y: 150, br: 'tempered', from: 5, to: 10, lin: 'pure' },
+      { y: 280, br: 'dual', from: 0, to: 4, lin: 'dual' }, { y: 225, br: 'tempered', from: 5, to: 10, lin: 'dual' }, { y: 335, br: 'evolved', from: 5, to: 10, lin: 'dual' },
+      { y: 465, br: 'base', from: 0, to: 4, lin: 'base' }, { y: 410, br: 'pure', from: 5, to: 10, lin: 'base' }, { y: 520, br: 'dual', from: 5, to: 10, lin: 'base' }],
+    links: [[95, 40, 'keen'], [95, 150, 'tempered'], [280, 225, 'tempered'], [280, 335, 'evolved'], [465, 410, 'pure'], [465, 520, 'dual']] };
 }
-function itemOf(t, g, br) {
-  if (g === 0) return 'Owned at G0 (the Training weapon)';
-  if (t >= 2 && g === 5) return `1 Branch Gem (4 refined: the G5 Weapon Gem in Tier ${t}'s pair, ${wgMats(t, 5)}); she picks ${br === 'keen' || br === 'tempered' ? 'Keen or Tempered' : br === 'pure' || br === 'dual' ? 'Pure or Dual' : ''} here`;
-  return `1 Weapon Gem G${g} (4 refined: ${wgMats(t, g)})`;
-}
-// profession-progression's ladder (PP9): Tier 2 moves G5 and G10 onto its pair; Tier 3 G4 and G9 onto Tier 2's, G5 and G10 onto its own.
 const WGM = { 1: ['Copper Ingot', 'Pine Plank', 'Iron Ingot', 'Oak Plank'], 2: ['Silver Ingot', 'Mahogany Plank', 'Titanium Ingot', 'Ebony Plank'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Orichalcum Ingot', 'Yggdrasil Plank'] };
 function wgMats(t, g) {
   const p = t >= 2 && (g === 5 || g === 10) ? t : t === 3 && (g === 4 || g === 9) ? 2 : 1, m = WGM[p];
   return g <= 5 ? `2 ${m[0]}, 2 ${m[1]}` : `2 ${m[2]}, 2 ${m[3]}`;
+}
+function itemOf(t, g, lin) {
+  if (g === 0) return 'Owned at G0 (the Training weapon)';
+  if (t >= 2 && g === 5) {
+    const pick = t === 2 ? `Pure or Dual + ${nm(P1[kind])}` : lin === 'pure' ? `Keen or Tempered + ${nm(P1[kind])}` : lin === 'dual' ? `Tempered + ${nm(P1[kind])} or Evolved + ${nm(P2[kind])}` : `Pure or Dual + ${nm(P1[kind])}`;
+    return `1 Branch Gem (4 refined: the G5 Weapon Gem in Tier ${t}'s pair, ${wgMats(t, 5)}); she picks ${pick} here`;
+  }
+  return `1 Weapon Gem G${g} (4 refined: ${wgMats(t, g)})`;
 }
 function treeSvg() {
   const L = layout(tier), X0 = 168, STEP = 64, NW = 52, NH = 38, W = 1000;
@@ -397,56 +459,58 @@ function treeSvg() {
   });
   const rowsOut = [];
   L.rows.forEach((r) => {
-    const col = BR[r.br][1];
+    const col = BR[r.br][1], sec = secondOf(r.br, kind);
     for (let g = r.from; g < r.to; g++) s += `<line x1="${x(g) + NW / 2}" x2="${x(g + 1) - NW / 2}" y1="${r.y}" y2="${r.y}" stroke="${col}" stroke-width="2"/>`;
     for (let g = r.from; g <= r.to; g++) {
       const fork = tier >= 2 && g === 5, m = MIGHT[tier][g];
-      const twoKinds = r.br === 'dual' || r.br === 'tempered';
-      const kinds = twoKinds ? [kind, second] : [kind];
-      const title = `${K[kind].name} · G${g} · Tier ${tier} · ${BR[r.br][0]}${twoKinds ? ' + ' + nm(second) : ''}`;
-      const body = `${g ? `Worn at Uma Lv ${LV(g)} · made at Craft Lv ${LV(g)}<br>` : ''}${itemOf(tier, g, r.br)}<br>Might ${m} · a weak hit ×${WEAK[r.br]} · kinds: ${kinds.map(nm).join(', ')}`;
-      rowsOut.push([r.lin, BR[r.br][0] + (twoKinds ? ' + ' + nm(second) : ''), g, g ? LV(g) : '—', g === 0 ? 'Owned' : fork ? 'Branch Gem' : 'Weapon Gem', m, '×' + WEAK[r.br], kinds.map(nm).join(', ')]);
+      const kinds = sec ? [kind, sec] : [kind];
+      const label = BR[r.br][0] + (sec ? ' + ' + nm(sec) : '');
+      const title = `${K[kind].name} · G${g} · Tier ${tier} · ${label}`;
+      const body = `${g ? `Worn at Uma Lv ${LV(g)} · made at Craft Lv ${LV(g)}<br>` : ''}${itemOf(tier, g, r.lin)}<br>Might ${m} · a weak hit ×${WEAK[r.br]} · kinds: ${kinds.map(nm).join(', ')}`;
+      rowsOut.push([r.lin, label, g, g ? LV(g) : '—', g === 0 ? 'Owned' : fork ? 'Branch Gem' : 'Weapon Gem', m, '×' + WEAK[r.br], kinds.map(nm).join(', ')]);
       s += `<g class="node" data-t="${title}" data-d="${body.replace(/"/g, '&quot;')}"><rect x="${x(g) - NW / 2}" y="${r.y - NH / 2}" width="${NW}" height="${NH}" rx="8" fill="color-mix(in srgb, ${col} ${g === 0 ? 6 : 16}%, var(--panel))" stroke="${fork ? 'var(--accent)' : col}" stroke-width="${fork ? 2 : 1.5}" ${fork ? 'stroke-dasharray="4 3"' : ''}/>` +
         `<text x="${x(g)}" y="${r.y - 3}" text-anchor="middle" class="val-text" style="font-size:12px">G${g}</text><text x="${x(g)}" y="${r.y + 12}" text-anchor="middle" class="val-soft" style="font-size:10px">${g ? 'Might ' + m : 'owned'}</text></g>`;
     }
-    const lx = x(r.to) + NW / 2 + 10;
     if (r.to === 10) {
-      const two = r.br === 'dual' || r.br === 'tempered';
-      s += `<text x="${lx}" y="${r.y - 3}" class="val-text" style="font-size:12.5px;fill:${col}">${BR[r.br][0]}${two ? ' + ' + nm(second) : ''}</text><text x="${lx}" y="${r.y + 12}" class="val-soft">${two ? 'two kinds' : 'one kind'} · weak ×${WEAK[r.br]}</text>`;
+      const lx = x(r.to) + NW / 2 + 10;
+      s += `<text x="${lx}" y="${r.y - 3}" class="val-text" style="font-size:12.5px;fill:${col}">${BR[r.br][0]}${sec ? ' + ' + nm(sec) : ''}</text><text x="${lx}" y="${r.y + 12}" class="val-soft">${sec ? 'two kinds' : 'one kind'} · weak ×${WEAK[r.br]}</text>`;
     }
   });
   return { svg: s + '</svg>', rows: rowsOut };
 }
+function blockedFor(id, partner) {
+  const out = [];
+  Object.entries(DEF).forEach(([c, ks]) => { if (ks.includes(id) && ks.includes(partner)) out.push(BRANCH2[c][0]); });
+  Object.entries(REV).forEach(([c, ks]) => { if (ks.includes(id) && ks.includes(partner)) out.push(BRANCH2[c][1]); });
+  return out;
+}
 function side() {
   const k = K[kind], st = SETS[k.set];
-  const t1 = T1W(kind);
   let h = `<h3>${chip(kind)} ${chB(k.ch)} <span class="muted" style="font-weight:500;font-size:12px">group: ${k.group}</span></h3>`;
   h += `<div class="row">Twin: ${chip(k.ch === 'arms' ? k.set : st.arm)} · the <b>${st.n} twins</b></div>`;
-  h += `<div class="row"><b>Tier 1:</b> answers the ${st.n} twins (${st.foe} foes)${kind === 'bow' || kind === 'katana' ? ' and Twilight (Light + Dark foes)' : ''}: <b>${t1} of 48</b> signatures.</div>`;
+  h += `<div class="row"><b>Tier 1:</b> answers the ${st.n} twins (${st.foe} foes)${kind === 'bow' || kind === 'katana' ? ' and Twilight (Light + Dark foes)' : ''}: <b>${T1W(kind)} of 48</b> signatures.</div>`;
   h += `<div class="row"><b>From Tier 2:</b> regulars weak to ${nm(kind)} alone: <b>${k.w2} of 48</b>; bosses keep the ${st.n} twins.</div>`;
-  if (tier >= 2) {
-    h += `<div class="row" style="margin-top:12px"><b>Second-kind options</b> (its own channel; coverage only, every bonus reads ${nm(kind)}):</div>`;
-    h += `<table><tr><th>Adds</th><th class="num">Regulars weak to it</th><th>Boss twins it adds</th></tr>` + otherSame(kind).sort((a, b) => b.w2 - a.w2).map((o) =>
-      `<tr${o.id === second ? ' style="background:var(--raised)"' : ''}><td>${chip(o.id, nm(o.id))}</td><td class="num">${o.w2} / 48</td><td>${SETS[o.set].n}${o.id === 'bow' || o.id === 'katana' ? ', Twilight' : ''}</td></tr>`).join('') + '</table>';
-  }
+  const owner = k.group === 'Ring';
+  h += `<div class="row" style="margin-top:12px"><b>Its partners</b> (${owner ? 'the owner\'s Tier 2 partner; Tier 3 the other sub weapon' : 'authored'}; coverage only, every bonus reads ${nm(kind)}):</div>`;
+  h += `<table><tr><th>Partner</th><th>Tier</th><th>Answers</th></tr>` +
+    [[P1[kind], tier >= 2 ? 'Tier 2: Dual, Tempered' : 'Tier 2 on: Dual, Tempered'], [P2[kind], 'Tier 3: Evolved']].map(([p, t]) => `<tr><td>${chip(p, nm(p))}</td><td>${t}</td><td>${answers(p)}</td></tr>`).join('') + '</table>';
+  if (!owner) h += `<div class="cap"><b>Why these</b><ul><li>${WHY[kind][0]}</li><li>${WHY[kind][1]}</li></ul></div>`;
+  const bl = blockedFor(kind, P1[kind]);
+  h += `<div class="row">Sets that slot both it and its Tier 2 partner (no Dual from it there): <b>${bl.join(', ') || 'none'}</b>.</div>`;
   const caps = { 1: ['No branch: one kind, weak ×1.3', 'Three different kinds in her slots', 'A weak hit at most ×1.3'],
-    2: ['One two-kind weapon in her three slots', 'Kinds she holds: at most 4', 'A weak hit at most ×1.5', 'Re-forge: another Branch Gem, the grade stays'],
-    3: ['Two two-kind weapons; the Brawler and the Mage one', 'Kinds: at most 5 (Brawler, Mage 4); never all five of a channel', 'A weak hit at most ×1.7', 'A Pure keeps both doors; a Dual commits to Tempered'] };
+    2: ['One two-kind weapon in her three slots', 'Kinds she holds: at most 4', 'A weak hit at most ×1.5', 'Re-forge: another Branch Gem, Pure ↔ Dual, the grade stays'],
+    3: ['Two two-kind weapons; the Brawler and the Mage one', 'Kinds: at most 5 (Brawler, Mage 4); never all five of a channel', 'A weak hit at most ×1.7', 'Every line forks: Pure to Keen or Tempered, Dual to Tempered or Evolved'] };
   h += `<div class="cap"><b>Tier ${tier}'s limits</b><ul>${caps[tier].map((c) => `<li>${c}</li>`).join('')}</ul></div>`;
-  const who = k.ch === 'arms' ? 'Brawler, Spell Blade, Summoner, Paladin, Cleric' : 'Mage, Spell Blade, Summoner, Paladin, Cleric';
-  const DEF = { brawler: ['greatsword', 'axe', 'lance'], mage: ['fire', 'ice', 'lightning'], spellblade: ['katana', 'lance', 'lightning'], summoner: ['dark', 'light', 'bow'], paladin: ['greatsword', 'axe', 'light'], cleric: ['light', 'ice', 'bow'] };
-  const NAMES = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' };
   const dflt = Object.entries(DEF).filter(([, ks]) => ks.includes(kind)).map(([c]) => NAMES[c]);
-  h += `<div class="row">Slotted by: ${who}. In the defaults of: <b>${dflt.join(', ') || 'none'}</b>.</div>`;
+  const rev = Object.entries(REV).filter(([, ks]) => ks.includes(kind)).map(([c]) => BRANCH2[c][1]);
+  h += `<div class="row">In the defaults of: <b>${dflt.join(', ') || 'none'}</b>; in the reverse sets of: <b>${rev.join(', ') || 'none'}</b>.</div>`;
   return h;
 }
 function render() {
-  if (!second || second === kind || K[second].ch !== K[kind].ch) second = bestSecond(kind);
   document.querySelectorAll('#kind button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.k === kind));
   document.querySelectorAll('#tier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === tier));
-  const sel = document.getElementById('sec');
-  sel.innerHTML = otherSame(kind).map((o) => `<option value="${o.id}"${o.id === second ? ' selected' : ''}>+ ${nm(o.id)}</option>`).join('');
-  document.getElementById('secwrap').style.visibility = tier >= 2 ? 'visible' : 'hidden';
+  document.getElementById('partner-line').innerHTML = tier === 1 ? '<span class="muted">Tier 1 has no branch.</span>' :
+    `Partners: <b>Tier 2</b> ${chip(P1[kind], nm(P1[kind]))}${tier === 3 ? ` · <b>Tier 3</b> ${chip(P2[kind], nm(P2[kind]))}` : ''} <span class="muted">(fixed: nothing to pick but the branch)</span>`;
   const { svg, rows } = treeSvg();
   document.getElementById('tree').innerHTML = svg;
   document.querySelectorAll('#tree .node').forEach((n) => bindTip(n, n.dataset.t, n.dataset.d));
@@ -457,15 +521,129 @@ function render() {
 }
 render();
 
+// ---- Partner map: four bipartite panels
+(function () {
+  const panels = [
+    ['arms', 'ring', 'Arms: Ring weapons → their partners', 'The owner\'s (2026-10-24): Greatsword, Axe → Bow; Lance → Katana. Tier 3: the other sub weapon.'],
+    ['tome', 'ring', 'Tomes: Ring weapons → their partners', 'The owner\'s: Fire → Dark; Ice, Lightning → Light. Tier 3: the other sub weapon.'],
+    ['arms', 'ld', 'Arms: Light/Dark weapons → their partners', 'Authored: Bow → Greatsword, Katana → Axe; Tier 3 both → Lance.'],
+    ['tome', 'ld', 'Tomes: Light/Dark weapons → their partners', 'Authored: Light → Fire, Dark → Ice; Tier 3 both → Lightning.'],
+  ];
+  const html = panels.map(([ch, from, title, cat], pi) => {
+    const src = KINDS.filter((k) => k.ch === ch && (from === 'ring' ? k.group === 'Ring' : k.group !== 'Ring'));
+    const dst = KINDS.filter((k) => k.ch === ch && (from === 'ring' ? k.group !== 'Ring' : k.group === 'Ring'));
+    const W = 560, H = 230, NWd = 132, NHt = 30;
+    const ys = (n, i) => H / 2 + (i - (n - 1) / 2) * 62;
+    const sx = 24, dx = W - 24 - NWd;
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${title}">`;
+    s += `<defs><marker id="ah${pi}a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--c2)"/></marker><marker id="ah${pi}b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ev)"/></marker></defs>`;
+    const pos = {};
+    src.forEach((k, i) => { pos[k.id] = [sx + NWd, ys(src.length, i)]; });
+    dst.forEach((k, i) => { pos['d' + k.id] = [dx, ys(dst.length, i)]; });
+    src.forEach((k) => {
+      [[P1[k.id], 'a', 'var(--c2)', '', -5, 'Tier 2 partner: Dual, Tempered'], [P2[k.id], 'b', 'var(--ev)', 'stroke-dasharray="6 4"', 5, 'Tier 3 partner: Evolved']].forEach(([p, m, col, dash, off, what]) => {
+        const [x1, y1] = pos[k.id], [x2, y2] = pos['d' + p], mx = (x1 + x2) / 2;
+        const why = from === 'ring' ? (m === 'a' ? 'The owner\'s fixed Tier 2 partner.' : 'The owner\'s "Dual paths branch to the other sub weapons".') : WHY[k.id][m === 'a' ? 0 : 1];
+        s += `<path class="edge" d="M${x1 + 2},${y1 + off} C${mx},${y1 + off} ${mx},${y2 + off} ${x2 - 4},${y2 + off}" fill="none" stroke="${col}" stroke-width="2.5" ${dash} marker-end="url(#ah${pi}${m})" data-t="${nm(k.id)} → ${nm(p)}" data-d="${what}. ${why.replace(/"/g, '&quot;')}"/>`;
+      });
+    });
+    const node = (k, x, y) => `<rect x="${x}" y="${y - NHt / 2}" width="${NWd}" height="${NHt}" rx="8" fill="${k.ch === 'tome' ? 'var(--k-' + k.c + ')' : 'var(--panel)'}" stroke="var(--k-${k.c})" stroke-width="2"/><text x="${x + NWd / 2}" y="${y + 4.5}" text-anchor="middle" class="val-text" style="font-size:12.5px;fill:${k.ch === 'tome' ? (k.c === 'ltn' ? '#1b1300' : 'var(--on-k)') : 'var(--k-' + k.c + ')'}">${k.name}</text>`;
+    src.forEach((k, i) => { s += node(k, sx, ys(src.length, i)); });
+    dst.forEach((k, i) => { s += node(k, dx, ys(dst.length, i)); });
+    s += `<text x="${sx}" y="16" class="axis-text">${from === 'ring' ? 'Ring' : 'Light/Dark'}</text><text x="${dx + NWd}" y="16" class="axis-text" text-anchor="end">${from === 'ring' ? 'Light/Dark' : 'Ring'}</text>`;
+    return `<div class="panel"><h3>${title}</h3><div class="cat">${cat}</div>${s}</svg></div>`;
+  }).join('');
+  document.getElementById('pmap').innerHTML = html;
+  document.querySelectorAll('#pmap .edge').forEach((e) => bindTip(e, e.dataset.t, e.dataset.d));
+  document.getElementById('pmap-table').innerHTML = `<table><tr><th>Weapon</th><th>Group</th><th>Tier 2 partner (Dual, Tempered)</th><th>Tier 3 partner (Evolved)</th><th>Whose, and why</th></tr>` +
+    KINDS.map((k) => `<tr><td>${k.name}</td><td>${k.group}</td><td>${K[P1[k.id]].name}</td><td>${K[P2[k.id]].name}</td><td>${k.group === 'Ring' ? 'The owner\'s; Tier 3 the other sub weapon' : 'Authored. ' + WHY[k.id][0]}</td></tr>`).join('') + '</table>' +
+    '<p class="foot">Alternatives (default party, best picks, Tier 2 · Tier 3 answers a regular with a Cleric): twin mirrors with mutual pairs 2.00 · 2.18; all mirrors 1.95 · 2.08; the Lightning twins first 1.98 · 2.27; this table 2.00 · 2.30, every kind held twice from Tier 2.</p>';
+})();
+
+// ---- All ten trees
+(function () {
+  const leaf = (x, y, w, br, k, t) => {
+    const sec = secondOf(br, k), col = BR[br][1];
+    const title = `Tier ${t} · ${BR[br][0]} ${nm(k)}${sec ? ' + ' + nm(sec) : ''}`;
+    const body = `A weak hit ×${WEAK[br]} · ${sec ? `two kinds: ${nm(k)} and ${nm(sec)}<br>${nm(sec)} adds the ${answers(sec)}` : 'one kind'}`;
+    return `<g class="leaf" data-t="${title}" data-d="${body}"><rect x="${x}" y="${y - 15}" width="${w}" height="30" rx="7" fill="color-mix(in srgb, ${col} 16%, var(--panel))" stroke="${col}" stroke-width="1.5"/>` +
+      `<text x="${x + 5}" y="${y - 2}" class="val-text" style="font-size:10.5px;fill:${col}">${BR[br][0]}</text><text x="${x + 5}" y="${y + 10}" class="val-soft" style="font-size:9.5px">${sec ? '+ ' + nm(sec) : 'one kind'}</text></g>`;
+  };
+  const link = (x1, y1, x2, y2, col) => { const mx = (x1 + x2) / 2; return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${col}" stroke-width="1.6"/>`; };
+  document.getElementById('ten').innerHTML = KINDS.map((k) => {
+    const W = 230, H = 190;
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${k.name}: its branches in Tiers 2 and 3">`;
+    s += `<text x="60" y="12" class="axis-text" style="font-size:10px">Tier 2</text><text x="${W - 4}" y="12" text-anchor="end" class="axis-text" style="font-size:10px">Tier 3</text>`;
+    // root
+    s += `<rect x="2" y="${H / 2 - 15}" width="44" height="30" rx="7" fill="var(--raised)" stroke="var(--neutral-strong)" stroke-width="1.5"/><text x="24" y="${H / 2 + 4}" text-anchor="middle" class="val-text" style="font-size:10.5px">Base</text>`;
+    const t2x = 60, t2w = 70, t3x = 146, t3w = 82;
+    s += link(46, H / 2, t2x, 55, BR.pure[1]) + link(46, H / 2, t2x, 140, BR.dual[1]);
+    s += link(t2x + t2w, 55, t3x, 30, BR.keen[1]) + link(t2x + t2w, 55, t3x, 75, BR.tempered[1]) + link(t2x + t2w, 140, t3x, 118, BR.tempered[1]) + link(t2x + t2w, 140, t3x, 163, BR.evolved[1]);
+    s += leaf(t2x, 55, t2w, 'pure', k.id, 2) + leaf(t2x, 140, t2w, 'dual', k.id, 2);
+    s += leaf(t3x, 30, t3w, 'keen', k.id, 3) + leaf(t3x, 75, t3w, 'tempered', k.id, 3) + leaf(t3x, 118, t3w, 'tempered', k.id, 3) + leaf(t3x, 163, t3w, 'evolved', k.id, 3);
+    return `<div class="tcard"><h3>${chip(k.id)} <span class="muted" style="font-weight:500;font-size:11px">${k.group}</span></h3>${s}</svg><div class="pp">Partners: ${nm(P1[k.id])} (Tier 2) · ${nm(P2[k.id])} (Tier 3)</div></div>`;
+  }).join('');
+  document.querySelectorAll('#ten .leaf').forEach((n) => bindTip(n, n.dataset.t, n.dataset.d));
+  document.getElementById('ten-legend').innerHTML = Object.entries(BR).filter(([id]) => id !== 'base').map(([id, [n, c]]) => `<span><i style="--bc:${c}"></i>${n} · weak ×${WEAK[id]}</span>`).join('') + '<span class="muted">Tempered appears on both lines: Pure widens to it, Dual deepens to it. Evolved is the Dual line\'s other door.</span>';
+})();
+
+// ---- Every set can branch
+(function () {
+  const legal = (ks) => ks.filter((k) => !ks.includes(P1[k])).map((k) => `${nm(k)} + ${nm(P1[k])}`);
+  const t3 = (ks, c) => {
+    if (PURE_CLASS.has(c)) return '1 (her cap)';
+    const opts = ks.map((k) => [P1[k], P2[k]].filter((p) => !ks.includes(p)));
+    let best = 0;
+    for (let a = 0; a < 3; a++) for (let b = a + 1; b < 3; b++) for (const pa of opts[a]) for (const pb of opts[b]) if (pa !== pb) best = 2;
+    return best === 2 ? '2' : '1';
+  };
+  document.getElementById('sets-table').innerHTML = `<tr><th>Class</th><th>Default set (branch 1): legal Tier 2 Duals</th><th>Reverse set (branch 2): legal Tier 2 Duals</th><th class="num">Two-kind weapons in Tier 3</th></tr>` +
+    Object.keys(DEF).map((c) => `<tr><td><span class="cdot" style="--cc:${COLS[c]}"></span> <b>${NAMES[c]}</b></td><td><span class="muted">${BRANCH2[c][0]}: ${DEF[c].map(nm).join(', ')}.</span> ${legal(DEF[c]).join(' · ')}</td><td><span class="muted">${BRANCH2[c][1]}: ${REV[c].map(nm).join(', ')}.</span> ${legal(REV[c]).join(' · ')}</td><td class="num">${t3(DEF[c], c)} · ${t3(REV[c], c)}</td></tr>`).join('');
+})();
+
+// ---- Builds (recommended picks), from which the holders are counted
+const BUILD = {
+  cleric: {
+    brawler: [[['pure', 'greatsword'], ['pure', 'axe'], ['dual', 'lance']], [['keen', 'greatsword'], ['keen', 'axe'], ['tempered', 'lance']]],
+    mage: [[['dual', 'fire'], ['pure', 'ice'], ['pure', 'lightning']], [['tempered', 'fire'], ['keen', 'ice'], ['keen', 'lightning']]],
+    spellblade: [[['dual', 'katana'], ['pure', 'lance'], ['pure', 'lightning']], [['tempered', 'katana'], ['keen', 'lance'], ['tempered', 'lightning']]],
+    summoner: [[['pure', 'dark'], ['pure', 'light'], ['dual', 'bow']], [['keen', 'dark'], ['tempered', 'light'], ['tempered', 'bow']]],
+    cleric: [[['dual', 'light'], ['pure', 'ice'], ['pure', 'bow']], [['tempered', 'light'], ['keen', 'ice'], ['tempered', 'bow']]],
+  },
+  paladin: {
+    summoner: [[['dual', 'dark'], ['pure', 'light'], ['pure', 'bow']], [['tempered', 'dark'], ['keen', 'light'], ['tempered', 'bow']]],
+    paladin: [[['pure', 'greatsword'], ['pure', 'axe'], ['dual', 'light']], [['keen', 'greatsword'], ['tempered', 'axe'], ['tempered', 'light']]],
+  },
+  reverse: {
+    brawler: [[['dual', 'bow'], ['pure', 'katana'], ['pure', 'axe']], [['tempered', 'bow'], ['keen', 'katana'], ['keen', 'axe']]],
+    mage: [[['dual', 'light'], ['pure', 'dark'], ['pure', 'ice']], [['tempered', 'light'], ['keen', 'dark'], ['keen', 'ice']]],
+    spellblade: [[['dual', 'katana'], ['pure', 'bow'], ['pure', 'dark']], [['tempered', 'katana'], ['keen', 'bow'], ['tempered', 'dark']]],
+    summoner: [[['pure', 'fire'], ['pure', 'lightning'], ['dual', 'greatsword']], [['tempered', 'fire'], ['keen', 'lightning'], ['tempered', 'greatsword']]],
+    paladin: [[['dual', 'bow'], ['pure', 'katana'], ['pure', 'light']], [['tempered', 'bow'], ['keen', 'katana'], ['tempered', 'light']]],
+    cleric: [[['pure', 'light'], ['pure', 'fire'], ['dual', 'greatsword']], [['keen', 'light'], ['tempered', 'fire'], ['tempered', 'greatsword']]],
+  },
+};
+const buildOf = (party, m) => (BUILD[party] && BUILD[party][m]) || BUILD.cleric[m];
+const kindsOf = (lst) => [...new Set(lst.flatMap(([br, a]) => [a, secondOf(br, a)].filter(Boolean)))];
+const PARTY = { cleric: ['brawler', 'mage', 'spellblade', 'summoner', 'cleric'], paladin: ['brawler', 'mage', 'spellblade', 'summoner', 'paladin'] };
+const ORDER = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'fire', 'ice', 'lightning', 'light', 'dark'];
+function memberKinds(party, m, t) { return t === 1 ? DEF[m] : kindsOf(buildOf(party, m)[t - 2]); }
+function holders(party, t) { const h = Object.fromEntries(ORDER.map((k) => [k, 0])); PARTY[party].forEach((m) => memberKinds(party, m, t).forEach((k) => h[k]++)); return h; }
+function answersRegular(party, t) { return PARTY[party].reduce((a, m) => a + memberKinds(party, m, t).reduce((b, k) => b + K[k].w2, 0), 0) / 48; }
+function answersTwins(party, t) { return PARTY[party].reduce((a, m) => { const ks = memberKinds(party, m, t); return a + Object.entries(TWINS).reduce((b, [s, pair]) => b + (pair.some((x) => ks.includes(x)) ? TW[s] : 0), 0); }, 0) / 48; }
+const r2 = (v) => Math.round(v * 100) / 100;
+const COV = {};
+['cleric', 'paladin'].forEach((p) => { COV[p] = { t1: r2(answersTwins(p, 1)), nob: r2(answersRegular(p, 1)), t2: r2(answersRegular(p, 2)), t3: r2(answersRegular(p, 3)), b2: r2(answersTwins(p, 2)), b3: r2(answersTwins(p, 3)) }; });
+
 // ---- Coverage chart
-const COV = {"cleric": {"t1_twins": 2.47, "t23_nobranch_single": 1.47, "t2_single": 2.0, "t3_single": 2.34, "t2_twins_boss": 3.3, "t3_twins_boss": 3.76, "holders_t1": {"greatsword": 1, "axe": 1, "lance": 2, "bow": 2, "katana": 1, "fire": 1, "ice": 2, "lightning": 2, "light": 2, "dark": 1}, "holders_t2": {"greatsword": 2, "axe": 2, "lance": 2, "bow": 2, "katana": 2, "fire": 2, "ice": 2, "lightning": 2, "light": 2, "dark": 2}, "holders_t3": {"greatsword": 3, "axe": 2, "lance": 2, "bow": 2, "katana": 2, "fire": 3, "ice": 3, "lightning": 2, "light": 2, "dark": 2}, "kinds": {"brawler": {"1": ["axe", "greatsword", "lance"], "2": ["axe", "greatsword", "katana", "lance"], "3": ["axe", "greatsword", "katana", "lance"]}, "mage": {"1": ["fire", "ice", "lightning"], "2": ["dark", "fire", "ice", "lightning"], "3": ["dark", "fire", "ice", "lightning"]}, "spellblade": {"1": ["katana", "lance", "lightning"], "2": ["greatsword", "katana", "lance", "lightning"], "3": ["greatsword", "ice", "katana", "lance", "lightning"]}, "summoner": {"1": ["bow", "dark", "light"], "2": ["bow", "dark", "fire", "light"], "3": ["bow", "dark", "fire", "greatsword", "light"]}, "cleric": {"1": ["bow", "ice", "light"], "2": ["axe", "bow", "ice", "light"], "3": ["axe", "bow", "fire", "ice", "light"]}}}, "paladin": {"t1_twins": 2.66, "t23_nobranch_single": 1.49, "t2_single": 2.0, "t3_single": 2.33, "t2_twins_boss": 3.4, "t3_twins_boss": 4.06, "holders_t1": {"greatsword": 2, "axe": 2, "lance": 2, "bow": 1, "katana": 1, "fire": 1, "ice": 1, "lightning": 2, "light": 2, "dark": 1}, "holders_t2": {"greatsword": 2, "axe": 2, "lance": 2, "bow": 2, "katana": 2, "fire": 2, "ice": 2, "lightning": 2, "light": 2, "dark": 2}, "holders_t3": {"greatsword": 2, "axe": 3, "lance": 2, "bow": 2, "katana": 3, "fire": 2, "ice": 3, "lightning": 2, "light": 2, "dark": 2}, "kinds": {"brawler": {"1": ["axe", "greatsword", "lance"], "2": ["axe", "greatsword", "katana", "lance"], "3": ["axe", "greatsword", "katana", "lance"]}, "mage": {"1": ["fire", "ice", "lightning"], "2": ["dark", "fire", "ice", "lightning"], "3": ["dark", "fire", "ice", "lightning"]}, "spellblade": {"1": ["katana", "lance", "lightning"], "2": ["bow", "katana", "lance", "lightning"], "3": ["bow", "ice", "katana", "lance", "lightning"]}, "summoner": {"1": ["bow", "dark", "light"], "2": ["bow", "dark", "fire", "light"], "3": ["axe", "bow", "dark", "fire", "light"]}, "paladin": {"1": ["axe", "greatsword", "light"], "2": ["axe", "greatsword", "ice", "light"], "3": ["axe", "greatsword", "ice", "katana", "light"]}}}, "brawler_boss": {"1": 0.656, "2": 0.865}, "class_alone": {"brawler": {"1": 0.656, "2": 0.865, "3": 0.865, "s1": 0.328, "s2": 0.432, "s3": 0.432}, "mage": {"1": 0.656, "2": 0.823, "3": 0.823, "s1": 0.328, "s2": 0.411, "s3": 0.411}, "spellblade": {"1": 0.406, "2": 0.635, "3": 0.865, "s1": 0.302, "s2": 0.417, "s3": 0.531}, "summoner": {"1": 0.344, "2": 0.573, "3": 0.573, "s1": 0.24, "s2": 0.354, "s3": 0.469}, "paladin": {"1": 0.594, "2": 0.594, "3": 0.802, "s1": 0.297, "s2": 0.411, "s3": 0.516}, "cleric": {"1": 0.406, "2": 0.406, "3": 0.635, "s1": 0.271, "s2": 0.385, "s3": 0.5}}, "nocap_complete": 2.84, "nocap_four": 2.69};
 const COVROWS = [
-  ['Tier 1, defaults (twins)', COV.cleric.t1_twins, COV.paladin.t1_twins, 'ref', 'Tier 1: every foe weak to an Arm and its twin element'],
-  ['Tiers 2–3, no branches', COV.cleric.t23_nobranch_single, COV.paladin.t23_nobranch_single, 'low', 'Regulars weak to one kind; weapons stay one kind'],
-  ['Tier 2: one Dual each (recommended)', COV.cleric.t2_single, COV.paladin.t2_single, 'rec', 'Each member adds the kind the party holds least'],
-  ['Tier 3: a second for the four between (recommended)', COV.cleric.t3_single, COV.paladin.t3_single, 'rec', 'The Brawler and the Mage keep one'],
-  ['Own channel, no count cap, never all five', COV.nocap_four, null, 'no', 'Three Duals for the four between; the Brawler and Mage held to four kinds'],
-  ['Free Duals (first round GE7) or no caps', COV.nocap_complete, null, 'no', 'A pure class completes her channel'],
+  ['Tier 1, defaults (twins)', COV.cleric.t1, COV.paladin.t1, 'ref', 'Tier 1: every foe weak to an Arm and its twin element'],
+  ['Tiers 2–3, no branches', COV.cleric.nob, COV.paladin.nob, 'low', 'Regulars weak to one kind; weapons stay one kind'],
+  ['Tier 2: one Dual each, fixed partners', COV.cleric.t2, COV.paladin.t2, 'rec', 'Each member\'s Dual adds its partner; with a Cleric they fill the five kinds held once'],
+  ['Tier 3: a second for the four between', COV.cleric.t3, COV.paladin.t3, 'rec', 'Tempered or Evolved on the Dual line, Keen or Tempered on the Pure line; the Brawler and the Mage keep one'],
+  ['First draft, free second kind, Tier 3', 2.34, null, 'ref', 'Any kind of its channel, picked at the step: a little more reach, no fixed tree'],
+  ['Fixed partners, no count cap, never all five', 2.60, null, 'no', 'Every weapon may carry a partner; still past Tier 1'],
+  ['Fixed partners, no caps at all', 2.76, null, 'no', 'A pure class holds her whole channel'],
 ];
 document.getElementById('cov-legend').innerHTML = '<span><span class="sw" style="background:var(--accent)"></span>Recommended</span><span><span class="sw" style="background:var(--neutral-strong)"></span>Reference</span><span><span class="sw" style="background:var(--c2)"></span>Rejected: above Tier 1</span><span class="muted">Bars: with a Cleric; the table has the Paladin party.</span>';
 (function () {
@@ -477,46 +655,44 @@ document.getElementById('cov-legend').innerHTML = '<span><span class="sw" style=
     const yc = pad.t + i * rowH + rowH / 2, bh = 18, y = yc - bh / 2, x0 = xs(0), w = xs(v) - x0, r = 4;
     const fill = kindr === 'rec' ? 'var(--accent)' : kindr === 'no' ? 'var(--c2)' : 'var(--neutral-strong)';
     s += `<text class="val-soft" x="${pad.l - 12}" y="${yc + 4}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${l}</text>`;
-    s += `<path class="mark" d="M${x0},${y} H${x0 + w - r} Q${x0 + w},${y} ${x0 + w},${y + r} V${y + bh - r} Q${x0 + w},${y + bh} ${x0 + w - r},${y + bh} H${x0} Z" fill="${fill}" data-t="${l}: ${v}" data-d="${d}"></path>`;
+    s += `<path class="mark" d="M${x0},${y} H${x0 + w - r} Q${x0 + w},${y} ${x0 + w},${y + r} V${y + bh - r} Q${x0 + w},${y + bh} ${x0 + w - r},${y + bh} H${x0} Z" fill="${fill}" data-t="${l}: ${v.toFixed(2)}" data-d="${d}"></path>`;
     s += `<text class="val-text" x="${x0 + w + 8}" y="${yc + 4}">${v.toFixed(2)}</text>`;
   });
-  const xr = xs(COV.cleric.t1_twins);
-  s += `<line x1="${xr}" x2="${xr}" y1="${pad.t - 4}" y2="${H - pad.b}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${xr + 6}" y="${H - 8}" class="axis-text" style="fill:var(--ink)">Tier 1's line: ${COV.cleric.t1_twins}</text>`;
+  const xr = xs(COV.cleric.t1);
+  s += `<line x1="${xr}" x2="${xr}" y1="${pad.t - 4}" y2="${H - pad.b}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${xr + 6}" y="${H - 8}" class="axis-text" style="fill:var(--ink)">Tier 1's line: ${COV.cleric.t1.toFixed(2)}</text>`;
   document.getElementById('cov-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#cov-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   document.getElementById('cov-table').innerHTML = `<table><tr><th>Build</th><th class="num">With a Cleric</th><th class="num">With a Paladin</th><th>Verdict</th></tr>` +
     COVROWS.map(([l, c, p, kr]) => `<tr><td>${l}</td><td class="num">${c.toFixed(2)}</td><td class="num">${p == null ? '—' : p.toFixed(2)}</td><td>${kr === 'rec' ? 'Recommended' : kr === 'no' ? 'Rejected: above Tier 1' : 'Reference'}</td></tr>`).join('') +
-    `<tr><td>Bosses (twins): Tier 1 · 2 · 3</td><td class="num">${COV.cleric.t1_twins} · ${COV.cleric.t2_twins_boss} · ${COV.cleric.t3_twins_boss}</td><td class="num">${COV.paladin.t1_twins} · ${COV.paladin.t2_twins_boss} · ${COV.paladin.t3_twins_boss}</td><td>Shields scale (below)</td></tr></table>` +
-    '<p class="foot">The 48 signatures weighted as class-progression CP5; half of each twin set\'s regulars weak to its Arm (by role); Twilight regulars split between Bow and Katana; a member answers a foe once.</p>';
+    `<tr><td>Bosses (twins): Tier 1 · 2 · 3</td><td class="num">${COV.cleric.t1.toFixed(2)} · ${COV.cleric.b2.toFixed(2)} · ${COV.cleric.b3.toFixed(2)}</td><td class="num">${COV.paladin.t1.toFixed(2)} · ${COV.paladin.b2.toFixed(2)} · ${COV.paladin.b3.toFixed(2)}</td><td>CP8's shields hold (below)</td></tr></table>` +
+    '<p class="foot">Counted on the recommended picks (the builds below). The 48 signatures weighted as class-progression CP5; half of each twin set\'s regulars weak to its Arm (by role); Twilight regulars split between Bow and Katana; a member answers a foe once. The reference and rejected rows are the coverage script\'s maxima.</p>';
 })();
 
 // ---- Holders heat map
-const ORDER = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'fire', 'ice', 'lightning', 'light', 'dark'];
 let healer = 'cleric';
 function renderHold() {
   document.querySelectorAll('#holders .toggle button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.h === healer));
-  const c = COV[healer];
-  const rows = [['Tier 1', c.holders_t1], ['Tier 2', c.holders_t2], ['Tier 3', c.holders_t3]];
+  const rows = [1, 2, 3].map((t) => [t, holders(healer, t)]);
   document.getElementById('hold').innerHTML = `<tr><th></th>${ORDER.map((k) => `<th style="text-align:center">${chip(k, nm(k))}</th>`).join('')}</tr>` +
-    rows.map(([t, hh]) => `<tr><th>${t}</th>${ORDER.map((k) => `<td class="c h${Math.min(5, hh[k] + 1)}" data-t="${t} · ${K[k].name}" data-d="${hh[k]} member${hh[k] === 1 ? '' : 's'} hold it: ${Object.entries(c.kinds).filter(([, v]) => v[t.slice(-1)].includes(k)).map(([m]) => ({ brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' })[m]).join(', ')}">${hh[k]}</td>`).join('')}</tr>`).join('');
+    rows.map(([t, hh]) => `<tr><th>Tier ${t}</th>${ORDER.map((k) => { const who = PARTY[healer].filter((m) => memberKinds(healer, m, t).includes(k)).map((m) => NAMES[m]); return `<td class="c h${Math.min(5, hh[k] + 1)}" data-t="Tier ${t} · ${K[k].name}" data-d="${hh[k]} member${hh[k] === 1 ? '' : 's'} hold it: ${who.join(', ')}">${hh[k]}</td>`; }).join('')}</tr>`).join('');
   document.querySelectorAll('#hold td.c').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   document.getElementById('hold-table').innerHTML = `<table><tr><th>Member</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>` +
-    Object.entries(c.kinds).map(([m, v]) => `<tr><td>${({ brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' })[m]}</td>${[1, 2, 3].map((t) => `<td>${v[t].map((k) => nm(k)).join(', ')}</td>`).join('')}</tr>`).join('') + '</table>';
+    PARTY[healer].map((m) => `<tr><td>${NAMES[m]}</td>${[1, 2, 3].map((t) => `<td>${memberKinds(healer, m, t).map(nm).join(', ')}</td>`).join('')}</tr>`).join('') + '</table>';
 }
 document.querySelectorAll('#holders .toggle button').forEach((b) => b.addEventListener('click', () => { healer = b.dataset.h; renderHold(); }));
 renderHold();
 
 // ---- Bosses
 (function () {
-  const ans = [COV.cleric.t1_twins, COV.cleric.t2_twins_boss, COV.cleric.t3_twins_boss], sh = [6, 8, 9];
-  document.getElementById('boss-legend').innerHTML = '<span><span class="sw" style="background:var(--accent)"></span>Answers a boss (party)</span><span><span class="sw" style="background:var(--c1)"></span>Boss shield (draft)</span><span><span class="sw" style="background:var(--neutral-strong)"></span>Shield ÷ answers</span>';
+  const ans = [COV.cleric.t1, COV.cleric.b2, COV.cleric.b3], ansP = [COV.paladin.t1, COV.paladin.b2, COV.paladin.b3], sh = [6, 8, 9];
+  document.getElementById('boss-legend').innerHTML = '<span><span class="sw" style="background:var(--accent)"></span>Answers a boss (party, Cleric)</span><span><span class="sw" style="background:var(--c1)"></span>Boss shield (CP8)</span><span><span class="sw" style="background:var(--neutral-strong)"></span>Shield ÷ answers</span>';
   const W = 560, H = 240, pad = { l: 36, r: 12, t: 20, b: 30 }, max = 10, ih = H - pad.t - pad.b, gw = (W - pad.l - pad.r) / 3, bw = 34;
   const y = (v) => H - pad.b - (v / max) * ih;
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Boss answers and shields by tier">`;
   [0, 2, 4, 6, 8, 10].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(g) + 4}" text-anchor="end">${g}</text>`; });
   [0, 1, 2].forEach((i) => {
     const cx = pad.l + gw * i + gw / 2;
-    [[ans[i], 'var(--accent)', `Answers a boss: ${ans[i]}`], [sh[i], 'var(--c1)', `Shield draft: ${sh[i]}`], [sh[i] / ans[i], 'var(--neutral-strong)', `Shield ÷ answers: ${(sh[i] / ans[i]).toFixed(2)}`]].forEach(([v, c, t], j) => {
+    [[ans[i], 'var(--accent)', `Answers a boss: ${ans[i].toFixed(2)} (a Paladin's party ${ansP[i].toFixed(2)})`], [sh[i], 'var(--c1)', `Shield: ${sh[i]}`], [sh[i] / ans[i], 'var(--neutral-strong)', `Shield ÷ answers: ${(sh[i] / ans[i]).toFixed(2)} (Paladin ${(sh[i] / ansP[i]).toFixed(2)})`]].forEach(([v, c, t], j) => {
       const x = cx - 1.5 * bw - 4 + j * (bw + 4), yy = y(v), r = 4;
       s += `<path class="mark" d="M${x},${H - pad.b} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${H - pad.b} Z" fill="${c}" data-t="Tier ${i + 1}" data-d="${t}"></path><text class="val-text" x="${x + bw / 2}" y="${yy - 5}" text-anchor="middle" style="font-size:11px">${(Math.round(v * 100) / 100)}</text>`;
     });
@@ -524,70 +700,61 @@ renderHold();
   });
   document.getElementById('boss-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#boss-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('boss-table').innerHTML = `<table><tr><th>Tier</th><th class="num">Answers a boss, Cleric · Paladin</th><th class="num">Shield draft</th><th class="num">Shield ÷ answers</th></tr>` +
-    [0, 1, 2].map((i) => `<tr><td>Tier ${i + 1}</td><td class="num">${ans[i]} · ${[COV.paladin.t1_twins, COV.paladin.t2_twins_boss, COV.paladin.t3_twins_boss][i]}</td><td class="num">${sh[i]}</td><td class="num">${(sh[i] / ans[i]).toFixed(2)}</td></tr>`).join('') + '</table><p class="foot">Tier 1\'s boss shield is class-progression CP8\'s draft (8 → 6); Tiers 2 and 3 grow with answers, Z2\'s +1 included. The simulation sets them.</p>';
+  document.getElementById('boss-table').innerHTML = `<table><tr><th>Tier</th><th class="num">Answers a boss, Cleric · Paladin</th><th class="num">Shield (CP8)</th><th class="num">Shield ÷ answers, Cleric · Paladin</th></tr>` +
+    [0, 1, 2].map((i) => `<tr><td>Tier ${i + 1}</td><td class="num">${ans[i].toFixed(2)} · ${ansP[i].toFixed(2)}</td><td class="num">${sh[i]}</td><td class="num">${(sh[i] / ans[i]).toFixed(2)} · ${(sh[i] / ansP[i]).toFixed(2)}</td></tr>`).join('') + '</table><p class="foot">Every ratio within ±0.5 of Tier 1\'s, so class-progression CP8\'s drafts hold with the fixed partners. The simulation sets the final shields.</p>';
 })();
 (function () {
-  const A = COV.class_alone, CL = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
-  const S = [['1', 'Tier 1 regular (twins)', 'var(--t1)'], ['s2', 'Tier 2 regular (one kind), her Dual', 'var(--t2)'], ['s3', 'Tier 3 regular', 'var(--t3)']];
+  const CL = Object.keys(NAMES);
+  const kindsAt = (c, t) => t === 1 ? DEF[c] : kindsOf(buildOf(c === 'paladin' ? 'paladin' : 'cleric', c)[t - 2]);
+  const twinShare = (ks) => Object.entries(TWINS).reduce((a, [s, pair]) => a + (pair.some((x) => ks.includes(x)) ? TW[s] : 0), 0) / 48;
+  const oneShare = (ks) => ks.reduce((a, k) => a + K[k].w2, 0) / 48;
+  const A = Object.fromEntries(CL.map((c) => [c, { t1: twinShare(DEF[c]), s1: oneShare(DEF[c]), s2: oneShare(kindsAt(c, 2)), s3: oneShare(kindsAt(c, 3)), b2: twinShare(kindsAt(c, 2)), b3: twinShare(kindsAt(c, 3)) }]));
+  const S = [['t1', 'Tier 1 regular (twins)', 'var(--t1)'], ['s2', 'Tier 2 regular (one kind), her Dual', 'var(--t2)'], ['s3', 'Tier 3 regular', 'var(--t3)']];
   document.getElementById('alone-legend').innerHTML = S.map(([, n, c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('');
   const W = 560, H = 240, pad = { l: 36, r: 8, t: 20, b: 30 }, ih = H - pad.t - pad.b, gw = (W - pad.l - pad.r) / 6, bw = 20;
   const y = (v) => H - pad.b - v * ih;
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="One Uma alone: share of foes she answers">`;
   [0, 0.25, 0.5, 0.75, 1].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(g) + 4}" text-anchor="end">${g * 100}%</text>`; });
-  CL.forEach(([c, n], i) => {
+  CL.forEach((c, i) => {
     const cx = pad.l + gw * i + gw / 2;
     S.forEach(([key, sn, col], j) => {
       const v = A[c][key], x = cx - 1.5 * bw - 2 + j * (bw + 2), yy = y(v), r = 3;
-      s += `<path class="mark" d="M${x},${H - pad.b} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${H - pad.b} Z" fill="${col}" data-t="${n} · ${sn}" data-d="${Math.round(v * 100)}% of the 48 signatures"></path>`;
+      s += `<path class="mark" d="M${x},${H - pad.b} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${H - pad.b} Z" fill="${col}" data-t="${NAMES[c]} · ${sn}" data-d="${Math.round(v * 100)}% of the 48 signatures"></path>`;
     });
-    s += `<text class="axis-text" x="${cx}" y="${H - 8}" text-anchor="middle" style="font-size:11px">${n}</text>`;
+    s += `<text class="axis-text" x="${cx}" y="${H - 8}" text-anchor="middle" style="font-size:11px">${NAMES[c]}</text>`;
   });
   document.getElementById('alone-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#alone-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   const p = (v) => Math.round(v * 100) + '%';
   document.getElementById('alone-table').innerHTML = `<table><tr><th>Class</th><th class="num">T1 regular</th><th class="num">T2 regular, no branch</th><th class="num">T2, her Dual</th><th class="num">T3</th><th class="num">A boss, T1 · T2 · T3</th></tr>` +
-    CL.map(([c, n]) => `<tr><td>${n}</td><td class="num">${p(A[c]['1'])}</td><td class="num">${p(A[c].s1)}</td><td class="num">${p(A[c].s2)}</td><td class="num">${p(A[c].s3)}</td><td class="num">${p(A[c]['1'])} · ${p(A[c]['2'])} · ${p(A[c]['3'])}</td></tr>`).join('') + '</table>';
+    CL.map((c) => `<tr><td>${NAMES[c]}</td><td class="num">${p(A[c].t1)}</td><td class="num">${p(A[c].s1)}</td><td class="num">${p(A[c].s2)}</td><td class="num">${p(A[c].s3)}</td><td class="num">${p(A[c].t1)} · ${p(A[c].b2)} · ${p(A[c].b3)}</td></tr>`).join('') + '</table>';
 })();
 
 // ---- Builds
-const W1 = { brawler: ['greatsword', 'axe', 'lance'], mage: ['fire', 'ice', 'lightning'], spellblade: ['katana', 'lance', 'lightning'], summoner: ['dark', 'light', 'bow'], paladin: ['greatsword', 'axe', 'light'], cleric: ['light', 'ice', 'bow'] };
-const BUILD = {
-  cleric: {
-    brawler: [[['pure', 'greatsword'], ['dual', 'axe', 'katana'], ['pure', 'lance']], [['keen', 'greatsword'], ['tempered', 'axe', 'katana'], ['keen', 'lance']]],
-    mage: [[['pure', 'fire'], ['dual', 'ice', 'dark'], ['pure', 'lightning']], [['keen', 'fire'], ['tempered', 'ice', 'dark'], ['keen', 'lightning']]],
-    spellblade: [[['dual', 'katana', 'greatsword'], ['pure', 'lance'], ['pure', 'lightning']], [['tempered', 'katana', 'greatsword'], ['keen', 'lance'], ['tempered', 'lightning', 'ice']]],
-    summoner: [[['pure', 'dark'], ['dual', 'light', 'fire'], ['pure', 'bow']], [['keen', 'dark'], ['tempered', 'light', 'fire'], ['tempered', 'bow', 'greatsword']]],
-    cleric: [[['pure', 'light'], ['pure', 'ice'], ['dual', 'bow', 'axe']], [['keen', 'light'], ['tempered', 'ice', 'fire'], ['tempered', 'bow', 'axe']]],
-  },
-  paladin: {
-    spellblade: [[['dual', 'katana', 'bow'], ['pure', 'lance'], ['pure', 'lightning']], [['tempered', 'katana', 'bow'], ['keen', 'lance'], ['tempered', 'lightning', 'ice']]],
-    summoner: [[['pure', 'dark'], ['dual', 'light', 'fire'], ['pure', 'bow']], [['keen', 'dark'], ['tempered', 'light', 'fire'], ['tempered', 'bow', 'axe']]],
-    paladin: [[['pure', 'greatsword'], ['pure', 'axe'], ['dual', 'light', 'ice']], [['tempered', 'greatsword', 'katana'], ['keen', 'axe'], ['tempered', 'light', 'ice']]],
-  },
-};
 let bparty = 'cleric';
-const SINGLEW = Object.fromEntries(KINDS.map((k) => [k.id, k.w2]));
-const wpn = ([br, a, b]) => `<span class="wpn" style="--bc:${BR[br][1]}"><span class="bt">${BR[br][0]}</span>${chip(a)}${b ? '<span class="muted">+</span>' + chip(b, nm(b)) : ''}</span>`;
+const wpn = ([br, a]) => { const b = secondOf(br, a); return `<span class="wpn" style="--bc:${BR[br][1]}"><span class="bt">${BR[br][0]}</span>${chip(a)}${b ? '<span class="muted">+</span>' + chip(b, nm(b)) : ''}</span>`; };
 function renderBuilds() {
   document.querySelectorAll('#builds .toggle button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.b === bparty));
-  const members = ['brawler', 'mage', 'spellblade', 'summoner', bparty];
-  const NAMES = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' };
-  const COLS = { brawler: 'var(--cl-brawler)', mage: 'var(--cl-mage)', spellblade: 'var(--cl-spellblade)', summoner: 'var(--cl-summoner)', paladin: 'var(--cl-paladin)', cleric: 'var(--cl-cleric)' };
+  const members = bparty === 'reverse' ? Object.keys(NAMES) : PARTY[bparty];
+  const sets = bparty === 'reverse' ? REV : DEF;
   const rowsT = [];
-  document.getElementById('build-cards').innerHTML = members.map((m) => {
-    const b = (BUILD[bparty][m] || BUILD.cleric[m]);
-    const kinds = (lst) => [...new Set(lst.flatMap(([, a, c]) => [a, c].filter(Boolean)))];
-    const share = (ks) => Math.round(ks.reduce((a, k) => a + SINGLEW[k], 0) / 48 * 100);
-    const k2 = kinds(b[0]), k3 = kinds(b[1]);
-    rowsT.push([NAMES[m], W1[m].map((k) => K[k].name).join(', '), b[0].map(([br, a, c]) => BR[br][0] + ' ' + nm(a) + (c ? ' + ' + nm(c) : '')).join(', '), b[1].map(([br, a, c]) => BR[br][0] + ' ' + nm(a) + (c ? ' + ' + nm(c) : '')).join(', '), share(k2) + '%', share(k3) + '%']);
-    return `<div class="bcard" style="--cc:${COLS[m]}"><h3><span class="cdot" style="--cc:${COLS[m]}"></span>${NAMES[m]}</h3>` +
-      `<div class="bline"><span class="t" style="color:var(--t1)">T1</span><div>${W1[m].map((k) => wpn(['base', k])).join('')}</div></div>` +
+  const share = (ks) => Math.round(ks.reduce((a, k) => a + K[k].w2, 0) / 48 * 100);
+  let cards = members.map((m) => {
+    const b = buildOf(bparty, m), k2 = kindsOf(b[0]), k3 = kindsOf(b[1]);
+    const label = bparty === 'reverse' ? `${NAMES[m]} · ${BRANCH2[m][1]}` : NAMES[m];
+    rowsT.push([label, sets[m].map((k) => K[k].name).join(', '), b[0].map(([br, a]) => BR[br][0] + ' ' + nm(a) + (secondOf(br, a) ? ' + ' + nm(secondOf(br, a)) : '')).join(', '), b[1].map(([br, a]) => BR[br][0] + ' ' + nm(a) + (secondOf(br, a) ? ' + ' + nm(secondOf(br, a)) : '')).join(', '), share(k2) + '%', share(k3) + '%']);
+    return `<div class="bcard" style="--cc:${COLS[m]}"><h3><span class="cdot" style="--cc:${COLS[m]}"></span>${label}</h3>` +
+      `<div class="bline"><span class="t" style="color:var(--t1)">${bparty === 'reverse' ? 'Set' : 'T1'}</span><div>${sets[m].map((k) => wpn(['base', k])).join('')}</div></div>` +
       `<div class="bline"><span class="t" style="color:var(--t2)">T2</span><div>${b[0].map(wpn).join('')}</div></div>` +
       `<div class="bline"><span class="t" style="color:var(--t3)">T3</span><div>${b[1].map(wpn).join('')}</div></div>` +
       `<div class="bstat">Alone she answers ${share(k2)}% of Tier 2 regulars and ${share(k3)}% of Tier 3's (${k3.length} kinds).</div></div>`;
-  }).join('') + `<div class="bcard" style="--cc:var(--accent)"><h3>The party</h3><div class="row" style="font-size:13px;color:var(--ink-soft)">Answers a regular: <b style="color:var(--ink)">${COV[bparty].t1_twins} → ${COV[bparty].t2_single} → ${COV[bparty].t3_single}</b>.<br>Every kind held twice from Tier 2.<br>Kinds she holds, at most: 3 → 4 → 5 (the Brawler and the Mage 4).<br><br>${bparty === 'paladin' ? 'With a Paladin the Spell Blade\'s Dual takes the <b>Bow</b> (the Paladin brings none) and the Summoner\'s Tier 3 Bow adds the <b>Axe</b>.' : 'With a Cleric, the five Duals fill exactly the five kinds Tier 1 left with one holder: Greatsword, Axe, Katana, Fire, Dark.'}</div></div>`;
-  document.getElementById('build-table').innerHTML = `<table><tr><th>Class</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th class="num">T2 regulars alone</th><th class="num">T3</th></tr>` + rowsT.map((r) => `<tr>${r.map((x, i) => `<td${i > 3 ? ' class="num"' : ''}>${x}</td>`).join('')}</tr>`).join('') + '</table>';
+  }).join('');
+  const note = bparty === 'reverse' ? 'Branch 2\'s sets (CP40), each Uma\'s best alone with twin logic breaking ties: the Blademaster\'s Katana and Dark pair both into the Ice twins, the Templar\'s Bow and Light both into the Fire twins. The Warlord and the Sorcerer have one legal Dual each.' :
+    `Answers a regular: <b style="color:var(--ink)">${COV[bparty].t1.toFixed(2)} → ${COV[bparty].t2.toFixed(2)} → ${COV[bparty].t3.toFixed(2)}</b>.<br>Kinds she holds, at most: 3 → 4 → 5 (the Brawler and the Mage 4).<br><br>` +
+    (bparty === 'paladin' ? 'With a Paladin the Summoner\'s Dual is her <b>Dark + Ice</b> (the Ice had one holder); the Bow keeps one holder until the Paladin\'s Tier 3 <b>Axe + Bow</b>.' : 'With a Cleric the five Duals fill exactly the five kinds Tier 1 left with one holder: Greatsword, Axe, Katana, Fire, Dark.');
+  cards += `<div class="bcard" style="--cc:var(--accent)"><h3>${bparty === 'reverse' ? 'The reverse sets' : 'The party'}</h3><div class="row" style="font-size:13px;color:var(--ink-soft)">${note}</div></div>`;
+  document.getElementById('build-cards').innerHTML = cards;
+  document.getElementById('build-table').innerHTML = `<table><tr><th>Class</th><th>${bparty === 'reverse' ? 'Branch 2 set' : 'Tier 1'}</th><th>Tier 2</th><th>Tier 3</th><th class="num">T2 regulars alone</th><th class="num">T3</th></tr>` + rowsT.map((r) => `<tr>${r.map((x, i) => `<td${i > 3 ? ' class="num"' : ''}>${x}</td>`).join('')}</tr>`).join('') + '</table>';
 }
 document.querySelectorAll('#builds .toggle button').forEach((b) => b.addEventListener('click', () => { bparty = b.dataset.b; renderBuilds(); }));
 renderBuilds();

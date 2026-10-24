@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Accessory Catalog</title>
-<!-- The Tier rework's Weapon Progression (weapon-progression.md §5): the accessory redesign. The ten defensive and MP
-     supports retire; four damage families (Pendants, Bells, Orbs, Insignias) unlock by tier; one of each family at most;
-     the kind cap; the viability model; the presets. Numbers are the doc's model (§5.4, §5.7). No external scripts, fonts
-     or images. -->
+<!-- The Tier rework's Weapon Progression (weapon-progression.md §5): the accessory families after the owner's review
+     (2026-10-24): every family in every tier, a base form in Tier 1, two branches each from a slot's G5 in Tier 2, a step in
+     Tier 3; the catalog by tier and grade, the kind cap, the Dual pairing, viability by tier, presets for both class
+     branches' sets, and the signature accessory. Numbers are the doc's model (drafts for the simulation). No external
+     scripts, fonts or images. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -218,108 +219,182 @@
   .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   @media (max-width: 1100px) { .retired { grid-template-columns: repeat(3, 1fr); } .fams { grid-template-columns: 1fr 1fr; } }
 </style>
+<style>
+  .atree .fnode { cursor: default; }
+  .atree .fnode:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
+  .sig-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; align-items: start; }
+  .sig-grid > * { min-width: 0; }
+  .mock { background: var(--raised); border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+  .mock .mrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--hairline); }
+  .mock .mrow:first-of-type { border-top: 0; }
+  .mock .star { color: var(--accent); font-weight: 800; }
+  .mock .dim { color: var(--ink-faint); }
+  .mock h4 { margin: 0 0 6px; font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .pairbars td.num { font-variant-numeric: tabular-nums; }
+  @media (max-width: 1100px) { .sig-grid { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 <main>
-  <h1>Accessories: every one deals damage</h1>
-  <p class="lead">The owner (2026-10-24): defensive accessories are never picked over damage, and MP regen is always picked, so <b>all ten
-    supports retire</b> and armor takes their defense. Four damage families replace them, unlocked <b>multi-element first, focused damage
-    later</b>: <b>Pendants</b> and <b>Bells</b> in Tier 1, <b>Orbs</b> in Tier 2, <b>Insignias</b> in Tier 3, one slot a tier and one of each
-    family at most. Below, each family's best member against the best, by class and context. From
+  <h1>Accessories: every family, every tier</h1>
+  <p class="lead">Every accessory deals damage; the ten defensive and MP supports retire and armor takes their defense. The owner's review
+    (2026-10-24): <b>all four families are there from Tier 1</b> in a simple <b>base form</b> (one slot, one of four), each <b>branches in two</b>
+    at a slot's G5 from Tier 2, and Tier 3 takes each branch <b>a step deeper</b>; a branch is a form she sets, so nothing new is crafted.
+    <b>Uma uniqueness</b> rides an accessory too: her template's <b>signature family</b> adds ATK and M.ATK +0.2 a level while she wears it. From
     <a href="../weapon-progression.md">weapon-progression.md</a> §5; the other pages: <a href="weapon-trees.html">weapon trees</a> ·
     <a href="weapon-armor.html">armor</a> · <a href="weapon-materials.html">materials</a>.</p>
   <nav class="top">
-    <a href="#retired">What retires</a><a href="#catalog">The catalog</a><a href="#grades">Values by grade</a>
-    <a href="#slots">Slots and the kind cap</a><a href="#viability">Viability</a><a href="#bylevel">By level</a><a href="#presets">Presets</a>
+    <a href="#retired">What retires</a><a href="#trees">The trees</a><a href="#catalog">The catalog</a><a href="#grades">Values by grade</a>
+    <a href="#slots">Slots and the kind cap</a><a href="#pairing">With her weapons</a><a href="#viability">Viability</a><a href="#bylevel">By level</a><a href="#presets">Presets</a><a href="#signature">The signature</a>
   </nav>
   <div class="kpis" id="kpis"></div>
 
   <section id="retired">
     <h2>What retires</h2>
     <p class="sub">All ten, in every tier. Their defensive worth moves into armor (one support's worth: a regular's hit 20% → 18.7% of her HP);
-      MP comes from her level, armor's legs and her template's MP twists, and the Bell makes her free Attack worth taking.</p>
+      MP comes from her level, armor's legs, Vigor and her template's MP twists, and the Bell makes her free Attack worth taking.</p>
     <div class="retired" id="retired-cards"></div>
   </section>
 
+  <section id="trees">
+    <h2>The trees: a base, two branches, a step</h2>
+    <p class="sub">One shape for every family, like the weapons': the <b>Great</b> branch keeps the base's reach and deepens it (Pure's way); the
+      other changes what it reaches (Dual's way). Pick a tier to light what a slot can hold there (branches from the slot's G5 in Tier 2,
+      their step from its G5 in Tier 3). Values at G10; flat ones in Orbs, an Orb being half a G10 weapon's Might (+34 · +61 · +88).</p>
+    <div class="controls"><div class="pills" id="ttier"></div></div>
+    <div class="panel atree" style="margin-top:12px"><div id="tree"></div>
+      <details><summary>Show the numbers</summary><div id="tree-table"></div></details></div>
+  </section>
+
   <section id="catalog">
-    <h2>The catalog, by tier</h2>
-    <p class="sub">Pick a tier and a grade: every accessory with what it adds there. Flat values (Pendants, Orbs) are Tier 1's × 1.8 and × 2.6;
-      a Bell's power and an Insignia's percentage are shares and stay. The slot holds the grade; the type swaps freely among the unlocked families.</p>
+    <h2>The catalog, by tier and grade</h2>
+    <p class="sub">Pick a tier and a grade: every form a slot of that grade can hold, with what it adds there. Flat values are Tier 1's × 1.8
+      and × 2.6; a Bell's power and an Insignia's percentage are shares and stay. The slot holds the grade; family and form swap freely.</p>
     <div class="controls"><div class="pills" id="tier"></div>
       <label class="gsel" for="grade">Grade <input type="range" id="grade" min="1" max="10" value="10"><b id="gval">G10</b> <span class="muted" id="glv"></span></label></div>
     <div class="fams" id="fams"></div>
   </section>
 
   <section id="grades">
-    <h2>Values by grade</h2>
-    <p class="sub">A Pendant spreads 1.2 Orbs of offense over its kinds (0.4 an Orb on each of three, 0.6 on each of two); a Bell's follow-up
-      grows 0.1 a grade to a full Attack; Onslaught 2% a grade, Slayer 1.5%.</p>
-    <div class="multiples" id="grade-minis" style="grid-template-columns: repeat(5, minmax(0, 1fr))"></div>
+    <div class="head-row"><h2>Values by grade</h2><div class="pills" id="gtier" style="margin:0 0 0 auto"></div></div>
+    <p class="sub">Each family's forms by grade in the picked tier. A branch starts at G5, where it opens; in Tier 3 it holds its Tier 2 share
+      until G5, then takes its step. The Toll Bell is drawn as its first ring and its top.</p>
+    <div class="multiples" id="grade-minis"></div>
     <div class="panel" style="margin-top:12px"><details><summary>Show the numbers</summary><div id="grade-table"></div></details></div>
   </section>
 
   <section id="slots">
     <h2>Slots, families and the kind cap</h2>
-    <p class="sub">1 · 2 · 3 slots, untyped. <b>One accessory of each family at most,</b> so every tier keeps a choice of family: one of two, two of
-      three, three of four. Flat offense on one kind (Orbs, Pendants and the Halo together) stops at a G10 weapon's Might × tier.</p>
+    <p class="sub">1 · 2 · 3 slots, untyped. <b>One accessory of each family at most,</b> so every tier keeps a choice of family: one of four, two of
+      four, three of four. Flat offense on one kind (the Pendant and Orb forms and the Halo together) stops at a G10 weapon's Might × tier; the
+      Great Orb is the one form that passes it beside the Halo, so it wants a kind the Halo doesn't hold.</p>
     <div class="slots3" id="slots3"></div>
-    <div class="panel" style="margin-top:12px"><h3>The kind cap, a Tier 2 Greatsword</h3><div class="chart-legend" id="cap-legend"></div><div id="cap-chart"></div>
+    <div class="panel" style="margin-top:12px"><h3>The kind cap, Tier 2, G10</h3><div class="chart-legend" id="cap-legend"></div><div id="cap-chart"></div>
       <details><summary>Show the numbers</summary><div id="cap-table"></div></details></div>
   </section>
 
+  <section id="pairing">
+    <h2>With her weapons: the Dual pairs with a single-kind form</h2>
+    <p class="sub">The owner: "as I branch into Tier 2 weapons with Dual hits I can swap out of multi-element accessories and go into
+      single-element ones." Her Dual answers two kinds' foes, so more of her damage rides its own kind and a single-kind form on it pays more.
+      Tier 2 campaign, a Great Orb on her Dual weapon's kind, without and with the Dual's partner.</p>
+    <div class="panel"><div class="chart-legend" id="pair-legend"></div><div id="pair-chart"></div>
+      <details><summary>Show the numbers</summary><div id="pair-table"></div></details></div>
+  </section>
+
   <section id="viability">
-    <div class="head-row"><h2>Viability: every accessory a real choice</h2><div class="pills" id="vtier" style="margin:0 0 0 auto"></div></div>
-    <p class="sub">Damage each family's best member adds, at G10 and Lv 50 (the same share in every tier under SB1), on the owner's defaults. The
-      colour is its share of the best <b>unlocked</b> family in that row; hover for the member. Pick a tier to see what she can wear there.</p>
+    <div class="head-row"><h2>Viability: every base and branch someone's best</h2><div class="pills" id="vtier" style="margin:0 0 0 auto"></div></div>
+    <p class="sub">Damage each form's best member adds, at G10 and Lv 50 (the same share in every tier under SB1), on the owner's defaults and
+      their recommended weapon branches. The colour is its share of the row's best; hover for the member. Tier 1 races the four base forms;
+      from Tier 2 each Great branch beats its own base everywhere, so the eight branches race.</p>
     <div class="panel" style="overflow-x:auto"><div class="chart-legend" id="via-legend"></div><table class="vtab" id="via"></table>
       <details><summary>Show the numbers</summary><div id="via-table"></div></details></div>
-    <div class="callout"><b>What it shows</b>Every family is someone's best: Pendants left on all region long (four classes), the Bell for the Brawler
-      in the campaign and in long fights, the Orb when she tunes to a region or a front and on waves, Slayer on bosses, Onslaught close behind on waves.
-      In the campaign left alone the Pendant, the Orb and Onslaught sit within 6.1–7.5% for the damage classes. The Bell is a niche on purpose for the
-      healers and the Summoner, whose acts are skills; for the hybrids its worth is also in chips, which these numbers leave out.</div>
-    <div class="note"><b>The model:</b> a flat point is worth its place in offense² ÷ (offense + defense) (foe defense about 190: +34 on her lead kind is +18%);
-      her damage split by kind from the 48 signatures; her Attack share of acts by her MP (Brawler 30%, Mage 20%, hybrids 25%, healers 12%; × 1.7 in long
-      fights, × 0.6 on waves); a skill averages 4.7 single-target units at Lv 50. Contexts: <b>Campaign</b>, one accessory left on all region long;
-      <b>Tuned</b>, swapped for a region or a Rift front (75% of her damage on her best kind); <b>Long fight</b>, a boss or the Duel, MP runs dry;
-      <b>Waves</b>, the Horde's regulars. Drafts for the simulation.</div>
+    <div class="callout" id="via-callout"></div>
+    <div class="note"><b>The model:</b> a flat point is worth its place in offense² ÷ (offense + defense) (foe defense about 190: +34 on her lead kind is
+      +18%); her damage split by kind from the 48 signatures (she swings the weapon that lands weak; a hybrid her best Arm and her best Tome each
+      act); her Attack share of acts by her MP (Brawler 30%, Mage 20%, hybrids 25%, healers 12%; × 1.7 in long fights, × 0.6 on waves); a skill
+      averages 4.7 single-target units at Lv 50. Contexts: <b>Campaign</b>, left on all region long; <b>Tuned</b>, swapped for a region or a Rift front
+      (75% of her damage on the kind she tunes to; a hybrid tunes to a twin set, both halves); <b>Long fight</b>, a boss or the Duel, MP runs dry;
+      <b>Waves</b>, the Horde's regulars, which rotate every twin set, so nothing to tune to. Drafts for the simulation.</div>
   </section>
 
   <section id="bylevel">
-    <h2>By level: the choice moves through the tier</h2>
-    <p class="sub">A Brawler in the campaign, Tier 1, her accessory at her level's grade. The Bell leads while MP is tightest (Lv 6–31); the Pendant
-      catches it at G8; they tie at Lv 50. The Orb (Tier 2's, for reference) left alone trails both; tuned to a front it leads.</p>
+    <h2>By level: the choice moves through Tier 1</h2>
+    <p class="sub">A Brawler in the campaign, Tier 1, her accessory at her level's grade (the first draft's level model). The Bell leads while MP is
+      tightest (Lv 6–31); the Pendant catches it at G8; they tie at Lv 50. The Orb left on trails both; tuned to a front it leads. The Insignia
+      climbs with her damage on elites and leads only in long fights.</p>
     <div class="panel"><div class="chart-legend" id="lv-legend"></div><div id="lv-chart"></div>
       <details><summary>Show the numbers</summary><div id="lv-table"></div></details></div>
   </section>
 
   <section id="presets">
-    <h2>Presets, by class and tier</h2>
-    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks. The Orb (and the Halo's kind) is her
-      first weapon slot's kind (CP11). From Tier 2 the preset follows her class branch's set (CP40): branch 2's reverse set takes its own
-      accessories, since a Bell needs its weapon in her slots (cross-check, 2026-10-24).</p>
+    <div class="head-row"><h2>Presets, by class and tier</h2>
+      <div class="toggle" role="group" aria-label="Set"><button data-s="default" aria-pressed="true">Branch 1: default set</button><button data-s="reverse" aria-pressed="false">Branch 2: reverse set</button></div></div>
+    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks, one of each family, the Halo on her
+      first slot (two in Tier 3), every kind under the cap. From Tier 2 the preset follows her class branch's set (CP40); a single-kind form sits on
+      her Dual where it pays.</p>
     <div class="panel" style="overflow-x:auto"><table id="presets-table"></table></div>
+  </section>
+
+  <section id="signature">
+    <h2>The signature accessory: Uma uniqueness through accessories</h2>
+    <p class="sub">The owner: "maybe we don't have it affect weapons, but instead Umas equip slightly stronger accessories … exactly the same as
+      any other Uma's, but the stats get a fixed added bonus on every level up." Her template names one family; while she wears any form of it,
+      <b>ATK and M.ATK +0.2 a level × tier</b>, about +5% at each tier's Lv 50. Recommended to replace class-progression's affinity (CP36); which
+      family each template names is the Uma Templates pass's.</p>
+    <div class="controls"><div class="pills" id="sfam"></div><div class="pills" id="scls"></div></div>
+    <div class="sig-grid">
+      <div class="panel"><h3>The bonus by level and tier</h3><div class="chart-legend" id="sig-legend"></div><div id="sig-chart"></div>
+        <details><summary>Show the numbers</summary><div id="sig-table"></div></details></div>
+      <div class="panel"><h3>On her profile and in the picker</h3><div id="sig-mock"></div></div>
+    </div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-const ACC = {"1": {"orb": [0, 1, 2, 4, 6, 10, 13, 18, 23, 29, 34], "band2": [0, 1, 1, 2, 4, 6, 8, 11, 14, 17, 20], "band3": [0, 1, 1, 2, 2, 4, 5, 7, 9, 12, 14], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}, "2": {"orb": [0, 2, 4, 7, 11, 18, 23, 32, 41, 52, 61], "band2": [0, 2, 2, 4, 7, 11, 14, 20, 25, 31, 36], "band3": [0, 2, 2, 4, 4, 7, 9, 13, 16, 22, 25], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}, "3": {"orb": [0, 3, 5, 10, 16, 26, 34, 47, 60, 75, 88], "band2": [0, 3, 3, 5, 10, 16, 21, 29, 36, 44, 52], "band3": [0, 3, 3, 5, 5, 10, 13, 18, 23, 31, 36], "chaser": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "vanguard": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "reckoning": [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0]}};
-const VIA = {"campaign": {"brawler": {"band": [7.4, "Main Arms Pendant"], "chaser": [7.5, "greatsword"], "orb": [6.3, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "mage": {"band": [7.3, "Elemental Pendant"], "chaser": [4.5, "fire"], "orb": [6.1, "fire"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "spellblade": {"band": [7.3, "Lightning Twin Pendant"], "chaser": [3.9, "katana"], "orb": [6.9, "lightning"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "summoner": {"band": [7.5, "Arcane Pendant"], "chaser": [2.9, "dark"], "orb": [6.6, "dark"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "paladin": {"band": [5.7, "Main Arms Pendant"], "chaser": [2.6, "greatsword"], "orb": [7.0, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "cleric": {"band": [6.4, "Light Twin Pendant"], "chaser": [2.7, "ice"], "orb": [8.2, "ice"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}}, "tuned": {"brawler": {"band": [8.0, "Fire Twin Pendant"], "chaser": [8.4, "greatsword"], "orb": [13.7, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "mage": {"band": [7.8, "Fire Twin Pendant"], "chaser": [5.1, "fire"], "orb": [13.4, "fire"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "spellblade": {"band": [9.4, "Lightning Twin Pendant"], "chaser": [4.1, "katana"], "orb": [13.7, "katana"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "summoner": {"band": [9.4, "Arcane Pendant"], "chaser": [3.1, "dark"], "orb": [13.7, "dark"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "paladin": {"band": [8.4, "Arcane Pendant"], "chaser": [2.8, "greatsword"], "orb": [14.4, "greatsword"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}, "cleric": {"band": [9.6, "Light Twin Pendant"], "chaser": [2.8, "light"], "orb": [14.4, "light"], "vanguard": [6.6, "Onslaught Insignia"], "reckoning": [4.5, "Slayer Insignia"]}}, "long": {"brawler": {"band": [8.0, "Fire Twin Pendant"], "chaser": [18.1, "greatsword"], "orb": [13.7, "greatsword"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "mage": {"band": [7.8, "Fire Twin Pendant"], "chaser": [9.9, "fire"], "orb": [13.4, "fire"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "spellblade": {"band": [9.4, "Lightning Twin Pendant"], "chaser": [8.4, "katana"], "orb": [13.7, "katana"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "summoner": {"band": [9.4, "Arcane Pendant"], "chaser": [6.3, "dark"], "orb": [13.7, "dark"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "paladin": {"band": [8.4, "Arcane Pendant"], "chaser": [5.2, "greatsword"], "orb": [14.4, "greatsword"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}, "cleric": {"band": [9.6, "Light Twin Pendant"], "chaser": [5.2, "light"], "orb": [14.4, "light"], "vanguard": [1.6, "Onslaught Insignia"], "reckoning": [15.0, "Slayer Insignia"]}}, "waves": {"brawler": {"band": [7.4, "Main Arms Pendant"], "chaser": [4.5, "greatsword"], "orb": [9.1, "greatsword"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "mage": {"band": [7.3, "Elemental Pendant"], "chaser": [2.8, "fire"], "orb": [8.9, "fire"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "spellblade": {"band": [8.2, "Lightning Twin Pendant"], "chaser": [2.2, "katana"], "orb": [9.1, "katana"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "summoner": {"band": [8.2, "Arcane Pendant"], "chaser": [1.7, "dark"], "orb": [9.1, "dark"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "paladin": {"band": [6.1, "Main Arms Pendant"], "chaser": [1.6, "greatsword"], "orb": [9.6, "greatsword"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}, "cleric": {"band": [7.9, "Light Twin Pendant"], "chaser": [1.6, "light"], "orb": [9.6, "light"], "vanguard": [8.0, "Onslaught Insignia"], "reckoning": [0.0, "Slayer Insignia"]}}};
-const BYLEVEL = [{"lv": 1, "g": 1, "power": 1.48, "attack": 0.4, "pendant": 4.4, "bell": 2.8, "orbSet": 1.5, "orbTuned": 3.3}, {"lv": 6, "g": 2, "power": 2.03, "attack": 0.4, "pendant": 3.2, "bell": 4.4, "orbSet": 2.2, "orbTuned": 4.8}, {"lv": 11, "g": 3, "power": 2.19, "attack": 0.4, "pendant": 4.8, "bell": 6.2, "orbSet": 3.3, "orbTuned": 7.2}, {"lv": 16, "g": 4, "power": 2.82, "attack": 0.4, "pendant": 3.5, "bell": 6.8, "orbSet": 3.6, "orbTuned": 7.9}, {"lv": 21, "g": 5, "power": 3.42, "attack": 0.35, "pendant": 5.5, "bell": 6.1, "orbSet": 4.7, "orbTuned": 10.3}, {"lv": 26, "g": 6, "power": 3.78, "attack": 0.35, "pendant": 5.6, "bell": 6.7, "orbSet": 5.0, "orbTuned": 11.0}, {"lv": 31, "g": 7, "power": 4.48, "attack": 0.35, "pendant": 6.5, "bell": 6.7, "orbSet": 5.8, "orbTuned": 12.6}, {"lv": 36, "g": 8, "power": 4.7, "attack": 0.3, "pendant": 7.1, "bell": 5.9, "orbSet": 6.3, "orbTuned": 13.7}, {"lv": 41, "g": 9, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 6.7, "orbSet": 6.9, "orbTuned": 14.9}, {"lv": 46, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 7.4, "orbSet": 7.0, "orbTuned": 15.2}, {"lv": 50, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 7.4, "bell": 7.4, "orbSet": 6.3, "orbTuned": 13.7}];
+const DATA = {"FLAT":{"Pendant":{"1":[0,1,1,2,2,4,5,7,9,12,14],"2":[0,2,2,4,4,7,9,13,16,22,25],"3":[0,3,3,5,5,10,13,18,23,31,36]},"Orb":{"1":[0,1,2,4,6,10,13,18,23,29,34],"2":[0,2,4,7,11,18,23,32,41,52,61],"3":[0,3,5,10,16,26,34,47,60,75,88]},"Great Pendant":{"2":[null,null,null,null,null,9,13,16,22,27,31],"3":[0,3,3,5,8,16,18,26,34,42,49]},"Channel Pendant":{"2":[null,null,null,null,null,14,18,25,32,41,49],"3":[0,3,5,8,13,23,29,39,52,65,75]},"Great Orb":{"2":[null,null,null,null,null,22,29,40,50,63,74],"3":[0,3,5,13,18,34,44,60,78,99,114]},"Twin Orb":{"2":[null,null,null,null,null,14,18,25,32,41,49],"3":[0,3,5,8,13,23,29,39,52,65,75]}},"VIA":{"1":{"brawler|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[6.2,"greatsword"],"Bell":[7.5,"greatsword"],"Insignia":[4.5,"sub-bosses and bosses"]},"brawler|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[4.5,"sub-bosses and bosses"]},"brawler|long":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[18.1,"lance"],"Insignia":[15.0,"sub-bosses and bosses"]},"brawler|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[6.0,"lance"],"Bell":[4.0,"lance"],"Insignia":[0.0,"sub-bosses and bosses"]},"mage|campaign":{"Pendant":[7.0,"her three kinds"],"Orb":[6.1,"ice"],"Bell":[4.5,"ice"],"Insignia":[4.5,"sub-bosses and bosses"]},"mage|tuned":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[5.1,"lightning"],"Insignia":[4.5,"sub-bosses and bosses"]},"mage|long":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[9.9,"lightning"],"Insignia":[15.0,"sub-bosses and bosses"]},"mage|waves":{"Pendant":[7.0,"her three kinds"],"Orb":[5.9,"lightning"],"Bell":[2.5,"lightning"],"Insignia":[0.0,"sub-bosses and bosses"]},"spellblade|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[3.6,"katana"],"Insignia":[4.5,"sub-bosses and bosses"]},"spellblade|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[4.1,"lance"],"Insignia":[4.5,"sub-bosses and bosses"]},"spellblade|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[15.0,"sub-bosses and bosses"]},"spellblade|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[2.0,"lance"],"Insignia":[0.0,"sub-bosses and bosses"]},"summoner|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[2.9,"bow"],"Insignia":[4.5,"sub-bosses and bosses"]},"summoner|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[3.4,"light"],"Insignia":[4.5,"sub-bosses and bosses"]},"summoner|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[6.9,"light"],"Insignia":[15.0,"sub-bosses and bosses"]},"summoner|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[1.6,"bow"],"Insignia":[0.0,"sub-bosses and bosses"]},"paladin|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[7.4,"greatsword"],"Bell":[2.5,"greatsword"],"Insignia":[4.5,"sub-bosses and bosses"]},"paladin|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"]},"paladin|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"]},"paladin|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[6.8,"light"],"Bell":[1.5,"light"],"Insignia":[0.0,"sub-bosses and bosses"]},"cleric|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[8.7,"ice"],"Bell":[2.5,"ice"],"Insignia":[4.5,"sub-bosses and bosses"]},"cleric|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"]},"cleric|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"]},"cleric|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[8.1,"ice"],"Bell":[1.5,"ice"],"Insignia":[0.0,"sub-bosses and bosses"]}},"2":{"brawler|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[7.1,"lance"],"Bell":[7.5,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[10.0,"greatsword + lance"],"Great Orb":[8.5,"lance"],"Twin Orb":[5.6,"lightning twins"],"Great Bell":[10.5,"lance"],"Toll Bell":[5.3,"lance"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"brawler|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[12.8,"greatsword + lance"],"Great Orb":[16.3,"lance"],"Twin Orb":[10.8,"lightning twins"],"Great Bell":[11.7,"lance"],"Toll Bell":[5.8,"lance"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"brawler|long":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[18.1,"lance"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[12.8,"greatsword + lance"],"Great Orb":[16.3,"lance"],"Twin Orb":[10.8,"lightning twins"],"Great Bell":[25.4,"lance"],"Toll Bell":[26.6,"lance"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"brawler|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[7.2,"lance"],"Bell":[4.0,"lance"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[10.1,"greatsword + lance"],"Great Orb":[8.7,"lance"],"Twin Orb":[5.8,"lightning twins"],"Great Bell":[5.6,"lance"],"Toll Bell":[2.8,"lance"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]},"mage|campaign":{"Pendant":[7.0,"her three kinds"],"Orb":[7.0,"fire"],"Bell":[4.5,"fire"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[8.8,"her three kinds"],"Channel Pendant":[9.9,"fire + ice"],"Great Orb":[8.4,"fire"],"Twin Orb":[5.6,"fire twins"],"Great Bell":[6.4,"fire"],"Toll Bell":[2.7,"fire"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"mage|tuned":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[5.1,"lightning"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[8.8,"her three kinds"],"Channel Pendant":[12.6,"fire + ice"],"Great Orb":[15.9,"lightning"],"Twin Orb":[10.6,"lightning twins"],"Great Bell":[7.1,"lightning"],"Toll Bell":[3.0,"lightning"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"mage|long":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[9.9,"lightning"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[8.8,"her three kinds"],"Channel Pendant":[12.6,"fire + ice"],"Great Orb":[15.9,"lightning"],"Twin Orb":[10.6,"lightning twins"],"Great Bell":[13.8,"lightning"],"Toll Bell":[11.9,"lightning"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"mage|waves":{"Pendant":[7.0,"her three kinds"],"Orb":[7.1,"fire"],"Bell":[2.5,"fire"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[8.8,"her three kinds"],"Channel Pendant":[9.9,"fire + lightning"],"Great Orb":[8.5,"fire"],"Twin Orb":[5.6,"fire twins"],"Great Bell":[3.6,"fire"],"Toll Bell":[1.5,"fire"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]},"spellblade|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[3.7,"katana"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[9.0,"katana + lance"],"Great Orb":[8.3,"lightning"],"Twin Orb":[9.5,"lightning twins"],"Great Bell":[5.1,"katana"],"Toll Bell":[2.2,"katana"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"spellblade|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[4.1,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[9.0,"katana + lance"],"Great Orb":[10.2,"lance"],"Twin Orb":[12.3,"lightning twins"],"Great Bell":[5.8,"lance"],"Toll Bell":[2.5,"lance"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"spellblade|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[9.0,"katana + lance"],"Great Orb":[10.2,"lance"],"Twin Orb":[12.3,"lightning twins"],"Great Bell":[11.8,"lance"],"Toll Bell":[11.5,"lance"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"spellblade|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[2.0,"katana"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[9.0,"katana + lance"],"Great Orb":[8.3,"lightning"],"Twin Orb":[9.6,"lightning twins"],"Great Bell":[2.8,"katana"],"Toll Bell":[1.2,"katana"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]},"summoner|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[2.9,"bow"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[7.4,"dark + light"],"Great Orb":[10.8,"bow"],"Twin Orb":[10.8,"light twins"],"Great Bell":[4.1,"bow"],"Toll Bell":[1.8,"bow"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"summoner|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[3.4,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[7.4,"dark + light"],"Great Orb":[10.8,"bow"],"Twin Orb":[10.9,"light twins"],"Great Bell":[4.7,"light"],"Toll Bell":[2.0,"light"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"summoner|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[6.9,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[7.4,"dark + light"],"Great Orb":[10.8,"bow"],"Twin Orb":[10.9,"light twins"],"Great Bell":[9.7,"light"],"Toll Bell":[9.4,"light"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"summoner|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[1.6,"bow"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[9.0,"her three kinds"],"Channel Pendant":[7.4,"dark + light"],"Great Orb":[10.8,"bow"],"Twin Orb":[10.8,"light twins"],"Great Bell":[2.2,"bow"],"Toll Bell":[1.0,"bow"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]},"paladin|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[7.7,"light"],"Bell":[2.5,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[10.1,"greatsword + axe"],"Great Orb":[9.2,"light"],"Twin Orb":[6.1,"light twins"],"Great Bell":[3.6,"light"],"Toll Bell":[1.3,"light"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"paladin|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[14.0,"greatsword + axe"],"Great Orb":[18.3,"light"],"Twin Orb":[12.1,"light twins"],"Great Bell":[3.9,"light"],"Toll Bell":[1.4,"light"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"paladin|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[14.0,"greatsword + axe"],"Great Orb":[18.3,"light"],"Twin Orb":[12.1,"light twins"],"Great Bell":[7.2,"light"],"Toll Bell":[4.7,"light"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"paladin|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[8.1,"light"],"Bell":[1.5,"light"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[9.7,"greatsword + axe"],"Great Orb":[9.8,"light"],"Twin Orb":[6.5,"light twins"],"Great Bell":[2.0,"light"],"Toll Bell":[0.7,"light"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]},"cleric|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[7.9,"light"],"Bell":[2.5,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[11.4,"light + ice"],"Great Orb":[9.5,"light"],"Twin Orb":[11.0,"light twins"],"Great Bell":[3.6,"light"],"Toll Bell":[1.3,"light"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"cleric|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[14.4,"light + ice"],"Great Orb":[18.3,"light"],"Twin Orb":[14.3,"light twins"],"Great Bell":[3.9,"light"],"Toll Bell":[1.4,"light"],"Great Insignia":[6.0,"sub-bosses and bosses"],"Onslaught Insignia":[8.2,"her first act each wave"]},"cleric|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[14.4,"light + ice"],"Great Orb":[18.3,"light"],"Twin Orb":[14.3,"light twins"],"Great Bell":[7.2,"light"],"Toll Bell":[4.7,"light"],"Great Insignia":[20.0,"sub-bosses and bosses"],"Onslaught Insignia":[2.0,"her first act each wave"]},"cleric|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[8.1,"light"],"Bell":[1.5,"light"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[10.1,"her three kinds"],"Channel Pendant":[11.3,"light + ice"],"Great Orb":[9.8,"light"],"Twin Orb":[11.3,"light twins"],"Great Bell":[2.0,"light"],"Toll Bell":[0.7,"light"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[10.0,"her first act each wave"]}},"3":{"brawler|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[7.1,"lance"],"Bell":[7.5,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.9,"her three kinds"],"Channel Pendant":[10.7,"greatsword + lance"],"Great Orb":[9.2,"lance"],"Twin Orb":[6.0,"lightning twins"],"Great Bell":[11.3,"lance"],"Toll Bell":[5.3,"lance"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"brawler|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.9,"her three kinds"],"Channel Pendant":[13.6,"greatsword + lance"],"Great Orb":[17.7,"lance"],"Twin Orb":[11.5,"lightning twins"],"Great Bell":[12.5,"lance"],"Toll Bell":[5.8,"lance"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"brawler|long":{"Pendant":[7.2,"her three kinds"],"Orb":[13.5,"lance"],"Bell":[18.1,"lance"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[9.9,"her three kinds"],"Channel Pendant":[13.6,"greatsword + lance"],"Great Orb":[17.7,"lance"],"Twin Orb":[11.5,"lightning twins"],"Great Bell":[27.2,"lance"],"Toll Bell":[28.7,"lance"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"brawler|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[7.2,"lance"],"Bell":[4.0,"lance"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[9.9,"her three kinds"],"Channel Pendant":[10.7,"greatsword + lance"],"Great Orb":[9.4,"lance"],"Twin Orb":[6.1,"lightning twins"],"Great Bell":[6.0,"lance"],"Toll Bell":[2.8,"lance"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]},"mage|campaign":{"Pendant":[7.0,"her three kinds"],"Orb":[7.0,"fire"],"Bell":[4.5,"fire"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.7,"her three kinds"],"Channel Pendant":[10.6,"fire + ice"],"Great Orb":[9.1,"fire"],"Twin Orb":[5.9,"fire twins"],"Great Bell":[6.8,"fire"],"Toll Bell":[2.7,"fire"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"mage|tuned":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[5.1,"lightning"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[9.7,"her three kinds"],"Channel Pendant":[13.4,"fire + ice"],"Great Orb":[17.3,"lightning"],"Twin Orb":[11.2,"lightning twins"],"Great Bell":[7.6,"lightning"],"Toll Bell":[3.0,"lightning"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"mage|long":{"Pendant":[7.0,"her three kinds"],"Orb":[13.2,"lightning"],"Bell":[9.9,"lightning"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[9.7,"her three kinds"],"Channel Pendant":[13.4,"fire + ice"],"Great Orb":[17.3,"lightning"],"Twin Orb":[11.2,"lightning twins"],"Great Bell":[14.8,"lightning"],"Toll Bell":[11.9,"lightning"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"mage|waves":{"Pendant":[7.0,"her three kinds"],"Orb":[7.1,"fire"],"Bell":[2.5,"fire"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[9.7,"her three kinds"],"Channel Pendant":[10.5,"fire + lightning"],"Great Orb":[9.2,"fire"],"Twin Orb":[6.0,"fire twins"],"Great Bell":[3.8,"fire"],"Toll Bell":[1.5,"fire"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]},"spellblade|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[3.7,"katana"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[9.6,"katana + lance"],"Great Orb":[9.0,"lightning"],"Twin Orb":[10.1,"lightning twins"],"Great Bell":[5.5,"katana"],"Toll Bell":[2.2,"katana"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"spellblade|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[4.1,"lance"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[9.6,"katana + lance"],"Great Orb":[11.1,"lance"],"Twin Orb":[13.0,"lightning twins"],"Great Bell":[6.2,"lance"],"Toll Bell":[2.5,"lance"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"spellblade|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.5,"lance"],"Bell":[8.4,"lance"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[9.6,"katana + lance"],"Great Orb":[11.1,"lance"],"Twin Orb":[13.0,"lightning twins"],"Great Bell":[12.7,"lance"],"Toll Bell":[11.8,"lance"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"spellblade|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[6.9,"lightning"],"Bell":[2.0,"katana"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[9.6,"katana + lance"],"Great Orb":[9.0,"lightning"],"Twin Orb":[10.2,"lightning twins"],"Great Bell":[3.0,"katana"],"Toll Bell":[1.2,"katana"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]},"summoner|campaign":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[2.9,"bow"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[7.9,"dark + light"],"Great Orb":[11.7,"bow"],"Twin Orb":[11.5,"light twins"],"Great Bell":[4.4,"bow"],"Toll Bell":[1.8,"bow"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"summoner|tuned":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[3.4,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[7.9,"dark + light"],"Great Orb":[11.7,"bow"],"Twin Orb":[11.6,"light twins"],"Great Bell":[5.1,"light"],"Toll Bell":[2.0,"light"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"summoner|long":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[6.9,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[7.9,"dark + light"],"Great Orb":[11.7,"bow"],"Twin Orb":[11.6,"light twins"],"Great Bell":[10.4,"light"],"Toll Bell":[9.7,"light"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"summoner|waves":{"Pendant":[7.2,"her three kinds"],"Orb":[8.9,"bow"],"Bell":[1.6,"bow"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[10.0,"her three kinds"],"Channel Pendant":[7.9,"dark + light"],"Great Orb":[11.7,"bow"],"Twin Orb":[11.5,"light twins"],"Great Bell":[2.4,"bow"],"Toll Bell":[1.0,"bow"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]},"paladin|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[7.7,"light"],"Bell":[2.5,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[10.7,"greatsword + axe"],"Great Orb":[10.0,"light"],"Twin Orb":[6.5,"light twins"],"Great Bell":[3.8,"light"],"Toll Bell":[1.3,"light"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"paladin|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[14.8,"greatsword + axe"],"Great Orb":[19.9,"light"],"Twin Orb":[12.9,"light twins"],"Great Bell":[4.2,"light"],"Toll Bell":[1.4,"light"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"paladin|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[14.8,"greatsword + axe"],"Great Orb":[19.9,"light"],"Twin Orb":[12.9,"light twins"],"Great Bell":[7.8,"light"],"Toll Bell":[4.7,"light"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"paladin|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[8.1,"light"],"Bell":[1.5,"light"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[10.3,"greatsword + axe"],"Great Orb":[10.6,"light"],"Twin Orb":[6.9,"light twins"],"Great Bell":[2.2,"light"],"Toll Bell":[0.7,"light"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]},"cleric|campaign":{"Pendant":[8.0,"her three kinds"],"Orb":[7.9,"light"],"Bell":[2.5,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[12.2,"light + ice"],"Great Orb":[10.3,"light"],"Twin Orb":[11.7,"light twins"],"Great Bell":[3.8,"light"],"Toll Bell":[1.3,"light"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"cleric|tuned":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[2.8,"light"],"Insignia":[4.5,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[15.3,"light + ice"],"Great Orb":[19.9,"light"],"Twin Orb":[15.3,"light twins"],"Great Bell":[4.2,"light"],"Toll Bell":[1.4,"light"],"Great Insignia":[6.8,"sub-bosses and bosses"],"Onslaught Insignia":[9.1,"her first act each wave"]},"cleric|long":{"Pendant":[8.0,"her three kinds"],"Orb":[15.2,"light"],"Bell":[5.2,"light"],"Insignia":[15.0,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[15.3,"light + ice"],"Great Orb":[19.9,"light"],"Twin Orb":[15.3,"light twins"],"Great Bell":[7.8,"light"],"Toll Bell":[4.7,"light"],"Great Insignia":[22.5,"sub-bosses and bosses"],"Onslaught Insignia":[2.2,"her first act each wave"]},"cleric|waves":{"Pendant":[8.0,"her three kinds"],"Orb":[8.1,"light"],"Bell":[1.5,"light"],"Insignia":[0.0,"sub-bosses and bosses"],"Great Pendant":[11.1,"her three kinds"],"Channel Pendant":[12.0,"light + ice"],"Great Orb":[10.6,"light"],"Twin Orb":[12.0,"light twins"],"Great Bell":[2.2,"light"],"Toll Bell":[0.7,"light"],"Great Insignia":[0.0,"sub-bosses and bosses"],"Onslaught Insignia":[11.0,"her first act each wave"]}}},"PRESETS":{"default":{"brawler":{"1":{"gain":7.5,"picks":[["Bell","greatsword"]],"capped":[]},"2":{"gain":21.6,"picks":[["Channel Pendant","axe + lance"],["Great Bell","lance"]],"capped":[]},"3":{"gain":33.6,"picks":[["Channel Pendant","axe + lance"],["Great Bell","lance"],["Onslaught Insignia",""]],"capped":[]}},"mage":{"1":{"gain":7.0,"picks":[["Pendant","her three kinds"]],"capped":[]},"2":{"gain":18.2,"picks":[["Channel Pendant","fire + ice"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":27.2,"picks":[["Channel Pendant","fire + ice"],["Great Bell","fire"],["Onslaught Insignia",""]],"capped":[]}},"spellblade":{"1":{"gain":7.2,"picks":[["Pendant","her three kinds"]],"capped":[]},"2":{"gain":18.5,"picks":[["Twin Orb","lightning twins"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":29.0,"picks":[["Great Pendant","her three kinds"],["Great Orb","lightning"],["Onslaught Insignia",""]],"capped":[]}},"summoner":{"1":{"gain":8.9,"picks":[["Orb","bow"]],"capped":[]},"2":{"gain":19.9,"picks":[["Twin Orb","light twins"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":32.1,"picks":[["Great Pendant","her three kinds"],["Great Orb","bow"],["Onslaught Insignia",""]],"capped":[]}},"paladin":{"1":{"gain":8.0,"picks":[["Pendant","her three kinds"]],"capped":[]},"2":{"gain":19.0,"picks":[["Great Pendant","her three kinds"],["Great Orb","light"]],"capped":[]},"3":{"gain":31.2,"picks":[["Great Pendant","her three kinds"],["Great Orb","light"],["Onslaught Insignia",""]],"capped":[]}},"cleric":{"1":{"gain":8.7,"picks":[["Orb","ice"]],"capped":[]},"2":{"gain":19.6,"picks":[["Channel Pendant","light + ice"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":28.9,"picks":[["Channel Pendant","light + ice"],["Great Orb","bow"],["Onslaught Insignia",""]],"capped":[]}}},"reverse":{"brawler":{"2":{"gain":20.9,"picks":[["Channel Pendant","bow + axe"],["Great Bell","bow"]],"capped":[]},"3":{"gain":33.5,"picks":[["Channel Pendant","bow + axe"],["Great Bell","bow"],["Onslaught Insignia",""]],"capped":[]}},"mage":{"2":{"gain":18.3,"picks":[["Channel Pendant","light + ice"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":28.0,"picks":[["Channel Pendant","light + ice"],["Great Bell","light"],["Onslaught Insignia",""]],"capped":[]}},"spellblade":{"2":{"gain":19.0,"picks":[["Twin Orb","dark twins"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":29.0,"picks":[["Great Pendant","her three kinds"],["Great Orb","dark"],["Onslaught Insignia",""]],"capped":[]}},"summoner":{"2":{"gain":19.9,"picks":[["Great Orb","greatsword"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":32.1,"picks":[["Great Pendant","her three kinds"],["Great Orb","greatsword"],["Onslaught Insignia",""]],"capped":[]}},"paladin":{"2":{"gain":19.9,"picks":[["Channel Pendant","bow + katana"],["Onslaught Insignia",""]],"capped":[]},"3":{"gain":28.7,"picks":[["Channel Pendant","bow + katana"],["Great Orb","light"],["Onslaught Insignia",""]],"capped":[]}},"cleric":{"2":{"gain":21.6,"picks":[["Great Pendant","her three kinds"],["Twin Orb","fire twins"]],"capped":[]},"3":{"gain":32.1,"picks":[["Great Pendant","her three kinds"],["Great Orb","greatsword"],["Onslaught Insignia",""]],"capped":[]}}}}};
+const FLAT = DATA.FLAT, VIA = DATA.VIA, PRESETS = DATA.PRESETS;
 const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
 const LV = (g) => 5 * g - 4;
 const KINDS = { greatsword: ['Greatsword', 'arms', 'fire'], axe: ['Axe', 'arms', 'ice'], lance: ['Lance', 'arms', 'ltn'], bow: ['Bow', 'arms', 'light'], katana: ['Katana', 'arms', 'dark'],
   fire: ['Fire', 'tome', 'fire'], ice: ['Ice', 'tome', 'ice'], lightning: ['Lightning', 'tome', 'ltn'], light: ['Light', 'tome', 'light'], dark: ['Dark', 'tome', 'dark'] };
 const chip = (id) => { const [n, ch, c] = KINDS[id]; return `<span class="k ${ch === 'arms' ? 'arm' : 'tome'} ${c}" style="--kc:var(--k-${c})">${n}</span>`; };
 const FAM = {
-  pendant: { name: 'Pendants', c: 'var(--c3)', tier: 1, what: 'Flat offense on each of its kinds\' hits: 0.4 of an Orb on three kinds, 0.6 on two.' },
-  bell: { name: 'Bells', c: 'var(--c5)', tier: 1, what: 'When she Attacks, her weapon of its kind strikes once more: one hit, × her hand. Its kind must be one she holds.' },
-  orb: { name: 'Orbs', c: 'var(--c1)', tier: 2, what: 'Flat offense on one kind\'s hits: half a weapon\'s Might (today\'s).' },
-  insignia: { name: 'Insignias', c: 'var(--c2)', tier: 3, what: 'A percentage by timing: her first act each wave, or her hits on sub-bosses and bosses.' },
+  pendant: { name: 'Pendant', c: 'var(--c3)', what: 'Flat offense spread over several of her kinds.' },
+  orb: { name: 'Orb', c: 'var(--c1)', what: 'Flat offense focused on one kind, or one twin set.' },
+  bell: { name: 'Bell', c: 'var(--c5)', what: 'After her Attack, her weapon of its kind strikes once more. Its kind must be one she holds.' },
+  insignia: { name: 'Insignia', c: 'var(--c2)', what: 'A percentage by the foe\'s rank or the act\'s timing.' },
 };
-const PENDANTS = [['Main Arms Pendant', ['greatsword', 'axe', 'lance']], ['Secondary Arms Pendant', ['bow', 'katana']], ['Elemental Pendant', ['fire', 'ice', 'lightning']], ['Arcane Pendant', ['light', 'dark']],
-  ['Fire Twin Pendant', ['greatsword', 'fire']], ['Ice Twin Pendant', ['axe', 'ice']], ['Lightning Twin Pendant', ['lance', 'lightning']], ['Light Twin Pendant', ['bow', 'light']], ['Dark Twin Pendant', ['katana', 'dark']]];
-const KORDER = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'fire', 'ice', 'lightning', 'light', 'dark'];
-const INSIG = [['Onslaught Insignia', 'Her first act in each wave', 'vanguard'], ['Slayer Insignia', 'Her hits on a sub-boss or a boss', 'reckoning']];
+// Every form: family, kind ('base' or 'great' or 'shift'), what it reaches, its value at G10 by tier
+const FORMS = [
+  ['Pendant', 'pendant', 'base', 'Her three slotted kinds', 'each kind'],
+  ['Great Pendant', 'pendant', 'great', 'Her three slotted kinds, more', 'each kind'],
+  ['Channel Pendant', 'pendant', 'shift', 'Two kinds of one channel', 'each kind'],
+  ['Orb', 'orb', 'base', 'One kind she sets', 'one kind'],
+  ['Great Orb', 'orb', 'great', 'One kind, more', 'one kind'],
+  ['Twin Orb', 'orb', 'shift', 'One twin set (an Arm and its element)', 'each kind'],
+  ['Bell', 'bell', 'base', 'A follow-up of one of her kinds', 'power × hand'],
+  ['Great Bell', 'bell', 'great', 'A harder follow-up', 'power × hand'],
+  ['Toll Bell', 'bell', 'shift', 'Louder each time it rings in a fight', 'first ring → top'],
+  ['Insignia', 'insignia', 'base', 'Her hits on sub-bosses and bosses', '%'],
+  ['Great Insignia', 'insignia', 'great', 'Sub-bosses and bosses, more', '%'],
+  ['Onslaught Insignia', 'insignia', 'shift', 'Her first act each wave', '%'],
+];
+const FM = Object.fromEntries(FORMS.map((f) => [f[0], f]));
+// Values at grade g (1-10) in tier t, as a display string and a number; null if the form isn't open there
+function valueAt(name, t, g) {
+  const fam = FM[name][1], kind = FM[name][2];
+  const open = kind === 'base' || (t >= 2 && (g >= 5 || t === 3));
+  if (!open) return null;
+  if (fam === 'pendant' || fam === 'orb') { const v = FLAT[name][t][g]; return v == null ? null : { n: v, s: '+' + v }; }
+  const step = t === 3 && g >= 5;
+  if (name === 'Bell') return { n: 0.1 * g, s: (0.1 * g).toFixed(1) + ' × hand' };
+  if (name === 'Great Bell') { const v = (step ? 0.15 : 0.14) * g; return { n: v, s: (Math.round(v * 100) / 100) + ' × hand' }; }
+  if (name === 'Toll Bell') { const a = 0.05 * g, st = 0.02 * g, top = (step ? 0.25 : 0.2) * g; return { n: top, s: `${+a.toFixed(2)} → ${+top.toFixed(2)}`, first: a, step: st }; }
+  if (name === 'Insignia') return { n: 1.5 * g, s: '+' + (1.5 * g).toFixed(1).replace('.0', '') + '%' };
+  if (name === 'Great Insignia') { const v = (step ? 2.25 : 2) * g; return { n: v, s: '+' + (+v.toFixed(2)) + '%' }; }
+  if (name === 'Onslaught Insignia') { const v = (step ? 2.75 : 2.5) * g; return { n: v, s: '+' + (+v.toFixed(2)) + '%' }; }
+}
 const tip = document.getElementById('tip');
 function bindTip(el, title, body) {
   el.setAttribute('tabindex', '0');
@@ -329,10 +404,15 @@ function bindTip(el, title, body) {
   el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
 }
+const pills = (id, label, opts, cur, cb) => {
+  const el = document.getElementById(id);
+  el.innerHTML = `<span class="lbl">${label}</span>` + opts.map(([v, n]) => `<button data-v="${v}" aria-pressed="${v == cur}">${n}</button>`).join('');
+  el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); cb(b.dataset.v); }));
+};
 
-const KPI = [['Slots', '1 · 2 · 3', 'Tier 1 · 2 · 3, untyped'], ['Families she can wear', '2 · 3 · 4', 'one of each at most'], ['Members unlocked', '19 · 29 · 31', '9 Pendants, 10 Bells; + 10 Orbs; + 2 Insignias'],
-  ['Defensive or MP accessories', '0', 'today 10 (5 Talismans, 5 Amulets)'], ['The kind cap', '+68 · +122 · +177', 'Orbs, Pendants and the Halo on one kind'], ['A Bell at G10', '1.0 × hand', 'a full Attack, once an act']];
-document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:20px">${v}</div><div class="delta">${d}</div></div>`).join('');
+const KPI = [['Slots', '1 · 2 · 3', 'Tier 1 · 2 · 3, untyped'], ['Families', 'All four, every tier', 'one of each at most'], ['Tier 1 choice', 'One of four', 'the first draft: one of 19'],
+  ['Forms open', '4 · 12 · 12', 'bases; + 8 branches; a step deeper'], ['Defensive or MP accessories', '0', 'today 10 (5 Talismans, 5 Amulets)'], ['Her signature', '+0.2 a level', 'ATK and M.ATK, × tier, worn']];
+document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="delta">${d}</div></div>`).join('');
 
 // Retired
 const RET = [['Iron Talisman', 'Cut physical damage 15%', 'Never picked over damage (owner)'], ['Ward Amulet', 'Cut magical damage 15%', 'Never picked over damage (owner)'],
@@ -342,80 +422,114 @@ const RET = [['Iron Talisman', 'Cut physical damage 15%', 'Never picked over dam
   ['Spring Amulet', '10 MP a round', '"Too broken; I would always wear one" (owner)', 1], ['Siphon Amulet', '8% of magical damage back as MP', 'At G10 a deep cast refunds more than it costs', 1]];
 document.getElementById('retired-cards').innerHTML = RET.map(([n, d, w, mp]) => `<div class="rcard${mp ? ' mp' : ''}"><b>${n}</b>${d} at G10<div class="why">${w}</div></div>`).join('');
 
-// Catalog
+// ---- The trees
+let ttier = 3;
+function renderTree() {
+  const W = 1180, rowH = 120, H = 30 + rowH * 4, x0 = 150, nw = 230, nh = 44, xs = [x0, x0 + 360, x0 + 770];
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The four accessory families: base, branches and Tier 3's step">`;
+  ['Tier 1 · base (G0 on)', 'Tier 2 · branches (a slot\'s G5 on)', 'Tier 3 · the step (a slot\'s G5 on)'].forEach((t, i) => { s += `<text x="${xs[i]}" y="16" class="axis-text" style="font-size:12px;fill:${TIERC[i + 1]};font-weight:700">${t}</text>`; });
+  const node = (x, y, name, line, tierOpen, fc, dash) => {
+    const lit = tierOpen <= ttier;
+    return `<g class="fnode" data-t="${name}" data-d="${line.replace(/"/g, '&quot;')}${lit ? '' : '<br><i>Not open in Tier ' + ttier + '</i>'}" opacity="${lit ? 1 : 0.32}"><rect x="${x}" y="${y - nh / 2}" width="${nw}" height="${nh}" rx="9" fill="color-mix(in srgb, ${fc} ${lit ? 16 : 6}%, var(--panel))" stroke="${fc}" stroke-width="1.6" ${dash ? 'stroke-dasharray="5 3"' : ''}/>` +
+      `<text x="${x + 10}" y="${y - 4}" class="val-text" style="font-size:12.5px">${name}</text><text x="${x + 10}" y="${y + 13}" class="val-soft" style="font-size:11px">${line.split('<br>')[0]}</text></g>`;
+  };
+  const link = (x1, y1, x2, y2, c, lit) => { const mx = (x1 + x2) / 2; return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${c}" stroke-width="2" opacity="${lit ? 1 : 0.3}"/>`; };
+  const ROWS = [
+    ['pendant', ['Pendant', 'her three kinds · 0.4 each'], ['Great Pendant', 'her three kinds · 0.5 each'], ['Channel Pendant', 'two of one channel · 0.8 each'], ['0.55 each'], ['0.85 each']],
+    ['orb', ['Orb', 'one kind · 1.0'], ['Great Orb', 'one kind · 1.2'], ['Twin Orb', 'a twin set · 0.8 each'], ['1.3'], ['0.85 each']],
+    ['bell', ['Bell', 'a hit at 1.0 × her hand'], ['Great Bell', 'a hit at 1.4'], ['Toll Bell', '0.5, +0.2 a ring, up to 2.0'], ['1.5'], ['up to 2.5']],
+    ['insignia', ['Insignia', 'sub-bosses, bosses +15%'], ['Great Insignia', 'sub-bosses, bosses +20%'], ['Onslaught Insignia', 'her first act each wave +25%'], ['+22.5%'], ['+27.5%']],
+  ];
+  ROWS.forEach(([fam, base, great, shift, g3, s3], i) => {
+    const yc = 30 + rowH * i + rowH / 2, fc = FAM[fam].c, yu = yc - 27, yd = yc + 27;
+    s += `<text x="8" y="${yc - 2}" class="val-text" style="font-size:14px;fill:${fc}">${FAM[fam].name}</text><text x="8" y="${yc + 15}" class="axis-text">${['spread', 'focused', 'follow-up', 'rank or timing'][i]}</text>`;
+    s += link(xs[0] + nw, yc, xs[1], yu, fc, ttier >= 2) + link(xs[0] + nw, yc, xs[1], yd, fc, ttier >= 2) + link(xs[1] + nw, yu, xs[2], yu, fc, ttier >= 3) + link(xs[1] + nw, yd, xs[2], yd, fc, ttier >= 3);
+    s += node(xs[0], yc, base[0], base[1], 1, fc);
+    s += node(xs[1], yu, great[0], great[1] + '<br>The Great branch: the base\'s reach, deeper', 2, fc);
+    s += node(xs[1], yd, shift[0], shift[1] + '<br>The other branch: a different reach', 2, fc, true);
+    s += node(xs[2], yu, great[0] + ' · Tier 3', g3[0] + '<br>Its Tier 3 step, from the slot\'s G5', 3, fc);
+    s += node(xs[2], yd, shift[0] + ' · Tier 3', s3[0] + '<br>Its Tier 3 step, from the slot\'s G5', 3, fc, true);
+    if (i < 3) s += `<line x1="8" x2="${W - 8}" y1="${30 + rowH * (i + 1)}" y2="${30 + rowH * (i + 1)}" stroke="var(--hairline)"/>`;
+  });
+  document.getElementById('tree').innerHTML = s + '</svg>';
+  document.querySelectorAll('#tree .fnode').forEach((n) => bindTip(n, n.dataset.t, n.dataset.d));
+  document.getElementById('tree-table').innerHTML = `<table><tr><th>Form</th><th>Family</th><th>Opens</th><th>Reaches</th><th class="num">G10, Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3 (its step)</th></tr>` +
+    FORMS.map(([n, f, k, what]) => `<tr><td>${n}</td><td>${FAM[f].name}</td><td>${k === 'base' ? 'Tier 1, G0' : 'Tier 2, a slot\'s G5'}</td><td>${what}</td>${[1, 2, 3].map((t) => { const v = valueAt(n, t, 10); return `<td class="num">${v ? v.s : '—'}</td>`; }).join('')}</tr>`).join('') + '</table>';
+}
+pills('ttier', 'Open in', [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], ttier, (v) => { ttier = +v; renderTree(); });
+renderTree();
+
+// ---- Catalog
 let tier = 1, grade = 10;
-document.getElementById('tier').innerHTML = '<span class="lbl">Tier</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
-document.querySelectorAll('#tier button').forEach((b) => b.addEventListener('click', () => { tier = +b.dataset.t; renderCat(); }));
+pills('tier', 'Tier', [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], tier, (v) => { tier = +v; renderCat(); });
 document.getElementById('grade').addEventListener('input', (e) => { grade = +e.target.value; renderCat(); });
 function renderCat() {
-  document.querySelectorAll('#tier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === tier));
   document.getElementById('gval').textContent = 'G' + grade; document.getElementById('glv').textContent = `worn at Uma Lv ${LV(grade)}`;
-  const A = ACC[tier];
-  const card = (id, members) => {
-    const f = FAM[id], locked = tier < f.tier;
-    return `<div class="fam${locked ? ' locked' : ''}" style="--fc:${f.c}"><h3>${f.name} <span class="tag">${locked ? 'Unlocks in Tier ' + f.tier : 'Tier ' + f.tier + ' on'}</span></h3><div class="what">${f.what}</div>${members}</div>`;
-  };
-  const pend = PENDANTS.map(([n, ks]) => { const v = (ks.length === 3 ? A.band3 : A.band2)[grade]; return `<div class="mem"><div class="nmk">${n}<div class="ks">${ks.map(chip).join('')}</div></div><span class="val">+${v} each</span></div>`; }).join('');
-  const bells = KORDER.map((k) => `<div class="mem"><div class="nmk">${KINDS[k][0]} Bell</div><span class="val">${A.chaser[grade].toFixed(1)} × hand</span></div>`).join('');
-  const orbs = KORDER.map((k) => `<div class="mem"><div class="nmk">${KINDS[k][0]} Orb</div><span class="val">+${A.orb[grade]}</span></div>`).join('');
-  const ins = INSIG.map(([n, d, key]) => `<div class="mem"><div class="nmk">${n}<span class="muted" style="font-size:11.5px">${d}</span></div><span class="val">+${A[key][grade]}%</span></div>`).join('');
-  document.getElementById('fams').innerHTML = card('pendant', pend) + card('bell', bells) + card('orb', orbs) + card('insignia', ins);
+  document.getElementById('fams').innerHTML = Object.entries(FAM).map(([id, f]) => {
+    const mem = FORMS.filter((x) => x[1] === id).map(([n, , k, what, unit]) => {
+      const v = valueAt(n, tier, grade);
+      const tag = k === 'base' ? 'base' : k === 'great' ? 'branch: deeper' : 'branch: another reach';
+      return `<div class="mem"${v ? '' : ' style="opacity:.42"'}><div class="nmk">${n}<span class="muted" style="font-size:11.5px">${what} · ${tag}</span></div><span class="val">${v ? v.s : (tier === 1 ? 'Tier 2 on' : 'from G5')}</span></div>`;
+    }).join('');
+    return `<div class="fam" style="--fc:${f.c}"><h3>${f.name} <span class="tag">every tier</span></h3><div class="what">${f.what}</div>${mem}</div>`;
+  }).join('');
 }
 renderCat();
 
-// Values by grade minis
-(function () {
-  const P = [
-    ['Pendant, each of three kinds', (t) => ACC[t].band3, '', true], ['Pendant, each of two kinds', (t) => ACC[t].band2, '', true],
-    ['Orb, one kind', (t) => ACC[t].orb, '', true], ['Bell power', 'bell', '', false], ['Insignias', 'ins', '', false],
-  ];
-  document.getElementById('grade-minis').innerHTML = P.map(([title, fn, , flat], i) => {
-    const W = 300, H = 180, pad = { l: 34, r: 30, t: 14, b: 22 };
+// ---- Values by grade
+let gtier = 2;
+pills('gtier', 'Tier', [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], gtier, (v) => { gtier = +v; renderGrades(); });
+function renderGrades() {
+  const groups = [['pendant', 'Pendant forms, each kind', 'Flat offense'], ['orb', 'Orb forms', 'Flat offense'], ['bell', 'Bell forms', 'A follow-up\'s power × her hand'], ['insignia', 'Insignia forms', 'A percentage']];
+  const styles = { base: '', great: '', shift: '6 4' };
+  document.getElementById('grade-minis').innerHTML = groups.map(([fam, title, cat]) => {
+    const W = 300, H = 190, pad = { l: 36, r: 12, t: 14, b: 22 };
     const x = (g) => pad.l + (g / 10) * (W - pad.l - pad.r);
-    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${title} by grade">`;
-    if (flat) {
-      const max = Math.max(...[1, 2, 3].map((t) => fn(t)[10])) * 1.1, y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
-      [0, 0.5, 1].forEach((f) => { const v = Math.round(max / 1.1 * f); s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
-      [1, 2, 3].forEach((t) => { const a = fn(t); s += `<path d="${a.map((v, g) => (g ? 'L' : 'M') + x(g) + ',' + y(v)).join(' ')}" fill="none" stroke="${TIERC[t]}" stroke-width="2.5"/>`;
-        a.forEach((v, g) => { if (g) s += `<circle class="mark" cx="${x(g)}" cy="${y(v)}" r="3.5" fill="${TIERC[t]}" stroke="var(--panel)" data-t="${title} · Tier ${t} · G${g}" data-d="+${v} offense${t < (title.startsWith('Orb') ? 2 : 1) ? ' (reference: Orbs unlock in Tier 2)' : ''}"/>`; });
-        s += `<text class="val-text" x="${x(10) + 5}" y="${y(a[10]) + 4}" style="font-size:11px">${a[10]}</text>`; });
-    } else {
-      const y = (v) => H - pad.b - (v / 22) * (H - pad.t - pad.b), yb = (v) => H - pad.b - (v / 1.1) * (H - pad.t - pad.b);
-      if (fn === 'bell') [0, 0.5, 1].forEach((v) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${yb(v)}" y2="${yb(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${yb(v) + 4}" text-anchor="end">${v}</text>`; });
-      else [0, 10, 20].forEach((v) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`; });
-      (fn === 'bell' ? [['chaser', 'var(--c5)', (v) => yb(v), (v) => v.toFixed(1) + ' × her hand', 'Bell']] : [['vanguard', 'var(--c2)', y, (v) => '+' + v + '%', 'Onslaught'], ['reckoning', 'var(--accent)', y, (v) => '+' + v + '%', 'Slayer']]).forEach(([k, c, yy, f, n]) => {
-        const a = ACC[1][k]; s += `<path d="${a.map((v, g) => (g ? 'L' : 'M') + x(g) + ',' + yy(v)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
-        a.forEach((v, g) => { if (g) s += `<circle class="mark" cx="${x(g)}" cy="${yy(v)}" r="3.5" fill="${c}" stroke="var(--panel)" data-t="${n} · G${g} (every tier)" data-d="${f(v)}"/>`; });
-        s += `<text class="val-text" x="${x(10) + 5}" y="${yy(a[10]) + 4 + (k === 'reckoning' ? 10 : 0)}" style="font-size:10.5px">${n === 'Bell' ? '1.0' : n}</text>`; });
-    }
+    const forms = FORMS.filter((f) => f[1] === fam);
+    let max = 0; forms.forEach(([n]) => { for (let g = 1; g <= 10; g++) { const v = valueAt(n, gtier, g); if (v) max = Math.max(max, v.n); } });
+    max = max * 1.12 || 1;
+    const y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${title} by grade, Tier ${gtier}">`;
+    [0, 0.5, 1].forEach((f) => { const v = max / 1.12 * f; s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${fam === 'bell' ? v.toFixed(1) : Math.round(v)}</text>`; });
+    const cols = { base: 'var(--neutral-strong)', great: FAM[fam].c, shift: FAM[fam].c };
+    forms.forEach(([n, , k]) => {
+      const pts = []; for (let g = 1; g <= 10; g++) { const v = valueAt(n, gtier, g); if (v) pts.push([g, v.n, v.s]); }
+      if (!pts.length) return;
+      s += `<path d="${pts.map(([g, v], i) => (i ? 'L' : 'M') + x(g) + ',' + y(v)).join(' ')}" fill="none" stroke="${cols[k]}" stroke-width="2.5" ${styles[k] ? `stroke-dasharray="${styles[k]}"` : ''}/>`;
+      pts.forEach(([g, v, str]) => { s += `<circle class="mark" cx="${x(g)}" cy="${y(v)}" r="3.3" fill="${cols[k]}" stroke="var(--panel)" data-t="${n} · Tier ${gtier} · G${g}" data-d="${str}${n === 'Toll Bell' ? ' (its first ring → its top)' : ''}"/>`; });
+      if (n === 'Toll Bell') { const first = pts.map(([g]) => [g, valueAt(n, gtier, g).first]); s += `<path d="${first.map(([g, v], i) => (i ? 'L' : 'M') + x(g) + ',' + y(v)).join(' ')}" fill="none" stroke="${cols[k]}" stroke-width="1.4" stroke-dasharray="2 3"/>`; }
+    });
     s += [0, 5, 10].map((g) => `<text class="axis-text" x="${x(g)}" y="${H - 6}" text-anchor="middle">G${g}</text>`).join('');
-    return `<div class="mini"><h3>${title}</h3><div class="cat">${flat ? 'Flat offense · Tier 1, 2, 3 (× 1, × 1.8, × 2.6)' : fn === 'bell' ? 'A follow-up\'s power (an Attack = 1.0) · every tier' : 'Onslaught, Slayer · % · every tier'}</div>${s}</svg></div>`;
+    const leg = forms.map(([n, , k]) => `<span><svg width="22" height="8" aria-hidden="true"><line x1="0" x2="22" y1="4" y2="4" stroke="${cols[k]}" stroke-width="2.5" ${styles[k] ? `stroke-dasharray="${styles[k]}"` : ''}/></svg>${n.replace(' Insignia', '')}</span>`).join('');
+    return `<div class="mini"><h3>${title}</h3><div class="cat">${cat} · Tier ${gtier}</div>${s}</svg><div class="chart-legend" style="font-size:11px">${leg}</div></div>`;
   }).join('');
   document.querySelectorAll('#grade-minis .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  const row = (n, a, f) => `<tr><td>${n}</td>${a.slice(1).map((v) => `<td class="num">${f ? f(v) : v}</td>`).join('')}</tr>`;
-  let t = `<table><tr><th>Value</th>${Array.from({ length: 10 }, (_, i) => `<th class="num">G${i + 1}</th>`).join('')}</tr>`;
-  [1, 2, 3].forEach((tt) => { t += row(`Pendant, three kinds, Tier ${tt}`, ACC[tt].band3) + row(`Pendant, two kinds, Tier ${tt}`, ACC[tt].band2) + row(`Orb, Tier ${tt}${tt === 1 ? ' (reference)' : ''}`, ACC[tt].orb); });
-  t += row('Bell power (× her hand), every tier', ACC[1].chaser, (v) => v.toFixed(1)) + row('Onslaught Insignia, every tier', ACC[1].vanguard, (v) => '+' + v + '%') + row('Slayer Insignia, every tier', ACC[1].reckoning, (v) => '+' + v + '%') + `<tr><td>Uma Lv to wear</td>${Array.from({ length: 10 }, (_, i) => `<td class="num">${LV(i + 1)}</td>`).join('')}</tr></table>`;
-  document.getElementById('grade-table').innerHTML = t;
-})();
+  document.getElementById('grade-table').innerHTML = `<table><tr><th>Form, Tier ${gtier}</th>${Array.from({ length: 10 }, (_, i) => `<th class="num">G${i + 1}</th>`).join('')}</tr>` +
+    FORMS.map(([n]) => `<tr><td>${n}</td>${Array.from({ length: 10 }, (_, i) => { const v = valueAt(n, gtier, i + 1); return `<td class="num">${v ? v.s : '—'}</td>`; }).join('')}</tr>`).join('') +
+    `<tr><td>Uma Lv to wear</td>${Array.from({ length: 10 }, (_, i) => `<td class="num">${LV(i + 1)}</td>`).join('')}</tr></table>`;
+}
+renderGrades();
 
-// Slots and the cap
+// ---- Slots and the cap
 (function () {
-  const cols = [[1, ['pendant', 'bell'], []], [2, ['pendant', 'bell', 'orb'], ['orb']], [3, ['pendant', 'bell', 'orb', 'insignia'], ['insignia']]];
-  document.getElementById('slots3').innerHTML = cols.map(([t, fams, nw]) => `<div class="scol" style="--tc:${TIERC[t]}"><h3>Tier ${t}: ${t} slot${t > 1 ? 's' : ''}</h3><div class="sl">${Array.from({ length: t }, (_, i) => `<i>Slot ${i + 1}</i>`).join('')}</div>` +
-    `<div class="fb">${fams.map((f) => `<span class="fbadge${nw.includes(f) ? ' new' : ''}" style="--fc:${FAM[f].c}">${FAM[f].name}${nw.includes(f) ? ' · new' : ''}</span>`).join('')}</div>` +
-    `<div class="muted" style="font-size:12px;margin-top:8px">${['One of two families: a Pendant or a Bell.', 'Two of three: a Pendant, a Bell or an Orb, different families.', 'Three of four: one of each, minus one.'][t - 1]}</div></div>`).join('');
-  document.getElementById('cap-legend').innerHTML = '<span><span class="sw" style="background:var(--c1)"></span>Greatsword Orb +61</span><span><span class="sw" style="background:var(--c4)"></span>The Halo, two nodes +61 (Extra Stats)</span><span><span class="sw" style="background:var(--c3)"></span>Main Arms Pendant +25</span>';
-  const W = 1180, H = 120, pad = { l: 190, r: 30 }, max = 160, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
-  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The kind cap on a Tier 2 Greatsword">`;
-  const rows = [['On her Greatsword', [[61, 'var(--c1)', 'Greatsword Orb'], [61, 'var(--c4)', 'The Halo'], [25, 'var(--c3)', 'Main Arms Pendant']], 20], ['On her Axe and Lance', [[25, 'var(--c3)', 'Main Arms Pendant']], 70]];
+  const cols = [[1, 'One of four, base forms: a Pendant, an Orb, a Bell or an Insignia.'], [2, 'Two of four families; from the slot\'s G5, either branch of each.'], [3, 'Three of four; from the slot\'s G5, the branches a step deeper.']];
+  document.getElementById('slots3').innerHTML = cols.map(([t, txt]) => `<div class="scol" style="--tc:${TIERC[t]}"><h3>Tier ${t}: ${t} slot${t > 1 ? 's' : ''}</h3><div class="sl">${Array.from({ length: t }, (_, i) => `<i>Slot ${i + 1}</i>`).join('')}</div>` +
+    `<div class="fb">${Object.entries(FAM).map(([, f]) => `<span class="fbadge" style="--fc:${f.c}">${f.name}${t > 1 ? (t === 2 ? ' · 2 branches' : ' · step') : ''}</span>`).join('')}</div>` +
+    `<div class="muted" style="font-size:12px;margin-top:8px">${txt}</div></div>`).join('');
+  document.getElementById('cap-legend').innerHTML = '<span><span class="sw" style="background:var(--c4)"></span>The Halo, two nodes +61 (Extra Stats)</span><span><span class="sw" style="background:var(--c1)"></span>Orb forms</span><span><span class="sw" style="background:var(--c3)"></span>Pendant forms</span>';
+  const W = 1180, H = 200, pad = { l: 290, r: 30 }, max = 170, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The kind cap on one Tier 2 kind">`;
+  const rows = [['Halo + Great Orb on her first slot', [[61, 'var(--c4)', 'The Halo'], [74, 'var(--c1)', 'Great Orb']], 18],
+    ['Halo on her first slot, Great Orb on her Dual', [[61, 'var(--c4)', 'The Halo (first slot)']], 64],
+    ['', [[74, 'var(--c1)', 'Great Orb (her Dual\'s kind)']], 98],
+    ['Halo + Channel Pendant or Twin Orb', [[61, 'var(--c4)', 'The Halo'], [49, 'var(--c3)', 'Channel Pendant (or a Twin Orb, +49)']], 144]];
   rows.forEach(([lbl, segs, yy]) => {
-    s += `<text class="val-soft" x="${pad.l - 12}" y="${yy + 19}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${lbl}</text>`;
+    if (lbl) s += `<text class="val-soft" x="${pad.l - 12}" y="${yy + 19}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${lbl}</text>`;
     let acc = 0;
     segs.forEach(([v, c, n]) => {
       const over = acc + v > 122 ? Math.max(0, acc + v - 122) : 0, inside = v - over;
       if (inside > 0) s += `<rect class="mark" x="${x(acc)}" y="${yy}" width="${x(acc + inside) - x(acc) - 2}" height="28" rx="4" fill="${c}" data-t="${n}" data-d="+${v}${over ? `: only +${inside} counts (capped)` : ''}"/>`;
-      if (over > 0) s += `<rect class="mark" x="${x(acc + inside)}" y="${yy}" width="${x(acc + v) - x(acc + inside) - 2}" height="28" rx="4" fill="none" stroke="${c}" stroke-dasharray="4 3" data-t="${n}, past the cap" data-d="+${over} adds nothing on this kind: point the Pendant (or the Halo) at her other kinds"/>`;
+      if (over > 0) s += `<rect class="mark" x="${x(acc + inside)}" y="${yy}" width="${x(acc + v) - x(acc + inside) - 2}" height="28" rx="4" fill="none" stroke="${c}" stroke-dasharray="4 3" data-t="${n}, past the cap" data-d="+${over} adds nothing on this kind: point the Great Orb at a kind the Halo doesn't hold"/>`;
       acc += v;
     });
     s += `<text class="val-text" x="${x(Math.min(acc, 160)) + 8}" y="${yy + 19}">+${Math.min(acc, 122)}${acc > 122 ? ' (capped)' : ''}</text>`;
@@ -423,44 +537,69 @@ renderCat();
   s += `<line x1="${x(122)}" x2="${x(122)}" y1="10" y2="${H - 6}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${x(122) + 4}" y="${H - 6}" class="axis-text" style="fill:var(--ink)">cap +122 (G10 Might × 1.8)</text>`;
   document.getElementById('cap-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#cap-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('cap-table').innerHTML = '<table><tr><th>Tier</th><th class="num">Cap a kind</th><th class="num">Orb G10</th><th class="num">Halo (two nodes)</th><th class="num">Pendant G10, three · two kinds</th></tr>' +
-    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">+${[68, 122, 177][t - 1]}</td><td class="num">${t === 1 ? '—' : '+' + ACC[t].orb[10]}</td><td class="num">${t === 1 ? '—' : '+' + [0, 61, 88][t - 1]}</td><td class="num">+${ACC[t].band3[10]} · +${ACC[t].band2[10]}</td></tr>`).join('') + '</table>';
+  document.getElementById('cap-table').innerHTML = '<table><tr><th>Tier</th><th class="num">Cap a kind</th><th class="num">The Halo</th><th class="num">Orb · Great Orb</th><th class="num">Channel Pendant · Twin Orb</th><th class="num">Pendant · Great Pendant</th><th>Binds</th></tr>' +
+    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">+${[68, 122, 177][t - 1]}</td><td class="num">${t === 1 ? '—' : '+' + [0, 61, 88][t - 1] + (t === 3 ? ' (two kinds)' : '')}</td><td class="num">+${FLAT.Orb[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Orb'][t][10]}</td><td class="num">${t === 1 ? '—' : '+' + FLAT['Channel Pendant'][t][10]}</td><td class="num">+${FLAT.Pendant[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Pendant'][t][10]}</td><td>${t === 1 ? 'Never (one slot)' : 'The Great Orb beside the Halo; two flat forms and the Halo on one kind'}</td></tr>`).join('') + '</table>';
 })();
 
-// Viability
+// ---- With her weapons: the Dual pairing
+(function () {
+  const P = [['Brawler', 'Lance', 'Lance + Katana', 7.0, 8.5], ['Mage', 'Fire', 'Fire + Dark', 7.2, 8.4], ['Spell Blade', 'Katana', 'Katana + Axe', 6.8, 7.6], ['Summoner', 'Bow', 'Bow + Greatsword', 10.8, 10.8], ['Paladin', 'Light', 'Light + Fire', 7.4, 9.2], ['Cleric', 'Light', 'Light + Fire', 7.6, 9.5]];
+  document.getElementById('pair-legend').innerHTML = '<span><span class="sw" style="background:var(--neutral-strong)"></span>The weapon without its partner (Pure)</span><span><span class="sw" style="background:var(--c1)"></span>With its partner (her Dual)</span>';
+  const W = 1180, H = 250, pad = { l: 230, r: 80, t: 12, b: 24 }, max = 12, rowH = (H - pad.t - pad.b) / P.length, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="A Great Orb on her Dual weapon's kind, with and without its partner">`;
+  [0, 3, 6, 9, 12].forEach((g) => { s += `<line x1="${x(g)}" x2="${x(g)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(g)}" y="${H - 6}" text-anchor="middle">${g}%</text>`; });
+  P.forEach(([c, k, dual, a, b], i) => {
+    const y0 = pad.t + i * rowH + 4, bh = (rowH - 10) / 2;
+    s += `<text class="val-soft" x="${pad.l - 12}" y="${y0 + bh + 3}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${c} · Great Orb on her ${k}</text>`;
+    s += `<rect class="mark" x="${x(0)}" y="${y0}" width="${x(a) - x(0)}" height="${bh}" rx="3" fill="var(--neutral-strong)" data-t="${c}: ${k} without its partner" data-d="+${a}% of her damage"/><text class="val-soft" x="${x(a) + 6}" y="${y0 + bh - 2}">${a}%</text>`;
+    s += `<rect class="mark" x="${x(0)}" y="${y0 + bh + 2}" width="${x(b) - x(0)}" height="${bh}" rx="3" fill="var(--c1)" data-t="${c}: Dual ${dual}" data-d="+${b}% of her damage (${b === a ? 'her Bow is in every act of her pair already' : '+' + Math.round((b / a - 1) * 100) + '%'})"/><text class="val-text" x="${x(b) + 6}" y="${y0 + 2 * bh}">${b}%</text>`;
+  });
+  document.getElementById('pair-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#pair-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('pair-table').innerHTML = '<table class="pairbars"><tr><th>Class</th><th>Her Dual (Tier 2)</th><th class="num">Great Orb on its kind: without the partner</th><th class="num">With it</th><th class="num">Gain</th></tr>' +
+    P.map(([c, k, dual, a, b]) => `<tr><td>${c}</td><td>${dual}</td><td class="num">${a}%</td><td class="num">${b}%</td><td class="num">${b === a ? '—' : '+' + Math.round((b / a - 1) * 100) + '%'}</td></tr>`).join('') + '</table><p class="foot">Tier 2 campaign, the model of §5.7. Tuned to a region, the Great Orb (or, for a hybrid on her twin pair, the Twin Orb) is every class\'s best. A Bell set to her Dual weapon follows up weak on either kind\'s foes: the Brawler\'s and the Warlord\'s presets ring it there.</p>';
+})();
+
+// ---- Viability
 const CL = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
 const CTX = [['campaign', 'Campaign, set and forget'], ['tuned', 'Tuned'], ['long', 'Long fight'], ['waves', 'Waves']];
-const COLS = [['band', 'Pendant', 1], ['chaser', 'Bell', 1], ['orb', 'Orb', 2], ['vanguard', 'Onslaught', 3], ['reckoning', 'Slayer', 3]];
-let vtier = 3;
-document.getElementById('vtier').innerHTML = '<span class="lbl">Unlocked in</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
-document.querySelectorAll('#vtier button').forEach((b) => b.addEventListener('click', () => { vtier = +b.dataset.t; renderVia(); }));
-document.getElementById('via-legend').innerHTML = '<span class="scale"><i class="h5"></i>the best</span><span class="scale"><i class="h4"></i>≥ 85%</span><span class="scale"><i class="h3"></i>≥ 70%</span><span class="scale"><i class="h2"></i>≥ 50%</span><span class="scale"><i class="h1"></i>≥ 25%</span><span class="scale"><i class="h0"></i>below</span><span class="muted">Grey: not unlocked in this tier.</span>';
-const memberName = (k, m, c) => k === 'band' ? m : k === 'chaser' ? (KINDS[m] ? KINDS[m][0] + ' Bell' : m) : k === 'orb' ? KINDS[m][0] + ' Orb' : m;
+let vtier = 2;
+pills('vtier', 'Tier', [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], vtier, (v) => { vtier = +v; renderVia(); });
+document.getElementById('via-legend').innerHTML = '<span class="scale"><i class="h5"></i>the best</span><span class="scale"><i class="h4"></i>≥ 85%</span><span class="scale"><i class="h3"></i>≥ 70%</span><span class="scale"><i class="h2"></i>≥ 50%</span><span class="scale"><i class="h1"></i>≥ 25%</span><span class="scale"><i class="h0"></i>below</span>';
+const KN = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' };
+const memberLabel = (l) => KN[l] || (l.endsWith('twins') ? l[0].toUpperCase() + l.slice(1) : l.includes(' + ') ? l.split(' + ').map((x) => KN[x]).join(' + ') : l);
 function renderVia() {
-  document.querySelectorAll('#vtier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === vtier));
-  let h = `<tr><th>Class</th><th>Context</th>${COLS.map(([, n, t]) => `<th style="text-align:center">${n}<br><span class="muted" style="font-weight:500;font-size:11px">Tier ${t} on</span></th>`).join('')}</tr>`;
+  const cols = vtier === 1 ? ['Pendant', 'Orb', 'Bell', 'Insignia'] : ['Great Pendant', 'Channel Pendant', 'Great Orb', 'Twin Orb', 'Great Bell', 'Toll Bell', 'Great Insignia', 'Onslaught Insignia'];
+  const fc = (n) => FAM[FM[n][1]].c;
+  let h = `<tr><th>Class</th><th>Context</th>${cols.map((n) => `<th style="text-align:center;border-bottom:3px solid ${fc(n)}">${n === 'Onslaught Insignia' ? 'Onslaught' : n}</th>`).join('')}</tr>`;
+  const wins = Object.fromEntries(cols.map((n) => [n, []]));
   CL.forEach(([c, cn]) => CTX.forEach(([x, xn], i) => {
-    const row = VIA[x][c];
-    const best = Math.max(...COLS.filter(([, , t]) => t <= vtier).map(([k]) => row[k][0]));
-    h += `<tr class="${i === 0 ? 'first' : ''}"><td>${i === 0 ? `<span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${cn}</b>` : ''}</td><td class="muted">${xn}</td>` + COLS.map(([k, n, t]) => {
-      const [v, m] = row[k];
-      if (t > vtier) return `<td class="c hna">—<small>Tier ${t}</small></td>`;
+    const row = VIA[vtier][`${c}|${x}`];
+    const best = Math.max(...cols.map((n) => row[n][0]));
+    h += `<tr class="${i === 0 ? 'first' : ''}"><td>${i === 0 ? `<span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${cn}</b>` : ''}</td><td class="muted">${xn}</td>` + cols.map((n) => {
+      const [v, m] = row[n];
       const f = best ? v / best : 0, cls = f >= 0.999 ? 'h5' : f >= 0.85 ? 'h4' : f >= 0.7 ? 'h3' : f >= 0.5 ? 'h2' : f >= 0.25 ? 'h1' : 'h0';
-      return `<td class="c ${cls}" data-t="${cn} · ${xn} · ${n}" data-d="${memberName(k, m, c)}: +${v}% damage (${Math.round(f * 100)}% of the best unlocked here)">+${v}%<small>${Math.round(f * 100)}%</small></td>`;
+      if (f >= 0.999) wins[n].push(`${cn} (${xn.split(',')[0].toLowerCase()})`);
+      const lab = memberLabel(m);
+      return `<td class="c ${cls}" data-t="${cn} · ${xn} · ${n}" data-d="${lab ? lab + ': ' : ''}+${v}% damage (${Math.round(f * 100)}% of the row's best)">+${v}%<small>${['Orb', 'Bell', 'Channel Pendant', 'Great Orb', 'Twin Orb', 'Great Bell'].includes(n) && lab ? lab : Math.round(f * 100) + '%'}</small></td>`;
     }).join('') + '</tr>';
   }));
   document.getElementById('via').innerHTML = h;
-  document.querySelectorAll('#via td.c').forEach((m) => { if (m.dataset.t) bindTip(m, m.dataset.t, m.dataset.d); });
-  document.getElementById('via-table').innerHTML = `<table><tr><th>Class</th><th>Context</th>${COLS.map(([, n]) => `<th>${n}: best member</th>`).join('')}</tr>` +
-    CL.map(([c, cn]) => CTX.map(([x, xn]) => `<tr><td>${cn}</td><td>${xn}</td>${COLS.map(([k]) => `<td>${VIA[x][c][k][0]}% · ${memberName(k, VIA[x][c][k][1], c)}</td>`).join('')}</tr>`).join('')).join('') + '</table>';
+  document.querySelectorAll('#via td.c').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('via-table').innerHTML = `<table><tr><th>Form</th><th class="num">Best in</th><th>Where</th></tr>` + cols.map((n) => `<tr><td>${n}</td><td class="num">${wins[n].length} of 24</td><td>${wins[n].join(', ') || '—'}</td></tr>`).join('') + '</table>';
+  document.getElementById('via-callout').innerHTML = vtier === 1 ?
+    '<b>Tier 1: every base is someone\'s best</b>The Pendant left on (the Mage, the Spell Blade, the Paladin; four classes on waves); the Orb tuned (every class) and left on for the Summoner (her Bow is in every act of her pair) and the Cleric; the Bell for the Brawler (the campaign and long fights); the Insignia in long fights for the Mage, the Spell Blade and the Summoner.' :
+    `<b>Tier ${vtier}: every branch is someone's best</b>The Great Pendant left on (the Paladin); the Channel Pendant on a pair of one channel (the Mage's Fire and Ice, the Cleric's Light and Ice); the Great Orb tuned and on the Summoner's Bow; the Twin Orb on a hybrid's twin pair; the Great Bell in the Brawler's campaign and the Toll Bell in her long fights; the Great Insignia in every other class's long fights; Onslaught on waves. No branch is the best in more than seven of the 24 cells.`;
 }
 renderVia();
 
-// By level
+// ---- By level (Tier 1, a Brawler; the first draft's level model, plus the base Insignia)
 (function () {
-  const S = [['pendant', 'Main Arms Pendant (Tier 1)', 'var(--c3)', ''], ['bell', 'Greatsword Bell (Tier 1)', 'var(--c5)', ''], ['orbSet', 'Greatsword Orb, left on (Tier 2 ref.)', 'var(--c1)', '6 4'], ['orbTuned', 'Greatsword Orb, tuned (Tier 2 ref.)', 'var(--c1)', '']];
+  const BYLEVEL = [{"lv": 1, "g": 1, "power": 1.48, "attack": 0.4, "pendant": 4.4, "bell": 2.8, "orbSet": 1.5, "orbTuned": 3.3}, {"lv": 6, "g": 2, "power": 2.03, "attack": 0.4, "pendant": 3.2, "bell": 4.4, "orbSet": 2.2, "orbTuned": 4.8}, {"lv": 11, "g": 3, "power": 2.19, "attack": 0.4, "pendant": 4.8, "bell": 6.2, "orbSet": 3.3, "orbTuned": 7.2}, {"lv": 16, "g": 4, "power": 2.82, "attack": 0.4, "pendant": 3.5, "bell": 6.8, "orbSet": 3.6, "orbTuned": 7.9}, {"lv": 21, "g": 5, "power": 3.42, "attack": 0.35, "pendant": 5.5, "bell": 6.1, "orbSet": 4.7, "orbTuned": 10.3}, {"lv": 26, "g": 6, "power": 3.78, "attack": 0.35, "pendant": 5.6, "bell": 6.7, "orbSet": 5.0, "orbTuned": 11.0}, {"lv": 31, "g": 7, "power": 4.48, "attack": 0.35, "pendant": 6.5, "bell": 6.7, "orbSet": 5.8, "orbTuned": 12.6}, {"lv": 36, "g": 8, "power": 4.7, "attack": 0.3, "pendant": 7.1, "bell": 5.9, "orbSet": 6.3, "orbTuned": 13.7}, {"lv": 41, "g": 9, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 6.7, "orbSet": 6.9, "orbTuned": 14.9}, {"lv": 46, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 8.2, "bell": 7.4, "orbSet": 7.0, "orbTuned": 15.2}, {"lv": 50, "g": 10, "power": 4.7, "attack": 0.3, "pendant": 7.4, "bell": 7.4, "orbSet": 6.3, "orbTuned": 13.7}];
+  BYLEVEL.forEach((r) => { r.insignia = Math.round(0.3 * 1.5 * r.g * 10) / 10; });
+  const S = [['pendant', 'Pendant', 'var(--c3)', ''], ['bell', 'Bell (Greatsword)', 'var(--c5)', ''], ['orbSet', 'Orb, left on', 'var(--c1)', '6 4'], ['orbTuned', 'Orb, tuned', 'var(--c1)', ''], ['insignia', 'Insignia (her damage on elites)', 'var(--c2)', '']];
   document.getElementById('lv-legend').innerHTML = S.map(([, n, c, d]) => `<span><svg width="26" height="8" aria-hidden="true"><line x1="0" x2="26" y1="4" y2="4" stroke="${c}" stroke-width="2.5" ${d ? `stroke-dasharray="${d}"` : ''}/></svg>${n}</span>`).join('');
-  const W = 1180, H = 300, pad = { l: 44, r: 200, t: 16, b: 30 }, max = 17;
+  const W = 1180, H = 300, pad = { l: 44, r: 210, t: 16, b: 30 }, max = 17;
   const x = (lv) => pad.l + ((lv - 1) / 49) * (W - pad.l - pad.r), y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Accessory value by level, a Brawler in Tier 1">`;
   [0, 5, 10, 15].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">${g}%</text>`; });
@@ -475,24 +614,70 @@ renderVia();
   labs.forEach((l) => { s += `<text class="val-text" x="${x(50) + 10}" y="${l.y}" style="font-size:11.5px;fill:${l.c}">${l.n.split(' (')[0]}: ${last[l.k]}%</text>`; });
   document.getElementById('lv-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#lv-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('lv-table').innerHTML = `<table><tr><th class="num">Lv</th><th class="num">Grade</th><th class="num">Skill power</th><th class="num">Attack share</th><th class="num">Pendant</th><th class="num">Bell</th><th class="num">Orb, left on</th><th class="num">Orb, tuned</th></tr>` +
-    BYLEVEL.map((r) => `<tr><td class="num">${r.lv}</td><td class="num">G${r.g}</td><td class="num">${r.power}</td><td class="num">${Math.round(r.attack * 100)}%</td><td class="num">${r.pendant}%</td><td class="num">${r.bell}%</td><td class="num">${r.orbSet}%</td><td class="num">${r.orbTuned}%</td></tr>`).join('') + '</table>';
+  document.getElementById('lv-table').innerHTML = `<table><tr><th class="num">Lv</th><th class="num">Grade</th><th class="num">Skill power</th><th class="num">Attack share</th><th class="num">Pendant</th><th class="num">Bell</th><th class="num">Orb, left on</th><th class="num">Orb, tuned</th><th class="num">Insignia</th></tr>` +
+    BYLEVEL.map((r) => `<tr><td class="num">${r.lv}</td><td class="num">G${r.g}</td><td class="num">${r.power}</td><td class="num">${Math.round(r.attack * 100)}%</td><td class="num">${r.pendant}%</td><td class="num">${r.bell}%</td><td class="num">${r.orbSet}%</td><td class="num">${r.orbTuned}%</td><td class="num">${r.insignia}%</td></tr>`).join('') + '</table><p class="foot">The first draft\'s level model (its Lv 50 point within 0.3 of the viability table\'s). In long fights the Insignia\'s line is 15% at G10.</p>';
 })();
 
-// Presets
+// ---- Presets
+let pset = 'default';
+const FNAME = { 'Onslaught Insignia': 'Onslaught Insignia' };
+function badge([n, l]) {
+  const fam = FM[n][1], lab = memberLabel(l);
+  const extra = l && l !== 'her three kinds' ? ' · ' + (l.endsWith('twins') ? 'the ' + lab : lab) : '';
+  return `<span class="fbadge" style="--fc:${FAM[fam].c}">${n}${extra}</span>`;
+}
+function renderPresets() {
+  document.querySelectorAll('#presets .toggle button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.s === pset));
+  const P = PRESETS[pset];
+  const B = { brawler: ['Berserker', 'Warlord: Bow, Katana, Axe'], mage: ['Sage', 'Sorcerer: Light, Dark, Blizzard'], spellblade: ['Rune Knight', 'Blademaster: Katana, Bow, Dark'], summoner: ['Warlock', 'Conjurer: Fire, Thunder, Greatsword'], paladin: ['Guardian', 'Templar: Bow, Katana, Light'], cleric: ['Bishop', 'Oracle: Light, Fire, Greatsword'] };
+  const tiers = pset === 'default' ? [1, 2, 3] : [2, 3];
+  document.getElementById('presets-table').innerHTML = `<tr><th>Class</th>${tiers.map((t) => `<th style="border-top:4px solid ${TIERC[t]}">Tier ${t}</th>`).join('')}<th class="num">Damage they add (campaign)</th></tr>` +
+    CL.map(([c, n]) => `<tr><td><span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${n}</b><div class="muted" style="font-size:11.5px">${pset === 'default' ? B[c][0] + ' (her defaults)' : B[c][1]}</div></td>` +
+      tiers.map((t) => `<td>${P[c][t].picks.map(badge).join(' ')}</td>`).join('') + `<td class="num">${tiers.map((t) => P[c][t].gain + '%').join(' · ')}</td></tr>`).join('');
+}
+document.querySelectorAll('#presets .toggle button').forEach((b) => b.addEventListener('click', () => { pset = b.dataset.s; renderPresets(); }));
+renderPresets();
+
+// ---- The signature accessory
+let sfam = 'bell', scls = 'brawler';
+const GAIN = { brawler: 5.3, mage: 5.1, spellblade: 5.3, summoner: 5.3, paladin: 5.9, cleric: 5.9 };
+const CHAN = { brawler: 'ATK', mage: 'M.ATK', spellblade: 'ATK (her Arms) and M.ATK (her Tome)', summoner: 'M.ATK (her Tomes) and ATK (her Arm)', paladin: 'ATK', cleric: 'M.ATK' };
+pills('sfam', 'Her signature', Object.entries(FAM).map(([id, f]) => [id, f.name]), sfam, (v) => { sfam = v; renderSig(); });
+pills('scls', 'Class', CL, scls, (v) => { scls = v; renderSig(); });
 (function () {
-  // [id, class, Tier 1, Tier 2 adds, Tier 3 adds, branch 2's name and set, its slot 1, its Orb, its Tier 3]
-  const PR = [['brawler', 'Brawler', 'Greatsword Bell', 'Greatsword Orb', 'Main Arms Pendant', 'Warlord: Bow, Katana, Axe', 'Bow Bell', 'Bow Orb', 'Secondary Arms Pendant'],
-    ['mage', 'Mage', 'Elemental Pendant', 'Fire Orb', 'Onslaught Insignia', 'Sorcerer: Light, Dark, Blizzard', 'Arcane Pendant', 'Light Orb', 'Onslaught Insignia'],
-    ['spellblade', 'Spell Blade', 'Lightning Twin Pendant', 'Katana Orb', 'Onslaught Insignia', 'Blademaster: Katana, Bow, Dark', 'Dark Twin Pendant', 'Katana Orb', 'Onslaught Insignia'],
-    ['summoner', 'Summoner', 'Arcane Pendant', 'Dark Orb', 'Onslaught Insignia', 'Conjurer: Fire, Thunder, Greatsword', 'Fire Twin Pendant', 'Fire Orb', 'Onslaught Insignia'],
-    ['paladin', 'Paladin', 'Main Arms Pendant', 'Greatsword Orb', 'Onslaught Insignia', 'Templar: Bow, Katana, Light', 'Secondary Arms Pendant', 'Bow Orb', 'Onslaught Insignia'],
-    ['cleric', 'Cleric', 'Light Twin Pendant', 'Light Orb', 'Onslaught Insignia', 'Oracle: Light, Fire, Greatsword', 'Fire Twin Pendant', 'Light Orb', 'Onslaught Insignia']];
-  const fc = (n) => n.includes('Bell') ? FAM.bell.c : n.includes('Orb') ? FAM.orb.c : n.includes('Insignia') ? FAM.insignia.c : FAM.pendant.c;
-  const b = (n) => `<span class="fbadge" style="--fc:${fc(n)}">${n}</span>`;
-  document.getElementById('presets-table').innerHTML = `<tr><th>Class</th><th>Tier 1 (and branch 1)</th><th>Tier 2 adds</th><th>Tier 3 adds</th><th>Branch 2's set (Tier 2 on)</th><th>Its slots 1 · 2</th><th>Tier 3 adds</th></tr>` +
-    PR.map(([c, n, a, o, i, set, a2, o2, i2]) => `<tr><td><span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${n}</b></td><td>${b(a)}</td><td>${b(o)}</td><td>${b(i)}</td><td class="muted">${set}</td><td>${b(a2)} ${b(o2)}</td><td>${b(i2)}</td></tr>`).join('');
+  document.getElementById('sig-legend').innerHTML = [1, 2, 3].map((t) => `<span><span class="sw" style="background:${TIERC[t]}"></span>Tier ${t}: +${[0.2, 0.36, 0.52][t - 1]} a level</span>`).join('');
+  const W = 620, H = 260, pad = { l: 40, r: 70, t: 14, b: 30 }, max = 28;
+  const x = (lv) => pad.l + ((lv - 1) / 49) * (W - pad.l - pad.r), y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The signature's ATK and M.ATK bonus by level and tier">`;
+  [0, 10, 20].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 6}" y="${y(g) + 4}" text-anchor="end">+${g}</text>`; });
+  [1, 10, 20, 30, 40, 50].forEach((lv) => { s += `<text class="axis-text" x="${x(lv)}" y="${H - 8}" text-anchor="middle">Lv ${lv}</text>`; });
+  [1, 2, 3].forEach((t) => {
+    const r = [0.2, 0.36, 0.52][t - 1];
+    s += `<path d="M${x(1)},${y(r)} L${x(50)},${y(r * 50)}" stroke="${TIERC[t]}" stroke-width="2.5" fill="none"/>`;
+    [10, 20, 30, 40, 50].forEach((lv) => { s += `<circle class="mark" cx="${x(lv)}" cy="${y(r * lv)}" r="4" fill="${TIERC[t]}" stroke="var(--panel)" stroke-width="1.5" data-t="Tier ${t} · Lv ${lv}" data-d="ATK and M.ATK +${Math.round(r * lv * 10) / 10} while she wears her family${lv === 50 ? '<br>about +5% of her damage (healers +5.9%)' : ''}"/>`; });
+    s += `<text class="val-text" x="${x(50) + 8}" y="${y(r * 50) + 4}">+${Math.round(r * 50)}</text>`;
+  });
+  document.getElementById('sig-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#sig-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('sig-table').innerHTML = `<table><tr><th>Class</th><th class="num">Matched at each tier's Lv 50 (+10 · +18 · +26)</th><th>A stat per family instead: an Orb or a Bell signature</th></tr>` +
+    CL.map(([c, n]) => `<tr><td>${n}</td><td class="num">+${GAIN[c]}%</td><td>${c === 'spellblade' ? '+3.3% on an Arm, +2.0% on her Tome' : c === 'summoner' ? '+2.6% on her Arm, +2.7% on a Tome' : 'the same +' + GAIN[c] + '% (one channel)'}</td></tr>`).join('') + '</table><p class="foot">Offense about 270, foe defense 190 at Lv 50; × tier under SB1, so the share holds in every tier. Why one rule: a stat per family would leave a hybrid with an Orb or Bell signature at about half. Her moon\'s node II stays on defense (CP36\'s note), so the two stay near U12\'s +5%.</p>';
 })();
+function renderSig() {
+  const f = FAM[sfam], forms = FORMS.filter((x) => x[1] === sfam).map((x) => x[0]);
+  const others = Object.entries(FAM).filter(([id]) => id !== sfam);
+  const name = { brawler: 'Tireless Ironhide', mage: 'Clever Starlit', spellblade: 'Fleet Duelist', summoner: 'Gritty Caller', paladin: 'Mighty Warden', cleric: 'Tireless Chorister' }[scls];
+  document.getElementById('sig-mock').innerHTML =
+    `<div class="mock"><h4>Her template sheet</h4><div class="mrow"><span>"${name}" · ${CL.find(([c]) => c === scls)[1]}</span><span class="muted">a sample template</span></div>` +
+    `<div class="mrow"><span><span class="star">★</span> Signature: <b>${f.name}</b></span><span>ATK and M.ATK +0.2 a level · <b>+10 now</b> (Lv 50)</span></div>` +
+    `<div class="mrow"><span class="dim">Unworn</span><span class="dim">"Wear ${/^[AEIOU]/.test(f.name) ? 'an' : 'a'} ${f.name} for +10"</span></div></div>` +
+    `<div class="mock" style="margin-top:10px"><h4>The Gear tab and the Battle tab</h4><div class="mrow"><span>${forms[1]} · G10 <span class="star">★ +10</span></span><span class="muted">accessory row</span></div>` +
+    `<div class="mrow"><span>Offense · ${CHAN[scls]}</span><span>+10 (signature)</span></div></div>` +
+    `<div class="mock" style="margin-top:10px"><h4>The accessory picker, her slot at G10</h4>` +
+    forms.map((n) => `<div class="mrow"><span><span class="star">★</span> ${n}</span><span>${valueAt(n, 1, 10) ? valueAt(n, 1, 10).s : 'Tier 2 on'} · <b>ATK and M.ATK +10</b></span></div>`).join('') +
+    others.map(([id, o]) => `<div class="mrow"><span class="dim">${o.name}</span><span class="dim">${valueAt(o.name, 1, 10).s}</span></div>`).join('') +
+    `<div class="muted" style="font-size:12px;margin-top:6px">Another Uma's picker lists the same ${f.name} plainly: the same item, no ★, no bonus. Matched, this ${CL.find(([c]) => c === scls)[1]} gains about +${GAIN[scls]}% at Lv 50.</div></div>`;
+}
+renderSig();
 </script>
 </body>
 </html>

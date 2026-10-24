@@ -211,7 +211,8 @@
     Fittings</b> at the Armorer and <b>Accessory Settings</b> at the Charm Shop. Each has one fixed amount, and <b>a grade decides its material</b>
     (profession-progression's ladder, PP9): in Tier 1 the low type of a pair for grades 1–5 and the high type for 6–10; Tier 2 moves G5 and G10 onto
     its own pair, Tier 3 G4 and G9 onto Tier 2's and G5 and G10 onto its own. The Branch Gem is the G5 Weapon Gem in its tier's pair. One Uma's gear is
-    365 refined items in every tier. From <a href="../weapon-progression.md">weapon-progression.md</a> §6, whose recipes and amounts are
+    365 refined items in every tier. <b>The owner's review (2026-10-24) changes no count:</b> a Dual's partner is fixed, so the Branch Gem still carries
+    only the branch, and an accessory's branches are forms its slot's G5 Setting opens, with no item of their own. From <a href="../weapon-progression.md">weapon-progression.md</a> §6, whose recipes and amounts are
     <a href="../profession-progression.md">profession-progression.md</a>'s (cross-check, 2026-10-24).
     The other pages: <a href="weapon-trees.html">weapon trees</a> · <a href="weapon-armor.html">armor</a> · <a href="weapon-accessories.html">accessories</a>.</p>
   <nav class="top">
@@ -263,7 +264,7 @@
       per Uma. Make time is PP12's: one gather's time per refined item (a Branch Gem, 4).</p>
     <div class="panel" style="overflow-x:auto"><table id="iface"></table></div>
     <div class="callout"><b>Who owns what</b>weapon-progression.md owns the four products, <b>one Branch Gem item a tier</b> (the branch picked when
-      it is used, not a Pure, Dual, Keen or Tempered Gem each), the pieces per Uma (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30) and the gates.
+      it is used, not a Pure, Dual, Keen, Tempered or Evolved Gem each; accessory forms need none), the pieces per Uma (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30) and the gates.
       profession-progression.md owns which materials fill each grade and how many (PP8–PP10): one Uma 485 · 503 · 521 refined with her jewels,
       822 · 852 · 883 hours.</div>
   </section>
@@ -297,7 +298,7 @@ function recipe(item, g, t) {
   if (item === 'armor') return g <= 5 ? { [cloth]: 1, [carving]: 1 } : { [metal]: 1, [wood]: 1, [stone]: 1 };
   if (item === 'setting') { const n = { 1: 6, 2: 3, 3: 2 }[t]; return { [cloth]: n, [carving]: n }; }
 }
-const ITEMS = [['weapon', 'Weapon Gem', 'Forge · a weapon one grade', 3], ['branch', 'Branch Gem', 'Forge · a weapon\'s G5 step, Tier 2 on', 3], ['armor', 'Armor Fittings', 'Armorer · an armor slot one grade', 5], ['setting', 'Accessory Setting', 'Charm Shop · an accessory slot one grade', 0]];
+const ITEMS = [['weapon', 'Weapon Gem', 'Forge · a weapon one grade', 3], ['branch', 'Branch Gem', 'Forge · a weapon\'s G5 step, Tier 2 on', 3], ['armor', 'Armor Fittings', 'Armorer · an armor slot one grade', 5], ['setting', 'Accessory Setting', 'Charm Shop · an accessory slot one grade; its G5 opens the branches', 0]];
 const IC = { weapon: 'var(--c2)', branch: 'var(--accent)', armor: 'var(--c4)', setting: 'var(--c5)', jewels: 'var(--neutral)' };
 const tip = document.getElementById('tip');
 function bindTip(el, title, body) {

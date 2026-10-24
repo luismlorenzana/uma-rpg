@@ -1037,6 +1037,13 @@ until we see Uma uniqueness on all other classes": CP36 stands, and **the Uma Te
 category's template pieces in view. A note for that pass: her affinity's twin set is either a Ring or a Light/Dark set,
 so it already leans her to one Tier 2 focus (on her affinity kinds the two multiply, +6% and +15%, when they agree).
 
+**Proposed follow-up (owner's weapon review, 2026-10-24): replaced by weapon-progression's signature accessory; decided
+in the Uma Templates pass.** The owner wants Uma uniqueness through accessories rather than weapons: her template names a
+signature accessory family, and while she wears it her ATK and M.ATK gain +0.2 a level × tier, about +5% at each tier's
+Lv 50, the same item for anyone else ([weapon-progression §5.10](weapon-progression.md#510-the-signature-accessory-uma-uniqueness-through-accessories-wp33),
+WP33). With both, a matched Uma would reach about +11%, past U12's cap, so the signature takes the affinity's place; the
+signature tip's anchor (her affinity kind's tree, CP24) moves with that pass's call.
+
 ### 6.10 Every tree is viable (CP43)
 
 The owner (second pass): "All classes have viable skill trees for all weapons; in Tier 1 veering off the default
