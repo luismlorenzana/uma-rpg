@@ -425,9 +425,9 @@ within a tenth more work, and the secondary trailing the main profession by one 
 
 ## 10. Save impact
 
-Save **v26**, the Tier 1 rework's single migration ([README §9](README.md#9-engine-save-and-refund)): the gear and Star
+Save **v26** (*now v27, README XC11*), the Tier 1 rework's single migration ([README §9](README.md#9-engine-save-and-refund)): the gear and Star
 Gem refunds come back as today's ids, so this conversion must run in the same step. Every world gets the same
-migration. `OwnedUma.secondary` (Tier 2+) joins with Tier 2's toolbox, v27.
+migration. `OwnedUma.secondary` (Tier 2+) joins with Tier 2's toolbox, v27 (*now v28*).
 
 | Today in the save | After | For the refund |
 |---|---|---|

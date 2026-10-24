@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gear Materials</title>
 <!-- The Tier rework's Weapon Progression (weapon-progression.md §6): what is crafted for weapons, armor and accessories,
-     every recipe by grade and tier, where each material comes from, and one Uma's totals per tier. Material names and ids
-     are professions.md's (§0.3, §5.2), every one an existing item. No external scripts, fonts or images. -->
+     every recipe by grade and tier, where each material comes from, and one Uma's totals per tier. Recipes, material names
+     and ids are profession-progression.md's (PP8–PP10, the ladder), every one an existing item; cross-checked 2026-10-24.
+     No external scripts, fonts or images. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -194,6 +195,7 @@
   .mat { display: flex; align-items: center; gap: 4px; line-height: 1.35; margin: 1px 0; }
   .mat i { width: 8px; height: 8px; border-radius: 2px; flex: none; background: var(--pc); }
   .mat.new { font-weight: 700; }
+  .mat.mid { font-style: italic; font-weight: 600; }
   .item b { display: block; font-size: 12.5px; }
   .item span { color: var(--ink-faint); font-size: 11px; }
   .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -206,9 +208,11 @@
 <main>
   <h1>Gear materials: every recipe and one Uma's totals</h1>
   <p class="lead">Four things are crafted for gear: <b>Weapon Gems</b> and, from Tier 2, one <b>Branch Gem</b> a weapon at the Forge, <b>Armor
-    Fittings</b> at the Armorer and <b>Accessory Settings</b> at the Charm Shop. Each has one recipe a grade band, the low type of a pair for
-    grades 1–5 and the high type for 6–10; a tier's new pair goes only into its new piece. One Uma's gear stays at 365 · 380 · 380 refined items.
-    From <a href="../weapon-progression.md">weapon-progression.md</a> §6; profession-progression.md owns supply and reads this as its interface.
+    Fittings</b> at the Armorer and <b>Accessory Settings</b> at the Charm Shop. Each has one fixed amount, and <b>a grade decides its material</b>
+    (profession-progression's ladder, PP9): in Tier 1 the low type of a pair for grades 1–5 and the high type for 6–10; Tier 2 moves G5 and G10 onto
+    its own pair, Tier 3 G4 and G9 onto Tier 2's and G5 and G10 onto its own. The Branch Gem is the G5 Weapon Gem in its tier's pair. One Uma's gear is
+    365 refined items in every tier. From <a href="../weapon-progression.md">weapon-progression.md</a> §6, whose recipes and amounts are
+    <a href="../profession-progression.md">profession-progression.md</a>'s (cross-check, 2026-10-24).
     The other pages: <a href="weapon-trees.html">weapon trees</a> · <a href="weapon-armor.html">armor</a> · <a href="weapon-accessories.html">accessories</a>.</p>
   <nav class="top">
     <a href="#recipes">Every recipe</a><a href="#flow">Where it comes from</a><a href="#totals">One Uma's totals</a>
@@ -219,7 +223,7 @@
   <section id="recipes">
     <div class="head-row"><h2>Every recipe, by grade and tier</h2><div class="pills" id="tier" style="margin:0 0 0 auto"></div></div>
     <p class="sub">Each cell is one item of that grade: its refined materials (a raw item each, refined one for one at the Workbench). Made at
-      Craft Lv 5g − 4, worn at Uma Lv 5g − 4. Bold is the tier's new pair. From Tier 2 a weapon's G5 step takes a Branch Gem instead of a Weapon Gem.</p>
+      Craft Lv 5g − 4, worn at Uma Lv 5g − 4. Bold is the tier's own pair, italic Tier 2's in Tier 3. From Tier 2 a weapon's G5 step takes a Branch Gem instead of a Weapon Gem.</p>
     <div class="plegend" id="plegend"></div>
     <div class="panel" style="padding:12px 14px"><table class="rtab" id="rtab"></table>
       <details><summary>Show the numbers</summary><div id="rtab-num"></div></details></div>
@@ -254,35 +258,44 @@
   </section>
 
   <section id="interface">
-    <h2>The interface for profession-progression</h2>
-    <p class="sub">profession-progression.md reads this table and may resize any row. If it does, the pieces (what she needs) stay and the refined per
-      piece moves, within PR10's tenth more a tier. Make time stays PR9's: one gather's time per refined item (a Branch Gem, 9).</p>
+    <h2>The interface with profession-progression, settled</h2>
+    <p class="sub">The cross-check (2026-10-24) adopted profession-progression.md's recipes and amounts: this doc keeps the products and the pieces
+      per Uma. Make time is PP12's: one gather's time per refined item (a Branch Gem, 4).</p>
     <div class="panel" style="overflow-x:auto"><table id="iface"></table></div>
-    <div class="callout"><b>What stands whatever the recipes</b>This doc owns the four products, <b>one Branch Gem item a tier</b> (the branch picked when
+    <div class="callout"><b>Who owns what</b>weapon-progression.md owns the four products, <b>one Branch Gem item a tier</b> (the branch picked when
       it is used, not a Pure, Dual, Keen or Tempered Gem each), the pieces per Uma (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30) and the gates.
-      profession-progression.md owns which materials fill each grade and how many. Its parallel draft (2026-10-24) already puts a tier's new pair
-      into fixed grades (G5 and G10; G4 and G9 take Tier 2's in Tier 3) and makes the branch gem a G5 Weapon Gem in the tier's metal and wood
-      (4 refined): 503 · 521 an Uma in Tiers 2 and 3. Where the two differ, its amounts win.</div>
+      profession-progression.md owns which materials fill each grade and how many (PP8–PP10): one Uma 485 · 503 · 521 refined with her jewels,
+      822 · 852 · 883 hours.</div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-const MATS = {"1": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 120, "armor": 125, "setting": 120}, "by_prof": {"mining": 85, "wood": 85, "farming": 85, "fishing": 85, "hunting": 25}}, "2": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Silver Ingot": 3, "Cedar Plank": 3, "Wool Cloth": 3, "Trilobite Carving": 3, "Cut Sapphire": 3, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 108, "armor": 125, "setting": 120, "branch": 27}, "by_prof": {"mining": 88, "wood": 88, "farming": 88, "fishing": 88, "hunting": 28}}, "3": {"total": {"Copper Ingot": 30, "Pine Plank": 30, "Linen": 55, "Shell Carving": 55, "Titanium Ingot": 3, "Ebony Plank": 3, "Moonsilk": 3, "Aether Infusion": 3, "Cut Starstone": 3, "Iron Ingot": 55, "Oak Plank": 55, "Cut Garnet": 25, "Cotton Cloth": 30, "Ammonite Carving": 30}, "by_item": {"weapon": 108, "armor": 125, "setting": 120, "branch": 27}, "by_prof": {"mining": 88, "wood": 88, "farming": 88, "fishing": 88, "hunting": 28}}};
+// MATS is computed from recipe() below (one Uma's gear by material, item and profession).
 const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
 const PROF = { mining: ['Mining', 'Mine', 'var(--pr-mining)'], wood: ['Wood Chopping', 'Forest', 'var(--pr-wood)'], farming: ['Farming', 'Fields', 'var(--pr-farming)'], fishing: ['Fishing', 'Fishery', 'var(--pr-fishing)'], hunting: ['Hunting', 'Monster Den', 'var(--pr-hunting)'] };
 const MAT = {
   'Copper Ingot': ['mining', 'copper-ingot', 1], 'Iron Ingot': ['mining', 'iron-ingot', 1], 'Pine Plank': ['wood', 'pine-plank', 1], 'Oak Plank': ['wood', 'oak-plank', 1],
   'Linen': ['farming', 'linen', 1], 'Cotton Cloth': ['farming', 'cotton-cloth', 1], 'Shell Carving': ['fishing', 'shell-carving', 1], 'Ammonite Carving': ['fishing', 'ammonite-carving', 1],
   'Cut Quartz': ['hunting', 'cut-quartz', 1], 'Cut Garnet': ['hunting', 'cut-garnet', 1],
-  'Silver Ingot': ['mining', 'silver-ingot', 2], 'Cedar Plank': ['wood', 'cedar-plank', 2], 'Wool Cloth': ['farming', 'wool-cloth', 2], 'Trilobite Carving': ['fishing', 'trilobite-carving', 2], 'Cut Sapphire': ['hunting', 'cut-sapphire', 2],
-  'Titanium Ingot': ['mining', 'titanium-ingot', 3], 'Ebony Plank': ['wood', 'ebony-plank', 3], 'Moonsilk': ['farming', 'moonsilk', 3], 'Aether Infusion': ['fishing', 'aether-infusion', 3], 'Cut Starstone': ['hunting', 'cut-starstone', 3],
+  'Silver Ingot': ['mining', 'silver-ingot', 2], 'Titanium Ingot': ['mining', 'titanium-ingot', 2], 'Mahogany Plank': ['wood', 'mahogany-plank', 2], 'Ebony Plank': ['wood', 'ebony-plank', 2],
+  'Wool Cloth': ['farming', 'wool-cloth', 2], 'Silk': ['farming', 'silk', 2], 'Trilobite Carving': ['fishing', 'trilobite-carving', 2], 'Tide Infusion': ['fishing', 'tide-infusion', 2],
+  'Cut Sapphire': ['hunting', 'cut-sapphire', 2], 'Cut Diamond': ['hunting', 'cut-diamond', 2],
+  'Mythril Ingot': ['mining', 'mythril-ingot', 3], 'Orichalcum Ingot': ['mining', 'orichalcum-ingot', 3], 'Elderwood Plank': ['wood', 'elderwood-plank', 3], 'Yggdrasil Plank': ['wood', 'yggdrasil-plank', 3],
+  'Moonsilk': ['farming', 'moonsilk', 3], 'Cloudweave': ['farming', 'cloudweave', 3], 'Aether Infusion': ['fishing', 'aether-infusion', 3], 'Prismatic Infusion': ['fishing', 'prismatic-infusion', 3],
+  'Cut Starstone': ['hunting', 'cut-starstone', 3], "Cut Philosopher's Stone": ['hunting', 'cut-philosophers-stone', 3],
 };
-const PAIR = { 2: ['Silver Ingot', 'Cedar Plank', 'Wool Cloth', 'Trilobite Carving', 'Cut Sapphire'], 3: ['Titanium Ingot', 'Ebony Plank', 'Moonsilk', 'Aether Infusion', 'Cut Starstone'] };
+// Each tier's pair (profession-progression PP8): metal, wood, cloth, carving, stone; the low type and the high type.
+const LOW = { 1: ['Copper Ingot', 'Pine Plank', 'Linen', 'Shell Carving', 'Cut Quartz'], 2: ['Silver Ingot', 'Mahogany Plank', 'Wool Cloth', 'Trilobite Carving', 'Cut Sapphire'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Moonsilk', 'Aether Infusion', 'Cut Starstone'] };
+const HIGH = { 1: ['Iron Ingot', 'Oak Plank', 'Cotton Cloth', 'Ammonite Carving', 'Cut Garnet'], 2: ['Titanium Ingot', 'Ebony Plank', 'Silk', 'Tide Infusion', 'Cut Diamond'], 3: ['Orichalcum Ingot', 'Yggdrasil Plank', 'Cloudweave', 'Prismatic Infusion', "Cut Philosopher's Stone"] };
+const LOWSET = new Set(Object.values(LOW).flat());
+// The ladder (PP9): which tier's pair fills grade g in tier t.
+const pairOf = (g, t) => (t >= 2 && (g === 5 || g === 10) ? t : t === 3 && (g === 4 || g === 9) ? 2 : 1);
 function recipe(item, g, t) {
-  if (item === 'weapon') { if (t >= 2 && g === 5) return null; return g <= 5 ? { 'Copper Ingot': 2, 'Pine Plank': 2 } : { 'Iron Ingot': 2, 'Oak Plank': 2 }; }
-  if (item === 'branch') { if (t === 1 || g !== 5) return null; const r = { 'Copper Ingot': 2, 'Pine Plank': 2 }; PAIR[t].forEach((m) => (r[m] = 1)); return r; }
-  if (item === 'armor') return g <= 5 ? { 'Linen': 1, 'Shell Carving': 1 } : { 'Iron Ingot': 1, 'Oak Plank': 1, 'Cut Garnet': 1 };
-  if (item === 'setting') { const n = { 1: 6, 2: 3, 3: 2 }[t]; return g <= 5 ? { 'Linen': n, 'Shell Carving': n } : { 'Cotton Cloth': n, 'Ammonite Carving': n }; }
+  const [metal, wood, cloth, carving, stone] = (g <= 5 ? LOW : HIGH)[pairOf(g, t)];
+  if (item === 'weapon') { if (t >= 2 && g === 5) return null; return { [metal]: 2, [wood]: 2 }; }
+  if (item === 'branch') { if (t === 1 || g !== 5) return null; return { [metal]: 2, [wood]: 2 }; }
+  if (item === 'armor') return g <= 5 ? { [cloth]: 1, [carving]: 1 } : { [metal]: 1, [wood]: 1, [stone]: 1 };
+  if (item === 'setting') { const n = { 1: 6, 2: 3, 3: 2 }[t]; return { [cloth]: n, [carving]: n }; }
 }
 const ITEMS = [['weapon', 'Weapon Gem', 'Forge · a weapon one grade', 3], ['branch', 'Branch Gem', 'Forge · a weapon\'s G5 step, Tier 2 on', 3], ['armor', 'Armor Fittings', 'Armorer · an armor slot one grade', 5], ['setting', 'Accessory Setting', 'Charm Shop · an accessory slot one grade', 0]];
 const IC = { weapon: 'var(--c2)', branch: 'var(--accent)', armor: 'var(--c4)', setting: 'var(--c5)', jewels: 'var(--neutral)' };
@@ -296,18 +309,27 @@ function bindTip(el, title, body) {
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
 }
 const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
-const JEWELS = { 1: 120, 2: 130, 3: 140 };
+const JEWELS = { 1: 120, 2: 138, 3: 156 };
 const PIECES = { 1: { weapon: 30, branch: 0, armor: 50, setting: 10 }, 2: { weapon: 27, branch: 3, armor: 50, setting: 20 }, 3: { weapon: 27, branch: 3, armor: 50, setting: 30 } };
+const MATS = Object.fromEntries([1, 2, 3].map((t) => {
+  const total = {}, by_item = {}, by_prof = { mining: 0, wood: 0, farming: 0, fishing: 0, hunting: 0 };
+  for (let g = 1; g <= 10; g++) ITEMS.forEach(([id, , , per]) => {
+    const r = recipe(id, g, t); if (!r) return;
+    const n = id === 'setting' ? t : per;
+    Object.entries(r).forEach(([m, k]) => { total[m] = (total[m] || 0) + k * n; by_item[id] = (by_item[id] || 0) + k * n; by_prof[MAT[m][0]] += k * n; });
+  });
+  return [t, { total, by_item, by_prof }];
+}));
 
-const KPI = [['One Uma\'s gear, refined', '365 · 380 · 380', 'Tier 1 · 2 · 3; today 240'], ['Gear items to max her', '90 · 100 · 110', 'today 120 pieces, bound in order'], ['One Uma in all, with jewels', '485 · 510 · 520', '+8 for her moon; today 472'],
-  ['Products', '3 → 4', '+ the Branch Gem from Tier 2 (one item, not five)'], ['Materials in her gear', '9 · 14 · 14', 'Tier 1\'s pairs, + one tier pair\'s low types'], ['Hours, one Uma (with jewels)', '822 · 864 · 881', 'Craft Lv 25 speed; today 776']];
+const KPI = [['One Uma\'s gear, refined', '365 · 365 · 365', 'Tier 1 · 2 · 3; today 240'], ['Gear items to max her', '90 · 100 · 110', 'today 120 pieces, bound in order'], ['One Uma in all, with jewels', '485 · 503 · 521', '493 · 511 · 529 with her moon; today 472'],
+  ['Products', '3 → 4', '+ the Branch Gem from Tier 2 (one item, not five)'], ['Materials in her gear', '9 · 18 · 27', 'each tier\'s pair at G5 and G10 (the ladder)'], ['Hours, one Uma (with jewels)', '822 · 852 · 883', 'Craft Lv 25 speed; today 776']];
 document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="delta">${d}</div></div>`).join('');
 document.getElementById('plegend').innerHTML = Object.values(PROF).map(([n, p, c]) => `<span><span class="sw" style="background:${c}"></span>${n} (${p})</span>`).join('');
 
 let tier = 1;
 document.getElementById('tier').innerHTML = '<span class="lbl">Tier</span>' + [1, 2, 3].map((t) => `<button data-t="${t}" aria-pressed="false">Tier ${t}</button>`).join('');
 document.querySelectorAll('#tier button').forEach((b) => b.addEventListener('click', () => { tier = +b.dataset.t; render(); }));
-const matHtml = (r) => Object.entries(r).map(([m, n]) => `<div class="mat${MAT[m][2] > 1 ? ' new' : ''}" style="--pc:${PROF[MAT[m][0]][2]}"><i></i>${n} ${m}</div>`).join('');
+const matHtml = (r) => Object.entries(r).map(([m, n]) => `<div class="mat${MAT[m][2] > 1 && MAT[m][2] === tier ? ' new' : MAT[m][2] > 1 ? ' mid' : ''}" style="--pc:${PROF[MAT[m][0]][2]}"><i></i>${n} ${m}</div>`).join('');
 function render() {
   document.querySelectorAll('#tier button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.t === tier));
   let h = `<tr><th></th>${Array.from({ length: 10 }, (_, i) => `<th style="text-align:center">G${i + 1}<br><span class="muted" style="font-weight:500">Lv ${5 * (i + 1) - 4}</span></th>`).join('')}</tr>`;
@@ -331,7 +353,7 @@ function flowUnits(t) {
   const out = {}; // [mat][item] = units
   for (let g = 1; g <= 10; g++) ITEMS.forEach(([id]) => {
     const r = recipe(id, g, t); if (!r) return;
-    const n = id === 'weapon' || id === 'branch' ? 3 : id === 'armor' ? 5 : t;
+    const n = id === 'setting' ? t : ITEMS.find((it) => it[0] === id)[3];
     Object.entries(r).forEach(([m, k]) => { out[m] = out[m] || {}; out[m][id] = (out[m][id] || 0) + k * n; });
   });
   return out;
@@ -385,7 +407,7 @@ render();
   document.getElementById('item-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#item-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   document.getElementById('item-table').innerHTML = `<table><tr><th>Tier</th>${order.map((k) => `<th class="num">${names[k]}</th>`).join('')}<th class="num">Gear</th><th class="num">One Uma</th><th class="num">+ her moon</th></tr>` +
-    rows.map(([t, v, a]) => `<tr><td>Tier ${t}</td>${order.map((k) => `<td class="num">${k === 'jewels' ? v[k] : (PIECES[t][k] || 0) + ' · ' + (v[k] || 0)}</td>`).join('')}<td class="num"><b>${a - v.jewels}</b></td><td class="num"><b>${a}</b></td><td class="num">${a + 8}</td></tr>`).join('') + '</table><p class="foot">Cells are pieces · refined items. Jewels as professions.md and the cross-reference counted them (120, 130, 140), now extra-stats-progression.md\'s.</p>';
+    rows.map(([t, v, a]) => `<tr><td>Tier ${t}</td>${order.map((k) => `<td class="num">${k === 'jewels' ? v[k] : (PIECES[t][k] || 0) + ' · ' + (v[k] || 0)}</td>`).join('')}<td class="num"><b>${a - v.jewels}</b></td><td class="num"><b>${a}</b></td><td class="num">${a + 8}</td></tr>`).join('') + '</table><p class="foot">Cells are pieces · refined items. Jewels: extra-stats-progression.md\'s counts at profession-progression.md\'s amounts (120, 138, 156).</p>';
 })();
 (function () {
   const profOrder = Object.keys(PROF);
@@ -398,9 +420,9 @@ render();
   [1, 2, 3].forEach((t, i) => {
     const y = pad.t + 10 + i * (rowH + 8); let acc = 0;
     const tot = MATS[t].total;
-    const ms = Object.keys(tot).sort((a, b) => profOrder.indexOf(MAT[a][0]) - profOrder.indexOf(MAT[b][0]) || MAT[a][2] - MAT[b][2] || (/(Copper|Pine|Linen|Shell|Quartz)/.test(a) ? -1 : 1));
+    const ms = Object.keys(tot).sort((a, b) => profOrder.indexOf(MAT[a][0]) - profOrder.indexOf(MAT[b][0]) || MAT[a][2] - MAT[b][2] || (LOWSET.has(a) ? -1 : 1));
     s += `<text class="val-text" x="${pad.l - 8}" y="${y + rowH / 2 + 4}" text-anchor="end">Tier ${t}</text>`;
-    ms.forEach((m) => { const n = tot[m], c = PROF[MAT[m][0]][2], low = /(Copper|Pine|Linen|Shell|Quartz)/.test(m), pair = MAT[m][2] > 1;
+    ms.forEach((m) => { const n = tot[m], c = PROF[MAT[m][0]][2], low = LOWSET.has(m), pair = MAT[m][2] > 1;
       s += `<rect class="mark" x="${x(acc)}" y="${y}" width="${Math.max(1, x(acc + n) - x(acc) - 1.5)}" height="${rowH}" fill="${low ? `color-mix(in srgb, ${c} 55%, var(--panel))` : c}" ${pair ? 'stroke="var(--ink)" stroke-width="1.5"' : ''} rx="2" data-t="Tier ${t} · ${m}" data-d="${n} refined (${PROF[MAT[m][0]][0]})"/>`; acc += n; });
     s += `<text class="val-text" x="${x(acc) + 6}" y="${y + rowH / 2 + 4}">${acc}</text>`;
     rows.push([t, tot]);
@@ -441,16 +463,13 @@ render();
 // Interface table
 (function () {
   const rows = [
-    ['<code>weapon-gem-g{1–10}</code>', '1', '1–10', 30, 4, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>', '2 <code>iron-ingot</code>, 2 <code>oak-plank</code>'],
-    ['<code>weapon-gem-g{1–4, 6–10}</code>', '2, 3', 'not 5', 27, 4, 'as Tier 1', 'as Tier 1'],
-    ['<code>branch-gem</code>', '2', '5', 3, 9, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>, 1 each <code>silver-ingot</code>, <code>cedar-plank</code>, <code>wool-cloth</code>, <code>trilobite-carving</code>, <code>cut-sapphire</code>', '—'],
-    ['<code>branch-gem</code>', '3', '5', 3, 9, '2 <code>copper-ingot</code>, 2 <code>pine-plank</code>, 1 each <code>titanium-ingot</code>, <code>ebony-plank</code>, <code>moonsilk</code>, <code>aether-infusion</code>, <code>cut-starstone</code>', '—'],
-    ['<code>armor-fittings-g{1–10}</code>', '1–3', '1–10', 50, '2 · 3', '1 <code>linen</code>, 1 <code>shell-carving</code>', '1 <code>iron-ingot</code>, 1 <code>oak-plank</code>, 1 <code>cut-garnet</code>'],
-    ['<code>accessory-setting-g{1–10}</code>', '1', '1–10', 10, 12, '6 <code>linen</code>, 6 <code>shell-carving</code>', '6 <code>cotton-cloth</code>, 6 <code>ammonite-carving</code>'],
-    ['<code>accessory-setting-g{1–10}</code>', '2', '1–10', 20, 6, '3 · 3', '3 · 3'],
-    ['<code>accessory-setting-g{1–10}</code>', '3', '1–10', 30, 4, '2 · 2', '2 · 2'],
+    ['<code>weapon-gem-g{1–10}</code>', '1–3', '1–10 (not G5 from Tier 2)', '30 · 27 · 27', 4, '2 ingots, 2 planks of the grade\'s pair: <code>copper-ingot</code>, <code>pine-plank</code> (Tier 2 G5 · Tier 3 G4: <code>silver-ingot</code>, <code>mahogany-plank</code>)', '<code>iron-ingot</code>, <code>oak-plank</code> (Tier 2 G10 · Tier 3 G9: <code>titanium-ingot</code>, <code>ebony-plank</code>; Tier 3 G10: <code>orichalcum-ingot</code>, <code>yggdrasil-plank</code>)'],
+    ['<code>branch-gem</code>', '2, 3', '5', '3 · 3', 4, 'The G5 Weapon Gem in its tier\'s pair: 2 <code>silver-ingot</code>, 2 <code>mahogany-plank</code> (Tier 2); 2 <code>mythril-ingot</code>, 2 <code>elderwood-plank</code> (Tier 3)', '—'],
+    ['<code>armor-fittings-g{1–10}</code>', '1–3', '1–10', '50', '2 · 3', '1 cloth, 1 carving: <code>linen</code>, <code>shell-carving</code> (by the ladder: <code>wool-cloth</code>, <code>trilobite-carving</code>; <code>moonsilk</code>, <code>aether-infusion</code>)', '1 ingot, 1 plank, 1 cut stone: <code>iron-ingot</code>, <code>oak-plank</code>, <code>cut-garnet</code> (by the ladder: Titanium, Ebony, Diamond; Orichalcum, Yggdrasil, Philosopher\'s Stone)'],
+    ['<code>accessory-setting-g{1–10}</code>', '1 · 2 · 3', '1–10', '10 · 20 · 30', '12 · 6 · 4', 'Half cloth, half carving: <code>linen</code>, <code>shell-carving</code> (by the ladder: Wool, Trilobite; Moonsilk, Aether)', '<code>cotton-cloth</code>, <code>ammonite-carving</code> (by the ladder: Silk, Tide; Cloudweave, Prismatic)'],
   ];
-  document.getElementById('iface').innerHTML = `<tr><th>Item id (draft)</th><th>Tier</th><th>Grades</th><th class="num">Pieces a Uma</th><th class="num">Refined each</th><th>Low band (G1–G5)</th><th>High band (G6–G10)</th></tr>` +
+
+  document.getElementById('iface').innerHTML = `<tr><th>Item id (draft)</th><th>Tier</th><th>Grades</th><th class="num">Pieces an Uma</th><th class="num">Refined each</th><th>Low band (G1–G5)</th><th>High band (G6–G10)</th></tr>` +
     rows.map((r) => `<tr>${r.map((c, i) => `<td${i === 3 || i === 4 ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('');
 })();
 </script>

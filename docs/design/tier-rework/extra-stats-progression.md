@@ -1,7 +1,7 @@
 # Extra Stats Progression: the Planet and its moons from Tier 1 to Tier 3
 
 > **Authored 2026-10-24. Nothing here is built.** The third standalone doc of the Tier rework
-> ([README §5](README.md#5-cross-reference-then-review), step 3.3). It absorbs [extra-stats.md](extra-stats.md), which
+> ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](extra-stats.md), which
 > stays as history, and supersedes every ES call ([§17](#17-decisions) maps each one). Calls are **EP1–EP22**, each with
 > a recommendation. No open questions.
 >
@@ -12,6 +12,12 @@
 > (EP17). Jewel recipes are **one fixed amount a jewel in every tier** (Moon 4, Planet 8, Halo 5), the types by
 > profession-progression.md's ladder, with exact totals per Uma (EP18). Everything else
 > of the first round's shape stands: one Planet, four moons, five nodes each, every open node counting.
+>
+> **Cross-checked with the other three standalone docs, 2026-10-24** ([README §7](README.md#7-cross-reference-and-cross-check-log),
+> XC1–XC16). Nothing here changed value: class-progression §9 and weapon-progression §4.4 now show this doc's §8.2 sheet;
+> the weapon groups are class-progression's two (CP38, §4.1); the Halo's preset follows her class branch's set (§4.1); its
+> place on a hit is [weapon-progression's damage stack](weapon-progression.md#24-the-damage-stack-everything-on-one-hit-wp31)
+> (WP31); **save v27 and v28** (§15).
 >
 > **The owner's context, 2026-10-24, decided elsewhere and kept here:** accessories become damage-oriented (defensive
 > and MP-regen ones go; defense lives in armor; weapon-progression.md); weapons grow by Pure or Dual branches
@@ -224,14 +230,17 @@ A ring round the Planet, tuned to **one damage kind** she picks. H41's idea (X1,
   a Dual's second kind decides weaknesses and locks only, so no branch doubles a bonus. Weaknesses, locks and shields
   never read the Halo.
 - **The kind is a setting, free to change outside fights,** and may be empty. Two nodes, two jewels; matching a
-  front's weakness is a tap. **The preset** is the Orb preset's kind, her first slot (CP11): Brawler Greatsword, Mage
-  Fire, Spell Blade Katana, Summoner Dark, Paladin Greatsword, Cleric Light.
+  front's weakness is a tap. **The preset** is the Orb preset's kind, her first slot (CP11, WP25): Brawler Greatsword,
+  Mage Fire, Spell Blade Katana, Summoner Dark, Paladin Greatsword, Cleric Light; on a class branch 2's reverse set
+  (CP40), that set's first slot: Warlord Bow, Sorcerer Light, Blademaster Katana, Conjurer Fire, Templar Bow, Oracle
+  Light (*cross-check, 2026-10-24*).
 - **The bound with the Orb (X7, with SB1):** on one kind, Orb + Halo ≤ a G10 weapon's Might × tier: **122 in Tier 2**
   (Orb 61 + Halo 61), **177 in Tier 3** (88 + 88). weapon-progression.md extends it to its Pendants as the **kind cap**
   (WP24): every flat offense on one kind together, so a Pendant on a capped kind adds nothing ("Greatsword: +122,
   capped") and she points one of them elsewhere. The Orb's and Pendants' values are that doc's; the cap is both docs'.
-- **Weapon groups (EP10):** class specializations become weapon-group focus (main Arms: Greatsword, Axe, Lance;
-  secondary: Bow, Katana; elemental Tomes: Fire, Ice, Lightning; arcane: Light, Dark; weapon-progression §3.9). **The
+- **Weapon groups (EP10):** class specializations become a weapon-group focus (class-progression CP38–CP39: the
+  **Ring** group, main Arms and elemental Tomes, or the **Light/Dark** group, secondary Arms and arcane Tomes; +15% on
+  its kinds; weapon-progression §3.9). *Cross-check (2026-10-24): two groups across both channels, not four.* **The
   Halo serves kinds, never a group:** a group Halo would put +61 on two or three kinds at
   once, past X7, and Strength and Sorcery already serve whole channels. A group-focused branch is served by where she
   points the Halo, and from Tier 3 by its two kinds, both inside her group. **Its picker lists her three slotted kinds
@@ -348,34 +357,37 @@ Her full sheet at each tier's Lv 50 (the balance simulation's average outfit, ba
 Power, from [stats-by-tier](previews/stats-by-tier.html)), fully built: armor G10 at weapon-progression.md's values
 (WP15: HP +150, DEF and M.DEF +40, MP +30, +25 offense on her half), every Extra Stats node her class uses, **without
 her moon**, every flat build value × tier. Offense is her lead kind: her ATK or M.ATK
-plus Might (68 · 122 · 177), and from Tier 2 the Orb (61 · 88) and the Halo (61 · 88). In brackets, Extra Stats' part.
+plus Might (68 · 122 · 177), her preset's accessories on that kind (WP25: a Tier 1 Pendant, +14 or +20, on the
+Mage's, Summoner's, Paladin's and Cleric's lead kind; from Tier 2 the Orb, 61 · 88) and the Halo (61 · 88), under the kind
+cap (122 · 177). In brackets, Extra Stats' part. *Cross-check (2026-10-24): the presets' Pendants added; the same
+sheet as [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1) and
+[weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50).*
 
 | Class | Tier | HP | MP | ATK | M.ATK | DEF | M.DEF | Offense, lead kind |
 |---|---|---|---|---|---|---|---|---|
 | **Brawler** | 1 | 1,477 (255) | 213 (51) | 192 (51) | 116 (21) | 207 (51) | 182 (51) | 260 (51) |
 | | 2 | 2,548 (460) | 368 (92) | 343 (92) | 206 (38) | 370 (92) | 326 (92) | 587 (153) |
-| | 3 | 3,628 (665) | 523 (133) | 495 (133) | 298 (55) | 534 (133) | 470 (133) | 848 (221) |
-| **Mage** | 1 | 1,244 (255) | 296 (51) | 116 (21) | 197 (51) | 186 (51) | 202 (51) | 265 (51) |
+| | 3 | 3,628 (665) | 523 (133) | 495 (133) | 298 (55) | 534 (133) | 470 (133) | 849 (221) |
+| **Mage** | 1 | 1,244 (255) | 296 (51) | 116 (21) | 197 (51) | 186 (51) | 202 (51) | 279 (51) |
 | | 2 | 2,153 (460) | 507 (92) | 206 (38) | 352 (92) | 332 (92) | 361 (92) | 596 (153) |
-| | 3 | 3,068 (665) | 719 (133) | 298 (55) | 509 (133) | 480 (133) | 521 (133) | 862 (221) |
+| | 3 | 3,068 (665) | 719 (133) | 298 (55) | 509 (133) | 480 (133) | 521 (133) | 863 (221) |
 | **Spell Blade** | 1 | 1,337 (255) | 247 (51) | 192 (51) | 151 (51) | 196 (51) | 192 (51) | 260 (51) |
 | | 2 | 2,311 (460) | 424 (92) | 343 (92) | 270 (92) | 351 (92) | 344 (92) | 587 (153) |
 | | 3 | 3,292 (665) | 602 (133) | 495 (133) | 390 (133) | 507 (133) | 496 (133) | 848 (221) |
-| **Summoner** | 1 | 1,337 (255) | 247 (51) | 151 (51) | 192 (51) | 196 (51) | 192 (51) | 260 (51) |
+| **Summoner** | 1 | 1,337 (255) | 247 (51) | 151 (51) | 192 (51) | 196 (51) | 192 (51) | 280 (51) |
 | | 2 | 2,311 (460) | 424 (92) | 270 (92) | 343 (92) | 351 (92) | 344 (92) | 587 (153) |
-| | 3 | 3,292 (665) | 602 (133) | 390 (133) | 495 (133) | 507 (133) | 496 (133) | 848 (221) |
-| **Paladin** | 1 | 1,337 (255) | 296 (51) | 181 (51) | 135 (51) | 212 (51) | 192 (51) | 249 (51) |
+| | 3 | 3,292 (665) | 602 (133) | 390 (133) | 495 (133) | 507 (133) | 496 (133) | 849 (221) |
+| **Paladin** | 1 | 1,337 (255) | 296 (51) | 181 (51) | 135 (51) | 212 (51) | 192 (51) | 263 (51) |
 | | 2 | 2,311 (460) | 507 (92) | 324 (92) | 242 (92) | 379 (92) | 344 (92) | 568 (153) |
-| | 3 | 3,292 (665) | 719 (133) | 468 (133) | 349 (133) | 548 (133) | 496 (133) | 821 (221) |
-| **Cleric** | 1 | 1,337 (255) | 296 (51) | 135 (51) | 181 (51) | 196 (51) | 207 (51) | 249 (51) |
+| | 3 | 3,292 (665) | 719 (133) | 468 (133) | 349 (133) | 548 (133) | 496 (133) | 822 (221) |
+| **Cleric** | 1 | 1,337 (255) | 296 (51) | 135 (51) | 181 (51) | 196 (51) | 207 (51) | 269 (51) |
 | | 2 | 2,311 (460) | 507 (92) | 242 (92) | 324 (92) | 351 (92) | 370 (92) | 568 (153) |
-| | 3 | 3,292 (665) | 719 (133) | 349 (133) | 468 (133) | 507 (133) | 534 (133) | 821 (221) |
+| | 3 | 3,292 (665) | 719 (133) | 349 (133) | 468 (133) | 507 (133) | 534 (133) | 822 (221) |
 
-- **Against [weapon-progression §4.4](weapon-progression.md)** (its sheets with the new armor): HP, DEF and M.DEF the
-  same (within a point of rounding); **MP is 30 × tier higher**, Vigor's MP (EP4): a Brawler 213 · 368 · 523 against
-  183 · 314 · 445. **Against [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1)** (the old
-  armor): armor's support's worth and Vigor's MP; **offense is 8 × tier lower** because §9 counts her moon's lead node
-  (+8), which this doc keeps outside (her moon, §6; CP36 moves it to defense).
+- **One sheet since the cross-check (2026-10-24):** [weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50)
+  took Vigor's MP (+30 × tier) and this doc's per-node rounding; [class-progression §9](class-progression.md#9-class-stats-at-lv-50-under-sb1)
+  took the new armor, Vigor's MP, the presets' accessories and her moon apart (its first draft counted her moon's lead
+  node, +8 × tier on offense, which this doc keeps outside: her moon, §6; CP36 moves it to defense).
 - **Where it shows:** a Brawler's ATK is 27% Extra Stats, her HP 17%, her MP 24%; a Mage's DEF 27%.
 
 ### 8.3 The build's share holds (SB1)
@@ -566,10 +578,10 @@ and 9 take Tier 2's and grades 5 and 10 Tier 3's. A Halo Jewel keeps the pair of
 - **Hunting carries the Lapidary,** as professions planned: 70 of Tier 1's 120 (58%), every other profession 10 to 20.
 - **A party** on the defaults (two of five skip a moon): 560 · 650 · 740 refined (+40 for their moons); a Rift run of
   twenty, four times that.
-- **Against [README §2.3](README.md#23-one-umas-demand):** Tier 1 is unchanged (25 · 120). Tiers 2 and 3 drop the
-  first round's "resized from Tier 2" (27 Planet and Moon Jewels at 120, then 29 at 120): no single amount fits both
-  counts, and an amount that changes per tier is one more thing to learn. Valor's and Swiftness's Moon Jewels cost what
-  every Moon Jewel costs: **138 and 156** an Uma, where §2.3 said 130 and 140.
+- **Against the first round's README §2.3** (now updated to these numbers): Tier 1 is unchanged (25 · 120). Tiers 2 and
+  3 drop the first round's "resized from Tier 2" (27 Planet and Moon Jewels at 120, then 29 at 120): no single amount
+  fits both counts, and an amount that changes per tier is one more thing to learn. Valor's and Swiftness's Moon Jewels
+  cost what every Moon Jewel costs: **138 and 156** an Uma, where the first round said 130 and 140.
 - **The whole Uma** (profession-progression.md's lines, the branch gem a G5 Weapon Gem): **485 · 503 · 521 refined**
   (493 · 511 · 529 with her moon), about **822 · 852 · 883 hours** at Craft Lv 25's speed (835 · 866 · 896): every tier
   inside PR10's tenth (+3.7%, +7.4%). Profession-progression.md owns the final amounts.
@@ -602,9 +614,9 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 | To | What |
 |---|---|
 | **README §2** | Tier 1 "the Planet and four moons, 25 nodes, every open node counts"; Tier 2 "+ the Halo (one kind), + Valor: 29"; Tier 3 "+ the Halo's second kind, + Swiftness: 33"; her moon 2 in every tier; values × 1 / 1.8 / 2.6. Jewel kinds · items 2 · 10, 3 · 12, **3 · 14**; §2.3's jewel rows **25 · 120, 29 · 138, 33 · 156** (every moon), her moon 2 · 8; §9.5 item 5 "MP **+51** in the Springs test" |
-| **weapon-progression.md** | **The Halo** is flat offense on one kind's hits (two from Tier 3), never a kind and never a heal: Tier 1 values +10 and +34, × 1.8 and × 2.6 (+18 · +61 in Tier 2, +26 · +88 in Tier 3). **The bound** Orb + Halo ≤ 68 × tier on one kind (122, 177), so the Orb at G10 is at most 34 × tier. **Defense:** Extra Stats keeps Guard (+30 × tier to each defense), Vigor (+150 HP × tier) and the Planet (+21 × tier): alone they hold an on-curve Uma at the budget's 28% a hit (Lv 10–50); armor's support's worth (WP15) is the margin over it, and no value is raised on both sides. Sheets with WP15's armor: §8.2. **Sustain:** Vigor's MP (+30 × tier) and the Planet's (+21 × tier) replace the Spring and Siphon Amulets' MP; the Springs test's knobs in order: legs' MP, Vigor's MP rate, the Flourish's twists. **Evasion:** feet armor keeps 12% at G10; Swiftness adds 6% in Tier 3 (cap 50%). **The Halo's preset** is the Orb preset's kind (her first slot); Tier 3's second, her second slot. **The Halo reads a hit's own kind** (its §3.9 rule) and sits under the kind cap (WP24: Orbs, Pendants and the Halo ≤ 68 × tier on one kind). **Pure's and Keen's multipliers** apply after the flat offense (the kind-focus stack is the weapon doc's, weapon-research risk 3) |
+| **weapon-progression.md** | **The Halo** is flat offense on one kind's hits (two from Tier 3), never a kind and never a heal: Tier 1 values +10 and +34, × 1.8 and × 2.6 (+18 · +61 in Tier 2, +26 · +88 in Tier 3). **The bound** Orb + Halo ≤ 68 × tier on one kind (122, 177), so the Orb at G10 is at most 34 × tier. **Defense:** Extra Stats keeps Guard (+30 × tier to each defense), Vigor (+150 HP × tier) and the Planet (+21 × tier): alone they hold an on-curve Uma at the budget's 28% a hit (Lv 10–50); armor's support's worth (WP15) is the margin over it, and no value is raised on both sides. Sheets with WP15's armor: §8.2. **Sustain:** Vigor's MP (+30 × tier) and the Planet's (+21 × tier) replace the Spring and Siphon Amulets' MP; the Springs test's knobs in order: legs' MP, Vigor's MP rate, the Flourish's twists. **Evasion:** feet armor keeps 12% at G10; Swiftness adds 6% in Tier 3 (cap 50%). **The Halo's preset** is the Orb preset's kind (her first slot); Tier 3's second, her second slot. **The Halo reads a hit's own kind** (its §3.9 rule) and sits under the kind cap (WP24: Orbs, Pendants and the Halo ≤ 68 × tier on one kind). **Pure's and Keen's multipliers** apply after the flat offense: the full order is weapon-progression's damage stack (WP31, §2.4), the Halo in its step 1 |
 | **profession-progression.md** | **Jewel kinds and grades** (§11.1): Planet I–V (1, 3, 5, 7, 9), Moon I–V (2, 4, 6, 8, 10), Halo I–II (5, 10, Tier 2), Halo III–IV (5, 10, Tier 3); grade g made at Craft Lv 5g − 4. **Counts an Uma** (§11.3): 25 · 29 · 33 every moon, 20 · 24 · 28 her class's, + her moon's Moon Jewels II and IV every tier. **Recipes** (§11.2): Moon 4 (3 Hunting stones + 1 Mining ingot), Planet 8 (2 each of Hunting, Wood Chopping, Farming, Fishing), Halo 5 (one of each of its tier's five pairs, low for I and III, high for II and IV, kept by the tier that brought it), the same amounts in every tier; **the types by grade are its ladder (PP9) and catalog (PP8)**, which §11.2 follows. **Lapidary an Uma: 120 · 138 · 156 refined** (+8); by profession in §11.3. The whole Uma 485 · 503 · 521 (its numbers), every tier inside PR10's tenth |
-| **class-progression.md** (its final pass) | A class-free map: her class decides which offense moon counts (the Brawler and the Mage skip one). **§9's MP column + 30 × tier** (Vigor); §9's offense without her moon's lead (−8 × tier) if CP36's note is taken. The Halo's picker groups kinds as her class branch names them (EP10). The hybrids' mirror on full maps is the hands' (CP9) |
+| **class-progression.md** (its final pass; *taken in the cross-check, 2026-10-24*) | A class-free map: her class decides which offense moon counts (the Brawler and the Mage skip one). **§9's MP column + 30 × tier** (Vigor); §9's offense without her moon's lead (−8 × tier) if CP36's note is taken. The Halo's picker groups kinds as her class branch names them (EP10). The hybrids' mirror on full maps is the hands' (CP9) |
 | **Uma Templates pass** | Her moon's slot (§6): two nodes, Lv 16 and 36, Moon Jewels II and IV, × tier, outside the budget, ids `template:1–2`; knack units (Speed, Limit) don't scale; CP36's note recorded (node II to her calling channel's defense) |
 | **The balance simulation** | `onCurveStars` → every node her level opens on her class's bodies, at her tier's values; `rpgFoeTierBudget`'s build part × tier (§10); the Springs test at +51 MP; Vigor's MP rate as its second knob, after legs' MP |
 | **The engine** | v16: nothing new (points freeze at a fight's start; Vigor's MP is a point). v17: the Halo, flat offense joined to her Might of its kind (as the Orb is), its kinds frozen into the fight's input; Valor's Limit start and Swiftness's evasion are points |
@@ -636,15 +648,15 @@ refined inputs (`gems.ts`), each refined item its raw one, one for one; then pro
 them into the Tier 1 types. A fully built Uma returns about 232 raw items from Star Gems; the reworked Tier 1 map asks
 120 (+8).
 
-**New, save v26** (the Tier 1 rework's migration):
-- `OwnedUma.stars: { open: string[], halo: RpgDamageKind[] }`: no `active`; `halo` empty until v27.
+**New, save v27** (the Tier 1 rework's migration; *changed in cross-check, 2026-10-24: v26 is taken on main, D190*):
+- `OwnedUma.stars: { open: string[], halo: RpgDamageKind[] }`: no `active`; `halo` empty until v28.
 - **Node ids,** fresh so none reads as today's: `planet:1–5`; `strength:1–5`, `sorcery:1–5`, `vigor:1–5`, `guard:1–5`;
   her moon `template:1` (knack), `template:2` (lead).
 - **Jewel ids:** `jewel-planet-1–5`, `jewel-moon-1–5` in the world's stock of made items (the record the weapon line's
   Weapon Gems use, weapon-progression.md's); `gems` retires with the refund. No id collides with a gem.
 - **Strict parsing:** a body the world's tier doesn't have (a Halo node in Tier 1) is refused.
 
-**Save v27** (Tier 2's toolbox): `valor:1–2`, `halo:1–2`, `stars.halo` holding one kind; `jewel-halo-1–2`.
+**Save v28** (Tier 2's toolbox): `valor:1–2`, `halo:1–2`, `stars.halo` holding one kind; `jewel-halo-1–2`.
 **Tier 3's save:** `swiftness:1–2`, `halo:3–4`, `stars.halo` holding two different kinds; `jewel-halo-3–4`.
 
 **Promotion** empties `stars.open` and `stars.halo` in the new world (the old world keeps its own). Old fights replay
@@ -666,7 +678,7 @@ unchanged: their allies' stats are frozen in the input.
 - **Tiers 2 and 3:** the core gives the same share at each tier's Lv 50 (§8.3), so D170's restart-and-scale holds on
   SB1. The Halo, Valor and Swiftness are the tier's tools, priced in its toolbox term (Z4), not in the build curve.
 - **Simulation items** (README §9.5): the re-baseline with full maps (item 1); the mirror on full maps (item 2); the
-  Springs at **+51 MP** (item 5); Tier 2: the Orb + Halo stack on one kind at 122, with Pure's ×1.5 (weapon-research
+  Springs at **+51 MP** (item 5); Tier 2: the Orb + Halo stack on one kind at 122, with Pure's ×1.5 (the damage stack, WP31; weapon-research
   risk 3); her moon with the affinity under U12's +5% (item 6).
 
 ## 17. Decisions

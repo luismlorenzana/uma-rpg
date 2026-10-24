@@ -5,7 +5,7 @@
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of the six Tier rework docs ([brief](README.md)).
 > It replaces today's 100-node map from Tier 1 on, and absorbs [the Halo](../extra-stats-tier2.md) (H41, Q12) into
 > Tier 2. Calls are **ES1–ES16**, each with a recommendation ([Decisions](#decisions)). Numbers are drafts for the
-> simulation. The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed ES12: her moon is
+> simulation. The cross-reference pass ([README §7](README.md#72-the-cross-reference-2026-10-22-history)) changed ES12: her moon is
 > [variance.md](variance.md)'s two nodes in every tier (it owns template-only nodes; this doc keeps the map's rules for
 > them), and the Lapidary's numbers are [professions.md](professions.md)' final recipes.
 >
@@ -230,7 +230,7 @@ this doc holds its slot and the map's rules for it (ES12):
 inputs (`gems.ts`), each refined item its raw one (1:1). Recommendation (ES14): nothing converts; the refund returns
 the raw items, as the brief leans.
 
-**New** (save **v26**, the Tier 1 rework's migration; the Halo's field joins with Tier 2's toolbox, v27):
+**New** (save **v26**, the Tier 1 rework's migration; the Halo's field joins with Tier 2's toolbox, v27; *now v27 and v28, README XC11*):
 - `stars: { open: string[], halo: (RpgDamageKind | null)[] }`: no `active`; `halo` holds 0, 1 or 2 kinds by tier
   (always empty until v27).
 - **Node ids, fresh so none reads as today's:** `planet:1–5`; `strength:`, `sorcery:`, `vigor:`, `guard:1–5`;

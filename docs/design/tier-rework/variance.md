@@ -3,7 +3,7 @@
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One category of [the Tier rework](README.md), reviewed
 > last. Calls **U1–U16**, each with a recommendation ([§15](#15-decisions)). No open questions. It fills the slots
 > [skill-trees.md](skill-trees.md) (SK11) and [extra-stats.md](extra-stats.md) (ES12) left for it. The cross-reference
-> pass ([README §7](README.md#7-cross-reference-log)) changed no U call: classes.md adopted the whole calling as the
+> pass ([README §7](README.md#72-the-cross-reference-2026-10-22-history)) changed no U call: classes.md adopted the whole calling as the
 > start (CL13), extra-stats.md adopted this doc's two moon nodes in every tier (ES12), and the items are **jewels**
 > (Moon Jewel II, IV), not gems.
 

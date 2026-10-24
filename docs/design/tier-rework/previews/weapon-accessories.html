@@ -294,8 +294,9 @@
 
   <section id="presets">
     <h2>Presets, by class and tier</h2>
-    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks. The Orb is her first weapon slot's kind
-      (CP11).</p>
+    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks. The Orb (and the Halo's kind) is her
+      first weapon slot's kind (CP11). From Tier 2 the preset follows her class branch's set (CP40): branch 2's reverse set takes its own
+      accessories, since a Bell needs its weapon in her slots (cross-check, 2026-10-24).</p>
     <div class="panel" style="overflow-x:auto"><table id="presets-table"></table></div>
   </section>
 </main>
@@ -480,13 +481,17 @@ renderVia();
 
 // Presets
 (function () {
-  const PR = [['brawler', 'Brawler', 'Greatsword Bell', 'Greatsword Orb', 'Main Arms Pendant'], ['mage', 'Mage', 'Elemental Pendant', 'Fire Orb', 'Onslaught Insignia'],
-    ['spellblade', 'Spell Blade', 'Lightning Twin Pendant', 'Katana Orb', 'Onslaught Insignia'], ['summoner', 'Summoner', 'Arcane Pendant', 'Dark Orb', 'Onslaught Insignia'],
-    ['paladin', 'Paladin', 'Main Arms Pendant', 'Greatsword Orb', 'Onslaught Insignia'], ['cleric', 'Cleric', 'Light Twin Pendant', 'Light Orb', 'Onslaught Insignia']];
+  // [id, class, Tier 1, Tier 2 adds, Tier 3 adds, branch 2's name and set, its slot 1, its Orb, its Tier 3]
+  const PR = [['brawler', 'Brawler', 'Greatsword Bell', 'Greatsword Orb', 'Main Arms Pendant', 'Warlord: Bow, Katana, Axe', 'Bow Bell', 'Bow Orb', 'Secondary Arms Pendant'],
+    ['mage', 'Mage', 'Elemental Pendant', 'Fire Orb', 'Onslaught Insignia', 'Sorcerer: Light, Dark, Blizzard', 'Arcane Pendant', 'Light Orb', 'Onslaught Insignia'],
+    ['spellblade', 'Spell Blade', 'Lightning Twin Pendant', 'Katana Orb', 'Onslaught Insignia', 'Blademaster: Katana, Bow, Dark', 'Dark Twin Pendant', 'Katana Orb', 'Onslaught Insignia'],
+    ['summoner', 'Summoner', 'Arcane Pendant', 'Dark Orb', 'Onslaught Insignia', 'Conjurer: Fire, Thunder, Greatsword', 'Fire Twin Pendant', 'Fire Orb', 'Onslaught Insignia'],
+    ['paladin', 'Paladin', 'Main Arms Pendant', 'Greatsword Orb', 'Onslaught Insignia', 'Templar: Bow, Katana, Light', 'Secondary Arms Pendant', 'Bow Orb', 'Onslaught Insignia'],
+    ['cleric', 'Cleric', 'Light Twin Pendant', 'Light Orb', 'Onslaught Insignia', 'Oracle: Light, Fire, Greatsword', 'Fire Twin Pendant', 'Light Orb', 'Onslaught Insignia']];
   const fc = (n) => n.includes('Bell') ? FAM.bell.c : n.includes('Orb') ? FAM.orb.c : n.includes('Insignia') ? FAM.insignia.c : FAM.pendant.c;
   const b = (n) => `<span class="fbadge" style="--fc:${fc(n)}">${n}</span>`;
-  document.getElementById('presets-table').innerHTML = `<tr><th>Class</th><th>Tier 1</th><th>Tier 2 adds</th><th>Tier 3 adds</th></tr>` +
-    PR.map(([c, n, a, o, i]) => `<tr><td><span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${n}</b></td><td>${b(a)}</td><td>${b(o)}</td><td>${b(i)}</td></tr>`).join('');
+  document.getElementById('presets-table').innerHTML = `<tr><th>Class</th><th>Tier 1 (and branch 1)</th><th>Tier 2 adds</th><th>Tier 3 adds</th><th>Branch 2's set (Tier 2 on)</th><th>Its slots 1 · 2</th><th>Tier 3 adds</th></tr>` +
+    PR.map(([c, n, a, o, i, set, a2, o2, i2]) => `<tr><td><span class="cdot" style="--cc:var(--cl-${c})"></span> <b>${n}</b></td><td>${b(a)}</td><td>${b(o)}</td><td>${b(i)}</td><td class="muted">${set}</td><td>${b(a2)} ${b(o2)}</td><td>${b(i2)}</td></tr>`).join('');
 })();
 </script>
 </body>

@@ -303,16 +303,16 @@
 
 <script>
 const KINDS = [
-  { id: 'greatsword', name: 'Greatsword', ch: 'arms', c: 'fire', set: 'fire', group: 'Main Arms', w2: 5.5 },
-  { id: 'axe', name: 'Axe', ch: 'arms', c: 'ice', set: 'ice', group: 'Main Arms', w2: 5.5 },
-  { id: 'lance', name: 'Lance', ch: 'arms', c: 'ltn', set: 'lightning', group: 'Main Arms', w2: 4.75 },
-  { id: 'bow', name: 'Bow', ch: 'arms', c: 'light', set: 'light', group: 'Secondary Arms', w2: 4.25 },
-  { id: 'katana', name: 'Katana', ch: 'arms', c: 'dark', set: 'dark', group: 'Secondary Arms', w2: 5 },
-  { id: 'fire', name: 'Fire Tome', short: 'Fire', ch: 'tome', c: 'fire', set: 'fire', group: 'Elemental', w2: 5.5 },
-  { id: 'ice', name: 'Blizzard Tome', short: 'Ice', ch: 'tome', c: 'ice', set: 'ice', group: 'Elemental', w2: 5.5 },
-  { id: 'lightning', name: 'Thunder Tome', short: 'Lightning', ch: 'tome', c: 'ltn', set: 'lightning', group: 'Elemental', w2: 4.75 },
-  { id: 'light', name: 'Light Tome', short: 'Light', ch: 'tome', c: 'light', set: 'light', group: 'Arcane', w2: 3.25 },
-  { id: 'dark', name: 'Dark Tome', short: 'Dark', ch: 'tome', c: 'dark', set: 'dark', group: 'Arcane', w2: 4 },
+  { id: 'greatsword', name: 'Greatsword', ch: 'arms', c: 'fire', set: 'fire', group: 'Ring (main Arms)', w2: 5.5 },
+  { id: 'axe', name: 'Axe', ch: 'arms', c: 'ice', set: 'ice', group: 'Ring (main Arms)', w2: 5.5 },
+  { id: 'lance', name: 'Lance', ch: 'arms', c: 'ltn', set: 'lightning', group: 'Ring (main Arms)', w2: 4.75 },
+  { id: 'bow', name: 'Bow', ch: 'arms', c: 'light', set: 'light', group: 'Light/Dark (secondary Arms)', w2: 4.25 },
+  { id: 'katana', name: 'Katana', ch: 'arms', c: 'dark', set: 'dark', group: 'Light/Dark (secondary Arms)', w2: 5 },
+  { id: 'fire', name: 'Fire Tome', short: 'Fire', ch: 'tome', c: 'fire', set: 'fire', group: 'Ring (elemental Tomes)', w2: 5.5 },
+  { id: 'ice', name: 'Blizzard Tome', short: 'Ice', ch: 'tome', c: 'ice', set: 'ice', group: 'Ring (elemental Tomes)', w2: 5.5 },
+  { id: 'lightning', name: 'Thunder Tome', short: 'Lightning', ch: 'tome', c: 'ltn', set: 'lightning', group: 'Ring (elemental Tomes)', w2: 4.75 },
+  { id: 'light', name: 'Light Tome', short: 'Light', ch: 'tome', c: 'light', set: 'light', group: 'Light/Dark (arcane Tomes)', w2: 3.25 },
+  { id: 'dark', name: 'Dark Tome', short: 'Dark', ch: 'tome', c: 'dark', set: 'dark', group: 'Light/Dark (arcane Tomes)', w2: 4 },
 ];
 const K = Object.fromEntries(KINDS.map((k) => [k.id, k]));
 const SETS = { fire: { n: 'Fire', w: 11, foe: 'Ice', arm: 'greatsword' }, ice: { n: 'Ice', w: 11, foe: 'Lightning', arm: 'axe' },
@@ -374,8 +374,14 @@ function layout(t) {
 }
 function itemOf(t, g, br) {
   if (g === 0) return 'Owned at G0 (the Training weapon)';
-  if (t >= 2 && g === 5) return `1 Branch Gem (9 refined: a G5 Weapon Gem's 2 Copper Ingot, 2 Pine Plank and one of each of the Tier ${t} pair's low types); she picks ${br === 'keen' || br === 'tempered' ? 'Keen or Tempered' : br === 'pure' || br === 'dual' ? 'Pure or Dual' : ''} here`;
-  return `1 Weapon Gem G${g} (4 refined: 2 ${g <= 5 ? 'Copper Ingot, 2 Pine Plank' : 'Iron Ingot, 2 Oak Plank'})`;
+  if (t >= 2 && g === 5) return `1 Branch Gem (4 refined: the G5 Weapon Gem in Tier ${t}'s pair, ${wgMats(t, 5)}); she picks ${br === 'keen' || br === 'tempered' ? 'Keen or Tempered' : br === 'pure' || br === 'dual' ? 'Pure or Dual' : ''} here`;
+  return `1 Weapon Gem G${g} (4 refined: ${wgMats(t, g)})`;
+}
+// profession-progression's ladder (PP9): Tier 2 moves G5 and G10 onto its pair; Tier 3 G4 and G9 onto Tier 2's, G5 and G10 onto its own.
+const WGM = { 1: ['Copper Ingot', 'Pine Plank', 'Iron Ingot', 'Oak Plank'], 2: ['Silver Ingot', 'Mahogany Plank', 'Titanium Ingot', 'Ebony Plank'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Orichalcum Ingot', 'Yggdrasil Plank'] };
+function wgMats(t, g) {
+  const p = t >= 2 && (g === 5 || g === 10) ? t : t === 3 && (g === 4 || g === 9) ? 2 : 1, m = WGM[p];
+  return g <= 5 ? `2 ${m[0]}, 2 ${m[1]}` : `2 ${m[2]}, 2 ${m[3]}`;
 }
 function treeSvg() {
   const L = layout(tier), X0 = 168, STEP = 64, NW = 52, NH = 38, W = 1000;
@@ -414,7 +420,7 @@ function treeSvg() {
 function side() {
   const k = K[kind], st = SETS[k.set];
   const t1 = T1W(kind);
-  let h = `<h3>${chip(kind)} ${chB(k.ch)} <span class="muted" style="font-weight:500;font-size:12px">${k.group} group</span></h3>`;
+  let h = `<h3>${chip(kind)} ${chB(k.ch)} <span class="muted" style="font-weight:500;font-size:12px">group: ${k.group}</span></h3>`;
   h += `<div class="row">Twin: ${chip(k.ch === 'arms' ? k.set : st.arm)} · the <b>${st.n} twins</b></div>`;
   h += `<div class="row"><b>Tier 1:</b> answers the ${st.n} twins (${st.foe} foes)${kind === 'bow' || kind === 'katana' ? ' and Twilight (Light + Dark foes)' : ''}: <b>${t1} of 48</b> signatures.</div>`;
   h += `<div class="row"><b>From Tier 2:</b> regulars weak to ${nm(kind)} alone: <b>${k.w2} of 48</b>; bosses keep the ${st.n} twins.</div>`;

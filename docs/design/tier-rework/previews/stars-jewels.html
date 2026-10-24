@@ -272,7 +272,7 @@
       Umas, four parties. Make time at the Lapidary is one gather's time a refined item: 0.6 h at Craft Lv 25 in a ×1.25 slot.</p>
     <div class="grid2">
       <div class="panel scroll"><table id="party-table"></table></div>
-      <div class="panel scroll"><h3>Against the plan (README §2.3)</h3><table id="plan-table" style="margin-top:6px"></table>
+      <div class="panel scroll"><h3>Against the first round's plan (README §2.3 before the cross-check)</h3><table id="plan-table" style="margin-top:6px"></table>
         <p class="foot">Tiers 2 and 3 drop the first round's "resized from Tier 2": no single amount fits 27 and 29 jewels at 120.
           With the branch gem a G5 Weapon Gem (profession-progression), every tier sits inside PR10's tenth: +3.7%, +7.4%.</p></div>
     </div>
@@ -487,8 +487,8 @@ document.getElementById('w-pure').addEventListener('click', () => { which = 'pur
     [['One Uma, every moon', one], ['One Uma, her class’s moons (Brawler, Mage)', pure], ['+ her moon, every Uma', () => 8], ['A party on defaults (3 + 2)', pt], ['A party, with their moons', (t) => pt(t) + 40], ['A Rift run of twenty', (t) => 4 * pt(t)], ['Lapidary hours, one Uma (Craft Lv 25)', (t) => (one(t) * 0.6).toFixed(0) + ' h']]
       .map(([n, f]) => `<tr><td>${n}</td>${[1, 2, 3].map((t) => `<td class="num">${typeof f(t) === 'number' ? fmt(f(t)) : f(t)}</td>`).join('')}</tr>`).join('') + '</tbody>';
   document.getElementById('plan-table').innerHTML = `<thead><tr><th></th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr></thead><tbody>` +
-    [['Planet and Moon Jewels: §2.3', '25 · 120', '27 · 120', '29 · 120'], ['Planet and Moon Jewels: this doc', '25 · 120', '27 · 128', '29 · 136'], ['Halo Jewels (the same)', '—', '2 · 10', '4 · 20'],
-     ['Lapidary an Uma', '<b>120</b>', '<b>138</b>', '<b>156</b>'], ['The whole Uma: §2.3', '485', '510', '520'], ['The whole Uma: profession-progression', '<b>485</b>', '<b>503</b>', '<b>521</b>'], ['Hours at Craft Lv 25', '822', '852', '883']]
+    [['Planet and Moon Jewels: first round', '25 · 120', '27 · 120', '29 · 120'], ['Planet and Moon Jewels: this doc', '25 · 120', '27 · 128', '29 · 136'], ['Halo Jewels (the same)', '—', '2 · 10', '4 · 20'],
+     ['Lapidary an Uma', '<b>120</b>', '<b>138</b>', '<b>156</b>'], ['The whole Uma: first round', '485', '510', '520'], ['The whole Uma: profession-progression', '<b>485</b>', '<b>503</b>', '<b>521</b>'], ['Hours at Craft Lv 25', '822', '852', '883']]
       .map((r) => `<tr><td>${r[0]}</td>${r.slice(1).map((c) => `<td class="num">${c}</td>`).join('')}</tr>`).join('') + '</tbody>';
 })();
 

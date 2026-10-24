@@ -1,7 +1,7 @@
 # Profession Progression: ten professions from Tier 1 to Tier 3
 
 > **Authored 2026-10-24. Nothing here is built.** The fourth standalone doc of the Tier rework
-> ([README §5](README.md#5-cross-reference-then-review), step 3.4). It absorbs [professions.md](professions.md) (the
+> ([README §5](README.md#5-the-plan), step 3.4). It absorbs [professions.md](professions.md) (the
 > first round, as revised after the owner's first review), which stays as history, and supersedes every PR call
 > ([§16](#16-decisions) maps each one). Calls are **PP1–PP23**, each with a recommendation. No open questions.
 >
@@ -20,6 +20,10 @@
 >   Silver and Titanium, Tier 3 Mythril and Orichalcum; Wood Chopping's Mahogany and Ebony, then Elderwood and Yggdrasil.
 > - **The Exchange by tier** (PP17), **the open shop** (PP16), **the refund paid in the new recipes' mix** (PP20).
 >
+> **Cross-checked with the other three standalone docs, 2026-10-24** ([README §7](README.md#7-cross-reference-and-cross-check-log),
+> XC1–XC16). Nothing here changed: weapon-progression.md adopted this doc's recipes, amounts and refund mix (its §6,
+> WP26), and the save numbers are **v27** (Tier 1) and **v28** (Tier 2) everywhere (§14).
+>
 > **Values** follow SB1 ([README §2.5](README.md#25-the-stat-budget-sb1-working-rule-2026-10-23)) in the docs that own
 > them. This doc's numbers are counts of items and hours, which SB1 doesn't touch.
 >
@@ -27,7 +31,7 @@
 > [every material type](previews/prof-materials.html) · [gathering → processing → making → what she wears](previews/prof-flow.html)
 > · [demand against supply](previews/prof-demand.html).
 >
-> **Interfaces, not designed here:** what is crafted and how many an Uma needs belong to [weapon-progression.md](weapon-progression.md#64-the-interface-for-profession-progression) (Weapon
+> **Interfaces, not designed here:** what is crafted and how many an Uma needs belong to [weapon-progression.md](weapon-progression.md#64-the-interface-with-profession-progression-settled) (Weapon
 > Gems, the Branch Gem, Armor Fittings, accessories) and [extra-stats-progression.md](extra-stats-progression.md#11-jewels)
 > (jewels); the calling and its pick to [class-progression.md](class-progression.md#10-the-calling-pick) (CP29–CP30).
 > This doc sets every material, recipe and amount for their items; [§13](#13-assumes) lists where their tables differ.
@@ -313,7 +317,7 @@ The items are weapon-progression.md's and extra-stats-progression.md's; their re
   here are every moon (the Uma maxed in any class); a default party (a Brawler and a Mage in five) takes 560 refined
   of jewels in Tier 1, not 600 (EP §11.3).
 - **A second weapon set** (a class switch, or Tier 2's reverse set, CP38–CP41) adds only the weapons she hasn't
-  raised: up to 30 Weapon Gems a tier. Armor and accessory grades sit on the slot and cost nothing again (XR6).
+  raised: up to 30 gems a tier (in Tiers 2 and 3, 27 Weapon Gems and 3 Branch Gems), 120 refined. Armor and accessory grades sit on the slot and cost nothing again (XR6).
 
 ## 4. Places: the Wilds at each tier
 
@@ -826,18 +830,18 @@ Drawn in the [demand page](previews/prof-demand.html).
 
 | From | What this doc assumes | If it differs |
 |---|---|---|
-| **[weapon-progression.md](weapon-progression.md)** (WP10, WP19, WP26, §6.4; cross-checked 2026-10-24, 15:29) | Its items and counts, adopted as written: Weapon Gem 30 · 27 · 27; **one Branch Gem line** at G5, 3 a tier from Tier 2, its branch picked when used (WP10); Armor Fittings 50, armor carrying all defense; **accessories in four families** (Pendants, Bells; + Orbs; + Insignias), **1 · 2 · 3 untyped slots, one Accessory Setting a slot a grade** (10 · 20 · 30), any type; one item of a line fits any weapon, slot or type | **WP §6.4 already agrees that "where the two differ, its amounts and materials win"** (this doc's); its tables still show its draft, so the differences, for the cross-check: (1) **the Branch Gem is 4 refined, the G5 Weapon Gem in its tier's pair**, not WP26's 9 (the G5 recipe + one of each pair): the ladder already puts G5 on the tier's pair. (2) **The ladder** (PP9) also puts WP §6.2's G10 Weapon Gem, G5 and G10 Fittings and Settings on Tier 2's pair, and G4 and G9 on Tier 2's in Tier 3; WP §6.2 keeps base types there. Same amounts. (3) **Names:** WP §6.2 uses the first round's catalog (Cedar for Tier 2; Titanium, Ebony for Tier 3's Branch Gem); with PP8 Tier 2's low types are Silver, Mahogany, Wool, Trilobite, Sapphire, Tier 3's Mythril, Elderwood, Moonsilk, Aether, Starstone. (4) **Totals:** gear **365 · 365 · 365** here (the Forge 120 in every tier), WP §6.3's 365 · 380 · 380; the whole Uma **485 · 503 · 521**, WP's 485 · 510 · 520 (first-round jewels). (5) **The refund** is paid in Tier 1's demand mix (PP20), not converted by family (WP §11's PR14). (6) WP §11's "save v26": the next free number (below) |
+| **[weapon-progression.md](weapon-progression.md)** (WP10, WP19, WP26, §6) | Its items and counts, adopted as written: Weapon Gem 30 · 27 · 27; **one Branch Gem line** at G5, 3 a tier from Tier 2, its branch picked when used (WP10); Armor Fittings 50, armor carrying all defense; **accessories in four families** (Pendants, Bells; + Orbs; + Insignias), **1 · 2 · 3 untyped slots, one Accessory Setting a slot a grade** (10 · 20 · 30), any type; one item of a line fits any weapon, slot or type | **Agrees since the cross-check (2026-10-24):** WP §6 now shows this doc's recipes (the ladder, the Branch Gem at 4 in its tier's pair, PP8's names), gear 365 in every tier and the whole Uma 485 · 503 · 521; WP §11 pays the refund in Tier 1's demand mix (PP20) and numbers the save v27. Before it, WP's draft had the first round's catalog, a Branch Gem of 9 and 365 · 380 · 380 |
 | **[extra-stats-progression.md](extra-stats-progression.md#11-jewels)** (EP17, EP18; re-checked 2026-10-24, 15:27) | Jewel kinds, grades and counts: 25 · 29 · 33 every moon (20 · 24 · 28 her class's), her moon's 2; Planet 8, Moon 4, **Halo 5** (one of each of its tier's types); the Lapidary **120 · 138 · 156** | **Agrees:** EP §11.2 now follows the ladder (PP9) and the catalog (PP8), and EP §11.3 states the whole Uma at 485 · 503 · 521. Nothing to reconcile |
 | **class-progression.md** (CP29–CP30, CP38–CP41) | The calling and its pick name the trade; the class branch's reverse set is a second set of weapons, not more items an Uma | — |
 | **variance.md** (U4) | One rule names her calling; today's split 17.0–22.6% | — |
-| **README §9.3** | "Save v26 is the Tier 1 rework." **The code reached v26 with D190's party lead** (2026-10-22), so the rework's migration takes the next number, v27, and Tier 2's toolbox v28 | Only the number moves |
+| **README §9.3** | **Save v27 is the Tier 1 rework, v28 Tier 2's toolbox:** the code reached v26 with D190's party lead (2026-10-22). *The README and the other three docs say so since the cross-check (2026-10-24)* | Only the number moves |
 | **The kit and uma-art** | Nothing new: `Place.frame` and eight pips exist; the ten frames and sixty icons exist (§3.3, §4.1) | — |
 | **Tier 2's world** (tier2-world §11) | A run of twenty ascends together at Craft Lv 1 with the purse; about four weeks to max | — |
 
 ## 14. Save impact
 
-The Tier 1 rework's one migration ([README §9.3](README.md#93-save-v26-one-migration-every-world); the next free number,
-§13), every world alike. The deleted gear and Star Gems come back as raw items, so this conversion runs in the same step.
+The Tier 1 rework's one migration, **save v27** ([README §9.3](README.md#93-save-v27-one-migration-every-world); v26 is
+taken on main, §13), every world alike. The deleted gear and Star Gems come back as raw items, so this conversion runs in the same step.
 
 | Today in the save | After | For the refund |
 |---|---|---|

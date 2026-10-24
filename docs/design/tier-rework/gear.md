@@ -5,7 +5,7 @@
 > **Tier rework, cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs
 > ([the brief](README.md)); the owner reviews it second, after Classes. Every number is a draft for the balance
 > simulation (`SIM=1`). Calls are **GE1**, **GE2** …, each with a recommendation ([§14](#14-decisions)). The
-> cross-reference pass ([README §7](README.md#7-cross-reference-log)) replaced §8's draft amounts with
+> cross-reference pass ([README §7](README.md#72-the-cross-reference-2026-10-22-history)) replaced §8's draft amounts with
 > [professions.md](professions.md)'s recipes (it owns amounts), named the vocabulary (gems, jewels, stones), stated what a
 > class switch costs, and moved Tier 2's engine changes to Tier 2's own version (v17). No GE call changed.
 >

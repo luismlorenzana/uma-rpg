@@ -5,7 +5,7 @@
 
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One of six category docs ([the brief](README.md)),
 > for the owner's review, which starts with this category. Calls are **CL1–CL15** ([§11](#11-decisions)); every one has
-> a recommendation. The cross-reference pass ([README §7](README.md#7-cross-reference-log)) changed CL5 (the mirror's
+> a recommendation. The cross-reference pass ([README §7](README.md#72-the-cross-reference-2026-10-22-history)) changed CL5 (the mirror's
 > re-check with full Extra Stats maps), CL13 (the start is her calling, all eight rows) and CL14 (her trade follows her
 > calling), and the save rows for armor.
 >

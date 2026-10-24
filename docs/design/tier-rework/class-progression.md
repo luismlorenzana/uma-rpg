@@ -1,7 +1,7 @@
 # Class Progression: the six classes from Tier 1 to Tier 3
 
 > **Authored 2026-10-23; revised after the owner's first review and again after his second pass, both 2026-10-24.
-> Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-cross-reference-then-review), step 3.1). It absorbs
+> Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.1). It absorbs
 > [classes.md](classes.md) and [skill-trees.md](skill-trees.md), which stay as history, and supersedes every CL and SK
 > call ([§16](#16-decisions) maps each one). Calls are **CP1–CP43**, each with a recommendation. No open questions;
 > one proposal waits on the owner's word (CP42, the Spell Blade's branch B).
@@ -15,6 +15,14 @@
 > (weapon-progression.md designs them); **the weapon branches redrawn** to the research note (Pure or Dual of its own
 > channel, one Dual an Uma in Tier 2, CP33); **the Spell Blade's branch B** proposed as **Pierce**, not one more hit
 > (CP42, for the owner); **Uma uniqueness** kept as it is (CP36), revisited in the Uma Templates pass.
+>
+> **Cross-checked with the other three standalone docs, 2026-10-24** ([README
+> §7](README.md#7-cross-reference-and-cross-check-log), XC1–XC16). **The owner's names for the weapon groups**
+> (2026-10-24) are noted at CP38 and land at implementation; this doc keeps "Ring" and "Light/Dark" until then. What
+> moved here: the accessories are weapon-progression's four families and presets (§5, CP10, CP11); a Dual's second kind
+> in one wording with WP7 (§3.3, CP12); shields per tier (§4.4, CP8); the Lv 50 sheets on weapon-progression's armor and
+> accessories and extra-stats-progression's values (§9); the focus's place in [weapon-progression's damage
+> stack](weapon-progression.md#24-the-damage-stack-everything-on-one-hit-wp31) (WP31); **save v27 and v28** (§14, CP31).
 >
 > **The owner's first review, 2026-10-24** ("the baseline level of work I want"), eight points, each answered below
 > ([the table](#the-owners-points)): **Skill Ranks** every 2 Class Ranks (CP32); **what grows on her three weapons**
@@ -74,7 +82,7 @@
 | **2026-10-24:** the Uma Template on the class trees: not just "Mage + Light/Dark"; something that won't explode over 3 tiers; maybe % bonuses per weapon type | **Affinity** ([§6.9](#69-her-template-on-the-trees-affinity-cp36), CP36): +6% damage with one twin set's two kinds, every tier, any class; the options compared |
 | **Second pass, 2026-10-24:** "I still don't like the class specializations in later tiers, feels like almost nothing changes." Brawler branch 1 extra damage on the 3 main Arms, branch 2 only on the secondary Arms (Bow, Katana); the Mage the same with her Tomes; reverse options for every other class ("an Elemental Mage and a regular Summoner" in one party, "a Light/Dark Mage and an Elemental Summoner" in another) | **The class branch is a weapon-group focus** ([§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41)): two groups, **Ring** and **Light/Dark** (CP38); **+15% damage** on the focus group's kinds, the class skills cast through a focus weapon, the passives folded into it (CP39); every class's **default and reverse sets**, no default changed (CP40); **party pairings** and their coverage (CP41); [templates page](previews/class-templates.html#focus), [tree viewer](previews/class-trees.html) |
 | **Second pass:** "All classes have viable skill trees for all weapons; in Tier 1 veering off the default weapons is rare, in Tier 2 it is greatly encouraged for variety, in Tier 3 some further variety may come" | **Audited: all 50 trees are full** (CP43, [§6.10](#610-every-tree-is-viable-cp43)); the tree viewer draws every tree she can slot, the reverse set one tap away. Tier 2's reverse set is free at Ascend (grades reset); Tier 3 adds a second two-kind weapon, two tree branches held and the mastery |
-| **Second pass:** accessories are being redesigned (weapon-progression.md): damage-oriented, defensive and MP ones go, counts 1 · 2 · 3 | **Accessory slots 1 · 2 · 3, damage-oriented** in every sheet and preset ([§5](#5-the-class-template-per-tier), CP10, CP11); the "Support" and "Damage" slot names are gone; nothing designed here |
+| **Second pass:** accessories are being redesigned (weapon-progression.md): damage-oriented, defensive and MP ones go, counts 1 · 2 · 3 | **Accessory slots 1 · 2 · 3, damage-oriented** in every sheet and preset ([§5](#5-the-class-template-per-tier), CP10, CP11); the "Support" and "Damage" slot names are gone; nothing designed here. **Cross-check:** weapon-progression's four families (Pendants and Bells; + Orbs; + Insignias) and its presets fill the sheets (§5.2) |
 | **The research note's two flags** (weapon-research §6.5): §3.5's Brawler held all five Arms in Tier 2; the templates page drew cross-channel Duals | **Redrawn to WR3 and WR4** ([§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33), CP33, CP12): a Dual's second kind is of its own channel; one Dual an Uma in Tier 2, two in Tier 3, one for good for the Brawler and the Mage; [templates page](previews/class-templates.html#grows) |
 | **The research note's third flag:** the Spell Blade's tree branch B (Flurry, one more hit) repeats "more multi-hit on a multi-hit class" | **Proposed: Pierce** (CP42, [§6.2](#62-tier-1-two-branches-cp18), for the owner): one hit that ignores the unbroken halving; A chips the shield, B cuts through it; the Blademaster's three "extra hits" skills reshaped the same way |
 | **Second pass:** Uma uniqueness "still pretty weak, but let's not overcomplicate until we see Uma uniqueness on all other classes" | **CP36 kept as it is;** revisited in the Uma Templates pass ([§6.9](#69-her-template-on-the-trees-affinity-cp36)) |
@@ -90,7 +98,7 @@
 | **What grows on a weapon** | Ranks, Might | Its grade's Might | + a branch at G5: **Pure** (weak ×1.5) or **Dual** (+1 kind of its channel) | Pure → **Keen** (×1.7) or **Tempered**; Dual → Tempered; never a third kind; the Halo's second kind |
 | **Foes weak to** | 2–5 kinds, half drawn at random | **2: one Arm and its twin element**, every foe | Regulars **1**; sub-bosses and bosses 2 | Regulars and sub-bosses 1; **bosses 2** |
 | **Armor** | 5, a half per piece | 5, her class's half | 5, per piece for the four between | The same |
-| **Accessories** | 2: Damage, Support | **1 slot, damage-oriented** (weapon-progression.md) | 2 | 3 |
+| **Accessories** | 2: Damage, Support | **1 slot: a Pendant or a Bell** (weapon-progression WP18–WP19) | 2: + Orbs | 3: + Insignias |
 | **Trees she uses** | 5 (of 5 or 10) | 3 weapon trees | 3, + her class tree | 3, + her class tree |
 | **Nodes a weapon tree** | 15 | 8 | 14 | 17 |
 | **Picks a class** | 25 forks and a 50-point budget | 3 | 7 (6 + her branch) | 10 (9 + her branch) |
@@ -112,10 +120,10 @@ every item a draft priced by its tier's simulation (Tier 2's term, Z4; Tier 3's 
 |---|---|---|---|
 | **Class branches** (second pass: a weapon-group focus) | One of two a class, swapped freely: **Ring or Light/Dark focus, +15% on its kinds**, her default or reverse set, three class skills at Class Rank 20, 30, 40; **all twelve written**, party pairings drawn | The branch's capstone at Class Rank 50 and the class's mastery mechanic (six) | [§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41), [§7.3](#73-tier-3-the-branch-capstone-and-the-mastery-cp27); [tree viewer](previews/class-trees.html), [pairings](previews/class-templates.html#focus) |
 | **Weapon trees** | **Branch C** joins the fork (every class's third line); each tip forks **Power or Break** | **Capstones** at depth 6; **two branches held**; the master slot | [§6.3](#63-tier-2-branch-c-and-the-tip-fork-cp19), [§6.4](#64-tier-3-capstones-and-two-branches-held-cp20); every node named in [§6.5](#65-every-classs-trees) |
-| **Weapon branches** (owner, 2026-10-24: Prism dropped) | At G5: **Pure** (weak ×1.5) or **Dual** (a second kind of its own channel); one Dual in her slots | Pure → **Keen** or **Tempered**, Dual → Tempered; two two-kind weapons (Brawler, Mage one); never three kinds | [§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33); [weapon-research](weapon-research.md) WR1–WR6; weapon-progression.md decides |
-| **Accessories** | A **second slot**, damage-oriented | A **third** | weapon-progression.md (being redesigned by the owner: damage-oriented, defensive and MP ones go) |
-| **Armor** | The four classes between **mix halves per piece** | The same | [gear §4.2](gear.md#42-armor) |
-| **Extra Stats** | **The Halo** (+10 → +34 on one kind's hits); the **Valor** moon (Limit start) | The Halo's **second kind**; the **Swiftness** moon (evasion) | [extra-stats Tier 2](extra-stats.md#tier-2-the-halo-and-the-valor-moon), [Tier 3](extra-stats.md#tier-3-a-second-halo-kind-and-the-swiftness-moon) |
+| **Weapon branches** (owner, 2026-10-24: Prism dropped) | At G5: **Pure** (weak ×1.5) or **Dual** (a second kind of its own channel); one Dual in her slots | Pure → **Keen** or **Tempered**, Dual → Tempered; two two-kind weapons (Brawler, Mage one); never three kinds | [§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33); [weapon-research](weapon-research.md) WR1–WR6; decided in [weapon-progression §3](weapon-progression.md#3-weapons) (WP6–WP9) |
+| **Accessories** | A **second slot**; **Orbs** join the Pendants and Bells | A **third**; **Insignias** join | [weapon-progression §5](weapon-progression.md#5-accessories) (WP17–WP25: damage only, one of each family) |
+| **Armor** | The four classes between **mix halves per piece**; armor carries all defense, × 1.8 | × 2.6 | [weapon-progression §4](weapon-progression.md#4-armor) (WP14–WP15) |
+| **Extra Stats** | **The Halo** (+18 → +61 on one kind's hits: +10 → +34 × 1.8); the **Valor** moon (Limit start) | The Halo's **second kind** (+88 each); the **Swiftness** moon (evasion) | [extra-stats-progression §4](extra-stats-progression.md#4-tier-2-the-halo-and-valor), [§5](extra-stats-progression.md#5-tier-3-the-halos-second-kind-and-swiftness) |
 | **Her template** | The ★ **signature tip** on her affinity kind's tree | At both of its tip forks | [§6.9](#69-her-template-on-the-trees-affinity-cp36), [variance §7](variance.md#7-skill-trees-the-flourish-and-the-signature-tip) |
 | **Limit Breaks** | **LB+** at Bond 10 (24 extra effects) | Kept | [§8](#8-halls-of-heroes-and-limit-breaks-cp28-cp35), [tier2-classes §7.2](../tier2-classes.md) |
 | **Foes** | Regulars weak to **one kind**; shields +1 (Z2) | Sub-bosses one kind too; bosses keep two | [§4.2](#42-tiers-2-and-3-the-list-narrows-by-rank-cp6) |
@@ -327,12 +335,16 @@ Every class can slot every kind of its channels in every tier. What changes per 
 - **Tier 1:** a weapon is one kind, its tree and its grade's Might.
 - **Tier 2:** at G5 a weapon takes a branch, **Pure** (weak hits ×1.5) or **Dual** (a second kind of its own channel,
   weak ×1.3). The **slot doesn't change**: a Dual stays in its first kind's slot and channel and opens its first kind's
-  tree; its second kind is coverage, the same in every class that slots it (WR3; GE7's class check retires, so the
-  first round's "Greatsword + Fire" weapon is gone). **One Dual in her slots** (WR4), her three kinds all different.
+  tree; its second kind is **coverage only**: its hits carry both kinds for weaknesses and charged-move locks **in every
+  class that slots it**, one shield point and one lock a hit whichever kind matched, and every bonus (the focus, the
+  affinity, Pendants, Orbs, the Halo) reads the hit's own, first kind (WP7, one wording since the cross-check; GE7's
+  class check retires, so the first round's "Greatsword + Fire" weapon is gone). **One Dual in her slots** (WR4,
+  WP8), her three kinds all different.
 - **Tier 3:** Pure deepens to **Keen** (×1.7) or **Tempered** (+ a kind of its channel, both ×1.5), Dual to Tempered;
   **two** two-kind weapons for the four classes between, **one for good** for the Brawler and the Mage, so no Uma ever
   holds a whole channel. A weapon never carries more than two kinds (owner, 2026-10-24: Prism dropped).
-- Forms are the weapons doc's; this doc owns which kinds fit which class's slots, and the rule above for extra kinds.
+- Branches are the weapons doc's (WP6–WP9); this doc owns which kinds fit which class's slots, and the rule above for
+  extra kinds, worded as WP7.
   [§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33) sums up what grows on a weapon per tier.
 
 The [templates page](previews/class-templates.html#matrix) draws the matrix (class × slot × kind, defaults marked).
@@ -356,20 +368,22 @@ The [templates page](previews/class-templates.html#matrix) draws the matrix (cla
 The owner (2026-10-24): "If we keep 3 weapons through the tiers, do the DPS classes unlock specialized hits on the 3
 weapons, or more weapon damage types in later tiers?" **Both, and each has one home** (weapons own *which kinds* and
 *how hard a weak hit lands*; classes and trees own *how she hits*: the [research note](weapon-research.md), WR1):
-- **On the weapon: a branch from Tier 2** (WR2–WR5, recommended to weapon-progression.md, which decides). At G5 each
+- **On the weapon: a branch from Tier 2** (WR2–WR5, decided in weapon-progression.md as WP6–WP9). At G5 each
   of her three weapons becomes **Pure** (one kind, weak hits ×1.5 instead of ×1.3; was "Specialized", renamed so it
   can't be read as a hit shape) or **Dual** (a second kind **of its own channel**: an Arm adds an Arm, a Tome an
   element; weak ×1.3). **No third branch:** every candidate (Break, lock, Executioner, imbue …) duplicates a tree or a
   class job, or trivializes. **Her slots hold one Dual in Tier 2 and two two-kind weapons in Tier 3; the Brawler and
   the Mage keep one for good**, so no Uma ever holds all five kinds of a channel. **Tier 3 deepens, never stacks:**
   Pure → **Keen** (×1.7) or **Tempered** (+ a kind of its channel, both ×1.5); Dual → Tempered. A Dual's second kind
-  keeps the hit's channel, offense and tree, and counts for weaknesses and locks in every class that slots it (WR3).
+  keeps the hit's channel, offense and tree, counts for weaknesses and locks in every class that slots it, and earns no
+  bonus: every bonus reads the hit's own, first kind (WR3, WP7).
 - **In the trees: the specialized hits** (branch C, the Power or Break tip, capstones, the class branch). No tree and no
   template adds a kind (CP17).
 - **In her class branch: the focus** (Tier 2, [§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41)):
   +15% on the Ring or the Light/Dark group's kinds. A percentage on a group, never a kind.
-- **Beside them: damage on a kind,** her **accessories** (1 · 2 · 3 slots, damage-oriented: weapon-progression.md
-  designs them, the owner is reshaping them) and the Extra Stats **Halo** (Tier 2, a second kind in Tier 3).
+- **Beside them: damage on a kind,** her **accessories** (1 · 2 · 3 slots: Pendants or Bells, + Orbs, + Insignias;
+  weapon-progression WP18–WP19) and the Extra Stats **Halo** (Tier 2, a second kind in Tier 3). Where each sits on a
+  hit: [weapon-progression's damage stack](weapon-progression.md#24-the-damage-stack-everything-on-one-hit-wp31) (WP31).
 
 > **Owner, 2026-10-24: Prism dropped.** Three kinds on one weapon "could trivialize the weakness concept". The first
 > round's forms (Dual or Pure in Tier 2; Prism, Tempered or Keen in Tier 3) are
@@ -379,10 +393,10 @@ weapons, or more weapon damage types in later tiers?" **Both, and each has one h
 
 | What grows | Tier 1 | Tier 2 | Tier 3 | Where it lives |
 |---|---|---|---|---|
-| **The weapon's branch** | **Base:** one kind, weak ×1.3 | At G5: **Pure** (weak ×1.5) · **Dual** (+1 kind of its channel, weak ×1.3); **one Dual in her slots** | Pure → **Keen** (×1.7) or **Tempered** (both kinds ×1.5) · Dual → Tempered; **two two-kind weapons** (Brawler, Mage one); never a third kind | [weapon-research](weapon-research.md) WR2–WR5; weapon-progression.md decides |
+| **The weapon's branch** | **Base:** one kind, weak ×1.3 | At G5: **Pure** (weak ×1.5) · **Dual** (+1 kind of its channel, weak ×1.3); **one Dual in her slots** | Pure → **Keen** (×1.7) or **Tempered** (both kinds ×1.5) · Dual → Tempered; **two two-kind weapons** (Brawler, Mage one); never a third kind | [weapon-progression §3](weapon-progression.md#3-weapons) WP6–WP9 |
 | **Kinds an Uma holds, at most** | 3 | 4 | 5 (Brawler, Mage 4) | WR4 |
-| **Its power** | Its grade's Might, G0–G10 | The same × 1.8 (SB1) | × 2.6 | gear §3.1, [README §2.5](README.md#25-the-stat-budget-sb1-working-rule-2026-10-23) |
-| **Damage on a kind** | Her accessory (damage-oriented) | + a second accessory · **the Halo** (Extra Stats): +10, then +34, on one kind | + a third accessory · the Halo's **second kind** | weapon-progression.md (accessories), [extra-stats](extra-stats.md#tier-2-the-halo-and-the-valor-moon) |
+| **Its power** | Its grade's Might, G0–G10 | The same × 1.8 (SB1) | × 2.6 | [weapon-progression §3.1](weapon-progression.md#31-tier-1-a-straight-line-wp5), [README §2.5](README.md#25-the-stat-budget-sb1-working-rule-2026-10-23) |
+| **Damage on a kind** | Her accessory: a **Pendant** (flat on 2–3 kinds) or a **Bell** (a follow-up on her Attack) | + an **Orb** (flat on one kind) · **the Halo** (Extra Stats): +18, then +61, on one kind | + an **Insignia** (a % by timing) · the Halo's **second kind** | [weapon-progression §5](weapon-progression.md#5-accessories), [extra-stats-progression §4](extra-stats-progression.md#4-tier-2-the-halo-and-valor); the order on a hit: WP31 |
 | **Its tree's hits** | Trunk; fork A or B | + **branch C**; every tip forks **Power** or **Break** (one more shield point on a weak hit) | + **capstones** (D6); **two branches held** | [§6.2–§6.5](#62-tier-1-two-branches-cp18) |
 | **Her class branch** | — | **A focus:** +15% on the Ring or the Light/Dark kinds, her default or reverse set; three class skills, cast through a focus weapon | + the branch's **capstone** and the mastery | [§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41) |
 | **Her template** | Affinity +6% on one twin set (any tier) | + ★ signature tip on her affinity kind's tree | At both of its tip forks | [§6.9](#69-her-template-on-the-trees-affinity-cp36) |
@@ -484,6 +498,18 @@ party may enter.
   answer nearly all; but a hybrid on her twin set lands **both halves** weak, and the default party answers each foe
   with 2.5 members on average. Breaks come slower; the simulation re-sets shields so rounds to the first Break stay
   within ±0.5 of today's. The draft is sub-boss 6 → 5 and boss 8 → 6, regulars unchanged.
+- **Shields per tier** (*changed in cross-check, 2026-10-24*, with weapon-progression's measure, WP12): rounds to the
+  first Break stay level when **a shield grows with the answers its foe's list gets** (members who hold a kind she is
+  weak to, on the default party with best weapon branches), **never below Tier 1's + 1** (Z2's). Bosses keep their
+  twins while every Uma adds a kind, so their answers rise (2.47 → 3.30 → 3.76) and their shields with them:
+
+  | Foe (drafts) | Tier 1 | Tier 2 | Tier 3 |
+  |---|---|---|---|
+  | Regulars | 2–3 (twins, 2.47 answers) | 3–4 (one kind, 2.0: Z2's +1) | 3–4 (one kind, 2.34) |
+  | Sub-bosses | 5 | 7 (twins, 3.30) | 6 (one kind, 2.34: Z2's floor) |
+  | Bosses | 6 | **8** (twins, 3.30) | **9** (twins, 3.76) |
+
+  The simulation sets the final numbers (README §9.5 item 3); a boss's locks stay drawn from her twins.
 
 ### 4.5 Balanced, checked (CP4, CP7)
 
@@ -544,59 +570,64 @@ Horde no Fire twins, 1 on the Ice; Iron no Bow). That is the guided builds' job,
 |---|---|---|---|---|
 | **Weapons** | 3, by the class's Arms count | 3; one may be a Dual | 3; two may carry two kinds (Brawler, Mage one) | 5 |
 | **Armor** | 5 (head, body, legs, arms, feet), **her class's half**: physical for Brawler, Spell Blade, Paladin; magical for Mage, Summoner, Cleric | 5; Brawler physical, Mage magical, **the four between per piece** | As Tier 2 | 5, per piece |
-| **Accessory slots** (second pass) | **1**, damage-oriented | **2** | **3** | 2: Damage, Support |
+| **Accessory slots** (second pass; families: weapon-progression WP18–WP19) | **1**: a Pendant or a Bell | **2**: + an Orb | **3**: + an Insignia; one of each family | 2: Damage, Support |
 | **Class choice** | Her class | + a class branch, one of two: a **weapon-group focus** (+15%), her default or reverse set, three class skills | + the branch's capstone and the class's mastery | — |
 | **Trees · picks** | 3 · 3 | 3 + her class tree · 7 | 3 + her class tree · 10 | 5 · 25 + points |
 | **Equipped skills** | 3 → 7 (Lv 10, 20, 30, 40) | 3 → 10 | 10 and a master slot | 3 → 10 |
 
 Grades are the weapons doc's (every slot G0–G10, worn at Uma Lv 5g − 4); the slots and what they hold are this doc's.
-**Accessories** (owner, second pass): the owner is redesigning them in weapon-progression.md: **damage-oriented**
-(elemental and physical damage, multi-element ones early in Tier 1, a set that adds one follow-up hit on basic Attacks
-of any kind); the defensive (DEF and M.DEF cuts, shields) and MP-regen ones go; **the counts stay 1 · 2 · 3**. This doc
-names the slots "accessory slot 1, 2, 3" and designs nothing in them; the first round's Support and Damage (Orb) slots,
-and their Talismans, Amulets and Orbs, are history (gear §4.3, §5.3).
+**Accessories** (owner, second pass; designed in [weapon-progression §5](weapon-progression.md#5-accessories)):
+**damage only**, the ten defensive and MP supports retired (WP17); **untyped slots 1 · 2 · 3**, one accessory of each
+family (WP19): **Pendants** (flat offense on two or three kinds) and **Bells** (one follow-up hit on her Attack, of a kind
+she holds) from Tier 1, **Orbs** (flat offense on one kind) from Tier 2, **Insignias** (a percentage by timing) in
+Tier 3. This doc names the slots "accessory slot 1, 2, 3" and fills them only through the presets (§5.2, WP25); the
+first round's Support and Damage (Orb) slots, and their Talismans and Amulets, are history (gear §4.3, §5.3).
+*Changed in cross-check (2026-10-24): the families named, as weapon-progression decided them.*
 
 ### 5.2 Every class's sheet (CP11)
 
-**The preset's accessories:** each slot takes weapon-progression.md's damage accessory that fits her three weapons, her
-first slot's kind first (from Tier 2, her branch's set's). Named there, not here.
+**The preset's accessories are [weapon-progression's presets](weapon-progression.md#58-presets-per-class-and-tier-wp25)
+(WP25):** the family and member the simulation plays for her set; the Orb, and the Halo's kind, on her set's first
+slot's kind; from Tier 2 they follow her class branch's set. *Changed in cross-check (2026-10-24): named here as
+weapon-progression decided them; the Spell Blade's Tier 1 Pendant is the Lightning Twin (her Lance and Thunder), not
+her first slot's Katana.*
 
 **Tier 1** (the standard preset: these weapons, the armor half, one accessory):
 
-| Class | Weapon slots | Armor | Accessory slots |
+| Class | Weapon slots | Armor | Accessory slot 1 |
 |---|---|---|---|
-| Brawler | Arms: Greatsword · Arms: Axe · Arms: Lance | Physical | 1 (for the Greatsword) |
-| Mage | Tome: Fire · Tome: Blizzard · Tome: Thunder | Magical | 1 (for the Fire Tome) |
-| Spell Blade | Arms: Katana · Arms: Lance · Tome: Thunder | Physical | 1 (for the Katana) |
-| Summoner | Tome: Dark · Tome: Light · Arms: Bow | Magical | 1 (for the Dark Tome) |
-| Paladin | Arms: Greatsword · Arms: Axe · Tome: Light | Physical | 1 (for the Greatsword) |
-| Cleric | Tome: Light · Tome: Blizzard · Arms: Bow | Magical | 1 (for the Light Tome) |
+| Brawler | Arms: Greatsword · Arms: Axe · Arms: Lance | Physical | Greatsword Bell |
+| Mage | Tome: Fire · Tome: Blizzard · Tome: Thunder | Magical | Elemental Pendant |
+| Spell Blade | Arms: Katana · Arms: Lance · Tome: Thunder | Physical | Lightning Twin Pendant |
+| Summoner | Tome: Dark · Tome: Light · Arms: Bow | Magical | Arcane Pendant |
+| Paladin | Arms: Greatsword · Arms: Axe · Tome: Light | Physical | Main Arms Pendant |
+| Cleric | Tome: Light · Tome: Blizzard · Arms: Bow | Magical | Light Twin Pendant |
 
 **Tier 2** adds a second accessory slot, per-piece armor for the four between (the preset still dresses her class's
 half) and her class branch ([§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41)). **Ascend
 preselects branch 1** with her default set; branch 2 swaps her preset to her reverse set in one tap (free at Ascend:
-grades reset):
+grades reset), its accessories with it:
 
-| Class | Branch 1 (preselected): focus · set | Branch 2: focus · reverse set | Armor |
+| Class | Branch 1 (preselected): focus · set · accessories | Branch 2: focus · reverse set · accessories | Armor |
 |---|---|---|---|
-| Brawler | **Berserker** · Ring · Greatsword, Axe, Lance | **Warlord** · Light/Dark · Bow, Katana, Axe | Physical |
-| Mage | **Sage** · Ring · Fire, Blizzard, Thunder | **Sorcerer** · Light/Dark · Light, Dark, Blizzard | Magical |
-| Spell Blade | **Rune Knight** · Ring · Katana, Lance, Thunder | **Blademaster** · Light/Dark · Katana, Bow, Dark | Per piece (preset physical) |
-| Summoner | **Warlock** · Light/Dark · Dark, Light, Bow | **Conjurer** · Ring · Fire, Thunder, Greatsword | Per piece (preset magical) |
-| Paladin | **Guardian** · Ring · Greatsword, Axe, Light | **Templar** · Light/Dark · Bow, Katana, Light | Per piece (preset physical) |
-| Cleric | **Bishop** · Light/Dark · Light, Blizzard, Bow | **Oracle** · Ring · Light, Fire, Greatsword | Per piece (preset magical) |
+| Brawler | **Berserker** · Ring · Greatsword, Axe, Lance · Greatsword Bell, Greatsword Orb | **Warlord** · Light/Dark · Bow, Katana, Axe · Bow Bell, Bow Orb | Physical |
+| Mage | **Sage** · Ring · Fire, Blizzard, Thunder · Elemental Pendant, Fire Orb | **Sorcerer** · Light/Dark · Light, Dark, Blizzard · Arcane Pendant, Light Orb | Magical |
+| Spell Blade | **Rune Knight** · Ring · Katana, Lance, Thunder · Lightning Twin Pendant, Katana Orb | **Blademaster** · Light/Dark · Katana, Bow, Dark · Dark Twin Pendant, Katana Orb | Per piece (preset physical) |
+| Summoner | **Warlock** · Light/Dark · Dark, Light, Bow · Arcane Pendant, Dark Orb | **Conjurer** · Ring · Fire, Thunder, Greatsword · Fire Twin Pendant, Fire Orb | Per piece (preset magical) |
+| Paladin | **Guardian** · Ring · Greatsword, Axe, Light · Main Arms Pendant, Greatsword Orb | **Templar** · Light/Dark · Bow, Katana, Light · Secondary Arms Pendant, Bow Orb | Per piece (preset physical) |
+| Cleric | **Bishop** · Light/Dark · Light, Blizzard, Bow · Light Twin Pendant, Light Orb | **Oracle** · Ring · Light, Fire, Greatsword · Fire Twin Pendant, Light Orb | Per piece (preset magical) |
 
 **Tier 3** adds a third accessory slot, her branch's capstone and the class's mastery
 ([§7.3](#73-tier-3-the-branch-capstone-and-the-mastery-cp27)):
 
-| Class | Capstones: branch 1 · branch 2 | Mastery | Two-kind weapons |
-|---|---|---|---|
-| Brawler | Unbound Fury · Warlord's Reckoning | Unstoppable | 1 |
-| Mage | Total Convergence · Annihilation | Resonance | 1 |
-| Spell Blade | Rune Deluge · Eclipse Cut | Spellbind | 2 |
-| Summoner | Final Pact · Host of Farewells | Menagerie | 2 |
-| Paladin | Steadfast Vow · Dawnshield | Last Stand | 2 |
-| Cleric | Mercy Chorus · Revelation | Overflow | 2 |
+| Class | Capstones: branch 1 · branch 2 | Mastery | Two-kind weapons | Accessory slot 3 (WP25): branch 1 · branch 2 |
+|---|---|---|---|---|
+| Brawler | Unbound Fury · Warlord's Reckoning | Unstoppable | 1 | Main Arms Pendant · Secondary Arms Pendant |
+| Mage | Total Convergence · Annihilation | Resonance | 1 | Onslaught Insignia · the same |
+| Spell Blade | Rune Deluge · Eclipse Cut | Spellbind | 2 | Onslaught Insignia · the same |
+| Summoner | Final Pact · Host of Farewells | Menagerie | 2 | Onslaught Insignia · the same |
+| Paladin | Steadfast Vow · Dawnshield | Last Stand | 2 | Onslaught Insignia · the same |
+| Cleric | Mercy Chorus · Revelation | Overflow | 2 | Onslaught Insignia · the same |
 
 The [templates page](previews/class-templates.html) draws all eighteen sheets with their slots, and every class's two
 Tier 2 sets ([focus](previews/class-templates.html#focus)).
@@ -611,8 +642,8 @@ Tier 2 sets ([focus](previews/class-templates.html#focus)).
 | Weak marks on a foe's card | 2–5 kinds | **2** |
 | Finding her weak weapon | Match up to 5 marks against 5 weapons | Match 2 marks against 3 weapons |
 | Armor | 5 halves to choose, 32 suits | **None:** her class's half |
-| Accessories | 2 slots: 10 Orbs × 10 supports | **1 slot**, damage-oriented (its choices: weapon-progression.md) |
-| Loadouts a class can wear (weapons × armor × accessories) | Brawler 3,200; the others 320,000 | Brawler, Mage 10 spreads, the others 50, × one accessory's choices (the first round's 10 gave 100 and 500) |
+| Accessories | 2 slots: 10 Orbs × 10 supports | **1 slot: one of 19** (9 Pendants, 10 Bells; the sheet lists first the 6–8 that touch her weapons, WP §7) |
+| Loadouts a class can wear (weapons × armor × accessories) | Brawler 3,200; the others 320,000 | Brawler, Mage 10 spreads, the others 50, × 19 accessories: 190 and 950 |
 | Trees on her page · nodes | 5 or 10 · 75 or 150 | **3 · 24** |
 | Picks · a skill currency | 25 forks · side points | **3 · none** |
 | Charged-move locks | Kinds to match | The same: kinds, from her two |
@@ -975,7 +1006,7 @@ specific weapon types, like the original game's stat bonus percentages."
 | **Affinity: a % on one twin set** (recommended) | Her template names one **twin set** (an Arm and its element): **+6% damage with those two kinds**, every tier, in any class (whichever of the two her class wields; a hybrid can use both) | A percentage holds its share at every tier under SB1: nothing to rescale, nothing to add per tier | **Recommended** |
 | A template adds a damage kind (the "Mage + Light/Dark" idea) | Her weapons or skills carry one more kind | Collides with the Dual branch (the one way a weapon gains a kind) and with CP17 (no kind from a tree or a template); a Dual plus her kind is **three kinds on one weapon**, the stacking the owner just ruled out with Prism ("could trivialize the weakness concept"). The owner's Mage Fire + Dark example **is the Dual branch**, so it lives there | Rejected |
 | A fourth weapon slot for her template's kind | One more weapon, her template's | The owner finds it awkward; it breaks the three-slot template (CP2, CP10) and every coverage check | Rejected |
-| Flat offense on her kind (a Halo-like node) | +N offense on one kind's hits | A flat value needs × 1.8, × 2.6 each tier (SB1) and shares the Halo's and the accessories' bound (+68): a third flat source on one kind | Rejected |
+| Flat offense on her kind (a Halo-like node) | +N offense on one kind's hits | A flat value needs × 1.8, × 2.6 each tier (SB1) and shares the Halo's and the accessories' bound (+68 × tier, the kind cap, WP24): a third flat source on one kind | Rejected |
 | A template branch on her trees | A fourth branch at the fork, hers | 90 templates × trees to author and price; the signature tip already does it at one place | Rejected |
 
 **The call (CP36), Affinity:**
@@ -1084,6 +1115,10 @@ class's weapon trees are its own, §6.5, and each branch keeps three class skill
   sits in one group.
 - **The names:** "Ring" is this doc's word for the Fire > Ice > Lightning ring (§4.1); "Light/Dark" is the owner's.
   Not "Arcane": that word is the Rift's Tome path (CP7). On screen: "Mage · Sage · Ring", "a Ring Mage".
+- **Names (owner, 2026-10-24):** Arms: **Heavy** (Greatsword, Axe, Lance) and **Lite** (Bow, Katana). Tomes:
+  **Elemental** (Fire, Ice, Lightning) and **Arcane** (Light, Dark). This doc's "Ring" group is Heavy + Elemental, its
+  "Light/Dark" group Lite + Arcane; the names land everywhere at implementation. Two clashes to settle then: "Arcane" is
+  also the Rift's Arcane front, and "Heavy" begins some skill names (Heavy Slash).
 - **Three kinds against two:** a channel holds three Ring kinds and two Light/Dark ones, so a pure class's
   Light/Dark set carries one Ring weapon off-focus (her reach, below).
 
@@ -1096,9 +1131,11 @@ class's weapon trees are its own, §6.5, and each branch keeps three class skill
 - **Why +15%:** the passives it replaces paid +15–25% in their context (the Sage and Sorcerer +15%, the Warlord and
   Conjurer +20%, the Templar and Bishop +25%); on her set two or three of her three weapons carry it, and in its context
   (a region weak to the group, below) her acts lean on them. **One number for both groups:** the Light/Dark group's
-  narrower span is paid by her reach weapon, not by a bigger percentage. The kind-focus stack on a weak hit in Tier 2
-  (Pure ×1.5 × focus 1.15 × affinity 1.06 ≈ ×1.83) goes into Tier 2's simulation (weapon-research risk 3); the fallback
-  is +10%.
+  narrower span is paid by her reach weapon, not by a bigger percentage. **Where it sits on a hit:**
+  [weapon-progression's damage stack](weapon-progression.md#24-the-damage-stack-everything-on-one-hit-wp31) (WP31,
+  stated once there): after the weak multiplier, a factor of its own beside the affinity, read on the hit's own kind.
+  A weak hit in Tier 2 at most Pure ×1.5 × focus 1.15 × affinity 1.06 ≈ ×1.83; the stack goes into Tier 2's
+  simulation whole (weapon-research risk 3); the first fallback is +10%.
 - **Her weapons follow it:** each branch carries a preset set (CP40); swapping branch offers her set in one tap ("Use
   the Light/Dark set: Bow, Katana, Axe"). She owns every kind and swaps are free outside fights; at Ascend every grade
   resets, so the reverse set costs nothing more than the default.
@@ -1407,40 +1444,60 @@ different weaknesses. Four halls already do; two don't. **Two changes, nothing e
 ## 9. Class stats at Lv 50 under SB1
 
 An Uma's full sheet at each tier's Lv 50: the balance simulation's average outfit (base 110, +10% growth in Speed,
-Stamina and Power), fully built (every slot G10, every Extra Stats node her class uses, her template matched), from
-[stats-by-tier](previews/stats-by-tier.html), with **every flat build value × 1, × 1.8, × 2.6** (SB1). Offense is on
-her lead kind: her ATK or M.ATK plus the weapon's Might (68 · 122 · 177), and from Tier 2 an accessory's offense and
-the Halo (61 · 88 each). **The accessory value is a placeholder** (the first round's Orb): the owner is redesigning
-accessories as damage-oriented, 1 · 2 · 3 slots from Tier 1, and weapon-progression.md sets their values; Tier 1's
-accessory isn't in these drafts. The class focus (+15%) and the affinity (+6%) are percentages on damage, not stats,
-so they sit outside this sheet.
+Stamina and Power), fully built, from [stats-by-tier](previews/stats-by-tier.html)'s level and lean parts, with **every
+flat build value × 1, × 1.8, × 2.6** (SB1). *Changed in cross-check (2026-10-24): one sheet for the three docs,* the
+same numbers as [weapon-progression §4.4](weapon-progression.md#44-her-sheet-at-lv-50) and
+[extra-stats-progression §8.2](extra-stats-progression.md#82-the-sheets):
+
+- **Armor** at G10, weapon-progression's values (WP15): per grade DEF and M.DEF +4, HP +15, MP +3, evasion 1.2%, ⌈g ÷ 2⌉
+  offense a piece on her half; the suit HP +150, DEF and M.DEF +40, MP +30, offense +25, × tier (evasion 12% stays).
+- **Extra Stats**, every node her class uses (EP1–EP7): the Planet +21 to every core stat, her offense moon(s) +30,
+  **Vigor HP +150 and MP +30**, Guard +30 to each defense, × tier rounded per node (+38, +54 in Tier 2; +55, +78 in
+  Tier 3); from Tier 2 the Halo on her lead kind (+61, then +88).
+- **Accessories:** her preset's (WP25, §5.2): Tier 1 a Pendant or a Bell, Tier 2 + an Orb (+61 on her first slot's
+  kind), Tier 3 + an Insignia (a percentage) or the Brawler's group Pendant. Flat offense on one kind stops at the kind
+  cap (+68 · +122 · +177, WP24), which the Orb and the Halo fill from Tier 2.
+- **Her template apart** (her moon and the affinity: the Uma Templates pass's, outside the foe budget, EP14, CP36).
+  The focus (+15%), the affinity (+6%) and an Insignia are percentages on damage, not stats: they sit in the damage
+  stack (WP31), outside this sheet.
+
+Offense is on her lead kind, her first slot's: her ATK or M.ATK plus the weapon's Might (68 · 122 · 177) plus her
+accessories' and the Halo's flat offense on that kind.
 
 | Class | Tier | HP | MP | ATK | M.ATK | DEF | M.DEF | Offense, lead kind | Offense, flat drafts |
 |---|---|---|---|---|---|---|---|---|---|
-| **Brawler** | 1 | 1,427 | 173 | 200 | 116 | 187 | 162 | 268 | 268 |
-|  | 2 | 2,457 | 296 | 357 | 206 | 334 | 290 | 601 | 426 |
-|  | 3 | 3,496 | 419 | 516 | 298 | 482 | 418 | 869 | 517 |
-| **Mage** | 1 | 1,194 | 256 | 116 | 205 | 166 | 182 | 273 | 273 |
-|  | 2 | 2,062 | 435 | 206 | 366 | 296 | 325 | 610 | 435 |
-|  | 3 | 2,936 | 615 | 298 | 530 | 428 | 469 | 883 | 531 |
-| **Spell Blade** | 1 | 1,287 | 207 | 200 | 151 | 176 | 172 | 268 | 268 |
-|  | 2 | 2,220 | 352 | 357 | 270 | 315 | 308 | 601 | 426 |
-|  | 3 | 3,160 | 498 | 516 | 390 | 455 | 444 | 869 | 517 |
-| **Summoner** | 1 | 1,287 | 207 | 151 | 200 | 176 | 172 | 268 | 268 |
-|  | 2 | 2,220 | 352 | 270 | 357 | 315 | 308 | 601 | 426 |
-|  | 3 | 3,160 | 498 | 390 | 516 | 455 | 444 | 869 | 517 |
-| **Paladin** | 1 | 1,287 | 256 | 189 | 135 | 192 | 172 | 257 | 257 |
-|  | 2 | 2,220 | 435 | 338 | 242 | 343 | 308 | 582 | 407 |
-|  | 3 | 3,160 | 615 | 489 | 349 | 496 | 444 | 842 | 490 |
-| **Cleric** | 1 | 1,287 | 256 | 135 | 189 | 176 | 187 | 257 | 257 |
-|  | 2 | 2,220 | 435 | 242 | 338 | 315 | 334 | 582 | 407 |
-|  | 3 | 3,160 | 615 | 349 | 489 | 455 | 482 | 842 | 490 |
+| **Brawler** (Greatsword) | 1 | 1,477 | 213 | 192 | 116 | 207 | 182 | 260 | 260 |
+|  | 2 | 2,548 | 368 | 343 | 206 | 370 | 326 | 587 | 418 |
+|  | 3 | 3,628 | 523 | 495 | 298 | 534 | 470 | 849 | 509 |
+| **Mage** (Fire) | 1 | 1,244 | 296 | 116 | 197 | 186 | 202 | 279 | 279 |
+|  | 2 | 2,153 | 507 | 206 | 352 | 332 | 361 | 596 | 427 |
+|  | 3 | 3,068 | 719 | 298 | 509 | 480 | 521 | 863 | 523 |
+| **Spell Blade** (Katana) | 1 | 1,337 | 247 | 192 | 151 | 196 | 192 | 260 | 260 |
+|  | 2 | 2,311 | 424 | 343 | 270 | 351 | 344 | 587 | 418 |
+|  | 3 | 3,292 | 602 | 495 | 390 | 507 | 496 | 848 | 509 |
+| **Summoner** (Dark) | 1 | 1,337 | 247 | 151 | 192 | 196 | 192 | 280 | 280 |
+|  | 2 | 2,311 | 424 | 270 | 343 | 351 | 344 | 587 | 418 |
+|  | 3 | 3,292 | 602 | 390 | 495 | 507 | 496 | 849 | 509 |
+| **Paladin** (Greatsword) | 1 | 1,337 | 296 | 181 | 135 | 212 | 192 | 263 | 263 |
+|  | 2 | 2,311 | 507 | 324 | 242 | 379 | 344 | 568 | 399 |
+|  | 3 | 3,292 | 719 | 468 | 349 | 548 | 496 | 822 | 482 |
+| **Cleric** (Light) | 1 | 1,337 | 296 | 135 | 181 | 196 | 207 | 269 | 269 |
+|  | 2 | 2,311 | 507 | 242 | 324 | 351 | 370 | 568 | 399 |
+|  | 3 | 3,292 | 719 | 349 | 468 | 507 | 534 | 822 | 482 |
 
-- **The build's share holds:** a Brawler's HP is 25% build at Tier 1 and 26% at Tier 3 (the flat drafts: 25% → 12%);
-  her ATK 42% at every tier. Offense rises from 57% to 66% in Tier 2 only because an accessory's offense and the Halo
-  arrive there (the accessories' redesign moves that step).
+- **The lead kind's accessory offense,** Tier 1: the Mage's Elemental and the Paladin's Main Arms Pendant +14, the
+  Summoner's Arcane and the Cleric's Light Twin Pendant +20, the Brawler's Bell and the Spell Blade's Lightning
+  Twin Pendant 0 on that kind (the Bell adds a hit, not offense; the Spell Blade's Pendant pays on her Lance and
+  Thunder). From Tier 2 the Orb and the Halo fill the kind cap on every class's lead kind (122, then 176 or the cap's
+  177 with a Pendant on it).
+- **The build's share holds:** a Brawler's HP is 27% build at Tier 1 and 29% at Tier 3 (the flat drafts: 27% → 14%);
+  her ATK 40% at every tier. Her lead offense is 55% build in Tier 1 and 65% in Tiers 2 and 3, because the Orb and
+  the Halo arrive in Tier 2.
 - **The classes' identities hold at every tier:** the leans are multiplicative, so the Mage keeps the deepest MP, the
   Brawler the most HP, the hybrids their mirror.
+- **Against this section's first draft** (the old armor, no Vigor MP, her moon's lead counted, the first round's Orb as
+  a placeholder): HP +50 × tier, DEF and M.DEF +20 × tier, MP +40 × tier (armor's +10, Vigor's +30), offense −8 × tier
+  (her moon apart), plus the presets' accessories.
 - **What this doc owns here:** the leans and hands (§2.2). The values themselves are the weapons and Extra Stats docs'
   under SB1; the overall balancing sets them by simulation. The [templates page](previews/class-templates.html#stats)
   draws every class's sheet with its sources.
@@ -1472,7 +1529,7 @@ the Spell Blade or the Paladin), so a player who never looks gets U4's calling.
   the Summoner's share (opened to the pick, the Brawler could lose 14 callings and the Summoner most of its 33 Wit-led
   closers).
 - **When:** the pick stays open until it is **confirmed**: by a tap, or by her **first won fight** (the owner's "once at
-  Uma Level 1, at 0 Class Rank": she has no Class EXP before it). Owned Umas at save v26 start unconfirmed, with the
+  Uma Level 1, at 0 Class Rank": she has no Class EXP before it). Owned Umas at save v27 start unconfirmed, with the
   pre-selection active, and a dot on the sheet until the owner confirms. Changing an unconfirmed pick is refused while
   she works (her trade moves with it). Once confirmed it never changes; she still switches class freely.
 - **Literal reading** (Pace and Late both choose Mage or Spell Blade), shown for comparison: Late's 61 become hybrids or
@@ -1509,8 +1566,8 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 | **Stat leans** | Per class | Unchanged (no specialization moves them) | The same |
 | **Healing and its stat** | Paladin ATK, Cleric M.ATK; one healer a party | Unchanged | The same |
 | **Armor** | Her class's half | Per piece for the four between | Per piece |
-| **Accessories** | 1 slot, damage-oriented (weapon-progression.md) | 2, then 3 | 2 |
-| **Standard preset** | 3 weapons, the half, an accessory for her first slot's kind | Her branch's set (default or reverse); an accessory a slot | 5, half, Orb, support |
+| **Accessories** | 1 slot: a Pendant or a Bell (weapon-progression WP18–WP19) | 2 (+ Orbs), then 3 (+ Insignias) | 2: Damage, Support |
+| **Standard preset** | 3 weapons, the half, weapon-progression's accessory for her set (WP25) | Her branch's set (default or reverse) and its accessories (WP25) | 5, half, Orb, support |
 | **Limit Break power** | Brawler 2×, Mage 2.4×, hybrids 2.2×, healers 1.5× | Unchanged; LB+ is the halls' | The same |
 | **Class Rank** | Per class; opens depths and **ranks every skill** (CP32) | The same, + D6 in Tier 3 | Opens depths and side points |
 | **Class branch, mastery** | — | One of two branches: a **focus** (Ring or Light/Dark, +15%), its set and three class skills (Tier 2); its capstone and the mastery (Tier 3) | — |
@@ -1528,7 +1585,7 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 | To | What |
 |---|---|
 | **README §2** | The six classes; slots by channel (3 · 0 · 2 · 1 · 2 · 1 Arms); the template per tier; weaknesses by kind: twins in Tier 1, narrowing by rank (§4); the calling pick; SB1 applied to class sheets |
-| **weapon-progression.md** | Three slots a class by channel; the owner's defaults (§3.2) and **every class's Tier 2 default and reverse sets** (§7.2, CP40), the weapons a Tier 2 Uma raises; every kind fits every slot of its channel in every tier; the class-switch cost from the defaults (§3.4); foes' single kinds from Tier 2 (regulars) and Tier 3 (sub-bosses), bosses' twins in every tier, which the weapon branches answer; **the branch frame this doc writes to (§3.5, the research note's WR2–WR5): Pure or Dual at Tier 2's G5, a Dual's second kind of its own channel, one Dual in her slots in Tier 2 and two in Tier 3 (Brawler, Mage one), Keen or Tempered in Tier 3, no third branch**; **accessory slots 1 · 2 · 3, damage-oriented**, and the preset rule (§5.2: an accessory for her first slot's kind first); the focus (+15% on a group, CP39) beside her accessories in the kind-focus stack; class skills cast through a focus weapon carry its kind, Might, Halo and branch (§7.2); Break +1 lives only in the trees |
+| **weapon-progression.md** | Three slots a class by channel; the owner's defaults (§3.2) and **every class's Tier 2 default and reverse sets** (§7.2, CP40), the weapons a Tier 2 Uma raises; every kind fits every slot of its channel in every tier; the class-switch cost from the defaults (§3.4); foes' single kinds from Tier 2 (regulars) and Tier 3 (sub-bosses), bosses' twins in every tier, which the weapon branches answer; **the branch frame this doc writes to (§3.5, the research note's WR2–WR5): Pure or Dual at Tier 2's G5, a Dual's second kind of its own channel, one Dual in her slots in Tier 2 and two in Tier 3 (Brawler, Mage one), Keen or Tempered in Tier 3, no third branch**; **accessory slots 1 · 2 · 3, damage-oriented**, and the preset rule (§5.2: an accessory for her first slot's kind first); the focus (+15% on a group, CP39) beside her accessories in the damage stack (WP31, weapon-progression's); class skills cast through a focus weapon carry its kind, Might, Halo and branch (§7.2); Break +1 lives only in the trees |
 | **extra-stats-progression.md** | Each class's channels and leans; the hybrids' mirror on full maps, the hands the knob; the twins and single kinds the Halo's kind setting answers; SB1 sheets (§9) |
 | **profession-progression.md** | Per Uma, per tier: 3 weapons, 5 armor (one half in Tier 1), accessories 1 · 2 · 3. Her trade follows her calling, which the Pace pick can move between Forest · Armorer and Monster Den · Lapidary (each fight type 0–37.8% for those two, the others fixed); the Late pick moves none |
 | **Uma Templates pass (variance)** | The root's Flourish slot and the signature tip slot, now on her affinity kind's tree (§6.7); **the affinity** (§6.9, CP36, kept as it is in the second pass and **revisited in that pass**, the owner finding Uma uniqueness still weak): which twin set a template names (stride or knack) is that pass's; her affinity set is Ring or Light/Dark, so it leans her Tier 2 focus; the recommendation to move her moon's node II to defense; the calling's pick (§10) as the template's calling for Pace and Late Umas |
@@ -1536,7 +1593,8 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 | **The Skills tab and the Uma sheet** | The tree drawn (CP23) with rank pips (CP32) and the class tree (CP34) with its focus and set (CP39, CP40); the focus mark on her focus trees; the root plate (§6.7); the calling card (§10.2) |
 | **The party screen (Tier 2)** | The pairing table (CP41): a hint when a mix of default and reverse sets drops a kind ("No Bow in this party: a Light/Dark healer or the Spell Blade's reverse set holds one") |
 
-**What weapon-progression must change because strikes are gone:**
+**What weapon-progression must change because strikes are gone** (*all taken: weapon-progression.md WP1–WP31; the
+cross-check found nothing left, 2026-10-24*):
 1. Gear §3.1 "three slots a class, one per strike (CL1)" → **three slots by channel** (CP2): each slot holds any kind of
    its channel.
 2. Gear §4.1 "a Dual keeps its slot's strike" → **a Dual keeps its first kind's slot, channel and tree;** its second kind
@@ -1571,7 +1629,8 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 
 ## 14. Save impact
 
-**Save v26 (the Tier 1 rework's one migration, every world):**
+**Save v27 (the Tier 1 rework's one migration, every world).** *Changed in cross-check (2026-10-24): v26 is taken on main
+(D190, the UI clarity pass), so the rework's migration is v27 and Tier 2's v28; the engine stays v16 and v17.*
 
 | Data | What happens |
 |---|---|
@@ -1585,11 +1644,11 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 | **The calling pick** (new) | `OwnedUma.calling: { pick, confirmed }`, only for the 163 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed. Everything else of the template stays derived (U13) |
 | Starting class | New unlocks start in their calling or their pick |
 | Class ids, Class Ranks, Hero seats, Bonds, Class Marks | Unchanged; Gear Marks → Class Marks one for one (GE15) |
-| Accessories, armor, crafted weapons | The weapons doc's (GE15): deleted, refunded raw |
+| Accessories, armor, crafted weapons | The weapons doc's (WP27): deleted, refunded raw, paid in Tier 1's demand mix (PP20) |
 | Foes | Generated, never saved. The Tier 1 foe digest (`world/tier1-foes.test.ts`) moves on purpose, in the D-row; an open fight replays on its own engine |
 | Stored fights | Unchanged: v6–v15 replay on their own engines (`RPG_ALL_NODES` keeps every retired node) |
 
-**Save v27 (Tier 2):** a class branch per class (default: branch 1, her default group; the focus is read from it, never
+**Save v28 (Tier 2):** a class branch per class (default: branch 1, her default group; the focus is read from it, never
 stored), its class skills in the loadout like any skill; her weapons as she slots them (the branch's set is a preset,
 not a lock); branch C and tip picks (Power, Break, signature). The affinity is derived, never stored (U13). **Tier 3's save** with
 its design: two held branches a tree and the master slot.
@@ -1610,8 +1669,8 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 - **Damage a turn:** an Uma acts once a turn whatever she holds. **The weak-act share falls** from nearly all (five
   weapons answer most lists) to about half on the owner's defaults (one Uma: 34–66%; a hybrid on her twin set lands
   both halves), while every foe keeps at least two answers in the campaign's default party and the Rift's guided
-  builds. Breaks come slower; the simulation re-sets shields (§4.4, draft sub-boss 5, boss
-  6) so rounds to the first Break stay within ±0.5 of today's at Lv 10, 30, 50.
+  builds. Breaks come slower; the simulation re-sets shields (§4.4, drafts: sub-boss 5 · 7 · 6,
+  boss 6 · 8 · 9 by tier) so rounds to the first Break stay within ±0.5 of today's at Lv 10, 30, 50.
 - **The re-baseline** (README §9.5 item 1): an on-curve party (three default weapons, branch A, one accessory at its
   draft value, the full map) wins every Tier 1 stage within 3 points of today's table; what the damage-oriented
   accessories add (weapon-progression.md) goes back through the foe budget, as the first round's Orb did.
@@ -1625,7 +1684,7 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
   tips, the affinity and the narrowed regulars are priced in Tier 2's term (Z4, XR15). **The focus:** each class's two
   branches within ±5% of each other across the world's regions, and each ahead by 10–20% in its own (a Ring branch on
   the ring's regions, a Light/Dark one on the Light/Dark regions); the three parties of §7.2 within 3 points of the
-  defaults' win rate in their regions or better; the kind-focus stack (Pure, focus, affinity, accessories, Halo) on one
+  defaults' win rate in their regions or better; the damage stack (WP31: Pure, focus, affinity, accessories, Halo) on one
   weak hit simulated whole (weapon-research risk 3), the fallback +10%. **Tier 3:** depth 6, two branches,
   the branch capstones and the masteries in Tier 3's.
 - **The affinity:** five matched Umas within 3 points of the template-less party (U12's check), with the affinity and
@@ -1643,11 +1702,11 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CP5** Tier 1 weaknesses | **Her twins:** the element that beats hers on the ring and its twin Arm; two elements read her lead first; Light + Dark the Bow and the Katana | One kind by role; the ring's element and a drawn Arm; strikes | One rule, two icons, an answer in each channel on every foe; the Arm read from the element |
 | **CP6** Later tiers | **Narrow by rank:** Tier 2 regulars to one kind (the element for strikers and guards, the Arm for casters and skirmishers); Tier 3 sub-bosses too; **bosses keep their twins** | Twins in every tier; one kind for all; strike × channel | Depth for the forms and picks; every Uma can always answer a boss |
 | **CP7** The Rift's fronts | **Changed after owner review, 2026-10-24.** **The Rift is where specialized parties come in:** today's counts and wards; the Duel's and the Horde's draws as twins; Arcane to one element from Tier 2; the Horde narrows by rank; **each path's guided build** (composition and weapons, §2.3) answers each of its Tier 1 foes at least twice and holds every kind its later foes ask | Defaults only (the Duel and Horde miss sets); independent draws | Rebuilt and re-specced per path, as the owner plays it; swaps are free, so a build costs only unraised grades |
-| **CP8** Locks and shields | Locks as today (kinds from her weaknesses; the Duel's mixed sets); shields as today, re-measured for the lower weak share (about half on the owner's defaults; draft sub-boss 6 → 5, boss 8 → 6) | Shields by strike (CL9, retired); a lock that breaks to any weak act (CL8) | No engine change; the simulation holds rounds to the Break |
+| **CP8** Locks and shields | Locks as today (kinds from her weaknesses; the Duel's mixed sets); shields as today, re-measured for the lower weak share (about half on the owner's defaults; draft sub-boss 6 → 5, boss 8 → 6). *Changed in cross-check (2026-10-24), with weapon-progression's WP12:* **shields per tier grow with their foe's answers, never below Tier 1's + 1 (Z2): bosses 6 · 8 · 9, sub-bosses 5 · 7 · 6, regulars 2–3 · 3–4 · 3–4** (§4.4) | Shields by strike (CL9, retired); a lock that breaks to any weak act (CL8) | No engine change; the simulation holds rounds to the Break |
 | **CP9** The hybrids and healers on 2 + 1 | Hands unchanged; the mirror re-checked on full maps (±5%, 70/30 ± 5), the hands the knob, the Summoner's Arms hand first; Paladin vs Cleric ±10% | New hands now | One act is one pair whatever the slots (CL5 kept) |
-| **CP10** The template per tier | **Changed after owner review, 2026-10-24 (second pass).** Weapons 3 · 3 · 3 (one two-kind weapon in Tier 2, two in Tier 3, Brawler and Mage one); armor 5, her class's half in Tier 1, per piece for the four between from Tier 2; **accessory slots 1 · 2 · 3, damage-oriented**, named and designed in weapon-progression.md (the owner's redesign: defensive and MP-regen accessories go) | The first round's Support, Damage (Orb) and second Support; a fourth weapon or a sixth armor later | Depth from weapon branches, trees, the focus and Extra Stats, not slots (CL6, CL7 kept); the owner's accessory redesign |
-| **CP11** Presets | **Changed after owner review, 2026-10-24 (second pass).** Tier 1: the owner's defaults, her half, an accessory for her first slot's kind (weapon-progression.md names it). **Tier 2: her branch's set** (branch 1 her defaults, branch 2 her reverse set, CP40), one tap; an accessory a slot, her set's first kind first. Tier 3: the same, three accessories | The Orb of her first slot and named Supports (the first round); one preset for both branches | One tap dresses any class, any branch, at any tier; accessories stay weapon-progression.md's |
-| **CP12** Equippable kinds | **Changed after owner review, 2026-10-24 (second pass).** Every kind of a slot's channel, in every tier. **A Dual's second kind is of the weapon's own channel** (an Arm adds an Arm, a Tome an element) and counts in every class that slots it; **one two-kind weapon in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good** (WR3, WR4) | Any of the ten, counted by class (GE7, the first round); no cap | The research note's two flags: the Brawler held all five Arms in Tier 2 and the templates page drew cross-channel Duals; a shared weapon now reads the same in every class, and no Uma holds a whole channel |
+| **CP10** The template per tier | **Changed after owner review, 2026-10-24 (second pass).** Weapons 3 · 3 · 3 (one two-kind weapon in Tier 2, two in Tier 3, Brawler and Mage one); armor 5, her class's half in Tier 1, per piece for the four between from Tier 2; **accessory slots 1 · 2 · 3, damage-oriented**, named and designed in weapon-progression.md (the owner's redesign: defensive and MP-regen accessories go). *Changed in cross-check (2026-10-24): the families named, as WP18–WP19 decided: a Pendant or a Bell in Tier 1, + an Orb, + an Insignia; untyped slots, one of each family* | The first round's Support, Damage (Orb) and second Support; a fourth weapon or a sixth armor later | Depth from weapon branches, trees, the focus and Extra Stats, not slots (CL6, CL7 kept); the owner's accessory redesign |
+| **CP11** Presets | **Changed after owner review, 2026-10-24 (second pass).** Tier 1: the owner's defaults, her half, an accessory for her first slot's kind (weapon-progression.md names it). **Tier 2: her branch's set** (branch 1 her defaults, branch 2 her reverse set, CP40), one tap; an accessory a slot, her set's first kind first. Tier 3: the same, three accessories. *Changed in cross-check (2026-10-24): the accessories are weapon-progression's presets (WP25) for both branches' sets (§5.2), the Orb and the Halo on her set's first slot's kind; the Spell Blade's Tier 1 Pendant is the Lightning Twin (her Lance and Thunder)* | The Orb of her first slot and named Supports (the first round); one preset for both branches | One tap dresses any class, any branch, at any tier; accessories stay weapon-progression.md's |
+| **CP12** Equippable kinds | **Changed after owner review, 2026-10-24 (second pass).** Every kind of a slot's channel, in every tier. **A Dual's second kind is of the weapon's own channel** (an Arm adds an Arm, a Tome an element) and is **coverage only**: its hits carry both kinds for weaknesses and charged-move locks in every class that slots it, one shield point and one lock a hit whichever kind matched; the slot, channel, offense, Might and tree stay the first kind's, and every bonus reads the hit's own, first kind; **one two-kind weapon in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good** (WR3, WR4). *Cross-check (2026-10-24): one wording with weapon-progression WP7* | Any of the ten, counted by class (GE7, the first round); no cap | The research note's two flags: the Brawler held all five Arms in Tier 2 and the templates page drew cross-channel Duals; a shared weapon now reads the same in every class, and no Uma holds a whole channel |
 | **CP13** What a tree is | One per weapon slot, three a class, under a class root; the catalog stays class × kind | One tree per class; one per kind for every class | Ids and replays stay; one tree on screen (SK1) |
 | **CP14** What a node costs | Nothing, at any tier; branches exclusive, free, swappable; A the default | Points against a budget | Removes the asymmetry (SK2) |
 | **CP15** What a fork changes | Reach, hits, support or Breaks; never a few percent alone | Free-form variants | Real options (SK3) |
@@ -1666,15 +1725,15 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CP28** Halls | **Changed after owner review, 2026-10-24.** Six halls, 24 Limit Breaks, Bonds per world, LB+ at Bond 10 from Tier 2, power by class; **two seats' kinds change** (CP35); Limit Breaks don't rank | A Limit Break of her class's own | They already are class progression; kinds make them coverage |
 | **CP29** The calling pick | A one-time pick on the Uma sheet: **Pace Spell Blade or Mage, Late Paladin or Cleric**, Power vs Wit pre-selecting; confirmed by a tap or her first win; owned Umas start unconfirmed; the four signal rows fixed | The literal reading (Pace and Late both Mage or Spell Blade); no pick | The owner's moment; healers keep their callers; the default is today's rule |
 | **CP30** What the pick sets | Her calling, starting class, trade, template channel and type, armor and preset; never her class afterwards (a class switch moves no job: CL14 kept) | The pick sets only her start | One signal, as the calling was meant to be |
-| **CP31** The save | **Changed after owner review, 2026-10-24.** v26: weapons to the owner's defaults, Skill Ranks derived (nothing stored), the Paladin's revive on her Light tree, sides to picks, loadouts pruned, `legacy` retired, the calling pick stored; v27: class branches and Tier 2 picks (second pass: the branch per class defaults to branch 1; the focus and set derived, the weapons as she slots them) | Keep her best old kinds per channel | Grades reset anyway; defaults are balanced; her branch picks per tree are kept |
+| **CP31** The save | **Changed after owner review, 2026-10-24.** *Changed in cross-check (2026-10-24): the numbers are **v27** and **v28** (v26 is taken on main, D190).* v27: weapons to the owner's defaults, Skill Ranks derived (nothing stored), the Paladin's revive on her Light tree, sides to picks, loadouts pruned, `legacy` retired, the calling pick stored; v28: class branches and Tier 2 picks (second pass: the branch per class defaults to branch 1; the focus and set derived, the weapons as she slots them) | Keep her best old kinds per channel | Grades reset anyway; defaults are balanced; her branch picks per tree are kept |
 | **CP32** Skill Ranks | **New, owner review 2026-10-24.** Every skill she holds ranks 1–5: Rank 1 at its gate, +1 every 2 Class Ranks, automatic; power ×0.95, 0.975, 1.00, 1.025, 1.05 (healers' shares the same; MP unchanged); capstones open whole; Limit Breaks and passives don't rank | Ranks bought with points; +2% a rank with no Rank 1 dip; ranks every Class Rank | The owner's ask; a step every 2 Class Ranks; the window's average is today's power, so balance holds |
 | **CP33** What grows on her weapons | **Changed after owner review, 2026-10-24 (second pass).** Kinds grow only on the weapon, at most two; shape grows in the trees; damage on a kind from the accessories and the Halo; a percentage on a group from the focus. **From Tier 2 each weapon takes a branch at G5, Pure (weak ×1.5) or Dual (a second kind of its own channel); no third branch; one Dual in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good; Tier 3 deepens: Pure → Keen (×1.7) or Tempered, Dual → Tempered** (the research note's WR2–WR5; weapon-progression.md decides). §3.5's Brawler and the templates page redrawn | "Specialized, Dual or a third" (the first review's); gear's first-round forms (Prism, Tempered, Keen); kinds from trees | One home for each kind of growth; breadth grows as weaknesses narrow (2.0 and 2.34 answers against Tier 1's 2.47, WR6) |
 | **CP34** Class branches | **Changed after owner review, 2026-10-24 (second pass).** From Tier 2 her root carries a class tree: one of two branches, each **its focus and three class skills** at Class Rank 20, 30, 40, cast through a focus weapon (its kind: CP17 holds) or utility; **the 36 class skills and 12 capstones kept as each branch's flavour, re-paired to the focus they fit** (§7.2); the Blademaster's three "extra hits" skills reshaped; the Templar's and the Oracle's statuses re-themed to their group | Retire the class skills (the focus alone); keep the passives beside the focus; class-only trees with their own kinds | The first review's variation stays; the second pass's focus makes it visible; no new kinds or slots |
 | **CP35** Limit Breaks' kinds | **New, owner review 2026-10-24.** Two small changes so every hall spreads over the twin sets: **Rampart Charge Greatsword → Axe**; **Choir of Angels Light twice → Light, then Lightning**. Inherited Limit Breaks are the deliberate way to reach a kind outside her three weapons (C3) | Leave all 24; rework every hall to one twin set a seat | The Bastion lacked Ice, the Chapel Lightning; everything else already spreads |
 | **CP36** Template affinity | **New, owner review 2026-10-24; second pass: kept as it is, revisited in the Uma Templates pass** (the owner: uniqueness "still pretty weak, but let's not overcomplicate"). Each template names one **twin set**: **+6% damage with those two kinds** (a hit's own kind), every tier, any class; the signature tip on her affinity kind's tree from Tier 2; the Flourish at the root. Which set: the Uma Templates pass's (stride or knack; draft: stride's pair). Recommended to that pass: her moon's node II to defense, keeping a matched Uma about +5% (U12) | A template damage kind (collides with Dual, stacks kinds); a fourth slot; flat offense on a kind; a template branch | A percentage holds its share at every tier; it nudges a weapon choice, never forces it |
 | **CP37** The Paladin's revive | **New, owner review 2026-10-24.** Valkyrie's Oath moves from her Lance D4 B to **her Light D3 B**, where the Cleric's Rebirth sits; her Lance D4 B becomes Heavy Transfix | Keep it on the Lance (off her defaults); a second revive | Her defaults hold no Lance; both healers revive from a default tree at Class Rank 20 |
-| **CP38** The weapon groups | **New, owner review 2026-10-24 (second pass).** **Ring:** Greatsword, Axe, Lance · Fire, Ice, Lightning (the ring's twins; the owner's main Arms and elemental Tomes). **Light/Dark:** Bow, Katana · Light, Dark (his secondary Arms and Light/Dark Tomes). One split for both channels, through the twins | Per-channel groups only; "Elemental" and "Arcane" as names (Arcane is the Rift's Tome path); three groups | The owner's split lines up across channels through the twins, so a hybrid's twin pair sits in one group |
-| **CP39** The focus | **New, owner review 2026-10-24 (second pass).** **+15% damage on hits of the focus group's kinds** (a hit's own kind), healers also +15% on those skills' mend and Barrier shares; on from Class Rank 1; the class skills cast through a focus weapon; the twelve passives fold into it; the Skills tab marks her focus trees | +10% (the fallback if the kind-focus stack runs hot); +12% Ring and +18% Light/Dark; a penalty off-focus; keep the passives beside it | A percentage holds its share at every tier (SB1); the size of the passives it replaces; visible on her trees |
+| **CP38** The weapon groups | **New, owner review 2026-10-24 (second pass).** **Ring:** Greatsword, Axe, Lance · Fire, Ice, Lightning (the ring's twins; the owner's main Arms and elemental Tomes). **Light/Dark:** Bow, Katana · Light, Dark (his secondary Arms and Light/Dark Tomes). One split for both channels, through the twins | Per-channel groups only; "Elemental" and "Arcane" as names (Arcane is the Rift's Tome path); three groups | The owner's split lines up across channels through the twins, so a hybrid's twin pair sits in one group. **Names (owner, 2026-10-24):** Arms: **Heavy** (Greatsword, Axe, Lance) and **Lite** (Bow, Katana). Tomes: **Elemental** (Fire, Ice, Lightning) and **Arcane** (Light, Dark). This doc's "Ring" group is Heavy + Elemental, its "Light/Dark" group Lite + Arcane; the names land everywhere at implementation. Two clashes to settle then: "Arcane" is also the Rift's Arcane front, and "Heavy" begins some skill names (Heavy Slash). |
+| **CP39** The focus | **New, owner review 2026-10-24 (second pass).** **+15% damage on hits of the focus group's kinds** (a hit's own kind), healers also +15% on those skills' mend and Barrier shares; on from Class Rank 1; the class skills cast through a focus weapon; the twelve passives fold into it; the Skills tab marks her focus trees | +10% (the fallback if the damage stack, WP31, runs hot); +12% Ring and +18% Light/Dark; a penalty off-focus; keep the passives beside it | A percentage holds its share at every tier (SB1); the size of the passives it replaces; visible on her trees |
 | **CP40** Default and reverse sets | **New, owner review 2026-10-24 (second pass).** Branch 1 her default set (the owner's, **none changed**); branch 2 her reverse set: Brawler Bow, Katana, Axe; Mage Light, Dark, Blizzard; Spell Blade Katana, Bow, Dark Tome; Summoner Fire, Thunder, Greatsword; Paladin Bow, Katana, Light; Cleric Light, Fire, Greatsword. Re-paired names: Berserker · Warlord, Sage · Sorcerer, Rune Knight · Blademaster, Warlock · Conjurer, Guardian · Templar, Bishop · Oracle | Change the Spell Blade's Katana to a Ring Arm (the default party loses its only Katana); reverse sets without the healers' Light (no revive) | Each class keeps its identity (twin pairs, revives, reach); the script's choice keeps the most party mixes at all ten kinds |
 | **CP41** Party pairings | **New, owner review 2026-10-24 (second pass).** Tier 2's campaign check on the defaults (all ten kinds, either healer) and the **pairing table** (§7.2): 5 of 16 pair states hold all ten with any healer, 4 more with the right healer; three parties drawn (the defaults, the owner's swap, the Light/Dark lean) with the regions each suits; the party screen hints when a mix drops a kind | Require every mix to hold all ten (forces the sets into sameness); no check | The owner's "Elemental Mage and a regular Summoner" and "Light/Dark Mage and an Elemental Summoner", both whole |
 | **CP42** The Spell Blade's branch B | **New, owner review 2026-10-24 (second pass).** **Proposed, for the owner's word: Pierce.** One hit, ×1.15, that ignores the unbroken halving, +2 MP, on today's B ids (`spellblade-*.3b`–`.5b`), replacing Flurry (one more hit); her Arms half's extra hit unchanged. Until confirmed the viewer draws it marked "proposed" | Focused (+10% alone on her one-hit depths); Sweep in Tier 1 (new content; crowds are the Summoner's); Finisher (collides with the Katana and Light D5); +1 chip (the Break tip's job); keep Flurry | The owner's "more multi-hit on a multi-hit class"; A chips the shield, B cuts through it; the engine's own pierce |
