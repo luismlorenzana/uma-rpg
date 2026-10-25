@@ -47,7 +47,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 8 families and 160 items |
 | `hub/places.ts` | Every place on the four Hub pages, and Town Hall's plaza |
-| `master/`, `roster/` | Master data to the game's roster, RPG aptitude labels and stat totals. Album queries/order live in uma-kit |
+| `master/`, `roster/` | Master data to the game's roster, RPG aptitude labels and stat totals; `template.ts`, the Uma Template rule and the calling (D203), built dark: new unlocks start in their calling from v16, live from H72. Album queries/order live in uma-kit |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
 ## Web app

@@ -6,7 +6,7 @@ import { healerNote } from './healer-note'
 const outfit = (outfitId: string): BattleOutfit => ({
   outfitId, baseStats: { speed: 100, stamina: 100, power: 100, guts: 100, wit: 100 },
   growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 },
-  aptitudes: { strategy: { front: 'G', pace: 'G', late: 'A', end: 'G' } },
+  aptitudes: { strategy: { front: 'G', pace: 'G', late: 'A', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 })
 const OUTFITS = new Map(['1', '2', '3', '4', '5'].map((id) => [id, outfit(id)]))
 const world = (classes: (RpgClass | null)[]) => ({

@@ -12,7 +12,7 @@ import { newSave, parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 const T = (n: number) => new Date(Date.parse('2026-10-12T12:00:00.000Z') + n * 1000).toISOString()
 // Invented outfits only.
 const outfit = (id: string): BattleOutfit => ({ outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-  growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 0, wit: 0 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } } })
+  growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 0, wit: 0 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } } })
 const IDS = ['101', '102', '103', '104', '105']
 const OUTFITS = new Map(IDS.map((id) => [id, outfit(id)]))
 const ura = regionChapter(worldContinent({ name: 'Synthetic', order: 1 }).regions[0]!, [{ id: 'c', name: 'C' }])

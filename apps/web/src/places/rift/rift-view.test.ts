@@ -15,7 +15,7 @@ const TWENTY = ids(101, 20)
 const outfit = (id: string): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
   growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 10, wit: 10 },
-  aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } },
+  aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 })
 const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(ids(101, 40).map((id) => [id, outfit(id)]))
 /** The guided parties, Iron's to Horde's (classes v2's, D178 point 5): parties 0–3 hold the twenty in those classes. */

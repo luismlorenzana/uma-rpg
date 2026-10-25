@@ -18,7 +18,7 @@ const ROSTER: RosterMember[] = (['boss', 'subboss', 'key', 'regular'] as const).
   (['azurlane', 'nikke', 'priconne'] as const).flatMap((franchise) => [1, 2, 3].map((i) => ({ id: `${franchise}-${tier}-${i}`, name: `${tier} ${i}`, franchise, tier }))))
 const OUTFITS = new Map(ids(101, 25).map((id): [string, BattleOutfit] => [id, {
   outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-  growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 10, wit: 10 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } },
+  growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 10, wit: 10 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 }]))
 
 /** Twenty-five Lv 50 Umas in parties 0–4. */

@@ -3,10 +3,11 @@
 // fight rules and the engine, which only the lazy `@rpg/domain/battle` subpath reaches (H62). `save/battle.ts`
 // re-exports all of it. Pure.
 import type { Aptitudes } from '@luismlorenzana/uma-data'
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import { rpgIsHealer } from '../rpg/kinds'
 import { rpgDefaultClass, rpgDefaultWeapons, type RpgClass } from '../rpg/rules'
 import { best } from '../roster/aptitudes'
+import { umaCalling, type CallingOutfit } from '../roster/template'
 import type { ClassLoadout, OwnedUma, TierWorld } from './save'
 
 /** What the battle rules need from an outfit's master data (a `RosterOutfit` fits). */
@@ -14,22 +15,28 @@ export interface BattleOutfit {
   outfitId: string
   baseStats: Record<'speed' | 'stamina' | 'power' | 'guts' | 'wit', number>
   growthRatePercents: Record<'speed' | 'stamina' | 'power' | 'guts' | 'wit', number>
-  aptitudes: Pick<Aptitudes, 'strategy'>
+  /** Her styles (her style's class) and distances (her template's calling and stride, H67). */
+  aptitudes: Pick<Aptitudes, 'strategy' | 'distance'>
 }
 
 /** Her best running style's class (ties: front, pace, late, end): what an Uma who never picked fights as. */
 export const styleClass = (outfit: Pick<BattleOutfit, 'aptitudes'>): RpgClass => rpgDefaultClass(best(outfit.aptitudes.strategy)[0])
 
-/** What `startingClass` reads: her aptitudes, and her base stats (an outfit always has them; without, her style's class). */
-export type StartingOutfit = Pick<BattleOutfit, 'aptitudes'> & { baseStats?: Pick<BattleOutfit['baseStats'], 'power' | 'wit'> }
-/** The class she starts in at unlock: her style's, except that from classes v2 a Late surger whose base Power beats her
- * base Wit starts as a Paladin (§3.3, D180; ties stay Cleric). The save writes that start as her class. */
+/** What `startingClass` reads: her styles and distances, and her base Power and Wit (an outfit always has them; without,
+ * her style's class to v15, and Power = Wit from v16). */
+export type StartingOutfit = Pick<CallingOutfit, 'aptitudes'> & { baseStats?: CallingOutfit['baseStats'] }
+/** The class she starts in at unlock. From engine v16 her calling, the pick's pre-selection (`umaCalling`; CP29, H67). To
+ * v15 her style's, except that from classes v2 a Late surger whose base Power beats her base Wit starts as a Paladin
+ * (§3.3, D180; ties stay Cleric). The save writes that start as her class (`newOwnedUma`). */
 export function startingClass(outfit: StartingOutfit, engine: number = BATTLE_ENGINE_VERSION): RpgClass {
-  const style = styleClass(outfit), stats = outfit.baseStats
+  const stats = outfit.baseStats
+  if (rpgRework('fight', engine)) return umaCalling({ aptitudes: outfit.aptitudes, baseStats: stats ?? { power: 0, wit: 0 } })
+  const style = styleClass(outfit)
   return style === 'cleric' && rpgV2(engine) && !!stats && stats.power > stats.wit ? 'paladin' : style
 }
 
-/** The class she fights as: the chosen one, or her style's, so no Uma who never picked changes class at the switch. */
+/** The class she fights as: the chosen one, or her style's, so no Uma who never picked changes class at the switch. From
+ * v16 every new unlock is written with her start (H67), so the fallback holds only for Umas unlocked before it (UT17). */
 export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>): RpgClass {
   return uma.classId ?? styleClass(outfit)
 }

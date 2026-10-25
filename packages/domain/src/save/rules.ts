@@ -64,8 +64,8 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
 
 /**
  * Spends one Uma Ticket on an outfit; final once committed (D44). `startClass` is her starting class, which picks her
- * armor kinds (D160 §7); without it she starts all-physical. A Paladin start (classes v2) is also written as her class
- * (D180). An outfit any world owns is refused: she lives in one (§3).
+ * armor kinds (D160 §7); without it she starts all-physical. From engine v16 every start is also written as her class
+ * (H67); to v15 only a Paladin start (classes v2, D180). An outfit any world owns is refused: she lives in one (§3).
  */
 export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE, startClass?: RpgClass): Save {
   const world = worldOf(save, tier)
