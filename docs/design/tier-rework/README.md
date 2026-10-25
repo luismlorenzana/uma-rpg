@@ -7,9 +7,11 @@
 > **cross-checked into one design** (§7, XC1–XC16), to be reviewed **one doc at a time** with the owner (§10), decided
 > with no open questions, and shipped as implementation packets (§9). **Class (D192), Weapon (D193) and Extra Stats
 > (D194) Progression are approved**; their follow-ups are carried into the other docs and this brief (§7.1, XC17–XC22
-> after the weapon review, XC23–XC27 after Extra Stats). **Profession Progression is ready for the owner's review, the
-> last of four**, with his compensation direction designed in full (Craft Levels reset to 1, Speed Tickets for the time:
-> §9.4, profession-progression §14).
+> after the weapon review, XC23–XC27 after Extra Stats). **Profession Progression is approved too (D195)**, with his
+> compensation direction designed in full (Craft Levels reset to 1, Speed Tickets for the time: §9.4,
+> profession-progression §14). **The stat balancing is approved (D196, 2026-10-25;
+> [stat-balance.md](stat-balance.md), SB1–SB18)**; its follow-ups are logged against D192–D194 and carried into this
+> brief (§7.1, XC29). **Next: the Uma Templates pass.**
 
 ## 1. What the owner asked for
 
@@ -62,7 +64,8 @@ names the doc and call that own it; the first round's drafts and the cross-refer
   paths are specialized, with guided builds (CP4, CP7).
 - **Foe weaknesses** (CP5, CP6): a Tier 1 foe is weak to **her twins**, the element that beats hers on the ring and its
   twin Arm; from Tier 2 regulars narrow to one kind of it, from Tier 3 sub-bosses too; **bosses keep their twins**.
-  Shields grow with the answers a foe's list gets (CP8).
+  Shields grow with the answers a foe's list gets (CP8): bosses **6 · 9 · 10** (*follow-up to D196 (stat balancing),
+  2026-10-25: was 6 · 8 · 9; SB6*).
 - **Weapon groups and the class branch** (CP26, CP38–CP41): the **Ring** group (Greatsword, Axe, Lance · Fire, Ice,
   Lightning) and the **Light/Dark** group (Bow, Katana · Light, Dark), one split for both channels through the twins.
   From Tier 2 each class takes **one of two class branches**: a **focus** (+15% on the hits of its group's kinds), her
@@ -81,7 +84,9 @@ names the doc and call that own it; the first round's drafts and the cross-refer
 - **Armor carries all defense** (WP14–WP16): five slots, the slot holds the grade, the half sets only the piece shown
   and its offense; per grade DEF and M.DEF +4, HP +15, MP +3, evasion 1.2%, × tier. Her class's half in Tier 1, per
   piece for the four between from Tier 2. No sets.
-- **Accessories deal damage only** (WP17–WP25, WP34): the ten defensive and MP supports retire; **untyped slots
+- **Accessories deal damage only** (WP17–WP25, WP34): the ten defensive and MP supports retire, and **MP comes back by
+  a base regen every Uma has** (SB18: at the end of each round 0.8% of her max MP for each skill depth her class has
+  open, 4% from Class Rank 40; a rule, never an item; *follow-up to D196 (stat balancing), 2026-10-25*); **untyped slots
   1 · 2 · 3**, one of each family; **all four families in every tier**: **Pendants** (flat offense spread over her kinds),
   **Orbs** (flat offense on one kind), **Bells** (her weapon of its kind strikes once more after her Attack) and
   **Insignias** (a percentage on sub-bosses and bosses, or by timing). Tier 1's one slot holds one of four **base forms**;
@@ -121,8 +126,10 @@ names the doc and call that own it; the first round's drafts and the cross-refer
   Templates pass fills them later. **Proposed** (the owner's weapon review, WP33): a **signature accessory**, one family
   her template names, ATK and M.ATK +0.2 a level × tier while she wears it (about +5% at Lv 50), **in the affinity's
   place**; noted at CP36, decided in the Uma Templates pass.
-- **Values (SB1, §2.5):** every flat build value is its Tier 1 value × 1, × 1.8, × 2.6; shares and percentages stay.
-  **Amounts don't scale** (PP11): one Uma maxed is **485 · 505 · 525** refined items, every tier within a tenth
+- **Values (SB1, §2.5, decided: D196):** every flat build value is its Tier 1 value × 1, × 1.8, × 2.6; shares and
+  percentages stay. **The foes price each tier's tools** by a toolbox term on their HP and DEF and their offense (SB3–SB5:
+  Tier 2 +27%, Tier 3 ×1.08 → ×1.48, offense +10% by Lv 50, bosses' term × 1.1; *follow-up to D196 (stat balancing),
+  2026-10-25: was Z4's draft +15% for Tier 2 alone*). **Amounts don't scale** (PP11): one Uma maxed is **485 · 505 · 525** refined items, every tier within a tenth
   (profession-progression's numbers since D194, the Planet Jewel at 12; pending its review).
 - **Pacing:** the time to level, the EXP and rewards per fight, and the time to gear an Uma on curve keep today's order
   ([pacing.md](../pacing.md)): 822 · 856 · 890 hours an Uma against today's 776; a Tier 1 run of twenty in 15.8 days of
@@ -145,7 +152,9 @@ docs are decided.
 | **Weapon slots** | 5 | 3, by her class's Arms count | 3 | 3 |
 | **Default weapons** | Five | The owner's three (CP3) | Branch 1 the defaults, branch 2 the reverse set (CP40) | The same |
 | **Foes weak to** | 2–5 kinds, half at random | 2: her twins (an Arm and its element) | Regulars 1; sub-bosses and bosses 2 | Regulars and sub-bosses 1; bosses 2 |
-| **Shields (drafts)** | Regular 2–3, sub-boss 6, boss 8 | 2–3 · 5 · 6 | 3–4 · 7 · 8 | 3–4 · 6 · 9 |
+| **Shields (drafts; regular · sub-boss · boss)** | Regular 2–3, sub-boss 6, boss 8 | 2–3 · 5 · 6 | 3–4 · 7 · **9** | 3–4 · 6 · **10** |
+| **Toolbox term** (foes' HP and DEF · offense, by Lv 50; SB3–SB5) | — | — | HP and DEF **×1.27** · offense +10%; bosses' HP and DEF × 1.1 | HP and DEF **×1.08 → ×1.48** · offense +10%; bosses × 1.1 |
+| **MP back a round** (SB18, every Uma, a rule) | The Spring or the Siphon, worn | **0.8% of max MP per skill depth open**: 0.8 → 4% (Class Rank 1 → 40) | The same (a share: tier-free) | The same |
 | **Weapon branch** | — | Base: one kind, weak ×1.3 | G5: Pure (×1.5) or Dual (+ its fixed partner, the other group) | Pure → Keen (×1.7) or Tempered; Dual → Tempered or Evolved |
 | **Two-kind weapons in her slots** | — | 0 | 1 | 2 (Brawler, Mage 1) |
 | **Answers a regular** (default party) | Nearly all | 2.47 | 2.0 | 2.30 |
@@ -173,6 +182,9 @@ docs are decided.
 | **Hours, Craft Lv 25 speed** | 776 | 822 (835) | 856 (869) | 890 (903) |
 | **A run of twenty** | 24 days | 15.8 days | 28.5 days | 29.7 days |
 | **Build values** | Flat | × 1 | × 1.8 | × 2.6 |
+
+*Follow-up to D196 (stat balancing), 2026-10-25: boss shields 6 · 9 · 10 (SB6, was 6 · 8 · 9); the toolbox term row
+(SB3–SB5; Z4's draft was +15% for Tier 2 alone); the base MP regen row (SB18).*
 
 ### 2.3 One Uma's demand
 
@@ -265,6 +277,10 @@ With the owner's compensation direction: Speed Ticket · the grant.*
 
 ### 2.5 The stat budget (SB1, working rule, 2026-10-23)
 
+**Decided (SB1, [stat-balance.md](stat-balance.md#2-sb1-every-source-keeps-its-share), D196, 2026-10-25):** the
+multipliers stand, ×1 · ×1.8 · ×2.6; every source keeps its share of every stat within 2.3 points at each tier's Lv 50.
+*Follow-up to D196 (stat balancing), 2026-10-25: was a working rule; the heading keeps its date so the links to it hold.*
+
 The owner's worry: stat growth across tiers mustn't drift out of balance. [stats-by-tier](previews/stats-by-tier.html)
 shows the first drafts' problem: gear and Extra Stats gave the **same values in every tier** while her level keeps
 growing, so the build's share of a stat fell (a Summoner's offense 57% → 43%, HP 28% → 14%, MP 20% → 9% from Tier 1 to
@@ -282,7 +298,8 @@ scale (PP11).
   offense 55% → 61% → 61% (CP §9).
 - **The alternative,** flat values: the build matters less each tier and every tier needs its own tuning.
 - **Docs write values as "T1 value × tier"** so either choice is a one-line change. The overall stat balancing pass
-  (§5, after the owner's reviews) sets the final numbers by simulation.
+  (§5, after the owner's reviews) **set: ×1 · ×1.8 · ×2.6 stand** (SB1; the fight simulation tunes the rest at
+  implementation, §9.5).
 
 ## 3. Who owns what
 
@@ -295,6 +312,7 @@ scale (PP11).
 | [extra-stats-progression.md](extra-stats-progression.md) (EP1–EP29) | **Extra Stats bodies, nodes and grants** per tier (the Planet, three moons with Prowess split by class, the weapon moons, Full or Split), her moon in full, **jewels** (kinds, grades, counts), the foe budget's tier scaling | Weapons (the weapon moons outside the kind cap, the stack, presets), Professions (jewel recipes), Uma Templates (her moon) | [extra-stats.md](extra-stats.md) |
 | [profession-progression.md](profession-progression.md) (PP1–PP25) | The ten professions and their kinds, places and slots, **materials** (catalog, the ladder), **recipes and amounts** (the Planet Jewel at 12), supply and demand, the secondary, the Exchange, **the compensation** (Craft Levels reset, Speed Tickets for the time, the first launch) | Weapons and Extra Stats (what is made, how many; what the save deletes), Classes (the calling) | [professions.md](professions.md) |
 | [variance.md](variance.md) (U1–U16) | Uma Templates: the catalog, the calling's rule (U4), template-only pieces | Classes (CP24, CP36), Extra Stats (EP14), Weapons (WP33, the signature family) | Folded into the standalone docs by the Uma Templates pass |
+| [stat-balance.md](stat-balance.md) (SB1–SB18, D196) | The final multipliers (SB1); **the foes' toolbox terms** per tier (SB3–SB5); **the base MP regen** (SB18); the balance model and the simulation's expected results (§12). Every other value it moved stays its owning doc's, as a logged follow-up (§13) | Every doc above (values); the Uma Templates pass (the template budget, §8) | tier2-world Z4's draft term (history) |
 
 Every standalone doc has: the owner's points, at a glance, today, the proposal per tier, Provides and Assumes, save
 impact, pacing and a closing **Decisions** table where every call has a recommendation. No open questions.
@@ -314,6 +332,7 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 | **Extra Stats Progression** | [the map at every tier](previews/stars-maps.html) · [what it grants, the build share](previews/stars-grants.html) · [the jewels and per-Uma totals](previews/stars-jewels.html) · [her moon](previews/stars-uma.html) |
 | **Profession Progression** | [the Wilds map at each tier](previews/prof-map.html) · [every material type](previews/prof-materials.html) · [gathering → processing → making](previews/prof-flow.html) · [demand against supply](previews/prof-demand.html) · [the first launch: Craft Levels reset, Speed Tickets for the time](previews/prof-grant.html) |
 | Every category (first round, 2026-10-22/23; refreshed after the standalone docs are decided) | [every category × every tier](previews/progression.html) · [her detail page at Tier 1, 2 and 3](previews/character-tiers.html) · [max stats by tier](previews/stats-by-tier.html) |
+| **Stat balancing** (D196) | [**the summary: three problems, three fixes**](previews/balance-summary.html) · [damage per act, the foes, every check and every tuning before and after](previews/balance-damage.html) · [every stat sheet by source, every class, tier, level and build stage](previews/balance-sheets.html) |
 | Uma Templates (first round; input to the Uma Templates pass) | [the catalog](previews/variance-templates.html) · [two front runners](previews/variance-two-umas.html) · [her profile by tier](previews/variance-profile.html) |
 | First round, history | Classes: [composition](previews/classes-composition.html) · [strikes](previews/classes-strikes.html) · [template sheets](previews/classes-template-sheets.html) · [trees](previews/classes-trees.html). Skill trees: [by tier](previews/skills-trees-by-tier.html) · [every class at Tier 1](previews/skills-all-classes-t1.html) · [the Skills tab](previews/skills-profile.html). Gear: [weapon tree](previews/gear-weapon-tree.html) · [the Gear tab](previews/gear-loadout.html) · [crafting](previews/gear-crafting.html). Extra Stats: [the map](previews/extra-stats-maps.html) · [the budget](previews/extra-stats-budget.html). Professions: [the Wilds map](previews/professions-map.html) · [the flow](previews/professions-flow.html) · [demand](previews/professions-demand.html) |
 
@@ -334,27 +353,30 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
       the owner's compensation direction the same day (PP24, PP25 new). Absorbs professions.md.
    5. **Cross-check** (2026-10-24): the four made to agree, this brief brought up to date (§7, XC1–XC16).
 4. **The owner's reviews, one doc at a time, in order:** Class (approved, D192) → Weapon (approved, D193) → Extra Stats
-   (approved, D194) → **Profession (next, the last)** (§10), each ending with its D-rows in
+   (approved, D194) → Profession (approved, D195) (§10), each ending with its D-rows in
    [decisions.md](../../decisions.md).
-5. **Then:** the overall **stat balancing** by simulation (SB1, §9.5); the **Uma Templates** pass (variance.md, folded
-   into the standalone docs; CP36's and EP14's notes); then **implementation** packets behind engine v16's switch, save
-   v27, with the compensation (§9.4).
+5. **The overall stat balancing** ([stat-balance.md](stat-balance.md)): an analytic model on the four docs' numbers,
+   SB1–SB18, **approved, D196 (2026-10-25)**; its follow-ups logged against D192–D194 (§7.1, XC29). *Done.* The fight
+   simulation tunes the final numbers at implementation (§9.5, with the model's expected results).
+6. **Next: the Uma Templates pass** (variance.md, folded into the standalone docs; CP36's and EP14's notes; the template
+   budget measured in stat-balance §8); then **implementation** packets behind engine v16's switch, save v27, with the
+   compensation (§9.4).
 
 ## 6. Status
 
 | Doc | State |
 |---|---|
-| **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20); **follow-ups to D194** the same way (XC24) |
-| **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral). **Follow-ups to D194** (extra-stats §18.1) logged against D193, no decision changed (XC23) |
-| **extra-stats-progression.md** | **Approved by the owner, 2026-10-24 (D194):** EP1–EP29 (weapon moons, Full or Split; Prowess by class; the Halo, Valor and Swiftness retired; her moon in full) |
+| **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20); **follow-ups to D194** the same way (XC24); **follow-ups to D196** (stat-balance §13: CP8's bosses 6 · 9 · 10, CP9's Summoner Arms hand 0.48, CP32's real pace, the foe terms, the base MP regen; XC29) |
+| **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral). **Follow-ups to D194** (extra-stats §18.1) logged against D193, no decision changed (XC23); **follow-ups to D196** (WP20's Great Pendant 0.55, WP21's Toll Bell +0.05 a ring, WP25's hybrid presets on the lead half, §5.7 re-run, the base MP regen; XC29) |
+| **extra-stats-progression.md** | **Approved by the owner, 2026-10-24 (D194):** EP1–EP29 (weapon moons, Full or Split; Prowess by class; the Halo, Valor and Swiftness retired; her moon in full). **Follow-ups to D196** (EP29's hybrid moons on the lead half, EP4 and EP15 the base MP regen and the knob order, EP16 the weapon moons in the new terms; XC29) |
 | **profession-progression.md** | **Approved by the owner, 2026-10-24 (D195):** PP1–PP25, with the flavor change (Vegetables, Fish); unused materials may be reused later |
-| **stat-balance.md** | **Approved by the owner, 2026-10-25 (D196):** SB1–SB18 (foe terms per tier, boss shields 6 · 9 · 10, the hybrid mirror, accessory forms, the base MP regen) |
+| **stat-balance.md** | **Approved by the owner, 2026-10-25 (D196):** SB1–SB18 (foe terms per tier, boss shields 6 · 9 · 10, the hybrid mirror, accessory forms, the base MP regen). **Its §13 follow-ups are applied** (XC29); profession-progression.md unchanged (no tuning moves an item, a recipe or a count) |
 | weapon-research.md | Input (WR1–WR6), decided as WP1–WP12 |
 | variance.md | First round, cross-referenced; the Uma Templates pass's input |
 | classes.md, skill-trees.md, gear.md, extra-stats.md, professions.md | History: superseded by the standalone docs |
 | Overview pages (progression, character-tiers, stats-by-tier) | First round; bannered; refreshed after the standalone docs are decided |
 | Cross-reference (XR) | Done, 2026-10-22 |
-| Cross-check (XC) | **Done, 2026-10-24** (XC1–XC16); the weapon review's follow-ups the same day (XC17–XC22); D194's follow-ups and the compensation (XC23–XC27). Next: the owner's review of profession-progression.md |
+| Cross-check (XC) | **Done, 2026-10-24** (XC1–XC16); the weapon review's follow-ups the same day (XC17–XC22); D194's follow-ups and the compensation (XC23–XC27); the profession flavor change (XC28); **D196's follow-ups, 2026-10-25 (XC29)**. Next: **the Uma Templates pass** |
 
 ## 7. Cross-reference and cross-check log
 
@@ -364,7 +386,10 @@ standalone docs agree; each changed call says "Changed in cross-check (2026-10-2
 owner's weapon review (2026-10-24) into the other docs: wording and numbers only, no design change; each spot says
 "Follow-up to the weapon review, 2026-10-24". **XC23–XC27** carry the approved Extra Stats doc (D194) and its interface
 changes (extra-stats §18) into the other docs, each spot marked "Follow-up to D194 (Extra Stats), 2026-10-24", and
-the owner's compensation direction into profession-progression (§14) and §9.4 here.
+the owner's compensation direction into profession-progression (§14) and §9.4 here. **XC29** carries the approved stat
+balancing (D196, [stat-balance §13](stat-balance.md#13-if-approved-the-follow-ups-by-doc)) into the four docs, this
+brief and the pages, each spot marked "Follow-up to D196 (stat balancing), 2026-10-25": values only, no call changed
+beyond §13's.
 
 ### 7.1 The cross-check (2026-10-24)
 
@@ -398,6 +423,7 @@ the owner's compensation direction into profession-progression (§14) and §9.4 
 | **XC26** | **The compensation.** WP27, EP21, PP19–PP20 and §9.4 here held the first draft's raw-material refund, with the owner's direction (D193's note) only as a banner | **Designed in profession-progression §14 (PP19, PP20 changed; PP24, PP25 new):** Craft Levels to 1; a Speed Ticket for every 30 minutes of work an Uma's Craft EXP records (⌈EXP ÷ 60⌉, per Uma, into her world's wallet); gear and Star Gems folded in, with a floor at their making time; stock kept and converted; upgrades' Laurels and items back; work settled first; the first launch's sheet. §9.3–§9.4 here rewritten; WP27, WP §11, EP21 and EP §15 point to it (wording only). A new page, [the first launch](previews/prof-grant.html) | profession-progression (the compensation) |
 | **XC27** | **This brief after D194** | §2.1–§2.4 (Prowess, weapon moons, Full · Split, the retired Halo, Valor and Swiftness; 20 · 25 · 30 nodes and jewels, equal for every class; one Uma 485 · 505 · 525 pending the Profession review); §2.5, §3, §4, §5, §6; §8's extra-stats-tier2 and Q9 rows; §9.1–§9.5; §10's EP1–EP29 and PP1–PP25 | — |
 | **XC28** | **The profession flavor change (owner's note, 2026-10-24).** Farming gathered the Wilds' Fibers and Fishing shells and essences | Farming gathers the old Farm's **Vegetables** (Fields, drawn with `vegetable-garden`), Fishing its **Fish**; one pick rule for every line (grades 1, 3 · 6, 8 · 9, 10), renaming four types (Silver → Gold, Oak → Cedar, Mahogany → Cherry, Garnet → Citrine); amounts, totals and times unchanged; recipe names followed in weapon- and extra-stats-progression (wording only) | profession-progression PP6–PP8, PP10 |
+| **XC29** | **The stat balancing's follow-ups (D196, 2026-10-25).** stat-balance §13 lists the values the approved pass moved in D192–D194 and this brief | **Applied, logged against D192–D194, values only:** class-progression CP8 (bosses **6 · 9 · 10**; §4.4, §15), CP9 (the Summoner's Arms hand **0.56 → 0.48**; §2.1, §2.2, §6.5, §7.2), CP11 and §5.2 (a hybrid's single-kind forms on her lead half), CP32 (the re-baseline on the real Class Rank pace, 2E), §15 (the foe terms), §6.6 (the base MP regen beside skill MP), §9 (the Great Pendant's +34 · +51 on the sheet); weapon-progression WP20 (**Great Pendant 0.55**, Tier 3 **0.575**), WP21 (**Toll Bell +0.05 a grade each ring**), WP25 (§5.8: a hybrid's single-kind forms on her **lead** half; the damage column re-measured), §5.7 (Tiers 2 and 3 re-run on the balance model, a Tier 3 table added), §4.3, §0 and §13 (a regular's hit 18.3% · 18.1%, about 20% with the terms' offense; the depth priced in the terms), §4.4 (the hybrids' other kinds), WP12 and §3.6 (the shields), WP17, §5.1 and §5.9 (the base regen, the knob order); extra-stats-progression EP29 (§5.3: the hybrids' weapon moons on the lead half), §8.1–§8.2 and §8.4's on-kind table, EP4 and EP15 (§9: the pool and the base regen; the knobs SB18's share, Vigor's MP rate, legs, the Flourish the template's), EP16 (§10: the moons a quarter of the toolbox, priced in +27% and ×1.08 → ×1.48). This brief: §2.1–§2.2 (shields, the toolbox term, MP back a round), §2.5 (SB1 decided; the heading kept for its links), §3 (stat-balance's row), §4, §5, §6, §8 (Z2, Z4, Z5 rows), §9.1 (the regen rule), §9.2 (Tier 2's term, `RPG_FOE_TUNING`), §9.5 (§12's expected results), §10 (SB1–SB18). profession-progression: **no change**. tier2-world: one note at Z4. variance: one-line notes at U9 and U12. Pages: class-templates (presets, sheet), class-overview and class-trees (the hand), class-weaknesses (shields by tier), weapon-trees (boss shields), weapon-accessories (forms, viability, presets, the MP note), weapon-armor (the regular's hit, where MP comes from), stars-maps and stars-grants (EP29's presets, the sheet), classes-template-sheets (history note) | stat-balance (D196) |
 
 **Checked, no conflict:** slots by channel and the owner's defaults in every doc and page; the calling and its pick
 moving only Forest · Armorer ↔ Monster Den · Lapidary (CP30, PP2); accessories 1 · 2 · 3 and Settings 12 · 6 · 4
@@ -458,12 +484,13 @@ Old docs stay as they are, for history; the D-rows of each review record these.
 | **weapon-arts.md** (H40, Q15) | E1 a core and an A/B fork per weapon; E2 Weapon Rank gates; E3 per weapon; E4 Lore Scrolls; E5 what an art touches; E6 the Break cap; E7 thirty nodes; E8 armor sets; E9 Lore Seals | E1's A/B fork **moves into the trees** as the Power or Break tip (CP19); E6 **kept** for the Break tip; E7 **replaced** by weapon branches (WP6–WP9); E2–E5, E8, E9 **dropped** (WP3, WP16) | weapon-progression §3, class-progression §6.3 |
 | **extra-stats-tier2.md** (H41, Q12) | X1 the Halo; X2 a pair per kind, grades 5 and 10; X3 flat; X4 one specialty slot; X5 twenty ring gems from a second-profession item; X6 an outer orbit; X7 Orb + ring ≤ a G10 weapon's Might; X8 the inner map unchanged | X1 **replaced** by the weapon moons (EP24–EP26: five nodes, Full or Split, a second in Tier 3; the Halo retired, D194); X3 **kept** (flat offense on a kind); X6 **kept** (the weapon moons on the outer orbit); X7 **extended** to the kind cap × tier, binding the accessory forms only, the weapon moons outside it (WP24, EP27); X2 and X5 → the weapon moons take Moon Jewels by the ladder (EP17); X4 → a free setting, Full or Split and its kinds (EP25); X8 **replaced** (the Planet and three moons) | extra-stats-progression §4–§5 |
 | **second-profession.md** (H42, Q13) | Lore Level, Relics and Glyphs, three Tier 2 sites, Scrolls and Seals | **Replaced:** a secondary of any other profession's base work (PP14), the ladder (PP9); no Lore (PP18) | profession-progression §2.3, §3.4 |
-| **tier2-world.md** (H43, Q16) Z2 | The same biomes and signatures, every foe's shield +1 | **Weaknesses narrow by rank** (CP6); shields grow with answers, Z2's +1 the floor (CP8) | class-progression §4.2, §4.4 |
-| **tier2-world.md** Z4 | One Tier 2 term (+15% HP and defense, +10% offense by Lv 50) from H39–H41's tools | **One term kept;** its tools re-listed: class branches and the focus, weapon branches, the second accessory slot and the accessory branches, branch C and Break tips, the weapon moon (D194); priced with v17 | class-progression §15, weapon-progression §13, extra-stats-progression §10 |
+| **tier2-world.md** (H43, Q16) Z2 | The same biomes and signatures, every foe's shield +1 | **Weaknesses narrow by rank** (CP6); shields grow with answers, Z2's +1 the floor (CP8; bosses 6 · 9 · 10, *follow-up to D196*, SB6) | class-progression §4.2, §4.4 |
+| **tier2-world.md** Z4 | One Tier 2 term (+15% HP and defense, +10% offense by Lv 50) from H39–H41's tools | **One term kept;** its tools re-listed: class branches and the focus, weapon branches, the second accessory slot and the accessory branches, branch C and Break tips, the weapon moon (D194); priced with v17. *Follow-up to D196 (stat balancing), 2026-10-25:* **sized by SB3** (HP and DEF +27% by Lv 50, offense +10% kept), **a Tier 3 term** (SB4: ×1.08 → ×1.48) and **bosses' term × 1.1** (SB5) | class-progression §15, weapon-progression §13, extra-stats-progression §10, [stat-balance §3.6](stat-balance.md#36-the-proposed-terms) |
 | **tier2-world.md** Z9 | Fronts that test weapon arts and the outer ring | Fronts test weapon branches, Break tips, the focus and the weapon moons (Full against Split) | class-progression §4.3 |
 | **Q9** (keep the Limit stat) | Keep it | **Answered:** off the shared map in every tier; her Gritty knack and the halls' Limit Breaks keep it (EP8, EP28; Valor retired, D194) | extra-stats-progression §5.4, §6.2 |
 | **Q10** (variance sketch) | Distance as a hard limit; her unique skill as a passive; gold skills | **Replaced** by Uma Templates: nothing from the original's skills (U2, U7) | variance |
 | **Q17** (hybrid crossovers) | A Spell Blade sweep side, a Summoner focus side | **Answered:** Tier 2's branch C, Sweep and Hunt, on the leading half's trees (CP19) | class-progression §6.3 |
+| **tier2-world.md** Z5, §7 (MP over a region) | Springs once a region; MP carries across it; skill MP ×1.7 | **Kept,** and every Uma regains MP each round by the base regen (SB18), the Spring and Siphon Amulets retired. *Follow-up to D196 (stat balancing), 2026-10-25* | stat-balance §7.2 |
 | **Today's rules the rework retires** | Two typed accessory slots (C10, D124) and the ten supports; rotating recipe pairs (D139); facilities and upgrades (D144); side points and their dot (D166); side gates (D102's); weapon, armor and accessory ranks and Gear Marks; Star Gems and active slots; the start by style alone (D162, D180) | WP17, WP19; PP10; PP4; CP14; CP16; WP3; EP6, EP17; CP29 (D180's split kept inside the calling) | Each doc's §1 "Today" |
 
 ## 9. Engine, save and refund
@@ -486,6 +513,7 @@ replay on their own engine; stored fights keep their frozen inputs.
 | Armor's values per slot (DEF, M.DEF +4 a grade; HP +15; MP +3); Might, armor offense and accessory values × tier; the foes' build budget × tier | WP4, WP15, EP16 | Data |
 | The Paladin's revive on her Light D3 B; two Limit Breaks' kinds (Rampart Charge Axe, Choir of Angels Lightning) | CP37, CP35 | Data |
 | The Flourish's three MP twists (Opening, Even pace, Second wind), on as her calling | U9 | Rule |
+| **Base MP regen:** at the end of each round every ally regains 0.8% of her max MP for each skill depth her class has open (rounded, at least 1), in the round-end step the Spring Amulet used (`mpRegen`), set when the fight starts; her stat sheet shows it beside her MP ("MP 296 · +12 a round"). *Follow-up to D196 (stat balancing), 2026-10-25* | SB18 | Rule |
 | No engine change: weaknesses by kind (the generator's twins), locks as today, the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start; Vigor's MP is a point; Prowess's points split by her class when the fight starts) | CP5, CP8, CP18, EP, EP23 | Generator, data |
 
 ### 9.2 Engine v17: Tier 2's toolbox
@@ -500,8 +528,9 @@ replay on their own engine; stored fights keep their frozen inputs.
 | Branch C nodes (Sweep, Hunt, Mighty, Wide) and the Break tips (one more shield point on a weak hit, once an act, under E6's cap) | CP19 |
 | **The weapon moon:** flat offense on her hits of its kind (Full) or two kinds (Split, 0.7 each), joined to her offense in the stack's step 1 outside the kind cap; never a heal or a kind; its setting frozen into the input | EP24, EP25, EP27 |
 | The signature tips | U16 |
-| Weakness counts by rank and shields by answers (generator only) | CP6, CP8 |
-| **Tier 3, later:** Keen, Tempered, Evolved, the accessory branches' step, the third slot; depth 6 capstones, two branches held, the master slot, branch capstones and masteries; the second weapon moon (data on v17's rule) | WP9, WP34, CP20, CP27, EP26 |
+| Weakness counts by rank and shields by answers (generator only): Tier 2 bosses 9 | CP6, CP8, SB6 |
+| **Tier 2's toolbox term** (`RPG_FOE_TUNING`): the foes' HP and DEF × (1 + 0.27 (ℓ − 1) ÷ 49), offense × (1 + 0.10 (ℓ − 1) ÷ 49); bosses' HP and DEF × 1.1 on top. *Follow-up to D196 (stat balancing), 2026-10-25: was Z4's draft +15%* | SB3, SB5 |
+| **Tier 3, later:** Keen, Tempered, Evolved, the accessory branches' step, the third slot; depth 6 capstones, two branches held, the master slot, branch capstones and masteries; the second weapon moon (data on v17's rule); **Tier 3's term** (HP and DEF × (1.08 + 0.40 (ℓ − 1) ÷ 49), offense +10%, bosses × 1.1) and bosses' shields 10 | WP9, WP34, CP20, CP27, EP26, SB4–SB6 |
 | **With the Uma Templates pass:** the signature accessory (ATK and M.ATK + her level × 0.2 × tier while worn, frozen into the input) | WP33 |
 
 ### 9.3 Save v27: one migration, every world
@@ -573,43 +602,64 @@ world with twenty Lv 20 Umas and 4,800 pieces left by the forty who ascended: 32
 
 ### 9.5 Simulation items
 
+*Follow-up to D196 (stat balancing), 2026-10-25: each item takes [stat-balance §12](stat-balance.md#12-what-the-fight-simulation-must-confirm)'s
+expected results (the analytic model's numbers) and the approved tunings.*
+
 **For the Tier 1 packet (v16):**
 1. **Re-baseline:** an on-curve party (three default weapons, branch A, Tier 1's presets (WP25), the new armor, the full
-   map (the same 20 nodes, Prowess at her class's split) with Vigor's MP, Skill Ranks, no template) wins every Tier 1 stage within 3 points of today's table; what the
-   accessories and Skill Ranks add goes back through the foe budget (CP §15, WP §13, EP16).
+   map (the same 20 nodes, Prowess at her class's split) with Vigor's MP, **the base MP regen** (SB18), Skill Ranks, no
+   template) wins every Tier 1 stage within 3 points of today's table; what the accessories and Skill Ranks add goes back
+   through the foe budget (CP §15, WP §13, EP16). **The balance party reads Class Rank on the real pace** (2E a win:
+   Class Rank 50 at Uma Lv 34; SB16, CP32). Expected: Tier 1's build within 2% of today's for five classes, the
+   Summoner's +16% gone with her presets on her lead half and her Arms hand 0.48 (SB10, SB11); Skill Ranks +5% at Lv 50.
 2. **The mirror on full maps:** Spell Blade and Summoner damage a turn within ±5%, each 70/30 ± 5; Paladin vs Cleric
-   ±10% (CP9).
-3. **Weaknesses and shields:** rounds to the first Break within ±0.5 of today's on the shield drafts (CP8); Auto cancels
+   ±10% (CP9). Expected, with SB10 and SB11: +6% at Lv 10 to −3% at Lv 50, splits 71/29 and 68/32; the Summoner's Arms
+   hand moves inside 0.46–0.50 if the simulation lands outside. Tier 2's Ring mirror (Rune Knight ↔ Conjurer, −6% to −9%)
+   is tuned by the Rune Knight's class skills.
+3. **Weaknesses and shields:** rounds to the first Break within ±0.5 of today's on the shield drafts (CP8), **bosses
+   6 · 9 · 10** (SB6; the chip index: −0.41 and −0.39 in Tiers 2 and 3; regulars and sub-bosses hold); Auto cancels
    charged moves as today ±5 points; the fronts inside rift.md §11's bands; no single Uma Breaks a Duel boss in one act.
 4. **Tree branches:** a B or C branch +10–20% in its context; any mix within ±5 points of all-A; Pierce (CP42) the same
    on long shields.
-5. **MP:** the Springs test with no MP accessory and +51 MP from the map: a region on Auto clears 10–12 of 12; knobs in
-   order: legs' MP, Vigor's MP rate, the Flourish's twists (WP §5.9, EP15).
-6. **Defense:** a regular's 100% hit about 18.7% of an on-curve Brawler's HP (WP15); the knob is armor's HP a grade.
+5. **MP:** the Springs test with no MP accessory, the map's +51 MP **and SB18's base regen**: a region on Auto clears
+   10–12 of 12, **and the party's pace in a region's last four stages within ±10% of today's** (the model: 0.94–1.05×);
+   no class's deep cast refunded by a round (a healer's 76–77% the most); knobs in order: **the regen's share a depth**,
+   Vigor's MP rate, legs' MP a grade, the Flourish's twists (SB14, SB18; WP §5.9, EP15).
+6. **Defense:** a regular's 100% hit about 18.7% of an on-curve Brawler's HP (WP15): 18.7% · 18.3% · 18.1% at each
+   tier's Lv 50 without the terms' offense, about 20% with it (SB13); the knob is armor's HP a grade.
 7. **Accessories:** every base form the best somewhere in Tier 1 and every branch in Tiers 2 and 3, and no form the
    best in more than half of its tier's class-and-context cells; if one is, its per-grade values step down first (WP §5.7).
+   Expected with the Toll Bell's +0.05 a ring and the Great Pendant's 0.55 (SB8): every form someone's best; the Tier 1
+   Orb at 13 of 24 by near-ties (its values step down only if confirmed).
 8. **Templates:** five matched Umas within 3 points; the mirror with both matched; the affinity and her moon under
-   U12's +5% (CP36, EP14).
+   U12's +5% (CP36, EP14). Expected: the signature +4.3–6.1% matched at Lv 50 (SB15); the affinity retired with the Uma
+   Templates pass.
 
 **For Tier 2's toolbox (v17):** Pure against Dual within ±10% (WP §3.7); **the damage stack** on one weak hit (WP31;
+×1.50 · ×2.16 · ×2.49, the tuned peak 1.3 · 1.6 · 1.8 times the campaign's act, priced by the Rift's fronts, SB7;
 fallbacks: focus +10%, Insignias, Keen ×1.6); each class's two branches within ±5% across the regions and +10–20% in
-their own (CP §15); the coverage script at 2.0 and 2.30 answers (WP12, CP4, CP41); boss shields 8 and 9 (CP8); Duals
-and the Duel boss (weapon-research risk 2); **the weapon moon**, Full against Split at 0.7 (EP25) and the stack with a
-moon beside the accessory forms (WP31, EP27), priced in Z4's term (+12–16% an act).
+their own (CP §15); the coverage script at 2.0 and 2.30 answers (WP12, CP4, CP41); boss shields **9 and 10** (CP8,
+SB6); Duals and the Duel boss (weapon-research risk 2); **the weapon moon**, Full against Split at 0.7 (EP25) and the
+stack with a moon beside the accessory forms (WP31, EP27); **the pace with the terms** (SB3–SB5; Z4's check, now Tier
+3's too): rounds a fight within ±10% of Tier 1's at Lv 10–50 for regulars, elites and bosses, the model's edge Tier 3
+Lv 30 at 1.11; the weapon moons a quarter of the toolbox the terms price (×1.14 of Tier 2's act, ×1.23 of Tier 3's).
+*Follow-up to D196: was "boss shields 8 and 9" and "priced in Z4's term (+12–16% an act)".*
 
 ## 10. Review order
 
 One standalone doc at a time, in this order; each ends with its D-rows. ✱ marks the calls the cross-check changed or
 added (§7.1); † the calls the owner's weapon review changed or added (2026-10-24); ‡ the calls the owner's Extra Stats
 review changed or added (2026-10-24, D194); § the Profession calls changed or added for D194 and the owner's
-compensation direction (2026-10-24).
+compensation direction (2026-10-24); ¶ the calls whose values the stat balancing's follow-ups moved (D196, 2026-10-25;
+XC29).
 
 **0. The frame** (§2, §7, §9): **XR2** the vocabulary (§2.4) · **XR6** weapons owned per kind, a class switch costs
 only unraised weapons · **XC11** engine v16 and save v27 are the Tier 1 rework, v17 and v28 Tier 2's · **the
 compensation** (§9.4: Craft Levels to 1, a Speed Ticket for every 30 minutes of work, gear and Star Gems folded in;
-decided with the Profession doc's PP19, PP20, PP24, PP25) · **SB1** (§2.5). The other XC rows land inside the docs below.
+decided with the Profession doc's PP19, PP20, PP24, PP25) · **SB1** (§2.5; decided with the stat balancing, D196). The
+other XC rows land inside the docs below.
 
-**1. Class Progression**: 43 calls, CP1–CP43. [class-progression.md](class-progression.md); pages: overview,
+**1. Class Progression**: 43 calls, CP1–CP43; **approved (D192)**, follow-ups to the weapon review (XC17, XC18, XC20), D194 (XC24) and D196 (XC29) logged against it. [class-progression.md](class-progression.md); pages: overview,
 templates, tree viewer, weaknesses.
 
 | Call | One line |
@@ -621,8 +671,8 @@ templates, tree viewer, weaknesses.
 | CP5 | A Tier 1 foe is weak to her twins: the ring's answer element and its Arm |
 | CP6 | Later tiers narrow by rank; bosses keep their twins |
 | CP7 | The Rift is where specialized parties come in: a guided build per path |
-| CP8 ✱ | Locks as today; shields per tier by their answers: bosses 6 · 8 · 9, sub-bosses 5 · 7 · 6 |
-| CP9 | Hands unchanged; the mirror re-checked on full maps |
+| CP8 ✱ ¶ | Locks as today; shields per tier by their answers: bosses 6 · 9 · 10 (follow-up to D196: was 6 · 8 · 9), sub-bosses 5 · 7 · 6 |
+| CP9 ¶ | Hands unchanged but the Summoner's Arms hand, 0.56 → 0.48 (follow-up to D196); the mirror re-checked on full maps |
 | CP10 ✱ | The template: 3 weapons, 5 armor, accessories 1 · 2 · 3 (all four families every tier: base forms, then branches; follow-up, XC18) |
 | CP11 ✱ | Presets: the defaults in Tier 1, her branch's set from Tier 2, weapon-progression's accessories (WP25) |
 | CP12 ✱ | Every kind of a slot's channel fits; a Dual's second kind is own-channel coverage, worded as WP7 |
@@ -645,7 +695,7 @@ templates, tree viewer, weaknesses.
 | CP29 | The calling pick: Pace Spell Blade or Mage, Late Paladin or Cleric, once |
 | CP30 | The pick sets calling, start, trade and template; never locks a class |
 | CP31 ✱ | The save: v27 (defaults, sides to picks, the calling pick), v28 (class branches) |
-| CP32 | Skill Ranks 1–5, one every 2 Class Ranks, balance-neutral |
+| CP32 ¶ | Skill Ranks 1–5, one every 2 Class Ranks, balance-neutral; the re-baseline reads Class Rank on the real pace (follow-up to D196) |
 | CP33 | On the weapon: Pure or Dual (its fixed partner) at Tier 2's G5; in Tier 3 Keen or Tempered, a Dual Tempered or Evolved; two kinds at most (follow-up, XC17) |
 | CP34 | A class branch is its focus and three class skills; the 36 skills re-paired to the focus |
 | CP35 | Two Limit Breaks' kinds change: Rampart Charge to the Axe, Choir of Angels adds Lightning |
@@ -658,7 +708,7 @@ templates, tree viewer, weaknesses.
 | CP42 | The Spell Blade's branch B becomes Pierce (recommended, for the owner's word) |
 | CP43 | Every tree viable: the audit found no gap |
 
-**2. Weapon Progression**: 34 calls, WP1–WP34; **approved (D193)**, follow-ups to D194 logged against it (XC23).
+**2. Weapon Progression**: 34 calls, WP1–WP34; **approved (D193)**, follow-ups to D194 (XC23) and D196 (XC29) logged against it.
 [weapon-progression.md](weapon-progression.md); pages: tree viewer, armor, accessories, materials.
 
 | Call | One line |
@@ -679,15 +729,15 @@ templates, tree viewer, weaknesses.
 | WP14 | Armor: the slot holds the grade, the half sets only the piece and its offense (kept) |
 | WP15 | Armor's values: one support's worth moves in (a regular's hit 20% → 18.7%; kept) |
 | WP16 | Armor sets stay dropped |
-| WP17 | All ten Talismans and Amulets retire |
+| WP17 ¶ | All ten Talismans and Amulets retire; MP comes back by a base regen every Uma has (follow-up to D196, SB18) |
 | WP18 † | Four families, Pendant, Orb, Bell, Insignia, every one in every tier: a base form, then two branches |
 | WP19 † | Slots 1 · 2 · 3, untyped, one of each family; branches from a slot's G5 |
-| WP20 † | Pendants: base her three kinds; Great Pendant; Channel Pendant (two of one channel) |
-| WP21 † | Bells: her weapon of its kind strikes once more after her Attack; Great Bell; Toll Bell |
+| WP20 † ¶ | Pendants: base her three kinds; Great Pendant (0.55 a kind, Tier 3 0.575: follow-up to D196); Channel Pendant (two of one channel) |
+| WP21 † ¶ | Bells: her weapon of its kind strikes once more after her Attack; Great Bell; Toll Bell (+0.05 a grade each ring: follow-up to D196) |
 | WP22 † | Orbs from Tier 1, half a weapon's Might × tier; Great Orb; Twin Orb (a twin set) |
 | WP23 † | Insignias from Tier 1: sub-bosses and bosses +15%; Great Insignia; Onslaught (Slayer retired) |
 | WP24 | The kind cap: flat offense on one kind ≤ +68 × tier from the Pendant and Orb forms; weapon moons outside it (follow-up to D194) |
-| WP25 ✱ † | Presets per class and tier for both class branches' sets: single-kind forms on her Dual; her weapon moons as EP29 (follow-up to D194) |
+| WP25 ✱ † ¶ | Presets per class and tier for both class branches' sets: single-kind forms on her Dual, a hybrid's on her lead half (follow-up to D196); her weapon moons as EP29 (follow-up to D194) |
 | WP26 ✱ | Four products; recipes and amounts profession-progression's: 365 refined in every tier (re-checked) |
 | WP27 ✱ † | The save: v27 deletes, compensated by the grant (Craft Levels to 1, Speed Tickets for the time, PP19–PP20), families and forms in the slot; v28 branches, no stored partner |
 | WP28 † | Names: grade, Pure, Dual, Keen, Tempered, Evolved, partner, Branch Gem, the four families and their forms, signature accessory |
@@ -698,7 +748,7 @@ templates, tree viewer, weaknesses.
 | WP33 † | New: the signature accessory, ATK and M.ATK +0.2 a level × tier while worn; proposed in CP36's place |
 | WP34 † | New: accessory branches are forms, set freely once a slot's G5 opens them; no item |
 
-**3. Extra Stats Progression**: 29 calls, EP1–EP29; **approved (D194)**.
+**3. Extra Stats Progression**: 29 calls, EP1–EP29; **approved (D194)**, follow-ups to D196 logged against it (XC29).
 [extra-stats-progression.md](extra-stats-progression.md); pages: maps, grants, jewels, her moon.
 
 | Call | One line |
@@ -706,7 +756,7 @@ templates, tree viewer, weaknesses.
 | EP1 ‡ | Tier 1: the Planet and three moons (Prowess, Vigor, Guard), five nodes each: 20 nodes, every class the same |
 | EP2 | The Planet: +21 to all six core stats, × tier |
 | EP3 | A moon node is worth its grade; Guard gives both defenses |
-| EP4 | Vigor gives both pools, HP and MP |
+| EP4 ¶ | Vigor gives both pools, HP and MP; with SB18's base regen beside the pool (follow-up to D196) |
 | EP5 | A node opens with its jewel, in order, at Uma Lv 5g − 4 |
 | EP6 | Every open node counts; no active slots |
 | EP7 | Values × tier, rounded per node (Prowess's split and a Split node too); Limit start and evasion don't scale |
@@ -717,8 +767,8 @@ templates, tree viewer, weaknesses.
 | EP12 ‡ | Tier 3: a second weapon moon; no class constellations |
 | EP13 | The same core rebuilt each tier, × tier |
 | EP14 ‡ | Her moon in full: knack (Lv 16), lead on her calling channel's defense (Lv 36), × tier |
-| EP15 ‡ | Defense and sustain: no new values; MP from regen to the pool; Swiftness leaves |
-| EP16 ‡ | The foe budget's build part × tier; on curve, the same 20 core nodes for every class; weapon moons in Z4's term |
+| EP15 ‡ ¶ | Defense and sustain: no new values; MP from the pool and SB18's base regen (follow-up to D196); Swiftness leaves |
+| EP16 ‡ ¶ | The foe budget's build part × tier; on curve, the same 20 core nodes for every class; weapon moons in the toolbox terms, +27% and ×1.08 → ×1.48 (follow-up to D196) |
 | EP17 ‡ | Jewels: Planet I–V and Moon I–V in every tier, two kinds; the Halo Jewels retire |
 | EP18 ‡ | Recipes: Moon 4, the Planet 12 proposed; the Lapidary 120 · 140 · 160 an Uma, every class |
 | EP19 ‡ | The Observatory: one page in every tier, "Open n of 20 · 25 · 30", the weapon moons' chips |
@@ -731,9 +781,9 @@ templates, tree viewer, weaknesses.
 | EP26 ‡ | New: Tier 3's second weapon moon; Full + Split serves her three weapons |
 | EP27 ‡ | New: weapon moons outside the kind cap |
 | EP28 ‡ | New: Valor and Swiftness retire |
-| EP29 ‡ | New: weapon-moon presets, Tier 2 Split on her two most-used kinds, Tier 3 Full + Split |
+| EP29 ‡ ¶ | New: weapon-moon presets, Tier 2 Split on her two most-used kinds, Tier 3 Full + Split; a hybrid's on her lead half (follow-up to D196) |
 
-**4. Profession Progression**: 25 calls, PP1–PP25; **for review, the last of four.**
+**4. Profession Progression**: 25 calls, PP1–PP25; **approved (D195)**, the last of four.
 [profession-progression.md](profession-progression.md); pages: map, materials, flow, demand, the first launch.
 
 | Call | One line |
@@ -764,5 +814,31 @@ templates, tree viewer, weaknesses.
 | PP24 § | New: the grant's rate, ⌈Craft EXP ÷ 60⌉ an Uma, a ticket per 30 minutes of the manual's time (1,470 at Lv 50) |
 | PP25 § | New: the first launch's sheet once per world, an Account row, "Finish all" on a place page |
 
-**In all: 131 calls** (Class 43, Weapon 34, Extra Stats 29, Profession 25), and the frame's. The Uma Templates pass
-(variance.md's U1–U16) follows the balancing. Nothing is left for the owner to settle outside these reviews.
+**5. Stat balancing**: 18 calls, SB1–SB18; **approved (D196, 2026-10-25)**, its §13 follow-ups applied (XC29).
+[stat-balance.md](stat-balance.md); pages: [the summary](previews/balance-summary.html) (first),
+[damage and the foes](previews/balance-damage.html), [the sheets](previews/balance-sheets.html).
+
+| Call | One line |
+|---|---|
+| SB1 | The stat budget holds as the final rule: flat values × 1 · × 1.8 · × 2.6; every source's share within 2.3 points at each tier's Lv 50 |
+| SB2 | The analytic model is the pre-simulation yardstick: it reproduces the approved Lv 50 sheets, WP15's hit, WP31's ceilings and WP12's coverage |
+| SB3 | Tier 2's toolbox term: the foes' HP and DEF +15% → +27% by Lv 50; offense +10% kept |
+| SB4 | A Tier 3 term: the foes' HP and DEF × 1.08 → × 1.48, offense +10% |
+| SB5 | Bosses in Tiers 2–3 carry their tier's term × 1.1 on HP and DEF |
+| SB6 | Boss shields 6 · 8 · 9 → 6 · 9 · 10; regulars and sub-bosses unchanged |
+| SB7 | The damage stack and its ceilings kept (×1.50 · ×2.16 · ×2.49), no fallback applied; the Rift's fronts price the tuned party at 1.6 and 1.8 times the campaign's act |
+| SB8 | The Toll Bell +0.02 → +0.05 a grade each ring; the Great Pendant 0.5 → 0.55 a kind (Tier 3 0.575); the Tier 1 Orb kept |
+| SB9 | Channel parity holds: every family within 0.4 points between a Brawler and a Mage, read at an equal Attack share |
+| SB10 | A hybrid's single-kind accessory forms and her Full weapon moon go on her lead half's kinds |
+| SB11 | The Summoner's Arms hand 0.56 → 0.48 (her Tome hand 0.58 kept) |
+| SB12 | Paladin and Cleric kept: equal in Tier 1, the branch pairs within ±10% |
+| SB13 | Armor kept: a regular's hit 18.7% · 18.3% · 18.1% of a Brawler's HP at Lv 50, about 20% with the terms' offense |
+| SB14 | MP: no pool value changes; the knobs re-ranked (SB18's share a depth, Vigor's MP rate, legs, the Flourish); the Springs test measures region pace |
+| SB15 | The signature accessory stays +0.2 a level × tier (+4.3–6.1% at Lv 50), in the affinity's place |
+| SB16 | Skill Ranks' band kept; the re-baseline reads Class Rank on the real pace (2E) |
+| SB17 | The follow-ups land as logged edits against D192–D194 (D195 untouched); the simulation takes §12's expected results |
+| SB18 | New: a base MP regen for every Uma, 0.8% of her max MP a round for each skill depth open (4% from Class Rank 40), a rule in every fight, never an item |
+
+**In all: 149 calls** (Class 43, Weapon 34, Extra Stats 29, Profession 25, Stat balancing 18), and the frame's. **Next:
+the Uma Templates pass** (variance.md's U1–U16), with the template budget the balancing measured (stat-balance §8).
+Nothing is left for the owner to settle outside these reviews.

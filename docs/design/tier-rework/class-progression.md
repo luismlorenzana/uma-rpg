@@ -18,6 +18,14 @@
 > one offense moon split by her class (EP23), so §9's ATK and M.ATK for the four between follow its split. CP36's note
 > (her moon's node II on defense) stands. Each edited spot says "Follow-up to D194 (Extra Stats), 2026-10-24".
 >
+> **Follow-up to D196 (stat balancing), 2026-10-25** (logged against D192; values only, as
+> [stat-balance §13](stat-balance.md#13-if-approved-the-follow-ups-by-doc) lists them): **CP8's bosses 6 · 9 · 10**
+> (SB6; §4.4, §15); **CP9: the Summoner's Arms hand 0.56 → 0.48** (SB11; §2.1, §2.2, §6.5, §7.2), with **a hybrid's
+> single-kind accessory forms and Full weapon moon on her lead half** (SB10; §5.2, §9, CP11); **CP32: the re-baseline
+> reads Class Rank on the real pace** (SB16; §6.1, §15); **§15's pacing** names the foes' toolbox terms (SB3–SB5);
+> **§6.6** puts the base MP regen (SB18) beside skill MP; §9's sheet takes the Great Pendant's 0.55 (SB8). Each edited
+> spot says "Follow-up to D196 (stat balancing), 2026-10-25".
+>
 > **Authored 2026-10-23; revised after the owner's first review and again after his second pass, both 2026-10-24.
 > Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.1). It absorbs
 > [classes.md](classes.md) and [skill-trees.md](skill-trees.md), which stay as history, and supersedes every CL and SK
@@ -136,7 +144,9 @@ weapon-progression's fixed partners, Tier 3's Evolved and every family in every 
 #### Later tiers at a glance
 
 **What is authored for Tiers 2 and 3** (the owner, 2026-10-24: "let me know what you have authored for later tiers"),
-every item a draft priced by its tier's simulation (Tier 2's term, Z4; Tier 3's with its design):
+every item a draft priced by its tier's simulation (Tier 2's term, Z4; Tier 3's with its design; *follow-up to D196
+(stat balancing), 2026-10-25: both terms sized, Tier 2's +27% and Tier 3's ×1.08 → ×1.48 on the foes' HP and DEF, SB3,
+SB4*):
 
 | Piece | Tier 2 | Tier 3 | Authored in |
 |---|---|---|---|
@@ -148,8 +158,8 @@ every item a draft priced by its tier's simulation (Tier 2's term, Z4; Tier 3's 
 | **Extra Stats** | **A weapon moon** (Full +90 on one kind or Split +63 on two: +50 × 1.8 Full), outside the kind cap. *Follow-up to D194 (Extra Stats), 2026-10-24: the Halo and Valor retire* | **A second weapon moon** (Full +130, Split +91); Full + Split serves all three weapons. *Follow-up to D194: the Halo's second kind and Swiftness retire* | [extra-stats-progression §4](extra-stats-progression.md#4-tier-2-a-weapon-moon), [§5](extra-stats-progression.md#5-tier-3-the-second-weapon-moon) |
 | **Her template** | The ★ **signature tip** on her affinity kind's tree | At both of its tip forks | [§6.9](#69-her-template-on-the-trees-affinity-cp36), [variance §7](variance.md#7-skill-trees-the-flourish-and-the-signature-tip) |
 | **Limit Breaks** | **LB+** at Bond 10 (24 extra effects) | Kept | [§8](#8-halls-of-heroes-and-limit-breaks-cp28-cp35), [tier2-classes §7.2](../tier2-classes.md) |
-| **Foes** | Regulars weak to **one kind**; shields +1 (Z2) | Sub-bosses one kind too; bosses keep two | [§4.2](#42-tiers-2-and-3-the-list-narrows-by-rank-cp6) |
-| **Skill MP** | ×1.7 | ×2.4 | [§6.6](#66-new-nodes-by-rule) |
+| **Foes** | Regulars weak to **one kind**; shields +1 (Z2), bosses 9 (*follow-up to D196: was 8*) | Sub-bosses one kind too; bosses keep two, shields 10 (*was 9*) | [§4.2](#42-tiers-2-and-3-the-list-narrows-by-rank-cp6), [§4.4](#44-locks-and-shields-cp8) |
+| **Skill MP** | ×1.7; MP back a round as in Tier 1, a share of her bar (SB18, *follow-up to D196*) | ×2.4; the same | [§6.6](#66-new-nodes-by-rule) |
 
 Not yet authored: Tier 3's numbers (its simulation sets them), and Tier 3's world beyond the weakness rule.
 
@@ -182,20 +192,22 @@ magical, the two hybrids 70/30 each way as a mirror, two healers who act at half
 | **Brawler** | Physical | 3 Arms | 100 / 0 | Raw physical burst: one foe hard, or a crowd with her Axe | ×1, MP ×1 | 2× | Front runners; Pace sprinters with Power over Wit |
 | **Mage** | Magical | 3 Tomes | 0 / 100 | Raw magic; the element ring | ×1, MP ×1 | 2.4× | Pace chasers, Wit at or over Power, **or picked** ([§10](#10-the-calling-pick)) |
 | **Spell Blade** | Physical hybrid | 2 Arms + 1 Tome | 70 / 30 | The shield chipper: every act a blade and a spell, the blade landing one extra hit | Arms ×0.72 + Tome ×0.44; MP ×0.5 a half | 2.2× | Pace chasers, Power over Wit, **or picked** |
-| **Summoner** | Magical hybrid | 1 Arm + 2 Tomes | 30 / 70 | Crowds: her Tome summon lingers and strikes every foe in farewell. No support | Tome ×0.58 + Arms ×0.56; MP ×0.5 a half; the farewell on top | 2.2× | End closers; Wit-led closers |
+| **Summoner** | Magical hybrid | 1 Arm + 2 Tomes | 30 / 70 | Crowds: her Tome summon lingers and strikes every foe in farewell. No support | Tome ×0.58 + Arms ×0.48 (*follow-up to D196: was 0.56*); MP ×0.5 a half; the farewell on top | 2.2× | End closers; Wit-led closers |
 | **Paladin** | Healer | 2 Arms + 1 Tome | Half hand | Barriers, Aegis, debuffs, Valkyrie's Oath; heals from ATK | ×0.5, MP ×0.6 | 1.5× | Late surgers, Power over Wit, **or picked** |
 | **Cleric** | Healer | 1 Arm + 2 Tomes | Half hand | Mends, Regen, drain, Rebirth; heals from M.ATK | ×0.5, MP ×0.6 | 1.5× | Late surgers, Wit at or over Power, **or picked** |
 
 ### 2.2 The hands and leans (CP9)
 
-Unchanged by this doc (H63, D187); the Tier 1 simulation re-checks them on the full template.
+Unchanged by this doc (H63, D187); the Tier 1 simulation re-checks them on the full template. *Follow-up to D196 (stat
+balancing), 2026-10-25: the Summoner's Arms hand 0.56 → 0.48 (SB11), the mirror's knob as CP9 names it; every other hand
+and lean stands.*
 
 | Class | HP | ATK | M.ATK | DEF | M.DEF | MP | Hand |
 |---|---|---|---|---|---|---|---|
 | Brawler | ×1.15 | ×1.1 | ×0.9 | ×1.1 | ×0.9 | ×0.8 | ×1 |
 | Mage | ×0.9 | ×0.9 | ×1.15 | ×0.9 | ×1.1 | ×1.3 | ×1 |
 | Spell Blade | ×1 | ×1.1 | ×0.95 | ×1 | ×1 | ×1 | Arms 0.72 + Tome 0.44 (1.16 a turn), extra hit on the Arms half |
-| Summoner | ×1 | ×0.95 | ×1.1 | ×1 | ×1 | ×1 | Tome 0.58 + Arms 0.56 (1.14), farewell on every foe |
+| Summoner | ×1 | ×0.95 | ×1.1 | ×1 | ×1 | ×1 | Tome 0.58 + Arms 0.48 (1.06; was 0.56, 1.14), farewell on every foe |
 | Paladin | ×1 | ×1 | ×0.8 | ×1.15 | ×1 | ×1.3 | 0.5; mends and Barriers from ATK |
 | Cleric | ×1 | ×0.8 | ×1 | ×1 | ×1.15 | ×1.3 | 0.5; mends and Barriers from M.ATK |
 
@@ -203,7 +215,12 @@ Unchanged by this doc (H63, D187); the Tier 1 simulation re-checks them on the f
   slot count. Her lead half picks between two trees, her minor half draws on one. Auto alternates lead, minor, lead.
 - **The mirror** (XR5, kept): on the full template (three weapons, one accessory, the full Extra Stats map) the Spell
   Blade and the Summoner deal equal damage a turn within ±5%, each 70/30 ± 5; the knob is the hands, the Summoner's
-  Arms hand first, never the map. Paladin against Cleric sustain within ±10%.
+  Arms hand first, never the map. Paladin against Cleric sustain within ±10%. *Follow-up to D196 (stat balancing),
+  2026-10-25: measured on the new maps ([stat-balance §5.1](stat-balance.md#51-spell-blade-against-summoner)), Prowess's
+  split gives the Summoner's Arms half +30 ATK and the presets stacked flat offense on her lone half, so the mirror
+  drifted to 0.88 and her split to 57/43 by Lv 50. With her Arms hand at 0.48 and a hybrid's single-kind forms and Full
+  moon on her lead half (SB10, SB11) the Tier 1 mirror holds within +6/−3% and both splits return to 70/30 ± 5 (71/29,
+  68/32). Paladin against Cleric holds (SB12: equal in Tier 1; the branch pairs −6.5% and +7%).*
 - **The healers' 2 + 1 sharpens classes v2's split:** the Paladin's two Arms give Barriers and debuffs and her one Tome
   mends; the Cleric's two Tomes mend and buff and her one Arm Barriers.
 
@@ -488,7 +505,7 @@ Lightning twins" are the Lance and the Thunder Tome.
 
 **Over the world's 19 biomes and 48 signatures** (a pair's two leads count a half each): the Fire twins answer 11,
 the Ice twins 11, the Lightning twins 9.5, the Dark twins 8, the Light twins 6.5, Twilight 2. The
-[weaknesses page](previews/class-weaknesses.html#biomes) lists every biome.
+[weaknesses page](previews/class-weaknesses.html#world) lists every biome.
 
 **Why twins:** the Arm is read from the element, so one ring teaches both channels; each channel always has an answer
 on every foe; a hybrid holding a twin set (a Lance and a Thunder Tome, the Spell Blade's default) lands both halves weak.
@@ -553,11 +570,16 @@ party may enter.
   |---|---|---|---|
   | Regulars | 2–3 (twins, 2.47 answers) | 3–4 (one kind, 2.0: Z2's +1) | 3–4 (one kind, 2.30) |
   | Sub-bosses | 5 | 7 (twins, 3.53) | 6 (one kind, 2.30: Z2's floor) |
-  | Bosses | 6 | **8** (twins, 3.53) | **9** (twins, 3.67) |
+  | Bosses | 6 | **9** (twins, 3.53) | **10** (twins, 3.67) |
 
   The simulation sets the final numbers (README §9.5 item 3); a boss's locks stay drawn from her twins.
   *Follow-up to the weapon review, 2026-10-24: answers re-run on the fixed partners (WP12; were 3.30 · 3.76 for bosses,
   2.34 for Tier 3's one kind); the shields hold, a shield per answer within ±0.5 of Tier 1's.*
+  *Follow-up to D196 (stat balancing), 2026-10-25: bosses 8 → **9** and 9 → **10** (SB6). Answers hold, chips don't:
+  the partner table points every Ring weapon at a Light/Dark kind, the multi-hit ones (a Bow's or a Light Tome's three
+  hits, a Katana's two), so a Tier 2 or 3 boss's new answers chip two or three a turn each and her Break came about half
+  a round sooner than Tier 1's (0.54 and 0.51 rounds, past ±0.5). One more shield puts them back inside (0.41 and 0.39
+  sooner; a Paladin party 0.18 and 0.17); regulars and sub-bosses hold ([stat-balance §10](stat-balance.md#10-shields-against-answers)).*
 
 ### 4.5 Balanced, checked (CP4, CP7)
 
@@ -643,8 +665,9 @@ from Tier 2, Insignias in Tier 3).*
 (WP25):** the forms the simulation plays for her set, the model's campaign picks, one of each family; her weapon moons
 by extra-stats-progression EP29 (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used, Split on the
 other two; *follow-up to D194 (Extra Stats), 2026-10-24*: was the Halo's kind on her set's first slot, two in Tier 3);
-a single-kind form (a Great Orb, a Great Bell) on her Dual, or her lone Arm or
-Tome, where it pays; every kind under the kind cap; from Tier 2 they follow her class branch's set. *Changed in
+a single-kind form (a Great Orb, a Great Bell) on her Dual where it pays, **a hybrid's on her lead half** (the kind
+that twins her lone weapon; *follow-up to D196 (stat balancing), 2026-10-25: was "or her lone Arm or Tome", SB10*);
+every kind under the kind cap; from Tier 2 they follow her class branch's set. *Changed in
 cross-check (2026-10-24): named here as weapon-progression decided them. Follow-up to the weapon review, 2026-10-24:
 WP25's new presets, every family open from Tier 1 (so the Summoner's and the Cleric's Tier 1 preset is an Orb) and the
 branch forms from Tier 2; the first draft's named Pendants (Elemental, Arcane, Main Arms, Secondary Arms, the Twin
@@ -657,7 +680,7 @@ Pendants) retired into the forms that read her slots.*
 | Brawler | Arms: Greatsword · Arms: Axe · Arms: Lance | Physical | Bell (Greatsword) |
 | Mage | Tome: Fire · Tome: Blizzard · Tome: Thunder | Magical | Pendant (her three kinds) |
 | Spell Blade | Arms: Katana · Arms: Lance · Tome: Thunder | Physical | Pendant |
-| Summoner | Tome: Dark · Tome: Light · Arms: Bow | Magical | Orb (Bow) |
+| Summoner | Tome: Dark · Tome: Light · Arms: Bow | Magical | Orb (Light; *follow-up to D196: was her Bow*) |
 | Paladin | Arms: Greatsword · Arms: Axe · Tome: Light | Physical | Pendant |
 | Cleric | Tome: Light · Tome: Blizzard · Arms: Bow | Magical | Orb (Blizzard) |
 
@@ -671,7 +694,7 @@ grades reset), its accessories with it:
 | Brawler | **Berserker** · Ring · Greatsword, Axe, Lance · Great Bell (Lance, her Dual), Channel Pendant (Axe + Lance) | **Warlord** · Light/Dark · Bow, Katana, Axe · Great Bell (Bow, her Dual), Channel Pendant (Bow + Axe) | Physical |
 | Mage | **Sage** · Ring · Fire, Blizzard, Thunder · Channel Pendant (Fire + Ice), Onslaught Insignia | **Sorcerer** · Light/Dark · Light, Dark, Blizzard · Channel Pendant (Light + Ice), Onslaught Insignia | Magical |
 | Spell Blade | **Rune Knight** · Ring · Katana, Lance, Thunder · Twin Orb (the Lightning twins: her Lance and Thunder), Onslaught Insignia | **Blademaster** · Light/Dark · Katana, Bow, Dark · Twin Orb (the Dark twins: her Katana and Dark), Onslaught Insignia | Per piece (preset physical) |
-| Summoner | **Warlock** · Light/Dark · Dark, Light, Bow · Twin Orb (the Light twins: her Bow and Light), Onslaught Insignia | **Conjurer** · Ring · Fire, Thunder, Greatsword · Great Orb (Greatsword, her Dual), Onslaught Insignia | Per piece (preset magical) |
+| Summoner | **Warlock** · Light/Dark · Dark, Light, Bow · Twin Orb (the Light twins: her Bow and Light), Onslaught Insignia | **Conjurer** · Ring · Fire, Thunder, Greatsword · Great Orb (Fire, her lead half; *follow-up to D196: was her Dual Greatsword*), Onslaught Insignia | Per piece (preset magical) |
 | Paladin | **Guardian** · Ring · Greatsword, Axe, Light · Great Pendant, Great Orb (Light, her Dual) | **Templar** · Light/Dark · Bow, Katana, Light · Channel Pendant (Bow + Katana), Onslaught Insignia | Per piece (preset physical) |
 | Cleric | **Bishop** · Light/Dark · Light, Blizzard, Bow · Channel Pendant (Light + Ice), Onslaught Insignia | **Oracle** · Ring · Light, Fire, Greatsword · Great Pendant, Twin Orb (the Fire twins) | Per piece (preset magical) |
 
@@ -682,13 +705,18 @@ grades reset), its accessories with it:
 |---|---|---|---|---|---|
 | Brawler | Unbound Fury · Warlord's Reckoning | Unstoppable | 1 | Tier 2's + Onslaught Insignia | Tier 2's + Onslaught Insignia |
 | Mage | Total Convergence · Annihilation | Resonance | 1 | Tier 2's + Great Bell (Fire, her Dual) | Tier 2's + Great Bell (Light, her Dual) |
-| Spell Blade | Rune Deluge · Eclipse Cut | Spellbind | 2 | Great Pendant, Great Orb (Lightning), Onslaught Insignia | Great Pendant, Great Orb (Dark), Onslaught Insignia |
-| Summoner | Final Pact · Host of Farewells | Menagerie | 2 | Great Pendant, Great Orb (Bow), Onslaught Insignia | Tier 2's + Great Pendant |
+| Spell Blade | Rune Deluge · Eclipse Cut | Spellbind | 2 | Great Pendant, Great Orb (Lance; *was Lightning*), Onslaught Insignia | Great Pendant, Great Orb (Katana; *was Dark*), Onslaught Insignia |
+| Summoner | Final Pact · Host of Farewells | Menagerie | 2 | Great Pendant, Great Orb (Light; *was Bow*), Onslaught Insignia | Tier 2's (the Great Orb on her Fire) + Great Pendant |
 | Paladin | Steadfast Vow · Dawnshield | Last Stand | 2 | Tier 2's + Onslaught Insignia | Tier 2's + Great Orb (Light) |
 | Cleric | Mercy Chorus · Revelation | Overflow | 2 | Tier 2's + Great Orb (Bow) | Great Pendant, Great Orb (Greatsword, her Dual), Onslaught Insignia |
 
 *Follow-up to the weapon review, 2026-10-24: every tier's accessories are WP25's new presets (weapon-progression §5.8);
-the campaign damage they add, Tier 1 · 2 · 3: 7–9% · 18–22% · 27–34%.*
+the campaign damage they add, Tier 1 · 2 · 3: 7–9% · 18–22% · 27–34%.* *Follow-up to D196 (stat balancing),
+2026-10-25: the hybrids' single-kind forms move to their lead half (SB10: the Summoner's Orb and Great Orb on her Light,
+the Conjurer's on her Fire, the Spell Blade's Great Orb on her Lance, the Blademaster's on her Katana), and their weapon
+moons with them (EP29). That is the price of 70/30: the Summoner's and the Conjurer's presets add about 4 points less,
+the Great Pendant's 0.55 (SB8) about a point more where a preset wears it (5–9% · 16–23% · 27–34% in all), and the
+mirror holds (§2.2).*
 
 The [templates page](previews/class-templates.html) draws all eighteen sheets with their slots, and every class's two
 Tier 2 sets ([focus](previews/class-templates.html#focus)).
@@ -763,7 +791,11 @@ Ranks, automatically, without skill point allocation?" **Yes.**
   Breaks (the halls' power at her open depth, as today) and template nodes.
 - **Where it shows:** Lv 34–50 on one class, past Class Rank 48, every skill she holds sits at Rank 5, 5% above
   today's. The re-baseline measures it at Lv 50 (README §9.5 item 1, inside its 3 points); if it lands outside, the
-  foe budget takes it back, as with the first round's Orb.
+  foe budget takes it back, as with the first round's Orb. *Follow-up to D196 (stat balancing), 2026-10-25: **the
+  re-baseline reads Class Rank on the real pace** (2E a win: Class Rank 20 at Uma Lv 13, 50 at Lv 34), not Class Rank =
+  her level (SB16). Measured: ×1.000 on the balance party over Lv 1–50, ×1.014 at a real player's pace (×1.05 from
+  Lv 34); the bigger gap is the depth she opens sooner (Lv 20: depth 4 against 3), which the foes never priced, so the
+  re-baseline measures what players hold ([stat-balance §9](stat-balance.md#9-skill-ranks-neutrality)).*
 - **Engine:** v16. A fight's input carries each skill's rank multiplier, frozen at the fight's start (as Extra Stats
   points are); nothing stored in the save.
 
@@ -950,7 +982,7 @@ Every skill is a single-target half; her Arms half lands one extra hit; hands 0.
 #### Summoner
 
 A Tome summon lingers at 0.3 and strikes every foe in farewell when her next pair comes; an Arms summon arrives and
-strikes, and leaves nothing. Hands 0.58 and 0.56, MP ×0.5 a half. No support.
+strikes, and leaves nothing. Hands 0.58 and 0.48 (*follow-up to D196 (stat balancing), 2026-10-25: her Arms hand was 0.56, SB11*), MP ×0.5 a half. No support.
 
 | Tree | Trunk: D1 · D2 | A, the core (D3 · D4 · D5) | B, Tier 1 | C, from Tier 2 | Capstones D6, Tier 3: A · B · C |
 |---|---|---|---|---|---|
@@ -1018,6 +1050,13 @@ binds them (reach, hits, support or Breaks).
 
 **Skill MP by tier:** ×1, ×1.7, ×2.4 (tier2-classes A10), which the MP bar matches under SB1 (a Brawler's 173 → 296 →
 419: ×1.71, ×2.42).
+
+**MP back a round** (SB18; *follow-up to D196 (stat balancing), 2026-10-25*): every Uma regains **0.8% of her max MP at
+the end of each round for each skill depth her class has open** (0.8 · 1.6 · 2.4 · 3.2 · 4% at Class Rank 1 · 10 · 20 ·
+30 · 40), rounded, at least 1; a rule in every fight, never an item. It is tier-free under SB1 (her bar and her skills'
+MP both grow × 1.7–1.8 and × 2.4–2.6) and steps with her depths, so it stays a share of what she casts: a Tier 1 Mage at
+Lv 50 gets 12 of her 296 back a round against her deepest skill's 26. The hands' MP (×1, ×0.5 a half, ×0.6) are
+unchanged.
 
 ### 6.7 The root (CP24)
 
@@ -1332,7 +1371,9 @@ foe's); MP is full-turn, before her hand, at Tier 1's scale (×1.7 in Tier 2).
 | **CR 40** | **Runic Storm**: her pair, 4.6: her Arms half on one foe, her Tome half on every foe at the area share. MP 30 | **Blade Dance** (second pass: her kinds' own hits, no extra ones; was 3 and 2): her pair at random foes, 4.83. MP 26 |
 | **Tier 3 · CR 50** | **Rune Deluge**: her pair, 5.6: Arms half on one foe, Tome half on every foe at the area share, a foe weak to it at full. MP 34 | **Eclipse Cut** (second pass; was Thousand Cuts, three extra hits): her pair on one foe, 5.6; her Arms half ignores the unbroken halving; ×1.3 on a Broken foe. MP 30 |
 
-#### Summoner: Warlock · Conjurer (her pair: a focus Tome and her Arm; hands 0.58 + 0.56; no party support)
+#### Summoner: Warlock · Conjurer (her pair: a focus Tome and her Arm; hands 0.58 + 0.48; no party support)
+
+*Follow-up to D196 (stat balancing), 2026-10-25: her Arms hand 0.56 → 0.48 (SB11).*
 
 | | **Warlock**, branch 1 (preselected) | **Conjurer**, branch 2 |
 |---|---|---|
@@ -1527,7 +1568,7 @@ same numbers as [weapon-progression §4.4](weapon-progression.md#44-her-sheet-at
   (Extra Stats), 2026-10-24: Prowess for Strength and Sorcery; the weapon moons for the Halo (+61, then +88).*
 - **Accessories:** her preset's (WP25, §5.2): Tier 1 one base form, Tier 2 two branch forms, Tier 3 three, each at
   its G10 value × tier; the single-kind forms (a Great Orb, a Great Bell, a Twin Orb) on her Dual or her other kinds. Flat offense on one kind stops at the kind cap (+68 · +122 · +177, WP24); no preset reaches
-  it on her lead kind (at most 163 of 177). *Follow-up to the weapon review, 2026-10-24: WP25's new presets (were a
+  it on her lead kind (at most 165 of 177; *follow-up to D196: was 163, the Great Pendant's +51*). *Follow-up to the weapon review, 2026-10-24: WP25's new presets (were a
   Pendant or a Bell, + an Orb on her first slot's kind, + an Insignia, the Orb and the Halo filling the cap).*
 - **Her template apart** (her moon and the affinity: the Uma Templates pass's, outside the foe budget, EP14, CP36).
   The focus (+15%), the affinity (+6%) and an Insignia are percentages on damage, not stats: they sit in the damage
@@ -1548,28 +1589,34 @@ moons; HP, MP, DEF and M.DEF don't move (extra-stats-progression §8.2).*
 |  | 3 | 3,068 | 719 | 298 | 509 | 480 | 521 | 891 | 534 |
 | **Spell Blade** (Katana) | 1 | 1,337 | 247 | **183** | **130** | 196 | 192 | 265 | 265 |
 |  | 2 | 2,311 | 424 | **328** | **231** | 351 | 344 | 513 | 376 |
-|  | 3 | 3,292 | 602 | **472** | **335** | 507 | 496 | 789 | 486 |
+|  | 3 | 3,292 | 602 | **472** | **335** | 507 | 496 | 791 | 487 |
 | **Summoner** (Dark) | 1 | 1,337 | 247 | **130** | **183** | 196 | 192 | 251 | 251 |
 |  | 2 | 2,311 | 424 | **231** | **328** | 351 | 344 | 513 | 376 |
-|  | 3 | 3,292 | 602 | **335** | **472** | 507 | 496 | 789 | 486 |
+|  | 3 | 3,292 | 602 | **335** | **472** | 507 | 496 | 791 | 487 |
 | **Paladin** (Greatsword) | 1 | 1,337 | 296 | **175** | **111** | 212 | 192 | 257 | 257 |
-|  | 2 | 2,311 | 507 | **313** | **199** | 379 | 344 | 529 | 377 |
-|  | 3 | 3,292 | 719 | **453** | **286** | 548 | 496 | 770 | 462 |
+|  | 2 | 2,311 | 507 | **313** | **199** | 379 | 344 | 532 | 379 |
+|  | 3 | 3,292 | 719 | **453** | **286** | 548 | 496 | 772 | 463 |
 | **Cleric** (Light) | 1 | 1,337 | 296 | **111** | **175** | 196 | 207 | 243 | 243 |
 |  | 2 | 2,311 | 507 | **199** | **313** | 351 | 370 | 547 | 387 |
 |  | 3 | 3,292 | 719 | **286** | **453** | 507 | 534 | 835 | 487 |
 
 In bold, what Prowess moved (*follow-up to D194, 2026-10-24*; the first draft: Spell Blade 192 · 343 · 495 and 151 · 270
-· 390, Summoner mirrored; Paladin 181 · 324 · 468 and 135 · 242 · 349, Cleric mirrored).
+· 390, Summoner mirrored; Paladin 181 · 324 · 468 and 135 · 242 · 349, Cleric mirrored). *Follow-up to D196 (stat
+balancing), 2026-10-25: the Great Pendant's 0.55 (Tier 3 0.575, SB8) adds +3 in Tier 2 and +2 in Tier 3 on every kind a
+preset's Great Pendant reaches (the Paladin 529 → 532 and 770 → 772, the Spell Blade and the Summoner 789 → 791; flat
+drafts +2 and +1); the hybrids' presets on their lead half (SB10) move only their other kinds (weapon-progression
+§4.4), so no other lead-kind cell moves.*
 
 - **The lead kind's accessory offense** (*follow-up to the weapon review, 2026-10-24: the offense columns follow WP25's
   new presets*): Tier 1 the Pendant's +14 for the Mage, the Spell Blade and the Paladin; 0 for the Brawler (her Bell adds
-  a hit, not offense), the Summoner (her Orb on her Bow) and the Cleric (her Orb on her Blizzard). Tier 2 her weapon
+  a hit, not offense), the Summoner (her Orb on her Light, her lead half's other Tome: *follow-up to D196, SB10; was
+  her Bow*) and the Cleric (her Orb on her Blizzard). Tier 2 her weapon
   moon's Split +63 (every class's preset Splits on her lead kind), with the Mage's and the Cleric's Channel Pendant +49
-  and the Paladin's Great Pendant +31; the single-kind forms sit on her Dual or her other kinds. Tier 3 her weapon moons'
+  and the Paladin's Great Pendant +34 (*follow-up to D196: was +31*); the single-kind forms sit on her Dual or her other
+  kinds (a hybrid's on her lead half's other kind). Tier 3 her weapon moons'
   Full +130 (Mage, Cleric) or Split +91 (Brawler, Spell Blade, Summoner, Paladin), with a Channel Pendant +75 (Mage,
-  Cleric) or a Great Pendant +49 (Spell Blade, Summoner, Paladin). The flat drafts take each form's Tier 1 share
-  (Channel 27 · 29, Great Pendant 17 · 19) and the moon's Tier 1 value (Split +35, Full +50). *Follow-up to D194 (Extra
+  Cleric) or a Great Pendant +51 (Spell Blade, Summoner, Paladin; *was +49*). The flat drafts take each form's Tier 1 share
+  (Channel 27 · 29, Great Pendant 19 · 20, *was 17 · 19*) and the moon's Tier 1 value (Split +35, Full +50). *Follow-up to D194 (Extra
   Stats), 2026-10-24: the weapon moons replace the Halo's +61 · +88 (flat draft +34).* Before the review: 587 · 849 for
   the Brawler, the Orb and the Halo filling the cap.
 - **The build's share holds:** a Brawler's HP is 27% build at Tier 1 and 29% at Tier 3 (the flat drafts: 27% → 14%);
@@ -1748,23 +1795,34 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 
 - **Class progression keeps today's pace:** Class EXP 2E a win, the same depth gates, no points to save. A pick is free
   and instant. **Skill Ranks add steps, not power:** a rank every 2 Class Ranks, the depth's average unchanged (CP32);
-  past Class Rank 48 her skills sit 5% over today's, which the Lv 50 re-baseline measures.
+  past Class Rank 48 her skills sit 5% over today's, which the Lv 50 re-baseline measures, **on the real Class Rank
+  pace** (2E: Class Rank 50 at Uma Lv 34; *follow-up to D196 (stat balancing), 2026-10-25, SB16*).
 - **Damage a turn:** an Uma acts once a turn whatever she holds. **The weak-act share falls** from nearly all (five
   weapons answer most lists) to about half on the owner's defaults (one Uma: 34–66%; a hybrid on her twin set lands
   both halves), while every foe keeps at least two answers in the campaign's default party and the Rift's guided
   builds. Breaks come slower; the simulation re-sets shields (§4.4, drafts: sub-boss 5 · 7 · 6,
-  boss 6 · 8 · 9 by tier) so rounds to the first Break stay within ±0.5 of today's at Lv 10, 30, 50.
+  boss 6 · 9 · 10 by tier; *follow-up to D196: bosses were 6 · 8 · 9, SB6*) so rounds to the first Break stay within
+  ±0.5 of today's at Lv 10, 30, 50.
 - **The re-baseline** (README §9.5 item 1): an on-curve party (three default weapons, branch A, one accessory at its
   draft value, the full map) wins every Tier 1 stage within 3 points of today's table; what the damage-oriented
-  accessories add (weapon-progression.md) goes back through the foe budget, as the first round's Orb did.
-- **The hybrids and healers:** 70/30 ± 5, the mirror ±5%, Paladin against Cleric ±10%, on full maps (§2.2).
+  accessories add (weapon-progression.md) goes back through the foe budget, as the first round's Orb did. *Follow-up
+  to D196 (stat balancing), 2026-10-25:* its balance party reads Class Rank on the real pace (2E), not Class Rank = her
+  level (CP32, SB16), plays the base MP regen (SB18), and expects Tier 1's build within 2% of today's for five classes
+  (stat-balance §3.7, §12).
+- **The hybrids and healers:** 70/30 ± 5, the mirror ±5%, Paladin against Cleric ±10%, on full maps (§2.2). *Follow-up
+  to D196: with the Summoner's Arms hand 0.48 and the hybrids' presets on their lead half the model holds the Tier 1
+  mirror within +6/−3%, splits 71/29 and 68/32 (SB10, SB11).*
 - **The fronts:** inside rift §11's bands with three weapons and twins; no single Uma Breaks a Duel boss in one act
   (each class's best default act checked).
 - **Branches:** a B or C branch beats A by 10–20% in its context; any mix of branches within ±5 points of win rate of
   all-A; a Sweep Spell Blade or a Hunt Summoner within ±15% of the mirror in its context; the Spell Blade's Pierce B
   (CP42) the same 10–20% on long shields.
 - **Tier 2:** the class branches (the focus and class skills), the accessories, the weapon branches, branch C, the Break
-  tips, the affinity and the narrowed regulars are priced in Tier 2's term (Z4, XR15). **The focus:** each class's two
+  tips, the affinity and the narrowed regulars are priced in Tier 2's term (Z4, XR15). *Follow-up to D196 (stat
+  balancing), 2026-10-25:* **Tier 2's term +27%, Tier 3's 1.08 → 1.48, bosses × 1.1 (SB3–SB5)** on the foes' HP and
+  DEF, offense +10% by Lv 50: measured, the four docs' tools compound to +51% an act in Tier 2 and +88% in Tier 3 (the
+  focus +12%, the weapon branches +5–10%, the accessories +13–25%, the weapon moons +14–23%), and the terms bring a
+  party's pace back to 1.03–1.11× Tier 1's at every level, Z4's ±10% at its edge ([stat-balance §3](stat-balance.md#3-the-damage-stack-and-the-foe-budget)). **The focus:** each class's two
   branches within ±5% of each other across the world's regions, and each ahead by 10–20% in its own (a Ring branch on
   the ring's regions, a Light/Dark one on the Light/Dark regions); the three parties of §7.2 within 3 points of the
   defaults' win rate in their regions or better; the damage stack (WP31: Pure, focus, affinity, accessories, weapon moons) on one
@@ -1785,10 +1843,10 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CP5** Tier 1 weaknesses | **Her twins:** the element that beats hers on the ring and its twin Arm; two elements read her lead first; Light + Dark the Bow and the Katana | One kind by role; the ring's element and a drawn Arm; strikes | One rule, two icons, an answer in each channel on every foe; the Arm read from the element |
 | **CP6** Later tiers | **Narrow by rank:** Tier 2 regulars to one kind (the element for strikers and guards, the Arm for casters and skirmishers); Tier 3 sub-bosses too; **bosses keep their twins** | Twins in every tier; one kind for all; strike × channel | Depth for the forms and picks; every Uma can always answer a boss |
 | **CP7** The Rift's fronts | **Changed after owner review, 2026-10-24.** **The Rift is where specialized parties come in:** today's counts and wards; the Duel's and the Horde's draws as twins; Arcane to one element from Tier 2; the Horde narrows by rank; **each path's guided build** (composition and weapons, §2.3) answers each of its Tier 1 foes at least twice and holds every kind its later foes ask | Defaults only (the Duel and Horde miss sets); independent draws | Rebuilt and re-specced per path, as the owner plays it; swaps are free, so a build costs only unraised grades |
-| **CP8** Locks and shields | Locks as today (kinds from her weaknesses; the Duel's mixed sets); shields as today, re-measured for the lower weak share (about half on the owner's defaults; draft sub-boss 6 → 5, boss 8 → 6). *Changed in cross-check (2026-10-24), with weapon-progression's WP12:* **shields per tier grow with their foe's answers, never below Tier 1's + 1 (Z2): bosses 6 · 8 · 9, sub-bosses 5 · 7 · 6, regulars 2–3 · 3–4 · 3–4** (§4.4) | Shields by strike (CL9, retired); a lock that breaks to any weak act (CL8) | No engine change; the simulation holds rounds to the Break |
-| **CP9** The hybrids and healers on 2 + 1 | Hands unchanged; the mirror re-checked on full maps (±5%, 70/30 ± 5), the hands the knob, the Summoner's Arms hand first; Paladin vs Cleric ±10% | New hands now | One act is one pair whatever the slots (CL5 kept) |
+| **CP8** Locks and shields | Locks as today (kinds from her weaknesses; the Duel's mixed sets); shields as today, re-measured for the lower weak share (about half on the owner's defaults; draft sub-boss 6 → 5, boss 8 → 6). *Changed in cross-check (2026-10-24), with weapon-progression's WP12:* **shields per tier grow with their foe's answers, never below Tier 1's + 1 (Z2): bosses 6 · 8 · 9, sub-bosses 5 · 7 · 6, regulars 2–3 · 3–4 · 3–4** (§4.4). *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D192): **bosses 6 · 9 · 10** (SB6): a Dual's partner adds multi-hit answers, so by chips a boss Broke half a round sooner at 8 and 9* | Shields by strike (CL9, retired); a lock that breaks to any weak act (CL8) | No engine change; the simulation holds rounds to the Break |
+| **CP9** The hybrids and healers on 2 + 1 | Hands unchanged; the mirror re-checked on full maps (±5%, 70/30 ± 5), the hands the knob, the Summoner's Arms hand first; Paladin vs Cleric ±10%. *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D192): the re-check measured, **the Summoner's Arms hand 0.56 → 0.48** (Tome 0.58 kept; 1.14 → 1.06 a turn, her farewell on top; SB11), with the hybrids' presets on their lead half (SB10): the Tier 1 mirror within +6/−3%, both splits 70/30 ± 5* | New hands now | One act is one pair whatever the slots (CL5 kept) |
 | **CP10** The template per tier | **Changed after owner review, 2026-10-24 (second pass).** Weapons 3 · 3 · 3 (one two-kind weapon in Tier 2, two in Tier 3, Brawler and Mage one); armor 5, her class's half in Tier 1, per piece for the four between from Tier 2; **accessory slots 1 · 2 · 3, damage-oriented**, named and designed in weapon-progression.md (the owner's redesign: defensive and MP-regen accessories go). *Changed in cross-check (2026-10-24): the families named, as WP18–WP19 decided: a Pendant or a Bell in Tier 1, + an Orb, + an Insignia; untyped slots, one of each family. Follow-up to the weapon review, 2026-10-24 (logged against D192, no decision changed): all four families in every tier, Tier 1's one slot holding one of four base forms, a slot's G5 opening two branches each in Tier 2 and their step in Tier 3 (WP18, WP19, WP34)* | The first round's Support, Damage (Orb) and second Support; a fourth weapon or a sixth armor later | Depth from weapon branches, trees, the focus and Extra Stats, not slots (CL6, CL7 kept); the owner's accessory redesign |
-| **CP11** Presets | **Changed after owner review, 2026-10-24 (second pass).** Tier 1: the owner's defaults, her half, an accessory for her first slot's kind (weapon-progression.md names it). **Tier 2: her branch's set** (branch 1 her defaults, branch 2 her reverse set, CP40), one tap; an accessory a slot, her set's first kind first. Tier 3: the same, three accessories. *Changed in cross-check (2026-10-24): the accessories are weapon-progression's presets (WP25) for both branches' sets (§5.2), the Orb and the Halo on her set's first slot's kind; the Spell Blade's Tier 1 Pendant is the Lightning Twin (her Lance and Thunder). Follow-up to the weapon review, 2026-10-24 (no decision changed): WP25's new presets for both sets (§5.2): Tier 1 a Bell (Brawler), a Pendant (Mage, Spell Blade, Paladin) or an Orb (the Summoner's Bow, the Cleric's Blizzard); Tier 2 two branch forms, Tier 3 three; the Halo on her set's first slot, a single-kind form on her Dual where it pays.* *Follow-up to D194 (Extra Stats), 2026-10-24 (no decision changed): her weapon moons by EP29 replace the Halo (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used, Split on the other two)* | The Orb of her first slot and named Supports (the first round); one preset for both branches | One tap dresses any class, any branch, at any tier; accessories stay weapon-progression.md's |
+| **CP11** Presets | **Changed after owner review, 2026-10-24 (second pass).** Tier 1: the owner's defaults, her half, an accessory for her first slot's kind (weapon-progression.md names it). **Tier 2: her branch's set** (branch 1 her defaults, branch 2 her reverse set, CP40), one tap; an accessory a slot, her set's first kind first. Tier 3: the same, three accessories. *Changed in cross-check (2026-10-24): the accessories are weapon-progression's presets (WP25) for both branches' sets (§5.2), the Orb and the Halo on her set's first slot's kind; the Spell Blade's Tier 1 Pendant is the Lightning Twin (her Lance and Thunder). Follow-up to the weapon review, 2026-10-24 (no decision changed): WP25's new presets for both sets (§5.2): Tier 1 a Bell (Brawler), a Pendant (Mage, Spell Blade, Paladin) or an Orb (the Summoner's Bow, the Cleric's Blizzard); Tier 2 two branch forms, Tier 3 three; the Halo on her set's first slot, a single-kind form on her Dual where it pays.* *Follow-up to D194 (Extra Stats), 2026-10-24 (no decision changed): her weapon moons by EP29 replace the Halo (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used, Split on the other two)* *Follow-up to D196 (stat balancing), 2026-10-25: a hybrid's single-kind forms and Full weapon moon on her lead half (SB10, WP25, EP29): the Summoner's Tier 1 Orb on her Light* | The Orb of her first slot and named Supports (the first round); one preset for both branches | One tap dresses any class, any branch, at any tier; accessories stay weapon-progression.md's |
 | **CP12** Equippable kinds | **Changed after owner review, 2026-10-24 (second pass).** Every kind of a slot's channel, in every tier. **A Dual's second kind is of the weapon's own channel** (an Arm adds an Arm, a Tome an element) and is **coverage only**: its hits carry both kinds for weaknesses and charged-move locks in every class that slots it, one shield point and one lock a hit whichever kind matched; the slot, channel, offense, Might and tree stay the first kind's, and every bonus reads the hit's own, first kind; **one two-kind weapon in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good** (WR3, WR4). *Cross-check (2026-10-24): one wording with weapon-progression WP7. Follow-up to the weapon review, 2026-10-24 (no decision changed): the second kind is the weapon's **fixed partner** (WP32), of its own channel and always of the other weapon group; a partner she already slots is not a legal Dual, and every class's default and reverse set keeps one* | Any of the ten, counted by class (GE7, the first round); no cap | The research note's two flags: the Brawler held all five Arms in Tier 2 and the templates page drew cross-channel Duals; a shared weapon now reads the same in every class, and no Uma holds a whole channel |
 | **CP13** What a tree is | One per weapon slot, three a class, under a class root; the catalog stays class × kind | One tree per class; one per kind for every class | Ids and replays stay; one tree on screen (SK1) |
 | **CP14** What a node costs | Nothing, at any tier; branches exclusive, free, swappable; A the default | Points against a budget | Removes the asymmetry (SK2) |
@@ -1809,7 +1867,7 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **CP29** The calling pick | A one-time pick on the Uma sheet: **Pace Spell Blade or Mage, Late Paladin or Cleric**, Power vs Wit pre-selecting; confirmed by a tap or her first win; owned Umas start unconfirmed; the four signal rows fixed | The literal reading (Pace and Late both Mage or Spell Blade); no pick | The owner's moment; healers keep their callers; the default is today's rule |
 | **CP30** What the pick sets | Her calling, starting class, trade, template channel and type, armor and preset; never her class afterwards (a class switch moves no job: CL14 kept) | The pick sets only her start | One signal, as the calling was meant to be |
 | **CP31** The save | **Changed after owner review, 2026-10-24.** *Changed in cross-check (2026-10-24): the numbers are **v27** and **v28** (v26 is taken on main, D190).* v27: weapons to the owner's defaults, Skill Ranks derived (nothing stored), the Paladin's revive on her Light tree, sides to picks, loadouts pruned, `legacy` retired, the calling pick stored; v28: class branches and Tier 2 picks (second pass: the branch per class defaults to branch 1; the focus and set derived, the weapons as she slots them) | Keep her best old kinds per channel | Grades reset anyway; defaults are balanced; her branch picks per tree are kept |
-| **CP32** Skill Ranks | **New, owner review 2026-10-24.** Every skill she holds ranks 1–5: Rank 1 at its gate, +1 every 2 Class Ranks, automatic; power ×0.95, 0.975, 1.00, 1.025, 1.05 (healers' shares the same; MP unchanged); capstones open whole; Limit Breaks and passives don't rank | Ranks bought with points; +2% a rank with no Rank 1 dip; ranks every Class Rank | The owner's ask; a step every 2 Class Ranks; the window's average is today's power, so balance holds |
+| **CP32** Skill Ranks | **New, owner review 2026-10-24.** Every skill she holds ranks 1–5: Rank 1 at its gate, +1 every 2 Class Ranks, automatic; power ×0.95, 0.975, 1.00, 1.025, 1.05 (healers' shares the same; MP unchanged); capstones open whole; Limit Breaks and passives don't rank. *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D192): the re-baseline reads Class Rank on the real pace (2E), not Class Rank = Uma level (SB16): ×1.000 on the balance party, ×1.014 a tier and ×1.05 from Lv 34 at a real player's pace* | Ranks bought with points; +2% a rank with no Rank 1 dip; ranks every Class Rank | The owner's ask; a step every 2 Class Ranks; the window's average is today's power, so balance holds |
 | **CP33** What grows on her weapons | **Changed after owner review, 2026-10-24 (second pass).** Kinds grow only on the weapon, at most two; shape grows in the trees; damage on a kind from the accessories and the Halo (*follow-up to D194, 2026-10-24*: now the weapon moons, EP24–EP26); a percentage on a group from the focus. **From Tier 2 each weapon takes a branch at G5, Pure (weak ×1.5) or Dual (a second kind of its own channel); no third branch; one Dual in her slots in Tier 2, two in Tier 3, the Brawler and the Mage one for good; Tier 3 deepens: Pure → Keen (×1.7) or Tempered, Dual → Tempered** (the research note's WR2–WR5; weapon-progression.md decides). §3.5's Brawler and the templates page redrawn. *Follow-up to the weapon review, 2026-10-24 (no decision changed): a Dual takes its fixed partner (WP32); Tier 3 forks both lines, Pure → Keen or Tempered, Dual → Tempered or Evolved (WP9); the coverage re-run 2.0 and 2.30 (WP12; was 2.34); §3.5's Brawler redrawn on the partners* | "Specialized, Dual or a third" (the first review's); gear's first-round forms (Prism, Tempered, Keen); kinds from trees | One home for each kind of growth; breadth grows as weaknesses narrow (2.0 and 2.30 answers against Tier 1's 2.47, WR6, WP12) |
 | **CP34** Class branches | **Changed after owner review, 2026-10-24 (second pass).** From Tier 2 her root carries a class tree: one of two branches, each **its focus and three class skills** at Class Rank 20, 30, 40, cast through a focus weapon (its kind: CP17 holds) or utility; **the 36 class skills and 12 capstones kept as each branch's flavour, re-paired to the focus they fit** (§7.2); the Blademaster's three "extra hits" skills reshaped; the Templar's and the Oracle's statuses re-themed to their group | Retire the class skills (the focus alone); keep the passives beside the focus; class-only trees with their own kinds | The first review's variation stays; the second pass's focus makes it visible; no new kinds or slots |
 | **CP35** Limit Breaks' kinds | **New, owner review 2026-10-24.** Two small changes so every hall spreads over the twin sets: **Rampart Charge Greatsword → Axe**; **Choir of Angels Light twice → Light, then Lightning**. Inherited Limit Breaks are the deliberate way to reach a kind outside her three weapons (C3) | Leave all 24; rework every hall to one twin set a seat | The Bastion lacked Ice, the Chapel Lightning; everything else already spreads |

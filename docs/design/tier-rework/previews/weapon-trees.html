@@ -317,7 +317,9 @@
   <section id="bosses">
     <h2>Bosses keep their twins, so their shields grow with their answers</h2>
     <p class="sub">Regulars narrow to one kind from Tier 2; bosses keep both twins, so every two-kind weapon widens the party's reach on them.
-      class-progression's shields (CP8: 6 · 8 · 9) keep a shield per answer within ±0.5 of Tier 1's, so the rounds to the first Break hold.</p>
+      class-progression's shields (CP8: 6 · 9 · 10) keep a shield per answer within ±0.5 of Tier 1's, and with them the rounds to the first Break.
+      <i>Follow-up to D196 (stat balancing), 2026-10-25: the bosses were 6 · 8 · 9; by chips (a partner is a multi-hit Light/Dark kind) they Broke
+      half a round sooner, so each later tier's boss takes one more shield (SB6).</i></p>
     <div class="grid2">
       <div class="panel"><h3>Answers a boss, and the shield draft</h3><div class="chart-legend" id="boss-legend"></div><div id="boss-chart"></div>
         <details><summary>Show the numbers</summary><div id="boss-table"></div></details></div>
@@ -685,7 +687,7 @@ renderHold();
 
 // ---- Bosses
 (function () {
-  const ans = [COV.cleric.t1, COV.cleric.b2, COV.cleric.b3], ansP = [COV.paladin.t1, COV.paladin.b2, COV.paladin.b3], sh = [6, 8, 9];
+  const ans = [COV.cleric.t1, COV.cleric.b2, COV.cleric.b3], ansP = [COV.paladin.t1, COV.paladin.b2, COV.paladin.b3], sh = [6, 9, 10]; // follow-up to D196 (stat balancing), 2026-10-25: was [6, 8, 9] (SB6)
   document.getElementById('boss-legend').innerHTML = '<span><span class="sw" style="background:var(--accent)"></span>Answers a boss (party, Cleric)</span><span><span class="sw" style="background:var(--c1)"></span>Boss shield (CP8)</span><span><span class="sw" style="background:var(--neutral-strong)"></span>Shield ÷ answers</span>';
   const W = 560, H = 240, pad = { l: 36, r: 12, t: 20, b: 30 }, max = 10, ih = H - pad.t - pad.b, gw = (W - pad.l - pad.r) / 3, bw = 34;
   const y = (v) => H - pad.b - (v / max) * ih;
@@ -702,7 +704,7 @@ renderHold();
   document.getElementById('boss-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#boss-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   document.getElementById('boss-table').innerHTML = `<table><tr><th>Tier</th><th class="num">Answers a boss, Cleric · Paladin</th><th class="num">Shield (CP8)</th><th class="num">Shield ÷ answers, Cleric · Paladin</th></tr>` +
-    [0, 1, 2].map((i) => `<tr><td>Tier ${i + 1}</td><td class="num">${ans[i].toFixed(2)} · ${ansP[i].toFixed(2)}</td><td class="num">${sh[i]}</td><td class="num">${(sh[i] / ans[i]).toFixed(2)} · ${(sh[i] / ansP[i]).toFixed(2)}</td></tr>`).join('') + '</table><p class="foot">Every ratio within ±0.5 of Tier 1\'s, so class-progression CP8\'s drafts hold with the fixed partners. The simulation sets the final shields.</p>';
+    [0, 1, 2].map((i) => `<tr><td>Tier ${i + 1}</td><td class="num">${ans[i].toFixed(2)} · ${ansP[i].toFixed(2)}</td><td class="num">${sh[i]}</td><td class="num">${(sh[i] / ans[i]).toFixed(2)} · ${(sh[i] / ansP[i]).toFixed(2)}</td></tr>`).join('') + '</table><p class="foot">Every ratio within ±0.5 of Tier 1\'s. <i>Follow-up to D196 (stat balancing), 2026-10-25: the bosses\' shields are 6 · 9 · 10 (SB6, were 6 · 8 · 9). Answers held at 8 and 9, but chips didn\'t: the partners are the multi-hit Light/Dark kinds, so a Tier 2 or 3 boss Broke about half a round sooner than Tier 1\'s; one more shield puts the rounds to the first Break back inside ±0.5.</i> The simulation sets the final shields.</p>';
 })();
 (function () {
   const CL = Object.keys(NAMES);

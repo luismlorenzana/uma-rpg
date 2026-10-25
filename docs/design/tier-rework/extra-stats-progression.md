@@ -2,6 +2,16 @@
 
 > **Approved by the owner, 2026-10-24 (D194): every call EP1–EP29 as written.** Changes from here are follow-ups logged against it.
 
+> **Follow-up to D196 (stat balancing), 2026-10-25** (logged against D194; values only, as
+> [stat-balance §13](stat-balance.md#13-if-approved-the-follow-ups-by-doc) lists them): **EP29, a hybrid's weapon moons
+> on her lead half** (SB10: the Spell Blade's Split Lance + Katana in Tier 2, Full Lance in Tier 3; the Summoner's Split
+> Light + Dark, Full Light; the Blademaster's and the Conjurer's the same way; §5.3, §8.1–§8.2, whose lead-kind columns
+> move only by the Great Pendant's 0.55, SB8); **EP4 and EP15, MP: the pool and a base regen for every Uma** (SB18:
+> 0.8% of her max MP a round for each skill depth open) and the knobs re-ranked, SB18's share a depth first, then Vigor's
+> MP rate, then legs (§9, §16); **EP16, the weapon moons priced in the new toolbox terms**, about a quarter of Tier 2's
+> toolbox (×1.14) and Tier 3's (×1.23), in Tier 2's +27% and Tier 3's ×1.08 → ×1.48 (SB3, SB4; §10). Each edited spot
+> says "Follow-up to D196 (stat balancing), 2026-10-25".
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The third standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](extra-stats.md),
 > which stays as history, and supersedes every ES call ([§17](#17-decisions) maps each one). Calls are **EP1–EP29**,
@@ -91,7 +101,7 @@
 | **The core** | The same Planet and three moons, rebuilt empty in the new world, × 1.8 | × 2.6 | [§2](#2-the-rules-every-tier-shares), [§3.2](#32-every-node) |
 | **Weapon moon 1** | Five nodes at Lv 6, 16, 26, 36, 46: **Full** +7 → +90 on one kind, or **Split** +5 → +63 on each of two | Rebuilt, × 2.6: Full +130, Split +91 | [§4](#4-tier-2-a-weapon-moon) |
 | **Weapon moon 2** | — | Five nodes more, Full or Split; every kind different; **Full + Split serves her three weapons** | [§5](#5-tier-3-the-second-weapon-moon) |
-| **Presets** | Split on her two most-used kinds | Full on the most-used, Split on the other two | [§5.3](#53-presets-for-every-class-and-both-branches-ep29) |
+| **Presets** | Split on her two most-used kinds (a hybrid's two lead-half kinds: *follow-up to D196*) | Full on the most-used, Split on the other two (a hybrid's Full on her lead half) | [§5.3](#53-presets-for-every-class-and-both-branches-ep29) |
 | **Her moon** | Rebuilt, × 1.8 | × 2.6 | [§6](#6-her-moon-the-template-slot-in-full) |
 | **Jewels** | Five more Moon Jewels (I–V); no new kind | Five more | [§11](#11-jewels) |
 | **Retired** | The Halo, Valor | The Halo's second kind, Swiftness | [§5.4](#54-what-retired-the-halo-valor-and-swiftness-ep9-ep11-ep28) |
@@ -396,23 +406,28 @@ on every weapon she slots. The Halo's two kinds added +9–12%. Extra Stats is *
 ### 5.3 Presets for every class and both branches (EP29)
 
 The standard preset (D164) sets her weapon moons as the simulation plays them. **The rule:** Tier 2 **Split on her two
-most-used kinds**; Tier 3 **Full on the most-used, Split on the other two**. Most-used: a hybrid's lone half (her Spell
-Blade Tome, her Summoner Arm: in every act), then her Dual; everyone else her Dual (it answers the most foes, WP §5.3),
-then her slots in order. From Tier 2 the preset follows her class branch's set (CP40); "Use the Light/Dark set" offers
+most-used kinds**; Tier 3 **Full on the most-used, Split on the other two**. Most-used: **a hybrid's lead half** (her
+Spell Blade's two Arms, her Summoner's two Tomes: Tier 2 Split on both; Tier 3 Full on the lead-half kind that twins her
+lone weapon, Split on her other lead kind and her lone weapon); everyone else her Dual (it answers the most foes, WP
+§5.3), then her slots in order. *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): was "a hybrid's
+lone half (her Spell Blade Tome, her Summoner Arm: in every act), then her Dual". Stacked on her minor half, her Full moon
+and single-kind forms pulled both hybrids toward 60/40 (the Summoner 53/47 in Tier 3); on her lead half both hold
+70/30 ± 5 (SB10, [stat-balance §5.1](stat-balance.md#51-spell-blade-against-summoner)).* From Tier 2 the preset follows her class branch's set (CP40); "Use the Light/Dark set" offers
 its moons in the same tap.
 
 | Class | Branch 1 (default set): Tier 2 · Tier 3 | Branch 2 (reverse set): Tier 2 · Tier 3 |
 |---|---|---|
 | **Brawler** | Berserker: **Split Lance + Greatsword** · **Full Lance**, Split Greatsword + Axe | Warlord (Bow, Katana, Axe; Dual Bow): Split Bow + Katana · Full Bow, Split Katana + Axe |
 | **Mage** | Sage: **Split Fire + Ice** · **Full Fire**, Split Ice + Lightning | Sorcerer (Light, Dark, Ice; Dual Light): Split Light + Dark · Full Light, Split Dark + Ice |
-| **Spell Blade** | Rune Knight: **Split Lightning + Katana** · **Full Lightning**, Split Katana + Lance | Blademaster (Katana, Bow, Dark): Split Dark + Katana · Full Dark, Split Katana + Bow |
-| **Summoner** | Warlock: **Split Bow + Dark** · **Full Bow**, Split Dark + Light | Conjurer (Fire, Lightning, Greatsword; Dual Greatsword): Split Greatsword + Fire · Full Greatsword, Split Fire + Lightning |
+| **Spell Blade** | Rune Knight: **Split Lance + Katana** · **Full Lance**, Split Katana + Lightning (*follow-up to D196: was Split Lightning + Katana · Full Lightning, Split Katana + Lance*) | Blademaster (Katana, Bow, Dark): Split Katana + Bow · Full Katana, Split Bow + Dark (*was Split Dark + Katana · Full Dark, Split Katana + Bow*) |
+| **Summoner** | Warlock: **Split Light + Dark** · **Full Light**, Split Dark + Bow (*follow-up to D196: was Split Bow + Dark · Full Bow, Split Dark + Light*) | Conjurer (Fire, Lightning, Greatsword; Dual Greatsword): Split Fire + Lightning · Full Fire, Split Lightning + Greatsword (*was Split Greatsword + Fire · Full Greatsword, Split Fire + Lightning*) |
 | **Paladin** | Guardian: **Split Light + Greatsword** · **Full Light**, Split Greatsword + Axe | Templar (Bow, Katana, Light; Dual Bow): Split Bow + Katana · Full Bow, Split Katana + Light |
 | **Cleric** | Bishop: **Split Light + Ice** · **Full Light**, Split Ice + Bow | Oracle (Light, Fire, Greatsword; Dual Greatsword): Split Greatsword + Light · Full Greatsword, Split Light + Fire |
 
 - **The accessory presets (WP25) stand as written:** with the moons outside the kind cap, a Great Orb no longer needs
-  a kind the moons leave free. A preset kind's accessories and moon stack (the Spell Blade's Tier 3 Lightning: Great
-  Pendant +49, Great Orb +114, Full moon +130).
+  a kind the moons leave free. A preset kind's accessories and moon stack (the Spell Blade's Tier 3 Lance: Great
+  Pendant +51, Great Orb +114, Full moon +130). *Follow-up to D196 (stat balancing), 2026-10-25: WP25's hybrids' single-kind
+  forms moved to the lead half with the moons (SB10); the example was her Lightning, with the Great Pendant's +49 (SB8).*
 
 ### 5.4 What retired: the Halo, Valor and Swiftness (EP9, EP11, EP28)
 
@@ -580,11 +595,11 @@ Extra Stats alone, at each tier's Lv 50, every node (her moon apart, §6); the w
 | | 2 | +460 | +92 | +38 | +92 | +92 | +92 | Fire, Ice +63 |
 | | 3 | +665 | +133 | +55 | +133 | +133 | +133 | Fire +130; Ice, Lightning +91 |
 | **Spell Blade** | 1 | +255 | +51 | +42 | +30 | +51 | +51 | — |
-| | 2 | +460 | +92 | +77 | +53 | +92 | +92 | Lightning, Katana +63 |
-| | 3 | +665 | +133 | +110 | +78 | +133 | +133 | Lightning +130; Katana, Lance +91 |
+| | 2 | +460 | +92 | +77 | +53 | +92 | +92 | Lance, Katana +63 |
+| | 3 | +665 | +133 | +110 | +78 | +133 | +133 | Lance +130; Katana, Lightning +91 |
 | **Summoner** | 1 | +255 | +51 | +30 | +42 | +51 | +51 | — |
-| | 2 | +460 | +92 | +53 | +77 | +92 | +92 | Bow, Dark +63 |
-| | 3 | +665 | +133 | +78 | +110 | +133 | +133 | Bow +130; Dark, Light +91 |
+| | 2 | +460 | +92 | +53 | +77 | +92 | +92 | Light, Dark +63 |
+| | 3 | +665 | +133 | +78 | +110 | +133 | +133 | Light +130; Dark, Bow +91 |
 | **Paladin** | 1 | +255 | +51 | +45 | +27 | +51 | +51 | — |
 | | 2 | +460 | +92 | +81 | +49 | +92 | +92 | Light, Greatsword +63 |
 | | 3 | +665 | +133 | +118 | +70 | +133 | +133 | Light +130; Greatsword, Axe +91 |
@@ -611,14 +626,14 @@ weapon moons, not the Halo; HP, MP, DEF and M.DEF don't move.*
 | | 2 | 2,153 (460) | 507 (92) | 206 (38) | 352 (92) | 332 (92) | 361 (92) | 586 (+63) · 586 (+63) · 474 |
 | | 3 | 3,068 (665) | 719 (133) | 298 (55) | 509 (133) | 480 (133) | 521 (133) | 891 (+130) · 852 (+91) · 777 (+91) |
 | **Spell Blade** | 1 | 1,337 (255) | 247 (51) | 183 (42) | 130 (30) | 196 (51) | 192 (51) | Katana 265 · Lance 265 · Lightning 212 |
-| | 2 | 2,311 (460) | 424 (92) | 328 (77) | 231 (53) | 351 (92) | 344 (92) | 513 (+63) · 499 · 465 (+63) |
-| | 3 | 3,292 (665) | 602 (133) | 472 (110) | 335 (78) | 507 (133) | 496 (133) | 789 (+91) · 789 (+91) · 805 (+130) |
-| **Summoner** | 1 | 1,337 (255) | 247 (51) | 130 (30) | 183 (42) | 196 (51) | 192 (51) | Dark 251 · Light 251 · Bow 232 |
-| | 2 | 2,311 (460) | 424 (92) | 231 (53) | 328 (77) | 351 (92) | 344 (92) | 513 (+63) · 499 · 465 (+63) |
-| | 3 | 3,292 (665) | 602 (133) | 335 (78) | 472 (110) | 507 (133) | 496 (133) | 789 (+91) · 789 (+91) · 805 (+130) |
+| | 2 | 2,311 (460) | 424 (92) | 328 (77) | 231 (53) | 351 (92) | 344 (92) | 513 (+63) · **562 (+63)** · **402** |
+| | 3 | 3,292 (665) | 602 (133) | 472 (110) | 335 (78) | 507 (133) | 496 (133) | **791** (+91) · **944 (+130)** · **654 (+91)** |
+| **Summoner** | 1 | 1,337 (255) | 247 (51) | 130 (30) | 183 (42) | 196 (51) | 192 (51) | Dark 251 · **Light 285** · **Bow 198** |
+| | 2 | 2,311 (460) | 424 (92) | 231 (53) | 328 (77) | 351 (92) | 344 (92) | 513 (+63) · **562 (+63)** · **402** |
+| | 3 | 3,292 (665) | 602 (133) | 335 (78) | 472 (110) | 507 (133) | 496 (133) | **791** (+91) · **944 (+130)** · **654 (+91)** |
 | **Paladin** | 1 | 1,337 (255) | 296 (51) | 175 (45) | 111 (27) | 212 (51) | 192 (51) | Greatsword 257 · Axe 257 · Light 193 |
-| | 2 | 2,311 (460) | 507 (92) | 313 (81) | 199 (49) | 379 (92) | 344 (92) | 529 (+63) · 466 · 489 (+63) |
-| | 3 | 3,292 (665) | 719 (133) | 453 (118) | 286 (70) | 548 (133) | 496 (133) | 770 (+91) · 770 (+91) · 756 (+130) |
+| | 2 | 2,311 (460) | 507 (92) | 313 (81) | 199 (49) | 379 (92) | 344 (92) | **532** (+63) · **469** · **492** (+63) |
+| | 3 | 3,292 (665) | 719 (133) | 453 (118) | 286 (70) | 548 (133) | 496 (133) | **772** (+91) · **772** (+91) · **758** (+130) |
 | **Cleric** | 1 | 1,337 (255) | 296 (51) | 111 (27) | 175 (45) | 196 (51) | 207 (51) | Light 243 · Ice 277 · Bow 179 |
 | | 2 | 2,311 (460) | 507 (92) | 199 (49) | 313 (81) | 351 (92) | 370 (92) | 547 (+63) · 547 (+63) · 321 |
 | | 3 | 3,292 (665) | 719 (133) | 286 (70) | 453 (118) | 507 (133) | 534 (133) | 835 (+130) · 796 (+91) · 668 (+91) |
@@ -627,6 +642,13 @@ weapon moons, not the Halo; HP, MP, DEF and M.DEF don't move.*
   ATK and M.ATK the same for the Brawler and the Mage; for the four between ATK and M.ATK lower by Prowess's split
   (a Spell Blade 192 → 183 and 151 → 130 in Tier 1). Her **lead kind's** offense (her first slot): Brawler 260 · 528 ·
   763 (first draft 260 · 526 · 760); the moons' kinds gain most (her Lance 514 → 577 in Tier 2).
+- *Follow-up to D196 (stat balancing), 2026-10-25: in bold, what moved. The hybrids' weapon moons and single-kind forms
+  sit on their lead half (EP29, WP25, SB10): the Summoner's Tier 1 Orb on her Light; in Tier 2 the Split on the lead
+  half's two kinds (the Spell Blade's Lance and the Summoner's Light 499 → 562, their Thunder and Bow 465 → 402); in Tier 3
+  the Full moon and the Great Orb on that kind (789 → 944), the Split on her lead kind and her lone weapon (805 → 654).
+  The Great Pendant's 0.55 · 0.575 (SB8) adds +3 · +2 wherever a preset wears it (the Paladin's Tier 2 and 3, the hybrids'
+  Tier 3). The lead-kind column moves only by that (the Spell Blade's Katana and the Summoner's Dark 789 → 791, the
+  Paladin's Greatsword 529 → 532 and 770 → 772); HP, MP, ATK, M.ATK, DEF and M.DEF don't move.*
 - **Where it shows:** a Brawler's ATK is 27% Extra Stats, her HP 17%, her MP 24%; a Mage's DEF 27%.
 
 ### 8.3 The build's share holds (SB1)
@@ -678,10 +700,16 @@ her hands (Spell Blade 0.72 + 0.44, Summoner 0.56 + 0.58), a healer's at 0.5. **
 |---|---|---|
 | Brawler | Lance +17.4%, Greatsword +19.6% | Lance +24.8% · Greatsword +19.6%, Axe +17.3% |
 | Mage | Fire +17.0%, Ice +17.0% | Fire +24.2% · Ice +16.9%, Lightning +19.1% |
-| Spell Blade | Lightning +23.4%, Katana +20.4% | Lightning +28.0% · Katana +18.7%, Lance +18.7% |
-| Summoner | Bow +23.4%, Dark +20.4% | Bow +28.0% · Dark +18.7%, Light +18.7% |
-| Paladin | Light +21.8%, Greatsword +19.5% | Light +30.7% · Greatsword +19.3%, Axe +19.3% |
+| Spell Blade | Lance +18.0%, Katana +20.4% | Lance +22.3% · Katana +18.6%, Lightning +24.2% |
+| Summoner | Light +18.0%, Dark +20.4% | Light +22.3% · Dark +18.6%, Bow +24.2% |
+| Paladin | Light +21.6%, Greatsword +19.4% | Light +30.6% · Greatsword +19.3%, Axe +19.3% |
 | Cleric | Light +18.7%, Ice +18.7% | Light +26.6% · Ice +18.5%, Bow +23.5% |
+
+*Follow-up to D196 (stat balancing), 2026-10-25: this table follows the hybrids' moons to their lead half (§5.3, SB10;
+the Spell Blade's and the Summoner's rows were Lightning and Bow +23.4% and +28.0% on the first presets) and the Great
+Pendant's 0.55 (the Paladin's, a tenth or two). The first table (her act) stays as measured on EP29's first presets and
+the Summoner's 0.56 Arms hand (now 0.48, CP9); the balance model re-measures the moons as a whole, a quarter of each
+tier's toolbox: ×1.14 of a Tier 2 act and ×1.23 of a Tier 3 act ([stat-balance §3.4](stat-balance.md#34-where-the-gain-comes-from)).*
 
 - **Tier 2 and 3 now matter:** Extra Stats' total gain on her act is **+27–37% in Tier 1, +45–51% in Tier 2, +52–62% in
   Tier 3** (the first draft: +33–40%, +41–49%, +45–52%). A Full moon's kind gains a quarter or more a hit; Tier 1's
@@ -690,6 +718,8 @@ her hands (Spell Blade 0.72 + 0.44, Summoner 0.56 + 0.58), a healer's at 0.5. **
   Brawler and the Mage and 7–8% weaker for the four between (Prowess, §3.3; the hands are the knob, CP9).
 - **Where the gain goes, the foes follow:** the weapon moons sit in each tier's toolbox term (Z4, §10), priced by its
   simulation; what the player feels is the build choice (which kinds, Full or Split) and the fronts tuned to them.
+  *Follow-up to D196 (stat balancing), 2026-10-25: the terms are sized, Tier 2's +27% and Tier 3's ×1.08 → ×1.48 on the
+  foes' HP and DEF (SB3, SB4).*
 
 ## 9. Defense and sustain, now that accessories deal damage
 
@@ -719,14 +749,22 @@ never in the budget, leaves.*
 - **No new values.** Raising Guard or Vigor would only raise the foes' offense with them.
 - **Tier 3 has no defensive body** now: Swiftness retired (EP28); its defense keeps its share through SB1.
 
-**Sustain: MP moves from regen to the pool** (EP4).
+**Sustain: MP, the pool and a base regen for every Uma** (EP4; SB18). *Follow-up to D196 (stat balancing), 2026-10-25
+(logged against D194): was "MP moves from regen to the pool". Measured, a bigger pool can't hold a region's pace (a full
+bar empties as surely; what the region lost is MP coming back), so the regen comes back as a rule of the game for every
+Uma, never an item ([stat-balance §7](stat-balance.md#7-mp-after-the-regen-accessories)).*
 - **What goes:** the Spring Amulet (+1 MP a round a grade) and the Siphon (MP from magical damage).
 - **What replaces it:** Vigor gives MP as well as HP, a point for a point: **+30 MP** in Tier 1, with the Planet's +21
   **+51 MP an Uma** at Lv 46 (× 1.8, × 2.6 after), every Uma: **+255 MP a party**. Extra Stats is 17–25% of her MP at
-  Lv 50 (armor's legs add 30 more).
+  Lv 50 (armor's legs add 30 more). **Beside the pool, the base regen** (SB18): at the end of each round every Uma
+  regains 0.8% of her max MP for each skill depth her class has open (4% from Class Rank 40), so a bigger pool also
+  brings a little more back. Vigor's values don't change.
 - **The Springs test** (README §9.5 item 5): a region on Auto still clears 10–12 of 12 stages with **+51 MP** from the
-  map and armor's legs at +30. **Knobs, in order:** legs' MP a grade, then **Vigor's MP rate**, then the Flourish's
-  twists; never the foes, never an MP accessory.
+  map, armor's legs at +30 and the base regen, **and the party's pace in a region's last four stages stays within ±10%
+  of today's** (the model: 0.94–1.05×). **Knobs, in order:** **SB18's share a depth** first, then **Vigor's MP rate**,
+  then legs' MP a grade; the Flourish's twists are the template's; never the foes, never an MP accessory. *Follow-up to
+  D196: was legs, then Vigor's MP rate, then the Flourish (SB14 re-ranked them: Vigor's MP ×2 buys 10% more deep casts
+  a bar, legs +1 a grade 3%).*
 
 ## 10. The foe budget
 
@@ -738,8 +776,12 @@ never in the budget, leaves.*
 - **`onCurveStars` becomes every node her level opens on the core** (the Planet, Prowess at her class's split, Vigor,
   Guard), at her tier's values: **the same 20 nodes for every class.** *Changed after owner review, 2026-10-24: was "her
   class's bodies" (a Brawler or a Mage skipping a moon).* The average Uma has no template moon. **The weapon moons are
-  the tier's tools,** priced in its toolbox term (Z4, XR15) as the Halo was; Tier 2's term was drafted with the Halo
-  (+5–8% an act) and now prices +12–16%; Tier 3's prices +21–23%.
+  the tier's tools,** priced in its toolbox term (Z4, XR15) as the Halo was. *Follow-up to D196 (stat balancing),
+  2026-10-25 (logged against D194): was "Tier 2's term was drafted with the Halo (+5–8% an act) and now prices +12–16%;
+  Tier 3's prices +21–23%".* Measured on the whole toolbox, **the weapon moons are about a quarter of Tier 2's (×1.14 of
+  an act) and of Tier 3's (×1.23)**, beside the focus (×1.12), the weapon branches (×1.05, ×1.10) and the accessories
+  (×1.13, ×1.25), and are priced in **Tier 2's term, +27% on the foes' HP and DEF by Lv 50, and Tier 3's, ×1.08 → ×1.48**
+  (offense +10%, bosses × 1.1; SB3–SB5, [stat-balance §3.4](stat-balance.md#34-where-the-gain-comes-from)).
 - **The core matches today's on-curve stars,** stat by stat, within 1.25 points at every five levels, for every stat a
   full moon serves (HP, MP, DEF, M.DEF for every class; ATK for the Brawler, M.ATK for the Mage):
 
@@ -891,7 +933,7 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 | class-progression.md | Six classes, their channels, hands and leans (§2.1–§2.2); the presets' sets (CP11, CP40); the focus reads a hit's own kind (CP39); CP9's knob is the hands | — |
 | Uma Templates pass | Fills her moon's two nodes (§6; node II on defense) | The slot stays empty; nothing else moves |
 | Combat (D104) | A point is +1, +5 HP; 0.6% evasion; 0.4 of a 12 gauge; fights freeze points (and her class) at their start | — |
-| Tier 2's world (Z4, XR15) | The weapon moons sit in each tier's toolbox term, priced by its simulation; her moon outside every budget | — |
+| Tier 2's world (Z4, XR15) | The weapon moons sit in each tier's toolbox term, priced by its simulation; her moon outside every budget. *Follow-up to D196: the terms sized by stat-balance SB3–SB5 (Tier 2 +27%, Tier 3 ×1.08 → ×1.48)* | — |
 
 ## 15. Save impact
 
@@ -930,14 +972,15 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 - **Something opens every five levels,** in every tier, alternating the Planet and the moons (the weapon moons with the
   moons).
 - **The foes:** rates unchanged; tier scaling on SB1. The defensive budget is Extra Stats' alone at Lv 10–50 (§9).
-- **MP:** +51 an Uma at Lv 46, tested in the Springs.
+- **MP:** +51 an Uma at Lv 46 and the base regen (SB18, *follow-up to D196*), tested in the Springs with the region's pace against today's.
 - **Crafting:** 20 · 25 · 30 jewels an Uma, every class (+2 hers), against 100 Star Gems; the Lapidary 120 · 140 · 160
   refined (+8), **72 · 84 · 96 hours** of making at Craft Lv 25; the whole Uma 485 · 505 · 525 refined, 822 · 856 ·
   890 hours (835 · 869 · 903 with her moon), every tier inside PR10's tenth (§11.3).
 - **Tiers 2 and 3:** the core gives the same share at each tier's Lv 50 (§8.3); the weapon moons are the tiers' added
-  depth, +12–16% and +21–23% an act, priced in their toolbox terms (Z4), not the build curve.
+  depth, +12–16% and +21–23% an act, priced in their toolbox terms (Z4), not the build curve (*follow-up to D196: the
+  terms sized, Tier 2's +27% and Tier 3's ×1.08 → ×1.48, SB3, SB4*).
 - **Simulation items** (README §9.5): the re-baseline with full maps and Prowess's split (item 1); the mirror on full
-  maps, the four between's Tier 1 act through the hands (item 2); the Springs at **+51 MP** (item 5); Tier 2: Full against
+  maps, the four between's Tier 1 act through the hands (item 2); the Springs at **+51 MP** with the base regen (item 5); Tier 2: Full against
   Split (§4.2) and the stack with a weapon moon beside the accessories (WP31, weapon-research risk 3); her moon with the
   signature or the affinity under U12's +5% (item 8, §6.6).
 
@@ -948,7 +991,7 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 | **EP1** Tier 1's shape | **The Planet (5 nodes) and three moons (5 each): Prowess, Vigor, Guard; 20 nodes, every class;** her moon's 2 beside. *Changed after owner review, 2026-10-24: Strength and Sorcery become Prowess (EP23); was 25 nodes, 20 for a Brawler or a Mage* | Four moons (Strength and Sorcery apart: unequal jewels by class); three nodes a moon (steps of ten levels) | One node every five levels, as gear; the curve within 1.25 points; every class the same map |
 | **EP2** The Planet | +1, +2, +4, +6, +8 points to all six core stats (+21 each) × tier, at Lv 1, 11, 21, 31, 41 | Worth its grade (+25); no MP | "Every stat" is the profile's six; fits today's curve. *Kept after owner review: "general stats, that's fine"* |
 | **EP3** A moon node | Its grade, +2 … +10 (+30) × tier; Guard gives both defenses; Prowess splits by class (EP23) | Guard split per stat | D141 kept; every class needs both defenses |
-| **EP4** Vigor, both pools | Each Vigor node gives its points to HP (×5) and to MP: +150 HP and +30 MP in Tier 1, × tier | A regen node; MP on the Planet at ×2; nothing | The Spring Amulet goes; the pool replaces regen for every Uma |
+| **EP4** Vigor, both pools | Each Vigor node gives its points to HP (×5) and to MP: +150 HP and +30 MP in Tier 1, × tier | A regen node; MP on the Planet at ×2; nothing | The Spring Amulet goes; **the pool and a base regen for every Uma** (SB18) replace it. *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): was "the pool replaces regen for every Uma"; Vigor's values unchanged* |
 | **EP5** What opens a node | Its jewel, in order, at Uma Lv 5g − 4 | Jewels only; level only | The budget stays exact; the gate matches gear's |
 | **EP6** What counts | Every open node; no active slots | Three lit moons (toggles back) | The biggest single simplification |
 | **EP7** Values across tiers | Every stat grant is its Tier 1 points × 1, × 1.8, × 2.6, rounded per node (half up); **Prowess's split rounds each node's larger share half up, the rest to the smaller; a Split weapon moon node is 0.7 of the Full one, rounded**; Limit start and evasion don't scale | Flat values; a core that adds nodes per tier | SB1: one curve, one number a tier |
@@ -959,8 +1002,8 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 | **EP12** Tier 3 | **A second weapon moon (EP26);** no class constellations. *Changed after owner review, 2026-10-24: was the Halo's second kind and Swiftness* | Class constellations; Swiftness kept | "Improve all three weapon types for a single Uma"; the map stays class-free |
 | **EP13** The core across tiers | The same bodies, rebuilt empty at promotion, values × tier; tiers add weapon moons, never nodes on the core | The same values every tier | SB1: the core's share holds within 1.5 points (§8.3) |
 | **EP14** Her moon | **Two nodes in every tier, in full (§6):** I her knack (Lv 16, Moon Jewel II; Tireless HP, Clever MP, Mighty DEF and M.DEF, Fleet evasion, Gritty Limit start), II her lead (Lv 36, Moon Jewel IV) **on her calling channel's defense, counted in every class** (CP36's note, WP33); × tier (Fleet, Gritty don't scale); outside the budget; the recommended template set (the signature in the affinity's place, node II on defense) stays at +4–6% in every tier. *Changed after owner review, 2026-10-24: fleshed out; node II's defense moves from a note to the recommendation; the pass decides* | Node II on offense (+6–10% with the signature); a moon that grows each tier; nodes on the shared bodies | The owner: clarity, not more nodes; U12's +5% at every tier |
-| **EP15** Defense and sustain | No new values: the Planet, Vigor and Guard are the defensive build the foe budget prices (alone 26–29% a hit, against its 28%); MP moves from regen to the pool; Vigor's MP rate is the Springs' second knob. *Changed after owner review, 2026-10-24: Tier 3's Swiftness leaves; nothing else moves* | Raise Guard and Vigor; a regen node | The budget prices points; the map keeps six stats |
-| **EP16** The foe budget | Rates unchanged; `rpgFoeTierBudget`'s build part × tier; **`onCurveStars` = the core, the same 20 nodes for every class (Prowess at her split);** the weapon moons in each tier's toolbox term. *Changed after owner review, 2026-10-24: was "her class's bodies"; the Halo, Valor, Swiftness for the weapon moons* | Re-fit the rates; the weapon moons in the build curve | The core matches today's curve within 1.25 points; the tools are priced where the tier's term is |
+| **EP15** Defense and sustain | No new values: the Planet, Vigor and Guard are the defensive build the foe budget prices (alone 26–29% a hit, against its 28%); MP moves from regen to the pool; Vigor's MP rate is the Springs' second knob. *Changed after owner review, 2026-10-24: Tier 3's Swiftness leaves; nothing else moves.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): **MP: the pool, and a base regen for every Uma** (SB18); knobs **SB18's share a depth first**, then Vigor's MP rate, then legs, the Flourish's twists the template's; the Springs test measures region pace against today's (SB14)* | Raise Guard and Vigor; a regen node | The budget prices points; the map keeps six stats |
+| **EP16** The foe budget | Rates unchanged; `rpgFoeTierBudget`'s build part × tier; **`onCurveStars` = the core, the same 20 nodes for every class (Prowess at her split);** the weapon moons in each tier's toolbox term. *Changed after owner review, 2026-10-24: was "her class's bodies"; the Halo, Valor, Swiftness for the weapon moons.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): the weapon moons are a quarter of Tier 2's toolbox (×1.14) and Tier 3's (×1.23), priced in **+27%** and **×1.08 → ×1.48** on the foes' HP and DEF (SB3, SB4; was "Tier 2's term … now prices +12–16%")* | Re-fit the rates; the weapon moons in the build curve | The core matches today's curve within 1.25 points; the tools are priced where the tier's term is |
 | **EP17** Jewel kinds | **Planet Jewel I–V and Moon Jewel I–V (any moon, picked when set) in every tier: 2 kinds, 10 items.** *Changed after owner review, 2026-10-24: the Halo Jewels I–IV retire* | A Weapon Jewel for the weapon moons (a third kind for a moon like the others) | A weapon moon is a moon; one name, one recipe |
 | **EP18** Recipes | Moon Jewel 4 refined (kept), **Planet Jewel 12 (proposed, was 8)**; the type at each grade by profession-progression's ladder; **Lapidary an Uma 120 · 140 · 160 (+8), every class; the whole Uma 485 · 505 · 525**. Profession-progression owns the final amounts (§18.2). *Changed after owner review, 2026-10-24: was Planet 8, Halo 5; 120 · 138 · 156* | Today's recipes (Lapidary 100 · 120 · 140; the magical trade 17.2% in Tier 1); a Moon Jewel of 5 (115 · 140 · 165; 25.2% in Tier 3) | Tier 1 lands back on 120 and 485; every trade 18.6–23.3% in every tier; inside PR10's tenth (+4.1%, +8.2%) |
 | **EP19** The Observatory | One page in every tier: the map in code, "Open n of 20 · 25 · 30", totals, the weapon moons' chips from Tier 2, the Set list in map order; no toggles; no dim moon. *Changed after owner review, 2026-10-24* | Today's page with toggles; a page per tier | It grows with the map and teaches once |
@@ -973,7 +1016,7 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 | **EP26** Tier 3: the second weapon moon | **New after owner review, 2026-10-24.** Weapon moon 2, the same five nodes, Full or Split; every kind different; Full + Split serves her three weapons (the preset), Full + Full two; Split + Split not offered | Three weapon moons in Tier 3 (15 nodes: past the work budget); Tier 3 values only on weapon moon 1 | "One or two extra weapon moons … improve all three weapon types" |
 | **EP27** Weapon moons and the kind cap | **New after owner review, 2026-10-24.** **Outside the cap,** as Prowess is, bounded by their own size (+50 × tier a kind); the cap (+68 × tier, WP24) binds the accessory forms only. An interface change for weapon-progression (§18.1) | Inside the approved cap (every Tier 3 Great Orb capped beside a moon); a raised cap, (68 + 50) × tier, everything inside (the same bound, one more competition) | The cap stopped accessories and the Halo stacking; the moons are build value, and the accessories' viability (WP §5.7) holds |
 | **EP28** Valor and Swiftness | **New after owner review, 2026-10-24: retired.** Limit start is her Gritty knack's, evasion feet armor's and her Fleet knack's | Make them meaningful (Limit start +8, evasion +15%: an unpriced defense, a gauge half full); fold them into the Planet from Tier 2 | The owner finds them negligible; their jewels buy the weapon moons |
-| **EP29** Weapon-moon presets | **New after owner review, 2026-10-24.** Tier 2: Split on her two most-used kinds; Tier 3: Full on the most-used, Split on the other two; most-used a hybrid's lone half, then her Dual, else her Dual, then her slots in order; both class branches' sets (§5.3) | Full on her first slot (the Halo's preset) | The model's campaign best; one rule for twelve sets |
+| **EP29** Weapon-moon presets | **New after owner review, 2026-10-24.** Tier 2: Split on her two most-used kinds; Tier 3: Full on the most-used, Split on the other two; most-used a hybrid's lone half, then her Dual, else her Dual, then her slots in order; both class branches' sets (§5.3). *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): **a hybrid's Full (and Tier 2's Split) on her lead half** (SB10): the Spell Blade Split Lance + Katana · Full Lance, Split Katana + Lightning; the Summoner Split Light + Dark · Full Light, Split Dark + Bow; the Blademaster Split Katana + Bow · Full Katana, Split Bow + Dark; the Conjurer Split Fire + Lightning · Full Fire, Split Lightning + Greatsword* | Full on her first slot (the Halo's preset) | The model's campaign best; one rule for twelve sets |
 
 **The first round's calls, mapped:**
 

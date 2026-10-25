@@ -274,6 +274,9 @@ straight line in ℓ is a fair draft.
 **Z4, how is Tier 2's bigger toolbox priced?** Recommendation: **one Tier 2 term on the restarted curve,** +15% HP and
 defense and +10% offense by Tier 2 Lv 50 (drafts), from H39–H41's numbers.
 
+> *Superseded by [stat-balance](tier-rework/stat-balance.md#36-the-proposed-terms) SB3/SB4 (D196, 2026-10-25): Tier 2's
+> term on HP and defense +27% by Lv 50 (offense +10% kept), a Tier 3 term ×1.08 → ×1.48, bosses' term × 1.1 (SB5).*
+
 ## 7. Skill MP in Tier 2 (Z5)
 
 **Today:** `battleSkillFor` multiplies a skill's MP by its tier, ×2 in Tier 2. Her MP is `(20 + 1.5 × Wit) × her

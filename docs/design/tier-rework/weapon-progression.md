@@ -12,6 +12,17 @@
 > (profession-progression's, for its review; §0, §6.3, §13). The save's compensation now reads as profession-progression
 > designs it (§11, WP27).
 
+> **Follow-up to D196 (stat balancing), 2026-10-25** (logged against D193; values only, as
+> [stat-balance §13](stat-balance.md#13-if-approved-the-follow-ups-by-doc) lists them): **WP20, the Great Pendant 0.5 →
+> 0.55 a kind** (Tier 3 0.55 → 0.575; G10 +31 → **+34**, +49 → **+51**) and **WP21, the Toll Bell +0.02 → +0.05 a grade
+> each ring** (G10: 0.5, +0.5 a ring, to 2.0; Tier 3 to 2.5), so both are someone's best (SB8; §0, §5.3–§5.6, §5.7's
+> tables re-run on the balance model); **WP25, a hybrid's single-kind forms on her lead half** (SB10: the Summoner's Orb
+> and Great Orb on her Light, the Spell Blade's Great Orb on her Lance, the Blademaster's on her Katana, the Conjurer's on
+> her Fire; §5.8, §4.4); **a regular's hit about 20% in Tiers 2–3 with the toolbox terms' offense**, the accessories'
+> depth priced in the terms (SB3, SB4, SB13; §0, §4.3, §13); **MP comes back by a base regen every Uma has** (SB18;
+> WP17, §5.1, §5.9, §13); boss shields 6 · 9 · 10 (SB6; §3.6, §9, WP12). Each edited spot says "Follow-up to D196 (stat
+> balancing), 2026-10-25".
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The second standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.2). It absorbs [gear.md](gear.md), which stays as
 > history, and adopts the research note's direction ([weapon-research.md](weapon-research.md), WR1–WR6). Calls are
@@ -111,12 +122,12 @@
 | **Answers a regular foe** (the default party) | Nearly all | **2.47** (twins) | **2.0** (one kind) | **2.30** (one kind) |
 | **Armor** (kept as it is) | 5 pieces, a half each, Armor Rank | 5 slots at G0, **her class's half**; **Armor Fittings** raise a slot | 5; the four between **per piece** | The same |
 | **Armor at G10** | HP +100, DEF +20, M.DEF +20, MP +20, evasion 12%, offense +25 | **HP +150, DEF +40, M.DEF +40, MP +30**, evasion 12%, offense +25 | × 1.8 (HP +270, DEF +72 …); evasion 12% | × 2.6 (HP +390, DEF +104 …); evasion 12% |
-| **A regular's 100% hit** (on-curve Brawler, Lv 50) | 20.0% of her HP (17.0% with an Iron Talisman) | **18.7%**, armor alone | 18.7% | 18.6% |
+| **A regular's 100% hit** (on-curve Brawler, Lv 50) | 20.0% of her HP (17.0% with an Iron Talisman) | **18.7%**, armor alone | 18.3%; about 20% with the toolbox term's offense | 18.1%; about 20% with it (*follow-up to D196: were 18.7% and 18.6%*) |
 | **Accessory slots** | 2 typed: Damage (Orb), Support (Talisman, Amulet) | **1** | **2** | **3** |
 | **Families she can wear** (one of each) | Orbs; 10 defensive supports | **All four, base forms:** Pendant · Orb · Bell · Insignia | All four; from a slot's G5 **two branches each** | All four; from a slot's G5 each branch **a step deeper** |
-| **Accessory forms at G10** | Orb +34 on one kind; a support | Pendant +14 on her three kinds · Orb +34 on one · Bell: a hit at 1.0 · Insignia +15% on sub-bosses and bosses | + Great Pendant +31 on three · Channel Pendant +49 on two of a channel · Great Orb +74 · Twin Orb +49 on a twin set · Great Bell 1.4 · Toll Bell 0.5 → 2.0 · Great Insignia +20% · Onslaught +25% on a wave's first act | Each branch a step deeper: Great Pendant +49, Channel Pendant and Twin Orb +75, Great Orb +114, Great Bell 1.5, Toll Bell to 2.5, Great Insignia +22.5%, Onslaught +27.5% |
+| **Accessory forms at G10** | Orb +34 on one kind; a support | Pendant +14 on her three kinds · Orb +34 on one · Bell: a hit at 1.0 · Insignia +15% on sub-bosses and bosses | + Great Pendant **+34** on three · Channel Pendant +49 on two of a channel · Great Orb +74 · Twin Orb +49 on a twin set · Great Bell 1.4 · Toll Bell 0.5, **+0.5 a ring**, to 2.0 · Great Insignia +20% · Onslaught +25% on a wave's first act | Each branch a step deeper: Great Pendant **+51**, Channel Pendant and Twin Orb +75, Great Orb +114, Great Bell 1.5, Toll Bell to 2.5, Great Insignia +22.5%, Onslaught +27.5% (*follow-up to D196: the Great Pendant was +31 · +49, the Toll Bell +0.2 a ring*) |
 | **Her signature accessory** (her template) | — | One family; worn by her, **ATK and M.ATK +0.2 a level** (+10 at Lv 50) | × 1.8 (+18) | × 2.6 (+26) |
-| **Defensive or MP accessories** | 10 | **None** | None | None |
+| **Defensive or MP accessories** | 10 | **None;** MP comes back by a base regen every Uma has (SB18, *follow-up to D196*) | None | None |
 | **Crafted items** | 40 gear types × 10 grades | **Weapon Gem, Armor Fittings, Accessory Setting**, G1–G10 | + **Branch Gem** (G5); accessory branches need **no item** | The same |
 | **One Uma's gear, refined items** | 240 | **365** (90 items) | 365 (100) | 365 (110) |
 | **One Uma in all, with jewels** (*follow-up to D194, 2026-10-24*; profession-progression's, for its review) | 472 | 485 (493 with her moon) | 505 (513) | 525 (533) |
@@ -488,7 +499,10 @@ Brawler's and the Paladin's do more elsewhere); her Tier 3 Axe + Bow brings it t
 while every Uma adds a kind. That is the one place branches widen reach past Tier 1, so **boss shields scale with it**,
 class-progression's CP8 (6 · 8 · 9): a shield per answer is 2.43 · 2.27 · 2.45 with a Cleric and 2.26 · 2.29 · 2.31 with
 a Paladin, all within ±0.5 of Tier 1's, so **CP8's drafts hold**. A boss's charged-move locks stay drawn from her twins;
-a pure class still breaks only her own channel's locks.
+a pure class still breaks only her own channel's locks. *Follow-up to D196 (stat balancing), 2026-10-25: answers hold,
+chips don't. A Dual's partner is always a Light/Dark kind for a Ring weapon, and those are the multi-hit kinds (a Bow's
+or a Light Tome's three hits, a Katana's two), so at 8 and 9 a Tier 2 or 3 boss Broke 0.54 and 0.51 rounds sooner than
+Tier 1's, past ±0.5; **CP8's bosses are now 6 · 9 · 10** (SB6: 0.41 and 0.39 sooner). Regulars and sub-bosses hold.*
 
 **Assumptions** (the research's): the 48 signatures weighted as CP5; half of each twin set's regulars weak to its Arm
 (by role); Twilight regulars split between the Bow and the Katana; a member answers a foe once. Regions lean (7
@@ -660,6 +674,12 @@ Tier 1 shown; **Tiers 2 and 3 land within 0.1 point of it for every class** (the
 armor, Extra Stats and the foes' budget all move by the same multiplier. Every class gains 1.3–1.8 points on both
 channels: half of what a one-channel support gave on its channel, on both, with nothing to pick.
 
+*Follow-up to D196 (stat balancing), 2026-10-25* ([stat-balance §6](stat-balance.md#6-defense-a-regulars-hit), SB13):
+the balance model reproduces 18.7% at Tier 1's Lv 50 and finds **18.3% and 18.1%** in Tiers 2 and 3 (HP's constant 100
+doesn't scale: 0.4–0.6 points, not 0.1), 16.9–18.7% across Tier 1's levels. **With the toolbox terms' offense** (+10% by
+Lv 50, SB3–SB4) a regular's hit is **about 20%** in Tiers 2–3 (a Brawler 20.4% and 20.1%, today's 20.0%): what the terms'
+offense prices is the sustain the healers' focus adds. Armor stays as drafted; its knob stays armor's HP a grade.
+
 - **Why not more:** a full support's cut on both channels (17%) would be a support and a half, and the foes' offense
   budget would have to rise to match. **Why not less:** the on-curve party loses its supports' sustain (Vampire's
   lifesteal, the MP regen) and needs it back somewhere the owner never has to choose.
@@ -695,13 +715,19 @@ move; the offense on her kinds carries her preset accessories under the kind cap
 |---|---|---|---|---|
 | **Brawler** | 1 · 2 · 3 | 192 · 343 · 495 | 116 · 206 · 298 | T1 Greatsword, Axe, Lance 260 each · T2 528 (+63) · 514 · 577 (+63) · T3 763 (+91) · 838 (+91) · 877 (+130) |
 | **Mage** | 1 · 2 · 3 | 116 · 206 · 298 | 197 · 352 · 509 | T1 Fire, Ice, Lightning 279 each · T2 586 (+63) · 586 (+63) · 474 · T3 891 (+130) · 852 (+91) · 777 (+91) |
-| **Spell Blade** | 1 · 2 · 3 | **183 · 328 · 472** | **130 · 231 · 335** | T1 Katana 265 · Lance 265 · Lightning 212 · T2 513 (+63) · 499 · 465 (+63) · T3 789 (+91) · 789 (+91) · 805 (+130) |
-| **Summoner** | 1 · 2 · 3 | **130 · 231 · 335** | **183 · 328 · 472** | T1 Dark 251 · Light 251 · Bow 232 · T2 513 (+63) · 499 · 465 (+63) · T3 789 (+91) · 789 (+91) · 805 (+130) |
-| **Paladin** | 1 · 2 · 3 | **175 · 313 · 453** | **111 · 199 · 286** | T1 Greatsword 257 · Axe 257 · Light 193 · T2 529 (+63) · 466 · 489 (+63) · T3 770 (+91) · 770 (+91) · 756 (+130) |
+| **Spell Blade** | 1 · 2 · 3 | **183 · 328 · 472** | **130 · 231 · 335** | T1 Katana 265 · Lance 265 · Lightning 212 · T2 513 (+63) · **562 (+63)** · **402** · T3 **791** (+91) · **944 (+130)** · **654 (+91)** |
+| **Summoner** | 1 · 2 · 3 | **130 · 231 · 335** | **183 · 328 · 472** | T1 Dark 251 · **Light 285** · **Bow 198** · T2 513 (+63) · **562 (+63)** · **402** · T3 **791** (+91) · **944 (+130)** · **654 (+91)** |
+| **Paladin** | 1 · 2 · 3 | **175 · 313 · 453** | **111 · 199 · 286** | T1 Greatsword 257 · Axe 257 · Light 193 · T2 **532** (+63) · **469** · **492** (+63) · T3 **772** (+91) · **772** (+91) · **758** (+130) |
 | **Cleric** | 1 · 2 · 3 | **111 · 199 · 286** | **175 · 313 · 453** | T1 Light 243 · Ice 277 · Bow 179 · T2 547 (+63) · 547 (+63) · 321 · T3 835 (+130) · 796 (+91) · 668 (+91) |
 
 In bold, what Prowess moved (the first draft's Spell Blade 192 and 151 in Tier 1); her lead kind's offense, a Brawler's
-260 · 528 · 763 (the first draft's 260 · 526 · 760).
+260 · 528 · 763 (the first draft's 260 · 526 · 760). *Follow-up to D196 (stat balancing), 2026-10-25: in bold in the
+offense column, what moved. The hybrids' single-kind forms and weapon moons sit on their lead half (SB10, §5.8, EP29):
+the Summoner's Tier 1 Orb on her Light (Light 251 → 285, Bow 232 → 198); in Tier 2 the Split moon on her lead half's
+two kinds (the Spell Blade's Lance and the Summoner's Light 499 → 562, their Thunder and Bow 465 → 402); in Tier 3 the
+Great Orb and the Full moon on that kind (789 → 944), the Split on her lead kind and her lone weapon (805 → 654). The
+Great Pendant's 0.55 · 0.575 (SB8) adds +3 · +2 wherever a preset wears it (the Paladin's Tier 2 and 3, the hybrids' Tier
+3). Their lead kind moves only by the Great Pendant (the Spell Blade's Katana and the Summoner's Dark 789 → 791).*
 
 ### 4.5 No sets (WP16)
 
@@ -728,7 +754,11 @@ a little offense; depth comes from weapons, trees, accessories and Extra Stats.
 
 Redesigning the MP accessories out of the always-pick zone was weighed (a fraction of today's, or only between waves):
 any MP regen competes with damage on a different axis, and a small one is a dead pick while a large one is always worn.
-**MP comes from her level, armor's legs and her template's MP twists** ([§5.9](#59-mp-after-the-mp-accessories)).
+**MP comes from her level, armor's legs and her template's MP twists** ([§5.9](#59-mp-after-the-mp-accessories)), **and a
+base regen every Uma has** (SB18): a rule, not an item, so neither a dead pick nor an always-pick. *Follow-up to D196
+(stat balancing), 2026-10-25: without the regen accessories a party ran dry over a region (late-region power 0.41–0.52×
+today's from Lv 30); every Uma now regains 0.8% of her max MP a round for each skill depth open, the regen the owner
+would have worn on every class, as a rule.*
 
 ### 5.2 Four families, in every tier (WP18)
 
@@ -782,15 +812,18 @@ draft's nineteen Tier 1 members (nine Pendants, ten Bells) retire into the four 
 
 ```text
             Tier 1: base (G0 on)             Tier 2: branches (a slot's G5 on)               Tier 3: the step (G5 on)
-Pendant ─── her three kinds, 0.4 each ─┬─ Great Pendant    her three kinds, 0.5 each   ──►  0.55 each
+Pendant ─── her three kinds, 0.4 each ─┬─ Great Pendant    her three kinds, 0.55 each  ──►  0.575 each
                                        └─ Channel Pendant  two of one channel, 0.8      ──►  0.85
 Orb ─────── one kind, 1.0 ─────────────┬─ Great Orb        one kind, 1.2               ──►  1.3
                                        └─ Twin Orb         a twin set, 0.8 each        ──►  0.85
 Bell ────── a hit at 1.0 × her hand ───┬─ Great Bell       a hit at 1.4                ──►  1.5
-                                       └─ Toll Bell        0.5, +0.2 a ring, up to 2.0 ──►  up to 2.5
+                                       └─ Toll Bell        0.5, +0.5 a ring, up to 2.0 ──►  up to 2.5
 Insignia ── sub-bosses, bosses +15% ───┬─ Great Insignia   sub-bosses, bosses +20%     ──►  +22.5%
                                        └─ Onslaught        her first act each wave +25% ──►  +27.5%
 ```
+
+*Follow-up to D196 (stat balancing), 2026-10-25: the Great Pendant 0.5 → 0.55 (Tier 3 0.55 → 0.575) and the Toll Bell's
+step +0.02 → +0.05 a grade each ring (WP20, WP21, SB8), so both are someone's best (§5.7).*
 
 ### 5.4 The catalog, every form
 
@@ -802,7 +835,7 @@ Tier 1 1, 2, 4, 6, 10, 13, 18, 23, 29, 34), × tier. Cells are Tier 1 · 2 · 3;
 |---|---|---|---|---|---|---|---|---|---|---|
 | **Pendant** (base), each of her three kinds | 1 · 2 · 3 | 1 · 2 · 3 | 2 · 4 · 5 | 2 · 4 · 5 | 4 · 7 · 10 | 5 · 9 · 13 | 7 · 13 · 18 | 9 · 16 · 23 | 12 · 22 · 31 | **14 · 25 · 36** |
 | **Orb** (base), one kind | 1 · 2 · 3 | 2 · 4 · 5 | 4 · 7 · 10 | 6 · 11 · 16 | 10 · 18 · 26 | 13 · 23 · 34 | 18 · 32 · 47 | 23 · 41 · 60 | 29 · 52 · 75 | **34 · 61 · 88** |
-| **Great Pendant**, each of her three kinds | — · — · 3 | — · — · 3 | — · — · 5 | — · — · 8 | — · 9 · 16 | — · 13 · 18 | — · 16 · 26 | — · 22 · 34 | — · 27 · 42 | **— · 31 · 49** |
+| **Great Pendant**, each of her three kinds | — · — · 3 | — · — · 3 | — · — · 6 | — · — · 9 | — · 10 · 17 | — · 14 · 19 | — · 18 · 27 | — · 24 · 36 | — · 30 · 44 | **— · 34 · 51** |
 | **Channel Pendant**, each of two kinds of one channel | — · — · 3 | — · — · 5 | — · — · 8 | — · — · 13 | — · 14 · 23 | — · 18 · 29 | — · 25 · 39 | — · 32 · 52 | — · 41 · 65 | **— · 49 · 75** |
 | **Great Orb**, one kind | — · — · 3 | — · — · 5 | — · — · 13 | — · — · 18 | — · 22 · 34 | — · 29 · 44 | — · 40 · 60 | — · 50 · 78 | — · 63 · 99 | **— · 74 · 114** |
 | **Twin Orb**, each kind of one twin set | — · — · 3 | — · — · 5 | — · — · 8 | — · — · 13 | — · 14 · 23 | — · 18 · 29 | — · 25 · 39 | — · 32 · 52 | — · 41 · 65 | **— · 49 · 75** |
@@ -821,7 +854,13 @@ Tier 1 1, 2, 4, 6, 10, 13, 18, 23, 29, 34), × tier. Cells are Tier 1 · 2 · 3;
 |---|---|---|---|---|---|---|---|---|---|---|
 | **Bell** (base): the follow-up's power (an Attack is 1.0), × her hand | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | **1.0** |
 | **Great Bell** (Tier 2 · Tier 3 step): 0.14 · 0.15 a grade | — | — | — | — | 0.7 · 0.75 | 0.84 · 0.9 | 0.98 · 1.05 | 1.12 · 1.2 | 1.26 · 1.35 | **1.4 · 1.5** |
-| **Toll Bell**: its first ring in a fight, then + a step each ring, up to a top (Tier 3 step: a higher top) | — | — | — | — | 0.25, +0.1, to 1.0 (1.25) | 0.3, +0.12, to 1.2 (1.5) | 0.35, +0.14, to 1.4 (1.75) | 0.4, +0.16, to 1.6 (2.0) | 0.45, +0.18, to 1.8 (2.25) | **0.5, +0.2, to 2.0 (2.5)** |
+| **Toll Bell**: its first ring in a fight, then + a step each ring, up to a top (Tier 3 step: a higher top) | — | — | — | — | 0.25, +0.25, to 1.0 (1.25) | 0.3, +0.3, to 1.2 (1.5) | 0.35, +0.35, to 1.4 (1.75) | 0.4, +0.4, to 1.6 (2.0) | 0.45, +0.45, to 1.8 (2.25) | **0.5, +0.5, to 2.0 (2.5)** |
+
+*Follow-up to D196 (stat balancing), 2026-10-25: the Toll Bell's step +0.02 → +0.05 a grade each ring (WP21, SB8),
+its first ring and top unchanged: at G10 0.5, 1.0, 1.5, 2.0, so six rings (a long fight) average 1.5 against the Great
+Bell's flat 1.4, and two (the campaign's) 0.75. At +0.02 it beat the Great Bell only after 11 rings, about a 22-round
+fight. The Great Pendant's row above is 0.55 a kind (Tier 3 0.575, WP20): Tier 2 cells × 1.1, the Tier 3 step's ×
+0.575 ÷ 0.55 (below its G5, the Tier 2 share).*
 
 **Insignias** (every tier; a percentage, the same in every tier):
 
@@ -841,12 +880,13 @@ The owner's set: "one single follow-up attack on auto attacks only, for any weap
 - **When:** her act includes an **Attack** (the free action: a Brawler's Attack, either half of a hybrid's pair, a
   healer's Attack). Never on a skill, a Guard or a Limit Break. Once an act.
 - **What:** **her weapon of the Bell's kind strikes once** at the form's power × her hand for that kind's channel
-  (Brawler and Mage ×1; Spell Blade Arms ×0.72, Tome ×0.44; Summoner Arms ×0.56, Tome ×0.58; healers ×0.5). One hit,
+  (Brawler and Mage ×1; Spell Blade Arms ×0.72, Tome ×0.44; Summoner Arms ×0.48, Tome ×0.58; healers ×0.5; *follow-up to D196 (stat balancing), 2026-10-25: the Summoner's Arms hand was 0.56, CP9, SB11*). One hit,
   never split (no Spell Blade extra hit), on the foe her Attack struck, or a random living foe if that one fell (seeded,
   as the Lance's random hits are).
 - **The forms:** the base Bell at 0.1 a grade; the **Great Bell** at 0.14 (Tier 3: 0.15); the **Toll Bell** starts lower
-  and rises each time it rings in the same fight (at G10: 0.5, then 0.7, 0.9 … up to 2.0; Tier 3 up to 2.5), the count
-  resetting each fight and shown as pips on her chip. Each still strikes once an Attack: no form adds a hit or a chip.
+  and rises each time it rings in the same fight (at G10: 0.5, then 1.0, 1.5, up to 2.0; Tier 3 up to 2.5; *follow-up
+  to D196 (stat balancing), 2026-10-25: was 0.7, 0.9 …, SB8*), the count resetting each fight and shown as pips on her
+  chip. Each still strikes once an Attack: no form adds a hit or a chip.
 - **It is a hit of that weapon:** its channel and offense, its Might, its kinds (a partner too), its branch's weak
   multiplier, and the Pendant and Orb forms and her weapon moons on its kind. It adds nothing to the Limit gauge.
 - **Its kind counts for weaknesses and locks:** a weak follow-up removes a shield point and breaks a lock, like any weak
@@ -877,11 +917,11 @@ it** (EP27), as Prowess and the signature do, bounded by their own size (Full +5
 each of two). The Halo it used to share with is retired (EP9).*
 
 - **Tier 1** never reaches it: one slot, at most +34 (an Orb).
-- **Tier 2:** an Orb or a Twin Orb (+61, +49) with a Great Pendant (+31) on one kind stays under +122 (one of each family, WP19);
+- **Tier 2:** an Orb or a Twin Orb (+61, +49) with a Great Pendant (+34; *follow-up to D196: was +31*) on one kind stays under +122 (one of each family, WP19);
   **a Great Orb (+74) and a Channel Pendant (+49) on one kind cap at +122** (+123). A weapon moon adds beside it (Full
   +90, Split +63). The sheet shows "Greatsword: +122 (capped) · Greatsword moon +63".
 - **Tier 3:** **a Great Orb (+114) and a Channel Pendant (+75) on one kind cap at +177** (+189); a Great
-  Orb and a Great Pendant stay under it (+163). The weapon moons add beside it (Full +130, Split +91).
+  Orb and a Great Pendant stay under it (+165; *follow-up to D196: was +163*). The weapon moons add beside it (Full +130, Split +91).
 - **What it bounds now:** the flat on one kind is at most Might + the cap + a Full moon, (68 + 68 + 50) × tier: **334
   in Tier 2 and 484 in Tier 3** (the approved Might + cap: 244 and 354). The Great Orb no longer needs a kind the Halo
   leaves free; its presets stand (§5.8).
@@ -935,53 +975,104 @@ single-target units at Lv 50. Four contexts, two redrawn in the review:
 |  | Long fight | 8.0% | **15.2% Light** | 5.2% | 15.0% |
 |  | Waves | 8.0% | **8.1% Ice** | 1.5% | 0.0% |
 
-**Tier 2, the branches** (each Great branch beats its own base everywhere, so the bases leave the race; values are the
-same shares in Tier 3, each a step higher):
+*Follow-up to D196 (stat balancing), 2026-10-25: Tier 1 has neither form SB8 changed, so this table stands (this
+section's first model). The balance model ([stat-balance §4.2](stat-balance.md#42-every-form-someones-best)) finds the
+same shape: the Orb best in 13 of 24 cells by near-ties (this table 12), the Pendant 8, the Insignia 2, the Bell 1, the
+Pendant 0.6 points ahead of the Bell in the Brawler's campaign (7.9% against 7.3%; her preset Bell kept, it wins her long
+fights). With the Summoner's Arms hand at 0.48 (SB11) her Bow is worth less: her campaign is a dead heat (the Orb on her
+Bow 9.10%, the Pendant 9.10%) and her waves tip to the Pendant (9.1% against 9.0%), so the Orb is best in 12 of 24.*
+
+**Tier 2, the branches** (each Great branch beats its own base everywhere, so the bases leave the race). *Follow-up to
+D196 (stat balancing), 2026-10-25: **re-run on the balance model with SB8's values** (the Great Pendant 0.55, the Toll
+Bell +0.05 a grade each ring), the yardstick the stat balancing set (SB2); the first model's table had the Great Pendant
+and the Toll Bell nobody's best. Its numbers differ from the first model's in places (by up to ten points in a few tuned
+cells); the shape is the same: the Great Orb or the Twin Orb wins every class's tuned front, the Bells the Brawler's.*
 
 | Class | Context | Great Pendant | Channel Pendant | Great Orb | Twin Orb | Great Bell | Toll Bell | Great Insignia | Onslaught |
 |---|---|---|---|---|---|---|---|---|---|
-| **Brawler** | Campaign | 9.0% | 10.0% Greatsword + Lance | 8.5% Lance | 5.6% | **10.5% Lance** | 5.3% | 6.0% | 8.2% |
-|  | Tuned | 9.0% | 12.8% | **16.3% Lance** | 10.8% | 11.7% | 5.8% | 6.0% | 8.2% |
-|  | Long fight | 9.0% | 12.8% | 16.3% | 10.8% | 25.4% | **26.6%** | 20.0% | 2.0% |
-|  | Waves | 9.0% | **10.1% Greatsword + Lance** | 8.7% | 5.8% | 5.6% | 2.8% | 0.0% | 10.0% |
-| **Mage** | Campaign | 8.8% | **9.9% Fire + Ice** | 8.4% Fire | 5.6% | 6.4% Fire | 2.7% | 6.0% | 8.2% |
-|  | Tuned | 8.8% | 12.6% | **15.9% Lightning** | 10.6% | 7.1% | 3.0% | 6.0% | 8.2% |
-|  | Long fight | 8.8% | 12.6% | 15.9% | 10.6% | 13.8% | 11.9% | **20.0%** | 2.0% |
-|  | Waves | 8.8% | 9.9% | 8.5% | 5.6% | 3.6% | 1.5% | 0.0% | **10.0%** |
-| **Spell Blade** | Campaign | 9.0% | 9.0% Katana + Lance | 8.3% Lightning | **9.5% Lightning twins** | 5.1% Katana | 2.2% | 6.0% | 8.2% |
-|  | Tuned | 9.0% | 9.0% | 10.2% | **12.3% Lightning twins** | 5.8% | 2.5% | 6.0% | 8.2% |
-|  | Long fight | 9.0% | 9.0% | 10.2% | 12.3% | 11.8% | 11.5% | **20.0%** | 2.0% |
-|  | Waves | 9.0% | 9.0% | 8.3% | 9.6% | 2.8% | 1.2% | 0.0% | **10.0%** |
-| **Summoner** | Campaign | 9.0% | 7.4% Dark + Light | **10.8% Bow** | 10.8% Light twins | 4.1% Bow | 1.8% | 6.0% | 8.2% |
-|  | Tuned | 9.0% | 7.4% | 10.8% | **10.9% Light twins** | 4.7% | 2.0% | 6.0% | 8.2% |
-|  | Long fight | 9.0% | 7.4% | 10.8% | 10.9% | 9.7% | 9.4% | **20.0%** | 2.0% |
-|  | Waves | 9.0% | 7.4% | **10.8% Bow** | 10.8% | 2.2% | 1.0% | 0.0% | 10.0% |
-| **Paladin** | Campaign | **10.1%** | 10.1% Greatsword + Axe | 9.2% Light | 6.1% | 3.6% Light | 1.3% | 6.0% | 8.2% |
-|  | Tuned | 10.1% | 14.0% | **18.3% Light** | 12.1% | 3.9% | 1.4% | 6.0% | 8.2% |
-|  | Long fight | 10.1% | 14.0% | 18.3% | 12.1% | 7.2% | 4.7% | **20.0%** | 2.0% |
-|  | Waves | **10.1%** | 9.7% | 9.8% | 6.5% | 2.0% | 0.7% | 0.0% | 10.0% |
-| **Cleric** | Campaign | 10.1% | **11.4% Light + Ice** | 9.5% Light | 11.0% Light twins | 3.6% Light | 1.3% | 6.0% | 8.2% |
-|  | Tuned | 10.1% | 14.4% | **18.3% Light** | 14.3% | 3.9% | 1.4% | 6.0% | 8.2% |
-|  | Long fight | 10.1% | 14.4% | 18.3% | 14.3% | 7.2% | 4.7% | **20.0%** | 2.0% |
-|  | Waves | 10.1% | **11.3% Light + Ice** | 9.8% | 11.3% | 2.0% | 0.7% | 0.0% | 10.0% |
+| **Brawler** | Campaign | 9.5% | 9.6% Greatsword + Lance | 8.2% Lance | 5.4% Lightning twins | **10.8% Lance** | 5.8% Lance | 6.0% | 8.2% |
+|  | Tuned | 10.4% | 14.1% | **19.5% Axe** | 12.9% | 11.3% | 6.0% | 6.0% | 8.2% |
+|  | Long fight | 10.4% | 14.1% | 19.5% | 12.9% | 24.5% | **26.3% Greatsword** | 20.0% | 2.0% |
+|  | Waves | 9.5% | 9.7% | 8.4% | 5.5% | 5.8% | 2.1% | 0.0% | **10.0%** |
+| **Mage** | Campaign | 9.4% | **9.7% Fire + Ice** | 8.1% Fire | 5.3% Fire twins | 6.6% Fire | 2.3% Fire | 6.0% | 8.3% |
+|  | Tuned | 10.2% | 13.8% | **19.1% Lightning** | 12.6% | 6.8% | 2.4% | 6.0% | 8.3% |
+|  | Long fight | 10.2% | 13.8% | 19.1% | 12.6% | 13.4% | 11.9% | **20.0%** | 2.0% |
+|  | Waves | 9.4% | 9.6% | 8.3% | 5.4% | 3.7% | 1.3% | 0.0% | **10.0%** |
+| **Spell Blade** | Campaign | **10.8%** | 9.8% Katana + Lance | 8.9% Lightning | 10.4% Lightning twins | 5.9% Katana | 2.1% Katana | 6.0% | 8.3% |
+|  | Tuned | 11.4% | 10.3% | 14.1% | **15.4% Lightning twins** | 6.3% | 2.3% | 6.0% | 8.3% |
+|  | Long fight | 11.4% | 10.3% | 14.1% | 15.4% | 13.0% | 13.0% | **20.0%** | 2.0% |
+|  | Waves | **10.8%** | 9.8% | 8.9% | 10.5% | 3.2% | 1.1% | 0.0% | 10.0% |
+| **Summoner** | Campaign | 11.0% | 8.7% Dark + Light | 11.1% Bow | **11.5% Light twins** | 5.1% Dark | 1.8% Dark | 6.0% | 8.3% |
+|  | Tuned | 11.5% | 9.4% | 13.0% | **15.6% Light twins** | 5.6% | 2.0% | 6.0% | 8.3% |
+|  | Long fight | 11.5% | 9.4% | 13.0% | 15.6% | 11.6% | 11.6% | **20.0%** | 2.0% |
+|  | Waves | 11.0% | 8.7% | 11.0% | **11.5% Light twins** | 2.8% | 1.0% | 0.0% | 10.0% |
+| **Paladin** | Campaign | **11.3%** | 11.0% Greatsword + Axe | 8.5% Greatsword | 5.6% Fire twins | 4.3% Greatsword | 1.5% Greatsword | 6.0% | 8.3% |
+|  | Tuned | 12.8% | 15.6% | **23.4% Light** | 15.3% | 4.8% | 1.7% | 6.0% | 8.3% |
+|  | Long fight | 12.8% | 15.6% | **23.4% Light** | 15.3% | 8.8% | 4.7% | 20.0% | 2.0% |
+|  | Waves | **11.3%** | 10.7% | 8.7% | 5.7% | 2.5% | 0.9% | 0.0% | 10.0% |
+| **Cleric** | Campaign | 11.1% | **11.5% Light + Ice** | 10.0% Light | 11.2% Light twins | 4.2% Light | 1.5% Light | 6.0% | 8.3% |
+|  | Tuned | 15.0% | 13.7% | **28.3% Bow** | 20.4% | 4.7% | 1.7% | 6.0% | 8.2% |
+|  | Long fight | 15.0% | 13.7% | **28.3% Bow** | 20.4% | 8.7% | 4.6% | 20.0% | 2.0% |
+|  | Waves | 11.1% | 11.4% | 10.4% | **11.6% Light twins** | 2.4% | 0.9% | 0.0% | 10.0% |
+
+**Tier 3, the step** (*follow-up to D196: new, the same model, the Great Pendant 0.575, the Toll Bell to 2.5*):
+
+| Class | Context | Great Pendant | Channel Pendant | Great Orb | Twin Orb | Great Bell | Toll Bell | Great Insignia | Onslaught |
+|---|---|---|---|---|---|---|---|---|---|
+| **Brawler** | Campaign | 9.2% | 9.5% Greatsword + Lance | 8.2% Lance | 5.4% Lightning twins | **11.0% Lance** | 5.5% Lance | 6.7% | 9.1% |
+|  | Tuned | 9.5% | 13.2% | **18.4% Greatsword** | 12.0% | 12.0% | 6.0% | 6.8% | 9.1% |
+|  | Long fight | 9.5% | 13.2% | 18.4% | 12.0% | 26.0% | **28.9% Lance** | 22.5% | 2.2% |
+|  | Waves | 9.2% | 9.6% | 8.5% | 5.6% | 6.0% | 2.0% | 0.0% | **11.0%** |
+| **Mage** | Campaign | 9.1% | **9.6% Fire + Ice** | 8.2% Fire | 5.4% Fire twins | 6.8% Fire | 2.3% Fire | 6.7% | 9.1% |
+|  | Tuned | 9.3% | 12.9% | **18.1% Ice** | 11.9% | 7.3% | 2.4% | 6.7% | 9.1% |
+|  | Long fight | 9.3% | 12.9% | 18.1% | 11.9% | 14.2% | 11.8% | **22.5%** | 2.2% |
+|  | Waves | 9.1% | 9.5% | 8.3% | 5.5% | 3.8% | 1.3% | 0.0% | **11.0%** |
+| **Spell Blade** | Campaign | **10.4%** | 9.7% Katana + Lance | 8.7% Lightning | 10.2% Lightning twins | 6.3% Lance | 2.1% Lance | 6.7% | 9.1% |
+|  | Tuned | 10.5% | 10.4% | 14.3% | **14.5% Lightning twins** | 6.7% | 2.2% | 6.7% | 9.1% |
+|  | Long fight | 10.5% | 10.4% | 14.3% | 14.5% | 13.8% | 13.8% | **22.5%** | 2.2% |
+|  | Waves | 10.5% | 9.7% | 8.8% | 10.4% | 3.5% | 1.2% | 0.0% | **11.0%** |
+| **Summoner** | Campaign | 10.6% | 8.6% Dark + Light | 10.8% Bow | **11.9% Light twins** | 5.0% Light | 1.7% Light | 6.7% | 9.1% |
+|  | Tuned | 10.7% | 9.9% | 13.6% | **15.0% Light twins** | 5.9% | 2.0% | 6.7% | 9.1% |
+|  | Long fight | 10.7% | 9.9% | 13.6% | 15.0% | 12.2% | 12.2% | **22.5%** | 2.2% |
+|  | Waves | 10.6% | 8.7% | 10.7% | **11.8% Light twins** | 2.7% | 0.9% | 0.0% | 11.0% |
+| **Paladin** | Campaign | 10.7% | **11.1% Greatsword + Axe** | 9.6% Axe | 6.3% Ice twins | 4.0% Axe | 1.3% Axe | 6.8% | 9.1% |
+|  | Tuned | 12.3% | 14.4% | **23.0% Light** | 15.0% | 4.1% | 1.4% | 6.8% | 9.1% |
+|  | Long fight | 12.3% | 14.4% | **23.0% Light** | 15.0% | 7.6% | 3.8% | 22.5% | 2.2% |
+|  | Waves | 10.8% | 10.8% | 9.6% | 6.3% | 2.3% | 0.8% | 0.0% | **11.0%** |
+| **Cleric** | Campaign | 11.0% | 10.1% Light + Ice | 9.3% Bow | **12.0% Light twins** | 4.3% Light | 1.4% Light | 6.7% | 9.1% |
+|  | Tuned | 13.2% | 14.1% | **25.7% Bow** | 18.4% | 4.3% | 1.4% | 6.8% | 9.1% |
+|  | Long fight | 13.2% | 14.1% | **25.7% Bow** | 18.4% | 8.0% | 4.0% | 22.5% | 2.2% |
+|  | Waves | 10.9% | 10.2% | 9.6% | **12.3% Light twins** | 2.5% | 0.8% | 0.0% | 11.0% |
+
+*With SB10's weapon moons on the hybrids' lead half and SB11's hand the hybrids' cells move by about a point (1.3 at most)
+and one Tier 3 cell tips (the Spell Blade's tuned: a Great Orb on her Katana 14.6% against the Twin Orb's 14.2%); Tier 2's
+counts don't move.*
 
 **What it shows:**
 - **Every base is someone's best in Tier 1:** the Pendant left on (the Mage, the Spell Blade, the Paladin; four classes
   on waves), the Orb tuned (every class) and in the campaign for the two whose damage leans on one kind (the Summoner's Bow,
   in every act of her pair; the Cleric's Blizzard), the Bell for the Brawler (the campaign and long fights), the
   Insignia in long fights for the Mage, the Spell Blade and the Summoner.
-- **Every branch is someone's best in Tier 2, and again in Tier 3:** the Great Pendant left on (the Paladin), the Channel
-  Pendant on a pair of one channel (the Mage's Fire and Ice, the Cleric's Light and Ice, the Brawler on waves), the Great
-  Orb tuned (four classes, five in Tier 3) and on the Summoner's Bow, the Twin Orb on a hybrid's twin pair (the Spell Blade's Lance and
-  Thunder, the Summoner's Bow and Light), the Great Bell in the Brawler's campaign, the Toll Bell in her long fights, the
-  Great Insignia in every other class's long fights, Onslaught on waves (the Mage, the Spell Blade; in Tier 3 the Brawler
-  too).
+- **Every branch is someone's best in Tier 2, and again in Tier 3** (*follow-up to D196 (stat balancing), 2026-10-25:
+  the re-run tables above; with the first values the Great Pendant and the Toll Bell were nobody's*): the Great Pendant
+  left on (the Spell Blade's and the Paladin's campaign and waves in Tier 2, 10.8% and 11.3% against the Channel Pendant's
+  9.8% and 11.0%; the Spell Blade's campaign in Tier 3), the Channel Pendant on a pair of one channel (the Mage's Fire and
+  Ice in both tiers; the Cleric's Light and Ice in Tier 2, the Paladin's Greatsword and Axe in Tier 3), the Great Orb tuned (the Brawler, the
+  Mage, the Paladin, the Cleric; the healers' long fights too), the Twin Orb on a hybrid's twin pair (the Spell Blade's
+  Lightning twins tuned, the Summoner's Light twins in every context but long fights; the Cleric's waves, in Tier 3 her campaign too), the Great Bell
+  in the Brawler's campaign, **the Toll Bell in her long fights** (26.3% and 28.9% against the Great Bell's 24.5% and
+  26.0%; it loses the campaign's two-ring fights, 5.8% against 10.8%), the Great Insignia in the long fights of the Mage
+  and the hybrids, Onslaught on waves (the Brawler, the Mage; in Tier 3 the Spell Blade and the Paladin too).
 - **None dominates:** no form is the best in more than half its tier's 24 cells (the Tier 1 Orb's 12, tuning being its
-  job); from Tier 2 no branch in more than seven (the Great Orb's 6 and 7), and every branch in at least one.
-- **The Dual pairing** (the review): with her Dual, her damage leans on that weapon, so a single-kind form on its own
-  kind gains about a fifth (Tier 2 campaign, Great Orb on it, without → with the Dual): Brawler's Lance 7.0% → 8.5%, Mage's
-  Fire 7.2% → 8.4%, Spell Blade's Katana 6.8% → 7.6%, Paladin's Light 7.4% → 9.2%, Cleric's Light 7.6% → 9.5% (the
-  Summoner's Bow is in every act already: 10.8%). Tuned, the Great Orb (or the hybrids' Twin Orb) is every class's best.
+  job); from Tier 2 no branch in more than six (*follow-up to D196:* the Great Orb 6 · 6, the Twin Orb 5 · 6, the Great
+  Pendant 4 · 1, Onslaught 2 · 4, the Great Insignia 3 · 3, the Channel Pendant 2 · 2, the Great Bell and the Toll Bell
+  1 · 1; the first model's Great Orb 6 and 7), and every branch in at least one.
+- **The Dual pairing** (the review; the first model's numbers): with her Dual, her damage leans on that weapon, so a
+  single-kind form on its own kind gains about a fifth (Tier 2 campaign, Great Orb on it, without → with the Dual):
+  Brawler's Lance 7.0% → 8.5%, Mage's Fire 7.2% → 8.4%, Spell Blade's Katana 6.8% → 7.6%, Paladin's Light 7.4% → 9.2%,
+  Cleric's Light 7.6% → 9.5% (the Summoner's Bow is in every act already: 10.8%). Tuned, the Great Orb (or the hybrids'
+  Twin Orb) is every class's best. *Follow-up to D196 (stat balancing), 2026-10-25: a hybrid's preset still puts its
+  single-kind forms on her lead half, not her lone weapon, for her 70/30 (SB10, §5.8), at a small cost to her act.*
 - **The Bell stays the Brawler's** (and the Mage's MP answer, §5.9): the healers' and the hybrids' acts are skills and
   their hands small; for the hybrids its worth is also in chips, which these numbers leave out.
 - **By level** (Tier 1, a Brawler, campaign; the first draft's level model): the Bell leads from Lv 6 to Lv 31 (+4.4–6.8%
@@ -1000,7 +1091,14 @@ two most-used kinds; Tier 3 Full on the most-used, Split on the other two; *foll
 2026-10-24: was the Halo on her first slot, two in Tier 3; the accessory forms below stand*). **From Tier 2 the preset follows
 her class branch's set** (class-progression CP11, CP40). *Changed after owner review, 2026-10-24: every family is open
 from Tier 1, so the Tier 1 preset can be an Orb; from Tier 2 the branches; the single-kind forms sit on her Dual where
-it pays (the Brawler's Great Bell on her Lance, the Paladin's Great Orb on her Light).*
+it pays (the Brawler's Great Bell on her Lance, the Paladin's Great Orb on her Light).* *Follow-up to D196 (stat
+balancing), 2026-10-25 (logged against D193): **a hybrid's single-kind forms go on her lead half** (SB10), on the kind
+that twins her lone weapon, and her weapon moons with them (EP29): the Summoner's Tier 1 Orb and Tier 3 Great Orb on her
+Light (were her Bow), the Spell Blade's Tier 3 Great Orb on her Lance (was her Thunder), the Blademaster's on her Katana
+(was her Dark), the Conjurer's on her Fire (was her Greatsword). Stacked on her lone half they had pulled both hybrids
+toward 60/40 (the Summoner 57/43 at Lv 50); on her lead half both hold 70/30 ± 5 in every tier
+([stat-balance §5.1](stat-balance.md#51-spell-blade-against-summoner)). The damage column moves by the balance model's
+measured change (with the Summoner's Arms hand 0.48, SB11, and the Great Pendant's 0.55, SB8).*
 
 **Branch 1, her default set** (Tier 1 has no branch: this row is every Tier 1 preset):
 
@@ -1008,9 +1106,9 @@ it pays (the Brawler's Great Bell on her Lance, the Paladin's Great Orb on her L
 |---|---|---|---|---|
 | Brawler (Berserker) | **Bell** · Greatsword | **Great Bell** · Lance (her Dual) · **Channel Pendant** · Axe + Lance | + **Onslaught Insignia** | 7.5% · 21.6% · 33.6% |
 | Mage (Sage) | **Pendant** | **Channel Pendant** · Fire + Ice · **Onslaught Insignia** | + **Great Bell** · Fire (her Dual) | 7.0% · 18.2% · 27.2% |
-| Spell Blade (Rune Knight) | **Pendant** | **Twin Orb** · the Lightning twins (her Lance and Thunder) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Lightning · Onslaught | 7.2% · 18.5% · 29.0% |
-| Summoner (Warlock) | **Orb** · Bow | **Twin Orb** · the Light twins (her Bow and Light) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Bow · Onslaught | 8.9% · 19.9% · 32.1% |
-| Paladin (Guardian) | **Pendant** | **Great Pendant** · **Great Orb** · Light (her Dual) | + **Onslaught Insignia** | 8.0% · 19.0% · 31.2% |
+| Spell Blade (Rune Knight) | **Pendant** | **Twin Orb** · the Lightning twins (her Lance and Thunder) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Lance (*was Lightning*) · Onslaught | 7.2% · 18.5% · 27.6% (*was 29.0%*) |
+| Summoner (Warlock) | **Orb** · Light (*was Bow*) | **Twin Orb** · the Light twins (her Bow and Light) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Light (*was Bow*) · Onslaught | 5.2% · 19.6% · 29.3% (*was 8.9% · 19.9% · 32.1%*) |
+| Paladin (Guardian) | **Pendant** | **Great Pendant** · **Great Orb** · Light (her Dual) | + **Onslaught Insignia** | 8.0% · 20.1% · 31.7% (*was 19.0% · 31.2%: the Great Pendant's 0.55*) |
 | Cleric (Bishop) | **Orb** · Blizzard | **Channel Pendant** · Light + Ice · **Onslaught Insignia** | + **Great Orb** · Bow | 8.7% · 19.6% · 28.9% |
 
 **Branch 2, her reverse set** (Tier 2 on; one tap with the set, CP40):
@@ -1019,18 +1117,22 @@ it pays (the Brawler's Great Bell on her Lance, the Paladin's Great Orb on her L
 |---|---|---|---|
 | Brawler (Warlord: Bow, Katana, Axe) | **Great Bell** · Bow (her Dual) · **Channel Pendant** · Bow + Axe | + **Onslaught Insignia** | 20.9% · 33.5% |
 | Mage (Sorcerer: Light, Dark, Blizzard) | **Channel Pendant** · Light + Ice · **Onslaught Insignia** | + **Great Bell** · Light (her Dual) | 18.3% · 28.0% |
-| Spell Blade (Blademaster: Katana, Bow, Dark) | **Twin Orb** · the Dark twins (her Katana and Dark) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Dark · Onslaught | 19.0% · 29.0% |
-| Summoner (Conjurer: Fire, Thunder, Greatsword) | **Great Orb** · Greatsword (her Dual) · **Onslaught Insignia** | + **Great Pendant** | 19.9% · 32.1% |
+| Spell Blade (Blademaster: Katana, Bow, Dark) | **Twin Orb** · the Dark twins (her Katana and Dark) · **Onslaught Insignia** | **Great Pendant** · **Great Orb** · Katana (*was Dark*) · Onslaught | 18.9% · 29.9% (*was 19.0% · 29.0%*) |
+| Summoner (Conjurer: Fire, Thunder, Greatsword) | **Great Orb** · Fire (*was her Dual Greatsword*) · **Onslaught Insignia** | + **Great Pendant** | 16.2% · 29.4% (*was 19.9% · 32.1%*) |
 | Paladin (Templar: Bow, Katana, Light) | **Channel Pendant** · Bow + Katana · **Onslaught Insignia** | + **Great Orb** · Light | 19.9% · 28.7% |
-| Cleric (Oracle: Light, Fire, Greatsword) | **Great Pendant** · **Twin Orb** · the Fire twins | **Great Pendant** · **Great Orb** · Greatsword (her Dual) · Onslaught | 21.6% · 32.1% |
+| Cleric (Oracle: Light, Fire, Greatsword) | **Great Pendant** · **Twin Orb** · the Fire twins | **Great Pendant** · **Great Orb** · Greatsword (her Dual) · Onslaught | 22.6% · 32.6% (*was 21.6% · 32.1%: the Great Pendant's 0.55*) |
 
 - **The rule behind both tables:** the model's best campaign set for her weapons, one of each family; a Great Orb on her
-  Dual or her lone Arm or Tome; a Bell follows her Dual; Onslaught fills Tier 3's third slot for most. A preset kind's
-  accessories and weapon moon stack, the moon outside the cap (the Spell Blade's Tier 3 Lightning: Great Pendant +49,
-  Great Orb +114, Full moon +130). *Follow-up to D194 (Extra Stats), 2026-10-24: "the Halo stays her first slot, so a
+  Dual, **a hybrid's single-kind forms on her lead half** (the kind that twins her lone weapon, for her 70/30, even where
+  her lone weapon would add a little more; *follow-up to D196, SB10: was "or her lone Arm or Tome"*); a Bell follows her
+  Dual; Onslaught fills Tier 3's third slot for most. A preset kind's accessories and weapon moon stack, the moon outside
+  the cap (the Spell Blade's Tier 3 Lance: Great Pendant +51, Great Orb +114, Full moon +130; *was her Lightning, +49*). *Follow-up to D194 (Extra Stats), 2026-10-24: "the Halo stays her first slot, so a
   Great Orb sits elsewhere" goes; the moons don't share the cap.*
 - **Next to the first draft's** (the same model, its bases only): Tier 1 the same (7–9%); Tier 2 18–22% against 12–17%;
   Tier 3 27–34% against 19–25%. The branches are Tier 2's and 3's added depth, priced in their tiers' terms (§13).
+  *Follow-up to D196 (stat balancing), 2026-10-25: now 5–9% · 16–23% · 27–34% (the Summoner's and the Conjurer's
+  lead-half forms add about 4 points less, the price of her 70/30; the Great Pendant's 0.55 about a point more); the
+  terms are Tier 2's +27% and Tier 3's ×1.08 → ×1.48 on the foes' HP and DEF (SB3, SB4).*
 
 ### 5.9 MP after the MP accessories
 
@@ -1038,13 +1140,23 @@ it pays (the Brawler's Great Bell on her Lance, the Paladin's Great Orb on her L
   and Cleric. Today a region on Auto ends with 4–10% of its MP through Lv 35 and 26–31% at Lv 45–50
   ([tier2-world §7](../tier2-world.md)); without them the magical classes end it drier.
 - **What comes:** armor's legs at +3 a grade (+30 at G10, +10 over today's), **Vigor's MP** (+30 × tier, with the
-  Planet's +21 × tier: +51 an Uma at Lv 46 in Tier 1; extra-stats-progression EP4), the template's MP twists (U9:
-  Opening, Even pace, Second wind), and the Bell (every tier now), which makes her free Attack worth taking when the bar
-  is empty.
+  Planet's +21 × tier: +51 an Uma at Lv 46 in Tier 1; extra-stats-progression EP4), **the base regen** (SB18: every Uma
+  regains 0.8% of her max MP a round for each skill depth her class has open, 4% from Class Rank 40; a rule, never an
+  item), the template's MP twists (U9: Opening, Even pace, Second wind), and the Bell (every tier now), which makes her
+  free Attack worth taking when the bar is empty.
 - **What the simulation checks:** the Springs test (README §9.5 item 5) with no MP accessory: a region on Auto still
-  clears 10–12 of 12 stages in a row, as today. If not, the knobs in order: legs' MP a grade (+3 → +4), then Vigor's MP
-  rate (EP15), then the Flourish's twists; never an MP accessory. *Changed in cross-check (2026-10-24): Vigor's MP and
-  its knob added, extra-stats-progression's order.*
+  clears 10–12 of 12 stages in a row, as today, **and the party's pace in a region's last four stages stays within ±10%
+  of today's** (the model: 0.94–1.05×). If not, the knobs in order: **the regen's share a depth** (±0.1% moves
+  late-region pace about ±5%), then Vigor's MP rate (EP15), then legs' MP a grade (+3 → +4), then the Flourish's twists;
+  never an MP accessory. *Changed in cross-check (2026-10-24): Vigor's MP and its knob added, extra-stats-progression's
+  order.*
+- *Follow-up to D196 (stat balancing), 2026-10-25* ([stat-balance §7](stat-balance.md#7-mp-after-the-regen-accessories),
+  SB14, SB18): in one stage MP never binds (5–19 deep casts a bar), but over a region it bound every class: the
+  casters' late coverage fell from today's 100% to 30–37% and the party's late-region power to 0.41–0.52× today's from
+  Lv 30. No pool knob answers it (legs +4 a grade buys 3% more casts, Vigor's MP ×2 10%); MP coming back does. With
+  the base regen the party's region power is 1.01–1.06× today's and its late region 0.94–1.05×; at Lv 50 the Mage casts
+  deep in 80% of a region's acts, the Summoner 67%, the Cleric 100%; no deep cast is refunded by a round (a healer's 76%
+  the most).
 
 ### 5.10 The signature accessory: Uma uniqueness through accessories (WP33)
 
@@ -1273,7 +1385,7 @@ the split of ownership.*
 | **class-progression.md** | **CP36: the note is added** (§6.9: proposed follow-up, the signature accessory replaces the affinity, decided in the Uma Templates pass). Follow-ups for its next pass, not edited here: CP12 and CP33's wording (a Dual's second kind is its **fixed partner**, always of the other group; Tier 3 Dual → Tempered or Evolved); CP10 and §5.3 (Tier 1's accessory choice is one of four, every family every tier); CP11 and §5.2 (the presets of §5.8); §3.5's Brawler (Dual Lance + Katana, not Axe + Katana; her Light/Dark set's Bow + Greatsword); §9's offense column (the Tier 1 presets now give the Summoner and the Cleric an Orb) |
 | **extra-stats-progression.md** | The kind cap (§5.6, +68 × tier) binding the Pendant and Orb forms only, **the weapon moons outside it** (EP27); the damage stack's step 1 taking the weapon moons on a hit's own kind (§2.4); the presets' accessory forms (§5.8), beside EP29's weapon-moon presets; §8.2's offense column follows §5.8's presets. Evasion on feet armor stays 1.2% a grade, 12% at G10, in every tier (a share). *Follow-up to D194 (Extra Stats), 2026-10-24: was the Halo under the cap, on her first slot* |
 | **profession-progression.md** | The four products and pieces per Uma, unchanged (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30); one Branch Gem line; **no item for accessory forms**; wording only (§6.4's box). 365 refined in every tier |
-| **The world and the Rift** (balance) | The foes' offense budget holds with the armor (§4.3); boss shields by answers (§3.6: CP8's 6 · 8 · 9 hold); the Tier 1 re-baseline plays the presets of §5.8 |
+| **The world and the Rift** (balance) | The foes' offense budget holds with the armor (§4.3); boss shields by answers (§3.6: CP8's bosses 6 · 9 · 10, *follow-up to D196*, SB6; were 6 · 8 · 9); the Tier 1 re-baseline plays the presets of §5.8 |
 | **Uma Templates pass** | **The signature accessory** (WP33): which family each template names (about a quarter each); **whether it replaces the affinity** (recommended, noted at CP36); the signature tip's anchor if it does (CP24); the moon's node II on defense (CP36's note) |
 | **Screens** | §8: the Gear tab, the weapon and accessory sheets, the planner, the signature ★ |
 
@@ -1286,7 +1398,7 @@ the split of ownership.*
 | class-progression's second pass (CP38–CP41) | The class branches' weapon-group focus: the Ring group (main Arms, elemental Tomes) or the Light/Dark group (secondary Arms, arcane Tomes), +15% on a hit's own kind; the reverse sets (CP40) | **Settled:** the partners always cross the groups (WP32), the accessory forms read her slots (§3.9) |
 | extra-stats-progression.md (approved, D194) | **The weapon moons** (EP24–EP27, EP29): flat offense on her hits of one kind (Full, +50 × tier) or two (Split, +35 × tier each) from Tier 2, a second moon in Tier 3, outside the kind cap, preset by EP29; Prowess's split for ATK and M.ATK (EP23); Vigor's MP (+30 × tier, EP4); no evasion on the map (Swiftness retired, EP28). *Follow-up to D194, 2026-10-24: was the Halo under the cap and Swiftness's +3%, +6%* | If the moons came back under the cap: raise it to (68 + 50) × tier (118 · 212 · 307), else every Tier 3 Great Orb caps beside a moon |
 | profession-progression.md | The catalog (PP8), the ladder (PP9), the recipes (PP10), make time (PP12) | **Adopted in the cross-check** (§6.2): the pieces stay this doc's |
-| The simulation | Prices Pure against Dual (§3.7), the forms' values and the Attack shares (§5.7), the defensive budget (§4.3), the Springs test without MP accessories (§5.9), boss shields with Duals (§3.6), the signature at about +5% (§5.10) | The fallbacks named in each |
+| The simulation | Prices Pure against Dual (§3.7), the forms' values and the Attack shares (§5.7), the defensive budget (§4.3), the Springs test without MP accessories, with the base regen (§5.9; *follow-up to D196*, SB18), boss shields with Duals (§3.6), the signature at about +5% (§5.10) | The fallbacks named in each |
 
 ## 11. Save impact
 
@@ -1365,11 +1477,11 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **When a grade is worn** | Rank g, about Lv 5g − 4 for a weapon used every fight | Lv 5g − 4 | The same gate, by level |
 | **EXP per win** | Uma E, Class 2E, weapons 5E, armor E a kind, accessories E a kind | Uma E, Class 2E | Gear EXP fed only ranks and Gear Marks |
 | **Weapon power on curve** | Might by grade | Might × tier | SB1: a weapon's share holds at every tier's Lv 50 |
-| **Defense on curve** | Armor, Extra Stats, a support | Armor (one support's worth more), Extra Stats | A regular's hit 18.7% of her HP against today's 20%; the foes' offense budget unchanged (§4.3) |
-| **Accessory damage on curve** | An Orb on her lead kind (−4% at Lv 1 to −16% at Lv 50 on that kind's hits) and a support | Tier 1: one base form (7–9% of her damage, as the first draft's); Tier 2: two branch forms (18–22%, the first draft's two 12–17%); Tier 3: three (27–34%, against 19–25%) | The Tier 1 re-baseline plays §5.8's presets; Tier 2's and 3's added depth goes through their terms (Z4's for Tier 2); **the knob:** the branches' per-grade values step down together |
+| **Defense on curve** | Armor, Extra Stats, a support | Armor (one support's worth more), Extra Stats | A regular's hit 18.7% of her HP against today's 20%; the foes' offense budget unchanged (§4.3). *Follow-up to D196 (stat balancing), 2026-10-25: 18.3% and 18.1% in Tiers 2 and 3, **about 20% with the toolbox terms' offense** (+10% by Lv 50, the healers' sustain priced; SB13)* |
+| **Accessory damage on curve** | An Orb on her lead kind (−4% at Lv 1 to −16% at Lv 50 on that kind's hits) and a support | Tier 1: one base form (7–9% of her damage, as the first draft's); Tier 2: two branch forms (18–22%, the first draft's two 12–17%); Tier 3: three (27–34%, against 19–25%). *Follow-up to D196: 5–9% · 16–23% · 27–34% with the hybrids' forms on their lead half and the Great Pendant's 0.55 (§5.8)* | The Tier 1 re-baseline plays §5.8's presets; Tier 2's and 3's added depth goes through their terms. *Follow-up to D196 (stat balancing), 2026-10-25: the accessories are about a third of each tier's toolbox (×1.13 of Tier 2's act, ×1.25 of Tier 3's), **priced in Tier 2's term (+27% on the foes' HP and DEF, SB3) and Tier 3's (×1.08 → ×1.48, SB4)**, offense +10%, bosses × 1.1 (SB5)*; **the knob:** the branches' per-grade values step down together (held in reserve, SB7: × 0.8 moves Tier 2's pace without a term only 1.47 → 1.44× Tier 1's) |
 | **Her template** | — | The signature accessory, about +5% matched; recommended to replace the affinity's | Off the curve, as every template piece (XR12) |
-| **MP** | The Spring and the Siphon on the balance party's casters | Legs +30 at G10, Vigor's MP (+30, EP4), the template's twists, the Bell | The Springs test re-run (§5.9) |
-| **Tier 2's toolbox** | Weapon arts (+6–10% of party damage) and sets, Z4's draft term | Branches, the second slot and its branches, the class branches' focus (the damage stack, §2.4) | The simulation prices them in Z4's one term (XR15); Tier 3's in its own |
+| **MP** | The Spring and the Siphon on the balance party's casters | Legs +30 at G10, Vigor's MP (+30, EP4), **the base regen** (SB18: 0.8% of max MP a round a depth, 4% from Class Rank 40; *follow-up to D196*), the template's twists, the Bell | The Springs test re-run (§5.9), **and the region's pace against today's** (the last four stages within ±10%); knobs: the regen's share a depth, Vigor's MP rate, legs' MP a grade, the Flourish's twists |
+| **Tier 2's toolbox** | Weapon arts (+6–10% of party damage) and sets, Z4's draft term | Branches, the second slot and its branches, the class branches' focus (the damage stack, §2.4) | The simulation prices them in Z4's one term (XR15); Tier 3's in its own. *Follow-up to D196 (stat balancing), 2026-10-25: the four docs' tools compound to +51% an act in Tier 2 and +88% in Tier 3; **Tier 2's term +27%, Tier 3's ×1.08 → ×1.48** on the foes' HP and DEF (offense +10%, bosses × 1.1) bring a party's pace back to 1.03–1.11× Tier 1's (SB3–SB5)* |
 | **A newly slotted weapon** | Needs its rank | Any grade her level allows, if the stock has the gems | Class switching and the Rift's guided builds get cheaper |
 
 ## 14. Decisions
@@ -1387,20 +1499,20 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **WP9** Tier 3 | Pure → **Keen** (×1.7) or **Tempered** (+ its Tier 2 partner, both ×1.5); Dual → **Tempered** (keeps its partner) or **Evolved** (its Tier 3 partner, both ×1.5); Base → Pure or Dual; a weak hit at most ×1.7. *Changed after owner review, 2026-10-24: the Dual line forks too (the owner's "Evolution"); Pure's Tempered takes the fixed partner* | Dual → Tempered only (the first draft); a third kind (Prism, dropped); no Tier 3 step | Every line forks in Tier 3; depth by multiplier is SB1-neutral (WR5); Evolved re-aims, never adds |
 | **WP10** The Branch Gem | **One item a tier**, the branch picked when used; the first round's five fork gems become one line, the Prism Gem retires | A gem per branch (Pure, Dual, Keen, Tempered, Evolved Gems) | The crafter decides only how many, as with Moon Jewels; one product line, one icon |
 | **WP11** Re-forging, switching, promotion | Another Branch Gem changes a branch within its line (Pure ↔ Dual; Keen ↔ Tempered; Tempered ↔ Evolved), the grade stays; a class switch costs only unraised weapons; branches carry, grades reset, used items return to the old world (GE13, GE14 kept). *Changed after owner review, 2026-10-24: no second kind to re-pick* | Branches locked; free re-forging | A wrong pick costs one gem, not a tier |
-| **WP12** The coverage check | A script beside CP4's: with best picks the default party's answers per regular stay at or under Tier 1's in every tier: **2.47 · 2.0 · 2.30** with a Cleric, 2.66 · 2.03 · 2.30 with a Paladin; bosses 3.53 · 3.67 and 3.49 · 3.90, so **CP8's shields (6 · 8 · 9) hold** (a shield per answer within ±0.5). *Changed after owner review, 2026-10-24: re-run on fixed partners (was 2.0 · 2.34; bosses 3.30 · 3.76)*; fallbacks named (§3.7) | Price by feel | One number makes "trivializes" measurable (WR6) |
+| **WP12** The coverage check | A script beside CP4's: with best picks the default party's answers per regular stay at or under Tier 1's in every tier: **2.47 · 2.0 · 2.30** with a Cleric, 2.66 · 2.03 · 2.30 with a Paladin; bosses 3.53 · 3.67 and 3.49 · 3.90, so **CP8's shields (6 · 8 · 9) hold** (a shield per answer within ±0.5). *Changed after owner review, 2026-10-24: re-run on fixed partners (was 2.0 · 2.34; bosses 3.30 · 3.76)*; fallbacks named (§3.7). *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D193): by chips the bosses Broke half a round sooner; CP8's bosses are 6 · 9 · 10 (SB6); the answers stand* | Price by feel | One number makes "trivializes" measurable (WR6) |
 | **WP13** Weapon groups | Every group, kind and template bonus reads **a hit's own kind**; the groups are class-progression's CP38, Ring and Light/Dark. *Changed after owner review, 2026-10-24:* **every two-kind weapon bridges the groups** (partners cross them); the group and twin Pendants retire into forms that read her slots (§3.9) | Second kinds earn group bonuses; a Pendant per group half | No stacking through a partner; one rule for the focus and every flat bonus |
 | **WP14** Armor's shape | Five slots, the slot holds the grade; **the half sets only the piece shown and its offense;** every defensive stat is the slot's; her class's half in Tier 1, per piece for the four between from Tier 2. *Kept after owner review, 2026-10-24 ("just as they are")* | Halves that trade DEF for M.DEF; ten kinds of piece | Changing half never trades defense; one table to learn |
 | **WP15** Armor's values | Per grade, Tier 1: **DEF +4, M.DEF +4, HP +15, MP +3**, evasion 1.2%, offense ⌈g ÷ 2⌉ a piece; × tier except evasion. **One support's worth moves in:** a regular's hit 20% → 18.7% of an on-curve Brawler's HP, every class 1.3–1.8 points better, every tier. *Kept after owner review* | Today's values (defense falls a support's worth); a full support on both channels (17%: the foes' budget would rise) | The defensive budget the foes expect holds with nothing to pick |
 | **WP16** Sets | Stay dropped (GE10). *Kept after owner review* | Weapon arts' E8, E9 | The rework's trigger |
-| **WP17** Supports retire | **All ten Talismans and Amulets, in every tier:** the cuts, shields, returns, regen, lifesteal and both MP accessories | Keep a few; redesign MP regen smaller | The owner: defensive ones are never picked over damage; MP regen is always picked; a small MP regen is a dead pick |
+| **WP17** Supports retire | **All ten Talismans and Amulets, in every tier:** the cuts, shields, returns, regen, lifesteal and both MP accessories. *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D193): MP comes back by **a base regen every Uma has** (SB18, a rule of the game, not an item: 0.8% of her max MP a round for each skill depth open), so neither a dead pick nor an always-pick* | Keep a few; redesign MP regen smaller | The owner: defensive ones are never picked over damage; MP regen is always picked; a small MP regen is a dead pick |
 | **WP18** Four families, every tier | **Pendant** (spread), **Orb** (focused), **Bell** (a follow-up on her Attack), **Insignia** (rank or timing); damage only; **every family from Tier 1**, a simple base form each, two branches each from Tier 2: a **Great** one (the same reach, deeper) and one that changes the reach (§5.2). *Changed after owner review, 2026-10-24: families were unlocked by tier (Orbs Tier 2, Insignias Tier 3) with nineteen Tier 1 members* *Symmetry (owner note, 2026-10-24): channel-neutral by construction; the balance pass checks parity per channel (§5).* | Families by tier (the first draft); Orbs alone; % damage on a kind (stacks with the affinity); Break or weak-hit accessories | The owner's "all accessories available in Tier 1 in their base form"; one shape like the weapons'; each form wins a different context (§5.7) |
 | **WP19** Slots and forms | Slots 1 · 2 · 3, **untyped, one accessory of each family**; base forms from G0, the branches from a slot's G5 in Tier 2, their step from its G5 in Tier 3. *Changed after owner review, 2026-10-24: every family in every slot from Tier 1* | Typed slots; two of a family; branches by tier, not by grade | A family choice in every tier; branches arrive where weapons' do (G5) |
-| **WP20** Pendants | Base **Pendant**: her three slotted kinds, 0.4 Orb each (+14 at G10 × tier); **Great Pendant** 0.5 each (Tier 3 0.55); **Channel Pendant** two kinds of one channel, 0.8 each (0.85). *Changed after owner review, 2026-10-24: the nine fixed Pendants (group halves, twin sets) retire into these* | Nine fixed Pendants; Pendants on all five of a channel | Nothing to pick in Tier 1; breadth costs depth; the Channel Pendant serves a hybrid's pair of one channel |
-| **WP21** Bells | Base **Bell**: on her Attack, her weapon of its kind strikes once more at 0.1 a grade × her hand; **Great Bell** 0.14 a grade (0.15); **Toll Bell** 0.05 a grade at its first ring, +0.02 a grade each ring, up to 0.2 (0.25); one hit an Attack; **its kind counts for weaknesses and locks; it must be a kind she holds**; no gauge. *Changed after owner review, 2026-10-24: one Bell with its kind as a setting; two branches* | Any kind of her channel (adds a kind: 3.2 answers); a follow-up that can't chip; two follow-ups (more chips) | The owner's set; it adds hits and chips, never a kind or an extra chip; the Brawler's, and long fights' |
+| **WP20** Pendants | Base **Pendant**: her three slotted kinds, 0.4 Orb each (+14 at G10 × tier); **Great Pendant** 0.5 each (Tier 3 0.55); **Channel Pendant** two kinds of one channel, 0.8 each (0.85). *Changed after owner review, 2026-10-24: the nine fixed Pendants (group halves, twin sets) retire into these.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D193): **the Great Pendant 0.55 a kind (Tier 3 0.575)**, G10 +34 · +51 (SB8): at 0.5 the Channel Pendant dominated it (0.5 on three kinds is 1.5 Orbs, 0.8 on two 1.6); now it wins the Spell Blade's and the Paladin's campaigns and waves in Tier 2, the Spell Blade's campaign in Tier 3* | Nine fixed Pendants; Pendants on all five of a channel | Nothing to pick in Tier 1; breadth costs depth; the Channel Pendant serves a hybrid's pair of one channel |
+| **WP21** Bells | Base **Bell**: on her Attack, her weapon of its kind strikes once more at 0.1 a grade × her hand; **Great Bell** 0.14 a grade (0.15); **Toll Bell** 0.05 a grade at its first ring, +0.02 a grade each ring, up to 0.2 (0.25) (*follow-up to D196 (stat balancing), 2026-10-25, logged against D193: **+0.05 a grade each ring** (G10: 0.5, 1.0, 1.5, 2.0), SB8; at +0.02 it needed 11 rings to pass the Great Bell, and a long fight rings about six; now it wins the Brawler's long fights, 26.3% and 28.9% against 24.5% and 26.0%*); one hit an Attack; **its kind counts for weaknesses and locks; it must be a kind she holds**; no gauge. *Changed after owner review, 2026-10-24: one Bell with its kind as a setting; two branches* | Any kind of her channel (adds a kind: 3.2 answers); a follow-up that can't chip; two follow-ups (more chips) | The owner's set; it adds hits and chips, never a kind or an extra chip; the Brawler's, and long fights' |
 | **WP22** Orbs | Base **Orb**: one kind, half a weapon's Might × tier (+34 · +61 · +88), **from Tier 1**; **Great Orb** 1.2 Orbs (Tier 3 1.3); **Twin Orb** one twin set, 0.8 each (0.85). *Changed after owner review, 2026-10-24: Orbs from Tier 1 (were Tier 2's)* | Orbs in Tier 2 only (the first draft) | The owner keeps them and wants every family in Tier 1; the single-kind forms pair with a Dual |
 | **WP23** Insignias | Base **Insignia**: hits on sub-bosses and bosses +1.5% a grade (+15%), **from Tier 1**; **Great Insignia** +2% a grade (+20%; Tier 3 +22.5%); **Onslaught Insignia** her first act each wave +2.5% a grade (+25%; +27.5%). *Changed after owner review, 2026-10-24: Tier 3's Slayer becomes the base, Onslaught its Tier 2 branch* | Insignias in Tier 3 only; vs Broken (the Warlord's and trees' job) | Two contexts the others don't cover; every family in Tier 1 |
 | **WP24** The kind cap | **Flat offense on one kind from the Pendant and Orb forms at most a G10 Might × tier** (+68, +122, +177). *Re-checked after owner review, 2026-10-24: unchanged; the Great Orb is the one form it binds; the signature, a stat, sits outside it.* *Follow-up to D194 (Extra Stats), 2026-10-24: the Halo retires; **the weapon moons sit outside the cap** (EP27), bounded by their own size, so the flat on one kind is at most Might + cap + a Full moon (334 · 484 in Tiers 2 and 3); the cap's values don't move* | No cap; one source a kind | X7's bound extended; the damage stack (WP31) stays bounded |
-| **WP25** Presets | §5.8: Tier 1 Bell (Brawler), Pendant (Mage, Spell Blade, Paladin), Orb (Summoner's Bow, Cleric's Blizzard); Tier 2 two branch forms, Tier 3 three, for both class branches' sets; her weapon moons by extra-stats-progression EP29 (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used, Split on the other two), every kind under the cap. *Changed after owner review, 2026-10-24: every family from Tier 1, branches from Tier 2, the single-kind forms on her Dual where they pay.* *Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons replace "the Halo on her first slot"; the accessory forms stand* | One family for every class | The model's campaign picks; the simulation plays them |
+| **WP25** Presets | §5.8: Tier 1 Bell (Brawler), Pendant (Mage, Spell Blade, Paladin), Orb (Summoner's Bow, Cleric's Blizzard); Tier 2 two branch forms, Tier 3 three, for both class branches' sets; her weapon moons by extra-stats-progression EP29 (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used, Split on the other two), every kind under the cap. *Changed after owner review, 2026-10-24: every family from Tier 1, branches from Tier 2, the single-kind forms on her Dual where they pay.* *Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons replace "the Halo on her first slot"; the accessory forms stand.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D193): **a hybrid's single-kind forms on her lead half** (SB10): the Summoner's Tier 1 Orb and Tier 3 Great Orb on her Light, the Spell Blade's Tier 3 Great Orb on her Lance, the Blademaster's on her Katana, the Conjurer's on her Fire (§5.8); with the Summoner's Arms hand 0.48 (CP9) both hold 70/30 ± 5* | One family for every class | The model's campaign picks; the simulation plays them |
 | **WP26** Products and recipes | **Weapon Gem, Branch Gem, Armor Fittings, Accessory Setting;** the pieces per Uma are this doc's (§6.3); the recipes and amounts are profession-progression.md's (PP8–PP10): gear **365 refined in every tier**, one Uma 485 · 505 · 525. *Re-checked after owner review, 2026-10-24: unchanged, no item for accessory forms (WP34).* *Follow-up to D194 (Extra Stats), 2026-10-24: the Uma's jewels moved her to 485 · 505 · 525 (was 503 · 521); gear doesn't move* | Recipes per family | profession-progression owns amounts (README §3) |
 | **WP27** The save | v27 deletes every crafted piece and gear rank, refunds each piece's raw items (paid in Tier 1's demand mix, PP20), recalls Forge jobs, Gear Marks → Class Marks, the ten supports retire, one accessory slot at G0 `{ grade, family, form, kind? }` with her preset; **v28** branches (no stored partner) and the second slot's forms; Tier 3's with its version. *Changed after owner review, 2026-10-24: families and forms in the slot; no stored second kind* *Owner, 2026-10-24: the compensation is reworked in the Profession review (Craft Levels reset to 1, tickets granted for the time they took; README §9.4); the raw refund here is the first draft.* *Follow-up to D194 and the owner's compensation direction, 2026-10-24 (wording only): as [profession-progression §14](profession-progression.md#14-save-impact) designs it (PP19, PP20), Craft Levels reset to 1 and each world gets a Speed Ticket for every 30 minutes of its Umas' lifetime Craft EXP (EXP ÷ 60, rounded up per Uma, PP24); deleted gear is folded into that grant, with a floor per world at the deleted pieces' own making time (PP20), no raw items back* | Convert her best grade per track, no refund | The owner's lean: every raw item back, recrafted by hand (GE15) |
 | **WP28** Names | "Grade" G0–G10 (GE16); **Pure, Dual, Keen, Tempered, Evolved**; **partner**; **Branch Gem**; **Pendant, Orb, Bell, Insignia** and their branches **Great** (Pendant, Orb, Bell, Insignia), **Channel Pendant, Twin Orb, Toll Bell, Onslaught Insignia**; **signature accessory**. *Changed after owner review, 2026-10-24: Evolved (the owner's "Evolution"), the forms, the signature; Slayer retires into the base Insignia* | "Specialized"; Crossed (a Twin Cross skill exists), Shifted (Shifting Spell), Grand (Grand Summon); Band, Chaser, Echo, Crest, Vanguard (taken) | One word, one meaning (README §2.4) |

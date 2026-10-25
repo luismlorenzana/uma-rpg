@@ -1,5 +1,7 @@
 # Uma Variance: Uma Templates
 
+> **Superseded by [uma-templates.md](uma-templates.md) (2026-10-25); kept as history.**
+
 > **Cross-referenced draft, 2026-10-22. Nothing here is built.** One category of [the Tier rework](README.md), reviewed
 > last. Calls **U1–U16**, each with a recommendation ([§15](#15-decisions)). No open questions. It fills the slots
 > [skill-trees.md](skill-trees.md) (SK11) and [extra-stats.md](extra-stats.md) (ES12) left for it. The cross-reference
@@ -289,10 +291,10 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 | **U6** Knack | Top growth rate; ties by base stat, then Speed … Wit | Top base stat; an outfit-id hash | Base stats follow the calling (35 of 56 Spell Blades top in Power); growth spreads; a hash can't be explained on her profile |
 | **U7** Not read | Surface, the outfit's skills, her name and id | Dirt as a flavor; the unique skill's effect type picks the twist | Turf is 94%; the skills are the uniqueness the owner declined. Supersedes Q10's sketch |
 | **U8** Start | New unlocks start in their calling (Spell Blade becomes a start; Pace sprinters with Power start as Brawlers, Wit-led closers as Summoners) | Keep D162/D180 and show the calling apart | One signal, not two; owned Umas unchanged |
-| **U9** Flourish | The root slot: an MP twist by stride, on as her calling, every tier | A damage twist (+% from round 3); a twist on one weapon's tree | MP is outside the foe budget and shows on every skill chip; class-wide needs no weapon |
+| **U9** Flourish | The root slot: an MP twist by stride, on as her calling, every tier. *Follow-up to D196 (stat balancing), 2026-10-25: with SB18's base regen each MP twist still adds 13–20 points of a region's coverage; a matched Mage reaches 100% (stat-balance §7.2)* | A damage twist (+% from round 3); a twist on one weapon's tree | MP is outside the foe budget and shows on every skill chip; class-wide needs no weapon |
 | **U10** Moon | ES12's two nodes: I knack (+4, every class), II lead (+8, her channel) | One stat for both, in the template's classes (ES12 as written) | Keeps the owner's "physical-only" node and still splits same-calling Umas by knack |
 | **U11** Professions | Only PR1's link: her calling's fight type names her trade. No speed, yield or level effect | Craft EXP +10% in her trade; +1 item a job | D139: every Uma of a level finishes together; professions.md is rebalancing demand |
-| **U12** Strength | About +5% damage at most when matched, all from the lead node; MP from the Flourish; never negative | Zero-sum trades (+ here, − there) | Matters, never forces; off the curve the foe budget prices |
+| **U12** Strength | About +5% damage at most when matched, all from the lead node; MP from the Flourish; never negative. *Follow-up to D196 (stat balancing), 2026-10-25: measured (stat-balance §8): the signature +4.3–6.1% at Lv 50, the matched affinity +2.1–4.7%, both 7–11%* | Zero-sum trades (+ here, − there) | Matters, never forces; off the curve the foe budget prices |
 | **U13** Stored? | Derived each time; ES12's positional ids | A template id written at unlock | No migration; tuning the rule reaches everyone |
 | **U14** Names | "{knack word} {type}", our own words | Numbers ("Template 17") | Readable; nothing from the original games |
 | **U15** Party synergy | None | Bonuses for matching strides | A template is the Uma's; party shape stays the classes' job |
