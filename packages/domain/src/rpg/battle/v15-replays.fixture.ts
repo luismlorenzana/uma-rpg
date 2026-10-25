@@ -98,9 +98,9 @@ function respec(a: BattleAlly, change: { weapons?: RpgWeapon[]; sides?: string[]
   for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
   const tree = profile.tree
   if (!validRpgTree(profile)) throw new Error(`${a.id}: an invalid re-spec`)
-  const known = rpgLearnedSkills(profile).sort((x, y) => rpgNode(y.id)!.depth - rpgNode(x.id)!.depth)
+  const known = rpgLearnedSkills(profile, ENGINE).sort((x, y) => rpgNode(y.id)!.depth - rpgNode(x.id)!.depth)
   const loadout: RpgNodeRef[] = (change.equip ?? []).map((id) => known.find((r) => r.id === id) ?? (() => { throw new Error(`${a.id}: ${id} unknown`) })())
-  const slots = change.only ? 0 : rpgActiveSlots(a.level)
+  const slots = change.only ? 0 : rpgActiveSlots(a.level, ENGINE)
   for (let pass = 0; pass < 5 && loadout.length < slots; pass++) {
     for (const w of weapons) {
       const next = known.find((r) => rpgNode(r.id)!.weapon === w && !loadout.some((x) => rpgNodeKey(x) === rpgNodeKey(r)))

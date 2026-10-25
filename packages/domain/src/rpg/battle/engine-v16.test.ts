@@ -12,7 +12,8 @@ import type { BattleAlly, BattleEnemy, BattleInput } from './types'
 const LEVEL = 20
 type Version = 15 | 16
 /** An invented Uma of a class at Lv 20 (depths 1–3 open), built by the fight's generation: her default weapons, her stats,
- * and in her loadout the cores of depth 1 of each weapon's tree, then of depth 2, as her slots allow. */
+ * and in her loadout the cores of depth 1 of each weapon's tree, then of depth 2, as her generation's slots allow (H65:
+ * five at Lv 20 from v16, six to v15). */
 function member(id: string, classId: RpgClass, version: Version, options: { weapons?: RpgWeapon[]; sides?: string[]; tier?: number } = {}): BattleAlly {
   const weapons = options.weapons ?? rpgDefaultWeapons(classId, version)
   const tier = options.tier ?? 1
@@ -21,7 +22,7 @@ function member(id: string, classId: RpgClass, version: Version, options: { weap
     tree: [], legacy: [], classRank: LEVEL }
   p = (options.sides ?? []).reduce(learnRpgNode, p)
   const stats = projectRpgStats(p, version)
-  const loadout = [1, 2].flatMap((d) => weapons.map((w) => ({ tier, id: `${classId}-${w}.${d}` }))).slice(0, rpgActiveSlots(LEVEL))
+  const loadout = [1, 2].flatMap((d) => weapons.map((w) => ({ tier, id: `${classId}-${w}.${d}` }))).slice(0, rpgActiveSlots(LEVEL, version))
   return { id, classId, weapons, tier, level: LEVEL, stats, tree: p.tree, legacy: [], loadout, mp: stats.mp, classRank: LEVEL }
 }
 /** One Uma of each class but one healer. */

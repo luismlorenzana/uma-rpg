@@ -1,7 +1,8 @@
 // An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
 // wields five weapons to v15, three from v16 (the Tier rework's fight), and has a tree per weapon; its Class Rank opens
-// the depths and pays the points for side skills (D102), her Uma Level her stats and skill slots, and a hand per class
-// scales power and MP.
+// the depths and, to v15, pays the points for side skills (D102), her Uma Level her stats and skill slots, and a hand per
+// class scales power and MP. From v16 a tree is a trunk and one free fork into line A or B, with no points, and every
+// skill she holds has a Skill Rank (H65, class-progression.md §6.1–§6.2).
 // Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/design/classes-v2.md) from v15, and
 // from v16 the Tier rework's fight (D200, docs/design/tier-rework/class-progression.md §3), a third row where it differs.
 // Each takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game
@@ -9,23 +10,27 @@
 // generation's.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
-import { rpgClassWeapons, rpgNodeIdentity as rpgNode, rpgSideNodeLevel, rpgTreeOf, type RpgNodeIdentity as RpgNode } from './node-identity'
+import {
+  rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgNodeIdentity as rpgNode, rpgNodeLine, rpgSideNodeLevel, rpgTreeOf, type RpgBranch,
+  type RpgLines, type RpgNodeIdentity as RpgNode,
+} from './node-identity'
 import {
   isRpgTome, isRpgWeapon, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon,
 } from './kinds'
 
 export * from './kinds'
-export { rpgClassWeapons } from './node-identity'
+export {
+  RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgNodeLine, validRpgLines, type RpgBranch, type RpgLines,
+} from './node-identity'
 
 export const RPG_TIER_MAX_LEVEL = 50
-/** Points buy side skills only (D86): one a Class Rank, per class (D102). Core skills cost nothing. */
+/** Points buy side skills only (D86): one a Class Rank, per class (D102). Core skills cost nothing. Engines v6–v15: from v16
+ * no node costs anything (CP14). */
 export const RPG_SIDE_POINTS_PER_LEVEL = 1
 /** Class Ranks that open depths 1–5 (D102; Uma levels before). */
 export const RPG_DEPTH_GATES = [1, 10, 20, 30, 40] as const
-/** Three skill slots at Lv1, one more at each gate: ten by Lv40. */
+/** Three skill slots at Lv1, one more at each of her generation's gates (`rpgActiveSlots`). */
 export const RPG_BASE_ACTIVE_SLOTS = 3
-export const RPG_ACTIVE_SLOT_GATES = [10, 15, 20, 25, 30, 35, 40] as const
-export const RPG_MAX_ACTIVE_SLOTS = RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length
 /** Skills carried from an earlier tier (S8); the engine still checks the cap. */
 export const RPG_MAX_LEGACY_SLOTS = 2
 /** Side skills one class may hold: one per depth in each of ten trees. */
@@ -48,11 +53,15 @@ export interface RpgProfile {
   tier: number
   level: number
   exp: number
-  /** The side skills she has learned in this class's trees. Core skills aren't listed: an open depth gives them. */
+  /** The side skills she has learned in this class's trees, to v15. Core skills aren't listed: an open depth gives them.
+   * Empty from v16 (no side skills, CP14). */
   tree: RpgNodeRef[]
   legacy: RpgNodeRef[]
-  /** Her rank in this class (1–50): it opens the trees' depths and pays their side points (D102). */
+  /** Her rank in this class (1–50): it opens the trees' depths, to v15 pays their side points (D102), and from v16 sets
+   * every held skill's Skill Rank (CP32). */
   classRank: number
+  /** From v16, her line on each weapon's tree (CP14, CP18): a weapon listed is on B, any other on A, the default. */
+  lines?: RpgLines
 }
 export interface RpgCoreStats extends Stats {
   atk: number
@@ -305,19 +314,30 @@ export function grantRpgExp(profile: Pick<RpgProfile, 'tier' | 'level' | 'exp'>,
   return { level, exp, levelsCrossed }
 }
 
-// --- Trees (D77, D86) --------------------------------------------------------------------------------------------------
+// --- Trees (D77, D86; from v16 the Tier rework's, H65) -----------------------------------------------------------------
 
-/** Side points a class has earned: one per Class Rank. */
+/** Side points a class has earned: one per Class Rank. Engines v6–v15: from v16 nothing costs points (CP14). */
 export function rpgTreePointsEarned(classRank: number): number {
   return Math.max(0, Math.min(classRank, RPG_TIER_MAX_LEVEL)) * RPG_SIDE_POINTS_PER_LEVEL
 }
 
-export function rpgActiveSlots(level: number): number {
+const SLOT_GATES_V1: readonly number[] = [10, 15, 20, 25, 30, 35, 40]
+/** The Uma Levels that each add an equipped slot: to v15 seven (ten slots by Lv 40); from v16 four, one more at Lv 10, 20,
+ * 30 and 40 (CP22: 3 → 7). */
+const slotGatesOf = byRework(SLOT_GATES_V1, SLOT_GATES_V1, [10, 20, 30, 40] as readonly number[])
+/** An engine's generation's slot gates. */
+export const rpgActiveSlotGates = (engine: number = BATTLE_ENGINE_VERSION): readonly number[] => slotGatesOf(engine)
+/** The live generation's gates and most slots: ten until H72 turns on the Tier rework's fight. */
+export const RPG_ACTIVE_SLOT_GATES: readonly number[] = slotGatesOf(BATTLE_ENGINE_VERSION)
+export const RPG_MAX_ACTIVE_SLOTS = RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length
+
+/** The skills she may equip at an Uma Level in an engine's generation: three at Lv 1, one more at each of its gates. */
+export function rpgActiveSlots(level: number, engine: number = BATTLE_ENGINE_VERSION): number {
   rpgLifetimeLevels(1, level)
-  return RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.filter((gate) => level >= gate).length
+  return RPG_BASE_ACTIVE_SLOTS + slotGatesOf(engine).filter((gate) => level >= gate).length
 }
 
-/** Side skills cost their depth; unknown nodes count as out of budget. */
+/** Side skills cost their depth; unknown nodes count as out of budget. Engines v6–v15. */
 export function rpgTreePointsSpent(tree: readonly RpgNodeRef[]): number {
   return tree.reduce((sum, ref) => sum + (rpgNode(ref.id)?.cost ?? Number.MAX_SAFE_INTEGER / 64), 0)
 }
@@ -339,8 +359,41 @@ export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'classRank'>, tr
     .sort((a, b) => a.depth - b.depth).map((n) => ({ tier: profile.tier, id: n.id }))
 }
 
+// --- Skill Ranks (engine v16, CP32) ------------------------------------------------------------------------------------
+
+/** A Skill Rank's multiplier, Ranks 1–5 (CP32): on a skill's power and a healer's mend and Barrier shares; MP, hits,
+ * targets and statuses never change. The window's average is ×1.00, today's depth power. */
+export const RPG_SKILL_RANK_FACTOR = [0.95, 0.975, 1, 1.025, 1.05] as const
+export const RPG_SKILL_RANK_MAX = RPG_SKILL_RANK_FACTOR.length
+/** The Class Ranks each Skill Rank lasts. */
+export const RPG_SKILL_RANK_STEP = 2
+/** Her Skill Rank at a depth: 0 while it is closed, 1 when it opens, one more every 2 Class Ranks after, 5 at most
+ * (`1 + ⌊(Class Rank − gate) ÷ 2⌋`). Nothing is stored: it reads her Class Rank, so a branch swap keeps it. */
+export function rpgSkillRank(depth: number, classRank: number): number {
+  const gate = RPG_DEPTH_GATES[depth - 1]
+  if (gate === undefined || !(classRank >= gate)) return 0
+  return Math.min(RPG_SKILL_RANK_MAX, 1 + Math.floor((classRank - gate) / RPG_SKILL_RANK_STEP))
+}
+/** The Class Rank that brings her next Skill Rank at a depth (its gate while closed), or null at Rank 5. */
+export function rpgSkillRankNextAt(depth: number, classRank: number): number | null {
+  const gate = RPG_DEPTH_GATES[depth - 1]
+  if (gate === undefined) return null
+  const rank = rpgSkillRank(depth, classRank)
+  return rank >= RPG_SKILL_RANK_MAX ? null : gate + rank * RPG_SKILL_RANK_STEP
+}
+/** The multiplier her Skill Rank puts on a skill of a depth in an engine's generation: from v16 ×0.95–×1.05; 1 before v16,
+ * and at a closed depth (nothing casts it). Limit Breaks never rank (CP28): the engine asks only for tree skills. A fight
+ * derives it from her input's `classRank`, so the input freezes every rank. */
+export function rpgSkillRankFactor(depth: number, classRank: number, engine: number = BATTLE_ENGINE_VERSION): number {
+  const rank = rpgRework('fight', engine) ? rpgSkillRank(depth, classRank) : 0
+  return rank > 0 ? RPG_SKILL_RANK_FACTOR[rank - 1]! : 1
+}
+
+// --- Learning side skills (engines v6–v15) -----------------------------------------------------------------------------
+
 type Learner = Pick<RpgProfile, 'classId' | 'tier' | 'classRank' | 'tree'>
-/** Why this node can't be learned now, or null. Only side skills are learned; the same rules validate a stored tree. */
+/** Why this node can't be learned now, or null. Only side skills are learned; the same rules validate a stored tree.
+ * Engines v6–v15: from v16 nothing is learned (CP14; the save refuses it from H69). */
 export function rpgLearnBlock(profile: Learner, id: string): string | null {
   const node = rpgNode(id)
   if (!node || !rpgClassTrees(profile.classId).includes(node.tree)) return 'Not in this class’s trees'
@@ -355,20 +408,22 @@ export function rpgLearnBlock(profile: Learner, id: string): string | null {
 const otherSide = (tree: readonly RpgNodeRef[], node: RpgNode): boolean =>
   tree.some((ref) => ref.id === `${node.tree}.${node.depth}${node.variant === 'a' ? 'b' : 'a'}`)
 
+/** Learns a side skill. Engines v6–v15. */
 export function learnRpgNode<P extends Learner>(profile: P, id: string): P {
   const block = rpgLearnBlock(profile, id)
   if (block) throw new RangeError(block)
   return { ...profile, tree: [...profile.tree, { tier: profile.tier, id }] }
 }
 
-/** Side skills swap freely and the points come back. */
+/** Side skills swap freely and the points come back. Engines v6–v15. */
 export function forgetRpgVariant<P extends Pick<RpgProfile, 'tree'>>(profile: P, id: string): P {
   const node = rpgNode(id)
   if (!node || node.variant === null || !profile.tree.some((ref) => ref.id === id)) throw new RangeError('Only a learned side skill can be swapped out')
   return { ...profile, tree: profile.tree.filter((ref) => ref.id !== id) }
 }
 
-/** A stored set of side skills obeys every learning rule at its Class Rank, whatever order it was learned in. */
+/** A stored set of side skills obeys every learning rule at its Class Rank, whatever order it was learned in. Engines
+ * v6–v15 (from v16 the set is empty, which this accepts). */
 export function validRpgTree(profile: Learner): boolean {
   const trees = rpgClassTrees(profile.classId)
   const nodes: RpgNode[] = []
@@ -382,16 +437,35 @@ export function validRpgTree(profile: Learner): boolean {
   return !nodes.some((node) => otherSide(profile.tree, node))
 }
 
-/** Skills she may equip now: the open cores and learned sides of her weapons' trees, and her legacy ones. */
-export function rpgLearnedSkills(profile: Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'classRank' | 'tree' | 'legacy'>): RpgNodeRef[] {
+// --- What she holds and equips -----------------------------------------------------------------------------------------
+
+type Holder = Pick<RpgProfile, 'classId' | 'weapons' | 'tier' | 'classRank' | 'tree' | 'legacy' | 'lines'>
+
+/** The skills she holds in the Tier rework's trees (v16, CP14, CP18): on each of her weapons' trees, every open depth's
+ * node on her path (the trunk at depths 1–2, her line's at 3–5), shallowest first, her weapons in slot order: no points,
+ * no sides, no legacy. To v15 there are no lines, and what she holds is what she has learned (`rpgLearnedSkills`). */
+export function rpgHeldSkills(profile: Holder, engine: number = BATTLE_ENGINE_VERSION): RpgNodeRef[] {
+  if (!rpgRework('fight', engine)) return rpgLearnedSkills(profile, engine)
+  const held: RpgNodeRef[] = []
+  for (let depth = 1; depth <= rpgOpenDepth(profile.classRank); depth++) {
+    for (const w of profile.weapons) held.push({ tier: profile.tier, id: rpgBranchNode(profile.classId, w, depth, rpgLineOf(profile.lines, w)) })
+  }
+  return held
+}
+
+/** Skills she may equip now. To v15: the open cores and learned sides of her weapons' trees, and her legacy ones. From v16
+ * her held skills (`rpgHeldSkills`). */
+export function rpgLearnedSkills(profile: Holder, engine: number = BATTLE_ENGINE_VERSION): RpgNodeRef[] {
+  if (rpgRework('fight', engine)) return rpgHeldSkills(profile, engine)
   const trees = rpgProfileTrees(profile)
   const sides = profile.tree.filter((ref) => trees.includes(rpgNode(ref.id)?.tree as RpgTreeId))
   return [...rpgOpenCores(profile, trees), ...sides, ...profile.legacy]
 }
 
-/** The equipped skills she can still use, in order: known, in her weapons' trees, unique, within her slots. */
-export function rpgUsableLoadout(profile: RpgProfile, refs: readonly RpgNodeRef[]): RpgNodeRef[] {
-  const known = new Set(rpgLearnedSkills(profile).map(rpgNodeKey))
+/** The equipped skills she can still use, in order: known, in her weapons' trees, unique, within her slots, by an engine's
+ * generation. */
+export function rpgUsableLoadout(profile: RpgProfile, refs: readonly RpgNodeRef[], engine: number = BATTLE_ENGINE_VERSION): RpgNodeRef[] {
+  const known = new Set(rpgLearnedSkills(profile, engine).map(rpgNodeKey))
   const kept: RpgNodeRef[] = []
   for (const ref of refs) {
     const key = rpgNodeKey(ref)
@@ -399,18 +473,35 @@ export function rpgUsableLoadout(profile: RpgProfile, refs: readonly RpgNodeRef[
     if (ref.tier < profile.tier && kept.filter((r) => r.tier < profile.tier).length >= RPG_MAX_LEGACY_SLOTS) continue
     kept.push({ tier: ref.tier, id: ref.id })
   }
-  return kept.slice(0, rpgActiveSlots(profile.level))
+  return kept.slice(0, rpgActiveSlots(profile.level, engine))
 }
 
-/** Skills chosen for her when she hasn't picked: each weapon's deepest open core in turn, then the next deepest. A
- * hybrid's weapons alternate Arms and Tomes (her larger half first), so a Spell Blade always has both halves. */
-export function rpgAutoLoadout(profile: RpgProfile): RpgNodeRef[] {
+/** Skills chosen for her when she hasn't picked: each weapon's deepest skill in turn, then the next deepest (to v15 her
+ * open cores, from v16 her held skills). A hybrid's weapons alternate Arms and Tomes (her larger half first), so a Spell
+ * Blade always has both halves. */
+export function rpgAutoLoadout(profile: RpgProfile, engine: number = BATTLE_ENGINE_VERSION): RpgNodeRef[] {
   const arms = profile.weapons.filter((w) => !isRpgTome(w)), tomes = profile.weapons.filter(isRpgTome)
   const [first, second] = arms.length >= tomes.length ? [arms, tomes] : [tomes, arms]
   const order = first.flatMap((w, i) => (second[i] ? [w, second[i]!] : [w]))
-  const trees = order.map((w) => rpgTreeOf(profile.classId, w))
-  const byTree = trees.map((tree) => rpgOpenCores(profile, [tree]).reverse())
+  const held = rpgRework('fight', engine) ? rpgHeldSkills(profile, engine) : null
+  const byTree = order.map((w) => (held ? held.filter((ref) => rpgNode(ref.id)?.weapon === w)
+    : rpgOpenCores(profile, [rpgTreeOf(profile.classId, w)])).reverse())
   const picks: RpgNodeRef[] = []
   for (let round = 0; round < 5; round++) for (const list of byTree) if (list[round]) picks.push(list[round]!)
-  return picks.slice(0, rpgActiveSlots(profile.level))
+  return picks.slice(0, rpgActiveSlots(profile.level, engine))
+}
+
+/** Her equipped ids after she takes line `to` on a weapon's tree (v16, CP23: her equipped skills follow): that tree's
+ * depth 3–5 nodes on a line become `to`'s at the same depth, in place (Rend becomes Rending Combo), and every other id
+ * keeps its place. An id the swap would equip twice is kept once, first. Pure: the save's branch pick (H69) uses it. */
+export function rpgSwapBranchLoadout(loadout: readonly string[], classId: RpgClass, weapon: RpgWeapon, to: RpgBranch): string[] {
+  const tree = rpgTreeOf(classId, weapon)
+  const out: string[] = []
+  for (const id of loadout) {
+    const node = rpgNode(id)
+    const line = rpgNodeLine(id)
+    const next = node?.tree === tree && (line === 'A' || line === 'B') ? rpgBranchNode(classId, weapon, node.depth, to) : id
+    if (!out.includes(next)) out.push(next)
+  }
+  return out
 }

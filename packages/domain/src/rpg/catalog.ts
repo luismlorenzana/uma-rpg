@@ -3,12 +3,16 @@
 // class's hand (rules.ts) scales them. Every tree is one line of five depths: a core skill and two side skills (A, B)
 // at each. Each kind keeps one shape in every class: Greatsword and Fire hit one foe hard, Axe and Ice every foe, Lance
 // and Lightning random foes, Bow and Light one foe many times, Katana and Dark twice.
+// Engine v16 (the Tier rework's fight, H65) reads every tree as a trunk and two lines (`node-identity.ts`'s branch
+// tables) and plays new data on 32 ids, kept apart in `skill16` so older fights replay: the Spell Blade's B line is
+// Pierce, and the Paladin's revive moves to her Light tree. Names and summaries are presentation: they follow the live
+// generation at module load, so an old fight may show a new name.
 import {
   isRpgTome, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
 import { RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
-import { BATTLE_REGEN_ROUNDS, rpgV2 } from './battle/caps'
+import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, rpgRework, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 // The depth tables live with the node identities (H62): the world's foes read them without building this catalog.
 export { RPG_SKILL_MP, RPG_SKILL_POWER } from './node-identity'
@@ -88,8 +92,12 @@ export interface RpgNode {
   name: string
   /** Side skills cost their depth in points; core skills come free as their depth opens (D86). */
   cost: number
+  /** The def engines v6–v15 play, kept as it was so their fights replay. */
   skill: RpgSkillDef
-  /** One line for the tree screen. */
+  /** The def engine v16 plays where it differs (H65): Pierce on the Spell Blade's B line, the Paladin's revive on her Light
+   * tree. A fight reads a node's def through `rpgNodeSkill(node, version)`, never `skill` directly. */
+  skill16?: RpgSkillDef
+  /** One line for the tree screen: the live generation's def. */
   summary: string
 }
 
@@ -131,6 +139,8 @@ function describe(skill: RpgSkillDef): string {
   return parts.join(' · ')
 }
 
+/** Whether the live generation is the Tier rework's fight (v16): the names and summaries it shows. */
+const LIVE16 = rpgRework('fight')
 const NODES: RpgNode[] = []
 interface TreeSpec {
   classId: RpgClass
@@ -141,6 +151,8 @@ interface TreeSpec {
   core: (d: number) => RpgSkillDef
   sideA: (d: number) => RpgSkillDef
   sideB: (d: number) => RpgSkillDef
+  /** Engine v16's def for a side B node where it differs (H65), and its name, shown while v16 is live. */
+  sideB16?: (d: number) => { skill: RpgSkillDef; name: string } | undefined
 }
 function addTree(spec: TreeSpec): void {
   const tree = rpgTreeOf(spec.classId, spec.weapon)
@@ -150,7 +162,10 @@ function addTree(spec: TreeSpec): void {
     NODES.push({ ...base, id: `${tree}.${d}`, variant: null, name: at(spec.names, d), skill: core, summary: describe(core) })
     for (const side of ['a', 'b'] as const) {
       const skill = side === 'a' ? spec.sideA(d) : spec.sideB(d)
-      NODES.push({ ...base, id: `${tree}.${d}${side}`, variant: side, name: at(side === 'a' ? spec.a : spec.b, d), skill, summary: describe(skill) })
+      const v16 = side === 'b' ? spec.sideB16?.(d) : undefined
+      const live = LIVE16 && v16 ? v16 : { skill, name: at(side === 'a' ? spec.a : spec.b, d) }
+      NODES.push({ ...base, id: `${tree}.${d}${side}`, variant: side, name: live.name, skill, ...(v16 ? { skill16: v16.skill } : {}),
+        summary: describe(live.skill) })
     }
   }
 }
@@ -271,7 +286,9 @@ const SUMMONS: Readonly<Record<RpgWeapon, readonly string[]>> = {
   // From v15 "Paladin" is a class, so her depth-3 knight is the Knight Captain (tier2-classes §5.7, D183): the live
   // generation's name, as names are presentation; the id stays `summoner-greatsword.3`.
   greatsword: ['Squire', 'Shield Knight', rpgV2() ? 'Knight Captain' : 'Paladin', 'Aegis Champion', 'Sword Saint'],
-  axe: ['Brigand', 'Berserker', 'Axe Ogre', 'Minotaur Chief', 'Jotun Warlord'],
+  // From v16 the depth-2 and depth-5 brutes are the Marauder and the Jotun King (CP21: "Berserker" and "Warlord" name the
+  // Brawler's Tier 2 class branches), live names on the same ids, as the Knight Captain's; their sides follow.
+  axe: ['Brigand', LIVE16 ? 'Marauder' : 'Berserker', 'Axe Ogre', 'Minotaur Chief', LIVE16 ? 'Jotun King' : 'Jotun Warlord'],
   lance: ['Pikeman', 'Dragoon', 'Lance Knight', 'Valkyrie', 'Valkyrie Queen'],
   bow: ['Slinger', 'Archer', 'Ranger', 'Sylph Archer', 'Sagittarius'],
   katana: ['Ronin', 'Samurai', 'Kensei', 'Blade Shogun', 'Sword Spirit'],
@@ -338,6 +355,9 @@ function bladeCapstone(kind: RpgDamageKind): Partial<RpgSkillDef> {
   const status: RpgStatusKind = kind === 'fire' ? 'burn' : kind === 'ice' ? 'enfeeble' : kind === 'lightning' ? 'shock' : 'armor-break'
   return { rider: { status, stacks: 1, per: 'foe' } }
 }
+/** v16 (CP42): the Spell Blade's branch B, Pierce, on v15's Flurry ids (depths 3–5): one hit at this × the depth's power
+ * that ignores the unbroken halving (`special: 'pierce'`), +2 MP. On an Arms tree her extra hit still lands, and pierces. */
+export const RPG_PIERCE_SCALE = 1.15
 for (const weapon of RPG_WEAPONS) {
   const kind = rpgWeaponKind(weapon)
   const names = TIERS.map((t) => `${t} ${BLADE_NOUN[kind]}`)
@@ -346,7 +366,8 @@ for (const weapon of RPG_WEAPONS) {
   addTree({ classId: 'spellblade', weapon, names, a: names.map((n) => `Focused ${n}`), b: names.map((n) => `${n} Flurry`),
     core: (d) => ({ ...one(d, at(BLADE_HITS[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) }),
     sideA: (d) => one(d, Math.max(1, at(BLADE_HITS[kind], d) - 1), 1.1, 2),
-    sideB: (d) => one(d, at(BLADE_HITS[kind], d) + 1, 0.95, 2) })
+    sideB: (d) => one(d, at(BLADE_HITS[kind], d) + 1, 0.95, 2),
+    sideB16: (d) => (d >= 3 ? { skill: { ...one(d, 1, RPG_PIERCE_SCALE, 2), special: 'pierce' }, name: `Piercing ${at(names, d)}` } : undefined) })
 }
 
 // --- Cleric: a blow that weakens, a spell that blesses (D86) -----------------------------------------------------------
@@ -415,15 +436,21 @@ for (const weapon of RPG_WEAPONS) {
 
 // --- Paladin (classes v2, engine v15, D179): the Cleric's kit and names, her other half ---------------------------------
 
-/** The Paladin's one side skill not named Lasting or Heavy: the Lance tree's depth-4 B, Valkyrie's Oath, in the Heavy
- * shape, whose v15 support also revives (§4). Her Light 3B is Heavy Devotion, since Rebirth stays the Cleric's. */
-export const RPG_VALKYRIE_OATH_NODE = 'paladin-lance.4b'
+/** The Paladin's one side skill not named Lasting or Heavy, Valkyrie's Oath: in the Heavy shape, whose support also
+ * revives (§4). To v15 it is her Lance tree's depth-4 B, her Light 3B Heavy Devotion, since Rebirth stays the Cleric's;
+ * from v16 (CP37) it moves to her Light tree's depth-3 B, on her default Light Tome where the Cleric's Rebirth sits, and
+ * her Lance 4B is Heavy Transfix. Ids stay. */
+export const rpgValkyrieOathNode = (engine: number = BATTLE_ENGINE_VERSION): string =>
+  (rpgRework('fight', engine) ? 'paladin-tome-light.3b' : 'paladin-lance.4b')
 for (const weapon of RPG_WEAPONS) {
   const names = CLERIC_NAMES[weapon]
   const b = names.map((n, i) => (weapon === 'lance' && i === 3 ? "Valkyrie's Oath" : `Heavy ${n}`))
+  const moves = (d: number) => (weapon === 'tome-light' && d === 3) || (weapon === 'lance' && d === 4)
   addTree({ classId: 'paladin', weapon, names, a: names.map((n) => `Lasting ${n}`), b,
     core: (d) => cleric(weapon, d, 2, 0, 0, false, true), sideA: (d) => cleric(weapon, d, 3, 0, 2, false, true),
-    sideB: (d) => cleric(weapon, d, 2, 1, 4, weapon === 'lance' && d === 4, true) })
+    sideB: (d) => cleric(weapon, d, 2, 1, 4, weapon === 'lance' && d === 4, true),
+    sideB16: (d) => (moves(d) ? { skill: cleric(weapon, d, 2, 1, 4, weapon === 'tome-light', true),
+      name: weapon === 'tome-light' ? "Valkyrie's Oath" : `Heavy ${at(names, d)}` } : undefined) })
 }
 
 /** Every node of every generation (750, D179): `rpgNode` finds any of them, the Paladin's included. */
@@ -433,3 +460,18 @@ export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.inc
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)
 export const rpgTreeNodes = (tree: RpgTreeId): RpgNode[] => NODES.filter((n) => n.tree === tree)
+/** The def a node plays in a fight of an engine's version (H65): from v16 its `skill16` where it has one, else `skill`. The
+ * engine, Limit Breaks, Auto and a summon's farewell read nodes through this, with the fight's version. */
+export const rpgNodeSkill = (node: RpgNode, version: number): RpgSkillDef =>
+  (rpgRework('fight', version) && node.skill16 ? node.skill16 : node.skill)
+/** A skill at a Skill Rank's multiplier (v16, CP32): every hit's power (`hits`, `focus`, `splash`, `other`) and its
+ * support's mend and Barrier shares (`support15`'s `share` and `shieldShare`) × `factor`. Its MP, hit count, targets,
+ * riders, statuses, drain and revive stay. */
+export function rpgRankedSkill(def: RpgSkillDef, factor: number): RpgSkillDef {
+  if (factor === 1) return def
+  const scale = (hit: RpgHit): RpgHit => ({ ...hit, power: hit.power * factor })
+  const sup = def.support15
+  return { ...def, hits: def.hits.map(scale), ...(def.focus ? { focus: def.focus.map(scale) } : {}), ...(def.splash ? { splash: scale(def.splash) } : {}),
+    ...(def.other ? { other: def.other.map(scale) } : {}),
+    ...(sup ? { support15: { ...sup, share: sup.share * factor, ...(sup.shieldShare !== undefined ? { shieldShare: sup.shieldShare * factor } : {}) } } : {}) }
+}

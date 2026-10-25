@@ -1,7 +1,8 @@
-// Battle numbers and skill lookup, engine v6–v15 (D86, D102, D141, D169, D179; docs/design/class-rework.md, combat-balance.md).
-import { rpgNode, type RpgNode, type RpgSkillDef } from '../catalog'
-import { isRpgTome, RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, type RpgDamageKind, type RpgElement,
-  type RpgNodeRef } from '../rules'
+// Battle numbers and skill lookup, engine v6–v16 (D86, D102, D141, D169, D179; docs/design/class-rework.md, combat-balance.md;
+// v16's held skills and Skill Ranks, H65).
+import { rpgNode, rpgNodeSkill, rpgRankedSkill, type RpgNode, type RpgSkillDef } from '../catalog'
+import { isRpgTome, RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, rpgSkillRankFactor,
+  type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
 
 /** Octopath Traveler: a weakness hit ×1.3, a broken foe ×2 — here as ×0.5 before the break and ×1 after. */
@@ -56,17 +57,26 @@ export function battleClassRank(ally: Pick<BattleAlly, 'classRank' | 'level' | '
   return Math.min(ally.level, RPG_DEPTH_GATES[ally.maxDepth]! - 1)
 }
 
+/** A node's def as this ally casts it in a fight of `version` (H65): its generation's def (`rpgNodeSkill`), and from v16 at
+ * the Skill Rank her Class Rank gives its depth (CP32), so the fight's input freezes it. The same def for a cast and for
+ * a summon's farewell, which reads her summon as she cast it. */
+export function battleNodeDef(ally: Pick<BattleAlly, 'classRank' | 'level' | 'maxDepth'>, node: RpgNode, version: number): RpgSkillDef {
+  return rpgRankedSkill(rpgNodeSkill(node, version), rpgSkillRankFactor(node.depth, battleClassRank(ally), version))
+}
+
 /** A known, equipped skill as this ally casts it in a fight of `version`: her hand of that generation scales its power
- * (`arms` or `tome` by its weapon, equal in v1, D179) and MP, the skill's tier scales MP. */
-export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'loadout' | 'maxDepth' | 'classRank'>,
+ * (`arms` or `tome` by its weapon, equal in v1, D179) and MP, the skill's tier scales MP. Known is learned to v15 and held
+ * from v16 (her line, an open depth); from v16 its def is ranked (`battleNodeDef`), its MP the unranked def's. */
+export function battleSkillFor(ally: Pick<BattleAlly, 'classId' | 'weapons' | 'tier' | 'level' | 'tree' | 'legacy' | 'lines' | 'loadout' | 'maxDepth' | 'classRank'>,
   ref: RpgNodeRef, version: number): BattleSkill | null {
   const node = rpgNode(ref.id)
   if (!node || (ref.tier === ally.tier && !rpgProfileTrees(ally).includes(node.tree))) return null
   const key = rpgNodeKey(ref)
-  if (!rpgLearnedSkills({ ...ally, classRank: battleClassRank(ally) }).some((r) => rpgNodeKey(r) === key) || !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
+  if (!rpgLearnedSkills({ ...ally, classRank: battleClassRank(ally) }, version).some((r) => rpgNodeKey(r) === key) ||
+    !ally.loadout.some((r) => rpgNodeKey(r) === key)) return null
   const hand = rpgHand(ally, version)
-  return { node, def: node.skill, ref, label: node.name, power: isRpgTome(node.weapon) ? hand.tome : hand.arms,
-    mp: Math.max(1, Math.round(node.skill.mp * hand.mp)) * ref.tier }
+  return { node, def: battleNodeDef(ally, node, version), ref, label: node.name, power: isRpgTome(node.weapon) ? hand.tome : hand.arms,
+    mp: Math.max(1, Math.round(rpgNodeSkill(node, version).mp * hand.mp)) * ref.tier }
 }
 
 export const battleSkillLabel = (id: string): string => rpgNode(id)?.name ?? id

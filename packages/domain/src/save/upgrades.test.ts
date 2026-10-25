@@ -121,6 +121,12 @@ describe('can upgrade (H34)', () => {
     expect(up(at({ brawler: 1, mage: 20 }), 'mage').points).toBe(20)
   })
 
+  it('counts no points from engine v16, where nothing costs points (H65, CP14)', () => {
+    const w = world({ ranks: ranks({ classes: { brawler: 15 } }), classes: { brawler: { weapons: rpgDefaultWeapons('brawler', 16), tree: [], loadout: null } } })
+    expect(upgradesFor(w, '101', 'brawler', 1, 15)!.points).toBe(15)
+    expect(upgradesFor(w, '101', 'brawler', 1, 16)).toMatchObject({ points: 0, any: false })
+  })
+
   it('counts settable gem kinds and free active slots, agreeing with nodeFromGem for all 100 gems', () => {
     const all = Object.fromEntries(GEM_IDENTITIES.map((g) => [g.id, 1]))
     let seed = 3

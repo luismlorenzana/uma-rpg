@@ -9,20 +9,21 @@
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
 // v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs;
-// v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills.
+// v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills; a trunk and one fork into
+// line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65).
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
-import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
+import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
   isRpgDamageKind, isRpgTome, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
-  rpgWeaponKind, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
+  rpgWeaponKind, validRpgLines, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
   BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BREATHER, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT, BATTLE_COVER_CAP,
   BATTLE_COVER_CAP_V15, BATTLE_DEFENSE_SHARE, BATTLE_FOE_STATUS_STEP, BATTLE_GUARD_FACTOR, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE, BATTLE_MAX_ROUNDS,
   BATTLE_MIN_OFFENSE_SHARE, BATTLE_RALLY_SHARE, BATTLE_REGEN_ROUNDS, BATTLE_REGEN_SHARE, BATTLE_REVIVE_SHARE,
   BATTLE_STATUS_STACK_CAP, BATTLE_STATUS_STEP, BATTLE_STATUS_TURNS,
-  BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleSkillFor, type BattleSkill,
+  BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleChannel, battleClassRank, battleNodeDef, battleSkillFor, type BattleSkill,
 } from './skills'
 import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
@@ -116,10 +117,13 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
 /** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
  * weapons' Might, her armor's Barrier and Regen (D102, D104). Her class and weapons by the fight's generation (D179): a
  * Paladin only from v15. From v16 (the Tier rework's fight, D200) three weapons by channel and position, and no side
- * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31). */
+ * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31); her `lines` (H65) name only her weapons, each B,
+ * and her loadout holds only her held skills, at most her generation's slots (seven by Lv 40, CP22). */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
-  if (rpgRework('fight', version) && (!Array.isArray(a.tree) || a.tree.length > 0 || !Array.isArray(a.legacy) || a.legacy.length > 0)) return false
+  const v16 = rpgRework('fight', version)
+  if (v16 && (!Array.isArray(a.tree) || a.tree.length > 0 || !Array.isArray(a.legacy) || a.legacy.length > 0)) return false
+  if (a.lines !== undefined && (!v16 || !Array.isArray(a.weapons) || !validRpgLines(a.lines, a.weapons))) return false
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a, version)) return false
   if (!validCharms(a, version)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
@@ -131,7 +135,7 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
     !safeInt(a.mp, 0, a.stats.mp) || (a.orb !== undefined && !isRpgDamageKind(a.orb)) || (a.maxDepth !== undefined && !safeInt(a.maxDepth, 0, 5)) ||
     (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
-    a.loadout.length > rpgActiveSlots(a.level) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
+    a.loadout.length > rpgActiveSlots(a.level, version) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
   if (!validRpgTree({ ...a, classRank: battleClassRank(a) }) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
@@ -786,7 +790,8 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (s.engineVersion >= 15) regenerate(s, cues)
     else for (const summon of s.summons) {
       const owner = unit(s, summon.allyId)
-      const sup = rpgNode(summon.ref.id)?.skill.support
+      const node = rpgNode(summon.ref.id)
+      const sup = node && rpgNodeSkill(node, s.engineVersion).support
       if (owner && owner.hp > 0 && sup?.mend) support(s, owner, { share: sup.share, mend: sup.mend }, 0, cues, summon.scale)
     }
   }
@@ -958,14 +963,16 @@ function linger(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: Bat
   const foes = living(s, 'enemy')
   if (!node || !foes.length) return
   cues.push({ kind: 'summon', actorId: actor.id, targetId: target.id, label: node.name })
+  // Her summon as she cast it: its generation's def, from v16 at her Skill Rank (H65).
+  const def = battleNodeDef(ally, node, s.engineVersion)
   if (rpgV2(s.engineVersion)) {
-    const { hits, primary } = node.skill
+    const { hits, primary } = def
     const hit: RpgHit = { power: hits.reduce((sum, h) => sum + h.power, 0), parts: [{ kind: primary, share: 1 }] }
     for (const foe of foes) strike(s, actor, foe, hit, summon!.scale * BATTLE_FAREWELL_FACTOR, cues, false)
     return
   }
   // Its farewell strike mends or shields at its linger share too (v12); a revive or a blessing doesn't repeat.
-  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, node.skill, summon!.scale, cues, 'linger', orbsOf(ally), summon!.scale)
+  cast(s, actor, target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!, def, summon!.scale, cues, 'linger', orbsOf(ally), summon!.scale)
 }
 function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): void {
   s.summons = [...s.summons.filter((x) => x.allyId !== allyId), { allyId, ref: { tier: ref.tier, id: ref.id }, scale }]
