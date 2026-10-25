@@ -84,13 +84,13 @@ Five continents a tier, one per scenario, in release order. **Every continent ha
 band, the order (which biomes sit at the low levels and which at the high ones) and a **climate lean**: the biome on
 its theme appears an extra time.
 
-| Continent (Tier 1) | Band | Lean | Low levels | High levels |
+| Continent (Tier 1; its name is its scenario's, read from master data) | Band | Lean | Low levels | High levels |
 |---|---|---|---|---|
-| URA Finale | 1–10 | Temperate | Meadow, Forest, Coast | Volcano, Glacier, Twilight Rift |
-| Unity Cup | 11–20 | Archipelago | Coast, Jungle, Highlands | Sky Isles, Storm Peaks, Underworld |
-| Trackblazer | 21–30 | Frontier south | Desert, Canyon, Meadow | Volcano, Geyser Basin, Ancient Ruins |
-| Our Grand Concert | 31–40 | Far north | Tundra, Coast, Forest | Glacier, Crystal Caverns, Storm Peaks |
-| Grand Masters | 41–50 | Shadowlands | Swamp, Haunted Moor, Highlands | Underworld, Twilight Rift, Sky Isles |
+| Continent 1 (scenario 1) | 1–10 | Temperate | Meadow, Forest, Coast | Volcano, Glacier, Twilight Rift |
+| Continent 2 (scenario 2) | 11–20 | Archipelago | Coast, Jungle, Highlands | Sky Isles, Storm Peaks, Underworld |
+| Continent 3 (scenario 3) | 21–30 | Frontier south | Desert, Canyon, Meadow | Volcano, Geyser Basin, Ancient Ruins |
+| Continent 4 (scenario 4) | 31–40 | Far north | Tundra, Coast, Forest | Glacier, Crystal Caverns, Storm Peaks |
+| Continent 5 (scenario 5) | 41–50 | Shadowlands | Swamp, Haunted Moor, Highlands | Underworld, Twilight Rift, Sky Isles |
 
 Tiers 2 and 3 are not built. Their five-continent layout remains planned; there are nineteen region biomes plus
 the capital, not twenty region biomes.

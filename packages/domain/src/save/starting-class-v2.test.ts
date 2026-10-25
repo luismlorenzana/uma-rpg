@@ -54,7 +54,7 @@ describe('the Paladin’s start (H58, §3.3)', () => {
 
 describe('one healer a party is a classes v2 rule (H58)', () => {
   const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
-  const ura = regionChapter(worldContinent({ name: 'URA Finale', order: 1 }).regions[0]!, cast)
+  const ura = regionChapter(worldContinent({ name: 'Test Circuit', order: 1 }).regions[0]!, cast)
   const OUTFITS = new Map(['101', '102', '103', '104', '105'].map((id, i) => [id, outfit(id, STYLES[i % 4]!)]))
 
   it('let three Clerics fight together on engine v14; the live game refuses them (H61)', () => {

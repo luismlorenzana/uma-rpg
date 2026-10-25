@@ -10,7 +10,7 @@ import { newSave, type Save, type TierWorld } from './save'
 
 
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
-const ura = regionChapter(worldContinent({ name: 'URA Finale', order: 1 }).regions[0]!, cast)
+const ura = regionChapter(worldContinent({ name: 'Test Circuit', order: 1 }).regions[0]!, cast)
 const S1 = 'w1-1-1-s1'
 // Invented outfits only: 103 is a Late surger with Power and Wit even, so she starts (and fights) as a Cleric.
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110): BattleOutfit => ({

@@ -14,7 +14,7 @@ import { newOwnedUma, newSave, newWorldState, parseSave, SaveParseError, type Sa
 
 const T = (n: number) => `2026-10-10T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
-const ura = regionChapter(worldContinent({ name: 'URA Finale', order: 1 }).regions[0]!, cast)
+const ura = regionChapter(worldContinent({ name: 'Test Circuit', order: 1 }).regions[0]!, cast)
 
 // Invented outfits only.
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end'): BattleOutfit => ({

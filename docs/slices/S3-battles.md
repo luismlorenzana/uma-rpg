@@ -43,7 +43,7 @@ Historical check; releases use the [current phone script](../testing/phone-check
 
 On the iPhone, after **Update ready — Restart**:
 
-1. With a full party, open URA Finale, spend skill points on two Umas, and win a fight: the effects play, the result
+1. With a full party, open the first continent, spend skill points on two Umas, and win a fight: the effects play, the result
    pays EXP and Laurels, and the node turns gold with the nodes below it open.
 2. Close the app mid-fight and reopen it: **Resume the fight** continues from the same action.
 3. Rest at a camp, and lose or give up a fight: nothing is lost.

@@ -72,7 +72,7 @@ live content or **"Opens in S#"** with a short preview of what it will do.
 - **Stable:** browse all **268 outfits**. A grid of Uma icons with search by name, every outfit shown as **locked**,
   and the note "20 Unlock Tickets · unlocking opens in S2". Tapping an outfit shows a read-only profile: portrait,
   name and character, rarity, aptitudes (surface, distance, running style), base stats, growth rates and unique skill.
-- **Scenario Gate:** the **Tier 1 chapters** in order (URA Finale → Grand Masters) with crest, name and level band
+- **Scenario Gate:** the **Tier 1 chapters** in order (the first scenario's to the fifth's) with crest, name and level band
   (1–10 … 41–50). Tier 2 and Tier 3 are listed as locked. Tapping a chapter says "Battles open in S3".
 - **Account** (from the account bar or the menu): trainer name (editable), tier world, account created date, Umas
   unlocked 0/268, the wallet, master data release version, app build, and sign out. If a new build is ready, it shows
