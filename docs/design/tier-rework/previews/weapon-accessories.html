@@ -286,8 +286,10 @@
   <section id="slots">
     <h2>Slots, families and the kind cap</h2>
     <p class="sub">1 · 2 · 3 slots, untyped. <b>One accessory of each family at most,</b> so every tier keeps a choice of family: one of four, two of
-      four, three of four. Flat offense on one kind (the Pendant and Orb forms and the Halo together) stops at a G10 weapon's Might × tier; the
-      Great Orb is the one form that passes it beside the Halo, so it wants a kind the Halo doesn't hold.</p>
+      four, three of four. Flat offense on one kind from the Pendant and Orb forms stops at a G10 weapon's Might × tier; the Great Orb with a
+      Channel Pendant is the pair that reaches it. <b>Her weapon moons (Extra Stats, from Tier 2) sit outside the cap</b>, bounded by
+      their own size, so the flat on one kind is at most Might + the cap + a Full moon: 334 in Tier 2, 484 in Tier 3.
+      <i>Follow-up to D194 (Extra Stats), 2026-10-24: the Halo, which shared the cap, retired into the weapon moons.</i></p>
     <div class="slots3" id="slots3"></div>
     <div class="panel" style="margin-top:12px"><h3>The kind cap, Tier 2, G10</h3><div class="chart-legend" id="cap-legend"></div><div id="cap-chart"></div>
       <details><summary>Show the numbers</summary><div id="cap-table"></div></details></div>
@@ -330,9 +332,10 @@
   <section id="presets">
     <div class="head-row"><h2>Presets, by class and tier</h2>
       <div class="toggle" role="group" aria-label="Set"><button data-s="default" aria-pressed="true">Branch 1: default set</button><button data-s="reverse" aria-pressed="false">Branch 2: reverse set</button></div></div>
-    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks, one of each family, the Halo on her
-      first slot (two in Tier 3), every kind under the cap. From Tier 2 the preset follows her class branch's set (CP40); a single-kind form sits on
-      her Dual where it pays.</p>
+    <p class="sub">What the standard preset dresses (D164) and the simulation plays: the model's campaign picks, one of each family, every kind
+      under the cap, and her weapon moons by extra-stats-progression EP29 (Tier 2 Split on her two most-used kinds; Tier 3 Full on the most-used,
+      Split on the other two). From Tier 2 the preset follows her class branch's set (CP40); a single-kind form sits on her Dual where it pays.
+      <i>Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons replace the Halo on her first slot; the accessory forms stand.</i></p>
     <div class="panel" style="overflow-x:auto"><table id="presets-table"></table></div>
   </section>
 
@@ -516,29 +519,35 @@ renderGrades();
   document.getElementById('slots3').innerHTML = cols.map(([t, txt]) => `<div class="scol" style="--tc:${TIERC[t]}"><h3>Tier ${t}: ${t} slot${t > 1 ? 's' : ''}</h3><div class="sl">${Array.from({ length: t }, (_, i) => `<i>Slot ${i + 1}</i>`).join('')}</div>` +
     `<div class="fb">${Object.entries(FAM).map(([, f]) => `<span class="fbadge" style="--fc:${f.c}">${f.name}${t > 1 ? (t === 2 ? ' · 2 branches' : ' · step') : ''}</span>`).join('')}</div>` +
     `<div class="muted" style="font-size:12px;margin-top:8px">${txt}</div></div>`).join('');
-  document.getElementById('cap-legend').innerHTML = '<span><span class="sw" style="background:var(--c4)"></span>The Halo, two nodes +61 (Extra Stats)</span><span><span class="sw" style="background:var(--c1)"></span>Orb forms</span><span><span class="sw" style="background:var(--c3)"></span>Pendant forms</span>';
-  const W = 1180, H = 200, pad = { l: 290, r: 30 }, max = 170, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
+  document.getElementById('cap-legend').innerHTML = '<span><span class="sw" style="background:var(--c1)"></span>Orb forms</span><span><span class="sw" style="background:var(--c3)"></span>Pendant forms</span><span><span class="sw" style="background:var(--c4)"></span>A weapon moon (Extra Stats, outside the cap)</span>';
+  const W = 1180, H = 210, pad = { l: 290, r: 30 }, max = 300, x = (v) => pad.l + (v / max) * (W - pad.l - pad.r);
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The kind cap on one Tier 2 kind">`;
-  const rows = [['Halo + Great Orb on her first slot', [[61, 'var(--c4)', 'The Halo'], [74, 'var(--c1)', 'Great Orb']], 18],
-    ['Halo on her first slot, Great Orb on her Dual', [[61, 'var(--c4)', 'The Halo (first slot)']], 64],
-    ['', [[74, 'var(--c1)', 'Great Orb (her Dual\'s kind)']], 98],
-    ['Halo + Channel Pendant or Twin Orb', [[61, 'var(--c4)', 'The Halo'], [49, 'var(--c3)', 'Channel Pendant (or a Twin Orb, +49)']], 144]];
+  // Follow-up to D194 (Extra Stats), 2026-10-24: the cap binds the Pendant and Orb forms only; a weapon moon (the fourth field true) adds beside it.
+  const rows = [['Great Orb + Channel Pendant', [[74, 'var(--c1)', 'Great Orb'], [49, 'var(--c3)', 'Channel Pendant']], 18],
+    ['Great Orb + Great Pendant', [[74, 'var(--c1)', 'Great Orb'], [31, 'var(--c3)', 'Great Pendant']], 64],
+    ['Great Orb + Channel Pendant + a Full moon', [[74, 'var(--c1)', 'Great Orb'], [49, 'var(--c3)', 'Channel Pendant'], [90, 'var(--c4)', 'Full weapon moon', true]], 110],
+    ['Orb + Channel Pendant + a Split moon', [[61, 'var(--c1)', 'Orb'], [49, 'var(--c3)', 'Channel Pendant'], [63, 'var(--c4)', 'Split weapon moon (each of its two kinds)', true]], 156]];
   rows.forEach(([lbl, segs, yy]) => {
     if (lbl) s += `<text class="val-soft" x="${pad.l - 12}" y="${yy + 19}" text-anchor="end" style="fill:var(--ink);font-size:12.5px">${lbl}</text>`;
-    let acc = 0;
-    segs.forEach(([v, c, n]) => {
+    let acc = 0, moon = 0;
+    segs.forEach(([v, c, n, outside]) => {
+      if (outside) {
+        s += `<rect class="mark" x="${x(acc)}" y="${yy}" width="${x(acc + v) - x(acc) - 2}" height="28" rx="4" fill="${c}" data-t="${n}" data-d="+${v}: Extra Stats, outside the kind cap"/>`;
+        moon = v; return;
+      }
       const over = acc + v > 122 ? Math.max(0, acc + v - 122) : 0, inside = v - over;
       if (inside > 0) s += `<rect class="mark" x="${x(acc)}" y="${yy}" width="${x(acc + inside) - x(acc) - 2}" height="28" rx="4" fill="${c}" data-t="${n}" data-d="+${v}${over ? `: only +${inside} counts (capped)` : ''}"/>`;
-      if (over > 0) s += `<rect class="mark" x="${x(acc + inside)}" y="${yy}" width="${x(acc + v) - x(acc + inside) - 2}" height="28" rx="4" fill="none" stroke="${c}" stroke-dasharray="4 3" data-t="${n}, past the cap" data-d="+${over} adds nothing on this kind: point the Great Orb at a kind the Halo doesn't hold"/>`;
+      if (over > 0) s += `<rect class="mark" x="${x(acc + inside)}" y="${yy}" width="${Math.max(2, x(acc + v) - x(acc + inside) - 2)}" height="28" rx="4" fill="none" stroke="${c}" stroke-dasharray="4 3" data-t="${n}, past the cap" data-d="+${over} adds nothing on this kind"/>`;
       acc += v;
     });
-    s += `<text class="val-text" x="${x(Math.min(acc, 160)) + 8}" y="${yy + 19}">+${Math.min(acc, 122)}${acc > 122 ? ' (capped)' : ''}</text>`;
+    const capped = Math.min(acc, 122);
+    s += `<text class="val-text" x="${x(acc + moon) + 8}" y="${yy + 19}">+${capped}${acc > 122 ? ' (capped)' : ''}${moon ? ` + ${moon} moon = +${capped + moon}` : ''}</text>`;
   });
   s += `<line x1="${x(122)}" x2="${x(122)}" y1="10" y2="${H - 6}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${x(122) + 4}" y="${H - 6}" class="axis-text" style="fill:var(--ink)">cap +122 (G10 Might × 1.8)</text>`;
   document.getElementById('cap-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#cap-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('cap-table').innerHTML = '<table><tr><th>Tier</th><th class="num">Cap a kind</th><th class="num">The Halo</th><th class="num">Orb · Great Orb</th><th class="num">Channel Pendant · Twin Orb</th><th class="num">Pendant · Great Pendant</th><th>Binds</th></tr>' +
-    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">+${[68, 122, 177][t - 1]}</td><td class="num">${t === 1 ? '—' : '+' + [0, 61, 88][t - 1] + (t === 3 ? ' (two kinds)' : '')}</td><td class="num">+${FLAT.Orb[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Orb'][t][10]}</td><td class="num">${t === 1 ? '—' : '+' + FLAT['Channel Pendant'][t][10]}</td><td class="num">+${FLAT.Pendant[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Pendant'][t][10]}</td><td>${t === 1 ? 'Never (one slot)' : 'The Great Orb beside the Halo; two flat forms and the Halo on one kind'}</td></tr>`).join('') + '</table>';
+  document.getElementById('cap-table').innerHTML = '<table><tr><th>Tier</th><th class="num">Cap a kind</th><th class="num">Orb · Great Orb</th><th class="num">Channel Pendant · Twin Orb</th><th class="num">Pendant · Great Pendant</th><th class="num">Weapon moon, outside: Full · Split</th><th class="num">At most on one kind (Might + cap + Full moon)</th><th>Binds</th></tr>' +
+    [1, 2, 3].map((t) => `<tr><td>Tier ${t}</td><td class="num">+${[68, 122, 177][t - 1]}</td><td class="num">+${FLAT.Orb[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Orb'][t][10]}</td><td class="num">${t === 1 ? '—' : '+' + FLAT['Channel Pendant'][t][10]}</td><td class="num">+${FLAT.Pendant[t][10]} · ${t === 1 ? '—' : '+' + FLAT['Great Pendant'][t][10]}</td><td class="num">${t === 1 ? '—' : ['', '', '+90 · +63', '+130 · +91'][t]}</td><td class="num">${[136, 334, 484][t - 1]}</td><td>${t === 1 ? 'Never (one slot)' : 'The Great Orb with a Channel Pendant or a Twin Orb on one kind'}</td></tr>`).join('') + '</table>';
 })();
 
 // ---- With her weapons: the Dual pairing

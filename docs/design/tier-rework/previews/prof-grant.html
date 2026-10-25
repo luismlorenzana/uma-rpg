@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rework Grant</title>
+<!-- Profession Progression (profession-progression.md §14, PP19, PP20, PP24, PP25): the save v27 compensation. Every Craft Level back to 1; one Speed Ticket for every 30 minutes of work her Craft EXP records; gear and Star Gems folded in with a floor at their making time; three worked players; the first launch's sheet. Style blocks copied from prof-demand.html (the kit's tokens; trades on the reference palette's validated slots). No sprites, no original-game content: invented names only. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312;
+      --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 2px; }
+  p { margin: 0; }
+  .lead { color: var(--ink-soft); max-width: 900px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 40px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a:hover { background: var(--raised); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Tier themes */
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
+  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
+  .theme p { color: var(--ink-soft); font-size: 13px; }
+
+  /* Roadmap */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
+  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
+  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
+  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
+  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
+  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start .chip { white-space: normal; }
+  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
+  .track { position: relative; margin: 0 24px 0 18px; }
+  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
+    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
+  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
+  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
+  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
+  .chip.craft { border-style: dashed; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ev { position: absolute; }
+  .ev.right { transform: translateX(-100%); }
+  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
+  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
+  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
+  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
+  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
+  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
+  .promo b { color: var(--ink); }
+
+  /* Charts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .mini h3 { display: flex; align-items: center; gap: 6px; }
+  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; }
+  .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .val-soft { fill: var(--ink-soft); font-size: 11px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Matrix */
+  .matrix td { font-size: 13px; }
+  .matrix td.today { color: var(--ink-faint); }
+  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .matrix th.t { border-top: 4px solid var(--tc); }
+  .matrix b { color: var(--ink); }
+
+  /* Tooltip */
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+<style>
+  /* Profession Progression pages: the kit's tokens above, plus the five trades (the reference palette's slots 1–5 in
+     row order, validated adjacent in both modes) and the material tiers (one violet ordinal ramp, validated). */
+  :root {
+    --tr1: var(--c1); --tr2: var(--c2); --tr3: var(--c3); --tr4: var(--c4); --tr5: var(--c5);
+    --mt1: #9b8fea; --mt2: #6250d6; --mt3: #33268a; --on-mt1: #101a24; --on-mt2: #ffffff; --on-mt3: #ffffff;
+    --today: #a9b4c2; --road: #d9c9a6; --ground: #e4ecd9; --ground-line: rgb(16 26 36 / 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --mt1: #5141b5; --mt2: #8677ea; --mt3: #c0b8ff; --on-mt1: #ffffff; --on-mt2: #101a24; --on-mt3: #101a24;
+      --today: #4a586b; --road: #4a4234; --ground: #1c2a22; --ground-line: rgb(255 255 255 / 0.04);
+    }
+  }
+  .grid2 > *, .grid3 > *, .multiples > * { min-width: 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .spr { display: inline-block; image-rendering: pixelated; background-image: var(--sheet); background-repeat: no-repeat; flex: none; vertical-align: middle; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 12px; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
+  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .tc { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; padding: 0 6px; height: 18px; border-radius: 5px;
+    font-size: 11px; font-weight: 750; letter-spacing: .02em; line-height: 1; }
+  .tc.t1 { background: var(--mt1); color: var(--on-mt1); } .tc.t2 { background: var(--mt2); color: var(--on-mt2); } .tc.t3 { background: var(--mt3); color: var(--on-mt3); }
+  .tdot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+  .trs { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--cc); }
+  .kind { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 6px 0 10px; align-items: center; }
+  .legend-row span { display: inline-flex; align-items: center; gap: 6px; }
+  .hit { cursor: default; }
+  .hit:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  svg .gridl { stroke: var(--grid); stroke-width: 1; }
+  svg .axisl { stroke: var(--axis); stroke-width: 1; }
+  svg .refl { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 4 4; }
+  table.compact th, table.compact td { padding: 5px 8px; }
+  .scrollx { overflow-x: auto; }
+  code { font-size: 12px; background: var(--raised); padding: 1px 5px; border-radius: 5px; }
+  .theme { --tc: var(--mt1); }
+  @media (max-width: 1100px) { .grid3 { grid-template-columns: 1fr; } }
+  .pair2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bind { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; fill: var(--accent); }
+</style>
+<style>
+  .sheetwrap { display: grid; grid-template-columns: 430px 1fr; gap: 24px; align-items: start; }
+  .phone { background: var(--sunken); border-radius: 28px; padding: 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .sheet { background: var(--panel); border-radius: 18px; padding: 18px 16px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / .12); }
+  .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--hairline-strong); margin: -6px auto 12px; }
+  .sheet h3 { font-size: 18px; margin: 0 0 4px; }
+  .sheet .lead2 { color: var(--ink-soft); font-size: 13px; }
+  .sheet .big { margin: 14px 0 2px; font-size: 30px; font-weight: 750; letter-spacing: -.01em; display: flex; align-items: center; gap: 10px; }
+  .sheet .big .tk { width: 26px; height: 18px; border-radius: 4px; background: var(--accent); position: relative; flex: none; }
+  .sheet .big .tk::after { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; border-left: 2px dashed var(--panel); }
+  .sheet .bigsub { color: var(--ink-soft); font-size: 12.5px; margin-bottom: 12px; }
+  .sheet .line { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 7px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .sheet .line b { color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding-top: 1px; }
+  .sheet .umas { max-height: 210px; overflow: auto; border-top: 1px solid var(--hairline); margin-top: 4px; }
+  .sheet .u { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; padding: 6px 2px; border-bottom: 1px solid var(--hairline); font-size: 12.5px; }
+  .sheet .u .face { width: 30px; height: 30px; border-radius: 50%; background: var(--raised); border: 2px solid var(--cc); display: grid; place-items: center; font-weight: 750; font-size: 12px; }
+  .sheet .u .sub3 { color: var(--ink-faint); font-size: 11px; }
+  .sheet .u .n { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .sheet .foot2 { color: var(--ink-faint); font-size: 11.5px; margin: 10px 0; }
+  .sheet .btns { display: flex; gap: 8px; }
+  .sheet .btns span { flex: 1; text-align: center; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 14px; background: var(--raised); }
+  .sheet .btns span.pri { background: var(--accent); color: #1b1406; }
+  .rule { font-size: 15px; background: var(--raised); border-radius: 12px; padding: 14px 18px; margin: 10px 0 4px; }
+  .rule code { font-size: 14px; }
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 12px; }
+  .stp { background: var(--raised); border-radius: 12px; padding: 12px 14px; }
+  .stp .k { font-size: 11px; font-weight: 800; color: var(--accent); letter-spacing: .05em; text-transform: uppercase; }
+  .stp b { display: block; margin: 2px 0 4px; }
+  .stp p { font-size: 12.5px; color: var(--ink-soft); }
+  .exs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .exc { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .exc .t { font-size: 11px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .exc .v { font-size: 24px; font-weight: 750; margin: 2px 0; }
+  .exc p { font-size: 12.5px; color: var(--ink-soft); }
+  @media (max-width: 1100px) { .sheetwrap { grid-template-columns: 1fr; } .steps, .exs { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+<h1>The first launch: Craft Levels reset, Speed Tickets for the time</h1>
+  <p class="lead">The Tier rework's one save migration (v27), as the owner directed on 2026-10-24: "reset all farm/craft levels to 1,
+    and then grant all tickets based on the amount of time it took to get all those levels." Every Uma's Craft Level goes back to 1, and
+    her world is paid one Speed Ticket for every 30 minutes of work her Craft EXP records. From
+    <a href="../profession-progression.md">profession-progression.md</a> §14 (PP19, PP20, PP24, PP25).</p>
+  <nav class="top"><a href="#rule">The rule</a><a href="#levels">By Craft Level</a><a href="#examples">Three players</a><a href="#floor">The floor</a><a href="#what">Everything else</a><a href="#sheet">The first launch</a><a href="#ways">The approaches</a></nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="rule">
+    <h2>The rule</h2>
+    <p class="sub">The game pays 2 Craft EXP for every minute of every job, at her level, before the place's speed. So her lifetime Craft EXP is
+      her working time, to the minute, and the save already holds it.</p>
+    <div class="panel">
+      <div class="rule"><b>Speed Tickets for an Uma = ⌈ (EXP her Craft Level took + her <code>craft.exp</code>) ÷ 60 ⌉</b><br>
+        <span class="muted">EXP to Craft Lv L = 1,425 (L − 1) + 7.5 L (L − 1); her bank past Lv 50 sits in <code>craft.exp</code> and counts. 60 EXP is 30 minutes of the manual's job time; a Speed Ticket takes 30 minutes off a running job.</span></div>
+      <div class="steps" id="steps"></div>
+    </div>
+  </section>
+
+  <section id="levels">
+    <h2>Speed Tickets by Craft Level</h2>
+    <p class="sub">The grant for an Uma at each Craft Level (no bank), against what re-earning that level takes in the new places, which work ×1.25 from
+      day 1. The gap is the quarter's margin of PP24: the ×1 days before today's facilities reached level 3, Finish's rounding, inputs bought at the
+      Exchange. Hover for each level.</p>
+    <div class="panel"><div class="legend-row" id="lv-legend"></div><div id="lv-chart"></div>
+      <details><summary>Show the numbers</summary><div id="lv-table"></div></details></div>
+  </section>
+
+  <section id="examples">
+    <h2>Three players at the update</h2>
+    <p class="sub">Each world's grant, what re-levelling its Umas in the new places takes, and the making time of the pieces it loses (the floor). The
+      grant always covers the re-level; a world whose crafters are home never needs the floor.</p>
+    <div class="exs" id="exs"></div>
+    <div class="panel" style="margin-top:14px"><div class="legend-row" id="ex-legend"></div><div id="ex-chart"></div>
+      <details><summary>Show the numbers</summary><div id="ex-table"></div></details></div>
+  </section>
+
+  <section id="floor">
+    <h2>The floor: pieces whose makers have left</h2>
+    <p class="sub">Gear and Star Gems are folded into the grant: their gathering, refining and making are already in the Umas' EXP. Two kinds of piece
+      aren't: gear left in a world's stock by Umas who ascended (their Craft EXP left with them), and pieces made of items bought at the Exchange. So a
+      world is never paid less than its deleted pieces' own making time (a gear piece 203 minutes, a Star Gem 221 on average, at Craft Lv 25's times).</p>
+    <div class="panel"><div id="floor-chart"></div>
+      <details><summary>Show the numbers</summary><div id="floor-table"></div></details></div>
+  </section>
+
+  <section id="what">
+    <h2>Everything else the migration does</h2>
+    <p class="sub">Computed from the save alone, in this order, in every tier world.</p>
+    <div class="panel"><div id="what-table"></div></div>
+  </section>
+
+  <section id="sheet">
+    <h2>The first launch</h2>
+    <p class="sub">Once per world, the first time it opens after the update: the kit's sheet, as the Tier sheet is. Drawn for the fully built roster's Tier 1
+      world; the names are invented.</p>
+    <div class="sheetwrap">
+      <div class="phone"><div class="sheet" id="mock"></div></div>
+      <div class="panel"><h3>What it shows, and after</h3><div id="sheet-notes"></div></div>
+    </div>
+  </section>
+
+  <section id="ways">
+    <h2>The approaches weighed</h2>
+    <div class="panel"><div id="ways-table"></div></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+function h(tag, attrs = {}, html = '') { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; }
+const tip = document.getElementById('tip');
+function placeTip(x, y) { const w = tip.offsetWidth, hh = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + hh > innerHeight ? Math.max(8, y - hh - 12) : y + 16) + 'px'; }
+function bindTip(el, title, body) {
+  if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+  const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; placeTip(x, y); };
+  el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY));
+  el.addEventListener('mousemove', (e) => placeTip(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
+  el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); });
+  el.addEventListener('blur', () => (tip.style.opacity = 0));
+}
+function tips(root) { root.querySelectorAll('[data-tt]').forEach((el) => { if (!el._tip) { el._tip = 1; bindTip(el, el.getAttribute('data-tt'), el.getAttribute('data-tb') || ''); } }); }
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const tt = (title, body) => `data-tt="${esc(title)}" data-tb="${esc(body)}"`;
+const fmt = (n, d = 0) => Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+function table(head, rows, numCols = []) {
+  return `<div class="scrollx"><table class="compact"><thead><tr>${head.map((c, i) => `<th${numCols.includes(i) ? ' class="num"' : ''}>${c}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td${numCols.includes(i) ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+// ---- The game's numbers (economy/pacing.ts; uma-work's timeline.ts)
+const EXP = (L) => 1425 * (L - 1) + 7.5 * L * (L - 1);       // Craft EXP from Lv 1 to Lv L (D96)
+const TICKETS = (e) => (e > 0 ? Math.ceil(e / 60) : 0);       // PP24: 30 minutes of the manual's time = 60 EXP
+const RELEVEL = (e) => Math.ceil(e / 75);                     // a ticket at the new places' x1.25 = 75 EXP
+const G25 = 54 - 18 * 24 / 49;                                // a gather at Craft Lv 25, minutes
+const GEAR_MIN = 2 * G25 + 2 * G25 / 4 + 2 * G25;             // a gear piece: 2 gathers, 2 refines, a craft of 2 gathers' time
+const GEM_MIN = 2.32 * (G25 + G25 / 4) + 2 * G25;             // a Star Gem: 2.32 refined on average and a cut
+const CHAIN = 2 * G25 + G25 / 4;                              // one refined item, gather + process + make
+
+// ---- KPIs
+const KPIS = [
+  ['The rate', '', '1 per 30 min', 'of work her Craft EXP records: 60 EXP a ticket'],
+  ['A Craft Lv 50 Uma', '', '1,470', 'the manual\'s 735 hours; 1,176 re-level her at ×1.25'],
+  ['A fully built roster', '', '63,800', 'its Tier 1 world (forty Lv 50 crafters, ten with a bank)'],
+  ['Gear and Star Gems', '', 'folded in', 'their making is in the EXP; a floor for pieces whose makers left'],
+  ['Upgrades', '', 'up to 7,150', 'Laurels back a world, and their 66 refined items'],
+  ['Stock', '', 'kept', 'converted one for one to the new materials'],
+];
+$('#kpis').append(...KPIS.map(([l, was, now, d]) => h('div', { class: 'kpi' }, `<div class="label"><span class="sw" style="background:var(--c1)"></span>${l}</div><div class="value"><span class="was">${was}</span> ${now}</div><div class="delta">${d}</div>`)));
+
+$('#steps').innerHTML = [
+  ['1 · Settle work', 'As save v22 did', 'Every started job finishes into the Warehouse with its Craft EXP; queues drop (they took nothing).'],
+  ['2 · Read her EXP', 'Every Uma, every world', 'Her level\'s EXP plus her bank: the minutes she worked, × 2.'],
+  ['3 · Pay tickets', 'Into her world\'s wallet', '⌈EXP ÷ 60⌉ each, rounded up per Uma; the floor if the deleted pieces took longer.'],
+  ['4 · Reset', 'Craft Lv 1, 0 EXP', 'Gear, Star Gems and maps deleted; stock converted; upgrades\' Laurels and items back.'],
+  ['5 · Show it', 'Once per world', 'The sheet "The Wilds are rebuilt", Uma by Uma; an Account row reopens it.'],
+].map(([k, b, p]) => `<div class="stp"><span class="k">${k}</span><b>${b}</b><p>${p}</p></div>`).join('');
+
+// ---- By Craft Level: two lines
+(function () {
+  const W = 1200, H = 360, left = 64, right = 150, top = 16, bottom = 40, maxT = 1600;
+  const x = (L) => left + ((L - 1) / 49) * (W - left - right), y = (t) => top + (H - top - bottom) * (1 - t / maxT);
+  let s = '';
+  for (let t = 0; t <= maxT; t += 400) s += `<line class="gridl" x1="${left}" x2="${W - right}" y1="${y(t)}" y2="${y(t)}"/><text x="${left - 8}" y="${y(t) + 4}" text-anchor="end" class="axis-text">${fmt(t)}</text>`;
+  for (let L = 1; L <= 50; L += (L === 1 ? 5 : 5)) s += `<text x="${x(L)}" y="${H - bottom + 18}" text-anchor="middle" class="axis-text">Lv ${L}</text>`;
+  s += `<text x="${x(50)}" y="${H - bottom + 18}" text-anchor="middle" class="axis-text">Lv 50</text>`;
+  const series = [['The grant (÷ 60)', (L) => TICKETS(EXP(L)), 'var(--c1)'], ['Re-levelling her in the new places (÷ 75)', (L) => RELEVEL(EXP(L)), 'var(--c2)']];
+  series.forEach(([lab, f, col]) => {
+    let p = ''; for (let L = 1; L <= 50; L++) p += `${L === 1 ? 'M' : 'L'}${x(L)},${y(f(L))}`;
+    s += `<path d="${p}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    s += `<text x="${x(50) + 10}" y="${y(f(50)) + 4}" class="val-text">${fmt(f(50))}</text><text x="${x(50) + 10}" y="${y(f(50)) + 19}" class="val-soft">${lab.split(' (')[0].replace('Re-levelling her in the new places', 'Re-level')}</text>`;
+  });
+  [6, 11, 16, 21, 26, 31, 36, 41, 46, 50].forEach((L) => series.forEach(([lab, f, col]) => s += `<circle cx="${x(L)}" cy="${y(f(L))}" r="4.5" fill="${col}" stroke="var(--panel)" stroke-width="2"/>`));
+  for (let L = 1; L <= 50; L++) {
+    const e = EXP(L);
+    s += `<rect class="hit" x="${x(L) - (W - left - right) / 98}" y="${top}" width="${(W - left - right) / 49}" height="${H - top - bottom}" fill="transparent" ${tt(`Craft Lv ${L}`, `${fmt(e)} Craft EXP: ${fmt(e / 120, 1)} hours of work.<br>Grant: <b>${fmt(TICKETS(e))}</b> Speed Tickets.<br>Re-levelling her at ×1.25: ${fmt(RELEVEL(e))} (${fmt(e / 150, 1)} h).`)}/>`;
+  }
+  $('#lv-chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Speed Tickets granted by Craft Level, against re-levelling">${s}</svg>`;
+  $('#lv-legend').innerHTML = series.map(([lab, , col]) => `<span><svg width="22" height="8"><line x1="0" x2="22" y1="4" y2="4" stroke="${col}" stroke-width="2"/></svg>${lab}</span>`).join('');
+  tips($('#lv-chart'));
+  $('#lv-table').innerHTML = table(['Craft Lv', 'Craft EXP', 'Hours of work', 'Speed Tickets (÷ 60, up)', 'Re-level at ×1.25 (÷ 75)', 'Margin'],
+    [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 50].map((L) => { const e = EXP(L); return [L, fmt(e), fmt(e / 120), `<b>${fmt(TICKETS(e))}</b>`, fmt(RELEVEL(e)), fmt(TICKETS(e) - RELEVEL(e))]; }), [0, 1, 2, 3, 4, 5]);
+})();
+
+// ---- Three players (and the fully built roster's Tier 2 world)
+const EX = [
+  { k: 'fresh', t: 'A fresh player', when: 'Day 3, Tier 1', umas: [[8640, 5, '5 Umas at Craft Lv 6 (worked nonstop at level-1 places)']], gear: 24, gems: 10, laurels: 0, items: 0, stock: 45 },
+  { k: 'mid', t: 'A mid player', when: 'Day 20, Tier 1', umas: [[EXP(36) + 50, 8, '8 at Lv 36, mid-job'], [EXP(26), 6, '6 at Lv 26'], [EXP(11), 6, '6 at Lv 11']], gear: 576, gems: 320, laurels: 3800, items: 40, stock: 600 },
+  { k: 'full1', t: 'A fully built roster', when: 'Its Tier 1 world', umas: [[EXP(50), 30, '30 at Lv 50'], [EXP(50) + 30000, 10, '10 at Lv 50 with 30,000 EXP banked']], gear: 5400, gems: 2500, laurels: 7150, items: 66, stock: 2000 },
+  { k: 'full2', t: 'The same roster', when: 'Its Tier 2 world', umas: [[EXP(31), 20, 'One run\'s 20 at Lv 31']], gear: 1200, gems: 600, laurels: 900, items: 12, stock: 300 },
+];
+EX.forEach((w) => {
+  w.grant = w.umas.reduce((a, [e, n]) => a + n * TICKETS(e), 0);
+  w.relevel = Math.ceil(w.umas.reduce((a, [e, n]) => a + n * Math.min(e, EXP(50)), 0) / 75);
+  w.making = w.gear * GEAR_MIN + w.gems * GEM_MIN;   // minutes
+  w.floor = Math.ceil(w.making / 30);
+  w.paid = Math.max(w.grant, w.floor);
+  w.made = w.umas.reduce((a, [e, n]) => a + n * Math.min(e, EXP(50)), 0) / 2 / CHAIN;
+});
+$('#exs').innerHTML = EX.map((w) => `<div class="exc"><span class="t">${w.t} · ${w.when}</span><div class="v">${fmt(w.paid)}</div><p>Speed Tickets: ${fmt(w.paid / 2)} hours of work. ${w.umas.map((u) => u[2]).join('; ')}.</p></div>`).join('');
+(function () {
+  const W = 1200, left = 210, right = 110, groupH = 96, barH = 22;
+  const max = 70000, x = (v) => left + (v / max) * (W - left - right);
+  const SER = [['paid', 'The grant', 'var(--c1)'], ['relevel', 'Re-levelling its Umas at ×1.25', 'var(--c2)'], ['floor', 'The deleted pieces\' making time (the floor)', 'var(--neutral-strong)']];
+  let s = '';
+  [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000].forEach((v) => s += `<line class="gridl" x1="${x(v)}" x2="${x(v)}" y1="0" y2="${EX.length * groupH}"/><text x="${x(v)}" y="${EX.length * groupH + 16}" text-anchor="middle" class="axis-text">${fmt(v)}</text>`);
+  EX.forEach((w, gi) => {
+    const y0 = gi * groupH + 8;
+    s += `<text x="${left - 14}" y="${y0 + 30}" text-anchor="end" class="val-text">${w.t}</text><text x="${left - 14}" y="${y0 + 47}" text-anchor="end" class="val-soft">${w.when}</text>`;
+    SER.forEach(([k, lab, col], i) => {
+      const v = w[k], y = y0 + i * (barH + 3);
+      const body = k === 'paid' ? `${w.umas.map(([e, n, d]) => `${d}: ${n} × ${fmt(TICKETS(e))}`).join('<br>')}<br>${fmt(v / 2)} hours of work; ${fmt(v * 10)} Laurels at the Exchange's price.`
+        : k === 'relevel' ? `Every Uma back to her old Craft Level in the new places (×1.25). The jobs on the way make about ${fmt(w.made)} refined items (${fmt(w.made / 485, 1)} maxed Umas of the new Tier 1). ${fmt(w.paid - v)} tickets left.`
+        : `${fmt(w.gear)} gear pieces and ${fmt(w.gems)} Star Gems deleted: ${fmt(w.making / 60)} hours of making at Craft Lv 25's times. ${w.floor > w.grant ? 'The floor pays.' : 'Below the grant: the floor doesn\'t bind.'}`;
+      s += `<rect class="hit" x="${left}" y="${y}" width="${Math.max(2, x(v) - left)}" height="${barH}" rx="4" fill="${col}" ${tt(`${w.t} · ${lab}: ${fmt(v)}`, body)}/><text x="${x(v) + 6}" y="${y + 15}" class="val-text" style="font-size:11.5px">${fmt(v)}</text>`;
+    });
+  });
+  $('#ex-chart').innerHTML = `<svg viewBox="0 0 ${W} ${EX.length * groupH + 24}" width="100%" role="img" aria-label="Speed Tickets granted, re-levelling, and the deleted pieces' making time, per world">${s}</svg>`;
+  $('#ex-legend').innerHTML = SER.map(([, lab, col]) => `<span><span class="tdot" style="background:${col}"></span>${lab}</span>`).join('') + '<span class="muted">Speed Tickets</span>';
+  tips($('#ex-chart'));
+  $('#ex-table').innerHTML = table(['World', 'Umas · Craft Levels', 'The grant', 'Hours', 'Re-level at ×1.25', 'Left after it', 'Deleted', 'Making time · floor', 'Laurels back', 'Items back · stock kept', 'Exchange value'],
+    EX.map((w) => [`${w.t} · ${w.when}`, w.umas.map(([e, n, d]) => `${d}: ${fmt(TICKETS(e))} each`).join('<br>'), `<b>${fmt(w.paid)}</b>`, fmt(w.paid / 2), fmt(w.relevel), fmt(w.paid - w.relevel),
+      `${fmt(w.gear)} pieces, ${fmt(w.gems)} Star Gems`, `${fmt(w.making / 60)} h · ${fmt(w.floor)}`, fmt(w.laurels), `${w.items} · ${fmt(w.stock)}`, fmt(w.paid * 10)]), [2, 3, 4, 5, 8, 10]);
+})();
+
+// ---- The floor at work
+(function () {
+  const umas = 20 * TICKETS(EXP(20)), pieces = 4800, floor = Math.ceil(pieces * GEAR_MIN / 30);
+  const W = 1200, left = 340, right = 140, barH = 30, max = 40000, x = (v) => left + (v / max) * (W - left - right);
+  const rows = [['Its twenty Umas at Craft Lv 20', umas, 'var(--c1)', `20 × ${fmt(TICKETS(EXP(20)))} Speed Tickets (${fmt(EXP(20))} EXP each).`],
+    ['The 4,800 pieces left by the forty who ascended', floor, 'var(--neutral-strong)', `${fmt(pieces)} gear pieces × 203 minutes: ${fmt(pieces * GEAR_MIN / 60)} hours of making.`]];
+  let s = '';
+  [0, 10000, 20000, 30000, 40000].forEach((v) => s += `<line class="gridl" x1="${x(v)}" x2="${x(v)}" y1="0" y2="${rows.length * (barH + 18)}"/><text x="${x(v)}" y="${rows.length * (barH + 18) + 14}" text-anchor="middle" class="axis-text">${fmt(v)}</text>`);
+  rows.forEach(([lab, v, col, body], i) => {
+    const y = 6 + i * (barH + 18);
+    s += `<text x="${left - 12}" y="${y + 20}" text-anchor="end" class="val-text">${lab}</text><rect class="hit" x="${left}" y="${y}" width="${x(v) - left}" height="${barH}" rx="4" fill="${col}" ${tt(`${lab}: ${fmt(v)}`, body)}/><text x="${x(v) + 6}" y="${y + 20}" class="val-text">${fmt(v)}</text>`;
+  });
+  s += `<text x="${x(floor) + 64}" y="${6 + barH + 18 + 20}" class="bind">the world is paid this</text>`;
+  $('#floor-chart').innerHTML = `<p class="muted" style="margin-bottom:8px">A Tier 1 world two Rift runs on: its forty best Umas ascended, twenty left at Craft Lv 20, the forty's gear in its stock (their maps left with them).</p><svg viewBox="0 0 ${W} ${rows.length * (barH + 18) + 24}" width="100%" role="img" aria-label="The floor: the Umas' grant against the deleted pieces' making time">${s}</svg>`;
+  tips($('#floor-chart'));
+  $('#floor-table').innerHTML = table(['', 'Speed Tickets', 'Hours'], [['The Umas\' grant (20 × 499)', fmt(umas), fmt(umas / 2)], ['The 4,800 pieces\' making time', fmt(floor), fmt(pieces * GEAR_MIN / 60)], ['<b>Paid</b>: the Umas\' lines and "Pieces whose makers have left this world"', `<b>${fmt(floor)}</b> (${fmt(umas)} + ${fmt(floor - umas)})`, fmt(floor / 2)]], [1, 2]);
+})();
+
+// ---- Everything else
+$('#what-table').innerHTML = table(['Today in the save', 'After', 'In the grant'], [
+  ['<code>work</code>: started entries, queues, Repeat', 'Settled first, as save v22 did: every started entry finishes into the Warehouse, outputs on their shelves, Craft EXP paid; queues drop; Repeat forgets', 'The finished work\'s EXP: no minute lost'],
+  ['<code>OwnedUma.craft</code>, every Uma, every world', '<b>Craft Lv 1, 0 EXP</b>', 'Its EXP ÷ 60, rounded up'],
+  ['Crafted gear (stock, bound, lockers), every Orb and support', 'Deleted (WP27)', 'Folded in; the floor guards the rest'],
+  ['Star Gems (stock, set) and the old maps', 'Deleted (EP21)', 'Folded in'],
+  ['<code>items</code>: 80 raw, 80 refined', '<b>Kept</b>, converted one for one by family and grade band', '— (the stock stays)'],
+  ['<code>buildings</code>: up to 22 upgrades', 'Dropped: places have no levels', '<b>Laurels back</b> (150, then 500: up to 7,150 a world) and their refined items (up to 66)'],
+  ['Weapon, Armor, Accessory Ranks; gear Manuals', 'Deleted (WP3)', '—'],
+  ['<code>wallet.gearMarks</code>', 'Class Marks, one for one', '—'],
+  ['<code>wallet.timeTickets</code>', 'Kept', '<b>+ the grant</b>'],
+  ['A save older than v21 (two professions)', 'The chain\'s v21 step (D144) kept the higher', 'Read as kept'],
+  ['An Uma who ascended', 'Left her old world\'s Craft Level at ascension (today\'s rule)', 'Only what the save holds counts; her gear left behind is the floor\'s'],
+  ['<code>TierWorld.grant</code>', 'New: tickets, floor, each Uma\'s level, EXP and tickets, what was deleted and what came back, <code>seen</code>', 'The first launch reads it'],
+]);
+
+// ---- The sheet mock (invented names)
+(function () {
+  const C = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)'];
+  const U = [['Uma A', 'Physical · Mine · Forge', 1970, '30,000 EXP past Lv 50', 0], ['Uma B', 'Magical · Monster Den · Lapidary', 1970, '30,000 EXP past Lv 50', 4], ['Uma C', 'Healer · Fields · Workbench', 1470, '', 2], ['Uma D', 'Physical hybrid · Forest · Armorer', 1470, '', 1], ['Uma E', 'Magical hybrid · Fishery · Charm Shop', 1470, '', 3], ['Uma F', 'Healer · Fields · Workbench', 1470, '', 2]];
+  $('#mock').innerHTML = `<div class="grab"></div><h3>The Wilds are rebuilt</h3>
+    <p class="lead2">Ten professions, each in its own place. Every Uma starts again at Craft Lv 1, and the time they worked comes back as Speed Tickets.</p>
+    <div class="big"><span class="tk"></span>+63,800</div><div class="bigsub">Speed Tickets · 31,900 hours of work: every gather, refine, craft and cut your Umas did</div>
+    <div class="line"><b>What went</b><span>5,400 gear pieces · 2,500 Star Gems · 22 facility upgrades. Their making is in those hours.</span></div>
+    <div class="line"><b>Came back</b><span>7,150 Laurels · 66 refined items · your Warehouse's 2,000 items, now the new materials (Ores → Copper and Iron …)</span></div>
+    <div class="line"><b>What stays</b><span>Uma Levels, classes and Class Ranks, Laurels, every ticket you had</span></div>
+    <div class="umas">${U.map(([n, tr, k, note, c]) => `<div class="u"><span class="face" style="--cc:${C[c]}">${n.slice(-1)}</span><div>${n} <span class="sub3">· ${tr}</span><div class="sub3">Craft Lv 50 → 1${note ? ' · ' + note : ''}</div></div><span class="n">${fmt(k)}</span></div>`).join('')}<div class="u"><span class="face" style="--cc:var(--neutral)">+</span><div>34 more Umas <span class="sub3">· Craft Lv 50 → 1</span></div><span class="n">${fmt(63800 - 2 * 1970 - 4 * 1470)}</span></div></div>
+    <p class="foot2">A ticket takes 30 minutes off a running job: Finish on a job, or Finish all on a place.</p>
+    <div class="btns"><span class="pri">To the Wilds</span><span>Later</span></div>`;
+  $('#sheet-notes').innerHTML = `<ul style="margin:6px 0 0;padding-left:18px;color:var(--ink-soft);font-size:13px;line-height:1.55">
+    <li><b>When:</b> once per world, the first time it opens after the update: Tier 1's at launch, a Tier 2 world's when the player switches to it. "To the Wilds" or "Later" sets <code>seen</code>.</li>
+    <li><b>The grant, large</b>, with the hours it stands for; <b>what went</b> (pieces, Star Gems, upgrades), <b>what came back</b> (Laurels, items, the converted Warehouse) and <b>what stays</b>.</li>
+    <li><b>By Uma:</b> her face, name and trade, "Craft Lv 50 → 1", her tickets, sorted by tickets; a banked Uma says so; the floor's line ("Pieces whose makers have left this world") when it pays.</li>
+    <li><b>Afterwards:</b> the Account page keeps a row, "The Tier rework's grant · 63,800 Speed Tickets", that reopens the sheet. The top bar's Speed chip shows the count as Laurels are shown (63,800): no kit change.</li>
+    <li><b>Finish all on a place:</b> a place page's header offers "Finish all · n Speed Tickets" when two or more of its slots run; one confirm finishes each at ⌈remaining ÷ 30 min⌉ and starts their queues. uma-work's <code>finish</code> in a loop on the game's page: no engine or kit change.</li>
+    <li><b>No expiry, no forced spending:</b> the tickets sit in the wallet like bought ones; jobs also run in real time.</li>
+    <li><b>A new account</b> (or a save with no Craft EXP and nothing crafted) sees no sheet.</li></ul>`;
+})();
+
+// ---- The approaches
+$('#ways-table').innerHTML = table(['Approach', 'A Craft Lv 50 Uma', 'Verdict'], [
+  ['<b>Craft Levels to 1; a Speed Ticket per 30 minutes of the manual\'s time (EXP ÷ 60); gear and Star Gems folded in, with a floor at their making time</b>', '<b>1,470</b>', '<b>Recommended</b> (PP20, PP24): the owner\'s "time it took", read exactly from the save; never short'],
+  ['The same at the new places\' speed (EXP ÷ 75)', '1,176', 'Exact on paper, short in play: Finish\'s rounding, the ×1 days before a facility\'s level 3, bought inputs'],
+  ['Levels\' tickets plus a second grant for gear and Star Gems by their making time', '1,470 + up to 1,552', 'Pays their making twice: it is already in her EXP'],
+  ['Levels\' tickets only, no floor', '1,470', 'A world whose crafters ascended loses their gear for nothing'],
+  ['The stock turned into tickets too', '1,470, the Warehouse emptied', 'Takes back items the new recipes use as they are; the overlap is about 6% of a fully built world\'s hours'],
+  ['Raw items back in Tier 1\'s demand mix (the first draft)', '472 raw items (a fully built Uma)', 'Set aside by the owner, 2026-10-24'],
+  ['Keep Craft Levels', '—', 'Set aside by the owner: every world starts the new trades on one clock'],
+]);
+</script>
+</body>
+</html>

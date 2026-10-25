@@ -5,9 +5,11 @@
 > getting far more complex still. The first round (one doc per category, 2026-10-22) was cross-referenced (§7, XR);
 > the owner then asked for **four standalone docs, detailed, one at a time** (§5). They are written and
 > **cross-checked into one design** (§7, XC1–XC16), to be reviewed **one doc at a time** with the owner (§10), decided
-> with no open questions, and shipped as implementation packets (§9). **Class Progression is approved (D192); Weapon
-> Progression was revised after the owner's review (2026-10-24)**, its follow-ups carried into the other three docs and
-> this brief (§7.1, XC17–XC22).
+> with no open questions, and shipped as implementation packets (§9). **Class (D192), Weapon (D193) and Extra Stats
+> (D194) Progression are approved**; their follow-ups are carried into the other docs and this brief (§7.1, XC17–XC22
+> after the weapon review, XC23–XC27 after Extra Stats). **Profession Progression is ready for the owner's review, the
+> last of four**, with his compensation direction designed in full (Craft Levels reset to 1, Speed Tickets for the time:
+> §9.4, profession-progression §14).
 
 ## 1. What the owner asked for
 
@@ -17,7 +19,10 @@
   grows across all tiers.
 - Fan out, cross-reference every definition together, then review one category at a time. No open-ended questions.
 - Things already crafted that the rework deletes get refunded later (probably every raw material back, the owner
-  recrafting by hand). That's for implementation; each doc only lists what would be deleted or converted.
+  recrafting by hand). That's for implementation; each doc only lists what would be deleted or converted. *Then
+  (2026-10-24, the weapon review): "I don't think the material refund is going to be our main approach; basically I
+  want to reset all farm/craft levels to 1, and then grant all tickets based on the amount of time it took to get all
+  those levels." Designed in §9.4 and profession-progression §14.*
 
 **By category** (the owner's points; the docs answer each one):
 
@@ -82,10 +87,11 @@ names the doc and call that own it; the first round's drafts and the cross-refer
   **Insignias** (a percentage on sub-bosses and bosses, or by timing). Tier 1's one slot holds one of four **base forms**;
   from a slot's G5 in Tier 2 each family opens **two branches**, a **Great** one (the same reach, deeper) and the
   **Channel Pendant**, **Twin Orb**, **Toll Bell** or **Onslaught Insignia**; Tier 3's G5 takes each **a step deeper**. A
-  form is a setting of the slot, nothing crafted. Flat offense on one kind stops at **the kind cap**, +68 × tier.
+  form is a setting of the slot, nothing crafted. Flat offense on one kind from the Pendant and Orb forms stops at **the
+  kind cap**, +68 × tier; the weapon moons sit outside it (EP27, D194).
 - **The damage stack** (WP31, new in the cross-check): one order on every hit, her ATK or M.ATK (with her signature's
-  bonus while she wears it) and flat offense on its own kind (capped), then the weak multiplier, then each percentage
-  (focus, affinity, Insignia) as its own factor.
+  bonus while she wears it) and flat offense on its own kind (the accessory forms capped, her weapon moons beside them),
+  then the weak multiplier, then each percentage (focus, affinity, Insignia) as its own factor.
 - **Grades, one rule for every piece** (WP2, WP3): a crafted item raises one a grade, up to **G10**. Grade g is **made**
   at Craft Lv 5g − 4 and **worn** at Uma Lv 5g − 4. No gear ranks. A class switch costs only the weapons she hasn't
   raised.
@@ -93,12 +99,16 @@ names the doc and call that own it; the first round's drafts and the cross-refer
   **No skill points at any tier.** Class Rank opens depths at 1, 10, 20, 30, 40 (and 50 in Tier 3); a fork's branches
   are free and exclusive, branch A the default. **Skill Ranks** (CP32): every skill ranks 1–5 by itself, one rank every
   2 Class Ranks, balance-neutral.
-- **Extra Stats** ([extra-stats-progression.md](extra-stats-progression.md) EP1–EP14): **the Planet** (+21 to all six
-  core stats) and four moons, Strength, Sorcery, **Vigor (HP and MP)** and Guard, five nodes each: 25 nodes, **every
-  open node counts**; a node opens with its jewel, in order, at Uma Lv 5g − 4. Tier 2 adds **the Halo** (flat offense on
-  one kind) and **Valor** (Limit start), Tier 3 the Halo's second kind and **Swiftness** (evasion). The core is rebuilt
+- **Extra Stats** ([extra-stats-progression.md](extra-stats-progression.md) EP1–EP29, D194): **the Planet** (+21 to all
+  six core stats) and three moons, **Prowess** (offense, its points split by her class: Brawler 100/0, Mage 0/100, Spell
+  Blade 70/30, Summoner 30/70, Paladin 80/20, Cleric 20/80), **Vigor (HP and MP)** and **Guard**, five nodes each:
+  **20 nodes, the same for every class**, every open node counts; a node opens with its jewel, in order, at Uma Lv
+  5g − 4. Tier 2 adds **a weapon moon** (five nodes of flat offense on her hits of one kind, +50 × tier: **Full** on one
+  kind, or **Split** on two at 0.7 each): 25 nodes. Tier 3 **a second weapon moon**, Full + Split serving all three of her
+  weapons: 30 nodes. **The Halo, Valor and Swiftness retire** (Limit start and evasion stay her knack's and feet
+  armor's). Two jewel kinds in every tier, **20 · 25 · 30 jewels an Uma, equal for every class**. The core is rebuilt
   the same each tier, × tier.
-- **Professions** ([profession-progression.md](profession-progression.md) PP1–PP23): ten professions in three kinds:
+- **Professions** ([profession-progression.md](profession-progression.md) PP1–PP25, for review): ten professions in three kinds:
   five **gathering** (Mining, Wood Chopping, Farming, Fishing, **Hunting**), one **processing** (Material Processing)
   and four **making** (Weapon, Armor, Accessory and Jewel Crafting). An Uma works one **trade**, her calling's gathering
   and crafting pair, on one Craft Level; from Tier 2 a **secondary** (any other profession's base work). Each
@@ -112,10 +122,14 @@ names the doc and call that own it; the first round's drafts and the cross-refer
   her template names, ATK and M.ATK +0.2 a level × tier while she wears it (about +5% at Lv 50), **in the affinity's
   place**; noted at CP36, decided in the Uma Templates pass.
 - **Values (SB1, §2.5):** every flat build value is its Tier 1 value × 1, × 1.8, × 2.6; shares and percentages stay.
-  **Amounts don't scale** (PP11): one Uma maxed is **485 · 503 · 521** refined items, every tier within a tenth.
+  **Amounts don't scale** (PP11): one Uma maxed is **485 · 505 · 525** refined items, every tier within a tenth
+  (profession-progression's numbers since D194, the Planet Jewel at 12; pending its review).
 - **Pacing:** the time to level, the EXP and rewards per fight, and the time to gear an Uma on curve keep today's order
-  ([pacing.md](../pacing.md)): 822 · 852 · 883 hours an Uma against today's 776; a Tier 1 run of twenty in 15.7 days of
-  volume, Tier 2's in 28.4.
+  ([pacing.md](../pacing.md)): 822 · 856 · 890 hours an Uma against today's 776; a Tier 1 run of twenty in 15.8 days of
+  volume, Tier 2's in 28.5.
+- **Old saves** (save v27, PP19–PP20, PP24): every Craft Level resets to 1 and each world is granted **a Speed Ticket for
+  every 30 minutes of work** its Umas' Craft EXP records (a Craft Lv 50 Uma: 1,470); deleted gear and Star Gems are
+  folded into that grant (§9.4).
 - **Versions** (§9): **engine v16 and save v27 are the Tier 1 rework**, every category, live together (save v26 is
   taken on main by D190). **Tier 2's toolbox is engine v17 and save v28**; Tier 3's is designed with Tier 3.
 
@@ -138,32 +152,35 @@ docs are decided.
 | **Might at G10** | 68 | 68 | 122 | 177 |
 | **Armor** | 5, a half per piece; Armor Ranks | 5 slots, her class's half; **all defense**: HP +150, DEF and M.DEF +40, MP +30 at G10 | × 1.8; per piece for the four between | × 2.6 |
 | **Accessories** | 2 typed: Damage (Orb), Support | 1: one of four base forms (Pendant, Orb, Bell, Insignia) | 2: all four families; two branches each from a slot's G5 | 3: each branch a step deeper |
-| **Kind cap** (flat offense on one kind) | +68 (Orb and ring, X7) | +68 | +122 | +177 |
+| **Kind cap** (flat offense on one kind from the Pendant and Orb forms; weapon moons beside it) | +68 (Orb and ring, X7) | +68 | +122 | +177 |
 | **Gear gate** | 24 rank bars | Uma Lv 5g − 4 | The same | The same |
 | **Trees she uses · nodes a weapon tree** | 5 · 15 | 3 · 8 | 3 + her class tree · 14 | 3 + her class tree · 17 |
 | **Picks a class** | 25 forks and a 50-point budget | 3 | 7 (6 and her class branch) | 10 (9 and her class branch) |
 | **Skills held · equipped** | Up to 50 · 3 → 10 | 15 · 3 → 7 | 18 · 3 → 10 | 34 · 10 and a master slot |
 | **Skill Ranks** | — | 1–5 on every skill, +1 every 2 Class Ranks | The same, class skills too | The same; capstones open whole |
-| **Extra Stats nodes** | 100, 5 → 30 active | 25, all count | 29: + Halo (1 kind), Valor | 33: + Halo's 2nd kind, Swiftness |
+| **Extra Stats nodes** (every class the same) | 100, 5 → 30 active | 20, all count: the Planet, Prowess, Vigor, Guard | 25: + a weapon moon (Full or Split) | 30: + a second weapon moon |
 | **A stat with its moon, Lv 50** | About +50 | +51 | +92 | +133 |
+| **Weapon moons, Lv 50** | — | — | Full +90 on one kind, or Split +63 on each of two | + Full +130 and Split +91: all three of her weapons |
 | **Her moon** | — | 2 nodes | 2 | 2 |
-| **Jewel kinds · items** | 3 · 100 Star Gems | 2 · 10 | 3 · 12 | 3 · 14 |
+| **Jewel kinds · items · an Uma** | 3 · 100 Star Gems | 2 · 10 · 20 | 2 · 10 · 25 | 2 · 10 · 30 |
 | **Template** | — | Calling, Flourish, moon, affinity +6% | + signature tip | Tip at both forks |
 | **Signature accessory** (proposed in the affinity's place, WP33) | — | Her template's family, worn: ATK and M.ATK +0.2 a level (+10 at Lv 50) | × 1.8 (+18) | × 2.6 (+26) |
 | **Work places · slots** | 11 facilities · 33–55 slots | 10 places, existing buildings · 40 | 10 · 40 | 10 · 40 |
 | **Material types a gathering profession** | 8 families × 10 grades | 2 (a pair) | 4 | 6 |
 | **Which material a grade takes** | Two families, rotating | G1–G5 low, G6–G10 high | G5 and G10 on Tier 2's pair | G4 and G9 Tier 2's; G5 and G10 Tier 3's |
 | **Where an Uma works** | Any of 11 | Her trade's 2 places | + a secondary's base work | The secondary reaches its Tier 2 work |
-| **One Uma maxed, refined** | 472 | 485 (493 with her moon) | 503 (511) | 521 (529) |
-| **Hours, Craft Lv 25 speed** | 776 | 822 (835) | 852 (866) | 883 (896) |
-| **A run of twenty** | 24 days | 15.7 days | 28.4 days | 29.4 days |
+| **One Uma maxed, refined** (pending the Profession review) | 472 | 485 (493 with her moon) | 505 (513) | 525 (533) |
+| **Hours, Craft Lv 25 speed** | 776 | 822 (835) | 856 (869) | 890 (903) |
+| **A run of twenty** | 24 days | 15.8 days | 28.5 days | 29.7 days |
 | **Build values** | Flat | × 1 | × 1.8 | × 2.6 |
 
 ### 2.3 One Uma's demand
 
 [profession-progression.md](profession-progression.md) owns materials, recipes and amounts (PP8–PP11);
 [weapon-progression.md](weapon-progression.md) and [extra-stats-progression.md](extra-stats-progression.md) own the
-items and how many she needs. Cells are pieces · refined items.
+items and how many she needs. Cells are pieces · refined items. *Follow-up to D194 (Extra Stats), 2026-10-24: two jewel
+kinds, the same jewels for every class, the Planet Jewel at 12 (profession-progression §6.5); the totals are
+profession-progression's, pending its review.*
 
 | Item | Made at | Refined a piece | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
@@ -172,24 +189,25 @@ items and how many she needs. Cells are pieces · refined items.
 | Armor Fittings | Armorer | 2 (G1–G5), 3 (G6–G10) | 50 · 125 | 50 · 125 | 50 · 125 |
 | Accessory Setting | Charm Shop | 12 · 6 · 4 by slot count | 10 · 120 | 20 · 120 | 30 · 120 |
 | **Gear** | | | **90 · 365** | **100 · 365** | **110 · 365** |
-| Planet Jewel I–V | Lapidary | 8 | 5 · 40 | 5 · 40 | 5 · 40 |
-| Moon Jewel I–V (four moons; + Valor's, + Swiftness's II and IV) | Lapidary | 4 | 20 · 80 | 22 · 88 | 24 · 96 |
-| Halo Jewel I–II, III–IV | Lapidary | 5 | — | 2 · 10 | 4 · 20 |
-| **Jewels** | | | **25 · 120** | **29 · 138** | **33 · 156** |
-| **One Uma** | | | **115 · 485** | **129 · 503** | **143 · 521** |
-| Her moon: Moon Jewels II and IV | Lapidary | 4 | 2 · 8 → 493 | 2 · 8 → 511 | 2 · 8 → 529 |
-| Hours at Craft Lv 25's speed (with her moon) | | | 822 (835) | 852 (866) | 883 (896) |
-| Made from the tier's own pair | | | — | 21% | 21% (+ 22% Tier 2's) |
+| Planet Jewel I–V | Lapidary | 12 | 5 · 60 | 5 · 60 | 5 · 60 |
+| Moon Jewel I–V (Prowess, Vigor, Guard; + weapon moon 1; + weapon moon 2) | Lapidary | 4 | 15 · 60 | 20 · 80 | 25 · 100 |
+| **Jewels** (every class) | | | **20 · 120** | **25 · 140** | **30 · 160** |
+| **One Uma** | | | **110 · 485** | **125 · 505** | **140 · 525** |
+| Her moon: Moon Jewels II and IV | Lapidary | 4 | 2 · 8 → 493 | 2 · 8 → 513 | 2 · 8 → 533 |
+| Hours at Craft Lv 25's speed (with her moon) | | | 822 (835) | 856 (869) | 890 (903) |
+| Made from the tier's own pair | | | — | 20% | 20% (+ 20% Tier 2's) |
 
-Today: 220 pieces, 472 refined (240 gear, 232 Star Gems), 776 hours. A party is five times one Uma (a Brawler or a Mage
-skips one moon: 20 · 24 · 28 jewels). A second class, or Tier 2's reverse set, adds only the weapons she hasn't raised:
-up to 30 gems a tier, 120 refined. Each trade carries about a fifth of the work in every tier (18.7–22.8%).
+Today: 220 pieces, 472 refined (240 gear, 232 Star Gems), 776 hours. A party is five times one Uma, whatever the classes
+(every class sets the same jewels, EP23). A second class, or Tier 2's reverse set, adds only the weapons she hasn't
+raised: up to 30 gems a tier, 120 refined. Each trade carries about a fifth of the work in every tier (18.6–23.3%).
 
 ### 2.4 Glossary
 
 One word, one meaning, in every doc and preview. *Cross-checked 2026-10-24: "Strike", "Orb · Support", "Specialized …
 or a third" and the fork gems are retired (last rows). After the weapon review (2026-10-24): partner, Evolved, the
-accessory forms and the signature accessory added; Slayer and the named Pendants retired.*
+accessory forms and the signature accessory added; Slayer and the named Pendants retired. After the Extra Stats review
+(D194, 2026-10-24): Prowess, weapon moon, Full · Split added; the Halo, Valor, Swiftness, Strength and Sorcery retired.
+With the owner's compensation direction: Speed Ticket · the grant.*
 
 | Word | Means | Never means |
 |---|---|---|
@@ -218,9 +236,9 @@ accessory forms and the signature accessory added; Slayer and the named Pendants
 | **Insignia** | An accessory family (every tier): base **Insignia** her hits on sub-bosses and bosses +15%; branches **Great Insignia** (the same, more) and **Onslaught Insignia** (her first act each wave) | — |
 | **Base form · accessory branch · Great branch** | An accessory family's Tier 1 form; from a slot's G5 in Tier 2 its two branches, the **Great** one (the same reach, deeper) and the one that changes the reach (Channel Pendant, Twin Orb, Toll Bell, Onslaught); Tier 3's G5 takes each **a step deeper**. A form is a setting of the slot, nothing crafted (WP34) | A weapon branch; an item |
 | **Signature accessory** | Her template's accessory family (WP33): while she wears any form of it, ATK and M.ATK +0.2 a level × tier (+10 · +18 · +26 at Lv 50); the normal item on anyone else. Proposed in the affinity's place (CP36), decided in the Uma Templates pass | A unique item; a weapon bonus |
-| **Kind cap** | Flat offense on one kind from accessories and the Halo stops at a G10 weapon's Might × tier: +68 · +122 · +177 (WP24) | A cap on percentages |
-| **Damage stack** | WP31's order on every hit: flat offense (her own kind's, capped) → the hit (× hand, Skill Rank) → the weak multiplier → the focus, affinity, Insignia → today's statuses and halving | — |
-| **Jewel** | Only the Lapidary's Extra Stats items: **Planet**, **Moon** and **Halo Jewels** (a numeral is the node it opens) | A gem |
+| **Kind cap** | Flat offense on one kind from the Pendant and Orb forms stops at a G10 weapon's Might × tier: +68 · +122 · +177 (WP24); her weapon moons sit outside it (EP27) | A cap on percentages; a cap on the weapon moons |
+| **Damage stack** | WP31's order on every hit: flat offense on her own kind (the accessory forms capped, her weapon moons beside them) → the hit (× hand, Skill Rank) → the weak multiplier → the focus, affinity, Insignia → today's statuses and halving | — |
+| **Jewel** | Only the Lapidary's Extra Stats items: **Planet** and **Moon Jewels**, two kinds in every tier (a numeral is the node it opens; a Moon Jewel opens any moon's node of its numeral, picked when set) | A gem |
 | **Stone** | What Hunting gathers (Quartz, Garnet; Sapphire, Diamond; Starstone, Philosopher's Stone); refined, **Cut Quartz** and so on | A gem or a jewel |
 | **Raw · refined item** | Gathered · processed one for one at the Workbench (the job is "process") | "Processed item" |
 | **Pair · band · the ladder** | A gathering profession's low and high type for one tier · grades 1–5 or 6–10 · PP9: a grade decides its material (Tier 2: G5 and G10 on Tier 2's pair; Tier 3: G4 and G9 Tier 2's, G5 and G10 Tier 3's) | — |
@@ -231,13 +249,19 @@ accessory forms and the signature accessory added; Slayer and the named Pendants
 | **Affinity** | Her template's twin set: +6% damage with its two kinds (the signature accessory proposed in its place, WP33) | A damage kind |
 | **Guided build** | A Rift path's composition and every member's three weapons | The campaign's defaults |
 | **Flourish · signature tip · her moon** | Her template's root node · its Tier 2+ tip option · her own two-node moon | — |
-| **Planet · moons · Halo · Valor · Swiftness** | Extra Stats bodies: every core stat · Strength, Sorcery, Vigor (HP and MP), Guard · one damage kind's flat offense · Limit start · evasion | — |
+| **Planet · moons · weapon moons** | Extra Stats bodies: every core stat · **Prowess** (offense, split by her class), **Vigor** (HP and MP), **Guard** (DEF and M.DEF) · from Tier 2 flat offense on her hits of one kind or two | — |
+| **Prowess** | The one offense moon (EP23): each node's points split between ATK and M.ATK by her active class (Brawler 100/0, Mage 0/100, Spell Blade 70/30, Summoner 30/70, Paladin 80/20, Cleric 20/80) | Strength or Sorcery (retired) |
+| **Weapon moon · Full · Split** | A Tier 2+ moon of five nodes giving flat offense on her hits of a kind (EP24): **Full** on one kind (+50 × tier), **Split** on two at 0.7 each, drawn as two moonlets on one track (EP25); Tier 3 adds a second (EP26) | Pure or Dual (the weapon branches' words); the Halo |
+| **Speed Ticket · the grant** | A Speed Ticket takes 30 minutes off a running job (today's, `timeTickets`). **The grant:** save v27's Speed Tickets for every 30 minutes of work an Uma's Craft EXP records, paid into her world's wallet as her Craft Level resets to 1 (PP20, PP24) | A refund in items; an Uma Ticket |
 | ~~**Strike**~~ | Retired (owner, 2026-10-23): the ten kinds are the damage and weakness types | — |
 | ~~**Orb · Support** (slots)~~ | Retired with the supports (WP17, WP19): slots are untyped; the Orb is a family | — |
 | ~~**Specialized … or a third**~~ | Retired: Pure or Dual, no third branch (WP6) | — |
 | ~~**Fork gems**~~ (Dual, Pure, Prism, Tempered, Keen Gem) | Retired: one Branch Gem (WP10); Prism dropped | — |
 | ~~**Slayer**~~ (Insignia) | Retired (the owner's weapon review, 2026-10-24): it is the base Insignia (WP23, WP28) | — |
 | ~~**Named Pendants**~~ (Main Arms, Secondary Arms, Elemental, Arcane; the five Twin Pendants) | Retired into forms that read her slots: the Pendant and Great Pendant her three kinds, the Channel Pendant two of one channel, the Twin Orb a twin set (WP13, WP20) | — |
+| ~~**Halo · Valor · Swiftness**~~ | Retired (the owner's Extra Stats review, D194; EP9, EP11, EP28): the Halo folds into the weapon moons; Limit start and evasion stay her knack's (Gritty, Fleet) and feet armor's; the Halo Jewels are never made | — |
+| ~~**Strength · Sorcery**~~ (moons) | Merged into Prowess (EP23): every class the same nodes and jewels | — |
+| ~~**The refund**~~ (raw items back in Tier 1's demand mix) | Replaced by the grant (PP20, the owner's direction, 2026-10-24) | — |
 
 ### 2.5 The stat budget (SB1, working rule, 2026-10-23)
 
@@ -247,7 +271,7 @@ growing, so the build's share of a stat fell (a Summoner's offense 57% → 43%, 
 Tier 3).
 
 **The rule every standalone doc writes to:** the build keeps **the same share of every stat at each tier's Lv 50**.
-Every flat build value (weapon Might, armor, Pendants and Orbs, the kind cap, the Halo, Extra Stats nodes, template
+Every flat build value (weapon Might, armor, Pendants and Orbs, the kind cap, the weapon moons, Extra Stats nodes, template
 nodes) is written as its **Tier 1 value × the tier's multiplier**, the growth of an average Uma's base stats: **Tier 1
 ×1, Tier 2 ×1.8, Tier 3 ×2.6** (base core stat 104.5 → 187 → 269.5 at lifetime Lv 50, 100, 150). Shares and
 percentages (weak multipliers, the focus, the affinity, Insignias, a Bell's power, evasion, Limit start) stay the same
@@ -267,9 +291,9 @@ scale (PP11).
 | Doc | Owns | Main interfaces | Absorbs (history) |
 |---|---|---|---|
 | [class-progression.md](class-progression.md) (CP1–CP43) | The six classes, slots by channel, the defaults; class templates and presets per tier (which set; the accessories named by weapon-progression); class trees, Class Rank, Skill Ranks; **class branches**: the weapon groups, the focus, default and reverse sets, class skills; masteries; foe weaknesses and **shields**; the Rift's guided builds; the calling pick; the halls' Limit Break kinds | Weapons (slots, sets), Extra Stats (channels, leans), Professions (the calling's trade), Uma Templates (two slots, the affinity) | [classes.md](classes.md), [skill-trees.md](skill-trees.md) |
-| [weapon-progression.md](weapon-progression.md) (WP1–WP34) | **Weapons** (branches, **the partner table**, the two-kind cap, Might × tier, coverage), **armor** (all defense), **accessories** (families, base forms and branches, slots, the **kind cap**, presets' forms, **the signature accessory**), **the damage stack**; the crafted products and pieces per Uma | Classes (slots, sets, focus), Extra Stats (the Halo under the cap), Professions (what is made) | [gear.md](gear.md); decides [weapon-research.md](weapon-research.md) |
-| [extra-stats-progression.md](extra-stats-progression.md) (EP1–EP22) | **Extra Stats bodies, nodes and grants** per tier (the Planet, four moons, the Halo, Valor, Swiftness), her moon's slot, **jewels** (kinds, grades, counts), the foe budget's tier scaling | Weapons (the kind cap, armor beside it), Professions (jewel recipes), Uma Templates (her moon) | [extra-stats.md](extra-stats.md) |
-| [profession-progression.md](profession-progression.md) (PP1–PP23) | The ten professions and their kinds, places and slots, **materials** (catalog, the ladder), **recipes and amounts**, supply and demand, the secondary, the Exchange, **the refund's mix** | Weapons and Extra Stats (what is made, how many), Classes (the calling) | [professions.md](professions.md) |
+| [weapon-progression.md](weapon-progression.md) (WP1–WP34) | **Weapons** (branches, **the partner table**, the two-kind cap, Might × tier, coverage), **armor** (all defense), **accessories** (families, base forms and branches, slots, the **kind cap**, presets' forms, **the signature accessory**), **the damage stack**; the crafted products and pieces per Uma | Classes (slots, sets, focus), Extra Stats (the weapon moons beside the cap, D194), Professions (what is made) | [gear.md](gear.md); decides [weapon-research.md](weapon-research.md) |
+| [extra-stats-progression.md](extra-stats-progression.md) (EP1–EP29) | **Extra Stats bodies, nodes and grants** per tier (the Planet, three moons with Prowess split by class, the weapon moons, Full or Split), her moon in full, **jewels** (kinds, grades, counts), the foe budget's tier scaling | Weapons (the weapon moons outside the kind cap, the stack, presets), Professions (jewel recipes), Uma Templates (her moon) | [extra-stats.md](extra-stats.md) |
+| [profession-progression.md](profession-progression.md) (PP1–PP25) | The ten professions and their kinds, places and slots, **materials** (catalog, the ladder), **recipes and amounts** (the Planet Jewel at 12), supply and demand, the secondary, the Exchange, **the compensation** (Craft Levels reset, Speed Tickets for the time, the first launch) | Weapons and Extra Stats (what is made, how many; what the save deletes), Classes (the calling) | [professions.md](professions.md) |
 | [variance.md](variance.md) (U1–U16) | Uma Templates: the catalog, the calling's rule (U4), template-only pieces | Classes (CP24, CP36), Extra Stats (EP14), Weapons (WP33, the signature family) | Folded into the standalone docs by the Uma Templates pass |
 
 Every standalone doc has: the owner's points, at a glance, today, the proposal per tier, Provides and Assumes, save
@@ -287,8 +311,8 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 |---|---|
 | **Class Progression** | [overview, composition, the calling pick](previews/class-overview.html) · [templates, focus and pairings, what grows, Lv 50 stats](previews/class-templates.html) · [the tree viewer](previews/class-trees.html) · [foe weaknesses and coverage](previews/class-weaknesses.html) |
 | **Weapon Progression** | [the weapon tree viewer and coverage](previews/weapon-trees.html) · [armor and the defensive budget](previews/weapon-armor.html) · [the accessory catalog and viability](previews/weapon-accessories.html) · [every recipe and one Uma's totals](previews/weapon-materials.html) |
-| **Extra Stats Progression** | [the map at every tier](previews/stars-maps.html) · [what it grants, the build share](previews/stars-grants.html) · [the jewels and per-Uma totals](previews/stars-jewels.html) |
-| **Profession Progression** | [the Wilds map at each tier](previews/prof-map.html) · [every material type](previews/prof-materials.html) · [gathering → processing → making](previews/prof-flow.html) · [demand against supply](previews/prof-demand.html) |
+| **Extra Stats Progression** | [the map at every tier](previews/stars-maps.html) · [what it grants, the build share](previews/stars-grants.html) · [the jewels and per-Uma totals](previews/stars-jewels.html) · [her moon](previews/stars-uma.html) |
+| **Profession Progression** | [the Wilds map at each tier](previews/prof-map.html) · [every material type](previews/prof-materials.html) · [gathering → processing → making](previews/prof-flow.html) · [demand against supply](previews/prof-demand.html) · [the first launch: Craft Levels reset, Speed Tickets for the time](previews/prof-grant.html) |
 | Every category (first round, 2026-10-22/23; refreshed after the standalone docs are decided) | [every category × every tier](previews/progression.html) · [her detail page at Tier 1, 2 and 3](previews/character-tiers.html) · [max stats by tier](previews/stats-by-tier.html) |
 | Uma Templates (first round; input to the Uma Templates pass) | [the catalog](previews/variance-templates.html) · [two front runners](previews/variance-two-umas.html) · [her profile by tier](previews/variance-profile.html) |
 | First round, history | Classes: [composition](previews/classes-composition.html) · [strikes](previews/classes-strikes.html) · [template sheets](previews/classes-template-sheets.html) · [trees](previews/classes-trees.html). Skill trees: [by tier](previews/skills-trees-by-tier.html) · [every class at Tier 1](previews/skills-all-classes-t1.html) · [the Skills tab](previews/skills-profile.html). Gear: [weapon tree](previews/gear-weapon-tree.html) · [the Gear tab](previews/gear-loadout.html) · [crafting](previews/gear-crafting.html). Extra Stats: [the map](previews/extra-stats-maps.html) · [the budget](previews/extra-stats-budget.html). Professions: [the Wilds map](previews/professions-map.html) · [the flow](previews/professions-flow.html) · [demand](previews/professions-demand.html) |
@@ -304,30 +328,32 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
    2. [weapon-progression.md](weapon-progression.md): authored 2026-10-24 on the research note
       ([weapon-research.md](weapon-research.md)); revised after the owner's review the same day (WP32–WP34 new).
       Absorbs gear.md.
-   3. [extra-stats-progression.md](extra-stats-progression.md): authored 2026-10-24. Absorbs extra-stats.md.
-   4. [profession-progression.md](profession-progression.md): authored 2026-10-24. Absorbs professions.md.
+   3. [extra-stats-progression.md](extra-stats-progression.md): authored 2026-10-24; revised after the owner's review
+      the same day (EP23–EP29 new). Absorbs extra-stats.md.
+   4. [profession-progression.md](profession-progression.md): authored 2026-10-24; brought in line with D192–D194 and
+      the owner's compensation direction the same day (PP24, PP25 new). Absorbs professions.md.
    5. **Cross-check** (2026-10-24): the four made to agree, this brief brought up to date (§7, XC1–XC16).
-4. **Next: the owner's reviews, one doc at a time, in order:** Class (approved, D192) → Weapon (revised after his
-   review; its second review next) → Extra Stats → Profession (§10), each ending with its D-rows in
+4. **The owner's reviews, one doc at a time, in order:** Class (approved, D192) → Weapon (approved, D193) → Extra Stats
+   (approved, D194) → **Profession (next, the last)** (§10), each ending with its D-rows in
    [decisions.md](../../decisions.md).
 5. **Then:** the overall **stat balancing** by simulation (SB1, §9.5); the **Uma Templates** pass (variance.md, folded
    into the standalone docs; CP36's and EP14's notes); then **implementation** packets behind engine v16's switch, save
-   v27, with the refund (§9).
+   v27, with the compensation (§9.4).
 
 ## 6. Status
 
 | Doc | State |
 |---|---|
-| **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20) |
-| **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral) |
+| **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20); **follow-ups to D194** the same way (XC24) |
+| **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral). **Follow-ups to D194** (extra-stats §18.1) logged against D193, no decision changed (XC23) |
 | **extra-stats-progression.md** | **Approved by the owner, 2026-10-24 (D194):** EP1–EP29 (weapon moons, Full or Split; Prowess by class; the Halo, Valor and Swiftness retired; her moon in full) |
-| **profession-progression.md** | Authored 2026-10-24 (PP1–PP23). **Cross-checked:** no call changed; weapon-progression adopted its recipes, amounts and refund. **Follow-up to the weapon review:** wording only, no amount moved (XC21). **For review, fourth** |
+| **profession-progression.md** | Authored 2026-10-24 (PP1–PP23). **Cross-checked:** no call changed; weapon-progression adopted its recipes, amounts and refund. **Follow-up to the weapon review:** wording only, no amount moved (XC21). **Brought in line with D194** (two jewel kinds, 20 · 25 · 30 jewels every class, the Planet Jewel at 12: PP10, PP11; XC25) and **the owner's compensation direction designed** (PP19, PP20 changed; PP24, PP25 new; XC26). **PP1–PP25, for review, the last of four** |
 | weapon-research.md | Input (WR1–WR6), decided as WP1–WP12 |
 | variance.md | First round, cross-referenced; the Uma Templates pass's input |
 | classes.md, skill-trees.md, gear.md, extra-stats.md, professions.md | History: superseded by the standalone docs |
 | Overview pages (progression, character-tiers, stats-by-tier) | First round; bannered; refreshed after the standalone docs are decided |
 | Cross-reference (XR) | Done, 2026-10-22 |
-| Cross-check (XC) | **Done, 2026-10-24** (XC1–XC16); the weapon review's follow-ups the same day (XC17–XC22). Next: the owner's second review of weapon-progression.md |
+| Cross-check (XC) | **Done, 2026-10-24** (XC1–XC16); the weapon review's follow-ups the same day (XC17–XC22); D194's follow-ups and the compensation (XC23–XC27). Next: the owner's review of profession-progression.md |
 
 ## 7. Cross-reference and cross-check log
 
@@ -335,7 +361,9 @@ Two passes. **The cross-reference (XR, 2026-10-22)** reconciled the six first-ro
 for the calls the standalone docs still carry (XR2, XR6, XR12). **The cross-check (XC, 2026-10-24)** made the four
 standalone docs agree; each changed call says "Changed in cross-check (2026-10-24)" in its doc. **XC17–XC22** carry the
 owner's weapon review (2026-10-24) into the other docs: wording and numbers only, no design change; each spot says
-"Follow-up to the weapon review, 2026-10-24".
+"Follow-up to the weapon review, 2026-10-24". **XC23–XC27** carry the approved Extra Stats doc (D194) and its interface
+changes (extra-stats §18) into the other docs, each spot marked "Follow-up to D194 (Extra Stats), 2026-10-24", and
+the owner's compensation direction into profession-progression (§14) and §9.4 here.
 
 ### 7.1 The cross-check (2026-10-24)
 
@@ -363,6 +391,11 @@ owner's weapon review (2026-10-24) into the other docs: wording and numbers only
 | **XC20** | **Lv 50 offense.** class-progression §9, extra-stats §8.2–§8.3, class-templates.html and stars-grants.html showed the first draft's Orb filling the kind cap on her lead kind (a Brawler 260 · 587 · 849); stars-grants.html had also missed the cross-check's Tier 1 Pendants | **One offense column on WP25's new presets** (her lead kind: the Halo, and a Pendant form for most): Brawler 260 · 526 · 760, Mage 279 · 584 · 849, Spell Blade 274 · 526 · 809, Summoner 260 · 526 · 809, Paladin 263 · 538 · 782, Cleric 249 · 556 · 808, the flat drafts beside them; a Brawler's lead offense 55% → 61% → 61% build (Extra Stats 20% → 29% → 29%). HP, MP, ATK, M.ATK, DEF and M.DEF don't move | weapon-progression (presets); extra-stats-progression (Extra Stats) |
 | **XC21** | **Profession wording.** profession-progression named the families by tier (Pendants, Bells; + Orbs; + Insignias), a Setting "any type", and the Tier 3 Branch Gem "Keen or Tempered" | **Wording only** (WP §6.4's box): all four families in every tier, base forms then branches, a Setting any family and form; the Tier 3 Branch Gem "Keen, Tempered or Evolved". **No amount moves:** Settings 10 · 20 · 30 an Uma, 120 refined a tier; the Branch Gem 3 a tier; gear 365; one Uma **485 · 503 · 521** in all four docs and §2.3 | profession-progression (amounts) |
 | **XC22** | **This brief after the weapon review** | §2 frame and tiers at a glance (fixed partners, Evolved, every accessory family in every tier, the signature accessory proposed in the affinity's place, coverage 2.30); §2.4 glossary (partner, Evolved, base form, Great branch, Channel Pendant, Twin Orb, Toll Bell, Onslaught Insignia, signature accessory; Slayer and the named Pendants retired); §2.5, §3, §5, §6; §8–§9's weapon and accessory rows (WP27, WP30); §10's Weapon list, WP1–WP34 | — |
+| **XC23** | **weapon-progression after D194** (extra-stats §18.1): the kind cap (WP24) bound "the Pendant and Orb forms and the Halo"; the stack's step 1 (WP31) and presets (WP25) named the Halo; §4.4's ATK and M.ATK for the four between were the first draft's; §4.2 had 18% evasion in Tier 3 with Swiftness; "Halo" throughout | **Follow-ups logged against D193, no decision changed:** the cap binds the Pendant and Orb forms only (+68 · +122 · +177), **weapon moons outside it** (at most 334 and 484 on one kind in Tiers 2 and 3); step 1 adds her weapon moons on the hit's own kind beside the capped forms; presets take EP29's weapon moons, the accessory forms as written; §4.4 follows Prowess (Spell Blade ATK 183 · 328 · 472, M.ATK 130 · 231 · 335; Paladin 175 · 313 · 453, 111 · 199 · 286; mirrors); evasion 12% every tier; every "Halo" reads "weapon moons"; WP26's Uma 485 · 505 · 525; WP27 and §11 point to profession-progression §14. Pages: accessories, materials | extra-stats-progression (EP24–EP29) |
+| **XC24** | **class-progression after D194:** the Halo and Valor in §0, "Later tiers at a glance", §3.5, §7.2, §9; §9's ATK and M.ATK for the four between; class-overview.html's Extra Stats row and class-templates.html's Lv 50 stats | **Follow-ups logged against D192, no decision changed:** a weapon moon (Full +90 or Split +63) in Tier 2, a second in Tier 3; class skills carry "that weapon's kind, channel, Might, weapon moons and branch"; §9 follows Prowess and EP §8.2's offense on her lead kind (Brawler 260 · 528 · 763); the pages redrawn; the anchors to extra-stats §4 and §5 fixed. CP36's note stands | extra-stats-progression |
+| **XC25** | **profession-progression after D194** (extra-stats §18.2): Halo Jewels I–IV, Valor's and Swiftness's Moon Jewels, 25 · 29 · 33 jewels (20 · 24 · 28 for a Brawler or a Mage), Planet Jewel 8, Lapidary 120 · 138 · 156, one Uma 485 · 503 · 521 | **Two jewel kinds in every tier; 20 · 25 · 30 jewels, every class; the Planet Jewel at 12** (D194's proposal, taken, PP10, profession §6.5: Tier 1 back on 120 · 485 · 822 h); Lapidary **120 · 140 · 160**; one Uma **485 · 505 · 525** (493 · 513 · 533), **822 · 856 · 890 h**; trades 18.6–23.3%; a run of twenty 15.8 · 28.5 · 29.7 days; the tier's own pair 20%. Every table and the four pages redone | profession-progression (amounts) |
+| **XC26** | **The compensation.** WP27, EP21, PP19–PP20 and §9.4 here held the first draft's raw-material refund, with the owner's direction (D193's note) only as a banner | **Designed in profession-progression §14 (PP19, PP20 changed; PP24, PP25 new):** Craft Levels to 1; a Speed Ticket for every 30 minutes of work an Uma's Craft EXP records (⌈EXP ÷ 60⌉, per Uma, into her world's wallet); gear and Star Gems folded in, with a floor at their making time; stock kept and converted; upgrades' Laurels and items back; work settled first; the first launch's sheet. §9.3–§9.4 here rewritten; WP27, WP §11, EP21 and EP §15 point to it (wording only). A new page, [the first launch](previews/prof-grant.html) | profession-progression (the compensation) |
+| **XC27** | **This brief after D194** | §2.1–§2.4 (Prowess, weapon moons, Full · Split, the retired Halo, Valor and Swiftness; 20 · 25 · 30 nodes and jewels, equal for every class; one Uma 485 · 505 · 525 pending the Profession review); §2.5, §3, §4, §5, §6; §8's extra-stats-tier2 and Q9 rows; §9.1–§9.5; §10's EP1–EP29 and PP1–PP25 | — |
 
 **Checked, no conflict:** slots by channel and the owner's defaults in every doc and page; the calling and its pick
 moving only Forest · Armorer ↔ Monster Den · Lapidary (CP30, PP2); accessories 1 · 2 · 3 and Settings 12 · 6 · 4
@@ -372,7 +405,10 @@ coverage numbers 2.47 · 2.0 · 2.34 (WP12, CP §3.5, WR6); one Craft Level and 
 "a hit's own kind" for the affinity, the focus and every flat bonus (CP36, CP39, WP13, EP9). **Left for the owner:**
 nothing outside the reviews; CP42 (Pierce) is a recommendation like every call. **After the weapon review (XC17–XC22):**
 the coverage numbers read 2.47 · 2.0 · 2.30 (WP12, CP §3.5 and §4.4, here); the accessory slots stay 1 · 2 · 3 and
-Settings 12 · 6 · 4; the kind cap is unchanged (the Great Orb the one form it binds beside the Halo).
+Settings 12 · 6 · 4; the kind cap is unchanged (the Great Orb the one form it binds beside the Halo). **After D194
+(XC23–XC27):** the kind cap binds the Pendant and Orb forms only, the weapon moons beside it (WP24, EP27); evasion is 12%
+in every tier (no Swiftness); every doc reads 20 · 25 · 30 jewels an Uma for every class and one Uma 485 · 505 · 525; no
+"Halo", "Valor" or "Swiftness" remains except as retired history.
 
 ### 7.2 The cross-reference (2026-10-22, history)
 
@@ -418,12 +454,12 @@ Old docs stay as they are, for history; the D-rows of each review record these.
 | **tiers.md §6**, Tier 3 | Awakening at G10; class constellations; a master class per advanced class | Awakening → Tier 3's G5 step, Keen, Tempered or Evolved (WP9); constellations dropped (EP12); a mastery per class, opening with the branch capstone (CP27) | weapon-progression §3.3, extra-stats-progression §5, class-progression §7.3 |
 | **tier2-classes.md** (H39, Q14) | A1 free switching among twelve; A2 leans ±0.1; A3 today's side rules; A4 names; A5 the twelve passives; A6 the Ascend pick; A7 Hero LB+; A8 LB power; A9 no Tier 1 skills carry; A10 skill MP ×1.7 | A1, A2 **dropped**; A3 **replaced** by branch C and the tip fork (CP19); A4 **kept** as the branch names; A5 **folded into the focus** (CP39); A6 **replaced** by branch 1 preselected (CP26); A7, A8, A10 **kept**; A9 **kept** (CP31) | class-progression §7.2, §8 |
 | **weapon-arts.md** (H40, Q15) | E1 a core and an A/B fork per weapon; E2 Weapon Rank gates; E3 per weapon; E4 Lore Scrolls; E5 what an art touches; E6 the Break cap; E7 thirty nodes; E8 armor sets; E9 Lore Seals | E1's A/B fork **moves into the trees** as the Power or Break tip (CP19); E6 **kept** for the Break tip; E7 **replaced** by weapon branches (WP6–WP9); E2–E5, E8, E9 **dropped** (WP3, WP16) | weapon-progression §3, class-progression §6.3 |
-| **extra-stats-tier2.md** (H41, Q12) | X1 the Halo; X2 a pair per kind, grades 5 and 10; X3 flat; X4 one specialty slot; X5 twenty ring gems from a second-profession item; X6 an outer orbit; X7 Orb + ring ≤ a G10 weapon's Might; X8 the inner map unchanged | X1, X3, X6 **kept**; X7 **extended** to the kind cap, × tier (WP24); X2 **kept** for one kind (Tier 2) and a second (Tier 3, Halo Jewels III–IV, EP17); X4 → a free kind setting (EP9); X5 → Halo Jewels from the tier's pairs (EP18); X8 **replaced** (the Planet and moons) | extra-stats-progression §4–§5 |
+| **extra-stats-tier2.md** (H41, Q12) | X1 the Halo; X2 a pair per kind, grades 5 and 10; X3 flat; X4 one specialty slot; X5 twenty ring gems from a second-profession item; X6 an outer orbit; X7 Orb + ring ≤ a G10 weapon's Might; X8 the inner map unchanged | X1 **replaced** by the weapon moons (EP24–EP26: five nodes, Full or Split, a second in Tier 3; the Halo retired, D194); X3 **kept** (flat offense on a kind); X6 **kept** (the weapon moons on the outer orbit); X7 **extended** to the kind cap × tier, binding the accessory forms only, the weapon moons outside it (WP24, EP27); X2 and X5 → the weapon moons take Moon Jewels by the ladder (EP17); X4 → a free setting, Full or Split and its kinds (EP25); X8 **replaced** (the Planet and three moons) | extra-stats-progression §4–§5 |
 | **second-profession.md** (H42, Q13) | Lore Level, Relics and Glyphs, three Tier 2 sites, Scrolls and Seals | **Replaced:** a secondary of any other profession's base work (PP14), the ladder (PP9); no Lore (PP18) | profession-progression §2.3, §3.4 |
 | **tier2-world.md** (H43, Q16) Z2 | The same biomes and signatures, every foe's shield +1 | **Weaknesses narrow by rank** (CP6); shields grow with answers, Z2's +1 the floor (CP8) | class-progression §4.2, §4.4 |
-| **tier2-world.md** Z4 | One Tier 2 term (+15% HP and defense, +10% offense by Lv 50) from H39–H41's tools | **One term kept;** its tools re-listed: class branches and the focus, weapon branches, the second accessory slot and the accessory branches, branch C and Break tips, the Halo, Valor; priced with v17 | class-progression §15, weapon-progression §13, extra-stats-progression §10 |
-| **tier2-world.md** Z9 | Fronts that test weapon arts and the outer ring | Fronts test weapon branches, Break tips, the focus and the Halo | class-progression §4.3 |
-| **Q9** (keep the Limit stat) | Keep it | **Answered:** off Tier 1's shared map (her knack keeps it), back as Tier 2's Valor moon (EP8, EP11) | extra-stats-progression §4.2 |
+| **tier2-world.md** Z4 | One Tier 2 term (+15% HP and defense, +10% offense by Lv 50) from H39–H41's tools | **One term kept;** its tools re-listed: class branches and the focus, weapon branches, the second accessory slot and the accessory branches, branch C and Break tips, the weapon moon (D194); priced with v17 | class-progression §15, weapon-progression §13, extra-stats-progression §10 |
+| **tier2-world.md** Z9 | Fronts that test weapon arts and the outer ring | Fronts test weapon branches, Break tips, the focus and the weapon moons (Full against Split) | class-progression §4.3 |
+| **Q9** (keep the Limit stat) | Keep it | **Answered:** off the shared map in every tier; her Gritty knack and the halls' Limit Breaks keep it (EP8, EP28; Valor retired, D194) | extra-stats-progression §5.4, §6.2 |
 | **Q10** (variance sketch) | Distance as a hard limit; her unique skill as a passive; gold skills | **Replaced** by Uma Templates: nothing from the original's skills (U2, U7) | variance |
 | **Q17** (hybrid crossovers) | A Spell Blade sweep side, a Summoner focus side | **Answered:** Tier 2's branch C, Sweep and Hunt, on the leading half's trees (CP19) | class-progression §6.3 |
 | **Today's rules the rework retires** | Two typed accessory slots (C10, D124) and the ten supports; rotating recipe pairs (D139); facilities and upgrades (D144); side points and their dot (D166); side gates (D102's); weapon, armor and accessory ranks and Gear Marks; Star Gems and active slots; the start by style alone (D162, D180) | WP17, WP19; PP10; PP4; CP14; CP16; WP3; EP6, EP17; CP29 (D180's split kept inside the calling) | Each doc's §1 "Today" |
@@ -448,7 +484,7 @@ replay on their own engine; stored fights keep their frozen inputs.
 | Armor's values per slot (DEF, M.DEF +4 a grade; HP +15; MP +3); Might, armor offense and accessory values × tier; the foes' build budget × tier | WP4, WP15, EP16 | Data |
 | The Paladin's revive on her Light D3 B; two Limit Breaks' kinds (Rampart Charge Axe, Choir of Angels Lightning) | CP37, CP35 | Data |
 | The Flourish's three MP twists (Opening, Even pace, Second wind), on as her calling | U9 | Rule |
-| No engine change: weaknesses by kind (the generator's twins), locks as today, the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start; Vigor's MP is a point) | CP5, CP8, CP18, EP | Generator, data |
+| No engine change: weaknesses by kind (the generator's twins), locks as today, the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start; Vigor's MP is a point; Prowess's points split by her class when the fight starts) | CP5, CP8, CP18, EP, EP23 | Generator, data |
 
 ### 9.2 Engine v17: Tier 2's toolbox
 
@@ -456,14 +492,14 @@ replay on their own engine; stored fights keep their frozen inputs.
 |---|---|
 | Weapon branches: a weak multiplier per weapon (Pure ×1.5) in place of `BATTLE_WEAK`; a Dual's partner, from the partner table, for weaknesses and locks | WP6, WP7, WP32 |
 | The two-kind cap; one accessory of each family; the second slot; the accessory branches (the Great forms, the Channel Pendant and the Twin Orb on the Orb path; the Toll Bell's and Onslaught's rules) | WP8, WP19, WP34 |
-| The kind cap: flat offense on one kind from Orbs, Pendants and the Halo at most a G10 Might × tier | WP24 |
+| The kind cap: flat offense on one kind from the Pendant and Orb forms at most a G10 Might × tier; the weapon moons outside it | WP24, EP27 |
 | The damage stack's percentages: the focus (+15% on a hit's own kind of her group; healers' shares) and the affinity (+6%), each a factor after the weak multiplier | WP31, CP39, CP36 |
 | The class branches: the focus, class skills cast through a named focus weapon slot, Frenzy, guards as skills and the other new rules of CP34 | CP26, CP34 |
 | Branch C nodes (Sweep, Hunt, Mighty, Wide) and the Break tips (one more shield point on a weak hit, once an act, under E6's cap) | CP19 |
-| The Halo (flat offense joined to her Might of its kind; its kind frozen into the input); Valor's Limit start is a point | EP9, EP11 |
+| **The weapon moon:** flat offense on her hits of its kind (Full) or two kinds (Split, 0.7 each), joined to her offense in the stack's step 1 outside the kind cap; never a heal or a kind; its setting frozen into the input | EP24, EP25, EP27 |
 | The signature tips | U16 |
 | Weakness counts by rank and shields by answers (generator only) | CP6, CP8 |
-| **Tier 3, later:** Keen, Tempered, Evolved, the accessory branches' step, the third slot; depth 6 capstones, two branches held, the master slot, branch capstones and masteries; the Halo's second kind and Swiftness | WP9, WP34, CP20, CP27, EP12 |
+| **Tier 3, later:** Keen, Tempered, Evolved, the accessory branches' step, the third slot; depth 6 capstones, two branches held, the master slot, branch capstones and masteries; the second weapon moon (data on v17's rule) | WP9, WP34, CP20, CP27, EP26 |
 | **With the Uma Templates pass:** the signature accessory (ATK and M.ATK + her level × 0.2 × tier while worn, frozen into the input) | WP33 |
 
 ### 9.3 Save v27: one migration, every world
@@ -474,54 +510,70 @@ replay on their own engine; stored fights keep their frozen inputs.
 | `classes[id].tree`, `loadout`, `legacy` | Learned sides → picks (B if any B-line node, else A); other sides deleted; loadout pruned; `legacy` retired. Skill Ranks derived from Class Rank, nothing stored | CP31, CP32 |
 | `OwnedUma.calling` | New: `{ pick, confirmed }` for the 163 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed | CP29 |
 | `uma.gear` (`locker`, `equipped`, `kinds`) | Replaced by grades: one per weapon kind (10), per armor slot (5) with its half, one accessory slot `{ grade: 0, family, form: 'base', kind? }` with her Tier 1 preset; all G0 | WP2, WP27 |
-| `world.gear`, Forge jobs | Deleted, refunded; jobs collected or recalled | WP27 |
+| `work` (every place's rows) | **Settled first,** as save v22 did (SC3): every started entry finishes into the Warehouse with its Craft EXP; queues drop; Repeat forgets | PP19 |
+| `world.gear`, Forge jobs' outputs | Deleted; folded into the grant (§9.4) | WP27, PP20 |
 | `uma.ranks.weapons`, `armors`, `accessories`; the Exchange's gear Manuals | Deleted | WP3 |
 | `wallet.gearMarks` | Class Marks, one for one | WP27, CP25 |
-| `stars.unlocked`, `stars.active` | → `stars: { open, halo: [] }`, fresh ids (`planet:1–5`, `strength:` … `guard:1–5`, `template:1–2`) | EP §15 |
-| `gems` (Star Gems), Lapidary cuts | Deleted, refunded; cuts collected or recalled | EP21 |
+| `stars.unlocked`, `stars.active` | → `stars: { open, moons: [] }`, fresh ids (`planet:1–5`, `prowess:1–5`, `vigor:1–5`, `guard:1–5`, `template:1–2`) | EP §15 |
+| `gems` (Star Gems), Lapidary cuts' outputs | Deleted; folded into the grant (§9.4) | EP21, PP20 |
 | The Warehouse | New shelves: Weapon Gems, Armor Fittings, Accessory Settings G1–G10; Planet and Moon Jewels I–V (`jewel-planet-1–5`, `jewel-moon-1–5`) | WP26, EP17 |
 | `items` (160 ids) | Converted one for one to the 20 Tier 1 types by family and grade band | PP19 |
-| `buildings`, `work`, place ids | Levels dropped (upgrades refunded); work settled; six ids kept, five removed, four new (`fields`, `fishery`, `armorer`, `charm-shop`) | PP19 |
-| `OwnedUma.craft` | Kept | PP19 |
+| `buildings`, place ids | Levels dropped, **their Laurels and refined items back** (up to 7,150 and 66 a world); six ids kept, five removed, four new (`fields`, `fishery`, `armorer`, `charm-shop`) | PP19 |
+| `OwnedUma.craft` | **Reset to Craft Lv 1, 0 EXP**, after its EXP is read for the grant | PP19, PP20 |
+| `wallet.timeTickets` | **+ the grant:** ⌈Craft EXP ÷ 60⌉ an Uma, summed per world, never below the deleted pieces' making time (§9.4) | PP20, PP24 |
+| `TierWorld.grant` | New: the grant's record (tickets, floor, each Uma's level, EXP and tickets, what was deleted and what came back, `seen`) for the first launch's sheet | PP25 |
 | The template | Nothing stored (U13); new unlocks start in their calling or pick | U13, CP29 |
 
 **Save v28 (Tier 2):** a class branch per class (default branch 1; the focus and set derived), branch C and tip picks
 (Power, Break, signature) (CP31); per weapon kind `{ grade, branch?: 'pure' | 'dual' }` (no stored partner: the
 partner table fixes it, WP32), a second accessory slot, an accessory's `form` gaining `'great' | 'channel' | 'twin' |
-'toll' | 'onslaught'`, the Branch Gem shelf (WP27); `valor:1–2`, `halo:1–2`, `stars.halo` with one kind,
-`jewel-halo-1–2` (EP §15); `OwnedUma.secondary` (PP §14). **Tier 3's save** with its version: two held branches a tree
-and the master slot; `branch: 'keen' | 'tempered' | 'evolved'`, a third slot (the accessory step derived from the slot's
-grade); `swiftness:1–2`, `halo:3–4`.
+'toll' | 'onslaught'`, the Branch Gem shelf (WP27); `weapon-moon-1:1–5` and `stars.moons` holding one entry, her
+preset (EP §15, EP29); `OwnedUma.secondary` (PP §14). **Tier 3's save** with its version: two held branches a tree and
+the master slot; `branch: 'keen' | 'tempered' | 'evolved'`, a third slot (the accessory step derived from the slot's
+grade); `weapon-moon-2:1–5`, two `stars.moons` entries, every kind different. *Follow-up to D194: the first draft's
+`valor`, `halo`, `swiftness`, `stars.halo` and Halo Jewels never ship.*
 
-### 9.4 The refund
+### 9.4 The compensation
 
-> **Owner direction (2026-10-24, the weapon review): the raw-material refund is not the main approach.** Every Craft Level (the work levels, and today's farm and craft levels in old saves) **resets to 1**, and the player is **granted tickets for the time it took to reach those levels**; deleted crafted gear and Star Gems are compensated the same way rather than item by item. Worked out fully in the Profession review; the table below is the first draft it replaces.
+**The owner's direction (2026-10-24, the weapon review):** "I don't think the material refund is going to be our main
+approach; basically I want to reset all farm/craft levels to 1, and then grant all tickets based on the amount of time
+it took to get all those levels." **Designed in [profession-progression §14](profession-progression.md#14-save-impact)
+(PP19, PP20, PP24, PP25), reviewed with it;** drawn on [the first launch's page](previews/prof-grant.html).
+*Replaces the first draft (every deleted item's raw count back in Tier 1's demand mix; WP27, EP21, PP20 as they were).*
 
-The owner's lean (WP27, EP21, PP20): every raw item back, recrafted by hand. Computed from the save alone: every deleted
-item names its raw inputs, and **the count is paid in Tier 1's demand mix** (the shares one Uma's 485 take), so what
-comes back rebuilds what went.
+- **Craft Levels:** every Uma in every world goes back to **Craft Lv 1** at save v27. (A save older than v21 had two
+  professions; the chain's v21 step, D144, kept the higher, and v27 reads that.)
+- **The grant:** each Uma's lifetime Craft EXP, her level's and her bank past Lv 50, read after her work is settled,
+  becomes **⌈EXP ÷ 60⌉ Speed Tickets**: one for every 30 minutes of the manual's job time (2 Craft EXP a minute). A
+  Craft Lv 50 Uma gets **1,470** (735 hours); re-levelling her in the new places (×1.25) takes 1,176, so the grant is
+  never short. Computed per Uma, **paid into her world's wallet** (`wallet.timeTickets`).
+- **Gear and Star Gems: folded in.** Their gathering, refining and making are already in the EXP; a separate grant would
+  pay them twice. **A floor per world:** never less than the deleted pieces' own making time (a gear piece 203 minutes, a
+  Star Gem 221 on average), for pieces whose makers ascended or that were made of bought items.
 
-| Deleted | Comes back as |
+| At v27 | Becomes |
 |---|---|
-| Crafted gear in stock and bound to any Uma, every Orb and support, in every world | Each piece's 2 raw items, counted, paid in Tier 1's mix |
-| Forge jobs | Finished outputs collected, then refunded as pieces; unfinished inputs returned, then converted |
-| Star Gems in stock and set on nodes | Each gem's raw inputs, counted, paid in Tier 1's mix |
-| Lapidary cuts | As Forge jobs |
-| Facility upgrades (up to 22 a world) | Their Laurels (up to 7,150 a world), and their refined items as raw items in the mix (up to 66) |
-| Weapon, Armor and Accessory Ranks | Nothing: Uma Level is the new gate |
+| Craft Level, every Uma, every world | **Lv 1**; its EXP paid as Speed Tickets (÷ 60, up, per Uma, into her world's wallet) |
+| Crafted gear (stock, bound, lockers), every Orb and support; Star Gems (stock, set), the old maps | Deleted; **folded into the grant**, with the floor at their making time |
+| Work: started entries, queues | Settled first, as save v22 did: started entries finish into the Warehouse with their Craft EXP (so their minutes count); queues drop |
+| Items in stock | **Kept**, converted one for one to the 20 Tier 1 types by family and grade band |
+| Facility upgrades (up to 22 a world) | **Their Laurels back** (up to 7,150 a world) and their refined items (up to 66), converted like stock |
+| Weapon, Armor and Accessory Ranks; gear Manuals | Nothing: Uma Level is the new gate |
 | Gear Marks | Class Marks, one for one |
 | Side skills learned | Nothing to refund: points were never stored |
-| Items in stock, work in progress | Converted one for one, not refunded; only time in progress is lost |
+| The first launch | Once per world, the sheet "The Wilds are rebuilt": the grant, its hours, what went and came back, each Uma's line; an Account row reopens it; "Finish all" on a place page |
 
-**Volume:** a fully built Lv 50 Uma returns 472 raw items (240 from gear, 232 from Star Gems), paid as Copper Ore 37,
-Iron Ore 65, Pine Log 35, Oak Log 58, Flax 60, Cotton 33, Seashell 59, Ammonite 33, Quartz 29, Garnet 63: every type
-1–2 short of the 485 the reworked Tier 1 asks (493 with her moon).
+**Worked:** a fresh player (day 3, five Umas at Craft Lv 6) gets **720** Speed Tickets; a mid player (day 20, twenty Umas
+at Lv 36, 26 and 11) **13,482** and 3,800 Laurels; a fully built roster's Tier 1 world (forty Lv 50 crafters, ten with
+30,000 EXP banked; 5,400 pieces and 2,500 Star Gems deleted) **63,800** and 7,150 Laurels, enough to re-level all forty
+(47,040) and make about 36 maxed Umas' items on the way. A world left thin by ascension is paid by the floor (a Tier 1
+world with twenty Lv 20 Umas and 4,800 pieces left by the forty who ascended: 32,533, not 9,980).
 
 ### 9.5 Simulation items
 
 **For the Tier 1 packet (v16):**
 1. **Re-baseline:** an on-curve party (three default weapons, branch A, Tier 1's presets (WP25), the new armor, the full
-   map with Vigor's MP, Skill Ranks, no template) wins every Tier 1 stage within 3 points of today's table; what the
+   map (the same 20 nodes, Prowess at her class's split) with Vigor's MP, Skill Ranks, no template) wins every Tier 1 stage within 3 points of today's table; what the
    accessories and Skill Ranks add goes back through the foe budget (CP §15, WP §13, EP16).
 2. **The mirror on full maps:** Spell Blade and Summoner damage a turn within ±5%, each 70/30 ± 5; Paladin vs Cleric
    ±10% (CP9).
@@ -540,17 +592,20 @@ Iron Ore 65, Pine Log 35, Oak Log 58, Flax 60, Cotton 33, Seashell 59, Ammonite 
 **For Tier 2's toolbox (v17):** Pure against Dual within ±10% (WP §3.7); **the damage stack** on one weak hit (WP31;
 fallbacks: focus +10%, Insignias, Keen ×1.6); each class's two branches within ±5% across the regions and +10–20% in
 their own (CP §15); the coverage script at 2.0 and 2.30 answers (WP12, CP4, CP41); boss shields 8 and 9 (CP8); Duals
-and the Duel boss (weapon-research risk 2).
+and the Duel boss (weapon-research risk 2); **the weapon moon**, Full against Split at 0.7 (EP25) and the stack with a
+moon beside the accessory forms (WP31, EP27), priced in Z4's term (+12–16% an act).
 
 ## 10. Review order
 
 One standalone doc at a time, in this order; each ends with its D-rows. ✱ marks the calls the cross-check changed or
-added (§7.1); † the calls the owner's weapon review changed or added (2026-10-24).
+added (§7.1); † the calls the owner's weapon review changed or added (2026-10-24); ‡ the calls the owner's Extra Stats
+review changed or added (2026-10-24, D194); § the Profession calls changed or added for D194 and the owner's
+compensation direction (2026-10-24).
 
 **0. The frame** (§2, §7, §9): **XR2** the vocabulary (§2.4) · **XR6** weapons owned per kind, a class switch costs
-only unraised weapons · **XC11** engine v16 and save v27 are the Tier 1 rework, v17 and v28 Tier 2's · **the refund**
-(§9.4: every raw item back, paid in Tier 1's demand mix, recrafted by hand) · **SB1** (§2.5). The other XC rows land
-inside the docs below.
+only unraised weapons · **XC11** engine v16 and save v27 are the Tier 1 rework, v17 and v28 Tier 2's · **the
+compensation** (§9.4: Craft Levels to 1, a Speed Ticket for every 30 minutes of work, gear and Star Gems folded in;
+decided with the Profession doc's PP19, PP20, PP24, PP25) · **SB1** (§2.5). The other XC rows land inside the docs below.
 
 **1. Class Progression**: 43 calls, CP1–CP43. [class-progression.md](class-progression.md); pages: overview,
 templates, tree viewer, weaknesses.
@@ -601,7 +656,7 @@ templates, tree viewer, weaknesses.
 | CP42 | The Spell Blade's branch B becomes Pierce (recommended, for the owner's word) |
 | CP43 | Every tree viable: the audit found no gap |
 
-**2. Weapon Progression**: 34 calls, WP1–WP34; revised after the owner's review (2026-10-24), for its second review.
+**2. Weapon Progression**: 34 calls, WP1–WP34; **approved (D193)**, follow-ups to D194 logged against it (XC23).
 [weapon-progression.md](weapon-progression.md); pages: tree viewer, armor, accessories, materials.
 
 | Call | One line |
@@ -629,48 +684,55 @@ templates, tree viewer, weaknesses.
 | WP21 † | Bells: her weapon of its kind strikes once more after her Attack; Great Bell; Toll Bell |
 | WP22 † | Orbs from Tier 1, half a weapon's Might × tier; Great Orb; Twin Orb (a twin set) |
 | WP23 † | Insignias from Tier 1: sub-bosses and bosses +15%; Great Insignia; Onslaught (Slayer retired) |
-| WP24 | The kind cap: flat offense on one kind ≤ +68 × tier (re-checked: the Great Orb the form it binds) |
-| WP25 ✱ † | Presets per class and tier for both class branches' sets: the Halo on her first slot, single-kind forms on her Dual |
+| WP24 | The kind cap: flat offense on one kind ≤ +68 × tier from the Pendant and Orb forms; weapon moons outside it (follow-up to D194) |
+| WP25 ✱ † | Presets per class and tier for both class branches' sets: single-kind forms on her Dual; her weapon moons as EP29 (follow-up to D194) |
 | WP26 ✱ | Four products; recipes and amounts profession-progression's: 365 refined in every tier (re-checked) |
-| WP27 ✱ † | The save: v27 deletes and refunds (Tier 1's mix), families and forms in the slot; v28 branches, no stored partner |
+| WP27 ✱ † | The save: v27 deletes, compensated by the grant (Craft Levels to 1, Speed Tickets for the time, PP19–PP20), families and forms in the slot; v28 branches, no stored partner |
 | WP28 † | Names: grade, Pure, Dual, Keen, Tempered, Evolved, partner, Branch Gem, the four families and their forms, signature accessory |
 | WP29 † | No new art: a branch shows its family's icon |
 | WP30 † | Engine: Tier 1's pieces (the four base forms) in v16, Tier 2's in v17, Evolved and the steps with Tier 3 |
-| WP31 ✱ † | The damage stack, one order on every hit; the signature a stat in step 1 |
+| WP31 ✱ † | The damage stack, one order on every hit; the signature a stat in step 1; weapon moons beside the capped forms (follow-up to D194) |
 | WP32 † | New: the partner table, a fixed Tier 2 and Tier 3 partner for each weapon, always the other group |
 | WP33 † | New: the signature accessory, ATK and M.ATK +0.2 a level × tier while worn; proposed in CP36's place |
 | WP34 † | New: accessory branches are forms, set freely once a slot's G5 opens them; no item |
 
-**3. Extra Stats Progression**: 22 calls, EP1–EP22. [extra-stats-progression.md](extra-stats-progression.md); pages:
-maps, grants, jewels.
+**3. Extra Stats Progression**: 29 calls, EP1–EP29; **approved (D194)**.
+[extra-stats-progression.md](extra-stats-progression.md); pages: maps, grants, jewels, her moon.
 
 | Call | One line |
 |---|---|
-| EP1 | Tier 1: the Planet and four moons, five nodes each; 25 nodes |
-| EP2 | The Planet: +21 to all six core stats |
+| EP1 ‡ | Tier 1: the Planet and three moons (Prowess, Vigor, Guard), five nodes each: 20 nodes, every class the same |
+| EP2 | The Planet: +21 to all six core stats, × tier |
 | EP3 | A moon node is worth its grade; Guard gives both defenses |
 | EP4 | Vigor gives both pools, HP and MP |
 | EP5 | A node opens with its jewel, in order, at Uma Lv 5g − 4 |
 | EP6 | Every open node counts; no active slots |
-| EP7 | Values × tier, rounded per node; Limit start and evasion don't scale |
-| EP8 | Speed and Limit leave Tier 1's shared map |
-| EP9 | The Halo: one kind, +10 → +34 × tier, under the kind cap |
-| EP10 | The Halo serves kinds, never a group |
-| EP11 | Valor: Limit start +4 from Tier 2 |
-| EP12 | Tier 3: the Halo's second kind and Swiftness; no class constellations |
+| EP7 | Values × tier, rounded per node (Prowess's split and a Split node too); Limit start and evasion don't scale |
+| EP8 ‡ | Speed and Limit off the shared map in every tier: her knack and feet armor keep them |
+| EP9 ‡ | The Halo retires, folded into the weapon moons |
+| EP10 ‡ | Weapon moons serve kinds, never a group |
+| EP11 ‡ | Valor retires |
+| EP12 ‡ | Tier 3: a second weapon moon; no class constellations |
 | EP13 | The same core rebuilt each tier, × tier |
-| EP14 | Her moon: a marked two-node slot for the Uma Templates pass |
-| EP15 | Defense and sustain: no new values; MP from regen to the pool |
-| EP16 | The foe budget's build part × tier |
-| EP17 | Jewels: Planet I–V, Moon I–V, Halo I–II and III–IV |
-| EP18 | Recipes: Moon 4, Planet 8, Halo 5; the Lapidary 120 · 138 · 156 an Uma |
-| EP19 | The Observatory: one page in every tier |
-| EP20 | Targets and "can upgrade" |
-| EP21 | Old maps and Star Gems deleted, raw items refunded |
-| EP22 | Names and art: today's gem icons |
+| EP14 ‡ | Her moon in full: knack (Lv 16), lead on her calling channel's defense (Lv 36), × tier |
+| EP15 ‡ | Defense and sustain: no new values; MP from regen to the pool; Swiftness leaves |
+| EP16 ‡ | The foe budget's build part × tier; on curve, the same 20 core nodes for every class; weapon moons in Z4's term |
+| EP17 ‡ | Jewels: Planet I–V and Moon I–V in every tier, two kinds; the Halo Jewels retire |
+| EP18 ‡ | Recipes: Moon 4, the Planet 12 proposed; the Lapidary 120 · 140 · 160 an Uma, every class |
+| EP19 ‡ | The Observatory: one page in every tier, "Open n of 20 · 25 · 30", the weapon moons' chips |
+| EP20 ‡ | Targets and "can upgrade", the same for every class |
+| EP21 ‡ | Old maps and Star Gems deleted; compensated by the owner's tickets for time (§9.4) |
+| EP22 ‡ | Names: the Planet, Prowess, Vigor, Guard, weapon moons, Full and Split; today's gem icons |
+| EP23 ‡ | New: Prowess, one offense moon split by class (100/0, 0/100, 70/30, 30/70, 80/20, 20/80) |
+| EP24 ‡ | New: weapon moons, five nodes of flat offense on her hits of a kind, +50 × tier |
+| EP25 ‡ | New: Full (one kind) or Split (two at 0.7), two moonlets on one track |
+| EP26 ‡ | New: Tier 3's second weapon moon; Full + Split serves her three weapons |
+| EP27 ‡ | New: weapon moons outside the kind cap |
+| EP28 ‡ | New: Valor and Swiftness retire |
+| EP29 ‡ | New: weapon-moon presets, Tier 2 Split on her two most-used kinds, Tier 3 Full + Split |
 
-**4. Profession Progression**: 23 calls, PP1–PP23. [profession-progression.md](profession-progression.md); pages:
-map, materials, flow, demand.
+**4. Profession Progression**: 25 calls, PP1–PP25; **for review, the last of four.**
+[profession-progression.md](profession-progression.md); pages: map, materials, flow, demand, the first launch.
 
 | Call | One line |
 |---|---|
@@ -683,8 +745,8 @@ map, materials, flow, demand.
 | PP7 | Five material lines, a low and a high type a tier: 2 · 4 · 6 a profession |
 | PP8 | The catalog's order: each tier's pair above the last |
 | PP9 | The ladder: a grade decides its material |
-| PP10 | One fixed recipe an item; the Branch Gem the G5 Weapon Gem (4) |
-| PP11 | Amounts don't scale with the tier: 485 · 503 · 521 |
+| PP10 § | One fixed recipe an item; the Branch Gem the G5 Weapon Gem (4); **the Planet Jewel 12**, two jewel kinds |
+| PP11 § | Amounts don't scale with the tier: 485 · 505 · 525 |
 | PP12 | Make time: one gather a refined item |
 | PP13 | Gates at Craft Lv 1 and 26 in every pair; Craft Level restarts each tier |
 | PP14 | The secondary from Tier 2: any other profession's base work |
@@ -692,11 +754,13 @@ map, materials, flow, demand.
 | PP16 | The open shop: a trade with no Uma opens to all |
 | PP17 | The Exchange by pair, prices × tier |
 | PP18 | Today's second-profession proposal replaced |
-| PP19 | Old saves: stock converted, work collected, Craft Level kept |
-| PP20 | The refund paid in Tier 1's demand mix |
+| PP19 § | Old saves: work settled first, Craft Levels to 1, stock kept and converted, upgrades' Laurels and items back |
+| PP20 § | The compensation: Speed Tickets for the time, per Uma into her world's wallet; gear and Star Gems folded in, a floor at their making time |
 | PP21 | The Stable's Trade filter |
 | PP22 | Pages, pickers and targets per place |
 | PP23 | Promotion: materials stay in the old world; Craft Level 1 |
+| PP24 § | New: the grant's rate, ⌈Craft EXP ÷ 60⌉ an Uma, a ticket per 30 minutes of the manual's time (1,470 at Lv 50) |
+| PP25 § | New: the first launch's sheet once per world, an Account row, "Finish all" on a place page |
 
-**In all: 122 calls** (Class 43, Weapon 34, Extra Stats 22, Profession 23), and the frame's. The Uma Templates pass
+**In all: 131 calls** (Class 43, Weapon 34, Extra Stats 29, Profession 25), and the frame's. The Uma Templates pass
 (variance.md's U1–U16) follows the balancing. Nothing is left for the owner to settle outside these reviews.

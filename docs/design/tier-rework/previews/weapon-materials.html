@@ -240,8 +240,8 @@
 
   <section id="totals">
     <h2>One Uma's totals, per tier</h2>
-    <p class="sub">Pieces and refined items for one Uma, one class, fully geared; jewels (Extra Stats, extra-stats-progression.md's) beside them for
-      her whole total. The redesign changes no count: armor's values and the accessory families don't change what she crafts.</p>
+    <p class="sub">Pieces and refined items for one Uma, one class, fully geared; jewels (Extra Stats, extra-stats-progression.md's: Planet and Moon
+      Jewels, 20 · 25 · 30 for every class) beside them for her whole total. The redesign changes no count: armor's values and the accessory families don't change what she crafts.</p>
     <div class="grid2">
       <div class="panel"><h3>By item</h3><div class="chart-legend" id="item-legend"></div><div id="item-chart"></div>
         <details><summary>Show the numbers</summary><div id="item-table"></div></details></div>
@@ -253,7 +253,8 @@
   <section id="profs">
     <h2>By profession</h2>
     <p class="sub">Gathering per Uma by profession: gear alone for each tier, and Tier 1 with the jewels, where every gathering profession lands near a
-      fifth (Mining 105, the others 95), as professions.md drew.</p>
+      fifth (Mining, Wood Chopping, Farming and Fishing 100, Hunting 85). <i>Follow-up to D194 (Extra Stats), 2026-10-24: with the Planet Jewel of 12
+      (3 each of a cut stone, a plank, a cloth and a carving); was Mining 105, the others 95.</i></p>
     <div class="panel"><div class="chart-legend" id="prof-legend"></div><div id="prof-chart"></div>
       <details><summary>Show the numbers</summary><div id="prof-table"></div></details></div>
   </section>
@@ -265,8 +266,8 @@
     <div class="panel" style="overflow-x:auto"><table id="iface"></table></div>
     <div class="callout"><b>Who owns what</b>weapon-progression.md owns the four products, <b>one Branch Gem item a tier</b> (the branch picked when
       it is used, not a Pure, Dual, Keen, Tempered or Evolved Gem each; accessory forms need none), the pieces per Uma (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30) and the gates.
-      profession-progression.md owns which materials fill each grade and how many (PP8–PP10): one Uma 485 · 503 · 521 refined with her jewels,
-      822 · 852 · 883 hours.</div>
+      profession-progression.md owns which materials fill each grade and how many (PP8–PP10): one Uma 485 · 505 · 525 refined with her jewels,
+      822 · 856 · 890 hours (follow-up to D194, 2026-10-24; profession-progression's, for its review).</div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
@@ -310,7 +311,8 @@ function bindTip(el, title, body) {
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(r.left, r.bottom); }); el.addEventListener('blur', () => (tip.style.opacity = 0));
 }
 const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
-const JEWELS = { 1: 120, 2: 138, 3: 156 };
+// Follow-up to D194 (Extra Stats), 2026-10-24: two jewel kinds in every tier, the same for every class; the Planet Jewel proposed at 12.
+const JEWELS = { 1: 120, 2: 140, 3: 160 };
 const PIECES = { 1: { weapon: 30, branch: 0, armor: 50, setting: 10 }, 2: { weapon: 27, branch: 3, armor: 50, setting: 20 }, 3: { weapon: 27, branch: 3, armor: 50, setting: 30 } };
 const MATS = Object.fromEntries([1, 2, 3].map((t) => {
   const total = {}, by_item = {}, by_prof = { mining: 0, wood: 0, farming: 0, fishing: 0, hunting: 0 };
@@ -322,8 +324,8 @@ const MATS = Object.fromEntries([1, 2, 3].map((t) => {
   return [t, { total, by_item, by_prof }];
 }));
 
-const KPI = [['One Uma\'s gear, refined', '365 · 365 · 365', 'Tier 1 · 2 · 3; today 240'], ['Gear items to max her', '90 · 100 · 110', 'today 120 pieces, bound in order'], ['One Uma in all, with jewels', '485 · 503 · 521', '493 · 511 · 529 with her moon; today 472'],
-  ['Products', '3 → 4', '+ the Branch Gem from Tier 2 (one item, not five)'], ['Materials in her gear', '9 · 18 · 27', 'each tier\'s pair at G5 and G10 (the ladder)'], ['Hours, one Uma (with jewels)', '822 · 852 · 883', 'Craft Lv 25 speed; today 776']];
+const KPI = [['One Uma\'s gear, refined', '365 · 365 · 365', 'Tier 1 · 2 · 3; today 240'], ['Gear items to max her', '90 · 100 · 110', 'today 120 pieces, bound in order'], ['One Uma in all, with jewels', '485 · 505 · 525', '493 · 513 · 533 with her moon; today 472'],
+  ['Products', '3 → 4', '+ the Branch Gem from Tier 2 (one item, not five)'], ['Materials in her gear', '9 · 18 · 27', 'each tier\'s pair at G5 and G10 (the ladder)'], ['Hours, one Uma (with jewels)', '822 · 856 · 890', 'Craft Lv 25 speed; today 776']];
 document.getElementById('kpis').innerHTML = KPI.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="delta">${d}</div></div>`).join('');
 document.getElementById('plegend').innerHTML = Object.values(PROF).map(([n, p, c]) => `<span><span class="sw" style="background:${c}"></span>${n} (${p})</span>`).join('');
 
@@ -401,14 +403,14 @@ render();
     const y = pad.t + 10 + i * (rowH + 8); let acc = 0;
     const v = { ...MATS[t].by_item, jewels: JEWELS[t] };
     s += `<text class="val-text" x="${pad.l - 8}" y="${y + rowH / 2 + 4}" text-anchor="end">Tier ${t}</text>`;
-    order.forEach((k) => { const n = v[k] || 0; if (!n) return; s += `<rect class="mark" x="${x(acc)}" y="${y}" width="${x(acc + n) - x(acc) - 1.5}" height="${rowH}" fill="${IC[k]}" rx="3" data-t="Tier ${t} · ${names[k]}" data-d="${k === 'jewels' ? 'Planet, Moon and Halo Jewels: extra-stats-progression.md\'s' : PIECES[t][k] + ' pieces'} · ${n} refined"/>`; if (x(acc + n) - x(acc) > 30) s += `<text x="${(x(acc) + x(acc + n)) / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#101a24;pointer-events:none">${n}</text>`; acc += n; });
+    order.forEach((k) => { const n = v[k] || 0; if (!n) return; s += `<rect class="mark" x="${x(acc)}" y="${y}" width="${x(acc + n) - x(acc) - 1.5}" height="${rowH}" fill="${IC[k]}" rx="3" data-t="Tier ${t} · ${names[k]}" data-d="${k === 'jewels' ? 'Planet and Moon Jewels: extra-stats-progression.md\'s' : PIECES[t][k] + ' pieces'} · ${n} refined"/>`; if (x(acc + n) - x(acc) > 30) s += `<text x="${(x(acc) + x(acc + n)) / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#101a24;pointer-events:none">${n}</text>`; acc += n; });
     s += `<text class="val-text" x="${x(acc) + 6}" y="${y + rowH / 2 + 4}">${acc}</text>`;
     rows.push([t, v, acc]);
   });
   document.getElementById('item-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#item-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
   document.getElementById('item-table').innerHTML = `<table><tr><th>Tier</th>${order.map((k) => `<th class="num">${names[k]}</th>`).join('')}<th class="num">Gear</th><th class="num">One Uma</th><th class="num">+ her moon</th></tr>` +
-    rows.map(([t, v, a]) => `<tr><td>Tier ${t}</td>${order.map((k) => `<td class="num">${k === 'jewels' ? v[k] : (PIECES[t][k] || 0) + ' · ' + (v[k] || 0)}</td>`).join('')}<td class="num"><b>${a - v.jewels}</b></td><td class="num"><b>${a}</b></td><td class="num">${a + 8}</td></tr>`).join('') + '</table><p class="foot">Cells are pieces · refined items. Jewels: extra-stats-progression.md\'s counts at profession-progression.md\'s amounts (120, 138, 156).</p>';
+    rows.map(([t, v, a]) => `<tr><td>Tier ${t}</td>${order.map((k) => `<td class="num">${k === 'jewels' ? v[k] : (PIECES[t][k] || 0) + ' · ' + (v[k] || 0)}</td>`).join('')}<td class="num"><b>${a - v.jewels}</b></td><td class="num"><b>${a}</b></td><td class="num">${a + 8}</td></tr>`).join('') + '</table><p class="foot">Cells are pieces · refined items. Jewels: extra-stats-progression.md\'s counts at profession-progression.md\'s amounts (120, 140, 160: two kinds in every tier, the Planet Jewel proposed at 12; follow-up to D194, 2026-10-24).</p>';
 })();
 (function () {
   const profOrder = Object.keys(PROF);
@@ -439,7 +441,7 @@ render();
 // By profession
 (function () {
   const profOrder = Object.keys(PROF);
-  const JEW1 = { mining: 20, wood: 10, farming: 10, fishing: 10, hunting: 70 };
+  const JEW1 = { mining: 15, wood: 15, farming: 15, fishing: 15, hunting: 60 };
   const S = [['g1', 'Tier 1 gear', 'var(--t1)'], ['g2', 'Tier 2 gear', 'var(--t2)'], ['g3', 'Tier 3 gear', 'var(--t3)'], ['j1', 'Tier 1 with jewels', 'var(--neutral-strong)']];
   document.getElementById('prof-legend').innerHTML = S.map(([, n, c]) => `<span><span class="sw" style="background:${c}"></span>${n}</span>`).join('');
   const W = 1180, H = 260, pad = { l: 44, r: 16, t: 20, b: 34 }, max = 120, gw = (W - pad.l - pad.r) / 5, bw = 44;
