@@ -1,5 +1,7 @@
 # Profession Progression: ten professions from Tier 1 to Tier 3
 
+> **Approved by the owner, 2026-10-24 (D195): every call PP1–PP25 as written, with the flavor change (Farming gathers Vegetables, Fishing gathers Fish).** The 130 unused raw types of today's Wilds and the old Farm may be reused in a future pass. Changes from here are follow-ups logged against it.
+
 > **For the owner's review, the fourth and last standalone doc (2026-10-24).** Brought in line with the three approved
 > docs (Class D192, Weapon D193, Extra Stats D194) and with **the owner's compensation direction**, designed in full in
 > [§14](#14-save-impact): every Craft Level resets to 1 at save v27 and each world is granted **Speed Tickets for every 30
