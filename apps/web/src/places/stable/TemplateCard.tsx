@@ -1,7 +1,7 @@
-// Her template on the Uma sheet from engine v16 (the Tier rework's R1, H70; uma-templates.md §5, UT14; class-progression.md
+// Her template on the Uma sheet (the Tier rework's R1, engine v16, H70; uma-templates.md §5, UT14; class-progression.md
 // §10.2, CP29): the chip after her rarity stars, which opens "Her template" (the three readings with their sources, then
 // her ★ Flourish and its state), and a Pace or Late Uma's calling pick card above her class chip until it is confirmed.
-// Both read `template-view.ts`, which answers null before v16, so nothing shows until the switch.
+// Both read `template-view.ts`.
 import { SaveRuleError, type OwnedUma, type RosterOutfit, type RpgClass } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
@@ -15,7 +15,6 @@ export function TemplateChip({ outfit, uma, classId }: { outfit: RosterOutfit; u
   const [open, setOpen] = useState(false)
   const chip = templateChip(outfit, uma)
   const card = open ? templateCard(outfit, uma, classId) : null
-  if (!chip) return null
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} aria-label={`Her template: ${chip.name.slice(2)}${chip.dot ? ', calling not chosen' : ''}`}

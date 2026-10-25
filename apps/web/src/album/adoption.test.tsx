@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { heroLimitsOf, ITEM_FAMILIES, placeById, withTrack } from '@rpg/domain'
+import { heroLimitsOf, ITEM_FAMILIES, placeById } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { buildCampaign } from '../battle/campaign'
 import { FeaturedSheet } from '../hub/Featured'
@@ -61,9 +61,9 @@ describe('SB4 uses the shared album in every RPG choice', () => {
   })
 
   it('marks an Uma who can upgrade on the Stable tile, and the Can upgrade quick pick shows only her', async () => {
-    // Every fixture Uma is a Brawler: Class Rank 5 lets 81001 alone learn a depth-1 side skill.
+    // 81001 alone has an open Extra Stats node she hasn't switched on (no skill costs points from engine v16).
     const aster = fixture.world.umas['81001']!
-    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...aster, ranks: withTrack(aster.ranks, { kind: 'class', id: 'brawler' }, { rank: 5, exp: 0 }) } } }
+    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...aster, stars: { unlocked: ['moon:atk:1'], active: [] } } } }
     show(<StablePage {...page('stable')} />)
     expect(within(screen.getByRole('button', { name: 'Aster, Lv 3' })).getByRole('img', { name: 'Can upgrade' })).toBeDefined()
     expect(within(screen.getByRole('button', { name: 'Beryl, Lv 20' })).queryByRole('img', { name: 'Can upgrade' })).toBeNull()

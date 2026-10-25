@@ -11,7 +11,7 @@ const OUTFIT: BattleOutfit = {
   aptitudes: { strategy: { front: 'A', pace: 'C', late: 'C', end: 'C' }, distance: { sprint: 'C', mile: 'C', medium: 'A', long: 'C' } },
 }
 const uma: OwnedUma = { ...newOwnedUma(NOW, 'brawler'), level: 30, classId: 'brawler',
-  classes: { brawler: { weapons: ['greatsword', 'axe', 'lance'], loadout: null } } }
+  classes: { brawler: { weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: null } } }
 const world = { umas: { '801': uma } } as unknown as TierWorld
 const gain = (before: number, after: number): RankGain =>
   ({ ref: { kind: 'class', id: 'brawler' }, exp: 10, before: { rank: before, exp: 0 }, after: { rank: after, exp: 0 } })
@@ -29,7 +29,7 @@ describe('a win\'s Skill Rank lines (H70)', () => {
     expect(rankUpLines(world, OUTFIT, gain(22, 22), 1, 16)).toEqual([])
   })
 
-  it('says nothing before v16, or without her', () => {
+  it('says nothing for a fight before v16 (a v15 fight open at the switch), or without her', () => {
     expect(rankUpLines(world, OUTFIT, gain(21, 22), 1, 15)).toEqual([])
     expect(rankUpLines(null, OUTFIT, gain(21, 22), 1, 16)).toEqual([])
     expect(rankUpLines(world, undefined, gain(21, 22), 1, 16)).toEqual([])

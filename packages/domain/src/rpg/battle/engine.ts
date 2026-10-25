@@ -1,4 +1,5 @@
-// Deterministic campaign battle reducer, engine v17 (R2, D209; W3, D91; classes D86; Limit Breaks D311).
+// Deterministic campaign battle reducer, engine v17 (v16 live since H72, D210; R2's v17 dark, D209; W3, D91; classes
+// D86, docs/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
@@ -9,9 +10,9 @@
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
 // v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs;
-// v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills; a trunk and one fork into
-// line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the base MP regen
-// for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
+// v16 the Tier rework's fight (D200, live since H72, D210): three weapons by channel, no side skills; a trunk and one
+// fork into line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the
+// base MP regen for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
 // v17 is R2's dark economy foundation (D209): gear grades arrive only as stats and Might, and support fields retire.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
@@ -36,7 +37,7 @@ import {
 } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
- * the engine. Older versions still replay; v15 is live since H61 (D188). The Tier rework's releases open at their engines
+ * the engine. Older versions still replay; v16 is live since H72 (D210). The Tier rework's releases open at their engines
  * (`rpgRework`, D200). */
 export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpgV2, type RpgReworkStage } from './caps'
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.

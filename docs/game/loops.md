@@ -29,9 +29,9 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
-- **Classes:** switching is free. A new Uma starts in her running style's class and in its armor, magical for a Mage,
-  Cleric or Summoner (D162, [classes](classes.md)); a Late surger whose Power beats her Wit starts as a Paladin (D180).
-  A party fights with one healer, a Paladin or a Cleric, at most.
+- **Classes:** switching is free. A new Uma starts in her **calling** and in its armor, magical for a Mage, Cleric or
+  Summoner (engine v16, CP29, [classes](classes.md#her-calling-and-her-template)); a Pace or Late Uma picks once between
+  her two, and her first win confirms it. A party fights with one healer, a Paladin or a Cleric, at most.
 
 ## Leveling
 
@@ -65,8 +65,8 @@ Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-an
 <!-- live:ranks -->
 | Bar | Ranks | Per win worth E Uma EXP | Opens |
 |---|---|---|---|
-| Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees: cores at 1, 10, 20, 30, 40; side skills at 5 … 45; a side point a rank |
-| Weapon Rank, per weapon | 1–10 | 5E over her five weapons, double for each she used | Wears that weapon up to its rank's grade |
+| Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees' depths at 1, 10, 20, 30, 40; ranks every skill she holds, a Skill Rank every 2 Class Ranks up to 5 |
+| Weapon Rank, per weapon | 1–10 | 3E over her three weapons (E a weapon), double for each she used | Wears that weapon up to its rank's grade |
 | Armor Rank, per armor kind | 1–10 | 1E to each of her five armor kinds | Wears that kind up to its rank's grade |
 | Accessory Rank, per accessory kind | 1–10 | 1E to the kind of each accessory she wears | Wears accessories of that kind up to its rank's grade |
 
@@ -91,11 +91,12 @@ Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-an
 Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs 1,000 Marks and gives 1,000 EXP to one bar of one Uma. Armor kinds by slot: Head Helm or Circlet; Body Cuirass or Robe; Legs Greaves or Leggings; Arms Gauntlets or Bracers; Feet Boots or Slippers. 10 kinds in all. Accessory kinds: Arms Orb, Elemental Orb, Talisman, Amulet.
 <!-- /live -->
 
-- **What a win pays,** for `E` Uma EXP: her class 2E; her five slotted weapons share 5E, two parts for each weapon she
-  used that fight (an attack, a skill, a Spell Blade's or a Summoner's half, a Limit Break), one part for the rest; each of her five armor
-  slots' kinds E. A Sweep shares weapon EXP evenly.
+- **What a win pays,** for `E` Uma EXP: her class 2E; her three slotted weapons share 3E, E a weapon (H64), two parts for
+  each weapon she used that fight (an attack, a skill, a Spell Blade's or a Summoner's half, a Limit Break), one part for
+  the rest; each of her five armor slots' kinds E. A Sweep shares weapon EXP evenly. A v15 fight still open at the switch
+  pays its five weapons 5E.
 - **No caps between bars:** a Lv 1 Uma can wear a grade-10 weapon if its rank allows.
-- **A campaign** (about 120 first clears) takes one Uma to Lv 50, two classes to Rank 50, and five weapons and five
+- **A campaign** (about 120 first clears) takes one Uma to Lv 50, two classes to Rank 50, and three weapons and five
   armor kinds to Rank 10.
 - **Marks:** past a max rank, a bar's EXP banks at half rate, world-wide: Gear Marks from weapons and armor, Class Marks
   from classes. **Manuals** at the Exchange turn 1,000 Marks into 1,000 EXP on one bar of one Uma. Uma EXP is never for
@@ -190,7 +191,7 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 - **Speed Tickets** never spend more than finish the job: asking for more spends only what's needed.
 - **Targets:** mark up to ten Umas total on their profiles. Every facility then lists what maxing them still
   takes from it:
-  - **The Forge:** every grade above the best she has bound, up to 10, on her class's five weapons, her five armor
+  - **The Forge:** every grade above the best she has bound, up to 10, on her class's three weapons, her five armor
     slots' kinds and the type in each accessory slot (an empty one plans nothing).
   - **The Lapidary:** a Star Gem for each Extra Stats node she hasn't opened.
   - **The Workbench and sites:** the refined and raw items those still need.
@@ -243,7 +244,7 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
 
 **Gear** (the Forge, [materials](materials.md#gear)):
 - **Slots (D124):**
-  - her class's five weapon slots;
+  - her class's three weapon slots, by channel (engine v16);
   - five armor slots (head, body, legs, arms, feet), each holding its physical or its magical piece;
   - two accessory slots: **Damage** for an Orb, **Support** for a Talisman or an Amulet (classes v2, C10).
 
@@ -265,7 +266,7 @@ sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilit
   grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
   and the stock above it.
 - **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
-  ([classes](classes.md#weapons)): the class's five default weapons, its armor half in all five slots, its Orb in the
+  ([classes](classes.md#weapons)): the class's three default weapons, its armor half in all five slots, its Orb in the
   Damage slot and its support in the Support slot.
   - **What it wears:** on each of those types, her best own piece her rank allows. Then **the climb**: from her best
     grade, it binds each next grade while the stock has it and her rank allows it, and wears the top, as tapping a sheet
@@ -300,10 +301,13 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   can be cancelled.
 - **The roster lock:** front and Convergence fights take only the twenty. Between fights, arrange them into any of the
   world's parties, and change their classes, skills and gear freely.
-- **The guidance** (classes v2, D178, H60): Iron 2 Brawler, 2 Spell Blade and a Paladin; Arcane 2 Mage, 2 Summoner and
-  a Cleric; Duel 2 Brawler, 2 Mage and a Paladin; Horde 2 Spell Blade, 2 Summoner and a Cleric. The page suggests the
-  party that fits a front best, and one for each of the Convergence's slots, never one with two healers. A front,
-  Echo or Convergence fight takes one healer at most, as the world map does.
+- **The guidance** (classes v2, D178, H60; the guided builds, engine v16, CP7): Iron 2 Brawler, 2 Spell Blade and a
+  Paladin; Arcane 2 Mage, 2 Summoner and a Cleric; Duel 2 Brawler, 2 Mage and a Paladin; Horde 2 Spell Blade, 2 Summoner
+  and a Cleric. Each comes with every member's three weapons: on her defaults, or for a front's second copy of a class
+  the kinds the first doesn't hold (Iron's second Brawler on the Bow, the Katana and the Axe;
+  [combat](combat.md#the-rifts-foes) has every build). The page suggests the party that fits a front best, and one for
+  each of the Convergence's slots, never one with two healers; "Use the guided weapons" sets its members' weapons in one
+  tap. A front, Echo or Convergence fight takes one healer at most, as the world map does.
 - **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
   in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
   world's twenty parties, full, all five on the roster. Its 12th stage seals the front.
@@ -325,14 +329,14 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   - **How hard:** a party with one Uma at Class Rank 1 wins the Lv 45 Echoes, and an on-curve party the Lv 50 ones.
     Lv 55 is the hard step, hardest on the Horde.
 - **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win,
-  her five weapons sharing evenly. They record no faces and earn no achievements.
+  her three weapons sharing evenly. They record no faces and earn no achievements.
 - **Ascend:** once the run is won, its twenty move up a tier together, in one step: no Rift or world-map fight open,
   and none of them at work ("Recall or collect").
   - **They leave** the old world's Stable, parties, targets, carried MP, Hall seats and work. A Hero's seat empties and
     its Learners leave it. Every piece of gear they owned goes back to the old world's stock; Star Gems set on their
     maps are gone.
   - **They arrive** at Lv 1 with Class Rank 1 everywhere, no skills, Training gear, an empty Extra Stats map, Craft Lv 1
-    and no Bonds. Each keeps her class and her armor halves.
+    and no Bonds. Each keeps her class, her armor halves and her calling.
   - **The new world** gets the purse and their banked EXP as Class Marks (below). A party whose five all ascend moves,
     with its name, into its first empty party; the rest fill the next empty parties, five at a time.
   - Each Uma's history records the climb. The tier's next twenty Lv 50 Umas can run its Rift again.

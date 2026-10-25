@@ -1,4 +1,4 @@
-// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3) and live since H61 (D188): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
+// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3) and live since H61 (D188; v16's two kinds since H72): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
 // Paladin Bastion, two new Limit Breaks in each of those halls, Sunfire Edge and Moon Fox reshaped, the hybrids' power at
 // 2.2×, a Limit Break's support at its strength, and a Learner's inherited hits at her higher offense.
 import { createHash } from 'node:crypto'
@@ -14,7 +14,7 @@ import { battleLimitPlan } from './limit'
 import { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_REVIVE_SHARE } from './skills'
 import type { BattleAlly, BattleCue, BattleEnemy, BattleInherit, BattleState, BattleStep } from './types'
 
-type V = 14 | 15
+type V = 14 | 15 | 16
 const LEVEL = 30
 /** An invented Uma at Lv 30 (depths 1–4 open), built by the fight's generation. */
 function member(id: string, classId: RpgClass, version: V, extra: Partial<BattleAlly> = {}): BattleAlly {
@@ -64,7 +64,9 @@ describe('the six halls’ table (H56, §5)', () => {
     expect(table(14)).toHaveLength(20)
     expect(sha(table(14))).toBe('72cb9b8facbc49012c92684942f1c9ae')
     expect(sha(table(14).map((l) => heroLimitSkills(l, 10)))).toBe('6f6d2c3e98ed23205d012a1319da59a8')
-    expect(table(15)).toEqual(HERO_LIMITS)
+    // The live table is v16's since H72 (D210): v15's but Choir of Angels and Rampart Charge (H65, `trees-v16.test.ts`).
+    expect(table(16)).toEqual(HERO_LIMITS)
+    expect(HERO_LIMITS.filter((l) => l !== heroLimitFor(l.id, 15)).map((l) => l.id)).toEqual(['cleric-1', 'paladin-3'])
     expect(table(15).map((l) => l.id)).toEqual(ALL_HERO_LIMIT_IDS)
     expect(Object.fromEntries(table(15).map((l) => [l.id, l.name]))).toEqual({
       'brawler-1': 'Arsenal Rush', 'brawler-2': 'Iaido Cleave', 'brawler-3': 'Spear and Arrow Storm', 'brawler-4': 'Earthsplitter',

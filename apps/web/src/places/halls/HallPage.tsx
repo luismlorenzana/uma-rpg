@@ -81,7 +81,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
                 <div className="mt-0.5"><LimitKinds limit={limit} /></div>
                 {(() => {
                   const sets = seatTwinSets(limit)
-                  return sets && sets.length > 0 && <p className="mt-0.5 text-[12px] font-semibold leading-4">Answers {sets.map((t) => TWIN_SET_LABEL[t]).join(' · ')}</p>
+                  return sets.length > 0 && <p className="mt-0.5 text-[12px] font-semibold leading-4">Answers {sets.map((t) => TWIN_SET_LABEL[t]).join(' · ')}</p>
                 })()}
                 <p className="mt-0.5 text-[12px] leading-4 text-ink-soft">{limit.blurb}</p>
                 <p className="mt-1 truncate text-[13px] font-semibold">{seat ? hero?.name ?? `Outfit ${seat.hero}` : <span className="text-ink-faint">No Hero yet</span>}</p>
@@ -125,11 +125,11 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
           describe={row => `${formatLevel(row.level)} · ${row.classId ? CLASS_LABEL[row.classId] : row.base.title ?? ''}`}
           renderChips={row => {
             if (!row.uma || pick.role !== 'learner') return undefined
-            // v16 (CP28, §8.2): the sets this seat answers that her weapons miss.
+            // CP28, §8.2: the sets this seat answers that her weapons miss.
             const adds = learnerAdds(heroLimit(pick.seat), classOf(row.uma, activeClass(row.outfit, row.uma)).weapons)
             return <span className="text-[10px] text-ink-soft">
               Bond {bondOf(row.uma, pick.seat).level} · {parentsOf(world, row.id).length}/{LEARNER_MAX_PARENTS} Heroes
-              {adds && adds.length > 0 && <span className="block font-semibold text-ink">Adds {adds.map((t) => TWIN_SET_LABEL[t]).join(', ')}</span>}
+              {adds.length > 0 && <span className="block font-semibold text-ink">Adds {adds.map((t) => TWIN_SET_LABEL[t]).join(', ')}</span>}
             </span>
           }}
           onClose={() => setPick(null)}

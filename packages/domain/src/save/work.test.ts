@@ -23,7 +23,9 @@ const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()
 // Invented outfits only.
 const outfit = (id: string, turf: 'A' | 'G' = 'G', dirt: 'A' | 'G' = 'G'): WorkOutfit & BattleOutfit => ({
-  outfitId: id, aptitudes: { surface: { turf, dirt }, strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } } as never,
+  // Her distances read her template's stride from engine v16 (her Flourish, H68).
+  outfitId: id, aptitudes: { surface: { turf, dirt }, strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' },
+    distance: { sprint: 'G', mile: 'A', medium: 'G', long: 'G' } } as never,
   baseStats: { speed: 100, stamina: 100, power: 100, guts: 100, wit: 100 }, growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 },
 })
 const turfA = outfit('101', 'A')

@@ -47,8 +47,8 @@ describe('collection rules', () => {
       expect(ARMOR_SLOTS.map((s) => slotKind(gearV1(uma), s))).toEqual(want[c])
       // A physical start writes nothing: an absent kind is already physical.
       expect(Object.keys(gearV1(uma).kinds)).toHaveLength(want[c] === MAGICAL ? 5 : 0)
-      // A Paladin start is written as her class (D180); every other start stays her style's.
-      expect(uma.classId).toBe(c === 'paladin' ? 'paladin' : null)
+      // From v16 her start is written as her class (H67), whichever it is.
+      expect(uma.classId).toBe(c)
       // The Umas already owned are untouched.
       expect(world.umas['100101']).toBe(worldOf(before).umas['100101'])
       expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)

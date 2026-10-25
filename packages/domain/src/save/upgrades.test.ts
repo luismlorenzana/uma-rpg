@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { accessoryFits, ACCESSORY_TYPES, EQUIP_TYPES, gearId, gearIdentity, isOrb, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { ACCESSORY_KINDS, ACCESSORY_SLOTS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, newRanks, WEAPON_TYPES, type ArmorKind, type Ranks } from '../economy/ranks'
 import { GEM_IDENTITIES, STAR_NODES } from '../economy/stars'
-import { rpgDefaultWeapons, rpgProfileTrees, type RpgClass } from '../rpg/rules'
+import { rpgDefaultWeapons, type RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { equipBlock, gearChoices } from './forge'
 import { nodeFromGem } from './observatory'
@@ -31,7 +31,7 @@ describe('can upgrade (H34)', () => {
     expect(up(world({ ...wearsG1, ranks: ranks({ weapons: { greatsword: 2 } }) }, { 'greatsword-g2': 2 })).gearSlots).toEqual(['greatsword'])
   })
 
-  it('skips stock above her rank, two grades ahead, or of a weapon outside her five', () => {
+  it('skips stock above her rank, two grades ahead, or of a weapon outside her three', () => {
     expect(up(world({}, { 'greatsword-g2': 1 })).gear).toBe(0)
     expect(up(world({ ranks: ranks({ weapons: { axe: 3 } }) }, { 'axe-g3': 1 })).gear).toBe(0)
     expect(up(world({ gear: gearOf([], { lance: 'lance-g1' }) }, { 'lance-g2': 1 })).gear).toBe(0)
@@ -41,10 +41,12 @@ describe('can upgrade (H34)', () => {
   })
 
   it('counts her own better piece she isn\'t wearing', () => {
-    const r = ranks({ weapons: { bow: 2 } })
-    expect(up(world({ ranks: r, gear: gearOf(['bow-g2'], { bow: 'bow-g1' }) })).gearSlots).toEqual(['bow'])
-    expect(up(world({ ranks: r, gear: gearOf(['bow-g1', 'bow-g2']) })).gearSlots).toEqual(['bow'])
-    expect(up(world({ ranks: r, gear: gearOf(['bow-g1'], { bow: 'bow-g2' }) })).gear).toBe(0)
+    const r = ranks({ weapons: { lance: 2, bow: 2 } })
+    expect(up(world({ ranks: r, gear: gearOf(['lance-g2'], { lance: 'lance-g1' }) })).gearSlots).toEqual(['lance'])
+    expect(up(world({ ranks: r, gear: gearOf(['lance-g1', 'lance-g2']) })).gearSlots).toEqual(['lance'])
+    expect(up(world({ ranks: r, gear: gearOf(['lance-g1'], { lance: 'lance-g2' }) })).gear).toBe(0)
+    // A Bow isn't one of her three (engine v16): her better Bow doesn't count.
+    expect(up(world({ ranks: r, gear: gearOf(['bow-g2'], { bow: 'bow-g1' }) })).gear).toBe(0)
   })
 
   it('counts armor only of the kind each slot holds', () => {
@@ -107,24 +109,10 @@ describe('can upgrade (H34)', () => {
     }
   })
 
-  it('counts points only when a side skill can be learned now', () => {
-    const at = (classes: Record<string, number>, tree: string[] = []) =>
-      world({ ranks: ranks({ classes }), classes: { brawler: { weapons: rpgDefaultWeapons('brawler'), tree, loadout: null } } })
-    for (const rank of [1, 2, 3, 4]) expect(up(at({ brawler: rank })).points, `Class Rank ${rank}`).toBe(0)
-    expect(up(at({ brawler: 5 })).points).toBe(5)
-    const trees = rpgProfileTrees({ classId: 'brawler', weapons: rpgDefaultWeapons('brawler') })
-    const firstSides = trees.map((t) => `${t}.1a`)
-    expect(up(at({ brawler: 9 }, firstSides.slice(0, 4))).points).toBe(5)
-    expect(up(at({ brawler: 9 }, firstSides))).toMatchObject({ points: 0, any: false })
-    expect(up(at({ brawler: 15 }, firstSides)).points).toBe(10)
-    expect(up(at({ brawler: 1, mage: 20 })).points).toBe(0)
-    expect(up(at({ brawler: 1, mage: 20 }), 'mage').points).toBe(20)
-  })
-
-  it('counts no points from engine v16, where nothing costs points (H65, CP14)', () => {
-    const w = world({ ranks: ranks({ classes: { brawler: 15 } }), classes: { brawler: { weapons: rpgDefaultWeapons('brawler', 16), tree: [], loadout: null } } })
-    expect(upgradesFor(w, '101', 'brawler', 1, 15)!.points).toBe(15)
-    expect(upgradesFor(w, '101', 'brawler', 1, 16)).toMatchObject({ points: 0, any: false })
+  it('counts nothing for skills: no skill costs points from engine v16 (H65, CP14; side points retired with H72)', () => {
+    const w = world({ ranks: ranks({ classes: { brawler: 15 } }), classes: { brawler: { weapons: rpgDefaultWeapons('brawler'), lines: { axe: 'B' }, loadout: null } } })
+    expect(up(w)).toMatchObject({ gear: 0, stars: 0, any: false })
+    expect(up(w)).not.toHaveProperty('points')
   })
 
   it('counts settable gem kinds and free active slots, agreeing with nodeFromGem for all 100 gems', () => {
@@ -149,7 +137,7 @@ describe('can upgrade (H34)', () => {
 
   it('returns null for an Uma not owned; a fresh Uma with an empty stock has nothing', () => {
     expect(upgradesFor(world(), '999', 'brawler')).toBeNull()
-    expect(up(world())).toEqual({ gearSlots: [], gear: 0, points: 0, gems: 0, freeNodes: 0, stars: 0, any: false })
+    expect(up(world())).toEqual({ gearSlots: [], gear: 0, gems: 0, freeNodes: 0, stars: 0, any: false })
   })
 
   // A guard against an accidental quadratic blowup, not a micro-benchmark: about 20 ms locally, and shared CI runners can be

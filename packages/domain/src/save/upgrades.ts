@@ -1,28 +1,24 @@
 // "Can upgrade" (H34, classes v2 §7, D160): what one tap can make an Uma stronger with right now. A piece or a gem in the
-// stock, or points or a slot she already has; what could be crafted doesn't count (targets plan that, D100). Gear counts
-// on the tracks a target climbs: her active class's five weapons, each armor slot's kind and each filled accessory
-// slot's type, plus an empty accessory slot she could fill. "Better" is the sheets' D119 rule (`gearChoices` +
-// `equipBlock`): her own piece above the one she wears, or the stock's next grade her rank allows. Points: her active
-// class's unspent side points, while a side skill of her five trees can be learned (to v15; none from v16, H65). Extra Stats: gem kinds she can set
-// (the Observatory's rule, `nodeFromGem`) and free active slots she could fill. Pure and cheap: lookups by id, no scan
-// of the stock per slot, so the Stable can ask it for every Uma.
-import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
+// stock, or a slot she already has; what could be crafted doesn't count (targets plan that, D100). Gear counts on the
+// tracks a target climbs: her active class's three weapons, each armor slot's kind and each filled accessory slot's
+// type, plus an empty accessory slot she could fill. "Better" is the sheets' D119 rule (`gearChoices` + `equipBlock`):
+// her own piece above the one she wears, or the stock's next grade her rank allows. No skill costs points (engine v16,
+// CP14), so skills never count. Extra Stats: gem kinds she can set (the Observatory's rule, `nodeFromGem`) and free active
+// slots she could fill. Pure and cheap: lookups by id, no scan of the stock per slot, so the Stable can ask it for every
+// Uma.
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { accessoryFits, ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
-import { ACCESSORY_SLOTS, ARMOR_SLOTS, classRankOf } from '../economy/ranks'
+import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
-import { rpgLearnBlock, rpgProfileTrees, rpgTreePointsEarned, rpgTreePointsSpent, type RpgClass } from '../rpg/rules'
-import { rpgSideNodeLevel } from '../rpg/node-identity'
+import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { gearV1, slotKind, type OwnedUma, type TierWorld } from './save'
 
 export interface UmaUpgrades {
-  /** Slots that can take a better piece now: a weapon type of her five, an armor slot or an accessory slot. */
+  /** Slots that can take a better piece now: a weapon type of her three, an armor slot or an accessory slot. */
   gearSlots: GearSlot[]
   gear: number
-  /** Her active class's unspent side points, or 0 when no side skill can be learned now; always 0 from v16, where nothing
-   * costs points (CP14), so the Skills tab's dot reads only gear. */
-  points: number
   /** Star Gem kinds in stock she can set now. */
   gems: number
   /** Open nodes she could switch on now. */
@@ -68,24 +64,11 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
   return best + 1 <= rank && (stock[gearId(type, best + 1)] ?? 0) > 0
 }
 
-/** Whether she can learn any side skill of her five trees now (`rpgLearnBlock` is null for one). Engines v6–v15. */
-function canLearnSide(uma: OwnedUma, classId: RpgClass, tier: number, unspent: number): boolean {
-  const setup = classOf(uma, classId)
-  const learner = { classId, tier, classRank: classRankOf(uma.ranks, classId), tree: (setup.tree ?? []).map((id) => ({ tier, id })) }
-  for (const tree of rpgProfileTrees({ classId, weapons: setup.weapons })) {
-    for (let depth = 1; depth <= Math.min(5, unspent); depth++) {
-      if (learner.classRank < rpgSideNodeLevel(depth)) break
-      for (const side of ['a', 'b']) if (rpgLearnBlock(learner, `${tree}.${depth}${side}`) === null) return true
-    }
-  }
-  return false
-}
-
 /**
  * What she can upgrade now, as the class `classId` (the caller passes her active class, as for `targetPlan`, since the
  * domain has no master data). Null for an Uma this world doesn't own. Accessory slots follow the engine's generation (H57).
  */
-export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, tier = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
+export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, _tier = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
   const uma = world.umas[outfitId]
   if (!uma) return null
   const bound = boundGrades(uma)
@@ -116,11 +99,6 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
     if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
   }
 
-  // Side points end with v15: from v16 no node costs anything (CP14).
-  const rank = classRankOf(uma.ranks, classId)
-  const unspent = rpgRework('fight', engine) ? 0 : rpgTreePointsEarned(rank) - rpgTreePointsSpent((classOf(uma, classId).tree ?? []).map((id) => ({ tier, id })))
-  const points = unspent > 0 && canLearnSide(uma, classId, tier, unspent) ? unspent : 0
-
   const open = new Set(uma.stars.unlocked)
   let gems = 0
   for (const [gem, count] of Object.entries(world.gems)) {
@@ -132,6 +110,6 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const active = uma.stars.active.length
   const freeNodes = Math.max(0, Math.min(activeNodeSlots(uma.level) - active, uma.stars.unlocked.length - active))
   const stars = gems + freeNodes
-  return { gearSlots, gear: gearSlots.length, points, gems, freeNodes, stars, any: gearSlots.length > 0 || points > 0 || stars > 0 }
+  return { gearSlots, gear: gearSlots.length, gems, freeNodes, stars, any: gearSlots.length > 0 || stars > 0 }
 }
 

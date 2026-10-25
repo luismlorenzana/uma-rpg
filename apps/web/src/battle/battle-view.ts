@@ -1,7 +1,7 @@
 // Read-only projections of the engine for the fight screen: legal choices, previews and cue text. Ported from uma-racer,
-// reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
-// an Arms half with a Tome half (from v15 a Summoner's too, her Tome half leading, D183). Everything reads the fight's
-// own engine version, so an open v14 fight shows v14's rules whatever the live generation (H59).
+// reworked for D86: every class acts once, picks which of her weapons to attack with (three from v16), and a Spell
+// Blade's act pairs an Arms half with a Tome half (from v15 a Summoner's too, her Tome half leading, D183). Everything
+// reads the fight's own engine version, so an open v15 fight shows v15's rules whatever the live generation (H59).
 import { BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgRework, rpgV2, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'

@@ -1,19 +1,18 @@
-// A tree's line over the save (H69, D205; class-progression.md §6.1, CP14, CP18, CP23): the one switch mocked to 16 in
-// this file of its own (H64's `capsAt`). Her line on each of her class's trees is a free pick that her equipped skills
-// follow; nothing is learned; her profile, loadout and fights read her lines. Invented outfits.
-import { describe, expect, it, vi } from 'vitest'
+// A tree's line over the save (H69, D205; class-progression.md §6.1, CP14, CP18, CP23), live since H72 (D210). Her line
+// on each of her class's trees is a free pick that her equipped skills follow; nothing is learned; her profile, loadout
+// and fights read her lines. Invented outfits.
+import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
 import { rpgDefaultWeapons } from '../rpg/rules'
 import { regionChapter, worldContinent } from '../world/world'
 import {
-  classOf, equipSkills, forgetSkill, holdWeapon, learnSkill, NO_BRANCHES, partyMembers, pickBranch, setClassWeapons, SKILLS_BY_RANK, startFight, umaLoadout,
+  classOf, equipSkills, holdWeapon, partyMembers, pickBranch, setClassWeapons, startFight, umaLoadout,
   umaProfile, type BattleOutfit,
 } from './battle'
 import { wearClassPreset } from './presets'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
 const T = (n: number) => new Date(Date.UTC(2026, 9, 25, 12) + n * 60_000).toISOString()
 const outfit = (outfitId: string, style: 'front' | 'pace' | 'end', power = 104, wit = 90): BattleOutfit => ({
@@ -58,7 +57,6 @@ describe('a tree’s line over the save (H69)', () => {
     const save = party()
     expect(classOf(umaOf(save, '101'), 'brawler')).toEqual({ weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: null })
     expect(classOf(umaOf(save, '101'), 'mage')).toEqual({ weapons: rpgDefaultWeapons('mage', 16), lines: {}, loadout: null })
-    expect(classOf(umaOf(save, '101'), 'mage', 15)).toEqual({ weapons: rpgDefaultWeapons('mage', 15), tree: [], loadout: null })
   })
 
   it('takes line B with her equipped skills following, Rend becoming Rending Combo, and back', () => {
@@ -81,13 +79,10 @@ describe('a tree’s line over the save (H69)', () => {
       .toEqual({ weapons: rpgDefaultWeapons('mage', 16), lines: { 'tome-ice': 'B' }, loadout: null })
   })
 
-  it('refuses a kind outside her class, a line that isn’t A or B, and every side-skill rule', () => {
+  it('refuses a kind outside her class and a line that isn’t A or B (nothing is learned: the save-level learning rules retired with H72)', () => {
     const save = party()
     expect(() => pickBranch(save, BRAWLER, 'brawler', 'tome-fire', 'B', T(1))).toThrow('Not in this class’s trees')
     expect(() => pickBranch(save, BRAWLER, 'brawler', 'axe', 'C' as 'B', T(1))).toThrow('No such line')
-    expect(() => learnSkill(save, BRAWLER, 'brawler', 'brawler-greatsword.1a', T(1))).toThrow(SKILLS_BY_RANK)
-    expect(() => forgetSkill(save, BRAWLER, 'brawler', 'brawler-greatsword.1a', T(1))).toThrow(SKILLS_BY_RANK)
-    expect(NO_BRANCHES).toBe('No branches yet')
   })
 
   it('builds her profile and loadout from her lines: no sides, no legacy, B’s nodes where she is on B', () => {

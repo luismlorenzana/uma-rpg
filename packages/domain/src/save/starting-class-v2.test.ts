@@ -1,8 +1,8 @@
 // The Paladin's start and one healer a party by generation (H58): both are classes v2 rules, so engine v14 started every
-// Late surger as a Cleric and let two Clerics fight together, and the live game since H61 (D188) doesn't.
+// Late surger as a Cleric and let two Clerics fight together, and the live game since H61 (D188) doesn't. From v16 (live
+// since H72, D210) her start is her calling (`starting-class-v16.test.ts`), which keeps the Paladin's for a Late surger.
 // `healers-v2.test.ts` holds the live rules where a party fights.
 import { describe, expect, it } from 'vitest'
-import { STYLE_CLASSES } from '../roster/aptitudes'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { regionChapter, worldContinent } from '../world/world'
 import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, startingClass, styleClass, type BattleOutfit } from './battle'
@@ -18,8 +18,8 @@ const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 11
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 
 describe('the Paladin’s start (H58, §3.3)', () => {
-  it('is a Late surger whose base Power beats her base Wit, from classes v2 only (live since H61)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(15)
+  it('is a Late surger whose base Power beats her base Wit, from classes v2 only (and her calling from v16, live since H72)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
     const strong = outfit('1', 'late', 120, 100), even = outfit('2', 'late', 110, 110), wise = outfit('3', 'late', 100, 120)
     expect([strong, even, wise].map((o) => startingClass(o, 15))).toEqual(['paladin', 'cleric', 'cleric'])
     expect([strong, even, wise].map((o) => startingClass(o, 14))).toEqual(['cleric', 'cleric', 'cleric'])
@@ -29,19 +29,18 @@ describe('the Paladin’s start (H58, §3.3)', () => {
     expect(STYLES.map((s) => startingClass(outfit('4', s, 120, 100), 14))).toEqual(['brawler', 'mage', 'cleric', 'summoner'])
     // Without base stats (an outfit always has them) she starts as her style's class.
     expect(startingClass({ aptitudes: strong.aptitudes }, 15)).toBe('cleric')
-    expect(STYLE_CLASSES.late).toEqual(['Paladin', 'Cleric'])
   })
 
-  it('writes a Paladin start as her class, with no magical armor kinds; every other start stays null', () => {
+  it('writes a Paladin start as her class, with no magical armor kinds; from v16 every start is written (H67)', () => {
     let save = newSave('Luis', T(0))
     save = unlockUma(save, '1', T(0), '1', 'paladin')
     save = unlockUma(save, '2', T(0), '1', 'cleric')
     save = unlockUma(save, '3', T(0), '1', 'brawler')
     const { umas } = worldOf(save)
     expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { kinds: {} } })
-    expect(umas['2']!.classId).toBeNull()
+    expect(umas['2']!.classId).toBe('cleric')
     expect(Object.keys(gearV1(umas['2']!).kinds)).toHaveLength(5)
-    expect(umas['3']).toMatchObject({ classId: null, gear: { kinds: {} } })
+    expect(umas['3']).toMatchObject({ classId: 'brawler', gear: { kinds: {} } })
   })
 
   it('keeps an unpicked Late surger a Cleric in both generations: her style’s class, not her start', () => {

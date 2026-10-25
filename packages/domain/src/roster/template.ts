@@ -82,10 +82,12 @@ const STATS: readonly StatKey[] = ['speed', 'stamina', 'power', 'guts', 'wit']
 const GRADES: readonly AptitudeGrade[] = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
 const DISTANCE_STRIDE: Readonly<Record<typeof DISTANCES[number], UmaStride>> = { sprint: 'dash', mile: 'dash', medium: 'middle', long: 'stayer' }
 const STAT_KNACK: Readonly<Record<StatKey, UmaKnack>> = { speed: 'fleet', stamina: 'tireless', power: 'mighty', guts: 'gritty', wit: 'clever' }
-const ROW_CALLING: Readonly<Record<UmaCallingRow, RpgClass>> = {
+/** Each calling row's class (uma-templates §2.2): rows 1–4 fixed, 5–8 the pick's pre-selection. The manual prints them. */
+export const UMA_ROW_CALLING: Readonly<Record<UmaCallingRow, RpgClass>> = {
   1: 'brawler', 2: 'summoner', 3: 'summoner', 4: 'brawler', 5: 'spellblade', 6: 'mage', 7: 'paladin', 8: 'cleric',
 }
-const ROW_PICK: Readonly<Partial<Record<UmaCallingRow, readonly [RpgClass, RpgClass]>>> = {
+/** The calling pick's two classes by row (CP29), the pre-selection first. */
+export const UMA_ROW_PICK: Readonly<Partial<Record<UmaCallingRow, readonly [RpgClass, RpgClass]>>> = {
   5: ['spellblade', 'mage'], 6: ['mage', 'spellblade'], 7: ['paladin', 'cleric'], 8: ['cleric', 'paladin'],
 }
 
@@ -115,14 +117,14 @@ export function umaCallingRow(outfit: CallingOutfit): UmaCallingRow {
 
 /** Her calling pick (CP29): null for rows 1–4; for rows 5–8 her row's two classes, the suggested one first. */
 export function umaCallingPick(outfit: CallingOutfit): UmaCallingPick | null {
-  const options = ROW_PICK[umaCallingRow(outfit)]
+  const options = UMA_ROW_PICK[umaCallingRow(outfit)]
   return options ? { options: [options[0], options[1]], suggested: options[0], power: outfit.baseStats.power, wit: outfit.baseStats.wit } : null
 }
 
 /** Her calling: her pick when she has one and it is one of her row's two (UT4), else her row's class. */
 export function umaCalling(outfit: CallingOutfit, pick?: RpgClass | null): RpgClass {
   const row = umaCallingRow(outfit)
-  return pick && ROW_PICK[row]?.includes(pick) ? pick : ROW_CALLING[row]
+  return pick && UMA_ROW_PICK[row]?.includes(pick) ? pick : UMA_ROW_CALLING[row]
 }
 
 /** Her stride: the longest distance at her best distance grade (Sprint or Mile a dash, Medium the middle, Long a stayer). */

@@ -3,10 +3,17 @@
 // skills; a Cleric with only her Class Rank (105) wearing two Orbs; a Mage (106) wearing an Amulet in accessory 1 and an
 // Orb in accessory 2; the Chapel's seats 3–4 with their Heroes (107, 110), Learners (108, 109) and Bonds; a Brawler (100)
 // with her own setup; party 1 with two Clerics; and an open world-map fight and an open Rift fight (Iron stage 5), both
-// engine v14, taken from the frozen replays mid-fight (`rpg/battle/v14-replays.fixture.json`).
+// engine v14, taken from the frozen replays mid-fight (`rpg/battle/v14-replays.fixture.json`). Its classes are v24's
+// (five weapons and `tree`) and its Umas hold no calling, shapes the live types no longer describe (H72), so they are set
+// through `setClass`.
 import { loadV14Replays, type V14Replay } from '../rpg/battle/v14-replays.fixture'
 import type { RpgClass } from '../rpg/kinds'
 import { newOwnedUma, newSave, type OwnedUma, type Save } from './save'
+
+/** A class as saves v24–v26 stored it. */
+export interface V24Class { weapons: string[]; tree: string[]; loadout: string[] | null }
+/** Sets one of her classes in v24's shape. */
+const setClass = (u: OwnedUma, classId: RpgClass, setup: V24Class) => { (u.classes as Record<string, V24Class>)[classId] = setup }
 
 export const V25_T = ['2026-10-01T12:00:00.000Z', '2026-10-10T12:00:00.000Z', '2026-10-20T12:00:00.000Z'] as const
 const [T0, T1, T2] = V25_T
@@ -23,6 +30,7 @@ export const CLERIC_LOADOUT = ['cleric-tome-fire.1', 'cleric-greatsword.1a', 'cl
 
 function uma(classId: RpgClass | null, change: (u: OwnedUma) => void = () => {}): OwnedUma {
   const u: OwnedUma = { ...newOwnedUma(T0), level: 50, classId }
+  delete (u as Partial<OwnedUma>).calling
   change(u)
   return u
 }
@@ -34,14 +42,14 @@ export function v24Save(): Save {
   for (const [i, id] of ids(100, 20).entries()) world.umas[id] = uma(classes[i] ?? null)
   world.umas['100'] = uma('brawler', (u) => {
     u.ranks.classes.brawler = { rank: 20, exp: 0 }
-    u.classes.brawler = { weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: null }
+    setClass(u, 'brawler', { weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: null })
     u.gear = { locker: ['orb-fire-g1', 'talisman-vital-g1'], equipped: { 'accessory-1': 'orb-fire-g1', 'accessory-2': 'talisman-vital-g1' }, kinds: {} }
   })
   world.umas['103'] = uma('cleric', (u) => {
     u.ranks.classes.cleric = { rank: 40, exp: 0 }
     u.ranks.classes.mage = { rank: 5, exp: 0 }
-    u.classes.cleric = { weapons: [...CLERIC_WEAPONS], tree: [...CLERIC_TREE], loadout: [...CLERIC_LOADOUT] }
-    u.classes.mage = { weapons: ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'], tree: [], loadout: null }
+    setClass(u, 'cleric', { weapons: [...CLERIC_WEAPONS], tree: [...CLERIC_TREE], loadout: [...CLERIC_LOADOUT] })
+    setClass(u, 'mage', { weapons: ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'], tree: [], loadout: null })
     u.gear = { locker: ['orb-fire-g1', 'talisman-vital-g1'], equipped: { 'accessory-1': 'orb-fire-g1', 'accessory-2': 'talisman-vital-g1' }, kinds: {} }
   })
   world.umas['105'] = uma('cleric', (u) => {

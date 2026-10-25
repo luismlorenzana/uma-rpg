@@ -48,33 +48,37 @@ Nineteen biomes. Each sets the **element signatures** its foes carry, its **form
 <!-- live:biomes -->
 | Biome | Id | Signatures (weak to) | Formations | Roles |
 |---|---|---|---|---|
-| Meadow | `meadow` | fire (lightning); ice (fire); lightning (ice) | squad, duo, trio | striker, caster, skirmisher, guard |
-| Forest | `forest` | lightning (ice); light (dark); dark (light) | squad, trio, swarm | skirmisher, striker |
-| Coast | `coast` | ice+lightning (fire); ice (fire); lightning (ice) | trio, squad | caster, skirmisher |
-| Swamp | `swamp` | lightning+dark (ice, light); dark (light) | squad, trio | caster, skirmisher |
-| Jungle | `jungle` | fire+lightning (ice); lightning (ice) | swarm, squad | skirmisher, striker |
-| Desert | `desert` | fire+light (lightning, dark); fire (lightning); light (dark) | trio, duo | guard, striker |
-| Canyon | `canyon` | fire (lightning); lightning (ice); fire+lightning (ice) | duo, solo, trio | striker |
-| Volcano | `volcano` | fire+dark (lightning, light); fire+light (lightning, dark); fire (lightning) | solo, duo | striker, caster |
-| Geyser Basin | `geyser` | fire+ice (lightning); ice (fire); fire (lightning) | trio, squad | caster |
-| Tundra | `tundra` | ice (fire); ice+dark (fire, light) | squad, trio | guard, striker |
-| Glacier | `glacier` | ice+light (fire, dark); ice (fire) | solo, duo | guard |
-| Storm Peaks | `peaks` | ice+lightning (fire); lightning (ice) | trio, squad | skirmisher |
-| Highlands | `highlands` | lightning+light (ice, dark); light (dark) | duo, trio | caster |
-| Sky Isles | `sky` | fire+light (lightning, dark); ice+light (fire, dark); lightning+light (ice, dark) | trio, duo | caster |
-| Underworld | `underworld` | fire+dark (lightning, light); ice+dark (fire, light); lightning+dark (ice, light) | swarm, squad | striker, caster, skirmisher |
-| Haunted Moor | `moor` | dark (light); ice+dark (fire, light) | swarm, squad | skirmisher, caster |
-| Crystal Caverns | `crystal` | ice+light (fire, dark); light (dark) | squad, trio | guard, caster |
-| Ancient Ruins | `ruins` | light+dark (weapons only); fire (lightning); ice (fire); lightning (ice) | escort, trio | guard |
-| Twilight Rift | `rift` | light+dark (weapons only) | solo | striker, caster |
+| Meadow | `meadow` | fire (Lightning twins); ice (Fire twins); lightning (Ice twins) | squad, duo, trio | striker, caster, skirmisher, guard |
+| Forest | `forest` | lightning (Ice twins); light (Dark twins); dark (Light twins) | squad, trio, swarm | skirmisher, striker |
+| Coast | `coast` | ice+lightning (Fire twins); ice (Fire twins); lightning (Ice twins) | trio, squad | caster, skirmisher |
+| Swamp | `swamp` | lightning+dark (Ice twins or Light twins); dark (Light twins) | squad, trio | caster, skirmisher |
+| Jungle | `jungle` | fire+lightning (Ice twins); lightning (Ice twins) | swarm, squad | skirmisher, striker |
+| Desert | `desert` | fire+light (Lightning twins or Dark twins); fire (Lightning twins); light (Dark twins) | trio, duo | guard, striker |
+| Canyon | `canyon` | fire (Lightning twins); lightning (Ice twins); fire+lightning (Ice twins) | duo, solo, trio | striker |
+| Volcano | `volcano` | fire+dark (Lightning twins or Light twins); fire+light (Lightning twins or Dark twins); fire (Lightning twins) | solo, duo | striker, caster |
+| Geyser Basin | `geyser` | fire+ice (Lightning twins); ice (Fire twins); fire (Lightning twins) | trio, squad | caster |
+| Tundra | `tundra` | ice (Fire twins); ice+dark (Fire twins or Light twins) | squad, trio | guard, striker |
+| Glacier | `glacier` | ice+light (Fire twins or Dark twins); ice (Fire twins) | solo, duo | guard |
+| Storm Peaks | `peaks` | ice+lightning (Fire twins); lightning (Ice twins) | trio, squad | skirmisher |
+| Highlands | `highlands` | lightning+light (Ice twins or Dark twins); light (Dark twins) | duo, trio | caster |
+| Sky Isles | `sky` | fire+light (Lightning twins or Dark twins); ice+light (Fire twins or Dark twins); lightning+light (Ice twins or Dark twins) | trio, duo | caster |
+| Underworld | `underworld` | fire+dark (Lightning twins or Light twins); ice+dark (Fire twins or Light twins); lightning+dark (Ice twins or Light twins) | swarm, squad | striker, caster, skirmisher |
+| Haunted Moor | `moor` | dark (Light twins); ice+dark (Fire twins or Light twins) | swarm, squad | skirmisher, caster |
+| Crystal Caverns | `crystal` | ice+light (Fire twins or Dark twins); light (Dark twins) | squad, trio | guard, caster |
+| Ancient Ruins | `ruins` | light+dark (Twilight); fire (Lightning twins); ice (Fire twins); lightning (Ice twins) | escort, trio | guard |
+| Twilight Rift | `rift` | light+dark (Twilight) | solo | striker, caster |
+
+The twin sets: Fire twins (Greatsword, Fire Tome); Ice twins (Axe, Blizzard Tome); Lightning twins (Lance, Thunder Tome); Light twins (Bow, Light Tome); Dark twins (Katana, Dark Tome); Twilight (Bow, Katana).
 <!-- /live -->
 
 ### Element signatures
 
-A signature is one element, or a pair that each foe carries both of. A pair's weaknesses are what beats either half,
-minus its own:
-- **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**.
-- A **light+dark** foe answers to weapons only.
+A signature is one element, or a pair that each foe carries both of. Since engine v16 (CP5) a foe is weak to her
+**twins**: the element that beats hers on the ring, **Fire > Ice > Lightning > Fire** and **Light ⇄ Dark**, and its twin
+Arm ([combat](combat.md#weaknesses-shields-and-breaks)):
+- A pair's foes read their lead element first, the lead alternating by slot; when its answer is one of her own, her
+  second. So a pair can answer to two twin sets ("Fire twins or Dark twins").
+- A **light+dark** foe answers to no element: the Bow and the Katana (**Twilight**).
 
 ### Faces
 

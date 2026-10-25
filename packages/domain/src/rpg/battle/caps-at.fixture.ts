@@ -3,9 +3,10 @@
 // A test file mocks the switch in a file of its own; `vi.mock` is hoisted above the imports, so its factory imports this
 // module itself:
 //
-//   vi.mock('./caps', async (orig) => (await import('./caps-at.fixture')).capsAt(16, await orig()))
+//   vi.mock('./caps', async (orig) => (await import('./caps-at.fixture')).capsAt(17, await orig()))
 //
-// with the paths to `rpg/battle/caps` and this file from that test. R1's packets (H65–H71) mock 16; R2's 17.
+// with the paths to `rpg/battle/caps` and this file from that test. R1's packets (H65–H71) mocked 16 until H72 made it
+// live; R2's mock 17.
 import type * as Caps from './caps'
 
 type CapsModule = typeof Caps

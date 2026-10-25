@@ -1,8 +1,7 @@
-// Save v27 with the switch on (H69, D205): the one switch mocked to 16 in this file of its own (H64's `capsAt`), as
-// `save-v25.test.ts` read classes v2's live lists. A v26 world `toV27` produced parses (three weapons, `lines`, `calling`)
-// and its open v15 fights replay to their frozen ends; the same world unmigrated (labelled v26, so a chain would skip it)
-// doesn't. The parse with the switch at 15 is `migrations-v27.test.ts`'s.
-import { describe, expect, it, vi } from 'vitest'
+// Save v27 (H69, D205), live since H72 (D210; R1's packets ran this file with the switch mocked to 16). A v26 save parses
+// through the chain (three weapons, `lines`, `calling`) and its open v15 fights replay to their frozen ends; the same world
+// labelled v27 (so the chain skips it) doesn't.
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { replayV15 } from '../rpg/battle/v15-replays.fixture'
 import { RPG_WEAPON_SLOTS } from '../rpg/rules'
@@ -10,25 +9,24 @@ import { toV27 } from './migrations'
 import { gearV1, parseSave, SAVE_SCHEMA_VERSION, SaveParseError } from './save'
 import { migrated, v15Replay, v26Save, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
-
 type Raw = Record<string, unknown>
-/** The fixture through `toV27`, as JSON, with one Uma's raw record changed. */
+/** The fixture through `toV27`, as JSON labelled v27 (so the chain leaves it), with one Uma's raw record changed. */
 function editedUma(id: string, change: (uma: Raw) => void): unknown {
-  return migrated(v26Save(), (w) => {
+  return { ...(migrated(v26Save(), (w) => {
     const next = toV27(w)
     change((next.umas as Record<string, Raw>)[id]!)
     return next
-  })
+  }) as Raw), schemaVersion: 27 }
 }
 
-describe('save v27 with the switch on (H69)', () => {
-  it('runs with the Tier rework’s fight live and the save still v26', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([16, true, 3, 26])
+describe('save v27 (H69, live since H72)', () => {
+  it('runs with the Tier rework’s fight live and the save v27', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([16, true, 3, 27])
   })
 
-  it('parses a v26 world run through toV27: three weapons, lines and every Uma’s calling', () => {
-    const world = parseSave(migrated(v26Save(), toV27)).tierWorlds['1']!
+  it('parses a v26 world through the chain: three weapons, lines and every Uma’s calling', () => {
+    expect(parseSave(JSON.parse(JSON.stringify(v26Save())))).toEqual(parseSave(migrated(v26Save(), toV27)))
+    const world = parseSave(JSON.parse(JSON.stringify(v26Save()))).tierWorlds['1']!
     expect(world.umas['100']!.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance'], lines: { greatsword: 'B', lance: 'B', katana: 'B' },
       loadout: ['brawler-greatsword.5b', 'brawler-greatsword.2'] })
     expect(world.umas['101']!.classes.mage).toEqual({ weapons: ['tome-fire', 'tome-ice', 'tome-lightning'], lines: { 'tome-ice': 'B' }, loadout: null })
@@ -64,9 +62,8 @@ describe('save v27 with the switch on (H69)', () => {
     }
   })
 
-  it('refuses the same world unmigrated (labelled v26, so the chain skips it), on its five weapons', () => {
-    const unmigrated = JSON.parse(JSON.stringify(v26Save()))
-    expect(unmigrated.schemaVersion).toBe(26)
+  it('refuses the same world unmigrated (labelled v27, so the chain skips it), on its five weapons', () => {
+    const unmigrated = { ...JSON.parse(JSON.stringify(v26Save())), schemaVersion: 27 }
     expect(() => parseSave(unmigrated)).toThrow(SaveParseError)
     expect(() => parseSave(unmigrated)).toThrow(/umas\.100\.classes\.brawler\.weapons: not three weapons a brawler can wield/)
   })

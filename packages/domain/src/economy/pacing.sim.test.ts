@@ -45,7 +45,8 @@ describe('H14 pacing economy ledger', () => {
     expect(worldOf(second).wallet.laurels - worldOf(first).wallet.laurels).toBe(stageLaurels('fight', 1, false, node.level))
     expect(worldOf(second).umas[ids[0]!]!.exp - worldOf(first).umas[ids[0]!]!.exp).toBe(Math.round(row.exp / (1 + REPLAY_SHARE) * REPLAY_SHARE))
     expect(row.classExp).toBe(2 * row.exp)
-    expect(row.weaponExp).toBeCloseTo(5 * row.exp, -1)
+    // E a weapon over her three (engine v16, H64).
+    expect(row.weaponExp).toBeCloseTo(3 * row.exp, -1)
     expect(row.armorExp).toBe(5 * row.exp)
   })
 
@@ -60,21 +61,21 @@ describe('H14 pacing economy ledger', () => {
     const world = worldOf(result.save)
     for (const row of result.rows) {
       expect(row.classExp).toBe(2 * row.exp)
-      expect(row.weaponExp).toBe(5 * row.exp)
+      expect(row.weaponExp).toBe(3 * row.exp)
       expect(row.armorExp).toBe(5 * row.exp)
     }
     const uma = world.umas[ids[0]!]!
     expect(uma.ranks.classes.brawler!.rank).toBe(50)
-    expect(Object.values(uma.ranks.weapons ?? {}).map((r) => r!.rank)).toEqual(Array(5).fill(10))
+    expect(Object.values(uma.ranks.weapons ?? {}).map((r) => r!.rank)).toEqual(Array(3).fill(10))
     expect(Object.values(uma.ranks.armors ?? {}).map((r) => r!.rank)).toEqual(Array(5).fill(10))
     expect(world.wallet.classMarks).toBeGreaterThan(0)
     expect(world.wallet.gearMarks).toBeGreaterThan(0)
     expect(world.items).toEqual({})
   })
 
-  it('counts the material-only twelve-piece set and separates unlocked capacity from fresh workers', () => {
+  it('counts the material-only ten-piece set and separates unlocked capacity from fresh workers', () => {
     for (const grade of [2, 4, 6, 8, 10]) {
-      expect(Object.values(fullSet(grade)).reduce((a, b) => a + b, 0)).toBe(12 * 2)
+      expect(Object.values(fullSet(grade)).reduce((a, b) => a + b, 0)).toBe(10 * 2)
       expect(Object.keys(fullSet(grade)).some((id) => id.startsWith('token-'))).toBe(false)
     }
     expect(freshWorker(result.rows).profession.level).toBe(1)

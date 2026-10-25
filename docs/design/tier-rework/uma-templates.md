@@ -4,6 +4,10 @@
 > testing in action." Its §12 follow-ups are applied to the other docs, the README and the pages
 > ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC30); the versions are re-planned by D198 (§9, §10,
 > [implementation.md](implementation.md)). Changes from here are follow-ups logged against it.
+>
+> **R1 live from H72, 2026-10-25 (D210)** (a follow-up, no decision changed): the template's name, chip and card, the
+> calling and its pick, the Flourish as her calling, the Racing tab's "Her template" and the Stable's Calling, Stride and
+> Knack filters play in the game (UT2–UT6, UT12, UT14, UT15, UT17, UT18); the signature and her moon wait for R2.
 
 > **For the owner's review, 2026-10-25. Nothing here is built.** The Tier rework's **Uma Templates pass**
 > ([README §5](README.md#5-the-plan), step 5), the centralization the owner asked for: "the Uma uniqueness page, part of

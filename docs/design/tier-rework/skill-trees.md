@@ -23,7 +23,7 @@
 
 ## 1. Today
 
-The rules are in [classes](../../game/classes.md#skills-depths-points-and-slots), every node in
+The rules are in [classes](../../game/classes.md#skills-depths-lines-and-ranks), every node in
 [skill trees](../../game/skill-trees.md), the screen in [sections](../../game/sections.md#stable).
 
 | | Today (engine v15, save v25) |

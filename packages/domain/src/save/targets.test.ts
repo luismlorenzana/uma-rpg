@@ -17,7 +17,7 @@ const withWorld = (save: Save, fn: (w: TierWorld) => TierWorld): Save => ({ ...s
 // Invented outfits only.
 const worker = { outfitId: '102' } as const
 const hides = () => familyById('hides-scales')!
-const ARMS = ['greatsword', 'axe', 'lance', 'bow', 'katana'], ARMOR = ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']
+const ARMS = ['greatsword', 'axe', 'lance'], ARMOR = ['helm', 'cuirass', 'greaves', 'gauntlets', 'boots']
 
 describe('the requirements engine (D126)', () => {
   it('nets each item once, parents first, and passes down only what is still short', () => {
@@ -71,12 +71,12 @@ describe('targets (D100, D126, D144)', () => {
   it('plans every track she climbs all the way to grade 10, and every Star Gem her Extra Stats still need', () => {
     const save = setTarget(umas('101', '102'), '101', true, at(1))
     const plan = targetPlan(worldOf(save), brawler)
-    // A new Brawler: her five Arms and five physical armor kinds, grades 1–10 each; no accessory, so none planned.
+    // A new Brawler: her three Arms (engine v16) and five physical armor kinds, grades 1–10 each; no accessory, so none planned.
     const expected = [...ARMS, ...ARMOR].flatMap((t) => Array.from({ length: 10 }, (_, i) => `${t}-g${i + 1}`)).sort()
     expect(plan.gear.map((g) => g.key).sort()).toEqual(expected)
     expect(plan.gear.every((g) => g.need === 1 && g.have === 0 && g.short === 1)).toBe(true)
     expect(plan.gems).toHaveLength(100)
-    expect(facilityTargets(plan, 'forge')).toHaveLength(100)
+    expect(facilityTargets(plan, 'forge')).toHaveLength(80)
     expect(facilityTargets(plan, 'lapidary')).toHaveLength(100)
   })
 

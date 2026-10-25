@@ -1,5 +1,5 @@
-// Test-only (excluded from the build): the frozen v15 replays that pin engine v15 while the Tier rework's fight (engine
-// v16, R1) is built dark (H64, D200). `v15-replays.fixture.json` holds eight engine v15 fights played on Auto:
+// Test-only (excluded from the build): the frozen v15 replays that pin engine v15 under the Tier rework's fight (engine
+// v16, R1: built dark from H64, D200, live since H72, D210). `v15-replays.fixture.json` holds eight engine v15 fights played on Auto:
 // - one world stage per Tier 1 continent: the v15 balance party on curve with inherited Limit Breaks, healed by a
 //   Paladin in two of them and a Cleric in three, so both kits run (Barriers on every Uma, Aegis, Regen, drain);
 // - a Rift Duel champion (a third act, mixed locks) and a Rift Iron stage (the ward) on v15's tuning;
@@ -9,8 +9,8 @@
 //   a Learner of Choir of Angels (`cleric-1`) and one of Rampart Charge (`paladin-3`); a revive and both Limit Breaks fire.
 // Each keeps its input, its action log, its final `battleStateHash` and a digest of its cues (v14's `cueDigest`, without
 // labels: v16 renames some nodes). It was generated on the engine before H64 touched it. `v15-replays.test.ts` replays
-// them under the live engine and `v15-replays-live16.test.ts` with the switch mocked to 16: every R1 packet keeps both
-// green, and H72's switch makes the mocked twin the live case.
+// them under the live engine, engine v16 since H72 (R1's packets also replayed them with the switch mocked to 16, the
+// twin H72 merged into it).
 //
 // The file regenerates only with `UPDATE_V15=1 npx vitest run src/rpg/battle/v15-replays.test.ts`, which should never be
 // needed: a v15 fight replays forever. To pin another fight, add a `V15Spec` to `V15_SPECS` and regenerate once, on a

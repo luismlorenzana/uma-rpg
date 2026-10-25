@@ -143,7 +143,8 @@ export const CLASS_EXP_SHARE = 2
 /** E a weapon she fights with (H64, D200): five weapons share today's 5E, three from v16 share 3E, so each weapon's rank
  * keeps today's pace. */
 export const WEAPON_EXP_PER_WEAPON = 1
-/** Her weapons' total in the live generation, E a weapon: 5E until H72 turns on three weapons. The manual prints it. */
+/** Her weapons' total in the live generation, E a weapon: 3E over her three since H72 (D210; 5E over five to v15). The
+ * manual prints it. */
 export const WEAPON_EXP_SHARE = WEAPON_EXP_PER_WEAPON * RPG_WEAPON_SLOTS
 export const ARMOR_EXP_SHARE = 1
 export const ACCESSORY_EXP_SHARE = 1

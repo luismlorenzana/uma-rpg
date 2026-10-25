@@ -1,11 +1,9 @@
-// Her template on the Uma sheet (the Tier rework's R1, engine v16; uma-templates.md §5, UT14; class-progression.md §10.2,
-// CP29): the chip and its card, the calling pick card, the Racing tab's "Her template" and the Skills tab's ★ Flourish
-// line. Pure, each taking `engine` (the live generation by default), so a test passes 16 without mocking the domain;
-// before v16 every one answers null, and the sheet shows nothing new (H70). Lazy, with the Stable's pages.
+// Her template on the Uma sheet (the Tier rework's R1, engine v16, H70, live since H72; uma-templates.md §5, UT14;
+// class-progression.md §10.2, CP29): the chip and its card, the calling pick card, the Racing tab's "Her template" and the
+// Skills tab's ★ Flourish line. Pure. Lazy, with the Stable's pages.
 import {
-  BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT,
-  rpgRework, STRIDE_LABEL, umaCallingPick, umaCallingRow, umaTemplate, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit,
-  type UmaCalling,
+  BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, umaCallingPick,
+  umaCallingRow, umaTemplate, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type UmaCalling,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
@@ -22,7 +20,7 @@ type Holder = Pick<OwnedUma, 'calling'> | null
 
 /** Her stored pick, when it is one of her row's two (a master-data fix can move her out of them; UT4). */
 function pickOf(outfit: TemplateOutfit, uma: Holder): RpgClass | null {
-  const pick = uma?.calling?.pick ?? null
+  const pick = uma?.calling.pick ?? null
   return pick && umaCallingPick(outfit)?.options.includes(pick) ? pick : null
 }
 
@@ -69,28 +67,23 @@ export function flourishLine(flourish: RpgFlourish): string {
 }
 
 /** The root plate's ★ line on the Skills tab: her Flourish, on while she is her calling's class; `off` names the class she
- * is, "No effect as Mage". Null before v16. */
-export function rootFlourish(outfit: TemplateOutfit, uma: Holder, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION):
-  { line: string; off: string | null } | null {
-  if (!rpgRework('fight', engine)) return null
+ * is, "No effect as Mage". */
+export function rootFlourish(outfit: TemplateOutfit, uma: Holder, classId: RpgClass): { line: string; off: string | null } {
   const t = umaTemplate(outfit, pickOf(outfit, uma))
   return { line: flourishLine(t.flourish), off: t.calling === classId ? null : `No effect as ${CLASS_LABEL[classId]}` }
 }
 
 /** The chip after her rarity stars (UT14): "★ Clever Spellwright", with a dot while an owned Uma's calling can still be
- * picked. Locked outfits show it too (no dot). Null before v16. */
-export function templateChip(outfit: TemplateOutfit, uma: Holder, engine: number = BATTLE_ENGINE_VERSION): { name: string; dot: boolean } | null {
-  if (!rpgRework('fight', engine)) return null
-  return { name: `★ ${umaTemplate(outfit, pickOf(outfit, uma)).name}`, dot: !!uma && !!umaCallingPick(outfit) && !uma.calling?.confirmed }
+ * picked. Locked outfits show it too (no dot). */
+export function templateChip(outfit: TemplateOutfit, uma: Holder): { name: string; dot: boolean } {
+  return { name: `★ ${umaTemplate(outfit, pickOf(outfit, uma)).name}`, dot: !!uma && !!umaCallingPick(outfit) && !uma.calling.confirmed }
 }
 
 export interface TemplateReading { label: 'Calling' | 'Stride' | 'Knack'; value: string; source: string }
 /** The template card (UT14, R1's part): her name, the three readings with their sources ("Calling ← Pace A, Wit 102 ≥
  * Power 90", or "← picked"), and her Flourish with its state ("★ Even pace · as a Mage · on", "· no effect as Brawler";
- * a locked outfit's has none). Null before v16. */
-export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null, engine: number = BATTLE_ENGINE_VERSION):
-  { name: string; readings: TemplateReading[]; flourish: string } | null {
-  if (!rpgRework('fight', engine)) return null
+ * a locked outfit's has none). */
+export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null): { name: string; readings: TemplateReading[]; flourish: string } {
   const pick = pickOf(outfit, uma)
   const t = umaTemplate(outfit, pick)
   const state = classId === null ? '' : classId === t.calling ? ' · on' : ` · no effect as ${CLASS_LABEL[classId]}`
@@ -106,10 +99,8 @@ export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgCl
 }
 
 /** The Racing tab's "Her template" (UT14): Calling, Stride, Knack and Flourish, each with its note. `classId` is the class
- * she fights as (null for a locked outfit: "As a Mage"). Null before v16, where the tab keeps today's two rows. */
-export function racingTemplate(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null, engine: number = BATTLE_ENGINE_VERSION):
-  { label: string; value: string; note: string }[] | null {
-  if (!rpgRework('fight', engine)) return null
+ * she fights as (null for a locked outfit: "As a Mage"). */
+export function racingTemplate(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null): { label: string; value: string; note: string }[] {
   const pick = pickOf(outfit, uma)
   const t = umaTemplate(outfit, pick)
   return [
@@ -132,11 +123,10 @@ export interface CallingTile {
   selected: boolean
 }
 /** The calling pick card (CP29, §10.2): two tiles for a Pace or Late Uma whose calling isn't confirmed, the suggested one
- * first and marked ("Suggested · Power 96 over Wit 88"). Null for a fixed row, a confirmed calling, and before v16. */
-export function callingCard(outfit: TemplateOutfit, calling: UmaCalling | null | undefined, engine: number = BATTLE_ENGINE_VERSION):
-  { tiles: CallingTile[]; suggested: string } | null {
+ * first and marked ("Suggested · Power 96 over Wit 88"). Null for a fixed row and a confirmed calling. */
+export function callingCard(outfit: TemplateOutfit, calling: UmaCalling | null | undefined): { tiles: CallingTile[]; suggested: string } | null {
   const pick = umaCallingPick(outfit)
-  if (!rpgRework('fight', engine) || !pick || calling?.confirmed) return null
+  if (!pick || calling?.confirmed) return null
   const current = calling?.pick && pick.options.includes(calling.pick) ? calling.pick : pick.suggested
   const { power, wit } = pick
   return {

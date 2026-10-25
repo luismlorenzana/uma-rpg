@@ -1,19 +1,19 @@
 // An outfit's profile (S1–S7, reorganised D60 and D77): a header with her Uma Level and EXP, the class she fights as,
-// her Craft Level and what she's doing now, then tabs: Skills (class, five weapons, skill trees, Class Ranks; first, as it
+// her Craft Level and what she's doing now, then tabs: Skills (class, three weapons, skill trees, Class Ranks; first, as it
 // changes most), Battle (her RPG stats), Gear (the standard preset, equipment, Weapon and Armor Ranks, Extra Stats),
 // Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
 // the Unlock flow and her racing profile; an outfit another tier's world owns says where she lives, and a later tier
 // sends unlocks to Tier 1 (H35, D5). The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56,
-// SD3). "Can upgrade" (H34) dots the Skills and Gear tabs, greens the class chip's points and counts Extra Stats. From
-// engine v16 (the Tier rework's R1, H70) her template's chip and card follow the stars, a Pace or Late Uma's calling pick
-// card sits above her class chip until confirmed, and the Racing tab's "Her template" replaces what her aptitudes did.
+// SD3). "Can upgrade" (H34) dots the Gear tab and counts Extra Stats. Engine v16 (the Tier rework's R1, H70, live since
+// H72): her template's chip and card follow the stars, a Pace or Late Uma's calling pick card sits above her class chip
+// until confirmed, and the Racing tab's "Her template" says what her aptitudes do.
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
-  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, best, classOf, classRankOf, classTrack, DISTANCE_GEAR, EFFECT_LABEL,
+  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, classOf, classRankOf, classTrack, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgV2, SaveRuleError, skillText, STYLE_CLASSES, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
+  rpgExpToNext, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -46,9 +46,9 @@ const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#
 const TABS = ['skills', 'battle', 'gear', 'work', 'racing'] as const
 type Tab = (typeof TABS)[number]
 const TAB_LABEL: Record<Tab, string> = { skills: 'Skills', battle: 'Battle', gear: 'Gear', work: 'Work', racing: 'Racing' }
-/** A tab's "Can upgrade" dot (H34): Skills while a side skill can be learned, Gear while a piece or Extra Stats can. */
+/** A tab's "Can upgrade" dot (H34): Gear while a piece or Extra Stats can (no skill costs points from engine v16, CP14). */
 function tabDot(t: Tab, up: UmaUpgrades | null): { dot?: boolean; dotLabel?: string } {
-  const on = !!up && (t === 'skills' ? up.points > 0 : t === 'gear' ? up.gear > 0 || up.stars > 0 : false)
+  const on = !!up && t === 'gear' && (up.gear > 0 || up.stars > 0)
   return on ? { dot: true, dotLabel: `${TAB_LABEL[t]}, can upgrade` } : {}
 }
 const TAB_KEY = 'rpg.profile.tab.v2'
@@ -131,7 +131,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         </div>}
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
-        summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} points={upgrades?.points ?? 0} onClass={() => setTab('skills')} />
+        summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} onClass={() => setTab('skills')} />
           : home !== null ? <ElsewhereNote text={`In Tier ${home}`} />
           : tier > 1 ? <ElsewhereNote text="Unlocked in Tier 1" />
           : <UnlockBox outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />}
@@ -168,7 +168,7 @@ function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
 }
 
 /** Under the header: her Uma EXP and the class she fights as, then her Craft Level and what she's up to. */
-function Summary({ outfit, owned, world, points, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; points: number; onClass: () => void }) {
+function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; onClass: () => void }) {
   const navigate = useNavigate()
   const now = useNow(30_000)
   const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
@@ -181,7 +181,7 @@ function Summary({ outfit, owned, world, points, onClass }: { outfit: RosterOutf
         <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
         <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
         <CallingCard outfit={outfit} uma={owned} />
-        <ClassChip outfit={outfit} uma={owned} points={points} onClick={onClass} />
+        <ClassChip outfit={outfit} uma={owned} onClick={onClass} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-md bg-raised p-2">
@@ -302,9 +302,8 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
 
 // --- Skills: class, weapons, trees (D86), then every class's rank ------------------------------------------------
 
-/** The class she fights as and its five weapons, under her level: one tap to the Skills tab. `points` are her unspent side
- * points while a side skill can be learned now (H34), else 0, so the green pill means "spend them". */
-function ClassChip({ outfit, uma, points, onClick }: { outfit: RosterOutfit; uma: OwnedUma; points: number; onClick: () => void }) {
+/** The class she fights as and its three weapons, under her level: one tap to the Skills tab. */
+function ClassChip({ outfit, uma, onClick }: { outfit: RosterOutfit; uma: OwnedUma; onClick: () => void }) {
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
   const rank = classRankOf(uma.ranks, classId)
@@ -318,7 +317,6 @@ function ClassChip({ outfit, uma, points, onClick }: { outfit: RosterOutfit; uma
           <span className="inline-flex gap-0.5">{setup.weapons.map((w) => <WeaponGlyph key={w} weapon={w} size={12} />)}</span>
         </span>
       </span>
-      {points > 0 && <span className="shrink-0 rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{points} pts</span>}
       <span className="shrink-0 text-ink-faint">›</span>
     </button>
   )
@@ -462,9 +460,7 @@ function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutf
     { name: 'Distance', grades: outfit.aptitudes.distance as Record<string, string> },
     { name: 'Style', grades: outfit.aptitudes.strategy as Record<string, string> },
   ]
-  const [style, styleGrade] = best(outfit.aptitudes.strategy)
-  const [distance, distanceGrade] = best(outfit.aptitudes.distance)
-  // v16 (UT14): her template's readings and Flourish; before it, what her aptitudes did (H72 deletes those two rows).
+  // UT14: her template's readings and Flourish, what her aptitudes do here.
   const template = racingTemplate(outfit, uma, uma ? activeClass(outfit, uma) : null)
   return (
     <div className="space-y-4">
@@ -480,22 +476,12 @@ function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutf
           </div>
         ))}
       </div>
-      {template ? (
-        <section>
-          <h4 className="text-micro mb-1">Her template</h4>
-          <div className="divide-y divide-hairline rounded-md bg-raised">
-            {template.map((r) => <Row key={r.label} label={r.label} value={r.value} note={r.note} />)}
-          </div>
-        </section>
-      ) : (
-        <section>
-          <h4 className="text-micro mb-1">What her aptitudes do here</h4>
-          <div className="divide-y divide-hairline rounded-md bg-raised">
-            <Row label="Learns fastest" value={STYLE_CLASSES[style].join(' / ')} note={`${KEY_LABELS[style]} ${styleGrade}`} />
-            <Row label="Masters fastest" value={DISTANCE_GEAR[distance].gear} note={`${KEY_LABELS[distance]} ${distanceGrade}`} />
-          </div>
-        </section>
-      )}
+      <section>
+        <h4 className="text-micro mb-1">Her template</h4>
+        <div className="divide-y divide-hairline rounded-md bg-raised">
+          {template.map((r) => <Row key={r.label} label={r.label} value={r.value} note={r.note} />)}
+        </div>
+      </section>
       <section>
         <h4 className="text-micro mb-1">Racing base stats · growth</h4>
         <table className="w-full text-[13px]">

@@ -1,6 +1,6 @@
 // The Tier rework's fight by generation (H64, D200): classes v2's rules to engine v15, the rework's from v16 behind
-// `rpgRework('fight')`, the live game still on 15 until H72. The v16 rows are class-progression.md §3 (CP2, CP3, CP12) and
-// SB11; every v15 row is today's game exactly.
+// `rpgRework('fight')`, the live game since H72 (D210). The v16 rows are class-progression.md §3 (CP2, CP3, CP12) and
+// SB11; every v15 row is the game before H72 exactly, which a v15 fight still replays on.
 import { describe, expect, it } from 'vitest'
 import {
   RPG_ALL_CLASSES, RPG_CLASS_SLOTS, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPON_SLOTS, rpgClassSlots, rpgClassWeapons, rpgDefaultWeapons, rpgHand,
@@ -12,7 +12,7 @@ import { WEAPON_EXP_PER_WEAPON, WEAPON_EXP_SHARE, weaponExpShares } from '../eco
 const V15 = 15, V16 = 16
 const A = 'arms', T = 'tome'
 
-/** Today's game (classes v2, engine v15), written out. */
+/** The game before H72 (classes v2, engine v15), written out. */
 const TODAY = {
   slots: {
     brawler: [A, A, A, A, A], mage: [T, T, T, T, T], spellblade: [A, A, A, T, T], cleric: [T, T, T, A, A], summoner: [T, T, T, A, A],
@@ -38,11 +38,11 @@ const V16_ROWS = {
 } as const
 
 describe('the Tier rework’s switch (H64)', () => {
-  it('opens each release at its engine, all dark on the live 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(15)
+  it('opens each release at its engine, the fight live on 16 since H72 and the rest dark', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
     expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, t2Weapons: 18, t2Classes: 19, t3: 20 })
     const stages = Object.keys(RPG_REWORK_ENGINE) as RpgReworkStage[]
-    expect(stages.map((s) => rpgRework(s))).toEqual([false, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s))).toEqual([true, false, false, false, false])
     expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false])
     expect([rpgRework('fight', V16), rpgRework('economy', V16)]).toEqual([true, false])
     for (const s of stages) expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 20)], s).toEqual([false, true, true])
@@ -50,24 +50,24 @@ describe('the Tier rework’s switch (H64)', () => {
 })
 
 describe('class rules, v15 and v16 (H64)', () => {
-  it('gives five weapon slots to v15 and three from v16; the live value is five', () => {
-    expect([rpgWeaponSlots(V15), rpgWeaponSlots(V16), rpgWeaponSlots()]).toEqual([5, 3, 5])
-    expect(RPG_WEAPON_SLOTS).toBe(5)
+  it('gives five weapon slots to v15 and three from v16; the live value is three', () => {
+    expect([rpgWeaponSlots(V15), rpgWeaponSlots(V16), rpgWeaponSlots()]).toEqual([5, 3, 3])
+    expect(RPG_WEAPON_SLOTS).toBe(3)
   })
 
-  it('types the slots by channel from v16, the lead channel first; v15 is today’s', () => {
+  it('types the slots by channel from v16, the lead channel first; v15 is classes v2’s', () => {
     for (const c of RPG_ALL_CLASSES) {
       expect(rpgClassSlots(c, V15), c).toEqual(TODAY.slots[c])
       expect(rpgClassSlots(c, V16), c).toEqual(V16_ROWS.slots[c])
-      expect(RPG_CLASS_SLOTS[c], c).toEqual(TODAY.slots[c])
+      expect(RPG_CLASS_SLOTS[c], c).toEqual(V16_ROWS.slots[c])
     }
   })
 
-  it('starts every class on the owner’s three from v16; v15 is today’s spreads', () => {
+  it('starts every class on the owner’s three from v16; v15 is classes v2’s spreads', () => {
     for (const c of RPG_ALL_CLASSES) {
       expect(rpgDefaultWeapons(c, V15), c).toEqual(TODAY.weapons[c])
       expect(rpgDefaultWeapons(c, V16), c).toEqual(V16_ROWS.weapons[c])
-      expect(rpgDefaultWeapons(c), c).toEqual(TODAY.weapons[c])
+      expect(rpgDefaultWeapons(c), c).toEqual(V16_ROWS.weapons[c])
       for (const v of [V15, V16]) expect(validRpgWeapons(c, rpgDefaultWeapons(c, v), v), `${c} v${v}`).toBe(true)
       expect(validRpgWeapons(c, rpgDefaultWeapons(c, V15), V16), c).toBe(false)
       expect(validRpgWeapons(c, rpgDefaultWeapons(c, V16), V15), c).toBe(false)
@@ -78,7 +78,7 @@ describe('class rules, v15 and v16 (H64)', () => {
     for (const c of RPG_ALL_CLASSES) {
       expect(rpgPicksWeapons(c, V15), c).toBe(c !== 'brawler' && c !== 'mage')
       expect(rpgPicksWeapons(c, V16), c).toBe(true)
-      expect(rpgPicksWeapons(c), c).toBe(rpgPicksWeapons(c, V15))
+      expect(rpgPicksWeapons(c), c).toBe(true)
     }
   })
 
@@ -126,8 +126,8 @@ describe('class rules, v15 and v16 (H64)', () => {
     const pick = (c: RpgClass, v?: number) => { const h = rpgHand({ classId: c }, v); return { arms: h.arms, tome: h.tome } }
     for (const c of RPG_ALL_CLASSES) {
       expect(pick(c, V15), c).toEqual(TODAY.hands[c])
-      expect(pick(c), c).toEqual(TODAY.hands[c])
       expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.58 } : TODAY.hands[c])
+      expect(pick(c), c).toEqual(pick(c, V16))
       const [h15, h16] = [rpgHand({ classId: c }, V15), rpgHand({ classId: c }, V16)]
       expect({ ...h16, arms: h15.arms }, c).toEqual(h15)
     }
@@ -137,14 +137,14 @@ describe('class rules, v15 and v16 (H64)', () => {
 })
 
 describe('weapon EXP, E a weapon (H64)', () => {
-  /** Today's rule, written out: 5E over her five weapons, two parts for each one she used. */
+  /** v15's rule, written out: 5E over her five weapons, two parts for each one she used. */
   const today = (weapons: readonly RpgWeapon[], used: ReadonlySet<RpgWeapon>, exp: number) => {
     const parts = weapons.reduce((n, w) => n + (used.has(w) ? 2 : 1), 0)
     return Object.fromEntries(weapons.map((w) => [w, Math.round((5 * exp * (used.has(w) ? 2 : 1)) / parts)]))
   }
 
-  it('pays five weapons today’s 5E exactly, whichever she used', () => {
-    expect([WEAPON_EXP_PER_WEAPON, WEAPON_EXP_SHARE]).toEqual([1, 5])
+  it('pays five weapons v15’s 5E exactly, whichever she used (an open v15 fight settles on five)', () => {
+    expect([WEAPON_EXP_PER_WEAPON, WEAPON_EXP_SHARE]).toEqual([1, 3])
     for (const c of RPG_ALL_CLASSES) {
       const five = rpgDefaultWeapons(c, V15)
       for (let mask = 0; mask < 32; mask++) {

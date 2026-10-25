@@ -213,10 +213,11 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v23 = version < 23 && isRecord(v22) ? toV23(v22) : v22
   const v24 = version < 24 && isRecord(v23) ? toV24(v23) : v23
   const v25 = version < 25 && isRecord(v24) ? toV25(v24) : v24
-  return version < 26 && isRecord(v25) ? toV26(v25) : v25
+  const v26 = version < 26 && isRecord(v25) ? toV26(v25) : v25
+  return version < 27 && isRecord(v26) ? toV27(v26) : v26
 }
 
-// --- v26 → v27 (D205): R1, the Tier rework's fight. Written dark in H69, chained by H72 with SAVE_SCHEMA_VERSION 27 -----
+// --- v26 → v27 (D205): R1, the Tier rework's fight. Written in H69, chained by H72 with SAVE_SCHEMA_VERSION 27 (D210) ---
 
 /** The owner's three weapons a class (CP3, D200), in slot order, as literals: a migration step is frozen history. */
 const V27_DEFAULTS: Readonly<Record<string, readonly string[]>> = {
@@ -285,8 +286,8 @@ function v27Uma(raw: unknown): unknown {
 
 /**
  * v26 → v27 (D205; class-progression.md §14, CP31's v27 part): R1's three weapons, branch picks for side skills, the
- * loadout pruned and the calling pick stored, and nobody loses progress. Written dark in H69 and **chained by H72** with
- * `SAVE_SCHEMA_VERSION` 27, in the switch's commit (until then the parse reads v27's shape only with the switch at 16).
+ * loadout pruned and the calling pick stored, and nobody loses progress. Written dark in H69 and chained by H72 (D210)
+ * with `SAVE_SCHEMA_VERSION` 27, in the switch's commit.
  * Per Uma, per class in `classes` that still has `tree` and no `lines`:
  * 1. `weapons` become the class's new defaults (CP3); her per-tree picks stay, so slotting an old kind back restores its
  *    line, and her crafted weapons stay equipped on their kinds;

@@ -1,8 +1,8 @@
-// The calling pick over the save (H69, D205; class-progression.md §10, CP29–CP30; uma-templates UT17): the one switch
-// mocked to 16 in this file of its own (H64's `capsAt`). A Pace or Late Uma picks between her row's two classes until her
-// calling is confirmed, by a tap or by her first won fight; at Uma Lv 1 the pick also moves her start. Invented outfits.
+// The calling pick over the save (H69, D205; class-progression.md §10, CP29–CP30; uma-templates UT17), live since H72
+// (D210). A Pace or Late Uma picks between her row's two classes until her calling is confirmed, by a tap or by her first
+// won fight; at Uma Lv 1 the pick also moves her start. Invented outfits.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
 import { battleActionsLeft } from '../rpg/battle/engine'
 import type { BattleEnemy } from '../rpg/battle/types'
@@ -18,7 +18,6 @@ import { ids, OUTFITS as RIFT_OUTFITS, play, riftWorldSave, ROSTER, T as RT, TWE
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { gearV1, newOwnedUma, newSave, parseSave, startingArmorKinds, type OwnedUma, type Save, type TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
 const T = (n: number) => new Date(Date.UTC(2026, 9, 25, 12) + n * 60_000).toISOString()
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
@@ -78,10 +77,9 @@ function winWorldFight(save: Save): Save {
 }
 
 describe('the calling pick (H69)', () => {
-  it('is stored open on every new Uma from v16, and not before', () => {
+  it('is stored open on every new Uma', () => {
     expect(newOwnedUma(T(0)).calling).toEqual({ pick: null, confirmed: false })
     expect(newOwnedUma(T(0), 'brawler').calling).toEqual({ pick: null, confirmed: false })
-    expect(newOwnedUma(T(0), 'mage', 15)).not.toHaveProperty('calling')
     expect(umaOf(party(), '305').calling).toEqual({ pick: null, confirmed: false })
     roundTrip(party())
   })

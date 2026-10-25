@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { withTrack } from '@rpg/domain'
 import { albumRows, stableResult, STABLE_PRESETS, STABLE_SCHEMA } from './rows'
 import { albumFixture, NOW } from './testing'
 import { umaUpgrades, withUpgrades } from './upgrades'
@@ -22,11 +21,12 @@ describe('Can upgrade on the Stable (H34)', () => {
   it('withUpgrades sets the facet, and the Can upgrade preset keeps only those Umas', async () => {
     const { view, world } = await albumFixture()
     const aster = world.umas['81001']!
-    world.umas['81001'] = { ...aster, ranks: withTrack(aster.ranks, { kind: 'class', id: 'brawler' }, { rank: 5, exp: 0 }) }
+    // An open Extra Stats node she hasn't switched on (no skill costs points from engine v16).
+    world.umas['81001'] = { ...aster, stars: { unlocked: ['moon:atk:1'], active: [] } }
     const plain = albumRows(view, world, [], NOW)
     expect(plain.every(row => row.upgrades === null && row.facets.upgrade === false)).toBe(true)
     const rows = withUpgrades(plain, world)
-    expect(rows.find(row => row.id === '81001')).toMatchObject({ upgrades: { points: 5, any: true }, facets: { upgrade: true } })
+    expect(rows.find(row => row.id === '81001')).toMatchObject({ upgrades: { freeNodes: 1, any: true }, facets: { upgrade: true } })
     expect(rows.find(row => row.id === '81006')).toMatchObject({ upgrades: null, facets: { upgrade: false } })
     const picked = STABLE_PRESETS.find(p => p.key === 'upgrade')!.apply(STABLE_SCHEMA.fallback)
     expect(picked.filters).toEqual({ upgrade: true })

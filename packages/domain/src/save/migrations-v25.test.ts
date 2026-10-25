@@ -1,26 +1,31 @@
-// Save v25's migration (H58): `toV25` as written dark, chained by H61 (D188): a v24 save parses as v25 through it.
+// Save v25's migration (H58): `toV25` as written dark, chained by H61 (D188): a v24 save parses through it (and through
+// v26's and v27's steps since H72).
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
-import { migrateWorld, toV25, toV26 } from './migrations'
+import { migrateWorld, toV25, toV26, toV27 } from './migrations'
 import { gearV1, parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
-import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save } from './v25.fixture'
+import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save, type V24Class } from './v25.fixture'
 
-const world = (): TierWorld => JSON.parse(JSON.stringify(v24Save().tierWorlds['1'])) as TierWorld
-const migrate = (w: TierWorld): TierWorld => toV25(w as unknown as Record<string, unknown>) as unknown as TierWorld
-const umaOf = (w: TierWorld, id: string): OwnedUma => w.umas[id]!
+/** A v24 Uma: her classes in v24's shape. */
+type V24Uma = Omit<OwnedUma, 'classes'> & { classes: Partial<Record<string, V24Class>> }
+type V24World = Omit<TierWorld, 'umas'> & { umas: Record<string, V24Uma> }
+const world = (): V24World => JSON.parse(JSON.stringify(v24Save().tierWorlds['1'])) as V24World
+const migrate = (w: V24World): V24World => toV25(w as unknown as Record<string, unknown>) as unknown as V24World
+const umaOf = (w: V24World, id: string): V24Uma => w.umas[id]!
+const raw = (w: unknown) => w as Record<string, unknown>
 
 describe('save v25’s migration (H58, chained in H61)', () => {
-  it('stays chained before v26: a v24 world runs through both later steps and a v25 world only gains its lead', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(26)
-    const raw = world()
-    expect(migrateWorld(raw, 24)).toEqual(toV26(migrate(world()) as unknown as Record<string, unknown>))
-    expect(migrateWorld(raw, 25)).toEqual(toV26(raw as unknown as Record<string, unknown>))
-    // A v24 save parses through v25 and v26.
+  it('stays chained before v26 and v27: a v24 world runs through every later step, a v25 world through v26’s and v27’s', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(27)
+    const w24 = world()
+    expect(migrateWorld(w24, 24)).toEqual(toV27(toV26(raw(migrate(world())))))
+    expect(migrateWorld(w24, 25)).toEqual(toV27(toV26(raw(w24))))
+    // A v24 save parses through v25, v26 and v27.
     const save = v24Save()
     expect(save.schemaVersion).toBe(24)
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(26)
-    expect(parsed).toEqual(parseSave(migrated(save, (w) => toV26(toV25(w)))))
+    expect(parsed.schemaVersion).toBe(27)
+    expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV27(toV26(toV25(w)))) as object), schemaVersion: 27 }))
     expect(Object.keys(parsed.tierWorlds['1']!.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
   })
 
@@ -30,10 +35,11 @@ describe('save v25’s migration (H58, chained in H61)', () => {
     expect(after.classes.paladin!.weapons).toEqual(['greatsword', 'axe', 'bow', 'tome-fire', 'tome-ice'])
     // Her tree renamed, Rebirth and Heavy Transfix included; her Class Rank copied, the others' untouched.
     expect(after.classes.paladin!.tree).toEqual(['paladin-greatsword.1a', 'paladin-axe.2a', 'paladin-tome-light.3b', 'paladin-lance.4b'])
+    // The live names (v16's since H72: Valkyrie's Oath moved to her Light 3B, CP37; to v15 it was her Lance 4B).
     expect(rpgNode('cleric-tome-light.3b')!.name).toBe('Rebirth')
-    expect(rpgNode('paladin-tome-light.3b')!.name).toBe('Heavy Devotion')
+    expect(rpgNode('paladin-tome-light.3b')!.name).toBe("Valkyrie's Oath")
     expect(rpgNode('cleric-lance.4b')!.name).toBe('Heavy Transfix')
-    expect(rpgNode('paladin-lance.4b')!.name).toBe("Valkyrie's Oath")
+    expect(rpgNode('paladin-lance.4b')!.name).toBe('Heavy Transfix')
     expect(after.ranks.classes).toEqual({ cleric: { rank: 40, exp: 0 }, mage: { rank: 5, exp: 0 }, paladin: { rank: 40, exp: 0 } })
     expect(after.classes.mage).toEqual(umaOf(world(), '103').classes.mage)
     expect(after.classId).toBe('cleric')

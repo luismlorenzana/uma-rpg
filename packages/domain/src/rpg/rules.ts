@@ -37,7 +37,7 @@ export const RPG_MAX_LEGACY_SLOTS = 2
 export const RPG_MAX_TREE_NODES = 50
 /** The weapons every class wields in an engine's generation: five to v15 (D86), three from v16 (CP2, D200). */
 export const rpgWeaponSlots = (engine: number = BATTLE_ENGINE_VERSION): number => (rpgRework('fight', engine) ? 3 : 5)
-/** The live generation's weapon slots: five until H72 turns on the Tier rework's fight. */
+/** The live generation's weapon slots: three since H72 turned on the Tier rework's fight (D210). */
 export const RPG_WEAPON_SLOTS = rpgWeaponSlots()
 
 /** A learned node of one tier. */
@@ -329,7 +329,7 @@ const SLOT_GATES_V1: readonly number[] = [10, 15, 20, 25, 30, 35, 40]
 const slotGatesOf = byRework(SLOT_GATES_V1, SLOT_GATES_V1, [10, 20, 30, 40] as readonly number[])
 /** An engine's generation's slot gates. */
 export const rpgActiveSlotGates = (engine: number = BATTLE_ENGINE_VERSION): readonly number[] => slotGatesOf(engine)
-/** The live generation's gates and most slots: ten until H72 turns on the Tier rework's fight. */
+/** The live generation's gates and most slots: seven since H72 turned on the Tier rework's fight (D210). */
 export const RPG_ACTIVE_SLOT_GATES: readonly number[] = slotGatesOf(BATTLE_ENGINE_VERSION)
 export const RPG_MAX_ACTIVE_SLOTS = RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length
 

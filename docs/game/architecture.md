@@ -39,15 +39,15 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v25, parsing, migrations) and its rules: `class.ts` (an Uma's starting and active class, her setup per class, one healer a party; main bundle), `battle.ts` (classes, fights, rewards, Springs; the world map's fights load on demand through `@rpg/domain/battle`, H62), `work.ts` (jobs on the shared engine, and the slot view the screens read), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `presets.ts` (each class's standard equipment preset), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; lazy, through `@rpg/domain/rift`) |
-| `rpg/` | `kinds.ts` (weapons, elements, statuses), `rules.ts` (classes, stats, levels, learning), `catalog.ts` (every skill tree), `heroes.ts` and `hero-id.ts` (the six halls' 24 hero Limit Breaks, v14's twenty, Bonds), `battle/` (engine v15, classes v2, live since H61; v16, the Tier rework's fight, built behind `rpgRework`, live from H72; v17, the Tier rework's economy, built behind `rpgRework`, live from H82; `caps.ts` holds the switch, `BATTLE_ENGINE_VERSION`, and every class rule answers by generation so v6–v14 replay; limits, auto; the engine's functions load on demand through `@rpg/domain/engine`, `battle/index.ts`, and the main index keeps its types, caps and skill numbers, H62), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
+| `save/` | The save (`save.ts`: schema v27, parsing, migrations) and its rules: `class.ts` (an Uma's starting and active class, her setup per class, one healer a party; main bundle), `battle.ts` (classes, fights, rewards, Springs; the world map's fights load on demand through `@rpg/domain/battle`, H62), `work.ts` (jobs on the shared engine, and the slot view the screens read), `observatory.ts` (setting Star Gems, active nodes), `forge.ts`, `targets.ts` (targets), `presets.ts` (each class's standard equipment preset), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; lazy, through `@rpg/domain/rift`) |
+| `rpg/` | `kinds.ts` (weapons, elements, twins, statuses), `rules.ts` (classes, stats, levels, lines and Skill Ranks), `catalog.ts` (every skill tree), `tree-view.ts` (the Skills tab's tree model), `heroes.ts` and `hero-id.ts` (the six halls' 24 hero Limit Breaks, v14's twenty, Bonds), `battle/` (engine v16, the Tier rework's fight, live since H72, D210, on classes v2's, live since H61; v17, the Tier rework's economy, built behind `rpgRework`, live from H82; `caps.ts` holds the switch, `BATTLE_ENGINE_VERSION`, and `rpgRework(stage, engine)` opens each release, so every class rule answers by generation and v6–v15 replay; limits, auto; the engine's functions load on demand through `@rpg/domain/engine`, `battle/index.ts`, and the main index keeps its types, caps and skill numbers, H62), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `rift/` | `state.ts`: the Rift's save shape, constants, achievement ids and selectors (`riftOpen`, `riftLevel50s`, `openRiftRun`; main index); `achievements.ts`: the achievement hook; `fronts.ts`, `picker.ts`, `generate.ts`: the Rift's fronts, faces and fights (`@rpg/domain/rift`, a lazy subpath, through `index.ts`, which also exports `save/rift.ts`) |
 | `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `request.ts` (a job's request), `kinds/` (`gather.ts`, `refine.ts`, `craft.ts`, `cut.ts`: plan and pay), `env.ts` (facilities as buildings, Speed Tickets, Craft Level, Laurels) |
 | `world/` | `biomes.ts`, `world.ts` (continents, regions, stage generator), `balance.test.ts` (the `SIM=1` win-rate simulation) |
 | `economy/` | `pacing.ts` (times, prices, Laurels), `ranks.ts` (Class, Weapon and Armor Ranks, Marks), `jobs.ts` (facilities), `stars.ts` (the Extra Stats map and gem ids), `gems.ts` (Star Gem recipes), `gear.ts`, `bonus.ts` (Extra Stats points), `stock.ts` |
 | `items/` | The 8 families and 160 items |
 | `hub/places.ts` | Every place on the four Hub pages, and Town Hall's plaza |
-| `master/`, `roster/` | Master data to the game's roster, RPG aptitude labels and stat totals; `template.ts`, the Uma Template rule and the calling (D203), built dark: new unlocks start in their calling from v16, live from H72. Album queries/order live in uma-kit |
+| `master/`, `roster/` | Master data to the game's roster, RPG aptitude labels and stat totals; `template.ts`, the Uma Template rule and the calling (D203): a new unlock starts in her calling (live since H72). Album queries/order live in uma-kit |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
 ## Web app
@@ -120,7 +120,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   the appearance and Motion, the shared `ContentProvider`, and `AlbumArtProvider`. Faces use
   uma-data 1.1.0's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their own families.
   `album/` holds RPG row values, schema, eligibility and the one-time old preference migration. `hub/` holds this
-  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v26 stay game-owned.
+  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v27 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API
@@ -155,7 +155,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v25** (`save/save.ts`).
+- **Schema v27** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -185,6 +185,13 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     API backs the stored v24 save up to `saveBackups/{uid}-v24` on the first v25 write (D69).
   - **v26:** each party gains `lead`. The migration names its first occupied slot, preserving the face used by v25,
     while later lead changes leave all five slots in place (D190).
+  - **v27:** the Tier rework's fight (D205, D210). Every class an Uma has set up gets its three default weapons (her
+    crafted pieces stay equipped on their kinds), her side skills become **lines** (B on a tree where she learned any
+    node of its B line, at any depth; `tree` goes), and her loadout keeps, in her order, what she still holds within
+    v16's slots at her level (none left: back to auto). Every Uma gains `calling: { pick: null, confirmed: false }`: her
+    pre-selection, unconfirmed. Class Ranks, seats, Bonds, Marks, gear, parties and the open fights don't move (their
+    v15 inputs replay and settle on v15). The API backs the stored v26 save up to `saveBackups/{uid}-v26` on the first
+    v27 write (D69).
 
 ```
 Save { schemaVersion, account, tierWorlds: { "1": TierWorld } }
@@ -206,10 +213,11 @@ WorkRow { outfitId, slot { building, slot } | null, entries [Entry], queue [≤3
   dropped { at, slot, requests, short, refused } | null }
 Entry { request { kind, item, count }, seconds[], inputs[], outputs[], exp[], startedAt, acceleratedMs, collected, speed,
   fromQueue }   (times in milliseconds)
-OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons, tree, loadout } },   (six classes; equipped
-  accessory-1 an Orb, accessory-2 a Talisman or an Amulet)
+OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons[3], lines { <weapon>: B }, loadout } },
+  (six classes; equipped accessory-1 an Orb, accessory-2 a Talisman or an Amulet)
   craft { level, exp }, ranks { classes, weapons, armors, accessories: { <id>: { rank, exp } } },
-  stars { unlocked, active }, gear { locker, equipped, kinds }, bonds { <seat>: { level, exp } } }
+  stars { unlocked, active }, gear { locker, equipped, kinds }, bonds { <seat>: { level, exp } },
+  calling { pick: spellblade | mage | paladin | cleric | null, confirmed } }
 ```
 
 An open fight is stored as `{ input, actions }`: the frozen fight and every action, replayed on load (D52).

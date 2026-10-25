@@ -1,6 +1,5 @@
-// Save v27's migration (H69, D205; class-progression.md §14, CP31): `toV27` as written dark, pure and with the switch at
-// today's 15. Not chained: `SAVE_SCHEMA_VERSION` stays 26 and `migrateWorld` never calls it until H72. The parse of what
-// it writes, with the switch at 16, is `save-v27.test.ts`'s; here the live parse still reads v26 and refuses v27's keys.
+// Save v27's migration (H69, D205; class-progression.md §14, CP31): `toV27`, pure, and chained by H72 (D210) with
+// `SAVE_SCHEMA_VERSION` 27. The parse of what it writes is `save-v27.test.ts`'s.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { RPG_BRANCH_B, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
@@ -20,12 +19,14 @@ const one = (level: number, classId: RpgClass, setup: Partial<ClassLoadout> & Ra
 }
 const BRAWLER_ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana']
 
-describe('save v27’s migration (H69), dark', () => {
-  it('is written but not chained: v26 stays the live version and the chain never runs it', () => {
-    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([26, 15])
+describe('save v27’s migration (H69), chained by H72', () => {
+  it('runs on every world before v27 and on none at v27', () => {
+    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([27, 16])
     const raw = world() as unknown as Raw
-    expect(migrateWorld(raw, 26)).toBe(raw)
-    expect(migrateWorld(raw, 25)).not.toHaveProperty('umas.100.calling')
+    expect(migrateWorld(raw, 27)).toBe(raw)
+    expect(migrateWorld(raw, 26)).toEqual(toV27(raw))
+    // A v25 world runs through v26's lead step too, then v27's.
+    expect(migrateWorld(raw, 25)).toHaveProperty('umas.100.calling', { pick: null, confirmed: false })
   })
 
   it('moves §14’s worked Brawler to her three defaults, her sides to lines and her loadout to what she still holds', () => {
@@ -133,19 +134,21 @@ describe('save v27’s migration (H69), dark', () => {
   })
 })
 
-describe('the live parse with the switch at 15 (today)', () => {
-  it('parses the v26 save as it is, five weapons and sides, and refuses v27’s keys', () => {
+describe('the live parse (H72)', () => {
+  it('parses a save labelled v26 through the chain to v27, as `toV27` writes it, and refuses v26’s keys on a v27 world', () => {
     const save = v26Save()
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed).toEqual(save)
-    expect(parsed.tierWorlds['1']!.umas['100']!.classes.brawler!.weapons).toHaveLength(5)
-    const withLines = migrated(save, (w) => {
-      const umas = w.umas as Record<string, Raw>
-      umas['104'] = { ...umas['104'], classes: { summoner: { weapons: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'], tree: [], lines: {}, loadout: null } } }
-      return w
+    expect(parsed.schemaVersion).toBe(27)
+    expect(parsed).toEqual(parseSave(migrated(save, toV27)))
+    expect(parsed.tierWorlds['1']!.umas['100']!.classes.brawler!.weapons).toHaveLength(3)
+    // A world that keeps a v26 class beside v27's keys fails: the chain left it (it holds `lines`), and `tree` is no key.
+    const mixed = migrated(save, (w) => {
+      const next = toV27(w)
+      const umas = next.umas as Record<string, Raw>
+      umas['104'] = { ...umas['104'], classes: { summoner: { weapons: ['tome-dark', 'tome-light', 'bow'], tree: [], lines: {}, loadout: null } } }
+      return next
     })
-    expect(() => parseSave(withLines)).toThrow(SaveParseError)
-    expect(() => parseSave(withLines)).toThrow(/umas\.104\.classes\.summoner: unknown keys lines/)
-    expect(() => parseSave(migrated(save, toV27))).toThrow(/umas\.100: unknown keys calling/)
+    expect(() => parseSave(mixed)).toThrow(SaveParseError)
+    expect(() => parseSave(mixed)).toThrow(/umas\.104\.classes\.summoner: unknown keys tree/)
   })
 })

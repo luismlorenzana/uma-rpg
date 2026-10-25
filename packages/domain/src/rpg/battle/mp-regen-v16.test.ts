@@ -46,7 +46,7 @@ function regained(version: Version, spec: Spec = {}): number {
   return mpOf(round(s).state) - mpOf(s)
 }
 
-describe('the base MP regen (SB18), engine v16, dark (H68)', () => {
+describe('the base MP regen (SB18), engine v16 (H68, live since H72)', () => {
   it('is 0.9% of her max MP a depth open, five at most, rounded, at least 1, and nothing before v16', () => {
     expect([RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS]).toEqual([0.009, 5])
     // 0.9 · 1.8 · 2.7 · 3.6 · 4.5% at Class Rank 1 · 10 · 20 · 30 · 40, and Class Rank 50 the same as 40.
@@ -54,7 +54,8 @@ describe('the base MP regen (SB18), engine v16, dark (H68)', () => {
     // stat-balance §7.2's Tier 1 Mage at Lv 10 · 20 · 30 · 40 · 50 on Class Rank = level: bar 107 · 148 · 194 · 243 · 296.
     expect([[107, 10], [148, 20], [194, 30], [243, 40], [296, 50]].map(([mp, rank]) => rpgBaseMpRegen(mp!, rank!, 16))).toEqual([2, 4, 7, 11, 13])
     expect([rpgBaseMpRegen(296, 1, 16), rpgBaseMpRegen(296, 10, 16), rpgBaseMpRegen(50, 1, 16)]).toEqual([3, 5, 1])
-    expect([rpgBaseMpRegen(296, 40, 15), rpgBaseMpRegen(296, 40, 14), rpgBaseMpRegen(296, 40)]).toEqual([0, 0, 0])
+    // The live default is v16 since H72 (D210).
+    expect([rpgBaseMpRegen(296, 40, 15), rpgBaseMpRegen(296, 40, 14), rpgBaseMpRegen(296, 40)]).toEqual([0, 0, 13])
   })
 
   it('gives a Mage with 296 max MP 13 at a round’s end at Class Rank 40, in one MP cue, round after round', () => {
