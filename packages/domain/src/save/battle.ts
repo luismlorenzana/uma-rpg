@@ -83,7 +83,7 @@ export function chooseClass(save: Save, outfitId: string, classId: RpgClass, now
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classId } } }, now)
 }
 
-/** Sets the five weapons a Summoner, Spell Blade or Cleric wields (a Brawler's and a Mage's are fixed). */
+/** Sets the weapons a class wields, as the live generation's slots allow (`validRpgWeapons`). */
 export function setClassWeapons(save: Save, outfitId: string, classId: RpgClass, weapons: readonly RpgWeapon[], now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfitId)
   if (!validRpgWeapons(classId, weapons)) throw new SaveRuleError('bad-loadout', 'those weapons don’t fit this class’s slots')
@@ -91,11 +91,12 @@ export function setClassWeapons(save: Save, outfitId: string, classId: RpgClass,
 }
 
 /**
- * Puts a weapon in one of a class's five slots (D98); the weapons in her slots are the trees she fights with. Every Uma
- * holds a Training weapon of all ten kinds (grade 0, no stats), so a null `gearId` means the Training one, and a crafted
- * piece of that kind is worn instead (from her locker, or from the stock, binding it). A Summoner, Spell Blade or Cleric
- * can change a slot's weapon within the slot's kind (one already in another slot swaps places); a Brawler's and a
- * Mage's slots keep theirs. A crafted piece serves every class that holds its weapon.
+ * Puts a weapon in one of a class's slots (D98), by the live generation's slots (`RPG_CLASS_SLOTS`, five to v15, three
+ * from v16); the weapons in her slots are the trees she fights with. Every Uma holds a Training weapon of all ten kinds
+ * (grade 0, no stats), so a null `gearId` means the Training one, and a crafted piece of that kind is worn instead (from
+ * her locker, or from the stock, binding it). A class that picks (`rpgPicksWeapons`: to v15 all but the Brawler and the
+ * Mage, from v16 every class) can change a slot's weapon within the slot's kind (one already in another slot swaps
+ * places); the others keep theirs. A crafted piece serves every class that holds its weapon.
  */
 export function holdWeapon(save: Save, outfitId: string, classId: RpgClass, slot: number, weapon: RpgWeapon, gearId: string | null, now: string,
   tier = TIER_ONE): Save {

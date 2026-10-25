@@ -8,7 +8,8 @@
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
-// v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs.
+// v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs;
+// v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
@@ -30,12 +31,13 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, B
 import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
- * the engine. Older versions still replay; v15 is live since H61 (D188). */
-export { BATTLE_ENGINE_VERSION, RPG_V2_ENGINE, rpgV2 } from './caps'
+ * the engine. Older versions still replay; v15 is live since H61 (D188). The Tier rework's releases open at their engines
+ * (`rpgRework`, D200). */
+export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpgV2, type RpgReworkStage } from './caps'
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'
-import { rpgV2 } from './caps'
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const
+import { rpgRework, rpgV2 } from './caps'
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] as const
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -113,9 +115,11 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
 
 /** Learned, slotted and legal for her class; the same tree rules the profile enforces. v8 adds her Class Rank, her
  * weapons' Might, her armor's Barrier and Regen (D102, D104). Her class and weapons by the fight's generation (D179): a
- * Paladin only from v15. */
+ * Paladin only from v15. From v16 (the Tier rework's fight, D200) three weapons by channel and position, and no side
+ * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31). */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
+  if (rpgRework('fight', version) && (!Array.isArray(a.tree) || a.tree.length > 0 || !Array.isArray(a.legacy) || a.legacy.length > 0)) return false
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a, version)) return false
   if (!validCharms(a, version)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
@@ -176,7 +180,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {

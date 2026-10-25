@@ -1,11 +1,14 @@
 // An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
-// wields five weapons and has a tree per weapon; its Class Rank opens the depths and pays the points for side skills
-// (D102), her Uma Level her stats and skill slots, and a hand per class scales power and MP.
-// Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/design/classes-v2.md) from v15. Each
-// takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game follows
-// the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live generation's.
+// wields five weapons to v15, three from v16 (the Tier rework's fight), and has a tree per weapon; its Class Rank opens
+// the depths and pays the points for side skills (D102), her Uma Level her stats and skill slots, and a hand per class
+// scales power and MP.
+// Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/design/classes-v2.md) from v15, and
+// from v16 the Tier rework's fight (D200, docs/design/tier-rework/class-progression.md §3), a third row where it differs.
+// Each takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game
+// follows the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live
+// generation's.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { BATTLE_ENGINE_VERSION, rpgV2 } from './battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
 import { rpgClassWeapons, rpgNodeIdentity as rpgNode, rpgSideNodeLevel, rpgTreeOf, type RpgNodeIdentity as RpgNode } from './node-identity'
 import {
   isRpgTome, isRpgWeapon, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, type RpgClass, type RpgTreeId, type RpgWeapon,
@@ -27,8 +30,10 @@ export const RPG_MAX_ACTIVE_SLOTS = RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATE
 export const RPG_MAX_LEGACY_SLOTS = 2
 /** Side skills one class may hold: one per depth in each of ten trees. */
 export const RPG_MAX_TREE_NODES = 50
-/** Every class wields five weapons (D86). */
-export const RPG_WEAPON_SLOTS = 5
+/** The weapons every class wields in an engine's generation: five to v15 (D86), three from v16 (CP2, D200). */
+export const rpgWeaponSlots = (engine: number = BATTLE_ENGINE_VERSION): number => (rpgRework('fight', engine) ? 3 : 5)
+/** The live generation's weapon slots: five until H72 turns on the Tier rework's fight. */
+export const RPG_WEAPON_SLOTS = rpgWeaponSlots()
 
 /** A learned node of one tier. */
 export interface RpgNodeRef { tier: number; id: string }
@@ -38,7 +43,7 @@ export interface RpgProfile {
   baseStats: Stats
   growthRates: Stats
   classId: RpgClass
-  /** The five weapons the class wields now (D86). */
+  /** The weapons the class wields now, in slot order: five to v15 (D86), three from v16 (CP2). */
   weapons: RpgWeapon[]
   tier: number
   level: number
@@ -68,8 +73,14 @@ export interface RpgCoreStats extends Stats {
 // Each class rule's generations are rows of data (D179). A Paladin row in a v1 table holds her v2 values: the type needs
 // it, and no v1 fight or save has a Paladin.
 const byGeneration = <T>(v1: T, v2: T) => (engine: number): T => (rpgV2(engine) ? v2 : v1)
+/** A rule with a third row (D200): classes v1's and v2's as `byGeneration`, the Tier rework's fight's from v16. */
+const byRework = <T>(v1: T, v2: T, v16: T) => {
+  const older = byGeneration(v1, v2)
+  return (engine: number): T => (rpgRework('fight', engine) ? v16 : older(engine))
+}
 
-/** What each of a class's five slots holds. Brawler and Mage wield all of their five; the others choose. */
+/** What each of a class's slots holds, in order. To v15 the Brawler and the Mage wield all of their five and the others
+ * choose; from v16 every class chooses (CP12), each slot a channel. */
 export type RpgSlotKind = 'arms' | 'tome' | 'any'
 const ARMS_LED: readonly RpgSlotKind[] = ['arms', 'arms', 'arms', 'tome', 'tome']
 const TOME_LED: readonly RpgSlotKind[] = ['tome', 'tome', 'tome', 'arms', 'arms']
@@ -81,9 +92,21 @@ const SLOTS_V1: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = {
   cleric: ['any', 'any', 'any', 'any', 'any'],
   paladin: ARMS_LED,
 }
+/** The Tier rework's fight (v16, CP2): three slots typed by channel, her lead channel first. The Brawler 3 Arms, the
+ * Mage 3 Tomes, the Spell Blade and the Paladin 2 Arms + 1 Tome, the Summoner and the Cleric 2 Tomes + 1 Arm. */
+const ARMS_PAIR: readonly RpgSlotKind[] = ['arms', 'arms', 'tome']
+const TOME_PAIR: readonly RpgSlotKind[] = ['tome', 'tome', 'arms']
+const SLOTS_V16: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = {
+  brawler: ['arms', 'arms', 'arms'],
+  mage: ['tome', 'tome', 'tome'],
+  summoner: TOME_PAIR,
+  spellblade: ARMS_PAIR,
+  cleric: TOME_PAIR,
+  paladin: ARMS_PAIR,
+}
 /** Classes v2 (§3): the Cleric 3 Tomes + 2 Arms, the Paladin her mirror. */
-const slotsOf = byGeneration(SLOTS_V1, { ...SLOTS_V1, cleric: TOME_LED })
-/** A class's five slots in an engine's generation. */
+const slotsOf = byRework(SLOTS_V1, { ...SLOTS_V1, cleric: TOME_LED }, SLOTS_V16)
+/** A class's slots in an engine's generation. */
 export const rpgClassSlots = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): readonly RpgSlotKind[] => slotsOf(engine)[classId]
 /** The live generation's slots. */
 export const RPG_CLASS_SLOTS: Readonly<Record<RpgClass, readonly RpgSlotKind[]>> = slotsOf(BATTLE_ENGINE_VERSION)
@@ -99,8 +122,10 @@ export const RPG_CLASS_ARMOR: Readonly<Record<RpgClass, 'physical' | 'magical'>>
   summoner: 'magical',
   paladin: 'physical',
 }
-/** Whether a class picks its weapons (Summoner, Spell Blade, Cleric, Paladin) or wields a fixed five. */
-export const rpgPicksWeapons = (classId: RpgClass): boolean => classId !== 'brawler' && classId !== 'mage'
+/** Whether a class picks its weapons in an engine's generation: to v15 the Summoner, Spell Blade, Cleric and Paladin
+ * (the Brawler and the Mage wield a fixed five); from v16 every class, any kinds of her slots' channels (CP12). */
+export const rpgPicksWeapons = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): boolean =>
+  rpgRework('fight', engine) || (classId !== 'brawler' && classId !== 'mage')
 const WEAPONS_V1: Readonly<Record<RpgClass, readonly RpgWeapon[]>> = {
   brawler: RPG_WEAPON_KINDS, mage: RPG_TOMES,
   summoner: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'],
@@ -108,18 +133,32 @@ const WEAPONS_V1: Readonly<Record<RpgClass, readonly RpgWeapon[]>> = {
   cleric: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'],
   paladin: ['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire'],
 }
+/** The owner's defaults (v16, CP3), in slot order: the pure classes the ring (Fire, Ice and Lightning's twins in each
+ * channel), the hybrids and the Cleric a twin set in both channels, the Paladin her Barriers and her Light. */
+const WEAPONS_V16: Readonly<Record<RpgClass, readonly RpgWeapon[]>> = {
+  brawler: ['greatsword', 'axe', 'lance'],
+  mage: ['tome-fire', 'tome-ice', 'tome-lightning'],
+  summoner: ['tome-dark', 'tome-light', 'bow'],
+  spellblade: ['katana', 'lance', 'tome-lightning'],
+  cleric: ['tome-light', 'tome-ice', 'bow'],
+  paladin: ['greatsword', 'axe', 'tome-light'],
+}
 /** Classes v2 (D179): the Cleric's Light, Dark and Thunder Tomes with Katana and Bow serve the Arcane party's shields, as
  * the Paladin's Greatsword, Axe and Lance with Blizzard and Fire Tomes serve the physical one. */
-const weaponsOf = byGeneration(WEAPONS_V1, { ...WEAPONS_V1, cleric: ['tome-light', 'tome-dark', 'tome-lightning', 'katana', 'bow'] })
-/** A class's weapons until she picks: Brawler and Mage their five, the others a spread (class-rework.md §10). */
+const weaponsOf = byRework(WEAPONS_V1, { ...WEAPONS_V1, cleric: ['tome-light', 'tome-dark', 'tome-lightning', 'katana', 'bow'] }, WEAPONS_V16)
+/** A class's weapons until she picks: to v15 Brawler and Mage their five, the others a spread (class-rework.md §10); from
+ * v16 the owner's three (CP3). */
 export function rpgDefaultWeapons(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): RpgWeapon[] {
   return [...weaponsOf(engine)[classId]]
 }
-/** Five different weapons, as many Tomes and Arms as the class's slots say in this engine's generation. */
+/** Different weapons of her class's trees, one a slot, in this engine's generation: to v15 five, as many Tomes and Arms as
+ * the class's slots say; from v16 three, each in a slot of its channel by position (CP2: her first slot is always her
+ * lead channel; swaps within a channel stay free). */
 export function validRpgWeapons(classId: RpgClass, weapons: readonly RpgWeapon[], engine: number = BATTLE_ENGINE_VERSION): boolean {
-  if (!Array.isArray(weapons) || weapons.length !== RPG_WEAPON_SLOTS || new Set(weapons).size !== weapons.length) return false
+  if (!Array.isArray(weapons) || weapons.length !== rpgWeaponSlots(engine) || new Set(weapons).size !== weapons.length) return false
   if (!weapons.every((w) => isRpgWeapon(w) && rpgClassWeapons(classId).includes(w))) return false
   const slots = rpgClassSlots(classId, engine)
+  if (rpgRework('fight', engine)) return weapons.every((w, i) => (slots[i] === 'tome') === isRpgTome(w))
   const tomes = weapons.filter(isRpgTome).length
   const want = slots.filter((k) => k === 'tome').length
   return slots.includes('any') || tomes === want
@@ -178,9 +217,12 @@ const HANDS_V1: Readonly<Record<RpgClass, RpgHand>> = {
  * (`BATTLE_FAREWELL_FACTOR`) on top. Her Tome summons carry her areas and her kit is all magic, so her Arms summon sits
  * near her Tome summon for a 70% magical split; her Tome stays the stronger hand, so it still leads (H60, D186, had
  * 0.68 + 0.32 and 0.58 + 0.32). */
-const handsOf = byGeneration(HANDS_V1, {
+const HANDS_V2: Readonly<Record<RpgClass, RpgHand>> = {
   ...HANDS_V1, spellblade: hand(0.72, 0.72, 0.44, 0.5, 0, true), summoner: hand(0.58, 0.56, 0.58, 0.5, 0.3, true),
-})
+}
+/** The Tier rework's fight (v16, SB11, CP9): v2's hands, the Summoner's Arms hand 0.48 (her Tome 0.58 still leads), the
+ * mirror's knob on the new maps. H71 measures it and may move it. */
+const handsOf = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58, 0.48, 0.58, 0.5, 0.3, true) })
 export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
   return { ...handsOf(engine)[p.classId] }
 }
