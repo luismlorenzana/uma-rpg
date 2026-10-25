@@ -4,234 +4,164 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extra Stats Maps</title>
-<!-- The Tier rework, Extra Stats Progression (extra-stats-progression.md): the Planet, its moons and every later body,
-     drawn at Tier 1, 2 and 3, every node with what it grants at that tier under SB1 (Tier 1 value × 1, 1.8, 2.6).
-     Generated from the doc's numbers; the node table lives in the DATA block below. Nothing from the original games. -->
+<!-- The Tier rework, Extra Stats Progression (extra-stats-progression.md), revised after the owner's review (2026-10-24):
+     the Planet, Prowess, Vigor, Guard and the weapon moons, drawn at Tier 1, 2 and 3 for every class, every node with what
+     it grants at that tier under SB1 (Tier 1 value × 1, 1.8, 2.6). Generated from the doc's model; the node table lives in
+     the DATA block below. Nothing from the original games: every Uma here is made up. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
     --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
-    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --danger: #c23b33; --success: #2f7a4f;
     --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
-    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #6250d6;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    /* One hue a body (charts), and the night sky the map is drawn on (dark in both themes, as the Observatory's). */
+    --b-planet: #eda100; --b-pro: #eb6834; --b-vig: #e34948; --b-grd: #2a78d6; --b-wm1: #1baf7a; --b-wm2: #6250d6; --b-tpl: #7d8a9b;
+    --p-mine: #2a78d6; --p-wood: #eb6834; --p-farm: #1baf7a; --p-fish: #eda100; --p-hunt: #e87ba4;
+    --sky: #142033; --sky-2: #1c2b42; --sky-ink: #e9eef4; --sky-soft: #9fb0c6; --sky-line: rgb(255 255 255 / 0.13);
+    --m-planet: #c98500; --m-pro: #d95926; --m-vig: #e66767; --m-grd: #3987e5; --m-wm1: #199e70; --m-wm2: #9085e9; --m-tpl: #8a98ac; --m-glow: #f2b33a;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
       --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
-      --accent: #d6a23e; --accent-wash: #2b2312;
+      --accent: #d6a23e; --accent-wash: #2b2312; --danger: #e0645c; --success: #4fb37a;
       --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
-      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --b-planet: #c98500; --b-pro: #d95926; --b-vig: #e66767; --b-grd: #3987e5; --b-wm1: #199e70; --b-wm2: #9085e9; --b-tpl: #6b7a8e;
+      --p-mine: #3987e5; --p-wood: #d95926; --p-farm: #199e70; --p-fish: #c98500; --p-hunt: #d55181;
+      --sky: #0b1220; --sky-2: #121d2e;
     }
   }
   * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
   body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
   h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
   h2 { font-size: 20px; margin: 0 0 4px; }
-  h3 { font-size: 14px; margin: 0 0 2px; }
+  h3 { font-size: 14px; margin: 0 0 4px; }
   p { margin: 0; }
-  .lead { color: var(--ink-soft); max-width: 900px; }
-  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  a { color: inherit; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin-bottom: 14px; max-width: 980px; }
   .muted { color: var(--ink-faint); }
-  section { margin-top: 40px; }
-  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  section { margin-top: 40px; scroll-margin-top: 56px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
     margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
   nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
   nav.top a:hover { background: var(--raised); }
-
-  /* KPI tiles */
-  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
-  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
-  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
-  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .value { font-size: 20px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
   .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
   .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
-
-  /* Tier themes */
-  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
-  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
-  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
-  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
-  .theme p { color: var(--ink-soft); font-size: 13px; }
-
-  /* Roadmap */
-  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
-  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
-  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
-  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
-  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
-  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
-  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
-  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
-  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
-  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
-  .lane .start .chip { white-space: normal; }
-  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
-  .track { position: relative; margin: 0 24px 0 18px; }
-  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
-    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
-  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
-  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
-  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
-  .chip.craft { border-style: dashed; }
-  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .ev { position: absolute; }
-  .ev.right { transform: translateX(-100%); }
-  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
-  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
-  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
-  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
-  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
-  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
-  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
-  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
-  .promo b { color: var(--ink); }
-
-  /* Charts */
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
-  .mini h3 { display: flex; align-items: center; gap: 6px; }
-  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .grid6 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
   svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .axis-text { fill: var(--ink-faint); font-size: 11px; }
   .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
   .val-soft { fill: var(--ink-soft); font-size: 11px; }
-  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 6px 0 6px; }
   .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
   details { margin-top: 10px; }
-  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
+  .scroll { overflow-x: auto; max-width: 100%; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th, td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
   th { color: var(--ink-soft); font-weight: 600; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { background: var(--raised); }
   .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
-
-  /* Matrix */
-  .matrix td { font-size: 13px; }
-  .matrix td.today { color: var(--ink-faint); }
-  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
-  .matrix th.t { border-top: 4px solid var(--tc); }
-  .matrix b { color: var(--ink); }
-
-  /* Tooltip */
-  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
-    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
-  #tip b { display: block; margin-bottom: 2px; }
-  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
-
-</style>
-<style>
-  /* Extra Stats pages: the kit's tokens above, plus one hue a body (the kit's categorical slots, validated as a set
-     in both modes), the night sky the map is drawn on (dark in both themes, as the Observatory's), and the five
-     gathering professions for recipes. */
-  :root {
-    --b-planet: #eda100; --b-str: #eb6834; --b-sor: #6250d6; --b-vig: #e34948; --b-grd: #2a78d6;
-    --b-halo: #1baf7a; --b-val: #e87ba4; --b-swf: #008300; --b-tpl: #7d8a9b;
-    --p-mine: #2a78d6; --p-wood: #eb6834; --p-farm: #1baf7a; --p-fish: #eda100; --p-hunt: #e87ba4;
-    --gear: #7d8a9b; --lvl: #c3cbd6; --flat: #c3cbd6;
-    --sky: #142033; --sky-2: #1c2b42; --sky-ink: #e9eef4; --sky-soft: #9fb0c6; --sky-line: rgb(255 255 255 / 0.13);
-    --m-planet: #c98500; --m-str: #d95926; --m-sor: #9085e9; --m-vig: #e66767; --m-grd: #3987e5;
-    --m-halo: #199e70; --m-val: #d55181; --m-swf: #008300; --m-tpl: #8a98ac; --m-glow: #f2b33a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --b-planet: #c98500; --b-str: #d95926; --b-sor: #9085e9; --b-vig: #e66767; --b-grd: #3987e5;
-      --b-halo: #199e70; --b-val: #d55181; --b-swf: #008300; --b-tpl: #6b7a8e;
-      --p-mine: #3987e5; --p-wood: #d95926; --p-farm: #199e70; --p-fish: #c98500; --p-hunt: #d55181;
-      --gear: #6b7a8e; --lvl: #4a586b; --flat: #4a586b;
-      --sky: #0b1220; --sky-2: #121d2e;
-    }
-  }
-  .grid2 > *, .multiples > * { min-width: 0; }
-  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
-    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
-  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
-  .controls { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin: 14px 0 12px; }
-  .toggle { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 999px; overflow: hidden; }
-  .toggle button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border: 0; background: var(--panel); color: var(--ink-soft); cursor: pointer; }
-  .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--ink); }
-  .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
   .note b { color: var(--ink); }
   .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
   .callout b { display: block; margin-bottom: 4px; }
-  .bdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--bc); }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills button:disabled { opacity: .4; cursor: not-allowed; }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .controls { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  input[type="range"] { accent-color: var(--accent); width: 200px; }
+  .slider { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+  .slider output { min-width: 40px; font-variant-numeric: tabular-nums; }
+  select { font: 600 12.5px system-ui, sans-serif; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); }
   .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
     background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
   .tag.new { border-color: var(--accent); background: var(--accent-wash); }
+  .tag.phys { color: var(--phys); border-color: color-mix(in srgb, var(--phys) 45%, transparent); }
+  .tag.magic { color: var(--magic); border-color: color-mix(in srgb, var(--magic) 45%, transparent); }
   .tier-chip { display: inline-flex; align-items: center; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 6px; color: #1b1300; background: var(--tc); }
-  .tier-chip.t3c { color: #fff; }
-  table.tight th, table.tight td { padding: 5px 8px; }
-  .scroll { overflow-x: auto; }
-  input[type="range"] { accent-color: var(--accent); width: 220px; }
-  .slider { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-  .slider output { min-width: 56px; font-variant-numeric: tabular-nums; }
-  .sw2 { width: 14px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
-  .ln { width: 18px; height: 0; border-top: 2px solid var(--lc); display: inline-block; flex: none; }
-  .ln.dash { border-top-style: dashed; }
+  .tier-chip.t3c, .tier-chip.t2c { color: #fff; }
+  .bdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--bc); }
   .mark { cursor: default; }
   .mark:focus { outline: none; }
   .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  @media (max-width: 1100px) { .controls { gap: 10px; } }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .bar-inline { display: inline-block; height: 8px; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } .grid3, .grid6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 </style>
 <style>
-  .mapgrid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .mapgrid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   .skywrap { border-radius: 16px; overflow: hidden; background: var(--sky); box-shadow: 0 1px 0 var(--hairline-strong); }
   .skywrap svg { display: block; width: 100%; height: auto; }
   .sky-text { fill: var(--sky-ink); font-weight: 700; }
   .sky-soft { fill: var(--sky-soft); }
   .nd { cursor: pointer; }
   .nd:focus { outline: none; }
-  .nd:focus-visible circle.ring { stroke: #fff; stroke-width: 3; }
   .nd .ring { fill: none; stroke: transparent; }
-  .nd.sel .ring { stroke: #fff; stroke-width: 2.5; }
-  .side { display: flex; flex-direction: column; gap: 12px; }
-  .sheet { background: var(--panel); border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--bc, var(--accent)); }
+  .nd.sel .ring, .nd:focus-visible .ring { stroke: #fff; stroke-width: 2.5; }
+  .side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .sheet { background: var(--panel); border-radius: 14px; padding: 14px 18px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--bc, var(--accent)); }
   .sheet h3 { font-size: 17px; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   .sheet .grant { font-size: 15px; font-weight: 650; margin: 2px 0 8px; }
-  .kv { display: grid; grid-template-columns: 120px 1fr; gap: 3px 10px; font-size: 13px; }
+  .kv { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; font-size: 13px; }
   .kv span:nth-child(odd) { color: var(--ink-soft); }
-  .across { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+  .across { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
   .across div { background: var(--raised); border-radius: 8px; padding: 6px 8px; font-size: 12px; border-top: 3px solid var(--tc); }
   .across b { display: block; font-size: 13px; }
-  .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .totals div { background: var(--raised); border-radius: 8px; padding: 6px 9px; font-size: 12px; color: var(--ink-soft); }
   .totals b { display: block; color: var(--ink); font-size: 15px; font-variant-numeric: tabular-nums; }
-  .totals .off { opacity: .45; }
+  .moonset { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .moonrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+  .moonrow .nm { font-weight: 700; min-width: 112px; display: inline-flex; align-items: center; gap: 6px; }
+  .toggle { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 999px; overflow: hidden; }
+  .toggle button { font: 600 12px system-ui, sans-serif; padding: 4px 11px; border: 0; background: var(--panel); color: var(--ink-soft); cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .toggle button:disabled { opacity: .35; cursor: not-allowed; }
+  .warn { font-size: 12px; color: var(--danger); }
   .nextlist { font-size: 12.5px; color: var(--ink-soft); margin: 6px 0 0; padding-left: 18px; }
   .nextlist b { color: var(--ink); }
   .legend-row { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 2px 0; }
   .legend-row span { display: inline-flex; align-items: center; gap: 6px; }
-  .bodies { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .bcard { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--bc); display: flex; flex-direction: column; gap: 6px; }
-  .bcard .top { display: flex; gap: 12px; align-items: center; }
-  .bcard .top svg { width: 64px; height: 64px; flex: none; border-radius: 12px; background: var(--sky); }
-  .bcard h3 { font-size: 15px; }
-  .bcard .gv { font-size: 12.5px; color: var(--ink-soft); }
-  .bcard table th, .bcard table td { padding: 4px 6px; font-size: 12px; }
-  .bcard .meta { font-size: 11.5px; color: var(--ink-faint); }
-  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .ccard { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); cursor: pointer; border: 2px solid transparent; min-width: 0; }
+  .ccard[aria-pressed="true"] { border-color: var(--accent); }
+  .ccard h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 6px; }
+  .ccard .split { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 8px 0 6px; background: var(--sunken); }
+  .ccard .split i { display: block; height: 100%; }
+  .ccard table td, .ccard table th { padding: 3px 4px; font-size: 12px; }
+  .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .trio .cap { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 8px 2px 0; font-size: 12.5px; color: var(--ink-soft); }
   .trio .cap b { color: var(--ink); font-size: 14px; }
-  .trio ul { margin: 4px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--ink-soft); }
-  .phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+  .phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
   .phone { background: var(--panel); border-radius: 28px; padding: 14px 12px 16px; box-shadow: 0 1px 0 var(--hairline-strong), 0 0 0 6px var(--sunken); max-width: 380px; width: 100%; margin: 0 auto; }
   .phone .bar { display: flex; align-items: center; gap: 10px; background: var(--raised); border-radius: 10px; padding: 6px 8px; }
-  .phone .face { width: 36px; height: 36px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font-weight: 800; color: var(--ink-soft); flex: none; }
+  .phone .face { width: 34px; height: 34px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font-weight: 800; color: var(--ink-soft); flex: none; }
   .phone .who { flex: 1; min-width: 0; font-size: 12px; color: var(--ink-soft); }
   .phone .who b { display: block; font-size: 14px; color: var(--ink); }
   .phone .cnt { font-size: 11.5px; color: var(--ink-soft); text-align: right; }
@@ -239,48 +169,46 @@
   .phone .pmap svg { display: block; width: 100%; height: auto; }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .chip2 { font-size: 12px; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: var(--raised); border: 1px solid var(--hairline-strong); }
-  .chip2 i { font-style: normal; color: var(--ink-faint); margin-left: 4px; }
-  .ptot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; text-align: center; }
+  .ptot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 8px; text-align: center; }
   .ptot span { background: var(--raised); border-radius: 6px; padding: 3px 2px; font-size: 11px; color: var(--ink-soft); }
   .ptot b { display: block; font-size: 12.5px; color: var(--ink); }
   .pset { margin-top: 10px; }
   .pset h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
   .prow { display: flex; align-items: center; gap: 8px; background: var(--raised); border-radius: 8px; padding: 6px 8px; margin-bottom: 5px; }
-  .prow .gem { width: 26px; height: 26px; flex: none; }
+  .prow .gem { width: 22px; height: 22px; flex: none; border-radius: 6px; }
   .prow .t { flex: 1; min-width: 0; font-size: 12px; }
   .prow .t b { display: block; font-size: 12.5px; }
   .prow .t span { color: var(--ink-soft); font-size: 11px; }
   .prow .set { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: var(--accent); color: #1b1300; }
   .psheet { margin-top: 8px; border: 1px dashed var(--hairline-strong); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink-soft); }
   .psheet b { color: var(--ink); }
-  .phone-notes { font-size: 12.5px; color: var(--ink-soft); margin: 10px 6px 0; }
-  .phone-notes li { margin-bottom: 3px; }
-  .vs { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 16px; align-items: start; }
-  .vs .skywrap { aspect-ratio: auto; }
-  .vs h3 { margin: 0 0 6px; }
-  @media (max-width: 1100px) { .mapgrid, .vs { grid-template-columns: 1fr; } .bodies, .trio, .phones { grid-template-columns: 1fr 1fr; } }
+  .fs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .fs3 .skywrap { border-radius: 12px; }
+  @media (max-width: 1100px) { .mapgrid { grid-template-columns: 1fr; } .trio, .phones, .fs3 { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
 <main>
   <h1>Extra Stats: the map at every tier</h1>
-  <p class="lead">The Planet sits where today's Sun sits and raises every core stat; four moons each do one job; later tiers add
-    the Halo, Valor and Swiftness. Pick a tier, a class and her level: every node shows what it grants at that tier
-    (Tier 1 value × 1, × 1.8, × 2.6), its jewel and when it opens. Hover a node for its line, click it for its sheet.
-    From <a href="../extra-stats-progression.md">extra-stats-progression.md</a>.</p>
+  <p class="lead">The Planet raises every core stat; three moons each do one job (Prowess her offense, split by her class;
+    Vigor her pools; Guard her defenses). Tier 2 adds a <b>weapon moon</b>, Full on one kind or Split on two, and Tier 3 a
+    second, so her three weapons are served. Every class opens the same nodes. Pick a tier, a class, her level and her
+    weapon moons: every node shows what it grants. Hover a node for its line, click it for its sheet. Revised after the
+    owner's review, 2026-10-24. From <a href="../extra-stats-progression.md">extra-stats-progression.md</a>.</p>
   <nav class="top">
-    <a href="#map">The map</a><a href="#bodies">Every body</a><a href="#side">Side by side</a><a href="#screen">The Observatory</a><a href="#today">Today vs Tier 1</a><a href="#nodes">Every node</a>
-    <a href="stars-grants.html">Grants page →</a><a href="stars-jewels.html">Jewels page →</a>
+    <a href="#map">The map</a><a href="#classes">Every class</a><a href="#split">Full or Split</a><a href="#side">Side by side</a><a href="#screen">The Observatory</a><a href="#nodes">Every node</a>
+    <a class="out" href="stars-grants.html">Grants →</a><a class="out" href="stars-jewels.html">Jewels →</a><a class="out" href="stars-uma.html">Her moon →</a>
   </nav>
   <div class="kpis" id="kpis"></div>
 
   <section id="map">
     <h2>The solar system</h2>
-    <p class="sub">Filled nodes are open at her level, outlined ones still to come. A moon her class doesn't use is drawn dim:
-      it still counts, and does nothing for her. Dashed gold marks what the tier adds.</p>
+    <p class="sub">Filled nodes are open at her level, outlined ones still to come. Dashed gold marks what the tier adds;
+      a dashed circle marks a weapon moon a later tier brings. A Split weapon moon is drawn as two moonlets on one track:
+      the same five nodes light both kinds.</p>
     <div class="controls">
-      <div class="pills" id="tier-pills"><span class="lbl">Tier</span></div>
-      <div class="pills" id="class-pills"><span class="lbl">Class</span></div>
+      <div class="pills" id="tier-pills"></div>
+      <div class="pills" id="class-pills"></div>
       <label class="slider">Uma Lv <input type="range" id="lv" min="1" max="50" value="50"><output id="lv-out">50</output></label>
     </div>
     <div class="mapgrid">
@@ -289,9 +217,13 @@
         <div class="legend-row" id="legend"></div>
       </div>
       <div class="side">
+        <div class="panel" style="padding:14px 16px">
+          <h3>Her weapon moons</h3>
+          <div class="moonset" id="moonset"></div>
+        </div>
         <div class="sheet" id="sheet"></div>
         <div class="panel" style="padding:14px 16px">
-          <div class="head-row" style="justify-content:space-between"><h3 id="tot-h">Her Extra Stats</h3><span class="muted" id="tot-n" style="font-size:12px"></span></div>
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><h3 id="tot-h">Her Extra Stats</h3><span class="muted" id="tot-n" style="font-size:12px"></span></div>
           <div class="totals" id="totals" style="margin-top:8px"></div>
           <p class="foot" id="tot-foot"></p>
           <h3 style="margin-top:12px">Opens next</h3>
@@ -299,116 +231,96 @@
         </div>
       </div>
     </div>
-    <details class="panel" style="margin-top:12px"><summary>Show the numbers: every node at this tier</summary><div class="scroll" id="tier-table"></div></details>
+    <details class="panel" style="margin-top:12px"><summary>Show the numbers: every node at this tier, for this class</summary><div class="scroll" id="tier-table"></div></details>
   </section>
 
-  <section id="bodies">
-    <h2>Every body, and what it grants at each tier</h2>
-    <p class="sub">Grants are points; HP is 5 a point. Each node's points are its Tier 1 points × 1.8 or × 2.6, rounded to
-      the nearest point. Limit start and evasion are shares already, so they don't scale.</p>
-    <div class="bodies" id="body-cards"></div>
+  <section id="classes">
+    <h2>Every class's map: the same nodes, her own split</h2>
+    <p class="sub">The owner's review: "Mages and Brawlers requiring fewer jewels makes no sense." Every class opens the same
+      20 · 25 · 30 nodes and sets the same jewels; Prowess sends each node's points to ATK or M.ATK by her class. Click a
+      class to draw its map above.</p>
+    <div class="grid6" id="ccards"></div>
+    <details class="panel" style="margin-top:12px"><summary>Show the numbers: Prowess node by node, every class</summary><div class="scroll" id="pro-table"></div></details>
+  </section>
+
+  <section id="split">
+    <h2>Full or Split: the owner's Pure or Dual, for the moons</h2>
+    <p class="sub">A weapon moon is five nodes of flat offense on her hits of a kind. <b>Full</b>: one kind at the full
+      values. <b>Split</b>: two kinds at 0.7 each, the same five jewels. In Tier 3 a second moon joins: Full + Split serves
+      all three of her weapons. Drawn for the Brawler's default set at Lv 50.</p>
+    <div class="fs3" id="fs-maps"></div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="panel"><h3>What the Tier 2 moon adds to her act</h3><div class="chart-legend" id="fs-legend"></div><div id="fs-chart"></div></div>
+      <div class="panel"><h3>The choice, in one rule</h3>
+        <p class="sub" style="margin:4px 0 8px">A Split is 1.4 Full moons spread over two kinds. <b>Full beats Split when her
+          damage on the Full's kind is more than 2⅓ times her damage on the Split's second kind.</b></p>
+        <ul class="nextlist" style="font-size:13px">
+          <li><b>The campaign</b> (her acts spread over her weapons): Split wins for every class.</li>
+          <li><b>A tuned front</b> (75% of her acts on one kind: a Rift path, a region she farms): Full wins for the pure classes and the healers.</li>
+          <li><b>A hybrid</b>: a Split on her pair (her lone half is in every act), as the Twin Orb is hers.</li>
+          <li><b>Tier 3:</b> Full + Split beats Full + Full for every class in the campaign; Split + Split isn't offered (she slots three kinds).</li>
+        </ul>
+      </div>
+    </div>
+    <details class="panel" style="margin-top:12px"><summary>Show the numbers: Full against Split, every class</summary><div class="scroll" id="fs-table"></div></details>
   </section>
 
   <section id="side">
     <h2>Side by side: Tier 1, 2 and 3</h2>
-    <p class="sub">Every node open (Lv 50). The core never gains nodes; each tier adds two small bodies, and every value grows
-      with the tier.</p>
+    <p class="sub">Every node open (Lv 50), the class picked above, her preset weapon moons. The core never gains nodes; each
+      later tier adds a weapon moon, and every value grows with the tier.</p>
     <div class="trio" id="trio"></div>
   </section>
 
   <section id="screen">
     <h2>The Observatory, tier by tier</h2>
     <p class="sub">One page in every tier, growing with the map: the header's counter, the map drawn in code as today, the
-      totals, the Halo's kind from Tier 2, and the Set list. No toggles. Uma A is a Spell Blade, a made-up Uma.</p>
+      weapon moons' chip from Tier 2, the totals and the Set list. No toggles. Uma A is a made-up Spell Blade, a Fleet
+      Flashblade.</p>
     <div class="phones" id="phones"></div>
-  </section>
-
-  <section id="today">
-    <h2>Today vs Tier 1</h2>
-    <p class="sub">Today's map is a Sun, eight planets, ten moons each, sixteen bridges and four Sun nodes, with 5 to 30 of
-      them active by hand. Tier 1's is the Planet and four moons, and every open node counts.</p>
-    <div class="vs">
-      <div><h3>Today: 100 nodes</h3><div class="skywrap" id="today-map"></div></div>
-      <div><h3>Tier 1: 25 nodes (+ 2 hers)</h3><div class="skywrap" id="t1-map"></div></div>
-      <div class="panel" style="padding:12px 14px"><table class="tight" id="vs-table"></table></div>
-    </div>
   </section>
 
   <section id="nodes">
     <h2>Every node at every tier</h2>
-    <p class="sub">The reference: 35 nodes, their grade, gate and jewel, and the grant at each tier. "—": the body isn't in that tier.</p>
+    <p class="sub">The reference: 32 nodes (20 core, 10 weapon moon, 2 hers), their grade, gate and jewel, and the grant at
+      each tier. Prowess's points split by her class (§3.3). "—": the body isn't in that tier.</p>
     <div class="panel scroll"><table id="all-nodes"></table></div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-const DATA = {"M":{"1":1,"2":1.8,"3":2.6},"nodeTable":[{"id":"planet:1","body":"planet","n":"I","grade":1,"lv":1,"jewel":"Planet Jewel I","stats":["hp","mp","atk","matk","def","mdef"],"t1":1,"t1pts":1,"t2pts":2,"t3pts":3},{"id":"planet:2","body":"planet","n":"II","grade":3,"lv":11,"jewel":"Planet Jewel II","stats":["hp","mp","atk","matk","def","mdef"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"planet:3","body":"planet","n":"III","grade":5,"lv":21,"jewel":"Planet Jewel III","stats":["hp","mp","atk","matk","def","mdef"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"planet:4","body":"planet","n":"IV","grade":7,"lv":31,"jewel":"Planet Jewel IV","stats":["hp","mp","atk","matk","def","mdef"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"planet:5","body":"planet","n":"V","grade":9,"lv":41,"jewel":"Planet Jewel V","stats":["hp","mp","atk","matk","def","mdef"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"strength:1","body":"strength","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["atk"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"strength:2","body":"strength","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["atk"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"strength:3","body":"strength","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["atk"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"strength:4","body":"strength","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["atk"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"strength:5","body":"strength","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["atk"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"sorcery:1","body":"sorcery","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["matk"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"sorcery:2","body":"sorcery","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["matk"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"sorcery:3","body":"sorcery","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["matk"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"sorcery:4","body":"sorcery","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["matk"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"sorcery:5","body":"sorcery","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["matk"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"vigor:1","body":"vigor","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["hp","mp"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"vigor:2","body":"vigor","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["hp","mp"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"vigor:3","body":"vigor","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["hp","mp"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"vigor:4","body":"vigor","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["hp","mp"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"vigor:5","body":"vigor","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["hp","mp"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"guard:1","body":"guard","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["def","mdef"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"guard:2","body":"guard","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["def","mdef"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"guard:3","body":"guard","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["def","mdef"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"guard:4","body":"guard","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["def","mdef"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"guard:5","body":"guard","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["def","mdef"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"halo:1","body":"halo","kindSlot":1,"n":"I","grade":5,"lv":21,"jewel":"Halo Jewel I","stats":["kind"],"t1":10,"t2pts":18,"t3pts":26,"from":2},{"id":"halo:2","body":"halo","kindSlot":1,"n":"II","grade":10,"lv":46,"jewel":"Halo Jewel II","stats":["kind"],"t1":24,"t2pts":43,"t3pts":62,"from":2},{"id":"halo:3","body":"halo","kindSlot":2,"n":"III","grade":5,"lv":21,"jewel":"Halo Jewel III","stats":["kind"],"t1":10,"t2pts":18,"t3pts":26,"from":3},{"id":"halo:4","body":"halo","kindSlot":2,"n":"IV","grade":10,"lv":46,"jewel":"Halo Jewel IV","stats":["kind"],"t1":24,"t2pts":43,"t3pts":62,"from":3},{"id":"valor:1","body":"valor","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["Limit start"],"t1":2,"t2pts":2,"t3pts":2,"from":2},{"id":"valor:2","body":"valor","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["Limit start"],"t1":2,"t2pts":2,"t3pts":2,"from":2},{"id":"swiftness:1","body":"swiftness","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["evasion %"],"t1":3,"t2pts":3,"t3pts":3,"from":3},{"id":"swiftness:2","body":"swiftness","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["evasion %"],"t1":3,"t2pts":3,"t3pts":3,"from":3},{"id":"template:1","body":"template","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["knack"],"t1":4,"t2pts":7,"t3pts":10},{"id":"template:2","body":"template","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["lead"],"t1":8,"t2pts":14,"t3pts":21}],"sheets":{"brawler":{"1":{"hp":{"base":1072,"armor":150,"es":255,"total":1477,"esShare":0.17264725795531483,"buildShare":0.2742044685172647,"flat":{"es":255,"total":1477,"esShare":0.17264725795531483}},"mp":{"base":132,"armor":30,"es":51,"total":213,"esShare":0.23943661971830985,"buildShare":0.38028169014084506,"flat":{"es":51,"total":213,"esShare":0.23943661971830985}},"atk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"matk":{"base":95,"armor":0,"es":21,"total":116,"esShare":0.1810344827586207,"buildShare":0.1810344827586207,"flat":{"es":21,"total":116,"esShare":0.1810344827586207}},"def":{"base":116,"armor":40,"es":51,"total":207,"esShare":0.2463768115942029,"buildShare":0.4396135265700483,"flat":{"es":51,"total":207,"esShare":0.2463768115942029}},"mdef":{"base":91,"armor":40,"es":51,"total":182,"esShare":0.2802197802197802,"buildShare":0.5,"flat":{"es":51,"total":182,"esShare":0.2802197802197802}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1818,"armor":270,"es":460,"total":2548,"esShare":0.18053375196232338,"buildShare":0.28649921507064363,"flat":{"es":255,"total":2223,"esShare":0.11470985155195682}},"mp":{"base":222,"armor":54,"es":92,"total":368,"esShare":0.25,"buildShare":0.3967391304347826,"flat":{"es":51,"total":303,"esShare":0.16831683168316833}},"atk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"matk":{"base":168,"armor":0,"es":38,"total":206,"esShare":0.18446601941747573,"buildShare":0.18446601941747573,"flat":{"es":21,"total":189,"esShare":0.1111111111111111}},"def":{"base":206,"armor":72,"es":92,"total":370,"esShare":0.24864864864864866,"buildShare":0.44324324324324327,"flat":{"es":51,"total":297,"esShare":0.1717171717171717}},"mdef":{"base":162,"armor":72,"es":92,"total":326,"esShare":0.2822085889570552,"buildShare":0.5030674846625767,"flat":{"es":51,"total":253,"esShare":0.2015810276679842}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2573,"armor":390,"es":665,"total":3628,"esShare":0.18329658213891953,"buildShare":0.2907938257993385,"flat":{"es":255,"total":2978,"esShare":0.08562793821356615}},"mp":{"base":312,"armor":78,"es":133,"total":523,"esShare":0.25430210325047803,"buildShare":0.40344168260038243,"flat":{"es":51,"total":393,"esShare":0.1297709923664122}},"atk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"matk":{"base":243,"armor":0,"es":55,"total":298,"esShare":0.18456375838926176,"buildShare":0.18456375838926176,"flat":{"es":21,"total":264,"esShare":0.07954545454545454}},"def":{"base":297,"armor":104,"es":133,"total":534,"esShare":0.24906367041198502,"buildShare":0.4438202247191011,"flat":{"es":51,"total":388,"esShare":0.13144329896907217}},"mdef":{"base":233,"armor":104,"es":133,"total":470,"esShare":0.28297872340425534,"buildShare":0.5042553191489362,"flat":{"es":51,"total":324,"esShare":0.1574074074074074}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"mage":{"1":{"hp":{"base":839,"armor":150,"es":255,"total":1244,"esShare":0.204983922829582,"buildShare":0.32556270096463025,"flat":{"es":255,"total":1244,"esShare":0.204983922829582}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":95,"armor":0,"es":21,"total":116,"esShare":0.1810344827586207,"buildShare":0.1810344827586207,"flat":{"es":21,"total":116,"esShare":0.1810344827586207}},"matk":{"base":121,"armor":25,"es":51,"total":197,"esShare":0.25888324873096447,"buildShare":0.38578680203045684,"flat":{"es":51,"total":197,"esShare":0.25888324873096447}},"def":{"base":95,"armor":40,"es":51,"total":186,"esShare":0.27419354838709675,"buildShare":0.489247311827957,"flat":{"es":51,"total":186,"esShare":0.27419354838709675}},"mdef":{"base":111,"armor":40,"es":51,"total":202,"esShare":0.2524752475247525,"buildShare":0.4504950495049505,"flat":{"es":51,"total":202,"esShare":0.2524752475247525}},"offense":{"base":121,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":265,"esShare":0.19245283018867926,"buildShare":0.5433962264150943,"flat":{"es":51,"total":265,"esShare":0.19245283018867926}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1423,"armor":270,"es":460,"total":2153,"esShare":0.21365536460752438,"buildShare":0.3390617742684626,"flat":{"es":255,"total":1828,"esShare":0.13949671772428884}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":168,"armor":0,"es":38,"total":206,"esShare":0.18446601941747573,"buildShare":0.18446601941747573,"flat":{"es":21,"total":189,"esShare":0.1111111111111111}},"matk":{"base":215,"armor":45,"es":92,"total":352,"esShare":0.26136363636363635,"buildShare":0.38920454545454547,"flat":{"es":51,"total":291,"esShare":0.17525773195876287}},"def":{"base":168,"armor":72,"es":92,"total":332,"esShare":0.27710843373493976,"buildShare":0.4939759036144578,"flat":{"es":51,"total":259,"esShare":0.1969111969111969}},"mdef":{"base":197,"armor":72,"es":92,"total":361,"esShare":0.2548476454293629,"buildShare":0.45429362880886426,"flat":{"es":51,"total":288,"esShare":0.17708333333333334}},"offense":{"base":215,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":596,"esShare":0.25671140939597314,"buildShare":0.639261744966443,"flat":{"es":85,"total":427,"esShare":0.1990632318501171}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2013,"armor":390,"es":665,"total":3068,"esShare":0.2167535853976532,"buildShare":0.3438722294654498,"flat":{"es":255,"total":2418,"esShare":0.1054590570719603}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":243,"armor":0,"es":55,"total":298,"esShare":0.18456375838926176,"buildShare":0.18456375838926176,"flat":{"es":21,"total":264,"esShare":0.07954545454545454}},"matk":{"base":311,"armor":65,"es":133,"total":509,"esShare":0.26129666011787817,"buildShare":0.3889980353634578,"flat":{"es":51,"total":387,"esShare":0.13178294573643412}},"def":{"base":243,"armor":104,"es":133,"total":480,"esShare":0.27708333333333335,"buildShare":0.49375,"flat":{"es":51,"total":334,"esShare":0.15269461077844312}},"mdef":{"base":284,"armor":104,"es":133,"total":521,"esShare":0.255278310940499,"buildShare":0.45489443378119004,"flat":{"es":51,"total":375,"esShare":0.136}},"offense":{"base":311,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":862,"esShare":0.25638051044083526,"buildShare":0.6392111368909513,"flat":{"es":85,"total":523,"esShare":0.16252390057361377}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"spellblade":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":166,"armor":30,"es":51,"total":247,"esShare":0.20647773279352227,"buildShare":0.32793522267206476,"flat":{"es":51,"total":247,"esShare":0.20647773279352227}},"atk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"matk":{"base":100,"armor":0,"es":51,"total":151,"esShare":0.33774834437086093,"buildShare":0.33774834437086093,"flat":{"es":51,"total":151,"esShare":0.33774834437086093}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":278,"armor":54,"es":92,"total":424,"esShare":0.2169811320754717,"buildShare":0.3443396226415094,"flat":{"es":51,"total":359,"esShare":0.14206128133704735}},"atk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"matk":{"base":178,"armor":0,"es":92,"total":270,"esShare":0.34074074074074073,"buildShare":0.34074074074074073,"flat":{"es":51,"total":229,"esShare":0.22270742358078602}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":391,"armor":78,"es":133,"total":602,"esShare":0.22093023255813954,"buildShare":0.3504983388704319,"flat":{"es":51,"total":472,"esShare":0.10805084745762712}},"atk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"matk":{"base":257,"armor":0,"es":133,"total":390,"esShare":0.34102564102564104,"buildShare":0.34102564102564104,"flat":{"es":51,"total":308,"esShare":0.16558441558441558}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"summoner":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":166,"armor":30,"es":51,"total":247,"esShare":0.20647773279352227,"buildShare":0.32793522267206476,"flat":{"es":51,"total":247,"esShare":0.20647773279352227}},"atk":{"base":100,"armor":0,"es":51,"total":151,"esShare":0.33774834437086093,"buildShare":0.33774834437086093,"flat":{"es":51,"total":151,"esShare":0.33774834437086093}},"matk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":278,"armor":54,"es":92,"total":424,"esShare":0.2169811320754717,"buildShare":0.3443396226415094,"flat":{"es":51,"total":359,"esShare":0.14206128133704735}},"atk":{"base":178,"armor":0,"es":92,"total":270,"esShare":0.34074074074074073,"buildShare":0.34074074074074073,"flat":{"es":51,"total":229,"esShare":0.22270742358078602}},"matk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":391,"armor":78,"es":133,"total":602,"esShare":0.22093023255813954,"buildShare":0.3504983388704319,"flat":{"es":51,"total":472,"esShare":0.10805084745762712}},"atk":{"base":257,"armor":0,"es":133,"total":390,"esShare":0.34102564102564104,"buildShare":0.34102564102564104,"flat":{"es":51,"total":308,"esShare":0.16558441558441558}},"matk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"paladin":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":105,"armor":25,"es":51,"total":181,"esShare":0.281767955801105,"buildShare":0.4198895027624309,"flat":{"es":51,"total":181,"esShare":0.281767955801105}},"matk":{"base":84,"armor":0,"es":51,"total":135,"esShare":0.37777777777777777,"buildShare":0.37777777777777777,"flat":{"es":51,"total":135,"esShare":0.37777777777777777}},"def":{"base":121,"armor":40,"es":51,"total":212,"esShare":0.24056603773584906,"buildShare":0.42924528301886794,"flat":{"es":51,"total":212,"esShare":0.24056603773584906}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":105,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":249,"esShare":0.20481927710843373,"buildShare":0.5783132530120482,"flat":{"es":51,"total":249,"esShare":0.20481927710843373}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":187,"armor":45,"es":92,"total":324,"esShare":0.2839506172839506,"buildShare":0.4228395061728395,"flat":{"es":51,"total":263,"esShare":0.19391634980988592}},"matk":{"base":150,"armor":0,"es":92,"total":242,"esShare":0.38016528925619836,"buildShare":0.38016528925619836,"flat":{"es":51,"total":201,"esShare":0.2537313432835821}},"def":{"base":215,"armor":72,"es":92,"total":379,"esShare":0.24274406332453827,"buildShare":0.43271767810026385,"flat":{"es":51,"total":306,"esShare":0.16666666666666666}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":187,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":568,"esShare":0.26936619718309857,"buildShare":0.670774647887324,"flat":{"es":85,"total":399,"esShare":0.21303258145363407}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":270,"armor":65,"es":133,"total":468,"esShare":0.2841880341880342,"buildShare":0.4230769230769231,"flat":{"es":51,"total":346,"esShare":0.14739884393063585}},"matk":{"base":216,"armor":0,"es":133,"total":349,"esShare":0.38108882521489973,"buildShare":0.38108882521489973,"flat":{"es":51,"total":267,"esShare":0.19101123595505617}},"def":{"base":311,"armor":104,"es":133,"total":548,"esShare":0.2427007299270073,"buildShare":0.4324817518248175,"flat":{"es":51,"total":402,"esShare":0.12686567164179105}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":270,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":821,"esShare":0.269183922046285,"buildShare":0.6711327649208283,"flat":{"es":85,"total":482,"esShare":0.17634854771784234}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"cleric":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":84,"armor":0,"es":51,"total":135,"esShare":0.37777777777777777,"buildShare":0.37777777777777777,"flat":{"es":51,"total":135,"esShare":0.37777777777777777}},"matk":{"base":105,"armor":25,"es":51,"total":181,"esShare":0.281767955801105,"buildShare":0.4198895027624309,"flat":{"es":51,"total":181,"esShare":0.281767955801105}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":116,"armor":40,"es":51,"total":207,"esShare":0.2463768115942029,"buildShare":0.4396135265700483,"flat":{"es":51,"total":207,"esShare":0.2463768115942029}},"offense":{"base":105,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":249,"esShare":0.20481927710843373,"buildShare":0.5783132530120482,"flat":{"es":51,"total":249,"esShare":0.20481927710843373}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":150,"armor":0,"es":92,"total":242,"esShare":0.38016528925619836,"buildShare":0.38016528925619836,"flat":{"es":51,"total":201,"esShare":0.2537313432835821}},"matk":{"base":187,"armor":45,"es":92,"total":324,"esShare":0.2839506172839506,"buildShare":0.4228395061728395,"flat":{"es":51,"total":263,"esShare":0.19391634980988592}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":206,"armor":72,"es":92,"total":370,"esShare":0.24864864864864866,"buildShare":0.44324324324324327,"flat":{"es":51,"total":297,"esShare":0.1717171717171717}},"offense":{"base":187,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":568,"esShare":0.26936619718309857,"buildShare":0.670774647887324,"flat":{"es":85,"total":399,"esShare":0.21303258145363407}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":216,"armor":0,"es":133,"total":349,"esShare":0.38108882521489973,"buildShare":0.38108882521489973,"flat":{"es":51,"total":267,"esShare":0.19101123595505617}},"matk":{"base":270,"armor":65,"es":133,"total":468,"esShare":0.2841880341880342,"buildShare":0.4230769230769231,"flat":{"es":51,"total":346,"esShare":0.14739884393063585}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":297,"armor":104,"es":133,"total":534,"esShare":0.24906367041198502,"buildShare":0.4438202247191011,"flat":{"es":51,"total":388,"esShare":0.13144329896907217}},"offense":{"base":270,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":821,"esShare":0.269183922046285,"buildShare":0.6711327649208283,"flat":{"es":85,"total":482,"esShare":0.17634854771784234}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}}},"curve":[{"L":1,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":2,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":3,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":4,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":5,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":6,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":7,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":8,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":9,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":10,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":11,"today":[6,6,5,5],"todayAvg":5.5,"withMoon":5,"planetOnly":3},{"L":12,"today":[6,6,6,5],"todayAvg":5.75,"withMoon":5,"planetOnly":3},{"L":13,"today":[6,6,6,5],"todayAvg":5.75,"withMoon":5,"planetOnly":3},{"L":14,"today":[6,6,6,6],"todayAvg":6,"withMoon":5,"planetOnly":3},{"L":15,"today":[6,6,6,6],"todayAvg":6,"withMoon":5,"planetOnly":3},{"L":16,"today":[10,9,9,9],"todayAvg":9.25,"withMoon":9,"planetOnly":3},{"L":17,"today":[10,9,9,9],"todayAvg":9.25,"withMoon":9,"planetOnly":3},{"L":18,"today":[10,10,9,9],"todayAvg":9.5,"withMoon":9,"planetOnly":3},{"L":19,"today":[10,10,9,9],"todayAvg":9.5,"withMoon":9,"planetOnly":3},{"L":20,"today":[10,10,10,9],"todayAvg":9.75,"withMoon":9,"planetOnly":3},{"L":21,"today":[14,14,14,12],"todayAvg":13.5,"withMoon":13,"planetOnly":7},{"L":22,"today":[14,14,14,14],"todayAvg":14,"withMoon":13,"planetOnly":7},{"L":23,"today":[14,14,14,14],"todayAvg":14,"withMoon":13,"planetOnly":7},{"L":24,"today":[15,14,14,14],"todayAvg":14.25,"withMoon":13,"planetOnly":7},{"L":25,"today":[15,14,14,14],"todayAvg":14.25,"withMoon":13,"planetOnly":7},{"L":26,"today":[20,20,18,18],"todayAvg":19,"withMoon":19,"planetOnly":7},{"L":27,"today":[20,20,18,18],"todayAvg":19,"withMoon":19,"planetOnly":7},{"L":28,"today":[20,20,20,18],"todayAvg":19.5,"withMoon":19,"planetOnly":7},{"L":29,"today":[20,20,20,18],"todayAvg":19.5,"withMoon":19,"planetOnly":7},{"L":30,"today":[20,20,20,20],"todayAvg":20,"withMoon":19,"planetOnly":7},{"L":31,"today":[25,25,25,25],"todayAvg":25,"withMoon":25,"planetOnly":13},{"L":32,"today":[27,25,25,25],"todayAvg":25.5,"withMoon":25,"planetOnly":13},{"L":33,"today":[27,25,25,25],"todayAvg":25.5,"withMoon":25,"planetOnly":13},{"L":34,"today":[27,27,25,25],"todayAvg":26,"withMoon":25,"planetOnly":13},{"L":35,"today":[27,27,25,25],"todayAvg":26,"withMoon":25,"planetOnly":13},{"L":36,"today":[33,33,33,30],"todayAvg":32.25,"withMoon":33,"planetOnly":13},{"L":37,"today":[33,33,33,30],"todayAvg":32.25,"withMoon":33,"planetOnly":13},{"L":38,"today":[33,33,33,33],"todayAvg":33,"withMoon":33,"planetOnly":13},{"L":39,"today":[33,33,33,33],"todayAvg":33,"withMoon":33,"planetOnly":13},{"L":40,"today":[35,33,33,33],"todayAvg":33.5,"withMoon":33,"planetOnly":13},{"L":41,"today":[42,39,39,39],"todayAvg":39.75,"withMoon":41,"planetOnly":21},{"L":42,"today":[42,42,39,39],"todayAvg":40.5,"withMoon":41,"planetOnly":21},{"L":43,"today":[42,42,39,39],"todayAvg":40.5,"withMoon":41,"planetOnly":21},{"L":44,"today":[42,42,42,39],"todayAvg":41.25,"withMoon":41,"planetOnly":21},{"L":45,"today":[42,42,42,39],"todayAvg":41.25,"withMoon":41,"planetOnly":21},{"L":46,"today":[49,49,49,49],"todayAvg":49,"withMoon":51,"planetOnly":21},{"L":47,"today":[49,49,49,49],"todayAvg":49,"withMoon":51,"planetOnly":21},{"L":48,"today":[52,49,49,49],"todayAvg":49.75,"withMoon":51,"planetOnly":21},{"L":49,"today":[52,49,49,49],"todayAvg":49.75,"withMoon":51,"planetOnly":21},{"L":50,"today":[52,52,49,49],"todayAvg":50.5,"withMoon":51,"planetOnly":21}],"hits":[{"L":1,"target":0.2,"bare":0.2,"es":0.19396896255935528,"armor":0.18075861400539478,"both":0.1755799311545502},{"L":2,"target":0.2088888888888889,"bare":0.2089315192743764,"es":0.2029680808274112,"armor":0.1898990537672102,"both":0.18473679051431935},{"L":3,"target":0.2177777777777778,"bare":0.21795555555555557,"es":0.21205182903920414,"armor":0.19910973230041348,"both":0.1939617671730255},{"L":4,"target":0.22666666666666668,"bare":0.2270829931972789,"es":0.2212319920522069,"armor":0.20840386890155194,"both":0.20326809375217078},{"L":5,"target":0.23555555555555557,"bare":0.23632471655328796,"es":0.23052018191462428,"armor":0.2177942554716456,"both":0.2126685771522868},{"L":6,"target":0.24444444444444446,"bare":0.24569160997732428,"es":0.22901492988448835,"armor":0.2109133683375692,"both":0.19766513852635512},{"L":7,"target":0.25333333333333335,"bare":0.2551945578231293,"es":0.238596970026354,"armor":0.22055727327612878,"both":0.20724588758985282},{"L":8,"target":0.26222222222222225,"bare":0.2648444444444445,"es":0.24831423195526395,"armor":0.2303284658335036,"both":0.21695425865450543},{"L":9,"target":0.27111111111111114,"bare":0.2746521541950113,"es":0.2581783298258146,"armor":0.24023872121721324,"both":0.2268014089089152},{"L":10,"target":0.28,"bare":0.28462857142857145,"es":0.2682007719207689,"armor":0.25029970133388796,"both":0.23679847145343727},{"L":11,"target":0.28,"bare":0.28571428571428575,"es":0.25985122188060905,"armor":0.23777138215570096,"both":0.21818085478610538},{"L":12,"target":0.28,"bare":0.2869142857142857,"es":0.2617044099286708,"armor":0.24011169153157236,"both":0.22086049900171914},{"L":13,"target":0.28,"bare":0.2882285714285715,"es":0.2636272610333559,"armor":0.242491511981209,"both":0.22356045347923634},{"L":14,"target":0.28,"bare":0.28965714285714284,"es":0.2656234366896396,"armor":0.24491667004230436,"both":0.22628757987631637},{"L":15,"target":0.28,"bare":0.2912,"es":0.26769620921879755,"armor":0.24739240517703984,"both":0.22904809233019627},{"L":16,"target":0.28,"bare":0.29285714285714287,"es":0.25343181471642007,"armor":0.23774056047554587,"both":0.20888188355926388},{"L":17,"target":0.28,"bare":0.29462857142857146,"es":0.25594892795513796,"armor":0.2405130780763267,"both":0.21197708389008638},{"L":18,"target":0.28,"bare":0.2965142857142856,"es":0.25853334259816235,"armor":0.24333864612600853,"both":0.21510750061759168},{"L":19,"target":0.28,"bare":0.29851428571428573,"es":0.26118831023128203,"armor":0.24622135790223987,"both":0.21827792259713988},{"L":20,"target":0.28,"bare":0.30062857142857147,"es":0.2639167919488875,"armor":0.24916495527441054,"both":0.22149276810540167},{"L":21,"target":0.28,"bare":0.30285714285714294,"es":0.25280887788437356,"armor":0.24153947912205564,"both":0.20578306819326614},{"L":22,"target":0.28,"bare":0.30519999999999997,"es":0.2558552613628195,"armor":0.24472552162468791,"both":0.20920722248076382},{"L":23,"target":0.28,"bare":0.30765714285714296,"es":0.258972800392972,"armor":0.24797550827468137,"both":0.21268023779409875},{"L":24,"target":0.28,"bare":0.3102285714285715,"es":0.26216408485897974,"armor":0.2512924002631416,"both":0.21620552150252795},{"L":25,"target":0.28,"bare":0.3129142857142857,"es":0.26543150518557,"armor":0.2546789371534154,"both":0.21978625786342584},{"L":26,"target":0.28,"bare":0.3157142857142858,"es":0.2507488485176367,"armor":0.24857629164959097,"both":0.20288040100510765},{"L":27,"target":0.28,"bare":0.3186285714285714,"es":0.25430461356991546,"armor":0.25217509982478564,"both":0.20661237489476675},{"L":28,"target":0.28,"bare":0.321657142857143,"es":0.25793402332253845,"armor":0.2558464121430627,"both":0.21040333877195724},{"L":29,"target":0.28,"bare":0.32480000000000003,"es":0.2616392067410101,"armor":0.2595924344193484,"both":0.2142558001971564},{"L":30,"target":0.28,"bare":0.3280571428571429,"es":0.26542215107715306,"armor":0.26341522576505755,"both":0.2181721266279997},{"L":31,"target":0.28,"bare":0.33142857142857146,"es":0.2534538387933424,"armor":0.2585152085108106,"both":0.20428879760116872},{"L":32,"target":0.28,"bare":0.33491428571428566,"es":0.25745193137707445,"armor":0.26253250831951314,"both":0.20830733306226024},{"L":33,"target":0.28,"bare":0.33851428571428577,"es":0.26152777474725153,"armor":0.2666290609376397,"both":0.21239321635919844},{"L":34,"target":0.28,"bare":0.34222857142857155,"es":0.26568307423921134,"armor":0.2708065519245173,"both":0.21654834933490757},{"L":35,"target":0.28,"bare":0.34605714285714284,"es":0.2699194349510741,"armor":0.2750665655374165,"both":0.22077454053424703},{"L":36,"target":0.28,"bare":0.35000000000000003,"es":0.2554183150967163,"armor":0.2711545026599,"both":0.20581875463207913},{"L":37,"target":0.28,"bare":0.3540571428571429,"es":0.25982712558258214,"armor":0.2755981367589547,"both":0.21010518525548785},{"L":38,"target":0.28,"bare":0.3582285714285715,"es":0.264316904790631,"armor":0.2801263995425628,"both":0.21446532388516085},{"L":39,"target":0.28,"bare":0.3625142857142857,"es":0.2688890439360394,"armor":0.2847406065207874,"both":0.2189006521004548},{"L":40,"target":0.28,"bare":0.36691428571428575,"es":0.27354486166918784,"armor":0.28944200067959996,"both":0.22341258684337303},{"L":41,"target":0.28,"bare":0.37142857142857144,"es":0.2612897655936406,"armor":0.28636796692719846,"both":0.21064897981363173},{"L":42,"target":0.28,"bare":0.376057142857143,"es":0.26607808441545067,"armor":0.29124612013287027,"both":0.21520207877793748},{"L":43,"target":0.28,"bare":0.3808,"es":0.2709508035421885,"armor":0.29621323217687584,"both":0.21983406617037055},{"L":44,"target":0.28,"bare":0.38565714285714287,"es":0.27590905628909923,"armor":0.3012703474548455,"both":0.22454612614337957},{"L":45,"target":0.28,"bare":0.39062857142857144,"es":0.28095392242915396,"armor":0.3064184568448809,"both":0.22933939558958963},{"L":46,"target":0.28,"bare":0.3957142857142858,"es":0.2666728653642588,"armor":0.30407427330634235,"both":0.21554278648937197},{"L":47,"target":0.28,"bare":0.4009142857142857,"es":0.27180889782652623,"armor":0.3093947357543632,"both":0.22034388560397908},{"L":48,"target":0.28,"bare":0.40622857142857144,"es":0.2770320726374494,"armor":0.3148076793175104,"both":0.2252278524808562},{"L":49,"target":0.28,"bare":0.41165714285714283,"es":0.28234332604954704,"armor":0.3203139445683409,"both":0.23019565318235907},{"L":50,"target":0.28,"bare":0.41719999999999996,"es":0.28774355395107637,"armor":0.32591433159323596,"both":0.2352482179797884}],"tierHits":[{"t":1,"L":50,"budgetOff":1.49,"budgetHp":2.7150000000000003,"bare":0.41719999999999996,"es":0.28774355395107637,"armor":0.32591433159323596,"both":0.2352482179797884},{"t":2,"L":100,"budgetOff":1.4911689426453376,"budgetHp":2.7190912992586815,"bare":0.4175273039406946,"es":0.28251260796466793,"armor":0.3220957720333412,"both":0.22912228514838462},{"t":3,"L":150,"budgetOff":1.4916200224016067,"budgetHp":2.7206700784056235,"bare":0.41765360627244985,"es":0.28037855711693455,"armor":0.3205237638011615,"both":0.22664921152089965}],"JEWELS":[{"id":"jewel-planet-1","name":"Planet Jewel I","kind":"Planet","grade":1,"craft":1,"opens":"Planet I","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"from":1,"size":8},{"id":"jewel-planet-2","name":"Planet Jewel II","kind":"Planet","grade":3,"craft":11,"opens":"Planet II","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"from":1,"size":8},{"id":"jewel-planet-3","name":"Planet Jewel III","kind":"Planet","grade":5,"craft":21,"opens":"Planet III","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Sapphire":2,"Mahogany Plank":2,"Wool Cloth":2,"Trilobite Carving":2},{"Cut Starstone":2,"Elderwood Plank":2,"Moonsilk":2,"Aether Infusion":2}],"from":1,"size":8},{"id":"jewel-planet-4","name":"Planet Jewel IV","kind":"Planet","grade":7,"craft":31,"opens":"Planet IV","recipe":{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},"byTier":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2}],"from":1,"size":8},{"id":"jewel-planet-5","name":"Planet Jewel V","kind":"Planet","grade":9,"craft":41,"opens":"Planet V","recipe":{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},"byTier":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Diamond":2,"Ebony Plank":2,"Silk":2,"Tide Infusion":2}],"from":1,"size":8},{"id":"jewel-moon-1","name":"Moon Jewel I","kind":"Moon","grade":2,"craft":6,"opens":"Node I of any moon","recipe":{"Cut Quartz":3,"Copper Ingot":1},"byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-2","name":"Moon Jewel II","kind":"Moon","grade":4,"craft":16,"opens":"Node II of any moon; Valor I, Swiftness I, her moon I","recipe":{"Cut Quartz":3,"Copper Ingot":1},"byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Sapphire":3,"Silver Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-3","name":"Moon Jewel III","kind":"Moon","grade":6,"craft":26,"opens":"Node III of any moon","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-4","name":"Moon Jewel IV","kind":"Moon","grade":8,"craft":36,"opens":"Node IV of any moon; Valor II, Swiftness II, her moon II","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-5","name":"Moon Jewel V","kind":"Moon","grade":10,"craft":46,"opens":"Node V of any moon","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Diamond":3,"Titanium Ingot":1},{"Cut Philosopher's Stone":3,"Orichalcum Ingot":1}],"from":1,"size":4},{"id":"jewel-halo-1","name":"Halo Jewel I","kind":"Halo","grade":5,"craft":21,"opens":"Halo I","recipe":{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},"byTier":[{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1}],"from":2,"size":5},{"id":"jewel-halo-2","name":"Halo Jewel II","kind":"Halo","grade":10,"craft":46,"opens":"Halo II","recipe":{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},"byTier":[{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1}],"from":2,"size":5},{"id":"jewel-halo-3","name":"Halo Jewel III","kind":"Halo","grade":5,"craft":21,"opens":"Halo III","recipe":{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},"byTier":[{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1}],"from":3,"size":5},{"id":"jewel-halo-4","name":"Halo Jewel IV","kind":"Halo","grade":10,"craft":46,"opens":"Halo IV","recipe":{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},"byTier":[{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1}],"from":3,"size":5}],"jewelDemand":{"1":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":4,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":4,"jewel-planet-5":1,"jewel-moon-5":4},"pieces":25,"refined":120,"mats":{"Cut Quartz":30,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Copper Ingot":8,"Cut Garnet":40,"Iron Ingot":12,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":3,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":3,"jewel-planet-5":1,"jewel-moon-5":3},"pieces":20,"refined":100,"mats":{"Cut Quartz":24,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Copper Ingot":6,"Cut Garnet":31,"Iron Ingot":9,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}},"2":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":5,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":5,"jewel-planet-5":1,"jewel-moon-5":4,"jewel-halo-1":1,"jewel-halo-2":1},"pieces":29,"refined":138,"mats":{"Cut Quartz":31,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":9,"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3,"Cut Garnet":31,"Iron Ingot":9,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Cut Diamond":13,"Titanium Ingot":5,"Silver Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":4,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":4,"jewel-planet-5":1,"jewel-moon-5":3,"jewel-halo-1":1,"jewel-halo-2":1},"pieces":24,"refined":118,"mats":{"Cut Quartz":25,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":7,"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3,"Cut Garnet":25,"Iron Ingot":7,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Cut Diamond":10,"Titanium Ingot":4,"Silver Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}},"3":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":6,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":6,"jewel-planet-5":1,"jewel-moon-5":4,"jewel-halo-1":1,"jewel-halo-2":1,"jewel-halo-3":1,"jewel-halo-4":1},"pieces":33,"refined":156,"mats":{"Cut Quartz":16,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":4,"Cut Sapphire":19,"Silver Ingot":7,"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3,"Cut Garnet":32,"Iron Ingot":10,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2,"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3,"Cut Philosopher's Stone":13,"Orichalcum Ingot":5,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Titanium Ingot":1,"Mythril Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":5,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":5,"jewel-planet-5":1,"jewel-moon-5":3,"jewel-halo-1":1,"jewel-halo-2":1,"jewel-halo-3":1,"jewel-halo-4":1},"pieces":28,"refined":136,"mats":{"Cut Quartz":13,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":3,"Cut Sapphire":16,"Silver Ingot":6,"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3,"Cut Garnet":26,"Iron Ingot":8,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2,"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3,"Cut Philosopher's Stone":10,"Orichalcum Ingot":4,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Titanium Ingot":1,"Mythril Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Sapphire":3,"Silver Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}}},"perUma":[{"t":1,"lapidary":120,"gear":365,"total":485,"withMoon":493,"readme":485,"hours":822,"hoursMoon":835.558762886598},{"t":2,"lapidary":138,"gear":365,"total":503,"withMoon":511,"readme":510,"hours":852.5072164948454,"hoursMoon":866.0659793814433},{"t":3,"lapidary":156,"gear":365,"total":521,"withMoon":529,"readme":520,"hours":883.0144329896907,"hoursMoon":896.5731958762887}],"PROF_OF":{"Copper Ingot":"mining","Pine Plank":"wood","Linen":"farming","Shell Carving":"fishing","Cut Quartz":"hunting","Iron Ingot":"mining","Oak Plank":"wood","Cotton Cloth":"farming","Ammonite Carving":"fishing","Cut Garnet":"hunting","Silver Ingot":"mining","Mahogany Plank":"wood","Wool Cloth":"farming","Trilobite Carving":"fishing","Cut Sapphire":"hunting","Titanium Ingot":"mining","Ebony Plank":"wood","Silk":"farming","Tide Infusion":"fishing","Cut Diamond":"hunting","Mythril Ingot":"mining","Elderwood Plank":"wood","Moonsilk":"farming","Aether Infusion":"fishing","Cut Starstone":"hunting","Orichalcum Ingot":"mining","Yggdrasil Plank":"wood","Cloudweave":"farming","Prismatic Infusion":"fishing","Cut Philosopher's Stone":"hunting"}};
-// Shared by the three Extra Stats pages: the bodies, the classes, what a node grants, the tooltip.
+const DATA = {"nodes":[{"id":"planet:1","body":"planet","n":"I","grade":1,"lv":1,"jewel":"Planet Jewel I","from":1,"pts":{"1":1,"2":2,"3":3}},{"id":"planet:2","body":"planet","n":"II","grade":3,"lv":11,"jewel":"Planet Jewel II","from":1,"pts":{"1":2,"2":4,"3":5}},{"id":"planet:3","body":"planet","n":"III","grade":5,"lv":21,"jewel":"Planet Jewel III","from":1,"pts":{"1":4,"2":7,"3":10}},{"id":"planet:4","body":"planet","n":"IV","grade":7,"lv":31,"jewel":"Planet Jewel IV","from":1,"pts":{"1":6,"2":11,"3":16}},{"id":"planet:5","body":"planet","n":"V","grade":9,"lv":41,"jewel":"Planet Jewel V","from":1,"pts":{"1":8,"2":14,"3":21}},{"id":"prowess:1","body":"prowess","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","from":1,"pts":{"1":2,"2":4,"3":5},"split":{"brawler":{"1":[2,0],"2":[4,0],"3":[5,0]},"mage":{"1":[0,2],"2":[0,4],"3":[0,5]},"spellblade":{"1":[1,1],"2":[3,1],"3":[4,1]},"summoner":{"1":[1,1],"2":[1,3],"3":[1,4]},"paladin":{"1":[2,0],"2":[3,1],"3":[4,1]},"cleric":{"1":[0,2],"2":[1,3],"3":[1,4]}}},{"id":"prowess:2","body":"prowess","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","from":1,"pts":{"1":4,"2":7,"3":10},"split":{"brawler":{"1":[4,0],"2":[7,0],"3":[10,0]},"mage":{"1":[0,4],"2":[0,7],"3":[0,10]},"spellblade":{"1":[3,1],"2":[5,2],"3":[7,3]},"summoner":{"1":[1,3],"2":[2,5],"3":[3,7]},"paladin":{"1":[3,1],"2":[6,1],"3":[8,2]},"cleric":{"1":[1,3],"2":[1,6],"3":[2,8]}}},{"id":"prowess:3","body":"prowess","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","from":1,"pts":{"1":6,"2":11,"3":16},"split":{"brawler":{"1":[6,0],"2":[11,0],"3":[16,0]},"mage":{"1":[0,6],"2":[0,11],"3":[0,16]},"spellblade":{"1":[4,2],"2":[8,3],"3":[11,5]},"summoner":{"1":[2,4],"2":[3,8],"3":[5,11]},"paladin":{"1":[5,1],"2":[9,2],"3":[13,3]},"cleric":{"1":[1,5],"2":[2,9],"3":[3,13]}}},{"id":"prowess:4","body":"prowess","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":1,"pts":{"1":8,"2":14,"3":21},"split":{"brawler":{"1":[8,0],"2":[14,0],"3":[21,0]},"mage":{"1":[0,8],"2":[0,14],"3":[0,21]},"spellblade":{"1":[6,2],"2":[10,4],"3":[15,6]},"summoner":{"1":[2,6],"2":[4,10],"3":[6,15]},"paladin":{"1":[6,2],"2":[11,3],"3":[17,4]},"cleric":{"1":[2,6],"2":[3,11],"3":[4,17]}}},{"id":"prowess:5","body":"prowess","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","from":1,"pts":{"1":10,"2":18,"3":26},"split":{"brawler":{"1":[10,0],"2":[18,0],"3":[26,0]},"mage":{"1":[0,10],"2":[0,18],"3":[0,26]},"spellblade":{"1":[7,3],"2":[13,5],"3":[18,8]},"summoner":{"1":[3,7],"2":[5,13],"3":[8,18]},"paladin":{"1":[8,2],"2":[14,4],"3":[21,5]},"cleric":{"1":[2,8],"2":[4,14],"3":[5,21]}}},{"id":"vigor:1","body":"vigor","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","from":1,"pts":{"1":2,"2":4,"3":5}},{"id":"vigor:2","body":"vigor","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","from":1,"pts":{"1":4,"2":7,"3":10}},{"id":"vigor:3","body":"vigor","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","from":1,"pts":{"1":6,"2":11,"3":16}},{"id":"vigor:4","body":"vigor","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":1,"pts":{"1":8,"2":14,"3":21}},{"id":"vigor:5","body":"vigor","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","from":1,"pts":{"1":10,"2":18,"3":26}},{"id":"guard:1","body":"guard","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","from":1,"pts":{"1":2,"2":4,"3":5}},{"id":"guard:2","body":"guard","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","from":1,"pts":{"1":4,"2":7,"3":10}},{"id":"guard:3","body":"guard","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","from":1,"pts":{"1":6,"2":11,"3":16}},{"id":"guard:4","body":"guard","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":1,"pts":{"1":8,"2":14,"3":21}},{"id":"guard:5","body":"guard","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","from":1,"pts":{"1":10,"2":18,"3":26}},{"id":"wm1:1","body":"wm1","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","from":2,"full":{"1":null,"2":7,"3":10},"splitv":{"1":null,"2":5,"3":7},"t1":4.0},{"id":"wm1:2","body":"wm1","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","from":2,"full":{"1":null,"2":13,"3":18},"splitv":{"1":null,"2":9,"3":13},"t1":7.0},{"id":"wm1:3","body":"wm1","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","from":2,"full":{"1":null,"2":18,"3":26},"splitv":{"1":null,"2":13,"3":18},"t1":10.0},{"id":"wm1:4","body":"wm1","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":2,"full":{"1":null,"2":23,"3":34},"splitv":{"1":null,"2":16,"3":24},"t1":13.0},{"id":"wm1:5","body":"wm1","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","from":2,"full":{"1":null,"2":29,"3":42},"splitv":{"1":null,"2":20,"3":29},"t1":16.0},{"id":"wm2:1","body":"wm2","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","from":3,"full":{"1":null,"2":null,"3":10},"splitv":{"1":null,"2":null,"3":7},"t1":4.0},{"id":"wm2:2","body":"wm2","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","from":3,"full":{"1":null,"2":null,"3":18},"splitv":{"1":null,"2":null,"3":13},"t1":7.0},{"id":"wm2:3","body":"wm2","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","from":3,"full":{"1":null,"2":null,"3":26},"splitv":{"1":null,"2":null,"3":18},"t1":10.0},{"id":"wm2:4","body":"wm2","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":3,"full":{"1":null,"2":null,"3":34},"splitv":{"1":null,"2":null,"3":24},"t1":13.0},{"id":"wm2:5","body":"wm2","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","from":3,"full":{"1":null,"2":null,"3":42},"splitv":{"1":null,"2":null,"3":29},"t1":16.0},{"id":"template:1","body":"template","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","from":1,"pts":{"1":4,"2":7,"3":10}},{"id":"template:2","body":"template","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","from":1,"pts":{"1":8,"2":14,"3":21}}],"presets":{"brawler":{"b1":"Berserker","t2":["split",["Lance","Greatsword"]],"t3":[["full",["Lance"]],["split",["Greatsword","Axe"]]],"b2":["Warlord","Bow, Katana, Axe; Dual Bow + Greatsword",["split",["Bow","Katana"]],[["full",["Bow"]],["split",["Katana","Axe"]]]]},"mage":{"b1":"Sage","t2":["split",["Fire","Ice"]],"t3":[["full",["Fire"]],["split",["Ice","Lightning"]]],"b2":["Sorcerer","Light, Dark, Ice; Dual Light + Fire",["split",["Light","Dark"]],[["full",["Light"]],["split",["Dark","Ice"]]]]},"spellblade":{"b1":"Rune Knight","t2":["split",["Lightning","Katana"]],"t3":[["full",["Lightning"]],["split",["Katana","Lance"]]],"b2":["Blademaster","Katana, Bow, Dark; Dual Katana + Axe",["split",["Dark","Katana"]],[["full",["Dark"]],["split",["Katana","Bow"]]]]},"summoner":{"b1":"Warlock","t2":["split",["Bow","Dark"]],"t3":[["full",["Bow"]],["split",["Dark","Light"]]],"b2":["Conjurer","Fire, Lightning, Greatsword; Dual Greatsword + Bow",["split",["Greatsword","Fire"]],[["full",["Greatsword"]],["split",["Fire","Lightning"]]]]},"paladin":{"b1":"Guardian","t2":["split",["Light","Greatsword"]],"t3":[["full",["Light"]],["split",["Greatsword","Axe"]]],"b2":["Templar","Bow, Katana, Light; Dual Bow + Greatsword",["split",["Bow","Katana"]],[["full",["Bow"]],["split",["Katana","Light"]]]]},"cleric":{"b1":"Bishop","t2":["split",["Light","Ice"]],"t3":[["full",["Light"]],["split",["Ice","Bow"]]],"b2":["Oracle","Light, Fire, Greatsword; Dual Greatsword + Bow",["split",["Greatsword","Light"]],[["full",["Greatsword"]],["split",["Light","Fire"]]]]}},"fullSplit":{"brawler":{"a":"Lance","b":"Greatsword","campaign":{"full":0.1039,"split":0.12551},"tuned":{"kind":"Lance","full":0.19025,"split":0.15413},"t3":{"fullSplit":0.21016,"fullFull":0.17924,"ffKinds":["Lance","Greatsword"]}},"mage":{"a":"Fire","b":"Ice","campaign":{"full":0.10167,"split":0.12395},"tuned":{"kind":"Fire","full":0.18625,"split":0.15137},"t3":{"fullSplit":0.20538,"fullFull":0.17671,"ffKinds":["Fire","Ice"]}},"spellblade":{"a":"Lightning","b":"Katana","campaign":{"full":0.11,"split":0.14981},"tuned":{"kind":"Katana","full":0.14102,"split":0.17587},"t3":{"fullSplit":0.22129,"fullFull":0.20012,"ffKinds":["Lightning","Katana"]}},"summoner":{"a":"Bow","b":"Dark","campaign":{"full":0.14522,"split":0.15452},"tuned":{"kind":"Dark","full":0.11819,"split":0.18521},"t3":{"fullSplit":0.23161,"fullFull":0.19417,"ffKinds":["Bow","Dark"]}},"paladin":{"a":"Light","b":"Greatsword","campaign":{"full":0.11577,"split":0.14208},"tuned":{"kind":"Light","full":0.22715,"split":0.18476},"t3":{"fullSplit":0.23164,"fullFull":0.18239,"ffKinds":["Light","Greatsword"]}},"cleric":{"a":"Light","b":"Ice","campaign":{"full":0.12415,"split":0.15124},"tuned":{"kind":"Light","full":0.21326,"split":0.1732},"t3":{"fullSplit":0.2323,"fullFull":0.18591,"ffKinds":["Light","Ice"]}}}};
+// Shared by the four Extra Stats pages: classes, bodies, what a node grants, the tooltip, small chart helpers.
 const MULT = { 1: 1, 2: 1.8, 3: 2.6 };
 const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 const CLASSES = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
 const CLASS_NAME = Object.fromEntries(CLASSES);
-const STATS = [['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['matk', 'M.ATK'], ['def', 'DEF'], ['mdef', 'M.DEF']];
-const STAT_NAME = Object.fromEntries(STATS);
-// Each body: its name, what it gives, the token it's drawn in (charts: --b-*, the night-sky map: --m-*), the tier it arrives.
+const SPLIT_TXT = { brawler: '100/0', mage: '0/100', spellblade: '70/30', summoner: '30/70', paladin: '80/20', cleric: '20/80' };
+const ARMS = ['Greatsword', 'Axe', 'Lance', 'Bow', 'Katana'];
+const TOMES = ['Fire', 'Ice', 'Lightning', 'Light', 'Dark'];
+const isArm = (k) => ARMS.includes(k);
+const KINDS_OF = { // her three slotted kinds, branch 1 (weapon-progression §3.8)
+  brawler: ['Greatsword', 'Axe', 'Lance'], mage: ['Fire', 'Ice', 'Lightning'], spellblade: ['Katana', 'Lance', 'Lightning'],
+  summoner: ['Dark', 'Light', 'Bow'], paladin: ['Greatsword', 'Axe', 'Light'], cleric: ['Light', 'Ice', 'Bow'],
+};
 const BODY = {
   planet: { name: 'The Planet', short: 'Planet', gives: 'Every core stat: HP, MP, ATK, M.ATK, DEF, M.DEF', c: 'var(--b-planet)', m: 'var(--m-planet)', from: 1, jewel: 'Planet Jewel' },
-  strength: { name: 'Strength', short: 'Strength', gives: 'ATK', c: 'var(--b-str)', m: 'var(--m-str)', from: 1, jewel: 'Moon Jewel' },
-  sorcery: { name: 'Sorcery', short: 'Sorcery', gives: 'M.ATK', c: 'var(--b-sor)', m: 'var(--m-sor)', from: 1, jewel: 'Moon Jewel' },
+  prowess: { name: 'Prowess', short: 'Prowess', gives: 'Offense: each node split between ATK and M.ATK by her class', c: 'var(--b-pro)', m: 'var(--m-pro)', from: 1, jewel: 'Moon Jewel' },
   vigor: { name: 'Vigor', short: 'Vigor', gives: 'Both pools: HP (+5 a point) and MP', c: 'var(--b-vig)', m: 'var(--m-vig)', from: 1, jewel: 'Moon Jewel' },
   guard: { name: 'Guard', short: 'Guard', gives: 'Both defenses: DEF and M.DEF', c: 'var(--b-grd)', m: 'var(--m-grd)', from: 1, jewel: 'Moon Jewel' },
-  halo: { name: 'The Halo', short: 'Halo', gives: 'Flat offense on the hits of a kind she picks (never a kind for weaknesses)', c: 'var(--b-halo)', m: 'var(--m-halo)', from: 2, jewel: 'Halo Jewel' },
-  valor: { name: 'Valor', short: 'Valor', gives: 'Limit start: a head start on the Limit gauge of 12', c: 'var(--b-val)', m: 'var(--m-val)', from: 2, jewel: 'Moon Jewel' },
-  swiftness: { name: 'Swiftness', short: 'Swiftness', gives: 'Evasion: a share of every hit avoided', c: 'var(--b-swf)', m: 'var(--m-swf)', from: 3, jewel: 'Moon Jewel' },
-  template: { name: 'Her moon', short: '★ Her moon', gives: 'A marked slot for her Uma Template: I her knack, II her lead', c: 'var(--b-tpl)', m: 'var(--m-tpl)', from: 1, jewel: 'Moon Jewel' },
+  wm1: { name: 'Weapon moon 1', short: 'Weapon moon', gives: 'Flat offense on her hits of a kind: Full on one kind, or Split on two at 0.7 each', c: 'var(--b-wm1)', m: 'var(--m-wm1)', from: 2, jewel: 'Moon Jewel' },
+  wm2: { name: 'Weapon moon 2', short: 'Weapon moon 2', gives: 'A second weapon moon, on different kinds: Full + Split serves her three weapons', c: 'var(--b-wm2)', m: 'var(--m-wm2)', from: 3, jewel: 'Moon Jewel' },
+  template: { name: 'Her moon', short: '★ Her moon', gives: 'Her Uma Template: I her knack, II her lead (her calling channel’s defense)', c: 'var(--b-tpl)', m: 'var(--m-tpl)', from: 1, jewel: 'Moon Jewel' },
 };
-const CORE = ['planet', 'strength', 'sorcery', 'vigor', 'guard'];
-const usesBody = (cls, body) => cls === 'any' || !((cls === 'brawler' && body === 'sorcery') || (cls === 'mage' && body === 'strength'));
-const HALO_KIND = { brawler: ['Greatsword', 'Axe'], mage: ['Fire', 'Ice'], spellblade: ['Katana', 'Lance'], summoner: ['Dark', 'Light'], paladin: ['Greatsword', 'Axe'], cleric: ['Light', 'Ice'], any: ['her first kind', 'her second kind'] };
-const NODES = DATA.nodeTable;
-const inTier = (n, t) => (n.body === 'halo' ? t >= n.from : n.body === 'valor' ? t >= 2 : n.body === 'swiftness' ? t >= 3 : true);
-const pts = (n, t) => n['t' + t + 'pts'];
+const CORE = ['planet', 'prowess', 'vigor', 'guard'];
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
-const sgn = (n) => (n >= 0 ? '+' : '') + fmt(n);
+const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
+const sgnPct = (x, d = 1) => (x >= 0 ? '+' : '') + (x * 100).toFixed(d) + '%';
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-/** What a node gives at a tier, in words. */
-function grantText(n, t, cls = 'any') {
-  const p = pts(n, t);
-  switch (n.body) {
-    case 'planet': return `+${p} to each core stat (HP +${p * 5})`;
-    case 'strength': return `ATK +${p}`;
-    case 'sorcery': return `M.ATK +${p}`;
-    case 'vigor': return `HP +${p * 5}, MP +${p}`;
-    case 'guard': return `DEF +${p}, M.DEF +${p}`;
-    case 'halo': {
-      const k = HALO_KIND[cls] ?? HALO_KIND.any, kind = n.kindSlot === 1 ? k[0] : k[1];
-      const first = NODES.find((x) => x.body === 'halo' && x.kindSlot === n.kindSlot && x.grade === 5);
-      return n.grade === 5 ? `+${p} offense on her ${kind} hits` : `+${p} more on her ${kind} hits: +${pts(first, t) + p}`;
-    }
-    case 'valor': return n.n === 'I' ? 'Limit start +2 (of 12)' : 'Limit start +2 more: +4';
-    case 'swiftness': return n.n === 'I' ? 'Evasion +3%' : 'Evasion +3% more: +6%';
-    case 'template': return n.n === 'I' ? `Her knack +${p} points (HP +${p * 5}, MP +${p}, DEF and M.DEF +${p} each, or +2.4% evasion, or +1.6 Limit start)` : `Her lead +${p}: ATK or M.ATK, her calling's channel (CP36's note: her channel's DEF or M.DEF)`;
-  }
-  return '';
-}
-/** Extra Stats at a tier and tier level, for a class: every node her level opens on her class's bodies. */
-function grantsAt(t, L, cls = 'any', skip = []) {
-  const g = { hp: 0, mp: 0, atk: 0, matk: 0, def: 0, mdef: 0, halo1: 0, halo2: 0, limit: 0, evasion: 0, by: {} };
-  for (const n of NODES) {
-    if (n.lv > L || !inTier(n, t) || skip.includes(n.id)) continue;
-    const p = pts(n, t);
-    const add = (s, v) => { g[s] += v; g.by[n.body] ??= {}; g.by[n.body][s] = (g.by[n.body][s] ?? 0) + v; };
-    if (CORE.includes(n.body)) { if (!usesBody(cls, n.body)) continue; for (const s of n.stats) add(s, s === 'hp' ? p * 5 : p); }
-    else if (n.body === 'halo') add(n.kindSlot === 1 ? 'halo1' : 'halo2', p);
-    else if (n.body === 'valor') add('limit', n.t1);
-    else if (n.body === 'swiftness') add('evasion', n.t1);
-  }
-  return g;
-}
-
-// Tooltip (the progression page's)
+// Tooltip
 const tip = document.getElementById('tip');
-function placeTip(x, y) { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; }
+function placeTip(x, y) { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
 function showTip(x, y, title, body) { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; placeTip(x, y); }
 function hideTip() { tip.style.opacity = 0; }
 function bindTip(el, title, body) {
@@ -420,260 +332,342 @@ function bindTip(el, title, body) {
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, t(), b()); });
   el.addEventListener('blur', hideTip);
 }
-/** Wire every element carrying data-tt (title) and data-td (body) inside root. */
 function bindAll(root) { root.querySelectorAll('[data-tt]').forEach((el) => bindTip(el, el.dataset.tt, el.dataset.td || '')); }
-function pillGroup(el, items, current, onPick) {
-  el.innerHTML = items.map(([id, label, extra]) => `<button data-v="${id}" aria-pressed="${String(id) === String(current)}">${extra ?? ''}${label}</button>`).join('');
+function pillGroup(el, label, items, current, onPick) {
+  el.innerHTML = (label ? `<span class="lbl">${label}</span>` : '') + items.map(([id, l]) => `<button data-v="${id}" aria-pressed="${String(id) === String(current)}">${l}</button>`).join('');
   el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); onPick(b.dataset.v); }));
 }
+function kpis(el, rows) {
+  el.innerHTML = rows.map(([l, v, d, c]) => `<div class="kpi"><div class="label"><span class="sw" style="background:${c}"></span>${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('');
+}
+const kindTag = (k) => `<span class="tag ${isArm(k) ? 'phys' : 'magic'}">${k}</span>`;
+/** A rounded bar (horizontal) as an SVG path. */
+function hbar(x, y, w, h, r = 3) { if (w <= 0) return ''; r = Math.min(r, w / 2, h / 2); return `M${x},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} H${x} Z`; }
+function vbar(x, y0, w, h, r = 3) { if (h <= 0) return ''; r = Math.min(r, w / 2, h); const y = y0 - h; return `M${x},${y0} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y0} Z`; }
 
+const NODES = DATA.nodes;
+const ALLKINDS = [...ARMS, ...TOMES];
+const inTier = (n, t) => t >= n.from;
+let tier = 2, cls = 'spellblade', lv = 50, sel = 'wm1:3';
+const settings = {};
+function presetMoons(c, t) {
+  if (t < 2) return [];
+  const p = DATA.presets[c];
+  return t === 2 ? [{ mode: p.t2[0], kinds: [...p.t2[1]] }] : p.t3.map(([m, k]) => ({ mode: m, kinds: [...k] }));
+}
+function moonsFor(c, t) { const key = c + t; if (!settings[key]) settings[key] = presetMoons(c, t); return settings[key]; }
+const moonOf = (n, moons) => moons[n.body === 'wm1' ? 0 : 1];
+function wmVal(n, t, m) { return m && m.mode === 'split' ? n.splitv[t] : n.full[t]; }
+/** What a node gives at a tier, for a class, in words. */
+function grantText(n, t, c, moons) {
+  if (!inTier(n, t)) return 'Not in this tier';
+  switch (n.body) {
+    case 'planet': { const p = n.pts[t]; return `+${p} to each core stat (HP +${p * 5})`; }
+    case 'prowess': { const [a, b] = n.split[c][t]; return [a && `ATK +${a}`, b && `M.ATK +${b}`].filter(Boolean).join(', ') + ` <span class="muted">(${CLASS_NAME[c]} ${SPLIT_TXT[c]})</span>`; }
+    case 'vigor': { const p = n.pts[t]; return `HP +${p * 5}, MP +${p}`; }
+    case 'guard': { const p = n.pts[t]; return `DEF +${p}, M.DEF +${p}`; }
+    case 'wm1': case 'wm2': {
+      const m = moonOf(n, moons); const v = wmVal(n, t, m);
+      return m.mode === 'split' ? `+${v} on her ${m.kinds[0]} hits and +${v} on her ${m.kinds[1]} hits (Split)` : `+${v} on her ${m.kinds[0]} hits (Full)`;
+    }
+    case 'template': { const p = n.pts[t]; return n.n === 'I' ? `Her knack +${p} points: HP +${p * 5}, MP +${p} or DEF and M.DEF +${p} each (Fleet +2.4% evasion, Gritty +1.6 Limit start)` : `Her lead: DEF or M.DEF +${p}, her calling channel's defense, every class`; }
+  }
+  return '';
+}
+/** Extra Stats at a tier and level, for a class and her weapon-moon settings. */
+function grantsAt(t, L, c, moons) {
+  const g = { hp: 0, mp: 0, atk: 0, matk: 0, def: 0, mdef: 0, kinds: {}, tpl: [0, 0] };
+  for (const n of NODES) {
+    if (n.lv > L || !inTier(n, t)) continue;
+    if (n.body === 'planet') { const p = n.pts[t]; g.hp += 5 * p; g.mp += p; g.atk += p; g.matk += p; g.def += p; g.mdef += p; }
+    else if (n.body === 'prowess') { const [a, b] = n.split[c][t]; g.atk += a; g.matk += b; }
+    else if (n.body === 'vigor') { const p = n.pts[t]; g.hp += 5 * p; g.mp += p; }
+    else if (n.body === 'guard') { const p = n.pts[t]; g.def += p; g.mdef += p; }
+    else if (n.body === 'wm1' || n.body === 'wm2') { const m = moonOf(n, moons); const v = wmVal(n, t, m); const ks = m.mode === 'split' ? m.kinds.slice(0, 2) : m.kinds.slice(0, 1); for (const k of ks) g.kinds[k] = (g.kinds[k] || 0) + v; }
+    else if (n.body === 'template') g.tpl[n.n === 'I' ? 0 : 1] = n.pts[t];
+  }
+  return g;
+}
+function moonProblems(t, moons, c) {
+  const out = []; if (t < 2) return out;
+  const used = moons.flatMap((m) => (m.mode === 'split' ? m.kinds.slice(0, 2) : m.kinds.slice(0, 1)));
+  if (new Set(used).size < used.length) out.push('Every weapon moon on a different kind: a repeated kind counts once.');
+  for (const k of new Set(used)) if (!KINDS_OF[c].includes(k)) out.push(`No ${k} in her slots (her default set): that kind's moon does nothing until she slots it.`);
+  return out;
+}
 
-let tier = 1, cls = 'any', lv = 50, sel = 'planet:1';
-const NEW_IN = { 2: ['halo:1', 'halo:2', 'valor:1', 'valor:2'], 3: ['halo:3', 'halo:4', 'swiftness:1', 'swiftness:2'] };
-
-// --- Geometry: the big map (760 × 640) --------------------------------------------------------------------------------
+// --- Geometry: the big map (760 × 640) -----------------------------------------------------------------------------------
 const C = { x: 380, y: 320 };
 const rad = (d) => (d * Math.PI) / 180;
 const at = (r, deg, o = C) => ({ x: o.x + r * Math.cos(rad(deg)), y: o.y + r * Math.sin(rad(deg)) });
-const MOON_POS = { strength: -90, sorcery: 0, vigor: 90, guard: 180 };
-const SMALL_POS = { valor: -135, swiftness: 45 };
-const TPL = { a: 135, r: 258, nodes: [200, 150] };
+const ORB = { prowess: [-90, 200], vigor: [150, 200], guard: [30, 200], wm1: [-22, 290], wm2: [-158, 290], template: [90, 245] };
+function center(id) { const [a, r] = ORB[id]; return at(r, a); }
 function nodePos(n) {
   const i = ROMAN.indexOf(n.n);
-  if (n.body === 'planet') return { ...at(86, -90 + 72 * i), r: 14 };
-  if (n.body === 'halo') return { ...at(128, [-72, -42, 108, 138][Number(n.id.split(':')[1]) - 1]), r: 12 };
-  if (MOON_POS[n.body] !== undefined) { const a = MOON_POS[n.body], o = at(215, a); return { ...at(60, a - 56 + 28 * i, o), r: 12 }; }
-  if (SMALL_POS[n.body] !== undefined) { const a = SMALL_POS[n.body], o = at(215, a); return { ...at(40, a + (i === 0 ? -24 : 24), o), r: 11 }; }
-  if (n.body === 'template') { const o = at(TPL.r, TPL.a); return { ...at(40, TPL.nodes[i], o), r: 11 }; }
+  if (n.body === 'planet') return { ...at(84, -90 + 72 * i), r: 13 };
+  if (n.body === 'template') { const o = center('template'); return { ...at(40, [205, 335][i], o), r: 11 }; }
+  const a = ORB[n.body][0], o = center(n.body);
+  return { ...at(58, a - 60 + 30 * i, o), r: 12 };
 }
-function stars(w, h, n, seed) { let s = seed, out = ''; const rnd = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
+function starsBg(w, h, n, seed) { let s = seed, out = ''; const rnd = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
   for (let i = 0; i < n; i++) { const x = rnd() * w, y = rnd() * h, r = rnd() * 1.1 + 0.3; out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="#fff" opacity="${(0.15 + rnd() * 0.35).toFixed(2)}"/>`; }
   return out; }
-const nodeState = (n, L) => (n.lv <= L ? 'open' : 'locked');
-function nodeSvg(n, t, L, c, opts = {}) {
-  const p = nodePos(n), B = BODY[n.body], st = nodeState(n, L), dim = n.body !== 'template' && CORE.includes(n.body) && !usesBody(c, n.body);
-  const fill = st === 'open' ? B.m : 'var(--sky)';
-  const txt = st === 'open' ? (n.body === 'planet' ? '#1b1300' : '#fff') : 'var(--sky-soft)';
-  const isNew = (NEW_IN[t] || []).includes(n.id);
+const NEW_IN = { 2: ['wm1'], 3: ['wm2'] };
+function nodeSvg(n, t, L, c, moons, o) {
+  const p = nodePos(n), B = BODY[n.body], open = n.lv <= L;
+  const fill = open ? B.m : 'var(--sky)', txt = open ? (n.body === 'planet' ? '#1b1300' : '#fff') : 'var(--sky-soft)';
+  const isNew = (NEW_IN[t] || []).includes(n.body) && o.showNew !== false;
   const fs = Math.round(p.r * (n.n.length > 2 ? 0.78 : 0.95));
-  return `<g class="nd${opts.interactive && n.id === sel ? ' sel' : ''}" data-id="${n.id}" ${opts.interactive ? 'tabindex="0" role="button"' : 'tabindex="0"'} aria-label="${B.name} ${n.n}: ${grantText(n, t, c)}" opacity="${dim ? 0.35 : 1}">
-    ${isNew && opts.showNew !== false ? `<circle cx="${p.x}" cy="${p.y}" r="${p.r + 6}" fill="none" stroke="var(--m-glow)" stroke-width="1.5" stroke-dasharray="3 3"/>` : ''}
+  const label = `${B.name} ${n.n}: ${grantText(n, t, c, moons).replace(/<[^>]+>/g, '')}`;
+  return `<g class="nd${o.interactive && n.id === sel ? ' sel' : ''}" data-id="${n.id}" tabindex="0" role="${o.interactive ? 'button' : 'img'}" aria-label="${esc(label)}">
+    ${isNew ? `<circle cx="${p.x}" cy="${p.y}" r="${p.r + 5}" fill="none" stroke="var(--m-glow)" stroke-width="1.4" stroke-dasharray="3 3"/>` : ''}
     <circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${fill}" stroke="${B.m}" stroke-width="2"/>
     <circle class="ring" cx="${p.x}" cy="${p.y}" r="${p.r + 3.5}"/>
     <text x="${p.x}" y="${p.y + fs * 0.36}" text-anchor="middle" style="font-size:${fs}px;font-weight:800;fill:${txt};pointer-events:none">${n.n}</text></g>`;
 }
-function bodySvg(id, t, c, opts) {
-  const B = BODY[id], dim = CORE.includes(id) && !usesBody(c, id), fsz = opts.fs || 1;
-  if (id === 'planet') return `<g><circle cx="${C.x}" cy="${C.y}" r="70" fill="url(#glow)" opacity=".55"/><circle cx="${C.x}" cy="${C.y}" r="52" fill="url(#pl)"/>
-    <text x="${C.x}" y="${C.y - 2}" text-anchor="middle" style="font-size:${14 * fsz}px;font-weight:800;fill:#1b1300">The Planet</text>
-    ${opts.labels !== 'names' ? `<text x="${C.x}" y="${C.y + 14}" text-anchor="middle" style="font-size:10.5px;font-weight:600;fill:#3a2a08">every core stat</text>` : ''}</g>`;
-  if (MOON_POS[id] !== undefined) { const a = MOON_POS[id], o = at(215, a), v = [30, 54, 78][t - 1];
-    const lines = { strength: [`ATK +${v}`], sorcery: [`M.ATK +${v}`], vigor: [`HP +${v * 5} · MP +${v}`], guard: [`DEF +${v}`, `M.DEF +${v}`] }[id];
-    if (dim) lines.push('not her class\u2019s');
-    const pos = { strength: { x: o.x, y: 17, an: 'middle', dy: -13 }, vigor: { x: o.x, y: 630, an: 'middle', dy: -13 }, sorcery: { x: 683, y: 316, an: 'start', dy: 14 }, guard: { x: 77, y: 316, an: 'end', dy: 14 } }[id];
-    const lab = opts.labels === 'names' ? '' : lines.map((l, k) => `<text x="${pos.x}" y="${pos.y + (pos.dy < 0 ? -(lines.length - 1 - k) * 13 : k * pos.dy)}" text-anchor="${pos.an}" class="sky-soft" style="font-size:11px;font-weight:600">${l}</text>`).join('');
-    return `<g opacity="${dim ? 0.35 : 1}"><circle cx="${o.x}" cy="${o.y}" r="30" fill="${B.m}"/><circle cx="${o.x}" cy="${o.y}" r="30" fill="url(#shade)"/>
-      <text x="${o.x}" y="${o.y + 4 * fsz}" text-anchor="middle" style="font-size:${11.5 * fsz}px;font-weight:800;fill:#fff">${B.short}</text>${lab}</g>`; }
-  if (SMALL_POS[id] !== undefined) { if (t < B.from) return ''; const a = SMALL_POS[id], o = at(215, a), lab = at(48, a + 180, o), an = o.x > C.x ? 'end' : 'start';
-    const line = id === 'valor' ? 'Limit start +4' : 'Evasion +6%';
-    return `<g><circle cx="${o.x}" cy="${o.y}" r="20" fill="${B.m}"/><circle cx="${o.x}" cy="${o.y}" r="20" fill="url(#shade)"/>
-      <text x="${lab.x}" y="${lab.y}" text-anchor="${an}" class="sky-text" style="font-size:${11.5 * fsz}px">${B.short}</text>
-      ${opts.labels !== 'names' ? `<text x="${lab.x}" y="${lab.y + 14}" text-anchor="${an}" class="sky-soft" style="font-size:10.5px">${line}</text>` : ''}
-      ${(NEW_IN[t] || []).includes(id + ':1') && opts.showNew !== false ? `<circle cx="${o.x}" cy="${o.y}" r="27" fill="none" stroke="var(--m-glow)" stroke-width="1.5" stroke-dasharray="4 4"/>` : ''}</g>`; }
-  if (id === 'template') { const o = at(TPL.r, TPL.a);
-    return `<g><circle cx="${o.x}" cy="${o.y}" r="18" fill="${B.m}"/><text x="${o.x}" y="${o.y + 6}" text-anchor="middle" style="font-size:17px;fill:var(--m-glow)">★</text>
-      <text x="${o.x + 26}" y="${o.y + 36 + 6 * (fsz - 1)}" text-anchor="start" class="sky-text" style="font-size:${11 * fsz}px">Her moon</text>
-      ${opts.labels !== 'names' ? `<text x="${o.x + 26}" y="${o.y + 50}" text-anchor="start" class="sky-soft" style="font-size:10.5px">a marked slot</text>` : ''}</g>`; }
-  if (id === 'halo') { if (t < 2) return '';
-    const k = HALO_KIND[c] ?? HALO_KIND.any, l1 = at(165, -57), l2 = at(165, 123);
-    return `<g><circle cx="${C.x}" cy="${C.y}" r="128" fill="none" stroke="${B.m}" stroke-width="12" opacity=".22"/>
-      <circle cx="${C.x}" cy="${C.y}" r="122" fill="none" stroke="${B.m}" stroke-width="1" opacity=".55"/><circle cx="${C.x}" cy="${C.y}" r="134" fill="none" stroke="${B.m}" stroke-width="1" opacity=".55"/>
-      ${opts.showNew !== false && t === 2 ? `<circle cx="${C.x}" cy="${C.y}" r="142" fill="none" stroke="var(--m-glow)" stroke-width="1.5" stroke-dasharray="5 5"/>` : ''}
-      <text x="${l1.x}" y="${l1.y}" text-anchor="start" class="sky-text" style="font-size:${11.5 * fsz}px">Halo · ${k[0]}</text>
-      ${opts.labels !== 'names' ? `<text x="${l1.x}" y="${l1.y + 14}" text-anchor="start" class="sky-soft" style="font-size:10.5px">+${t === 2 ? 61 : 88} on its hits</text>` : ''}
-      ${t >= 3 ? `<text x="${l2.x}" y="${l2.y}" text-anchor="end" class="sky-text" style="font-size:${11.5 * fsz}px">Halo · ${k[1]}</text>${opts.labels !== 'names' ? `<text x="${l2.x}" y="${l2.y + 14}" text-anchor="end" class="sky-soft" style="font-size:10.5px">+88 on its hits</text>` : ''}` : ''}</g>`; }
+function totalOf(body, t, c, moons) {
+  const ns = NODES.filter((n) => n.body === body && inTier(n, t));
+  if (body === 'prowess') { const a = ns.reduce((s, n) => s + n.split[c][t][0], 0), b = ns.reduce((s, n) => s + n.split[c][t][1], 0); return [a, b]; }
+  if (body === 'wm1' || body === 'wm2') { const m = moonOf(ns[0], moons); return ns.reduce((s, n) => s + wmVal(n, t, m), 0); }
+  return ns.reduce((s, n) => s + n.pts[t], 0);
+}
+function bodySvg(id, t, c, moons, o) {
+  const B = BODY[id], small = o.compact;
+  const lab = (x, y, an, l1, l2) => `<text x="${x}" y="${y}" text-anchor="${an}" class="sky-text" style="font-size:${small ? 15 : 12}px">${l1}</text>${l2 && !small ? `<text x="${x}" y="${y + 14}" text-anchor="${an}" class="sky-soft" style="font-size:11px">${l2}</text>` : ''}`;
+  if (id === 'planet') { const p = totalOf('planet', t, c, moons);
+    return `<g><circle cx="${C.x}" cy="${C.y}" r="68" fill="url(#glow-${o.uid})" opacity=".55"/><circle cx="${C.x}" cy="${C.y}" r="50" fill="url(#pl-${o.uid})"/>
+      <text x="${C.x}" y="${C.y - (small ? 0 : 3)}" text-anchor="middle" style="font-size:${small ? 17 : 14}px;font-weight:800;fill:#1b1300">The Planet</text>
+      ${small ? '' : `<text x="${C.x}" y="${C.y + 13}" text-anchor="middle" style="font-size:10.5px;font-weight:600;fill:#3a2a08">+${p} every stat</text>`}</g>`; }
+  if (['prowess', 'vigor', 'guard'].includes(id)) { const o2 = center(id), v = totalOf(id, t, c, moons);
+    const line = id === 'prowess' ? [v[0] && `ATK +${v[0]}`, v[1] && `M.ATK +${v[1]}`].filter(Boolean).join(' · ') : id === 'vigor' ? `HP +${v * 5} · MP +${v}` : `DEF, M.DEF +${v}`;
+    const L = id === 'prowess' ? lab(o2.x + 44, o2.y + 6, 'start', 'Prowess', line) : lab(o2.x, o2.y + 88, 'middle', B.short, line);
+    return `<g><circle cx="${o2.x}" cy="${o2.y}" r="28" fill="${B.m}"/><circle cx="${o2.x}" cy="${o2.y}" r="28" fill="url(#shade-${o.uid})"/>${small ? '' : `<text x="${o2.x}" y="${o2.y + 4}" text-anchor="middle" style="font-size:10.5px;font-weight:800;fill:#fff">${B.short}</text>`}${L}</g>`; }
+  if (id === 'wm1' || id === 'wm2') { const o2 = center(id);
+    if (t < B.from) return `<g><circle cx="${o2.x}" cy="${o2.y}" r="26" fill="none" stroke="var(--sky-line)" stroke-width="1.5" stroke-dasharray="4 4"/>${small ? '' : `<text x="${o2.x}" y="${o2.y + 4}" text-anchor="middle" class="sky-soft" style="font-size:10.5px">Tier ${B.from}</text><text x="${o2.x}" y="${o2.y + 44}" text-anchor="middle" class="sky-soft" style="font-size:10.5px">a weapon moon</text>`}</g>`;
+    const m = moons[id === 'wm1' ? 0 : 1]; const v = totalOf(id, t, c, moons);
+    const isNew = (NEW_IN[t] || []).includes(id) && o.showNew !== false;
+    let disk;
+    if (m.mode === 'split') disk = `<circle cx="${o2.x - 15}" cy="${o2.y}" r="18" fill="${B.m}"/><circle cx="${o2.x + 15}" cy="${o2.y}" r="18" fill="${B.m}" opacity=".85"/><circle cx="${o2.x - 15}" cy="${o2.y}" r="18" fill="url(#shade-${o.uid})"/><circle cx="${o2.x + 15}" cy="${o2.y}" r="18" fill="url(#shade-${o.uid})"/>`;
+    else disk = `<circle cx="${o2.x}" cy="${o2.y}" r="28" fill="${B.m}"/><circle cx="${o2.x}" cy="${o2.y}" r="28" fill="url(#shade-${o.uid})"/>`;
+    const name = m.mode === 'split' ? `${m.kinds[0]} · ${m.kinds[1]}` : `${m.kinds[0]} moon`;
+    const line = m.mode === 'split' ? `Split: +${v} on each` : `Full: +${v}`;
+    return `<g>${isNew ? `<circle cx="${o2.x}" cy="${o2.y}" r="40" fill="none" stroke="var(--m-glow)" stroke-width="1.5" stroke-dasharray="4 4"/>` : ''}${disk}
+      ${lab(o2.x, o2.y + 78, 'middle', name, line)}</g>`; }
+  if (id === 'template') { const o2 = center('template');
+    return `<g><circle cx="${o2.x}" cy="${o2.y}" r="17" fill="${B.m}"/><text x="${o2.x}" y="${o2.y + 6}" text-anchor="middle" style="font-size:17px;fill:var(--m-glow)">★</text>
+      ${lab(o2.x + 62, o2.y + 4, 'start', 'Her moon', 'her template, 2 nodes')}</g>`; }
   return '';
 }
-function drawSystem(t, L, c, opts = {}) {
-  const W = 760, H = 640, uid = opts.uid || 'm';
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tier ${t} Extra Stats map: ${opts.aria || ''}">
-    <defs><radialGradient id="pl" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="var(--m-glow)"/><stop offset="1" stop-color="var(--m-planet)"/></radialGradient>
-    <radialGradient id="glow"><stop offset=".55" stop-color="var(--m-glow)" stop-opacity=".55"/><stop offset="1" stop-color="var(--m-glow)" stop-opacity="0"/></radialGradient>
-    <radialGradient id="shade" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>
-    <linearGradient id="skyg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--sky-2)"/><stop offset="1" stop-color="var(--sky)"/></linearGradient></defs>
-    <rect width="${W}" height="${H}" fill="url(#skyg)"/>${stars(W, H, 110, 7)}
-    <circle cx="${C.x}" cy="${C.y}" r="215" fill="none" stroke="var(--sky-line)" stroke-width="1.5" stroke-dasharray="2 6"/>
-    <circle cx="${C.x}" cy="${C.y}" r="258" fill="none" stroke="var(--sky-line)" stroke-width="1" stroke-dasharray="1 7"/>
-    <circle cx="${C.x}" cy="${C.y}" r="86" fill="none" stroke="rgb(255 216 120 / .25)" stroke-width="1"/>`;
-  if (opts.corner !== false) s += `<text x="22" y="34" class="sky-text" style="font-size:${15 * (opts.fs || 1)}px">Tier ${t}</text><text x="22" y="${52 + 6 * ((opts.fs || 1) - 1)}" class="sky-soft" style="font-size:${11.5 * (opts.fs || 1)}px">${[25, 29, 33][t - 1]} shared nodes · ★ 2 hers</text>`;
-  for (const id of ['halo', 'planet', 'strength', 'sorcery', 'vigor', 'guard', 'valor', 'swiftness', 'template']) s += bodySvg(id, t, c, opts);
-  for (const n of NODES) if (inTier(n, t)) s += nodeSvg(n, t, L, c, opts);
+let uidN = 0;
+function drawSystem(t, L, c, moons, o = {}) {
+  const W = 760, H = 640, uid = o.uid || 'm' + (uidN++);
+  o.uid = uid;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tier ${t} Extra Stats map, ${CLASS_NAME[c]}">
+    <defs><radialGradient id="pl-${uid}" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="var(--m-glow)"/><stop offset="1" stop-color="var(--m-planet)"/></radialGradient>
+    <radialGradient id="glow-${uid}"><stop offset=".55" stop-color="var(--m-glow)" stop-opacity=".55"/><stop offset="1" stop-color="var(--m-glow)" stop-opacity="0"/></radialGradient>
+    <radialGradient id="shade-${uid}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>
+    <linearGradient id="skyg-${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--sky-2)"/><stop offset="1" stop-color="var(--sky)"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#skyg-${uid})"/>${starsBg(W, H, 110, 7)}
+    <circle cx="${C.x}" cy="${C.y}" r="200" fill="none" stroke="var(--sky-line)" stroke-width="1.5" stroke-dasharray="2 6"/>
+    <circle cx="${C.x}" cy="${C.y}" r="290" fill="none" stroke="var(--sky-line)" stroke-width="1" stroke-dasharray="1 7"/>
+    <circle cx="${C.x}" cy="${C.y}" r="84" fill="none" stroke="rgb(255 216 120 / .25)" stroke-width="1"/>`;
+  if (o.corner !== false) s += `<text x="22" y="34" class="sky-text" style="font-size:${o.compact ? 22 : 15}px">Tier ${t}</text>${o.compact ? '' : `<text x="22" y="52" class="sky-soft" style="font-size:11.5px">${CLASS_NAME[c]} · Lv ${L} · values × ${MULT[t]}</text>`}`;
+  for (const id of ['planet', 'prowess', 'vigor', 'guard', 'wm1', 'wm2', 'template']) s += bodySvg(id, t, c, moons, o);
+  for (const n of NODES) if (inTier(n, t)) s += nodeSvg(n, t, L, c, moons, o);
   return s + '</svg>';
 }
-function wireNodes(root, t, c, L, onClick) {
+function wireNodes(root, t, c, L, moons, onClick) {
   root.querySelectorAll('.nd').forEach((g) => {
     const n = NODES.find((x) => x.id === g.dataset.id), B = BODY[n.body];
-    const body = () => `${grantText(n, t, c)}<br>Grade ${n.grade} · opens at Uma Lv ${n.lv} · ${n.jewel}<br>${n.lv <= L ? 'Open at Lv ' + L : 'Opens at Lv ' + n.lv}${CORE.includes(n.body) && !usesBody(c, n.body) ? ` · ${CLASS_NAME[c]} doesn't use it` : ''}`;
-    bindTip(g, `${B.name} ${n.n} · Tier ${t}`, body);
+    bindTip(g, `${B.name} ${n.n} · Tier ${t}`, () => `${grantText(n, t, c, moons)}<br>Grade ${n.grade} · opens at Uma Lv ${n.lv} · ${n.jewel}<br>${n.lv <= L ? 'Open at Lv ' + L : 'Opens at Lv ' + n.lv}`);
     if (onClick) { g.addEventListener('click', () => onClick(n.id)); g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(n.id); } }); }
   });
 }
 
-// --- KPIs --------------------------------------------------------------------------------------------------------------
-document.getElementById('kpis').innerHTML = [
-  ['Shared nodes', '25 · 29 · 33', 'Today 100; her moon +2 in every tier', 'var(--accent)'],
-  ['Bodies', '5 · 7 · 8', 'The Planet, 4 moons; + Halo, Valor; + Swiftness', 'var(--b-planet)'],
-  ['A stat with its moon, Lv 50', '+51 · +92 · +133', 'Tier 1 × 1, × 1.8, × 2.6 (HP ×5)', 'var(--b-str)'],
-  ['The Halo, Lv 50', '— · +61 · +88 ×2', 'Flat offense on a kind she picks', 'var(--b-halo)'],
-  ['Jewel kinds · items', '2·10 · 3·12 · 3·14', 'Today 3 · 100 Star Gems', 'var(--b-sor)'],
+// --- KPIs ----------------------------------------------------------------------------------------------------------------
+kpis(document.getElementById('kpis'), [
+  ['Shared nodes, every class', '20 · 25 · 30', 'Today 100; her moon +2 in every tier', 'var(--accent)'],
+  ['Bodies', '4 · 5 · 6', 'Planet, Prowess, Vigor, Guard; + a weapon moon each tier', 'var(--b-planet)'],
+  ['A stat with its moon, Lv 50', '+51 · +92 · +133', 'Tier 1 × 1, × 1.8, × 2.6 (HP ×5)', 'var(--b-vig)'],
+  ['A Full weapon moon, Lv 50', '— · +90 · +130', 'Split: +63 · +91 on each of two kinds', 'var(--b-wm1)'],
+  ['Jewel kinds · items', '2 · 10', 'Every tier (today 3 · 100 Star Gems)', 'var(--b-pro)'],
   ['Active slots', 'None', 'Every open node counts (today 5 → 30)', 'var(--b-grd)'],
-].map(([l, v, d, c]) => `<div class="kpi"><div class="label"><span class="sw" style="background:${c}"></span>${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('');
+]);
 
-// --- The big map -------------------------------------------------------------------------------------------------------
-pillGroup(document.getElementById('tier-pills'), [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], tier, (v) => { tier = Number(v); if (!inTier(NODES.find((n) => n.id === sel), tier)) sel = 'planet:1'; render(); });
-document.getElementById('tier-pills').insertAdjacentHTML('afterbegin', '<span class="lbl">Tier</span>');
-pillGroup(document.getElementById('class-pills'), [['any', 'Any class'], ...CLASSES], cls, (v) => { cls = v; render(); });
-document.getElementById('class-pills').insertAdjacentHTML('afterbegin', '<span class="lbl">Class</span>');
+// --- The big map ---------------------------------------------------------------------------------------------------------
+pillGroup(document.getElementById('tier-pills'), 'Tier', [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], tier, (v) => { tier = Number(v); if (!inTier(NODES.find((n) => n.id === sel), tier)) sel = 'planet:1'; render(); });
+pillGroup(document.getElementById('class-pills'), 'Class', CLASSES, cls, (v) => { cls = v; render(); });
 document.getElementById('lv').addEventListener('input', (e) => { lv = Number(e.target.value); document.getElementById('lv-out').textContent = lv; render(); });
+document.getElementById('legend').innerHTML = ['planet', 'prowess', 'vigor', 'guard', 'wm1', 'wm2', 'template'].map((b) => `<span><span class="bdot" style="--bc:${BODY[b].m}"></span>${BODY[b].name}</span>`).join('') +
+  '<span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="var(--neutral-strong)" stroke-width="2"/></svg>Not open yet</span><span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--m-glow)" stroke-width="1.4" stroke-dasharray="3 3"/></svg>New this tier</span>';
 
+function kindSelect(id, val, c) {
+  const mine = KINDS_OF[c], rest = ALLKINDS.filter((k) => !mine.includes(k));
+  return `<select id="${id}" aria-label="Kind">${`<optgroup label="Her weapons">${mine.map((k) => `<option${k === val ? ' selected' : ''}>${k}</option>`).join('')}</optgroup><optgroup label="Other kinds">${rest.map((k) => `<option${k === val ? ' selected' : ''}>${k}</option>`).join('')}</optgroup>`}</select>`;
+}
+function renderMoonSet() {
+  const el = document.getElementById('moonset');
+  if (tier < 2) { el.innerHTML = '<p class="muted" style="font-size:12.5px">Tier 1 has no weapon moon. Tier 2 brings one (Full on one kind or Split on two); Tier 3 a second.</p>'; return; }
+  const moons = moonsFor(cls, tier);
+  el.innerHTML = moons.map((m, i) => {
+    const other = moons[1 - i];
+    const splitBlocked = tier === 3 && other && other.mode === 'split' && m.mode !== 'split';
+    return `<div class="moonrow"><span class="nm"><span class="bdot" style="--bc:${BODY['wm' + (i + 1)].m}"></span>Weapon moon ${i + 1}</span>
+      <span class="toggle" role="group" aria-label="Full or Split"><button data-i="${i}" data-m="full" aria-pressed="${m.mode === 'full'}">Full</button><button data-i="${i}" data-m="split" aria-pressed="${m.mode === 'split'}" ${splitBlocked ? 'disabled title="Split + Split is not offered: she slots three kinds"' : ''}>Split</button></span>
+      ${kindSelect(`k${i}a`, m.kinds[0], cls)}${m.mode === 'split' ? kindSelect(`k${i}b`, m.kinds[1], cls) : ''}</div>`;
+  }).join('') + `<div class="warn" id="moonwarn">${moonProblems(tier, moons, cls).join('<br>')}</div><p class="foot" style="margin-top:2px">Preset (${DATA.presets[cls].b1}): ${tier === 2 ? 'Split on her two most-used kinds' : 'Full on her most-used kind, Split on the other two'}. <a href="#" id="reset">Back to the preset</a></p>`;
+  el.querySelectorAll('.toggle button').forEach((b) => b.addEventListener('click', () => {
+    const m = moons[Number(b.dataset.i)];
+    if (b.dataset.m === 'split' && m.kinds.length < 2) { const used = moons.flatMap((x) => x.kinds); m.kinds[1] = KINDS_OF[cls].find((k) => !used.includes(k)) || ALLKINDS.find((k) => !used.includes(k)); }
+    m.mode = b.dataset.m; if (m.mode === 'full') m.kinds = m.kinds.slice(0, 1); render();
+  }));
+  moons.forEach((m, i) => {
+    document.getElementById(`k${i}a`).addEventListener('change', (e) => { m.kinds[0] = e.target.value; render(); });
+    const b = document.getElementById(`k${i}b`); if (b) b.addEventListener('change', (e) => { m.kinds[1] = e.target.value; render(); });
+  });
+  document.getElementById('reset').addEventListener('click', (e) => { e.preventDefault(); settings[cls + tier] = presetMoons(cls, tier); render(); });
+}
 function render() {
+  document.querySelectorAll('#tier-pills button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === String(tier)));
+  document.querySelectorAll('#class-pills button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === cls));
+  document.querySelectorAll('.ccard').forEach((b) => b.setAttribute('aria-pressed', b.dataset.c === cls));
+  const moons = moonsFor(cls, tier);
+  renderMoonSet();
   const sky = document.getElementById('sky');
-  sky.innerHTML = drawSystem(tier, lv, cls, { interactive: true, uid: 'big', aria: 'the Planet in the middle, four moons on one orbit, her moon apart' + (tier >= 2 ? ', the Halo round the Planet, Valor' : '') + (tier >= 3 ? ', Swiftness' : '') });
-  wireNodes(sky, tier, cls, lv, (id) => { sel = id; render(); });
-  const bodies = ['planet', 'strength', 'sorcery', 'vigor', 'guard', 'halo', 'valor', 'swiftness', 'template'].filter((b) => BODY[b].from <= tier);
-  document.getElementById('legend').innerHTML = bodies.map((b) => `<span><span class="bdot" style="--bc:${BODY[b].c}"></span><b style="color:var(--ink)">${BODY[b].short}</b> ${BODY[b].gives.split(':')[0].replace('Flat offense on the hits of a kind she picks (never a kind for weaknesses)', 'offense on one kind')}</span>`).join('') + '<span class="muted">Dashed gold: new this tier</span>';
-  renderSheet(); renderTotals(); renderTierTable();
-}
-function renderSheet() {
-  const n = NODES.find((x) => x.id === sel), B = BODY[n.body], el = document.getElementById('sheet');
-  el.style.setProperty('--bc', B.c);
-  const uses = !CORE.includes(n.body) || usesBody(cls, n.body);
-  const across = [1, 2, 3].map((t) => `<div style="--tc:var(--t${t})"><span class="muted">Tier ${t}</span><b>${inTier(n, t) ? grantText(n, t, cls).replace(/\(HP.*\)$/, '') : '—'}</b></div>`).join('');
-  el.innerHTML = `<h3><span class="bdot" style="--bc:${B.c}"></span>${B.name} ${n.n}</h3>
-    <div class="grant">${grantText(n, tier, cls)}</div>
-    <div class="kv"><span>Grade</span><span>${n.grade}</span><span>Opens at</span><span>Uma Lv ${n.lv} of her tier</span><span>Jewel</span><span>${n.jewel} (made from Craft Lv ${n.body === 'halo' ? (n.grade === 5 ? 21 : 46) : 5 * n.grade - 4})</span>
-      <span>At Lv ${lv}</span><span>${n.lv <= lv ? '<b>Open</b>' : 'Locked: opens at Lv ' + n.lv}</span>
-      <span>${cls === 'any' ? 'Who uses it' : CLASS_NAME[cls]}</span><span>${n.body === 'template' ? (n.n === 'I' ? 'Every class (her knack)' : 'Her calling channel’s classes') : CORE.includes(n.body) ? (cls === 'any' ? (n.body === 'strength' ? 'Every class but the Mage' : n.body === 'sorcery' ? 'Every class but the Brawler' : 'Every class') : uses ? 'Counts for her' : 'Counts, does nothing: her class doesn’t use ' + B.gives) : (cls === 'any' ? 'Every class' : 'Counts for her')}</span>
-      <span>The body</span><span>${B.gives}${B.from > 1 ? ` · from Tier ${B.from}` : ''}</span></div>
+  sky.innerHTML = drawSystem(tier, lv, cls, moons, { interactive: true, uid: 'big' });
+  wireNodes(sky, tier, cls, lv, moons, (id) => { sel = id; render(); });
+  // Node sheet
+  const n = NODES.find((x) => x.id === sel), B = BODY[n.body];
+  const across = [1, 2, 3].map((t) => { const ok = inTier(n, t); const mt = moonsFor(cls, t); return `<div style="--tc:var(--t${t})"><span class="muted">Tier ${t}</span><b>${ok ? grantText(n, t, cls, mt).replace(/<span[^>]*>.*?<\/span>/, '') : '—'}</b></div>`; }).join('');
+  const sh = document.getElementById('sheet'); sh.style.setProperty('--bc', B.c);
+  sh.innerHTML = `<h3><span class="bdot" style="--bc:${B.c}"></span>${B.name} ${n.n}</h3><div class="grant">${grantText(n, tier, cls, moons)}</div>
+    <div class="kv"><span>Body</span><span>${B.gives}</span><span>Grade</span><span>${n.grade}</span><span>Opens at</span><span>Uma Lv ${n.lv} of her tier</span><span>Jewel</span><span>${n.jewel}${n.body === 'template' ? ' (her moon)' : ''}</span>
+    <span>State</span><span>${n.lv <= lv ? `<b style="color:var(--success)">Open</b> at Lv ${lv}` : `Opens at Lv ${n.lv}`}</span></div>
     <div class="across">${across}</div>`;
-}
-function renderTotals() {
-  const g = grantsAt(tier, lv, cls);
-  const open = NODES.filter((n) => inTier(n, tier) && n.body !== 'template' && n.lv <= lv && (!CORE.includes(n.body) || usesBody(cls, n.body))).length;
-  const total = NODES.filter((n) => inTier(n, tier) && n.body !== 'template' && (!CORE.includes(n.body) || usesBody(cls, n.body))).length;
-  document.getElementById('tot-h').textContent = `${cls === 'any' ? 'A hybrid or healer' : CLASS_NAME[cls]}, Tier ${tier}, Lv ${lv}`;
-  document.getElementById('tot-n').textContent = `Open ${open} of ${total} · ★ ${NODES.filter((n) => n.body === 'template' && n.lv <= lv).length} of 2`;
-  const k = HALO_KIND[cls] ?? HALO_KIND.any;
-  const cells = [['HP', sgn(g.hp)], ['MP', sgn(g.mp)], ['ATK', sgn(g.atk)], ['M.ATK', sgn(g.matk)], ['DEF', sgn(g.def)], ['M.DEF', sgn(g.mdef)],
-    [`Halo · ${tier >= 2 ? k[0] : '—'}`, tier >= 2 ? sgn(g.halo1) : '—'], [tier >= 3 ? `Halo · ${k[1]}` : 'Limit start', tier >= 3 ? sgn(g.halo2) : tier >= 2 ? '+' + g.limit : '—'], [tier >= 3 ? 'Limit · evasion' : 'Evasion', tier >= 3 ? `+${g.limit} · +${g.evasion}%` : '—']];
-  document.getElementById('totals').innerHTML = cells.map(([l, v]) => `<div class="${v === '—' ? 'off' : ''}">${l}<b>${v}</b></div>`).join('');
-  document.getElementById('tot-foot').textContent = 'Every node her level opens on her class’s bodies (on curve). Her moon not included. HP is 5 a point.';
-  const next = NODES.filter((n) => inTier(n, tier) && n.lv > lv && (!CORE.includes(n.body) || usesBody(cls, n.body))).sort((a, b) => a.lv - b.lv);
-  const nl = next.length ? next[0].lv : null;
-  document.getElementById('next').innerHTML = nl ? next.filter((n) => n.lv === nl).map((n) => `<li><b>${BODY[n.body].short} ${n.n}</b> at Lv ${n.lv}: ${grantText(n, tier, cls)} · ${n.jewel}</li>`).join('') : '<li>Everything is open: the map is full for this tier.</li>';
-}
-function renderTierTable() {
-  const rows = NODES.filter((n) => inTier(n, tier));
-  document.getElementById('tier-table').innerHTML = `<table class="tight"><thead><tr><th>Node</th><th class="num">Grade</th><th class="num">Opens at</th><th>Jewel</th><th>Grants in Tier ${tier}</th><th>${cls === 'any' ? 'Used by' : CLASS_NAME[cls]}</th><th>At Lv ${lv}</th></tr></thead><tbody>` +
-    rows.map((n) => `<tr><td><span class="bdot" style="--bc:${BODY[n.body].c}"></span> ${BODY[n.body].name} ${n.n}</td><td class="num">${n.grade}</td><td class="num">Lv ${n.lv}</td><td>${n.jewel}</td><td>${grantText(n, tier, cls)}</td><td>${!CORE.includes(n.body) || usesBody(cls, n.body) ? 'Yes' : 'No (counts, does nothing)'}</td><td>${n.lv <= lv ? 'Open' : 'Locked'}</td></tr>`).join('') + '</tbody></table>';
+  // Totals
+  const g = grantsAt(tier, lv, cls, moons);
+  const opened = NODES.filter((x) => inTier(x, tier) && x.body !== 'template' && x.lv <= lv).length, all = NODES.filter((x) => inTier(x, tier) && x.body !== 'template').length;
+  const hers = NODES.filter((x) => x.body === 'template' && x.lv <= lv).length;
+  document.getElementById('tot-h').textContent = `${CLASS_NAME[cls]}, Tier ${tier}, Lv ${lv}`;
+  document.getElementById('tot-n').textContent = `Open ${opened} of ${all} · ★ ${hers} of 2`;
+  const kinds = Object.entries(g.kinds);
+  document.getElementById('totals').innerHTML = [['HP', g.hp], ['MP', g.mp], ['ATK', g.atk], ['M.ATK', g.matk], ['DEF', g.def], ['M.DEF', g.mdef]].map(([k, v]) => `<div>${k}<b>+${fmt(v)}</b></div>`).join('') +
+    kinds.map(([k, v]) => `<div style="border-left:3px solid var(--b-wm1)">${k} hits<b>+${v}</b></div>`).join('');
+  document.getElementById('tot-foot').innerHTML = `Every node her level opens; her moon apart (★ knack +${g.tpl[0]} points, lead DEF or M.DEF +${g.tpl[1]}). ${tier >= 2 ? 'Weapon moons add to her hits of their kinds, outside the kind cap.' : ''}`;
+  const next = NODES.filter((x) => inTier(x, tier) && x.lv > lv).sort((a, b) => a.lv - b.lv);
+  const lvls = [...new Set(next.map((x) => x.lv))].slice(0, 3);
+  document.getElementById('next').innerHTML = lvls.length ? lvls.map((L) => `<li><b>Lv ${L}:</b> ${next.filter((x) => x.lv === L).map((x) => `${BODY[x.body].short} ${x.n}`).join(', ')}</li>`).join('') : '<li>Every node is open.</li>';
+  // Tier table
+  document.getElementById('tier-table').innerHTML = `<table><thead><tr><th>Node</th><th class="num">Grade</th><th class="num">Opens at</th><th>Jewel</th><th>Gives (Tier ${tier}, ${CLASS_NAME[cls]})</th></tr></thead><tbody>` +
+    NODES.filter((x) => inTier(x, tier)).map((x) => `<tr${x.id === sel ? ' class="hl"' : ''}><td><span class="bdot" style="--bc:${BODY[x.body].c}"></span> ${BODY[x.body].name} ${x.n}</td><td class="num">${x.grade}</td><td class="num">Lv ${x.lv}</td><td>${x.jewel}</td><td>${grantText(x, tier, cls, moons)}</td></tr>`).join('') + '</tbody></table>';
+  renderTrio(); renderSplitMaps();
 }
 
-// --- Body cards --------------------------------------------------------------------------------------------------------
-function glyph(id) {
-  const B = BODY[id], n = NODES.filter((x) => x.body === id && (id !== 'halo' || x.kindSlot === 1));
-  let s = `<svg viewBox="0 0 64 64" aria-hidden="true">`;
-  if (id === 'halo') s += `<circle cx="32" cy="32" r="12" fill="var(--m-glow)"/><circle cx="32" cy="32" r="22" fill="none" stroke="${B.m}" stroke-width="5" opacity=".5"/>` + [-60, -20, 120, 160].map((a, i) => { const p = { x: 32 + 22 * Math.cos(rad(a)), y: 32 + 22 * Math.sin(rad(a)) }; return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${B.m}" stroke="#fff" stroke-width="1"/>`; }).join('');
-  else { const big = id === 'planet', r = big ? 15 : id === 'template' || id === 'valor' || id === 'swiftness' ? 10 : 13;
-    s += `<circle cx="32" cy="32" r="${r}" fill="${big ? 'var(--m-glow)' : B.m}"/>` + (id === 'template' ? '<text x="32" y="37" text-anchor="middle" style="font-size:13px;fill:var(--m-glow)">★</text>' : '');
-    const k = n.length, R = big ? 24 : 23; n.forEach((_, i) => { const a = big ? -90 + 72 * i : -90 - (k - 1) * 22 + 44 * i; const p = { x: 32 + R * Math.cos(rad(a)), y: 32 + R * Math.sin(rad(a)) }; s += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="${B.m}" stroke="#fff" stroke-width="1"/>`; }); }
-  return s + '</svg>';
-}
-const USED_BY = { planet: 'Every class', strength: 'Every class but the Mage', sorcery: 'Every class but the Brawler', vigor: 'Every class', guard: 'Every class', halo: 'Every class: she points it at a kind she holds', valor: 'Every class', swiftness: 'Every class', template: 'Hers: I in every class, II in her calling channel’s classes' };
-document.getElementById('body-cards').innerHTML = ['planet', 'strength', 'sorcery', 'vigor', 'guard', 'halo', 'valor', 'swiftness', 'template'].map((id) => {
-  const B = BODY[id], ns = NODES.filter((x) => x.body === id);
-  const short = (n, t) => !inTier(n, t) ? '—' : id === 'halo' ? '+' + pts(n, t) : id === 'valor' ? '+2' : id === 'swiftness' ? '+3%' : id === 'vigor' ? `${pts(n, t) * 5} / ${pts(n, t)}` : '+' + pts(n, t);
-  const totalRow = id === 'halo' ? '<tr><td><b>Each kind</b></td><td></td><td>—</td><td><b>+61</b></td><td><b>+88</b></td></tr>' : id === 'valor' ? '<tr><td><b>In all</b></td><td></td><td>—</td><td><b>+4</b></td><td><b>+4</b></td></tr>' : id === 'swiftness' ? '<tr><td><b>In all</b></td><td></td><td>—</td><td>—</td><td><b>+6%</b></td></tr>' : id === 'template' ? '<tr><td colspan="5" class="muted">Knack units for Speed (+2.4% evasion) and Limit (+1.6) don’t scale</td></tr>' : id === 'vigor' ? '<tr><td><b>In all</b></td><td></td><td><b>150 / 30</b></td><td><b>270 / 54</b></td><td><b>390 / 78</b></td></tr>' : id === 'planet' ? '<tr><td><b>Each stat</b></td><td></td><td><b>+21</b></td><td><b>+38</b></td><td><b>+55</b></td></tr>' : '<tr><td><b>In all</b></td><td></td><td><b>+30</b></td><td><b>+54</b></td><td><b>+78</b></td></tr>';
-  return `<div class="bcard" style="--bc:${B.c}"><div class="top">${glyph(id)}<div><h3>${B.name} ${B.from > 1 ? `<span class="tag new">Tier ${B.from}</span>` : ''}</h3><div class="gv">${B.gives}${id === 'planet' ? '. Each node gives its points to all six; HP is 5 a point' : id === 'vigor' ? '. Cells: HP / MP' : ''}</div></div></div>
-    <table class="tight"><thead><tr><th>Node</th><th>Opens · jewel</th><th>T1</th><th>T2</th><th>T3</th></tr></thead><tbody>${ns.map((n) => `<tr><td>${n.n}</td><td style="white-space:nowrap">Lv ${n.lv} · ${n.jewel.replace(' Jewel', '')}</td><td>${short(n, 1)}</td><td>${short(n, 2)}</td><td>${short(n, 3)}</td></tr>`).join('')}${totalRow}</tbody></table>
-    <div class="meta">${USED_BY[id]}</div></div>`;
+// --- Every class ---------------------------------------------------------------------------------------------------------
+function proTot(c, t) { return NODES.filter((n) => n.body === 'prowess').reduce((s, n) => [s[0] + n.split[c][t][0], s[1] + n.split[c][t][1]], [0, 0]); }
+document.getElementById('ccards').innerHTML = CLASSES.map(([c, nm]) => {
+  const [a, b] = proTot(c, 1), sa = a / 30;
+  return `<div class="ccard" data-c="${c}" role="button" tabindex="0" aria-pressed="false"><h3>${nm}<span class="muted" style="font-size:12px">${SPLIT_TXT[c]}</span></h3>
+    <div class="split" aria-label="ATK ${Math.round(sa * 100)}%, M.ATK ${Math.round((1 - sa) * 100)}%"><i style="width:${sa * 100}%;background:var(--phys)"></i><i style="width:${(1 - sa) * 100}%;background:var(--magic)"></i></div>
+    <table><thead><tr><th></th><th class="num">T1</th><th class="num">T2</th><th class="num">T3</th></tr></thead><tbody>
+    <tr><td>Nodes</td><td class="num">20</td><td class="num">25</td><td class="num">30</td></tr>
+    <tr><td>Jewels</td><td class="num">20</td><td class="num">25</td><td class="num">30</td></tr>
+    <tr><td>Prowess ATK</td>${[1, 2, 3].map((t) => `<td class="num">${proTot(c, t)[0]}</td>`).join('')}</tr>
+    <tr><td>Prowess M.ATK</td>${[1, 2, 3].map((t) => `<td class="num">${proTot(c, t)[1]}</td>`).join('')}</tr>
+    <tr><td>ATK, Lv 50</td>${[1, 2, 3].map((t) => `<td class="num">+${proTot(c, t)[0] + [21, 38, 55][t - 1]}</td>`).join('')}</tr>
+    <tr><td>M.ATK, Lv 50</td>${[1, 2, 3].map((t) => `<td class="num">+${proTot(c, t)[1] + [21, 38, 55][t - 1]}</td>`).join('')}</tr></tbody></table></div>`;
 }).join('');
+document.querySelectorAll('.ccard').forEach((el) => {
+  const go = () => { cls = el.dataset.c; render(); document.getElementById('map').scrollIntoView({ behavior: 'smooth' }); };
+  el.addEventListener('click', go); el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+});
+document.getElementById('pro-table').innerHTML = `<table><thead><tr><th>Class (split)</th>${ROMAN.map((r) => `<th class="num">${r}: T1 · T2 · T3</th>`).join('')}<th class="num">In all</th></tr></thead><tbody>` +
+  CLASSES.map(([c, nm]) => `<tr><td><b>${nm}</b> ${SPLIT_TXT[c]}</td>${NODES.filter((n) => n.body === 'prowess').map((n) => `<td class="num">${[1, 2, 3].map((t) => n.split[c][t].join('/')).join(' · ')}</td>`).join('')}<td class="num">${[1, 2, 3].map((t) => proTot(c, t).join('/')).join(' · ')}</td></tr>`).join('') +
+  '</tbody></table><p class="foot">ATK/M.ATK. Each node\'s larger share is rounded half up, the smaller takes the rest, so a node\'s total is the moon\'s grade × tier.</p>';
 
-// --- Side by side ------------------------------------------------------------------------------------------------------
-const NEWTXT = { 1: ['The Planet: five nodes, every core stat', 'Four moons, five nodes each', 'Her moon: a marked two-node slot'], 2: ['<b>The Halo</b>: one kind, +18 at Lv 21, +61 at Lv 46', '<b>Valor</b>: Limit start +2, then +4', 'Every value × 1.8'], 3: ['<b>The Halo’s second kind</b>: Halo III–IV, +88', '<b>Swiftness</b>: evasion +3%, then +6%', 'Every value × 2.6'] };
-document.getElementById('trio').innerHTML = [1, 2, 3].map((t) => `<div><div class="skywrap" id="trio-${t}">${drawSystem(t, 50, 'any', { labels: 'names', fs: 1.45, uid: 't' + t })}</div>
-  <div class="cap"><b>Tier ${t}</b><span>${[25, 29, 33][t - 1]} shared nodes · ${['2 · 10', '3 · 12', '3 · 14'][t - 1]} jewels</span></div><ul>${NEWTXT[t].map((x) => `<li>${x}</li>`).join('')}</ul></div>`).join('');
-[1, 2, 3].forEach((t) => wireNodes(document.getElementById('trio-' + t), t, 'any', 50));
-
-// --- The Observatory phones --------------------------------------------------------------------------------------------
-function phoneMap(t, L, c, pending = []) {
-  const S = 360, cx = 180, cy = 180, at2 = (r, d, o = { x: cx, y: cy }) => ({ x: o.x + r * Math.cos(rad(d)), y: o.y + r * Math.sin(rad(d)) });
-  let s = `<svg viewBox="0 0 ${S} ${S}" role="img" aria-label="The Observatory's map, Tier ${t}"><rect width="${S}" height="${S}" fill="var(--sky)"/>${stars(S, S, 50, 3)}
-    <circle cx="${cx}" cy="${cy}" r="118" fill="none" stroke="var(--sky-line)" stroke-dasharray="2 5"/>`;
-  if (t >= 2) s += `<circle cx="${cx}" cy="${cy}" r="62" fill="none" stroke="var(--m-halo)" stroke-width="7" opacity=".3"/>`;
-  s += `<circle cx="${cx}" cy="${cy}" r="27" fill="var(--m-glow)"/><text x="${cx}" y="${cy + 4}" text-anchor="middle" style="font-size:10px;font-weight:800;fill:#1b1300">Planet</text>`;
-  const isOpen = (n) => n.lv <= L && !pending.includes(n.id);
-  const dot = (p, open, col, r = 6) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${open ? col : 'transparent'}" stroke="${col}" stroke-width="1.4" ${open ? `style="filter:drop-shadow(0 0 3px ${col})"` : ''}/>`;
-  NODES.filter((n) => n.body === 'planet').forEach((n, i) => (s += dot(at2(44, -90 + 72 * i), isOpen(n), 'var(--m-glow)', 5.5)));
-  if (t >= 2) NODES.filter((n) => n.body === 'halo' && inTier(n, t)).forEach((n) => { const i = Number(n.id.split(':')[1]) - 1; s += dot(at2(62, [-72, -42, 108, 138][i]), isOpen(n), 'var(--m-halo)', 5.5); });
-  for (const [b, a] of Object.entries(MOON_POS)) { const o = at2(118, a), dim = !usesBody(c, b);
-    s += `<g opacity="${dim ? 0.35 : 1}"><circle cx="${o.x}" cy="${o.y}" r="17" fill="${BODY[b].m}" opacity=".9"/><text x="${o.x}" y="${o.y + 3.5}" text-anchor="middle" style="font-size:9px;font-weight:800;fill:#fff">${{ strength: 'STR', sorcery: 'SOR', vigor: 'VIG', guard: 'GRD' }[b]}</text>`;
-    NODES.filter((n) => n.body === b).forEach((n, i) => (s += dot(at2(31, a - 56 + 28 * i, o), isOpen(n), BODY[b].m, 5)));
-    s += '</g>'; }
-  for (const [b, a] of Object.entries(SMALL_POS)) { if (t < BODY[b].from) continue; const o = at2(118, a); s += `<circle cx="${o.x}" cy="${o.y}" r="11" fill="${BODY[b].m}"/>`; NODES.filter((n) => n.body === b).forEach((n, i) => (s += dot(at2(22, a + (i ? 26 : -26), o), isOpen(n), BODY[b].m, 4.5))); }
-  const to = at2(150, TPL.a); s += `<circle cx="${to.x}" cy="${to.y}" r="11" fill="var(--m-tpl)"/><text x="${to.x}" y="${to.y + 4}" text-anchor="middle" style="font-size:11px;fill:var(--m-glow)">★</text>`;
-  NODES.filter((n) => n.body === 'template').forEach((n, i) => (s += dot(at2(22, TPL.nodes[i], to), isOpen(n), 'var(--m-tpl)', 4.5)));
-  return s + '</svg>';
+// --- Full or Split -------------------------------------------------------------------------------------------------------
+function renderSplitMaps() {
+  const c = 'brawler';
+  const cases = [
+    [2, [{ mode: 'full', kinds: ['Lance'] }], 'Tier 2 · Full', 'Lance +90; her other kinds nothing'],
+    [2, [{ mode: 'split', kinds: ['Lance', 'Greatsword'] }], 'Tier 2 · Split', 'Lance +63 and Greatsword +63: the preset'],
+    [3, [{ mode: 'full', kinds: ['Lance'] }, { mode: 'split', kinds: ['Greatsword', 'Axe'] }], 'Tier 3 · Full + Split', 'Lance +130; Greatsword, Axe +91: all three'],
+  ];
+  const el = document.getElementById('fs-maps');
+  el.innerHTML = cases.map(([t, m, h, d], i) => `<div><div class="skywrap" id="fsm${i}">${drawSystem(t, 50, c, m, { uid: 'fs' + i, showNew: false })}</div><div class="cap" style="display:flex;justify-content:space-between;margin:8px 2px 0;font-size:12.5px;color:var(--ink-soft)"><b style="color:var(--ink)">${h}</b><span>${d}</span></div></div>`).join('');
+  cases.forEach(([t, m], i) => wireNodes(document.getElementById('fsm' + i), t, c, 50, m));
 }
-function gemIcon(kind) {
-  const col = kind === 'Planet' ? 'var(--b-planet)' : kind === 'Halo' ? 'var(--b-halo)' : 'var(--b-sor)';
-  return `<svg class="gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2 L23 10 L13 24 L3 10 Z" fill="${col}"/><path d="M3 10 H23 M13 2 L9 10 L13 24 L17 10 Z" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"/></svg>`;
+(function fsChart() {
+  const FS = DATA.fullSplit;
+  document.getElementById('fs-legend').innerHTML = '<span><span class="sw" style="background:var(--b-wm1)"></span>Full</span><span><span class="sw" style="background:var(--b-wm2)"></span>Split</span><span class="muted">Damage her act gains, Tier 2, Lv 50</span>';
+  const W = 620, rowH = 15, gap = 4, grp = 2 * rowH + gap + 12, lw = 96, mid = 290, scale = (W - lw - 40) / 2 / 0.25;
+  const H = CLASSES.length * grp + 30;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Full against Split, campaign and tuned"><text class="axis-text" x="${lw}" y="12">Campaign</text><text class="axis-text" x="${lw + mid - lw + 10}" y="12">Tuned to one kind</text>`;
+  CLASSES.forEach(([c, nm], i) => {
+    const y = 22 + i * grp, f = FS[c];
+    s += `<text class="val-text" x="0" y="${y + rowH + 4}">${nm}</text>`;
+    [['campaign', lw], ['tuned', mid + 10]].forEach(([ctx, x0]) => {
+      [['full', 'var(--b-wm1)', 0], ['split', 'var(--b-wm2)', 1]].forEach(([k, col, j]) => {
+        const v = f[ctx][k], w = v * scale, yy = y + j * (rowH + gap);
+        const what = ctx === 'campaign' ? (k === 'full' ? `Full on ${f.a}` : `Split on ${f.a} + ${f.b}`) : (k === 'full' ? `Full on ${f.tuned.kind}` : `Split on ${f.a} + ${f.b}`);
+        s += `<path class="mark" d="${hbar(x0, yy, w, rowH)}" fill="${col}" data-tt="${nm} · ${ctx === 'campaign' ? 'campaign' : 'tuned to ' + f.tuned.kind}" data-td="${what}: her act +${(v * 100).toFixed(1)}%"></path><text class="val-soft" x="${x0 + w + 4}" y="${yy + rowH - 3}">${(v * 100).toFixed(1)}%</text>`;
+      });
+    });
+  });
+  document.getElementById('fs-chart').innerHTML = s + '</svg>';
+  bindAll(document.getElementById('fs-chart'));
+  document.getElementById('fs-table').innerHTML = `<table><thead><tr><th>Class</th><th>Campaign: Full</th><th>Campaign: Split</th><th>Tuned: Full</th><th>Tuned: Split</th><th>Tier 3: Full + Split</th><th>Tier 3: Full + Full</th></tr></thead><tbody>` +
+    CLASSES.map(([c, nm]) => { const f = FS[c]; return `<tr><td><b>${nm}</b></td><td>${f.a} ${sgnPct(f.campaign.full)}</td><td>${f.a} + ${f.b} ${sgnPct(f.campaign.split)}</td><td>${f.tuned.kind} ${sgnPct(f.tuned.full)}</td><td>${sgnPct(f.tuned.split)}</td><td>${sgnPct(f.t3.fullSplit)}</td><td>${f.t3.ffKinds.join(' + ')} ${sgnPct(f.t3.fullFull)}</td></tr>`; }).join('') +
+    '</tbody></table><p class="foot">The model (extra-stats-progression §8.4): offense² ÷ (offense + defense), foe defense 190 × tier; her acts over her weapons (a two-kind weapon 4 parts, a one-kind 3; a hybrid one Arm and one Tome at her hands). Tuned: 75% of the acts she chooses on one kind.</p>';
+})();
+
+// --- Side by side --------------------------------------------------------------------------------------------------------
+function renderTrio() {
+  const el = document.getElementById('trio');
+  el.innerHTML = [1, 2, 3].map((t) => { const m = presetMoons(cls, t); const g = grantsAt(t, 50, cls, m); const k = Object.entries(g.kinds).map(([a, b]) => `${a} +${b}`).join(', ');
+    return `<div><div class="skywrap" id="trio${t}">${drawSystem(t, 50, cls, m, { uid: 'tr' + t, showNew: true })}</div><div class="cap"><span><span class="tier-chip ${t > 1 ? 't' + t + 'c' : ''}" style="--tc:var(--t${t})">Tier ${t}</span> ${20 + 5 * (t - 1)} nodes</span><b>HP +${g.hp} · ATK +${g.atk} · M.ATK +${g.matk}</b></div><p class="foot" style="margin:2px 2px 0">${k ? 'Weapon moons: ' + k : 'No weapon moon yet'}</p></div>`; }).join('');
+  [1, 2, 3].forEach((t) => wireNodes(document.getElementById('trio' + t), t, cls, 50, presetMoons(cls, t)));
 }
-const PHONES = [
-  { t: 1, L: 26, pending: ['planet:3', 'sorcery:3', 'vigor:3', 'guard:3'], set: [['Planet', 'Planet Jewel III ×1', 'Opens Planet III · +4 to every stat'], ['Moon', 'Moon Jewel III ×3', 'Opens node III of a moon · Set asks which: Sorcery, Vigor or Guard (Strength III is open)']], sheet: '<b>Strength IV</b> · ATK +8 · needs a Moon Jewel IV · opens at Lv 36', notes: ['The header counts the shared map and her moon apart', 'No toggles: every open node counts', 'A Moon Jewel is given a moon when set, not when made'] },
-  { t: 2, L: 36, pending: ['sorcery:4', 'guard:4'], set: [['Moon', 'Moon Jewel IV ×2', 'Opens node IV of a moon · +14 · Sorcery or Guard'], ['Halo', 'Halo Jewel II ×1', 'Waits: opens Halo II at Lv 46 (+43 on her Katana hits)']], sheet: '<b>Valor II</b> · Limit start +2 more: +4 · Moon Jewel IV · open', notes: ['The Halo’s kind sits under the map, free to change outside fights', 'Values × 1.8: Strength IV reads ATK +14', 'Valor shares Moon Jewels II and IV with the moons'] },
-  { t: 3, L: 46, pending: ['strength:5', 'sorcery:5', 'vigor:5', 'guard:5', 'halo:4'], set: [['Moon', 'Moon Jewel V ×4', 'Opens node V of a moon · +26 · one for each'], ['Halo', 'Halo Jewel IV ×1', 'Opens Halo IV · +62 more on her Lance hits: +88']], sheet: '<b>Swiftness II</b> · Evasion +3% more: +6% · Moon Jewel IV · open', notes: ['Two Halo kinds, two different kinds', 'Values × 2.6', 'Swiftness: the defense Tier 3 adds'] },
-];
-document.getElementById('phones').innerHTML = PHONES.map((P) => {
-  const c = 'spellblade', g = grantsAt(P.t, P.L, c, P.pending);
-  const open = NODES.filter((n) => inTier(n, P.t) && n.body !== 'template' && n.lv <= P.L && !P.pending.includes(n.id)).length, all = NODES.filter((n) => inTier(n, P.t) && n.body !== 'template').length;
-  const tot = [['HP', sgn(g.hp)], ['MP', sgn(g.mp)], ['ATK', sgn(g.atk)], ['M.ATK', sgn(g.matk)], ['DEF', sgn(g.def)], ['M.DEF', sgn(g.mdef)]];
-  if (P.t >= 2) tot.push(['Halo · Katana', sgn(g.halo1)], ['Limit start', '+' + g.limit]);
-  if (P.t >= 3) tot.push(['Halo · Lance', sgn(g.halo2)], ['Evasion', '+' + g.evasion + '%']);
-  return `<div><div class="tier-chip ${P.t === 3 ? 't3c' : ''}" style="--tc:var(--t${P.t});margin:0 0 8px 6px">Tier ${P.t} · Uma A at Lv ${P.L}</div><div class="phone">
-    <div class="bar"><div class="face">A</div><div class="who"><b>Uma A</b>Spell Blade · Lv ${P.L}</div><div class="cnt">Open ${open} of ${all}<br>★ ${P.L >= 36 ? 2 : P.L >= 16 ? 1 : 0} of 2</div></div>
-    <div class="pmap">${phoneMap(P.t, P.L, c, P.pending)}</div>
-    ${P.t >= 2 ? `<div class="chips"><span class="chip2">Halo · Katana<i>▾</i></span>${P.t >= 3 ? '<span class="chip2">Halo · Lance<i>▾</i></span>' : ''}</div>` : ''}
-    <div class="ptot">${tot.map(([l, v]) => `<span>${l}<b>${v}</b></span>`).join('')}</div>
-    <div class="pset"><h4>Set · jewels from the Lapidary</h4>${P.set.map(([k, a, b]) => `<div class="prow">${gemIcon(k)}<div class="t"><b>${a}</b><span>${b}</span></div><span class="set">Set</span></div>`).join('')}</div>
-    <div class="psheet">Tapped: ${P.sheet}</div></div>
-    <ul class="phone-notes">${P.notes.map((x) => `<li>${x}</li>`).join('')}</ul></div>`;
-}).join('');
 
-// --- Today vs Tier 1 ---------------------------------------------------------------------------------------------------
-function todayMap() { // the Observatory as built (ObservatoryPage.tsx's geometry): a Sun, eight planets, ten moons each, bridges
-  const RING = ['HP', 'DEF', 'MDEF', 'MP', 'MATK', 'ATK', 'SPD', 'LB'], COL = ['#e8706a', '#9fb4cc', '#5fd3c0', '#6aa8ff', '#c48bff', '#ff9a4d', '#ffd84d', '#f0b8ff'];
-  const Cc = 180, R = 118, ang = (i) => (i / 8) * Math.PI * 2 - Math.PI / 2, pl = (i) => ({ x: Cc + R * Math.cos(ang(i)), y: Cc + R * Math.sin(ang(i)) });
-  let s = `<svg viewBox="0 0 360 360" role="img" aria-label="Today's map: a Sun, eight planets with ten moons each, sixteen bridges, four Sun nodes"><rect width="360" height="360" fill="var(--sky)"/>${stars(360, 360, 40, 11)}<circle cx="${Cc}" cy="${Cc}" r="${R}" fill="none" stroke="var(--sky-line)"/><circle cx="${Cc}" cy="${Cc}" r="22" fill="#d6a23e" opacity=".3"/>`;
-  [0, 1, 2, 3].forEach((i) => (s += `<circle cx="${Cc + 11 * Math.cos((i * Math.PI) / 2 + Math.PI / 4)}" cy="${Cc + 11 * Math.sin((i * Math.PI) / 2 + Math.PI / 4)}" r="4" fill="none" stroke="#ffd84d"/>`));
-  RING.forEach((e, i) => { const p = pl(i), q = pl((i + 1) % 8);
-    [0.42, 0.58].forEach((t) => (s += `<circle cx="${p.x + (q.x - p.x) * t}" cy="${p.y + (q.y - p.y) * t}" r="3.6" fill="none" stroke="${COL[i]}"/>`));
-    s += `<circle cx="${p.x}" cy="${p.y}" r="15" fill="${COL[i]}" opacity=".22"/><text x="${p.x}" y="${p.y + 3.5}" text-anchor="middle" style="font-size:9px;font-weight:700;fill:${COL[i]}">${e}</text>`;
-    for (let m = 0; m < 10; m++) { const a = ang(i) + ((m - 4.5) / 10) * Math.PI * 1.1; s += `<circle cx="${p.x + 27 * Math.cos(a)}" cy="${p.y + 27 * Math.sin(a)}" r="3" fill="none" stroke="${COL[i]}" stroke-opacity=".8"/>`; } });
-  return s + '</svg>';
-}
-document.getElementById('today-map').innerHTML = todayMap();
-document.getElementById('t1-map').innerHTML = phoneMap(1, 50, 'any');
-document.getElementById('vs-table').innerHTML = '<thead><tr><th>For one Uma</th><th>Today</th><th>Tier 1</th></tr></thead><tbody>' + [
-  ['Bodies', 'A Sun, 8 planets', '<b>The Planet, 4 moons</b> (+ hers)'], ['Nodes', '100', '<b>25</b> (+ 2)'], ['Node kinds', '3: moon, bridge, Sun', '<b>2</b>: Planet, moon'],
-  ['Stats on the map', '8', '<b>6</b> core stats'], ['Active slots', '5 → 30, by hand', '<b>None</b>'], ['What gates a node', 'Its gem, in order', 'Its jewel, in order, and her level'],
-  ['Items · kinds', '100 Star Gems · 3', '<b>10 jewels · 2</b>'], ['Items to finish her', '100', '<b>20</b> or <b>25</b> (+ 2)'], ['Refined items', '232', '<b>120</b> (+ 8)'],
-  ['Decisions', 'Which of 100 gems; which 30 count', 'Which moon next; the other offense moon or not'],
-].map((r) => `<tr><td>${r[0]}</td><td class="muted">${r[1]}</td><td>${r[2]}</td></tr>`).join('') + '</tbody>';
+// --- The Observatory -----------------------------------------------------------------------------------------------------
+(function phones() {
+  const c = 'spellblade';
+  const cases = [
+    { t: 1, L: 26, sheet: ['Prowess III', 'As Spell Blade: ATK +4, M.ATK +2 · Moon Jewel III · open'], set: [['Planet Jewel IV', 'Opens at Lv 31 · +6 to every stat', false], ['Moon Jewel IV ×3', 'Opens at Lv 36 · one each: Prowess, Vigor, Guard', false]] },
+    { t: 2, L: 41, sheet: ['Weapon moon IV', 'Split · Lightning +16, Katana +16 · Moon Jewel IV · open'], set: [['Moon Jewel V ×4', 'Opens at Lv 46 · Prowess, Vigor, Guard, weapon moon', false]] },
+    { t: 3, L: 50, sheet: ['Weapon moon 2 V', 'Split · Katana +29, Lance +29 · Moon Jewel V · open'], set: [['Nothing to set', 'Every node open: Lapidary targets met', false]] },
+  ];
+  const el = document.getElementById('phones');
+  el.innerHTML = cases.map((x, i) => {
+    const m = presetMoons(c, x.t), g = grantsAt(x.t, x.L, c, m);
+    const opened = NODES.filter((n) => inTier(n, x.t) && n.body !== 'template' && n.lv <= x.L).length, all = 20 + 5 * (x.t - 1);
+    const hers = NODES.filter((n) => n.body === 'template' && n.lv <= x.L).length;
+    const chips = x.t < 2 ? '<span class="chip2">Prowess · Spell Blade 70/30</span>' : m.map((mm, j) => `<span class="chip2">Weapon moon${x.t === 3 ? ' ' + (j + 1) : ''} · ${mm.mode === 'split' ? 'Split' : 'Full'} · ${mm.kinds.join(' + ')} ▾</span>`).join('');
+    return `<div><div class="phone"><div class="bar"><div class="face">A</div><div class="who"><b>Uma A</b>Spell Blade · Tier ${x.t} · Lv ${x.L}</div><div class="cnt">Open ${opened} of ${all}<br>★ ${hers} of 2</div></div>
+      <div class="pmap" id="ph${i}">${drawSystem(x.t, x.L, c, m, { uid: 'ph' + i, compact: true, corner: true, showNew: false })}</div>
+      <div class="chips">${chips}</div>
+      <div class="ptot">${[['HP', g.hp], ['MP', g.mp], ['ATK', g.atk], ['M.ATK', g.matk], ['DEF', g.def], ['M.DEF', g.mdef]].map(([k, v]) => `<span>${k}<b>+${v}</b></span>`).join('')}${Object.entries(g.kinds).map(([k, v]) => `<span style="background:color-mix(in srgb, var(--b-wm1) 16%, var(--raised))">${k}<b>+${v}</b></span>`).join('')}</div>
+      <div class="psheet"><b>${x.sheet[0]}</b> · ${x.sheet[1]}</div>
+      <div class="pset"><h4>Set</h4>${x.set.map(([a, b, can]) => `<div class="prow"><span class="gem" style="background:${a.startsWith('Planet') ? 'var(--b-planet)' : a.startsWith('Moon') ? 'var(--b-grd)' : 'var(--sunken)'}"></span><div class="t"><b>${a}</b><span>${b}</span></div>${can ? '<span class="set">Set</span>' : ''}</div>`).join('')}</div></div>
+      <ul class="nextlist" style="margin:10px 6px 0">${['<b>Tier 1:</b> the Planet and three moons; the dim moon of the first draft is gone: every moon helps her.', '<b>Tier 2:</b> the weapon moon\'s chip under the map; free to change outside fights.', '<b>Tier 3:</b> two chips, every kind different; Full + Split serves her three weapons.'][i]}</ul></div>`;
+  }).join('');
+  cases.forEach((x, i) => wireNodes(document.getElementById('ph' + i), x.t, c, x.L, presetMoons(c, x.t)));
+})();
 
-// --- Every node --------------------------------------------------------------------------------------------------------
-document.getElementById('all-nodes').innerHTML = '<thead><tr><th>Node</th><th>Id</th><th class="num">Grade</th><th class="num">Opens at</th><th>Jewel</th><th style="border-top:4px solid var(--t1)">Tier 1</th><th style="border-top:4px solid var(--t2)">Tier 2 (× 1.8)</th><th style="border-top:4px solid var(--t3)">Tier 3 (× 2.6)</th></tr></thead><tbody>' +
-  NODES.map((n) => `<tr><td style="white-space:nowrap"><span class="bdot" style="--bc:${BODY[n.body].c}"></span> ${BODY[n.body].name} ${n.n}</td><td class="muted"><code>${n.id}</code></td><td class="num">${n.grade}</td><td class="num" style="white-space:nowrap">Lv ${n.lv}</td><td style="white-space:nowrap">${n.jewel}</td>${[1, 2, 3].map((t) => `<td>${inTier(n, t) ? grantText(n, t) : '<span class="muted">—</span>'}</td>`).join('')}</tr>`).join('') + '</tbody>';
-
+// --- Every node ----------------------------------------------------------------------------------------------------------
+(function allNodes() {
+  const cell = (n, t) => {
+    if (!inTier(n, t)) return '—';
+    if (n.body === 'planet') return `+${n.pts[t]} each (HP +${n.pts[t] * 5})`;
+    if (n.body === 'prowess') return `+${n.pts[t]}, split`;
+    if (n.body === 'vigor') return `HP +${n.pts[t] * 5}, MP +${n.pts[t]}`;
+    if (n.body === 'guard') return `DEF, M.DEF +${n.pts[t]}`;
+    if (n.body === 'wm1' || n.body === 'wm2') return `Full +${n.full[t]} · Split +${n.splitv[t]} ×2`;
+    return n.n === 'I' ? `Knack +${n.pts[t]} pts` : `Lead +${n.pts[t]}`;
+  };
+  document.getElementById('all-nodes').innerHTML = `<thead><tr><th>Node</th><th class="num">Grade</th><th class="num">Opens at</th><th>Jewel</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr></thead><tbody>` +
+    NODES.map((n) => `<tr><td><span class="bdot" style="--bc:${BODY[n.body].c}"></span> ${BODY[n.body].name} ${n.n}</td><td class="num">${n.grade}</td><td class="num">Lv ${n.lv}</td><td>${n.jewel}</td>${[1, 2, 3].map((t) => `<td>${cell(n, t)}</td>`).join('')}</tr>`).join('') + '</tbody>';
+})();
 render();
 </script>
 </body>

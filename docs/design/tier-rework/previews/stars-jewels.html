@@ -4,349 +4,232 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extra Stats Jewels</title>
-<!-- The Tier rework, Extra Stats Progression (extra-stats-progression.md §11): the jewels per tier, their grades and
-     gates, what each opens, the recipes (the interface profession-progression.md reads, every material an item that
-     exists today), and the totals per Uma, party and run. Generated; the numbers live in the DATA block below. -->
+<!-- The Tier rework, Extra Stats Progression (extra-stats-progression.md §11), revised after the owner's review
+     (2026-10-24): two jewel kinds in every tier, the same count for every class, the recipes proposed to
+     profession-progression (Planet Jewel 12), per-Uma totals and the trades' shares under three recipe options.
+     Generated from the doc's model (DATA below). Nothing from the original games. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
     --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
-    --accent: #d39a2b; --accent-wash: #fbf1dd;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --danger: #c23b33; --success: #2f7a4f;
     --grid: #e3e8ef; --axis: #c3cbd6; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
-    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #6250d6;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    /* One hue a body (charts), and the night sky the map is drawn on (dark in both themes, as the Observatory's). */
+    --b-planet: #eda100; --b-pro: #eb6834; --b-vig: #e34948; --b-grd: #2a78d6; --b-wm1: #1baf7a; --b-wm2: #6250d6; --b-tpl: #7d8a9b;
+    --p-mine: #2a78d6; --p-wood: #eb6834; --p-farm: #1baf7a; --p-fish: #eda100; --p-hunt: #e87ba4;
+    --sky: #142033; --sky-2: #1c2b42; --sky-ink: #e9eef4; --sky-soft: #9fb0c6; --sky-line: rgb(255 255 255 / 0.13);
+    --m-planet: #c98500; --m-pro: #d95926; --m-vig: #e66767; --m-grd: #3987e5; --m-wm1: #199e70; --m-wm2: #9085e9; --m-tpl: #8a98ac; --m-glow: #f2b33a;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
       --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
-      --accent: #d6a23e; --accent-wash: #2b2312;
+      --accent: #d6a23e; --accent-wash: #2b2312; --danger: #e0645c; --success: #4fb37a;
       --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
-      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --b-planet: #c98500; --b-pro: #d95926; --b-vig: #e66767; --b-grd: #3987e5; --b-wm1: #199e70; --b-wm2: #9085e9; --b-tpl: #6b7a8e;
+      --p-mine: #3987e5; --p-wood: #d95926; --p-farm: #199e70; --p-fish: #c98500; --p-hunt: #d55181;
+      --sky: #0b1220; --sky-2: #121d2e;
     }
   }
   * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
   body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
   h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
   h2 { font-size: 20px; margin: 0 0 4px; }
-  h3 { font-size: 14px; margin: 0 0 2px; }
+  h3 { font-size: 14px; margin: 0 0 4px; }
   p { margin: 0; }
-  .lead { color: var(--ink-soft); max-width: 900px; }
-  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  a { color: inherit; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin-bottom: 14px; max-width: 980px; }
   .muted { color: var(--ink-faint); }
-  section { margin-top: 40px; }
-  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  section { margin-top: 40px; scroll-margin-top: 56px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
     margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
   nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
   nav.top a:hover { background: var(--raised); }
-
-  /* KPI tiles */
-  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
-  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
-  .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
-  .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
+  .kpi .value { font-size: 20px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
   .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
   .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
-
-  /* Tier themes */
-  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
-  .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
-  .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
-  .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
-  .theme p { color: var(--ink-soft); font-size: 13px; }
-
-  /* Roadmap */
-  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
-  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
-  .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
-  .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
-  .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
-  .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
-  .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
-  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
-  .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
-  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
-  .lane .start .chip { white-space: normal; }
-  .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
-  .track { position: relative; margin: 0 24px 0 18px; }
-  .gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--raised);
-    border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--ink); line-height: 1.3; cursor: default; }
-  .chip .pin { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--panel); }
-  .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
-  .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
-  .chip.craft { border-style: dashed; }
-  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .ev { position: absolute; }
-  .ev.right { transform: translateX(-100%); }
-  .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
-  .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
-  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
-  .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
-  .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
-  .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
-  .promo { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 10px 0; color: var(--ink-soft); font-size: 13px; }
-  .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
-  .promo b { color: var(--ink); }
-
-  /* Charts */
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
-  .mini h3 { display: flex; align-items: center; gap: 6px; }
-  .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .grid6 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
   svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .axis-text { fill: var(--ink-faint); font-size: 11px; }
   .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
   .val-soft { fill: var(--ink-soft); font-size: 11px; }
-  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 6px 0 6px; }
   .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
   details { margin-top: 10px; }
-  summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
+  .scroll { overflow-x: auto; max-width: 100%; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th, td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
   th { color: var(--ink-soft); font-weight: 600; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { background: var(--raised); }
   .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
-
-  /* Matrix */
-  .matrix td { font-size: 13px; }
-  .matrix td.today { color: var(--ink-faint); }
-  .matrix tr.catrow td { background: var(--raised); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
-  .matrix th.t { border-top: 4px solid var(--tc); }
-  .matrix b { color: var(--ink); }
-
-  /* Tooltip */
-  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
-    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
-  #tip b { display: block; margin-bottom: 2px; }
-  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
-
-</style>
-<style>
-  /* Extra Stats pages: the kit's tokens above, plus one hue a body (the kit's categorical slots, validated as a set
-     in both modes), the night sky the map is drawn on (dark in both themes, as the Observatory's), and the five
-     gathering professions for recipes. */
-  :root {
-    --b-planet: #eda100; --b-str: #eb6834; --b-sor: #6250d6; --b-vig: #e34948; --b-grd: #2a78d6;
-    --b-halo: #1baf7a; --b-val: #e87ba4; --b-swf: #008300; --b-tpl: #7d8a9b;
-    --p-mine: #2a78d6; --p-wood: #eb6834; --p-farm: #1baf7a; --p-fish: #eda100; --p-hunt: #e87ba4;
-    --gear: #7d8a9b; --lvl: #c3cbd6; --flat: #c3cbd6;
-    --sky: #142033; --sky-2: #1c2b42; --sky-ink: #e9eef4; --sky-soft: #9fb0c6; --sky-line: rgb(255 255 255 / 0.13);
-    --m-planet: #c98500; --m-str: #d95926; --m-sor: #9085e9; --m-vig: #e66767; --m-grd: #3987e5;
-    --m-halo: #199e70; --m-val: #d55181; --m-swf: #008300; --m-tpl: #8a98ac; --m-glow: #f2b33a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --b-planet: #c98500; --b-str: #d95926; --b-sor: #9085e9; --b-vig: #e66767; --b-grd: #3987e5;
-      --b-halo: #199e70; --b-val: #d55181; --b-swf: #008300; --b-tpl: #6b7a8e;
-      --p-mine: #3987e5; --p-wood: #d95926; --p-farm: #199e70; --p-fish: #c98500; --p-hunt: #d55181;
-      --gear: #6b7a8e; --lvl: #4a586b; --flat: #4a586b;
-      --sky: #0b1220; --sky-2: #121d2e;
-    }
-  }
-  .grid2 > *, .multiples > * { min-width: 0; }
-  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--hairline-strong);
-    background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
-  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 4px; }
-  .controls { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin: 14px 0 12px; }
-  .toggle { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 999px; overflow: hidden; }
-  .toggle button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border: 0; background: var(--panel); color: var(--ink-soft); cursor: pointer; }
-  .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--ink); }
-  .head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .note { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
   .note b { color: var(--ink); }
   .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
   .callout b { display: block; margin-bottom: 4px; }
-  .bdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--bc); }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 13px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills button:disabled { opacity: .4; cursor: not-allowed; }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .controls { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  input[type="range"] { accent-color: var(--accent); width: 200px; }
+  .slider { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+  .slider output { min-width: 40px; font-variant-numeric: tabular-nums; }
+  select { font: 600 12.5px system-ui, sans-serif; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); }
   .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
     background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
   .tag.new { border-color: var(--accent); background: var(--accent-wash); }
+  .tag.phys { color: var(--phys); border-color: color-mix(in srgb, var(--phys) 45%, transparent); }
+  .tag.magic { color: var(--magic); border-color: color-mix(in srgb, var(--magic) 45%, transparent); }
   .tier-chip { display: inline-flex; align-items: center; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 6px; color: #1b1300; background: var(--tc); }
-  .tier-chip.t3c { color: #fff; }
-  table.tight th, table.tight td { padding: 5px 8px; }
-  .scroll { overflow-x: auto; }
-  input[type="range"] { accent-color: var(--accent); width: 220px; }
-  .slider { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-  .slider output { min-width: 56px; font-variant-numeric: tabular-nums; }
-  .sw2 { width: 14px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
-  .ln { width: 18px; height: 0; border-top: 2px solid var(--lc); display: inline-block; flex: none; }
-  .ln.dash { border-top-style: dashed; }
+  .tier-chip.t3c, .tier-chip.t2c { color: #fff; }
+  .bdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; background: var(--bc); }
   .mark { cursor: default; }
   .mark:focus { outline: none; }
   .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  @media (max-width: 1100px) { .controls { gap: 10px; } }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .bar-inline { display: inline-block; height: 8px; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } .grid3, .grid6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 </style>
 <style>
-  .kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .kcard { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--bc); display: flex; flex-direction: column; gap: 8px; }
-  .kcard h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
-  .kcard .gv { font-size: 12.5px; color: var(--ink-soft); }
-  .gems { display: flex; gap: 8px; flex-wrap: wrap; }
-  .gemb { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 62px; padding: 6px 2px; border-radius: 10px; background: var(--raised); cursor: default; }
-  .gemb.off { opacity: .3; }
-  .gemb svg { width: 40px; height: 40px; }
-  .gemb b { font-size: 12px; } .gemb span { font-size: 10.5px; color: var(--ink-soft); }
-  .gemb:focus-visible { outline: 2px solid var(--accent); }
-  .ing { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px 2px 6px; border-radius: 6px; background: var(--raised);
-    border: 1px solid var(--hairline-strong); margin: 1px 4px 1px 0; white-space: nowrap; }
-  .ing i { width: 9px; height: 9px; border-radius: 3px; background: var(--pc); display: inline-block; }
-  .ing b { font-variant-numeric: tabular-nums; }
-  .rec td { vertical-align: middle; }
-  .lane-svg svg { display: block; width: 100%; height: auto; }
-  @media (max-width: 1100px) { .kinds { grid-template-columns: 1fr; } }
+  .jcards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .jcard { background: var(--panel); border-radius: 12px; padding: 10px 12px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--bc); min-width: 0; }
+  .jcard h3 { font-size: 13.5px; display: flex; justify-content: space-between; gap: 6px; }
+  .jcard .meta { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 6px; }
+  .jcard .tierrow { display: grid; grid-template-columns: 22px 1fr; gap: 4px; align-items: start; margin-top: 4px; font-size: 11.5px; }
+  .mat { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 6px; margin: 1px 2px 1px 0;
+    background: color-mix(in srgb, var(--pc) 16%, var(--raised)); border: 1px solid color-mix(in srgb, var(--pc) 40%, transparent); white-space: nowrap; }
+  .mat.t2 { box-shadow: inset 3px 0 0 var(--t2); } .mat.t3 { box-shadow: inset 3px 0 0 var(--t3); }
+  .lap { background: var(--panel); border-radius: 22px; padding: 14px 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong), 0 0 0 6px var(--sunken); max-width: 400px; width: 100%; margin: 0 auto; }
+  .lap .hd { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 700; padding: 4px 4px 10px; }
+  .lap .rowh { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); margin: 8px 4px 4px; }
+  .lap .chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+  .lap .g { border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 11px; font-weight: 700; background: var(--raised); border: 1px solid var(--hairline-strong); border-bottom: 3px solid var(--tc); }
+  .lap .g small { display: block; font-weight: 500; color: var(--ink-faint); font-size: 10px; }
+  .lap .gone { margin-top: 10px; font-size: 11.5px; color: var(--ink-faint); text-decoration: line-through; }
+  @media (max-width: 1100px) { .jcards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
 <body>
 <main>
   <h1>Extra Stats: the jewels</h1>
-  <p class="lead">The Lapidary's three jewel kinds and what each opens, when each can be made and set, the recipes
-    (one fixed recipe a jewel in every tier; every material an item that exists today), and what one Uma, a party and a
-    Rift run need at Tier 1, 2 and 3. Profession-progression.md owns the final amounts. From
+  <p class="lead">Two jewel kinds in every tier, Planet and Moon, a numeral for the node each opens. The owner's review
+    made every class equal: <b>20 · 25 · 30 jewels an Uma</b>, whatever her class. The weapon moons are moons, so they
+    take Moon Jewels; the Halo Jewels retire. The recipes are the interface for profession-progression, which owns the
+    amounts: proposed, a Planet Jewel of 12 so the Lapidary stays at 120 in Tier 1. Revised 2026-10-24. From
     <a href="../extra-stats-progression.md">extra-stats-progression.md</a> §11.</p>
   <nav class="top">
-    <a href="#kinds">The jewels</a><a href="#when">When</a><a href="#recipes">Recipes</a><a href="#uma">Per Uma</a><a href="#materials">Materials</a><a href="#party">Party and run</a>
-    <a href="stars-maps.html">← Maps page</a><a href="stars-grants.html">← Grants page</a>
+    <a href="#equal">Equal for every class</a><a href="#kinds">Every jewel</a><a href="#materials">Per Uma</a><a href="#options">Recipe options</a><a href="#picker">The Lapidary</a>
+    <a class="out" href="stars-maps.html">Maps →</a><a class="out" href="stars-grants.html">Grants →</a><a class="out" href="stars-uma.html">Her moon →</a>
   </nav>
   <div class="kpis" id="kpis"></div>
 
+  <section id="equal">
+    <h2>Equal for every class</h2>
+    <p class="sub">"Mages and Brawlers requiring fewer jewels makes no sense." Prowess is one offense moon for every class, so
+      every class opens the same nodes and sets the same jewels. The first draft had a Brawler or a Mage skip a moon.</p>
+    <div class="panel"><div class="chart-legend"><span><span class="sw" style="background:var(--b-planet)"></span>Planet Jewels</span><span><span class="sw" style="background:var(--b-grd)"></span>Moon Jewels</span><span><svg width="12" height="14"><rect x="5" y="0" width="2" height="14" fill="var(--ink)"/></svg>First draft (Halo Jewels included)</span></div>
+      <div id="equal-chart"></div>
+      <details><summary>Show the numbers</summary><div class="scroll" id="equal-table"></div></details></div>
+  </section>
+
   <section id="kinds">
-    <div class="head-row"><h2>Three kinds, a numeral for the node it opens</h2><div class="pills" id="tier-k" style="margin-left:auto"></div></div>
-    <p class="sub">Planet Jewel III opens Planet III; Moon Jewel III opens node III of any moon (the moon is picked when it is
-      set); Halo Jewel IV opens Halo IV. Hover a jewel for its recipe. Faded: not in the tier you picked.</p>
-    <div class="kinds" id="kind-cards"></div>
-  </section>
-
-  <section id="when">
-    <h2>When each can be made and set</h2>
-    <p class="sub">Grade g is made at Craft Lv 5g − 4 and set at Uma Lv 5g − 4 of her tier, the gear rule. In Tier 1 grades 1–5
-      take a profession's low type, 6–10 its high type (gathered from Craft Lv 26); from Tier 2 the ladder moves the top
-      of each band onto the tier's pairs (profession-progression PP9). Something opens every five levels.</p>
-    <div class="panel lane-svg" id="lanes"></div>
-  </section>
-
-  <section id="recipes">
-    <h2>Recipes: the interface for profession-progression.md</h2>
-    <p class="sub">One fixed amount a jewel, the same in every tier (PR10: base recipes never change); which tier's type fills it
-      at each grade is profession-progression.md's ladder (PP9), outlined in gold where it moves. A moon is cut stones on
-      a metal mount; the Planet a bit of everything; a Halo Jewel is its tier in one jewel, one refined item from each
-      gathering profession's new pair.</p>
-    <div class="controls"><div class="pills" id="tier-r"></div></div>
-    <div class="panel scroll"><table class="rec" id="rec-table"></table>
-      <div class="chart-legend" id="prof-legend" style="margin-top:10px"></div></div>
-  </section>
-
-  <section id="uma">
-    <div class="head-row"><h2>Per Uma, per tier</h2>
-      <div class="toggle" role="group" aria-label="Which moons" style="margin-left:auto"><button id="w-every" aria-pressed="true">Every moon (hybrids, healers)</button><button id="w-pure" aria-pressed="false">Her class's moons (Brawler, Mage)</button></div></div>
-    <p class="sub">Shared jewels, with her moon's two beside them. Tier 2 adds Valor's two Moon Jewels and Halo Jewels I–II;
-      Tier 3 Swiftness's two and Halo Jewels III–IV.</p>
-    <div class="grid2">
-      <div class="panel"><h3>Jewels an Uma</h3><div class="chart-legend" id="cnt-legend"></div><div class="lane-svg" id="cnt-chart"></div>
-        <details><summary>Show the numbers</summary><div class="scroll" id="cnt-table"></div></details></div>
-      <div class="panel"><h3>Refined items an Uma, by gathering profession</h3><div class="chart-legend" id="ref-legend"></div><div class="lane-svg" id="ref-chart"></div>
-        <details><summary>Show the numbers</summary><div class="scroll" id="ref-table"></div></details></div>
-    </div>
+    <h2>Every jewel, by grade and tier</h2>
+    <p class="sub">Grade g is made at Craft Lv 5g − 4 and set at Uma Lv 5g − 4. The type at each grade is profession-progression's
+      ladder (PP9): Tier 2 moves grades 5 and 10 onto its pair; Tier 3 grades 4 and 9 onto Tier 2's and 5 and 10 onto its
+      own. Colour is the gathering profession; the left stripe marks a Tier 2 or Tier 3 type.</p>
+    <div class="chart-legend" id="prof-legend"></div>
+    <div class="jcards" id="jcards"></div>
   </section>
 
   <section id="materials">
-    <h2>Materials an Uma, type by type</h2>
-    <p class="sub">Every moon open, her moon apart (it adds 3 Cut Quartz, 1 Copper Ingot, 3 Cut Garnet and 1 Iron Ingot in every tier).</p>
-    <div class="panel scroll"><table id="mat-table"></table></div>
+    <h2>One Uma's jewels, per tier</h2>
+    <p class="sub">Every class the same: the Planet's five, three Moon Jewels a grade in Tier 1, four in Tier 2 (the weapon
+      moon), five in Tier 3 (the second). Her moon's two Moon Jewels apart.</p>
+    <div class="grid2">
+      <div class="panel"><h3>Refined items by gathering profession</h3><div id="prof-chart"></div></div>
+      <div class="panel"><h3>By which tier's types</h3><div id="tier-chart"></div></div>
+    </div>
+    <details class="panel" style="margin-top:12px"><summary>Show the numbers: every type, every tier</summary><div class="scroll" id="mat-table"></div></details>
   </section>
 
-  <section id="party">
-    <h2>A party and a run</h2>
-    <p class="sub">A party on the owner's defaults (two of five, the Brawler and the Mage, skip a moon); a Rift run is twenty
-      Umas, four parties. Make time at the Lapidary is one gather's time a refined item: 0.6 h at Craft Lv 25 in a ×1.25 slot.</p>
+  <section id="options">
+    <h2>Recipe options for profession-progression</h2>
+    <p class="sub">Prowess cuts Tier 1 from 25 jewels to 20 for the four classes between. At today's recipes the Lapidary
+      would make 100 an Uma and the magical trade (Monster Den · Lapidary) carry 17% of the work. Three options; each dot
+      is one trade's share of an Uma's work (gather, process, make), the band the fifth each should carry.</p>
     <div class="grid2">
-      <div class="panel scroll"><table id="party-table"></table></div>
-      <div class="panel scroll"><h3>Against the first round's plan (README §2.3 before the cross-check)</h3><table id="plan-table" style="margin-top:6px"></table>
-        <p class="foot">Tiers 2 and 3 drop the first round's "resized from Tier 2": no single amount fits 27 and 29 jewels at 120.
-          With the branch gem a G5 Weapon Gem (profession-progression), every tier sits inside PR10's tenth: +3.7%, +7.4%.</p></div>
+      <div class="panel"><div class="chart-legend" id="trade-legend"></div><div id="trade-chart"></div></div>
+      <div class="panel"><h3>The totals</h3><div class="scroll" id="opt-table"></div>
+        <div class="callout"><b>Recommended: a Planet Jewel of 12 (three each of a cut stone, a plank, a cloth and a carving or infusion).</b>Tier 1 lands back on the approved frame (Lapidary 120, one Uma 485); every trade stays 18.6–23.3% in every tier, as the first draft's 18.7–22.8%; Tier 3 is +8.2% on Tier 1, inside PR10's tenth. profession-progression.md decides.</div></div>
     </div>
+  </section>
+
+  <section id="picker">
+    <h2>The Lapidary's page, every tier</h2>
+    <p class="sub">One row a kind, the same in every tier: Planet I–V and Moon I–V. A grade chip's colour is the tier of its
+      material. The first draft's Halo rows are gone.</p>
+    <div class="grid3" id="laps"></div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
-const DATA = {"M":{"1":1,"2":1.8,"3":2.6},"nodeTable":[{"id":"planet:1","body":"planet","n":"I","grade":1,"lv":1,"jewel":"Planet Jewel I","stats":["hp","mp","atk","matk","def","mdef"],"t1":1,"t1pts":1,"t2pts":2,"t3pts":3},{"id":"planet:2","body":"planet","n":"II","grade":3,"lv":11,"jewel":"Planet Jewel II","stats":["hp","mp","atk","matk","def","mdef"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"planet:3","body":"planet","n":"III","grade":5,"lv":21,"jewel":"Planet Jewel III","stats":["hp","mp","atk","matk","def","mdef"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"planet:4","body":"planet","n":"IV","grade":7,"lv":31,"jewel":"Planet Jewel IV","stats":["hp","mp","atk","matk","def","mdef"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"planet:5","body":"planet","n":"V","grade":9,"lv":41,"jewel":"Planet Jewel V","stats":["hp","mp","atk","matk","def","mdef"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"strength:1","body":"strength","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["atk"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"strength:2","body":"strength","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["atk"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"strength:3","body":"strength","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["atk"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"strength:4","body":"strength","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["atk"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"strength:5","body":"strength","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["atk"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"sorcery:1","body":"sorcery","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["matk"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"sorcery:2","body":"sorcery","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["matk"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"sorcery:3","body":"sorcery","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["matk"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"sorcery:4","body":"sorcery","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["matk"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"sorcery:5","body":"sorcery","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["matk"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"vigor:1","body":"vigor","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["hp","mp"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"vigor:2","body":"vigor","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["hp","mp"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"vigor:3","body":"vigor","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["hp","mp"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"vigor:4","body":"vigor","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["hp","mp"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"vigor:5","body":"vigor","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["hp","mp"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"guard:1","body":"guard","n":"I","grade":2,"lv":6,"jewel":"Moon Jewel I","stats":["def","mdef"],"t1":2,"t1pts":2,"t2pts":4,"t3pts":5},{"id":"guard:2","body":"guard","n":"II","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["def","mdef"],"t1":4,"t1pts":4,"t2pts":7,"t3pts":10},{"id":"guard:3","body":"guard","n":"III","grade":6,"lv":26,"jewel":"Moon Jewel III","stats":["def","mdef"],"t1":6,"t1pts":6,"t2pts":11,"t3pts":16},{"id":"guard:4","body":"guard","n":"IV","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["def","mdef"],"t1":8,"t1pts":8,"t2pts":14,"t3pts":21},{"id":"guard:5","body":"guard","n":"V","grade":10,"lv":46,"jewel":"Moon Jewel V","stats":["def","mdef"],"t1":10,"t1pts":10,"t2pts":18,"t3pts":26},{"id":"halo:1","body":"halo","kindSlot":1,"n":"I","grade":5,"lv":21,"jewel":"Halo Jewel I","stats":["kind"],"t1":10,"t2pts":18,"t3pts":26,"from":2},{"id":"halo:2","body":"halo","kindSlot":1,"n":"II","grade":10,"lv":46,"jewel":"Halo Jewel II","stats":["kind"],"t1":24,"t2pts":43,"t3pts":62,"from":2},{"id":"halo:3","body":"halo","kindSlot":2,"n":"III","grade":5,"lv":21,"jewel":"Halo Jewel III","stats":["kind"],"t1":10,"t2pts":18,"t3pts":26,"from":3},{"id":"halo:4","body":"halo","kindSlot":2,"n":"IV","grade":10,"lv":46,"jewel":"Halo Jewel IV","stats":["kind"],"t1":24,"t2pts":43,"t3pts":62,"from":3},{"id":"valor:1","body":"valor","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["Limit start"],"t1":2,"t2pts":2,"t3pts":2,"from":2},{"id":"valor:2","body":"valor","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["Limit start"],"t1":2,"t2pts":2,"t3pts":2,"from":2},{"id":"swiftness:1","body":"swiftness","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["evasion %"],"t1":3,"t2pts":3,"t3pts":3,"from":3},{"id":"swiftness:2","body":"swiftness","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["evasion %"],"t1":3,"t2pts":3,"t3pts":3,"from":3},{"id":"template:1","body":"template","n":"I","grade":4,"lv":16,"jewel":"Moon Jewel II","stats":["knack"],"t1":4,"t2pts":7,"t3pts":10},{"id":"template:2","body":"template","n":"II","grade":8,"lv":36,"jewel":"Moon Jewel IV","stats":["lead"],"t1":8,"t2pts":14,"t3pts":21}],"sheets":{"brawler":{"1":{"hp":{"base":1072,"armor":150,"es":255,"total":1477,"esShare":0.17264725795531483,"buildShare":0.2742044685172647,"flat":{"es":255,"total":1477,"esShare":0.17264725795531483}},"mp":{"base":132,"armor":30,"es":51,"total":213,"esShare":0.23943661971830985,"buildShare":0.38028169014084506,"flat":{"es":51,"total":213,"esShare":0.23943661971830985}},"atk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"matk":{"base":95,"armor":0,"es":21,"total":116,"esShare":0.1810344827586207,"buildShare":0.1810344827586207,"flat":{"es":21,"total":116,"esShare":0.1810344827586207}},"def":{"base":116,"armor":40,"es":51,"total":207,"esShare":0.2463768115942029,"buildShare":0.4396135265700483,"flat":{"es":51,"total":207,"esShare":0.2463768115942029}},"mdef":{"base":91,"armor":40,"es":51,"total":182,"esShare":0.2802197802197802,"buildShare":0.5,"flat":{"es":51,"total":182,"esShare":0.2802197802197802}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1818,"armor":270,"es":460,"total":2548,"esShare":0.18053375196232338,"buildShare":0.28649921507064363,"flat":{"es":255,"total":2223,"esShare":0.11470985155195682}},"mp":{"base":222,"armor":54,"es":92,"total":368,"esShare":0.25,"buildShare":0.3967391304347826,"flat":{"es":51,"total":303,"esShare":0.16831683168316833}},"atk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"matk":{"base":168,"armor":0,"es":38,"total":206,"esShare":0.18446601941747573,"buildShare":0.18446601941747573,"flat":{"es":21,"total":189,"esShare":0.1111111111111111}},"def":{"base":206,"armor":72,"es":92,"total":370,"esShare":0.24864864864864866,"buildShare":0.44324324324324327,"flat":{"es":51,"total":297,"esShare":0.1717171717171717}},"mdef":{"base":162,"armor":72,"es":92,"total":326,"esShare":0.2822085889570552,"buildShare":0.5030674846625767,"flat":{"es":51,"total":253,"esShare":0.2015810276679842}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2573,"armor":390,"es":665,"total":3628,"esShare":0.18329658213891953,"buildShare":0.2907938257993385,"flat":{"es":255,"total":2978,"esShare":0.08562793821356615}},"mp":{"base":312,"armor":78,"es":133,"total":523,"esShare":0.25430210325047803,"buildShare":0.40344168260038243,"flat":{"es":51,"total":393,"esShare":0.1297709923664122}},"atk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"matk":{"base":243,"armor":0,"es":55,"total":298,"esShare":0.18456375838926176,"buildShare":0.18456375838926176,"flat":{"es":21,"total":264,"esShare":0.07954545454545454}},"def":{"base":297,"armor":104,"es":133,"total":534,"esShare":0.24906367041198502,"buildShare":0.4438202247191011,"flat":{"es":51,"total":388,"esShare":0.13144329896907217}},"mdef":{"base":233,"armor":104,"es":133,"total":470,"esShare":0.28297872340425534,"buildShare":0.5042553191489362,"flat":{"es":51,"total":324,"esShare":0.1574074074074074}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"mage":{"1":{"hp":{"base":839,"armor":150,"es":255,"total":1244,"esShare":0.204983922829582,"buildShare":0.32556270096463025,"flat":{"es":255,"total":1244,"esShare":0.204983922829582}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":95,"armor":0,"es":21,"total":116,"esShare":0.1810344827586207,"buildShare":0.1810344827586207,"flat":{"es":21,"total":116,"esShare":0.1810344827586207}},"matk":{"base":121,"armor":25,"es":51,"total":197,"esShare":0.25888324873096447,"buildShare":0.38578680203045684,"flat":{"es":51,"total":197,"esShare":0.25888324873096447}},"def":{"base":95,"armor":40,"es":51,"total":186,"esShare":0.27419354838709675,"buildShare":0.489247311827957,"flat":{"es":51,"total":186,"esShare":0.27419354838709675}},"mdef":{"base":111,"armor":40,"es":51,"total":202,"esShare":0.2524752475247525,"buildShare":0.4504950495049505,"flat":{"es":51,"total":202,"esShare":0.2524752475247525}},"offense":{"base":121,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":265,"esShare":0.19245283018867926,"buildShare":0.5433962264150943,"flat":{"es":51,"total":265,"esShare":0.19245283018867926}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1423,"armor":270,"es":460,"total":2153,"esShare":0.21365536460752438,"buildShare":0.3390617742684626,"flat":{"es":255,"total":1828,"esShare":0.13949671772428884}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":168,"armor":0,"es":38,"total":206,"esShare":0.18446601941747573,"buildShare":0.18446601941747573,"flat":{"es":21,"total":189,"esShare":0.1111111111111111}},"matk":{"base":215,"armor":45,"es":92,"total":352,"esShare":0.26136363636363635,"buildShare":0.38920454545454547,"flat":{"es":51,"total":291,"esShare":0.17525773195876287}},"def":{"base":168,"armor":72,"es":92,"total":332,"esShare":0.27710843373493976,"buildShare":0.4939759036144578,"flat":{"es":51,"total":259,"esShare":0.1969111969111969}},"mdef":{"base":197,"armor":72,"es":92,"total":361,"esShare":0.2548476454293629,"buildShare":0.45429362880886426,"flat":{"es":51,"total":288,"esShare":0.17708333333333334}},"offense":{"base":215,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":596,"esShare":0.25671140939597314,"buildShare":0.639261744966443,"flat":{"es":85,"total":427,"esShare":0.1990632318501171}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2013,"armor":390,"es":665,"total":3068,"esShare":0.2167535853976532,"buildShare":0.3438722294654498,"flat":{"es":255,"total":2418,"esShare":0.1054590570719603}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":243,"armor":0,"es":55,"total":298,"esShare":0.18456375838926176,"buildShare":0.18456375838926176,"flat":{"es":21,"total":264,"esShare":0.07954545454545454}},"matk":{"base":311,"armor":65,"es":133,"total":509,"esShare":0.26129666011787817,"buildShare":0.3889980353634578,"flat":{"es":51,"total":387,"esShare":0.13178294573643412}},"def":{"base":243,"armor":104,"es":133,"total":480,"esShare":0.27708333333333335,"buildShare":0.49375,"flat":{"es":51,"total":334,"esShare":0.15269461077844312}},"mdef":{"base":284,"armor":104,"es":133,"total":521,"esShare":0.255278310940499,"buildShare":0.45489443378119004,"flat":{"es":51,"total":375,"esShare":0.136}},"offense":{"base":311,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":862,"esShare":0.25638051044083526,"buildShare":0.6392111368909513,"flat":{"es":85,"total":523,"esShare":0.16252390057361377}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"spellblade":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":166,"armor":30,"es":51,"total":247,"esShare":0.20647773279352227,"buildShare":0.32793522267206476,"flat":{"es":51,"total":247,"esShare":0.20647773279352227}},"atk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"matk":{"base":100,"armor":0,"es":51,"total":151,"esShare":0.33774834437086093,"buildShare":0.33774834437086093,"flat":{"es":51,"total":151,"esShare":0.33774834437086093}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":278,"armor":54,"es":92,"total":424,"esShare":0.2169811320754717,"buildShare":0.3443396226415094,"flat":{"es":51,"total":359,"esShare":0.14206128133704735}},"atk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"matk":{"base":178,"armor":0,"es":92,"total":270,"esShare":0.34074074074074073,"buildShare":0.34074074074074073,"flat":{"es":51,"total":229,"esShare":0.22270742358078602}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":391,"armor":78,"es":133,"total":602,"esShare":0.22093023255813954,"buildShare":0.3504983388704319,"flat":{"es":51,"total":472,"esShare":0.10805084745762712}},"atk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"matk":{"base":257,"armor":0,"es":133,"total":390,"esShare":0.34102564102564104,"buildShare":0.34102564102564104,"flat":{"es":51,"total":308,"esShare":0.16558441558441558}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"summoner":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":166,"armor":30,"es":51,"total":247,"esShare":0.20647773279352227,"buildShare":0.32793522267206476,"flat":{"es":51,"total":247,"esShare":0.20647773279352227}},"atk":{"base":100,"armor":0,"es":51,"total":151,"esShare":0.33774834437086093,"buildShare":0.33774834437086093,"flat":{"es":51,"total":151,"esShare":0.33774834437086093}},"matk":{"base":116,"armor":25,"es":51,"total":192,"esShare":0.265625,"buildShare":0.3958333333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":116,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":260,"esShare":0.19615384615384615,"buildShare":0.5538461538461539,"flat":{"es":51,"total":260,"esShare":0.19615384615384615}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":278,"armor":54,"es":92,"total":424,"esShare":0.2169811320754717,"buildShare":0.3443396226415094,"flat":{"es":51,"total":359,"esShare":0.14206128133704735}},"atk":{"base":178,"armor":0,"es":92,"total":270,"esShare":0.34074074074074073,"buildShare":0.34074074074074073,"flat":{"es":51,"total":229,"esShare":0.22270742358078602}},"matk":{"base":206,"armor":45,"es":92,"total":343,"esShare":0.26822157434402333,"buildShare":0.39941690962099125,"flat":{"es":51,"total":282,"esShare":0.18085106382978725}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":206,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":587,"esShare":0.2606473594548552,"buildShare":0.6490630323679727,"flat":{"es":85,"total":418,"esShare":0.20334928229665072}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":391,"armor":78,"es":133,"total":602,"esShare":0.22093023255813954,"buildShare":0.3504983388704319,"flat":{"es":51,"total":472,"esShare":0.10805084745762712}},"atk":{"base":257,"armor":0,"es":133,"total":390,"esShare":0.34102564102564104,"buildShare":0.34102564102564104,"flat":{"es":51,"total":308,"esShare":0.16558441558441558}},"matk":{"base":297,"armor":65,"es":133,"total":495,"esShare":0.2686868686868687,"buildShare":0.4,"flat":{"es":51,"total":373,"esShare":0.13672922252010725}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":297,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":848,"esShare":0.2606132075471698,"buildShare":0.6497641509433962,"flat":{"es":85,"total":509,"esShare":0.16699410609037327}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"paladin":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":105,"armor":25,"es":51,"total":181,"esShare":0.281767955801105,"buildShare":0.4198895027624309,"flat":{"es":51,"total":181,"esShare":0.281767955801105}},"matk":{"base":84,"armor":0,"es":51,"total":135,"esShare":0.37777777777777777,"buildShare":0.37777777777777777,"flat":{"es":51,"total":135,"esShare":0.37777777777777777}},"def":{"base":121,"armor":40,"es":51,"total":212,"esShare":0.24056603773584906,"buildShare":0.42924528301886794,"flat":{"es":51,"total":212,"esShare":0.24056603773584906}},"mdef":{"base":101,"armor":40,"es":51,"total":192,"esShare":0.265625,"buildShare":0.4739583333333333,"flat":{"es":51,"total":192,"esShare":0.265625}},"offense":{"base":105,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":249,"esShare":0.20481927710843373,"buildShare":0.5783132530120482,"flat":{"es":51,"total":249,"esShare":0.20481927710843373}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":187,"armor":45,"es":92,"total":324,"esShare":0.2839506172839506,"buildShare":0.4228395061728395,"flat":{"es":51,"total":263,"esShare":0.19391634980988592}},"matk":{"base":150,"armor":0,"es":92,"total":242,"esShare":0.38016528925619836,"buildShare":0.38016528925619836,"flat":{"es":51,"total":201,"esShare":0.2537313432835821}},"def":{"base":215,"armor":72,"es":92,"total":379,"esShare":0.24274406332453827,"buildShare":0.43271767810026385,"flat":{"es":51,"total":306,"esShare":0.16666666666666666}},"mdef":{"base":180,"armor":72,"es":92,"total":344,"esShare":0.26744186046511625,"buildShare":0.47674418604651164,"flat":{"es":51,"total":271,"esShare":0.1881918819188192}},"offense":{"base":187,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":568,"esShare":0.26936619718309857,"buildShare":0.670774647887324,"flat":{"es":85,"total":399,"esShare":0.21303258145363407}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":270,"armor":65,"es":133,"total":468,"esShare":0.2841880341880342,"buildShare":0.4230769230769231,"flat":{"es":51,"total":346,"esShare":0.14739884393063585}},"matk":{"base":216,"armor":0,"es":133,"total":349,"esShare":0.38108882521489973,"buildShare":0.38108882521489973,"flat":{"es":51,"total":267,"esShare":0.19101123595505617}},"def":{"base":311,"armor":104,"es":133,"total":548,"esShare":0.2427007299270073,"buildShare":0.4324817518248175,"flat":{"es":51,"total":402,"esShare":0.12686567164179105}},"mdef":{"base":259,"armor":104,"es":133,"total":496,"esShare":0.26814516129032256,"buildShare":0.4778225806451613,"flat":{"es":51,"total":350,"esShare":0.1457142857142857}},"offense":{"base":270,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":821,"esShare":0.269183922046285,"buildShare":0.6711327649208283,"flat":{"es":85,"total":482,"esShare":0.17634854771784234}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}},"cleric":{"1":{"hp":{"base":932,"armor":150,"es":255,"total":1337,"esShare":0.1907255048616305,"buildShare":0.3029169783096485,"flat":{"es":255,"total":1337,"esShare":0.1907255048616305}},"mp":{"base":215,"armor":30,"es":51,"total":296,"esShare":0.17229729729729729,"buildShare":0.27364864864864863,"flat":{"es":51,"total":296,"esShare":0.17229729729729729}},"atk":{"base":84,"armor":0,"es":51,"total":135,"esShare":0.37777777777777777,"buildShare":0.37777777777777777,"flat":{"es":51,"total":135,"esShare":0.37777777777777777}},"matk":{"base":105,"armor":25,"es":51,"total":181,"esShare":0.281767955801105,"buildShare":0.4198895027624309,"flat":{"es":51,"total":181,"esShare":0.281767955801105}},"def":{"base":105,"armor":40,"es":51,"total":196,"esShare":0.2602040816326531,"buildShare":0.4642857142857143,"flat":{"es":51,"total":196,"esShare":0.2602040816326531}},"mdef":{"base":116,"armor":40,"es":51,"total":207,"esShare":0.2463768115942029,"buildShare":0.4396135265700483,"flat":{"es":51,"total":207,"esShare":0.2463768115942029}},"offense":{"base":105,"armor":25,"might":68,"orb":0,"halo":0,"es":51,"total":249,"esShare":0.20481927710843373,"buildShare":0.5783132530120482,"flat":{"es":51,"total":249,"esShare":0.20481927710843373}},"limit":0,"evasion":0,"halo2":0,"by":{"planet":{"hp":105,"mp":21,"atk":21,"matk":21,"def":21,"mdef":21},"strength":{"atk":30},"sorcery":{"matk":30},"vigor":{"hp":150,"mp":30},"guard":{"def":30,"mdef":30}}},"2":{"hp":{"base":1581,"armor":270,"es":460,"total":2311,"esShare":0.199048031155344,"buildShare":0.3158805711813068,"flat":{"es":255,"total":1986,"esShare":0.1283987915407855}},"mp":{"base":361,"armor":54,"es":92,"total":507,"esShare":0.1814595660749507,"buildShare":0.2879684418145957,"flat":{"es":51,"total":442,"esShare":0.11538461538461539}},"atk":{"base":150,"armor":0,"es":92,"total":242,"esShare":0.38016528925619836,"buildShare":0.38016528925619836,"flat":{"es":51,"total":201,"esShare":0.2537313432835821}},"matk":{"base":187,"armor":45,"es":92,"total":324,"esShare":0.2839506172839506,"buildShare":0.4228395061728395,"flat":{"es":51,"total":263,"esShare":0.19391634980988592}},"def":{"base":187,"armor":72,"es":92,"total":351,"esShare":0.2621082621082621,"buildShare":0.4672364672364672,"flat":{"es":51,"total":278,"esShare":0.18345323741007194}},"mdef":{"base":206,"armor":72,"es":92,"total":370,"esShare":0.24864864864864866,"buildShare":0.44324324324324327,"flat":{"es":51,"total":297,"esShare":0.1717171717171717}},"offense":{"base":187,"armor":45,"might":122,"orb":61,"halo":61,"es":153,"total":568,"esShare":0.26936619718309857,"buildShare":0.670774647887324,"flat":{"es":85,"total":399,"esShare":0.21303258145363407}},"limit":4,"evasion":0,"halo2":0,"by":{"planet":{"hp":190,"mp":38,"atk":38,"matk":38,"def":38,"mdef":38},"strength":{"atk":54},"sorcery":{"matk":54},"vigor":{"hp":270,"mp":54},"guard":{"def":54,"mdef":54}}},"3":{"hp":{"base":2237,"armor":390,"es":665,"total":3292,"esShare":0.2020048602673147,"buildShare":0.32047387606318345,"flat":{"es":255,"total":2642,"esShare":0.09651778955336866}},"mp":{"base":508,"armor":78,"es":133,"total":719,"esShare":0.18497913769123783,"buildShare":0.29346314325452016,"flat":{"es":51,"total":589,"esShare":0.0865874363327674}},"atk":{"base":216,"armor":0,"es":133,"total":349,"esShare":0.38108882521489973,"buildShare":0.38108882521489973,"flat":{"es":51,"total":267,"esShare":0.19101123595505617}},"matk":{"base":270,"armor":65,"es":133,"total":468,"esShare":0.2841880341880342,"buildShare":0.4230769230769231,"flat":{"es":51,"total":346,"esShare":0.14739884393063585}},"def":{"base":270,"armor":104,"es":133,"total":507,"esShare":0.26232741617357,"buildShare":0.46745562130177515,"flat":{"es":51,"total":361,"esShare":0.14127423822714683}},"mdef":{"base":297,"armor":104,"es":133,"total":534,"esShare":0.24906367041198502,"buildShare":0.4438202247191011,"flat":{"es":51,"total":388,"esShare":0.13144329896907217}},"offense":{"base":270,"armor":65,"might":177,"orb":88,"halo":88,"es":221,"total":821,"esShare":0.269183922046285,"buildShare":0.6711327649208283,"flat":{"es":85,"total":482,"esShare":0.17634854771784234}},"limit":4,"evasion":6,"halo2":88,"by":{"planet":{"hp":275,"mp":55,"atk":55,"matk":55,"def":55,"mdef":55},"strength":{"atk":78},"sorcery":{"matk":78},"vigor":{"hp":390,"mp":78},"guard":{"def":78,"mdef":78}}}}},"curve":[{"L":1,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":2,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":3,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":4,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":5,"today":[1,1,1,1],"todayAvg":1,"withMoon":1,"planetOnly":1},{"L":6,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":7,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":8,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":9,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":10,"today":[3,3,3,3],"todayAvg":3,"withMoon":3,"planetOnly":1},{"L":11,"today":[6,6,5,5],"todayAvg":5.5,"withMoon":5,"planetOnly":3},{"L":12,"today":[6,6,6,5],"todayAvg":5.75,"withMoon":5,"planetOnly":3},{"L":13,"today":[6,6,6,5],"todayAvg":5.75,"withMoon":5,"planetOnly":3},{"L":14,"today":[6,6,6,6],"todayAvg":6,"withMoon":5,"planetOnly":3},{"L":15,"today":[6,6,6,6],"todayAvg":6,"withMoon":5,"planetOnly":3},{"L":16,"today":[10,9,9,9],"todayAvg":9.25,"withMoon":9,"planetOnly":3},{"L":17,"today":[10,9,9,9],"todayAvg":9.25,"withMoon":9,"planetOnly":3},{"L":18,"today":[10,10,9,9],"todayAvg":9.5,"withMoon":9,"planetOnly":3},{"L":19,"today":[10,10,9,9],"todayAvg":9.5,"withMoon":9,"planetOnly":3},{"L":20,"today":[10,10,10,9],"todayAvg":9.75,"withMoon":9,"planetOnly":3},{"L":21,"today":[14,14,14,12],"todayAvg":13.5,"withMoon":13,"planetOnly":7},{"L":22,"today":[14,14,14,14],"todayAvg":14,"withMoon":13,"planetOnly":7},{"L":23,"today":[14,14,14,14],"todayAvg":14,"withMoon":13,"planetOnly":7},{"L":24,"today":[15,14,14,14],"todayAvg":14.25,"withMoon":13,"planetOnly":7},{"L":25,"today":[15,14,14,14],"todayAvg":14.25,"withMoon":13,"planetOnly":7},{"L":26,"today":[20,20,18,18],"todayAvg":19,"withMoon":19,"planetOnly":7},{"L":27,"today":[20,20,18,18],"todayAvg":19,"withMoon":19,"planetOnly":7},{"L":28,"today":[20,20,20,18],"todayAvg":19.5,"withMoon":19,"planetOnly":7},{"L":29,"today":[20,20,20,18],"todayAvg":19.5,"withMoon":19,"planetOnly":7},{"L":30,"today":[20,20,20,20],"todayAvg":20,"withMoon":19,"planetOnly":7},{"L":31,"today":[25,25,25,25],"todayAvg":25,"withMoon":25,"planetOnly":13},{"L":32,"today":[27,25,25,25],"todayAvg":25.5,"withMoon":25,"planetOnly":13},{"L":33,"today":[27,25,25,25],"todayAvg":25.5,"withMoon":25,"planetOnly":13},{"L":34,"today":[27,27,25,25],"todayAvg":26,"withMoon":25,"planetOnly":13},{"L":35,"today":[27,27,25,25],"todayAvg":26,"withMoon":25,"planetOnly":13},{"L":36,"today":[33,33,33,30],"todayAvg":32.25,"withMoon":33,"planetOnly":13},{"L":37,"today":[33,33,33,30],"todayAvg":32.25,"withMoon":33,"planetOnly":13},{"L":38,"today":[33,33,33,33],"todayAvg":33,"withMoon":33,"planetOnly":13},{"L":39,"today":[33,33,33,33],"todayAvg":33,"withMoon":33,"planetOnly":13},{"L":40,"today":[35,33,33,33],"todayAvg":33.5,"withMoon":33,"planetOnly":13},{"L":41,"today":[42,39,39,39],"todayAvg":39.75,"withMoon":41,"planetOnly":21},{"L":42,"today":[42,42,39,39],"todayAvg":40.5,"withMoon":41,"planetOnly":21},{"L":43,"today":[42,42,39,39],"todayAvg":40.5,"withMoon":41,"planetOnly":21},{"L":44,"today":[42,42,42,39],"todayAvg":41.25,"withMoon":41,"planetOnly":21},{"L":45,"today":[42,42,42,39],"todayAvg":41.25,"withMoon":41,"planetOnly":21},{"L":46,"today":[49,49,49,49],"todayAvg":49,"withMoon":51,"planetOnly":21},{"L":47,"today":[49,49,49,49],"todayAvg":49,"withMoon":51,"planetOnly":21},{"L":48,"today":[52,49,49,49],"todayAvg":49.75,"withMoon":51,"planetOnly":21},{"L":49,"today":[52,49,49,49],"todayAvg":49.75,"withMoon":51,"planetOnly":21},{"L":50,"today":[52,52,49,49],"todayAvg":50.5,"withMoon":51,"planetOnly":21}],"hits":[{"L":1,"target":0.2,"bare":0.2,"es":0.19396896255935528,"armor":0.18075861400539478,"both":0.1755799311545502},{"L":2,"target":0.2088888888888889,"bare":0.2089315192743764,"es":0.2029680808274112,"armor":0.1898990537672102,"both":0.18473679051431935},{"L":3,"target":0.2177777777777778,"bare":0.21795555555555557,"es":0.21205182903920414,"armor":0.19910973230041348,"both":0.1939617671730255},{"L":4,"target":0.22666666666666668,"bare":0.2270829931972789,"es":0.2212319920522069,"armor":0.20840386890155194,"both":0.20326809375217078},{"L":5,"target":0.23555555555555557,"bare":0.23632471655328796,"es":0.23052018191462428,"armor":0.2177942554716456,"both":0.2126685771522868},{"L":6,"target":0.24444444444444446,"bare":0.24569160997732428,"es":0.22901492988448835,"armor":0.2109133683375692,"both":0.19766513852635512},{"L":7,"target":0.25333333333333335,"bare":0.2551945578231293,"es":0.238596970026354,"armor":0.22055727327612878,"both":0.20724588758985282},{"L":8,"target":0.26222222222222225,"bare":0.2648444444444445,"es":0.24831423195526395,"armor":0.2303284658335036,"both":0.21695425865450543},{"L":9,"target":0.27111111111111114,"bare":0.2746521541950113,"es":0.2581783298258146,"armor":0.24023872121721324,"both":0.2268014089089152},{"L":10,"target":0.28,"bare":0.28462857142857145,"es":0.2682007719207689,"armor":0.25029970133388796,"both":0.23679847145343727},{"L":11,"target":0.28,"bare":0.28571428571428575,"es":0.25985122188060905,"armor":0.23777138215570096,"both":0.21818085478610538},{"L":12,"target":0.28,"bare":0.2869142857142857,"es":0.2617044099286708,"armor":0.24011169153157236,"both":0.22086049900171914},{"L":13,"target":0.28,"bare":0.2882285714285715,"es":0.2636272610333559,"armor":0.242491511981209,"both":0.22356045347923634},{"L":14,"target":0.28,"bare":0.28965714285714284,"es":0.2656234366896396,"armor":0.24491667004230436,"both":0.22628757987631637},{"L":15,"target":0.28,"bare":0.2912,"es":0.26769620921879755,"armor":0.24739240517703984,"both":0.22904809233019627},{"L":16,"target":0.28,"bare":0.29285714285714287,"es":0.25343181471642007,"armor":0.23774056047554587,"both":0.20888188355926388},{"L":17,"target":0.28,"bare":0.29462857142857146,"es":0.25594892795513796,"armor":0.2405130780763267,"both":0.21197708389008638},{"L":18,"target":0.28,"bare":0.2965142857142856,"es":0.25853334259816235,"armor":0.24333864612600853,"both":0.21510750061759168},{"L":19,"target":0.28,"bare":0.29851428571428573,"es":0.26118831023128203,"armor":0.24622135790223987,"both":0.21827792259713988},{"L":20,"target":0.28,"bare":0.30062857142857147,"es":0.2639167919488875,"armor":0.24916495527441054,"both":0.22149276810540167},{"L":21,"target":0.28,"bare":0.30285714285714294,"es":0.25280887788437356,"armor":0.24153947912205564,"both":0.20578306819326614},{"L":22,"target":0.28,"bare":0.30519999999999997,"es":0.2558552613628195,"armor":0.24472552162468791,"both":0.20920722248076382},{"L":23,"target":0.28,"bare":0.30765714285714296,"es":0.258972800392972,"armor":0.24797550827468137,"both":0.21268023779409875},{"L":24,"target":0.28,"bare":0.3102285714285715,"es":0.26216408485897974,"armor":0.2512924002631416,"both":0.21620552150252795},{"L":25,"target":0.28,"bare":0.3129142857142857,"es":0.26543150518557,"armor":0.2546789371534154,"both":0.21978625786342584},{"L":26,"target":0.28,"bare":0.3157142857142858,"es":0.2507488485176367,"armor":0.24857629164959097,"both":0.20288040100510765},{"L":27,"target":0.28,"bare":0.3186285714285714,"es":0.25430461356991546,"armor":0.25217509982478564,"both":0.20661237489476675},{"L":28,"target":0.28,"bare":0.321657142857143,"es":0.25793402332253845,"armor":0.2558464121430627,"both":0.21040333877195724},{"L":29,"target":0.28,"bare":0.32480000000000003,"es":0.2616392067410101,"armor":0.2595924344193484,"both":0.2142558001971564},{"L":30,"target":0.28,"bare":0.3280571428571429,"es":0.26542215107715306,"armor":0.26341522576505755,"both":0.2181721266279997},{"L":31,"target":0.28,"bare":0.33142857142857146,"es":0.2534538387933424,"armor":0.2585152085108106,"both":0.20428879760116872},{"L":32,"target":0.28,"bare":0.33491428571428566,"es":0.25745193137707445,"armor":0.26253250831951314,"both":0.20830733306226024},{"L":33,"target":0.28,"bare":0.33851428571428577,"es":0.26152777474725153,"armor":0.2666290609376397,"both":0.21239321635919844},{"L":34,"target":0.28,"bare":0.34222857142857155,"es":0.26568307423921134,"armor":0.2708065519245173,"both":0.21654834933490757},{"L":35,"target":0.28,"bare":0.34605714285714284,"es":0.2699194349510741,"armor":0.2750665655374165,"both":0.22077454053424703},{"L":36,"target":0.28,"bare":0.35000000000000003,"es":0.2554183150967163,"armor":0.2711545026599,"both":0.20581875463207913},{"L":37,"target":0.28,"bare":0.3540571428571429,"es":0.25982712558258214,"armor":0.2755981367589547,"both":0.21010518525548785},{"L":38,"target":0.28,"bare":0.3582285714285715,"es":0.264316904790631,"armor":0.2801263995425628,"both":0.21446532388516085},{"L":39,"target":0.28,"bare":0.3625142857142857,"es":0.2688890439360394,"armor":0.2847406065207874,"both":0.2189006521004548},{"L":40,"target":0.28,"bare":0.36691428571428575,"es":0.27354486166918784,"armor":0.28944200067959996,"both":0.22341258684337303},{"L":41,"target":0.28,"bare":0.37142857142857144,"es":0.2612897655936406,"armor":0.28636796692719846,"both":0.21064897981363173},{"L":42,"target":0.28,"bare":0.376057142857143,"es":0.26607808441545067,"armor":0.29124612013287027,"both":0.21520207877793748},{"L":43,"target":0.28,"bare":0.3808,"es":0.2709508035421885,"armor":0.29621323217687584,"both":0.21983406617037055},{"L":44,"target":0.28,"bare":0.38565714285714287,"es":0.27590905628909923,"armor":0.3012703474548455,"both":0.22454612614337957},{"L":45,"target":0.28,"bare":0.39062857142857144,"es":0.28095392242915396,"armor":0.3064184568448809,"both":0.22933939558958963},{"L":46,"target":0.28,"bare":0.3957142857142858,"es":0.2666728653642588,"armor":0.30407427330634235,"both":0.21554278648937197},{"L":47,"target":0.28,"bare":0.4009142857142857,"es":0.27180889782652623,"armor":0.3093947357543632,"both":0.22034388560397908},{"L":48,"target":0.28,"bare":0.40622857142857144,"es":0.2770320726374494,"armor":0.3148076793175104,"both":0.2252278524808562},{"L":49,"target":0.28,"bare":0.41165714285714283,"es":0.28234332604954704,"armor":0.3203139445683409,"both":0.23019565318235907},{"L":50,"target":0.28,"bare":0.41719999999999996,"es":0.28774355395107637,"armor":0.32591433159323596,"both":0.2352482179797884}],"tierHits":[{"t":1,"L":50,"budgetOff":1.49,"budgetHp":2.7150000000000003,"bare":0.41719999999999996,"es":0.28774355395107637,"armor":0.32591433159323596,"both":0.2352482179797884},{"t":2,"L":100,"budgetOff":1.4911689426453376,"budgetHp":2.7190912992586815,"bare":0.4175273039406946,"es":0.28251260796466793,"armor":0.3220957720333412,"both":0.22912228514838462},{"t":3,"L":150,"budgetOff":1.4916200224016067,"budgetHp":2.7206700784056235,"bare":0.41765360627244985,"es":0.28037855711693455,"armor":0.3205237638011615,"both":0.22664921152089965}],"JEWELS":[{"id":"jewel-planet-1","name":"Planet Jewel I","kind":"Planet","grade":1,"craft":1,"opens":"Planet I","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"from":1,"size":8},{"id":"jewel-planet-2","name":"Planet Jewel II","kind":"Planet","grade":3,"craft":11,"opens":"Planet II","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"from":1,"size":8},{"id":"jewel-planet-3","name":"Planet Jewel III","kind":"Planet","grade":5,"craft":21,"opens":"Planet III","recipe":{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},"byTier":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Sapphire":2,"Mahogany Plank":2,"Wool Cloth":2,"Trilobite Carving":2},{"Cut Starstone":2,"Elderwood Plank":2,"Moonsilk":2,"Aether Infusion":2}],"from":1,"size":8},{"id":"jewel-planet-4","name":"Planet Jewel IV","kind":"Planet","grade":7,"craft":31,"opens":"Planet IV","recipe":{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},"byTier":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2}],"from":1,"size":8},{"id":"jewel-planet-5","name":"Planet Jewel V","kind":"Planet","grade":9,"craft":41,"opens":"Planet V","recipe":{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},"byTier":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Diamond":2,"Ebony Plank":2,"Silk":2,"Tide Infusion":2}],"from":1,"size":8},{"id":"jewel-moon-1","name":"Moon Jewel I","kind":"Moon","grade":2,"craft":6,"opens":"Node I of any moon","recipe":{"Cut Quartz":3,"Copper Ingot":1},"byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-2","name":"Moon Jewel II","kind":"Moon","grade":4,"craft":16,"opens":"Node II of any moon; Valor I, Swiftness I, her moon I","recipe":{"Cut Quartz":3,"Copper Ingot":1},"byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Sapphire":3,"Silver Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-3","name":"Moon Jewel III","kind":"Moon","grade":6,"craft":26,"opens":"Node III of any moon","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-4","name":"Moon Jewel IV","kind":"Moon","grade":8,"craft":36,"opens":"Node IV of any moon; Valor II, Swiftness II, her moon II","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"from":1,"size":4},{"id":"jewel-moon-5","name":"Moon Jewel V","kind":"Moon","grade":10,"craft":46,"opens":"Node V of any moon","recipe":{"Cut Garnet":3,"Iron Ingot":1},"byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Diamond":3,"Titanium Ingot":1},{"Cut Philosopher's Stone":3,"Orichalcum Ingot":1}],"from":1,"size":4},{"id":"jewel-halo-1","name":"Halo Jewel I","kind":"Halo","grade":5,"craft":21,"opens":"Halo I","recipe":{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},"byTier":[{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1},{"Silver Ingot":1,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Cut Sapphire":1}],"from":2,"size":5},{"id":"jewel-halo-2","name":"Halo Jewel II","kind":"Halo","grade":10,"craft":46,"opens":"Halo II","recipe":{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},"byTier":[{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1},{"Titanium Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1,"Cut Diamond":1}],"from":2,"size":5},{"id":"jewel-halo-3","name":"Halo Jewel III","kind":"Halo","grade":5,"craft":21,"opens":"Halo III","recipe":{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},"byTier":[{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1},{"Mythril Ingot":1,"Elderwood Plank":1,"Moonsilk":1,"Aether Infusion":1,"Cut Starstone":1}],"from":3,"size":5},{"id":"jewel-halo-4","name":"Halo Jewel IV","kind":"Halo","grade":10,"craft":46,"opens":"Halo IV","recipe":{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},"byTier":[{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1},{"Orichalcum Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1,"Cut Philosopher's Stone":1}],"from":3,"size":5}],"jewelDemand":{"1":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":4,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":4,"jewel-planet-5":1,"jewel-moon-5":4},"pieces":25,"refined":120,"mats":{"Cut Quartz":30,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Copper Ingot":8,"Cut Garnet":40,"Iron Ingot":12,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":3,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":3,"jewel-planet-5":1,"jewel-moon-5":3},"pieces":20,"refined":100,"mats":{"Cut Quartz":24,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Copper Ingot":6,"Cut Garnet":31,"Iron Ingot":9,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}},"2":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":5,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":5,"jewel-planet-5":1,"jewel-moon-5":4,"jewel-halo-1":1,"jewel-halo-2":1},"pieces":29,"refined":138,"mats":{"Cut Quartz":31,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":9,"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3,"Cut Garnet":31,"Iron Ingot":9,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Cut Diamond":13,"Titanium Ingot":5,"Silver Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":4,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":4,"jewel-planet-5":1,"jewel-moon-5":3,"jewel-halo-1":1,"jewel-halo-2":1},"pieces":24,"refined":118,"mats":{"Cut Quartz":25,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":7,"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3,"Cut Garnet":25,"Iron Ingot":7,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Cut Diamond":10,"Titanium Ingot":4,"Silver Ingot":1,"Ebony Plank":1,"Silk":1,"Tide Infusion":1}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}},"3":{"every":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":4,"jewel-planet-2":1,"jewel-moon-2":6,"jewel-planet-3":1,"jewel-moon-3":4,"jewel-planet-4":1,"jewel-moon-4":6,"jewel-planet-5":1,"jewel-moon-5":4,"jewel-halo-1":1,"jewel-halo-2":1,"jewel-halo-3":1,"jewel-halo-4":1},"pieces":33,"refined":156,"mats":{"Cut Quartz":16,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":4,"Cut Sapphire":19,"Silver Ingot":7,"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3,"Cut Garnet":32,"Iron Ingot":10,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2,"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3,"Cut Philosopher's Stone":13,"Orichalcum Ingot":5,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Titanium Ingot":1,"Mythril Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1}},"pure":{"cnt":{"jewel-planet-1":1,"jewel-moon-1":3,"jewel-planet-2":1,"jewel-moon-2":5,"jewel-planet-3":1,"jewel-moon-3":3,"jewel-planet-4":1,"jewel-moon-4":5,"jewel-planet-5":1,"jewel-moon-5":3,"jewel-halo-1":1,"jewel-halo-2":1,"jewel-halo-3":1,"jewel-halo-4":1},"pieces":28,"refined":136,"mats":{"Cut Quartz":13,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Copper Ingot":3,"Cut Sapphire":16,"Silver Ingot":6,"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3,"Cut Garnet":26,"Iron Ingot":8,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2,"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3,"Cut Philosopher's Stone":10,"Orichalcum Ingot":4,"Mahogany Plank":1,"Wool Cloth":1,"Trilobite Carving":1,"Titanium Ingot":1,"Mythril Ingot":1,"Yggdrasil Plank":1,"Cloudweave":1,"Prismatic Infusion":1}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Sapphire":3,"Silver Ingot":1,"Cut Garnet":3,"Iron Ingot":1}}}},"perUma":[{"t":1,"lapidary":120,"gear":365,"total":485,"withMoon":493,"readme":485,"hours":822,"hoursMoon":835.558762886598},{"t":2,"lapidary":138,"gear":365,"total":503,"withMoon":511,"readme":510,"hours":852.5072164948454,"hoursMoon":866.0659793814433},{"t":3,"lapidary":156,"gear":365,"total":521,"withMoon":529,"readme":520,"hours":883.0144329896907,"hoursMoon":896.5731958762887}],"PROF_OF":{"Copper Ingot":"mining","Pine Plank":"wood","Linen":"farming","Shell Carving":"fishing","Cut Quartz":"hunting","Iron Ingot":"mining","Oak Plank":"wood","Cotton Cloth":"farming","Ammonite Carving":"fishing","Cut Garnet":"hunting","Silver Ingot":"mining","Mahogany Plank":"wood","Wool Cloth":"farming","Trilobite Carving":"fishing","Cut Sapphire":"hunting","Titanium Ingot":"mining","Ebony Plank":"wood","Silk":"farming","Tide Infusion":"fishing","Cut Diamond":"hunting","Mythril Ingot":"mining","Elderwood Plank":"wood","Moonsilk":"farming","Aether Infusion":"fishing","Cut Starstone":"hunting","Orichalcum Ingot":"mining","Yggdrasil Plank":"wood","Cloudweave":"farming","Prismatic Infusion":"fishing","Cut Philosopher's Stone":"hunting"}};
-// Shared by the three Extra Stats pages: the bodies, the classes, what a node grants, the tooltip.
+const DATA = {"jewels":[{"id":"jewel-planet-1","name":"Planet Jewel I","kind":"Planet","grade":1,"craft":1,"opens":"Planet I","byTier":[{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3},{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3},{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3}],"byTierNow":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"tierOf":[1,1,1]},{"id":"jewel-planet-2","name":"Planet Jewel II","kind":"Planet","grade":3,"craft":11,"opens":"Planet II","byTier":[{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3},{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3},{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3}],"byTierNow":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2}],"tierOf":[1,1,1]},{"id":"jewel-planet-3","name":"Planet Jewel III","kind":"Planet","grade":5,"craft":21,"opens":"Planet III","byTier":[{"Cut Quartz":3,"Pine Plank":3,"Linen":3,"Shell Carving":3},{"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3},{"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3}],"byTierNow":[{"Cut Quartz":2,"Pine Plank":2,"Linen":2,"Shell Carving":2},{"Cut Sapphire":2,"Mahogany Plank":2,"Wool Cloth":2,"Trilobite Carving":2},{"Cut Starstone":2,"Elderwood Plank":2,"Moonsilk":2,"Aether Infusion":2}],"tierOf":[1,2,3]},{"id":"jewel-planet-4","name":"Planet Jewel IV","kind":"Planet","grade":7,"craft":31,"opens":"Planet IV","byTier":[{"Cut Garnet":3,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3},{"Cut Garnet":3,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3},{"Cut Garnet":3,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3}],"byTierNow":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2}],"tierOf":[1,1,1]},{"id":"jewel-planet-5","name":"Planet Jewel V","kind":"Planet","grade":9,"craft":41,"opens":"Planet V","byTier":[{"Cut Garnet":3,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3},{"Cut Garnet":3,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3},{"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3}],"byTierNow":[{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Garnet":2,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2},{"Cut Diamond":2,"Ebony Plank":2,"Silk":2,"Tide Infusion":2}],"tierOf":[1,1,2]},{"id":"jewel-moon-1","name":"Moon Jewel I","kind":"Moon","grade":2,"craft":6,"opens":"Node I of any moon","byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1}],"tierOf":[1,1,1]},{"id":"jewel-moon-2","name":"Moon Jewel II","kind":"Moon","grade":4,"craft":16,"opens":"Node II of any moon","byTier":[{"Cut Quartz":3,"Copper Ingot":1},{"Cut Quartz":3,"Copper Ingot":1},{"Cut Sapphire":3,"Silver Ingot":1}],"tierOf":[1,1,2]},{"id":"jewel-moon-3","name":"Moon Jewel III","kind":"Moon","grade":6,"craft":26,"opens":"Node III of any moon","byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"tierOf":[1,1,1]},{"id":"jewel-moon-4","name":"Moon Jewel IV","kind":"Moon","grade":8,"craft":36,"opens":"Node IV of any moon","byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1},{"Cut Garnet":3,"Iron Ingot":1}],"tierOf":[1,1,1]},{"id":"jewel-moon-5","name":"Moon Jewel V","kind":"Moon","grade":10,"craft":46,"opens":"Node V of any moon","byTier":[{"Cut Garnet":3,"Iron Ingot":1},{"Cut Diamond":3,"Titanium Ingot":1},{"Cut Philosopher's Stone":3,"Orichalcum Ingot":1}],"tierOf":[1,2,3]}],"jewelDemand":{"1":{"every":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":3,"jewel-moon-2":3,"jewel-moon-3":3,"jewel-moon-4":3,"jewel-moon-5":3},"pieces":20,"refined":120,"mats":{"Cut Quartz":27,"Pine Plank":9,"Linen":9,"Shell Carving":9,"Cut Garnet":33,"Oak Plank":6,"Cotton Cloth":6,"Ammonite Carving":6,"Copper Ingot":6,"Iron Ingot":9},"byProf":{"hunting":60,"wood":15,"farming":15,"fishing":15,"mining":15},"byTier":{"1":120,"2":0,"3":0}},"now":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":3,"jewel-moon-2":3,"jewel-moon-3":3,"jewel-moon-4":3,"jewel-moon-5":3},"pieces":20,"refined":100,"mats":{"Cut Quartz":24,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Cut Garnet":31,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Copper Ingot":6,"Iron Ingot":9},"byProf":{"hunting":55,"wood":10,"farming":10,"fishing":10,"mining":15},"byTier":{"1":100,"2":0,"3":0}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1},"byProf":{"hunting":6,"mining":2},"byTier":{"1":8,"2":0,"3":0}}},"2":{"every":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":4,"jewel-moon-2":4,"jewel-moon-3":4,"jewel-moon-4":4,"jewel-moon-5":4},"pieces":25,"refined":140,"mats":{"Cut Quartz":30,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Cut Sapphire":3,"Mahogany Plank":3,"Wool Cloth":3,"Trilobite Carving":3,"Cut Garnet":30,"Oak Plank":6,"Cotton Cloth":6,"Ammonite Carving":6,"Copper Ingot":8,"Iron Ingot":8,"Cut Diamond":12,"Titanium Ingot":4},"byProf":{"hunting":75,"wood":15,"farming":15,"fishing":15,"mining":20},"byTier":{"1":112,"2":28,"3":0}},"now":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":4,"jewel-moon-2":4,"jewel-moon-3":4,"jewel-moon-4":4,"jewel-moon-5":4},"pieces":25,"refined":120,"mats":{"Cut Quartz":28,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Cut Sapphire":2,"Mahogany Plank":2,"Wool Cloth":2,"Trilobite Carving":2,"Cut Garnet":28,"Oak Plank":4,"Cotton Cloth":4,"Ammonite Carving":4,"Copper Ingot":8,"Iron Ingot":8,"Cut Diamond":12,"Titanium Ingot":4},"byProf":{"hunting":70,"wood":10,"farming":10,"fishing":10,"mining":20},"byTier":{"1":96,"2":24,"3":0}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Quartz":3,"Copper Ingot":1,"Cut Garnet":3,"Iron Ingot":1},"byProf":{"hunting":6,"mining":2},"byTier":{"1":8,"2":0,"3":0}}},"3":{"every":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":5,"jewel-moon-2":5,"jewel-moon-3":5,"jewel-moon-4":5,"jewel-moon-5":5},"pieces":30,"refined":160,"mats":{"Cut Quartz":21,"Pine Plank":6,"Linen":6,"Shell Carving":6,"Cut Starstone":3,"Elderwood Plank":3,"Moonsilk":3,"Aether Infusion":3,"Cut Garnet":33,"Oak Plank":3,"Cotton Cloth":3,"Ammonite Carving":3,"Cut Diamond":3,"Ebony Plank":3,"Silk":3,"Tide Infusion":3,"Copper Ingot":5,"Cut Sapphire":15,"Silver Ingot":5,"Iron Ingot":10,"Cut Philosopher's Stone":15,"Orichalcum Ingot":5},"byProf":{"hunting":90,"wood":15,"farming":15,"fishing":15,"mining":25},"byTier":{"1":96,"2":32,"3":32}},"now":{"cnt":{"jewel-planet-1":1,"jewel-planet-2":1,"jewel-planet-3":1,"jewel-planet-4":1,"jewel-planet-5":1,"jewel-moon-1":5,"jewel-moon-2":5,"jewel-moon-3":5,"jewel-moon-4":5,"jewel-moon-5":5},"pieces":30,"refined":140,"mats":{"Cut Quartz":19,"Pine Plank":4,"Linen":4,"Shell Carving":4,"Cut Starstone":2,"Elderwood Plank":2,"Moonsilk":2,"Aether Infusion":2,"Cut Garnet":32,"Oak Plank":2,"Cotton Cloth":2,"Ammonite Carving":2,"Cut Diamond":2,"Ebony Plank":2,"Silk":2,"Tide Infusion":2,"Copper Ingot":5,"Cut Sapphire":15,"Silver Ingot":5,"Iron Ingot":10,"Cut Philosopher's Stone":15,"Orichalcum Ingot":5},"byProf":{"hunting":85,"wood":10,"farming":10,"fishing":10,"mining":25},"byTier":{"1":84,"2":28,"3":28}},"her":{"cnt":{"jewel-moon-2":1,"jewel-moon-4":1},"pieces":2,"refined":8,"mats":{"Cut Sapphire":3,"Silver Ingot":1,"Cut Garnet":3,"Iron Ingot":1},"byProf":{"hunting":6,"mining":2},"byTier":{"1":4,"2":4,"3":0}}}},"recipeOptions":{"proposed":{"1":{"lapidary":120,"byProf":{"hunting":60,"wood":15,"farming":15,"fishing":15,"mining":15},"trades":{"Physical: Mine \u00b7 Forge":0.2016,"Physical hybrid: Forest \u00b7 Armorer":0.20619,"Healer: Fields \u00b7 Workbench":0.20275,"Magical hybrid: Fishery \u00b7 Charm Shop":0.2016,"Magical: Monster Den \u00b7 Lapidary":0.18786},"uma":485},"2":{"lapidary":140,"byProf":{"hunting":75,"wood":15,"farming":15,"fishing":15,"mining":20},"trades":{"Physical: Mine \u00b7 Forge":0.19802,"Physical hybrid: Forest \u00b7 Armorer":0.19802,"Healer: Fields \u00b7 Workbench":0.19912,"Magical hybrid: Fishery \u00b7 Charm Shop":0.19362,"Magical: Monster Den \u00b7 Lapidary":0.21122},"uma":505},"3":{"lapidary":160,"byProf":{"hunting":90,"wood":15,"farming":15,"fishing":15,"mining":25},"trades":{"Physical: Mine \u00b7 Forge":0.19471,"Physical hybrid: Forest \u00b7 Armorer":0.19048,"Healer: Fields \u00b7 Workbench":0.19577,"Magical hybrid: Fishery \u00b7 Charm Shop":0.18624,"Magical: Monster Den \u00b7 Lapidary":0.2328},"uma":525}},"today":{"1":{"lapidary":100,"byProf":{"hunting":55,"wood":10,"farming":10,"fishing":10,"mining":15},"trades":{"Physical: Mine \u00b7 Forge":0.21027,"Physical hybrid: Forest \u00b7 Armorer":0.21027,"Healer: Fields \u00b7 Workbench":0.20191,"Magical hybrid: Fishery \u00b7 Charm Shop":0.2055,"Magical: Monster Den \u00b7 Lapidary":0.17204},"uma":465},"2":{"lapidary":120,"byProf":{"hunting":70,"wood":10,"farming":10,"fishing":10,"mining":20},"trades":{"Physical: Mine \u00b7 Forge":0.20619,"Physical hybrid: Forest \u00b7 Armorer":0.2016,"Healer: Fields \u00b7 Workbench":0.19817,"Magical hybrid: Fishery \u00b7 Charm Shop":0.19702,"Magical: Monster Den \u00b7 Lapidary":0.19702},"uma":485},"3":{"lapidary":140,"byProf":{"hunting":85,"wood":10,"farming":10,"fishing":10,"mining":25},"trades":{"Physical: Mine \u00b7 Forge":0.20242,"Physical hybrid: Forest \u00b7 Armorer":0.19362,"Healer: Fields \u00b7 Workbench":0.19472,"Magical hybrid: Fishery \u00b7 Charm Shop":0.18922,"Magical: Monster Den \u00b7 Lapidary":0.22002},"uma":505}},"moon5":{"1":{"lapidary":115,"byProf":{"hunting":70,"mining":15,"wood":10,"farming":10,"fishing":10},"trades":{"Physical: Mine \u00b7 Forge":0.2037,"Physical hybrid: Forest \u00b7 Armorer":0.2037,"Healer: Fields \u00b7 Workbench":0.19907,"Magical hybrid: Fishery \u00b7 Charm Shop":0.19907,"Magical: Monster Den \u00b7 Lapidary":0.19444},"uma":480},"2":{"lapidary":140,"byProf":{"hunting":90,"mining":20,"wood":10,"farming":10,"fishing":10},"trades":{"Physical: Mine \u00b7 Forge":0.19802,"Physical hybrid: Forest \u00b7 Armorer":0.19362,"Healer: Fields \u00b7 Workbench":0.19472,"Magical hybrid: Fishery \u00b7 Charm Shop":0.18922,"Magical: Monster Den \u00b7 Lapidary":0.22442},"uma":505},"3":{"lapidary":165,"byProf":{"hunting":110,"mining":25,"wood":10,"farming":10,"fishing":10},"trades":{"Physical: Mine \u00b7 Forge":0.19287,"Physical hybrid: Forest \u00b7 Armorer":0.18449,"Healer: Fields \u00b7 Workbench":0.19078,"Magical hybrid: Fishery \u00b7 Charm Shop":0.18029,"Magical: Monster Den \u00b7 Lapidary":0.25157},"uma":530}}},"firstDraft":{"1":{"lapidary":120,"uma":485},"2":{"lapidary":138,"uma":503},"3":{"lapidary":156,"uma":521}},"PROF_OF":{"Cut Quartz":"hunting","Cut Garnet":"hunting","Cut Sapphire":"hunting","Cut Diamond":"hunting","Cut Starstone":"hunting","Cut Philosopher's Stone":"hunting","Copper Ingot":"mining","Iron Ingot":"mining","Silver Ingot":"mining","Titanium Ingot":"mining","Mythril Ingot":"mining","Orichalcum Ingot":"mining","Pine Plank":"wood","Oak Plank":"wood","Mahogany Plank":"wood","Ebony Plank":"wood","Elderwood Plank":"wood","Yggdrasil Plank":"wood","Linen":"farming","Cotton Cloth":"farming","Wool Cloth":"farming","Silk":"farming","Moonsilk":"farming","Cloudweave":"farming","Shell Carving":"fishing","Ammonite Carving":"fishing","Trilobite Carving":"fishing","Tide Infusion":"fishing","Aether Infusion":"fishing","Prismatic Infusion":"fishing"},"TIER_OF":{"Cut Quartz":1,"Cut Garnet":1,"Cut Sapphire":2,"Cut Diamond":2,"Cut Starstone":3,"Cut Philosopher's Stone":3,"Copper Ingot":1,"Iron Ingot":1,"Silver Ingot":2,"Titanium Ingot":2,"Mythril Ingot":3,"Orichalcum Ingot":3,"Pine Plank":1,"Oak Plank":1,"Mahogany Plank":2,"Ebony Plank":2,"Elderwood Plank":3,"Yggdrasil Plank":3,"Linen":1,"Cotton Cloth":1,"Wool Cloth":2,"Silk":2,"Moonsilk":3,"Cloudweave":3,"Shell Carving":1,"Ammonite Carving":1,"Trilobite Carving":2,"Tide Infusion":2,"Aether Infusion":3,"Prismatic Infusion":3}};
+// Shared by the four Extra Stats pages: classes, bodies, what a node grants, the tooltip, small chart helpers.
 const MULT = { 1: 1, 2: 1.8, 3: 2.6 };
 const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 const CLASSES = [['brawler', 'Brawler'], ['mage', 'Mage'], ['spellblade', 'Spell Blade'], ['summoner', 'Summoner'], ['paladin', 'Paladin'], ['cleric', 'Cleric']];
 const CLASS_NAME = Object.fromEntries(CLASSES);
-const STATS = [['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['matk', 'M.ATK'], ['def', 'DEF'], ['mdef', 'M.DEF']];
-const STAT_NAME = Object.fromEntries(STATS);
-// Each body: its name, what it gives, the token it's drawn in (charts: --b-*, the night-sky map: --m-*), the tier it arrives.
+const SPLIT_TXT = { brawler: '100/0', mage: '0/100', spellblade: '70/30', summoner: '30/70', paladin: '80/20', cleric: '20/80' };
+const ARMS = ['Greatsword', 'Axe', 'Lance', 'Bow', 'Katana'];
+const TOMES = ['Fire', 'Ice', 'Lightning', 'Light', 'Dark'];
+const isArm = (k) => ARMS.includes(k);
+const KINDS_OF = { // her three slotted kinds, branch 1 (weapon-progression §3.8)
+  brawler: ['Greatsword', 'Axe', 'Lance'], mage: ['Fire', 'Ice', 'Lightning'], spellblade: ['Katana', 'Lance', 'Lightning'],
+  summoner: ['Dark', 'Light', 'Bow'], paladin: ['Greatsword', 'Axe', 'Light'], cleric: ['Light', 'Ice', 'Bow'],
+};
 const BODY = {
   planet: { name: 'The Planet', short: 'Planet', gives: 'Every core stat: HP, MP, ATK, M.ATK, DEF, M.DEF', c: 'var(--b-planet)', m: 'var(--m-planet)', from: 1, jewel: 'Planet Jewel' },
-  strength: { name: 'Strength', short: 'Strength', gives: 'ATK', c: 'var(--b-str)', m: 'var(--m-str)', from: 1, jewel: 'Moon Jewel' },
-  sorcery: { name: 'Sorcery', short: 'Sorcery', gives: 'M.ATK', c: 'var(--b-sor)', m: 'var(--m-sor)', from: 1, jewel: 'Moon Jewel' },
+  prowess: { name: 'Prowess', short: 'Prowess', gives: 'Offense: each node split between ATK and M.ATK by her class', c: 'var(--b-pro)', m: 'var(--m-pro)', from: 1, jewel: 'Moon Jewel' },
   vigor: { name: 'Vigor', short: 'Vigor', gives: 'Both pools: HP (+5 a point) and MP', c: 'var(--b-vig)', m: 'var(--m-vig)', from: 1, jewel: 'Moon Jewel' },
   guard: { name: 'Guard', short: 'Guard', gives: 'Both defenses: DEF and M.DEF', c: 'var(--b-grd)', m: 'var(--m-grd)', from: 1, jewel: 'Moon Jewel' },
-  halo: { name: 'The Halo', short: 'Halo', gives: 'Flat offense on the hits of a kind she picks (never a kind for weaknesses)', c: 'var(--b-halo)', m: 'var(--m-halo)', from: 2, jewel: 'Halo Jewel' },
-  valor: { name: 'Valor', short: 'Valor', gives: 'Limit start: a head start on the Limit gauge of 12', c: 'var(--b-val)', m: 'var(--m-val)', from: 2, jewel: 'Moon Jewel' },
-  swiftness: { name: 'Swiftness', short: 'Swiftness', gives: 'Evasion: a share of every hit avoided', c: 'var(--b-swf)', m: 'var(--m-swf)', from: 3, jewel: 'Moon Jewel' },
-  template: { name: 'Her moon', short: '★ Her moon', gives: 'A marked slot for her Uma Template: I her knack, II her lead', c: 'var(--b-tpl)', m: 'var(--m-tpl)', from: 1, jewel: 'Moon Jewel' },
+  wm1: { name: 'Weapon moon 1', short: 'Weapon moon', gives: 'Flat offense on her hits of a kind: Full on one kind, or Split on two at 0.7 each', c: 'var(--b-wm1)', m: 'var(--m-wm1)', from: 2, jewel: 'Moon Jewel' },
+  wm2: { name: 'Weapon moon 2', short: 'Weapon moon 2', gives: 'A second weapon moon, on different kinds: Full + Split serves her three weapons', c: 'var(--b-wm2)', m: 'var(--m-wm2)', from: 3, jewel: 'Moon Jewel' },
+  template: { name: 'Her moon', short: '★ Her moon', gives: 'Her Uma Template: I her knack, II her lead (her calling channel’s defense)', c: 'var(--b-tpl)', m: 'var(--m-tpl)', from: 1, jewel: 'Moon Jewel' },
 };
-const CORE = ['planet', 'strength', 'sorcery', 'vigor', 'guard'];
-const usesBody = (cls, body) => cls === 'any' || !((cls === 'brawler' && body === 'sorcery') || (cls === 'mage' && body === 'strength'));
-const HALO_KIND = { brawler: ['Greatsword', 'Axe'], mage: ['Fire', 'Ice'], spellblade: ['Katana', 'Lance'], summoner: ['Dark', 'Light'], paladin: ['Greatsword', 'Axe'], cleric: ['Light', 'Ice'], any: ['her first kind', 'her second kind'] };
-const NODES = DATA.nodeTable;
-const inTier = (n, t) => (n.body === 'halo' ? t >= n.from : n.body === 'valor' ? t >= 2 : n.body === 'swiftness' ? t >= 3 : true);
-const pts = (n, t) => n['t' + t + 'pts'];
+const CORE = ['planet', 'prowess', 'vigor', 'guard'];
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
-const sgn = (n) => (n >= 0 ? '+' : '') + fmt(n);
+const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
+const sgnPct = (x, d = 1) => (x >= 0 ? '+' : '') + (x * 100).toFixed(d) + '%';
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-/** What a node gives at a tier, in words. */
-function grantText(n, t, cls = 'any') {
-  const p = pts(n, t);
-  switch (n.body) {
-    case 'planet': return `+${p} to each core stat (HP +${p * 5})`;
-    case 'strength': return `ATK +${p}`;
-    case 'sorcery': return `M.ATK +${p}`;
-    case 'vigor': return `HP +${p * 5}, MP +${p}`;
-    case 'guard': return `DEF +${p}, M.DEF +${p}`;
-    case 'halo': {
-      const k = HALO_KIND[cls] ?? HALO_KIND.any, kind = n.kindSlot === 1 ? k[0] : k[1];
-      const first = NODES.find((x) => x.body === 'halo' && x.kindSlot === n.kindSlot && x.grade === 5);
-      return n.grade === 5 ? `+${p} offense on her ${kind} hits` : `+${p} more on her ${kind} hits: +${pts(first, t) + p}`;
-    }
-    case 'valor': return n.n === 'I' ? 'Limit start +2 (of 12)' : 'Limit start +2 more: +4';
-    case 'swiftness': return n.n === 'I' ? 'Evasion +3%' : 'Evasion +3% more: +6%';
-    case 'template': return n.n === 'I' ? `Her knack +${p} points (HP +${p * 5}, MP +${p}, DEF and M.DEF +${p} each, or +2.4% evasion, or +1.6 Limit start)` : `Her lead +${p}: ATK or M.ATK, her calling's channel (CP36's note: her channel's DEF or M.DEF)`;
-  }
-  return '';
-}
-/** Extra Stats at a tier and tier level, for a class: every node her level opens on her class's bodies. */
-function grantsAt(t, L, cls = 'any', skip = []) {
-  const g = { hp: 0, mp: 0, atk: 0, matk: 0, def: 0, mdef: 0, halo1: 0, halo2: 0, limit: 0, evasion: 0, by: {} };
-  for (const n of NODES) {
-    if (n.lv > L || !inTier(n, t) || skip.includes(n.id)) continue;
-    const p = pts(n, t);
-    const add = (s, v) => { g[s] += v; g.by[n.body] ??= {}; g.by[n.body][s] = (g.by[n.body][s] ?? 0) + v; };
-    if (CORE.includes(n.body)) { if (!usesBody(cls, n.body)) continue; for (const s of n.stats) add(s, s === 'hp' ? p * 5 : p); }
-    else if (n.body === 'halo') add(n.kindSlot === 1 ? 'halo1' : 'halo2', p);
-    else if (n.body === 'valor') add('limit', n.t1);
-    else if (n.body === 'swiftness') add('evasion', n.t1);
-  }
-  return g;
-}
-
-// Tooltip (the progression page's)
+// Tooltip
 const tip = document.getElementById('tip');
-function placeTip(x, y) { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; }
+function placeTip(x, y) { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
 function showTip(x, y, title, body) { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; placeTip(x, y); }
 function hideTip() { tip.style.opacity = 0; }
 function bindTip(el, title, body) {
@@ -358,141 +241,132 @@ function bindTip(el, title, body) {
   el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, t(), b()); });
   el.addEventListener('blur', hideTip);
 }
-/** Wire every element carrying data-tt (title) and data-td (body) inside root. */
 function bindAll(root) { root.querySelectorAll('[data-tt]').forEach((el) => bindTip(el, el.dataset.tt, el.dataset.td || '')); }
-function pillGroup(el, items, current, onPick) {
-  el.innerHTML = items.map(([id, label, extra]) => `<button data-v="${id}" aria-pressed="${String(id) === String(current)}">${extra ?? ''}${label}</button>`).join('');
+function pillGroup(el, label, items, current, onPick) {
+  el.innerHTML = (label ? `<span class="lbl">${label}</span>` : '') + items.map(([id, l]) => `<button data-v="${id}" aria-pressed="${String(id) === String(current)}">${l}</button>`).join('');
   el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); onPick(b.dataset.v); }));
 }
-
-
-const J = DATA.JEWELS, JD = DATA.jewelDemand;
-const PROF = [['mining', 'Mining', 'var(--p-mine)'], ['wood', 'Wood Chopping', 'var(--p-wood)'], ['farming', 'Farming', 'var(--p-farm)'], ['fishing', 'Fishing', 'var(--p-fish)'], ['hunting', 'Hunting', 'var(--p-hunt)']];
-const PCOL = Object.fromEntries(PROF.map(([k, , c]) => [k, c]));
-const KIND = { Planet: { c: 'var(--b-planet)', m: 'var(--m-planet)', gives: 'Opens the Planet’s nodes, one a grade: every core stat', from: 1 }, Moon: { c: 'var(--b-sor)', m: 'var(--m-sor)', gives: 'Opens node I–V of any moon, picked when set; II and IV also open Valor, Swiftness and her moon', from: 1 }, Halo: { c: 'var(--b-halo)', m: 'var(--m-halo)', gives: 'Opens the Halo: I–II her first kind (Tier 2), III–IV her second (Tier 3)', from: 2 } };
-const ing = (name, q) => `<span class="ing" style="--pc:${PCOL[DATA.PROF_OF[name]]}"><i></i>${name} <b>×${q}</b></span>`;
-const recipeHtml = (j) => Object.entries(j.recipe).map(([n, q]) => ing(n, q)).join('');
-
-document.getElementById('kpis').innerHTML = [
-  ['Kinds · items', '2·10 · 3·12 · 3·14', 'Tier 1, 2, 3; today 3 · 100 Star Gems', 'var(--b-sor)'],
-  ['Jewels an Uma', '25 · 29 · 33', 'Every moon; + 2 for her moon in every tier', 'var(--b-planet)'],
-  ['Lapidary, refined an Uma', '120 · 138 · 156', '+ 8 for her moon; today 232', 'var(--accent)'],
-  ['Hunting’s share', '58%', '70 of Tier 1’s 120: Cut Quartz and Cut Garnet', 'var(--p-hunt)'],
-  ['Make time, Craft Lv 25', '2.4 · 3.0 · 4.8 h', 'A Moon, a Halo, a Planet Jewel', 'var(--b-halo)'],
-  ['The whole Uma, refined', '485 · 503 · 521', 'Profession-progression’s lines; + 8 her moon', 'var(--b-grd)'],
-].map(([l, v, d, c]) => `<div class="kpi"><div class="label"><span class="sw" style="background:${c}"></span>${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('');
-
-// --- Jewel icons ------------------------------------------------------------------------------------------------------
-function gemSvg(kind, n) {
-  const c = KIND[kind].m;
-  let shape = '';
-  if (kind === 'Planet') shape = `<polygon points="20,3 34,11 34,29 20,37 6,29 6,11" fill="${c}"/><polygon points="20,10 28,15 28,25 20,30 12,25 12,15" fill="#fff" opacity=".22"/>`;
-  else if (kind === 'Moon') shape = `<path d="M20 3 L35 16 L20 37 L5 16 Z" fill="${c}"/><path d="M5 16 H35 M20 3 L13 16 L20 37 L27 16 Z" fill="none" stroke="#fff" stroke-opacity=".5"/>`;
-  else shape = `<circle cx="20" cy="20" r="16" fill="${c}"/><circle cx="20" cy="20" r="7" fill="var(--raised)"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-opacity=".45"/>`;
-  return `<svg viewBox="0 0 40 40" aria-hidden="true">${shape}<text x="20" y="${kind === 'Halo' ? 24.5 : 24}" text-anchor="middle" style="font-size:${n.length > 2 ? 9 : 11}px;font-weight:800;fill:${kind === 'Halo' ? 'var(--ink)' : '#fff'}">${n}</text></svg>`;
+function kpis(el, rows) {
+  el.innerHTML = rows.map(([l, v, d, c]) => `<div class="kpi"><div class="label"><span class="sw" style="background:${c}"></span>${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('');
 }
-let tierK = 3;
-function renderKinds() {
-  document.getElementById('kind-cards').innerHTML = ['Planet', 'Moon', 'Halo'].map((k) => {
-    const js = J.filter((j) => j.kind === k);
-    return `<div class="kcard" style="--bc:${KIND[k].c}"><h3>${k} Jewel ${k === 'Halo' ? '<span class="tag new">Tier 2</span>' : ''}</h3><div class="gv">${KIND[k].gives}</div>
-      <div class="gems">${js.map((j) => { const n = j.name.split(' ').pop(); return `<div class="gemb ${j.from > tierK ? 'off' : ''}" tabindex="0" data-tt="${j.name} · grade ${j.grade}" data-td="Made from Craft Lv ${j.craft} · set at Uma Lv ${j.craft}<br>Opens ${j.opens}<br>${j.size} refined${j.from > tierK ? '' : ' in Tier ' + tierK}: ${Object.entries(j.byTier[Math.max(tierK, j.from) - 1]).map(([a, q]) => q + ' ' + a).join(', ')}<br>From Tier ${j.from}">${gemSvg(k, n)}<b>${n}</b><span>Lv ${j.craft}</span></div>`; }).join('')}</div>
-      <div class="gv"><b style="color:var(--ink)">${js[0].size} refined</b> a jewel${k === 'Moon' ? ': 3 Hunting stones on 1 Mining ingot' : k === 'Planet' ? ': 2 each of four professions' : ': one of each of its tier’s five pairs'}</div></div>`;
-  }).join('');
-  bindAll(document.getElementById('kind-cards'));
-}
-pillGroup(document.getElementById('tier-k'), [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], tierK, (v) => { tierK = Number(v); renderKinds(); });
+const kindTag = (k) => `<span class="tag ${isArm(k) ? 'phys' : 'magic'}">${k}</span>`;
+/** A rounded bar (horizontal) as an SVG path. */
+function hbar(x, y, w, h, r = 3) { if (w <= 0) return ''; r = Math.min(r, w / 2, h / 2); return `M${x},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} H${x} Z`; }
+function vbar(x, y0, w, h, r = 3) { if (h <= 0) return ''; r = Math.min(r, w / 2, h); const y = y0 - h; return `M${x},${y0} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y0} Z`; }
 
-// --- Lanes ---------------------------------------------------------------------------------------------------------------
-(function lanes() {
-  const W = 1240, H = 300, l = 170, r = 30, X = (lv) => l + ((lv - 1) / 49) * (W - l - r);
-  const rows = [['Planet Jewels', 'Planet'], ['Moon Jewels', 'Moon'], ['Halo Jewels I–II (Tier 2)', 'Halo', [1, 2]], ['Halo Jewels III–IV (Tier 3)', 'Halo', [3, 4]]];
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="When each jewel can be made and set, by level">`;
-  s += `<rect x="${X(1)}" y="16" width="${X(25.5) - X(1)}" height="${H - 56}" fill="var(--raised)" rx="6"/><rect x="${X(25.5)}" y="16" width="${X(50) - X(25.5)}" height="${H - 56}" fill="var(--sunken)" rx="6"/>`;
-  s += `<text class="axis-text" x="${X(1) + 8}" y="32">Grades 1–5: each profession's low type</text><text class="axis-text" x="${X(26) + 8}" y="32">Grades 6–10: its high type, gathered from Craft Lv 26</text>`;
-  [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 50].forEach((v) => (s += `<line x1="${X(v)}" x2="${X(v)}" y1="40" y2="${H - 40}" stroke="var(--grid)"/><text class="axis-text" x="${X(v)}" y="${H - 22}" text-anchor="middle">${v === 1 ? 'Lv 1' : v}</text>`));
-  rows.forEach(([name, kind, only], i) => { const y = 66 + i * 52;
-    s += `<text class="val-text" x="0" y="${y + 5}">${name}</text><line x1="${X(1)}" x2="${X(50)}" y1="${y}" y2="${y}" stroke="var(--axis)"/>`;
-    J.filter((j) => j.kind === kind && (!only || only.includes(Number(j.id.split('-').pop())))).forEach((j) => { const x = X(j.craft), n = j.name.split(' ').pop();
-      s += `<g class="mark" tabindex="0" data-tt="${j.name}" data-td="Grade ${j.grade} · made from Craft Lv ${j.craft}, set at Uma Lv ${j.craft}<br>Opens ${j.opens}<br>${j.size} refined">
-        <circle cx="${x}" cy="${y}" r="15" fill="${KIND[kind].c}"/><text x="${x}" y="${y + 4}" text-anchor="middle" style="font-size:${n.length > 2 ? 9.5 : 11}px;font-weight:800;fill:${kind === 'Planet' ? '#1b1300' : '#fff'};pointer-events:none">${n}</text></g>`; }); });
-  const el = document.getElementById('lanes'); el.innerHTML = s + '</svg>' + '<p class="foot">Opening order on the map: the Planet on Lv 1, 11, 21, 31, 41; the moons on 6, 16, 26, 36, 46 (Valor, Swiftness and her moon on 16 and 36); the Halo on 21 and 46.</p>'; bindAll(el);
+const J = DATA.jewels, JD = DATA.jewelDemand, OPT = DATA.recipeOptions;
+const PROF = { hunting: ['Hunting', 'var(--p-hunt)', 'cut stones'], mining: ['Mining', 'var(--p-mine)', 'ingots'], wood: ['Wood Chopping', 'var(--p-wood)', 'planks'], farming: ['Farming', 'var(--p-farm)', 'cloth'], fishing: ['Fishing', 'var(--p-fish)', 'carvings, infusions'] };
+const PORDER = ['hunting', 'mining', 'wood', 'farming', 'fishing'];
+const mat = (name, n) => { const p = DATA.PROF_OF[name], t = DATA.TIER_OF[name]; return `<span class="mat ${t > 1 ? 't' + t : ''}" style="--pc:${PROF[p][1]}" title="${PROF[p][0]}, Tier ${t} type">${n} ${name}</span>`; };
+
+kpis(document.getElementById('kpis'), [
+  ['Jewel kinds · items', '2 · 10', 'Planet I–V, Moon I–V; every tier', 'var(--b-planet)'],
+  ['Jewels an Uma, every class', '20 · 25 · 30', 'First draft 20–25 · 24–29 · 28–33 by class', 'var(--b-grd)'],
+  ['Lapidary, refined an Uma', '120 · 140 · 160', 'Her moon +8 every tier (proposed recipes)', 'var(--p-hunt)'],
+  ['One Uma maxed, refined', '485 · 505 · 525', '+4.1%, +8.2% on Tier 1; first draft 485 · 503 · 521', 'var(--accent)'],
+  ['Planet Jewel', '12 refined', 'Proposed (was 8); Moon Jewel 4 unchanged', 'var(--p-wood)'],
+  ['Halo Jewels', 'Retired', 'The weapon moons take Moon Jewels', 'var(--neutral-strong)'],
+]);
+document.getElementById('prof-legend').innerHTML = PORDER.map((p) => `<span><span class="sw" style="background:${PROF[p][1]}"></span>${PROF[p][0]} (${PROF[p][2]})</span>`).join('') + '<span><span class="sw" style="background:var(--t2)"></span>Tier 2 type</span><span><span class="sw" style="background:var(--t3)"></span>Tier 3 type</span>';
+
+// --- Equal for every class ----------------------------------------------------------------------------------------------
+(function equal() {
+  const FIRST = { brawler: [20, 24, 28], mage: [20, 24, 28], spellblade: [25, 29, 33], summoner: [25, 29, 33], paladin: [25, 29, 33], cleric: [25, 29, 33] };
+  const W = 1180, lw = 110, rowH = 14, gap = 3, grp = 3 * (rowH + gap) + 10, max = 36, iw = W - lw - 260;
+  const H = CLASSES.length * grp + 20;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Jewels an Uma by class and tier">`;
+  for (let v = 0; v <= max; v += 5) { const x = lw + 30 + (v / max) * iw; s += `<line x1="${x}" x2="${x}" y1="14" y2="${H}" stroke="var(--grid)"/><text class="axis-text" x="${x}" y="10" text-anchor="middle">${v}</text>`; }
+  CLASSES.forEach(([c, nm], i) => {
+    const y0 = 18 + i * grp;
+    s += `<text class="val-text" x="0" y="${y0 + grp / 2}" style="font-size:13px">${nm}</text>`;
+    [1, 2, 3].forEach((t, j) => {
+      const y = y0 + j * (rowH + gap), moon = 10 + 5 * t, x0 = lw + 30, wp = (5 / max) * iw, wm = (moon / max) * iw;
+      s += `<text class="axis-text" x="${lw}" y="${y + rowH - 3}">T${t}</text>`;
+      s += `<path class="mark" d="${hbar(x0, y, wp - 1.5, rowH, 0)}" fill="var(--b-planet)" data-tt="${nm} · Tier ${t}" data-td="Planet Jewels I–V: 5"></path>`;
+      s += `<path class="mark" d="${hbar(x0 + wp, y, wm, rowH)}" fill="var(--b-grd)" data-tt="${nm} · Tier ${t}" data-td="Moon Jewels: ${moon} (${t + 2} a grade: Prowess, Vigor, Guard${t > 1 ? ', weapon moon' + (t > 2 ? 's 1 and 2' : '') : ''})"></path>`;
+      const xf = x0 + (FIRST[c][t - 1] / max) * iw; s += `<rect x="${xf - 1}" y="${y - 2}" width="2" height="${rowH + 4}" fill="var(--ink)"/>`;
+      s += `<text class="val-text" x="${x0 + iw + 12}" y="${y + rowH - 3}">${5 + moon} jewels · ${OPT.proposed[t].lapidary} refined</text><text class="val-soft" x="${x0 + iw + 150}" y="${y + rowH - 3}">first draft ${FIRST[c][t - 1]}</text>`;
+    });
+  });
+  document.getElementById('equal-chart').innerHTML = s + '</svg>';
+  bindAll(document.getElementById('equal-chart'));
+  document.getElementById('equal-table').innerHTML = `<table><thead><tr><th>Class</th><th class="num">Tier 1: jewels · refined</th><th class="num">Tier 2</th><th class="num">Tier 3</th><th class="num">First draft (jewels)</th><th class="num">Her moon, every tier</th></tr></thead><tbody>` +
+    CLASSES.map(([c, nm]) => `<tr><td><b>${nm}</b></td>${[1, 2, 3].map((t) => `<td class="num">${15 + 5 * t} · ${OPT.proposed[t].lapidary}</td>`).join('')}<td class="num">${FIRST[c].join(' · ')}</td><td class="num">2 · 8</td></tr>`).join('') + '</tbody></table>';
 })();
 
-// --- Recipes -------------------------------------------------------------------------------------------------------------
-let tierR = 1;
-function renderRecipes() {
-  const rows = [['Planet Jewel I, II', 'jewel-planet-1', 'grades 1, 3'], ['Planet Jewel III', 'jewel-planet-3', 'grade 5'], ['Planet Jewel IV', 'jewel-planet-4', 'grade 7'], ['Planet Jewel V', 'jewel-planet-5', 'grade 9'],
-    ['Moon Jewel I', 'jewel-moon-1', 'grade 2'], ['Moon Jewel II', 'jewel-moon-2', 'grade 4'], ['Moon Jewel III, IV', 'jewel-moon-3', 'grades 6, 8'], ['Moon Jewel V', 'jewel-moon-5', 'grade 10'],
-    ['Halo Jewel I', 'jewel-halo-1', 'Tier 2\u2019s pair, grade 5'], ['Halo Jewel II', 'jewel-halo-2', 'Tier 2\u2019s pair, grade 10'], ['Halo Jewel III', 'jewel-halo-3', 'Tier 3\u2019s pair, grade 5'], ['Halo Jewel IV', 'jewel-halo-4', 'Tier 3\u2019s pair, grade 10']];
-  document.getElementById('rec-table').innerHTML = `<thead><tr><th>Jewel</th>${PROF.map(([, n, c]) => `<th><span class="sw2" style="background:${c}"></span> ${n}</th>`).join('')}<th class="num">Refined</th></tr></thead><tbody>` +
-    rows.map(([name, id, which]) => { const j = J.find((x) => x.id === id);
-      if (j.from > tierR) return `<tr class="muted"><td style="white-space:nowrap"><b>${name}</b><br><small>${which}</small></td><td colspan="5" class="muted">From Tier ${j.from}</td><td class="num">${j.size}</td></tr>`;
-      const rec = j.byTier[tierR - 1], base = j.byTier[0];
-      const moved = (n) => j.kind !== 'Halo' && !(n in base);
-      return `<tr><td style="white-space:nowrap"><b>${name}</b><br><small class="muted">${which}</small></td>${PROF.map(([k]) => `<td>${Object.entries(rec).filter(([n]) => DATA.PROF_OF[n] === k).map(([n, q]) => ing(n, q).replace('class="ing"', `class="ing"${moved(n) ? ' style="--pc:' + PCOL[k] + ';border-color:var(--accent);border-width:2px"' : ''}`)).join('') || '<span class="muted">—</span>'}</td>`).join('')}<td class="num"><b>${j.size}</b></td></tr>`; }).join('') + '</tbody>';
-}
-pillGroup(document.getElementById('tier-r'), [[1, 'Tier 1'], [2, 'Tier 2'], [3, 'Tier 3']], tierR, (v) => { tierR = Number(v); renderRecipes(); });
-document.getElementById('tier-r').insertAdjacentHTML('afterbegin', '<span class="lbl">Recipes in</span>');
-document.getElementById('prof-legend').innerHTML = PROF.map(([, n, c]) => `<span><span class="sw2" style="background:${c}"></span>${n}</span>`).join('') + '<span class="muted">Gold outline: the ladder moved this grade onto the tier\u2019s pair. Every item is a type of profession-progression PP8; no new item, no new icon</span>';
+// --- Every jewel --------------------------------------------------------------------------------------------------------
+document.getElementById('jcards').innerHTML = J.map((j) => {
+  const col = j.kind === 'Planet' ? 'var(--b-planet)' : 'var(--b-grd)';
+  const size = Object.values(j.byTier[0]).reduce((a, b) => a + b, 0);
+  return `<div class="jcard" style="--bc:${col}"><h3>${j.name}<span class="muted">${size} refined</span></h3><div class="meta">Grade ${j.grade} · made from Craft Lv ${j.craft} · ${j.opens}</div>` +
+    [1, 2, 3].map((t) => `<div class="tierrow"><span class="tier-chip ${t > 1 ? 't' + t + 'c' : ''}" style="--tc:var(--t${t})">${t}</span><span>${Object.entries(j.byTier[t - 1]).map(([n, k]) => mat(n, k)).join('')}</span></div>`).join('') + '</div>';
+}).join('');
 
-// --- Per Uma -------------------------------------------------------------------------------------------------------------
-let which = 'every';
-function hbars(el, rows, segsOf, legend, aria, unit = '') {
-  const W = 600, l = 70, r = 70, rowH = 30, gap = 14, H = rows.length * (rowH + gap) + 10;
-  const max = Math.max(...rows.map((rw) => segsOf(rw).reduce((a, s) => a + s[2], 0)));
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${aria}">`, y = 6;
-  rows.forEach((rw) => { const segs = segsOf(rw).filter((x) => x[2] > 0), tot = segs.reduce((a, x) => a + x[2], 0); let x = l;
-    s += `<text class="val-text" x="0" y="${y + rowH / 2 + 4}">${rw.label}</text>`;
-    segs.forEach(([n, c, v, extra], i) => { const w = (v / max) * (W - l - r), last = i === segs.length - 1, ww = Math.max(0.5, w - (last ? 0 : 2)), rr = last ? Math.min(4, ww) : 0;
-      s += `<path class="mark" tabindex="0" data-tt="${rw.label} · ${n}" data-td="${v}${unit}${extra ? '<br>' + extra : ''}" d="M${x},${y} H${x + ww - rr} Q${x + ww},${y} ${x + ww},${y + rr} V${y + rowH - rr} Q${x + ww},${y + rowH} ${x + ww - rr},${y + rowH} H${x} Z" fill="${c}"/>`;
-      if (ww > 22) s += `<text x="${x + ww / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#fff;pointer-events:none">${v}</text>`; x += w; });
-    s += `<text class="val-text" x="${x + 8}" y="${y + rowH / 2 + 4}">${tot}</text>`; y += rowH + gap; });
-  el.innerHTML = s + '</svg>'; bindAll(el);
+// --- Per Uma ------------------------------------------------------------------------------------------------------------
+function stacked(elId, rows, keys, colors, names, max, unit) {
+  const W = 560, lw = 60, rowH = 26, gap = 10, iw = W - lw - 60, H = rows.length * (rowH + gap) + 24;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${unit}">`;
+  for (let v = 0; v <= max; v += 40) { const x = lw + (v / max) * iw; s += `<line x1="${x}" x2="${x}" y1="14" y2="${H}" stroke="var(--grid)"/><text class="axis-text" x="${x}" y="10" text-anchor="middle">${v}</text>`; }
+  rows.forEach(([lab, vals], i) => {
+    const y = 18 + i * (rowH + gap); let x = lw; const tot = keys.reduce((a, k) => a + (vals[k] || 0), 0);
+    s += `<text class="val-text" x="0" y="${y + rowH / 2 + 4}">${lab}</text>`;
+    keys.forEach((k, j) => { const v = vals[k] || 0; if (!v) return; const w = (v / max) * iw;
+      s += `<path class="mark" d="${hbar(x, y, w - 1.5, rowH, 0)}" fill="${colors[j]}" data-tt="${lab} · ${names[j]}" data-td="${v} refined (${pct(v / tot, 0)})"></path>`;
+      if (w > 26) s += `<text x="${x + w / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#fff;pointer-events:none">${v}</text>`; x += w; });
+    s += `<text class="val-text" x="${x + 6}" y="${y + rowH / 2 + 4}">${tot}</text>`;
+  });
+  document.getElementById(elId).innerHTML = s + '</svg>';
+  bindAll(document.getElementById(elId));
 }
-function renderUma() {
-  document.getElementById('w-every').setAttribute('aria-pressed', which === 'every'); document.getElementById('w-pure').setAttribute('aria-pressed', which === 'pure');
-  const moons = which === 'every' ? 4 : 3;
-  const counts = (t) => ({ planet: 5, core: 5 * moons, small: t >= 3 ? 4 : t >= 2 ? 2 : 0, halo: t >= 3 ? 4 : t >= 2 ? 2 : 0, hers: 2 });
-  const rows = [1, 2, 3].map((t) => ({ label: `Tier ${t}`, t, c: counts(t) }));
-  const CNT = [['Planet Jewels', 'var(--b-planet)', 'planet'], ['Moon Jewels, the four moons', 'var(--b-sor)', 'core'], ['Moon Jewels, Valor and Swiftness', 'var(--b-val)', 'small'], ['Halo Jewels', 'var(--b-halo)', 'halo'], ['Her moon (Moon Jewels II, IV)', 'var(--b-tpl)', 'hers']];
-  hbars(document.getElementById('cnt-chart'), rows, (rw) => CNT.map(([n, c, k]) => [n, c, rw.c[k]]), null, 'Jewels an Uma by tier', ' jewels');
-  document.getElementById('cnt-legend').innerHTML = CNT.map(([n, c]) => `<span><span class="sw2" style="background:${c}"></span>${n}</span>`).join('');
-  document.getElementById('cnt-table').innerHTML = `<table class="tight"><thead><tr><th>Tier</th>${CNT.map(([n]) => `<th class="num">${n}</th>`).join('')}<th class="num">Shared</th><th class="num">With hers</th></tr></thead><tbody>` +
-    rows.map((rw) => { const sh = rw.c.planet + rw.c.core + rw.c.small + rw.c.halo; return `<tr><td>${rw.label}</td>${CNT.map(([, , k]) => `<td class="num">${rw.c[k]}</td>`).join('')}<td class="num"><b>${sh}</b></td><td class="num">${sh + 2}</td></tr>`; }).join('') + '</tbody></table>';
-  const byProf = (t) => { const m = JD[t][which].mats, out = Object.fromEntries(PROF.map(([k]) => [k, 0])); for (const [n, q] of Object.entries(m)) out[DATA.PROF_OF[n]] += q; return out; };
-  const rrows = [1, 2, 3].map((t) => ({ label: `Tier ${t}`, t, p: byProf(t) }));
-  hbars(document.getElementById('ref-chart'), rrows, (rw) => [...PROF.map(([k, n, c]) => [n, c, rw.p[k], Object.entries(JD[rw.t][which].mats).filter(([nm]) => DATA.PROF_OF[nm] === k).map(([nm, q]) => `${q} ${nm}`).join(', ')]), ['Her moon', 'var(--b-tpl)', 8, '3 Cut Quartz, 1 Copper Ingot, 3 Cut Garnet, 1 Iron Ingot']], null, 'Refined items an Uma by profession and tier', ' refined');
-  document.getElementById('ref-legend').innerHTML = [...PROF.map(([, n, c]) => [n, c]), ['Her moon', 'var(--b-tpl)']].map(([n, c]) => `<span><span class="sw2" style="background:${c}"></span>${n}</span>`).join('');
-  document.getElementById('ref-table').innerHTML = `<table class="tight"><thead><tr><th>Tier</th>${PROF.map(([, n]) => `<th class="num">${n}</th>`).join('')}<th class="num">Shared</th><th class="num">+ her moon</th></tr></thead><tbody>` +
-    rrows.map((rw) => `<tr><td>${rw.label}</td>${PROF.map(([k]) => `<td class="num">${rw.p[k]}</td>`).join('')}<td class="num"><b>${JD[rw.t][which].refined}</b></td><td class="num">${JD[rw.t][which].refined + 8}</td></tr>`).join('') + '</tbody></table>';
-}
-document.getElementById('w-every').addEventListener('click', () => { which = 'every'; renderUma(); });
-document.getElementById('w-pure').addEventListener('click', () => { which = 'pure'; renderUma(); });
-
-// --- Materials -----------------------------------------------------------------------------------------------------------
-(function materials() {
-  const names = [...new Set([1, 2, 3].flatMap((t) => Object.keys(JD[t].every.mats)))];
-  const order = (n) => PROF.findIndex(([k]) => k === DATA.PROF_OF[n]);
-  names.sort((a, b) => order(a) - order(b));
-  document.getElementById('mat-table').innerHTML = `<thead><tr><th>Type</th><th>Profession</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr></thead><tbody>` +
-    names.map((n) => `<tr><td>${ing(n, '').replace(' <b>×</b>', '')}</td><td class="muted">${PROF.find(([k]) => k === DATA.PROF_OF[n])[1]}</td>${[1, 2, 3].map((t) => `<td class="num">${JD[t].every.mats[n] ?? '<span class="muted">—</span>'}</td>`).join('')}</tr>`).join('') +
-    `<tr><td><b>Lapidary, an Uma</b></td><td></td>${[1, 2, 3].map((t) => `<td class="num"><b>${JD[t].every.refined}</b></td>`).join('')}</tr></tbody>`;
+stacked('prof-chart', [1, 2, 3].map((t) => [`Tier ${t}`, JD[t].every.byProf]), PORDER, PORDER.map((p) => PROF[p][1]), PORDER.map((p) => PROF[p][0]), 160, 'Refined by profession');
+stacked('tier-chart', [1, 2, 3].map((t) => [`Tier ${t}`, JD[t].every.byTier]), ['1', '2', '3'], ['var(--t1)', 'var(--t2)', 'var(--t3)'], ["Tier 1's types", "Tier 2's types", "Tier 3's types"], 160, 'Refined by tier type');
+(function matTable() {
+  const names = [...new Set([1, 2, 3].flatMap((t) => Object.keys(JD[t].every.mats)))].sort((a, b) => PORDER.indexOf(DATA.PROF_OF[a]) - PORDER.indexOf(DATA.PROF_OF[b]) || DATA.TIER_OF[a] - DATA.TIER_OF[b]);
+  document.getElementById('mat-table').innerHTML = `<table><thead><tr><th>Type</th><th>Profession</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th><th class="num">Her moon, Tier 1 · 2 · 3</th></tr></thead><tbody>` +
+    names.map((n) => `<tr><td>${mat(n, '')}</td><td>${PROF[DATA.PROF_OF[n]][0]}</td>${[1, 2, 3].map((t) => `<td class="num">${JD[t].every.mats[n] || '—'}</td>`).join('')}<td class="num">${[1, 2, 3].map((t) => JD[t].her.mats[n] || 0).join(' · ')}</td></tr>`).join('') +
+    `<tr class="hl"><td><b>In all</b></td><td></td>${[1, 2, 3].map((t) => `<td class="num"><b>${JD[t].every.refined}</b></td>`).join('')}<td class="num">8 · 8 · 8</td></tr></tbody></table>`;
 })();
 
-// --- Party and run -------------------------------------------------------------------------------------------------------
-(function party() {
-  const one = (t) => JD[t].every.refined, pure = (t) => JD[t].pure.refined, pt = (t) => 3 * one(t) + 2 * pure(t);
-  document.getElementById('party-table').innerHTML = `<thead><tr><th>Refined items</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr></thead><tbody>` +
-    [['One Uma, every moon', one], ['One Uma, her class’s moons (Brawler, Mage)', pure], ['+ her moon, every Uma', () => 8], ['A party on defaults (3 + 2)', pt], ['A party, with their moons', (t) => pt(t) + 40], ['A Rift run of twenty', (t) => 4 * pt(t)], ['Lapidary hours, one Uma (Craft Lv 25)', (t) => (one(t) * 0.6).toFixed(0) + ' h']]
-      .map(([n, f]) => `<tr><td>${n}</td>${[1, 2, 3].map((t) => `<td class="num">${typeof f(t) === 'number' ? fmt(f(t)) : f(t)}</td>`).join('')}</tr>`).join('') + '</tbody>';
-  document.getElementById('plan-table').innerHTML = `<thead><tr><th></th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr></thead><tbody>` +
-    [['Planet and Moon Jewels: first round', '25 · 120', '27 · 120', '29 · 120'], ['Planet and Moon Jewels: this doc', '25 · 120', '27 · 128', '29 · 136'], ['Halo Jewels (the same)', '—', '2 · 10', '4 · 20'],
-     ['Lapidary an Uma', '<b>120</b>', '<b>138</b>', '<b>156</b>'], ['The whole Uma: first round', '485', '510', '520'], ['The whole Uma: profession-progression', '<b>485</b>', '<b>503</b>', '<b>521</b>'], ['Hours at Craft Lv 25', '822', '852', '883']]
-      .map((r) => `<tr><td>${r[0]}</td>${r.slice(1).map((c) => `<td class="num">${c}</td>`).join('')}</tr>`).join('') + '</tbody>';
+// --- Recipe options -----------------------------------------------------------------------------------------------------
+(function options() {
+  const OPTS = [['proposed', 'Proposed: Planet Jewel 12'], ['today', "Today's recipes: Planet 8"], ['moon5', 'Moon Jewel 5 (4 stones)']];
+  const TR = Object.keys(OPT.proposed[1].trades), TCOL = ['var(--p-mine)', 'var(--p-wood)', 'var(--p-farm)', 'var(--p-fish)', 'var(--p-hunt)'];
+  document.getElementById('trade-legend').innerHTML = TR.map((t, i) => `<span><span class="sw" style="background:${TCOL[i]}"></span>${t}</span>`).join('');
+  const W = 560, lw = 110, rowH = 20, H = OPTS.length * 3 * (rowH + 4) + OPTS.length * 30 + 30, lo = 0.15, hi = 0.27, iw = W - lw - 16, X = (v) => lw + ((v - lo) / (hi - lo)) * iw;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Each trade's share of an Uma's work, by recipe option and tier">`;
+  s += `<rect x="${X(0.18)}" y="14" width="${X(0.22) - X(0.18)}" height="${H - 14}" fill="var(--accent)" opacity=".12"/>`;
+  for (let v = 0.15; v <= 0.27 + 1e-9; v += 0.02) s += `<line x1="${X(v)}" x2="${X(v)}" y1="14" y2="${H}" stroke="var(--grid)"/><text class="axis-text" x="${X(v)}" y="10" text-anchor="middle">${Math.round(v * 100)}%</text>`;
+  let y = 20;
+  OPTS.forEach(([k, l]) => {
+    s += `<text class="val-text" x="0" y="${y + 12}">${l}</text>`; y += 18;
+    [1, 2, 3].forEach((t) => {
+      const o = OPT[k][t];
+      s += `<text class="axis-text" x="8" y="${y + rowH - 6}">Tier ${t} · ${o.uma} refined</text><line x1="${lw}" x2="${lw + iw}" y1="${y + rowH / 2}" y2="${y + rowH / 2}" stroke="var(--hairline-strong)"/>`;
+      TR.forEach((tr, i) => { const v = o.trades[tr]; s += `<circle class="mark" cx="${X(v)}" cy="${y + rowH / 2}" r="6" fill="${TCOL[i]}" stroke="var(--panel)" stroke-width="1.5" data-tt="${l} · Tier ${t}" data-td="${tr}: ${pct(v)} of an Uma's work"></circle>`; });
+      y += rowH + 4;
+    });
+    y += 12;
+  });
+  document.getElementById('trade-chart').innerHTML = s + '</svg>';
+  bindAll(document.getElementById('trade-chart'));
+  const rng = (o, t) => { const v = Object.values(OPT[o][t].trades); return `${(Math.min(...v) * 100).toFixed(1)}–${(Math.max(...v) * 100).toFixed(1)}%`; };
+  document.getElementById('opt-table').innerHTML = `<table><thead><tr><th>Option</th><th class="num">Lapidary an Uma</th><th class="num">One Uma</th><th class="num">Trades, T1 · T2 · T3</th></tr></thead><tbody>` +
+    OPTS.map(([k, l]) => `<tr${k === 'proposed' ? ' class="hl"' : ''}><td><b>${l}</b></td><td class="num">${[1, 2, 3].map((t) => OPT[k][t].lapidary).join(' · ')}</td><td class="num">${[1, 2, 3].map((t) => OPT[k][t].uma).join(' · ')}</td><td class="num">${[1, 2, 3].map((t) => rng(k, t)).join(' · ')}</td></tr>`).join('') +
+    `<tr><td>First draft (Halo Jewels; a Brawler or a Mage skipping a moon)</td><td class="num">${[1, 2, 3].map((t) => DATA.firstDraft[t].lapidary).join(' · ')}</td><td class="num">${[1, 2, 3].map((t) => DATA.firstDraft[t].uma).join(' · ')}</td><td class="num">18.7–22.8%</td></tr></tbody></table>` +
+    '<p class="foot">Gear stays 365 refined in every tier (weapon-progression, profession-progression). A trade is its gathering profession and its making place (or the Workbench, a quarter of a gather an item); hours follow refined items, about 1.69 h each at Craft Lv 25.</p>';
 })();
 
-renderKinds(); renderRecipes(); renderUma();
+// --- The Lapidary -------------------------------------------------------------------------------------------------------
+document.getElementById('laps').innerHTML = [1, 2, 3].map((t) => {
+  const chips = (kind) => J.filter((j) => j.kind === kind).map((j) => { const tt = j.tierOf[t - 1]; return `<div class="g mark" style="--tc:var(--t${tt})" data-tt="${j.name} · Tier ${t}" data-td="${Object.entries(j.byTier[t - 1]).map(([n, k]) => k + ' ' + n).join(', ')}<br>Craft Lv ${j.craft}">${ROMAN[(j.grade - (kind === 'Planet' ? 1 : 2)) / 2]}<small>Lv ${j.craft}</small></div>`; }).join('');
+  const need = JD[t].every.cnt;
+  return `<div><div class="lap"><div class="hd"><span>Lapidary · Jewel Crafting</span><span class="tier-chip ${t > 1 ? 't' + t + 'c' : ''}" style="--tc:var(--t${t})">Tier ${t}</span></div>
+    <div class="rowh">Planet Jewel · 12 refined · 1 an Uma each</div><div class="chips">${chips('Planet')}</div>
+    <div class="rowh">Moon Jewel · 4 refined · ${need['jewel-moon-1']} an Uma each</div><div class="chips">${chips('Moon')}</div>
+    ${t > 1 ? `<div class="gone">Halo Jewel ${t === 2 ? 'I–II' : 'I–IV'} (the first draft)</div>` : ''}</div>
+    <p class="foot" style="text-align:center">Targets for one Uma, any class: ${JD[t].every.pieces} jewels, ${JD[t].every.refined} refined (+2 · 8 her moon)</p></div>`;
+}).join('');
+bindAll(document.getElementById('laps'));
 </script>
 </body>
 </html>
