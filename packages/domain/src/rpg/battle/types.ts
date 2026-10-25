@@ -8,6 +8,7 @@
 // v16 the Tier rework's fight, D200, live since H72 (D210): three weapons by channel, no side or legacy skills, a
 // trunk and one fork into lines A and B, Skill Ranks (H65), the base MP regen and the Flourish (H68, D204);
 // v17 the Tier rework's economy, D209, dark until H82: gear grades arrive as stats and Might, and the ten supports are refused;
+// her accessory's base form arrives as `flat`, `bell` or `insignia` and her signature as `signature` (H75, D212);
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -45,8 +46,8 @@ export interface BattleAlly {
   /** Her Class Rank (v8, D102): it opens her trees' depths and sets her Limit Break's depth. */
   classRank?: number
   /** Might by damage kind (v8, D104): added to the offense of hits made with that weapon (a grade × 4 to v11; D142's
-   * table from v13). In v12 alone (D141) a percent: the hits made with that weapon deal this much more. From v15 it also
-   * carries her Orb's offense on its kind (H57). */
+   * table from v13). In v12 alone (D141) a percent: the hits made with that weapon deal this much more. In v15 and v16 it
+   * also carries her Orb's offense on its kind (H57); from v17 her accessory's arrives in `flat` (H75). */
   might?: Partial<Record<RpgDamageKind, number>>
   /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
    * absorbing physical damage only). Refused from v17 (D209). */
@@ -85,7 +86,27 @@ export interface BattleAlly {
   /** v16 (UT6, H68): her template's Flourish, sent only while she fights as her calling's class (UT12) and frozen here
    * (UT18); refused before v16. Clean break starts her with a Barrier, Even pace and Late reserve mend at a round's end. */
   flourish?: RpgFlourish
+  /** v17 (WP20, WP22; H75, D212): her accessory's flat offense by kind, a Pendant's on each of her three weapons' kinds or
+   * an Orb's on its one (any kind, even one she doesn't wield: her inherited Limit Breaks' hits), added to the offense of
+   * her hits of that kind (the damage stack's step 1, WP31). Apart from `might`, where v15's Orb joined, so R3's kind cap
+   * and weapon moons read it alone. 0–1,000 a kind; refused before v17. One slot in v17: at most one of a non-empty `flat`,
+   * `bell` and `insignia`. */
+  flat?: Partial<Record<RpgDamageKind, number>>
+  /** v17 (WP21; H75, D212): her Bell. When her act includes an Attack, her weapon of its kind (one of hers) strikes once
+   * more; refused before v17. */
+  bell?: BattleBell
+  /** v17 (WP23; H75, D212): her Insignia: her hits on a sub-boss or a boss deal more (step 4); refused before v17. */
+  insignia?: BattleInsignia
+  /** v17 (WP33, UT7, SB15, UT18; H75, D212): her signature's bonus while she wears her family, added to her ATK and M.ATK
+   * on her hits only (never her mends, Barriers or revives), frozen here. 0–1,000; refused before v17. */
+  signature?: number
 }
+/** v17 (WP21): a Bell's follow-up. `kind` is one of her weapons' kinds; `power` is per mille of an Attack, 1–3,000, × her
+ * hand for that weapon's channel. R3 adds a Toll Bell's step and top. */
+export interface BattleBell { kind: RpgDamageKind; power: number }
+/** v17 (WP23): an Insignia's `value`, per mille, 1–1,000, a factor of its own on her hits on sub-bosses and bosses. R3
+ * adds Onslaught's scope. */
+export interface BattleInsignia { value: number }
 /** An inherited Limit Break (D106): it works at 50% plus 5% a Bond Level; `from` is the Hero's outfit, for the cut-in. */
 export interface BattleInherit { limit: HeroLimitId; bond: number; from: string }
 export interface BattleEnemyStats { hp: number; atk: number; matk: number; pdef: number; mdef: number; initiative: number }

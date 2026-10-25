@@ -1,7 +1,9 @@
 // Deterministic ally auto-battle policy (H02): prefer a ready Limit Break, otherwise choose the strongest affordable
-// skill or Attack for the living foes. This is intentionally a small policy, not another battle engine.
+// skill or Attack for the living foes. This is intentionally a small policy, not another battle engine. From v17 an
+// Attack counts her Bell's follow-up (H75).
 import { rpgNode, rpgNodeSkill, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
-import { isRpgTome, rpgHand, type RpgHand, type RpgNodeRef, type RpgWeapon } from '../rules'
+import { isRpgTome, rpgHand, rpgWeaponKind, type RpgHand, type RpgNodeRef, type RpgWeapon } from '../rules'
+import { rpgRework } from './caps'
 import { applyBattleAction, battleActorSkill, battleAttackDef, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
 import { BATTLE_WARD_FACTOR, battleChannel } from './skills'
@@ -76,15 +78,35 @@ function limitAction(state: BattleState, actor: BattleAlly, unit: BattleUnit, fo
   return target ? { kind: 'limit', actorId: actor.id, targetId: target.id, ...choice } : null
 }
 
+/**
+ * v17 (WP21, H75): what her Bell's follow-up adds to an Attack with `weapon` on this foe, in that Attack's terms: the
+ * follow-up scored as a one-hit skill of the Bell's kind at its power (weak when its kind is on the foe's lists), × its
+ * weapon's hand over the Attack's. Nothing before v17 or without a Bell. Her Insignia needs no term: it multiplies every
+ * hit of hers on a foe alike.
+ */
+function bellScore(state: BattleState, actor: BattleAlly, weapon: RpgWeapon, foe: BattleUnit, foes: readonly BattleUnit[]): number {
+  const bell = actor.bell
+  const own = bell && actor.weapons.find((candidate) => rpgWeaponKind(candidate) === bell.kind)
+  if (!bell || !own || !rpgRework('economy', state.engineVersion)) return 0
+  const hand = rpgHand(actor, state.engineVersion)
+  const handOf = (w: RpgWeapon) => (isRpgTome(w) ? hand.tome : hand.arms)
+  const def: RpgSkillDef = { target: 'one', hits: [{ power: bell.power / 1000, parts: [{ kind: bell.kind, share: 1 }] }], mp: 0, primary: bell.kind }
+  return (score(state, def, foe, foes) * handOf(own)) / handOf(weapon)
+}
+
 interface Pick { half: BattleHalf; mp: number; foe: BattleUnit; score: number }
-function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes: readonly BattleUnit[], tome: boolean | null, budget: number): Pick | null {
+/** Her best half of one channel (`tome`), or of any. `bell`: an Attack here would ring her Bell (false once the act's
+ * leading half is already an Attack: it rings once an act). */
+function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes: readonly BattleUnit[], tome: boolean | null, budget: number,
+  bell = true): Pick | null {
   let pick: Pick | null = null
   const consider = (candidate: Pick) => {
     if (!pick || candidate.score > pick.score) pick = candidate
   }
   for (const foe of foes) {
     for (const weapon of actor.weapons.filter((candidate) => tome === null || isRpgTome(candidate) === tome)) {
-      consider({ half: { weapon }, mp: 0, foe, score: score(state, battleAttackDef(weapon), foe, foes) })
+      const follow = bell ? bellScore(state, actor, weapon, foe, foes) : 0
+      consider({ half: { weapon }, mp: 0, foe, score: score(state, battleAttackDef(weapon), foe, foes) + follow })
     }
     for (const ref of actor.loadout) {
       const skill = battleActorSkill(state, unit.id, ref)
@@ -111,7 +133,7 @@ function bestAction(state: BattleState, actor: BattleAlly, unit: BattleUnit, foe
   }
   const tome = tomeLeads(hand)
   const lead = bestHalf(state, actor, unit, foes, tome, unit.mp)
-  const other = lead ? bestHalf(state, actor, unit, foes, !tome, unit.mp - lead.mp) : null
+  const other = lead ? bestHalf(state, actor, unit, foes, !tome, unit.mp - lead.mp, !!lead.half.skill) : null
   if (!lead || !other) return null
   return lead.half.skill
     ? { kind: 'skill', actorId: unit.id, targetId: lead.foe.id, skill: lead.half.skill, pair: other.half }

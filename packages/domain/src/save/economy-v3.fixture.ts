@@ -1,7 +1,7 @@
 // Test-only constructors for R2's graded save shape (H74). H75–H78 extend these instead of duplicating v28-shaped rows.
-import { newGrades } from '../economy/grades'
+import { newGrades, type AccessoryFamily, type AccessorySlotState } from '../economy/grades'
 import { CORE_NODES, MAP_NODES, type StarMap } from '../economy/planet'
-import type { RpgClass } from '../rpg/kinds'
+import type { RpgClass, RpgDamageKind } from '../rpg/kinds'
 import { UMA_KNACKS, type UmaKnack } from '../roster/template'
 import type { BattleOutfit } from './class'
 import { newOwnedUma, newTierWorld, type OwnedUma, type TierWorld } from './save'
@@ -47,3 +47,10 @@ export function templateOutfit(outfitId: string, knack: UmaKnack, channel: 'phys
 /** Every knack on both channels, for tables. */
 export const TEMPLATE_CASES: readonly { knack: UmaKnack; channel: 'physical' | 'magical'; calling: RpgClass }[] =
   UMA_KNACKS.flatMap((knack) => (['physical', 'magical'] as const).map((channel) => ({ knack, channel, calling: channel === 'physical' ? 'brawler' as const : 'summoner' as const })))
+
+// --- Accessories v3 (H75) ---------------------------------------------------------------------------------------------
+
+/** An accessory slot (R2): a family's base form at a grade, with an Orb's or a Bell's kind. */
+export function accessorySlot(family: AccessoryFamily | null, grade: number, kind?: RpgDamageKind): AccessorySlotState {
+  return { grade, family, form: 'base', ...(kind ? { kind } : {}) }
+}

@@ -3,10 +3,13 @@ import { applyPoints } from '../economy/bonus'
 import { newGrades, type GearTier } from '../economy/grades'
 import { MANUAL_PRICE } from '../economy/ranks'
 import { rpgCarriedMp, rpgPartyAllies } from '../rpg/campaign/run'
+import { rpgFoe } from '../rpg/campaign/enemies'
+import { createBattle } from '../rpg/battle/engine'
 import { projectRpgStats, rpgDefaultWeapons, rpgWeaponKind, type RpgClass } from '../rpg/rules'
+import type { UmaKnack } from '../roster/template'
 import { manualBlock, readManuals } from './exchange'
 import { fillRanks, partyMembers, payEntrants, umaPointParts } from './battle'
-import { ECONOMY_V3_NOW as NOW, FULL_CORE, FULL_MAP, gradedUma, gradedWorld, starMap, templateOutfit } from './economy-v3.fixture'
+import { accessorySlot, ECONOMY_V3_NOW as NOW, FULL_CORE, FULL_MAP, gradedUma, gradedWorld, starMap, templateOutfit } from './economy-v3.fixture'
 import { umaBattleSheet } from './sheet'
 import type { StarMap } from '../economy/planet'
 import type { Save, TierWorld } from './save'
@@ -152,5 +155,64 @@ describe('Extra Stats v3 in the fight (H76; EP2–EP4, EP14, EP23, UT10)', () =>
     expect(umaPointParts({ ...uma, stars: FULL_CORE }, 'spellblade', 1).extra).toMatchObject({ hp: 51, def: 51 })
     const v1 = umaPointParts({ ...uma, stars: { unlocked: ['moon:hp:1', 'moon:hp:2'], active: ['moon:hp:2'] } }, 'spellblade', 1)
     expect(v1.extra.hp).toBe(2)
+  })
+})
+
+describe('a graded Uma’s accessory and signature in the fight (R2, H75)', () => {
+  const CLASSES: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'summoner', 'paladin']
+  /** Five Tier 1 Lv 50 Umas, every weapon and armor slot G10; the Brawler (101) wears `slot` and is of `knack`. */
+  function fight(slot: ReturnType<typeof accessorySlot>, knack: UmaKnack) {
+    const umas = Object.fromEntries(CLASSES.map((classId, i) => {
+      const gear = newGrades(1)
+      for (const weapon of rpgDefaultWeapons(classId, 17)) gear.weapons[weapon] = { grade: 10 }
+      for (const part of ['head', 'body', 'legs', 'arms', 'feet'] as const) gear.armor[part] = { grade: 10 }
+      if (i === 0) gear.accessories = [slot]
+      return [`${101 + i}`, gradedUma({ level: 50, classId, gear, ranks: { classes: { [classId]: { rank: 50, exp: 0 } } } })]
+    }))
+    const ids = Object.keys(umas)
+    const outfits = new Map(ids.map((id, i) => [id, templateOutfit(id, i === 0 ? knack : 'gritty', 'physical')]))
+    const members = partyMembers(gradedWorld({ umas }), ids, outfits, '1', 17)
+    const allies = rpgPartyAllies(members, (profile, points) => rpgCarriedMp({ mp: {} }, profile, points, 17), 17)
+    return { member: members[0]!, ally: allies[0]!, allies }
+  }
+  const foe = rpgFoe({ id: 'f1', castId: 'cast-f1', element: 'ice', role: 'striker', rank: 'boss', level: 50, shield: 6,
+    weaknesses: { weapons: ['greatsword'], elements: ['fire'] } })
+  const fields = ['flat', 'bell', 'insignia', 'signature'] as const
+  const ofFields = (ally: object) => Object.fromEntries(fields.filter((f) => f in ally).map((f) => [f, (ally as Record<string, unknown>)[f]]))
+
+  it('brings a Fleet Brawler’s G10 Greatsword Bell and her signature +10', () => {
+    const { member, ally, allies } = fight(accessorySlot('bell', 10, 'greatsword'), 'fleet')
+    expect(member).toMatchObject({ accessory: { flat: {}, bell: { kind: 'greatsword', power: 1000 } }, signature: 10 })
+    expect(ofFields(ally)).toEqual({ bell: { kind: 'greatsword', power: 1000 }, signature: 10 })
+    expect(() => createBattle({ version: 17, seed: 75, allies, enemies: [foe] })).not.toThrow()
+  })
+
+  it('brings a Pendant, not her family, as 14 on each of her three kinds and no signature', () => {
+    const { ally, allies } = fight(accessorySlot('pendant', 10), 'fleet')
+    expect(ofFields(ally)).toEqual({ flat: { greatsword: 14, axe: 14, lance: 14 } })
+    // Apart from her weapons' Might (v15's Orb joined it; v17's doesn't).
+    expect(ally.might).toEqual({ greatsword: 68, axe: 68, lance: 68 })
+    expect(() => createBattle({ version: 17, seed: 75, allies, enemies: [foe] })).not.toThrow()
+  })
+
+  it('brings nothing from a G0 slot, her family or not', () => {
+    for (const slot of [accessorySlot('bell', 0, 'greatsword'), accessorySlot(null, 0)]) {
+      const { ally, allies } = fight(slot, 'fleet')
+      expect(ofFields(ally)).toEqual({})
+      expect(() => createBattle({ version: 17, seed: 75, allies, enemies: [foe] })).not.toThrow()
+    }
+  })
+
+  it('brings an Orb on a kind she doesn’t wield, an Insignia, and her signature on another class’s family', () => {
+    expect(ofFields(fight(accessorySlot('orb', 10, 'dark'), 'mighty').ally)).toEqual({ flat: { dark: 34 }, signature: 10 })
+    expect(ofFields(fight(accessorySlot('insignia', 4), 'clever').ally)).toEqual({ insignia: { value: 60 }, signature: 10 })
+    expect(ofFields(fight(accessorySlot('bell', 10, 'fire'), 'fleet').ally)).toEqual({ signature: 10 })
+  })
+
+  it('sends none of it to a fight on engine 16', () => {
+    const umas = { '101': gradedUma({ level: 50, gear: { ...newGrades(1), accessories: [accessorySlot('bell', 10, 'greatsword')] } }) }
+    const members = partyMembers(gradedWorld({ umas }), ['101'], new Map([['101', templateOutfit('101', 'fleet', 'physical')]]), '1', 17)
+    const ally = rpgPartyAllies(members, (profile, points) => rpgCarriedMp({ mp: {} }, profile, points, 16), 16)[0]!
+    expect(ofFields(ally)).toEqual({})
   })
 })
