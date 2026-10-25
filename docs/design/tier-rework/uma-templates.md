@@ -1,5 +1,10 @@
 # Uma Templates: what makes one Uma unique, in one place
 
+> **Approved by the owner, 2026-10-25 (D197): every call UT1–UT20 as written.** "One of those things that I prefer
+> testing in action." Its §12 follow-ups are applied to the other docs, the README and the pages
+> ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC30); the versions are re-planned by D198 (§9, §10,
+> [implementation.md](implementation.md)). Changes from here are follow-ups logged against it.
+
 > **For the owner's review, 2026-10-25. Nothing here is built.** The Tier rework's **Uma Templates pass**
 > ([README §5](README.md#5-the-plan), step 5), the centralization the owner asked for: "the Uma uniqueness page, part of
 > the centralization effort". Every piece that makes one Uma unique, from all four approved docs and the balancing, is
@@ -310,6 +315,9 @@ which kind stay her choice. From Tier 2 she has two or three slots, one of each 
 her best. **When her class's preset lacks her family, her family takes the slot of the preset's form that adds least for
 her class** (WP §5.7, the campaign), in that family's best form for her: Tier 1 her family's base form (an Orb or a Bell on
 her lead kind); from Tier 2 its best branch. The balance party (no template) keeps WP25's presets as they are.
+*Clarified for implementation, 2026-10-25 (D198): UT8 picks the family, SB10 picks the kind. For a hybrid, an Orb or a
+Bell of her family sits on the kind SB10 gives a hybrid's single-kind forms (her lead half's), not automatically her
+first slot.*
 
 ### 3.5 The signature tip (UT9)
 
@@ -515,6 +523,10 @@ her tip on her Katana tree), the same Even pace and Insignia; Uma E as a Cleric 
 
 ## 9. Save impact (UT17)
 
+*Versions re-planned by D198 (2026-10-25): the calling pick (`OwnedUma.calling`) ships with **R1, Tier 1's fight (save
+v27)** as written; her moon's ids (`template:1–2`) with **R2, Tier 1's economy (save v28)**, where this table says v27;
+the tip pick with **R4, Tier 2's classes (save v30)**, where it says v28. See [implementation.md](implementation.md).*
+
 **Only the calling pick is stored, as approved; everything else is derived** (U13 kept).
 
 | Data | What happens | From |
@@ -532,6 +544,10 @@ her tip on her Katana tree), the same Even pace and Insignia; Uma E as a Cleric 
 `learningTime` and the Racing tab's rows that read them.
 
 ## 10. Engine (UT18)
+
+*Versions re-planned by D198 (2026-10-25): **the Flourish** ships in **R1, Tier 1's fight (engine v16)** as written;
+**the signature accessory** and **her moon** in **R2, Tier 1's economy (engine v17)**, where this table says v16; **the
+signature tips** in **R4, Tier 2's classes (engine v19)**, where it says v17. See [implementation.md](implementation.md).*
 
 | Change | Engine | Kind |
 |---|---|---|

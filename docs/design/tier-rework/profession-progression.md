@@ -940,6 +940,11 @@ Drawn in the [demand page](previews/prof-demand.html).
 
 ## 14. Save impact
 
+*Versions re-planned by D198 (2026-10-25): the professions, the places and the compensation ship with **R2, Tier 1's
+economy (engine v17, save v28)**, so this section's "save v27" is v28 (the grant, Craft Levels to 1, the first launch's
+sheet; its switch packet runs the migration on a scratch copy of a full-shaped save first); the secondary's "v28" is
+**R3, Tier 2's weapons (v18, v29)**. See [implementation.md](implementation.md).*
+
 The Tier 1 rework's one migration, **save v27** ([README §9.3](README.md#93-save-v27-one-migration-every-world); v26 is
 taken on main, §13), every tier world alike, computed from the save alone. *Changed for the owner's direction,
 2026-10-24 (his weapon review, D193's note): the first draft paid every deleted item's raw items back in Tier 1's demand

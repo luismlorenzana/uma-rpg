@@ -252,10 +252,11 @@
   <section id="retired">
     <h2>What retires</h2>
     <p class="sub">All ten, in every tier. Their defensive worth moves into armor (one support's worth: a regular's hit 20% → 18.7% of her HP);
-      MP comes from her level, armor's legs, Vigor and her template's MP twists, <b>and a base regen every Uma has</b> (a rule, never an
+      MP comes from her level, armor's legs, Vigor <b>and a base regen every Uma has</b> (a rule, never an
       item: 0.8% of her max MP a round for each skill depth open, 4% from Class Rank 40), and the Bell makes her free Attack worth taking.
       <i>Follow-up to D196 (stat balancing), 2026-10-25: without the regen accessories a party ran dry over a region; the regen the owner would
-      have worn on every class is now every class's, as a rule (SB18).</i></p>
+      have worn on every class is now every class's, as a rule (SB18).</i> <i>Follow-up to D197 (Uma Templates), 2026-10-25: "her
+      template's MP twists" removed: the Flourish is HP now, and no template piece touches MP (UT6).</i></p>
     <div class="retired" id="retired-cards"></div>
   </section>
 
@@ -354,14 +355,44 @@
     <h2>The signature accessory: Uma uniqueness through accessories</h2>
     <p class="sub">The owner: "maybe we don't have it affect weapons, but instead Umas equip slightly stronger accessories … exactly the same as
       any other Uma's, but the stats get a fixed added bonus on every level up." Her template names one family; while she wears any form of it,
-      <b>ATK and M.ATK +0.2 a level × tier</b>, about +5% at each tier's Lv 50. Recommended to replace class-progression's affinity (CP36); which
-      family each template names is the Uma Templates pass's.</p>
+      <b>ATK and M.ATK +0.2 a level × tier</b>, about +5% at each tier's Lv 50. <b>Her knack names the family</b> (UT7): Fleet a Bell,
+      Mighty an Orb, Tireless a Pendant, Gritty and Clever an Insignia; it <b>replaces the affinity</b> (UT11), and <b>her preset wears it</b>
+      (UT8). <i>Follow-up to D197 (Uma Templates), 2026-10-25: was "Recommended to replace class-progression's affinity (CP36); which family
+      each template names is the Uma Templates pass's" (<a href="../uma-templates.md#34-the-signature-accessory-ut7-ut8">uma-templates §3.4</a>).</i></p>
     <div class="controls"><div class="pills" id="sfam"></div><div class="pills" id="scls"></div></div>
     <div class="sig-grid">
       <div class="panel"><h3>The bonus by level and tier</h3><div class="chart-legend" id="sig-legend"></div><div id="sig-chart"></div>
         <details><summary>Show the numbers</summary><div id="sig-table"></div></details></div>
       <div class="panel"><h3>On her profile and in the picker</h3><div id="sig-mock"></div></div>
     </div>
+    <div class="sig-grid">
+      <div class="panel"><h3>Her family, by her knack (UT7)</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 6px">Her knack is her top growth rate: the reading that splits two Umas of one type, so two
+          front runners of one calling and stride can wear different families. Today's roster, 270 outfits (aggregate counts).</p>
+        <table><tr><th>Knack (top growth)</th><th>Word</th><th>Her signature family</th><th class="num">Umas today</th></tr>
+          <tr><td>Speed</td><td><b>Fleet</b></td><td>Bell: quick feet, her weapon strikes once more after her Attack</td><td class="num">69</td></tr>
+          <tr><td>Power</td><td><b>Mighty</b></td><td>Orb: power on one kind</td><td class="num">69</td></tr>
+          <tr><td>Stamina</td><td><b>Tireless</b></td><td>Pendant: steady offense on all her kinds</td><td class="num">48</td></tr>
+          <tr><td>Guts</td><td><b>Gritty</b></td><td>Insignia: grit against the big foes</td><td class="num">43</td></tr>
+          <tr><td>Wit</td><td><b>Clever</b></td><td>Insignia: picking her moment</td><td class="num">41</td></tr>
+          <tr><td colspan="3"><b>By family:</b> Insignia 84 (31%), Bell 69 (26%), Orb 69 (26%), Pendant 48 (18%); the calling pick never moves it</td><td class="num">270</td></tr></table></div>
+      <div class="panel"><h3>The Tier 1 nudge: her family always wins</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 6px">Her one Tier 1 slot, the campaign's damage the accessory adds at Lv 50 (§5.7's model), each
+          family worn with her signature (+10) against her best base form without it. Every family with her signature beats or ties her best.</p>
+        <table><tr><th>Class</th><th>Best without it</th><th class="num">Pendant + ★</th><th class="num">Orb + ★</th><th class="num">Bell + ★</th><th class="num">Insignia + ★</th></tr>
+          <tr><td>Brawler</td><td>Bell 7.5%</td><td class="num">13.2%</td><td class="num">12.1%</td><td class="num">13.5%</td><td class="num">10.4%</td></tr>
+          <tr><td>Mage</td><td>Pendant 7.0%</td><td class="num">12.6%</td><td class="num">11.6%</td><td class="num">9.9%</td><td class="num">9.9%</td></tr>
+          <tr><td>Spell Blade</td><td>Pendant 7.2%</td><td class="num">13.6%</td><td class="num">13.3%</td><td class="num">9.8%</td><td class="num">10.8%</td></tr>
+          <tr><td>Summoner</td><td>Orb 8.9%</td><td class="num">13.7%</td><td class="num">15.5%</td><td class="num">9.2%</td><td class="num">10.9%</td></tr>
+          <tr><td>Paladin</td><td>Pendant 8.0%</td><td class="num">14.6%</td><td class="num">14.0%</td><td class="num">8.8%</td><td class="num">10.9%</td></tr>
+          <tr><td>Cleric</td><td>Orb 8.7%</td><td class="num">14.5%</td><td class="num">15.2%</td><td class="num">8.7% (a tie)</td><td class="num">10.8%</td></tr></table>
+        <p class="foot">From Tier 2 she has two or three slots, one of each family: her family always fits.</p></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><h3>Presets wear her signature (UT8)</h3>
+      <p style="margin:0;font-size:13px">When her class's preset (§5.8) lacks her family, <b>her family takes the slot of the preset's form that adds
+        least for her class</b> in the campaign, in that family's best form for her: in Tier 1 her family's base form (an Orb or a Bell on her
+        lead kind), from Tier 2 its best branch. One tap dresses her best. The balance party, which has no template, keeps the presets as
+        they are. <i>Follow-up to D197 (Uma Templates), 2026-10-25.</i></p></div>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
@@ -663,7 +694,10 @@ renderPresets();
 let sfam = 'bell', scls = 'brawler';
 const GAIN = { brawler: 5.3, mage: 5.1, spellblade: 5.3, summoner: 5.3, paladin: 5.9, cleric: 5.9 };
 const CHAN = { brawler: 'ATK', mage: 'M.ATK', spellblade: 'ATK (her Arms) and M.ATK (her Tome)', summoner: 'M.ATK (her Tomes) and ATK (her Arm)', paladin: 'ATK', cleric: 'M.ATK' };
-pills('sfam', 'Her signature', Object.entries(FAM).map(([id, f]) => [id, f.name]), sfam, (v) => { sfam = v; renderSig(); });
+// Follow-up to D197 (Uma Templates), 2026-10-25: her knack names the family (UT7).
+const KNACK = { pendant: 'Tireless', orb: 'Mighty', bell: 'Fleet', insignia: 'Gritty or Clever' };
+const TYPE = { brawler: 'Bruiser', mage: 'Spellwright', spellblade: 'Spellfencer', summoner: 'Binder', paladin: 'Warden', cleric: 'Mender' };
+pills('sfam', 'Her knack → her family', Object.entries(FAM).map(([id, f]) => [id, `${KNACK[id]} → ${f.name}`]), sfam, (v) => { sfam = v; renderSig(); });
 pills('scls', 'Class', CL, scls, (v) => { scls = v; renderSig(); });
 (function () {
   document.getElementById('sig-legend').innerHTML = [1, 2, 3].map((t) => `<span><span class="sw" style="background:${TIERC[t]}"></span>Tier ${t}: +${[0.2, 0.36, 0.52][t - 1]} a level</span>`).join('');
@@ -686,9 +720,9 @@ pills('scls', 'Class', CL, scls, (v) => { scls = v; renderSig(); });
 function renderSig() {
   const f = FAM[sfam], forms = FORMS.filter((x) => x[1] === sfam).map((x) => x[0]);
   const others = Object.entries(FAM).filter(([id]) => id !== sfam);
-  const name = { brawler: 'Tireless Ironhide', mage: 'Clever Starlit', spellblade: 'Fleet Duelist', summoner: 'Gritty Caller', paladin: 'Mighty Warden', cleric: 'Tireless Chorister' }[scls];
+  const name = `${sfam === 'insignia' ? 'Clever' : KNACK[sfam]} ${TYPE[scls]}`; // a Middle-stride sample of her calling's class
   document.getElementById('sig-mock').innerHTML =
-    `<div class="mock"><h4>Her template sheet</h4><div class="mrow"><span>"${name}" · ${CL.find(([c]) => c === scls)[1]}</span><span class="muted">a sample template</span></div>` +
+    `<div class="mock"><h4>Her template sheet</h4><div class="mrow"><span>"${name}" · ${CL.find(([c]) => c === scls)[1]}</span><span class="muted">a sample template: her knack names the ${f.name}</span></div>` +
     `<div class="mrow"><span><span class="star">★</span> Signature: <b>${f.name}</b></span><span>ATK and M.ATK +0.2 a level · <b>+10 now</b> (Lv 50)</span></div>` +
     `<div class="mrow"><span class="dim">Unworn</span><span class="dim">"Wear ${/^[AEIOU]/.test(f.name) ? 'an' : 'a'} ${f.name} for +10"</span></div></div>` +
     `<div class="mock" style="margin-top:10px"><h4>The Gear tab and the Battle tab</h4><div class="mrow"><span>${forms[1]} · G10 <span class="star">★ +10</span></span><span class="muted">accessory row</span></div>` +

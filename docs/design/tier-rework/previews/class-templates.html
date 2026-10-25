@@ -282,7 +282,7 @@
   <p class="lead">Every class's template sheet at Tier 1, 2 and 3: its three weapon slots, five armor pieces and one to three
     accessory slots, drawn with the standard preset in them. Then <b>Tier 2's weapon-group focus</b>: every class's default and reverse
     sets and the party pairings (the owner's second pass); what grows on her three weapons (redrawn to the research note: Pure or Dual of
-    its own channel, one Dual an Uma; since the weapon review a Dual's second kind is its fixed partner and Tier 3 forks both lines); which weapons fit which slot, what a class switch costs, her template's affinity, and each class's
+    its own channel, one Dual an Uma; since the weapon review a Dual's second kind is its fixed partner and Tier 3 forks both lines); which weapons fit which slot, what a class switch costs, her template's affinity (retired by the Uma Templates pass, UT11: <i>follow-up to D197, 2026-10-25</i>), and each class's
     Lv 50 sheet under the stat budget rule (SB1). Revised after the owner's review and his second pass (2026-10-24);
     follow-ups to the weapon review (2026-10-24): fixed partners, Evolved, every accessory family in every tier and the new presets. From
     <a href="../class-progression.md">class-progression.md</a> §3, §5, §6.9, §7.2, §9.
@@ -372,6 +372,10 @@
 
   <section id="affinity">
     <h2>Her template on the trees: affinity</h2>
+    <div class="callout" style="margin:0 0 14px"><b>Retired (UT11).</b>Follow-up to D197 (Uma Templates), 2026-10-25: the affinity
+      is retired, never built. The signature accessory (WP33) takes its place, her knack naming its family, and the signature tip
+      sits on her lead weapon's tree (UT9). This section stays as the record of CP36; the template's pieces are drawn on
+      <a href="uma-gives.html">what a template gives</a> (<a href="../uma-templates.md#37-the-affinity-retired-ut11">uma-templates §3.7</a>).</div>
     <p class="sub">The owner asked for a proposal that "won't explode across the 3 tiers", maybe "% damage bonuses for specific weapon types".
       The call (CP36): each Uma Template names one <b>twin set</b>, an Arm and its element, and she deals <b>+6% damage with those two
       kinds</b>, every tier, in any class. From Tier 2 her ★ signature tip sits on her affinity kind's tree; the Flourish stays at the root.
@@ -402,7 +406,9 @@
       hybrid's single-kind forms and weapon moons on her lead half (SB10; the Summoner's Orb on her Light), the Great Pendant +34 · +51
       (SB8: the Paladin's Tier 2 and 3 and the hybrids' Tier 3 lead kind +3 · +2), and the Summoner's Arms hand 0.48 (CP9, SB11).</i> <i>Follow-up to D194 (Extra Stats), 2026-10-24: ATK and
       M.ATK for the four between follow Prowess, one offense moon split by her class; the weapon moons replace the Halo.</i> One sheet with weapon-progression §4.4 and extra-stats-progression §8.2 (cross-check, 2026-10-24): the new armor, Vigor's MP,
-      her template apart. The focus (+15%), the affinity (+6%) and an Insignia are percentages on damage (the damage stack, WP31), outside it.</p>
+      her template apart. The focus (+15%) and an Insignia are percentages on damage (the damage stack, WP31), outside it.
+      <i>Follow-up to D197 (Uma Templates), 2026-10-25: "the affinity (+6%)" left the list; her template apart is her moon and
+      her signature accessory (UT11).</i></p>
     <div class="pills" id="st-pills"></div>
     <div class="statsheet" id="statsheet"></div>
     <div class="panel" style="margin-top:14px"><div class="chart-legend" id="st-legend"></div><div id="st-chart"></div>
@@ -634,7 +640,8 @@ function renderGrows() {
       ['Trees', 'Trunk; A or B a tree; <b>Skill Ranks</b> every 2 Class Ranks', '+ branch C; every tip <b>Power or Break</b>', '+ capstones (D6); two branches held'],
       ['Class', '—', `<b>${B[0].n}</b> (${GROUPS[B[0].g].name}) or <b>${B[1].n}</b> (${GROUPS[B[1].g].name}): <b>focus +15%</b>, her set, 3 class skills`, `+ ${B[0].cap} or ${B[1].cap} and ${MAST[grCls]}`],
       ['Damage on a kind', 'Her accessory: one of four base forms (Pendant, Orb, Bell, Insignia)', '+ a second slot, two branches a family · <b>a weapon moon</b>: Full on one kind or Split on two', '+ a third slot, each branch a step deeper · a second weapon moon'],
-      ['Template', 'Affinity +6% on one twin set', '+ ★ signature tip on her affinity kind\'s tree', 'Tip at both forks'],
+      // Follow-up to D197 (Uma Templates), 2026-10-25: was 'Affinity +6% on one twin set' and the tip on her affinity kind's tree (UT6, UT9, UT11).
+      ['Template', '★ Flourish (4% HP a fight); her signature accessory', '+ ★ signature tip on her lead weapon\'s tree', 'Tip at both forks'],
     ].map(([n, ...v]) => `<div><span class="lab">${n}</span>${v[t - 1]}</div>`).join('');
     return `<div class="grow">${head}${cards}<div class="also">${also}</div></div>`;
   };
@@ -664,7 +671,7 @@ function renderGrows() {
     <tr><td>Damage on a kind</td><td>Her accessory: one of four base forms (Pendant, Orb, Bell, Insignia)</td><td>+ a second slot; two branches a family from a slot's G5 · a weapon moon (Full +90 on one kind or Split +63 on two)</td><td>+ a third slot; each branch a step deeper · a second weapon moon (Full +130, Split +91)</td></tr>
     <tr><td>Its tree's hits</td><td>Trunk; fork A or B; Skill Ranks</td><td>+ branch C; Power or Break tip</td><td>+ capstones; two branches held</td></tr>
     <tr><td>Her class branch</td><td>—</td><td>A focus (+15% on Ring or Light/Dark kinds), her set, 3 class skills</td><td>+ the branch capstone and the mastery</td></tr>
-    <tr><td>Her template</td><td>Affinity +6%</td><td>+ signature tip</td><td>Tip at both forks</td></tr></table>
+    <tr><td>Her template</td><td>Flourish (4% HP a fight); her signature accessory</td><td>+ signature tip, her lead weapon's tree</td><td>Tip at both forks</td></tr></table>
     <table style="margin-top:10px"><tr><th>Tier</th><th>Slot</th><th>${C[grCls].name}'s branch (this view)</th><th>Kinds</th><th>Twin sets answered</th></tr>${rows.map((r) => `<tr>${r.map((v) => `<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
 }
 renderGrows();

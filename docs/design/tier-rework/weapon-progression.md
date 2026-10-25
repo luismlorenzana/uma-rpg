@@ -23,6 +23,17 @@
 > WP17, §5.1, §5.9, §13); boss shields 6 · 9 · 10 (SB6; §3.6, §9, WP12). Each edited spot says "Follow-up to D196 (stat
 > balancing), 2026-10-25".
 
+> **Follow-up to D197 (Uma Templates), 2026-10-25** (logged against D193; wording and values only, as
+> [uma-templates §12](uma-templates.md#12-if-approved-the-follow-ups-by-doc) lists them): **WP33 decided: the signature
+> replaces the affinity** (UT11) and **her knack names the family** (UT7): Fleet a Bell, Mighty an Orb, Tireless a
+> Pendant, Gritty and Clever an Insignia; its size SB15's, unchanged (§5.10); **WP31: the affinity's factor leaves the
+> damage stack** and the "with both" ceilings go (§0, §2.1, §2.4, §5.6, WP31); **WP25: a matched Uma's preset wears her signature
+> family** (UT8; §5.8); **WP17: no template piece touches MP** (the Flourish is HP now, UT6; §5.1, §5.9); the picker's ★
+> rows by family, the signature in engine **v16** as a stat in the input (§8, §9, §10, §12, §13, WP30). Where the doc
+> still names the affinity in passing (the owner's review notes, §2.4's opening, the lists of what reads a hit's own kind
+> in §3.2, §3.9, §3.10 and WP7, WP18's alternatives), it is history: read it as retired. Each edited spot says
+> "Follow-up to D197 (Uma Templates), 2026-10-25".
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The second standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.2). It absorbs [gear.md](gear.md), which stays as
 > history, and adopts the research note's direction ([weapon-research.md](weapon-research.md), WR1–WR6). Calls are
@@ -79,7 +90,8 @@
 > ([class-progression.md](class-progression.md)); the weapon moons and the jewels ([extra-stats-progression.md](extra-stats-progression.md));
 > materials, recipes, places and amounts ([profession-progression.md](profession-progression.md), which owns
 > [§6](#6-crafting-and-materials)'s recipe tables); Uma Templates (a later pass: which signature family each template
-> names, and whether the signature replaces the affinity).
+> names, and whether the signature replaces the affinity). *Follow-up to D197 (Uma Templates), 2026-10-25: decided in
+> [uma-templates.md](uma-templates.md): her knack names the family (UT7) and the signature replaces the affinity (UT11).*
 
 ## The owner's points
 
@@ -126,7 +138,7 @@
 | **Accessory slots** | 2 typed: Damage (Orb), Support (Talisman, Amulet) | **1** | **2** | **3** |
 | **Families she can wear** (one of each) | Orbs; 10 defensive supports | **All four, base forms:** Pendant · Orb · Bell · Insignia | All four; from a slot's G5 **two branches each** | All four; from a slot's G5 each branch **a step deeper** |
 | **Accessory forms at G10** | Orb +34 on one kind; a support | Pendant +14 on her three kinds · Orb +34 on one · Bell: a hit at 1.0 · Insignia +15% on sub-bosses and bosses | + Great Pendant **+34** on three · Channel Pendant +49 on two of a channel · Great Orb +74 · Twin Orb +49 on a twin set · Great Bell 1.4 · Toll Bell 0.5, **+0.5 a ring**, to 2.0 · Great Insignia +20% · Onslaught +25% on a wave's first act | Each branch a step deeper: Great Pendant **+51**, Channel Pendant and Twin Orb +75, Great Orb +114, Great Bell 1.5, Toll Bell to 2.5, Great Insignia +22.5%, Onslaught +27.5% (*follow-up to D196: the Great Pendant was +31 · +49, the Toll Bell +0.2 a ring*) |
-| **Her signature accessory** (her template) | — | One family; worn by her, **ATK and M.ATK +0.2 a level** (+10 at Lv 50) | × 1.8 (+18) | × 2.6 (+26) |
+| **Her signature accessory** (her template) | — | Her knack's family (UT7; *follow-up to D197: was "one family"*); worn by her, **ATK and M.ATK +0.2 a level** (+10 at Lv 50) | × 1.8 (+18) | × 2.6 (+26) |
 | **Defensive or MP accessories** | 10 | **None;** MP comes back by a base regen every Uma has (SB18, *follow-up to D196*) | None | None |
 | **Crafted items** | 40 gear types × 10 grades | **Weapon Gem, Armor Fittings, Accessory Setting**, G1–G10 | + **Branch Gem** (G5); accessory branches need **no item** | The same |
 | **One Uma's gear, refined items** | 240 | **365** (90 items) | 365 (100) | 365 (110) |
@@ -148,7 +160,8 @@
 7. **Each form is someone's best** (§5.7): spread forms left on all region long, single-kind forms tuned or on a Dual,
    twin forms for a hybrid's pair, Bells for the Brawler, Insignias on bosses and waves.
 8. **Uma uniqueness rides an accessory, not a weapon:** her signature family, worn, gives ATK and M.ATK +0.2 a level ×
-   tier, about +5% at Lv 50.
+   tier, about +5% at Lv 50; her knack names the family, in the affinity's place (*follow-up to D197 (Uma Templates),
+   2026-10-25: UT7, UT11*).
 9. **Four items to craft,** none new for accessory branches; one Uma's gear is 365 refined in every tier.
 10. **One damage stack** (§2.4): flat offense on a hit's own kind (capped), then the weak multiplier, then each
     percentage as its own factor; flat values × 1, × 1.8, × 2.6, shares unchanged.
@@ -186,7 +199,7 @@ reaches her through an accessory.**
 | **Armor** | **Every defensive stat:** HP, DEF, M.DEF, MP, evasion; a little offense on her half | A kind; any effect beyond stats |
 | **Accessories** | **Damage only:** flat offense on her kinds (Pendants, Orbs), one follow-up hit of a kind she holds (Bells), a percentage by rank or timing (Insignias) | A kind she doesn't hold; defense; MP; the weak multiplier; Breaks |
 | **Extra Stats** (weapon moons) | Flat offense on one kind (Full) or two (Split) from Tier 2, a second moon in Tier 3, outside the kind cap ([§5.6](#56-the-kind-cap-wp24)). *Follow-up to D194 (Extra Stats), 2026-10-24: was the Halo, under the cap* | A kind for weaknesses |
-| **Uma Templates** | **Her signature accessory family** (WP33): ATK and M.ATK +0.2 a level × tier while she wears it; until the Uma Templates pass decides, also the affinity, +6% on one twin set's hits (CP36, recommended replaced) | A kind; anything on a weapon |
+| **Uma Templates** | **Her signature accessory family** (WP33; her knack names it, UT7): ATK and M.ATK +0.2 a level × tier while she wears it. *Follow-up to D197 (Uma Templates), 2026-10-25: "until the Uma Templates pass decides, also the affinity" removed; the affinity retired (UT11)* | A kind; anything on a weapon |
 | **Limit Breaks** | Reach to kinds outside her weapons, once a gauge (C3) | — |
 
 ### 2.2 One rule for every piece (WP2, WP3)
@@ -219,7 +232,7 @@ first round's GE3 (flat Might in every tier) is replaced. Tier 3's branch step i
 ### 2.4 The damage stack: everything on one hit (WP31)
 
 **New in the cross-check, 2026-10-24; changed after owner review, 2026-10-24** (Insignias from Tier 1, the signature,
-the affinity marked for replacement). Every piece that adds damage sits in one order, stated once, here.
+the affinity marked for replacement; *follow-up to D197 (Uma Templates), 2026-10-25: the affinity retired, UT11*). Every piece that adds damage sits in one order, stated once, here.
 class-progression (the focus CP39, Skill Ranks CP32, the affinity CP36) and extra-stats-progression (the weapon moons,
 EP24–EP27) point to it. It is today's formula (`battleDamage`, engine v12 on) with the rework's pieces in their places.
 *Follow-up to D194 (Extra Stats), 2026-10-24: step 1 takes the weapon moons on the hit's own kind, outside the kind cap,
@@ -230,22 +243,22 @@ where the Halo sat inside it; the ceilings (steps 3–4) don't move.*
 | **1. Offense** | Her ATK or M.ATK (the hit's channel; **+ her signature's bonus while she wears it**, a stat) **+ the weapon's Might + flat offense on the hit's own kind**: the Pendant and Orb forms **under the kind cap** (at most a G10 Might × tier, [WP24](#56-the-kind-cap-wp24): +68, +122, +177), **and her weapon moons on that kind** (Extra Stats, outside it) | Might at G10 68 · 122 · 177; Pendant forms +14 to +49 a kind, Orb forms +34 to +114 (§5.4); a weapon moon +50 × tier (Full) or +35 × tier (Split) a kind, Tier 2 on; the signature +10 · +18 · +26 at Lv 50 | The hit's **own** kind (flat); her channel (the signature) |
 | **2. The hit** | offense² ÷ (offense + defense) × power | Power: the skill's (an Attack 1.0, a Bell's follow-up its form's power) × her hand × **her Skill Rank** (×0.95 → ×1.05, CP32) | — |
 | **3. Weak** | × the weapon's weak multiplier, once, when **either** of its kinds is on the foe's list | Base ×1.3; Pure, Tempered and Evolved ×1.5; Keen ×1.7; a Limit Break ×1.3 | **Both** kinds (a Dual's, Tempered's or Evolved's partner too) |
-| **4. Percentages** | Each its own factor, multiplied | **The focus ×1.15** (Tier 2 on, CP39); **an Insignia** (from Tier 1: ×1.15 on sub-bosses and bosses; Tier 2: Great ×1.2 on them, or Onslaught ×1.25 on her first act each wave; Tier 3 a step more); **the affinity ×1.06** (CP36) **until the Uma Templates pass** (recommended replaced by the signature, step 1) | The hit's own kind (focus, affinity); the foe's rank or the act's timing (Insignias) |
+| **4. Percentages** | Each its own factor, multiplied | **The focus ×1.15** (Tier 2 on, CP39); **an Insignia** (from Tier 1: ×1.15 on sub-bosses and bosses; Tier 2: Great ×1.2 on them, or Onslaught ×1.25 on her first act each wave; Tier 3 a step more). *Follow-up to D197 (Uma Templates), 2026-10-25: "the affinity ×1.06 (CP36) until the Uma Templates pass" removed (UT11); the signature is step 1's* | The hit's own kind (focus); the foe's rank or the act's timing (Insignias) |
 | **5. Today's** | Statuses (Brave, Faith, Armor and Mind Break, Shock, Aegis …), riders (×1.3 on a Broken foe …), **the unbroken halving ×0.5** (a pierce ignores it), the Rift's ward, evasion | Unchanged | — |
 
-- **One reading rule** ([WP13](#39-weapon-groups-and-everything-that-reads-a-kind-wp13)): flat offense, the focus and the
-  affinity read **a hit's own kind**, its weapon's first; only step 3, shields and locks read a partner. So no branch
+- **One reading rule** ([WP13](#39-weapon-groups-and-everything-that-reads-a-kind-wp13)): flat offense and the focus
+  read **a hit's own kind**, its weapon's first (*follow-up to D197: the affinity left the list, UT11*); only step 3, shields and locks read a partner. So no branch
   doubles a bonus, and no focus is earned through a partner.
 - **Every hit takes the same steps, whatever casts it:** an Attack, a skill, a class skill (through its focus weapon,
   CP34), a Bell's follow-up (its weapon's), a summon (its tree's kind), a Limit Break (its own kinds, ×1.3, no branch).
-- **Heals take none of steps 1, 3 and the affinity:** a mend or Barrier is a share of max HP from her ATK or M.ATK ×
+- **Heals take none of steps 1 and 3** (*follow-up to D197: was "steps 1, 3 and the affinity", UT11*): a mend or Barrier is a share of max HP from her ATK or M.ATK ×
   her Skill Rank, and a healer's focus adds +15% to those shares (CP39). The weapon moons, the Orb and Pendant forms and
   the signature's bonus never heal: mends and Barriers read her ATK or M.ATK without them (EP24; Prowess, a stat, does
   reach them).
-- **The ceiling on one weak hit,** steps 3 and 4, with the signature replacing the affinity (the recommendation):
+- **The ceiling on one weak hit,** steps 3 and 4, the signature in the affinity's place (UT11):
   Tier 1 ×1.3 × Insignia 1.15 (a boss) = **×1.50**; Tier 2 Pure ×1.5 × focus 1.15 × Onslaught 1.25 (a wave's first
-  act) = **×2.16**; Tier 3 Keen ×1.7 × 1.15 × Onslaught 1.275 = **×2.49**. With the affinity kept as well: ×1.58 ·
-  ×2.29 · ×2.64. Today: ×1.3. Flat offense is bounded apart: the accessories' by the kind cap, the weapon moons by
+  act) = **×2.16**; Tier 3 Keen ×1.7 × 1.15 × Onslaught 1.275 = **×2.49**. Today: ×1.3. *Follow-up to D197 (Uma
+  Templates), 2026-10-25: "With the affinity kept as well: ×1.58 · ×2.29 · ×2.64" removed; the affinity is never built.* Flat offense is bounded apart: the accessories' by the kind cap, the weapon moons by
   their own size (a Full moon +50 × tier); the signature, a stat, is bounded by its size (about +5%).
 - **Why multiplied, not added:** each percentage is small, bounded on its own and shown on its own (the focus mark on
   her trees, the Insignia's row), and a factor reads the same at every tier under SB1. Added, each would shrink the
@@ -754,8 +767,10 @@ a little offense; depth comes from weapons, trees, accessories and Extra Stats.
 
 Redesigning the MP accessories out of the always-pick zone was weighed (a fraction of today's, or only between waves):
 any MP regen competes with damage on a different axis, and a small one is a dead pick while a large one is always worn.
-**MP comes from her level, armor's legs and her template's MP twists** ([§5.9](#59-mp-after-the-mp-accessories)), **and a
-base regen every Uma has** (SB18): a rule, not an item, so neither a dead pick nor an always-pick. *Follow-up to D196
+**MP comes from her level, armor's legs and a base regen every Uma has** (SB18; [§5.9](#59-mp-after-the-mp-accessories)):
+a rule, not an item, so neither a dead pick nor an always-pick; **no template piece touches MP** (UT6). *Follow-up to
+D197 (Uma Templates), 2026-10-25: was "her level, armor's legs and her template's MP twists … and a base regen"; the
+Flourish moved to HP.* *Follow-up to D196
 (stat balancing), 2026-10-25: without the regen accessories a party ran dry over a region (late-region power 0.41–0.52×
 today's from Lv 30); every Uma now regains 0.8% of her max MP a round for each skill depth open, the regen the owner
 would have worn on every class, as a rule.*
@@ -925,8 +940,8 @@ each of two). The Halo it used to share with is retired (EP9).*
 - **What it bounds now:** the flat on one kind is at most Might + the cap + a Full moon, (68 + 68 + 50) × tier: **334
   in Tier 2 and 484 in Tier 3** (the approved Might + cap: 244 and 354). The Great Orb no longer needs a kind the Halo
   leaves free; its presets stand (§5.8).
-- **Percentages** (the focus, the affinity, Insignias) and the weak multiplier sit outside the cap; each is bounded on
-  its own. **The signature's bonus** (§5.10) is a stat, ATK and M.ATK, not offense on a kind, so it sits outside the cap,
+- **Percentages** (the focus, Insignias; *follow-up to D197: the affinity retired, UT11*) and the weak multiplier sit
+  outside the cap; each is bounded on its own. **The signature's bonus** (§5.10) is a stat, ATK and M.ATK, not offense on a kind, so it sits outside the cap,
   as Prowess does. Their order is the damage stack's ([§2.4](#24-the-damage-stack-everything-on-one-hit-wp31)).
 
 ### 5.7 Viability: every base and branch someone's best
@@ -1128,6 +1143,10 @@ measured change (with the Summoner's Arms hand 0.48, SB11, and the Great Pendant
   Dual; Onslaught fills Tier 3's third slot for most. A preset kind's accessories and weapon moon stack, the moon outside
   the cap (the Spell Blade's Tier 3 Lance: Great Pendant +51, Great Orb +114, Full moon +130; *was her Lightning, +49*). *Follow-up to D194 (Extra Stats), 2026-10-24: "the Halo stays her first slot, so a
   Great Orb sits elsewhere" goes; the moons don't share the cap.*
+- **A matched Uma's preset wears her signature family** (UT8): when her class's preset lacks it, it takes the slot of
+  the form that adds least for her class in the campaign, in its best form for her (Tier 1 her family's base form; from
+  Tier 2 its best branch); the balance party keeps these presets. *Follow-up to D197 (Uma Templates), 2026-10-25;
+  [uma-templates §3.4](uma-templates.md#34-the-signature-accessory-ut7-ut8).*
 - **Next to the first draft's** (the same model, its bases only): Tier 1 the same (7–9%); Tier 2 18–22% against 12–17%;
   Tier 3 27–34% against 19–25%. The branches are Tier 2's and 3's added depth, priced in their tiers' terms (§13).
   *Follow-up to D196 (stat balancing), 2026-10-25: now 5–9% · 16–23% · 27–34% (the Summoner's and the Conjurer's
@@ -1142,13 +1161,14 @@ measured change (with the Summoner's Arms hand 0.48, SB11, and the Great Pendant
 - **What comes:** armor's legs at +3 a grade (+30 at G10, +10 over today's), **Vigor's MP** (+30 × tier, with the
   Planet's +21 × tier: +51 an Uma at Lv 46 in Tier 1; extra-stats-progression EP4), **the base regen** (SB18: every Uma
   regains 0.8% of her max MP a round for each skill depth her class has open, 4% from Class Rank 40; a rule, never an
-  item), the template's MP twists (U9: Opening, Even pace, Late reserve), and the Bell (every tier now), which makes her
-  free Attack worth taking when the bar is empty.
+  item), and the Bell (every tier now), which makes her free Attack worth taking when the bar is empty. **No template
+  piece touches MP** (UT6). *Follow-up to D197 (Uma Templates), 2026-10-25: "the template's MP twists (U9 …)" removed;
+  the Flourish moved to HP.*
 - **What the simulation checks:** the Springs test (README §9.5 item 5) with no MP accessory: a region on Auto still
   clears 10–12 of 12 stages in a row, as today, **and the party's pace in a region's last four stages stays within ±10%
   of today's** (the model: 0.94–1.05×). If not, the knobs in order: **the regen's share a depth** (±0.1% moves
-  late-region pace about ±5%), then Vigor's MP rate (EP15), then legs' MP a grade (+3 → +4), then the Flourish's twists;
-  never an MP accessory. *Changed in cross-check (2026-10-24): Vigor's MP and its knob added, extra-stats-progression's
+  late-region pace about ±5%), then Vigor's MP rate (EP15), then legs' MP a grade (+3 → +4); never an MP accessory
+  (*follow-up to D197: "then the Flourish's twists" removed, UT6*). *Changed in cross-check (2026-10-24): Vigor's MP and its knob added, extra-stats-progression's
   order.*
 - *Follow-up to D196 (stat balancing), 2026-10-25* ([stat-balance §7](stat-balance.md#7-mp-after-the-regen-accessories),
   SB14, SB18): in one stage MP never binds (5–19 deep casts a bar), but over a region it bound every class: the
@@ -1164,8 +1184,11 @@ The owner (review, 2026-10-24): "One thing completely missing is how Uma uniquen
 it affect weapons, but instead Umas equip slightly stronger accessories: if the Uma equips one specific accessory, that
 accessory is exactly the same as any other Uma's, but the stats get a fixed added bonus on every level up."
 
-**The call: weapons carry no uniqueness; her template names a signature accessory family.**
-- **What:** each Uma Template names one of the four families: Pendant, Orb, Bell or Insignia. **While she wears any form
+**The call: weapons carry no uniqueness; her template names a signature accessory family.** **It replaces the affinity
+(UT11); her knack names the family (UT7): Fleet a Bell, Mighty an Orb, Tireless a Pendant, Gritty and Clever an
+Insignia.** *Follow-up to D197 (Uma Templates), 2026-10-25: was "recommended to replace CP36's affinity; which family
+each template names is the Uma Templates pass's".*
+- **What:** each Uma Template names one of the four families by her knack: Pendant, Orb, Bell or Insignia. **While she wears any form
   of it in any slot, her ATK and M.ATK each gain +0.2 a level × tier:** +2 at Lv 10, +6 at Lv 30, **+10 at Tier 1's Lv
   50; +18 at Tier 2's; +26 at Tier 3's** (+0.36 and +0.52 a level). The accessory is the same item as anyone's; worn by
   another Uma it is the normal item, and her bonus goes when she takes it off.
@@ -1184,23 +1207,22 @@ accessory is exactly the same as any other Uma's, but the stats get a fixed adde
   tier's Lv 50. Her moon's node II stays on defense (CP36's note), so the two never add past it.
 - **It nudges, never forces:** in Tier 1 a matched Uma wears her family when its best form is within about 5% of her
   best (a Brawler with an Insignia signature in the campaign: 4.5% + 5.3% against the Bell's 7.5%, so she wears the
-  Insignia); from Tier 2, two or three of four families, she almost always wears it.
-- **On her profile:** her template sheet reads "★ Signature: Bell · ATK and M.ATK +0.2 a level (+10 now)"; the Gear
+  Insignia); from Tier 2, two or three of four families, she almost always wears it. *Follow-up to D197 (Uma
+  Templates), 2026-10-25: re-run on the balance model, every family worn with her signature beats or ties her best plain
+  form in Tier 1 (uma-templates §3.4), and her preset wears it (UT8, §5.8).*
+- **On her profile** (a Fleet Uma, her family a Bell)**:** her template sheet reads "★ Signature: Bell · ATK and M.ATK +0.2 a level (+10 now)"; the Gear
   tab's accessory row "Great Bell · G10 · ★ +10"; the Battle tab's offense group "+10 (signature)" beside "Lance moon
   +63" (*follow-up to D194, 2026-10-24*: was "Halo · Katana +61"). Unworn, the sheet line is grey: "Wear a Bell for +10".
 - **In the picker:** her signature family's forms list first, each with a ★ and "ATK and M.ATK +10 (her signature)";
-  another Uma's picker shows the plain item. The party screen's Uma chip carries "★ Bell".
+  another Uma's picker shows the plain item. The party screen's Uma chip carries "★ Bell" (her family: a Fleet Uma's
+  Bell, a Mighty Uma's Orb, a Tireless Uma's Pendant, a Gritty or Clever Uma's Insignia).
 - **In the damage stack:** a stat in step 1, beside her ATK or M.ATK, on her hits only (her mends and Barriers read
   her ATK or M.ATK without it, as without the weapon moons); outside the kind cap (§5.6) and the foe budget (a template is off
   the curve, XR12). The engine freezes it into the fight's input, as her moon's nodes are.
-- **Interface for the Uma Templates pass:** which family each template names (read from her stride or her knack; any
-  rule that gives each family about a quarter of the 90 templates); the signature tip's new anchor if the affinity goes
-  (CP24 puts it on her affinity kind's tree).
-
-**Recommended: the signature accessory replaces class-progression's affinity (CP36: +6% with one twin set's kinds).**
-The owner wants uniqueness through accessories rather than weapons, and the affinity is a weapon pick (slot her twin
-set). With both, a matched Uma would reach about +11%, past U12's cap. class-progression.md carries the note at CP36;
-the Uma Templates pass decides. Until then the stack keeps the affinity's factor (§2.4).
+- **Decided in the Uma Templates pass** ([uma-templates §3.4](uma-templates.md#34-the-signature-accessory-ut7-ut8)):
+  the family by her knack (UT7), presets that wear it (UT8), the affinity retired (UT11), the tip on her lead weapon's
+  tree (UT9). *Follow-up to D197 (Uma Templates), 2026-10-25: replaces the paragraphs "Interface for the Uma Templates
+  pass" and "Recommended: the signature accessory replaces class-progression's affinity".*
 
 ## 6. Crafting and materials
 
@@ -1359,15 +1381,16 @@ the split of ownership.*
 
 - **The Gear tab:** three weapon rows (kind, branch, grade, Might, weak multiplier: "Dual Lance + Katana · G7 · Might 63
   · weak ×1.3"), five armor slots (half, grade, the slot's stat), one to three accessory rows (form, member, grade, what
-  it adds: "Great Bell · Lance · G6 · her Attack, then her Lance at 0.84", "★" on her signature family). Each row has its
-  Upgrade pill.
+  it adds: "Great Bell · Lance · G6 · her Attack, then her Lance at 0.84", "★" on her signature family, her knack's:
+  a Fleet Uma's Bell, a Mighty Uma's Orb, a Tireless Uma's Pendant, a Gritty or Clever Uma's Insignia). Each row has
+  its Upgrade pill. *Follow-up to D197 (Uma Templates), 2026-10-25: the family by knack (UT7).*
 - **The weapon sheet** draws its own branch line (the viewer's tree, one kind) with the next step and its item; at G4 in
   Tier 2 the G5 step offers Pure or Dual, the Dual naming its partner and what it answers ("+ Katana: the Dark twins and
   Twilight; Tier 2 Katana-weak regulars"); in Tier 3 the two doors of her line ("Tempered: keep the Katana · Evolved:
   + Bow").
 - **The accessory sheet** draws each family's tree (base, two branches, Tier 3's step) with the forms her slot's grade
-  has opened lit, each with its value at her grade; one of each family at most; her signature family first with its ★
-  and bonus; a capped kind reads "(capped)".
+  has opened lit, each with its value at her grade; one of each family at most; her signature family (her knack's,
+  UT7) first, each of its forms with its ★ row "★ ATK and M.ATK +n (her signature)"; a capped kind reads "(capped)".
 - **The targets planner** (D100) lists every grade above her current one on her class's three weapons, five slots and
   accessory slots, a Branch Gem at G5 from Tier 2; an unchosen branch plans nothing until picked; an accessory slot's G5
   says "opens two branches".
@@ -1386,7 +1409,7 @@ the split of ownership.*
 | **extra-stats-progression.md** | The kind cap (§5.6, +68 × tier) binding the Pendant and Orb forms only, **the weapon moons outside it** (EP27); the damage stack's step 1 taking the weapon moons on a hit's own kind (§2.4); the presets' accessory forms (§5.8), beside EP29's weapon-moon presets; §8.2's offense column follows §5.8's presets. Evasion on feet armor stays 1.2% a grade, 12% at G10, in every tier (a share). *Follow-up to D194 (Extra Stats), 2026-10-24: was the Halo under the cap, on her first slot* |
 | **profession-progression.md** | The four products and pieces per Uma, unchanged (30 · 50 · 10; 27 + 3 · 50 · 20; 27 + 3 · 50 · 30); one Branch Gem line; **no item for accessory forms**; wording only (§6.4's box). 365 refined in every tier |
 | **The world and the Rift** (balance) | The foes' offense budget holds with the armor (§4.3); boss shields by answers (§3.6: CP8's bosses 6 · 9 · 10, *follow-up to D196*, SB6; were 6 · 8 · 9); the Tier 1 re-baseline plays the presets of §5.8 |
-| **Uma Templates pass** | **The signature accessory** (WP33): which family each template names (about a quarter each); **whether it replaces the affinity** (recommended, noted at CP36); the signature tip's anchor if it does (CP24); the moon's node II on defense (CP36's note) |
+| **Uma Templates pass** | **Done (UT7, UT8, UT11):** [uma-templates.md](uma-templates.md) names the family by her knack (UT7), dresses her preset in it (UT8) and retires the affinity in its place (UT11); the tip on her lead weapon's tree (UT9); her moon's node II on defense (UT10). *Follow-up to D197 (Uma Templates), 2026-10-25: was "which family each template names; whether it replaces the affinity"* |
 | **Screens** | §8: the Gear tab, the weapon and accessory sheets, the planner, the signature ★ |
 
 ## 10. Assumes
@@ -1394,7 +1417,7 @@ the split of ownership.*
 | From | Assumed | If not |
 |---|---|---|
 | The owner (2026-10-24) | The weapon direction (research WR1–WR6), the accessory redesign, armor carrying defense, Prism dropped; **his review the same day**: the fixed partners and Tier 3's fork, uniqueness through accessories, every family every tier with branches, armor kept | — |
-| class-progression.md | Three slots by channel (CP2); the defaults (CP3); foes' twins in Tier 1 and narrowing by rank (CP5, CP6); class skills cast through a weapon (CP34); the affinity (CP36) until the Uma Templates pass; presets name the accessories here (CP11) | Coverage numbers (§3.6) re-run on the new defaults |
+| class-progression.md | Three slots by channel (CP2); the defaults (CP3); foes' twins in Tier 1 and narrowing by rank (CP5, CP6); class skills cast through a weapon (CP34); presets name the accessories here (CP11). *Follow-up to D197 (Uma Templates), 2026-10-25: "the affinity (CP36) until the Uma Templates pass" removed; retired (UT11)* | Coverage numbers (§3.6) re-run on the new defaults |
 | class-progression's second pass (CP38–CP41) | The class branches' weapon-group focus: the Ring group (main Arms, elemental Tomes) or the Light/Dark group (secondary Arms, arcane Tomes), +15% on a hit's own kind; the reverse sets (CP40) | **Settled:** the partners always cross the groups (WP32), the accessory forms read her slots (§3.9) |
 | extra-stats-progression.md (approved, D194) | **The weapon moons** (EP24–EP27, EP29): flat offense on her hits of one kind (Full, +50 × tier) or two (Split, +35 × tier each) from Tier 2, a second moon in Tier 3, outside the kind cap, preset by EP29; Prowess's split for ATK and M.ATK (EP23); Vigor's MP (+30 × tier, EP4); no evasion on the map (Swiftness retired, EP28). *Follow-up to D194, 2026-10-24: was the Halo under the cap and Swiftness's +3%, +6%* | If the moons came back under the cap: raise it to (68 + 50) × tier (118 · 212 · 307), else every Tier 3 Great Orb caps beside a moon |
 | profession-progression.md | The catalog (PP8), the ladder (PP9), the recipes (PP10), make time (PP12) | **Adopted in the cross-check** (§6.2): the pieces stay this doc's |
@@ -1415,6 +1438,10 @@ the split of ownership.*
 
 **For the refund** (first draft: the owner's lean was every raw material back, recrafted by hand; README §9.4. Now the
 tickets-for-time grant above).
+
+*Versions re-planned by D198 (2026-10-25): every save row of this doc is gear, so its **save v27** below is **R2, Tier
+1's economy (engine v17, save v28)**; R1 (v16, v27) is the fight on today's gear. Its **save v28 (Tier 2)** is **R3,
+Tier 2's weapons (v18, v29)**; Tier 3's is **R5 (v20, v31)**. See [implementation.md](implementation.md).*
 
 **Save v27 (Tier 1, one migration, every world).** *Changed in cross-check (2026-10-24): v26 is taken on main (D190, the
 UI clarity pass), so the Tier 1 rework's migration is v27 and Tier 2's v28; the engine stays v16 and v17.*
@@ -1450,6 +1477,11 @@ branches, forms or the signature needs a refund:** they are new.
 
 ## 12. Engine
 
+*Versions re-planned by D198 (2026-10-25): every **v16** row below (armor, SB1 data, the supports, the four base forms,
+the Bell and the Insignia, the signature) ships with **R2, Tier 1's economy (engine v17)**; the **v17** rows split into
+**R3, Tier 2's weapons (v18)** (weapon branches, the two-kind cap, the second slot and its branches, the kind cap) and
+**R4, Tier 2's classes (v19)** (the focus in the stack); Tier 3's is **R5 (v20)**. See [implementation.md](implementation.md).*
+
 | Change | Version | Kind |
 |---|---|---|
 | Armor's new values per slot (DEF, M.DEF +4 a grade; HP +15; MP +3), × tier | v16 | Data (`ARMOR_DEFENSE_PER_GRADE` becomes a slot table) |
@@ -1463,9 +1495,9 @@ branches, forms or the signature needs a refund:** they are new.
 | The two-kind cap; one accessory of each family; the second slot; the accessory branches (Great forms, Channel Pendant, Twin Orb on the Orb path; Great Bell; Great Insignia) | v17 | Validation, data |
 | **Toll Bell** (a ring count per fight); **Onslaught** (her first act each wave) | v17 | Two rules |
 | The kind cap: flat kind offense from the Pendant and Orb forms at most a G10 Might × tier (the weapon moons outside it are extra-stats-progression's v17 rule; *follow-up to D194, 2026-10-24*) | v17 | Rule |
-| The damage stack's percentages (§2.4): the focus (+15% on a hit's own kind of her group, CP39) and the affinity (+6%, CP36), each a factor after the weak multiplier | v17 | Rule (class-progression's pieces, this doc's order) |
+| The damage stack's percentages (§2.4): the focus (+15% on a hit's own kind of her group, CP39), a factor after the weak multiplier (*follow-up to D197: "and the affinity (+6%, CP36)" removed, UT11*) | v17 | Rule (class-progression's piece, this doc's order) |
 | Keen (×1.7), Tempered (its partner at ×1.5), **Evolved** (its Tier 3 partner at ×1.5); every accessory branch's Tier 3 step; the third slot | Tier 3's version | Data on v17's rules |
-| **The signature accessory:** ATK and M.ATK + her level × 0.2 × tier while she wears her family, frozen into the input | With the Uma Templates pass | Data (a stat, as her moon's nodes) |
+| **The signature accessory:** ATK and M.ATK + her level × 0.2 × tier while she wears her family (her knack's, UT7), frozen into the input | **v16**, a stat in the input (*follow-up to D197 (Uma Templates), 2026-10-25: was "with the Uma Templates pass"; UT18*) | Data (a stat, as her moon's nodes) |
 
 ## 13. Pacing
 
@@ -1479,8 +1511,8 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **Weapon power on curve** | Might by grade | Might × tier | SB1: a weapon's share holds at every tier's Lv 50 |
 | **Defense on curve** | Armor, Extra Stats, a support | Armor (one support's worth more), Extra Stats | A regular's hit 18.7% of her HP against today's 20%; the foes' offense budget unchanged (§4.3). *Follow-up to D196 (stat balancing), 2026-10-25: 18.3% and 18.1% in Tiers 2 and 3, **about 20% with the toolbox terms' offense** (+10% by Lv 50, the healers' sustain priced; SB13)* |
 | **Accessory damage on curve** | An Orb on her lead kind (−4% at Lv 1 to −16% at Lv 50 on that kind's hits) and a support | Tier 1: one base form (7–9% of her damage, as the first draft's); Tier 2: two branch forms (18–22%, the first draft's two 12–17%); Tier 3: three (27–34%, against 19–25%). *Follow-up to D196: 5–9% · 16–23% · 27–34% with the hybrids' forms on their lead half and the Great Pendant's 0.55 (§5.8)* | The Tier 1 re-baseline plays §5.8's presets; Tier 2's and 3's added depth goes through their terms. *Follow-up to D196 (stat balancing), 2026-10-25: the accessories are about a third of each tier's toolbox (×1.13 of Tier 2's act, ×1.25 of Tier 3's), **priced in Tier 2's term (+27% on the foes' HP and DEF, SB3) and Tier 3's (×1.08 → ×1.48, SB4)**, offense +10%, bosses × 1.1 (SB5)*; **the knob:** the branches' per-grade values step down together (held in reserve, SB7: × 0.8 moves Tier 2's pace without a term only 1.47 → 1.44× Tier 1's) |
-| **Her template** | — | The signature accessory, about +5% matched; recommended to replace the affinity's | Off the curve, as every template piece (XR12) |
-| **MP** | The Spring and the Siphon on the balance party's casters | Legs +30 at G10, Vigor's MP (+30, EP4), **the base regen** (SB18: 0.8% of max MP a round a depth, 4% from Class Rank 40; *follow-up to D196*), the template's twists, the Bell | The Springs test re-run (§5.9), **and the region's pace against today's** (the last four stages within ±10%); knobs: the regen's share a depth, Vigor's MP rate, legs' MP a grade, the Flourish's twists |
+| **Her template** | — | The signature accessory, +4.3–6.1% matched at Lv 50, in the affinity's place (UT11, UT13); no template piece touches MP (UT6). *Follow-up to D197 (Uma Templates), 2026-10-25: was "about +5% matched; recommended to replace the affinity's"* | Off the curve, as every template piece (XR12) |
+| **MP** | The Spring and the Siphon on the balance party's casters | Legs +30 at G10, Vigor's MP (+30, EP4), **the base regen** (SB18: 0.8% of max MP a round a depth, 4% from Class Rank 40; *follow-up to D196*), the Bell (*follow-up to D197: "the template's twists" removed, UT6*) | The Springs test re-run (§5.9), **and the region's pace against today's** (the last four stages within ±10%); knobs: the regen's share a depth, Vigor's MP rate, legs' MP a grade (*follow-up to D197: "the Flourish's twists" removed*) |
 | **Tier 2's toolbox** | Weapon arts (+6–10% of party damage) and sets, Z4's draft term | Branches, the second slot and its branches, the class branches' focus (the damage stack, §2.4) | The simulation prices them in Z4's one term (XR15); Tier 3's in its own. *Follow-up to D196 (stat balancing), 2026-10-25: the four docs' tools compound to +51% an act in Tier 2 and +88% in Tier 3; **Tier 2's term +27%, Tier 3's ×1.08 → ×1.48** on the foes' HP and DEF (offense +10%, bosses × 1.1) bring a party's pace back to 1.03–1.11× Tier 1's (SB3–SB5)* |
 | **A newly slotted weapon** | Needs its rank | Any grade her level allows, if the stock has the gems | Class switching and the Rift's guided builds get cheaper |
 
@@ -1517,10 +1549,10 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 | **WP27** The save | v27 deletes every crafted piece and gear rank, refunds each piece's raw items (paid in Tier 1's demand mix, PP20), recalls Forge jobs, Gear Marks → Class Marks, the ten supports retire, one accessory slot at G0 `{ grade, family, form, kind? }` with her preset; **v28** branches (no stored partner) and the second slot's forms; Tier 3's with its version. *Changed after owner review, 2026-10-24: families and forms in the slot; no stored second kind* *Owner, 2026-10-24: the compensation is reworked in the Profession review (Craft Levels reset to 1, tickets granted for the time they took; README §9.4); the raw refund here is the first draft.* *Follow-up to D194 and the owner's compensation direction, 2026-10-24 (wording only): as [profession-progression §14](profession-progression.md#14-save-impact) designs it (PP19, PP20), Craft Levels reset to 1 and each world gets a Speed Ticket for every 30 minutes of its Umas' lifetime Craft EXP (EXP ÷ 60, rounded up per Uma, PP24); deleted gear is folded into that grant, with a floor per world at the deleted pieces' own making time (PP20), no raw items back* | Convert her best grade per track, no refund | The owner's lean: every raw item back, recrafted by hand (GE15) |
 | **WP28** Names | "Grade" G0–G10 (GE16); **Pure, Dual, Keen, Tempered, Evolved**; **partner**; **Branch Gem**; **Pendant, Orb, Bell, Insignia** and their branches **Great** (Pendant, Orb, Bell, Insignia), **Channel Pendant, Twin Orb, Toll Bell, Onslaught Insignia**; **signature accessory**. *Changed after owner review, 2026-10-24: Evolved (the owner's "Evolution"), the forms, the signature; Slayer retires into the base Insignia* | "Specialized"; Crossed (a Twin Cross skill exists), Shifted (Shifting Spell), Grand (Grand Summon); Band, Chaser, Echo, Crest, Vanguard (taken) | One word, one meaning (README §2.4) |
 | **WP29** Art | **No new art:** Pendants the retired Charm row, Insignias the retired Ring row, Bells the Talisman and Amulet rows with a kind chip, Orbs theirs; a branch is its family's icon with its name on the chip; the item icons are gear.md's request with one Branch Gem icon. *Changed after owner review, 2026-10-24: branches reuse their family's icon* | New rows for each form | Lean assets; every row already exists |
-| **WP30** Engine | v16: armor values, SB1 data, supports retire, the four base forms (Pendant and Orb data; Bell and Insignia rules); v17: weapon branches on the partner table, caps, the accessory branches (data; the Toll Bell and Onslaught rules), the kind cap, the stack's percentages; Tier 3's: Keen, Tempered, Evolved, the steps; the signature with the Uma Templates pass. *Changed after owner review, 2026-10-24* | Orbs and Insignias in later engines | Tier 1's accessories must exist in Tier 1's engine |
-| **WP31** The damage stack | One order for every hit (§2.4): **(1)** her ATK or M.ATK (+ the signature while worn) + Might + flat offense on the hit's own kind (the Pendant and Orb forms under the kind cap; her weapon moons on that kind, outside it); **(2)** offense² ÷ (offense + defense) × power × hand × Skill Rank; **(3)** × the weapon's weak multiplier (either kind); **(4)** × the focus 1.15, × an Insignia, × the affinity 1.06 until the Uma Templates pass, each its own factor; **(5)** today's statuses, riders, the unbroken halving, ward, evasion. Heals take none of the flat or weak steps. Ceiling on one weak hit ×1.50 · ×2.16 · ×2.49 with the signature replacing the affinity (×1.58 · ×2.29 · ×2.64 with both); fallbacks: focus +10%, then the Insignias a step down, then Keen ×1.6. *Changed after owner review, 2026-10-24: Insignias from Tier 1, the signature in step 1.* *Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons take the Halo's place in step 1, outside the cap; the ceilings don't move* | Percentages added into one bucket; the focus and affinity on either kind of a Dual; a cap on the stack's product | weapon-research risk 3: every piece sat on one kind with no stated order |
+| **WP30** Engine | v16: armor values, SB1 data, supports retire, the four base forms (Pendant and Orb data; Bell and Insignia rules); v17: weapon branches on the partner table, caps, the accessory branches (data; the Toll Bell and Onslaught rules), the kind cap, the stack's percentages; Tier 3's: Keen, Tempered, Evolved, the steps; **the signature in v16**, a stat in the input (*follow-up to D197 (Uma Templates), 2026-10-25: was "with the Uma Templates pass"; UT18*). *Changed after owner review, 2026-10-24* | Orbs and Insignias in later engines | Tier 1's accessories must exist in Tier 1's engine |
+| **WP31** The damage stack | One order for every hit (§2.4): **(1)** her ATK or M.ATK (+ the signature while worn) + Might + flat offense on the hit's own kind (the Pendant and Orb forms under the kind cap; her weapon moons on that kind, outside it); **(2)** offense² ÷ (offense + defense) × power × hand × Skill Rank; **(3)** × the weapon's weak multiplier (either kind); **(4)** × the focus 1.15, × an Insignia, each its own factor; **(5)** today's statuses, riders, the unbroken halving, ward, evasion. Heals take none of the flat or weak steps. Ceiling on one weak hit ×1.50 · ×2.16 · ×2.49, the signature in the affinity's place; fallbacks: focus +10%, then the Insignias a step down, then Keen ×1.6. *Changed after owner review, 2026-10-24: Insignias from Tier 1, the signature in step 1.* *Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons take the Halo's place in step 1, outside the cap; the ceilings don't move.* *Follow-up to D197 (Uma Templates), 2026-10-25: "× the affinity 1.06 until the Uma Templates pass" and the "with both" ceilings (×1.58 · ×2.29 · ×2.64) removed; the affinity retired (UT11)* | Percentages added into one bucket; the focus and affinity on either kind of a Dual; a cap on the stack's product | weapon-research risk 3: every piece sat on one kind with no stated order |
 | **WP32** The partner table | **New after owner review, 2026-10-24.** Each weapon has a fixed Tier 2 partner and a fixed Tier 3 partner, of its own channel and the other group: the owner's Greatsword, Axe → Bow; Lance → Katana; Fire → Dark; Ice, Lightning → Light, Tier 3 the other sub weapon; authored **Bow → Greatsword, Katana → Axe, Light → Fire, Dark → Ice**, Tier 3 **Bow, Katana → Lance; Light, Dark → Lightning** (§3.2) | Twin mirrors with mutual pairs (2.18 in Tier 3; the Bishop's Light and Ice lock each other); all mirrors (1.95 · 2.08); the Lightning twins first (1.98 · 2.27); a free second kind | Twin logic (a hybrid's pair Duals into a twin pair), every Ring kind a partner somewhere, the Lightning twins Tier 3's evolution, no set locked out; 2.0 · 2.30 with every kind held twice from Tier 2 |
-| **WP33** The signature accessory | **New after owner review, 2026-10-24.** Her template names one family; while she wears any form of it, **ATK and M.ATK +0.2 a level × tier** (+10 · +18 · +26 at Lv 50: about +5% matched, healers +5.9%); worn by anyone else, the normal item; ★ on her profile, the Gear tab, the Battle tab and the picker; a stat outside the kind cap and the foe budget. **Recommended to replace CP36's affinity** (noted at CP36; decided in the Uma Templates pass); which family each template names is that pass's | A stat per family (a hybrid with an Orb or Bell signature at +2.6–3.3%); flat offense on her kinds (under the kind cap); a signature form or kind (pins her branch or weapons); uniqueness on weapons | The owner's "slightly stronger accessories … a fixed added bonus on every level up"; one rule, every matched Uma near U12's +5% at every tier |
+| **WP33** The signature accessory | **New after owner review, 2026-10-24.** Her template names one family; while she wears any form of it, **ATK and M.ATK +0.2 a level × tier** (+10 · +18 · +26 at Lv 50: about +5% matched, healers +5.9%); worn by anyone else, the normal item; ★ on her profile, the Gear tab, the Battle tab and the picker; a stat outside the kind cap and the foe budget. **Replaces the affinity (UT11); her knack names the family (UT7): Fleet Bell, Mighty Orb, Tireless Pendant, Gritty and Clever Insignia**; her preset wears it (UT8). *Follow-up to D197 (Uma Templates), 2026-10-25: was "Recommended to replace CP36's affinity (noted at CP36; decided in the Uma Templates pass); which family each template names is that pass's"* | A stat per family (a hybrid with an Orb or Bell signature at +2.6–3.3%); flat offense on her kinds (under the kind cap); a signature form or kind (pins her branch or weapons); uniqueness on weapons | The owner's "slightly stronger accessories … a fixed added bonus on every level up"; one rule, every matched Uma near U12's +5% at every tier |
 | **WP34** Accessory forms | **New after owner review, 2026-10-24.** A branch is a **form**, a setting of the slot: the slot's G5 opens its family's two branches (Tier 2) and their step (Tier 3); she sets any opened form freely outside fights; **no item**, so Accessory Settings stay 10 · 20 · 30 an Uma | A committed accessory branch (an accessory Branch Gem, re-forged to change); branches unlocked by tier, not grade | Accessories are swapped per region and a slot serves any family; a commitment would add an item for a choice she can already undo |
 
 ## 15. The first round's calls, mapped

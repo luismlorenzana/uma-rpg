@@ -12,6 +12,14 @@
 > toolbox (×1.14) and Tier 3's (×1.23), in Tier 2's +27% and Tier 3's ×1.08 → ×1.48 (SB3, SB4; §10). Each edited spot
 > says "Follow-up to D196 (stat balancing), 2026-10-25".
 
+> **Follow-up to D197 (Uma Templates), 2026-10-25** (logged against D194; wording and values only, as
+> [uma-templates §12](uma-templates.md#12-if-approved-the-follow-ups-by-doc) lists them): **EP14 decided (UT10): her
+> moon's values as written, node II on her calling channel's defense** (§6.1, §6.3, §6.8); **the Flourish is 4% of her
+> max HP a fight**, Clean break, Even pace or Late reserve by stride (UT6, UT16; §6.5, §6.7); **the affinity retires**
+> (UT11; §6.6), and since the Flourish leaves MP no template piece moves pace; **the MP knobs no longer list the
+> Flourish** (EP15; §9, §16). [uma-templates.md](uma-templates.md) owns every template piece; this doc keeps her moon's
+> slot. Each edited spot says "Follow-up to D197 (Uma Templates), 2026-10-25".
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The third standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](extra-stats.md),
 > which stays as history, and supersedes every ES call ([§17](#17-decisions) maps each one). Calls are **EP1–EP29**,
@@ -49,7 +57,8 @@
 > **Interfaces, not designed here:** accessories, armor, weapon branches, the kind cap and the damage stack
 > (weapon-progression.md; changes asked in [§18.1](#181-for-weapon-progression-follow-up-to-d193)); material amounts and
 > the Lapidary's place (profession-progression.md; [§18.2](#182-for-profession-progression)); her moon's content and
-> the signature's family (the Uma Templates pass); class hands and the mirror (class-progression.md).
+> the signature's family (the Uma Templates pass, *since D197 [uma-templates.md](uma-templates.md)*); class hands and the
+> mirror (class-progression.md).
 
 ## The owner's points
 
@@ -447,8 +456,9 @@ its moons in the same tap.
 **The owner (2026-10-24):** "I need more clarity on the Uma variance for stats, maybe flesh it out more as well."
 **Her moon** is the two-node moon of her Uma Template ([variance §8](variance.md#8-extra-stats-her-moon)) on its own
 small orbit, starred and named for her template ("Ironhide's moon"). This section states everything the map does with
-it; what the Uma Templates pass decides is marked **[for the pass]** (EP14). Drawn on
-[the her-moon page](previews/stars-uma.html).
+it; what the Uma Templates pass was to decide was marked **[for the pass]** (EP14), and is now decided: her moon's
+values as written, node II on defense ([uma-templates §3.6](uma-templates.md#36-her-moon-ut10), UT10; *follow-up to
+D197 (Uma Templates), 2026-10-25*). Drawn on [the her-moon page](previews/stars-uma.html).
 
 ### 6.1 The slot
 
@@ -464,7 +474,7 @@ it; what the Uma Templates pass decides is marked **[for the pass]** (EP14). Dra
 - **Outside the foe budget,** as today's off-curve nodes are: the balance party's average Uma has no template (XR12).
 - **Rebuilt every tier** with the tier's values, like the core; ids `template:1`, `template:2` in every world.
 - **Two nodes in every tier, never more** (XR3): a growing moon pushed Tier 3 past the work budget; the template's later
-  depth is the signature tip (CP24) and, if adopted, the signature accessory (WP33).
+  depth is the signature tip (CP24) and the signature accessory (WP33; *follow-up to D197: was "if adopted", UT7, UT11*).
 
 ### 6.2 Her knack: node I
 
@@ -483,19 +493,21 @@ it; what the Uma Templates pass decides is marked **[for the pass]** (EP14). Dra
 
 ### 6.3 Her lead: node II
 
-**Recommended: her calling channel's defense, every class** (CP36's note; WP33). The first draft (variance U10) put
+**Decided (UT10): her calling channel's defense, every class** (CP36's note; WP33; *follow-up to D197 (Uma Templates),
+2026-10-25: was "Recommended"*). The first draft (variance U10) put
 +8 on her calling channel's **offense** (ATK or M.ATK); CP36 noted moving it to defense so the affinity's +6% stays
 the template's whole damage, and WP33 keeps it there beside the signature accessory.
 
 | Option for node II | Gives (Tier 1 · 2 · 3) | Counts | Damage a matched Uma gains (§6.6) | The call |
 |---|---|---|---|---|
-| **Her calling channel's defense** | DEF (physical calling) or M.DEF (magical) +8 · +14 · +21 | Every class | None | **Recommended:** the template's damage is the signature's (or the affinity's) alone, near U12's +5% |
+| **Her calling channel's defense** | DEF (physical calling) or M.DEF (magical) +8 · +14 · +21 | Every class | None | **Decided (UT10):** the template's damage is the signature's alone, near U12's +5% |
 | Her calling channel's offense (U10's draft) | ATK or M.ATK +8 · +14 · +21 | Classes that hit or mend with it | +2.5–4.4% (Tier 1) → +1.9–3.5% (Tier 3) | Pushes a matched Uma to +6.4–9.9% with the signature, past U12 |
 
 - **The owner's "physical-only node" still holds:** a front runner's node II is DEF, a physical stat; as a Mage she
   still has it, as defense.
-- **[For the pass]** whether node II is defense or offense is the Uma Templates pass's, with the signature (WP33) and
-  the affinity (CP36). The map takes either: one stat, one value, `template:2`.
+- **Decided (UT10):** node II is defense; the values as written. *Follow-up to D197 (Uma Templates), 2026-10-25: was
+  "[For the pass] whether node II is defense or offense is the Uma Templates pass's, with the signature (WP33) and the
+  affinity (CP36)".*
 
 ### 6.4 Gates and jewels
 
@@ -514,14 +526,19 @@ stride ← her longest best distance; knack ← her top growth). Her moon at eac
 | Uma (made up) | Profile | Template | ★ I, knack (T1 · T2 · T3) | ★ II, lead (T1 · T2 · T3) | Her Flourish (stride) |
 |---|---|---|---|---|---|
 | **Uma A** | Front A; Medium A, Long A; growth Stamina +20% | Brawler · Stayer: **Tireless Ironhide** | HP +20 · +35 · +50 | DEF +8 · +14 · +21 | Late reserve |
-| **Uma B** | Pace A; Mile A; Power 96 > Wit 84; growth Speed +20% | Spell Blade · Dash: **Fleet Flashblade** | Evasion +2.4% (every tier) | DEF +8 · +14 · +21 | Opening |
+| **Uma B** | Pace A; Mile A; Power 96 > Wit 84; growth Speed +20% | Spell Blade · Dash: **Fleet Flashblade** | Evasion +2.4% (every tier) | DEF +8 · +14 · +21 | Clean break |
 | **Uma C** | Pace A; Medium A; Wit 102 ≥ Power 90; growth Wit +20% | Mage · Middle: **Clever Spellwright** | MP +4 · +7 · +10 | M.DEF +8 · +14 · +21 | Even pace |
 | **Uma D** | End A; Long A; growth Guts +20% | Summoner · Stayer: **Gritty Shepherd** | Limit start +1.6 (every tier) | M.DEF +8 · +14 · +21 | Late reserve |
 | **Uma E** | Late A; Medium A; Power 104 > Wit 88; growth Power +20% | Paladin · Middle: **Mighty Warden** | DEF and M.DEF +4 · +7 · +10 each | DEF +8 · +14 · +21 (DEF +12 in all in Tier 1) | Even pace |
-| **Uma F** | Late A (Pace B, End C); Mile A; Wit 98 ≥ Power 92; growth Stamina +20% | Cleric · Dash: **Tireless Lamplighter** | HP +20 · +35 · +50 | M.DEF +8 · +14 · +21 | Opening |
+| **Uma F** | Late A (Pace B, End C); Mile A; Wit 98 ≥ Power 92; growth Stamina +20% | Cleric · Dash: **Tireless Lamplighter** | HP +20 · +35 · +50 | M.DEF +8 · +14 · +21 | Clean break |
+
+*Follow-up to D197 (Uma Templates), 2026-10-25: each Flourish is **4% of her max HP a fight** in her stride's shape
+(UT6): **Clean break** (a Barrier of 4% at the start; was "Opening", UT16), **Even pace** (1% a round, kept), **Late
+reserve** (2% a round from round 3). [uma-templates §6.2](uma-templates.md#62-one-uma-per-calling) adds each Uma's
+signature family and tip.*
 
 - **As another class:** every node above counts in every class (node II is a defense); her Flourish and signature tip
-  work only as her calling (variance U9, U16). Uma A as a Mage keeps HP +20 and DEF +8.
+  work only as her calling (UT12; *follow-up to D197: was variance U9, U16*). Uma A as a Mage keeps HP +20 and DEF +8.
 - **Same calling, different knack:** a front runner at Long with Speed growth is a **Fleet Ironhide**: evasion +2.4%
   instead of HP +20, the same DEF +8 (variance §5.1's two front runners).
 
@@ -533,19 +550,24 @@ that touch damage, measured on the full build at each tier's Lv 50 (the §8.4 mo
 | Piece | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
 | **Signature accessory** (WP33: ATK and M.ATK +10 · +18 · +26, worn) | +5.1–6.2% | +4.5–5.3% | +4.2–4.8% |
-| **Affinity** (CP36: +6% on one twin set's two kinds) | About +5% a fight matched | The same | The same |
+| ~~**Affinity**~~ (CP36: +6% on one twin set's two kinds) | Retired (UT11) | Retired | Retired |
 | Her moon's lead on offense (U10's draft) | +2.5–4.4% | +2.1–3.6% | +1.9–3.5% |
 | **Her moon's lead on defense** (recommended) | 0% | 0% | 0% |
-| **Recommended: the signature in the affinity's place, node II on defense** | **+5.1–6.2%** | **+4.5–5.3%** | **+4.2–4.8%** |
+| **Decided (UT11, UT13): the signature in the affinity's place, node II on defense** | **+5.1–6.2%** | **+4.5–5.3%** | **+4.2–4.8%** |
 | The signature and the lead on offense | +8.5–9.9% | +7.4–8.2% | +6.4–7.8% |
-| The signature and the affinity (≈ × 1.05) | +10.4–11.5% | +9.7–10.6% | +9.4–10.0% |
-| The affinity and node II on defense (if the signature isn't adopted) | About +5% | About +5% | About +5% |
+| ~~The signature and the affinity~~ (≈ × 1.05) | Retired (UT11): was +10.4–11.5% | Was +9.7–10.6% | Was +9.4–10.0% |
+| ~~The affinity and node II on defense~~ | Retired (UT11) | Retired | Retired |
+
+*Follow-up to D197 (Uma Templates), 2026-10-25: the affinity rows are retired (UT11). **The Flourish leaves MP (UT6), so
+no template piece moves pace**; its 4% of her max HP a fight is on the defense side ([uma-templates §4](uma-templates.md#4-the-budget-ut13):
+damage +4.3–6.1% on the campaign's model, defense +4.7% plus her knack's 0–2.8%, pace 0).*
 
 - **The recommended set stays near U12 in every tier;** the others pass it. Her knack adds no damage (a share of HP, MP,
   defense, evasion or Limit start).
 - **The signature eases from +5–6% to +4–5% by Tier 3:** later tiers add flat offense on her kinds (the weapon moons,
-  the accessory branches) faster than SB1's × tier, so a stat point is worth a little less. **[For the pass]** if it
-  wants +5% exactly at every tier, the signature's rate per level (+0.2 × tier) is the knob; nothing here moves.
+  the accessory branches) faster than SB1's × tier, so a stat point is worth a little less. If the owner wants a
+  stronger edge after playing it, the signature's rate per level (+0.2 × tier) is the dial (UT20); nothing here moves.
+  *Follow-up to D197 (Uma Templates), 2026-10-25: was "[For the pass] if it wants +5% exactly …".*
 
 ### 6.7 How it shows
 
@@ -555,18 +577,21 @@ that touch damage, measured on the full build at each tier's Lv 50 (the §8.4 mo
 | **A node, tapped** | "★ Ironhide's moon I · Tireless · HP +20 · Moon Jewel II · opens at Lv 16"; "★ Ironhide's moon II · Ironhide's lead · DEF +8 · Moon Jewel IV · opens at Lv 36" | "HP +35", "DEF +14" |
 | **The header** | "Open 12 of 20 · ★ 1 of 2" | "of 25", "of 30" |
 | **Totals under the map** | Her moon's points join their stats with a star: "DEF +51 ★ +8" | The same |
-| **Her profile** | The template chip "★ Tireless Ironhide"; the template sheet: "Moon · I HP +20 (knack: Stamina +20%) · II DEF +8 (lead: a physical calling) · both count in every class" | Tier values |
+| **Her profile** | The template chip "★ Tireless Ironhide"; the template sheet: "Moon · I HP +20 (knack: Stamina +20%) · II DEF +8 (lead: a physical calling) · both count in every class"; beside it "Flourish · Late reserve · 4% of her max HP a fight, as a Brawler" (*follow-up to D197 (Uma Templates), 2026-10-25, UT6*) | Tier values |
 | **The Battle tab** | Her moon's points in the green Extra Stats bracket, starred | The same |
 | **The Racing tab's "Her template"** | Calling ← Front A; Stride ← Long A; Knack ← Stamina +20%; then each node "Active" | The same |
 
 ### 6.8 For the Uma Templates pass
 
-| The pass decides | This doc's default | What moves here if it differs |
+**Decided: [uma-templates §3.6](uma-templates.md#36-her-moon-ut10)** (D197). *Follow-up to D197 (Uma Templates),
+2026-10-25: the table below was "The pass decides"; each row is now its decision.*
+
+| The pass decided | Decided | On the map |
 |---|---|---|
-| Node II: defense or offense | Defense (CP36's note, WP33) | One stat on `template:2`; §6.6's budget row |
-| The signature (WP33) in the affinity's place | Recommended (the budget, §6.6) | Nothing on the map |
-| The signature's rate across tiers | +0.2 × tier a level | Nothing on the map |
-| Knack values (+4 points; Fleet 2.4%, Gritty 1.6) | Variance U10's | `template:1`'s value |
+| Node II: defense or offense | **Defense** (UT10) | One stat on `template:2`, as written |
+| The signature (WP33) in the affinity's place | **Yes** (UT11, UT13) | Nothing on the map |
+| The signature's rate across tiers | **+0.2 × tier a level** (SB15; the dial if it runs hot or cold, UT20) | Nothing on the map |
+| Knack values (+4 points; Fleet 2.4%, Gritty 1.6) | **As written** (UT10) | `template:1`'s value |
 
 ## 7. Counts
 
@@ -762,9 +787,10 @@ Uma, never an item ([stat-balance §7](stat-balance.md#7-mp-after-the-regen-acce
 - **The Springs test** (README §9.5 item 5): a region on Auto still clears 10–12 of 12 stages with **+51 MP** from the
   map, armor's legs at +30 and the base regen, **and the party's pace in a region's last four stages stays within ±10%
   of today's** (the model: 0.94–1.05×). **Knobs, in order:** **SB18's share a depth** first, then **Vigor's MP rate**,
-  then legs' MP a grade; the Flourish's twists are the template's; never the foes, never an MP accessory. *Follow-up to
+  then legs' MP a grade; never the foes, never an MP accessory. *Follow-up to
   D196: was legs, then Vigor's MP rate, then the Flourish (SB14 re-ranked them: Vigor's MP ×2 buys 10% more deep casts
-  a bar, legs +1 a grade 3%).*
+  a bar, legs +1 a grade 3%).* *Follow-up to D197 (Uma Templates), 2026-10-25: "the Flourish's twists are the
+  template's" removed: the Flourish is HP now (UT6), and no template piece touches MP.*
 
 ## 10. The foe budget
 
@@ -918,7 +944,7 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 | **weapon-progression.md** | [§18.1](#181-for-weapon-progression-follow-up-to-d193): the kind cap binds accessories only, weapon moons outside it (WP24); the stack's step 1 (WP31); presets name the weapon moons, the accessory forms unchanged (WP25); §4.4's ATK and M.ATK for the four between; evasion 12% in every tier (no Swiftness); every "Halo" mention reads "weapon moons". Unchanged: Vigor's MP, the defensive budget, Guard and the Planet |
 | **profession-progression.md** | [§18.2](#182-for-profession-progression): two jewel kinds in every tier; **20 · 25 · 30 an Uma, every class**; Planet Jewel 12 proposed; Lapidary **120 · 140 · 160** (+8); the whole Uma 485 · 505 · 525; §6.3's new pieces are five Moon Jewels a tier |
 | **class-progression.md** (its next pass; follow-ups logged against D192) | §0 and "Later tiers at a glance": Extra Stats rows read "a weapon moon (Full +90 on one kind or Split +63 on two)" and "a second weapon moon", not the Halo and Valor; §9's ATK and M.ATK for the four between (§8.2 here) and its offense column; §7.2's class skills carry "that weapon's kind, channel, Might, weapon moons and branch"; **CP36's note stands** (her moon's node II on defense, §6.3); the mirror re-check (CP9) on Prowess's split |
-| **Uma Templates pass** | §6 in full: two nodes, Lv 16 and 36, Moon Jewels II and IV, × tier, outside the budget, ids `template:1–2`; five knacks (Fleet and Gritty don't scale and are now the map's only evasion and Limit start); node II on her calling channel's defense in every class (recommended); the template budget per tier (§6.6) and the signature's easing by Tier 3 |
+| **Uma Templates pass** | §6 in full: two nodes, Lv 16 and 36, Moon Jewels II and IV, × tier, outside the budget, ids `template:1–2`; five knacks (Fleet and Gritty don't scale and are now the map's only evasion and Limit start); node II on her calling channel's defense in every class (decided, UT10; *follow-up to D197: was "recommended"*); the template budget per tier (§6.6) and the signature's easing by Tier 3 |
 | **The balance simulation** | `onCurveStars` → the core (the same 20 nodes for every class, Prowess at her split); `rpgFoeTierBudget`'s build part × tier; the weapon moons in Tiers 2's and 3's toolbox terms; Full against Split (§4.2); the hybrids' and healers' Tier 1 act (−7–8%) through the hands (CP9) |
 | **The engine** | v16: Prowess's split (data: points by her class at a fight's start). v17: weapon moons, flat offense on her hits of a kind, outside the kind cap, its kinds frozen into the input. Tier 3's: the second weapon moon (data on v17's rule). The Halo, Valor and Swiftness never built |
 
@@ -931,11 +957,16 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 | weapon-progression.md | Accessories damage-oriented (WP17); armor's one support's worth (WP15) and feet evasion (12% at G10); the presets' accessories (WP25); a hit reads its own kind (WP13); **the kind cap reshaped to accessories only (§18.1)** | If the cap keeps weapon moons inside it: raise it to (68 + 50) × tier (118 · 212 · 307), else every Tier 3 Great Orb caps beside a moon |
 | profession-progression.md | Jewel Crafting at the Lapidary on the 5g − 4 gate; the catalog (PP8) and ladder (PP9); **the Planet Jewel at 12 (§18.2)** | At 8: Lapidary 100 · 120 · 140, the Uma 465 · 485 · 505, the magical trade 17.2% in Tier 1 |
 | class-progression.md | Six classes, their channels, hands and leans (§2.1–§2.2); the presets' sets (CP11, CP40); the focus reads a hit's own kind (CP39); CP9's knob is the hands | — |
-| Uma Templates pass | Fills her moon's two nodes (§6; node II on defense) | The slot stays empty; nothing else moves |
+| Uma Templates pass | Fills her moon's two nodes (§6; node II on defense). **Done: uma-templates §3.6 (UT10)**, *follow-up to D197 (Uma Templates), 2026-10-25* | — |
 | Combat (D104) | A point is +1, +5 HP; 0.6% evasion; 0.4 of a 12 gauge; fights freeze points (and her class) at their start | — |
 | Tier 2's world (Z4, XR15) | The weapon moons sit in each tier's toolbox term, priced by its simulation; her moon outside every budget. *Follow-up to D196: the terms sized by stat-balance SB3–SB5 (Tier 2 +27%, Tier 3 ×1.08 → ×1.48)* | — |
 
 ## 15. Save impact
+
+*Versions re-planned by D198 (2026-10-25): the Planet, the three moons, her moon and the jewels ship with **R2, Tier 1's
+economy (engine v17, save v28)**, so this section's "save v27" is v28 and §13's engine "v16" (Prowess's split) is v17;
+the weapon moon's "save v28" and engine v17 are **R3, Tier 2's weapons (v18, v29)**; Tier 3's second weapon moon is **R5
+(v20, v31)**. See [implementation.md](implementation.md).*
 
 **Deleted** (in every tier world):
 - Every Uma's `stars.unlocked` and `stars.active`: today's `moon:`, `bridge:` and `sun:` ids.
@@ -982,7 +1013,8 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 - **Simulation items** (README §9.5): the re-baseline with full maps and Prowess's split (item 1); the mirror on full
   maps, the four between's Tier 1 act through the hands (item 2); the Springs at **+51 MP** with the base regen (item 5); Tier 2: Full against
   Split (§4.2) and the stack with a weapon moon beside the accessories (WP31, weapon-research risk 3); her moon with the
-  signature or the affinity under U12's +5% (item 8, §6.6).
+  signature under U12's +5% (item 8, §6.6; *follow-up to D197 (Uma Templates), 2026-10-25: "or the affinity" removed,
+  UT11; the Flourish moves no MP, UT6*).
 
 ## 17. Decisions
 
@@ -1001,8 +1033,8 @@ keeps its own). Old fights replay unchanged: their allies' stats are frozen in t
 | **EP11** Valor | **Retired (EP28).** *Changed after owner review, 2026-10-24: was Tier 2's Limit start +2, +4* | Kept; made larger (+8 of 12) | Negligible to the owner; Limit start stays her Gritty knack's |
 | **EP12** Tier 3 | **A second weapon moon (EP26);** no class constellations. *Changed after owner review, 2026-10-24: was the Halo's second kind and Swiftness* | Class constellations; Swiftness kept | "Improve all three weapon types for a single Uma"; the map stays class-free |
 | **EP13** The core across tiers | The same bodies, rebuilt empty at promotion, values × tier; tiers add weapon moons, never nodes on the core | The same values every tier | SB1: the core's share holds within 1.5 points (§8.3) |
-| **EP14** Her moon | **Two nodes in every tier, in full (§6):** I her knack (Lv 16, Moon Jewel II; Tireless HP, Clever MP, Mighty DEF and M.DEF, Fleet evasion, Gritty Limit start), II her lead (Lv 36, Moon Jewel IV) **on her calling channel's defense, counted in every class** (CP36's note, WP33); × tier (Fleet, Gritty don't scale); outside the budget; the recommended template set (the signature in the affinity's place, node II on defense) stays at +4–6% in every tier. *Changed after owner review, 2026-10-24: fleshed out; node II's defense moves from a note to the recommendation; the pass decides* | Node II on offense (+6–10% with the signature); a moon that grows each tier; nodes on the shared bodies | The owner: clarity, not more nodes; U12's +5% at every tier |
-| **EP15** Defense and sustain | No new values: the Planet, Vigor and Guard are the defensive build the foe budget prices (alone 26–29% a hit, against its 28%); MP moves from regen to the pool; Vigor's MP rate is the Springs' second knob. *Changed after owner review, 2026-10-24: Tier 3's Swiftness leaves; nothing else moves.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): **MP: the pool, and a base regen for every Uma** (SB18); knobs **SB18's share a depth first**, then Vigor's MP rate, then legs, the Flourish's twists the template's; the Springs test measures region pace against today's (SB14)* | Raise Guard and Vigor; a regen node | The budget prices points; the map keeps six stats |
+| **EP14** Her moon | **Two nodes in every tier, in full (§6):** I her knack (Lv 16, Moon Jewel II; Tireless HP, Clever MP, Mighty DEF and M.DEF, Fleet evasion, Gritty Limit start), II her lead (Lv 36, Moon Jewel IV) **on her calling channel's defense, counted in every class** (CP36's note, WP33); × tier (Fleet, Gritty don't scale); outside the budget; the recommended template set (the signature in the affinity's place, node II on defense) stays at +4–6% in every tier. *Changed after owner review, 2026-10-24: fleshed out; node II's defense moves from a note to the recommendation; the pass decides.* *Follow-up to D197 (Uma Templates), 2026-10-25: **decided (UT10)**: node II on her calling channel's defense; the values as written; the affinity retired (UT11)* | Node II on offense (+6–10% with the signature); a moon that grows each tier; nodes on the shared bodies | The owner: clarity, not more nodes; U12's +5% at every tier |
+| **EP15** Defense and sustain | No new values: the Planet, Vigor and Guard are the defensive build the foe budget prices (alone 26–29% a hit, against its 28%); MP moves from regen to the pool; Vigor's MP rate is the Springs' second knob. *Changed after owner review, 2026-10-24: Tier 3's Swiftness leaves; nothing else moves.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): **MP: the pool, and a base regen for every Uma** (SB18); knobs **SB18's share a depth first**, then Vigor's MP rate, then legs; the Springs test measures region pace against today's (SB14).* *Follow-up to D197 (Uma Templates), 2026-10-25: "the Flourish's twists the template's" removed (UT6)* | Raise Guard and Vigor; a regen node | The budget prices points; the map keeps six stats |
 | **EP16** The foe budget | Rates unchanged; `rpgFoeTierBudget`'s build part × tier; **`onCurveStars` = the core, the same 20 nodes for every class (Prowess at her split);** the weapon moons in each tier's toolbox term. *Changed after owner review, 2026-10-24: was "her class's bodies"; the Halo, Valor, Swiftness for the weapon moons.* *Follow-up to D196 (stat balancing), 2026-10-25 (logged against D194): the weapon moons are a quarter of Tier 2's toolbox (×1.14) and Tier 3's (×1.23), priced in **+27%** and **×1.08 → ×1.48** on the foes' HP and DEF (SB3, SB4; was "Tier 2's term … now prices +12–16%")* | Re-fit the rates; the weapon moons in the build curve | The core matches today's curve within 1.25 points; the tools are priced where the tier's term is |
 | **EP17** Jewel kinds | **Planet Jewel I–V and Moon Jewel I–V (any moon, picked when set) in every tier: 2 kinds, 10 items.** *Changed after owner review, 2026-10-24: the Halo Jewels I–IV retire* | A Weapon Jewel for the weapon moons (a third kind for a moon like the others) | A weapon moon is a moon; one name, one recipe |
 | **EP18** Recipes | Moon Jewel 4 refined (kept), **Planet Jewel 12 (proposed, was 8)**; the type at each grade by profession-progression's ladder; **Lapidary an Uma 120 · 140 · 160 (+8), every class; the whole Uma 485 · 505 · 525**. Profession-progression owns the final amounts (§18.2). *Changed after owner review, 2026-10-24: was Planet 8, Halo 5; 120 · 138 · 156* | Today's recipes (Lapidary 100 · 120 · 140; the magical trade 17.2% in Tier 1); a Moon Jewel of 5 (115 · 140 · 165; 25.2% in Tier 3) | Tier 1 lands back on 120 and 485; every trade 18.6–23.3% in every tier; inside PR10's tenth (+4.1%, +8.2%) |

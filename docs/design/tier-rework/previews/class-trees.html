@@ -245,7 +245,9 @@
     Rank gate and numbers (hover). Pick her <b>default or reverse set</b>, or any kind in any slot: every tree she can slot is full
     (below, <a href="#all">every tree she can slot</a> and <a href="#audit">the audit</a>). Drag <b>Class Rank</b> to see what she
     holds and each skill's <b>Skill Rank</b>. Click a branch to hold it, a tip to take Power or Break; pick her template's
-    <b>affinity</b>. Revised after the owner's review and his second pass (2026-10-24); the Spell Blade's branch B is drawn as the
+    <b>stride</b>: her ★ Flourish at the root and, from Tier 2, her ★ signature tip on her lead weapon's tree (slot 1).
+    <i>Follow-up to D197 (Uma Templates), 2026-10-25: was an affinity picker; the affinity is retired and the tip sits on
+    her lead weapon's tree (<a href="../uma-templates.md#35-the-signature-tip-ut9">uma-templates §3.5</a>, UT6, UT9, UT11).</i> Revised after the owner's review and his second pass (2026-10-24); the Spell Blade's branch B is drawn as the
     proposed <b>Pierce</b> (CP42, for the owner). From <a href="../class-progression.md">class-progression.md</a> §6–§7;
     numbers are the catalog's (<code>catalog.ts</code>) for every node that exists today, and the doc's rules for the new ones. The
     other pages: <a href="class-overview.html">overview</a> · <a href="class-templates.html">templates</a> ·
@@ -256,7 +258,7 @@
   </div>
   <div class="controls"><div class="pills" id="sets"></div></div>
   <div class="controls"><div class="slotsel" id="slots"></div><button class="linkish" id="reset">Back to the defaults</button>
-    <label class="affsel">★ Her affinity (template) <select id="aff"></select></label></div>
+    <label class="affsel">★ Tip on her lead weapon · her stride <select id="aff"></select></label></div>
   <div class="crbox panel"><div class="crtop"><label for="cr"><b>Class Rank</b></label><input type="range" id="cr" min="1" max="50" value="26">
     <span class="crval"><b id="crv">26</b> <span class="muted" id="crlv"></span></span><span class="muted" id="crnext" style="margin-left:auto;font-size:12px"></span></div>
     <div id="crline"></div></div>
@@ -425,7 +427,14 @@ const MAST = { brawler: ['Unstoppable', 'An unbroken foe takes ×0.6 from her hi
 const GATE = [1, 10, 20, 30, 40, 50];
 const TARGET = { one: 'one foe', all: 'every foe', random: 'random foes', party: 'every Uma', self: 'herself' };
 const MULT = [0.95, 0.975, 1, 1.025, 1.05];
-let cls = 'brawler', tier = 2, cr = 26, aff = 'fire', spec = {};
+// Follow-up to D197 (Uma Templates), 2026-10-25: the affinity picker became her stride (UT6, UT9, UT11).
+let cls = 'brawler', tier = 2, cr = 26, stride = 'middle', spec = {};
+const TIPS = { dash: ['Dash', 'Quickstep', 'the tip lands two more hits, the same total power'],
+  middle: ['Middle', 'Spillover', 'the tip, and a splash on every other foe at ×0.3 of its power (+4 MP)'],
+  stayer: ['Stayer', 'Long guard', 'the tip, and a Barrier on herself of 10% of her max HP until the round\'s end (+2 MP)'] };
+const FLOUR = { dash: ['Clean break', 'a Barrier of 4% of her max HP when the fight starts'],
+  middle: ['Even pace', '1% of her max HP back at each round\'s end, up to 4% a fight'],
+  stayer: ['Late reserve', '2% of her max HP back a round from round 3, up to 4% a fight'] };
 let weapons = {}; // class -> [3 kinds]
 const state = {}; // `${cls}|${kind}|${tier}` -> { held: [...], tips: {A:'P'} }
 const getW = () => (weapons[cls] ||= [...C[cls].def]);
@@ -437,7 +446,6 @@ function st(kind) { const key = `${cls}|${kind}|${tier}`; return (state[key] ||=
 /** Skill Rank at Class Rank `cr` for a node opening at `gate` (CP32): 0 locked, 1–5; depth 6 opens whole (no ranks). */
 const rankAt = (gate) => (cr < gate ? 0 : gate >= 50 ? -1 : Math.min(5, 1 + Math.floor((cr - gate) / 2)));
 const fmtP = (p) => (Math.round(p * 100) / 100).toString();
-const affKinds = () => (aff === 'none' ? [] : [TW[aff].arm, TW[aff].tome]);
 const lvOf = (r) => Math.max(1, Math.round(r * 0.68));
 /** Put one branch's set in her slots (the one-tap preset). */
 const useSet = (i) => { weapons[cls] = [...BRANCHES[cls].b[i].set]; };
@@ -454,9 +462,9 @@ function controls() {
   document.getElementById('slots').innerHTML = sl.map((ch, i) => `<label>Slot ${i + 1} ${chan(ch)}<select data-i="${i}">${['ring', 'ld'].map((g) => `<optgroup label="${GROUPS[g].name}">${KINDS.filter((k) => k.ch === ch && grpOf(k.id) === g).map((k) => `<option value="${k.id}"${w[i] === k.id ? ' selected' : ''}>${k.weapon}${B.b[0].set[i] === k.id ? ' (default)' : B.b[1].set.includes(k.id) && !B.b[0].set.includes(k.id) ? ' (reverse set)' : ''}</option>`).join('')}</optgroup>`).join('')}</select></label>`).join('');
   document.querySelectorAll('#slots select').forEach((s) => s.addEventListener('change', () => { const i = +s.dataset.i, w2 = getW(), j = w2.indexOf(s.value); if (j >= 0 && j !== i) w2[j] = w2[i]; w2[i] = s.value; render(); }));
   const as = document.getElementById('aff');
-  as.innerHTML = [['none', 'None'], ...TWINS.map((tw) => [tw.id, `${tw.el} twins: ${K[tw.arm].weapon} · ${K[tw.tome].weapon}`])].map(([id, n]) => `<option value="${id}"${aff === id ? ' selected' : ''}>${n}</option>`).join('');
+  as.innerHTML = Object.entries(TIPS).map(([id, [sd, tp]]) => `<option value="${id}"${stride === id ? ' selected' : ''}>${sd}: ${FLOUR[id][0]} · ${tp}</option>`).join('');
 }
-document.getElementById('aff').addEventListener('change', (e) => { aff = e.target.value; render(); });
+document.getElementById('aff').addEventListener('change', (e) => { stride = e.target.value; render(); });
 document.getElementById('cr').addEventListener('input', (e) => { cr = +e.target.value; render(); });
 document.getElementById('reset').addEventListener('click', () => { weapons[cls] = [...C[cls].def]; spec[cls] = 0; Object.keys(state).filter((k) => k.startsWith(cls + '|')).forEach((k) => delete state[k]); render(); });
 
@@ -483,13 +491,12 @@ function crLine() {
 function rootPlate() {
   const c = C[cls], B = BRANCHES[cls], m = MAST[cls]; if (spec[cls] === undefined) spec[cls] = 0; const br = brOf();
   const el = document.getElementById('root'); el.style.setProperty('--cc', c.c);
-  const ak = affKinds(), hold = getW().filter((k) => ak.includes(k));
   el.innerHTML = `<div class="who"><b>${c.name}</b><span>${c.type} · ${c.arms} Arms + ${3 - c.arms} Tome${3 - c.arms === 1 ? '' : 's'}</span><span>${HAND[cls]}</span></div>
-    <div class="rslot tpl" id="fl"><b>★ Flourish · ★ affinity</b>${aff === 'none' ? 'No affinity picked.' : `Affinity: the ${TW[aff].el} twins, +6% with ${K[TW[aff].arm].weapon} and ${K[TW[aff].tome].weapon} hits. ${hold.length ? `She holds ${hold.map((k) => K[k].weapon).join(' and ')}.` : `Her three hold neither: slot one (a free swap) to use it.`}`} The Flourish (an MP twist) as her calling, every tier.</div>
+    <div class="rslot tpl" id="fl"><b>★ Flourish: ${FLOUR[stride][0]}</b>${FLOUR[stride][1]}, as her calling, every tier. ${tier >= 2 ? `★ Signature tip: ${TIPS[stride][1]}, at the tip fork of her lead weapon's tree (${K[getW()[0]].weapon}).` : 'From Tier 2, her ★ signature tip on her lead weapon\'s tree.'}</div>
     <div class="rslot${tier < 2 ? ' off' : ''}"><b>Class branch${tier < 2 ? ' · from Tier 2' : `: ${br.n} · ${GROUPS[br.g].name} focus`}</b>${tier < 2 ? `${B.b[0].n} (${GROUPS[B.b[0].g].name}) or ${B.b[1].n} (${GROUPS[B.b[1].g].name}): a weapon-group focus, +15%, her default or reverse set, three class skills.` : `<div class="spec">${[0, 1].map((i) => `<button data-i="${i}" aria-pressed="${spec[cls] === i}" style="--gc:${GROUPS[B.b[i].g].c}">${B.b[i].n} · ${GROUPS[B.b[i].g].name}</button>`).join('')}</div><div style="margin-top:4px">+15% with ${GROUPS[br.g].kinds.filter((k) => slotsOf(c).includes(K[k].ch)).map((k) => K[k].kind).join(', ')}. Ascend preselects ${B.b[0].n} (branch 1). Picking a branch puts its set in her slots.</div>`}</div>
     <div class="rslot${tier < 3 ? ' off' : ''}"><b>Mastery${tier < 3 ? ' · Tier 3' : `: ${m[0]}`}</b>${tier < 3 ? 'The class\'s mechanic, with her branch\'s capstone at Class Rank 50.' : `${m[1]}. ${cr >= 50 ? 'Open' : 'Opens at Class Rank 50'}, with ${br.sk[3].n}.`}${tier === 3 ? '<div style="margin-top:4px">Master slot: one capstone, outside her ten equipped.</div>' : ''}</div>`;
   el.querySelectorAll('.spec button').forEach((b) => b.addEventListener('click', () => { spec[cls] = +b.dataset.i; useSet(spec[cls]); render(); }));
-  bindTip(document.getElementById('fl'), '★ Her template on the trees', 'The Flourish (variance\'s MP twist by stride) at the root; the affinity (CP36, kept as it is in the second pass, revisited in the Uma Templates pass): +6% damage with one twin set\'s two kinds, every tier, any class; from Tier 2 the signature tip on her affinity kind\'s tree. Which twin set a template names is the Uma Templates pass\'s; the draft is her stride\'s pair.');
+  bindTip(document.getElementById('fl'), '★ Her template on the trees', 'The Flourish at the root: 4% of her max HP a fight in her stride\'s shape (Clean break, Even pace, Late reserve), as her calling, every tier (UT6). From Tier 2 the signature tip, a third option at the tip fork of her lead weapon\'s tree, her first slot (UT9). The affinity is retired, never built (UT11). Follow-up to D197 (Uma Templates), 2026-10-25.');
 }
 
 /** One node box: name, a tag, five rank pips or the Class Rank it waits for. */
@@ -598,7 +605,6 @@ function describe(nd, kind) {
   else if (rk === -1) lines.push('Opens whole at Class Rank 50: no ranks');
   else lines.push(`Skill Rank ${rk} of 5 at Class Rank ${cr}: power ${n.p} × ${MULT[rk - 1]} = ${fmtP(n.p * MULT[rk - 1])}${rk < 5 ? ` · Rank ${rk + 1} at Class Rank ${GATE[d - 1] + 2 * rk}` : ''}`);
   if (tier >= 2) lines.push(foc ? `Focus (${GROUPS[brOf().g].name}, ${brOf().n}): +15% → ${fmtP(n.p * (rk > 0 ? MULT[rk - 1] : 1) * FOCUS)}` : `Off her focus (${GROUPS[brOf().g].name}): no +15%`);
-  if (affKinds().includes(kind)) lines.push(`★ Affinity: +6% (the ${TW[aff].el} twins)`);
   if (tier > 1) lines.push(`Skill MP ×${tier === 2 ? 1.7 : 2.4} in Tier ${tier}`);
   return lines.join('<br>');
 }
@@ -608,13 +614,13 @@ function render() {
   const cn = classTree(), fk = focusKinds();
   if (tier >= 2) cn.forEach((nd) => { if (nd.focus || nd.bi !== spec[cls]) return; const sk = nd.sk, rk = rankAt(sk.cr);
     rows.push([`Class tree · ${nd.br.n}`, '—', sk.cr, 'Class skill', sk.n, TARGET[sk.t], sk.h || '—', sk.p ?? '—', rk === 0 ? 'locked' : rk === -1 ? 'whole' : rk, sk.p && rk > 0 ? fmtP(sk.p * MULT[rk - 1]) : sk.p && rk === -1 ? sk.p : '—', sk.p ? '×1.15' : '—', sk.m, sk.x.join('; '), sk.chg || 'new']); });
-  const ak = affKinds(), sigSlot = w.findIndex((k) => ak.includes(k));
+  const sigSlot = 0; // her lead weapon, the first slot (UT9)
   w.forEach((kind, slot) => {
     const s = st(kind), { svg, nodes, sig } = treeSvg(kind, slot, sigSlot), foc = fk.includes(kind), g = grpOf(kind);
     const picks = s.held.map((b) => `${b}${tier > 1 ? (s.tips[b] === 'P' ? ' · Power' : ' · Break') : ''}`).join(', ');
     const nn = [8, 14, 17][tier - 1], pk = [1, 2, 3][tier - 1], heldN = [5, 5, 10][tier - 1];
     const which = BRANCHES[cls].b[0].set[slot] === kind ? 'default' : BRANCHES[cls].b[1].set.includes(kind) ? 'reverse set' : BRANCHES[cls].b[0].set.includes(kind) ? 'default set' : 'off-default';
-    const div = h('div', { class: 'tree' + (foc ? ' foc' : '') }, `<div class="th"><span class="muted" style="font-size:12px;font-weight:700">SLOT ${slot + 1}</span>${chan(K[kind].ch)}${kchip(kind, { long: true })}<b>${c.name} · ${K[kind].weapon}</b><span class="muted" style="font-size:12px">${which}</span>${gtag(g, tier >= 2 ? (foc ? `${GROUPS[g].name} · focus +15%` : `${GROUPS[g].name} · off-focus`) : GROUPS[g].name)}${ak.includes(kind) ? `<span class="afftag">★ affinity +6%</span>` : ''}<span class="sum">Holds <b>${picks}</b> · ${nn} nodes · ${pk} pick${pk > 1 ? 's' : ''} · ${heldN} skills held</span></div>${svg}`);
+    const div = h('div', { class: 'tree' + (foc ? ' foc' : '') }, `<div class="th"><span class="muted" style="font-size:12px;font-weight:700">SLOT ${slot + 1}</span>${chan(K[kind].ch)}${kchip(kind, { long: true })}<b>${c.name} · ${K[kind].weapon}</b><span class="muted" style="font-size:12px">${which}</span>${gtag(g, tier >= 2 ? (foc ? `${GROUPS[g].name} · focus +15%` : `${GROUPS[g].name} · off-focus`) : GROUPS[g].name)}${slot === 0 && tier >= 2 ? `<span class="afftag">★ her lead weapon: ${TIPS[stride][1]}</span>` : ''}<span class="sum">Holds <b>${picks}</b> · ${nn} nodes · ${pk} pick${pk > 1 ? 's' : ''} · ${heldN} skills held</span></div>${svg}`);
     if (foc) div.style.setProperty('--gc', GROUPS[g].c);
     wrap.append(div);
     div.querySelectorAll('.node').forEach((gn) => { const nd = nodes[+gn.dataset.i]; bindTip(gn, nd.n.n, describe(nd, kind));
@@ -623,7 +629,7 @@ function render() {
         if (!s2.held.includes(nd.br)) { if (tier === 3) { s2.held = [s2.held[1], nd.br]; } else s2.held = [nd.br]; if (nd.tip) s2.tips[nd.br] = nd.tip; }
         tip.style.opacity = 0; render(); });
       gn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gn.dispatchEvent(new Event('click')); } }); });
-    if (sig) bindTip(div.querySelector('.sigslot'), '★ Signature tip (template slot)', `From Tier 2: a third option at this tree's tip fork, on her affinity kind's tree (CP36; her lead half's if she holds both), as her calling; at both of its tip forks in Tier 3. Filled by the Uma Templates pass.`);
+    if (sig) bindTip(div.querySelector('.sigslot'), `★ Signature tip: ${TIPS[stride][1]}`, `From Tier 2: a third option at this tree's tip fork beside Power and Break, on her lead weapon's tree (her first slot), as her calling: ${TIPS[stride][2]}. At both of its tip forks in Tier 3. Follow-up to D197 (Uma Templates), 2026-10-25 (UT9).`);
     bindKinds(div);
     nodes.forEach((nd) => { const rk = rankAt(GATE[nd.d - 1]); rows.push([`${slot + 1} · ${K[kind].weapon}`, nd.d, GATE[nd.d - 1], nd.br ? `${nd.br}${nd.tip ? (nd.tip === 'P' ? ' Power' : ' Break') : ''}` : 'Trunk', nd.n.n, TARGET[nd.n.t], nd.n.h, nd.n.p, rk === 0 ? 'locked' : rk === -1 ? 'whole' : rk, rk > 0 ? fmtP(nd.n.p * MULT[rk - 1]) : rk === -1 ? nd.n.p : '—', foc ? '×1.15' : '—', nd.n.m, nd.n.x.join('; '), nd.n.prop ? `${nd.n.id || 'new'} · proposed` : nd.n.id || 'new']); });
   });

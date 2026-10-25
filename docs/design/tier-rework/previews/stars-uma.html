@@ -155,10 +155,13 @@
   <h1>Her moon: the template's two nodes, in full</h1>
   <p class="lead">The owner's review: "I need more clarity on the Uma variance for stats, maybe flesh it out more." Her moon
     is her Uma Template's place on the map: <b>node I her knack</b> (her top growth's stat), <b>node II her lead</b> (her
-    calling channel's defense, recommended), two Moon Jewels a tier, × tier. Every knack, the lead's options, six made-up
+    calling channel's defense, decided), two Moon Jewels a tier, × tier. Every knack, the lead's options, six made-up
     Umas (one per calling), how it shows, and the template's damage budget against U12's +5% at every tier. Revised
     2026-10-24. From <a href="../extra-stats-progression.md">extra-stats-progression.md</a> §6; the catalog is
-    <a href="../variance.md">variance.md</a>'s.</p>
+    <a href="../uma-templates.md">uma-templates.md</a>'s. <i>Follow-up to D197 (Uma Templates), 2026-10-25: her moon's values
+    are final as drawn, node II on defense (UT10); the Flourish is 4% of her max HP a fight with the new names (UT6, UT16); her
+    signature family is her knack's (UT7); the affinity is retired (UT11). All of the template's pieces are drawn on
+    <a href="uma-gives.html">what a template gives</a>.</i></p>
   <nav class="top">
     <a href="#slot">The slot</a><a href="#knacks">Five knacks</a><a href="#lead">Her lead</a><a href="#umas">Six Umas</a><a href="#budget">The budget</a><a href="#shows">How it shows</a>
     <a class="out" href="stars-maps.html">Maps →</a><a class="out" href="stars-grants.html">Grants →</a><a class="out" href="stars-jewels.html">Jewels →</a>
@@ -189,7 +192,8 @@
     <h2>Her lead: node II</h2>
     <p class="sub">Read from her calling: physical (Brawler, Spell Blade, Paladin) or magical (Mage, Summoner, Cleric). The
       first draft put +8 on her calling channel's offense; CP36's note and the signature accessory (WP33) move it to her
-      calling channel's defense, so the template's damage stays one piece's. The Uma Templates pass decides.</p>
+      calling channel's defense, so the template's damage stays one piece's. <b>Decided by the Uma Templates pass (UT10):
+      defense.</b> <i>Follow-up to D197 (Uma Templates), 2026-10-25: was "The Uma Templates pass decides".</i></p>
     <div class="panel scroll"><table id="lead-table"></table></div>
   </section>
 
@@ -207,10 +211,12 @@
       tier's Lv 50, on the full build (the grants page's model). The band is U12's +4–6%.</p>
     <div class="panel"><div class="chart-legend" id="bud-legend"></div><div id="bud-chart"></div>
       <details><summary>Show the numbers</summary><div class="scroll" id="bud-table"></div></details></div>
-    <div class="callout"><b>Recommended: the signature accessory in the affinity's place, node II on defense.</b>Her template's
+    <div class="callout"><b>Decided (UT11, UT13): the signature accessory in the affinity's place, node II on defense.</b>Her template's
       damage is the signature's alone: +5.1–6.2% in Tier 1, +4.5–5.3% in Tier 2, +4.2–4.8% in Tier 3. It eases by Tier 3
-      because later tiers add flat offense on her kinds (weapon moons, accessory branches) faster than × tier; if the Uma
-      Templates pass wants +5% exactly at every tier, the signature's rate a level is the knob. Her knack adds no damage.</div>
+      because later tiers add flat offense on her kinds (weapon moons, accessory branches) faster than × tier; if the owner
+      wants a stronger edge after playing it, the signature's rate a level is the dial (UT20). Her knack adds no damage; the
+      Flourish adds defense, never pace. <i>Follow-up to D197 (Uma Templates), 2026-10-25: was "Recommended"; the affinity
+      is retired (UT11).</i></div>
   </section>
 
   <section id="shows">
@@ -288,13 +294,16 @@ const KN = [
 const LEAD = [8, 14, 21];
 const UMAS = [
   { id: 'A', prof: 'Front A · Medium A, Long A · growth Stamina +20%, Guts +10%', calling: ['Brawler', 'physical', 'Front'], stride: ['Stayer', 'Long A'], knack: 'tireless', type: 'Ironhide', flourish: 'Late reserve', tip: 'Long guard' },
-  { id: 'B', prof: 'Pace A · Mile A · Power 96 > Wit 84 · growth Speed +20%', calling: ['Spell Blade', 'physical', 'Pace, Power over Wit'], stride: ['Dash', 'Mile A'], knack: 'fleet', type: 'Flashblade', flourish: 'Opening', tip: 'Breakaway' },
-  { id: 'C', prof: 'Pace A · Medium A · Wit 102 ≥ Power 90 · growth Wit +20%', calling: ['Mage', 'magical', 'Pace, Wit at or over Power'], stride: ['Middle', 'Medium A'], knack: 'clever', type: 'Spellwright', flourish: 'Even pace', tip: 'Spread' },
+  { id: 'B', prof: 'Pace A · Mile A · Power 96 > Wit 84 · growth Speed +20%', calling: ['Spell Blade', 'physical', 'Pace, Power over Wit'], stride: ['Dash', 'Mile A'], knack: 'fleet', type: 'Flashblade', flourish: 'Clean break', tip: 'Quickstep' },
+  { id: 'C', prof: 'Pace A · Medium A · Wit 102 ≥ Power 90 · growth Wit +20%', calling: ['Mage', 'magical', 'Pace, Wit at or over Power'], stride: ['Middle', 'Medium A'], knack: 'clever', type: 'Spellwright', flourish: 'Even pace', tip: 'Spillover' },
   { id: 'D', prof: 'End A · Long A · growth Guts +20%', calling: ['Summoner', 'magical', 'End'], stride: ['Stayer', 'Long A'], knack: 'gritty', type: 'Shepherd', flourish: 'Late reserve', tip: 'Long guard' },
-  { id: 'E', prof: 'Late A · Medium A · Power 104 > Wit 88 · growth Power +20%', calling: ['Paladin', 'physical', 'Late, Power over Wit'], stride: ['Middle', 'Medium A'], knack: 'mighty', type: 'Warden', flourish: 'Even pace', tip: 'Spread' },
-  { id: 'F', prof: 'Late A (Pace B, End C) · Mile A · Wit 98 ≥ Power 92 · growth Stamina +20%', calling: ['Cleric', 'magical', 'Late, Wit at or over Power'], stride: ['Dash', 'Mile A'], knack: 'tireless', type: 'Lamplighter', flourish: 'Opening', tip: 'Breakaway' },
+  { id: 'E', prof: 'Late A · Medium A · Power 104 > Wit 88 · growth Power +20%', calling: ['Paladin', 'physical', 'Late, Power over Wit'], stride: ['Middle', 'Medium A'], knack: 'mighty', type: 'Warden', flourish: 'Even pace', tip: 'Spillover' },
+  { id: 'F', prof: 'Late A (Pace B, End C) · Mile A · Wit 98 ≥ Power 92 · growth Stamina +20%', calling: ['Cleric', 'magical', 'Late, Wit at or over Power'], stride: ['Dash', 'Mile A'], knack: 'tireless', type: 'Lamplighter', flourish: 'Clean break', tip: 'Quickstep' },
 ];
 const kn = (k) => KN.find((x) => x.k === k);
+// Follow-up to D197 (Uma Templates), 2026-10-25: the Flourish on HP and its new names (UT6, UT16); her family by knack (UT7).
+const FLOUR = { 'Clean break': 'a Barrier of 4% of her max HP at the start', 'Even pace': '1% of her max HP a round, up to 4%', 'Late reserve': '2% of her max HP a round from round 3, up to 4%' };
+const FAMN = { fleet: 'Bell', mighty: 'Orb', tireless: 'Pendant', gritty: 'Insignia', clever: 'Insignia' };
 const leadStat = (u) => (u.calling[1] === 'physical' ? 'DEF' : 'M.DEF');
 
 kpis(document.getElementById('kpis'), [
@@ -303,7 +312,7 @@ kpis(document.getElementById('kpis'), [
   ['Jewels a tier', 'Moon II, IV', '8 refined; from the shared stock', 'var(--b-grd)'],
   ['Values', '× 1 · 1.8 · 2.6', 'Knack +4 → +10 points; lead +8 → +21', 'var(--b-planet)'],
   ['Knacks', '5', 'Tireless, Clever, Mighty, Fleet, Gritty', 'var(--b-vig)'],
-  ['Lead (recommended)', 'Defense', 'Her calling channel’s: DEF or M.DEF, every class', 'var(--b-wm1)'],
+  ['Lead (decided, UT10)', 'Defense', 'Her calling channel’s: DEF or M.DEF, every class', 'var(--b-wm1)'],
 ]);
 
 // --- The slot -----------------------------------------------------------------------------------------------------------
@@ -338,7 +347,7 @@ document.getElementById('slot-table').innerHTML = `<thead><tr><th></th><th>Node 
   <tr><td>Read from</td><td>Her top growth rate (U6)</td><td>Her calling's channel (U4): physical or magical</td></tr>
   <tr><td>Opens</td><td>Lv 16, Moon Jewel II</td><td>Lv 36, Moon Jewel IV</td></tr>
   <tr><td>Worth</td><td>+4 points × tier (grade 4)</td><td>+8 points × tier (grade 8)</td></tr>
-  <tr><td>Gives</td><td>Her knack's stat (five, below)</td><td><b>Her calling channel's defense</b> (recommended): DEF if physical, M.DEF if magical</td></tr>
+  <tr><td>Gives</td><td>Her knack's stat (five, below)</td><td><b>Her calling channel's defense</b> (decided, UT10): DEF if physical, M.DEF if magical</td></tr>
   <tr><td>Counts</td><td>In every class</td><td>In every class (a defense)</td></tr>
   <tr><td>Tier 1 · 2 · 3</td><td>+4 · +7 · +10 points</td><td>+8 · +14 · +21</td></tr>
   <tr><td>Budget</td><td colspan="2">Outside the foe budget (XR12); the template's damage is U12's: about +5% when matched (§ budget)</td></tr></tbody>`;
@@ -352,7 +361,7 @@ document.getElementById('kcards').innerHTML = KN.map((x) => `<div class="kcard" 
 (function lead() {
   const r = (k, t) => { const v = CLASSES.map(([c]) => TB[c][t][k]); return `+${(Math.min(...v) * 100).toFixed(1)}–${(Math.max(...v) * 100).toFixed(1)}%`; };
   document.getElementById('lead-table').innerHTML = `<thead><tr><th>Option for node II</th><th>Gives, T1 · T2 · T3</th><th>Counts</th><th>Damage a matched Uma gains, T1 · T2 · T3</th><th>With the signature</th><th>The call</th></tr></thead><tbody>
-    <tr class="hl"><td><b>Her calling channel's defense</b></td><td>DEF or M.DEF +8 · +14 · +21</td><td>Every class</td><td>None</td><td>${[1, 2, 3].map((t) => r('signature', t)).join(' · ')}</td><td><b>Recommended</b> (CP36's note, WP33): the template's damage is one piece's, near U12</td></tr>
+    <tr class="hl"><td><b>Her calling channel's defense</b></td><td>DEF or M.DEF +8 · +14 · +21</td><td>Every class</td><td>None</td><td>${[1, 2, 3].map((t) => r('signature', t)).join(' · ')}</td><td><b>Decided</b> (UT10; CP36's note, WP33): the template's damage is one piece's, near U12</td></tr>
     <tr><td>Her calling channel's offense (variance U10's draft)</td><td>ATK or M.ATK +8 · +14 · +21</td><td>Classes that hit or mend with it</td><td>${[1, 2, 3].map((t) => r('leadOff', t)).join(' · ')}</td><td>${[1, 2, 3].map((t) => r('sigLead', t)).join(' · ')}</td><td>Past U12 with the signature</td></tr></tbody>`;
 })();
 
@@ -363,21 +372,21 @@ function renderUma() {
   const u = UMAS.find((x) => x.id === cur), k = kn(u.knack), ls = leadStat(u);
   document.getElementById('ucard').innerHTML = `<div class="muted" style="font-size:12.5px">Uma ${u.id} (made up) · ${u.prof}</div>
     <div class="tname">★ ${k.w} ${u.type}</div>
-    <div class="reads"><div><span>Calling ← ${u.calling[2]}</span><b>${u.calling[0]}</b><span>${u.calling[1]} channel</span></div><div><span>Stride ← ${u.stride[1]}</span><b>${u.stride[0]}</b><span>Flourish: ${u.flourish}</span></div><div><span>Knack ← ${k.g} growth</span><b>${k.w}</b><span>${k.stat}</span></div></div>
+    <div class="reads"><div><span>Calling ← ${u.calling[2]}</span><b>${u.calling[0]}</b><span>${u.calling[1]} channel</span></div><div><span>Stride ← ${u.stride[1]}</span><b>${u.stride[0]}</b><span>Flourish: ${u.flourish} (4% HP a fight)</span></div><div><span>Knack ← ${k.g} growth</span><b>${k.w}</b><span>${k.stat}</span></div></div>
     <table class="mtable"><thead><tr><th>Her moon</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th>Counts</th></tr></thead><tbody>
       <tr><td><b>I, knack</b> · Lv 16 · Moon Jewel II</td>${[0, 1, 2].map((i) => `<td>${k.u(k.v[i])}</td>`).join('')}<td>Every class</td></tr>
       <tr><td><b>II, lead</b> · Lv 36 · Moon Jewel IV</td>${LEAD.map((v) => `<td>${ls} +${v}</td>`).join('')}<td>Every class</td></tr></tbody></table>
-    <p class="note"><b>As another class</b> both nodes still count (node II is a defense): ${u.calling[0] === 'Mage' ? 'as a Brawler' : 'as a Mage'} she keeps ${k.u(k.v[0])} and ${ls} +8 in Tier 1. Her Flourish (${u.flourish}) and her signature tip (${u.tip}, Tier 2 on) work only as a ${u.calling[0]}. Her signature accessory's family is the Uma Templates pass's to name.</p>`;
+    <p class="note"><b>As another class</b> both nodes still count (node II is a defense): ${u.calling[0] === 'Mage' ? 'as a Brawler' : 'as a Mage'} she keeps ${k.u(k.v[0])} and ${ls} +8 in Tier 1. Her Flourish (${u.flourish}) and her signature tip (${u.tip}, Tier 2 on) work only as a ${u.calling[0]} (${u.flourish}: ${FLOUR[u.flourish]}). Her signature accessory is her knack's family, <b>${/^[AEIOU]/.test(FAMN[u.knack]) ? 'an' : 'a'} ${FAMN[u.knack]}</b>: ATK and M.ATK +10 at Lv 50 while she wears it, in every class.</p>`;
 }
 document.getElementById('ulist').innerHTML = UMAS.map((u) => `<button data-u="${u.id}" aria-pressed="false">Uma ${u.id}: ${kn(u.knack).w} ${u.type}<small>${u.calling[0]} · ${u.stride[0]} · ${kn(u.knack).g}</small></button>`).join('');
 document.querySelectorAll('#ulist button').forEach((b) => b.addEventListener('click', () => { cur = b.dataset.u; renderUma(); }));
 renderUma();
-document.getElementById('uma-table').innerHTML = `<table><thead><tr><th>Uma</th><th>Profile</th><th>Template</th><th>★ I, knack: T1 · T2 · T3</th><th>★ II, lead: T1 · T2 · T3</th><th>Flourish</th></tr></thead><tbody>` +
+document.getElementById('uma-table').innerHTML = `<table><thead><tr><th>Uma</th><th>Profile</th><th>Template</th><th>★ I, knack: T1 · T2 · T3</th><th>★ II, lead: T1 · T2 · T3</th><th>Flourish (4% of her max HP a fight)</th></tr></thead><tbody>` +
   UMAS.map((u) => { const k = kn(u.knack); return `<tr><td><b>Uma ${u.id}</b></td><td>${u.prof}</td><td>${u.calling[0]} · ${u.stride[0]}: <b>${k.w} ${u.type}</b></td><td>${k.v.map((v) => k.u(v)).join(' · ')}</td><td>${leadStat(u)} ${LEAD.map((v) => '+' + v).join(' · ')}</td><td>${u.flourish}</td></tr>`; }).join('') + '</tbody></table>';
 
 // --- Budget -------------------------------------------------------------------------------------------------------------
 (function budget() {
-  const SETS = [['signature', 'Signature, node II on defense (recommended)', 'var(--b-wm1)'], ['sigLead', 'Signature and node II on offense', 'var(--c5)'], ['sigAff', 'Signature and the affinity', 'var(--neutral-strong)']];
+  const SETS = [['signature', 'Signature, node II on defense (decided)', 'var(--b-wm1)'], ['sigLead', 'Signature and node II on offense', 'var(--c5)'], ['sigAff', 'Signature and the affinity (retired, UT11)', 'var(--neutral-strong)']];
   const val = (c, t, k) => (k === 'sigAff' ? (1 + TB[c][t].signature) * 1.05 - 1 : TB[c][t][k]);
   document.getElementById('bud-legend').innerHTML = SETS.map(([, l, c]) => `<span><span class="sw" style="background:${c}"></span>${l}</span>`).join('') + '<span><span class="sw" style="background:var(--accent);opacity:.35"></span>U12: about +5%</span>';
   const W = 1180, lw = 130, rowH = 9, gap = 2, sub = 3 * (rowH + gap) + 6, grp = 3 * sub + 12, max = 0.12, iw = W - lw - 120;
@@ -399,7 +408,7 @@ document.getElementById('uma-table').innerHTML = `<table><thead><tr><th>Uma</th>
   bindAll(document.getElementById('bud-chart'));
   document.getElementById('bud-table').innerHTML = `<table><thead><tr><th>Class</th><th>Tier</th><th class="num">Signature (+10 · +18 · +26)</th><th class="num">Node II on offense alone</th><th class="num">Signature + node II on offense</th><th class="num">Signature + affinity (≈ ×1.05)</th></tr></thead><tbody>` +
     CLASSES.map(([c, nm]) => [1, 2, 3].map((t) => `<tr><td>${t === 1 ? `<b>${nm}</b>` : ''}</td><td>T${t}</td><td class="num">${sgnPct(TB[c][t].signature)}</td><td class="num">${sgnPct(TB[c][t].leadOff)}</td><td class="num">${sgnPct(TB[c][t].sigLead)}</td><td class="num">${sgnPct(val(c, t, 'sigAff'))}</td></tr>`).join('')).join('') +
-    '</tbody></table><p class="foot">Her act at each tier\'s Lv 50, matched (her calling\'s class), the full build with her preset accessories and weapon moons; the affinity is CP36\'s "about +5% a fight matched". Her knack adds no damage.</p>';
+    '</tbody></table><p class="foot">Her act at each tier\'s Lv 50, matched (her calling\'s class), the full build with her preset accessories and weapon moons; the affinity is CP36\'s "about +5% a fight matched", retired by the Uma Templates pass (UT11), drawn for the record. Her knack adds no damage.</p>';
 })();
 
 // --- How it shows -------------------------------------------------------------------------------------------------------
@@ -413,7 +422,8 @@ document.getElementById('mocks').innerHTML = `
     <div class="line"><b><span class="star">★</span> Tireless Ironhide</b>The chip after her class chip; tap for the sheet</div>
     <div class="line"><b>Calling ← Front A · Stride ← Long A · Knack ← Stamina +20%</b>Brawler · Stayer · Tireless</div>
     <div class="line"><b>Moon</b>I HP +20 (knack) · II DEF +8 (lead: a physical calling) · both count in every class</div>
-    <div class="line"><b>Flourish (as a Brawler)</b>Late reserve: from round 3, 3% of her max MP a round</div></div>
+    <div class="line"><b>Flourish (as a Brawler)</b>Late reserve: from round 3, 2% of her max HP a round, up to 4% a fight</div>
+    <div class="line"><b><span class="star">★</span> Signature · Pendant</b>Her knack's family (Tireless): ATK and M.ATK +10 at Lv 50, worn</div></div>
   <div class="mock"><h4>The Battle tab (Lv 50) and the Set list</h4>
     <div class="line"><b>HP 1,497</b>Extra Stats +255 <span class="star">★ +20</span> in the green bracket</div>
     <div class="line"><b>DEF 215</b>Extra Stats +51 <span class="star">★ +8</span></div>

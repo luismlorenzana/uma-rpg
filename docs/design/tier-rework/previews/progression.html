@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tier Progression Roadmap</title>
-<!-- The Tier rework's whole-rework view: a roadmap of when each category unlocks what, level by level, across the three
-     tiers, then the counts, the choices, the Tier 1 simplification, the workload and the full matrix. Numbers are the
-     cross-referenced docs' (README §2, §10). Colours: uma-kit's theme tokens for the page; the six categories use the
-     dataviz reference palette's first six slots, validated on the kit's surfaces (light #ffffff, dark #17202b). -->
+<!-- The Tier rework's whole-rework view, refreshed 2026-10-25 to the approved docs (D192–D198): a roadmap of when each
+     category unlocks what, level by level, across the three tiers; the five releases that ship it; the counts, the
+     choices, the Tier 1 simplification, the pace and the full matrix. Numbers are the approved docs' (README §2.1–§2.2,
+     class-, weapon-, extra-stats- and profession-progression, stat-balance, uma-templates, implementation §1).
+     Colours: uma-kit's theme tokens for the page; the six categories use the dataviz reference palette's first six slots,
+     validated on the kit's surfaces (light #ffffff, dark #17202b). -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -17,6 +19,7 @@
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
     --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --tk1: #9c7a00; --tk2: #c2502a; --tk3: #7a5ad0;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
@@ -27,28 +30,31 @@
       --grid: #243041; --axis: #34445a; --neutral: #4a586b; --neutral-strong: #6b7a8e;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
       --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+      --tk1: #e8c25a; --tk2: #e0784a; --tk3: #9a80e6;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  a { color: inherit; }
   h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
   h2 { font-size: 20px; margin: 0 0 4px; }
   h3 { font-size: 14px; margin: 0 0 2px; }
   p { margin: 0; }
-  .lead { color: var(--ink-soft); max-width: 900px; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
   .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
   .muted { color: var(--ink-faint); }
-  section { margin-top: 40px; }
-  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  section { margin-top: 40px; scroll-margin-top: 60px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
     margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
   nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
   nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
 
   /* KPI tiles */
-  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; }
-  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   .kpi .label { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
   .kpi .value { font-size: 22px; font-weight: 650; margin-top: 4px; }
   .kpi .value .was { color: var(--ink-faint); font-weight: 500; }
@@ -56,7 +62,7 @@
   .sw { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
 
   /* Tier themes */
-  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .themes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
   .theme { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 4px solid var(--tc); }
   .theme .n { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
   .theme b { display: block; font-size: 16px; margin: 2px 0 4px; }
@@ -66,15 +72,15 @@
   .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 10px 0 14px; align-items: center; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .tierblock { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
-  .tierhead { display: grid; grid-template-columns: 140px 250px 1fr; align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
+  .tierhead { display: grid; grid-template-columns: 140px 260px minmax(0, 1fr); align-items: end; padding: 12px 0 6px; border-top: 5px solid var(--tc); }
   .tierhead .title { grid-column: 1 / 3; padding-left: 20px; }
   .tierhead .title b { font-size: 17px; } .tierhead .title span { color: var(--ink-soft); margin-left: 8px; font-size: 13px; }
   .axis { position: relative; height: 18px; font-size: 11px; color: var(--ink-faint); }
   .axis i { position: absolute; transform: translateX(-50%); font-style: normal; white-space: nowrap; }
   .axis i:first-child { transform: none; } .axis i:last-child { transform: translateX(-100%); }
-  .lane { display: grid; grid-template-columns: 140px 250px 1fr; border-top: 1px solid var(--hairline); }
+  .lane { display: grid; grid-template-columns: 140px 260px minmax(0, 1fr); border-top: 1px solid var(--hairline); }
   .lane .name { padding: 10px 12px 10px 20px; font-weight: 650; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
-  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; }
+  .lane .start { padding: 8px 12px; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); background: var(--raised); display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
   .lane .start .chip { white-space: normal; }
   .lane .start .note { font-size: 11px; color: var(--ink-faint); line-height: 1.35; }
   .track { position: relative; margin: 0 24px 0 18px; }
@@ -85,12 +91,12 @@
   .chip.step { font-weight: 500; color: var(--ink-soft); background: transparent; }
   .chip.step .pin { background: transparent !important; border: 2px solid var(--neutral-strong); width: 8px; height: 8px; }
   .chip.craft { border-style: dashed; }
-  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip:focus-visible, .tick:focus-visible, .mark:focus-visible, .rel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .ev { position: absolute; }
   .ev.right { transform: translateX(-100%); }
   .ev.right .chip { flex-direction: row-reverse; padding: 3px 7px 3px 9px; }
   .ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 16px; }
-  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); }
+  .tick { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; color: var(--ink-faint); white-space: nowrap; }
   .tick .m { width: 2px; height: 6px; background: var(--neutral-strong); border-radius: 1px; }
   .tick .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral-strong); }
   .tick .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--neutral-strong); }
@@ -98,18 +104,39 @@
   .promo .arrow { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); font-size: 18px; color: var(--ink); }
   .promo b { color: var(--ink); }
 
+  /* How it ships */
+  .ships { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-top: 6px; }
+  .ships::before { content: ""; position: absolute; left: 4%; right: 4%; top: 25px; height: 2px; background: var(--axis); }
+  .rel { position: relative; background: var(--panel); border-radius: 12px; box-shadow: 0 1px 0 var(--hairline-strong); padding: 0 14px 12px; min-width: 0; border-top: 4px solid var(--tc); }
+  .rel .hd { display: flex; align-items: center; gap: 8px; padding: 10px 0 6px; }
+  .rel .num { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--tc); color: #fff; box-shadow: 0 0 0 4px var(--panel); }
+  .rel .num.lt { color: #1b1406; }
+  .rel .nm { font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .rel .ver { font-size: 11.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .rel ul { margin: 6px 0 0; padding-left: 16px; font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
+  .rel li { margin: 2px 0; }
+  .rel li b { color: var(--ink); font-weight: 600; }
+  .rel .cats { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+  .rel .cat { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink-soft); padding: 1px 6px; border-radius: 6px; background: var(--raised); }
+  .tierband { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+  .tierband div { grid-column: span 2; border-top: 3px solid var(--tc); padding-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .tierband div:last-child { grid-column: span 1; }
+
   /* Charts */
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .multiples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .multiples { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
   .mini h3 { display: flex; align-items: center; gap: 6px; }
   .mini .cat { font-size: 11px; color: var(--ink-faint); margin-bottom: 6px; }
   svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  svg { display: block; }
   .axis-text { fill: var(--ink-faint); font-size: 11px; }
   .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; }
   .val-soft { fill: var(--ink-soft); font-size: 11px; }
   .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 8px 0 4px; }
   .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .ln { width: 16px; height: 0; border-top: 2px solid; display: inline-block; }
+  .ln.dash { border-top-style: dashed; }
   details { margin-top: 10px; }
   summary { cursor: pointer; color: var(--ink-soft); font-size: 12px; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -126,56 +153,67 @@
   .matrix b { color: var(--ink); }
 
   /* Tooltip */
-  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+  #tip { position: fixed; left: 0; top: 0; z-index: 20; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
     font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
   #tip b { display: block; margin-bottom: 2px; }
-  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, 1fr); } .multiples { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .multiples { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: minmax(0, 1fr); } .ships { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ships::before { display: none; } }
 </style>
 </head>
 <body>
 <main>
 <div role="note" style="border-left:4px solid var(--accent, #d39a2b); background:var(--accent-wash, rgba(211,154,43,0.12)); color:inherit; padding:12px 16px; border-radius:10px; margin:0 0 20px; font-size:14px; line-height:1.5">
-  <b style="display:block;margin-bottom:4px">Reflects the first round (2026-10-22/23); refreshed after the standalone docs are decided.</b>
-  The current design is in the four standalone docs: <a href="../class-progression.md">Class Progression</a> ·
+  <b style="display:block;margin-bottom:4px">Refreshed 2026-10-25 to the approved docs (D192–D198).</b>
+  The design is in the approved docs: <a href="../class-progression.md">Class Progression</a> ·
   <a href="../weapon-progression.md">Weapon Progression</a> · <a href="../extra-stats-progression.md">Extra Stats Progression</a> ·
-  <a href="../profession-progression.md">Profession Progression</a>; the shared frame is the <a href="../README.md">README</a> (§2).
+  <a href="../profession-progression.md">Profession Progression</a> · <a href="../stat-balance.md">Stat Balance</a> ·
+  <a href="../uma-templates.md">Uma Templates</a> · <a href="../implementation.md">the five releases</a>; the shared frame is the <a href="../README.md">README</a> (§2).
 </div>
   <h1>The Tier rework: how everything grows</h1>
-  <p class="lead">One page for the whole rework: when each category unlocks what, level by level, across the three tiers; how the
-    counts grow; how many choices a player owns; how much simpler Tier 1 gets; and why the pace holds. Numbers are the
-    cross-referenced drafts (<a href="../README.md">README</a> §2 and §10). One Uma's page at each tier is
-    <a href="character-tiers.html">character-tiers</a>.</p>
+  <p class="lead">One page for the whole rework: when each category unlocks what, level by level, across the three tiers;
+    the five releases that ship it; how the counts grow; how many choices a player owns; how much simpler Tier 1 gets; and
+    why the pace holds. Every number is an approved doc's (D192–D198). One Uma's page at each tier is
+    <a href="character-tiers.html">character-tiers</a>; every class's sheet by source is <a href="stats-by-tier.html">stats-by-tier</a>.</p>
 
   <nav class="top">
-    <a href="#roadmap">Roadmap</a><a href="#counts">How counts grow</a><a href="#choices">Choices a player owns</a>
-    <a href="#simpler">Tier 1: today vs proposed</a><a href="#pace">Pace holds</a><a href="#matrix">Full matrix</a>
+    <a href="#roadmap">Roadmap</a><a href="#ships">How it ships</a><a href="#counts">How counts grow</a><a href="#choices">Choices a player owns</a>
+    <a href="#simpler">Tier 1: today vs approved</a><a href="#pace">Pace holds</a><a href="#matrix">Full matrix</a>
+    <a class="out" href="character-tiers.html">Her page by tier →</a><a class="out" href="stats-by-tier.html">Max stats by tier →</a>
   </nav>
 
   <div class="kpis" id="kpis"></div>
   <div class="themes">
     <div class="theme" style="--tc: var(--t1)"><span class="n">Tier 1 · Apprentice · day</span><b>The base: one rule per system</b>
-      <p>Three weapons, one per strike. Every piece of gear climbs G0 → G10 on one gate. One fork per tree, no points. One planet and four moons. One trade per Uma.</p></div>
+      <p>Three weapons by channel on the owner's defaults; foes weak to their twins. Every piece owned at G0, one gate. One fork a tree, no points. The Planet and three moons. One trade per Uma. Her template's calling, Flourish, signature accessory and moon.</p></div>
     <div class="theme" style="--tc: var(--t2)"><span class="n">Tier 2 · Adept · dusk</span><b>One more choice in every category</b>
-      <p>A specialization, a weapon form at G5, the Damage slot, a third branch and a tip fork, the Halo and Valor, a secondary profession, the signature tip.</p></div>
+      <p>A class branch (a weapon-group focus), Pure or Dual at G5, a second accessory slot and its branches, branch C and the tip fork, a weapon moon, a secondary profession, her signature tip. The foes price it.</p></div>
     <div class="theme" style="--tc: var(--t3)"><span class="n">Tier 3 · Master · night</span><b>Depth on the same frame</b>
-      <p>A mastery, a second weapon form, a second Support, two branches held and depth 6 capstones, the Halo's second kind and Swiftness.</p></div>
+      <p>The branch's capstone and the class's mastery, Keen, Tempered or Evolved, a third accessory slot a step deeper, two tree branches held and depth 6, a second weapon moon. Every flat value × 2.6.</p></div>
   </div>
 
   <section id="roadmap">
     <h2>Roadmap: what unlocks when</h2>
     <p class="sub">Each tier runs Lv 1 → 50. The grey column is what she has from the tier's first day; the track shows what arrives
       as she levels. Filled pins are something new to use or choose; hollow pins and the small ticks are steps of a cadence she
-      already knows. Hover or tab to any mark for its detail.</p>
+      already knows; dashed chips sit on her Craft Level. Hover or tab to any mark for its detail and the call behind it.</p>
     <div class="legend">
       <span><span class="chip" style="pointer-events:none"><span class="pin" style="background:var(--c1)"></span>New: to use or choose</span></span>
       <span><span class="chip step" style="pointer-events:none"><span class="pin"></span>Step of a known cadence</span></span>
       <span><span class="chip craft" style="pointer-events:none"><span class="pin" style="background:var(--c5)"></span>On her Craft Level, not her Uma Level</span></span>
-      <span><span class="tick" style="position:static;transform:none"><span class="m"></span></span>Grade or depth step</span>
+      <span><span class="tick" style="position:static;transform:none"><span class="m"></span></span>Grade, depth or class skill</span>
       <span><span class="tick" style="position:static;transform:none"><span class="dot"></span></span>Planet node</span>
       <span><span class="tick" style="position:static;transform:none"><span class="ring"></span></span>Moon node</span>
-      <span class="muted">Skill depths open by Class Rank; placed where an Uma fighting as one class reaches it (CR 20 ≈ Lv 13, 30 ≈ 20, 40 ≈ 27, 50 ≈ 34).</span>
+      <span class="muted">Depths open by Class Rank, placed at the docs' pace for one class (CR 20 ≈ Lv 13, 30 ≈ 20, 40 ≈ 27, 50 ≈ 34; class-progression §7.1).</span>
     </div>
     <div id="road"></div>
+  </section>
+
+  <section id="ships">
+    <h2>How it ships: five live releases</h2>
+    <p class="sub">D198: each release is built dark behind its own engine and save version and turned on by its own switch,
+      as classes v2 was. Between releases a later tier's world plays the shape that is live, × tier (SB1). From
+      <a href="../implementation.md">implementation.md</a> §1; packets H64–H105.</p>
+    <div class="ships" id="ships-row"></div>
+    <div class="tierband"><div style="--tc:var(--t1)">Tier 1: the fight, then the economy</div><div style="--tc:var(--t2)">Tier 2: weapons, then classes</div><div style="--tc:var(--t3)">Tier 3</div></div>
   </section>
 
   <section id="counts">
@@ -189,20 +227,22 @@
   <section id="choices">
     <h2>Choices a player owns, per Uma</h2>
     <p class="sub">Every build decision she keeps, counted for a Spell Blade (a class with every kind of choice), at the tier's Lv 50.
-      Today's Tier 1 asks for 68; the rework's Tier 1 asks for 8, and each tier adds its own.</p>
+      Today's Tier 1 asks for 68; the rework's Tier 1 asks for 8, Tier 2 for 23 and Tier 3 for 31.</p>
     <div class="panel">
       <div class="chart-legend" id="choices-legend"></div>
       <div id="choices-chart"></div>
-      <p class="foot">Counted as: Classes, her class (+ specialization from Tier 2; the Tier 3 mastery is fixed per class). Gear, one weapon per
-        slot, armor halves where she picks them, each accessory's type, each weapon form. Skill trees, each fork held. Extra Stats, today's 30
-        active nodes at Lv 50; the rework's Halo kinds. Professions, the secondary. Uma Variance asks for nothing: her template is derived.</p>
+      <p class="foot">Counted as: Classes, her class (+ her class branch from Tier 2; the capstone follows the branch, the mastery is the
+        class's). Gear, one weapon a slot, each weapon branch (Pure or Dual; Tier 3's step), armor halves where she picks them (the
+        four between, from Tier 2), each accessory slot's family and form. Skill trees, each fork and tip held (CP §6.8). Extra Stats,
+        her weapon moons' settings (EP §7). Professions, the secondary (PP14). Her template asks only the one-time calling pick of a
+        Pace or Late Uma; the signature tip is a tree pick.</p>
       <details><summary>Show the numbers</summary><div id="choices-table"></div></details>
     </div>
   </section>
 
   <section id="simpler">
-    <h2>Tier 1: today vs proposed</h2>
-    <p class="sub">Each bar is the proposal as a share of today, per class or per Uma. Coloured bars are complexity, meant to fall;
+    <h2>Tier 1: today vs approved</h2>
+    <p class="sub">Each bar is the approved Tier 1 as a share of today, per class or per Uma. Coloured bars are complexity, meant to fall;
       the grey pair at the bottom is the pace, meant to stay near 100%.</p>
     <div class="panel"><div id="simpler-chart"></div>
       <details><summary>Show the numbers</summary><div id="simpler-table"></div></details></div>
@@ -210,21 +250,27 @@
 
   <section id="pace">
     <h2>Pace holds</h2>
-    <p class="sub">The rate of progression stays: one Uma's work is within a tenth of today's in Tier 1, each later tier adds less than a tenth more, and the stats she earns
-      from Extra Stats track today's curve level by level, so the foes' budget doesn't move.</p>
+    <p class="sub">The rate of progression stays: one Uma's work is within a tenth of today's in every tier; the stats Extra Stats gives
+      track today's curve in Tier 1 and scale × tier after; and the foes' toolbox terms (D196) bring a later tier's fights back to
+      Tier 1's speed.</p>
     <div class="grid2">
-      <div class="panel"><h3>One Uma, fully built: refined items</h3><p class="muted" style="font-size:12px">Hours at today's Craft Lv 25 speed at the bar's end; her template moon included.</p>
+      <div class="panel"><h3>One Uma, fully built: refined items</h3><p class="muted" style="font-size:12px">Hours at Craft Lv 25's speed at the bar's end, her own moon included (profession-progression §0).</p>
         <div class="chart-legend" id="work-legend"></div><div id="work-chart"></div>
         <details><summary>Show the numbers</summary><div id="work-table"></div></details></div>
-      <div class="panel"><h3>A stat from Extra Stats, by level (Tier 1)</h3><p class="muted" style="font-size:12px">Today on curve vs the planet plus that stat's moon. Within 2 points at every level.</p>
+      <div class="panel"><h3>A stat with its moon, by level</h3><p class="muted" style="font-size:12px">The Planet and a full moon, each tier × 1 · 1.8 · 2.6; today's on-curve stars for reference (extra-stats-progression §1, §3.4).</p>
         <div class="chart-legend" id="stat-legend"></div><div id="stat-chart"></div>
         <details><summary>Show the numbers</summary><div id="stat-table"></div></details></div>
     </div>
+    <div class="panel" style="margin-top:16px"><h3>The foes keep pace: how fast a party fells a regular, against Tier 1</h3>
+      <p class="muted" style="font-size:12px">On curve, the default party at the same tier level; 1.0 is Tier 1's speed, the band Z4's ±10%. Without a term the later
+        toolboxes outrun the foes; the approved terms (SB3–SB5) bring them back (stat-balance §3.3).</p>
+      <div class="chart-legend" id="foe-legend"></div><div id="foe-chart"></div>
+      <details><summary>Show the numbers</summary><div id="foe-table"></div></details></div>
   </section>
 
   <section id="matrix">
     <h2>Full matrix</h2>
-    <p class="sub">Every row of every category, today and per tier. Bold is what that tier adds.</p>
+    <p class="sub">Every row of every category, today and per tier, as approved. Bold is what that tier adds.</p>
     <div class="panel" style="overflow-x:auto"><table class="matrix" id="mx"></table></div>
   </section>
 </main>
@@ -234,88 +280,119 @@
 const LANES = [
   { id: 'classes', name: 'Classes', c: 'var(--c1)' }, { id: 'gear', name: 'Gear', c: 'var(--c2)' },
   { id: 'skills', name: 'Skill trees', c: 'var(--c3)' }, { id: 'stats', name: 'Extra Stats', c: 'var(--c4)' },
-  { id: 'prof', name: 'Professions', c: 'var(--c5)' }, { id: 'var', name: 'Uma Variance', c: 'var(--c6)' },
+  { id: 'prof', name: 'Professions', c: 'var(--c5)' }, { id: 'var', name: 'Uma Template', c: 'var(--c6)' },
 ];
 const laneColor = Object.fromEntries(LANES.map((l) => [l.id, l.c]));
+const laneName = Object.fromEntries(LANES.map((l) => [l.id, l.name]));
 const GRADE = (g) => 5 * g - 4;
-const gearTicks = Array.from({ length: 10 }, (_, i) => ({ lv: GRADE(i + 1), label: 'G' + (i + 1), tip: `Grade ${i + 1} opens at Lv ${GRADE(i + 1)}: one crafted item raises a slot to it` }));
-const depthTicks = (t3) => [[1, 1], [6, 2], [13, 3], [20, 4], [27, 5], ...(t3 ? [[34, 6]] : [])].map(([lv, d]) => ({ lv, label: 'D' + d, tip: `Depth ${d} opens at Class Rank ${d === 1 ? 1 : (d - 1) * 10} (about Lv ${lv})` }));
-const statTicks = [1, 11, 21, 31, 41].map((lv, i) => ({ lv, shape: 'dot', tip: `Planet ${'I II III IV V'.split(' ')[i]} at Lv ${lv}: +${[1, 2, 4, 6, 8][i]} to all six core stats` }))
-  .concat([6, 16, 26, 36, 46].map((lv, i) => ({ lv, shape: 'ring', tip: `Moon node ${'I II III IV V'.split(' ')[i]} at Lv ${lv}: +${[2, 4, 6, 8, 10][i]} on each moon (Strength, Sorcery, Vigor, Guard)` })));
+const gearTicks = Array.from({ length: 10 }, (_, i) => ({ lv: GRADE(i + 1), label: 'G' + (i + 1), tip: `Grade ${i + 1} worn at Uma Lv ${GRADE(i + 1)}: one made item raises one weapon, armor slot or accessory slot to it (WP2)` }));
+// Depths by Class Rank 1 · 10 · 20 · 30 · 40 (· 50), placed at the docs' pace for one class (CP §7.1: CR 20 ≈ Lv 13, 30 ≈ 20, 40 ≈ 27, 50 ≈ 34; CR 10 between, ≈ Lv 6).
+const DEPTH_LV = [[1, 1], [6, 2], [13, 3], [20, 4], [27, 5], [34, 6]];
+const depthTicks = (t3) => DEPTH_LV.slice(0, t3 ? 6 : 5).map(([lv, d]) => ({ lv, label: 'D' + d, tip: `Depth ${d} opens at Class Rank ${d === 1 ? 1 : (d - 1) * 10} (about Uma Lv ${lv} on one class)${d === 3 ? ': the fork' : d === 5 ? ': the tip' : d === 6 ? ': the capstones (Tier 3)' : ''}` }));
+const mpTicks = DEPTH_LV.slice(0, 5).map(([lv, d]) => ({ lv, label: (0.8 * d).toFixed(1).replace('.0', '') + '%', tip: `With depth ${d} open she regains ${(0.8 * d).toFixed(1)}% of her max MP at the end of each round (SB18)` }));
+const csTicks = (t3) => [[13, 'CS1', 20], [20, 'CS2', 30], [27, 'CS3', 40], ...(t3 ? [[34, 'Cap', 50]] : [])].map(([lv, label, cr]) => ({ lv, label, tip: label === 'Cap' ? 'Class Rank 50: her branch\'s capstone and the class\'s mastery (CP27)' : `Class skill ${label.slice(2)} at Class Rank ${cr}, cast through a focus weapon (CP34)` }));
+const statTicks = (m) => [1, 11, 21, 31, 41].map((lv, i) => ({ lv, shape: 'dot', tip: `Planet ${'I II III IV V'.split(' ')[i]} at Lv ${lv}: +${[[1, 2, 4, 6, 8], [2, 4, 7, 11, 14], [3, 5, 10, 16, 21]][m][i]} to all six core stats (EP §3.2)` }))
+  .concat([6, 16, 26, 36, 46].map((lv, i) => ({ lv, shape: 'ring', tip: `Moon node ${'I II III IV V'.split(' ')[i]} at Lv ${lv}: +${[[2, 4, 6, 8, 10], [4, 7, 11, 14, 18], [5, 10, 16, 21, 26]][m][i]} on each moon (Prowess, Vigor, Guard)${m ? ' and the weapon moons\' node' : ''} (EP §3.2)` })));
 
 const TIERS = [
   { n: 1, name: 'Apprentice', tc: 'var(--t1)', sub: 'every Uma starts here',
     start: {
-      classes: [['6 classes, 3 weapon slots', 'One slot per strike (Heavy, Flurry, Area); her class sets how many are Arms. New Umas start in their calling (CL1, CL13).'],
-        ['Foes weak to 1 strike', 'Every Tier 1 foe is weak to exactly one strike, from the element ring; every Uma always holds a weak weapon (CL2).']],
-      gear: [['3 weapons · 5 armor · 1 Support', 'All at G0. One crafted item raises one slot one grade; the gate is her Uma Level (GE1, GE2, GE11).']],
-      skills: [['3 trees, no points', 'One tree per weapon slot. Every node is free; a fork\'s branches are exclusive, swapped freely outside fights (SK1, SK2).']],
-      stats: [['1 planet + 4 moons, 25 nodes', 'Planet: all six core stats. Moons: Strength, Sorcery, Vigor, Guard. Every open node counts (ES1–ES5).']],
-      prof: [['Her trade: 2 places', 'One gathering and one making profession by her fight type. Ten places on the Wilds, each a building uma-art already has, 4 work slots each (40); 2 material types a gathering profession, all existing icons (PR1–PR7).']],
-      var: [['Her template', 'Calling, stride and knack, read from her racing profile. The Flourish (an MP twist) sits at her trees\' root (U2, U9).']],
+      classes: [['6 classes · 3 weapon slots', 'Three slots in every tier, typed by channel: Arms slots Brawler 3, Mage 0, Spell Blade and Paladin 2, Summoner and Cleric 1. The owner\'s defaults fill them: Brawler Greatsword, Axe, Lance; Mage Fire, Blizzard, Thunder; Spell Blade Katana, Lance, Thunder; Summoner Dark, Light, Bow; Paladin Greatsword, Axe, Light; Cleric Light, Blizzard, Bow. No strikes (CP2, CP3).'],
+        ['Foes weak to their twins', 'Every Tier 1 foe is weak to one twin set: the element that beats hers on the ring, and its twin Arm (Greatsword and Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark). Shields: regulars 2–3, sub-bosses 5, bosses 6 (CP5, CP8).'],
+        ['MP back a round: a rule', 'Every Uma regains 0.8% of her max MP at the end of each round for each skill depth her class has open: 4% from Class Rank 40. Never an item; the MP accessories retire (SB18).']],
+      gear: [['Every piece owned at G0', 'All ten weapon kinds, five armor slots and her accessory slot, at G0. One made item raises one a grade: a Weapon Gem, Armor Fittings or an Accessory Setting, worn at Uma Lv 5g − 4. Gear ranks, Gear Marks and Manuals retire (WP2, WP3).'],
+        ['Armor carries all defense', 'Her class\'s half. At G10: HP +150, DEF and M.DEF +40, MP +30, evasion 12%, +25 offense on her half. A regular\'s hit takes 18.7% of a Brawler\'s HP (WP14, WP15).'],
+        ['1 accessory slot: a base form', 'Damage only, one of four families: Pendant (flat on her three kinds), Orb (flat on one kind), Bell (her weapon strikes again after her Attack), Insignia (+15% on sub-bosses and bosses). The ten supports retire (WP17–WP19).']],
+      skills: [['3 weapon trees, no points', 'One tree per weapon slot, 8 nodes: a trunk, one fork at depth 3 into branches A and B, each to its tip. Branch A the default; swaps free outside fights. 3 picks, 15 skills held, equipped 3 → 7 (CP13–CP18).'],
+        ['Skill Ranks', 'Every skill she holds ranks 1–5 by itself, one rank every 2 Class Ranks after its depth opens (×0.95 → ×1.05): balance-neutral (CP32).']],
+      stats: [['The Planet + 3 moons: 20 nodes', 'The Planet: +21 to every core stat. Prowess (offense, split by her class: Brawler 100/0 … Cleric 20/80), Vigor (HP +150, MP +30) and Guard (DEF and M.DEF +30). Every open node counts; the same 20 nodes and jewels for every class (EP1–EP7, EP23).']],
+      prof: [['Her trade: 2 of 10 places', 'Her calling\'s gathering and making pair: Mine · Forge, Forest · Armorer, Fields · Workbench, Fishery · Charm Shop, Monster Den · Lapidary. Ten existing buildings, 4 slots each (40), no upgrades, no new art (PP1–PP6).'],
+        ['2 material types a line', 'A low type (Craft Lv 1) and a high type (Craft Lv 26) per gathering profession, 20 ids: Copper, Iron · Pine, Cedar · Carrot, Cabbage · Carp, Sardine · Quartz, Citrine. Grades 1–5 take the low, 6–10 the high (PP7–PP9).']],
+      var: [['Her calling', 'One rule reads her racing profile (her best style, Power against Wit): her starting class, her trade and her channel. A Pace Uma picks Spell Blade or Mage, a Late Uma Paladin or Cleric, once on the Uma sheet (UT3, UT4).'],
+        ['★ Flourish: 4% of max HP a fight', 'At her root, as her calling, by her stride: Clean break (a Barrier at the start), Even pace (1% a round) or Late reserve (2% a round from round 3) (UT6).'],
+        ['★ Signature accessory', 'Her knack names a family (Fleet a Bell, Mighty an Orb, Tireless a Pendant, Gritty and Clever an Insignia). While she wears any form of it, ATK and M.ATK +0.2 a level: +10 at Lv 50, in any class (UT7, WP33).']],
     },
-    notes: { gear: 'G1–G10, a grade every 5 levels', skills: 'Depths D1–D5 by Class Rank', stats: 'Planet every 10 levels, moons between' },
-    ticks: { gear: gearTicks, skills: depthTicks(false), stats: statTicks },
+    notes: { classes: 'Ticks: MP back a round, by depth', gear: 'Ticks: grade g at Lv 5g − 4', skills: 'Depths at Class Rank 1 · 10 · 20 · 30 · 40', stats: 'The Planet on odd grades, moons on even' },
+    ticks: { classes: mpTicks, gear: gearTicks, skills: depthTicks(false), stats: statTicks(0) },
     events: [
-      { lane: 'skills', lv: 13, t: 'Fork: branch A or B', d: 'Depth 3, Class Rank 20. The one pick per tree, three a class; A is the default (SK6).' },
-      { lane: 'prof', lv: 26, t: 'High material type', d: 'Craft Lv 26 opens each gathering profession\'s high type, for grades 6–10 (PR7). Her Craft Level, not her Uma Level.', kind: 'craft' },
-      { lane: 'var', lv: 16, t: 'Her moon I: knack +4', d: 'Moon Jewel II, Lv 16. +4 to her knack\'s stat; counts in every class (U10).' },
-      { lane: 'var', lv: 36, t: 'Her moon II: lead +8', d: 'Moon Jewel IV, Lv 36. +8 ATK or M.ATK, her calling\'s channel; counts in that channel\'s classes (U10).', row: 0 },
+      { lane: 'gear', lv: 46, t: 'G10: Might 68', d: 'Every weapon at G10: Might 68, weak ×1.3; armor\'s suit at its full values; her accessory\'s form at G10 (Pendant +14 a kind, Orb +34) (WP5, WP15, §5.4).' },
+      { lane: 'skills', lv: 13, t: 'Fork: branch A or B', d: 'Depth 3 at Class Rank 20: one free pick a tree, three a class; A the default. The Spell Blade\'s B is Pierce, one hit that ignores the unbroken halving (CP18, CP42).' },
+      { lane: 'stats', lv: 46, t: 'A stat with its moon: +51', d: 'The Planet and a full moon by Lv 46: +51 (HP +255). Today\'s on-curve stars give about +51 at Lv 50 (EP §3.4).' },
+      { lane: 'prof', lv: 26, t: 'High material type', d: 'Craft Lv 26 opens each gathering profession\'s high type, for grades 6–10. About day 11 working nonstop (PP13, PP §5.3).', kind: 'craft' },
+      { lane: 'prof', lv: 46, t: 'Grade 10 made', d: 'Craft Lv 46 makes G10: about day 22 working nonstop, today\'s day 24 (PP §5.3).', kind: 'craft', row: 1 },
+      { lane: 'var', lv: 16, t: '★ Her moon I: knack +4', d: 'Moon Jewel II. +4 points on her knack\'s stat: HP +20, MP +4, DEF and M.DEF +4 each, evasion +2.4% or Limit start +1.6. Counts in every class (UT10).' },
+      { lane: 'var', lv: 36, t: '★ Her moon II: defense +8', d: 'Moon Jewel IV. DEF +8 for a physical calling, M.DEF +8 for a magical one; counts in every class (UT10).' },
     ] },
   { n: 2, name: 'Adept', tc: 'var(--t2)', sub: 'after the Tier 1 Rift',
     start: {
-      classes: [['+ Specialization: 1 of 2', 'One of two passives per class (tier2-classes\' twelve), swapped freely; no new class ids (CL11).'],
-        ['Foes weak to 2 kinds', 'The strike stays; the kinds narrow to two of it (CL10).']],
-      gear: [['+ Damage slot (an Orb)', 'Half a weapon\'s Might at its grade on hits of its kind; the kind swaps freely (GE11).'],
-        ['+ Armor halves per piece', 'The four classes between Brawler and Mage mix physical and magical per piece (GE9).']],
-      skills: [['Trees carry over', 'The same three trees; picks from Tier 1 carry. Equipped slots 3 → 10.']],
-      stats: [['+ Halo, + Valor moon', 'The same core map, rebuilt in the new world, plus two new bodies (ES8, ES9).']],
-      prof: [['+ A Tier 2 material pair', 'Each gathering profession adds a low and a high type, today\'s ids; the ten places and their 40 slots stay (PR10).'], ['+ A secondary profession', 'Gathers one other profession\'s base pair; picked once per tier, 1,000 Laurels to change (PR11).']],
-      var: [['Template carries', 'The same calling, stride and knack; the Flourish stays.']],
+      classes: [['+ Class branch, 1 of 2', 'A focus, +15% on one weapon group\'s kinds (Heavy Arms and Elemental Tomes, or Lite Arms and Arcane Tomes; the docs\' Ring and Light/Dark), her default or reverse weapon set, and three class skills. Swapped freely; Ascend preselects branch 1, the defaults (CP26, CP38–CP41).'],
+        ['Regulars weak to 1 kind', 'Regulars narrow to one kind of their twins, by role; sub-bosses and bosses keep both. Shields 3–4 · 7 · 9 (CP6, CP8, SB6).'],
+        ['The foes price the toolbox', 'Tier 2\'s term: the foes\' HP and DEF ×1.27 and offense +10% by Lv 50; bosses\' HP and DEF × 1.1 more (SB3, SB5).']],
+      gear: [['Grades restart · × 1.8', 'Every flat value × 1.8: Might 122 at G10, armor HP +270, DEF and M.DEF +72, the kind cap +122. Branches already taken stay known (SB1, WP4, WP11).'],
+        ['+ 2nd accessory slot', 'Two untyped slots, one of each family (WP19).'],
+        ['Armor per piece', 'The four classes between Brawler and Mage pick a half per piece; every defensive stat stays the slot\'s (WP14).']],
+      skills: [['+ Her class tree', 'Her class branch at the root: its focus and three class skills, cast through a focus weapon (CP19, CP34).'],
+        ['14 nodes a weapon tree', 'Branch C joins the fork and every tip forks: 7 picks (six and her branch), 18 skills held, equipped 3 → 10 (CP19).']],
+      stats: [['The core rebuilt · × 1.8', 'The Planet and three moons, rebuilt empty in the new world: a stat with its moon +92 at Lv 50 (EP7, EP13).'],
+        ['+ A weapon moon', 'Five nodes of flat offense on her hits of a kind: Full on one kind (+90 at Lv 50) or Split on two (+63 each), a free setting, outside the kind cap. 25 nodes (EP24, EP25, EP27).']],
+      prof: [['+ Tier 2 material pair', 'Each gathering profession adds its Tier 2 pair: Gold, Titanium · Cherry, Ebony · Bell Pepper, Asparagus · Sea Bream, Tuna · Sapphire, Diamond. Grades 5 and 10 are made of it: her main trade\'s work, a fifth of the whole (PP8, PP9, PP15).'],
+        ['+ A secondary profession', 'Any of the other eight professions\' base work. Free the first time each tier; a change 2,000 Laurels (PP14, PP15).']],
+      var: [['Template carries · × 1.8', 'Her calling and Flourish (the same share of her HP); her signature +0.36 a level (+18 at Lv 50); her moon rebuilt at +7 and +14 (UT6, UT7, UT10).']],
     },
-    notes: { gear: 'Grades restart at G0; forms carry', skills: 'Same depths', stats: 'Same cadence' },
-    ticks: { gear: gearTicks, skills: depthTicks(false), stats: statTicks },
+    notes: { classes: 'Ticks: class skills at CR 20 · 30 · 40', gear: 'Ticks: grades again, Lv 5g − 4', skills: 'The same depths', stats: 'The same cadence, × 1.8' },
+    ticks: { classes: csTicks(false), gear: gearTicks, skills: depthTicks(false), stats: statTicks(1) },
     events: [
-      { lane: 'gear', lv: 21, t: 'G5 fork: Dual or Pure', d: 'Each weapon picks once at G5: Dual adds a second kind (coverage only), Pure makes its weak hits ×1.5 (GE6).' },
-      { lane: 'skills', lv: 13, t: 'Fork: A, B or C', d: 'Branch C joins: new content, and Q17\'s crossovers, the Spell Blade\'s Sweep and the Summoner\'s Hunt (SK7, SK9).' },
-      { lane: 'skills', lv: 27, t: 'Tip fork: Power or Break', d: 'Each branch\'s tip forks: more power, or Break +1 (weapon arts moved into the tree) (SK7).' },
-      { lane: 'stats', lv: 16, t: 'Valor I: Limit +2', d: 'Limit start +2 (Moon Jewel II) (ES9).', row: 0 },
-      { lane: 'stats', lv: 21, t: 'Halo I: +10', d: '+10 offense on her hits of one chosen kind (a free setting); Halo Jewel I (ES8).', row: 1 },
-      { lane: 'stats', lv: 36, t: 'Valor II: +2', d: 'Limit start +2 more, +4 in all (ES9).', row: 0 },
-      { lane: 'stats', lv: 46, t: 'Halo II: +24 (+34)', d: '+24 more on that kind: +34, the same scale as an Orb; Orb and Halo on one kind stop at +68 (ES8).', row: 1 },
-      { lane: 'var', lv: 16, t: 'Her moon I', d: 'The same two nodes, rebuilt with Tier 2\'s jewels.', kind: 'step' },
-      { lane: 'var', lv: 27, t: 'Signature tip', d: 'A third option at the tip fork of her signature kind\'s tree, by stride: Breakaway, Spread or Long guard (U16).', row: 1 },
-      { lane: 'var', lv: 36, t: 'Her moon II', d: 'Lead +8, Tier 2\'s jewels.', kind: 'step', row: 0 },
+      { lane: 'classes', lv: 13, t: 'Class skills at CR 20 · 30 · 40', d: 'Her branch\'s three class skills open at the gates of depths 3–5 and rank up like any skill (CP34, CP §7.2).' },
+      { lane: 'gear', lv: 21, t: 'G5: Pure or Dual', d: 'Each weapon\'s G5 takes a Branch Gem: Pure (weak ×1.5) or Dual (+ its fixed partner, of its own channel and the other weapon group, coverage only). One two-kind weapon in her slots (WP6–WP8, WP32).' },
+      { lane: 'gear', lv: 21, t: 'Accessory branches open', row: 1, d: 'From a slot\'s G5 each family opens two branches, a free setting: Great Pendant or Channel Pendant, Great Orb or Twin Orb, Great Bell or Toll Bell, Great Insignia or Onslaught. Nothing crafted for a form (WP19, WP34).' },
+      { lane: 'gear', lv: 46, t: 'G10: Might 122', d: 'Might 122 at G10; Pure weak hits ×1.5; the kind cap +122 on one kind from the Pendant and Orb forms (WP24).' },
+      { lane: 'skills', lv: 13, t: 'Fork: A, B or C', d: 'Branch C joins the fork: the Brawler\'s and the Mage\'s third lines, the Spell Blade\'s Sweep, the Summoner\'s Hunt, the healers\' Wide (CP19).' },
+      { lane: 'skills', lv: 27, t: 'Tip fork: Power or Break', d: 'Each branch\'s tip forks: Power, or Break (its first weak hit on a foe removes one more shield point) (CP19).' },
+      { lane: 'stats', lv: 6, t: 'Weapon moon I opens', d: 'Full +7 or Split +5 a kind; its nodes open at Lv 6, 16, 26, 36, 46 with Moon Jewels I–V (EP24).' },
+      { lane: 'stats', lv: 46, t: 'Full +90 · Split +63', d: 'The weapon moon complete: Full +90 on one kind, or Split +63 on each of two; +12–16% to her act (EP §4.3).' },
+      { lane: 'prof', lv: 21, t: 'G5 on Tier 2\'s pair', kind: 'craft', d: 'Craft Lv 21: grade 5 is made of Tier 2\'s low type; the Branch Gem with it. Her main trade\'s work (PP9, PP15).' },
+      { lane: 'prof', lv: 46, t: 'G10 on Tier 2\'s pair', kind: 'craft', row: 1, d: 'Craft Lv 46: grade 10 is made of Tier 2\'s high type (PP9).' },
+      { lane: 'var', lv: 16, t: 'Her moon I, +7', kind: 'step', d: 'Her knack\'s node rebuilt with Tier 2\'s values: +7 points (HP +35) (UT10).' },
+      { lane: 'var', lv: 27, t: '★ Signature tip', row: 1, d: 'A third option at the tip fork of her lead weapon\'s tree (Class Rank 40), as her calling, by stride: Quickstep (two more hits, the same power), Spillover (a splash ×0.3 on every other foe) or Long guard (a Barrier on herself) (UT9).' },
+      { lane: 'var', lv: 36, t: 'Her moon II, +14', kind: 'step', d: 'Her calling channel\'s defense, +14 (UT10).' },
     ] },
   { n: 3, name: 'Master', tc: 'var(--t3)', sub: 'after the Tier 2 Rift',
     start: {
-      classes: [['+ Mastery', 'One signature mechanic per class, six in all, designed with Tier 3 (CL12).'], ['Foes weak to 1 kind', 'The strike stays; one kind of it (CL10).']],
-      gear: [['+ Second Support slot', 'A different Talisman or Amulet from the first (GE11).']],
-      skills: [['Trees carry over', 'Equipped: 10 and a master slot.']],
-      stats: [['+ Halo\'s 2nd kind, + Swiftness', 'A second Halo kind and the Swiftness moon (ES10).']],
-      prof: [['+ A Tier 3 material pair', 'Each gathering profession adds a third pair, today\'s ids; the map stays as it is (PR10).'], ['Secondary reaches Tier 2 pair', 'Her secondary profession can gather its Tier 2 pair too (PR11).']],
-      var: [['Template carries', 'Calling, Flourish, her moon.']],
+      classes: [['+ Capstone and mastery', 'At Class Rank 50 her branch opens its capstone and the class\'s mastery: Unstoppable, Resonance, Spellbind, Menagerie, Last Stand, Overflow (CP27).'],
+        ['Sub-bosses narrow too', 'Regulars and sub-bosses weak to one kind; bosses keep their twins. Shields 3–4 · 6 · 10 (CP6, CP8, SB6).'],
+        ['Tier 3\'s term', 'The foes\' HP and DEF ×1.08 at Lv 1 rising to ×1.48 by Lv 50; offense +10%; bosses × 1.1 (SB4, SB5).']],
+      gear: [['Grades restart · × 2.6', 'Might 177 at G10, armor HP +390, DEF and M.DEF +104, the kind cap +177 (SB1).'],
+        ['+ 3rd accessory slot', 'Three slots, one of each family (WP19).']],
+      skills: [['17 nodes · a master slot', 'Two of three branches held at every fork, each with its tip and its depth 6 capstone: 10 picks (nine and her branch), 34 skills held, equipped 10 and a master slot (CP20, CP22).']],
+      stats: [['The core × 2.6, moon 1 rebuilt', 'A stat with its moon +133 at Lv 50; her first weapon moon rebuilt at Tier 3\'s values (EP13).'],
+        ['+ A second weapon moon', 'Full + Split serves all three of her weapons: +130 on one, +91 on each of the other two. 30 nodes (EP26).']],
+      prof: [['+ Tier 3 material pair', 'Mythril, Orichalcum · Elderwood, Yggdrasil Branch · Golden Carrot, Emperor Pumpkin · Silverfin, Rainbow Koi · Starstone, Philosopher\'s Stone. G5 and G10 on Tier 3\'s pair, G4 and G9 on Tier 2\'s (PP8, PP9).'],
+        ['Secondary: + its Tier 2 work', 'Her secondary now gathers or makes its Tier 2 pair\'s work too (PP14).']],
+      var: [['Template carries · × 2.6', 'Her signature +0.52 a level (+26 at Lv 50); her moon +10 and +21; the Flourish the same share (UT7, UT10).']],
     },
-    notes: { gear: 'Grades restart; forms carry', skills: 'Depths D1–D6', stats: 'Same cadence' },
-    ticks: { gear: gearTicks, skills: depthTicks(true), stats: statTicks },
+    notes: { classes: 'Ticks: class skills, then the capstone', gear: 'Grades again; branches carry', skills: 'Depths to D6 at Class Rank 50', stats: 'The same cadence, × 2.6' },
+    ticks: { classes: csTicks(true), gear: gearTicks, skills: depthTicks(true), stats: statTicks(2) },
     events: [
-      { lane: 'gear', lv: 21, t: 'G5 fork: Prism, Tempered or Keen', d: 'From the Tier 2 form: Dual → Prism (three kinds) or Tempered (two kinds, ×1.5); Pure → Tempered or Keen (one kind, ×1.7) (GE8).' },
-      { lane: 'skills', lv: 13, t: 'Hold two of three branches', d: 'At the depth 3 fork she holds two branches (SK8).', row: 0 },
-      { lane: 'skills', lv: 27, t: 'Two tip forks', d: 'One tip fork per branch held.', kind: 'step', row: 0 },
-      { lane: 'skills', lv: 34, t: 'Depth 6 capstones', d: 'Class Rank 50: a capstone per branch held (SK8).', row: 1 },
-      { lane: 'stats', lv: 16, t: 'Swiftness I: +3% evasion', d: 'Moon Jewel II (ES10).', row: 0 },
-      { lane: 'stats', lv: 21, t: 'Halo III: +10', d: 'A second kind she picks (ES10).', row: 1 },
-      { lane: 'stats', lv: 36, t: 'Swiftness II: +3%', d: '+6% evasion in all.', row: 0 },
-      { lane: 'stats', lv: 46, t: 'Halo IV: +24', d: '+34 on the second kind.', row: 1 },
-      { lane: 'var', lv: 27, t: 'Signature tip at both forks', d: 'She holds two branches, so the tip option shows at both tip forks of her signature tree (U16).' },
+      { lane: 'classes', lv: 34, t: 'Capstone + mastery', d: 'Class Rank 50, about Uma Lv 34 on one class: her branch\'s capstone and the class\'s mastery, the tier\'s last milestone (CP27).' },
+      { lane: 'gear', lv: 21, t: 'G5: Keen, Tempered or Evolved', d: 'Pure → Keen (×1.7) or Tempered (+ its partner, both ×1.5); Dual → Tempered or Evolved (its Tier 3 partner). Two two-kind weapons; the Brawler and the Mage keep one (WP9).' },
+      { lane: 'gear', lv: 21, t: 'Accessory branches, a step deeper', row: 1, d: 'At a slot\'s G5 each branch takes its Tier 3 step: Great Pendant 0.575, Channel Pendant and Twin Orb +75, Great Orb +114, Great Bell 1.5, Toll Bell to 2.5, Great Insignia +22.5%, Onslaught +27.5% (WP34, SB8).' },
+      { lane: 'gear', lv: 46, t: 'G10: Might 177', d: 'Might 177 at G10; Keen weak hits ×1.7; the kind cap +177 (WP24).' },
+      { lane: 'skills', lv: 13, t: 'Hold two of three branches', d: 'At the depth 3 fork she holds two branches (A and B by default); Auto picks between them each turn (CP20).' },
+      { lane: 'skills', lv: 27, t: 'Two tip forks', kind: 'step', d: 'One tip fork for each branch held (CP20).' },
+      { lane: 'skills', lv: 34, t: 'Depth 6 capstones', row: 1, d: 'Class Rank 50: a capstone for each branch held, power 5.6; the master slot holds one capstone outside her ten (CP20, CP22).' },
+      { lane: 'stats', lv: 6, t: 'Weapon moon 2 opens', d: 'Her second weapon moon\'s node I; every weapon moon on a different kind (EP26).' },
+      { lane: 'stats', lv: 46, t: 'Full +130 · Split +91', d: 'Both weapon moons complete: Full + Split serve all three of her weapons; +21–23% to her act (EP §5.2).' },
+      { lane: 'prof', lv: 21, t: 'G5 on Tier 3\'s pair', kind: 'craft', d: 'Craft Lv 21: grade 5 made of Tier 3\'s low type, her main trade\'s; G4 (Craft Lv 16) of Tier 2\'s (PP9).' },
+      { lane: 'prof', lv: 46, t: 'G10 on Tier 3\'s pair', kind: 'craft', row: 1, d: 'Craft Lv 46: grade 10 made of Tier 3\'s high type; G9 (Craft Lv 41) of Tier 2\'s (PP9).' },
+      { lane: 'var', lv: 27, t: '★ Tip at both tip forks', d: 'She holds two branches, so her signature tip shows at both tip forks of her lead weapon\'s tree (UT9).' },
     ] },
 ];
 
 const tip = document.getElementById('tip');
 function bindTip(el, title, body) {
   el.tabIndex = 0;
+  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
   const show = (x, y) => { tip.innerHTML = `<b>${title}</b>${body}`; tip.style.opacity = 1; place(x, y); };
-  const place = (x, y) => { const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.min(x + 14, innerWidth - w - 10) + 'px'; tip.style.top = (y + 16 + h > innerHeight ? y - h - 12 : y + 16) + 'px'; };
   el.addEventListener('mouseenter', (e) => show(e.clientX, e.clientY));
   el.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
   el.addEventListener('mouseleave', () => (tip.style.opacity = 0));
@@ -325,14 +402,14 @@ function bindTip(el, title, body) {
 const pct = (lv) => ((lv - 1) / 49) * 100;
 const h = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; };
 
-// ---- KPIs
+// ---- KPIs (Tier 1 against today)
 const KPIS = [
-  ['skills', 'Skill nodes on a class\'s page', '75–150', '24', '−68% or more'],
-  ['gear', 'Item types to craft', '500', '40', 'gear 400 → 30, jewels 100 → 10'],
-  ['prof', 'Material types', '160', '20', '2 per gathering profession, today\'s icons'],
-  ['stats', 'Extra Stats nodes', '100', '25', 'every open node counts'],
-  ['gear', 'Gear rank bars and currencies', '24 + 3', '0', 'one gate: Uma Lv 5g − 4'],
-  [null, 'One Uma\'s work, fully built', '776 h', '835 h', '+8%: the pace holds'],
+  ['skills', 'Skill nodes on a class\'s page', '75–150', '24', '3 trees of 8; no points (CP §5.3)'],
+  ['gear', 'Item types to make', '500', '40', 'gear 400 → 30, Star Gems 100 → 10 jewels'],
+  ['prof', 'Material ids, raw and refined', '160', '20', '2 types a gathering line (PP §0)'],
+  ['stats', 'Extra Stats nodes', '100', '20', 'every open node counts (EP §0)'],
+  ['gear', 'Gear rank bars', '24', '0', 'one gate: Uma Lv 5g − 4 (WP2)'],
+  [null, 'One Uma\'s work, fully built', '776 h', '822 h', '+6% (835 h with her moon): the pace holds'],
 ];
 document.getElementById('kpis').append(...KPIS.map(([lane, label, was, now, delta]) => h('div', { class: 'kpi' },
   `<div class="label">${lane ? `<span class="sw" style="background:${laneColor[lane]}"></span>` : ''}${label}</div><div class="value"><span class="was">${was} →</span> ${now}</div><div class="delta">Tier 1 · ${delta}</div>`)));
@@ -346,20 +423,18 @@ TIERS.forEach((T, ti) => {
   [1, 10, 20, 30, 40, 50].forEach((lv) => axis.append(h('i', { style: `left:${pct(lv)}%` }, 'Lv ' + lv)));
   head.append(axis); block.append(head);
   LANES.forEach((L) => {
-    const lane = h('div', { class: 'lane' });
+    const lane = h('div', { class: 'lane', 'data-lane': L.id });
     lane.append(h('div', { class: 'name' }, `<span class="sw" style="background:${L.c};margin-top:5px"></span>${L.name}`));
     const st = h('div', { class: 'start' });
     (T.start[L.id] || []).forEach(([t, d]) => { const c = h('span', { class: 'chip' }, `<span class="pin" style="background:${L.c}"></span>${t}`); bindTip(c, t, d); st.append(c); });
     if (T.notes[L.id]) st.append(h('div', { class: 'note' }, T.notes[L.id]));
     lane.append(st);
     const evs = T.events.filter((e) => e.lane === L.id);
-    const rows = Math.max(1, ...evs.map((e) => (e.row ?? 0) + 1));
     const ticks = T.ticks[L.id];
-    const track = h('div', { class: 'track', style: `height:${rows * 30 + (ticks ? 30 : 14)}px` });
+    const track = h('div', { class: 'track', 'data-ticks': ticks ? 1 : 0 });
     [1, 10, 20, 30, 40, 50].forEach((lv) => track.append(h('div', { class: 'gridline', style: `left:${pct(lv)}%` })));
     evs.forEach((e) => {
-      const right = e.lv > 38;
-      const wrap = h('div', { class: 'ev' + (right ? ' right' : ''), style: `left:calc(${pct(e.lv)}% ${right ? '+ 4px' : '- 4px'});top:${8 + (e.row ?? 0) * 30}px` });
+      const wrap = h('div', { class: 'ev', 'data-lv': e.lv, 'data-row': e.row ?? 0 });
       const c = h('span', { class: 'chip' + (e.kind === 'step' ? ' step' : e.kind === 'craft' ? ' craft' : '') }, `<span class="pin" style="background:${L.c}"></span>${e.t}`);
       bindTip(c, `${e.t} · ${e.kind === 'craft' ? 'Craft' : 'Uma'} Lv ${e.lv}`, e.d);
       wrap.append(c); track.append(wrap);
@@ -368,26 +443,70 @@ TIERS.forEach((T, ti) => {
       const tk = h('div', { class: 'ticks' });
       ticks.forEach((t) => {
         const k = h('div', { class: 'tick', style: `left:${pct(t.lv)}%` }, t.shape ? `<span class="${t.shape}"></span>` : `<span>${t.label}</span><span class="m"></span>`);
-        bindTip(k, t.shape ? 'Extra Stats node' : t.label, t.tip); tk.append(k);
+        bindTip(k, t.shape ? 'Extra Stats node' : t.label + ' · Lv ' + t.lv, t.tip); tk.append(k);
       });
       track.append(tk);
     }
     lane.append(track); block.append(lane);
   });
   road.append(block);
-  if (ti < 2) road.append(h('div', { class: 'promo' }, `<span class="arrow">↓</span><span><b>Promotion through Tier ${T.n}'s Rift.</b> Twenty Lv 50 Umas ascend to Tier ${T.n + 1} Lv 1: gear grades restart at G0 and weapon forms carry; the Extra Stats map is rebuilt; skill picks carry; her template carries; the purse and Class Marks land in the new world.</span>`));
+  if (ti < 2) road.append(h('div', { class: 'promo' }, `<span class="arrow">↓</span><span><b>Promotion through Tier ${T.n}'s Rift.</b> A run's Lv 50 Umas ascend to Tier ${T.n + 1} Lv 1: every grade restarts at G0 (weapon and accessory branches stay known), the Extra Stats map is rebuilt empty, Class Rank and Craft Level start at 1 (EXP past Lv 50 becomes Class Marks), and her template carries, × ${T.n === 1 ? '1.8' : '2.6'}.</span>`));
 });
+// Place each lane's chips at its level: anchored left of the point, or right of it when it would leave the track; a chip
+// that would touch one already placed drops to the next free row, so labels never overlap at any page width.
+function layoutTracks() {
+  document.querySelectorAll('#road .lane .track').forEach((track) => {
+    const W = track.clientWidth, placed = [];
+    const evs = [...track.querySelectorAll('.ev')].sort((a, b) => +a.dataset.row - +b.dataset.row || +a.dataset.lv - +b.dataset.lv);
+    evs.forEach((ev) => {
+      const w = ev.firstChild.offsetWidth, x = ((+ev.dataset.lv - 1) / 49) * W, right = x - 4 + w > W + 18;
+      const x0 = right ? x + 4 - w : x - 4, x1 = x0 + w;
+      let row = +ev.dataset.row;
+      while (placed.some((p) => p.row === row && x0 < p.x1 + 6 && p.x0 < x1 + 6)) row++;
+      placed.push({ row, x0, x1 });
+      ev.className = 'ev' + (right ? ' right' : '');
+      ev.style.left = `calc(${pct(+ev.dataset.lv)}% ${right ? '+ 4px' : '- 4px'})`;
+      ev.style.top = 8 + row * 30 + 'px';
+    });
+    const rows = placed.length ? Math.max(...placed.map((p) => p.row)) + 1 : 0;
+    track.style.height = Math.max(rows * 30 + (+track.dataset.ticks ? 30 : 14), 40) + 'px';
+  });
+}
+layoutTracks();
+addEventListener('resize', layoutTracks);
+
+// ---- How it ships (implementation.md §1, D198)
+const RELEASES = [
+  { r: 'R1', name: 'Tier 1\'s fight', tc: 'var(--t1)', lt: true, ver: 'engine v16 · save v27', pk: 'H64–H72', lanes: ['classes', 'skills', 'var'],
+    items: ['<b>Three weapons</b> a class, on the owner\'s defaults', 'Trees with <b>no points</b>: a trunk and one fork; <b>Skill Ranks</b>; Pierce', 'Foes weak to their <b>twins</b>', 'The <b>calling pick</b>; her template\'s name, chip and <b>Flourish</b> (HP)', 'The <b>base MP regen</b>; the halls\' two kinds and the Paladin\'s revive', '<i>On today\'s gear</i>'] },
+  { r: 'R2', name: 'Tier 1\'s economy', tc: 'var(--t1)', lt: true, ver: 'engine v17 · save v28', pk: 'H73–H82', lanes: ['gear', 'stats', 'prof', 'var'],
+    items: ['Every piece owned at <b>G0</b>, a grade at Lv 5g − 4; ranks gone', '<b>Armor</b> carries defense; one accessory slot, four <b>base forms</b>; supports retire', 'The <b>signature accessory</b>', 'The <b>Planet and three moons</b>, her moon, jewels; Star Gems gone', '<b>Ten professions</b> in ten buildings, 4 slots each', 'The <b>compensation</b>: Craft Levels to 1, Speed Tickets for the time; new item icons'] },
+  { r: 'R3', name: 'Tier 2\'s weapons', tc: 'var(--t2)', ver: 'engine v18 · save v29', pk: 'H83–H90', lanes: ['gear', 'stats', 'prof'],
+    items: ['<b>Pure or Dual</b> at G5, with the Branch Gem', 'A <b>second accessory slot</b> and its branches (Great, Channel, Twin, Toll, Onslaught)', 'The <b>kind cap</b>', 'The <b>weapon moon</b> (Full or Split)', 'The <b>secondary profession</b>'] },
+  { r: 'R4', name: 'Tier 2\'s classes', tc: 'var(--t2)', ver: 'engine v19 · save v30', pk: 'H91–H97', lanes: ['classes', 'skills', 'var'],
+    items: ['The <b>class branches</b>: the weapon-group focus and class skills', 'The group names <b>Heavy, Lite, Elemental, Arcane</b>', '<b>Branch C</b> and the Power or Break tip', 'Her <b>signature tip</b>', 'Weaknesses by rank, boss shields 9, <b>Tier 2\'s term</b>'] },
+  { r: 'R5', name: 'Tier 3', tc: 'var(--t3)', ver: 'engine v20 · save v31', pk: 'H98–H105', lanes: ['classes', 'gear', 'skills', 'stats'],
+    items: ['<b>Keen, Tempered, Evolved</b>', 'The <b>third accessory slot</b> and its step', 'The <b>second weapon moon</b>', '<b>Depth 6</b> capstones, two branches held, the master slot', 'The six <b>masteries</b>; boss shields 10, <b>Tier 3\'s term</b>'] },
+];
+document.getElementById('ships-row').append(...RELEASES.map((R) => {
+  const el = h('div', { class: 'rel', style: `--tc:${R.tc}` },
+    `<div class="hd"><span class="num${R.lt ? ' lt' : ''}">${R.r}</span><div><div class="nm">${R.name}</div><div class="ver">${R.ver}</div></div></div>
+     <ul>${R.items.map((i) => `<li>${i}</li>`).join('')}</ul>
+     <div class="cats">${R.lanes.map((l) => `<span class="cat"><span class="sw" style="background:${laneColor[l]}"></span>${laneName[l]}</span>`).join('')}</div>`);
+  bindTip(el, `${R.r}. ${R.name} · ${R.ver}`, `Packets ${R.pk}. Built dark behind its own engine and save version; one switch packet flips both and chains its migration (implementation §2).`);
+  return el;
+}));
 
 // ---- Small multiples (one hue per chart: its category; today in grey)
 const MULTI = [
   ['gear', 'Weapon slots', 'per class', [5, 3, 3, 3]],
   ['gear', 'Accessory slots', 'per Uma', [2, 1, 2, 3]],
-  ['gear', 'Upgrades to max her gear', 'items per Uma', [120, 90, 100, 110]],
-  ['skills', 'Nodes in a tree', 'per weapon tree', [15, 8, 14, 17]],
-  ['skills', 'Tree picks', 'per class (today: forks)', [25, 3, 6, 9]],
-  ['stats', 'Extra Stats nodes', 'shared map', [100, 25, 29, 33]],
-  ['prof', 'Work slots on the Wilds', '10 places, one building each (today 11 facilities)', [55, 40, 40, 40], '33–55'],
-  ['prof', 'Material types', 'raw and refined', [160, 20, 40, 60]],
+  ['gear', 'Items to max her gear', 'pieces per Uma', [120, 90, 100, 110]],
+  ['skills', 'Nodes in a weapon tree', 'per tree', [15, 8, 14, 17]],
+  ['skills', 'Picks a class', 'her class branch included (today: forks)', [25, 3, 7, 10]],
+  ['stats', 'Extra Stats nodes', 'shared, the same for every class', [100, 20, 25, 30]],
+  ['prof', 'Work slots on the Wilds', '10 places (today 11 facilities)', [55, 40, 40, 40], '33–55'],
+  ['prof', 'Material ids', 'raw and refined', [160, 20, 40, 60]],
 ];
 const COLS = ['Today', 'T1', 'T2', 'T3'];
 function miniChart([lane, title, unit, vals, todayLabel]) {
@@ -405,18 +524,18 @@ function miniChart([lane, title, unit, vals, todayLabel]) {
   return s + '</svg>';
 }
 document.getElementById('multiples').append(...MULTI.map((m) => h('div', { class: 'mini' },
-  `<h3><span class="sw" style="background:${laneColor[m[0]]}"></span>${m[1]}</h3><div class="cat">${LANES.find((l) => l.id === m[0]).name} · ${m[2]}</div>${miniChart(m)}`)));
-document.getElementById('multiples-table').innerHTML = `<table><tr><th>Count</th><th>Category</th><th class="num">Today</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>${MULTI.map(([lane, t, u, v, tl]) => `<tr><td>${t} (${u})</td><td>${LANES.find((l) => l.id === lane).name}</td><td class="num">${tl || v[0]}</td><td class="num">${v[1]}</td><td class="num">${v[2]}</td><td class="num">${v[3]}</td></tr>`).join('')}</table>`;
+  `<h3><span class="sw" style="background:${laneColor[m[0]]}"></span>${m[1]}</h3><div class="cat">${laneName[m[0]]} · ${m[2]}</div>${miniChart(m)}`)));
+document.getElementById('multiples-table').innerHTML = `<table><tr><th>Count</th><th>Category</th><th class="num">Today</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>${MULTI.map(([lane, t, u, v, tl]) => `<tr><td>${t} (${u})</td><td>${laneName[lane]}</td><td class="num">${tl || v[0]}</td><td class="num">${v[1]}</td><td class="num">${v[2]}</td><td class="num">${v[3]}</td></tr>`).join('')}</table><p class="foot">Sources: weapon and accessory slots CP10; pieces WP §6.3 (Weapon Gems 30 · 27, Branch Gems 0 · 3, Fittings 50, Settings 10 · 20 · 30); nodes and picks CP §6.8; Extra Stats EP §7; slots and ids PP §0.</p>`;
 
-// ---- Choices: stacked columns
+// ---- Choices: stacked columns (a Spell Blade)
 const CHO_CATS = ['classes', 'gear', 'skills', 'stats', 'prof'];
 const CHO = [
-  ['Today, Tier 1', [1, 12, 25, 30, 0], ['her class', '5 weapons, 5 armor halves, Orb kind, support type', '25 forks (and a 50-point budget)', '30 active nodes chosen by hand', '—']],
-  ['Tier 1', [1, 4, 3, 0, 0], ['her class', '3 weapons (one per strike), support type', '3 forks', '—', '—']],
-  ['Tier 2', [2, 13, 6, 1, 1], ['class + specialization', '3 weapons, 3 forms, 5 armor halves, Orb kind, support type', '3 forks (A/B/C) + 3 tip forks', 'Halo kind', 'secondary']],
-  ['Tier 3', [2, 17, 9, 2, 1], ['class + specialization', '+ 3 second forms, second support type', 'two branches held + their tip forks', 'two Halo kinds', 'secondary']],
+  ['Today, Tier 1', [1, 12, 25, 30, 0], ['her class', '5 weapons, 5 armor halves, the Orb\'s kind, a support', '25 forks (and a 50-point budget)', '30 active nodes chosen by hand', '—']],
+  ['Tier 1', [1, 4, 3, 0, 0], ['her class', '3 weapons (a kind in each slot), her accessory\'s form', '3 forks', '— (a Moon Jewel goes where she sets it)', '— (her calling sets her trade)']],
+  ['Tier 2', [2, 13, 6, 1, 1], ['her class + her class branch', '3 weapons, 3 weapon branches (Pure or Dual), 5 armor halves, 2 accessory forms', '3 forks (A, B or C) + 3 tip forks', 'her weapon moon: Full or Split, and its kinds', 'her secondary']],
+  ['Tier 3', [2, 17, 9, 2, 1], ['her class + her class branch', '+ 3 Tier 3 steps (Keen, Tempered or Evolved), a third accessory form', 'two branches held a tree + their tip forks', 'two weapon moons', 'her secondary']],
 ];
-document.getElementById('choices-legend').innerHTML = CHO_CATS.map((c) => `<span><span class="sw" style="background:${laneColor[c]}"></span>${LANES.find((l) => l.id === c).name}</span>`).join('') + '<span class="muted">Uma Variance: 0 at every tier</span>';
+document.getElementById('choices-legend').innerHTML = CHO_CATS.map((c) => `<span><span class="sw" style="background:${laneColor[c]}"></span>${laneName[c]}</span>`).join('') + '<span class="muted">Uma Template: the calling pick, once (Pace and Late Umas)</span>';
 (function () {
   const W = 1180, H = 300, pad = { l: 40, r: 20, t: 24, b: 30 }, bw = 64, max = 72;
   const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b, step = iw / CHO.length, y = (v) => H - pad.b - (v / max) * ih;
@@ -427,148 +546,203 @@ document.getElementById('choices-legend').innerHTML = CHO_CATS.map((c) => `<span
     vals.forEach((v, k) => {
       if (!v) return; const y0 = y(acc), y1 = y(acc + v); acc += v; const top = acc === total;
       const hgt = y0 - y1 - 2, r = top ? Math.min(4, hgt) : 0;
-      s += `<path class="mark" tabindex="0" d="M${x},${y0 - 1} V${y1 + 1 + r} Q${x},${y1 + 1} ${x + r},${y1 + 1} H${x + bw - r} Q${x + bw},${y1 + 1} ${x + bw},${y1 + 1 + r} V${y0 - 1} Z" fill="${laneColor[CHO_CATS[k]]}" data-t="${label} · ${LANES.find((l) => l.id === CHO_CATS[k]).name}: ${v}" data-d="${what[k]}"></path>`;
+      s += `<path class="mark" tabindex="0" d="M${x},${y0 - 1} V${y1 + 1 + r} Q${x},${y1 + 1} ${x + r},${y1 + 1} H${x + bw - r} Q${x + bw},${y1 + 1} ${x + bw},${y1 + 1 + r} V${y0 - 1} Z" fill="${laneColor[CHO_CATS[k]]}" data-t="${label} · ${laneName[CHO_CATS[k]]}: ${v}" data-d="${what[k]}"></path>`;
     });
     s += `<text class="val-text" x="${x + bw / 2}" y="${y(total) - 8}" text-anchor="middle" style="font-size:14px">${total}</text>`;
     s += `<text class="axis-text" x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" style="font-size:12px">${label}</text>`;
   });
   document.getElementById('choices-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#choices-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('choices-table').innerHTML = `<table><tr><th></th>${CHO_CATS.map((c) => `<th class="num">${LANES.find((l) => l.id === c).name}</th>`).join('')}<th class="num">Total</th></tr>${CHO.map(([l, v]) => `<tr><td>${l}</td>${v.map((x) => `<td class="num">${x}</td>`).join('')}<td class="num"><b>${v.reduce((a, b) => a + b)}</b></td></tr>`).join('')}</table>`;
+  document.getElementById('choices-table').innerHTML = `<table><tr><th></th>${CHO_CATS.map((c) => `<th class="num">${laneName[c]}</th>`).join('')}<th class="num">Total</th></tr>${CHO.map(([l, v]) => `<tr><td>${l}</td>${v.map((x) => `<td class="num">${x}</td>`).join('')}<td class="num"><b>${v.reduce((a, b) => a + b)}</b></td></tr>`).join('')}</table>`;
 })();
 
-// ---- Tier 1 today vs proposed: share-of-today bars
+// ---- Tier 1 today vs approved: share-of-today bars
 const SIMPLER = [
-  ['classes', 'Weapons a class holds', 5, 3],
-  ['classes', 'Weakness rules to learn', 5, 1],
-  ['gear', 'Gear slots', 12, 9],
-  ['gear', 'Gear rank bars', 24, 0],
-  ['gear', 'Item types the stations make', 400, 30],
-  ['gear', 'Upgrades to max her gear', 120, 90],
-  ['skills', 'Nodes on a class\'s page (Brawler, Mage)', 75, 24],
-  ['skills', 'Picks', 25, 3],
-  ['skills', 'Skills she can hold', 50, 15],
-  ['stats', 'Extra Stats nodes', 100, 25],
-  ['stats', 'Extra Stats items per Uma', 100, 25],
-  ['prof', 'Building upgrades', 22, 0],
-  ['prof', 'Material types', 160, 20],
-  ['prof', 'Things to make', 500, 40],
-  [null, 'Pace: refined items per Uma', 472, 493],
-  [null, 'Pace: hours per Uma', 776, 835],
+  ['classes', 'Weapons a class holds', 5, 3, 'CP2'],
+  ['classes', 'Weakness rules to learn', 5, 1, 'CP §5.3: her twins'],
+  ['gear', 'Gear slots (weapons, armor, accessories)', 12, 9, 'CP10'],
+  ['gear', 'Gear rank bars', 24, 0, 'WP2'],
+  ['gear', 'Item types the stations make', 400, 30, 'WP §6.1'],
+  ['gear', 'Accessory settings to pick from', 100, 15, 'CP §5.3: 10 Orbs × 10 supports → four base forms'],
+  ['gear', 'Upgrades to max her gear', 120, 90, 'WP §6.3'],
+  ['skills', 'Nodes on a class\'s page (Brawler, Mage)', 75, 24, 'CP §5.3'],
+  ['skills', 'Picks', 25, 3, 'CP §5.3'],
+  ['skills', 'Skills she can hold', 50, 15, 'CP §6.8'],
+  ['stats', 'Extra Stats nodes', 100, 20, 'EP §3.6'],
+  ['stats', 'Extra Stats items per Uma', 100, 20, 'EP §3.6'],
+  ['stats', 'Active-node toggles', 30, 0, 'EP §7'],
+  ['prof', 'Building upgrades', 22, 0, 'PP §0'],
+  ['prof', 'Material ids', 160, 20, 'PP §0'],
+  ['prof', 'Things to make', 500, 40, 'PP §0'],
+  [null, 'Pace: refined items per Uma', 472, 485, 'PP §0 (493 with her moon)'],
+  [null, 'Pace: hours per Uma', 776, 822, 'PP §0 (835 with her moon)'],
 ];
 (function () {
   const W = 1180, rowH = 26, pad = { l: 330, r: 150, t: 26, b: 10 }, H = pad.t + pad.b + rowH * SIMPLER.length, max = 1.1;
   const iw = W - pad.l - pad.r, x = (f) => pad.l + (f / max) * iw;
-  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Tier 1 proposal as a share of today">`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Tier 1 as a share of today">`;
   [0, 0.25, 0.5, 0.75, 1].forEach((g) => { s += `<line x1="${x(g)}" x2="${x(g)}" y1="${pad.t - 6}" y2="${H - pad.b}" stroke="${g === 1 ? 'var(--axis)' : 'var(--grid)'}"/><text class="axis-text" x="${x(g)}" y="${pad.t - 10}" text-anchor="middle">${g * 100}%</text>`; });
-  let prev = undefined;
-  SIMPLER.forEach(([lane, label, was, now], i) => {
+  let prev;
+  SIMPLER.forEach(([lane, label, was, now, src], i) => {
     const yc = pad.t + i * rowH + rowH / 2, f = now / was, bw = Math.max(0, x(f) - x(0)), bh = 14, y = yc - bh / 2, r = Math.min(4, bw);
-    if (lane !== prev) { s += `<text class="axis-text" x="12" y="${yc + 4}" style="font-weight:700;fill:var(--ink-soft)">${lane ? LANES.find((l) => l.id === lane).name : 'Pace'}</text>`; prev = lane; }
+    if (lane !== prev) { s += `<text class="axis-text" x="12" y="${yc + 4}" style="font-weight:700;fill:var(--ink-soft)">${lane ? laneName[lane] : 'Pace'}</text>`; prev = lane; }
     s += `<text class="val-soft" x="${pad.l - 12}" y="${yc + 4}" text-anchor="end" style="fill:var(--ink)">${label}</text>`;
-    if (bw > 0) s += `<path class="mark" tabindex="0" d="M${x(0)},${y} H${x(0) + bw - r} Q${x(0) + bw},${y} ${x(0) + bw},${y + r} V${y + bh - r} Q${x(0) + bw},${y + bh} ${x(0) + bw - r},${y + bh} H${x(0)} Z" fill="${lane ? laneColor[lane] : 'var(--neutral-strong)'}" data-t="${label}" data-d="Today ${was} → proposed ${now} (${Math.round(f * 100)}% of today)"></path>`;
+    if (bw > 0) s += `<path class="mark" tabindex="0" d="M${x(0)},${y} H${x(0) + bw - r} Q${x(0) + bw},${y} ${x(0) + bw},${y + r} V${y + bh - r} Q${x(0) + bw},${y + bh} ${x(0) + bw - r},${y + bh} H${x(0)} Z" fill="${lane ? laneColor[lane] : 'var(--neutral-strong)'}" data-t="${label}" data-d="Today ${was} → Tier 1 ${now} (${Math.round(f * 100)}% of today) · ${src}"></path>`;
     else s += `<circle cx="${x(0)}" cy="${yc}" r="4" fill="${laneColor[lane]}"/>`;
     s += `<text class="val-text" x="${x(Math.max(f, 0)) + (bw > 0 ? 8 : 10)}" y="${yc + 4}">${was} → ${now}</text><text class="val-soft" x="${W - 10}" y="${yc + 4}" text-anchor="end">${Math.round(f * 100)}%</text>`;
   });
   document.getElementById('simpler-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#simpler-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('simpler-table').innerHTML = `<table><tr><th>Category</th><th>Measure (Tier 1)</th><th class="num">Today</th><th class="num">Proposed</th><th class="num">Share</th></tr>${SIMPLER.map(([l, t, w, n]) => `<tr><td>${l ? LANES.find((x) => x.id === l).name : 'Pace'}</td><td>${t}</td><td class="num">${w}</td><td class="num">${n}</td><td class="num">${Math.round((n / w) * 100)}%</td></tr>`).join('')}</table>`;
+  document.getElementById('simpler-table').innerHTML = `<table><tr><th>Category</th><th>Measure (Tier 1)</th><th class="num">Today</th><th class="num">Tier 1</th><th class="num">Share</th><th>Source</th></tr>${SIMPLER.map(([l, t, w, n, src]) => `<tr><td>${l ? laneName[l] : 'Pace'}</td><td>${t}</td><td class="num">${w}</td><td class="num">${n}</td><td class="num">${Math.round((n / w) * 100)}%</td><td class="muted">${src}</td></tr>`).join('')}</table>`;
 })();
 
-// ---- Pace: workload (stacked horizontal, two series) and the stat curve (two lines)
-const WORK = [['Today', 240, 232, 776], ['Tier 1', 365, 128, 835], ['Tier 2', 380, 138, 878], ['Tier 3', 380, 148, 895]];
-document.getElementById('work-legend').innerHTML = `<span><span class="sw" style="background:var(--c2)"></span>Gear: weapons, armor, accessories (and forms)</span><span><span class="sw" style="background:var(--c4)"></span>Extra Stats: jewels (today: Star Gems)</span>`;
+// ---- Pace: workload (stacked horizontal, three series)
+const WORK = [['Today', 240, 232, 0, 776, 'Star Gems'], ['Tier 1', 365, 120, 8, 835], ['Tier 2', 365, 140, 8, 869], ['Tier 3', 365, 160, 8, 903]];
+document.getElementById('work-legend').innerHTML = `<span><span class="sw" style="background:var(--c2)"></span>Gear: Weapon and Branch Gems, Fittings, Settings</span><span><span class="sw" style="background:var(--c4)"></span>Jewels (today: Star Gems)</span><span><span class="sw" style="background:var(--c6)"></span>Her moon's two jewels</span>`;
 (function () {
-  const W = 560, rowH = 44, pad = { l: 64, r: 96, t: 10, b: 24 }, H = pad.t + pad.b + rowH * WORK.length, max = 560;
+  const W = 560, rowH = 44, pad = { l: 64, r: 104, t: 10, b: 24 }, H = pad.t + pad.b + rowH * WORK.length, max = 560;
   const iw = W - pad.l - pad.r, x = (v) => pad.l + (v / max) * iw;
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Refined items per Uma by tier">`;
   [0, 100, 200, 300, 400, 500].forEach((g) => { s += `<line x1="${x(g)}" x2="${x(g)}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--grid)"/><text class="axis-text" x="${x(g)}" y="${H - 6}" text-anchor="middle">${g}</text>`; });
-  WORK.forEach(([label, gear, stats, hours], i) => {
-    const y = pad.t + i * rowH + 12, bh = 20, g1 = x(gear) - x(0), s1 = x(gear + stats) - x(gear);
+  WORK.forEach(([label, gear, jew, moon, hours], i) => {
+    const y = pad.t + i * rowH + 12, bh = 20, segs = [[gear, 'var(--c2)', 'Gear'], [jew, 'var(--c4)', i ? 'Jewels' : 'Star Gems'], [moon, 'var(--c6)', 'Her moon']].filter((z) => z[0] > 0);
     s += `<text class="val-soft" x="${pad.l - 10}" y="${y + 14}" text-anchor="end" style="fill:var(--ink)">${label}</text>`;
-    s += `<rect class="mark" tabindex="0" x="${x(0)}" y="${y}" width="${g1 - 1}" height="${bh}" fill="var(--c2)" data-t="${label} · Gear" data-d="${gear} refined items"></rect>`;
-    s += `<path class="mark" tabindex="0" d="M${x(gear) + 1},${y} H${x(gear) + s1 - 4} Q${x(gear) + s1},${y} ${x(gear) + s1},${y + 4} V${y + bh - 4} Q${x(gear) + s1},${y + bh} ${x(gear) + s1 - 4},${y + bh} H${x(gear) + 1} Z" fill="var(--c4)" data-t="${label} · Extra Stats" data-d="${stats} refined items"></path>`;
-    s += `<text class="val-text" x="${x(gear + stats) + 8}" y="${y + 14}">${gear + stats}</text><text class="val-soft" x="${W - 6}" y="${y + 14}" text-anchor="end">${hours} h</text>`;
+    let acc = 0;
+    segs.forEach(([v, c, n], k) => {
+      const x0 = x(acc), x1 = x(acc + v), last = k === segs.length - 1, r = last ? Math.min(4, x1 - x0) : 0, w = Math.max(1, x1 - x0 - (last ? 0 : 1.5));
+      s += `<path class="mark" tabindex="0" d="M${x0},${y} H${x0 + w - r} Q${x0 + w},${y} ${x0 + w},${y + r} V${y + bh - r} Q${x0 + w},${y + bh} ${x0 + w - r},${y + bh} H${x0} Z" fill="${c}" data-t="${label} · ${n}" data-d="${v} refined items"></path>`;
+      acc += v;
+    });
+    s += `<text class="val-text" x="${x(acc) + 8}" y="${y + 14}">${acc}</text><text class="val-soft" x="${W - 6}" y="${y + 14}" text-anchor="end">${hours} h</text>`;
   });
   document.getElementById('work-chart').innerHTML = s + '</svg>';
   document.querySelectorAll('#work-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
-  document.getElementById('work-table').innerHTML = `<table><tr><th></th><th class="num">Gear</th><th class="num">Extra Stats</th><th class="num">Total</th><th class="num">Hours</th></tr>${WORK.map(([l, g, e, hr]) => `<tr><td>${l}</td><td class="num">${g}</td><td class="num">${e}</td><td class="num">${g + e}</td><td class="num">${hr}</td></tr>`).join('')}</table><p class="foot">Tier 1: Weapon Gems 120, Armor Fittings 125, Accessory Settings 120; jewels 120 + her moon 8. Tiers 2–3 add fork gems (27) and Halo Jewels (10, 20); Weapon Gems fall to 108.</p>`;
+  document.getElementById('work-table').innerHTML = `<table><tr><th></th><th class="num">Gear</th><th class="num">Jewels</th><th class="num">Her moon</th><th class="num">Total</th><th class="num">Hours (without her moon)</th></tr>${WORK.map(([l, g, e, m, hr], i) => `<tr><td>${l}</td><td class="num">${g}</td><td class="num">${e}</td><td class="num">${m || '—'}</td><td class="num">${g + e + m}</td><td class="num">${hr}${i ? ` (${[822, 856, 890][i - 1]})` : ''}</td></tr>`).join('')}</table><p class="foot">Gear 365 in every tier (Weapon Gems 120 → 108 + Branch Gems 12; Fittings 125; Settings 120). Jewels: Planet 60 and Moon 60 · 80 · 100 refined, the Planet Jewel at 12. Amounts don't scale with the tier (PP11). A run of twenty: 15.8 · 28.5 · 29.7 days, today 24.</p>`;
 })();
-const LV = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50], TODAY = [1, 3, 6, 10, 14, 20, 26, 33, 41, 50], NEW = [1, 3, 5, 9, 13, 19, 25, 33, 41, 51];
-document.getElementById('stat-legend').innerHTML = `<span><span class="sw" style="background:var(--neutral-strong)"></span>Today, on curve</span><span><span class="sw" style="background:var(--c4)"></span>Proposed: planet + that stat's moon</span>`;
+
+// ---- Pace: a stat with its moon by level (step lines at the opening levels) and today's on-curve stars
+const OPEN = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46];
+const TIERV = [[1, 3, 5, 9, 13, 19, 25, 33, 41, 51], [2, 6, 10, 17, 24, 35, 46, 60, 74, 92], [3, 8, 13, 23, 33, 49, 65, 86, 107, 133]];
+const TODAY_LV = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50], TODAY = [1, 3, 6, 10, 14, 20, 26, 34, 41, 51];
+const TK = ['var(--tk1)', 'var(--tk2)', 'var(--tk3)'];
+document.getElementById('stat-legend').innerHTML = `<span><span class="ln" style="border-color:var(--neutral-strong)"></span>Today, on curve</span>` + TK.map((c, i) => `<span><span class="ln" style="border-color:${c}"></span>Tier ${i + 1} (× ${[1, 1.8, 2.6][i]})</span>`).join('');
 (function () {
-  const W = 560, H = 236, pad = { l: 40, r: 112, t: 14, b: 28 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
-  const x = (lv) => pad.l + ((lv - 5) / 45) * iw, y = (v) => H - pad.b - (v / 55) * ih;
-  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Stat from Extra Stats by level, today vs proposed">`;
-  [0, 10, 20, 30, 40, 50].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">+${g}</text>`; });
-  LV.forEach((lv) => { s += `<text class="axis-text" x="${x(lv)}" y="${H - 8}" text-anchor="middle">Lv ${lv}</text>`; });
-  const path = (vals) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(LV[i])},${y(v)}`).join(' ');
-  s += `<path d="${path(TODAY)}" fill="none" stroke="var(--neutral-strong)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  s += `<path d="${path(NEW)}" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  s += `<circle cx="${x(50)}" cy="${y(50)}" r="4" fill="var(--neutral-strong)" stroke="var(--panel)" stroke-width="2"/><circle cx="${x(50)}" cy="${y(51)}" r="4" fill="var(--c4)" stroke="var(--panel)" stroke-width="2"/>`;
-  // The two lines meet at Lv 50, so the end labels sit apart on leader lines rather than stacked on the points.
-  s += `<path d="M${x(50) + 6},${y(51)} L${x(50) + 18},${y(51) - 14} H${x(50) + 24}" fill="none" stroke="var(--axis)"/><text class="val-soft" x="${x(50) + 27}" y="${y(51) - 10}">Proposed +51</text>`;
-  s += `<path d="M${x(50) + 6},${y(50)} L${x(50) + 18},${y(50) + 14} H${x(50) + 24}" fill="none" stroke="var(--axis)"/><text class="val-soft" x="${x(50) + 27}" y="${y(50) + 18}">Today +50</text>`;
+  const W = 560, H = 236, pad = { l: 40, r: 108, t: 12, b: 28 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const x = (lv) => pad.l + ((lv - 1) / 49) * iw, y = (v) => H - pad.b - (v / 140) * ih;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="A stat with its moon by level, per tier, and today's on-curve stars">`;
+  [0, 25, 50, 75, 100, 125].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="var(--grid)"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">+${g}</text>`; });
+  [1, 10, 20, 30, 40, 50].forEach((lv) => { s += `<text class="axis-text" x="${x(lv)}" y="${H - 8}" text-anchor="middle">Lv ${lv}</text>`; });
+  const step = (vals) => vals.map((v, i) => `${i ? `H${x(OPEN[i])} V${y(v)}` : `M${x(OPEN[0])},${y(v)}`}`).join(' ') + ` H${x(50)}`;
+  s += `<path d="${TODAY_LV.map((lv, i) => `${i ? 'L' : 'M'}${x(lv)},${y(TODAY[i])}`).join(' ')}" fill="none" stroke="var(--neutral-strong)" stroke-width="2" stroke-dasharray="4 3" stroke-linejoin="round"/>`;
+  TIERV.forEach((vals, i) => { s += `<path d="${step(vals)}" fill="none" stroke="${TK[i]}" stroke-width="2" stroke-linejoin="round"/>`; });
+  // End labels, nudged apart (Today and Tier 1 both end at +51).
+  const ends = [[51, 'Today +51', 'var(--neutral-strong)'], [51, 'Tier 1 +51', TK[0]], [92, 'Tier 2 +92', TK[1]], [133, 'Tier 3 +133', TK[2]]].map(([v, t, c]) => ({ v, t, c, yy: y(v) }));
+  ends.sort((a, b) => a.yy - b.yy); for (let i = 1; i < ends.length; i++) if (ends[i].yy - ends[i - 1].yy < 14) ends[i].yy = ends[i - 1].yy + 14;
+  ends.forEach((e) => { s += `<circle cx="${x(50)}" cy="${y(e.v)}" r="3.5" fill="${e.c}" stroke="var(--panel)" stroke-width="1.5"/><path d="M${x(50) + 5},${y(e.v)} L${x(50) + 14},${e.yy} H${x(50) + 18}" fill="none" stroke="var(--axis)"/><text class="val-soft" x="${x(50) + 21}" y="${e.yy + 4}">${e.t}</text>`; });
   s += `<line id="cross" x1="0" x2="0" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--axis)" style="opacity:0"/><rect id="hit" x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
   document.getElementById('stat-chart').innerHTML = s + '</svg>';
   const svg = document.querySelector('#stat-chart svg'), hit = svg.querySelector('#hit'), cross = svg.querySelector('#cross');
+  const at = (vals, lv) => { let v = 0; OPEN.forEach((o, i) => { if (lv >= o) v = vals[i]; }); return v; };
   hit.addEventListener('mousemove', (e) => {
     const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse());
-    const i = Math.max(0, Math.min(9, Math.round(((p.x - pad.l) / iw) * 9))); cross.setAttribute('x1', x(LV[i])); cross.setAttribute('x2', x(LV[i])); cross.style.opacity = 1;
-    tip.innerHTML = `<b>Lv ${LV[i]}</b>Today +${TODAY[i]} · proposed +${NEW[i]}`; tip.style.opacity = 1; tip.style.left = e.clientX + 14 + 'px'; tip.style.top = e.clientY + 16 + 'px';
+    const lv = Math.max(1, Math.min(50, Math.round(1 + ((p.x - pad.l) / iw) * 49)));
+    cross.setAttribute('x1', x(lv)); cross.setAttribute('x2', x(lv)); cross.style.opacity = 1;
+    const ti = TODAY_LV.findIndex((l) => l === lv);
+    tip.innerHTML = `<b>Lv ${lv}</b>Tier 1 +${at(TIERV[0], lv)} · Tier 2 +${at(TIERV[1], lv)} · Tier 3 +${at(TIERV[2], lv)}${ti >= 0 ? ` · today about +${TODAY[ti]}` : ''}`;
+    tip.style.opacity = 1; tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 10) + 'px'; tip.style.top = e.clientY + 16 + 'px';
   });
   hit.addEventListener('mouseleave', () => { cross.style.opacity = 0; tip.style.opacity = 0; });
-  document.getElementById('stat-table').innerHTML = `<table><tr><th>Level</th>${LV.map((l) => `<th class="num">${l}</th>`).join('')}</tr><tr><td>Today</td>${TODAY.map((v) => `<td class="num">+${v}</td>`).join('')}</tr><tr><td>Proposed</td>${NEW.map((v) => `<td class="num">+${v}</td>`).join('')}</tr></table>`;
+  document.getElementById('stat-table').innerHTML = `<table><tr><th>Opens at Lv</th>${OPEN.map((l) => `<th class="num">${l}</th>`).join('')}</tr>${TIERV.map((v, i) => `<tr><td>Tier ${i + 1}</td>${v.map((n) => `<td class="num">+${n}</td>`).join('')}</tr>`).join('')}<tr><td>Today (Lv 5 … 50)</td>${TODAY.map((n) => `<td class="num">+${n}</td>`).join('')}</tr></table><p class="foot">A stat with its moon: the Planet and a full moon (HP, MP, DEF and M.DEF for every class; ATK for the Brawler, M.ATK for the Mage). Today's row is at Lv 5, 10 … 50 (onCurveStars).</p>`;
+})();
+
+// ---- Pace: the foes keep pace (stat-balance §3.3)
+const FLV = [10, 20, 30, 40, 50];
+const FOE = [
+  { t: 'Tier 2, no term', v: [1.13, 1.20, 1.36, 1.43, 1.46], c: TK[1], dash: true },
+  { t: 'Tier 3, no term', v: [1.25, 1.38, 1.63, 1.76, 1.85], c: TK[2], dash: true },
+  { t: 'Tier 2, approved term', v: [1.06, 1.04, 1.10, 1.08, 1.03], c: TK[1] },
+  { t: 'Tier 3, approved term', v: [1.03, 1.02, 1.11, 1.10, 1.05], c: TK[2] },
+];
+const BOSS = { 'Tier 2': [1.00, 1.02, 1.05, 1.02, 0.96], 'Tier 3': [0.99, 0.98, 1.09, 1.06, 1.00] };
+document.getElementById('foe-legend').innerHTML = FOE.map((f) => `<span><span class="ln${f.dash ? ' dash' : ''}" style="border-color:${f.c}"></span>${f.t}</span>`).join('') + `<span><span class="sw" style="background:color-mix(in srgb, var(--c3) 22%, transparent)"></span>Within ±10% of Tier 1</span>`;
+(function () {
+  const W = 1180, H = 260, pad = { l: 48, r: 210, t: 14, b: 28 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const x = (lv) => pad.l + ((lv - 10) / 40) * iw, y = (v) => H - pad.b - ((v - 0.8) / 1.1) * ih;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="How fast a party fells a regular against Tier 1, with and without the toolbox terms">`;
+  s += `<rect x="${pad.l}" y="${y(1.1)}" width="${iw}" height="${y(0.9) - y(1.1)}" fill="color-mix(in srgb, var(--c3) 14%, transparent)"/>`;
+  [0.8, 1.0, 1.2, 1.4, 1.6, 1.8].forEach((g) => { s += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(g)}" y2="${y(g)}" stroke="${g === 1 ? 'var(--axis)' : 'var(--grid)'}"/><text class="axis-text" x="${pad.l - 8}" y="${y(g) + 4}" text-anchor="end">×${g.toFixed(1)}</text>`; });
+  FLV.forEach((lv) => { s += `<text class="axis-text" x="${x(lv)}" y="${H - 8}" text-anchor="middle">Tier level ${lv}</text>`; });
+  FOE.forEach((f) => {
+    s += `<path d="${f.v.map((v, i) => `${i ? 'L' : 'M'}${x(FLV[i])},${y(v)}`).join(' ')}" fill="none" stroke="${f.c}" stroke-width="2" ${f.dash ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round"/>`;
+    f.v.forEach((v, i) => { s += `<circle class="mark" cx="${x(FLV[i])}" cy="${y(v)}" r="${f.dash ? 3 : 3.5}" fill="${f.dash ? 'var(--panel)' : f.c}" stroke="${f.c}" stroke-width="1.5" data-t="${f.t} · Lv ${FLV[i]}" data-d="×${v.toFixed(2)} Tier 1's speed${f.dash ? '' : `; bosses × 1.1: ×${BOSS[f.t.slice(0, 6)][i].toFixed(2)}`}"/>`; });
+  });
+  const ends = FOE.map((f) => ({ t: `${f.t} ×${f.v[4].toFixed(2)}`, c: f.c, v: f.v[4], yy: y(f.v[4]) })).sort((a, b) => a.yy - b.yy);
+  for (let i = 1; i < ends.length; i++) if (ends[i].yy - ends[i - 1].yy < 15) ends[i].yy = ends[i - 1].yy + 15;
+  ends.forEach((e) => { s += `<path d="M${x(50) + 6},${y(e.v)} L${x(50) + 16},${e.yy} H${x(50) + 22}" fill="none" stroke="var(--axis)"/><text class="val-soft" x="${x(50) + 26}" y="${e.yy + 4}" style="fill:var(--ink)">${e.t}</text>`; });
+  document.getElementById('foe-chart').innerHTML = s + '</svg>';
+  document.querySelectorAll('#foe-chart .mark').forEach((m) => bindTip(m, m.dataset.t, m.dataset.d));
+  document.getElementById('foe-table').innerHTML = `<table><tr><th>Against Tier 1, on curve</th>${FLV.map((l) => `<th class="num">Lv ${l}</th>`).join('')}</tr>${FOE.map((f) => `<tr><td>${f.t}</td>${f.v.map((v) => `<td class="num">×${v.toFixed(2)}</td>`).join('')}</tr>`).join('')}${Object.entries(BOSS).map(([t, v]) => `<tr><td>${t} boss, term × 1.1</td>${v.map((n) => `<td class="num">×${n.toFixed(2)}</td>`).join('')}</tr>`).join('')}</table><p class="foot">The terms (SB3–SB5): Tier 2 HP and DEF 1 + 0.27 (ℓ − 1) ÷ 49 (×1.27 by Lv 50), Tier 3 1.08 + 0.40 (ℓ − 1) ÷ 49 (×1.48), offense +10% by Lv 50 in both, bosses × 1.1. Without them the toolboxes add +46% and +85% (stat-balance §3.4).</p>`;
 })();
 
 // ---- Matrix
 const MX = [
   ['classes', [
-    ['Class choice', '6 classes, free switching', '6 classes, free switching', '+ <b>a specialization</b>, one of two', '+ <b>a mastery</b>, one per class'],
-    ['Starting class', 'Running style (never a Spell Blade)', 'Her <b>calling</b>: 8 rows, every class has starters', 'Kept through promotion', 'Kept'],
-    ['Foes weak to', '2–5 kinds, half drawn at random', '<b>1 strike</b>: Heavy, Flurry or Area', '<b>2 kinds</b> of their strike', '<b>1 kind</b> of their strike'],
-    ['Charged-move locks', 'Kinds to match', 'Weak acts to count', 'Kinds again; a Dual counts', 'Kinds'],
+    ['Class choice', '6 classes, free switching', '6 classes, free switching', '+ <b>a class branch</b>, one of two: a <b>focus</b> (+15% on its group), her default or reverse set, three class skills', '+ the branch\'s <b>capstone</b> and the class\'s <b>mastery</b>'],
+    ['Weapon groups (the owner\'s words)', '—', '—', '<b>Heavy</b> and <b>Lite</b> Arms · <b>Elemental</b> and <b>Arcane</b> Tomes: a focus on Heavy + Elemental (the docs\' Ring) or Lite + Arcane (Light/Dark)', 'The same'],
+    ['Weapon slots', '5', '<b>3</b>, by channel: Arms 3 · 0 · 2 · 1 · 2 · 1', '3', '3'],
+    ['Default weapons', 'Five', '<b>The owner\'s three</b>', 'Branch 1 the defaults, branch 2 the <b>reverse set</b>', 'The same'],
+    ['Starting class', 'Running style (never a Spell Blade)', 'Her <b>calling</b> by rule; a <b>one-time pick</b> for Pace and Late Umas', 'Kept', 'Kept'],
+    ['Foes weak to', '2–5 kinds, half drawn at random', '<b>2: her twins</b> (an Arm and its element)', 'Regulars <b>1</b>; sub-bosses and bosses 2', 'Regulars and sub-bosses 1; bosses 2'],
+    ['Shields: regular · sub-boss · boss', '2–3 · 6 · 8', '2–3 · 5 · 6', '3–4 · 7 · <b>9</b>', '3–4 · 6 · <b>10</b>'],
+    ['The foes\' toolbox term (by Lv 50)', '—', '—', 'HP and DEF <b>×1.27</b> · offense +10%; bosses × 1.1', 'HP and DEF <b>×1.08 → ×1.48</b> · +10%; bosses × 1.1'],
+    ['MP back a round', 'The Spring or the Siphon, worn', '<b>0.8% of max MP per open skill depth</b> (4% from Class Rank 40), every Uma', 'The same', 'The same'],
   ]],
   ['gear', [
-    ['Weapon slots', '5 (5 + 0 or 3 + 2)', '<b>3</b>, one per strike', '3', '3'],
-    ['Weapon forms', '— (weapon arts proposed)', 'Base: one kind, G0–G10', '+ G5 fork: <b>Dual</b> or <b>Pure</b>', '+ G5 fork: <b>Prism</b>, <b>Tempered</b> or <b>Keen</b>'],
-    ['A weak hit', '×1.3', '×1.3', '×1.3, or ×1.5 (Pure)', 'Up to ×1.7 (Keen)'],
-    ['Armor', '5, a half per piece (32 suits)', '5, her class\'s half', '5, per piece for the four between', 'The same'],
-    ['Accessories', '2: an Orb and a support', '<b>1</b>: Support', '<b>2</b>: + Damage (an Orb)', '<b>3</b>: + a second Support'],
+    ['A weapon', 'Crafted, bound; Weapon Rank', '<b>Owned at G0</b>; a Weapon Gem raises it a grade', '+ the <b>Branch Gem</b> at G5', 'The same'],
+    ['Weapon branch', '—', 'Base: one kind, weak ×1.3', '<b>Pure</b> (×1.5) or <b>Dual</b> (+ its fixed partner)', 'Pure → <b>Keen</b> (×1.7) or <b>Tempered</b>; Dual → Tempered or <b>Evolved</b>'],
+    ['Two-kind weapons in her slots', '—', '0', '1', '2 (the Brawler and the Mage 1)'],
+    ['Might at G10 · kind cap', '68 · +68', '68 · +68', '122 · +122', '177 · +177'],
+    ['Armor', '5, a half per piece; Armor Ranks', '5 slots, her class\'s half; <b>all defense</b>: HP +150, DEF and M.DEF +40, MP +30', '× 1.8; <b>per piece</b> for the four between', '× 2.6'],
+    ['Accessories', '2 typed: Damage (Orb), Support', '<b>1</b>: one of four base forms (Pendant, Orb, Bell, Insignia)', '<b>2</b>: two branches a family from a slot\'s G5', '<b>3</b>: each branch a step deeper'],
     ['What gates a grade', '24 rank bars, Gear Marks, Manuals', 'Uma Lv 5g − 4', 'The same', 'The same'],
-    ['Items to max one Uma', '120 pieces, bound in order', '90 upgrades', '100 (3 fork gems)', '110 (3 fork gems)'],
+    ['Pieces to max one Uma', '120, bound in order', '90', '100 (+ 3 Branch Gems; Settings 20)', '110 (Settings 30)'],
   ]],
   ['skills', [
-    ['Trees she uses', '5 (of 5 or 10)', '3', '3', '3'],
-    ['Nodes a tree', '15', '8: trunk, fork, two branches', '14: + branch C, tip forks', '17: + depth 6 capstones'],
-    ['Picks a class', '25 forks + 50 points', '<b>3</b>, each with a default', '<b>6</b>', '<b>9</b>: two branches held'],
-    ['Skills held · equipped', 'Up to 50 · 3 → 10', '15 · 3 → 7', '15 · 3 → 10', '30 · 10 + a master slot'],
-    ['Skill currency', 'Side points', 'None', 'None', 'None'],
-    ['Her tree\'s root', '—', 'Class, ★ Flourish', '+ specialization', '+ mastery'],
+    ['Trees she uses · nodes a weapon tree', '5 (of 5 or 10) · 15', '3 · 8: trunk, one fork, two branches', '3 + <b>her class tree</b> · 14: + branch C, tip forks', '3 + her class tree · 17: + <b>depth 6 capstones</b>'],
+    ['Picks a class', '25 forks + 50 points', '<b>3</b>, each with a default', '<b>7</b> (6 and her branch)', '<b>10</b> (9 and her branch): two branches held'],
+    ['Skills held · equipped', 'Up to 50 · 3 → 10', '15 · 3 → 7', '18 · 3 → 10', '34 · 10 and a <b>master slot</b>'],
+    ['Skill currency · Skill Ranks', 'Side points · —', 'None · <b>Ranks 1–5</b>, +1 every 2 Class Ranks', 'None · the same, class skills too', 'None · the same; capstones open whole'],
+    ['Depth gates (Class Rank)', '1 … 40; sides 5 … 45', '1, 10, 20, 30, 40', 'The same; class skills at 20, 30, 40', '+ 50'],
+    ['Her tree\'s root', '—', 'Class, ★ Flourish', '+ her class branch', '+ its capstone and the mastery'],
   ]],
   ['stats', [
-    ['Bodies', 'A Sun and 8 planets', '1 planet, 4 moons', '+ <b>the Halo</b> (one kind), <b>Valor</b>', '+ the Halo\'s 2nd kind, <b>Swiftness</b>'],
-    ['Shared nodes', '100', '25', '29', '33'],
-    ['Her moon', '—', '2 nodes', '2, rebuilt', '2, rebuilt'],
-    ['Nodes that count', '5 → 30, chosen by hand', 'Every open node', 'Every open node', 'Every open node'],
-    ['Jewels: kinds · per Uma', '3 · 100 Star Gems', '2 · 20–25 (+2 hers)', '3 · 24–29 (+2)', '3 · 28–33 (+2)'],
+    ['Bodies', 'A Sun and 8 planets', '<b>The Planet</b> and three moons: Prowess, Vigor, Guard', '+ <b>a weapon moon</b> (Full or Split)', '+ <b>a second weapon moon</b>'],
+    ['Shared nodes (every class)', '100; 5 → 30 active', '20, every open node counts', '25', '30'],
+    ['A stat with its moon, Lv 50', 'About +50', '+51', '+92', '+133'],
+    ['Weapon moons, Lv 50', '—', '—', 'Full +90 on one kind, or Split +63 on two', '+ Full +130 and Split +91: all three weapons'],
+    ['Jewel kinds · items · an Uma', '3 · 100 Star Gems', '2 · 10 · 20 (+2 hers)', '2 · 10 · 25 (+2)', '2 · 10 · 30 (+2)'],
+    ['Limit start · evasion', 'Limit and Speed planets', 'Her knack (Gritty, Fleet); feet armor 12%', 'The same', 'The same'],
   ]],
   ['prof', [
-    ['Places on the Wilds', '11 facilities', '10 places, one a profession, each an existing building', '10', '10'],
-    ['Work slots', '33–55 slots, 22 upgrades', '<b>40</b>, 4 a place, no upgrades', '40', '40'],
-    ['Material types', '160 (80 raw, 80 refined)', '20: a pair a profession, today\'s icons', '40: + a Tier 2 pair', '60: + a Tier 3 pair'],
-    ['New art', '—', 'None: existing frames and icons', 'None', 'None'],
-    ['Where an Uma works', 'Any of 11', 'Her trade\'s 2 places', '+ a <b>secondary</b>\'s gathering (base pair)', 'Secondary + its Tier 2 pair'],
-    ['One Uma maxed', '472 refined, 776 h', '485 (493 with her moon), 822 h', '510 (518), 864 h', '520 (528), 881 h'],
+    ['Professions', 'One Craft Level, any job anywhere', '<b>Ten</b>: five gathering, one processing, four making', 'The same', 'The same'],
+    ['Places · slots', '11 facilities · 33–55, 22 upgrades', '10 existing buildings · <b>40</b>, no upgrades', '10 · 40', '10 · 40'],
+    ['Where an Uma works', 'Any of 11', 'Her <b>trade</b>\'s 2 places', '+ a <b>secondary</b>\'s base work', 'The secondary reaches its Tier 2 work'],
+    ['Material types a gathering line · ids', '8 families × 10 grades · 160', '2 · 20', '4 · 40', '6 · 60'],
+    ['Which material a grade takes', 'Two families, rotating', 'G1–G5 low, G6–G10 high', 'G5 and G10 on <b>Tier 2\'s pair</b>', 'G4 and G9 Tier 2\'s; G5 and G10 <b>Tier 3\'s</b>'],
+    ['One Uma maxed: refined · hours', '472 · 776 h', '485 (493) · 822 h (835)', '505 (513) · 856 h (869)', '525 (533) · 890 h (903)'],
+    ['A run of twenty', '24 days', '15.8 days', '28.5 days', '29.7 days'],
   ]],
   ['var', [
-    ['Her template', '—', 'Calling, stride, knack: ★ Flourish, her moon', '+ <b>signature tip</b>', 'Tip at both of the tree\'s forks'],
-    ['Choices it asks', '—', 'None', 'One tip option', 'The same'],
-    ['Matched edge', '—', 'About +5% at most', 'The same', 'The same'],
+    ['Her template', '—', 'Calling, <b>★ Flourish</b>, <b>★ signature accessory</b>, <b>★ her moon</b>', '+ <b>★ signature tip</b>', 'The tip at both tip forks'],
+    ['★ Flourish', '—', '4% of her max HP a fight, by stride: Clean break, Even pace, Late reserve', 'The same share', 'The same share'],
+    ['★ Signature accessory', '—', 'Her knack\'s family, worn: ATK and M.ATK +0.2 a level (+10 at Lv 50)', '+0.36 a level (+18)', '+0.52 a level (+26)'],
+    ['★ Her moon', '—', 'I knack +4 (Lv 16) · II her channel\'s defense +8 (Lv 36)', '+7 · +14', '+10 · +21'],
+    ['Choices it asks', '—', 'The calling pick, once (Pace and Late)', 'The tip is a tree pick', 'The same'],
+    ['Budget, matched (Lv 50)', '—', 'Damage +5.2–6.1%; defense +4.7% (+ her knack 0–2.8%); pace 0', 'Damage +4.6–5.3%', 'Damage +4.3–4.8%'],
   ]],
 ];
-document.getElementById('mx').innerHTML = `<thead><tr><th style="width:190px"></th><th>Today (every tier)</th><th class="t" style="--tc:var(--t1)">Tier 1 · Apprentice</th><th class="t" style="--tc:var(--t2)">Tier 2 · Adept</th><th class="t" style="--tc:var(--t3)">Tier 3 · Master</th></tr></thead><tbody>` +
-  MX.map(([lane, rows]) => `<tr class="catrow"><td colspan="5"><span class="sw" style="background:${laneColor[lane]};margin-right:8px"></span>${LANES.find((l) => l.id === lane).name}</td></tr>` +
+document.getElementById('mx').innerHTML = `<thead><tr><th style="width:200px"></th><th>Today (every tier)</th><th class="t" style="--tc:var(--t1)">Tier 1 · Apprentice</th><th class="t" style="--tc:var(--t2)">Tier 2 · Adept</th><th class="t" style="--tc:var(--t3)">Tier 3 · Master</th></tr></thead><tbody>` +
+  MX.map(([lane, rows]) => `<tr class="catrow"><td colspan="5"><span class="sw" style="background:${laneColor[lane]};margin-right:8px"></span>${laneName[lane]}</td></tr>` +
     rows.map(([r, ...c]) => `<tr><td><b>${r}</b></td><td class="today">${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td></tr>`).join('')).join('') + '</tbody>';
 </script>
 </body>

@@ -333,7 +333,10 @@
     <h2>The calling pick, on the Uma sheet</h2>
     <p class="sub">The owner (2026-10-22): Pace and Late Umas may choose, once, at Uma Lv 1 with no Class Rank yet. A Pace Uma picks
       Spell Blade or Mage, a Late Uma Paladin or Cleric; her Power against her Wit pre-selects today's answer. Two invented
-      Umas below; tap a tile to see what the other choice would set.</p>
+      Umas below; tap a tile to see what the other choice would set. <i>Follow-up to D197 (Uma Templates), 2026-10-25:
+      each tile's template line reads the Uma Templates pass: the Flourish 4% of her max HP a fight, her moon's node II on
+      her calling channel's defense, the signature tip on her lead weapon's tree; no affinity
+      (<a href="../uma-templates.md">uma-templates.md</a>, UT6, UT9–UT11).</i></p>
     <div class="sheet" id="sheets"></div>
     <div class="flow">
       <div><b>Unlock</b>Lv 1, no Class EXP. Her calling card shows the pre-selected class, active from the start.</div>
@@ -505,7 +508,8 @@ const LATER = [
   ['Armor', 'The four classes between mix halves per piece; all defense, × 1.8', '× 2.6', '../weapon-progression.md#4-armor', 'weapon-armor.html', 'armor'],
   // Follow-up to D194 (Extra Stats), 2026-10-24: the weapon moons replace the Halo, Valor and Swiftness.
   ['Extra Stats', 'A weapon moon: Full +90 on one kind or Split +63 on two, outside the kind cap', 'A second weapon moon (Full +130, Split +91): Full + Split serves all three weapons', '../extra-stats-progression.md#4-tier-2-a-weapon-moon', 'stars-maps.html', 'the map'],
-  ['Her template', 'The signature tip on her affinity kind\'s tree; the affinity (+6%) every tier', 'The tip at both of its forks', `${DOC}#69-her-template-on-the-trees-affinity-cp36`, 'class-templates.html#affinity', 'affinity'],
+  // Follow-up to D197 (Uma Templates), 2026-10-25: the tip on her lead weapon's tree; the affinity retired (UT9, UT11).
+  ['Her template', 'The ★ signature tip on her lead weapon\'s tree (Quickstep, Spillover or Long guard, as her calling); the affinity retired', 'The tip at both of its forks', '../uma-templates.md#35-the-signature-tip-ut9', 'uma-gives.html#tiers', 'what it gives'],
   ['Limit Breaks', 'LB+ at Bond 10: 24 extra effects', 'Kept', `${DOC}#8-halls-of-heroes-and-limit-breaks-cp28-cp35`, 'class-weaknesses.html#lb', 'coverage'],
   ['Foes', 'Regulars weak to one kind; shields +1', 'Sub-bosses one kind too; bosses keep two', `${DOC}#42-tiers-2-and-3-the-list-narrows-by-rank-cp6`, 'class-weaknesses.html#tiers', 'by rank'],
   ['The Rift', 'Each path\'s guided build; Arcane one element a foe; Horde keys one kind', 'The same rules, narrower', `${DOC}#43-the-rifts-fronts-cp7`, 'class-weaknesses.html#rift', 'fronts'],
@@ -548,13 +552,14 @@ const AFF = [
   ['Stat leans', 'Per class', 'Unchanged: no specialization moves them', 'The same'],
   ['Healing and its stat', 'Paladin ATK, Cleric M.ATK; one healer a party', 'Unchanged', 'The same'],
   ['Armor', 'Her class\'s half', 'Per piece for the four between', 'Per piece'],
-  ['Accessories', '1 slot: a Pendant or a Bell (weapon-progression WP18–WP19)', '2 (+ Orbs), then 3 (+ Insignias)', '2: Damage, Support'],
+  ['Accessories', '1 slot: any of the four families in its base form, Pendant, Orb, Bell or Insignia (weapon-progression WP18–WP19)', '2 slots, with branches from a slot’s G5; then 3, with their step (WP19, WP34)', '2: Damage, Support'],
   ['Standard preset', 'Her 3 weapons, the half, weapon-progression\'s accessory for her set (WP25)', 'Her branch\'s set and its accessories (WP25)', '5 weapons, half, Orb, support'],
   ['Limit Break power', 'Brawler 2×, Mage 2.4×, hybrids 2.2×, healers 1.5×', 'Unchanged; LB+ is the halls\'', 'The same'],
   ['Class Rank', 'Per class; opens depths 1–5 and <b>ranks every skill</b>, every 2 Class Ranks', '+ depth 6 in Tier 3', 'Depths and side points'],
   ['Class branch · mastery', '—', 'One of two branches: a <b>focus</b> (Ring or Light/Dark, +15%), her set and three class skills (Tier 2) · its capstone and the mastery (Tier 3)', '—'],
   ['Which foes she answers', 'The twins of her three kinds: 34–66% of foes on defaults; her Heroes\' Limit Breaks reach the rest', 'Single kinds for regulars; picks and Dual branches widen it', 'Nearly all'],
-  ['Her template', 'Flourish only as her calling; her moon\'s lead only in its channel; <b>her affinity in any class</b>', '+ her signature tip on her affinity kind\'s tree, as her calling', '—'],
+  // Follow-up to D197 (Uma Templates), 2026-10-25: her moon and signature in any class; the affinity retired (UT10–UT12).
+  ['Her template', 'Flourish (4% of her max HP a fight) only as her calling; <b>her moon and her signature in any class</b> (the signature while worn)', '+ her signature tip on her lead weapon\'s tree, as her calling', '—'],
   ['The Rift', 'A guided build per path: composition and weapons', 'The same', 'Guided compositions'],
   ['Extra Stats', 'The map is class-free; her class splits Prowess, her one offense moon', 'The same; her weapon moons\' kinds are a free setting', 'Which nodes she picks'],
   ['What a switch costs', 'Only the weapons she hasn\'t raised: 0–30 Weapon Gems', 'The same in her tier', 'Ranks per new kind'],
@@ -563,8 +568,10 @@ const AFF = [
 document.getElementById('affects-table').innerHTML = `<thead><tr><th style="width:190px"></th><th class="t" style="--tc:var(--t1)">Tier 1</th><th class="t" style="--tc:var(--t2)">Tiers 2 and 3</th><th>Today</th></tr></thead><tbody>${AFF.map(([d, a, b, t]) => `<tr><td><b>${d}</b></td><td>${a}</td><td>${b}</td><td class="today">${t}</td></tr>`).join('')}</tbody>`;
 
 // ---- Calling pick sheets
-const TPL = { spellblade: ['Spellfencer', 'ATK', 'her Greatsword tree (affinity: the Fire twins)'], mage: ['Spellwright', 'M.ATK', 'her Fire Tome tree (affinity: the Fire twins)'],
-  paladin: ['Stalwart', 'ATK', 'her Bow tree (affinity: the Light twins)'], cleric: ['Pilgrim', 'M.ATK', 'her Light Tome tree (affinity: the Light twins)'] };
+// Follow-up to D197 (Uma Templates), 2026-10-25: node II on her calling channel's defense (UT10); the tip on her lead
+// weapon's tree, branch 1's first slot (UT9); was her affinity twins' tree and node II on offense.
+const TPL = { spellblade: ['Spellfencer', 'DEF', 'her Katana tree (her lead weapon)'], mage: ['Spellwright', 'M.DEF', 'her Fire Tome tree (her lead weapon)'],
+  paladin: ['Stalwart', 'DEF', 'her Greatsword tree (her lead weapon)'], cleric: ['Pilgrim', 'M.DEF', 'her Light Tome tree (her lead weapon)'] };
 const TRADE = { spellblade: ['Forest · Armorer', 3], mage: ['Monster Den · Lapidary', 6], paladin: ['Fields · Workbench', 5], cleric: ['Fields · Workbench', 5] };
 const UMAS = [
   { name: 'Uma A', init: 'A', line: 'Pace A · Medium A · turf', pw: 96, wit: 88, pair: ['spellblade', 'mage'], stride: 'Middle' },
@@ -580,7 +587,7 @@ document.getElementById('sheets').innerHTML = UMAS.map((u, ui) => { const pre = 
         <div class="nm"><span class="cdot" style="--cc:${c.c}"></span>${c.name}</div>
         <dl><dt>Fight type</dt><dd>${c.type}</dd><dt>Starts as</dt><dd>${c.name}, ${c.arms >= 2 ? 'physical' : 'magical'} armor</dd>
         <dt>Trade</dt><dd>${tr[0]} <span class="muted">(${tr[1]} Umas)</span></dd>
-        <dt>Template</dt><dd>${u.stride === 'Middle' ? ({ spellblade: 'Spellfencer', mage: 'Spellwright' })[id] : ({ paladin: 'Stalwart', cleric: 'Pilgrim' })[id]}: Flourish as a ${c.name}; moon lead ${t[1]}; signature tip on ${t[2]}</dd></dl></button>`; }).join('')}</div>
+        <dt>Template</dt><dd>${u.stride === 'Middle' ? ({ spellblade: 'Spellfencer', mage: 'Spellwright' })[id] : ({ paladin: 'Stalwart', cleric: 'Pilgrim' })[id]}: Flourish ${u.stride === 'Middle' ? 'Even pace' : 'Late reserve'} (4% HP a fight) as a ${c.name}; moon II ${t[1]} +8; signature tip on ${t[2]}</dd></dl></button>`; }).join('')}</div>
     <div class="confirm"><span class="btn">Confirm</span><span>Her first win confirms it.${u.pair[0] === 'paladin' ? ' Both choices keep her healer trade.' : ''}</span></div></div></div>`; }).join('');
 document.querySelectorAll('.tile').forEach((b) => b.addEventListener('click', () => { document.querySelectorAll(`.tile[data-u="${b.dataset.u}"]`).forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
 const ROWS = [
