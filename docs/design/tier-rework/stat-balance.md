@@ -1,5 +1,7 @@
 # Stat Balance: the overall balancing pass, Tier 1 to Tier 3
 
+> **Approved by the owner, 2026-10-25 (D196): every call SB1–SB18 as written.** Its §13 follow-ups land as logged edits against D192–D194.
+
 > **For the owner's review (2026-10-24). Nothing here is built.** The Tier rework's **overall stat balancing pass**
 > ([README §5](README.md#5-the-plan), step 5; [§2.5](README.md#25-the-stat-budget-sb1-working-rule-2026-10-23) SB1;
 > [§9.5](README.md#95-simulation-items)'s simulation items), the step after the four approved standalone docs (Class

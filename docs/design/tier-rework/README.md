@@ -348,6 +348,7 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 | **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral). **Follow-ups to D194** (extra-stats §18.1) logged against D193, no decision changed (XC23) |
 | **extra-stats-progression.md** | **Approved by the owner, 2026-10-24 (D194):** EP1–EP29 (weapon moons, Full or Split; Prowess by class; the Halo, Valor and Swiftness retired; her moon in full) |
 | **profession-progression.md** | **Approved by the owner, 2026-10-24 (D195):** PP1–PP25, with the flavor change (Vegetables, Fish); unused materials may be reused later |
+| **stat-balance.md** | **Approved by the owner, 2026-10-25 (D196):** SB1–SB18 (foe terms per tier, boss shields 6 · 9 · 10, the hybrid mirror, accessory forms, the base MP regen) |
 | weapon-research.md | Input (WR1–WR6), decided as WP1–WP12 |
 | variance.md | First round, cross-referenced; the Uma Templates pass's input |
 | classes.md, skill-trees.md, gear.md, extra-stats.md, professions.md | History: superseded by the standalone docs |
