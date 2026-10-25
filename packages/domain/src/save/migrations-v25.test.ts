@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
 import { migrateWorld, toV25, toV26 } from './migrations'
-import { parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
+import { gearV1, parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
 import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save } from './v25.fixture'
 
 const world = (): TierWorld => JSON.parse(JSON.stringify(v24Save().tierWorlds['1'])) as TierWorld
@@ -78,11 +78,11 @@ describe('save v25’s migration (H58, chained in H61)', () => {
   it('puts an Orb in the Damage slot and a Talisman or Amulet in the Support slot; a second Orb stays in her locker', () => {
     const after = migrate(world())
     expect(umaOf(after, '105').gear).toEqual({ locker: ['orb-fire-g1', 'orb-ice-g1'], equipped: { 'accessory-1': 'orb-fire-g1' }, kinds: {} })
-    expect(umaOf(after, '106').gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
+    expect(gearV1(umaOf(after, '106')).equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
     const w = world()
-    umaOf(w, '106').gear.equipped = { 'accessory-1': 'amulet-spring-g1', greatsword: 'greatsword-g1' }
-    umaOf(w, '106').gear.locker.push('greatsword-g1')
-    expect(umaOf(migrate(w), '106').gear.equipped).toEqual({ greatsword: 'greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
+    gearV1(umaOf(w, '106')).equipped = { 'accessory-1': 'amulet-spring-g1', greatsword: 'greatsword-g1' }
+    gearV1(umaOf(w, '106')).locker.push('greatsword-g1')
+    expect(gearV1(umaOf(migrate(w), '106')).equipped).toEqual({ greatsword: 'greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
   })
 
   it('leaves a Brawler, the parties, wallets, the Rift runs and both open fights byte for byte', () => {

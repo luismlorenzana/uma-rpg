@@ -6,7 +6,7 @@ import { rpgDefaultWeapons, rpgProfileTrees, type RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { equipBlock, gearChoices } from './forge'
 import { nodeFromGem } from './observatory'
-import { newOwnedUma, newTierWorld, slotKind, type OwnedUma, type TierWorld } from './save'
+import { gearV1, newOwnedUma, newTierWorld, slotKind, type OwnedUma, type TierWorld } from './save'
 import { upgradesFor } from './upgrades'
 
 const NOW = '2026-10-21T12:00:00.000Z'
@@ -20,7 +20,7 @@ const ranks = (set: { weapons?: Record<string, number>; armors?: Record<string, 
   return { ...r, weapons: tracks(set.weapons), armors: tracks(set.armors), accessories: tracks(set.accessories), classes: tracks(set.classes) }
 }
 const gearOf = (locker: string[], equipped: Partial<Record<GearSlot, string>> = {}, kinds: Partial<Record<string, ArmorKind>> = {}): OwnedUma['gear'] =>
-  ({ locker: [...new Set([...locker, ...Object.values(equipped) as string[]])], equipped, kinds: { ...newOwnedUma(NOW, 'brawler').gear.kinds, ...kinds } })
+  ({ locker: [...new Set([...locker, ...Object.values(equipped) as string[]])], equipped, kinds: { ...gearV1(newOwnedUma(NOW, 'brawler')).kinds, ...kinds } })
 const up = (w: TierWorld, classId: RpgClass = 'brawler') => upgradesFor(w, '101', classId)!
 
 describe('can upgrade (H34)', () => {
@@ -48,7 +48,7 @@ describe('can upgrade (H34)', () => {
   })
 
   it('counts armor only of the kind each slot holds', () => {
-    expect(slotKind(newOwnedUma(NOW, 'brawler').gear, 'head')).toBe('helm')
+    expect(slotKind(gearV1(newOwnedUma(NOW, 'brawler')), 'head')).toBe('helm')
     expect(up(world({}, { 'helm-g1': 1, 'circlet-g1': 1, 'robe-g1': 1 })).gearSlots).toEqual(['head'])
     expect(up(world({ gear: gearOf([], {}, { head: 'circlet', body: 'robe' }) }, { 'helm-g1': 1, 'circlet-g1': 1, 'robe-g1': 1 })).gearSlots).toEqual(['head', 'body'])
     expect(up(world({ gear: gearOf([], {}, { head: 'circlet' }) }, { 'helm-g1': 1 })).gear).toBe(0)
@@ -93,12 +93,12 @@ describe('can upgrade (H34)', () => {
       if (support && rand(2)) equipped['accessory-2'] = support
       const w = world({ ranks: r, gear: gearOf(locker, equipped, kinds) }, stock)
       const uma = w.umas['101']!
-      const worn = (slot: GearSlot) => (uma.gear.equipped[slot] ? grade(uma.gear.equipped[slot]!) : 0)
+      const worn = (slot: GearSlot) => (gearV1(uma).equipped[slot] ? grade(gearV1(uma).equipped[slot]!) : 0)
       const ready = (match: (type: EquipType) => boolean, above: number) =>
         gearChoices(uma, w.gear, (p) => match(p.type)).some((c) => !equipBlock(uma, c.id) && grade(c.id) > above)
       const expected: GearSlot[] = classOf(uma, 'brawler').weapons.filter((t) => ready((p) => p === t, worn(t)))
-      for (const slot of ARMOR_SLOTS) if (ready((p) => p === slotKind(uma.gear, slot), worn(slot))) expected.push(slot)
-      const typeIn = (slot: GearSlot) => (uma.gear.equipped[slot] ? gearIdentity(uma.gear.equipped[slot]!)!.type : undefined)
+      for (const slot of ARMOR_SLOTS) if (ready((p) => p === slotKind(gearV1(uma), slot), worn(slot))) expected.push(slot)
+      const typeIn = (slot: GearSlot) => (gearV1(uma).equipped[slot] ? gearIdentity(gearV1(uma).equipped[slot]!)!.type : undefined)
       for (const slot of ACCESSORY_SLOTS) {
         const type = typeIn(slot)
         if (type ? ready((p) => p === type, worn(slot)) : ACCESSORY_TYPES.some((t) => accessoryFits(slot, t) && ready((p) => p === t, 0))) expected.push(slot)

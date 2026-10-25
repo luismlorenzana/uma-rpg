@@ -79,7 +79,7 @@ function Exchange({ view }: { view: MasterView }) {
         <button type="button" onClick={() => setReading(true)} className="mt-1 flex w-full items-center justify-between rounded-md bg-raised p-3 text-left">
           <span>
             <span className="block font-semibold">Read a Manual</span>
-            <span className="block text-[12px] text-ink-soft">Gear Marks {world.wallet.gearMarks.toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</span>
+            <span className="block text-[12px] text-ink-soft">Gear Marks {(world.wallet.gearMarks ?? 0).toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</span>
           </span>
           <span className="text-ink-faint">›</span>
         </button>
@@ -98,7 +98,7 @@ function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterV
   const read = (ref: RankRef, n: number) => readManual(outfitId!, ref, n).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t read it.'))
   const bar = (ref: RankRef, label: string) => {
     const track = trackOf(uma!.ranks, ref)
-    const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks
+    const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks ?? 0
     const most = Math.floor(marks / MANUAL_PRICE)
     return (
       <li key={`${ref.kind}:${ref.id}`} className="flex items-center gap-2 rounded-sm bg-raised p-2">
@@ -115,7 +115,7 @@ function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterV
   return (
     <BottomSheet title="Which bar?" onClose={onClose}>
         <div className="space-y-3">
-          <p className="text-[12px] text-ink-soft">Gear Marks {world.wallet.gearMarks.toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</p>
+          <p className="text-[12px] text-ink-soft">Gear Marks {(world.wallet.gearMarks ?? 0).toLocaleString('en-US')} · Class Marks {world.wallet.classMarks.toLocaleString('en-US')}</p>
           <section><h4 className="text-micro mb-1">Classes</h4><ul className="space-y-1">{RPG_CLASSES.map((c) => bar({ kind: 'class', id: c }, CLASS_LABEL[c]))}</ul></section>
           <section><h4 className="text-micro mb-1">Weapons</h4><ul className="space-y-1">{WEAPON_TYPES.map((w) => bar({ kind: 'weapon', id: w }, WEAPON_LABEL[w]))}</ul></section>
           <section><h4 className="text-micro mb-1">Armor</h4><ul className="space-y-1">{ARMOR_KINDS.map((k) => bar({ kind: 'armor', id: k }, ARMOR_LABEL[k]))}</ul></section>

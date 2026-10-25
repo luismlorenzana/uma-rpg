@@ -25,9 +25,10 @@ import {
 } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
 import { addPoints, type Points } from '../economy/bonus'
+import { armorHalf, gradeMight, gradePoints, type GearTier } from '../economy/grades'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
-import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, gradesOf, isGrades, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
@@ -124,8 +125,8 @@ export function holdWeapon(save: Save, outfitId: string, classId: RpgClass, slot
   }
   if (gearId !== null) {
     if (gearById(gearId)?.type !== weapon) throw new SaveRuleError('bad-loadout', 'that piece isn’t this weapon')
-    if (uma.gear.equipped[weapon] !== gearId) next = equipGear(next, outfitId, gearId, now, tier)
-  } else if (uma.gear.equipped[weapon]) next = unequipGear(next, outfitId, weapon, now, tier)
+    if (gearV1(uma).equipped[weapon] !== gearId) next = equipGear(next, outfitId, gearId, now, tier)
+  } else if (gearV1(uma).equipped[weapon]) next = unequipGear(next, outfitId, weapon, now, tier)
   return next
 }
 
@@ -220,7 +221,8 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
   let next: OwnedUma = { ...uma, calling: { pick, confirmed: false } }
   if (uma.level === 1) {
     if (uma.classId === null || activeClass(outfit, uma) === umaCalling(outfit, uma.calling?.pick)) next = { ...next, classId: pick }
-    if (!ARMOR_SLOTS.some((slot) => uma.gear.equipped[slot])) next = { ...next, gear: { ...uma.gear, kinds: startingArmorKinds(pick) } }
+    const gear = gearV1(uma)
+    if (!isGrades(uma.gear) && !ARMOR_SLOTS.some((slot) => gear.equipped[slot])) next = { ...next, gear: { ...gear, kinds: startingArmorKinds(pick) } }
   }
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfit.outfitId]: next } }, now)
 }
@@ -243,21 +245,24 @@ export function callingConfirmed(uma: OwnedUma): OwnedUma {
 }
 
 /** Every stat point she brings to a fight: her active Extra Stats nodes (S6) and her armor (S7, D104). */
-export function umaPoints(uma: OwnedUma, classId: RpgClass): Points {
-  const { gear, extra } = umaPointParts(uma, classId)
+export function umaPoints(uma: OwnedUma, classId: RpgClass, tier: GearTier = 1): Points {
+  const { gear, extra } = umaPointParts(uma, classId, tier)
   return addPoints(extra, gear)
 }
 /** Her points apart: what her armor gives, and her active Extra Stats nodes. (Weapons add Might to their hits instead.) */
-export function umaPointParts(uma: OwnedUma, _classId?: RpgClass): { gear: Points; extra: Points } {
-  return { gear: equippedPoints(uma.gear.equipped), extra: starPoints(uma.stars.active) }
+export function umaPointParts(uma: OwnedUma, classId: RpgClass = 'brawler', tier: GearTier = 1): { gear: Points; extra: Points } {
+  const gear = isGrades(uma.gear)
+    ? gradePoints(gradesOf(uma), armorHalf(classId), tier)
+    : equippedPoints(gearV1(uma).equipped)
+  return { gear, extra: starPoints(uma.stars.active) }
 }
 
 /** What her weapons add to each offense on her profile (D119): the average Might of the weapons in her class's five
  * slots that hit with it, Arms with ATK and Tomes with M.ATK, a Training weapon counting 0. In a fight each hit adds its
  * own weapon's Might. */
-export function umaWeaponMight(uma: OwnedUma, classId: RpgClass): { atk: number; matk: number } {
+export function umaWeaponMight(uma: OwnedUma, classId: RpgClass, tier: GearTier = 1): { atk: number; matk: number } {
   const weapons = classOf(uma, classId).weapons
-  const might = equippedMight(uma.gear.equipped, weapons)
+  const might = isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, tier) : equippedMight(gearV1(uma).equipped, weapons)
   const average = (ws: readonly RpgWeapon[]) =>
     ws.length ? Math.round(ws.reduce((n, w) => n + (might[rpgWeaponKind(w)] ?? 0), 0) / ws.length) : 0
   return { atk: average(weapons.filter((w) => !isRpgTome(w))), matk: average(weapons.filter(isRpgTome)) }
@@ -325,9 +330,12 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const classId = activeClass(outfit, uma)
     // Her Flourish by her stored calling pick (save v27, H69): a Pace Uma who picked the Spell Blade has it as one.
     const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling?.pick ?? null) : null
-    return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
-      accessories: equippedAccessories(uma.gear.equipped, engine), ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
+    const gearTier = Number(tier) as GearTier
+    const weapons = classOf(uma, classId).weapons
+    const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
+      points: umaPoints(uma, classId, gearTier), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
+      ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
+    return isGrades(uma.gear) ? common : { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
   })
 }
 
@@ -460,11 +468,13 @@ export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'wea
     gains.push({ ref, exp: amount, before, after: r.track })
   }
   fill({ kind: 'class', id: entrant.classId }, CLASS_EXP_SHARE * exp)
+  if (isGrades(uma.gear)) return { ranks, gains, gearMarks: 0, classMarks }
   for (const [w, n] of Object.entries(weaponExpShares(entrant.weapons, entrant.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
-  for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(uma.gear, slot) }, ARMOR_EXP_SHARE * exp)
+  const gear = gearV1(uma)
+  for (const slot of ARMOR_SLOTS) fill({ kind: 'armor', id: slotKind(gear, slot) }, ARMOR_EXP_SHARE * exp)
   // Each accessory she wears fills its kind's Accessory Rank (D124).
   for (const slot of ACCESSORY_SLOTS) {
-    const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+    const piece = gear.equipped[slot] ? gearById(gear.equipped[slot]!) : undefined
     if (piece && isAccessory(piece.type)) fill({ kind: 'accessory', id: accessoryKindOf(piece.type) }, ACCESSORY_EXP_SHARE * exp)
   }
   return { ranks, gains, gearMarks, classMarks }
@@ -503,7 +513,7 @@ export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind
   const pooled = world.wallet.shards + shards
   const tickets = Math.floor(pooled / SHARDS_PER_TICKET)
   const wallet = { ...world.wallet, unlockTickets: world.wallet.unlockTickets + tickets, shards: pooled % SHARDS_PER_TICKET, laurels: world.wallet.laurels + laurels,
-    gearMarks: world.wallet.gearMarks + gearMarks, classMarks: world.wallet.classMarks + classMarks }
+    ...('gearMarks' in world.wallet ? { gearMarks: (world.wallet.gearMarks ?? 0) + gearMarks } : {}), classMarks: world.wallet.classMarks + classMarks }
   return { world: { ...world, umas, wallet }, members, shards, tickets, laurels, gearMarks, classMarks }
 }
 

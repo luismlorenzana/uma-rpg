@@ -9,7 +9,7 @@ import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
 import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
 import { stageBand, stagePay } from '../world/world'
-import { PARTY_SIZE, type Save, type TierWorld } from './save'
+import { isGrades, PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 
 export const MAX_PURCHASE = 99
@@ -140,8 +140,9 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
 export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, count = 1): string | null {
   const uma = world.umas[outfitId]
   if (!uma) return 'Not unlocked'
+  if (isGrades(uma.gear) && ref.kind !== 'class') return 'Gear Manuals are retired'
   if (trackOf(uma.ranks, ref).rank >= maxRankOf(ref.kind)) return 'Already at the top rank'
-  const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks
+  const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks ?? 0
   return marks < MANUAL_PRICE * count ? `Needs ${MANUAL_PRICE * count} ${ref.kind === 'class' ? 'Class' : 'Gear'} Marks` : null
 }
 
@@ -156,9 +157,10 @@ export function readManuals(save: Save, outfitId: string, ref: RankRef, count: n
   const r = grantTrack(trackOf(uma.ranks, ref), ref.kind, MANUAL_EXP * count)
   const back = Math.floor(r.overflow * MARKS_SHARE)
   const key = ref.kind === 'class' ? 'classMarks' : 'gearMarks'
+  const marks = world.wallet[key] ?? 0
   return withWorld(save, tier, {
     ...world, umas: { ...world.umas, [outfitId]: { ...uma, ranks: withTrack(uma.ranks, ref, r.track) } },
-    wallet: { ...world.wallet, [key]: world.wallet[key] - MANUAL_PRICE * count + back },
+    wallet: { ...world.wallet, [key]: marks - MANUAL_PRICE * count + back },
   }, now)
 }
 

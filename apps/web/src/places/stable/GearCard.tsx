@@ -4,7 +4,7 @@
 // swap freely. Her Weapon, Armor or Accessory Rank lets her wear its grade. A slot that can take a better piece now shows
 // the "Can upgrade" mark (H34).
 import {
-  ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, activeClass, ARMOR_SLOT_LABEL, ARMOR_SLOTS, classOf, slotKind, type AccessorySlot, type ArmorSlot,
+  ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, activeClass, ARMOR_SLOT_LABEL, ARMOR_SLOTS, classOf, gearV1, slotKind, type AccessorySlot, type ArmorSlot,
   type GearSlot, type OwnedUma, type RosterOutfit, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -23,6 +23,7 @@ export function GearCard({ outfit, uma, world, marked = [] }: {
   marked?: readonly GearSlot[]
 }) {
   const classId = activeClass(outfit, uma)
+  const gear = gearV1(uma)
   const weapons = classOf(uma, classId).weapons
   const [open, setOpen] = useState<Open>(null)
   const row = (key: string, slot: GearSlot, label: string, icon: React.ReactNode, name: string, onClick: () => void, note?: string) => (
@@ -40,23 +41,23 @@ export function GearCard({ outfit, uma, world, marked = [] }: {
     <section className="space-y-1.5 rounded-md bg-raised p-3">
       <h4 className="text-micro">Weapons</h4>
       {weapons.map((w: RpgWeapon, i) => {
-        const id = uma.gear.equipped[w]
+        const id = gear.equipped[w]
         const out = id ? outputView(id) : null
         return row(`w${i}`, w, `Weapon ${i + 1}`, out ? <ItemIcon id={out.icon} size={28} /> : <TrainingIcon weapon={w} />,
           out ? `${out.name} · G${out.grade}` : `${trainingName(w)} · G0`, () => setOpen({ weapon: i }))
       })}
       <h4 className="text-micro pt-1.5">Armor</h4>
       {ARMOR_SLOTS.map((slot) => {
-        const id = uma.gear.equipped[slot]
+        const id = gear.equipped[slot]
         const out = id ? outputView(id) : null
-        const kind = slotKind(uma.gear, slot)
+        const kind = slotKind(gear, slot)
         return row(slot, slot, ARMOR_SLOT_LABEL[slot], out ? <ItemIcon id={out.icon} size={28} />
           : <span className="flex size-7 shrink-0 items-center justify-center rounded-xs border border-dashed border-hairline-strong opacity-70"><ArmorMark kind={kind} size={20} /></span>,
         out ? `${out.name} · G${out.grade}` : `${trainingArmorName(kind)} · G0`, () => setOpen({ armor: slot }))
       })}
       <h4 className="text-micro pt-1.5">Accessories</h4>
       {ACCESSORY_SLOTS.map((slot) => {
-        const id = uma.gear.equipped[slot]
+        const id = gear.equipped[slot]
         const out = id ? outputView(id) : null
         return row(slot, slot, ACCESSORY_SLOT_LABEL[slot], out ? <ItemIcon id={out.icon} size={28} />
           : <span className="flex size-7 shrink-0 items-center justify-center rounded-xs border border-dashed border-hairline-strong text-ink-faint">+</span>,

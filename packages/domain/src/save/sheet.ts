@@ -9,10 +9,10 @@ import type { RpgFlourish } from '../rpg/battle/types'
 import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
 import { projectRpgStats, rpgBaseMpRegen, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
-import { equippedAccessories, equippedMight } from '../economy/gear'
+import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
 import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
-import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, type BattleOutfit } from './battle'
-import type { OwnedUma } from './save'
+import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
+import { gearV1, isGrades, type OwnedUma } from './save'
 
 /** The classes' names on the sheet ("No effect as Brawler"). */
 const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
@@ -42,15 +42,16 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
   engine: number = BATTLE_ENGINE_VERSION): SheetGroup[] {
   const v2 = rpgV2(engine)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId), engine)
-  const parts = umaPointParts(uma, classId)
+  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3)
   const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
   const geared = applyPoints(base, parts.gear).stats
   const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>
     ({ label, value: String(boosted.stats[k]), gear: geared[k] - base[k], extra: boosted.stats[k] - geared[k] })
   const weapons = classOf(uma, classId).weapons
-  const might = equippedMight(uma.gear.equipped, weapons)
-  const mightText = weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ')
-  const a = equippedAccessories(uma.gear.equipped, engine)
+  const mightText = isGrades(uma.gear)
+    ? (() => { const averaged = umaWeaponMight(uma, classId, tier as 1 | 2 | 3); return [averaged.atk ? `Arms +${averaged.atk}` : '', averaged.matk ? `Tomes +${averaged.matk}` : ''].filter(Boolean).join(' · ') })()
+    : (() => { const might = equippedMight(gearV1(uma).equipped, weapons); return weapons.filter((w) => might[rpgWeaponKind(w)]).map((w) => `${WEAPON_LABEL[w]} +${might[rpgWeaponKind(w)]}`).join(' · ') })()
+  const a = isGrades(uma.gear) ? noAccessoryEffects() : equippedAccessories(gearV1(uma).equipped, engine)
   // Regen and the two shields are shares of her max HP (D141): the sheet shows both.
   const hp = boosted.stats.hp
   const ofHp = (permilleOfHp: number, suffix = '') => permilleOfHp ? `${Math.max(1, Math.round((hp * permilleOfHp) / 1000))}${suffix} (${permille(permilleOfHp)})` : `0${suffix}`

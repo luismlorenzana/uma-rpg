@@ -5,7 +5,7 @@
 // branch (free; her equipped skills follow). Nothing is learned and nothing costs points (CP14). The model is the domain's
 // `rpgTreeView`, which reads the catalog: only this lazy page imports it.
 import {
-  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, gearById, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
+  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, gearById, gearV1, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
   RPG_SKILL_RANK_MAX, SaveRuleError, type BattleOutfit, type OwnedUma, type RpgBranch, type RpgClass, type RpgHand, type RpgProfile,
   type RpgTreeView, type RpgTreeViewNode, type RpgTreeViewTree, type TemplateOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -56,6 +56,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
   const [branchSheet, setBranchSheet] = useState<RpgBranch | null>(null)
   const [error, setError] = useState<string | null>(null)
   const setup = classOf(uma, classId)
+  const gear = gearV1(uma)
   const tree = view.trees[Math.min(treeIndex, view.trees.length - 1)]!
   const shown = [...loadout]
   const auto = setup.loadout === null
@@ -111,7 +112,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
           <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-3 gap-1" aria-label="Weapon slots">
             {view.trees.map((t, i) => {
-              const piece = uma.gear.equipped[t.weapon] ? gearById(uma.gear.equipped[t.weapon]!) : undefined
+              const piece = gear.equipped[t.weapon] ? gearById(gear.equipped[t.weapon]!) : undefined
               const mark = better.includes(t.weapon)
               return (
                 <button key={`${i}-${t.weapon}`} type="button" onClick={() => setSlotPick(i)}

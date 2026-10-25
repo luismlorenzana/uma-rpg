@@ -67,9 +67,9 @@ export interface RankTrack { rank: number; exp: number }
 /** Her ranks, sparse: a class, weapon, armor or accessory kind she hasn't earned EXP in yet is absent and stands at rank 1. */
 export interface Ranks {
   classes: Partial<Record<RpgClass, RankTrack>>
-  weapons: Partial<Record<WeaponType, RankTrack>>
-  armors: Partial<Record<ArmorKind, RankTrack>>
-  accessories: Partial<Record<AccessoryKind, RankTrack>>
+  weapons?: Partial<Record<WeaponType, RankTrack>>
+  armors?: Partial<Record<ArmorKind, RankTrack>>
+  accessories?: Partial<Record<AccessoryKind, RankTrack>>
 }
 export const newRanks = (): Ranks => ({ classes: {}, weapons: {}, armors: {}, accessories: {} })
 const FRESH: RankTrack = { rank: 1, exp: 0 }
@@ -80,9 +80,9 @@ export type RankRef = { kind: 'class'; id: RpgClass } | { kind: 'weapon'; id: We
   | { kind: 'accessory'; id: AccessoryKind }
 
 export const classTrack = (ranks: Ranks, id: RpgClass): RankTrack => ranks.classes[id] ?? FRESH
-export const weaponTrack = (ranks: Ranks, id: WeaponType): RankTrack => ranks.weapons[id] ?? FRESH
-export const armorTrack = (ranks: Ranks, id: ArmorKind): RankTrack => ranks.armors[id] ?? FRESH
-export const accessoryTrack = (ranks: Ranks, id: AccessoryKind): RankTrack => ranks.accessories[id] ?? FRESH
+export const weaponTrack = (ranks: Ranks, id: WeaponType): RankTrack => ranks.weapons?.[id] ?? FRESH
+export const armorTrack = (ranks: Ranks, id: ArmorKind): RankTrack => ranks.armors?.[id] ?? FRESH
+export const accessoryTrack = (ranks: Ranks, id: AccessoryKind): RankTrack => ranks.accessories?.[id] ?? FRESH
 export function trackOf(ranks: Ranks, ref: RankRef): RankTrack {
   return ref.kind === 'class' ? classTrack(ranks, ref.id) : ref.kind === 'weapon' ? weaponTrack(ranks, ref.id)
     : ref.kind === 'armor' ? armorTrack(ranks, ref.id) : accessoryTrack(ranks, ref.id)
@@ -130,9 +130,9 @@ export function withTrack(ranks: Ranks, ref: RankRef, track: RankTrack): Ranks {
     return next
   }
   if (ref.kind === 'class') return { ...ranks, classes: set(ranks.classes, ref.id) }
-  if (ref.kind === 'weapon') return { ...ranks, weapons: set(ranks.weapons, ref.id) }
-  if (ref.kind === 'armor') return { ...ranks, armors: set(ranks.armors, ref.id) }
-  return { ...ranks, accessories: set(ranks.accessories, ref.id) }
+  if (ref.kind === 'weapon') return { ...ranks, weapons: set(ranks.weapons ?? {}, ref.id) }
+  if (ref.kind === 'armor') return { ...ranks, armors: set(ranks.armors ?? {}, ref.id) }
+  return { ...ranks, accessories: set(ranks.accessories ?? {}, ref.id) }
 }
 
 // --- EXP per win and Marks (D102) ---------------------------------------------------------------------------------------

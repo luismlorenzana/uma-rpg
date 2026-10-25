@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ARMOR_SLOTS } from '../economy/ranks'
 import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass } from '../rpg/rules'
-import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION, slotKind } from './save'
+import { gearV1, newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION, slotKind } from './save'
 import { addShards, isPartyFull, ownerTier, partyLead, partyOf, renameParty, savedTiers, SaveRuleError, setPartyLead, setPartySlot, TIER_ONE, tierKey, unlockUma, worldOf } from './rules'
 import { TIER2_LAURELS, TIER2_UMAS, withTierTwo } from './tiers.fixture'
 
@@ -44,9 +44,9 @@ describe('collection rules', () => {
       const save = unlockUma(before, '100201', T1, TIER_ONE, c)
       const world = worldOf(save)
       const uma = world.umas['100201']!
-      expect(ARMOR_SLOTS.map((s) => slotKind(uma.gear, s))).toEqual(want[c])
+      expect(ARMOR_SLOTS.map((s) => slotKind(gearV1(uma), s))).toEqual(want[c])
       // A physical start writes nothing: an absent kind is already physical.
-      expect(Object.keys(uma.gear.kinds)).toHaveLength(want[c] === MAGICAL ? 5 : 0)
+      expect(Object.keys(gearV1(uma).kinds)).toHaveLength(want[c] === MAGICAL ? 5 : 0)
       // A Paladin start is written as her class (D180); every other start stays her style's.
       expect(uma.classId).toBe(c === 'paladin' ? 'paladin' : null)
       // The Umas already owned are untouched.
@@ -54,7 +54,7 @@ describe('collection rules', () => {
       expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     }
     // Without a starting class (tests, the pacing sim) she starts all-physical, as before.
-    expect(worldOf(unlockUma(before, '100201', T1)).umas['100201']!.gear.kinds).toEqual({})
+    expect(gearV1(worldOf(unlockUma(before, '100201', T1)).umas['100201']!).kinds).toEqual({})
   })
 
   it('gives magical armor to exactly the Mage, Summoner and Cleric (D160 §7)', () => {

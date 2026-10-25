@@ -164,7 +164,7 @@ export function markdown(): string {
   const total = result.rows.reduce((s, r) => ({ fights: s.fights + r.fights, first: s.first + r.first, replays: s.replays + r.replays }), { fights: 0, first: 0, replays: 0 })
   const uma = world.umas[ids[0]!]!
   rows.push('', `Total: **${total.fights} wins** (${total.first} first, ${total.replays} replay), **${result.minutes.toFixed(1)} fight minutes**, five Lv50 Umas.`,
-    `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; five Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors).map((r) => r!.rank).join('/')}.`,
+    `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; five Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons?.[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors ?? {}).map((r) => r!.rank).join('/')}.`,
     `Banked: ${world.wallet.laurels} Laurels, ${world.wallet.gearMarks} Gear Marks and ${world.wallet.classMarks} Class Marks. No Manuals bought, no class switching, no tokens.`,
     `Four-hour target (180–300 min): **${result.minutes < TARGET_MINUTES * (1 - TARGET_TOLERANCE) ? 'under' : result.minutes > TARGET_MINUTES * (1 + TARGET_TOLERANCE) ? 'over' : 'met'}**. No game number retuned.`,
     `*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. A fresh worker finishes ${wilds.finished} grade-1 raw items and ends at Craft Lv${wilds.profession.level}. Refining and crafting need additional time.`)

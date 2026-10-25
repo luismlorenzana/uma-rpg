@@ -74,7 +74,7 @@ describe('ranks (D102)', () => {
     expect(manualBlock(worldOf(save), '101', { kind: 'weapon', id: 'lance' })).toBe('Already at the top rank')
     save = readManuals(save, '101', ref, 2, T(4))
     expect(worldOf(save).wallet.gearMarks).toBe(0)
-    expect(worldOf(save).umas['101']!.ranks.armors.robe).toEqual(grantTrack({ rank: 1, exp: 0 }, 'armor', 2 * MANUAL_EXP).track)
+    expect(worldOf(save).umas['101']!.ranks.armors?.robe).toEqual(grantTrack({ rank: 1, exp: 0 }, 'armor', 2 * MANUAL_EXP).track)
     expect(() => readManuals(save, '101', ref, 1, T(5))).toThrow(/Gear Marks/)
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })

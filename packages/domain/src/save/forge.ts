@@ -5,19 +5,23 @@
 // in the Support slot, H57). She binds each track's grades in order, one above the best she has (D119), so a sheet offers
 // her best pieces and the stock above them.
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
+import { GRADE_MAX, gradeItemId, gradeOf, raiseBlock, type GradeTarget, type UmaGrades } from '../economy/grades'
 import { ACCESSORY_SLOTS, ARMOR_SLOT_KINDS, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import {
   accessorySlotFor, gearById, gearLevel, gearLevelName, gearTrackOf, isAccessory, isArmor, isWeapon, slotOf, type GearPiece, type GearSlot,
 } from '../economy/gear'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import type { OwnedUma, Save, TierWorld } from './save'
+import { gearV1, isGrades, type OwnedUma, type Save, type TierWorld } from './save'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
 }
 
 /** Every piece bound to her: her locker and what she wears. */
-export const ownGear = (uma: OwnedUma): string[] => [...new Set([...uma.gear.locker, ...Object.values(uma.gear.equipped)])]
+export const ownGear = (uma: OwnedUma): string[] => {
+  const gear = gearV1(uma)
+  return [...new Set([...gear.locker, ...Object.values(gear.equipped)])]
+}
 
 /** The highest grade she has bound on a track (D119): 0, her Training piece, when none. */
 export function boundGrade(uma: OwnedUma, track: string): number {
@@ -49,7 +53,7 @@ export function equipBlock(uma: OwnedUma, gearId: string): string | null {
  */
 export function gearChoices(uma: OwnedUma, stock: Readonly<Record<string, number>>, match: (piece: GearPiece) => boolean): { id: string; bound: boolean }[] {
   const own = ownGear(uma)
-  const worn = new Set(Object.values(uma.gear.equipped))
+  const worn = new Set(Object.values(gearV1(uma).equipped))
   const pieceOf = (id: string) => { const p = gearById(id); return p && match(p) ? p : null }
   const top = (p: GearPiece) => boundGrade(uma, gearTrackOf(p.type))
   const grade = (id: string) => gearById(id)!.grade
@@ -60,7 +64,10 @@ export function gearChoices(uma: OwnedUma, stock: Readonly<Record<string, number
 }
 
 /** The accessory slot a new accessory goes in when none is named: the first empty one, else the first. */
-const freeAccessorySlot = (uma: OwnedUma): AccessorySlot => ACCESSORY_SLOTS.find((s) => !uma.gear.equipped[s]) ?? ACCESSORY_SLOTS[0]
+const freeAccessorySlot = (uma: OwnedUma): AccessorySlot => {
+  const gear = gearV1(uma)
+  return ACCESSORY_SLOTS.find((s) => !gear.equipped[s]) ?? ACCESSORY_SLOTS[0]
+}
 
 /** Puts a piece on her: from her locker, or from the stock (binding it to her for good). An armor piece also sets its
  * slot's kind; an accessory goes in `accessorySlot` (D124), never beside another of its type. Classes v2 (C10, H57): an
@@ -78,21 +85,22 @@ export function equipGear(save: Save, outfitId: string, gearId: string, now: str
     throw new SaveRuleError('bad-loadout', typed === 'accessory-1' ? 'The Support slot takes a Talisman or an Amulet' : 'The Damage slot takes an Orb')
   }
   const slot: GearSlot = isAccessory(piece.type) ? typed || accessorySlot || freeAccessorySlot(uma) : slotOf(piece.type)
+  const current = gearV1(uma)
   if (isAccessory(piece.type)) {
     const other = ACCESSORY_SLOTS.find((s) => s !== slot)!
-    const there = uma.gear.equipped[other] ? gearById(uma.gear.equipped[other]!) : undefined
+    const there = current.equipped[other] ? gearById(current.equipped[other]!) : undefined
     if (there?.type === piece.type) throw new SaveRuleError('bad-loadout', 'she already wears one of these')
   }
   let gear = world.gear
-  let locker = uma.gear.locker
+  let locker = current.locker
   if (!locker.includes(gearId)) {
     if ((gear[gearId] ?? 0) < 1) throw new SaveRuleError('no-items', 'none in stock')
     gear = { ...gear, [gearId]: gear[gearId]! - 1 }
     if (gear[gearId] === 0) delete gear[gearId]
     locker = [...locker, gearId]
   }
-  const equipped = { ...uma.gear.equipped, [slot]: gearId }
-  const kinds = isArmor(piece.type) ? { ...uma.gear.kinds, [slot]: piece.type } : uma.gear.kinds
+  const equipped = { ...current.equipped, [slot]: gearId }
+  const kinds = isArmor(piece.type) ? { ...current.kinds, [slot]: piece.type } : current.kinds
   return withWorld(save, tier, { ...world, gear, umas: { ...world.umas, [outfitId]: { ...uma, gear: { locker, equipped, kinds } } } }, now)
 }
 
@@ -101,9 +109,10 @@ export function unequipGear(save: Save, outfitId: string, slot: GearSlot, now: s
   const world = worldOf(save, tier)
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'not unlocked')
-  const equipped = { ...uma.gear.equipped }
+  const gear = gearV1(uma)
+  const equipped = { ...gear.equipped }
   delete equipped[slot]
-  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...uma.gear, equipped } } } }, now)
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...gear, equipped } } } }, now)
 }
 
 /**
@@ -120,9 +129,10 @@ export function wearArmor(save: Save, outfitId: string, slot: ArmorSlot, kind: A
     if (!piece || piece.type !== kind) throw new SaveRuleError('bad-loadout', 'that piece isn’t this armor')
     return equipGear(save, outfitId, gearId, now, tier)
   }
-  const equipped = { ...uma.gear.equipped }
+  const gear = gearV1(uma)
+  const equipped = { ...gear.equipped }
   delete equipped[slot]
-  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...uma.gear, equipped, kinds: { ...uma.gear.kinds, [slot]: kind } } } } }, now)
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...gear, equipped, kinds: { ...gear.kinds, [slot]: kind } } } } }, now)
 }
 
 /** Puts an accessory in one of her two accessory slots (D124), or empties the slot (null); a removed one stays hers.
@@ -138,4 +148,51 @@ export function wearAccessory(save: Save, outfitId: string, slot: AccessorySlot,
     return equipGear(save, outfitId, gearId, now, tier, slot, engine)
   }
   return unequipGear(save, outfitId, slot, now, tier)
+}
+
+const withGrade = (grades: UmaGrades, target: GradeTarget, grade: number): UmaGrades => {
+  if (target.kind === 'weapon') return { ...grades, weapons: { ...grades.weapons, [target.weapon]: { grade } } }
+  if (target.kind === 'armor') return { ...grades, armor: { ...grades.armor, [target.slot]: { grade } } }
+  const accessories = grades.accessories.map((slot, index) => index === target.slot ? { ...slot, grade } : slot)
+  return { ...grades, accessories }
+}
+
+/** The complete material plan for raising one graded track, before the mutation is committed (R2, D209). */
+export function raisePlan(world: TierWorld, outfitId: string, target: GradeTarget, to: number): { items: string[]; block: string | null } {
+  const uma = world.umas[outfitId]
+  if (!uma) return { items: [], block: 'Not unlocked' }
+  if (!isGrades(uma.gear)) return { items: [], block: 'Not graded' }
+  const current = gradeOf(uma.gear, target)
+  const highest = Math.min(GRADE_MAX, Math.max(current + 1, to))
+  const items = Array.from({ length: highest - current }, (_, index) => gradeItemId(target, current + index + 1))
+  return { items, block: raiseBlock(uma.gear, target, uma.level, world.items, highest) }
+}
+
+/** Raises a graded weapon, armor slot or accessory slot one grade, consuming its one made item. */
+export function raiseGrade(save: Save, outfitId: string, target: GradeTarget, now: string, tier = TIER_ONE): Save {
+  const uma = worldOf(save, tier).umas[outfitId]
+  if (!uma || !isGrades(uma.gear)) {
+    if (!uma) throw new SaveRuleError('not-owned', 'Not unlocked')
+    throw new SaveRuleError('bad-job', 'Not graded')
+  }
+  return raiseGradeTo(save, outfitId, target, gradeOf(uma.gear, target) + 1, now, tier)
+}
+
+/** Raises through every grade up to `to`, consuming all required items atomically. */
+export function raiseGradeTo(save: Save, outfitId: string, target: GradeTarget, to: number, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const uma = world.umas[outfitId]
+  if (!uma) throw new SaveRuleError('not-owned', 'Not unlocked')
+  if (!isGrades(uma.gear)) throw new SaveRuleError('bad-job', 'Not graded')
+  const plan = raisePlan(world, outfitId, target, to)
+  if (plan.block) throw new SaveRuleError(plan.block.startsWith('Needs 1 ') || plan.block.startsWith('Needs Weapon') ||
+    plan.block.startsWith('Needs Armor') || plan.block.startsWith('Needs Accessory') ? 'no-items' : 'bad-job', plan.block)
+  const items = { ...world.items }
+  for (const id of plan.items) {
+    items[id] = (items[id] ?? 0) - 1
+    if (items[id] === 0) delete items[id]
+  }
+  const grade = Math.min(GRADE_MAX, Math.max(gradeOf(uma.gear, target) + 1, to))
+  const gear = withGrade(uma.gear, target, grade)
+  return withWorld(save, tier, { ...world, items, umas: { ...world.umas, [outfitId]: { ...uma, gear } } }, now)
 }

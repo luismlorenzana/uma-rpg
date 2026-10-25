@@ -109,6 +109,8 @@ Built (dark, live from H72): H64 (D199, D200), H65 (D201), H66 (D202), H67 (D203
 Waves: H73 can start now. 1) H74, H77 after H64 (they run beside R1's waves 2–4) → 2) H75, H76 after H67 → 3) H78,
 then H81 after H71 → 4) H79, H80 after H70 → 5) H82 after H72.
 
+Built (dark, live from H82): H74 (D208, D209).
+
 **R3. Tier 2's weapons (engine v18, save v29)**
 
 | Id | Task | Who | Size | Needs |

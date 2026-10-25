@@ -8,7 +8,7 @@
 // grades she has spent.
 import {
   ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
-  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory, isMagicalArmor, isOrb, isRpgTome,
+  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearV1, isAccessory, isMagicalArmor, isOrb, isRpgTome,
   isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
   type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
   type TierWorld,
@@ -53,7 +53,7 @@ export function pieceLine(id: string, engine: number = BATTLE_ENGINE_VERSION): s
 /** What a slot holds: the weapon and its piece (null for the Training one). */
 export function heldIn(uma: OwnedUma, classId: RpgClass, slot: number): { weapon: RpgWeapon; gearId: string | null } {
   const weapon = classOf(uma, classId).weapons[slot]!
-  return { weapon, gearId: uma.gear.equipped[weapon] ?? null }
+  return { weapon, gearId: gearV1(uma).equipped[weapon] ?? null }
 }
 
 /** A Training weapon's icon: the weapon's mark in an empty frame. */
@@ -69,6 +69,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   outfitId: string; uma: OwnedUma; world: TierWorld; classId: RpgClass; slot: number; onClose: () => void
 }) {
   const [error, setError] = useState<string | null>(null)
+  const gear = gearV1(uma)
   const weapons = classOf(uma, classId).weapons
   const kind = RPG_CLASS_SLOTS[classId][slot]!
   const here = weapons[slot]!
@@ -76,7 +77,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
     ? [here, ...rpgClassWeapons(classId).filter((w) => w !== here && (kind === 'any' || (kind === 'tome') === isRpgTome(w)))]
     : [here]
   const pieces = (w: RpgWeapon) => gearChoices(uma, world.gear, (p) => p.type === w)
-  const held = (w: RpgWeapon, id: string | null) => here === w && (uma.gear.equipped[w] ?? null) === id
+  const held = (w: RpgWeapon, id: string | null) => here === w && (gear.equipped[w] ?? null) === id
   const choose = (w: RpgWeapon, id: string | null) =>
     hold(outfitId, classId, slot, w, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   return (
@@ -131,10 +132,11 @@ export const trainingArmorName = (kind: ArmorKind): string => `Training ${ARMOR_
 /** One of her five armor slots (D103): its physical or magical kind, as a Training piece or a crafted one. */
 export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: ArmorSlot; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
-  const here = slotKind(uma.gear, slot)
+  const gear = gearV1(uma)
+  const here = slotKind(gear, slot)
   const kinds = [here, ...ARMOR_SLOT_KINDS[slot].filter((k) => k !== here)] as ArmorKind[]
   const pieces = (kind: ArmorKind) => gearChoices(uma, world.gear, (p) => p.type === kind)
-  const held = (kind: ArmorKind, id: string | null) => here === kind && (uma.gear.equipped[slot] ?? null) === id
+  const held = (kind: ArmorKind, id: string | null) => here === kind && (gear.equipped[slot] ?? null) === id
   const choose = (kind: ArmorKind, id: string | null) =>
     wearArmorPiece(outfitId, slot, kind, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   return (
@@ -185,9 +187,10 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
  * except the type she wears in the other slot. An empty slot holds nothing. */
 export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: AccessorySlot; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
-  const here = uma.gear.equipped[slot] ?? null
+  const gear = gearV1(uma)
+  const here = gear.equipped[slot] ?? null
   const other = ACCESSORY_SLOTS.find((s) => s !== slot)!
-  const otherType = uma.gear.equipped[other] ? gearById(uma.gear.equipped[other]!)?.type : undefined
+  const otherType = gear.equipped[other] ? gearById(gear.equipped[other]!)?.type : undefined
   const choose = (id: string | null) =>
     wearAccessoryPiece(outfitId, slot, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   const groups = accessorySheetTypes(slot, otherType).map(({ kind, types }) => ({

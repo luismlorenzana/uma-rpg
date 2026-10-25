@@ -8,7 +8,7 @@ import { regionChapter, worldContinent } from '../world/world'
 import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, startingClass, styleClass, type BattleOutfit } from './battle'
 import { T } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, type Save } from './save'
+import { gearV1, newSave, type Save } from './save'
 
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110, wit = 110): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power, guts: 110, wit },
@@ -40,7 +40,7 @@ describe('the Paladin’s start (H58, §3.3)', () => {
     const { umas } = worldOf(save)
     expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { kinds: {} } })
     expect(umas['2']!.classId).toBeNull()
-    expect(Object.keys(umas['2']!.gear.kinds)).toHaveLength(5)
+    expect(Object.keys(gearV1(umas['2']!).kinds)).toHaveLength(5)
     expect(umas['3']).toMatchObject({ classId: null, gear: { kinds: {} } })
   })
 

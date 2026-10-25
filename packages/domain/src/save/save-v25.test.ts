@@ -7,7 +7,7 @@ import { HERO_LIMIT_IDS } from '../rpg/hero-id'
 import { RPG_ALL_CLASSES, RPG_CLASSES } from '../rpg/kinds'
 import { healerBlock, type BattleOutfit } from './battle'
 import { toV25 } from './migrations'
-import { parseSave, SaveParseError } from './save'
+import { gearV1, parseSave, SaveParseError } from './save'
 import { migrated, v14Replay, v24Save, V25_RIFT_FIGHT, V25_WORLD_FIGHT } from './v25.fixture'
 
 
@@ -36,8 +36,8 @@ describe('save v25 with the switch on (H58)', () => {
     expect(world.heroes['paladin-2']).toEqual({ hero: '110', learners: ['108'] })
     expect(world.heroes['cleric-3']).toBeUndefined()
     expect(world.umas['108']!.bonds).toEqual({ 'paladin-1': { level: 4, exp: 3 }, 'paladin-2': { level: 10, exp: 0 } })
-    expect(world.umas['105']!.gear.equipped).toEqual({ 'accessory-1': 'orb-fire-g1' })
-    expect(world.umas['106']!.gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
+    expect(gearV1(world.umas['105']!).equipped).toEqual({ 'accessory-1': 'orb-fire-g1' })
+    expect(gearV1(world.umas['106']!).equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
     // Party 1 keeps its two Clerics: they can't fight together until one changes class.
     expect(world.parties[1]!.slots).toEqual(['105', '111', '112', '113', '114'])
     expect(healerBlock(world, world.parties[1]!.slots as string[], OUTFITS)).toBe('One healer a party')

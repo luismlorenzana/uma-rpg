@@ -1,4 +1,4 @@
-// Deterministic campaign battle reducer, engine v15 (W3, D91; classes D86, docs/design/class-rework.md; Limit Breaks D311).
+// Deterministic campaign battle reducer, engine v17 (R2, D209; W3, D91; classes D86; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
@@ -12,6 +12,7 @@
 // v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills; a trunk and one fork into
 // line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the base MP regen
 // for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
+// v17 is R2's dark economy foundation (D209): gear grades arrive only as stats and Might, and support fields retire.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
@@ -41,7 +42,7 @@ export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpg
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'
 import { rpgRework, rpgV2 } from './caps'
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] as const
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] as const
 /** v16 (UT6): the three Flourishes, one by stride. */
 const FLOURISHES: readonly RpgFlourish[] = ['clean-break', 'even-pace', 'late-reserve']
 
@@ -152,6 +153,7 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
  * (D179) no Orb kinds: an Orb's flat offense arrives in `might` (H57). */
 function validCharms(a: BattleAlly, version: BattleInput['version']): boolean {
   const shares = [a.lifesteal, a.mpSteal, a.guard, a.resist, a.thorns, a.mirror]
+  if (version >= 17 && [a.barrier, a.veil, a.regen, a.mpRegen, ...shares].some((v) => v !== undefined)) return false
   if (version < 11) return a.orbs === undefined && a.veil === undefined && a.mpRegen === undefined && shares.every((v) => v === undefined)
   if (version >= 15 && a.orbs !== undefined) return false
   return a.orb === undefined && (a.orbs === undefined || (Array.isArray(a.orbs) && a.orbs.length <= 2 && a.orbs.every(isRpgDamageKind) &&
@@ -191,7 +193,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {

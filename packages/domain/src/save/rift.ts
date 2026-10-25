@@ -21,7 +21,7 @@ import {
 import { MAX_PURCHASE, mergeGains } from './exchange'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, TIERS, tierKey, worldOf } from './rules'
-import { MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, type Account, type Party, type Save, type TierWorld } from './save'
+import { gearV1, MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, type Account, type Party, type Save, type TierWorld } from './save'
 import { workOf } from './status'
 
 /** Echoes pay this many times a stage's Class and gear rank EXP (R6). */
@@ -419,7 +419,8 @@ function payEcho(world: TierWorld, entrants: readonly Entrant[], foeLevel: numbe
     classMarks += filled.classMarks
     members.push({ outfitId: e.outfitId, exp: 0, beforeLevel: uma.level, afterLevel: uma.level, afterExp: uma.exp, shards: 0, ranks: filled.gains, bonds: [] })
   }
-  const wallet = { ...world.wallet, gearMarks: world.wallet.gearMarks + gearMarks, classMarks: world.wallet.classMarks + classMarks }
+  const wallet = { ...world.wallet, ...('gearMarks' in world.wallet ? { gearMarks: (world.wallet.gearMarks ?? 0) + gearMarks } : {}),
+    classMarks: world.wallet.classMarks + classMarks }
   return { world: { ...world, umas, wallet }, members, gearMarks, classMarks }
 }
 
@@ -567,7 +568,7 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
   const arrivals = Object.fromEntries(run.roster.map((id) => {
     const uma = world.umas[id]!
     const fresh = newOwnedUma(uma.unlockedAt)
-    return [id, { ...fresh, classId: uma.classId, gear: { ...fresh.gear, kinds: { ...uma.gear.kinds } }, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
+    return [id, { ...fresh, classId: uma.classId, gear: { ...gearV1(fresh), kinds: { ...gearV1(uma).kinds } }, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
   }))
   const n = run.roster.length
   const laurels = ASCEND_PURSE.laurels * n, speedTickets = ASCEND_PURSE.speedTickets * n
