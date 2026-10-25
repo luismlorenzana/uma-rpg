@@ -21,7 +21,7 @@ const outfits = new Map(classes.map((_, i) => {
   const outfitId = `${9000000 + i}`
   const outfit: BattleOutfit = { outfitId, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 0, wit: 0 },
-    aptitudes: { strategy: { front: 'A', pace: 'B', late: 'C', end: 'D' } } }
+    aptitudes: { strategy: { front: 'A', pace: 'B', late: 'C', end: 'D' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } } }
   return [outfitId, outfit]
 }))
 

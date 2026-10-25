@@ -27,7 +27,7 @@ const { db } = await import('./db')
 
 /** An invented outfit whose best running style is `best`. */
 const outfit = (outfitId: string, best: 'front' | 'pace' | 'late' | 'end' = 'front') => ({
-  outfitId, aptitudes: { strategy: { front: 'G', pace: 'G', late: 'G', end: 'G', [best]: 'A' } as const },
+  outfitId, aptitudes: { strategy: { front: 'G', pace: 'G', late: 'G', end: 'G', [best]: 'A' } as const, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } as const },
 })
 
 beforeEach(async () => {

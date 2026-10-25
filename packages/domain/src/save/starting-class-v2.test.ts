@@ -13,7 +13,7 @@ import { newSave, type Save } from './save'
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110, wit = 110): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power, guts: 110, wit },
   growthRatePercents: { speed: 10, stamina: 10, power: 0, guts: 0, wit: 20 },
-  aptitudes: { strategy: { front: style === 'front' ? 'A' : 'G', pace: style === 'pace' ? 'A' : 'G', late: style === 'late' ? 'A' : 'G', end: style === 'end' ? 'A' : 'G' } },
+  aptitudes: { strategy: { front: style === 'front' ? 'A' : 'G', pace: style === 'pace' ? 'A' : 'G', late: style === 'late' ? 'A' : 'G', end: style === 'end' ? 'A' : 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 })
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 

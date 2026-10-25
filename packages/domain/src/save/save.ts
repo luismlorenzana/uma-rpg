@@ -30,7 +30,7 @@ import { activeNodeSlots } from '../economy/pacing'
 import { isItemId } from '../items/identity'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
-import { BATTLE_MAX_ROUNDS } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, BATTLE_MAX_ROUNDS, rpgRework } from '../rpg/battle/caps'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
 import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
@@ -222,8 +222,11 @@ export function startingArmorKinds(classId?: RpgClass): UmaGear['kinds'] {
   return Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, 'magical')]))
 }
 /** A just-unlocked Uma; `startClass` (her starting class) sets her armor kinds, and without it she starts all-physical.
- * Her class stays null (her style's), except a Paladin start (classes v2, D180), the one start her style can't name. */
-export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0, classId: startClass === 'paladin' ? 'paladin' : null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
+ * From engine v16 her start is written as her class (H67): her calling can name a class her style doesn't (a Wit-led
+ * closer's Summoner, a Pace sprinter's Brawler, a Spell Blade). To v15 her class stays null (her style's), except a Paladin
+ * start (classes v2, D180), the one start her style couldn't name. */
+export const newOwnedUma = (now: string, startClass?: RpgClass, engine: number = BATTLE_ENGINE_VERSION): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0,
+  classId: rpgRework('fight', engine) ? startClass ?? null : startClass === 'paladin' ? 'paladin' : null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
   stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {} })
 
 /** The world's state (D66). */

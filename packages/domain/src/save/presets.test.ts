@@ -12,7 +12,7 @@ const T = (n: number) => `2026-10-21T12:${String(Math.floor(n / 60)).padStart(2,
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end'): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
   growthRatePercents: { speed: 10, stamina: 10, power: 0, guts: 0, wit: 20 },
-  aptitudes: { strategy: { front: style === 'front' ? 'A' : 'G', pace: style === 'pace' ? 'A' : 'G', late: style === 'late' ? 'A' : 'G', end: style === 'end' ? 'A' : 'G' } },
+  aptitudes: { strategy: { front: style === 'front' ? 'A' : 'G', pace: style === 'pace' ? 'A' : 'G', late: style === 'late' ? 'A' : 'G', end: style === 'end' ? 'A' : 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 })
 const OUTFITS = [outfit('101', 'front'), outfit('102', 'pace'), outfit('103', 'late'), outfit('104', 'end')]
 

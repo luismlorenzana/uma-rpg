@@ -12,6 +12,9 @@ import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, Rpg
 export type BattleSide = 'ally' | 'enemy'
 export type BattleChannel = 'physical' | 'magical'
 export type EnemyRank = 'regular' | 'sub-boss' | 'boss'
+/** Her template's Flourish, by her stride (uma-templates §3.3, UT6): 4% of her max HP a fight, as her calling. Named by
+ * `roster/template.ts` (H67); engine v16 plays it from her input (H68). */
+export type RpgFlourish = 'clean-break' | 'even-pace' | 'late-reserve'
 export interface BattleStatus { kind: RpgStatusKind; stacks: number; turns: number }
 
 export interface BattleAlly {

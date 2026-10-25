@@ -14,7 +14,7 @@ import { migrated, v14Replay, v24Save, V25_RIFT_FIGHT, V25_WORLD_FIGHT } from '.
 /** Every Uma of the fixture as a Late surger: the class of one who never picked is her style's, the Cleric. */
 const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(Array.from({ length: 20 }, (_, i) => `${100 + i}`).map((id) => [id, {
   outfitId: id, baseStats: { speed: 100, stamina: 100, power: 120, guts: 100, wit: 100 },
-  growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 }, aptitudes: { strategy: { front: 'G', pace: 'G', late: 'A', end: 'G' } },
+  growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 }, aptitudes: { strategy: { front: 'G', pace: 'G', late: 'A', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 }]))
 
 describe('save v25 with the switch on (H58)', () => {

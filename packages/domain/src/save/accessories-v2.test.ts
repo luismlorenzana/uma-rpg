@@ -16,7 +16,7 @@ import { upgradesFor } from './upgrades'
 const T = (n: number) => `2026-10-22T12:00:${String(n).padStart(2, '0')}.000Z`
 // An invented front runner: a Brawler.
 const O101: BattleOutfit = { outfitId: '101', baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-  growthRatePercents: { speed: 10, stamina: 10, power: 0, guts: 0, wit: 20 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' } } }
+  growthRatePercents: { speed: 10, stamina: 10, power: 0, guts: 0, wit: 20 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } } }
 const edit = (save: Save, fn: (w: TierWorld) => TierWorld): Save => ({ ...save, tierWorlds: { ...save.tierWorlds, '1': fn(worldOf(save)) } })
 const editUma = (save: Save, fn: (u: OwnedUma) => OwnedUma): Save => edit(save, (w) => ({ ...w, umas: { ...w.umas, '101': fn(w.umas['101']!) } }))
 /** Uma 101 as a Brawler, with this stock. */
