@@ -1,12 +1,16 @@
 // The skill, support and class lines by generation (H59): classes v1's exactly as before, classes v2's from the engine's
 // own rules (each half's hand, the Spell Blade's extra hit, the Summoner's farewell, the healers' `support15`). Numbers
-// come from the domain, so H60's tuning moves them with it.
+// come from the domain, so H60's tuning moves them with it. Engine v16's (H70): a foe's twins Arm first, Pierce's words,
+// a Skill Rank's factor on the power, three weapons in the blurbs.
 import {
-  BATTLE_REGEN_ROUNDS, RPG_ALL_NODES, rpgClasses, rpgHand, rpgNode, rpgTreeNodes, type RpgProfile, type RpgSkillDef, type RpgSupport,
+  BATTLE_REGEN_ROUNDS, RPG_ALL_NODES, RPG_SKILL_RANK_FACTOR, rpgClasses, rpgHand, rpgNode, rpgNodeSkill, rpgTreeNodes, type RpgProfile, type RpgSkillDef,
+  type RpgSupport,
 } from '@rpg/domain'
 import { battleExtraHit } from '@rpg/domain/engine'
-import { describe, expect, it } from 'vitest'
-import { CLASS_BLURB, classBlurbs, skillLine, supportText } from './labels'
+import { cleanup, render } from '@testing-library/react'
+import { createElement } from 'react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { CLASS_BLURB, classBlurbs, skillLine, supportText, WeaknessIcons } from './labels'
 
 const STATUS: Record<string, string> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -96,5 +100,53 @@ describe('classes v2\'s lines (H59)', () => {
       paladin: 'Three Arms and two Tomes: Barriers and Aegis on the party, from her ATK.',
       cleric: 'Three Tomes and two Arms: mends, Regen and cleanses for the party, from her M.ATK.',
     })
+  })
+})
+
+describe('engine v16\'s lines and weaknesses (H70)', () => {
+  afterEach(cleanup)
+  /** The icons' order as drawn: a weapon glyph (filled) or an element glyph (stroked), and the aria label. */
+  const drawn = (engine: number) => {
+    const { container } = render(createElement(WeaknessIcons, { weaknesses: { weapons: ['lance'], elements: ['lightning'] }, engine }))
+    const icons = [...container.querySelectorAll('svg')].map((svg) => (svg.getAttribute('fill') === 'currentColor' ? 'weapon' : 'element'))
+    return { icons, label: container.firstElementChild!.getAttribute('aria-label') }
+  }
+
+  it('lists a foe\'s twins Arm first from v16, and today\'s order (elements first) before', () => {
+    expect(drawn(16)).toEqual({ icons: ['weapon', 'element'], label: 'Weak to Lance, Lightning' })
+    expect(drawn(15)).toEqual({ icons: ['element', 'weapon'], label: 'Weak to Lightning, Lance' })
+    // Twilight: two Arms, Bow then Katana.
+    const { container } = render(createElement(WeaknessIcons, { weaknesses: { weapons: ['bow', 'katana'], elements: [] }, engine: 16 }))
+    expect(container.firstElementChild!.getAttribute('aria-label')).toBe('Weak to Bow, Katana')
+  })
+
+  it('says a Pierce cuts through the shield from v16, and only then', () => {
+    const blade = { classId: 'spellblade', tier: 1 } as const
+    const pierce = rpgNodeSkill(rpgNode('spellblade-katana.3b')!, 16)
+    expect(pierce.special).toBe('pierce')
+    expect(skillLine(blade, pierce, 16)).toMatch(/^one foe · 2 hits · .* MP · cuts through the shield$/)
+    // The Brawler's Katana side had a pierce in v15 too: its v15 line keeps today's words.
+    const v15 = rpgNode('brawler-katana.3a')!.skill
+    expect(v15.special).toBe('pierce')
+    expect(skillLine({ classId: 'brawler', tier: 1 }, v15, 15)).not.toContain('cuts through')
+    expect(skillLine({ classId: 'brawler', tier: 1 }, v15, 16)).toContain(' · cuts through the shield')
+    expect(skillLine(blade, rpgNodeSkill(rpgNode('spellblade-katana.3')!, 16), 16)).not.toContain('cuts through')
+  })
+
+  it('shows a Rank 5 skill at ×1.05 its power, and Rank 1 at ×0.95', () => {
+    const brawler = { classId: 'brawler', tier: 1 } as const
+    const sunder = rpgNode('brawler-greatsword.3')!.skill
+    const total = sunder.hits.reduce((n, h) => n + h.power, 0) * rpgHand(brawler, 16).arms
+    const power = (line: string) => Number(/ · ([\d.]+)× · /.exec(line)![1])
+    expect(RPG_SKILL_RANK_FACTOR[4]).toBe(1.05)
+    expect(power(skillLine(brawler, sunder, 16, RPG_SKILL_RANK_FACTOR[4]))).toBe(Number((total * 1.05).toFixed(1)))
+    expect(power(skillLine(brawler, sunder, 16, RPG_SKILL_RANK_FACTOR[0]))).toBe(Number((total * 0.95).toFixed(1)))
+    expect(skillLine(brawler, sunder, 16)).toBe(skillLine(brawler, sunder, 16, 1))
+  })
+
+  it('counts three weapons in the blurbs', () => {
+    expect(classBlurbs(16).brawler).toBe('Three Arms, one heavy act a turn.')
+    expect(classBlurbs(16).cleric).toBe('Two Tomes and an Arm: mends, Regen and cleanses for the party, from her M.ATK.')
+    expect(classBlurbs(15).brawler).toBe('Five Arms, one heavy act a turn.')
   })
 })

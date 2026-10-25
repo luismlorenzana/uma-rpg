@@ -1,11 +1,12 @@
 // The Rift page's pure helpers (H50): fight labels, which world parties can take a fight, the Convergence's coverage, the
 // Ascend sheet's numbers, the result screen's lines and the finale's faces (H52). Lazy, with the page.
 import {
-  activeClass, CONVERGENCE_FIGHTS, FRONT_NAME, healerBlock, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, type BattleEnemy, type BattleOutfit,
-  type EnemyTier, type RiftFightRef, type RiftFront, type RiftRun, type RosterMember, type RpgClass, type TierWorld,
+  activeClass, BATTLE_ENGINE_VERSION, CONVERGENCE_FIGHTS, FRONT_NAME, healerBlock, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, rpgRework,
+  type BattleEnemy, type BattleOutfit, type EnemyTier, type RiftFightRef, type RiftFront, type RiftRun, type RosterMember, type RpgClass, type RpgWeapon,
+  type TierWorld,
 } from '@rpg/domain'
 import {
-  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, type RiftContext, type RiftFightPlan, type RiftFightResult,
+  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, riftGuidedBuild, type RiftContext, type RiftFightPlan, type RiftFightResult,
 } from '@rpg/domain/rift'
 import { CLASS_LABEL } from '../../battle/labels'
 
@@ -77,6 +78,22 @@ export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly
   return members.flatMap((id) => {
     const uma = world.umas[id], outfit = outfits.get(id)
     return uma && outfit ? [activeClass(outfit, uma)] : []
+  })
+}
+
+/** A front's guided weapons for a party (CP7, H70): each member matched to the front's guided build by her class, in party
+ * order (a party's first Brawler takes the build's first Brawler), with that build member's three weapons; null for a
+ * member the build has no place for. Null before v16, where the guidance is classes only. */
+export function guidedWeapons(classes: readonly (RpgClass | null)[], front: RiftFront, engine: number = BATTLE_ENGINE_VERSION):
+  (readonly RpgWeapon[] | null)[] | null {
+  if (!rpgRework('fight', engine)) return null
+  const build = riftGuidedBuild(front, engine)
+  const taken = new Set<number>()
+  return classes.map((classId) => {
+    const at = build.findIndex((m, i) => !taken.has(i) && m.classId === classId)
+    if (at < 0) return null
+    taken.add(at)
+    return build[at]!.weapons
   })
 }
 

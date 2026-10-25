@@ -1,6 +1,7 @@
 // The Rift's result (H50): Victory or Defeated and the rounds; a front's stage or seal, the Convergence's fight, or an
 // Echo's rank bars and Marks (no EXP: Echoes pay ranks only, R6). An achievement earned plays its cut-in first (H49); on
-// the win that wins the run, the finale plays before it (H52).
+// the win that wins the run, the finale plays before it (H52). From engine v16 (H70) each skill that ranked up with her
+// Class Rank says so under its bar, as on the world map's result.
 import { RIFT_FRONTS, type RankGain, type RpgClass } from '@rpg/domain'
 import type { RiftFightResult } from '@rpg/domain/rift'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
@@ -10,10 +11,13 @@ import type { Campaign } from '../../battle/campaign'
 import { CLASS_LABEL } from '../../battle/labels'
 import { FrontCrest } from '../../battle/pixel-icons'
 import { RankCells, RankRow, type RankCell } from '../../ui/RankBars'
+import { useActiveTier, useWorld } from '../../save/game'
+import { RankUps } from '../scenario-gate/FightResult'
+import { rankUpLines } from '../scenario-gate/rank-ups'
 import { riftRefTitle, riftResultView } from './rift-view'
 import { RiftFinale } from './RiftFinale'
 
-export function RiftResult({ campaign, result, onAgain, onBack, againLabel, error, finale }: {
+export function RiftResult({ campaign, result, onAgain, onBack, againLabel, error, finale, engine }: {
   campaign: Campaign
   result: RiftFightResult
   onAgain: () => void
@@ -23,7 +27,11 @@ export function RiftResult({ campaign, result, onAgain, onBack, againLabel, erro
   error?: string | null
   /** The run's champions, for the finale on the win that wins the run. */
   finale?: { tier: number; faces: readonly string[] } | null
+  /** The fight's own engine version (a Sweep's is the live one). */
+  engine?: number
 }) {
+  const world = useWorld()
+  const tier = useActiveTier()
   const win = result.outcome === 'victory'
   const cutIns = result.earned.length > 0
   const [step, setStep] = useState<'finale' | 'cut-in' | null>(() => (win && result.runWon && finale ? 'finale' : cutIns ? 'cut-in' : null))
@@ -58,6 +66,7 @@ export function RiftResult({ campaign, result, onAgain, onBack, againLabel, erro
                       <p className="min-w-0 flex-1 truncate text-[13px] font-semibold">{campaign.name(m.outfitId)}</p>
                     </div>
                     {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
+                    <RankUps lines={rankUpLines(world, campaign.outfits.get(m.outfitId), cls, tier, engine)} />
                     <RankCells label="Weapon Ranks" cells={cells('weapon')} />
                     <RankCells label="Armor Ranks" cells={cells('armor')} />
                     {cells('accessory').length > 0 && <RankCells label="Accessory Ranks" cells={cells('accessory')} />}

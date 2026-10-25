@@ -4,8 +4,8 @@ import {
 } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import {
-  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceMatch, levelPartyBlock, partyGuidance, partyHolding, riftFinaleFaces,
-  riftFinalePlans, riftHome, riftRefLabel, riftRefTitle, suggestConvergence,
+  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceMatch, guidedWeapons, levelPartyBlock, partyGuidance, partyHolding,
+  riftFinaleFaces, riftFinalePlans, riftHome, riftRefLabel, riftRefTitle, suggestConvergence,
 } from './rift-view'
 
 const NOW = '2026-10-22T12:00:00.000Z'
@@ -124,6 +124,24 @@ describe('which parties can fight', () => {
     const { world } = fixture()
     expect(partyHolding(world, [...ids(106, 5)].reverse())).toBe(1)
     expect(partyHolding(world, ids(105, 5))).toBeNull()
+  })
+})
+
+describe('the guided weapons (CP7, H70)', () => {
+  it('pairs a party\'s members to the front\'s build by class, in party order, from v16 only', () => {
+    // Iron's build: the first Brawler and Spell Blade on their defaults, the second ones on the Bow and the Katana.
+    expect(guidedWeapons(GUIDED[0]!, 'iron', 16)).toEqual([
+      ['greatsword', 'axe', 'lance'], ['bow', 'katana', 'axe'],
+      ['katana', 'lance', 'tome-lightning'], ['bow', 'greatsword', 'tome-fire'],
+      ['greatsword', 'axe', 'tome-light'],
+    ])
+    // Any order: the first Brawler met takes the build's first; a class the build lacks, or a third Brawler, gets none.
+    expect(guidedWeapons(['paladin', 'brawler', 'mage', 'brawler', 'brawler'], 'iron', 16)).toEqual([
+      ['greatsword', 'axe', 'tome-light'], ['greatsword', 'axe', 'lance'], null, ['bow', 'katana', 'axe'], null,
+    ])
+    expect(guidedWeapons([null, 'cleric'], 'arcane', 16)).toEqual([null, ['tome-light', 'tome-ice', 'bow']])
+    // Before v16 the guidance is classes only.
+    expect(guidedWeapons(GUIDED[0]!, 'iron', 15)).toBeNull()
   })
 })
 

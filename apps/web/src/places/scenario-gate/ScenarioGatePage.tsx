@@ -225,8 +225,8 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
   const run = world ? openFightOf(world) : null
   // The last action settles the fight in the save at once, while its cues still play. Keep showing the fight it was, so
   // the screen isn't remounted mid-animation; its own onEnd then brings up the result.
-  const shownFight = useRef<{ battleId: string; nodeId: string } | null>(null)
-  if (run?.battle) shownFight.current = { battleId: run.battle.battleId, nodeId: run.battle.nodeId }
+  const shownFight = useRef<{ battleId: string; nodeId: string; version: number } | null>(null)
+  if (run?.battle) shownFight.current = { battleId: run.battle.battleId, nodeId: run.battle.nodeId, version: run.battle.input.version }
   const fight = run?.battle ?? shownFight.current
   const stageId = ended?.nodeId ?? fight?.nodeId
   const region = stageId ? campaign.stageRegion(stageId) : null
@@ -236,7 +236,7 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
   if (ended) {
     return (
       <>
-        <FightResult campaign={campaign} chapter={region} result={ended.result} onMap={toRegion}
+        <FightResult campaign={campaign} chapter={region} result={ended.result} onMap={toRegion} engine={shownFight.current?.version}
           onAgain={() => {
             beginFight(region, ended.nodeId, campaign.outfits).then(() => setEnded(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.'))
           }} />

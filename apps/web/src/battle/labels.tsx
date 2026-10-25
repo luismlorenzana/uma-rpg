@@ -2,7 +2,7 @@
 // break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes; six from classes
 // v2, whose lines follow the generation, H59). In the main bundle: never import the engine here (H62).
 import {
-  BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, isRpgElement, isRpgWeaponKind, rpgHand, rpgTierLevel, rpgV2, type BattleWeaknesses,
+  BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, isRpgElement, isRpgWeaponKind, rpgHand, rpgRework, rpgTierLevel, rpgV2, type BattleWeaknesses,
   type RpgClass, type RpgDamageKind, type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgSupport,
   type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
@@ -35,8 +35,18 @@ const BLURBS_V2: Readonly<Record<RpgClass, string>> = {
   paladin: 'Three Arms and two Tomes: Barriers and Aegis on the party, from her ATK.',
   cleric: 'Three Tomes and two Arms: mends, Regen and cleanses for the party, from her M.ATK.',
 }
+/** The Tier rework's fight (v16, H70): three weapons a class (CP2). */
+const BLURBS_V16: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Three Arms, one heavy act a turn.',
+  mage: 'Three Tomes, one full cast a turn.',
+  spellblade: 'Two Arms and a Tome: a blade and a spell each turn, the blade striking twice.',
+  summoner: 'Two Tomes and an Arm: a Tome summon that lingers and strikes every foe as it leaves, and an Arms summon.',
+  paladin: 'Two Arms and a Tome: Barriers and Aegis on the party, from her ATK.',
+  cleric: 'Two Tomes and an Arm: mends, Regen and cleanses for the party, from her M.ATK.',
+}
 /** Each class in one line, by generation. */
-export const classBlurbs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RpgClass, string>> => (rpgV2(engine) ? BLURBS_V2 : BLURBS_V1)
+export const classBlurbs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RpgClass, string>> =>
+  (rpgRework('fight', engine) ? BLURBS_V16 : rpgV2(engine) ? BLURBS_V2 : BLURBS_V1)
 /** The live generation's lines. */
 export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = classBlurbs()
 /** What each slot holds, for the class's weapon pickers. */
@@ -63,13 +73,15 @@ export const extraHit = (classId: RpgClass, skill: Pick<RpgSkillDef, 'primary'>,
 export const supportOf = (skill: Pick<RpgSkillDef, 'support' | 'support15'>, engine: number = BATTLE_ENGINE_VERSION): RpgSupport | undefined =>
   rpgV2(engine) ? skill.support15 : engine >= 12 ? skill.support : undefined
 
-/** A skill as this Uma casts it: targets, hits, power after her hand (its half's, D179), and MP; by generation. */
-export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: RpgSkillDef, engine: number = BATTLE_ENGINE_VERSION): string {
+/** A skill as this Uma casts it: targets, hits, power after her hand (its half's, D179), and MP; by generation. From v16
+ * (H70) `factor` is her Skill Rank's on its power (×0.95–×1.05, CP32), and a Pierce says it cuts through the shield. */
+export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: RpgSkillDef, engine: number = BATTLE_ENGINE_VERSION, factor = 1): string {
   const hand = rpgHand(profile, engine)
   const v2 = rpgV2(engine), tome = tomeSkill(skill)
   const per = skill.target === 'all' ? 'every foe' : skill.target === 'random' ? 'random foes' : 'one foe'
   const hits = skill.hits.length + (extraHit(profile.classId, skill, engine) ? 1 : 0)
-  const total = skill.hits.reduce((sum, h) => sum + h.power, 0) * (tome ? hand.tome : hand.arms)
+  const total = skill.hits.reduce((sum, h) => sum + h.power, 0) * (tome ? hand.tome : hand.arms) * factor
+  const pierce = skill.special === 'pierce' && rpgRework('fight', engine) ? ' · cuts through the shield' : ''
   const mp = Math.max(1, Math.round(skill.mp * hand.mp)) * profile.tier
   // From v2 only a Tome summon stays, and its farewell strikes every foe (D183).
   const summon = !skill.summon ? '' : !v2 ? ` · lingers ${skill.summon.linger}×` : tome ? ' · lingers, then strikes every foe' : ' · strikes once'
@@ -77,7 +89,7 @@ export function skillLine(profile: Pick<RpgProfile, 'classId' | 'tier'>, skill: 
     : summon
   // Its support (D141): what it does for the party besides its hits.
   const support = supportText(supportOf(skill, engine), engine)
-  return `${per} · ${hits} hit${hits === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${extra}${support ? ` · ${support}` : ''}`
+  return `${per} · ${hits} hit${hits === 1 ? '' : 's'} · ${total.toFixed(1)}× · ${mp} MP${pierce}${extra}${support ? ` · ${support}` : ''}`
 }
 export const STATUS_LABEL: Readonly<Record<RpgStatusKind | NonNullable<RpgSkillDef['status']>['key'], string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -177,13 +189,17 @@ export function ShieldBadge({ value, broken = false, steeled = false }: { value:
   )
 }
 
-/** Weakness icons: elements first, then weapon kinds. */
-export function WeaknessIcons({ weaknesses, size = 14 }: { weaknesses: BattleWeaknesses; size?: number }) {
-  const names = [...weaknesses.elements.map((e) => ELEMENT_LABEL[e]), ...weaknesses.weapons.map((w) => WEAPON_KIND_LABEL[w])]
+/** Weakness icons: elements first, then weapon kinds; from v16 (CP5, H70) a foe's twins, the Arm first, then the element
+ * (Twilight: Bow, Katana), the twin sets' order. `engine` is the generation (a fight's own version on the fight screen). */
+export function WeaknessIcons({ weaknesses, size = 14, engine = BATTLE_ENGINE_VERSION }: { weaknesses: BattleWeaknesses; size?: number; engine?: number }) {
+  const arms = weaknesses.weapons.map((w) => <span key={w} className="inline-flex text-ink-soft"><WeaponGlyph weapon={w} size={size} /></span>)
+  const elements = weaknesses.elements.map((e) => <ElementGlyph key={e} element={e} size={size} />)
+  const twins = rpgRework('fight', engine)
+  const armNames = weaknesses.weapons.map((w) => WEAPON_KIND_LABEL[w]), elementNames = weaknesses.elements.map((e) => ELEMENT_LABEL[e])
+  const names = twins ? [...armNames, ...elementNames] : [...elementNames, ...armNames]
   return (
     <span className="inline-flex flex-wrap items-center justify-center gap-0.5" aria-label={`Weak to ${names.join(', ')}`}>
-      {weaknesses.elements.map((e) => <ElementGlyph key={e} element={e} size={size} />)}
-      {weaknesses.weapons.map((w) => <span key={w} className="inline-flex text-ink-soft"><WeaponGlyph weapon={w} size={size} /></span>)}
+      {twins ? <>{arms}{elements}</> : <>{elements}{arms}</>}
     </span>
   )
 }

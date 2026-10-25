@@ -1,7 +1,7 @@
 // The active party (D66): the five who fight, swappable from any world screen outside a fight. Each Uma shows her level
 // and the MP she carries between stages (Springs refill it). From classes v2 it says when it fields two healers (H59).
 import {
-  activeClass, applyPoints, classOf, healerBlock, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgTreePointsEarned,
+  activeClass, applyPoints, classOf, healerBlock, isPartyFull, openFightOf, projectRpgStats, rpgCarriedMp, rpgRework, rpgTreePointsEarned,
   rpgTreePointsSpent, SaveRuleError, umaPoints, umaProfile, worldRun,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -50,7 +50,8 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const points = umaPoints(uma, classId)
           const max = applyPoints(projectRpgStats(profile), points).stats.mp
           const mp = rpgCarriedMp(run, profile, points)
-          const spare = rpgTreePointsEarned(uma.level) - rpgTreePointsSpent((classOf(uma, classId).tree ?? []).map((n) => ({ tier, id: n })))
+          // Spare side points (to v15); from v16 nothing costs points (CP14), so no dot (H70).
+          const spare = rpgRework('fight') ? 0 : rpgTreePointsEarned(uma.level) - rpgTreePointsSpent((classOf(uma, classId).tree ?? []).map((n) => ({ tier, id: n })))
           return (
             <button key={id} type="button" className="relative min-w-0 flex-1" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: ${CLASS_LABEL[classId]}, Lv ${uma.level}, MP ${mp} of ${max}`}
               onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>

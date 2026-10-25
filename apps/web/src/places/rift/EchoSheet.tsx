@@ -1,5 +1,5 @@
-// An Echo's sheet (H50, rift.md §8): its front and level, its foes, a party of five Lv 50 Umas and Fight; once won, Sweeps
-// with Sweep Tickets, whose result shows like a win.
+// An Echo's sheet (H50, rift.md §8): its front and level, its foes, a party of five Lv 50 Umas and Fight (from v16 with
+// the front's guided weapons, H70); once won, Sweeps with Sweep Tickets, whose result shows like a win.
 import { FRONT_NAME, SaveRuleError, type EchoLevel, type RiftFront } from '@rpg/domain'
 import { riftFight, riftFightBlock, sweepEchoBlock, type RiftFightResult } from '@rpg/domain/rift'
 import { useMemo, useState } from 'react'
@@ -8,6 +8,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import { beginRiftFight, sweepEchoes } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
+import { GuidedWeapons } from './GuidedWeapons'
 import { PartyPick } from './PartyPick'
 import { bestParty, levelPartyBlock } from './rift-view'
 import { RiftResult } from './RiftResult'
@@ -57,6 +58,7 @@ export function EchoSheet({ campaign, place, front, level, onClose }: {
     <BottomSheet title={`${FRONT_NAME[front]} Echo · Lv ${level}`} onClose={onClose} footer={
       <div className="space-y-2">
         {!open && <PartyPick campaign={campaign} world={world} value={party} block={(i) => levelPartyBlock(world, i)} onChange={setParty} title="Who fights?" />}
+        {!open && <GuidedWeapons campaign={campaign} world={world} front={front} party={party} />}
         <button type="button" disabled={block !== null} onClick={() => void fight()}
           className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">
           {open ? 'Fight open' : won ? 'Fight again' : 'Fight'}

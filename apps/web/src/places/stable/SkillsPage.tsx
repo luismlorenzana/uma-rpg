@@ -3,20 +3,23 @@
 // Cleric choose), then her skills. Each weapon in a slot opens its tree; she holds a Training weapon of every kind until
 // she wears a crafted one. A depth's core skill comes free once her class rank and level open it, and side skills cost
 // points. Skills are chosen for her until she picks her own. A weapon slot that can take a better piece now shows the
-// "Can upgrade" mark (H34).
+// "Can upgrade" mark (H34). From engine v16 (the Tier rework's R1, H70) the tab is `SkillTree`: three slots, one tree a
+// slot with a trunk and a fork, Skill Ranks and no points; this page's body below is v6–v15's.
 import {
-  activeClass, classOf, classRankOf, classTrack, gearById, RPG_CLASSES, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
-  rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent,
+  activeClass, classOf, classRankOf, classTrack, gearById, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
+  rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent, rpgTreeView,
   rpgV2, SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { umaUpgrades } from '../../album/upgrades'
 import { CLASS_BLURB, CLASS_LABEL, KindMark, skillKinds, skillLine, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
-import { ClassEmblem, StatusGlyph } from '../../battle/pixel-icons'
+import { StatusGlyph } from '../../battle/pixel-icons'
 import { equip, learn, pickClass, unlearn, useActiveTier, useWorld } from '../../save/game'
 import { HelpButton } from '../../ui/HelpButton'
 import { RankRow } from '../../ui/RankBars'
 import { UpgradeMark } from '../../ui/UpgradeMark'
+import { ClassPicker } from './ClassPicker'
+import { SkillTree } from './SkillTree'
 import { WeaponSheet } from './WeaponSheet'
 
 export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: string }) {
@@ -30,6 +33,12 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   const classId = activeClass(outfit, uma)
   const setup = classOf(uma, classId)
   const profile = umaProfile(outfit, uma, tier, classId)
+  // v16 (H65's model, null before it): the tree tab.
+  const view = world ? rpgTreeView(profile, umaLoadout(outfit, uma, tier, classId)) : null
+  if (view && world) {
+    return <SkillTree outfit={outfit} uma={uma} world={world} tier={tier} classId={classId} profile={profile} view={view}
+      loadout={umaLoadout(outfit, uma, tier, classId).map((r) => r.id)} />
+  }
   const weapons = setup.weapons
   const treeWeapons = [...weapons, ...rpgClassWeapons(classId).filter((w) => !weapons.includes(w))]
   const weapon = treeWeapons[Math.min(treeIndex, treeWeapons.length - 1)]!
@@ -70,17 +79,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
             <p>Until you equip skills yourself, each weapon's deepest skill is equipped for her.</p>
           </HelpButton>
         </div>
-        {/* Classes v2's six in two rows of three (H59): six in a row leaves "Summoner" no room at 375 pt. */}
-        <div className={`grid gap-1 ${RPG_CLASSES.length > 5 ? 'grid-cols-3' : 'grid-cols-5'}`} role="radiogroup" aria-label="Class">
-          {RPG_CLASSES.map((c) => (
-            <button key={c} type="button" role="radio" aria-checked={c === classId} onClick={() => switchTo(c)}
-              className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-center ${c === classId ? 'bg-accent text-accent-ink' : 'bg-raised text-ink'}`}>
-              <ClassEmblem classId={c} />
-              <span className="text-[11px] font-semibold leading-tight">{CLASS_LABEL[c]}</span>
-              <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>Rank {classRankOf(uma.ranks, c)}</span>
-            </button>
-          ))}
-        </div>
+        <ClassPicker uma={uma} classId={classId} onPick={switchTo} />
         <div>
           <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-5 gap-1" aria-label="Weapon slots">

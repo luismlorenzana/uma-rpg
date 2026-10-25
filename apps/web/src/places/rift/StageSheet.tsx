@@ -1,5 +1,6 @@
 // A front stage's sheet (H50): its foes by wave as the fight will have them (faces, Boss or Elite by face, acts, shields,
-// weaknesses, the ward), and on the next stage a party of the roster and Fight.
+// weaknesses, the ward), and on the next stage a party of the roster and Fight; from v16 the front's guided weapons for
+// that party, in one tap (CP7, H70).
 import { FRONT_NAME, SaveRuleError, type RiftFront } from '@rpg/domain'
 import { riftFightBlock, type RiftFightPlan } from '@rpg/domain/rift'
 import { useMemo, useState } from 'react'
@@ -10,6 +11,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import { beginRiftFight } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
+import { GuidedWeapons } from './GuidedWeapons'
 import { PartyPick } from './PartyPick'
 import { bestParty, frontPartyBlock, planSize } from './rift-view'
 import { useRift } from './use-rift'
@@ -64,7 +66,10 @@ export function StageSheet({ campaign, place, front, plan, status, onClose }: {
     <BottomSheet title={`${FRONT_NAME[front]} · ${plan.name}`} onClose={onClose} footer={
       <div className="space-y-2">
         {status === 'next' && !open && (
-          <PartyPick campaign={campaign} world={world} value={party} block={(i) => frontPartyBlock(world, run, i)} onChange={setParty} title="Who fights?" />
+          <>
+            <PartyPick campaign={campaign} world={world} value={party} block={(i) => frontPartyBlock(world, run, i)} onChange={setParty} title="Who fights?" />
+            <GuidedWeapons campaign={campaign} world={world} front={front} party={party} />
+          </>
         )}
         <button type="button" disabled={status !== 'next' || block !== null} onClick={() => void fight()}
           className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-40">

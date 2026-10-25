@@ -89,7 +89,7 @@ on the shape it ships.
 
 Waves: 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
 
-Built (dark, live from H72): H64 (D199, D200), H65 (D201), H66 (D202), H67 (D203), H68 (D204), H69 (D205).
+Built (dark, live from H72): H64 (D199, D200), H65 (D201), H66 (D202), H67 (D203), H68 (D204), H69 (D205), H70 (D206).
 
 **R2. Tier 1's economy (engine v17, save v28)**
 

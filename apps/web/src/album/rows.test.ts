@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { byLevel, workOrder } from '@luismlorenzana/uma-kit/roster'
-import { availabilityBlock, availableWorkers, newOwnedUma, newTierWorld, startJob, worldOf } from '@rpg/domain'
+import { availabilityBlock, availableWorkers, BATTLE_ENGINE_VERSION, newOwnedUma, newTierWorld, startJob, worldOf } from '@rpg/domain'
 import { activePartyRows } from './party-rows'
-import { albumRows, stableResult, STABLE_SCHEMA, STABLE_SORTS, TIER_ONE_SCOPE } from './rows'
+import { albumRows, STABLE_FACETS, stableFacets, stableResult, STABLE_SCHEMA, STABLE_SORTS, TIER_ONE_SCOPE } from './rows'
 import { albumFixture, NOW } from './testing'
 
 describe('SB4 RPG album adapters', () => {
@@ -78,5 +78,53 @@ describe('one Uma, one tier world in the album (H35)', () => {
     const rows = albumRows(view, tier2, [], NOW, { tier: 2, elsewhere: new Set(Object.keys(world.umas)) })
     expect(rows.map(row => [row.id, row.uma !== null])).toEqual([['81006', true]])
     expect(albumRows(view, newTierWorld(NOW, 0), [], NOW, { tier: 2, elsewhere: new Set() })).toEqual([])
+  })
+})
+
+describe('the Stable\'s Template filters (UT15, H70)', () => {
+  /** The six invented outfits re-shaped: 81001 a front runner at Long (an Ironhide), 81002 a Pace Uma with Wit over Power
+   * (a Mage, owned, who picked the Spell Blade), the rest Pace Umas with Power at Mile (Spell Blades). */
+  async function templated() {
+    const fx = await albumFixture()
+    const [ironhide, pacer, ...rest] = fx.view.roster
+    Object.assign(ironhide!, { aptitudes: { ...ironhide!.aptitudes, strategy: { front: 'A', pace: 'C', late: 'C', end: 'C' },
+      distance: { sprint: 'C', mile: 'C', medium: 'B', long: 'A' } } })
+    Object.assign(pacer!, { baseStats: { ...pacer!.baseStats, power: 80, wit: 120 }, aptitudes: { ...pacer!.aptitudes,
+      strategy: { front: 'C', pace: 'A', late: 'C', end: 'C' }, distance: { sprint: 'C', mile: 'C', medium: 'A', long: 'C' } } })
+    for (const o of rest) Object.assign(o, { baseStats: { ...o.baseStats, power: 120, wit: 80 }, aptitudes: { ...o.aptitudes,
+      strategy: { front: 'C', pace: 'A', late: 'C', end: 'C' }, distance: { sprint: 'C', mile: 'A', medium: 'C', long: 'C' } } })
+    fx.world.umas['81002'] = { ...fx.world.umas['81002']!, calling: { pick: 'spellblade', confirmed: false } }
+    return fx
+  }
+
+  it('adds a Template group after RPG from v16 (Calling, Stride, Knack; no Signature), today\'s list before', () => {
+    const v16 = stableFacets(16), v15 = stableFacets(15)
+    // The Stable reads the live generation's list.
+    expect(STABLE_FACETS).toEqual(stableFacets(BATTLE_ENGINE_VERSION))
+    expect(v15.some((f) => f.group === 'Template')).toBe(false)
+    expect(v16.slice(0, v15.length)).toEqual(v15)
+    expect(v16.slice(v15.length).map((f) => [f.group, f.key, f.options!.map((o) => o.label)])).toEqual([
+      ['Template', 'calling', ['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin']],
+      ['Template', 'stride', ['Dash', 'Middle', 'Stayer']],
+      ['Template', 'knack', ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']],
+    ])
+  })
+
+  it('finds an Ironhide by her template\'s name, and counts an owned Uma\'s pick as her calling', async () => {
+    const { view, world } = await templated()
+    const rows = albumRows(view, world, [], NOW, TIER_ONE_SCOPE, 16)
+    const found = stableResult(rows, { ...STABLE_SCHEMA.fallback, search: 'ironhide' }, stableFacets(16)).rows.map((r) => r.id)
+    expect(found).toEqual(['81001'])
+    expect(rows[0]!.facets).toMatchObject({ calling: ['brawler'], stride: ['stayer'] })
+    // Her row says Mage; her pick makes her a Spell Blade (and a Spellfencer by name).
+    expect(rows[1]!.facets.calling).toEqual(['spellblade'])
+    expect(rows[1]!.search).toContain('spellfencer')
+    const blades = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { calling: ['spellblade'] } }, stableFacets(16))
+    expect(blades.rows.map((r) => r.id).sort()).toEqual(['81002', '81003', '81004', '81005', '81006'])
+    expect(blades.counts.calling).toMatchObject({ brawler: 1, spellblade: 5, mage: 0 })
+    // Before v16 nothing changes: no template facets, no template name in search. The default is the live generation.
+    const today = albumRows(view, world, [], NOW, TIER_ONE_SCOPE, 15)
+    expect(today.every((r) => !('calling' in r.facets) && !r.search.includes('ironhide'))).toBe(true)
+    expect(albumRows(view, world, [], NOW)).toEqual(albumRows(view, world, [], NOW, TIER_ONE_SCOPE, BATTLE_ENGINE_VERSION))
   })
 })
