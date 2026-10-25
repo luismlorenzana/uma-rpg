@@ -5,7 +5,7 @@
 // D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5;
 // v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md;
 // v16 the Tier rework's fight, D200, dark until H72: three weapons by channel, no side or legacy skills, a
-// trunk and one fork into lines A and B, Skill Ranks (H65);
+// trunk and one fork into lines A and B, Skill Ranks (H65), the base MP regen and the Flourish (H68, D204);
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -14,7 +14,7 @@ export type BattleSide = 'ally' | 'enemy'
 export type BattleChannel = 'physical' | 'magical'
 export type EnemyRank = 'regular' | 'sub-boss' | 'boss'
 /** Her template's Flourish, by her stride (uma-templates §3.3, UT6): 4% of her max HP a fight, as her calling. Named by
- * `roster/template.ts` (H67); engine v16 plays it from her input (H68). */
+ * `roster/template.ts` (H67); engine v16 plays it from her input (`BattleAlly.flourish`, H68). */
 export type RpgFlourish = 'clean-break' | 'even-pace' | 'late-reserve'
 export interface BattleStatus { kind: RpgStatusKind; stacks: number; turns: number }
 
@@ -56,7 +56,8 @@ export interface BattleAlly {
   orbs?: RpgDamageKind[]
   /** v11: a Veil absorbing magical damage, from the start of the fight (Veil Amulet). */
   veil?: number
-  /** v11: MP restored at the end of each round (Spring Amulet). */
+  /** v11: MP restored at the end of each round (Spring Amulet). From v16 the base MP regen adds to it, read from her
+   * `stats.mp` and Class Rank (`rpgBaseMpRegen`, SB18): no field of its own. */
   mpRegen?: number
   /** v11, per mille: physical damage she deals healed back (Vampire Talisman); magical damage she deals restored as MP
    * (Siphon Amulet). */
@@ -76,6 +77,9 @@ export interface BattleAlly {
   hero?: HeroLimitId
   /** v9: the Heroes she learns under (two at most): each seat's Limit Break, her Bond Level with it, and the Hero. */
   inherits?: BattleInherit[]
+  /** v16 (UT6, H68): her template's Flourish, sent only while she fights as her calling's class (UT12) and frozen here
+   * (UT18); refused before v16. Clean break starts her with a Barrier, Even pace and Late reserve mend at a round's end. */
+  flourish?: RpgFlourish
 }
 /** An inherited Limit Break (D106): it works at 50% plus 5% a Bond Level; `from` is the Hero's outfit, for the cut-in. */
 export interface BattleInherit { limit: HeroLimitId; bond: number; from: string }
@@ -166,6 +170,9 @@ export interface BattleUnit {
   charged?: number
   /** v12: back up from a Break, her shield can't be chipped until she has made a move, so she acts between Breaks. */
   steeled?: boolean
+  /** v16 (UT6, H68): the HP her Even pace or Late reserve can still mend this fight, 4% of her max HP at the start. Set
+   * only for those two, so older states hash as before; waves keep her unit, so it is the fight's, not a wave's. */
+  flourish?: number
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
