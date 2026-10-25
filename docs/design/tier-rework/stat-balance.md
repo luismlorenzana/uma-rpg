@@ -5,10 +5,14 @@
 > [§9.5](README.md#95-simulation-items)'s simulation items), the step after the four approved standalone docs (Class
 > D192, Weapon D193, Extra Stats D194, Profession D195). **It is an analytic model:** expected values from the game's
 > formulas and the four docs' numbers; no fight is simulated. The final tuning by simulation happens at implementation,
-> once engine v16 exists behind its switch. Calls are **SB1–SB17**, each with a recommendation ([§14](#14-decisions)).
-> No open questions.
+> once engine v16 exists behind its switch. Calls are **SB1–SB18**, each with a recommendation ([§14](#14-decisions)).
+> No open questions. *Updated 2026-10-25 after the owner's first look ("a lot of numbers … can we not fix them?"): a
+> picture page for the three problems and their fixes, and **SB18**, the MP fix ([§7.2](#72-sb18-a-base-mp-regen-for-every-uma)).*
 >
-> **What it found, in five lines** ([§0](#0-at-a-glance)):
+> **Start here: [the three problems and their fixes, in pictures](previews/balance-summary.html)** (one card each, a
+> before/after chart, then what already holds).
+>
+> **What it found, in six lines** ([§0](#0-at-a-glance)):
 > 1. **SB1 holds.** Every source keeps its share of every stat at each tier's Lv 50 within 2.3 points; the model
 >    reproduces all eighteen approved Lv 50 sheets to the point.
 > 2. **The Tier 2 and Tier 3 toolboxes outrun the foes.** On curve, a party fells a regular **1.46×** as fast as Tier 1
@@ -18,12 +22,16 @@
 > 4. **The hybrid mirror moves to the Summoner** (Prowess's split puts ATK on her Arms half, the presets put flat
 >    offense on her Bow): her 70/30 falls to 57/43. **Proposed:** a hybrid's single-kind forms and Full moon go on her
 >    lead half, and her Arms hand 0.56 → 0.48.
-> 5. **Defense, the template, Skill Ranks and the damage stack's ceilings hold as written;** MP binds every class over
->    a region now, the casters most, which is the owner's intent; the knob order is re-ranked.
+> 5. **Defense, the template, Skill Ranks and the damage stack's ceilings hold as written.**
+> 6. **MP runs dry over a region** without the regen accessories: late in a region the party acts at **41–52%** of
+>    today's power from Lv 30 (at Lv 50 the Mage and the Summoner cast deep in a third of a region's acts; today in all).
+>    **Proposed (SB18):** a base MP regen for every Uma, a rule and never a pick: **0.8% of her max MP at the end of each
+>    round for each skill depth she has open** (4% from Class Rank 40). Late-region power returns to **0.94–1.05×**
+>    today's.
 >
-> **Pages** (full desktop, light and dark): [every stat sheet by source, every class, tier, level and build
-> stage](previews/balance-sheets.html) · [damage per act, the foes, every check and every tuning before and
-> after](previews/balance-damage.html).
+> **Pages** (full desktop, light and dark): [**the summary: three problems, three fixes**](previews/balance-summary.html)
+> · [every stat sheet by source, every class, tier, level and build stage](previews/balance-sheets.html) · [damage per
+> act, the foes, every check and every tuning before and after](previews/balance-damage.html).
 >
 > **Interfaces, not designed here:** the values themselves stay their owning docs' (README §3); this pass proposes
 > changes as follow-ups ([§13](#13-if-approved-the-follow-ups-by-doc)). The Uma Templates pass (variance.md) takes §8's
@@ -37,13 +45,14 @@
 | "The rate of progression is fine as it is: keep it" (the brief, 2026-10-22) | [§3](#3-the-damage-stack-and-the-foe-budget): the foes must keep pace with each tier's toolbox, so rounds a fight stay Tier 1's; the terms that do it (SB3–SB5) |
 | "Tier 2 and Tier 3 feel too low impact" (the Extra Stats review, 2026-10-24) | [§3.4](#34-where-the-gain-comes-from): the four docs' Tier 2 tools add **+51%** to an on-curve act and Tier 3's **+88%**: they matter; the terms price them so the pace holds, and a player feels them as choices and tuned fronts (SB7) |
 | Defensive accessories are unfun; leave defense to armor (the weapon review) | [§6](#6-defense-a-regulars-hit): armor alone keeps a regular's hit at 18.7% · 18.3% · 18.1% of a Brawler's HP (SB13) |
-| "MP regen accessories are too broken; I would always wear one on every class" | [§7](#7-mp-after-the-regen-accessories): every class is now MP-bound over a region on one footing; the casters lose their late unbound sustain, as intended (SB14) |
+| "MP regen accessories are too broken; I would always wear one on every class" | [§7](#7-mp-after-the-regen-accessories): without them a party runs dry late in a region (SB14); **SB18** gives every class the regen he'd have worn, as a rule of the game, not a pick: late-region power back at today's within 6% |
+| "This is the most difficult part to visualize for me, it's a lot of numbers. Why do we have those big issues, can we not fix them?" (2026-10-25) | [The summary page](previews/balance-summary.html): each problem in one sentence, why, its fix and one before/after chart. The three: later tiers outrun the foes (SB3–SB5), the hybrid mirror drifts (SB10–SB11), MP runs dry over a region (**SB18**, new) |
 | "All accessories viable"; channel-neutral, parity checked per channel (the weapon review, D193's note) | [§4](#4-accessories-their-share-viability-and-parity): every form someone's best after two steps (SB8); every family within 0.4 points between a Brawler and a Mage at equal Attack share (SB9) |
 | Uma uniqueness through accessories, about +5% (WP33) | [§8](#8-the-template-budget): the signature gives +4.3–6.1% at Lv 50, the matched affinity only +2–5% in the campaign (SB15) |
 | Skill Ranks every 2 Class Ranks, balance-neutral (CP32) | [§9](#9-skill-ranks-neutrality): neutral on the balance party; +5% from Uma Lv 34 at a real player's pace (SB16) |
 | The hybrids a mirror, 70/30 each way; Paladin against Cleric (CP1, CP9) | [§5](#5-the-mirrors) (SB10–SB12) |
 | Shields grow with the answers a foe's list gets (CP8) | [§10](#10-shields-against-answers) (SB6) |
-| No open questions; decide with a recommendation, log it | [§14](#14-decisions): SB1–SB17, each recommended |
+| No open questions; decide with a recommendation, log it | [§14](#14-decisions): SB1–SB18, each recommended |
 
 ## 0. At a glance
 
@@ -57,7 +66,7 @@
 | 4a | **The hybrid mirror** on the new maps | Equal ±5%, 70/30 ± 5 each way | The mirror drifts **1–12%** toward the Summoner in Tier 1, **3–19%** in Tiers 2–3; her split falls to **57/43** (53/47 in Tier 3) | ✗ | SB10, SB11 |
 | 4b | **Paladin against Cleric** | ±10% | Equal in Tier 1; Guardian vs Bishop **−6.5%** (mends −13%), Templar vs Oracle **+7%** | ✓ | SB12 |
 | 5 | **Defense:** a regular's 100% hit | 18.7% for a Brawler (WP15) | **18.7 · 18.3 · 18.1%** at Lv 50; 16.9–18.7% across levels; every class 17–24% | ✓ | SB13 |
-| 6 | **MP** after the regen accessories | The Springs test (10–12 of 12) | One stage: never binds (5–19 deep casts a bar). A region: every class binds; the casters' late coverage **100% → 32–63%**, the others' **+7–13 points** | Intended; knobs re-ranked | SB14 |
+| 6 | **MP** after the regen accessories | The Springs test (10–12 of 12); late-region pace within ±10% of today's | One stage: never binds (5–19 deep casts a bar). A region: every class binds; the casters' late coverage **100% → 30–60%**; the party's late-region power **0.41–0.52× today's** from Lv 30. **With SB18: 0.94–1.05×**, coverage 57–100% | ✗ → ✓ with SB18 | SB14, **SB18** |
 | 7 | **Template budget** | About +5% matched (U12) | Signature **+5.2–6.1 · 4.6–5.3 · 4.3–4.8%** at Lv 50; matched affinity **+2.1–4.7%**; both **7–11%** | ✓ signature alone | SB15 |
 | 8 | **Skill Ranks' neutrality** | ×1.00 on average | Balance party **1.000** over Lv 1–50; a real player's pace **1.014** (×1.05 from Lv 34) | ✓ | SB16 |
 | 9 | **Shields** against answers | Rounds to the first Break within ±0.5 of Tier 1's | Answers 2.47 · 2.0 · 2.30 (bosses 3.53 · 3.67) ✓; bosses Break **0.5 rounds sooner** in Tiers 2–3 (Duals add multi-hit partners) | ✗ bosses | SB6 |
@@ -74,6 +83,7 @@
 | **Great Pendant** (WP20) | 0.5 → **0.55** a kind (Tier 3 0.55 → **0.575**) | 0 cells → **4** (Tier 2), **1** (Tier 3) |
 | **Hybrids' presets** (WP25, EP29) | single-kind forms and the Full moon on her **lone** half → on her **lead** half | Summoner 57/43 → **68/32**; Spell Blade Tier 3 62/38 → **71/29** |
 | **Summoner's Arms hand** (CP9) | 0.56 → **0.48** | Tier 1 mirror 0.88–0.99 → **0.97–1.06** |
+| **A base MP regen** (new rule, SB18) | none → **0.8% of max MP a round per skill depth open** (4% from Class Rank 40) | Late-region party power 0.41–0.90× today's → **0.94–1.05×**; Mage and Summoner coverage 30–37% → **67–80%** |
 
 ## 1. The model
 
@@ -81,8 +91,8 @@
 
 For each **class (6), tier (1–3), tier level (10, 20, 30, 40, 50) and build stage**, the script builds her stat sheet by
 source and her **expected damage per act** on a representative foe of her tier and level, then the checks below.
-The script is `model.py`, `analysis.py` and `checks2.py` in the session scratchpad (not in the repo); every number on
-the two pages is its output.
+The script is `model.py`, `analysis.py` and `checks2.py` in the session scratchpad (not in the repo), with `sb18.py`
+for a region act by act (A14, SB18); every number on the three pages is its output.
 
 | Stage | What she has |
 |---|---|
@@ -121,6 +131,7 @@ the two pages is its output.
 | A11 | Chips: a weak act lands its weapon's hits (Greatsword, Axe, Fire, Ice 1; Katana, Dark 2; Lance, Lightning 2.5; Bow, Light 3), the Spell Blade's Arms half one more, an Attack 1 | §10's rounds-to-Break index; class-progression §3.2's shapes |
 | A12 | Her template's knack from the six invented Umas (extra-stats §6.5): Tireless (Brawler, Cleric), Clever (Mage), Fleet (Spell Blade), Gritty (Summoner), Mighty (Paladin) | Fully built only |
 | A13 | Today's kit for the comparisons (§3.9, §5.1, §7): `BALANCE_KIT_V2` (an Orb on her first weapon, her support), `onCurveStars` (four stats), today's armor (+2 a grade, offense ⌈g ÷ 2⌉) | The re-baseline and the mirror are measured as drift from today's |
+| A14 | **A region act by act** (§7.2, SB18): twelve stages of five acts, a full bar at the start and the Spring before stage 7; Auto greedy (her deepest skill whenever her MP covers it, else an Attack); regen at the end of each round; today's Spring 1 MP a round a grade, the Siphon 0.8% a grade of her average act's magical damage. **Region power** = her acts' mean power (deepest skill's power, an Attack 1.0); **late region** = the last four stages'; the party is the default five | The pace a region plays at, stage by stage. Coverage reads 0–4 points under §7.1's two-bars figure (MP left in her bar when the Spring refills is lost) |
 
 ### 1.4 What it reproduces
 
@@ -139,7 +150,7 @@ The model is checked against every number it should match before it is trusted w
 ### 1.5 What it can't see
 
 Fight order, targets and overkill; Auto's choices beyond "the weak weapon"; statuses, mends and Barriers as hit
-points saved; waves; the unbroken halving's length (A5); MP inside a fight. These are the simulation's
+points saved; waves; the unbroken halving's length (A5); MP inside a fight beyond A14's greedy Auto. These are the simulation's
 ([§12](#12-what-the-fight-simulation-must-confirm)). The model's job is the shape: which tier, class or piece moves,
 by about how much, and which knob answers it.
 
@@ -480,7 +491,9 @@ Light/Dark. Their damage per act stays within 2–5% at every tier and level.
 ## 7. MP after the regen accessories
 
 **Target** (README §9.5 item 5): the Springs test, a region on Auto clearing 10–12 of 12 with **no MP accessory** and
-the map's +51 MP. Knobs, in order (EP15, WP §5.9): legs' MP a grade, then Vigor's MP rate, then the Flourish's twists.
+the map's +51 MP; and (SB18) **the region's pace**: the party's act power late in a region within ±10% of today's.
+
+### 7.1 As written
 
 **Deep casts a bar** (her pool ÷ her deepest skill's cost: 10 · 14 · 18 · 22 · 26 MP × her MP hand × the tier's ×1,
 ×1.7, ×2.4), and a region's coverage (A10: 60 acts, two bars):
@@ -499,17 +512,101 @@ the map's +51 MP. Knobs, in order (EP15, WP §5.9): legs' MP a grade, then Vigor
   made the Mage, the Summoner and the Cleric unbound from about Lv 30: a Mage's deep cast refunded more than it cost
   (WP §5.1 said so). Without them, their late region power (A10: skills while MP lasts, then Attacks) falls to about half
   today's (the Cleric's to two thirds); the three classes that wore no regen gain 15–17% (legs +10, Vigor +30, the Planet +21).
-- **Every class ends on one footing,** which is what the owner asked for: region power at Lv 50 is 2.0–2.4 for the four
-  damage dealers and 3.3 for the healers, against today's 1.7–4.6. Tiers 2 and 3 cast within 0.2 of Tier 1 at Lv 50
-  (A10's ×1.7 and ×2.4 hold under SB1).
-- **What the knobs buy** (Tier 1, deep casts a bar at Lv 50, a Mage): as written 11.4; legs +3 → +4 a grade **11.8
-  (+3%)**; Vigor's MP ×2 **12.5 (+10%)**; both 12.9. No pool knob brings back an unbound caster, and none should: that
-  was the always-pick.
-- **The risk:** late in a region a party's act power is about a third below today's at Lv 40–50 (the casters'), which is
-  pace, not just clears. **Recommended** (SB14): no value change now; **re-rank the knobs by what they buy** (Vigor's MP
-  rate first, legs second, the Flourish's twists the template's); the Springs test measures region pace as well as
-  clears (the last four stages' rounds within +10% of the first four's). If pace fails, Vigor's MP rate ×2, then ×3;
-  never an MP accessory, never the casters' MP hands (that would reopen a class gap the other way).
+- **The party, act by act** (A14): its region power is **0.94 · 0.85 · 0.71 · 0.63 · 0.67×** today's at Lv 10–50,
+  and in a region's last four stages **0.90 · 0.74 · 0.52 · 0.41 · 0.42×**: from Lv 30 the casters' bars are empty
+  for the second half of each bar's run and everyone Attacks. That is pace, not only clears.
+- **No pool knob answers it** (Tier 1, a Mage's deep casts a bar at Lv 50): as written 11.4; legs +3 → +4 a grade **11.8
+  (+3%)**; Vigor's MP ×2 **12.5 (+10%)**; both 12.9. A bigger bar empties as surely; what the region lost is MP coming
+  back. **SB14** re-ranked these knobs; **SB18** (below) is the fix.
+
+### 7.2 SB18: a base MP regen for every Uma
+
+**The rule (a rule of the game, in every fight, campaign and Rift; never an item, so never a pick):** at the end of each
+round, **every Uma regains 0.8% of her max MP for each skill depth her class has open**, rounded, at least 1:
+
+| Class Rank | 1 | 10 | 20 | 30 | 40+ |
+|---|---|---|---|---|---|
+| Depths open (the deepest skill's MP, before her hand and the tier) | 1 (10) | 2 (14) | 3 (18) | 4 (22) | 5 (26) |
+| **Her MP back a round** | **0.8%** | **1.6%** | **2.4%** | **3.2%** | **4%** |
+
+On the balance party (Class Rank = her level), a Mage at Tier 1 Lv 10 · 20 · 30 · 40 · 50: bar 107 · 148 · 194 · 243 ·
+296, back a round **2 · 4 · 6 · 10 · 12** MP, against her deepest skill's 14 · 18 · 22 · 26 · 26.
+
+- **Why a share of her max MP:** it is tier-free under SB1 (her bar and her skills' MP both grow × 1.7–1.8 and ×
+  2.4–2.6), it follows her MP lean (a Mage's 1.3 bar gets back more than a Brawler's 0.8), and it is the game's own idiom
+  (the Stayer's Second wind is 3% a round; Clarity 4% a stack).
+- **Why it steps up with her depths:** her deepest skill costs 10 → 26 MP as her depths open, so the regen keeps the same
+  share of what she casts; today's regen grew with its grade the same way. A flat share over-feeds the first levels or
+  starves the last (the table below); a real player's faster Class Rank (§9) gets her regen with the skills that need it.
+- **Where it lives:** engine v16's round-end step, the one the Spring Amulet used (`mpRegen`), set when the fight
+  starts; the battle log's MP cue as today's. Her stat sheet shows it beside her MP ("MP 296 · +12 a round").
+
+**The party, act by act** (A14; Tier 1, the default five, ÷ today's at the same level):
+
+| Lv | 10 | 20 | 30 | 40 | 50 |
+|---|---|---|---|---|---|
+| Region power, as written | 0.94 | 0.85 | 0.71 | 0.63 | 0.67 |
+| **Region power, SB18** | **1.04** | **1.06** | **1.01** | **1.01** | **1.06** |
+| Late region (the last four stages), as written | 0.90 | 0.74 | 0.52 | 0.41 | 0.42 |
+| **Late region, SB18** | **1.05** | **1.04** | **0.94** | **0.94** | **1.01** |
+
+**Each class: a region's deep-cast coverage** (A14; Tier 1, Lv 10 · 20 · 30 · 40 · 50) and her region power against
+today's at Lv 50:
+
+| Class | Today (her support) | As written | **SB18** | Region power ÷ today, Lv 50: as written → SB18 |
+|---|---|---|---|---|
+| Brawler | 13 · 13 · 13 · 17 · 17% (Vampire) | 13 · 17 · 20 · 20 · 27% | **23 · 30 · 37 · 47 · 57%** | 1.22 → 1.90 |
+| **Mage** | 33 · 57 · 100 · 100 · 100% (Siphon) | 23 · 27 · 27 · 30 · 37% | **37 · 43 · 57 · 67 · 80%** | 0.50 → **0.84** |
+| Spell Blade | 17 · 17 · 20 · 20 · 23% (Vampire) | 20 · 20 · 23 · 23 · 30% | **27 · 37 · 43 · 53 · 67%** | 1.13 → 1.85 |
+| **Summoner** | 23 · 33 · 53 · 87 · 100% (Siphon) | 20 · 20 · 23 · 23 · 30% | **27 · 37 · 43 · 53 · 67%** | 0.45 → **0.74** |
+| Paladin | 40 · 40 · 40 · 40 · 50% (Thorn) | 40 · 43 · 47 · 50 · 60% | **60 · 77 · 93 · 100 · 100%** | 1.13 → 1.64 |
+| **Cleric** | 63 · 77 · 83 · 90 · 100% (Spring) | 40 · 43 · 47 · 50 · 60% | **60 · 77 · 93 · 100 · 100%** | 0.69 → **1.00** |
+
+- **The party is back on today's pace** at every level: region power 1.01–1.06×, late region 0.94–1.05×. The foes were
+  tuned on today's regions, so no term moves (SB3–SB5 price the act, not MP).
+- **The Cleric is whole (100%), the Mage and the Summoner get back two thirds of what they lost** (37 → 80%, 30 → 67%).
+  **The brief's two targets can't both hold for a rule every Uma shares:** the Spell Blade and the Summoner have the same
+  bar and the same costs (lean 1, hand 1), and so do the Paladin and the Cleric (lean 1.3, hand 0.6). Today's gap inside
+  each pair was only the support the balance party wore (a Siphon or a Spring on one, Vampire or Thorn on the other: H60's
+  equal-worth picks). Any rule for every Uma lifts both of a pair; a flat 6% a round puts the Mage at 100% and the party
+  **15–32% above** today's.
+- **Why the others' rise is right:** their own supports (lifesteal, Thorn) retired as well and armor gave back defense
+  only; and the damage model and the foe terms (§3) already assume each class spends WP §5.7's share of her acts on
+  skills (Brawler 70%, Mage 80%, hybrids 75%, healers 88%). At Lv 50 SB18 gives 57–100% (as written 27–60%), so the
+  region plays near the act the terms are sized on. **Every class ends on one footing** (region power 3.0–4.6 at Lv 50,
+  today 1.6–4.6), the owner's reason for retiring the always-pick.
+- **One stage is unchanged:** her bar is the same (5–19 deep casts against about five acts). **No class stops spending
+  MP:** a round gives back 33–46% of a deep cast for the four damage dealers and **76%** for a healer at depth 5 (77% in
+  Tier 3, the most anywhere); casting deep every act her bar still falls 23–41% a stage at Lv 50 (a healer's 6%). A healer's
+  depth 1–3 skills (6–10.8 MP) cost less than her round's 11.8, as today's Cleric's did with the Spring (10 a round);
+  Auto casts her deepest.
+- **The Spring still matters:** without it SB18's Lv 50 coverage falls to 45–63% for the four damage dealers.
+- **Tiers 2 and 3:** at Lv 50 every class's coverage is Tier 1's within 3 points. Their first levels are MP-rich as
+  written (A10's ×1.7 and ×2.4 are sized at Lv 50: the party's region power at Lv 10 is 1.10× and 1.14× Tier 1's);
+  SB18 adds a little (1.14×, 1.20×), level again by Lv 40 (1.03×). The simulation's item 7 measures it.
+- **The template's MP twists keep their worth:** Opening, Even pace and Second wind each still add 13–20 points of a
+  region's coverage (as written 6–20; a Brawler 57 → 70–77%); a matched Mage reaches 100% with any of them. The Uma
+  Templates pass prices them (U9, U12).
+- **Its knob:** the share a depth, ±0.1% moving late-region power about ±5% (0.7%: 0.88–1.02×; 0.9%: 0.98–1.07×); then
+  Vigor's MP rate, then legs; never an MP accessory, never the casters' MP lean.
+
+**Shapes and the alternative, compared** (Tier 1, the party ÷ today, Lv 10 · 20 · 30 · 40 · 50):
+
+| Option | Region power | Late region | Coverage at Lv 50 (Brawler · Mage · Spell Blade · Summoner · Paladin · Cleric) | One stage |
+|---|---|---|---|---|
+| As written | 0.94 · 0.85 · 0.71 · 0.63 · 0.67 | 0.90 · 0.74 · 0.52 · 0.41 · 0.42 | 27 · 37 · 30 · 30 · 60 · 60% | Unchanged |
+| **SB18: 0.8% a round a depth** | **1.04 · 1.06 · 1.01 · 1.01 · 1.06** | **1.05 · 1.04 · 0.94 · 0.94 · 1.01** | **57 · 80 · 67 · 67 · 100 · 100%** | **Her bar unchanged; every deep cast still costs** |
+| A flat 4% a round | 1.20 · 1.19 · 1.08 · 1.01 · 1.06 | 1.26 · 1.25 · 1.05 · 0.94 · 1.01 | The same as SB18 | Early levels 19–26% fast |
+| A flat 3.5% a round | 1.17 · 1.15 · 1.04 · 0.98 · 1.03 | 1.22 · 1.19 · 0.99 · 0.88 · 0.95 | 53 · 73 · 63 · 63 · 100 · 100% | Early 15–22% fast, Lv 40 12% slow |
+| +6 MP a round × tier | 1.34 · 1.25 · 1.04 · 0.92 · 0.94 | 1.47 · 1.32 · 0.97 · 0.80 · 0.82 | 47 · 60 · 53 · 53 · 100 · 100% | Flat MP buys most where skills are cheap: 47% fast at Lv 10 |
+| **The alternative: a bigger pool,** the Mage's, the Summoner's and the Cleric's MP lean × 2 | 1.08 · 1.03 · 0.90 · 0.82 · 0.85 | 1.07 · 0.99 · 0.77 · 0.67 · 0.70 | 27 · 63 · 30 · 50 · 60 · 100% | A Mage holds 20 deep casts, a Cleric 33 (bars 513) |
+| Their MP lean × 3 | 1.19 · 1.15 · 1.02 · 0.93 · 0.96 | 1.26 · 1.21 · 0.99 · 0.85 · 0.89 | 27 · 93 · 30 · 73 · 60 · 100% | 28 and 47 deep casts (bars 728): a stage never moves her bar |
+
+- **The bigger pool loses on every count:** it can't hold the pace late in a region (a full bar still empties, and
+  nothing comes back), it must be enormous to try (a Mage's lean 1.3 → 3.9, a 728 MP bar), it makes one stage
+  meaningless for the three classes, and it splits the MP mirrors (the Spell Blade 30% against the Summoner 73%; the
+  Paladin 60% against the Cleric 100%): the class gap SB14 warned of.
+- **Recommended: SB18**, the regen for every Uma at 0.8% a round a depth.
 
 ## 8. The template budget
 
@@ -591,12 +688,14 @@ index (A11): the shield ÷ the weak hits the answering members land a round.
 | 6 | The Great Pendant | WP20 | 0.5 a kind (Tier 3 0.55) → **0.55** (Tier 3 **0.575**); G10 +31 → +34, +49 → +51 | Best in 0 cells | **4 (Tier 2), 1 (Tier 3)**; no form over 6 of 24 |
 | 7 | The hybrids' presets | WP25, EP29 | A hybrid's single-kind forms and Full moon on her lone half → **on her lead half** | Splits Tier 1 71/29 · 57/43; Tier 3 62/38 · 53/47 | **71/29 · 68/32; 71/29 · 67/33** |
 | 8 | The Summoner's Arms hand | CP9 (XR5's knob) | 0.56 → **0.48** (1.14 → 1.06 a turn, her farewell on top) | Tier 1 mirror 0.99 → 0.88 (Lv 10 → 50) | **1.06 → 0.97** |
-| 9 | MP's knob order | EP15, WP §5.9 | Legs, Vigor, the Flourish → **Vigor's MP rate, legs, the Flourish**; the Springs test adds region pace | Legs +1 a grade buys +3% casts | Vigor ×2 buys +10% |
+| 9 | MP's knob order | EP15, WP §5.9 | Legs, Vigor, the Flourish → **SB18's share a depth, Vigor's MP rate, legs, the Flourish**; the Springs test adds region pace against today's | Legs +1 a grade buys +3% casts | The regen's ±0.1% a depth moves late-region pace ±5% |
 | 10 | The re-baseline's Class Rank | CP32, README §9.5 item 1 | The balance party's Class Rank = her level → **the real pace (2E)** | Skill Ranks' late +5% and the depth lead unmeasured | Measured where players are |
+| 11 | **A base MP regen for every Uma** | New rule (SB18; CP §6.6, EP15, WP §5.9 point to it) | None → at each round's end **0.8% of her max MP for each skill depth open** (4% from Class Rank 40), rounded, at least 1 | The party's late-region power 0.90 · 0.74 · 0.52 · 0.41 · 0.42× today's (Lv 10–50); Mage 37%, Summoner 30%, Cleric 60% of a region cast deep | **1.05 · 1.04 · 0.94 · 0.94 · 1.01×**; Mage 80%, Summoner 67%, Cleric 100% |
 
 **Not applied, measured and kept in reserve** (§3.5): the focus +10%, the Insignias a step down, Keen ×1.6, the accessory
 branches × 0.8. **Kept as written:** SB1's multipliers, the stack's ceilings, armor, the signature's rate, Skill Ranks'
-band, the Paladin and Cleric, the Tier 1 Orb, regulars' and sub-bosses' shields.
+band, the Paladin and Cleric, the Tier 1 Orb, regulars' and sub-bosses' shields. **Not chosen for MP** (§7.2): a bigger
+pool for the casters (their MP lean), a flat regen share, a flat MP a round.
 
 ## 12. What the fight simulation must confirm
 
@@ -614,7 +713,10 @@ At v16 (Tier 1) and v17 (Tier 2's toolbox), README §9.5's items with this pass'
 5. **Accessories** (item 7): every form someone's best with tunings 5 and 6, none in over half its tier's cells; the
    Tier 1 Orb's 13 of 24 (step its values down only if confirmed).
 6. **Defense** (item 6): 18.7% · 18.3% · 18.1% at Lv 50 without the terms' offense, about 20% with it.
-7. **MP** (item 5): the Springs test with clears and region pace; Vigor's MP rate the first knob (tuning 9).
+7. **MP** (item 5): the Springs test with SB18's regen (tuning 11): clears 10–12 of 12, and the party's act power in a
+   region's last four stages within ±10% of today's (the model: 0.94–1.05×); no class's deep cast refunded by a round
+   (a healer's 76–77% the most); Tier 2 and 3's first levels' MP lead (1.14× and 1.20× Tier 1's at Lv 10). Knobs: the
+   regen's share a depth, then Vigor's MP rate (tuning 9).
 8. **Templates** (item 8): the signature +4.3–6.1% matched; the affinity retired with the Uma Templates pass.
 9. **The stack whole** (weapon-research risk 3): a weak hit at ×1.50 · ×2.16 · ×2.49; the tuned peak 1.3 · 1.6 · 1.8
    times the campaign's act, priced by the Rift's fronts.
@@ -629,25 +731,34 @@ call changes beyond the values below.
 | [README.md](README.md) | §2.5 SB1 | "working rule" → **decided** (SB1, stat-balance.md); "this pass sets the final numbers" → "set: ×1 · ×1.8 · ×2.6 stand" |
 | | §2.1 frame, §2.2 "Shields (drafts)" row | Bosses 6 · 8 · 9 → **6 · 9 · 10** |
 | | §2.2, new row | "**Toolbox term** (foes' HP and DEF · offense, by Lv 50): — · ×1.27 · ×1.08 → ×1.48 (bosses × 1.1) · +10%" |
+| | §2.2 frame, the accessories line | "the ten defensive and MP supports retire" + "**MP comes back by a base regen every Uma has** (SB18)" |
+| | **§9.1 engine v16**, new row | "**Base MP regen:** at the end of each round every ally regains 0.8% of her max MP for each skill depth her class has open (rounded, at least 1), in the round-end step the Spring Amulet used (`mpRegen`), set when the fight starts · SB18 · Rule" |
 | | §9.2 engine v17 | Add the Tier 2 term's values (RPG_FOE_TUNING); §9.5 items 1–8 take §12's expected results |
-| | §4, §5, §6, §10 | The pages row, step 5 done, the status row, a fifth review list: SB1–SB17 |
+| | §9.5 item 5 | "The Springs test with no MP accessory and +51 MP from the map" → "… **and SB18's base regen**: clears 10–12 of 12 and the last four stages' pace within ±10% of today's; knobs: the regen's share a depth, Vigor's MP rate, legs" |
+| | §4, §5, §6, §10 | The pages row (the summary page first), step 5 done, the status row, a fifth review list: SB1–SB18 |
 | [class-progression.md](class-progression.md) | **CP8** · §4.4 shields table, §15 | Bosses 6 · 8 · 9 → **6 · 9 · 10** (Breaks by chips: a Dual's partner adds multi-hit answers) |
 | | **CP9** · §2.1 and §2.2 hands | The Summoner's hand: Arms 0.56 → **0.48** (Tome 0.58 kept; 1.14 → 1.06 a turn, her farewell on top) |
 | | **CP32** · Skill Ranks, §15 | The re-baseline reads Class Rank on the real pace (2E), not Class Rank = Uma level |
 | | §15 pacing | "priced in Tier 2's term (Z4)" → "Tier 2's term +27%, Tier 3's 1.08 → 1.48, bosses × 1.1 (SB3–SB5)" |
+| | §6.6 "Skill MP by tier" (the MP rules beside the hands) | Add: "**MP back a round** (SB18): every Uma regains 0.8% of her max MP at the end of each round for each depth open (0.8 · 1.6 · 2.4 · 3.2 · 4% at Class Rank 1 · 10 · 20 · 30 · 40); tier-free under SB1. The hands' MP (×1, ×0.5 a half, ×0.6) unchanged" |
 | [weapon-progression.md](weapon-progression.md) | **WP20** · §0 forms row, §5.3 tree, §5.4 table | Great Pendant 0.5 → **0.55** a kind (G10 +31 → **+34**); Tier 3 step 0.55 → **0.575** (+49 → **+51**) |
 | | **WP21** · §0, §5.3, §5.4 Bells table, §5.5 | Toll Bell +0.02 → **+0.05** a grade each ring (G10: 0.5, +0.5 a ring, to 2.0; Tier 3 to 2.5) |
 | | **WP25** · §5.8 both tables, "damage they add" | A hybrid's single-kind forms on her **lead** half: Summoner Tier 1 Orb Bow → **Light**; Tier 3 Great Orb Bow → **Light**; Spell Blade Tier 3 Great Orb Lightning → **Lance**; Blademaster Tier 3 Great Orb Dark → **Katana**; Conjurer Tiers 2–3 Great Orb Greatsword → **Fire** |
 | | §5.7 viability tables | Re-run with WP20 and WP21's new values (this pass's §4.2) |
 | | §4.3, §13 | The regular's hit with the terms' offense: about 20% in Tiers 2–3; the accessories' depth priced in the terms (SB3, SB4) |
+| | **WP17** · §5.1's closing paragraph | "MP comes from her level, armor's legs and her template's MP twists" → "… **and a base regen every Uma has** (SB18): a rule, not an item, so neither a dead pick nor an always-pick" |
+| | §5.9, §13's MP row | "What comes": add **the base regen** (0.8% of max MP a round a depth, 4% from Class Rank 40); "What the simulation checks": knobs **the regen's share, Vigor's MP rate, legs' MP a grade, the Flourish's twists**; pace against today's |
 | [extra-stats-progression.md](extra-stats-progression.md) | **EP29** · §5.3 table | A hybrid's Full (and Tier 2's Split) on her **lead** half: Spell Blade Tier 2 Split **Lance + Katana**, Tier 3 Full **Lance**, Split Katana + Lightning; Summoner Tier 2 Split **Light + Dark**, Tier 3 Full **Light**, Split Dark + Bow; Blademaster Split **Katana + Bow**, Full **Katana**, Split Bow + Dark; Conjurer Split **Fire + Lightning**, Full **Fire**, Split Lightning + Greatsword |
 | | §8.1–§8.2 offense columns | The hybrids' other kinds follow EP29 (their lead-kind column doesn't move) |
-| | **EP15** · §9, §16 | Knobs: **Vigor's MP rate first**, legs second, the Flourish's twists; the Springs test measures region pace |
+| | **EP4** · §16 row | "The Spring Amulet goes; the pool replaces regen for every Uma" → "… **the pool and a base regen for every Uma** (SB18) replace it" (Vigor's values unchanged) |
+| | **EP15** · §9 "Sustain", §16 | "MP moves from regen to the pool" → "**MP: the pool, and a base regen for every Uma** (SB18)"; knobs: **SB18's share a depth first**, then Vigor's MP rate, then legs, the Flourish's twists the template's; the Springs test measures region pace against today's |
 | | **EP16** · §10 | "Tier 2's term … now prices +12–16%" → the weapon moons are a quarter of Tier 2's toolbox (×1.14) and Tier 3's (×1.23), priced in **+27%** and **1.08 → 1.48** |
 | [profession-progression.md](profession-progression.md) | — | **No change:** no tuning moves an item, a recipe or a count |
 | [../tier2-world.md](../tier2-world.md) (history) | **Z4** | A note: superseded by SB3 (HP and DEF +27%, offense +10%) |
+| | §7 (Z5) | A note: MP over a region now has SB18's base regen; Springs as they are |
 | [variance.md](variance.md) (the Uma Templates pass's input) | U12 | The measured budget (§8): signature +4.3–6.1%, matched affinity +2.1–4.7%, both 7–11% |
-| Pages | class-templates.html (hands), weapon-accessories.html (Toll Bell, Great Pendant, presets, viability), stars-maps.html and stars-grants.html (EP29's presets), class-weaknesses.html (shields) | Redrawn to the values above |
+| | U9 | The MP twists with SB18: each still adds 13–20 points of a region's coverage; a matched Mage reaches 100% (§7.2) |
+| Pages | class-templates.html (hands), weapon-accessories.html (Toll Bell, Great Pendant, presets, viability; the retired supports' MP note), stars-maps.html and stars-grants.html (EP29's presets), class-weaknesses.html (shields), weapon-armor.html and classes-template-sheets.html (where MP comes from) | Redrawn to the values above |
 
 ## 14. Decisions
 
@@ -666,7 +777,8 @@ call changes beyond the values below.
 | **SB11** The Summoner's hand | **Her Arms hand 0.56 → 0.48** (CP9; her Tome hand 0.58 kept) | 0.44 alone (the split stays 62/38); 0.56 kept (the mirror 12% off at Lv 50) | H63 set 0.56 for an Arms half with no stars; Prowess gives her +30 ATK. With SB10: the Tier 1 mirror within +6/−3% |
 | **SB12** Paladin and Cleric | **Kept:** equal in Tier 1; the Guardian 6.5% behind the Bishop (mends −13%), the Templar 7% ahead of the Oracle | The healer's focus on every mend and Barrier she casts | Inside CP9's ±10%; the asymmetry is the focus reading the mending weapon's kind |
 | **SB13** Defense | **Armor kept (WP15):** a regular's hit 18.7% · 18.3% · 18.1% of a Brawler's HP at Lv 50, about 20% with the terms' offense | Armor's HP a grade +15 → +17 | Inside the docs' target; the knob stays armor's HP |
-| **SB14** MP | **No value change; the knobs re-ranked: Vigor's MP rate first, legs second, the Flourish's twists the template's.** The Springs test measures region pace as well as clears; if it fails, Vigor ×2, then ×3 | Legs first (+3% casts); an MP accessory back; the casters' MP hands (reopens a class gap); a stage-start MP refill | Every class is MP-bound over a region on one footing now, the owner's intent; Vigor buys three times what legs do |
+| **SB14** MP | *Changed 2026-10-25: the fix is SB18.* **No pool value changes; the knobs re-ranked: SB18's share a depth first, then Vigor's MP rate, then legs, the Flourish's twists the template's.** The Springs test measures region pace against today's (the last four stages within ±10%), as well as clears | Legs first (+3% casts); Vigor ×2–×3 as the fix (it can't hold late-region pace: a bigger bar empties as surely); an MP accessory back; the casters' MP hands (reopens a class gap) | No pool knob brings MP back; a regen for every Uma does (SB18). Vigor buys three times what legs do |
 | **SB15** The template | **The signature stays +0.2 a level × tier** (+4.3–6.1% at Lv 50); **its place is the affinity's** (the matched affinity measures +2.1–4.7%, both 7–11%) | A rate per tier for +5.0% exactly (0.172 · 0.356 · 0.570); keep the affinity too | Inside U12's "about +5%" with SB1's one multiplier; both together pass the cap |
 | **SB16** Skill Ranks | **The band ×0.95 → ×1.05 kept;** the re-baseline's balance party reads Class Rank on the real pace (2E) | Re-centre the band (×0.94 → ×1.04); keep Class Rank = Uma level in the simulation | Neutral on the balance party (1.000); a real player's +1.4% a tier and +5% at its end is CP32's, measured where she is |
 | **SB17** The follow-ups | **On approval, §13's edits land in the four docs, the README and the pages as follow-ups logged against D192–D194** (D195 untouched); the simulation items take §12's expected results | Re-open the approved docs' calls | The owner's process: approved docs change only by logged follow-ups |
+| **SB18** A base MP regen (new, 2026-10-25) | **Every Uma regains 0.8% of her max MP at the end of each round for each skill depth her class has open** (0.8 · 1.6 · 2.4 · 3.2 · 4% at Class Rank 1 · 10 · 20 · 30 · 40), rounded, at least 1; a rule in every fight, engine v16, never an item. The party's late-region power returns to **0.94–1.05×** today's (as written 0.41–0.90×); region coverage at Lv 50: Mage 80%, Summoner 67%, Cleric 100% (as written 37 · 30 · 60%), Brawler 57%, Spell Blade 67%, Paladin 100% | **A bigger pool for the casters** (their MP lean × 2–3: late region still 0.67–0.89× at Lv 40–50, bars of 513–728 make one stage meaningless, splits the MP mirrors); a flat share (4%: early levels 19–26% fast; 3.5%: Lv 40 12% slow); flat MP a round × tier (47% fast at Lv 10, 18% slow at Lv 50); a share sized to put the Mage at 100% (6%: the party 15–32% fast); an MP accessory back (the always-pick) | The owner would wear MP regen on every class: so every class has it, as a rule. Stepping with her depths keeps it a share of what she casts at every level; the party returns to today's pace, every class on one footing; one stage is unchanged and every deep cast still costs her MP |
