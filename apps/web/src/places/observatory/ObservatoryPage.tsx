@@ -1,7 +1,7 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, type OwnedUma,
+  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, starsV1, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -31,19 +31,21 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
   const id = picked && world.umas[picked] ? picked : owned[0]?.id ?? null
   if (!id) return <p className="p-4 text-ink-soft">Unlock an Uma first.</p>
   const uma = world.umas[id]!
+  // Today's map (v1); R2's Planet and moons draw here from H79.
+  const stars = starsV1(uma)
   const slots = activeNodeSlots(uma.level)
-  const points = starPoints(uma.stars.active)
+  const points = starPoints(stars.active)
   const run = (op: () => Promise<unknown>, ok?: (r: unknown) => string) => {
     setMessage(null)
     op().then((r) => ok && setMessage(ok(r)), (err: unknown) => setMessage(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   }
   const toggle = (node: string) => {
-    if (!uma.stars.unlocked.includes(node)) {
+    if (!stars.unlocked.includes(node)) {
       return setMessage(`${nodeLabel(node)}: set a ${gemById(nodeGem(node))!.name} (cut it at the Lapidary, in the Wilds)`)
     }
-    const on = uma.stars.active.includes(node)
-    if (!on && uma.stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
-    run(() => activate(id, on ? uma.stars.active.filter((n) => n !== node) : [...uma.stars.active, node]))
+    const on = stars.active.includes(node)
+    if (!on && stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
+    run(() => activate(id, on ? stars.active.filter((n) => n !== node) : [...stars.active, node]))
   }
   const settable = Object.entries(world.gems).filter(([g]) => nodeFromGem(uma, g))
   return (
@@ -57,7 +59,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
         onClose={() => setPicking(false)} onPick={id => { setPicked(id); setPicking(false) }} />}
       <div className="flex items-baseline justify-between">
         <h2 className="truncate font-display text-lg font-bold">{owned.find(o => o.id === id)?.name}</h2>
-        <span className="shrink-0 text-[13px] text-ink-soft">Active {uma.stars.active.length}/{slots} · {uma.stars.unlocked.length}/100 open</span>
+        <span className="shrink-0 text-[13px] text-ink-soft">Active {stars.active.length}/{slots} · {stars.unlocked.length}/100 open</span>
       </div>
       <StarMap uma={uma} onToggle={toggle} />
       <div className="grid grid-cols-4 gap-1 text-center text-[11px]">
@@ -104,7 +106,8 @@ function StarMap({ uma, onToggle }: { uma: OwnedUma; onToggle: (node: string) =>
   const R = 118
   const angle = (i: number) => (i / RING.length) * Math.PI * 2 - Math.PI / 2
   const planet = (i: number) => ({ x: C + R * Math.cos(angle(i)), y: C + R * Math.sin(angle(i)) })
-  const state = (n: string) => (uma.stars.active.includes(n) ? 'on' : uma.stars.unlocked.includes(n) ? 'off' : 'locked')
+  const stars = starsV1(uma)
+  const state = (n: string) => (stars.active.includes(n) ? 'on' : stars.unlocked.includes(n) ? 'off' : 'locked')
   const Node = ({ id, x, y, r, color }: { id: string; x: number; y: number; r: number; color: string }) => {
     const s = state(id)
     return (

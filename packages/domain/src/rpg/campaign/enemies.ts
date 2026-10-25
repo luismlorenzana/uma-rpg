@@ -1,5 +1,6 @@
 // Campaign foes: roles and level scaling (docs/design/battles.md), ported from uma-racer where a campaign sim tuned them.
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
+import { TIER_SCALE_TENTHS } from '../../economy/grades'
 import { RPG_TIER_MAX_LEVEL, type RpgElement } from '../rules'
 import type { BattleEnemy, BattleEnemyMove, BattleWeaknesses, EnemyRank } from '../battle/types'
 
@@ -110,16 +111,26 @@ export function rpgFoeBudget(level: number, rate: number): number {
   return 1 + (rate * past * past) / 49
 }
 
+/** The tier a lifetime level is in, 1–3: ⌈lifetime ÷ 50⌉ (Tier 3 past it). */
+export const rpgLifetimeTier = (lifetime: number): 1 | 2 | 3 => Math.min(3, Math.max(1, Math.ceil(lifetime / RPG_TIER_MAX_LEVEL))) as 1 | 2 | 3
+
 /**
  * The expected-build budget a foe at a lifetime level carries (tier2-world Z3, D170): the curve restarts at each tier's
  * Lv 1, and its build part scales by her stats' growth, since gear and Extra Stats points are flat while her stats keep
  * climbing: `1 + (rpgFoeBudget(ℓ) − 1) × rpgReferenceStat(ℓ) ÷ rpgReferenceStat(L)`, ℓ the tier level. ×1.96 HP and
- * defense and ×1.27 offense at Tier 2 Lv 50. In Tier 1, ℓ = L, so it is `rpgFoeBudget(L)` exactly.
+ * defense and ×1.27 offense at Tier 2 Lv 50. In Tier 1, ℓ = L, so it is `rpgFoeBudget(L)` exactly. From engine v17 (R2,
+ * EP16, SB1; H76, D213) the build is Tier 1's × the tier (gear and Extra Stats × 1, 1.8, 2.6), so the build part is ×
+ * the lifetime level's tier's multiplier m too: `1 + (rpgFoeBudget(ℓ) − 1) × m × rpgReferenceStat(ℓ) ÷
+ * rpgReferenceStat(L)`, which lands each tier's Lv 50 on Tier 1's curve (×2.715, ×2.719, ×2.721 HP and defense; ×1.49,
+ * ×1.491, ×1.492 offense). Tier 1 doesn't move (m = 1, ℓ = L); v16 and older are byte for byte as before.
  */
-export function rpgFoeTierBudget(lifetime: number, rate: number): number {
+export function rpgFoeTierBudget(lifetime: number, rate: number, engine: number = BATTLE_ENGINE_VERSION): number {
   const level = rpgFoeCurveLevel(lifetime)
   const curve = rpgFoeBudget(level, rate)
-  return level === lifetime ? curve : 1 + ((curve - 1) * rpgReferenceStat(level)) / rpgReferenceStat(lifetime)
+  if (level === lifetime) return curve
+  if (!rpgRework('economy', engine)) return 1 + ((curve - 1) * rpgReferenceStat(level)) / rpgReferenceStat(lifetime)
+  const tenths = TIER_SCALE_TENTHS[rpgLifetimeTier(lifetime)]
+  return 1 + ((curve - 1) * tenths * rpgReferenceStat(level)) / (10 * rpgReferenceStat(lifetime))
 }
 
 /** The offense that makes a 100% hit take `share` of an average Uma's HP at a lifetime level (D141): an average Uma has
@@ -130,10 +141,11 @@ export function rpgFoeOffense(level: number, share: number = rpgFoeHitShare(rpgF
   return (target + Math.sqrt(target * target + 4 * target * s)) / 2
 }
 
-/** A foe's full frozen kit at a lifetime level (her `level`, and the reference stat, stay lifetime). Stats are code, so a
+/** A foe's full frozen kit at a lifetime level (her `level`, and the reference stat, stay lifetime), in an engine's
+ * generation (its build budget, EP16 from v17; the live one by default, as a fight starts on it). Stats are code, so a
  * rebalance never needs a content publish. */
 export function rpgFoe(input: { id: string; castId: string; element: RpgElement; element2?: RpgElement; twice?: boolean; role: RpgFoeRole;
-  rank: EnemyRank; level: number; shield: number; weaknesses: BattleWeaknesses; reach?: number }): BattleEnemy {
+  rank: EnemyRank; level: number; shield: number; weaknesses: BattleWeaknesses; reach?: number }, engine: number = BATTLE_ENGINE_VERSION): BattleEnemy {
   const t = RPG_FOE_TUNING
   const s = rpgReferenceStat(input.level)
   const shape = ROLE[input.role]
@@ -142,8 +154,8 @@ export function rpgFoe(input: { id: string; castId: string; element: RpgElement;
   const kit = moves(input.role, input.element, input.element2)
   // The party's expected gear and Extra Stats at this level, given to the foe's HP and defense (§7.3, D59); her offense is
   // set by the share of an Uma's HP a hit takes (D141). Both read the tier level, scaled to her lifetime stats (Z3, D170).
-  const budget = rpgFoeTierBudget(input.level, t.budgetPerLevel)
-  const offense = rpgFoeOffense(input.level, rpgFoeHitShare(rpgFoeCurveLevel(input.level)) * rpgFoeTierBudget(input.level, t.offenseBudgetPerLevel))
+  const budget = rpgFoeTierBudget(input.level, t.budgetPerLevel, engine)
+  const offense = rpgFoeOffense(input.level, rpgFoeHitShare(rpgFoeCurveLevel(input.level)) * rpgFoeTierBudget(input.level, t.offenseBudgetPerLevel, engine))
   return {
     id: input.id, castId: input.castId, element: input.element, ...(input.element2 ? { element2: input.element2 } : {}),
     ...(input.twice ? { twice: true } : {}), rank: input.rank, level: input.level,

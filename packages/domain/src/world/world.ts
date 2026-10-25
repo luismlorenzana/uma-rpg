@@ -223,7 +223,7 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
     const element = signature[slot % signature.length]!
     const element2 = signature.length > 1 ? signature[(slot + 1) % signature.length] : undefined
     const base = rpgFoe({ id: `foe${slot + 1}`, castId: faces(tier, slot)?.id ?? '', element, ...(element2 && element2 !== element ? { element2 } : {}),
-      ...(twice ? { twice } : {}), role: r, rank, level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) })
+      ...(twice ? { twice } : {}), role: r, rank, level, shield, weaknesses: weaknesses(signature, slot, rank), ...(rank === 'regular' ? {} : { reach }) }, engine)
     const tough = rank === 'boss' ? WORLD_TUNING.bossHp : 1 + (rank === 'sub-boss' ? WORLD_TUNING.eliteHpPerLevel : WORLD_TUNING.regularHpPerLevel) * above
     return { ...base, stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * hp * tough)),
       atk: Math.round(base.stats.atk * offense), matk: Math.round(base.stats.matk * offense) } }

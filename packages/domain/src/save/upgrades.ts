@@ -13,7 +13,7 @@ import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
-import { gearV1, slotKind, type OwnedUma, type TierWorld } from './save'
+import { gearV1, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
 
 export interface UmaUpgrades {
   /** Slots that can take a better piece now: a weapon type of her three, an armor slot or an accessory slot. */
@@ -99,16 +99,18 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
     if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
   }
 
-  const open = new Set(uma.stars.unlocked)
+  // A v1 map's Star Gems and active slots; a v3 map (R2, H76) reads neither: its "can upgrade" is H79's.
+  const map = starsV1(uma)
+  const open = new Set(map.unlocked)
   let gems = 0
-  for (const [gem, count] of Object.entries(world.gems)) {
+  for (const [gem, count] of Object.entries(isStarMap(uma.stars) ? {} : world.gems)) {
     const track = GEM_TRACKS.get(gem)
     if (!track || count < 1) continue
     const next = track.nodes.find(([node]) => !open.has(node))
     if (next && next[1] === track.grade) gems++
   }
-  const active = uma.stars.active.length
-  const freeNodes = Math.max(0, Math.min(activeNodeSlots(uma.level) - active, uma.stars.unlocked.length - active))
+  const active = map.active.length
+  const freeNodes = Math.max(0, Math.min(activeNodeSlots(uma.level) - active, map.unlocked.length - active))
   const stars = gems + freeNodes
   return { gearSlots, gear: gearSlots.length, gems, freeNodes, stars, any: gearSlots.length > 0 || stars > 0 }
 }

@@ -9,7 +9,7 @@ import { projectRpgStats } from '../rpg/rules'
 import { startFight, umaProfile } from './battle'
 import { extraStatPoints, gemBlock, nodeFromGem, setActiveNodes, setGem } from './observatory'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, type Save } from './save'
+import { newSave, parseSave, starsV1, type Save } from './save'
 import { collectJob, grantProfessionExp, planJob, startJob } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
@@ -97,7 +97,7 @@ describe('cutting and setting (D144)', () => {
     let save: Save = { ...withUma(), tierWorlds: { '1': { ...w, umas: { '101': { ...w.umas['101']!, stars: { unlocked, active: [] } } } } } }
     expect(() => setActiveNodes(save, '101', unlocked, at(0))).toThrow(/at most 5/)
     save = setActiveNodes(setLevel(save, 2), '101', unlocked, at(0))
-    expect(worldOf(save).umas['101']!.stars.active).toHaveLength(6)
+    expect(starsV1(worldOf(save).umas['101']!).active).toHaveLength(6)
   })
 })
 

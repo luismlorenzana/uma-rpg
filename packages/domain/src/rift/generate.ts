@@ -160,7 +160,7 @@ export function riftFight(ctx: RiftContext, ref: RiftFightRef, engine: number = 
       const element = own[riftSeed(`${key}:element`) % own.length]!
       const role = slot.role === 'seeded' ? RPG_FOE_ROLES[riftSeed(`${key}:role`) % RPG_FOE_ROLES.length]! : slot.role
       const base = rpgFoe({ id: `foe${n + 1}`, castId: faces[n]!, element, role, rank: slot.rank, level: lifetime, shield: slot.shield, weaknesses,
-        ...(slot.rank === 'regular' ? {} : { reach }), ...(slot.acts === 2 ? { twice: true } : {}) })
+        ...(slot.rank === 'regular' ? {} : { reach }), ...(slot.acts === 2 ? { twice: true } : {}) }, engine)
       return {
         ...base,
         stats: { ...base.stats, hp: Math.max(1, Math.round(base.stats.hp * slot.hp * (slot.rank === 'regular' ? step : 1) * strength)),

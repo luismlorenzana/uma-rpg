@@ -16,6 +16,7 @@
 import type { DroppedQueue, Entry, ItemQty, LastWork, Refusal, SlotRef, WorkOutput, WorkRow, WorkState } from '@luismlorenzana/uma-work'
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL } from '../economy/pacing'
 import { newGrades, type UmaGrades } from '../economy/grades'
+import type { StarMap } from '../economy/planet'
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
 import type { RpgWorkRequest } from '../work/request'
 import {
@@ -99,8 +100,10 @@ export interface OwnedUma {
   craft: ProfessionLevel
   /** Class Ranks (1–50), Weapon and Armor Ranks (1–10), earned by fighting (D102). */
   ranks: Ranks
-  /** Her Sun-and-planets map: nodes opened by setting Star Gems, and the ones active now (S6, design §10). */
-  stars: Stars
+  /** Her Extra Stats map. To save v27 the Sun and planets: nodes opened by setting Star Gems, and the ones active now (S6,
+   * design §10). From save v28 (R2, dark until H82; D208 point 7, D213) the Planet and three moons with her moon: the nodes
+   * her jewels opened, every one counting. Readers narrow through `starsV1` and `starMapOf`. */
+  stars: StarsV1 | StarMap
   /** Gear bound to her (her locker) and what she wears: one piece per weapon type and one per armor slot (S7, D103). */
   gear: UmaGearV1 | UmaGrades
   /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
@@ -126,7 +129,14 @@ export const gradesOf = (uma: Pick<OwnedUma, 'gear'>): UmaGrades => isGrades(uma
 /** The armor kind a slot holds now: absent means physical (a new Mage, Cleric or Summoner has all five set magical). */
 export const slotKind = (gear: Pick<UmaGearV1, 'kinds'>, slot: ArmorSlot): ArmorKind => gear.kinds[slot] ?? ARMOR_SLOT_KINDS[slot][0]
 
-export interface Stars { unlocked: string[]; active: string[] }
+/** Her Sun-and-planets map (to save v27): the nodes she opened and the ones active now. */
+export interface StarsV1 { unlocked: string[]; active: string[] }
+/** Whether her map is v3's, the Planet and three moons (R2, H76). */
+export const isStarMap = (stars: StarsV1 | StarMap): stars is StarMap => 'open' in stars
+/** Her v1 map, or an empty one for a v3 map: what today's Observatory, Star Gems and active slots read. */
+export const starsV1 = (uma: Pick<OwnedUma, 'stars'>): StarsV1 => isStarMap(uma.stars) ? { unlocked: [], active: [] } : uma.stars
+/** Her v3 map, or an empty one for a v1 map. */
+export const starMapOf = (uma: Pick<OwnedUma, 'stars'>): StarMap => isStarMap(uma.stars) ? uma.stars : { open: [], moons: [] }
 
 export interface Party {
   name: string
@@ -478,7 +488,7 @@ function ids(value: unknown, path: string, max: number): string[] {
   return value as string[]
 }
 
-function parseStars(value: unknown, path: string, level: number): Stars {
+function parseStars(value: unknown, path: string, level: number): StarsV1 {
   const o = object(value, path, ['unlocked', 'active'])
   const unlocked = ids(o.unlocked, `${path}.unlocked`, 100)
   if (unlocked.some((n) => !isStarNode(n))) throw new SaveParseError(`${path}.unlocked`, 'unknown node')

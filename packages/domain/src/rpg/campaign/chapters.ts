@@ -151,7 +151,7 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
   const regular = (slot: number, element: RpgElement, role?: RpgFoeRole): BattleEnemy => {
     const member = castFor(slot)
     return rpgFoe({ id: `foe${slot + 1}`, castId: member.id, element, rank: 'regular', level: node.level, shield,
-      weaknesses: weaknesses(slot, element, 'regular'), role: role ?? pick(RPG_FOE_ROLES, `${chapterId}:${node.id}:${slot}:role`) })
+      weaknesses: weaknesses(slot, element, 'regular'), role: role ?? pick(RPG_FOE_ROLES, `${chapterId}:${node.id}:${slot}:role`) }, engine)
   }
   const others = (avoid: RpgElement, slot: number) => pick(RPG_ELEMENTS.filter((e) => e !== avoid), `${chapterId}:${node.id}:${slot}:el`)
   if (node.kind === 'fight') {
@@ -176,7 +176,7 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
   // A Finals route's escorts are authored; a stage sub-boss's are drawn from the seed.
   const authored = node.route ? (node.kind === 'boss' ? node.route.spec.champion : node.route.spec.vanguard).escorts : null
   const enemies = [rpgFoe({ id: 'foe1', castId: boss.id, element, rank, level: node.level, role: node.kind === 'boss' ? 'champion' : 'captain',
-    shield: rpgFoeShields(engine)[node.kind === 'boss' ? 'boss' : 'subBoss'], weaknesses: weaknesses(0, element, rank), reach }),
+    shield: rpgFoeShields(engine)[node.kind === 'boss' ? 'boss' : 'subBoss'], weaknesses: weaknesses(0, element, rank), reach }, engine),
   ...Array.from({ length: minions }, (_, i) => authored ? regular(i + 1, authored[i]![1], authored[i]![0]) : regular(i + 1, others(element, i + 1)))]
   return { enemies, lead: boss }
 }
