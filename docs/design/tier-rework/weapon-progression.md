@@ -1112,11 +1112,14 @@ the Uma Templates pass decides. Until then the stack keeps the affinity's factor
 
 **The recipes, materials and amounts are [profession-progression.md](profession-progression.md#6-the-recipe-book)'s**
 (PP8–PP10), shown here so this doc reads whole. *Changed in cross-check (2026-10-24): this section's draft (the first
-round's catalog, a tier's pair only in its new piece, a Branch Gem of 9) is replaced by them.*
+round's catalog, a tier's pair only in its new piece, a Branch Gem of 9) is replaced by them. Follow-up to the
+profession flavor change, 2026-10-24: profession-progression's Farming gathers Vegetables and its Fishing Fish, and one
+rule picks every line's pairs (its PP8), so the names below follow (Gold, Cedar, Cherry, Citrine; the vegetables and
+fish). Wording only: no amount moves.*
 
 - **One fixed amount an item, in every tier:** a Weapon Gem **4** refined (2 ingots, 2 planks); Armor Fittings **2** in
-  the low band (a cloth, a carving), **3** in the high band (an ingot, a plank, a cut stone); an Accessory Setting
-  **12 · 6 · 4** by the tier's slot count (half cloth, half carving); **the Branch Gem is the G5 Weapon Gem in its tier's
+  the low band (a prepared vegetable, a fillet), **3** in the high band (an ingot, a plank, a cut stone); an Accessory
+  Setting **12 · 6 · 4** by the tier's slot count (half prepared vegetables, half fillets); **the Branch Gem is the G5 Weapon Gem in its tier's
   metal and wood, 4** (PP10).
 - **The ladder: a grade decides its material** (PP9). Tier 1: grades 1–5 take a line's low type, 6–10 its high type.
   **Tier 2:** G5 and G10 take Tier 2's pair. **Tier 3:** G4 and G9 Tier 2's, G5 and G10 Tier 3's. The amounts never move.
@@ -1126,37 +1129,38 @@ round's catalog, a tier's pair only in its new piece, a Branch Gem of 9) is repl
 | Grade | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
 | G1–G3 | 2 Copper Ingot, 2 Pine Plank | The same | The same |
-| G4 | The same | The same | **2 Silver Ingot, 2 Mahogany Plank** |
-| G5 | 2 Copper Ingot, 2 Pine Plank | **Branch Gem:** 2 Silver Ingot, 2 Mahogany Plank | **Branch Gem:** 2 Mythril Ingot, 2 Elderwood Plank |
-| G6–G8 | 2 Iron Ingot, 2 Oak Plank | The same | The same |
+| G4 | The same | The same | **2 Gold Ingot, 2 Cherry Plank** |
+| G5 | 2 Copper Ingot, 2 Pine Plank | **Branch Gem:** 2 Gold Ingot, 2 Cherry Plank | **Branch Gem:** 2 Mythril Ingot, 2 Elderwood Plank |
+| G6–G8 | 2 Iron Ingot, 2 Cedar Plank | The same | The same |
 | G9 | The same | The same | **2 Titanium Ingot, 2 Ebony Plank** |
-| G10 | 2 Iron Ingot, 2 Oak Plank | **2 Titanium Ingot, 2 Ebony Plank** | **2 Orichalcum Ingot, 2 Yggdrasil Plank** |
+| G10 | 2 Iron Ingot, 2 Cedar Plank | **2 Titanium Ingot, 2 Ebony Plank** | **2 Orichalcum Ingot, 2 Yggdrasil Plank** |
 
 **Armor Fittings** (2 low, 3 high).
 
 | Grade | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
-| G1–G3 | 1 Linen, 1 Shell Carving | The same | The same |
-| G4 | The same | The same | **1 Wool Cloth, 1 Trilobite Carving** |
-| G5 | 1 Linen, 1 Shell Carving | **1 Wool Cloth, 1 Trilobite Carving** | **1 Moonsilk, 1 Aether Infusion** |
-| G6–G8 | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet | The same | The same |
+| G1–G3 | 1 Chopped Carrot, 1 Carp Fillet | The same | The same |
+| G4 | The same | The same | **1 Sliced Bell Pepper, 1 Sea Bream Fillet** |
+| G5 | 1 Chopped Carrot, 1 Carp Fillet | **1 Sliced Bell Pepper, 1 Sea Bream Fillet** | **1 Golden Carrot Purée, 1 Silverfin Fillet** |
+| G6–G8 | 1 Iron Ingot, 1 Cedar Plank, 1 Cut Citrine | The same | The same |
 | G9 | The same | The same | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** |
-| G10 | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** | **1 Orichalcum Ingot, 1 Yggdrasil Plank, 1 Cut Philosopher's Stone** |
+| G10 | 1 Iron Ingot, 1 Cedar Plank, 1 Cut Citrine | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** | **1 Orichalcum Ingot, 1 Yggdrasil Plank, 1 Cut Philosopher's Stone** |
 
 **Accessory Setting** (12 · 6 · 4).
 
 | Grade | Tier 1 (12) | Tier 2 (6) | Tier 3 (4) |
 |---|---|---|---|
-| G1–G3 | 6 Linen, 6 Shell Carving | 3 Linen, 3 Shell Carving | 2 Linen, 2 Shell Carving |
-| G4 | 6 Linen, 6 Shell Carving | 3 Linen, 3 Shell Carving | **2 Wool Cloth, 2 Trilobite Carving** |
-| G5 | 6 Linen, 6 Shell Carving | **3 Wool Cloth, 3 Trilobite Carving** | **2 Moonsilk, 2 Aether Infusion** |
-| G6–G8 | 6 Cotton Cloth, 6 Ammonite Carving | 3 Cotton Cloth, 3 Ammonite Carving | 2 Cotton Cloth, 2 Ammonite Carving |
-| G9 | 6 Cotton Cloth, 6 Ammonite Carving | 3 Cotton Cloth, 3 Ammonite Carving | **2 Silk, 2 Tide Infusion** |
-| G10 | 6 Cotton Cloth, 6 Ammonite Carving | **3 Silk, 3 Tide Infusion** | **2 Cloudweave, 2 Prismatic Infusion** |
+| G1–G3 | 6 Chopped Carrot, 6 Carp Fillet | 3 Chopped Carrot, 3 Carp Fillet | 2 Chopped Carrot, 2 Carp Fillet |
+| G4 | 6 Chopped Carrot, 6 Carp Fillet | 3 Chopped Carrot, 3 Carp Fillet | **2 Sliced Bell Pepper, 2 Sea Bream Fillet** |
+| G5 | 6 Chopped Carrot, 6 Carp Fillet | **3 Sliced Bell Pepper, 3 Sea Bream Fillet** | **2 Golden Carrot Purée, 2 Silverfin Fillet** |
+| G6–G8 | 6 Shredded Cabbage, 6 Sardine Fillet | 3 Shredded Cabbage, 3 Sardine Fillet | 2 Shredded Cabbage, 2 Sardine Fillet |
+| G9 | 6 Shredded Cabbage, 6 Sardine Fillet | 3 Shredded Cabbage, 3 Sardine Fillet | **2 Trimmed Asparagus, 2 Tuna Fillet** |
+| G10 | 6 Shredded Cabbage, 6 Sardine Fillet | **3 Trimmed Asparagus, 3 Tuna Fillet** | **2 Pumpkin Purée, 2 Rainbow Koi Fillet** |
 
-**Easy to say:** weapons are ingots and planks; light armor cloth and a carving, heavy armor an ingot, a plank and a cut
-stone; settings cloth and carvings; a Branch Gem is the G5 Weapon Gem; a tier's best grades are made of its best pair.
-The G5 Setting that opens an accessory's branches is already in its tier's pair, like the Branch Gem.
+**Easy to say:** weapons are ingots and planks; light armor a prepared vegetable and a fillet, heavy armor an ingot, a
+plank and a cut stone; settings vegetables and fillets; a Branch Gem is the G5 Weapon Gem; a tier's best grades are
+made of its best pair. The G5 Setting that opens an accessory's branches is already in its tier's pair, like the
+Branch Gem.
 
 ### 6.3 One Uma's totals per tier
 
@@ -1182,14 +1186,14 @@ class, with the Planet Jewel at 12 refined (taken in profession-progression §6.
 | Copper Ingot (Mining) | 30 | 24 | 18 |
 | Iron Ingot (Mining) | 55 | 44 | 33 |
 | Pine Plank (Wood Chopping) | 30 | 24 | 18 |
-| Oak Plank (Wood Chopping) | 55 | 44 | 33 |
-| Linen (Farming) | 55 | 44 | 33 |
-| Cotton Cloth (Farming) | 30 | 24 | 18 |
-| Shell Carving (Fishing) | 55 | 44 | 33 |
-| Ammonite Carving (Fishing) | 30 | 24 | 18 |
-| Cut Garnet (Hunting) | 25 | 20 | 15 |
-| **Tier 2's pair:** Silver 6, Titanium 11 · Mahogany 6, Ebony 11 · Wool 11, Silk 6 · Trilobite 11, Tide 6 · Diamond 5 | — | 73 | 73 |
-| **Tier 3's pair:** Mythril 6, Orichalcum 11 · Elderwood 6, Yggdrasil 11 · Moonsilk 11, Cloudweave 6 · Aether 11, Prismatic 6 · Philosopher's Stone 5 | — | — | 73 |
+| Cedar Plank (Wood Chopping) | 55 | 44 | 33 |
+| Chopped Carrot (Farming) | 55 | 44 | 33 |
+| Shredded Cabbage (Farming) | 30 | 24 | 18 |
+| Carp Fillet (Fishing) | 55 | 44 | 33 |
+| Sardine Fillet (Fishing) | 30 | 24 | 18 |
+| Cut Citrine (Hunting) | 25 | 20 | 15 |
+| **Tier 2's pair:** Gold 6, Titanium 11 · Cherry 6, Ebony 11 · Bell Pepper 11, Asparagus 6 · Sea Bream 11, Tuna 6 · Diamond 5 | — | 73 | 73 |
+| **Tier 3's pair:** Mythril 6, Orichalcum 11 · Elderwood 6, Yggdrasil 11 · Golden Carrot 11, Emperor Pumpkin 6 · Silverfin 11, Rainbow Koi 6 · Philosopher's Stone 5 | — | — | 73 |
 | **Gear in all** | **365** | **365** | **365** |
 
 **By profession** (gear · with the jewels): Tier 1 Mining 85 · 100, Wood Chopping 85 · 100, Farming 85 · 100, Fishing

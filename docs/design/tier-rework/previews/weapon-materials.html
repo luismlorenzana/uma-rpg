@@ -213,7 +213,8 @@
     its own pair, Tier 3 G4 and G9 onto Tier 2's and G5 and G10 onto its own. The Branch Gem is the G5 Weapon Gem in its tier's pair. One Uma's gear is
     365 refined items in every tier. <b>The owner's review (2026-10-24) changes no count:</b> a Dual's partner is fixed, so the Branch Gem still carries
     only the branch, and an accessory's branches are forms its slot's G5 Setting opens, with no item of their own. From <a href="../weapon-progression.md">weapon-progression.md</a> §6, whose recipes and amounts are
-    <a href="../profession-progression.md">profession-progression.md</a>'s (cross-check, 2026-10-24).
+    <a href="../profession-progression.md">profession-progression.md</a>'s (cross-check, 2026-10-24). <i>Follow-up to the profession flavor change, 2026-10-24: Farming gathers
+    Vegetables and Fishing Fish, and one rule picks every line's pairs (PP8): material names only, no amount moves.</i>
     The other pages: <a href="weapon-trees.html">weapon trees</a> · <a href="weapon-armor.html">armor</a> · <a href="weapon-accessories.html">accessories</a>.</p>
   <nav class="top">
     <a href="#recipes">Every recipe</a><a href="#flow">Where it comes from</a><a href="#totals">One Uma's totals</a>
@@ -233,7 +234,7 @@
   <section id="flow">
     <h2>Where it comes from</h2>
     <p class="sub">One Uma's gear for the tier picked above: each refined material's units into each item. Mining and Wood Chopping feed the Forge;
-      Farming and Fishing the Charm Shop and light armor; heavy armor takes iron, oak and a garnet. Hunting's stones go mostly to jewels.</p>
+      Farming and Fishing the Charm Shop and light armor; heavy armor takes iron, cedar and a citrine. Hunting's stones go mostly to jewels.</p>
     <div class="panel"><div id="flow-chart"></div>
       <details><summary>Show the numbers</summary><div id="flow-table"></div></details></div>
   </section>
@@ -254,7 +255,7 @@
     <h2>By profession</h2>
     <p class="sub">Gathering per Uma by profession: gear alone for each tier, and Tier 1 with the jewels, where every gathering profession lands near a
       fifth (Mining, Wood Chopping, Farming and Fishing 100, Hunting 85). <i>Follow-up to D194 (Extra Stats), 2026-10-24: with the Planet Jewel of 12
-      (3 each of a cut stone, a plank, a cloth and a carving); was Mining 105, the others 95.</i></p>
+      (3 each of a cut stone, a plank, a prepared vegetable and a fillet); was Mining 105, the others 95.</i></p>
     <div class="panel"><div class="chart-legend" id="prof-legend"></div><div id="prof-chart"></div>
       <details><summary>Show the numbers</summary><div id="prof-table"></div></details></div>
   </section>
@@ -276,19 +277,20 @@
 const TIERC = { 1: 'var(--t1)', 2: 'var(--t2)', 3: 'var(--t3)' };
 const PROF = { mining: ['Mining', 'Mine', 'var(--pr-mining)'], wood: ['Wood Chopping', 'Forest', 'var(--pr-wood)'], farming: ['Farming', 'Fields', 'var(--pr-farming)'], fishing: ['Fishing', 'Fishery', 'var(--pr-fishing)'], hunting: ['Hunting', 'Monster Den', 'var(--pr-hunting)'] };
 const MAT = {
-  'Copper Ingot': ['mining', 'copper-ingot', 1], 'Iron Ingot': ['mining', 'iron-ingot', 1], 'Pine Plank': ['wood', 'pine-plank', 1], 'Oak Plank': ['wood', 'oak-plank', 1],
-  'Linen': ['farming', 'linen', 1], 'Cotton Cloth': ['farming', 'cotton-cloth', 1], 'Shell Carving': ['fishing', 'shell-carving', 1], 'Ammonite Carving': ['fishing', 'ammonite-carving', 1],
-  'Cut Quartz': ['hunting', 'cut-quartz', 1], 'Cut Garnet': ['hunting', 'cut-garnet', 1],
-  'Silver Ingot': ['mining', 'silver-ingot', 2], 'Titanium Ingot': ['mining', 'titanium-ingot', 2], 'Mahogany Plank': ['wood', 'mahogany-plank', 2], 'Ebony Plank': ['wood', 'ebony-plank', 2],
-  'Wool Cloth': ['farming', 'wool-cloth', 2], 'Silk': ['farming', 'silk', 2], 'Trilobite Carving': ['fishing', 'trilobite-carving', 2], 'Tide Infusion': ['fishing', 'tide-infusion', 2],
+  'Copper Ingot': ['mining', 'copper-ingot', 1], 'Iron Ingot': ['mining', 'iron-ingot', 1], 'Pine Plank': ['wood', 'pine-plank', 1], 'Cedar Plank': ['wood', 'cedar-plank', 1],
+  'Chopped Carrot': ['farming', 'chopped-carrot', 1], 'Shredded Cabbage': ['farming', 'shredded-cabbage', 1], 'Carp Fillet': ['fishing', 'carp-fillet', 1], 'Sardine Fillet': ['fishing', 'sardine-fillet', 1],
+  'Cut Quartz': ['hunting', 'cut-quartz', 1], 'Cut Citrine': ['hunting', 'cut-citrine', 1],
+  'Gold Ingot': ['mining', 'gold-ingot', 2], 'Titanium Ingot': ['mining', 'titanium-ingot', 2], 'Cherry Plank': ['wood', 'cherry-plank', 2], 'Ebony Plank': ['wood', 'ebony-plank', 2],
+  'Sliced Bell Pepper': ['farming', 'sliced-bell-pepper', 2], 'Trimmed Asparagus': ['farming', 'trimmed-asparagus', 2], 'Sea Bream Fillet': ['fishing', 'sea-bream-fillet', 2], 'Tuna Fillet': ['fishing', 'tuna-fillet', 2],
   'Cut Sapphire': ['hunting', 'cut-sapphire', 2], 'Cut Diamond': ['hunting', 'cut-diamond', 2],
   'Mythril Ingot': ['mining', 'mythril-ingot', 3], 'Orichalcum Ingot': ['mining', 'orichalcum-ingot', 3], 'Elderwood Plank': ['wood', 'elderwood-plank', 3], 'Yggdrasil Plank': ['wood', 'yggdrasil-plank', 3],
-  'Moonsilk': ['farming', 'moonsilk', 3], 'Cloudweave': ['farming', 'cloudweave', 3], 'Aether Infusion': ['fishing', 'aether-infusion', 3], 'Prismatic Infusion': ['fishing', 'prismatic-infusion', 3],
+  'Golden Carrot Purée': ['farming', 'golden-carrot-puree', 3], 'Pumpkin Purée': ['farming', 'pumpkin-puree', 3], 'Silverfin Fillet': ['fishing', 'silverfin-fillet', 3], 'Rainbow Koi Fillet': ['fishing', 'rainbow-koi-fillet', 3],
   'Cut Starstone': ['hunting', 'cut-starstone', 3], "Cut Philosopher's Stone": ['hunting', 'cut-philosophers-stone', 3],
 };
-// Each tier's pair (profession-progression PP8): metal, wood, cloth, carving, stone; the low type and the high type.
-const LOW = { 1: ['Copper Ingot', 'Pine Plank', 'Linen', 'Shell Carving', 'Cut Quartz'], 2: ['Silver Ingot', 'Mahogany Plank', 'Wool Cloth', 'Trilobite Carving', 'Cut Sapphire'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Moonsilk', 'Aether Infusion', 'Cut Starstone'] };
-const HIGH = { 1: ['Iron Ingot', 'Oak Plank', 'Cotton Cloth', 'Ammonite Carving', 'Cut Garnet'], 2: ['Titanium Ingot', 'Ebony Plank', 'Silk', 'Tide Infusion', 'Cut Diamond'], 3: ['Orichalcum Ingot', 'Yggdrasil Plank', 'Cloudweave', 'Prismatic Infusion', "Cut Philosopher's Stone"] };
+// Each tier's pair (profession-progression PP8): metal, wood, vegetable, fish, stone; the low type and the high type (recipe()
+// still names the vegetable and the fish cloth and carving, the draft's words).
+const LOW = { 1: ['Copper Ingot', 'Pine Plank', 'Chopped Carrot', 'Carp Fillet', 'Cut Quartz'], 2: ['Gold Ingot', 'Cherry Plank', 'Sliced Bell Pepper', 'Sea Bream Fillet', 'Cut Sapphire'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Golden Carrot Purée', 'Silverfin Fillet', 'Cut Starstone'] };
+const HIGH = { 1: ['Iron Ingot', 'Cedar Plank', 'Shredded Cabbage', 'Sardine Fillet', 'Cut Citrine'], 2: ['Titanium Ingot', 'Ebony Plank', 'Trimmed Asparagus', 'Tuna Fillet', 'Cut Diamond'], 3: ['Orichalcum Ingot', 'Yggdrasil Plank', 'Pumpkin Purée', 'Rainbow Koi Fillet', "Cut Philosopher's Stone"] };
 const LOWSET = new Set(Object.values(LOW).flat());
 // The ladder (PP9): which tier's pair fills grade g in tier t.
 const pairOf = (g, t) => (t >= 2 && (g === 5 || g === 10) ? t : t === 3 && (g === 4 || g === 9) ? 2 : 1);
@@ -466,10 +468,10 @@ render();
 // Interface table
 (function () {
   const rows = [
-    ['<code>weapon-gem-g{1–10}</code>', '1–3', '1–10 (not G5 from Tier 2)', '30 · 27 · 27', 4, '2 ingots, 2 planks of the grade\'s pair: <code>copper-ingot</code>, <code>pine-plank</code> (Tier 2 G5 · Tier 3 G4: <code>silver-ingot</code>, <code>mahogany-plank</code>)', '<code>iron-ingot</code>, <code>oak-plank</code> (Tier 2 G10 · Tier 3 G9: <code>titanium-ingot</code>, <code>ebony-plank</code>; Tier 3 G10: <code>orichalcum-ingot</code>, <code>yggdrasil-plank</code>)'],
-    ['<code>branch-gem</code>', '2, 3', '5', '3 · 3', 4, 'The G5 Weapon Gem in its tier\'s pair: 2 <code>silver-ingot</code>, 2 <code>mahogany-plank</code> (Tier 2); 2 <code>mythril-ingot</code>, 2 <code>elderwood-plank</code> (Tier 3)', '—'],
-    ['<code>armor-fittings-g{1–10}</code>', '1–3', '1–10', '50', '2 · 3', '1 cloth, 1 carving: <code>linen</code>, <code>shell-carving</code> (by the ladder: <code>wool-cloth</code>, <code>trilobite-carving</code>; <code>moonsilk</code>, <code>aether-infusion</code>)', '1 ingot, 1 plank, 1 cut stone: <code>iron-ingot</code>, <code>oak-plank</code>, <code>cut-garnet</code> (by the ladder: Titanium, Ebony, Diamond; Orichalcum, Yggdrasil, Philosopher\'s Stone)'],
-    ['<code>accessory-setting-g{1–10}</code>', '1 · 2 · 3', '1–10', '10 · 20 · 30', '12 · 6 · 4', 'Half cloth, half carving: <code>linen</code>, <code>shell-carving</code> (by the ladder: Wool, Trilobite; Moonsilk, Aether)', '<code>cotton-cloth</code>, <code>ammonite-carving</code> (by the ladder: Silk, Tide; Cloudweave, Prismatic)'],
+    ['<code>weapon-gem-g{1–10}</code>', '1–3', '1–10 (not G5 from Tier 2)', '30 · 27 · 27', 4, '2 ingots, 2 planks of the grade\'s pair: <code>copper-ingot</code>, <code>pine-plank</code> (Tier 2 G5 · Tier 3 G4: <code>gold-ingot</code>, <code>cherry-plank</code>)', '<code>iron-ingot</code>, <code>cedar-plank</code> (Tier 2 G10 · Tier 3 G9: <code>titanium-ingot</code>, <code>ebony-plank</code>; Tier 3 G10: <code>orichalcum-ingot</code>, <code>yggdrasil-plank</code>)'],
+    ['<code>branch-gem</code>', '2, 3', '5', '3 · 3', 4, 'The G5 Weapon Gem in its tier\'s pair: 2 <code>gold-ingot</code>, 2 <code>cherry-plank</code> (Tier 2); 2 <code>mythril-ingot</code>, 2 <code>elderwood-plank</code> (Tier 3)', '—'],
+    ['<code>armor-fittings-g{1–10}</code>', '1–3', '1–10', '50', '2 · 3', '1 prepared vegetable, 1 fillet: <code>chopped-carrot</code>, <code>carp-fillet</code> (by the ladder: <code>sliced-bell-pepper</code>, <code>sea-bream-fillet</code>; <code>golden-carrot-puree</code>, <code>silverfin-fillet</code>)', '1 ingot, 1 plank, 1 cut stone: <code>iron-ingot</code>, <code>cedar-plank</code>, <code>cut-citrine</code> (by the ladder: Titanium, Ebony, Diamond; Orichalcum, Yggdrasil, Philosopher\'s Stone)'],
+    ['<code>accessory-setting-g{1–10}</code>', '1 · 2 · 3', '1–10', '10 · 20 · 30', '12 · 6 · 4', 'Half prepared vegetables, half fillets: <code>chopped-carrot</code>, <code>carp-fillet</code> (by the ladder: Bell Pepper, Sea Bream; Golden Carrot, Silverfin)', '<code>shredded-cabbage</code>, <code>sardine-fillet</code> (by the ladder: Asparagus, Tuna; Emperor Pumpkin, Rainbow Koi)'],
   ];
 
   document.getElementById('iface').innerHTML = `<tr><th>Item id (draft)</th><th>Tier</th><th>Grades</th><th class="num">Pieces an Uma</th><th class="num">Refined each</th><th>Low band (G1–G5)</th><th>High band (G6–G10)</th></tr>` +

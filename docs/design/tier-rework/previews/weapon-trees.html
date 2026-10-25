@@ -432,7 +432,8 @@ function layout(t) {
       { y: 465, br: 'base', from: 0, to: 4, lin: 'base' }, { y: 410, br: 'pure', from: 5, to: 10, lin: 'base' }, { y: 520, br: 'dual', from: 5, to: 10, lin: 'base' }],
     links: [[95, 40, 'keen'], [95, 150, 'tempered'], [280, 225, 'tempered'], [280, 335, 'evolved'], [465, 410, 'pure'], [465, 520, 'dual']] };
 }
-const WGM = { 1: ['Copper Ingot', 'Pine Plank', 'Iron Ingot', 'Oak Plank'], 2: ['Silver Ingot', 'Mahogany Plank', 'Titanium Ingot', 'Ebony Plank'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Orichalcum Ingot', 'Yggdrasil Plank'] };
+// Follow-up to the profession flavor change, 2026-10-24: one rule picks every line's pairs (profession-progression PP8): Cedar, Gold, Cherry.
+const WGM = { 1: ['Copper Ingot', 'Pine Plank', 'Iron Ingot', 'Cedar Plank'], 2: ['Gold Ingot', 'Cherry Plank', 'Titanium Ingot', 'Ebony Plank'], 3: ['Mythril Ingot', 'Elderwood Plank', 'Orichalcum Ingot', 'Yggdrasil Plank'] };
 function wgMats(t, g) {
   const p = t >= 2 && (g === 5 || g === 10) ? t : t === 3 && (g === 4 || g === 9) ? 2 : 1, m = WGM[p];
   return g <= 5 ? `2 ${m[0]}, 2 ${m[1]}` : `2 ${m[2]}, 2 ${m[3]}`;

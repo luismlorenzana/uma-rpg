@@ -6,13 +6,28 @@
 > minutes of work its Umas did** (PP19, PP20 changed; PP24, PP25 new; [the grant's page](previews/prof-grant.html)).
 > Calls are **PP1–PP25**. No open questions.
 
+> **Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish.** The owner: "keep the
+> symmetry, add flavor". Each gathering profession gathers its own family: Mining ores, Wood Chopping woods, Hunting
+> stones, **Farming the old farm's Vegetables** (a carrot up to the emperor pumpkin; processed, chopped, sliced or a
+> purée) and **Fishing the old farm's Fish** (a carp up to the rainbow koi; processed, a fillet). **One rule now picks
+> every line's pairs from its family's ten grades** (PP8): **Tier 1 grades 1 and 3, Tier 2 grades 6 and 8, Tier 3
+> grades 9 and 10.** The other three lines didn't share one rule, so four of their names move to fit it: Mining's Tier 2
+> Silver → **Gold**, Wood Chopping's Oak → **Cedar** and Mahogany → **Cherry**, Hunting's Garnet → **Citrine**. The
+> Fields draw the farm's **Vegetable Garden** frame (PP6). **Names only: no amount, count, total or time changes.** Each
+> new type takes the old one's place one for one, so one Uma is still **485 · 505 · 525** refined (493 · 513 · 533),
+> **822 · 856 · 890 hours** (835 · 869 · 903), the trades 18.6–23.3%, a Tier 1 roster 1.27 maxed Umas a day, a run of
+> twenty **15.8 · 28.5 · 29.7 days**. Redone: §0, §2.1–§2.2, §3.2–§3.4, §4.1, §6, §7.1, §8.2, §9.2, §14.7, §16
+> (PP6–PP8, PP10), the materials, map and flow pages and the demand page's data. weapon-progression §6,
+> extra-stats-progression §6.4 and §11, their pages and the README's glossary follow in wording, each spot marked
+> "Follow-up to the profession flavor change, 2026-10-24".
+
 > **Authored 2026-10-24. Nothing here is built.** The fourth standalone doc of the Tier rework
 > ([README §5](README.md#5-the-plan), step 3.4). It absorbs [professions.md](professions.md) (the
 > first round, as revised after the owner's first review), which stays as history, and supersedes every PR call
 > ([§16](#16-decisions) maps each one). Calls are **PP1–PP25**, each with a recommendation. No open questions.
 >
 > **What it keeps from the first round:** ten professions, one **trade** an Uma by her calling, ten buildings that exist
-> today with four slots each in every tier, two material types a gathering profession in Tier 1 (all today's icons), a
+> today with four slots each in every tier, two material types a gathering profession in Tier 1 (all uma-art's icons), a
 > secondary from Tier 2, one fixed recipe an item. **What it adds or changes:**
 > - **Profession types** ([§2](#2-profession-types)): three kinds of work, gathering, processing and making, and who
 >   works where at each tier.
@@ -22,8 +37,9 @@
 > - **The secondary takes any other profession's base work** (PP14), making included, so a thin trade never stalls a run.
 > - **SB1: amounts don't scale with the tier** (PP11); stat values do. One Uma maxed is **485 · 505 · 525** refined items
 >   (493 · 513 · 533 with her own moon), every tier within a tenth of Tier 1.
-> - **The catalog reordered** so each tier's pair sits above the last on today's grade ladder (PP8): Mining's Tier 2 is
->   Silver and Titanium, Tier 3 Mythril and Orichalcum; Wood Chopping's Mahogany and Ebony, then Elderwood and Yggdrasil.
+> - **One rule for every line's pairs** (PP8): grades 1 and 3 of its family's ten in Tier 1, 6 and 8 in Tier 2, 9 and 10
+>   in Tier 3, so each tier's pair sits above the last; Farming gathers the old farm's Vegetables and Fishing its Fish
+>   (*changed at the owner's note, 2026-10-24*).
 > - **The Exchange by tier** (PP17), **the open shop** (PP16), and **old saves compensated in time, not items** (PP19,
 >   PP20, PP24, PP25): Craft Levels back to 1, a Speed Ticket for every 30 minutes of work, the deleted gear and Star
 >   Gems folded into the same grant.
@@ -80,6 +96,7 @@
 | D194's interface: "take or adjust the proposed Planet Jewel of 12" (extra-stats §18.2) | [§6.5](#65-the-planet-jewel-at-12-pp10) (PP10): **taken**, with the alternatives measured |
 | ~~The refund: the owner leans to refunding every raw material~~ (the first draft) | Replaced by the owner's direction below |
 | **The owner, 2026-10-24 (the weapon review):** "I don't think the material refund is going to be our main approach; basically I want to reset all farm/craft levels to 1, and then grant all tickets based on the amount of time it took to get all those levels." | [§14](#14-save-impact) in full (PP19, PP20, PP24, PP25): the rule from the save, gear and Star Gems folded in, stock, upgrades and work in progress, three worked players, the first launch; [the grant's page](previews/prof-grant.html) |
+| **The owner, 2026-10-24 (this doc's review): "keep the symmetry, add flavor"**: each profession gathers its own family; Farming → Vegetables, Fishing → Fish | [§3.2](#32-five-material-lines), [§3.3](#33-the-catalog-every-type-every-tier-pp7-pp8) (PP6–PP8, PP10): the old farm's Vegetables and Fish, one rule for every line's pairs (grades 1 and 3 · 6 and 8 · 9 and 10), the Fields drawn as the Vegetable Garden; names only, **no amount moves** |
 
 ## 0. At a glance
 
@@ -113,7 +130,7 @@ volume with every slot it can fill busy; the fighting party's next grade waits o
 
 | Piece | Tier 2 | Tier 3 | Where |
 |---|---|---|---|
-| **Materials** | Each gathering profession adds its Tier 2 pair: Silver, Titanium · Mahogany, Ebony · Wool, Silk Cocoon · Trilobite, Tide Essence · Sapphire, Diamond | Tier 3's: Mythril, Orichalcum · Elderwood, Yggdrasil Branch · Moonsilk Cocoon, Cloudfleece · Aether, Prismatic Essence · Starstone, Philosopher's Stone | [§3.3](#33-the-catalog-every-type-every-tier-pp7-pp8) |
+| **Materials** | Each gathering profession adds its Tier 2 pair: Gold, Titanium · Cherry, Ebony · Bell Pepper, Asparagus · Sea Bream, Tuna · Sapphire, Diamond | Tier 3's: Mythril, Orichalcum · Elderwood, Yggdrasil Branch · Golden Carrot, Emperor Pumpkin · Silverfin, Rainbow Koi · Starstone, Philosopher's Stone | [§3.3](#33-the-catalog-every-type-every-tier-pp7-pp8) |
 | **The ladder** | G5 and G10 of every line are made of Tier 2's pair | G4 and G9 of Tier 2's, G5 and G10 of Tier 3's | [§3.4](#34-the-ladder-a-grade-decides-its-material-pp9) |
 | **Her work** | Her trade, all of it; a **secondary**'s base work | + the secondary's Tier 2 work | [§2.3](#23-the-secondary-tier-2-on-pp14-pp15) |
 | **New pieces** | The G5 **Branch Gem** on each weapon (Pure or Dual, picked when used); **a weapon moon's five Moon Jewels** | The Branch Gem again, in Tier 3's materials (Keen, Tempered or Evolved); **the second weapon moon's five Moon Jewels** | [§6.3](#63-the-tiers-new-pieces) |
@@ -157,10 +174,10 @@ professions are the processing one and the four making ones.
 |---|---|---|---|---|---|---|
 | **Gathering** | **Mining** | Mining | Mine | Gather | — | Ores |
 | | **Wood Chopping** | Wood Chopping | Forest | Gather | — | Logs (and a Yggdrasil Branch) |
-| | **Farming** | Farming | Fields | Gather | — | Flax, cotton, wool, cocoons, fleece |
-| | **Fishing** | Fishing | Fishery | Gather | — | Shells, then tide and sky essences |
+| | **Farming** | Farming | Fields | Gather | — | Vegetables, a carrot up to the emperor pumpkin |
+| | **Fishing** | Fishing | Fishery | Gather | — | Fish, a carp up to the rainbow koi |
 | | **Hunting** | Fighting for gems | Monster Den | Gather | — | Stones, carried by the den's beasts |
-| **Processing** | **Material Processing** | Material Processing | Workbench | Process | One raw item | One refined item: an ingot, a plank, a cloth, a carving or infusion, a cut stone |
+| **Processing** | **Material Processing** | Material Processing | Workbench | Process | One raw item | One refined item: an ingot, a plank, a prepared vegetable, a fillet, a cut stone |
 | **Making** | **Weapon Crafting** | Weapon Crafting | Forge | Make | Refined items | Weapon Gems; the G5 Branch Gem |
 | | **Armor Crafting** | Armor Crafting | Armorer | Make | Refined items | Armor Fittings |
 | | **Accessory Crafting** | Accessory Crafting | Charm Shop | Make | Refined items | Accessory Settings |
@@ -185,8 +202,8 @@ today.
 |---|---|---|---|---|---|
 | **Physical** | Brawler | 61 (22.6%) | **Mine**: Mining | **Forge**: Weapon Crafting | Ore into the gems her weapons climb |
 | **Physical hybrid** | Spell Blade | 56 (20.7%) | **Forest**: Wood Chopping | **Armorer**: Armor Crafting | Timber into the fittings of a suit |
-| **Healer** | Paladin, Cleric | 61 (22.6%) | **Fields**: Farming | **Workbench**: Material Processing | Cloth, and everyone's refining |
-| **Magical hybrid** | Summoner | 46 (17.0%) | **Fishery**: Fishing | **Charm Shop**: Accessory Crafting | Shells and essences into charm settings |
+| **Healer** | Paladin, Cleric | 61 (22.6%) | **Fields**: Farming | **Workbench**: Material Processing | Vegetables, and everyone's refining |
+| **Magical hybrid** | Summoner | 46 (17.0%) | **Fishery**: Fishing | **Charm Shop**: Accessory Crafting | Fish into charm settings |
 | **Magical** | Mage | 46 (17.0%) | **Monster Den**: Hunting | **Lapidary**: Jewel Crafting | Stones into the jewels of her map |
 
 - **Her calling sets it, never her active class** (PR1, CL14, CP30 kept): classes switch freely and a switch moves no
@@ -247,48 +264,60 @@ The owner's words: a secondary is "another profession's base items, while the ma
 
 | Line | Profession | Raw → refined | Tier 1 feeds | The look by tier |
 |---|---|---|---|---|
-| **Metal** | Mining | Ore → Ingot | Weapon Gems; high-band Armor Fittings; every Moon Jewel's mount | Copper, iron · silver, titanium · mythril, orichalcum |
-| **Wood** | Wood Chopping | Log → Plank | Weapon Gems; high-band Fittings; Planet Jewels | Pine, oak · mahogany, ebony · elderwood, the world tree |
-| **Cloth** | Farming | Fiber → Cloth | Low-band Fittings; Accessory Settings; Planet Jewels | Flax, cotton · wool, silk · moonsilk, cloudfleece |
-| **Shell and tide** | Fishing | Shell → Carving; essence → Infusion | Low-band Fittings; Accessory Settings; Planet Jewels | Seashell, ammonite · trilobite, tide · aether, prismatic |
-| **Stone** | Hunting | Stone → Cut stone | High-band Fittings; Planet and Moon Jewels | Quartz, garnet · sapphire, diamond · starstone, philosopher's stone |
+| **Metal** | Mining | Ore → Ingot | Weapon Gems; high-band Armor Fittings; every Moon Jewel's mount | Copper, iron · gold, titanium · mythril, orichalcum |
+| **Wood** | Wood Chopping | Log → Plank | Weapon Gems; high-band Fittings; Planet Jewels | Pine, cedar · cherry, ebony · elderwood, the world tree |
+| **Vegetables** | Farming | Vegetable → prepared (chopped, shredded, sliced, trimmed, a purée) | Low-band Fittings; Accessory Settings; Planet Jewels | Carrot, cabbage · bell pepper, asparagus · golden carrot, emperor pumpkin |
+| **Fish** | Fishing | Fish → Fillet | Low-band Fittings; Accessory Settings; Planet Jewels | Carp, sardine · sea bream, tuna · silverfin, rainbow koi |
+| **Stone** | Hunting | Stone → Cut stone | High-band Fittings; Planet and Moon Jewels | Quartz, citrine · sapphire, diamond · starstone, philosopher's stone |
 
-- **Easy to say:** weapons take ingots and planks; light fittings cloth and shells, heavy fittings ingot, plank and a
-  cut stone; settings cloth and shells; jewels cut stones on a metal mount, the Planet a bit of everything.
-- **Fishing's line** keeps the first round's reuse: the shells are today's Fossil Dig's first two, and its later catches
-  are today's Ley Spring essences, which already come from a pool. The farm's fish stay unused: their refined icons
-  are food, and nothing here is eaten.
+- **Easy to say:** weapons take ingots and planks; light fittings a prepared vegetable and a fillet, heavy fittings an
+  ingot, a plank and a cut stone; settings vegetables and fillets; jewels cut stones on a metal mount, the Planet a bit
+  of everything.
+- **Each gathering profession gathers its own family** (*changed at the owner's note, 2026-10-24*; the draft gave
+  Farming the Meadow's fibers and Fishing the Fossil Dig's shells and the Ley Spring's essences). Farming and Fishing
+  take back the old farm's Vegetables and Fish, gone from the game since save v21 (D144). Their icons are uma-art's,
+  read by id like every icon here (uma-racer's farm draws the same art; nothing is imported from it). Their refined
+  forms are kitchen cuts, and here they go into fittings, settings and jewels like any refined item: nothing is eaten.
+  Fishing's line now has one refined word, a fillet, as every other line has.
 
 ### 3.3 The catalog: every type, every tier (PP7, PP8)
 
 **Two types a gathering profession in Tier 1, four in Tier 2, six in Tier 3.** Every id and icon exists in uma-art's
-`items` atlas today; "today" names its current family and grade. A low type opens at **Craft Lv 1**, a high type at
-**Craft Lv 26**, in every tier and every pair (PP13).
+`items` atlas today; "today" names its family and grade there (Farming's and Fishing's are the old farm's, gone from the
+game since save v21). A low type opens at **Craft Lv 1**, a high type at **Craft Lv 26**, in every tier and every pair
+(PP13).
+
+**One rule picks every pair** (PP8): of its family's ten grades, **Tier 1 takes grades 1 and 3, Tier 2 grades 6 and 8,
+Tier 3 grades 9 and 10**, in all five lines.
 
 | Profession | Tier | Low type: raw → refined (ids) | Today | High type: raw → refined (ids) | Today |
 |---|---|---|---|---|---|
 | **Mining** | 1 | Copper Ore → Copper Ingot (`copper-ore`, `copper-ingot`) | Ores G1 | Iron Ore → Iron Ingot (`iron-ore`, `iron-ingot`) | Ores G3 |
-| | 2 | Silver Ore → Silver Ingot (`silver-ore`, `silver-ingot`) | Ores G4 | **Titanium Ore → Titanium Ingot** (`titanium-ore`, `titanium-ingot`) | Ores G8 |
-| | 3 | **Mythril Ore → Mythril Ingot** (`mythril-ore`, `mythril-ingot`) | Ores G9 | Orichalcum Ore → Orichalcum Ingot (`orichalcum-ore`, `orichalcum-ingot`) | Ores G10 |
-| **Wood Chopping** | 1 | Pine Log → Pine Plank (`pine-log`, `pine-plank`) | Woods G1 | Oak Log → Oak Plank (`oak-log`, `oak-plank`) | Woods G5 |
-| | 2 | **Mahogany Log → Mahogany Plank** (`mahogany-log`, `mahogany-plank`) | Woods G7 | **Ebony Log → Ebony Plank** (`ebony-log`, `ebony-plank`) | Woods G8 |
-| | 3 | **Elderwood Log → Elderwood Plank** (`elderwood-log`, `elderwood-plank`) | Woods G9 | Yggdrasil Branch → Yggdrasil Plank (`yggdrasil-branch`, `yggdrasil-plank`) | Woods G10 |
-| **Farming** | 1 | Flax → Linen (`flax`, `linen`) | Fibers G1 | Cotton → Cotton Cloth (`cotton`, `cotton-cloth`) | Fibers G4 |
-| | 2 | Wool → Wool Cloth (`wool`, `wool-cloth`) | Fibers G5 | Silk Cocoon → Silk (`silk-cocoon`, `silk`) | Fibers G8 |
-| | 3 | Moonsilk Cocoon → Moonsilk (`moonsilk-cocoon`, `moonsilk`) | Fibers G9 | Cloudfleece → Cloudweave (`cloudfleece`, `cloudweave`) | Fibers G10 |
-| **Fishing** | 1 | Seashell → Shell Carving (`seashell`, `shell-carving`) | Bones & Horns G1 | Ammonite → Ammonite Carving (`ammonite`, `ammonite-carving`) | Bones & Horns G2 |
-| | 2 | Trilobite → Trilobite Carving (`trilobite`, `trilobite-carving`) | Bones & Horns G3 | Tide Essence → Tide Infusion (`tide-essence`, `tide-infusion`) | Essences G5 |
-| | 3 | Aether → Aether Infusion (`aether`, `aether-infusion`) | Essences G9 | Prismatic Essence → Prismatic Infusion (`prismatic-essence`, `prismatic-infusion`) | Essences G10 |
-| **Hunting** | 1 | Quartz → Cut Quartz (`quartz`, `cut-quartz`) | Crystals G1 | Garnet → Cut Garnet (`garnet`, `cut-garnet`) | Crystals G4 |
+| | 2 | **Gold Ore → Gold Ingot** (`gold-ore`, `gold-ingot`) | Ores G6 | Titanium Ore → Titanium Ingot (`titanium-ore`, `titanium-ingot`) | Ores G8 |
+| | 3 | Mythril Ore → Mythril Ingot (`mythril-ore`, `mythril-ingot`) | Ores G9 | Orichalcum Ore → Orichalcum Ingot (`orichalcum-ore`, `orichalcum-ingot`) | Ores G10 |
+| **Wood Chopping** | 1 | Pine Log → Pine Plank (`pine-log`, `pine-plank`) | Woods G1 | **Cedar Log → Cedar Plank** (`cedar-log`, `cedar-plank`) | Woods G3 |
+| | 2 | **Cherry Log → Cherry Plank** (`cherry-log`, `cherry-plank`) | Woods G6 | Ebony Log → Ebony Plank (`ebony-log`, `ebony-plank`) | Woods G8 |
+| | 3 | Elderwood Log → Elderwood Plank (`elderwood-log`, `elderwood-plank`) | Woods G9 | Yggdrasil Branch → Yggdrasil Plank (`yggdrasil-branch`, `yggdrasil-plank`) | Woods G10 |
+| **Farming** | 1 | Carrot → Chopped Carrot (`carrot`, `chopped-carrot`) | Farm Vegetables G1 | Cabbage → Shredded Cabbage (`cabbage`, `shredded-cabbage`) | Farm Vegetables G3 |
+| | 2 | Bell Pepper → Sliced Bell Pepper (`bell-pepper`, `sliced-bell-pepper`) | Farm Vegetables G6 | Asparagus → Trimmed Asparagus (`asparagus`, `trimmed-asparagus`) | Farm Vegetables G8 |
+| | 3 | Golden Carrot → Golden Carrot Purée (`golden-carrot`, `golden-carrot-puree`) | Farm Vegetables G9 | Emperor Pumpkin → Pumpkin Purée (`emperor-pumpkin`, `pumpkin-puree`) | Farm Vegetables G10 |
+| **Fishing** | 1 | Carp → Carp Fillet (`carp`, `carp-fillet`) | Farm Fish G1 | Sardine → Sardine Fillet (`sardine`, `sardine-fillet`) | Farm Fish G3 |
+| | 2 | Sea Bream → Sea Bream Fillet (`sea-bream`, `sea-bream-fillet`) | Farm Fish G6 | Tuna → Tuna Fillet (`tuna`, `tuna-fillet`) | Farm Fish G8 |
+| | 3 | Silverfin → Silverfin Fillet (`silverfin`, `silverfin-fillet`) | Farm Fish G9 | Rainbow Koi → Rainbow Koi Fillet (`rainbow-koi`, `rainbow-koi-fillet`) | Farm Fish G10 |
+| **Hunting** | 1 | Quartz → Cut Quartz (`quartz`, `cut-quartz`) | Crystals G1 | **Citrine → Cut Citrine** (`citrine`, `cut-citrine`) | Crystals G3 |
 | | 2 | Sapphire → Cut Sapphire (`sapphire`, `cut-sapphire`) | Crystals G6 | Diamond → Cut Diamond (`diamond`, `cut-diamond`) | Crystals G8 |
 | | 3 | Starstone → Cut Starstone (`starstone`, `cut-starstone`) | Crystals G9 | Philosopher's Stone → Cut Philosopher's Stone (`philosophers-stone`, `cut-philosophers-stone`) | Crystals G10 |
 
 - **10 · 20 · 30 types, 20 · 40 · 60 ids.** A world holds every tier's types up to its own: a Tier 3 Warehouse shows 60.
-- **Each tier's pair sits above the last on today's ladder** (PP8): every later icon is a richer one, so a tier reads
-  at a glance. In bold, the five types that differ from the first round (professions.md §0.3): Mining's Tier 2 high
-  (Titanium for Mythril) and Tier 3 low (Mythril for Titanium); Wood Chopping's Tier 2 (Mahogany and Ebony for Cedar
-  and Elderwood) and Tier 3 low (Elderwood for Ebony). The first round's Mythril came before Titanium, and Cedar (today's
-  G3) after Oak (G5). Farming, Fishing and Hunting were already in order.
+- **One rule, the same grades in every line** (PP8; *changed at the owner's note, 2026-10-24*; the draft picked each
+  line's pairs on its own, each tier's above the last): a tier's icons read alike across the five places. Tier 1 takes
+  the low band's first and third grades, **Tier 2 the same two a band up** (6 and 8), Tier 3 the legendary pair that
+  crowns each family, so every later icon is a richer one and the six spread evenly over the ten.
+- **In bold, the four names the rule moves** in the lines that stay: Mining's Tier 2 low (Gold, Ores G6, for Silver,
+  G4), Wood Chopping's Tier 1 high (Cedar, G3, for Oak, G5) and Tier 2 low (Cherry, G6, for Mahogany, G7), Hunting's
+  Tier 1 high (Citrine, G3, for Garnet, G4). Mining, Wood Chopping and Hunting didn't share one rule (their grades were
+  1, 3 · 4, 8, then 1, 5 · 7, 8, then 1, 4 · 6, 8), and every single rule moves at least four of their names; this one
+  keeps Iron, every Tier 3 name and 14 of their 18. The other rules that move four are in PP8.
 - **The five lines in one row of icons, per tier,** are drawn on the [materials page](previews/prof-materials.html).
 
 ### 3.4 The ladder: a grade decides its material (PP9)
@@ -303,8 +332,8 @@ never change; only which type fills them.
 | **Tier 2** | T1 low | T1 low | T1 low | T1 low | **T2 low** | T1 high | T1 high | T1 high | T1 high | **T2 high** |
 | **Tier 3** | T1 low | T1 low | T1 low | *T2 low* | **T3 low** | T1 high | T1 high | T1 high | *T2 high* | **T3 high** |
 
-- **A Weapon Gem in Tier 3**, for example: G1–G3 two Copper Ingots and two Pine Planks; G4 Silver and Mahogany; G5 (her
-  Branch Gem) Mythril and Elderwood; G6–G8 Iron and Oak; G9 Titanium and Ebony; G10 Orichalcum and Yggdrasil.
+- **A Weapon Gem in Tier 3**, for example: G1–G3 two Copper Ingots and two Pine Planks; G4 Gold and Cherry; G5 (her
+  Branch Gem) Mythril and Elderwood; G6–G8 Iron and Cedar; G9 Titanium and Ebony; G10 Orichalcum and Yggdrasil.
   Her best grades are made of her tier's best metal and wood.
 - **No tier adds a jewel kind** (EP17, D194): a weapon moon is a moon and takes Moon Jewels, so every jewel follows the
   ladder like every other item (Moon Jewel V on Tier 2's pair in Tier 2; Moon Jewel II on Tier 2's and V on Tier 3's in
@@ -364,19 +393,22 @@ farm buildings come back, two unused frames get a job. A place names its uma-art
 | 1 | **Forge** (`forge`) | Weapon Crafting | `forge` | Today's Forge | 0.74, 0.12 | 4 | Make | Weapon Gem G1–G10; the Branch Gem at G5 |
 | 2 | **Forest** (`forest`) | Wood Chopping | `forest` | Today's Forest | 0.20, 0.30 | 4 | Gather | The tier's wood types |
 | 2 | **Armorer** (`armorer`) | Armor Crafting | `lancers-barracks` | Unused: a slate depot with racks | 0.76, 0.32 | 4 | Make | Armor Fittings G1–G10 |
-| 3 | **Fields** (`fields`) | Farming | `fields` | The farm's Fields | 0.22, 0.51 | 4 | Gather | The tier's cloth types |
+| 3 | **Fields** (`fields`) | Farming | `vegetable-garden` | The farm's Vegetable Garden: crop rows under a scarecrow (*changed at the owner's note, 2026-10-24*; was the farm's `fields` frame, a wheat field) | 0.22, 0.51 | 4 | Gather | The tier's vegetables |
 | 3 | **Workbench** (`workbench`) | Material Processing | `workbench` | Today's Workbench | 0.78, 0.51 | 4 | Process | Every type in stock, one for one |
-| 4 | **Fishery** (`fishery`) | Fishing | `fishery` | The farm's Fishery | 0.22, 0.71 | 4 | Gather | The tier's shell and tide types |
+| 4 | **Fishery** (`fishery`) | Fishing | `fishery` | The farm's Fishery | 0.22, 0.71 | 4 | Gather | The tier's fish |
 | 4 | **Charm Shop** (`charm-shop`) | Accessory Crafting | `arcane-armory` | Unused since the Lapidary got its own (H29): a shop with glowing orbs | 0.78, 0.70 | 4 | Make | Accessory Setting G1–G10 |
 | 5 | **Monster Den** (`monster-den`) | Hunting | `monster-den` | Today's Monster Den | 0.26, 0.90 | 4 | Gather | The tier's stones |
 | 5 | **Lapidary** (`lapidary`) | Jewel Crafting | `lapidary` | Today's Lapidary, moved from the middle row | 0.74, 0.90 | 4 | Make | Planet I–V, Moon I–V, in every tier |
 
 - **Ten of uma-art's 42 building frames and sixty of its 331 item icons.** No building, tile, icon or kit option is new
   (the art packet line for Professions in uma-platform: none). The positions are today's `WILDS_LAYOUT`.
-- **Kept unused:** the farm's other eight buildings (uma-racer's), the Ley Spring, Crystal Cavern, Quarry, Meadow, Fossil
+- **Kept unused:** the farm's other eight buildings, its wheat `fields` among them (uma-racer's), the Ley Spring, Crystal Cavern, Quarry, Meadow, Fossil
   Dig, the Rangers' Lodge and the farmlands tiles. The Wilds keep their own ground and props.
 - **No upgrades:** every place has its four slots from day one, each at today's level-3 speed, ×1.25 (PP4). One row of
   four pips keeps a place 112 px tall, so a column of five fits the measured Wilds (592 px of 675 at 390 × 844).
+- **The Fields keep their id and name and draw the Vegetable Garden** (PP6): its crop rows of carrots and pumpkins
+  under a scarecrow are the line's own crops, where the farm's `fields` frame draws wheat (the old Grains). The short
+  name and the id stay, so the trade's words (Fields · Workbench) and the save's new ids (§14.4) don't move.
 
 ### 4.2 The map at each tier (PP5)
 
@@ -470,11 +502,11 @@ ladder (§3.4) says which tier's type fills each one at each grade.
 
 | Item | Refined | Low band (Tier 1: G1–G5) | High band (Tier 1: G6–G10) | Gathering professions |
 |---|---|---|---|---|
-| **Weapon Gem** | **4** | 2 Copper Ingot, 2 Pine Plank | 2 Iron Ingot, 2 Oak Plank | Mining, Wood Chopping |
-| **Armor Fittings** | **2** low, **3** high | 1 Linen, 1 Shell Carving | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet | Farming, Fishing; then Mining, Wood Chopping, Hunting |
-| **Accessory Setting** | **12 · 6 · 4** (Tier 1 · 2 · 3) | 6 · 3 · 2 Linen and as many Shell Carving | 6 · 3 · 2 Cotton Cloth and as many Ammonite Carving | Farming, Fishing |
-| **Planet Jewel** (I–V: 1, 3, 5, 7, 9) | **12** | 3 each: Cut Quartz, Pine Plank, Linen, Shell Carving | 3 each: Cut Garnet, Oak Plank, Cotton Cloth, Ammonite Carving | Hunting, Wood Chopping, Farming, Fishing |
-| **Moon Jewel** (I–V: 2, 4, 6, 8, 10) | **4** | 3 Cut Quartz, 1 Copper Ingot | 3 Cut Garnet, 1 Iron Ingot | Hunting, Mining |
+| **Weapon Gem** | **4** | 2 Copper Ingot, 2 Pine Plank | 2 Iron Ingot, 2 Cedar Plank | Mining, Wood Chopping |
+| **Armor Fittings** | **2** low, **3** high | 1 Chopped Carrot, 1 Carp Fillet | 1 Iron Ingot, 1 Cedar Plank, 1 Cut Citrine | Farming, Fishing; then Mining, Wood Chopping, Hunting |
+| **Accessory Setting** | **12 · 6 · 4** (Tier 1 · 2 · 3) | 6 · 3 · 2 Chopped Carrot and as many Carp Fillet | 6 · 3 · 2 Shredded Cabbage and as many Sardine Fillet | Farming, Fishing |
+| **Planet Jewel** (I–V: 1, 3, 5, 7, 9) | **12** | 3 each: Cut Quartz, Pine Plank, Chopped Carrot, Carp Fillet | 3 each: Cut Citrine, Cedar Plank, Shredded Cabbage, Sardine Fillet | Hunting, Wood Chopping, Farming, Fishing |
+| **Moon Jewel** (I–V: 2, 4, 6, 8, 10) | **4** | 3 Cut Quartz, 1 Copper Ingot | 3 Cut Citrine, 1 Iron Ingot | Hunting, Mining |
 | **Branch Gem** (G5) | **4** | The G5 Weapon Gem: 2 ingots, 2 planks of its tier's low pair | — | Mining, Wood Chopping |
 | **Process** (Workbench) | 1 raw | Every type, one for one | | — |
 
@@ -498,43 +530,43 @@ ladder (§3.4) says which tier's type fills each one at each grade.
 | Grade | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
 | G1–G3 | 2 Copper Ingot, 2 Pine Plank | The same | The same |
-| G4 | The same | The same | **2 Silver Ingot, 2 Mahogany Plank** |
-| G5 | 2 Copper Ingot, 2 Pine Plank | **Branch Gem:** 2 Silver Ingot, 2 Mahogany Plank | **Branch Gem:** 2 Mythril Ingot, 2 Elderwood Plank |
-| G6–G8 | 2 Iron Ingot, 2 Oak Plank | The same | The same |
+| G4 | The same | The same | **2 Gold Ingot, 2 Cherry Plank** |
+| G5 | 2 Copper Ingot, 2 Pine Plank | **Branch Gem:** 2 Gold Ingot, 2 Cherry Plank | **Branch Gem:** 2 Mythril Ingot, 2 Elderwood Plank |
+| G6–G8 | 2 Iron Ingot, 2 Cedar Plank | The same | The same |
 | G9 | The same | The same | **2 Titanium Ingot, 2 Ebony Plank** |
-| G10 | 2 Iron Ingot, 2 Oak Plank | **2 Titanium Ingot, 2 Ebony Plank** | **2 Orichalcum Ingot, 2 Yggdrasil Plank** |
+| G10 | 2 Iron Ingot, 2 Cedar Plank | **2 Titanium Ingot, 2 Ebony Plank** | **2 Orichalcum Ingot, 2 Yggdrasil Plank** |
 
 **Armor Fittings** (2 low, 3 high).
 
 | Grade | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
-| G1–G3 | 1 Linen, 1 Shell Carving | The same | The same |
-| G4 | The same | The same | **1 Wool Cloth, 1 Trilobite Carving** |
-| G5 | 1 Linen, 1 Shell Carving | **1 Wool Cloth, 1 Trilobite Carving** | **1 Moonsilk, 1 Aether Infusion** |
-| G6–G8 | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet | The same | The same |
+| G1–G3 | 1 Chopped Carrot, 1 Carp Fillet | The same | The same |
+| G4 | The same | The same | **1 Sliced Bell Pepper, 1 Sea Bream Fillet** |
+| G5 | 1 Chopped Carrot, 1 Carp Fillet | **1 Sliced Bell Pepper, 1 Sea Bream Fillet** | **1 Golden Carrot Purée, 1 Silverfin Fillet** |
+| G6–G8 | 1 Iron Ingot, 1 Cedar Plank, 1 Cut Citrine | The same | The same |
 | G9 | The same | The same | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** |
-| G10 | 1 Iron Ingot, 1 Oak Plank, 1 Cut Garnet | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** | **1 Orichalcum Ingot, 1 Yggdrasil Plank, 1 Cut Philosopher's Stone** |
+| G10 | 1 Iron Ingot, 1 Cedar Plank, 1 Cut Citrine | **1 Titanium Ingot, 1 Ebony Plank, 1 Cut Diamond** | **1 Orichalcum Ingot, 1 Yggdrasil Plank, 1 Cut Philosopher's Stone** |
 
-**Accessory Setting** (12 · 6 · 4: half cloth, half carving or infusion).
+**Accessory Setting** (12 · 6 · 4: half prepared vegetables, half fillets).
 
 | Grade | Tier 1 (12) | Tier 2 (6) | Tier 3 (4) |
 |---|---|---|---|
-| G1–G3 | 6 Linen, 6 Shell Carving | 3 Linen, 3 Shell Carving | 2 Linen, 2 Shell Carving |
-| G4 | 6 Linen, 6 Shell Carving | 3 Linen, 3 Shell Carving | **2 Wool Cloth, 2 Trilobite Carving** |
-| G5 | 6 Linen, 6 Shell Carving | **3 Wool Cloth, 3 Trilobite Carving** | **2 Moonsilk, 2 Aether Infusion** |
-| G6–G8 | 6 Cotton Cloth, 6 Ammonite Carving | 3 Cotton Cloth, 3 Ammonite Carving | 2 Cotton Cloth, 2 Ammonite Carving |
-| G9 | 6 Cotton Cloth, 6 Ammonite Carving | 3 Cotton Cloth, 3 Ammonite Carving | **2 Silk, 2 Tide Infusion** |
-| G10 | 6 Cotton Cloth, 6 Ammonite Carving | **3 Silk, 3 Tide Infusion** | **2 Cloudweave, 2 Prismatic Infusion** |
+| G1–G3 | 6 Chopped Carrot, 6 Carp Fillet | 3 Chopped Carrot, 3 Carp Fillet | 2 Chopped Carrot, 2 Carp Fillet |
+| G4 | 6 Chopped Carrot, 6 Carp Fillet | 3 Chopped Carrot, 3 Carp Fillet | **2 Sliced Bell Pepper, 2 Sea Bream Fillet** |
+| G5 | 6 Chopped Carrot, 6 Carp Fillet | **3 Sliced Bell Pepper, 3 Sea Bream Fillet** | **2 Golden Carrot Purée, 2 Silverfin Fillet** |
+| G6–G8 | 6 Shredded Cabbage, 6 Sardine Fillet | 3 Shredded Cabbage, 3 Sardine Fillet | 2 Shredded Cabbage, 2 Sardine Fillet |
+| G9 | 6 Shredded Cabbage, 6 Sardine Fillet | 3 Shredded Cabbage, 3 Sardine Fillet | **2 Trimmed Asparagus, 2 Tuna Fillet** |
+| G10 | 6 Shredded Cabbage, 6 Sardine Fillet | **3 Trimmed Asparagus, 3 Tuna Fillet** | **2 Pumpkin Purée, 2 Rainbow Koi Fillet** |
 
-**Planet Jewel** (12: three each of a cut stone, a plank, a cloth and a carving or infusion; *follow-up to D194, was
+**Planet Jewel** (12: three each of a cut stone, a plank, a prepared vegetable and a fillet; *follow-up to D194, was
 8, two of each*).
 
 | Jewel (grade) | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
-| I (1), II (3) | 3 each: Cut Quartz, Pine Plank, Linen, Shell Carving | The same | The same |
-| III (5) | The same | **3 each: Cut Sapphire, Mahogany Plank, Wool Cloth, Trilobite Carving** | **3 each: Cut Starstone, Elderwood Plank, Moonsilk, Aether Infusion** |
-| IV (7) | 3 each: Cut Garnet, Oak Plank, Cotton Cloth, Ammonite Carving | The same | The same |
-| V (9) | The same | The same | **3 each: Cut Diamond, Ebony Plank, Silk, Tide Infusion** |
+| I (1), II (3) | 3 each: Cut Quartz, Pine Plank, Chopped Carrot, Carp Fillet | The same | The same |
+| III (5) | The same | **3 each: Cut Sapphire, Cherry Plank, Sliced Bell Pepper, Sea Bream Fillet** | **3 each: Cut Starstone, Elderwood Plank, Golden Carrot Purée, Silverfin Fillet** |
+| IV (7) | 3 each: Cut Citrine, Cedar Plank, Shredded Cabbage, Sardine Fillet | The same | The same |
+| V (9) | The same | The same | **3 each: Cut Diamond, Ebony Plank, Trimmed Asparagus, Tuna Fillet** |
 
 **Moon Jewel** (4: three cut stones on a metal mount). Every moon takes them, picked when set: Prowess, Vigor and Guard,
 from Tier 2 a weapon moon (Tier 3 two), and her moon (II and IV).
@@ -542,8 +574,8 @@ from Tier 2 a weapon moon (Tier 3 two), and her moon (II and IV).
 | Jewel (grade) | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
 | I (2) | 3 Cut Quartz, 1 Copper Ingot | The same | The same |
-| II (4) | The same | The same | **3 Cut Sapphire, 1 Silver Ingot** |
-| III (6), IV (8) | 3 Cut Garnet, 1 Iron Ingot | The same | The same |
+| II (4) | The same | The same | **3 Cut Sapphire, 1 Gold Ingot** |
+| III (6), IV (8) | 3 Cut Citrine, 1 Iron Ingot | The same | The same |
 | V (10) | The same | **3 Cut Diamond, 1 Titanium Ingot** | **3 Cut Philosopher's Stone, 1 Orichalcum Ingot** |
 
 The [flow page](previews/prof-flow.html) draws every recipe with its icons, by tier and grade.
@@ -552,10 +584,10 @@ The [flow page](previews/prof-flow.html) draws every recipe with its icons, by t
 
 | Tier | Piece | How many an Uma | Recipe | Made by |
 |---|---|---|---|---|
-| 2 | **Branch Gem**, a weapon's G5 step; Pure or Dual picked when used | 3 (one a weapon) | 2 Silver Ingot, 2 Mahogany Plank | The Forge's Brawlers (Tier 2's own pair) |
+| 2 | **Branch Gem**, a weapon's G5 step; Pure or Dual picked when used | 3 (one a weapon) | 2 Gold Ingot, 2 Cherry Plank | The Forge's Brawlers (Tier 2's own pair) |
 | 2 | **Weapon moon I–V: Moon Jewels I–V** (EP24) | 1 each (5) | The Moon Jewel's, by the ladder: I–IV on base types, **V on Tier 2's** (3 Cut Diamond, 1 Titanium Ingot) | Mages; I–IV also Jewel Crafting secondaries |
 | 3 | **Branch Gem**: Pure → Keen or Tempered, Dual → Tempered or Evolved; a weapon arriving as Base takes Pure or Dual | 3 | 2 Mythril Ingot, 2 Elderwood Plank | Brawlers |
-| 3 | **The second weapon moon: Moon Jewels I–V** (EP26) | 1 each (5) | The ladder's: I, III, IV on base types, **II on Tier 2's** (3 Cut Sapphire, 1 Silver Ingot), **V on Tier 3's** (3 Cut Philosopher's Stone, 1 Orichalcum Ingot) | Mages (V); Jewel Crafting secondaries the rest (Tier 2's work is theirs in Tier 3) |
+| 3 | **The second weapon moon: Moon Jewels I–V** (EP26) | 1 each (5) | The ladder's: I, III, IV on base types, **II on Tier 2's** (3 Cut Sapphire, 1 Gold Ingot), **V on Tier 3's** (3 Cut Philosopher's Stone, 1 Orichalcum Ingot) | Mages (V); Jewel Crafting secondaries the rest (Tier 2's work is theirs in Tier 3) |
 | 3 | Weapon moon 1, rebuilt: Moon Jewels I–V | 1 each (5) | The same | As above |
 | Any | **Re-forging** (WP11): another Branch Gem of the tier | Outside the demand | The tier's Branch Gem | As above |
 
@@ -583,7 +615,7 @@ grade gives × 1.8 the Might.
 
 **D194 proposed it and left the amount here** (extra-stats §11.2, §18.2): with Prowess every class sets 20 jewels in
 Tier 1 (5 Planet, 15 Moon), not the first draft's 25, so at the old recipes the Lapidary would make 100 an Uma. **Taken:
-a Planet Jewel is 12 refined, three each of a cut stone, a plank, a cloth and a carving or infusion.** The Moon Jewel
+a Planet Jewel is 12 refined, three each of a cut stone, a plank, a prepared vegetable and a fillet.** The Moon Jewel
 stays 4 (EP18).
 
 | Recipe | Lapidary an Uma: T1 · T2 · T3 | One Uma: T1 · T2 · T3 | Hours (Lv 25) | Gathered an Uma in Tier 1: Mining · Wood · Farming · Fishing · Hunting | The magical trade's share: T1 · T2 · T3 | Every trade, every tier |
@@ -622,8 +654,8 @@ stays 4 (EP18).
 | **Total** | **110** | | | **485**: 485 gathers, 485 processes |
 | ★ + her moon: Moon Jewels II and IV | 2 | Lapidary | 4 | 8: **493** |
 
-**By type** (her moon in brackets): Copper 36 (37), Iron 64 (65); Pine 39, Oak 61; Flax 64, Cotton 36; Seashell 64,
-Ammonite 36; Quartz 27 (30), Garnet 58 (61). *Follow-up to D194: the same 485, made of 20 jewels for every class instead
+**By type** (her moon in brackets): Copper 36 (37), Iron 64 (65); Pine 39, Cedar 61; Carrot 64, Cabbage 36; Carp 64,
+Sardine 36; Quartz 27 (30), Citrine 58 (61). *Follow-up to D194: the same 485, made of 20 jewels for every class instead
 of the first draft's 25.*
 
 ### 7.2 What each trade carries
@@ -727,9 +759,9 @@ trades and the Armorer's four slots set the pace together:
 | **Total** | **125** | | **505** (+4.1% on Tier 1) |
 | ★ + her moon | 2 | Lapidary | 8: **513** |
 
-**By type** (her moon in brackets): base Copper 32 (33), Iron 52 (53), Pine 30, Oak 50, Flax 50, Cotton 30,
-Seashell 50, Ammonite 30, Quartz 30 (33), Garnet 50 (53); **Tier 2's** Silver 6, Titanium 15, Mahogany 9, Ebony 11,
-Wool 14, Silk 6, Trilobite 14, Tide Essence 6, Sapphire 3, Diamond 17: **101, 20%**.
+**By type** (her moon in brackets): base Copper 32 (33), Iron 52 (53), Pine 30, Cedar 50, Carrot 50, Cabbage 30,
+Carp 50, Sardine 30, Quartz 30 (33), Citrine 50 (53); **Tier 2's** Gold 6, Titanium 15, Cherry 9, Ebony 11,
+Bell Pepper 14, Asparagus 6, Sea Bream 14, Tuna 6, Sapphire 3, Diamond 17: **101, 20%**.
 
 ### 8.3 What each trade carries
 
@@ -804,10 +836,11 @@ Sapphire and Diamond (and the open shop lets anyone cut them).
 | **Total** | **140** | | **525** (+8.2% on Tier 1) |
 | ★ + her moon | 2 | Lapidary | 8: **533** (+8.1% on Tier 1's 493) |
 
-**By type** (her moon in brackets): base Copper 23, Iron 43 (44), Pine 24, Oak 36, Flax 39, Cotton 21, Seashell 39,
-Ammonite 21, Quartz 21, Garnet 48 (51); **Tier 2's** Silver 11 (12), Titanium 11, Mahogany 6, Ebony 14, Wool 11, Silk 9,
-Trilobite 11, Tide 9, Sapphire 15 (18), Diamond 8: **105, 20%**; **Tier 3's** Mythril 6, Orichalcum 16, Elderwood 9,
-Yggdrasil 11, Moonsilk 14, Cloudfleece 6, Aether 14, Prismatic 6, Starstone 3, Philosopher's Stone 20: **105, 20%**.
+**By type** (her moon in brackets): base Copper 23, Iron 43 (44), Pine 24, Cedar 36, Carrot 39, Cabbage 21, Carp 39,
+Sardine 21, Quartz 21, Citrine 48 (51); **Tier 2's** Gold 11 (12), Titanium 11, Cherry 6, Ebony 14, Bell Pepper 11,
+Asparagus 9, Sea Bream 11, Tuna 9, Sapphire 15 (18), Diamond 8: **105, 20%**; **Tier 3's** Mythril 6, Orichalcum 16,
+Elderwood 9, Yggdrasil 11, Golden Carrot 14, Emperor Pumpkin 6, Silverfin 14, Rainbow Koi 6, Starstone 3, Philosopher's
+Stone 20: **105, 20%**.
 
 ### 9.3 What each trade carries
 
@@ -1048,14 +1081,18 @@ them). The pieces' making is 16,266 hours, **32,533 tickets**, so the world is p
 | Today's family (site) | Becomes | Grades 1–5 → | Grades 6–10 → |
 |---|---|---|---|
 | Ores (Mine), Stones (Quarry) | Mining | Copper Ore · Copper Ingot | Iron Ore · Iron Ingot |
-| Woods (Forest) | Wood Chopping | Pine Log · Pine Plank | Oak Log · Oak Plank |
-| Fibers (Meadow) | Farming | Flax · Linen | Cotton · Cotton Cloth |
-| Essences (Ley Spring), Bones & Horns (Fossil Dig) | Fishing | Seashell · Shell Carving | Ammonite · Ammonite Carving |
-| Crystals (Crystal Cavern), Hides & Scales (Monster Den) | Hunting | Quartz · Cut Quartz | Garnet · Cut Garnet |
+| Woods (Forest) | Wood Chopping | Pine Log · Pine Plank | Cedar Log · Cedar Plank |
+| Fibers (Meadow) | Farming | Carrot · Chopped Carrot | Cabbage · Shredded Cabbage |
+| Essences (Ley Spring), Bones & Horns (Fossil Dig) | Fishing | Carp · Carp Fillet | Sardine · Sardine Fillet |
+| Crystals (Crystal Cavern), Hides & Scales (Monster Den) | Hunting | Quartz · Cut Quartz | Citrine · Cut Citrine |
 
-Of today's 160 ids, 20 stay as Tier 1's types and 40 come back as Tiers 2 and 3's; the other 100 leave the code
-(old-save fixtures keep them, as D144's did) and uma-art keeps every icon. A Tier 2 world's old Silver Ore converts to
-Copper Ore like any other: its Tier 2 pair starts empty. Raw stays raw and refined stays refined, so nothing is lost.
+Of today's 160 ids, 36 stay (Mining's, Wood Chopping's and Hunting's: 12 as Tier 1's types, 24 as Tiers 2 and 3's) and
+124 leave the code (old-save fixtures keep them, as D144's did); Farming's and Fishing's 24 come back from the old
+farm's Vegetables and Fish, gone from the code since save v21. uma-art keeps every icon. A Tier 2 world's old Gold Ore
+converts to Iron Ore like any other ore of grades 6–10: its Tier 2 pair starts empty. Raw stays raw and refined stays
+refined, so nothing is lost. *Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers
+Fish; the families still convert by band, Fibers into Farming's vegetables, Essences and Bones & Horns into Fishing's
+fish.*
 
 ### 14.8 The approaches weighed
 
@@ -1100,11 +1137,11 @@ quarter, batches, queues.
 | **PP3** The pairings | Physical: Mine · Forge. Physical hybrid: Forest · Armorer. Healer: Fields · Workbench. Magical hybrid: Fishery · Charm Shop. Magical: Monster Den · Lapidary (PR3 kept) | Any other matching | One craft a row, the Learning page's order |
 | **PP4** Places | **One existing building a profession, four slots, ×1.25 from day 1, no upgrades: ten places and forty slots in every tier** (PR4 kept, the owner's first review) | Five trade lodges of eight slots; sites and three stations; a slot a place a tier (40 · 50 · 60) | Ten structures instead of 40–80; a run of twenty never fills forty slots, so more slots only add empty pips |
 | **PP5** The map | Today's ten side spots, one row a trade, gathering left, making right; **the same map in every tier**, the tier's look; a tier adds type icons, never a building (PR5 kept) | A fifth Hub page; a building a tier | The measured layout, one row of pips; an Uma's places side by side |
-| **PP6** Art | **Reuse only:** ten frames (`mine`, `forest`, `fields`, `fishery`, `monster-den`, `workbench`, `forge`, `lancers-barracks`, `arcane-armory`, `lapidary`), sixty item icons; no kit change, no new art (PR6 kept) | New pearl icons; hut tiles | The owner's ask; the kit draws any frame and eight pips |
-| **PP7** Material types | **Five lines, a pair a tier:** a low type (grades 1–5, Craft Lv 1) and a high type (6–10, Lv 26); **2 · 4 · 6 types a gathering profession** (10 · 20 · 30; 20 · 40 · 60 ids); processing one for one (PR7, extended) | Ten grades each (today's 160); one type each; a pair a tier for Tier 1 only | The owner's two types, more each tier; grades still matter on the items |
-| **PP8** The catalog's order | **Each tier's pair sits above the last on today's grade ladder:** Mining Copper, Iron · Silver, Titanium · Mythril, Orichalcum; Wood Chopping Pine, Oak · Mahogany, Ebony · Elderwood, Yggdrasil; the other three as the first round. *Changed from professions.md §0.3* | The first round's (Silver, Mythril · Titanium, Orichalcum; Cedar, Elderwood · Ebony, Yggdrasil) | Each tier's icons look richer than the last's; the legendary pair crowns Tier 3 |
+| **PP6** Art | **Reuse only:** ten frames (`mine`, `forest`, `vegetable-garden`, `fishery`, `monster-den`, `workbench`, `forge`, `lancers-barracks`, `arcane-armory`, `lapidary`), sixty item icons; no kit change, no new art (PR6 kept). **The Fields (`fields`) draw the farm's `vegetable-garden` frame** (`Place.frame`). *Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish; the Fields drew the farm's `fields` frame* | New pearl icons; hut tiles; the `fields` frame (a wheat field, the old Grains); renaming the place the Vegetable Garden (`vegetable-garden`) | The owner's ask; the kit draws any frame and eight pips; the Vegetable Garden's crop rows show the line's own crops, and the place's short name and id don't move |
+| **PP7** Material types | **Five lines, a pair a tier:** a low type (grades 1–5, Craft Lv 1) and a high type (6–10, Lv 26); **2 · 4 · 6 types a gathering profession** (10 · 20 · 30; 20 · 40 · 60 ids); processing one for one (PR7, extended). **Each profession gathers its own family:** Mining ores, Wood Chopping woods, Farming the old farm's Vegetables, Fishing its Fish, Hunting stones. *Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish; Farming gathered the Wilds' fibers, Fishing shells and essences* | Ten grades each (today's 160); one type each; a pair a tier for Tier 1 only; the Wilds' fibers for Farming and shells and essences for Fishing (the draft) | The owner's two types, more each tier; grades still matter on the items; "keep the symmetry, add flavor": each trade gathers what its name says |
+| **PP8** The catalog's rule | **One rule for every line: of its family's ten grades, Tier 1 takes 1 and 3, Tier 2 6 and 8, Tier 3 9 and 10.** Mining Copper, Iron · Gold, Titanium · Mythril, Orichalcum; Wood Chopping Pine, Cedar · Cherry, Ebony · Elderwood, Yggdrasil; Farming Carrot, Cabbage · Bell Pepper, Asparagus · Golden Carrot, Emperor Pumpkin; Fishing Carp, Sardine · Sea Bream, Tuna · Silverfin, Rainbow Koi; Hunting Quartz, Citrine · Sapphire, Diamond · Starstone, Philosopher's Stone. *Changed from professions.md §0.3. Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish: the draft picked each line's pairs on its own, each tier's above the last (Silver, Oak, Mahogany, Garnet where Gold, Cedar, Cherry, Citrine now stand)* | Each line its own picks (the draft: 1, 3 · 4, 8 in Mining, 1, 5 · 7, 8 in Wood Chopping, 1, 4 · 6, 8 in Hunting); another single rule moving four names: 1, 3 · 4, 8 (keeps Mining whole, but Tier 2's low type falls in the low band), 1, 4 · 6, 8 (loses Iron, Oak and Mahogany), 1, 5 · 7, 8 (loses Iron, Silver, Garnet and Sapphire); the first round's (Silver, Mythril · Titanium, Orichalcum; Cedar, Elderwood · Ebony, Yggdrasil) | The owner's symmetry: the same grades in every line, Tier 2 the same two as Tier 1 a band up, the legendary pair crowning Tier 3; each tier's icons richer than the last's; four renames, the fewest any one rule needs, with Iron and every Tier 3 name kept |
 | **PP9** The ladder | **A grade decides its material.** Tier 1: G1–G5 low, G6–G10 high. **Tier 2: G5 and G10 take Tier 2's pair. Tier 3: G4 and G9 Tier 2's, G5 and G10 Tier 3's.** Amounts never change. *New: the first round gave a tier's pair only to its new pieces* | The first round's (a tier's pair in its new pieces only: 5% of Tier 2); every recipe on the tier's pair; half-and-half recipes | The main profession's higher tier is a real fifth of the work; one row to learn a tier; the base pair keeps most of the volume, so a secondary can always help |
-| **PP10** Recipes | **One fixed set an item, the same amounts in every tier:** Weapon Gem 4; Armor Fittings 2 · 3; Accessory Setting 12 · 6 · 4 by slot count; **Planet Jewel 12** (three each of a cut stone, a plank, a cloth and a carving or infusion; D194's proposal, taken, §6.5); Moon Jewel 4 (EP18); **the Branch Gem the G5 Weapon Gem in its tier's pair (4)**; two jewel kinds in every tier, every jewel by the ladder. Each making place about a quarter of an Uma's refined items, each gathering profession about a fifth (PR8 kept, changed for the Branch Gem). *Changed for D194 (Extra Stats), 2026-10-24: the Planet Jewel was 8 and a Halo Jewel 5; the Halo Jewels retire* | Planet 8 (Tier 1 465, the Lapidary 100, the magical trade 17.2%); Planet 16 (Tier 1 505; 24.5% in Tier 3); a Moon Jewel of 5 (25.2% in Tier 3); the first round's and WP26's Branch Gem (9); rotating pairs (D139) | Tier 1 lands back on the approved 120 · 485 · 822 h; every trade 18.6–23.3% in every tier; anyone can say what an item takes; the branch costs a grade's worth in the tier's materials |
+| **PP10** Recipes | **One fixed set an item, the same amounts in every tier:** Weapon Gem 4; Armor Fittings 2 · 3; Accessory Setting 12 · 6 · 4 by slot count; **Planet Jewel 12** (three each of a cut stone, a plank, a prepared vegetable and a fillet; D194's proposal, taken, §6.5); Moon Jewel 4 (EP18); **the Branch Gem the G5 Weapon Gem in its tier's pair (4)**; two jewel kinds in every tier, every jewel by the ladder. Each making place about a quarter of an Uma's refined items, each gathering profession about a fifth (PR8 kept, changed for the Branch Gem). *Changed for D194 (Extra Stats), 2026-10-24: the Planet Jewel was 8 and a Halo Jewel 5; the Halo Jewels retire. Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish: names only, no amount moves* | Planet 8 (Tier 1 465, the Lapidary 100, the magical trade 17.2%); Planet 16 (Tier 1 505; 24.5% in Tier 3); a Moon Jewel of 5 (25.2% in Tier 3); the first round's and WP26's Branch Gem (9); rotating pairs (D139) | Tier 1 lands back on the approved 120 · 485 · 822 h; every trade 18.6–23.3% in every tier; anyone can say what an item takes; the branch costs a grade's worth in the tier's materials |
 | **PP11** SB1 and amounts | **Counts and amounts don't scale with the tier;** stat values do. One Uma **485 · 505 · 525** refined (+4.1%, +8.2%); a run 28.5 · 29.7 days. *New; numbers refreshed for D194, 2026-10-24 (were 503 · 521, 28.4 · 29.4)* | Amounts × 1.8 and × 2.6 (909 · 1,365 refined; runs of 51 and 77 days); times × tier (the same) | The owner keeps today's rate; SB1 is about a stat's share, not time |
 | **PP12** Make time | **One gather's time a refined item in the piece** (PR9 kept) | Today's flat two gathers | Today's rule for two-item recipes; bigger pieces take longer, so trades stay even |
 | **PP13** Gates and Craft Level | A low type at Craft Lv 1, a high type at Lv 26, **in every pair and tier**; grade g made at Lv 5g − 4; **Craft Level restarts at Lv 1 in each tier**, as today | Later gates for a tier's pairs; Craft Level carried across tiers | No new gate to learn; the tier's own clock is today's (tier2-world §11) |
@@ -1131,9 +1168,11 @@ quarter, batches, queues.
 | PR4 one building, four slots | PP4 (kept) | | PR12 Lore replaced | PP18 (kept) |
 | PR5 the map | PP5 (kept) | | PR13 the Exchange | **PP17** (× tier) |
 | PR6 reuse only | PP6 (kept) | | PR14 old saves | **PP19, PP20** (Craft Levels to 1, tickets for time), **PP24, PP25** |
-| PR7 two types a profession | PP7 (kept), **PP8** (the order) | | PR15 the Trade filter | PP21 (kept) |
+| PR7 two types a profession | PP7 (kept; each its own family), **PP8** (one rule) | | PR15 the Trade filter | PP21 (kept) |
 | PR8 one fixed recipe an item | **PP10** (the Branch Gem at 4; the Planet Jewel at 12) | | — | **PP1, PP13, PP16, PP22, PP23, PP24, PP25** (new) |
 
 In bold, the calls this doc changed or added. **Changed for D194 (Extra Stats), 2026-10-24:** PP10 (the Planet Jewel at
 12, no Halo Jewel), PP11 (numbers). **Changed for the owner's compensation direction, 2026-10-24:** PP19, PP20; **new:**
-PP24, PP25.
+PP24, PP25. **Changed at the owner's note (2026-10-24): Farming gathers Vegetables, Fishing gathers Fish:** PP6 (the
+Fields draw the Vegetable Garden), PP7 (each profession its own family), PP8 (one rule for every line's pairs), PP10
+(names only; no amount moves).

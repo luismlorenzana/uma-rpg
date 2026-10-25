@@ -487,7 +487,7 @@ the template's whole damage, and WP33 keeps it there beside the signature access
 - **Node I opens at Lv 16 with a Moon Jewel II; node II at Lv 36 with a Moon Jewel IV,** in every tier, in order (I
   before II), as every moon node of those grades.
 - **Two Moon Jewels a tier, 8 refined,** counted beside the shared demand (§11.3): in Tier 3 her Moon Jewel II is Tier
-  2's pair (Cut Sapphire on a Silver Ingot), by the ladder.
+  2's pair (Cut Sapphire on a Gold Ingot), by the ladder (*Follow-up to the profession flavor change, 2026-10-24: was a Silver Ingot*).
 - **Moon Jewels are any moon's,** so hers come from the same stock as the shared moons; the Set list offers her moon
   with the rest ("Moon Jewel II · Set on: Prowess · Vigor · Guard · weapon moon · ★ Ironhide's moon").
 
@@ -780,7 +780,7 @@ never in the budget, leaves.*
 ### 11.2 Recipes: the interface for profession-progression.md (EP18)
 
 **One fixed amount a jewel, the same in every tier:** a Moon Jewel 4 refined (3 cut stones on 1 ingot, unchanged), a
-**Planet Jewel 12** (3 each of a cut stone, a plank, a cloth and a carving or infusion; **proposed**, was 8). The type at
+**Planet Jewel 12** (3 each of a cut stone, a plank, a prepared vegetable and a fillet; **proposed**, was 8). The type at
 each grade follows [profession-progression.md](profession-progression.md)'s ladder (PP9) and catalog (PP8): in Tier 2
 grades 5 and 10 take Tier 2's pair; in Tier 3 grades 4 and 9 Tier 2's and grades 5 and 10 Tier 3's.
 
@@ -792,17 +792,20 @@ of 12 puts Tier 1 back exactly (120, 485) and keeps every trade at 18.6–23.3% 
 
 | Jewel (grade) | Refined | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|
-| **Planet Jewel I, II** (1, 3) | 12 | 3 each: Cut Quartz, Pine Plank, Linen, Shell Carving | The same | The same |
-| **Planet Jewel III** (5) | 12 | The same | **3 each: Cut Sapphire, Mahogany Plank, Wool Cloth, Trilobite Carving** | **3 each: Cut Starstone, Elderwood Plank, Moonsilk, Aether Infusion** |
-| **Planet Jewel IV** (7) | 12 | 3 each: Cut Garnet, Oak Plank, Cotton Cloth, Ammonite Carving | The same | The same |
-| **Planet Jewel V** (9) | 12 | The same | The same | **3 each: Cut Diamond, Ebony Plank, Silk, Tide Infusion** |
+| **Planet Jewel I, II** (1, 3) | 12 | 3 each: Cut Quartz, Pine Plank, Chopped Carrot, Carp Fillet | The same | The same |
+| **Planet Jewel III** (5) | 12 | The same | **3 each: Cut Sapphire, Cherry Plank, Sliced Bell Pepper, Sea Bream Fillet** | **3 each: Cut Starstone, Elderwood Plank, Golden Carrot Purée, Silverfin Fillet** |
+| **Planet Jewel IV** (7) | 12 | 3 each: Cut Citrine, Cedar Plank, Shredded Cabbage, Sardine Fillet | The same | The same |
+| **Planet Jewel V** (9) | 12 | The same | The same | **3 each: Cut Diamond, Ebony Plank, Trimmed Asparagus, Tuna Fillet** |
 | **Moon Jewel I** (2) | 4 | 3 Cut Quartz, 1 Copper Ingot | The same | The same |
-| **Moon Jewel II** (4) | 4 | 3 Cut Quartz, 1 Copper Ingot | The same | **3 Cut Sapphire, 1 Silver Ingot** |
-| **Moon Jewel III, IV** (6, 8) | 4 | 3 Cut Garnet, 1 Iron Ingot | The same | The same |
-| **Moon Jewel V** (10) | 4 | 3 Cut Garnet, 1 Iron Ingot | **3 Cut Diamond, 1 Titanium Ingot** | **3 Cut Philosopher's Stone, 1 Orichalcum Ingot** |
+| **Moon Jewel II** (4) | 4 | 3 Cut Quartz, 1 Copper Ingot | The same | **3 Cut Sapphire, 1 Gold Ingot** |
+| **Moon Jewel III, IV** (6, 8) | 4 | 3 Cut Citrine, 1 Iron Ingot | The same | The same |
+| **Moon Jewel V** (10) | 4 | 3 Cut Citrine, 1 Iron Ingot | **3 Cut Diamond, 1 Titanium Ingot** | **3 Cut Philosopher's Stone, 1 Orichalcum Ingot** |
 
 - **Easy to say:** a moon is cut stones on a metal mount; the Planet a bit of everything, three of each.
-- **Every type exists today** (PP8): no new item, no new icon.
+- **Every type is an existing uma-art icon** (PP8): no new icon. *Follow-up to the profession flavor change, 2026-10-24: profession-progression's
+  Farming gathers Vegetables and its Fishing Fish, and one rule picks every line's pairs (its PP8), so the table's
+  names follow (Cut Citrine, Cedar and Cherry Planks, a Gold Ingot; the vegetables and fish). Wording only: no amount
+  moves.*
 - **Make time** (PP12): one gather's time a refined item. At Craft Lv 25 (×1.25): a Moon Jewel 2.4 h, a Planet Jewel
   7.2 h.
 
@@ -825,8 +828,8 @@ of 12 puts Tier 1 back exactly (120, 485) and keeps every trade at 18.6–23.3% 
 | Hunting (cut stones) | 60 | 75 | 90 |
 | Mining (ingots) | 15 | 20 | 25 |
 | Wood Chopping (planks) | 15 | 15 | 15 |
-| Farming (cloth) | 15 | 15 | 15 |
-| Fishing (carvings, infusions) | 15 | 15 | 15 |
+| Farming (prepared vegetables) | 15 | 15 | 15 |
+| Fishing (fillets) | 15 | 15 | 15 |
 | **Lapidary, an Uma** | **120** | **140** | **160** |
 | Of it, Tier 1's types · Tier 2's · Tier 3's | 120 · — · — | 112 · 28 · — | 96 · 32 · 32 |
 | ★ Her moon | +8 | +8 | +8 |
@@ -1030,9 +1033,9 @@ In bold, the calls the owner's review (2026-10-24) changed or replaced. New afte
 > 2. **Counts an Uma, every class the same:** **20 · 25 · 30** jewels (5 Planet; Moon 15 · 20 · 25: three moons, + weapon
 >    moon 1, + weapon moon 2), + her moon's Moon Jewels II and IV in every tier. "A Brawler or a Mage skips her other
 >    offense moon (20 · 24 · 28)" retires; a party is five times one Uma whatever the classes.
-> 3. **Recipes (PP10), proposed:** **Planet Jewel 12** (3 each of a cut stone, a plank, a cloth and a carving or
->    infusion; was 8); Moon Jewel 4 unchanged; the ladder as PP9 (§11.2's table). Make time: a Planet Jewel 12 gathers
->    (7.2 h at Craft Lv 25).
+> 3. **Recipes (PP10), proposed:** **Planet Jewel 12** (3 each of a cut stone, a plank, a prepared vegetable and a
+>    fillet, *follow-up to the profession flavor change, 2026-10-24*; was 8); Moon Jewel 4 unchanged; the ladder as PP9
+>    (§11.2's table). Make time: a Planet Jewel 12 gathers (7.2 h at Craft Lv 25).
 > 4. **Lapidary refined an Uma:** **120 · 140 · 160** (+8 her moon); by profession Hunting 60 · 75 · 90, Mining 15 · 20 ·
 >    25, Wood Chopping, Farming, Fishing 15 each; Tier 2's types 28 of 140, Tier 3 32 Tier 2's and 32 Tier 3's of 160.
 > 5. **The whole Uma:** **485 · 505 · 525** refined (493 · 513 · 533 with her moon), 822 · 856 · 890 hours (835 · 869 ·
