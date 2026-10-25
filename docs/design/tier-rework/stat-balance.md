@@ -536,7 +536,7 @@ On the balance party (Class Rank = her level), a Mage at Tier 1 Lv 10 · 20 · 3
 
 - **Why a share of her max MP:** it is tier-free under SB1 (her bar and her skills' MP both grow × 1.7–1.8 and ×
   2.4–2.6), it follows her MP lean (a Mage's 1.3 bar gets back more than a Brawler's 0.8), and it is the game's own idiom
-  (the Stayer's Second wind is 3% a round; Clarity 4% a stack).
+  (the Stayer's Late reserve is 3% a round; Clarity 4% a stack).
 - **Why it steps up with her depths:** her deepest skill costs 10 → 26 MP as her depths open, so the regen keeps the same
   share of what she casts; today's regen grew with its grade the same way. A flat share over-feeds the first levels or
   starves the last (the table below); a real player's faster Class Rank (§9) gets her regen with the skills that need it.
@@ -586,7 +586,7 @@ today's at Lv 50:
 - **Tiers 2 and 3:** at Lv 50 every class's coverage is Tier 1's within 3 points. Their first levels are MP-rich as
   written (A10's ×1.7 and ×2.4 are sized at Lv 50: the party's region power at Lv 10 is 1.10× and 1.14× Tier 1's);
   SB18 adds a little (1.14×, 1.20×), level again by Lv 40 (1.03×). The simulation's item 7 measures it.
-- **The template's MP twists keep their worth:** Opening, Even pace and Second wind each still add 13–20 points of a
+- **The template's MP twists keep their worth:** Opening, Even pace and Late reserve each still add 13–20 points of a
   region's coverage (as written 6–20; a Brawler 57 → 70–77%); a matched Mage reaches 100% with any of them. The Uma
   Templates pass prices them (U9, U12).
 - **Its knob:** the share a depth, ±0.1% moving late-region power about ±5% (0.7%: 0.88–1.02×; 0.9%: 0.98–1.07×); then

@@ -512,7 +512,7 @@ replay on their own engine; stored fights keep their frozen inputs.
 | **Insignia** base form: a percentage on her hits on sub-boss and boss rank (a factor in the damage stack's step 4) | WP23 | Rule |
 | Armor's values per slot (DEF, M.DEF +4 a grade; HP +15; MP +3); Might, armor offense and accessory values × tier; the foes' build budget × tier | WP4, WP15, EP16 | Data |
 | The Paladin's revive on her Light D3 B; two Limit Breaks' kinds (Rampart Charge Axe, Choir of Angels Lightning) | CP37, CP35 | Data |
-| The Flourish's three MP twists (Opening, Even pace, Second wind), on as her calling | U9 | Rule |
+| The Flourish's three MP twists (Opening, Even pace, Late reserve), on as her calling | U9 | Rule |
 | **Base MP regen:** at the end of each round every ally regains 0.8% of her max MP for each skill depth her class has open (rounded, at least 1), in the round-end step the Spring Amulet used (`mpRegen`), set when the fight starts; her stat sheet shows it beside her MP ("MP 296 · +12 a round"). *Follow-up to D196 (stat balancing), 2026-10-25* | SB18 | Rule |
 | No engine change: weaknesses by kind (the generator's twins), locks as today, the Tier 1 trees (every node exists today), Extra Stats and her moon (points frozen at a fight's start; Vigor's MP is a point; Prowess's points split by her class when the fight starts) | CP5, CP8, CP18, EP, EP23 | Generator, data |
 

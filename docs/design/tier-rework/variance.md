@@ -91,7 +91,7 @@ Umas, the median 3. The 15 front-running stayers spread over four templates.
 |---|---|---|---|
 | **Dash** | **Opening:** her first skill each fight costs no MP | Katana · Dark Tome | **Breakaway:** two more hits, the same total |
 | **Middle** | **Even pace:** her skills cost 25% less MP | Greatsword · Fire Tome | **Spread:** and a splash on every other foe |
-| **Stayer** | **Second wind:** from the fight's third round, she regains 3% of her max MP a round | Bow · Light Tome | **Long haul:** and a Barrier on herself |
+| **Stayer** | **Late reserve:** from the fight's third round, she regains 3% of her max MP a round | Bow · Light Tome | **Long guard:** and a Barrier on herself |
 
 The signature kinds are the shape pairs (Katana and Dark strike twice, Greatsword and Fire hit one foe hard, Bow and
 Light hit one foe many times), on her calling's leading half. Tip numbers are the trees' to set under SK3.
@@ -148,9 +148,9 @@ Two invented front runners, long distance, turf A ([preview](previews/variance-t
 | 2. Stride | Medium and Long both A → Long → Stayer | Long A → Stayer |
 | 3. Knack | Stamina (+20%) | Three tie at +10% → highest base, Speed 106 |
 | **Template** | **Tireless Ironhide** | **Fleet Ironhide** |
-| Flourish, as a Brawler | Second wind | The same |
+| Flourish, as a Brawler | Late reserve | The same |
 | Moon | I: HP +20 (Lv 16) · II: ATK +8 (Lv 36) | I: evasion +2.4% (Lv 16) · II: ATK +8 (Lv 36) |
-| Tier 2 tip | Long haul, on her Brawler Bow tree | The same |
+| Tier 2 tip | Long guard, on her Brawler Bow tree | The same |
 | As a Mage | Her HP node only | Her evasion node only |
 
 The same calling and stride give the same Flourish and tip; the knack splits them. A third front runner at Mile with
@@ -172,7 +172,7 @@ that tier's trees and jewels (promotion resets both, [tiers](../tiers.md#5-promo
 ## 7. Skill trees: the Flourish and the signature tip
 
 **The Flourish** fills [skill-trees.md](skill-trees.md#6-slots-for-other-categories)'s root template slot:
-- **What:** one class-wide passive, her stride's MP twist ([§4](#4-the-catalog)). Named by type: "Ironhide · Second wind".
+- **What:** one class-wide passive, her stride's MP twist ([§4](#4-the-catalog)). Named by type: "Ironhide · Late reserve".
 - **When:** on while she fights as her calling, in either specialization. Free, no pick, every tier.
 - **Why MP:** it changes how often she can cast, not how hard a cast hits, so the foe budget doesn't see it. It echoes
   racing stamina: a dash spends early, a stayer has some left at the end.
@@ -217,7 +217,7 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 - **Racing tab:** "What her aptitudes do here" becomes **Her template**: the three readings with their source grades
   (Calling ← Front A; Stride ← Long A; Knack ← Stamina +20%), then each node with its scope, "Active" or "No effect as
   Mage". A locked outfit shows it too, so it helps pick an unlock.
-- **Skills page:** a small star on her calling's class tile; the root plate's template line ("★ Second wind · from round
+- **Skills page:** a small star on her calling's class tile; the root plate's template line ("★ Late reserve · from round
   3, 3% MP a round"); in Tier 2, a starred third option at her signature tree's tip fork.
 - **Extra Stats:** her moon, starred, with her template's name.
 - **Battle tab:** her moon's points join the green Extra Stats bracket; Sustain lists her Flourish.
@@ -229,7 +229,7 @@ It fits now, as Variance's own packets after Extra Stats and Skill trees land. T
 
 | To | What |
 |---|---|
-| [skill-trees.md](skill-trees.md) | **The root template slot's content:** the Flourish, three MP twists (Opening, Even pace, Second wind), on as her calling, every tier. **The template tip's content,** Tier 2 on: one sidegrade by stride (Breakaway, Spread, Long haul) at the tip fork of her calling's tree of her signature kind, by stride and leading half (Katana · Dark, Greatsword · Fire, Bow · Light) |
+| [skill-trees.md](skill-trees.md) | **The root template slot's content:** the Flourish, three MP twists (Opening, Even pace, Late reserve), on as her calling, every tier. **The template tip's content,** Tier 2 on: one sidegrade by stride (Breakaway, Spread, Long guard) at the tip fork of her calling's tree of her signature kind, by stride and leading half (Katana · Dark, Greatsword · Fire, Bow · Light) |
 | [extra-stats.md](extra-stats.md) | **The template moon's content:** node I her knack (+4 to evasion, HP, DEF and M.DEF, Limit or MP), counting in every class; node II her lead (+8 ATK or M.ATK), counting in the classes of that channel. Ids `template:1–2` |
 | [classes.md](classes.md) | **A calling per Uma** (one of six), by [§5](#5-the-assignment-rule)'s rule. Recommend new Umas start in it (CL13, D162/D180 extended): besides a Pace chaser with Power over Wit starting as a Spell Blade, a Pace sprinter with Power over Wit starts as a Brawler and a Wit-led closer (A in two of Pace, Late, End) as a Summoner. A star on the picker. A row for "what class selection affects": her Flourish and tip work only in her calling; her moon's lead only in classes of its channel |
 | [professions.md](professions.md) | **Her fight type**, her calling's, for PR1's trade: physical 61, physical hybrid 56, magical 46, magical hybrid 46, healer 61 Umas today (22.6 / 20.7 / 17.0 / 17.0 / 22.6%). Nothing else: no speed, yield or level effect. Demand: one Moon Jewel II and one Moon Jewel IV an Uma per tier, as ES12 counts |

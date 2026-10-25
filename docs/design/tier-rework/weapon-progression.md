@@ -1142,7 +1142,7 @@ measured change (with the Summoner's Arms hand 0.48, SB11, and the Great Pendant
 - **What comes:** armor's legs at +3 a grade (+30 at G10, +10 over today's), **Vigor's MP** (+30 × tier, with the
   Planet's +21 × tier: +51 an Uma at Lv 46 in Tier 1; extra-stats-progression EP4), **the base regen** (SB18: every Uma
   regains 0.8% of her max MP a round for each skill depth her class has open, 4% from Class Rank 40; a rule, never an
-  item), the template's MP twists (U9: Opening, Even pace, Second wind), and the Bell (every tier now), which makes her
+  item), the template's MP twists (U9: Opening, Even pace, Late reserve), and the Bell (every tier now), which makes her
   free Attack worth taking when the bar is empty.
 - **What the simulation checks:** the Springs test (README §9.5 item 5) with no MP accessory: a region on Auto still
   clears 10–12 of 12 stages in a row, as today, **and the party's pace in a region's last four stages stays within ±10%

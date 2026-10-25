@@ -513,10 +513,10 @@ stride ← her longest best distance; knack ← her top growth). Her moon at eac
 
 | Uma (made up) | Profile | Template | ★ I, knack (T1 · T2 · T3) | ★ II, lead (T1 · T2 · T3) | Her Flourish (stride) |
 |---|---|---|---|---|---|
-| **Uma A** | Front A; Medium A, Long A; growth Stamina +20% | Brawler · Stayer: **Tireless Ironhide** | HP +20 · +35 · +50 | DEF +8 · +14 · +21 | Second wind |
+| **Uma A** | Front A; Medium A, Long A; growth Stamina +20% | Brawler · Stayer: **Tireless Ironhide** | HP +20 · +35 · +50 | DEF +8 · +14 · +21 | Late reserve |
 | **Uma B** | Pace A; Mile A; Power 96 > Wit 84; growth Speed +20% | Spell Blade · Dash: **Fleet Flashblade** | Evasion +2.4% (every tier) | DEF +8 · +14 · +21 | Opening |
 | **Uma C** | Pace A; Medium A; Wit 102 ≥ Power 90; growth Wit +20% | Mage · Middle: **Clever Spellwright** | MP +4 · +7 · +10 | M.DEF +8 · +14 · +21 | Even pace |
-| **Uma D** | End A; Long A; growth Guts +20% | Summoner · Stayer: **Gritty Shepherd** | Limit start +1.6 (every tier) | M.DEF +8 · +14 · +21 | Second wind |
+| **Uma D** | End A; Long A; growth Guts +20% | Summoner · Stayer: **Gritty Shepherd** | Limit start +1.6 (every tier) | M.DEF +8 · +14 · +21 | Late reserve |
 | **Uma E** | Late A; Medium A; Power 104 > Wit 88; growth Power +20% | Paladin · Middle: **Mighty Warden** | DEF and M.DEF +4 · +7 · +10 each | DEF +8 · +14 · +21 (DEF +12 in all in Tier 1) | Even pace |
 | **Uma F** | Late A (Pace B, End C); Mile A; Wit 98 ≥ Power 92; growth Stamina +20% | Cleric · Dash: **Tireless Lamplighter** | HP +20 · +35 · +50 | M.DEF +8 · +14 · +21 | Opening |
 
