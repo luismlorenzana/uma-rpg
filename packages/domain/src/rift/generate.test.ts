@@ -44,15 +44,15 @@ describe('the Rift generator (H47)', () => {
     expect(a!.weaknesses.weapons[0]).not.toBe(b!.weaknesses.weapons[0])
   })
 
-  it('makes Arcane foes weak to elements only, by rank, warding Arms', () => {
-    for (const plan of [...riftChain(ctx(), 'arcane'), riftConvergence(ctx())[1]!]) {
+  it('makes Arcane foes weak to elements only, by rank, warding Arms (v15; v16’s one element on sub-bosses: generate-v16)', () => {
+    for (const plan of [...riftChain(ctx(), 'arcane', 15), riftConvergence(ctx(), 15)[1]!]) {
       for (const e of foes(plan)) {
         expect(e.weaknesses.weapons).toEqual([])
         expect(e.weaknesses.elements).toHaveLength(RIFT_TUNING.weak.arcane[e.rank])
         expect(e.ward).toBe('physical')
       }
     }
-    const [a, b] = riftFight(ctx(), { kind: 'front', front: 'arcane', stage: 12 }).enemies
+    const [a, b] = riftFight(ctx(), { kind: 'front', front: 'arcane', stage: 12 }, 15).enemies
     expect(a!.weaknesses.elements[0]).not.toBe(b!.weaknesses.elements[0])
   })
 
@@ -77,8 +77,8 @@ describe('the Rift generator (H47)', () => {
     expect(convergence[0]!.thrice).toBe(true)
   })
 
-  it('makes the Horde three waves of 4, 5 or 6, each foe her own Arms and element pair', () => {
-    riftChain(ctx(), 'horde').forEach((plan, i) => {
+  it('makes the Horde three waves of 4, 5 or 6, each foe her own Arms and element pair (v15; v16’s twin sets: generate-v16)', () => {
+    riftChain(ctx(), 'horde', 15).forEach((plan, i) => {
       const stage = i + 1
       const list = waves(plan)
       expect(list).toHaveLength(3)

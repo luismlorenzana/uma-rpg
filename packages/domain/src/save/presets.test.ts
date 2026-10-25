@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { isAmulet, isOrb, isTalisman, orbKind } from '../economy/gear-id'
 import { withTrack, type ArmorKind, type RankRef } from '../economy/ranks'
 import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, RPG_KIND_PAIRS, rpgWeaponKind, validRpgWeapons, type RpgClass, type RpgDamageKind } from '../rpg/rules'
-import { chooseClass, classOf, equipSkills, learnSkill, setClassWeapons, startingClass, type BattleOutfit } from './battle'
+import { chooseClass, classOf, equipSkills, pickBranch, setClassWeapons, startingClass, type BattleOutfit } from './battle'
 import { applyClassPreset, CLASS_PRESET_ACCESSORIES, classPreset, classPresetPlan, wearClassPreset } from './presets'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
 import { gearV1, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
@@ -108,23 +108,24 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     roundTrips(save)
   })
 
-  it('puts back the default spread, keeping her tree and loadout and her pieces on other weapons', () => {
+  it('puts back the default three, keeping her lines and her pieces on other weapons; skills of a tree she stops slotting leave', () => {
     const blade = outfit('101', 'front')
     let save = edit(unlocked(), (w) => ({ ...w, umas: { ...w.umas, '101': { ...w.umas['101']!, ranks: withTrack(w.umas['101']!.ranks, { kind: 'class', id: 'spellblade' }, { rank: 5, exp: 0 }) } } }))
     save = chooseClass(save, '101', 'spellblade', T(1))
-    save = setClassWeapons(save, '101', 'spellblade', ['katana', 'bow', 'axe', 'tome-dark', 'tome-ice'], T(2))
-    save = learnSkill(save, blade, 'spellblade', 'spellblade-bow.1a', T(3))
-    save = learnSkill(save, blade, 'spellblade', 'spellblade-katana.1a', T(4))
-    save = equipSkills(save, blade, 'spellblade', ['spellblade-bow.1a', 'spellblade-katana.1a'], T(5))
+    save = setClassWeapons(save, '101', 'spellblade', ['lance', 'bow', 'tome-ice'], T(2))
+    save = pickBranch(save, blade, 'spellblade', 'bow', 'B', T(3))
+    save = equipSkills(save, blade, 'spellblade', ['spellblade-bow.1', 'spellblade-lance.1'], T(4))
     save = wearing(save, '101', { bow: 'bow-g1' })
     const before = classOf(worldOf(save).umas['101']!, 'spellblade')
     const p = plan(save, '101', 'spellblade')
-    expect(p.weapons).toEqual(['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'])
-    // All five positions change (her Katana moves from 1 to 3), and nothing else.
-    expect(p.changes).toBe(5)
+    expect(p.weapons).toEqual(['katana', 'lance', 'tome-lightning'])
+    // All three positions change (her Lance moves from 1 to 2), and nothing else.
+    expect(p.changes).toBe(3)
     save = wearClassPreset(save, '101', 'spellblade', T(6))
     const uma = worldOf(save).umas['101']!
-    expect(classOf(uma, 'spellblade')).toEqual({ ...before, weapons: p.weapons })
+    // Her line on the Bow stays (any kind of her class); her Bow skill leaves with her Bow (H69).
+    expect(classOf(uma, 'spellblade')).toEqual({ ...before, weapons: p.weapons, loadout: ['spellblade-lance.1'] })
+    expect(before.lines).toEqual({ bow: 'B' })
     expect(gearV1(uma).equipped).toEqual({ bow: 'bow-g1' })
     roundTrips(save)
   })

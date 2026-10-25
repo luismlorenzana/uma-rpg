@@ -82,8 +82,8 @@ describe('six standard presets (classes v2 §7, C6)', () => {
       expect(orbKind(p.orb), c).toBe(rpgWeaponKind(p.weapons[0]!))
       // v1's support, but where v2 lists its own.
       expect(p.support, c).toBe(CLASS_PRESET_SUPPORT_V2[c] ?? CLASS_PRESET_ACCESSORIES[c].support)
-      // The live preset is v2's.
-      expect(classPreset(c), c).toEqual(classPreset(c, 15))
+      // The live preset is v16's since H72 (her three, her Orb on her first slot's kind; `world/balance-v16.test.ts`).
+      expect(classPreset(c), c).toEqual(classPreset(c, 16))
     }
     expect(classPreset('cleric', 15).weapons).toEqual(['tome-light', 'tome-dark', 'tome-lightning', 'katana', 'bow'])
   })
@@ -94,7 +94,6 @@ describe('six standard presets (classes v2 §7, C6)', () => {
     // Classes v1 had no Paladin; the live game has.
     expect(refusal(() => classPresetPlan(worldOf(save), '101', 'paladin', 14))).toBe('bad-class: no class paladin')
     const plan = classPresetPlan(worldOf(save), '101', 'paladin', 15)
-    expect(classPresetPlan(worldOf(save), '101', 'paladin')).toEqual(plan)
     expect(plan.weapons).toEqual(['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire'])
     expect(plan.kinds).toEqual({ head: 'helm', body: 'cuirass', legs: 'greaves', arms: 'gauntlets', feet: 'boots' })
     expect([...plan.binds].sort()).toEqual(kit.map((t) => `${t}-g1`).sort())
@@ -151,12 +150,12 @@ describe('the battle sheet in classes v2 (§3.3, §6.2)', () => {
     expect(row(save, 'cleric', 'Heal', 15)).toBeUndefined()
   })
 
-  it('is v2’s live, and v1’s at engine 14: Orb kinds and Heal', () => {
+  it('is v1’s at engine 14: Orb kinds and Heal; the live sheet is v16’s (H72)', () => {
     expect(row(save, 'brawler', 'Orbs', 14)?.value).toBe('Fire')
     expect(row(save, 'brawler', 'Heal', 14)?.value).toMatch(/^\d+ \(mends ×\d\.\d\d\)$/)
     expect(row(save, 'brawler', 'Orb', 14)).toBeUndefined()
     expect(row(save, 'cleric', 'Mends', 14)).toBeUndefined()
-    expect(rows(save, 'brawler')).toEqual(rows(save, 'brawler', 15))
-    expect(rows(save, 'cleric')).toEqual(rows(save, 'cleric', 15))
+    expect(rows(save, 'brawler')).toEqual(rows(save, 'brawler', 16))
+    expect(rows(save, 'cleric')).toEqual(rows(save, 'cleric', 16))
   })
 })

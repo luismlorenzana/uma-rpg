@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { applyBattleAction, battleActionsLeft, createBattle } from '../battle/engine'
 import { battleWeakness } from '../battle/skills'
 import type { BattleState } from '../battle/types'
-import { grantRpgExp, projectRpgStats, RPG_ELEMENTS, type RpgProfile } from '../rules'
+import { grantRpgExp, projectRpgStats, RPG_ELEMENTS, rpgDefaultWeapons, type RpgProfile } from '../rules'
 import { rpgCampaignChapter, rpgChapterReach, rpgNodeParents, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 import { RPG_FINALS, rpgFinals } from './finals'
 import { rpgBattleBaseExp, rpgBattleExp, rpgBattleLaurels, rpgLevelExpFactor, rpgRewardKind, rpgShardsBetween } from './rewards'
@@ -56,8 +56,9 @@ describe('generated chapters (D48)', () => {
     for (const finals of RPG_FINALS) expect(new Set(finals.routes.map((r) => r.champion.element)).size).toBe(3)
   })
 
-  it('shows more weaknesses on weaker foes and bigger shields on stronger ones, never their own element', () => {
-    const foes = ura.nodes.flatMap((n) => n.enemies)
+  it('shows more weaknesses on weaker foes and bigger shields on stronger ones, never their own element (v15; v16’s twins: twins-v16)', () => {
+    // v15's rule, which an open v15 fight still holds; from v16 (live since H72) every foe is weak to her twins.
+    const foes = rpgCampaignChapter({ scenarioId: 1001, name: 'Chapter 1', order: 1 }, cast, 15).nodes.flatMap((n) => n.enemies)
     const counts = (rank: string) => new Set(foes.filter((f) => f.rank === rank).map((f) => `${f.weaknesses.weapons.length}+${f.weaknesses.elements.length}`))
     expect([...counts('regular')].sort()).toEqual(['2+3', '3+2'])
     expect([...counts('sub-boss')]).toEqual(['2+2'])
@@ -98,10 +99,10 @@ describe('rewards (D51)', () => {
   })
 })
 
-/** An invented Lv1 party: five Brawlers with no skills. */
+/** An invented Lv1 party: five Brawlers with no skills, on the live generation's three weapons. */
 function member(id: string, level = 1): RpgProfile {
   return { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'],
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: rpgDefaultWeapons('brawler'),
     tier: 1, level, exp: 0, tree: [], legacy: [], classRank: level }
 }
 const party = ['m1', 'm2', 'm3', 'm4', 'm5'].map((id) => ({ profile: member(id), loadout: [] }))

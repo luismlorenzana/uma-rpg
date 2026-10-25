@@ -42,19 +42,16 @@ export function activeClass(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId'>
   return uma.classId ?? styleClass(outfit)
 }
 
-/** Her setup for a class: what she saved, or its default weapons with skills chosen for her and, by the generation, nothing
- * learned (to v15: five weapons, save v26's `tree`) or every tree on line A (from v16: three, save v27's `lines`, H69). */
-export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): ClassLoadout =>
-  uma.classes[classId] ?? (rpgRework('fight', engine)
-    ? { weapons: rpgDefaultWeapons(classId, engine), lines: {}, loadout: null }
-    : { weapons: rpgDefaultWeapons(classId, engine), tree: [], loadout: null })
+/** Her setup for a class: what she saved, or its three default weapons, every tree on line A and skills chosen for her
+ * (save v27, H69). */
+export const classOf = (uma: Pick<OwnedUma, 'classes'>, classId: RpgClass): ClassLoadout =>
+  uma.classes[classId] ?? { weapons: rpgDefaultWeapons(classId), lines: {}, loadout: null }
 
-/** Her setup for a class with new weapons. From v16 (save v27, H69) her equipped skills of a tree she no longer slots
- * leave her loadout, so it stays one she could hold (a loadout this empties goes back to auto); to v15 it is kept as it
- * was, and the trees she doesn't slot sit unused. */
-export function withClassWeapons(setup: ClassLoadout, weapons: readonly RpgWeapon[], engine: number = BATTLE_ENGINE_VERSION): ClassLoadout {
+/** Her setup for a class with new weapons (save v27, H69): her equipped skills of a tree she no longer slots leave her
+ * loadout, so it stays one she could hold (a loadout this empties goes back to auto). */
+export function withClassWeapons(setup: ClassLoadout, weapons: readonly RpgWeapon[]): ClassLoadout {
   const next = { ...setup, weapons: [...weapons] }
-  if (!rpgRework('fight', engine) || setup.loadout === null) return next
+  if (setup.loadout === null) return next
   const kept = setup.loadout.filter((id) => { const node = rpgNodeIdentity(id); return !!node && weapons.includes(node.weapon) })
   return { ...next, loadout: kept.length === setup.loadout.length ? [...setup.loadout] : kept.length ? kept : null }
 }

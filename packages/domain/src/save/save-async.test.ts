@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
-import { rpgDefaultWeapons } from '../rpg/rules'
+import { rpgBranchNode, rpgDefaultWeapons } from '../rpg/rules'
 import { RPG_CLASSES } from '../rpg/kinds'
 import { GEMS } from '../economy/gems'
 import { EQUIP_TYPES } from '../economy/gear'
@@ -63,8 +63,9 @@ describe('asynchronous strict save parsing (H16)', () => {
     for (const u of Object.values(w.umas)) for (const classId of RPG_CLASSES) {
       u.level = 45
       u.ranks.classes[classId] = { rank: 45, exp: 0 }
-      const weapons = rpgDefaultWeapons(classId), tree = [`${classId}-${weapons[0]}.1a`, `${classId}-${weapons[1]}.2b`]
-      u.classes[classId] = { weapons, tree, loadout: [...tree, `${classId}-${weapons[0]}.5`] }
+      // Save v27 (H72): her three, line B on her second tree, a trunk skill, her B line's depth-4 node and a depth-5 core.
+      const weapons = rpgDefaultWeapons(classId)
+      u.classes[classId] = { weapons, lines: { [weapons[1]!]: 'B' }, loadout: [`${classId}-${weapons[0]}.1`, rpgBranchNode(classId, weapons[1]!, 4, 'B'), `${classId}-${weapons[0]}.5`] }
     }
     expect(await parseSaveAsync(rawOf(s))).toEqual(parseSave(rawOf(s)))
     expect(await parseSaveAsync(rawOf(s))).toEqual(s)
@@ -153,8 +154,12 @@ describe('asynchronous strict save parsing (H16)', () => {
     older.input.version = 6; delete older.input.waves
     older.input.enemies = older.input.enemies.slice(0, 3).map((e) => { delete e.element2; delete e.twice; return e })
     older.actions = []
-    // A v6 fight's allies never carry v8's Class Rank, Might, Barrier or Regen.
-    for (const a of older.input.allies) { delete a.classRank; delete a.might; delete a.barrier; delete a.regen }
+    // A v6 fight's allies never carry v8's Class Rank, Might, Barrier or Regen, nor v16's lines and Flourish; they hold
+    // classes v1's five weapons (the live fight's three since H72), and these none of v16's skills.
+    for (const a of older.input.allies) {
+      delete a.classRank; delete a.might; delete a.barrier; delete a.regen; delete a.lines; delete a.flourish
+      a.weapons = rpgDefaultWeapons(a.classId, 6); a.loadout = []
+    }
     expect(await parseSaveAsync(v6)).toEqual(parseSave(v6))
   })
 
@@ -175,7 +180,7 @@ describe('asynchronous strict save parsing (H16)', () => {
   it('keeps strict keys, class gates, catalog ids and wear levels; never mutates the source while migrating', async () => {
     const base = party(), invalids: unknown[] = [{ ...base, extra: 1 }, { ...base, schemaVersion: SAVE_SCHEMA_VERSION + 1 }]
     const gear = rawOf(base); worldOf(gear).umas['9000000']!.gear = { locker: ['lance-g10'], equipped: { lance: 'lance-g10' }, kinds: {} }; invalids.push(gear)
-    const tree = rawOf(base); worldOf(tree).umas['9000000']!.classes.brawler = { weapons: rpgDefaultWeapons('brawler'), tree: ['brawler-greatsword.5a'], loadout: null }; invalids.push(tree)
+    const line = rawOf(base); worldOf(line).umas['9000000']!.classes.brawler = { weapons: rpgDefaultWeapons('brawler'), lines: { 'tome-fire': 'B' }, loadout: null }; invalids.push(line)
     const items = rawOf(base); worldOf(items).items.unknown = 1; invalids.push(items)
     const gem = rawOf(base); worldOf(gem).gems['gem-sun-5'] = 1; invalids.push(gem)
     for (const s of invalids) {

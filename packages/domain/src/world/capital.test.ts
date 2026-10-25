@@ -11,6 +11,7 @@ import { newSave, parseSave, type Save } from '../save/save'
 import { capitalChapter, capitalId, capitalStageIds } from './capital'
 import { stageBand, stageExpPay, stagePay, stageRegionId, worldContinent } from './world'
 import { grantRpgExp, type RpgClass } from '../rpg/rules'
+import { WEAPON_EXP_SHARE } from '../economy/ranks'
 
 const NOW = '2026-10-12T12:00:00.000Z'
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
@@ -169,7 +170,8 @@ describe('capital Finals (H15)', () => {
     expect(first.result!.members.every((m) => m.exp === Math.round(rpgBattleExp('sub-boss', 10, 10) / 2))).toBe(true)
     for (const member of first.result!.members) {
       expect(member.ranks.find((r) => r.ref.kind === 'class')!.exp).toBe(2 * member.exp)
-      expect(member.ranks.filter((r) => r.ref.kind === 'weapon').reduce((n, r) => n + r.exp, 0)).toBeCloseTo(5 * member.exp, -1)
+      // E a weapon (H64): her three share 3E since H72's switch (five shared 5E to v15).
+      expect(member.ranks.filter((r) => r.ref.kind === 'weapon').reduce((n, r) => n + r.exp, 0)).toBeCloseTo(WEAPON_EXP_SHARE * member.exp, -1)
       expect(member.ranks.filter((r) => r.ref.kind === 'armor')).toHaveLength(5)
       expect(member.ranks.filter((r) => r.ref.kind === 'armor').every((r) => r.exp === member.exp)).toBe(true)
     }

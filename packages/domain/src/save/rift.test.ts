@@ -144,8 +144,10 @@ describe('front fights (§4–§5, R4)', () => {
     expect(traces.length).toBeGreaterThan(0)
     expect(run.traces).toEqual({ iron: traces })
     expect(won.save.account.defeated).toEqual({ [captain]: won.save.account.updatedAt })
-    // Front fights pay nothing else (D168).
-    expect(world1(won.save).umas).toEqual(world1(started).umas)
+    // Front fights pay nothing else (D168); a win confirms each fighter's calling (CP29, H69).
+    const fighters = new Set(won.battle.input.allies.map((a) => a.id))
+    expect(world1(won.save).umas).toEqual(Object.fromEntries(Object.entries(world1(started).umas)
+      .map(([id, u]) => [id, fighters.has(id) ? { ...u, calling: { ...u.calling, confirmed: true } } : u])))
     expect(world1(won.save).wallet).toEqual(world1(started).wallet)
     expect(world1(won.save).rift.battle).toBeNull()
     roundTrip(won.save)
@@ -345,7 +347,7 @@ describe('riftTraces (§7)', () => {
   }
   /** Five Lv 50 Brawlers, each with `extra`. */
   const brawlers = (extra: (b: BattleInput['allies'][number]) => Partial<BattleInput['allies'][number]> = () => ({})) =>
-    [1, 2, 3, 4, 5].map((i) => { const b = balanceMember('brawler', i, 50); return { ...b, ...extra(b) } })
+    [1, 2, 3, 4, 5].map((i) => { const b = balanceMember('brawler', i, 50, { engine: 14 }); return { ...b, ...extra(b) } })
   const input = (allies: BattleInput['allies'], hp: number, atk: number): BattleInput => ({ version: 14, seed: 1, allies, enemies: [foe(hp, atk)] })
   /** `rounds` rounds of every Uma attacking the foe, or guarding the next Uma. */
   const rounds = (allies: BattleInput['allies'], kind: 'attack' | 'guard', n: number): BattleAction[] => Array.from({ length: n }, () => allies.map((a, i): BattleAction =>
@@ -387,7 +389,7 @@ describe('Ascend (tiers.md §5, R7)', () => {
       w.umas['101']!.gear = { locker: ['greatsword-g1', 'axe-g1'], equipped: { greatsword: 'greatsword-g1' }, kinds: {} }
       w.umas['102']!.gear = { locker: ['robe-g1'], equipped: { body: 'robe-g1' }, kinds: { head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' } }
       w.umas['101']!.stars = { unlocked: ['moon:hp:1'], active: ['moon:hp:1'] }
-      w.umas['101']!.classes = { brawler: { weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: [], loadout: null } }
+      w.umas['101']!.classes = { brawler: { weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: null } }
       w.gear = { 'axe-g1': 2 }
       w.work = { '103': { outfitId: '103', slot: null, entries: [], queue: [], last: null, dropped: null } }
     })

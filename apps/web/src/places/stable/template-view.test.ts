@@ -1,6 +1,6 @@
-// Her template on the Uma sheet (H70; uma-templates.md §5, UT14; class-progression.md §10.2, CP29), asked with an explicit
-// engine: nothing before v16; from it the chip, the card's readings with their sources, the Racing tab's rows, the root
-// plate's ★ line, and the calling pick card for a Pace or a Late Uma until her calling is confirmed. Invented outfits.
+// Her template on the Uma sheet (H70, live since H72; uma-templates.md §5, UT14; class-progression.md §10.2, CP29): the
+// chip, the card's readings with their sources, the Racing tab's rows, the root plate's ★ line, and the calling pick card
+// for a Pace or a Late Uma until her calling is confirmed. Invented outfits.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import type { TemplateOutfit } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
@@ -22,23 +22,15 @@ const A = outfit({ front: 'A' }, { medium: 'A', long: 'A' }, 88, 86, { stamina: 
 const open = { calling: { pick: null, confirmed: false } }
 
 describe('her template on the sheet (H70)', () => {
-  it('shows nothing before v16', () => {
-    expect(templateChip(C, open, 15)).toBeNull()
-    expect(templateCard(C, open, 'mage', 15)).toBeNull()
-    expect(racingTemplate(C, open, 'mage', 15)).toBeNull()
-    expect(rootFlourish(C, open, 'mage', 15)).toBeNull()
-    expect(callingCard(C, open.calling, 15)).toBeNull()
-  })
-
   it('names her on the chip, with a dot while an owned Uma\'s calling is open; locked outfits show it too', () => {
-    expect(templateChip(C, open, 16)).toEqual({ name: '★ Clever Spellwright', dot: true })
-    expect(templateChip(C, { calling: { pick: 'spellblade', confirmed: true } }, 16)).toEqual({ name: '★ Clever Spellfencer', dot: false })
-    expect(templateChip(C, null, 16)).toEqual({ name: '★ Clever Spellwright', dot: false })
-    expect(templateChip(A, open, 16)).toEqual({ name: '★ Tireless Ironhide', dot: false })
+    expect(templateChip(C, open)).toEqual({ name: '★ Clever Spellwright', dot: true })
+    expect(templateChip(C, { calling: { pick: 'spellblade', confirmed: true } })).toEqual({ name: '★ Clever Spellfencer', dot: false })
+    expect(templateChip(C, null)).toEqual({ name: '★ Clever Spellwright', dot: false })
+    expect(templateChip(A, open)).toEqual({ name: '★ Tireless Ironhide', dot: false })
   })
 
   it('reads the card: the three readings and their sources, then her Flourish and its state', () => {
-    expect(templateCard(C, open, 'mage', 16)).toEqual({
+    expect(templateCard(C, open, 'mage')).toEqual({
       name: 'Clever Spellwright',
       readings: [
         { label: 'Calling', value: 'Mage', source: 'Pace A, Wit 102 ≥ Power 90' },
@@ -47,13 +39,13 @@ describe('her template on the sheet (H70)', () => {
       ],
       flourish: '★ Even pace · as a Mage · on',
     })
-    expect(templateCard(C, open, 'brawler', 16)!.flourish).toBe('★ Even pace · as a Mage · no effect as Brawler')
-    expect(templateCard(C, null, null, 16)!.flourish).toBe('★ Even pace · as a Mage')
-    const picked = templateCard(C, { calling: { pick: 'spellblade', confirmed: false } }, 'spellblade', 16)!
+    expect(templateCard(C, open, 'brawler')!.flourish).toBe('★ Even pace · as a Mage · no effect as Brawler')
+    expect(templateCard(C, null, null)!.flourish).toBe('★ Even pace · as a Mage')
+    const picked = templateCard(C, { calling: { pick: 'spellblade', confirmed: false } }, 'spellblade')!
     expect(picked.readings[0]).toEqual({ label: 'Calling', value: 'Spell Blade', source: 'picked' })
     expect(picked.flourish).toBe('★ Even pace · as a Spell Blade · on')
     // A front runner's calling reads her style; the longest distance at her best grade is her stride.
-    expect(templateCard(A, open, 'brawler', 16)!.readings).toEqual([
+    expect(templateCard(A, open, 'brawler')!.readings).toEqual([
       { label: 'Calling', value: 'Brawler', source: 'Front A' },
       { label: 'Stride', value: 'Stayer', source: 'Long A' },
       { label: 'Knack', value: 'Tireless', source: 'Stamina +20%' },
@@ -61,26 +53,26 @@ describe('her template on the sheet (H70)', () => {
   })
 
   it('fills the Racing tab\'s "Her template", Active or no effect', () => {
-    expect(racingTemplate(C, open, 'mage', 16)).toEqual([
+    expect(racingTemplate(C, open, 'mage')).toEqual([
       { label: 'Calling', value: 'Mage', note: 'Pace A · Wit 102 ≥ Power 90' },
       { label: 'Stride', value: 'Middle', note: 'Medium A' },
       { label: 'Knack', value: 'Clever', note: 'Wit +20%' },
       { label: 'Flourish', value: 'Even pace', note: 'Active' },
     ])
-    expect(racingTemplate(C, open, 'brawler', 16)![3]!.note).toBe('No effect as Brawler')
-    expect(racingTemplate(C, { calling: { pick: 'spellblade', confirmed: true } }, 'spellblade', 16)![0]).toEqual({ label: 'Calling', value: 'Spell Blade', note: 'Picked' })
-    expect(racingTemplate(C, null, null, 16)![3]!.note).toBe('As a Mage')
+    expect(racingTemplate(C, open, 'brawler')![3]!.note).toBe('No effect as Brawler')
+    expect(racingTemplate(C, { calling: { pick: 'spellblade', confirmed: true } }, 'spellblade')![0]).toEqual({ label: 'Calling', value: 'Spell Blade', note: 'Picked' })
+    expect(racingTemplate(C, null, null)![3]!.note).toBe('As a Mage')
   })
 
   it('draws the root plate\'s ★ line, dimmed outside her calling\'s class', () => {
-    expect(rootFlourish(C, open, 'mage', 16)).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: null })
-    expect(rootFlourish(C, open, 'cleric', 16)).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: 'No effect as Cleric' })
+    expect(rootFlourish(C, open, 'mage')).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: null })
+    expect(rootFlourish(C, open, 'cleric')).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: 'No effect as Cleric' })
     expect(flourishLine('late-reserve')).toBe('★ Late reserve · from round 3, 2% of her max HP a round, up to 4%')
     expect(flourishLine('clean-break')).toBe('★ Clean break · a Barrier of 4% of her max HP at the start')
   })
 
   it('offers the calling pick to Pace and Late Umas, the suggested one first and marked, until it is confirmed', () => {
-    expect(callingCard(C, open.calling, 16)).toEqual({
+    expect(callingCard(C, open.calling)).toEqual({
       tiles: [
         { classId: 'mage', name: 'Clever Spellwright', flourish: '★ Even pace as a Mage', suggested: true, selected: true },
         { classId: 'spellblade', name: 'Clever Spellfencer', flourish: '★ Even pace as a Spell Blade', suggested: false, selected: false },
@@ -88,17 +80,17 @@ describe('her template on the sheet (H70)', () => {
       suggested: 'Suggested · Wit 102 over Power 90',
     })
     // Her stored pick is the one selected; the suggestion stays marked.
-    const picked = callingCard(C, { pick: 'spellblade', confirmed: false }, 16)!
+    const picked = callingCard(C, { pick: 'spellblade', confirmed: false })!
     expect(picked.tiles.map((t) => [t.classId, t.suggested, t.selected])).toEqual([['mage', true, false], ['spellblade', false, true]])
     // A Late Uma with Power over Wit: Paladin suggested, or Cleric; one with Wit, Cleric first.
-    const late = callingCard(E, undefined, 16)!
+    const late = callingCard(E, undefined)!
     expect(late.tiles.map((t) => [t.classId, t.name, t.suggested])).toEqual([['paladin', 'Mighty Warden', true], ['cleric', 'Mighty Mender', false]])
     expect(late.suggested).toBe('Suggested · Power 104 over Wit 88')
-    expect(callingCard(F, open.calling, 16)!.tiles.map((t) => [t.classId, t.flourish])).toEqual([
+    expect(callingCard(F, open.calling)!.tiles.map((t) => [t.classId, t.flourish])).toEqual([
       ['cleric', '★ Clean break as a Cleric'], ['paladin', '★ Clean break as a Paladin']])
     // Confirmed: the card is gone. A front runner has no pick.
-    expect(callingCard(C, { pick: 'spellblade', confirmed: true }, 16)).toBeNull()
-    expect(callingCard(C, { pick: null, confirmed: true }, 16)).toBeNull()
-    expect(callingCard(A, open.calling, 16)).toBeNull()
+    expect(callingCard(C, { pick: 'spellblade', confirmed: true })).toBeNull()
+    expect(callingCard(C, { pick: null, confirmed: true })).toBeNull()
+    expect(callingCard(A, open.calling)).toBeNull()
   })
 })

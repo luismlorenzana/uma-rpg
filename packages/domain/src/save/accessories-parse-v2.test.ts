@@ -19,8 +19,8 @@ function wearing(equipped: Record<string, string>): Save {
 const parsed = (save: Save) => parseSave(JSON.parse(JSON.stringify(save)))
 
 describe('typed accessory slots in a save, with classes v2 live (H57)', () => {
-  it('runs with the switch at 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(15)
+  it('runs with the switch at 16 (H72; the slots are classes v2’s since H61)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
     expect(ACCESSORY_SLOT_LABEL).toEqual({ 'accessory-1': 'Damage', 'accessory-2': 'Support' })
   })
 

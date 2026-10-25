@@ -1,8 +1,9 @@
 // Tier 1's foes on engine v16 (H66, D202; class-progression.md §4.1, §4.4): every foe of every rank is weak to her twins
 // (CP5), the sub-boss's and the boss's shields are `RPG_FOE_SHIELDS_V16`'s (CP8, SB6; H71 measured today's 6 and 8, D207),
-// and nothing else moves. v15's generation stays
-// byte for byte today's, whatever the switch says: the digests below were taken on the generators before this change.
+// and nothing else moves; live since H72 (D210), so the generators give v16's foes by default. v15's generation stays
+// byte for byte as it was, whatever the switch says: the digests below were taken on the generators before H66.
 import { describe, expect, it } from 'vitest'
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import type { BattleEnemy } from '../rpg/battle/types'
 import { rpgCampaignChapter, type RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { RPG_FOE_SHIELDS_V16, RPG_FOE_TUNING, rpgFoeShields } from '../rpg/campaign/enemies'
@@ -10,6 +11,10 @@ import {
   RPG_ELEMENTS, RPG_KIND_PAIRS, RPG_TWIN_SET_IDS, RPG_TWIN_SETS, rpgAnsweredTwinSets, rpgElementWeakness, rpgTwinArm, rpgTwinsOf,
   type RpgElement,
 } from '../rpg/kinds'
+import { RIFT_FRONT_SPECS, riftGuidedBuild, riftTuning } from '../rift/fronts'
+import { riftFight } from '../rift/generate'
+import { packRoster } from '../rift/roster.fixture'
+import { RIFT_FRONTS } from '../rift/state'
 import { capitalChapter } from './capital'
 import { regionChapter, worldContinent } from './world'
 
@@ -131,6 +136,23 @@ describe('Tier 1’s foes on v16 (D202)', () => {
         if (foe.rank !== 'regular') expect(foe.shield).toBe(foe.rank === 'boss' ? 8 : 6)
       }
     }
+  })
+})
+
+describe('the foe generators live (H72, D210)', () => {
+  it('generate v16’s foes by default', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
+    const w1 = worldContinent({ name: 'T', order: 1 })
+    for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 16))
+    expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 16))
+    expect(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast)).toEqual(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast, 16))
+    expect(rpgFoeShields()).toEqual(RPG_FOE_SHIELDS_V16)
+    const ctx = { tier: 1, runId: 't1-r1', roster: packRoster(), defeated: new Set<string>() }
+    for (const front of ['duel', 'horde'] as const) {
+      expect(riftFight(ctx, { kind: 'front', front, stage: 3 })).toEqual(riftFight(ctx, { kind: 'front', front, stage: 3 }, 16))
+    }
+    expect(riftTuning()).toBe(riftTuning(16))
+    for (const front of RIFT_FRONTS) expect(RIFT_FRONT_SPECS[front].build).toEqual(riftGuidedBuild(front, 16))
   })
 })
 

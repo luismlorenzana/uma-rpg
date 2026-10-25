@@ -1,5 +1,5 @@
 // Battle rules over the save (S3, D86, D102): classes, their weapons and skills, the world's fights and their rewards. A
-// win fills four bars: Uma Level, the Class Rank she fought as, her five weapons' and her five armor kinds' ranks, and her
+// win fills four bars: Uma Level, the Class Rank she fought as, her three weapons' and her five armor kinds' ranks, and her
 // accessories' kinds (D124). Pure
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
 // docs/design/class-rework.md, docs/design/progression.md.
@@ -15,7 +15,7 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  forgetRpgVariant, grantRpgExp, learnRpgNode, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgClassWeapons, rpgLineOf,
+  grantRpgExp, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgClassWeapons, rpgLineOf,
   rpgPicksWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef,
   type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
@@ -53,21 +53,17 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
 
 // --- Classes (D86) ---------------------------------------------------------------------------------------------------
 
-/** Her battle profile as a class (the active one by default); its Class Rank opens the depths (D102). By the live
- * generation: to v15 the side skills she learned (save v26's `tree`); from v16 none, and her line on each of her class's
- * trees (save v27's `lines`, H69). */
+/** Her battle profile as a class (the active one by default); its Class Rank opens the depths and ranks her skills (D102,
+ * CP25). No side skills (engine v16): her line on each of her class's trees (save v27's `lines`, H69). */
 export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {
   const growth = (key: keyof BattleOutfit['growthRatePercents']) => Math.min(1, Math.max(0, outfit.growthRatePercents[key] / 100))
   const setup = classOf(uma, classId)
-  const v16 = rpgRework('fight')
   return {
     outfitId: outfit.outfitId,
     baseStats: { ...outfit.baseStats },
     growthRates: { speed: growth('speed'), stamina: growth('stamina'), power: growth('power'), guts: growth('guts'), wit: growth('wit') },
-    classId, weapons: [...setup.weapons], tier, level: uma.level, exp: uma.exp,
-    tree: v16 ? [] : (setup.tree ?? []).map((id) => ({ tier, id })), legacy: [],
-    classRank: classRankOf(uma.ranks, classId),
-    ...(v16 ? { lines: { ...setup.lines } } : {}),
+    classId, weapons: [...setup.weapons], tier, level: uma.level, exp: uma.exp, tree: [], legacy: [],
+    classRank: classRankOf(uma.ranks, classId), lines: { ...setup.lines },
   }
 }
 
@@ -130,40 +126,6 @@ export function holdWeapon(save: Save, outfitId: string, classId: RpgClass, slot
   return next
 }
 
-/** What `learnSkill` and `forgetSkill` say from v16: nothing is learned, and every node on her path is hers at its Class
- * Rank (CP14). */
-export const SKILLS_BY_RANK = 'Skills open with Class Rank'
-
-/** Learns a side skill. With skills she picked herself, a new one goes straight into a free slot. Refused from v16 (H69),
- * which has no side skills. */
-export function learnSkill(save: Save, outfit: BattleOutfit, classId: RpgClass, nodeId: string, now: string, tier = TIER_ONE): Save {
-  const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
-  if (rpgRework('fight')) throw new SaveRuleError('cannot-learn', SKILLS_BY_RANK)
-  let profile: RpgProfile
-  try {
-    profile = learnRpgNode(umaProfile(outfit, uma, Number(tier), classId), nodeId)
-  } catch (err) {
-    throw new SaveRuleError('cannot-learn', err instanceof Error ? err.message : 'cannot learn that')
-  }
-  const current = classOf(uma, classId)
-  const loadout = current.loadout !== null && current.loadout.length < rpgActiveSlots(uma.level) ? [...current.loadout, nodeId] : current.loadout
-  return withClass(save, outfit.outfitId, classId, { ...current, tree: profile.tree.map((r) => r.id), loadout }, now, tier)
-}
-
-/** Swaps out a learned side skill: its points come back and it leaves the loadout. Refused from v16 (H69). */
-export function forgetSkill(save: Save, outfit: BattleOutfit, classId: RpgClass, nodeId: string, now: string, tier = TIER_ONE): Save {
-  const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
-  if (rpgRework('fight')) throw new SaveRuleError('cannot-learn', SKILLS_BY_RANK)
-  let profile: RpgProfile
-  try {
-    profile = forgetRpgVariant(umaProfile(outfit, uma, Number(tier), classId), nodeId)
-  } catch (err) {
-    throw new SaveRuleError('cannot-learn', err instanceof Error ? err.message : 'cannot swap that out')
-  }
-  const current = classOf(uma, classId)
-  return withClass(save, outfit.outfitId, classId, { ...current, tree: profile.tree.map((r) => r.id), loadout: current.loadout?.filter((id) => id !== nodeId) ?? null }, now, tier)
-}
-
 /** Sets a class's equipped skills, in order, or null to have them chosen for her. Every id must be a skill she knows. */
 export function equipSkills(save: Save, outfit: BattleOutfit, classId: RpgClass, loadout: readonly string[] | null, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
@@ -177,17 +139,14 @@ export function equipSkills(save: Save, outfit: BattleOutfit, classId: RpgClass,
 
 // --- Lines and the calling (save v27, H69: from v16, the Tier rework's fight) -----------------------------------------
 
-/** What `pickBranch` says before v16. */
-export const NO_BRANCHES = 'No branches yet'
 /**
  * Takes line `branch` on one of her class's trees (CP14, CP18; save v27's `lines`): any kind of her class, slotted or
  * not, B listed and A absent. Free and at any time (an open fight's input is frozen). Her equipped skills of that tree
  * follow in place (`rpgSwapBranchLoadout`, CP23: with Rend equipped, Combo puts Rending Combo in its slot); a pick she
- * already has changes nothing. Refused before v16.
+ * already has changes nothing.
  */
 export function pickBranch(save: Save, outfit: BattleOutfit, classId: RpgClass, weapon: RpgWeapon, branch: RpgBranch, now: string, tier = TIER_ONE): Save {
   const uma = ownedOf(worldOf(save, tier), outfit.outfitId)
-  if (!rpgRework('fight')) throw new SaveRuleError('cannot-learn', NO_BRANCHES)
   if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
   if (!rpgClassWeapons(classId).includes(weapon)) throw new SaveRuleError('cannot-learn', 'Not in this class’s trees')
   if (branch !== 'A' && branch !== 'B') throw new SaveRuleError('cannot-learn', 'No such line')
@@ -200,8 +159,6 @@ export function pickBranch(save: Save, outfit: BattleOutfit, classId: RpgClass, 
   return withClass(save, outfit.outfitId, classId, { ...current, lines, loadout }, now, tier)
 }
 
-/** What `pickCalling` and `confirmCalling` say before v16. */
-export const NO_CALLING_PICK = 'No calling pick yet'
 /** What `pickCalling` says for a class outside her two. */
 export const NOT_HER_PICK = 'Not one of her two'
 /**
@@ -209,18 +166,17 @@ export const NOT_HER_PICK = 'Not one of her two'
  * Uma with no pick or a confirmed one (`umaCallingPickBlock`). Stored unconfirmed: she can change it until she confirms
  * it or wins a fight. At Uma Lv 1, her start, it also moves her class to the pick while she still fights as her start
  * (her previous calling's class, or no class chosen yet), and her five armor kinds to the pick's half when she wears no
- * armor piece. Above Lv 1 only her calling moves; she switches class freely as ever. Refused before v16.
+ * armor piece. Above Lv 1 only her calling moves; she switches class freely as ever.
  */
 export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfit.outfitId)
-  if (!rpgRework('fight')) throw new SaveRuleError('bad-class', NO_CALLING_PICK)
   const block = umaCallingPickBlock(outfit, uma.calling)
   if (block) throw new SaveRuleError('bad-class', block)
   if (!umaCallingPick(outfit)!.options.includes(pick)) throw new SaveRuleError('bad-class', NOT_HER_PICK)
   let next: OwnedUma = { ...uma, calling: { pick, confirmed: false } }
   if (uma.level === 1) {
-    if (uma.classId === null || activeClass(outfit, uma) === umaCalling(outfit, uma.calling?.pick)) next = { ...next, classId: pick }
+    if (uma.classId === null || activeClass(outfit, uma) === umaCalling(outfit, uma.calling.pick)) next = { ...next, classId: pick }
     const gear = gearV1(uma)
     if (!isGrades(uma.gear) && !ARMOR_SLOTS.some((slot) => gear.equipped[slot])) next = { ...next, gear: { ...gear, kinds: startingArmorKinds(pick) } }
   }
@@ -228,20 +184,19 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
 }
 
 /** Confirms her calling, the card's Confirm (CP29): her pick, or her pre-selection when she has none, is final. Nothing
- * changes when it already is. Refused before v16. */
+ * changes when it already is. */
 export function confirmCalling(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
-  if (!rpgRework('fight')) throw new SaveRuleError('bad-class', NO_CALLING_PICK)
-  if (uma.calling?.confirmed) return save
+  if (uma.calling.confirmed) return save
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: callingConfirmed(uma) } }, now)
 }
 
-/** She after a won fight (CP29: her first win confirms her calling): from v16 her calling confirmed, the pick (or none)
- * kept, on every Uma (a fixed row's confirmed calling changes nothing); to v15 as she is, since save v26 holds none. */
+/** She after a won fight (CP29: her first win confirms her calling): her calling confirmed, the pick (or none) kept, on
+ * every Uma (a fixed row's confirmed calling changes nothing). */
 export function callingConfirmed(uma: OwnedUma): OwnedUma {
-  if (!rpgRework('fight') || uma.calling?.confirmed) return uma
-  return { ...uma, calling: { pick: uma.calling?.pick ?? null, confirmed: true } }
+  if (uma.calling.confirmed) return uma
+  return { ...uma, calling: { pick: uma.calling.pick, confirmed: true } }
 }
 
 /** Every stat point she brings to a fight: her active Extra Stats nodes (S6) and her armor (S7, D104). */
@@ -314,7 +269,7 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
  * row's calling. Read from the template's two parts (`umaTemplate(outfit, pick)`'s `calling` and `flourish`), so its name
  * tables stay out of the main bundle. */
 export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' | 'calling'>, classId: RpgClass = activeClass(outfit, uma),
-  pick: RpgClass | null = uma.calling?.pick ?? null): RpgFlourish | null {
+  pick: RpgClass | null = uma.calling.pick): RpgFlourish | null {
   return umaFlourishActive({ calling: umaCalling(outfit, pick) }, classId) ? STRIDE_FLOURISH[umaStride(outfit)] : null
 }
 
@@ -329,7 +284,7 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const uma = ownedOf(world, id)
     const classId = activeClass(outfit, uma)
     // Her Flourish by her stored calling pick (save v27, H69): a Pace Uma who picked the Spell Blade has it as one.
-    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling?.pick ?? null) : null
+    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling.pick) : null
     const gearTier = Number(tier) as GearTier
     const weapons = classOf(uma, classId).weapons
     const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),

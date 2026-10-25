@@ -28,6 +28,9 @@ Break (D107): 24 in all, with the Paladin Bastion's four (classes v2 §5, D181, 
 - **Her offense** (C3): an inherited Limit Break hits with the higher of her ATK and M.ATK, whatever its kinds, and its
   kinds still decide weaknesses and locks. A Mage can carry an Arms Limit Break to Break a foe weak only to Arms. A
   Hero's own Limit Break hits with each kind's own offense.
+- **Her coverage** (CP28, engine v16): with three weapons, her two Heroes are the deliberate way to reach a twin set her
+  weapons miss. A seat in the hall reads the sets its Limit Break answers ("Answers Fire · Light"), and the Learner
+  picker the sets a seat would add to hers ("Adds Light, Dark, Twilight").
 - **Bond EXP:** every won fight, replays and Sweeps included, raises her Bond with each of her Heroes. A Bond is kept
   when she leaves a Hero, so returning picks up where she was. On first clears alone, a Learner bonds fully with two
   Heroes by about Lv 23 and with four by Lv 50.
@@ -40,7 +43,10 @@ Charge Barriers every Uma, and Valkyrie Lances raises the first fallen. A mend o
 max HP, × the caster's healing scale ([combat](combat.md#support)) and the cast's strength; the cleanse and the revive
 land at any strength. When the Paladin came (save v25), the
 Chapel's seats 3 and 4, Archangel's Verdict and Archdemon's Pact, moved to the Bastion's seats 1 and 2 with their
-Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and Frost Sanctuary.
+Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and Frost Sanctuary. Since engine v16
+(CP35), so each hall's seats point at different twin sets, **Rampart Charge** charges with an Axe (it was a Greatsword)
+and **Choir of Angels** strikes with Light, then Lightning (it was Light twice). Limit Breaks don't rank: their power
+follows her open depth, never her Skill Ranks.
 
 <!-- live:heroes -->
 | Hall | Seat | Limit Break | Kinds | What it does | Casts |
@@ -57,7 +63,7 @@ Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and F
 | Spell Blade Salle (Spell Blade) | 2 | Rimefang Waltz | katana, ice | Six Katana-and-Ice cuts on one foe | 6 hits on one foe |
 | Spell Blade Salle (Spell Blade) | 3 | Thunder Javelin | lance, lightning | Four Lance-and-Lightning throws at random foes | 4 hits on random foes |
 | Spell Blade Salle (Spell Blade) | 4 | Eclipse Volley | bow, light, dark | Bow volleys on every foe, one of Light, one of Dark | 2 hits on every foe |
-| Cleric Chapel (Cleric) | 1 | Choir of Angels | light | Light on every foe twice, then Aegis 2 on every ally | 2 hits on every foe + aegis 2 on every ally |
+| Cleric Chapel (Cleric) | 1 | Choir of Angels | light, lightning | Light on every foe, then Lightning on every foe, then Aegis 2 on every ally | 2 hits on every foe + aegis 2 on every ally |
 | Cleric Chapel (Cleric) | 2 | Legion of Demons | dark | Hex on every foe, then eight Dark claws at random foes | hex 1 on every foe; 8 hits on random foes |
 | Cleric Chapel (Cleric) | 3 | Dawn Hymn | fire | Fire on every foe, then a mend on every ally | 1 hit on every foe + a mend on every ally |
 | Cleric Chapel (Cleric) | 4 | Frost Sanctuary | ice | Ice on every foe, then a cleanse and a Barrier on every ally | 1 hit on every foe + a Barrier on every ally + a cleanse |
@@ -67,7 +73,7 @@ Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and F
 | Summoner Circle (Summoner) | 4 | Moon Fox | katana, dark, bow, light | Eight strikes at random foes: Katana, Dark, Bow and Light in turn | 8 hits on random foes |
 | Paladin Bastion (Paladin) | 1 | Archangel’s Verdict | greatsword, light | A Greatsword-and-Light judgment on one foe, then Brave and Faith 2 on every ally | 1 hit on one foe + brave 2 on every ally; faith 2 on every ally |
 | Paladin Bastion (Paladin) | 2 | Archdemon’s Pact | katana, dark | Armor Break and Mind Break 3 on one foe, then three Katana-and-Dark rends | armor-break 3 on the foe; mind-break 3 on the foe; 3 hits on one foe |
-| Paladin Bastion (Paladin) | 3 | Rampart Charge | greatsword | One Greatsword charge on one foe, then a Barrier on every ally | 1 hit on one foe + a Barrier on every ally |
+| Paladin Bastion (Paladin) | 3 | Rampart Charge | axe | One Axe charge on one foe, then a Barrier on every ally | 1 hit on one foe + a Barrier on every ally |
 | Paladin Bastion (Paladin) | 4 | Valkyrie Lances | lance | Four Lance hits at random foes, then the first fallen ally rises | 4 hits on random foes + the first fallen rises |
 
 | Setting | Value |
@@ -88,6 +94,8 @@ Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and F
 - Engine v15 (D181): the six halls' 24, the hybrids' power at 2.2×, a hall Limit Break's support at its cast's
   strength, and a Learner's hits at her higher offense. Fights from v10–v14 replay with the five halls' twenty
   (`heroLimitFor(id, version)`).
+- Engine v16 (D201): Rampart Charge's Axe and Choir of Angels' Lightning (`heroLimitFor(id, 16)`). Fights from v15
+  replay with the Greatsword and Light twice.
 - Every-foe hits and splashes deal the area share (0.55 a foe); random hits get the 1.05 bonus, as skills do.
 - A cast with no hits only casts its status (the Legion of Demons hexes every foe before its claws land).
 - Auto (`rpg/battle/auto.ts`) fires a Hero's own Limit Break, and a Learner's strongest Bond.

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-22; save v26, engine v15 (independent party leads, D190).** The full running-system reference is
+> **Status: current, 2026-10-25; save v27, engine v16 (the Tier rework's fight, R1, D210).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -28,9 +28,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
   levels, per-Uma work rows (SC3), targets, Hall of Heroes seats and its Rift: runs (with each front's traces and the
   open Convergence attempt), Echo wins, the open Rift fight (replayed like the world map's) and its fight count (D161,
   D171).
-- An Uma keeps `classId` and per-class `classes` (five weapons, learned sides, loadout) for six classes, her Craft
-  Level, ranks, Extra Stats, bound gear (a Damage and a Support accessory slot) and Bonds. There are no active
-  `build`/`builds` keys (D86).
+- An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for six classes, her calling pick
+  (`calling`, D205), her Craft Level, ranks, Extra Stats, bound gear (a Damage and a Support accessory slot) and Bonds.
+  There are no active `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
   runs retired in v11 (D72).
 - Wallet shortcuts are `timeTickets` and `sweepTickets` (D74); tokens live in item stock.
@@ -54,8 +54,10 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v23 empty account achievements and tier history, and an empty Rift in each world | D163 |
 | v24 no defeated faces, no open Rift fight (count 0), and each run without traces or an open Convergence attempt | D171 |
 | v25 classes v2: Cleric progress copied to the Paladin, v2's weapon slots, the Chapel's seats 3–4 to the Bastion, typed accessory slots | D180, D188 |
+| v26 each party's independent lead | D190 |
+| v27 the Tier rework's fight: three default weapons a class, side skills to lines, the loadout pruned, every Uma's calling pick open; open v15 fights replay on v15 | D205, D210 |
 
-`parseSave` accepts v1–v25 and returns v25; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v27 and returns v27; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in
@@ -66,9 +68,9 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v15 (classes v2, D179–D188), every older version replaying as it was; v16, the Tier rework's fight, built behind `rpgRework` (D200), live from H72, with the base MP regen and the Flourish (D204); `caps.ts` holds the switch |
-| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules; from v16 (dark until H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
-| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v16's twins and Tier 1's shields built dark (D202), live from H72 |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v16, the Tier rework's fight (D200, live since H72, D210), with the base MP regen and the Flourish (D204), on classes v2's (D179–D188); every older version replaying as it was; `caps.ts` holds the switch and `rpgRework` |
+| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
+| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v16's twins and Tier 1's shields (D202), live since H72 |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
 | `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |
 

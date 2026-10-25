@@ -100,12 +100,10 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
             <span className="font-semibold">{CLASS_LABEL[view.root.classId]}</span>
             <span className="text-ink-soft">· {handLine(view.root.classId, view.root.hand)}</span>
           </p>
-          {flourish && (
-            <p className="mt-0.5 text-[11.5px] leading-snug">
-              <span className={flourish.off ? 'text-ink-faint opacity-60' : 'font-semibold text-accent'}>{flourish.line}</span>
-              {flourish.off && <span className="block text-[11px] text-ink-faint">{flourish.off}</span>}
-            </p>
-          )}
+          <p className="mt-0.5 text-[11.5px] leading-snug">
+            <span className={flourish.off ? 'text-ink-faint opacity-60' : 'font-semibold text-accent'}>{flourish.line}</span>
+            {flourish.off && <span className="block text-[11px] text-ink-faint">{flourish.off}</span>}
+          </p>
         </div>
         <ClassPicker uma={uma} classId={classId} onPick={switchTo} />
         <div>

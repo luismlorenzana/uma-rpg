@@ -1,7 +1,7 @@
-// The Skills tab from engine v16 (H70; class-progression.md §6.1, §6.2, CP23, CP32), with the one switch mocked to 16 in this
-// file of its own (H64's `capsAt`): three weapon tabs, a tree a slot with its trunk and fork, her branch filled and the
-// other dimmed, a closed depth faded with its gate, five rank pips, and the branch sheet's "Take branch A" calling the
-// save's `pickBranch`. Invented outfits; the store is the real one, holding a test save.
+// The Skills tab from engine v16 (H70, live since H72; class-progression.md §6.1, §6.2, CP23, CP32): three weapon tabs, a
+// tree a slot with its trunk and fork, her branch filled and the other dimmed, a closed depth faded with its gate, five rank
+// pips, and the branch sheet's "Take branch A" calling the save's `pickBranch`. Invented outfits; the store is the real one,
+// holding a test save.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { configureKit, MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
 import { BATTLE_ENGINE_VERSION, newOwnedUma, newSave, rpgNode, withTrack, worldOf, type Save } from '@rpg/domain'
@@ -14,8 +14,6 @@ import { albumFixture } from '../../album/testing'
 import { resetGame, useGame } from '../../save/game'
 import { SkillsPage } from './SkillsPage'
 
-vi.mock('../../../../../packages/domain/src/rpg/battle/caps', async (orig) =>
-  (await import('../../../../../packages/domain/src/rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 vi.mock('@rpg/domain/battle', async (orig) => {
   const actual = await orig<typeof import('@rpg/domain/battle')>()
   return { ...actual, pickBranch: vi.fn(actual.pickBranch) }

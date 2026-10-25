@@ -1,9 +1,10 @@
 // v6–v15 fights replay exactly, whatever the Tier rework builds (H64, D200): the frozen fixture's v15 fights, generated on
-// the engine before H64, replayed under the live engine. The switch stays at 15 until H72, so every rule's default reads
-// classes v2; `v15-replays-live16.test.ts` replays them with the switch mocked to 16, where a rules call in the engine
-// that leaned on its default instead of the fight's version would move them.
+// the engine before H64, replayed under the live engine. Since H72 (D210) the live switch is 16, so every rule's default
+// reads the Tier rework's fight (three weapons, the Summoner's Arms hand 0.50): a rules call in the engine that leaned on
+// its default instead of the fight's version would move them. (Until H72 a twin file replayed them with `caps.ts` mocked
+// to 16; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
-import { RPG_ALL_CLASSES } from '../rules'
+import { RPG_ALL_CLASSES, RPG_CLASS_SLOTS, RPG_WEAPON_SLOTS, rpgHand } from '../rules'
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, rpgRework, rpgV2 } from './engine'
 import type { BattleAction, BattleCue } from './types'
 import { loadV15Replays, regenerateV15Replays, replayV15, type V15Replay } from './v15-replays.fixture'
@@ -23,10 +24,12 @@ const halves = (a: BattleAction): string[] =>
   a.kind === 'guard' || a.kind === 'limit' ? [] : [...(a.kind === 'skill' ? [a.skill.id] : []), ...(a.pair?.skill ? [a.pair.skill.id] : [])]
 
 describe('the frozen v15 replays (H64)', () => {
-  it('runs on the live switch, engine v15, with the Tier rework dark', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(15)
-    expect(rpgV2()).toBe(true)
-    expect(rpgRework('fight')).toBe(false)
+  it('runs with the Tier rework’s fight live (H72)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
+    expect([rpgV2(), rpgRework('fight'), rpgRework('economy')]).toEqual([true, true, false])
+    expect(RPG_WEAPON_SLOTS).toBe(3)
+    expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)
+    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.58 })
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {

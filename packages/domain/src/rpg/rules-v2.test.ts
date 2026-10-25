@@ -1,5 +1,6 @@
 // Class rules by generation (H53, D179): classes v1 to engine v14, classes v2 from v15, the live game on the switch's
-// default (15 since H61, D188). Every v1 row is the old game's exactly; the v2 rows are classes-v2.md §3's.
+// default (15 since H61, D188; 16, the Tier rework's fight, since H72, D210, whose rows are `rules-v16.test.ts`'s). Every v1
+// row is the old game's exactly; the v2 rows are classes-v2.md §3's.
 import { describe, expect, it } from 'vitest'
 import { RPG_ALL_NODES, RPG_NODES, rpgNode } from './catalog'
 import { ALL_HERO_LIMIT_IDS, hallClass, HERO_HALLS, HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitPower,
@@ -15,8 +16,8 @@ const V1 = 14, V2 = 15
 const FIVE: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 
 describe('the one switch (D179)', () => {
-  it('is on engine 15 since H61 (D188), with classes v2 from 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(15)
+  it('is on engine 16 since H72 (D210), with classes v2 from 15', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(16)
     expect(RPG_V2_ENGINE).toBe(15)
     expect([rpgV2(), rpgV2(14), rpgV2(15)]).toEqual([true, false, true])
     expect(BATTLE_HEAL_OFFENSE_SCALE).toBe(300)
@@ -42,7 +43,8 @@ describe('class rules by generation (D179)', () => {
       summoner: [T, T, T, A, A], paladin: [A, A, A, T, T] }
     for (const c of RPG_ALL_CLASSES) expect(rpgClassSlots(c, V1), c).toEqual(v1[c])
     for (const c of RPG_ALL_CLASSES) expect(rpgClassSlots(c, V2), c).toEqual(c === 'cleric' ? [T, T, T, A, A] : v1[c])
-    expect(RPG_CLASS_SLOTS).toEqual(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassSlots(c, V2)])))
+    // The live slots are the live generation's (v16's three since H72).
+    expect(RPG_CLASS_SLOTS).toEqual(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassSlots(c)])))
     expect(RPG_CLASS_ARMOR.paladin).toBe('physical')
   })
 
@@ -69,10 +71,10 @@ describe('class rules by generation (D179)', () => {
     expect(rpgDefaultWeapons('paladin', V1)).toEqual(rpgDefaultWeapons('paladin', V2))
     for (const c of ['brawler', 'mage', 'spellblade', 'summoner'] as const) expect(rpgDefaultWeapons(c, V2), c).toEqual(today[c])
     for (const c of RPG_ALL_CLASSES) for (const v of [V1, V2]) expect(validRpgWeapons(c, rpgDefaultWeapons(c, v), v), `${c} v${v}`).toBe(true)
-    // A fresh copy each time.
+    // A fresh copy each time (the live generation's three since H72).
     const spread = rpgDefaultWeapons('brawler')
     spread.pop()
-    expect(rpgDefaultWeapons('brawler')).toHaveLength(5)
+    expect(rpgDefaultWeapons('brawler')).toHaveLength(3)
   })
 
   it('gives the leans: today’s in v1; the mirrored hybrids, the Paladin and no Heal in v2', () => {
@@ -117,7 +119,6 @@ describe('class rules by generation (D179)', () => {
     for (const c of FIVE) {
       const t = today[c as keyof typeof today]
       expect(rpgHand({ classId: c }, V1), c).toEqual({ ...t, arms: t.power, tome: t.power })
-      expect(rpgHand({ classId: c }), c).toEqual(rpgHand({ classId: c }, V2))
     }
     expect(rpgHand({ classId: 'spellblade' }, V2)).toEqual({ power: 0.72, arms: 0.72, tome: 0.44, mp: 0.5, linger: 0, pair: true })
     expect(rpgHand({ classId: 'summoner' }, V2)).toEqual({ power: 0.58, arms: 0.56, tome: 0.58, mp: 0.5, linger: 0.3, pair: true })
@@ -127,7 +128,7 @@ describe('class rules by generation (D179)', () => {
 })
 
 describe('the Paladin as an identity (D179)', () => {
-  it('has hero seats from v15: 24 in all and live, 20 in v14; the Paladin Bastion; her power; v15’s Limit Breaks live, v1’s in v14', () => {
+  it('has hero seats from v15: 24 in all and live, 20 in v14; the Paladin Bastion; her power; the live Limit Breaks, v1’s in v14', () => {
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(24)
     expect(HERO_LIMIT_IDS).toEqual(ALL_HERO_LIMIT_IDS)
     expect([isHeroLimitId('paladin-1'), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([true, false, true])
@@ -137,7 +138,8 @@ describe('the Paladin as an identity (D179)', () => {
     expect(HERO_LIMIT_POWER.paladin).toBe(1.5)
     // v15's table and powers (H56) are `rpg/battle/halls-v15.test.ts`'s.
     for (const c of RPG_ALL_CLASSES) expect(heroLimitPower(c, V2)).toBe(HERO_LIMIT_POWER[c])
-    for (const l of HERO_LIMITS) expect(heroLimitFor(l.id, V2)).toEqual(heroLimit(l.id))
+    // The live table is the live generation's: v16's since H72 (two kinds moved, `halls-v15.test.ts`).
+    for (const l of HERO_LIMITS) expect(heroLimitFor(l.id, BATTLE_ENGINE_VERSION)).toEqual(heroLimit(l.id))
     expect(heroLimitFor('paladin-1', V1)).toBeUndefined()
     expect(HERO_LIMITS).toHaveLength(24)
   })
@@ -157,7 +159,7 @@ describe('the Paladin as an identity (D179)', () => {
     expect(rpgNode('paladin-greatsword.1a')?.classId).toBe('paladin')
   })
 
-  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, Heavy Devotion, Valkyrie’s Oath, no v14 support', () => {
+  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, Valkyrie’s Oath, no v14 support', () => {
     for (const n of RPG_ALL_NODES.filter((x) => x.classId === 'paladin')) {
       const twin = rpgNode(n.id.replace('paladin-', 'cleric-'))!
       // Both have v15's support (H56, `rpg/battle/healers-v15.test.ts`); only the Cleric has v14's.
@@ -167,7 +169,9 @@ describe('the Paladin as an identity (D179)', () => {
       expect([n.skill.support, support15 && 'v15'], n.id).toEqual([undefined, 'v15'])
       const to = n.weapon === 'axe' && n.depth === 4 ? 'foes' : kit.status!.to
       expect(own, n.id).toEqual({ ...kit, status: { ...kit.status!, to } })
-      const name = n.id === 'paladin-tome-light.3b' ? 'Heavy Devotion' : n.id === 'paladin-lance.4b' ? "Valkyrie's Oath" : twin.name
+      // Names are the live generation's: since H72 Valkyrie's Oath is her Light 3B (CP37; v15's was her Lance 4B, with
+      // her Light 3B Heavy Devotion), and her Lance 4B is Heavy Transfix, as the Cleric's.
+      const name = n.id === 'paladin-tome-light.3b' ? "Valkyrie's Oath" : twin.name
       expect(n.name, n.id).toBe(name)
     }
     expect(rpgNode('cleric-tome-light.3b')?.name).toBe('Rebirth')

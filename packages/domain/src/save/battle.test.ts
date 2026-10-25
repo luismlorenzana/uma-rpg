@@ -4,7 +4,7 @@ import { applyBattleAction, battleActionsLeft } from '../rpg/battle/engine'
 import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
-  actInFight, activeClass, chooseClass, classOf, equipSkills, forgetSkill, learnSkill, openFightOf, retreat, setActiveParty, setClassWeapons,
+  actInFight, activeClass, chooseClass, classOf, equipSkills, openFightOf, retreat, setActiveParty, setClassWeapons,
   settleFight, startFight, startingClass, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
 import { umaBattleSheet } from './sheet'
@@ -69,21 +69,23 @@ describe('classes (D86)', () => {
     const uma = worldOf(save).umas['102']!
     expect(activeClass(OUTFITS.get('102')!, uma)).toBe('mage')
     expect(activeClass(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('summoner')
-    // Her starting class, the one her armor follows at unlock (D160 §7).
+    // Her starting class, the one her armor follows at unlock (D160 §7): from v16 her calling (Power = Wit here).
     expect((['front', 'pace', 'late', 'end'] as const).map((s) => startingClass(outfit('x', s)))).toEqual(['brawler', 'mage', 'cleric', 'summoner'])
     const switched = chooseClass(save, '102', 'cleric', T(3))
     expect(activeClass(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('cleric')
     const profile = umaProfile(o101, worldOf(save).umas['101']!, 1)
-    expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], level: 1, tree: [] })
+    expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'axe', 'lance'], level: 1, tree: [], lines: {} })
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
-    // A Cleric and a Summoner pick three Tomes and two Arms, a Paladin three Arms and two Tomes (classes v2); a Brawler's five
-    // are fixed.
-    const picked = setClassWeapons(save, '101', 'cleric', ['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'], T(4))
-    expect(classOf(worldOf(picked).umas['101']!, 'cleric').weapons).toEqual(['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'])
-    expect(() => setClassWeapons(save, '101', 'cleric', ['katana', 'bow', 'tome-dark', 'tome-ice', 'axe'], T(4))).toThrow(/slots/)
-    expect(() => setClassWeapons(save, '101', 'paladin', ['tome-dark', 'tome-ice', 'tome-fire', 'katana', 'bow'], T(4))).toThrow(/slots/)
-    expect(() => setClassWeapons(save, '101', 'summoner', ['katana', 'bow', 'axe', 'tome-ice', 'tome-dark'], T(4))).toThrow(/slots/)
-    expect(() => setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'axe', 'lance', 'tome-dark'], T(4))).toThrow(/slots/)
+    // From v16 every class picks three, each in a slot of its channel (CP2, CP12): a Cleric and a Summoner two Tomes and an
+    // Arm, a Paladin two Arms and a Tome, a Brawler three Arms.
+    const picked = setClassWeapons(save, '101', 'cleric', ['tome-dark', 'tome-ice', 'katana'], T(4))
+    expect(classOf(worldOf(picked).umas['101']!, 'cleric').weapons).toEqual(['tome-dark', 'tome-ice', 'katana'])
+    expect(classOf(worldOf(setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'axe'], T(4))).umas['101']!, 'brawler').weapons).toEqual(['katana', 'bow', 'axe'])
+    expect(() => setClassWeapons(save, '101', 'cleric', ['katana', 'bow', 'tome-dark'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'paladin', ['tome-dark', 'tome-ice', 'katana'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'summoner', ['katana', 'tome-ice', 'tome-dark'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'brawler', ['katana', 'bow', 'tome-dark'], T(4))).toThrow(/slots/)
+    expect(() => setClassWeapons(save, '101', 'brawler', ['greatsword', 'axe', 'lance', 'bow', 'katana'], T(4))).toThrow(/slots/)
   })
 
   it('knows every open depth’s core skills for free and chooses her skills until she picks; Class Rank opens depths (D102)', () => {
@@ -96,29 +98,20 @@ describe('classes (D86)', () => {
     expect(umaLoadout(o101, worldOf(lv10).umas['101']!, 1).map((r) => r.id)[0]).toBe('brawler-greatsword.1')
     const rank10 = ranked(save, 10)
     expect(umaLoadout(o101, worldOf(rank10).umas['101']!, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
-    expect(() => learnSkill(save, o101, 'brawler', 'brawler-greatsword.1', T(5))).toThrow(/Learned/)
-  })
-
-  it('learns side skills with points from Class Rank 5, one per fork, swapped freely (D73, D86, D102)', () => {
-    const save = withParty()
-    expect(() => learnSkill(ranked(save, 4), o101, 'brawler', 'brawler-greatsword.1a', T(3))).toThrow(/Opens at Class Rank 5/)
-    const five = learnSkill(ranked(save, 5), o101, 'brawler', 'brawler-greatsword.1a', T(4))
-    expect(classOf(worldOf(five).umas['101']!, 'brawler')).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: ['brawler-greatsword.1a'], loadout: null })
-    expect(() => learnSkill(five, o101, 'brawler', 'brawler-greatsword.1b', T(5))).toThrow(/other side/)
-    expect(() => learnSkill(five, o101, 'brawler', 'mage-tome-fire.1a', T(5))).toThrow(SaveRuleError)
-    const swapped = forgetSkill(five, o101, 'brawler', 'brawler-greatsword.1a', T(6))
-    expect(classOf(worldOf(swapped).umas['101']!, 'brawler').tree).toEqual([])
-    expect(parseSave(JSON.parse(JSON.stringify(five)))).toEqual(five)
+    // Nothing is learned from v16 (CP14): her line on each tree is `lines-v16.test.ts`'s.
   })
 
   it('equips skills she knows within her slots, or goes back to having them chosen', () => {
     let save = withParty()
-    save = equipSkills(save, o101, 'brawler', ['brawler-katana.1'], T(4))
-    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toEqual(['brawler-katana.1'])
-    expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['brawler-katana.1'])
-    expect(() => equipSkills(save, o101, 'brawler', ['brawler-katana.2'], T(5))).toThrow(/knows/)
-    // Five equipped skills need Lv 15 (her Uma Level keeps the slots).
-    expect(() => equipSkills(save, o101, 'brawler', ['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1', 'brawler-bow.1'], T(5))).toThrow(/up to 3/)
+    save = equipSkills(save, o101, 'brawler', ['brawler-lance.1'], T(4))
+    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toEqual(['brawler-lance.1'])
+    expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['brawler-lance.1'])
+    expect(() => equipSkills(save, o101, 'brawler', ['brawler-lance.2'], T(5))).toThrow(/knows/)
+    // A tree she doesn't slot isn't hers to equip.
+    expect(() => equipSkills(save, o101, 'brawler', ['brawler-katana.1'], T(5))).toThrow(/knows/)
+    // A fourth equipped skill needs Lv 10 (her Uma Level keeps the slots).
+    expect(() => equipSkills(ranked(save, 10), o101, 'brawler', ['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1', 'brawler-greatsword.2'], T(5)))
+      .toThrow(/up to 3/)
     expect(() => equipSkills(save, o101, 'brawler', ['brawler-axe.1', 'brawler-axe.1'], T(5))).toThrow(SaveRuleError)
     save = equipSkills(save, o101, 'brawler', null, T(6))
     expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toBeNull()
@@ -152,12 +145,14 @@ describe('fights (D52, D66)', () => {
     // A replay pays a quarter of the first clear (D79): 30 Laurels become 8, and a quarter of the EXP at most.
     expect(again.result).toMatchObject({ laurels: 8, firstClear: false })
     expect(again.result!.members[0]!.exp).toBeLessThanOrEqual(Math.ceil(fought.result!.members[0]!.exp / 4))
-    // Her bars (D102): 2E to her class, her weapons share 5E (double for the one she attacked with), E to each armor kind.
+    // Her bars (D102): 2E to her class, her three weapons share 3E (H64: double for the one she attacked with), E to each
+    // armor kind.
     const m = fought.result!.members[0]!
     const gain = (kind: string, id: string) => m.ranks.find((g) => g.ref.kind === kind && g.ref.id === id)?.exp ?? 0
     expect(gain('class', 'brawler')).toBe(2 * m.exp)
-    expect(gain('weapon', 'greatsword')).toBe(Math.round((5 * m.exp * 2) / 6))
-    expect(gain('weapon', 'axe')).toBe(Math.round((5 * m.exp) / 6))
+    expect(gain('weapon', 'greatsword')).toBe(Math.round((3 * m.exp * 2) / 4))
+    expect(gain('weapon', 'axe')).toBe(Math.round((3 * m.exp) / 4))
+    expect(gain('weapon', 'bow')).toBe(0)
     expect(['helm', 'cuirass', 'greaves', 'gauntlets', 'boots'].every((k) => gain('armor', k) === m.exp)).toBe(true)
     expect(m.ranks.some((g) => g.ref.kind === 'accessory')).toBe(false) // she wears none
     expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
@@ -199,7 +194,7 @@ describe('fights (D52, D66)', () => {
 
 describe('save parsing', () => {
   it('round-trips classes and an open fight with actions', () => {
-    let save = equipSkills(withParty(), o101, 'brawler', ['brawler-katana.1', 'brawler-bow.1'], T(3))
+    let save = equipSkills(withParty(), o101, 'brawler', ['brawler-lance.1', 'brawler-axe.1'], T(3))
     save = startFight(save, ura, 'w1-1-1-s1', OUTFITS, T(4))
     const action: BattleAction = { kind: 'attack', actorId: '101', targetId: 'foe1' }
     save = actInFight(save, ura, action, T(5)).save
@@ -214,17 +209,17 @@ describe('save parsing', () => {
     expect(parseSave(JSON.parse(JSON.stringify(bladed)))).toEqual(bladed)
   })
 
-  it('rejects a side skill too deep, a skill of another class, wrong weapons, a refused action and an unknown Spring', () => {
-    const save = startFight(equipSkills(withParty(), o101, 'brawler', ['brawler-katana.1'], T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
+  it('rejects a line other than B, a skill of another class, wrong weapons, a refused action and an unknown Spring', () => {
+    const save = startFight(equipSkills(withParty(), o101, 'brawler', ['brawler-lance.1'], T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
     const raw = () => JSON.parse(JSON.stringify(save))
-    const deep = raw()
-    deep.tierWorlds['1'].umas['101'].classes.brawler.tree.push('brawler-greatsword.2a')
-    expect(() => parseSave(deep)).toThrow(/tree/)
+    const line = raw()
+    line.tierWorlds['1'].umas['101'].classes.brawler.lines = { greatsword: 'A' }
+    expect(() => parseSave(line)).toThrow(/lines/)
     const equip = raw()
     equip.tierWorlds['1'].umas['101'].classes.brawler.loadout = ['mage-tome-fire.1']
     expect(() => parseSave(equip)).toThrow(/trees/)
     const weapons = raw()
-    weapons.tierWorlds['1'].umas['101'].classes.brawler.weapons = ['greatsword', 'axe', 'lance', 'bow', 'tome-fire']
+    weapons.tierWorlds['1'].umas['101'].classes.brawler.weapons = ['greatsword', 'axe', 'tome-fire']
     expect(() => parseSave(weapons)).toThrow(/weapons/)
     const refused = raw()
     refused.tierWorlds['1'].world.run.battle.actions = [{ kind: 'attack', actorId: '101', targetId: 'foe1' }, { kind: 'attack', actorId: '101', targetId: 'foe1' }]
@@ -276,8 +271,10 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     expect(sheet.map((g) => g.title)).toEqual(['Offense', 'Defense', 'Sustain', 'Other'])
     const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
     for (const label of ['ATK', 'M.ATK', 'Might', 'Orb', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
-      'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen',
-      'MP Steal', 'Limit Break head start']) expect(labels).toContain(label)
+      'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Steal',
+      '★ Flourish', 'Limit Break head start']) expect(labels).toContain(label)
+    // From v16 (H70) the MP row carries her regen; "MP Regen" retired with v15's sheet.
+    expect(labels).not.toContain('MP Regen')
     // Classes v2: one flat Orb, and no Heal (a healer's Mends come from her ATK or M.ATK, `accessories-v2.test.ts`).
     expect(labels).not.toContain('Orbs')
     expect(labels).not.toContain('Heal')

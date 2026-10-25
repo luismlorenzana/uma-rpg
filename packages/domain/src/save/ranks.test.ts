@@ -61,9 +61,10 @@ describe('ranks (D102)', () => {
       w.wallet.sweepTickets = 1
     })
     const swept = sweepFight(save, ura, ura.nodes[1]!.id, OUTFITS, T(3))
-    // Every weapon is at Rank 10, so all of its EXP banks, at half rate; classes and armor are still climbing.
+    // Every weapon is at Rank 10, so all of its EXP banks, at half rate; classes and armor are still climbing. Five Umas,
+    // three weapons each (engine v16).
     const weaponGains = swept.result.members.flatMap((m) => m.ranks.filter((g) => g.ref.kind === 'weapon'))
-    expect(weaponGains).toHaveLength(25)
+    expect(weaponGains).toHaveLength(15)
     expect(swept.result.gearMarks).toBe(weaponGains.reduce((n, g) => n + Math.floor(g.exp * 0.5), 0))
     expect(swept.result.gearMarks).toBeGreaterThan(0)
     expect(swept.result.classMarks).toBe(0)
@@ -132,7 +133,8 @@ describe('save v18: the progress reset (D105)', () => {
     const uma = w.umas['101']!
     expect(save.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(uma).toMatchObject({ level: 1, exp: 0, classId: 'brawler', ranks: { classes: {}, weapons: {}, armors: {}, accessories: {} }, bonds: {} })
-    expect(uma.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'], tree: [], loadout: null })
+    // Through every step to v27 (H72): her three defaults, every tree on A.
+    expect(uma.classes.brawler).toEqual({ weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: null })
     // v21 (D144) keeps the higher of her two levels as her Craft Level.
     expect(uma.craft).toEqual({ level: 7, exp: 3 })
     expect(uma.stars).toEqual({ unlocked: expect.arrayContaining(['moon:hp:1']), active: ['moon:hp:1', 'moon:hp:2', 'moon:def:1', 'moon:def:2', 'moon:mp:1'] })

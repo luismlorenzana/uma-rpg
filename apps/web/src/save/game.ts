@@ -157,17 +157,13 @@ const edit = async <Rules,>(rules: Promise<Rules>, change: (rules: Rules, save: 
 
 /** Switches her active class for free (D86). */
 export const pickClass = (outfitId: string, classId: RpgClass) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.chooseClass(s, outfitId, classId, now, t))
-/** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. Engines v6–v15: from v16 the
- * Skills tab never calls it (nothing is learned, CP14) and the rule refuses it. */
-export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.learnSkill(s, outfit, classId, nodeId, now, t))
-export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.forgetSkill(s, outfit, classId, nodeId, now, t))
-/** Takes line A or B on one of her class's trees (v16, CP18, H69's `pickBranch`): free, her equipped skills follow. */
+/** Takes line A or B on one of her class's trees (CP18, H69's `pickBranch`): free, her equipped skills follow. */
 export const takeBranch = (outfit: BattleOutfit, classId: RpgClass, weapon: RpgWeapon, branch: RpgBranch) =>
   edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickBranch(s, outfit, classId, weapon, branch, now, t))
-/** Picks her calling, one of her row's two (v16, CP29, H69's `pickCalling`); at Uma Lv 1 her class follows. */
+/** Picks her calling, one of her row's two (CP29, H69's `pickCalling`); at Uma Lv 1 her class follows. */
 export const chooseCalling = (outfit: BattleOutfit, pick: RpgClass) =>
   edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickCalling(s, outfit, pick, now, t))
-/** Makes her calling final (v16, CP29, H69's `confirmCalling`). */
+/** Makes her calling final (CP29, H69's `confirmCalling`). */
 export const confirmCallingPick = (outfitId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.confirmCalling(s, outfitId, now, t))
 /** Sets several Umas' class weapons in one save (the Rift's guided build, v16, CP7): weapons are owned per kind, so it
  * costs nothing; her equipped skills of a tree she stops slotting leave her loadout (H69). */

@@ -82,7 +82,8 @@ type Kind = 'fight' | 'sub-boss' | 'boss'
 /** A Tier 1 level's stages of some kinds across its continent's regions (as `world/balance.test.ts`'s `simulate`). */
 function worldStages(level: number, kinds: readonly Kind[]) {
   const regions = worldContinent({ name: 'Sim', order: Math.ceil(level / 10) }).regions.filter((r) => r.level <= level && level <= r.levelTop)
-  return regions.flatMap((r) => regionChapter(r, cast).nodes.filter((n) => kinds.includes(n.kind as Kind) && n.level === level))
+  // v15's foes, named (the live chapters are v16's since H72).
+  return regions.flatMap((r) => regionChapter(r, cast, V15).nodes.filter((n) => kinds.includes(n.kind as Kind) && n.level === level))
 }
 /** The balance party on v15 at a level, a class swapped for another in her place (the Paladin for the Cleric). */
 const worldParty = (level: number, swap: Partial<Record<RpgClass, RpgClass>> = {}): BattleAlly[] =>

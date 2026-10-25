@@ -1,15 +1,14 @@
-// The start by calling with the Tier rework's fight live (H67; CP29, uma-templates §2.3): the one switch mocked to 16 in
-// this file of its own (H64's `capsAt`). A new unlock starts in her calling, the pick's pre-selection, and the save writes
-// that start as her class, so `activeClass`'s style fallback is left to Umas unlocked before the switch. Unmocked, today's
-// starts hold: `starting-class-v2.test.ts`. Invented outfits only.
+// The start by calling with the Tier rework's fight live (H67; CP29, uma-templates §2.3; live since H72, D210). A new
+// unlock starts in her calling, the pick's pre-selection, and the save writes that start as her class, so `activeClass`'s
+// style fallback is left to Umas unlocked before the switch. v15's starts, which `startingClass(…, 15)` still answers:
+// `starting-class-v2.test.ts`. Invented outfits only.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { activeClass, startingClass, type BattleOutfit } from './class'
 import { unlockUma, worldOf } from './rules'
 import { gearV1, newOwnedUma, newSave, startingArmorKinds } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
 const T0 = '2026-10-25T12:00:00.000Z'
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
@@ -57,9 +56,9 @@ describe('the start by calling, engine v16 (H67)', () => {
     expect(gearV1(umas['305']!).kinds).toEqual({})
   })
 
-  it('keeps v15’s writes for an older engine, and no start writes no class', () => {
+  it('writes her start as her class, and no start writes no class', () => {
     expect(newOwnedUma(T0).classId).toBeNull()
     expect(newOwnedUma(T0, 'mage').classId).toBe('mage')
-    expect([newOwnedUma(T0, 'mage', 15).classId, newOwnedUma(T0, 'paladin', 15).classId]).toEqual([null, 'paladin'])
+    expect(newOwnedUma(T0, 'paladin').classId).toBe('paladin')
   })
 })

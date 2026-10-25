@@ -1,7 +1,7 @@
 // Her battle sheet on engine v16 (H70; stat-balance.md §7.2, SB18; uma-templates.md §3.3, UT6, UT14), asked with an explicit
 // engine: the Sustain group's MP row carries what she regains a round (the base regen by her Class Rank plus any Spring's),
-// "MP Regen" goes, and a ★ Flourish row reads her template's as her calling, or "No effect as Brawler". v15's rows stay.
-// Invented outfits only.
+// "MP Regen" goes, and a ★ Flourish row reads her template's as her calling, or "No effect as Brawler". The live sheet since
+// H72 (D210), when v15's Sustain rows retired. Invented outfits only.
 import { describe, expect, it } from 'vitest'
 import { withTrack } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
@@ -19,7 +19,7 @@ const MAGE: BattleOutfit = {
 }
 /** A Lv 50 Mage at Class Rank 40, her Extra Stats topped up with MP moons so her max MP is `mp`. */
 function mageAt(mp: number, extra: Partial<OwnedUma> = {}): OwnedUma {
-  let uma: OwnedUma = { ...newOwnedUma(NOW, 'mage', 15), level: 50, classId: 'mage', ...extra }
+  let uma: OwnedUma = { ...newOwnedUma(NOW, 'mage'), level: 50, classId: 'mage', ...extra }
   uma = { ...uma, ranks: withTrack(uma.ranks, { kind: 'class', id: 'mage' }, { rank: 40, exp: 0 }) }
   const base = Number(row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), 'MP').value)
   // Moons of grade 10 down to 1 (each worth its grade in MP) close the gap, so the case reads 296 whatever her base.
@@ -59,12 +59,10 @@ describe('the battle sheet on engine v16 (H70)', () => {
     expect(flourishShort('late-reserve')).toBe('Late reserve · from round 3, 2% a round, up to 4%')
   })
 
-  it('keeps v15\'s sheet as it is: MP alone, the Spring in "MP Regen", no Flourish', () => {
+  it('is the live sheet since H72: v15\'s Sustain rows ("MP Regen", no Flourish) retired with the switch', () => {
     const uma = spring(mageAt(296))
-    const sheet = umaBattleSheet(MAGE, uma, 'mage', 1, 15)
-    expect(sustain(sheet).map((r) => r.label)).toEqual(['HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Regen', 'MP Steal'])
-    expect(sheet.flatMap((g) => g.rows).every((r) => r.note === undefined)).toBe(true)
-    expect(row(sheet, 'MP Regen').value).toBe('10 a round')
+    expect(umaBattleSheet(MAGE, uma, 'mage')).toEqual(umaBattleSheet(MAGE, uma, 'mage', 1, 16))
+    expect(sustain(umaBattleSheet(MAGE, uma, 'mage')).map((r) => r.label)).not.toContain('MP Regen')
     // Every other row reads the same in both generations.
     const others = (engine: number) => umaBattleSheet(MAGE, uma, 'mage', 1, engine).filter((g) => g.title !== 'Sustain')
     expect(others(16)).toEqual(others(15))

@@ -1,8 +1,8 @@
 // Tier 1's trees on engine v16 (H65, D201; class-progression.md §6.1, §6.2, §6.5, §6.10, §8.3; CP13–CP18, CP21–CP23,
-// CP32, CP35, CP37, CP42, CP43), with the one switch mocked to 16 so the live lists, names and summaries are v16's: a
-// trunk and one free fork into line A or B, no points, Skill Ranks, Pierce, the Paladin's revive on her Light tree, the
-// Summoner's renamed brutes and the halls' two kinds. The live game stays on 15 until H72.
-import { describe, expect, it, vi } from 'vitest'
+// CP32, CP35, CP37, CP42, CP43), live since H72 (D210), so the live lists, names and summaries are v16's: a trunk and one
+// free fork into line A or B, no points, Skill Ranks, Pierce, the Paladin's revive on her Light tree, the Summoner's
+// renamed brutes and the halls' two kinds. (R1's packets ran it with the switch mocked to 16.)
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from './battle/caps'
 import { RPG_LINE_B_POWER_V16, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, rpgNode, rpgNodeSkill, rpgTreeOf, rpgValkyrieOathNode } from './catalog'
 import { HERO_LIMITS, heroLimit, heroLimitKinds } from './heroes'
@@ -13,8 +13,6 @@ import {
   type RpgWeapon,
 } from './rules'
 import { rpgSkillRankUps, rpgTreeView } from './tree-view'
-
-vi.mock('./battle/caps', async (orig) => (await import('./battle/caps-at.fixture')).capsAt(16, await orig()))
 
 /** An invented Uma of a class on v16: her default weapons unless named, her Class Rank her level unless named. */
 function uma(classId: RpgClass, level: number, o: { classRank?: number; lines?: RpgLines; weapons?: RpgWeapon[] } = {}): RpgProfile {

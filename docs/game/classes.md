@@ -1,26 +1,27 @@
 # Classes and weapons
 
-Six classes and ten weapons (D86; classes v2, D160, live since H61, D188). Every Uma has one **active class** at a time
-and can switch freely. She keeps each class's own weapons, learned skills and loadout. Classes and weapons are chosen on
-the Stable → an Uma → **Skills** page, six classes in two rows of three ([sections](sections.md#stable)).
+Six classes and ten weapons (D86; classes v2, D160, live since H61, D188; the Tier rework's fight, engine v16, live
+since H72, D210). Every Uma has one **active class** at a time and can switch freely. She keeps each class's own three
+weapons, her line on each of its trees and her loadout. Classes and weapons are chosen on the Stable → an Uma →
+**Skills** page, six classes in two rows of three ([sections](sections.md#stable)).
 
 Native-size pixel emblems accompany the full class names in the picker, profile chip and active party bar.
 The names remain available to accessibility tools.
 
-Code: `packages/domain/src/rpg/kinds.ts` (weapons and kinds), `rules.ts` (slots, hands, stat leans, learning rules),
-`catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks), `economy/ranks.ts`
-(ranks), `save/presets.ts` (standard presets).
+Code: `packages/domain/src/rpg/kinds.ts` (weapons, kinds and twins), `rules.ts` (slots, hands, stat leans, lines and
+Skill Ranks), `catalog.ts` (trees, see [skill trees](skill-trees.md)), `battle/limit.ts` (Limit Breaks),
+`roster/template.ts` (her calling and template), `economy/ranks.ts` (ranks), `save/presets.ts` (standard presets).
 
 ## The six classes
 
 | Class | Plays like |
 |---|---|
-| **Brawler** | Pure physical damage. All five Arms, one heavy act a turn |
-| **Mage** | Pure magic. All five Tomes, one full cast a turn |
-| **Spell Blade** | Three Arms and two Tomes, physical-led. Every act is a blade and a spell, the blade the stronger half; the blade lands one extra hit, so she chips shields fast |
-| **Summoner** | Three Tomes and two Arms, the Spell Blade's mirror: magic-led. Every act is a Tome summon and an Arms summon, the Tome the stronger half. The Tome summon stays, and when her next pair comes it strikes every foe in farewell. No support |
-| **Paladin** | Three Arms and two Tomes. A healer whose mends and Barriers grow with her ATK. Her blows weaken the foe they hit and put a Barrier on the Uma in danger; her spells bless the party, mend the most hurt and cleanse. Her Blizzard spells also Barrier every Uma, her Greatsword blows give Aegis, her Axe weakens every foe from depth 4, and Valkyrie's Oath raises the fallen |
-| **Cleric** | Three Tomes and two Arms. A healer whose mends and Barriers grow with her M.ATK, with the Paladin's kit. Her Light spells leave Regen, a mend that repeats, her Dark spells drain, and Rebirth raises the fallen |
+| **Brawler** | Pure physical damage. Three Arms, one heavy act a turn |
+| **Mage** | Pure magic. Three Tomes, one full cast a turn |
+| **Spell Blade** | Two Arms and a Tome, physical-led. Every act is a blade and a spell, the blade the stronger half; the blade lands one extra hit, so she chips shields fast. Her line B, Pierce, cuts through a shield instead |
+| **Summoner** | Two Tomes and an Arm, the Spell Blade's mirror: magic-led. Every act is a Tome summon and an Arms summon, the Tome the stronger half. The Tome summon stays, and when her next pair comes it strikes every foe in farewell. No support |
+| **Paladin** | Two Arms and a Tome. A healer whose mends and Barriers grow with her ATK. Her blows weaken the foe they hit and put a Barrier on the Uma in danger; her spells bless the party, mend the most hurt and cleanse. Her Blizzard spells also Barrier every Uma, her Greatsword blows give Aegis, her Axe weakens every foe from depth 4, and Valkyrie's Oath, her Light tree's depth-3 B, raises the fallen |
+| **Cleric** | Two Tomes and an Arm. A healer whose mends and Barriers grow with her M.ATK, with the Paladin's kit. Her Light spells leave Regen, a mend that repeats, her Dark spells drain, and Rebirth, her Light tree's depth-3 B, raises the fallen |
 
 Brawler, Mage, Spell Blade and Summoner deal the damage; the Paladin and the Cleric split their turns between damage
 and support, at twice the old shares ([combat](combat.md#support)).
@@ -40,7 +41,7 @@ they don't check.
 | Light | Cherub, Mending Angel, Seraph Choir, Dominion Host, Heaven's Legion |
 | Dark | Leech Imp, Night Bat, Vampire Knight, Blood Countess, Abyssal Overlord |
 | Greatsword | Squire, Shield Knight, Knight Captain, Aegis Champion, Sword Saint |
-| Axe | Brigand, Berserker, Axe Ogre, Minotaur Chief, Jotun Warlord |
+| Axe | Brigand, Marauder, Axe Ogre, Minotaur Chief, Jotun King |
 | Lance | Pikeman, Dragoon, Lance Knight, Valkyrie, Valkyrie Queen |
 | Bow, Katana | Slinger … Sagittarius; Ronin … Sword Spirit |
 
@@ -48,32 +49,84 @@ Fights from engines v12–v14 replay with the lines' old support: Blizzard Barri
 Aegis, Axe Enfeeble and the Valkyries' revive, which moved to the Paladin and the Cleric.
 
 <!-- live:classes -->
-| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break power | Starts as | Starting armor |
+| Class | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break power | Her calling (starts as) | Starting armor |
 |---|---|---|---|---|---|---|---|---|
-| Brawler | 5 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | 2× her open depth | Front runners | Physical |
-| Mage | 5 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers | Magical |
-| Spell Blade | 3 Arms + 2 Tomes | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | 2.2× her open depth | — | Physical |
-| Cleric | 3 Tomes + 2 Arms | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers, Wit at or over Power | Magical |
-| Summoner | 3 Tomes + 2 Arms | 10 | ×0.56 Arms, ×0.58 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | End closers | Magical |
-| Paladin | 3 Arms + 2 Tomes | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | 1.5× her open depth | Late surgers, Power over Wit | Physical |
+| Brawler | 3 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | 2× her open depth | Front runners; Pace sprinters, Power over Wit | Physical |
+| Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers, Wit at or over Power, or picked | Magical |
+| Spell Blade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | 2.2× her open depth | Pace chasers, Power over Wit, or picked | Physical |
+| Cleric | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers, Wit at or over Power, or picked | Magical |
+| Summoner | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.58 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | Wit-led closers; End closers | Magical |
+| Paladin | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | 1.5× her open depth | Late surgers, Power over Wit, or picked | Physical |
 <!-- /live -->
 
 **Hand:** the share of full power and full MP her acts use. A Brawler's Attack is 1.0. A Spell Blade's two halves add
 up to a little more than one full turn, across two kinds, her Arms half the larger; a Summoner's are close to level,
 her Tome half the larger, and her farewell strike comes on top, so the two deal about the same damage a turn
-(H63). Each half costs its own MP. The healers act at half power.
+(H63, H71). Each half costs its own MP. The healers act at half power.
 
-**Starts as:** a new Uma begins in the class of her best running style, and in that class's armor: magical for a Mage,
-a Cleric or a Summoner, physical for a Brawler or a Paladin (D162). A Late surger starts as a **Paladin** when her base
-Power beats her Wit, else as a Cleric, and a Paladin start is written as her class (D180). An Uma who never picked a
-class keeps her style's, so nobody changed class when the Paladin came. Umas unlocked before keep their armor. Spell
-Blade is never a default.
+## Her calling and her template
+
+**Her calling** (engine v16, CP29, D203): her racing profile names one class, by the first row that fits: a front
+runner is a Brawler; a Wit-led closer (Wit at or over Power, A in two of Pace, Late and End) and an End closer are
+Summoners; a Pace sprinter with Power over Wit (best distance Sprint) is a Brawler; a Pace chaser a Spell Blade with
+Power over Wit, else a Mage; a Late surger a Paladin with Power over Wit, else a Cleric. Her base Power and Wit are at
+her starting stars; Power = Wit counts as Wit.
+
+- **She starts in it.** A new Uma is written in her calling, as her class, and in its armor half: magical for a Mage, a
+  Cleric or a Summoner, physical for a Brawler, a Spell Blade or a Paladin. Umas unlocked before v16 keep their class
+  and armor (an Uma who never picked a class fights as her best running style's).
+- **The calling pick** (CP29, CP30): a Pace Uma picks once between the Spell Blade and the Mage, a Late Uma between the
+  Paladin and the Cleric. Her Power against her Wit pre-selects ("Suggested · Power 96 over Wit 88"). The pick stays
+  open until it is confirmed, by a tap or by her first won fight. At Uma Lv 1 a pick also moves her class and, while she
+  wears no armor piece, her armor half. Once confirmed it never changes; she still switches class freely. Every Uma owned
+  at save v27 starts unconfirmed on her pre-selection, with a dot on her template chip.
+
+**Her template** (UT2–UT6, D203, D204): three readings of her racing profile name her "{knack word} {type}", one of 90,
+the same in every tier: her **calling**, her **stride** (the longest distance at her best grade) and her **knack** (her top
+growth rate; ties go to the higher base stat, then Speed, Stamina, Power, Guts, Wit). Her calling and stride give her
+type, her knack its word: "Clever Spellwright".
+
+<!-- live:templates -->
+| Calling | Dash | Middle | Stayer |
+|---|---|---|---|
+| Brawler | Charger | Bruiser | Ironhide |
+| Mage | Flarecaster | Spellwright | Starkeeper |
+| Spell Blade | Flashblade | Spellfencer | Longblade |
+| Cleric | Lamplighter | Mender | Pilgrim |
+| Summoner | Beckoner | Binder | Shepherd |
+| Paladin | Shieldrunner | Warden | Stalwart |
+
+| Knack: her top growth rate | Word |
+|---|---|
+| Speed | Fleet |
+| Power | Mighty |
+| Stamina | Tireless |
+| Guts | Gritty |
+| Wit | Clever |
+
+| Stride: her longest distance at her best grade | Flourish | As her calling |
+|---|---|---|
+| Dash (Sprint or Mile) | Clean break | a Barrier of 4% of her max HP at the start |
+| Middle (Medium) | Even pace | 1% of her max HP at each round's end, up to 4% |
+| Stayer (Long) | Late reserve | 2% of her max HP at each round's end from round 3, up to 4% |
+<!-- /live -->
+
+- **★ Her Flourish** works only while she fights as her calling's class ("No effect as Brawler" otherwise): 4% of her max
+  HP a fight, in her stride's shape. Not a heal skill: no healing scale, it never overheals, and a fallen Uma gets none.
+  Once a fight, not each wave ([combat](combat.md#sustain-mp-and-the-flourish)).
+- **Nothing else moves:** a template adds no damage kind, stat, lean, hand or rule, and never takes anything away. Her
+  signature accessory and her moon come with the economy's release (R2).
+
+The template's chip and card and the calling pick card are on the Uma sheet ([sections](sections.md#stable)); the Stable
+filters by calling, stride and knack.
 
 ## Weapons
 
 Ten weapons: five **Arms** (physical kinds) and five **Tomes** (elements). Each kind keeps one shape in every class, so
 an Axe skill always reaches every foe, whoever swings it. A Paladin's or a Cleric's skills with that weapon carry the
-status listed: her blows on the foe they hit, her spells on every Uma.
+status listed: her blows on the foe they hit, her spells on every Uma. An Arm and the element that share its shape are
+**twins** (Greatsword and Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark): every foe is weak to
+one twin set ([combat](combat.md#weaknesses-shields-and-breaks)).
 
 <!-- live:weapons -->
 | Weapon | Id | Kind | Channel | Shape | Healer status | Classes |
@@ -90,17 +143,19 @@ status listed: her blows on the foe they hit, her spells on every Uma.
 | Dark Tome | `tome-dark` | Dark | Magical | Twice: the foe and one other | Clarity | Mage, Spell Blade, Cleric, Summoner, Paladin |
 <!-- /live -->
 
-**Weapon slots (D98).** A class has five weapon slots, and the weapon in each slot opens its skill tree. Every Uma holds
-a **Training weapon** of all ten kinds: grade 0, no stats, always hers. A slot holds the Training weapon until she wears
-a crafted one of that kind, which opens the same tree and adds its Might to the hits made with it
-([materials](materials.md#gear)). A crafted piece serves every class that holds its weapon. Spell Blade, Summoner,
-Paladin and Cleric choose each slot's weapon within the slot's kind (Arms or Tome); a Brawler's and a Mage's slots are
-fixed to their five. A new Uma's slots hold her class's default spread, in Training weapons, so she starts with the
-depth-1 cores of those trees.
+**Three weapon slots, by channel (D98; CP2, engine v16).** A class has three slots, each an **Arms** or a **Tome** slot,
+the lead channel first: a Brawler three Arms, a Mage three Tomes, a Spell Blade and a Paladin two Arms and a Tome, a
+Summoner and a Cleric two Tomes and an Arm. Any kind of a slot's channel fits it, three different kinds, and every class
+picks; the weapon in each slot opens its tree. Every Uma holds a **Training weapon** of all ten kinds: grade 0, no
+stats, always hers. A slot holds the Training weapon until she wears a crafted one of that kind, which opens the same
+tree and adds its Might to the hits made with it ([materials](materials.md#gear)). A crafted piece serves every class
+that holds its weapon. A new class starts on its three defaults (the presets below), in Training weapons. When she
+stops slotting a kind, her equipped skills of its tree leave her loadout; her line on it stays. Fights from engines
+v6–v15 replay with five weapons a class.
 
 **Armor slots (D103, D124)** mirror them: head, body, legs, arms and feet, each holding its physical or its magical
 piece, with a Training piece of each kind until she binds a crafted one ([materials](materials.md#gear)). A new Uma's
-five start in her starting class's half ([starts as](#the-six-classes)).
+five start in her calling's half ([her calling](#her-calling-and-her-template)).
 
 **Two accessory slots (D124), typed (classes v2, C10):**
 - **Damage** holds one **Orb**, an Arms Orb or an Elemental Orb. It adds offense to her hits of its kind: half a
@@ -112,50 +167,62 @@ Equipping refuses the other slot's type ("The Damage slot takes an Orb", "The Su
 Amulet").
 
 **Standard preset (D164).** Each class has one, applied on tap from her profile's Gear tab ("Use the standard preset",
-for her active class): its default weapon spread, its armor half in all five slots, an Orb in the Damage slot and a
-support in the Support slot. The Orb is of her spread's first weapon's kind, so it strengthens her leading damage, and
-the support is the one the balance simulation plays with. It wears the best she can: her own pieces, or the stock's
-next grades her ranks allow, else Training pieces ([loops](loops.md#extra-stats-and-gear)). Her learned and equipped
-skills stay.
+for her active class): its three default weapons (the owner's, CP3), its armor half in all five slots, an Orb in the
+Damage slot and a support in the Support slot. The Orb is of her first slot's kind, so it strengthens her leading
+damage, and the support is the one the balance simulation plays with. It wears the best she can: her own pieces, or the
+stock's next grades her ranks allow, else Training pieces ([loops](loops.md#extra-stats-and-gear)). Her lines stay;
+her equipped skills of a tree the preset takes out of her slots leave her loadout.
 
 <!-- live:presets -->
 | Class | Weapons | Armor | Orb, Damage slot | Support, Support slot |
 |---|---|---|---|---|
-| Brawler | Greatsword, Axe, Lance, Bow, Katana | Physical | Greatsword Orb | Vampire Talisman |
-| Mage | Fire Tome, Blizzard Tome, Thunder Tome, Light Tome, Dark Tome | Magical | Fire Orb | Siphon Amulet |
-| Spell Blade | Greatsword, Lance, Katana, Fire Tome, Thunder Tome | Physical | Greatsword Orb | Vampire Talisman |
-| Cleric | Light Tome, Dark Tome, Thunder Tome, Katana, Bow | Magical | Light Orb | Spring Amulet |
-| Summoner | Fire Tome, Blizzard Tome, Thunder Tome, Greatsword, Lance | Magical | Fire Orb | Siphon Amulet |
-| Paladin | Greatsword, Axe, Lance, Blizzard Tome, Fire Tome | Physical | Greatsword Orb | Thorn Talisman |
+| Brawler | Greatsword, Axe, Lance | Physical | Greatsword Orb | Vampire Talisman |
+| Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Fire Orb | Siphon Amulet |
+| Spell Blade | Katana, Lance, Thunder Tome | Physical | Katana Orb | Vampire Talisman |
+| Cleric | Light Tome, Blizzard Tome, Bow | Magical | Light Orb | Spring Amulet |
+| Summoner | Dark Tome, Light Tome, Bow | Magical | Dark Orb | Siphon Amulet |
+| Paladin | Greatsword, Axe, Light Tome | Physical | Greatsword Orb | Thorn Talisman |
 <!-- /live -->
 
-## Skills: depths, points and slots
+The defaults pair up: the Brawler's and the Mage's are the ring (Fire, Ice and Lightning in each channel), and the
+Spell Blade's, the Summoner's and the Cleric's each hold a twin set in both channels (Lance and Thunder; Bow and Light;
+Bow and Light), so both halves of a hybrid's act land weak on it. The five fight types' defaults hold all ten kinds
+with either healer.
 
-- Each tree is **five depths**. Each depth has a **core** skill and two **side** skills, A and B, and you take one of the
-  two (a fork).
-- **Cores are free**: a depth's core is known as soon as that depth opens.
-- **Sides cost points.** A side costs its depth; she can forget a side to take the other.
-- **A depth opens** when her **Class Rank** in that class reaches its gate (D102). Her Uma Level no longer gates depths.
-- **Side points:** one per Class Rank, per class, spent across that class's trees.
+## Skills: depths, lines and ranks
+
+- **Five depths a tree, eight nodes.** Depths 1 and 2 are the **trunk**, always hers. At depth 3 the tree **forks** into
+  **line A** and **line B**, and her line runs on through depths 4 and 5 (CP13, CP18).
+- **Nothing is learned and nothing costs points** (CP14). A depth opens when her **Class Rank** in that class reaches its
+  gate (D102, CP16), and every node there on her line is hers at once.
+- **Line A is the default; line B is a sidegrade with its own name** (Combo, Impale, Pierce, Heavy…; every tree's is in
+  [skill trees](skill-trees.md)). She takes B, or A again, free at any time outside a fight; her equipped skills follow
+  in place (with Rend equipped, taking Combo puts Rending Combo in its slot). A line sits on any kind of her class's
+  trees, slotted or not.
+- **Skill Ranks** (CP32): every skill she holds is Rank 1 when its depth opens and gains a rank every 2 Class Ranks, up
+  to Rank 5, on its own. A rank scales its power, and a healer's mend and Barrier shares, ×0.95 to ×1.05; MP, hits,
+  targets and statuses never change. A line swap keeps the ranks: they read her Class Rank.
+- **Pierce** (CP42): the Spell Blade's line B on every tree, the Brawler's Katana B and the Mage's Dark B land one hit at
+  ×1.15 that ignores the unbroken halving; the Spell Blade's Arms half still lands its extra hit.
 
 <!-- live:depths -->
-| Depth | Core skill opens | Side skills open | Side cost | Single-target power | Full-turn MP |
+| Depth | Line | Opens at | Ranks 2–5 at Class Rank | Single-target power, Rank 1 → 5 | Full-turn MP |
 |---|---|---|---|---|---|
-| 1 | Class Rank 1 | Class Rank 5 | 1 point | 1.6 | 10 |
-| 2 | Class Rank 10 | Class Rank 15 | 2 points | 2.2 | 14 |
-| 3 | Class Rank 20 | Class Rank 25 | 3 points | 2.9 | 18 |
-| 4 | Class Rank 30 | Class Rank 35 | 4 points | 3.7 | 22 |
-| 5 | Class Rank 40 | Class Rank 45 | 5 points | 4.6 | 26 |
+| 1 | Trunk | Class Rank 1 | 3, 5, 7, 9 | 1.52 → 1.68 (1.6 at Rank 3) | 10 |
+| 2 | Trunk | Class Rank 10 | 12, 14, 16, 18 | 2.09 → 2.31 (2.2 at Rank 3) | 14 |
+| 3 | The fork: A or B | Class Rank 20 | 22, 24, 26, 28 | 2.76 → 3.05 (2.9 at Rank 3) | 18 |
+| 4 | Her line, A or B | Class Rank 30 | 32, 34, 36, 38 | 3.52 → 3.89 (3.7 at Rank 3) | 22 |
+| 5 | Her line, A or B | Class Rank 40 | 42, 44, 46, 48 | 4.37 → 4.83 (4.6 at Rank 3) | 26 |
 <!-- /live -->
 
 <!-- live:active-slots -->
-3 equipped skills at Lv 1, one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at most). 1 side point per Class Rank, per class.
+3 equipped skills at Lv 1, one more at Lv 10, 20, 30, 40 (7 at most). No points and no side skills: every skill on her path is hers at its depth's Class Rank, and ranks up every 2 Class Ranks (×0.95 at Rank 1 to ×1.05 at Rank 5).
 <!-- /live -->
 
-A Brawler or Mage has 5 trees. The others have all 10, and the 5 weapons in her slots decide which are usable. Until
-you pick her skills, the auto loadout takes each slot's deepest open core in turn (a hybrid's Arms and Tomes
-alternating, her larger half first). Every skill
-is listed in [skill trees](skill-trees.md).
+A Brawler or Mage has 5 trees. The others have all 10, and the 3 weapons in her slots decide which are usable. Until
+you pick her skills, the auto loadout takes each slot's deepest skill on her line in turn (a hybrid's Arms and Tomes
+alternating, her larger half first). Every skill is listed in [skill trees](skill-trees.md). Fights from engines v6–v15
+replay with side skills bought with points, ten equipped skills at most.
 
 ## Limit Breaks
 
@@ -171,7 +238,7 @@ is listed in [skill trees](skill-trees.md).
 | Summoner | 2.2× |
 | Paladin | 1.5× |
 
-A Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP ×0.4, × her healing scale and the cast's strength; its cleanse and its revive land at any strength. The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 Archangel’s Verdict and Archdemon’s Pact, Sunfire Edge in one cleave, Moon Fox on one foe, the Spell Blade at 2× and the Summoner at 1.8×, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
+A Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP ×0.4, × her healing scale and the cast's strength; its cleanse and its revive land at any strength. The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. Since engine v16 Rampart Charge charges with an Axe and Choir of Angels strikes with Light, then Lightning (CP35); fights from v15 replay with Rampart Charge's Greatsword and Choir of Angels' Light twice. Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 Archangel’s Verdict and Archdemon’s Pact, Sunfire Edge in one cleave, Moon Fox on one foe, the Spell Blade at 2× and the Summoner at 1.8×, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
 <!-- /live -->
 
 ## Ranks and levels
@@ -180,8 +247,8 @@ Four bars, all filled by winning fights (D102). Nothing is trained and no token 
 
 | Bar | Range | Rises with | Opens |
 |---|---|---|---|
-| **Uma Level** | 1–50 | Every win | Her stats, skill slots (3 → 10) and Extra Stats slots |
-| **Class Rank**, per class | 1–50 | Wins as that class | That class's trees: cores at Rank 1, 10, 20, 30, 40, side skills at 5 … 45, a side point a rank. Her Limit Break's depth |
+| **Uma Level** | 1–50 | Every win | Her stats, skill slots (3 → 7) and Extra Stats slots |
+| **Class Rank**, per class | 1–50 | Wins as that class | That class's trees: depths at Rank 1, 10, 20, 30, 40, and a Skill Rank every 2 Class Ranks. Her Limit Break's depth |
 | **Weapon Rank**, per weapon | 1–10 | Wins with that weapon in her slots | Wearing that weapon up to grade = rank, in every class |
 | **Armor Rank**, per armor kind | 1–10 | Wins wearing that kind | Wearing that kind up to grade = rank |
 

@@ -1,9 +1,9 @@
 // The Flourish as her calling with the Tier rework's fight live (H68, D204; uma-templates.md §3.3, §3.8, UT6, UT12, UT18):
-// the one switch mocked to 16 in this file of its own (H64's `capsAt`). `partyMembers` sends her template's Flourish only
+// live since H72 (D210; R1's packets mocked the switch to 16 here). `partyMembers` sends her template's Flourish only
 // while she fights as her calling's class, by her stored calling pick (save v27, H69), and the world map's and the Rift's
 // fights freeze it into their inputs. Invented outfits only.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { Points } from '../economy/bonus'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { createBattle } from '../rpg/battle/engine'
@@ -17,7 +17,6 @@ import { OUTFITS as RIFT_OUTFITS, riftWorldSave, ROSTER, T as RT, TWENTY } from 
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, type Save } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
 const T0 = '2026-10-25T12:00:00.000Z'
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>

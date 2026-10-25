@@ -1,6 +1,6 @@
 // A front's guided weapons for the chosen party (the Tier rework's R1, engine v16, CP7; H70): each member's build weapons as
 // glyphs, matched to the front's guided build by her class in party order, and one button that sets them all (weapons are
-// owned per kind, so it costs nothing). Shown from v16 only (`guidedWeapons` is null before it).
+// owned per kind, so it costs nothing).
 import { FaceTile } from '@luismlorenzana/uma-kit/album'
 import { activeClass, classOf, SaveRuleError, type RiftFront, type RpgClass, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
@@ -18,7 +18,6 @@ export function GuidedWeapons({ campaign, world, front, party }: { campaign: Cam
     return uma && outfit ? activeClass(outfit, uma) : null
   })
   const guide = guidedWeapons(classes, front)
-  if (!guide) return null
   const changes = five.flatMap((outfitId, i) => {
     const weapons = guide[i], classId = classes[i], uma = world.umas[outfitId]
     if (!weapons || !classId || !uma) return []

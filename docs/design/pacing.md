@@ -119,25 +119,25 @@ packet assumptions: 40 seconds regular, 70 elite, 100 boss, not measured play ti
 <!-- live:pacing-sim -->
 | Band | Wins (first/replay) | Fight min | Uma EXP | Class EXP | Weapon EXP | Armor EXP | Laurels | Gear / Class Marks |
 |---|---|---|---|---|---|---|---|---|
-| 1–10 | 25 (24/1) | 19.7 | 2100 | 4200 | 10500 | 10500 | 1268 | 0 / 0 |
-| 11–20 | 24 (24/0) | 19.0 | 3702 | 7404 | 18510 | 18510 | 1260 | 0 / 0 |
-| 21–30 | 24 (24/0) | 19.0 | 5311 | 10622 | 26555 | 26555 | 1260 | 0 / 0 |
-| 31–40 | 24 (24/0) | 19.0 | 6925 | 13850 | 34625 | 34625 | 1260 | 0 / 26490 |
-| 41–50 | 22 (22/0) | 16.2 | 7545 | 15090 | 37725 | 37725 | 3840 | 90550 / 37725 |
+| 1–10 | 25 (24/1) | 19.7 | 2100 | 4200 | 6300 | 10500 | 1268 | 0 / 0 |
+| 11–20 | 24 (24/0) | 19.0 | 3702 | 7404 | 11106 | 18510 | 1260 | 0 / 0 |
+| 21–30 | 24 (24/0) | 19.0 | 5311 | 10622 | 15933 | 26555 | 1260 | 0 / 0 |
+| 31–40 | 24 (24/0) | 19.0 | 6925 | 13850 | 20775 | 34625 | 1260 | 0 / 26490 |
+| 41–50 | 22 (22/0) | 16.2 | 7545 | 15090 | 22635 | 37725 | 3840 | 72440 / 37725 |
 
-EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.
+EXP is per Uma; Weapon EXP sums her three bars, Armor EXP her five. Currency and Marks are the whole party’s stock.
 
-| Grade | Refined / twelve-piece set | Raw capacity* | Fresh G1 output |
+| Grade | Refined / ten-piece set | Raw capacity* | Fresh G1 output |
 |---|---|---|---|
-| 2 | 24 | 0.38 | 0 |
-| 4 | 24 | 0.39 | 0 |
-| 6 | 24 | 0.42 | 1 |
-| 8 | 24 | 0.46 | 0 |
-| 10 | 24 | 0.43 | 0 |
+| 2 | 20 | 0.38 | 0 |
+| 4 | 20 | 0.39 | 0 |
+| 6 | 20 | 0.42 | 1 |
+| 8 | 20 | 0.46 | 0 |
+| 10 | 20 | 0.43 | 0 |
 
 Total: **119 wins** (118 first, 1 replay), **92.8 fight minutes**, five Lv50 Umas.
-Representative Brawler: Class Rank 50; five Weapon Ranks 10/10/10/10/10; five Armor Ranks 10/10/10/10/10.
-Banked: 8888 Laurels, 90550 Gear Marks and 64215 Class Marks. No Manuals bought, no class switching, no tokens.
+Representative Brawler: Class Rank 50; three Weapon Ranks 10/10/10; five Armor Ranks 10/10/10/10/10.
+Banked: 8888 Laurels, 72440 Gear Marks and 64215 Class Marks. No Manuals bought, no class switching, no tokens.
 Four-hour target (180–300 min): **under**. No game number retuned.
 *One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. A fresh worker finishes 1 grade-1 raw items and ends at Craft Lv1. Refining and crafting need additional time.
 <!-- /live -->

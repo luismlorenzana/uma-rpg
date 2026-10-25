@@ -1,5 +1,5 @@
 // Engine v16, the Tier rework's fight, accepted dark (H64, D200): three weapons by channel, no side skills (`tree`) and no
-// legacy skills, every class rule read by the fight's own version. Nothing starts a v16 fight until H72; H65 adds the
+// legacy skills, every class rule read by the fight's own version. Every new fight runs on v16 since H72 (D210); H65 adds the
 // branch picks, the equipped-slot count and Skill Ranks, H68 the base MP regen and the Flourish.
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'

@@ -11,7 +11,7 @@
 
 | Release | What the player gets | Engine · save | Packets |
 |---|---|---|---|
-| **R1. Tier 1's fight** | Three weapons a class, set to the owner's defaults. Trees with no points: a trunk and one free fork. Skill Ranks every 2 Class Ranks. Foes weak to their twins (an Arm and its element). The calling pick. Her template's name, chip and Flourish (HP). The base MP regen. Pierce. The halls' two kinds and the Paladin's revive. **On today's gear.** | **v16 · v27** | H64–H72 |
+| **R1. Tier 1's fight** | Three weapons a class, set to the owner's defaults. Trees with no points: a trunk and one free fork. Skill Ranks every 2 Class Ranks. Foes weak to their twins (an Arm and its element). The calling pick. Her template's name, chip and Flourish (HP). The base MP regen. Pierce. The halls' two kinds and the Paladin's revive. **On today's gear.** | **v16 · v27** | H64–H72, **built and live** (D199–D207, D210) |
 | **R2. Tier 1's economy** | She owns every weapon, armor slot and accessory slot at G0, and one made item raises one a grade at Uma Lv 5g − 4 (ranks gone). Armor carries defense. One accessory slot holds the four families' base forms (Pendant, Orb, Bell, Insignia), and the supports retire. The signature accessory. The Planet and three moons, with her moon, opened by jewels (Star Gems gone). Ten professions in ten buildings, four slots each. The compensation: Craft Levels to 1, Speed Tickets for the time they took, and the first launch's sheet. New item icons. | **v17 · v28** | H73–H82 |
 | **R3. Tier 2's weapons** | Pure or Dual at G5, with the Branch Gem. A second accessory slot and its branches (Great, Channel, Twin, Toll, Onslaught). The kind cap. The weapon moon (Full or Split). The secondary profession. | **v18 · v29** | H83–H90 |
 | **R4. Tier 2's classes** | The class branches: the weapon-group focus, class skills, and the group names Heavy, Lite, Elemental and Arcane. Branch C and the Power or Break tip. Her signature tip. Tier 2's weaknesses by rank, boss shields 9 and Tier 2's term. | **v19 · v30** | H91–H97 |
@@ -89,7 +89,7 @@ on the shape it ships.
 
 Waves: 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
 
-Built (dark, live from H72): H64 (D199, D200), H65 (D201), H66 (D202), H67 (D203), H68 (D204), H69 (D205), H70 (D206), H71 (D207).
+Built and live (H64–H72, D199–D207, D210): H64 (D199, D200), H65 (D201), H66 (D202), H67 (D203), H68 (D204), H69 (D205), H70 (D206), H71 (D207), and H72's switch (D210), which turned engine v16 and save v27 on.
 
 **R2. Tier 1's economy (engine v17, save v28)**
 

@@ -1,5 +1,6 @@
-// Test-only (excluded from the build): a real-shaped v26 save for save v27's migration (H69). Tier 1 holds twenty Umas,
-// 100–119, invented, built on engine 15's rules whatever the switch says (a v26 save holds no `calling`):
+// Test-only (excluded from the build): a real-shaped v26 save for save v27's migration (H69; chained by H72, D210), labelled
+// v26 so parsing it runs the chain. Tier 1 holds twenty Umas, 100–119, invented, in v26's shapes (five weapons and the
+// side skills learned, no `calling`), which the live types no longer describe (`V26Class`, `V26Save`):
 // - 100, a Lv 50 Brawler at Class Rank 45 with five Arms, the sides Greatsword 4B and 5B, Lance 3A, Katana 2A and Axe 3A
 //   (§14's worked Brawler, her Greatsword 5B learned so the v26 parse takes her loadout), and four skills picked;
 // - 101, a Lv 20 Mage whose loadout holds only side skills; 102, a Lv 40 Spell Blade with her Katana 4B equipped; 103, a
@@ -10,7 +11,15 @@
 //   replays (`rpg/battle/v15-replays.fixture.json`), whose allies are 100–104.
 import { loadV15Replays, type V15Replay } from '../rpg/battle/v15-replays.fixture'
 import type { RpgClass } from '../rpg/kinds'
-import { newOwnedUma, newSave, type ClassLoadout, type OwnedUma, type Save } from './save'
+import type { RpgWeapon } from '../rpg/rules'
+import { newOwnedUma, newSave, type OwnedUma, type Save, type TierWorld } from './save'
+
+/** A class as save v26 stored it: five weapons, the side skills she learned and her equipped skills. */
+export interface V26Class { weapons: RpgWeapon[]; tree: string[]; loadout: string[] | null }
+/** An Uma as save v26 stored her: v26's classes, no calling. */
+export type V26Uma = Omit<OwnedUma, 'classes' | 'calling'> & { classes: Partial<Record<RpgClass, V26Class>> }
+/** A save labelled v26, its worlds holding v26's Umas. */
+export type V26Save = Omit<Save, 'schemaVersion' | 'tierWorlds'> & { schemaVersion: 26; tierWorlds: Record<string, Omit<TierWorld, 'umas'> & { umas: Record<string, V26Uma> }> }
 
 export const V27_T = ['2026-10-01T12:00:00.000Z', '2026-10-10T12:00:00.000Z', '2026-10-20T12:00:00.000Z'] as const
 const [T0, T1, T2] = V27_T
@@ -21,7 +30,7 @@ export const V27_RIFT_FIGHT = { name: 'the Rift Iron front, stage 5', actions: 1
 export const v15Replay = (prefix: string): V15Replay => loadV15Replays().find((r) => r.name.startsWith(prefix))!
 
 /** Each set-up class of the fixture's Umas, as v26 stores it. */
-export const V26_CLASSES: Readonly<Record<string, Partial<Record<RpgClass, ClassLoadout>>>> = {
+export const V26_CLASSES: Readonly<Record<string, Partial<Record<RpgClass, V26Class>>>> = {
   100: { brawler: { weapons: ['greatsword', 'axe', 'lance', 'bow', 'katana'],
     tree: ['brawler-greatsword.4b', 'brawler-greatsword.5b', 'brawler-lance.3a', 'brawler-katana.2a', 'brawler-axe.3a'],
     loadout: ['brawler-greatsword.5b', 'brawler-axe.3a', 'brawler-katana.5', 'brawler-greatsword.2'] } },
@@ -38,19 +47,21 @@ export const V26_CLASSES: Readonly<Record<string, Partial<Record<RpgClass, Class
 const LEVELS: Readonly<Record<string, number>> = { 100: 50, 101: 20, 102: 40, 103: 50, 104: 30, 105: 15 }
 const RANKS: Readonly<Record<string, number>> = { 100: 45, 101: 30, 102: 40, 103: 40, 104: 20, 105: 10 }
 
-function uma(id: string, classId: RpgClass | null): OwnedUma {
-  const u: OwnedUma = { ...newOwnedUma(T0, undefined, 15), level: LEVELS[id] ?? 50, classId }
+function uma(id: string, classId: RpgClass | null): V26Uma {
+  const { calling: _, ...fresh } = newOwnedUma(T0)
+  const u: V26Uma = { ...fresh, level: LEVELS[id] ?? 50, classId, classes: {} }
   const classes = V26_CLASSES[id]
   if (classes) {
-    u.classes = JSON.parse(JSON.stringify(classes)) as OwnedUma['classes']
+    u.classes = JSON.parse(JSON.stringify(classes)) as V26Uma['classes']
     for (const c of Object.keys(classes) as RpgClass[]) u.ranks.classes[c] = { rank: RANKS[id]!, exp: 0 }
   }
   return u
 }
 
-/** The v26 save, labelled v26 (the live version until H72). */
-export function v26Save(): Save {
-  const save = newSave('Save v27', T0)
+/** The v26 save, labelled v26 (the live version until H72): parsing it runs `toV27` through the chain. */
+export function v26Save(): V26Save {
+  const { schemaVersion: _, tierWorlds: worlds, ...fresh } = newSave('Save v27', T0)
+  const save: V26Save = { ...fresh, schemaVersion: 26, tierWorlds: { '1': { ...worlds['1']!, umas: {} } } }
   const world = save.tierWorlds['1']!
   const classes: (RpgClass | null)[] = ['brawler', 'mage', 'spellblade', 'paladin', 'summoner', 'brawler', null, 'cleric', null, 'mage']
   for (const [i, id] of ids(100, 20).entries()) world.umas[id] = uma(id, classes[i] ?? null)
@@ -73,8 +84,9 @@ export function v26Save(): Save {
   return save
 }
 
-/** A save's worlds as JSON, each run through `step`, still labelled v26: what H72's chain will hand the parser. */
-export function migrated(save: Save, step: (world: Record<string, unknown>) => Record<string, unknown>): unknown {
+/** A save's worlds as JSON, each run through `step`, still labelled as it was (v26: the chain runs `toV27` again, which
+ * changes nothing on a v27 world). */
+export function migrated(save: V26Save | Save, step: (world: Record<string, unknown>) => Record<string, unknown>): unknown {
   const raw = JSON.parse(JSON.stringify(save)) as { tierWorlds: Record<string, Record<string, unknown>> }
   return { ...raw, tierWorlds: Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, step(w)])) }
 }

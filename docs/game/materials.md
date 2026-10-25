@@ -300,14 +300,14 @@ Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade
 - **A Talisman or an Amulet:** the effect in the table below ([combat](combat.md#damage)).
 
 **Slots and wearing:**
-- **Slots:** five weapon slots (her class's), five armor slots (head, body, legs, arms, feet) and two accessory slots,
-  Damage for an Orb and Support for a Talisman or an Amulet (C10).
+- **Slots:** three weapon slots (her class's, by channel, engine v16), five armor slots (head, body, legs, arms, feet)
+  and two accessory slots, Damage for an Orb and Support for a Talisman or an Amulet (C10).
 - **Wearing a grade:** grade k needs her Weapon Rank for that weapon, her Armor Rank for that armor kind, or her
   Accessory Rank for the accessory's kind, at k or more ([classes](classes.md#ranks-and-levels)).
 - **Training pieces:** every Uma holds a grade-0 Training piece of each weapon and armor kind, with no stats. It fills a
   slot until she binds that kind's grade 1, and isn't offered after (D98, D124). A new Uma's armor slots hold her
-  starting class's Training pieces: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or Summoner, the
-  physical ones for a Brawler or a Paladin (D162).
+  starting class's Training pieces, her calling's: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or
+  Summoner, the physical ones for a Brawler, a Spell Blade or a Paladin (D162).
 
 <!-- live:gear -->
 | Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |

@@ -5,7 +5,7 @@ import { newOwnedUma, newTierWorld, type OwnedUma, type TierWorld } from './save
 export const ECONOMY_V3_NOW = '2026-10-25T12:00:00.000Z'
 
 export function gradedUma(overrides: Partial<OwnedUma> = {}): OwnedUma {
-  const fresh = newOwnedUma(ECONOMY_V3_NOW, 'brawler', 17)
+  const fresh = newOwnedUma(ECONOMY_V3_NOW, 'brawler')
   return { ...fresh, classId: 'brawler', ...overrides, gear: overrides.gear ?? newGrades(1) }
 }
 

@@ -97,7 +97,7 @@ export function simulate(seed = 1400) {
   return { save, rows, visited, springUses, minutes: elapsed / MINUTE }
 }
 
-/** One Brawler's five weapons, five physical armor pieces and two accessories: 24 refined items (D124, D125). */
+/** One Brawler's three weapons (engine v16), five physical armor pieces and two accessories: 20 refined items (D124, D125). */
 export function fullSet(grade: number): Record<string, number> {
   const inputs: Record<string, number> = {}
   for (const type of [...rpgDefaultWeapons('brawler'), 'helm', 'cuirass', 'greaves', 'gauntlets', 'boots', 'orb-greatsword', 'talisman-vital'] as const)
@@ -155,8 +155,8 @@ export function markdown(): string {
   ]
   for (const r of result.rows) rows.push(`| ${WORLD_LEVELS * (r.band - 1) + 1}–${WORLD_LEVELS * r.band} | ${r.fights} (${r.first}/${r.replays}) | ${(r.milliseconds / MINUTE).toFixed(1)} | ${r.exp} | ${r.classExp} | ${r.weaponExp} | ${r.armorExp} | ${r.laurels} | ${r.gearMarks} / ${r.classMarks} |`)
   const wilds = freshWorker(result.rows), world = worldOf(result.save)
-  rows.push('', 'EXP is per Uma; Weapon/Armor EXP sums her five bars. Currency and Marks are the whole party’s stock.', '',
-    '| Grade | Refined / twelve-piece set | Raw capacity* | Fresh G1 output |', '|---|---|---|---|')
+  rows.push('', 'EXP is per Uma; Weapon EXP sums her three bars, Armor EXP her five. Currency and Marks are the whole party’s stock.', '',
+    '| Grade | Refined / ten-piece set | Raw capacity* | Fresh G1 output |', '|---|---|---|---|')
   for (const r of result.rows) {
     const grade = 2 * r.band, minutes = r.milliseconds / MINUTE
     rows.push(`| ${grade} | ${Object.values(fullSet(grade)).reduce((n, v) => n + v, 0)} | ${capacity(world, grade, minutes).toFixed(2)} | ${wilds.production[r.band - 1]} |`)
@@ -164,10 +164,10 @@ export function markdown(): string {
   const total = result.rows.reduce((s, r) => ({ fights: s.fights + r.fights, first: s.first + r.first, replays: s.replays + r.replays }), { fights: 0, first: 0, replays: 0 })
   const uma = world.umas[ids[0]!]!
   rows.push('', `Total: **${total.fights} wins** (${total.first} first, ${total.replays} replay), **${result.minutes.toFixed(1)} fight minutes**, five Lv50 Umas.`,
-    `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; five Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons?.[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors ?? {}).map((r) => r!.rank).join('/')}.`,
+    `Representative Brawler: Class Rank ${uma.ranks.classes.brawler!.rank}; three Weapon Ranks ${rpgDefaultWeapons('brawler').map((w) => uma.ranks.weapons?.[w]!.rank).join('/')}; five Armor Ranks ${Object.values(uma.ranks.armors ?? {}).map((r) => r!.rank).join('/')}.`,
     `Banked: ${world.wallet.laurels} Laurels, ${world.wallet.gearMarks} Gear Marks and ${world.wallet.classMarks} Class Marks. No Manuals bought, no class switching, no tokens.`,
     `Four-hour target (180–300 min): **${result.minutes < TARGET_MINUTES * (1 - TARGET_TOLERANCE) ? 'under' : result.minutes > TARGET_MINUTES * (1 + TARGET_TOLERANCE) ? 'over' : 'met'}**. No game number retuned.`,
     `*One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. A fresh worker finishes ${wilds.finished} grade-1 raw items and ends at Craft Lv${wilds.profession.level}. Refining and crafting need additional time.`)
   return rows.join('\n')
 }
-export const report = (): string => 'Victory ledger: fixed classes; equal five-weapon shares; all currency banked; no combat or MP-spend estimate.\n\n' + markdown()
+export const report = (): string => 'Victory ledger: fixed classes; equal three-weapon shares; all currency banked; no combat or MP-spend estimate.\n\n' + markdown()

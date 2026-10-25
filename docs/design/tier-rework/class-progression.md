@@ -37,6 +37,12 @@
 > weapon-progression), it is history: read it as retired. Each edited spot says "Follow-up to D197 (Uma Templates),
 > 2026-10-25".
 >
+> **R1 live from H72, 2026-10-25 (D210)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the
+> game on engine v16 and save v27: three weapons a class by channel on the owner's defaults (CP2, CP3, CP12), trees with
+> a trunk and one fork and Skill Ranks (CP13–CP18, CP21–CP23, CP32, CP42), twin weaknesses and Tier 1's shields 6 and 8
+> (CP5, CP7, CP8), the halls' two kinds and the Paladin's revive (CP35, CP37), the calling pick (CP29, CP30). The manual
+> ([classes](../../game/classes.md), [combat](../../game/combat.md)) describes them as played.
+>
 > **Authored 2026-10-23; revised after the owner's first review and again after his second pass, both 2026-10-24.
 > Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.1). It absorbs
 > [classes.md](classes.md) and [skill-trees.md](skill-trees.md), which stay as history, and supersedes every CL and SK

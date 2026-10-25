@@ -128,8 +128,8 @@ BY_V16.set('cleric-1', { ...BY_V2.get('cleric-1')!, blurb: 'Light on every foe, 
   casts: [{ target: 'all', hits: [one('light', 0.5), one('lightning', 0.5)], status: { key: 'aegis', stacks: 2, turns: 2, to: 'allies' } }] })
 const byVersion = (version: number) => (rpgRework('fight', version) ? BY_V16 : rpgV2(version) ? BY_V2 : BY_V1)
 const LIVE = byVersion(BATTLE_ENGINE_VERSION)
-/** The live generation's Limit Breaks, in seat order: today's 20 until the switch (H61), the six halls' 24 after, with
- * v16's two kinds from H72. Screens and the manual read these; the engine reads `heroLimitFor(id, version)`. */
+/** The live generation's Limit Breaks, in seat order: the six halls' 24 (20 to v14), with v16's two kinds since H72
+ * (D210). Screens and the manual read these; the engine reads `heroLimitFor(id, version)`. */
 export const HERO_LIMITS: readonly HeroLimit[] = [...LIVE.values()]
 export const heroLimit = (id: HeroLimitId): HeroLimit => LIVE.get(id)!
 /** A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Undefined only

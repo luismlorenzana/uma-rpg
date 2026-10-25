@@ -23,11 +23,12 @@ export const BATTLE_HEAL_SCALE = 300
 //
 // The Tier rework's five releases (D198, docs/design/tier-rework/implementation.md) each open at their engine:
 // `rpgRework(stage, engine)`, the same pattern. Each is built dark and turned on by its switch packet, which moves
-// BATTLE_ENGINE_VERSION to the stage's engine (H72 for the fight, 16). `rpg/battle/v15-replays*.test.ts` pins v15's fights
-// under the live switch and with it at 16 (H64, D200); tests mock the switch with `caps-at.fixture.ts`'s `capsAt`.
+// BATTLE_ENGINE_VERSION to the stage's engine: R1, Tier 1's fight, is engine v16, built in H64–H71 and live since H72
+// (D210). `rpg/battle/v15-replays.test.ts` pins v15's fights under the live switch (H64, D200); tests mock the switch with
+// `caps-at.fixture.ts`'s `capsAt`.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 15
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 16
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
@@ -50,7 +51,7 @@ export const BATTLE_REGEN_ROUNDS = 2
  * with today's supports worn it brings a region's last four stages to today's pace at Lv 50 (0.88× → 0.90×), MP's drag
  * there to today's (1.24); no deep cast refunded by a round (a healer's 63% the most). */
 export const RPG_BASE_MP_REGEN = 0.009
-/** v16: the depths the base MP regen counts, at most: five, so 4% from Class Rank 40 (Tier 3's sixth doesn't raise it). */
+/** v16: the depths the base MP regen counts, at most: five, so 4.5% from Class Rank 40 (Tier 3's sixth doesn't raise it). */
 export const RPG_BASE_MP_REGEN_DEPTHS = 5
 /** v16 (UT6, D204): her Flourish gives this share of her max HP a fight, as her calling's class: Clean break's Barrier, or
  * the most Even pace and Late reserve mend. */

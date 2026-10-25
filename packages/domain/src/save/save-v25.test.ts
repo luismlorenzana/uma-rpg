@@ -1,6 +1,6 @@
 // Save v25 with the switch on (H58; live since H61, D188): a v24 world `toV25` produced parses under classes v2's live
-// lists (six classes, 24 seats, v2's weapon slots), and its open v14 fights replay; the same world unmigrated, labelled
-// v25, doesn't. The chain itself (a v24 save parsed as v25) is `migrations-v25.test.ts`'s.
+// lists (six classes, 24 seats), through the chain's later steps to v27 since H72 (D210), and its open v14 fights replay;
+// the same world unmigrated, labelled v25, doesn't. The chain itself is `migrations-v25.test.ts`'s.
 import { describe, expect, it } from 'vitest'
 import { replayV14 } from '../rpg/battle/v14-replays.fixture'
 import { HERO_LIMIT_IDS } from '../rpg/hero-id'
@@ -23,14 +23,14 @@ describe('save v25 with the switch on (H58)', () => {
     expect(HERO_LIMIT_IDS).toHaveLength(24)
   })
 
-  it('parses a v24 world run through toV25: the Paladin, the Bastion’s seats and typed accessories', () => {
+  it('parses a v24 world run through toV25: the Paladin, the Bastion’s seats and typed accessories (then v27’s classes)', () => {
     const save = parseSave(migrated(v24Save(), toV25))
     const world = save.tierWorlds['1']!
     expect(Object.keys(world.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
-    expect(world.umas['103']!.classes.paladin).toEqual({
-      weapons: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-ice'], tree: ['paladin-greatsword.1a', 'paladin-axe.2a', 'paladin-tome-light.3b', 'paladin-lance.4b'],
-      loadout: ['paladin-greatsword.1a', 'paladin-axe.2', 'paladin-bow.3', 'paladin-tome-fire.1'],
-    })
+    // toV25's Paladin (`migrations-v25.test.ts`), then toV27's three and lines: her Light 3B and Lance 4B put both on B, and
+    // only her Axe 2 of the renamed loadout is on her path in her three.
+    expect(world.umas['103']!.classes.paladin).toEqual({ weapons: ['greatsword', 'axe', 'tome-light'], lines: { lance: 'B', 'tome-light': 'B' },
+      loadout: ['paladin-axe.2'] })
     expect(world.umas['103']!.ranks.classes.paladin).toEqual({ rank: 40, exp: 0 })
     expect(world.heroes['paladin-1']).toEqual({ hero: '107', learners: ['108', '109'] })
     expect(world.heroes['paladin-2']).toEqual({ hero: '110', learners: ['108'] })
@@ -59,9 +59,9 @@ describe('save v25 with the switch on (H58)', () => {
     }
   })
 
-  it('refuses the same world unmigrated (labelled v25, so the chain skips it), on the Cleric’s weapons', () => {
+  it('refuses the same world unmigrated (labelled v25, so the chain skips toV25), on the second Orb toV25 moves', () => {
     const unmigrated = { ...JSON.parse(JSON.stringify(v24Save())), schemaVersion: 25 }
     expect(() => parseSave(unmigrated)).toThrow(SaveParseError)
-    expect(() => parseSave(unmigrated)).toThrow(/umas\.103\.classes\.cleric\.weapons: not five weapons a cleric can wield/)
+    expect(() => parseSave(unmigrated)).toThrow(/umas\.105\.gear\.equipped\.accessory-2: expected a piece from her locker for this slot/)
   })
 })

@@ -128,7 +128,7 @@ describe('which parties can fight', () => {
 })
 
 describe('the guided weapons (CP7, H70)', () => {
-  it('pairs a party\'s members to the front\'s build by class, in party order, from v16 only', () => {
+  it('pairs a party\'s members to the front\'s build by class, in party order', () => {
     // Iron's build: the first Brawler and Spell Blade on their defaults, the second ones on the Bow and the Katana.
     expect(guidedWeapons(GUIDED[0]!, 'iron', 16)).toEqual([
       ['greatsword', 'axe', 'lance'], ['bow', 'katana', 'axe'],
@@ -140,8 +140,8 @@ describe('the guided weapons (CP7, H70)', () => {
       ['greatsword', 'axe', 'tome-light'], ['greatsword', 'axe', 'lance'], null, ['bow', 'katana', 'axe'], null,
     ])
     expect(guidedWeapons([null, 'cleric'], 'arcane', 16)).toEqual([null, ['tome-light', 'tome-ice', 'bow']])
-    // Before v16 the guidance is classes only.
-    expect(guidedWeapons(GUIDED[0]!, 'iron', 15)).toBeNull()
+    // The live build is v16's.
+    expect(guidedWeapons(GUIDED[0]!, 'iron')).toEqual(guidedWeapons(GUIDED[0]!, 'iron', 16))
   })
 })
 
