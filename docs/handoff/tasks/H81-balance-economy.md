@@ -144,3 +144,18 @@ days), which no packet has measured yet.
   the deploy.
 - **Flag it done:** after the merge, a `docs(handoff): H81 done (D…)` commit deletes this file, sets H81 to Done with a
   Done row (its numbers for H82's manual and for R3's H89), and sets H82 to Ready if its other needs are done.
+
+## Notes from the build (main session, 2026-10-25)
+
+- **From H76 (D213):** her Gritty moon's +1.6 Limit start (4 Limit points) reaches a fight as a start of **1**: the
+  engine takes a whole-number `limitStart` and `applyPoints` rounds down, as today's Limit points do. Decide whether that
+  stands or the rounding changes, and record it. `balanceMember` at engine 17 reads stars through `mapPoints` but still
+  v1 gear (`equippedPoints`): swap in grades before measuring. `rpgFoeTierBudget(lifetime, rate, 17)` scales the build
+  part × tier (Lv 50 of each tier ×2.715 · ×2.719 · ×2.721 HP and defense, ×1.49 · ×1.491 · ×1.492 offense).
+- **From H77 (D211):** recipes and counts through `madeRecipe`, `madeRefined`, `ladderTier`, `PLACE_SLOTS_V3` (4),
+  `PLACE_SPEED_V3` (1.25), `TRADES`, `tradePlaces`; make time `itemMinutes(level)` × the refined count. One Uma's Tier 1
+  demand measures 110 pieces and 485 refined (493 with her moon).
+- **From H71 (D207):** with the supports gone, today's gear gives a late-region pace of 0.87 · 0.80 · 0.66: re-tune the
+  regen's share against R2's MP (Vigor, legs). The Summoner's Arms hand is 0.50 from v16 with no v17 row; SB11's 0.48 is
+  on Prowess, so add a v17 row if the measure says so. `RPG_LINE_B_POWER_V16` and `RIFT_TUNING_V16` also apply from v17.
+
