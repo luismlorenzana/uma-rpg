@@ -374,6 +374,43 @@ the wrong party's 58%; ×2: 4% to 14%), because the balance party's core-and-sid
 game's default loadout Iron's party wins every Iron stage and 95% of the champions, so in play the gap is wider than the
 table's.
 
+### Tier rework R1 (engine v16, H71, D207)
+
+*Follow-up to H71 (D207), 2026-10-25; dark until R1's switch (H72).* The same tables with each front's v16 guided build
+(class-progression CP7: classes v2's compositions, each member on her three weapons, a second copy re-specced) on curve
+at Lv 50 as R1 Umas (`balanceMember(…, { engine: 16 })`: line A, Class Rank 50, every Skill Rank 5, the base MP regen,
+today's gear with her Orb on her first slot's kind), first try on Auto, 96 fights a stage (three runs, 32 seeds); the Duel
+and the Horde draw twin sets (D202). On v15's numbers these parties cleared the fronts far faster than classes v2's
+did (Iron's stages in 5 rounds, not 8): Iron's champion 100%, the Horde's 99%, Arcane's 77%, the Convergence 94%, and
+the Duel's champion 22%; Arcane's wrong party (Iron's) won 78%, 96%, 43% of its stages and 31% of its champion.
+**`RIFT_TUNING_V16`**, v15's override with: Iron ×1.6 offense; Arcane ×1.6 HP and ×1.2 offense (×1.2 and ×1.1), its
+sub-bosses weak to one element (two); the elites' offense 1.6 → 2 (Iron's and Arcane's stages 5 and 7); the Duel's
+champion ×0.8 HP and offense; the Horde's champion ×1.3 (×1.05); the Convergence −0.18 → −0.1. Iron's and Arcane's
+champion scales, every shield, the Duel's shields and the Echo multiplier stay v15's; faces, ranks and counts are v15's
+(a test). H63's in brackets.
+
+| Target | Value | Measured, R1 (H71, D207) |
+|---|---|---|
+| The right party | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 95%, 99%, 89% [100%, 100%, 98%]; Arcane 92%, 92%, 99% [89%, 98%, 96%]; Duel 100%, 99%, 94% [99%, 97%, 97%]; Horde 99%, 100%, 98% [100%, 85%, 97%]. Champions: Iron 61% [66%], Arcane 69% [64%], Duel 65% [61%], Horde 70% [70%] |
+| The wrong party | ≤ 30% a stage, ≤ 10% a champion | On Iron, Arcane's party: 10%, 20%, 1% a stage [40%, 84%, 56%], 0% the champion: **met for the first time**. On Arcane, Iron's party: 28%, **75%**, 4% a stage [0%, 8%, 0%], 4% the champion (**missed** at stages 5–8, below) |
+| The Convergence, right parties | About 50% an attempt | 52% (50 of 96) [52%]; its fights 67%, 83%, 100%, 96% |
+| The Duel's guard rail | Every class's best single act < the Duel's lowest shield | 10 against 13: each class's own acts 5–10 at Skill Rank 5 on either line (the Spell Blade's Pierce included), the best Limit Break 12 (shields 13–15, unchanged) |
+| A run's length | About 2–3 weeks | About 57 fights on Auto [59]: 52 for the 48 stages and 5 for the Convergence's two attempts |
+| Echoes, how hard | Lv 45 ≥ 80% re-specced; Lv 50 ≥ 80%, Lv 55 about 50% | Lv 45: 100%. Lv 50: 92–100%. Lv 55: Iron 98–100%, Arcane 66–79% [35%], Duel 17–54% [100%], Horde 78–97% [28%] (one multiplier, as H51's) |
+| The Bestiary | Two or three runs | Three runs (unchanged) |
+
+**Arcane's wrong party, R1's one miss.** Iron's v16 build carries more magic than classes v2's (both Spell Blades' Tome
+halves, the second's Fire Tome, the Paladin's Light Tome) and Paladin-and-Brawler bulk, so through the physical ward it
+outlasts Arcane's two sub-bosses (stages 5 and 7) and its boss and guard (6 and 8): 14 rounds a stage, where Arcane's
+own party needs 11–12. Every setting that pushed it under 30% there pushed Arcane's own party under 80%: the elites' and the boss's
+offense ×2.2 and ×1.8 took the wrong party to 10% and the right to 64%, Arcane ×1.4 HP and ×1.6 offense to 41% and 89% (and
+its stages 1–4 to 55%). Its sub-bosses weak to one element and the elites' offense 2 are the closest (75% against the
+right party's 92%). Iron's wrong party, the miss since H51, now holds: Iron's higher offense ends Arcane's slow casters.
+
+**The default loadout** plays the balance party's loadout from v16 (each weapon's deepest held skill), so its rows equal
+the right parties'. **One healer:** Paladin ÷ Cleric healing and absorbed Barriers 111% a fight across the world's Lv 50
+bosses and each front's stage 8 and champion (H63 94%).
+
 ## 12. Owner calls: decided 2026-10-21 (D161), all as recommended
 
 | Call | Question | Recommendation |

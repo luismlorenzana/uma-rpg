@@ -6,16 +6,17 @@ import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import type { BattleAlly, BattleInput } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
-import type { RpgDamageKind } from '../rpg/kinds'
+import { rpgWeaponKind, type RpgDamageKind } from '../rpg/kinds'
+import type { RpgLines } from '../rpg/node-identity'
 import {
-  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
-  type RpgClass, type RpgNodeRef, type RpgProfile,
+  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
+  type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/stars'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
-import { ARMOR_SLOT_KINDS, ARMOR_SLOTS } from '../economy/ranks'
+import { ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext } from '../economy/ranks'
 import type { ItemEffect } from '../items/kinds'
 
 export const BALANCE_PARTY: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
@@ -50,7 +51,37 @@ export const BALANCE_KIT_V2: Readonly<Record<RpgClass, BalanceKit>> = {
   summoner: { ...KIT.summoner, magical: MAGICAL, accessories: ['orb-fire', 'amulet-siphon'] },
   paladin: { ...KIT.paladin, magical: PHYSICAL, accessories: ['orb-greatsword', 'talisman-thorn'] },
 }
-const kitOf = (classId: RpgClass, engine: number): BalanceKit => (rpgV2(engine) ? BALANCE_KIT_V2 : KIT)[classId]
+/**
+ * The Tier rework's R1 kit (engine v16, H71; D199 point 2): today's gear, so v2's kit with her Orb on her **v16 first
+ * slot's** kind (a hybrid's lead half, SB10's rule met by the slot order) and today's supports. `classPreset(c, 16)` must
+ * agree: `world/balance-v16.test.ts` checks it. A member built on other weapons (a guided build's second copy) wears her
+ * Orb on her own first slot's kind, the preset's rule (`balanceMember`).
+ */
+export const BALANCE_KIT_V16: Readonly<Record<RpgClass, BalanceKit>> = {
+  brawler: { ...BALANCE_KIT_V2.brawler, accessories: ['orb-greatsword', 'talisman-vampire'] },
+  mage: { ...BALANCE_KIT_V2.mage, accessories: ['orb-fire', 'amulet-siphon'] },
+  spellblade: { ...BALANCE_KIT_V2.spellblade, accessories: ['orb-katana', 'talisman-vampire'] },
+  cleric: { ...BALANCE_KIT_V2.cleric, accessories: ['orb-light', 'amulet-spring'] },
+  summoner: { ...BALANCE_KIT_V2.summoner, accessories: ['orb-dark', 'amulet-siphon'] },
+  paladin: { ...BALANCE_KIT_V2.paladin, accessories: ['orb-greatsword', 'talisman-thorn'] },
+}
+const kitOf = (classId: RpgClass, engine: number): BalanceKit =>
+  (rpgRework('fight', engine) ? BALANCE_KIT_V16 : rpgV2(engine) ? BALANCE_KIT_V2 : KIT)[classId]
+
+/**
+ * The balance Uma's Class Rank on the real pace (SB16, CP32; H71): a win pays 2E Class EXP (`CLASS_EXP_SHARE`) on the Uma
+ * Level's curve, so it is the highest rank whose total Class EXP from Rank 1 fits in twice her total Uma EXP to `level`:
+ * Class Rank 20 at Lv 13, 30 at 20, 40 at 27, 50 at 34 (class-progression §7.1). From v16 the balance party reads it;
+ * to v15 her Class Rank is her level, as H60 measured.
+ */
+export function balanceClassRank(level: number): number {
+  let uma = 0
+  for (let l = 1; l < level; l++) uma += rpgExpToNext(l)
+  const budget = CLASS_EXP_SHARE * uma
+  let rank = 1, spent = 0
+  while (rank < CLASS_MAX_RANK && spent + classExpToNext(rank) <= budget) { spent += classExpToNext(rank); rank++ }
+  return rank
+}
 
 /** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats. */
 export function onCurveStars(classId: RpgClass, level: number, engine: number = BATTLE_ENGINE_VERSION): string[] {
@@ -66,22 +97,30 @@ export function onCurveStars(classId: RpgClass, level: number, engine: number = 
  * grade, Extra Stats, slots and Bond read the tier level, as a player's restart at Ascend. `engine` (default the live one)
  * builds her in that engine's class generation (H60): from v15 her v2 spread, leans and HP, the v2 kit, her Orb's offense
  * on its kind's Might and no `orbs`, and her class's first seat in the v15 halls. `support` replaces her kit's second
- * accessory (v2: the Support slot) with that type, or empties it with null (H60's support-accessory rule). */
+ * accessory (v2: the Support slot) with that type, or empties it with null (H60's support-accessory rule). From v16 (H71)
+ * `lines` puts her B trees on B (all A by default, the anchor, CP15), `weapons` gives her other weapons than her class's
+ * defaults (a guided build's member), and her Class Rank reads the real pace (`balanceClassRank`) unless `classRank` says. */
 export interface BalanceOptions {
   gear?: boolean; stars?: boolean; heroes?: boolean; classRank?: number; tier?: number; engine?: number; support?: string | null
+  lines?: RpgLines; weapons?: readonly RpgWeapon[]
 }
 
 /** An average outfit of a class at a level: side skills learned deepest first, the deepest skills equipped one weapon at a
  * time, and, on curve, her gear, Extra Stats and an inherited Limit Break. From v16 (H65) the Tier rework's Uma: her three
- * default weapons, no side skills, every tree on line A, her held skills and v16's slots (seven by Lv 40); her Class Rank
- * is her level unless `classRank` says otherwise (the real pace is H71's). */
+ * default weapons (or `weapons`), no side skills, every tree on line A (or `lines`), her held skills and v16's slots
+ * (seven by Lv 40); her Class Rank on the real pace (`balanceClassRank`, H71) unless `classRank` says otherwise. */
 export function balanceMember(classId: RpgClass, i: number, level: number, options: BalanceOptions = {}): BattleAlly {
   const tier = options.tier ?? 1
   const engine = options.engine ?? BATTLE_ENGINE_VERSION
   const v2 = rpgV2(engine)
+  const v16 = rpgRework('fight', engine)
+  const weapons = v16 && options.weapons ? [...options.weapons] : rpgDefaultWeapons(classId, engine)
+  // Her lines on the weapons she holds (a line on a tree she doesn't slot means nothing).
+  const held = v16 ? Object.entries(options.lines ?? {}).filter(([w]) => weapons.includes(w as RpgWeapon)) : []
+  const lines: RpgLines | undefined = held.length ? Object.fromEntries(held) : undefined
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId, engine), tier, level, exp: 0,
-    tree: [], legacy: [], classRank: options.classRank ?? level }
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons, tier, level, exp: 0,
+    tree: [], legacy: [], classRank: options.classRank ?? (v16 ? balanceClassRank(level) : level), ...(lines ? { lines } : {}) }
   // To v15 she learns the A side at every depth while her points last; from v16 nothing is learned (CP14).
   if (!rpgRework('fight', engine)) {
     for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
@@ -101,7 +140,9 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   if (options.gear) {
     for (const w of profile.weapons) equipped[w] = `${w}-g${grade}`
     ARMOR_SLOTS.forEach((slot, k) => { equipped[slot] = `${ARMOR_SLOT_KINDS[slot][kit.magical[k] ? 1 : 0]}-g${grade}` })
-    const accessories = options.support === undefined ? kit.accessories : [kit.accessories[0]!, options.support]
+    // From v16 her Orb is on her first slot's kind: the kit's on her defaults, her own first weapon's on a guided build.
+    const orb = v16 && options.weapons ? `orb-${rpgWeaponKind(profile.weapons[0]!)}` : kit.accessories[0]!
+    const accessories = options.support === undefined ? [orb, ...kit.accessories.slice(1)] : [orb, options.support]
     accessories.forEach((type, k) => { if (type) equipped[`accessory-${k + 1}` as GearSlot] = `${type}-g${grade}` })
   }
   const points = addPoints(options.gear ? equippedPoints(equipped) : noPoints(), options.stars ? starPoints(onCurveStars(classId, level, engine)) : noPoints())
@@ -115,7 +156,7 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   const bond = Math.min(10, Math.floor(level / 2.3))
   const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined
   return { id: profile.outfitId, classId, weapons: profile.weapons, tier, level, stats: boosted.stats, tree: profile.tree, legacy: [],
-    loadout, mp: boosted.stats.mp, classRank: profile.classRank, ...(Object.keys(might).length ? { might } : {}), ...effects,
+    ...(lines ? { lines } : {}), loadout, mp: boosted.stats.mp, classRank: profile.classRank, ...(Object.keys(might).length ? { might } : {}), ...effects,
     ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}),
     ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}), ...(inherits ? { inherits } : {}) }
 }

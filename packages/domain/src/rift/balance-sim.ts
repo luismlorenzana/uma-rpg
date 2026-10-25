@@ -1,18 +1,20 @@
 // The Rift's balance simulation's support (rift.md §11, H51; classes v2 §9, H60): the guided parties, the fights, the
 // buckets and the Duel's guard rail, by engine, shared by `rift/balance.test.ts` (H51's tables, `SIM_ENGINE` picks the
-// generation) and `rift/balance-v15.test.ts` (classes v2's targets). Test support only: nothing in the game imports it.
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+// generation), `rift/balance-v15.test.ts` (classes v2's targets) and `rift/balance-v16.test.ts` (R1's, H71). Test support
+// only: nothing in the game imports it.
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import { applyBattleAction, createBattle } from '../rpg/battle/engine'
 import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
 import type { BattleAction, BattleAlly, BattleCue, BattleEnemy, BattleHalf, BattleInput, BattleState } from '../rpg/battle/types'
-import { RPG_ALL_NODES, RPG_NODES, type RpgNode } from '../rpg/catalog'
+import { RPG_ALL_NODES, RPG_NODES, rpgNodeSkill, type RpgNode } from '../rpg/catalog'
 import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_IDS, type HeroLimitId } from '../rpg/hero-id'
 import { isRpgElement } from '../rpg/kinds'
+import { rpgNodeLine, type RpgLines } from '../rpg/node-identity'
 import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, isRpgTome, rpgAutoLoadout, rpgClassSlots, rpgClassTrees, rpgHand, validRpgWeapons,
   type RpgClass, type RpgNodeRef, type RpgWeapon } from '../rpg/rules'
 import { balanceMember, type BalanceOptions } from '../world/balance-party'
 import { play, type Played, type PlayObserver } from '../world/balance-play'
-import { riftParty, riftTuning } from './fronts'
+import { riftGuidedBuild, riftParty, riftTuning } from './fronts'
 import { riftBattleInput, riftFight, riftSeed, type RiftContext, type RiftFightPlan } from './generate'
 import { packRoster } from './roster.fixture'
 import { RIFT_STAGES, type RiftFront } from './state'
@@ -24,18 +26,23 @@ export const RUNS = ['t1-r1', 't1-r2', 't1-r3'] as const
 export const ctx = (runId: string | null): RiftContext => ({ tier: 1, runId, roster, defeated: new Set() })
 
 /** A front's guided party (D168; v2 D178): its five classes in the engine's generation (`riftParty`), on curve at Lv 50;
- * `respec` puts one member at Class Rank 1 (a fresh class, the same gear), as an Uma who has just switched; `options`
- * adds to each member's (H60: a support accessory). */
+ * from v16 (H71) its guided build (`riftGuidedBuild`, CP7): each member on her own three weapons. `respec` puts one member
+ * at Class Rank 1 (a fresh class, the same gear), as an Uma who has just switched; `options` adds to each member's (H60: a
+ * support accessory). */
 export const guided = (front: RiftFront, engine: number = BATTLE_ENGINE_VERSION, respec?: number, options: BalanceOptions = {}): BattleAlly[] =>
-  partyOf(riftParty(front, engine), engine, respec, options)
+  (rpgRework('fight', engine)
+    ? riftGuidedBuild(front, engine).map((m, i) => balanceMember(m.classId, i, RPG_TIER_MAX_LEVEL,
+      { ...ON_CURVE, engine, weapons: m.weapons, ...options, ...(i === respec ? { classRank: 1 } : {}) }))
+    : partyOf(riftParty(front, engine), engine, respec, options))
 /** Five classes on curve at Lv 50 in an engine's generation. */
 export const partyOf = (classes: readonly RpgClass[], engine: number = BATTLE_ENGINE_VERSION, respec?: number, options: BalanceOptions = {}): BattleAlly[] =>
   classes.map((c, i) => balanceMember(c, i, RPG_TIER_MAX_LEVEL, { ...ON_CURVE, engine, ...options, ...(i === respec ? { classRank: 1 } : {}) }))
 /** The same Uma with the game's default loadout (`rpgAutoLoadout`: each weapon's deepest open cores), as a save fights
- * before the player picks her skills. The balance party equips each weapon's deepest core and side skill instead. */
-export const withDefaultLoadout = (a: BattleAlly): BattleAlly => ({ ...a, loadout: rpgAutoLoadout({ outfitId: a.id, classId: a.classId, weapons: a.weapons,
-  tier: a.tier, level: a.level, exp: 0, tree: [], legacy: [], classRank: a.classRank ?? a.level,
-  baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 }, growthRates: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 } }) })
+ * before the player picks her skills, in an engine's generation (from v16 her held skills on her `lines`, H71). The
+ * balance party equips each weapon's deepest core and side skill instead (from v16 her deepest held ones). */
+export const defaultLoadoutAt = (engine: number) => (a: BattleAlly): BattleAlly => ({ ...a, loadout: rpgAutoLoadout({ outfitId: a.id, classId: a.classId,
+  weapons: a.weapons, tier: a.tier, level: a.level, exp: 0, tree: [], legacy: [], classRank: a.classRank ?? a.level, ...(a.lines ? { lines: a.lines } : {}),
+  baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 }, growthRates: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 } }, engine) })
 /** The wrong party for a front (H51): all-magic on Iron, all-physical on Arcane; the Duel and the Horde swap. */
 export const WRONG: Readonly<Record<RiftFront, RiftFront>> = { iron: 'arcane', arcane: 'iron', duel: 'horde', horde: 'duel' }
 
@@ -141,7 +148,7 @@ const best = (list: readonly RailAct[]): RailAct => list.reduce((a, b) => (b.chi
  * v15), since any Uma may learn under any Hero (D106), at full strength. No buffs from others.
  */
 export function guardRail(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): Rail {
-  return rpgV2(engine) ? guardRailV2(classId, engine) : guardRailV1(classId)
+  return rpgRework('fight', engine) ? guardRailV16(classId, engine) : rpgV2(engine) ? guardRailV2(classId, engine) : guardRailV1(classId)
 }
 
 /** H51's rail, engine v14, as it printed. */
@@ -261,5 +268,71 @@ function guardRailV2(classId: RpgClass, engine: number): Rail {
     railFight(ally, action, engine, others, setup)?.chips ?? null
   return { classId, own, limit: limitRail(base, ALL_HERO_LIMIT_IDS, railChips) }
 }
+/** Her on-curve self (v16) holding these skills on their lines and equipped, with the weapons they need: no side skills,
+ * a B node's tree on B, the trunk and A on A. Null when her class's three slots can't hold them. */
+function withHeld(base: BattleAlly, nodes: readonly RpgNode[], engine: number): BattleAlly | null {
+  const weapons = weaponsWith(base.classId, base.weapons, nodes.map((n) => n.weapon), engine)
+  if (!weapons) return null
+  const lines: RpgLines = {}
+  for (const n of nodes) if (rpgNodeLine(n.id) === 'B') lines[n.weapon] = 'B'
+  const { lines: _, ...rest } = base
+  return { ...rest, weapons, tree: [], ...(Object.keys(lines).length ? { lines } : {}), loadout: nodes.map((n) => ({ tier: 1, id: n.id })), mp: base.stats.mp }
+}
+
+/**
+ * The Tier rework's rail (v16, H71): classes v2's, with her skills at Class Rank 50 (every Skill Rank 5, ×1.05) and
+ * every node she can hold on either line of every tree her class can slot (the trunk, A and B: the Spell Blade's Pierce,
+ * the Brawler's Combo, the Summoner's Pack and Bonded), each tree in a slot of its channel (three slots, by position).
+ * Limit Breaks never rank (CP28): the 24 at full strength, as v15's.
+ */
+function guardRailV16(classId: RpgClass, engine: number): Rail {
+  const others = railOthers(engine)
+  const base = balanceMember(classId, 0, 50, { ...ON_CURVE, engine, classRank: 50 })
+  const nodes = RPG_ALL_NODES.filter((n) => rpgClassTrees(classId).includes(n.tree) && rpgNodeLine(n.id) !== null)
+  const pair = rpgHand({ classId }, engine).pair
+  const acts: (RailAct & { tome: boolean })[] = []
+  const partner = (ally: BattleAlly, tome: boolean): BattleHalf => ({ weapon: ally.weapons.find((w) => isRpgTome(w) !== tome)! })
+  const credit = (r: RailFight | null, tome: boolean): number | null => (r === null ? null : pair ? (tome ? r.tome : r.arms) : r.chips)
+  for (const weapon of [...new Set([...base.weapons, ...nodes.map((n) => n.weapon)])]) {
+    const ally = withHeld(base, [], engine)
+    const armed = ally && weaponsWith(classId, ally.weapons, [weapon], engine)
+    if (!ally || !armed) continue
+    const a = { ...ally, weapons: armed }
+    const tome = isRpgTome(weapon)
+    const chips = credit(railFight(a, (id, target) => ({ kind: 'attack', actorId: id, targetId: target, weapon, ...(pair ? { pair: partner(a, tome) } : {}) }), engine, others), tome)
+    if (chips !== null) acts.push({ chips, act: `Attack (${weapon})`, tome })
+  }
+  for (const node of nodes) {
+    const ally = withHeld(base, [node], engine)
+    if (!ally) continue
+    const tome = isRpgTome(node.weapon)
+    const skill = { tier: 1, id: node.id }
+    const chips = credit(railFight(ally, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill, ...(pair ? { pair: partner(ally, tome) } : {}) }), engine, others), tome)
+    if (chips !== null) acts.push({ chips, act: node.name, tome })
+  }
+  let own: RailAct
+  if (pair) {
+    const arms = best(acts.filter((a) => !a.tome)), tome = best(acts.filter((a) => a.tome))
+    own = { chips: arms.chips + tome.chips, act: `${arms.act} + ${tome.act}` }
+  } else own = best(acts)
+  if (classId === 'summoner') {
+    // Her own earlier Tome summon says farewell first (only a Tome half lingers, Bonded's at 0.4): the best farewell.
+    const lingerers = nodes.filter((n) => rpgNodeSkill(n, engine).summon && isRpgTome(n.weapon))
+    const probe = withHeld(base, [], engine)!
+    const act = (id: string, target: string): BattleAction => ({ kind: 'attack', actorId: id, targetId: target, weapon: probe.weapons.find(isRpgTome)!,
+      pair: partner(probe, true) })
+    const plain = railFight(probe, act, engine, others)!.chips
+    const farewell = lingerers.reduce((m, l) => {
+      const r = railFight(probe, act, engine, others, (s) => { s.summons = [{ allyId: '100', ref: { tier: 1, id: l.id }, scale: rpgNodeSkill(l, engine).summon!.linger }] })
+      const c = (r?.chips ?? plain) - plain
+      return c > m.chips ? { chips: c, act: l.name } : m
+    }, { chips: 0, act: '—' })
+    own = { chips: own.chips + farewell.chips, act: `${own.act} (${farewell.act} lingering)` }
+  }
+  const railChips = (ally: BattleAlly, action: (id: string, target: string) => BattleAction, setup?: (s: BattleState) => void): number | null =>
+    railFight(ally, action, engine, others, setup)?.chips ?? null
+  return { classId, own, limit: limitRail(base, ALL_HERO_LIMIT_IDS, railChips) }
+}
+
 /** The Duel's shields, stage 1 to 12, in an engine's tuning. */
 export const duelShields = (engine: number = BATTLE_ENGINE_VERSION): number[] => [...riftTuning(engine).duel.shields]

@@ -235,6 +235,11 @@ and lean stands.*
   drifted to 0.88 and her split to 57/43 by Lv 50. With her Arms hand at 0.48 and a hybrid's single-kind forms and Full
   moon on her lead half (SB10, SB11) the Tier 1 mirror holds within +6/−3% and both splits return to 70/30 ± 5 (71/29,
   68/32). Paladin against Cleric holds (SB12: equal in Tier 1; the branch pairs −6.5% and +7%).*
+  *Follow-up to H71 (D207), 2026-10-25: R1 (engine v16, today's gear, no Prowess) plays the Summoner's Arms hand
+  **0.50**, the top of SB11's 0.46–0.50: it brings her split inside 70/30 ± 5 at Lv 50 (76 → 75% magical). Measured
+  on the world's regular stages, Summoner ÷ Spell Blade a turn 103 · 102 · 92% at Lv 10 · 30 · 50; her Arms half is a
+  quarter of her damage, so even 0.56 only reaches 94% at Lv 50, and R1 lacks Prowess, the cause SB11 answered. R2's
+  balance (H81) re-measures the hand on Prowess, where 0.48 is the target ([stat-balance §12](stat-balance.md#12-what-the-fight-simulation-must-confirm)).*
 - **The healers' 2 + 1 sharpens classes v2's split:** the Paladin's two Arms give Barriers and debuffs and her one Tome
   mends; the Cleric's two Tomes mend and buff and her one Arm Barriers.
 
@@ -583,8 +588,8 @@ party may enter.
   | Foe (drafts) | Tier 1 | Tier 2 | Tier 3 |
   |---|---|---|---|
   | Regulars | 2–3 (twins, 2.47 answers) | 3–4 (one kind, 2.0: Z2's +1) | 3–4 (one kind, 2.30) |
-  | Sub-bosses | 5 | 7 (twins, 3.53) | 6 (one kind, 2.30: Z2's floor) |
-  | Bosses | 6 | **9** (twins, 3.53) | **10** (twins, 3.67) |
+  | Sub-bosses | 5 (measured: **6**, H71) | 7 (twins, 3.53) | 6 (one kind, 2.30: Z2's floor) |
+  | Bosses | 6 (measured: **8**, H71) | **9** (twins, 3.53) | **10** (twins, 3.67) |
 
   The simulation sets the final numbers (README §9.5 item 3); a boss's locks stay drawn from her twins.
   *Follow-up to the weapon review, 2026-10-24: answers re-run on the fixed partners (WP12; were 3.30 · 3.76 for bosses,
@@ -594,6 +599,13 @@ party may enter.
   hits, a Katana's two), so a Tier 2 or 3 boss's new answers chip two or three a turn each and her Break came about half
   a round sooner than Tier 1's (0.54 and 0.51 rounds, past ±0.5). One more shield puts them back inside (0.41 and 0.39
   sooner; a Paladin party 0.18 and 0.17); regulars and sub-bosses hold ([stat-balance §10](stat-balance.md#10-shields-against-answers)).*
+  *Follow-up to H71 (D207), 2026-10-25: Tier 1's shields as measured (R1, engine v16 on today's gear, the real Class
+  Rank pace).* The drafts (sub-boss 5, boss 6) let the first Break come 0.7–0.9 rounds sooner than today's from Lv 30:
+  twins cut the answers, but at the real pace her deeper, many-hit skills open ten Class Ranks sooner. **Tier 1 keeps
+  today's 6 and 8** (`RPG_FOE_SHIELDS_V16`), the closest to today's rounds to the first Break: sub-boss +0.79 · −0.67 ·
+  −0.48 and boss +0.26 · −0.48 · +0.03 rounds at Lv 10 · 30 · 50, regulars (unchanged) +0.28 · −0.26 · −0.08. Tier 2
+  and 3's bosses (9 and 10) were set against Tier 1's 6; R4 and R5's balance packets re-read them against 8
+  ([stat-balance §12](stat-balance.md#12-what-the-fight-simulation-must-confirm)).
 
 ### 4.5 Balanced, checked (CP4, CP7)
 

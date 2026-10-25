@@ -4,7 +4,7 @@
 // Summoner's renamed brutes and the halls' two kinds. The live game stays on 15 until H72.
 import { describe, expect, it, vi } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from './battle/caps'
-import { RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, rpgNode, rpgNodeSkill, rpgTreeOf, rpgValkyrieOathNode } from './catalog'
+import { RPG_LINE_B_POWER_V16, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, rpgNode, rpgNodeSkill, rpgTreeOf, rpgValkyrieOathNode } from './catalog'
 import { HERO_LIMITS, heroLimit, heroLimitKinds } from './heroes'
 import {
   RPG_ACTIVE_SLOT_GATES, RPG_ALL_CLASSES, RPG_BRANCH_B, RPG_BRANCH_B_NAME, RPG_MAX_ACTIVE_SLOTS, RPG_SKILL_RANK_FACTOR, rpgActiveSlots,
@@ -107,9 +107,31 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     }
     expect(count).toBe(30)
     expect([3, 4, 5].map((d) => rpgNodeSkill(rpgNode(`spellblade-katana.${d}b`)!, 16).hits[0]!.power)).toEqual([3.335, 4.255, 5.29])
-    // Only 32 nodes play new data in v16: Pierce's 30 and the Paladin's two.
-    expect(RPG_NODES.filter((n) => n.skill16)).toHaveLength(32)
-    expect(RPG_NODES.filter((n) => n.skill16).map((n) => n.id).filter((id) => !id.startsWith('spellblade-'))).toEqual(['paladin-lance.4b', 'paladin-tome-light.3b'])
+    // 44 nodes play new data in v16: Pierce's 30, the Paladin's two, and four B lines' tuned power (H71, D207).
+    expect(RPG_NODES.filter((n) => n.skill16)).toHaveLength(44)
+    const lines = ['brawler-lance', 'brawler-katana', 'mage-tome-ice', 'mage-tome-dark'].flatMap((t) => [3, 4, 5].map((d) => `${t}.${d}a`))
+    expect(RPG_NODES.filter((n) => n.skill16).map((n) => n.id).filter((id) => !id.startsWith('spellblade-')).sort())
+      .toEqual(['paladin-lance.4b', 'paladin-tome-light.3b', ...lines].sort())
+  })
+
+  it('plays a tuned B line at its v16 power (H71: `RPG_LINE_B_POWER_V16`), its MP, hits and statuses as v15’s', () => {
+    for (const [classId, byWeapon] of Object.entries(RPG_LINE_B_POWER_V16)) {
+      for (const [weapon, factor] of Object.entries(byWeapon)) {
+        for (const d of [3, 4, 5]) {
+          const node = rpgNode(rpgBranchNode(classId as RpgClass, weapon as RpgWeapon, d, 'B'))!
+          const [v15, v16] = [rpgNodeSkill(node, 15), rpgNodeSkill(node, 16)]
+          expect(v15).toBe(node.skill)
+          expect(v16.hits.map((h) => h.power)).toEqual(v15.hits.map((h) => h.power * factor!))
+          expect({ ...v16, hits: v15.hits }).toEqual(v15)
+        }
+        // Depths 1–2 (the trunk) and the A line never move.
+        for (const d of [1, 2, 3, 4, 5]) {
+          const core = rpgNode(`${classId}-${weapon}.${d}`)!
+          expect(rpgNodeSkill(core, 16)).toBe(core.skill)
+        }
+      }
+    }
+    expect(RPG_LINE_B_POWER_V16).toEqual({ brawler: { lance: 0.95, katana: 0.9 }, mage: { 'tome-dark': 0.9, 'tome-ice': 1.1 } })
   })
 
   it('names v16’s nodes: Pierce, Valkyrie’s Oath on the Light tree, Heavy Transfix, the Marauder and the Jotun King (CP21, CP37)', () => {

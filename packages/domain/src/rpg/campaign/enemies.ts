@@ -26,11 +26,14 @@ export const RPG_FOE_TUNING = {
   regularShield: 2, lateRegularShield: 3, subBossShield: 6, bossShield: 8,
 } as const
 
-/** Tier 1's shields from v16 (CP8, SB6, D202): with twins a foe has fewer answers (2.47 a foe on the default party), so her
- * Breaks come slower and the sub-boss's and the boss's shields drop; regulars, guards and assistants keep theirs. H71 tunes
- * them against the rounds to the first Break. */
-export const RPG_FOE_SHIELDS_V16 = { subBoss: 5, boss: 6 } as const
-/** A sub-boss's and a boss's shield in an engine's generation: `RPG_FOE_TUNING`'s 6 and 8 to v15, 5 and 6 from v16. */
+/** Tier 1's shields from v16 (CP8, SB6, D202; tuned by R1's balance, H71, D207): with twins a foe has fewer answers (2.47
+ * a foe on the default party), which the drafts (5 and 6) priced, but at the real Class Rank pace the party opens deeper,
+ * many-hit skills sooner, and with the drafts the sub-boss and the boss broke 0.7–0.9 rounds sooner than today's from
+ * Lv 30. Today's 6 and 8 keep the rounds to the first Break closest to today's (the sub-boss +0.8, −0.7, −0.5 at Lv 10,
+ * 30, 50; the boss +0.3, −0.5, 0.0); regulars, guards and assistants keep theirs. */
+export const RPG_FOE_SHIELDS_V16 = { subBoss: 6, boss: 8 } as const
+/** A sub-boss's and a boss's shield in an engine's generation: `RPG_FOE_TUNING`'s 6 and 8 to v15, `RPG_FOE_SHIELDS_V16`'s
+ * from v16. */
 export const rpgFoeShields = (engine: number = BATTLE_ENGINE_VERSION): { subBoss: number; boss: number } =>
   (rpgRework('fight', engine) ? RPG_FOE_SHIELDS_V16 : { subBoss: RPG_FOE_TUNING.subBossShield, boss: RPG_FOE_TUNING.bossShield })
 

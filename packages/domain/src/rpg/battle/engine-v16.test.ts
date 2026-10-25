@@ -55,14 +55,14 @@ describe('battle engine v16: the Tier rework’s fight, dark (D200)', () => {
     expect(s.round).toBe(3)
   })
 
-  it('reads the fight’s own generation: a Summoner’s Arms summon at 0.48 in v16, 0.56 in v15', () => {
+  it('reads the fight’s own generation: a Summoner’s Arms summon at 0.50 in v16, 0.56 in v15', () => {
     const armsSkill = (version: Version) => {
       const allies = party(version)
       const summoner = allies.find((a) => a.classId === 'summoner')!
       const ref = summoner.loadout.find((r) => !isRpgTome(rpgNodeIdentity(r.id)!.weapon))!
       return battleActorSkill(createBattle(input(allies, version)).state, summoner.id, ref)!.power
     }
-    expect([armsSkill(15), armsSkill(16)]).toEqual([0.56, 0.48])
+    expect([armsSkill(15), armsSkill(16)]).toEqual([0.56, 0.5])
   })
 
   it('takes three weapons from v16 and five to v15', () => {

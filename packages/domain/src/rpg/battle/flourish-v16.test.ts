@@ -138,7 +138,8 @@ describe('the Flourish, engine v16, dark (H68)', () => {
   it('mends after armor’s Regen and before her MP comes back', () => {
     const s = withHp(createBattle(input(16, { 1: { flourish: 'even-pace', regen: 5, mp: 100 } })).state, 'a2', 500)
     const end = round(s).cues.filter(onUnit).filter((c) => c.targetId === 'a2' && ['status', 'heal', 'mp'].includes(c.kind))
-    expect(end.map((c) => [c.kind, amountOf(c)])).toEqual([['status', 5], ['heal', 10], ['mp', 8]])
+    // Her MP last: the base regen (0.9% a depth since H71, D207).
+    expect(end.map((c) => [c.kind, amountOf(c)])).toEqual([['status', 5], ['heal', 10], ['mp', 9]])
   })
 
   it('gives at most 4% over a three-wave stage, and the breather between waves stays as it is', () => {

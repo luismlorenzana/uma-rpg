@@ -1,5 +1,5 @@
 // The frozen v15 and v14 fights replay byte for byte with the one switch at 16 (H64, D200): every rule's default then reads
-// the Tier rework's fight (three weapons, the Summoner's Arms hand 0.48), so a rules call in the engine that leaned on its
+// the Tier rework's fight (three weapons, the Summoner's Arms hand 0.50), so a rules call in the engine that leaned on its
 // default instead of the fight's version would move them. `caps.ts` is mocked in this file of its own; H72's switch makes
 // this the live case.
 import { describe, expect, it, vi } from 'vitest'
@@ -16,7 +16,7 @@ describe('the frozen v15 and v14 replays with the switch at 16 (H64)', () => {
     expect([rpgV2(), rpgRework('fight'), rpgRework('economy')]).toEqual([true, true, false])
     expect(RPG_WEAPON_SLOTS).toBe(3)
     expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)
-    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.48, tome: 0.58 })
+    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.58 })
   })
 
   it.each(loadV15Replays().map((r) => [r.name, r] as const))('v15, %s, replays byte for byte', (_, r) => {

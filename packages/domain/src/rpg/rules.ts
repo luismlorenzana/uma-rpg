@@ -229,9 +229,11 @@ const HANDS_V1: Readonly<Record<RpgClass, RpgHand>> = {
 const HANDS_V2: Readonly<Record<RpgClass, RpgHand>> = {
   ...HANDS_V1, spellblade: hand(0.72, 0.72, 0.44, 0.5, 0, true), summoner: hand(0.58, 0.56, 0.58, 0.5, 0.3, true),
 }
-/** The Tier rework's fight (v16, SB11, CP9): v2's hands, the Summoner's Arms hand 0.48 (her Tome 0.58 still leads), the
- * mirror's knob on the new maps. H71 measures it and may move it. */
-const handsOf = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58, 0.48, 0.58, 0.5, 0.3, true) })
+/** The Tier rework's fight (v16, SB11, CP9): v2's hands, the Summoner's Arms hand 0.50 (her Tome 0.58 still leads), the
+ * mirror's knob on the new maps: SB11's 0.48, set by R1's balance (H71, D207) to the top of SB11's 0.46–0.50, which brings
+ * her split inside 70/30 ± 5 at Lv 50. Her Arms half is about a quarter of her damage, so the hand moves the mirror little
+ * (0.48 → 0.56: Lv 50 92% → 94% of the Spell Blade, Lv 10 102% → 105%); R2 (H81) re-measures it on Prowess. */
+const handsOf = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58, 0.5, 0.58, 0.5, 0.3, true) })
 export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
   return { ...handsOf(engine)[p.classId] }
 }

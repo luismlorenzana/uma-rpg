@@ -1,7 +1,7 @@
 // The Rift's Tier 1 fronts on engine v16 (H66, D202; class-progression.md §4.3, CP7): the Duel's boss is weak to twin
 // sets, two at stages 1–6 and one at 7–12; the Horde deals each foe a twin set, a wave repeating none until all five are
-// used; Iron and Arcane draw as before. v15's and v14's fights stay byte for byte as they were: the digests below were
-// taken on the generator before this change.
+// used; Iron and Arcane draw as before; R1's balance (H71, D207) re-tuned v16's numbers. v15's and v14's fights stay byte
+// for byte as they were: the digests below were taken on the generator before this change.
 import { describe, expect, it } from 'vitest'
 import { createBattle } from '../rpg/battle/engine'
 import type { BattleAlly, BattleEnemy } from '../rpg/battle/types'
@@ -35,16 +35,21 @@ function fnv1a(text: string): string {
 }
 
 describe('the Rift on v16 (CP7, D202)', () => {
-  it('reads v15’s numbers with the Duel’s draws as twin sets', () => {
+  it('reads v15’s numbers with the Duel’s draws as twin sets and R1’s balance on top (H71)', () => {
     const v15 = riftTuning(15), v16 = riftTuning(16)
     expect(v16.weak.duel.sets).toEqual([2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1])
     expect(v15.weak.duel.sets).toBeUndefined()
     expect(riftTuning(14)).toBe(RIFT_TUNING)
     expect(riftTuning(14).weak.duel.sets).toBeUndefined()
-    const { weak: _a, ...rest16 } = v16
-    const { weak: _b, ...rest15 } = v15
+    // What R1's balance moved (H71, D207), and nothing else.
+    const { weak: w16, scale: s16, champions: c16, elites: e16, convergence: v16c, ...rest16 } = v16
+    const { weak: w15, scale: _s, champions: _c, elites: e15, convergence: _v, ...rest15 } = v15
     expect(rest16).toEqual(rest15)
-    expect({ ...v16.weak, duel: { ...v16.weak.duel, sets: undefined } }).toEqual({ ...v15.weak, duel: { ...v15.weak.duel, sets: undefined } })
+    expect({ scale: s16, champions: c16, convergence: v16c }).toEqual({ scale: { iron: { hp: 1, offense: 1.6 }, arcane: { hp: 1.6, offense: 1.2 } },
+      champions: { iron: { hp: 1.2, offense: 1.2 }, arcane: { hp: 1, offense: 0.92 }, duel: { hp: 0.8, offense: 0.8 }, horde: { hp: 1.3, offense: 1.3 } },
+      convergence: -0.1 })
+    expect(e16).toEqual({ ...e15, offense: 2 })
+    expect({ ...w16, duel: { ...w16.duel, sets: undefined } }).toEqual({ ...w15, arcane: { ...w15.arcane, 'sub-boss': 1 }, duel: { ...w15.duel, sets: undefined } })
   })
 
   it('makes the Duel’s boss weak to two twin sets’ four kinds at stages 1–6 and one set’s two at 7–12, her locks mixed', () => {
@@ -89,21 +94,36 @@ describe('the Rift on v16 (CP7, D202)', () => {
     }
   })
 
-  it('draws Iron and Arcane as before: their v16 fights are v15’s', () => {
+  it('draws Iron and Arcane as before: their v16 fights are v15’s faces, ranks and draws (Arcane’s sub-bosses one of v15’s two)', () => {
+    // H71 (D207) moved their strength and Arcane's sub-bosses' count; the draws are v15's: a sub-boss's one element is the
+    // first of her v15 two, and her own element (her moves) follows it.
+    const same = (a: RiftFightPlan, b: RiftFightPlan) => {
+      const [x, y] = [foes(a), foes(b)]
+      expect(x.map((e) => [e.id, e.castId, e.rank, e.shield, e.twice, e.thrice, e.ward])).toEqual(y.map((e) => [e.id, e.castId, e.rank, e.shield, e.twice, e.thrice, e.ward]))
+      x.forEach((e, k) => {
+        const old = y[k]!
+        if (e.ward === 'physical' && e.rank === 'sub-boss') {
+          expect(e.weaknesses.elements).toHaveLength(1)
+          expect(old.weaknesses.elements).toContain(e.weaknesses.elements[0])
+        } else expect(e.weaknesses).toEqual(old.weaknesses)
+      })
+    }
     for (const c of RUNS) {
-      for (const front of ['iron', 'arcane'] as const) expect(riftChain(c, front, 16)).toEqual(riftChain(c, front, 15))
-      expect(riftConvergence(c, 16).slice(0, 2)).toEqual(riftConvergence(c, 15).slice(0, 2))
+      for (const front of ['iron', 'arcane'] as const) riftChain(c, front, 16).forEach((plan, i) => same(plan, riftChain(c, front, 15)[i]!))
+      riftConvergence(c, 16).slice(0, 2).forEach((plan, i) => same(plan, riftConvergence(c, 15)[i]!))
     }
     for (const ref of echoes().filter((r) => r.kind === 'echo' && (r.front === 'iron' || r.front === 'arcane'))) {
-      expect(riftFight(ctx(), ref, 16)).toEqual(riftFight(ctx(), ref, 15))
+      same(riftFight(ctx(), ref, 16), riftFight(ctx(), ref, 15))
     }
   })
 
-  it('moves only the Duel’s and the Horde’s weaknesses and the element each draws beside them', () => {
-    const shape = (e: BattleEnemy) => ({ id: e.id, castId: e.castId, rank: e.rank, level: e.level, stats: e.stats, shield: e.shield,
-      twice: e.twice, thrice: e.thrice, mixedLocks: e.mixedLocks, ward: e.ward })
+  it('moves only the Duel’s and the Horde’s weaknesses and the element each draws beside them, and their champions’ scales (H71)', () => {
+    const shape = (e: BattleEnemy, stats = true) => ({ id: e.id, castId: e.castId, rank: e.rank, level: e.level, ...(stats ? { stats: e.stats } : {}),
+      shield: e.shield, twice: e.twice, thrice: e.thrice, mixedLocks: e.mixedLocks, ward: e.ward })
     for (const front of ['duel', 'horde'] as const) {
-      expect(riftChain(ctx(), front, 16).map((p) => foes(p).map(shape))).toEqual(riftChain(ctx(), front, 15).map((p) => foes(p).map(shape)))
+      const [v16, v15] = [riftChain(ctx(), front, 16), riftChain(ctx(), front, 15)]
+      expect(v16.slice(0, 11).map((p) => foes(p).map((e) => shape(e)))).toEqual(v15.slice(0, 11).map((p) => foes(p).map((e) => shape(e))))
+      expect(foes(v16[11]!).map((e) => shape(e, false))).toEqual(foes(v15[11]!).map((e) => shape(e, false)))
     }
   })
 

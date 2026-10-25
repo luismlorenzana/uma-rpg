@@ -46,8 +46,10 @@ export const BATTLE_HEAL_OFFENSE_SCALE = 300
 /** v15 (classes v2 §4): the round ends a Cleric's Regen mends at, the round she casts her Light spell and the next. */
 export const BATTLE_REGEN_ROUNDS = 2
 /** v16 (SB18, D204): at each round's end every Uma regains this share of her max MP for each skill depth her class has
- * open (`rpgBaseMpRegen`). Here so the sheet reads it without the engine; H71 tunes it. */
-export const RPG_BASE_MP_REGEN = 0.008
+ * open (`rpgBaseMpRegen`). Here so the sheet reads it without the engine. R1's balance (H71, D207) set it 0.8% → 0.9%:
+ * with today's supports worn it brings a region's last four stages to today's pace at Lv 50 (0.88× → 0.90×), MP's drag
+ * there to today's (1.24); no deep cast refunded by a round (a healer's 63% the most). */
+export const RPG_BASE_MP_REGEN = 0.009
 /** v16: the depths the base MP regen counts, at most: five, so 4% from Class Rank 40 (Tier 3's sixth doesn't raise it). */
 export const RPG_BASE_MP_REGEN_DEPTHS = 5
 /** v16 (UT6, D204): her Flourish gives this share of her max HP a fight, as her calling's class: Clean break's Barrier, or
