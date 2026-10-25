@@ -1,5 +1,6 @@
 // Tier 1's foes on engine v16 (H66, D202; class-progression.md §4.1, §4.4): every foe of every rank is weak to her twins
-// (CP5), the sub-boss's and the boss's shields drop to 5 and 6 (CP8, SB6), and nothing else moves. v15's generation stays
+// (CP5), the sub-boss's and the boss's shields are `RPG_FOE_SHIELDS_V16`'s (CP8, SB6; H71 measured today's 6 and 8, D207),
+// and nothing else moves. v15's generation stays
 // byte for byte today's, whatever the switch says: the digests below were taken on the generators before this change.
 import { describe, expect, it } from 'vitest'
 import type { BattleEnemy } from '../rpg/battle/types'
@@ -99,16 +100,16 @@ describe('Tier 1’s foes on v16 (D202)', () => {
     expect(twilight).toBeGreaterThan(0)
   })
 
-  it('drops the sub-boss’s shield to 5 and the boss’s to 6; regulars, guards and assistants keep theirs', () => {
+  it('gives the sub-boss and the boss v16’s shields (H71: 6 and 8, today’s); regulars, guards and assistants keep theirs', () => {
     expect(rpgFoeShields(15)).toEqual({ subBoss: RPG_FOE_TUNING.subBossShield, boss: RPG_FOE_TUNING.bossShield })
     expect([RPG_FOE_TUNING.subBossShield, RPG_FOE_TUNING.bossShield]).toEqual([6, 8])
     expect(rpgFoeShields(16)).toEqual(RPG_FOE_SHIELDS_V16)
-    expect(RPG_FOE_SHIELDS_V16).toEqual({ subBoss: 5, boss: 6 })
+    expect(RPG_FOE_SHIELDS_V16).toEqual({ subBoss: 6, boss: 8 })
     const ranks = new Set<string>()
     v16.forEach((chapter, c) => foesOf(chapter).forEach((foe, k) => {
       const old = foesOf(v15[c]!)[k]!
       ranks.add(foe.rank)
-      expect(foe.shield).toBe(foe.rank === 'sub-boss' ? 5 : foe.rank === 'boss' ? 6 : old.shield)
+      expect(foe.shield).toBe(foe.rank === 'sub-boss' ? 6 : foe.rank === 'boss' ? 8 : old.shield)
       expect(old.shield).toBe(foe.rank === 'sub-boss' ? 6 : foe.rank === 'boss' ? 8 : old.shield)
     }))
     expect([...ranks].sort()).toEqual(['boss', 'regular', 'sub-boss'])
@@ -127,7 +128,7 @@ describe('Tier 1’s foes on v16 (D202)', () => {
       for (const foe of foesOf(chapter)) {
         expect(foe.element2).toBeUndefined()
         expect(foe.weaknesses).toEqual(rpgTwinsOf([foe.element], 0))
-        if (foe.rank !== 'regular') expect(foe.shield).toBe(foe.rank === 'boss' ? 6 : 5)
+        if (foe.rank !== 'regular') expect(foe.shield).toBe(foe.rank === 'boss' ? 8 : 6)
       }
     }
   })

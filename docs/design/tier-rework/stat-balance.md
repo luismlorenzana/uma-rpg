@@ -602,6 +602,14 @@ today's at Lv 50:
   *Follow-up to D197 (Uma Templates), 2026-10-25.*
 - **Its knob:** the share a depth, ±0.1% moving late-region power about ±5% (0.7%: 0.88–1.02×; 0.9%: 0.98–1.07×); then
   Vigor's MP rate, then legs; never an MP accessory, never the casters' MP lean.
+- **Measured in R1, with today's supports worn (H71, D207):** *follow-up logged against D196, values only.* R1 keeps the
+  Spring and the Siphon (D199 point 3), so the regen **stacks** with them in the same round-end step (a Lv 50 Mage's 233
+  MP at Class Rank 50: 10 a round from the regen, 20 with a G10 Spring). On the balance party (its bars 63–233 MP with
+  gear, not this section's 107–296) the share a depth moved the region's last four stages by about 2% a step (0.7% ·
+  0.8% · 0.9%: 0.86 · 0.88 · 0.90× today's at Lv 50), so **R1 plays 0.9% a depth (4.5% from Class Rank 40)**: the late
+  pace 0.90 · 1.12 · 0.90× today's at Lv 10 · 30 · 50, MP's drag equal to today's at Lv 10 and 50; a healer's deep cast
+  63% refunded by a round at most. Without the two supports (R2's preview) the late pace falls to 0.87 · 0.80 · 0.66×:
+  R2's balance (H81) re-measures the share with R2's MP sources ([§12](#12-what-the-fight-simulation-must-confirm)).
 
 **Shapes and the alternative, compared** (Tier 1, the party ÷ today, Lv 10 · 20 · 30 · 40 · 50):
 
@@ -737,6 +745,56 @@ At v16 (Tier 1) and v17 (Tier 2's toolbox), README §9.5's items with this pass'
    affinity retired with the Uma Templates pass".*
 9. **The stack whole** (weapon-research risk 3): a weak hit at ×1.50 · ×2.16 · ×2.49; the tuned peak 1.3 · 1.6 · 1.8
    times the campaign's act, priced by the Rift's fronts.
+
+> **Measured, R1 (H71, D207), 2026-10-25** (follow-up logged against D196, values only). Engine v16 on **today's gear**
+> (R1: crafted weapons and ranks, her Orb on her first slot's kind, today's supports; `BALANCE_KIT_V16`), the balance
+> party on the **real Class Rank pace** (`balanceClassRank`: 20 at Lv 13, 50 at Lv 34), no Flourish, against the same
+> measurement on v15 ("today's"); first try on Auto, 32 seeds (`world/balance-v16.test.ts`, `rift/balance-v16.test.ts`).
+> The model compared R2's full maps, so the numbers below are R1's own; R2's H81 re-measures on R2's gear.
+>
+> - **Item 1, the re-baseline: holds.** Every Tier 1 stage won 100% at Lv 10–50 on curve on both engines, with the
+>   Cleric or the Paladin: **0 points** (geared without Extra Stats, 0 too). The pace moved: the party's damage a round
+>   ÷ today's, regulars · elites · bosses, **0.83 · 0.90 · 0.92** at Lv 10, **0.97 · 1.00 · 1.06** at 20, **1.19 · 1.33
+>   · 1.26** at 30, **0.90 · 0.96 · 0.92** at 40, **0.80 · 0.80 · 0.93** at 50. At Class Rank = her level it is 0.80–0.93
+>   at every level: the build alone (three weapons, the twins' weak share) is about a fifth slower than today's five
+>   weapons, and the real pace gives it back early (Lv 20–30: depth 4–5 ten Class Ranks sooner) and Skill Ranks ×1.05
+>   late. No foe-budget term was needed (the target is in points); the pace is H81's to read on R2's gear.
+> - **Item 2, the mirror: misses at Lv 50 (92%).** Summoner ÷ Spell Blade a turn on the world's regular stages **103% ·
+>   102% · 92%** at Lv 10 · 30 · 50; splits Spell Blade **65 · 74 · 73%** physical, Summoner **69 · 72 · 75%** magical.
+>   Her Arms hand is a quarter of her damage, so it barely moves the mirror (0.48 → 0.56: Lv 50 92% → 94%, Lv 10 102% →
+>   105%); **set to 0.50**, SB11's top, which brings her Lv 50 split inside (76 → 75%); the gap is her single-target v16
+>   defaults and her Limit Break, not her hand (cause 1 is R2's: no Prowess in R1). By context, both in the Horde's
+>   guided build on stages 1–11: the Duel **88%**, the Horde **83%**, Arcane **112%**, Iron **61%** (the ward on her
+>   magic). Paladin ÷ Cleric healing and absorbed Barriers **111%** a fight and a round (world Lv 50 bosses 122%; no
+>   healer knob in R1's list).
+> - **Item 3, shields: today's 6 and 8 are closest.** With the drafts (sub-boss 5, boss 6) the first Break came 0.7–0.9
+>   rounds sooner than today's from Lv 30 (the real pace's deeper, many-hit skills). **Sub-boss 6, boss 8**: rounds to
+>   the first Break against today's, sub-boss **+0.79 · −0.67 · −0.48**, boss **+0.26 · −0.48 · +0.03** at Lv 10 · 30 ·
+>   50; regulars (unchanged) **+0.28 · −0.26 · −0.08**. Auto cancels charged moves 69 · 59 · 62% of elites' (today's 62 ·
+>   76 · 75%) and 58 · 70 · 71% of bosses' (64 · 66 · 61%): outside ±5 points at most levels, no knob of the list moves
+>   it. No act Breaks a Duel boss: the best own act **10** (Rank 5, either line), the best Limit Break **12**, the Duel's
+>   lowest shield 13.
+> - **Item 4, the lines** (her damage a turn with one tree on B ÷ all A, on her context's stages: sub-bosses and bosses
+>   for one-foe lines, waves of 4–6 for reach; Lv 30 · 50): in band or within 3 points **Wave 1.11 · 1.19, Cascade
+>   1.14 · 1.10, Impale 1.21 · 1.13, Spike 1.13 · 1.13, Draw 1.14 · 1.15, the Spell Blade's Pierce 1.05–1.20 (mean
+>   1.12), Bolt 1.07 · 1.17, the Mage's Pierce 1.20 · 1.12, Rain 1.11 · 1.08**; tuned on their v16 power (`RPG_LINE_B_POWER_V16`): Impale ×0.95,
+>   Draw ×0.9, the Mage's Pierce ×0.9, Spike ×1.1; Pierce's ×1.15 kept. **Below, and no power factor fixes them as a
+>   sidegrade:** Combo 0.97 · 1.01 and Pack 0.98 · 0.99 (one member's extra chip doesn't move the party's Break), Reap
+>   0.94 · 0.90 (its focus hit makes it a few-foes line), Bonded 1.00 (the farewell is ×0.1 since H63), the healers'
+>   Heavy 1.00 (statuses stack to 3, which A reaches at depth 5). Behind or level with A elsewhere (0.82–1.05) except
+>   Rain (1.07–1.08) and the piercing lines (Draw and both Pierces 1.08–1.25: every shield halves A). At Lv 20 (depth
+>   3–4) the piercing lines run 1.17–1.39. Any mix (each member's slot 1, 2 or 3 on B, or every tree): 100% as
+>   all-A, **0 points**.
+> - **Item 5, MP: holds with the regen at 0.9%.** A region on Auto with one Spring clears **12 of 12** every time at Lv
+>   10, 30 and 50 (128 runs each); its last four stages' pace against today's **0.90 · 1.12 · 0.90** (0.8%: 0.90 · 1.12
+>   · 0.88); MP's drag there (those rounds ÷ the same stages on a full bar) 1.59 · 1.41 · 1.24, today's 1.62 · 1.27 ·
+>   1.24. ±0.1% a depth moves the late pace about 2%, not the model's 5%, because today's Spring and Siphon are still
+>   worn. No deep act refunded by a round by the regen alone: the most is a healer's **63%** (Lv 44+), the damage
+>   dealers' 23–33%. **R2's preview** (the Siphon and the Spring taken off): 0.87 · 0.80 · 0.66, drag 1.66 · 1.97 ·
+>   1.69: the regen alone does not replace them on today's gear; H81 measures it with R2's MP sources.
+> - **Item 7, Tier 2 and 3 worlds on R1's shape:** 100% on both engines (**0 points**) at Tier 2 Lv 10 · 30 · 50 and
+>   Tier 3 Lv 10 · 50; pace 0.86–0.90 · 1.19–1.32 · 0.84–0.90 and 0.85–0.90 · 0.83–0.90.
+> - **The Rift's Tier 1 fronts** (item 3's fronts): [rift.md §11](../rift.md#tier-rework-r1-engine-v16-h71-d207).
 
 ## 13. If approved: the follow-ups by doc
 

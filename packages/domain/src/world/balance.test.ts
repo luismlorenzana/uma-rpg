@@ -1,7 +1,8 @@
 // The balance simulation for the world map (combat-balance.md §6.0): a five-class party built through the game's own
 // rules plays every stage at its level on the current engine with the shared Auto policy. Run the full table with
 // `SIM=1 npx vitest run src/world/balance.test.ts` (`SIM_ENGINE=15` plays it on classes v2 and adds H60's campaign
-// check); the always-on tests keep Auto legal and the opening stages winnable.
+// check; `SIM_ENGINE=16` on the Tier rework's R1, its foes and party, H71: R1's targets are `world/balance-v16.test.ts`);
+// the always-on tests keep Auto legal and the opening stages winnable.
 import { describe, expect, it } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
@@ -40,7 +41,7 @@ export function simulate(level: number, options: BalanceOptions, classes?: reado
   const lifetime = lifetimeOf(level, options.tier)
   const out: Record<Kind, Bucket> = { fight: empty(), 'sub-boss': empty(), boss: empty() }
   for (const region of regionsAt(level, options.tier)) {
-    regionChapter(region, cast).nodes.filter((n) => n.kind !== 'camp' && n.level === lifetime).forEach((node, i) => {
+    regionChapter(region, cast, version).nodes.filter((n) => n.kind !== 'camp' && n.level === lifetime).forEach((node, i) => {
       for (let s = 0; s < seeds; s++) {
         const r = play(balanceStage(node, 1000 + i + 100 * s, party, version))
         const b = out[node.kind as Kind]
@@ -62,7 +63,7 @@ function run(level: number, options: BalanceOptions, classes?: readonly RpgClass
     let mp: Record<string, number> = {}
     let full = 0, n = 0
     let party = partyAt(region.level)
-    for (const node of regionChapter(region, cast).nodes.filter((x) => x.kind !== 'camp')) {
+    for (const node of regionChapter(region, cast, version).nodes.filter((x) => x.kind !== 'camp')) {
       party = partyAt(node.level).map((a) => ({ ...a, mp: Math.min(a.mp, mp[a.id] ?? a.mp) }))
       if (n === 0) full = party.reduce((m, a) => m + a.mp, 0)
       const r = play(balanceStage(node, 2000 + n, party, version))

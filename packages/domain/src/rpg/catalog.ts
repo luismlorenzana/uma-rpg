@@ -5,13 +5,14 @@
 // and Lightning random foes, Bow and Light one foe many times, Katana and Dark twice.
 // Engine v16 (the Tier rework's fight, H65) reads every tree as a trunk and two lines (`node-identity.ts`'s branch
 // tables) and plays new data on 32 ids, kept apart in `skill16` so older fights replay: the Spell Blade's B line is
-// Pierce, and the Paladin's revive moves to her Light tree. Names and summaries are presentation: they follow the live
+// Pierce, and the Paladin's revive moves to her Light tree; R1's balance (H71) adds a B line's tuned power where it set
+// one (`RPG_LINE_B_POWER_V16`). Names and summaries are presentation: they follow the live
 // generation at module load, so an old fight may show a new name.
 import {
   isRpgTome, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
-import { RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
+import { RPG_BRANCH_B, RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
 import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, rpgRework, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 // The depth tables live with the node identities (H62): the world's foes read them without building this catalog.
@@ -154,15 +155,31 @@ interface TreeSpec {
   /** Engine v16's def for a side B node where it differs (H65), and its name, shown while v16 is live. */
   sideB16?: (d: number) => { skill: RpgSkillDef; name: string } | undefined
 }
+/**
+ * v16 (H71): a B line's power factor where R1's fight simulation tuned it (CP15: a B line 10–20% ahead of A in its
+ * context; ±0.05 a step): from v16 its depth 3–5 nodes play their def × this on every hit's power and a healer's mend and
+ * Barrier shares (`rpgRankedSkill`'s scaling), their MP, hits, targets and statuses unchanged. By class and kind; the B
+ * line is `RPG_BRANCH_B`'s side. Pierce's own scale is `RPG_PIERCE_SCALE`. v6–v15 never read it.
+ */
+export const RPG_LINE_B_POWER_V16: Readonly<Partial<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, number>>>>>> = {
+  // Measured on the sub-bosses and bosses (her damage a turn there, B ÷ A, Lv 30 · 50; H71): Impale 1.24 · 1.15, Draw
+  // 1.24 · 1.21 (and ahead everywhere), the Mage's Pierce 1.30 · 1.19, Spike 0.94 · 1.08.
+  brawler: { lance: 0.95, katana: 0.9 },
+  mage: { 'tome-dark': 0.9, 'tome-ice': 1.1 },
+}
 function addTree(spec: TreeSpec): void {
   const tree = rpgTreeOf(spec.classId, spec.weapon)
+  const lineB = RPG_BRANCH_B[spec.classId][spec.weapon]
   for (let d = 1; d <= 5; d += 1) {
     const base = { tree, classId: spec.classId, weapon: spec.weapon, depth: d, cost: d }
     const core = spec.core(d)
     NODES.push({ ...base, id: `${tree}.${d}`, variant: null, name: at(spec.names, d), skill: core, summary: describe(core) })
     for (const side of ['a', 'b'] as const) {
       const skill = side === 'a' ? spec.sideA(d) : spec.sideB(d)
-      const v16 = side === 'b' ? spec.sideB16?.(d) : undefined
+      const own = side === 'b' ? spec.sideB16?.(d) : undefined
+      const factor = side === lineB && d >= 3 ? RPG_LINE_B_POWER_V16[spec.classId]?.[spec.weapon] ?? 1 : 1
+      const v16 = factor === 1 ? own
+        : { skill: rpgRankedSkill(own?.skill ?? skill, factor), name: own?.name ?? at(side === 'a' ? spec.a : spec.b, d) }
       const live = LIVE16 && v16 ? v16 : { skill, name: at(side === 'a' ? spec.a : spec.b, d) }
       NODES.push({ ...base, id: `${tree}.${d}${side}`, variant: side, name: live.name, skill, ...(v16 ? { skill16: v16.skill } : {}),
         summary: describe(live.skill) })

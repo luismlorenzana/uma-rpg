@@ -109,7 +109,7 @@ the owner checks on the phone ([implementation.md](../../design/tier-rework/impl
    - the API parses it and stores v27 (`apps/api/.data/save.json`: `schemaVersion` 27, three weapons a class, `lines`
      where the sides were, `calling` on every Uma, the open fights' inputs still `version: 15`);
    - the open world-map fight continues to its end on v15 and settles; the next fight starts as `version: 16`: twin
-     weaknesses ("Weak:" with two icons), an elite's shield 5 and a boss's 6, an `mp` cue with the base regen, and for an
+     weaknesses ("Weak:" with two icons), an elite's shield 6 and a boss's 8 (H71), an `mp` cue with the base regen, and for an
      Uma fighting as her calling her Flourish (★) in the log;
    - the Skills tab's tree (a branch swap moving an equipped skill, pips and "next at"), the Gear tab's three weapons, the
      template chip and card, the calling card on the Pace Uma (pick, confirm; or a win confirms it), the Battle tab's
@@ -169,3 +169,23 @@ the owner checks on the phone ([implementation.md](../../design/tier-rework/impl
 - **Screen edges for the owner's phone check:** the Uma sheet header (the chip beside "Mark target"), the calling card,
   the fight footer's three weapon buttons above the home indicator, the Rift sheet footers (the guided-weapons block),
   the two tree columns at 375 pt.
+
+**From H71 (D207):**
+- **The numbers the manual carries** (all v16-only, read by the generated blocks once the switch is 16): Tier 1's
+  sub-boss and boss shields **6 and 8** (`RPG_FOE_SHIELDS_V16`, today's values: the drafts 5 and 6 broke too soon at the
+  real Class Rank pace); the base MP regen **0.9% a depth, 4.5% from Class Rank 40** (`RPG_BASE_MP_REGEN` 0.009; a
+  Class Rank 40 Mage with 296 MP regains 13, 23 with a G10 Spring: the sheet reads "+13 a round"); the Summoner's v16 Arms
+  hand **0.50** (Tome 0.58 + Arms 0.50, 1.08 a turn); four B lines' v16 power (`RPG_LINE_B_POWER_V16`: Impale ×0.95,
+  Draw ×0.9, the Mage's Pierce ×0.9, Spike ×1.1; their nodes' summaries follow at the flip); the Rift's
+  `RIFT_TUNING_V16` (Iron ×1.6 offense; Arcane ×1.6 HP and ×1.2 offense, its sub-bosses weak to one element; the elites'
+  offense 2; the Duel's champion ×0.8, the Horde's ×1.3; the Convergence −0.1), which the manual's `riftFronts` block
+  reads through `riftTuning()`.
+- **Tests that pin v16's tuned values** move with them, not with the flip: `world/twins-v16.test.ts`,
+  `rift/generate-v16.test.ts`, `rpg/battle/mp-regen-v16.test.ts`, `rpg/battle/flourish-v16.test.ts`,
+  `save/sheet-v16.test.ts`, `rpg/trees-v16.test.ts`, `rpg/rules-v16.test.ts`, `rpg/battle/engine-v16.test.ts`,
+  `rpg/battle/v15-replays-live16.test.ts`. H71's always-on checks (`world/balance-v16.test.ts`,
+  `rift/balance-v16.test.ts`) pass with the switch at 16 and use explicit engines.
+- **What R1 leaves open** (rift.md §11, stat-balance §12's R1 note): Arcane's wrong party wins its stages 5–8 75%; the
+  mirror's Lv 50 (Summoner 92% of the Spell Blade); Combo, Pack, Reap, Bonded and the healers' Heavy behind their 10–20%
+  (structural: one member's chips, the farewell ×0.1, the 3-stack cap); Auto's cancels off today's by up to 17 points;
+  the late-region MP at the ±10% edge. None blocks the flip.

@@ -31,7 +31,7 @@ export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClas
   (flourish ? flourishShort(flourish) : `No effect as ${CLASS_NAME[classId]}`)
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
- * them (v16's MP: "+12 a round"). */
+ * them (v16's MP: "+13 a round"). */
 export interface SheetRow { label: string; value: string; gear?: number; extra?: number; note?: string }
 export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)

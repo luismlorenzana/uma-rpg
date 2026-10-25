@@ -1,8 +1,9 @@
 // The Rift's balance simulation (rift.md §11, H51): on-curve Lv 50 parties built through the game's own rules
 // (`world/balance-party.ts`) play the Rift's fights on Auto (`world/balance-play.ts`, the shared policy), with the shared
 // support in `rift/balance-sim.ts`. The full tables: `SIM=1 npx vitest run src/rift/balance.test.ts`; `SIM_FRONTS=iron,duel`
-// and `SIM_SEEDS=4` narrow them while tuning, and `SIM_ENGINE=15` plays them on classes v2 with v2's guided parties (H60).
-// The always-on checks are small and use fixed seeds; classes v2's are in `rift/balance-v15.test.ts`.
+// and `SIM_SEEDS=4` narrow them while tuning, and `SIM_ENGINE=15` plays them on classes v2 with v2's guided parties (H60),
+// `SIM_ENGINE=16` on the Tier rework's R1 with its guided builds (H71). The always-on checks are small and use fixed seeds;
+// classes v2's are in `rift/balance-v15.test.ts`, R1's in `rift/balance-v16.test.ts`.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import type { BattleAlly } from '../rpg/battle/types'
@@ -11,8 +12,8 @@ import { RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgClasses, rpgDefaultWeapons } from '
 import { CLASS_EXP_SHARE, classExpToNext, grantTrack, weaponExpShares, type RankTrack } from '../economy/ranks'
 import { echoFoeLevel, ECHO_RANK_PAY } from '../save/rift'
 import {
-  add, cell, ctx, duelShields, empty, fight, frontStages, GROUPS, guardRail, guided, merge, pct, planOf, rate, roster, RUNS, seedsOf,
-  withDefaultLoadout, WRONG,
+  add, cell, ctx, defaultLoadoutAt, duelShields, empty, fight, frontStages, GROUPS, guardRail, guided, merge, pct, planOf, rate, roster, RUNS,
+  seedsOf, WRONG,
 } from './balance-sim'
 import { riftConvergence, riftSeed } from './generate'
 import { RIFT_RUN_FIGHTS, riftRunFaces } from './picker'
@@ -112,7 +113,7 @@ describe('the Rift\'s balance (H51)', () => {
     }
     // The same guided parties with the game's default loadout, for the record: what a save fights with before she picks.
     for (const front of fronts) {
-      const stages = frontStages(front, party(front).map(withDefaultLoadout), seeds, engine)
+      const stages = frontStages(front, party(front).map(defaultLoadoutAt(engine)), seeds, engine)
       await tick()
       rows.push(`${front} | right, default loadout | ${GROUPS.map(([a, z]) => cell(merge(stages.slice(a - 1, z)))).join(' | ')}`)
     }
@@ -133,7 +134,7 @@ describe('the Rift\'s balance (H51)', () => {
     }
     const { conv, attempts, won } = convergence((a) => a)
     const product = conv.reduce((p, b) => p * rate(b), 1)
-    const byDefault = convergence(withDefaultLoadout)
+    const byDefault = convergence(defaultLoadoutAt(engine))
     rows.push('', 'Convergence | Iron | Arcane | Duel | Horde | attempt', `fights | ${conv.map(cell).join(' | ')} | ${pct(won / attempts)} (${won}/${attempts}; product ${pct(product)})`,
       `default loadouts | ${byDefault.conv.map(cell).join(' | ')} | ${pct(byDefault.won / byDefault.attempts)} (${byDefault.won}/${byDefault.attempts})`)
     // The guard rail.

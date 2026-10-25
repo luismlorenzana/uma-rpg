@@ -122,12 +122,12 @@ describe('class rules, v15 and v16 (H64)', () => {
     expect(validRpgWeapons('brawler', ['bow', 'katana', 'axe'], V15)).toBe(false)
   })
 
-  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, 0.48; her Tome still leads (SB11)', () => {
+  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, 0.50 (SB11; H71); her Tome still leads', () => {
     const pick = (c: RpgClass, v?: number) => { const h = rpgHand({ classId: c }, v); return { arms: h.arms, tome: h.tome } }
     for (const c of RPG_ALL_CLASSES) {
       expect(pick(c, V15), c).toEqual(TODAY.hands[c])
       expect(pick(c), c).toEqual(TODAY.hands[c])
-      expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.48, tome: 0.58 } : TODAY.hands[c])
+      expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.58 } : TODAY.hands[c])
       const [h15, h16] = [rpgHand({ classId: c }, V15), rpgHand({ classId: c }, V16)]
       expect({ ...h16, arms: h15.arms }, c).toEqual(h15)
     }

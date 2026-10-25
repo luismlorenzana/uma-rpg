@@ -163,11 +163,23 @@ const RIFT_TUNING_V15: RiftTuning = {
   convergence: -0.18,
 }
 
-/** The Tier rework's Rift, Tier 1 (CP7, D202): v15's numbers, with the Duel's weaknesses drawn as twin sets, two at stages
- * 1–6 and one at 7–12 (today's counts, as sets). H71 owns every other v16 number. */
+/**
+ * The Tier rework's Rift, Tier 1 (CP7, D202): v15's numbers, with the Duel's weaknesses drawn as twin sets, two at stages
+ * 1–6 and one at 7–12 (today's counts, as sets). R1's balance (H71, D207) re-tuned it for the v16 guided builds, which
+ * cleared v15's numbers far faster (Iron's champion 100%, the Horde's 99%, the Convergence 94%; the Duel's champion
+ * 22%), against rift.md §11's bands: Iron's offense ×1.6, Arcane ×1.6 HP and ×1.2 offense (×1.2 and ×1.1) with its
+ * sub-bosses weak to one element (two), the elites' offense 1.6 → 2, the Duel's champion ×0.8 and the Horde's ×1.3
+ * (×1.05), the Convergence −0.18 → −0.1; Iron's and Arcane's champions keep v15's scales. Faces, ranks and counts stay
+ * v15's (a test).
+ */
 const RIFT_TUNING_V16: RiftTuning = {
   ...RIFT_TUNING_V15,
-  weak: { ...RIFT_TUNING_V15.weak, duel: { ...RIFT_TUNING_V15.weak.duel, sets: [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1] } },
+  scale: { iron: { hp: 1, offense: 1.6 }, arcane: { hp: 1.6, offense: 1.2 } },
+  champions: { ...RIFT_TUNING_V15.champions, duel: { hp: 0.8, offense: 0.8 }, horde: { hp: 1.3, offense: 1.3 } },
+  elites: { ...RIFT_TUNING_V15.elites, offense: 2 },
+  weak: { ...RIFT_TUNING_V15.weak, arcane: { ...RIFT_TUNING_V15.weak.arcane, 'sub-boss': 1 },
+    duel: { ...RIFT_TUNING_V15.weak.duel, sets: [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1] } },
+  convergence: -0.1,
 }
 
 /** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, the Tier rework's

@@ -33,16 +33,16 @@ const sustain = (sheet: ReturnType<typeof umaBattleSheet>) => sheet.find((g) => 
 const spring = (uma: OwnedUma): OwnedUma => ({ ...uma, gear: { ...uma.gear, equipped: { ...uma.gear.equipped, 'accessory-2': 'amulet-spring-g10' } } })
 
 describe('the battle sheet on engine v16 (H70)', () => {
-  it('reads a Class Rank 40 Mage\'s 296 MP as "296 · +12 a round", "+22" with a G10 Spring, and drops the MP Regen row', () => {
+  it('reads a Class Rank 40 Mage\'s 296 MP as "296 · +13 a round", "+23" with a G10 Spring, and drops the MP Regen row', () => {
     const uma = mageAt(296)
     const mp = row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), 'MP')
-    expect(`${mp.value} · ${mp.note}`).toBe('296 · +12 a round')
-    expect(rpgBaseMpRegen(296, 40, 16)).toBe(12)
+    expect(`${mp.value} · ${mp.note}`).toBe('296 · +13 a round')
+    expect(rpgBaseMpRegen(296, 40, 16)).toBe(13)
     const sprung = row(umaBattleSheet(MAGE, spring(uma), 'mage', 1, 16), 'MP')
-    expect(`${sprung.value} · ${sprung.note}`).toBe('296 · +22 a round')
+    expect(`${sprung.value} · ${sprung.note}`).toBe('296 · +23 a round')
     expect(sustain(umaBattleSheet(MAGE, uma, 'mage', 1, 16)).map((r) => r.label))
       .toEqual(['HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Steal', '★ Flourish'])
-    // The base regen follows her Class Rank: 0.8% a depth open.
+    // The base regen follows her Class Rank: 0.9% a depth open (R1's balance, H71; SB18 drafted 0.8%).
     const low = { ...uma, ranks: withTrack(uma.ranks, { kind: 'class', id: 'mage' }, { rank: 10, exp: 0 }) }
     expect(row(umaBattleSheet(MAGE, low, 'mage', 1, 16), 'MP').note).toBe(`+${rpgBaseMpRegen(296, 10, 16)} a round`)
   })
