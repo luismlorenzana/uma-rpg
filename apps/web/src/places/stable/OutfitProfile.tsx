@@ -4,7 +4,9 @@
 // Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
 // the Unlock flow and her racing profile; an outfit another tier's world owns says where she lives, and a later tier
 // sends unlocks to Tier 1 (H35, D5). The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56,
-// SD3). "Can upgrade" (H34) dots the Skills and Gear tabs, greens the class chip's points and counts Extra Stats.
+// SD3). "Can upgrade" (H34) dots the Skills and Gear tabs, greens the class chip's points and counts Extra Stats. From
+// engine v16 (the Tier rework's R1, H70) her template's chip and card follow the stars, a Pace or Late Uma's calling pick
+// card sits above her class chip until confirmed, and the Racing tab's "Her template" replaces what her aptitudes did.
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
@@ -36,6 +38,8 @@ import { pointText } from '../../items/planets'
 import { GearCard } from './GearCard'
 import { PresetButton } from './PresetButton'
 import { SkillsPage } from './SkillsPage'
+import { CallingCard, TemplateChip } from './TemplateCard'
+import { racingTemplate } from './template-view'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
 const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#eb6fb0', C: '#7fb8ff', D: '#6fd39a', E: '#b8a6f0', F: '#a6b0bc', G: '#8a94a0' }
@@ -70,7 +74,7 @@ function GradeChip({ grade }: { grade: string }) {
 function Row({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 px-3 py-2 text-[13px]">
-      <span className="text-ink-soft">{label}</span>
+      <span className="shrink-0 text-ink-soft">{label}</span>
       <span className="text-right">
         <span className="font-semibold">{value}</span>
         {note && <span className="text-ink-faint"> · {note}</span>}
@@ -121,7 +125,10 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         name={outfit.name}
         title={outfit.title}
         level={owned ? <>{formatLevel(owned.level)}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></> : undefined}
-        chips={<p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>}
+        chips={<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
+          <TemplateChip outfit={outfit} uma={owned} classId={owned ? activeClass(outfit, owned) : null} />
+        </div>}
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
         summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} points={upgrades?.points ?? 0} onClass={() => setTab('skills')} />
@@ -138,9 +145,9 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
             {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
             {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} />}
             {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
-            {shown === 'racing' && <RacingTab view={view} outfit={outfit} />}
+            {shown === 'racing' && <RacingTab view={view} outfit={outfit} uma={owned} />}
           </>
-        ) : <RacingTab view={view} outfit={outfit} />}
+        ) : <RacingTab view={view} outfit={outfit} uma={null} />}
       </ProfileFrame>
     </div>
   )
@@ -173,6 +180,7 @@ function Summary({ outfit, owned, world, points, onClass }: { outfit: RosterOutf
       <div>
         <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
         <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
+        <CallingCard outfit={outfit} uma={owned} />
         <ClassChip outfit={outfit} uma={owned} points={points} onClick={onClass} />
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -262,7 +270,7 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
           </div>
           <div className="divide-y divide-hairline pt-2">
             {group.rows.map((r) => (
-              <Row key={r.label} label={r.label} value={
+              <Row key={r.label} label={r.label} note={r.note} value={
                 <span className="tabular-nums">
                   <span className={r.gear === undefined ? '' : 'font-display'}>{r.value}</span>
                   {(!!r.gear || !!r.extra) && (
@@ -440,7 +448,7 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
 
 // --- Racing: the original's profile ---------------------------------------------------------------------------
 
-function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit }) {
+function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutfit; uma: OwnedUma | null }) {
   const [unique, setUnique] = useState<{ name: string; description: string } | null | 'loading'>('loading')
   useEffect(() => {
     let live = true
@@ -456,6 +464,8 @@ function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit })
   ]
   const [style, styleGrade] = best(outfit.aptitudes.strategy)
   const [distance, distanceGrade] = best(outfit.aptitudes.distance)
+  // v16 (UT14): her template's readings and Flourish; before it, what her aptitudes did (H72 deletes those two rows).
+  const template = racingTemplate(outfit, uma, uma ? activeClass(outfit, uma) : null)
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -470,13 +480,22 @@ function RacingTab({ view, outfit }: { view: MasterView; outfit: RosterOutfit })
           </div>
         ))}
       </div>
-      <section>
-        <h4 className="text-micro mb-1">What her aptitudes do here</h4>
-        <div className="divide-y divide-hairline rounded-md bg-raised">
-          <Row label="Learns fastest" value={STYLE_CLASSES[style].join(' / ')} note={`${KEY_LABELS[style]} ${styleGrade}`} />
-          <Row label="Masters fastest" value={DISTANCE_GEAR[distance].gear} note={`${KEY_LABELS[distance]} ${distanceGrade}`} />
-        </div>
-      </section>
+      {template ? (
+        <section>
+          <h4 className="text-micro mb-1">Her template</h4>
+          <div className="divide-y divide-hairline rounded-md bg-raised">
+            {template.map((r) => <Row key={r.label} label={r.label} value={r.value} note={r.note} />)}
+          </div>
+        </section>
+      ) : (
+        <section>
+          <h4 className="text-micro mb-1">What her aptitudes do here</h4>
+          <div className="divide-y divide-hairline rounded-md bg-raised">
+            <Row label="Learns fastest" value={STYLE_CLASSES[style].join(' / ')} note={`${KEY_LABELS[style]} ${styleGrade}`} />
+            <Row label="Masters fastest" value={DISTANCE_GEAR[distance].gear} note={`${KEY_LABELS[distance]} ${distanceGrade}`} />
+          </div>
+        </section>
+      )}
       <section>
         <h4 className="text-micro mb-1">Racing base stats · growth</h4>
         <table className="w-full text-[13px]">

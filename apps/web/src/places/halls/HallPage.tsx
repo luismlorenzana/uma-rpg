@@ -1,8 +1,9 @@
 // A Hall of Heroes (D106, D107): four seats, each with its own unique Limit Break. A seat's Hero is shown large, her
 // Learners (ten at most) below her. A Hero always uses her seat's Limit Break at full strength; a Learner inherits it at
-// 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most.
+// 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most. From engine v16
+// (CP28, H70) a seat names the twin sets it answers, and a Learner candidate the sets it adds to her weapons'.
 import {
-  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, hallClass, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds, heroLimitsOf, learnerBlock,
+  activeClass, BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, classOf, hallClass, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds, heroLimitsOf, learnerBlock,
   LEARNER_MAX_PARENTS, parentsOf, rpgV2, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
+import { learnerAdds, seatTwinSets, TWIN_SET_LABEL } from './hall-view'
 
 export default function HallPage({ place }: PageProps) {
   return <MasterGate>{(view) => <Hall view={view} placeId={place.id} />}</MasterGate>
@@ -77,6 +79,10 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
                 <p className="text-micro">Seat {i + 1} · Limit Break</p>
                 <p className="font-display text-[16px] font-bold leading-tight">{limit.name}</p>
                 <div className="mt-0.5"><LimitKinds limit={limit} /></div>
+                {(() => {
+                  const sets = seatTwinSets(limit)
+                  return sets && sets.length > 0 && <p className="mt-0.5 text-[12px] font-semibold leading-4">Answers {sets.map((t) => TWIN_SET_LABEL[t]).join(' · ')}</p>
+                })()}
                 <p className="mt-0.5 text-[12px] leading-4 text-ink-soft">{limit.blurb}</p>
                 <p className="mt-1 truncate text-[13px] font-semibold">{seat ? hero?.name ?? `Outfit ${seat.hero}` : <span className="text-ink-faint">No Hero yet</span>}</p>
               </div>
@@ -117,7 +123,15 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
             ?? (world.heroes[pick.seat]?.hero === row.id ? 'Already seated here' : null)
             ?? (pick.role === 'hero' ? heroBlock(world, pick.seat, row.id) : learnerBlock(world, pick.seat, row.id))}
           describe={row => `${formatLevel(row.level)} · ${row.classId ? CLASS_LABEL[row.classId] : row.base.title ?? ''}`}
-          renderChips={row => row.uma && pick.role === 'learner' ? <span className="text-[10px] text-ink-soft">Bond {bondOf(row.uma, pick.seat).level} · {parentsOf(world, row.id).length}/{LEARNER_MAX_PARENTS} Heroes</span> : undefined}
+          renderChips={row => {
+            if (!row.uma || pick.role !== 'learner') return undefined
+            // v16 (CP28, §8.2): the sets this seat answers that her weapons miss.
+            const adds = learnerAdds(heroLimit(pick.seat), classOf(row.uma, activeClass(row.outfit, row.uma)).weapons)
+            return <span className="text-[10px] text-ink-soft">
+              Bond {bondOf(row.uma, pick.seat).level} · {parentsOf(world, row.id).length}/{LEARNER_MAX_PARENTS} Heroes
+              {adds && adds.length > 0 && <span className="block font-semibold text-ink">Adds {adds.map((t) => TWIN_SET_LABEL[t]).join(', ')}</span>}
+            </span>
+          }}
           onClose={() => setPick(null)}
           onPick={(id) => run(() => (pick.role === 'hero' ? appointHero(pick.seat, id) : addLearner(pick.seat, id)), () => { setPick(null); setHeroOpen(null) })} />
       )}

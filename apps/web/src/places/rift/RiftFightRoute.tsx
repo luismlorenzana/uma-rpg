@@ -37,8 +37,8 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
   const rank = useMemo(() => faceRank(campaign.cast.byId), [campaign.cast.byId])
   const battle = world?.rift.battle ?? null
   // The last action settles the fight in the save while its cues still play: keep showing the fight it was.
-  const shown = useRef<{ battleId: string; ref: RiftFightRef; five: string[] } | null>(null)
-  if (battle) shown.current = { battleId: battle.battleId, ref: battle.ref, five: battle.input.allies.map((a) => a.id) }
+  const shown = useRef<{ battleId: string; ref: RiftFightRef; five: string[]; version: number } | null>(null)
+  if (battle) shown.current = { battleId: battle.battleId, ref: battle.ref, five: battle.input.allies.map((a) => a.id), version: battle.input.version }
   const fight = shown.current
   const home = (ref: RiftFightRef | undefined) => navigate(pagePath(place, ref ? riftHome(ref) : ''), { replace: true })
 
@@ -60,7 +60,7 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
         setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.')
       }
     }
-    return <RiftResult campaign={campaign} result={ended.result} error={error} finale={ended.finale} onAgain={() => void again()}
+    return <RiftResult campaign={campaign} result={ended.result} error={error} finale={ended.finale} engine={shown.current?.version} onAgain={() => void again()}
       onBack={() => home(ended.result.ref)} />
   }
   if (!fight) {

@@ -1,10 +1,11 @@
-// One of a class's five weapon slots (D98), one of her five armor slots (D103, D124) or one of her two accessory slots:
-// the weapon she holds there opens its skill tree; armor adds its stats; an accessory its kind or a defensive effect (from
-// classes v2 the slots are typed, Damage for an Orb's flat offense and Support for a Talisman or an Amulet, H59).
-// Every Uma holds a Training weapon and armor piece of each kind (grade 0, no stats), shown only until she binds its
-// grade 1. A Summoner, Spell Blade or Cleric chooses each slot's weapon within the slot's kind; a Brawler's and a Mage's
-// slots keep theirs. She binds each kind's grades in order (D119): the sheet shows her best piece and the stock above it,
-// never the grades she has spent.
+// One of a class's weapon slots (D98; five to v15, three by channel from v16), one of her five armor slots (D103, D124)
+// or one of her two accessory slots: the weapon she holds there opens its skill tree; armor adds its stats; an accessory
+// its kind or a defensive effect (from classes v2 the slots are typed, Damage for an Orb's flat offense and Support for a
+// Talisman or an Amulet, H59). Every Uma holds a Training weapon and armor piece of each kind (grade 0, no stats), shown
+// only until she binds its grade 1. A class that picks (`rpgPicksWeapons`: to v15 the Summoner, Spell Blade and Cleric,
+// from v16 every class, CP12) chooses each slot's weapon among her class's kinds of the slot's channel; the others keep
+// theirs. She binds each kind's grades in order (D119): the sheet shows her best piece and the stock above it, never the
+// grades she has spent.
 import {
   ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
   boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, isAccessory, isMagicalArmor, isOrb, isRpgTome,

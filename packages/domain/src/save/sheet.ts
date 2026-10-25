@@ -1,16 +1,38 @@
 // Her battle sheet (combat-balance.md §6.0): every battle stat of her active class, for her profile. Apart from the
-// battle rules so it ships with the Stable's lazy chunk, not the main bundle (H57).
-import { BATTLE_ENGINE_VERSION, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE, BATTLE_LIMIT_MAX, rpgV2 } from '../rpg/battle/caps'
+// battle rules so it ships with the Stable's lazy chunk, not the main bundle (H57). From engine v16 (H70) her MP row carries
+// what she regains a round (SB18's base regen and any Spring's) and a ★ Flourish row her template's (UT6, UT14).
+import {
+  BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE,
+  BATTLE_LIMIT_MAX, rpgRework, rpgV2,
+} from '../rpg/battle/caps'
+import type { RpgFlourish } from '../rpg/battle/types'
 import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
-import { projectRpgStats, type RpgClass } from '../rpg/rules'
+import { projectRpgStats, rpgBaseMpRegen, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight } from '../economy/gear'
-import { WEAPON_LABEL } from '../economy/ranks'
-import { activeClass, classOf, umaPointParts, umaProfile, type BattleOutfit } from './battle'
+import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
+import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, type BattleOutfit } from './battle'
 import type { OwnedUma } from './save'
 
-/** One line of her battle sheet: the total, and for the six core stats what gear and Extra Stats add. */
-export interface SheetRow { label: string; value: string; gear?: number; extra?: number }
+/** The classes' names on the sheet ("No effect as Brawler"). */
+const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
+  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric',
+}
+const pct = (share: number) => `${Math.round(share * 1000) / 10}%`
+/** A Flourish in a few words (UT6), from the engine's own numbers: "Even pace · 1% a round, up to 4%". */
+export function flourishShort(flourish: RpgFlourish): string {
+  const most = pct(BATTLE_FLOURISH_SHARE)
+  if (flourish === 'clean-break') return `Clean break · a Barrier of ${most} at the start`
+  if (flourish === 'even-pace') return `Even pace · ${pct(BATTLE_FLOURISH_RATE['even-pace'])} a round, up to ${most}`
+  return `Late reserve · from round ${BATTLE_FLOURISH_FROM}, ${pct(BATTLE_FLOURISH_RATE['late-reserve'])} a round, up to ${most}`
+}
+/** The sheet's ★ Flourish row (v16): hers as she fights now, or "No effect as Brawler" outside her calling's class. */
+export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClass): string =>
+  (flourish ? flourishShort(flourish) : `No effect as ${CLASS_NAME[classId]}`)
+
+/** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
+ * them (v16's MP: "+12 a round"). */
+export interface SheetRow { label: string; value: string; gear?: number; extra?: number; note?: string }
 export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
 const permille = (n: number) => `${Math.round(n) / 10}%`
@@ -38,6 +60,9 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
   const times = `×${(1 + heal / (v2 ? BATTLE_HEAL_OFFENSE_SCALE : BATTLE_HEAL_SCALE)).toFixed(2)}`
   const mends: SheetRow[] = !v2 ? [{ label: 'Heal', value: `${heal} (mends ${times})` }]
     : rpgIsHealer(classId, engine) ? [{ label: 'Mends', value: `${times} (from ${by === 'atk' ? 'ATK' : 'M.ATK'})` }] : []
+  // v16 (SB18, UT6): the MP she regains at each round's end, the base regen by her Class Rank and her Spring's; her Flourish.
+  const rework = rpgRework('fight', engine)
+  const regen = rework ? rpgBaseMpRegen(boosted.stats.mp, classRankOf(uma.ranks, classId), engine) + a.mpRegen : 0
   return [
     { title: 'Offense', rows: [core('ATK', 'atk'), core('M.ATK', 'matk'), { label: 'Might', value: mightText || 'None' }, { label: v2 ? 'Orb' : 'Orbs',
       value: (v2 ? Object.entries(a.orbMight ?? {}).map(([k, n]) => `${KIND_NAME(k)} Orb +${n}`) : a.orbs.map(KIND_NAME)).join(', ') || 'None' }] },
@@ -47,7 +72,9 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
       { label: 'Thorns', value: permille(a.thorns) }, { label: 'Mirror', value: permille(a.mirror) }] },
     { title: 'Sustain', rows: [core('HP', 'hp'), ...mends,
       { label: 'HP Regen', value: ofHp(a.regen, ' a round') }, { label: 'Lifesteal', value: permille(a.lifesteal) },
-      core('MP', 'mp'), { label: 'MP Regen', value: `${a.mpRegen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) }] },
+      ...(rework ? [{ ...core('MP', 'mp'), note: `+${regen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) },
+        { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId), classId) }]
+        : [core('MP', 'mp'), { label: 'MP Regen', value: `${a.mpRegen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) }])] },
     { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
   ]
 }

@@ -1,4 +1,4 @@
-// What she wears (S7, D59, D86, D98, D103, D124): her class's five weapons, her five armor slots (head, body, legs, arms,
+// What she wears (S7, D59, D86, D98, D103, D124): her class's weapons (five to v15, three from v16), her five armor slots (head, body, legs, arms,
 // feet), each physical or magical, and her two accessories. An empty weapon or armor slot holds the Training piece of its
 // kind; an empty accessory slot holds nothing. Pieces from the stock bind to her for good when equipped; her own pieces
 // swap freely. Her Weapon, Armor or Accessory Rank lets her wear its grade. A slot that can take a better piece now shows

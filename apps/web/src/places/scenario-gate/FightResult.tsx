@@ -1,5 +1,6 @@
-// What a fight paid (D51, D102): EXP and levels for all five with every bar she filled (her class, five weapons, five
+// What a fight paid (D51, D102): EXP and levels for all five with every bar she filled (her class, her weapons, five
 // armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Uma Shards at Lv10/20/30/40/50 and any Ticket they made.
+// From engine v16 (H70) each skill that ranked up with her Class Rank says so under its bar.
 import {
   BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
   type RpgClass,
@@ -10,15 +11,21 @@ import type { Campaign } from '../../battle/campaign'
 import { RankCells, RankRow, type RankCell } from '../../ui/RankBars'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
+import { useActiveTier, useWorld } from '../../save/game'
+import { rankUpLines } from './rank-ups'
 
-export function FightResult({ campaign, chapter, result, onAgain, onMap, againLabel }: {
+export function FightResult({ campaign, chapter, result, onAgain, onMap, againLabel, engine }: {
   campaign: Campaign
   chapter: RpgCampaignChapter
   result: Result
   onAgain: () => void
   onMap: () => void
   againLabel?: string
+  /** The fight's own engine version (a Sweep's is the live one). */
+  engine?: number
 }) {
+  const world = useWorld()
+  const tier = useActiveTier()
   const win = result.outcome === 'victory'
   const node = chapter.nodes.find((n) => n.id === result.nodeId)
   return (
@@ -67,6 +74,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                       </div>
                     </div>
                     {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
+                    <RankUps lines={rankUpLines(world, campaign.outfits.get(m.outfitId), cls, tier, engine)} />
                     <RankCells label="Weapon Ranks" cells={cells('weapon')} />
                     <RankCells label="Armor Ranks" cells={cells('armor')} />
                     {cells('accessory').length > 0 && <RankCells label="Accessory Ranks" cells={cells('accessory')} />}
@@ -104,4 +112,10 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
       </div>
     </div>
   )
+}
+
+/** The skills that ranked up with her Class Rank, one line each (v16). */
+export function RankUps({ lines }: { lines: readonly string[] }) {
+  if (lines.length === 0) return null
+  return <ul className="space-y-0.5" aria-label="Skill ranks">{lines.map((l) => <li key={l} className="text-[12px] font-semibold text-accent">{l}</li>)}</ul>
 }

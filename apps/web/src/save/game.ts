@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgClass,
+  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
 } from '@rpg/domain'
 import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
@@ -157,9 +157,22 @@ const edit = async <Rules,>(rules: Promise<Rules>, change: (rules: Rules, save: 
 
 /** Switches her active class for free (D86). */
 export const pickClass = (outfitId: string, classId: RpgClass) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.chooseClass(s, outfitId, classId, now, t))
-/** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. */
+/** Learns a side skill in a class; throws SaveRuleError with the reason when she can't. Engines v6–v15: from v16 the
+ * Skills tab never calls it (nothing is learned, CP14) and the rule refuses it. */
 export const learn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.learnSkill(s, outfit, classId, nodeId, now, t))
 export const unlearn = (outfit: BattleOutfit, classId: RpgClass, nodeId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.forgetSkill(s, outfit, classId, nodeId, now, t))
+/** Takes line A or B on one of her class's trees (v16, CP18, H69's `pickBranch`): free, her equipped skills follow. */
+export const takeBranch = (outfit: BattleOutfit, classId: RpgClass, weapon: RpgWeapon, branch: RpgBranch) =>
+  edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickBranch(s, outfit, classId, weapon, branch, now, t))
+/** Picks her calling, one of her row's two (v16, CP29, H69's `pickCalling`); at Uma Lv 1 her class follows. */
+export const chooseCalling = (outfit: BattleOutfit, pick: RpgClass) =>
+  edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickCalling(s, outfit, pick, now, t))
+/** Makes her calling final (v16, CP29, H69's `confirmCalling`). */
+export const confirmCallingPick = (outfitId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.confirmCalling(s, outfitId, now, t))
+/** Sets several Umas' class weapons in one save (the Rift's guided build, v16, CP7): weapons are owned per kind, so it
+ * costs nothing; her equipped skills of a tree she stops slotting leave her loadout (H69). */
+export const wieldWeapons = (members: readonly { outfitId: string; classId: RpgClass; weapons: readonly RpgWeapon[] }[]) =>
+  edit(import('@rpg/domain/battle'), (d, s, now, t) => members.reduce((next, m) => d.setClassWeapons(next, m.outfitId, m.classId, m.weapons, now, t), s))
 /** Equips skills in order, or null to have them chosen for her (D86). */
 export const equip = (outfit: BattleOutfit, classId: RpgClass, loadout: string[] | null) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.equipSkills(s, outfit, classId, loadout, now, t))
 export const beginFight = (region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>

@@ -1,6 +1,9 @@
 // RPG data and eligibility over the kit's neutral album rows. No list/query implementation lives here.
 import { type AlbumPreset, type AlbumPrefsSchema, type AlbumQuery, type FacetDef, type SortDef, type OutfitRowBase, runAlbumQuery } from '@luismlorenzana/uma-kit/roster'
-import { activeClass, availableWorkers, KEY_LABELS, RPG_CLASSES, statTotal, type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades } from '@rpg/domain'
+import {
+  activeClass, availableWorkers, BATTLE_ENGINE_VERSION, KEY_LABELS, KNACK_LABEL, RPG_CLASSES, rpgRework, statTotal, STRIDE_LABEL, UMA_KNACKS, UMA_STRIDES,
+  umaTemplateFacets, type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades,
+} from '@rpg/domain'
 import { CLASS_LABEL } from '../battle/labels'
 import type { MasterView } from '../master/master'
 import type { UmaPickerRow } from '@luismlorenzana/uma-kit/album'
@@ -19,7 +22,12 @@ export interface RpgUmaRow extends UmaPickerRow {
 const enumFacet = (key: string, label: string, options: readonly string[], group = 'Aptitudes'): FacetDef => ({
   key, label, group, kind: 'enum', options: options.map(value => ({ value, label: KEY_LABELS[value] ?? value })),
 })
-export const STABLE_FACETS: readonly FacetDef[] = [
+/** The Stable's facets in an engine's generation; from v16 (UT15, H70) a Template group after RPG: her calling (an owned
+ * Uma's pick counts), stride and knack. No Signature facet before R2. */
+export function stableFacets(engine: number = BATTLE_ENGINE_VERSION): readonly FacetDef[] {
+  return rpgRework('fight', engine) ? [...FACETS, ...TEMPLATE_FACETS] : FACETS
+}
+const FACETS: readonly FacetDef[] = [
   { ...enumFacet('ownership', 'Ownership', ['owned', 'locked'], 'Collection'), options: [{ value: 'owned', label: 'Owned' }, { value: 'locked', label: 'Locked' }] },
   { ...enumFacet('rarity', 'Rarity', ['1', '2', '3'], 'Collection'), options: [1, 2, 3].map(n => ({ value: String(n), label: '★'.repeat(n) })) },
   enumFacet('surface', 'Surface · A+', ['turf', 'dirt']),
@@ -31,6 +39,13 @@ export const STABLE_FACETS: readonly FacetDef[] = [
   { key: 'class', label: 'Class', group: 'RPG', kind: 'enum', options: RPG_CLASSES.map(value => ({ value, label: CLASS_LABEL[value] })) },
   { key: 'upgrade', label: 'Can upgrade', group: 'RPG', kind: 'boolean' },
 ]
+const TEMPLATE_FACETS: readonly FacetDef[] = [
+  { key: 'calling', label: 'Calling', group: 'Template', kind: 'enum', options: RPG_CLASSES.map(value => ({ value, label: CLASS_LABEL[value] })) },
+  { key: 'stride', label: 'Stride', group: 'Template', kind: 'enum', options: UMA_STRIDES.map(value => ({ value, label: STRIDE_LABEL[value] })) },
+  { key: 'knack', label: 'Knack', group: 'Template', kind: 'enum', options: UMA_KNACKS.map(value => ({ value, label: KNACK_LABEL[value] })) },
+]
+/** The live generation's facets, the list the Stable reads. */
+export const STABLE_FACETS: readonly FacetDef[] = stableFacets()
 /** The Filters sheet's quick picks (H34): "Can upgrade" turns that facet on. */
 export const STABLE_PRESETS: readonly AlbumPreset[] = [
   { key: 'upgrade', label: 'Can upgrade', apply: q => ({ ...q, filters: { ...q.filters, upgrade: true } }) },
@@ -55,8 +70,11 @@ export const foldSearch = (text: string): string => text.normalize('NFD').replac
 export interface AlbumScope { tier: number; elsewhere: ReadonlySet<string> }
 export const TIER_ONE_SCOPE: AlbumScope = { tier: 1, elsewhere: new Set() }
 
+/** The album's rows. From v16 (UT15, H70) each carries her template's facets and its name in search ("ironhide" finds
+ * every Ironhide); `engine` is the generation, the live one by default. */
 export function albumRows(view: MasterView, world: TierWorld | null, seen: readonly string[] = [], now = new Date().toISOString(),
-  scope: AlbumScope = TIER_ONE_SCOPE): RpgUmaRow[] {
+  scope: AlbumScope = TIER_ONE_SCOPE, engine: number = BATTLE_ENGINE_VERSION): RpgUmaRow[] {
+  const templates = rpgRework('fight', engine)
   const known = new Set(seen)
   const available = world ? availableWorkers(world, now) : new Set<string>()
   return view.roster.flatMap(outfit => {
@@ -68,13 +86,15 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
     const classId = uma ? activeClass(outfit, uma) : null
     const isNew = !known.has(base.id)
     const top = (grades: Record<string, string>) => Object.keys(grades).filter(k => grades[k] === 'A' || grades[k] === 'S')
+    const template = templates ? umaTemplateFacets(outfit, uma?.calling?.pick ?? null) : null
     return [{
       id: base.id, name: base.name, releasedAt: base.releasedAt, level: uma?.level ?? null,
       free: uma !== null && !busy, workLevel: uma?.craft.level ?? null,
-      search: `${base.name} ${base.title ?? ''} ${foldSearch(`${base.name} ${base.title ?? ''}`)}`.toLowerCase(),
+      search: `${base.name} ${base.title ?? ''} ${foldSearch(`${base.name} ${base.title ?? ''}`)}${template ? ` ${template.name}` : ''}`.toLowerCase(),
       facets: { ownership: uma ? ['owned'] : ['locked'], rarity: [String(base.rarity)],
         surface: top(base.aptitudes.surface), distance: top(base.aptitudes.distance), strategy: top(base.aptitudes.strategy),
-        sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [], upgrade: false },
+        sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [], upgrade: false,
+        ...(template ? { calling: [template.calling], stride: [template.stride], knack: [template.knack] } : {}) },
       sorts: { level: uma?.level ?? null, release: base.releasedAt, name: base.name, rarity: base.rarity,
         statTotal: statTotal(outfit), craft: uma?.craft.level ?? null,
         classRank: uma ? Math.max(1, ...Object.values(uma.ranks.classes).map(track => track.rank)) : null },
@@ -83,9 +103,10 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
   })
 }
 
-/** The kit sorts both ownership groups; the RPG keeps owned before locked even when direction flips (D146). */
-export function stableResult(rows: readonly RpgUmaRow[], query: AlbumQuery) {
-  const result = runAlbumQuery(rows, STABLE_FACETS, { ...query, search: foldSearch(query.search) }, [
+/** The kit sorts both ownership groups; the RPG keeps owned before locked even when direction flips (D146). `facets` is the
+ * live list unless a test names a generation's. */
+export function stableResult(rows: readonly RpgUmaRow[], query: AlbumQuery, facets: readonly FacetDef[] = STABLE_FACETS) {
+  const result = runAlbumQuery(rows, facets, { ...query, search: foldSearch(query.search) }, [
     { key: 'release', direction: 'desc' }, { key: 'name', direction: 'asc' },
   ])
   const byId = new Map(rows.map(row => [row.id, row]))

@@ -2,7 +2,7 @@
 // reworked for D86: every class acts once, picks which of her five weapons to attack with, and a Spell Blade's act pairs
 // an Arms half with a Tome half (from v15 a Summoner's too, her Tome half leading, D183). Everything reads the fight's
 // own engine version, so an open v14 fight shows v14's rules whatever the live generation (H59).
-import { BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgV2, rpgWeaponKind,
+import { BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgRework, rpgV2, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 import { BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleHasLimit, battleLimitPlan,
@@ -131,7 +131,12 @@ export function limitMode(state: BattleState, actorId: string, choice: BattleLim
   return plan ? { kind: 'limit', name: plan.name, ...choice } : null
 }
 
-/** A cue in words, in its fight's version (`engine`): from v15 a lingering summon's farewell strikes every foe (D183). */
+/** A v16 fight's Flourish cue (H68): a `heal` or Clean break's `cover`, labelled `Flourish`. */
+const flourish = (cue: BattleCue, engine: number | undefined): boolean =>
+  cue.label === 'Flourish' && engine !== undefined && rpgRework('fight', engine)
+
+/** A cue in words, in its fight's version (`engine`): from v15 a lingering summon's farewell strikes every foe (D183); from
+ * v16 her Flourish (UT6) is her ★, a mend "★ +30 HP" and Clean break's opening Barrier "★ Barrier 59" (H70). */
 export function describeCue(cue: BattleCue, name: (id: string) => string, engine?: number): string {
   switch (cue.kind) {
     case 'hit': return cue.label === 'Burn' ? `${name(cue.targetId)} burns for ${cue.amount}`
@@ -151,8 +156,9 @@ export function describeCue(cue: BattleCue, name: (id: string) => string, engine
     case 'intent': return `${name(cue.actorId)}: ${cue.label}`
     case 'move': return `${name(cue.actorId)}: ${cue.label}`
     case 'result': return cue.label === 'victory' ? 'Victory!' : 'Defeated'
-    case 'heal': return `${name(cue.targetId)} +${cue.amount ?? 0} HP${cue.label ? ` · ${cue.label}` : ''}`
-    case 'cover': return `${name(cue.targetId)}: Barrier ${cue.amount ?? 0}`
+    case 'heal': return flourish(cue, engine) ? `${name(cue.targetId)} ★ +${cue.amount ?? 0} HP`
+      : `${name(cue.targetId)} +${cue.amount ?? 0} HP${cue.label ? ` · ${cue.label}` : ''}`
+    case 'cover': return `${name(cue.targetId)}: ${flourish(cue, engine) ? '★ ' : ''}Barrier ${cue.amount ?? 0}`
     case 'lock': return `${name(cue.targetId)}: a lock breaks${cue.amount ? ` (${cue.amount} left)` : ''}`
     case 'cancel': return `${name(cue.targetId)}: ${cue.label ?? 'charge'} cancelled!`
   }

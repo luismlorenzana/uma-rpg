@@ -115,6 +115,16 @@ describe('the hybrids\' pairs by the fight\'s version (H59, D183)', () => {
     expect(describeCue(cue, name, 14)).toBe('Sum’s Ember Sprites strikes again')
     expect(describeCue({ kind: 'heal', actorId: 'c1', targetId: 's1', amount: 12, label: 'Regen' }, name, 15)).toBe('Sum +12 HP · Regen')
   })
+
+  it('reads a v16 Flourish as her ★: a mend "★ +30 HP" and Clean break\'s Barrier "★ Barrier 59" (H70)', () => {
+    const name = (id: string) => ({ a1: 'Aster' })[id] ?? id
+    expect(describeCue({ kind: 'heal', actorId: 'a1', targetId: 'a1', amount: 30, label: 'Flourish' }, name, 16)).toBe('Aster ★ +30 HP')
+    expect(describeCue({ kind: 'cover', actorId: 'a1', targetId: 'a1', amount: 59, label: 'Flourish' }, name, 16)).toBe('Aster: ★ Barrier 59')
+    // Other mends and Barriers, and an MP cue, read as today.
+    expect(describeCue({ kind: 'heal', actorId: 'c1', targetId: 'a1', amount: 12, label: 'Regen' }, name, 16)).toBe('Aster +12 HP · Regen')
+    expect(describeCue({ kind: 'cover', actorId: 'c1', targetId: 'a1', amount: 40 }, name, 16)).toBe('Aster: Barrier 40')
+    expect(describeCue({ kind: 'mp', actorId: 'a1', targetId: 'a1', amount: 12 }, name, 16)).toBe('Aster +12 MP')
+  })
 })
 
 describe('the Limit Break menu reads the fight\'s table (H59, D181)', () => {
