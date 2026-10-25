@@ -11,3 +11,13 @@ export function workOf(world: TierWorld, outfitId: string): { placeId: string; s
   const row = world.work[outfitId]
   return row?.slot && row.entries.length > 0 ? { placeId: row.slot.building, slot: row.slot.slot } : null
 }
+
+/** What `callingPickBlock` says. */
+export const CALLING_WORKING = 'Finish her work first'
+
+/** Why her calling pick can't move now, or null (R2, PP2; H77): the pick moves her trade, so it waits while she has work
+ * started (finished or not, until collected) or queued. The calling pick asks it from the economy stage. */
+export function callingPickBlock(world: TierWorld, outfitId: string, _now: string): string | null {
+  const row = world.work[outfitId]
+  return row && (row.entries.length > 0 || row.queue.length > 0) ? CALLING_WORKING : null
+}

@@ -2,7 +2,7 @@
 // Learning · Battle · Wilds, the sibling apps' Home · Grow · Play · Work), one source for the map, the hit targets, the
 // global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -102,7 +102,7 @@ function sites(specs: SiteSpec[]): Place[] {
   }))
 }
 
-const WILDS: Place[] = [
+const WILDS_V1: Place[] = [
   ...sites(GATHER_SITES),
   {
     id: 'workbench', page: 'wilds', kind: 'station', name: 'Workbench', opensIn: 'S4', slots: FIRST_SLOTS,
@@ -124,6 +124,31 @@ const WILDS: Place[] = [
     at: { x: 0.5, y: 0.5 },
   },
 ]
+
+/** R2's Wilds (profession-progression.md §4, PP4–PP6; H77): ten places, one existing building a profession, four slots at
+ * ×1.25 and no upgrades, at today's ten side spots: one row a trade, gathering left and making right. A place names its
+ * uma-art frame where it isn't its id. */
+/** One of R2's places: its row and side give its spot (`WILDS_LAYOUT`), the same in every tier. */
+const placeV3 = (at: number, id: string, kind: PlaceKind, name: string, opensIn: SliceId, blurb: string, detail: string, frame?: string): Place => ({
+  id, page: 'wilds', kind, name, blurb, details: [detail, 'Four slots, ×1.25'], slots: 4, opensIn, at: WILDS_LAYOUT[at]!, ...(frame ? { frame } : {}),
+})
+const WILDS_V3: Place[] = [
+  placeV3(0, 'mine', 'gather-site', 'Mine', 'S4', 'Mining: ores into ingots.', 'Two ores a tier'),
+  placeV3(1, 'forge', 'station', 'Forge', 'S7', 'Weapon Crafting: Weapon Gems.', 'Weapon Gems G1–G10'),
+  placeV3(2, 'forest', 'gather-site', 'Forest', 'S4', 'Wood Chopping: logs into planks.', 'Two woods a tier'),
+  placeV3(3, 'armorer', 'station', 'Armorer', 'S7', 'Armor Crafting: Armor Fittings.', 'Armor Fittings G1–G10', 'lancers-barracks'),
+  placeV3(4, 'fields', 'gather-site', 'Fields', 'S4', 'Farming: vegetables for kitchen cuts.', 'Two vegetables a tier', 'vegetable-garden'),
+  placeV3(5, 'workbench', 'station', 'Workbench', 'S4', 'Material Processing: raw into refined.', 'Every material, ×1 to ×40'),
+  placeV3(6, 'fishery', 'gather-site', 'Fishery', 'S4', 'Fishing: fish into fillets.', 'Two fish a tier'),
+  placeV3(7, 'charm-shop', 'station', 'Charm Shop', 'S7', 'Accessory Crafting: Accessory Settings.', 'Accessory Settings G1–G10', 'arcane-armory'),
+  placeV3(8, 'monster-den', 'gather-site', 'Monster Den', 'S4', 'Hunting: stones into cut stones.', 'Two stones a tier'),
+  placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Planet and Moon Jewels I–V'),
+]
+
+/** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, R2's ten places from v17. */
+export function wildsPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
+  return rpgRework('economy', engine) ? WILDS_V3 : WILDS_V1
+}
 
 /** The Learning District's class halls are its Halls of Heroes (D106): four Hero seats each, each seat's Hero with up to
  * ten Learners who inherit her unique Limit Break. */
@@ -165,7 +190,7 @@ export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] 
 }
 
 /** Town Hall (D147): the four corners as uma-racer's, and its plaza (`TOWN_PLAZA`) where the featured Uma stands. */
-const TOWN: Place[] = [
+const TOWN_V1: Place[] = [
   {
     id: 'stable', page: 'town', kind: 'town', name: 'Stable', opensIn: 'S1', slots: 0, at: { x: 0.24, y: 0.18 },
     blurb: 'Every Uma outfit, locked or yours. Uma Tickets open new ones.',
@@ -193,6 +218,22 @@ const TOWN: Place[] = [
   },
 ]
 
+/** R2's Warehouse and Exchange (H77): materials and made items, raw materials by pair. */
+const TOWN_V3: Place[] = TOWN_V1.map((p): Place => {
+  if (p.id === 'warehouse') {
+    return { ...p, blurb: 'Every item you own: materials and made items.', details: ['Materials and made items', 'Filled by the Wilds and the Exchange'] }
+  }
+  if (p.id === 'exchange') {
+    return { ...p, details: ['Raw materials by pair', 'Speed Ticket: 30 minutes off any job', 'Sweep: clear a beaten regular stage now'] }
+  }
+  return p
+})
+
+/** Town Hall by generation (H77): the Warehouse's and the Exchange's words follow the economy. */
+export function townPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
+  return rpgRework('economy', engine) ? TOWN_V3 : TOWN_V1
+}
+
 /** Where the featured Uma stands on Town Hall's road, kept clear of props (D147). */
 export const TOWN_PLAZA = { x: 0.5, y: 0.45 } as const
 
@@ -211,7 +252,8 @@ const BATTLE: Place[] = [
   },
 ]
 
-export const PLACES: readonly Place[] = [...TOWN, ...learningPlaces(), ...BATTLE, ...WILDS]
+/** Every place of the live generation: a place R2 removes has none (a stale link falls back to its page). */
+export const PLACES: readonly Place[] = [...townPlaces(), ...learningPlaces(), ...BATTLE, ...wildsPlaces()]
 
 const BY_ID = new Map(PLACES.map((p) => [p.id, p]))
 

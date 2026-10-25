@@ -1,10 +1,19 @@
 // The Exchange (S4, design §11, D54): Laurels from battles buy raw items of the continents you've reached, Time
 // Tickets and Sweep Tickets; spare stock sells back for Laurels; Marks buy Manuals (D102). A Sweep replays a beaten
 // regular stage at once and pays what a replay pays (D79).
+//
+// R2 (profession-progression.md §10, PP17; H77), from the economy stage: raw materials by pair, the base pair's low type
+// after the tier's first win and its high type after a win on continent 3, every later tier's pair low after continent 2
+// and high after continent 4, at 30 and 80 Laurels × the world's tier; selling materials and made items × the tier.
+// Tickets as today.
 import { chapterGrades, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE } from '../economy/pacing'
 import { gemById } from '../economy/gems'
 import { gearById } from '../economy/gear'
 import { itemById } from '../items/catalog'
+import { worldMaterialTier } from '../items/made'
+import { madeIdentity } from '../items/made-id'
+import { MATERIAL_IDENTITIES, materialIdentity, type MaterialBand } from '../items/materials-id'
+import { rpgRework } from '../rpg/battle/caps'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
 import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
@@ -28,16 +37,65 @@ export function stockedGrades(world: TierWorld): number[] {
   return [...grades].sort((a, b) => a - b)
 }
 
-export function buyRawItem(save: Save, itemId: string, quantity: number, stocked: readonly number[], now: string, tier = TIER_ONE): Save {
+// --- R2's stock (PP17) -----------------------------------------------------------------------------------------------
+
+/** The furthest continent of the world's own tier with a won stage (`stockedGrades`' reading of `stageBand`), 0 before the
+ * first win. */
+export function continentReached(world: TierWorld): number {
+  let reached = 0
+  for (const [stageId, wins] of Object.entries(worldRun(world).wins)) {
+    const band = stageBand(stageId)
+    if (wins > 0 && band >= 1) reached = Math.max(reached, ((band - 1) % 5) + 1)
+  }
+  return reached
+}
+
+/** The continent a pair's type opens after (PP17): the base pair's low type after the first win, its high type after
+ * continent 3; a later tier's pair low after continent 2, high after 4. */
+export const stockedAfter = (materialTier: number, band: MaterialBand): number => (materialTier === 1 ? (band === 'low' ? 1 : 3) : band === 'low' ? 2 : 4)
+
+/** The raw materials the Exchange sells now in a world of `tier` (R2): every tier's types up to its own, by pair. */
+export function stockedTypes(world: TierWorld, tier: string | number): string[] {
+  const reached = continentReached(world)
+  const top = worldMaterialTier(Number(tier))
+  return MATERIAL_IDENTITIES.filter((m) => !m.refined && m.tier <= top && reached >= stockedAfter(m.tier, m.band)).map((m) => m.id)
+}
+
+/** R2's raw prices (PP17): a low type 30 Laurels, a high type 80, × the world's tier (D170: fights pay × tier); 0 for an
+ * id that isn't a raw material. */
+export const RAW_PRICE_V3: Readonly<Record<MaterialBand, number>> = { low: 30, high: 80 }
+export function rawPriceV3(id: string, tier: string | number): number {
+  const m = materialIdentity(id)
+  return m && !m.refined ? RAW_PRICE_V3[m.band] * worldMaterialTier(Number(tier)) : 0
+}
+
+/** Buys raw items: by grade to engine v16 (`stocked` from `stockedGrades`), by type from R2 (`stocked` from
+ * `stockedTypes`, refusing a type it doesn't stock). */
+export function buyRawItem(save: Save, itemId: string, quantity: number, stocked: readonly number[] | readonly string[], now: string, tier = TIER_ONE): Save {
+  if (rpgRework('economy')) return buyMaterial(save, itemId, quantity, stocked as readonly unknown[], now, tier)
   const world = worldOf(save, tier)
   const item = itemById(itemId)
   if (!item || item.refined) throw new SaveRuleError('bad-job', 'the Exchange sells raw items only')
-  if (!stocked.includes(item.grade)) throw new SaveRuleError('bad-job', `Grade ${item.grade} isn’t stocked yet: win a stage on its continent`)
+  if (!(stocked as readonly unknown[]).includes(item.grade)) throw new SaveRuleError('bad-job', `Grade ${item.grade} isn’t stocked yet: win a stage on its continent`)
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
   const cost = rawItemPrice(item.grade) * quantity
   if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)
   return withWorld(save, tier, {
     ...world, wallet: { ...world.wallet, laurels: world.wallet.laurels - cost }, items: { ...world.items, [item.id]: (world.items[item.id] ?? 0) + quantity },
+  }, now)
+}
+
+/** R2's purchase: a stocked raw material at `rawPriceV3`. */
+function buyMaterial(save: Save, itemId: string, quantity: number, stocked: readonly unknown[], now: string, tier: string): Save {
+  const world = worldOf(save, tier)
+  const material = materialIdentity(itemId)
+  if (!material || material.refined) throw new SaveRuleError('bad-job', 'the Exchange sells raw items only')
+  if (!stocked.includes(itemId)) throw new SaveRuleError('bad-job', 'Not stocked yet')
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
+  const cost = rawPriceV3(itemId, tier) * quantity
+  if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)
+  return withWorld(save, tier, {
+    ...world, wallet: { ...world.wallet, laurels: world.wallet.laurels - cost }, items: { ...world.items, [itemId]: (world.items[itemId] ?? 0) + quantity },
   }, now)
 }
 
@@ -167,8 +225,21 @@ export function readManuals(save: Save, outfitId: string, ref: RankRef, count: n
 // --- Selling (QoL): spare stock back for a few Laurels, always far below what buying costs ---------------------------
 
 export type Shelf = 'items' | 'gems' | 'gear'
-/** Laurels for one (D65): raw `2 + 2g`, refined twice that, Star Gems and unbound gear `6 + 6g`. */
-export function sellPrice(shelf: Shelf, id: string): number {
+
+/** R2's selling prices (PP17), before × the world's tier: raw low 6, high 16; refined twice that; a made item 6 + 6g. */
+export const SELL_RAW_V3: Readonly<Record<MaterialBand, number>> = { low: 6, high: 16 }
+function sellPriceV3(shelf: Shelf, id: string, tier: number): number {
+  if (shelf !== 'items') return 0
+  const material = materialIdentity(id)
+  const made = madeIdentity(id)
+  const base = material ? SELL_RAW_V3[material.band] * (material.refined ? 2 : 1) : made ? 6 + 6 * made.grade : 0
+  return base * worldMaterialTier(tier)
+}
+
+/** Laurels for one (D65): raw `2 + 2g`, refined twice that, Star Gems and unbound gear `6 + 6g`. From R2 (PP17) only the
+ * Warehouse's materials and made items sell, × the world's `tier`. */
+export function sellPrice(shelf: Shelf, id: string, tier: string | number = TIER_ONE): number {
+  if (rpgRework('economy')) return sellPriceV3(shelf, id, Number(tier))
   if (shelf === 'items') {
     const item = itemById(id)
     return item ? (2 + 2 * item.grade) * (item.refined ? 2 : 1) : 0
@@ -182,7 +253,7 @@ export function sellStock(save: Save, shelf: Shelf, id: string, quantity: number
   const stock = world[shelf]
   const have = stock[id] ?? 0
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > have) throw new SaveRuleError('bad-count', `you have ${have}`)
-  const price = sellPrice(shelf, id)
+  const price = sellPrice(shelf, id, tier)
   if (price < 1) throw new SaveRuleError('bad-job', 'that can’t be sold')
   const next = { ...stock, [id]: have - quantity }
   if (next[id] === 0) delete next[id]

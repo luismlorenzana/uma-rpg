@@ -31,6 +31,7 @@ import { equipGear, unequipGear } from './forge'
 import { gearV1, gradesOf, isGrades, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
+import { callingPickBlock } from './status'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
@@ -166,7 +167,8 @@ export const NOT_HER_PICK = 'Not one of her two'
  * Uma with no pick or a confirmed one (`umaCallingPickBlock`). Stored unconfirmed: she can change it until she confirms
  * it or wins a fight. At Uma Lv 1, her start, it also moves her class to the pick while she still fights as her start
  * (her previous calling's class, or no class chosen yet), and her five armor kinds to the pick's half when she wears no
- * armor piece. Above Lv 1 only her calling moves; she switches class freely as ever.
+ * armor piece. Above Lv 1 only her calling moves; she switches class freely as ever. From R2 the pick moves her trade
+ * (PP2), so it is refused while she works (`callingPickBlock`, H77).
  */
 export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
@@ -174,6 +176,8 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
   const block = umaCallingPickBlock(outfit, uma.calling)
   if (block) throw new SaveRuleError('bad-class', block)
   if (!umaCallingPick(outfit)!.options.includes(pick)) throw new SaveRuleError('bad-class', NOT_HER_PICK)
+  const working = rpgRework('economy') ? callingPickBlock(world, outfit.outfitId, now) : null
+  if (working) throw new SaveRuleError('busy', working)
   let next: OwnedUma = { ...uma, calling: { pick, confirmed: false } }
   if (uma.level === 1) {
     if (uma.classId === null || activeClass(outfit, uma) === umaCalling(outfit, uma.calling.pick)) next = { ...next, classId: pick }
