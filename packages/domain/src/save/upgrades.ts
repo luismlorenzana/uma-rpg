@@ -70,7 +70,7 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
 /** Whether she can learn any side skill of her five trees now (`rpgLearnBlock` is null for one). Engines v6–v15. */
 function canLearnSide(uma: OwnedUma, classId: RpgClass, tier: number, unspent: number): boolean {
   const setup = classOf(uma, classId)
-  const learner = { classId, tier, classRank: classRankOf(uma.ranks, classId), tree: setup.tree.map((id) => ({ tier, id })) }
+  const learner = { classId, tier, classRank: classRankOf(uma.ranks, classId), tree: (setup.tree ?? []).map((id) => ({ tier, id })) }
   for (const tree of rpgProfileTrees({ classId, weapons: setup.weapons })) {
     for (let depth = 1; depth <= Math.min(5, unspent); depth++) {
       if (learner.classRank < rpgSideNodeLevel(depth)) break
@@ -116,7 +116,7 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
 
   // Side points end with v15: from v16 no node costs anything (CP14).
   const rank = classRankOf(uma.ranks, classId)
-  const unspent = rpgRework('fight', engine) ? 0 : rpgTreePointsEarned(rank) - rpgTreePointsSpent(classOf(uma, classId).tree.map((id) => ({ tier, id })))
+  const unspent = rpgRework('fight', engine) ? 0 : rpgTreePointsEarned(rank) - rpgTreePointsSpent((classOf(uma, classId).tree ?? []).map((id) => ({ tier, id })))
   const points = unspent > 0 && canLearnSide(uma, classId, tier, unspent) ? unspent : 0
 
   const open = new Set(uma.stars.unlocked)

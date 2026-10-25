@@ -7,7 +7,7 @@ import { ACCESSORY_SLOTS, ARMOR_SLOTS, armorKindFor, type AccessorySlot, type Ar
 import { gearId, gearIdentity, gearLevel, type AmuletType, type EquipType, type GearSlot, type OrbType, type TalismanType } from '../economy/gear-id'
 import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
 import { RPG_CLASS_ARMOR, rpgClasses, rpgDefaultWeapons, rpgWeaponKind, type RpgClass, type RpgWeapon } from '../rpg/rules'
-import { classOf } from './battle'
+import { classOf, withClassWeapons } from './battle'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { slotKind, type OwnedUma, type Save, type TierWorld } from './save'
@@ -147,7 +147,7 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
     else equipped[slot] = id
   }
   const setup = classOf(uma, classId)
-  const classes = setup.weapons.every((w, i) => w === plan.weapons[i]) ? uma.classes : { ...uma.classes, [classId]: { ...setup, weapons: [...plan.weapons] } }
+  const classes = setup.weapons.every((w, i) => w === plan.weapons[i]) ? uma.classes : { ...uma.classes, [classId]: withClassWeapons(setup, plan.weapons) }
   const locker = plan.binds.length ? [...uma.gear.locker, ...plan.binds] : uma.gear.locker
   return { ...world, gear, umas: { ...world.umas, [outfitId]: { ...uma, classes, gear: { locker, equipped, kinds: { ...plan.kinds } } } } }
 }

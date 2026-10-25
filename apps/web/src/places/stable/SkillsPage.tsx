@@ -38,7 +38,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   const rank = classRankOf(uma.ranks, classId)
   const points = rpgTreePointsEarned(rank) - rpgTreePointsSpent(profile.tree)
   const slots = rpgActiveSlots(uma.level)
-  const learned = new Set(setup.tree)
+  const learned = new Set(setup.tree ?? [])
   const better = umaUpgrades(world, outfit, tier)?.gearSlots ?? []
   const run = (op: () => Promise<void>) => {
     setError(null)

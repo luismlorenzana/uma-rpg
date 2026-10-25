@@ -1,8 +1,10 @@
-// Save v25: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v25 (D180,
-// D188): classes v2's Paladin from the Cleric, the Bastion's seats and typed accessories. v24 (D171):
-// the account's defeated Rift faces, each world's open Rift fight and fight count, and each run's traces and open
-// Convergence attempt, all empty until the Rift's run rules write them. v23 (D163): the account's achievements and each
-// Uma's tier history, and each world's Rift (D159, D161). v22 (SC3): work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row,
+// Save v26: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v27 (D205):
+// R1, the Tier rework's fight: three weapons a class, a line a tree in place of side skills (`lines`), the loadout pruned
+// and each Uma's calling pick (`calling`); written dark (the parse reads its shape with the switch at 16), chained by
+// H72. v26 (D190): every party's independent lead. v25 (D180, D188): classes v2's Paladin from the Cleric, the Bastion's
+// seats and typed accessories. v24 (D171): the account's defeated Rift faces, each world's open Rift fight and fight
+// count, and each run's traces and open Convergence attempt, all empty until the Rift's run rules write them. v23 (D163):
+// the account's achievements and each Uma's tier history, and each world's Rift (D159, D161). v22 (SC3): work runs on the shared engine, `@luismlorenzana/uma-work`: each Uma's work is her own row,
 // and facilities keep only their levels. v21 (D144): one profession, Craft Level, and Star Gems for Extra Stats; more
 // facility slots. v20 (D124): armor without accents, a feet slot, two accessory slots and Accessory Ranks. v19 (D106):
 // the Halls of Heroes, their Learners and Bonds. v18 (D102–D105): ranks earned by fighting, five armor slots, Marks, no
@@ -34,9 +36,10 @@ import { BATTLE_ENGINE_VERSION, BATTLE_MAX_ROUNDS, rpgRework } from '../rpg/batt
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
 import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
-  isRpgWeapon, RPG_CLASS_ARMOR, rpgActiveSlots, rpgClassTrees, rpgDefaultWeapons, validRpgTree, validRpgWeapons, type RpgClass, type RpgTreeId,
-  type RpgWeapon,
+  isRpgWeapon, RPG_CLASS_ARMOR, rpgActiveSlots, rpgBranchNode, rpgClassTrees, rpgClassWeapons, rpgDefaultWeapons, rpgLineOf, rpgWeaponSlots, validRpgLines,
+  validRpgTree, validRpgWeapons, type RpgClass, type RpgLines, type RpgTreeId, type RpgWeapon,
 } from '../rpg/rules'
+import type { UmaCalling } from '../roster/template'
 import {
   CONVERGENCE_FIGHTS, ECHO_LEVELS, isAchievementId, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, RIFT_TRACES, riftRunId, type EchoLevel, type RiftAttempt,
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
@@ -72,11 +75,16 @@ export interface Wallet {
 
 export interface ProfessionLevel { level: number; exp: number }
 
-/** One class of an Uma (D86): the five weapons it wields, the side skills learned in its trees and the skills it has
- * equipped (null: chosen for her, each weapon's deepest core first), by node id. */
+/** One class of an Uma (D86): the weapons it wields (five to v26, three from v27), her picks in its trees and the skills
+ * it has equipped (null: chosen for her, each weapon's deepest skill first), by node id. To v26 (engine to v15) her picks
+ * are the side skills she learned, `tree`; from v27 (engine v16, H69) her line on each tree, `lines`. While R1 is dark
+ * both shapes live, one of them stored by the live generation; H72 makes `lines` required and drops `tree`. */
 export interface ClassLoadout {
   weapons: RpgWeapon[]
-  tree: string[]
+  /** To v26: the side skills she learned in its trees. */
+  tree?: string[]
+  /** From v27 (CP14, CP18): a kind of her class listed takes line B on its tree, slotted or not; any other line A. */
+  lines?: RpgLines
   loadout: string[] | null
 }
 
@@ -100,6 +108,9 @@ export interface OwnedUma {
   gear: UmaGear
   /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
   bonds: Partial<Record<HeroLimitId, BondTrack>>
+  /** From v27 (H69; CP29, UT17): her calling pick and whether it is final, on every Uma; a null pick is the rule's
+   * calling, her pre-selection, and a pick outside her row is ignored (UT4). Absent to v26; H72 makes it required. */
+  calling?: UmaCalling
 }
 
 /** Bond Level 0–10 and the EXP toward the next (D106). */
@@ -223,11 +234,13 @@ export function startingArmorKinds(classId?: RpgClass): UmaGear['kinds'] {
 }
 /** A just-unlocked Uma; `startClass` (her starting class) sets her armor kinds, and without it she starts all-physical.
  * From engine v16 her start is written as her class (H67): her calling can name a class her style doesn't (a Wit-led
- * closer's Summoner, a Pace sprinter's Brawler, a Spell Blade). To v15 her class stays null (her style's), except a Paladin
- * start (classes v2, D180), the one start her style couldn't name. */
+ * closer's Summoner, a Pace sprinter's Brawler, a Spell Blade); and her calling pick is stored open, the pre-selection
+ * unconfirmed (save v27, H69). To v15 her class stays null (her style's), except a Paladin start (classes v2, D180), the
+ * one start her style couldn't name. */
 export const newOwnedUma = (now: string, startClass?: RpgClass, engine: number = BATTLE_ENGINE_VERSION): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0,
   classId: rpgRework('fight', engine) ? startClass ?? null : startClass === 'paladin' ? 'paladin' : null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
-  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {} })
+  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {},
+  ...(rpgRework('fight', engine) ? { calling: { pick: null, confirmed: false } } : {}) })
 
 /** The world's state (D66). */
 export interface WorldState {
@@ -592,8 +605,10 @@ function parseHeroes(value: unknown, path: string, umas: Record<string, OwnedUma
 }
 
 /** A class's weapons fit its slots, its side skills obey every learning rule at its Class Rank, and its equipped skills
- * are its trees' nodes within her slots (whether a core is open yet is checked when she fights). */
+ * are its trees' nodes within her slots (whether a core is open yet is checked when she fights). By the live generation
+ * (D199): v27's shape with the Tier rework's fight (`parseLines`), else v26's. */
 function parseLoadout(value: unknown, path: string, classId: RpgClass, tier: number, level: number, classRank: number): ClassLoadout {
+  if (rpgRework('fight')) return parseLines(value, path, classId, level)
   const b = object(value, path, ['weapons', 'tree', 'loadout'])
   const weapons = ids(b.weapons, `${path}.weapons`, 5) as RpgWeapon[]
   if (!weapons.every(isRpgWeapon) || !validRpgWeapons(classId, weapons)) throw new SaveParseError(`${path}.weapons`, `not five weapons a ${classId} can wield`)
@@ -610,13 +625,53 @@ function parseLoadout(value: unknown, path: string, classId: RpgClass, tier: num
   return { weapons, tree, loadout }
 }
 
+/** v27's class (H69; CP2, CP14, CP18): three weapons, each in a slot of its channel by position; her lines, a kind of her
+ * class (slotted or not) listed on B; and her equipped skills, at most her slots, each a node she could hold: one of her
+ * three weapons' trees, its trunk's core at depths 1–2 or her line's node at 3–5 (whether its depth is open yet is checked
+ * when she fights, as before). */
+function parseLines(value: unknown, path: string, classId: RpgClass, level: number): ClassLoadout {
+  // Her weapons are read before her keys are checked, so a v26 class (five weapons and its sides) fails on its weapons,
+  // the change H72's chain makes.
+  const any = object(value, path, Object.keys(value ?? {}))
+  const weapons = ids(any.weapons, `${path}.weapons`, 5) as RpgWeapon[]
+  if (!weapons.every(isRpgWeapon) || !validRpgWeapons(classId, weapons)) {
+    throw new SaveParseError(`${path}.weapons`, `not ${rpgWeaponSlots() === 3 ? 'three' : 'five'} weapons a ${classId} can wield`)
+  }
+  const b = object(value, path, ['weapons', 'lines', 'loadout'])
+  if (!validRpgLines(b.lines, rpgClassWeapons(classId))) throw new SaveParseError(`${path}.lines`, `expected line B on ${classId} trees`)
+  const lines: RpgLines = { ...b.lines }
+  if (b.loadout === null) return { weapons, lines, loadout: null }
+  const loadout = ids(b.loadout, `${path}.loadout`, rpgActiveSlots(level))
+  if (loadout.some((n) => {
+    const node = rpgNode(n)
+    return !node || node.classId !== classId || !weapons.includes(node.weapon) || n !== rpgBranchNode(classId, node.weapon, node.depth, rpgLineOf(lines, node.weapon))
+  })) {
+    throw new SaveParseError(`${path}.loadout`, 'only skills on her path in her three trees can be equipped')
+  }
+  return { weapons, lines, loadout }
+}
+
+/** The classes a calling pick can name (CP29): a Pace Uma's Spell Blade or Mage, a Late one's Paladin or Cleric. */
+const CALLING_PICKS: readonly RpgClass[] = ['spellblade', 'mage', 'paladin', 'cleric']
+/** v27's calling (H69; CP29, UT17): `{ pick, confirmed }`, the pick null or one of those four. */
+function parseCalling(value: unknown, path: string): UmaCalling {
+  const c = object(value, path, ['pick', 'confirmed'])
+  if (c.pick !== null && !CALLING_PICKS.includes(c.pick as RpgClass)) throw new SaveParseError(`${path}.pick`, 'expected null, spellblade, mage, paladin or cleric')
+  if (typeof c.confirmed !== 'boolean') throw new SaveParseError(`${path}.confirmed`, 'expected true or false')
+  return { pick: c.pick as RpgClass | null, confirmed: c.confirmed }
+}
+
+const UMA_KEYS = ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'craft', 'ranks', 'stars', 'gear', 'bonds']
+
 function parseUmas(value: unknown, path: string, tier: number): Record<string, OwnedUma> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const umas: Record<string, OwnedUma> = {}
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
-    const u = object(raw, at, ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'craft', 'ranks', 'stars', 'gear', 'bonds'])
+    // From v27 (the live generation's, D199) every Uma holds her calling pick; to v26 the key is refused.
+    const v16 = rpgRework('fight')
+    const u = object(raw, at, v16 ? [...UMA_KEYS, 'calling'] : UMA_KEYS)
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
     const ranks = parseRanks(u.ranks, `${at}.ranks`)
@@ -630,6 +685,7 @@ function parseUmas(value: unknown, path: string, tier: number): Record<string, O
       const classId = key as RpgClass
       owned.classes[classId] = parseLoadout(loadout, `${at}.classes.${key}`, classId, tier, level, (ranks.classes[classId] ?? { rank: 1 }).rank)
     }
+    if (v16) owned.calling = parseCalling(u.calling, `${at}.calling`)
     umas[id] = owned
   }
   return umas
@@ -759,7 +815,8 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v25 are migrated to the current shape first (migrations.ts), so the parse below reads only v26.
+  // v10–v25 are migrated to the current shape first (migrations.ts), so the parse below reads only v26 (v27's classes and
+  // calling with the switch at 16: H69; H72 chains `toV27`).
   const value = migrate(raw, version)
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes', 'rift'])
   const umas = parseUmas(w.umas, `${path}.umas`, tier)
@@ -1074,11 +1131,11 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v25 save and always returns v25. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+/** Parses a v1–v26 save and always returns v26. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
  * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
  * tier history and Rift (D163), v23 gains no defeated faces, no open Rift fight, and empty traces and Convergence attempts
  * (D171), v24 → v25 (D180, D188): the Paladin from the Cleric, the Bastion's seats, typed accessories, and anything older
- * than v10 starts over (D69). */
+ * than v10 starts over (D69); v25 → v26 (D190): each party's lead. */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

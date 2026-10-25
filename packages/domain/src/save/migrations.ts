@@ -216,6 +216,95 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   return version < 26 && isRecord(v25) ? toV26(v25) : v25
 }
 
+// --- v26 → v27 (D205): R1, the Tier rework's fight. Written dark in H69, chained by H72 with SAVE_SCHEMA_VERSION 27 -----
+
+/** The owner's three weapons a class (CP3, D200), in slot order, as literals: a migration step is frozen history. */
+const V27_DEFAULTS: Readonly<Record<string, readonly string[]>> = {
+  brawler: ['greatsword', 'axe', 'lance'],
+  mage: ['tome-fire', 'tome-ice', 'tome-lightning'],
+  spellblade: ['katana', 'lance', 'tome-lightning'],
+  summoner: ['tome-dark', 'tome-light', 'bow'],
+  paladin: ['greatsword', 'axe', 'tome-light'],
+  cleric: ['tome-light', 'tome-ice', 'bow'],
+}
+/** Branch B's catalog side letter by class and kind (H65's `RPG_BRANCH_B`, D201, copied): a class's keys are its kinds. */
+const V27_BRANCH_B: Readonly<Record<string, Readonly<Record<string, 'a' | 'b'>>>> = {
+  brawler: { greatsword: 'b', axe: 'b', lance: 'a', bow: 'b', katana: 'a' },
+  mage: { 'tome-fire': 'a', 'tome-ice': 'a', 'tome-lightning': 'a', 'tome-light': 'b', 'tome-dark': 'a' },
+  spellblade: { greatsword: 'b', axe: 'b', lance: 'b', bow: 'b', katana: 'b', 'tome-fire': 'b', 'tome-ice': 'b', 'tome-lightning': 'b', 'tome-light': 'b', 'tome-dark': 'b' },
+  summoner: { greatsword: 'a', axe: 'a', lance: 'a', bow: 'a', katana: 'a', 'tome-fire': 'b', 'tome-ice': 'b', 'tome-lightning': 'b', 'tome-light': 'b', 'tome-dark': 'b' },
+  paladin: { greatsword: 'b', axe: 'b', lance: 'b', bow: 'b', katana: 'b', 'tome-fire': 'b', 'tome-ice': 'b', 'tome-lightning': 'b', 'tome-light': 'b', 'tome-dark': 'b' },
+  cleric: { greatsword: 'b', axe: 'b', lance: 'b', bow: 'b', katana: 'b', 'tome-fire': 'b', 'tome-ice': 'b', 'tome-lightning': 'b', 'tome-light': 'b', 'tome-dark': 'b' },
+}
+/** v16's equipped slots: three, and one more at Uma Lv 10, 20, 30 and 40 (CP22). */
+const V27_SLOT_GATES = [10, 20, 30, 40]
+const V27_NODE = /^([a-z]+)-([a-z-]+)\.([1-5])([ab])?$/
+const isStrings = (v: unknown): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string')
+
+/** One class's steps 1–3 of `toV27`; a class that isn't a v26 one (no `tree` list of strings, or `lines` already) is left. */
+function v27Class(classId: string, raw: unknown, level: unknown): unknown {
+  const weapons = V27_DEFAULTS[classId], sides = V27_BRANCH_B[classId]
+  if (!weapons || !sides || !isRecord(raw) || 'lines' in raw || !isStrings(raw.tree)) return raw
+  const tree = raw.tree
+  const node = (id: string) => {
+    const m = V27_NODE.exec(id)
+    return m && m[1] === classId && m[2]! in sides ? { weapon: m[2]!, depth: Number(m[3]), side: m[4] ?? null } : null
+  }
+  // 2. B on a tree where she learned any node of its B line, at any depth; A (absent) everywhere else.
+  const lines: Record<string, 'B'> = {}
+  for (const w of Object.keys(sides)) {
+    if (tree.some((id) => { const n = node(id); return n?.weapon === w && n.side === sides[w] })) lines[w] = 'B'
+  }
+  // 3. What she still holds, in her order and once each, within v16's slots at her level; nothing left is auto.
+  const holds = (id: string): boolean => {
+    const n = node(id)
+    if (!n || !weapons.includes(n.weapon)) return false
+    return n.depth <= 2 || lines[n.weapon] !== 'B' ? n.side === null : n.side === sides[n.weapon]
+  }
+  let loadout: unknown = raw.loadout
+  if (isStrings(raw.loadout)) {
+    const slots = 3 + V27_SLOT_GATES.filter((gate) => typeof level === 'number' && level >= gate).length
+    const kept = [...new Set(raw.loadout.filter(holds))].slice(0, slots)
+    loadout = kept.length ? kept : null
+  }
+  const { weapons: _weapons, tree: _tree, loadout: _loadout, ...rest } = raw
+  // 1. The class's new defaults.
+  return { weapons: [...weapons], lines, loadout, ...rest }
+}
+
+/** One Uma of `toV27`: each class she has set up, and her calling. */
+function v27Uma(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw
+  const classes = raw.classes
+  return {
+    ...raw,
+    ...(isRecord(classes) ? { classes: Object.fromEntries(Object.entries(classes).map(([classId, setup]) => [classId, v27Class(classId, setup, raw.level)])) } : {}),
+    ...('calling' in raw ? {} : { calling: { pick: null, confirmed: false } }),
+  }
+}
+
+/**
+ * v26 → v27 (D205; class-progression.md §14, CP31's v27 part): R1's three weapons, branch picks for side skills, the
+ * loadout pruned and the calling pick stored, and nobody loses progress. Written dark in H69 and **chained by H72** with
+ * `SAVE_SCHEMA_VERSION` 27, in the switch's commit (until then the parse reads v27's shape only with the switch at 16).
+ * Per Uma, per class in `classes` that still has `tree` and no `lines`:
+ * 1. `weapons` become the class's new defaults (CP3); her per-tree picks stay, so slotting an old kind back restores its
+ *    line, and her crafted weapons stay equipped on their kinds;
+ * 2. `lines[w]` is B for each of her class's kinds `w` where `tree` holds a node of that tree's B line
+ *    (`<class>-<w>.<1–5><B's letter>`, H65's table), at any depth; `tree` is removed, and every other side with it;
+ * 3. `loadout` (when not null) keeps, in her order and once each, the ids she holds in v27: her three new weapons' trees,
+ *    depths 1–2 the cores, depths 3–5 the core (A) or her B line's node (B), at most her v16 slot count at her Uma level
+ *    (three, plus one each at Lv 10, 20, 30, 40); none left goes back to auto (`null`).
+ * And per Uma, `calling` becomes `{ pick: null, confirmed: false }` when absent: the pre-selection, unconfirmed (UT17).
+ * Nothing else moves: class ids, Class Ranks, Hero seats, Bonds, Class Marks, gear, ranks and wallets, active classes,
+ * parties, the open world-map and Rift fights (v15 inputs replay on v15). Literals only, like every step; idempotent (a
+ * class with `lines` is v27 already); anything malformed (a class that isn't an object, a `tree` that isn't a list of
+ * strings, a loadout that isn't one) is left for the strict parse.
+ */
+export function toV27(world: Record<string, unknown>): Record<string, unknown> {
+  return isRecord(world.umas) ? { ...world, umas: Object.fromEntries(Object.entries(world.umas).map(([id, uma]) => [id, v27Uma(uma)])) } : world
+}
+
 // --- v25 → v26 (D190): an independent party lead ---------------------------------------------------------------
 
 /**
