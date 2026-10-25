@@ -1,4 +1,6 @@
-// Save v27: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v27 (D205,
+// Save v27: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v28 (D214,
+// H78), dark until H82 chains `toV28`: R2, the Tier rework's economy: gear by grade, the Planet and three moons, the ten
+// places, the Warehouse's v3 stock and the grant; the strict parse reads it once R2's economy is live (D208). v27 (D205,
 // D210): R1, the Tier rework's fight: three weapons a class, a line a tree in place of side skills (`lines`), the loadout
 // pruned and each Uma's calling pick (`calling`). v26 (D190): every party's independent lead. v25 (D180, D188): classes v2's Paladin from the Cleric, the Bastion's
 // seats and typed accessories. v24 (D171): the account's defeated Rift faces, each world's open Rift fight and fight
@@ -15,15 +17,19 @@
 // D59).
 import type { DroppedQueue, Entry, ItemQty, LastWork, Refusal, SlotRef, WorkOutput, WorkRow, WorkState } from '@luismlorenzana/uma-work'
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL } from '../economy/pacing'
-import { newGrades, type UmaGrades } from '../economy/grades'
-import type { StarMap } from '../economy/planet'
+import { ACCESSORY_FAMILIES, accessorySlotCount, GRADE_MAX, gradeGateLevel, newGrades, type AccessorySlotState, type GearTier, type UmaGrades } from '../economy/grades'
+import { emptyStarMap, isMapNode, MAP_NODES, mapNodeGate, nodeBody, nodeNumeral, type StarMap } from '../economy/planet'
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
+import { PLACE_SLOTS_V3, placeSpecV3 } from '../economy/professions'
+import { madeIdentity } from '../items/made-id'
+import { materialIdentity } from '../items/materials-id'
+import { isStockItemId } from '../items/stock-id'
 import type { RpgWorkRequest } from '../work/request'
 import {
   ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, armorKindFor, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
   WEAPON_TYPES, type AccessoryKind, type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
 } from '../economy/ranks'
-import { RPG_CLASSES } from '../rpg/kinds'
+import { RPG_CLASSES, RPG_DAMAGE_KINDS, type RpgDamageKind } from '../rpg/kinds'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
 import { isGemId, isStarNode } from '../economy/stars'
 import {
@@ -33,7 +39,7 @@ import { activeNodeSlots } from '../economy/pacing'
 import { isItemId } from '../items/identity'
 import { replayBattle } from '../rpg/battle/engine'
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
-import { BATTLE_MAX_ROUNDS } from '../rpg/battle/caps'
+import { BATTLE_MAX_ROUNDS, rpgRework } from '../rpg/battle/caps'
 import { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from '../rpg/campaign/run-state'
 import { rpgNodeIdentity as rpgNode } from '../rpg/node-identity'
 import {
@@ -45,7 +51,9 @@ import {
   CONVERGENCE_FIGHTS, ECHO_LEVELS, isAchievementId, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, RIFT_TRACES, riftRunId, type EchoLevel, type RiftAttempt,
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
 } from '../rift/state'
-import { migrateWorld, toV26 } from './migrations'
+import { migrateWorld, toV26, type TierGrant } from './migrations'
+
+export type { TierGrant } from './migrations'
 
 export const SAVE_SCHEMA_VERSION = 27
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
@@ -68,7 +76,8 @@ export interface Wallet {
   timeTickets: number
   /** Each completes one beaten regular fight at once (§11). */
   sweepTickets: number
-  /** EXP past a max Weapon or Armor Rank, banked at half rate; spent on Manuals (D102). */
+  /** EXP past a max Weapon or Armor Rank, banked at half rate; spent on Manuals (D102). Save v27 only: v28 adds them to
+   * Class Marks (WP27, H78). */
   gearMarks?: number
   /** EXP past a max Class Rank, banked at half rate. */
   classMarks: number
@@ -98,7 +107,7 @@ export interface OwnedUma {
   classes: Partial<Record<RpgClass, ClassLoadout>>
   /** Her Craft Level, 1–50 (D144): gathering, refining, crafting and cutting. */
   craft: ProfessionLevel
-  /** Class Ranks (1–50), Weapon and Armor Ranks (1–10), earned by fighting (D102). */
+  /** Class Ranks (1–50), Weapon and Armor Ranks (1–10), earned by fighting (D102). Save v28 keeps only Class Ranks (WP3). */
   ranks: Ranks
   /** Her Extra Stats map. To save v27 the Sun and planets: nodes opened by setting Star Gems, and the ones active now (S6,
    * design §10). From save v28 (R2, dark until H82; D208 point 7, D213) the Planet and three moons with her moon: the nodes
@@ -162,17 +171,27 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   /** Each Uma's work, by outfit id (SC3): her started entries, up to three queued, her last job for Repeat and a queue
    * that couldn't start. Absent when she has none of these. */
   work: Record<string, WorkRow<RpgWorkRequest>>
-  /** Cut Star Gems waiting to be set, by gem id (D144). */
-  gems: Record<string, number>
-  /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. */
-  gear: Record<string, number>
+  /** Cut Star Gems waiting to be set, by gem id (D144). Save v27 only: v28 deletes them (EP21, H78); readers narrow
+   * through `gemStock`. */
+  gems?: Record<string, number>
+  /** Crafted gear nobody wears yet, by piece id (S7). Equipping binds a piece to an Uma for good. Save v27 only: v28
+   * deletes it (WP27, H78); readers narrow through `gearStock`. */
+  gear?: Record<string, number>
   /** Up to five owned Umas whose gear and gems the facilities plan for (D100). */
   targets: string[]
   /** The Halls of Heroes' seats (D106): an Uma is a Hero in one seat at most, or a Learner in two at most, never both. */
   heroes: Partial<Record<HeroLimitId, HeroSeat>>
   /** This tier's Rift (D161): its runs, oldest first, and its Echo wins. */
   rift: RiftState
+  /** Save v28 (H78, PP25): the Tier rework's grant, which the world's first launch shows, or null when it had nothing to
+   * pay. Always present in v28. */
+  grant?: TierGrant | null
 }
+
+/** A v27 world's gear stock, or none for a v28 world (WP27). */
+export const gearStock = (world: Pick<TierWorld, 'gear'>): Record<string, number> => world.gear ?? {}
+/** A v27 world's Star Gems, or none for a v28 world (EP21). */
+export const gemStock = (world: Pick<TierWorld, 'gems'>): Record<string, number> => world.gems ?? {}
 
 /** An achievement earned (D161): when, and the run it came from (null when no single run earned it, as the Bestiary). */
 export interface Achievement { at: string; run: string | null }
@@ -236,7 +255,10 @@ export function defaultParties(): Party[] {
   return Array.from({ length: PARTY_COUNT }, (_, i) => ({ name: `Party ${i + 1}`, slots: Array.from({ length: PARTY_SIZE }, () => null), lead: null }))
 }
 
-export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
+/** A new world's wallet: v28's has no Gear Marks once R2's economy is live (D208 point 2), v27's has them. */
+export const newWallet = (unlockTickets: number): Wallet => (rpgRework('economy')
+  ? { unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, classMarks: 0 }
+  : { unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
 /** A new Uma's armor kinds (D160 §7): all five magical for a magical starting class, none set (physical) otherwise. */
 export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
   if (!classId || RPG_CLASS_ARMOR[classId] !== 'magical') return {}
@@ -245,11 +267,15 @@ export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
 /** A just-unlocked Uma; `startClass` (her starting class, her calling: `startingClass`) is written as her class and sets her
  * armor kinds, and without it she starts with no class (her style's) and all-physical. Her calling can name a class her
  * style doesn't (a Wit-led closer's Summoner, a Pace sprinter's Brawler, a Spell Blade; H67), and her calling pick is
- * stored open, the pre-selection unconfirmed (save v27, H69). */
-export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => ({ unlockedAt: now, level: 1, exp: 0,
-  classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
-  stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {},
-  calling: { pick: null, confirmed: false } })
+ * stored open, the pre-selection unconfirmed (save v27, H69). Once R2's economy is live she is v28's (H78): every grade
+ * G0 and one accessory slot with no family (no armor kinds: the half is her class's, H74), an empty map and only Class
+ * Ranks. */
+export const newOwnedUma = (now: string, startClass?: RpgClass): OwnedUma => (rpgRework('economy')
+  ? { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: { classes: {} },
+    stars: emptyStarMap(), gear: newGrades(1), bonds: {}, calling: { pick: null, confirmed: false } }
+  : { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
+    stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {},
+    calling: { pick: null, confirmed: false } })
 
 /** The world's state (D66). */
 export interface WorldState {
@@ -262,7 +288,12 @@ export interface WorldState {
 }
 export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run: createRpgRun(0, 'world', now), springs: {} })
 
+/** A new world: v28's (no gear or gem shelf, no grant) once R2's economy is live, v27's until then. */
 export function newTierWorld(now: string, unlockTickets: number): TierWorld {
+  if (rpgRework('economy')) {
+    return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, targets: [], heroes: {},
+      rift: newRiftState(), grant: null }
+  }
   return { createdAt: now, wallet: newWallet(unlockTickets), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
     rift: newRiftState() }
 }
@@ -309,12 +340,13 @@ function timestamp(value: unknown, path: string): string {
 
 const OUTFIT_ID = /^[1-9]\d{0,11}$/
 
-function parseWallet(value: unknown, path: string): Wallet {
-  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', 'timeTickets', 'sweepTickets', 'gearMarks', 'classMarks'])
+/** A wallet: v27's with Gear Marks, v28's without (WP27). */
+function parseWallet(value: unknown, path: string, v28 = false): Wallet {
+  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', 'timeTickets', 'sweepTickets', ...(v28 ? [] : ['gearMarks']), 'classMarks'])
   return {
     unlockTickets: count(o.unlockTickets, `${path}.unlockTickets`), shards: count(o.shards, `${path}.shards`), laurels: count(o.laurels, `${path}.laurels`),
     timeTickets: count(o.timeTickets, `${path}.timeTickets`), sweepTickets: count(o.sweepTickets, `${path}.sweepTickets`),
-    gearMarks: count(o.gearMarks, `${path}.gearMarks`), classMarks: count(o.classMarks, `${path}.classMarks`),
+    ...(v28 ? {} : { gearMarks: count(o.gearMarks, `${path}.gearMarks`) }), classMarks: count(o.classMarks, `${path}.classMarks`),
   }
 }
 
@@ -323,6 +355,20 @@ function parseCraft(value: unknown, path: string): ProfessionLevel {
   const level = count(v.level, `${path}.level`)
   if (level < 1 || level > PROFESSION_MAX_LEVEL) throw new SaveParseError(`${path}.level`, `expected 1–${PROFESSION_MAX_LEVEL}`)
   return { level, exp: count(v.exp, `${path}.exp`) }
+}
+
+/** v28's Warehouse (H77, R2's build decision 5): the materials of the world's tier and below and the live made items. */
+function parseStock(value: unknown, path: string, tier: number): Record<string, number> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const items: Record<string, number> = {}
+  for (const [id, n] of Object.entries(value)) {
+    if (!isStockItemId(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
+    const material = materialIdentity(id)
+    if (material && material.tier > tier) throw new SaveParseError(`${path}.${id}`, `a Tier ${material.tier} material in a Tier ${tier} world`)
+    const c = count(n, `${path}.${id}`)
+    if (c > 0) items[id] = c
+  }
+  return items
 }
 
 function parseItems(value: unknown, path: string): Record<string, number> {
@@ -376,9 +422,61 @@ function parseSlot(value: unknown, path: string): SlotRef {
 
 const kindAt = (slot: SlotRef): JobKind => facilitySpec(slot.building)!.kind
 
-function parseQty(value: unknown, path: string): ItemQty {
+/** How a world's work is read: v27's facilities (SC3) or v28's places (H77, H78). */
+interface WorkRules {
+  slot: (value: unknown, path: string) => SlotRef
+  /** A request at a slot, of the kind its place does. */
+  request: (value: unknown, path: string, slot: SlotRef) => RpgWorkRequest
+  /** An item an entry may take. */
+  item: (id: string) => boolean
+  /** The slots a building has now. */
+  slots: (building: string) => number
+}
+
+const v27Work = (buildings: Record<string, { level: number }>): WorkRules => ({
+  slot: parseSlot, request: (value, path, slot) => parseRequest(value, path, kindAt(slot)), item: isItemId,
+  slots: (building) => FACILITY_SLOTS[(buildings[building]?.level ?? 1) - 1]!,
+})
+
+/** v28's slot: one of the ten places (PP4), four slots each. */
+function parseSlotV28(value: unknown, path: string): SlotRef {
+  const o = object(value, path, ['building', 'slot'])
+  if (typeof o.building !== 'string' || !placeSpecV3(o.building)) throw new SaveParseError(`${path}.building`, 'not a place')
+  const slot = count(o.slot, `${path}.slot`)
+  if (slot >= PLACE_SLOTS_V3) throw new SaveParseError(`${path}.slot`, 'no such slot')
+  return { building: o.building, slot }
+}
+
+/** Whether a v28 place's kind makes `item` in a world of `tier` (H77): a gathering place a raw material of its line, the
+ * Workbench a refined one, of the world's tier or below; a making place a live made item of its lines (the Branch Gem
+ * from R3's weapons, in a Tier 2 world or above). */
+function madeAtV28(placeId: string, item: string, tier: number): boolean {
+  const place = placeSpecV3(placeId)!
+  if (place.kind === 'gather' || place.kind === 'refine') {
+    const m = materialIdentity(item)
+    return !!m && m.refined === (place.kind === 'refine') && m.tier <= tier && (place.kind === 'refine' || m.line === place.line)
+  }
+  const made = madeIdentity(item)
+  return !!made && place.made.includes(made.line) && isStockItemId(item) && (made.line !== 'branch-gem' || tier >= 2)
+}
+
+function parseRequestV28(value: unknown, path: string, slot: SlotRef, tier: number): RpgWorkRequest {
+  const r = object(value, path, ['kind', 'item', 'count'])
+  const kind = placeSpecV3(slot.building)!.kind
+  if (r.kind !== kind) throw new SaveParseError(`${path}.kind`, `expected ${kind}`)
+  if (typeof r.item !== 'string' || !madeAtV28(slot.building, r.item, tier)) throw new SaveParseError(`${path}.item`, 'not made at this place')
+  const n = count(r.count, `${path}.count`)
+  if (n < 1 || n > maxJobCount(kind)) throw new SaveParseError(`${path}.count`, `expected 1–${maxJobCount(kind)}`)
+  return { kind, item: r.item, count: n }
+}
+
+const v28Work = (tier: number): WorkRules => ({
+  slot: parseSlotV28, request: (value, path, slot) => parseRequestV28(value, path, slot, tier), item: (id) => isStockItemId(id), slots: () => PLACE_SLOTS_V3,
+})
+
+function parseQty(value: unknown, path: string, known: (id: string) => boolean): ItemQty {
   const o = object(value, path, ['item', 'qty'])
-  if (typeof o.item !== 'string' || !isItemId(o.item)) throw new SaveParseError(`${path}.item`, 'unknown item')
+  if (typeof o.item !== 'string' || !known(o.item)) throw new SaveParseError(`${path}.item`, 'unknown item')
   const qty = count(o.qty, `${path}.qty`)
   if (qty < 1) throw new SaveParseError(`${path}.qty`, 'expected at least 1')
   return { item: o.item, qty }
@@ -386,13 +484,13 @@ function parseQty(value: unknown, path: string): ItemQty {
 
 const ENTRY_KEYS = ['request', 'seconds', 'inputs', 'outputs', 'exp', 'startedAt', 'acceleratedMs', 'collected', 'speed', 'fromQueue'] as const
 
-function parseEntry(value: unknown, path: string, kind: JobKind): Entry<RpgWorkRequest> {
+function parseEntry(value: unknown, path: string, slot: SlotRef, rules: WorkRules): Entry<RpgWorkRequest> {
   const e = object(value, path, ENTRY_KEYS)
-  const request = parseRequest(e.request, `${path}.request`, kind)
+  const request = rules.request(e.request, `${path}.request`, slot)
   const n = request.count
   const each = <T>(raw: unknown, key: string, parse: (v: unknown, at: string) => T): T[] => list(raw, `${path}.${key}`, n, n).map((v, i) => parse(v, `${path}.${key}.${i}`))
   const seconds = each(e.seconds, 'seconds', positive)
-  const inputs = each(e.inputs, 'inputs', (v, at) => list(v, at, 0, 8).map((q, j) => parseQty(q, `${at}.${j}`)))
+  const inputs = each(e.inputs, 'inputs', (v, at) => list(v, at, 0, 8).map((q, j) => parseQty(q, `${at}.${j}`, rules.item)))
   const outputs = each(e.outputs, 'outputs', (v, at): WorkOutput => {
     const o = object(v, at, ['item'])
     if (o.item !== request.item) throw new SaveParseError(`${at}.item`, 'expected the request\'s item')
@@ -416,23 +514,23 @@ function parseRefusal(value: unknown, path: string): Refusal | null {
   return { refused: true, code: o.code, message: o.message, data: data as Record<string, string | number> }
 }
 
-function parseDropped(value: unknown, path: string): DroppedQueue<RpgWorkRequest> | null {
+function parseDropped(value: unknown, path: string, rules: WorkRules): DroppedQueue<RpgWorkRequest> | null {
   if (value === null) return null
   const d = object(value, path, ['at', 'slot', 'requests', 'short', 'refused'])
-  const slot = parseSlot(d.slot, `${path}.slot`)
+  const slot = rules.slot(d.slot, `${path}.slot`)
   return {
     at: ms(d.at, `${path}.at`), slot,
-    requests: list(d.requests, `${path}.requests`, 1, MAX_QUEUED + 1).map((r, i) => parseRequest(r, `${path}.requests.${i}`, kindAt(slot))),
-    short: list(d.short, `${path}.short`, 0, 8).map((q, i) => parseQty(q, `${path}.short.${i}`)),
+    requests: list(d.requests, `${path}.requests`, 1, MAX_QUEUED + 1).map((r, i) => rules.request(r, `${path}.requests.${i}`, slot)),
+    short: list(d.short, `${path}.short`, 0, 8).map((q, i) => parseQty(q, `${path}.short.${i}`, rules.item)),
     refused: parseRefusal(d.refused, `${path}.refused`),
   }
 }
 
-function parseLast(value: unknown, path: string): LastWork<RpgWorkRequest> | null {
+function parseLast(value: unknown, path: string, rules: WorkRules): LastWork<RpgWorkRequest> | null {
   if (value === null) return null
   const l = object(value, path, ['slot', 'request'])
-  const slot = parseSlot(l.slot, `${path}.slot`)
-  return { slot, request: parseRequest(l.request, `${path}.request`, kindAt(slot)) }
+  const slot = rules.slot(l.slot, `${path}.slot`)
+  return { slot, request: rules.request(l.request, `${path}.request`, slot) }
 }
 
 /** Up to three requests wait behind the running one (the engine's MAX_QUEUE). */
@@ -452,7 +550,7 @@ function parseBuildings(value: unknown, path: string): Record<string, { level: n
   return out
 }
 
-function parseWork(value: unknown, path: string, umas: Record<string, OwnedUma>, buildings: Record<string, { level: number }>): Record<string, WorkRow<RpgWorkRequest>> {
+function parseWork(value: unknown, path: string, umas: Record<string, OwnedUma>, rules: WorkRules): Record<string, WorkRow<RpgWorkRequest>> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const out: Record<string, WorkRow<RpgWorkRequest>> = {}
   const held = new Set<string>()
@@ -461,21 +559,21 @@ function parseWork(value: unknown, path: string, umas: Record<string, OwnedUma>,
     if (!umas[id]) throw new SaveParseError(at, 'expected an owned outfit')
     const r = object(raw, at, ['outfitId', 'slot', 'entries', 'queue', 'last', 'dropped'])
     if (r.outfitId !== id) throw new SaveParseError(`${at}.outfitId`, 'expected its own key')
-    const slot = r.slot === null ? null : parseSlot(r.slot, `${at}.slot`)
+    const slot = r.slot === null ? null : rules.slot(r.slot, `${at}.slot`)
     const entries = list(r.entries, `${at}.entries`, 0, MAX_ENTRIES)
     const queue = list(r.queue, `${at}.queue`, 0, MAX_QUEUED)
     if (!slot && (entries.length > 0 || queue.length > 0)) throw new SaveParseError(`${at}.slot`, 'work needs a slot')
     if (slot && entries.length > 0) {
       const key = `${slot.building}:${slot.slot}`
       if (held.has(key)) throw new SaveParseError(`${at}.slot`, 'already held')
-      if (slot.slot >= FACILITY_SLOTS[(buildings[slot.building]?.level ?? 1) - 1]!) throw new SaveParseError(`${at}.slot`, 'no such slot at its level')
+      if (slot.slot >= rules.slots(slot.building)) throw new SaveParseError(`${at}.slot`, 'no such slot at its level')
       held.add(key)
     }
     out[id] = {
       outfitId: id, slot,
-      entries: entries.map((e, i) => parseEntry(e, `${at}.entries.${i}`, kindAt(slot!))),
-      queue: queue.map((q, i) => parseRequest(q, `${at}.queue.${i}`, kindAt(slot!))),
-      last: parseLast(r.last, `${at}.last`), dropped: parseDropped(r.dropped, `${at}.dropped`),
+      entries: entries.map((e, i) => parseEntry(e, `${at}.entries.${i}`, slot!, rules)),
+      queue: queue.map((q, i) => rules.request(q, `${at}.queue.${i}`, slot!)),
+      last: parseLast(r.last, `${at}.last`, rules), dropped: parseDropped(r.dropped, `${at}.dropped`, rules),
     }
   }
   return out
@@ -495,6 +593,56 @@ function parseStars(value: unknown, path: string, level: number): StarsV1 {
   const active = ids(o.active, `${path}.active`, activeNodeSlots(level))
   if (active.some((n) => !unlocked.includes(n))) throw new SaveParseError(`${path}.active`, 'only unlocked nodes can be active')
   return { unlocked, active }
+}
+
+/** v28's map (H76, EP §15): open nodes only, each body's in order (a node needs the one before it), each at or under her
+ * level's gate; no weapon moons until R3. */
+function parseStarMap(value: unknown, path: string, level: number): StarMap {
+  const o = object(value, path, ['open', 'moons'])
+  const open = ids(o.open, `${path}.open`, MAP_NODES.length)
+  for (const id of open) {
+    if (!isMapNode(id)) throw new SaveParseError(`${path}.open`, `unknown node ${id}`)
+    const before = `${nodeBody(id)}:${nodeNumeral(id) - 1}`
+    if (nodeNumeral(id) > 1 && !open.includes(before)) throw new SaveParseError(`${path}.open`, `${id} needs ${before} first`)
+    if (mapNodeGate(id) > level) throw new SaveParseError(`${path}.open`, `${id} opens at Lv ${mapNodeGate(id)}`)
+  }
+  if (!Array.isArray(o.moons) || o.moons.length > 0) throw new SaveParseError(`${path}.moons`, 'expected none until Tier 2\'s weapon moons')
+  return { open: [...open], moons: [] }
+}
+
+/** A grade, G0–G10, worn at Uma Lv 5g − 4 (WP3). */
+function parseGrade(value: unknown, path: string, level: number): number {
+  const g = count(value, path)
+  if (g > GRADE_MAX) throw new SaveParseError(path, `expected 0–${GRADE_MAX}`)
+  if (gradeGateLevel(g) > level) throw new SaveParseError(path, `G${g} needs Lv ${gradeGateLevel(g)}`)
+  return g
+}
+
+/** A world's tier as gear reads it: the three tiers' scales (WP4). */
+const gearTier = (tier: number): GearTier => Math.min(3, Math.max(1, tier)) as GearTier
+
+/** v28's gear (H74, H75; WP2, WP3, WP19): a grade on each weapon and armor slot, absent being G0, and her tier's accessory
+ * slots, each a grade and a base form: no family, a Pendant or an Insignia, or an Orb or a Bell on one of the ten kinds. */
+function parseGrades(value: unknown, path: string, level: number, tier: number): UmaGrades {
+  const o = object(value, path, ['weapons', 'armor', 'accessories'])
+  const graded = <K extends string>(raw: unknown, at: string, keys: readonly K[]): Partial<Record<K, { grade: number }>> => {
+    const out: Partial<Record<K, { grade: number }>> = {}
+    for (const [k, v] of Object.entries(object(raw, at, keys))) out[k as K] = { grade: parseGrade(object(v, `${at}.${k}`, ['grade']).grade, `${at}.${k}.grade`, level) }
+    return out
+  }
+  const slots = accessorySlotCount(gearTier(tier))
+  const accessories = list(o.accessories, `${path}.accessories`, slots, slots).map((raw, i): AccessorySlotState => {
+    const at = `${path}.accessories.${i}`
+    const a = object(raw, at, ['grade', 'family', 'form', 'kind'])
+    const grade = parseGrade(a.grade, `${at}.grade`, level)
+    if (a.family !== null && !(ACCESSORY_FAMILIES as readonly unknown[]).includes(a.family)) throw new SaveParseError(`${at}.family`, `expected null or ${ACCESSORY_FAMILIES.join(', ')}`)
+    if (a.form !== 'base') throw new SaveParseError(`${at}.form`, 'expected base')
+    const family = a.family as AccessorySlotState['family']
+    const kinded = family === 'orb' || family === 'bell'
+    if (kinded ? !RPG_DAMAGE_KINDS.includes(a.kind as RpgDamageKind) : 'kind' in a) throw new SaveParseError(`${at}.kind`, kinded ? 'expected one of the ten kinds' : 'only an Orb or a Bell has a kind')
+    return { grade, family, form: 'base', ...(kinded ? { kind: a.kind as RpgDamageKind } : {}) }
+  })
+  return { weapons: graded(o.weapons, `${path}.weapons`, WEAPON_TYPES), armor: graded(o.armor, `${path}.armor`, ARMOR_SLOTS), accessories }
 }
 
 function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGearV1 {
@@ -553,6 +701,16 @@ function parseTrack(value: unknown, path: string, max: number, toNext: (rank: nu
   const exp = count(o.exp, `${path}.exp`)
   if (rank < max ? exp >= toNext(rank) : exp !== 0) throw new SaveParseError(`${path}.exp`, rank < max ? 'more than the rank needs' : 'expected 0 at the top rank')
   return { rank, exp }
+}
+
+/** v28's ranks: Class Ranks only (WP3: gear ranks retire). */
+function parseClassRanks(value: unknown, path: string): Ranks {
+  const o = object(value, path, ['classes'])
+  const classes: Ranks['classes'] = {}
+  for (const [c, t] of Object.entries(object(o.classes, `${path}.classes`, RPG_CLASSES))) {
+    classes[c as RpgClass] = parseTrack(t, `${path}.classes.${c}`, CLASS_MAX_RANK, classExpToNext)
+  }
+  return { classes }
 }
 
 function parseRanks(value: unknown, path: string): Ranks {
@@ -649,7 +807,8 @@ function parseCalling(value: unknown, path: string): UmaCalling {
 
 const UMA_KEYS = ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'craft', 'ranks', 'stars', 'gear', 'bonds', 'calling']
 
-function parseUmas(value: unknown, path: string): Record<string, OwnedUma> {
+/** Her world's shape: v27's, or v28's with the world's tier (its accessory slots). */
+function parseUmas(value: unknown, path: string, v28?: { tier: number }): Record<string, OwnedUma> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const umas: Record<string, OwnedUma> = {}
   for (const [id, raw] of Object.entries(value)) {
@@ -658,10 +817,11 @@ function parseUmas(value: unknown, path: string): Record<string, OwnedUma> {
     const u = object(raw, at, UMA_KEYS)
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
-    const ranks = parseRanks(u.ranks, `${at}.ranks`)
+    const ranks = v28 ? parseClassRanks(u.ranks, `${at}.ranks`) : parseRanks(u.ranks, `${at}.ranks`)
     const owned: Omit<OwnedUma, 'calling'> = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null,
-      classes: {}, craft: parseCraft(u.craft, `${at}.craft`), ranks, stars: parseStars(u.stars, `${at}.stars`, level),
-      gear: parseUmaGear(u.gear, `${at}.gear`, ranks), bonds: parseBonds(u.bonds, `${at}.bonds`) }
+      classes: {}, craft: parseCraft(u.craft, `${at}.craft`), ranks,
+      stars: v28 ? parseStarMap(u.stars, `${at}.stars`, level) : parseStars(u.stars, `${at}.stars`, level),
+      gear: v28 ? parseGrades(u.gear, `${at}.gear`, level, v28.tier) : parseUmaGear(u.gear, `${at}.gear`, ranks), bonds: parseBonds(u.bonds, `${at}.bonds`) }
     if (u.classId !== null && !RPG_CLASSES.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
     owned.classId = u.classId as RpgClass | null
     const classes = object(u.classes, `${at}.classes`, RPG_CLASSES)
@@ -797,17 +957,59 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
 }
 
 
+/** v28's grant (H78, PP25): null, or the record `toV28` writes, every count whole; its Umas are outfit ids, owned or not
+ * (an Uma may leave the world later). */
+function parseGrant(value: unknown, path: string): TierGrant | null {
+  if (value === null) return null
+  const g = object(value, path, ['tickets', 'floor', 'umas', 'deleted', 'back', 'seen'])
+  if (typeof g.umas !== 'object' || g.umas === null || Array.isArray(g.umas)) throw new SaveParseError(`${path}.umas`, 'expected an object')
+  const umas: TierGrant['umas'] = {}
+  for (const [id, raw] of Object.entries(g.umas)) {
+    const at = `${path}.umas.${id}`
+    if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
+    const u = object(raw, at, ['level', 'exp', 'tickets'])
+    const level = count(u.level, `${at}.level`)
+    if (level < 1 || level > PROFESSION_MAX_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${PROFESSION_MAX_LEVEL}`)
+    umas[id] = { level, exp: count(u.exp, `${at}.exp`), tickets: count(u.tickets, `${at}.tickets`) }
+  }
+  const d = object(g.deleted, `${path}.deleted`, ['gear', 'gems', 'upgrades'])
+  const b = object(g.back, `${path}.back`, ['laurels', 'items', 'stock'])
+  if (typeof g.seen !== 'boolean') throw new SaveParseError(`${path}.seen`, 'expected true or false')
+  return {
+    tickets: count(g.tickets, `${path}.tickets`), floor: count(g.floor, `${path}.floor`), umas,
+    deleted: { gear: count(d.gear, `${path}.deleted.gear`), gems: count(d.gems, `${path}.deleted.gems`), upgrades: count(d.upgrades, `${path}.deleted.upgrades`) },
+    back: { laurels: count(b.laurels, `${path}.back.laurels`), items: count(b.items, `${path}.back.items`), stock: count(b.stock, `${path}.back.stock`) },
+    seen: g.seen,
+  }
+}
+
+/** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant. */
+function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant'])
+  const umas = parseUmas(w.umas, `${path}.umas`, { tier })
+  object(w.buildings, `${path}.buildings`, [])
+  return {
+    createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, true), umas,
+    parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
+    items: parseStock(w.items, `${path}.items`, tier), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v28Work(tier)),
+    targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
+    rift: parseRift(w.rift, `${path}.rift`, tier, umas, check), grant: parseGrant(w.grant, `${path}.grant`),
+  }
+}
+
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
   if (version < 10) return resetTierWorld(raw, path)
-  // v10–v26 are migrated to the current shape first (migrations.ts), so the parse below reads only v27.
-  const value = migrate(raw, version)
+  // v10–v26 are migrated to the current shape first (migrations.ts), so the parse below reads only v27, or v28's shape once
+  // R2's economy is live (D208 point 2; H82 chains `toV28`).
+  const value = migrate(raw, version, tier)
+  if (rpgRework('economy')) return parseTierWorldV28(value, path, tier, check)
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'gems', 'gear', 'targets', 'heroes', 'rift'])
   const umas = parseUmas(w.umas, `${path}.umas`)
   const buildings = parseBuildings(w.buildings, `${path}.buildings`)
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
-    items: parseItems(w.items, `${path}.items`), buildings, work: parseWork(w.work, `${path}.work`, umas, buildings),
+    items: parseItems(w.items, `${path}.items`), buildings, work: parseWork(w.work, `${path}.work`, umas, v27Work(buildings)),
     gems: parseGems(w.gems, `${path}.gems`), gear: parseGearStock(w.gear, `${path}.gear`),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
     rift: parseRift(w.rift, `${path}.rift`, tier, umas, check),

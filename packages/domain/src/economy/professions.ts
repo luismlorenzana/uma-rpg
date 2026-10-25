@@ -53,6 +53,9 @@ export const PLACES_V3: readonly PlaceSpecV3[] = [
   { id: 'monster-den', profession: 'hunting', kind: 'gather', line: 'stone', made: [] },
   { id: 'lapidary', profession: 'jewel-crafting', kind: 'cut', line: null, made: ['jewel-planet', 'jewel-moon'] },
 ]
+/** Every place's slots and speed from day 1 (PP4): one level, nothing to upgrade. */
+export const PLACE_SLOTS_V3 = 4
+export const PLACE_SPEED_V3 = 1.25
 const PLACE_BY_ID = new Map(PLACES_V3.map((p) => [p.id, p]))
 export const placeSpecV3 = (placeId: string): PlaceSpecV3 | undefined => PLACE_BY_ID.get(placeId as PlaceIdV3)
 

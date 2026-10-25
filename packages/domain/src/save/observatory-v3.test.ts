@@ -71,7 +71,7 @@ describe('setJewel (EP5, EP17)', () => {
   })
 
   it('a v1 map is "Not graded", and a v3 map refuses Star Gems and active slots', () => {
-    const v1 = saveOf(gradedWorld({ items: { 'jewel-planet-1': 1 } }))
+    const v1 = saveOf(gradedWorld({ items: { 'jewel-planet-1': 1 }, umas: { '101': gradedUma({ stars: { unlocked: [], active: [] } }) } }))
     expect(umaOf(v1).stars).toEqual({ unlocked: [], active: [] })
     expect(() => setJewel(v1, '101', 'jewel-planet-1', 'planet:1', NOW)).toThrow('Not graded')
     const v3 = withUma({ level: 10 }, {})

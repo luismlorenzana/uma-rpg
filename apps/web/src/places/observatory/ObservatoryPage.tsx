@@ -1,7 +1,7 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, gemById, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, starsV1, type OwnedUma,
+  activeNodeSlots, BRIDGES, gemById, gemStock, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, starsV1, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -47,7 +47,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
     if (!on && stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
     run(() => activate(id, on ? stars.active.filter((n) => n !== node) : [...stars.active, node]))
   }
-  const settable = Object.entries(world.gems).filter(([g]) => nodeFromGem(uma, g))
+  const settable = Object.entries(gemStock(world)).filter(([g]) => nodeFromGem(uma, g))
   return (
     <div className="space-y-3 p-3">
       <button type="button" onClick={() => setPicking(true)} aria-label="Choose an Uma" className="flex min-h-12 items-center gap-3 rounded-md bg-raised p-2">
@@ -74,7 +74,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
       <section>
         <h3 className="text-micro mb-1.5">Set · Star Gems from the Lapidary</h3>
         {settable.length === 0 ? (
-          <p className="text-[13px] text-ink-faint">{Object.keys(world.gems).length ? 'No gem on the shelf opens anything new for her.' : 'No Star Gems yet: cut some at the Lapidary (Wilds).'}</p>
+          <p className="text-[13px] text-ink-faint">{Object.keys(gemStock(world)).length ? 'No gem on the shelf opens anything new for her.' : 'No Star Gems yet: cut some at the Lapidary (Wilds).'}</p>
         ) : (
           <ul className="space-y-1.5">
             {settable.map(([gemId, n]) => {

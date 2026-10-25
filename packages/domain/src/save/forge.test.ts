@@ -83,7 +83,7 @@ describe('the Forge and equipping (S7)', () => {
       gear: { 'greatsword-g1': 2, 'greatsword-g2': 1, 'greatsword-g3': 1, 'helm-g1': 2, 'orb-fire-g2': 1, 'orb-ice-g1': 1 },
       umas: { '101': { ...w.umas['101']!, ranks: { ...w.umas['101']!.ranks, weapons: { greatsword: top }, armors: { helm: top }, accessories: { 'elemental-orb': top } } } } }))
     const uma = () => worldOf(save).umas['101']!
-    const greatswords = () => gearChoices(uma(), worldOf(save).gear, (p) => p.type === 'greatsword')
+    const greatswords = () => gearChoices(uma(), worldOf(save).gear!, (p) => p.type === 'greatsword')
     // Nothing bound yet: grade 1 is next; grade 2 and 3 wait their turn.
     expect(boundGrade(uma(), 'greatsword')).toBe(0)
     expect(equipBlock(uma(), 'greatsword-g2')).toBe('Needs G1 first')
@@ -101,7 +101,7 @@ describe('the Forge and equipping (S7)', () => {
     expect(greatswords().map((c) => c.id)).toEqual(['greatsword-g3', 'greatsword-g1'])
     // Armor climbs by kind: her grade-1 Helm spends grade 1, so the spare in stock no longer shows.
     save = equipGear(save, '101', 'helm-g1', at(0))
-    expect(gearChoices(uma(), worldOf(save).gear, (p) => p.type === 'helm')).toEqual([{ id: 'helm-g1', bound: true }])
+    expect(gearChoices(uma(), worldOf(save).gear!, (p) => p.type === 'helm')).toEqual([{ id: 'helm-g1', bound: true }])
     // Each Orb climbs on its own: Fire waits for grade 1, Ice starts now.
     expect(equipBlock(uma(), 'orb-fire-g2')).toBe('Needs G1 first')
     expect(equipBlock(uma(), 'orb-ice-g1')).toBeNull()

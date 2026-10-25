@@ -182,7 +182,7 @@ describe('asynchronous strict save parsing (H16)', () => {
     const gear = rawOf(base); worldOf(gear).umas['9000000']!.gear = { locker: ['lance-g10'], equipped: { lance: 'lance-g10' }, kinds: {} }; invalids.push(gear)
     const line = rawOf(base); worldOf(line).umas['9000000']!.classes.brawler = { weapons: rpgDefaultWeapons('brawler'), lines: { 'tome-fire': 'B' }, loadout: null }; invalids.push(line)
     const items = rawOf(base); worldOf(items).items.unknown = 1; invalids.push(items)
-    const gem = rawOf(base); worldOf(gem).gems['gem-sun-5'] = 1; invalids.push(gem)
+    const gem = rawOf(base); worldOf(gem).gems!['gem-sun-5'] = 1; invalids.push(gem)
     for (const s of invalids) {
       expect(() => parseSave(s)).toThrow(SaveParseError)
       await expect(parseSaveAsync(s)).rejects.toThrow(SaveParseError)

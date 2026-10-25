@@ -13,7 +13,7 @@ import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
-import { gearV1, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
+import { gearStock, gearV1, gemStock, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
 
 export interface UmaUpgrades {
   /** Slots that can take a better piece now: a weapon type of her three, an armor slot or an accessory slot. */
@@ -74,15 +74,16 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const bound = boundGrades(uma)
   const gear = gearV1(uma)
   const { equipped } = gear
+  const stock = gearStock(world)
   const gearSlots: GearSlot[] = []
 
   for (const w of new Set(classOf(uma, classId).weapons)) {
-    if (better(uma, world.gear, bound, w, pieceOf(equipped[w])?.grade ?? 0)) gearSlots.push(w)
+    if (better(uma, stock, bound, w, pieceOf(equipped[w])?.grade ?? 0)) gearSlots.push(w)
   }
   for (const slot of ARMOR_SLOTS) {
     const kind = slotKind(gear, slot)
     const piece = pieceOf(equipped[slot])
-    if (better(uma, world.gear, bound, kind, piece?.type === kind ? piece.grade : 0)) gearSlots.push(slot)
+    if (better(uma, stock, bound, kind, piece?.type === kind ? piece.grade : 0)) gearSlots.push(slot)
   }
   const accessories = ACCESSORY_SLOTS.map((slot) => {
     const piece = pieceOf(equipped[slot])
@@ -94,16 +95,16 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const counted = new Set<EquipType>()
   for (const { slot, piece } of accessories) {
     const fill = piece ? undefined
-      : ACCESSORY_TYPES.find((t) => t !== taken && !counted.has(t) && accessoryFits(slot, t, engine) && better(uma, world.gear, bound, t, 0))
+      : ACCESSORY_TYPES.find((t) => t !== taken && !counted.has(t) && accessoryFits(slot, t, engine) && better(uma, stock, bound, t, 0))
     if (fill) counted.add(fill)
-    if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
+    if (piece ? better(uma, stock, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
   }
 
   // A v1 map's Star Gems and active slots; a v3 map (R2, H76) reads neither: its "can upgrade" is H79's.
   const map = starsV1(uma)
   const open = new Set(map.unlocked)
   let gems = 0
-  for (const [gem, count] of Object.entries(isStarMap(uma.stars) ? {} : world.gems)) {
+  for (const [gem, count] of Object.entries(isStarMap(uma.stars) ? {} : gemStock(world))) {
     const track = GEM_TRACKS.get(gem)
     if (!track || count < 1) continue
     const next = track.nodes.find(([node]) => !open.has(node))

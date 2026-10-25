@@ -15,7 +15,7 @@ import {
 import { classOf, withClassWeapons } from './battle'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { gearV1, isGrades, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearStock, gearV1, isGrades, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
 /**
  * Each class's suggested accessories in classes v1. The Orb (accessory 1) adds a kind her default spread lacks: the shape
@@ -169,7 +169,7 @@ export function classPresetPlan(world: TierWorld, outfitId: string, classId: Rpg
   const worn = (slot: GearSlot): string | null => currentGear.equipped[slot] ?? null
   const binds: string[] = []
   const take = (type: EquipType): string | null => {
-    const r = bestReachable(uma, world.gear, type)
+    const r = bestReachable(uma, gearStock(world), type)
     binds.push(...r.binds)
     return r.id
   }
@@ -211,7 +211,7 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
   const uma = world.umas[outfitId]!
   if (isGrades(uma.gear) && plan.accessory) return applyPresetV3(world, outfitId, uma, uma.gear, plan.weapons, plan.accessory, classId)
   const currentGear = gearV1(uma)
-  let gear = world.gear
+  let gear = gearStock(world)
   if (plan.binds.length) {
     gear = { ...gear }
     for (const id of plan.binds) {
