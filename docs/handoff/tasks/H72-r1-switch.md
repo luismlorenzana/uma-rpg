@@ -146,3 +146,26 @@ the owner checks on the phone ([implementation.md](../../design/tier-rework/impl
 - **Flag it done:** after the merge, a `docs(handoff): H72 done, R1 is live (D…)` commit deletes this file, sets H72 to
   Done with a Done row, replaces R1's build status with one line ("R1 is built and live"), and sets R2's H82 to Ready when
   its other needs are done.
+
+## Notes from the build (main session, 2026-10-25)
+
+**From H70 (D206):**
+- **Dead code to remove at the flip:** `SkillsPage`'s v6–v15 body (NodeCard, sides, the points line, Learn and Swap
+  out); the store's `learn` and `unlearn`; ActiveParty's spare-point code; ClassChip's points pill and `tabDot`'s points
+  check; RacingTab's old rows with `STYLE_CLASSES`, `DISTANCE_GEAR` and `learningTime`; `sheet.ts`'s v15 Sustain branch;
+  the `rpgRework` gates in `template-view.ts`, `album/rows.ts`, `hall-view.ts`, `rank-ups.ts` and `rift-view.ts`'s
+  `guidedWeapons`.
+- **Keep** the fight-version paths (`WeaknessIcons({ engine })`, `describeCue`, the fight screen's "Weak:" gate): a v15
+  fight can still be open after the flip.
+- **Tests that assume the switch at 15** (H70 ran the suite at 16): web `places/stable/OutfitProfile.test.tsx`,
+  `album/upgrades.test.ts`, `album/adoption.test.tsx`; domain about 71, among them `docs.test.ts` (the manual),
+  `save/battle.test.ts`, `rpg/rules-v2.test.ts`, `rpg/rules-v16.test.ts`'s "live is 15" cases,
+  `world/tier1-foes.test.ts`, `economy/pacing.sim.test.ts`, `save/accessories-v2.test.ts`, `save/forge.test.ts`,
+  `save/healers-v2.test.ts`; H69's "not chained" test and `migrations-v27.test.ts`'s live-15 describe.
+- **Manual (`sections.md`):** § Stable (the template chip and card, the calling card, Can-upgrade without points, the
+  three weapon slots, the Skills tab tree, the Battle tab's MP and Flourish rows, "Her template", the Template filters
+  and search); § Scenario Gate ("Weak:", the ★ cues, rank-up lines, three Weapon Rank cells, no spare-point dot); § The
+  Rift (guided weapons, weaknesses, rank-ups); § Learning ("Answers …" and "Adds …").
+- **Screen edges for the owner's phone check:** the Uma sheet header (the chip beside "Mark target"), the calling card,
+  the fight footer's three weapon buttons above the home indicator, the Rift sheet footers (the guided-weapons block),
+  the two tree columns at 375 pt.
