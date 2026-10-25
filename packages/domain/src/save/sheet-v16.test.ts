@@ -7,7 +7,7 @@ import { withTrack } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
 import { rpgBaseMpRegen } from '../rpg/rules'
 import type { BattleOutfit } from './battle'
-import { newOwnedUma, type OwnedUma } from './save'
+import { gearV1, newOwnedUma, type OwnedUma } from './save'
 import { flourishShort, umaBattleSheet } from './sheet'
 
 const NOW = '2026-10-25T12:00:00.000Z'
@@ -30,7 +30,7 @@ function mageAt(mp: number, extra: Partial<OwnedUma> = {}): OwnedUma {
 }
 const row = (sheet: ReturnType<typeof umaBattleSheet>, label: string) => sheet.flatMap((g) => g.rows).find((r) => r.label === label)!
 const sustain = (sheet: ReturnType<typeof umaBattleSheet>) => sheet.find((g) => g.title === 'Sustain')!.rows
-const spring = (uma: OwnedUma): OwnedUma => ({ ...uma, gear: { ...uma.gear, equipped: { ...uma.gear.equipped, 'accessory-2': 'amulet-spring-g10' } } })
+const spring = (uma: OwnedUma): OwnedUma => ({ ...uma, gear: { ...gearV1(uma), equipped: { ...gearV1(uma).equipped, 'accessory-2': 'amulet-spring-g10' } } })
 
 describe('the battle sheet on engine v16 (H70)', () => {
   it('reads a Class Rank 40 Mage\'s 296 MP as "296 · +13 a round", "+23" with a G10 Spring, and drops the MP Regen row', () => {

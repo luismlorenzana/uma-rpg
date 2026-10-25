@@ -6,7 +6,7 @@
 // "Can upgrade" mark (H34). From engine v16 (the Tier rework's R1, H70) the tab is `SkillTree`: three slots, one tree a
 // slot with a trunk and a fork, Skill Ranks and no points; this page's body below is v6–v15's.
 import {
-  activeClass, classOf, classRankOf, classTrack, gearById, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
+  activeClass, classOf, classRankOf, classTrack, gearById, gearV1, RPG_DEPTH_GATES, rpgActiveSlots, rpgClassWeapons, rpgOpenDepth,
   rpgDepthBlock, rpgLearnBlock, rpgNode, rpgSideNodeLevel, rpgTreeNodes, rpgTreeOf, rpgTreePointsEarned, rpgTreePointsSpent, rpgTreeView,
   rpgV2, SaveRuleError, umaLoadout, umaProfile, type BattleOutfit, type RpgClass, type RpgNode,
 } from '@rpg/domain'
@@ -31,6 +31,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
   const [error, setError] = useState<string | null>(null)
   if (!uma) return <p className="p-4 text-ink-soft">Unlock her first.</p>
   const classId = activeClass(outfit, uma)
+  const gear = gearV1(uma)
   const setup = classOf(uma, classId)
   const profile = umaProfile(outfit, uma, tier, classId)
   // v16 (H65's model, null before it): the tree tab.
@@ -84,7 +85,7 @@ export function SkillsPage({ outfit, name }: { outfit: BattleOutfit; name: strin
           <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-5 gap-1" aria-label="Weapon slots">
             {weapons.map((w, i) => {
-              const piece = uma.gear.equipped[w] ? gearById(uma.gear.equipped[w]!) : undefined
+              const piece = gear.equipped[w] ? gearById(gear.equipped[w]!) : undefined
               const mark = better.includes(w)
               return (
                 <button key={`${i}-${w}`} type="button" onClick={() => setSlotPick(i)}

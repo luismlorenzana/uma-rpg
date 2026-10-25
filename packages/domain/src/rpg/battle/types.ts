@@ -1,4 +1,5 @@
-// Campaign battle vocabulary, engine v15 (W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
+// Campaign battle vocabulary, engine v17 (R2, D209: gear grades arrive as stats and Might, and support fields retire;
+// W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
 // Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
@@ -6,6 +7,7 @@
 // v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md;
 // v16 the Tier rework's fight, D200, dark until H72: three weapons by channel, no side or legacy skills, a
 // trunk and one fork into lines A and B, Skill Ranks (H65), the base MP regen and the Flourish (H68, D204);
+// v17 the Tier rework's economy, D209, dark until H82: gear grades arrive as stats and Might, and the ten supports are refused;
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
@@ -47,27 +49,30 @@ export interface BattleAlly {
    * carries her Orb's offense on its kind (H57). */
   might?: Partial<Record<RpgDamageKind, number>>
   /** A Barrier she starts the fight with (v8: from physical armor, absorbing any damage; v11: a Bulwark Talisman's,
-   * absorbing physical damage only). */
+   * absorbing physical damage only). Refused from v17 (D209). */
   barrier?: number
-  /** HP she regains at the end of each round (v8: magical armor; v11: a Vital Talisman). */
+  /** HP she regains at the end of each round (v8: magical armor; v11: a Vital Talisman). Refused from v17 (D209). */
   regen?: number
   /** v11 (D124): the kinds of the Orbs she wears, two at most; each makes her hits weak as `orb` did. Replaces `orb`.
    * Refused from v15 (D179): an Orb's flat offense arrives in `might`, and it no longer adds kinds. */
   orbs?: RpgDamageKind[]
-  /** v11: a Veil absorbing magical damage, from the start of the fight (Veil Amulet). */
+  /** v11: a Veil absorbing magical damage, from the start of the fight (Veil Amulet). Refused from v17 (D209). */
   veil?: number
   /** v11: MP restored at the end of each round (Spring Amulet). From v16 the base MP regen adds to it, read from her
-   * `stats.mp` and Class Rank (`rpgBaseMpRegen`, SB18): no field of its own. */
+   * `stats.mp` and Class Rank (`rpgBaseMpRegen`, SB18): no field of its own. Refused from v17 (D209). */
   mpRegen?: number
   /** v11, per mille: physical damage she deals healed back (Vampire Talisman); magical damage she deals restored as MP
-   * (Siphon Amulet). */
+   * (Siphon Amulet). Refused from v17 (D209). */
   lifesteal?: number
+  /** Refused from v17 (D209). */
   mpSteal?: number
-  /** v11, per mille: physical (Iron Talisman) and magical (Ward Amulet) damage she doesn't take. */
+  /** v11, per mille: physical (Iron Talisman) and magical (Ward Amulet) damage she doesn't take. Refused from v17 (D209). */
   guard?: number
+  /** Refused from v17 (D209). */
   resist?: number
-  /** v11, per mille: physical (Thorn Talisman) and magical (Mirror Amulet) damage she takes, returned to its attacker. */
+  /** v11, per mille: physical (Thorn Talisman) and magical (Mirror Amulet) damage she takes, returned to its attacker. Refused from v17 (D209). */
   thorns?: number
+  /** Refused from v17 (D209). */
   mirror?: number
   /** Share of every hit she avoids, per mille, from Speed points (S6, S7). */
   evasion?: number
@@ -130,7 +135,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -176,7 +181,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

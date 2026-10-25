@@ -14,7 +14,7 @@ import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
 import { rpgLearnBlock, rpgProfileTrees, rpgTreePointsEarned, rpgTreePointsSpent, type RpgClass } from '../rpg/rules'
 import { rpgSideNodeLevel } from '../rpg/node-identity'
 import { classOf } from './battle'
-import { slotKind, type OwnedUma, type TierWorld } from './save'
+import { gearV1, slotKind, type OwnedUma, type TierWorld } from './save'
 
 export interface UmaUpgrades {
   /** Slots that can take a better piece now: a weapon type of her five, an armor slot or an accessory slot. */
@@ -54,8 +54,9 @@ function boundGrades(uma: OwnedUma): Map<EquipType, number> {
     const piece = pieceOf(id)
     if (piece && piece.grade > (best.get(piece.type) ?? 0)) best.set(piece.type, piece.grade)
   }
-  for (const id of uma.gear.locker) see(id)
-  for (const id of Object.values(uma.gear.equipped)) if (id) see(id)
+  const gear = gearV1(uma)
+  for (const id of gear.locker) see(id)
+  for (const id of Object.values(gear.equipped)) if (id) see(id)
   return best
 }
 
@@ -88,14 +89,15 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const uma = world.umas[outfitId]
   if (!uma) return null
   const bound = boundGrades(uma)
-  const { equipped } = uma.gear
+  const gear = gearV1(uma)
+  const { equipped } = gear
   const gearSlots: GearSlot[] = []
 
   for (const w of new Set(classOf(uma, classId).weapons)) {
     if (better(uma, world.gear, bound, w, pieceOf(equipped[w])?.grade ?? 0)) gearSlots.push(w)
   }
   for (const slot of ARMOR_SLOTS) {
-    const kind = slotKind(uma.gear, slot)
+    const kind = slotKind(gear, slot)
     const piece = pieceOf(equipped[slot])
     if (better(uma, world.gear, bound, kind, piece?.type === kind ? piece.grade : 0)) gearSlots.push(slot)
   }

@@ -5,7 +5,7 @@ import { ACCESSORY_SLOT_LABEL } from '../economy/ranks'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { equipGear, wearAccessory } from './forge'
 import { unlockUma, worldOf } from './rules'
-import { newSave, parseSave, type Save } from './save'
+import { gearV1, newSave, parseSave, type Save } from './save'
 
 
 const T = (n: number) => `2026-10-22T12:00:${String(n).padStart(2, '0')}.000Z`
@@ -42,7 +42,7 @@ describe('typed accessory slots in a save, with classes v2 live (H57)', () => {
     const save = wearing({})
     const stocked = { ...save, tierWorlds: { ...save.tierWorlds, '1': { ...worldOf(save), gear: { 'amulet-spring-g1': 1, 'orb-fire-g1': 1 } } } }
     const after = equipGear(stocked, '101', 'amulet-spring-g1', T(1))
-    expect(worldOf(after).umas['101']!.gear.equipped).toEqual({ 'accessory-2': 'amulet-spring-g1' })
+    expect(gearV1(worldOf(after).umas['101']!).equipped).toEqual({ 'accessory-2': 'amulet-spring-g1' })
     expect(() => wearAccessory(after, '101', 'accessory-2', 'orb-fire-g1', T(2))).toThrow('The Support slot takes a Talisman or an Amulet')
     expect(parsed(after)).toEqual(after)
   })

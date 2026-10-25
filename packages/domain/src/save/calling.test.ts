@@ -16,7 +16,7 @@ import { sweepFight } from './exchange'
 import { ascend, signUpRift, startRiftFight, sweepEcho } from './rift'
 import { ids, OUTFITS as RIFT_OUTFITS, play, riftWorldSave, ROSTER, T as RT, TWENTY, weaken } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newOwnedUma, newSave, parseSave, startingArmorKinds, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, newOwnedUma, newSave, parseSave, startingArmorKinds, type OwnedUma, type Save, type TierWorld } from './save'
 
 vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
@@ -99,16 +99,16 @@ describe('the calling pick (H69)', () => {
 
   it('at Uma Lv 1 moves her class and, with no armor worn, her armor half to the pick’s', () => {
     const save = party()
-    expect([umaOf(save, '305').classId, umaOf(save, '305').gear.kinds]).toEqual(['spellblade', {}])
+    expect([umaOf(save, '305').classId, gearV1(umaOf(save, '305')).kinds]).toEqual(['spellblade', {}])
     const mage = pickCalling(save, PACE, 'mage', T(1))
     expect(umaOf(mage, '305')).toMatchObject({ classId: 'mage', calling: { pick: 'mage', confirmed: false } })
-    expect(umaOf(mage, '305').gear.kinds).toEqual(startingArmorKinds('mage'))
-    expect(Object.keys(umaOf(mage, '305').gear.kinds)).toHaveLength(5)
+    expect(gearV1(umaOf(mage, '305')).kinds).toEqual(startingArmorKinds('mage'))
+    expect(Object.keys(gearV1(umaOf(mage, '305')).kinds)).toHaveLength(5)
     roundTrip(mage)
     // Back to the suggested one: her class and her physical half.
     const back = pickCalling(mage, PACE, 'spellblade', T(2))
     expect(umaOf(back, '305')).toMatchObject({ classId: 'spellblade', calling: { pick: 'spellblade', confirmed: false } })
-    expect(umaOf(back, '305').gear.kinds).toEqual({})
+    expect(gearV1(umaOf(back, '305')).kinds).toEqual({})
     // A Late Uma picks the Cleric: magical.
     expect(umaOf(pickCalling(save, LATE, 'cleric', T(1)), '307')).toMatchObject({ classId: 'cleric', gear: { kinds: startingArmorKinds('cleric') } })
     // Wearing an armor piece, her halves stay; switched to another class, her class stays.

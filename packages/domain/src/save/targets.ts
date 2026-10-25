@@ -12,7 +12,7 @@ import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
 /** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -45,9 +45,10 @@ export interface TargetPlan { gear: TargetNeed[]; gems: TargetNeed[]; refined: T
 /** The gear types an Uma climbs (D124): her class's five weapons, each armor slot's kind, and the type in each accessory
  * slot (an empty one plans nothing: nothing says which she wants). */
 function gearTypes(uma: OwnedUma, classId: RpgClass): EquipType[] {
-  const types: EquipType[] = [...classOf(uma, classId).weapons, ...ARMOR_SLOTS.map((slot) => slotKind(uma.gear, slot))]
+  const gear = gearV1(uma)
+  const types: EquipType[] = [...classOf(uma, classId).weapons, ...ARMOR_SLOTS.map((slot) => slotKind(gear, slot))]
   for (const slot of ACCESSORY_SLOTS) {
-    const piece = uma.gear.equipped[slot] ? gearById(uma.gear.equipped[slot]!) : undefined
+    const piece = gear.equipped[slot] ? gearById(gear.equipped[slot]!) : undefined
     if (piece && isAccessory(piece.type)) types.push(piece.type)
   }
   return types

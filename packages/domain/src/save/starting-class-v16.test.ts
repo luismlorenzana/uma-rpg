@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { activeClass, startingClass, type BattleOutfit } from './class'
 import { unlockUma, worldOf } from './rules'
-import { newOwnedUma, newSave, startingArmorKinds } from './save'
+import { gearV1, newOwnedUma, newSave, startingArmorKinds } from './save'
 
 vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
 
@@ -52,9 +52,9 @@ describe('the start by calling, engine v16 (H67)', () => {
     const { umas } = worldOf(save)
     expect(ROWS.map((o) => umas[o.outfitId]!.classId)).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
     expect(ROWS.map((o) => activeClass(o, umas[o.outfitId]!))).toEqual(ROWS.map((o) => startingClass(o)))
-    for (const o of ROWS) expect(umas[o.outfitId]!.gear.kinds).toEqual(startingArmorKinds(startingClass(o)))
-    expect(Object.keys(umas['306']!.gear.kinds)).toHaveLength(5)
-    expect(umas['305']!.gear.kinds).toEqual({})
+    for (const o of ROWS) expect(gearV1(umas[o.outfitId]!).kinds).toEqual(startingArmorKinds(startingClass(o)))
+    expect(Object.keys(gearV1(umas['306']!).kinds)).toHaveLength(5)
+    expect(gearV1(umas['305']!).kinds).toEqual({})
   })
 
   it('keeps v15’s writes for an older engine, and no start writes no class', () => {

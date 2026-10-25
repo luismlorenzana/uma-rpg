@@ -9,7 +9,7 @@ import type { BattleOutfit } from './battle'
 import { equipGear, wearAccessory } from './forge'
 import { CLASS_PRESET_ACCESSORIES, CLASS_PRESET_SUPPORT_V2, classPreset, classPresetPlan, wearClassPreset } from './presets'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
 import { umaBattleSheet } from './sheet'
 import { upgradesFor } from './upgrades'
 
@@ -23,10 +23,10 @@ const editUma = (save: Save, fn: (u: OwnedUma) => OwnedUma): Save => edit(save, 
 const brawler = (gear: Record<string, number> = {}): Save => edit(unlockUma(newSave('Luis', T(0)), '101', T(0), '1', 'brawler'), (w) => ({ ...w, gear }))
 /** Pieces already hers, worn in these slots. */
 const wearing = (save: Save, equipped: Record<string, string>): Save => editUma(save, (u) => ({
-  ...u, gear: { ...u.gear, locker: [...u.gear.locker, ...Object.values(equipped)], equipped: { ...u.gear.equipped, ...equipped } },
+  ...u, gear: { ...gearV1(u), locker: [...gearV1(u).locker, ...Object.values(equipped)], equipped: { ...gearV1(u).equipped, ...equipped } },
 }))
 const accessories = (save: Save) => {
-  const e = worldOf(save).umas['101']!.gear.equipped
+  const e = gearV1(worldOf(save).umas['101']!).equipped
   return { 'accessory-1': e['accessory-1'], 'accessory-2': e['accessory-2'] }
 }
 const refusal = (fn: () => unknown): string | null => {
@@ -45,7 +45,7 @@ describe('typed slots when she equips (classes v2 §6.1, C10)', () => {
     save = wearAccessory(save, '101', 'accessory-2', 'amulet-veil-g1', T(3), '1', 15)
     save = wearAccessory(save, '101', 'accessory-1', 'orb-lance-g1', T(4), '1', 15)
     expect(accessories(save)).toEqual({ 'accessory-1': 'orb-lance-g1', 'accessory-2': 'amulet-veil-g1' })
-    expect(worldOf(save).umas['101']!.gear.locker).toEqual(expect.arrayContaining(['talisman-vital-g1', 'orb-fire-g1']))
+    expect(gearV1(worldOf(save).umas['101']!).locker).toEqual(expect.arrayContaining(['talisman-vital-g1', 'orb-fire-g1']))
     roundTrips(save)
   })
 
@@ -100,7 +100,7 @@ describe('six standard presets (classes v2 §7, C6)', () => {
     expect([...plan.binds].sort()).toEqual(kit.map((t) => `${t}-g1`).sort())
     const after = wearClassPreset(save, '101', 'paladin', T(1), '1', 15)
     const uma = worldOf(after).umas['101']!
-    expect(uma.gear.equipped).toEqual({ ...Object.fromEntries(kit.slice(0, 5).map((w) => [w, `${w}-g1`])),
+    expect(gearV1(uma).equipped).toEqual({ ...Object.fromEntries(kit.slice(0, 5).map((w) => [w, `${w}-g1`])),
       head: 'helm-g1', body: 'cuirass-g1', legs: 'greaves-g1', arms: 'gauntlets-g1', feet: 'boots-g1',
       'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-thorn-g1' })
     expect(worldOf(after).gear).toEqual({})

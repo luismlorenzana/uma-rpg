@@ -11,7 +11,7 @@ import { classOf, holdWeapon, startFight, umaPointParts, umaPoints, umaProfile }
 import { rpgProfileTrees } from '../rpg/rules'
 import { boundGrade, equipBlock, equipGear, gearChoices, unequipGear, wearAccessory, wearArmor } from './forge'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, SaveParseError, type Save } from './save'
+import { gearV1, newSave, parseSave, SaveParseError, type Save } from './save'
 import { collectJob, planJob, startJob } from './work'
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
@@ -115,7 +115,7 @@ describe('the Forge and equipping (S7)', () => {
     expect(() => equipGear(save, '102', 'greatsword-g1', at(0))).toThrow(/none in stock/)
     expect(equipBlock(worldOf(save).umas['101']!, 'cuirass-g2')).toBe('Needs Cuirass Rank 2')
     save = unequipGear(save, '101', 'greatsword', at(0))
-    expect(worldOf(save).umas['101']!.gear.locker).toEqual(['greatsword-g1'])
+    expect(gearV1(worldOf(save).umas['101']!).locker).toEqual(['greatsword-g1'])
     save = equipGear(save, '101', 'greatsword-g1', at(0))
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     const stolen = JSON.parse(JSON.stringify(save))
@@ -125,7 +125,7 @@ describe('the Forge and equipping (S7)', () => {
 
   it('wears one kind per armor slot: a crafted piece or its Training piece, physical or magical (D103)', () => {
     let save = edit(umas('101'), (w) => ({ ...w, gear: { 'robe-g1': 1, 'helm-g1': 1, 'slippers-g1': 1 } }))
-    const gear = () => worldOf(save).umas['101']!.gear
+    const gear = () => gearV1(worldOf(save).umas['101']!)
     save = wearArmor(save, '101', 'body', 'robe', 'robe-g1', at(0))
     expect(gear()).toMatchObject({ equipped: { body: 'robe-g1' }, kinds: { body: 'robe' } })
     // Back to a Cuirass: its Training piece, and the Robe stays in her locker.
@@ -145,7 +145,7 @@ describe('the Forge and equipping (S7)', () => {
 
   it('wears an Orb in the Damage slot and a Talisman or an Amulet in the Support slot; an empty slot holds nothing (D124, C10)', () => {
     let save = edit(umas('101'), (w) => ({ ...w, gear: { 'orb-fire-g1': 2, 'talisman-vital-g1': 1, 'amulet-veil-g1': 1 } }))
-    const gear = () => worldOf(save).umas['101']!.gear
+    const gear = () => gearV1(worldOf(save).umas['101']!)
     save = equipGear(save, '101', 'talisman-vital-g1', at(0))
     save = equipGear(save, '101', 'orb-fire-g1', at(1))
     expect(gear().equipped).toEqual({ 'accessory-1': 'orb-fire-g1', 'accessory-2': 'talisman-vital-g1' })
@@ -192,7 +192,7 @@ describe('weapon slots (D98)', () => {
     const uma = () => worldOf(save).umas['101']!
     // A new Spell Blade holds the default spread, every one a Training weapon: no Might.
     expect(classOf(uma(), 'spellblade').weapons).toEqual(['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'])
-    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({})
+    expect(equippedMight(gearV1(uma()).equipped, classOf(uma(), 'spellblade').weapons)).toEqual({})
     expect(Object.values(umaPointParts(uma(), 'spellblade').gear).every((n) => n === 0)).toBe(true)
     // An Axe in slot 1 opens the Axe tree in place of the Greatsword's.
     save = holdWeapon(save, '101', 'spellblade', 0, 'axe', null, at(1))
@@ -200,11 +200,11 @@ describe('weapon slots (D98)', () => {
     expect(rpgProfileTrees({ classId: 'spellblade', weapons: classOf(uma(), 'spellblade').weapons })).not.toContain('spellblade-greatsword')
     // A crafted Lance takes the Training one's place and binds to her; choosing Training again takes it off.
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', 'lance-g1', at(2))
-    expect(uma().gear.equipped.lance).toBe('lance-g1')
-    expect(equippedMight(uma().gear.equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 1 })
+    expect(gearV1(uma()).equipped.lance).toBe('lance-g1')
+    expect(equippedMight(gearV1(uma()).equipped, classOf(uma(), 'spellblade').weapons)).toEqual({ lance: 1 })
     save = holdWeapon(save, '101', 'spellblade', 1, 'lance', null, at(3))
-    expect(uma().gear.equipped.lance).toBeUndefined()
-    expect(uma().gear.locker).toContain('lance-g1')
+    expect(gearV1(uma()).equipped.lance).toBeUndefined()
+    expect(gearV1(uma()).locker).toContain('lance-g1')
     // A Tome already in the other Tome slot swaps places; a Tome can't go in an Arms slot; a Brawler's slots are fixed.
     save = holdWeapon(save, '101', 'spellblade', 3, 'tome-lightning', null, at(4))
     expect(classOf(uma(), 'spellblade').weapons.slice(3)).toEqual(['tome-lightning', 'tome-fire'])
@@ -213,7 +213,7 @@ describe('weapon slots (D98)', () => {
     expect(() => holdWeapon(save, '101', 'spellblade', 2, 'katana', 'lance-g1', at(5))).toThrow(/isn’t this weapon/)
     // A Brawler can still trade a slot's Training weapon for a crafted one of its kind.
     save = holdWeapon(save, '101', 'brawler', classOf(uma(), 'brawler').weapons.indexOf('lance'), 'lance', 'lance-g1', at(6))
-    expect(uma().gear.equipped.lance).toBe('lance-g1')
+    expect(gearV1(uma()).equipped.lance).toBe('lance-g1')
   })
 })
 

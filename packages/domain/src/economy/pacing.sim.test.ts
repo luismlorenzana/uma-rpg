@@ -65,8 +65,8 @@ describe('H14 pacing economy ledger', () => {
     }
     const uma = world.umas[ids[0]!]!
     expect(uma.ranks.classes.brawler!.rank).toBe(50)
-    expect(Object.values(uma.ranks.weapons).map((r) => r!.rank)).toEqual(Array(5).fill(10))
-    expect(Object.values(uma.ranks.armors).map((r) => r!.rank)).toEqual(Array(5).fill(10))
+    expect(Object.values(uma.ranks.weapons ?? {}).map((r) => r!.rank)).toEqual(Array(5).fill(10))
+    expect(Object.values(uma.ranks.armors ?? {}).map((r) => r!.rank)).toEqual(Array(5).fill(10))
     expect(world.wallet.classMarks).toBeGreaterThan(0)
     expect(world.wallet.gearMarks).toBeGreaterThan(0)
     expect(world.items).toEqual({})

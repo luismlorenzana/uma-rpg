@@ -16,6 +16,7 @@
 // D59).
 import type { DroppedQueue, Entry, ItemQty, LastWork, Refusal, SlotRef, WorkOutput, WorkRow, WorkState } from '@luismlorenzana/uma-work'
 import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL } from '../economy/pacing'
+import { newGrades, type UmaGrades } from '../economy/grades'
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
 import type { RpgWorkRequest } from '../work/request'
 import {
@@ -68,7 +69,7 @@ export interface Wallet {
   /** Each completes one beaten regular fight at once (§11). */
   sweepTickets: number
   /** EXP past a max Weapon or Armor Rank, banked at half rate; spent on Manuals (D102). */
-  gearMarks: number
+  gearMarks?: number
   /** EXP past a max Class Rank, banked at half rate. */
   classMarks: number
 }
@@ -105,7 +106,7 @@ export interface OwnedUma {
   /** Her Sun-and-planets map: nodes opened by setting Star Gems, and the ones active now (S6, design §10). */
   stars: Stars
   /** Gear bound to her (her locker) and what she wears: one piece per weapon type and one per armor slot (S7, D103). */
-  gear: UmaGear
+  gear: UmaGearV1 | UmaGrades
   /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
   bonds: Partial<Record<HeroLimitId, BondTrack>>
   /** From v27 (H69; CP29, UT17): her calling pick and whether it is final, on every Uma; a null pick is the rule's
@@ -122,9 +123,12 @@ export interface HeroSeat { hero: string; learners: string[] }
  * all five set to the magical kind; a physical one has none (D160 §7). An empty armor slot holds the kind's Training
  * piece, grade 0, as an empty weapon slot holds a Training weapon (D98, D103); an empty accessory slot holds nothing.
  * `equipped` keys: her weapons, her five armor slots and her two accessory slots (D124). */
-export interface UmaGear { locker: string[]; equipped: Partial<Record<GearSlot, string>>; kinds: Partial<Record<ArmorSlot, ArmorKind>> }
+export interface UmaGearV1 { locker: string[]; equipped: Partial<Record<GearSlot, string>>; kinds: Partial<Record<ArmorSlot, ArmorKind>> }
+export const isGrades = (gear: UmaGearV1 | UmaGrades): gear is UmaGrades => !('locker' in gear)
+export const gearV1 = (uma: Pick<OwnedUma, 'gear'>): UmaGearV1 => isGrades(uma.gear) ? { locker: [], equipped: {}, kinds: {} } : uma.gear
+export const gradesOf = (uma: Pick<OwnedUma, 'gear'>): UmaGrades => isGrades(uma.gear) ? uma.gear : newGrades(1)
 /** The armor kind a slot holds now: absent means physical (a new Mage, Cleric or Summoner has all five set magical). */
-export const slotKind = (gear: Pick<UmaGear, 'kinds'>, slot: ArmorSlot): ArmorKind => gear.kinds[slot] ?? ARMOR_SLOT_KINDS[slot][0]
+export const slotKind = (gear: Pick<UmaGearV1, 'kinds'>, slot: ArmorSlot): ArmorKind => gear.kinds[slot] ?? ARMOR_SLOT_KINDS[slot][0]
 
 export interface Stars { unlocked: string[]; active: string[] }
 
@@ -228,7 +232,7 @@ export function defaultParties(): Party[] {
 
 export const newWallet = (unlockTickets: number): Wallet => ({ unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
 /** A new Uma's armor kinds (D160 §7): all five magical for a magical starting class, none set (physical) otherwise. */
-export function startingArmorKinds(classId?: RpgClass): UmaGear['kinds'] {
+export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
   if (!classId || RPG_CLASS_ARMOR[classId] !== 'magical') return {}
   return Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, 'magical')]))
 }
@@ -488,7 +492,7 @@ function parseStars(value: unknown, path: string, level: number): Stars {
   return { unlocked, active }
 }
 
-function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGear {
+function parseUmaGear(value: unknown, path: string, ranks: Ranks): UmaGearV1 {
   const o = object(value, path, ['locker', 'equipped', 'kinds'])
   const locker = ids(o.locker, `${path}.locker`, 300)
   if (locker.some((g) => !gearById(g))) throw new SaveParseError(`${path}.locker`, 'unknown gear')
@@ -553,13 +557,13 @@ function parseRanks(value: unknown, path: string): Ranks {
     ranks.classes[c as RpgClass] = parseTrack(t, `${path}.classes.${c}`, CLASS_MAX_RANK, classExpToNext)
   }
   for (const [w, t] of Object.entries(object(o.weapons, `${path}.weapons`, WEAPON_TYPES))) {
-    ranks.weapons[w as RpgWeapon] = parseTrack(t, `${path}.weapons.${w}`, GEAR_MAX_RANK, gearExpToNext)
+    ranks.weapons![w as RpgWeapon] = parseTrack(t, `${path}.weapons.${w}`, GEAR_MAX_RANK, gearExpToNext)
   }
   for (const [a, t] of Object.entries(object(o.armors, `${path}.armors`, ARMOR_KINDS))) {
-    ranks.armors[a as ArmorKind] = parseTrack(t, `${path}.armors.${a}`, GEAR_MAX_RANK, gearExpToNext)
+    ranks.armors![a as ArmorKind] = parseTrack(t, `${path}.armors.${a}`, GEAR_MAX_RANK, gearExpToNext)
   }
   for (const [a, t] of Object.entries(object(o.accessories, `${path}.accessories`, ACCESSORY_KINDS))) {
-    ranks.accessories[a as AccessoryKind] = parseTrack(t, `${path}.accessories.${a}`, GEAR_MAX_RANK, gearExpToNext)
+    ranks.accessories![a as AccessoryKind] = parseTrack(t, `${path}.accessories.${a}`, GEAR_MAX_RANK, gearExpToNext)
   }
   return ranks
 }

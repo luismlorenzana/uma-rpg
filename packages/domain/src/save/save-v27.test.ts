@@ -7,7 +7,7 @@ import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { replayV15 } from '../rpg/battle/v15-replays.fixture'
 import { RPG_WEAPON_SLOTS } from '../rpg/rules'
 import { toV27 } from './migrations'
-import { parseSave, SAVE_SCHEMA_VERSION, SaveParseError } from './save'
+import { gearV1, parseSave, SAVE_SCHEMA_VERSION, SaveParseError } from './save'
 import { migrated, v15Replay, v26Save, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
 vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
@@ -43,7 +43,7 @@ describe('save v27 with the switch on (H69)', () => {
       for (const setup of Object.values(uma.classes)) expect(setup.weapons).toHaveLength(3)
     }
     // Her crafted Katana is still on.
-    expect(world.umas['102']!.gear.equipped).toEqual({ katana: 'katana-g1' })
+    expect(gearV1(world.umas['102']!).equipped).toEqual({ katana: 'katana-g1' })
     // Written back and read again, the world is the same.
     const save = parseSave(migrated(v26Save(), toV27))
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)

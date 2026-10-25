@@ -6,7 +6,7 @@ import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, starting
 import { beginConvergence, convergenceBlock, riftFightBlock, signUpRift, startRiftFight, sweepEcho } from './rift'
 import { OUTFITS as RIFT_OUTFITS, riftWorldSave, ROSTER, T, TWENTY } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { newSave, type Save, type TierWorld } from './save'
+import { gearV1, newSave, type Save, type TierWorld } from './save'
 
 
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
@@ -102,7 +102,7 @@ describe('the Paladin’s start, with the switch on (H58, §3.3)', () => {
     const save = unlockUma(newSave('Luis', T(0)), '201', T(0), '1', startingClass(strong))
     const uma = worldOf(save).umas['201']!
     expect(uma.classId).toBe('paladin')
-    expect(uma.gear.kinds).toEqual({})
+    expect(gearV1(uma).kinds).toEqual({})
     expect(activeClass(strong, uma)).toBe('paladin')
     // An Uma who never picked keeps her style's class at the switch: a Late surger stays a Cleric.
     expect(activeClass(strong, { classId: null })).toBe('cleric')

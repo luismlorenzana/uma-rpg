@@ -5,7 +5,7 @@ import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, RPG_KIND_PAIRS, rpgWeaponKind, validR
 import { chooseClass, classOf, equipSkills, learnSkill, setClassWeapons, startingClass, type BattleOutfit } from './battle'
 import { applyClassPreset, CLASS_PRESET_ACCESSORIES, classPreset, classPresetPlan, wearClassPreset } from './presets'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
-import { newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
 
 const T = (n: number) => `2026-10-21T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 // Invented outfits only: 101 a front runner (Brawler), 102 pace (Mage), 103 late (Cleric), 104 end (Summoner).
@@ -24,7 +24,7 @@ const stocked = (save: Save, gear: Record<string, number>): Save => edit(save, (
 const ranked = (save: Save, id: string, ref: RankRef, rank: number): Save => editUma(save, id, (u) => ({ ...u, ranks: withTrack(u.ranks, ref, { rank, exp: 0 }) }))
 /** Pieces already bound to her and worn in these slots. */
 const wearing = (save: Save, id: string, equipped: Record<string, string>, kinds: Record<string, ArmorKind> = {}): Save => editUma(save, id, (u) => ({
-  ...u, gear: { locker: [...u.gear.locker, ...Object.values(equipped)], equipped: { ...u.gear.equipped, ...equipped }, kinds: { ...u.gear.kinds, ...kinds } },
+  ...u, gear: { locker: [...gearV1(u).locker, ...Object.values(equipped)], equipped: { ...gearV1(u).equipped, ...equipped }, kinds: { ...gearV1(u).kinds, ...kinds } },
 }))
 const plan = (save: Save, id: string, c: RpgClass) => classPresetPlan(worldOf(save), id, c)
 const roundTrips = (save: Save) => expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
@@ -81,8 +81,8 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     save = wearClassPreset(save, '102', 'mage', T(1))
     const w = worldOf(save)
     expect(w.gear).toEqual({ 'robe-g3': 1 })
-    expect(w.umas['102']!.gear.locker).toEqual(['robe-g1', 'robe-g2'])
-    expect(w.umas['102']!.gear.equipped).toEqual({ body: 'robe-g2' })
+    expect(gearV1(w.umas['102']!).locker).toEqual(['robe-g1', 'robe-g2'])
+    expect(gearV1(w.umas['102']!).equipped).toEqual({ body: 'robe-g2' })
     roundTrips(save)
     // Robe Rank 1 and only grade 2 in stock: grade 1 comes first, so nothing binds and she keeps the Training Robe.
     const short = stocked(unlocked(), { 'robe-g2': 2 })
@@ -101,9 +101,9 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     expect(p.wear.body).toBeNull()
     save = wearClassPreset(save, '101', 'brawler', T(1))
     const uma = worldOf(save).umas['101']!
-    expect(uma.gear.equipped).toEqual({ head: 'helm-g1' })
-    expect(uma.gear.locker).toEqual(['robe-g1', 'helm-g1'])
-    expect(uma.gear.kinds).toEqual({ head: 'helm', body: 'cuirass', legs: 'greaves', arms: 'gauntlets', feet: 'boots' })
+    expect(gearV1(uma).equipped).toEqual({ head: 'helm-g1' })
+    expect(gearV1(uma).locker).toEqual(['robe-g1', 'helm-g1'])
+    expect(gearV1(uma).kinds).toEqual({ head: 'helm', body: 'cuirass', legs: 'greaves', arms: 'gauntlets', feet: 'boots' })
     expect(worldOf(save).gear).toEqual({ 'circlet-g1': 1, 'robe-g1': 1 })
     roundTrips(save)
   })
@@ -125,7 +125,7 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     save = wearClassPreset(save, '101', 'spellblade', T(6))
     const uma = worldOf(save).umas['101']!
     expect(classOf(uma, 'spellblade')).toEqual({ ...before, weapons: p.weapons })
-    expect(uma.gear.equipped).toEqual({ bow: 'bow-g1' })
+    expect(gearV1(uma).equipped).toEqual({ bow: 'bow-g1' })
     roundTrips(save)
   })
 
@@ -134,7 +134,7 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     let save = stocked(unlocked(), { 'orb-greatsword-g1': 1 })
     expect(plan(save, '101', 'brawler')).toMatchObject({ binds: ['orb-greatsword-g1'], wear: { 'accessory-1': 'orb-greatsword-g1' }, changes: 1 })
     save = wearClassPreset(save, '101', 'brawler', T(1))
-    expect(worldOf(save).umas['101']!.gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1' })
+    expect(gearV1(worldOf(save).umas['101']!).equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1' })
     expect(worldOf(save).gear).toEqual({})
     roundTrips(save)
     // An Orb of another kind she wears gives way to her preset's; her Vampire Talisman binds into accessory 2, the Support slot.
@@ -142,8 +142,8 @@ describe('the standard preset per class (H33, classes v2 §7, C6)', () => {
     const p = plan(other, '101', 'brawler')
     expect(p).toMatchObject({ binds: ['orb-greatsword-g1', 'talisman-vampire-g1'], wear: { 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-vampire-g1' }, changes: 2 })
     const after = wearClassPreset(other, '101', 'brawler', T(1))
-    expect(worldOf(after).umas['101']!.gear.equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-vampire-g1' })
-    expect(worldOf(after).umas['101']!.gear.locker).toEqual(expect.arrayContaining(['orb-fire-g1']))
+    expect(gearV1(worldOf(after).umas['101']!).equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'talisman-vampire-g1' })
+    expect(gearV1(worldOf(after).umas['101']!).locker).toEqual(expect.arrayContaining(['orb-fire-g1']))
     expect(worldOf(after).gear).toEqual({ 'amulet-ward-g1': 1 })
     roundTrips(after)
     // With no Orb of her kind to wear, her own Orb stays on.

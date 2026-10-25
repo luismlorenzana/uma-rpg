@@ -10,7 +10,7 @@ import { RPG_CLASS_ARMOR, rpgClasses, rpgDefaultWeapons, rpgWeaponKind, type Rpg
 import { classOf, withClassWeapons } from './battle'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { slotKind, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
 
 /**
  * Each class's suggested accessories in classes v1. The Orb (accessory 1) adds a kind her default spread lacks: the shape
@@ -92,7 +92,8 @@ export function classPresetPlan(world: TierWorld, outfitId: string, classId: Rpg
   if (!uma) throw new SaveRuleError('not-owned', 'not unlocked')
   if (!rpgClasses(engine).includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
   const preset = classPreset(classId, engine)
-  const worn = (slot: GearSlot): string | null => uma.gear.equipped[slot] ?? null
+  const currentGear = gearV1(uma)
+  const worn = (slot: GearSlot): string | null => currentGear.equipped[slot] ?? null
   const binds: string[] = []
   const take = (type: EquipType): string | null => {
     const r = bestReachable(uma, world.gear, type)
@@ -110,7 +111,7 @@ export function classPresetPlan(world: TierWorld, outfitId: string, classId: Rpg
   for (const slot of ARMOR_SLOTS) {
     kinds[slot] = armorKindFor(slot, preset.armor)
     wear[slot] = take(kinds[slot])
-    if (kinds[slot] !== slotKind(uma.gear, slot) || wear[slot] !== worn(slot)) changes++
+    if (kinds[slot] !== slotKind(currentGear, slot) || wear[slot] !== worn(slot)) changes++
   }
   // The Orb in accessory 1, the support in accessory 2: v2's damage and support slots (C10). A slot with nothing of its
   // type keeps what it holds, unless the other slot now takes that type.
@@ -133,6 +134,7 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
   const plan = classPresetPlan(world, outfitId, classId, engine)
   if (plan.changes === 0) return world
   const uma = world.umas[outfitId]!
+  const currentGear = gearV1(uma)
   let gear = world.gear
   if (plan.binds.length) {
     gear = { ...gear }
@@ -141,14 +143,14 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
       if (gear[id] === 0) delete gear[id]
     }
   }
-  const equipped = { ...uma.gear.equipped }
+  const equipped = { ...currentGear.equipped }
   for (const [slot, id] of Object.entries(plan.wear) as [GearSlot, string | null][]) {
     if (id === null) delete equipped[slot]
     else equipped[slot] = id
   }
   const setup = classOf(uma, classId)
   const classes = setup.weapons.every((w, i) => w === plan.weapons[i]) ? uma.classes : { ...uma.classes, [classId]: withClassWeapons(setup, plan.weapons) }
-  const locker = plan.binds.length ? [...uma.gear.locker, ...plan.binds] : uma.gear.locker
+  const locker = plan.binds.length ? [...currentGear.locker, ...plan.binds] : currentGear.locker
   return { ...world, gear, umas: { ...world.umas, [outfitId]: { ...uma, classes, gear: { locker, equipped, kinds: { ...plan.kinds } } } } }
 }
 

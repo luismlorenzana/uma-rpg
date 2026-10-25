@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { newOwnedUma, newSave, newTierWorld, SAVE_SCHEMA_VERSION, unlockUma, type Save, type SaveEnvelope } from '@rpg/domain'
+import { gearV1, newOwnedUma, newSave, newTierWorld, SAVE_SCHEMA_VERSION, unlockUma, type Save, type SaveEnvelope } from '@rpg/domain'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -114,8 +114,8 @@ describe('game store', () => {
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
     expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null], lead: null })
     // A pace outfit starts as a Mage, in five magical kinds; a front one in physical (D160 §7).
-    expect(world?.umas['100201']?.gear.kinds).toEqual({ head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' })
-    expect(world?.umas['100101']?.gear.kinds).toEqual({})
+    expect(gearV1(world!.umas['100201']!).kinds).toEqual({ head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' })
+    expect(gearV1(world!.umas['100101']!).kinds).toEqual({})
     await expect(unlock(outfit('100101'))).rejects.toThrow(/already/)
   })
 
