@@ -4,10 +4,11 @@
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
 import { chapterFor } from '../master/roster'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
 import { rpgChapterReach, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
-import { RPG_FOE_TUNING, rpgFoe, rpgFoeCurveLevel, type RpgFoeRole } from '../rpg/campaign/enemies'
-import { RPG_ELEMENTS, RPG_WEAPON_KINDS, type RpgElement } from '../rpg/kinds'
+import { rpgFoe, rpgFoeCurveLevel, rpgFoeShields, type RpgFoeRole } from '../rpg/campaign/enemies'
+import { RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgTwinsOf, type RpgElement } from '../rpg/kinds'
 import { BIOMES, biomeById, signatureWeaknesses, type Biome, type BiomeDef, type Formation } from './biomes'
 import { bandFranchise, stageFaces, type EnemyRoster, type EnemyTier, type RosterMember } from './roster'
 
@@ -156,8 +157,9 @@ export const TWIN_BOSS_ROW = WORLD_ROWS - 1
 
 /** A region as a small chapter for the battle rules: a start camp, then its twelve stages in a line. Its foes wear the
  * faces of its franchise's units (D135), from `roster`. Its tier is its continent's (Z8, D170): a `w6` region pays Tier 2's
- * Laurels wherever it's built. */
-export function regionChapter(region: WorldRegion, roster: EnemyRoster): RpgCampaignChapter {
+ * Laurels wherever it's built. Its foes are an engine's generation's (D202): to v15 today's weaknesses and shields, from v16
+ * her twins and Tier 1's shields; the live one by default, so the game follows the switch. */
+export function regionChapter(region: WorldRegion, roster: EnemyRoster, engine: number = BATTLE_ENGINE_VERSION): RpgCampaignChapter {
   const biome = biomeById(region.biome)
   const order = Number(region.continentId.slice(1))
   const { tier } = chapterFor(order)
@@ -171,7 +173,7 @@ export function regionChapter(region: WorldRegion, roster: EnemyRoster): RpgCamp
     const kind = i === WORLD_STAGES - 1 ? 'boss' : i === WORLD_STAGES - 2 ? 'sub-boss' : 'fight'
     const level = stageLevel(region, i + 1)
     const faces = stageFaces(roster, franchise, id)
-    const [enemies, ...waves] = stageWaves(level, biome, id, kind, p, faces, reach, region.row === TWIN_BOSS_ROW)
+    const [enemies, ...waves] = stageWaves(level, biome, id, kind, p, faces, reach, region.row === TWIN_BOSS_ROW, engine)
     nodes.push({ id, row: i + 1, col: 2, kind, level, stage: 0,
       name: kind === 'boss' ? `${biome.name} boss` : kind === 'sub-boss' ? 'Elite' : FORMATION[p.formation].name,
       element: p.signature[0] ?? null, note: p.signature.length > 1 ? p.signature.join(' + ') : null, enemies: enemies!,
@@ -192,11 +194,15 @@ export const TWIN_BOSS_HP = 0.55
  * A stage's foes, wave by wave. A pair signature makes dual-element foes (W3): each carries both elements, the lead
  * one alternating by slot. Faces by tier (D135): regular stages Regular units; the elite a Sub-boss with two Key
  * assistants; the boss's opening waves and guards Sub-bosses around a Boss (two on a twin-boss row). Faces never
- * repeat within a stage.
+ * repeat within a stage. From v16 (D202) every foe is weak to her twins (`rpgTwinsOf`, CP5) and the sub-boss and the boss
+ * carry `rpgFoeShields`'s (CP8).
  */
 function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'fight' | 'sub-boss' | 'boss', plan: StagePlan,
-  faces: (tier: EnemyTier, slot: number) => RosterMember | null, reach: number, twin: boolean): BattleEnemy[][] {
+  faces: (tier: EnemyTier, slot: number) => RosterMember | null, reach: number, twin: boolean, engine: number): BattleEnemy[][] {
+  const twins = rpgRework('fight', engine)
+  const shields = rpgFoeShields(engine)
   const weaknesses = (signature: readonly RpgElement[], slot: number, rank: EnemyRank): BattleWeaknesses => {
+    if (twins) return rpgTwinsOf(signature, slot)
     const answers = signatureWeaknesses(signature)
     const key = `${stageId}:${slot}`
     const weapons = [...RPG_WEAPON_KINDS].sort((a, b) => hash(`${key}:${a}`) - hash(`${key}:${b}`))
@@ -239,14 +245,14 @@ function stageWaves(level: number, biome: BiomeDef, stageId: string, kind: 'figh
   const after = (signature: readonly RpgElement[]) => sigs[(sigs.indexOf(signature) + 1) % sigs.length]!
   if (kind === 'sub-boss') {
     // The sub-boss acts twice a round beside her assistants from tier Lv 10 (D141: foes act more, each move answerable).
-    return [[foe(plan.signature, 'sub-boss', 'captain', 1, RPG_FOE_TUNING.subBossShield, 'subboss', curve >= WORLD_BOSS_TWICE_FROM),
+    return [[foe(plan.signature, 'sub-boss', 'captain', 1, shields.subBoss, 'subboss', curve >= WORLD_BOSS_TWICE_FROM),
       ...Array.from({ length: ELITE_ASSISTANTS.count }, () => foe(plan.signature, 'regular', 'guard', ELITE_ASSISTANTS.hp, ELITE_ASSISTANTS.shield, 'key'))]]
   }
   if (kind === 'boss') {
     // Two lighter waves of sub-bosses on the biome's other signatures lead to the boss (or two) and her sub-boss guards.
     const share = WAVE_HP[BOSS_WAVES]!
     // A lone boss acts twice from tier Lv 10 (D141), so a fresh party's first bosses stay within reach; twin bosses once each.
-    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, RPG_FOE_TUNING.bossShield, 'boss', !twin && curve >= WORLD_BOSS_TWICE_FROM)
+    const champion = (hp: number) => foe(plan.signature, 'boss', 'champion', hp, shields.boss, 'boss', !twin && curve >= WORLD_BOSS_TWICE_FROM)
     const guard = () => foe(plan.signature, 'regular', 'guard', 0.8, 2, 'subboss')
     return [formation(biome.formations[0]!, after(plan.signature), share, 0, 'subboss'), formation('trio', after(after(plan.signature)), share, 1, 'subboss'),
       twin ? [champion(TWIN_BOSS_HP), champion(TWIN_BOSS_HP), guard()] : [champion(1), guard(), guard()]]

@@ -1,11 +1,11 @@
 // The Rift's fights (docs/design/rift.md §4–§9, D161; built in H47, D173): any front stage, Convergence fight or Echo as
 // the `BattleEnemy` waves the engine takes, with engine v14's foe traits where the front calls for them (D169). Pure and
 // deterministic: the same context and fight give the same foes, weaknesses and faces; only a retry's seed is new.
-import { BATTLE_ENGINE_VERSION } from '../rpg/battle/engine'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/engine'
 import type { BattleAlly, BattleEnemy, BattleInput, BattleWeaknesses } from '../rpg/battle/types'
 import { rpgChapterReach } from '../rpg/campaign/chapters'
 import { RPG_FOE_ROLES, rpgFoe, rpgFoeCurveLevel } from '../rpg/campaign/enemies'
-import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS } from '../rpg/rules'
+import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, rpgTwinWeaknesses, type RpgElement } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
 import { WORLD_TUNING } from '../world/world'
 import { RIFT_FRONT_SPECS, riftShape, riftTuning, type RiftSlot, type RiftTuning } from './fronts'
@@ -70,13 +70,25 @@ export function riftStrength(ref: RiftFightRef, engine: number = BATTLE_ENGINE_V
 const ordered = <T extends string>(list: readonly T[], key: string): T[] => [...list].sort((a, b) => riftSeed(`${key}:${a}`) - riftSeed(`${key}:${b}`))
 const canonical = <T extends string>(list: readonly T[], all: readonly T[]): T[] => [...list].sort((a, b) => all.indexOf(a) - all.indexOf(b))
 
+/** The five twin sets the Rift draws from v16 (CP7): each an element and its twin Arm; Twilight is the world's alone. */
+const RIFT_TWIN_SETS: readonly RpgElement[] = RPG_ELEMENTS
+/** Twin sets as one foe's weaknesses: their Arms and their elements, in canonical order (the pairs share it). */
+const twinSets = (sets: readonly RpgElement[]): BattleWeaknesses => {
+  const each = canonical(sets, RIFT_TWIN_SETS).map(rpgTwinWeaknesses)
+  return { weapons: each.flatMap((w) => w.weapons), elements: each.flatMap((w) => w.elements) }
+}
+
 /** One wave's weaknesses (§5), from the front, never the face: Iron Arms only and Arcane elements only, by rank, a pair's
- * differing; the Duel both, by stage; the Horde one of each, dealt from the 25 pairs so no two foes of a wave share one. */
+ * differing; the Duel both, by stage; the Horde one of each, dealt from the 25 pairs so no two foes of a wave share one.
+ * From v16 (CP7, D202) the Duel draws `duel.sets` twin sets, and the Horde deals each foe a twin set, a wave repeating
+ * none until all five are dealt (a champion pair's partners, dealt first, differ); Iron and Arcane draw as before. */
 function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot[], keyOf: (k: number) => string,
-  tuning: RiftTuning): BattleWeaknesses[] {
+  tuning: RiftTuning, engine: number): BattleWeaknesses[] {
   const t = tuning.weak
+  const twins = rpgRework('fight', engine)
   const taken = new Set<string>()
   const deal = RPG_WEAPON_KINDS.flatMap((w) => RPG_ELEMENTS.map((e) => [w, e] as const))
+  const deck: RpgElement[] = []
   /** `count` kinds of `all` by the slot's seed; a pair's later foe takes kinds her partners don't have first. */
   const draw = <T extends string>(all: readonly T[], count: number, slot: RiftSlot, key: string): T[] => {
     const order = ordered(all, key)
@@ -89,9 +101,17 @@ function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot
     switch (front) {
       case 'iron': return { weapons: draw(RPG_WEAPON_KINDS, t.iron[slot.rank], slot, `${key}:arms`), elements: [] }
       case 'arcane': return { weapons: [], elements: draw(RPG_ELEMENTS, t.arcane[slot.rank], slot, `${key}:elements`) }
-      case 'duel': return { weapons: draw(RPG_WEAPON_KINDS, t.duel.weapons[stage - 1]!, slot, `${key}:arms`),
-        elements: draw(RPG_ELEMENTS, t.duel.elements[stage - 1]!, slot, `${key}:elements`) }
+      case 'duel': {
+        const sets = twins ? t.duel.sets?.[stage - 1] : undefined
+        if (sets !== undefined) return twinSets(draw(RIFT_TWIN_SETS, sets, slot, `${key}:sets`))
+        return { weapons: draw(RPG_WEAPON_KINDS, t.duel.weapons[stage - 1]!, slot, `${key}:arms`),
+          elements: draw(RPG_ELEMENTS, t.duel.elements[stage - 1]!, slot, `${key}:elements`) }
+      }
       case 'horde': {
+        if (twins) {
+          if (!deck.length) deck.push(...RIFT_TWIN_SETS)
+          return twinSets(deck.splice(riftSeed(`${key}:set`) % deck.length, 1))
+        }
         const [weapon, element] = deal.splice(riftSeed(`${key}:pair`) % deal.length, 1)[0]!
         return { weapons: [weapon], elements: [element] }
       }
@@ -130,7 +150,7 @@ export function riftFight(ctx: RiftContext, ref: RiftFightRef, engine: number = 
   let next = 0
   const waves = riftShape(front, stage, engine).map((wave) => {
     const first = next
-    const weak = waveWeaknesses(front, stage, wave, (k) => keyOf(first + k), tuning)
+    const weak = waveWeaknesses(front, stage, wave, (k) => keyOf(first + k), tuning, engine)
     return wave.map((slot, k): BattleEnemy => {
       const n = next++
       const key = keyOf(n)

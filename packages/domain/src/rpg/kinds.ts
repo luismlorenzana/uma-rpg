@@ -3,6 +3,7 @@
 // hit one foe hard, Axe and Ice every foe, Lance and Lightning random foes, Bow and Light one foe many times, Katana and
 // Dark twice.
 import { BATTLE_ENGINE_VERSION, rpgV2 } from './battle/caps'
+import type { BattleWeaknesses } from './battle/types'
 
 /** Elements that can be weaknesses. Fire > Ice > Lightning > Fire; Light ↔ Dark. */
 export const RPG_ELEMENTS = ['fire', 'ice', 'lightning', 'light', 'dark'] as const
@@ -58,6 +59,37 @@ export function rpgElementWeakness(element: RpgElement): RpgElement {
 /** The element this one beats: Fire beats Ice, Ice beats Lightning, Lightning beats Fire. */
 export function rpgElementBeats(element: 'fire' | 'ice' | 'lightning'): 'fire' | 'ice' | 'lightning' {
   return ({ fire: 'ice', ice: 'lightning', lightning: 'fire' } as const)[element]
+}
+
+// --- Twins (the Tier rework, CP5, D202; class-progression.md §4.1) ------------------------------------------------------
+
+/** A twin set: an element and its twin Arm, named by the element, or Twilight (the Bow and the Katana, Light + Dark's). */
+export type RpgTwinSet = RpgElement | 'twilight'
+/** The six twin sets' kinds, Arm first. */
+export const RPG_TWIN_SETS: Readonly<Record<RpgTwinSet, readonly RpgDamageKind[]>> = {
+  fire: ['greatsword', 'fire'], ice: ['axe', 'ice'], lightning: ['lance', 'lightning'], light: ['bow', 'light'], dark: ['katana', 'dark'],
+  twilight: ['bow', 'katana'],
+}
+/** The twin sets in order: the five elements' (the Rift's draws), then Twilight. */
+export const RPG_TWIN_SET_IDS = Object.keys(RPG_TWIN_SETS) as readonly RpgTwinSet[]
+/** An element's twin Arm, its partner in `RPG_KIND_PAIRS`: Fire's the Greatsword, Dark's the Katana. */
+export const rpgTwinArm = (element: RpgElement): RpgWeaponKind => RPG_KIND_PAIRS.find(([, e]) => e === element)![0]
+/** A twin set as a foe's weaknesses: its Arms and its element. */
+export function rpgTwinWeaknesses(set: RpgTwinSet): BattleWeaknesses {
+  return { weapons: RPG_TWIN_SETS[set].filter(isRpgWeaponKind), elements: RPG_TWIN_SETS[set].filter(isRpgElement) }
+}
+/** A foe's twins (v16, CP5): what beats her lead element (by slot, W3, as her `element`), or her second's when that is her
+ * own, and its twin Arm; Light + Dark answer to no element, so Twilight. Never her own element. */
+export function rpgTwinsOf(signature: readonly RpgElement[], slot: number): BattleWeaknesses {
+  const n = signature.length
+  const reads = n ? [signature[slot % n]!, ...(n > 1 ? [signature[(slot + 1) % n]!] : [])] : []
+  const answer = reads.map(rpgElementWeakness).find((e) => !signature.includes(e))
+  return rpgTwinWeaknesses(answer ?? 'twilight')
+}
+/** The twin sets a list of kinds answers (holds either kind of), in order; an Uma's `weapons` pass as they are. */
+export function rpgAnsweredTwinSets(kinds: readonly (RpgDamageKind | RpgWeapon)[]): RpgTwinSet[] {
+  const held = new Set<RpgDamageKind>(kinds.map((k) => (isRpgTome(k) ? rpgWeaponKind(k) : k)))
+  return RPG_TWIN_SET_IDS.filter((set) => RPG_TWIN_SETS[set].some((k) => held.has(k)))
 }
 
 /** Statuses on foes (from allies) and on allies (from the Cleric and summons), plus the foes' own D265 statuses. */
