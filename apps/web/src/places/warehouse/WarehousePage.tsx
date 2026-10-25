@@ -2,7 +2,7 @@
 // Gem and unbound piece of gear you own, by grade; anything can be sold for a few Laurels (far below its Exchange price).
 import { ShelfView, type Price, type ShelfItem } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
-import { EFFECT_LABEL, gemById, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type Shelf } from '@rpg/domain'
+import { EFFECT_LABEL, gearStock, gemById, gemStock, ITEM_FAMILIES, itemById, SaveRuleError, sellPrice, type Shelf } from '@rpg/domain'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { sell, useWorld } from '../../save/game'
@@ -28,8 +28,8 @@ export default function WarehousePage() {
   }
   const items: Stock[] = [
     ...MATERIAL_ORDER.filter((id) => (world.items[id] ?? 0) > 0).map((id) => stock('items', id, world.items[id]!)),
-    ...Object.entries(world.gems).filter(([, n]) => n > 0).map(([id, n]) => stock('gems', id, n)),
-    ...Object.entries(world.gear).filter(([, n]) => n > 0).map(([id, n]) => stock('gear', id, n)),
+    ...Object.entries(gemStock(world)).filter(([, n]) => n > 0).map(([id, n]) => stock('gems', id, n)),
+    ...Object.entries(gearStock(world)).filter(([, n]) => n > 0).map(([id, n]) => stock('gear', id, n)),
   ]
   const total = (shelf: Shelf) => items.filter((i) => i.shelf === shelf).reduce((a, i) => a + i.count, 0)
   const price = (i: Stock): Price | null => { const amount = sellPrice(i.shelf, i.id); return amount > 0 ? { mark: LAUREL, amount } : null }

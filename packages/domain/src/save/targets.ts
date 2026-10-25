@@ -12,7 +12,7 @@ import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { gearV1, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearStock, gearV1, gemStock, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
 
 /** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -108,7 +108,7 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
     for (const [key, n] of targetDemand(uma, activeClassOf(id))) demand.set(key, (demand.get(key) ?? 0) + n)
   }
   const { coming, held } = jobSupply(world)
-  const owned = (id: string) => (gearById(id) ? world.gear[id] : gemById(id) ? world.gems[id] : world.items[id]) ?? 0
+  const owned = (id: string) => (gearById(id) ? gearStock(world)[id] : gemById(id) ? gemStock(world)[id] : world.items[id]) ?? 0
   const plan = planRequirements({
     demand, recipe: recipeOf,
     supply: (id) => ({ onHand: Math.max(0, owned(id) - (held.get(id) ?? 0)), coming: coming.get(id) ?? 0 }),

@@ -97,7 +97,7 @@ describe('can upgrade (H34)', () => {
       const uma = w.umas['101']!
       const worn = (slot: GearSlot) => (gearV1(uma).equipped[slot] ? grade(gearV1(uma).equipped[slot]!) : 0)
       const ready = (match: (type: EquipType) => boolean, above: number) =>
-        gearChoices(uma, w.gear, (p) => match(p.type)).some((c) => !equipBlock(uma, c.id) && grade(c.id) > above)
+        gearChoices(uma, w.gear!, (p) => match(p.type)).some((c) => !equipBlock(uma, c.id) && grade(c.id) > above)
       const expected: GearSlot[] = classOf(uma, 'brawler').weapons.filter((t) => ready((p) => p === t, worn(t)))
       for (const slot of ARMOR_SLOTS) if (ready((p) => p === slotKind(gearV1(uma), slot), worn(slot))) expected.push(slot)
       const typeIn = (slot: GearSlot) => (gearV1(uma).equipped[slot] ? gearIdentity(gearV1(uma).equipped[slot]!)!.type : undefined)

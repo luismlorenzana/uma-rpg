@@ -66,7 +66,7 @@ describe('R2\'s places over the save', () => {
     expect(worldOf(save).items).toEqual({ 'pine-plank': 1 })
     const done = collectJob(save, 'forge', 0, at(4 * GATHER_MS)).save
     expect(worldOf(done).items).toEqual({ 'pine-plank': 1, 'weapon-gem-g1': 1 })
-    expect(worldOf(done).gear).toEqual({})
+    expect(worldOf(done).gear).toBeUndefined()
   })
 
   it('takes 30 minutes off with a Speed Ticket', () => {

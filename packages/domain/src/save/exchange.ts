@@ -18,7 +18,7 @@ import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
 import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
 import { stageBand, stagePay } from '../world/world'
-import { isGrades, PARTY_SIZE, type Save, type TierWorld } from './save'
+import { gearStock, gemStock, isGrades, PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 
 export const MAX_PURCHASE = 99
@@ -250,7 +250,7 @@ export function sellPrice(shelf: Shelf, id: string, tier: string | number = TIER
 
 export function sellStock(save: Save, shelf: Shelf, id: string, quantity: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
-  const stock = world[shelf]
+  const stock = shelf === 'items' ? world.items : shelf === 'gems' ? gemStock(world) : gearStock(world)
   const have = stock[id] ?? 0
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > have) throw new SaveRuleError('bad-count', `you have ${have}`)
   const price = sellPrice(shelf, id, tier)

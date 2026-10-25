@@ -18,7 +18,7 @@ import {
 } from '../economy/gear'
 import { classOf } from './class'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { gearV1, isGrades, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearStock, gearV1, isGrades, type OwnedUma, type Save, type TierWorld } from './save'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
@@ -98,7 +98,7 @@ export function equipGear(save: Save, outfitId: string, gearId: string, now: str
     const there = current.equipped[other] ? gearById(current.equipped[other]!) : undefined
     if (there?.type === piece.type) throw new SaveRuleError('bad-loadout', 'she already wears one of these')
   }
-  let gear = world.gear
+  let gear = gearStock(world)
   let locker = current.locker
   if (!locker.includes(gearId)) {
     if ((gear[gearId] ?? 0) < 1) throw new SaveRuleError('no-items', 'none in stock')

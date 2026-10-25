@@ -9,7 +9,7 @@ import { isMapNode, mapNodeGate, MAP_NODES, nodeBody, nodeJewel, nodeNumeral, ty
 import { madeName } from '../items/made'
 import { madeIdentity } from '../items/made-id'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { isStarMap, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
+import { gemStock, isStarMap, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
@@ -39,13 +39,14 @@ export function setGem(save: Save, outfitId: string, gemId: string, now: string,
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'only owned Umas set gems')
   if (isStarMap(uma.stars)) throw new SaveRuleError('bad-job', STAR_GEMS_RETIRED)
-  if ((world.gems[gemId] ?? 0) < 1) throw new SaveRuleError('no-items', 'none of that gem left')
+  const stock = gemStock(world)
+  if ((stock[gemId] ?? 0) < 1) throw new SaveRuleError('no-items', 'none of that gem left')
   const block = gemBlock(uma, gemId)
   if (block) throw new SaveRuleError('bad-job', block)
   const node = nodeFromGem(uma, gemId)!
   const unlocked = [...uma.stars.unlocked, node]
   const active = uma.stars.active.length < activeNodeSlots(uma.level) ? [...uma.stars.active, node] : uma.stars.active
-  const gems = { ...world.gems, [gemId]: world.gems[gemId]! - 1 }
+  const gems = { ...stock, [gemId]: stock[gemId]! - 1 }
   if (gems[gemId] === 0) delete gems[gemId]
   const next: TierWorld = { ...world, gems, umas: { ...world.umas, [outfitId]: { ...uma, stars: { unlocked, active } } } }
   return { save: withWorld(save, tier, next, now), node }

@@ -65,7 +65,9 @@ function withWorld(save: Save, tier: string, world: TierWorld, now: string): Sav
 /**
  * Spends one Uma Ticket on an outfit; final once committed (D44). `startClass` is her starting class, which picks her
  * armor kinds (D160 §7); without it she starts all-physical. From engine v16 every start is also written as her class
- * (H67); to v15 only a Paladin start (classes v2, D180). An outfit any world owns is refused: she lives in one (§3).
+ * (H67); to v15 only a Paladin start (classes v2, D180). Once R2's economy is live she arrives in save v28's shape, with
+ * no armor kinds: the half is her class's (`newOwnedUma`, H74, H78). An outfit any world owns is refused: she lives in
+ * one (§3).
  */
 export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER_ONE, startClass?: RpgClass): Save {
   const world = worldOf(save, tier)
@@ -77,6 +79,14 @@ export function unlockUma(save: Save, outfitId: string, now: string, tier = TIER
     wallet: { ...world.wallet, unlockTickets: world.wallet.unlockTickets - 1 },
     umas: { ...world.umas, [outfitId]: newOwnedUma(now, startClass) },
   }, now)
+}
+
+/** The first launch's sheet was seen (save v28, PP25; H80's "Got it"): that world's grant is marked `seen`. A world with
+ * no grant, or one seen already, is returned as it is. */
+export function markGrantSeen(save: Save, tier: string, now: string): Save {
+  const world = worldOf(save, tier)
+  if (!world.grant || world.grant.seen) return save
+  return withWorld(save, tier, { ...world, grant: { ...world.grant, seen: true } }, now)
 }
 
 /** Where an Uma sits, or null when she's in no party. */

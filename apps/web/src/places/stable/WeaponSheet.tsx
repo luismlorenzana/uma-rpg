@@ -8,8 +8,8 @@
 // grades she has spent.
 import {
   ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
-  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearV1, isAccessory, isMagicalArmor, isOrb, isRpgTome,
-  isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
+  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isMagicalArmor, isOrb,
+  isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
   type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
   type TierWorld,
 } from '@rpg/domain'
@@ -76,7 +76,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   const kinds = rpgPicksWeapons(classId)
     ? [here, ...rpgClassWeapons(classId).filter((w) => w !== here && (kind === 'any' || (kind === 'tome') === isRpgTome(w)))]
     : [here]
-  const pieces = (w: RpgWeapon) => gearChoices(uma, world.gear, (p) => p.type === w)
+  const pieces = (w: RpgWeapon) => gearChoices(uma, gearStock(world), (p) => p.type === w)
   const held = (w: RpgWeapon, id: string | null) => here === w && (gear.equipped[w] ?? null) === id
   const choose = (w: RpgWeapon, id: string | null) =>
     hold(outfitId, classId, slot, w, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -112,7 +112,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
                         <span className="block truncate text-[13px] font-semibold">{out.name} · G{out.grade}</span>
                         <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
                       </span>
-                      <span className="shrink-0 text-[11px] text-ink-faint">{held(w, id) ? 'Held' : bound ? 'Hers' : `Stock ×${world.gear[id]} · binds`}</span>
+                      <span className="shrink-0 text-[11px] text-ink-faint">{held(w, id) ? 'Held' : bound ? 'Hers' : `Stock ×${gearStock(world)[id]} · binds`}</span>
                     </button>
                   </li>
                 )
@@ -135,7 +135,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
   const gear = gearV1(uma)
   const here = slotKind(gear, slot)
   const kinds = [here, ...ARMOR_SLOT_KINDS[slot].filter((k) => k !== here)] as ArmorKind[]
-  const pieces = (kind: ArmorKind) => gearChoices(uma, world.gear, (p) => p.type === kind)
+  const pieces = (kind: ArmorKind) => gearChoices(uma, gearStock(world), (p) => p.type === kind)
   const held = (kind: ArmorKind, id: string | null) => here === kind && (gear.equipped[slot] ?? null) === id
   const choose = (kind: ArmorKind, id: string | null) =>
     wearArmorPiece(outfitId, slot, kind, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -169,7 +169,7 @@ export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: 
                         <span className="block truncate text-[13px] font-semibold">{out.name} · G{out.grade}</span>
                         <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
                       </span>
-                      <span className="shrink-0 text-[11px] text-ink-faint">{held(kind, id) ? 'Worn' : bound ? 'Hers' : `Stock ×${world.gear[id]} · binds`}</span>
+                      <span className="shrink-0 text-[11px] text-ink-faint">{held(kind, id) ? 'Worn' : bound ? 'Hers' : `Stock ×${gearStock(world)[id]} · binds`}</span>
                     </button>
                   </li>
                 )
@@ -194,7 +194,7 @@ export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfit
   const choose = (id: string | null) =>
     wearAccessoryPiece(outfitId, slot, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   const groups = accessorySheetTypes(slot, otherType).map(({ kind, types }) => ({
-    kind, types: types.map((t) => ({ t, pieces: gearChoices(uma, world.gear, (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
+    kind, types: types.map((t) => ({ t, pieces: gearChoices(uma, gearStock(world), (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
   })).filter((g) => g.types.length > 0)
   return (
     <BottomSheet title={ACCESSORY_SLOT_LABEL[slot]} onClose={onClose}>
@@ -222,7 +222,7 @@ export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfit
                         <span className="block truncate text-[13px] font-semibold">{EQUIP_LABEL[t]} · G{out.grade}</span>
                         <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
                       </span>
-                      <span className="shrink-0 text-[11px] text-ink-faint">{worn ? 'Worn' : bound ? 'Hers' : `Stock ×${world.gear[id]} · binds`}</span>
+                      <span className="shrink-0 text-[11px] text-ink-faint">{worn ? 'Worn' : bound ? 'Hers' : `Stock ×${gearStock(world)[id]} · binds`}</span>
                     </button>
                   </li>
                 )

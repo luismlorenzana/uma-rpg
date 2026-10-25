@@ -4,7 +4,7 @@
 // Laurels and who may work are v1's (`env.ts`), which stays as it is for the deployed game and the migrations.
 // `liveWorkEnv` picks by `rpgRework('economy')`, so the live game keeps v1's env until R2's switch (H82).
 import { buildingTable, type WorkEnv } from '@luismlorenzana/uma-work'
-import { PLACES_V3, type TradeOf } from '../economy/professions'
+import { PLACE_SLOTS_V3, PLACE_SPEED_V3, PLACES_V3, type TradeOf } from '../economy/professions'
 import { worldMaterialTier } from '../items/made'
 import { rpgRework } from '../rpg/battle/caps'
 import type { TierWorld } from '../save/save'
@@ -15,9 +15,7 @@ import { materialKindV3 } from './kinds-v3/material'
 export { openShop, tradeBlock, ANOTHER_TRADE, TRADE_REFUSAL } from './kinds-v3/trade'
 export { madeLive } from './kinds-v3/make'
 
-/** Every place's slots and speed from day 1 (PP4): one level, nothing to upgrade. */
-export const PLACE_SLOTS_V3 = 4
-export const PLACE_SPEED_V3 = 1.25
+export { PLACE_SLOTS_V3, PLACE_SPEED_V3 } from '../economy/professions'
 
 /** The ten places as buildings, in the Wilds' order (the engine's tie-break order). */
 export const RPG_BUILDINGS_V3 = buildingTable(Object.fromEntries(PLACES_V3.map((p) => [p.id, { slots: [PLACE_SLOTS_V3], speed: [PLACE_SPEED_V3], upgrades: [] }])))

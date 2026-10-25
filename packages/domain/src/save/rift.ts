@@ -2,6 +2,8 @@
 // roster, front fights and seals, the Convergence and its attempts, Echoes and their pay, Sweeps, the defeated faces and
 // the achievement hook, and promotion to the next tier. Pure functions over the save that return a new save or throw
 // SaveRuleError, like every rule file. Lazy: only `@rpg/domain/rift` loads it (its selectors live in `rift/state.ts`).
+import { gradeItemId, newGrades, type GearTier, type GradeTarget, type UmaGrades } from '../economy/grades'
+import type { ArmorSlot } from '../economy/ranks'
 import { achievementsEarned, type AchievementGrant } from '../rift/achievements'
 import { RIFT_FRONT_SPECS } from '../rift/fronts'
 import { defeatedBefore, riftBattleInput, riftFight, riftSeed, type RiftContext } from '../rift/generate'
@@ -13,7 +15,7 @@ import { applyBattleAction, createBattle, replayBattle } from '../rpg/battle/eng
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 import { rpgBattleExp } from '../rpg/campaign/rewards'
 import { RPG_MAX_BATTLE_ACTIONS, rpgCarriedMp, rpgMemberLevel, rpgPartyAllies, RPG_REFUSED } from '../rpg/campaign/run'
-import { RPG_TIER_MAX_LEVEL } from '../rpg/rules'
+import { RPG_TIER_MAX_LEVEL, type RpgWeapon } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
 import {
   activeClass, callingConfirmed, classOf, fillRanks, healerBlock, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain,
@@ -21,7 +23,7 @@ import {
 import { MAX_PURCHASE, mergeGains } from './exchange'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, TIERS, tierKey, worldOf } from './rules'
-import { gearV1, MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, type Account, type Party, type Save, type TierWorld } from './save'
+import { gearV1, isGrades, MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, type Account, type OwnedUma, type Party, type Save, type TierWorld } from './save'
 import { workOf } from './status'
 
 /** Echoes pay this many times a stage's Class and gear rank EXP (R6). */
@@ -526,13 +528,35 @@ function seatArrivals(parties: readonly Party[], moved: readonly Party[], roster
   return next
 }
 
+/** The made items a graded Uma's grades used (R2's build decision 9; WP §3.10, GE14): a weapon kind or armor slot at
+ * grade g its line's G1 … Gg, an accessory slot at g Accessory Settings G1 … Gg. */
+function gradeItemsUsed(uma: OwnedUma): string[] {
+  if (!isGrades(uma.gear)) return []
+  const { weapons, armor, accessories } = uma.gear
+  const climb = (target: GradeTarget, grade: number) => Array.from({ length: grade }, (_, i) => gradeItemId(target, i + 1))
+  return [
+    ...Object.entries(weapons).flatMap(([weapon, g]) => climb({ kind: 'weapon', weapon: weapon as RpgWeapon }, g?.grade ?? 0)),
+    ...Object.entries(armor).flatMap(([slot, g]) => climb({ kind: 'armor', slot: slot as ArmorSlot }, g?.grade ?? 0)),
+    ...accessories.flatMap((a, slot) => climb({ kind: 'accessory', slot }, a.grade)),
+  ]
+}
+
+/** A graded Uma as she arrives in Tier `to`: G0 everywhere, keeping each accessory slot's family and kind (the forms stay
+ * known, WP §5.3). */
+function arrivingGrades(uma: OwnedUma, to: number): UmaGrades {
+  const fresh = newGrades(Math.min(3, to) as GearTier)
+  const was = isGrades(uma.gear) ? uma.gear.accessories : []
+  return { ...fresh, accessories: fresh.accessories.map((slot, i) => (was[i] ? { ...slot, family: was[i]!.family, ...(was[i]!.kind ? { kind: was[i]!.kind } : {}) } : slot)) }
+}
+
 /**
  * Ascends a won run's twenty to Tier t+1 in one transaction (tiers.md §5, R7). In the old world each leaves its Umas,
  * parties, targets, carried MP and work rows; a Hero's seat empties (its Learners leave, T4) and she leaves every seat she
- * learns in; every piece she owns returns to its gear stock. The new world (created with no Uma Tickets, D5) gets each at
- * Lv 1 with her class and armor halves and her calling pick (save v27, H69), nothing else of hers; its wallet gains the
- * purse (T5) and her banked EXP as Class Marks (T3), and her parties move with her. The run is ascended and each Uma's
- * history records the climb.
+ * learns in; every piece she owns returns to its gear stock, or, graded (save v28, H78), the made items her grades used
+ * return to its Warehouse, her open jewels not. The new world (created with no Uma Tickets, D5) gets each at Lv 1 with her
+ * class and armor halves and her calling pick (save v27, H69), or graded at G0 with her accessory slots' forms, nothing
+ * else of hers; its wallet gains the purse (T5) and her banked EXP as Class Marks (T3), and her parties move with her.
+ * The run is ascended and each Uma's history records the climb.
  */
 export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; summary: AscendSummary } {
   const block = ascendBlock(save, tier)
@@ -541,12 +565,14 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
   const world = worldOf(save, tier)
   const run = openRiftRun(world.rift)!
   const leaving = new Set(run.roster)
-  // The old world: they leave, and their gear stays in its stock (D15).
-  const umas = { ...world.umas }, gear = { ...world.gear }, mp = { ...world.world.run.mp }, work = { ...world.work }
+  // The old world: they leave, and their gear stays in its stock (D15), or their grades' made items in its Warehouse.
+  const umas = { ...world.umas }, mp = { ...world.world.run.mp }, work = { ...world.work }, items = { ...world.items }
+  const gear = world.gear ? { ...world.gear } : undefined
   let classMarks = 0
   for (const id of run.roster) {
     const uma = world.umas[id]!
-    for (const piece of ownGear(uma)) gear[piece] = (gear[piece] ?? 0) + 1
+    if (gear) for (const piece of ownGear(uma)) gear[piece] = (gear[piece] ?? 0) + 1
+    for (const item of gradeItemsUsed(uma)) items[item] = (items[item] ?? 0) + 1
     classMarks += bankedMarks(uma.exp)
     delete umas[id]
     delete mp[id]
@@ -559,7 +585,7 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
   }
   const { parties, moved } = emptyParties(world.parties, leaving)
   const old: TierWorld = {
-    ...world, umas, gear, work, heroes, parties, targets: world.targets.filter((id) => !leaving.has(id)),
+    ...world, umas, items, ...(gear ? { gear } : {}), work, heroes, parties, targets: world.targets.filter((id) => !leaving.has(id)),
     world: { ...world.world, run: { ...world.world.run, mp } },
     rift: withLastRun(world.rift, { ...run, ascendedAt: now }),
   }
@@ -568,7 +594,8 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
   const arrivals = Object.fromEntries(run.roster.map((id) => {
     const uma = world.umas[id]!
     const fresh = newOwnedUma(uma.unlockedAt)
-    return [id, { ...fresh, classId: uma.classId, gear: { ...gearV1(fresh), kinds: { ...gearV1(uma).kinds } }, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
+    const gearOut = isGrades(uma.gear) ? arrivingGrades(uma, to) : { ...gearV1(fresh), kinds: { ...gearV1(uma).kinds } }
+    return [id, { ...fresh, classId: uma.classId, gear: gearOut, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
   }))
   const n = run.roster.length
   const laurels = ASCEND_PURSE.laurels * n, speedTickets = ASCEND_PURSE.speedTickets * n

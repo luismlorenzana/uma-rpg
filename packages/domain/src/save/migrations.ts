@@ -1,6 +1,7 @@
 // Legacy migrations are needed only for old saves, not every current-save boot (H16).
-import { FACILITY_SLOTS, grantProfessionExp, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
+import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
 import { facilitySpec } from '../economy/jobs'
+import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
 import { gearById } from '../economy/gear'
 
@@ -200,7 +201,8 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-export function migrateWorld(raw: unknown, version: number): unknown {
+/** Every step to v27 for a world of `tier` (its key; v28 doesn't read it, R3's v29 does, H87). */
+export function migrateWorld(raw: unknown, version: number, _tier = 1): unknown {
   const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
   const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
   const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14
@@ -215,6 +217,199 @@ export function migrateWorld(raw: unknown, version: number): unknown {
   const v25 = version < 25 && isRecord(v24) ? toV25(v24) : v24
   const v26 = version < 26 && isRecord(v25) ? toV26(v25) : v25
   return version < 27 && isRecord(v26) ? toV27(v26) : v26
+}
+
+// --- v27 → v28 (D214): R2, the Tier rework's economy. Written in H78, chained by H82 with SAVE_SCHEMA_VERSION 28 -------
+
+/** §14.7's conversion (PR14 kept), by legacy family: the v3 pair its grades 1–5 become, then grades 6–10's, raw before
+ * refined. Literals: a migration step is frozen history. */
+const V28_PAIRS: Readonly<Record<string, readonly [readonly [string, string], readonly [string, string]]>> = {
+  ores: [['copper-ore', 'copper-ingot'], ['iron-ore', 'iron-ingot']],
+  stones: [['copper-ore', 'copper-ingot'], ['iron-ore', 'iron-ingot']],
+  woods: [['pine-log', 'pine-plank'], ['cedar-log', 'cedar-plank']],
+  fibers: [['carrot', 'chopped-carrot'], ['cabbage', 'shredded-cabbage']],
+  essences: [['carp', 'carp-fillet'], ['sardine', 'sardine-fillet']],
+  'bones-horns': [['carp', 'carp-fillet'], ['sardine', 'sardine-fillet']],
+  crystals: [['quartz', 'cut-quartz'], ['citrine', 'cut-citrine']],
+  'hides-scales': [['quartz', 'cut-quartz'], ['citrine', 'cut-citrine']],
+}
+/** Each legacy item id by its legacy meaning (the frozen catalog): 36 ids keep their name and change meaning in v3. */
+const V27_ITEMS = new Map<string, { family: string; grade: number; refined: boolean }>(ITEM_FAMILIES.flatMap((f) => [
+  ...f.raw.map((id, i) => [id, { family: f.id, grade: i + 1, refined: false }] as const),
+  ...f.refined.map((id, i) => [id, { family: f.id, grade: i + 1, refined: true }] as const),
+]))
+/** A legacy item's v28 id: its family's pair for its band, raw or refined as it was; undefined for an id the legacy
+ * catalog doesn't know (left for the parse). */
+function v28Item(id: string): string | undefined {
+  const old = V27_ITEMS.get(id)
+  const pair = old && V28_PAIRS[old.family]?.[old.grade <= 5 ? 0 : 1]
+  return pair ? pair[old.refined ? 1 : 0] : undefined
+}
+/** v27's facility upgrades (`FACILITY_UPGRADE`), as literals: level 2 took 150 Laurels and one grade-2 refined item of each
+ * of its two families; level 3 500 more and two grade-5 of each. */
+const V27_UPGRADES = [{ laurels: 150, grade: 2, count: 1 }, { laurels: 500, grade: 5, count: 2 }] as const
+/** One ticket per 30 minutes of the manual's job time: Craft EXP pays 2 a minute (PP24). */
+const V28_EXP_PER_TICKET = 60
+/** The floor's pace (PP20): Craft Lv 25's manual times. */
+const V28_FLOOR_LEVEL = 25
+/** A deleted gear piece in quarters of a gather: two gathers, two refines (a quarter each) and a craft of two gathers. */
+const V28_PIECE_QUARTERS = 18
+/** A Star Gem's refined items by its recipe (`economy/gems.ts`, frozen): a moon gem one, plus a side from grade 4 and a
+ * second from grade 8; a bridge gem two, plus a side at grade 7; a Sun gem one of each of the eight families. */
+function v27GemRefined(id: string): number {
+  const gem = gemIdentity(id)
+  if (!gem) return 0
+  if (gem.kind === 'moon') return 1 + (gem.grade <= 3 ? 0 : gem.grade <= 7 ? 1 : 2)
+  if (gem.kind === 'bridge') return 2 + (gem.grade >= 7 ? 1 : 0)
+  return 8
+}
+/** A Star Gem in quarters of a gather: its cut of two gathers, plus a gather and a refine for each refined item in it. */
+const v28GemQuarters = (id: string): number => 8 + 5 * v27GemRefined(id)
+
+/** What the first launch's sheet reads (PP25): the grant, what went and what came back, each Uma's line. */
+export interface TierGrant {
+  /** Paid into `wallet.timeTickets`: the Umas' tickets summed, or the floor when higher. */
+  tickets: number
+  /** The deleted pieces' and gems' own making time in tickets (PP20). */
+  floor: number
+  /** Each Uma's Craft Level before the reset, her EXP past it and her tickets, by outfit id. */
+  umas: Record<string, { level: number; exp: number; tickets: number }>
+  deleted: { gear: number; gems: number; upgrades: number }
+  /** The upgrades' Laurels and refined items, and the Warehouse's count after the conversion. */
+  back: { laurels: number; items: number; stock: number }
+  seen: boolean
+}
+
+const isCraft = (v: unknown): v is { level: number; exp: number } => isRecord(v) && Number.isSafeInteger(v.level) && Number.isSafeInteger(v.exp)
+const add = (to: Record<string, number>, id: string, n: number) => { if (n > 0) to[id] = (to[id] ?? 0) + n }
+const countOf = (n: unknown): number => (typeof n === 'number' && Number.isSafeInteger(n) && n > 0 ? n : 0)
+
+/**
+ * v27 → v28 (D214; profession-progression.md §14, PP19, PP20, PP24, PP25; WP27, EP21; R2's build decisions 4–9, D208):
+ * R2's economy and the compensation. Written dark in H78 and chained by H82 with `SAVE_SCHEMA_VERSION` 28, in the
+ * switch's commit; `tier` is the world's key (v28 doesn't read it). Per world, in §14's order:
+ * 1. **Work is settled** (v22's rule, no clock): every started entry's outputs from `collected` on are made now, an item
+ *    of a gather or refine into `items` (its legacy id), a craft's piece and a cut's gem counted as deleted; each pays its
+ *    `exp[i]` into her `craft`. Queued requests drop; `work` becomes `{}`.
+ * 2. **Each Uma's tickets** (PP24): ⌈(E(L) + exp) ÷ 60⌉, E(L) the EXP her level took (pacing's curve), her bank counting.
+ * 3. **What goes:** gear pieces (the stock, each locker's unique ids, the settled crafts), Star Gems (the stock, an open
+ *    node's `nodeGem`, the settled cuts) and upgrades (Σ level − 1).
+ * 4. **The floor** (PP20): ⌈`itemMinutes(25)` × (4.5 a piece + Σ (2 + 1.25 × its refined items) a gem) ÷ 30⌉ tickets.
+ * 5. **The grant** is the Umas' tickets summed, or the floor when higher, into `wallet.timeTickets`.
+ * 6. **Upgrades back:** each facility at level 2 or 3 its Laurels and refined items (literals), before step 7.
+ * 7. **The stock converts** one for one by family and band (§14.7), collisions summed; unknown ids stay for the parse.
+ * 8. **Each Uma:** Craft Lv 1 and 0 EXP; every grade G0 and one accessory slot with no family; an empty map; only her
+ *    Class Ranks. Her level, EXP, class, classes, calling and Bonds stay.
+ * 9. **The world:** Gear Marks join Class Marks; `gear`, `gems` and `gearMarks` go; `buildings` is `{}`. Parties,
+ *    targets, heroes, the Rift and the world map stay (an open fight replays on its own engine).
+ * 10. **`grant`:** the record (`TierGrant`), or null for a world with no Craft EXP, nothing deleted and no upgrade.
+ * Literals only, as every step: it never reads master data or the live catalogs. Idempotent by shape (a world with no
+ * `gems` and a `grant` key is v28 already: a second run would convert v3 ids by their legacy meaning). Anything malformed
+ * is left for the strict parse.
+ */
+export function toV28(world: Record<string, unknown>, _tier = 1): Record<string, unknown> {
+  if (!('gems' in world) && 'grant' in world) return world
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  const items: Record<string, number> = {}
+  if (isRecord(world.items)) for (const [id, n] of Object.entries(world.items)) add(items, id, countOf(n))
+  // 1. Settle work.
+  const madePieces: string[] = [], madeGems: string[] = []
+  for (const row of isRecord(world.work) ? Object.values(world.work) : []) {
+    if (!isRecord(row) || !Array.isArray(row.entries)) continue
+    for (const entry of row.entries) {
+      if (!isRecord(entry) || !isRecord(entry.request) || !Array.isArray(entry.outputs) || !Array.isArray(entry.exp)) continue
+      const kind = entry.request.kind
+      let exp = 0
+      for (let i = countOf(entry.collected); i < entry.outputs.length; i++) {
+        const out = entry.outputs[i]
+        const item = isRecord(out) && typeof out.item === 'string' ? out.item : undefined
+        if (item !== undefined) {
+          if (kind === 'craft') madePieces.push(item)
+          else if (kind === 'cut') madeGems.push(item)
+          else add(items, item, 1)
+        }
+        exp += countOf(entry.exp[i])
+      }
+      const uma = typeof row.outfitId === 'string' ? umas[row.outfitId] : undefined
+      if (exp > 0 && isRecord(uma) && isCraft(uma.craft)) umas[row.outfitId as string] = { ...uma, craft: grantProfessionExp(uma.craft, exp) }
+    }
+  }
+  // 2. Each Uma's tickets, from her Craft Level and bank after the settle.
+  const lines: TierGrant['umas'] = {}
+  let fromUmas = 0, exp = 0
+  for (const [id, uma] of Object.entries(umas)) {
+    if (!isRecord(uma) || !isCraft(uma.craft)) continue
+    let earned = uma.craft.exp
+    for (let l = 1; l < uma.craft.level; l++) earned += professionExpToNext(l)
+    const tickets = Math.ceil(earned / V28_EXP_PER_TICKET)
+    lines[id] = { level: uma.craft.level, exp: uma.craft.exp, tickets }
+    fromUmas += tickets
+    exp += earned
+  }
+  // 3. What goes.
+  let pieces = madePieces.length
+  const gems = [...madeGems]
+  if (isRecord(world.gear)) for (const n of Object.values(world.gear)) pieces += countOf(n)
+  if (isRecord(world.gems)) for (const [id, n] of Object.entries(world.gems)) for (let k = countOf(n); k > 0; k--) gems.push(id)
+  for (const uma of Object.values(umas)) {
+    if (!isRecord(uma)) continue
+    if (isRecord(uma.gear) && Array.isArray(uma.gear.locker)) pieces += new Set(uma.gear.locker).size
+    if (isRecord(uma.stars) && Array.isArray(uma.stars.unlocked)) {
+      for (const node of uma.stars.unlocked) if (typeof node === 'string' && isStarNode(node)) gems.push(nodeGem(node))
+    }
+  }
+  const buildings = isRecord(world.buildings) ? Object.entries(world.buildings) : []
+  const levelOf = (b: unknown): number => (isRecord(b) && Number.isSafeInteger(b.level) ? Math.min(V27_UPGRADES.length + 1, Math.max(1, b.level as number)) : 1)
+  const upgrades = buildings.reduce((n, [, b]) => n + levelOf(b) - 1, 0)
+  // 4. The floor, in quarters of a gather at Craft Lv 25 (a hair under the quotient, so float noise on an exact multiple
+  // can't add a ticket: a real remainder is at least 1/980 of one).
+  const quarters = V28_PIECE_QUARTERS * pieces + gems.reduce((n, id) => n + v28GemQuarters(id), 0)
+  const floor = Math.ceil((itemMinutes(V28_FLOOR_LEVEL) * quarters) / 4 / 30 - 1e-9)
+  // 5. The grant.
+  const tickets = Math.max(fromUmas, floor)
+  // 6. Upgrades back, as legacy items before the conversion.
+  let laurels = 0, backItems = 0
+  for (const [place, b] of buildings) {
+    const families = facilitySpec(place)?.upgradeFamilies
+    for (const step of V27_UPGRADES.slice(0, levelOf(b) - 1)) {
+      laurels += step.laurels
+      for (const family of families ?? []) {
+        const id = ITEM_FAMILIES.find((f) => f.id === family)?.refined[step.grade - 1]
+        if (id) { add(items, id, step.count); backItems += step.count }
+      }
+    }
+  }
+  // 7. The stock converts.
+  const stock: Record<string, number> = {}
+  for (const [id, n] of Object.entries(items)) add(stock, v28Item(id) ?? id, n)
+  // 8. Each Uma.
+  for (const [id, uma] of Object.entries(umas)) {
+    if (!isRecord(uma)) continue
+    umas[id] = {
+      ...uma,
+      ...(isCraft(uma.craft) ? { craft: { level: 1, exp: 0 } } : {}),
+      gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] },
+      stars: { open: [], moons: [] },
+      ...(isRecord(uma.ranks) ? { ranks: { classes: uma.ranks.classes } } : {}),
+    }
+  }
+  // 9. The world.
+  const { gear: _gear, gems: _gems, ...rest } = world
+  const wallet = isRecord(world.wallet) ? (() => {
+    const { gearMarks, ...w } = world.wallet as Record<string, unknown>
+    return {
+      ...w,
+      ...(typeof w.classMarks === 'number' ? { classMarks: w.classMarks + countOf(gearMarks) } : {}),
+      ...(typeof w.timeTickets === 'number' ? { timeTickets: w.timeTickets + tickets } : {}),
+      ...(typeof w.laurels === 'number' ? { laurels: w.laurels + laurels } : {}),
+    }
+  })() : world.wallet
+  // 10. The grant's record.
+  const grant: TierGrant | null = exp === 0 && pieces === 0 && gems.length === 0 && upgrades === 0 ? null : {
+    tickets, floor, umas: lines, deleted: { gear: pieces, gems: gems.length, upgrades },
+    back: { laurels, items: backItems, stock: Object.values(stock).reduce((n, c) => n + c, 0) }, seen: false,
+  }
+  return { ...rest, wallet, umas, items: stock, buildings: {}, work: {}, grant }
 }
 
 // --- v26 → v27 (D205): R1, the Tier rework's fight. Written in H69, chained by H72 with SAVE_SCHEMA_VERSION 27 (D210) ---
