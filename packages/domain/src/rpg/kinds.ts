@@ -74,6 +74,11 @@ export const RPG_TWIN_SETS: Readonly<Record<RpgTwinSet, readonly RpgDamageKind[]
 export const RPG_TWIN_SET_IDS = Object.keys(RPG_TWIN_SETS) as readonly RpgTwinSet[]
 /** An element's twin Arm, its partner in `RPG_KIND_PAIRS`: Fire's the Greatsword, Dark's the Katana. */
 export const rpgTwinArm = (element: RpgElement): RpgWeaponKind => RPG_KIND_PAIRS.find(([, e]) => e === element)![0]
+/** A kind's twin, its partner in `RPG_KIND_PAIRS` either way: the Greatsword's Fire, Lightning's Lance (R2's presets, SB10). */
+export function rpgTwinKind(kind: RpgDamageKind): RpgDamageKind {
+  const [arm, element] = RPG_KIND_PAIRS.find((pair) => pair.includes(kind as never))!
+  return arm === kind ? element : arm
+}
 /** A twin set as a foe's weaknesses: its Arms and its element. */
 export function rpgTwinWeaknesses(set: RpgTwinSet): BattleWeaknesses {
   return { weapons: RPG_TWIN_SETS[set].filter(isRpgWeaponKind), elements: RPG_TWIN_SETS[set].filter(isRpgElement) }

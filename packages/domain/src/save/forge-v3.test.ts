@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { gradeOf, newGrades, type GradeTarget } from '../economy/grades'
-import { raiseGrade, raiseGradeTo } from './forge'
-import { ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
+import { accessoryFormBlock, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
+import { accessorySlot, ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { SaveRuleError } from './rules'
 import { type Save } from './save'
 
@@ -63,5 +63,60 @@ describe('graded Forge rules (R2)', () => {
     const legacy = gradedUma({ gear: { locker: [], equipped: {}, kinds: {} } })
     const save = saveOf({ 'weapon-gem-g1': 1 }, 1, legacy.gear as never)
     expect(() => raiseGrade(save, '101', weapon, NOW)).toThrowError(new SaveRuleError('bad-job', 'Not graded'))
+  })
+})
+
+describe('setting the accessory slot’s form (R2, H75)', () => {
+  const graded = (level = 30) => {
+    const grades = newGrades(1)
+    grades.accessories = [accessorySlot('pendant', 6)]
+    return saveOf({}, level, grades)
+  }
+  const slotOf = (save: Save) => (world(save).umas['101']!.gear as ReturnType<typeof newGrades>).accessories
+  const refusal = (fn: () => unknown) => {
+    try { fn(); return null } catch (err) { return err instanceof SaveRuleError ? `${err.reason}: ${err.message}` : String(err) }
+  }
+
+  it('changes the family and kind and keeps the grade', () => {
+    let save = setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'dark', NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'dark')])
+    save = setAccessoryForm(save, '101', 'brawler', 0, 'bell', 'axe', NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('bell', 6, 'axe')])
+    save = setAccessoryForm(save, '101', 'brawler', 0, 'insignia', undefined, NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('insignia', 6)])
+    save = setAccessoryForm(save, '101', 'brawler', 0, null, undefined, NOW)
+    expect(slotOf(save)).toEqual([accessorySlot(null, 6)])
+    expect(world(save).items).toEqual({})
+  })
+
+  it('checks a Bell against the class she names: her active class’s three weapons', () => {
+    expect(slotOf(setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'fire', NOW))).toEqual([accessorySlot('bell', 6, 'fire')])
+    expect(refusal(() => setAccessoryForm(graded(), '101', 'brawler', 0, 'bell', 'fire', NOW))).toBe('bad-loadout: No Fire Tome in her slots')
+    expect(refusal(() => setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'greatsword', NOW))).toBe('bad-loadout: No Greatsword in her slots')
+  })
+
+  it('refuses what one slot of base forms can’t hold', () => {
+    const save = graded()
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'talisman' as never, undefined, NOW))).toBe('bad-loadout: Unknown accessory')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 1, 'pendant', undefined, NOW))).toBe('bad-loadout: No such accessory slot')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', -1, 'pendant', undefined, NOW))).toBe('bad-loadout: No such accessory slot')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'orb', undefined, NOW))).toBe('bad-loadout: An Orb needs a kind')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'bell', undefined, NOW))).toBe('bad-loadout: A Bell needs a kind')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'pendant', 'axe', NOW))).toBe('bad-loadout: A Pendant has no kind')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'insignia', 'axe', NOW))).toBe('bad-loadout: An Insignia has no kind')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, null, 'axe', NOW))).toBe('bad-loadout: Pick an accessory first')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'orb', 'shield' as never, NOW))).toBe('bad-loadout: Unknown kind')
+    expect(refusal(() => setAccessoryForm(save, '999', 'brawler', 0, 'pendant', undefined, NOW))).toBe('not-owned: Not unlocked')
+    expect(refusal(() => setAccessoryForm(save, '101', 'bard' as never, 0, 'pendant', undefined, NOW))).toBe('bad-class: no class bard')
+    const legacy = saveOf({}, 1, { locker: [], equipped: {}, kinds: {} } as never)
+    expect(refusal(() => setAccessoryForm(legacy, '101', 'brawler', 0, 'pendant', undefined, NOW))).toBe('bad-loadout: Not graded')
+    expect(accessoryFormBlock(world(legacy).umas['101']!, 'brawler', 0, 'pendant', undefined)).toBe('Not graded')
+    expect(slotOf(save)).toEqual([accessorySlot('pendant', 6)])
+  })
+
+  it('leaves a Bell on a kind she no longer slots set, doing nothing', () => {
+    const save = setAccessoryForm(graded(), '101', 'brawler', 0, 'bell', 'greatsword', NOW)
+    expect(accessoryFormBlock(world(save).umas['101']!, 'mage', 0, 'bell', 'greatsword')).toBe('No Greatsword in her slots')
+    expect(slotOf(save)).toEqual([accessorySlot('bell', 6, 'greatsword')])
   })
 })

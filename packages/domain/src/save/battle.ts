@@ -26,6 +26,7 @@ import {
 import { starPoints } from '../economy/stars'
 import { addPoints, type Points } from '../economy/bonus'
 import { armorHalf, gradeMight, gradePoints, type GearTier } from '../economy/grades'
+import { accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
 import { mapPoints, moonTemplate, type MoonTemplate } from '../economy/planet'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
@@ -37,7 +38,7 @@ import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
 import { callingPickBlock } from './status'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
-import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride } from '../roster/template'
+import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride, umaTemplate } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
@@ -288,8 +289,9 @@ export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' 
 /** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
  * her accessories (the fight's generation's, H57), her Hero seat or inherited Limit Breaks, and from v16 her Flourish as
  * her calling (H68). A v3 map's points read her active class (Prowess's split) and her moon's template, her knack and her
- * calling's channel by her stored pick (H76). Working Umas fight too (D119). The world map and the Rift both build their
- * allies here. */
+ * calling's channel by her stored pick (H76). A graded Uma (R2, H75) brings her accessory slot's base form with her class's
+ * three weapons and, while she wears her signature family (her knack's, by her template with her calling pick: UT7, H67,
+ * H69), its bonus. Working Umas fight too (D119). The world map and the Rift both build their allies here. */
 export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE,
   engine: number = BATTLE_ENGINE_VERSION): RpgPartyMember[] {
   return ids.map((id) => {
@@ -304,7 +306,10 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
       points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, uma.calling.pick)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
       ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
-    return isGrades(uma.gear) ? common : { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
+    if (!isGrades(uma.gear)) return { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
+    const grades = gradesOf(uma)
+    const signature = signatureWorn(grades, umaTemplate(outfit, uma.calling.pick).family) ? signatureBonus(uma.level, gearTier) : 0
+    return { ...common, accessory: accessoryParts(grades.accessories[0], weapons, gearTier), ...(signature ? { signature } : {}) }
   })
 }
 

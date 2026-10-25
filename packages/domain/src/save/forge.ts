@@ -4,12 +4,19 @@
 // nothing, and her two accessories are of different types (classes v2: an Orb in the Damage slot, a Talisman or an Amulet
 // in the Support slot, H57). She binds each track's grades in order, one above the best she has (D119), so a sheet offers
 // her best pieces and the stock above them.
+// R2 (D209): a graded Uma raises each weapon kind, armor slot and accessory slot a grade with one made item, and sets her
+// accessory slot's form (`setAccessoryForm`, H75).
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
-import { GRADE_MAX, gradeItemId, gradeOf, raiseBlock, type GradeTarget, type UmaGrades } from '../economy/grades'
-import { ACCESSORY_SLOTS, ARMOR_SLOT_KINDS, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
+import { isRpgDamageKind, isRpgElement, rpgClasses, rpgTomeOf, rpgWeaponKind, type RpgClass, type RpgDamageKind } from '../rpg/kinds'
+import {
+  ACCESSORY_FAMILIES, accessorySlotCount, GRADE_MAX, gradeItemId, gradeOf, raiseBlock, type AccessoryFamily, type AccessorySlotState, type GearTier,
+  type GradeTarget, type UmaGrades,
+} from '../economy/grades'
+import { ACCESSORY_SLOTS, ARMOR_SLOT_KINDS, WEAPON_LABEL, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import {
   accessorySlotFor, gearById, gearLevel, gearLevelName, gearTrackOf, isAccessory, isArmor, isWeapon, slotOf, type GearPiece, type GearSlot,
 } from '../economy/gear'
+import { classOf } from './class'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { gearV1, isGrades, type OwnedUma, type Save, type TierWorld } from './save'
 
@@ -195,4 +202,51 @@ export function raiseGradeTo(save: Save, outfitId: string, target: GradeTarget, 
   const grade = Math.min(GRADE_MAX, Math.max(gradeOf(uma.gear, target) + 1, to))
   const gear = withGrade(uma.gear, target, grade)
   return withWorld(save, tier, { ...world, items, umas: { ...world.umas, [outfitId]: { ...uma, gear } } }, now)
+}
+
+// --- Accessory forms (R2, H75; weapon-progression §5.3, WP19, WP34) ---------------------------------------------------
+
+const FAMILY_WORD: Readonly<Record<AccessoryFamily, string>> = { pendant: 'A Pendant', orb: 'An Orb', bell: 'A Bell', insignia: 'An Insignia' }
+const EMPTY_SLOT: AccessorySlotState = { grade: 0, family: null, form: 'base' }
+
+/**
+ * Why her accessory slot can't take this form, or null (R2: one slot, base forms; R3's H84 extends it). A family's base
+ * form, or null to take it off; an Orb takes any of the ten kinds, a Bell one of `classId`'s three weapons' kinds ("No
+ * Fire Tome in her slots", WP21), and a Pendant or an Insignia none. `classId` is her active class, which the caller
+ * passes (as `upgradesFor` takes it): the save can't read her style.
+ */
+export function accessoryFormBlock(uma: OwnedUma, classId: RpgClass, slot: number, family: AccessoryFamily | null,
+  kind: RpgDamageKind | undefined, tier = TIER_ONE): string | null {
+  if (!isGrades(uma.gear)) return 'Not graded'
+  if (!Number.isSafeInteger(slot) || slot < 0 || slot >= accessorySlotCount(Number(tier) as GearTier)) return 'No such accessory slot'
+  if (family !== null && !ACCESSORY_FAMILIES.includes(family)) return 'Unknown accessory'
+  if (kind !== undefined && !isRpgDamageKind(kind)) return 'Unknown kind'
+  if (family === null) return kind === undefined ? null : 'Pick an accessory first'
+  if (family === 'pendant' || family === 'insignia') return kind === undefined ? null : `${FAMILY_WORD[family]} has no kind`
+  if (kind === undefined) return `${FAMILY_WORD[family]} needs a kind`
+  if (family === 'bell' && !classOf(uma, classId).weapons.some((weapon) => rpgWeaponKind(weapon) === kind)) {
+    return `No ${WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]} in her slots`
+  }
+  return null
+}
+
+/**
+ * Sets her accessory slot's form (R2, WP19, WP34; H75): a family's base form and, for an Orb or a Bell, its kind; null
+ * takes it off. The slot's grade never changes: a form is a setting, changed freely outside fights. Refused as
+ * `accessoryFormBlock` says (`bad-loadout`). A Bell left on a kind she no longer slots, after a class or weapon change,
+ * stays set and does nothing (`accessoryParts`); the sheet says so (H79).
+ */
+export function setAccessoryForm(save: Save, outfitId: string, classId: RpgClass, slot: number, family: AccessoryFamily | null,
+  kind: RpgDamageKind | undefined, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const uma = world.umas[outfitId]
+  if (!uma) throw new SaveRuleError('not-owned', 'Not unlocked')
+  if (!rpgClasses().includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
+  const block = accessoryFormBlock(uma, classId, slot, family, kind, tier)
+  if (block !== null || !isGrades(uma.gear)) throw new SaveRuleError('bad-loadout', block ?? 'Not graded')
+  const grades = uma.gear
+  const next: AccessorySlotState = { grade: grades.accessories[slot]?.grade ?? 0, family, form: 'base', ...(kind !== undefined ? { kind } : {}) }
+  const accessories = Array.from({ length: Math.max(grades.accessories.length, slot + 1) },
+    (_, index) => (index === slot ? next : grades.accessories[index] ?? { ...EMPTY_SLOT }))
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, gear: { ...grades, accessories } } } }, now)
 }

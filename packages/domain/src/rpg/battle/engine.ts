@@ -13,12 +13,14 @@
 // v16 the Tier rework's fight (D200, live since H72, D210): three weapons by channel, no side skills; a trunk and one
 // fork into line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the
 // base MP regen for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
-// v17 is R2's dark economy foundation (D209): gear grades arrive only as stats and Might, and support fields retire.
+// v17 is R2's dark economy foundation (D209): gear grades arrive only as stats and Might, and support fields retire; her
+// accessory's base form and her signature join the damage stack (H75, D212): `flat` and `signature` in a hit's offense,
+// the Insignia a factor after the weak step, and the Bell's follow-up after an act with an Attack (`ring`).
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
-  isRpgDamageKind, isRpgTome, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBaseMpRegen, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
+  isRpgDamageKind, isRpgTome, isRpgWeapon, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBaseMpRegen, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
   rpgWeaponKind, validRpgLines, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
@@ -126,7 +128,7 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
  * Paladin only from v15. From v16 (the Tier rework's fight, D200) three weapons by channel and position, and no side
  * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31); her `lines` (H65) name only her weapons, each B,
  * and her loadout holds only her held skills, at most her generation's slots (seven by Lv 40, CP22); her `flourish` (H68)
- * is one of the three. */
+ * is one of the three. From v17 her accessory and signature (H75, `validAccessory`). */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
   const v16 = rpgRework('fight', version)
@@ -145,6 +147,7 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
     (a.evasion !== undefined && !safeInt(a.evasion, 0, 500)) || (a.limitStart !== undefined && !safeInt(a.limitStart, 0, BATTLE_LIMIT_MAX)) ||
     !Array.isArray(a.tree) || !Array.isArray(a.legacy) || !Array.isArray(a.loadout) ||
     a.loadout.length > rpgActiveSlots(a.level, version) || a.tree.length > RPG_MAX_TREE_NODES || a.legacy.length > RPG_MAX_LEGACY_SLOTS) return false
+  if (!validAccessory(a, version)) return false
   if (!validRpgTree({ ...a, classRank: battleClassRank(a) }) || a.legacy.some((r) => r.tier >= a.tier || !rpgNode(r.id))) return false
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
@@ -160,6 +163,22 @@ function validCharms(a: BattleAlly, version: BattleInput['version']): boolean {
   return a.orb === undefined && (a.orbs === undefined || (Array.isArray(a.orbs) && a.orbs.length <= 2 && a.orbs.every(isRpgDamageKind) &&
     new Set(a.orbs).size === a.orbs.length)) && (a.veil === undefined || safeInt(a.veil, 0, 100_000)) &&
     (a.mpRegen === undefined || safeInt(a.mpRegen, 0, 10_000)) && shares.every((v) => v === undefined || safeInt(v, 0, 1000))
+}
+/** v17 (H75, D212): her accessory's base form and her signature, each refused before v17. `flat` 0–1,000 a kind; a Bell
+ * of one of her weapons' kinds at 1–3,000 per mille; an Insignia 1–1,000 per mille; `signature` 0–1,000. One slot (WP19):
+ * at most one of a non-empty `flat`, a `bell` and an `insignia` (R3 relaxes it with the slot count). */
+function validAccessory(a: BattleAlly, version: BattleInput['version']): boolean {
+  const { flat, bell, insignia, signature } = a
+  if (flat === undefined && bell === undefined && insignia === undefined && signature === undefined) return true
+  if (!rpgRework('economy', version)) return false
+  const record = (v: unknown, keys: number) => !!v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === keys
+  if (flat !== undefined && (!flat || typeof flat !== 'object' || Array.isArray(flat) ||
+    !Object.entries(flat).every(([k, n]) => isRpgDamageKind(k) && safeInt(n, 0, 1_000)))) return false
+  if (bell !== undefined && (!record(bell, 2) || !isRpgDamageKind(bell.kind) || !safeInt(bell.power, 1, 3_000) ||
+    !a.weapons.some((w) => isRpgWeapon(w) && rpgWeaponKind(w) === bell.kind))) return false
+  if (insignia !== undefined && (!record(insignia, 1) || !safeInt(insignia.value, 1, 1_000))) return false
+  if (signature !== undefined && !safeInt(signature, 0, 1_000)) return false
+  return [flat !== undefined && Object.keys(flat).length > 0, bell !== undefined, insignia !== undefined].filter(Boolean).length <= 1
 }
 /** The kinds her Orbs add to every hit: v11's two, or older fights' one. */
 const orbsOf = (a: BattleAlly): readonly RpgDamageKind[] | undefined => a.orbs ?? (a.orb ? [a.orb] : undefined)
@@ -335,8 +354,9 @@ export function battleHitIsWeak(enemy: BattleEnemy, foe: BattleUnit | null, kind
 }
 
 /** `orbs`: the attacker's Orb kinds, which make a hit weak too (D86, D124), with no damage of their own. `best` (v15, C3):
- * a Learner's inherited Limit Break hits with the higher of her ATK and M.ATK; its kinds still pick Might and weaknesses. */
-interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[]; best?: boolean }
+ * a Learner's inherited Limit Break hits with the higher of her ATK and M.ATK; its kinds still pick Might and weaknesses.
+ * `label` (v17): the hit's cue label when no guard or ward names it (the Bell's, H75). */
+interface HitOptions { special?: RpgSkillDef['special']; area?: boolean; orbs?: readonly RpgDamageKind[]; best?: boolean; label?: string }
 /** One part's final amount; shared by live play, previews and the simulator. `warded`: the foe's ward cut it (v14). */
 export function battleDamage(s: BattleState, attacker: BattleUnit, defender: BattleUnit, channel: BattleChannel,
   power: number, kind: RpgDamageKind | null, options: HitOptions = {}): { amount: number; weak: boolean; warded: boolean } {
@@ -346,8 +366,13 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   // a percent on the hit (D141).
   const ratio = s.engineVersion >= 12
   const percent = s.engineVersion === 12
-  const might = attacker.side === 'ally' && kind !== null ? allyOf(s, attacker.id)?.might?.[kind] ?? 0 : 0
-  const offense = (options.best ? Math.max(atk.atk, atk.matk) : channel === 'physical' ? atk.atk : atk.matk) + (percent ? 0 : might)
+  const ally = attacker.side === 'ally' ? allyOf(s, attacker.id) : undefined
+  const might = ally && kind !== null ? ally.might?.[kind] ?? 0 : 0
+  // v17, the damage stack's step 1 (WP31, H75): her signature joins her ATK and M.ATK, and her accessory's flat offense on
+  // the hit's own kind joins its weapon's Might. Heals never come here, so neither reaches a mend or a Barrier.
+  const v17 = rpgRework('economy', s.engineVersion)
+  const added = v17 && ally ? (ally.signature ?? 0) + (kind !== null ? ally.flat?.[kind] ?? 0 : 0) : 0
+  const offense = (options.best ? Math.max(atk.atk, atk.matk) : channel === 'physical' ? atk.atk : atk.matk) + (percent ? 0 : might) + added
   const defense = channel === 'physical' ? def.pdef : def.mdef
   // From v12: offense² ÷ (offense + defense), so the same ratio gives the same share at every level and never zero.
   let amount = ratio ? (offense > 0 ? (offense * offense) / (offense + defense) : 0) * power * (percent ? 1 + might / 100 : 1)
@@ -355,6 +380,9 @@ export function battleDamage(s: BattleState, attacker: BattleUnit, defender: Bat
   const foe = defender.side === 'enemy' ? enemyOf(s, defender.id)! : null
   const weak = !!foe && attacker.side === 'ally' && (battleHitIsWeak(foe, defender, kind) || !!options.orbs?.some((o) => battleHitIsWeak(foe, defender, o)))
   if (weak) amount *= BATTLE_WEAK
+  // v17, step 4 (WP23, H75): her Insignia, a factor of its own, on a sub-boss or a boss (by rank).
+  const insignia = v17 && ally && foe && foe.rank !== 'regular' ? ally.insignia?.value ?? 0 : 0
+  if (insignia > 0) amount *= 1 + insignia / 1000
   const physical = channel === 'physical'
   amount *= 1 + stacks(attacker, physical ? 'brave' : 'faith') * BATTLE_STATUS_STEP
   amount *= 1 + stacks(attacker, 'power-up') * BATTLE_FOE_STATUS_STEP
@@ -601,7 +629,7 @@ function strike(s: BattleState, actor: BattleUnit, target: BattleUnit, hit: RpgH
     const amount = receiver !== target ? Math.max(1, Math.round(result.amount * BATTLE_GUARD_FACTOR)) : result.amount
     receiver.hp = Math.max(0, receiver.hp - amount)
     cues.push({ kind: 'hit', actorId: actor.id, targetId: receiver.id, amount, channel, element: part.kind, weak: result.weak,
-      label: receiver !== target ? 'Intercepted' : result.warded ? 'Warded' : undefined })
+      label: receiver !== target ? 'Intercepted' : result.warded ? 'Warded' : options.label })
     if (actor.side === 'ally') drain(s, actor, channel, amount, cues)
     if (receiver.side === 'enemy') popLocks(s, actor, receiver, [part.kind, ...(options.orbs ?? [])], cues)
     if (receiver.hp === 0) {
@@ -1035,6 +1063,24 @@ function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target
   if (half.kind === 'skill' && def.summon && (!v2 || tome)) stay(s, actor.id, half.skill.ref, def.summon.linger)
 }
 
+/**
+ * v17 (WP21, H75): her Bell's follow-up. Her weapon of the Bell's kind strikes once at the Bell's power × her hand for that
+ * weapon's channel: one hit of its kind, never split (no Spell Blade extra hit), on the act's target if it stands, else a
+ * living foe drawn by the fight's seed. It is a hit of that weapon (its Might, her flat offense on its kind, her
+ * signature, the weak multiplier, her Insignia) and strikes as an Attack's does: a guard intercepts it, a weak one chips a
+ * shield and breaks a lock. Its cue is labelled 'Bell' unless a guard or a ward names it. It adds nothing to the Limit
+ * gauge (that fills by the act).
+ */
+function ring(s: BattleState, actor: BattleUnit, ally: BattleAlly, hand: ReturnType<typeof rpgHand>, target: BattleUnit, cues: BattleCue[]): void {
+  const bell = ally.bell
+  const weapon = bell && ally.weapons.find((w) => rpgWeaponKind(w) === bell.kind)
+  if (!bell || !weapon || actor.hp <= 0) return
+  const foe = target.hp > 0 ? target : randomFoe(s, actor.id, 0, 'bell')
+  if (!foe || foe.hp <= 0) return
+  const hit: RpgHit = { power: 1, parts: [{ kind: bell.kind, share: 1 }] }
+  strike(s, actor, foe, hit, (bell.power / 1000) * (isRpgTome(weapon) ? hand.tome : hand.arms), cues, true, { label: 'Bell' })
+}
+
 export function applyBattleAction(previous: BattleState, action: BattleAction): BattleStep {
   if (!(VERSIONS as readonly number[]).includes(previous.engineVersion) || !previous.input || !Array.isArray(previous.units)) return invalid(previous, 'invalid-state')
   if (previous.outcome !== 'active') return invalid(previous, 'terminal')
@@ -1104,6 +1150,8 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     }
     // Each half at its own power (D179): `arms` or `tome`, both her `power` before v15.
     halves.forEach((h, i) => resolveHalf(s, actor, ally, target, h, halfIsTome(h) ? hand.tome : hand.arms, cues, i ? 'pair' : 'random'))
+    // v17 (WP21, H75): her Bell rings once after an act with an Attack in it, either half of a pair.
+    if (rpgRework('economy', s.engineVersion) && ally.bell && halves.some((h) => h.kind === 'attack')) ring(s, actor, ally, hand, target, cues)
     charge = halves.some((h) => h.kind === 'skill') ? 'skill' : 'attack'
   }
   if (charge) actor.limit = Math.min(BATTLE_LIMIT_MAX, actor.limit + battleLimitGain(charge))

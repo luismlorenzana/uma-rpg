@@ -5,6 +5,7 @@ import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, r
 import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { accessoryFightFields, noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
+import type { AccessoryParts } from '../../economy/accessories'
 import { projectRpgStats, rpgLifetimeLevels, type RpgLines, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 import { RPG_MAX_BATTLE_ACTIONS, type RpgRun } from './run-state'
@@ -32,12 +33,14 @@ export function rpgRestAtCamp(chapter: RpgCampaignChapter, run: RpgRun, campId: 
 
 /** A party member as she enters a fight: her profile, her class's equipped skills, her stat points, her weapons' Might
  * (D104), what her two accessories do (D124), her Hero seat or inherited Limit Breaks (D106), and from v16 her Flourish
- * while she fights as her calling's class (UT6, UT12; H68). */
+ * while she fights as her calling's class (UT6, UT12; H68). From v17 (H75) her accessory slot's base form (`accessory`,
+ * from `accessoryParts`) and her signature's bonus while she wears her family (`signature`) in place of `accessories`. */
 export interface RpgPartyMember {
   profile: RpgProfile; loadout: RpgProfile['tree']; points?: Points
   might?: BattleInput['allies'][number]['might']; accessories?: AccessoryEffects
   hero?: BattleInput['allies'][number]['hero']; inherits?: BattleInput['allies'][number]['inherits']
   flourish?: RpgFlourish
+  accessory?: AccessoryParts; signature?: number
 }
 
 export const rpgMemberLevel = (profile: Pick<RpgProfile, 'tier' | 'level'>): number => rpgLifetimeLevels(profile.tier, profile.level) + 1
@@ -62,22 +65,33 @@ function fightLines(lines: RpgLines | undefined, weapons: RpgProfile['weapons'])
   return Object.keys(held).length ? { lines: held } : {}
 }
 
+/** v17 (H75): her accessory's base form and her signature as the fight takes them: only what's there. */
+function accessoryInput(parts: AccessoryParts | undefined, signature: number | undefined): Partial<BattleInput['allies'][number]> {
+  return {
+    ...(parts && Object.keys(parts.flat).length ? { flat: { ...parts.flat } } : {}),
+    ...(parts?.bell ? { bell: { ...parts.bell } } : {}), ...(parts?.insignia ? { insignia: { ...parts.insignia } } : {}),
+    ...(signature ? { signature } : {}),
+  }
+}
+
 /** The party as the engine takes it (D104, D124, D106): each member's boosted stats, Might, accessory effects and Hero
  * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). Built by the fight's
  * generation: classes v2 (H57) projects her stats by v2's rules (HP with Guts) and sends no Orb kinds, her Orb's offense
  * joining her Might instead; from v16 her lines (H65) on her slotted weapons' trees ride along (H69), and her Flourish is
- * frozen in (UT18, H68). */
+ * frozen in (UT18, H68); from v17 (H75) her accessory's `flat`, `bell` or `insignia` and her `signature`, never v1's or
+ * v2's accessory fields. */
 export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number,
   engine: number = BATTLE_ENGINE_VERSION): BattleInput['allies'] {
   const v2 = rpgV2(engine)
   const v16 = rpgRework('fight', engine)
-  return party.map(({ profile, loadout, points, might: weapons, accessories, hero, inherits, flourish }) => {
+  const v17 = rpgRework('economy', engine)
+  return party.map(({ profile, loadout, points, might: weapons, accessories, hero, inherits, flourish, accessory, signature }) => {
     const boosted = applyPoints(projectRpgStats(profile, engine), points ?? noPoints())
     const a = accessories ?? noAccessoryEffects()
     // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
-    const effects = accessoryFightFields(a, boosted.stats.hp)
+    const effects = v17 ? {} : accessoryFightFields(a, boosted.stats.hp)
     // v2 (C4): her Orb's offense joins her Might on its kind, even a kind she doesn't wield (her inherited Limit Breaks).
-    const might = v2 && a.orbMight
+    const might = v2 && !v17 && a.orbMight
       ? Object.entries(a.orbMight).reduce<Might>((m, [k, n]) => ({ ...m, [k]: (m[k as keyof Might] ?? 0) + n }), { ...weapons }) : weapons
     return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
       tree: profile.tree, legacy: profile.legacy, loadout, ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
@@ -85,7 +99,7 @@ export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile:
       ...(might && Object.keys(might).length ? { might } : {}), ...effects,
       ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
       ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}),
-      ...(v16 && flourish ? { flourish } : {}) }
+      ...(v16 && flourish ? { flourish } : {}), ...(v17 ? accessoryInput(accessory, signature) : {}) }
   })
 }
 
