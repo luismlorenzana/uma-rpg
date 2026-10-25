@@ -18,7 +18,7 @@ describe('save', () => {
   })
 
   it('normalizes trainer names and enforces 1–24 characters', () => {
-    expect(normalizeTrainerName('  Silence   Suzuka ')).toBe('Silence Suzuka')
+    expect(normalizeTrainerName('  Quiet   Harbor ')).toBe('Quiet Harbor')
     expect(normalizeTrainerName('')).toBeNull()
     expect(normalizeTrainerName('x'.repeat(25))).toBeNull()
     expect(normalizeTrainerName('x'.repeat(24))).toHaveLength(24)

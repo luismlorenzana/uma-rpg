@@ -7,9 +7,9 @@ export interface RosterOutfit {
   outfitId: string
   masterId: number
   characterId: number
-  /** Character name, e.g. "Special Week". */
+  /** Character name from master data. */
   name: string
-  /** Outfit title without brackets, e.g. "Special Dreamer"; null when the source has none. */
+  /** Outfit title without brackets; null when the source has none. */
   title: string | null
   rarity: number
   aptitudes: Aptitudes
