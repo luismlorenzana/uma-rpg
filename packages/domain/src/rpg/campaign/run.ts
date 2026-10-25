@@ -1,11 +1,11 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
-import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, rpgV2 } from '../battle/engine'
+import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, rpgRework, rpgV2 } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { accessoryFightFields, noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
-import { projectRpgStats, rpgLifetimeLevels, type RpgProfile } from '../rules'
+import { projectRpgStats, rpgLifetimeLevels, type RpgLines, type RpgProfile } from '../rules'
 import { rpgNodeParents, type RpgCampaignChapter, type RpgMapNode } from './chapters'
 import { RPG_MAX_BATTLE_ACTIONS, type RpgRun } from './run-state'
 export { createRpgRun, RPG_MAX_BATTLE_ACTIONS, type RpgRun, type RpgRunBattle } from './run-state'
@@ -53,10 +53,17 @@ function seedOf(text: string): number {
   return h >>> 0
 }
 
+/** Her lines as a fight takes them (v16, H69): only her slotted weapons' trees on B (the save keeps a line for every kind
+ * of her class), and none at all when every one is on A, so an A-only input is the same as before lines. */
+function fightLines(lines: RpgLines | undefined, weapons: RpgProfile['weapons']): { lines?: RpgLines } {
+  const held = Object.fromEntries(Object.entries(lines ?? {}).filter(([w, line]) => line === 'B' && weapons.includes(w as never))) as RpgLines
+  return Object.keys(held).length ? { lines: held } : {}
+}
+
 /** The party as the engine takes it (D104, D124, D106): each member's boosted stats, Might, accessory effects and Hero
  * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). Built by the fight's
  * generation: classes v2 (H57) projects her stats by v2's rules (HP with Guts) and sends no Orb kinds, her Orb's offense
- * joining her Might instead. */
+ * joining her Might instead; from v16 her lines (H65) on her slotted weapons' trees ride along (H69). */
 export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number,
   engine: number = BATTLE_ENGINE_VERSION): BattleInput['allies'] {
   const v2 = rpgV2(engine)
@@ -70,7 +77,7 @@ export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile:
       ? Object.entries(a.orbMight).reduce<Might>((m, [k, n]) => ({ ...m, [k]: (m[k as keyof Might] ?? 0) + n }), { ...weapons }) : weapons
     return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
       tree: profile.tree, legacy: profile.legacy, loadout, ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
-      classRank: profile.classRank,
+      classRank: profile.classRank, ...(rpgRework('fight', engine) ? fightLines(profile.lines, profile.weapons) : {}),
       ...(might && Object.keys(might).length ? { might } : {}), ...effects,
       ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
       ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }

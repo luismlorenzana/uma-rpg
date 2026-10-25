@@ -15,7 +15,9 @@ import { rpgBattleExp } from '../rpg/campaign/rewards'
 import { RPG_MAX_BATTLE_ACTIONS, rpgCarriedMp, rpgMemberLevel, rpgPartyAllies, RPG_REFUSED } from '../rpg/campaign/run'
 import { RPG_TIER_MAX_LEVEL } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
-import { activeClass, classOf, fillRanks, healerBlock, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain } from './battle'
+import {
+  activeClass, callingConfirmed, classOf, fillRanks, healerBlock, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain,
+} from './battle'
 import { MAX_PURCHASE, mergeGains } from './exchange'
 import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, TIERS, tierKey, worldOf } from './rules'
@@ -292,7 +294,8 @@ function recordDefeated(defeated: Account['defeated'], input: BattleInput, roste
 /**
  * Closes a finished Rift fight. A loss pays and records nothing (and ends a Convergence attempt). A win clears a front's
  * stage and merges its traces, counts a Convergence fight (the fourth wins the run), or pays an Echo; then records the
- * faces defeated and stores what `achievementsEarned` grants. Front and Convergence fights pay nothing else (D168).
+ * faces defeated and stores what `achievementsEarned` grants. Front and Convergence fights pay nothing else (D168). From
+ * v16 any win confirms each fighter's calling pick (CP29, H69).
  */
 function settleRiftFight(save: Save, battle: RiftBattle, state: BattleState, roster: EnemyRoster, now: string, tier: string): { save: Save; result: RiftFightResult } {
   const world = worldOf(save, tier)
@@ -330,6 +333,7 @@ function settleRiftFight(save: Save, battle: RiftBattle, state: BattleState, ros
     const won = rift.echoes[ref.front] ?? {}
     rift = { ...rift, echoes: { ...rift.echoes, [ref.front]: { ...won, [ref.level]: won[ref.level] ?? now } } }
   }
+  next = winnersConfirmed(next, battle.input.allies.map((a) => a.id))
   const defeated = recordDefeated(save.account.defeated, battle.input, roster, now)
   result.earned = achievementsEarned({ tier: Number(tier), ref, run, attemptRounds, state, defeated, roster }, save.account.achievements)
   const achievements = { ...save.account.achievements }
@@ -338,6 +342,13 @@ function settleRiftFight(save: Save, battle: RiftBattle, state: BattleState, ros
     save: { ...save, account: { ...save.account, updatedAt: now, defeated, achievements }, tierWorlds: { ...save.tierWorlds, [tier]: { ...next, rift } } },
     result,
   }
+}
+
+/** The world with each of these Umas' calling confirmed by a win (`callingConfirmed`); the same world when none moves. */
+function winnersConfirmed(world: TierWorld, ids: readonly string[]): TierWorld {
+  const moved = ids.filter((id) => world.umas[id] && callingConfirmed(world.umas[id]) !== world.umas[id])
+  if (!moved.length) return world
+  return { ...world, umas: { ...world.umas, ...Object.fromEntries(moved.map((id) => [id, callingConfirmed(world.umas[id]!)])) } }
 }
 
 // --- The Convergence (§6) --------------------------------------------------------------------------------------------
@@ -391,7 +402,8 @@ export function abandonConvergence(save: Save, now: string, tier = TIER_ONE): Sa
 /**
  * Pays an Echo win to the five still owned here (R6): her E is a regular stage's EXP at the Echo's level for her
  * (`rpgBattleExp`, so Lv 45 pays less and Lv 55 no more than Lv 50), and `ECHO_RANK_PAY` × what a stage fills goes to her
- * class, weapons, armor and accessories, Marks past the caps. No Uma EXP, levels, Shards, Laurels or Bonds.
+ * class, weapons, armor and accessories, Marks past the caps. No Uma EXP, levels, Shards, Laurels or Bonds. From v16 it
+ * confirms her calling pick, an Echo Sweep's too (CP29, H69).
  */
 function payEcho(world: TierWorld, entrants: readonly Entrant[], foeLevel: number, tier: string): { world: TierWorld; members: MemberGain[]; gearMarks: number; classMarks: number } {
   const umas = { ...world.umas }
@@ -402,7 +414,7 @@ function payEcho(world: TierWorld, entrants: readonly Entrant[], foeLevel: numbe
     if (!uma) continue
     const exp = rpgBattleExp('fight', foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level }))
     const filled = fillRanks(uma, e, exp, ECHO_RANK_PAY)
-    umas[e.outfitId] = { ...uma, ranks: filled.ranks }
+    umas[e.outfitId] = callingConfirmed({ ...uma, ranks: filled.ranks })
     gearMarks += filled.gearMarks
     classMarks += filled.classMarks
     members.push({ outfitId: e.outfitId, exp: 0, beforeLevel: uma.level, afterLevel: uma.level, afterExp: uma.exp, shards: 0, ranks: filled.gains, bonds: [] })
@@ -517,8 +529,9 @@ function seatArrivals(parties: readonly Party[], moved: readonly Party[], roster
  * Ascends a won run's twenty to Tier t+1 in one transaction (tiers.md §5, R7). In the old world each leaves its Umas,
  * parties, targets, carried MP and work rows; a Hero's seat empties (its Learners leave, T4) and she leaves every seat she
  * learns in; every piece she owns returns to its gear stock. The new world (created with no Uma Tickets, D5) gets each at
- * Lv 1 with her class and armor halves, nothing else of hers; its wallet gains the purse (T5) and her banked EXP as Class
- * Marks (T3), and her parties move with her. The run is ascended and each Uma's history records the climb.
+ * Lv 1 with her class and armor halves and her calling pick (save v27, H69), nothing else of hers; its wallet gains the
+ * purse (T5) and her banked EXP as Class Marks (T3), and her parties move with her. The run is ascended and each Uma's
+ * history records the climb.
  */
 export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; summary: AscendSummary } {
   const block = ascendBlock(save, tier)
@@ -549,12 +562,12 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
     world: { ...world.world, run: { ...world.world.run, mp } },
     rift: withLastRun(world.rift, { ...run, ascendedAt: now }),
   }
-  // The new world: each at Lv 1 with her class and armor halves; the purse and the banked EXP's Marks.
+  // The new world: each at Lv 1 with her class, armor halves and calling pick; the purse and the banked EXP's Marks.
   const base = save.tierWorlds[toKey] ?? newTierWorld(now, 0)
   const arrivals = Object.fromEntries(run.roster.map((id) => {
     const uma = world.umas[id]!
     const fresh = newOwnedUma(uma.unlockedAt)
-    return [id, { ...fresh, classId: uma.classId, gear: { ...fresh.gear, kinds: { ...uma.gear.kinds } } }]
+    return [id, { ...fresh, classId: uma.classId, gear: { ...fresh.gear, kinds: { ...uma.gear.kinds } }, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
   }))
   const n = run.roster.length
   const laurels = ASCEND_PURSE.laurels * n, speedTickets = ASCEND_PURSE.speedTickets * n
