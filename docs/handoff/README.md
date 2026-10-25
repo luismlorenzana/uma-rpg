@@ -1,17 +1,108 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-22, after D188.** Classes v2 (H53–H63) and the Rift (H44–H52) are built and live; the open work is
-> the approved tiers ([tiers](../design/tiers.md), [classes v2](../design/classes-v2.md), [the Rift](../design/rift.md);
-> D159–D161) and the Tier 2 design docs' calls (Q12–Q16).
+> **Status: 2026-10-25, after D198.** Classes v2 (H53–H63) and the Rift (H44–H52) are built and live. The open work
+> is **the Tier rework's build**: six approved docs (D192–D197) shipping as five live releases, R1–R5, in 42 packets,
+> H64–H105 ([implementation.md](../design/tier-rework/implementation.md), D198). Each release is built dark behind its
+> own engine and save version and turned on by its own switch packet.
 > Each task is a self-contained packet in [tasks/](tasks/).
 > - Start a worker, Claude or ChatGPT, with uma-platform's
 >   [master prompt](https://github.com/luismlorenzana/uma-platform/blob/main/docs/handoff/master-prompt.md). Name the
->   packet: "Take H35".
+>   packet: "Take H64".
 > - Workers decide what a packet leaves open, record it, and flag their own packets done: delete the packet and add a
 >   Done row below (D35).
-> - **The owner dispatches.** On 2026-10-21 the owner had Claude's main session dispatch all twelve to its worker agents, in waves, and review each.
+> - **The owner dispatches** to ChatGPT (art, and "Either" packets), other Claude sessions or Claude's main session's
+>   workers. A packet marked Ready can start; Waiting ones need the packets in their Needs merged first.
 
 ## This repo's packets
+
+**The Tier rework build** (2026-10-25; [implementation.md](../design/tier-rework/implementation.md), D198; the
+design is [tier-rework/](../design/tier-rework/README.md), D192–D197). Five releases, each live at its switch packet.
+Every foundation packet logs its release's build decisions first.
+
+**R1. Tier 1's fight** (engine v16, save v27; on today's gear):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H64 | Engine v16 foundation: the rework's switch (`rpgRework`), three weapon slots by channel, the owner's defaults, equippable kinds; v15 replays pinned; R1's build decisions | Claude | M | — | Ready |
+| H65 | Trees v16: no points, the trunk and one fork (lines A and B), Pierce, equipped slots 3 → 7, Skill Ranks; the halls' two kinds and the Paladin's revive | Claude | L | H64 | Waiting |
+| H66 | Weaknesses and shields: every foe's twins by kind, Tier 1's shields, the coverage checks, the Rift's fronts and guided builds on three weapons | Claude | M | H64 | Waiting |
+| H67 | The template and the calling (domain): `umaTemplate`, the 90 templates, the calling pick and the start by calling, the Stable's Template facets | Either | M | H64 | Waiting |
+| H68 | Engine v16 rules: the base MP regen (at most five depths) and the Flourish (Clean break, Even pace, Late reserve) as her calling | Claude | M | H64, H67 | Waiting |
+| H69 | Save v27 (dark): five weapons to three, learned sides to lines, `OwnedUma.calling`; `toV27` written, not chained | Claude | M | H65, H67 | Waiting |
+| H70 | R1's screens (inert): the Skills tab as a tree with ranks, three weapons, the calling card, the template chip and card with ★, the Template filter, "Weak:" icons, the MP regen line | Either | L | H65, H66, H67, H68, H69 | Waiting |
+| H71 | R1's balance (dark): the re-baseline on today's gear, the mirror, shields, lines and Pierce, MP; the Rift's Tier 1 fronts; Tier 2 and 3 worlds | Claude | L | H65, H66, H68 | Waiting |
+| H72 | **R1's switch:** engine v16 and save v27 live; the manual rewritten | Claude | M | H69, H70, H71 | Waiting |
+
+**Waves:** 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
+
+**R2. Tier 1's economy** (engine v17, save v28; the compensation):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H73 | **Art** (uma-platform): Weapon Gem, Armor Fittings and Accessory Setting icons G1–G10 and the Branch Gem; Claude publishes uma-art 2.13.0 | ChatGPT | M | — | Ready |
+| H74 | Engine v17 foundation and the gear model: grades from G0, the Lv 5g − 4 gate, values × tier, armor's values; ranks and Gear Marks retired; R2's build decisions | Claude | L | H64 | Waiting |
+| H75 | Accessories v3 (dark): the four families' base forms, the Bell and Insignia rules, the damage stack's order, the supports retired, the signature accessory, the presets | Claude | L | H67, H74 | Waiting |
+| H76 | Extra Stats v3 (dark): the Planet, Prowess by class, Vigor, Guard, her moon, jewels and gates; Star Gems retired | Claude | M | H67, H74 | Waiting |
+| H77 | Professions v3 (dark): ten places with four slots, every material and made-item id, the ladder, every recipe, the trade by calling, the open shop, the Exchange | Claude | L | H64 | Waiting |
+| H78 | Save v28 (dark) and the compensation: work settled, gear to grades, the new map, items to the 20 types, Craft Levels to 1, the Speed Ticket grant, `TierWorld.grant` | Claude | L | H69, H74, H75, H76, H77 | Waiting |
+| H79 | R2's screens, gear and stars (inert): the Gear tab by grade, the accessory picker with ★, targets, "Can upgrade", the Observatory with her moon, the Signature facet | Either | L | H70, H73, H75, H76, H78 | Waiting |
+| H80 | R2's screens, the Wilds and the first launch (inert): ten place pages, the Warehouse, the Exchange, the Trade facet, "The Wilds are rebuilt", "Finish all" | Either | L | H70, H73, H77, H78 | Waiting |
+| H81 | R2's balance (dark): the full Tier 1 re-baseline, accessory viability, MP, defense, five matched templates, later tiers; the profession pacing ledger | Claude | L | H71, H75, H76, H77 | Waiting |
+| H82 | **R2's switch:** v16's replays frozen, then engine v17 and save v28 live; the first launch checked on a full-shaped save; the manual | Claude | M | H72, H78, H79, H80, H81 | Waiting |
+
+**Waves:** H73 now. 1) H74, H77 once H64 lands (beside R1) → 2) H75, H76 once H67 lands → 3) H78; H81 after H71 →
+4) H79, H80 after H70 → 5) H82 after H72. **H82 is the rework's one irreversible step** (Craft Levels to 1, the grant):
+it runs the migration on a full-shaped scratch save first and puts the sheet's numbers in its pull request.
+
+**R3. Tier 2's weapons** (engine v18, save v29):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Waiting |
+| H84 | Accessories, Tier 2: the second slot, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 | Waiting |
+| H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83 | Waiting |
+| H86 | The secondary profession from Tier 2 | Either | M | H82 | Waiting |
+| H87 | Save v29 (dark): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
+| H88 | R3's screens (inert): the G5 pick, accessory branches, the weapon moon, the secondary, armor halves | Either | L | H87 | Waiting |
+| H89 | R3's balance (dark): Pure against Dual, Full against Split, Tier 2's shields and most of its term, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85, H86 | Waiting |
+| H90 | **R3's switch:** engine v18 and save v29 live; the manual | Claude | M | H87, H88, H89 | Waiting |
+
+**Waves:** 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
+
+**R4. Tier 2's classes** (engine v19, save v30):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H91 | Engine v19 foundation and the class branches: the focus, Heavy, Lite, Elemental and Arcane, class skills, branch 2's presets, Tier 2's skill MP | Claude | L | H90 | Waiting |
+| H92 | Trees, Tier 2: line C, the Power or Break tip, the signature tip, ten equipped slots, LB+ at Bond 10 | Claude | L | H91 | Waiting |
+| H93 | Weaknesses by rank and the rest of Tier 2's term; the Rift's Tier 2 fronts; the pairings check | Claude | M | H91 | Waiting |
+| H94 | Save v30 (dark): a class branch per class, line C and tip picks | Claude | S–M | H91, H92 | Waiting |
+| H95 | R4's screens (inert): the class tree, the branch pick, line C and the tips, ★ signature tip, the focus, the group names | Either | L | H93, H94 | Waiting |
+| H96 | R4's balance (dark): each class's two branches, the damage stack, the Tier 2 mirror, the pace with the term | Claude | L | H92, H93 | Waiting |
+| H97 | **R4's switch:** engine v19 and save v30 live; the manual | Claude | M | H94, H95, H96 | Waiting |
+
+**Waves:** 1) H91 → 2) H92, H93 → 3) H94, H96 → 4) H95 → 5) H97.
+
+**R5. Tier 3** (engine v20, save v31):
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H98 | Engine v20 foundation and Tier 3's weapons: Keen, Tempered, Evolved, the Tier 3 partners, re-forging | Claude | L | H97 | Waiting |
+| H99 | Accessories, Tier 3 (the third slot and the step) and the second weapon moon | Claude | M | H98 | Waiting |
+| H100 | Trees, Tier 3, and the six masteries: depth 6, two lines held, the master slot | Claude | L | H98 | Waiting |
+| H101 | Weaknesses and Tier 3's term; boss shields 10; the secondary reaches Tier 2's work | Claude | M | H98 | Waiting |
+| H102 | Save v31 (dark): two lines, the master slot, Tier 3's branches, the third slot, the second moon | Claude | M | H99, H100 | Waiting |
+| H103 | R5's screens (inert) | Either | L | H102 | Waiting |
+| H104 | R5's balance (dark): the masteries, Keen against Tempered against Evolved, the stack's ceiling, the pace with Tier 3's term | Claude | L | H99, H100, H101 | Waiting |
+| H105 | **R5's switch:** engine v20 and save v31 live; the manual | Claude | M | H102, H103, H104 | Waiting |
+
+**Waves:** 1) H98 → 2) H99, H100, H101 → 3) H102, H104 → 4) H103 → 5) H105.
+
+**Detail by release:** R1's and R2's packets point at files and lines on `421eacd` and are ready to dispatch. R3–R5's
+point at code by file and function, and name what R1–R4 introduce: whoever takes one re-reads the code first.
+**Overlaps to know:** two dark generations can be in flight at once (R2's H74–H78 beside R1's waves 2–4); the switch
+predicate keeps them apart. The Gear tab and the Stable are touched by H70, then H79–H80, then H88, H95 and H103:
+each rebases on the one before.
 
 **Build now** (approved designs; checks are local, the owner checks screen edges on the phone, P60):
 
@@ -83,7 +174,7 @@ one switch and turned on by H61; the build decisions are logged by H53):
 measured results are in classes-v2.md §9 and rift.md §11 (H60, H63; D186, D187), and the manual describes the game as
 it plays.
 
-The five docs' calls wait on the owner (Q12–Q16).
+The five Tier 2 docs' calls (Q12–Q16) are answered by the Tier rework (D192–D197).
 
 **Overlaps to know:**
 - **Gear tab:** H33 and H34 both touch it. Whichever lands second rebases.
@@ -91,14 +182,14 @@ The five docs' calls wait on the owner (Q12–Q16).
 - **Doc pairs:** H39 and H40 share engine v16, and H41, H42 and H43 cross-reference each other. Each doc matches the
   others that already exist.
 
-**Next, packets to write after these:**
-- **Tier 1 simplification** (D1).
+**Next, packets to write after these:** none. The rework's 42 packets cover every approved call; Tier 3's Rift waits
+for the fifth scenario (tiers T9).
 
 **Also:**
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Versions:** this game runs on uma-kit 0.12.0, uma-art 2.12.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+- **Versions:** this game runs on uma-kit 0.14.0, uma-art 2.12.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
   protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done

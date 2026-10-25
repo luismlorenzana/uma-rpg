@@ -48,7 +48,14 @@ on the shape it ships.
 - **Balance is measured, not guessed.** Each release has one balance packet. It runs README §9.5's simulation items
   with stat-balance §12's expected results and tunes only the knobs the docs name, in their order. It writes the
   measured numbers into the docs.
-- **D-rows.** A packet logs its own decisions as one D-row when it lands. Fetch `main` first for the number.
+- **D-rows.** A packet logs its own decisions as one D-row when it lands. Fetch `main` first for the number. Each
+  foundation packet (H64, H74, H83, H91, H98) first logs its release's build decisions as one D-row.
+- **"Built" lines.** A dark packet records itself in one place. R1's and R2's packets add "Built: H6x (D…)" under
+  their release's table here (§3). R3–R5's packets add "Built in H… (D…), live from H…" to the design sections they
+  build. Each switch packet turns its release's lines into "Live".
+- **Names that cross releases.** A tree's A/B/C pick is its **line** (`lines` on the profile, the input and the
+  loadout, R1). A weapon's Pure or Dual (and Keen, Tempered, Evolved) is its **branch** (`branches`, R3). A class's
+  focus branch is its **class branch** (`classBranch`, R4). The test mock for the switch is H64's `capsAt`.
 - **Done.** The packet file is deleted in the commit that finishes it (D35). Its row moves to Done in the handoff
   index.
 - **The house rules** (CLAUDE.md, AGENTS.md):
@@ -88,42 +95,45 @@ Waves: 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
 |---|---|---|---|---|
 | H73 | **Art** (uma-platform): Weapon Gem, Armor Fittings and Accessory Setting icon rows (G1–G10 each) and the Branch Gem; Claude publishes uma-art | ChatGPT | M | — |
 | H74 | Engine v17 foundation and the gear model: grades per weapon kind, armor slot and accessory slot from G0; the Uma Lv 5g − 4 gate; values × tier; armor's values; weapon, armor and accessory ranks and Gear Marks retired in the rules | Claude | L | H64 |
-| H75 | Accessories v3 (dark): the four families' base forms, the Bell's follow-up and the Insignia's rule, the damage stack's order, one slot, the supports retired, the signature accessory, the presets | Claude | L | H74 |
-| H76 | Extra Stats v3 (dark): the Planet, Prowess by class, Vigor and Guard; her moon; jewels and gates; the foe budget's on-curve map; Star Gems retired | Claude | M | H74 |
+| H75 | Accessories v3 (dark): the four families' base forms, the Bell's follow-up and the Insignia's rule, the damage stack's order, one slot, the supports retired, the signature accessory, the presets | Claude | L | H67, H74 |
+| H76 | Extra Stats v3 (dark): the Planet, Prowess by class, Vigor and Guard; her moon; jewels and gates; the foe budget's on-curve map; Star Gems retired | Claude | M | H67, H74 |
 | H77 | Professions v3 (dark): ten places with four slots, the five lines' catalog for every tier, the ladder, every recipe and made-item id, jobs and gates, the trade by calling, the open shop, the Exchange; facilities and upgrades retired | Claude | L | H64 |
 | H78 | Save v28 (dark) and the compensation: work settled, gear to grades, ranks and Manuals gone, Gear Marks to Class Marks, the new map, Star Gems gone, items to the 20 types, places and Laurels back, Craft Levels to 1, the Speed Ticket grant with its floor, `TierWorld.grant` | Claude | L | H69, H74, H75, H76, H77 |
-| H79 | R2's screens: gear and stars (inert): the Gear tab by grade, the accessory picker, ★ signature, the targets planner, "Can upgrade", the Observatory with her moon, the Stable's Signature facet | Either | L | H70, H73, H75, H76, H78 |
+| H79 | R2's screens: gear and stars (inert): the Gear tab by grade, the accessory picker, ★ signature, the targets planner, "Can upgrade", the Observatory with her moon, the Stable's Signature facet; pins uma-art 2.13.0 (whichever of H79 and H80 lands first) | Either | L | H70, H73, H75, H76, H78 |
 | H80 | R2's screens: the Wilds and the first launch (inert): the ten place pages and quick looks, the Workbench, the making places, the Warehouse, the Exchange, the Trade filter, "The Wilds are rebuilt" and its Account row, "Finish all" | Either | L | H70, H73, H77, H78 |
 | H81 | R2's balance (dark): the full Tier 1 re-baseline, accessory viability, MP, defense, five matched templates, Tier 2 and 3 worlds on Tier 1's shape × tier; the profession pacing simulation | Claude | L | H71, H75, H76, H77 |
-| H82 | R2's switch: engine v17 and save v28 live, uma-art pinned, the first launch checked on a full-shaped save; the manual rewritten | Claude | M | H72, H78, H79, H80, H81 |
+| H82 | R2's switch: v16's replays frozen first, then engine v17 and save v28 live; the first launch checked on a full-shaped save; the manual rewritten | Claude | M | H72, H78, H79, H80, H81 |
 
-Waves: H73 can start now. 1) H74, H77 after H64 (they run beside R1's waves 2–4) → 2) H75, H76 → 3) H78, then H81
-after H71 → 4) H79, H80 after H70 → 5) H82 after H72.
+Waves: H73 can start now. 1) H74, H77 after H64 (they run beside R1's waves 2–4) → 2) H75, H76 after H67 → 3) H78,
+then H81 after H71 → 4) H79, H80 after H70 → 5) H82 after H72.
 
 **R3. Tier 2's weapons (engine v18, save v29)**
 
 | Id | Task | Who | Size | Needs |
 |---|---|---|---|---|
-| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the two-kind cap, the Branch Gem and re-forging, the coverage script | Claude | L | H82 |
+| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the two-kind cap, the Branch Gem and re-forging, the coverage script; armor halves per piece for the four between classes (WP14) | Claude | L | H82 |
 | H84 | Accessories, Tier 2: the second slot, one of each family, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 |
 | H85 | The weapon moon: Full or Split, its jewels and gates, outside the kind cap, the presets | Claude | M | H83 |
 | H86 | The secondary profession: any other profession's base work from Tier 2, the main trade's own pair, the picker's order | Either | M | H82 |
 | H87 | Save v29 (dark): a branch per weapon kind, the second accessory slot and its form, the Branch Gem shelf, `weapon-moon-1` and `stars.moons`, `OwnedUma.secondary` | Claude | M | H83, H84, H85, H86 |
 | H88 | R3's screens (inert): the G5 branch pick and its partner, accessory branches, the weapon moon on the Observatory, the secondary on the Work tab and place pages, targets and "Can upgrade" | Either | L | H87 |
-| H89 | R3's balance (dark): Pure against Dual, coverage, Full against Split, every branch someone's best, Tier 2's term for these tools, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85 |
+| H89 | R3's balance (dark): Pure against Dual, coverage, Full against Split, every branch someone's best, Tier 2's shields (bosses 9) and most of its term on HP and DEF, the Rift's Tier 2 fronts, a Tier 2 run of twenty with the secondary | Claude | L | H83, H84, H85, H86 |
 | H90 | R3's switch: engine v18 and save v29 live; the manual | Claude | M | H87, H88, H89 |
 
-Waves: 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
+Waves: 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90. **Tier 2's shields move here from R4:** the Duals
+arrive while weaknesses are still twins, so H89 sets bosses 9 (SB6), sub-bosses 7 and regulars Tier 1's + 1 by CP8's
+rule, and carries most of SB3's HP and DEF (R3's tools are about ×1.35 an act); R4's H93 writes the rest of the term
+(HP and DEF to +27%, offense +10%, bosses × 1.1) and H96 tunes it.
 
 **R4. Tier 2's classes (engine v19, save v30)**
 
 | Id | Task | Who | Size | Needs |
 |---|---|---|---|---|
-| H91 | Engine v19 foundation and the class branches: the focus in the damage stack, the groups (Heavy, Lite, Elemental, Arcane), default and reverse sets, class skills through a focus slot, Frenzy, guards as skills, branch 1 preselected | Claude | L | H90 |
-| H92 | Trees, Tier 2: branch C (Sweep, Hunt, Focused, Mighty, Wide), the Power or Break tip, the signature tip (Quickstep, Spillover, Long guard), ten equipped slots | Claude | L | H91 |
-| H93 | Weaknesses by rank and Tier 2's term: Tier 2's lists, boss shields 9, the term on HP, DEF and offense and bosses × 1.1, the Rift's Tier 2 fronts, the pairings check | Claude | M | H91 |
+| H91 | Engine v19 foundation and the class branches: the focus in the damage stack, the groups (Heavy, Lite, Elemental, Arcane), default and reverse sets, class skills through a focus slot, Frenzy, guards as skills, branch 1 preselected, branch 2's presets, Tier 2's skill MP ×1.7 | Claude | L | H90 |
+| H92 | Trees, Tier 2: branch C (Sweep, Hunt, Focused, Mighty, Wide), the Power or Break tip, the signature tip (Quickstep, Spillover, Long guard), ten equipped slots, LB+ at Bond 10 | Claude | L | H91 |
+| H93 | Weaknesses by rank and Tier 2's term: Tier 2's lists, the rest of the term (HP and DEF to +27%, offense +10%, bosses × 1.1; the shields are R3's), the Rift's Tier 2 fronts, the pairings check | Claude | M | H91 |
 | H94 | Save v30 (dark): a class branch per class, branch C and tip picks | Claude | S–M | H91, H92 |
-| H95 | R4's screens (inert): the class tree on the Skills tab, the branch pick, branch C and the tips, ★ signature tip, the focus on the Battle tab, the group names on chips | Either | L | H94 |
+| H95 | R4's screens (inert): the class tree on the Skills tab, the branch pick, branch C and the tips, ★ signature tip, the focus on the Battle tab, the group names on chips | Either | L | H93, H94 |
 | H96 | R4's balance (dark): each class's two branches, the focus in its regions, the damage stack on one weak hit, the Tier 2 mirror, the pace with the term | Claude | L | H92, H93 |
 | H97 | R4's switch: engine v19 and save v30 live; the manual | Claude | M | H94, H95, H96 |
 
@@ -155,11 +165,11 @@ doc's owner) and UT11 (the affinity, never built).
 
 | Doc | R1 | R2 | R3 | R4 | R5 |
 |---|---|---|---|---|---|
-| **Class** (D192) | CP1, CP2, CP3, CP12 (H64); CP13–CP18, CP21, CP22 (Tier 1), CP23, CP24 (the root), CP25, CP28, CP32, CP35, CP37, CP42, CP43 (H65, H70); CP4, CP5, CP7, CP8 (Tier 1) (H66); CP29, CP30 (H67, H69, H70); CP9 (H71); CP31 (v27's part, H69); CP10, CP11 (weapons) | CP10, CP11 (accessories) (H75) | CP33 (H83) | CP6 (Tier 2), CP8 (Tier 2), CP41 (H93); CP19, CP22 (Tier 2) (H92); CP26, CP34, CP38–CP40 (H91); CP31 (v30's part) | CP6 (Tier 3), CP8 (Tier 3) (H101); CP20, CP22 (Tier 3), CP27 (H100) |
-| **Weapon** (D193) | — | WP1–WP5, WP14–WP16, WP26, WP28, WP29 (H74, H73); WP17–WP23 (base forms), WP25 (Tier 1), WP31, WP33 (H75) | WP6–WP8, WP10–WP12, WP32 (H83); WP19 (second slot), WP20–WP24, WP25 (Tier 2), WP34 (H84); WP13 (H83, H85) | — | WP9, WP8 (Tier 3) (H98); WP19 (third slot), WP25 (Tier 3), WP34 (step) (H99) |
+| **Class** (D192) | CP1, CP2, CP3, CP12 (H64); CP13–CP18, CP21, CP22 (Tier 1), CP23, CP24 (the root), CP25, CP28, CP32, CP35, CP37, CP42, CP43 (H65, H70); CP4, CP5, CP7, CP8 (Tier 1) (H66); CP29, CP30 (H67, H69, H70); CP9 (H71); CP31 (v27's part, H69); CP10, CP11 (weapons) | CP10, CP11 (accessories) (H75) | CP33 (H83); CP8 (Tier 2) (H89) | CP6 (Tier 2), CP41 (H93); CP19, CP22 (Tier 2) (H92); CP26, CP34, CP38–CP40 (H91); CP31 (v30's part) | CP6 (Tier 3), CP8 (Tier 3) (H101); CP20, CP22 (Tier 3), CP27 (H100) |
+| **Weapon** (D193) | — | WP1–WP5, WP14 (her class's half), WP15, WP16, WP26, WP28, WP29 (H74, H73); WP17–WP23 (base forms), WP25 (Tier 1), WP31, WP33 (H75) | WP6–WP8, WP10–WP12, WP14 (halves per piece), WP32 (H83); WP19 (second slot), WP20–WP24, WP25 (Tier 2), WP34 (H84); WP13 (H83, H85) | — | WP9, WP8 (Tier 3) (H98); WP19 (third slot), WP25 (Tier 3), WP34 (step) (H99) |
 | **Extra Stats** (D194) | — | EP1–EP8, EP13–EP23 (H76; EP19, EP20 on screen in H79; EP21 in H78) | EP10, EP24, EP25, EP27, EP29 (Tier 2) (H85) | — | EP12, EP26, EP29 (Tier 3) (H99) |
 | **Profession** (D195) | — | PP1–PP13, PP16, PP17, PP23 (H77); PP19, PP20, PP24, PP25 (H78, H80); PP21, PP22 (H80) | PP14, PP15 (H86) | — | PP14 (Tier 3's reach) (H101) |
-| **Stat balance** (D196) | SB6 (Tier 1), SB11, SB16, SB18 (H68, H71); SB1 (H64) | SB1, SB13 (H74); SB9, SB10, SB14, SB15 (H75, H81) | SB3 (the weapons' share), SB7, SB8 (H84, H89) | SB3, SB5, SB6 (9) (H93, H96) | SB4, SB5, SB6 (10), SB8 (Tier 3) (H99, H101, H104) |
+| **Stat balance** (D196) | SB6 (Tier 1), SB11, SB16, SB18 (H68, H71); SB1 (H64) | SB1, SB13 (H74); SB9, SB10, SB14, SB15 (H75, H81) | SB3 (most of HP and DEF), SB6 (9), SB7, SB8 (H84, H89) | SB3 (the rest), SB5 (H93, H96) | SB4, SB5, SB6 (10), SB8 (Tier 3) (H99, H101, H104) |
 | **Uma Templates** (D197) | UT2–UT6, UT12, UT14 (the chip, card and Flourish), UT15 (Calling, Stride, Knack), UT16, UT17, UT18 (the Flourish) (H67, H68, H70) | UT7, UT8, UT10, UT13, UT14 (the signature, her moon), UT15 (Signature), UT18 (the signature), UT19 (H75, H76, H77, H79, H81) | — | UT9, UT18 (the tips) (H92, H95) | UT20 (the dial, if the owner asks after playing) |
 
 ## 5. What each release asks of the owner
