@@ -1,4 +1,4 @@
-import type { BattleInput } from './types'
+import type { BattleInput, RpgFlourish } from './types'
 
 // Shared replay bounds: safe to use while parsing a save without loading the engine or skill catalog (H16).
 export const BATTLE_MAX_ROUNDS = 40
@@ -45,3 +45,15 @@ export const rpgRework = (stage: RpgReworkStage, engine: number = BATTLE_ENGINE_
 export const BATTLE_HEAL_OFFENSE_SCALE = 300
 /** v15 (classes v2 §4): the round ends a Cleric's Regen mends at, the round she casts her Light spell and the next. */
 export const BATTLE_REGEN_ROUNDS = 2
+/** v16 (SB18, D204): at each round's end every Uma regains this share of her max MP for each skill depth her class has
+ * open (`rpgBaseMpRegen`). Here so the sheet reads it without the engine; H71 tunes it. */
+export const RPG_BASE_MP_REGEN = 0.008
+/** v16: the depths the base MP regen counts, at most: five, so 4% from Class Rank 40 (Tier 3's sixth doesn't raise it). */
+export const RPG_BASE_MP_REGEN_DEPTHS = 5
+/** v16 (UT6, D204): her Flourish gives this share of her max HP a fight, as her calling's class: Clean break's Barrier, or
+ * the most Even pace and Late reserve mend. */
+export const BATTLE_FLOURISH_SHARE = 0.04
+/** v16: the share of her max HP Even pace and Late reserve mend at a round's end, within the fight's share. */
+export const BATTLE_FLOURISH_RATE: Readonly<Record<Exclude<RpgFlourish, 'clean-break'>, number>> = { 'even-pace': 0.01, 'late-reserve': 0.02 }
+/** v16: the first round whose end Late reserve mends at. */
+export const BATTLE_FLOURISH_FROM = 3

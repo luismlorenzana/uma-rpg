@@ -9,7 +9,7 @@
 // follows the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live
 // generation's.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
+import { BATTLE_ENGINE_VERSION, RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, rpgRework, rpgV2 } from './battle/caps'
 import {
   rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgNodeIdentity as rpgNode, rpgNodeLine, rpgSideNodeLevel, rpgTreeOf, type RpgBranch,
   type RpgLines, type RpgNodeIdentity as RpgNode,
@@ -351,6 +351,13 @@ export function rpgDepthBlock(profile: DepthGated, depth: number): string | null
 }
 /** The deepest depth a Class Rank opens. */
 export const rpgOpenDepth = (classRank: number): number => RPG_DEPTH_GATES.filter((gate) => classRank >= gate).length
+/** Engine v16's base MP regen (SB18, D204): the MP she regains at each round's end, 0.8% of her max MP for each depth her
+ * Class Rank opens, five at most (4% from Class Rank 40), rounded, at least 1; 0 before v16. A Spring Amulet's adds to it.
+ * The engine reads it from her frozen input, the sheet from her stats: one number. */
+export function rpgBaseMpRegen(maxMp: number, classRank: number, engine: number = BATTLE_ENGINE_VERSION): number {
+  if (!rpgRework('fight', engine)) return 0
+  return Math.max(1, Math.round(maxMp * RPG_BASE_MP_REGEN * Math.min(RPG_BASE_MP_REGEN_DEPTHS, rpgOpenDepth(classRank))))
+}
 
 /** The core skills an open depth gives in these trees, shallowest first. */
 export function rpgOpenCores(profile: Pick<RpgProfile, 'tier' | 'classRank'>, trees: readonly RpgTreeId[]): RpgNodeRef[] {

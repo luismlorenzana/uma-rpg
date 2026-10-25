@@ -10,12 +10,13 @@
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;
 // v15 classes v2 (D179, live since H61, D188): the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs;
 // v16 the Tier rework's fight (D200), dark until H72: three weapons by channel, no side skills; a trunk and one fork into
-// line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65).
+// line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the base MP regen
+// for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
-  isRpgDamageKind, isRpgTome, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
+  isRpgDamageKind, isRpgTome, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBaseMpRegen, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
   rpgWeaponKind, validRpgLines, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
@@ -28,8 +29,10 @@ import {
 import { RPG_MAX_TREE_NODES } from '../rules'
 import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
 import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, BattleEnemyMove, BattleError, BattleHalf,
-  BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit } from './types'
-import { BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES } from './caps'
+  BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit, RpgFlourish } from './types'
+import {
+  BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES,
+} from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
  * the engine. Older versions still replay; v15 is live since H61 (D188). The Tier rework's releases open at their engines
@@ -39,6 +42,8 @@ export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpg
 import { BATTLE_FAREWELL_FACTOR } from './skills'
 import { rpgRework, rpgV2 } from './caps'
 const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] as const
+/** v16 (UT6): the three Flourishes, one by stride. */
+const FLOURISHES: readonly RpgFlourish[] = ['clean-break', 'even-pace', 'late-reserve']
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/
 const safeInt = (v: unknown, min: number, max: number): v is number => Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max
@@ -118,12 +123,14 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
  * weapons' Might, her armor's Barrier and Regen (D102, D104). Her class and weapons by the fight's generation (D179): a
  * Paladin only from v15. From v16 (the Tier rework's fight, D200) three weapons by channel and position, and no side
  * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31); her `lines` (H65) name only her weapons, each B,
- * and her loadout holds only her held skills, at most her generation's slots (seven by Lv 40, CP22). */
+ * and her loadout holds only her held skills, at most her generation's slots (seven by Lv 40, CP22); her `flourish` (H68)
+ * is one of the three. */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
   const v16 = rpgRework('fight', version)
   if (v16 && (!Array.isArray(a.tree) || a.tree.length > 0 || !Array.isArray(a.legacy) || a.legacy.length > 0)) return false
   if (a.lines !== undefined && (!v16 || !Array.isArray(a.weapons) || !validRpgLines(a.lines, a.weapons))) return false
+  if (a.flourish !== undefined && (!v16 || !FLOURISHES.includes(a.flourish))) return false
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a, version)) return false
   if (!validCharms(a, version)) return false
   if (!v8 && (a.classRank !== undefined || a.might !== undefined || a.barrier !== undefined || a.regen !== undefined)) return false
@@ -288,20 +295,33 @@ function reveal(s: BattleState): BattleCue[] {
   })
 }
 
+/** v16 (UT6): what her Flourish puts on her unit as the fight starts. Clean break a Barrier of 4% of her max HP, the
+ * skill Barrier (`cover`), so it absorbs any damage first and lapses at round 1's end; Even pace and Late reserve the 4%
+ * they can mend this fight. Nothing for anyone else, so older states hash as they did. */
+function flourishStart(a: BattleAlly, version: BattleInput['version']): Pick<BattleUnit, 'cover' | 'flourish'> {
+  if (!a.flourish || !rpgRework('fight', version)) return {}
+  const share = Math.round(a.stats.hp * BATTLE_FLOURISH_SHARE)
+  if (a.flourish !== 'clean-break') return { flourish: share }
+  return share > 0 ? { cover: share } : {}
+}
+
 export function createBattle(source: BattleInput): BattleStep {
   validateInput(source)
   const input = JSON.parse(JSON.stringify(source)) as BattleInput
   const base = { statuses: [], barrier: 0, phase: 1 as const, guardingFor: null, brokenAt: 0, revived: false, limit: 0 }
   const units: BattleUnit[] = [
     ...input.allies.map((a) => ({ ...base, id: a.id, side: 'ally' as const, hp: a.stats.hp, mp: a.mp, shield: 0, limit: a.limitStart ?? 0, barrier: a.barrier ?? 0,
-      ...(input.version >= 11 ? { veil: a.veil ?? 0 } : {}) })),
+      ...(input.version >= 11 ? { veil: a.veil ?? 0 } : {}), ...flourishStart(a, input.version) })),
     ...input.enemies.map((e) => ({ ...base, id: e.id, side: 'enemy' as const, hp: e.stats.hp, mp: 0, shield: e.shield })),
   ]
   const state: BattleState = { engineVersion: input.version, input, round: 1, units, acted: [], summons: [], intents: [], outcome: 'active',
     ...(input.waves?.length ? { wave: 0 } : {}) }
   state.intents = intentsFor(state)
   armCharges(state)
-  return { state, cues: reveal(state), hash: battleStateHash(state) }
+  // v16: Clean break's Barrier, her own, shown before the foes' opening moves.
+  const opening: BattleCue[] = units.filter((u) => u.side === 'ally' && u.cover)
+    .map((u) => ({ kind: 'cover', actorId: u.id, targetId: u.id, amount: u.cover, label: 'Flourish' }))
+  return { state, cues: [...opening, ...reveal(state)], hash: battleStateHash(state) }
 }
 
 /** A hit is weak when its kind is on the foe's lists, or it is Light or Dark against a Hexed foe. */
@@ -776,11 +796,15 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     }
     u.statuses = u.statuses.map((x) => ({ ...x, turns: x.turns - 1 })).filter((x) => x.turns > 0)
     // v8: magical armor's Regen (D104); v11: a Vital Talisman's, and a Spring Amulet's MP (D124).
-    const regen = u.side === 'ally' ? allyOf(s, u.id)?.regen ?? 0 : 0
+    const ally = u.side === 'ally' ? allyOf(s, u.id) : undefined
+    const regen = ally?.regen ?? 0
     const healed = Math.min(regen, maxHp(s, u.id) - u.hp)
     if (healed > 0) { u.hp += healed; cues.push({ kind: 'status', actorId: u.id, targetId: u.id, label: `Regen +${healed}`, amount: healed }) }
-    const mpRegen = u.side === 'ally' ? allyOf(s, u.id)?.mpRegen ?? 0 : 0
-    const mp = Math.min(mpRegen, (allyOf(s, u.id)?.stats.mp ?? 0) - u.mp)
+    // v16 (UT6): her Even pace or Late reserve, after armor's Regen.
+    if (ally && u.flourish) flourishMend(s, u, ally, cues)
+    // v16 (SB18): the base MP regen joins the Spring's, one cue, never past her max MP.
+    const mpRegen = ally ? (ally.mpRegen ?? 0) + rpgBaseMpRegen(ally.stats.mp, battleClassRank(ally), s.engineVersion) : 0
+    const mp = Math.min(mpRegen, (ally?.stats.mp ?? 0) - u.mp)
     if (mp > 0) { u.mp += mp; cues.push({ kind: 'mp', actorId: u.id, targetId: u.id, amount: mp }) }
   }
   if (s.engineVersion >= 12) {
@@ -808,6 +832,19 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
   s.intents = intentsFor(s)
   armCharges(s)
   cues.push(...reveal(s))
+}
+
+/** v16 (UT6): at a round's end, Even pace mends 1% of her max HP and Late reserve 2% from round 3's end, each within what
+ * is left of her 4% this fight (`flourish`). Not a heal skill: no healing scale, never past her max HP; at full HP she
+ * mends nothing and keeps it. Only an Uma standing reaches here. */
+function flourishMend(s: BattleState, u: BattleUnit, ally: BattleAlly, cues: BattleCue[]): void {
+  if (!ally.flourish || ally.flourish === 'clean-break' || (ally.flourish === 'late-reserve' && s.round < BATTLE_FLOURISH_FROM)) return
+  const max = maxHp(s, u.id)
+  const healed = Math.min(Math.round(max * BATTLE_FLOURISH_RATE[ally.flourish]), u.flourish ?? 0, max - u.hp)
+  if (healed <= 0) return
+  u.hp += healed
+  u.flourish = (u.flourish ?? 0) - healed
+  cues.push({ kind: 'heal', actorId: u.id, targetId: u.id, amount: healed, label: 'Flourish' })
 }
 
 function restoreMp(s: BattleState, u: BattleUnit, share: number, actorId: string, cues: BattleCue[]): void {

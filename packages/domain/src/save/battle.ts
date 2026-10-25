@@ -3,7 +3,7 @@
 // accessories' kinds (D124). Pure
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
 // docs/design/class-rework.md, docs/design/progression.md.
-import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
+import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../rpg/battle/types'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
@@ -31,7 +31,7 @@ import { PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, type Class
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
-import { umaCalling, umaCallingPick, umaCallingPickBlock } from '../roster/template'
+import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
@@ -304,8 +304,18 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
   return withWorld(save, tier, { ...world, world: { ...world.world, run: { ...world.world.run, mp, updatedAt: now }, springs: { ...world.world.springs, [springId]: now } } }, now)
 }
 
+/** Her Flourish as she fights (UT6, UT12): her template's, by her stride, while she fights as her calling's class (her
+ * active one unless named), else null. `pick` is her calling pick, her stored one (save v27, H69) unless named; null is her
+ * row's calling. Read from the template's two parts (`umaTemplate(outfit, pick)`'s `calling` and `flourish`), so its name
+ * tables stay out of the main bundle. */
+export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' | 'calling'>, classId: RpgClass = activeClass(outfit, uma),
+  pick: RpgClass | null = uma.calling?.pick ?? null): RpgFlourish | null {
+  return umaFlourishActive({ calling: umaCalling(outfit, pick) }, classId) ? STRIDE_FLOURISH[umaStride(outfit)] : null
+}
+
 /** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
- * her accessories (the fight's generation's, H57) and her Hero seat or inherited Limit Breaks. Working Umas fight too (D119). */
+ * her accessories (the fight's generation's, H57), her Hero seat or inherited Limit Breaks, and from v16 her Flourish as
+ * her calling (H68). Working Umas fight too (D119). The world map and the Rift both build their allies here. */
 export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE,
   engine: number = BATTLE_ENGINE_VERSION): RpgPartyMember[] {
   return ids.map((id) => {
@@ -313,9 +323,11 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
     const uma = ownedOf(world, id)
     const classId = activeClass(outfit, uma)
+    // Her Flourish by her stored calling pick (save v27, H69): a Pace Uma who picked the Spell Blade has it as one.
+    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling?.pick ?? null) : null
     return { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
       points: umaPoints(uma, classId), might: equippedMight(uma.gear.equipped, classOf(uma, classId).weapons),
-      accessories: equippedAccessories(uma.gear.equipped, engine), ...heroFields(world, id) }
+      accessories: equippedAccessories(uma.gear.equipped, engine), ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
   })
 }
 

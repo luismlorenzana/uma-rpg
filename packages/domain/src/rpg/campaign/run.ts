@@ -2,7 +2,7 @@
 // (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, rpgRework, rpgV2 } from '../battle/engine'
-import type { BattleAction, BattleInput, BattleState, BattleStep } from '../battle/types'
+import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../battle/types'
 import { applyPoints, noPoints, type Points } from '../../economy/bonus'
 import { accessoryFightFields, noAccessoryEffects, type AccessoryEffects } from '../../economy/gear-id'
 import { projectRpgStats, rpgLifetimeLevels, type RpgLines, type RpgProfile } from '../rules'
@@ -31,11 +31,13 @@ export function rpgRestAtCamp(chapter: RpgCampaignChapter, run: RpgRun, campId: 
 }
 
 /** A party member as she enters a fight: her profile, her class's equipped skills, her stat points, her weapons' Might
- * (D104), what her two accessories do (D124), and her Hero seat or inherited Limit Breaks (D106). */
+ * (D104), what her two accessories do (D124), her Hero seat or inherited Limit Breaks (D106), and from v16 her Flourish
+ * while she fights as her calling's class (UT6, UT12; H68). */
 export interface RpgPartyMember {
   profile: RpgProfile; loadout: RpgProfile['tree']; points?: Points
   might?: BattleInput['allies'][number]['might']; accessories?: AccessoryEffects
   hero?: BattleInput['allies'][number]['hero']; inherits?: BattleInput['allies'][number]['inherits']
+  flourish?: RpgFlourish
 }
 
 export const rpgMemberLevel = (profile: Pick<RpgProfile, 'tier' | 'level'>): number => rpgLifetimeLevels(profile.tier, profile.level) + 1
@@ -63,11 +65,13 @@ function fightLines(lines: RpgLines | undefined, weapons: RpgProfile['weapons'])
 /** The party as the engine takes it (D104, D124, D106): each member's boosted stats, Might, accessory effects and Hero
  * fields, with the MP `mpOf` gives her (the world map's carried MP; a Rift fight's full MP, R4). Built by the fight's
  * generation: classes v2 (H57) projects her stats by v2's rules (HP with Guts) and sends no Orb kinds, her Orb's offense
- * joining her Might instead; from v16 her lines (H65) on her slotted weapons' trees ride along (H69). */
+ * joining her Might instead; from v16 her lines (H65) on her slotted weapons' trees ride along (H69), and her Flourish is
+ * frozen in (UT18, H68). */
 export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile: RpgProfile, points?: Points) => number,
   engine: number = BATTLE_ENGINE_VERSION): BattleInput['allies'] {
   const v2 = rpgV2(engine)
-  return party.map(({ profile, loadout, points, might: weapons, accessories, hero, inherits }) => {
+  const v16 = rpgRework('fight', engine)
+  return party.map(({ profile, loadout, points, might: weapons, accessories, hero, inherits, flourish }) => {
     const boosted = applyPoints(projectRpgStats(profile, engine), points ?? noPoints())
     const a = accessories ?? noAccessoryEffects()
     // Only what's there goes in the frozen fight: an absent effect is 0. Shares of max HP become HP here (D141).
@@ -77,10 +81,11 @@ export function rpgPartyAllies(party: readonly RpgPartyMember[], mpOf: (profile:
       ? Object.entries(a.orbMight).reduce<Might>((m, [k, n]) => ({ ...m, [k]: (m[k as keyof Might] ?? 0) + n }), { ...weapons }) : weapons
     return { id: profile.outfitId, classId: profile.classId, weapons: [...profile.weapons], tier: profile.tier, level: profile.level, stats: boosted.stats,
       tree: profile.tree, legacy: profile.legacy, loadout, ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), mp: mpOf(profile, points),
-      classRank: profile.classRank, ...(rpgRework('fight', engine) ? fightLines(profile.lines, profile.weapons) : {}),
+      classRank: profile.classRank, ...(v16 ? fightLines(profile.lines, profile.weapons) : {}),
       ...(might && Object.keys(might).length ? { might } : {}), ...effects,
       ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}), ...(boosted.limitStart > 0 ? { limitStart: boosted.limitStart } : {}),
-      ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}) }
+      ...(hero ? { hero } : {}), ...(inherits?.length ? { inherits: inherits.map((i) => ({ ...i })) } : {}),
+      ...(v16 && flourish ? { flourish } : {}) }
   })
 }
 
