@@ -14,6 +14,8 @@ import {
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/stars'
+import { CORE_NODES, mapNodeGate, mapPoints } from '../economy/planet'
+import type { GearTier } from '../economy/grades'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
 import { ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext } from '../economy/ranks'
@@ -83,8 +85,12 @@ export function balanceClassRank(level: number): number {
   return rank
 }
 
-/** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats. */
+/** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats.
+ * From v17 (R2, EP16; H76, D213) the core's nodes her level opens, in map order: `planet:n` from Lv 10n − 9 and each
+ * moon's `n` from Lv 10n − 4, the same 20 for every class (Prowess at her split, in `mapPoints`) and no template moon
+ * (the average Uma has none, XR12). */
 export function onCurveStars(classId: RpgClass, level: number, engine: number = BATTLE_ENGINE_VERSION): string[] {
+  if (rpgRework('economy', engine)) return CORE_NODES.filter((id) => mapNodeGate(id) <= level)
   const grade = onCurveGrade(level)
   const slots = 5 + Math.floor(level / 2)
   const stats = kitOf(classId, engine).stats
@@ -145,7 +151,10 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
     const accessories = options.support === undefined ? [orb, ...kit.accessories.slice(1)] : [orb, options.support]
     accessories.forEach((type, k) => { if (type) equipped[`accessory-${k + 1}` as GearSlot] = `${type}-g${grade}` })
   }
-  const points = addPoints(options.gear ? equippedPoints(equipped) : noPoints(), options.stars ? starPoints(onCurveStars(classId, level, engine)) : noPoints())
+  // From v17 her on-curve map is v3's, worth its tier's values (H76); H81 builds the rest of the v17 member.
+  const stars = !options.stars ? noPoints() : rpgRework('economy', engine)
+    ? mapPoints(onCurveStars(classId, level, engine), classId, tier as GearTier) : starPoints(onCurveStars(classId, level, engine))
+  const points = addPoints(options.gear ? equippedPoints(equipped) : noPoints(), stars)
   const boosted = applyPoints(projectRpgStats(profile, engine), points)
   const a = equippedAccessories(equipped, engine)
   // v2 (C4): her Orb's offense joins her Might on its kind, as `rpgPartyAllies` adds it.

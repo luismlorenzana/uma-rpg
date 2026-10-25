@@ -13,7 +13,7 @@ import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, classOf, classRankOf, classTrack, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack,
+  rpgExpToNext, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack, starsV1,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -387,7 +387,7 @@ function GearTab({ outfit, uma, world, upgrades }: { outfit: RosterOutfit; uma: 
             <span className="text-[14px] font-semibold">Extra Stats</span>
             {ready && <span className="rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{ready}</span>}
           </span>
-          <span className="text-[12px] text-ink-soft">{uma.stars.active.length}/{activeNodeSlots(uma.level)} active · {uma.stars.unlocked.length}/100 · map ›</span>
+          <span className="text-[12px] text-ink-soft">{starsV1(uma).active.length}/{activeNodeSlots(uma.level)} active · {starsV1(uma).unlocked.length}/100 · map ›</span>
         </span>
         <span className="mt-1 block text-[11px] text-ink-faint">
           Total with armor: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}

@@ -11,6 +11,7 @@ import { projectRpgStats, rpgBaseMpRegen, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
 import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
+import { moonTemplate } from '../economy/planet'
 import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
 import { gearV1, isGrades, type OwnedUma } from './save'
 
@@ -42,7 +43,7 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
   engine: number = BATTLE_ENGINE_VERSION): SheetGroup[] {
   const v2 = rpgV2(engine)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId), engine)
-  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3)
+  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick))
   const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
   const geared = applyPoints(base, parts.gear).stats
   const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>

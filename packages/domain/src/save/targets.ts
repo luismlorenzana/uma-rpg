@@ -12,7 +12,7 @@ import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { gearV1, MAX_TARGETS, slotKind, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearV1, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
 
 /** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -62,7 +62,9 @@ export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, numb
   for (const type of gearTypes(uma, classId)) {
     for (let g = boundGrade(uma, gearTrackOf(type)) + 1; g <= GEAR_MAX_RANK; g++) add(gearId(type, g))
   }
-  for (const node of STAR_NODES) if (!uma.stars.unlocked.includes(node)) add(nodeGem(node))
+  // A v1 map's Star Gems; a v3 map (R2, H76) needs jewels, which the targets planner reads from H79.
+  const unlocked = starsV1(uma).unlocked
+  if (!isStarMap(uma.stars)) for (const node of STAR_NODES) if (!unlocked.includes(node)) add(nodeGem(node))
   return demand
 }
 

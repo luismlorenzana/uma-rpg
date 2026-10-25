@@ -26,9 +26,13 @@ import {
 import { starPoints } from '../economy/stars'
 import { addPoints, type Points } from '../economy/bonus'
 import { armorHalf, gradeMight, gradePoints, type GearTier } from '../economy/grades'
+import { mapPoints, moonTemplate, type MoonTemplate } from '../economy/planet'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
-import { gearV1, gradesOf, isGrades, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, type ClassLoadout, type OwnedUma, type Save, type TierWorld } from './save'
+import {
+  gearV1, gradesOf, isGrades, isStarMap, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, starsV1, type ClassLoadout, type OwnedUma, type Save,
+  type TierWorld,
+} from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { heroFields, payBonds, type BondGain } from './heroes'
 import { callingPickBlock } from './status'
@@ -203,17 +207,21 @@ export function callingConfirmed(uma: OwnedUma): OwnedUma {
   return { ...uma, calling: { pick: uma.calling.pick, confirmed: true } }
 }
 
-/** Every stat point she brings to a fight: her active Extra Stats nodes (S6) and her armor (S7, D104). */
-export function umaPoints(uma: OwnedUma, classId: RpgClass, tier: GearTier = 1): Points {
-  const { gear, extra } = umaPointParts(uma, classId, tier)
+/** Every stat point she brings to a fight: her Extra Stats (S6; R2's map with her moon from `template`) and her armor
+ * (S7, D104). */
+export function umaPoints(uma: OwnedUma, classId: RpgClass, tier: GearTier = 1, template?: MoonTemplate): Points {
+  const { gear, extra } = umaPointParts(uma, classId, tier, template)
   return addPoints(extra, gear)
 }
-/** Her points apart: what her armor gives, and her active Extra Stats nodes. (Weapons add Might to their hits instead.) */
-export function umaPointParts(uma: OwnedUma, classId: RpgClass = 'brawler', tier: GearTier = 1): { gear: Points; extra: Points } {
+/** Her points apart: what her armor gives, and her Extra Stats: a v1 map's active nodes, or a v3 map's open nodes
+ * (`mapPoints`: Prowess split by `classId`, her moon by `template`, values × `tier`; H76, D213). (Weapons add Might to
+ * their hits instead.) */
+export function umaPointParts(uma: OwnedUma, classId: RpgClass = 'brawler', tier: GearTier = 1, template?: MoonTemplate): { gear: Points; extra: Points } {
   const gear = isGrades(uma.gear)
     ? gradePoints(gradesOf(uma), armorHalf(classId), tier)
     : equippedPoints(gearV1(uma).equipped)
-  return { gear, extra: starPoints(uma.stars.active) }
+  const extra = isStarMap(uma.stars) ? mapPoints(uma.stars.open, classId, tier, template) : starPoints(starsV1(uma).active)
+  return { gear, extra }
 }
 
 /** What her weapons add to each offense on her profile (D119): the average Might of the weapons in her class's five
@@ -279,7 +287,9 @@ export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' 
 
 /** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
  * her accessories (the fight's generation's, H57), her Hero seat or inherited Limit Breaks, and from v16 her Flourish as
- * her calling (H68). Working Umas fight too (D119). The world map and the Rift both build their allies here. */
+ * her calling (H68). A v3 map's points read her active class (Prowess's split) and her moon's template, her knack and her
+ * calling's channel by her stored pick (H76). Working Umas fight too (D119). The world map and the Rift both build their
+ * allies here. */
 export function partyMembers(world: TierWorld, ids: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = TIER_ONE,
   engine: number = BATTLE_ENGINE_VERSION): RpgPartyMember[] {
   return ids.map((id) => {
@@ -292,7 +302,7 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const gearTier = Number(tier) as GearTier
     const weapons = classOf(uma, classId).weapons
     const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      points: umaPoints(uma, classId, gearTier), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
+      points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, uma.calling.pick)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
       ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
     return isGrades(uma.gear) ? common : { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
   })
