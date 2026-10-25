@@ -113,7 +113,7 @@ describe('the Rift on v16 (CP7, D202)', () => {
         growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId, weapons: [...weapons], tier: 1, level: 50, exp: 0,
         tree: [], legacy: [], classRank: 50 }
       const stats = projectRpgStats(p, 16)
-      const loadout = [1, 2, 3].flatMap((d) => weapons.map((w) => ({ tier: 1, id: `${classId}-${w}.${d}` }))).slice(0, rpgActiveSlots(50))
+      const loadout = [1, 2, 3].flatMap((d) => weapons.map((w) => ({ tier: 1, id: `${classId}-${w}.${d}` }))).slice(0, rpgActiveSlots(50, 16))
       return { id, classId, weapons: [...weapons], tier: 1, level: 50, stats, tree: [], legacy: [], loadout, mp: stats.mp, classRank: 50 }
     }
     const party = (front: RiftFront) => riftGuidedBuild(front, 16).map((m, i) => member(`a${i + 1}`, m.classId, m.weapons))

@@ -4,10 +4,11 @@
 // Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
 // D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5;
 // v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md;
-// v16 the Tier rework's fight, D200, dark until H72: three weapons by channel, no side or legacy skills;
+// v16 the Tier rework's fight, D200, dark until H72: three weapons by channel, no side or legacy skills, a
+// trunk and one fork into lines A and B, Skill Ranks (H65);
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
-import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
+import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
 export type BattleSide = 'ally' | 'enemy'
 export type BattleChannel = 'physical' | 'magical'
@@ -29,6 +30,9 @@ export interface BattleAlly {
   tree: RpgNodeRef[]
   /** Skills carried from an earlier tier (S8); retired from v16 (CP31): empty. */
   legacy: RpgNodeRef[]
+  /** v16 (H65, CP18): her line on each weapon's tree, B where listed, else A. Its keys are among her weapons and its values
+   * B; refused before v16. Her held skills follow it, and every one of them takes the Skill Rank her `classRank` gives. */
+  lines?: RpgLines
   loadout: RpgNodeRef[]
   /** The kind her Orb adds to every hit, for weaknesses only (D86). Refused from v15 (D179). */
   orb?: RpgDamageKind

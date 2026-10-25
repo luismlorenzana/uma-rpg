@@ -1,8 +1,9 @@
 // Halls of Heroes (D106, D107): each class's hall seats four Heroes, and each seat teaches one unique Limit Break. A Hero
 // always uses her seat's Limit Break at full strength; a Learner under her inherits it at half, plus 5% a Bond Level, and
 // keeps its shape: its weapons and elements (worn or not), its hits and its statuses. Classes v2 (engine v15, §5) adds the
-// Paladin Bastion: 24 Limit Breaks, read by generation like every class rule (D179).
-import { rpgV2 } from './battle/caps'
+// Paladin Bastion: 24 Limit Breaks, read by generation like every class rule (D179). Engine v16 (the Tier rework's fight,
+// H65) changes two seats' kinds (CP35). A Limit Break never takes a Skill Rank (CP28): its power is her open depth's.
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, type RpgSkillDef, type RpgSupport } from './catalog'
 import type { RpgClass, RpgDamageKind } from './kinds'
 import type { HeroLimitId } from './hero-id'
@@ -117,14 +118,23 @@ const NEW: readonly HeroLimit[] = [
 ]
 /** A replaced seat keeps its place in the Map, and the Bastion's four come last: seat order, as `ALL_HERO_LIMIT_IDS`. */
 const BY_V2 = new Map([...LIMITS, ...NEW].map((l) => [l.id, l]))
-const LIVE = rpgV2() ? BY_V2 : BY_V1
-/** The live generation's Limit Breaks, in seat order: today's 20 until the switch (H61), the six halls' 24 after. Screens
- * and the manual read these; the engine reads `heroLimitFor(id, version)`. */
+/** v16, the Tier rework's fight (CP35, class-progression §8.3): two seats change kind so every hall spreads over the twin
+ * sets. Rampart Charge charges with an Axe (the Bastion answered Fire twice and Ice never), and Choir of Angels' second
+ * hit is Lightning (the Chapel had none). Shapes, power and support stay. */
+const BY_V16 = new Map(BY_V2)
+BY_V16.set('paladin-3', { ...BY_V2.get('paladin-3')!, blurb: 'One Axe charge on one foe, then a Barrier on every ally',
+  casts: [{ target: 'one', hits: [one('axe', 1)], support: heal({ shield: 'all' }) }] })
+BY_V16.set('cleric-1', { ...BY_V2.get('cleric-1')!, blurb: 'Light on every foe, then Lightning on every foe, then Aegis 2 on every ally',
+  casts: [{ target: 'all', hits: [one('light', 0.5), one('lightning', 0.5)], status: { key: 'aegis', stacks: 2, turns: 2, to: 'allies' } }] })
+const byVersion = (version: number) => (rpgRework('fight', version) ? BY_V16 : rpgV2(version) ? BY_V2 : BY_V1)
+const LIVE = byVersion(BATTLE_ENGINE_VERSION)
+/** The live generation's Limit Breaks, in seat order: today's 20 until the switch (H61), the six halls' 24 after, with
+ * v16's two kinds from H72. Screens and the manual read these; the engine reads `heroLimitFor(id, version)`. */
 export const HERO_LIMITS: readonly HeroLimit[] = [...LIVE.values()]
 export const heroLimit = (id: HeroLimitId): HeroLimit => LIVE.get(id)!
 /** A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Undefined only
  * for a seat its generation lacks (a Paladin seat before v15, which the engine refuses). */
-export const heroLimitFor = (id: HeroLimitId, version: number): HeroLimit | undefined => (rpgV2(version) ? BY_V2 : BY_V1).get(id)
+export const heroLimitFor = (id: HeroLimitId, version: number): HeroLimit | undefined => byVersion(version).get(id)
 /** Her class's Limit Break power in an engine's generation (D179): the hybrids' 2.2× from v15 (§5). */
 export const heroLimitPower = (classId: RpgClass, version: number): number => (rpgV2(version) ? POWER_V2 : POWER_V1)[classId]
 /** A seat's Limit Breaks by class, in seat order, in the live generation. */

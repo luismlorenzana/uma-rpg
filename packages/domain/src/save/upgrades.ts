@@ -3,10 +3,10 @@
 // on the tracks a target climbs: her active class's five weapons, each armor slot's kind and each filled accessory
 // slot's type, plus an empty accessory slot she could fill. "Better" is the sheets' D119 rule (`gearChoices` +
 // `equipBlock`): her own piece above the one she wears, or the stock's next grade her rank allows. Points: her active
-// class's unspent side points, while a side skill of her five trees can be learned. Extra Stats: gem kinds she can set
+// class's unspent side points, while a side skill of her five trees can be learned (to v15; none from v16, H65). Extra Stats: gem kinds she can set
 // (the Observatory's rule, `nodeFromGem`) and free active slots she could fill. Pure and cheap: lookups by id, no scan
 // of the stock per slot, so the Stable can ask it for every Uma.
-import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { accessoryFits, ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, classRankOf } from '../economy/ranks'
@@ -20,7 +20,8 @@ export interface UmaUpgrades {
   /** Slots that can take a better piece now: a weapon type of her five, an armor slot or an accessory slot. */
   gearSlots: GearSlot[]
   gear: number
-  /** Her active class's unspent side points, or 0 when no side skill can be learned now. */
+  /** Her active class's unspent side points, or 0 when no side skill can be learned now; always 0 from v16, where nothing
+   * costs points (CP14), so the Skills tab's dot reads only gear. */
   points: number
   /** Star Gem kinds in stock she can set now. */
   gems: number
@@ -66,7 +67,7 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
   return best + 1 <= rank && (stock[gearId(type, best + 1)] ?? 0) > 0
 }
 
-/** Whether she can learn any side skill of her five trees now (`rpgLearnBlock` is null for one). */
+/** Whether she can learn any side skill of her five trees now (`rpgLearnBlock` is null for one). Engines v6–v15. */
 function canLearnSide(uma: OwnedUma, classId: RpgClass, tier: number, unspent: number): boolean {
   const setup = classOf(uma, classId)
   const learner = { classId, tier, classRank: classRankOf(uma.ranks, classId), tree: setup.tree.map((id) => ({ tier, id })) }
@@ -113,8 +114,9 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
     if (piece ? better(uma, world.gear, bound, piece.type, piece.grade) : fill) gearSlots.push(slot)
   }
 
+  // Side points end with v15: from v16 no node costs anything (CP14).
   const rank = classRankOf(uma.ranks, classId)
-  const unspent = rpgTreePointsEarned(rank) - rpgTreePointsSpent(classOf(uma, classId).tree.map((id) => ({ tier, id })))
+  const unspent = rpgRework('fight', engine) ? 0 : rpgTreePointsEarned(rank) - rpgTreePointsSpent(classOf(uma, classId).tree.map((id) => ({ tier, id })))
   const points = unspent > 0 && canLearnSide(uma, classId, tier, unspent) ? unspent : 0
 
   const open = new Set(uma.stars.unlocked)

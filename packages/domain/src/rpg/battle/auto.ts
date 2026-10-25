@@ -1,6 +1,6 @@
 // Deterministic ally auto-battle policy (H02): prefer a ready Limit Break, otherwise choose the strongest affordable
 // skill or Attack for the living foes. This is intentionally a small policy, not another battle engine.
-import { rpgNode, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
+import { rpgNode, rpgNodeSkill, RPG_SKILL_POWER, type RpgSkillDef } from '../catalog'
 import { isRpgTome, rpgHand, type RpgHand, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { applyBattleAction, battleActorSkill, battleAttackDef, battleFoe, battleHitIsWeak, battleSupportValue } from './engine'
 import { BATTLE_LIMIT_MAX, battleLimitPlan, type BattleLimitChoice } from './limit'
@@ -56,7 +56,7 @@ function classLimitChoice(state: BattleState, actor: BattleAlly): BattleLimitCho
   if (actor.classId === 'mage' || actor.classId === 'cleric') return {}
   if (actor.classId === 'brawler') return skills[0] ? { skill: skills[0] } : actor.weapons[0] ? { weapon: actor.weapons[0] } : null
   if (actor.classId === 'summoner') {
-    const skill = skills.find((ref) => rpgNode(ref.id)?.skill?.summon)
+    const skill = skills.find((ref) => { const node = rpgNode(ref.id); return node && rpgNodeSkill(node, state.engineVersion).summon })
     return skill ? { skill } : null
   }
   const arms = skills.find((ref) => !isRpgTome(rpgNode(ref.id)?.weapon ?? 'greatsword'))

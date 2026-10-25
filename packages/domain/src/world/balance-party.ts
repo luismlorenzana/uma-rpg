@@ -2,7 +2,7 @@
 // simulation measures the game as it is. "On curve" means what a player at her level would have: weapons, armor and
 // accessories of the grade her ranks open, the Extra Stats nodes her level allows and an inherited Limit Break. Test
 // support only: nothing in the game imports it.
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import type { BattleAlly, BattleInput } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
@@ -72,7 +72,9 @@ export interface BalanceOptions {
 }
 
 /** An average outfit of a class at a level: side skills learned deepest first, the deepest skills equipped one weapon at a
- * time, and, on curve, her gear, Extra Stats and an inherited Limit Break. */
+ * time, and, on curve, her gear, Extra Stats and an inherited Limit Break. From v16 (H65) the Tier rework's Uma: her three
+ * default weapons, no side skills, every tree on line A, her held skills and v16's slots (seven by Lv 40); her Class Rank
+ * is her level unless `classRank` says otherwise (the real pace is H71's). */
 export function balanceMember(classId: RpgClass, i: number, level: number, options: BalanceOptions = {}): BattleAlly {
   const tier = options.tier ?? 1
   const engine = options.engine ?? BATTLE_ENGINE_VERSION
@@ -80,13 +82,17 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons: rpgDefaultWeapons(classId, engine), tier, level, exp: 0,
     tree: [], legacy: [], classRank: options.classRank ?? level }
-  for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
-  const known = rpgLearnedSkills(profile).sort((a, b) => rpgNode(b.id)!.depth - rpgNode(a.id)!.depth)
+  // To v15 she learns the A side at every depth while her points last; from v16 nothing is learned (CP14).
+  if (!rpgRework('fight', engine)) {
+    for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
+  }
+  const known = rpgLearnedSkills(profile, engine).sort((a, b) => rpgNode(b.id)!.depth - rpgNode(a.id)!.depth)
+  const slots = rpgActiveSlots(level, engine)
   const loadout: RpgNodeRef[] = []
-  for (let pass = 0; pass < 5 && loadout.length < rpgActiveSlots(level); pass++) {
+  for (let pass = 0; pass < 5 && loadout.length < slots; pass++) {
     for (const w of profile.weapons) {
       const next = known.find((r) => rpgNode(r.id)!.weapon === w && !loadout.some((x) => x.id === r.id))
-      if (next && loadout.length < rpgActiveSlots(level)) loadout.push(next)
+      if (next && loadout.length < slots) loadout.push(next)
     }
   }
   const grade = onCurveGrade(level)
