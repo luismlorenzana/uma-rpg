@@ -68,7 +68,7 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
 | `rpg/battle/` | Deterministic combat reducer and cues; engine v15 (classes v2, D179–D188), every older version replaying as it was; v16, the Tier rework's fight, built behind `rpgRework` (D200), live from H72; `caps.ts` holds the switch |
 | `rpg/catalog.ts`, `rpg/rules.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules |
-| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97) |
+| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v16's twins and Tier 1's shields built dark (D202), live from H72 |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
 | `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |
 

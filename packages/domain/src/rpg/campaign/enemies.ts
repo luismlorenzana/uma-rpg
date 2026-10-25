@@ -1,4 +1,5 @@
 // Campaign foes: roles and level scaling (docs/design/battles.md), ported from uma-racer where a campaign sim tuned them.
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
 import { RPG_TIER_MAX_LEVEL, type RpgElement } from '../rules'
 import type { BattleEnemy, BattleEnemyMove, BattleWeaknesses, EnemyRank } from '../battle/types'
 
@@ -24,6 +25,14 @@ export const RPG_FOE_TUNING = {
   /** Break shields (D279): regular foes 2 early and 3 from Senior Year, sub-bosses 6, champions 8. */
   regularShield: 2, lateRegularShield: 3, subBossShield: 6, bossShield: 8,
 } as const
+
+/** Tier 1's shields from v16 (CP8, SB6, D202): with twins a foe has fewer answers (2.47 a foe on the default party), so her
+ * Breaks come slower and the sub-boss's and the boss's shields drop; regulars, guards and assistants keep theirs. H71 tunes
+ * them against the rounds to the first Break. */
+export const RPG_FOE_SHIELDS_V16 = { subBoss: 5, boss: 6 } as const
+/** A sub-boss's and a boss's shield in an engine's generation: `RPG_FOE_TUNING`'s 6 and 8 to v15, 5 and 6 from v16. */
+export const rpgFoeShields = (engine: number = BATTLE_ENGINE_VERSION): { subBoss: number; boss: number } =>
+  (rpgRework('fight', engine) ? RPG_FOE_SHIELDS_V16 : { subBoss: RPG_FOE_TUNING.subBossShield, boss: RPG_FOE_TUNING.bossShield })
 
 interface RoleShape { hp: number; atk: number; matk: number; def: number; mdef: number; speed: number }
 const ROLE: Readonly<Record<RpgFoeRole, RoleShape>> = {

@@ -1,4 +1,5 @@
 // H15: a continent's three authored Finals routes, distinct from its region bosses and the Tier Finale.
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { rpgCampaignChapter, rpgFinalsNodeIds, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { RPG_FINALS_ROUTES, rpgFinals } from '../rpg/campaign/finals'
 import { capitalFranchise, stageFaces, type EnemyRoster } from './roster'
@@ -14,11 +15,12 @@ export function capitalStageIds(continentId: string, route: number): { vanguard:
 /** Reuse the authored chapter foes, elements, escorts, weaknesses and tuning; only the world layout, ids and faces change.
  * Faces come from the capital's franchise (D135): a vanguard is a Sub-boss with Key enemy minions, a champion a Boss
  * with Sub-boss minions. Each route opens independently from start; its champion needs its vanguard.
- * Stage 0 deliberately pays the vanguard as a sub-boss, not the legacy chapter's vanguard reward kind. */
-export function capitalChapter(continent: WorldContinent, roster: EnemyRoster): RpgCampaignChapter {
+ * Stage 0 deliberately pays the vanguard as a sub-boss, not the legacy chapter's vanguard reward kind. Its foes are an
+ * engine's generation's, as the chapter's (D202): from v16 her twins and Tier 1's shields; the live one by default. */
+export function capitalChapter(continent: WorldContinent, roster: EnemyRoster, engine: number = BATTLE_ENGINE_VERSION): RpgCampaignChapter {
   const id = capitalId(continent.id), finals = rpgFinals(continent.order)
   // The legacy generator wants a cast for its own names; the faces are replaced below.
-  const chapter = rpgCampaignChapter({ scenarioId: id, name: continent.name, order: continent.order }, [{ id: '', name: '' }])
+  const chapter = rpgCampaignChapter({ scenarioId: id, name: continent.name, order: continent.order }, [{ id: '', name: '' }], engine)
   const franchise = capitalFranchise(continent.order)
   const reface = (node: RpgMapNode): RpgMapNode => {
     const face = stageFaces(roster, franchise, node.id)

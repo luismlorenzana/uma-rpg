@@ -2,10 +2,10 @@
 // stage, and every number the generator reads, in one table (`RIFT_TUNING`) that the balance pass (H51) tunes against
 // §11's targets. Which ranks a stage holds is §5's and stays; its counts, shares, shields and acts are tuning. Lazy: only
 // `@rpg/domain/rift` loads it.
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import type { BattleChannel, EnemyRank } from '../rpg/battle/types'
 import type { RpgFoeRole } from '../rpg/campaign/enemies'
-import type { RpgClass } from '../rpg/rules'
+import { rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
 import { formationOffense } from '../world/world'
 import { RIFT_FRONTS, RIFT_STAGES, type RiftFront } from './state'
 
@@ -16,7 +16,11 @@ export interface RiftFrontSpec {
   ward: BattleChannel | null
   /** The party guidance, five classes: classes v1's (D168, point 2) or v2's (D178, point 5), by `riftParty`. */
   party: readonly RpgClass[]
+  /** The guided build (`riftGuidedBuild`): `party`'s members, each with her three weapons from v16 (CP7), her defaults before. */
+  build: readonly RiftGuidedMember[]
 }
+/** One member of a guided build: her class and her weapons, in slot order. */
+export interface RiftGuidedMember { classId: RpgClass; weapons: readonly RpgWeapon[] }
 
 const PARTY_V1: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
   iron: ['brawler', 'brawler', 'spellblade', 'spellblade', 'cleric'],
@@ -37,13 +41,32 @@ const PARTY_V2: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
 export const riftParty = (front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] =>
   (rpgV2(engine) ? PARTY_V2 : PARTY_V1)[front]
 
+/** The guided builds from v16 (CP7, class-progression.md §2.3, D202): classes v2's compositions (D178, point 5), the
+ * second copy of a class re-specced to the kinds the first doesn't hold; `null` keeps her defaults (CP3). Each build answers
+ * each of its front's Tier 1 foes at least twice and holds every kind its later foes ask for (§4.5). */
+const BUILDS_V16: Readonly<Record<RiftFront, readonly (readonly [RpgClass, readonly RpgWeapon[] | null])[]>> = {
+  iron: [['brawler', null], ['brawler', ['bow', 'katana', 'axe']], ['spellblade', null], ['spellblade', ['bow', 'greatsword', 'tome-fire']],
+    ['paladin', null]],
+  arcane: [['mage', null], ['mage', null], ['summoner', null], ['summoner', null], ['cleric', null]],
+  duel: [['brawler', null], ['brawler', ['bow', 'katana', 'lance']], ['mage', null], ['mage', ['tome-light', 'tome-dark', 'tome-lightning']],
+    ['paladin', null]],
+  horde: [['spellblade', null], ['spellblade', ['greatsword', 'axe', 'tome-fire']], ['summoner', null], ['summoner', ['tome-ice', 'tome-fire', 'lance']],
+    ['cleric', null]],
+}
+/** A front's guided build in an engine's generation (CP7): five members and their weapons, in slot order. From v16 the
+ * table above; before it the guided classes (`riftParty`) on their own defaults. The screen's one-tap use is H70's. */
+export function riftGuidedBuild(front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): RiftGuidedMember[] {
+  if (rpgRework('fight', engine)) return BUILDS_V16[front].map(([classId, weapons]) => ({ classId, weapons: weapons ? [...weapons] : rpgDefaultWeapons(classId, engine) }))
+  return riftParty(front, engine).map((classId) => ({ classId, weapons: rpgDefaultWeapons(classId, engine) }))
+}
+
 /** §5's fronts in an engine's generation: Iron's foes are weak to Arms only and ward elements, Arcane's the reverse; the
- * Duel is one boss weak to both, the Horde many foes each weak to her own pair. */
+ * Duel is one boss weak to both, the Horde many foes each weak to her own pair (from v16 a twin set each). */
 export const riftFrontSpecs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RiftFront, RiftFrontSpec>> => ({
-  iron: { front: 'iron', name: 'Iron', ward: 'magical', party: riftParty('iron', engine) },
-  arcane: { front: 'arcane', name: 'Arcane', ward: 'physical', party: riftParty('arcane', engine) },
-  duel: { front: 'duel', name: 'Duel', ward: null, party: riftParty('duel', engine) },
-  horde: { front: 'horde', name: 'Horde', ward: null, party: riftParty('horde', engine) },
+  iron: { front: 'iron', name: 'Iron', ward: 'magical', party: riftParty('iron', engine), build: riftGuidedBuild('iron', engine) },
+  arcane: { front: 'arcane', name: 'Arcane', ward: 'physical', party: riftParty('arcane', engine), build: riftGuidedBuild('arcane', engine) },
+  duel: { front: 'duel', name: 'Duel', ward: null, party: riftParty('duel', engine), build: riftGuidedBuild('duel', engine) },
+  horde: { front: 'horde', name: 'Horde', ward: null, party: riftParty('horde', engine), build: riftGuidedBuild('horde', engine) },
 })
 /** The live generation's fronts: today's guidance until the switch (H61), classes v2's after. */
 export const RIFT_FRONT_SPECS: Readonly<Record<RiftFront, RiftFrontSpec>> = riftFrontSpecs()
@@ -105,7 +128,8 @@ export const RIFT_TUNING = {
   },
   /** How many kinds each foe is weak to (§5): Iron's Arms and Arcane's elements by rank; the Duel's both, by stage. The
    * Horde's is always one of each, dealt so no two foes of a wave share a pair. Iron's single Arms kind favours the
-   * Brawlers, who carry all five, over the Arms a caster party brings. */
+   * Brawlers, who carry all five, over the Arms a caster party brings. From v16 (CP7) the Duel draws twin sets
+   * (`duel.sets`, `RIFT_TUNING_V16`) and the Horde a twin set a foe. */
   weak: {
     iron: { regular: 1, 'sub-boss': 1, boss: 1 },
     arcane: { regular: 2, 'sub-boss': 2, boss: 1 },
@@ -118,6 +142,9 @@ type Widen<T> = T extends number ? number : T extends string ? T : { readonly [K
 export type RiftTuning = Widen<typeof RIFT_TUNING> & {
   /** v15: a front's champion (stage 12, and so its Convergence fight) at this HP and offense over its front's shape. */
   champions?: Partial<Record<RiftFront, { hp: number; offense: number }>>
+  /** v16 (CP7): the Duel's boss is weak to this many twin sets a stage, each its Arm and its element, in place of
+   * `weapons` and `elements`' independent draws. */
+  weak: { duel: { sets?: PerStage } }
 }
 
 /** Classes v2's Rift (H60, D186; rift.md §5, §11): `RIFT_TUNING` with what classes v2's parties' measurements moved:
@@ -136,10 +163,18 @@ const RIFT_TUNING_V15: RiftTuning = {
   convergence: -0.18,
 }
 
-/** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, read through the
- * fight's version so a fight started before the switch keeps its generation's foes. Faces, ranks and counts are the
- * same in both, so the run's face allocation (`picker.ts`) holds for either. */
-export const riftTuning = (engine: number = BATTLE_ENGINE_VERSION): RiftTuning => (rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
+/** The Tier rework's Rift, Tier 1 (CP7, D202): v15's numbers, with the Duel's weaknesses drawn as twin sets, two at stages
+ * 1–6 and one at 7–12 (today's counts, as sets). H71 owns every other v16 number. */
+const RIFT_TUNING_V16: RiftTuning = {
+  ...RIFT_TUNING_V15,
+  weak: { ...RIFT_TUNING_V15.weak, duel: { ...RIFT_TUNING_V15.weak.duel, sets: [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1] } },
+}
+
+/** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, the Tier rework's
+ * from v16 (H66), read through the fight's version so a fight started before the switch keeps its generation's foes.
+ * Faces, ranks and counts are the same in all, so the run's face allocation (`picker.ts`) holds for any. */
+export const riftTuning = (engine: number = BATTLE_ENGINE_VERSION): RiftTuning =>
+  (rpgRework('fight', engine) ? RIFT_TUNING_V16 : rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
 
 /** One foe of a Rift stage, before faces, weaknesses and levels. */
 export interface RiftSlot {
