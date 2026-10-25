@@ -20,6 +20,11 @@ export const BATTLE_HEAL_SCALE = 300
 //   (`rpgHand(ally, s.engineVersion)`), so a v6–v14 fight reads classes v1's rules whatever the switch says;
 // - the live lists and tables (`RPG_CLASSES`, `HERO_LIMIT_IDS`, `RPG_CLASS_SLOTS`…) are the default generation's.
 // `rpg/battle/v14-replays*.test.ts` proves it: v14 fights replay byte for byte under the live switch and with it at 15.
+//
+// The Tier rework's five releases (D198, docs/design/tier-rework/implementation.md) each open at their engine:
+// `rpgRework(stage, engine)`, the same pattern. Each is built dark and turned on by its switch packet, which moves
+// BATTLE_ENGINE_VERSION to the stage's engine (H72 for the fight, 16). `rpg/battle/v15-replays*.test.ts` pins v15's fights
+// under the live switch and with it at 16 (H64, D200); tests mock the switch with `caps-at.fixture.ts`'s `capsAt`.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
 export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 15
@@ -27,6 +32,14 @@ export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 15
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
 export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_V2_ENGINE
+/** The first engine of each Tier rework release (D198): R1 Tier 1's fight, R2 its economy, R3 Tier 2's weapons, R4 its
+ * classes, R5 Tier 3. */
+export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, t2Weapons: 18, t2Classes: 19, t3: 20 } as const
+/** A Tier rework release, by its stage name. */
+export type RpgReworkStage = keyof typeof RPG_REWORK_ENGINE
+/** Whether an engine plays a Tier rework release's rules (H64, D200). Rules call it with their `engine` argument; rules
+ * outside fights (the places, the professions) read the live default, so one flip turns a release on everywhere. */
+export const rpgRework = (stage: RpgReworkStage, engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_REWORK_ENGINE[stage]
 /** v15 (D179): a healer's mends, Barriers and revives grow ×(1 + ATK or M.ATK ÷ this). Here so the profile reads it without
  * the engine; H56 uses it, H60 tunes it. */
 export const BATTLE_HEAL_OFFENSE_SCALE = 300

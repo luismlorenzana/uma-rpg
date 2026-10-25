@@ -4,6 +4,7 @@
 // the whole world. Nothing is trained and no token is spent.
 import { rpgV2 } from '../rpg/battle/caps'
 import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_TOMES, RPG_WEAPONS, type RpgClass, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
+import { RPG_WEAPON_SLOTS } from '../rpg/rules'
 
 export const CLASS_MAX_RANK = 50
 export const GEAR_MAX_RANK = 10
@@ -136,10 +137,14 @@ export function withTrack(ranks: Ranks, ref: RankRef, track: RankTrack): Ranks {
 
 // --- EXP per win and Marks (D102) ---------------------------------------------------------------------------------------
 
-/** For each win worth `E` Uma EXP: her class earns 2E, her five weapons share 5E (a weapon she used counts double), each of
- * her five armor kinds earns E, and each accessory she wears earns E for its kind (D124). */
+/** For each win worth `E` Uma EXP: her class earns 2E, her weapons share E a weapon (a weapon she used counts double), each
+ * of her five armor kinds earns E, and each accessory she wears earns E for its kind (D124). */
 export const CLASS_EXP_SHARE = 2
-export const WEAPON_EXP_SHARE = 5
+/** E a weapon she fights with (H64, D200): five weapons share today's 5E, three from v16 share 3E, so each weapon's rank
+ * keeps today's pace. */
+export const WEAPON_EXP_PER_WEAPON = 1
+/** Her weapons' total in the live generation, E a weapon: 5E until H72 turns on three weapons. The manual prints it. */
+export const WEAPON_EXP_SHARE = WEAPON_EXP_PER_WEAPON * RPG_WEAPON_SLOTS
 export const ARMOR_EXP_SHARE = 1
 export const ACCESSORY_EXP_SHARE = 1
 /** EXP past a max rank banks at half rate as Marks. */
@@ -148,12 +153,14 @@ export const MARKS_SHARE = 0.5
 export const MANUAL_EXP = 1000
 export const MANUAL_PRICE = 1000
 
-/** Weapon EXP for one win: 5E over her five weapons, two parts for each one she used, one for the rest. */
+/** Weapon EXP for one win: E a weapon she fights with, shared over her weapons, two parts for each one she used and one for
+ * the rest (H64, D200): five weapons share today's 5E exactly, three share 3E. */
 export function weaponExpShares(weapons: readonly WeaponType[], used: ReadonlySet<WeaponType>, exp: number): Partial<Record<WeaponType, number>> {
   const parts = weapons.reduce((n, w) => n + (used.has(w) ? 2 : 1), 0)
   const out: Partial<Record<WeaponType, number>> = {}
   if (!parts) return out
-  for (const w of weapons) out[w] = Math.round((WEAPON_EXP_SHARE * exp * (used.has(w) ? 2 : 1)) / parts)
+  const total = WEAPON_EXP_PER_WEAPON * weapons.length
+  for (const w of weapons) out[w] = Math.round((total * exp * (used.has(w) ? 2 : 1)) / parts)
   return out
 }
 

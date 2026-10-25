@@ -3,8 +3,9 @@
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
 // Might as a share, heals and Barriers, Rally, charged moves with locks; docs/design/combat-balance.md; v13 Might as
 // D142's flat table; v14 the Rift's foe traits, D169: the ward, a third act and mixed locks; docs/design/rift.md §5;
-// v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md).
-// Older fights still replay unchanged.
+// v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md;
+// v16 the Tier rework's fight, D200, dark until H72: three weapons by channel, no side or legacy skills;
+// docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
@@ -20,8 +21,10 @@ export interface BattleAlly {
   tier: number
   level: number
   stats: RpgCoreStats
-  /** Side skills learned in this tier; open depths give the core skills. */
+  /** Side skills learned in this tier, to v15; empty from v16 (the Tier rework's trees have no points, CP14). Open depths
+   * give the core skills. */
   tree: RpgNodeRef[]
+  /** Skills carried from an earlier tier (S8); retired from v16 (CP31): empty. */
   legacy: RpgNodeRef[]
   loadout: RpgNodeRef[]
   /** The kind her Orb adds to every hit, for weaknesses only (D86). Refused from v15 (D179). */
@@ -116,7 +119,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -159,7 +162,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */
