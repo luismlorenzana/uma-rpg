@@ -1,5 +1,7 @@
 # Extra Stats Progression: the Planet and its moons from Tier 1 to Tier 3
 
+> **Approved by the owner, 2026-10-24 (D194): every call EP1–EP29 as written.** Changes from here are follow-ups logged against it.
+
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The third standalone
 > doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](extra-stats.md),
 > which stays as history, and supersedes every ES call ([§17](#17-decisions) maps each one). Calls are **EP1–EP29**,

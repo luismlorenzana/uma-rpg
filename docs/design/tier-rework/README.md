@@ -320,7 +320,7 @@ impact, pacing and a closing **Decisions** table where every call has a recommen
 |---|---|
 | **class-progression.md** | **Approved by the owner, 2026-10-24 (D192):** CP1–CP43 as written, CP42's Pierce included. Cross-checked the same day. **Follow-ups to the weapon review** logged against D192, no decision changed (XC17, XC18, XC20) |
 | **weapon-progression.md** | **Approved by the owner, 2026-10-24 (D193):** WP1–WP34, with his notes (refund as tickets for time, worked in the Profession review; accessories channel-neutral) |
-| **extra-stats-progression.md** | Authored 2026-10-24 (EP1–EP22). **Cross-checked:** no call changed; its sheet, groups, Halo preset and save numbers aligned. **Follow-ups to the weapon review:** the Halo's preset wording and the offense column (XC19, XC20), no call changed. **For review, third** |
+| **extra-stats-progression.md** | **Approved by the owner, 2026-10-24 (D194):** EP1–EP29 (weapon moons, Full or Split; Prowess by class; the Halo, Valor and Swiftness retired; her moon in full) |
 | **profession-progression.md** | Authored 2026-10-24 (PP1–PP23). **Cross-checked:** no call changed; weapon-progression adopted its recipes, amounts and refund. **Follow-up to the weapon review:** wording only, no amount moved (XC21). **For review, fourth** |
 | weapon-research.md | Input (WR1–WR6), decided as WP1–WP12 |
 | variance.md | First round, cross-referenced; the Uma Templates pass's input |
