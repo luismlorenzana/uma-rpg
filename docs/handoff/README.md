@@ -19,7 +19,7 @@
 design is [tier-rework/](../design/tier-rework/README.md), D192–D197). Five releases, each live at its switch packet.
 Every foundation packet logs its release's build decisions first.
 
-**R1. Tier 1's fight** (engine v16, save v27; on today's gear):
+**R1. Tier 1's fight** (engine v16, save v27; on today's gear): **live since H72 (2026-10-25).**
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -31,7 +31,7 @@ Every foundation packet logs its release's build decisions first.
 | H69 | Save v27 (dark): five weapons to three, learned sides to lines, `OwnedUma.calling`; `toV27` written, not chained | Claude | M | H65, H67 | Done (`978af4c`) |
 | H70 | R1's screens (inert): the Skills tab as a tree with ranks, three weapons, the calling card, the template chip and card with ★, the Template filter, "Weak:" icons, the MP regen line | Either | L | H65, H66, H67, H68, H69 | Done (`024f22b`) |
 | H71 | R1's balance (dark): the re-baseline on today's gear, the mirror, shields, lines and Pierce, MP; the Rift's Tier 1 fronts; Tier 2 and 3 worlds | Claude | L | H65, H66, H68 | Done (`6fa80fc`) |
-| H72 | **R1's switch:** engine v16 and save v27 live; the manual rewritten | Claude | M | H69, H70, H71 | In progress |
+| H72 | **R1's switch:** engine v16 and save v27 live; the manual rewritten | Claude | M | H69, H70, H71 | Done (`5395387`) |
 
 **Waves:** 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
 
@@ -195,6 +195,7 @@ for the fifth scenario (tiers T9).
 
 | Id | Task | Commit |
 |---|---|---|
+| H72 | **R1 is live** (D210): `BATTLE_ENGINE_VERSION` 16, `SAVE_SCHEMA_VERSION` 27 and `toV27` chained in one commit; `lines` and `calling` required, `tree` gone; H70's dead code and the save's live gates removed; the fight-version paths kept, so an open v15 fight replays and settles on v15; the API's first v27 write keeps `saveBackups/{uid}-v26` (a fake-Firestore test, D69); the manual rewritten for R1 (a new `templates` block). Rebased onto H74 (R2's dark v17, merged meanwhile). Checked locally on a scratch v26 save with 30 Umas over two worlds from the CJS build before the flip: every class to three defaults and `lines`, every Uma's calling open, both open v15 fights settled on v15, the next fights v16; a v20 dev save migrated through v27 and round-tripped. Main JS 211.44 KB gzip on CI. [Deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/40226400653) | `5395387` |
 | H71 | R1's balance on engine v16, dark (D207), 32 seeds on Auto against today's: every Tier 1 stage within 0 points (Lv 10–50, either healer); Tier 2 and 3 worlds 0 points; a region clears 12 of 12; the Rift's right parties 89–100% a stage, champions 61–70%, the Convergence 52%, and for the first time since H51 Arcane's party loses on Iron (10/20/1%, champion 0). Tuned, v16 only: shields back to today's 6 and 8 (the drafts' 5 and 6 broke 0.7–0.9 rounds early at the real Class Rank pace), the Summoner's Arms hand 0.50, the base MP regen 0.9% a depth, four B lines' power (`RPG_LINE_B_POWER_V16`), `RIFT_TUNING_V16`. **Recorded misses:** the mirror at Lv 50 (92%, no Prowess in R1), Paladin ÷ Cleric 111%, sub-boss Break timing at Lv 10 and 30, Auto's cancels, Iron's party on Arcane's stages 5–8 (75%), five B lines (Combo, Pack, Reap, Bonded, the healers' Heavy) at about A's value. Main JS 210.43 KB gzip on CI. [Deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/40219508235) | `6fa80fc` |
 | H70 | R1's screens, inert until the switch (D206): the Skills tab as a tree (trunk, two line columns, rank pips, gates), three weapon rows, the template chip and card with ★, the calling card (pick, confirm, the Lv 1 class move), the Battle tab's "MP 108 · +3 a round" and ★ Flourish row, the Stable's Template filters and search, the Racing tab's "Her template", "Weak:" icons by the fight's version, ★ cues in the log, rank-ups on the result sheets, the Rift's guided weapons, the Halls' twin-set lines. Checked at 15 (as today) and with a local switch at 16 on a migrated scratch save, 390×844 and 375×667, light and dark. Main JS 209.47 KB gzip. [Deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/40215092018) | `024f22b` |
 | H68 | The base MP regen and the Flourish on engine v16, dark (D204): every v16 ally regains 0.8% of max MP a round per open depth, at most five (4%), at least 1, beside a worn Spring (`rpgBaseMpRegen`, no input field); the Flourish as her calling's class (`umaFlourish(outfit, uma)`, her stored pick): Clean break a 4% Barrier at the start, Even pace 1% a round and Late reserve 2% a round from round 3, within 4% a fight (`BattleAlly.flourish`, `BattleUnit.flourish`), cues labelled "Flourish". v14 and v15 replay unchanged. Main JS 208.26 KB gzip. [Deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/40208237874) | `0c41e55` |
