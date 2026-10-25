@@ -2,12 +2,10 @@
 // work rows settled to the window's end, so a queue that stopped on short inputs never announces jobs that didn't start.
 // Every tier world announces its own news, and each link carries `?tier=` to open that world (H35).
 import { endsAt, settle } from '@luismlorenzana/uma-work'
-import { gearById } from '../economy/gear'
-import { gemById } from '../economy/gems'
 import type { JobKind } from '../economy/jobs'
+import { stockName } from '../economy/stock'
 import { placeById } from '../hub/places'
-import { itemById } from '../items/catalog'
-import { RPG_WORK_ENV } from '../work/env'
+import { liveWorkEnv } from '../work/env-v3'
 import { savedTiers, tierKey, TIER_ONE, worldOf } from './rules'
 import type { Save } from './save'
 import { readyWork } from './work'
@@ -27,7 +25,7 @@ export interface Finish {
 export function finishesBetween(save: Save, from: number, to: number, tier = TIER_ONE): Finish[] {
   const out: Finish[] = []
   // Settled to `to`, each row holds every entry started by then: a queued one started the moment the one before ended.
-  const world = settle(worldOf(save, tier), to, RPG_WORK_ENV).state
+  const world = settle(worldOf(save, tier), to, liveWorkEnv(Number(tier))).state
   for (const row of Object.values(world.work)) {
     if (!row.slot) continue
     row.entries.forEach((entry, i) => {
@@ -42,16 +40,12 @@ export function finishesBetween(save: Save, from: number, to: number, tier = TIE
 
 /** Slots with something to collect at `now` in one tier world. */
 export function readySlots(save: Save, now: string, tier = TIER_ONE): number {
-  return [...readyWork(worldOf(save, tier), now).values()].reduce((a, b) => a + b, 0)
+  return [...readyWork(worldOf(save, tier), now, tier).values()].reduce((a, b) => a + b, 0)
 }
 
 /** Slots with something to collect at `now` in every tier world: the app badge. */
 export function readyEverywhere(save: Save, now: string): number {
   return savedTiers(save).reduce((n, tier) => n + readySlots(save, now, tierKey(tier)), 0)
-}
-
-function outputName(output: string): string {
-  return itemById(output)?.name ?? gemById(output)?.name ?? gearById(output)?.name ?? output
 }
 
 export interface Notice { title: string; body: string; tag: string; url: string }
@@ -62,7 +56,7 @@ export interface Notice { title: string; body: string; tag: string; url: string 
 export function finishNotice(all: readonly Finish[], tier = 1, named = false): Notice | null {
   const finishes = all.filter((f) => f.idle)
   if (finishes.length === 0) return null
-  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${outputName(f.output)} ×${f.count}`
+  const line = (f: Finish) => `${placeById(f.placeId)?.name ?? f.placeId}: ${stockName(f.output)} ×${f.count}`
   const title = (text: string) => (named ? `Tier ${tier} · ${text}` : text)
   const tag = (text: string) => (tier > 1 ? `t${tier}-${text}` : text)
   const link = (path: string) => `${path}?tier=${tier}`
