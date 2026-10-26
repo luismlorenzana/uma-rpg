@@ -8,6 +8,11 @@
 > PP25). The manual ([loops](../../game/loops.md), [materials](../../game/materials.md),
 > [sections](../../game/sections.md)) describes them as played.
 
+> **The owner's review, 2026-10-26 (D219)** (decisions changed, pending their design): **§3's two types a line a tier
+> and the ladder (PP7–PP9) are superseded** by graded materials, G1–G10 a line with tier-specific families, and
+> **§14.4's kept stock** by Speed Tickets: every material in a migrated world becomes tickets at the grant's rate, in the
+> same save step. Their design is [H108](../../handoff/README.md); until it ships, this doc describes the live game.
+
 > **For the owner's review, the fourth and last standalone doc (2026-10-24).** Brought in line with the three approved
 > docs (Class D192, Weapon D193, Extra Stats D194) and with **the owner's compensation direction**, designed in full in
 > [§14](#14-save-impact): every Craft Level resets to 1 at save v27 and each world is granted **Speed Tickets for every 30
