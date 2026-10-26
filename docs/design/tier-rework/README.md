@@ -584,7 +584,7 @@ removed; the signature is v16's (§9.1, UT18).*
 |---|---|---|---|
 | `classes[id].weapons` | 5 → 3: the class's new defaults; her per-tree picks stay | CP3, CP31 | R1 |
 | `classes[id].tree`, `loadout`, `legacy` | Learned sides → picks (B if any B-line node, else A); other sides deleted; loadout pruned; `legacy` retired. Skill Ranks derived from Class Rank, nothing stored | CP31, CP32 | R1 |
-| `OwnedUma.calling` | New: `{ pick, confirmed }` for the 163 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed | CP29 | R1 |
+| `OwnedUma.calling` | New: `{ pick, confirmed }` for the pick-eligible outfits; owned Umas get the pre-selection, unconfirmed. D220's live follow-up makes that 176 and repairs changed eligibility after master data loads | CP29 | R1 |
 | `uma.gear` (`locker`, `equipped`, `kinds`) | Replaced by grades: one per weapon kind (10), per armor slot (5) with its half, one accessory slot `{ grade: 0, family, form: 'base', kind? }` with her Tier 1 preset; all G0 | WP2, WP27 | R2 |
 | `work` (every place's rows) | **Settled first,** as save v22 did (SC3): every started entry finishes into the Warehouse with its Craft EXP; queues drop; Repeat forgets | PP19 | R2 |
 | `world.gear`, Forge jobs' outputs | Deleted; folded into the grant (§9.4) | WP27, PP20 | R2 |
@@ -901,7 +901,7 @@ follow-ups logged against it (XC30).
 | UT2 | Three readings of her racing profile (calling, stride, knack) feeding five pieces, the same every tier; never a kind, a weapon bonus or a malus |
 | UT3 | The rule: one pure function of master data by stable id (`umaTemplate`); surface, the outfit's skills, her name and id not read |
 | UT4 | The calling pick as CP29–CP30; it moves her type, channel and trade (Pace), never her stride, knack or family |
-| UT5 | The catalog: 90 templates, "{knack word} {type}"; 66 in use today; two front runners of one type split by knack |
+| UT5 | The catalog: 90 templates, "{knack word} {type}"; 63 in use today after D220's calling precedence; two front runners of one type split by knack |
 | UT6 | The Flourish moves from MP to HP: 4% of her max HP a fight, Clean break, Even pace or Late reserve, as her calling |
 | UT7 | Her knack names her signature family: Fleet a Bell, Mighty an Orb, Tireless a Pendant, Gritty and Clever an Insignia; +0.2 a level × tier while worn |
 | UT8 | Her preset wears her signature family, in the slot of the form that adds least; the balance party's presets unchanged |

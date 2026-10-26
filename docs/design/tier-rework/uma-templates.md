@@ -11,6 +11,10 @@
 >
 > **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): the signature accessory, its family by her
 > knack, the presets that wear it, and her moon play in the game on engine v17 and save v28.
+>
+> **Calling precedence corrected, 2026-10-26 (D220):** Front wins a best-style tie, then Pace; Late + End is the fixed
+> Summoner signal, and only a pure Late best style takes the healer choice. The roster counts and save repair below are
+> the live follow-up.
 
 > **For the owner's review, 2026-10-25. Nothing here is built.** The Tier rework's **Uma Templates pass**
 > ([README §5](README.md#5-the-plan), step 5), the centralization the owner asked for: "the Uma uniqueness page, part of
@@ -120,11 +124,11 @@ never a malus. It is outside the foe budget: the balance party has none (XR12).
 ### 2.2 The assignment rule (UT3)
 
 One pure function of the outfit's master data, read by **stable id** (`umaTemplate(outfit, pick?)`), never a list of
-Umas or names. Kept from variance U4–U7, re-run on today's release (2026-10-10): the same counts.
+Umas or names. Kept from variance U4–U7, with D220's best-style precedence, re-run on today's release (2026-10-17).
 
 | Step | Reads | Rule | Ties |
 |---|---|---|---|
-| **1. Calling** | `aptitudes.strategy`, `aptitudes.distance`; base Power and Wit at her starting stars (`stats.star{rarity}`) | The first row below that fits; then her pick, if she has one | Styles in today's order (Front, Pace, Late, End); Power = Wit goes magical |
+| **1. Calling** | `aptitudes.strategy`, `aptitudes.distance`; base Power and Wit at her starting stars (`stats.star{rarity}`) | The first row below that fits; then her pick, if she has one | Among tied best styles Front wins, then Pace; Power = Wit goes magical |
 | **2. Stride** | `aptitudes.distance` | The **longest** distance at her best grade: Sprint or Mile → **Dash**, Medium → **Middle**, Long → **Stayer** | None: the longest wins |
 | **3. Knack** | `growthRatePercents`; base stats | Her **highest** growth rate | The higher base stat, then Speed, Stamina, Power, Guts, Wit |
 | **4. Template** | — | Calling × stride → her **type**; knack → its **word**: "{knack word} {type}" | — |
@@ -134,18 +138,18 @@ Umas or names. Kept from variance U4–U7, re-run on today's release (2026-10-10
 
 | # | Her racing profile | Calling | Umas today | The pick (CP29) |
 |---|---|---|---|---|
-| 1 | Best style Front | **Brawler** | 47 | — |
-| 2 | Wit ≥ Power, and A in two of Pace, Late, End | **Summoner** | 33 | — |
-| 3 | Best style End | **Summoner** | 13 | — |
-| 4 | Best style Pace, Power > Wit, best distance Sprint | **Brawler** | 14 | — |
-| 5 | Best style Pace, Power > Wit | **Spell Blade** | 56 | Spell Blade (pre-selected) or Mage |
-| 6 | Best style Pace, Wit ≥ Power | **Mage** | 46 | Mage (pre-selected) or Spell Blade |
-| 7 | Best style Late, Power > Wit | **Paladin** | 48 | Paladin (pre-selected) or Cleric |
+| 1 | Front among her best styles | **Brawler** | 47 | — |
+| 2 | Late and End tied for best, without Front or Pace | **Summoner** | 20 | — |
+| 3 | End among her best styles | **Summoner** | 13 | — |
+| 4 | Pace among her best styles, Power > Wit, best distance Sprint | **Brawler** | 14 | — |
+| 5 | Pace among her best styles, Power > Wit | **Spell Blade** | 56 | Spell Blade (pre-selected) or Mage |
+| 6 | Pace among her best styles, Wit ≥ Power | **Mage** | 74 | Mage (pre-selected) or Spell Blade |
+| 7 | Best style Late, Power > Wit | **Paladin** | 33 | Paladin (pre-selected) or Cleric |
 | 8 | Best style Late, Wit ≥ Power | **Cleric** | 13 | Cleric (pre-selected) or Paladin |
 
-"Best distance Sprint" (row 4) is the **shortest** distance at her best grade; the stride reads the **longest**. "A in
-two of" counts S as A. **Not read** (U7 kept): surface (turf for 94%), the outfit's skills, her name and id. By fight
-type: physical 61, physical hybrid 56, magical 46, magical hybrid 46, healer 61 (22.6 · 20.7 · 17.0 · 17.0 · 22.6%).
+"Best distance Sprint" (row 4) is the **shortest** distance at her best grade; the stride reads the **longest**.
+**Not read** (U7 kept): surface (turf for 94%), the outfit's skills, her name and id. By fight type: physical 61,
+physical hybrid 56, magical 74, magical hybrid 33, healer 46 (22.6 · 20.7 · 27.4 · 12.2 · 17.0%).
 
 The [catalog page](previews/uma-templates.html#rule) draws the rule as a flow, with every row hoverable.
 
@@ -153,7 +157,7 @@ The [catalog page](previews/uma-templates.html#rule) draws the rule as a flow, w
 
 **As approved (CP29, CP30), restated here so the template has one home.** A **Pace** Uma picks **Spell Blade or Mage**,
 a **Late** Uma **Paladin or Cleric**, once, on the Uma sheet; her Power against her Wit pre-selects (rows 5–8 above).
-**163 of 270** get the pick (102 Pace, 61 Late); the four signal rows stay fixed. The pick is open until confirmed, by a
+**176 of 270** get the pick (130 Pace, 46 Late); the four signal rows stay fixed. The pick is open until confirmed, by a
 tap or by her first won fight; owned Umas at save v27 start unconfirmed on the pre-selection.
 
 | The pick moves | Pace: Spell Blade ↔ Mage | Late: Paladin ↔ Cleric |
@@ -176,9 +180,9 @@ If a master-data fix ever moves her out of a pick row, the rule's calling applie
 |---|---|---|---|---|---|
 | Brawler | Physical | **Charger** (26) | **Bruiser** (20) | **Ironhide** (15) | 61 |
 | Spell Blade | Physical | **Flashblade** (9) | **Spellfencer** (28) | **Longblade** (19) | 56 |
-| Mage | Magical | **Flarecaster** (0) | **Spellwright** (25) | **Starkeeper** (21) | 46 |
-| Summoner | Magical | **Beckoner** (3) | **Binder** (20) | **Shepherd** (23) | 46 |
-| Paladin | Physical | **Shieldrunner** (10) | **Warden** (21) | **Stalwart** (17) | 48 |
+| Mage | Magical | **Flarecaster** (2) | **Spellwright** (41) | **Starkeeper** (31) | 74 |
+| Summoner | Magical | **Beckoner** (3) | **Binder** (10) | **Shepherd** (20) | 33 |
+| Paladin | Physical | **Shieldrunner** (8) | **Warden** (15) | **Stalwart** (10) | 33 |
 | Cleric | Magical | **Lamplighter** (0) | **Mender** (4) | **Pilgrim** (9) | 13 |
 
 | Knack (top growth) | Word | Umas today | Her moon's node I | Her signature family |
@@ -189,9 +193,9 @@ If a master-data fix ever moves her out of a pick row, the rule's calling applie
 | Guts | **Gritty** | 43 | Limit start +1.6 | **Insignia** |
 | Wit | **Clever** | 41 | MP +4 | **Insignia** |
 
-**Today's roster** (master data of 2026-10-10, 270 outfits; aggregate counts only): **66 of the 90 templates in use**,
-16 of the 18 types (no Wit-led dasher among the Pace and Late Umas: no Flarecaster or Lamplighter yet). The largest template holds 14 Umas,
-the median 3; 18 templates hold one Uma each. Strides: 48 Dash, 118 Middle, 104 Stayer. Families: Insignia 84, Bell 69,
+**Today's roster** (master data release of 2026-10-17, 270 outfits; aggregate counts only): **63 of the 90 templates in use**,
+17 of the 18 types (no Lamplighter yet). The largest template holds 14 Umas,
+the median 4; 17 templates hold one Uma each. Strides: 48 Dash, 118 Middle, 104 Stayer. Families: Insignia 84, Bell 69,
 Orb 69, Pendant 48.
 
 - **Two of one kind still differ.** The 15 front-running stayers (all Ironhides) spread over four templates: Fleet 5,
@@ -542,7 +546,7 @@ the tip pick with **R4, Tier 2's classes (save v30)**, where it says v28. See [i
 
 | Data | What happens | From |
 |---|---|---|
-| `OwnedUma.calling: { pick, confirmed }` | Already in save v27, for the 163 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed | CP29, CP31 |
+| `OwnedUma.calling: { pick, confirmed }` | Already in save v27, for the 176 pick-eligible outfits. D220 reopens a newly eligible confirmed choice with its suggestion stored, and clears an old healer choice that is now fixed; active class never moves | CP29, CP31, D220 |
 | The template (calling, stride, knack, type, family) | **Nothing stored:** `umaTemplate(outfit, pick)` each time; a master-data fix reaches everyone | U13 |
 | The Flourish | Nothing: on by rule while she fights as her calling | UT6 |
 | The signature | Nothing: read from her template and her worn family | WP33 |
@@ -633,7 +637,7 @@ no approved call changes beyond what is listed. **variance.md** carries its supe
 | **UT2** What a template is | **Three readings** of her racing profile (calling, stride, knack) feeding **five pieces** (her calling's effects, the Flourish, the signature accessory, her moon, the signature tip); the same in every tier; never a kind, a weapon bonus, a lean, a pace change, a party synergy or a malus | A flat "+5% as her calling" (U2's rejected); template branches on every tree | The owner's examples are nodes and an accessory; five small pieces each with one home |
 | **UT3** The rule | **One pure function of master data by stable id** (`umaTemplate(outfit, pick?)`): U4's eight calling rows, U5's stride, U6's knack; surface, the outfit's skills, her name and id **not read** | A hand-written list; the unique skill's effect; an id hash | No original-game content in git; the same counts today as variance's; a rule tuned once reaches everyone |
 | **UT4** The calling pick | **CP29–CP30 as approved:** Pace Spell Blade or Mage, Late Paladin or Cleric, once, pre-selected by Power against Wit; it moves her type, the Flourish's and tip's class, node II's channel and (Pace) her trade; **never her stride, knack or family** | A pick for every Uma; no pick | The owner's moment; the knack-keyed pieces stay hers whatever she picks |
-| **UT5** The catalog | **90 templates** (6 callings × 3 strides × 5 knacks), "{knack word} {type}", variance's eighteen type words and five knack words kept; today 66 in use (largest 14, median 3); 81 of the 105 pairs of front-running stayers differ | More readings (surface, a second knack: 180–360); fewer (by calling and stride only: 18) | Same-type Umas split by knack; a balanced party never holds two of one; readable at a glance |
+| **UT5** The catalog | **90 templates** (6 callings × 3 strides × 5 knacks), "{knack word} {type}", variance's eighteen type words and five knack words kept; today 63 in use (largest 14, median 4); 81 of the 105 pairs of front-running stayers differ | More readings (surface, a second knack: 180–360); fewer (by calling and stride only: 18) | Same-type Umas split by knack; a balanced party never holds two of one; readable at a glance |
 | **UT6** The Flourish | **Reshaped from MP to HP:** 4% of her max HP a fight in her stride's shape: **Clean break** (a Barrier at the start), **Even pace** (1% a round), **Late reserve** (2% a round from round 3), up to 4% a fight; as her calling, every tier | **As written** (MP twists: +15–25% late-region power, 3–5× the cap; a healer's 0 from Lv 40 and a refunded deep cast); **MP resized** to the cap (about 3 MP a fight: invisible; the healer still 0); a damage twist (shares the signature's +5%); Limit twists (only Heroes have Limit Breaks) | SB18 made MP one rule for every Uma; HP resets each stage so it can't compound; equal for every calling; stamina is HP in this game |
 | **UT7** The signature's family | **Her knack names it:** Fleet a Bell, Mighty an Orb, Tireless a Pendant, Gritty and Clever an Insignia; the size SB15's (+0.2 a level × tier, +10 · +18 · +26 at Lv 50), any class, while worn | By stride; by calling; by knack and stride (a quarter each); by a second growth | It splits two Umas of one type (the owner's two front runners); one five-row table; every calling holds three or four families |
 | **UT8** Presets | **Her preset wears her signature family:** where her class's preset lacks it, it takes the slot of the form that adds least for her class, in its best form for her; the balance party's presets unchanged | Leave presets alone (one tap would undress her signature) | In Tier 1 her family always wins or ties with the signature; one tap should dress her best |

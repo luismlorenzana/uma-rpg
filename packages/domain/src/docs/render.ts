@@ -101,7 +101,7 @@ const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
 }
 /** The calling rule's rows in words (uma-templates §2.2, CP29), the first that fits. */
 const CALLING_ROW: Readonly<Record<UmaCallingRow, string>> = {
-  1: 'Front runners', 2: 'Wit-led closers', 3: 'End closers',
+  1: 'Front runners', 2: 'Late + End closers', 3: 'End closers',
   4: 'Pace sprinters, Power over Wit', 5: 'Pace chasers, Power over Wit', 6: 'Pace chasers, Wit at or over Power',
   7: 'Late surgers, Power over Wit', 8: 'Late surgers, Wit at or over Power',
 }

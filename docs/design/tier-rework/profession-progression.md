@@ -8,6 +8,9 @@
 > PP25). The manual ([loops](../../game/loops.md), [materials](../../game/materials.md),
 > [sections](../../game/sections.md)) describes them as played.
 
+> **Calling precedence corrected, 2026-10-26 (D220):** the live head counts below follow Pace over a tied best style,
+> Late + End as Summoner, and pure Late as the healer choice. The work rules themselves do not change.
+
 > **The owner's review, 2026-10-26 (D219)** (decisions changed, pending their design): **§3's two types a line a tier
 > and the ladder (PP7–PP9) are superseded** by graded materials, G1–G10 a line with tier-specific families, and
 > **§14.4's kept stock** by Speed Tickets: every material in a migrated world becomes tickets at the grant's rate, in the
@@ -215,13 +218,13 @@ today.
 |---|---|---|---|---|---|
 | **Physical** | Brawler | 61 (22.6%) | **Mine**: Mining | **Forge**: Weapon Crafting | Ore into the gems her weapons climb |
 | **Physical hybrid** | Spell Blade | 56 (20.7%) | **Forest**: Wood Chopping | **Armorer**: Armor Crafting | Timber into the fittings of a suit |
-| **Healer** | Paladin, Cleric | 61 (22.6%) | **Fields**: Farming | **Workbench**: Material Processing | Vegetables, and everyone's refining |
-| **Magical hybrid** | Summoner | 46 (17.0%) | **Fishery**: Fishing | **Charm Shop**: Accessory Crafting | Fish into charm settings |
-| **Magical** | Mage | 46 (17.0%) | **Monster Den**: Hunting | **Lapidary**: Jewel Crafting | Stones into the jewels of her map |
+| **Healer** | Paladin, Cleric | 46 (17.0%) | **Fields**: Farming | **Workbench**: Material Processing | Vegetables, and everyone's refining |
+| **Magical hybrid** | Summoner | 33 (12.2%) | **Fishery**: Fishing | **Charm Shop**: Accessory Crafting | Fish into charm settings |
+| **Magical** | Mage | 74 (27.4%) | **Monster Den**: Hunting | **Lapidary**: Jewel Crafting | Stones into the jewels of her map |
 
 - **Her calling sets it, never her active class** (PR1, CL14, CP30 kept): classes switch freely and a switch moves no
   job. The **calling pick** (CP29) moves a Pace Uma between physical hybrid and magical (Forest · Armorer ↔ Monster Den ·
-  Lapidary), so those two trades span 0–37.8% each; the Late pick moves none (healer either way). The pick's card shows
+  Lapidary), so those two trades span 0–48.1% each; the Late pick moves none (healer either way). The pick's card shows
   both trades' head counts in her world, so the owner can fill a short one.
 - **Why these pairs** (PR3 kept): each reads as one craft (ore to weapons, timber to armor, stones to jewels); the five
   rows mirror the Learning page, physical on top; the healer, the party's support, carries the one profession every

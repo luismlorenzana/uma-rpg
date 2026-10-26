@@ -7,7 +7,7 @@ import { RPG_ALL_CLASSES } from '../rpg/kinds'
 import {
   CALLING_NO_PICK, CALLING_SET, FLOURISH_NAMES, KNACK_FAMILY, KNACK_LABEL, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_FAMILIES, UMA_KNACK_WORDS,
   UMA_KNACKS, UMA_STRIDES, UMA_TYPE_NAMES, umaCalling, umaCallingPick, umaCallingPickBlock, umaCallingRow, umaFlourishActive, umaKnack, umaStride,
-  umaTemplate, umaTemplateFacets,
+  repairUmaCallingChoice, umaTemplate, umaTemplateFacets,
 } from './template'
 
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
@@ -38,7 +38,7 @@ describe('the calling (UT3, the first row that fits)', () => {
   it('reads each of the eight rows', () => {
     const rows = [
       uma({ style: { front: 'A' } }),
-      uma({ style: { pace: 'A', late: 'A' }, base: pw(90, 100) }),
+      uma({ style: { late: 'A', end: 'A' }, base: pw(110, 90) }),
       uma({ style: { end: 'A' }, base: pw(110, 90) }),
       uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(110, 90) }),
       uma({ style: { pace: 'A' }, distance: { mile: 'A' }, base: pw(110, 90) }),
@@ -50,19 +50,20 @@ describe('the calling (UT3, the first row that fits)', () => {
     expect(rows.map((o) => umaCalling(o))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
   })
 
-  it('ties styles Front, Pace, Late, End, and Front comes first', () => {
+  it('gives tied best styles to Front first, then Pace, then Late + End', () => {
     expect(umaCallingRow(uma({ style: { front: 'A', pace: 'A' }, base: pw(90, 110) }))).toBe(1)
     expect(umaCallingRow(uma({ style: { pace: 'A', end: 'A' }, distance: { medium: 'A' }, base: pw(110, 90) }))).toBe(5)
-    expect(umaCallingRow(uma({ style: { late: 'A', end: 'A' }, base: pw(110, 90) }))).toBe(7)
+    expect(umaCallingRow(uma({ style: { pace: 'A', late: 'A' }, base: pw(90, 110) }))).toBe(6)
+    expect(umaCallingRow(uma({ style: { late: 'A', end: 'A' }, base: pw(110, 90) }))).toBe(2)
     // A better grade beats the order.
     expect(umaCallingRow(uma({ style: { front: 'A', pace: 'S' }, distance: { medium: 'A' }, base: pw(110, 90) }))).toBe(5)
+    expect(umaCallingRow(uma({ style: { late: 'S', end: 'A' }, base: pw(110, 90) }))).toBe(7)
   })
 
-  it('counts an S as an A for row 2, and needs Wit ≥ Power there', () => {
-    expect(umaCallingRow(uma({ style: { pace: 'A', late: 'S' }, base: pw(90, 100) }))).toBe(2)
-    expect(umaCallingRow(uma({ style: { pace: 'S', end: 'A' }, base: pw(100, 100) }))).toBe(2)
-    expect(umaCallingRow(uma({ style: { pace: 'A', late: 'S' }, base: pw(100, 90) }))).toBe(7)
-    // One A of the three isn't two.
+  it('uses row 2 only when Late and End share the best grade', () => {
+    expect(umaCallingRow(uma({ style: { late: 'S', end: 'S' }, base: pw(90, 100) }))).toBe(2)
+    expect(umaCallingRow(uma({ style: { late: 'A', end: 'A' }, base: pw(100, 90) }))).toBe(2)
+    expect(umaCallingRow(uma({ style: { late: 'S', end: 'A' }, base: pw(90, 100) }))).toBe(8)
     expect(umaCallingRow(uma({ style: { end: 'A', late: 'B' }, base: pw(90, 100) }))).toBe(3)
   })
 
@@ -79,6 +80,27 @@ describe('the calling (UT3, the first row that fits)', () => {
     expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A', mile: 'S' }, base: pw(110, 90) }))).toBe('spellblade')
     // Wit over Power: a Mage whatever her distance.
     expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(90, 110) }))).toBe('mage')
+  })
+})
+
+describe('the D220 calling compatibility repair', () => {
+  it('reopens old fixed closers that now choose, storing the suggestion so confirmation stays final', () => {
+    const paceLate = uma({ style: { pace: 'A', late: 'A' }, base: pw(90, 100) })
+    const repaired = repairUmaCallingChoice(paceLate, { pick: null, confirmed: true })
+    expect(repaired).toEqual({ pick: 'mage', confirmed: false })
+    expect(repairUmaCallingChoice(paceLate, { ...repaired, confirmed: true })).toEqual({ pick: 'mage', confirmed: true })
+    expect(repairUmaCallingChoice(paceLate, { pick: null, confirmed: false })).toEqual({ pick: null, confirmed: false })
+  })
+
+  it('clears the old healer choice when Late + End becomes a fixed Summoner', () => {
+    const lateEnd = uma({ style: { late: 'A', end: 'A' }, base: pw(110, 90) })
+    expect(repairUmaCallingChoice(lateEnd, { pick: 'cleric', confirmed: true })).toEqual({ pick: null, confirmed: true })
+    expect(repairUmaCallingChoice(lateEnd, { pick: 'paladin', confirmed: false })).toEqual({ pick: null, confirmed: true })
+  })
+
+  it('leaves choices whose eligibility did not change untouched', () => {
+    const calling = { pick: 'cleric', confirmed: true } as const
+    expect(repairUmaCallingChoice(uma({ style: { late: 'A' }, base: pw(110, 90) }), calling)).toBe(calling)
   })
 })
 
@@ -181,7 +203,7 @@ describe('the calling pick (UT4, CP29)', () => {
       { options: ['paladin', 'cleric'], suggested: 'paladin', power: 104, wit: 88 },
       { options: ['cleric', 'paladin'], suggested: 'cleric', power: 92, wit: 98 },
     ])
-    const fixed = [WORKED.A, WORKED.D, uma({ style: { pace: 'A', late: 'A' }, base: pw(90, 100) }),
+    const fixed = [WORKED.A, WORKED.D, uma({ style: { late: 'A', end: 'A' }, base: pw(90, 100) }),
       uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(110, 90) })]
     expect(fixed.map(umaCallingRow)).toEqual([1, 3, 2, 4])
     expect(fixed.map(umaCallingPick)).toEqual([null, null, null, null])

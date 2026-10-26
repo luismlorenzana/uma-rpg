@@ -22,7 +22,7 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
+const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, repairCallingRule, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
 const { db } = await import('./db')
 
 /** An invented outfit whose best running style is `best`. */
@@ -133,6 +133,30 @@ describe('game store', () => {
     const save = useGame.getState().save
     expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
+  })
+
+  it('persists the master-data-aware calling repair without moving her active class', async () => {
+    const paceLate = {
+      outfitId: '100201', baseStats: { power: 90, wit: 100 },
+      aptitudes: {
+        strategy: { front: 'G', pace: 'A', late: 'A', end: 'G' } as const,
+        distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } as const,
+      },
+    }
+    await boot('u1')
+    await createAccount('Luis')
+    await unlock(paceLate)
+    const save = structuredClone(useGame.getState().save!)
+    save.tierWorlds['1']!.umas['100201']!.classId = 'summoner'
+    save.tierWorlds['1']!.umas['100201']!.calling = { pick: null, confirmed: true }
+    useGame.setState({ save, dirty: false })
+    await repairCallingRule([paceLate])
+    expect(useGame.getState()).toMatchObject({ dirty: true, save: { tierWorlds: { '1': { umas: {
+      '100201': { classId: 'summoner', calling: { pick: 'mage', confirmed: false } },
+    } } } } })
+    resetGame()
+    await boot('u1')
+    expect(useGame.getState().save!.tierWorlds['1']!.umas['100201']).toMatchObject({ classId: 'summoner', calling: { pick: 'mage', confirmed: false } })
   })
 })
 

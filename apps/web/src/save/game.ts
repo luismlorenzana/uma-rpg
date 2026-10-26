@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBranch, type RpgClass,
+  markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -115,6 +115,14 @@ export async function createAccount(trainerName: string): Promise<void> {
   useGame.setState({ status: 'ready', activeTier: 1 })
   rememberTier(1)
   await commit(newSave(trainerName, nowIso()))
+}
+
+/** D220: master-data-aware repair for the calling rows whose eligibility changed. Idempotent on every app boot. */
+export async function repairCallingRule(roster: readonly CallingRepairOutfit[]): Promise<void> {
+  const { save } = useGame.getState()
+  if (!save) return
+  const next = repairCallingChoices(save, roster, nowIso())
+  if (next !== save) await commit(next)
 }
 
 /** Throws SaveParseError when the name isn't 1–24 characters. The account is shared by every tier. */

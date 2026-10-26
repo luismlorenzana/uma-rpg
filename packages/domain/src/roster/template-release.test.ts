@@ -65,10 +65,10 @@ describe.skipIf(!HAS_RELEASE)('the template against the local master-data releas
     }
     console.log(`template counts: ${JSON.stringify(counts)}`)
     expect(counts).toEqual({
-      outfits: 270, rows: [47, 33, 13, 14, 56, 46, 48, 13], fight: [61, 56, 46, 46, 61], picks: [163, 102, 61],
-      templates: 66, largest: 14, median: 3, single: 18,
-      // By calling (Brawler, Spell Blade, Mage, Summoner, Paladin, Cleric), Dash · Middle · Stayer: 16 of the 18 in use.
-      types: [26, 20, 15, 9, 28, 19, 0, 25, 21, 3, 20, 23, 10, 21, 17, 0, 4, 9],
+      outfits: 270, rows: [47, 20, 13, 14, 56, 74, 33, 13], fight: [61, 56, 74, 33, 46], picks: [176, 130, 46],
+      templates: 63, largest: 14, median: 4, single: 17,
+      // By calling (Brawler, Spell Blade, Mage, Summoner, Paladin, Cleric), Dash · Middle · Stayer: 17 of the 18 in use.
+      types: [26, 20, 15, 9, 28, 19, 2, 41, 31, 3, 10, 20, 8, 15, 10, 0, 4, 9],
       strides: [48, 118, 104], knacks: [69, 69, 48, 43, 41], families: [48, 69, 69, 84],
     })
   })

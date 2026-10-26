@@ -235,14 +235,14 @@
 
   <section id="roster">
     <h2>Today's roster, spread</h2>
-    <p class="sub">The master data of 2026-10-10: 270 outfits, counts only. Every fight type near a fifth; strides lean Middle and
-      Stayer; the families near a quarter each, the Insignia's two knacks a third.</p>
+    <p class="sub">The master data release of 2026-10-17: 270 outfits, counts only. Strides lean Middle and Stayer; the
+      families stay near a quarter each, with the Insignia's two knacks a third.</p>
     <div class="grid2">
       <div class="panel"><h3>By calling</h3><div class="svgwrap" id="r-calling"></div><details><summary>Show the numbers</summary><div id="t-calling"></div></details></div>
       <div class="panel"><h3>By signature family</h3><div class="svgwrap" id="r-family"></div><details><summary>Show the numbers</summary><div id="t-family"></div></details></div>
     </div>
     <div class="grid2" style="margin-top:16px">
-      <div class="panel"><h3>How many Umas a template holds</h3><p class="muted" style="font-size:12px">66 of 90 in use; 18 hold one Uma, the median holds 3, the largest 14.</p>
+      <div class="panel"><h3>How many Umas a template holds</h3><p class="muted" style="font-size:12px">63 of 90 in use; 17 hold one Uma, the median holds 4, the largest 14.</p>
         <div class="svgwrap" id="r-size"></div><details><summary>Show the numbers</summary><div id="t-size"></div></details></div>
       <div class="panel"><h3>Family by calling</h3><p class="muted" style="font-size:12px">Every calling holds three or four families.</p>
         <div class="svgwrap" id="r-cf"></div><details><summary>Show the numbers</summary><div id="t-cf"></div></details></div>
@@ -266,7 +266,7 @@
   <section id="pick">
     <h2>The calling pick, and how far it can move a class</h2>
     <p class="sub">CP29 as approved: a Pace Uma picks Spell Blade or Mage, a Late Uma Paladin or Cleric, once, pre-selected by
-      Power against Wit. 163 of 270 pick. The bar is today's pre-selection; the whisker how far the picks could move each class.
+      Power against Wit. 176 of 270 pick. The bar is today's pre-selection; the whisker how far the picks could move each class.
       The pick moves her type, node II's channel and (Pace) her trade; never her stride, knack or family.</p>
     <div class="panel"><div class="svgwrap" id="pick-chart"></div><details><summary>Show the numbers</summary><div id="pick-table"></div></details></div>
   </section>
@@ -275,7 +275,7 @@
 <div id="tip" role="tooltip"></div>
 <script>
 // Shared by the four Uma Templates pages (uma-templates.md): the catalog in our own words, today's roster as aggregate
-// counts (master data of 2026-10-10, 270 outfits; no names, no ids), the tooltip and small chart helpers.
+// counts (master data release of 2026-10-17, 270 outfits; no names, no ids), the tooltip and small chart helpers.
 const MULT = { 1: 1, 2: 1.8, 3: 2.6 };
 const CALLINGS = [
   { id: 'brawler', name: 'Brawler', ch: 'physical', type: 'Physical', c: 'var(--cl-brawler)', types: ['Charger', 'Bruiser', 'Ironhide'], trade: 'Mine · Forge', lead: ['Greatsword', 'Bow'], branches: ['Berserker', 'Warlord'] },
@@ -310,9 +310,9 @@ const KN = Object.fromEntries(KNACKS.map((k) => [k.id, k]));
 const LEAD = [8, 14, 21];
 const leadStat = (cid) => (CL[cid].ch === 'physical' ? 'DEF' : 'M.DEF');
 const tname = (cid, sid, kid) => `${KN[kid].word} ${CL[cid].types[STRIDES.findIndex((s) => s.id === sid)]}`;
-// Today's roster (aggregate counts only), from the rule run on the release of 2026-10-10.
-const ROSTER = {"n":270,"calling":{"spellblade":56,"summoner":46,"brawler":61,"mage":46,"paladin":48,"cleric":13},"rows":{"1":47,"2":33,"3":13,"4":14,"5":56,"6":46,"7":48,"8":13},"stride":{"stayer":104,"middle":118,"dash":48},"knack":{"tireless":48,"mighty":69,"fleet":69,"clever":41,"gritty":43},"family":{"pendant":48,"orb":69,"bell":69,"insignia":84},"sizeHist":{"1":18,"2":7,"3":10,"4":6,"5":8,"6":3,"7":5,"8":2,"9":2,"10":2,"11":1,"12":1,"14":1},
-  "templates":{"spellblade|stayer|tireless":7,"spellblade|stayer|mighty":6,"summoner|stayer|fleet":4,"brawler|middle|fleet":11,"mage|middle|fleet":7,"mage|middle|tireless":3,"mage|stayer|tireless":9,"brawler|dash|clever":3,"brawler|dash|fleet":10,"spellblade|dash|mighty":3,"mage|middle|gritty":7,"spellblade|middle|fleet":6,"summoner|stayer|gritty":2,"summoner|stayer|tireless":10,"summoner|stayer|mighty":3,"paladin|middle|mighty":12,"paladin|middle|fleet":5,"brawler|middle|gritty":5,"brawler|stayer|fleet":5,"brawler|dash|mighty":9,"brawler|dash|gritty":4,"spellblade|stayer|fleet":4,"summoner|stayer|clever":4,"spellblade|stayer|gritty":2,"summoner|middle|mighty":8,"mage|stayer|clever":5,"summoner|middle|fleet":5,"summoner|middle|clever":5,"summoner|middle|tireless":1,"spellblade|middle|gritty":6,"brawler|stayer|clever":2,"brawler|stayer|gritty":3,"spellblade|middle|mighty":14,"mage|middle|clever":7,"brawler|stayer|tireless":5,"paladin|stayer|tireless":8,"cleric|stayer|clever":5,"brawler|middle|tireless":1,"mage|stayer|gritty":3,"paladin|stayer|clever":1,"paladin|middle|gritty":4,"spellblade|dash|gritty":3,"spellblade|dash|clever":2,"mage|stayer|fleet":3,"summoner|dash|mighty":1,"summoner|dash|clever":1,"paladin|dash|gritty":1,"paladin|dash|mighty":7,"paladin|dash|fleet":2,"spellblade|middle|tireless":1,"paladin|stayer|fleet":3,"cleric|middle|clever":2,"cleric|middle|fleet":1,"paladin|stayer|mighty":4,"cleric|stayer|fleet":1,"summoner|middle|gritty":1,"cleric|stayer|tireless":2,"cleric|stayer|gritty":1,"mage|stayer|mighty":1,"brawler|middle|clever":3,"spellblade|dash|fleet":1,"cleric|middle|tireless":1,"mage|middle|mighty":1,"summoner|dash|fleet":1,"paladin|stayer|gritty":1,"spellblade|middle|clever":1},
+// Today's roster (aggregate counts only), from the D220 rule run on the release of 2026-10-17.
+const ROSTER = {"n":270,"calling":{"spellblade":56,"summoner":33,"brawler":61,"mage":74,"paladin":33,"cleric":13},"rows":{"1":47,"2":20,"3":13,"4":14,"5":56,"6":74,"7":33,"8":13},"stride":{"stayer":104,"middle":118,"dash":48},"knack":{"tireless":48,"mighty":69,"fleet":69,"clever":41,"gritty":43},"family":{"pendant":48,"orb":69,"bell":69,"insignia":84},"sizeHist":{"1":17,"2":9,"3":5,"4":6,"5":9,"6":4,"7":4,"8":1,"9":2,"10":1,"11":1,"12":2,"14":2},
+  "templates":{"spellblade|stayer|tireless":7,"brawler|middle|fleet":11,"mage|middle|fleet":12,"brawler|dash|clever":3,"spellblade|middle|fleet":6,"summoner|stayer|tireless":7,"paladin|middle|mighty":7,"brawler|middle|gritty":5,"brawler|dash|fleet":10,"spellblade|stayer|fleet":4,"mage|stayer|tireless":14,"mage|middle|mighty":5,"brawler|stayer|tireless":5,"spellblade|middle|mighty":14,"mage|stayer|gritty":4,"mage|stayer|clever":7,"paladin|dash|gritty":1,"paladin|stayer|tireless":6,"paladin|stayer|mighty":2,"paladin|dash|mighty":5,"brawler|middle|tireless":1,"mage|middle|tireless":4,"brawler|dash|mighty":9,"summoner|stayer|gritty":1,"brawler|stayer|clever":2,"summoner|middle|mighty":9,"spellblade|dash|mighty":3,"spellblade|dash|gritty":3,"spellblade|stayer|mighty":6,"paladin|stayer|clever":1,"mage|stayer|fleet":5,"paladin|middle|gritty":4,"spellblade|dash|clever":2,"mage|middle|gritty":8,"cleric|middle|clever":2,"cleric|stayer|clever":5,"mage|middle|clever":12,"brawler|stayer|fleet":5,"brawler|stayer|gritty":3,"mage|dash|mighty":1,"summoner|stayer|mighty":5,"cleric|middle|fleet":1,"summoner|stayer|clever":2,"brawler|middle|clever":3,"spellblade|middle|gritty":6,"summoner|stayer|fleet":5,"paladin|middle|fleet":4,"cleric|stayer|tireless":2,"summoner|dash|mighty":2,"mage|dash|clever":1,"paladin|dash|fleet":2,"cleric|stayer|fleet":1,"summoner|middle|fleet":1,"brawler|dash|gritty":4,"spellblade|dash|fleet":1,"summoner|dash|fleet":1,"mage|stayer|mighty":1,"spellblade|stayer|gritty":2,"cleric|middle|tireless":1,"spellblade|middle|tireless":1,"paladin|stayer|gritty":1,"cleric|stayer|gritty":1,"spellblade|middle|clever":1},
   "frontStayers":{"fleet":5,"clever":2,"gritty":3,"tireless":5}};
 const tcount = (cid, sid, kid) => ROSTER.templates[`${cid}|${sid}|${kid}`] || 0;
 
@@ -363,10 +363,10 @@ function table(head, rows, cls = '') {
 // --- The catalog page ---------------------------------------------------------------------------------------------
 kpis(document.getElementById('kpis'), [
   ['Templates', '90', '6 callings × 3 strides × 5 knacks', 'var(--accent)'],
-  ['In use today', '66', 'of 90; 16 of the 18 types', 'var(--cl-brawler)'],
-  ['A template holds', '1 – 14', 'Umas today; the median 3', 'var(--s-middle)'],
+  ['In use today', '63', 'of 90; 17 of the 18 types', 'var(--cl-brawler)'],
+  ['A template holds', '1 – 14', 'Umas today; the median 4', 'var(--s-middle)'],
   ['Front-running stayers', '15 → 4', 'templates; 81 of 105 pairs differ', 'var(--k-fleet)'],
-  ['The calling pick', '163', 'of 270: 102 Pace, 61 Late', 'var(--cl-mage)'],
+  ['The calling pick', '176', 'of 270: 130 Pace, 46 Late', 'var(--cl-mage)'],
   ['Signature families', '4', 'by knack: Insignia 84, Bell 69, Orb 69, Pendant 48', 'var(--f-insignia)'],
 ]);
 
@@ -382,20 +382,20 @@ kpis(document.getElementById('kpis'), [
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="The assignment rule as a flow"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--neutral-strong)"/></marker></defs>`;
   s += `<text x="20" y="14" class="axis-text">MASTER DATA, BY STABLE ID</text><text x="330" y="14" class="axis-text">THE THREE READINGS</text><text x="925" y="14" class="axis-text">WHAT THEY NAME</text>`;
   const IN = [
-    [30, 'aptitudes.strategy', ['Front, Pace, Late, End · S–G'], 'Running style grades', 'Her best style decides most callings; "A in two of Pace, Late, End" marks a Wit-led closer.'],
+    [30, 'aptitudes.strategy', ['Front, Pace, Late, End · S–G'], 'Running style grades', 'Front wins a best-style tie, then Pace; without either, Late + End marks a Summoner.'],
     [102, 'aptitudes.distance', ['Sprint, Mile, Medium, Long · S–G'], 'Distance grades', 'The longest distance at her best grade is her stride; the shortest decides the Pace sprinter row.'],
     [174, 'stats.star{rarity}', ['Base Power, Wit; every base stat'], 'Base stats at her starting stars', 'Power against Wit splits Pace and Late; the base stats break knack ties.'],
     [246, 'growthRatePercents', ['Speed, Stamina, Power, Guts, Wit'], 'Growth rates', 'Her highest growth rate is her knack.'],
   ];
   IN.forEach(([y, t, l, tt, td]) => { s += box(20, y, 230, 58, t, l, tt, td, 'var(--neutral-strong)'); });
   s += `<text x="20" y="335" class="val-soft" style="font-size:11px">Not read: surface (turf for 94%), the outfit's skills, her name, her id.</text>`;
-  s += box(330, 26, 350, 132, '1 · Calling', ['Front → Brawler 47 · Wit-led closer → Summoner 33', 'End → Summoner 13 · Pace sprinter, Power → Brawler 14', 'Pace, Power → Spell Blade 56 · Pace, Wit → Mage 46', 'Late, Power → Paladin 48 · Late, Wit → Cleric 13', 'The first row that fits; ties: Front, Pace, Late, End'],
+  s += box(330, 26, 350, 132, '1 · Calling', ['Front → Brawler 47 · Late + End → Summoner 20', 'End → Summoner 13 · Pace sprinter, Power → Brawler 14', 'Pace, Power → Spell Blade 56 · Pace, Wit → Mage 74', 'Late, Power → Paladin 33 · Late, Wit → Cleric 13', 'Best-style precedence: Front, then Pace, then Late + End'],
     'Step 1: the calling', 'Eight rows, the first that fits (U4). Her calling starts her class, names her trade, sets her channel and gates her Flourish and tip.', 'var(--cl-brawler)');
   s += box(330, 176, 350, 62, '2 · Stride', ['Longest distance at her best grade:', 'Sprint, Mile → Dash · Medium → Middle · Long → Stayer'], 'Step 2: the stride', 'Her Flourish’s shape and her signature tip. Today: Dash 48, Middle 118, Stayer 104.', 'var(--s-middle)');
   s += box(330, 256, 350, 72, '3 · Knack', ['Top growth: Speed Fleet · Stamina Tireless', 'Power Mighty · Guts Gritty · Wit Clever', 'Ties: higher base, then Speed … Wit'], 'Step 3: the knack', 'Her moon’s node I and her signature family. Today: Fleet 69, Mighty 69, Tireless 48, Gritty 43, Clever 41.', 'var(--k-fleet)');
-  s += box(715, 62, 170, 78, 'The pick', ['Pace: Spell Blade or Mage', 'Late: Paladin or Cleric', 'Once, on the Uma sheet'], 'The calling pick (CP29)', 'Rows 5–8 only (163 Umas), pre-selected by Power against Wit. It moves her calling and type, never her stride, knack or family.', 'var(--cl-mage)');
+  s += box(715, 62, 170, 78, 'The pick', ['Pace: Spell Blade or Mage', 'Late: Paladin or Cleric', 'Once, on the Uma sheet'], 'The calling pick (CP29)', 'Rows 5–8 only (176 Umas), pre-selected by Power against Wit. It moves her calling and type, never her stride, knack or family.', 'var(--cl-mage)');
   s += box(925, 26, 295, 62, 'Her calling’s effects', ['Starting class · trade (PP2) · channel', 'Gates the ★ Flourish and the ★ tip'], 'Her calling', 'Identity, not power: a start, a trade, a channel for her moon’s node II.', 'var(--cl-brawler)');
-  s += box(925, 112, 295, 92, '4 · Her template', ['Calling × stride → her type (18)', 'Knack → its word (5)', '"{knack word} {type}": 90 templates', 'Front · Long · Stamina → Tireless Ironhide'], 'Step 4: the name', '"{knack word} {type}", our own words (U14). 66 of the 90 hold an Uma today.');
+  s += box(925, 112, 295, 92, '4 · Her template', ['Calling × stride → her type (18)', 'Knack → its word (5)', '"{knack word} {type}": 90 templates', 'Front · Long · Stamina → Tireless Ironhide'], 'Step 4: the name', '"{knack word} {type}", our own words (U14). 63 of the 90 hold an Uma today.');
   s += box(925, 226, 295, 82, '5 · Her signature family', ['Fleet → Bell · Mighty → Orb', 'Tireless → Pendant', 'Gritty, Clever → Insignia'], 'Step 5: the family (UT7)', 'While she wears any form of it: ATK and M.ATK +0.2 a level × tier, in any class.', 'var(--f-insignia)');
   s += arrow(250, 59, 330, 70) + arrow(250, 131, 330, 100) + arrow(250, 131, 330, 205) + arrow(250, 203, 330, 120) + arrow(250, 203, 330, 285) + arrow(250, 275, 330, 300);
   s += arrow(680, 100, 715, 100) + arrow(885, 100, 925, 145) + arrow(680, 42, 925, 52) + arrow(680, 207, 925, 160) + arrow(680, 292, 925, 175) + arrow(680, 300, 925, 265);
@@ -405,11 +405,11 @@ kpis(document.getElementById('kpis'), [
 
 // Rows, stride, knack
 (function rows() {
-  const R = [['1 · Best style Front', 'brawler'], ['2 · Wit-led closer', 'summoner'], ['3 · Best style End', 'summoner'], ['4 · Pace sprinter, Power', 'brawler'],
+  const R = [['1 · Front among best', 'brawler'], ['2 · Late + End tied best', 'summoner'], ['3 · End among best', 'summoner'], ['4 · Pace sprinter, Power', 'brawler'],
     ['5 · Pace, Power > Wit', 'spellblade'], ['6 · Pace, Wit ≥ Power', 'mage'], ['7 · Late, Power > Wit', 'paladin'], ['8 · Late, Wit ≥ Power', 'cleric']];
-  const full = ['Best style Front', 'Wit ≥ Power, and A in two of Pace, Late, End', 'Best style End', 'Best style Pace, Power > Wit, best distance Sprint', 'Best style Pace, Power > Wit', 'Best style Pace, Wit ≥ Power', 'Best style Late, Power > Wit', 'Best style Late, Wit ≥ Power'];
+  const full = ['Front among her best styles', 'Late and End tied for best, without Front or Pace', 'End among her best styles', 'Pace among her best styles, Power > Wit, best distance Sprint', 'Pace among her best styles, Power > Wit', 'Pace among her best styles, Wit ≥ Power', 'Best style Late, Power > Wit', 'Best style Late, Wit ≥ Power'];
   document.getElementById('rows-chart').innerHTML = barChart(R.map(([l, c], i) => [l, ROSTER.rows[i + 1], CL[c].c, `Row ${i + 1} → ${CL[c].name}`, `${full[i]}: ${ROSTER.rows[i + 1]} Umas today${i >= 4 ? '; the pick applies' : ''}`]), { w: 600, lw: 180, label: 'Umas on each calling row' });
-  document.getElementById('rows-table').innerHTML = table(['Row', 'Her racing profile', 'Calling', '#Umas today', 'The pick'], full.map((f, i) => [i + 1, f, CL[R[i][1]].name, ROSTER.rows[i + 1], i >= 4 ? 'Yes' : '—']).concat([['', '<b>In all</b>', '', '<b>270</b>', '<b>163</b>']]));
+  document.getElementById('rows-table').innerHTML = table(['Row', 'Her racing profile', 'Calling', '#Umas today', 'The pick'], full.map((f, i) => [i + 1, f, CL[R[i][1]].name, ROSTER.rows[i + 1], i >= 4 ? 'Yes' : '—']).concat([['', '<b>In all</b>', '', '<b>270</b>', '<b>176</b>']]));
   const sk = STRIDES.map((s) => [`Stride · ${s.name}`, ROSTER.stride[s.id], s.c, s.name, `From ${s.from}; Flourish ${s.fl}, tip ${s.tip}`])
     .concat(KNACKS.map((k) => [`Knack · ${k.word}`, ROSTER.knack[k.id], k.c, `${k.word} (top growth ${k.growth})`, `Node I: ${k.nodeLong}; family: ${FA[k.fam].name}`]));
   document.getElementById('sk-chart').innerHTML = barChart(sk, { w: 600, lw: 150, label: 'Umas by stride and knack' });
@@ -466,7 +466,7 @@ renderGrid();
   document.getElementById('r-size').innerHTML = s + '</svg>';
   document.getElementById('t-size').innerHTML = table(['#Umas a template holds', '#Templates'], sizes.filter(([, v]) => v).map(([k, v]) => [k, v]).concat([['<b>Not in use</b>', '<b>24</b>']]));
   // family by calling, stacked
-  const CF = { brawler: { bell: 26, insignia: 20, orb: 9, pendant: 6 }, spellblade: { orb: 23, insignia: 14, bell: 11, pendant: 8 }, mage: { insignia: 22, pendant: 12, bell: 10, orb: 2 }, summoner: { insignia: 13, orb: 12, pendant: 11, bell: 10 }, paladin: { orb: 23, bell: 10, pendant: 8, insignia: 7 }, cleric: { insignia: 8, pendant: 3, bell: 2, orb: 0 } };
+  const CF = { brawler: { bell: 26, insignia: 20, orb: 9, pendant: 6 }, spellblade: { orb: 23, insignia: 14, bell: 11, pendant: 8 }, mage: { insignia: 32, pendant: 18, bell: 17, orb: 7 }, summoner: { insignia: 3, orb: 16, pendant: 7, bell: 7 }, paladin: { orb: 14, bell: 6, pendant: 6, insignia: 7 }, cleric: { insignia: 8, pendant: 3, bell: 2, orb: 0 } };
   const W2 = 600, lw = 100, rh = 22, gap = 9, iw = W2 - lw - 40, mx = 61;
   let t = `<svg viewBox="0 0 ${W2} ${CALLINGS.length * (rh + gap) + 8}" role="img" aria-label="Signature family by calling">`;
   CALLINGS.forEach((c, i) => { let x = lw; const y = 4 + i * (rh + gap);
@@ -493,8 +493,8 @@ renderGrid();
 
 // The pick
 (function pick() {
-  const P = [['brawler', 61, 61, 61, 'Fixed: rows 1 and 4'], ['summoner', 46, 46, 46, 'Fixed: rows 2 and 3'], ['spellblade', 56, 0, 102, 'Row 5 pre-selected; every Pace Uma may pick it (0–102)'], ['mage', 46, 0, 102, 'Row 6 pre-selected; every Pace Uma may pick it (0–102)'], ['paladin', 48, 0, 61, 'Row 7 pre-selected; every Late Uma may pick it (0–61)'], ['cleric', 13, 0, 61, 'Row 8 pre-selected; every Late Uma may pick it (0–61)']];
-  const W = 1180, lw = 120, rh = 22, gap = 12, iw = W - lw - 60, mx = 110, X = (v) => lw + (v / mx) * iw;
+  const P = [['brawler', 61, 61, 61, 'Fixed: rows 1 and 4'], ['summoner', 33, 33, 33, 'Fixed: rows 2 and 3'], ['spellblade', 56, 0, 130, 'Row 5 pre-selected; every Pace Uma may pick it (0–130)'], ['mage', 74, 0, 130, 'Row 6 pre-selected; every Pace Uma may pick it (0–130)'], ['paladin', 33, 0, 46, 'Row 7 pre-selected; every Late Uma may pick it (0–46)'], ['cleric', 13, 0, 46, 'Row 8 pre-selected; every Late Uma may pick it (0–46)']];
+  const W = 1180, lw = 120, rh = 22, gap = 12, iw = W - lw - 60, mx = 140, X = (v) => lw + (v / mx) * iw;
   let s = `<svg viewBox="0 0 ${W} ${P.length * (rh + gap) + 26}" role="img" aria-label="Umas per class, with the pick's range">`;
   for (let v = 0; v <= mx; v += 10) s += `<line x1="${X(v)}" x2="${X(v)}" y1="0" y2="${P.length * (rh + gap)}" stroke="var(--grid)"/><text class="axis-text" x="${X(v)}" y="${P.length * (rh + gap) + 16}" text-anchor="middle">${v}</text>`;
   P.forEach(([id, n, lo, hi, d], i) => { const y = 4 + i * (rh + gap), c = CL[id];
