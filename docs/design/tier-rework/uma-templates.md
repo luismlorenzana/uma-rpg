@@ -433,6 +433,10 @@ templates** (the balance party has none, XR12, SB §1.1). Three sides:
 - **The simulation's check** (README §9.5 item 8, rewritten in §12): five matched Umas within 3 points of the
   template-less party's win rate; the mirror with both hybrids matched; the signature at +4.3–6.1%; the Flourish's 4% a
   fight. The knob, if it runs hot: the signature's rate a level, never the foes.
+- **Measured by H81 (D215):** the signature in her preset's own family, over a region run at Lv 50: Brawler +4.9%, Mage
+  +3.9%, Spell Blade +8.2%, Summoner +6.7%, Paladin +5.1%, Cleric +6.6% (mean +5.9%: the rate stays +0.2); five matched
+  Umas 0 points off; the mirror with both hybrids matched 104–107% at Lv 10–30, 97% at Lv 50; the Flourish's 4% is its
+  cap (it mends 0.5–0.9% of her max HP a fight on the world's Lv 50 stages).
 
 The [gives page](previews/uma-gives.html#budget) charts every calling, tier and side, with the numbers under each chart.
 

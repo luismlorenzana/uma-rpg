@@ -411,6 +411,32 @@ right party's 92%). Iron's wrong party, the miss since H51, now holds: Iron's hi
 the right parties'. **One healer:** Paladin ÷ Cleric healing and absorbed Barriers 111% a fight across the world's Lv 50
 bosses and each front's stage 8 and champion (H63 94%).
 
+### Tier rework R2 (engine v17, H81, D215)
+
+*Follow-up to H81 (D215), 2026-10-25; dark until R2's switch (H82).* The same tables with each front's guided build on curve
+at Lv 50 as R2 Umas (`balanceMember(…, { engine: 17 })`: graded at G10 on her three weapons, five armor slots and one
+accessory slot in WP25's form, the core map, Class Rank 50, the base MP regen at 1.0% a depth, no MP accessory), first
+try on Auto, 96 fights a stage (three runs, 32 seeds). On v16's numbers these parties won Iron's champion 56% and the
+Horde's 77%. **`RIFT_TUNING_V17`**, v16's with Iron's champion ×1.2 → ×1.15 and the Horde's ×1.3 → ×1.4; every other
+number, face, rank and count is v16's. R1's in brackets.
+
+| Target | Value | Measured, R2 (H81, D215) |
+|---|---|---|
+| The right party | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 91%, 98%, 83% [95%, 99%, 89%]; Arcane 95%, 93%, 100% [92%, 92%, 99%]; Duel 100%, 100%, 92% [100%, 99%, 94%]; Horde 99%, 100%, 100% [99%, 100%, 98%]. Champions: Iron 65% [61%], Arcane 69% [69%], Duel 65% [65%], Horde 67% [70%] |
+| The wrong party | ≤ 30% a stage, ≤ 10% a champion | On Iron, Arcane's party: 12%, 24%, 5% a stage [10%, 20%, 1%], 0% the champion. On Arcane, Iron's party: 36%, **86%**, **52%** a stage [28%, 75%, 4%], 9% the champion (**missed**, R1's miss, wider) |
+| The Convergence, right parties | About 50% an attempt | 51% (49 of 96) [52%]; its fights 68%, 90%, 100%, 84% |
+| The Duel's guard rail | Every class's best single act < the Duel's lowest shield | 10 against 13 (each class's own acts 5–10, the best Limit Break 12) |
+| A run's length | About 2–3 weeks | About 58 fights on Auto [57] |
+| Echoes, how hard | Lv 45 ≥ 80% re-specced; Lv 50 ≥ 80%, Lv 55 about 50% | Lv 45: 100%. Lv 50: 100%. Lv 55: Iron 99–100%, Arcane 77–79%, Duel 16–61%, Horde 89–92% (one multiplier, as H51's) |
+
+**Arcane's wrong party, still the miss, and wider.** Iron's R2 build keeps R1's magic and bulk and gains R2's flat
+offense on every kind it slots (the Pendants, the Planet), so through the physical ward it outlasts Arcane's sub-bosses
+and boss more often (stages 5–8 86%). R1 found every setting that pushed it under 30% pushed Arcane's own party under
+80%; the packet's knob is Iron's and the Horde's champions only, so it stands, logged.
+
+**Paladin ÷ Cleric:** healing and absorbed Barriers 112% a fight across the world's Lv 50 bosses and each front's stage 8
+and champion (R1 111%).
+
 ## 12. Owner calls: decided 2026-10-21 (D161), all as recommended
 
 | Call | Question | Recommendation |

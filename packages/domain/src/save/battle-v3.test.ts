@@ -204,7 +204,7 @@ describe('a graded Uma’s accessory and signature in the fight (R2, H75)', () =
   })
 
   it('brings an Orb on a kind she doesn’t wield, an Insignia, and her signature on another class’s family', () => {
-    expect(ofFields(fight(accessorySlot('orb', 10, 'dark'), 'mighty').ally)).toEqual({ flat: { dark: 34 }, signature: 10 })
+    expect(ofFields(fight(accessorySlot('orb', 10, 'dark'), 'mighty').ally)).toEqual({ flat: { dark: 27 }, signature: 10 })
     expect(ofFields(fight(accessorySlot('insignia', 4), 'clever').ally)).toEqual({ insignia: { value: 60 }, signature: 10 })
     expect(ofFields(fight(accessorySlot('bell', 10, 'fire'), 'fleet').ally)).toEqual({ signature: 10 })
   })

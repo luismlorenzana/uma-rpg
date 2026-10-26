@@ -708,6 +708,11 @@ trades and the Armorer's four slots set the pace together:
 | The party holds it (40 workers), day | 0.4 | 2.4 | 4.6 | 6.8 | 9.2 | 11.6 | 14.2 | 16.9 | 19.6 | 22.5 |
 | A run of twenty holds it, day | 1.6 | 3.6 | 5.8 | 8.0 | 10.4 | 12.8 | 15.4 | 18.1 | 20.8 | 23.7 |
 
+**Measured by H81 (D215)** (`economy/professions.sim.ts`, the game's own recipes and times): one Uma 110 pieces, 485
+refined (493 with her moon), 822 hours (835); the trades 166 · 169 · 167 · 166 · 154 hours; the places' maxed Umas a day
+as §7.3 (the Armorer 1.27); forty at the callings' split 1.27 a day, a party in 3.9 days, a run of twenty in 15.8; G6 on
+day 11.3, G10 on day 22.1, held on 22.5 and 23.7.
+
 ### 7.5 Around the places
 
 | Area | Tier 1 |
@@ -806,6 +811,10 @@ A Tier 2 world starts with one Rift run's twenty, Craft Lv 1 each, nothing in st
   party's grade is 0.7 days of the run's work. Its schedule: G1 day 0.7, G5 9.5, G6 12.0, G10 22.8.
 - **Without any secondary** the two thin trades take 40 days; the first round's gathering-only secondary fixes the
   callings' split but not a run with two Mages (40 days) or one (80), since making stays the trade's.
+- **Measured by H81 (D215), R2's shape** (one accessory slot, no weapon moon, no Branch Gem, no secondary until R3): one
+  Uma 485 refined in Tiers 2 and 3 too, on the tiers' own pairs by the ladder; a run of twenty at the callings' split
+  without a secondary **36.8 days** in either tier (the magical hybrid trade's three bind), against this table's 40.2 and
+  §9.4's 46.0 at 505 and 525: the cost of R2 shipping before R3's secondary.
 
 ### 8.6 The Exchange in Tier 2
 

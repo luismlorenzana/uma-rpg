@@ -20,8 +20,10 @@ import { GRADE_MAX, TIER_SCALE_TENTHS, tierScaled, type AccessoryFamily, type Ac
 /** WP20: a Pendant's flat offense on each of her three kinds, Tier 1, G1–G10 (Tier 2 and 3 by `tierScaled`). */
 export const PENDANT_T1: readonly number[] = [1, 1, 2, 2, 4, 5, 7, 9, 12, 14]
 /** WP22: an Orb's flat offense on its kind, Tier 1, G1–G10: v2's Orb (`ORB_OFFENSE_BY_GRADE` from G1), half a weapon's
- * Might. */
-export const ORB_T1: readonly number[] = [1, 2, 4, 6, 10, 13, 18, 23, 29, 34]
+ * Might, **a step down** (×0.8, rounded; R2's balance, H81, D215): measured on region runs at Lv 50 the Orb was the best
+ * form in 19 of WP §5.7's 24 class-and-context cells (Auto spends most of an Uma's damage on her lead kind), over the
+ * half the rule allows, so its values step down as the docs' knob says (v2's row was 1, 2, 4, 6, 10, 13, 18, 23, 29, 34). */
+export const ORB_T1: readonly number[] = [1, 2, 3, 5, 8, 10, 14, 18, 23, 27]
 /** WP21: a Bell's follow-up, per mille of an Attack a grade: 0.1 a grade, 1.0 at G10, the same in every tier. */
 export const BELL_PERMILLE_PER_GRADE = 100
 /** WP23: an Insignia's factor, per mille a grade: +1.5% a grade, +15% at G10, the same in every tier. */

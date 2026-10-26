@@ -51,6 +51,10 @@ export const BATTLE_REGEN_ROUNDS = 2
  * with today's supports worn it brings a region's last four stages to today's pace at Lv 50 (0.88× → 0.90×), MP's drag
  * there to today's (1.24); no deep cast refunded by a round (a healer's 63% the most). */
 export const RPG_BASE_MP_REGEN = 0.009
+/** v17 (R2's balance, H81, D215): with the Spring and the Siphon retired, 0.9% → 1.0% a depth (5% from Class Rank 40)
+ * brings a region's last four stages to today's pace ±10% at Lv 10 · 30 · 50 (0.93 · 0.94 · 0.90×; 0.9%: 0.84× at Lv 50),
+ * MP's drag there to today's (1.21 against 1.24); no deep cast refunded by a round (a healer's 94% at Lv 49 the most). */
+export const RPG_BASE_MP_REGEN_V17 = 0.010
 /** v16: the depths the base MP regen counts, at most: five, so 4.5% from Class Rank 40 (Tier 3's sixth doesn't raise it). */
 export const RPG_BASE_MP_REGEN_DEPTHS = 5
 /** v16 (UT6, D204): her Flourish gives this share of her max HP a fight, as her calling's class: Clean break's Barrier, or
