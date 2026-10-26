@@ -445,7 +445,7 @@ function gear(): string {
     inputs(madeRecipe(`weapon-gem-g${g}`, 1)), inputs(madeRecipe(`armor-fittings-g${g}`, 1)), inputs(madeRecipe(`accessory-setting-g${g}`, 1))]))
   const forms = table(['Family', 'Base form', 'G1 → G10 (Tier 1)'], [
     [ACCESSORY_FAMILY_LABEL.pendant, 'Flat offense on each of her three weapons\' kinds', PENDANT_T1.join(', ')],
-    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, any of the ten', ORB_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', ORB_T1.join(', ')],
     [ACCESSORY_FAMILY_LABEL.bell, 'When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack', `${BELL_PERMILLE_PER_GRADE / 1000} a grade × her hand (${(BELL_PERMILLE_PER_GRADE * GRADE_MAX) / 1000} at G10), every tier`],
     [ACCESSORY_FAMILY_LABEL.insignia, 'Her hits on sub-bosses and bosses hit harder', `+${INSIGNIA_PERMILLE_PER_GRADE / 10}% a grade (+${(INSIGNIA_PERMILLE_PER_GRADE * GRADE_MAX) / 10}% at G10), every tier`],
   ])

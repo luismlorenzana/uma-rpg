@@ -4,22 +4,22 @@
 // Work (Craft Level and her job) and Racing (the original's aptitudes, stats and unique skill). A locked outfit shows
 // the Unlock flow and her racing profile; an outfit another tier's world owns says where she lives, and a later tier
 // sends unlocks to Tier 1 (H35, D5). The header, the tabs and the unlock confirm are the kit's frame (uma-platform P56,
-// SD3). "Can upgrade" (H34) dots the Gear tab and counts Extra Stats. Engine v16 (the Tier rework's R1, H70, live since
+// SD3). "Can upgrade" (H34) dots the Gear tab and counts Extra Stats; the Gear tab's two views, Equip and Upgrade, are
+// H107's (D219). Engine v16 (the Tier rework's R1, H70, live since
 // H72): her template's chip and card follow the stars, a Pace or Late Uma's calling pick card sits above her class chip
 // until confirmed, and the Racing tab's "Her template" says what her aptitudes do.
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
-  activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, classOf, classRankOf, classTrack, EFFECT_LABEL,
-  highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
+  activeClass, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, isInFight, itemMinutes, MINUTE, classOf, classRankOf, classTrack,
+  highestGrade, KEY_LABELS, partyOf, placeById,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, umaTrade, slotJobOf, ACCESSORY_KINDS, accessoryTrack, starsV1,
-  isGrades, isStarMap, moonTemplate, starMapOf,
+  rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaProfile, umaTrade, slotJobOf,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
-import { UiMark } from '@luismlorenzana/uma-kit/ui'
+import { Tabs, UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { seeStableOutfit } from '../../album/preferences'
@@ -35,10 +35,8 @@ import { tradeLabel } from '../../save/trade'
 import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
-import { RankCells, RankRow } from '../../ui/RankBars'
-import { pointText } from '../../items/planets'
-import { GearCard } from './GearCard'
-import { PresetButton } from './PresetButton'
+import { RankRow } from '../../ui/RankBars'
+import { EquipView, upgradeCount, UpgradeView } from './GearCardV3'
 import { SkillsPage } from './SkillsPage'
 import { CallingCard, TemplateChip } from './TemplateCard'
 import { racingTemplate } from './template-view'
@@ -145,7 +143,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
           <>
             {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
             {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
-            {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} />}
+            {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} onSkills={() => setTab('skills')} />}
             {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
             {shown === 'racing' && <RacingTab view={view} outfit={outfit} uma={owned} />}
           </>
@@ -374,39 +372,40 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
   )
 }
 
-// --- Gear: the standard preset (D164), what she wears, Weapon and Armor Ranks (D102), Extra Stats ----------------------
+// --- Gear: two views (H107, D219): Equip, what she wears; Upgrade, her grades and Extra Stats --------------------------
 
-function GearTab({ outfit, uma, world, upgrades }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; upgrades: UmaUpgrades | null }) {
-  const navigate = useNavigate()
-  const tier = useActiveTier()
-  const points = umaPoints(uma, activeClass(outfit, uma), tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick))
-  const ready = isStarMap(uma.stars) ? (upgrades?.jewels.length ? `${upgrades.jewels.length} to set` : '')
-    : [upgrades?.gems ? `${upgrades.gems} to set` : '', upgrades?.freeNodes ? `${upgrades.freeNodes} free` : ''].filter(Boolean).join(' · ')
-  const map = starMapOf(uma)
+const GEAR_VIEWS = ['equip', 'upgrade'] as const
+type GearView = (typeof GEAR_VIEWS)[number]
+const GEAR_VIEW_KEY = 'rpg.profile.gearView'
+
+function storedGearView(): GearView {
+  try {
+    const v = sessionStorage.getItem(GEAR_VIEW_KEY)
+    return (GEAR_VIEWS as readonly string[]).includes(v ?? '') ? (v as GearView) : 'equip'
+  } catch {
+    return 'equip'
+  }
+}
+
+function GearTab({ outfit, uma, world, upgrades, onSkills }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; upgrades: UmaUpgrades | null; onSkills: () => void }) {
+  const tier = useActiveTier() as 1 | 2 | 3
+  const [view, setViewState] = useState<GearView>(storedGearView)
+  const setView = (v: GearView) => {
+    setViewState(v)
+    try {
+      sessionStorage.setItem(GEAR_VIEW_KEY, v)
+    } catch {
+      // this session's convenience only
+    }
+  }
+  const count = upgradeCount(upgrades)
   return (
     <div className="space-y-3">
-      <PresetButton outfit={outfit} uma={uma} world={world} />
-      <GearCard outfit={outfit} uma={uma} world={world} marked={isGrades(uma.gear) ? upgrades?.grades : upgrades?.gearSlots} />
-      <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
-        <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-          <span className="flex items-center gap-1.5">
-            <span className="text-[14px] font-semibold">Extra Stats</span>
-            {ready && <span className="rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{ready}</span>}
-          </span>
-          <span className="text-[12px] text-ink-soft">{isStarMap(uma.stars) ? `${map.open.length}/22 open` : `${starsV1(uma).active.length}/${activeNodeSlots(uma.level)} active · ${starsV1(uma).unlocked.length}/100`} · map ›</span>
-        </span>
-        <span className="mt-1 block text-[11px] text-ink-faint">
-          Total with armor: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
-        </span>
-      </button>
-      {!isGrades(uma.gear) && <section className="space-y-2 rounded-md bg-raised p-3">
-        <p className="text-[11px] text-ink-faint">Weapon Ranks</p>
-        <RankCells label="Weapon Ranks" cells={WEAPON_TYPES.map((w) => ({ key: w, kind: 'weapon' as const, id: w, track: weaponTrack(uma.ranks, w) }))} />
-        <p className="pt-1 text-[11px] text-ink-faint">Armor Ranks</p>
-        <RankCells label="Armor Ranks" cells={ARMOR_KINDS.map((k) => ({ key: k, kind: 'armor' as const, id: k, track: armorTrack(uma.ranks, k) }))} />
-        <p className="pt-1 text-[11px] text-ink-faint">Accessory Ranks</p>
-        <RankCells label="Accessory Ranks" cells={ACCESSORY_KINDS.map((k) => ({ key: k, kind: 'accessory' as const, id: k, track: accessoryTrack(uma.ranks, k) }))} />
-      </section>}
+      <Tabs<GearView> label="Gear" value={view} onChange={setView}
+        options={[{ value: 'equip', label: 'Equip' }, { value: 'upgrade', label: count ? `Upgrade · ${count}` : 'Upgrade' }]} />
+      {view === 'equip'
+        ? <EquipView outfit={outfit} uma={uma} world={world} tier={tier} onSkills={onSkills} />
+        : <UpgradeView outfit={outfit} uma={uma} world={world} tier={tier} upgrades={upgrades} />}
     </div>
   )
 }

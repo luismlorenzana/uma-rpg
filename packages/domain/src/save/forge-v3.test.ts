@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { gradeOf, newGrades, type GradeTarget } from '../economy/grades'
-import { accessoryFormBlock, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
+import { RPG_ALL_CLASSES } from '../rpg/rules'
+import { accessoryFormBlock, accessoryKinds, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
+import { classPresetV3 } from './presets'
 import { accessorySlot, ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { SaveRuleError } from './rules'
 import { type Save } from './save'
@@ -78,8 +80,8 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
   }
 
   it('changes the family and kind and keeps the grade', () => {
-    let save = setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'dark', NOW)
-    expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'dark')])
+    let save = setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'lance', NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'lance')])
     save = setAccessoryForm(save, '101', 'brawler', 0, 'bell', 'axe', NOW)
     expect(slotOf(save)).toEqual([accessorySlot('bell', 6, 'axe')])
     save = setAccessoryForm(save, '101', 'brawler', 0, 'insignia', undefined, NOW)
@@ -93,6 +95,19 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     expect(slotOf(setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'fire', NOW))).toEqual([accessorySlot('bell', 6, 'fire')])
     expect(refusal(() => setAccessoryForm(graded(), '101', 'brawler', 0, 'bell', 'fire', NOW))).toBe('bad-loadout: No Fire Tome in her slots')
     expect(refusal(() => setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'greatsword', NOW))).toBe('bad-loadout: No Greatsword in her slots')
+  })
+
+  it('checks an Orb the same way since H107 (WP22, D219): only a kind she can hit with', () => {
+    expect(accessoryKinds(world(graded()).umas['101']!, 'brawler')).toEqual(['greatsword', 'axe', 'lance'])
+    expect(accessoryKinds(world(graded()).umas['101']!, 'mage')).toEqual(['fire', 'ice', 'lightning'])
+    expect(slotOf(setAccessoryForm(graded(), '101', 'mage', 0, 'orb', 'ice', NOW))).toEqual([accessorySlot('orb', 6, 'ice')])
+    expect(refusal(() => setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'dark', NOW))).toBe('bad-loadout: No Dark Tome in her slots')
+    expect(refusal(() => setAccessoryForm(graded(), '101', 'mage', 0, 'orb', 'bow', NOW))).toBe('bad-loadout: No Bow in her slots')
+    // Every class's preset Orb or Bell sits on one of her kinds.
+    for (const classId of RPG_ALL_CLASSES) {
+      const form = classPresetV3(classId).accessory
+      if (form.kind) expect(accessoryKinds(world(graded()).umas['101']!, classId)).toContain(form.kind)
+    }
   })
 
   it('refuses what one slot of base forms can’t hold', () => {

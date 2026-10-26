@@ -178,7 +178,7 @@ Accessory families (one slot, its family, form and kind a setting changed freely
 | Family | Base form | G1 → G10 (Tier 1) |
 |---|---|---|
 | Pendant | Flat offense on each of her three weapons' kinds | 1, 1, 2, 2, 4, 5, 7, 9, 12, 14 |
-| Orb | Flat offense on one kind she sets, any of the ten | 1, 2, 3, 5, 8, 10, 14, 18, 23, 27 |
+| Orb | Flat offense on one kind she sets, one of her three weapons’ kinds | 1, 2, 3, 5, 8, 10, 14, 18, 23, 27 |
 | Bell | When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack | 0.1 a grade × her hand (1 at G10), every tier |
 | Insignia | Her hits on sub-bosses and bosses hit harder | +1.5% a grade (+15% at G10), every tier |
 

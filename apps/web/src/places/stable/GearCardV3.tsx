@@ -1,23 +1,25 @@
+// The Gear tab's two views (H107, D219; R2's grades, H79): **Equip**, what she wears (the preset, her weapons, her armor
+// half, and her accessory slot as four cards of one shape, ★ on her signature family), and **Upgrade**, every slot's
+// grade row with the made item that raises it, then Extra Stats. The data is `gear-equip.ts`'.
 import {
-  ACCESSORY_FAMILY_LABEL, ARMOR_LABEL, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryFlatValue, activeClass, armorHalf, armorKindFor, armorValues, classOf, gradeOf, isGrades, isRpgElement, madeName, mightAt, raisePlan,
-  rpgTomeOf, rpgWeaponKind, signatureBonus, signatureWorn, umaTemplate, WEAPON_LABEL,
+  ARMOR_LABEL, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf, EFFECT_LABEL,
+  gradeOf, ITEM_EFFECTS, isGrades, madeName, mightAt, raisePlan, starMapOf, umaPoints, umaTemplate, moonTemplate, WEAPON_LABEL,
   type AccessoryFamily, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
-  type RpgDamageKind, type RpgWeapon, type TierWorld,
+  type RpgDamageKind, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
-import { useMemo, useState } from 'react'
-import type { ReactNode } from 'react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { WeaponGlyph } from '../../battle/labels'
 import { accessoryIconId } from '../../items/frames'
 import { ItemIcon } from '../../items/ItemIcon'
-import { outputView } from '../../items/outputs'
+import { pointText } from '../../items/planets'
 import { chooseAccessoryForm, raiseGear } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { UpgradeMark } from '../../ui/UpgradeMark'
-import { accessoryChoicesV3 } from './accessory-v3'
-import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
-
-type Open = { target: GradeTarget } | { accessory: number } | null
+import { accessoryCards, cardButton, cardKind, upgradeRows, type AccessoryCard, type UpgradeRow } from './gear-equip'
+import { gradeUpgradeView } from './gear-v3'
+import { PresetButton } from './PresetButton'
 
 const armorStat = (slot: ArmorSlot, grade: number, tier: GearTier) => {
   const values = armorValues(slot, grade, tier)
@@ -84,96 +86,151 @@ function GradeSheet({ outfitId, uma, world, tier, classId, target, onClose }: {
   )
 }
 
-function AccessorySheetV3({ outfitId, uma, world, tier, classId, slot, signature, onClose }: {
-  outfitId: string; uma: OwnedUma; world: TierWorld; tier: GearTier; classId: RpgClass; slot: number; signature: AccessoryFamily; onClose: () => void
-}) {
-  if (!isGrades(uma.gear)) return null
-  const grades = uma.gear
-  const state = uma.gear.accessories[slot]
-  const weapons = classOf(uma, classId).weapons
-  const choices = useMemo(() => accessoryChoicesV3(signature, weapons, classId), [signature, weapons, classId])
-  const [error, setError] = useState<string | null>(null)
-  const [gradeOpen, setGradeOpen] = useState(false)
-  const choose = (family: AccessoryFamily, kind?: RpgDamageKind) => chooseAccessoryForm(outfitId, classId, slot, family, kind)
-    .then(() => setError(null), (err: unknown) => setError(err instanceof Error ? err.message : 'That didn’t work.'))
-  const grade = state?.grade ?? 0
-  const familyLine = (family: AccessoryFamily) => family === 'pendant' ? `+${accessoryFlatValue(family, grade, tier)} on her three kinds`
-    : family === 'insignia' ? `+${(grade * 1.5).toFixed(grade % 2 ? 1 : 0)}% on sub-bosses and bosses` : ''
+// --- Equip ------------------------------------------------------------------------------------------------------------
+
+function AccessoryCardView({ card, grade, onEquip }: { card: AccessoryCard; grade: number; onEquip: (family: AccessoryFamily, kind?: RpgDamageKind) => void }) {
+  const [picked, setPicked] = useState<RpgDamageKind | null>(cardKind(card))
+  const button = cardButton(card, picked)
   return (
-    <BottomSheet title="Accessory" onClose={onClose}>
-      <div className="space-y-3">
-        <p className="text-[13px] text-ink-soft">G{state?.grade ?? 0} · changing form keeps its grade</p>
-        {choices.map((choice) => (
-          <section key={choice.family} className="rounded-md bg-raised p-2">
-            <div className="flex items-center gap-2">
-              <ItemIcon id={accessoryIconId({ grade: Math.max(1, state?.grade ?? 0), family: choice.family, form: 'base',
-                ...((choice.family === 'orb' || choice.family === 'bell') ? { kind: choice.kinds[0]?.kind } : {}) })} size={32} />
-              <span className="flex-1 text-[13px] font-semibold">{choice.signature ? '★ ' : ''}{choice.label}</span>
-              {!choice.kinds.length && <button type="button" onClick={() => void choose(choice.family)} className="min-h-11 rounded-sm bg-panel px-3 text-[12px] font-semibold">Wear</button>}
-            </div>
-            {choice.signature && <p className="mt-1 text-[11px] text-ink-soft">ATK and M.ATK +{signatureBonus(uma.level, tier)} (her signature)</p>}
-            {familyLine(choice.family) && <p className="mt-1 text-[11px] text-ink-soft">{familyLine(choice.family)}</p>}
-            {!!choice.kinds.length && <div className="mt-2 grid grid-cols-2 gap-1">
-              {choice.kinds.map(({ kind, label }) => {
-                const worn = state?.family === choice.family && state.kind === kind
-                return <button key={kind} type="button" onClick={() => void choose(choice.family, kind)}
-                  className={`min-h-11 rounded-sm px-2 text-left text-[11px] font-semibold ${worn ? 'bg-accent text-accent-ink' : 'bg-panel'}`}>
-                  {label}{choice.family === 'orb' ? ` · +${accessoryFlatValue('orb', grade, tier)} offense` : ` · ${(grade / 10).toFixed(1)} after her Attack`}
-                </button>
-              })}
-            </div>}
-          </section>
-        ))}
-        {state?.family === 'bell' && state.kind && !weapons.some((weapon) => rpgWeaponKind(weapon) === state.kind) &&
-          <p className="text-[13px] text-warning">No {WEAPON_LABEL[isRpgElement(state.kind) ? rpgTomeOf(state.kind) : state.kind]} in her slots</p>}
-        <button type="button" onClick={() => setGradeOpen(true)} className="min-h-12 w-full rounded-sm bg-raised font-semibold">Grade</button>
-        {error && <p className="text-[13px] text-danger">{error}</p>}
-        {gradeOpen && <GradeSheet outfitId={outfitId} uma={uma} world={world} tier={tier} classId={classId}
-          target={{ kind: 'accessory', slot }} onClose={() => setGradeOpen(false)} />}
+    <div className={`rounded-sm border bg-panel p-2 ${card.wearing ? 'border-accent' : 'border-transparent'}`} data-accessory={card.family}>
+      <div className="flex items-center gap-2">
+        <ItemIcon id={accessoryIconId({ grade: Math.max(1, grade), family: card.family, form: 'base', ...(picked ? { kind: picked } : {}) })} size={32} />
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-semibold">{card.signature ? '★ ' : ''}{card.label}</p>
+          <p className="text-[11px] text-ink-soft">{card.effect}</p>
+        </div>
+        <button type="button" disabled={button.disabled} onClick={() => onEquip(card.family, card.kinds.length ? picked ?? undefined : undefined)}
+          className="min-h-11 shrink-0 rounded-sm px-3 text-[12px] font-semibold enabled:bg-accent enabled:text-accent-ink disabled:bg-sunken disabled:text-ink-soft">
+          {button.label}
+        </button>
       </div>
-    </BottomSheet>
+      {card.signature && <p className="mt-1 text-[11px] font-semibold text-accent">{card.signature}</p>}
+      {card.kinds.length > 0 && (
+        <div role="group" aria-label={`${card.label}: which weapon`} className="mt-2 grid grid-cols-3 gap-1">
+          {card.kinds.map(({ kind, label }) => (
+            <button key={kind} type="button" aria-pressed={picked === kind} onClick={() => setPicked(kind)}
+              className={`min-h-11 rounded-sm border px-1 text-[11px] font-semibold ${picked === kind ? 'border-accent bg-accent/10' : 'border-transparent bg-sunken'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      {card.stale && <p className="mt-1 text-[11px] font-semibold text-warning">{card.stale}</p>}
+    </div>
   )
 }
 
-export function GearCardV3({ outfit, uma, world, tier, marked = [] }: {
-  outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; tier: GearTier; marked?: readonly GradeTarget[]
-}) {
+/** Equip: what she wears, nothing to spend. */
+export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; tier: GearTier; onSkills: () => void }) {
+  const [error, setError] = useState<string | null>(null)
+  if (!isGrades(uma.gear)) return null
+  const grades = uma.gear
+  const active = activeClass(outfit, uma)
+  const weapons = classOf(uma, active).weapons
+  const kinds = accessoryKinds(uma, active)
+  const signature = umaTemplate(outfit, uma.calling.pick).family
+  const equip = (slot: number) => (family: AccessoryFamily, kind?: RpgDamageKind) => chooseAccessoryForm(outfit.outfitId, active, slot, family, kind)
+    .then(() => setError(null), (err: unknown) => setError(err instanceof Error ? err.message : 'That didn’t work.'))
+  return (
+    <div className="space-y-3">
+      <PresetButton outfit={outfit} uma={uma} world={world} />
+      <section className="space-y-1.5 rounded-md bg-raised p-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-micro">Weapons</h4>
+          <button type="button" onClick={onSkills} className="min-h-11 px-1 text-[12px] font-semibold text-ink-soft">Set on Skills ›</button>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {weapons.map((weapon) => {
+            const target: GradeTarget = { kind: 'weapon', weapon }
+            const grade = gradeOf(grades, target)
+            return (
+              <div key={weapon} className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-sm bg-panel p-1.5 text-center">
+                <GradeIcon target={target} grade={grade} classId={active} />
+                <span className="text-[11px] font-semibold">{WEAPON_LABEL[weapon]} · G{grade}</span>
+              </div>
+            )
+          })}
+        </div>
+        <h4 className="pt-1 text-micro">Armor</h4>
+        <p className="rounded-sm bg-panel px-2 py-2 text-[12px]">
+          <span className="font-semibold">{armorHalf(active) === 'magical' ? 'Magical' : 'Physical'} armor</span>
+          <span className="text-ink-soft"> · {ARMOR_SLOTS.map((slot) => `${ARMOR_SLOT_LABEL[slot]} G${gradeOf(grades, { kind: 'armor', slot })}`).join(' · ')}</span>
+        </p>
+      </section>
+      {grades.accessories.map((slot, i) => (
+        <section key={i} className="space-y-1.5 rounded-md bg-raised p-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-micro">Accessory · G{slot.grade}</h4>
+            <HelpButton title="Accessory"><p>What she wears. A form changes freely outside fights; its strength follows the slot’s grade, raised on Upgrade.</p></HelpButton>
+          </div>
+          {accessoryCards(slot, kinds, signature, uma.level, tier).map((card) => (
+            <AccessoryCardView key={`${card.family}:${card.wornKind ?? ''}:${card.wearing}`} card={card} grade={slot.grade} onEquip={equip(i)} />
+          ))}
+        </section>
+      ))}
+      {error && <p className="text-[13px] text-danger">{error}</p>}
+    </div>
+  )
+}
+
+// --- Upgrade ----------------------------------------------------------------------------------------------------------
+
+const GROUP_LABEL = { weapon: 'Weapons', armor: 'Armor', accessory: 'Accessory' } as const
+
+/** Upgrade: every slot's grade row and the made item that raises it, then Extra Stats. */
+export function UpgradeView({ outfit, uma, world, tier, upgrades }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; tier: GearTier; upgrades: UmaUpgrades | null }) {
+  const navigate = useNavigate()
+  const [open, setOpen] = useState<GradeTarget | null>(null)
   if (!isGrades(uma.gear)) return null
   const grades = uma.gear
   const active = activeClass(outfit, uma)
   const weapons = classOf(uma, active).weapons
   const template = umaTemplate(outfit, uma.calling.pick)
-  const [open, setOpen] = useState<Open>(null)
-  const matches = (target: GradeTarget) => marked.some((m) => JSON.stringify(m) === JSON.stringify(target))
-  const Row = ({ target, icon, text, onClick }: { target: GradeTarget; icon: ReactNode; text: string; onClick: () => void }) => {
-    const upgrade = gradeUpgradeView(grades, target, uma.level, world.items)
-    return <div className="flex min-h-14 items-center gap-2 rounded-sm bg-panel px-2">
-      {icon}<button type="button" onClick={onClick} className="min-h-12 min-w-0 flex-1 text-left text-[12px] font-semibold">{text}</button>
-      <button type="button" disabled={!upgrade.ready} onClick={() => void raiseGear(outfit.outfitId, target)} aria-label={upgrade.ready ? upgrade.label : upgrade.block ?? upgrade.label}
-        className="flex min-h-11 max-w-32 items-center justify-center gap-1 rounded-sm bg-sunken px-2 text-[10px] font-semibold leading-tight disabled:text-ink-faint">
-        {(matches(target) || upgrade.ready) && <UpgradeMark size={14} />}<span>{upgrade.ready ? upgrade.label : upgrade.block ?? upgrade.label}</span>
-      </button>
-    </div>
-  }
-  const accessory = grades.accessories[0]
-  const accessoryTarget: GradeTarget = { kind: 'accessory', slot: 0 }
+  const rows = upgradeRows(grades, weapons, active, uma.level, world.items, tier, template.family)
+  const marked = upgrades?.grades ?? []
+  const isMarked = (target: GradeTarget) => marked.some((m) => JSON.stringify(m) === JSON.stringify(target))
+  const points = umaPoints(uma, active, tier, moonTemplate(outfit, uma.calling.pick))
+  const map = starMapOf(uma)
+  const jewels = upgrades?.jewels.length ?? 0
+  const icon = (row: UpgradeRow) => row.target.kind === 'accessory' && grades.accessories[row.target.slot]?.grade && grades.accessories[row.target.slot]?.family
+    ? <ItemIcon id={accessoryIconId(grades.accessories[row.target.slot])} size={32} />
+    : <GradeIcon target={row.target} grade={row.upgrade.grade} classId={active} />
   return (
-    <section className="space-y-1.5 rounded-md bg-raised p-3">
-      <div className="flex items-center justify-between"><h4 className="text-micro">Gear</h4><HelpButton title="Grades"><p>A made item raises one slot a grade, up to G10. Grade g opens at Lv 5g − 4. Weapon Gems, Armor Fittings and Accessory Settings come from the Forge, the Armorer and the Charm Shop.</p></HelpButton></div>
-      <h4 className="pt-1 text-micro">Weapons</h4>
-      {weapons.map((weapon) => { const target: GradeTarget = { kind: 'weapon', weapon }; const grade = gradeOf(grades, target)
-        return <Row key={weapon} target={target} icon={<GradeIcon target={target} grade={grade} classId={active} />} text={weaponGradeLine(grades, weapon, tier)} onClick={() => setOpen({ target })} /> })}
-      <h4 className="pt-1 text-micro">Armor</h4>
-      {ARMOR_SLOTS.map((slot) => { const target: GradeTarget = { kind: 'armor', slot }; const grade = gradeOf(grades, target)
-        return <Row key={slot} target={target} icon={<GradeIcon target={target} grade={grade} classId={active} />} text={armorGradeLine(grades, slot, active, tier)} onClick={() => setOpen({ target })} /> })}
-      <h4 className="pt-1 text-micro">Accessory</h4>
-      <Row target={accessoryTarget} icon={accessory?.grade && accessory.family ? <ItemIcon id={accessoryIconId(accessory)} size={32} /> : <GradeIcon target={accessoryTarget} grade={accessory?.grade ?? 0} classId={active} />}
-        text={accessoryGradeLine(accessory, weapons, tier, template.family, uma.level)} onClick={() => setOpen({ accessory: 0 })} />
-      {!signatureWorn(grades, template.family) && <p className="px-2 text-[11px] text-ink-faint">Wear a {ACCESSORY_NAME[template.family]} for ★ +{signatureBonus(uma.level, tier)}</p>}
-      {open && 'target' in open && <GradeSheet outfitId={outfit.outfitId} uma={uma} world={world} tier={tier} classId={active} target={open.target} onClose={() => setOpen(null)} />}
-      {open && 'accessory' in open && <AccessorySheetV3 outfitId={outfit.outfitId} uma={uma} world={world} tier={tier} classId={active} slot={open.accessory} signature={template.family} onClose={() => setOpen(null)} />}
-    </section>
+    <div className="space-y-3">
+      <section className="space-y-1.5 rounded-md bg-raised p-3">
+        <div className="flex items-center justify-between"><h4 className="text-micro">Grades</h4><HelpButton title="Grades"><p>A made item raises one slot a grade, up to G10. Grade g opens at Uma Lv 5g − 4. Weapon Gems, Armor Fittings and Accessory Settings come from the Forge, the Armorer and the Charm Shop.</p></HelpButton></div>
+        {rows.map((row, i) => (
+          <div key={row.key}>
+            {(i === 0 || rows[i - 1]!.target.kind !== row.target.kind) && <h4 className="pt-1 pb-1 text-micro">{GROUP_LABEL[row.target.kind]}</h4>}
+            <div className="flex min-h-14 items-center gap-2 rounded-sm bg-panel px-2">
+              {icon(row)}
+              <button type="button" onClick={() => setOpen(row.target)} className="min-h-12 min-w-0 flex-1 text-left text-[12px] font-semibold">{row.text}</button>
+              <button type="button" disabled={!row.upgrade.ready} onClick={() => void raiseGear(outfit.outfitId, row.target)}
+                aria-label={row.upgrade.ready ? row.upgrade.label : row.upgrade.block ?? row.upgrade.label}
+                className="flex min-h-11 max-w-32 items-center justify-center gap-1 rounded-sm bg-sunken px-2 text-[10px] font-semibold leading-tight disabled:text-ink-faint">
+                {(isMarked(row.target) || row.upgrade.ready) && <UpgradeMark size={14} />}<span>{row.upgrade.ready ? row.upgrade.label : row.upgrade.block ?? row.upgrade.label}</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </section>
+      <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
+        <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+          <span className="flex items-center gap-1.5">
+            <span className="text-[14px] font-semibold">Extra Stats</span>
+            {jewels > 0 && <span className="rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{jewels} to set</span>}
+          </span>
+          <span className="text-[12px] text-ink-soft">{map.open.length}/22 open · map ›</span>
+        </span>
+        <span className="mt-1 block text-[11px] text-ink-faint">
+          Total with armor: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
+        </span>
+      </button>
+      {open && <GradeSheet outfitId={outfit.outfitId} uma={uma} world={world} tier={tier} classId={active} target={open} onClose={() => setOpen(null)} />}
+    </div>
   )
 }
 
-const ACCESSORY_NAME: Record<AccessoryFamily, string> = ACCESSORY_FAMILY_LABEL
+/** The label count on the Upgrade view's tab: raises ready and jewels to set, as the profile's dot reads them. */
+export const upgradeCount = (upgrades: UmaUpgrades | null): number => (upgrades ? upgrades.gear + upgrades.stars : 0)
+

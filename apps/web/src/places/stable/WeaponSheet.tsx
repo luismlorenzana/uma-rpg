@@ -1,27 +1,23 @@
-// One of a class's weapon slots (D98; five to v15, three by channel from v16), one of her five armor slots (D103, D124)
-// or one of her two accessory slots: the weapon she holds there opens its skill tree; armor adds its stats; an accessory
-// its kind or a defensive effect (from classes v2 the slots are typed, Damage for an Orb's flat offense and Support for a
-// Talisman or an Amulet, H59). Every Uma holds a Training weapon and armor piece of each kind (grade 0, no stats), shown
-// only until she binds its grade 1. A class that picks (`rpgPicksWeapons`: to v15 the Summoner, Spell Blade and Cleric,
-// from v16 every class, CP12) chooses each slot's weapon among her class's kinds of the slot's channel; the others keep
-// theirs. She binds each kind's grades in order (D119): the sheet shows her best piece and the stock above it, never the
-// grades she has spent.
+// One of a class's weapon slots (D98; five to v15, three by channel from v16): the weapon she holds there opens its skill
+// tree. Every Uma holds a Training weapon of each kind (grade 0, no stats), shown only until she binds its grade 1. A class
+// that picks (`rpgPicksWeapons`: to v15 the Summoner, Spell Blade and Cleric, from v16 every class, CP12) chooses each
+// slot's weapon among her class's kinds of the slot's channel; the others keep theirs. From R2 (H82) the sheet lists her
+// weapons by grade. v1's armor and accessory sheets retired with the Gear tab's v1 path (H107); `pieceLine` and
+// `effectLines` still describe a piece for the work pages.
 import {
-  ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
-  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isGrades, isMagicalArmor, isOrb,
-  isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
-  type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
+  accessoryEffects, BATTLE_ENGINE_VERSION,
+  boundGrade, classOf, EFFECT_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isGrades, isOrb,
+  isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError,
+  type AccessoryEffects, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
   type GearTier, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { kindLabel, SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
-import { hold, useActiveTier, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
-import { ArmorMark } from '../../ui/RankBars'
+import { hold, useActiveTier } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../../items/planets'
-import { accessorySheetTypes, noAccessories } from './accessory-slots'
 import { weaponGradeLine } from './gear-v3'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
@@ -138,111 +134,3 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
 }
 
 /** The Training piece's name for an armor kind: "Training Helm". */
-export const trainingArmorName = (kind: ArmorKind): string => `Training ${ARMOR_LABEL[kind]}`
-
-/** One of her five armor slots (D103): its physical or magical kind, as a Training piece or a crafted one. */
-export function ArmorSheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: ArmorSlot; onClose: () => void }) {
-  const [error, setError] = useState<string | null>(null)
-  const gear = gearV1(uma)
-  const here = slotKind(gear, slot)
-  const kinds = [here, ...ARMOR_SLOT_KINDS[slot].filter((k) => k !== here)] as ArmorKind[]
-  const pieces = (kind: ArmorKind) => gearChoices(uma, gearStock(world), (p) => p.type === kind)
-  const held = (kind: ArmorKind, id: string | null) => here === kind && (gear.equipped[slot] ?? null) === id
-  const choose = (kind: ArmorKind, id: string | null) =>
-    wearArmorPiece(outfitId, slot, kind, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
-  return (
-    <BottomSheet title={ARMOR_SLOT_LABEL[slot]} onClose={onClose}>
-      <div className="space-y-3">
-        {kinds.map((kind) => (
-          <section key={kind}>
-            <h4 className="text-micro mb-1">{ARMOR_LABEL[kind]} · {isMagicalArmor(kind) ? 'Magical' : 'Physical'}</h4>
-            <ul className="space-y-1">
-              {boundGrade(uma, kind) === 0 && <li>
-                <button type="button" disabled={held(kind, null)} onClick={() => void choose(kind, null)}
-                  className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${held(kind, null) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-xs border border-dashed border-hairline-strong opacity-70"><ArmorMark kind={kind} size={22} /></span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-semibold">{trainingArmorName(kind)} · G0</span>
-                    <span className="block text-[11px] text-ink-soft">No stats</span>
-                  </span>
-                  <span className="shrink-0 text-[11px] text-ink-faint">{held(kind, null) ? 'Worn' : 'Hers'}</span>
-                </button>
-              </li>}
-              {pieces(kind).map(({ id, bound }) => {
-                const block = equipBlock(uma, id)
-                const out = outputView(id)
-                return (
-                  <li key={id}>
-                    <button type="button" disabled={!!block || held(kind, id)} onClick={() => void choose(kind, id)}
-                      className={`flex w-full items-center gap-2 rounded-sm p-2 text-left disabled:opacity-60 ${held(kind, id) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
-                      <ItemIcon id={out.icon} size={32} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-semibold">{out.name} · G{out.grade}</span>
-                        <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
-                      </span>
-                      <span className="shrink-0 text-[11px] text-ink-faint">{held(kind, id) ? 'Worn' : bound ? 'Hers' : `Stock ×${gearStock(world)[id]} · binds`}</span>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          </section>
-        ))}
-        {error && <p className="text-[13px] text-danger">{error}</p>}
-      </div>
-    </BottomSheet>
-  )
-}
-
-/** One of her two accessory slots (D124): any accessory it takes that she has bound or the stock holds, grouped by kind,
- * except the type she wears in the other slot. An empty slot holds nothing. */
-export function AccessorySheet({ outfitId, uma, world, slot, onClose }: { outfitId: string; uma: OwnedUma; world: TierWorld; slot: AccessorySlot; onClose: () => void }) {
-  const [error, setError] = useState<string | null>(null)
-  const gear = gearV1(uma)
-  const here = gear.equipped[slot] ?? null
-  const other = ACCESSORY_SLOTS.find((s) => s !== slot)!
-  const otherType = gear.equipped[other] ? gearById(gear.equipped[other]!)?.type : undefined
-  const choose = (id: string | null) =>
-    wearAccessoryPiece(outfitId, slot, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
-  const groups = accessorySheetTypes(slot, otherType).map(({ kind, types }) => ({
-    kind, types: types.map((t) => ({ t, pieces: gearChoices(uma, gearStock(world), (p) => p.type === t) })).filter((x) => x.pieces.length > 0),
-  })).filter((g) => g.types.length > 0)
-  return (
-    <BottomSheet title={ACCESSORY_SLOT_LABEL[slot]} onClose={onClose}>
-      <div className="space-y-3">
-        {here && (
-          <button type="button" onClick={() => void choose(null)} className="min-h-11 w-full rounded-sm border border-hairline-strong text-[13px] font-semibold text-ink-soft">
-            Take it off (it stays hers)
-          </button>
-        )}
-        {groups.length === 0 && <p className="text-[13px] text-ink-soft">{noAccessories(slot)}</p>}
-        {groups.map(({ kind, types }) => (
-          <section key={kind}>
-            <h4 className="text-micro mb-1">{ACCESSORY_LABEL[kind]}</h4>
-            <ul className="space-y-1">
-              {types.flatMap(({ t, pieces }) => pieces.map(({ id, bound }) => {
-                const block = equipBlock(uma, id)
-                const out = outputView(id)
-                const worn = here === id
-                return (
-                  <li key={id}>
-                    <button type="button" disabled={!!block || worn} onClick={() => void choose(id)}
-                      className={`flex w-full items-center gap-2 rounded-sm p-2 text-left disabled:opacity-60 ${worn ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
-                      <ItemIcon id={out.icon} size={32} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-semibold">{EQUIP_LABEL[t]} · G{out.grade}</span>
-                        <span className="block text-[11px] text-ink-soft">{block ?? pieceLine(id)}</span>
-                      </span>
-                      <span className="shrink-0 text-[11px] text-ink-faint">{worn ? 'Worn' : bound ? 'Hers' : `Stock ×${gearStock(world)[id]} · binds`}</span>
-                    </button>
-                  </li>
-                )
-              }))}
-            </ul>
-          </section>
-        ))}
-        {error && <p className="text-[13px] text-danger">{error}</p>}
-      </div>
-    </BottomSheet>
-  )
-}
