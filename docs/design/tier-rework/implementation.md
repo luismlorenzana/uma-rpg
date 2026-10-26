@@ -1,5 +1,9 @@
 # The Tier rework: implementation plan
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is the owner's "grant is tickets only" step, live. R3, R4 and R5
+> keep their engines (v18, v19, v20) and take saves **v30, v31 and v32**: read this doc's and their packets' save v29 as
+> v30, v30 as v31 and v31 as v32.
+
 > **2026-10-25, D198.** The six approved docs (D192–D197) become five live releases and 42 packets (H64–H105). The
 > owner asked for "proper phasing to have full releases along the way", so this replaces the one Tier 1 switch of
 > README §9 (XC11, XR10). Each release is built dark behind its own engine and save version and turned on by its own

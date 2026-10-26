@@ -39,7 +39,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 | Folder | What |
 |---|---|
-| `save/` | The save (`save.ts`: schema v28, parsing, migrations) and its rules: `class.ts` (an Uma's starting and active class, her setup per class, one healer a party; main bundle), `battle.ts` (classes, fights, rewards, Springs; the world map's fights load on demand through `@rpg/domain/battle`, H62), `work.ts` (jobs on the shared engine, Finish all, and the slot view the screens read), `observatory.ts` (setting jewels; v1's Star Gems), `forge.ts` (raising grades, the accessory's form; v1's pieces), `targets.ts` (targets), `presets.ts` (each class's standard equipment preset), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; lazy, through `@rpg/domain/rift`) |
+| `save/` | The save (`save.ts`: schema v29, parsing, migrations) and its rules: `class.ts` (an Uma's starting and active class, her setup per class, one healer a party; main bundle), `battle.ts` (classes, fights, rewards, Springs; the world map's fights load on demand through `@rpg/domain/battle`, H62), `work.ts` (jobs on the shared engine, Finish all, and the slot view the screens read), `observatory.ts` (setting jewels; v1's Star Gems), `forge.ts` (raising grades, the accessory's form; v1's pieces), `targets.ts` (targets), `presets.ts` (each class's standard equipment preset), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts`, `rules.ts` (unlocks, parties), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; lazy, through `@rpg/domain/rift`) |
 | `rpg/` | `kinds.ts` (weapons, elements, twins, statuses), `rules.ts` (classes, stats, levels, lines and Skill Ranks), `catalog.ts` (every skill tree), `tree-view.ts` (the Skills tab's tree model), `heroes.ts` and `hero-id.ts` (the six halls' 24 hero Limit Breaks, v14's twenty, Bonds), `battle/` (engine v17, the Tier rework's economy, live since H82, D218, on v16's fight, live since H72, D210, and classes v2's, live since H61; `caps.ts` holds the switch, `BATTLE_ENGINE_VERSION`, and `rpgRework(stage, engine)` opens each release, so every class rule answers by generation and v6–v16 replay; limits, auto; the engine's functions load on demand through `@rpg/domain/engine`, `battle/index.ts`, and the main index keeps its types, caps and skill numbers, H62), `campaign/` (foes, rewards, the chapter machinery regions reuse) |
 | `rift/` | `state.ts`: the Rift's save shape, constants, achievement ids and selectors (`riftOpen`, `riftLevel50s`, `openRiftRun`; main index); `achievements.ts`: the achievement hook; `fronts.ts`, `picker.ts`, `generate.ts`: the Rift's fronts, faces and fights (`@rpg/domain/rift`, a lazy subpath, through `index.ts`, which also exports `save/rift.ts`) |
 | `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `request.ts` (a job's request), `kinds-v3/` (gather and process `material.ts`, make `make.ts`, the trade gate and the open shop `trade.ts`), `env-v3.ts` (the ten places as buildings, by the world's tier; `liveWorkEnv`), `env.ts` (Speed Tickets, Craft Level, Laurels; v1's facilities and `kinds/`) |
@@ -120,7 +120,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
   the appearance and Motion, the shared `ContentProvider`, and `AlbumArtProvider`. Faces use
   uma-data 1.1.0's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their own families.
   `album/` holds RPG row values, schema, eligibility and the one-time old preference migration. `hub/` holds this
-  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v28 stay game-owned.
+  game's bars, plaza and Hub screen. Rules, vocabulary, routes and save v29 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
 
 ## API
@@ -155,7 +155,7 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
 
 ## The save
 
-- **Schema v28** (`save/save.ts`).
+- **Schema v29** (`save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse. Recent steps:
   - **v10:** a progress reset that kept Umas and parties.
@@ -201,6 +201,10 @@ pnpm workspace with Turbo. TypeScript is strict with `noUncheckedIndexedAccess`,
     shelves and `buildings` go; `grant` records it all (null when there was nothing to pay). Levels, classes, calling,
     Bonds, parties, targets, seats, the Rift and the open fights don't move (their v15 or v16 inputs replay and settle on
     their engine). The API backs the stored v27 save up to `saveBackups/{uid}-v27` on the first v28 write (D69).
+  - **v29:** the grant is tickets only (D221, the owner's review): in a world that took the grant every material leaves
+    the Warehouse (its gathering was already in the tickets), and the grant's sheet stops listing the stock and the
+    upgrades' refined items; made items, Laurels, tickets and Craft Levels stay, and a world without a grant keeps its
+    materials. The API backs the stored v28 save up to `saveBackups/{uid}-v28` on the first v29 write (D69).
 
 ```
 Save { schemaVersion, account, tierWorlds: { "1": TierWorld } }

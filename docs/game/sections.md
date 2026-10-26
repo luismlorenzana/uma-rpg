@@ -379,7 +379,7 @@ Reached from the account bar. The kit's `AccountPage` (SD3) with this game's con
   Tickets in a tier above 1.
 - **Appearance:** System, Light or Dark, kept on this device (D147).
 - Notifications.
-- **The Tier rework's grant** (save v28, H80): a row "The Tier rework's grant · 63,800 Speed Tickets" for a world with
+- **The Tier rework's grant** (save v28, H80; tickets only since v29, D221): a row "The Tier rework's grant · 63,800 Speed Tickets" for a world with
   a grant, which reopens "The Wilds are rebuilt" ([loops](loops.md#the-tier-reworks-grant)).
 - **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "n of N", then the earned
   ones, newest first, each with its badge, name and "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest

@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · S–M · Needs: H91, H92 · Unblocks: H95 (the screens' state and the local switch), H97 (the switch chains it)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H91 and H92 built Tier 2's class rules in the engine: a class branch per class (the focus, the set, three class

@@ -11,8 +11,9 @@
 > **Calling precedence corrected, 2026-10-26 (D220):** the live head counts below follow Pace over a tied best style,
 > Late + End as Summoner, and pure Late as the healer choice. The work rules themselves do not change.
 
-> **The owner's review, 2026-10-26 (D219):** the design stands as built. Graded materials and the stock as tickets
-> were weighed and set aside the same day; §3's pairs, the ladder and §14.4's kept stock stay.
+> **The owner's review, 2026-10-26 (D219, D221):** the design stands as built, but for §14.4's kept stock: **save v29
+> takes every material from a world that took the grant** (its gathering was already in the tickets; D221). Graded
+> materials were weighed and set aside (D219); §3's pairs and the ladder stay.
 
 > **For the owner's review, the fourth and last standalone doc (2026-10-24).** Brought in line with the three approved
 > docs (Class D192, Weapon D193, Extra Stats D194) and with **the owner's compensation direction**, designed in full in

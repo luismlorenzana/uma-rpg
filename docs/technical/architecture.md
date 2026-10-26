@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-26; save v28, engine v17 (the Tier rework's economy, R2, D218).** The full running-system reference is
+> **Status: current, 2026-10-26; save v29, engine v17 (the Tier rework's economy, R2, D218; the grant tickets only, D221).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -58,8 +58,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v26 each party's independent lead | D190 |
 | v27 the Tier rework's fight: three default weapons a class, side skills to lines, the loadout pruned, every Uma's calling pick open; open v15 fights replay on v15 | D205, D210 |
 | v28 the Tier rework's economy: work settled, Craft Levels to 1 and the Speed Ticket grant, gear and Star Gems to G0 grades and an empty map, upgrades refunded, the Warehouse converted to the five lines; open v15 and v16 fights replay on their engines | D214, D218 |
+| v29 the grant tickets only: a granted world's materials leave its Warehouse; made items, Laurels and tickets stay | D221 |
 
-`parseSave` accepts v1–v28 and returns v28; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v29 and returns v29; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in

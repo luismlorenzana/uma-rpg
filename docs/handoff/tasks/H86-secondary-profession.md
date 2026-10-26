@@ -2,6 +2,9 @@
 
 **uma-rpg · Either · M · Needs: H82 (Release 2 live) · Unblocks: H87, H89 (and through them H88, H90)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 Release 2 gave every Uma one **trade**: her calling's gathering and crafting pair, on one Craft Level, in ten places

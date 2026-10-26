@@ -19,7 +19,7 @@ function worldWith(tier: number, continents: readonly number[], overrides: Parti
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 const saveOf = (tier: number, world: TierWorld): Save => ({
-  schemaVersion: 28,
+  schemaVersion: 29,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { [String(tier)]: world },
 })

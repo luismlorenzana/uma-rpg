@@ -2,6 +2,9 @@
 
 **uma-rpg · Either · L · Needs: H94, H93 (and through them H91, H92) · Unblocks: H97**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H91–H94 built Tier 2's classes dark: the class branches and their focus, the 36 class skills, branch C, the Power or

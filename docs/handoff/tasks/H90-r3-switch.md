@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · M · Needs: H87, H88, H89 (and through them H83–H86) · Unblocks: H91 (Release 4)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H83–H89 built Release 3 dark: weapon branches and the Branch Gem, the second accessory slot and its forms, the kind
