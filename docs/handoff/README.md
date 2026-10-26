@@ -61,6 +61,15 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 |---|---|---|---|---|---|
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Done (`c07a463`) |
 
+**The farm by line** (the owner, 2026-10-26, D224): every trade gathers, processes and makes its own line, on G1–G10
+materials, Tier 1's focus; one item a making place (Arms Gems, Armor Fittings, Tome Ink, Accessory Settings, jewels).
+Code goes to **ChatGPT, with full autonomy to merge and deploy**. It takes save v30, so R3–R5 move to saves v31–v33 when
+it lands.
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H109 | The farm by line: ten grades a line from uma-art, processing at each making place, Tome Ink for Tomes, one-line recipes, make at ¾ of a gather, the Exchange by grade, save v30 | ChatGPT | L | H82 | Ready |
+
 **R3. Tier 2's weapons** (engine v18, save **v30**; its packets' "v29" reads v30, D221):
 
 | Id | Task | Who | Size | Needs | State |
