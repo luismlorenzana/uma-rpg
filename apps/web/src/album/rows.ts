@@ -1,8 +1,9 @@
 // RPG data and eligibility over the kit's neutral album rows. No list/query implementation lives here.
 import { type AlbumPreset, type AlbumPrefsSchema, type AlbumQuery, type FacetDef, type SortDef, type OutfitRowBase, runAlbumQuery } from '@luismlorenzana/uma-kit/roster'
 import {
-  activeClass, availableWorkers, KEY_LABELS, KNACK_LABEL, RPG_CLASSES, rpgRework, statTotal, STRIDE_LABEL, TRADE_IDS, UMA_KNACKS, UMA_STRIDES, umaTemplateFacets,
-  tradeOfCalling, type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades,
+  ACCESSORY_FAMILIES, ACCESSORY_FAMILY_LABEL, activeClass, availableWorkers, BATTLE_ENGINE_VERSION, KEY_LABELS, KNACK_LABEL, RPG_CLASSES, rpgRework, statTotal, STRIDE_LABEL,
+  TRADE_IDS, UMA_KNACKS, UMA_STRIDES, umaTemplate, umaTemplateFacets, tradeOfCalling,
+  type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { CLASS_LABEL } from '../battle/labels'
 import type { MasterView } from '../master/master'
@@ -44,10 +45,15 @@ const TEMPLATE_FACETS: readonly FacetDef[] = [
 export const TRADE_FACET: FacetDef = {
   key: 'trade', label: 'Trade', group: 'Trade', kind: 'enum', options: TRADE_IDS.map(value => ({ value, label: tradeLabel(value) })),
 }
+const SIGNATURE_FACET: FacetDef = { key: 'signature', label: 'Signature', group: 'Template', kind: 'enum',
+  options: ACCESSORY_FAMILIES.map(value => ({ value, label: ACCESSORY_FAMILY_LABEL[value] })) }
 /** The Stable's facets: from engine v16 (UT15, H70) a Template group after RPG, her calling (an owned Uma's pick counts),
- * stride and knack; from R2's switch (H80) a Trade group, on locked outfits too. */
-export const stableFacets = (economy: boolean = rpgRework('economy')): readonly FacetDef[] =>
-  [...FACETS, ...TEMPLATE_FACETS, ...(economy ? [TRADE_FACET] : [])]
+ * stride and knack; from R2's switch, Signature in Template and Trade after it, on locked outfits too. The boolean
+ * overload keeps H80's isolated switch test legible. */
+export const stableFacets = (stage: number | boolean = BATTLE_ENGINE_VERSION): readonly FacetDef[] => {
+  const economy = typeof stage === 'boolean' ? stage : rpgRework('economy', stage)
+  return [...FACETS, ...TEMPLATE_FACETS, ...(economy ? [SIGNATURE_FACET, TRADE_FACET] : [])]
+}
 export const STABLE_FACETS: readonly FacetDef[] = stableFacets()
 /** The Filters sheet's quick picks (H34): "Can upgrade" turns that facet on. */
 export const STABLE_PRESETS: readonly AlbumPreset[] = [
@@ -96,7 +102,8 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
       facets: { ownership: uma ? ['owned'] : ['locked'], rarity: [String(base.rarity)],
         surface: top(base.aptitudes.surface), distance: top(base.aptitudes.distance), strategy: top(base.aptitudes.strategy),
         sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [], upgrade: false,
-        calling: [template.calling], stride: [template.stride], knack: [template.knack], trade: [tradeOfCalling(template.calling)] },
+        calling: [template.calling], stride: [template.stride], knack: [template.knack],
+        signature: [umaTemplate(outfit, uma?.calling.pick ?? null).family], trade: [tradeOfCalling(template.calling)] },
       sorts: { level: uma?.level ?? null, release: base.releasedAt, name: base.name, rarity: base.rarity,
         statTotal: statTotal(outfit), craft: uma?.craft.level ?? null,
         classRank: uma ? Math.max(1, ...Object.values(uma.ranks.classes).map(track => track.rank)) : null },

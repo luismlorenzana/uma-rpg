@@ -1,7 +1,9 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeNodeSlots, BRIDGES, gemById, gemStock, ITEM_EFFECTS, nodeFromGem, nodeGem, RING, SaveRuleError, starPoints, starsV1, type OwnedUma,
+  activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemById, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
+  MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
+  umaTemplate, type GearTier, type OwnedUma,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -12,9 +14,12 @@ import { byLevel, formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { albumRows, lockedReason } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import type { MasterView } from '../../master/master'
-import { activate, setStarGem, useAlbumScope, useWorld } from '../../save/game'
+import { activate, setMapJewel, setStarGem, useActiveTier, useAlbumScope, useWorld } from '../../save/game'
+import { BottomSheet } from '../../ui/BottomSheet'
+import { HelpButton } from '../../ui/HelpButton'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
+import { observatoryLayoutV3 } from './layout-v3'
 
 export default function ObservatoryPage({ rest }: PageProps) {
   return <MasterGate>{(view) => <Observatory view={view} initial={rest || null} />}</MasterGate>
@@ -22,6 +27,7 @@ export default function ObservatoryPage({ rest }: PageProps) {
 
 function Observatory({ view, initial }: { view: MasterView; initial: string | null }) {
   const world = useWorld()
+  const tier = useActiveTier() as GearTier
   const rows = albumRows(view, world, [], undefined, useAlbumScope())
   const owned = rows.filter(row => row.uma).sort(byLevel)
   const [picking, setPicking] = useState(false)
@@ -31,6 +37,8 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
   const id = picked && world.umas[picked] ? picked : owned[0]?.id ?? null
   if (!id) return <p className="p-4 text-ink-soft">Unlock an Uma first.</p>
   const uma = world.umas[id]!
+  if (isStarMap(uma.stars)) return <ObservatoryV3 view={view} rows={rows} owned={owned} id={id} uma={uma} tier={tier}
+    picking={picking} setPicking={setPicking} setPicked={setPicked} message={message} setMessage={setMessage} />
   // Today's map (v1); R2's Planet and moons draw here from H79.
   const stars = starsV1(uma)
   const slots = activeNodeSlots(uma.level)
@@ -98,6 +106,123 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
       </section>
     </div>
   )
+}
+
+const ROMAN = ['I', 'II', 'III', 'IV', 'V'] as const
+const cap = (word: string) => word[0]!.toUpperCase() + word.slice(1)
+
+function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, setPicked, message, setMessage }: {
+  view: MasterView; rows: ReturnType<typeof albumRows>; owned: ReturnType<typeof albumRows>; id: string; uma: OwnedUma; tier: GearTier
+  picking: boolean; setPicking: (on: boolean) => void; setPicked: (id: string) => void; message: string | null; setMessage: (s: string | null) => void
+}) {
+  const world = useWorld()!
+  const map = isStarMap(uma.stars) ? uma.stars : { open: [], moons: [] as [] }
+  const outfit = view.roster.find((o) => o.outfitId === id)!
+  const classId = activeClass(outfit, uma)
+  const template = umaTemplate(outfit, uma.calling.pick)
+  const moon = moonTemplate(outfit, uma.calling.pick)
+  const [nodeOpen, setNodeOpen] = useState<string | null>(null)
+  const [jewelPick, setJewelPick] = useState<{ jewel: string; nodes: string[] } | null>(null)
+  const sharedOpen = map.open.filter((node) => !node.startsWith('template:')).length
+  const templateOpen = map.open.filter((node) => node.startsWith('template:')).length
+  const settable = Object.entries(world.items).filter(([item, count]) => count > 0 && jewelNodes(map, item, uma.level).length > 0)
+  const run = (jewel: string, node: string) => {
+    setMessage(null)
+    setMapJewel(id, jewel, node).then(() => { setMessage(`Opened ${mapNodeTitle(node, template.type)}`); setJewelPick(null) },
+      (err: unknown) => setMessage(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
+  }
+  const set = (jewel: string) => {
+    const nodes = jewelNodes(map, jewel, uma.level)
+    if (nodes.length === 1) run(jewel, nodes[0]!)
+    else setJewelPick({ jewel, nodes })
+  }
+  const points = mapPoints(map.open, classId, tier, moon)
+  const prowess = mapPoints(map.open.filter((node) => node.startsWith('prowess:')), classId, tier)
+  return <div className="space-y-3 p-3">
+    <button type="button" onClick={() => setPicking(true)} aria-label="Choose an Uma" className="flex min-h-12 w-full items-center gap-3 rounded-md bg-raised p-2 text-left">
+      <FaceTile outfitId={id} size={44} label={owned.find(row => row.id === id)?.name ?? 'Uma'} round />
+      <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{owned.find(o => o.id === id)?.name}</span>
+        <span className="block text-[12px] text-ink-soft">Open {sharedOpen} of 20 · ★ {templateOpen} of 2</span></span>
+    </button>
+    {picking && <PickerStep title="Observatory Uma" rows={rows} disabled={lockedReason}
+      describe={row => `${formatLevel(row.level)} · ${row.base.title ?? ''}`}
+      onClose={() => setPicking(false)} onPick={next => { setPicked(next); setPicking(false) }} />}
+    <div className="flex items-center justify-between"><h2 className="font-display text-lg font-bold">Extra Stats</h2>
+      <HelpButton title="Observatory"><p>Each node opens with its jewel, in order. Every open node counts.</p></HelpButton></div>
+    <StarMapV3 open={map.open} templateType={template.type} onNode={setNodeOpen} />
+    <p className="rounded-sm bg-raised px-2 py-1.5 text-[12px] text-ink-soft">Prowess · {CLASS_NAME[classId]} {PROWESS[classId]}: ATK +{prowess.atk}, M.ATK +{prowess.matk}</p>
+    <div className="grid grid-cols-3 gap-1 text-center text-[11px]">
+      {(['hp', 'mp', 'atk', 'matk', 'def', 'mdef'] as const).map((stat) => {
+        const shared = mapPoints(map.open.filter((node) => !node.startsWith('template:')), classId, tier)[stat]
+        const star = points[stat] - shared
+        return <span key={stat} className="rounded-xs bg-raised p-1"><span className="block font-semibold">{EFFECT_LABEL[stat]}</span>
+          <span className="text-ink-soft">{pointText(stat, shared)}{star ? ` ★ ${pointText(stat, star)}` : ''}</span></span>
+      })}
+    </div>
+    {message && <p className="rounded-sm bg-raised p-2 text-[13px]">{message}</p>}
+    <section><h3 className="mb-1.5 text-micro">Set</h3>
+      {settable.length === 0 ? <p className="text-[13px] text-ink-faint">No jewels ready.</p> : <ul className="space-y-1.5">{settable.map(([jewel, count]) => {
+        const node = jewelNodes(map, jewel, uma.level)[0]!
+        return <li key={jewel}><button type="button" onClick={() => set(jewel)} className="flex min-h-12 w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
+          <ItemIcon id={jewel} size={32} /><span className="min-w-0 flex-1"><span className="block text-[13px] font-semibold">{madeName(jewel)} ×{count}</span>
+            <span className="block text-[11px] text-ink-soft">Opens {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier)}</span></span>
+          <span className="rounded-sm bg-accent px-2 py-1 text-[12px] font-bold text-accent-ink">Set</span></button></li>
+      })}</ul>}
+    </section>
+    {nodeOpen && <NodeSheet node={nodeOpen} open={map.open.includes(nodeOpen)} classId={classId} knack={moon.knack} channel={moon.channel} tier={tier}
+      type={template.type} onClose={() => setNodeOpen(null)} />}
+    {jewelPick && <BottomSheet title={madeName(jewelPick.jewel) ?? 'Moon Jewel'} onClose={() => setJewelPick(null)}>
+      <div className="space-y-2">{jewelPick.nodes.map((node) => <button key={node} type="button" onClick={() => run(jewelPick.jewel, node)} className="min-h-12 w-full rounded-sm bg-raised px-3 text-left text-[13px] font-semibold">
+        {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier)}
+      </button>)}</div>
+    </BottomSheet>}
+  </div>
+}
+
+const CLASS_NAME = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' } as const
+const PROWESS = { brawler: '100/0', mage: '0/100', spellblade: '70/30', summoner: '30/70', paladin: '80/20', cleric: '20/80' } as const
+
+function mapNodeTitle(id: string, type: string): string {
+  const body = nodeBody(id), numeral = ROMAN[nodeNumeral(id) - 1]
+  return body === 'template' ? `★ ${cap(type)}'s moon ${numeral}` : `${cap(body)} ${numeral}`
+}
+
+function mapNodeValue(id: string, classId: keyof typeof CLASS_NAME, knack: keyof typeof KNACK_LABEL, channel: 'physical' | 'magical', tier: GearTier): string {
+  const body = nodeBody(id), value = nodePoints(id, tier)
+  if (body === 'planet') return `+${value} to every stat`
+  if (body === 'prowess') { const split = prowessSplit(value, classId); return `as ${CLASS_NAME[classId]} ATK +${split.atk}, M.ATK +${split.matk}` }
+  if (body === 'vigor') return `HP +${value * 5}, MP +${value}`
+  if (body === 'guard') return `DEF and M.DEF +${value}`
+  if (nodeNumeral(id) === 2) return `${channel === 'physical' ? 'DEF' : 'M.DEF'} +${value}`
+  return knack === 'tireless' ? `Tireless · HP +${value * 5}` : knack === 'clever' ? `Clever · MP +${value}`
+    : knack === 'mighty' ? `Mighty · DEF and M.DEF +${value}` : knack === 'fleet' ? 'Fleet · Evasion +2.4%' : 'Gritty · Limit +1.6'
+}
+
+function NodeSheet({ node, open, classId, knack, channel, tier, type, onClose }: {
+  node: string; open: boolean; classId: keyof typeof CLASS_NAME; knack: keyof typeof KNACK_LABEL; channel: 'physical' | 'magical'; tier: GearTier; type: string; onClose: () => void
+}) {
+  return <BottomSheet title={mapNodeTitle(node, type)} onClose={onClose}><div className="space-y-2 rounded-md bg-raised p-3 text-[13px]">
+    <p className="font-semibold">{mapNodeValue(node, classId, knack, channel, tier)}</p>
+    <p className="text-ink-soft">{open ? `${madeName(nodeJewel(node))} · Open` : `needs a ${madeName(nodeJewel(node))} · opens at Lv ${mapNodeGate(node)}`}</p>
+  </div></BottomSheet>
+}
+
+function StarMapV3({ open, templateType, onNode }: { open: readonly string[]; templateType: string; onNode: (id: string) => void }) {
+  const layout = observatoryLayoutV3()
+  const center = { planet: [180, 180], prowess: [180, 58], vigor: [92, 276], guard: [268, 276], template: [302, 112] } as const
+  return <svg viewBox="0 0 360 360" className="mx-auto block w-full max-w-sm rounded-md bg-sunken" aria-label="Planet-and-moons map">
+    <circle cx="180" cy="180" r="34" fill="none" stroke="rgb(255 216 77 / .25)" /><circle cx="180" cy="180" r="18" fill="#ffd84d" opacity=".18" />
+    <path d="M180 58 A142 142 0 0 1 268 276 A142 142 0 0 1 92 276 A142 142 0 0 1 180 58" fill="none" stroke="rgb(255 255 255 / .08)" />
+    <circle cx="302" cy="112" r="30" fill="none" stroke="rgb(240 184 255 / .22)" />
+    {Object.entries(center).map(([body, [x, y]]) => <text key={body} x={x} y={y + 3} textAnchor="middle" fontSize="10" fill="currentColor" opacity=".7">{body === 'template' ? `★ ${cap(templateType)}` : cap(body)}</text>)}
+    {layout.map((node) => { const on = open.includes(node.id); const select = () => onNode(node.id); return <g key={node.id} role="button" tabIndex={0}
+      aria-label={`${mapNodeTitle(node.id, templateType)}, ${on ? 'open' : 'locked'}`} onClick={select}
+      onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select() } }} className="cursor-pointer">
+      <circle cx={node.x} cy={node.y} r="22" fill="transparent" />
+      <circle cx={node.x} cy={node.y} r={node.r} pointerEvents="none"
+        fill={on ? (node.orbit === 'template' ? '#f0b8ff' : '#d6a23e') : 'transparent'} stroke={node.orbit === 'template' ? '#f0b8ff' : '#d6a23e'} strokeWidth="1.5" />
+    </g> })}
+  </svg>
 }
 
 /** The map: the Sun in the middle, eight planets on a ring with ten moons each, two bridge nodes between neighbours. */

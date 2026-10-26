@@ -10,17 +10,24 @@ import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { accessoryFits, ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
+import { gradeOf, raiseBlock, type GradeTarget } from '../economy/grades'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
+import { madeIdentity } from '../items/made-id'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
-import { gearStock, gearV1, gemStock, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
+import { jewelNodes } from './observatory'
+import { gearStock, gearV1, gemStock, isGrades, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
 
 export interface UmaUpgrades {
   /** Slots that can take a better piece now: a weapon type of her three, an armor slot or an accessory slot. */
   gearSlots: GearSlot[]
   gear: number
+  /** R2 grade targets ready now. Empty for legacy gear. */
+  grades: GradeTarget[]
   /** Star Gem kinds in stock she can set now. */
   gems: number
+  /** R2 jewel kinds in stock that can open at least one node now. Empty for a legacy map. */
+  jewels: string[]
   /** Open nodes she could switch on now. */
   freeNodes: number
   /** gems + freeNodes. */
@@ -71,6 +78,32 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
 export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, _tier = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
   const uma = world.umas[outfitId]
   if (!uma) return null
+  if (isGrades(uma.gear) || isStarMap(uma.stars)) {
+    const grades: GradeTarget[] = []
+    if (isGrades(uma.gear)) {
+      for (const weapon of new Set(classOf(uma, classId).weapons)) {
+        const target: GradeTarget = { kind: 'weapon', weapon }
+        if (raiseBlock(uma.gear, target, uma.level, world.items) === null) grades.push(target)
+      }
+      for (const slot of ARMOR_SLOTS) {
+        const target: GradeTarget = { kind: 'armor', slot }
+        if (raiseBlock(uma.gear, target, uma.level, world.items) === null) grades.push(target)
+      }
+      for (let slot = 0; slot < uma.gear.accessories.length; slot++) {
+        const target: GradeTarget = { kind: 'accessory', slot }
+        if (raiseBlock(uma.gear, target, uma.level, world.items) === null ||
+          (gradeOf(uma.gear, target) >= 1 && uma.gear.accessories[slot]?.family === null)) grades.push(target)
+      }
+    }
+    const map = isStarMap(uma.stars) ? uma.stars : null
+    const jewels = map ? Object.entries(world.items)
+      .filter(([id, count]) => count > 0 && madeIdentity(id)?.line.startsWith('jewel-') && jewelNodes(map, id, uma.level).length > 0)
+      .map(([id]) => id) : []
+    return {
+      gearSlots: [], gear: grades.length, grades, gems: 0, jewels, freeNodes: 0, stars: jewels.length,
+      any: grades.length > 0 || jewels.length > 0,
+    }
+  }
   const bound = boundGrades(uma)
   const gear = gearV1(uma)
   const { equipped } = gear
@@ -113,6 +146,6 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const active = map.active.length
   const freeNodes = Math.max(0, Math.min(activeNodeSlots(uma.level) - active, map.unlocked.length - active))
   const stars = gems + freeNodes
-  return { gearSlots, gear: gearSlots.length, gems, freeNodes, stars, any: gearSlots.length > 0 || stars > 0 }
+  return { gearSlots, gear: gearSlots.length, grades: [], gems, jewels: [], freeNodes, stars, any: gearSlots.length > 0 || stars > 0 }
 }
 

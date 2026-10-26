@@ -1,7 +1,7 @@
 // The Gear tab's standard preset (H33, classes v2 §7, C6, D164): one tap puts on her active class's default weapons, its
 // armor half in all five slots, its Orb and its support accessory, with the best pieces she can wear. Binding from the
 // stock is for good, so a preset that binds lists those pieces first; the rest can be undone slot by slot.
-import { activeClass, classPreset, classPresetPlan, EQUIP_LABEL, SaveRuleError, type OwnedUma, type RosterOutfit, type TierWorld } from '@rpg/domain'
+import { ACCESSORY_FAMILY_LABEL, activeClass, classPreset, classPresetPlan, classPresetV3, EQUIP_LABEL, isGrades, SaveRuleError, umaTemplate, type OwnedUma, type RosterOutfit, type TierWorld } from '@rpg/domain'
 import { useMemo, useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
@@ -12,12 +12,14 @@ import { BottomSheet } from '../../ui/BottomSheet'
 
 export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const classId = activeClass(outfit, uma)
-  const preset = classPreset(classId)
-  const plan = useMemo(() => classPresetPlan(world, outfit.outfitId, classId), [world, outfit.outfitId, classId])
+  const graded = isGrades(uma.gear)
+  const family = graded ? umaTemplate(outfit, uma.calling.pick).family : undefined
+  const preset = graded ? classPresetV3(classId) : classPreset(classId)
+  const plan = useMemo(() => classPresetPlan(world, outfit.outfitId, classId, undefined, family), [world, outfit.outfitId, classId, family])
   const [confirm, setConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const on = plan.changes === 0
-  const apply = () => wearPreset(outfit.outfitId, classId).then(
+  const apply = () => wearPreset(outfit.outfitId, classId, family).then(
     () => { setConfirm(false); setError(null) },
     (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'),
   )
@@ -30,7 +32,9 @@ export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-semibold">{on ? 'Standard preset on' : 'Use the standard preset'}</span>
           <span className="block text-[11px] text-ink-soft">
-            {CLASS_LABEL[classId]} · {preset.armor === 'magical' ? 'Magical' : 'Physical'} armor · {EQUIP_LABEL[preset.orb]} · {EQUIP_LABEL[preset.support]}
+            {CLASS_LABEL[classId]} · {preset.armor === 'magical' ? 'Magical' : 'Physical'} armor · {graded
+              ? ACCESSORY_FAMILY_LABEL[plan.accessory!.family]
+              : `${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).orb]} · ${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).support]}`}
           </span>
         </span>
         {!on && <span className="shrink-0 text-ink-faint">›</span>}

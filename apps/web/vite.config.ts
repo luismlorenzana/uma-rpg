@@ -124,6 +124,9 @@ export default defineConfig(({ mode }) => {
   },
   test: {
     environment: 'jsdom',
+    // The full published-map composition suite is intentionally CPU-heavy. Keep enough
+    // headroom for Vitest's worker RPC on the two-core CI runner (D217).
+    maxWorkers: 2,
   },
 }
 })
