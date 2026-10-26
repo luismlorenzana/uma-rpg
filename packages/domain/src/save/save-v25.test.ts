@@ -1,6 +1,6 @@
 // Save v25 with the switch on (H58; live since H61, D188): a v24 world `toV25` produced parses under classes v2's live
-// lists (six classes, 24 seats), through the chain's later steps to v27 since H72 (D210), and its open v14 fights replay;
-// the same world unmigrated, labelled v25, doesn't. The chain itself is `migrations-v25.test.ts`'s.
+// lists (six classes, 24 seats), through the chain's later steps to v27 since H72 (D210) and v28 since H82 (D218), and its
+// open v14 fights replay; the same world labelled v25 skips `toV25`. The chain itself is `migrations-v25.test.ts`'s.
 import { describe, expect, it } from 'vitest'
 import { replayV14 } from '../rpg/battle/v14-replays.fixture'
 import { HERO_LIMIT_IDS } from '../rpg/hero-id'
@@ -23,7 +23,7 @@ describe('save v25 with the switch on (H58)', () => {
     expect(HERO_LIMIT_IDS).toHaveLength(24)
   })
 
-  it('parses a v24 world run through toV25: the Paladin, the Bastion’s seats and typed accessories (then v27’s classes)', () => {
+  it('parses a v24 world run through toV25: the Paladin and the Bastion’s seats (then v27’s classes and v28’s grades)', () => {
     const save = parseSave(migrated(v24Save(), toV25))
     const world = save.tierWorlds['1']!
     expect(Object.keys(world.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
@@ -36,8 +36,9 @@ describe('save v25 with the switch on (H58)', () => {
     expect(world.heroes['paladin-2']).toEqual({ hero: '110', learners: ['108'] })
     expect(world.heroes['cleric-3']).toBeUndefined()
     expect(world.umas['108']!.bonds).toEqual({ 'paladin-1': { level: 4, exp: 3 }, 'paladin-2': { level: 10, exp: 0 } })
-    expect(gearV1(world.umas['105']!).equipped).toEqual({ 'accessory-1': 'orb-fire-g1' })
-    expect(gearV1(world.umas['106']!).equipped).toEqual({ 'accessory-1': 'orb-greatsword-g1', 'accessory-2': 'amulet-spring-g1' })
+    // toV25's typed accessories (`migrations-v25.test.ts`) are gone with v28's grades: their pieces are in the grant.
+    expect(world.umas['105']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(world.grant!.deleted.gear).toBeGreaterThan(0)
     // Party 1 keeps its two Clerics: they can't fight together until one changes class.
     expect(world.parties[1]!.slots).toEqual(['105', '111', '112', '113', '114'])
     expect(healerBlock(world, world.parties[1]!.slots as string[], OUTFITS)).toBe('One healer a party')
@@ -59,9 +60,8 @@ describe('save v25 with the switch on (H58)', () => {
     }
   })
 
-  it('refuses the same world unmigrated (labelled v25, so the chain skips toV25), on the second Orb toV25 moves', () => {
+  it('skips toV25 on the same world labelled v25: no Paladin copy of the Cleric (its accessory moves v28 resets either way)', () => {
     const unmigrated = { ...JSON.parse(JSON.stringify(v24Save())), schemaVersion: 25 }
-    expect(() => parseSave(unmigrated)).toThrow(SaveParseError)
-    expect(() => parseSave(unmigrated)).toThrow(/umas\.105\.gear\.equipped\.accessory-2: expected a piece from her locker for this slot/)
+    expect(Object.keys(parseSave(unmigrated).tierWorlds['1']!.umas['103']!.classes).sort()).toEqual(['cleric', 'mage'])
   })
 })

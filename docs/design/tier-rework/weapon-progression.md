@@ -2,6 +2,13 @@
 
 > **Approved by the owner, 2026-10-24 (D193): every call WP1–WP34 as written, with his notes applied (the refund reworked as tickets for time in the Profession review; accessories channel-neutral).** Changes from here are follow-ups logged against it.
 
+> **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the
+> game on engine v17 and save v28: every weapon, armor slot and accessory slot owned at G0, one made item raising one a
+> grade at Uma Lv 5g − 4 (the ranks gone), armor carrying defense, one accessory slot with the four families' base forms
+> (Pendant, Orb, Bell, Insignia; WP20–WP22), the supports retired, the signature accessory, the damage stack (WP31), and
+> the compensation as tickets for time. The manual ([materials](../../game/materials.md),
+> [combat](../../game/combat.md), [classes](../../game/classes.md)) describes them as played.
+
 > **Follow-up to D194 (Extra Stats), 2026-10-24** ([extra-stats-progression §18.1](extra-stats-progression.md#181-for-weapon-progression-follow-up-to-d193)):
 > wording and numbers only, no call changed beyond D194's interface. **The Halo retires into the weapon moons** (EP24–EP27:
 > five nodes of flat offense on one kind, Full +50 × tier or Split +35 × tier on each of two, from Tier 2; a second moon in

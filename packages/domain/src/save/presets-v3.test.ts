@@ -18,7 +18,7 @@ function graded(classId: RpgClass, grades: UmaGrades = newGrades(1), weapons?: R
   return gradedWorld({ umas: { '101': uma } })
 }
 const saveOf = (world: TierWorld): Save => ({
-  schemaVersion: 27, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world },
+  schemaVersion: 28, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world },
 })
 
 describe('R2’s standard presets (WP25)', () => {

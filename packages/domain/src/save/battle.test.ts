@@ -133,7 +133,7 @@ describe('fights (D52, D66)', () => {
     expect(worldRun(worldOf(retreat(save, T(6)))).battle).toBeNull()
   })
 
-  it('pays a win: EXP to all five, their Class, Weapon and Armor bars, Laurels (triple on a first clear, a quarter on a replay), and an Uma Shard at Lv10', () => {
+  it('pays a win: EXP to all five, their Class bar (R2 retired the gear bars), Laurels (triple on a first clear, a quarter on a replay), and an Uma Shard at Lv10', () => {
     const fought = autoplay(startFight(withParty(), ura, S1, OUTFITS, T(4)))
     expect(fought.result).toMatchObject({ outcome: 'victory', nodeId: S1, laurels: 30, shards: 0, firstClear: true })
     expect(fought.result!.members).toHaveLength(5)
@@ -145,16 +145,11 @@ describe('fights (D52, D66)', () => {
     // A replay pays a quarter of the first clear (D79): 30 Laurels become 8, and a quarter of the EXP at most.
     expect(again.result).toMatchObject({ laurels: 8, firstClear: false })
     expect(again.result!.members[0]!.exp).toBeLessThanOrEqual(Math.ceil(fought.result!.members[0]!.exp / 4))
-    // Her bars (D102): 2E to her class, her three weapons share 3E (H64: double for the one she attacked with), E to each
-    // armor kind.
+    // Her Class bar (D102): 2E. R2 retired the Weapon, Armor and Accessory bars (WP3, H74; live since H82): a win pays none.
     const m = fought.result!.members[0]!
     const gain = (kind: string, id: string) => m.ranks.find((g) => g.ref.kind === kind && g.ref.id === id)?.exp ?? 0
     expect(gain('class', 'brawler')).toBe(2 * m.exp)
-    expect(gain('weapon', 'greatsword')).toBe(Math.round((3 * m.exp * 2) / 4))
-    expect(gain('weapon', 'axe')).toBe(Math.round((3 * m.exp) / 4))
-    expect(gain('weapon', 'bow')).toBe(0)
-    expect(['helm', 'cuirass', 'greaves', 'gauntlets', 'boots'].every((k) => gain('armor', k) === m.exp)).toBe(true)
-    expect(m.ranks.some((g) => g.ref.kind === 'accessory')).toBe(false) // she wears none
+    expect(m.ranks.every((g) => g.ref.kind === 'class')).toBe(true)
     expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
     expect(world.items).toEqual({})
 
@@ -264,10 +259,13 @@ describe('save parsing', () => {
 })
 
 describe('her battle sheet (combat-balance.md §6.0)', () => {
-  it('lists every battle stat in four groups, 0 included, with gear and Extra Stats apart for the core six', () => {
+  it('lists every battle stat in four groups, 0 included, with gear and Extra Stats apart for the core six (engine v16’s sheet, to H82)', () => {
     const save = withParty()
-    const uma = worldOf(save).umas['101']!
-    const sheet = umaBattleSheet(o101, uma)
+    // Her v1 gear, map and ranks, as engine v16's sheet reads them; the live sheet since H82 is `sheet-v3.test.ts`'s.
+    const live = worldOf(save).umas['101']!
+    const old = newOwnedUma(live.unlockedAt, 'brawler', 16)
+    const uma = { ...live, gear: old.gear, stars: old.stars, ranks: { ...old.ranks, classes: live.ranks.classes } }
+    const sheet = umaBattleSheet(o101, uma, 'brawler', 1, 16)
     expect(sheet.map((g) => g.title)).toEqual(['Offense', 'Defense', 'Sustain', 'Other'])
     const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
     for (const label of ['ATK', 'M.ATK', 'Might', 'Orb', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
@@ -283,7 +281,7 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     expect(row('Might').value).toBe('None')
     // Might is a flat number on its weapon's hits (D142), and armor adds its offense from grade 1 (D143).
     const geared = { ...uma, gear: { ...uma.gear, equipped: { greatsword: 'greatsword-g1', head: 'helm-g1' } } }
-    const gearedRow = (label: string) => umaBattleSheet(o101, geared).flatMap((g) => g.rows).find((r) => r.label === label)!
+    const gearedRow = (label: string) => umaBattleSheet(o101, geared, 'brawler', 1, 16).flatMap((g) => g.rows).find((r) => r.label === label)!
     expect(gearedRow('Might').value).toBe('Greatsword +1')
     expect(gearedRow('ATK').gear).toBe(1)
     expect(gearedRow('DEF').gear).toBe(2)

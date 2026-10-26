@@ -22,6 +22,9 @@ export type V26Uma = Omit<OwnedUma, 'classes' | 'calling'> & { classes: Partial<
 export type V26Save = Omit<Save, 'schemaVersion' | 'tierWorlds'> & { schemaVersion: 26; tierWorlds: Record<string, Omit<TierWorld, 'umas'> & { umas: Record<string, V26Uma> }> }
 
 export const V27_T = ['2026-10-01T12:00:00.000Z', '2026-10-10T12:00:00.000Z', '2026-10-20T12:00:00.000Z'] as const
+/** The generation the fixture's worlds and Umas are built in: v16's, before save v28 (the constructors follow the live
+ * stage, v28's since H82). */
+const OLD = 16
 const [T0, T1, T2] = V27_T
 const ids = (from: number, n: number): string[] => Array.from({ length: n }, (_, i) => `${from + i}`)
 /** The world-map fight's and the Rift fight's frozen replays, and how many of their actions the open fights have taken. */
@@ -48,7 +51,7 @@ const LEVELS: Readonly<Record<string, number>> = { 100: 50, 101: 20, 102: 40, 10
 const RANKS: Readonly<Record<string, number>> = { 100: 45, 101: 30, 102: 40, 103: 40, 104: 20, 105: 10 }
 
 function uma(id: string, classId: RpgClass | null): V26Uma {
-  const { calling: _, ...fresh } = newOwnedUma(T0)
+  const { calling: _, ...fresh } = newOwnedUma(T0, undefined, OLD)
   const u: V26Uma = { ...fresh, level: LEVELS[id] ?? 50, classId, classes: {} }
   const classes = V26_CLASSES[id]
   if (classes) {
@@ -60,7 +63,7 @@ function uma(id: string, classId: RpgClass | null): V26Uma {
 
 /** The v26 save, labelled v26 (the live version until H72): parsing it runs `toV27` through the chain. */
 export function v26Save(): V26Save {
-  const { schemaVersion: _, tierWorlds: worlds, ...fresh } = newSave('Save v27', T0)
+  const { schemaVersion: _, tierWorlds: worlds, ...fresh } = newSave('Save v27', T0, OLD)
   const save: V26Save = { ...fresh, schemaVersion: 26, tierWorlds: { '1': { ...worlds['1']!, umas: {} } } }
   const world = save.tierWorlds['1']!
   const classes: (RpgClass | null)[] = ['brawler', 'mage', 'spellblade', 'paladin', 'summoner', 'brawler', null, 'cleric', null, 'mage']

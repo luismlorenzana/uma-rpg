@@ -1,7 +1,7 @@
 // Classes v2's accessories over the save, built dark (H57, classes-v2.md §6, §7) and live since H61 (D188): the typed slots
 // when she equips, the six standard presets, "Can upgrade" for an empty typed slot, and the battle sheet's Orb and Mends
 // rows. v2 cases pass engine 15, and the live game's defaults are checked to be the same; v1's (engine 14) alongside.
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { orbKind } from '../economy/gear-id'
 import { BATTLE_HEAL_OFFENSE_SCALE } from '../rpg/battle/caps'
 import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, rpgWeaponKind, validRpgWeapons } from '../rpg/rules'
@@ -12,6 +12,12 @@ import { SaveRuleError, unlockUma, worldOf } from './rules'
 import { gearV1, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
 import { umaBattleSheet } from './sheet'
 import { upgradesFor } from './upgrades'
+
+// The v1 economy's rules, kept as the old game's record since R2's switch (H82, D218): this file runs as the game before
+// it, the switch at engine 16 (today's facilities, crafted pieces, Star Gems and gear ranks) and old saves read through
+// the chain to v27.
+vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
+vi.mock('./migrations', async (orig) => { const m = await orig<typeof import('./migrations')>(); return { ...m, migrateWorld: m.migrateWorldToV27 } })
 
 const T = (n: number) => `2026-10-22T12:00:${String(n).padStart(2, '0')}.000Z`
 // An invented front runner: a Brawler.

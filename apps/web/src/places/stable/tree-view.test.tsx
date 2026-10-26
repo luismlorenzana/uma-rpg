@@ -58,7 +58,7 @@ afterEach(() => {
 })
 
 describe('the Skills tab as a tree (H70)', () => {
-  it('runs with the switch at 16', () => expect(BATTLE_ENGINE_VERSION).toBe(16))
+  it('runs with the Tier rework’s fight live (on 17 since H82)', () => expect(BATTLE_ENGINE_VERSION).toBe(17))
 
   it('draws three tabs, her Lance on B filled, depth 4 faded with its gate, and Sunder\'s pips at Rank 2', async () => {
     show(await brawler())

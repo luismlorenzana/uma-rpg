@@ -1,10 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { newGrades } from '../economy/grades'
 import { materialType } from '../items/materials-id'
 import { facilityTargets, targetDemand, targetPlan } from './targets'
 import { gradedUma, gradedWorld, starMap } from './economy-v3.fixture'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const total = (rows: readonly { need: number }[]) => rows.reduce((sum, row) => sum + row.need, 0)
 const planAt = (tier: 1 | 2 = 1) => {

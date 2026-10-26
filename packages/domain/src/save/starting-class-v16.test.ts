@@ -7,7 +7,8 @@ import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { activeClass, startingClass, type BattleOutfit } from './class'
 import { unlockUma, worldOf } from './rules'
-import { gearV1, newOwnedUma, newSave, startingArmorKinds } from './save'
+import { armorHalf } from '../economy/grades'
+import { newOwnedUma, newSave } from './save'
 
 
 const T0 = '2026-10-25T12:00:00.000Z'
@@ -33,7 +34,7 @@ const ROWS = [
 
 describe('the start by calling, engine v16 (H67)', () => {
   it('runs with the Tier rework’s fight live', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight')]).toEqual([16, true])
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight')]).toEqual([17, true])
   })
 
   it('starts her in her calling, where v15 started her in her style’s class', () => {
@@ -51,9 +52,9 @@ describe('the start by calling, engine v16 (H67)', () => {
     const { umas } = worldOf(save)
     expect(ROWS.map((o) => umas[o.outfitId]!.classId)).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
     expect(ROWS.map((o) => activeClass(o, umas[o.outfitId]!))).toEqual(ROWS.map((o) => startingClass(o)))
-    for (const o of ROWS) expect(gearV1(umas[o.outfitId]!).kinds).toEqual(startingArmorKinds(startingClass(o)))
-    expect(Object.keys(gearV1(umas['306']!).kinds)).toHaveLength(5)
-    expect(gearV1(umas['305']!).kinds).toEqual({})
+    // v28 (H82): every grade G0, and her armor's half her class's.
+    for (const o of ROWS) expect(umas[o.outfitId]!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(ROWS.map((o) => armorHalf(umas[o.outfitId]!.classId!))).toEqual(['physical', 'magical', 'magical', 'physical', 'physical', 'magical', 'physical', 'magical'])
   })
 
   it('writes her start as her class, and no start writes no class', () => {

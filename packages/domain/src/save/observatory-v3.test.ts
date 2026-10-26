@@ -1,15 +1,14 @@
-// Extra Stats v3's jewels on the save (H76; EP5, EP17, EP §3.5), with R2's switch mocked to 17: a jewel from the Warehouse
+// Extra Stats v3's jewels on the save (H76; EP5, EP17, EP §3.5), on engine v17 (live since H82): a jewel from the Warehouse
 // opens its node, in order, at Uma Lv 5g − 4; the Set list's nodes, the one furthest behind first.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld, starMap } from './economy-v3.fixture'
 import { jewelBlock, jewelNodes, setActiveNodes, setGem, setJewel } from './observatory'
 import { worldOf } from './rules'
 import type { OwnedUma, Save, TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
-const saveOf = (world: TierWorld): Save => ({ schemaVersion: 27, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
+const saveOf = (world: TierWorld): Save => ({ schemaVersion: 28, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
   defeated: {} }, tierWorlds: { '1': world } })
 const withUma = (uma: Partial<OwnedUma>, items: Record<string, number> = {}): Save =>
   saveOf(gradedWorld({ items, umas: { '101': gradedUma({ stars: starMap(), ...uma }) } }))

@@ -1,7 +1,7 @@
-// R2's work over the save (H77; profession-progression.md §4–§5, PP4, PP12, PP16), with the switch mocked to engine v17:
+// R2's work over the save (H77; profession-progression.md §4–§5, PP4, PP12, PP16), on engine v17 (live since H82):
 // the live env per world tier, four slots a place, no levels, collects, Speed Tickets, the trade gate through the
 // operations' context and none for settles.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { itemMinutes, jobExp, MINUTE } from '../economy/pacing'
 import { tradeOfCalling } from '../economy/professions'
 import type { RpgClass } from '../rpg/kinds'
@@ -13,7 +13,6 @@ import {
   upgradeCost, upgradeFacility,
 } from './work'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const T0 = Date.parse(ECONOMY_V3_NOW)
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -25,7 +24,7 @@ function saveOf(umas: Record<string, number>, items: Record<string, number> = {}
   const world = gradedWorld({ items, wallet: { ...base.wallet, ...wallet },
     umas: Object.fromEntries(Object.entries(umas).map(([id, level]) => [id, gradedUma({ craft: { level, exp: 0 } })])) })
   return {
-    schemaVersion: 27,
+    schemaVersion: 28,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { [tier]: world },
   }

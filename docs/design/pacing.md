@@ -116,7 +116,8 @@ whose level range contains the party’s level, then replays of its last regular
 Unused regions remain fresh for other parties. It stops immediately at Lv50, even mid-region. Fight durations are
 packet assumptions: 40 seconds regular, 70 elite, 100 boss, not measured play times.
 
-<!-- live:pacing-sim -->
+*Frozen at H82 (D218): the v1 economy's ledger as the last live rules printed it (engine v16, save v27). R2's economy replaced the facilities, crafted pieces and gear ranks it counts; R2's pacing is [profession-progression.md](tier-rework/profession-progression.md) §7 (`economy/professions.sim.ts`).*
+
 | Band | Wins (first/replay) | Fight min | Uma EXP | Class EXP | Weapon EXP | Armor EXP | Laurels | Gear / Class Marks |
 |---|---|---|---|---|---|---|---|---|
 | 1–10 | 25 (24/1) | 19.7 | 2100 | 4200 | 6300 | 10500 | 1268 | 0 / 0 |
@@ -140,7 +141,7 @@ Representative Brawler: Class Rank 50; three Weapon Ranks 10/10/10; five Armor R
 Banked: 8888 Laurels, 72440 Gear Marks and 64215 Class Marks. No Manuals bought, no class switching, no tokens.
 Four-hour target (180–300 min): **under**. No game number retuned.
 *One slot, facility Lv1, a worker at the grade's unlock level (speed is set by level, D139); partial output is unfinished. A fresh worker finishes 1 grade-1 raw items and ends at Craft Lv1. Refining and crafting need additional time.
-<!-- /live -->
+
 
 Run `SIM=1 pnpm --filter @rpg/domain exec vitest run src/economy/pacing.sim.test.ts` to print the same ledger.
 `pnpm docs:update` renders every exact total above; CI rejects a stale block. D82’s token budget is retired by D105.

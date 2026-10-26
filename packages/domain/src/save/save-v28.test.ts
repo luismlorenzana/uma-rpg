@@ -1,8 +1,7 @@
-// Save v28's strict parse and new saves (H78; R2's build decision 7), with the switch mocked to engine v17 (R2's economy
-// live): the rich v27 save through `toV28` parses and its open v15 fights replay to their frozen ends; unmigrated, it
-// doesn't; a v28 world's rules are refused one by one; a new save is v28's and round-trips. (Unmocked, today's saves
-// parse and round-trip as v27: `migrations-v28.test.ts`.)
-import { describe, expect, it, vi } from 'vitest'
+// Save v28's strict parse and new saves (H78; R2's build decision 7), live since H82 (D218): the rich v27 save through
+// `toV28` parses and its open v15 fights replay to their frozen ends; unmigrated, it doesn't; a v28 world's rules are
+// refused one by one; a new save is v28's and round-trips.
+import { describe, expect, it } from 'vitest'
 import { replayV15 } from '../rpg/battle/v15-replays.fixture'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { toV28 } from './migrations'
@@ -11,7 +10,6 @@ import { newSave, parseSave, SaveParseError, type Save } from './save'
 import { richV27Save } from './v28.fixture'
 import { v15Replay, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 type Raw = Record<string, unknown>
 type RawWorld = Raw & { umas: Record<string, Raw>; items: Record<string, number> }
@@ -40,8 +38,9 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     }
   })
 
-  it('refuses the same save unmigrated: its gear and gem shelves', () => {
-    expect(() => parseSave(richV27Save())).toThrow(/tierWorlds\.1: unknown keys gear, gems/)
+  it('migrates the same save labelled v27 on load, and refuses it labelled v28 (the chain skips `toV28`): its gear and gem shelves', () => {
+    expect(() => parseSave(richV27Save())).not.toThrow()
+    expect(() => parseSave({ ...richV27Save(), schemaVersion: 28 })).toThrow(/tierWorlds\.1: unknown keys gems, gear/)
   })
 
   it('refuses each of v28\'s rules broken', () => {

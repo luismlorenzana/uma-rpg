@@ -1,4 +1,4 @@
-// Campaign battle vocabulary, engine v17 (v16 live since H72, D210; R2, D209: gear grades arrive as stats and Might, and
+// Campaign battle vocabulary, engine v17 (live since H82, D218; v16 from H72 to H82, D210; R2, D209: gear grades arrive as stats and Might, and
 // support fields retire; W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
@@ -7,7 +7,7 @@
 // v15 classes v2, D179, live since H61 (D188): the Paladin, one healer a party, no Orb kinds; docs/design/classes-v2.md;
 // v16 the Tier rework's fight, D200, live since H72 (D210): three weapons by channel, no side or legacy skills, a
 // trunk and one fork into lines A and B, Skill Ranks (H65), the base MP regen and the Flourish (H68, D204);
-// v17 the Tier rework's economy, D209, dark until H82: gear grades arrive as stats and Might, and the ten supports are refused;
+// v17 the Tier rework's economy, D209, live since H82 (D218): gear grades arrive as stats and Might, and the ten supports are refused;
 // her accessory's base form arrives as `flat`, `bell` or `insignia` and her signature as `signature` (H75, D212);
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'

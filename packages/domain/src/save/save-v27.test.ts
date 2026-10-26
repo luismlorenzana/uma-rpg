@@ -1,6 +1,6 @@
-// Save v27 (H69, D205), live since H72 (D210; R1's packets ran this file with the switch mocked to 16). A v26 save parses
-// through the chain (three weapons, `lines`, `calling`) and its open v15 fights replay to their frozen ends; the same world
-// labelled v27 (so the chain skips it) doesn't.
+// Save v27 (H69, D205), live from H72 (D210) to H82 (D218; R1's packets ran this file with the switch mocked to 16). A v26
+// save parses through the chain (three weapons, `lines`, `calling`, then v28's grades) and its open v15 fights replay to
+// their frozen ends; the same world labelled v27 (so the chain skips `toV27`) doesn't.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { replayV15 } from '../rpg/battle/v15-replays.fixture'
@@ -20,8 +20,8 @@ function editedUma(id: string, change: (uma: Raw) => void): unknown {
 }
 
 describe('save v27 (H69, live since H72)', () => {
-  it('runs with the Tier rework’s fight live and the save v27', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([16, true, 3, 27])
+  it('runs with the Tier rework’s fight and economy live and the save v28 (H82)', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([17, true, 3, 28])
   })
 
   it('parses a v26 world through the chain: three weapons, lines and every Uma’s calling', () => {
@@ -40,8 +40,9 @@ describe('save v27 (H69, live since H72)', () => {
       expect(uma.calling).toEqual({ pick: null, confirmed: false })
       for (const setup of Object.values(uma.classes)) expect(setup.weapons).toHaveLength(3)
     }
-    // Her crafted Katana is still on.
-    expect(gearV1(world.umas['102']!).equipped).toEqual({ katana: 'katana-g1' })
+    // Her crafted Katana went with v28's grades (H82): it is the grant's one piece.
+    expect(world.umas['102']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(world.grant!.deleted.gear).toBe(1)
     // Written back and read again, the world is the same.
     const save = parseSave(migrated(v26Save(), toV27))
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)

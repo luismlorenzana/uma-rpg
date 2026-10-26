@@ -1,9 +1,9 @@
 // Save v27's migration (H69, D205; class-progression.md §14, CP31): `toV27`, pure, and chained by H72 (D210) with
-// `SAVE_SCHEMA_VERSION` 27. The parse of what it writes is `save-v27.test.ts`'s.
+// `SAVE_SCHEMA_VERSION` 27; since H82 (D218) v28's `toV28` follows it. The parse of what it writes is `save-v27.test.ts`'s.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { RPG_BRANCH_B, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
-import { migrateWorld, toV27 } from './migrations'
+import { migrateWorld, migrateWorldToV27, toV27, toV28 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, SaveParseError, type ClassLoadout, type OwnedUma, type TierWorld } from './save'
 import { migrated, v26Save, V26_CLASSES } from './v27.fixture'
 
@@ -20,11 +20,13 @@ const one = (level: number, classId: RpgClass, setup: Partial<ClassLoadout> & Ra
 const BRAWLER_ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana']
 
 describe('save v27’s migration (H69), chained by H72', () => {
-  it('runs on every world before v27 and on none at v27', () => {
-    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([27, 16])
+  it('runs on every world before v27 and on none at v27, and v28’s step after it (H82)', () => {
+    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([28, 17])
     const raw = world() as unknown as Raw
-    expect(migrateWorld(raw, 27)).toBe(raw)
-    expect(migrateWorld(raw, 26)).toEqual(toV27(raw))
+    expect(migrateWorldToV27(raw, 27)).toBe(raw)
+    expect(migrateWorldToV27(raw, 26)).toEqual(toV27(raw))
+    expect(migrateWorld(raw, 26)).toEqual(toV28(toV27(raw)))
+    expect(migrateWorld(raw, 28)).toBe(raw)
     // A v25 world runs through v26's lead step too, then v27's.
     expect(migrateWorld(raw, 25)).toHaveProperty('umas.100.calling', { pick: null, confirmed: false })
   })
@@ -135,11 +137,12 @@ describe('save v27’s migration (H69), chained by H72', () => {
 })
 
 describe('the live parse (H72)', () => {
-  it('parses a save labelled v26 through the chain to v27, as `toV27` writes it, and refuses v26’s keys on a v27 world', () => {
+  it('parses a save labelled v26 through the chain to v28, as `toV27` and `toV28` write it, and refuses v26’s keys on a v27 world', () => {
     const save = v26Save()
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(27)
+    expect(parsed.schemaVersion).toBe(28)
     expect(parsed).toEqual(parseSave(migrated(save, toV27)))
+    expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV28(toV27(w))) as object), schemaVersion: 28 }))
     expect(parsed.tierWorlds['1']!.umas['100']!.classes.brawler!.weapons).toHaveLength(3)
     // A world that keeps a v26 class beside v27's keys fails: the chain left it (it holds `lines`), and `tree` is no key.
     const mixed = migrated(save, (w) => {

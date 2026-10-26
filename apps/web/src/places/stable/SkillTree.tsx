@@ -5,7 +5,7 @@
 // branch (free; her equipped skills follow). Nothing is learned and nothing costs points (CP14). The model is the domain's
 // `rpgTreeView`, which reads the catalog: only this lazy page imports it.
 import {
-  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, gearById, gearV1, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
+  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, gearById, gearV1, gradeOf, isGrades, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
   RPG_SKILL_RANK_MAX, SaveRuleError, type BattleOutfit, type OwnedUma, type RpgBranch, type RpgClass, type RpgHand, type RpgProfile,
   type RpgTreeView, type RpgTreeViewNode, type RpgTreeViewTree, type TemplateOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -60,7 +60,10 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
   const tree = view.trees[Math.min(treeIndex, view.trees.length - 1)]!
   const shown = [...loadout]
   const auto = setup.loadout === null
-  const better: readonly string[] = umaUpgrades(world, outfit, tier)?.gearSlots ?? []
+  const upgrades = umaUpgrades(world, outfit, tier)
+  // A graded Uma (save v28, R2) has a grade on each weapon slot and no pieces; a v27 one her pieces and their slots.
+  const graded = isGrades(uma.gear) ? uma.gear : null
+  const better: readonly string[] = graded ? (upgrades?.grades ?? []).flatMap((g) => (g.kind === 'weapon' ? [g.weapon] : [])) : upgrades?.gearSlots ?? []
   const rank = classRankOf(uma.ranks, classId)
   const slots = rpgActiveSlots(uma.level)
   const flourish = rootFlourish(outfit, uma, classId)
@@ -91,7 +94,8 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
             <p>A party fights with one healer at most: a Paladin or a Cleric.</p>
             <p>Each weapon in her three slots opens its tree. Depths open at Class Rank 1, 10, 20, 30 and 40. At depth 3 the tree forks: branch A or B, free to swap. Every skill gains a rank every 2 Class Ranks, up to 5. Her Uma Level sets how many skills she can equip; until you pick, they are chosen for her.</p>
-            <p>She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>
+            {graded ? <p>Each of her weapons has a grade, G0 to G10, raised with Weapon Gems on the Gear tab; any grade opens the tree.</p>
+              : <p>She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>}
           </HelpButton>
         </div>
         <div className="rounded-md bg-raised px-3 py-2" aria-label="Her root">
@@ -110,17 +114,18 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
           <h4 className="text-micro mb-1">Weapons</h4>
           <div className="grid grid-cols-3 gap-1" aria-label="Weapon slots">
             {view.trees.map((t, i) => {
-              const piece = gear.equipped[t.weapon] ? gearById(gear.equipped[t.weapon]!) : undefined
+              const piece = !graded && gear.equipped[t.weapon] ? gearById(gear.equipped[t.weapon]!) : undefined
+              const grade = graded ? gradeOf(graded, { kind: 'weapon', weapon: t.weapon }) : piece?.grade ?? 0
               const mark = better.includes(t.weapon)
               return (
                 <button key={`${i}-${t.weapon}`} type="button" onClick={() => setSlotPick(i)}
-                  aria-label={`Weapon ${i + 1}: ${piece ? piece.name : `Training ${WEAPON_LABEL[t.weapon]}`}, branch ${t.branch}${mark ? ', can upgrade' : ''}`}
+                  aria-label={`Weapon ${i + 1}: ${graded ? `${WEAPON_LABEL[t.weapon]} · G${grade}` : piece ? piece.name : `Training ${WEAPON_LABEL[t.weapon]}`}, branch ${t.branch}${mark ? ', can upgrade' : ''}`}
                   className="relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-raised px-0.5 text-center">
                   {mark && <UpgradeMark size={14} className="absolute top-1 right-1" />}
                   <span className="absolute top-1 left-1.5 text-[9.5px] font-bold leading-none text-ink-faint">{t.branch}</span>
                   <WeaponGlyph weapon={t.weapon} size={18} />
                   <span className="w-full truncate text-[11px] font-semibold leading-tight">{WEAPON_LABEL[t.weapon]}</span>
-                  <span className={`text-[10px] leading-none ${piece ? 'font-semibold text-accent' : 'text-ink-faint'}`}>{piece ? `G${piece.grade}` : 'Training'}</span>
+                  <span className={`text-[10px] leading-none ${grade > 0 ? 'font-semibold text-accent' : 'text-ink-faint'}`}>{graded || piece ? `G${grade}` : 'Training'}</span>
                 </button>
               )
             })}

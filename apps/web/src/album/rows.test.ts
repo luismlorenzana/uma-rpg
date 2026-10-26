@@ -34,7 +34,7 @@ describe('SB4 RPG album adapters', () => {
 
   it('keeps a working Uma eligible for battle/Manuals but orders work by free first, then Craft Level', async () => {
     const { view, save } = await albumFixture()
-    const busy = worldOf(startJob(save, 'monster-den', 0, view.roster[0]!, 'puffbun-pelt', 3, NOW))
+    const busy = worldOf(startJob(save, 'monster-den', 0, view.roster[0]!, 'quartz', 3, NOW))
     const rows = albumRows(view, busy, [], NOW)
     expect(rows[0]).toMatchObject({ busy: true, free: false, level: 3 })
     expect(availabilityBlock(busy, '81001', NOW)).toBe('Already working')
@@ -97,13 +97,15 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
     return fx
   }
 
-  it('adds a Template group after RPG (Calling, Stride, Knack; no Signature)', () => {
+  it('adds a Template group after RPG (Calling, Stride, Knack, and from R2 her Signature), then R2\'s Trade group (H79, H80; live since H82)', () => {
     const at = STABLE_FACETS.findIndex((f) => f.group === 'Template')
     expect(STABLE_FACETS[at - 1]!.group).toBe('RPG')
     expect(STABLE_FACETS.slice(at).map((f) => [f.group, f.key, f.options!.map((o) => o.label)])).toEqual([
       ['Template', 'calling', ['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin']],
       ['Template', 'stride', ['Dash', 'Middle', 'Stayer']],
       ['Template', 'knack', ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']],
+      ['Template', 'signature', ['Pendant', 'Orb', 'Bell', 'Insignia']],
+      ['Trade', 'trade', ['Mine · Forge', 'Forest · Armorer', 'Fields · Workbench', 'Fishery · Charm Shop', 'Monster Den · Lapidary']],
     ])
   })
 

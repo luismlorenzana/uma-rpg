@@ -1,14 +1,16 @@
 # Combat
 
-How a fight works today: engine v16 (D210, the Tier rework's fight,
-[class progression](../design/tier-rework/class-progression.md): three weapons a class by channel, a trunk and one fork
+How a fight works today: engine v17 (D218, the Tier rework's economy, [weapon progression](../design/tier-rework/weapon-progression.md)
+and [Extra Stats progression](../design/tier-rework/extra-stats-progression.md): gear by grade, one accessory slot in the
+four families' base forms, her signature, the Planet and three moons; the ten supports retired); engine v16 (D210, the
+Tier rework's fight, [class progression](../design/tier-rework/class-progression.md): three weapons a class by channel, a trunk and one fork
 into lines A and B, Skill Ranks, Pierce, foes weak to their twins, the base MP regen and the Flourish as her calling;
 D188, [classes v2](../design/classes-v2.md): six classes with the Paladin, the hybrids' mirrored hands, one healer a
 party at doubled shares from her ATK or M.ATK, flat Orbs in a Damage slot, Guts in HP, six halls of Limit Breaks; D169:
 the Rift's foe traits, the ward, a third act and mixed locks, which no campaign foe carries; D142: Might as fixed values
 by grade again; D141, [combat balance](../design/combat-balance.md): a ratio damage formula, support, Rally, charged foe
 moves with locks, Steel after a Break, a breather between waves; D124: two accessories; D112: Limit Breaks only from the
-Halls of Heroes; D106: Heroes and inherited Limit Breaks; D104: Class Ranks; v6–v15 fights still replay as they were, an
+Halls of Heroes; D106: Heroes and inherited Limit Breaks; D104: Class Ranks; v6–v16 fights still replay as they were, an
 open one included). Every number below comes from the code. The
 tables between `live` markers are generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by
 hand and checked against the engine.
@@ -95,14 +97,17 @@ For each part of each hit:
 1. **Base:** `offense² ÷ (offense + defense) × power` (D141). Offense is ATK for Arms kinds and MATK for elements;
    defense the target's DEF or MDEF. The same ratio gives the same share at every level, and it is never zero.
    **Might**: the weapon a hit is made with adds its grade's Might to offense (D142, engine v13): 1, 4, 8, 12, 19, 26,
-   35, 45, 57, 68 for grades 1–10, about 6% × g at the level its grade opens. **Her Orb** (v15, C4) adds half that to
-   her hits of its kind (1, 2, 4, 6, 10, 13, 18, 23, 29, 34), a kind she doesn't wield too, for her inherited Limit
-   Breaks. (v12 fights took Might as +6% a grade on the hit; before v12, `max(offense × 0.2, offense − defense × 0.5)`,
-   with Might +4 a grade added to offense.) **Her Skill Rank** (v16) scales a skill's power ×0.95 to ×1.05
+   35, 45, 57, 68 for grades 1–10 in Tier 1, × 1.8 and × 2.6 in Tiers 2 and 3 (v17), about 6% × g at the level its
+   grade opens. **Her accessory's flat offense** (v17, WP31) joins it: a Pendant's on each of her three weapons' kinds,
+   an Orb's on the kind she set, a kind she doesn't wield too, for her inherited Limit Breaks
+   ([materials](materials.md#gear)). **Her signature** (v17, WP33) adds 0.2 a level × the tier to her ATK and M.ATK
+   while she wears her knack's family. (To v16 her Orb in the Damage slot added half a weapon's Might on its kind; v12
+   fights took Might as +6% a grade on the hit; before v12, `max(offense × 0.2, offense − defense × 0.5)`, with Might
+   +4 a grade added to offense.) **Her Skill Rank** (v16) scales a skill's power ×0.95 to ×1.05
    ([classes](classes.md#skills-depths-lines-and-ranks)); Attacks and Limit Breaks don't rank.
 2. **Weak hit:** ×1.3 when the hit's kind is one of the foe's weaknesses (her twins, [below](#weaknesses-shields-and-breaks)),
    or it's Light or Dark against a Hexed foe. (To v14 an Uma's Orb added its kind to every hit for this check, without
-   damage of its own.)
+   damage of its own.) Then **her Insignia** (v17): her hits on sub-bosses and bosses ×(1 + 1.5% a grade).
 3. **Statuses** (table below) raise or cut it.
 4. **Specials:** `vs-broken` ×1.3 on a broken foe, `vs-wounded` ×1.3 below half HP. `pierce` ignores the unbroken
    halving: the Spell Blade's line B (v16, one hit at ×1.15), the Brawler's Katana B and the Mage's Dark B.
@@ -111,7 +116,12 @@ For each part of each hit:
 6. An Uma's **evasion** (Speed Extra Stats, up to 50%) cuts what she takes.
 7. A guard intercepting a hit takes half of it. Damage is at least 1.
 8. **A skill's Barrier** (v12) absorbs any damage first. It lasts until the end of the round it was raised in.
-9. **Her Support accessory (D124, D141: shares of her own numbers, so they keep their worth at every level):**
+9. **Her Bell** (v17, WP21): when her act includes an Attack, her weapon of the Bell's kind strikes once more at 0.1 a
+   grade × her hand, one hit of its kind on the act's target (another foe if it fell), with every step above; a guard
+   can intercept it, and a weak one chips a shield and breaks a lock. Only on a kind she slots; it adds nothing to the
+   Limit gauge. The log labels it "Bell".
+10. **The supports are retired** (v17, WP17: no Talisman or Amulet, no damage cut, shield, return or drain from gear).
+   **Fights before v17** keep their Support accessory (D124, D141):
    - **Shields:** a Bulwark Talisman's shield absorbs physical damage, a Veil Amulet's magical damage, from the start of
      the fight (2% of her max HP a grade each).
    - **Damage cuts:** an Iron Talisman cuts the physical damage she takes, a Ward Amulet the magical (1.5% a grade).
@@ -143,31 +153,31 @@ Extra Stats; HP about 276 and 928.
 
 ### Where damage comes from
 
-Measured on the balance simulation's on-curve Brawler at each level (D142, D143), on her Greatsword hits, which her
-Orb strengthens. Offense adds up; a hit doesn't, since it is offense² ÷ (offense + defense), so each source is shown as
-what her hit loses without it (the others kept), and all four against her level stat alone. Skill depth, opened by
+Measured on the balance simulation's on-curve Brawler at each level (D142, D143; engine v17), on her Greatsword hits.
+Offense adds up; a hit doesn't, since it is offense² ÷ (offense + defense), so each source is shown as what her hit
+loses without it (the others kept), and all three against her level stat alone. Skill depth, opened by
 Class Rank, multiplies whatever offense she has.
 
 <!-- live:damage-sources -->
-| Level | Gear grade, skill depth | Uma stats (level) | Extra Stats | Weapon Might | Orb | Armor | Offense | Hit without Extra Stats | Hit without the weapon | Hit without the Orb | Hit without armor | All four vs her stats alone | Skill depth vs depth 1 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Lv 1 | G1, 1 | 24 (75%) | 1 (3%) | 1 (3%) | 1 (3%) | 5 (16%) | 32 | −4% | −4% | −4% | −21% | ×1.49 | ×1.00 |
-| Lv 10 | G2, 2 | 41 (75%) | 3 (5%) | 4 (7%) | 2 (4%) | 5 (9%) | 55 | −7% | −10% | −5% | −12% | ×1.51 | ×1.38 |
-| Lv 25 | G5, 3 | 68 (54%) | 15 (12%) | 19 (15%) | 10 (8%) | 15 (12%) | 127 | −16% | −20% | −11% | −16% | ×2.43 | ×1.81 |
-| Lv 40 | G8, 5 | 95 (44%) | 35 (16%) | 45 (21%) | 23 (11%) | 20 (9%) | 218 | −22% | −28% | −14% | −13% | ×3.46 | ×2.87 |
-| Lv 50 | G10, 5 | 113 (39%) | 52 (18%) | 68 (23%) | 34 (12%) | 25 (9%) | 292 | −25% | −32% | −16% | −12% | ×4.33 | ×2.87 |
+| Level | Gear grade, skill depth | Uma stats (level) | Extra Stats | Weapon Might | Armor | Offense | Hit without Extra Stats | Hit without the weapon | Hit without armor | All three vs her stats alone | Skill depth vs depth 1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Lv 1 | G1, 1 | 24 (77%) | 1 (3%) | 1 (3%) | 5 (16%) | 31 | −4% | −4% | −22% | ×1.43 | ×1.00 |
+| Lv 10 | G2, 2 | 41 (77%) | 3 (6%) | 4 (8%) | 5 (9%) | 53 | −8% | −10% | −13% | ×1.43 | ×1.38 |
+| Lv 25 | G5, 3 | 68 (59%) | 13 (11%) | 19 (17%) | 15 (13%) | 115 | −15% | −22% | −18% | ×2.13 | ×1.81 |
+| Lv 40 | G8, 5 | 95 (49%) | 33 (17%) | 45 (23%) | 20 (10%) | 193 | −24% | −32% | −15% | ×2.91 | ×2.87 |
+| Lv 50 | G10, 5 | 113 (44%) | 51 (20%) | 68 (26%) | 25 (10%) | 257 | −28% | −37% | −14% | ×3.60 | ×2.87 |
 
 A regular foe's 100% physical hit, as a share of her HP:
 
-| Level | Uma stats only | + Extra Stats (HP, DEF) | + armor (HP, DEF) | All (on curve) | With an Iron Talisman |
-|---|---|---|---|---|---|
-| Lv 1 | 16% | 15% | 15% | 14% | 14% |
-| Lv 10 | 22% | 21% | 20% | 19% | 19% |
-| Lv 25 | 23% | 20% | 21% | 18% | 17% |
-| Lv 40 | 27% | 21% | 24% | 19% | 17% |
-| Lv 50 | 31% | 23% | 27% | 20% | 17% |
+| Level | Uma stats only | + Extra Stats (HP, DEF) | + armor (HP, DEF) | All (on curve) |
+|---|---|---|---|---|
+| Lv 1 | 16% | 15% | 14% | 14% |
+| Lv 10 | 22% | 21% | 19% | 18% |
+| Lv 25 | 23% | 20% | 20% | 17% |
+| Lv 40 | 27% | 21% | 22% | 18% |
+| Lv 50 | 31% | 23% | 25% | 19% |
 
-The Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears her standard preset's Greatsword Orb (its offense on her Greatsword hits) and Vampire Talisman; the last column puts an Iron Talisman in her Support slot.
+The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, Prowess all to ATK; her armor is the physical half. Her preset's Bell adds a follow-up Attack rather than offense; a Pendant or an Orb would add its flat offense on her kinds, and her signature +0.2 a level while she wears her knack's family.
 <!-- /live -->
 
 ## Weaknesses, shields and Breaks
@@ -256,11 +266,11 @@ doubled). Brawler, Mage, Spell Blade and Summoner deal damage only. Every suppor
 
 ## Sustain: MP and the Flourish
 
-- **The base MP regen** (v16, SB18, D204): at each round's end every Uma standing regains 0.9% of her max MP for each
-  skill depth her Class Rank opens, five at most (4.5% from Class Rank 40), rounded, at least 1. A Spring Amulet's MP
-  adds to it in the same step, one cue ("+13 MP"). A Class Rank 40 Mage with 296 MP regains 13 a round, 23 with a G10
-  Spring; her Battle tab reads "MP 296 · +13 a round". It never takes her past her max. Fights before v16 had no base
-  regen.
+- **The base MP regen** (v16, SB18, D204): at each round's end every Uma standing regains 1.0% of her max MP for each
+  skill depth her Class Rank opens (v17, R2's balance, D215; 0.9% on v16), five at most (5% from Class Rank 40), rounded,
+  at least 1, one cue ("+15 MP"). A Class Rank 40 Mage with 296 MP regains 15 a round; her Battle tab reads "MP 296 · +15
+  a round". It never takes her past her max. On v16 a Spring Amulet's MP added to it in the same step; fights before v16
+  had no base regen.
 - **The Flourish** (v16, UT6, D204): while she fights as her calling's class, her template gives her 4% of her max HP a
   fight, in her stride's shape ([classes](classes.md#her-calling-and-her-template)): **Clean break** a Barrier of 4% at
   the start, which lapses at round 1's end; **Even pace** 1% at each round's end; **Late reserve** 2% at each round's
@@ -351,7 +361,7 @@ unchanged.
 | HP | (40 + 4.2 × reference stat) × role × rank; the reference stat is an average Uma's at the foe's lifetime level |
 | Offense | Set so a 100% hit takes a share of an average Uma's HP at her level (20% at tier Lv 1, 28% from tier Lv 10), × the offense budget, × role |
 | Sub-boss and boss HP | ×3.5 and ×5.5, times the party's reachable skill depth |
-| Build budget | What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + 0.035 × (ℓ − 1)² ÷ 49), ×2.72 at Lv 50; offense ×1.49 at Lv 50. It restarts at each tier's Lv 1; its build part scales by her stats' growth: ×1.96 HP and defense, ×1.27 offense at Tier 2 Lv 50 |
+| Build budget | What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + 0.035 × (ℓ − 1)² ÷ 49), ×2.72 at Lv 50; offense ×1.49 at Lv 50. It restarts at each tier's Lv 1, and its build part is × the tier's multiplier (×1.8 Tier 2, ×2.6 Tier 3; EP16): ×2.72 HP and defense, ×1.49 offense at Tier 2 Lv 50, ×2.72 and ×1.49 at Tier 3 Lv 50 |
 | World: regular foes | +3.5% HP per tier level |
 | World: elites | +0% HP per tier level |
 | World: region bosses | ×0.5 a champion's HP |
@@ -376,7 +386,7 @@ always the front's kinds.
 - **Horde:** three waves of 4 to 6 foes, each weak to one twin set (v16), a wave repeating none until all five are used.
 - Each foe's own element, the one her moves carry, is one she isn't weak to.
 - **The Duel's guard rail** ([classes v2](../design/classes-v2.md) §3.1, H51, D176, H60, D186, H71): no single act Breaks
-  a Duel boss. Each class's own best act removes 10 shield points on engine v16 (every node of every line at Class Rank
+  a Duel boss. Each class's own best act removes 10 shield points on engines v16 and v17 (every node of every line at Class Rank
   50 and Skill Rank 5; 11 to v15), and the best Limit Break 12 (Chaos Rain, twelve weak hits, one any Uma can learn), so
   her shields start at 13.
 - **The guided builds** (v16, CP7): each front's guidance is a build, its five classes and every member's three weapons,
@@ -395,7 +405,7 @@ always the front's kinds.
 | Duel | Twin sets (2 at stages 1–6, 1 at stages 7–12); locks mixed | — | A boss (acts 2, shield 13) | A boss (acts 2, shield 14) | A boss (acts 2, shield 15) | A boss (acts 3, shield 15) | Brawler, Brawler (Bow, Katana, Lance), Mage, Mage (Light Tome, Dark Tome, Thunder Tome), Paladin |
 | Horde | One twin set each; a wave repeats none until all five are used | — | Waves 1–2: a sub-boss-faced leader (shield 6) + 3 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 3 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 4 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 4 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 5 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: 2 boss-faced leaders from two packs (shield 6) + 4 key foes (shield 3) | Spell Blade, Spell Blade (Greatsword, Axe, Fire Tome), Summoner, Summoner (Blizzard Tome, Fire Tome, Lance), Cleric |
 
-Front and Convergence foes stand at tier Lv 50. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + 0.1 × (n − 1) ÷ 11), ×1.1 at the champion; a Convergence fight is its front's champion at ×0.99. An Echo is its front's stage 8 at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×1.22. Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. Rift foes hit harder than the world's: offense ×1.8 at stages 1–4, ×2 for stages 5 and 7's sub-bosses, ×1.3 for a boss and her guard, ×1.2 for an opening foe, ×2.2 for a champion, ×2.3 on the Duel (her HP ×1.1) and ×4.4 on the Horde. Arcane's foes have ×1.6 HP and ×1.2 offense over Iron's. Champions, and so the Convergence's fights, scale again by front: Iron ×1.2 HP and offense, Arcane ×0.92 offense, Duel ×0.8 HP and offense, Horde ×1.3 HP and offense. A run's 52 fights hold 46 boss, 64 sub-boss and 165 key face slots.
+Front and Convergence foes stand at tier Lv 50. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + 0.1 × (n − 1) ÷ 11), ×1.1 at the champion; a Convergence fight is its front's champion at ×0.99. An Echo is its front's stage 8 at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×1.22. Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. Rift foes hit harder than the world's: offense ×1.8 at stages 1–4, ×2 for stages 5 and 7's sub-bosses, ×1.3 for a boss and her guard, ×1.2 for an opening foe, ×2.2 for a champion, ×2.3 on the Duel (her HP ×1.1) and ×4.4 on the Horde. Arcane's foes have ×1.6 HP and ×1.2 offense over Iron's. Champions, and so the Convergence's fights, scale again by front: Iron ×1.15 HP and offense, Arcane ×0.92 offense, Duel ×0.8 HP and offense, Horde ×1.4 HP and offense. A run's 52 fights hold 46 boss, 64 sub-boss and 165 key face slots.
 <!-- /live -->
 
 **Levels.** The level a Rift fight shows is a tier level: 50 for the fronts and the Convergence, and 45, 50 or 55 for an
@@ -462,4 +472,8 @@ giving up pays nothing and leaves MP as it was before the fight. Numbers are in 
 | `BATTLE_FLOURISH_SHARE` | 0.04 | v16: her Flourish gives this share of her max HP a fight, while she fights as her calling's class |
 | `BATTLE_FLOURISH_RATE` | Even pace 0.01, Late reserve 0.02 | v16: the share of her max HP those two Flourishes mend at a round's end |
 | `BATTLE_FLOURISH_FROM` | 3 | v16: the first round whose end Late reserve mends at |
+| `RPG_BASE_MP_REGEN_V17` | 0.01 | v17: the base MP regen a depth (5% from Class Rank 40) |
+| `BELL_PERMILLE_PER_GRADE` | 100 | v17: a Bell's follow-up, per mille of an Attack a grade, × her hand |
+| `INSIGNIA_PERMILLE_PER_GRADE` | 15 | v17: an Insignia's extra damage on sub-bosses and bosses, per mille a grade |
+| Signature | 0.2 a level × tier | v17: her ATK and M.ATK while she wears her knack's family |
 <!-- /live -->

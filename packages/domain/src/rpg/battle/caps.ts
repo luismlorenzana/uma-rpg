@@ -24,11 +24,12 @@ export const BATTLE_HEAL_SCALE = 300
 // The Tier rework's five releases (D198, docs/design/tier-rework/implementation.md) each open at their engine:
 // `rpgRework(stage, engine)`, the same pattern. Each is built dark and turned on by its switch packet, which moves
 // BATTLE_ENGINE_VERSION to the stage's engine: R1, Tier 1's fight, is engine v16, built in H64–H71 and live since H72
-// (D210). `rpg/battle/v15-replays.test.ts` pins v15's fights under the live switch (H64, D200); tests mock the switch with
+// (D210); R2, Tier 1's economy, is engine v17, built in H73–H81 and live since H82 (D218). `rpg/battle/v15-replays.test.ts`
+// and `v16-replays.test.ts` pin v15's and v16's fights under the live switch (H64, D200; H82); tests mock the switch with
 // `caps-at.fixture.ts`'s `capsAt`.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 16
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 17
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */

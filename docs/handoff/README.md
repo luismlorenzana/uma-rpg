@@ -188,7 +188,7 @@ for the fifth scenario (tiers T9).
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Versions:** this game runs on engine v16 and save v27 (R1, live since H72), uma-kit 0.14.0, uma-art 2.13.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+- **Versions:** this game runs on engine v17 and save v28 (R2, live since H82), uma-kit 0.14.0, uma-art 2.13.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
   protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done

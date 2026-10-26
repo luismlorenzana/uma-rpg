@@ -16,7 +16,8 @@ import { sweepFight } from './exchange'
 import { ascend, signUpRift, startRiftFight, sweepEcho } from './rift'
 import { ids, OUTFITS as RIFT_OUTFITS, play, riftWorldSave, ROSTER, T as RT, TWENTY, weaken } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { gearV1, newOwnedUma, newSave, parseSave, startingArmorKinds, type OwnedUma, type Save, type TierWorld } from './save'
+import { armorHalf } from '../economy/grades'
+import { newOwnedUma, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
 
 
 const T = (n: number) => new Date(Date.UTC(2026, 9, 25, 12) + n * 60_000).toISOString()
@@ -95,23 +96,21 @@ describe('the calling pick (H69)', () => {
     expect(() => pickCalling(confirmed, PACE, 'mage', T(2))).toThrow(CALLING_SET)
   })
 
-  it('at Uma Lv 1 moves her class and, with no armor worn, her armor half to the pick’s', () => {
+  it('at Uma Lv 1 moves her class, and her armor half with it (v28: the half is her class’s, H82)', () => {
     const save = party()
-    expect([umaOf(save, '305').classId, gearV1(umaOf(save, '305')).kinds]).toEqual(['spellblade', {}])
+    expect(umaOf(save, '305').classId).toBe('spellblade')
     const mage = pickCalling(save, PACE, 'mage', T(1))
     expect(umaOf(mage, '305')).toMatchObject({ classId: 'mage', calling: { pick: 'mage', confirmed: false } })
-    expect(gearV1(umaOf(mage, '305')).kinds).toEqual(startingArmorKinds('mage'))
-    expect(Object.keys(gearV1(umaOf(mage, '305')).kinds)).toHaveLength(5)
+    expect(armorHalf(umaOf(mage, '305').classId!)).toBe('magical')
     roundTrip(mage)
     // Back to the suggested one: her class and her physical half.
     const back = pickCalling(mage, PACE, 'spellblade', T(2))
     expect(umaOf(back, '305')).toMatchObject({ classId: 'spellblade', calling: { pick: 'spellblade', confirmed: false } })
-    expect(gearV1(umaOf(back, '305')).kinds).toEqual({})
-    // A Late Uma picks the Cleric: magical.
-    expect(umaOf(pickCalling(save, LATE, 'cleric', T(1)), '307')).toMatchObject({ classId: 'cleric', gear: { kinds: startingArmorKinds('cleric') } })
-    // Wearing an armor piece, her halves stay; switched to another class, her class stays.
-    const worn = edit(save, (w) => { w.umas['305']!.gear = { locker: ['cuirass-g1'], equipped: { body: 'cuirass-g1' }, kinds: {} } })
-    expect(umaOf(pickCalling(worn, PACE, 'mage', T(1)), '305')).toMatchObject({ classId: 'mage', gear: { kinds: {} } })
+    expect(armorHalf(umaOf(back, '305').classId!)).toBe('physical')
+    // A Late Uma picks the Cleric: magical. Her grades don't move: a grade is the slot's, on either half.
+    const cleric = umaOf(pickCalling(save, LATE, 'cleric', T(1)), '307')
+    expect(cleric).toMatchObject({ classId: 'cleric', gear: umaOf(save, '307').gear })
+    // Switched to another class, her class stays.
     const switched = chooseClass(save, '305', 'brawler', T(1))
     expect(umaOf(pickCalling(switched, PACE, 'mage', T(2)), '305')).toMatchObject({ classId: 'brawler', calling: { pick: 'mage', confirmed: false } })
     // An Uma unlocked before v16 has no class written (her style's): the pick is her start.

@@ -29,14 +29,14 @@ export const CLERIC_TREE = ['cleric-greatsword.1a', 'cleric-axe.2a', 'cleric-tom
 export const CLERIC_LOADOUT = ['cleric-tome-fire.1', 'cleric-greatsword.1a', 'cleric-axe.2', 'cleric-tome-light.3b', 'cleric-bow.3', 'cleric-katana.4']
 
 function uma(classId: RpgClass | null, change: (u: OwnedUma) => void = () => {}): OwnedUma {
-  const u: OwnedUma = { ...newOwnedUma(T0), level: 50, classId }
+  const u: OwnedUma = { ...newOwnedUma(T0, undefined, 16), level: 50, classId }
   delete (u as Partial<OwnedUma>).calling
   change(u)
   return u
 }
 
 export function v24Save(): Save {
-  const save = newSave('Save v25', T0)
+  const save = newSave('Save v25', T0, 16)
   const world = save.tierWorlds['1']!
   const classes: (RpgClass | null)[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'cleric', 'mage', null, null, null, null, 'cleric']
   for (const [i, id] of ids(100, 20).entries()) world.umas[id] = uma(classes[i] ?? null)

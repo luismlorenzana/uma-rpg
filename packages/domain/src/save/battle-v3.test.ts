@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { applyPoints } from '../economy/bonus'
 import { newGrades, type GearTier } from '../economy/grades'
 import { MANUAL_PRICE } from '../economy/ranks'
@@ -14,7 +14,6 @@ import { umaBattleSheet } from './sheet'
 import type { StarMap } from '../economy/planet'
 import type { Save, TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const outfit = (outfitId: string) => ({
   outfitId, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
@@ -82,7 +81,7 @@ describe('graded battle projection (R2)', () => {
     world.wallet.classMarks = MANUAL_PRICE
     expect(manualBlock(world, '101', { kind: 'weapon', id: 'greatsword' })).toBe('Gear Manuals are retired')
     expect(manualBlock(world, '101', { kind: 'class', id: 'brawler' })).toBeNull()
-    const save: Save = { schemaVersion: 27, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world } }
+    const save: Save = { schemaVersion: 28, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world } }
     expect(readManuals(save, '101', { kind: 'class', id: 'brawler' }, 1, NOW).tierWorlds['1']!.wallet.classMarks).toBe(0)
   })
 

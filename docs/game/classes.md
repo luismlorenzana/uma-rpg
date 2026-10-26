@@ -1,7 +1,7 @@
 # Classes and weapons
 
 Six classes and ten weapons (D86; classes v2, D160, live since H61, D188; the Tier rework's fight, engine v16, live
-since H72, D210). Every Uma has one **active class** at a time and can switch freely. She keeps each class's own three
+since H72, D210; its economy, engine v17, live since H82, D218). Every Uma has one **active class** at a time and can switch freely. She keeps each class's own three
 weapons, her line on each of its trees and her loadout. Classes and weapons are chosen on the Stable → an Uma →
 **Skills** page, six classes in two rows of three ([sections](sections.md#stable)).
 
@@ -114,8 +114,13 @@ type, her knack its word: "Clever Spellwright".
 - **★ Her Flourish** works only while she fights as her calling's class ("No effect as Brawler" otherwise): 4% of her max
   HP a fight, in her stride's shape. Not a heal skill: no healing scale, it never overheals, and a fallen Uma gets none.
   Once a fight, not each wave ([combat](combat.md#sustain-mp-and-the-flourish)).
-- **Nothing else moves:** a template adds no damage kind, stat, lean, hand or rule, and never takes anything away. Her
-  signature accessory and her moon come with the economy's release (R2).
+- **★ Her signature** (R2, UT7): her knack names an accessory family: Fleet the Bell, Mighty the Orb, Tireless the
+  Pendant, Gritty and Clever the Insignia. While she wears it, her ATK and M.ATK rise 0.2 a level × the tier
+  ([materials](materials.md#gear)). Her standard preset wears it.
+- **★ Her moon** (R2, UT10): two nodes beside her Extra Stats map, opened by Moon Jewels II and IV: node I gives her
+  knack's stat, node II her calling's channel's defense ([loops](loops.md#extra-stats-and-gear)).
+- **Her trade** (R2, PP2): her calling names the two Wilds places she works ([loops](loops.md#craft-level)).
+- **Nothing else moves:** a template adds no damage kind, lean, hand or rule, and never takes anything away.
 
 The template's chip and card and the calling pick card are on the Uma sheet ([sections](sections.md#stable)); the Stable
 filters by calling, stride and knack.
@@ -146,42 +151,36 @@ one twin set ([combat](combat.md#weaknesses-shields-and-breaks)).
 **Three weapon slots, by channel (D98; CP2, engine v16).** A class has three slots, each an **Arms** or a **Tome** slot,
 the lead channel first: a Brawler three Arms, a Mage three Tomes, a Spell Blade and a Paladin two Arms and a Tome, a
 Summoner and a Cleric two Tomes and an Arm. Any kind of a slot's channel fits it, three different kinds, and every class
-picks; the weapon in each slot opens its tree. Every Uma holds a **Training weapon** of all ten kinds: grade 0, no
-stats, always hers. A slot holds the Training weapon until she wears a crafted one of that kind, which opens the same
-tree and adds its Might to the hits made with it ([materials](materials.md#gear)). A crafted piece serves every class
-that holds its weapon. A new class starts on its three defaults (the presets below), in Training weapons. When she
-stops slotting a kind, her equipped skills of its tree leave her loadout; her line on it stays. Fights from engines
-v6–v15 replay with five weapons a class.
+picks; the weapon in each slot opens its tree. **Each weapon has a grade** (R2, WP2), G0 to G10, raised with Weapon
+Gems; G0 opens the tree with no Might, and each grade adds its Might to the hits made with that weapon
+([materials](materials.md#gear)). A weapon's grade serves every class that holds it. A new class starts on its three
+defaults (the presets below). When she stops slotting a kind, her equipped skills of its tree leave her loadout; her
+line on it stays. Fights from engines v6–v15 replay with five weapons a class, and v6–v16 with crafted pieces.
 
-**Armor slots (D103, D124)** mirror them: head, body, legs, arms and feet, each holding its physical or its magical
-piece, with a Training piece of each kind until she binds a crafted one ([materials](materials.md#gear)). A new Uma's
-five start in her calling's half ([her calling](#her-calling-and-her-template)).
+**Armor slots** mirror them: head, body, legs, arms and feet, each at a grade raised with Armor Fittings. Its offense is
+her class's half: ATK for a Brawler, a Spell Blade or a Paladin, M.ATK for a Mage, a Summoner or a Cleric, so switching
+class switches it.
 
-**Two accessory slots (D124), typed (classes v2, C10):**
-- **Damage** holds one **Orb**, an Arms Orb or an Elemental Orb. It adds offense to her hits of its kind: half a
-  weapon's Might at its grade, +34 at grade 10 (C4). It no longer adds its kind for weaknesses or locks, so an Uma
-  specializes in one kind: her best weapon's, or the one her front is weak to.
-- **Support** holds one **Talisman** (physical) or **Amulet** (magical): one effect each ([combat](combat.md#damage)).
-
-Equipping refuses the other slot's type ("The Damage slot takes an Orb", "The Support slot takes a Talisman or an
-Amulet").
+**One accessory slot** (R2, WP19): its grade, raised with Accessory Settings, and its family, set freely outside fights:
+the **Pendant** (flat offense on her three weapons' kinds), the **Orb** (flat offense on one kind she picks, any of the
+ten), the **Bell** (a follow-up strike after her Attack, on a kind she holds) or the **Insignia** (more damage to
+sub-bosses and bosses) ([materials](materials.md#gear), [combat](combat.md#damage)). Her ★ signature family comes first
+in its sheet.
 
 **Standard preset (D164).** Each class has one, applied on tap from her profile's Gear tab ("Use the standard preset",
-for her active class): its three default weapons (the owner's, CP3), its armor half in all five slots, an Orb in the
-Damage slot and a support in the Support slot. The Orb is of her first slot's kind, so it strengthens her leading
-damage, and the support is the one the balance simulation plays with. It wears the best she can: her own pieces, or the
-stock's next grades her ranks allow, else Training pieces ([loops](loops.md#extra-stats-and-gear)). Her lines stay;
-her equipped skills of a tree the preset takes out of her slots leave her loadout.
+for her active class): its three default weapons (the owner's, CP3) and her accessory's form, her ★ signature family
+when she has one (on her lead kind for an Orb or a Bell), else the class's form below (WP25). Grades don't move.
+Her lines stay; her equipped skills of a tree the preset takes out of her slots leave her loadout.
 
 <!-- live:presets -->
-| Class | Weapons | Armor | Orb, Damage slot | Support, Support slot |
-|---|---|---|---|---|
-| Brawler | Greatsword, Axe, Lance | Physical | Greatsword Orb | Vampire Talisman |
-| Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Fire Orb | Siphon Amulet |
-| Spell Blade | Katana, Lance, Thunder Tome | Physical | Katana Orb | Vampire Talisman |
-| Cleric | Light Tome, Blizzard Tome, Bow | Magical | Light Orb | Spring Amulet |
-| Summoner | Dark Tome, Light Tome, Bow | Magical | Dark Orb | Siphon Amulet |
-| Paladin | Greatsword, Axe, Light Tome | Physical | Greatsword Orb | Thorn Talisman |
+| Class | Weapons | Armor | Accessory |
+|---|---|---|---|
+| Brawler | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
+| Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
+| Spell Blade | Katana, Lance, Thunder Tome | Physical | Pendant |
+| Cleric | Light Tome, Blizzard Tome, Bow | Magical | Orb (Blizzard Tome) |
+| Summoner | Dark Tome, Light Tome, Bow | Magical | Orb (Light Tome) |
+| Paladin | Greatsword, Axe, Light Tome | Physical | Pendant |
 <!-- /live -->
 
 The defaults pair up: the Brawler's and the Mage's are the ring (Fire, Ice and Lightning in each channel), and the
@@ -243,14 +242,13 @@ A Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP
 
 ## Ranks and levels
 
-Four bars, all filled by winning fights (D102). Nothing is trained and no token is spent.
+Two bars, both filled by winning fights (D102). Nothing is trained and no token is spent. Gear has no ranks since R2:
+a slot's grade opens at Uma Lv 5g − 4 and is raised with made items ([materials](materials.md#gear)).
 
 | Bar | Range | Rises with | Opens |
 |---|---|---|---|
-| **Uma Level** | 1–50 | Every win | Her stats, skill slots (3 → 7) and Extra Stats slots |
+| **Uma Level** | 1–50 | Every win | Her stats, skill slots (3 → 7), the grades her gear can reach and the Extra Stats nodes she can open |
 | **Class Rank**, per class | 1–50 | Wins as that class | That class's trees: depths at Rank 1, 10, 20, 30, 40, and a Skill Rank every 2 Class Ranks. Her Limit Break's depth |
-| **Weapon Rank**, per weapon | 1–10 | Wins with that weapon in her slots | Wearing that weapon up to grade = rank, in every class |
-| **Armor Rank**, per armor kind | 1–10 | Wins wearing that kind | Wearing that kind up to grade = rank |
 
 Curves, EXP per win and Marks are in [loops](loops.md#ranks). A Lv 1 Uma can reach any rank: there are no caps between
 bars.

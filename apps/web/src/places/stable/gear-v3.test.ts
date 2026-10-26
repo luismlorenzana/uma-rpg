@@ -16,6 +16,8 @@ describe('R2 gear rows', () => {
       .toBe('Bell · Greatsword · G6 · after her Attack, her Greatsword at 0.6 · ★ +6')
     expect(accessoryGradeLine({ grade: 1, family: null, form: 'base' }, ['greatsword'], 1, 'bell', 30))
       .toBe('Accessory · G1 · Pick a form')
+    expect(accessoryGradeLine({ grade: 0, family: 'bell', form: 'base', kind: 'katana' }, ['katana'], 1, 'bell', 50))
+      .toBe('Bell · Katana · G0 · counts from G1')
     expect(gradeUpgradeView(grades, { kind: 'armor', slot: 'head' }, 21, { 'armor-fittings-g5': 1 })).toMatchObject({
       ready: true, label: 'G4 → G5 · 1 Armor Fittings G5', block: null,
     })

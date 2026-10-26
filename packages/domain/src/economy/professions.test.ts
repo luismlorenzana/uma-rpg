@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { RPG_ALL_CLASSES } from '../rpg/kinds'
 import type { CallingOutfit } from '../roster/template'
 import { RPG_WORK_ENV } from '../work/env'
-import { liveWorkEnv } from '../work/env-v3'
+import { liveWorkEnv, RPG_BUILDINGS_V3 } from '../work/env-v3'
 import { facilitySpec } from './jobs'
 import {
   PLACES_V3, placeSpecV3, professionById, PROFESSIONS, tradeOfCalling, tradePlaces, tradeProfessions, tradeResolver, TRADES, umaTrade, workPlace,
@@ -38,10 +38,11 @@ describe('ten professions (PP1)', () => {
     expect(workPlace('armorer', 16)).toBeUndefined()
     expect(workPlace('armorer', 17)?.kind).toBe('craft')
     expect(workPlace('mine', 16)).toEqual(facilitySpec('mine'))
-    // The deployed game (engine 16) works today's facilities on today's env.
-    expect(workPlace('mine')).toEqual(facilitySpec('mine'))
-    expect(liveWorkEnv(1)).toBe(RPG_WORK_ENV)
-    expect(liveWorkEnv(3, { tradeOf: () => 'magical' })).toBe(RPG_WORK_ENV)
+    // The live game (engine 17 since H82) works R2's places on R2's env.
+    expect(workPlace('mine')).toEqual(workPlace('mine', 17))
+    expect(workPlace('quarry')).toBeUndefined()
+    expect(liveWorkEnv(1)).not.toBe(RPG_WORK_ENV)
+    expect(liveWorkEnv(1).buildings).toBe(RPG_BUILDINGS_V3)
   })
 })
 

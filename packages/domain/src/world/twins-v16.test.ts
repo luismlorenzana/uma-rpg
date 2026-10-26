@@ -139,20 +139,21 @@ describe('Tier 1’s foes on v16 (D202)', () => {
   })
 })
 
-describe('the foe generators live (H72, D210)', () => {
-  it('generate v16’s foes by default', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+describe('the foe generators live (H72, D210; on v17 since H82, D218)', () => {
+  it('generate the live engine’s foes by default: v17’s since H82', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     const w1 = worldContinent({ name: 'T', order: 1 })
-    for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 16))
-    expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 16))
-    expect(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast)).toEqual(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast, 16))
-    expect(rpgFoeShields()).toEqual(RPG_FOE_SHIELDS_V16)
+    for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 17))
+    expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 17))
+    expect(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast)).toEqual(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast, 17))
+    expect(rpgFoeShields()).toEqual(rpgFoeShields(17))
+    expect(rpgFoeShields(17)).toEqual(RPG_FOE_SHIELDS_V16)
     const ctx = { tier: 1, runId: 't1-r1', roster: packRoster(), defeated: new Set<string>() }
     for (const front of ['duel', 'horde'] as const) {
-      expect(riftFight(ctx, { kind: 'front', front, stage: 3 })).toEqual(riftFight(ctx, { kind: 'front', front, stage: 3 }, 16))
+      expect(riftFight(ctx, { kind: 'front', front, stage: 3 })).toEqual(riftFight(ctx, { kind: 'front', front, stage: 3 }, 17))
     }
-    expect(riftTuning()).toBe(riftTuning(16))
-    for (const front of RIFT_FRONTS) expect(RIFT_FRONT_SPECS[front].build).toEqual(riftGuidedBuild(front, 16))
+    expect(riftTuning()).toBe(riftTuning(17))
+    for (const front of RIFT_FRONTS) expect(RIFT_FRONT_SPECS[front].build).toEqual(riftGuidedBuild(front, 17))
   })
 })
 

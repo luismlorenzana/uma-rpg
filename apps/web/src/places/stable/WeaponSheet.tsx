@@ -8,20 +8,21 @@
 // grades she has spent.
 import {
   ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, accessoryEffects, ARMOR_LABEL, ARMOR_SLOT_KINDS, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION,
-  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isMagicalArmor, isOrb,
+  boundGrade, classOf, EFFECT_LABEL, EQUIP_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isGrades, isMagicalArmor, isOrb,
   isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError, slotKind,
   type AccessoryEffects, type AccessorySlot, type ArmorKind, type ArmorSlot, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
-  type TierWorld,
+  type GearTier, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { kindLabel, SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
-import { hold, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
+import { hold, useActiveTier, wearAccessoryPiece, wearArmorPiece } from '../../save/game'
 import { ArmorMark } from '../../ui/RankBars'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../../items/planets'
 import { accessorySheetTypes, noAccessories } from './accessory-slots'
+import { weaponGradeLine } from './gear-v3'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
 export function effectLines(a: AccessoryEffects): string[] {
@@ -78,6 +79,9 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
     : [here]
   const pieces = (w: RpgWeapon) => gearChoices(uma, gearStock(world), (p) => p.type === w)
   const held = (w: RpgWeapon, id: string | null) => here === w && (gear.equipped[w] ?? null) === id
+  // A graded Uma (save v28, R2): a weapon is a grade she raises on the Gear tab, so the sheet only picks the slot's weapon.
+  const graded = isGrades(uma.gear) ? uma.gear : null
+  const tier = Math.min(3, useActiveTier()) as GearTier
   const choose = (w: RpgWeapon, id: string | null) =>
     hold(outfitId, classId, slot, w, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   return (
@@ -88,7 +92,14 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
             <h4 className="text-micro mb-1">
               {WEAPON_LABEL[w]}{weapons.includes(w) && w !== here ? ` · swaps with slot ${weapons.indexOf(w) + 1}` : ''}
             </h4>
-            <ul className="space-y-1">
+            {graded ? <ul className="space-y-1"><li>
+              <button type="button" disabled={here === w} onClick={() => void choose(w, null)}
+                className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${here === w ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
+                <TrainingIcon weapon={w} size={32} />
+                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{weaponGradeLine(graded, w, tier)}</span>
+                <span className="shrink-0 text-[11px] text-ink-faint">{here === w ? 'Held' : 'Hers'}</span>
+              </button>
+            </li></ul> : <ul className="space-y-1">
               {boundGrade(uma, w) === 0 && <li>
                 <button type="button" disabled={held(w, null)} onClick={() => void choose(w, null)}
                   className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${held(w, null) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
@@ -117,7 +128,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
                   </li>
                 )
               })}
-            </ul>
+            </ul>}
           </section>
         ))}
         {error && <p className="text-[13px] text-danger">{error}</p>}

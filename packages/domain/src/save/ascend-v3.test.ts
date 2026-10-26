@@ -1,14 +1,13 @@
-// Promotion with R2's stock (H77; profession-progression.md PP23), with the switch mocked to engine v17: materials and
+// Promotion with R2's stock (H77; profession-progression.md PP23), on engine v17 (live since H82): materials and
 // made items stay in the old world's Warehouse, and she arrives in the new tier at Craft Lv 1. Her grades' made items go
 // back to the old world's Warehouse, her open jewels don't, and she arrives at G0 with her slot's form (H78; R2's build
 // decision 9, WP §3.10, GE14).
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { ascend, signUpRift } from './rift'
 import { riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import type { Save, TierWorld } from './save'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const edit = (save: Save, change: (w: TierWorld) => void): Save => {
   const copy: Save = JSON.parse(JSON.stringify(save))

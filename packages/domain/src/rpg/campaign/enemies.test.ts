@@ -16,10 +16,10 @@ describe('the foe curve by tier level (tier2-world Z3, H45)', () => {
     }
   })
 
-  it('restarts at Tier 2 Lv 1, its build part scaled to her lifetime stats (tier2-world §5, option A)', () => {
+  it('restarts at Tier 2 Lv 1, its build part scaled to her lifetime stats (tier2-world §5, option A; to engine v16, v17’s × tier is `foe-budget-v17.test.ts`’s)', () => {
     const lifetimes = [51, 60, 75, 90, 100]
-    expect(lifetimes.map((L) => round2(rpgFoeTierBudget(L, hp)))).toEqual([1, 1.02, 1.18, 1.56, 1.96])
-    expect(lifetimes.map((L) => round2(rpgFoeTierBudget(L, offense)))).toEqual([1, 1.01, 1.05, 1.16, 1.27])
+    expect(lifetimes.map((L) => round2(rpgFoeTierBudget(L, hp, 16)))).toEqual([1, 1.02, 1.18, 1.56, 1.96])
+    expect(lifetimes.map((L) => round2(rpgFoeTierBudget(L, offense, 16)))).toEqual([1, 1.01, 1.05, 1.16, 1.27])
     // The world's regular-foe HP step, 1 + 0.035 × (ℓ − 1).
     expect(lifetimes.map((L) => round2(1 + 0.035 * (rpgFoeCurveLevel(L) - 1)))).toEqual([1, 1.32, 1.84, 2.37, 2.72])
     expect(lifetimes.map((L) => round2(rpgFoeHitShare(rpgFoeCurveLevel(L))))).toEqual([0.2, 0.28, 0.28, 0.28, 0.28])

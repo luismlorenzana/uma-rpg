@@ -50,8 +50,8 @@ function worldMap(): Save {
 const flourishes = (allies: readonly { id: string; flourish?: string }[]) => Object.fromEntries(allies.map((a) => [a.id, a.flourish ?? null]))
 
 describe('the Flourish as her calling, engine v16 (H68)', () => {
-  it('runs with the Tier rework’s fight live', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+  it('runs with the Tier rework’s fight live (on engine 17 since H82)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     expect(IDS.map((id) => umaTemplate(OUTFITS.get(id)!)).map((t) => [t.calling, t.flourish])).toEqual([['mage', 'even-pace'],
       ['brawler', 'clean-break'], ['summoner', 'late-reserve'], ['brawler', 'even-pace'], ['paladin', 'clean-break']])
   })
@@ -110,7 +110,7 @@ describe('the Flourish as her calling, engine v16 (H68)', () => {
   it('freezes each Uma’s Flourish into a world-map fight’s input, and Clean break opens it with her Barrier', () => {
     const started = startFight(worldMap(), region, S1, OUTFITS, T0)
     const input = worldOf(started).world.run.battle!.input
-    expect(input.version).toBe(16)
+    expect(input.version).toBe(17)
     expect(flourishes(input.allies)).toEqual({ 201: 'even-pace', 202: 'clean-break', 203: 'late-reserve', 204: 'even-pace', 205: 'clean-break' })
     const opening = createBattle(input).cues.flatMap((c) => (c.kind === 'cover' ? [[c.targetId, c.label]] : []))
     expect(opening).toEqual([['202', 'Flourish'], ['205', 'Flourish']])
@@ -125,7 +125,7 @@ describe('the Flourish as her calling, engine v16 (H68)', () => {
     const save = signUpRift(riftWorldSave(), TWENTY, RT(1))
     const started = startRiftFight(save, { kind: 'front', front: 'iron', stage: 1 }, 0, RIFT_OUTFITS, ROSTER, RT(2))
     const input = worldOf(started).rift.battle!.input
-    expect(input.version).toBe(16)
+    expect(input.version).toBe(17)
     expect(flourishes(input.allies)).toEqual({ 101: 'even-pace', 102: null, 103: null, 104: null, 105: null })
   })
 })

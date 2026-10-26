@@ -75,8 +75,8 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
                     </div>
                     {cls && <RankRow label={CLASS_LABEL[cls.ref.id as RpgClass]} kind="class" track={cls.after} before={cls.before} gain={cls.exp} />}
                     <RankUps lines={rankUpLines(world, campaign.outfits.get(m.outfitId), cls, tier, engine)} />
-                    <RankCells label="Weapon Ranks" cells={cells('weapon')} />
-                    <RankCells label="Armor Ranks" cells={cells('armor')} />
+                    {cells('weapon').length > 0 && <RankCells label="Weapon Ranks" cells={cells('weapon')} />}
+                    {cells('armor').length > 0 && <RankCells label="Armor Ranks" cells={cells('armor')} />}
                     {cells('accessory').length > 0 && <RankCells label="Accessory Ranks" cells={cells('accessory')} />}
                     {(m.bonds ?? []).map((b) => {
                       const bondUp = b.after.level > b.before.level

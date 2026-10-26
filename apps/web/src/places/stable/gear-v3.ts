@@ -41,8 +41,10 @@ export function armorGradeLine(grades: UmaGrades, slot: ArmorSlot, classId: RpgC
 
 export function accessoryGradeLine(slot: AccessorySlotState | undefined, weapons: readonly RpgWeapon[], tier: GearTier,
   family: AccessoryFamily, level: number): string {
-  if (!slot || slot.grade < 1 || slot.family === null) return `Accessory · G${slot?.grade ?? 0} · Pick a form`
+  if (!slot || slot.family === null) return `Accessory · G${slot?.grade ?? 0} · Pick a form`
   const label = ACCESSORY_FAMILY_LABEL[slot.family]
+  // A form picked at G0 waits for G1, where every accessory starts counting (H82).
+  if (slot.grade < 1) return `${label}${slot.kind ? ` · ${kindLabel(slot.kind)}` : ''} · G0 · counts from G1`
   let effect: string
   if (slot.family === 'pendant') effect = `+${accessoryFlatValue('pendant', slot.grade, tier)} on her three kinds`
   else if (slot.family === 'orb') effect = `+${accessoryFlatValue('orb', slot.grade, tier)} ${slot.kind ? kindLabel(slot.kind) : ''} offense`

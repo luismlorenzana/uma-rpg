@@ -2,6 +2,11 @@
 
 > **Approved by the owner, 2026-10-24 (D194): every call EP1–EP29 as written.** Changes from here are follow-ups logged against it.
 
+> **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the
+> game on engine v17 and save v28: the Planet and three moons, Prowess by class, Vigor and Guard, her moon, the jewels
+> that open them, and Star Gems retired. The manual ([loops](../../game/loops.md), [materials](../../game/materials.md))
+> describes them as played.
+
 > **Follow-up to D196 (stat balancing), 2026-10-25** (logged against D194; values only, as
 > [stat-balance §13](stat-balance.md#13-if-approved-the-follow-ups-by-doc) lists them): **EP29, a hybrid's weapon moons
 > on her lead half** (SB10: the Spell Blade's Split Lance + Katana in Tier 2, Full Lance in Tier 3; the Summoner's Split

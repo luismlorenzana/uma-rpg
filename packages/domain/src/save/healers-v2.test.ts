@@ -47,7 +47,7 @@ describe('one healer a party, with the switch on (H58, C8)', () => {
     expect(() => startFight(save, ura, S1, OUTFITS, T(2))).toThrow('One healer a party')
     const one = startFight(chooseClass(save, '103', 'mage', T(2)), ura, S1, OUTFITS, T(3))
     const input = worldOf(one).world.run.battle!.input
-    expect(input.version).toBe(16)
+    expect(input.version).toBe(17)
     expect(input.allies.map((a) => a.classId)).toEqual(['paladin', 'mage', 'mage', 'summoner', 'brawler'])
   })
 
@@ -68,7 +68,7 @@ describe('one healer a party, with the switch on (H58, C8)', () => {
     expect(riftFightBlock(save, IRON1, 4, '1', RIFT_OUTFITS)).toBe('Only the run’s twenty fight here')
     expect(() => startRiftFight(save, IRON1, 0, RIFT_OUTFITS, ROSTER, T(3))).toThrow('One healer a party')
     const started = startRiftFight(save, IRON1, 1, RIFT_OUTFITS, ROSTER, T(3))
-    expect(worldOf(started).rift.battle!.input.version).toBe(16)
+    expect(worldOf(started).rift.battle!.input.version).toBe(17)
   })
 
   it('refuses to begin a Convergence attempt with two healers in any of its parties, and its frozen fight with two', () => {

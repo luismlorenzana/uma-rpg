@@ -1,8 +1,8 @@
 // v6–v14 fights replay exactly, whatever classes v2 builds (H53, D179): the frozen fixture's v14 fights, generated on the
 // engine before classes v2, replayed under the live engine. Since H61 (D188) every class rule's default reads classes v2,
-// and since H72 (D210) the Tier rework's fight (engine v16): a rules call in the engine that leaned on its default
-// instead of the fight's version would move them. (Until H61 and H72 twin files replayed them with `caps.ts` mocked to 15
-// and 16; this is now that case, live.)
+// since H72 (D210) the Tier rework's fight (engine v16) and since H82 (D218) its economy (engine v17): a rules call in the
+// engine that leaned on its default instead of the fight's version would move them. (Until H61, H72 and H82 twin files
+// replayed them with `caps.ts` mocked to 15, 16 and 17; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
 import { HERO_LIMIT_IDS } from '../hero-id'
 import { RPG_ALL_CLASSES, RPG_CLASSES, rpgHand } from '../rules'
@@ -12,8 +12,8 @@ import { loadV14Replays, regenerateV14Replays, replayV14 } from './v14-replays.f
 const replays = process.env.UPDATE_V14 ? regenerateV14Replays() : loadV14Replays()
 
 describe('the frozen v14 replays (H53)', () => {
-  it('runs with classes v2 and the Tier rework’s fight live (H61, H72)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+  it('runs with classes v2 and the Tier rework’s fight and economy live (H61, H72, H82)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     expect(rpgV2()).toBe(true)
     expect(RPG_CLASSES).toEqual(RPG_ALL_CLASSES)
     expect(HERO_LIMIT_IDS).toHaveLength(24)

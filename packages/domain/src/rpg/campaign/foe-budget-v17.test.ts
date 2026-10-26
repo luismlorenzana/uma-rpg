@@ -30,8 +30,9 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
       expect(rpgFoeTierBudget(l, rate, engine)).toBe(before(l, rate))
     }
     expect(r3(rpgFoeTierBudget(100, HP, 16))).toBeCloseTo(1.955, 3)
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
-    for (let l = 1; l <= 150; l++) expect(rpgFoeTierBudget(l, HP)).toBe(before(l, HP))
+    // The live default is v17's since H82 (D218).
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
+    for (let l = 1; l <= 150; l++) expect(rpgFoeTierBudget(l, HP)).toBe(rpgFoeTierBudget(l, HP, 17))
   })
 
   it('Tier 1 doesn’t move in v17 (m = 1, ℓ = L); later tiers rise by their multiplier on the build part', () => {
@@ -45,7 +46,7 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
     const foe = (level: number, engine?: number) => rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2,
       weaknesses: { weapons: [], elements: [] } }, engine)
     expect(foe(50, 17)).toEqual(foe(50, 16))
-    expect(foe(100)).toEqual(foe(100, 16))
+    expect(foe(100)).toEqual(foe(100, 17))
     expect(foe(100, 17).stats.hp).toBeGreaterThan(foe(100, 16).stats.hp)
     expect(foe(100, 17).stats.pdef).toBeGreaterThan(foe(100, 16).stats.pdef)
     expect(foe(100, 17).stats.atk).toBeGreaterThan(foe(100, 16).stats.atk)
@@ -56,7 +57,7 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
     const t1 = worldContinent({ name: 'T', order: 1 }).regions[0]!, t2 = worldContinent({ name: 'T', order: 6 }).regions[0]!
     const hp = (nodes: ReturnType<typeof regionChapter>['nodes']) => nodes.flatMap((n) => [...n.enemies, ...(n.waves ?? []).flat()]).map((e) => e.stats.hp)
     expect(regionChapter(t1, cast, 17).nodes).toEqual(regionChapter(t1, cast, 16).nodes)
-    expect(regionChapter(t2, cast).nodes).toEqual(regionChapter(t2, cast, 16).nodes)
+    expect(regionChapter(t2, cast).nodes).toEqual(regionChapter(t2, cast, 17).nodes)
     const v16 = hp(regionChapter(t2, cast, 16).nodes), v17 = hp(regionChapter(t2, cast, 17).nodes)
     expect(v17.every((n, i) => n >= v16[i]!)).toBe(true)
     expect(v17.some((n, i) => n > v16[i]!)).toBe(true)

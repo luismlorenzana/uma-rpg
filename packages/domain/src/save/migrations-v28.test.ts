@@ -1,6 +1,6 @@
 // Save v28's migration (H78; profession-progression.md §14.4, §14.7, PP19–PP20; WP27, EP21; R2's build decisions 4–9):
-// `toV28` on the rich v27 save and on small worlds, unmocked, so today's live game parses beside it. It isn't chained yet
-// (H82 does both), and `migrateWorld` hands each world its tier.
+// `toV28` on the rich v27 save and on small worlds, chained by H82 (D218) with `SAVE_SCHEMA_VERSION` 28, and `migrateWorld`
+// hands each world its tier.
 import { describe, expect, it, vi } from 'vitest'
 import { ITEM_IDENTITIES } from '../items/identity'
 import { migrateWorld, toV28, type TierGrant } from './migrations'
@@ -18,17 +18,21 @@ type World = Raw & { umas: Record<string, Raw>; items: Record<string, number>; w
 const richWorld = (): Raw => richV27Save().tierWorlds['1'] as Raw
 const v28 = (world: Raw, tier = 1): World => toV28(world, tier) as World
 
-describe('toV28 (D214): R2\'s economy and the compensation, dark until H82', () => {
-  it('isn\'t chained yet: the save stays v27 and migrateWorld stops at it', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(27)
+describe('toV28 (D214): R2\'s economy and the compensation, chained by H82 (D218)', () => {
+  it('is chained: the save is v28, every world before it runs `toV28`, and a v28 world is left', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(28)
     const raw = richWorld()
-    expect(migrateWorld(raw, 27)).toBe(raw)
+    expect(migrateWorld(raw, 27)).toEqual(toV28(raw))
+    const done = toV28(raw)
+    expect(migrateWorld(done, 28)).toBe(done)
   })
 
-  it('the rich v27 save is a real one: it parses today, as v27', () => {
+  it('the rich v27 save is a real one: it parses through the chain to v28, its work settled and its grant paid', () => {
     const save = parseSave(richV27Save())
-    expect(save.tierWorlds['1']!.work['101']!.entries).toHaveLength(1)
-    expect(save.tierWorlds['1']!.gems).toEqual({ 'gem-hp-1': 2, 'gem-sun-4': 1 })
+    expect(save.schemaVersion).toBe(28)
+    expect(save.tierWorlds['1']!.work).toEqual({})
+    expect(save.tierWorlds['1']!.grant).toEqual(v28(richWorld()).grant)
+    expect('gems' in save.tierWorlds['1']!).toBe(false)
   })
 
   it('settles work first: a gather\'s items reach the stock, a craft\'s pieces and a cut\'s gems count as deleted, each item\'s EXP reaches her tickets, a queue leaves no trace', () => {
@@ -146,10 +150,15 @@ describe('toV28 (D214): R2\'s economy and the compensation, dark until H82', () 
     expect(toV28(richWorld(), 2)).toEqual(toV28(richWorld(), 1))
   })
 
-  it('leaves today\'s saves as they are: a new save is v27\'s and round-trips', () => {
+  it('starts new saves as v28\'s, which round-trip; engine 16 still builds v27\'s for an old save\'s fixtures', () => {
     const save = newSave('Today', '2026-10-25T12:00:00.000Z')
-    expect(save.tierWorlds['1']).toMatchObject({ gems: {}, gear: {}, wallet: { gearMarks: 0 } })
-    expect('grant' in save.tierWorlds['1']!).toBe(false)
+    expect(save.schemaVersion).toBe(28)
+    expect(save.tierWorlds['1']).toMatchObject({ grant: null, buildings: {} })
+    expect(['gems', 'gear'].some((k) => k in save.tierWorlds['1']!)).toBe(false)
+    expect('gearMarks' in save.tierWorlds['1']!.wallet).toBe(false)
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
+    const old = newSave('Today', '2026-10-25T12:00:00.000Z', 16)
+    expect(old.tierWorlds['1']).toMatchObject({ gems: {}, gear: {}, wallet: { gearMarks: 0 } })
+    expect('grant' in old.tierWorlds['1']!).toBe(false)
   })
 })

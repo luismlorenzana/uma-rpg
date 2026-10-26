@@ -41,8 +41,8 @@ const B_AT_3: Readonly<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, strin
 const TREES = RPG_ALL_CLASSES.flatMap((c) => rpgClassWeapons(c).map((w) => [c, w] as const))
 
 describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
-  it('runs with the Tier rework’s fight live: seven equipped slots at most', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+  it('runs with the Tier rework’s fight live (on 17 since H82): seven equipped slots at most', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     expect(RPG_ACTIVE_SLOT_GATES).toEqual([10, 20, 30, 40])
     expect(RPG_MAX_ACTIVE_SLOTS).toBe(7)
     expect(RPG_NODES).toHaveLength(750)

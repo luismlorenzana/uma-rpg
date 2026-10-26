@@ -1,8 +1,8 @@
 // v6–v15 fights replay exactly, whatever the Tier rework builds (H64, D200): the frozen fixture's v15 fights, generated on
-// the engine before H64, replayed under the live engine. Since H72 (D210) the live switch is 16, so every rule's default
-// reads the Tier rework's fight (three weapons, the Summoner's Arms hand 0.50): a rules call in the engine that leaned on
-// its default instead of the fight's version would move them. (Until H72 a twin file replayed them with `caps.ts` mocked
-// to 16; this is now that case, live.)
+// the engine before H64, replayed under the live engine. Since H72 (D210) every rule's default reads the Tier rework's
+// fight (three weapons, the Summoner's Arms hand 0.50), and since H82 (D218) its economy (engine v17): a rules call in the
+// engine that leaned on its default instead of the fight's version would move them. (Until H72 and H82 twin files
+// replayed them with `caps.ts` mocked to 16 and 17; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
 import { RPG_ALL_CLASSES, RPG_CLASS_SLOTS, RPG_WEAPON_SLOTS, rpgHand } from '../rules'
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, rpgRework, rpgV2 } from './engine'
@@ -24,9 +24,9 @@ const halves = (a: BattleAction): string[] =>
   a.kind === 'guard' || a.kind === 'limit' ? [] : [...(a.kind === 'skill' ? [a.skill.id] : []), ...(a.pair?.skill ? [a.pair.skill.id] : [])]
 
 describe('the frozen v15 replays (H64)', () => {
-  it('runs with the Tier rework’s fight live (H72)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
-    expect([rpgV2(), rpgRework('fight'), rpgRework('economy')]).toEqual([true, true, false])
+  it('runs with the Tier rework’s fight and economy live (H72, H82)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
+    expect([rpgV2(), rpgRework('fight'), rpgRework('economy'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
     expect(RPG_WEAPON_SLOTS).toBe(3)
     expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)
     expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.58 })
