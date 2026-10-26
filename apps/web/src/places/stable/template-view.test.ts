@@ -18,6 +18,7 @@ const outfit = (style: Grades<keyof Aptitudes['strategy']>, distance: Grades<key
 const C = outfit({ pace: 'A' }, { medium: 'A' }, 90, 102, { wit: 20 })
 const F = outfit({ late: 'A', pace: 'B' }, { mile: 'A' }, 92, 98, { stamina: 20 })
 const E = outfit({ late: 'A' }, { medium: 'A' }, 104, 88, { power: 20 })
+const D = outfit({ late: 'A', end: 'A' }, { long: 'A' }, 104, 88, { power: 20 })
 const A = outfit({ front: 'A' }, { medium: 'A', long: 'A' }, 88, 86, { stamina: 20 })
 const open = { calling: { pick: null, confirmed: false } }
 
@@ -50,6 +51,7 @@ describe('her template on the sheet (H70)', () => {
       { label: 'Stride', value: 'Stayer', source: 'Long A' },
       { label: 'Knack', value: 'Tireless', source: 'Stamina +20%' },
     ])
+    expect(templateCard(D, open, 'summoner')!.readings[0]).toEqual({ label: 'Calling', value: 'Summoner', source: 'Late A, End A' })
   })
 
   it('fills the Racing tab\'s "Her template", Active or no effect', () => {
@@ -92,5 +94,6 @@ describe('her template on the sheet (H70)', () => {
     expect(callingCard(C, { pick: 'spellblade', confirmed: true })).toBeNull()
     expect(callingCard(C, { pick: null, confirmed: true })).toBeNull()
     expect(callingCard(A, open.calling)).toBeNull()
+    expect(callingCard(D, open.calling)).toBeNull()
   })
 })

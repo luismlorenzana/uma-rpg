@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { lastPage } from '../hub/start'
 import { TierVeil } from '../hub/TierVeil'
-import { boot, createAccount, startSyncTriggers, useGame } from '../save/game'
+import { useMaster } from '../master/master'
+import { boot, createAccount, repairCallingRule, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
 import { signInEnabled } from './firebase-config'
 
@@ -56,6 +57,16 @@ async function bootFor({ uid }: { uid: string }): Promise<{ firstLaunch: boolean
   return { firstLaunch: useGame.getState().status === 'first-launch' }
 }
 
+/** The calling rule reads private master data, so its compatibility repair runs once both roster and save are ready. */
+function CallingRuleRepair() {
+  const master = useMaster()
+  const ready = useGame((state) => state.status === 'ready')
+  useEffect(() => {
+    if (ready && master.status === 'ready') void repairCallingRule(master.view.roster)
+  }, [master, ready])
+  return null
+}
+
 export function Root() {
   const auth = useAuth()
 
@@ -71,6 +82,7 @@ export function Root() {
       <UpdateNotice />
       <BootGates auth={auth} boot={bootFor} firstLaunch={(done) => <FirstLaunch onDone={done} />} startPath={() => `/${lastPage()}`}
         words={{ name: 'Uma RPG', tagline: 'A party RPG for one trainer.' }}>
+        <CallingRuleRepair />
         <Outlet />
       </BootGates>
       <TierVeil />

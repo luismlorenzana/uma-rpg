@@ -266,7 +266,7 @@ export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
 }
 /** A just-unlocked Uma; `startClass` (her starting class, her calling: `startingClass`) is written as her class and sets her
  * armor kinds, and without it she starts with no class (her style's) and all-physical. Her calling can name a class her
- * style doesn't (a Wit-led closer's Summoner, a Pace sprinter's Brawler, a Spell Blade; H67), and her calling pick is
+ * style doesn't (a Late + End closer's Summoner, a Pace sprinter's Brawler, a Spell Blade; H67, D220), and her calling pick is
  * stored open, the pre-selection unconfirmed (save v27, H69). Once R2's economy is live she is v28's (H78): every grade
  * G0 and one accessory slot with no family (no armor kinds: the half is her class's, H74), an empty map and only Class
  * Ranks. `engine` (default the live one) builds her in another generation: an old save's fixtures ask for v16's. */

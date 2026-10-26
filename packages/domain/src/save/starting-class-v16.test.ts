@@ -23,7 +23,7 @@ const outfit = (outfitId: string, style: Grades<keyof Aptitudes['strategy']>, di
 // One per calling row, in row order.
 const ROWS = [
   outfit('301', { front: 'A' }, { long: 'A' }, 100, 90),
-  outfit('302', { pace: 'A', late: 'A' }, { medium: 'A' }, 90, 104),
+  outfit('302', { late: 'A', end: 'A' }, { medium: 'A' }, 104, 90),
   outfit('303', { end: 'A' }, { long: 'A' }, 104, 90),
   outfit('304', { pace: 'A' }, { sprint: 'A', mile: 'A' }, 104, 90),
   outfit('305', { pace: 'A' }, { mile: 'A' }, 104, 90),
@@ -39,8 +39,8 @@ describe('the start by calling, engine v16 (H67)', () => {
 
   it('starts her in her calling, where v15 started her in her style’s class', () => {
     expect(ROWS.map((o) => startingClass(o))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
-    expect(ROWS.map((o) => startingClass(o, 15))).toEqual(['brawler', 'mage', 'summoner', 'mage', 'mage', 'mage', 'paladin', 'cleric'])
-    // A Wit-led closer whose best style is Pace, a Pace sprinter with Power, a Late Uma with Power over Wit.
+    expect(ROWS.map((o) => startingClass(o, 15))).toEqual(['brawler', 'paladin', 'summoner', 'mage', 'mage', 'mage', 'paladin', 'cleric'])
+    // A Late + End closer, a Pace sprinter with Power, a Late Uma with Power over Wit.
     expect([ROWS[1]!, ROWS[3]!, ROWS[6]!].map((o) => startingClass(o))).toEqual(['summoner', 'brawler', 'paladin'])
     // Without base stats (never from master data) she reads Power = Wit: magical.
     expect(startingClass({ aptitudes: ROWS[4]!.aptitudes })).toBe('mage')

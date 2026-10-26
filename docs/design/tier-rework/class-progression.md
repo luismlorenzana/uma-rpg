@@ -3,6 +3,9 @@
 > **Approved by the owner, 2026-10-24 (D192): every call CP1–CP43 as written, CP42's Pierce included.** "A fine enough
 > state for now." Changes from here are follow-ups logged against it.
 >
+> **Calling precedence corrected, 2026-10-26 (D220):** Pace owns a tied best Pace style; Late + End is the fixed
+> Summoner signal; pure Late owns the healer choice. Counts and compatibility notes below reflect the live rule.
+>
 > **Follow-ups to the weapon review, 2026-10-24** (logged against D192; no decision changed; [README §7.1](README.md#71-the-cross-check-2026-10-24),
 > XC17–XC18, XC20). weapon-progression.md's revision after the owner's review reaches this doc in wording and numbers
 > only: a Dual's second kind is its **fixed partner**, always of the other weapon group, and Tier 3's Dual line forks
@@ -212,7 +215,7 @@ magical, the two hybrids 70/30 each way as a mirror, two healers who act at half
 | **Brawler** | Physical | 3 Arms | 100 / 0 | Raw physical burst: one foe hard, or a crowd with her Axe | ×1, MP ×1 | 2× | Front runners; Pace sprinters with Power over Wit |
 | **Mage** | Magical | 3 Tomes | 0 / 100 | Raw magic; the element ring | ×1, MP ×1 | 2.4× | Pace chasers, Wit at or over Power, **or picked** ([§10](#10-the-calling-pick)) |
 | **Spell Blade** | Physical hybrid | 2 Arms + 1 Tome | 70 / 30 | The shield chipper: every act a blade and a spell, the blade landing one extra hit | Arms ×0.72 + Tome ×0.44; MP ×0.5 a half | 2.2× | Pace chasers, Power over Wit, **or picked** |
-| **Summoner** | Magical hybrid | 1 Arm + 2 Tomes | 30 / 70 | Crowds: her Tome summon lingers and strikes every foe in farewell. No support | Tome ×0.58 + Arms ×0.48 (*follow-up to D196: was 0.56*); MP ×0.5 a half; the farewell on top | 2.2× | End closers; Wit-led closers |
+| **Summoner** | Magical hybrid | 1 Arm + 2 Tomes | 30 / 70 | Crowds: her Tome summon lingers and strikes every foe in farewell. No support | Tome ×0.58 + Arms ×0.48 (*follow-up to D196: was 0.56*); MP ×0.5 a half; the farewell on top | 2.2× | End closers; Late + End closers |
 | **Paladin** | Healer | 2 Arms + 1 Tome | Half hand | Barriers, Aegis, debuffs, Valkyrie's Oath; heals from ATK | ×0.5, MP ×0.6 | 1.5× | Late surgers, Power over Wit, **or picked** |
 | **Cleric** | Healer | 1 Arm + 2 Tomes | Half hand | Mends, Regen, drain, Rebirth; heals from M.ATK | ×0.5, MP ×0.6 | 1.5× | Late surgers, Wit at or over Power, **or picked** |
 
@@ -288,10 +291,10 @@ Light/Dark Mage and an Elemental Summoner".
 
 ### 2.4 Fight types across the roster
 
-Today's 270 outfits by calling (variance U4): physical 61 (22.6%), physical hybrid 56 (20.7%), magical 46 (17.0%),
-magical hybrid 46 (17.0%), healer 61 (22.6%), which professions' trades rely on (PR1). The calling pick
-([§10](#10-the-calling-pick)) lets 102 Pace Umas move between physical hybrid and magical, each anywhere from 0 to
-37.8%; the Late pick moves no fight type (both choices are healers).
+Today's 270 outfits by calling after D220: physical 61 (22.6%), physical hybrid 56 (20.7%), magical 74 (27.4%),
+magical hybrid 33 (12.2%), healer 46 (17.0%), which professions' trades rely on (PR1). The calling pick
+([§10](#10-the-calling-pick)) lets 130 Pace Umas move between physical hybrid and magical, each anywhere from 0 to
+48.1%; the Late pick moves no fight type (both choices are healers).
 
 ## 3. Weapons: three slots and what fits them
 
@@ -1689,19 +1692,17 @@ the Spell Blade or the Paladin), so a player who never looks gets U4's calling.
 
 | Her racing profile (U4's rows, first that fits) | Calling | Umas today | The pick |
 |---|---|---|---|
-| Best style Front | Brawler | 47 | — |
-| Wit ≥ Power, and A in two of Pace, Late, End | Summoner | 33 | — |
-| Best style End | Summoner | 13 | — |
-| Best style Pace, Power > Wit, best distance Sprint | Brawler | 14 | — |
-| Best style Pace, Power > Wit | Spell Blade | 56 | **Spell Blade** (pre-selected) or Mage |
-| Best style Pace, Wit ≥ Power | Mage | 46 | **Mage** (pre-selected) or Spell Blade |
-| Best style Late, Power > Wit | Paladin | 48 | **Paladin** (pre-selected) or Cleric |
+| Front among her best styles | Brawler | 47 | — |
+| Late and End tied for best, without Front or Pace | Summoner | 20 | — |
+| End among her best styles | Summoner | 13 | — |
+| Pace among her best styles, Power > Wit, best distance Sprint | Brawler | 14 | — |
+| Pace among her best styles, Power > Wit | Spell Blade | 56 | **Spell Blade** (pre-selected) or Mage |
+| Pace among her best styles, Wit ≥ Power | Mage | 74 | **Mage** (pre-selected) or Spell Blade |
+| Best style Late, Power > Wit | Paladin | 33 | **Paladin** (pre-selected) or Cleric |
 | Best style Late, Wit ≥ Power | Cleric | 13 | **Cleric** (pre-selected) or Paladin |
 
-- **163 of 270 Umas get the pick** (102 Pace, 61 Late). The four signal rows stay fixed: their racing profile already
-  names one class (a front runner, an end closer, a Pace sprinter, a Wit-led closer), and they keep the Brawler's and
-  the Summoner's share (opened to the pick, the Brawler could lose 14 callings and the Summoner most of its 33 Wit-led
-  closers).
+- **176 of 270 Umas get the pick** (130 Pace, 46 Late). The four signal rows stay fixed: their racing profile already
+  names one class (a front runner, an end closer, a Pace sprinter, a Late + End closer).
 - **When:** the pick stays open until it is **confirmed**: by a tap, or by her **first won fight** (the owner's "once at
   Uma Level 1, at 0 Class Rank": she has no Class EXP before it). Owned Umas at save v27 start unconfirmed, with the
   pre-selection active, and a dot on the sheet until the owner confirms. Changing an unconfirmed pick is refused while
@@ -1732,7 +1733,7 @@ each, the two trades' head counts in her world ("Forest · Armorer: 3 Umas · Mo
 trade can be filled, and Confirm. "Her first win confirms it."
 
 **Why:** the owner's moment and place; a default that is today's rule, so nothing changes for a player who ignores it;
-the trades stay near a fifth each unless the owner moves them on purpose, and the head counts help him balance them.
+the trade counts stay visible while the owner moves them on purpose, and the head counts help him balance them.
 
 ## 11. What class selection affects
 
@@ -1765,7 +1766,7 @@ the trades stay near a fifth each unless the owner moves them on purpose, and th
 | **README §2** | The six classes; slots by channel (3 · 0 · 2 · 1 · 2 · 1 Arms); the template per tier; weaknesses by kind: twins in Tier 1, narrowing by rank (§4); the calling pick; SB1 applied to class sheets |
 | **weapon-progression.md** | Three slots a class by channel; the owner's defaults (§3.2) and **every class's Tier 2 default and reverse sets** (§7.2, CP40), the weapons a Tier 2 Uma raises; every kind fits every slot of its channel in every tier; the class-switch cost from the defaults (§3.4); foes' single kinds from Tier 2 (regulars) and Tier 3 (sub-bosses), bosses' twins in every tier, which the weapon branches answer; **the branch frame this doc writes to (§3.5, the research note's WR2–WR5): Pure or Dual at Tier 2's G5, a Dual's second kind of its own channel, one Dual in her slots in Tier 2 and two in Tier 3 (Brawler, Mage one), Keen or Tempered in Tier 3, no third branch** (*follow-up to the weapon review, 2026-10-24: weapon-progression fixed the partners, WP32, and forked the Dual line into Tempered or Evolved, WP9; every set keeps a legal Dual*); **accessory slots 1 · 2 · 3, damage-oriented**, and the preset rule (§5.2; *follow-up: the single-kind forms where they pay, WP25; follow-up to D194 (Extra Stats), 2026-10-24: her weapon moons by EP29 in the Halo's place*); the focus (+15% on a group, CP39) beside her accessories in the damage stack (WP31, weapon-progression's); class skills cast through a focus weapon carry its kind, Might, weapon moons and branch (§7.2; *follow-up to D194: was "Halo"*); Break +1 lives only in the trees |
 | **extra-stats-progression.md** | Each class's channels and leans; the hybrids' mirror on full maps, the hands the knob; the twins and single kinds the weapon moons' kind settings answer (EP24–EP26, EP29); Prowess's split by class (EP23); SB1 sheets (§9). *Follow-up to D194, 2026-10-24: was the Halo's kind setting* |
-| **profession-progression.md** | Per Uma, per tier: 3 weapons, 5 armor (one half in Tier 1), accessories 1 · 2 · 3. Her trade follows her calling, which the Pace pick can move between Forest · Armorer and Monster Den · Lapidary (each fight type 0–37.8% for those two, the others fixed); the Late pick moves none |
+| **profession-progression.md** | Per Uma, per tier: 3 weapons, 5 armor (one half in Tier 1), accessories 1 · 2 · 3. Her trade follows her calling, which the Pace pick can move between Forest · Armorer and Monster Den · Lapidary (each fight type 0–48.1% for those two, the others fixed); the Late pick moves none |
 | **Uma Templates pass** | **Done: [uma-templates.md](uma-templates.md) (UT6, UT9, UT11).** The root's Flourish slot (4% of her max HP a fight, UT6) and the signature tip slot on her lead weapon's tree (§6.7, UT9); the affinity retired (§6.9, UT11); her moon's node II on defense (UT10); the calling's pick (§10) as the template's calling for Pace and Late Umas. *Follow-up to D197 (Uma Templates), 2026-10-25: was the slots "now on her affinity kind's tree" and the affinity "revisited in that pass"* |
 | **The world and the Rift** | The campaign keeps today's foe stats (CP4); the generator's weakness rule per tier and rank (§4.1–§4.2); the fronts' draws and **guided builds** (§2.3, §4.3); locks as today; the shield re-measure (§4.4); two Limit Breaks' kinds (§8.3) |
 | **The Skills tab and the Uma sheet** | The tree drawn (CP23) with rank pips (CP32) and the class tree (CP34) with its focus and set (CP39, CP40); the focus mark on her focus trees; the root plate (§6.7); the calling card (§10.2) |
@@ -1825,7 +1826,7 @@ branches and tips v19). See [implementation.md](implementation.md).*
 | Side points | Nothing stored, nothing to refund |
 | Skill Ranks | Nothing stored: read from Class Rank (CP32) |
 | The Paladin's revive | Nothing stored: the node id `paladin-tome-light.3b` keeps its place in a loadout and gains the revive; a loadout holding `paladin-lance.4b` keeps it as Heavy Transfix (CP37) |
-| **The calling pick** (new) | `OwnedUma.calling: { pick, confirmed }`, only for the 163 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed. Everything else of the template stays derived (U13) |
+| **The calling pick** (new) | `OwnedUma.calling: { pick, confirmed }`, for the 176 pick-eligible outfits; owned Umas get the pre-selection, unconfirmed. D220 repairs eligibility after master data loads without moving active classes. Everything else of the template stays derived (U13) |
 | Starting class | New unlocks start in their calling or their pick |
 | Class ids, Class Ranks, Hero seats, Bonds, Class Marks | Unchanged; Gear Marks → Class Marks one for one (GE15) |
 | Accessories, armor, crafted weapons | The weapons doc's (WP27): deleted, refunded raw, paid in Tier 1's demand mix (PP20) |
@@ -1886,7 +1887,7 @@ The time to level, the EXP and rewards per fight and the time to gear an Uma on 
 - **The template:** five matched Umas within 3 points of the template-less party (UT13): the signature +4.3–6.1% matched
   at Lv 50, the Flourish 4% of her max HP a fight, her moon. *Follow-up to D197 (Uma Templates), 2026-10-25: was "The
   affinity: … with the affinity and her moon together" (UT11, UT13).*
-- **The calling pick** moves no EXP, only who works where; the head counts on the card keep the trades near a fifth.
+- **The calling pick** moves no EXP, only who works where; the head counts on the card expose each trade's size.
 
 ## 16. Decisions
 

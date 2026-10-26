@@ -74,8 +74,8 @@ export const KNACK_STAT: Readonly<Record<UmaKnack, StatKey>> = { fleet: 'speed',
 export const CALLING_NO_PICK = 'No pick for her'
 export const CALLING_SET = 'Her calling is set'
 
-// The rule's orders: styles tie Front, Pace, Late, End; distances run shortest first; growth ties go Speed, Stamina,
-// Power, Guts, Wit (after the higher base stat); grades run best first.
+// The rule's orders: Front wins a best-style tie, then Pace owns any remaining tie; distances run shortest first;
+// growth ties go Speed, Stamina, Power, Guts, Wit (after the higher base stat); grades run best first.
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 const DISTANCES = ['sprint', 'mile', 'medium', 'long'] as const
 const STATS: readonly StatKey[] = ['speed', 'stamina', 'power', 'guts', 'wit']
@@ -102,10 +102,22 @@ function atBest<K extends string>(grades: Readonly<Record<K, AptitudeGrade>>, or
   return order.filter((k) => grade(grades[k]) === top)
 }
 
-/** Her calling's row (uma-templates §2.2), the first that fits: 1 best style Front; 2 Wit ≥ Power and A (or S) in two of
- * Pace, Late, End; 3 best style End; 4 best style Pace, Power > Wit, the shortest distance at her best grade Sprint; 5–6
- * best style Pace, Power > Wit or not; 7–8 best style Late, Power > Wit or not. */
+/** Her calling's row (uma-templates §2.2), the first that fits: 1 Front among the best styles; 2 Late and End tied for
+ * best (without Front or Pace); 3 End among the best; 4 Pace among the best, Power > Wit, the shortest distance at her
+ * best grade Sprint; 5–6 Pace among the best, Power > Wit or not; 7–8 Late, Power > Wit or not. */
 export function umaCallingRow(outfit: CallingOutfit): UmaCallingRow {
+  const { strategy, distance } = outfit.aptitudes, { power, wit } = outfit.baseStats
+  const styles = atBest(strategy, STYLES)
+  if (styles.includes('front')) return 1
+  if (styles.includes('pace')) return power > wit ? (atBest(distance, DISTANCES)[0] === 'sprint' ? 4 : 5) : 6
+  if (styles.includes('late') && styles.includes('end')) return 2
+  if (styles.includes('end')) return 3
+  return power > wit ? 7 : 8
+}
+
+/** D220's compatibility reading: the live rule before the best-style precedence fix. Kept only so current saves can
+ * reopen a choice that the old fixed Summoner row had already confirmed, or clear a healer pick that is now fixed. */
+function previousUmaCallingRow(outfit: CallingOutfit): UmaCallingRow {
   const { strategy, distance } = outfit.aptitudes, { power, wit } = outfit.baseStats
   const style = bestKey(strategy, STYLES)
   if (style === 'front') return 1
@@ -113,6 +125,18 @@ export function umaCallingRow(outfit: CallingOutfit): UmaCallingRow {
   if (style === 'end') return 3
   if (style === 'pace') return power > wit ? (atBest(distance, DISTANCES)[0] === 'sprint' ? 4 : 5) : 6
   return power > wit ? 7 : 8
+}
+
+/** Repairs only the choices whose eligibility changed in D220. An explicitly stored suggestion keeps the repair
+ * idempotent after the player confirms it; active class and every other part of the owned Uma stay untouched. */
+export function repairUmaCallingChoice(outfit: CallingOutfit, calling: UmaCalling): UmaCalling {
+  const before = previousUmaCallingRow(outfit), after = umaCallingRow(outfit)
+  const wasPick = UMA_ROW_PICK[before] !== undefined, isPick = UMA_ROW_PICK[after] !== undefined
+  if (!wasPick && isPick && calling.pick === null && calling.confirmed) {
+    return { pick: UMA_ROW_PICK[after]![0], confirmed: false }
+  }
+  if (wasPick && !isPick && (calling.pick !== null || !calling.confirmed)) return { pick: null, confirmed: true }
+  return calling
 }
 
 /** Her calling pick (CP29): null for rows 1–4; for rows 5–8 her row's two classes, the suggested one first. */

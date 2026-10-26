@@ -40,7 +40,7 @@ export function callingSources(outfit: TemplateOutfit): string[] {
   const style = STYLES.reduce((top, s) => (rank(strategy[s]) < rank(strategy[top]) ? s : top))
   switch (umaCallingRow(outfit)) {
     case 1: return [grade('front', strategy.front)]
-    case 2: return [...(['pace', 'late', 'end'] as const).filter((s) => rank(strategy[s]) <= rank('A')).map((s) => grade(s, strategy[s])), powerWit(outfit)]
+    case 2: return [grade('late', strategy.late), grade('end', strategy.end)]
     case 3: return [grade('end', strategy.end)]
     case 4: return [grade('pace', strategy.pace), grade('sprint', distance.sprint), powerWit(outfit)]
     default: return [grade(style, strategy[style]), powerWit(outfit)]

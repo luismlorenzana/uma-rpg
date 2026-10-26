@@ -55,7 +55,7 @@ Aegis, Axe Enfeeble and the Valkyries' revive, which moved to the Paladin and th
 | Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers, Wit at or over Power, or picked | Magical |
 | Spell Blade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | 2.2× her open depth | Pace chasers, Power over Wit, or picked | Physical |
 | Cleric | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers, Wit at or over Power, or picked | Magical |
-| Summoner | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.58 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | Wit-led closers; End closers | Magical |
+| Summoner | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.58 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | Late + End closers; End closers | Magical |
 | Paladin | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | 1.5× her open depth | Late surgers, Power over Wit, or picked | Physical |
 <!-- /live -->
 
@@ -66,11 +66,11 @@ her Tome half the larger, and her farewell strike comes on top, so the two deal 
 
 ## Her calling and her template
 
-**Her calling** (engine v16, CP29, D203): her racing profile names one class, by the first row that fits: a front
-runner is a Brawler; a Wit-led closer (Wit at or over Power, A in two of Pace, Late and End) and an End closer are
-Summoners; a Pace sprinter with Power over Wit (best distance Sprint) is a Brawler; a Pace chaser a Spell Blade with
-Power over Wit, else a Mage; a Late surger a Paladin with Power over Wit, else a Cleric. Her base Power and Wit are at
-her starting stars; Power = Wit counts as Wit.
+**Her calling** (engine v16, CP29, D203, D220): her racing profile names one class. Front wins a tie among her best
+styles and calls her a Brawler; otherwise Pace wins a tie and calls a Power-led sprinter a Brawler, another Power-led
+Uma a Spell Blade, and a Wit-led Uma a Mage. Without Front or Pace, Late tied with End and a pure End closer are
+Summoners; a pure Late surger is a Paladin with Power over Wit, else a Cleric. Her base Power and Wit are at her
+starting stars; Power = Wit counts as Wit.
 
 - **She starts in it.** A new Uma is written in her calling, as her class, and in its armor half: magical for a Mage, a
   Cleric or a Summoner, physical for a Brawler, a Spell Blade or a Paladin. Umas unlocked before v16 keep their class
