@@ -1,5 +1,5 @@
-// The Warehouse's shelves (H80): R2's two, Materials (line by line, raw then refined, tier by tier, no grade) and Made
-// items (the grade lines, then the jewels), with the header's totals; v1's three unchanged.
+// The Warehouse's icon shelves (H106): every held stack on All and its own shelf, ordered by material/made line, with
+// domain grades and highest-grade groups ready for the shared ShelfView.
 import { newTierWorld, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import { warehouseView } from './warehouse-shelves'
@@ -7,42 +7,62 @@ import { warehouseView } from './warehouse-shelves'
 const NOW = '2026-10-25T12:00:00.000Z'
 const world = (items: Record<string, number>, extra: Partial<TierWorld> = {}): TierWorld => ({ ...newTierWorld(NOW, 0), items, ...extra })
 
-describe('R2\'s Warehouse', () => {
+describe('the Warehouse icon grid', () => {
   const view = warehouseView(world({
     'jewel-moon-2': 1, 'cut-quartz': 4, 'iron-ingot': 3, 'gold-ore': 2, 'copper-ore': 100, 'pine-log': 11, 'weapon-gem-g5': 30,
     'jewel-planet-3': 2, 'armor-fittings-g1': 2,
-  }), true)
+  }))
 
-  it('has Materials and Made items, and their totals', () => {
-    expect(view.shelves).toEqual([{ key: 'materials', label: 'Materials' }, { key: 'made', label: 'Made items' }])
+  it('has All, five material lines and Made items, and keeps the header totals unique', () => {
+    expect(view.shelves).toEqual([
+      { key: 'all', label: 'All' }, { key: 'metal', label: 'Metal' }, { key: 'wood', label: 'Wood' },
+      { key: 'vegetables', label: 'Vegetables' }, { key: 'fish', label: 'Fish' }, { key: 'stone', label: 'Stone' },
+      { key: 'made', label: 'Made items' },
+    ])
     expect(view.header).toBe('120 materials · 35 made items')
   })
 
-  it('orders materials by line, raw then refined, tier by tier, each with its tier and band', () => {
-    const materials = view.items.filter((i) => i.shelf === 'materials')
-    expect(materials.map((i) => [i.id, i.line, i.grade])).toEqual([
-      ['copper-ore', 'Tier 1 · low · raw', null], ['gold-ore', 'Tier 2 · low · raw', null], ['iron-ingot', 'Tier 1 · high · refined', null],
-      ['pine-log', 'Tier 1 · low · raw', null], ['cut-quartz', 'Tier 1 · low · refined', null],
+  it('puts every held stack on All and its line shelf or Made items with the same id and stock data', () => {
+    const shelves = new Map<string, string>([
+      ['copper-ore', 'metal'], ['gold-ore', 'metal'], ['iron-ingot', 'metal'], ['pine-log', 'wood'], ['cut-quartz', 'stone'],
+      ['weapon-gem-g5', 'made'], ['armor-fittings-g1', 'made'], ['jewel-planet-3', 'made'], ['jewel-moon-2', 'made'],
+    ])
+    for (const [id, shelf] of shelves) {
+      const copies = view.items.filter((i) => i.id === id)
+      expect(copies.map((i) => i.shelf)).toEqual(['all', shelf])
+      expect(copies[1]).toEqual({ ...copies[0]!, shelf })
+    }
+  })
+
+  it('orders materials by line, raw then refined, tier by tier, with grade and highest groups from domain identity', () => {
+    const materials = view.items.filter((i) => i.shelf === 'metal' || i.shelf === 'wood' || i.shelf === 'stone')
+    expect(materials.map((i) => [i.id, i.line, i.grade, i.group])).toEqual([
+      ['copper-ore', 'Tier 1 · low · raw', null, 'metal-raw'], ['gold-ore', 'Tier 2 · low · raw', null, 'metal-raw'],
+      ['iron-ingot', 'Tier 1 · high · refined', null, 'metal-refined'], ['pine-log', 'Tier 1 · low · raw', null, 'wood-raw'],
+      ['cut-quartz', 'Tier 1 · low · refined', null, 'stone-refined'],
     ])
     expect(materials.every((i) => i.sell === 'items')).toBe(true)
   })
 
-  it('orders made items by line and grade, then Planet and Moon Jewels', () => {
+  it('orders made items by line and grade, then Planet and Moon Jewels, with one group per line', () => {
     const made = view.items.filter((i) => i.shelf === 'made')
-    expect(made.map((i) => [i.name, i.grade, i.line])).toEqual([
-      ['Weapon Gem G5', 5, 'Grade 5 · Raises a weapon one grade'],
-      ['Armor Fittings G1', 1, 'Grade 1 · Raises an armor piece one grade'],
-      ['Planet Jewel III', 5, 'Opens Planet III'],
-      ['Moon Jewel II', 4, 'Opens a moon’s node II'],
+    expect(made.map((i) => [i.name, i.grade, i.line, i.group])).toEqual([
+      ['Weapon Gem G5', 5, 'Grade 5 · Raises a weapon one grade', 'weapon-gem'],
+      ['Armor Fittings G1', 1, 'Grade 1 · Raises an armor piece one grade', 'armor-fittings'],
+      ['Planet Jewel III', 5, 'Opens Planet III', 'jewel-planet'],
+      ['Moon Jewel II', 4, 'Opens a moon’s node II', 'jewel-moon'],
     ])
   })
-})
 
-describe('v1\'s Warehouse', () => {
-  it('keeps its three shelves, its order and its header', () => {
-    const view = warehouseView(world({ 'iron-ore': 2 }, { gems: { 'gem-hp-1': 1 }, gear: { 'greatsword-g1': 3 } }), false)
-    expect(view.shelves.map((s) => s.label)).toEqual(['Materials', 'Star Gems', 'Gear'])
-    expect(view.items.map((i) => [i.shelf, i.id, i.count])).toEqual([['items', 'iron-ore', 2], ['gems', 'gem-hp-1', 1], ['gear', 'greatsword-g1', 3]])
-    expect(view.header).toBe('2 items · 1 Star Gems · 3 unbound gear')
+  it('keeps every shelf when the Warehouse is empty', () => {
+    expect(warehouseView(world({}))).toEqual({
+      shelves: [
+        { key: 'all', label: 'All' }, { key: 'metal', label: 'Metal' }, { key: 'wood', label: 'Wood' },
+        { key: 'vegetables', label: 'Vegetables' }, { key: 'fish', label: 'Fish' }, { key: 'stone', label: 'Stone' },
+        { key: 'made', label: 'Made items' },
+      ],
+      items: [],
+      header: '0 materials · 0 made items',
+    })
   })
 })
