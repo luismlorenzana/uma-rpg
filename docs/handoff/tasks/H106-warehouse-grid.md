@@ -10,9 +10,8 @@ that was the H80 worker's call, not the design's. The owner picked **v1's icon g
 - **shelves by line:** All · Metal · Wood · Vegetables · Fish · Stone · Made items;
 - **the kit's grade chips** (every grade, the highest of each line, one grade), as v1 had them.
 
-Today's materials have no grade (two types a line, §3), so the chips filter the made items only. **H108's graded
-materials** (D219, point 2) will give materials a grade, and then the same chips filter them too. Build it so that
-needs no change here: a stack's grade comes from the domain.
+Materials have no grade (two types a line, profession-progression §3; the owner kept it, D219), so the chips filter
+the made items; a material's row says its tier and band. A stack's grade comes from the domain.
 
 ## Context (read first)
 
@@ -44,11 +43,11 @@ needs no change here: a stack's grade comes from the domain.
     shelf at a time and finds an open stack by `id`, so both entries share the id; check that the stock sheet opens the
     same stack from either shelf.
 - **Order on every shelf:** line by line (the professions' order); raw, then refined; tier by tier. Within a line, low
-  before high today, and by grade once H108 lands. Made items: Weapon Gems, Armor Fittings and Accessory Settings G1–G10,
+  before high. Made items: Weapon Gems, Armor Fittings and Accessory Settings G1–G10,
   then Planet Jewels I–V and Moon Jewels I–V (and the Branch Gem from R3, before Armor Fittings).
 - **Grade chips:** on. A stack's `grade` comes from the domain:
   - made items: their grade;
-  - materials: `null` today, their grade after H108;
+  - materials: `null`;
   - `group` is the stack's line for "Highest", e.g. `weapon-gem`, `metal-raw`.
   - The chips then show only where some stack on the shelf has a grade. That is the kit's behaviour; check it on the
     Metal shelf today, where there should be no chips.
