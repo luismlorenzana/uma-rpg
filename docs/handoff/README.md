@@ -45,7 +45,7 @@ Every foundation packet logs its release's build decisions first.
 | H77 | Professions v3 (dark): ten places with four slots, every material and made-item id, the ladder, every recipe, the trade by calling, the open shop, the Exchange | Claude | L | H64 | Done (`ad8c55b`) |
 | H78 | Save v28 (dark) and the compensation: work settled, gear to grades, the new map, items to the 20 types, Craft Levels to 1, the Speed Ticket grant, `TierWorld.grant` | Claude | L | H69, H74, H75, H76, H77 | Done (`d5428a2`) |
 | H79 | R2's screens, gear and stars (inert): the Gear tab by grade, the accessory picker with ★, targets, "Can upgrade", the Observatory with her moon, the Signature facet | Either | L | H70, H73, H75, H76, H78 | Ready |
-| H80 | R2's screens, the Wilds and the first launch (inert): ten place pages, the Warehouse, the Exchange, the Trade facet, "The Wilds are rebuilt", "Finish all" | Either | L | H70, H73, H77, H78 | Ready |
+| H80 | R2's screens, the Wilds and the first launch (inert): ten place pages, the Warehouse, the Exchange, the Trade facet, "The Wilds are rebuilt", "Finish all" | Either | L | H70, H73, H77, H78 | In progress (main session; D216) |
 | H81 | R2's balance (dark): the full Tier 1 re-baseline, accessory viability, MP, defense, five matched templates, later tiers; the profession pacing ledger | Claude | L | H71, H75, H76, H77 | Done (`5af51fa`) |
 | H82 | **R2's switch:** v16's replays frozen, then engine v17 and save v28 live; the first launch checked on a full-shaped save; the manual | Claude | M | H72, H78, H79, H80, H81 | Waiting |
 
