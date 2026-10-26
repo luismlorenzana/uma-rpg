@@ -60,7 +60,7 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H106 | The Warehouse as an icon grid again: shelves by line (All, Metal, Wood, Vegetables, Fish, Stone, Made items) and the kit's grade chips | ChatGPT | S | H82 | Ready |
-| H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Ready |
+| H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | In progress (the main session) |
 
 **R3. Tier 2's weapons** (engine v18, save **v30**; its packets' "v29" reads v30, D221):
 
