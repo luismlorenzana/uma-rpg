@@ -61,14 +61,21 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 |---|---|---|---|---|---|
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Done (`c07a463`) |
 
-**The farm by line** (the owner, 2026-10-26, D224): every trade gathers, processes and makes its own line, on G1–G10
-materials, Tier 1's focus; one item a making place (Arms Gems, Armor Fittings, Tome Ink, Accessory Settings, jewels).
-Code goes to **ChatGPT, with full autonomy to merge and deploy**. It takes save v30, so R3–R5 move to saves v31–v33 when
-it lands.
+**The farm by line** (the owner, 2026-10-26, D224; the design is
+[farm-by-line.md](../design/tier-rework/farm-by-line.md), FL1–FL24): every trade gathers, processes and makes its own
+line, on G1–G10 materials, Tier 1's focus; one item a making place (Arms Gems, Armor Fittings, Tome Ink, Accessory
+Settings, jewels). Built as R2 was: the rules dark, the screens inert, then a switch. **No art packet:** every icon
+already exists in uma-art (FL15). Code goes to **ChatGPT, with full autonomy to merge and deploy**. H112 takes save
+v30, so R3–R5 move to saves v31–v33 when it lands.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H109 | The farm by line: ten grades a line from uma-art, processing at each making place, Tome Ink for Tomes, one-line recipes, make at ¾ of a gather, the Exchange by grade, save v30 | ChatGPT | L | H82 | Ready |
+| H109 | The rules (dark): the switch, fifty types by line and grade, Tome Ink's ids, one-line recipes, each making place processing its line, making at ¾ of a gather, gear items by channel, targets, the Exchange, the pacing ledger | ChatGPT | L | H82 | Ready |
+| H110 | Save v30 (dark): the settle step shared with `toV28`, `toV30` (R2's types to G1 and G6), the v30 parse, a full-shaped v29 fixture | ChatGPT | M | H109 | Waiting |
+| H111 | The screens (inert): the place pages' Process and Make groups and sizes, gathering tiles, quick looks, the Exchange's line tabs, the Warehouse's grades, Tome Ink's icon and words, the Gear tab's items | ChatGPT | L | H109 | Waiting |
+| H112 | **The switch:** `toV30` chained and save v30 live, R2's farm deleted, the API test, the manual, R3–R5's save numbers, a scratch migration in the pull request | ChatGPT | M | H110, H111 | Waiting |
+
+**Waves:** 1) H109 → 2) H110 and H111 in parallel (domain save files against web files) → 3) H112.
 
 **R3. Tier 2's weapons** (engine v18, save **v30**; its packets' "v29" reads v30, D221):
 
