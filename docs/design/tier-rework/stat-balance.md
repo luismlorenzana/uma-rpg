@@ -796,6 +796,48 @@ At v16 (Tier 1) and v17 (Tier 2's toolbox), README §9.5's items with this pass'
 >   Tier 3 Lv 10 · 50; pace 0.86–0.90 · 1.19–1.32 · 0.84–0.90 and 0.85–0.90 · 0.83–0.90.
 > - **The Rift's Tier 1 fronts** (item 3's fronts): [rift.md §11](../rift.md#tier-rework-r1-engine-v16-h71-d207).
 
+> **Measured, R2 (H81, D215), 2026-10-25** (follow-up logged against D196, values only). Engine v17 with explicit v17
+> inputs, never the switch: the balance party graded on curve (`onCurveGrade` on her three weapons, five armor slots and
+> her one accessory slot, values × tier), WP25's Tier 1 forms, the core map her level opens with Prowess at her split, Class
+> Rank on the real pace, no MP accessory, no template; against v15 ("today's") and v16 (R1) on the same stages; first try
+> on Auto, 32 seeds (`world/balance-v17.test.ts`, `rift/balance-v17.test.ts`, H51's tables with `SIM_ENGINE=17`).
+>
+> - **Item 1, the re-baseline: holds.** Every Tier 1 stage won 100% at Lv 10–50 on every engine, with the Cleric or the
+>   Paladin: **0 points**. The party's damage a round against R1's 0.94–1.01, against today's at Lv 50 **0.78 · 0.77 ·
+>   0.90** (R1's own 0.80 · 0.80 · 0.93): what was slower is R1's. Her damage a turn on v17 ÷ v16, Lv 10 → 50: the Mage
+>   1.00–1.04 and the Cleric 0.98–1.02 inside 2%; the Summoner 0.95–0.98 (the model's +16% gone); the Brawler 0.93–1.02,
+>   the Paladin 0.94–1.00, **the Spell Blade 0.91–1.00** (0.91–0.93 from Lv 30): the Pendant's 14 on three kinds against
+>   R1's Orb 34 on her Katana, where Auto spends most of her damage. No foe-budget term (the target is in points, as R1's).
+>   Skill Ranks at Lv 50: the party's damage a round at Class Rank 50 ÷ 44 (her depth-5 skills at Rank 5 against 3) 1.03.
+> - **Item 2, the mirror: misses at Lv 50 (93%), as R1's.** Summoner ÷ Spell Blade a turn on the world's regular stages
+>   **103 · 103 · 93%** at Lv 10 · 30 · 50; splits Spell Blade 64 · 74 · 72% physical, Summoner 67 · 65 · 68% magical. By
+>   context (the Horde's build): Iron 69%, Arcane 121%, Duel 102%, Horde 86% (R1 61, 112, 88, 83). Her Arms hand stays
+>   0.50, SB11's top: no v17 row. Paladin ÷ Cleric healing and absorbed Barriers **112%** a fight, 111% a round (R1 111%).
+> - **Item 5, MP: holds with the regen at 1.0% a depth** (`RPG_BASE_MP_REGEN_V17`, v17 only; 0.9% gave 0.84× at Lv 50).
+>   A region on Auto with one Spring clears **11.9 · 12 · 12 of 12** (128 runs a level); its last four stages' pace
+>   against today's **0.93 · 0.95 · 0.90**; MP's drag there 1.57 · 1.59 · 1.22 (today's 1.62 · 1.27 · 1.24). No deep
+>   act refunded by a round: a healer's **94%** (Lv 49) the most, the damage dealers' 37–50%. Vigor's and legs' MP kept.
+>   Tier 2 and 3's first levels lead Tier 1's on MP by **1.07 and 1.01** (drag at Lv 10), not the model's 1.14 and 1.20.
+> - **Item 6, defense: holds.** A regular's 100% hit takes **19.0 · 18.5 · 18.2%** of the on-curve Brawler's HP at each
+>   tier's Lv 50 (the code's level one lower: SB2), 16.7 · 16.2 · 16.0% through her feet's evasion; Tier 1 by level
+>   18.4 · 17.4 · 17.3 · 17.9 · 19.0%. Armor's HP a grade kept.
+> - **Item 7, accessories: misses, after the Orb's step.** Measured on region runs at Lv 50 with MP carried, WP §5.7's
+>   "left on all region long" (on a fresh bar Auto never Attacks, so the Bell gives 0): the Orb was the best form in
+>   **19** of 24 cells, so its values stepped down ×0.8 (`ORB_T1` 1, 2, 3, 5, 8, 10, 14, 18, 23, 27); then **Orb 16 ·
+>   Pendant 5 · Bell 3 · Insignia 0**. Auto spends most of an Uma's damage on her lead kind, which a one-kind form serves;
+>   the Insignia's long fights are boss stages whose guards and adds take much of her damage. Parity, Brawler − Mage as
+>   played: Pendant −0.7, Orb +0.3, Insignia −0.1 points; the Bell +7.8 (she Attacks 30% of her turns, a Mage 5%).
+> - **Item 8, templates: holds but for the mirror at Lv 10–30.** The signature, matched in her preset's own family
+>   over a region run at Lv 50: Brawler +4.9%, Mage +3.9%, Spell Blade +8.2%, Summoner +6.7%, Paladin +5.1%, Cleric +6.6%
+>   (mean +5.9%; a hybrid uses both its ATK and its M.ATK, as §8's table has it): the rate stays 0.2. Five matched Umas
+>   **0 points** off the template-less party at Lv 10 · 30 · 50. The mirror with both hybrids matched 104–107% at Lv
+>   10–30, 97% at Lv 50. The Flourish's 4% is its cap: on the world's Lv 50 stages it mends 0.5% (Even pace) and 0.9%
+>   (Late reserve) of her max HP a fight, Clean break's Barrier 4%. Gritty's +1.6 Limit start reaches a fight as **1**
+>   (the gauge is whole, `applyPoints` rounds down for every generation): kept, identity more than power (UT10).
+> - **Tier 2 and 3 worlds on Tier 1's shape:** rounds a fight **0.90–1.02** of Tier 1's at Lv 10–50 for regulars,
+>   elites and bosses; each source's share of each stat within **2.2 points** of Tier 1's at Lv 50 (SB1).
+> - **The Rift's Tier 1 fronts:** [rift.md §11](../rift.md#tier-rework-r2-engine-v17-h81-d215).
+
 ## 13. If approved: the follow-ups by doc
 
 Each approved doc is edited only as a follow-up logged against its D-row ("Follow-up to the stat balancing, SBn"); no

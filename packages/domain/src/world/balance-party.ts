@@ -9,13 +9,17 @@ import { rpgNode } from '../rpg/catalog'
 import { rpgWeaponKind, type RpgDamageKind } from '../rpg/kinds'
 import type { RpgLines } from '../rpg/node-identity'
 import {
-  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
+  learnRpgNode, projectRpgStats, RPG_CLASS_ARMOR, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
   type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/stars'
 import { CORE_NODES, mapNodeGate, mapPoints } from '../economy/planet'
-import type { GearTier } from '../economy/grades'
+import { armorHalf, gradeMight, gradePoints, newGrades, type GearTier, type UmaGrades } from '../economy/grades'
+import { accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
+import { rpgPartyAllies, type RpgPartyMember } from '../rpg/campaign/run'
+import { classPresetV3, presetAccessory, type PresetAccessory } from '../save/presets'
+import { KNACK_FAMILY, STRIDE_FLOURISH, umaFlourishActive, type UmaKnack, type UmaStride } from '../roster/template'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
 import { ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext } from '../economy/ranks'
@@ -109,12 +113,61 @@ export function onCurveStars(classId: RpgClass, level: number, engine: number = 
 export interface BalanceOptions {
   gear?: boolean; stars?: boolean; heroes?: boolean; classRank?: number; tier?: number; engine?: number; support?: string | null
   lines?: RpgLines; weapons?: readonly RpgWeapon[]
+  /** From v17 (H81, README §9.5 item 8): a matched member's invented template (the balance party has none, XR12). */
+  template?: BalanceTemplate
+  /** From v17 (H81, item 7): her accessory slot's form instead of the preset's, or null for an empty slot. */
+  accessory?: PresetAccessory | null
+}
+
+/** An invented template for a matched member (UT3's three readings, chosen rather than read from an outfit): her knack
+ * names her signature family (UT7) and her moon's node I; her calling her moon's node II (its channel's defense) and, while
+ * she fights as it, her Flourish by her stride (UT6; Even pace by default). */
+export interface BalanceTemplate { knack: UmaKnack; calling: RpgClass; stride?: UmaStride }
+
+/** Her moon's nodes her level opens (UT10): node I at Lv 16, node II at Lv 36 (Moon Jewels II and IV). */
+const templateNodes = (level: number): string[] => ['template:1', 'template:2'].filter((id) => mapNodeGate(id) <= level)
+
+/**
+ * The v17 member (R2, H81; D208 point 14): her grades on curve (`onCurveGrade`: her three weapons, her five armor slots
+ * on her class's half, her one accessory slot), values × her tier; her slot in WP25's Tier 1 form (`classPresetV3`: the
+ * Brawler's Bell on her Greatsword, a Pendant for the Mage, the Spell Blade and the Paladin, the Summoner's Orb on Light,
+ * the Cleric's on Ice), or, matched, her family by UT8's swap (`presetAccessory`); the full core her level opens with
+ * Prowess at her split, and, matched, her moon's two nodes and her signature while she wears her family and her Flourish
+ * as her calling. Built by the game's own path (`rpgPartyAllies` at the engine), so her input is what a graded save's
+ * fight would freeze; full MP, the base regen the engine's (SB18), no MP accessory.
+ */
+function v17Member(classId: RpgClass, profile: RpgProfile, loadout: RpgNodeRef[], inherits: RpgPartyMember['inherits'], options: BalanceOptions,
+  engine: number): BattleAlly {
+  const tier = Math.min(3, Math.max(1, profile.tier)) as GearTier
+  const level = profile.level
+  const grade = onCurveGrade(level)
+  const template = options.template
+  const family = template ? KNACK_FAMILY[template.knack] : null
+  const form = options.accessory !== undefined ? options.accessory
+    : template ? presetAccessory(classId, profile.weapons, family, engine) : classPresetV3(classId, engine).accessory
+  const grades: UmaGrades = options.gear ? {
+    weapons: Object.fromEntries(profile.weapons.map((w) => [w, { grade }])),
+    armor: Object.fromEntries(ARMOR_SLOTS.map((slot) => [slot, { grade }])),
+    accessories: [{ grade, family: form?.family ?? null, form: 'base', ...(form?.kind ? { kind: form.kind } : {}) }],
+  } : newGrades(tier)
+  const moon = template ? { knack: template.knack, channel: RPG_CLASS_ARMOR[template.calling] } : undefined
+  const open = options.stars ? [...onCurveStars(classId, level, engine), ...(template ? templateNodes(level) : [])] : []
+  const points = addPoints(options.gear ? gradePoints(grades, armorHalf(classId), tier) : noPoints(), mapPoints(open, classId, tier, moon))
+  const signature = family && signatureWorn(grades, family) ? signatureBonus(level, tier) : 0
+  const flourish = template && umaFlourishActive({ calling: template.calling }, classId) ? STRIDE_FLOURISH[template.stride ?? 'middle'] : undefined
+  const member: RpgPartyMember = {
+    profile, loadout, points, might: options.gear ? gradeMight(grades, profile.weapons, tier) : {},
+    accessory: accessoryParts(grades.accessories[0], profile.weapons, tier), ...(signature ? { signature } : {}),
+    ...(inherits ? { inherits } : {}), ...(flourish ? { flourish } : {}),
+  }
+  return rpgPartyAllies([member], (p, pts) => applyPoints(projectRpgStats(p, engine), pts ?? noPoints()).stats.mp, engine)[0]!
 }
 
 /** An average outfit of a class at a level: side skills learned deepest first, the deepest skills equipped one weapon at a
  * time, and, on curve, her gear, Extra Stats and an inherited Limit Break. From v16 (H65) the Tier rework's Uma: her three
  * default weapons (or `weapons`), no side skills, every tree on line A (or `lines`), her held skills and v16's slots
- * (seven by Lv 40); her Class Rank on the real pace (`balanceClassRank`, H71) unless `classRank` says otherwise. */
+ * (seven by Lv 40); her Class Rank on the real pace (`balanceClassRank`, H71) unless `classRank` says otherwise. From v17
+ * (H81) R2's Uma, graded and built by the game's own path (`v17Member`). */
 export function balanceMember(classId: RpgClass, i: number, level: number, options: BalanceOptions = {}): BattleAlly {
   const tier = options.tier ?? 1
   const engine = options.engine ?? BATTLE_ENGINE_VERSION
@@ -140,6 +193,10 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
       if (next && loadout.length < slots) loadout.push(next)
     }
   }
+  // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23).
+  const bond = Math.min(10, Math.floor(level / 2.3))
+  const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined
+  if (rpgRework('economy', engine)) return v17Member(classId, profile, loadout, inherits, options, engine)
   const grade = onCurveGrade(level)
   const kit = kitOf(classId, engine)
   const equipped: Partial<Record<GearSlot, string>> = {}
@@ -151,9 +208,7 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
     const accessories = options.support === undefined ? [orb, ...kit.accessories.slice(1)] : [orb, options.support]
     accessories.forEach((type, k) => { if (type) equipped[`accessory-${k + 1}` as GearSlot] = `${type}-g${grade}` })
   }
-  // From v17 her on-curve map is v3's, worth its tier's values (H76); H81 builds the rest of the v17 member.
-  const stars = !options.stars ? noPoints() : rpgRework('economy', engine)
-    ? mapPoints(onCurveStars(classId, level, engine), classId, tier as GearTier) : starPoints(onCurveStars(classId, level, engine))
+  const stars = options.stars ? starPoints(onCurveStars(classId, level, engine)) : noPoints()
   const points = addPoints(options.gear ? equippedPoints(equipped) : noPoints(), stars)
   const boosted = applyPoints(projectRpgStats(profile, engine), points)
   const a = equippedAccessories(equipped, engine)
@@ -161,9 +216,6 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   const might: Partial<Record<RpgDamageKind, number>> = options.gear ? equippedMight(equipped, profile.weapons) : {}
   if (v2) for (const [k, n] of Object.entries(a.orbMight ?? {})) might[k as RpgDamageKind] = (might[k as RpgDamageKind] ?? 0) + n
   const effects = accessoryFightFields(a, boosted.stats.hp)
-  // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23).
-  const bond = Math.min(10, Math.floor(level / 2.3))
-  const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined
   return { id: profile.outfitId, classId, weapons: profile.weapons, tier, level, stats: boosted.stats, tree: profile.tree, legacy: [],
     ...(lines ? { lines } : {}), loadout, mp: boosted.stats.mp, classRank: profile.classRank, ...(Object.keys(might).length ? { might } : {}), ...effects,
     ...(!v2 && a.orbs.length ? { orbs: [...a.orbs] } : {}), ...(boosted.evasion > 0 ? { evasion: boosted.evasion } : {}),

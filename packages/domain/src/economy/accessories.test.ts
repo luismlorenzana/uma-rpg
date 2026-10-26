@@ -22,11 +22,11 @@ describe('the flat forms (WP20, WP22)', () => {
     expect(row('pendant', 3)).toEqual([3, 3, 5, 5, 10, 13, 18, 23, 31, 36])
   })
 
-  it('gives the Orb’s rows for Tiers 1–3 exactly, Tier 1 v2’s Orb from G1', () => {
-    expect(ORB_T1).toEqual(ORB_OFFENSE_BY_GRADE.slice(1))
-    expect(row('orb', 1)).toEqual([1, 2, 4, 6, 10, 13, 18, 23, 29, 34])
-    expect(row('orb', 2)).toEqual([2, 4, 7, 11, 18, 23, 32, 41, 52, 61])
-    expect(row('orb', 3)).toEqual([3, 5, 10, 16, 26, 34, 47, 60, 75, 88])
+  it('gives the Orb’s rows for Tiers 1–3 exactly, Tier 1 v2’s Orb from G1 a step down (×0.8, R2’s balance, H81)', () => {
+    expect(ORB_T1).toEqual(ORB_OFFENSE_BY_GRADE.slice(1).map((n) => Math.round(0.8 * n)))
+    expect(row('orb', 1)).toEqual([1, 2, 3, 5, 8, 10, 14, 18, 23, 27])
+    expect(row('orb', 2)).toEqual([2, 4, 5, 9, 14, 18, 25, 32, 41, 49])
+    expect(row('orb', 3)).toEqual([3, 5, 8, 13, 21, 26, 36, 47, 60, 70])
   })
 
   it('has no flat value at G0, nor for the Bell and the Insignia', () => {
@@ -58,8 +58,8 @@ describe('accessoryParts', () => {
   })
 
   it('puts an Orb on its kind, even one she doesn’t wield', () => {
-    expect(accessoryParts(slot('orb', 10, 'greatsword'), brawler, 1)).toEqual({ flat: { greatsword: 34 } })
-    expect(accessoryParts(slot('orb', 10, 'dark'), brawler, 3)).toEqual({ flat: { dark: 88 } })
+    expect(accessoryParts(slot('orb', 10, 'greatsword'), brawler, 1)).toEqual({ flat: { greatsword: 27 } })
+    expect(accessoryParts(slot('orb', 10, 'dark'), brawler, 3)).toEqual({ flat: { dark: 70 } })
   })
 
   it('gives a Bell only on a kind she slots', () => {

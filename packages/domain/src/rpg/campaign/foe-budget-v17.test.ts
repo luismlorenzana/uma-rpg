@@ -62,7 +62,8 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
     expect(v17.some((n, i) => n > v16[i]!)).toBe(true)
     const roster = packRoster()
     const ctx = (tier: number): RiftContext => ({ tier, runId: `t${tier}-r1`, roster, defeated: new Set() })
-    const ref = { kind: 'front', front: 'iron', stage: 12 } as const
+    // Arcane's champion: R2's balance (H81) tuned Iron's and the Horde's champions for v17, so the budget is read where it alone moves.
+    const ref = { kind: 'front', front: 'arcane', stage: 12 } as const
     const riftHp = (tier: number, engine: number) => riftFight(ctx(tier), ref, engine).enemies.map((e) => e.stats.hp)
     expect(riftHp(1, 17)).toEqual(riftHp(1, 16))
     expect(riftHp(2, 17).every((n, i) => n > riftHp(2, 16)[i]!)).toBe(true)

@@ -699,6 +699,9 @@ offense prices is the sustain the healers' focus adds. Armor stays as drafted; i
 - **What the simulation checks** (README §9.5 item 1): the on-curve party, with new armor and its Tier 1 accessory
   preset, wins every Tier 1 stage within 3 points of today's table. If survival lands outside, armor's per-grade HP is
   the knob (+15 a grade), not the foes.
+- **Measured by H81 (D215):** every Tier 1 stage won 100% on v17 as today (0 points); a regular's 100% hit 19.0 · 18.5 ·
+  18.2% of the on-curve Brawler's HP at each tier's Lv 50 (16.7 · 16.2 · 16.0% through her feet's evasion): armor's HP
+  kept ([stat-balance §12](stat-balance.md#12-what-the-fight-simulation-must-confirm)).
 
 ### 4.4 Her sheet at Lv 50
 
@@ -1097,6 +1100,11 @@ counts don't move.*
 **The simulation checks** (README §9.5 item 7): every base wins somewhere in Tier 1 and every branch in Tiers 2 and 3,
 and no form is the best in more than half of its tier's class-and-context cells; if one is, its per-grade values step
 down first.
+
+**Measured by H81 (D215):** on region runs at Lv 50 with MP carried, the Orb was the best base form in 19 of 24 cells, so
+its Tier 1 values stepped down ×0.8 (G10 34 → 27); then Orb 16 · Pendant 5 · Bell 3 · Insignia 0 (Auto spends most of an
+Uma's damage on her lead kind; the Insignia's long fights are boss stages with guards and adds). Kept at one step: a
+second costs the Summoner's and the Cleric's presets ([stat-balance §12](stat-balance.md#12-what-the-fight-simulation-must-confirm)).
 
 ### 5.8 Presets per class and tier (WP25)
 

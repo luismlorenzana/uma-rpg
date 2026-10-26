@@ -182,11 +182,22 @@ const RIFT_TUNING_V16: RiftTuning = {
   convergence: -0.1,
 }
 
+/**
+ * R2's Rift, Tier 1 (engine v17; R2's balance, H81, D215): v16's numbers for the v17 guided builds (graded in WP25's
+ * forms, no MP accessory, the base regen at 1.0% a depth), which won Iron's champion 56% and the Horde's 77% on v16's
+ * against rift.md §11's 60–70%: Iron's champion ×1.2 → ×1.15, the Horde's ×1.3 → ×1.4 (65% and 67% at 96 fights each).
+ * Every other number, face, rank and count is v16's.
+ */
+const RIFT_TUNING_V17: RiftTuning = {
+  ...RIFT_TUNING_V16,
+  champions: { ...RIFT_TUNING_V16.champions, iron: { hp: 1.15, offense: 1.15 }, horde: { hp: 1.4, offense: 1.4 } },
+}
+
 /** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, the Tier rework's
- * from v16 (H66), read through the fight's version so a fight started before the switch keeps its generation's foes.
+ * from v16 (H66) and R2's from v17 (H81), read through the fight's version so a fight started before the switch keeps its generation's foes.
  * Faces, ranks and counts are the same in all, so the run's face allocation (`picker.ts`) holds for any. */
 export const riftTuning = (engine: number = BATTLE_ENGINE_VERSION): RiftTuning =>
-  (rpgRework('fight', engine) ? RIFT_TUNING_V16 : rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
+  (rpgRework('economy', engine) ? RIFT_TUNING_V17 : rpgRework('fight', engine) ? RIFT_TUNING_V16 : rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
 
 /** One foe of a Rift stage, before faces, weaknesses and levels. */
 export interface RiftSlot {

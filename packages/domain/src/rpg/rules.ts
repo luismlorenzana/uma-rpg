@@ -9,7 +9,7 @@
 // follows the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live
 // generation's.
 import { STATS, type Stats } from '@luismlorenzana/uma-data'
-import { BATTLE_ENGINE_VERSION, RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, rpgRework, rpgV2 } from './battle/caps'
+import { BATTLE_ENGINE_VERSION, RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, RPG_BASE_MP_REGEN_V17, rpgRework, rpgV2 } from './battle/caps'
 import {
   rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgNodeIdentity as rpgNode, rpgNodeLine, rpgSideNodeLevel, rpgTreeOf, type RpgBranch,
   type RpgLines, type RpgNodeIdentity as RpgNode,
@@ -358,7 +358,8 @@ export const rpgOpenDepth = (classRank: number): number => RPG_DEPTH_GATES.filte
  * The engine reads it from her frozen input, the sheet from her stats: one number. */
 export function rpgBaseMpRegen(maxMp: number, classRank: number, engine: number = BATTLE_ENGINE_VERSION): number {
   if (!rpgRework('fight', engine)) return 0
-  return Math.max(1, Math.round(maxMp * RPG_BASE_MP_REGEN * Math.min(RPG_BASE_MP_REGEN_DEPTHS, rpgOpenDepth(classRank))))
+  const share = rpgRework('economy', engine) ? RPG_BASE_MP_REGEN_V17 : RPG_BASE_MP_REGEN
+  return Math.max(1, Math.round(maxMp * share * Math.min(RPG_BASE_MP_REGEN_DEPTHS, rpgOpenDepth(classRank))))
 }
 
 /** The core skills an open depth gives in these trees, shallowest first. */

@@ -1,6 +1,7 @@
 // What a fight did, read from its cues (R1's balance, H71): each Uma's damage by channel and turn, each skill half's casts,
 // a healer's mends and absorbed Barriers, the party's damage taken, rounds to each foe's first Break from her arrival,
-// and the foes' charged moves (armed, cancelled). Shared by `world/balance-v16.test.ts` and `rift/balance-v16.test.ts`
+// and the foes' charged moves (armed, cancelled); from H81 each Uma's Attacks and Flourish mends. Shared by
+// `world/balance-v16.test.ts`, `rift/balance-v16.test.ts` and their v17 files
 // (H60's and H63's own tallies stay in `rift/balance-v15.test.ts`). Test support only: nothing in the game imports it.
 import type { BattleAction, BattleAlly, BattleCue, BattleState, BattleStep, EnemyRank } from '../rpg/battle/types'
 import { rpgNode } from '../rpg/catalog'
@@ -13,6 +14,8 @@ export interface UmaLog {
   heal: number
   /** Her damage on sub-boss and boss rank foes, and her turns while one stands (a one-foe line's context). */
   big: number; bigTurns: number
+  /** Her acts that were an Attack (an accessory Bell's trigger, H81), and the HP her Flourish mended her (UT6). */
+  attacks: number; flourish: number
 }
 /** A skill half's casts: how many, and the damage its kind's hits dealt (her farewell apart). */
 export interface CastLog { n: number; dmg: number }
@@ -32,7 +35,7 @@ export interface FightLog {
   charges: { armed: number; cancelled: number }
 }
 const umaLog = (classId: RpgClass): UmaLog => ({ classId, physical: 0, magical: 0, limitPhysical: 0, limitMagical: 0, farewell: 0, turns: 0, heal: 0,
-  big: 0, bigTurns: 0 })
+  big: 0, bigTurns: 0, attacks: 0, flourish: 0 })
 const breakLog = (): BreakLog => ({ foes: 0, broke: 0, rounds: 0, roundsAll: 0 })
 export const fightLog = (): FightLog => ({ fights: 0, wins: 0, rounds: 0, umas: {}, casts: {}, absorbed: 0, taken: 0,
   breaks: { regular: breakLog(), 'sub-boss': breakLog(), boss: breakLog() }, charges: { armed: 0, cancelled: 0 } })
@@ -62,6 +65,7 @@ export function logFight(allies: readonly BattleAlly[], into: FightLog): { obser
     if (!ally) return
     const uma = into.umas[ally.id]!
     uma.turns++
+    if (action.kind === 'attack') uma.attacks++
     const bigFoes = new Set(before.units.filter((u) => u.side === 'enemy' && u.hp > 0 && (rankOf.get(u.id) ?? 'regular') !== 'regular').map((u) => u.id))
     if (bigFoes.size) uma.bigTurns++
     // The halves of her act and their kinds: a skill's primary kind, or an Attack's weapon's.
@@ -81,6 +85,7 @@ export function logFight(allies: readonly BattleAlly[], into: FightLog): { obser
     for (const c of step.cues as BattleCue[]) {
       if (c.kind === 'move') foePhase = true
       if (c.kind === 'heal' && byId.get(c.actorId) && c.label !== 'Rally' && c.label !== 'Breather' && c.label !== 'Flourish') into.umas[c.actorId]!.heal += c.amount ?? 0
+      if (c.kind === 'heal' && c.label === 'Flourish' && into.umas[c.targetId]) into.umas[c.targetId]!.flourish += c.amount ?? 0
       if (c.kind === 'hit' && byId.has(c.targetId) && c.actorId !== c.targetId && c.channel !== 'status') {
         into.taken += c.amount
         const m = c.label ? BARRIER.exec(c.label) : null
@@ -125,6 +130,7 @@ export const bigPerTurn = (u: UmaLog | undefined): number => (u && u.bigTurns ? 
 const addUma = (m: UmaLog, u: UmaLog): void => {
   m.physical += u.physical; m.magical += u.magical; m.limitPhysical += u.limitPhysical; m.limitMagical += u.limitMagical
   m.farewell += u.farewell; m.turns += u.turns; m.heal += u.heal; m.big += u.big; m.bigTurns += u.bigTurns
+  m.attacks += u.attacks; m.flourish += u.flourish
 }
 export function byClass(log: FightLog, classId: RpgClass): UmaLog | undefined {
   const list = Object.values(log.umas).filter((u) => u.classId === classId)

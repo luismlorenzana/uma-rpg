@@ -791,6 +791,9 @@ Uma, never an item ([stat-balance §7](stat-balance.md#7-mp-after-the-regen-acce
   D196: was legs, then Vigor's MP rate, then the Flourish (SB14 re-ranked them: Vigor's MP ×2 buys 10% more deep casts
   a bar, legs +1 a grade 3%).* *Follow-up to D197 (Uma Templates), 2026-10-25: "the Flourish's twists are the
   template's" removed: the Flourish is HP now (UT6), and no template piece touches MP.*
+  **Measured by H81 (D215):** with no MP accessory and the regen at **1.0% a depth** (R2's value, 0.9% in R1), a region
+  clears 11.9–12 of 12 and its last four stages run 0.93 · 0.95 · 0.90× today's pace at Lv 10 · 30 · 50; no deep act
+  refunded by a round (a healer's 94% the most). Vigor's and legs' MP kept.
 
 ## 10. The foe budget
 
