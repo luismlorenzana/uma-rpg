@@ -62,7 +62,7 @@ owner's review, before its build packets are written.
 |---|---|---|---|---|---|
 | H106 | The Warehouse as an icon grid again: shelves by line (All, Metal, Wood, Vegetables, Fish, Stone, Made items) and the kit's grade chips | ChatGPT | S | H82 | Ready |
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Ready |
-| H108 | **Materials by grade, the design:** G1–G10 a line with tier-specific families, the art they take, gates, recipes, times, the Exchange; the save step that turns every material into Speed Tickets (only tickets, D219); the version re-plan for R3–R5. Framing decided (D219 point 5): a tier's own families only; uma-art's sixteen families mapped first, new art the fallback. For the owner's review; its build packets follow | Claude | M | H82 | Ready |
+| H108 | **Materials by grade, the design:** G1–G10 a line with tier-specific families, the art they take, gates, recipes, times, the Exchange; the save step that turns every material into Speed Tickets (only tickets, D219); the version re-plan for R3–R5. Framing decided (D219 point 5): a tier's own families only; uma-art's sixteen families mapped first, new art the fallback. For the owner's review; its build packets follow | Claude | M | H82 | In review: [materials-by-grade.md](../design/tier-rework/materials-by-grade.md) |
 
 **R3. Tier 2's weapons** (engine v18, save v29; **H108's materials design may move its save number**):
 
