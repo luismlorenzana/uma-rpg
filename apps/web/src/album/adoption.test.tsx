@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { heroLimitsOf, ITEM_FAMILIES, placeById } from '@rpg/domain'
+import { heroLimitsOf, placeById } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { buildCampaign } from '../battle/campaign'
 import { FeaturedSheet } from '../hub/Featured'
@@ -61,9 +61,10 @@ describe('SB4 uses the shared album in every RPG choice', () => {
   })
 
   it('marks an Uma who can upgrade on the Stable tile, and the Can upgrade quick pick shows only her', async () => {
-    // 81001 alone has an open Extra Stats node she hasn't switched on (no skill costs points from engine v16).
+    // 81001 alone has her accessory slot at G1 with no family yet: she can choose one (R2's grades, live since H82).
     const aster = fixture.world.umas['81001']!
-    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...aster, stars: { unlocked: ['moon:atk:1'], active: [] } } } }
+    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...aster,
+      gear: { weapons: {}, armor: {}, accessories: [{ grade: 1, family: null, form: 'base' }] } } } }
     show(<StablePage {...page('stable')} />)
     expect(within(screen.getByRole('button', { name: 'Aster, Lv 3' })).getByRole('img', { name: 'Can upgrade' })).toBeDefined()
     expect(within(screen.getByRole('button', { name: 'Beryl, Lv 20' })).queryByRole('img', { name: 'Can upgrade' })).toBeNull()
@@ -124,23 +125,19 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     expect(count.compareDocumentPosition(what) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
   })
 
-  it('compresses the Workbench to family and grade choices and keeps the chosen quantity while either changes', async () => {
-    for (const family of ITEM_FAMILIES) {
-      for (const raw of family.raw) fixture.world.items[raw.id] = 100
-    }
+  it('lays R2’s Workbench out as five line columns, a row a tier and band, and keeps the chosen quantity while the material changes', async () => {
+    for (const raw of ['copper-ore', 'pine-log', 'carrot', 'carp', 'quartz']) fixture.world.items[raw] = 100
     show(<FacilityPage {...page('workbench')} />)
     fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
     const sheet = dialog()
     const twenty = within(sheet).getByRole('radio', { name: /^×20,/ })
     fireEvent.click(twenty)
     expect(twenty.getAttribute('aria-checked')).toBe('true')
-    const families = sheet.querySelectorAll('[data-item-family]')
-    expect(families).toHaveLength(8)
-    fireEvent.click(families[1]!)
+    // Tier 1's low and high types of the five lines; the high row opens at Craft Lv 26.
+    expect(sheet.querySelectorAll('[data-type-tile]')).toHaveLength(10)
+    fireEvent.click(sheet.querySelector('[data-type-tile="pine-plank"]')!)
     expect(within(sheet).getByRole('radio', { name: /^×20,/ }).getAttribute('aria-checked')).toBe('true')
-    fireEvent.click(within(sheet).getByRole('button', { name: /^Grade 2/ }))
-    expect(within(sheet).getByRole('radio', { name: /^×20,/ }).getAttribute('aria-checked')).toBe('true')
-    expect(sheet.querySelector('[data-selected-item]')).not.toBeNull()
+    expect(sheet.querySelector('[data-selected-item="pine-plank"]')).not.toBeNull()
   })
 
   it('shows grades on the Farm wishlist icons', () => {
@@ -151,10 +148,10 @@ describe('SB4 uses the shared album in every RPG choice', () => {
 
   it('Observatory honors its explicit Uma route and changes her through the shared picker', async () => {
     show(<ObservatoryPage {...page('observatory', '81001')} />)
-    expect(screen.getByRole('heading', { name: 'Aster' })).toBeDefined()
+    expect(within(screen.getByRole('button', { name: 'Choose an Uma' })).getByText('Aster')).toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Choose an Uma' }))
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
-    await screen.findByRole('heading', { name: 'Cinder' })
+    await waitFor(() => expect(within(screen.getByRole('button', { name: 'Choose an Uma' })).getByText('Cinder')).toBeDefined())
   })
 
   it('Hall Heroes and Learners use shared choices and display the existing domain refusals instead of hiding them', async () => {
@@ -172,9 +169,9 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     await waitFor(() => expect(calls.hero).toHaveBeenCalledWith(heroLimitsOf('brawler')[1]!.id, '81005'))
   })
 
-  it('Manuals advance from the shared choice to the existing rank bars', async () => {
+  it('Class Manuals advance from the shared choice to the existing rank bars', async () => {
     show(<ExchangePage />)
-    fireEvent.click(screen.getByRole('button', { name: /Read a Manual/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Read a Class Manual/ }))
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
     await screen.findByRole('dialog', { name: 'Which bar?' })
     expect(within(dialog()).getByRole('heading', { name: 'Classes' })).toBeDefined()

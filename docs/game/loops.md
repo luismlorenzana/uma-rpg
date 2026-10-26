@@ -7,15 +7,17 @@ the Rift below it ascends twenty Umas ([the Rift](#the-rift); the page is in [se
 ## The loop
 
 ```
- Unlock Umas ─► build parties ─► fight on the world map ─► Uma EXP, Class, Weapon and Armor EXP, Laurels, Uma Shards
+ Unlock Umas ─► build parties ─► fight on the world map ─► Uma EXP, Class EXP, Laurels, Uma Shards
        ▲                                                          │
-       │            ┌────── ranks (deeper skills, higher grades) ◄┤── Marks past a max rank ─► Manuals
+       │            ┌───── Class Rank (deeper skills, Skill Ranks) ◄┤── Class Marks past Rank 50 ─► Class Manuals
        │            ▼                                             ▼
-   Uma Shards ─► Tickets                                      Exchange: raw items, tickets, Manuals
+   Uma Shards ─► Tickets                                      Exchange: raw materials, tickets
                                                                   │
                                                                   ▼
-                                            gather ─► refine ─► cut (Star Gems ─► Extra Stats)
-                                                              └─► craft (weapons, armor, accessories)
+                    gather (her trade's place) ─► process (the Workbench) ─► make (Weapon Gems, Armor Fittings,
+                                                                              Accessory Settings, Planet and Moon Jewels)
+                                                                                    │
+                                    grades raised, nodes opened ◄───────────────────┘
                                     └────────► a stronger party fights higher levels
 ```
 
@@ -29,9 +31,11 @@ Fights are active play. Everything else is jobs that run in real time, offline i
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
-- **Classes:** switching is free. A new Uma starts in her **calling** and in its armor, magical for a Mage, Cleric or
-  Summoner (engine v16, CP29, [classes](classes.md#her-calling-and-her-template)); a Pace or Late Uma picks once between
-  her two, and her first win confirms it. A party fights with one healer, a Paladin or a Cleric, at most.
+- **Classes:** switching is free. A new Uma starts in her **calling** (engine v16, CP29,
+  [classes](classes.md#her-calling-and-her-template)); her armor's half is her class's, magical for a Mage, Cleric or
+  Summoner. A Pace or Late Uma picks once between her two callings, and her first win confirms it; the pick waits while
+  she works ("Finish her work first"), because it moves her trade. A party fights with one healer, a Paladin or a Cleric,
+  at most.
 
 ## Leveling
 
@@ -55,20 +59,17 @@ Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight �
   gains about a third of a level. Fighting below her level pays less; above it, no more.
 - A regular stage at her level pays about a third of a level: about three fights a level-up. A region's twelve first
   clears carry a party across its five levels, a little short of the next region's first level (D97).
-- **Her Uma Level** sets her stats, her skill slots (3 → 10) and her Extra Stats slots. Skills open with **Class Rank**
-  ([ranks](#ranks)).
+- **Her Uma Level** sets her stats, her skill slots (3 → 7), the grades her gear can reach (Lv 5g − 4) and the Extra
+  Stats nodes she can open. Skills open with **Class Rank** ([ranks](#ranks)).
 
 ## Ranks
 
-Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-and-levels) for what each opens):
+One bar a class (D102; R2 retired the gear bars, WP3; [classes](classes.md#ranks-and-levels) for what it opens):
 
 <!-- live:ranks -->
 | Bar | Ranks | Per win worth E Uma EXP | Opens |
 |---|---|---|---|
 | Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees' depths at 1, 10, 20, 30, 40; ranks every skill she holds, a Skill Rank every 2 Class Ranks up to 5 |
-| Weapon Rank, per weapon | 1–10 | 3E over her three weapons (E a weapon), double for each she used | Wears that weapon up to its rank's grade |
-| Armor Rank, per armor kind | 1–10 | 1E to each of her five armor kinds | Wears that kind up to its rank's grade |
-| Accessory Rank, per accessory kind | 1–10 | 1E to the kind of each accessory she wears | Wears accessories of that kind up to its rank's grade |
 
 | Class Rank | EXP to next |
 |---|---|
@@ -79,28 +80,13 @@ Each win fills more bars than her Uma Level (D102; [classes](classes.md#ranks-an
 | 40 | 760 |
 | 49 | 904 |
 
-| Weapon or Armor Rank | EXP to next | Next rank, used every fight, by |
-|---|---|---|
-| 1 | 840 | Lv 6 |
-| 2 | 1,240 | Lv 11 |
-| 3 | 1,640 | Lv 16 |
-| 5 | 2,440 | Lv 26 |
-| 7 | 3,240 | Lv 36 |
-| 9 | 4,040 | Lv 46 |
-
-Past a max rank, EXP banks at 50% as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs 1,000 Marks and gives 1,000 EXP to one bar of one Uma. Armor kinds by slot: Head Helm or Circlet; Body Cuirass or Robe; Legs Greaves or Leggings; Arms Gauntlets or Bracers; Feet Boots or Slippers. 10 kinds in all. Accessory kinds: Arms Orb, Elemental Orb, Talisman, Amulet.
+Past the max rank, EXP banks at 50% as Class Marks. A Class Manual costs 1,000 Class Marks and gives 1,000 EXP to one class of one Uma. Gear has no ranks: a slot's grade is what she wears ([materials](materials.md#gear)).
 <!-- /live -->
 
-- **What a win pays,** for `E` Uma EXP: her class 2E; her three slotted weapons share 3E, E a weapon (H64), two parts for
-  each weapon she used that fight (an attack, a skill, a Spell Blade's or a Summoner's half, a Limit Break), one part for
-  the rest; each of her five armor slots' kinds E. A Sweep shares weapon EXP evenly. A v15 fight still open at the switch
-  pays its five weapons 5E.
-- **No caps between bars:** a Lv 1 Uma can wear a grade-10 weapon if its rank allows.
-- **A campaign** (about 120 first clears) takes one Uma to Lv 50, two classes to Rank 50, and three weapons and five
-  armor kinds to Rank 10.
-- **Marks:** past a max rank, a bar's EXP banks at half rate, world-wide: Gear Marks from weapons and armor, Class Marks
-  from classes. **Manuals** at the Exchange turn 1,000 Marks into 1,000 EXP on one bar of one Uma. Uma EXP is never for
-  sale.
+- **What a win pays,** for `E` Uma EXP: the class she fought as 2E. A Sweep pays the same.
+- **A campaign** (about 120 first clears) takes one Uma to Lv 50 and two classes to Rank 50.
+- **Class Marks:** past Rank 50, a class's EXP banks at half rate, world-wide. **Class Manuals** at the Exchange turn
+  1,000 Class Marks into 1,000 EXP on one class of one Uma. Uma EXP is never for sale.
 
 ## Laurels and EXP
 
@@ -127,156 +113,159 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 
 | Currency | Earned | Spent |
 |---|---|---|
-| Laurels | Fights and Sweeps; selling stock | The Exchange; facility upgrades |
-| Speed Tickets | The Exchange | 30 minutes off a running job (or "Finish": one per 30 minutes left) |
+| Laurels | Fights and Sweeps; selling stock | The Exchange |
+| Speed Tickets | The Exchange; the Tier rework's grant ([below](#the-tier-reworks-grant)) | 30 minutes off a running job ("Finish": one per 30 minutes left; "Finish all" on a place) |
 | Sweep Tickets | The Exchange | One Sweep of a cleared regular stage |
 | Uma Tickets | 20 at the start; 5 Uma Shards each | Unlocking an outfit |
 | Uma Shards | Lv 10, 20, 30, 40, 50 | Turned into Tickets automatically |
-| Gear Marks | Weapon and Armor EXP past Rank 10, at half rate | Weapon and Armor Manuals |
 | Class Marks | Class EXP past Rank 50, at half rate | Class Manuals |
 
 <!-- live:prices -->
+| World | Raw materials | Stocked | Price (Laurels) |
+|---|---|---|---|
+| Tier 1 | Tier 1's low types | after the tier's first win | 30 |
+| Tier 1 | Tier 1's high types | after a win on continent 3 | 80 |
+| Tier 2 | Tier 1's low types | after the tier's first win | 60 |
+| Tier 2 | Tier 1's high types | after a win on continent 3 | 160 |
+| Tier 2 | Tier 2's low types | after a win on continent 2 | 60 |
+| Tier 2 | Tier 2's high types | after a win on continent 4 | 160 |
+| Tier 3 | Tier 1's low types | after the tier's first win | 90 |
+| Tier 3 | Tier 1's high types | after a win on continent 3 | 240 |
+| Tier 3 | Tier 2's low types | after a win on continent 2 | 90 |
+| Tier 3 | Tier 2's high types | after a win on continent 4 | 240 |
+| Tier 3 | Tier 3's low types | after a win on continent 2 | 90 |
+| Tier 3 | Tier 3's high types | after a win on continent 4 | 240 |
+
 | Thing | Price (Laurels) |
 |---|---|
-| Raw item, grade 1 | 20 |
-| Raw item, grade 4 | 50 |
-| Raw item, grade 7 | 80 |
-| Raw item, grade 10 | 110 |
 | Speed Ticket | 10 |
 | Sweep Ticket | 15 |
 
-A Speed Ticket takes 30 minutes off a running job. A Manual costs 1,000 Marks, not Laurels.
+A Speed Ticket takes 30 minutes off a running job. Selling, × the world's tier: a raw low type 6, a high type 16; refined twice that; a made item 6 + 6 × its grade. A Class Manual costs 1,000 Class Marks, not Laurels.
 <!-- /live -->
 
-Selling pays 2 + 2g for a raw item, 4 + 4g refined, and 6 + 6g for a Star Gem or unbound gear. Bound
-gear can't be sold. The Exchange stocks raw grades 2n−1 and 2n once a stage on continent n has been won, up to 99 per
-purchase.
+The Exchange sells raw materials only, every tier's types up to the world's, by pair: a pair's low type once it's needed
+and its high type before G10. It sells up to 99 at a time; selling pays a few Laurels for any material or made item.
+
+### The Tier rework's grant
+
+R2's update (H82) rebuilt the Wilds: every Uma's Craft Level went back to 1, crafted gear and Star Gems became grades and
+an empty map, and facility upgrades were refunded. The time the Umas worked came back as **Speed Tickets** (PP20, PP24):
+one per 30 minutes of the work their Craft EXP records, ⌈(EXP her level took + her bank) ÷ 60⌉ an Uma, never below what
+the deleted pieces and gems took to make. It was paid once into each world's wallet when the save became v28.
+
+The first time each world opens after the update, the sheet **"The Wilds are rebuilt"** shows it: the grant ("+63,800
+Speed Tickets"), the hours it stands for, what went (gear pieces, Star Gems, facility upgrades), what came back (Laurels,
+refined items, the Warehouse converted to the new materials), what stays (Uma Levels, classes and Class Ranks, Laurels,
+every ticket you had), and each Uma's line ("Craft Lv 50 → 1 · 1,470"). Both of its buttons, To the Wilds and Later,
+close it for good; the Account's row "The Tier rework's grant" reopens it.
 
 ## Craft Level
 
-Each Uma has one profession, **Craft Level** (save key `craft`, D144), raised by every job at the Wilds: the eight
-sites, the Workbench, the Forge and the Lapidary ([sections](sections.md#facilities)).
+Each Uma has one profession level, **Craft Level** (save key `craft`, D144), raised by every job in the Wilds' ten places
+([sections](sections.md#wilds)).
 
-- **Grades:** grade k opens at Craft Lv 5k − 4 (1, 6, 11 … 46), for gathering, refining, crafting and cutting alike.
-- **Speed (D139):** set by her Craft Level alone, the same for every grade and every Uma. Aptitude doesn't matter.
-  - Gathering one item takes 54 minutes at Lv1, falling evenly to 36 at Lv50, so ten take 9 hours at Lv1 and 6 at Lv50.
-    Umas of the same level finish together.
-  - A new grade comes at the speed its level gives: G10 (Lv46) is already near the floor.
-  - Refining takes a quarter of that (D101); crafting and cutting take twice that.
-  - A level-3 facility works a quarter faster.
-- **Pace (D96):** a level takes 12 hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Working without a
-  break, an Uma gains about 2 levels a day early on and reaches Lv50 in about a month (24 days at a level-3 facility).
-  Batch size doesn't change it: EXP is paid per minute of work.
+- **Her trade** (PP2): her calling names two professions, a gathering one and a crafting one, and their two places are
+  hers. A Brawler mines and makes Weapon Gems; a Spell Blade chops wood and makes Armor Fittings; a Paladin or a Cleric
+  farms and processes at the Workbench; a Summoner fishes and makes Accessory Settings; a Mage hunts and cuts jewels. Her
+  calling sets it, never her active class: a class switch moves no job. Another trade's places refuse her ("Another
+  trade"), unless the world has no Uma of that trade: then the place is an **open shop** and takes everyone until one
+  arrives.
+- **Types and grades** (PP13): a low type opens at Craft Lv 1 and a high type at Craft Lv 26; a made item of grade g at
+  Craft Lv 5g − 4 (1, 6, 11 … 46).
+- **Speed (D139):** set by her Craft Level alone, the same for every type and grade. Aptitude doesn't matter.
+  - Gathering one raw item takes 54 minutes at Lv1, falling evenly to 36 at Lv50, before the place's ×1.25.
+  - Processing takes a quarter of that; making takes a gather's time for each refined item in the made item.
+- **Pace (D96):** a level takes 12 hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Batch size doesn't
+  change it: EXP is paid per minute of work.
 - **A job:**
   - An Uma makes its outputs one after another. Her work is her own row (SC3): she holds one slot from the moment a job
     starts until Collect frees her or she's recalled, so she works in one place at most. Starting a job on an Uma whose
     work is finished collects it first.
   - Every job runs in the shared work engine, `@luismlorenzana/uma-work`, the same code as uma-racer's; this game
-    supplies its kinds (gather, refine, craft, cut), its facilities and its Craft Level.
-  - **Batches (D139):** gathering, crafting and cutting make 1–10; refining makes ×1, ×4, ×8, ×20 or ×40, so a ×40
-    refine takes as long as a 10-item gather.
-  - Inputs are reserved at the start.
-  - Craft EXP is 2 per minute of the job at her level, before the facility's speed, so every job levels at the
-    same rate per hour.
+    supplies its kinds (gather, process, make), its ten places and its Craft Level.
+  - **Batches (D139):** gathering and making 1–10; processing ×1, ×4, ×8, ×20 or ×40.
+  - Inputs are reserved at the start. Made items and materials go to the Warehouse.
+  - Craft EXP is 2 per minute of the job at her level, before the place's speed, so every job levels at the same rate
+    per hour.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma at the same place. Each starts the
   moment the one before ends and takes its inputs then, so a chain catches up however late it's collected. If the
-  Warehouse can't cover the next one, the queue **stops**: it waits on the facility's page to be restarted (its first
-  job starts now) or dismissed (SC3).
+  Warehouse can't cover the next one, the queue **stops**: it waits on the place's page to be restarted (its first job
+  starts now) or dismissed (SC3).
 - **Offline:** everything runs from start times, so jobs finish while the app is closed. Push notifications say when
   ([sections](sections.md#global-ui)).
 - **Recall:** pays what's finished and returns the inputs of everything unfinished, the item in progress included. The
   queue drops and Repeat forgets her last job. Only the time is lost.
 - **Repeat (SC3):** starts her last job again where she did it, or in another free slot there if hers is taken; on an
   Uma whose work is finished it collects first.
-- **Speed Tickets** never spend more than finish the job: asking for more spends only what's needed.
-- **Targets:** mark up to ten Umas total on their profiles. Every facility then lists what maxing them still
-  takes from it:
-  - **The Forge:** every grade above the best she has bound, up to 10, on her class's three weapons, her five armor
-    slots' kinds and the type in each accessory slot (an empty one plans nothing).
-  - **The Lapidary:** a Star Gem for each Extra Stats node she hasn't opened.
-  - **The Workbench and sites:** the refined and raw items those still need.
+- **Speed Tickets** never spend more than finish the job: asking for more spends only what's needed. **Finish all** on a
+  place finishes every running job there at once, each at ⌈remaining ÷ 30 minutes⌉, after a confirm naming the total
+  ("Finish 3 jobs for 14 Speed Tickets?"); short of tickets it says "Needs 14 Speed Tickets".
+- **Targets:** mark up to ten Umas total on their profiles. Every place then lists what maxing them still takes from it:
+  - **The making places:** each grade still to raise on her three weapons, her five armor slots and her accessory slot,
+    and each jewel for a node she hasn't opened.
+  - **The Workbench and the gathering places:** the refined and raw materials those still need.
   - **Each line** shows the total need, what's in the Warehouse and what's coming. It stays until the Warehouse holds
     enough, then goes.
   - **Cascade:** only what's still short (not in stock, not being made) reaches the materials, so when a line is
     covered every line below it for that need goes too.
   - **Stock held by queued jobs** isn't counted as free, and a queued job counts as coming only if its inputs are in
     the Warehouse.
-  - **Leaving the list:** a piece she binds or a gem she sets drops off. Several targets add up.
-  ([design](../design/gear-and-targets.md))
-- **Upgrades:**
-  - Facilities level 1–3: 3, 4, then 5 slots, and speed at level 3 (D144).
-  - The cost is Laurels plus refined items of the facility's two families. A site's two families are its own and its
-    gear-recipe partner (Ores and Crystals, Woods and Essences, Hides & Scales and Bones & Horns, Stones and Fibers);
-    buildings take Stones and Woods.
+  - **Leaving the list:** a grade she raises or a node she opens drops off. Several targets add up.
+- **Places have no levels** (PP4): every place has its four slots at ×1.25 from day one.
 
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| Gather one item | any grade, by Craft Level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
-| Refine one item | a quarter of that: 13.5 min at Lv1, 9 min at Lv50 |
-| Craft or cut one | twice a gather: 108 min at Lv1, 72 min at Lv50 |
-| Craft EXP | 2 per minute of the job at her level, before the facility's speed |
-| Outputs per job | gathering, crafting and cutting 1–10; refining ×1, ×4, ×8, ×20, ×40 |
+| Gather one raw item | any type, by Craft Level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
+| Process one item | raw into refined, one for one, a quarter of a gather: 13.5 min at Lv1, 9 min at Lv50 |
+| Make one item | a gather's time for each refined item in it: a Weapon Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4 |
+| Opens | a low type at Craft Lv 1 and a high type at Lv 26; a made item of grade g at Craft Lv 5g − 4 |
+| Craft EXP | 2 per minute of the job at her level, before the place's speed |
+| Outputs per job | gathering and making 1–10; processing ×1, ×4, ×8, ×20, ×40 |
 | Jobs queued after it | 3 |
-| Facility levels | 1–3: 3, 4, 5 Uma slots; speed ×1, ×1, ×1.25 |
-| Upgrade to Lv 2 / 3 | 150 Laurels + 1× grade-2 refined of each of its two families / 500 Laurels + 2× grade-5 refined of each of its two families |
+| Places | 4 Uma slots each, speed ×1.25, from day one; no upgrades |
 | Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |
 <!-- /live -->
 
 ## Extra Stats and gear
 
-**Extra Stats** (the Observatory):
-- Each Uma has a map of 100 nodes: 80 moons, 16 bridges and 4 Sun nodes.
-- **Setting a Star Gem** (D144) opens the node of its own grade and uses the gem up. The Lapidary cuts them
-  ([materials](materials.md#star-gems)). Nodes open in order (D119): a gem waits until every lower node of its track
-  is open, and a grade she has set is spent, so the Observatory lists only the gems she can set now:
-  - a moon gem of grade n opens moon n of its stat;
-  - bridge gems (grades 3 and 7) open bridges;
-  - Sun gems (grades 4, 6, 8 and 10) open Sun nodes.
-- **Active nodes:** 5 + ⌊level ÷ 2⌋ at a time (5 at Lv 1, 30 at Lv 50), changed freely.
-- **Points, worth the node's grade (D141):** a moon of grade g gives g points to its stat (moon 7: 7), a bridge g ÷ 2 to
-  each of its two, a Sun node g ÷ 8 to all eight. A full track of ten moons is 55 points; since D139 every grade takes the
-  same time to cut, so a higher grade pays in what it gives.
-- **What a point does (D104, flat):**
-  - ATK, MATK, DEF, MDEF or MP: +1. HP: +5.
-  - Speed: 0.6% evasion (up to 50%).
-  - Limit: a 0.4 head start on the Limit Break gauge.
+**Extra Stats** (the Observatory, EP1–EP8):
+- Each Uma has a map of a **Planet** and three moons, **Prowess**, **Vigor** and **Guard**, five nodes each (20, the same
+  for every class), and beside them **her moon**, two nodes read from her template ★.
+- **A jewel opens a node,** in order: Planet n needs a Planet Jewel n, a moon's node n a Moon Jewel n (picked when it's
+  set), her moon's I and II Moon Jewels II and IV. A node opens at Uma Lv 5g − 4 for its grade (Planet n is grade
+  2n − 1, a moon's n grade 2n), once the node below it on its body is open. The jewel is used up.
+- **Every open node counts:** no active slots, nothing to switch on.
+- **What a node gives** (Tier 1, × 1.8 in Tier 2 and × 2.6 in Tier 3):
 
-**Gear** (the Forge, [materials](materials.md#gear)):
-- **Slots (D124):**
-  - her class's three weapon slots, by channel (engine v16);
-  - five armor slots (head, body, legs, arms, feet), each holding its physical or its magical piece;
-  - two accessory slots: **Damage** for an Orb, **Support** for a Talisman or an Amulet (classes v2, C10).
+<!-- live:star-map -->
+| Body | Nodes | Opens at Lv | Points (Tier 1) | To |
+|---|---|---|---|---|
+| Planet | I–V | 1, 11, 21, 31, 41 | 1, 2, 4, 6, 8 | all six core stats (HP 5 a point) |
+| Prowess | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | ATK and M.ATK by her active class: Brawler 100/0, Mage 0/100, Spell Blade 70/30, Cleric 20/80, Summoner 30/70, Paladin 80/20 |
+| Vigor | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | HP and MP |
+| Guard | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | DEF and M.DEF |
+| ★ Her moon | I, II | 16, 36 | 4, 8 | I: her knack's stat; II: her calling's channel's defense |
+<!-- /live -->
 
-  An empty weapon or armor slot holds the Training piece of its kind (grade 0, no stats); an empty accessory slot holds
-  nothing.
-- **What it does (D104, D124):**
-  - A weapon's **Might** adds to the offense of the hits made with that weapon (D142, D143): 1, 4, 8, 12, 19, 26, 35, 45, 57, 68
-    for grades 1–10. Each is set so that at the level its grade opens (Lv 5g − 4) the weapon adds about 6% × g to an
-    on-curve Uma's hits; worn ahead of its level it is worth more, kept long after less.
-  - Armor: ATK (physical) or M.ATK (magical) +⌈g ÷ 2⌉ (D143), and its slot's defensive stat +2g (D141). Head DEF, body HP, legs MP,
-    arms MDEF, feet Speed.
-  - An Orb adds offense to her hits of its kind, half a weapon's Might at its grade (C4). A Talisman or an Amulet gives
-    one effect, a share of her own numbers so it keeps its worth at every level ([combat](combat.md#damage), D141).
-- **Wearing a grade:** grade g needs her Weapon Rank (for a weapon), Armor Rank (for its kind) or Accessory Rank (for
-  the accessory's kind) ≥ g.
-- **Binding:** equipping a piece from stock binds it to that Uma. She can swap among her own pieces freely.
-- **In order (D119):** each weapon, each armor kind and each accessory type is a track she climbs one grade at a time.
-  From the stock she can bind only the grade above the best she has on that track (her Training piece is grade 0), so
-  grade 1 comes first and a grade she has bound is spent. A slot's sheet shows her best piece (and the one she wears)
-  and the stock above it.
+- **What a point does (D104, flat):** ATK, M.ATK, DEF, M.DEF or MP +1; HP +5; Speed 0.6% evasion (up to 50%); Limit a
+  0.4 head start on the Limit Break gauge. Speed and Limit come only from her moon (a Fleet or Gritty knack).
+- Ascending to a new tier starts her map empty.
+
+**Gear** ([materials](materials.md#gear)):
+- **Slots:** her class's three weapons, five armor slots (head, body, legs, arms, feet) and one accessory slot, each at a
+  grade, G0 to G10. Grade g opens at Uma Lv 5g − 4.
+- **Raising a grade:** a made item of the next grade (a Weapon Gem, Armor Fittings, an Accessory Setting), from the
+  Warehouse, raises the slot one grade; a sheet can climb several grades at once when the Warehouse holds each one. The
+  Gear tab marks a slot she can raise now.
+- **What it does:** a weapon's Might on its hits; armor its slot's stat and ATK or M.ATK by her class's half; her
+  accessory's family in its base form; her signature while she wears her knack's family ([combat](combat.md#damage)).
+- **The accessory slot:** its family (Pendant, Orb, Bell, Insignia), and an Orb's or a Bell's kind, change freely outside
+  fights; the grade is the slot's and stays.
 - **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
-  ([classes](classes.md#weapons)): the class's three default weapons, its armor half in all five slots, its Orb in the
-  Damage slot and its support in the Support slot.
-  - **What it wears:** on each of those types, her best own piece her rank allows. Then **the climb**: from her best
-    grade, it binds each next grade while the stock has it and her rank allows it, and wears the top, as tapping a sheet
-    grade by grade does. With nothing, a weapon or armor slot holds its Training piece, and an accessory slot keeps
-    what it holds.
-  - **What it never binds:** a grade above her rank, armor of the other half, other accessory types or weapons outside
-    the spread. Pieces on her other weapons stay on (they serve her other classes); armor of the other half goes back to
-    her locker. Her learned and equipped skills stay; one outside the new trees isn't used.
-  - **Binding asks first:** when it would bind from the stock, a sheet lists those pieces ("Binds to her for good").
-    With nothing to change, the button reads "Standard preset on".
+  ([classes](classes.md#weapons)): the class's three default weapons and her accessory slot's family (her signature's ★
+  family when she has one, else the class's form). Grades don't move.
 
 ## Springs, replays and Sweeps
 
@@ -322,21 +311,21 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   Bonds. Every won Rift fight records the boss and sub-boss faces it defeated, with the time of the first defeat.
 - **Echoes:** each front at Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without
   a run. A win fills each Uma's [rank bars](#ranks) at twice a stage's rule, E being a regular stage's EXP at the Echo's
-  level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past a max rank it
-  banks as Marks. No Uma EXP, Laurels, Shards or Bonds.
+  level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past Rank 50 it banks
+  as Class Marks. No Uma EXP, Laurels, Shards or Bonds.
   - **The pace** (H51, D176): a fresh class reaches Rank 30 in about 9 Echo wins at Lv 50 or 55 and 17 at Lv 45, and
-    Rank 50 in 20 (40 at Lv 45). At Lv 50 a weapon she fights with reaches Rank 8 in 14 to 16 wins, or 22 Sweeps.
+    Rank 50 in 20 (40 at Lv 45).
   - **How hard:** a party with one Uma at Class Rank 1 wins the Lv 45 Echoes, and an on-curve party the Lv 50 ones.
     Lv 55 is the hard step, hardest on the Horde.
-- **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win,
-  her three weapons sharing evenly. They record no faces and earn no achievements.
+- **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win.
+  They record no faces and earn no achievements.
 - **Ascend:** once the run is won, its twenty move up a tier together, in one step: no Rift or world-map fight open,
   and none of them at work ("Recall or collect").
   - **They leave** the old world's Stable, parties, targets, carried MP, Hall seats and work. A Hero's seat empties and
-    its Learners leave it. Every piece of gear they owned goes back to the old world's stock; Star Gems set on their
-    maps are gone.
-  - **They arrive** at Lv 1 with Class Rank 1 everywhere, no skills, Training gear, an empty Extra Stats map, Craft Lv 1
-    and no Bonds. Each keeps her class, her armor halves and her calling.
+    its Learners leave it. The made items her grades used go back to the old world's Warehouse (a G5 weapon returns Weapon
+    Gems G1–G5); the jewels she set are gone.
+  - **They arrive** at Lv 1 with Class Rank 1 everywhere, no skills, every grade G0, an empty Extra Stats map, Craft Lv 1
+    and no Bonds. Each keeps her class, her calling and her accessory slot's family and kind.
   - **The new world** gets the purse and their banked EXP as Class Marks (below). A party whose five all ascend moves,
     with its name, into its first empty party; the rest fill the next empty parties, five at a time.
   - Each Uma's history records the climb. The tier's next twenty Lv 50 Umas can run its Rift again.

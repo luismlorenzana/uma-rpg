@@ -39,12 +39,13 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 - A floating **Collect all · N ready** button collects every finished job.
 - **Taps:** a place opens its **quick look** in the side panel (`/:page?peek=:id`). Its **Enter** button opens the
   place's page (`/:page/:placeId/*`). The Scenario Gate skips the quick look and opens its page at once.
-  A facility's quick look uses its compact live slot rows: start, collect, repeat and stopped-queue recovery stay two
+  A Wilds place's quick look uses its compact live slot rows: start, collect, repeat and stopped-queue recovery stay two
   or three taps from the map.
 - **Routes:**
   - `/` returns to the last page you viewed.
   - Every screen is a place (D31), with no other top-level routes.
-  - A link to a place under another page, such as an old link or a push, moves to the place's own page.
+  - A link to a place under another page, such as an old link or a push, moves to the place's own page. A link to a
+    place R2 removed (the Ley Spring, Crystal Cavern, Quarry, Meadow or Fossil Dig) opens the Wilds page.
 
 <!-- live:places -->
 ### Town Hall (`town`)
@@ -53,7 +54,7 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 |---|---|---|---|---|
 | Stable | `stable` | town | — | Every Uma outfit, locked or yours. Uma Tickets open new ones. |
 | Party Hall | `party-hall` | town | — | Twenty parties of five. |
-| Warehouse | `warehouse` | town | — | Every item you own: materials, Star Gems and gear. |
+| Warehouse | `warehouse` | town | — | Every item you own: materials and made items. |
 | Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
 
 ### Learning (`learning`)
@@ -79,21 +80,21 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Monster Den | `monster-den` | gather-site | 3 | Gathers hides & scales while you're away, for the HP stat. |
-| Ley Spring | `ley-spring` | gather-site | 3 | Gathers essences while you're away, for the MP stat. |
-| Mine | `mine` | gather-site | 3 | Gathers ores while you're away, for the ATK stat. |
-| Crystal Cavern | `crystal-cavern` | gather-site | 3 | Gathers crystals while you're away, for the M.ATK stat. |
-| Quarry | `quarry` | gather-site | 3 | Gathers stones while you're away, for the DEF stat. |
-| Meadow | `meadow` | gather-site | 3 | Gathers fibers while you're away, for the M.DEF stat. |
-| Forest | `forest` | gather-site | 3 | Gathers woods while you're away, for the Speed stat. |
-| Fossil Dig | `fossil-dig` | gather-site | 3 | Gathers bones & horns while you're away, for the Limit Break charge stat. |
-| Workbench | `workbench` | station | 3 | Refines raw materials, one into one: ore into ingots, logs into planks. |
-| Forge | `forge` | station | 3 | Crafts weapons, armor and accessories. |
-| Lapidary | `lapidary` | station | 3 | Cuts Star Gems that open nodes on an Uma’s Extra Stats map. |
+| Mine | `mine` | gather-site | 4 | Mining: ores into ingots. |
+| Forge | `forge` | station | 4 | Weapon Crafting: Weapon Gems. |
+| Forest | `forest` | gather-site | 4 | Wood Chopping: logs into planks. |
+| Armorer | `armorer` | station | 4 | Armor Crafting: Armor Fittings. |
+| Fields | `fields` | gather-site | 4 | Farming: vegetables for kitchen cuts. |
+| Workbench | `workbench` | station | 4 | Material Processing: raw into refined. |
+| Fishery | `fishery` | gather-site | 4 | Fishing: fish into fillets. |
+| Charm Shop | `charm-shop` | station | 4 | Accessory Crafting: Accessory Settings. |
+| Monster Den | `monster-den` | gather-site | 4 | Hunting: stones into cut stones. |
+| Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
 
-The Wilds hold every facility: eight sites in two columns, and the Workbench, the Lapidary and the Forge across the
-middle row, the Lapidary on the road between them (D144). Town Hall keeps its four places in the corners around the
+The Wilds hold the ten places (R2, PP4–PP6): one row a trade, its gathering place on the left and its making place on
+the right, the trunk road between (Mine and Forge, Forest and Armorer, Fields and Workbench, Fishery and Charm Shop,
+Monster Den and Lapidary), each with four slot pips. Town Hall keeps its four places in the corners around the
 plaza. The Battle page holds the Scenario Gate and the Rift on a drill ground of its own, with flagstone roads,
 banners, weapon racks, training dummies and torches (H31, D148). The Rift draws uma-art's `rift` building (its place keeps
 the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
@@ -101,30 +102,33 @@ the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
   in Tiers 1 and 2. Shut, its building carries a lock, its quick look says "Opens at five Lv 50 Umas · 3/5" (or "No
   Rift in this tier yet" in Tier 3), it has no Enter, the menu locks it, and a link to its page goes to the quick look.
 
-### Facilities
+### Wilds
 
-Every site and station is a facility: Uma slots, a level, jobs ([loops](loops.md#craft-level)). The halls seat Heroes
-instead ([Halls of Heroes](heroes.md)).
+The ten places, four slots each at ×1.25 from day one, with nothing to upgrade ([loops](loops.md#craft-level)). The
+halls seat Heroes instead ([Halls of Heroes](heroes.md)).
 
 <!-- live:facilities -->
-| Place | Job | Makes | Upgraded with |
-|---|---|---|---|
-| Monster Den | Gather | Hides & Scales | Hides & Scales + Bones & Horns |
-| Ley Spring | Gather | Essences | Essences + Woods |
-| Mine | Gather | Ores | Ores + Crystals |
-| Crystal Cavern | Gather | Crystals | Crystals + Ores |
-| Quarry | Gather | Stones | Stones + Fibers |
-| Meadow | Gather | Fibers | Fibers + Stones |
-| Forest | Gather | Woods | Woods + Essences |
-| Fossil Dig | Gather | Bones & Horns | Bones & Horns + Hides & Scales |
-| Workbench | Refine | Refined items | Stones + Woods |
-| Forge | Craft | Gear | Stones + Woods |
-| Lapidary | Cut | Star Gems | Stones + Woods |
+| Place | Profession | Job | What it does | Its trade (callings) |
+|---|---|---|---|---|
+| Mine | Mining | Gathering | Gathers metal | Brawler |
+| Forge | Weapon Crafting | Making | Makes Weapon Gems | Brawler |
+| Forest | Wood Chopping | Gathering | Gathers wood | Spell Blade |
+| Armorer | Armor Crafting | Making | Makes Armor Fittings | Spell Blade |
+| Fields | Farming | Gathering | Gathers vegetables | Paladin, Cleric |
+| Workbench | Material Processing | Processing | Processes every line, raw into refined | Paladin, Cleric |
+| Fishery | Fishing | Gathering | Gathers fish | Summoner |
+| Charm Shop | Accessory Crafting | Making | Makes Accessory Settings | Summoner |
+| Monster Den | Hunting | Gathering | Gathers stone | Mage |
+| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Mage |
+
+Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
 
-**The facility page** (`places/work/FacilityPage.tsx`), for the eight sites, the Workbench, the Forge and the
-Lapidary:
-- **Shared facility header:** level, used slots, total slots, speed, **Upgrade**, and **Collect here** when work is ready.
+**A place's page** (`places/work/FacilityPage.tsx` and `PlaceV3.tsx`), one page for all ten:
+- **Header:** "Mine · Mining · 4 slots · ×1.25", with **Collect here** when work is ready and **Finish all · 14 Speed
+  Tickets** when two or more of its slots are running. Finish all asks "Finish 3 jobs for 14 Speed Tickets?", or says
+  "Needs 14 Speed Tickets" when the wallet is short. A place whose trade has no Uma in the world says so under it:
+  "Open shop: no Brawler in this world" ("no Paladin or Cleric" at the Fields and the Workbench).
 - **One shared slot row per slot:** a free row starts a job; a working row shows its Uma, item, progress and queue.
   Ready work has **Collect** and **Repeat**. A running row has **Speed up** (−30m or Finish), **Queue next**, queue
   ordering and removal, and **Recall** with a preview of what is paid, returned or lost.
@@ -133,18 +137,20 @@ Lapidary:
 - **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
   **Dismiss**.
 - **The shared job sheet:** Who → How many → What. A chosen amount stays selected while What changes (and clamps if a
-  recipe allows less). Its Uma picker
-  puts Craft Level on each face and opens free Umas first, then highest Craft Level, Uma Level, newest release and name.
-  Locked Umas and workers show why they cannot start. Fighting does not block work
-  (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench (D139).
-- **Workbench:** eight material families in four columns, ten grade chips and one selected-recipe card. Family or grade
-  changes do not reset How many. Gathering sites use the same compact G-badged item tiles for their ten grades.
-- **Forge:** the 40 types as icons only, four rows of ten, each physical then magical (D144): weapons and Tomes, armor,
-  Arms and Element Orbs, Talismans and Amulets. Then the grade, and the picked piece's name, effect and recipe below. A
-  type with no materials in stock is dimmed.
-- **Lapidary:** tabs for Moons (eight planets × ten grades), Bridges and Sun, each gem an icon. Grades above her Craft
-  Level are locked, gems without materials are dimmed, and a dot marks those the targets need. The picked gem shows the
-  node it opens, what that node gives and its materials.
+  recipe allows less). Its Uma picker puts Craft Level on each face and opens her trade's Umas first (free, then highest
+  Craft Level); the rest are greyed "Another trade", unless the place is an open shop. Locked Umas and workers show why
+  they cannot start. Fighting does not block work (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench.
+- **A gathering place's What step:** its line's types as tiles, one row a tier up to the world's, the low type then
+  the high one, which says "From Craft Lv 26" until then; the chosen type's card says "Tier 1 · high · raw · Refines into
+  Iron Ingot" and what's held.
+- **The Workbench:** five columns, one a line (Metal, Wood, Vegetables, Fish, Stone), a row a tier and band ("T1 low",
+  "T1 high" …), and the chosen refined type's card.
+- **The Forge, the Armorer and the Charm Shop:** ten grade chips, each underlined in its material's tier colour (Tier 2
+  amber, Tier 3 violet) with a legend, a grade above her Craft Level locked; the chosen grade's recipe card ("Weapon Gem
+  G5 · Raises a weapon one grade", each refined item and how many are held).
+- **The Lapidary:** one row a kind, Planet I–V and Moon I–V, the same chips and recipe card ("Opens Planet III").
+- **Quick look:** "Mine · Mining · 4 slots · ×1.25", the open shop's line, the type icons (2, 4 or 6 by the world's
+  tier) or the line's G1–G10 chips, and the four slots' rows.
 
 **The Learning page** holds the six Halls of Heroes (D106; classes v2, H59), one page shared by all six
 (`places/halls/HallPage.tsx`). The mirrors face each other across the road: Brawler Dojo and Mage Tower, Spell Blade
@@ -171,9 +177,11 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - All, Owned and Locked tabs, with counts.
   - Shared album views: **five columns of faces** by default, three columns of bust cards, or a one-column list.
   - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class; can
-    upgrade; and a **Template** group after RPG (engine v16, UT15): Calling (six), Stride (three) and Knack (five), an
-    owned Uma's calling pick counting. Search also finds her template's name ("ironhide" finds every Ironhide). "Can
-    upgrade" is also the sheet's quick pick.
+    upgrade; a **Template** group after RPG (engine v16, UT15): Calling (six), Stride (three), Knack (five) and, from R2,
+    Signature (Pendant, Orb, Bell, Insignia), an owned Uma's calling pick counting; and a **Trade** group (PP21): "Mine ·
+    Forge", "Forest · Armorer", "Fields · Workbench", "Fishery · Charm Shop", "Monster Den · Lapidary", each with its head
+    count, locked outfits too. Search also finds her template's name ("ironhide" finds every Ironhide). "Can upgrade" is
+    also the sheet's quick pick.
   - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
     Class Rank. Owned Umas stay before locked in either direction. Level ties use newest release, then name.
   - Corner badges: class top left, target bottom left, and bottom right New, or a green mark when
@@ -182,10 +190,10 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     over once, then their v2 key is removed. Nothing is added to the game save.
   - **New** means an outfit added since this device's first album visit, not seen yet. Opening its profile clears
     the badge; today's catalogue is marked seen on the first visit.
-  - **Can upgrade** (H34): one tap makes her stronger now, as her active class. Crafting doesn't count.
-    - Gear: a better piece she can wear, in stock or her own, for one of her three weapons, an armor slot's kind, a
-      worn accessory, or an empty Damage or Support slot that a piece of its type can fill.
-    - Extra Stats: a Star Gem in stock she can set, or an open node she can switch on.
+  - **Can upgrade** (H34): one tap makes her stronger now, as her active class. Making doesn't count.
+    - Gear: a made item in the Warehouse that raises one of her slots now (the next grade, her level allowing), or an
+      accessory slot at G1 or more with no family yet.
+    - Extra Stats: a jewel in the Warehouse that opens one of her nodes now.
     - Skills never count: no skill costs points (engine v16, CP14).
 - **An Uma's profile:**
   - **Header** (the kit's `ProfileFrame`, SD3): her bust, rarity and **template chip**, name, title and Uma Level, a
@@ -196,40 +204,46 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     tag that wraps to two lines beside "Mark target"; a green dot while an owned Uma's calling is open. It opens **Her
     template**: her name, the three readings with their sources ("Calling ← Pace A, Wit 102 ≥ Power 90", or "← picked";
     "Stride ← Medium A"; "Knack ← Wit +20%"), then her Flourish and its state ("★ Even pace · as a Mage · on", "· no
-    effect as Brawler"; a locked outfit's has neither).
+    effect as Brawler"; a locked outfit's has neither), her **Signature** (the family her knack names) and **Moon** lines,
+    and her trade: "Trade · Monster Den · Lapidary".
   - **The calling pick card** (CP29): above her class chip, for a Pace or Late Uma until her calling is confirmed. "Her
     calling · choose once", two class tiles (emblem, class, "★ Clever Spellfencer" her name with that pick, "★ Even pace
     as a Spell Blade"), the suggested one marked ("Suggested · Power 96 over Wit 88") and her pick selected; tapping the
-    other picks it. **Confirm**, and "Her first win confirms it." At Uma Lv 1 a pick moves her class too.
+    other picks it. Each tile names the trade it gives and its head count in her world ("Forest · Armorer · 8 Umas").
+    **Confirm**, and "Her first win confirms it." At Uma Lv 1 a pick moves her class too. While she has work started or
+    queued, the other tile is off and the card says "Finish her work first": the pick moves her trade.
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
-    - Gear: the standard preset ("Cleric · Magical armor · Light Orb · Spring Amulet"), three weapon slots, five armor
-      slots, the **Damage** and **Support** accessory slots, the Extra Stats link, and Weapon, Armor and Accessory
-      Rank cells. Damage shows her Orb and what it adds ("Emerald Fire Orb · G5", "+10 Fire offense"); its sheet lists
-      Orbs only, with the same line ("Ice Orb · G3 · +4 Ice offense"), or "No Orbs yet". Support's sheet lists
-      Talismans and Amulets only, or "No Talismans or Amulets yet";
-    - Work;
+    - Gear: "Use the standard preset" (or "Standard preset on"), then her grade rows: three weapons ("Greatsword · G3 ·
+      Might 8"), five armor slots ("Head · Helm · G2 · DEF +8") and her accessory ("Pendant · G4 · +2 on her three kinds
+      · ★ +10", or "Accessory · G0 · Pick a form"), each with a pill that raises it ("G3 → G4 · 1 Weapon Gem G4") or says
+      why not ("Needs Lv 16", "Already G10"). A row's sheet climbs several grades at once when the Warehouse holds each.
+      The accessory sheet picks the family, her ★ family first, an Orb's kind (any of the ten) or a Bell's (one she
+      holds), and says what the form gives; a line under the rows says "Wear a Bell for ★ +10" while she doesn't wear her
+      family. Then the Extra Stats link ("8/22 open · map ›");
+    - Work: her job, and her Craft Level with her trade: "Craft Lv 23 · Forest · Armorer";
     - Racing: her aptitudes, **Her template** (Calling, Stride, Knack and Flourish, each with its note: the calling's
       sources or "Picked", the Flourish's "Active" or "No effect as Brawler", a locked outfit's "As a Mage"), her racing
       base stats and growth, and her unique skill.
   - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
-  - **Can upgrade marks:** a green dot on Gear while a piece or Extra Stats can be upgraded (no skill costs points, so
-    Skills never dots). On the Gear tab and the Skills tab's weapon slots, each slot that can take a better piece has
-    the green mark, and Extra Stats has a green "N to set · N free" pill.
+  - **Can upgrade marks:** a green dot on Gear while a slot or Extra Stats can be upgraded (no skill costs points, so
+    Skills never dots). On the Gear tab and the Skills tab's weapon slots, each slot she can raise now has the green
+    mark, and Extra Stats has a green "N to set" pill.
   - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
-    - **Offense:** ATK, M.ATK, each weapon's Might, her Orb ("Fire Orb +10", or "None");
+    - **Offense:** ATK, M.ATK, each weapon's Might, her accessory ("Pendant: +2 on her three kinds", "Orb: Fire +8",
+      "Bell: Greatsword 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None") and, while she wears
+      her family, her Signature ("+10 ★");
     - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
     - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), HP Regen,
       Lifesteal, MP with what she regains a round ("296 · +13 a round": the base regen by her Class Rank and her
       Spring's), MP Steal, and **★ Flourish** ("Even pace · 1% a round, up to 4%", or "No effect as Brawler");
     - **Other:** the Limit Break head start.
 
-    Its help names Guts in HP, the Damage slot's Orb as offense, the Support slot's effect, and the healers' ATK and
-    M.ATK.
+    Its help names Guts in HP, her accessory and signature as offense, and the healers' ATK and M.ATK.
 
-    The six core stats show their total, then in brackets what gear adds (blue) and what active Extra Stats add
-    (green) (D99). Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
+    The six core stats show their total, then in brackets what gear adds (blue) and what Extra Stats add (green) (D99);
+    her moon's points are starred. Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
   - A locked outfit shows **Unlock · 1 Ticket**. An outfit another tier's world owns shows "In Tier n" instead, and in a
     tier above 1 an outfit nobody owns shows "Unlocked in Tier 1" (D5).
 - **Skills page** (`SkillTree.tsx`, engine v16, H70; class-progression §6.1, CP23):
@@ -237,10 +251,9 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
     ×0.44"), then her ★ Flourish line ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "No effect as
     Mage" outside her calling's class.
   - Pick the **active class**, six in two rows of three, each with its emblem and Class Rank, then her **three weapon
-    slots**: kind, "G3" or "Training", her line's letter, and the green mark when it can take a better piece. A slot's
-    sheet (shared with the Gear tab) lists her Training weapon and crafted pieces of each weapon of the slot's channel;
-    every class changes a slot's weapon within its channel (CP12). Each armor slot's sheet picks its physical or magical
-    kind and the piece (D103).
+    slots**: kind, its grade ("G3"), her line's letter, and the green mark when she can raise it. A slot's sheet lists
+    each weapon of the slot's channel with its grade ("Lance · G2 · Might 4"); every class changes a slot's weapon within
+    its channel (CP12). Grades are raised on the Gear tab.
   - The class's **Class Rank** bar, and the depths it opens (D102).
   - **Equipped · 4/7**, her equipped skills as chips (tap to unequip), and "Back to auto" or "Auto". No points line.
   - **The tree:** three tabs, one a slot (its kind and line letter), and the open tree drawn as a tree: depths 1–2 full
@@ -314,38 +327,49 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
     - her Flourish reads "Aster ★ +30 HP", Clean break's Barrier "Aster: ★ Barrier 37", and the round's MP back
       "+13 MP".
 
-    A fight keeps its own rules: one started before engine v16 still plays five weapons, v15's weaknesses ("weak" and
-    its icons) and no base regen or Flourish; one before classes v2 a one-half Summoner and v14's support.
-- **Result:** Victory or Defeated, Laurels, Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar, her Class Rank
-  bar with a line under it for each skill that rose ("Cleave reached Rank 3"; a depth that just opened, "Sunder
-  opened"; none for a fight before v16), and three Weapon and five Armor Rank cells, each glowing on a rank-up (D102).
+    A fight keeps its own rules: one started before engine v17 keeps its pieces and supports; one before engine v16
+    still plays five weapons, v15's weaknesses ("weak" and its icons) and no base regen or Flourish; one before classes
+    v2 a one-half Summoner and v14's support.
+- **Result:** Victory or Defeated, Laurels, Class Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar,
+  and her Class Rank bar with a line under it for each skill that rose ("Cleave reached Rank 3"; a depth that just
+  opened, "Sunder opened"; none for a fight before v16).
   Then "Fight again" or back to the map.
 - The fight screen plays a **fight source** (`battle/fight-source.ts`, H50): the world map's is its open fight, the
   region's title and biome, and foes sized by rank; the Rift hands it its own ([The Rift](#the-rift)).
 
 ### Warehouse
 
-The kit's `ShelfView` (SD3) with this game's shelves:
-- Materials (family by family, raw then refined), Star Gems and Gear, as icons with counts;
-- grade chips: every grade, the highest of each line, or one grade;
-- a stock sheet with what it is, and Sell ×1, 10 or All for Laurels.
+The kit's `ShelfView` (SD3) with this game's two shelves, one row per stack:
+- **Materials:** line by line, raw then refined, tier by tier; each row says its tier and band ("Tier 1 · high · raw"),
+  never a grade.
+- **Made items:** Weapon Gems, Armor Fittings and Accessory Settings by grade, then Planet and Moon Jewels I–V; grade
+  chips filter them (every grade, the highest of each line, or one grade).
+- The header counts both: "120 materials · 35 made items".
+- A stock sheet says what it is ("Tier 1 · high · raw · Refines into Iron Ingot", "Grade 5 · Raises a weapon one grade",
+  "Opens Planet III"), with Sell ×1, 10 or All for Laurels.
 
 ### Exchange
 
 - Your Laurels and ticket counts.
-- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and raw items of the grades your continents
-  unlock. A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
-- **Manuals** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working Umas
-  remain selectable. Then pick one of her bars (six classes, ten weapons, ten armor kinds); each Manual turns
-  1,000 Gear or Class Marks into 1,000 EXP on it.
+- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and **raw materials** by line, every type of the
+  world's tier and below with its tier and band ("Tier 1 · low · have 12"); a type not stocked yet is locked with the win
+  that stocks it ("After the tier's first win", "After a win on continent 3"). A row's sheet offers ×1, ×5, ×10, ×25 or a
+  typed quantity, the total, and "Need N more" when short.
+- **Read a Class Manual** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working
+  Umas remain selectable. Then pick one of her six classes; each Manual turns 1,000 Class Marks into 1,000 EXP on it.
 
 ### Observatory
 
 - A face and Choose an Uma open the shared picker, highest Uma Level first (newest release, then name for ties),
-  with locked Umas disabled. Opens on the Uma named in its route, else the highest; working Umas remain selectable.
-- Her Sun-and-planets map: tap a node to switch it on or off, up to her active limit. A locked node names the Star Gem
-  that opens it.
-- Effect totals, and a **Set** list of the Star Gems she can set now ([loops](loops.md#extra-stats-and-gear)).
+  with locked Umas disabled. Opens on the Uma named in its route, else the highest; working Umas remain selectable. The
+  face's line counts her open nodes ("Open 8 of 20 · ★ 1 of 2").
+- **Her map:** the Planet in the middle, Prowess, Vigor and Guard around it, five nodes each, and ★ her moon's two. Tap a
+  node for its sheet: what it gives ("+4 to every stat", "as Brawler ATK +6, M.ATK +0", "HP +30, MP +6") and its jewel
+  ("needs a Planet Jewel III · opens at Lv 21", or "Open"). Its help: "Each node opens with its jewel, in order. Every
+  open node counts."
+- Prowess's split ("Prowess · Brawler 100/0: ATK +6, M.ATK +0"), the six stats' totals with her moon's starred, and a
+  **Set** list of the jewels she can set now (a Moon Jewel asks which moon), or "No jewels ready"
+  ([loops](loops.md#extra-stats-and-gear)).
 
 ### Account
 
@@ -355,6 +379,8 @@ Reached from the account bar. The kit's `AccountPage` (SD3) with this game's con
   Tickets in a tier above 1.
 - **Appearance:** System, Light or Dark, kept on this device (D147).
 - Notifications.
+- **The Tier rework's grant** (save v28, H80): a row "The Tier rework's grant · 63,800 Speed Tickets" for a world with
+  a grant, which reopens "The Wilds are rebuilt" ([loops](loops.md#the-tier-reworks-grant)).
 - **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "n of N", then the earned
   ones, newest first, each with its badge, name and "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest
   in catalog order, badge dimmed, with how each is earned. It lists Tier 1's seals and Rift Conquered, every other

@@ -1,10 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { newGrades } from '../economy/grades'
 import { rpgDefaultWeapons } from '../rpg/rules'
 import { accessorySlot, FULL_MAP, gradedUma, templateOutfit } from './economy-v3.fixture'
 import { umaBattleSheet } from './sheet'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const sheet = (tier: 1 | 2) => {
   const gear = newGrades(tier)

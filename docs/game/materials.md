@@ -1,358 +1,186 @@
-# Materials, Star Gems and gear
+# Materials, made items and gear
 
-Everything an Uma gathers, refines, crafts or cuts. Lists are generated from `packages/domain/src/items/` and
-`economy/` (`gems.ts`, `gear.ts`). There are no tokens (D105). How the jobs work is in
-[loops](loops.md#craft-level).
+Everything an Uma gathers, processes or makes, and what it does. Lists are generated from `packages/domain/src/items/`
+(`materials-id.ts`, `materials.ts`, `made.ts`) and `economy/` (`grades.ts`, `accessories.ts`, `planet.ts`). How the jobs
+work is in [loops](loops.md#craft-level); the ten places in [sections](sections.md#wilds). This is Tier 1's economy as it
+plays since H82 (R2, engine v17, save v28); the old game's eight families, crafted pieces and Star Gems live on only in
+the save migration that converted them (`toV28`, [architecture](architecture.md#save-history)).
 
-## Families
+## Lines
 
-Eight families, all on the Wilds page (D144), feed the Forge and the Lapidary alike. Each feeds one of eight stats, has
-one site, and has ten grades. Every raw item refines one-for-one into its refined form at the Workbench, in a quarter of
-the time it took to gather (D101).
+Five lines, one a gathering profession, each in one Wilds place (PP7). Every tier has a **low** and a **high** type in
+each line: a world holds its own tier's types and every tier's below (a Tier 2 world gathers Tier 1's and Tier 2's). A
+low type opens at Craft Lv 1 and a high type at Craft Lv 26, in every tier (PP13).
 
 <!-- live:families -->
-| Family | Id | Feeds | Site |
-|---|---|---|---|
-| Hides & Scales | `hides-scales` | HP | Monster Den |
-| Essences | `essences` | MP | Ley Spring |
-| Ores | `ores` | ATK | Mine |
-| Crystals | `crystals` | M.ATK | Crystal Cavern |
-| Stones | `stones` | DEF | Quarry |
-| Fibers | `fibers` | M.DEF | Meadow |
-| Woods | `woods` | Speed | Forest |
-| Bones & Horns | `bones-horns` | Limit Break charge | Fossil Dig |
+| Line | Gathered by | Tier 1 (low · high) | Tier 2 | Tier 3 |
+|---|---|---|---|---|
+| Metal | Mining, the Mine | Copper Ore · Iron Ore | Gold Ore · Titanium Ore | Mythril Ore · Orichalcum Ore |
+| Wood | Wood Chopping, the Forest | Pine Log · Cedar Log | Cherry Log · Ebony Log | Elderwood Log · Yggdrasil Branch |
+| Vegetables | Farming, the Fields | Carrot · Cabbage | Bell Pepper · Asparagus | Golden Carrot · Emperor Pumpkin |
+| Fish | Fishing, the Fishery | Carp · Sardine | Sea Bream · Tuna | Silverfin · Rainbow Koi |
+| Stone | Hunting, the Monster Den | Quartz · Citrine | Sapphire · Diamond | Starstone · Philosopher's Stone |
 <!-- /live -->
 
-**Symmetry (D86, D144):** every family is used alike by gear and alike by Star Gems, so no site sits idle and none is a
-bottleneck. `economy/materials.test.ts` checks it.
+Every raw type processes one for one into its refined form at the Workbench, in a quarter of a gather's time. Made items
+take refined materials only.
 
-## Items by family
+## Types by line
 
 <!-- live:items -->
-### Hides & Scales (`hides-scales`, HP, Monster Den)
+### Metal (Mining, the Mine)
 
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Puffbun Pelt (`puffbun-pelt`) | Puffbun Leather (`puffbun-leather`) | 1 |
-| 2 | Boarling Hide (`boarling-hide`) | Boarling Leather (`boarling-leather`) | 6 |
-| 3 | Wolfkin Pelt (`wolfkin-pelt`) | Wolfkin Leather (`wolfkin-leather`) | 11 |
-| 4 | Rock Lizard Scale (`rock-lizard-scale`) | Lizard Leather (`lizard-leather`) | 16 |
-| 5 | Ironback Hide (`ironback-hide`) | Ironback Leather (`ironback-leather`) | 21 |
-| 6 | Basilisk Scale (`basilisk-scale`) | Basilisk Leather (`basilisk-leather`) | 26 |
-| 7 | Manticore Hide (`manticore-hide`) | Manticore Leather (`manticore-leather`) | 31 |
-| 8 | Behemoth Hide (`behemoth-hide`) | Behemoth Leather (`behemoth-leather`) | 36 |
-| 9 | Wyvern Scale (`wyvern-scale`) | Wyvern Leather (`wyvern-leather`) | 41 |
-| 10 | Dragon Scale (`dragon-scale`) | Dragonhide (`dragonhide`) | 46 |
+| Tier | Band | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|---|
+| 1 | low | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 |
+| 1 | high | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 26 |
+| 2 | low | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 1 |
+| 2 | high | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 26 |
+| 3 | low | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 1 |
+| 3 | high | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 26 |
 
-### Essences (`essences`, MP, Ley Spring)
+### Wood (Wood Chopping, the Forest)
 
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Mist Essence (`mist-essence`) | Mist Infusion (`mist-infusion`) | 1 |
-| 2 | Dew Essence (`dew-essence`) | Dew Infusion (`dew-infusion`) | 6 |
-| 3 | Breeze Essence (`breeze-essence`) | Breeze Infusion (`breeze-infusion`) | 11 |
-| 4 | Ember Essence (`ember-essence`) | Ember Infusion (`ember-infusion`) | 16 |
-| 5 | Tide Essence (`tide-essence`) | Tide Infusion (`tide-infusion`) | 21 |
-| 6 | Spark Essence (`spark-essence`) | Spark Infusion (`spark-infusion`) | 26 |
-| 7 | Glimmer Essence (`glimmer-essence`) | Glimmer Infusion (`glimmer-infusion`) | 31 |
-| 8 | Shadow Essence (`shadow-essence`) | Shadow Infusion (`shadow-infusion`) | 36 |
-| 9 | Aether (`aether`) | Aether Infusion (`aether-infusion`) | 41 |
-| 10 | Prismatic Essence (`prismatic-essence`) | Prismatic Infusion (`prismatic-infusion`) | 46 |
+| Tier | Band | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|---|
+| 1 | low | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 |
+| 1 | high | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 26 |
+| 2 | low | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 1 |
+| 2 | high | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 26 |
+| 3 | low | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 1 |
+| 3 | high | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 26 |
 
-### Ores (`ores`, ATK, Mine)
+### Vegetables (Farming, the Fields)
 
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 |
-| 2 | Tin Ore (`tin-ore`) | Tin Ingot (`tin-ingot`) | 6 |
-| 3 | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 11 |
-| 4 | Silver Ore (`silver-ore`) | Silver Ingot (`silver-ingot`) | 16 |
-| 5 | Cobalt Ore (`cobalt-ore`) | Cobalt Ingot (`cobalt-ingot`) | 21 |
-| 6 | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 26 |
-| 7 | Platinum Ore (`platinum-ore`) | Platinum Ingot (`platinum-ingot`) | 31 |
-| 8 | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 36 |
-| 9 | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 41 |
-| 10 | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 46 |
+| Tier | Band | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|---|
+| 1 | low | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 |
+| 1 | high | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 26 |
+| 2 | low | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 1 |
+| 2 | high | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 26 |
+| 3 | low | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 1 |
+| 3 | high | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 26 |
 
-### Crystals (`crystals`, M.ATK, Crystal Cavern)
+### Fish (Fishing, the Fishery)
 
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 |
-| 2 | Amethyst (`amethyst`) | Cut Amethyst (`cut-amethyst`) | 6 |
-| 3 | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 11 |
-| 4 | Garnet (`garnet`) | Cut Garnet (`cut-garnet`) | 16 |
-| 5 | Emerald (`emerald`) | Cut Emerald (`cut-emerald`) | 21 |
-| 6 | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 26 |
-| 7 | Ruby (`ruby`) | Cut Ruby (`cut-ruby`) | 31 |
-| 8 | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 36 |
-| 9 | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 41 |
-| 10 | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 46 |
+| Tier | Band | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|---|
+| 1 | low | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 |
+| 1 | high | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 26 |
+| 2 | low | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 1 |
+| 2 | high | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 26 |
+| 3 | low | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 1 |
+| 3 | high | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 26 |
 
-### Stones (`stones`, DEF, Quarry)
+### Stone (Hunting, the Monster Den)
 
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Limestone (`limestone`) | Limestone Block (`limestone-block`) | 1 |
-| 2 | Sandstone (`sandstone`) | Sandstone Block (`sandstone-block`) | 6 |
-| 3 | Slate (`slate`) | Slate Block (`slate-block`) | 11 |
-| 4 | Granite (`granite`) | Granite Block (`granite-block`) | 16 |
-| 5 | Basalt (`basalt`) | Basalt Block (`basalt-block`) | 21 |
-| 6 | Marble (`marble`) | Marble Block (`marble-block`) | 26 |
-| 7 | Obsidian (`obsidian`) | Obsidian Block (`obsidian-block`) | 31 |
-| 8 | Jade (`jade`) | Jade Block (`jade-block`) | 36 |
-| 9 | Runestone (`runestone`) | Runestone Block (`runestone-block`) | 41 |
-| 10 | Meteorite (`meteorite`) | Meteorite Block (`meteorite-block`) | 46 |
-
-### Fibers (`fibers`, M.DEF, Meadow)
-
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Flax (`flax`) | Linen (`linen`) | 1 |
-| 2 | Jute (`jute`) | Burlap (`burlap`) | 6 |
-| 3 | Hemp (`hemp`) | Hemp Cloth (`hemp-cloth`) | 11 |
-| 4 | Cotton (`cotton`) | Cotton Cloth (`cotton-cloth`) | 16 |
-| 5 | Wool (`wool`) | Wool Cloth (`wool-cloth`) | 21 |
-| 6 | Alpaca Fleece (`alpaca-fleece`) | Alpaca Cloth (`alpaca-cloth`) | 26 |
-| 7 | Cashmere Fleece (`cashmere-fleece`) | Cashmere Cloth (`cashmere-cloth`) | 31 |
-| 8 | Silk Cocoon (`silk-cocoon`) | Silk (`silk`) | 36 |
-| 9 | Moonsilk Cocoon (`moonsilk-cocoon`) | Moonsilk (`moonsilk`) | 41 |
-| 10 | Cloudfleece (`cloudfleece`) | Cloudweave (`cloudweave`) | 46 |
-
-### Woods (`woods`, Speed, Forest)
-
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 |
-| 2 | Birch Log (`birch-log`) | Birch Plank (`birch-plank`) | 6 |
-| 3 | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 11 |
-| 4 | Maple Log (`maple-log`) | Maple Plank (`maple-plank`) | 16 |
-| 5 | Oak Log (`oak-log`) | Oak Plank (`oak-plank`) | 21 |
-| 6 | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 26 |
-| 7 | Mahogany Log (`mahogany-log`) | Mahogany Plank (`mahogany-plank`) | 31 |
-| 8 | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 36 |
-| 9 | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 41 |
-| 10 | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 46 |
-
-### Bones & Horns (`bones-horns`, Limit Break charge, Fossil Dig)
-
-| Grade | Raw | Refined | Unlocks at Craft Lv |
-|---|---|---|---|
-| 1 | Seashell (`seashell`) | Shell Carving (`shell-carving`) | 1 |
-| 2 | Ammonite (`ammonite`) | Ammonite Carving (`ammonite-carving`) | 6 |
-| 3 | Trilobite (`trilobite`) | Trilobite Carving (`trilobite-carving`) | 11 |
-| 4 | Fossil Bone (`fossil-bone`) | Bone Carving (`bone-carving`) | 16 |
-| 5 | Mammoth Tusk (`mammoth-tusk`) | Tusk Carving (`tusk-carving`) | 21 |
-| 6 | Saber Fang (`saber-fang`) | Fang Carving (`fang-carving`) | 26 |
-| 7 | Raptor Claw (`raptor-claw`) | Claw Carving (`claw-carving`) | 31 |
-| 8 | Tyrant Tooth (`tyrant-tooth`) | Tooth Carving (`tooth-carving`) | 36 |
-| 9 | Titan Bone (`titan-bone`) | Titan Carving (`titan-carving`) | 41 |
-| 10 | Unicorn Horn (`unicorn-horn`) | Unicorn Carving (`unicorn-carving`) | 46 |
+| Tier | Band | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|---|
+| 1 | low | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 |
+| 1 | high | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 26 |
+| 2 | low | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 1 |
+| 2 | high | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 26 |
+| 3 | low | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 1 |
+| 3 | high | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 26 |
 <!-- /live -->
 
-## Star Gems
+## Made items
 
-Cut at the Lapidary from refined items (D144). Setting one opens a node on the Uma's Observatory map, her Extra Stats
-([loops](loops.md#extra-stats-and-gear)). There are 100, one for each node:
+The four making places turn refined materials into what an Uma uses (PP10):
+- **Weapon Gem** (the Forge): raises a weapon one grade.
+- **Armor Fittings** (the Armorer): raise an armor slot one grade.
+- **Accessory Setting** (the Charm Shop): raises her accessory slot one grade.
+- **Planet and Moon Jewels** (the Lapidary): open her Extra Stats map's nodes ([loops](loops.md#extra-stats-and-gear)).
 
-| Kind | What it is |
-|---|---|
-| **Moon** | Eight stats × ten grades. One refined item of the stat's family at the gem's grade; a half-grade side from another family from grade 4, and a second from grade 8 |
-| **Bridge** | A pair of neighbouring stats, at grades 3 and 7: one refined item of each family, plus a side at grade 7 |
-| **Sun** | All eight stats, at grades 4, 6, 8 and 10: one refined item of every family |
+**One recipe an item, the same amounts in every tier** (PP10, PP11): a Weapon Gem 2 metal and 2 wood; Armor Fittings 1
+vegetable and 1 fish in the low band (G1–G5), 1 metal, 1 wood and 1 stone in the high band (G6–G10); an Accessory Setting
+12 refined, half vegetables and half fish; a Planet Jewel 3 each of stone, wood, vegetables and fish; a Moon Jewel 3 stone
+on 1 metal.
 
-A gem is named for its grade's stone on the Crystal Cavern's ladder and its stat's virtue: HP Vigor, MP Spirit, ATK
-Strength, M.ATK Sorcery, DEF Fortitude, M.DEF Resolve, Speed Swiftness, Limit Valor. So "Garnet of Strength" is ATK's
-grade 4. Maxing one Uma's map takes 232 refined items, 29 of each family. Each planet has its own gem silhouette and
-colour (uma-art 2.8.0, H29): rough at grades 1–3, faceted at 4–6, mounted at 7–8, with legendary glints at 9–10.
-Bridges are two-colour twin crystals; Sun gems are gold prisms with more rays at each grade.
+**The ladder** (PP9) picks each refined type: a grade's band picks the low or the high type, and a later world moves the
+top grade of each band onto its own pair. In a Tier 2 world G5 and G10 take Tier 2's types; in Tier 3 G4 and G9 take Tier
+2's and G5 and G10 Tier 3's. The making places colour a grade by its material's tier (Tier 2 amber, Tier 3 violet).
+
+A made item of grade g opens at Craft Lv 5g − 4. Making one takes a gather's time for each refined item in it (a Weapon
+Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4).
+
+### Jewels
+
+A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's n grade 2n. A Moon Jewel opens node n of any moon,
+picked when it's set; Moon Jewels II and IV also open her own moon's I and II.
 
 <!-- live:gems -->
-| Star Gem | Id | Kind | Grade | Feeds | Materials |
+| Jewel | Id | Opens | Grade | Uma Lv | Recipe (Tier 1) |
 |---|---|---|---|---|---|
-| Quartz of Vigor | `gem-hp-1` | Moon | 1 | HP | Puffbun Leather |
-| Amethyst of Vigor | `gem-hp-2` | Moon | 2 | HP | Boarling Leather |
-| Citrine of Vigor | `gem-hp-3` | Moon | 3 | HP | Wolfkin Leather |
-| Garnet of Vigor | `gem-hp-4` | Moon | 4 | HP | Lizard Leather, Dew Infusion |
-| Emerald of Vigor | `gem-hp-5` | Moon | 5 | HP | Ironback Leather, Breeze Infusion |
-| Sapphire of Vigor | `gem-hp-6` | Moon | 6 | HP | Basilisk Leather, Breeze Infusion |
-| Ruby of Vigor | `gem-hp-7` | Moon | 7 | HP | Manticore Leather, Ember Infusion |
-| Diamond of Vigor | `gem-hp-8` | Moon | 8 | HP | Behemoth Leather, Ember Infusion, Cut Garnet |
-| Starstone of Vigor | `gem-hp-9` | Moon | 9 | HP | Wyvern Leather, Tide Infusion, Cut Emerald |
-| Philosopher's Stone of Vigor | `gem-hp-10` | Moon | 10 | HP | Dragonhide, Tide Infusion, Cut Emerald |
-| Quartz of Spirit | `gem-mp-1` | Moon | 1 | MP | Mist Infusion |
-| Amethyst of Spirit | `gem-mp-2` | Moon | 2 | MP | Dew Infusion |
-| Citrine of Spirit | `gem-mp-3` | Moon | 3 | MP | Breeze Infusion |
-| Garnet of Spirit | `gem-mp-4` | Moon | 4 | MP | Ember Infusion, Tin Ingot |
-| Emerald of Spirit | `gem-mp-5` | Moon | 5 | MP | Tide Infusion, Iron Ingot |
-| Sapphire of Spirit | `gem-mp-6` | Moon | 6 | MP | Spark Infusion, Iron Ingot |
-| Ruby of Spirit | `gem-mp-7` | Moon | 7 | MP | Glimmer Infusion, Silver Ingot |
-| Diamond of Spirit | `gem-mp-8` | Moon | 8 | MP | Shadow Infusion, Silver Ingot, Granite Block |
-| Starstone of Spirit | `gem-mp-9` | Moon | 9 | MP | Aether Infusion, Cobalt Ingot, Basalt Block |
-| Philosopher's Stone of Spirit | `gem-mp-10` | Moon | 10 | MP | Prismatic Infusion, Cobalt Ingot, Basalt Block |
-| Quartz of Strength | `gem-atk-1` | Moon | 1 | ATK | Copper Ingot |
-| Amethyst of Strength | `gem-atk-2` | Moon | 2 | ATK | Tin Ingot |
-| Citrine of Strength | `gem-atk-3` | Moon | 3 | ATK | Iron Ingot |
-| Garnet of Strength | `gem-atk-4` | Moon | 4 | ATK | Silver Ingot, Cut Amethyst |
-| Emerald of Strength | `gem-atk-5` | Moon | 5 | ATK | Cobalt Ingot, Cut Citrine |
-| Sapphire of Strength | `gem-atk-6` | Moon | 6 | ATK | Gold Ingot, Cut Citrine |
-| Ruby of Strength | `gem-atk-7` | Moon | 7 | ATK | Platinum Ingot, Cut Garnet |
-| Diamond of Strength | `gem-atk-8` | Moon | 8 | ATK | Titanium Ingot, Cut Garnet, Cotton Cloth |
-| Starstone of Strength | `gem-atk-9` | Moon | 9 | ATK | Mythril Ingot, Cut Emerald, Wool Cloth |
-| Philosopher's Stone of Strength | `gem-atk-10` | Moon | 10 | ATK | Orichalcum Ingot, Cut Emerald, Wool Cloth |
-| Quartz of Sorcery | `gem-matk-1` | Moon | 1 | M.ATK | Cut Quartz |
-| Amethyst of Sorcery | `gem-matk-2` | Moon | 2 | M.ATK | Cut Amethyst |
-| Citrine of Sorcery | `gem-matk-3` | Moon | 3 | M.ATK | Cut Citrine |
-| Garnet of Sorcery | `gem-matk-4` | Moon | 4 | M.ATK | Cut Garnet, Sandstone Block |
-| Emerald of Sorcery | `gem-matk-5` | Moon | 5 | M.ATK | Cut Emerald, Slate Block |
-| Sapphire of Sorcery | `gem-matk-6` | Moon | 6 | M.ATK | Cut Sapphire, Slate Block |
-| Ruby of Sorcery | `gem-matk-7` | Moon | 7 | M.ATK | Cut Ruby, Granite Block |
-| Diamond of Sorcery | `gem-matk-8` | Moon | 8 | M.ATK | Cut Diamond, Granite Block, Maple Plank |
-| Starstone of Sorcery | `gem-matk-9` | Moon | 9 | M.ATK | Cut Starstone, Basalt Block, Oak Plank |
-| Philosopher's Stone of Sorcery | `gem-matk-10` | Moon | 10 | M.ATK | Cut Philosopher's Stone, Basalt Block, Oak Plank |
-| Quartz of Fortitude | `gem-def-1` | Moon | 1 | DEF | Limestone Block |
-| Amethyst of Fortitude | `gem-def-2` | Moon | 2 | DEF | Sandstone Block |
-| Citrine of Fortitude | `gem-def-3` | Moon | 3 | DEF | Slate Block |
-| Garnet of Fortitude | `gem-def-4` | Moon | 4 | DEF | Granite Block, Burlap |
-| Emerald of Fortitude | `gem-def-5` | Moon | 5 | DEF | Basalt Block, Hemp Cloth |
-| Sapphire of Fortitude | `gem-def-6` | Moon | 6 | DEF | Marble Block, Hemp Cloth |
-| Ruby of Fortitude | `gem-def-7` | Moon | 7 | DEF | Obsidian Block, Cotton Cloth |
-| Diamond of Fortitude | `gem-def-8` | Moon | 8 | DEF | Jade Block, Cotton Cloth, Bone Carving |
-| Starstone of Fortitude | `gem-def-9` | Moon | 9 | DEF | Runestone Block, Wool Cloth, Tusk Carving |
-| Philosopher's Stone of Fortitude | `gem-def-10` | Moon | 10 | DEF | Meteorite Block, Wool Cloth, Tusk Carving |
-| Quartz of Resolve | `gem-mdef-1` | Moon | 1 | M.DEF | Linen |
-| Amethyst of Resolve | `gem-mdef-2` | Moon | 2 | M.DEF | Burlap |
-| Citrine of Resolve | `gem-mdef-3` | Moon | 3 | M.DEF | Hemp Cloth |
-| Garnet of Resolve | `gem-mdef-4` | Moon | 4 | M.DEF | Cotton Cloth, Birch Plank |
-| Emerald of Resolve | `gem-mdef-5` | Moon | 5 | M.DEF | Wool Cloth, Cedar Plank |
-| Sapphire of Resolve | `gem-mdef-6` | Moon | 6 | M.DEF | Alpaca Cloth, Cedar Plank |
-| Ruby of Resolve | `gem-mdef-7` | Moon | 7 | M.DEF | Cashmere Cloth, Maple Plank |
-| Diamond of Resolve | `gem-mdef-8` | Moon | 8 | M.DEF | Silk, Maple Plank, Lizard Leather |
-| Starstone of Resolve | `gem-mdef-9` | Moon | 9 | M.DEF | Moonsilk, Oak Plank, Ironback Leather |
-| Philosopher's Stone of Resolve | `gem-mdef-10` | Moon | 10 | M.DEF | Cloudweave, Oak Plank, Ironback Leather |
-| Quartz of Swiftness | `gem-speed-1` | Moon | 1 | Speed | Pine Plank |
-| Amethyst of Swiftness | `gem-speed-2` | Moon | 2 | Speed | Birch Plank |
-| Citrine of Swiftness | `gem-speed-3` | Moon | 3 | Speed | Cedar Plank |
-| Garnet of Swiftness | `gem-speed-4` | Moon | 4 | Speed | Maple Plank, Ammonite Carving |
-| Emerald of Swiftness | `gem-speed-5` | Moon | 5 | Speed | Oak Plank, Trilobite Carving |
-| Sapphire of Swiftness | `gem-speed-6` | Moon | 6 | Speed | Cherry Plank, Trilobite Carving |
-| Ruby of Swiftness | `gem-speed-7` | Moon | 7 | Speed | Mahogany Plank, Bone Carving |
-| Diamond of Swiftness | `gem-speed-8` | Moon | 8 | Speed | Ebony Plank, Bone Carving, Ember Infusion |
-| Starstone of Swiftness | `gem-speed-9` | Moon | 9 | Speed | Elderwood Plank, Tusk Carving, Tide Infusion |
-| Philosopher's Stone of Swiftness | `gem-speed-10` | Moon | 10 | Speed | Yggdrasil Plank, Tusk Carving, Tide Infusion |
-| Quartz of Valor | `gem-limit-1` | Moon | 1 | Limit Break charge | Shell Carving |
-| Amethyst of Valor | `gem-limit-2` | Moon | 2 | Limit Break charge | Ammonite Carving |
-| Citrine of Valor | `gem-limit-3` | Moon | 3 | Limit Break charge | Trilobite Carving |
-| Garnet of Valor | `gem-limit-4` | Moon | 4 | Limit Break charge | Bone Carving, Boarling Leather |
-| Emerald of Valor | `gem-limit-5` | Moon | 5 | Limit Break charge | Tusk Carving, Wolfkin Leather |
-| Sapphire of Valor | `gem-limit-6` | Moon | 6 | Limit Break charge | Fang Carving, Wolfkin Leather |
-| Ruby of Valor | `gem-limit-7` | Moon | 7 | Limit Break charge | Claw Carving, Lizard Leather |
-| Diamond of Valor | `gem-limit-8` | Moon | 8 | Limit Break charge | Tooth Carving, Lizard Leather, Silver Ingot |
-| Starstone of Valor | `gem-limit-9` | Moon | 9 | Limit Break charge | Titan Carving, Ironback Leather, Cobalt Ingot |
-| Philosopher's Stone of Valor | `gem-limit-10` | Moon | 10 | Limit Break charge | Unicorn Carving, Ironback Leather, Cobalt Ingot |
-| Citrine of Vigor & Fortitude | `gem-hp-def-3` | Bridge | 3 | HP, DEF | Wolfkin Leather, Slate Block |
-| Ruby of Vigor & Fortitude | `gem-hp-def-7` | Bridge | 7 | HP, DEF | Manticore Leather, Obsidian Block, Ember Infusion |
-| Citrine of Fortitude & Resolve | `gem-def-mdef-3` | Bridge | 3 | DEF, M.DEF | Slate Block, Hemp Cloth |
-| Ruby of Fortitude & Resolve | `gem-def-mdef-7` | Bridge | 7 | DEF, M.DEF | Obsidian Block, Cashmere Cloth, Cotton Cloth |
-| Citrine of Resolve & Spirit | `gem-mdef-mp-3` | Bridge | 3 | M.DEF, MP | Hemp Cloth, Breeze Infusion |
-| Ruby of Resolve & Spirit | `gem-mdef-mp-7` | Bridge | 7 | M.DEF, MP | Cashmere Cloth, Glimmer Infusion, Maple Plank |
-| Citrine of Spirit & Sorcery | `gem-mp-matk-3` | Bridge | 3 | MP, M.ATK | Breeze Infusion, Cut Citrine |
-| Ruby of Spirit & Sorcery | `gem-mp-matk-7` | Bridge | 7 | MP, M.ATK | Glimmer Infusion, Cut Ruby, Silver Ingot |
-| Citrine of Sorcery & Strength | `gem-matk-atk-3` | Bridge | 3 | M.ATK, ATK | Cut Citrine, Iron Ingot |
-| Ruby of Sorcery & Strength | `gem-matk-atk-7` | Bridge | 7 | M.ATK, ATK | Cut Ruby, Platinum Ingot, Granite Block |
-| Citrine of Strength & Swiftness | `gem-atk-speed-3` | Bridge | 3 | ATK, Speed | Iron Ingot, Cedar Plank |
-| Ruby of Strength & Swiftness | `gem-atk-speed-7` | Bridge | 7 | ATK, Speed | Platinum Ingot, Mahogany Plank, Cut Garnet |
-| Citrine of Swiftness & Valor | `gem-speed-limit-3` | Bridge | 3 | Speed, Limit Break charge | Cedar Plank, Trilobite Carving |
-| Ruby of Swiftness & Valor | `gem-speed-limit-7` | Bridge | 7 | Speed, Limit Break charge | Mahogany Plank, Claw Carving, Bone Carving |
-| Citrine of Valor & Vigor | `gem-limit-hp-3` | Bridge | 3 | Limit Break charge, HP | Trilobite Carving, Wolfkin Leather |
-| Ruby of Valor & Vigor | `gem-limit-hp-7` | Bridge | 7 | Limit Break charge, HP | Claw Carving, Manticore Leather, Lizard Leather |
-| Garnet of the Sun | `gem-sun-4` | Sun | 4 | All eight | Lizard Leather, Ember Infusion, Silver Ingot, Cut Garnet, Granite Block, Cotton Cloth, Maple Plank, Bone Carving |
-| Sapphire of the Sun | `gem-sun-6` | Sun | 6 | All eight | Basilisk Leather, Spark Infusion, Gold Ingot, Cut Sapphire, Marble Block, Alpaca Cloth, Cherry Plank, Fang Carving |
-| Diamond of the Sun | `gem-sun-8` | Sun | 8 | All eight | Behemoth Leather, Shadow Infusion, Titanium Ingot, Cut Diamond, Jade Block, Silk, Ebony Plank, Tooth Carving |
-| Philosopher's Stone of the Sun | `gem-sun-10` | Sun | 10 | All eight | Dragonhide, Prismatic Infusion, Orichalcum Ingot, Cut Philosopher's Stone, Meteorite Block, Cloudweave, Yggdrasil Plank, Unicorn Carving |
+| Planet Jewel I | `jewel-planet-1` | Planet I | 1 | 1 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
+| Planet Jewel II | `jewel-planet-2` | Planet II | 3 | 11 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
+| Planet Jewel III | `jewel-planet-3` | Planet III | 5 | 21 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
+| Planet Jewel IV | `jewel-planet-4` | Planet IV | 7 | 31 | 3× Cut Citrine, 3× Cedar Plank, 3× Shredded Cabbage, 3× Sardine Fillet |
+| Planet Jewel V | `jewel-planet-5` | Planet V | 9 | 41 | 3× Cut Citrine, 3× Cedar Plank, 3× Shredded Cabbage, 3× Sardine Fillet |
+| Moon Jewel I | `jewel-moon-1` | node I of a moon | 2 | 6 | 3× Cut Quartz, Copper Ingot |
+| Moon Jewel II | `jewel-moon-2` | node II of a moon; her moon's I | 4 | 16 | 3× Cut Quartz, Copper Ingot |
+| Moon Jewel III | `jewel-moon-3` | node III of a moon | 6 | 26 | 3× Cut Citrine, Iron Ingot |
+| Moon Jewel IV | `jewel-moon-4` | node IV of a moon; her moon's II | 8 | 36 | 3× Cut Citrine, Iron Ingot |
+| Moon Jewel V | `jewel-moon-5` | node V of a moon | 10 | 46 | 3× Cut Citrine, Iron Ingot |
 <!-- /live -->
 
 ## Gear
 
-Every gear type has its own ten-grade icon row (uma-art 2.5.0, H28), including Boots, Slippers and each Talisman and
-Amulet. Physical and magical feet share a silhouette with different materials; accessories have distinct shapes.
+**Grades, not pieces** (WP2, WP3): every Uma has three weapon slots (her class's three weapons), five armor slots (head,
+body, legs, arms, feet) and one accessory slot, each at a grade from G0 to G10. A made item of the next grade raises a
+slot one grade; nothing is crafted, bound or worn, and gear has no ranks. Grade g opens at Uma Lv 5g − 4.
 
-Crafted at the Forge (D124, D125): 40 types in ten grades, five physical and five magical in every row:
-- ten weapons;
-- ten armor pieces;
-- twenty accessories (Arms Orbs, Elemental Orbs, Talismans, Amulets).
+- **A weapon's Might:** its grade's value, added to the offense of hits made with that weapon, × the tier.
+- **Armor:** each slot adds its stat (head DEF, body HP, legs MP, arms M.DEF, feet Speed) and ATK or M.ATK by her class's
+  half: a physical class's armor gives ATK, a magical class's M.ATK. Switching class switches the half; the grades stay.
+- **The accessory slot:** its grade, and a family and form she sets freely outside fights (WP19). The four families, from
+  Tier 1, each in its base form: the **Pendant** (flat offense on her three weapons' kinds), the **Orb** (flat offense on
+  one kind she sets), the **Bell** (a follow-up strike when her act includes an Attack) and the **Insignia** (more damage
+  to sub-bosses and bosses). G0 does nothing.
+- **Her signature** (WP33, UT7): her knack names one family; while she wears it, her ATK and M.ATK rise 0.2 a level ×
+  the tier. The accessory sheet puts her family first, marked ★, and her standard preset wears it.
 
-**Recipes (D125, D139):** two refined items of the grade, one from each half of the Wilds, as one of four pairs:
-Ores + Crystals, Woods + Essences, Hides & Scales + Bones & Horns, Stones + Fibers. A type's grades walk through the
-pairs in turn, starting at its own place among the types (the table below lists each type's first four). So every
-Uma's gear uses all eight Wilds families about equally, whatever her class, armor half or accessories: 23–27 refined
-items of each, or 27–33 with two accessories (the Paladin's and the Cleric's spreads lean the most; the others stay
-within 24–26 and 28–32). Spread a roster's Wilds workers evenly and nothing piles up.
-
-Maxing one Uma's twelve tracks takes 240 refined items, about what her 100 Star Gems take (232). The Uma's Craft
-Level gates the grade made (5g − 4), as for every job. Ids are `<type>-g<grade>`; pieces carry no accent.
-
-**What a piece does (D104, D124):**
-- **A weapon's Might:** its grade's value added to the offense of hits made with that weapon (D142, D143).
-- **Armor:** ATK (physical) or M.ATK (magical) +⌈grade ÷ 2⌉, and its slot's defensive stat +2 a grade (D141). Head DEF,
-  body HP, legs MP, arms MDEF, feet Speed.
-- **An Orb:** offense on her hits of its kind, half a weapon's Might at its grade (classes v2, C4).
-- **A Talisman or an Amulet:** the effect in the table below ([combat](combat.md#damage)).
-
-**Slots and wearing:**
-- **Slots:** three weapon slots (her class's, by channel, engine v16), five armor slots (head, body, legs, arms, feet)
-  and two accessory slots, Damage for an Orb and Support for a Talisman or an Amulet (C10).
-- **Wearing a grade:** grade k needs her Weapon Rank for that weapon, her Armor Rank for that armor kind, or her
-  Accessory Rank for the accessory's kind, at k or more ([classes](classes.md#ranks-and-levels)).
-- **Training pieces:** every Uma holds a grade-0 Training piece of each weapon and armor kind, with no stats. It fills a
-  slot until she binds that kind's grade 1, and isn't offered after (D98, D124). A new Uma's armor slots hold her
-  starting class's Training pieces, her calling's: Circlet, Robe, Leggings, Bracers and Slippers for a Mage, Cleric or
-  Summoner, the physical ones for a Brawler, a Spell Blade or a Paladin (D162).
+Each grade's icon comes from uma-art's gear rows (H28), the made items' from its items atlas (uma-art 2.13.0, H73).
 
 <!-- live:gear -->
-| Type | Id | Slot | Half | Recipe families, grades 1–4 (then again from grade 5) | Example recipe: grade 3 | At grade 10 |
-|---|---|---|---|---|---|---|
-| Greatsword | `greatsword-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
-| Axe | `axe-g<grade>` | Weapon | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
-| Lance | `lance-g<grade>` | Weapon | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +68 on its hits |
-| Bow | `bow-g<grade>` | Weapon | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +68 on its hits |
-| Katana | `katana-g<grade>` | Weapon | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
-| Fire Tome | `tome-fire-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
-| Blizzard Tome | `tome-ice-g<grade>` | Weapon | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | Might +68 on its hits |
-| Thunder Tome | `tome-lightning-g<grade>` | Weapon | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | Might +68 on its hits |
-| Light Tome | `tome-light-g<grade>` | Weapon | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | Might +68 on its hits |
-| Dark Tome | `tome-dark-g<grade>` | Weapon | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | Might +68 on its hits |
-| Helm | `helm-g<grade>` | Head | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, DEF +20 |
-| Cuirass | `cuirass-g<grade>` | Body | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | HP +20, ATK +5 |
-| Greaves | `greaves-g<grade>` | Legs | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | MP +20, ATK +5 |
-| Gauntlets | `gauntlets-g<grade>` | Arms | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | ATK +5, M.DEF +20 |
-| Boots | `boots-g<grade>` | Feet | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | ATK +5, Speed +20 |
-| Circlet | `circlet-g<grade>` | Head | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, DEF +20 |
-| Robe | `robe-g<grade>` | Body | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | HP +20, M.ATK +5 |
-| Leggings | `leggings-g<grade>` | Legs | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | MP +20, M.ATK +5 |
-| Bracers | `bracers-g<grade>` | Arms | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | M.ATK +5, M.DEF +20 |
-| Slippers | `slippers-g<grade>` | Feet | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | M.ATK +5, Speed +20 |
-| Greatsword Orb | `orb-greatsword-g<grade>` | Damage (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
-| Axe Orb | `orb-axe-g<grade>` | Damage (Arms Orb) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
-| Lance Orb | `orb-lance-g<grade>` | Damage (Arms Orb) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | +34 offense on its kind's hits |
-| Bow Orb | `orb-bow-g<grade>` | Damage (Arms Orb) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | +34 offense on its kind's hits |
-| Katana Orb | `orb-katana-g<grade>` | Damage (Arms Orb) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
-| Fire Orb | `orb-fire-g<grade>` | Damage (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
-| Ice Orb | `orb-ice-g<grade>` | Damage (Elemental Orb) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | +34 offense on its kind's hits |
-| Lightning Orb | `orb-lightning-g<grade>` | Damage (Elemental Orb) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | +34 offense on its kind's hits |
-| Light Orb | `orb-light-g<grade>` | Damage (Elemental Orb) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | +34 offense on its kind's hits |
-| Dark Orb | `orb-dark-g<grade>` | Damage (Elemental Orb) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | +34 offense on its kind's hits |
-| Vital Talisman | `talisman-vital-g<grade>` | Support (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | heals 10% of her HP a round |
-| Vampire Talisman | `talisman-vampire-g<grade>` | Support (Talisman) | Physical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | heals 20% of physical damage dealt |
-| Bulwark Talisman | `talisman-bulwark-g<grade>` | Support (Talisman) | Physical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | a shield of 20% of her HP against physical damage |
-| Iron Talisman | `talisman-iron-g<grade>` | Support (Talisman) | Physical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | 15% less physical damage taken |
-| Thorn Talisman | `talisman-thorn-g<grade>` | Support (Talisman) | Physical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | returns 50% of physical damage taken |
-| Spring Amulet | `amulet-spring-g<grade>` | Support (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | restores 10 MP a round |
-| Siphon Amulet | `amulet-siphon-g<grade>` | Support (Amulet) | Magical | Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals | Slate Block, Hemp Cloth | restores MP as 8% of magical damage dealt |
-| Veil Amulet | `amulet-veil-g<grade>` | Support (Amulet) | Magical | Hides & Scales + Bones & Horns → Stones + Fibers → Ores + Crystals → Woods + Essences | Iron Ingot, Cut Citrine | a shield of 20% of her HP against magical damage |
-| Ward Amulet | `amulet-ward-g<grade>` | Support (Amulet) | Magical | Stones + Fibers → Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns | Cedar Plank, Breeze Infusion | 15% less magical damage taken |
-| Mirror Amulet | `amulet-mirror-g<grade>` | Support (Amulet) | Magical | Ores + Crystals → Woods + Essences → Hides & Scales + Bones & Horns → Stones + Fibers | Wolfkin Leather, Trilobite Carving | returns 50% of magical damage taken |
+| Grade | Opens at Lv | Weapon Might (Tier 1 · 2 · 3) | Armor: offense a piece | Head DEF | Body HP | Legs MP | Arms M.DEF | Feet Speed |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | 1 · 2 · 3 | 1 | 4 | 15 | 3 | 4 | 2 |
+| 2 | 6 | 4 · 7 · 10 | 1 | 8 | 30 | 6 | 8 | 4 |
+| 3 | 11 | 8 · 14 · 21 | 2 | 12 | 45 | 9 | 12 | 6 |
+| 4 | 16 | 12 · 22 · 31 | 2 | 16 | 60 | 12 | 16 | 8 |
+| 5 | 21 | 19 · 34 · 49 | 3 | 20 | 75 | 15 | 20 | 10 |
+| 6 | 26 | 26 · 47 · 68 | 3 | 24 | 90 | 18 | 24 | 12 |
+| 7 | 31 | 35 · 63 · 91 | 4 | 28 | 105 | 21 | 28 | 14 |
+| 8 | 36 | 45 · 81 · 117 | 4 | 32 | 120 | 24 | 32 | 16 |
+| 9 | 41 | 57 · 103 · 148 | 5 | 36 | 135 | 27 | 36 | 18 |
+| 10 | 46 | 68 · 122 · 177 | 5 | 40 | 150 | 30 | 40 | 20 |
 
-A weapon's Might adds to the offense of the hits made with it, by grade: 1, 4, 8, 12, 19, 26, 35, 45, 57, 68 (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (5 at grade 10), and its slot's defensive stat +2 a grade (D141). An Uma wears an Orb in her Damage slot and a Talisman or an Amulet in her Support slot. An Orb adds to the offense of her hits of its kind, by grade: 1, 2, 4, 6, 10, 13, 18, 23, 29, 34, half a weapon's Might; it no longer adds its kind for weaknesses.
+Each armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × 1, 1.8, 2.6 in Tiers 1, 2 and 3 (Feet Speed doesn't scale).
+
+What raises a slot one grade, in a Tier 1 world:
+
+| Grade | Weapon Gem | Armor Fittings | Accessory Setting |
+|---|---|---|---|
+| 1 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
+| 2 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
+| 3 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
+| 4 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
+| 5 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
+| 6 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+| 7 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+| 8 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+| 9 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+| 10 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+
+Accessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot's):
+
+| Family | Base form | G1 → G10 (Tier 1) |
+|---|---|---|
+| Pendant | Flat offense on each of her three weapons' kinds | 1, 1, 2, 2, 4, 5, 7, 9, 12, 14 |
+| Orb | Flat offense on one kind she sets, any of the ten | 1, 2, 3, 5, 8, 10, 14, 18, 23, 27 |
+| Bell | When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack | 0.1 a grade × her hand (1 at G10), every tier |
+| Insignia | Her hits on sub-bosses and bosses hit harder | +1.5% a grade (+15% at G10), every tier |
+
+Her signature: while she wears her knack's family, ATK and M.ATK +2 · +6 · +10 at Lv 10 · 30 · 50 (0.2 a level × the tier).
 <!-- /live -->
-

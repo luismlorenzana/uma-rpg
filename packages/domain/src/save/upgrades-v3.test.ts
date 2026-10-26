@@ -1,9 +1,8 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { newGrades } from '../economy/grades'
 import { gradedUma, gradedWorld, starMap } from './economy-v3.fixture'
 import { upgradesFor } from './upgrades'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const worldAt = (level: number) => {
   const gear = newGrades(1)

@@ -8,6 +8,9 @@
 > **R1 live from H72, 2026-10-25 (D210)** (a follow-up, no decision changed): the template's name, chip and card, the
 > calling and its pick, the Flourish as her calling, the Racing tab's "Her template" and the Stable's Calling, Stride and
 > Knack filters play in the game (UT2–UT6, UT12, UT14, UT15, UT17, UT18); the signature and her moon wait for R2.
+>
+> **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): the signature accessory, its family by her
+> knack, the presets that wear it, and her moon play in the game on engine v17 and save v28.
 
 > **For the owner's review, 2026-10-25. Nothing here is built.** The Tier rework's **Uma Templates pass**
 > ([README §5](README.md#5-the-plan), step 5), the centralization the owner asked for: "the Uma uniqueness page, part of

@@ -12,7 +12,7 @@ const sub = (endpoint: string): Subscription => ({ endpoint, keys: { p256dh: 'p'
 
 describe('push tick (D63)', () => {
   it('announces each finish once, to every live device, and forgets devices that are gone', async () => {
-    // An invented outfit at Craft Lv1: 2 ores take 108 minutes (D139).
+    // An invented outfit at Craft Lv1: 2 ores take 108 minutes (D139), 86.4 at R2's Mine (×1.25 from day one, PP4; H82).
     const save: Save = startJob(unlockUma(newSave('Luis', at(0)), '101', at(0)), 'mine', 0,
       { outfitId: '101' }, 'copper-ore', 2, at(0))
     const saves = { load: async () => ({ revision: 1, save }), put: async () => { throw new Error('read only') } } as unknown as SaveRepository
@@ -26,12 +26,12 @@ describe('push tick (D63)', () => {
     await push.subscribe('u', sub('https://push.example/phone'), T0)
     await push.subscribe('u', sub('https://push.example/gone'), T0)
 
-    expect(await push.tick(T0 + 100 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
-    expect(await push.tick(T0 + 110 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
+    expect(await push.tick(T0 + 80 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 90 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
     expect(sent.map((s) => s.endpoint)).toEqual(['https://push.example/phone', 'https://push.example/gone'])
     expect(sent[0]!.payload).toMatchObject({ title: 'Work done', body: 'Mine: Copper Ore ×2', url: '/wilds/mine?tier=1', badge: 1 })
     expect((await records.get('u'))!.subscriptions.map((s) => s.endpoint)).toEqual(['https://push.example/phone'])
-    expect(await push.tick(T0 + 115 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 95 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
   })
 
   it('sends one notification per tier world with news, each linking its tier, with the badge of both (H35)', async () => {

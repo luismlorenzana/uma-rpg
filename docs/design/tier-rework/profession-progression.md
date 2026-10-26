@@ -2,6 +2,12 @@
 
 > **Approved by the owner, 2026-10-24 (D195): every call PP1–PP25 as written, with the flavor change (Farming gathers Vegetables, Fishing gathers Fish).** The 130 unused raw types of today's Wilds and the old Farm may be reused in a future pass. Changes from here are follow-ups logged against it.
 
+> **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the
+> game on engine v17 and save v28: ten professions in ten places of four slots, the five lines' items, the trade by
+> calling, the open shop and the Exchange, and the compensation: Craft Levels to 1 and the Speed Ticket grant (PP24,
+> PP25). The manual ([loops](../../game/loops.md), [materials](../../game/materials.md),
+> [sections](../../game/sections.md)) describes them as played.
+
 > **For the owner's review, the fourth and last standalone doc (2026-10-24).** Brought in line with the three approved
 > docs (Class D192, Weapon D193, Extra Stats D194) and with **the owner's compensation direction**, designed in full in
 > [§14](#14-save-impact): every Craft Level resets to 1 at save v27 and each world is granted **Speed Tickets for every 30

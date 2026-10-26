@@ -73,10 +73,9 @@ describe('a fight’s allies in classes v2 (H57)', () => {
 })
 
 describe('a fight’s allies in classes v1 stay as they were', () => {
-  it('sends Orb kinds, keeps Might to her weapons and her stats v14’s; the live default is v15’s', () => {
+  it('sends Orb kinds, keeps Might to her weapons and her stats v14’s', () => {
     const p = party(14)
     const allies = rpgPartyAllies(p, mpOf(14), 14)
-    expect(rpgPartyAllies(party(15), mpOf(15))).toEqual(rpgPartyAllies(party(15), mpOf(15), 15))
     expect(allies.map((a) => a.orbs)).toEqual([['greatsword'], ['lance'], undefined, ['fire'], ['axe']])
     expect(allies.map((a) => a.might)).toEqual([{ greatsword: 12, axe: 8 }, { fire: 4 }, undefined, undefined, undefined])
     allies.forEach((a, i) => expect(a.stats, a.id).toEqual(projectRpgStats(p[i]!.profile, 14)))

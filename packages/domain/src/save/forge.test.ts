@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, equippedPoints, gearById, gearPoints, orbOffense, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
@@ -13,6 +13,12 @@ import { boundGrade, equipBlock, equipGear, gearChoices, unequipGear, wearAccess
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { gearV1, newSave, parseSave, SaveParseError, type Save } from './save'
 import { collectJob, planJob, startJob } from './work'
+
+// The v1 economy's rules, kept as the old game's record since R2's switch (H82, D218): this file runs as the game before
+// it, the switch at engine 16 (today's facilities, crafted pieces, Star Gems and gear ranks) and old saves read through
+// the chain to v27.
+vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
+vi.mock('./migrations', async (orig) => { const m = await orig<typeof import('./migrations')>(); return { ...m, migrateWorld: m.migrateWorldToV27 } })
 
 const T0 = Date.parse('2026-10-10T12:00:00.000Z')
 const at = (ms: number) => new Date(T0 + ms).toISOString()

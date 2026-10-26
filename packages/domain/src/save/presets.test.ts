@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { isAmulet, isOrb, isTalisman, orbKind } from '../economy/gear-id'
 import { withTrack, type ArmorKind, type RankRef } from '../economy/ranks'
 import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, RPG_KIND_PAIRS, rpgWeaponKind, validRpgWeapons, type RpgClass, type RpgDamageKind } from '../rpg/rules'
@@ -6,6 +6,12 @@ import { chooseClass, classOf, equipSkills, pickBranch, setClassWeapons, startin
 import { applyClassPreset, CLASS_PRESET_ACCESSORIES, classPreset, classPresetPlan, wearClassPreset } from './presets'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
 import { gearV1, newSave, parseSave, type OwnedUma, type Save, type TierWorld } from './save'
+
+// The v1 economy's rules, kept as the old game's record since R2's switch (H82, D218): this file runs as the game before
+// it, the switch at engine 16 (today's facilities, crafted pieces, Star Gems and gear ranks) and old saves read through
+// the chain to v27.
+vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
+vi.mock('./migrations', async (orig) => { const m = await orig<typeof import('./migrations')>(); return { ...m, migrateWorld: m.migrateWorldToV27 } })
 
 const T = (n: number) => `2026-10-21T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 // Invented outfits only: 101 a front runner (Brawler), 102 pace (Mage), 103 late (Cleric), 104 end (Summoner).

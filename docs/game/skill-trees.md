@@ -1,6 +1,6 @@
 # Skill trees
 
-Every tree, every node, every number, as engine v16 plays them (D201, D207, live since H72, D210): 50 trees, one per
+Every tree, every node, every number, as engines v16 and v17 play them (D201, D207, live since H72, D210; v17, live since H82, D218, keeps them): 50 trees, one per
 class and weapon (D86; the Paladin's ten, D179), of eight nodes each: the **trunk** (depths 1–2), **line A** and **line
 B** (depths 3–5), B named in each tree's heading. Generated from `packages/domain/src/rpg/catalog.ts`. The rules (her
 three slots, lines, Skill Ranks) are in [classes](classes.md#skills-depths-lines-and-ranks).

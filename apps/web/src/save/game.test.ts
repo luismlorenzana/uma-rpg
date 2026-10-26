@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { gearV1, newOwnedUma, newSave, newTierWorld, SAVE_SCHEMA_VERSION, unlockUma, type Save, type SaveEnvelope } from '@rpg/domain'
+import { armorHalf, gearV1, newOwnedUma, newSave, newTierWorld, SAVE_SCHEMA_VERSION, unlockUma, type Save, type SaveEnvelope } from '@rpg/domain'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -113,9 +113,10 @@ describe('game store', () => {
     expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
     expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null], lead: null })
-    // A pace outfit starts as a Mage, in five magical kinds; a front one in physical (D160 §7).
-    expect(gearV1(world!.umas['100201']!).kinds).toEqual({ head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' })
-    expect(gearV1(world!.umas['100101']!).kinds).toEqual({})
+    // A pace outfit starts as a Mage, on the magical half; a front one as a Brawler, on the physical (D160 §7; v28: the half
+    // is her class's, every grade G0, H82).
+    expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId].map((c) => armorHalf(c!))).toEqual(['magical', 'physical'])
+    expect(world!.umas['100201']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
     await expect(unlock(outfit('100101'))).rejects.toThrow(/already/)
   })
 

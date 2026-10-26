@@ -1,12 +1,19 @@
 // H14: economic victory ledger, not a combat simulation. Print the report with SIM=1.
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { worldOf } from '../save/rules'
 import { parseSave, MAX_UMA_LEVEL, PARTY_SIZE, STARTING_UNLOCK_TICKETS, type Save } from '../save/save'
 import { stageLaurels } from '../save/battle'
 import { regionChapter } from '../world/world'
 import { FACILITY_SPEED, itemMinutes, REPLAY_SHARE } from './pacing'
 import { cast, continents, freshParty, freshWorker, frontierRegion, fullSet, ids, newBand,
+
   refillIfDry, regions, report, result, simulate, TARGET_MINUTES, TARGET_TOLERANCE, win } from './pacing.sim'
+
+// The v1 economy's rules, kept as the old game's record since R2's switch (H82, D218): this file runs as the game before
+// it, the switch at engine 16 (today's facilities, crafted pieces, Star Gems and gear ranks) and old saves read through
+// the chain to v27.
+vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
+vi.mock('../save/migrations', async (orig) => { const m = await orig<typeof import('../save/migrations')>(); return { ...m, migrateWorld: m.migrateWorldToV27 } })
 
 describe('H14 pacing economy ledger', () => {
   it('picks only unvisited regions whose five-level range contains the party level', () => {

@@ -1,8 +1,8 @@
 // Save v25's migration (H58): `toV25` as written dark, chained by H61 (D188): a v24 save parses through it (and through
-// v26's and v27's steps since H72).
+// v26's and v27's steps since H72, v28's since H82).
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
-import { migrateWorld, toV25, toV26, toV27 } from './migrations'
+import { migrateWorld, toV25, toV26, toV27, toV28 } from './migrations'
 import { gearV1, parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
 import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save, type V24Class } from './v25.fixture'
 
@@ -15,17 +15,17 @@ const umaOf = (w: V24World, id: string): V24Uma => w.umas[id]!
 const raw = (w: unknown) => w as Record<string, unknown>
 
 describe('save v25’s migration (H58, chained in H61)', () => {
-  it('stays chained before v26 and v27: a v24 world runs through every later step, a v25 world through v26’s and v27’s', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(27)
+  it('stays chained before v26, v27 and v28: a v24 world runs through every later step, a v25 world through v26’s, v27’s and v28’s', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(28)
     const w24 = world()
-    expect(migrateWorld(w24, 24)).toEqual(toV27(toV26(raw(migrate(world())))))
-    expect(migrateWorld(w24, 25)).toEqual(toV27(toV26(raw(w24))))
-    // A v24 save parses through v25, v26 and v27.
+    expect(migrateWorld(w24, 24)).toEqual(toV28(toV27(toV26(raw(migrate(world()))))))
+    expect(migrateWorld(w24, 25)).toEqual(toV28(toV27(toV26(raw(w24)))))
+    // A v24 save parses through v25, v26, v27 and v28.
     const save = v24Save()
     expect(save.schemaVersion).toBe(24)
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(27)
-    expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV27(toV26(toV25(w)))) as object), schemaVersion: 27 }))
+    expect(parsed.schemaVersion).toBe(28)
+    expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV28(toV27(toV26(toV25(w))))) as object), schemaVersion: 28 }))
     expect(Object.keys(parsed.tierWorlds['1']!.umas['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
   })
 

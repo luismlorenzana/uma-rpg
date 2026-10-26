@@ -1,14 +1,13 @@
-// "Finish all" on a place (R2, PP25; H80), with the switch mocked to engine v17: the running jobs' tickets summed, each
+// "Finish all" on a place (R2, PP25; H80), on engine v17 (live since H82): the running jobs' tickets summed, each
 // ⌈remaining ÷ 30 minutes⌉; finishing spends exactly that and starts each queue at once; short tickets refuse; one
 // running job has no Finish all.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { itemMinutes } from '../economy/pacing'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { worldOf } from './rules'
 import type { Save } from './save'
 import { finishAllAt, finishAllCost, queueJob, startJob } from './work'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const T0 = Date.parse(ECONOMY_V3_NOW)
 const at = (ms: number) => new Date(T0 + ms).toISOString()
@@ -22,7 +21,7 @@ function saveWith(timeTickets: number): Save {
   const world = gradedWorld({ wallet: { ...base.wallet, timeTickets },
     umas: Object.fromEntries(['101', '102', '103'].map((id) => [id, gradedUma({ craft: { level: 1, exp: 0 } })])) })
   return {
-    schemaVersion: 27,
+    schemaVersion: 28,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { 1: world },
   }

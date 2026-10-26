@@ -8,7 +8,8 @@ import { regionChapter, worldContinent } from '../world/world'
 import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, startingClass, styleClass, type BattleOutfit } from './battle'
 import { T } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
-import { gearV1, newSave, type Save } from './save'
+import { armorHalf } from '../economy/grades'
+import { newSave, type Save } from './save'
 
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110, wit = 110): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power, guts: 110, wit },
@@ -19,7 +20,7 @@ const STYLES = ['front', 'pace', 'late', 'end'] as const
 
 describe('the Paladin’s start (H58, §3.3)', () => {
   it('is a Late surger whose base Power beats her base Wit, from classes v2 only (and her calling from v16, live since H72)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     const strong = outfit('1', 'late', 120, 100), even = outfit('2', 'late', 110, 110), wise = outfit('3', 'late', 100, 120)
     expect([strong, even, wise].map((o) => startingClass(o, 15))).toEqual(['paladin', 'cleric', 'cleric'])
     expect([strong, even, wise].map((o) => startingClass(o, 14))).toEqual(['cleric', 'cleric', 'cleric'])
@@ -31,16 +32,16 @@ describe('the Paladin’s start (H58, §3.3)', () => {
     expect(startingClass({ aptitudes: strong.aptitudes }, 15)).toBe('cleric')
   })
 
-  it('writes a Paladin start as her class, with no magical armor kinds; from v16 every start is written (H67)', () => {
+  it('writes a Paladin start as her class, on the physical half; from v16 every start is written (H67; v28: the half is her class’s, H82)', () => {
     let save = newSave('Luis', T(0))
     save = unlockUma(save, '1', T(0), '1', 'paladin')
     save = unlockUma(save, '2', T(0), '1', 'cleric')
     save = unlockUma(save, '3', T(0), '1', 'brawler')
     const { umas } = worldOf(save)
-    expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { kinds: {} } })
+    expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] } })
     expect(umas['2']!.classId).toBe('cleric')
-    expect(Object.keys(gearV1(umas['2']!).kinds)).toHaveLength(5)
-    expect(umas['3']).toMatchObject({ classId: 'brawler', gear: { kinds: {} } })
+    expect(umas['3']).toMatchObject({ classId: 'brawler', gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] } })
+    expect([armorHalf('paladin'), armorHalf('cleric'), armorHalf('brawler')]).toEqual(['physical', 'magical', 'physical'])
   })
 
   it('keeps an unpicked Late surger a Cleric in both generations: her style’s class, not her start', () => {

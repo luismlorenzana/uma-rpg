@@ -12,7 +12,7 @@
 | Release | What the player gets | Engine · save | Packets |
 |---|---|---|---|
 | **R1. Tier 1's fight** | Three weapons a class, set to the owner's defaults. Trees with no points: a trunk and one free fork. Skill Ranks every 2 Class Ranks. Foes weak to their twins (an Arm and its element). The calling pick. Her template's name, chip and Flourish (HP). The base MP regen. Pierce. The halls' two kinds and the Paladin's revive. **On today's gear.** | **v16 · v27** | H64–H72, **built and live** (D199–D207, D210) |
-| **R2. Tier 1's economy** | She owns every weapon, armor slot and accessory slot at G0, and one made item raises one a grade at Uma Lv 5g − 4 (ranks gone). Armor carries defense. One accessory slot holds the four families' base forms (Pendant, Orb, Bell, Insignia), and the supports retire. The signature accessory. The Planet and three moons, with her moon, opened by jewels (Star Gems gone). Ten professions in ten buildings, four slots each. The compensation: Craft Levels to 1, Speed Tickets for the time they took, and the first launch's sheet. New item icons. | **v17 · v28** | H73–H82 |
+| **R2. Tier 1's economy** | She owns every weapon, armor slot and accessory slot at G0, and one made item raises one a grade at Uma Lv 5g − 4 (ranks gone). Armor carries defense. One accessory slot holds the four families' base forms (Pendant, Orb, Bell, Insignia), and the supports retire. The signature accessory. The Planet and three moons, with her moon, opened by jewels (Star Gems gone). Ten professions in ten buildings, four slots each. The compensation: Craft Levels to 1, Speed Tickets for the time they took, and the first launch's sheet. New item icons. | **v17 · v28** | H73–H82, **built and live** (D208, D209, D211–D218) |
 | **R3. Tier 2's weapons** | Pure or Dual at G5, with the Branch Gem. A second accessory slot and its branches (Great, Channel, Twin, Toll, Onslaught). The kind cap. The weapon moon (Full or Split). The secondary profession. | **v18 · v29** | H83–H90 |
 | **R4. Tier 2's classes** | The class branches: the weapon-group focus, class skills, and the group names Heavy, Lite, Elemental and Arcane. Branch C and the Power or Break tip. Her signature tip. Tier 2's weaknesses by rank, boss shields 9 and Tier 2's term. | **v19 · v30** | H91–H97 |
 | **R5. Tier 3** | Keen, Tempered and Evolved. The third accessory slot and its step. The second weapon moon. Depth 6 capstones, two branches held and the master slot. The six masteries. Boss shields 10 and Tier 3's term. | **v20 · v31** | H98–H105 |
@@ -109,7 +109,7 @@ Built and live (H64–H72, D199–D207, D210): H64 (D199, D200), H65 (D201), H66
 Waves: H73 can start now. 1) H74, H77 after H64 (they run beside R1's waves 2–4) → 2) H75, H76 after H67 → 3) H78,
 then H81 after H71 → 4) H79, H80 after H70 → 5) H82 after H72.
 
-Built (dark, live from H82): H74 (D208, D209), H75 (D212), H76 (D213), H77 (D211), H78 (D214), H79 (D217), H80 (D216), H81 (D215).
+Built and live (H73–H82, D208, D209, D211–D218): H74 (D208, D209), H75 (D212), H76 (D213), H77 (D211), H78 (D214), H79 (D217), H80 (D216), H81 (D215), and H82's switch (D218), which turned engine v17 and save v28 on.
 
 **R3. Tier 2's weapons (engine v18, save v29)**
 

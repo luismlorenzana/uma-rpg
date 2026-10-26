@@ -16,8 +16,8 @@ const V1 = 14, V2 = 15
 const FIVE: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 
 describe('the one switch (D179)', () => {
-  it('is on engine 16 since H72 (D210), with classes v2 from 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(16)
+  it('is on engine 17 since H82 (D218), with classes v2 from 15', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(17)
     expect(RPG_V2_ENGINE).toBe(15)
     expect([rpgV2(), rpgV2(14), rpgV2(15)]).toEqual([true, false, true])
     expect(BATTLE_HEAL_OFFENSE_SCALE).toBe(300)

@@ -54,8 +54,8 @@ describe('the base MP regen (SB18), engine v16 (H68, live since H72)', () => {
     // stat-balance §7.2's Tier 1 Mage at Lv 10 · 20 · 30 · 40 · 50 on Class Rank = level: bar 107 · 148 · 194 · 243 · 296.
     expect([[107, 10], [148, 20], [194, 30], [243, 40], [296, 50]].map(([mp, rank]) => rpgBaseMpRegen(mp!, rank!, 16))).toEqual([2, 4, 7, 11, 13])
     expect([rpgBaseMpRegen(296, 1, 16), rpgBaseMpRegen(296, 10, 16), rpgBaseMpRegen(50, 1, 16)]).toEqual([3, 5, 1])
-    // The live default is v16 since H72 (D210).
-    expect([rpgBaseMpRegen(296, 40, 15), rpgBaseMpRegen(296, 40, 14), rpgBaseMpRegen(296, 40)]).toEqual([0, 0, 13])
+    // The live default is v17's since H82 (D218): 1.0% a depth (H81, D215).
+    expect([rpgBaseMpRegen(296, 40, 15), rpgBaseMpRegen(296, 40, 14), rpgBaseMpRegen(296, 40, 16), rpgBaseMpRegen(296, 40)]).toEqual([0, 0, 13, 15])
   })
 
   it('gives a Mage with 296 max MP 13 at a round’s end at Class Rank 40, in one MP cue, round after round', () => {

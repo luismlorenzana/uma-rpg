@@ -250,12 +250,11 @@ describe('Echoes (§8, R6)', () => {
     expect(riftFightBlock(save, { kind: 'echo', front: 'iron', level: '60' as '50' }, 4)).toBe('No such fight')
   })
 
-  it('pay 2× a stage’s Class and gear rank EXP, Marks past the caps, and nothing else', () => {
-    // Uma 121 at Class Rank 50 and Greatsword Rank 10, wearing two accessories; 122 a Hero with a Bond.
+  it('pay 2× a stage’s Class rank EXP, Class Marks past the cap, and nothing else (R2 retired the gear bars, H82)', () => {
+    // Uma 121 at Class Rank 50; 122 a Hero with a Bond.
     const base = edit(riftWorldSave(), (w) => {
       const u = w.umas['121']!
-      u.ranks = { ...u.ranks, classes: { brawler: { rank: 50, exp: 0 } }, weapons: { greatsword: { rank: 10, exp: 0 } } }
-      u.gear = { ...u.gear, locker: ['orb-lance-g1', 'amulet-mirror-g1'], equipped: { 'accessory-1': 'orb-lance-g1', 'accessory-2': 'amulet-mirror-g1' } }
+      u.ranks = { ...u.ranks, classes: { brawler: { rank: 50, exp: 0 } } }
       w.heroes = { 'mage-1': { hero: '122', learners: [] } }
       w.umas['122']!.bonds = { 'mage-1': { level: 2, exp: 5 } }
     })
@@ -267,22 +266,17 @@ describe('Echoes (§8, R6)', () => {
     const w = world1(won.save)
     expect(won.result).toMatchObject({ outcome: 'victory', cleared: null, attempt: null, runWon: false })
     expect(won.result.members).toHaveLength(5)
-    const used = usedWeapons(won.battle.input, won.battle.actions)
     for (const m of won.result.members) {
       const ally = input.allies.find((a) => a.id === m.outfitId)!
       expect(m).toMatchObject({ exp: 0, beforeLevel: 50, afterLevel: 50, afterExp: 0, shards: 0, bonds: [] })
       const gain = (kind: string, id: string) => m.ranks.find((g) => g.ref.kind === kind && g.ref.id === id)?.exp
       expect(gain('class', ally.classId)).toBe(ECHO_RANK_PAY * CLASS_EXP_SHARE * E)
-      // Her five weapons share 5E, two parts for each she used, all doubled.
-      for (const [weapon, n] of Object.entries(weaponExpShares(ally.weapons, used.get(ally.id)!, E))) expect(gain('weapon', weapon)).toBe(ECHO_RANK_PAY * n!)
-      expect(m.ranks.filter((g) => g.ref.kind === 'armor').map((g) => g.exp)).toEqual(Array(5).fill(ECHO_RANK_PAY * E))
+      expect(m.ranks.every((g) => g.ref.kind === 'class')).toBe(true)
     }
-    // 121's class bar is capped: its 4E banks at half as Class Marks; the accessories fill their kinds.
-    const capped = won.result.members.find((m) => m.outfitId === '121')!
-    expect(capped.ranks.filter((g) => g.ref.kind === 'accessory').map((g) => g.exp)).toEqual([ECHO_RANK_PAY * E, ECHO_RANK_PAY * E])
+    // 121's class bar is capped: its 4E banks at half as Class Marks; no Gear Marks (v28's wallet has none).
     expect(won.result.classMarks).toBe(Math.floor(ECHO_RANK_PAY * CLASS_EXP_SHARE * E * 0.5))
-    expect(won.result.gearMarks).toBe(Math.floor(capped.ranks.find((g) => g.ref.kind === 'weapon' && g.ref.id === 'greatsword')!.exp * 0.5))
-    expect(w.wallet).toEqual({ ...world1(base).wallet, classMarks: won.result.classMarks, gearMarks: won.result.gearMarks })
+    expect(won.result.gearMarks).toBe(0)
+    expect(w.wallet).toEqual({ ...world1(base).wallet, classMarks: won.result.classMarks })
     expect(w.umas['122']!.bonds).toEqual({ 'mage-1': { level: 2, exp: 5 } })
     for (const id of ids(121, 5)) expect({ level: w.umas[id]!.level, exp: w.umas[id]!.exp }).toEqual({ level: 50, exp: 0 })
     expect(w.rift.echoes).toEqual({ iron: { '50': won.save.account.updatedAt } })
@@ -309,7 +303,7 @@ describe('Echoes (§8, R6)', () => {
 })
 
 describe('Sweeps of won Echoes (§8)', () => {
-  it('are refused before a win and without tickets, and pay as many Echo wins as tickets spent, weapons even', () => {
+  it('are refused before a win and without tickets, and pay as many Echo wins as tickets spent, Class Rank only', () => {
     const save = edit(riftWorldSave(), (w) => { w.wallet.sweepTickets = 5 })
     expect(sweepEchoBlock(save, 'iron', '50', 4)).toBe('Win it first')
     const won = play(weaken(startRiftFight(save, { kind: 'echo', front: 'iron', level: '50' }, 4, OUTFITS, ROSTER, T(2))))
@@ -324,10 +318,9 @@ describe('Sweeps of won Echoes (§8)', () => {
     expect(swept.result).toMatchObject({ outcome: 'victory', ref: { kind: 'echo', front: 'iron', level: '50' }, rounds: 0, earned: [], swept: 3 })
     const m = swept.result.members.find((x) => x.outfitId === '116')!
     const uma = world1(won.save).umas['116']!
-    const weapons = classOf(uma, uma.classId!).weapons
     expect(m.ranks.find((g) => g.ref.kind === 'class')!.exp).toBe(3 * ECHO_RANK_PAY * CLASS_EXP_SHARE * E)
-    // Nothing is used in a Sweep: each of her five weapons takes 2E a Sweep.
-    for (const weapon of weapons) expect(m.ranks.find((g) => g.ref.kind === 'weapon' && g.ref.id === weapon)!.exp).toBe(3 * ECHO_RANK_PAY * E)
+    // R2 retired the gear bars (H82): a Sweep pays her Class bar alone.
+    expect(m.ranks.every((g) => g.ref.kind === 'class')).toBe(true)
     expect(world1(swept.save).umas['116']!.ranks.classes[uma.classId!]).toEqual(m.ranks.find((g) => g.ref.kind === 'class')!.after)
     expect(swept.save.account.defeated).toEqual(won.save.account.defeated)
     expect(swept.save.account.achievements).toEqual(won.save.account.achievements)
@@ -386,11 +379,7 @@ describe('Ascend (tiers.md §5, R7)', () => {
       w.world.run.mp = { '101': 3, '121': 4 }
       w.umas['101']!.exp = 12_345
       w.umas['102']!.exp = 30_000
-      w.umas['101']!.gear = { locker: ['greatsword-g1', 'axe-g1'], equipped: { greatsword: 'greatsword-g1' }, kinds: {} }
-      w.umas['102']!.gear = { locker: ['robe-g1'], equipped: { body: 'robe-g1' }, kinds: { head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' } }
-      w.umas['101']!.stars = { unlocked: ['moon:hp:1'], active: ['moon:hp:1'] }
       w.umas['101']!.classes = { brawler: { weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: null } }
-      w.gear = { 'axe-g1': 2 }
       w.work = { '103': { outfitId: '103', slot: null, entries: [], queue: [], last: null, dropped: null } }
     })
   }
@@ -420,7 +409,7 @@ describe('Ascend (tiers.md §5, R7)', () => {
     expect(bankedMarks(30_000)).toBe(2_000)
     expect(summary).toEqual({ from: 1, to: 2, umas: TWENTY, laurels: 20_000, speedTickets: 100, classMarks: 3_234 })
 
-    // The old world: they're gone from every list, and every piece they owned is back in its stock.
+    // The old world: they're gone from every list (their grades and made items: `ascend-v3.test.ts`).
     const old = world1(after)
     expect(Object.keys(old.umas).sort()).toEqual(ids(121, 5))
     expect(old.parties.slice(0, 5).map((p) => [p.name, p.slots])).toEqual([
@@ -433,16 +422,14 @@ describe('Ascend (tiers.md §5, R7)', () => {
     expect(old.work).toEqual({})
     // 101's seat empties and sends its Learner 125 away; 103 leaves 124's seat.
     expect(old.heroes).toEqual({ 'mage-2': { hero: '124', learners: [] } })
-    expect(old.gear).toEqual({ 'axe-g1': 3, 'greatsword-g1': 1, 'robe-g1': 1 })
     expect(old.wallet).toEqual(before.wallet)
     expect(old.rift.runs[0]!.ascendedAt).toBe(T(70))
 
-    // The new world: Lv 1, Class Rank 1, no skills, Training gear, an empty map, Craft Lv 1, no Bonds; class and armor halves kept.
+    // The new world: Lv 1, Class Rank 1, no skills, every grade G0, an empty map, Craft Lv 1, no Bonds; her class kept.
     const up = worldOf(after, '2')
     expect(Object.keys(up.umas).sort()).toEqual(TWENTY)
     expect(up.umas['101']).toEqual({ ...newOwnedUma(T(0)), classId: 'brawler' })
-    expect(up.umas['102']).toEqual({ ...newOwnedUma(T(0)), classId: 'mage',
-      gear: { locker: [], equipped: {}, kinds: { head: 'circlet', body: 'robe', legs: 'leggings', arms: 'bracers', feet: 'slippers' } } })
+    expect(up.umas['102']).toEqual({ ...newOwnedUma(T(0)), classId: 'mage' })
     expect(up.wallet).toEqual({ ...newTierWorld(T(70), 0).wallet, laurels: 20_000, timeTickets: 100, classMarks: 3_234 })
     expect(up.parties.slice(0, 5).map((p) => [p.name, p.slots])).toEqual([
       ['Iron Team', ids(101, 5)], ['Party 2', ids(106, 5)], ['Party 3', ids(111, 5)], ['Party 4', ids(116, 5)], ['Party 5', [null, null, null, null, null]],

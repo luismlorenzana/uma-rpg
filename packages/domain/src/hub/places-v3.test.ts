@@ -1,9 +1,8 @@
-// R2's Wilds on the Hub (H77; profession-progression.md §4.1, PP4–PP6), with the switch mocked to engine v17: the ten
+// R2's Wilds on the Hub (H77; profession-progression.md §4.1, PP4–PP6), on engine v17 (live since H82): the ten
 // places at today's side spots, and v1's eleven facilities and Town Hall byte for byte when asked for.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { HUB_PAGES, learningPlaces, PLACES, placeById, placesOn, townPlaces, wildsPlaces, type Place } from './places'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 /** FNV-1a, as `world.ts` hashes: the lists' JSON on `main` before H77 (engine 16). */
 const fnv = (text: string): string => {

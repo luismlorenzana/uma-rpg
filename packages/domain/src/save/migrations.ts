@@ -201,8 +201,15 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v27 for a world of `tier` (its key; v28 doesn't read it, R3's v29 does, H87). */
-export function migrateWorld(raw: unknown, version: number, _tier = 1): unknown {
+/** Every step to v28 for a world of `tier` (its key; v28 doesn't read it, R3's v29 does, H87). */
+export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
+  const v27 = migrateWorldToV27(raw, version)
+  return version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
+}
+
+/** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
+ * switch at 16, read old saves through it. */
+export function migrateWorldToV27(raw: unknown, version: number): unknown {
   const v13 = version < 13 && isRecord(raw) ? toV13(raw) : raw
   const v14 = version < 14 && isRecord(v13) ? toV14(v13) : v13
   const v15 = version < 15 && isRecord(v14) ? toV15(v14) : v14

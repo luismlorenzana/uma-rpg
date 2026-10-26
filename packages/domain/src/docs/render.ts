@@ -1,45 +1,52 @@
 // The live docs' generated blocks (docs/game/, D92): every list in the game manual is rendered here from the rules, so it
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
-import { BATTLE_LAURELS, EXP_PER_MINUTE, FACILITY_SLOTS, FACILITY_SPEED, FACILITY_UPGRADE, FIRST_CLEAR_LAURELS,
-  itemMinutes, LATE_LAURELS, makeMinutes, refineMinutes, MAX_JOB_COUNT, POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES,
-  PROFESSION_MAX_LEVEL, professionExpToNext, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN } from '../economy/pacing'
-import { markdown as pacingSimulation } from '../economy/pacing.sim'
-import { GEMS } from '../economy/gems'
 import {
-  accessoryEffects, accessoryKindOf, accessorySlotFor, ARMOR_DEFENSE_PER_GRADE, armorOffense, EQUIP_LABEL, EQUIP_TYPES, gearById, gearId, gearPoints, isAccessory, isMagicalGear,
-  isOrb, isWeapon, MIGHT_BY_GRADE, mightOf, ORB_OFFENSE_BY_GRADE, orbOffense, recipeFamilies, slotOf, type EquipType,
-} from '../economy/gear'
+  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, itemMinutes, LATE_LAURELS, refineMinutes, MAX_JOB_COUNT,
+  POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES, PROFESSION_MAX_LEVEL, professionExpToNext, REPLAY_SHARE,
+  SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN,
+} from '../economy/pacing'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
-import { FACILITIES } from '../economy/jobs'
 import {
-  BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_REGEN_ROUNDS,
-  RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, rpgV2,
+  ACCESSORY_FAMILY_LABEL, BELL_PERMILLE_PER_GRADE, INSIGNIA_PERMILLE_PER_GRADE, ORB_T1, PENDANT_T1, signatureBonus,
+} from '../economy/accessories'
+import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
+import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
+import { PLACE_SLOTS_V3, PLACE_SPEED_V3, PLACES_V3, professionById, TRADES } from '../economy/professions'
+import { stockName } from '../economy/stock'
+import { madeRecipe, madeName } from '../items/made'
+import { MADE_IDENTITIES } from '../items/made-id'
+import { MATERIAL_LINES, materialGateGrade, materialTypes, type MaterialLine } from '../items/materials-id'
+import { RAW_PRICE_V3, SELL_RAW_V3, stockedAfter } from '../save/exchange'
+import {
+  BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_HEAL_OFFENSE_SCALE,
+  BATTLE_REGEN_ROUNDS, RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, RPG_BASE_MP_REGEN_V17,
 } from '../rpg/battle/caps'
-import {
-  ACCESSORY_EXP_SHARE, ACCESSORY_KINDS, ACCESSORY_LABEL, ACCESSORY_SLOT_LABEL, ARMOR_EXP_SHARE, ARMOR_KINDS, ARMOR_LABEL, ARMOR_SLOT_LABEL, ARMOR_SLOTS, ARMOR_SLOT_KINDS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK,
-  gearExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_EXP_SHARE, WEAPON_LABEL,
-} from '../economy/ranks'
+import { CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, WEAPON_LABEL } from '../economy/ranks'
 import { HUB_PAGE_NAMES, HUB_PAGES, placeById, placesOn } from '../hub/places'
-import { EFFECT_LABEL, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES, itemById } from '../items/catalog'
+import { gradeUnlockLevel } from '../items/catalog'
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
 import * as K from '../rpg/battle/skills'
 import {
-  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS,
-  HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower, LEARNER_MAX_PARENTS, type HeroCast, type HeroLimitId,
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER,
+  HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower,
+  LEARNER_MAX_PARENTS, type HeroCast, type HeroLimitId,
 } from '../rpg/heroes'
 import {
-  RPG_CLERIC_STATUS, RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE,
-  RPG_SUPPORT_SHARE_V15, rpgNode, rpgNodeSkill, rpgTreeOf,
+  RPG_CLERIC_STATUS, RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER,
+  RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, RPG_SUPPORT_SHARE_V15, rpgNode, rpgNodeSkill, rpgTreeOf,
 } from '../rpg/catalog'
 import { RPG_BRANCH_B_NAME, rpgBranchNode } from '../rpg/node-identity'
-import { rpgBattleExp, RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS } from '../rpg/campaign/rewards'
+import {
+  rpgBattleExp, RPG_BATTLE_EXP_WEIGHTS, RPG_LEVEL_EXP_MAX, RPG_LEVEL_EXP_MIN, RPG_LEVEL_EXP_STEP, RPG_SHARD_LEVELS,
+} from '../rpg/campaign/rewards'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeShields, rpgFoeTierBudget, type RpgFoeRole } from '../rpg/campaign/enemies'
 import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
-  isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_DEPTH_GATES,
-  RPG_SKILL_RANK_FACTOR, RPG_SKILL_RANK_MAX, RPG_SKILL_RANK_STEP, RPG_TIER_MAX_LEVEL, RPG_TWIN_SETS, RPG_WEAPONS, rpgClasses, rpgClassWeapons,
-  isRpgWeaponKind, rpgDefaultWeapons, rpgExpToNext, rpgHand, rpgOpenDepth, rpgTwinsOf, rpgWeaponKind, type RpgClass, type RpgWeapon,
+  isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS,
+  RPG_CLASSES, RPG_DEPTH_GATES, RPG_SKILL_RANK_FACTOR, RPG_SKILL_RANK_MAX, RPG_SKILL_RANK_STEP, RPG_TIER_MAX_LEVEL,
+  RPG_TWIN_SETS, RPG_WEAPONS, rpgClasses, rpgClassWeapons, isRpgWeaponKind, rpgDefaultWeapons, rpgExpToNext, rpgHand,
+  rpgOpenDepth, rpgTwinsOf, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
 import { RIFT_FRONT_SPECS, riftGuidedBuild, riftShape, riftTuning, type RiftSlot } from '../rift/fronts'
@@ -47,17 +54,18 @@ import { riftStrength } from '../rift/generate'
 import { RIFT_RUN_FIGHTS, riftShapeOf } from '../rift/picker'
 import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER, RIFT_STAGES, RIFT_TIERS } from '../rift/state'
 import { ASCEND_PURSE, BANKED_EXP_PER_MARK, BANKED_MARKS_CAP, ECHO_RANK_PAY, echoFoeLevel } from '../save/rift'
-import { classPreset } from '../save/presets'
+import { classPresetV3 } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES } from '../world/biomes'
 import {
-  FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING, UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES,
-  type UmaCallingRow,
+  FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING,
+  UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES, type UmaCallingRow,
 } from '../roster/template'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
-  BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT, WORLD_FORMATIONS,
-  WORLD_BOSS_TWICE_FROM, WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES, WORLD_TUNING, worldContinent,
+  BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT,
+  WORLD_FORMATIONS, WORLD_BOSS_TWICE_FROM, WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES,
+  WORLD_TUNING, worldContinent,
 } from '../world/world'
 
 type Cell = string | number
@@ -74,7 +82,7 @@ const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
 }
 const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]
-const itemName = (id: string) => itemById(id)?.name ?? id
+const itemName = (id: string) => stockName(id)
 const inputs = (list: Record<string, number>) => Object.entries(list).map(([id, n]) => `${n > 1 ? `${n}× ` : ''}${itemName(id)}`).join(', ')
 
 /** Each kind's one shape in every class (D86). */
@@ -157,14 +165,17 @@ function templates(): string {
       [`${STRIDE_LABEL[s]} (${s === 'dash' ? 'Sprint or Mile' : s === 'middle' ? 'Medium' : 'Long'})`, FLOURISH_NAMES[STRIDE_FLOURISH[s]], flourish(STRIDE_FLOURISH[s])]))
 }
 
-/** Each class's standard preset (H33, D164), in the live generation (classes v2: H57). */
+/** Each class's standard preset (H33, D164; R2's, WP25, live since H82): her three weapons, her armor half and her one
+ * accessory slot's form. */
 function presets(): string {
-  const slots = rpgV2() ? ['Orb, Damage slot', 'Support, Support slot'] : ['Orb, accessory 1', 'Support, accessory 2']
-  return table(['Class', 'Weapons', 'Armor', ...slots], RPG_CLASSES.map((c) => {
-    const p = classPreset(c)
-    return [CLASS_NAME[c], p.weapons.map(weaponName).join(', '), cap(p.armor), EQUIP_LABEL[p.orb], EQUIP_LABEL[p.support]]
+  return table(['Class', 'Weapons', 'Armor', 'Accessory'], RPG_CLASSES.map((c) => {
+    const p = classPresetV3(c)
+    const a = p.accessory
+    return [CLASS_NAME[c], p.weapons.map(weaponName).join(', '), cap(p.armor), `${ACCESSORY_FAMILY_LABEL[a.family]}${a.kind ? ` (${kindName(a.kind)})` : ''}`]
   }))
 }
+/** A damage kind's name: a weapon's, or a Tome's element. */
+const kindName = (k: string): string => WEAPON_LABEL[(isRpgWeaponKind(k) ? k : `tome-${k}`) as RpgWeapon]
 
 function weapons(): string {
   return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Healer status', 'Classes'], RPG_WEAPONS.map((w) => {
@@ -305,6 +316,10 @@ function battleConstants(): string {
     ['`BATTLE_FLOURISH_SHARE`', BATTLE_FLOURISH_SHARE, 'v16: her Flourish gives this share of her max HP a fight, while she fights as her calling\'s class'],
     ['`BATTLE_FLOURISH_RATE`', `Even pace ${BATTLE_FLOURISH_RATE['even-pace']}, Late reserve ${BATTLE_FLOURISH_RATE['late-reserve']}`, 'v16: the share of her max HP those two Flourishes mend at a round\'s end'],
     ['`BATTLE_FLOURISH_FROM`', BATTLE_FLOURISH_FROM, 'v16: the first round whose end Late reserve mends at'],
+    ['`RPG_BASE_MP_REGEN_V17`', RPG_BASE_MP_REGEN_V17, `v17: the base MP regen a depth (${pct(RPG_BASE_MP_REGEN_V17 * RPG_BASE_MP_REGEN_DEPTHS)} from Class Rank ${RPG_DEPTH_GATES[RPG_BASE_MP_REGEN_DEPTHS - 1]})`],
+    ['`BELL_PERMILLE_PER_GRADE`', BELL_PERMILLE_PER_GRADE, 'v17: a Bell\'s follow-up, per mille of an Attack a grade, × her hand'],
+    ['`INSIGNIA_PERMILLE_PER_GRADE`', INSIGNIA_PERMILLE_PER_GRADE, 'v17: an Insignia\'s extra damage on sub-bosses and bosses, per mille a grade'],
+    ['Signature', '0.2 a level × tier', 'v17: her ATK and M.ATK while she wears her knack\'s family'],
   ]
   return table(['Constant', 'Value', 'Meaning'], rows)
 }
@@ -319,10 +334,11 @@ function foeRoles(): string {
 }
 
 /**
- * Where an on-curve Uma's damage comes from, and what cuts the damage she takes (D142): the balance simulation's Brawler
- * (`world/balance-party.ts`, gear of the grade her level opens and her level's Extra Stats nodes) against a regular
- * striker of her level. Offense adds up; damage doesn't (offense² ÷ (offense + defense)), so each source is shown as
- * what her hit would lose without it, with the other two kept, and all three against her level stat alone.
+ * Where an on-curve Uma's damage comes from, and what cuts the damage she takes (D142; R2's stack, WP31, live since H82):
+ * the balance simulation's Brawler (`world/balance-party.ts`: her grades on curve, the core of her map her level opens,
+ * her preset's Bell) against a regular striker of her level. Offense adds up; damage doesn't (offense² ÷ (offense +
+ * defense)), so each source is shown as what her hit would lose without it, with the others kept, and all against her
+ * level stat alone.
  */
 function damageSources(): string {
   const offense: Cell[][] = []
@@ -332,32 +348,30 @@ function damageSources(): string {
     const foe = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
     const bare = balanceMember('brawler', 0, level), geared = balanceMember('brawler', 0, level, { gear: true })
     const built = balanceMember('brawler', 0, level, { gear: true, stars: true })
-    // Her standard preset's Greatsword Orb (classes v2, C4) adds its offense to her Greatsword hits, beside the weapon's Might.
-    const own = bare.stats.atk, armor = geared.stats.atk - own, extra = built.stats.atk - geared.stats.atk, might = mightOf(grade), orb = orbOffense(grade)
-    const total = own + armor + extra + might + orb
+    const own = bare.stats.atk, armor = geared.stats.atk - own, extra = built.stats.atk - geared.stats.atk, might = mightAt(grade, 1)
+    const total = own + armor + extra + might
     const hit = (o: number) => (o * o) / (o + foe.stats.pdef)
     const part = (n: number) => `${n} (${Math.round((100 * n) / total)}%)`
     const lose = (n: number) => `−${Math.round(100 * (1 - hit(total - n) / hit(total)))}%`
     const depth = rpgOpenDepth(level)
-    offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(orb), part(armor), total,
-      lose(extra), lose(might), lose(orb), lose(armor), `×${(hit(total) / hit(own)).toFixed(2)}`, `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
+    offense.push([`Lv ${level}`, `G${grade}, ${depth}`, part(own), part(extra), part(might), part(armor), total,
+      lose(extra), lose(might), lose(armor), `×${(hit(total) / hit(own)).toFixed(2)}`, `×${(RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]).toFixed(2)}`])
     // What a regular foe's 100% physical hit takes of her HP, as each defensive source joins.
-    const share = (u: typeof bare, cut = 0) => {
+    const share = (u: typeof bare) => {
       const o = foe.stats.atk
-      return `${Math.round((100 * (o * o) / (o + u.stats.pdef) * (1 - cut / 1000)) / u.stats.hp)}%`
+      return `${Math.round((100 * (o * o) / (o + u.stats.pdef)) / u.stats.hp)}%`
     }
     const armorOnly = { ...bare, stats: { ...bare.stats, hp: geared.stats.hp, pdef: geared.stats.pdef } }
     const starsOnly = { ...bare, stats: { ...bare.stats, hp: bare.stats.hp + built.stats.hp - geared.stats.hp, pdef: bare.stats.pdef + built.stats.pdef - geared.stats.pdef } }
-    // Her Support slot holds a Vampire Talisman; an Iron Talisman there instead cuts what she takes.
-    const iron = balanceMember('brawler', 0, level, { gear: true, stars: true, support: 'talisman-iron' }).guard ?? 0
-    taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(built, built.guard ?? 0), share(built, iron)])
+    taken.push([`Lv ${level}`, share(bare), share(starsOnly), share(armorOnly), share(built)])
   }
-  return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Orb', 'Armor', 'Offense',
-    'Hit without Extra Stats', 'Hit without the weapon', 'Hit without the Orb', 'Hit without armor', 'All four vs her stats alone', 'Skill depth vs depth 1'], offense) +
+  return table(['Level', 'Gear grade, skill depth', 'Uma stats (level)', 'Extra Stats', 'Weapon Might', 'Armor', 'Offense',
+    'Hit without Extra Stats', 'Hit without the weapon', 'Hit without armor', 'All three vs her stats alone', 'Skill depth vs depth 1'], offense) +
     '\n\nA regular foe\'s 100% physical hit, as a share of her HP:\n\n' +
-    table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', 'All (on curve)', 'With an Iron Talisman'], taken) +
-    '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her on-curve nodes go to ATK, HP, DEF and M.DEF in turn, and she wears her standard preset\'s ' +
-    'Greatsword Orb (its offense on her Greatsword hits) and Vampire Talisman; the last column puts an Iron Talisman in her Support slot.'
+    table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', 'All (on curve)'], taken) +
+    '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, Prowess all to ATK; her armor is the ' +
+    'physical half. Her preset\'s Bell adds a follow-up Attack rather than offense; a Pendant or an Orb would add its flat offense ' +
+    'on her kinds, and her signature +0.2 a level while she wears her knack\'s family.'
 }
 
 function foeScaling(): string {
@@ -368,7 +382,7 @@ function foeScaling(): string {
     ['HP', `(${t.hpBase} + ${t.hpPerStat} × reference stat) × role × rank; the reference stat is an average Uma's at the foe's lifetime level`],
     ['Offense', `Set so a 100% hit takes a share of an average Uma's HP at her level (${pct(t.hitShareStart)} at tier Lv 1, ${pct(t.hitShare)} from tier Lv ${t.hitShareFull}), × the offense budget, × role`],
     ['Sub-boss and boss HP', `×${t.subBossHp} and ×${t.bossHp}, times the party's reachable skill depth`],
-    ['Build budget', `What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + ${t.budgetPerLevel} × (ℓ − 1)² ÷ 49), ${x(r2(rpgFoeBudget(top, t.budgetPerLevel)))} at Lv ${top}; offense ${x(r2(rpgFoeBudget(top, t.offenseBudgetPerLevel)))} at Lv ${top}. It restarts at each tier's Lv 1; its build part scales by her stats' growth: ${x(r2(rpgFoeTierBudget(2 * top, t.budgetPerLevel)))} HP and defense, ${x(r2(rpgFoeTierBudget(2 * top, t.offenseBudgetPerLevel)))} offense at Tier 2 Lv ${top}`],
+    ['Build budget', `What a built party's gear and Extra Stats call for, by tier level ℓ: HP and defense ×(1 + ${t.budgetPerLevel} × (ℓ − 1)² ÷ 49), ${x(r2(rpgFoeBudget(top, t.budgetPerLevel)))} at Lv ${top}; offense ${x(r2(rpgFoeBudget(top, t.offenseBudgetPerLevel)))} at Lv ${top}. It restarts at each tier's Lv 1, and its build part is × the tier's multiplier (×1.8 Tier 2, ×2.6 Tier 3; EP16): ${x(r2(rpgFoeTierBudget(2 * top, t.budgetPerLevel)))} HP and defense, ${x(r2(rpgFoeTierBudget(2 * top, t.offenseBudgetPerLevel)))} offense at Tier 2 Lv ${top}, ${x(r2(rpgFoeTierBudget(3 * top, t.budgetPerLevel)))} and ${x(r2(rpgFoeTierBudget(3 * top, t.offenseBudgetPerLevel)))} at Tier 3 Lv ${top}`],
     ['World: regular foes', `+${pct(WORLD_TUNING.regularHpPerLevel)} HP per tier level`],
     ['World: elites', `+${pct(WORLD_TUNING.eliteHpPerLevel)} HP per tier level`],
     ['World: region bosses', `${x(WORLD_TUNING.bossHp)} a champion's HP`],
@@ -379,70 +393,89 @@ function foeScaling(): string {
   ])
 }
 
-// --- Materials, Star Gems, gear -------- ---------------------------------------------------------------------------------
+// --- Materials, made items, gear (R2, live since H82) ---------------------------------------------------------------
 
-function families(): string {
-  return table(['Family', 'Id', 'Feeds', 'Site'], ITEM_FAMILIES.map((f) => [f.name, `\`${f.id}\``, EFFECT_LABEL[f.effect], placeById(f.site)?.name ?? f.site]))
+const TIERS_123: readonly GearTier[] = [1, 2, 3]
+const LINE_NAME: Readonly<Record<MaterialLine, string>> = { metal: 'Metal', wood: 'Wood', vegetables: 'Vegetables', fish: 'Fish', stone: 'Stone' }
+/** The profession and place that gather a line. */
+function lineHome(line: MaterialLine): { profession: string; place: string } {
+  const spec = PLACES_V3.find((p) => p.line === line)!
+  return { profession: professionById(spec.profession)!.name, place: placeById(spec.id)?.name ?? spec.id }
 }
+
+/** The five lines (PP7, PP8): who gathers each, and its low and high type in each tier. */
+function families(): string {
+  return table(['Line', 'Gathered by', 'Tier 1 (low · high)', 'Tier 2', 'Tier 3'], MATERIAL_LINES.map((line) => {
+    const home = lineHome(line)
+    const pair = (tier: 1 | 2 | 3) => materialTypes(line, tier).map((t) => stockName(t.raw)).join(' · ')
+    return [LINE_NAME[line], `${home.profession}, the ${home.place}`, pair(1), pair(2), pair(3)]
+  }))
+}
+/** Every type, raw and refined, by line (PP §3.3): the low type opens at Craft Lv 1, the high at 26. */
 function items(): string {
   const out: string[] = []
-  for (const f of ITEM_FAMILIES) {
-    out.push(`### ${f.name} (\`${f.id}\`, ${EFFECT_LABEL[f.effect]}, ${placeById(f.site)?.name ?? f.site})`, '')
-    out.push(table(['Grade', 'Raw', 'Refined', 'Unlocks at Craft Lv'], f.raw.map((r, i) => [
-      r.grade, `${r.name} (\`${r.id}\`)`, `${f.refined[i]!.name} (\`${f.refined[i]!.id}\`)`, gradeUnlockLevel(r.grade),
+  for (const line of MATERIAL_LINES) {
+    const home = lineHome(line)
+    out.push(`### ${LINE_NAME[line]} (${home.profession}, the ${home.place})`, '')
+    out.push(table(['Tier', 'Band', 'Raw', 'Refined', 'Opens at Craft Lv'], materialTypes(line).map((t) => [
+      t.tier, t.band, `${stockName(t.raw)} (\`${t.raw}\`)`, `${stockName(t.refined)} (\`${t.refined}\`)`, gradeUnlockLevel(materialGateGrade(t.raw)),
     ])), '')
   }
   return out.join('\n').trimEnd()
 }
+/** The jewels (EP17, EP22): which node each opens, its grade and gate, and its recipe in a Tier 1 world (the ladder moves
+ * a later world's top grades onto its own pairs). */
 function gems(): string {
-  return table(['Star Gem', 'Id', 'Kind', 'Grade', 'Feeds', 'Materials'], GEMS.map((g) => [g.name, `\`${g.id}\``, cap(g.kind), g.grade,
-    g.kind === 'sun' ? 'All eight' : g.effects.map((e) => EFFECT_LABEL[e]).join(', '), inputs(g.inputs)]))
+  const jewels = MADE_IDENTITIES.filter((m) => m.line === 'jewel-planet' || m.line === 'jewel-moon')
+  return table(['Jewel', 'Id', 'Opens', 'Grade', 'Uma Lv', 'Recipe (Tier 1)'], jewels.map((m) => {
+    const n = Math.ceil(m.grade / 2)
+    const opens = m.line === 'jewel-planet' ? `Planet ${['I', 'II', 'III', 'IV', 'V'][n - 1]}` : `node ${['I', 'II', 'III', 'IV', 'V'][n - 1]} of a moon${n === 2 || n === 4 ? `; her moon's ${n === 2 ? 'I' : 'II'}` : ''}`
+    return [madeName(m.id)!, `\`${m.id}\``, opens, m.grade, gradeGateLevel(m.grade), inputs(madeRecipe(m.id, 1))]
+  }))
 }
+/** Gear by grade (WP2–WP3, WP19–WP23, SB1): what each grade gives, the made item that raises it, and the four accessory
+ * families' base forms. */
 function gear(): string {
-  // The live generation's: classes v2 types the accessory slots and makes Orbs flat offense (H57).
-  const v2 = rpgV2()
-  const family = (id: string) => ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id
-  const slot = (t: EquipType) => (isWeapon(t) ? 'Weapon'
-    : isAccessory(t) ? `${v2 ? ACCESSORY_SLOT_LABEL[accessorySlotFor(t)!] : 'Accessory'} (${ACCESSORY_LABEL[accessoryKindOf(t)]})`
-    : ARMOR_SLOT_LABEL[slotOf(t) as keyof typeof ARMOR_SLOT_LABEL])
-  const g10 = (t: EquipType) => gearById(gearId(t, 10))!
-  const effect = (t: EquipType): string => {
-    const a = accessoryEffects(g10(t))
-    const parts = [a.regen && `heals ${a.regen / 10}% of her HP a round`, a.mpRegen && `restores ${a.mpRegen} MP a round`, a.lifesteal && `heals ${a.lifesteal / 10}% of physical damage dealt`,
-      a.mpSteal && `restores MP as ${a.mpSteal / 10}% of magical damage dealt`, a.barrier && `a shield of ${a.barrier / 10}% of her HP against physical damage`,
-      a.veil && `a shield of ${a.veil / 10}% of her HP against magical damage`, a.guard && `${a.guard / 10}% less physical damage taken`, a.resist && `${a.resist / 10}% less magical damage taken`,
-      a.thorns && `returns ${a.thorns / 10}% of physical damage taken`, a.mirror && `returns ${a.mirror / 10}% of magical damage taken`].filter(Boolean)
-    return parts.join('; ')
-  }
-  const does = (t: EquipType) => {
-    if (isWeapon(t)) return `Might +${mightOf(10)} on its hits`
-    if (isOrb(t)) return v2 ? `+${orbOffense(10)} offense on its kind's hits` : 'Its kind on every hit, for weaknesses'
-    if (isAccessory(t)) return effect(t)
-    const p = gearPoints(g10(t))
-    return ITEM_EFFECTS.filter((e) => p[e]).map((e) => `${EFFECT_LABEL[e]} +${p[e]}`).join(', ')
-  }
-  return table(['Type', 'Id', 'Slot', 'Half', 'Recipe families, grades 1–4 (then again from grade 5)', 'Example recipe: grade 3', 'At grade 10'], EQUIP_TYPES.map((t) => [
-    EQUIP_LABEL[t], `\`${t}-g<grade>\``, slot(t), isMagicalGear(t) ? 'Magical' : 'Physical',
-    [1, 2, 3, 4].map((g) => recipeFamilies(t, g).map(family).join(' + ')).join(' → '), inputs(gearById(gearId(t, 3))!.inputs), does(t),
-  ])) + `\n\nA weapon's Might adds to the offense of the hits made with it, by grade: ${MIGHT_BY_GRADE.slice(1).join(', ')} (D142). Armor adds ATK (physical) or M.ATK (magical), +1 every two grades from grade 1 (${armorOffense(10)} at grade 10), and its slot's defensive stat +${ARMOR_DEFENSE_PER_GRADE} a grade (D141). ` +
-    (v2 ? `An Uma wears an Orb in her Damage slot and a Talisman or an Amulet in her Support slot. An Orb adds to the offense of her ` +
-      `hits of its kind, by grade: ${ORB_OFFENSE_BY_GRADE.slice(1).join(', ')}, half a weapon's Might; it no longer adds its kind for weaknesses.`
-      : `An Uma wears two accessories of different types.`)
+  const grades = Array.from({ length: GRADE_MAX }, (_, i) => i + 1)
+  const tiers = (f: (tier: GearTier) => number) => TIERS_123.map(f).join(' · ')
+  const values = table(['Grade', 'Opens at Lv', 'Weapon Might (Tier 1 · 2 · 3)', 'Armor: offense a piece', 'Head DEF', 'Body HP', 'Legs MP', 'Arms M.DEF', 'Feet Speed'],
+    grades.map((g) => [g, gradeGateLevel(g), tiers((t) => mightAt(g, t)), armorValues('head', g, 1).offense, armorValues('head', g, 1).value,
+      armorValues('body', g, 1).value, armorValues('legs', g, 1).value, armorValues('arms', g, 1).value, armorValues('feet', g, 1).value]))
+  const made = table(['Grade', 'Weapon Gem', 'Armor Fittings', 'Accessory Setting'], grades.map((g) => [g,
+    inputs(madeRecipe(`weapon-gem-g${g}`, 1)), inputs(madeRecipe(`armor-fittings-g${g}`, 1)), inputs(madeRecipe(`accessory-setting-g${g}`, 1))]))
+  const forms = table(['Family', 'Base form', 'G1 → G10 (Tier 1)'], [
+    [ACCESSORY_FAMILY_LABEL.pendant, 'Flat offense on each of her three weapons\' kinds', PENDANT_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, any of the ten', ORB_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.bell, 'When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack', `${BELL_PERMILLE_PER_GRADE / 1000} a grade × her hand (${(BELL_PERMILLE_PER_GRADE * GRADE_MAX) / 1000} at G10), every tier`],
+    [ACCESSORY_FAMILY_LABEL.insignia, 'Her hits on sub-bosses and bosses hit harder', `+${INSIGNIA_PERMILLE_PER_GRADE / 10}% a grade (+${(INSIGNIA_PERMILLE_PER_GRADE * GRADE_MAX) / 10}% at G10), every tier`],
+  ])
+  return values +
+    `\n\nEach armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × ${TIERS_123.map((t) => TIER_SCALE_TENTHS[t] / 10).join(', ')} in Tiers 1, 2 and 3 (Feet Speed doesn't scale).\n\n` +
+    'What raises a slot one grade, in a Tier 1 world:\n\n' + made +
+    '\n\nAccessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot\'s):\n\n' + forms +
+    `\n\nHer signature: while she wears her knack's family, ATK and M.ATK +${signatureBonus(10, 1)} · +${signatureBonus(30, 1)} · +${signatureBonus(50, 1)} at Lv 10 · 30 · 50 (0.2 a level × the tier).`
+}
+/** The Planet and three moons (EP1–EP8, EP23) and her moon (UT10): what a node gives in Tier 1. */
+function starMap(): string {
+  const n = [1, 2, 3, 4, 5]
+  return table(['Body', 'Nodes', 'Opens at Lv', 'Points (Tier 1)', 'To'], [
+    ['Planet', 'I–V', n.map((i) => gradeGateLevel(2 * i - 1)).join(', '), PLANET_T1.join(', '), 'all six core stats (HP 5 a point)'],
+    ['Prowess', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), `ATK and M.ATK by her active class: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${PROWESS_SPLIT[c]}/${100 - PROWESS_SPLIT[c]}`).join(', ')}`],
+    ['Vigor', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'HP and MP'],
+    ['Guard', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'DEF and M.DEF'],
+    ['★ Her moon', 'I, II', `${gradeGateLevel(4)}, ${gradeGateLevel(8)}`, TEMPLATE_T1.join(', '), 'I: her knack\'s stat; II: her calling\'s channel\'s defense'],
+  ])
 }
 
+/** Class Rank, the one bar left from R2 (WP3; live since H82): what a win pays, and the EXP to next. */
 function ranks(): string {
-  const gearRows: Cell[][] = [1, 2, 3, 5, 7, 9].map((r) => [r, gearExpToNext(r).toLocaleString('en-US'), `Lv ${5 * (r + 1) - 4}`])
   const classRows: Cell[][] = [1, 10, 20, 30, 40, 49].map((r) => [r, classExpToNext(r).toLocaleString('en-US')])
   return table(['Bar', 'Ranks', 'Per win worth E Uma EXP', 'Opens'], [
     ['Class Rank, per class', `1–${CLASS_MAX_RANK}`, `${CLASS_EXP_SHARE}E to the class she fought as`,
       `Its trees' depths at ${RPG_DEPTH_GATES.join(', ')}; ranks every skill she holds, a Skill Rank every ${RPG_SKILL_RANK_STEP} Class Ranks up to ${RPG_SKILL_RANK_MAX}`],
-    ['Weapon Rank, per weapon', `1–${GEAR_MAX_RANK}`, `${WEAPON_EXP_SHARE}E over her three weapons (E a weapon), double for each she used`, 'Wears that weapon up to its rank\'s grade'],
-    ['Armor Rank, per armor kind', `1–${GEAR_MAX_RANK}`, `${ARMOR_EXP_SHARE}E to each of her five armor kinds`, 'Wears that kind up to its rank\'s grade'],
-    ['Accessory Rank, per accessory kind', `1–${GEAR_MAX_RANK}`, `${ACCESSORY_EXP_SHARE}E to the kind of each accessory she wears`, 'Wears accessories of that kind up to its rank\'s grade'],
-  ]) + '\n\n' + table(['Class Rank', 'EXP to next'], classRows) + '\n\n' + table(['Weapon or Armor Rank', 'EXP to next', 'Next rank, used every fight, by'], gearRows) +
-    `\n\nPast a max rank, EXP banks at ${pct(MARKS_SHARE)} as Marks: Gear Marks from weapons and armor, Class Marks from classes. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks and gives ${MANUAL_EXP.toLocaleString('en-US')} EXP to one bar of one Uma. ` +
-    `Armor kinds by slot: ${ARMOR_SLOTS.map((s) => `${ARMOR_SLOT_LABEL[s]} ${ARMOR_SLOT_KINDS[s].map((k) => ARMOR_LABEL[k]).join(' or ')}`).join('; ')}. ${ARMOR_KINDS.length} kinds in all. ` +
-    `Accessory kinds: ${ACCESSORY_KINDS.map((k) => ACCESSORY_LABEL[k]).join(', ')}.`
+  ]) + '\n\n' + table(['Class Rank', 'EXP to next'], classRows) +
+    `\n\nPast the max rank, EXP banks at ${pct(MARKS_SHARE)} as Class Marks. A Class Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Class Marks and gives ${MANUAL_EXP.toLocaleString('en-US')} EXP to one class of one Uma. ` +
+    'Gear has no ranks: a slot\'s grade is what she wears ([materials](materials.md#gear)).'
 }
 
 // --- Economy -------------------------------------------------------------------------------------------------------
@@ -459,24 +492,33 @@ function levels(): string {
   return table(['Level', 'Uma EXP to next', 'Craft EXP to next'], rows) +
     `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × her own EXP to next level, −${pct(RPG_LEVEL_EXP_STEP)} per level she's above the foes (down to ${pct(RPG_LEVEL_EXP_MIN)}), never more than ${pct(RPG_LEVEL_EXP_MAX)}. Uma Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Craft EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
 }
+/** The Exchange by pair (PP17; live since H82): every tier's types up to the world's, × the world's tier. */
 function prices(): string {
-  return table(['Thing', 'Price (Laurels)'], [
-    ...[1, 4, 7, 10].map((g) => [`Raw item, grade ${g}`, rawItemPrice(g)] as Cell[]),
-    ['Speed Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE],
-  ]) + `\n\nA Speed Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. A Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Marks, not Laurels.`
+  const after = (tier: number, band: 'low' | 'high') => (stockedAfter(tier, band) === 1 ? 'the tier\'s first win' : `a win on continent ${stockedAfter(tier, band)}`)
+  const rows: Cell[][] = []
+  for (const world of [1, 2, 3] as const) {
+    for (const tier of [1, 2, 3] as const) {
+      if (tier > world) continue
+      for (const band of ['low', 'high'] as const) rows.push([`Tier ${world}`, `Tier ${tier}'s ${band} types`, `after ${after(tier, band)}`, RAW_PRICE_V3[band] * world])
+    }
+  }
+  return table(['World', 'Raw materials', 'Stocked', 'Price (Laurels)'], rows) + '\n\n' +
+    table(['Thing', 'Price (Laurels)'], [['Speed Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE]]) +
+    `\n\nA Speed Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. Selling, × the world's tier: a raw low type ${SELL_RAW_V3.low}, a high type ${SELL_RAW_V3.high}; refined twice that; a made item 6 + 6 × its grade. ` +
+    `A Class Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Class Marks, not Laurels.`
 }
 const minutes = (m: number): string => `${Number(m.toFixed(1))} min`
 const hours = (m: number): string => `${Number((m / 60).toFixed(1))} h`
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather one item', `any grade, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
-    ['Refine one item', `a quarter of that: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Craft or cut one', `twice a gather: ${minutes(makeMinutes(1))} at Lv1, ${minutes(makeMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the facility's speed`],
-    ['Outputs per job', `gathering, crafting and cutting 1–${MAX_JOB_COUNT}; refining ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
+    ['Gather one raw item', `any type, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
+    ['Process one item', `raw into refined, one for one, a quarter of a gather: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
+    ['Make one item', 'a gather\'s time for each refined item in it: a Weapon Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4'],
+    ['Opens', 'a low type at Craft Lv 1 and a high type at Lv 26; a made item of grade g at Craft Lv 5g − 4'],
+    ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the place's speed`],
+    ['Outputs per job', `gathering and making 1–${MAX_JOB_COUNT}; processing ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
-    ['Facility levels', `1–3: ${FACILITY_SLOTS.join(', ')} Uma slots; speed ${FACILITY_SPEED.map(x).join(', ')}`],
-    ['Upgrade to Lv 2 / 3', FACILITY_UPGRADE.map((u) => `${u.laurels} Laurels + ${u.count}× grade-${u.grade} refined of each of its two families`).join(' / ')],
+    ['Places', `${PLACE_SLOTS_V3} Uma slots each, speed ×${PLACE_SPEED_V3}, from day one; no upgrades`],
     ['Extra Stats and armor points', `+1 to its stat per point (+${POINT_HP} HP); Speed ${pct(POINT_EVASION)} evasion; Limit +${POINT_LIMIT} starting charge`],
   ])
 }
@@ -491,13 +533,22 @@ function places(): string {
   }
   return out.join('\n').trimEnd()
 }
+/** The ten places (PP4) and the trades (PP2): who works each, and what it does. */
 function facilities(): string {
-  const family = (id: string | null) => (id ? ITEM_FAMILIES.find((f) => f.id === id)?.name ?? id : '—')
-  const makes = { gather: '', refine: 'Refined items', craft: 'Gear', cut: 'Star Gems' } as const
-  return table(['Place', 'Job', 'Makes', 'Upgraded with'], FACILITIES.map((f) => [
-    placeById(f.id)?.name ?? f.id, cap(f.kind), f.kind === 'gather' ? family(f.family) : makes[f.kind],
-    f.upgradeFamilies.map(family).join(' + '),
-  ]))
+  const trade = (profession: string) => TRADES.find((t) => t.gathering === profession || t.crafting === profession)!
+  const callings: Readonly<Record<string, string>> = { physical: 'Brawler', 'physical-hybrid': 'Spell Blade', healer: 'Paladin, Cleric', 'magical-hybrid': 'Summoner', magical: 'Mage' }
+  const MADE_LINE_NAME: Readonly<Record<string, string>> = { 'weapon-gem': 'Weapon Gems', 'armor-fittings': 'Armor Fittings', 'accessory-setting': 'Accessory Settings',
+    'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels' }
+  const does = (id: string): string => {
+    const spec = PLACES_V3.find((p) => p.id === id)!
+    if (spec.kind === 'gather') return `Gathers ${LINE_NAME[spec.line!].toLowerCase()}`
+    if (spec.kind === 'refine') return 'Processes every line, raw into refined'
+    return `Makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
+  }
+  return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (callings)'], PLACES_V3.map((p) => {
+    const profession = professionById(p.profession)!
+    return [placeById(p.id)?.name ?? p.id, profession.name, cap(profession.kind), does(p.id), callings[trade(p.profession).id]!]
+  })) + `\n\nEvery place has ${PLACE_SLOTS_V3} slots at ×${PLACE_SPEED_V3} from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.`
 }
 
 // --- The world ------------------------------------------------------------------------------------------------------
@@ -716,8 +767,8 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
   const blocks: Record<string, () => string> = {
     classes, templates, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
-    families, items, gems, gear, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'pacing-sim': pacingSimulation, 'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules,
+    families, items, gems, gear, 'star-map': starMap, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
+    'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules,
     dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ` +
       `No points and no side skills: every skill on her path is hers at its depth's Class Rank, and ranks up every ${RPG_SKILL_RANK_STEP} Class Ranks ` +

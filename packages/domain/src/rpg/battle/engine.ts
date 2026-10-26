@@ -1,4 +1,4 @@
-// Deterministic campaign battle reducer, engine v17 (v16 live since H72, D210; R2's v17 dark, D209; W3, D91; classes
+// Deterministic campaign battle reducer, engine v17 (live since H82, D218; v16 from H72 to H82, D210; W3, D91; classes
 // D86, docs/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
@@ -13,7 +13,7 @@
 // v16 the Tier rework's fight (D200, live since H72, D210): three weapons by channel, no side skills; a trunk and one
 // fork into line A or B, Pierce, the Paladin's revive on her Light tree and Skill Ranks from her Class Rank (H65); the
 // base MP regen for every Uma and the Flourish as her calling, Clean break, Even pace and Late reserve (H68, D204).
-// v17 is R2's dark economy foundation (D209): gear grades arrive only as stats and Might, and support fields retire; her
+// v17 is R2's economy (D209, live since H82): gear grades arrive only as stats and Might, and support fields retire; her
 // accessory's base form and her signature join the damage stack (H75, D212): `flat` and `signature` in a hit's offense,
 // the Insignia a factor after the weak step, and the Bell's follow-up after an act with an Attack (`ring`).
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).

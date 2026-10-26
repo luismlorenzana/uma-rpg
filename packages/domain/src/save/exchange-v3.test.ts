@@ -1,7 +1,7 @@
-// R2's Exchange and the calling pick's block (H77; profession-progression.md §10, PP2, PP17), with the switch mocked to
-// engine v17: raw materials by pair as a world's continents fall, × the world's tier, selling materials and made items,
+// R2's Exchange and the calling pick's block (H77; profession-progression.md §10, PP2, PP17), on engine v17 (live
+// since H82): raw materials by pair as a world's continents fall, × the world's tier, selling materials and made items,
 // and the pick refused while she works.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { pickCalling, type BattleOutfit } from './battle'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { buyRawItem, buyTickets, rawPriceV3, sellPrice, sellStock, stockedTypes } from './exchange'
@@ -10,7 +10,6 @@ import type { Save, TierWorld } from './save'
 import { callingPickBlock, CALLING_WORKING } from './status'
 import { collectJob, startJob } from './work'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const NOW = ECONOMY_V3_NOW
 /** A world of a tier with wins on these continents of its own tier (1–5). */
@@ -20,7 +19,7 @@ function worldWith(tier: number, continents: readonly number[], overrides: Parti
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 const saveOf = (tier: number, world: TierWorld): Save => ({
-  schemaVersion: 27,
+  schemaVersion: 28,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { [String(tier)]: world },
 })

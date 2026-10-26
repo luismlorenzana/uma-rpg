@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { accessoryFits, ACCESSORY_TYPES, EQUIP_TYPES, gearId, gearIdentity, isOrb, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { ACCESSORY_KINDS, ACCESSORY_SLOTS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, newRanks, WEAPON_TYPES, type ArmorKind, type Ranks } from '../economy/ranks'
 import { GEM_IDENTITIES, STAR_NODES } from '../economy/stars'
@@ -8,6 +8,12 @@ import { equipBlock, gearChoices } from './forge'
 import { nodeFromGem } from './observatory'
 import { gearV1, newOwnedUma, newTierWorld, slotKind, type OwnedUma, type TierWorld } from './save'
 import { upgradesFor } from './upgrades'
+
+// The v1 economy's rules, kept as the old game's record since R2's switch (H82, D218): this file runs as the game before
+// it, the switch at engine 16 (today's facilities, crafted pieces, Star Gems and gear ranks) and old saves read through
+// the chain to v27.
+vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(16, await orig()))
+vi.mock('./migrations', async (orig) => { const m = await orig<typeof import('./migrations')>(); return { ...m, migrateWorld: m.migrateWorldToV27 } })
 
 const NOW = '2026-10-21T12:00:00.000Z'
 /** One invented Brawler, '101', in a fresh world with this stock. */

@@ -1,7 +1,7 @@
-// R2's job kinds and trade gate (H77; profession-progression.md §4.3, §5, PP12, PP13, PP16), with the switch mocked to
-// engine v17: gathering, processing and making by the world's tier, the gates, the times and the open shop.
+// R2's job kinds and trade gate (H77; profession-progression.md §4.3, §5, PP12, PP13, PP16), on engine v17 (live
+// since H82): gathering, processing and making by the world's tier, the gates, the times and the open shop.
 import { isRefusal, kindRules, type PlannedItem, type Refusal, type WorkEnv } from '@luismlorenzana/uma-work'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { itemMinutes, jobExp, refineMinutes } from '../economy/pacing'
 import { tradeOfCalling, type TradeOf } from '../economy/professions'
 import type { RpgClass } from '../rpg/kinds'
@@ -11,7 +11,6 @@ import { refusalText } from '../save/work'
 import { RPG_WORK_ENV } from './env'
 import { liveWorkEnv, openShop, RPG_BUILDINGS_V3, rpgWorkEnv, type WorkContext } from './env-v3'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(17, await orig()))
 
 const SPEED = 1.25
 /** A world of Umas by outfit id, each at a Craft Level, with these items. */
