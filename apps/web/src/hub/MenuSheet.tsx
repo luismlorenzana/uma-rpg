@@ -11,7 +11,7 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
   const world = useWorld()
   const tier = useActiveTier()
   const now = useNow(15_000)
-  const ready = readyPlaces(world, now)
+  const ready = readyPlaces(world, now, tier)
   const groups: MenuGroup[] = HUB_PAGES.map((page) => ({
     key: page,
     label: HUB_PAGE_NAMES[page],

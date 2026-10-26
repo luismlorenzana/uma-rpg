@@ -1,9 +1,12 @@
 import gear from '@luismlorenzana/uma-art/gear/atlas.json'
 import gems from '@luismlorenzana/uma-art/gems/atlas.json'
 import items from '@luismlorenzana/uma-art/items/atlas.json'
-import { EQUIP_TYPES, gearId, GEM_IDENTITIES, GEMS, ITEM_FAMILIES, ITEMS } from '@rpg/domain'
+import {
+  EQUIP_TYPES, gearId, GEM_IDENTITIES, GEMS, ITEM_FAMILIES, ITEMS, MADE_IDENTITIES, MATERIALS,
+  type AccessorySlotState,
+} from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { gearArt, iconFrame, SHEET_SIZE } from './frames'
+import { accessoryIconId, gearArt, iconFrame, SHEET_SIZE } from './frames'
 
 describe('icon frames (P37–P38)', () => {
   it('finds every item, gear piece and Star Gem where the published indexes put it', () => {
@@ -26,5 +29,46 @@ describe('icon frames (P37–P38)', () => {
     }
     expect([items, gear, gems].map((a) => ({ w: a.width, h: a.height }))).toEqual([SHEET_SIZE.items, SHEET_SIZE.gear, SHEET_SIZE.gems])
     expect(iconFrame('gem-unknown-1')).toBeNull()
+  })
+
+  it('finds every R2 material, made item, jewel and accessory form', () => {
+    for (const material of MATERIALS) {
+      const frame = items.frames[material.id as keyof typeof items.frames]
+      expect(frame, material.id).toBeDefined()
+      expect(iconFrame(material.id), material.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
+    }
+    for (const made of MADE_IDENTITIES.filter((m) => !m.line.startsWith('jewel-'))) {
+      const frame = items.frames[made.id as keyof typeof items.frames]
+      expect(frame, made.id).toBeDefined()
+      expect(iconFrame(made.id), made.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
+    }
+    const jewelArt = {
+      'jewel-planet-1': 'gem-sun-4', 'jewel-planet-2': 'gem-sun-4', 'jewel-planet-3': 'gem-sun-6',
+      'jewel-planet-4': 'gem-sun-8', 'jewel-planet-5': 'gem-sun-10',
+      'jewel-moon-1': 'gem-limit-2', 'jewel-moon-2': 'gem-limit-4', 'jewel-moon-3': 'gem-limit-6',
+      'jewel-moon-4': 'gem-limit-8', 'jewel-moon-5': 'gem-limit-10',
+    } as const
+    for (const [id, art] of Object.entries(jewelArt)) {
+      const frame = gems.frames[art]
+      expect(iconFrame(id), id).toEqual({ sheet: 'gems', x: frame.x, y: frame.y })
+    }
+
+    const slot = (family: AccessorySlotState['family'], grade: number, kind?: AccessorySlotState['kind']): AccessorySlotState =>
+      ({ family, grade, form: 'base', ...(kind ? { kind } : {}) })
+    const bellRows = { greatsword: 'talisman-vital', axe: 'talisman-vampire', lance: 'talisman-bulwark', bow: 'talisman-iron', katana: 'talisman-thorn',
+      fire: 'amulet-spring', ice: 'amulet-siphon', lightning: 'amulet-veil', light: 'amulet-ward', dark: 'amulet-mirror' } as const
+    for (let grade = 1; grade <= 10; grade++) {
+      const forms = [slot('pendant', grade), slot('insignia', grade),
+        ...Object.keys(bellRows).map(kind => slot('orb', grade, kind as AccessorySlotState['kind'])),
+        ...Object.keys(bellRows).map(kind => slot('bell', grade, kind as AccessorySlotState['kind']))]
+      for (const state of forms) {
+        const row = state.family === 'pendant' ? 'charm' : state.family === 'insignia' ? 'ring'
+          : state.family === 'orb' ? `orb-${state.kind}` : bellRows[state.kind!]
+        const frame = gear.frames[`${row}-g${grade}` as keyof typeof gear.frames]!
+        expect(iconFrame(accessoryIconId(state))).toEqual({ sheet: 'gear', x: frame.x, y: frame.y,
+          ...('kind' in state && state.kind ? { kind: state.kind } : {}) })
+      }
+    }
+    expect(iconFrame(accessoryIconId(slot(null, 0)))).toBeNull()
   })
 })

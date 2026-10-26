@@ -2,8 +2,8 @@
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
 import {
-  facilitySpec, hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, RPG_WORK_ENV,
-  placeById, placeLock, placeOnPage, placeOpen, placesOn, type HubPage, type Place, type TierWorld,
+  hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, liveWorkEnv,
+  placeById, placeLock, placeOnPage, placeOpen, placesOn, workPlace, type HubPage, type Place, type TierWorld,
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
 import { FloatingPill, navState, PeekPanel, peekPath, useLeave, withParam } from '@luismlorenzana/uma-kit/shell'
@@ -63,8 +63,8 @@ function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string
       return hero ? { state: 'busy', progress: 1, tone: 'var(--color-accent)', face: face(hero) } : { state: 'free' }
     })
   }
-  if (!world || !facilitySpec(place.id)) return Array.from({ length: place.slots }, (): PipModel => ({ state: 'free' }))
-  return workView(world, Date.parse(now), RPG_WORK_ENV).cards(place.id).map((card): PipModel => {
+  if (!world || !workPlace(place.id)) return Array.from({ length: place.slots }, (): PipModel => ({ state: 'free' }))
+  return workView(world, Date.parse(now), liveWorkEnv(tier)).cards(place.id).map((card): PipModel => {
     if (card.kind === 'free') return { state: 'free' }
     return { state: card.running ? 'busy' : 'ready', progress: card.progress, queued: card.queue.length, face: face(card.outfitId) }
   })
@@ -76,9 +76,9 @@ function QuickLook({ place }: { place: Place }) {
 }
 
 /** One tap collects every finished job on every page. */
-function CollectAll({ world, now }: { world: TierWorld | null; now: string }) {
+function CollectAll({ world, now, tier }: { world: TierWorld | null; now: string; tier: number }) {
   const [note, setNote] = useState<string | null>(null)
-  const ready = readyPlaces(world, now).size
+  const ready = readyPlaces(world, now, tier).size
   if (ready === 0 && !note) return null
   return (
     <FloatingPill
@@ -104,7 +104,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
   const leave = useLeave()
   const reducedMotion = useReducedMotionSetting()
   const crowd = useCrowd()
-  const ready = readyPlaces(world, now)
+  const ready = readyPlaces(world, now, tier)
   const ground = useMemo(() => pageGround(page), [page])
   // The fight's code is lazy (H62): fetch it once the Hub has painted.
   useEffect(prefetchFight, [])
@@ -141,7 +141,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
         canvas={import.meta.env.DEV && params.has('canvas')}
         debug={import.meta.env.DEV}
       >
-        <CollectAll world={world} now={now} />
+        <CollectAll world={world} now={now} tier={tier} />
       </HubMap>
       {peek && (
         <PeekPanel

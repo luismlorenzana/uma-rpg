@@ -13,7 +13,7 @@ import {
   activeClass, activeNodeSlots, ARMOR_KINDS, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, armorTrack, isInFight, itemMinutes, MINUTE, classOf, classRankOf, classTrack, EFFECT_LABEL,
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
-  rpgExpToNext, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, slotJobOf, ACCESSORY_KINDS, accessoryTrack, starsV1,
+  rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, umaTrade, slotJobOf, ACCESSORY_KINDS, accessoryTrack, starsV1,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -30,6 +30,7 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { loadSkills, type MasterView } from '../../master/master'
 import { markTarget, unlock, useActiveTier, useOwnerTier, useWorld } from '../../save/game'
+import { tradeLabel } from '../../save/trade'
 import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
@@ -429,7 +430,9 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
         return (
           <section key="craft" className="rounded-md bg-raised p-3">
             <div className="flex items-baseline justify-between">
-              <p className="text-[14px] font-semibold">{CRAFT_LABEL} <span className="font-display text-lg">{prof.level}</span></p>
+              {rpgRework('economy')
+                ? <p className="text-[14px] font-semibold" data-craft-trade>Craft Lv <span className="font-display text-lg">{prof.level}</span> · {tradeLabel(umaTrade(outfit, uma.calling.pick))}</p>
+                : <p className="text-[14px] font-semibold">{CRAFT_LABEL} <span className="font-display text-lg">{prof.level}</span></p>}
               <span className="text-[11px] text-ink-faint">10 gathered in {formatDuration(10 * itemMinutes(prof.level) * MINUTE)}</span>
             </div>
             <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />

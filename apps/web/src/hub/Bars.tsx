@@ -49,10 +49,11 @@ const TABS: readonly { page: HubPage; Icon: IconComponent; raised?: boolean }[] 
 
 export function RpgBottomBar({ active }: { active: HubPage | null }) {
   const world = useWorld()
+  const tier = useActiveTier()
   const now = useNow(15_000)
   const location = useLocation()
   const tabs: BarTab[] = TABS.map(({ page, Icon, raised }) => {
-    const badge = page === 'wilds' ? readyOnPage(world, now, page) : 0
+    const badge = page === 'wilds' ? readyOnPage(world, now, page, tier) : 0
     return { key: page, to: `/${page}`, label: HUB_PAGE_NAMES[page], Icon, raised, active: page === active, badge, badgeLabel: `${HUB_PAGE_NAMES[page]}, ${badge} ready` }
   })
   return <BottomBar label="Pages" tabs={tabs} menu={{ to: withParam(location, 'sheet', 'menu'), label: 'Every place', text: 'Menu' }} />
