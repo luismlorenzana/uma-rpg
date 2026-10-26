@@ -339,11 +339,11 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 
 ### Warehouse
 
-The kit's `ShelfView` (SD3) with this game's two shelves, one row per stack:
-- **Materials:** line by line, raw then refined, tier by tier; each row says its tier and band ("Tier 1 · high · raw"),
-  never a grade.
-- **Made items:** Weapon Gems, Armor Fittings and Accessory Settings by grade, then Planet and Moon Jewels I–V; grade
-  chips filter them (every grade, the highest of each line, or one grade).
+The kit's `ShelfView` (SD3) as an icon grid with counts:
+- **Shelves:** All, Metal, Wood, Vegetables, Fish, Stone and Made items. Materials stay raw then refined and tier by
+  tier; made items stay line by line and grade by grade.
+- **Grade chips:** every grade, the highest of each line, or one grade. They filter made items; materials have no grades,
+  so their line shelves show no chips.
 - The header counts both: "120 materials · 35 made items".
 - A stock sheet says what it is ("Tier 1 · high · raw · Refines into Iron Ingot", "Grade 5 · Raises a weapon one grade",
   "Opens Planet III"), with Sell ×1, 10 or All for Laurels.
