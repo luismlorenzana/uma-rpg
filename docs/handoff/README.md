@@ -55,23 +55,21 @@ Every foundation packet logs its release's build decisions first.
 it runs the migration on a full-shaped scratch save first and puts the sheet's numbers in its pull request.
 
 **R1 + R2 review** (the owner's first review of the live rework, 2026-10-26, D219): fixes and improvements. Code packets
-go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26); the materials design is Claude's, for the
-owner's review, before its build packets are written.
+go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). The farm stays as R2 built it (D219).
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H106 | The Warehouse as an icon grid again: shelves by line (All, Metal, Wood, Vegetables, Fish, Stone, Made items) and the kit's grade chips | ChatGPT | S | H82 | Ready |
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Ready |
-| H108 | **Materials by grade, the design:** G1–G10 a line with tier-specific families, the art they take, gates, recipes, times, the Exchange; the save step that turns every material into Speed Tickets (only tickets, D219); the version re-plan for R3–R5. Framing decided (D219 point 5): a tier's own families only; uma-art's sixteen families mapped first, new art the fallback. For the owner's review; its build packets follow | Claude | M | H82 | In review: [materials-by-grade.md](../design/tier-rework/materials-by-grade.md) |
 
-**R3. Tier 2's weapons** (engine v18, save v29; **H108's materials design may move its save number**):
+**R3. Tier 2's weapons** (engine v18, save v29):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82, H108 | Waiting |
+| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Ready |
 | H84 | Accessories, Tier 2: the second slot, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 | Waiting |
-| H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83, H108 | Waiting |
-| H86 | The secondary profession from Tier 2 | Either | M | H82, H108 | Waiting |
+| H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83 | Waiting |
+| H86 | The secondary profession from Tier 2 | Either | M | H82 | Ready |
 | H87 | Save v29 (dark): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
 | H88 | R3's screens (inert): the G5 pick, accessory branches, the weapon moon, the secondary, armor halves | Either | L | H87 | Waiting |
 | H89 | R3's balance (dark): Pure against Dual, Full against Split, Tier 2's shields and most of its term, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85, H86 | Waiting |

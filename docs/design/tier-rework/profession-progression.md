@@ -11,10 +11,8 @@
 > **Calling precedence corrected, 2026-10-26 (D220):** the live head counts below follow Pace over a tied best style,
 > Late + End as Summoner, and pure Late as the healer choice. The work rules themselves do not change.
 
-> **The owner's review, 2026-10-26 (D219)** (decisions changed, pending their design): **§3's two types a line a tier
-> and the ladder (PP7–PP9) are superseded** by graded materials, G1–G10 a line with tier-specific families, and
-> **§14.4's kept stock** by Speed Tickets: every material in a migrated world becomes tickets at the grant's rate, in the
-> same save step. Their design is [H108](../../handoff/README.md); until it ships, this doc describes the live game.
+> **The owner's review, 2026-10-26 (D219):** the design stands as built. Graded materials and the stock as tickets
+> were weighed and set aside the same day; §3's pairs, the ladder and §14.4's kept stock stay.
 
 > **For the owner's review, the fourth and last standalone doc (2026-10-24).** Brought in line with the three approved
 > docs (Class D192, Weapon D193, Extra Stats D194) and with **the owner's compensation direction**, designed in full in
