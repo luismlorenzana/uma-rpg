@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · M · Needs: H99, H100 (and through them H98) · Unblocks: H103 (the local switch), H105 (the switch chains it)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H98–H100 built Tier 3's toolbox as rules, engine v20 and save actions, with the save's types widened. The save itself

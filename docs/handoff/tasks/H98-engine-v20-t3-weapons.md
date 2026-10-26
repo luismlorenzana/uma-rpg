@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · L · Needs: H97 (Release 4 live) · Unblocks: H99, H100, H101 (and through them H102–H105)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 Release 5 is Tier 3's whole toolbox ([implementation.md](../../design/tier-rework/implementation.md) §1 and §3, D198):

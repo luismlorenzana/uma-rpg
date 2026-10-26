@@ -1,7 +1,7 @@
 # Handoff: open work, ranked
 
 > **Status: 2026-10-26, after D218.** Classes v2 (H53–H63), the Rift (H44–H52) and the Tier rework's R1 and R2
-> (H64–H82: Tier 1's fight and economy, engine v17, save v28) are built and live. The open work
+> (H64–H82: Tier 1's fight and economy, engine v17, save v28; v29 since D221) are built and live. The open work
 > is **the Tier rework's build**: six approved docs (D192–D197) shipping as five live releases, R1–R5, in 42 packets,
 > H64–H105 ([implementation.md](../design/tier-rework/implementation.md), D198). Each release is built dark behind its
 > own engine and save version and turned on by its own switch packet.
@@ -62,7 +62,7 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 | H106 | The Warehouse as an icon grid again: shelves by line (All, Metal, Wood, Vegetables, Fish, Stone, Made items) and the kit's grade chips | ChatGPT | S | H82 | Ready |
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Ready |
 
-**R3. Tier 2's weapons** (engine v18, save v29):
+**R3. Tier 2's weapons** (engine v18, save **v30**; its packets' "v29" reads v30, D221):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -77,7 +77,7 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 
 **Waves:** 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
 
-**R4. Tier 2's classes** (engine v19, save v30):
+**R4. Tier 2's classes** (engine v19, save **v31**; its packets' "v30" reads v31, D221):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -91,7 +91,7 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 
 **Waves:** 1) H91 → 2) H92, H93 → 3) H94, H96 → 4) H95 → 5) H97.
 
-**R5. Tier 3** (engine v20, save v31):
+**R5. Tier 3** (engine v20, save **v32**; its packets' "v31" reads v32, D221):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -197,7 +197,7 @@ for the fifth scenario (tiers T9).
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Versions:** this game runs on engine v17 and save v28 (R2, live since H82), uma-kit 0.14.0, uma-art 2.13.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+- **Versions:** this game runs on engine v17 and save v29 (R2, live since H82; v29, the grant tickets only, D221), uma-kit 0.14.0, uma-art 2.13.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
   protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done

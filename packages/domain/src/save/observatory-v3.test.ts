@@ -8,7 +8,7 @@ import { worldOf } from './rules'
 import type { OwnedUma, Save, TierWorld } from './save'
 
 
-const saveOf = (world: TierWorld): Save => ({ schemaVersion: 28, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
+const saveOf = (world: TierWorld): Save => ({ schemaVersion: 29, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
   defeated: {} }, tierWorlds: { '1': world } })
 const withUma = (uma: Partial<OwnedUma>, items: Record<string, number> = {}): Save =>
   saveOf(gradedWorld({ items, umas: { '101': gradedUma({ stars: starMap(), ...uma }) } }))

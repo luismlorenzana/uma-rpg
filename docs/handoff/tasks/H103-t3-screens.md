@@ -2,6 +2,9 @@
 
 **uma-rpg · Either · L · Needs: H102 (and through it H98–H100) · Unblocks: H105**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H98–H102 built Tier 3's toolbox dark. The player meets it on screens that don't know it yet:

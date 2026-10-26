@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · M · Needs: H94, H95, H96 (and through them H91–H93) · Unblocks: H98 (R5's foundation)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H91–H96 built Release 4, Tier 2's classes, dark: engine v19 (the class branches and their focus, the 36 class skills,

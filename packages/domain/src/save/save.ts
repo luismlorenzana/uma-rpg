@@ -1,4 +1,5 @@
-// Save v28: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v28 (D214,
+// Save v29: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v29 (D221):
+// the grant is tickets only: a granted world's materials leave its Warehouse. v28 (D214,
 // H78; live since H82, D218): R2, the Tier rework's economy: gear by grade, the Planet and three moons, the ten places and
 // the five lines' items, Craft Levels to 1 and the Speed Ticket grant; the strict parse reads it (D208). v27 (D205,
 // D210): R1, the Tier rework's fight: three weapons a class, a line a tree in place of side skills (`lines`), the loadout
@@ -55,7 +56,7 @@ import { migrateWorld, toV26, type TierGrant } from './migrations'
 
 export type { TierGrant } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 28
+export const SAVE_SCHEMA_VERSION = 29
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
@@ -1317,13 +1318,14 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v28 save and always returns v28. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+/** Parses a v1–v29 save and always returns v29. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
  * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
  * tier history and Rift (D163), v23 gains no defeated faces, no open Rift fight, and empty traces and Convergence attempts
  * (D171), v24 → v25 (D180, D188): the Paladin from the Cleric, the Bastion's seats, typed accessories, and anything older
  * than v10 starts over (D69); v25 → v26 (D190): each party's lead; v26 → v27 (D205, D210): three weapons, branch picks,
  * the calling pick; v27 → v28 (D214, D218): gear by grade, the Planet and three moons, ten places and the five lines'
- * items, Craft Levels to 1 and the Speed Ticket grant. */
+ * items, Craft Levels to 1 and the Speed Ticket grant; v28 → v29 (D221): a granted world's materials go, the grant tickets
+ * only. */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

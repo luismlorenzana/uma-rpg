@@ -1,7 +1,6 @@
-// The production repository's backup on a schema change (D69), against an in-memory Firestore: H82 (D218) turns save v28
-// on, the Tier rework's economy and its one irreversible step (Craft Levels to 1, the Speed Ticket grant), so the first v28
-// write over a stored v27 save must keep `saveBackups/{uid}-v27` (H72's v26 → v27 step had the same proof, D210). Invented
-// data only.
+// The production repository's backup on a schema change (D69), against an in-memory Firestore: D221 turns save v29 on,
+// the owner's "only tickets" (every material leaves a granted world's Warehouse), so the first v29 write over a stored
+// v28 save must keep `saveBackups/{uid}-v28` (H82's v27 → v28 step had the same proof, D218). Invented data only.
 import { newOwnedUma, newSave, SAVE_SCHEMA_VERSION as V, type Save } from '@rpg/domain'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FirestoreSaveRepository } from './firestore-save.repository'
@@ -27,64 +26,65 @@ vi.mock('firebase-admin', () => {
   return { apps: [{}], initializeApp: () => ({}), firestore }
 })
 
-const NOW = '2026-10-25T12:00:00.000Z'
-/** A save as the app before H82 stored it: labelled v27, Uma 101 a Brawler at Craft Lv 21 with a crafted Greatsword in her
- * locker (v27's shapes, built in engine 16's generation). */
-const storedV27 = (name: string): Doc => {
-  const save = JSON.parse(JSON.stringify(newSave(name, NOW, 16))) as Doc
-  save.schemaVersion = 27
-  const world = (save.tierWorlds as Record<string, { umas: Record<string, Doc> }>)['1']!
-  const uma = JSON.parse(JSON.stringify(newOwnedUma(NOW, 'brawler', 16))) as Doc
-  world.umas['101'] = { ...uma, craft: { level: 21, exp: 0 }, gear: { locker: ['greatsword-g1'], equipped: { greatsword: 'greatsword-g1' }, kinds: {} } }
+const NOW = '2026-10-26T12:00:00.000Z'
+/** The Tier rework's grant as save v28 holds it: Uma 101's Craft Lv 21 paid 528 Speed Tickets; 30 items of stock and 4
+ * refined items from an upgrade came back with 650 Laurels. */
+const GRANT = { tickets: 528, floor: 0, umas: { 101: { level: 21, exp: 0, tickets: 528 } }, deleted: { gear: 1, gems: 0, upgrades: 1 },
+  back: { laurels: 650, items: 4, stock: 30 }, seen: true }
+/** A save as the app before D221 stored it: labelled v28, its world granted, with materials and a made item. */
+const storedV28 = (name: string): Doc => {
+  const save = JSON.parse(JSON.stringify(newSave(name, NOW))) as Doc
+  save.schemaVersion = 28
+  const world = (save.tierWorlds as Record<string, Doc & { umas: Record<string, Doc>; wallet: Doc }>)['1']!
+  world.umas['101'] = JSON.parse(JSON.stringify(newOwnedUma(NOW, 'brawler'))) as Doc
+  world.items = { 'iron-ore': 30, 'iron-ingot': 4, 'weapon-gem-g1': 2 }
+  world.wallet = { ...world.wallet, laurels: 650, timeTickets: 528 }
+  world.grant = GRANT
   return save
 }
-/** Uma 101 as save v28 holds her: Craft Lv 1, every grade G0, an empty map, Class Ranks only. */
-const V28_UMA = { craft: { level: 1, exp: 0 }, gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] },
-  stars: { open: [], moons: [] }, ranks: { classes: {} } }
-/** Her grant: Craft Lv 21 is 528 Speed Tickets (§14.3), her Greatsword the one piece. */
-const V28_GRANT = { tickets: 528, umas: { 101: { level: 21, exp: 0, tickets: 528 } }, deleted: { gear: 1, gems: 0, upgrades: 0 }, seen: false }
+/** The same world after v29: the made item stays, the materials go, the sheet lists only the Laurels. */
+const V29_WORLD = { items: { 'weapon-gem-g1': 2 }, grant: { ...GRANT, back: { laurels: 650, items: 0, stock: 0 } } }
 
 describe('the Firestore save repository (D45, D69)', () => {
   beforeEach(() => store.clear())
 
-  it('runs on save v28 since H82 (D218)', () => {
-    expect(V).toBe(28)
+  it('runs on save v29 since D221', () => {
+    expect(V).toBe(29)
   })
 
-  it('keeps saveBackups/{uid}-v27 on the first v28 write, and no backup on later v28 writes', async () => {
+  it('keeps saveBackups/{uid}-v28 on the first v29 write, and no backup on later v29 writes', async () => {
     const repo = new FirestoreSaveRepository()
-    const v27 = { revision: 7, save: storedV27('Luis') }
-    store.set('saves/u', structuredClone(v27))
-    // Loading parses (and migrates) what's stored: Craft Lv 1, G0, the grant paid; nothing is written.
+    const v28 = { revision: 7, save: storedV28('Luis') }
+    store.set('saves/u', structuredClone(v28))
+    // Loading parses (and migrates) what's stored: the materials go, the tickets and Laurels stay; nothing is written.
     const loaded = await repo.load('u')
     expect(loaded.revision).toBe(7)
-    expect(loaded.save?.schemaVersion).toBe(28)
-    expect(loaded.save?.tierWorlds['1']!.umas['101']).toMatchObject(V28_UMA)
-    expect(loaded.save?.tierWorlds['1']!.grant).toMatchObject(V28_GRANT)
-    expect(loaded.save?.tierWorlds['1']!.wallet.timeTickets).toBe(528)
-    expect(store.get('saves/u')).toEqual(v27)
-    expect(store.has('saveBackups/u-v27')).toBe(false)
-    // The new app's first write: v28 is stored, and the v27 document is copied whole first.
-    const next = await repo.put('u', 7, loaded.save!, 28)
+    expect(loaded.save?.schemaVersion).toBe(29)
+    expect(loaded.save?.tierWorlds['1']).toMatchObject(V29_WORLD)
+    expect(loaded.save?.tierWorlds['1']!.wallet).toMatchObject({ laurels: 650, timeTickets: 528 })
+    expect(store.get('saves/u')).toEqual(v28)
+    expect(store.has('saveBackups/u-v28')).toBe(false)
+    // The new app's first write: v29 is stored, and the v28 document is copied whole first.
+    const next = await repo.put('u', 7, loaded.save!, 29)
     expect(next.revision).toBe(8)
-    expect(store.get('saveBackups/u-v27')).toEqual({ ...v27, backedUpAt: SERVER_TIME })
-    expect(store.get('saves/u')).toMatchObject({ revision: 8, save: { schemaVersion: 28, tierWorlds: { '1': { umas: { '101': V28_UMA }, grant: V28_GRANT } } } })
-    // A later v28 write over v28 backs nothing up.
-    store.delete('saveBackups/u-v27')
-    await repo.put('u', 8, loaded.save!, 28)
+    expect(store.get('saveBackups/u-v28')).toEqual({ ...v28, backedUpAt: SERVER_TIME })
+    expect(store.get('saves/u')).toMatchObject({ revision: 8, save: { schemaVersion: 29, tierWorlds: { '1': V29_WORLD } } })
+    // A later v29 write over v29 backs nothing up.
+    store.delete('saveBackups/u-v28')
+    await repo.put('u', 8, loaded.save!, 29)
     expect([...store.keys()]).toEqual(['saves/u'])
   })
 
-  it('stores an old app’s write as v28 with the same backup while v27 is stored, then refuses its next one (D45)', async () => {
+  it('stores an old app’s write as v29 with the same backup while v28 is stored, then refuses its next one (D45)', async () => {
     const repo = new FirestoreSaveRepository()
-    store.set('saves/u', { revision: 3, save: storedV27('Luis') })
-    // The API parses every save it's sent to the current version (`parseSavePut`), so a v27 app's body arrives as v28.
+    store.set('saves/u', { revision: 3, save: storedV28('Luis') })
+    // The API parses every save it's sent to the current version (`parseSavePut`), so a v28 app's body arrives as v29.
     const sent = (await repo.load('u')).save as Save
-    await repo.put('u', 3, sent, 27)
-    expect(store.get('saves/u')).toMatchObject({ revision: 4, save: { schemaVersion: 28 } })
-    expect(store.has('saveBackups/u-v27')).toBe(true)
-    // Now v28 is stored: the old app's next write is refused with what's stored, and nothing changes.
-    await expect(repo.put('u', 4, sent, 27)).rejects.toBeInstanceOf(RevisionConflict)
+    await repo.put('u', 3, sent, 28)
+    expect(store.get('saves/u')).toMatchObject({ revision: 4, save: { schemaVersion: 29 } })
+    expect(store.has('saveBackups/u-v28')).toBe(true)
+    // Now v29 is stored: the old app's next write is refused with what's stored, and nothing changes.
+    await expect(repo.put('u', 4, sent, 28)).rejects.toBeInstanceOf(RevisionConflict)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
   })
 })

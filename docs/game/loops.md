@@ -152,11 +152,13 @@ and its high type before G10. It sells up to 99 at a time; selling pays a few La
 R2's update (H82) rebuilt the Wilds: every Uma's Craft Level went back to 1, crafted gear and Star Gems became grades and
 an empty map, and facility upgrades were refunded. The time the Umas worked came back as **Speed Tickets** (PP20, PP24):
 one per 30 minutes of the work their Craft EXP records, ⌈(EXP her level took + her bank) ÷ 60⌉ an Uma, never below what
-the deleted pieces and gems took to make. It was paid once into each world's wallet when the save became v28.
+the deleted pieces and gems took to make. It was paid once into each world's wallet when the save became v28. The tickets
+already hold the stock's gathering, so save v29 (D221) took every material from a world that was paid: the grant is
+tickets only, and Craft Levels come back from the jobs they pay for.
 
 The first time each world opens after the update, the sheet **"The Wilds are rebuilt"** shows it: the grant ("+63,800
-Speed Tickets"), the hours it stands for, what went (gear pieces, Star Gems, facility upgrades), what came back (Laurels,
-refined items, the Warehouse converted to the new materials), what stays (Uma Levels, classes and Class Ranks, Laurels,
+Speed Tickets"), the hours it stands for, what went (gear pieces, Star Gems, facility upgrades), what came back (the upgrades'
+Laurels), what stays (Uma Levels, classes and Class Ranks, Laurels,
 every ticket you had), and each Uma's line ("Craft Lv 50 → 1 · 1,470"). Both of its buttons, To the Wilds and Later,
 close it for good; the Account's row "The Tier rework's grant" reopens it.
 

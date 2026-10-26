@@ -13,12 +13,13 @@ import { v15Replay, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
 type Raw = Record<string, unknown>
 type RawWorld = Raw & { umas: Record<string, Raw>; items: Record<string, number> }
-/** The rich save with every world through `toV28`, still labelled v27 (H82 bumps it), and `change` on Tier 1's world. */
+/** The rich save with every world through `toV28`, labelled v29 so no step runs (v29 keeps v28's shape and rules; D221's
+ * step would take the materials), and `change` on Tier 1's world. */
 function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
   const raw = richV27Save()
   const tierWorlds = Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, toV28(w, Number(k))]))
   change(tierWorlds['1'] as RawWorld)
-  return JSON.parse(JSON.stringify({ ...raw, tierWorlds })) as Raw
+  return JSON.parse(JSON.stringify({ ...raw, schemaVersion: 29, tierWorlds })) as Raw
 }
 
 describe('save v28\'s parse (H78), the economy stage live', () => {

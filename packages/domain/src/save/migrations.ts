@@ -201,10 +201,11 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v28 for a world of `tier` (its key; v28 doesn't read it, R3's v29 does, H87). */
+/** Every step to v29 for a world of `tier` (its key; v28 doesn't read it, R3's v30 does, H87). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
-  return version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
+  const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
+  return version < 29 && isRecord(v28) ? toV29(v28) : v28
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -274,6 +275,32 @@ function v27GemRefined(id: string): number {
 const v28GemQuarters = (id: string): number => 8 + 5 * v27GemRefined(id)
 
 /** What the first launch's sheet reads (PP25): the grant, what went and what came back, each Uma's line. */
+/** R2's sixty material ids (H77's catalog as save v28 holds it), as literals: a step never reads the live catalogs. */
+const V28_MATERIALS: ReadonlySet<string> = new Set([
+  'copper-ore', 'copper-ingot', 'iron-ore', 'iron-ingot', 'gold-ore', 'gold-ingot', 'titanium-ore', 'titanium-ingot', 'mythril-ore', 'mythril-ingot',
+  'orichalcum-ore', 'orichalcum-ingot', 'pine-log', 'pine-plank', 'cedar-log', 'cedar-plank', 'cherry-log', 'cherry-plank', 'ebony-log', 'ebony-plank',
+  'elderwood-log', 'elderwood-plank', 'yggdrasil-branch', 'yggdrasil-plank', 'carrot', 'chopped-carrot', 'cabbage', 'shredded-cabbage',
+  'bell-pepper', 'sliced-bell-pepper', 'asparagus', 'trimmed-asparagus', 'golden-carrot', 'golden-carrot-puree', 'emperor-pumpkin', 'pumpkin-puree',
+  'carp', 'carp-fillet', 'sardine', 'sardine-fillet', 'sea-bream', 'sea-bream-fillet', 'tuna', 'tuna-fillet', 'silverfin', 'silverfin-fillet',
+  'rainbow-koi', 'rainbow-koi-fillet', 'quartz', 'cut-quartz', 'citrine', 'cut-citrine', 'sapphire', 'cut-sapphire', 'diamond', 'cut-diamond',
+  'starstone', 'cut-starstone', 'philosophers-stone', 'cut-philosophers-stone',
+])
+
+/**
+ * v28 → v29 (D221, the owner's R1 + R2 review): **the grant is tickets only.** The Tier rework's grant paid every minute
+ * of a world's work in Speed Tickets, the gathering of its stock included, so a world that took it keeps no materials:
+ * every material leaves its Warehouse (the converted stock, the upgrades' refined items and anything since), and its
+ * grant's sheet stops listing them (`back.items` and `back.stock` to 0). Made items, Laurels, tickets and Craft Levels
+ * stay. A world without a grant (made after R2) keeps its materials. Literals only; idempotent (a second run finds no
+ * material in a granted world).
+ */
+export function toV29(world: Record<string, unknown>): Record<string, unknown> {
+  if (!isRecord(world.grant) || !isRecord(world.items)) return world
+  const items = Object.fromEntries(Object.entries(world.items).filter(([id]) => !V28_MATERIALS.has(id)))
+  const back = isRecord(world.grant.back) ? { ...world.grant.back, items: 0, stock: 0 } : world.grant.back
+  return { ...world, items, grant: { ...world.grant, back } }
+}
+
 export interface TierGrant {
   /** Paid into `wallet.timeTickets`: the Umas' tickets summed, or the floor when higher. */
   tickets: number

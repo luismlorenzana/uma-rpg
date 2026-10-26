@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · M · Needs: H102, H103, H104 (and through them H98–H101) · Unblocks: nothing (closes Release 5 and the Tier rework's build)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H98–H104 built Tier 3's whole toolbox dark: engine v20 (Keen, Tempered, Evolved; the third accessory slot and its step;

@@ -2,6 +2,9 @@
 
 **uma-rpg · Claude · M · Needs: H83, H84, H85, H86 · Unblocks: H88 (the screens and the local switch), H90 (the switch chains it)**
 
+> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
+> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+
 ## Why
 
 H83–H86 built Release 3's rules dark. The save must hold what they introduce, and every existing save must reach that
