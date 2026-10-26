@@ -152,6 +152,6 @@ describe('targets (D100, D126, D144)', () => {
     expect(plan().gear.find((g) => g.key === 'axe-g1')).toMatchObject({ need: 1, have: 0 })
     expect(plan().gems.find((d) => d.key === 'gem-hp-1')).toMatchObject({ need: 1, have: 0 })
     save = setTarget(setTarget(save, '101', false, at(3)), '102', false, at(3))
-    expect(targetPlan(worldOf(save), brawler)).toEqual({ gear: [], gems: [], refined: [], raw: [] })
+    expect(targetPlan(worldOf(save), brawler)).toEqual({ gear: [], gems: [], made: [], refined: [], raw: [] })
   })
 })

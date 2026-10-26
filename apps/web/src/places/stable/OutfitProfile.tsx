@@ -14,6 +14,7 @@ import {
   highestGrade, ITEM_EFFECTS, KEY_LABELS, partyOf, placeById, WEAPON_TYPES, weaponTrack,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaPoints, umaProfile, umaTrade, slotJobOf, ACCESSORY_KINDS, accessoryTrack, starsV1,
+  isGrades, isStarMap, moonTemplate, starMapOf,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -274,9 +275,10 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
               <Row key={r.label} label={r.label} note={r.note} value={
                 <span className="tabular-nums">
                   <span className={r.gear === undefined ? '' : 'font-display'}>{r.value}</span>
-                  {(!!r.gear || !!r.extra) && (
+                  {(!!r.gear || !!r.extra || !!r.star) && (
                     <span className="font-normal text-ink-faint">
-                      {' ('}{!!r.gear && <span className="text-shard">+{r.gear}</span>}{!!r.gear && !!r.extra && ' '}{!!r.extra && <span className="text-success">+{r.extra}</span>})
+                      {' ('}{!!r.gear && <span className="text-shard">+{r.gear}</span>}{!!r.gear && (!!r.extra || !!r.star) && ' '}
+                      {!!r.extra && <span className="text-success">+{r.star ? r.extra - r.star : r.extra}</span>}{!!r.star && <span className="text-success"> ★ +{r.star}</span>})
                     </span>
                   )}
                 </span>
@@ -376,32 +378,35 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
 
 function GearTab({ outfit, uma, world, upgrades }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; upgrades: UmaUpgrades | null }) {
   const navigate = useNavigate()
-  const points = umaPoints(uma, activeClass(outfit, uma))
-  const ready = [upgrades?.gems ? `${upgrades.gems} to set` : '', upgrades?.freeNodes ? `${upgrades.freeNodes} free` : ''].filter(Boolean).join(' · ')
+  const tier = useActiveTier()
+  const points = umaPoints(uma, activeClass(outfit, uma), tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick))
+  const ready = isStarMap(uma.stars) ? (upgrades?.jewels.length ? `${upgrades.jewels.length} to set` : '')
+    : [upgrades?.gems ? `${upgrades.gems} to set` : '', upgrades?.freeNodes ? `${upgrades.freeNodes} free` : ''].filter(Boolean).join(' · ')
+  const map = starMapOf(uma)
   return (
     <div className="space-y-3">
       <PresetButton outfit={outfit} uma={uma} world={world} />
-      <GearCard outfit={outfit} uma={uma} world={world} marked={upgrades?.gearSlots} />
+      <GearCard outfit={outfit} uma={uma} world={world} marked={isGrades(uma.gear) ? upgrades?.grades : upgrades?.gearSlots} />
       <button type="button" onClick={() => navigate(`/town/observatory/${outfit.outfitId}`, { state: { fromHub: true } })} className="w-full rounded-md bg-raised p-3 text-left">
         <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <span className="flex items-center gap-1.5">
             <span className="text-[14px] font-semibold">Extra Stats</span>
             {ready && <span className="rounded-full bg-success px-1.5 text-[11px] font-bold text-ink-on-dark">{ready}</span>}
           </span>
-          <span className="text-[12px] text-ink-soft">{starsV1(uma).active.length}/{activeNodeSlots(uma.level)} active · {starsV1(uma).unlocked.length}/100 · map ›</span>
+          <span className="text-[12px] text-ink-soft">{isStarMap(uma.stars) ? `${map.open.length}/22 open` : `${starsV1(uma).active.length}/${activeNodeSlots(uma.level)} active · ${starsV1(uma).unlocked.length}/100`} · map ›</span>
         </span>
         <span className="mt-1 block text-[11px] text-ink-faint">
           Total with armor: {ITEM_EFFECTS.filter((e) => points[e]).map((e) => `${EFFECT_LABEL[e]} ${pointText(e, points[e])}`).join(' · ') || 'nothing yet'}
         </span>
       </button>
-      <section className="space-y-2 rounded-md bg-raised p-3">
+      {!isGrades(uma.gear) && <section className="space-y-2 rounded-md bg-raised p-3">
         <p className="text-[11px] text-ink-faint">Weapon Ranks</p>
         <RankCells label="Weapon Ranks" cells={WEAPON_TYPES.map((w) => ({ key: w, kind: 'weapon' as const, id: w, track: weaponTrack(uma.ranks, w) }))} />
         <p className="pt-1 text-[11px] text-ink-faint">Armor Ranks</p>
         <RankCells label="Armor Ranks" cells={ARMOR_KINDS.map((k) => ({ key: k, kind: 'armor' as const, id: k, track: armorTrack(uma.ranks, k) }))} />
         <p className="pt-1 text-[11px] text-ink-faint">Accessory Ranks</p>
         <RankCells label="Accessory Ranks" cells={ACCESSORY_KINDS.map((k) => ({ key: k, kind: 'accessory' as const, id: k, track: accessoryTrack(uma.ranks, k) }))} />
-      </section>
+      </section>}
     </div>
   )
 }

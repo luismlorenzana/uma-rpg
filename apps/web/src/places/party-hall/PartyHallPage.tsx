@@ -1,7 +1,7 @@
 // The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
 // member can be recalled from her job here, and fights either way (D119). From classes v2 a party with two healers
 // carries the "One healer a party" note (H59); editing it is never refused.
-import { activeClass, isInFight, isPartyFull, partyLead, partyOf, placeById, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
+import { ACCESSORY_FAMILY_LABEL, activeClass, isGrades, isInFight, isPartyFull, partyLead, partyOf, placeById, umaTemplate, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useHubNavigation } from '../../hub/navigation'
@@ -66,6 +66,7 @@ function PartySlot({ view, world, outfitId, lead }: { view: MasterView; world: T
       <span className="w-full min-w-0 text-center leading-none">
         <span className="block text-[10px] font-bold text-ink-soft">{formatLevel(uma?.level ?? 1)}</span>
         <span className="mt-0.5 block truncate text-[9px] font-semibold text-ink-faint">{classId ? CLASS_LABEL[classId] : ''}</span>
+        {outfit && uma && isGrades(uma.gear) && <span className="mt-0.5 block truncate text-[9px] font-semibold text-accent">★ {ACCESSORY_FAMILY_LABEL[umaTemplate(outfit, uma.calling.pick).family]}</span>}
       </span>
     </span>
   )

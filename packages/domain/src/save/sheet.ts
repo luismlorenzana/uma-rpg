@@ -10,10 +10,13 @@ import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
 import { projectRpgStats, rpgBaseMpRegen, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
+import { accessoryFlatValue, accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
+import { gradeOf, mightAt, type AccessorySlotState, type GearTier } from '../economy/grades'
 import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
-import { moonTemplate } from '../economy/planet'
+import { mapPoints, moonTemplate } from '../economy/planet'
+import { umaTemplate } from '../roster/template'
 import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
-import { gearV1, isGrades, type OwnedUma } from './save'
+import { gearV1, isGrades, starMapOf, type OwnedUma } from './save'
 
 /** The classes' names on the sheet ("No effect as Brawler"). */
 const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
@@ -33,10 +36,23 @@ export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClas
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
  * them (v16's MP: "+13 a round"). */
-export interface SheetRow { label: string; value: string; gear?: number; extra?: number; note?: string }
+export interface SheetRow { label: string; value: string; gear?: number; extra?: number; star?: number; note?: string }
 export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
 const permille = (n: number) => `${Math.round(n) / 10}%`
+
+/** R2's accessory row in the battle sheet. */
+export function accessorySheetLine(slot: AccessorySlotState | undefined, weapons: readonly import('../rpg/kinds').RpgWeapon[], tier: GearTier): string {
+  if (!slot || slot.grade < 1 || slot.family === null) return 'None'
+  const label = slot.kind ? KIND_NAME(slot.kind) : ''
+  if (slot.family === 'pendant') return `Pendant: +${accessoryFlatValue('pendant', slot.grade, tier)} on her three kinds`
+  if (slot.family === 'orb') return `Orb: ${label} +${accessoryFlatValue('orb', slot.grade, tier)}`
+  if (slot.family === 'bell') {
+    const bell = accessoryParts(slot, weapons, tier).bell
+    return bell ? `Bell: ${label} ${(bell.power / 1000).toFixed(1)} after her Attack` : `Bell: No ${label} in her slots`
+  }
+  return `Insignia: +${permille(15 * slot.grade)} on sub-bosses and bosses`
+}
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).
  * Classes v2 (H57): her Orb's offense ("Fire Orb +34"), and a healer's mends from her ATK or M.ATK instead of Heal. */
 export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma), tier = 1,
@@ -64,6 +80,33 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
     : rpgIsHealer(classId, engine) ? [{ label: 'Mends', value: `${times} (from ${by === 'atk' ? 'ATK' : 'M.ATK'})` }] : []
   // SB18, UT6: the MP she regains at each round's end, the base regen by her Class Rank and her Spring's; her Flourish.
   const regen = rpgBaseMpRegen(boosted.stats.mp, classRankOf(uma.ranks, classId), engine) + a.mpRegen
+  if (isGrades(uma.gear)) {
+    const grades = uma.gear
+    const gearTier = tier as GearTier
+    const template = moonTemplate(outfit, uma.calling.pick)
+    const map = starMapOf(uma)
+    const sharedPoints = mapPoints(map.open.filter((id) => !id.startsWith('template:')), classId, gearTier)
+    const sharedStats = applyPoints(base, addPoints(parts.gear, sharedPoints))
+    const coreV3 = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow => ({
+      label, value: String(boosted.stats[k]), gear: geared[k] - base[k],
+      extra: boosted.stats[k] - geared[k], star: boosted.stats[k] - sharedStats.stats[k],
+    })
+    const slot = grades.accessories[0]
+    const family = umaTemplate(outfit, uma.calling.pick).family
+    const signature = signatureWorn(grades, family) ? signatureBonus(uma.level, gearTier) : 0
+    const weaponRows: SheetRow[] = weapons.map((weapon) => ({
+      label: 'Might', value: `${WEAPON_LABEL[weapon]} +${mightAt(gradeOf(grades, { kind: 'weapon', weapon }), gearTier)}`,
+    }))
+    return [
+      { title: 'Offense', rows: [coreV3('ATK', 'atk'), coreV3('M.ATK', 'matk'), ...weaponRows,
+        { label: 'Accessory', value: accessorySheetLine(slot, weapons, gearTier) },
+        ...(signature ? [{ label: 'Signature', value: `+${signature} ★` }] : [])] },
+      { title: 'Defense', rows: [coreV3('DEF', 'pdef'), coreV3('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) }] },
+      { title: 'Sustain', rows: [coreV3('HP', 'hp'), ...mends, { ...coreV3('MP', 'mp'), note: `+${regen} a round` },
+        { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId), classId) }] },
+      { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
+    ]
+  }
   return [
     { title: 'Offense', rows: [core('ATK', 'atk'), core('M.ATK', 'matk'), { label: 'Might', value: mightText || 'None' }, { label: v2 ? 'Orb' : 'Orbs',
       value: (v2 ? Object.entries(a.orbMight ?? {}).map(([k, n]) => `${KIND_NAME(k)} Orb +${n}`) : a.orbs.map(KIND_NAME)).join(', ') || 'None' }] },

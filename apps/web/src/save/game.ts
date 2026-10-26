@@ -2,9 +2,9 @@
 // writes both at once and schedules a background sync. Gameplay never waits on the network. One tier world is on screen at
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
-  type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
+  type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
   markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBranch, type RpgClass,
-  type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
+  type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
 import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
@@ -294,6 +294,9 @@ export async function setStarGem(outfitId: string, gemId: string): Promise<strin
   return r.node
 }
 export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/observatory'), (d, s, now, t) => d.setActiveNodes(s, outfitId, nodes, now, t))
+/** Opens one v3 Extra Stats node with a jewel from the Warehouse. */
+export const setMapJewel = (outfitId: string, jewelId: string, node: string) =>
+  edit(import('@rpg/domain/observatory'), (d, s, now, t) => d.setJewel(s, outfitId, jewelId, node, now, t))
 export const wear = (outfitId: string, gearId: string) => edit(import('@rpg/domain/forge'), (d, s, now, t) => d.equipGear(s, outfitId, gearId, now, t))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/domain/forge'), (d, s, now, t) => d.unequipGear(s, outfitId, slot, now, t))
 /** Puts an armor kind in one of her five armor slots: its Training piece (null) or a crafted one (D103). */
@@ -303,12 +306,18 @@ export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKin
 export const wearAccessoryPiece = (outfitId: string, slot: AccessorySlot, gearId: string | null) =>
   edit(import('@rpg/domain/forge'), (d, s, now, t) => d.wearAccessory(s, outfitId, slot, gearId, now, t))
 /** Puts on a class's standard preset (H33, D164): weapons, armor and accessories, binding what it takes from the stock. */
-export async function wearPreset(outfitId: string, classId: RpgClass): Promise<void> {
+export async function wearPreset(outfitId: string, classId: RpgClass, family?: AccessoryFamily | null): Promise<void> {
   const { save } = useGame.getState()
   if (!save) return
-  const next = wearClassPreset(save, outfitId, classId, nowIso(), activeKey())
+  const next = wearClassPreset(save, outfitId, classId, nowIso(), activeKey(), undefined, family)
   if (next !== save) await commit(next)
 }
+/** Raises one R2 gear slot, or several grades after the sheet's confirmation. */
+export const raiseGear = (outfitId: string, target: GradeTarget, to?: number) => edit(import('@rpg/domain/forge'), (d, s, now, t) =>
+  to === undefined ? d.raiseGrade(s, outfitId, target, now, t) : d.raiseGradeTo(s, outfitId, target, to, now, t))
+/** Changes an R2 accessory's form without changing its grade. */
+export const chooseAccessoryForm = (outfitId: string, classId: RpgClass, slot: number, family: AccessoryFamily | null, kind?: RpgDamageKind) =>
+  edit(import('@rpg/domain/forge'), (d, s, now, t) => d.setAccessoryForm(s, outfitId, classId, slot, family, kind, now, t))
 /** Marks or unmarks an Uma as a target (D100). */
 export const markTarget = (outfitId: string, on: boolean) => edit(import('@rpg/domain/targets'), (d, s, now, t) => d.setTarget(s, outfitId, on, now, t))
 /** The Halls of Heroes (D106): seat or swap a Hero (null empties the seat), and add or remove a Learner. */

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { useMaster } from '../../master/master'
-import { chooseCalling, confirmCallingPick, useWorld } from '../../save/game'
+import { chooseCalling, confirmCallingPick, useActiveTier, useWorld } from '../../save/game'
 import { tradeCounts, tradeOfWorld } from '../../save/trade'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { callingCard, callingTradeLine, templateCard, templateChip, templateTrade } from './template-view'
@@ -15,8 +15,9 @@ import { callingCard, callingTradeLine, templateCard, templateChip, templateTrad
 /** "★ Clever Spellwright": her template, after her stars; a dot while her calling can still be picked. */
 export function TemplateChip({ outfit, uma, classId }: { outfit: RosterOutfit; uma: OwnedUma | null; classId: RpgClass | null }) {
   const [open, setOpen] = useState(false)
+  const tier = useActiveTier()
   const chip = templateChip(outfit, uma)
-  const card = open ? templateCard(outfit, uma, classId) : null
+  const card = open ? templateCard(outfit, uma, classId, tier as 1 | 2 | 3) : null
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} aria-label={`Her template: ${chip.name.slice(2)}${chip.dot ? ', calling not chosen' : ''}`}
@@ -38,6 +39,8 @@ export function TemplateChip({ outfit, uma, classId }: { outfit: RosterOutfit; u
             </div>
             {rpgRework('economy') && <p className="rounded-md bg-raised px-3 py-2 text-[13px] font-semibold" data-template-trade>{templateTrade(outfit, uma)}</p>}
             <p className="rounded-md bg-raised px-3 py-2 text-[13px] font-semibold">{card.flourish}</p>
+            {card.signature && <p className="rounded-md bg-raised px-3 py-2 text-[13px] font-semibold">{card.signature}</p>}
+            {card.moon && <p className="rounded-md bg-raised px-3 py-2 text-[13px] font-semibold">{card.moon}</p>}
           </div>
         </BottomSheet>
       )}

@@ -6,13 +6,20 @@ import { planRequirements, type Requirement } from '@luismlorenzana/uma-work'
 import { gemById, nodeGem, STAR_NODES } from '../economy/gems'
 import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
 import { facilitySpec } from '../economy/jobs'
+import { gradeOf, type GradeTarget } from '../economy/grades'
+import { MAP_NODES, nodeJewel } from '../economy/planet'
+import { placeSpecV3 } from '../economy/professions'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
 import { itemById } from '../items/catalog'
+import { madeIdentity } from '../items/made-id'
+import { madeName, madeRecipe } from '../items/made'
+import { materialIdentity } from '../items/materials-id'
+import { materialName } from '../items/materials'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { gearStock, gearV1, gemStock, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
+import { gearStock, gearV1, gemStock, isGrades, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
 
 /** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -40,7 +47,7 @@ export interface TargetNeed {
   coming: number
   short: number
 }
-export interface TargetPlan { gear: TargetNeed[]; gems: TargetNeed[]; refined: TargetNeed[]; raw: TargetNeed[] }
+export interface TargetPlan { gear: TargetNeed[]; gems: TargetNeed[]; made: TargetNeed[]; refined: TargetNeed[]; raw: TargetNeed[] }
 
 /** The gear types an Uma climbs (D124): her class's five weapons, each armor slot's kind, and the type in each accessory
  * slot (an empty one plans nothing: nothing says which she wants). */
@@ -59,6 +66,18 @@ function gearTypes(uma: OwnedUma, classId: RpgClass): EquipType[] {
 export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, number> {
   const demand = new Map<string, number>()
   const add = (id: string) => demand.set(id, (demand.get(id) ?? 0) + 1)
+  if (isGrades(uma.gear)) {
+    const targets: GradeTarget[] = [
+      ...classOf(uma, classId).weapons.map((weapon): GradeTarget => ({ kind: 'weapon', weapon })),
+      ...ARMOR_SLOTS.map((slot): GradeTarget => ({ kind: 'armor', slot })),
+      ...uma.gear.accessories.map((_, slot): GradeTarget => ({ kind: 'accessory', slot })),
+    ]
+    for (const target of targets) for (let grade = gradeOf(uma.gear, target) + 1; grade <= GEAR_MAX_RANK; grade++) {
+      add(target.kind === 'weapon' ? `weapon-gem-g${grade}` : target.kind === 'armor' ? `armor-fittings-g${grade}` : `accessory-setting-g${grade}`)
+    }
+    if (isStarMap(uma.stars)) for (const node of MAP_NODES) if (!uma.stars.open.includes(node)) add(nodeJewel(node))
+    return demand
+  }
   for (const type of gearTypes(uma, classId)) {
     for (let g = boundGrade(uma, gearTrackOf(type)) + 1; g <= GEAR_MAX_RANK; g++) add(gearId(type, g))
   }
@@ -69,7 +88,12 @@ export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, numb
 }
 
 /** One item's recipe, per unit: a piece's or a gem's refined inputs, a refined item's raw one; a raw item has none. */
-function recipeOf(id: string): Readonly<Record<string, number>> | null {
+function recipeOf(id: string, tier = 1, v3 = false): Readonly<Record<string, number>> | null {
+  if (v3) {
+    if (madeIdentity(id)) return madeRecipe(id, tier)
+    const material = materialIdentity(id)
+    return material?.refined ? { [material.pair]: 1 } : null
+  }
   const made = gearById(id) ?? gemById(id)
   if (made) return made.inputs
   const item = itemById(id)
@@ -81,7 +105,7 @@ function recipeOf(id: string): Readonly<Record<string, number>> | null {
  * the Warehouse when they started). A queued request takes its inputs from the Warehouse when it starts; it counts as
  * coming only if the Warehouse can cover them, since a job that can't start brings nothing.
  */
-export function jobSupply(world: TierWorld): { coming: Map<string, number>; held: Map<string, number> } {
+export function jobSupply(world: TierWorld, tier = 1, v3 = false): { coming: Map<string, number>; held: Map<string, number> } {
   const coming = new Map<string, number>()
   const held = new Map<string, number>()
   const add = (into: Map<string, number>, id: string, n: number) => into.set(id, (into.get(id) ?? 0) + n)
@@ -90,7 +114,7 @@ export function jobSupply(world: TierWorld): { coming: Map<string, number>; held
     const row = world.work[outfitId]!
     for (const entry of row.entries) add(coming, entry.request.item, entry.request.count - entry.collected)
     for (const q of row.queue) {
-      const needs = Object.entries(recipeOf(q.item) ?? {}).map(([id, n]) => [id, n * q.count] as const)
+      const needs = Object.entries(recipeOf(q.item, tier, v3) ?? {}).map(([id, n]) => [id, n * q.count] as const)
       if (needs.some(([id, n]) => stock(id) < n)) continue
       for (const [id, n] of needs) add(held, id, n)
       add(coming, q.item, q.count)
@@ -100,38 +124,49 @@ export function jobSupply(world: TierWorld): { coming: Map<string, number>; held
 }
 
 /** The plan for a world's targets. `activeClassOf` gives the class each target fights as. */
-export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) => RpgClass): TargetPlan {
+export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) => RpgClass, tier = 1): TargetPlan {
   const demand = new Map<string, number>()
   for (const id of world.targets) {
     const uma = world.umas[id]
     if (!uma) continue
     for (const [key, n] of targetDemand(uma, activeClassOf(id))) demand.set(key, (demand.get(key) ?? 0) + n)
   }
-  const { coming, held } = jobSupply(world)
-  const owned = (id: string) => (gearById(id) ? gearStock(world)[id] : gemById(id) ? gemStock(world)[id] : world.items[id]) ?? 0
+  const v3 = 'grant' in world || world.targets.some((id) => !!world.umas[id] && isGrades(world.umas[id]!.gear))
+  const { coming, held } = jobSupply(world, tier, v3)
+  const owned = (id: string) => v3 ? world.items[id] ?? 0 : (gearById(id) ? gearStock(world)[id] : gemById(id) ? gemStock(world)[id] : world.items[id]) ?? 0
   const plan = planRequirements({
-    demand, recipe: recipeOf,
+    demand, recipe: (id) => recipeOf(id, tier, v3),
     supply: (id) => ({ onHand: Math.max(0, owned(id) - (held.get(id) ?? 0)), coming: coming.get(id) ?? 0 }),
   })
   const line = (r: Requirement): TargetNeed => {
-    const piece = gearById(r.id), gem = gemById(r.id), item = itemById(r.id)
-    const name = piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
-    return { key: r.id, icon: r.id, name, grade: piece?.grade ?? gem?.grade ?? item?.grade ?? 0, need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
+    const madeV3 = v3 ? madeIdentity(r.id) : undefined, material = v3 ? materialIdentity(r.id) : undefined
+    const piece = !v3 ? gearById(r.id) : undefined, gem = !v3 ? gemById(r.id) : undefined, item = !v3 ? itemById(r.id) : undefined
+    const name = madeV3 ? madeName(r.id)! : material ? materialName(r.id)! : piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
+    return { key: r.id, icon: r.id, name, grade: madeV3?.grade ?? material?.tier ?? piece?.grade ?? gem?.grade ?? item?.grade ?? 0,
+      need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
   }
   const lines = [...plan.values()].filter((r) => r.gross > 0).map(line)
   const byGrade = (a: TargetNeed, b: TargetNeed) => a.grade - b.grade || a.name.localeCompare(b.name)
   const pick = (test: (key: string) => boolean) => lines.filter((n) => test(n.key)).sort(byGrade)
   return {
-    gear: pick((k) => !!gearById(k)),
-    gems: pick((k) => !!gemById(k)),
-    refined: pick((k) => !!itemById(k)?.refined),
-    raw: pick((k) => { const i = itemById(k); return !!i && !i.refined }),
+    gear: v3 ? [] : pick((k) => !!gearById(k)),
+    gems: v3 ? [] : pick((k) => !!gemById(k)),
+    made: v3 ? pick((k) => !!madeIdentity(k)) : [],
+    refined: pick((k) => v3 ? !!materialIdentity(k)?.refined : !!itemById(k)?.refined),
+    raw: pick((k) => v3 ? !!materialIdentity(k) && !materialIdentity(k)!.refined : (() => { const i = itemById(k); return !!i && !i.refined })()),
   }
 }
 
 /** The lines a facility makes: a site its family's raw items, the Workbench refined items, the Forge gear, the Lapidary
  * Star Gems. Each stays while the Warehouse holds fewer than the targets need. */
 export function facilityTargets(plan: TargetPlan, placeId: string): TargetNeed[] {
+  const v3 = plan.made.length > 0 ? placeSpecV3(placeId) : undefined
+  if (v3) {
+    const lines = v3.kind === 'gather' ? plan.raw.filter((n) => materialIdentity(n.key)?.line === v3.line)
+      : v3.kind === 'refine' ? plan.refined
+        : plan.made.filter((n) => v3.made.includes(madeIdentity(n.key)!.line))
+    return lines.filter((n) => n.need > n.have)
+  }
   const spec = facilitySpec(placeId)
   if (!spec) return []
   const lines = spec.kind === 'gather' ? plan.raw.filter((n) => itemById(n.key)?.family === spec.family)

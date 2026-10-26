@@ -4,8 +4,8 @@
 // swap freely. Her Weapon, Armor or Accessory Rank lets her wear its grade. A slot that can take a better piece now shows
 // the "Can upgrade" mark (H34).
 import {
-  ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, activeClass, ARMOR_SLOT_LABEL, ARMOR_SLOTS, classOf, gearV1, slotKind, type AccessorySlot, type ArmorSlot,
-  type GearSlot, type OwnedUma, type RosterOutfit, type RpgWeapon, type TierWorld,
+  ACCESSORY_SLOT_LABEL, ACCESSORY_SLOTS, activeClass, ARMOR_SLOT_LABEL, ARMOR_SLOTS, classOf, gearV1, isGrades, slotKind, type AccessorySlot, type ArmorSlot,
+  type GearSlot, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { trainingName } from '../../battle/labels'
@@ -13,6 +13,8 @@ import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { ArmorMark } from '../../ui/RankBars'
 import { UpgradeMark } from '../../ui/UpgradeMark'
+import { useActiveTier } from '../../save/game'
+import { GearCardV3 } from './GearCardV3'
 import { AccessorySheet, ArmorSheet, pieceLine, TrainingIcon, trainingArmorName, WeaponSheet } from './WeaponSheet'
 
 type Open = { weapon: number } | { armor: ArmorSlot } | { accessory: AccessorySlot } | null
@@ -20,8 +22,10 @@ type Open = { weapon: number } | { armor: ArmorSlot } | { accessory: AccessorySl
 export function GearCard({ outfit, uma, world, marked = [] }: {
   outfit: RosterOutfit; uma: OwnedUma; world: TierWorld
   /** Slots that can take a better piece now (H34's `gearSlots`). */
-  marked?: readonly GearSlot[]
+  marked?: readonly (GearSlot | GradeTarget)[]
 }) {
+  const tier = useActiveTier()
+  if (isGrades(uma.gear)) return <GearCardV3 outfit={outfit} uma={uma} world={world} tier={tier as 1 | 2 | 3} marked={marked.filter((m): m is GradeTarget => typeof m === 'object')} />
   const classId = activeClass(outfit, uma)
   const gear = gearV1(uma)
   const weapons = classOf(uma, classId).weapons
@@ -34,7 +38,7 @@ export function GearCard({ outfit, uma, world, marked = [] }: {
         <span className="block truncate text-[13px] font-semibold">{name}</span>
         {note && <span className="block truncate text-[11px] text-ink-soft">{note}</span>}
       </span>
-      {marked.includes(slot) && <UpgradeMark size={18} />}
+      {(marked as readonly GearSlot[]).includes(slot) && <UpgradeMark size={18} />}
     </button>
   )
   return (

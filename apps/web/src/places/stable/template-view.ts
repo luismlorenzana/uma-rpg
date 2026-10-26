@@ -3,7 +3,9 @@
 // Skills tab's ★ Flourish line. Pure. Lazy, with the Stable's pages.
 import {
   BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, tradeOfCalling,
-  umaCallingPick, umaCallingRow, umaTemplate, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling,
+  ACCESSORY_FAMILY_LABEL, isGrades, isStarMap, mapNodeGate, nodePoints, signatureBonus, signatureWorn,
+  umaCallingPick, umaCallingRow, umaTemplate,
+  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
@@ -84,10 +86,22 @@ export interface TemplateReading { label: 'Calling' | 'Stride' | 'Knack'; value:
 /** The template card (UT14, R1's part): her name, the three readings with their sources ("Calling ← Pace A, Wit 102 ≥
  * Power 90", or "← picked"), and her Flourish with its state ("★ Even pace · as a Mage · on", "· no effect as Brawler";
  * a locked outfit's has none). */
-export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null): { name: string; readings: TemplateReading[]; flourish: string } {
+export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null, tier: GearTier = 1): {
+  name: string; readings: TemplateReading[]; flourish: string; signature?: string; moon?: string
+} {
   const pick = pickOf(outfit, uma)
   const t = umaTemplate(outfit, pick)
   const state = classId === null ? '' : classId === t.calling ? ' · on' : ` · no effect as ${CLASS_LABEL[classId]}`
+  const owned = uma && 'gear' in uma ? uma as OwnedUma : null
+  const gradeGear = owned && isGrades(owned.gear) ? owned.gear : null
+  const graded = gradeGear && owned && isStarMap(owned.stars)
+  const family = t.family
+  const signature = graded ? `Signature · ${ACCESSORY_FAMILY_LABEL[family]} · +${signatureBonus(owned.level, tier)} now · ${signatureWorn(gradeGear, family) ? 'worn' : `Wear a ${ACCESSORY_FAMILY_LABEL[family]}`}` : undefined
+  const status = (id: string) => owned && isStarMap(owned.stars) && owned.stars.open.includes(id) ? 'open' : `Lv ${mapNodeGate(id)}`
+  const one = nodePoints('template:1', tier), two = nodePoints('template:2', tier)
+  const knack = t.knack === 'tireless' ? `HP +${one * 5}` : t.knack === 'clever' ? `MP +${one}`
+    : t.knack === 'mighty' ? `DEF and M.DEF +${one}` : t.knack === 'fleet' ? 'Evasion +2.4%' : 'Limit +1.6'
+  const defense = t.calling === 'mage' || t.calling === 'summoner' || t.calling === 'cleric' ? `M.DEF +${two}` : `DEF +${two}`
   return {
     name: t.name,
     readings: [
@@ -96,6 +110,7 @@ export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgCl
       { label: 'Knack', value: KNACK_LABEL[t.knack], source: knackSource(outfit) },
     ],
     flourish: `★ ${FLOURISH_NAMES[t.flourish]} · as a ${CLASS_LABEL[t.calling]}${state}`,
+    ...(signature ? { signature, moon: `Moon · I ${knack} (${status('template:1')}) · II ${defense} (${status('template:2')})` } : {}),
   }
 }
 
