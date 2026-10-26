@@ -1,6 +1,7 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-25, after D198.** Classes v2 (H53–H63) and the Rift (H44–H52) are built and live. The open work
+> **Status: 2026-10-26, after D218.** Classes v2 (H53–H63), the Rift (H44–H52) and the Tier rework's R1 and R2
+> (H64–H82: Tier 1's fight and economy, engine v17, save v28) are built and live. The open work
 > is **the Tier rework's build**: six approved docs (D192–D197) shipping as five live releases, R1–R5, in 42 packets,
 > H64–H105 ([implementation.md](../design/tier-rework/implementation.md), D198). Each release is built dark behind its
 > own engine and save version and turned on by its own switch packet.
@@ -35,7 +36,7 @@ Every foundation packet logs its release's build decisions first.
 
 **Waves:** 1) H64 → 2) H65, H66, H67 → 3) H68, H69 → 4) H70, H71 → 5) H72.
 
-**R2. Tier 1's economy** (engine v17, save v28; the compensation):
+**R2. Tier 1's economy** (engine v17, save v28; the compensation): **live since H82 (2026-10-26).**
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -47,7 +48,7 @@ Every foundation packet logs its release's build decisions first.
 | H79 | R2's screens, gear and stars (inert): the Gear tab by grade, the accessory picker with ★, targets, "Can upgrade", the Observatory with her moon, the Signature facet | Either | L | H70, H73, H75, H76, H78 | Done (`5032fe6`) |
 | H80 | R2's screens, the Wilds and the first launch (inert): ten place pages, the Warehouse, the Exchange, the Trade facet, "The Wilds are rebuilt", "Finish all" | Either | L | H70, H73, H77, H78 | Done (`fff7ba6`) |
 | H81 | R2's balance (dark): the full Tier 1 re-baseline, accessory viability, MP, defense, five matched templates, later tiers; the profession pacing ledger | Claude | L | H71, H75, H76, H77 | Done (`5af51fa`) |
-| H82 | **R2's switch:** v16's replays frozen, then engine v17 and save v28 live; the first launch checked on a full-shaped save; the manual | Claude | M | H72, H78, H79, H80, H81 | In progress (main session; D218) |
+| H82 | **R2's switch:** v16's replays frozen, then engine v17 and save v28 live; the first launch checked on a full-shaped save; the manual | Claude | M | H72, H78, H79, H80, H81 | Done (`b674007`) |
 
 **Waves:** 1) H74, H77 once H64 lands (beside R1) → 2) H75, H76 once H67 lands → 3) H78; H81 after H71 →
 4) H79, H80 after H70 → 5) H82 after H72. **H82 is the rework's one irreversible step** (Craft Levels to 1, the grant):
@@ -57,10 +58,10 @@ it runs the migration on a full-shaped scratch save first and puts the sheet's n
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Waiting |
+| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Ready |
 | H84 | Accessories, Tier 2: the second slot, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 | Waiting |
 | H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83 | Waiting |
-| H86 | The secondary profession from Tier 2 | Either | M | H82 | Waiting |
+| H86 | The secondary profession from Tier 2 | Either | M | H82 | Ready |
 | H87 | Save v29 (dark): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
 | H88 | R3's screens (inert): the G5 pick, accessory branches, the weapon moon, the secondary, armor halves | Either | L | H87 | Waiting |
 | H89 | R3's balance (dark): Pure against Dual, Full against Split, Tier 2's shields and most of its term, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85, H86 | Waiting |
@@ -195,6 +196,7 @@ for the fifth scenario (tiers T9).
 
 | Id | Task | Commit |
 |---|---|---|
+| H82 | **R2 is live** (D218): v16's replays frozen first (`v16-replays.fixture`, seven fights on the live v16 engine, replayed byte for byte under v17); then `BATTLE_ENGINE_VERSION` 17, `SAVE_SCHEMA_VERSION` 28 and `toV28` chained in one commit; the v1 economy's tests kept at engine 16 and the v27 chain (`migrateWorldToV27`), H74–H81's dark tests live; the API's first v28 write keeps `saveBackups/{uid}-v27` (a fake-Firestore test, D69); the manual rewritten for R2 (materials, loops, sections, combat, classes, both architecture pages) with `render.ts`' blocks on v3's tables; three screen gaps fixed (the Skills tab's graded weapon slots, empty rank cells on results, the accessory row for a form picked at G0). The scratch migration of a full-shaped v27 save: Tier 1 +63,808 Speed Tickets (H78's 63,800 + 8 from a settled running gather), 7,150 Laurels and 66 items back; Tier 2 +16,580, 900 and 12 back; open v16 fights finished on v16, the next ones v17 with the Bell and the Insignia; checked at 390×844 and 375×667, light and dark ([#51](https://github.com/luismlorenzana/uma-rpg/pull/51)) | `b674007` |
 | H79 | R2's gear and stars screens, inert until the switch (D217), by ChatGPT ([#50](https://github.com/luismlorenzana/uma-rpg/pull/50)), flagged by the main session: a graded Uma's Gear tab (three weapon, five armor and one accessory grade rows, the next-grade blocker or a one-tap made-item raise, multi-grade climbs), the accessory sheet (Pendant, Orb by kind, Bell, Insignia, ★ her family first, the preset wears it), Class Rank only, the battle sheet's per-weapon Might, accessory, Signature and moon points, the template card's Signature and Moon lines, Party Hall's `★ <family>`; v3 `umaBattleSheet`, `upgradesFor`, `targetDemand`, `targetPlan` and `facilityTargets`; the Stable's Signature facet; the `StarMap` Observatory (the Planet, three moons and ★ her moon, node sheets, jewels set in `jewelNodes` order). **Words H82 carries into the manual:** the grade rows, pills, blockers, sheets and preset; the accessory families and signature; per-weapon Might, accessory, Signature and starred Extra Stats; the template's Signature and Moon; Party Hall's family; the Observatory's header, map, node sheets, Prowess, totals and Set; the Signature filter; targets and Can upgrade. Main JS 218.45 KB. Deployed green with H80 on main (`bc75a92`) | `5032fe6` |
 | H80 | R2's screens, inert until the switch (D216): the Wilds' ten place pages on the shared work page (`PlaceV3.tsx`, `place-view.ts`): the header, no Upgrade, the open shop, Finish all (`finishAllCost`/`finishAllAt`), What steps by tier and band, grade chips underlined in their material's tier by the ladder (Tier 2 amber, Tier 3 violet), recipe cards from `madeRecipe`, her trade first and the rest "Another trade"; her trade from the master roster (`save/trade.ts`) on every work action; the Warehouse's Materials and Made items, the Exchange's raw types by pair with Class Manuals only, the Stable's Trade group, her trade on the profile, the template card and the calling pick card; "The Wilds are rebuilt" (lazy, `grantLines`) once per world and from the Account's row; uma-art 2.13.0 and H79's icon table. No kit change; main JS 218.88 KB. Checked locally with and without the switch on a scratch v27 save (grants +13,330 and +1,339, as `toV28`). **Words H82 carries into `sections.md` and `loops.md`:** "Mine · Mining · 4 slots · ×1.25"; "Open shop: no Brawler in this world" ("no Paladin or Cleric" for the healers' places); "Finish all · N Speed Tickets", "Finish 3 jobs for 14 Speed Tickets?", "Needs 14 Speed Tickets"; "From Craft Lv 26"; "Another trade"; the Warehouse's "120 materials · 35 made items", "Tier 1 · high · raw · Refines into Iron Ingot", "Grade 5 · Raises a weapon one grade", "Opens Planet III"; the Exchange's "After the tier’s first win", "After a win on continent 3", "Read a Class Manual"; the Stable's Trade values "Mine · Forge" …; "Craft Lv 23 · Forest · Armorer", "Trade · Monster Den · Lapidary", "Forest · Armorer · 8 Umas", "Finish her work first"; §14.6's sheet and "The Tier rework’s grant · 63,800 Speed Tickets". The targets strip waits on H79's v3 `facilityTargets`. | `fff7ba6` |
 | H81 | R2's balance on engine v17, dark (D215): measured against today's and R1 at 32 seeds with the game's own rules; tuned v17-only: the base regen 0.9% → 1.0% a depth (late pace 0.93 · 0.95 · 0.90× today's), the Orb's Tier 1 values ×0.8 (G10 27), the Rift's Iron and Horde champions ×1.15 and ×1.4. Every Tier 1 stage 0 points off; a regular's hit 19.0 · 18.5 · 18.2% of the Brawler; Tier 2 and 3 rounds 0.90–1.02 of Tier 1's; misses kept with why: the Lv 50 mirror 93%, accessories Orb 16 of 24 and the Insignia nobody's best, Arcane's wrong party 36 · 86 · 52%. The profession ledger (`economy/professions.sim.ts`): 485 refined, 822 h, 1.27 maxed Umas a day, a run of twenty in 15.8 days; R2's Tier 2 and 3 runs 36.8 days without a secondary (for R3's H89 and H86). For H82's manual: the regen's 5% from Class Rank 40 and the Orb's 27 at G10. Main JS 217.26 KB gzip. [Deployed green](https://github.com/luismlorenzana/uma-rpg/actions/runs/40254144023) (second attempt: the web suite's worker timeout) ([#48](https://github.com/luismlorenzana/uma-rpg/pull/48)) | `5af51fa` |
