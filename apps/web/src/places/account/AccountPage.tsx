@@ -1,12 +1,15 @@
 // The Account (S1, SD3): the kit's frame (uma-platform P56) with this game's content: the trainer name, the active
 // tier's wallet (H35), Appearance, push notifications, the achievements (H49), the info rows and sign-out. A hidden Town
-// place (D31).
+// place (D31). A world with the Tier rework's grant (save v28, PP25; H80) keeps a row that reopens its sheet.
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { AccountPage as AccountFrame } from '@luismlorenzana/uma-kit/places'
+import { withParam } from '@luismlorenzana/uma-kit/shell'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
-import { TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
+import { TRAINER_NAME_MAX, normalizeTrainerName, type TierGrant } from '@rpg/domain'
+import { useLocation, useNavigate } from 'react-router'
 import { AchievementList } from '../../achievements/AchievementList'
 import { APP_BUILD_ID } from '../../app/build'
+import { grantRow } from '../../grant/grant-lines'
 import { useMaster } from '../../master/master'
 import { NotificationsCard } from '../../push/NotificationsCard'
 import { renameAccount, resetGame, useActiveTier, useGame, useWorld } from '../../save/game'
@@ -15,7 +18,8 @@ import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 export default function AccountPage() {
   const save = useGame((s) => s.save)
   const tier = useActiveTier()
-  const wallet = useWorld()?.wallet
+  const world = useWorld()
+  const wallet = world?.wallet
   const sync = useGame((s) => s.sync)
   const lastSyncedAt = useGame((s) => s.lastSyncedAt)
   const master = useMaster()
@@ -39,7 +43,7 @@ export default function AccountPage() {
       rename={{ value: save.account.trainerName, maxLength: TRAINER_NAME_MAX, normalize: normalizeTrainerName, onSave: renameAccount }}
       wallet={shown}
       notifications={<NotificationsCard />}
-      sections={<AchievementList save={save} />}
+      sections={<>{world?.grant && <GrantRow grant={world.grant} />}<AchievementList save={save} /></>}
       info={[
         { label: 'Tier world', value: `Tier ${tier}` },
         { label: 'Trainer since', value: new Date(save.account.createdAt).toLocaleDateString() },
@@ -50,5 +54,19 @@ export default function AccountPage() {
       ]}
       onSignOut={auth.authRequired ? async () => { resetGame(); await auth.signOut() } : undefined}
     />
+  )
+}
+
+/** "The Tier rework’s grant · 63,800 Speed Tickets": reopens "The Wilds are rebuilt" (`?sheet=grant`). */
+function GrantRow({ grant }: { grant: TierGrant }) {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const row = grantRow(grant)
+  return (
+    <button type="button" onClick={() => navigate(withParam(location, 'sheet', 'grant'))} data-grant-row
+      className="flex min-h-12 w-full items-center justify-between gap-3 rounded-md bg-raised px-3 py-2 text-left">
+      <span className="text-[14px] font-semibold">{row.label}</span>
+      <span className="flex items-center gap-1 text-[13px] text-ink-soft">{row.value} <span aria-hidden className="text-ink-faint">›</span></span>
+    </button>
   )
 }

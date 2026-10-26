@@ -288,6 +288,38 @@ export function finishWorker(save: Save, outfitId: string, startedAt: number, no
   return withWorld(save, tier, done(finishNow(world, { outfitId, startedAt }, msOf(now), env), msOf(now)).state, now)
 }
 
+// --- Finish all (R2, PP25; H80) ---------------------------------------------------------------------------------------
+
+/** Each running entry of a place on a settled world: her id, the entry's start and the tickets that finish it. */
+function runningAt(world: TierWorld, placeId: string, now: number): { outfitId: string; startedAt: number; tickets: number }[] {
+  return Object.values(world.work).flatMap((row) => {
+    const last = row.entries.at(-1)
+    if (row.slot?.building !== placeId || !last || statusOf(row, now) !== 'working') return []
+    return [{ outfitId: row.outfitId, startedAt: last.startedAt, tickets: ticketsToFinish(remainingMs(last, now)) }]
+  })
+}
+
+/** What "Finish all" on a place costs now (PP25): its running jobs and the sum of each one's ⌈remaining ÷ 30 minutes⌉,
+ * or null when fewer than two are running (a single job has its own Finish). */
+export function finishAllCost(world: TierWorld, placeId: string, now: string, tier: string | number = TIER_ONE): { jobs: number; tickets: number } | null {
+  const running = runningAt(settle(world, msOf(now), envOf(tier)).state, placeId, msOf(now))
+  if (running.length < 2) return null
+  return { jobs: running.length, tickets: running.reduce((n, job) => n + job.tickets, 0) }
+}
+
+/** Finishes every running job of a place at once (uma-work's `finish` on each, so each queue starts at once), or refuses
+ * with the total it needs when the world's Speed Tickets fall short. */
+export function finishAllAt(save: Save, placeId: string, now: string, tier = TIER_ONE): Save {
+  const env = envOf(tier)
+  let world = settle(worldOf(save, tier), msOf(now), env).state
+  const running = runningAt(world, placeId, msOf(now))
+  if (running.length < 2) throw new SaveRuleError('bad-job', 'nothing to finish together')
+  const total = running.reduce((n, job) => n + job.tickets, 0)
+  if (world.wallet.timeTickets < total) throw new SaveRuleError('no-ticket', `Needs ${total} Speed Ticket${total === 1 ? '' : 's'}`)
+  for (const job of running) world = done(finishNow(world, { outfitId: job.outfitId, startedAt: job.startedAt }, msOf(now), env), msOf(now)).state
+  return withWorld(save, tier, world, now)
+}
+
 /** The first free slot of a facility, or null. */
 function freeSlot(world: TierWorld, placeId: string, env: WorkEnv<TierWorld>): number | null {
   return slotsOf(world, placeId, env.buildings).find((s) => slotHolder(world, s) === undefined)?.slot ?? null

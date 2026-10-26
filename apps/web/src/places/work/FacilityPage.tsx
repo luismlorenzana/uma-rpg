@@ -1,9 +1,10 @@
 // The Wilds' shared work screens (SC4, D144): uma-kit owns the compact slot, queue, speed, recall, upgrade and job-sheet
-// interaction; uma-rpg supplies its save, four work kinds, recipes, target plan, art and words.
+// interaction; uma-rpg supplies its save, four work kinds, recipes, target plan, art and words. The env is the live
+// generation's for the world's tier, with each Uma's trade (H80): R2's places render `PlaceV3`'s body from the switch.
 import {
   activeClass, BRIDGES, checkRestartStopped, CRAFT_LABEL, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, facilitySpec,
   facilityTargets, familyById, gearById, gearId, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
-  itemById, placeById, REFINE_BATCHES, refusalText, RPG_WORK_ENV, stockName, targetPlan,
+  itemById, liveWorkEnv, placeById, placeSpecV3, REFINE_BATCHES, refusalText, rpgRework, stockName, targetPlan,
   type EquipType, type Gem, type GemKind, type RpgQueueInput, type RpgWorkRequest, type TierWorld,
 } from '@rpg/domain'
 import { workOrder } from '@luismlorenzana/uma-kit/roster'
@@ -11,7 +12,7 @@ import {
   FacilityHeader, JobSheet, jobQuery, PeekRow, readJobQuery, SlotRow, StoppedQueueCard, TargetsStrip,
   withoutJobQuery, WorkProvider, useWorkView, type JobSelection, type WorkActions,
 } from '@luismlorenzana/uma-kit/work'
-import { useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router'
 import { albumRows, lockedReason, type RpgUmaRow } from '../../album/rows'
 import { ItemIcon } from '../../items/ItemIcon'
@@ -20,14 +21,16 @@ import { nodeLabel, nodeValue, PLANET_COLOR, PLANET_SHORT } from '../../items/pl
 import type { MasterView } from '../../master/master'
 import {
   collectEverything, collectWorker, dismissWork, editWorkQueue, finishWorker, recallWorker, repeatWork, restartWork,
-  speedWorker, startWork, upgrade, useAlbumScope, useWorld,
+  speedWorker, startWork, upgrade, useActiveTier, useAlbumScope, useWorld,
 } from '../../save/game'
+import { tradeOfWorld } from '../../save/trade'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon } from '../../ui/icons'
 import { useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { pieceLine } from '../stable/WeaponSheet'
+import { PlaceBodyV3, PlacePeekV3 } from './PlaceV3'
 
 /** A facility's title and help. Long rule text stays behind the help button (D95). */
 function describe(placeId: string): { title: string; help: string[] } {
@@ -42,8 +45,13 @@ function describe(placeId: string): { title: string; help: string[] } {
 
 const requestLabel = (request: RpgWorkRequest) => ({ name: outputView(request.item).name, item: request.item, count: request.count })
 
+/** Whether a place renders R2's page: from the economy stage, on one of its ten places. */
+const isPlaceV3 = (placeId: string): boolean => rpgRework('economy') && placeSpecV3(placeId) !== undefined
+
 /** The game-owned side of uma-kit/work: the kit never owns saves, clocks, rules or vocabulary. */
-function RpgWorkProvider({ view, world, now, children }: { view: MasterView; world: TierWorld; now: string; children: ReactNode }) {
+function RpgWorkProvider({ view, world, now, tier, children }: { view: MasterView; world: TierWorld; now: string; tier: number; children: ReactNode }) {
+  const tradeOf = tradeOfWorld(world, view.roster)
+  const env = useMemo(() => liveWorkEnv(tier, { tradeOf }), [tier, tradeOf])
   const actions: WorkActions = {
     collect: async ({ outfitId }) => {
       const got = await collectWorker(outfitId)
@@ -55,7 +63,8 @@ function RpgWorkProvider({ view, world, now, children }: { view: MasterView; wor
     recall: ({ outfitId }) => recallWorker(outfitId),
     queue: (input) => editWorkQueue(input as RpgQueueInput),
     unqueue: ({ outfitId, index }) => editWorkQueue({ outfitId, remove: index }),
-    upgrade: ({ building }) => upgrade(building),
+    // R2's places have no levels (PP4): no Upgrade.
+    ...(rpgRework('economy') ? {} : { upgrade: ({ building }: { building: string }) => upgrade(building) }),
     start: ({ outfitId, slot, request }) => {
       const job = request as RpgWorkRequest
       return startWork(slot.building, slot.slot, { outfitId }, job.item, job.count)
@@ -68,7 +77,7 @@ function RpgWorkProvider({ view, world, now, children }: { view: MasterView; wor
     <WorkProvider
       state={world}
       now={Date.parse(now)}
-      env={RPG_WORK_ENV}
+      env={env}
       actions={actions}
       names={{
         uma: (id) => roster.get(id) ?? id,
@@ -78,7 +87,7 @@ function RpgWorkProvider({ view, world, now, children }: { view: MasterView; wor
       words={{ workLevel: CRAFT_LABEL, workLevelLabel: 'Craft Lv {level}' }}
       describeRequest={(request) => requestLabel(request as RpgWorkRequest)}
       formatRefusal={(refusal) => refusalText(refusal, Date.parse(now))}
-      checkRestart={(state, outfitId) => checkRestartStopped(state, outfitId, Date.parse(now))}
+      checkRestart={(state, outfitId) => checkRestartStopped(state, outfitId, Date.parse(now), tier, { tradeOf })}
       renderMoney={(amount) => <span className="inline-flex items-center gap-1"><LaurelIcon size={17} />{amount.toLocaleString('en-US')}</span>}
     >
       {children}
@@ -93,10 +102,13 @@ export default function FacilityPage({ place }: PageProps) {
 function Facility({ view, placeId }: { view: MasterView; placeId: string }) {
   const world = useWorld()
   const now = useNow()
+  const tier = useActiveTier()
   if (!world) return null
   return (
-    <RpgWorkProvider view={view} world={world} now={now}>
-      <FacilityBody view={view} world={world} now={now} placeId={placeId} />
+    <RpgWorkProvider view={view} world={world} now={now} tier={tier}>
+      {isPlaceV3(placeId)
+        ? <PlaceBodyV3 view={view} world={world} now={now} tier={tier} placeId={placeId} />
+        : <FacilityBody view={view} world={world} now={now} placeId={placeId} />}
     </RpgWorkProvider>
   )
 }
@@ -443,10 +455,11 @@ export function FacilityPeek({ place }: PeekProps) {
 function FacilityPeekReady({ view, place }: { view: MasterView; place: PeekProps['place'] }) {
   const world = useWorld()
   const now = useNow()
+  const tier = useActiveTier()
   if (!world) return null
   return (
-    <RpgWorkProvider view={view} world={world} now={now}>
-      <FacilityPeekBody place={place} />
+    <RpgWorkProvider view={view} world={world} now={now} tier={tier}>
+      {isPlaceV3(place.id) ? <PlacePeekV3 view={view} world={world} tier={tier} placeId={place.id} /> : <FacilityPeekBody place={place} />}
     </RpgWorkProvider>
   )
 }

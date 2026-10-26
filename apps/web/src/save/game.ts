@@ -3,17 +3,20 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessorySlot, type ArmorKind, type ArmorSlot, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBranch, type RpgClass,
+  markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
+  type WorkContext,
 } from '@rpg/domain'
 import type { AscendSummary, RiftFightResult } from '@rpg/domain/rift'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import type { AlbumScope } from '../album/rows'
 import { conflictEnvelope, saveApi } from '../api/client'
+import { masterRoster } from '../master/master'
 import { readSaveRow, writeSaveRow } from './db'
 import { reconcile } from './reconcile'
 import { rememberedTier, rememberTier, startTier } from './tier'
+import { tradeOfWorld } from './trade'
 
 export type GameStatus = 'idle' | 'booting' | 'first-launch' | 'ready'
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'offline' | 'error'
@@ -119,6 +122,14 @@ export async function renameAccount(trainerName: string): Promise<void> {
   const { save } = useGame.getState()
   if (!save) return
   await commit(renameTrainer(save, trainerName, nowIso()))
+}
+
+/** The world's first-launch sheet was seen (R2, PP25): it shows once per world; the Account reopens it. */
+export async function seeGrant(): Promise<void> {
+  const { save } = useGame.getState()
+  if (!save) return
+  const next = markGrantSeen(save, activeKey(), nowIso())
+  if (next !== save) await commit(next)
 }
 
 /** Spends one Uma Ticket (final, D44); she starts in her starting class's armor (D160 §7). Throws SaveRuleError when it can't. */
@@ -243,19 +254,30 @@ export async function ascendRun(): Promise<AscendSummary> {
 
 // --- Work and the Exchange (S4) ----------------------------------------------------------------------------------
 
+/** What R2's work rules ask of the caller (R2's build decision 8): each Uma's trade, from the master roster. Before the
+ * switch the live env ignores it. */
+function workContext(save: Save, tier: string): WorkContext {
+  const roster = masterRoster()
+  const world = save.tierWorlds[tier]
+  return roster && world ? { tradeOf: tradeOfWorld(world, roster) } : {}
+}
+
 export const startWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
-  edit(import('@rpg/domain/work'), (d, s, now, t) => d.startJob(s, placeId, slot, outfit, output, count, now, t))
+  edit(import('@rpg/domain/work'), (d, s, now, t) => d.startJob(s, placeId, slot, outfit, output, count, now, t, workContext(s, t)))
 export const recall = (placeId: string, slot: number) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.recallJob(s, placeId, slot, now, t))
 /** Spends Speed Tickets on a job, 30 minutes each (D74). */
 export const cutTime = (placeId: string, slot: number, tickets: number) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.cutJobTime(s, placeId, slot, tickets, now, t))
 /** Queues another job after the slot's current one, same Uma (QoL, D62). */
 export const queueWork = (placeId: string, slot: number, outfit: WorkOutfit, output: string, count: number) =>
-  edit(import('@rpg/domain/work'), (d, s, now, t) => d.queueJob(s, placeId, slot, outfit, output, count, now, t))
+  edit(import('@rpg/domain/work'), (d, s, now, t) => d.queueJob(s, placeId, slot, outfit, output, count, now, t, workContext(s, t)))
 export const unqueueWork = (placeId: string, slot: number, index: number) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.unqueueJob(s, placeId, slot, index, now, t))
 export const editWorkQueue = (input: RpgQueueInput) =>
-  edit(import('@rpg/domain/work'), (d, s, now, t) => d.editWorkerQueue(s, input, now, t))
+  edit(import('@rpg/domain/work'), (d, s, now, t) => d.editWorkerQueue(s, input, now, t, workContext(s, t)))
 export const upgrade = (placeId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.upgradeFacility(s, placeId, now, t))
-export const buyItem = (itemId: string, quantity: number, stocked: readonly number[]) => edit(import('@rpg/domain/exchange'), (d, s, now, t) => d.buyRawItem(s, itemId, quantity, stocked, now, t))
+/** Finishes every running job of a place at once (R2, PP25): each one's remaining time in Speed Tickets. */
+export const finishAll = (placeId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.finishAllAt(s, placeId, now, t))
+/** Buys raw items: by grade to engine v16 (`stockedGrades`), by type from R2 (`stockedTypes`). */
+export const buyItem = (itemId: string, quantity: number, stocked: readonly number[] | readonly string[]) => edit(import('@rpg/domain/exchange'), (d, s, now, t) => d.buyRawItem(s, itemId, quantity, stocked, now, t))
 export const buyTicket = (kind: 'time' | 'sweep', quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now, t) => d.buyTickets(s, kind, quantity, now, t))
 export const sell = (shelf: Shelf, id: string, quantity: number) => edit(import('@rpg/domain/exchange'), (d, s, now, t) => d.sellStock(s, shelf, id, quantity, now, t))
 /** Reads Manuals for one Uma's bar: 1,000 Marks for 1,000 EXP each (D102). */
@@ -320,9 +342,9 @@ export async function collectEverything(placeIds?: readonly string[]): Promise<{
 }
 
 /** Starts her last job again where she did it, collecting first when she's ready (SC3). */
-export const repeatWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.repeatJob(s, outfitId, now, t))
+export const repeatWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.repeatJob(s, outfitId, now, t, workContext(s, t)))
 /** A queue that couldn't start (SC3): start it again now, or forget it. */
-export const restartWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.restartStopped(s, outfitId, now, t))
+export const restartWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.restartStopped(s, outfitId, now, t, workContext(s, t)))
 export const dismissWork = (outfitId: string) => edit(import('@rpg/domain/work'), (d, s, now, t) => d.dismissStopped(s, outfitId, now, t))
 /** Shared work screens address an Uma and preserve the exact entry identity for late speed-up taps. */
 export const collectWorker = async (outfitId: string): Promise<{ items: number; levelsUp: number }> => {

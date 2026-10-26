@@ -1,7 +1,7 @@
 // What each place shows (D43): a quick look in the side panel (Peek), a full page (Page) and a header counter. Places
 // without a Peek use the honest preview; places without a Page have no Enter button. Every body is a lazy chunk.
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
-import { FACILITIES, HERO_HALLS, type Place } from '@rpg/domain'
+import { FACILITIES, HERO_HALLS, PLACES_V3, rpgRework, type Place } from '@rpg/domain'
 
 export interface PeekProps {
   place: Place
@@ -57,8 +57,9 @@ export const PLACE_UI: Record<string, PlaceUi> = {
 // Every site and station shares one page (S4).
 const FacilityPage = lazy(() => import('./work/FacilityPage'))
 const FacilityPeek = lazy(() => import('./work/FacilityPage').then((m) => ({ default: m.FacilityPeek })))
-// Every working facility shares one page (S4).
-for (const f of FACILITIES) {
+// Every working facility shares one page (S4): today's eleven, or R2's ten places from its switch (H80). A link to a place
+// R2 removed has no place to open, so the router falls back to the Wilds page.
+for (const f of rpgRework('economy') ? PLACES_V3 : FACILITIES) {
   PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
 }
 

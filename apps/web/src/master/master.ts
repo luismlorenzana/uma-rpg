@@ -61,6 +61,11 @@ export function loadSkills(manifest: ReleaseManifest): Promise<Map<number, Skill
   return skillsPromise
 }
 
+/** The roster once it has loaded, else null: for rules that read master data outside React (the work actions' trades). */
+export function masterRoster(): readonly RosterOutfit[] | null {
+  return state.status === 'ready' ? state.view.roster : null
+}
+
 export function useMaster(): MasterState {
   const snapshot = useSyncExternalStore(
     (listener) => {

@@ -2,11 +2,12 @@
 // class-progression.md §10.2, CP29): the chip and its card, the calling pick card, the Racing tab's "Her template" and the
 // Skills tab's ★ Flourish line. Pure. Lazy, with the Stable's pages.
 import {
-  BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, umaCallingPick,
-  umaCallingRow, umaTemplate, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type UmaCalling,
+  BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, tradeOfCalling,
+  umaCallingPick, umaCallingRow, umaTemplate, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
+import { tradeLabel } from '../../save/trade'
 
 const STAT_LABEL = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' } as const
 const GRADES: readonly AptitudeGrade[] = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
@@ -137,4 +138,17 @@ export function callingCard(outfit: TemplateOutfit, calling: UmaCalling | null |
     }),
     suggested: `Suggested · ${power > wit ? `Power ${power} over Wit ${wit}` : wit > power ? `Wit ${wit} over Power ${power}` : `Wit ${wit} ≥ Power ${power}`}`,
   }
+}
+
+/** Her trade on the template card (R2, UT14; H80): "Trade · Monster Den · Lapidary", from her calling. */
+export function templateTrade(outfit: TemplateOutfit, uma: Holder): string {
+  return `Trade · ${tradeLabel(tradeOfCalling(umaTemplate(outfit, pickOf(outfit, uma)).calling))}`
+}
+
+/** A calling pick tile's trade (R2, uma-templates §2.3; H80): the trade the choice gives her and its head count in her
+ * world, "Forest · Armorer · 8 Umas", so the owner can fill a short one. */
+export function callingTradeLine(classId: RpgClass, counts: Readonly<Record<TradeId, number>>): string {
+  const trade = tradeOfCalling(classId)
+  const n = counts[trade]
+  return `${tradeLabel(trade)} · ${n === 1 ? '1 Uma' : `${n} Umas`}`
 }
