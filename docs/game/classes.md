@@ -162,10 +162,10 @@ her class's half: ATK for a Brawler, a Spell Blade or a Paladin, M.ATK for a Mag
 class switches it.
 
 **One accessory slot** (R2, WP19): its grade, raised with Accessory Settings, and its family, set freely outside fights:
-the **Pendant** (flat offense on her three weapons' kinds), the **Orb** (flat offense on one kind she picks, any of the
-ten), the **Bell** (a follow-up strike after her Attack, on a kind she holds) or the **Insignia** (more damage to
-sub-bosses and bosses) ([materials](materials.md#gear), [combat](combat.md#damage)). Her ★ signature family comes first
-in its sheet.
+the **Pendant** (flat offense on her three weapons' kinds), the **Orb** (flat offense on one kind she picks, one of her three
+weapons' kinds since H107), the **Bell** (a follow-up strike after her Attack, on a kind she holds) or the **Insignia**
+(more damage to sub-bosses and bosses) ([materials](materials.md#gear), [combat](combat.md#damage)). It is set on the
+Gear tab's Equip view, four cards of one shape with her ★ signature family first.
 
 **Standard preset (D164).** Each class has one, applied on tap from her profile's Gear tab ("Use the standard preset",
 for her active class): its three default weapons (the owner's, CP3) and her accessory's form, her ★ signature family

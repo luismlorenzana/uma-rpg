@@ -260,11 +260,12 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
   grade, G0 to G10. Grade g opens at Uma Lv 5g − 4.
 - **Raising a grade:** a made item of the next grade (a Weapon Gem, Armor Fittings, an Accessory Setting), from the
   Warehouse, raises the slot one grade; a sheet can climb several grades at once when the Warehouse holds each one. The
-  Gear tab marks a slot she can raise now.
+  Gear tab's Upgrade view marks a slot she can raise now.
 - **What it does:** a weapon's Might on its hits; armor its slot's stat and ATK or M.ATK by her class's half; her
   accessory's family in its base form; her signature while she wears her knack's family ([combat](combat.md#damage)).
-- **The accessory slot:** its family (Pendant, Orb, Bell, Insignia), and an Orb's or a Bell's kind, change freely outside
-  fights; the grade is the slot's and stays.
+- **The accessory slot:** its family (Pendant, Orb, Bell, Insignia), and an Orb's or a Bell's kind (one of her three
+  weapons' kinds), change freely outside fights on the Gear tab's Equip view; the grade is the slot's and stays, raised
+  on its Upgrade view.
 - **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
   ([classes](classes.md#weapons)): the class's three default weapons and her accessory slot's family (her signature's ★
   family when she has one, else the class's form). Grades don't move.

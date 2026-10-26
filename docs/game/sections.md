@@ -215,21 +215,26 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - **Tabs:**
     - Skills, with every Class Rank bar;
     - Battle;
-    - Gear: "Use the standard preset" (or "Standard preset on"), then her grade rows: three weapons ("Greatsword · G3 ·
-      Might 8"), five armor slots ("Head · Helm · G2 · DEF +8") and her accessory ("Pendant · G4 · +2 on her three kinds
-      · ★ +10", or "Accessory · G0 · Pick a form"), each with a pill that raises it ("G3 → G4 · 1 Weapon Gem G4") or says
-      why not ("Needs Lv 16", "Already G10"). A row's sheet climbs several grades at once when the Warehouse holds each.
-      The accessory sheet picks the family, her ★ family first, an Orb's kind (any of the ten) or a Bell's (one she
-      holds), and says what the form gives; a line under the rows says "Wear a Bell for ★ +10" while she doesn't wear her
-      family. Then the Extra Stats link ("8/22 open · map ›");
+    - Gear, two views (H107), **Equip** first and **Upgrade** ("Upgrade · 3" counts what can raise or be set):
+      - **Equip**, what she wears: "Use the standard preset" (or "Standard preset on"); her three weapons with their
+        grades and "Set on Skills ›"; her armor half and the five slots' grades ("Physical armor · Head G2 · Body G1 …");
+        then her accessory slot ("Accessory · G4") as four cards of one shape, her ★ family first, then Bell, Pendant,
+        Orb, Insignia: each says what it does at the slot's grade ("+2 on her three kinds"; "From G1: …" at G0), her
+        family's card adds "★ Her signature: ATK and M.ATK +10", a Bell's and an Orb's card pick one of her three weapons'
+        kinds ("Katana · Lance · Thunder Tome"), and every card has one button: **Equip**, **Equipped**, or "Switch to
+        Lance" on the one she wears. A Bell or Orb left on a kind she no longer holds says "No Greatsword in her slots".
+      - **Upgrade**, what she spends: her grade rows, three weapons ("Greatsword · G3 · Might 8"), five armor slots
+        ("Head · Helm · G2 · DEF +8") and her accessory ("Pendant · G4 · +2 on her three kinds · ★ +10"), each with a pill
+        that raises it ("G3 → G4 · 1 Weapon Gem G4") or says why not ("Needs Lv 16", "Already G10"); a row's sheet climbs
+        several grades at once when the Warehouse holds each. Then the Extra Stats link ("8/22 open · map ›");
     - Work: her job, and her Craft Level with her trade: "Craft Lv 23 · Forest · Armorer";
     - Racing: her aptitudes, **Her template** (Calling, Stride, Knack and Flourish, each with its note: the calling's
       sources or "Picked", the Flourish's "Active" or "No effect as Brawler", a locked outfit's "As a Mage"), her racing
       base stats and growth, and her unique skill.
   - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
   - **Can upgrade marks:** a green dot on Gear while a slot or Extra Stats can be upgraded (no skill costs points, so
-    Skills never dots). On the Gear tab and the Skills tab's weapon slots, each slot she can raise now has the green
-    mark, and Extra Stats has a green "N to set" pill.
+    Skills never dots). On the Gear tab's Upgrade view and the Skills tab's weapon slots, each slot she can raise now has
+    the green mark, and Extra Stats has a green "N to set" pill.
   - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
     - **Offense:** ATK, M.ATK, each weapon's Might, her accessory ("Pendant: +2 on her three kinds", "Orb: Fire +8",
       "Bell: Greatsword 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None") and, while she wears

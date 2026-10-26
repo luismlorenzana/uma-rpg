@@ -211,9 +211,9 @@ const EMPTY_SLOT: AccessorySlotState = { grade: 0, family: null, form: 'base' }
 
 /**
  * Why her accessory slot can't take this form, or null (R2: one slot, base forms; R3's H84 extends it). A family's base
- * form, or null to take it off; an Orb takes any of the ten kinds, a Bell one of `classId`'s three weapons' kinds ("No
- * Fire Tome in her slots", WP21), and a Pendant or an Insignia none. `classId` is her active class, which the caller
- * passes (as `upgradesFor` takes it): the save can't read her style.
+ * form, or null to take it off; an Orb or a Bell takes one of `accessoryKinds` ("No Fire Tome in her slots", WP21; the
+ * Orb since H107, WP22's follow-up in D219), and a Pendant or an Insignia none. `classId` is her active class, which the
+ * caller passes (as `upgradesFor` takes it): the save can't read her style.
  */
 export function accessoryFormBlock(uma: OwnedUma, classId: RpgClass, slot: number, family: AccessoryFamily | null,
   kind: RpgDamageKind | undefined, tier = TIER_ONE): string | null {
@@ -224,10 +224,14 @@ export function accessoryFormBlock(uma: OwnedUma, classId: RpgClass, slot: numbe
   if (family === null) return kind === undefined ? null : 'Pick an accessory first'
   if (family === 'pendant' || family === 'insignia') return kind === undefined ? null : `${FAMILY_WORD[family]} has no kind`
   if (kind === undefined) return `${FAMILY_WORD[family]} needs a kind`
-  if (family === 'bell' && !classOf(uma, classId).weapons.some((weapon) => rpgWeaponKind(weapon) === kind)) {
-    return `No ${WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]} in her slots`
-  }
+  if (!accessoryKinds(uma, classId).includes(kind)) return `No ${WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]} in her slots`
   return null
+}
+
+/** The kinds a Bell or an Orb can take for her (WP21, WP22 with D219's follow-up): the kinds she can hit with, her
+ * `classId`'s three weapons' kinds in order. The one source: R3 adds a Dual's partner kind here. */
+export function accessoryKinds(uma: OwnedUma, classId: RpgClass): RpgDamageKind[] {
+  return classOf(uma, classId).weapons.map((weapon) => rpgWeaponKind(weapon))
 }
 
 /**

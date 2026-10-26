@@ -45,6 +45,9 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
     expect(screen.queryByText(/\d pts/)).toBeNull()
     fireEvent.click(screen.getByRole('tab', { name: 'Gear, can upgrade' }))
+    // Equip opens first (H107); the Upgrade view's tab counts what can raise or be set.
+    expect(screen.getByRole('tab', { name: 'Equip' }).getAttribute('aria-selected')).toBe('true')
+    fireEvent.click(screen.getByRole('tab', { name: /^Upgrade · \d+$/ }))
     // The one Weapon Gem could raise any of her three weapons: each row is marked; the jewel opens Planet I.
     expect(screen.getAllByRole('img', { name: 'Can upgrade' })).toHaveLength(3)
     expect(screen.getByText('1 to set')).toBeDefined()
@@ -55,6 +58,7 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     fixture.world = worldOf(save)
     ui.rerender(profile())
     expect(screen.getByRole('tab', { name: 'Gear' })).toBeDefined()
+    expect(screen.getByRole('tab', { name: 'Upgrade' })).toBeDefined()
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
     expect(screen.queryByRole('img', { name: 'Can upgrade' })).toBeNull()
     expect(screen.queryByText(/to set/)).toBeNull()
