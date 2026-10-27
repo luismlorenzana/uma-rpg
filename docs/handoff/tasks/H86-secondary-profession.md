@@ -2,9 +2,9 @@
 
 **uma-rpg · Either · M · Needs: H82 (Release 2 live) · Unblocks: H87, H89 (and through them H88, H90)**
 
-> **Versions re-planned by D221 and D224 (2026-10-26):** saves v29 (the owner's "grant is tickets only" step) and v30 (the
-> farm by line, H112) are taken and live. Read this packet's save v29 as **v31**, v30 as **v32** and v31 as **v33**;
-> engines unchanged. Materials, recipes and the Workbench are the farm by line's
+> **Versions re-planned by D221, D224 and D230 (2026-10-27):** saves v29 (tickets-only grant), v30 (the farm by line) and
+> v31 (the Wilds' trios, H114) are taken and live. Read this packet's save v29 as **v32**, v30 as **v33** and v31 as
+> **v34**; engines unchanged. Materials, recipes and the three-place rows are the farm by line's
 > ([farm-by-line.md](../../design/tier-rework/farm-by-line.md)): re-read them before any step that names R2's pairs, the
 > ladder or a cross-line recipe.
 

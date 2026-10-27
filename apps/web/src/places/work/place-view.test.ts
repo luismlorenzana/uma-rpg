@@ -17,10 +17,10 @@ describe('who takes a slot', () => {
 
   it('puts her trade\'s Umas first and greys the rest "Another trade"', () => {
     const { world: w, tradeOf } = world({ 101: 'brawler', 102: 'mage', 103: 'cleric' })
-    const who = whoAt('forge', tradeOf, openShop(w, 'forge', tradeOf))
+    const who = whoAt('weapon-forge', tradeOf, openShop(w, 'weapon-forge', tradeOf))
     expect(['101', '102', '103'].map((id) => [who.first(id), who.reason(id)])).toEqual([[true, null], [false, 'Another trade'], [false, 'Another trade']])
-    // The Workbench is the healers' crafting place: a Paladin and a Cleric both work it.
-    const bench = whoAt('workbench', tradeOf, openShop(w, 'workbench', tradeOf))
+    // The Fields Workbench is the healers' processing place: a Paladin and a Cleric both work it.
+    const bench = whoAt('fields-workbench', tradeOf, openShop(w, 'fields-workbench', tradeOf))
     expect(bench.first('103')).toBe(true)
     // An Uma whose trade nobody can say is never greyed (D208).
     expect(who.reason('999')).toBeNull()

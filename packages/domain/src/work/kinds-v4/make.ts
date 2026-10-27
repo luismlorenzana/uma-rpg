@@ -1,6 +1,6 @@
 // Making under the farm by line (D224; farm-by-line.md FL3, FL6, FL9, FL10; H109): a making place makes its one item from
 // its own line's refined items of the item's grade (`madeRecipeV4`), three quarters of a gather for each refined item in
-// it (`makeMinutesV4`), grade g at Craft Lv 5g − 4 (a jewel's grade is its node's); paid into the Warehouse. The Branch
+// it (`stepMinutes` for each refined item), grade g at Craft Lv 5g − 4 (a jewel's grade is its node's); paid into the Warehouse. The Branch
 // Gem waits for R3 (`madeLive`).
 import { payItems, workRefusal, type WorkKindRules } from '@luismlorenzana/uma-work'
 import type { JobKind } from '../../economy/jobs'

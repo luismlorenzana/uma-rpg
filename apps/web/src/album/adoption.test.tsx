@@ -125,23 +125,32 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     expect(count.compareDocumentPosition(what) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
   })
 
-  it('lays the Workbench out as Process tiles and Make chips, its sizes following the picked job (FL22)', async () => {
+  it('lays a Workbench out as Process tiles with ×1 … ×40 sizes', async () => {
     for (const raw of ['carrot', 'potato']) fixture.world.items[raw] = 100
     fixture.world.items['chopped-carrot'] = 70
-    show(<FacilityPage {...page('workbench')} />)
+    show(<FacilityPage {...page('fields-workbench')} />)
     fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
     const sheet = dialog()
-    // Its line's ten refined items to process and its ten Tome Ink grades to make; the sheet opens on a make.
+    // Its line's ten refined items only.
     expect(sheet.querySelectorAll('[data-line-tile]')).toHaveLength(10)
-    expect(sheet.querySelectorAll('[data-grade-chip]')).toHaveLength(10)
-    expect(sheet.querySelector('[data-recipe^="tome-ink-g"]')).not.toBeNull()
-    expect(within(sheet).queryByRole('radio', { name: /^×20,/ })).toBeNull()
-    // Picking a process offers ×1 … ×40.
+    expect(sheet.querySelectorAll('[data-grade-chip]')).toHaveLength(0)
     fireEvent.click(sheet.querySelector('[data-line-tile="chopped-carrot"]')!)
+    expect(within(sheet).getByRole('radio', { name: /^×20,/ })).toBeDefined()
     const twenty = within(sheet).getByRole('radio', { name: /^×20,/ })
     fireEvent.click(twenty)
     expect(twenty.getAttribute('aria-checked')).toBe('true')
     expect(sheet.querySelector('[data-selected-item="chopped-carrot"]')).not.toBeNull()
+  })
+
+  it('lays a making place out as Make chips only with 1–10 sizes', () => {
+    fixture.world.items['chopped-carrot'] = 70
+    show(<FacilityPage {...page('tome-forge')} />)
+    fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
+    const sheet = dialog()
+    expect(sheet.querySelectorAll('[data-line-tile]')).toHaveLength(0)
+    expect(sheet.querySelectorAll('[data-grade-chip]')).toHaveLength(10)
+    expect(sheet.querySelector('[data-recipe^="tome-ink-g"]')).not.toBeNull()
+    expect(within(sheet).queryByRole('radio', { name: /^×20,/ })).toBeNull()
   })
 
   it('shows grades on the Farm wishlist icons', () => {

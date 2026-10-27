@@ -2,7 +2,7 @@
 // page (`PlaceV3.tsx`: its header, slots, Finish all, targets and stopped queues stay). A gathering place offers its
 // line's ten raw items; a making place two groups, Process (its line's ten refined items) and Make (its item's grades),
 // with the picked item's card. Shown only when `farmByLine()`; H112 retires R2's steps.
-import { isMakingPlaceV4, madeRecipeV4, placeSpecV4, stockName, type TierWorld } from '@rpg/domain'
+import { isMakingPlaceV4, isProcessingPlaceV4, madeRecipeV4, placeSpecV4, stockName, type TierWorld } from '@rpg/domain'
 import type { JobSelection } from '@luismlorenzana/uma-kit/work'
 import { ItemIcon } from '../../items/ItemIcon'
 import { madeUse, materialFacts, materialPair } from '../../items/v3-words'
@@ -14,30 +14,25 @@ export function WhatV4({ selection, placeId, world, onPick }: {
   const place = placeSpecV4(placeId)!
   const level = selection.outfitId ? world.umas[selection.outfitId]?.craft.level ?? 1 : 1
   if (!isMakingPlaceV4(place)) {
-    const tiles = gatherTilesV4(place.line, level)
+    const processing = isProcessingPlaceV4(place)
+    const tiles = processing ? processTilesV4(place.line, level) : gatherTilesV4(place.line, level)
     const picked = tiles.find((t) => t.id === selection.job) ?? tiles[0]!
     return (
       <div className="space-y-2.5">
-        <LineTiles label="Material" tiles={tiles} picked={picked.id} onPick={onPick} />
+        <LineTiles label={processing ? 'Process' : 'Material'} tiles={tiles} picked={picked.id} onPick={onPick} small={processing} />
         <MaterialCard world={world} id={picked.id} locked={picked.locked} />
       </div>
     )
   }
-  const tiles = processTilesV4(place.line, level)
   const groups = makeGroupsV4(placeId, level)
-  const tile = tiles.find((t) => t.id === selection.job)
-  const chip = groups.flatMap((g) => g.chips).find((c) => c.id === selection.job) ?? (tile ? undefined : groups[0]!.chips[0]!)
+  const chip = groups.flatMap((g) => g.chips).find((c) => c.id === selection.job) ?? groups[0]!.chips[0]!
   return (
     <div className="space-y-3" data-what-v4={placeId}>
-      <section className="space-y-1" aria-label="Process">
-        <h4 className="text-[11px] font-semibold text-ink-soft">Process</h4>
-        <LineTiles label="Process" tiles={tiles} picked={tile?.id ?? null} onPick={onPick} small />
-      </section>
       <section className="space-y-1" aria-label="Make">
         <h4 className="text-[11px] font-semibold text-ink-soft">Make</h4>
-        <MadeChips groups={groups} picked={chip?.id ?? null} onPick={onPick} />
+        <MadeChips groups={groups} picked={chip.id} onPick={onPick} />
       </section>
-      {tile ? <MaterialCard world={world} id={tile.id} locked={tile.locked} /> : <RecipeCardV4 world={world} id={chip!.id} locked={chip!.locked} />}
+      <RecipeCardV4 world={world} id={chip.id} locked={chip.locked} />
     </div>
   )
 }
@@ -123,7 +118,7 @@ function RecipeCardV4({ world, id, locked }: { world: TierWorld; id: string; loc
   )
 }
 
-/** The quick look's line: a gathering place's ten icons; a making place's grade chips and what it processes. */
+/** The quick look's line: a gathering or workbench place's ten icons; a making place's grade chips. */
 export function PeekLineV4({ placeId }: { placeId: string }) {
   const peek = peekV4(placeId)
   if ('icons' in peek) {
@@ -136,14 +131,11 @@ export function PeekLineV4({ placeId }: { placeId: string }) {
   const first = peek.chips[0]!.id
   const label = first.startsWith('jewel-') ? 'Planet and Moon Jewels I–V' : `${stockName(first).replace(/ G1$/, '')} G1–G10`
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5">
-        <ItemIcon id={first} size={24} />
-        <span className="flex flex-wrap gap-0.5" aria-label={label}>
-          {peek.chips.map((c) => <span key={c.id} aria-hidden className="min-w-5 rounded-xs bg-sunken px-0.5 text-center text-[10px] font-semibold leading-4">{c.label}</span>)}
-        </span>
-      </div>
-      <p className="text-[12px] text-ink-faint">{peek.process}</p>
+    <div className="flex items-center gap-1.5">
+      <ItemIcon id={first} size={24} />
+      <span className="flex flex-wrap gap-0.5" aria-label={label}>
+        {peek.chips.map((c) => <span key={c.id} aria-hidden className="min-w-5 rounded-xs bg-sunken px-0.5 text-center text-[10px] font-semibold leading-4">{c.label}</span>)}
+      </span>
     </div>
   )
 }

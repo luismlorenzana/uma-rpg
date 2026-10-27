@@ -26,11 +26,11 @@ function expectSpaced(places: readonly Place[]): void {
 }
 
 describe('place registry', () => {
-  it('has 23 visible places on four pages in the bar\'s order (D147; R2’s ten in the Wilds since H82) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(23)
+  it('has 28 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(28)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
     expect(HUB_PAGES).toEqual(['town', 'learning', 'battle', 'wilds'])
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 7, 2, 10])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 7, 2, 15])
     expect(PLACES.filter((p) => p.direct).map((p) => p.id)).toEqual(['scenario-gate'])
   })
 
@@ -98,7 +98,7 @@ describe('the Rift (H50)', () => {
     expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts, then ascend together.')
     expect(CURRENT_SLICE).toBe('S8')
     expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['paladin-bastion', 'knights-bastion'], ['tier-finale', 'rift'],
-      ['armorer', 'lancers-barracks'], ['fields', 'vegetable-garden'], ['charm-shop', 'arcane-armory']])
+      ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 
   it('opens only with five Lv 50 Umas, in Tiers 1 and 2', () => {

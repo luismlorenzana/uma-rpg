@@ -9,7 +9,7 @@ import { type Save } from './save'
 
 const weapon: GradeTarget = { kind: 'weapon', weapon: 'greatsword' }
 const saveOf = (items: Record<string, number>, level = 1, gear = newGrades(1)): Save => ({
-  schemaVersion: 30,
+  schemaVersion: 31,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { '1': gradedWorld({ items, umas: { '101': gradedUma({ level, gear }) } }) },
 })

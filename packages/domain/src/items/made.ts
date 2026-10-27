@@ -22,7 +22,7 @@ export function madeName(id: string): string | undefined {
 }
 
 const LINE_PLACE: Readonly<Record<MadeLine, PlaceIdV3>> = {
-  'weapon-gem': 'forge', 'branch-gem': 'forge', 'tome-ink': 'workbench', 'armor-fittings': 'armorer', 'accessory-setting': 'charm-shop',
+  'weapon-gem': 'weapon-forge', 'branch-gem': 'weapon-forge', 'tome-ink': 'tome-forge', 'armor-fittings': 'armorer', 'accessory-setting': 'charm-forge',
   'jewel-planet': 'lapidary', 'jewel-moon': 'lapidary',
 }
 /** The making place of a line (FL3): the Forge, the Workbench, the Armorer, the Charm Shop or the Lapidary. */

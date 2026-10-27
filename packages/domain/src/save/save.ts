@@ -441,8 +441,8 @@ const v27Work = (buildings: Record<string, { level: number }>): WorkRules => ({
   slots: (building) => FACILITY_SLOTS[(buildings[building]?.level ?? 1) - 1]!,
 })
 
-/** The Wilds' slot (v28 on): one of the ten places (PP4), four slots each. */
-function parseSlotV28(value: unknown, path: string): SlotRef {
+/** The Wilds' slot (v31 on): one of the fifteen places (FL25), four slots each. */
+function parseSlotV31(value: unknown, path: string): SlotRef {
   const o = object(value, path, ['building', 'slot'])
   if (typeof o.building !== 'string' || !placeSpecV4(o.building)) throw new SaveParseError(`${path}.building`, 'not a place')
   const slot = count(o.slot, `${path}.slot`)
@@ -450,29 +450,27 @@ function parseSlotV28(value: unknown, path: string): SlotRef {
   return { building: o.building, slot }
 }
 
-/** Whether a v30 place makes `item` as a job of `kind` (D224, FL2; H110): a gathering place a raw item of its line, a
- * making place a refined item of its line (processing) or a live made item of its lines (the Branch Gem from R3's
- * weapons, in a Tier 2 world or above), in every world. */
-function madeAtV30(placeId: string, kind: JobKind, item: string, tier: number): boolean {
+/** Whether a v31 place makes `item` as its one job kind (D230, FL25–FL27). */
+function madeAtV31(placeId: string, kind: JobKind, item: string, tier: number): boolean {
   if (jobKindV4(placeId, item) !== kind) return false
   const made = madeIdentity(item)
   return !made || (isStockItemId(item) && (made.line !== 'branch-gem' || tier >= 2))
 }
 
-function parseRequestV30(value: unknown, path: string, slot: SlotRef, tier: number): RpgWorkRequest {
+function parseRequestV31(value: unknown, path: string, slot: SlotRef, tier: number): RpgWorkRequest {
   const r = object(value, path, ['kind', 'item', 'count'])
-  const kinds = placeSpecV4(slot.building)!.kinds
-  if (!kinds.includes(r.kind as JobKind)) throw new SaveParseError(`${path}.kind`, `expected ${kinds.join(' or ')}`)
+  const kindAtPlace = placeSpecV4(slot.building)!.kinds[0]!
+  if (r.kind !== kindAtPlace) throw new SaveParseError(`${path}.kind`, `expected ${kindAtPlace}`)
   const kind = r.kind as JobKind
-  if (typeof r.item !== 'string' || !madeAtV30(slot.building, kind, r.item, tier)) throw new SaveParseError(`${path}.item`, 'not made at this place')
+  if (typeof r.item !== 'string' || !madeAtV31(slot.building, kind, r.item, tier)) throw new SaveParseError(`${path}.item`, 'not made at this place')
   const n = count(r.count, `${path}.count`)
   if (n < 1 || n > maxJobCount(kind)) throw new SaveParseError(`${path}.count`, `expected 1–${maxJobCount(kind)}`)
   return { kind, item: r.item, count: n }
 }
 
-/** v30's work (H110): v28's slots, each place's two kinds when it makes (FL2), the farm by line's ids. */
-const v30Work = (tier: number): WorkRules => ({
-  slot: parseSlotV28, request: (value, path, slot) => parseRequestV30(value, path, slot, tier), item: (id) => isStockItemId(id), slots: () => PLACE_SLOTS_V3,
+/** v31's work (H114): fifteen places of one kind each, four slots, the farm by line's ids. */
+const v31Work = (tier: number): WorkRules => ({
+  slot: parseSlotV31, request: (value, path, slot) => parseRequestV31(value, path, slot, tier), item: (id) => isStockItemId(id), slots: () => PLACE_SLOTS_V3,
 })
 
 function parseQty(value: unknown, path: string, known: (id: string) => boolean): ItemQty {
@@ -985,7 +983,7 @@ function parseGrant(value: unknown, path: string): TierGrant | null {
 }
 
 /** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant.
- * v30 (H110, live since H112) keeps its shape; its work and stock read by the farm by line's rules. */
+ * v31 (H114) keeps its shape; its work and stock read by the Wilds' trios. */
 function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant'])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
@@ -993,7 +991,7 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, true), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
-    items: parseStock(w.items, `${path}.items`), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v30Work(tier)),
+    items: parseStock(w.items, `${path}.items`), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v31Work(tier)),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
     rift: parseRift(w.rift, `${path}.rift`, tier, umas, check), grant: parseGrant(w.grant, `${path}.grant`),
   }
@@ -1318,14 +1316,15 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v29 save and always returns v29. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+/** Parses a v1–v31 save and always returns v31. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
  * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
  * tier history and Rift (D163), v23 gains no defeated faces, no open Rift fight, and empty traces and Convergence attempts
  * (D171), v24 → v25 (D180, D188): the Paladin from the Cleric, the Bastion's seats, typed accessories, and anything older
  * than v10 starts over (D69); v25 → v26 (D190): each party's lead; v26 → v27 (D205, D210): three weapons, branch picks,
  * the calling pick; v27 → v28 (D214, D218): gear by grade, the Planet and three moons, ten places and the five lines'
  * items, Craft Levels to 1 and the Speed Ticket grant; v28 → v29 (D221): a granted world's materials go, the grant tickets
- * only. */
+ * only; v29 → v30 (D224, D228): the farm by line and its stock; v30 → v31 (D230): work settles before the fifteen Wilds
+ * places replace the old ten. */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

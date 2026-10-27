@@ -11,8 +11,11 @@ const PLACE_NAME: ReadonlyMap<string, string> = new Map(wildsPlaces(RPG_REWORK_E
 /** An R2 place's name ("Monster Den"). */
 export const placeNameV3 = (placeId: string): string => PLACE_NAME.get(placeId) ?? placeId
 
-/** A trade by its two places, gathering first: "Mine · Forge". */
-export const tradeLabel = (trade: TradeId): string => tradePlaces(trade).map(placeNameV3).join(' · ')
+/** A trade by its first and last places: "Mine · Weapon Forge". */
+export const tradeLabel = (trade: TradeId): string => {
+  const places = tradePlaces(trade)
+  return [places[0], places.at(-1)!].map(placeNameV3).join(' · ')
+}
 
 /** Who a trade's Umas are, by class: the open shop's header names them ("Open shop: no Brawler in this world"). */
 export const TRADE_CLASS_WORDS: Readonly<Record<TradeId, string>> = {

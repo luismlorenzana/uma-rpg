@@ -2,7 +2,7 @@
 // ⌈remaining ÷ 30 minutes⌉; finishing spends exactly that and starts each queue at once; short tickets refuse; one
 // running job has no Finish all.
 import { describe, expect, it } from 'vitest'
-import { itemMinutes } from '../economy/pacing'
+import { stepMinutes } from '../economy/pacing'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { worldOf } from './rules'
 import type { Save } from './save'
@@ -12,8 +12,8 @@ import { finishAllAt, finishAllCost, queueJob, startJob } from './work'
 const T0 = Date.parse(ECONOMY_V3_NOW)
 const at = (ms: number) => new Date(T0 + ms).toISOString()
 const MIN = 60_000
-/** One Craft Lv 1 gather in a slot: 54 minutes ÷ 1.25. */
-const GATHER_MS = Math.round((itemMinutes(1) * 60) / 1.25) * 1000
+/** One Craft Lv 1 gather in a slot: 36 minutes ÷ 1.25. */
+const GATHER_MS = Math.round((stepMinutes(1) * 60) / 1.25) * 1000
 const tickets = (ms: number) => Math.ceil(ms / (30 * MIN))
 
 function saveWith(timeTickets: number): Save {
@@ -21,7 +21,7 @@ function saveWith(timeTickets: number): Save {
   const world = gradedWorld({ wallet: { ...base.wallet, timeTickets },
     umas: Object.fromEntries(['101', '102', '103'].map((id) => [id, gradedUma({ craft: { level: 1, exp: 0 } })])) })
   return {
-    schemaVersion: 30,
+    schemaVersion: 31,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { 1: world },
   }
@@ -41,9 +41,9 @@ const COST = tickets(3 * GATHER_MS - NOW) + tickets(GATHER_MS - NOW) + tickets(2
 
 describe('Finish all on a place', () => {
   it('costs the sum of each running job\'s ⌈remaining ÷ 30 minutes⌉', () => {
-    expect(COST).toBe(4 + 2 + 3)
+    expect(COST).toBe(3 + 1 + 2)
     expect(finishAllCost(worldOf(threeRunning(0)), 'mine', at(NOW), 1)).toEqual({ jobs: 3, tickets: COST })
-    expect(finishAllCost(worldOf(threeRunning(0)), 'forge', at(NOW), 1)).toBeNull()
+    expect(finishAllCost(worldOf(threeRunning(0)), 'weapon-forge', at(NOW), 1)).toBeNull()
   })
 
   it('spends exactly that and starts each queue at once', () => {

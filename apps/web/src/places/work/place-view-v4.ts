@@ -2,7 +2,7 @@
 // place's and a making place's What step list for her Craft Level, each job's kind and sizes, the (i)'s lines and the
 // quick look. Pure, so the page and the tests read the same; shown only when `farmByLine()` (H112).
 import {
-  gradeItem, gradeUnlockLevel, isMakingPlaceV4, jewelId, jobKindV4, lineItems, placeSpecV4, REFINE_BATCHES, type JobKind, type MadeLine,
+  gradeItem, gradeUnlockLevel, isMakingPlaceV4, isProcessingPlaceV4, jewelId, jobKindV4, lineItems, placeSpecV4, REFINE_BATCHES, type JobKind, type MadeLine,
   type MaterialLine,
 } from '@rpg/domain'
 import { LINE_WORD } from '../../items/v3-words'
@@ -22,13 +22,13 @@ const tiles = (line: MaterialLine, refined: boolean, level: number): LineTile[] 
 
 /** A gathering place's ten raw tiles, G1–G10 (FL22). */
 export const gatherTilesV4 = (line: MaterialLine, level: number): LineTile[] => tiles(line, false, level)
-/** A making place's ten refined tiles to process, G1–G10. */
+/** A workbench's ten refined tiles to process, G1–G10. */
 export const processTilesV4 = (line: MaterialLine, level: number): LineTile[] => tiles(line, true, level)
 
 const NUMERALS = ['I', 'II', 'III', 'IV', 'V'] as const
 const GRADED: ReadonlySet<MadeLine> = new Set(['weapon-gem', 'tome-ink', 'armor-fittings', 'accessory-setting'])
 
-/** A making place's Make groups: its item's ten grades, or the Lapidary's Planet I–V (grades 1, 3 … 9) and Moon I–V (2,
+/** A making place's groups: its item's ten grades, or the Lapidary's Planet I–V (grades 1, 3 … 9) and Moon I–V (2,
  * 4 … 10). The Branch Gem waits for R3. */
 export function makeGroupsV4(placeId: string, level: number): MadeGroup[] {
   const place = placeSpecV4(placeId)
@@ -49,43 +49,42 @@ export function makeGroupsV4(placeId: string, level: number): MadeGroup[] {
   }]
 }
 
-/** A job's kind at a place: by its item under the farm by line (a making place processes and makes). */
+/** A job's kind at a place: by its item under the farm by line. */
 export const jobKindAtV4 = (placeId: string, id: string): JobKind => jobKindV4(placeId, id) ?? placeSpecV4(placeId)?.kinds[0] ?? 'gather'
 
 /** The batches a kind offers: ×1, ×4, ×8, ×20, ×40 to process; 1–10 otherwise (the kit's default). */
 export const jobSizesV4 = (kind: JobKind): readonly number[] | undefined => (kind === 'refine' ? REFINE_BATCHES : undefined)
 
-/** What the sheet opens on: the highest grade she can take, a gathering place's raw item or a making place's made item. */
+/** What the sheet opens on: the highest grade she can take of the place's one kind. */
 export function initialJobV4(placeId: string, level: number): string {
   const place = placeSpecV4(placeId)!
   const open = <T extends { id: string; locked: string | null }>(list: readonly T[]): string => (list.filter((t) => t.locked === null).at(-1) ?? list[0]!).id
+  if (isProcessingPlaceV4(place)) return open(processTilesV4(place.line, level))
   if (!isMakingPlaceV4(place)) return open(gatherTilesV4(place.line, level))
   return open(makeGroupsV4(placeId, level).flatMap((g) => g.chips).sort((a, b) => a.grade - b.grade))
 }
 
 const MADE_WORDS: Readonly<Record<string, string>> = {
-  forge: 'Arms Gems from Ingots, three quarters of a gather for each Ingot',
-  armorer: 'Armor Fittings from Planks, three quarters of a gather for each Plank',
-  workbench: 'Tome Ink from vegetable cuts, three quarters of a gather for each cut',
-  'charm-shop': 'Accessory Settings from Fillets, three quarters of a gather for each Fillet',
-  lapidary: 'Planet and Moon Jewels from cut stones, three quarters of a gather for each stone',
+  'weapon-forge': 'Arms Gems from Ingots',
+  'tome-forge': 'Tome Ink from vegetable cuts',
+  armorer: 'Armor Fittings from Planks',
+  'charm-forge': 'Accessory Settings from Fillets',
+  lapidary: 'Planet and Moon Jewels from cut stones',
 }
 
 /** The (i)'s lines (FL16). */
 export function helpLinesV4(placeId: string): string[] {
   const place = placeSpecV4(placeId)!
   const shop = 'Her trade’s Umas work here. In a world with none of them, anyone may: the open shop.'
-  if (!isMakingPlaceV4(place)) return [`Gathers ${LINE_WORD[place.line].toLowerCase()}, G1–G10. Grade g opens at Craft Lv 5g − 4.`, shop]
-  return [
-    'Processes its line’s raw items into refined ones, one for one, in a quarter of a gather.',
-    `Makes ${MADE_WORDS[placeId]}. Grade g opens at Craft Lv 5g − 4.`,
-    shop,
-  ]
+  if (isProcessingPlaceV4(place)) return [`Processes ${LINE_WORD[place.line].toLowerCase()}’s raw items into refined ones, one for one. Grade g opens at Craft Lv 5g − 4.`, shop]
+  if (isMakingPlaceV4(place)) return [`Makes ${MADE_WORDS[placeId]}, one step for each refined item in it. Grade g opens at Craft Lv 5g − 4.`, shop]
+  return [`Gathers ${LINE_WORD[place.line].toLowerCase()}, G1–G10. Grade g opens at Craft Lv 5g − 4.`, shop]
 }
 
-/** The quick look: a gathering place's ten icons; a making place's chips and "Processes Metal G1–G10". */
-export function peekV4(placeId: string): { icons: string[] } | { chips: MadeChip[]; process: string } {
+/** The quick look: a gather or process place's ten icons; a making place's chips. */
+export function peekV4(placeId: string): { icons: string[] } | { chips: MadeChip[] } {
   const place = placeSpecV4(placeId)!
+  if (isProcessingPlaceV4(place)) return { icons: processTilesV4(place.line, 50).map((t) => t.id) }
   if (!isMakingPlaceV4(place)) return { icons: gatherTilesV4(place.line, 50).map((t) => t.id) }
-  return { chips: makeGroupsV4(placeId, 50).flatMap((g) => g.chips), process: `Processes ${LINE_WORD[place.line]} G1–G10` }
+  return { chips: makeGroupsV4(placeId, 50).flatMap((g) => g.chips) }
 }

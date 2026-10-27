@@ -53,14 +53,22 @@ export interface Place {
   frame?: string
 }
 
-/** The Wilds' layout: eight sites in two columns, the Workbench and the Forge in the middle row with the Lapidary between
- * them. Index = position. */
-const WILDS_LAYOUT: readonly { x: number; y: number }[] = [
+/** The v1 Wilds' ten side spots. */
+const WILDS_LAYOUT_V1: readonly { x: number; y: number }[] = [
   { x: 0.24, y: 0.1 }, { x: 0.74, y: 0.12 },
   { x: 0.2, y: 0.3 }, { x: 0.76, y: 0.32 },
   { x: 0.22, y: 0.51 }, { x: 0.78, y: 0.51 },
   { x: 0.22, y: 0.71 }, { x: 0.78, y: 0.7 },
   { x: 0.26, y: 0.9 }, { x: 0.74, y: 0.9 },
+]
+
+/** The Wilds' trios (FL32): five rows, gather left, workbench on the trunk, make right. */
+const WILDS_LAYOUT: readonly { x: number; y: number }[] = [
+  { x: 0.2, y: 0.15 }, { x: 0.5, y: 0.15 }, { x: 0.8, y: 0.15 },
+  { x: 0.2, y: 0.31 }, { x: 0.5, y: 0.31 }, { x: 0.8, y: 0.31 },
+  { x: 0.2, y: 0.47 }, { x: 0.5, y: 0.47 }, { x: 0.8, y: 0.47 },
+  { x: 0.2, y: 0.63 }, { x: 0.5, y: 0.63 }, { x: 0.8, y: 0.63 },
+  { x: 0.2, y: 0.79 }, { x: 0.5, y: 0.79 }, { x: 0.8, y: 0.79 },
 ]
 
 interface SiteSpec {
@@ -98,7 +106,7 @@ function sites(specs: SiteSpec[]): Place[] {
     details: [`Produces ${s.family}: ${s.firstItems}`, `Effect family: ${s.effect}`, 'Three Uma slots; more with upgrades'],
     slots: FIRST_SLOTS,
     opensIn: 'S4',
-    at: WILDS_LAYOUT[SITE_SLOTS[i] ?? 0] ?? { x: 0.5, y: 0.5 },
+    at: WILDS_LAYOUT_V1[SITE_SLOTS[i] ?? 0] ?? { x: 0.5, y: 0.5 },
   }))
 }
 
@@ -108,13 +116,13 @@ const WILDS_V1: Place[] = [
     id: 'workbench', page: 'wilds', kind: 'station', name: 'Workbench', opensIn: 'S4', slots: FIRST_SLOTS,
     blurb: 'Refines raw materials, one into one: ore into ingots, logs into planks.',
     details: ['Refines every Wilds family', 'Raises Craft Level'],
-    at: WILDS_LAYOUT[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
+    at: WILDS_LAYOUT_V1[STATION_SLOTS[0]] ?? { x: 0.3, y: 0.5 },
   },
   {
     id: 'forge', page: 'wilds', kind: 'station', name: 'Forge', opensIn: 'S7', slots: FIRST_SLOTS,
     blurb: 'Crafts weapons, armor and accessories.',
     details: ['Two refined items of the grade; Craft Level sets the grades she can make', 'Weapons, armor and accessories in ten grades'],
-    at: WILDS_LAYOUT[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
+    at: WILDS_LAYOUT_V1[STATION_SLOTS[1]] ?? { x: 0.7, y: 0.5 },
   },
   {
     id: 'lapidary', page: 'wilds', kind: 'station', name: 'Lapidary', opensIn: 'S6', slots: FIRST_SLOTS,
@@ -125,31 +133,32 @@ const WILDS_V1: Place[] = [
   },
 ]
 
-/** R2's Wilds (profession-progression.md §4, PP4–PP6; H77): ten places, one existing building a profession, four slots at
- * ×1.25 and no upgrades, at today's ten side spots: one row a trade, gathering left and making right. A place names its
- * uma-art frame where it isn't its id. */
-/** One of R2's places: its row and side give its spot (`WILDS_LAYOUT`), the same in every tier. */
+/** One Wilds place, at its trio's spot (`WILDS_LAYOUT`), the same in every tier. */
 const placeV3 = (at: number, id: string, kind: PlaceKind, name: string, opensIn: SliceId, blurb: string, detail: string, frame?: string): Place => ({
   id, page: 'wilds', kind, name, blurb, details: [detail, 'Four slots, ×1.25'], slots: 4, opensIn, at: WILDS_LAYOUT[at]!, ...(frame ? { frame } : {}),
 })
 
-/** The Wilds (R2's places; the farm by line's words, D224, FL16): each place one line's, a making place processing its
- * line too. */
+/** The Wilds' trios (D230, FL25–FL27): each line's gathering, processing and making places. */
 const WILDS_V4: Place[] = [
   placeV3(0, 'mine', 'gather-site', 'Mine', 'S4', 'Mining: metal, G1–G10.', 'Ores G1–G10'),
-  placeV3(1, 'forge', 'station', 'Forge', 'S7', 'Arms Crafting: Arms Gems.', 'Processes Metal, makes Arms Gems G1–G10'),
-  placeV3(2, 'forest', 'gather-site', 'Forest', 'S4', 'Wood Chopping: wood, G1–G10.', 'Logs G1–G10'),
-  placeV3(3, 'armorer', 'station', 'Armorer', 'S7', 'Armor Crafting: Armor Fittings.', 'Processes Wood, makes Armor Fittings G1–G10', 'lancers-barracks'),
-  placeV3(4, 'fields', 'gather-site', 'Fields', 'S4', 'Farming: vegetables, G1–G10.', 'Vegetables G1–G10', 'vegetable-garden'),
-  placeV3(5, 'workbench', 'station', 'Workbench', 'S4', 'Tome Crafting: Tome Ink.', 'Processes Vegetables, makes Tome Ink G1–G10'),
-  placeV3(6, 'fishery', 'gather-site', 'Fishery', 'S4', 'Fishing: fish, G1–G10.', 'Fish G1–G10'),
-  placeV3(7, 'charm-shop', 'station', 'Charm Shop', 'S7', 'Accessory Crafting: Accessory Settings.', 'Processes Fish, makes Accessory Settings G1–G10', 'arcane-armory'),
-  placeV3(8, 'monster-den', 'gather-site', 'Monster Den', 'S4', 'Hunting: stone, G1–G10.', 'Stones G1–G10'),
-  placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Processes Stone, makes Planet and Moon Jewels I–V'),
+  placeV3(1, 'mine-workbench', 'station', 'Mine Workbench', 'S4', 'Smelting: ores into ingots.', 'Processes Metal G1–G10'),
+  placeV3(2, 'weapon-forge', 'station', 'Weapon Forge', 'S7', 'Arms Crafting: Arms Gems.', 'Makes Arms Gems G1–G10'),
+  placeV3(3, 'fields', 'gather-site', 'Fields', 'S4', 'Farming: vegetables, G1–G10.', 'Vegetables G1–G10', 'vegetable-garden'),
+  placeV3(4, 'fields-workbench', 'station', 'Fields Workbench', 'S4', 'Prepping: vegetables into cuts.', 'Processes Vegetables G1–G10'),
+  placeV3(5, 'tome-forge', 'station', 'Tome Forge', 'S7', 'Tome Crafting: Tome Ink.', 'Makes Tome Ink G1–G10'),
+  placeV3(6, 'forest', 'gather-site', 'Forest', 'S4', 'Wood Chopping: wood, G1–G10.', 'Logs G1–G10'),
+  placeV3(7, 'forest-workbench', 'station', 'Forest Workbench', 'S4', 'Sawing: logs into planks.', 'Processes Wood G1–G10'),
+  placeV3(8, 'armorer', 'station', 'Armorer', 'S7', 'Armor Crafting: Armor Fittings.', 'Makes Armor Fittings G1–G10', 'lancers-barracks'),
+  placeV3(9, 'fishery', 'gather-site', 'Fishery', 'S4', 'Fishing: fish, G1–G10.', 'Fish G1–G10'),
+  placeV3(10, 'fishery-workbench', 'station', 'Fishery Workbench', 'S4', 'Filleting: fish into fillets.', 'Processes Fish G1–G10'),
+  placeV3(11, 'charm-forge', 'station', 'Charm Forge', 'S7', 'Accessory Crafting: Accessory Settings.', 'Makes Accessory Settings G1–G10'),
+  placeV3(12, 'monster-den', 'gather-site', 'Monster Den', 'S4', 'Hunting: stone, G1–G10.', 'Stones G1–G10'),
+  placeV3(13, 'den-workbench', 'station', 'Den Workbench', 'S4', 'Stonecutting: stones into cut stones.', 'Processes Stone G1–G10'),
+  placeV3(14, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Makes Planet and Moon Jewels I–V'),
 ]
 
 /** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, the ten places from v17
- * (the farm by line's words since H112). */
+ * (the Wilds' trios since H114). */
 export function wildsPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
   return rpgRework('economy', engine) ? WILDS_V4 : WILDS_V1
 }

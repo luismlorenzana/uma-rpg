@@ -4,7 +4,7 @@
 // opens grade g at Craft Lv 5g − 4, the same in every world, pays 2 Craft EXP a minute before the place's speed, and pays
 // into the Warehouse.
 import { payItems, workRefusal, type WorkKindRules } from '@luismlorenzana/uma-work'
-import { itemMinutes, jobExp, maxJobCount, refineMinutes } from '../../economy/pacing'
+import { jobExp, maxJobCount, stepMinutes } from '../../economy/pacing'
 import { placeSpecV4 } from '../../economy/places-v4'
 import { gradeUnlockLevel } from '../../items/catalog'
 import { lineItem } from '../../items/lines'
@@ -25,7 +25,7 @@ export function materialKindV4(kind: 'gather' | 'refine', { tradeOf }: KindSetup
       if (trade) return trade
       if (!env.exp.gradeOpen(world, outfitId, kind, m.grade)) return workRefusal('grade', { level: gradeUnlockLevel(m.grade) })
       const level = craftLevel(world, outfitId)
-      const minutes = gather ? itemMinutes(level) : refineMinutes(level)
+      const minutes = stepMinutes(level)
       const inputs = gather ? [] : [{ item: m.pair, qty: 1 }]
       return many({ seconds: secondsAt(minutes, speed), inputs, output: { item: m.id }, exp: jobExp(minutes) }, request.count)
     },

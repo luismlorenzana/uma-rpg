@@ -1,34 +1,47 @@
 // The professions (R2, D195, D208; profession-progression.md §2, PP1–PP6, PP16; H77; the farm by line, D224, FL1–FL3):
-// ten professions, five gathering and five making, each in one existing building of the Wilds, and one trade an Uma by her
-// calling (her gathering and making pair on one Craft Level, never her active class; UT19). A making profession's place
-// processes its own line too (`places-v4.ts`). The engine's job kinds stay four (`gather`, `refine`, `craft`, `cut`); the
-// player reads gather, process, make. Ids only and short words, safe for the main bundle. Profession ids never reach a
-// save, so two keep R2's ids under the farm by line's names: `weapon-crafting` (Arms Crafting) and `processing` (Tome
-// Crafting).
+// fifteen professions, five each for gathering, processing and making. One trade is a row of three Wilds places chosen
+// by an Uma's calling (one Craft Level across all three, never her active class; UT19). The engine's job kinds stay four
+// (`gather`, `refine`, `craft`, `cut`); the player reads gather, process, make. Profession ids never reach a save.
 import type { RpgClass } from '../rpg/kinds'
 import { umaCalling, type CallingOutfit } from '../roster/template'
 
-export const PROFESSION_IDS = ['mining', 'wood-chopping', 'farming', 'fishing', 'hunting', 'processing', 'weapon-crafting', 'armor-crafting',
-  'accessory-crafting', 'jewel-crafting'] as const
+export const PROFESSION_IDS = [
+  'mining', 'smelting', 'arms-crafting',
+  'farming', 'prepping', 'tome-crafting',
+  'wood-chopping', 'sawing', 'armor-crafting',
+  'fishing', 'filleting', 'accessory-crafting',
+  'hunting', 'stonecutting', 'jewel-crafting',
+] as const
 export type ProfessionId = typeof PROFESSION_IDS[number]
-/** What the work does (PP1): gathering brings material in; making processes its line and makes the items an Uma uses. */
-export type ProfessionKind = 'gathering' | 'making'
+/** What the work does (FL25): gathering brings raw material in, processing refines it, making makes an Uma's items. */
+export type ProfessionKind = 'gathering' | 'processing' | 'making'
 
-/** The ten places, in the Wilds' order: one row a trade, gathering left and making right (PP5). */
-export const PLACE_IDS_V3 = ['mine', 'forge', 'forest', 'armorer', 'fields', 'workbench', 'fishery', 'charm-shop', 'monster-den', 'lapidary'] as const
+/** The fifteen places, row by row: gathering, processing, making (FL25). */
+export const PLACE_IDS_V3 = [
+  'mine', 'mine-workbench', 'weapon-forge',
+  'fields', 'fields-workbench', 'tome-forge',
+  'forest', 'forest-workbench', 'armorer',
+  'fishery', 'fishery-workbench', 'charm-forge',
+  'monster-den', 'den-workbench', 'lapidary',
+] as const
 export type PlaceIdV3 = typeof PLACE_IDS_V3[number]
 
 export interface Profession { id: ProfessionId; name: string; kind: ProfessionKind; place: PlaceIdV3 }
 export const PROFESSIONS: readonly Profession[] = [
   { id: 'mining', name: 'Mining', kind: 'gathering', place: 'mine' },
-  { id: 'wood-chopping', name: 'Wood Chopping', kind: 'gathering', place: 'forest' },
+  { id: 'smelting', name: 'Smelting', kind: 'processing', place: 'mine-workbench' },
+  { id: 'arms-crafting', name: 'Arms Crafting', kind: 'making', place: 'weapon-forge' },
   { id: 'farming', name: 'Farming', kind: 'gathering', place: 'fields' },
-  { id: 'fishing', name: 'Fishing', kind: 'gathering', place: 'fishery' },
-  { id: 'hunting', name: 'Hunting', kind: 'gathering', place: 'monster-den' },
-  { id: 'processing', name: 'Tome Crafting', kind: 'making', place: 'workbench' },
-  { id: 'weapon-crafting', name: 'Arms Crafting', kind: 'making', place: 'forge' },
+  { id: 'prepping', name: 'Prepping', kind: 'processing', place: 'fields-workbench' },
+  { id: 'tome-crafting', name: 'Tome Crafting', kind: 'making', place: 'tome-forge' },
+  { id: 'wood-chopping', name: 'Wood Chopping', kind: 'gathering', place: 'forest' },
+  { id: 'sawing', name: 'Sawing', kind: 'processing', place: 'forest-workbench' },
   { id: 'armor-crafting', name: 'Armor Crafting', kind: 'making', place: 'armorer' },
-  { id: 'accessory-crafting', name: 'Accessory Crafting', kind: 'making', place: 'charm-shop' },
+  { id: 'fishing', name: 'Fishing', kind: 'gathering', place: 'fishery' },
+  { id: 'filleting', name: 'Filleting', kind: 'processing', place: 'fishery-workbench' },
+  { id: 'accessory-crafting', name: 'Accessory Crafting', kind: 'making', place: 'charm-forge' },
+  { id: 'hunting', name: 'Hunting', kind: 'gathering', place: 'monster-den' },
+  { id: 'stonecutting', name: 'Stonecutting', kind: 'processing', place: 'den-workbench' },
   { id: 'jewel-crafting', name: 'Jewel Crafting', kind: 'making', place: 'lapidary' },
 ]
 const PROFESSION_BY_ID = new Map(PROFESSIONS.map((p) => [p.id, p]))
@@ -43,14 +56,14 @@ export const PLACE_SPEED_V3 = 1.25
 export const TRADE_IDS = ['physical', 'physical-hybrid', 'healer', 'magical-hybrid', 'magical'] as const
 /** Her calling's fight type, which names her trade (UT19). */
 export type TradeId = typeof TRADE_IDS[number]
-export interface Trade { id: TradeId; gathering: ProfessionId; crafting: ProfessionId }
+export interface Trade { id: TradeId; gathering: ProfessionId; processing: ProfessionId; crafting: ProfessionId }
 /** One row a trade, physical on top as on the Learning page (PP3). */
 export const TRADES: readonly Trade[] = [
-  { id: 'physical', gathering: 'mining', crafting: 'weapon-crafting' },
-  { id: 'physical-hybrid', gathering: 'wood-chopping', crafting: 'armor-crafting' },
-  { id: 'healer', gathering: 'farming', crafting: 'processing' },
-  { id: 'magical-hybrid', gathering: 'fishing', crafting: 'accessory-crafting' },
-  { id: 'magical', gathering: 'hunting', crafting: 'jewel-crafting' },
+  { id: 'physical', gathering: 'mining', processing: 'smelting', crafting: 'arms-crafting' },
+  { id: 'physical-hybrid', gathering: 'wood-chopping', processing: 'sawing', crafting: 'armor-crafting' },
+  { id: 'healer', gathering: 'farming', processing: 'prepping', crafting: 'tome-crafting' },
+  { id: 'magical-hybrid', gathering: 'fishing', processing: 'filleting', crafting: 'accessory-crafting' },
+  { id: 'magical', gathering: 'hunting', processing: 'stonecutting', crafting: 'jewel-crafting' },
 ]
 const TRADE_BY_ID = new Map(TRADES.map((t) => [t.id, t]))
 
@@ -60,15 +73,15 @@ const CALLING_TRADE: Readonly<Record<RpgClass, TradeId>> = {
 /** Her trade by her calling's class (PP2): the calling pick (CP29) moves a Pace Uma between the physical hybrid and the
  * magical trades; a class switch moves no job. */
 export const tradeOfCalling = (calling: RpgClass): TradeId => CALLING_TRADE[calling]
-/** A trade's gathering and crafting professions. */
-export const tradeProfessions = (trade: TradeId): readonly [ProfessionId, ProfessionId] => {
+/** A trade's gathering, processing and crafting professions. */
+export const tradeProfessions = (trade: TradeId): readonly [ProfessionId, ProfessionId, ProfessionId] => {
   const t = TRADE_BY_ID.get(trade)!
-  return [t.gathering, t.crafting]
+  return [t.gathering, t.processing, t.crafting]
 }
-/** A trade's two places: gathering, then crafting. */
-export const tradePlaces = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3] => {
-  const [gathering, crafting] = tradeProfessions(trade)
-  return [PROFESSION_BY_ID.get(gathering)!.place, PROFESSION_BY_ID.get(crafting)!.place]
+/** A trade's three places: gathering, processing, then crafting. */
+export const tradePlaces = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3, PlaceIdV3] => {
+  const [gathering, processing, crafting] = tradeProfessions(trade)
+  return [PROFESSION_BY_ID.get(gathering)!.place, PROFESSION_BY_ID.get(processing)!.place, PROFESSION_BY_ID.get(crafting)!.place]
 }
 
 /** Her trade from her outfit and her stored calling pick (`OwnedUma.calling.pick`). */

@@ -227,6 +227,8 @@ H110 adds `toV30` and the v30 parse; H111 the screens, shown when `farmByLine()`
 > The owner, after playing the farm by line: "I really like the new loop of Farming → Processing → Crafting"; now each
 > step gets its own building, five rows of three, connected by roads.
 
+**Live from H114 (save v31).**
+
 - **FL25 · A trio a line.** Each line works three places, left to right: its gathering place (exactly as today), a new
   **workbench** that only processes, and its making place, which only makes and is renamed. The Wilds' rows follow the
   owner's order: Metal, Vegetables, Wood, Fish, Stone.
@@ -258,7 +260,7 @@ H110 adds `toV30` and the v30 parse; H111 the screens, shown when `farmByLine()`
   a large roster gears up to half again as fast (place supply 2.17–2.39 maxed Umas a day, up from 1.45–1.59).
 - **FL31 · Save v31.** Work settles as `toV30`'s did (`settleWork`, no clock; queued requests drop); nothing else
   changes. R3, R4 and R5 take saves **v32, v33 and v34**.
-- **FL32 · The map.** Fifteen spots, five rows at today's heights (y 0.1 · 0.3 · 0.5 · 0.7 · 0.9); the gathering place on
+- **FL32 · The map.** Fifteen spots, five even rows (y 0.15 · 0.31 · 0.47 · 0.63 · 0.79); the gathering place on
   the left (x ≈ 0.2), the workbench in the middle **on the trunk road** (x 0.5), the making place on the right (x ≈ 0.8,
   clear of the stream). uma-kit lays the roads itself: a branch from each side building's door to the trunk, and a lane
   round each building on it. At 375–390 px the map is 17 columns, the buildings at columns 3, 8 and 13, the three

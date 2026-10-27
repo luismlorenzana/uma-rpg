@@ -10,7 +10,7 @@ import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType
 import { facilitySpec } from '../economy/jobs'
 import { gradeItemId, gradeOf, type GradeTarget } from '../economy/grades'
 import { MAP_NODES, nodeJewel } from '../economy/planet'
-import { isMakingPlaceV4, placeSpecV4 } from '../economy/places-v4'
+import { isMakingPlaceV4, isProcessingPlaceV4, placeSpecV4 } from '../economy/places-v4'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
 import { itemById } from '../items/catalog'
 import { madeIdentity } from '../items/made-id'
@@ -166,10 +166,10 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
 export function facilityTargets(plan: TargetPlan, placeId: string): TargetNeed[] {
   const v4 = plan.made.length > 0 ? placeSpecV4(placeId) : undefined
   if (v4) {
-    // FL22: a gathering place its line's raw items; a making place its made items, then its line's refined items.
+    // FL25: a gathering place its raw items, its workbench the refined ones, its making place the made items.
     const ofLine = (n: TargetNeed) => lineItem(n.key)?.line === v4.line
-    const lines = isMakingPlaceV4(v4) ? [...plan.made.filter((n) => v4.made.includes(madeIdentity(n.key)!.line)), ...plan.refined.filter(ofLine)]
-      : plan.raw.filter(ofLine)
+    const lines = isMakingPlaceV4(v4) ? plan.made.filter((n) => v4.made.includes(madeIdentity(n.key)!.line))
+      : isProcessingPlaceV4(v4) ? plan.refined.filter(ofLine) : plan.raw.filter(ofLine)
     return lines.filter((n) => n.need > n.have)
   }
   const spec = facilitySpec(placeId)
