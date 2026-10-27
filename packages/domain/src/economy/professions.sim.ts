@@ -64,7 +64,10 @@ export const tradePlaceIds = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3] =
 
 /** Each trade's hours on one maxed Uma and its share of hers (§7.2). */
 export function tradeHours(tier: number, moon = false): Record<TradeId, { hours: number; share: number }> {
-  const hours = placeHours(tier, moon)
+  return tradeHoursOf(placeHours(tier, moon))
+}
+/** Each trade's hours and share from each place's hours (the farm by line's ledger shares it, H109). */
+export function tradeHoursOf(hours: Record<PlaceIdV3, number>): Record<TradeId, { hours: number; share: number }> {
   const total = sum(Object.values(hours))
   return Object.fromEntries(TRADES.map((t) => {
     const h = sum(tradePlaceIds(t.id).map((p) => hours[p]))
@@ -76,7 +79,10 @@ export function tradeHours(tier: number, moon = false): Record<TradeId, { hours:
 const slotDay = HOURS_A_DAY * PLACE_SPEED_V3
 /** Maxed Umas a day one place makes with all four of its slots working (§7.3). */
 export function placeSupply(tier: number, moon = false): Record<PlaceIdV3, number> {
-  const hours = placeHours(tier, moon)
+  return placeSupplyOf(placeHours(tier, moon))
+}
+/** Maxed Umas a day each place makes, from each place's hours. */
+export function placeSupplyOf(hours: Record<PlaceIdV3, number>): Record<PlaceIdV3, number> {
   return Object.fromEntries(PLACES_V3.map((p) => [p.id, (PLACE_SLOTS_V3 * slotDay) / hours[p.id]])) as Record<PlaceIdV3, number>
 }
 
@@ -89,8 +95,11 @@ export const TWENTY: TradeSplit = [5, 4, 5, 3, 3]
 /** Maxed Umas a day a roster makes, and what binds it (§7.4): each trade's Umas work its two places (at most their eight
  * slots), each place at most its four; the roster runs at its tightest trade or place. */
 export function rosterRate(split: TradeSplit, tier: number, moon = false): { rate: number; binds: string } {
-  const hours = placeHours(tier, moon)
-  const trades = tradeHours(tier, moon)
+  return rosterRateOf(split, placeHours(tier, moon))
+}
+/** A roster's rate and what binds it, from each place's hours. */
+export function rosterRateOf(split: TradeSplit, hours: Record<PlaceIdV3, number>): { rate: number; binds: string } {
+  const trades = tradeHoursOf(hours)
   let rate = Infinity, binds = ''
   TRADES.forEach((t, i) => {
     const workers = Math.min(split[i]!, 2 * PLACE_SLOTS_V3)
@@ -114,7 +123,10 @@ export function craftDay(level: number): number {
 /** Grade g's day (§7.4): it opens at Craft Lv 5g − 4; the fighting party holds it a tenth of five maxed Umas later, a run
  * of twenty a tenth of twenty. */
 export function gradeDays(split: TradeSplit = FORTY, tier = 1): { grade: number; opens: number; party: number; run: number }[] {
-  const { rate } = rosterRate(split, tier)
+  return gradeDaysAt(rosterRate(split, tier).rate)
+}
+/** Grade g's day at a roster's rate of maxed Umas a day. */
+export function gradeDaysAt(rate: number): { grade: number; opens: number; party: number; run: number }[] {
   return range(10).map((grade) => {
     const opens = craftDay(5 * grade - 4)
     return { grade, opens, party: opens + 0.5 / rate, run: opens + 2 / rate }

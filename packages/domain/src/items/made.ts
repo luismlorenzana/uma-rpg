@@ -16,7 +16,7 @@ import { materialType, type MaterialBand, type MaterialLine, type MaterialTier }
 const NUMERALS = ['I', 'II', 'III', 'IV', 'V'] as const
 const LINE_NAME: Readonly<Record<MadeLine, string>> = {
   'weapon-gem': 'Weapon Gem', 'armor-fittings': 'Armor Fittings', 'accessory-setting': 'Accessory Setting', 'branch-gem': 'Branch Gem',
-  'jewel-planet': 'Planet Jewel', 'jewel-moon': 'Moon Jewel',
+  'jewel-planet': 'Planet Jewel', 'jewel-moon': 'Moon Jewel', 'tome-ink': 'Tome Ink',
 }
 
 /** "Weapon Gem G3", "Armor Fittings G3", "Accessory Setting G3", "Branch Gem", "Planet Jewel III", "Moon Jewel II". */
@@ -30,8 +30,10 @@ export function madeName(id: string): string | undefined {
 
 const LINE_PLACE: Readonly<Record<MadeLine, PlaceIdV3>> = {
   'weapon-gem': 'forge', 'branch-gem': 'forge', 'armor-fittings': 'armorer', 'accessory-setting': 'charm-shop', 'jewel-planet': 'lapidary', 'jewel-moon': 'lapidary',
+  'tome-ink': 'workbench',
 }
-/** The making place of a line (PP4): the Forge, the Armorer, the Charm Shop or the Lapidary. */
+/** The making place of a line (PP4): the Forge, the Armorer, the Charm Shop or the Lapidary; Tome Ink the Workbench, under
+ * the farm by line (FL3). */
 export const madePlace = (line: MadeLine): PlaceIdV3 => LINE_PLACE[line]
 
 /** A world's tier as a material tier: the catalog has three. */
@@ -65,6 +67,7 @@ function parts(line: MadeLine, grade: number, slots: number): readonly Part[] {
     }
     case 'jewel-planet': return [['stone', 3], ['wood', 3], ['vegetables', 3], ['fish', 3]]
     case 'jewel-moon': return [['stone', 3], ['metal', 1]]
+    case 'tome-ink': throw new RangeError('Tome Ink is the farm by line\'s: `madeRecipeV4`')
   }
 }
 

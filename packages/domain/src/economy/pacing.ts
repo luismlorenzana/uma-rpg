@@ -48,6 +48,13 @@ export const itemMinutes = (level: number): number => {
 export const REFINE_SHARE = 0.25
 /** Minutes to refine one item at a profession level: 13½ at Lv1, 9 at Lv50. */
 export const refineMinutes = (level: number): number => itemMinutes(level) * REFINE_SHARE
+/** The farm by line (D224, FL10): making takes three quarters of a gather for each refined item in it, so with
+ * processing's quarter every refined item costs its making place one gather, as it costs its gathering place one: a
+ * trade's two places stay equally busy at every grade. */
+export const MAKE_SHARE_V4 = 0.75
+/** Minutes to make an item of `refined` refined items at a Craft Level, under the farm by line: an Arms Gem (7) 283½ at
+ * Lv1, 189 at Lv50. */
+export const makeMinutesV4 = (level: number, refined: number): number => itemMinutes(level) * MAKE_SHARE_V4 * refined
 /** Minutes to craft a piece of gear or cut a Star Gem at a Craft Level: two items' worth (S7, D65, D144). */
 export const makeMinutes = (level: number): number => 2 * itemMinutes(level)
 /** Profession EXP a job pays per item: 2 a minute of its time at her level, before a facility's speed (D96, D139). */

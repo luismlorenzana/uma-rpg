@@ -3,6 +3,7 @@
 // global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
+import { farmByLine } from '../save/version'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -145,8 +146,24 @@ const WILDS_V3: Place[] = [
   placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Planet and Moon Jewels I–V'),
 ]
 
-/** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, R2's ten places from v17. */
+/** The farm by line's Wilds (D224, FL16; H109): R2's places, each one line's, a making place processing its line too. */
+const WILDS_V4: Place[] = [
+  placeV3(0, 'mine', 'gather-site', 'Mine', 'S4', 'Mining: metal, G1–G10.', 'Ores G1–G10'),
+  placeV3(1, 'forge', 'station', 'Forge', 'S7', 'Arms Crafting: Arms Gems.', 'Processes Metal, makes Arms Gems G1–G10'),
+  placeV3(2, 'forest', 'gather-site', 'Forest', 'S4', 'Wood Chopping: wood, G1–G10.', 'Logs G1–G10'),
+  placeV3(3, 'armorer', 'station', 'Armorer', 'S7', 'Armor Crafting: Armor Fittings.', 'Processes Wood, makes Armor Fittings G1–G10', 'lancers-barracks'),
+  placeV3(4, 'fields', 'gather-site', 'Fields', 'S4', 'Farming: vegetables, G1–G10.', 'Vegetables G1–G10', 'vegetable-garden'),
+  placeV3(5, 'workbench', 'station', 'Workbench', 'S4', 'Tome Crafting: Tome Ink.', 'Processes Vegetables, makes Tome Ink G1–G10'),
+  placeV3(6, 'fishery', 'gather-site', 'Fishery', 'S4', 'Fishing: fish, G1–G10.', 'Fish G1–G10'),
+  placeV3(7, 'charm-shop', 'station', 'Charm Shop', 'S7', 'Accessory Crafting: Accessory Settings.', 'Processes Fish, makes Accessory Settings G1–G10', 'arcane-armory'),
+  placeV3(8, 'monster-den', 'gather-site', 'Monster Den', 'S4', 'Hunting: stone, G1–G10.', 'Stones G1–G10'),
+  placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Processes Stone, makes Planet and Moon Jewels I–V'),
+]
+
+/** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, R2's ten places from v17,
+ * the farm by line's from its switch (save v30, H112). */
 export function wildsPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
+  if (rpgRework('economy', engine) && farmByLine()) return WILDS_V4
   return rpgRework('economy', engine) ? WILDS_V3 : WILDS_V1
 }
 

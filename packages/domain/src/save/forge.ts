@@ -193,6 +193,7 @@ export function raiseGradeTo(save: Save, outfitId: string, target: GradeTarget, 
   if (!isGrades(uma.gear)) throw new SaveRuleError('bad-job', 'Not graded')
   const plan = raisePlan(world, outfitId, target, to)
   if (plan.block) throw new SaveRuleError(plan.block.startsWith('Needs 1 ') || plan.block.startsWith('Needs Weapon') ||
+    plan.block.startsWith('Needs Arms') || plan.block.startsWith('Needs Tome') ||
     plan.block.startsWith('Needs Armor') || plan.block.startsWith('Needs Accessory') ? 'no-items' : 'bad-job', plan.block)
   const items = { ...world.items }
   for (const id of plan.items) {

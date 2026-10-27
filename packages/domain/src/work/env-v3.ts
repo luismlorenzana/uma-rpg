@@ -8,7 +8,9 @@ import { PLACE_SLOTS_V3, PLACE_SPEED_V3, PLACES_V3, type TradeOf } from '../econ
 import { worldMaterialTier } from '../items/made'
 import { rpgRework } from '../rpg/battle/caps'
 import type { TierWorld } from '../save/save'
+import { farmByLine } from '../save/version'
 import { RPG_WORK_ENV } from './env'
+import { rpgWorkEnvV4 } from './env-v4'
 import { makeV3 } from './kinds-v3/make'
 import { materialKindV3 } from './kinds-v3/material'
 
@@ -33,7 +35,9 @@ export function rpgWorkEnv(tier: number, context: WorkContext = {}): WorkEnv<Tie
   }
 }
 
-/** The live game's env: v1's facilities until R2's switch, then R2's places for a world of `tier`. */
+/** The live game's env: v1's facilities until R2's switch, then R2's places for a world of `tier`, then the farm by line's
+ * from its switch (save v30, H112). */
 export function liveWorkEnv(tier: number, context?: WorkContext): WorkEnv<TierWorld> {
+  if (farmByLine()) return rpgWorkEnvV4(tier, context)
   return rpgRework('economy') ? rpgWorkEnv(tier, context) : RPG_WORK_ENV
 }

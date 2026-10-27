@@ -7,6 +7,8 @@ import { materialIdentity } from './materials-id'
 
 type Recipe = Readonly<Record<string, number>>
 const grades = Array.from({ length: 10 }, (_, i) => i + 1)
+/** R2's made items: every line but the farm by line's Tome Ink (`made-v4.ts`). */
+const R2_MADE = MADE_IDENTITIES.filter((m) => m.line !== 'tome-ink')
 
 describe('made items: names, places and grades', () => {
   it('names every line as the docs do', () => {
@@ -23,7 +25,8 @@ describe('made items: names, places and grades', () => {
     expect([1, 2, 3, 4, 5].map((n) => madeIdentity(jewelId('planet', n))!.grade)).toEqual([1, 3, 5, 7, 9])
     expect([1, 2, 3, 4, 5].map((n) => madeIdentity(jewelId('moon', n))!.grade)).toEqual([2, 4, 6, 8, 10])
     expect(madeIdentity('branch-gem')!.grade).toBe(5)
-    expect(MADE_IDENTITIES).toHaveLength(41)
+    // 41 of R2's, and Tome Ink's ten (the farm by line's, H109), which R2 never makes.
+    expect(MADE_IDENTITIES).toHaveLength(51)
   })
 
   it('reads the ladder (PP9): a band\'s top grade on the world\'s own pair, the one below on the tier before', () => {
@@ -116,7 +119,7 @@ describe('every recipe in world Tiers 1–3 (PP §6.2)', () => {
   })
 
   it('takes the same amounts in every tier (PP11), and the Setting 12 · 6 · 4 by its slots', () => {
-    for (const m of MADE_IDENTITIES) {
+    for (const m of R2_MADE) {
       const sizes = [1, 2, 3].map((tier) => madeRefined(m.id, tier))
       expect(new Set(sizes).size, m.id).toBe(1)
     }
@@ -127,7 +130,7 @@ describe('every recipe in world Tiers 1–3 (PP §6.2)', () => {
 
   it('takes refined materials only, every one of a tier at or below the world\'s', () => {
     for (const tier of [1, 2, 3]) {
-      for (const m of MADE_IDENTITIES) {
+      for (const m of R2_MADE) {
         for (const id of Object.keys(madeRecipe(m.id, tier))) {
           const material = materialIdentity(id)
           expect(material?.refined, id).toBe(true)

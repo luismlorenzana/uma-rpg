@@ -23,6 +23,10 @@ import { madeName } from '../items/made'
 import { madeIdentity } from '../items/made-id'
 import { materialById } from '../items/materials'
 import { materialGateGrade } from '../items/materials-id'
+import { lineItem } from '../items/lines'
+import { madeNameV4 } from '../items/made-v4'
+import { jobKindV4, placeSpecV4 } from '../economy/places-v4'
+import { farmByLine } from './version'
 import { rpgRework } from '../rpg/battle/caps'
 import { RPG_BUILDINGS, RPG_WORK_ENV, type CraftGain } from '../work/env'
 import { ANOTHER_TRADE, liveWorkEnv, TRADE_REFUSAL, type WorkContext } from '../work/env-v3'
@@ -77,10 +81,20 @@ function done<R>(result: OpResult<R, TierWorld>, now: number): { state: TierWorl
 }
 
 const slotRef = (placeId: string, slot: number): SlotRef => ({ building: placeId, slot })
+/** A job's kind: its place's under R2 and before; under the farm by line, its item's at the place (a making place both
+ * processes and makes, FL2). */
+const kindAt = (placeId: string, output: string): JobKind | null => {
+  if (farmByLine()) {
+    const place = placeSpecV4(placeId)
+    // An item the place doesn't work goes to its first kind, whose rules refuse it ("That isn't made here.").
+    return place ? jobKindV4(placeId, output) ?? place.kinds[0]! : null
+  }
+  return workPlace(placeId)?.kind ?? null
+}
 const requestFor = (placeId: string, output: string, count: number): RpgWorkRequest => {
-  const spec = workPlace(placeId)
-  if (!spec) throw new SaveRuleError('bad-job', 'nothing to make here')
-  return { kind: spec.kind, item: output, count }
+  const kind = kindAt(placeId, output)
+  if (!kind) throw new SaveRuleError('bad-job', 'nothing to make here')
+  return { kind, item: output, count }
 }
 
 /** Who holds a slot, or a refusal to act there. */
@@ -112,6 +126,12 @@ export const facilityLevel = (world: TierWorld, placeId: string): number => worl
 /** What a job makes, by generation: a legacy item, gear piece or Star Gem to engine v16; from v17 a material (its grade
  * is the one its type opens at: 1 low, 6 high) or a made item. */
 function outputOf(id: string): { id: string; name: string; grade: number } | undefined {
+  if (farmByLine()) {
+    const m = lineItem(id)
+    if (m) return { id, name: m.name, grade: m.grade }
+    const made = madeIdentity(id)
+    return made ? { id, name: madeNameV4(id)!, grade: made.grade } : undefined
+  }
   if (rpgRework('economy')) {
     const material = materialById(id)
     if (material) return { id, name: material.name, grade: materialGateGrade(id) }
@@ -127,13 +147,13 @@ function outputOf(id: string): { id: string; name: string; grade: number } | und
  * `context` her trade for R2's gate. */
 export function planJob(world: TierWorld, placeId: string, outfit: WorkOutfit, output: string, count = 1, tier: string | number = TIER_ONE,
   context?: WorkContext): JobPlan | null {
-  const spec = workPlace(placeId)
+  const jobKind = kindAt(placeId, output)
   const made = outputOf(output)
-  if (!spec || !made || !world.umas[outfit.outfitId]) return null
+  if (!jobKind || !made || !world.umas[outfit.outfitId]) return null
   const env = envOf(tier, context)
   const request = requestFor(placeId, output, 1)
   const plan = { slot: slotRef(placeId, 0), speed: env.buildings.speed(placeId, facilityLevel(world, placeId)), earlier: [] }
-  const kind = kindRules(env, spec.kind)!
+  const kind = kindRules(env, jobKind)!
   // Its time and EXP even behind the grade gate (a picker shows a locked grade's time); the gate becomes the block.
   const items = kind.plan(world, outfit.outfitId, request, 0, { ...plan, env: { ...env, exp: { ...env.exp, gradeOpen: () => true } } })
   const gate = kind.plan(world, outfit.outfitId, request, 0, { ...plan, env })
