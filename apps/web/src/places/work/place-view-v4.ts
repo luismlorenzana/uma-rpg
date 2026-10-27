@@ -2,8 +2,8 @@
 // place's and a making place's What step list for her Craft Level, each job's kind and sizes, the (i)'s lines and the
 // quick look. Pure, so the page and the tests read the same; shown only when `farmByLine()` (H112).
 import {
-  gradeItem, gradeUnlockLevel, isMakingPlaceV4, isProcessingPlaceV4, jewelId, jobKindV4, lineItems, placeSpecV4, REFINE_BATCHES, type JobKind, type MadeLine,
-  type MaterialLine,
+  gradeItem, gradeUnlockLevel, isLineItemId, isMakingPlaceV4, isProcessingPlaceV4, jewelId, jobKindV4, jobSizes, lineItems, madeRefinedV4, placeSpecV4,
+  type JobKind, type MadeLine, type MaterialLine,
 } from '@rpg/domain'
 import { LINE_WORD } from '../../items/v3-words'
 
@@ -52,8 +52,9 @@ export function makeGroupsV4(placeId: string, level: number): MadeGroup[] {
 /** A job's kind at a place: by its item under the farm by line. */
 export const jobKindAtV4 = (placeId: string, id: string): JobKind => jobKindV4(placeId, id) ?? placeSpecV4(placeId)?.kinds[0] ?? 'gather'
 
-/** The batches a kind offers: ×1, ×4, ×8, ×20, ×40 to process; 1–10 otherwise (the kit's default). */
-export const jobSizesV4 = (kind: JobKind): readonly number[] | undefined => (kind === 'refine' ? REFINE_BATCHES : undefined)
+/** The sizes a job offers (D233), about half an hour to about 8 hours: ×1 … ×20 to gather or process; a make's by its
+ * refined items, so an Arms Gem ×1, ×2 or ×3. */
+export const jobSizesV4 = (item: string): number[] => jobSizes(isLineItemId(item) ? 1 : madeRefinedV4(item))
 
 /** What the sheet opens on: the highest grade she can take of the place's one kind. */
 export function initialJobV4(placeId: string, level: number): string {

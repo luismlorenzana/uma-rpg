@@ -2,8 +2,8 @@
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import {
-  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, LATE_LAURELS, makeMinutesV4, MAX_JOB_COUNT,
-  POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES, PROFESSION_MAX_LEVEL, professionExpToNext, REPLAY_SHARE,
+  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, JOB_SIZES, JOB_STEPS_MOST, jobSizes, LATE_LAURELS, makeMinutesV4,
+  POINT_EVASION, POINT_HP, POINT_LIMIT, PROFESSION_MAX_LEVEL, professionExpToNext, REPLAY_SHARE,
   STEP_MINUTES, stepMinutes, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN,
 } from '../economy/pacing'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
@@ -521,7 +521,7 @@ function jobs(): string {
     ['Make one item', `one step for each refined item in it: an Arms Gem or Tome Ink ${RECIPE_V4['weapon-gem'].qty}, Armor Fittings ${RECIPE_V4['armor-fittings'].qty}, an Accessory Setting ${RECIPE_V4['accessory-setting'].qty}, a Planet Jewel ${RECIPE_V4['jewel-planet'].qty}, a Moon Jewel ${RECIPE_V4['jewel-moon'].qty} (an Arms Gem ${hours(makeMinutesV4(1, RECIPE_V4['weapon-gem'].qty))} at Lv1, ${hours(makeMinutesV4(PROFESSION_MAX_LEVEL, RECIPE_V4['weapon-gem'].qty))} at Lv${PROFESSION_MAX_LEVEL})`],
     ['Opens', 'grade g at Craft Lv 5g − 4, to gather, to process and to make'],
     ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the place's speed`],
-    ['Outputs per job', `gathering and making 1–${MAX_JOB_COUNT}; processing ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
+    ['Sizes', `${JOB_SIZES.map((n) => `×${n}`).join(', ')} to gather or process; a make up to about ${JOB_STEPS_MOST} steps (${hours((JOB_STEPS_MOST * stepMinutes(25)) / PLACE_SPEED_V3)} at Craft Lv25): Armor Fittings ×${jobSizes(RECIPE_V4['armor-fittings'].qty).at(-1)}, a Moon Jewel ×${jobSizes(RECIPE_V4['jewel-moon'].qty).at(-1)}, an Arms Gem or Tome Ink ×${jobSizes(RECIPE_V4['weapon-gem'].qty).at(-1)}, an Accessory Setting or a Planet Jewel ×${jobSizes(RECIPE_V4['accessory-setting'].qty).at(-1)}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
     ['Places', `${PLACE_SLOTS_V3} Uma slots each, speed ×${PLACE_SPEED_V3}, from day one; no upgrades`],
     ['Extra Stats and armor points', `+1 to its stat per point (+${POINT_HP} HP); Speed ${pct(POINT_EVASION)} evasion; Limit +${POINT_LIMIT} starting charge`],

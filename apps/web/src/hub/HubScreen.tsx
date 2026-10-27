@@ -52,10 +52,14 @@ export function PlaceRoute() {
   return <PlacePage place={place} rest={rest} />
 }
 
+/** The Wilds' places hang their pips over the building in a half arch, bigger, each with her Craft Level (D233). */
+const archPips = (place: Place): boolean => place.page === 'wilds'
+
 /** A place's slot pips: workers' faces ringed by their job's progress, a hall's four Heroes, or free dots. */
 function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string): PipModel[] | undefined {
   if (place.slots === 0 || !placeOpen(place, world, tier)) return undefined
-  const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={16} label="Assigned Uma" round />
+  const arch = archPips(place)
+  const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={arch ? 24 : 16} label="Assigned Uma" round />
   const hall = hallClass(place.id)
   if (hall && world) {
     return HERO_LIMIT_IDS.filter((id) => heroLimitClass(id) === hall).map((id): PipModel => {
@@ -66,7 +70,11 @@ function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string
   if (!world || !workPlace(place.id)) return Array.from({ length: place.slots }, (): PipModel => ({ state: 'free' }))
   return workView(world, Date.parse(now), liveWorkEnv(tier)).cards(place.id).map((card): PipModel => {
     if (card.kind === 'free') return { state: 'free' }
-    return { state: card.running ? 'busy' : 'ready', progress: card.progress, queued: card.queue.length, face: face(card.outfitId) }
+    const craft = arch ? world.umas[card.outfitId]?.craft.level : undefined
+    return {
+      state: card.running ? 'busy' : 'ready', progress: card.progress, queued: card.queue.length, face: face(card.outfitId),
+      ...(craft === undefined ? {} : { badge: String(craft) }),
+    }
   })
 }
 
@@ -122,6 +130,7 @@ function HubScreen({ page, peek }: { page: HubPage; peek: Place | undefined }) {
       ready: isReady ? 'Ready' : undefined,
       locked: !open,
       pips: pipsOf(place, world, tier, now),
+      pipsAt: archPips(place) ? 'arch' : 'below',
     }
   })
   const covered = peek !== undefined || params.get('sheet') !== null

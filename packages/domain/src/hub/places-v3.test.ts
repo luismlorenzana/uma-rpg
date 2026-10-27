@@ -21,11 +21,11 @@ describe('the Wilds by generation (H77)', () => {
 
   it('draws fifteen places in five rows of three, workbenches on the trunk, four slots each', () => {
     expect(spots(wildsPlaces())).toEqual([
-      ['mine', 'gather-site', 0.2, 0.15, null, 4], ['mine-workbench', 'station', 0.5, 0.15, null, 4], ['weapon-forge', 'station', 0.8, 0.15, null, 4],
-      ['fields', 'gather-site', 0.2, 0.31, 'vegetable-garden', 4], ['fields-workbench', 'station', 0.5, 0.31, null, 4], ['tome-forge', 'station', 0.8, 0.31, null, 4],
-      ['forest', 'gather-site', 0.2, 0.47, null, 4], ['forest-workbench', 'station', 0.5, 0.47, null, 4], ['armorer', 'station', 0.8, 0.47, 'lancers-barracks', 4],
-      ['fishery', 'gather-site', 0.2, 0.63, null, 4], ['fishery-workbench', 'station', 0.5, 0.63, null, 4], ['charm-forge', 'station', 0.8, 0.63, null, 4],
-      ['monster-den', 'gather-site', 0.2, 0.79, null, 4], ['den-workbench', 'station', 0.5, 0.79, null, 4], ['lapidary', 'station', 0.8, 0.79, null, 4],
+      ['mine', 'gather-site', 0.2, 0.155, null, 4], ['mine-workbench', 'station', 0.5, 0.155, null, 4], ['weapon-forge', 'station', 0.8, 0.155, null, 4],
+      ['fields', 'gather-site', 0.2, 0.315, 'vegetable-garden', 4], ['fields-workbench', 'station', 0.5, 0.315, null, 4], ['tome-forge', 'station', 0.8, 0.315, null, 4],
+      ['forest', 'gather-site', 0.2, 0.475, null, 4], ['forest-workbench', 'station', 0.5, 0.475, null, 4], ['armorer', 'station', 0.8, 0.475, 'lancers-barracks', 4],
+      ['fishery', 'gather-site', 0.2, 0.635, null, 4], ['fishery-workbench', 'station', 0.5, 0.635, null, 4], ['charm-forge', 'station', 0.8, 0.635, null, 4],
+      ['monster-den', 'gather-site', 0.2, 0.795, null, 4], ['den-workbench', 'station', 0.5, 0.795, null, 4], ['lapidary', 'station', 0.8, 0.795, null, 4],
     ])
     expect(placesOn('wilds')).toEqual(wildsPlaces(17))
     expect(wildsPlaces().every((p) => p.page === 'wilds' && !p.hidden && p.blurb.length > 0 && p.details.length > 0)).toBe(true)

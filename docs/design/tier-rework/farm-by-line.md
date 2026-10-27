@@ -269,6 +269,11 @@ H110 adds `toV30` and the v30 parse; H111 the screens, shown when `farmByLine()`
   making buildings (Weapon Forge, Tome Forge, Charm Forge). The gathering places, the Armorer (`lancers-barracks`) and
   the Lapidary keep their art.
 
+- **FL34 · Sizes in steps (D233, after H114).** With every step equal, a job's sizes are brackets of steps up to about
+  8 hours: ×1, ×2, ×3, ×5, ×10, ×15 or ×20 to gather or process; a make the sizes up to about twenty steps (Armor
+  Fittings ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2). A gather holds
+  up to 20 a job (was 10). Times don't change.
+
 ### The per-Uma review (D230)
 
 The owner asked whether one Uma's upgrades take equal amounts and times on every line, and whether splitting weapons and

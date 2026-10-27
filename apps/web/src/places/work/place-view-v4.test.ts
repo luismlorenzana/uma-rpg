@@ -1,7 +1,6 @@
 // The farm by line's place pages as data (H111; farm-by-line.md FL2, FL5, FL6, FL16, FL22): a gathering place's ten raw
 // tiles, a making place's Process tiles and Make chips with their gates, each job's kind and sizes, the opening job,
 // the (i) and the quick look. Pure helpers: they don't read the switch.
-import { REFINE_BATCHES } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import { gatherTilesV4, helpLinesV4, initialJobV4, jobKindAtV4, jobSizesV4, makeGroupsV4, peekV4, processTilesV4 } from './place-view-v4'
 
@@ -34,15 +33,20 @@ describe('the farm by line\'s What step (FL22)', () => {
     expect(makeGroupsV4('mine', 50)).toEqual([])
   })
 
-  it('tells each job\'s kind and sizes: process ×1 … ×40, make and gather 1–10', () => {
+  it('tells each job\'s kind and sizes, up to about 8 hours (D233)', () => {
     expect(jobKindAtV4('mine-workbench', 'copper-ingot')).toBe('refine')
     expect(jobKindAtV4('weapon-forge', 'weapon-gem-g1')).toBe('craft')
     expect(jobKindAtV4('mine', 'tin-ore')).toBe('gather')
     expect(jobKindAtV4('lapidary', 'jewel-planet-1')).toBe('cut')
     expect(jobKindAtV4('den-workbench', 'cut-ruby')).toBe('refine')
-    expect(jobSizesV4('refine')).toBe(REFINE_BATCHES)
-    expect(jobSizesV4('craft')).toBeUndefined()
-    expect(jobSizesV4('gather')).toBeUndefined()
+    expect(jobSizesV4('tin-ore')).toEqual([1, 2, 3, 5, 10, 15, 20])
+    expect(jobSizesV4('copper-ingot')).toEqual([1, 2, 3, 5, 10, 15, 20])
+    expect(jobSizesV4('armor-fittings-g1')).toEqual([1, 2, 3, 5, 10])
+    expect(jobSizesV4('jewel-moon-1')).toEqual([1, 2, 3, 5])
+    expect(jobSizesV4('weapon-gem-g4')).toEqual([1, 2, 3])
+    expect(jobSizesV4('tome-ink-g1')).toEqual([1, 2, 3])
+    expect(jobSizesV4('accessory-setting-g1')).toEqual([1, 2])
+    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2])
   })
 
   it('opens on the highest grade she can take', () => {
