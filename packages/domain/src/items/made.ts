@@ -11,6 +11,7 @@
 import { accessorySlotCount, type GearTier } from '../economy/grades'
 import type { PlaceIdV3 } from '../economy/professions'
 import { madeIdentity, type MadeLine } from './made-id'
+import { farmByLine } from '../save/version'
 import { materialType, type MaterialBand, type MaterialLine, type MaterialTier } from './materials-id'
 
 const NUMERALS = ['I', 'II', 'III', 'IV', 'V'] as const
@@ -25,6 +26,8 @@ export function madeName(id: string): string | undefined {
   if (!made) return undefined
   if (made.line === 'branch-gem') return LINE_NAME[made.line]
   if (made.line === 'jewel-planet' || made.line === 'jewel-moon') return `${LINE_NAME[made.line]} ${NUMERALS[Math.ceil(made.grade / 2) - 1]}`
+  // The farm by line (FL14): the Weapon Gem raises Arms only and reads Arms Gem.
+  if (made.line === 'weapon-gem' && farmByLine()) return `Arms Gem G${made.grade}`
   return `${LINE_NAME[made.line]} G${made.grade}`
 }
 

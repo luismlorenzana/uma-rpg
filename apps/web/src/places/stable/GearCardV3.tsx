@@ -3,7 +3,7 @@
 // grade row with the made item that raises it, then Extra Stats. The data is `gear-equip.ts`'.
 import {
   ARMOR_LABEL, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf, EFFECT_LABEL,
-  gradeOf, ITEM_EFFECTS, isGrades, madeName, mightAt, raisePlan, starMapOf, umaPoints, umaTemplate, moonTemplate, WEAPON_LABEL,
+  farmByLine, gradeOf, ITEM_EFFECTS, isGrades, madeName, mightAt, raisePlan, starMapOf, umaPoints, umaTemplate, moonTemplate, WEAPON_LABEL,
   type AccessoryFamily, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
   type RpgDamageKind, type TierWorld, type UmaUpgrades,
 } from '@rpg/domain'
@@ -198,7 +198,7 @@ export function UpgradeView({ outfit, uma, world, tier, upgrades }: { outfit: Ro
   return (
     <div className="space-y-3">
       <section className="space-y-1.5 rounded-md bg-raised p-3">
-        <div className="flex items-center justify-between"><h4 className="text-micro">Grades</h4><HelpButton title="Grades"><p>A made item raises one slot a grade, up to G10. Grade g opens at Uma Lv 5g − 4. Weapon Gems, Armor Fittings and Accessory Settings come from the Forge, the Armorer and the Charm Shop.</p></HelpButton></div>
+        <div className="flex items-center justify-between"><h4 className="text-micro">Grades</h4><HelpButton title="Grades"><p>A made item raises one slot a grade, up to G10. Grade g opens at Uma Lv 5g − 4. {farmByLine() ? 'Arms Gems, Tome Ink, Armor Fittings and Accessory Settings come from the Forge, the Workbench, the Armorer and the Charm Shop.' : 'Weapon Gems, Armor Fittings and Accessory Settings come from the Forge, the Armorer and the Charm Shop.'}</p></HelpButton></div>
         {rows.map((row, i) => (
           <div key={row.key}>
             {(i === 0 || rows[i - 1]!.target.kind !== row.target.kind) && <h4 className="pt-1 pb-1 text-micro">{GROUP_LABEL[row.target.kind]}</h4>}

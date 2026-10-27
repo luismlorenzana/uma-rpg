@@ -1,8 +1,13 @@
 // What a job makes, for display: its name, grade and icon id (items, gear and Star Gems, P38, D144). From R2's switch
 // (H80) a material or a made item first: 36 material ids are also legacy ids, whose grades differ.
-import { gearById, gemById, itemById, madeIdentity, madeName, materialById, rpgRework } from '@rpg/domain'
+import { farmByLine, gearById, gemById, itemById, lineItem, madeIdentity, madeName, materialById, rpgRework } from '@rpg/domain'
 
 export function outputView(id: string): { name: string; icon: string; grade: number } {
+  if (farmByLine()) {
+    // The farm by line (FL5): a line item shows its grade; made items as R2's (`madeName` says Arms Gem).
+    const line = lineItem(id)
+    if (line) return { name: line.name, icon: id, grade: line.grade }
+  }
   if (rpgRework('economy')) {
     const material = materialById(id)
     if (material) return { name: material.name, icon: id, grade: 0 }

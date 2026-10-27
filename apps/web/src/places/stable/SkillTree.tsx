@@ -5,7 +5,7 @@
 // branch (free; her equipped skills follow). Nothing is learned and nothing costs points (CP14). The model is the domain's
 // `rpgTreeView`, which reads the catalog: only this lazy page imports it.
 import {
-  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, gearById, gearV1, gradeOf, isGrades, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
+  BATTLE_ENGINE_VERSION, classOf, classRankOf, classTrack, farmByLine, gearById, gearV1, gradeOf, isGrades, rpgActiveSlots, rpgClassSlots, rpgNode, rpgNodeSkill, rpgOpenDepth, rpgSkillRankFactor,
   RPG_SKILL_RANK_MAX, SaveRuleError, type BattleOutfit, type OwnedUma, type RpgBranch, type RpgClass, type RpgHand, type RpgProfile,
   type RpgTreeView, type RpgTreeViewNode, type RpgTreeViewTree, type TemplateOutfit, type TierWorld,
 } from '@rpg/domain'
@@ -94,7 +94,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
             <p>A party fights with one healer at most: a Paladin or a Cleric.</p>
             <p>Each weapon in her three slots opens its tree. Depths open at Class Rank 1, 10, 20, 30 and 40. At depth 3 the tree forks: branch A or B, free to swap. Every skill gains a rank every 2 Class Ranks, up to 5. Her Uma Level sets how many skills she can equip; until you pick, they are chosen for her.</p>
-            {graded ? <p>Each of her weapons has a grade, G0 to G10, raised with Weapon Gems on the Gear tab; any grade opens the tree.</p>
+            {graded ? <p>Each of her weapons has a grade, G0 to G10, raised with {farmByLine() ? 'Arms Gems or Tome Ink' : 'Weapon Gems'} on the Gear tab; any grade opens the tree.</p>
               : <p>She holds a Training weapon of every kind: no stats, but it opens the tree. A crafted weapon from the Forge does the same and adds its stats.</p>}
           </HelpButton>
         </div>
