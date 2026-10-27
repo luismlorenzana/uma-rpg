@@ -61,7 +61,7 @@ go to **ChatGPT, with full autonomy to merge and deploy** (owner, 2026-10-26). T
 |---|---|---|---|---|---|
 | H107 | The Gear tab in two views, Equip and Upgrade; one card for every accessory family; the Orb on her kinds only (WP22 follow-up) | ChatGPT | M | H82 | Done (`c07a463`) |
 
-**The farm by line** (the owner, 2026-10-26, D224; the design is
+**The farm by line** (the owner, 2026-10-26, D224; **live since H112**, D228; the design is
 [farm-by-line.md](../design/tier-rework/farm-by-line.md), FL1–FL24): every trade gathers, processes and makes its own
 line, on G1–G10 materials, Tier 1's focus; one item a making place (Arms Gems, Armor Fittings, Tome Ink, Accessory
 Settings, jewels). Built as R2 was: the rules dark, the screens inert, then a switch. **No art packet:** every icon
@@ -73,7 +73,7 @@ v30, so R3–R5 move to saves v31–v33 when it lands.
 | H109 | The rules (dark): the switch, fifty types by line and grade, Tome Ink's ids, one-line recipes, each making place processing its line, making at ¾ of a gather, gear items by channel, targets, the Exchange, the pacing ledger | Claude | L | H82 | Done (`78e4c68`) |
 | H110 | Save v30 (dark): the settle step shared with `toV28`, `toV30` (R2's types to G1 and G6), the v30 parse, a full-shaped v29 fixture | Claude | M | H109 | Done (`e2fe7fd`) |
 | H111 | The screens (inert): the place pages' Process and Make groups and sizes, gathering tiles, quick looks, the Exchange's line tabs, the Warehouse's grades, Tome Ink's icon and words, the Gear tab's items | Claude | L | H109 | Done (`2dea1d6`) |
-| H112 | **The switch:** `toV30` chained and save v30 live, R2's farm deleted, the API test, the manual, R3–R5's save numbers, a scratch migration in the pull request | Claude | M | H110, H111 | In progress (the main session) |
+| H112 | **The switch:** `toV30` chained and save v30 live, R2's farm deleted, the API test, the manual, R3–R5's save numbers, a scratch migration in the pull request | Claude | M | H110, H111 | Done (`53e8f61`) |
 
 **Waves:** 1) H109 → 2) H110 and H111 in parallel (domain save files against web files) → 3) H112.
 
@@ -219,6 +219,7 @@ for the fifth scenario (tiers T9).
 
 | Id | Task | Commit |
 |---|---|---|
+| H112 | **The farm by line is live** (D228), by the main session ([#60](https://github.com/luismlorenzana/uma-rpg/pull/60)): save v30 and `toV30` chained; R2's farm deleted (its catalog with tiers and bands, the ladder and cross-line recipes, single-kind places, its job kinds and env, the v28 request parse, its Exchange, targets and ledger paths, the Workbench grid and R2 What steps, `farmByLine`); the API test v29 → v30; the manual rewritten; R3–R5 on saves v31–v33; a full-shaped v29 scratch save migrated through the local API (before and after in the PR) and played: an Arms Gem and Tome Ink made and finished, a Tome raised with Tome Ink, a Katana with an Arms Gem | `53e8f61` |
 | H111 | The farm by line's screens, inert (D227), by the main session ([#59](https://github.com/luismlorenzana/uma-rpg/pull/59)): inside `PlaceV3`'s shell, a gathering place's ten raw tiles and a making place's Process tiles and Make chips (`place-view-v4.ts`, `PlaceV4.tsx`), the sheet's sizes by the picked job's kind with no kit change, the (i), header and quick look; the Exchange's line tabs by grade; the Warehouse's graded materials; the words, icons (Tome Ink on the essences' infusion frames) and `madeName`'s Arms Gem; checked locally with the switch applied by hand on a v29 scratch save | `2dea1d6` |
 | H110 | Save v30, dark (D226), by the main session ([#58](https://github.com/luismlorenzana/uma-rpg/pull/58)): `settleWork` shared with `toV28`; `toV30` (not chained) settles work and converts R2's sixty types by `V30_TYPES` (low → G1, high → G6); the v30 parse under `farmByLine()` (`madeAtV30`, `parseRequestV30`, `v30Work`, no tier check on stock); `v29.fixture.ts`, a full-shaped v29 save with R2's own work rows and Tier 1, 2 and 3 stock | `e2fe7fd` |
 | H109 | The farm by line's rules, dark (D225), by the main session ([#57](https://github.com/luismlorenzana/uma-rpg/pull/57)): `farmByLine()` on save v30 (`save/version.ts`, mocked by `version-at.fixture.ts`); 100 line items from uma-art's families (`items/lines.ts`); Tome Ink's ids; one-line recipes (`made-v4.ts`); each making place processing its own line (`places-v4.ts`, `jobKindV4`); making at ¾ of a gather (`kinds-v4/`, `env-v4.ts`); gear by channel, targets by line, the Exchange by grade, names and blurbs under the switch; the ledger at R2's pace (forty 1.27 a day, twenty 0.54) | `78e4c68` |
