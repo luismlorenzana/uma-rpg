@@ -1,8 +1,10 @@
 # The Tier rework: implementation plan
 
-> **Versions re-planned by D221 (2026-10-26):** save v29 is the owner's "grant is tickets only" step, live. R3, R4 and R5
-> keep their engines (v18, v19, v20) and take saves **v30, v31 and v32**: read this doc's and their packets' save v29 as
-> v30, v30 as v31 and v31 as v32.
+> **Versions re-planned by D221 and D224 (2026-10-26):** save v29 is the owner's "grant is tickets only" step and save v30
+> the farm by line (H109–H112), both live. R3, R4 and R5 keep their engines (v18, v19, v20) and take saves **v31, v32 and
+> v33**: read this doc's and their packets' save v29 as v31, v30 as v32 and v31 as v33. The farm by line
+> ([farm-by-line.md](farm-by-line.md)) replaces R2's materials, recipes and processing for every tier until a later
+> release gives Tiers 2 and 3 their own.
 
 > **2026-10-25, D198.** The six approved docs (D192–D197) become five live releases and 42 packets (H64–H105). The
 > owner asked for "proper phasing to have full releases along the way", so this replaces the one Tier 1 switch of

@@ -1,13 +1,10 @@
-// The Warehouse under the farm by line (H111; farm-by-line.md FL16, FL23), with its switch mocked on: materials carry
+// The Warehouse under the farm by line (H111; farm-by-line.md FL16, FL23): materials carry
 // their grades (so the kit's grade chips filter every shelf), each line raw then refined by grade, Tome Ink on Made
 // items after the Arms Gems, and the words.
 import { newTierWorld } from '@rpg/domain'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { madeUse, materialFacts, materialPair } from '../../items/v3-words'
 import { warehouseView } from './warehouse-shelves'
-
-vi.mock('../../../../../packages/domain/src/save/version', async (orig) =>
-  (await import('../../../../../packages/domain/src/save/version-at.fixture')).versionAt(30, await orig()))
 
 describe('the Warehouse by grade (FL23)', () => {
   it('grades every material, orders each line raw then refined by grade, and puts Tome Ink after the Arms Gems', () => {

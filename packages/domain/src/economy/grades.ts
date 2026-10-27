@@ -8,7 +8,6 @@ import { MIGHT_BY_GRADE } from './gear'
 import type { ArmorSlot } from './ranks'
 import { noPoints, type Points } from './bonus'
 import { POINT_HP } from './pacing'
-import { farmByLine } from '../save/version'
 
 export interface UmaGrades {
   weapons: Partial<Record<RpgWeapon, { grade: number }>>
@@ -90,20 +89,20 @@ export function gradePoints(grades: UmaGrades, half: ArmorHalf, tier: GearTier):
 
 export const armorHalf = (classId: RpgClass): ArmorHalf => RPG_CLASS_ARMOR[classId]
 
-/** The made line a slot climbs with: a weapon's Weapon Gems, or under the farm by line (FL4) an Arms weapon's Arms Gems
- * (the same ids) and a Tome's Tome Ink; armor's Armor Fittings; an accessory's Accessory Settings. */
-export function gradeLine(target: GradeTarget, byLine: boolean = farmByLine()): GradeLine {
-  if (target.kind === 'weapon') return byLine && isRpgElement(rpgWeaponKind(target.weapon)) ? 'tome-ink' : 'weapon-gem'
+/** The made line a slot climbs with (FL4): an Arms weapon's Arms Gems, a Tome's Tome Ink, armor's Armor Fittings, an
+ * accessory's Accessory Settings. */
+export function gradeLine(target: GradeTarget): GradeLine {
+  if (target.kind === 'weapon') return isRpgElement(rpgWeaponKind(target.weapon)) ? 'tome-ink' : 'weapon-gem'
   return target.kind === 'armor' ? 'armor-fittings' : 'accessory-setting'
 }
 
-export function gradeItemId(target: GradeTarget, grade: number, byLine: boolean = farmByLine()): string {
-  return gradeItem(gradeLine(target, byLine), grade)
+export function gradeItemId(target: GradeTarget, grade: number): string {
+  return gradeItem(gradeLine(target), grade)
 }
 
-const itemWords = (target: GradeTarget, byLine: boolean): { one: string; many: string } => {
-  const line = gradeLine(target, byLine)
-  if (line === 'weapon-gem') return byLine ? { one: 'Arms Gem', many: 'Arms Gems' } : { one: 'Weapon Gem', many: 'Weapon Gems' }
+const itemWords = (target: GradeTarget): { one: string; many: string } => {
+  const line = gradeLine(target)
+  if (line === 'weapon-gem') return { one: 'Arms Gem', many: 'Arms Gems' }
   if (line === 'tome-ink') return { one: 'Tome Ink', many: 'Tome Ink' }
   if (line === 'armor-fittings') return { one: 'Armor Fittings', many: 'Armor Fittings' }
   return { one: 'Accessory Setting', many: 'Accessory Settings' }
@@ -125,11 +124,10 @@ export function raiseBlock(
   const highest = Math.min(GRADE_MAX, Math.max(current + 1, to))
   const gate = gradeGateLevel(highest)
   if (umaLevel < gate) return `Needs Lv ${gate}`
-  const byLine = farmByLine()
   const missing = Array.from({ length: highest - current }, (_, index) => current + index + 1)
-    .filter((grade) => (stock[gradeItemId(target, grade, byLine)] ?? 0) < 1)
+    .filter((grade) => (stock[gradeItemId(target, grade)] ?? 0) < 1)
   if (missing.length === 0) return null
-  const words = itemWords(target, byLine)
+  const words = itemWords(target)
   return highest - current === 1
     ? `Needs 1 ${words.one} G${missing[0]}`
     : `Needs ${words.many} ${listGrades(missing)}`

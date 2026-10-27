@@ -2,8 +2,11 @@
 
 **uma-rpg · Claude · L · Needs: H90 · Unblocks: H92, H93 (and through them H94–H97)**
 
-> **Versions re-planned by D221 (2026-10-26):** save v29 is taken (the owner's "grant is tickets only" step, live). Read
-> this packet's save v29 as **v30**, v30 as **v31** and v31 as **v32**; engines unchanged.
+> **Versions re-planned by D221 and D224 (2026-10-26):** saves v29 (the owner's "grant is tickets only" step) and v30 (the
+> farm by line, H112) are taken and live. Read this packet's save v29 as **v31**, v30 as **v32** and v31 as **v33**;
+> engines unchanged. Materials, recipes and the Workbench are the farm by line's
+> ([farm-by-line.md](../../design/tier-rework/farm-by-line.md)): re-read them before any step that names R2's pairs, the
+> ladder or a cross-line recipe.
 
 ## Why
 

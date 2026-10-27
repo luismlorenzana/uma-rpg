@@ -1,19 +1,23 @@
 // Making under the farm by line (D224; farm-by-line.md FL3, FL6, FL9, FL10; H109): a making place makes its one item from
 // its own line's refined items of the item's grade (`madeRecipeV4`), three quarters of a gather for each refined item in
 // it (`makeMinutesV4`), grade g at Craft Lv 5g − 4 (a jewel's grade is its node's); paid into the Warehouse. The Branch
-// Gem waits for R3, as in R2 (`madeLive`).
+// Gem waits for R3 (`madeLive`).
 import { payItems, workRefusal, type WorkKindRules } from '@luismlorenzana/uma-work'
 import type { JobKind } from '../../economy/jobs'
 import { jobExp, makeMinutesV4 } from '../../economy/pacing'
 import { placeSpecV4 } from '../../economy/places-v4'
 import { gradeUnlockLevel } from '../../items/catalog'
-import { madeIdentity } from '../../items/made-id'
+import { madeIdentity, type MadeLine } from '../../items/made-id'
 import { madeRecipeV4 } from '../../items/made-v4'
 import type { TierWorld } from '../../save/save'
 import { craftLevel, many, secondsAt } from '../kinds/shared'
-import { madeLive } from '../kinds-v3/make'
+import { rpgRework } from '../../rpg/battle/caps'
 import type { KindSetup } from '../kinds-v3/setup'
 import { tradeBlock } from '../kinds-v3/trade'
+
+/** Whether a made line is made in a world of this tier now: everything but the Branch Gem, which waits for R3's weapons
+ * (v18) in a Tier 2 world or above. */
+export const madeLive = (line: MadeLine, tier: number): boolean => line !== 'branch-gem' || (rpgRework('t2Weapons') && tier >= 2)
 
 export function makeV4(kind: Extract<JobKind, 'craft' | 'cut'>, { tier, tradeOf }: KindSetup): WorkKindRules<TierWorld> {
   return {

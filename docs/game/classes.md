@@ -151,8 +151,8 @@ one twin set ([combat](combat.md#weaknesses-shields-and-breaks)).
 **Three weapon slots, by channel (D98; CP2, engine v16).** A class has three slots, each an **Arms** or a **Tome** slot,
 the lead channel first: a Brawler three Arms, a Mage three Tomes, a Spell Blade and a Paladin two Arms and a Tome, a
 Summoner and a Cleric two Tomes and an Arm. Any kind of a slot's channel fits it, three different kinds, and every class
-picks; the weapon in each slot opens its tree. **Each weapon has a grade** (R2, WP2), G0 to G10, raised with Weapon
-Gems; G0 opens the tree with no Might, and each grade adds its Might to the hits made with that weapon
+picks; the weapon in each slot opens its tree. **Each weapon has a grade** (R2, WP2), G0 to G10, raised with Arms
+Gems for an Arms weapon and Tome Ink for a Tome (since H112, FL4); G0 opens the tree with no Might, and each grade adds its Might to the hits made with that weapon
 ([materials](materials.md#gear)). A weapon's grade serves every class that holds it. A new class starts on its three
 defaults (the presets below). When she stops slotting a kind, her equipped skills of its tree leave her loadout; her
 line on it stays. Fights from engines v6–v15 replay with five weapons a class, and v6–v16 with crafted pieces.

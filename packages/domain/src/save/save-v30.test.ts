@@ -1,14 +1,11 @@
-// Save v30's parse with the farm by line's switch on (H110; farm-by-line.md FL2, FL5, FL8): a migrated world reads, a
-// making place's work holds a process or a make of its own line, and the Warehouse holds the same fifty types in every
-// world. `farmByLine` is mocked to save v30, which H112 makes live.
-import { describe, expect, it, vi } from 'vitest'
+// Save v30's parse (H110, live since H112; farm-by-line.md FL2, FL5, FL8): a migrated world reads, a making place's work
+// holds a process or a make of its own line, and the Warehouse holds the same fifty types in every world.
+import { describe, expect, it } from 'vitest'
 import { toV30 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 import { gradedUma, gradedWorld } from './economy-v3.fixture'
 import { V29_T0, v29Save } from './v29.fixture'
 import { startJob } from './work'
-
-vi.mock('./version', async (orig) => (await import('./version-at.fixture')).versionAt(30, await orig()))
 
 type Raw = Record<string, unknown>
 const json = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
@@ -25,7 +22,7 @@ function withJob(place: string, item: string, stock: Record<string, number>): Sa
   return json(startJob(save, place, 0, { outfitId: '101' }, item, 1, V29_T0))
 }
 
-describe('save v30\'s parse (switch on)', () => {
+describe('save v30\'s parse', () => {
   it('reads the migrated save: settled, converted, every world', () => {
     const parsed = parseSave(v30Save())
     expect(parsed.schemaVersion).toBe(30)

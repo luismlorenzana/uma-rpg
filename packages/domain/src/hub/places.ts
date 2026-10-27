@@ -3,7 +3,6 @@
 // global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
-import { farmByLine } from '../save/version'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -133,20 +132,9 @@ const WILDS_V1: Place[] = [
 const placeV3 = (at: number, id: string, kind: PlaceKind, name: string, opensIn: SliceId, blurb: string, detail: string, frame?: string): Place => ({
   id, page: 'wilds', kind, name, blurb, details: [detail, 'Four slots, ×1.25'], slots: 4, opensIn, at: WILDS_LAYOUT[at]!, ...(frame ? { frame } : {}),
 })
-const WILDS_V3: Place[] = [
-  placeV3(0, 'mine', 'gather-site', 'Mine', 'S4', 'Mining: ores into ingots.', 'Two ores a tier'),
-  placeV3(1, 'forge', 'station', 'Forge', 'S7', 'Weapon Crafting: Weapon Gems.', 'Weapon Gems G1–G10'),
-  placeV3(2, 'forest', 'gather-site', 'Forest', 'S4', 'Wood Chopping: logs into planks.', 'Two woods a tier'),
-  placeV3(3, 'armorer', 'station', 'Armorer', 'S7', 'Armor Crafting: Armor Fittings.', 'Armor Fittings G1–G10', 'lancers-barracks'),
-  placeV3(4, 'fields', 'gather-site', 'Fields', 'S4', 'Farming: vegetables for kitchen cuts.', 'Two vegetables a tier', 'vegetable-garden'),
-  placeV3(5, 'workbench', 'station', 'Workbench', 'S4', 'Material Processing: raw into refined.', 'Every material, ×1 to ×40'),
-  placeV3(6, 'fishery', 'gather-site', 'Fishery', 'S4', 'Fishing: fish into fillets.', 'Two fish a tier'),
-  placeV3(7, 'charm-shop', 'station', 'Charm Shop', 'S7', 'Accessory Crafting: Accessory Settings.', 'Accessory Settings G1–G10', 'arcane-armory'),
-  placeV3(8, 'monster-den', 'gather-site', 'Monster Den', 'S4', 'Hunting: stones into cut stones.', 'Two stones a tier'),
-  placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Planet and Moon Jewels I–V'),
-]
 
-/** The farm by line's Wilds (D224, FL16; H109): R2's places, each one line's, a making place processing its line too. */
+/** The Wilds (R2's places; the farm by line's words, D224, FL16): each place one line's, a making place processing its
+ * line too. */
 const WILDS_V4: Place[] = [
   placeV3(0, 'mine', 'gather-site', 'Mine', 'S4', 'Mining: metal, G1–G10.', 'Ores G1–G10'),
   placeV3(1, 'forge', 'station', 'Forge', 'S7', 'Arms Crafting: Arms Gems.', 'Processes Metal, makes Arms Gems G1–G10'),
@@ -160,11 +148,10 @@ const WILDS_V4: Place[] = [
   placeV3(9, 'lapidary', 'station', 'Lapidary', 'S6', 'Jewel Crafting: Planet and Moon Jewels.', 'Processes Stone, makes Planet and Moon Jewels I–V'),
 ]
 
-/** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, R2's ten places from v17,
- * the farm by line's from its switch (save v30, H112). */
+/** The Wilds by generation (H77), as `learningPlaces`: today's eleven facilities to engine v16, the ten places from v17
+ * (the farm by line's words since H112). */
 export function wildsPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
-  if (rpgRework('economy', engine) && farmByLine()) return WILDS_V4
-  return rpgRework('economy', engine) ? WILDS_V3 : WILDS_V1
+  return rpgRework('economy', engine) ? WILDS_V4 : WILDS_V1
 }
 
 /** The Learning District's class halls are its Halls of Heroes (D106): four Hero seats each, each seat's Hero with up to

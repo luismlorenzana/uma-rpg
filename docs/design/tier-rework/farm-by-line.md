@@ -1,6 +1,6 @@
 # The farm by line: three steps for every trade, on G1–G10 materials
 
-> **The owner's request, 2026-10-26 (D224); the main session's design.** It replaces parts of
+> **Live from H112 (2026-10-26, save v30).** The owner's request, 2026-10-26 (D224); the main session's design. It replaces parts of
 > [profession-progression](profession-progression.md) (§3, §4's processing, §6's recipes and times, PP7–PP13, PP17).
 > It is built in four packets: H109 (the rules, dark), H110 (save v30, dark), H111 (the screens, inert) and H112 (the
 > switch). Each packet cites the calls below by number (FL1…FL24).

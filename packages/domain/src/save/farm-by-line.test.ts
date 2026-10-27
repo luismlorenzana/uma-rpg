@@ -1,8 +1,7 @@
-// The farm by line through the save's rules, with its switch on (H109; farm-by-line.md FL4, FL5, FL9, FL12–FL14, FL22):
-// the Warehouse's ids, work on its env (a job's kind by its item), gear by channel (Arms Gems and Tome Ink), Can
-// upgrade, Ascend, targets by line, the Exchange by grade and the names. `farmByLine` is mocked to save v30, which H112
-// makes live.
-import { describe, expect, it, vi } from 'vitest'
+// The farm by line through the save's rules (H109, live since H112; farm-by-line.md FL4, FL5, FL9, FL12–FL14, FL22): the
+// Warehouse's ids, work on its env (a job's kind by its item), gear by channel (Arms Gems and Tome Ink), Can upgrade,
+// Ascend, targets by line, the Exchange by grade and the names.
+import { describe, expect, it } from 'vitest'
 import { gradeItemId, raiseBlock, newGrades, type GradeTarget } from '../economy/grades'
 import { stockName } from '../economy/stock'
 import { wildsPlaces } from '../hub/places'
@@ -10,7 +9,7 @@ import { isStockItemId } from '../items/stock-id'
 import { liveWorkEnv } from '../work/env-v3'
 import { RPG_BUILDINGS_V4 } from '../work/env-v4'
 import { ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
-import { buyRawItem, rawPriceV3, sellPrice, stockedTypes } from './exchange'
+import { buyRawItem, rawPriceV4, sellPrice, stockedTypes } from './exchange'
 import { raiseGrade, raiseGradeTo } from './forge'
 import { ascend, signUpRift } from './rift'
 import { riftWorldSave, T, TWENTY } from './rift-rules.fixture'
@@ -18,10 +17,8 @@ import { worldOf } from './rules'
 import type { Save, TierWorld } from './save'
 import { facilityTargets, targetPlan } from './targets'
 import { upgradesFor } from './upgrades'
-import { farmByLine, SAVE_SCHEMA_VERSION } from './version'
+import { SAVE_SCHEMA_VERSION } from './version'
 import { planJob, startJob } from './work'
-
-vi.mock('./version', async (orig) => (await import('./version-at.fixture')).versionAt(30, await orig()))
 
 const saveOf = (world: TierWorld, tier = 1): Save => ({
   schemaVersion: SAVE_SCHEMA_VERSION,
@@ -38,17 +35,14 @@ function worldWith(tier: number, continents: readonly number[]): TierWorld {
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 
-describe('the farm by line\'s switch (save v30)', () => {
-  it('is on here, by the mock', () => {
+describe('the farm by line (save v30)', () => {
+  it('is the live save', () => {
     expect(SAVE_SCHEMA_VERSION).toBe(30)
-    expect(farmByLine()).toBe(true)
-    expect(farmByLine(29)).toBe(false)
   })
 
   it('lets the Warehouse hold the hundred line items and Tome Ink (FL5, FL14)', () => {
     for (const id of ['trout', 'diced-potato', 'cut-ruby', 'tome-ink-g3', 'weapon-gem-g3', 'iron-ore']) expect(isStockItemId(id), id).toBe(true)
-    expect(isStockItemId('tome-ink-g3', 17, 29)).toBe(false)
-    expect(isStockItemId('trout', 17, 29)).toBe(false)
+    expect(isStockItemId('tome-ink-g3', 16)).toBe(false)
     expect(isStockItemId('branch-gem')).toBe(false)
   })
 })
@@ -85,7 +79,6 @@ describe('gear by channel (FL4, FL16)', () => {
   it('raises an Arms weapon with Arms Gems and a Tome with Tome Ink, each refused with the other\'s item', () => {
     expect(gradeItemId(katana, 3)).toBe('weapon-gem-g3')
     expect(gradeItemId(fire, 3)).toBe('tome-ink-g3')
-    expect(gradeItemId(fire, 3, false)).toBe('weapon-gem-g3')
     expect(worldOf(raiseGrade(one({ 'weapon-gem-g1': 1 }), '101', katana, NOW), '1').umas['101']!.gear).toMatchObject({ weapons: { katana: { grade: 1 } } })
     expect(worldOf(raiseGrade(one({ 'tome-ink-g1': 1 }), '101', fire, NOW), '1').items).toEqual({})
     expect(() => raiseGrade(one({ 'weapon-gem-g1': 1 }), '101', fire, NOW)).toThrow('Needs 1 Tome Ink G1')
@@ -157,7 +150,7 @@ describe('the Exchange by grade (FL12, FL13)', () => {
   })
 
   it('prices raw G1–G5 at 30 and G6–G10 at 80 Laurels × the tier, and sells as R2 does by grade', () => {
-    expect([rawPriceV3('tin-ore', 1), rawPriceV3('gold-ore', 1), rawPriceV3('trout', 2), rawPriceV3('tin-ingot', 1)]).toEqual([30, 80, 60, 0])
+    expect([rawPriceV4('tin-ore', 1), rawPriceV4('gold-ore', 1), rawPriceV4('trout', 2), rawPriceV4('tin-ingot', 1)]).toEqual([30, 80, 60, 0])
     expect([sellPrice('items', 'trout'), sellPrice('items', 'eel'), sellPrice('items', 'eel-fillet'), sellPrice('items', 'tome-ink-g3', 2)]).toEqual([6, 16, 32, 48])
     const world = worldWith(1, [1])
     const bought = buyRawItem(saveOf({ ...world, wallet: { ...world.wallet, laurels: 100 } }), 'tin-ore', 3, stockedTypes(world, 1), NOW, '1')

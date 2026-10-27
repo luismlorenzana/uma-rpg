@@ -3,7 +3,8 @@
 // until one arrives. Her trade comes from the caller (`TradeOf`, from her template's calling, H80): rules that can't say
 // (settles, queue starts already accepted, the API's parse) pass none, and the gate is open (D208).
 import { refuse, type Refusal } from '@luismlorenzana/uma-work'
-import { placeSpecV3, tradeProfessions, type TradeOf } from '../../economy/professions'
+import { placeSpecV4 } from '../../economy/places-v4'
+import { tradeProfessions, type TradeOf } from '../../economy/professions'
 import type { TierWorld } from '../../save/save'
 
 /** The trade gate's refusal code and words (`refusalText` maps it). */
@@ -13,7 +14,7 @@ export const ANOTHER_TRADE = 'Another trade'
 /** Whether a place is an open shop in this world: no owned Uma (by `tradeOf`) has a trade with its profession. An Uma
  * whose trade the caller can't say counts for none. */
 export function openShop(world: Pick<TierWorld, 'umas'>, placeId: string, tradeOf: TradeOf): boolean {
-  const profession = placeSpecV3(placeId)?.profession
+  const profession = placeSpecV4(placeId)?.profession
   if (!profession) return false
   return !Object.keys(world.umas).some((id) => {
     const trade = tradeOf(id)
@@ -26,7 +27,7 @@ export function openShop(world: Pick<TierWorld, 'umas'>, placeId: string, tradeO
 export function tradeBlock(world: Pick<TierWorld, 'umas'>, outfitId: string, placeId: string, tradeOf?: TradeOf): Refusal | null {
   const trade = tradeOf?.(outfitId) ?? null
   if (!tradeOf || trade === null) return null
-  const profession = placeSpecV3(placeId)?.profession
+  const profession = placeSpecV4(placeId)?.profession
   if (!profession || tradeProfessions(trade).includes(profession) || openShop(world, placeId, tradeOf)) return null
   return refuse(TRADE_REFUSAL, ANOTHER_TRADE)
 }

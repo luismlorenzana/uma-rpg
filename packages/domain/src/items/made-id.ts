@@ -1,7 +1,6 @@
 // The made items' ids (R2, D208–D209): what the Forge, the Armorer, the Charm Shop and the Lapidary make. Ids, lines and grades
-// only, safe for the main bundle and the save's parse; names, places and recipes are `items/made.ts`'s (H77). Tome Ink
-// (D224, FL14; H109) is the farm by line's, made at the Workbench for Tomes; a save holds it only when `farmByLine()`
-// (`stock-id.ts`).
+// only, safe for the main bundle and the save's parse; names and places are `items/made.ts`'s (H77), recipes
+// `made-v4.ts`'. Tome Ink (D224, FL14; H109) is the farm by line's, made at the Workbench for Tomes.
 export const MADE_LINES = ['weapon-gem', 'armor-fittings', 'accessory-setting', 'branch-gem', 'jewel-planet', 'jewel-moon', 'tome-ink'] as const
 export type MadeLine = typeof MADE_LINES[number]
 export interface MadeIdentity { id: string; line: MadeLine; grade: number }
@@ -16,7 +15,7 @@ export const MADE_IDENTITIES: readonly MadeIdentity[] = [
 const BY_ID = new Map(MADE_IDENTITIES.map((m) => [m.id, m]))
 export const madeIdentity = (id: string): MadeIdentity | undefined => BY_ID.get(id)
 export const isMadeId = (id: string): boolean => BY_ID.has(id)
-/** The made lines a slot's grade climbs with: weapons (Tomes with Tome Ink under the farm by line), armor, accessories. */
+/** The made lines a slot's grade climbs with: an Arms weapon's Arms Gems, a Tome's Tome Ink, armor, accessories. */
 export type GradeLine = 'weapon-gem' | 'tome-ink' | 'armor-fittings' | 'accessory-setting'
 export const gradeItem = (line: GradeLine, grade: number): string => `${line}-g${grade}`
 export const jewelId = (body: 'planet' | 'moon', numeral: number): string => `jewel-${body}-${numeral}`

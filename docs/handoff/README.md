@@ -77,7 +77,7 @@ v30, so R3–R5 move to saves v31–v33 when it lands.
 
 **Waves:** 1) H109 → 2) H110 and H111 in parallel (domain save files against web files) → 3) H112.
 
-**R3. Tier 2's weapons** (engine v18, save **v30**; its packets' "v29" reads v30, D221):
+**R3. Tier 2's weapons** (engine v18, save **v31**; its packets' "v29" reads v31, D221, D224). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -92,7 +92,7 @@ v30, so R3–R5 move to saves v31–v33 when it lands.
 
 **Waves:** 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
 
-**R4. Tier 2's classes** (engine v19, save **v31**; its packets' "v30" reads v31, D221):
+**R4. Tier 2's classes** (engine v19, save **v32**; its packets' "v30" reads v32, D221, D224):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -106,7 +106,7 @@ v30, so R3–R5 move to saves v31–v33 when it lands.
 
 **Waves:** 1) H91 → 2) H92, H93 → 3) H94, H96 → 4) H95 → 5) H97.
 
-**R5. Tier 3** (engine v20, save **v32**; its packets' "v31" reads v32, D221):
+**R5. Tier 3** (engine v20, save **v33**; its packets' "v31" reads v33, D221, D224):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|

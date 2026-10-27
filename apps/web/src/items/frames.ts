@@ -1,7 +1,7 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
 // the indexes never ship in the main chunk; frames.test.ts pins every position against them.
 import {
-  gearById, GEM_IDENTITIES, ITEM_FAMILIES, lineItem, madeIdentity, materialById, itemById,
+  gearById, GEM_IDENTITIES, ITEM_FAMILIES, lineItem, madeIdentity, itemById,
   type AccessorySlotState, type EquipType, type RpgDamageKind,
 } from '@rpg/domain'
 
@@ -66,16 +66,11 @@ function accessoryFrame(id: string): IconFrame | null | undefined {
 export function iconFrame(id: string): IconFrame | null {
   const accessory = accessoryFrame(id)
   if (accessory !== undefined) return accessory
-  // A line item (the farm by line's hundred, R2's sixty among them at the same frames): its family's row at its grade.
+  // A line item (the Wilds' hundred, D224): its family's row at its grade.
   const line = lineItem(id)
   if (line) return {
     sheet: 'items', x: (line.art.grade - 1) * ATLAS_CELL,
     y: (MATERIAL_ROW[line.art.family] + (line.refined ? 1 : 0)) * ATLAS_CELL,
-  }
-  const material = materialById(id)
-  if (material) return {
-    sheet: 'items', x: (material.art.grade - 1) * ATLAS_CELL,
-    y: (MATERIAL_ROW[material.art.family] + (material.refined ? 1 : 0)) * ATLAS_CELL,
   }
   const made = madeIdentity(id)
   if (made) {

@@ -2,10 +2,9 @@
 // Tickets and Sweep Tickets; spare stock sells back for Laurels; Marks buy Manuals (D102). A Sweep replays a beaten
 // regular stage at once and pays what a replay pays (D79).
 //
-// R2 (profession-progression.md §10, PP17; H77), from the economy stage: raw materials by pair, the base pair's low type
-// after the tier's first win and its high type after a win on continent 3, every later tier's pair low after continent 2
-// and high after continent 4, at 30 and 80 Laurels × the world's tier; selling materials and made items × the tier.
-// Tickets as today. The farm by line (D224, FL12, FL13; H109) reads the same rule by grade: G1–G5 as low, G6–G10 as high.
+// From the economy stage (R2, PP17; the farm by line since H112, D224, FL12, FL13): raw materials by grade, G1–G5 after
+// the tier's first win at 30 Laurels and G6–G10 after a win on continent 3 at 80, × the world's tier, in every world;
+// selling materials and made items × the tier. Tickets as today.
 import { chapterGrades, rawItemPrice, REPLAY_SHARE, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE } from '../economy/pacing'
 import { gemById } from '../economy/gems'
 import { gearById } from '../economy/gear'
@@ -13,7 +12,6 @@ import { itemById } from '../items/catalog'
 import { worldMaterialTier } from '../items/made'
 import { madeIdentity } from '../items/made-id'
 import { LINE_ITEMS, lineItem } from '../items/lines'
-import { MATERIAL_IDENTITIES, materialIdentity, type MaterialBand } from '../items/materials-id'
 import { rpgRework } from '../rpg/battle/caps'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
@@ -21,7 +19,6 @@ import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, 
 import { stageBand, stagePay } from '../world/world'
 import { gearStock, gemStock, isGrades, PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
-import { farmByLine } from './version'
 
 export const MAX_PURCHASE = 99
 
@@ -52,37 +49,28 @@ export function continentReached(world: TierWorld): number {
   return reached
 }
 
-/** The continent a pair's type opens after (PP17): the base pair's low type after the first win, its high type after
- * continent 3; a later tier's pair low after continent 2, high after 4. */
-export const stockedAfter = (materialTier: number, band: MaterialBand): number => (materialTier === 1 ? (band === 'low' ? 1 : 3) : band === 'low' ? 2 : 4)
+/** A raw grade's band (FL12): G1–G5 low, G6–G10 high. */
+export type RawBand = 'low' | 'high'
+export const rawBand = (grade: number): RawBand => (grade <= 5 ? 'low' : 'high')
+/** The continent a band opens after: G1–G5 after the tier's first win, G6–G10 after continent 3. */
+export const stockedAfter = (band: RawBand): number => (band === 'low' ? 1 : 3)
 
-/** The raw materials the Exchange sells now in a world of `tier` (R2): every tier's types up to its own, by pair. Under the
- * farm by line (FL12), every world's ten grades a line: G1–G5 after the tier's first win, G6–G10 after continent 3. */
-export function stockedTypes(world: TierWorld, tier: string | number): string[] {
+/** The raw materials the Exchange sells now in a world (FL12): each line's ten grades, by band, in every tier. */
+export function stockedTypes(world: TierWorld, _tier?: string | number): string[] {
   const reached = continentReached(world)
-  if (farmByLine()) return LINE_ITEMS.filter((m) => !m.refined && reached >= (m.grade <= 5 ? 1 : 3)).map((m) => m.id)
-  const top = worldMaterialTier(Number(tier))
-  return MATERIAL_IDENTITIES.filter((m) => !m.refined && m.tier <= top && reached >= stockedAfter(m.tier, m.band)).map((m) => m.id)
+  return LINE_ITEMS.filter((m) => !m.refined && reached >= stockedAfter(rawBand(m.grade))).map((m) => m.id)
 }
 
-/** R2's raw prices (PP17): a low type 30 Laurels, a high type 80, × the world's tier (D170: fights pay × tier); 0 for an
- * id that isn't a raw material. */
-export const RAW_PRICE_V3: Readonly<Record<MaterialBand, number>> = { low: 30, high: 80 }
-export function rawPriceV3(id: string, tier: string | number): number {
-  if (farmByLine()) return rawPriceV4(id, tier)
-  const m = materialIdentity(id)
-  return m && !m.refined ? RAW_PRICE_V3[m.band] * worldMaterialTier(Number(tier)) : 0
-}
-
-/** The farm by line's raw prices (FL12): G1–G5 30 Laurels, G6–G10 80, × the world's tier; 0 for an id that isn't a raw
- * line item. */
+/** Raw prices (FL12): a G1–G5 item 30 Laurels, a G6–G10 one 80, × the world's tier (D170: fights pay × tier). */
+export const RAW_PRICE_V3: Readonly<Record<RawBand, number>> = { low: 30, high: 80 }
+/** A raw line item's price in a world of `tier`; 0 for an id that isn't one. */
 export function rawPriceV4(id: string, tier: string | number): number {
   const m = lineItem(id)
-  return m && !m.refined ? RAW_PRICE_V3[m.grade <= 5 ? 'low' : 'high'] * worldMaterialTier(Number(tier)) : 0
+  return m && !m.refined ? RAW_PRICE_V3[rawBand(m.grade)] * worldMaterialTier(Number(tier)) : 0
 }
 
-/** Buys raw items: by grade to engine v16 (`stocked` from `stockedGrades`), by type from R2 (`stocked` from
- * `stockedTypes`, refusing a type it doesn't stock). */
+/** Buys raw items: by grade to engine v16 (`stocked` from `stockedGrades`), by id from the economy stage (`stocked` from
+ * `stockedTypes`, refusing one it doesn't stock). */
 export function buyRawItem(save: Save, itemId: string, quantity: number, stocked: readonly number[] | readonly string[], now: string, tier = TIER_ONE): Save {
   if (rpgRework('economy')) return buyMaterial(save, itemId, quantity, stocked as readonly unknown[], now, tier)
   const world = worldOf(save, tier)
@@ -97,14 +85,14 @@ export function buyRawItem(save: Save, itemId: string, quantity: number, stocked
   }, now)
 }
 
-/** R2's purchase: a stocked raw material at `rawPriceV3`. */
+/** The economy stage's purchase: a stocked raw line item at `rawPriceV4`. */
 function buyMaterial(save: Save, itemId: string, quantity: number, stocked: readonly unknown[], now: string, tier: string): Save {
   const world = worldOf(save, tier)
-  const material = farmByLine() ? lineItem(itemId) : materialIdentity(itemId)
+  const material = lineItem(itemId)
   if (!material || material.refined) throw new SaveRuleError('bad-job', 'the Exchange sells raw items only')
   if (!stocked.includes(itemId)) throw new SaveRuleError('bad-job', 'Not stocked yet')
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PURCHASE) throw new SaveRuleError('bad-count', `buy 1–${MAX_PURCHASE}`)
-  const cost = rawPriceV3(itemId, tier) * quantity
+  const cost = rawPriceV4(itemId, tier) * quantity
   if (world.wallet.laurels < cost) throw new SaveRuleError('no-laurels', `needs ${cost} Laurels`)
   return withWorld(save, tier, {
     ...world, wallet: { ...world.wallet, laurels: world.wallet.laurels - cost }, items: { ...world.items, [itemId]: (world.items[itemId] ?? 0) + quantity },
@@ -238,15 +226,14 @@ export function readManuals(save: Save, outfitId: string, ref: RankRef, count: n
 
 export type Shelf = 'items' | 'gems' | 'gear'
 
-/** R2's selling prices (PP17), before × the world's tier: raw low 6, high 16; refined twice that; a made item 6 + 6g. */
-export const SELL_RAW_V3: Readonly<Record<MaterialBand, number>> = { low: 6, high: 16 }
+/** Selling prices (PP17, FL13), before × the world's tier: raw G1–G5 6, G6–G10 16; refined twice that; a made item
+ * 6 + 6g. */
+export const SELL_RAW_V3: Readonly<Record<RawBand, number>> = { low: 6, high: 16 }
 function sellPriceV3(shelf: Shelf, id: string, tier: number): number {
   if (shelf !== 'items') return 0
-  // FL13: under the farm by line a line item's band is its grade's (G1–G5 low, G6–G10 high).
-  const line = farmByLine() ? lineItem(id) : null
-  const material = line === null ? materialIdentity(id) : line && { band: line.grade <= 5 ? 'low' as const : 'high' as const, refined: line.refined }
+  const material = lineItem(id)
   const made = madeIdentity(id)
-  const base = material ? SELL_RAW_V3[material.band] * (material.refined ? 2 : 1) : made ? 6 + 6 * made.grade : 0
+  const base = material ? SELL_RAW_V3[rawBand(material.grade)] * (material.refined ? 2 : 1) : made ? 6 + 6 * made.grade : 0
   return base * worldMaterialTier(tier)
 }
 

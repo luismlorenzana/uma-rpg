@@ -1,7 +1,7 @@
-// uma-rpg's work env for the farm by line (D224; farm-by-line.md FL1–FL10; H109): R2's ten places of four slots at ×1.25,
+// uma-rpg's work env for the Wilds (D224; farm-by-line.md FL1–FL10; H109, live since H112): ten places of four slots at ×1.25,
 // each now one line's, with a making place taking two kinds of job (process and make). Speed Tickets, Craft EXP, Laurels
 // and who may work are v1's (`env.ts`); the trade gate and the open shop are R2's. `liveWorkEnv` (`env-v3.ts`) picks it
-// when `farmByLine()`.
+// from the economy stage.
 import { buildingTable, type WorkEnv } from '@luismlorenzana/uma-work'
 import { PLACE_SLOTS_V3, PLACE_SPEED_V3 } from '../economy/professions'
 import { PLACES_V4 } from '../economy/places-v4'

@@ -80,15 +80,15 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Mine | `mine` | gather-site | 4 | Mining: ores into ingots. |
-| Forge | `forge` | station | 4 | Weapon Crafting: Weapon Gems. |
-| Forest | `forest` | gather-site | 4 | Wood Chopping: logs into planks. |
+| Mine | `mine` | gather-site | 4 | Mining: metal, G1–G10. |
+| Forge | `forge` | station | 4 | Arms Crafting: Arms Gems. |
+| Forest | `forest` | gather-site | 4 | Wood Chopping: wood, G1–G10. |
 | Armorer | `armorer` | station | 4 | Armor Crafting: Armor Fittings. |
-| Fields | `fields` | gather-site | 4 | Farming: vegetables for kitchen cuts. |
-| Workbench | `workbench` | station | 4 | Material Processing: raw into refined. |
-| Fishery | `fishery` | gather-site | 4 | Fishing: fish into fillets. |
+| Fields | `fields` | gather-site | 4 | Farming: vegetables, G1–G10. |
+| Workbench | `workbench` | station | 4 | Tome Crafting: Tome Ink. |
+| Fishery | `fishery` | gather-site | 4 | Fishing: fish, G1–G10. |
 | Charm Shop | `charm-shop` | station | 4 | Accessory Crafting: Accessory Settings. |
-| Monster Den | `monster-den` | gather-site | 4 | Hunting: stones into cut stones. |
+| Monster Den | `monster-den` | gather-site | 4 | Hunting: stone, G1–G10. |
 | Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
 
@@ -110,16 +110,16 @@ halls seat Heroes instead ([Halls of Heroes](heroes.md)).
 <!-- live:facilities -->
 | Place | Profession | Job | What it does | Its trade (callings) |
 |---|---|---|---|---|
-| Mine | Mining | Gathering | Gathers metal | Brawler |
-| Forge | Weapon Crafting | Making | Makes Weapon Gems | Brawler |
-| Forest | Wood Chopping | Gathering | Gathers wood | Spell Blade |
-| Armorer | Armor Crafting | Making | Makes Armor Fittings | Spell Blade |
-| Fields | Farming | Gathering | Gathers vegetables | Paladin, Cleric |
-| Workbench | Material Processing | Processing | Processes every line, raw into refined | Paladin, Cleric |
-| Fishery | Fishing | Gathering | Gathers fish | Summoner |
-| Charm Shop | Accessory Crafting | Making | Makes Accessory Settings | Summoner |
-| Monster Den | Hunting | Gathering | Gathers stone | Mage |
-| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Mage |
+| Mine | Mining | Gathering | Gathers metal, G1–G10 | Brawler |
+| Forge | Arms Crafting | Making | Processes metal; makes Arms Gems | Brawler |
+| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Spell Blade |
+| Armorer | Armor Crafting | Making | Processes wood; makes Armor Fittings | Spell Blade |
+| Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Paladin, Cleric |
+| Workbench | Tome Crafting | Making | Processes vegetables; makes Tome Ink | Paladin, Cleric |
+| Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Summoner |
+| Charm Shop | Accessory Crafting | Making | Processes fish; makes Accessory Settings | Summoner |
+| Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Mage |
+| Lapidary | Jewel Crafting | Making | Processes stone; makes Planet Jewels and Moon Jewels | Mage |
 
 Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
@@ -139,18 +139,18 @@ Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma w
 - **The shared job sheet:** Who → How many → What. A chosen amount stays selected while What changes (and clamps if a
   recipe allows less). Its Uma picker puts Craft Level on each face and opens her trade's Umas first (free, then highest
   Craft Level); the rest are greyed "Another trade", unless the place is an open shop. Locked Umas and workers show why
-  they cannot start. Fighting does not block work (D119). Counts are 1–10, or ×1, ×4, ×8, ×20 or ×40 at the Workbench.
-- **A gathering place's What step:** its line's types as tiles, one row a tier up to the world's, the low type then
-  the high one, which says "From Craft Lv 26" until then; the chosen type's card says "Tier 1 · high · raw · Refines into
-  Iron Ingot" and what's held.
-- **The Workbench:** five columns, one a line (Metal, Wood, Vegetables, Fish, Stone), a row a tier and band ("T1 low",
-  "T1 high" …), and the chosen refined type's card.
-- **The Forge, the Armorer and the Charm Shop:** ten grade chips, each underlined in its material's tier colour (Tier 2
-  amber, Tier 3 violet) with a legend, a grade above her Craft Level locked; the chosen grade's recipe card ("Weapon Gem
-  G5 · Raises a weapon one grade", each refined item and how many are held).
-- **The Lapidary:** one row a kind, Planet I–V and Moon I–V, the same chips and recipe card ("Opens Planet III").
-- **Quick look:** "Mine · Mining · 4 slots · ×1.25", the open shop's line, the type icons (2, 4 or 6 by the world's
-  tier) or the line's G1–G10 chips, and the four slots' rows.
+  they cannot start. Fighting does not block work (D119). Counts follow the picked job (FL10): 1–10 to gather or make,
+  ×1, ×4, ×8, ×20 or ×40 to process. The sheet opens on the highest grade her Craft Level opens.
+- **A gathering place's What step** (`PlaceV4.tsx`, `place-view-v4.ts`): its line's ten raw items as tiles, G1–G10 in two
+  rows of five, a locked one saying "From Craft Lv 11"; the chosen item's card says "Metal · G3 · raw · Refines into Iron
+  Ingot" and what's held.
+- **A making place's What step** (the Forge, the Armorer, the Workbench, the Charm Shop, the Lapidary): two groups,
+  **Process** (its line's ten refined items as tiles) and **Make** (its item's G1–G10 chips; the Lapidary's Planet I–V
+  and Moon I–V rows). Picking a tile processes, picking a chip makes, and the counts follow. A refined tile's card says
+  "Metal · G1 · refined · Refined from Copper Ore"; a chip's recipe card "Arms Gem G3 · Raises an Arms weapon one grade"
+  with "Iron Ingot ×7" and how many are held.
+- **Quick look:** "Forge · Arms Crafting · 4 slots · ×1.25", the open shop's line, a gathering place's ten icons or a
+  making place's G1–G10 chips with "Processes Metal G1–G10", and the four slots' rows.
 
 **The Learning page** holds the six Halls of Heroes (D106; classes v2, H59), one page shared by all six
 (`places/halls/HallPage.tsx`). The mirrors face each other across the road: Brawler Dojo and Mage Tower, Spell Blade
@@ -225,7 +225,8 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
         Lance" on the one she wears. A Bell or Orb left on a kind she no longer holds says "No Greatsword in her slots".
       - **Upgrade**, what she spends: her grade rows, three weapons ("Greatsword · G3 · Might 8"), five armor slots
         ("Head · Helm · G2 · DEF +8") and her accessory ("Pendant · G4 · +2 on her three kinds · ★ +10"), each with a pill
-        that raises it ("G3 → G4 · 1 Weapon Gem G4") or says why not ("Needs Lv 16", "Already G10"); a row's sheet climbs
+        that raises it ("G3 → G4 · 1 Arms Gem G4", or Tome Ink on a Tome) or says why not ("Needs Lv 16", "Already G10");
+        a row's sheet climbs
         several grades at once when the Warehouse holds each. Then the Extra Stats link ("8/22 open · map ›");
     - Work: her job, and her Craft Level with her trade: "Craft Lv 23 · Forest · Armorer";
     - Racing: her aptitudes, **Her template** (Calling, Stride, Knack and Flourish, each with its note: the calling's
@@ -345,21 +346,21 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
 ### Warehouse
 
 The kit's `ShelfView` (SD3) as an icon grid with counts:
-- **Shelves:** All, Metal, Wood, Vegetables, Fish, Stone and Made items. Materials stay raw then refined and tier by
-  tier; made items stay line by line and grade by grade.
-- **Grade chips:** every grade, the highest of each line, or one grade. They filter made items; materials have no grades,
-  so their line shelves show no chips.
+- **Shelves:** All, Metal, Wood, Vegetables, Fish, Stone and Made items. Materials stay raw then refined, grade by grade;
+  made items stay line by line (Arms Gems, Tome Ink, Armor Fittings, Accessory Settings, the jewels) and grade by grade.
+- **Grade chips:** every grade, the highest of each line, or one grade, on every shelf (materials have grades since
+  H112).
 - The header counts both: "120 materials · 35 made items".
-- A stock sheet says what it is ("Tier 1 · high · raw · Refines into Iron Ingot", "Grade 5 · Raises a weapon one grade",
-  "Opens Planet III"), with Sell ×1, 10 or All for Laurels.
+- A stock sheet says what it is ("Metal · G3 · raw · Refines into Iron Ingot", "Grade 5 · Raises an Arms weapon one
+  grade", "Opens Planet III"), with Sell ×1, 10 or All for Laurels.
 
 ### Exchange
 
 - Your Laurels and ticket counts.
-- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and **raw materials** by line, every type of the
-  world's tier and below with its tier and band ("Tier 1 · low · have 12"); a type not stocked yet is locked with the win
-  that stocks it ("After the tier's first win", "After a win on continent 3"). A row's sheet offers ×1, ×5, ×10, ×25 or a
-  typed quantity, the total, and "Need N more" when short.
+- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and **raw materials** behind the kit's `Tabs`,
+  one a line (Metal first, the tab remembered for the session), its ten grades ("G3 · have 12"); one not stocked yet is
+  locked with the win that stocks it ("After the tier's first win" for G1–G5, "After a win on continent 3" for G6–G10).
+  A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
 - **Read a Class Manual** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working
   Umas remain selectable. Then pick one of her six classes; each Manual turns 1,000 Class Marks into 1,000 EXP on it.
 

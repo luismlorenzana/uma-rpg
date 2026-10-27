@@ -8,6 +8,10 @@
 > PP25). The manual ([loops](../../game/loops.md), [materials](../../game/materials.md),
 > [sections](../../game/sections.md)) describes them as played.
 
+> **Superseded in part by D224 (H109–H112, live 2026-10-26):** the farm by line ([farm-by-line.md](farm-by-line.md))
+> replaces §3 (two types a line a tier), §4's processing at the Workbench, §6's recipes and times, and PP7–PP13 and PP17:
+> every trade gathers, processes and makes its own line, on ten grades, each making place making one item.
+
 > **Calling precedence corrected, 2026-10-26 (D220):** the live head counts below follow Pace over a tied best style,
 > Late + End as Summoner, and pure Late as the healer choice. The work rules themselves do not change.
 

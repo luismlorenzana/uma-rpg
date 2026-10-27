@@ -2,7 +2,7 @@
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import {
-  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, itemMinutes, LATE_LAURELS, refineMinutes, MAX_JOB_COUNT,
+  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, itemMinutes, LATE_LAURELS, MAKE_SHARE_V4, makeMinutesV4, refineMinutes, MAX_JOB_COUNT,
   POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES, PROFESSION_MAX_LEVEL, professionExpToNext, REPLAY_SHARE,
   SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN,
 } from '../economy/pacing'
@@ -12,12 +12,14 @@ import {
 } from '../economy/accessories'
 import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
 import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
-import { PLACE_SLOTS_V3, PLACE_SPEED_V3, PLACES_V3, professionById, TRADES } from '../economy/professions'
+import { PLACE_SLOTS_V3, PLACE_SPEED_V3, professionById, TRADES } from '../economy/professions'
+import { isMakingPlaceV4, PLACES_V4 } from '../economy/places-v4'
 import { stockName } from '../economy/stock'
-import { madeRecipe, madeName } from '../items/made'
+import { madeName } from '../items/made'
+import { madeRecipeV4, RECIPE_V4 } from '../items/made-v4'
 import { MADE_IDENTITIES } from '../items/made-id'
-import { MATERIAL_LINES, materialGateGrade, materialTypes, type MaterialLine } from '../items/materials-id'
-import { RAW_PRICE_V3, SELL_RAW_V3, stockedAfter } from '../save/exchange'
+import { lineItems, MATERIAL_LINES, type MaterialLine } from '../items/lines'
+import { RAW_PRICE_V3, SELL_RAW_V3 } from '../save/exchange'
 import {
   BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_HEAL_OFFENSE_SCALE,
   BATTLE_REGEN_ROUNDS, RPG_BASE_MP_REGEN, RPG_BASE_MP_REGEN_DEPTHS, RPG_BASE_MP_REGEN_V17,
@@ -393,44 +395,50 @@ function foeScaling(): string {
   ])
 }
 
-// --- Materials, made items, gear (R2, live since H82) ---------------------------------------------------------------
+// --- Materials, made items, gear (R2, live since H82; the farm by line since H112) -----------------------------------
 
 const TIERS_123: readonly GearTier[] = [1, 2, 3]
 const LINE_NAME: Readonly<Record<MaterialLine, string>> = { metal: 'Metal', wood: 'Wood', vegetables: 'Vegetables', fish: 'Fish', stone: 'Stone' }
-/** The profession and place that gather a line. */
-function lineHome(line: MaterialLine): { profession: string; place: string } {
-  const spec = PLACES_V3.find((p) => p.line === line)!
-  return { profession: professionById(spec.profession)!.name, place: placeById(spec.id)?.name ?? spec.id }
+const MADE_LINE_NAME: Readonly<Record<string, string>> = { 'weapon-gem': 'Arms Gems', 'tome-ink': 'Tome Ink', 'armor-fittings': 'Armor Fittings',
+  'accessory-setting': 'Accessory Settings', 'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels' }
+/** A line's two places (FL1): its gathering place and profession, its making place and profession, and what it makes. */
+function lineHome(line: MaterialLine): { profession: string; place: string; maker: string; makes: string } {
+  const gather = PLACES_V4.find((p) => p.line === line && !isMakingPlaceV4(p))!
+  const make = PLACES_V4.find((p) => p.line === line && isMakingPlaceV4(p))!
+  return {
+    profession: professionById(gather.profession)!.name, place: placeById(gather.id)?.name ?? gather.id,
+    maker: `the ${placeById(make.id)?.name ?? make.id} (${professionById(make.profession)!.name})`,
+    makes: make.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and '),
+  }
 }
 
-/** The five lines (PP7, PP8): who gathers each, and its low and high type in each tier. */
+/** The five lines (FL1, FL5): who gathers each, where it's processed and made, and its ten raw items. */
 function families(): string {
-  return table(['Line', 'Gathered by', 'Tier 1 (low · high)', 'Tier 2', 'Tier 3'], MATERIAL_LINES.map((line) => {
+  return table(['Line', 'Gathered by', 'Processed and made at', 'Makes', 'Raw, G1 → G10'], MATERIAL_LINES.map((line) => {
     const home = lineHome(line)
-    const pair = (tier: 1 | 2 | 3) => materialTypes(line, tier).map((t) => stockName(t.raw)).join(' · ')
-    return [LINE_NAME[line], `${home.profession}, the ${home.place}`, pair(1), pair(2), pair(3)]
+    return [LINE_NAME[line], `${home.profession}, the ${home.place}`, home.maker, home.makes, lineItems(line, false).map((m) => m.name).join(', ')]
   }))
 }
-/** Every type, raw and refined, by line (PP §3.3): the low type opens at Craft Lv 1, the high at 26. */
+/** Every item, raw and refined, by line and grade (FL5, FL6): grade g opens at Craft Lv 5g − 4. */
 function items(): string {
   const out: string[] = []
   for (const line of MATERIAL_LINES) {
     const home = lineHome(line)
-    out.push(`### ${LINE_NAME[line]} (${home.profession}, the ${home.place})`, '')
-    out.push(table(['Tier', 'Band', 'Raw', 'Refined', 'Opens at Craft Lv'], materialTypes(line).map((t) => [
-      t.tier, t.band, `${stockName(t.raw)} (\`${t.raw}\`)`, `${stockName(t.refined)} (\`${t.refined}\`)`, gradeUnlockLevel(materialGateGrade(t.raw)),
+    out.push(`### ${LINE_NAME[line]} (${home.profession}, the ${home.place}; ${home.maker})`, '')
+    const refined = lineItems(line, true)
+    out.push(table(['Grade', 'Raw', 'Refined', 'Opens at Craft Lv'], lineItems(line, false).map((m, i) => [
+      `G${m.grade}`, `${m.name} (\`${m.id}\`)`, `${refined[i]!.name} (\`${refined[i]!.id}\`)`, gradeUnlockLevel(m.grade),
     ])), '')
   }
   return out.join('\n').trimEnd()
 }
-/** The jewels (EP17, EP22): which node each opens, its grade and gate, and its recipe in a Tier 1 world (the ladder moves
- * a later world's top grades onto its own pairs). */
+/** The jewels (EP17, EP22, FL7): which node each opens, its grade and gate, and its recipe: cut stones of its grade. */
 function gems(): string {
   const jewels = MADE_IDENTITIES.filter((m) => m.line === 'jewel-planet' || m.line === 'jewel-moon')
-  return table(['Jewel', 'Id', 'Opens', 'Grade', 'Uma Lv', 'Recipe (Tier 1)'], jewels.map((m) => {
+  return table(['Jewel', 'Id', 'Opens', 'Grade', 'Uma Lv', 'Recipe'], jewels.map((m) => {
     const n = Math.ceil(m.grade / 2)
     const opens = m.line === 'jewel-planet' ? `Planet ${['I', 'II', 'III', 'IV', 'V'][n - 1]}` : `node ${['I', 'II', 'III', 'IV', 'V'][n - 1]} of a moon${n === 2 || n === 4 ? `; her moon's ${n === 2 ? 'I' : 'II'}` : ''}`
-    return [madeName(m.id)!, `\`${m.id}\``, opens, m.grade, gradeGateLevel(m.grade), inputs(madeRecipe(m.id, 1))]
+    return [madeName(m.id)!, `\`${m.id}\``, opens, m.grade, gradeGateLevel(m.grade), inputs(madeRecipeV4(m.id))]
   }))
 }
 /** Gear by grade (WP2–WP3, WP19–WP23, SB1): what each grade gives, the made item that raises it, and the four accessory
@@ -441,8 +449,9 @@ function gear(): string {
   const values = table(['Grade', 'Opens at Lv', 'Weapon Might (Tier 1 · 2 · 3)', 'Armor: offense a piece', 'Head DEF', 'Body HP', 'Legs MP', 'Arms M.DEF', 'Feet Speed'],
     grades.map((g) => [g, gradeGateLevel(g), tiers((t) => mightAt(g, t)), armorValues('head', g, 1).offense, armorValues('head', g, 1).value,
       armorValues('body', g, 1).value, armorValues('legs', g, 1).value, armorValues('arms', g, 1).value, armorValues('feet', g, 1).value]))
-  const made = table(['Grade', 'Weapon Gem', 'Armor Fittings', 'Accessory Setting'], grades.map((g) => [g,
-    inputs(madeRecipe(`weapon-gem-g${g}`, 1)), inputs(madeRecipe(`armor-fittings-g${g}`, 1)), inputs(madeRecipe(`accessory-setting-g${g}`, 1))]))
+  const made = table(['Grade', 'Arms Gem (an Arms weapon)', 'Tome Ink (a Tome)', 'Armor Fittings', 'Accessory Setting'], grades.map((g) => [g,
+    inputs(madeRecipeV4(`weapon-gem-g${g}`)), inputs(madeRecipeV4(`tome-ink-g${g}`)), inputs(madeRecipeV4(`armor-fittings-g${g}`)),
+    inputs(madeRecipeV4(`accessory-setting-g${g}`))]))
   const forms = table(['Family', 'Base form', 'G1 → G10 (Tier 1)'], [
     [ACCESSORY_FAMILY_LABEL.pendant, 'Flat offense on each of her three weapons\' kinds', PENDANT_T1.join(', ')],
     [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', ORB_T1.join(', ')],
@@ -451,7 +460,7 @@ function gear(): string {
   ])
   return values +
     `\n\nEach armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × ${TIERS_123.map((t) => TIER_SCALE_TENTHS[t] / 10).join(', ')} in Tiers 1, 2 and 3 (Feet Speed doesn't scale).\n\n` +
-    'What raises a slot one grade, in a Tier 1 world:\n\n' + made +
+    'What raises a slot one grade, in every world:\n\n' + made +
     '\n\nAccessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot\'s):\n\n' + forms +
     `\n\nHer signature: while she wears her knack's family, ATK and M.ATK +${signatureBonus(10, 1)} · +${signatureBonus(30, 1)} · +${signatureBonus(50, 1)} at Lv 10 · 30 · 50 (0.2 a level × the tier).`
 }
@@ -492,29 +501,24 @@ function levels(): string {
   return table(['Level', 'Uma EXP to next', 'Craft EXP to next'], rows) +
     `\n\nUma EXP to next level: 120 + 16 × level, up to Lv ${RPG_TIER_MAX_LEVEL}. A stage pays its weight × her own EXP to next level, −${pct(RPG_LEVEL_EXP_STEP)} per level she's above the foes (down to ${pct(RPG_LEVEL_EXP_MIN)}), never more than ${pct(RPG_LEVEL_EXP_MAX)}. Uma Shards at Lv ${RPG_SHARD_LEVELS.join(', ')}. Craft EXP to next: ${professionExpToNext(0).toLocaleString('en-US')} + ${professionExpToNext(1) - professionExpToNext(0)} × level; jobs pay ${EXP_PER_MINUTE} EXP per base minute of work, so a level takes ${professionExpToNext(1) / EXP_PER_MINUTE / 60} base hours at Lv1 and ${professionExpToNext(PROFESSION_MAX_LEVEL - 1) / EXP_PER_MINUTE / 60} at Lv${PROFESSION_MAX_LEVEL - 1}.`
 }
-/** The Exchange by pair (PP17; live since H82): every tier's types up to the world's, × the world's tier. */
+/** The Exchange by grade (FL12, FL13): each line's ten raw grades, the same in every world, × the world's tier. */
 function prices(): string {
-  const after = (tier: number, band: 'low' | 'high') => (stockedAfter(tier, band) === 1 ? 'the tier\'s first win' : `a win on continent ${stockedAfter(tier, band)}`)
-  const rows: Cell[][] = []
-  for (const world of [1, 2, 3] as const) {
-    for (const tier of [1, 2, 3] as const) {
-      if (tier > world) continue
-      for (const band of ['low', 'high'] as const) rows.push([`Tier ${world}`, `Tier ${tier}'s ${band} types`, `after ${after(tier, band)}`, RAW_PRICE_V3[band] * world])
-    }
-  }
-  return table(['World', 'Raw materials', 'Stocked', 'Price (Laurels)'], rows) + '\n\n' +
+  return table(['Raw materials', 'Stocked', 'Price (Laurels), × the world\'s tier'], [
+    ['G1–G5, every line', 'after the tier\'s first win', RAW_PRICE_V3.low],
+    ['G6–G10, every line', 'after a win on continent 3', RAW_PRICE_V3.high],
+  ]) + '\n\n' +
     table(['Thing', 'Price (Laurels)'], [['Speed Ticket', TIME_TICKET_PRICE], ['Sweep Ticket', SWEEP_TICKET_PRICE]]) +
-    `\n\nA Speed Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. Selling, × the world's tier: a raw low type ${SELL_RAW_V3.low}, a high type ${SELL_RAW_V3.high}; refined twice that; a made item 6 + 6 × its grade. ` +
+    `\n\nA Speed Ticket takes ${TIME_TICKET_SPAN / 60000} minutes off a running job. Selling, × the world's tier: a raw G1–G5 item ${SELL_RAW_V3.low}, a G6–G10 one ${SELL_RAW_V3.high}; refined twice that; a made item 6 + 6 × its grade. ` +
     `A Class Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Class Marks, not Laurels.`
 }
 const minutes = (m: number): string => `${Number(m.toFixed(1))} min`
 const hours = (m: number): string => `${Number((m / 60).toFixed(1))} h`
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather one raw item', `any type, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
-    ['Process one item', `raw into refined, one for one, a quarter of a gather: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Make one item', 'a gather\'s time for each refined item in it: a Weapon Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4'],
-    ['Opens', 'a low type at Craft Lv 1 and a high type at Lv 26; a made item of grade g at Craft Lv 5g − 4'],
+    ['Gather one raw item', `any grade, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
+    ['Process one item', `raw into refined, one for one, at her line's making place, a quarter of a gather: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
+    ['Make one item', `${MAKE_SHARE_V4 === 0.75 ? 'three quarters' : MAKE_SHARE_V4} of a gather for each refined item in it: an Arms Gem or Tome Ink ${RECIPE_V4['weapon-gem'].qty}, Armor Fittings ${RECIPE_V4['armor-fittings'].qty}, an Accessory Setting ${RECIPE_V4['accessory-setting'].qty}, a Planet Jewel ${RECIPE_V4['jewel-planet'].qty}, a Moon Jewel ${RECIPE_V4['jewel-moon'].qty} (an Arms Gem ${hours(makeMinutesV4(1, RECIPE_V4['weapon-gem'].qty))} at Lv1, ${hours(makeMinutesV4(PROFESSION_MAX_LEVEL, RECIPE_V4['weapon-gem'].qty))} at Lv${PROFESSION_MAX_LEVEL})`],
+    ['Opens', 'grade g at Craft Lv 5g − 4, to gather, to process and to make'],
     ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the place's speed`],
     ['Outputs per job', `gathering and making 1–${MAX_JOB_COUNT}; processing ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
     ['Jobs queued after it', String(MAX_QUEUE)],
@@ -533,19 +537,16 @@ function places(): string {
   }
   return out.join('\n').trimEnd()
 }
-/** The ten places (PP4) and the trades (PP2): who works each, and what it does. */
+/** The ten places (PP4, FL1–FL3) and the trades (PP2): who works each, and what it does. */
 function facilities(): string {
   const trade = (profession: string) => TRADES.find((t) => t.gathering === profession || t.crafting === profession)!
   const callings: Readonly<Record<string, string>> = { physical: 'Brawler', 'physical-hybrid': 'Spell Blade', healer: 'Paladin, Cleric', 'magical-hybrid': 'Summoner', magical: 'Mage' }
-  const MADE_LINE_NAME: Readonly<Record<string, string>> = { 'weapon-gem': 'Weapon Gems', 'armor-fittings': 'Armor Fittings', 'accessory-setting': 'Accessory Settings',
-    'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels' }
   const does = (id: string): string => {
-    const spec = PLACES_V3.find((p) => p.id === id)!
-    if (spec.kind === 'gather') return `Gathers ${LINE_NAME[spec.line!].toLowerCase()}`
-    if (spec.kind === 'refine') return 'Processes every line, raw into refined'
-    return `Makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
+    const spec = PLACES_V4.find((p) => p.id === id)!
+    if (!isMakingPlaceV4(spec)) return `Gathers ${LINE_NAME[spec.line].toLowerCase()}, G1–G10`
+    return `Processes ${LINE_NAME[spec.line].toLowerCase()}; makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
   }
-  return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (callings)'], PLACES_V3.map((p) => {
+  return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (callings)'], PLACES_V4.map((p) => {
     const profession = professionById(p.profession)!
     return [placeById(p.id)?.name ?? p.id, profession.name, cap(profession.kind), does(p.id), callings[trade(p.profession).id]!]
   })) + `\n\nEvery place has ${PLACE_SLOTS_V3} slots at ×${PLACE_SPEED_V3} from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.`

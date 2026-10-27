@@ -3,15 +3,14 @@
 // slots are about half Arms and half Tomes (49% Arms on D220's defaults), so she holds 1.5 Arms Gems and 1.5 Tome Ink a
 // grade. Every refined item costs one gather at its line's gathering place and a quarter at its making place (processing);
 // each made item three quarters of a gather a refined item in it at its making place. Trades, places, rosters and grade
-// days are read with R2's ledger (`professions.sim.ts`). Test support only: nothing in the game imports it.
+// days are read with the ledger's shared math (`professions.sim.ts`). Test support only: nothing in the game imports it.
 import { madeRecipeV4 } from '../items/made-v4'
 import { gradeItem, jewelId } from '../items/made-id'
-import { lineItem } from '../items/lines'
+import { lineItem, type MaterialLine } from '../items/lines'
 import { itemMinutes, MAKE_SHARE_V4, refineMinutes } from './pacing'
 import { PLACES_V4 } from './places-v4'
-import { LEDGER_LEVEL } from './professions.sim'
-import type { PlaceIdV3 } from './professions'
-import type { MaterialLine } from '../items/materials-id'
+import { FORTY, gradeDaysAt, LEDGER_LEVEL, placeSupplyOf, rosterRateOf, tradeHoursOf, TWENTY } from './professions.sim'
+import { TRADES, type PlaceIdV3 } from './professions'
 
 const range = (n: number): number[] => Array.from({ length: n }, (_, i) => i + 1)
 
@@ -58,8 +57,29 @@ export function placeHoursV4(moon = false): Record<PlaceIdV3, number> {
     hours[makingOf(line)] += n * process
   }
   for (const [id, n] of Object.entries(umaPiecesV4(moon))) {
-    const [item, qty] = Object.entries(madeRecipeV4(id))[0]!
+    const [item, qty] = Object.entries(madeRecipeV4(id))[0] as [string, number]
     hours[makingOf(lineItem(item)!.line)] += n * qty * gather * MAKE_SHARE_V4
   }
   return hours
+}
+
+/** The ledger's report (`SIM=1`): one Uma's demand and hours, each trade and place, rosters and grade days. */
+export function professionsReport(): string {
+  const f1 = (x: number) => x.toFixed(1), f2 = (x: number) => x.toFixed(2), pct = (x: number) => `${(100 * x).toFixed(1)}%`
+  const total = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0)
+  const hours = placeHoursV4(), trades = tradeHoursOf(hours)
+  const rows = [
+    `One Uma: ${total(umaPiecesV4())} pieces, ${total(umaRefinedV4())} refined (${total(umaRefinedV4(true))} with her moon), ` +
+      `${f1(total(hours))} h (${f1(total(placeHoursV4(true)))} h) at Craft Lv ${LEDGER_LEVEL} before ×1.25`,
+    `  by line: ${Object.entries(umaRefinedByLine()).map(([line, n]) => `${line} ${n}`).join(', ')}`,
+    `  trades: ${TRADES.map((t) => `${t.id} ${f1(trades[t.id].hours)} h, ${pct(trades[t.id].share)}`).join(' · ')}`,
+    `  places, maxed Umas a day: ${Object.entries(placeSupplyOf(hours)).map(([p, n]) => `${p} ${f2(n)}`).join(' · ')}`,
+  ]
+  for (const [label, split] of [['forty', FORTY], ['twenty', TWENTY]] as const) {
+    const r = rosterRateOf(split, hours)
+    rows.push(`  ${label} (${split.join(' · ')}): ${f2(r.rate)} maxed Umas a day (${r.binds}); a party ${f1(5 / r.rate)} days, a run of twenty ${f1(20 / r.rate)} days`)
+  }
+  rows.push('', 'Grade | opens (Craft Lv 5g − 4), day | the party holds it (forty) | a run of twenty holds it')
+  for (const d of gradeDaysAt(rosterRateOf(FORTY, hours).rate)) rows.push(`G${d.grade} | ${f1(d.opens)} | ${f1(d.party)} | ${f1(d.run)}`)
+  return rows.join('\n')
 }

@@ -1,108 +1,130 @@
 # Materials, made items and gear
 
 Everything an Uma gathers, processes or makes, and what it does. Lists are generated from `packages/domain/src/items/`
-(`materials-id.ts`, `materials.ts`, `made.ts`) and `economy/` (`grades.ts`, `accessories.ts`, `planet.ts`). How the jobs
-work is in [loops](loops.md#craft-level); the ten places in [sections](sections.md#wilds). This is Tier 1's economy as it
-plays since H82 (R2, engine v17, save v28); the old game's eight families, crafted pieces and Star Gems live on only in
-the save migration that converted them (`toV28`, [architecture](architecture.md#save-history)).
+(`lines.ts`, `made.ts`, `made-v4.ts`) and `economy/` (`places-v4.ts`, `grades.ts`, `accessories.ts`, `planet.ts`). How
+the jobs work is in [loops](loops.md#craft-level); the ten places in [sections](sections.md#wilds). This is the farm by
+line as it plays since H112 (save v30, D224; its design is
+[farm-by-line.md](../design/tier-rework/farm-by-line.md)): every trade gathers, processes and makes its own line, on ten
+grades. The old game's eight families, crafted pieces and Star Gems, and R2's two types a line a tier, live on only in the
+save migrations that converted them (`toV28`, `toV30`, [architecture](architecture.md#save-history)).
 
 ## Lines
 
-Five lines, one a gathering profession, each in one Wilds place (PP7). Every tier has a **low** and a **high** type in
-each line: a world holds its own tier's types and every tier's below (a Tier 2 world gathers Tier 1's and Tier 2's). A
-low type opens at Craft Lv 1 and a high type at Craft Lv 26, in every tier (PP13).
+Five lines, each one trade's (FL1): gathered at its gathering place, processed and made at its making place, and never
+touched by another place. Each line has **ten grades**, a raw item and its refined form each, all from one uma-art family;
+every world holds the same fifty types (FL8). Grade g opens at **Craft Lv 5g − 4** to gather, to process and to make (FL6).
 
 <!-- live:families -->
-| Line | Gathered by | Tier 1 (low · high) | Tier 2 | Tier 3 |
+| Line | Gathered by | Processed and made at | Makes | Raw, G1 → G10 |
 |---|---|---|---|---|
-| Metal | Mining, the Mine | Copper Ore · Iron Ore | Gold Ore · Titanium Ore | Mythril Ore · Orichalcum Ore |
-| Wood | Wood Chopping, the Forest | Pine Log · Cedar Log | Cherry Log · Ebony Log | Elderwood Log · Yggdrasil Branch |
-| Vegetables | Farming, the Fields | Carrot · Cabbage | Bell Pepper · Asparagus | Golden Carrot · Emperor Pumpkin |
-| Fish | Fishing, the Fishery | Carp · Sardine | Sea Bream · Tuna | Silverfin · Rainbow Koi |
-| Stone | Hunting, the Monster Den | Quartz · Citrine | Sapphire · Diamond | Starstone · Philosopher's Stone |
+| Metal | Mining, the Mine | the Forge (Arms Crafting) | Arms Gems | Copper Ore, Tin Ore, Iron Ore, Silver Ore, Cobalt Ore, Gold Ore, Platinum Ore, Titanium Ore, Mythril Ore, Orichalcum Ore |
+| Wood | Wood Chopping, the Forest | the Armorer (Armor Crafting) | Armor Fittings | Pine Log, Birch Log, Cedar Log, Maple Log, Oak Log, Cherry Log, Mahogany Log, Ebony Log, Elderwood Log, Yggdrasil Branch |
+| Vegetables | Farming, the Fields | the Workbench (Tome Crafting) | Tome Ink | Carrot, Potato, Cabbage, Onion, Tomato, Bell Pepper, Eggplant, Asparagus, Golden Carrot, Emperor Pumpkin |
+| Fish | Fishing, the Fishery | the Charm Shop (Accessory Crafting) | Accessory Settings | Carp, Trout, Sardine, Mackerel, Salmon, Sea Bream, Eel, Tuna, Silverfin, Rainbow Koi |
+| Stone | Hunting, the Monster Den | the Lapidary (Jewel Crafting) | Planet Jewels and Moon Jewels | Quartz, Amethyst, Citrine, Garnet, Emerald, Sapphire, Ruby, Diamond, Starstone, Philosopher's Stone |
 <!-- /live -->
 
-Every raw type processes one for one into its refined form at the Workbench, in a quarter of a gather's time. Made items
-take refined materials only.
+A raw item processes one for one into its refined form at its line's making place, in a quarter of a gather's time. A
+made item takes its own line's refined items of its own grade (FL7).
 
-## Types by line
+## Items by line
 
 <!-- live:items -->
-### Metal (Mining, the Mine)
+### Metal (Mining, the Mine; the Forge (Arms Crafting))
 
-| Tier | Band | Raw | Refined | Opens at Craft Lv |
-|---|---|---|---|---|
-| 1 | low | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 |
-| 1 | high | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 26 |
-| 2 | low | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 1 |
-| 2 | high | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 26 |
-| 3 | low | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 1 |
-| 3 | high | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 26 |
+| Grade | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|
+| G1 | Copper Ore (`copper-ore`) | Copper Ingot (`copper-ingot`) | 1 |
+| G2 | Tin Ore (`tin-ore`) | Tin Ingot (`tin-ingot`) | 6 |
+| G3 | Iron Ore (`iron-ore`) | Iron Ingot (`iron-ingot`) | 11 |
+| G4 | Silver Ore (`silver-ore`) | Silver Ingot (`silver-ingot`) | 16 |
+| G5 | Cobalt Ore (`cobalt-ore`) | Cobalt Ingot (`cobalt-ingot`) | 21 |
+| G6 | Gold Ore (`gold-ore`) | Gold Ingot (`gold-ingot`) | 26 |
+| G7 | Platinum Ore (`platinum-ore`) | Platinum Ingot (`platinum-ingot`) | 31 |
+| G8 | Titanium Ore (`titanium-ore`) | Titanium Ingot (`titanium-ingot`) | 36 |
+| G9 | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 41 |
+| G10 | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 46 |
 
-### Wood (Wood Chopping, the Forest)
+### Wood (Wood Chopping, the Forest; the Armorer (Armor Crafting))
 
-| Tier | Band | Raw | Refined | Opens at Craft Lv |
-|---|---|---|---|---|
-| 1 | low | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 |
-| 1 | high | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 26 |
-| 2 | low | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 1 |
-| 2 | high | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 26 |
-| 3 | low | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 1 |
-| 3 | high | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 26 |
+| Grade | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|
+| G1 | Pine Log (`pine-log`) | Pine Plank (`pine-plank`) | 1 |
+| G2 | Birch Log (`birch-log`) | Birch Plank (`birch-plank`) | 6 |
+| G3 | Cedar Log (`cedar-log`) | Cedar Plank (`cedar-plank`) | 11 |
+| G4 | Maple Log (`maple-log`) | Maple Plank (`maple-plank`) | 16 |
+| G5 | Oak Log (`oak-log`) | Oak Plank (`oak-plank`) | 21 |
+| G6 | Cherry Log (`cherry-log`) | Cherry Plank (`cherry-plank`) | 26 |
+| G7 | Mahogany Log (`mahogany-log`) | Mahogany Plank (`mahogany-plank`) | 31 |
+| G8 | Ebony Log (`ebony-log`) | Ebony Plank (`ebony-plank`) | 36 |
+| G9 | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 41 |
+| G10 | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 46 |
 
-### Vegetables (Farming, the Fields)
+### Vegetables (Farming, the Fields; the Workbench (Tome Crafting))
 
-| Tier | Band | Raw | Refined | Opens at Craft Lv |
-|---|---|---|---|---|
-| 1 | low | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 |
-| 1 | high | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 26 |
-| 2 | low | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 1 |
-| 2 | high | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 26 |
-| 3 | low | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 1 |
-| 3 | high | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 26 |
+| Grade | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|
+| G1 | Carrot (`carrot`) | Chopped Carrot (`chopped-carrot`) | 1 |
+| G2 | Potato (`potato`) | Diced Potato (`diced-potato`) | 6 |
+| G3 | Cabbage (`cabbage`) | Shredded Cabbage (`shredded-cabbage`) | 11 |
+| G4 | Onion (`onion`) | Diced Onion (`diced-onion`) | 16 |
+| G5 | Tomato (`tomato`) | Tomato Purée (`tomato-puree`) | 21 |
+| G6 | Bell Pepper (`bell-pepper`) | Sliced Bell Pepper (`sliced-bell-pepper`) | 26 |
+| G7 | Eggplant (`eggplant`) | Sliced Eggplant (`sliced-eggplant`) | 31 |
+| G8 | Asparagus (`asparagus`) | Trimmed Asparagus (`trimmed-asparagus`) | 36 |
+| G9 | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 41 |
+| G10 | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 46 |
 
-### Fish (Fishing, the Fishery)
+### Fish (Fishing, the Fishery; the Charm Shop (Accessory Crafting))
 
-| Tier | Band | Raw | Refined | Opens at Craft Lv |
-|---|---|---|---|---|
-| 1 | low | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 |
-| 1 | high | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 26 |
-| 2 | low | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 1 |
-| 2 | high | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 26 |
-| 3 | low | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 1 |
-| 3 | high | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 26 |
+| Grade | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|
+| G1 | Carp (`carp`) | Carp Fillet (`carp-fillet`) | 1 |
+| G2 | Trout (`trout`) | Trout Fillet (`trout-fillet`) | 6 |
+| G3 | Sardine (`sardine`) | Sardine Fillet (`sardine-fillet`) | 11 |
+| G4 | Mackerel (`mackerel`) | Mackerel Fillet (`mackerel-fillet`) | 16 |
+| G5 | Salmon (`salmon`) | Salmon Fillet (`salmon-fillet`) | 21 |
+| G6 | Sea Bream (`sea-bream`) | Sea Bream Fillet (`sea-bream-fillet`) | 26 |
+| G7 | Eel (`eel`) | Eel Fillet (`eel-fillet`) | 31 |
+| G8 | Tuna (`tuna`) | Tuna Fillet (`tuna-fillet`) | 36 |
+| G9 | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 41 |
+| G10 | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 46 |
 
-### Stone (Hunting, the Monster Den)
+### Stone (Hunting, the Monster Den; the Lapidary (Jewel Crafting))
 
-| Tier | Band | Raw | Refined | Opens at Craft Lv |
-|---|---|---|---|---|
-| 1 | low | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 |
-| 1 | high | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 26 |
-| 2 | low | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 1 |
-| 2 | high | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 26 |
-| 3 | low | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 1 |
-| 3 | high | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 26 |
+| Grade | Raw | Refined | Opens at Craft Lv |
+|---|---|---|---|
+| G1 | Quartz (`quartz`) | Cut Quartz (`cut-quartz`) | 1 |
+| G2 | Amethyst (`amethyst`) | Cut Amethyst (`cut-amethyst`) | 6 |
+| G3 | Citrine (`citrine`) | Cut Citrine (`cut-citrine`) | 11 |
+| G4 | Garnet (`garnet`) | Cut Garnet (`cut-garnet`) | 16 |
+| G5 | Emerald (`emerald`) | Cut Emerald (`cut-emerald`) | 21 |
+| G6 | Sapphire (`sapphire`) | Cut Sapphire (`cut-sapphire`) | 26 |
+| G7 | Ruby (`ruby`) | Cut Ruby (`cut-ruby`) | 31 |
+| G8 | Diamond (`diamond`) | Cut Diamond (`cut-diamond`) | 36 |
+| G9 | Starstone (`starstone`) | Cut Starstone (`cut-starstone`) | 41 |
+| G10 | Philosopher's Stone (`philosophers-stone`) | Cut Philosopher's Stone (`cut-philosophers-stone`) | 46 |
 <!-- /live -->
 
 ## Made items
 
-The four making places turn refined materials into what an Uma uses (PP10):
-- **Weapon Gem** (the Forge): raises a weapon one grade.
-- **Armor Fittings** (the Armorer): raise an armor slot one grade.
-- **Accessory Setting** (the Charm Shop): raises her accessory slot one grade.
-- **Planet and Moon Jewels** (the Lapidary): open her Extra Stats map's nodes ([loops](loops.md#extra-stats-and-gear)).
+Each making place makes one thing from its own line (FL3):
+- **Arms Gem** (the Forge, from Ingots): raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade. It keeps
+  R2's Weapon Gem's ids (`weapon-gem-g1` …): a Weapon Gem made before save v30 is an Arms Gem.
+- **Tome Ink** (the Workbench, from vegetable cuts): raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade. Its
+  icon is uma-art's infusion bottles (FL15).
+- **Armor Fittings** (the Armorer, from Planks): raise an armor slot one grade.
+- **Accessory Setting** (the Charm Shop, from Fillets): raises her accessory slot one grade.
+- **Planet and Moon Jewels** (the Lapidary, from cut stones): open her Extra Stats map's nodes
+  ([loops](loops.md#extra-stats-and-gear)).
 
-**One recipe an item, the same amounts in every tier** (PP10, PP11): a Weapon Gem 2 metal and 2 wood; Armor Fittings 1
-vegetable and 1 fish in the low band (G1–G5), 1 metal, 1 wood and 1 stone in the high band (G6–G10); an Accessory Setting
-12 refined, half vegetables and half fish; a Planet Jewel 3 each of stone, wood, vegetables and fish; a Moon Jewel 3 stone
-on 1 metal.
+**One recipe an item, one line each, the same amount at every grade and in every world** (FL9): an Arms Gem or Tome Ink 7
+refined items, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4, all of the item's grade. A
+maxed Uma's work comes to about 100–110 refined items a line (her weapon slots are about half Arms, half Tomes).
 
-**The ladder** (PP9) picks each refined type: a grade's band picks the low or the high type, and a later world moves the
-top grade of each band onto its own pair. In a Tier 2 world G5 and G10 take Tier 2's types; in Tier 3 G4 and G9 take Tier
-2's and G5 and G10 Tier 3's. The making places colour a grade by its material's tier (Tier 2 amber, Tier 3 violet).
-
-A made item of grade g opens at Craft Lv 5g − 4. Making one takes a gather's time for each refined item in it (a Weapon
-Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4).
+A made item of grade g opens at Craft Lv 5g − 4. Making one takes **three quarters of a gather** for each refined item in it
+(FL10), so each refined item costs its line's making place one gather (a quarter to process, three quarters to make), as it
+costs its gathering place one.
 
 ### Jewels
 
@@ -110,18 +132,18 @@ A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's n grade 2n. 
 picked when it's set; Moon Jewels II and IV also open her own moon's I and II.
 
 <!-- live:gems -->
-| Jewel | Id | Opens | Grade | Uma Lv | Recipe (Tier 1) |
+| Jewel | Id | Opens | Grade | Uma Lv | Recipe |
 |---|---|---|---|---|---|
-| Planet Jewel I | `jewel-planet-1` | Planet I | 1 | 1 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
-| Planet Jewel II | `jewel-planet-2` | Planet II | 3 | 11 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
-| Planet Jewel III | `jewel-planet-3` | Planet III | 5 | 21 | 3× Cut Quartz, 3× Pine Plank, 3× Chopped Carrot, 3× Carp Fillet |
-| Planet Jewel IV | `jewel-planet-4` | Planet IV | 7 | 31 | 3× Cut Citrine, 3× Cedar Plank, 3× Shredded Cabbage, 3× Sardine Fillet |
-| Planet Jewel V | `jewel-planet-5` | Planet V | 9 | 41 | 3× Cut Citrine, 3× Cedar Plank, 3× Shredded Cabbage, 3× Sardine Fillet |
-| Moon Jewel I | `jewel-moon-1` | node I of a moon | 2 | 6 | 3× Cut Quartz, Copper Ingot |
-| Moon Jewel II | `jewel-moon-2` | node II of a moon; her moon's I | 4 | 16 | 3× Cut Quartz, Copper Ingot |
-| Moon Jewel III | `jewel-moon-3` | node III of a moon | 6 | 26 | 3× Cut Citrine, Iron Ingot |
-| Moon Jewel IV | `jewel-moon-4` | node IV of a moon; her moon's II | 8 | 36 | 3× Cut Citrine, Iron Ingot |
-| Moon Jewel V | `jewel-moon-5` | node V of a moon | 10 | 46 | 3× Cut Citrine, Iron Ingot |
+| Planet Jewel I | `jewel-planet-1` | Planet I | 1 | 1 | 10× Cut Quartz |
+| Planet Jewel II | `jewel-planet-2` | Planet II | 3 | 11 | 10× Cut Citrine |
+| Planet Jewel III | `jewel-planet-3` | Planet III | 5 | 21 | 10× Cut Emerald |
+| Planet Jewel IV | `jewel-planet-4` | Planet IV | 7 | 31 | 10× Cut Ruby |
+| Planet Jewel V | `jewel-planet-5` | Planet V | 9 | 41 | 10× Cut Starstone |
+| Moon Jewel I | `jewel-moon-1` | node I of a moon | 2 | 6 | 4× Cut Amethyst |
+| Moon Jewel II | `jewel-moon-2` | node II of a moon; her moon's I | 4 | 16 | 4× Cut Garnet |
+| Moon Jewel III | `jewel-moon-3` | node III of a moon | 6 | 26 | 4× Cut Sapphire |
+| Moon Jewel IV | `jewel-moon-4` | node IV of a moon; her moon's II | 8 | 36 | 4× Cut Diamond |
+| Moon Jewel V | `jewel-moon-5` | node V of a moon | 10 | 46 | 4× Cut Philosopher's Stone |
 <!-- /live -->
 
 ## Gear
@@ -131,6 +153,8 @@ body, legs, arms, feet) and one accessory slot, each at a grade from G0 to G10. 
 slot one grade; nothing is crafted, bound or worn, and gear has no ranks. Grade g opens at Uma Lv 5g − 4.
 
 - **A weapon's Might:** its grade's value, added to the offense of hits made with that weapon, × the tier.
+- **What raises it** (FL4): an Arms weapon takes Arms Gems, a Tome Tome Ink, armor Armor Fittings, the accessory slot
+  Accessory Settings.
 - **Armor:** each slot adds its stat (head DEF, body HP, legs MP, arms M.DEF, feet Speed) and ATK or M.ATK by her class's
   half: a physical class's armor gives ATK, a magical class's M.ATK. Switching class switches the half; the grades stay.
 - **The accessory slot:** its grade, and a family and form she sets freely outside fights (WP19). The four families, from
@@ -158,20 +182,20 @@ Each grade's icon comes from uma-art's gear rows (H28), the made items' from its
 
 Each armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × 1, 1.8, 2.6 in Tiers 1, 2 and 3 (Feet Speed doesn't scale).
 
-What raises a slot one grade, in a Tier 1 world:
+What raises a slot one grade, in every world:
 
-| Grade | Weapon Gem | Armor Fittings | Accessory Setting |
-|---|---|---|---|
-| 1 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
-| 2 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
-| 3 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
-| 4 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
-| 5 | 2× Copper Ingot, 2× Pine Plank | Chopped Carrot, Carp Fillet | 6× Chopped Carrot, 6× Carp Fillet |
-| 6 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
-| 7 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
-| 8 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
-| 9 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
-| 10 | 2× Iron Ingot, 2× Cedar Plank | Iron Ingot, Cedar Plank, Cut Citrine | 6× Shredded Cabbage, 6× Sardine Fillet |
+| Grade | Arms Gem (an Arms weapon) | Tome Ink (a Tome) | Armor Fittings | Accessory Setting |
+|---|---|---|---|---|
+| 1 | 7× Copper Ingot | 7× Chopped Carrot | 2× Pine Plank | 10× Carp Fillet |
+| 2 | 7× Tin Ingot | 7× Diced Potato | 2× Birch Plank | 10× Trout Fillet |
+| 3 | 7× Iron Ingot | 7× Shredded Cabbage | 2× Cedar Plank | 10× Sardine Fillet |
+| 4 | 7× Silver Ingot | 7× Diced Onion | 2× Maple Plank | 10× Mackerel Fillet |
+| 5 | 7× Cobalt Ingot | 7× Tomato Purée | 2× Oak Plank | 10× Salmon Fillet |
+| 6 | 7× Gold Ingot | 7× Sliced Bell Pepper | 2× Cherry Plank | 10× Sea Bream Fillet |
+| 7 | 7× Platinum Ingot | 7× Sliced Eggplant | 2× Mahogany Plank | 10× Eel Fillet |
+| 8 | 7× Titanium Ingot | 7× Trimmed Asparagus | 2× Ebony Plank | 10× Tuna Fillet |
+| 9 | 7× Mythril Ingot | 7× Golden Carrot Purée | 2× Elderwood Plank | 10× Silverfin Fillet |
+| 10 | 7× Orichalcum Ingot | 7× Pumpkin Purée | 2× Yggdrasil Plank | 10× Rainbow Koi Fillet |
 
 Accessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot's):
 

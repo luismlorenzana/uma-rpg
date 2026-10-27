@@ -1,11 +1,11 @@
 // The farm by line's job kinds (H109; farm-by-line.md FL2, FL6, FL9, FL10): every place one line's, a making place
 // processing its own line and making its one item, every gate Craft Lv 5g − 4, making at three quarters of a gather a
-// refined item. Read from `rpgWorkEnvV4` directly: the switch (`farmByLine`) stays off until H112.
+// refined item. Read from `rpgWorkEnvV4`, the live env since H112.
 import { isRefusal, kindRules, type PlannedItem, type Refusal, type WorkEnv } from '@luismlorenzana/uma-work'
 import { describe, expect, it } from 'vitest'
 import { itemMinutes, jobExp, makeMinutesV4, refineMinutes } from '../economy/pacing'
 import { jobKindV4, PLACES_V4, placeSpecV4, PROFESSION_NAMES_V4 } from '../economy/places-v4'
-import { PLACES_V3, tradeOfCalling, type TradeOf } from '../economy/professions'
+import { PLACE_IDS_V3, PROFESSIONS, tradeOfCalling, type TradeOf } from '../economy/professions'
 import { madeRecipeV4, madeNameV4, madeRefinedV4 } from '../items/made-v4'
 import { gradeItem, jewelId, MADE_IDENTITIES } from '../items/made-id'
 import { lineItem } from '../items/lines'
@@ -40,8 +40,8 @@ const NOT_HERE = "That isn't made here."
 
 describe('the farm by line\'s places and env (FL1–FL3)', () => {
   it('keeps R2\'s ten places, slots and speed, each now one line\'s, the making places taking two kinds', () => {
-    expect(PLACES_V4.map((p) => p.id)).toEqual(PLACES_V3.map((p) => p.id))
-    expect(PLACES_V4.map((p) => p.profession)).toEqual(PLACES_V3.map((p) => p.profession))
+    expect(PLACES_V4.map((p) => p.id)).toEqual([...PLACE_IDS_V3])
+    expect(PLACES_V4.map((p) => p.profession)).toEqual(PLACE_IDS_V3.map((id) => PROFESSIONS.find((p) => p.place === id)!.id))
     expect(PLACES_V4.map((p) => `${p.id}:${p.line}:${p.kinds.join('+')}:${p.made.join('+')}`)).toEqual([
       'mine:metal:gather:', 'forge:metal:refine+craft:weapon-gem+branch-gem', 'forest:wood:gather:', 'armorer:wood:refine+craft:armor-fittings',
       'fields:vegetables:gather:', 'workbench:vegetables:refine+craft:tome-ink', 'fishery:fish:gather:', 'charm-shop:fish:refine+craft:accessory-setting',
@@ -53,9 +53,8 @@ describe('the farm by line\'s places and env (FL1–FL3)', () => {
     expect(PROFESSION_NAMES_V4.mining).toBe('Mining')
   })
 
-  it('is not live until the switch: the live env stays R2\'s', () => {
-    const env = liveWorkEnv(1)
-    expect(env.buildings).not.toBe(RPG_BUILDINGS_V4)
+  it('is the live env from the economy stage (H112)', () => {
+    expect(liveWorkEnv(1).buildings).toBe(RPG_BUILDINGS_V4)
     expect(rpgWorkEnvV4(1).exp).toBe(RPG_WORK_ENV.exp)
   })
 

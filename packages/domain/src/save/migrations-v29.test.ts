@@ -1,10 +1,10 @@
 // Save v29 (D220, the owner's R1 + R2 review): the Tier rework's grant is tickets only, so a world that took it keeps no
 // materials; made items, Laurels and tickets stay, and a world without a grant keeps its materials.
 import { describe, expect, it } from 'vitest'
-import { MATERIAL_IDENTITIES } from '../items/materials-id'
 import { migrateWorld, toV28, toV29 } from './migrations'
 import { newSave, parseSave, SAVE_SCHEMA_VERSION } from './save'
 import { fullRoster, richV27Save } from './v28.fixture'
+import { R2_TYPES } from './v29.fixture'
 
 type Raw = Record<string, unknown>
 type World = Raw & { items: Record<string, number>; wallet: Raw; grant: (Raw & { tickets: number; back: Raw }) | null }
@@ -23,8 +23,8 @@ describe('save v29 (D220): the grant is tickets only', () => {
   })
 
   it('knows each of R2\'s sixty material ids', () => {
-    const all = Object.fromEntries(MATERIAL_IDENTITIES.map((m) => [m.id, 1]))
-    expect(MATERIAL_IDENTITIES).toHaveLength(60)
+    const all = Object.fromEntries(R2_TYPES.map((m) => [m.id, 1]))
+    expect(R2_TYPES).toHaveLength(60)
     expect((toV29(granted(all)) as World).items).toEqual({})
   })
 
@@ -35,21 +35,21 @@ describe('save v29 (D220): the grant is tickets only', () => {
     expect(toV29(once)).toEqual(once)
   })
 
-  it('is chained after v28: a v27 save parses to v29 with no material in a granted world', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(29)
+  it('is chained after v28: a v27 save parses (to v30 since H112) with no material in a granted world', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(30)
     const world = toV28(fullRoster())
     expect(migrateWorld(world, 28)).toEqual(toV29(world))
     const save = parseSave(richV27Save())
-    expect(save.schemaVersion).toBe(29)
+    expect(save.schemaVersion).toBe(30)
     for (const w of Object.values(save.tierWorlds)) {
       if (!w.grant) continue
-      expect(Object.keys(w.items).filter((id) => MATERIAL_IDENTITIES.some((m) => m.id === id))).toEqual([])
+      expect(Object.keys(w.items).filter((id) => R2_TYPES.some((m) => m.id === id))).toEqual([])
     }
   })
 
-  it('starts new saves at v29 with no grant, so nothing is taken', () => {
+  it('starts new saves (v30 since H112) with no grant, so nothing is taken', () => {
     const save = newSave('Today', '2026-10-26T12:00:00.000Z')
-    expect(save.schemaVersion).toBe(29)
+    expect(save.schemaVersion).toBe(30)
     expect(save.tierWorlds['1']!.grant).toBeNull()
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })

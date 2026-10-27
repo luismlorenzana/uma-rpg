@@ -13,13 +13,14 @@ import { v15Replay, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
 type Raw = Record<string, unknown>
 type RawWorld = Raw & { umas: Record<string, Raw>; items: Record<string, number> }
-/** The rich save with every world through `toV28`, labelled v29 so no step runs (v29 keeps v28's shape and rules; D221's
- * step would take the materials), and `change` on Tier 1's world. */
+/** The rich save with every world through `toV28`, labelled v30 so no step runs (v29 and v30 keep v28's shape; v30's rules
+ * read it since H112; D221's step would take the materials and D224's settle and convert), and `change` on Tier 1's
+ * world. */
 function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
   const raw = richV27Save()
   const tierWorlds = Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, toV28(w, Number(k))]))
   change(tierWorlds['1'] as RawWorld)
-  return JSON.parse(JSON.stringify({ ...raw, schemaVersion: 29, tierWorlds })) as Raw
+  return JSON.parse(JSON.stringify({ ...raw, schemaVersion: 30, tierWorlds })) as Raw
 }
 
 describe('save v28\'s parse (H78), the economy stage live', () => {
@@ -46,8 +47,8 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
 
   it('refuses each of v28\'s rules broken', () => {
     const refused = (change: (world: RawWorld) => void, message: RegExp) => expect(() => parseSave(v28Save(change))).toThrow(message)
-    // A Tier 2 type in a Tier 1 world; the Branch Gem before R3's weapons.
-    refused((w) => { w.items['gold-ore'] = 1 }, /items\.gold-ore: a Tier 2 material in a Tier 1 world/)
+    // An id no line or made line holds (every world holds every grade since v30, FL8); the Branch Gem before R3's weapons.
+    refused((w) => { w.items['tome-ink-g11'] = 1 }, /items\.tome-ink-g11: unknown item/)
     refused((w) => { w.items['branch-gem'] = 1 }, /items\.branch-gem: unknown item/)
     // A grade above her level's: Uma 101 is Lv 20, and G6 needs Lv 26.
     refused((w) => { (w.umas['101']!.gear as Raw).weapons = { greatsword: { grade: 6 } } }, /umas\.101\.gear\.weapons\.greatsword\.grade: G6 needs Lv 26/)
@@ -76,6 +77,9 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     expect(() => parseSave(v28Save((w) => { w.work = { 101: row('mine', 0, 'carrot') } }))).toThrow(/request\.item: not made at this place/)
     expect(() => parseSave(v28Save((w) => { w.work = { 101: row('forge', 0, 'armor-fittings-g1', 'craft') } }))).toThrow(/request\.item: not made at this place/)
     expect(parseSave(v28Save((w) => { w.work = { 101: row('lapidary', 0, 'jewel-moon-1', 'cut') } })).tierWorlds['1']!.work['101']!.slot).toEqual({ building: 'lapidary', slot: 0 })
+    // v30 (H112): a making place processes its own line, and only its own.
+    expect(parseSave(v28Save((w) => { w.work = { 101: row('forge', 1, 'copper-ingot', 'refine') } })).tierWorlds['1']!.work['101']!.entries[0]!.request.kind).toBe('refine')
+    expect(() => parseSave(v28Save((w) => { w.work = { 101: row('workbench', 0, 'copper-ingot', 'refine') } }))).toThrow(/request\.item: not made at this place/)
   })
 
   it('makes new saves in v28\'s shape, which round-trip; a new Uma has no armor kinds', () => {
