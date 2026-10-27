@@ -32,6 +32,21 @@ const profile = () => <MemoryRouter><MotionRoot features={domAnimation}><AlbumAr
 const withWorld = (save: Save, fn: (w: TierWorld) => TierWorld): Save => ({ ...save, tierWorlds: { ...save.tierWorlds, '1': fn(worldOf(save)) } })
 
 describe('her profile says what she can upgrade (H34; R2\'s grades and jewels since H82)', () => {
+  it('keeps profile actions compact: an icon target, one-row accessory families, and one selected action', () => {
+    render(profile())
+    expect(screen.getByRole('button', { name: 'Mark target' }).textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Gear' }))
+    const families = within(screen.getByRole('radiogroup', { name: 'Accessory family' })).getAllByRole('radio')
+    expect(families).toHaveLength(4)
+    expect(families.map((family) => family.getAttribute('aria-label')!.replace('Signature ', '')).sort()).toEqual(['Pendant', 'Bell', 'Orb', 'Insignia'].sort())
+    expect(screen.getAllByRole('button', { name: /^(Equip|Equipped)$/ })).toHaveLength(1)
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Orb' }))
+    expect(within(screen.getByRole('group', { name: 'Orb: which weapon' })).getAllByRole('button')).toHaveLength(3)
+    expect(screen.getAllByRole('button', { name: /^(Equip|Equipped)$/ })).toHaveLength(1)
+  })
+
   it('shows the Gear dot, the grade rows\' marks and the jewels to set, and drops them once used; no skill costs points (v16 on)', () => {
     // Aster: Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
     let save = withWorld(fixture.save, (w) => {

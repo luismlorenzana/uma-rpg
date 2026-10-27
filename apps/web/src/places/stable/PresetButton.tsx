@@ -27,16 +27,14 @@ export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma
   return (
     <>
       <button type="button" disabled={on} onClick={() => (plan.binds.length ? setConfirm(true) : void apply())}
-        className="flex min-h-12 w-full items-center gap-2 rounded-md bg-raised px-3 py-1.5 text-left disabled:opacity-60">
+        className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2 text-left disabled:opacity-60">
         <ClassEmblem classId={classId} />
         <span className="min-w-0 flex-1">
-          <span className="block text-[13px] font-semibold">{on ? 'Standard preset on' : 'Use the standard preset'}</span>
-          <span className="block text-[11px] text-ink-soft">
-            {CLASS_LABEL[classId]} · {preset.armor === 'magical' ? 'Magical' : 'Physical'} armor · {graded
-              ? ACCESSORY_FAMILY_LABEL[plan.accessory!.family]
-              : `${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).orb]} · ${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).support]}`}
-          </span>
+          <span className="block truncate text-[12px] font-semibold">{on ? 'Standard preset on' : 'Use standard preset'}</span>
         </span>
+        <span className="truncate text-[10.5px] text-ink-soft">{CLASS_LABEL[classId]} · {preset.armor === 'magical' ? 'Magic' : 'Physical'} · {graded
+          ? ACCESSORY_FAMILY_LABEL[plan.accessory!.family]
+          : `${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).orb]} · ${EQUIP_LABEL[(preset as ReturnType<typeof classPreset>).support]}`}</span>
         {!on && <span className="shrink-0 text-ink-faint">›</span>}
       </button>
       {error && !confirm && <p className="text-[13px] text-danger">{error}</p>}

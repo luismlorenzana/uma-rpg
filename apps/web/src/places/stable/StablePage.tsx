@@ -74,7 +74,11 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
         onOpen={row => { prefs.see([row.id]); nav.sub(place, `outfit/${row.id}`) }}
         renderBadges={row => ({
           topLeft: row.classId ? <ClassEmblem classId={row.classId} /> : undefined,
-          bottomLeft: world?.targets.includes(row.id) ? <span className="text-accent" aria-label="Target"><TargetIcon size={14} /></span> : undefined,
+          bottomLeft: world?.targets.includes(row.id) ? (
+            <span className="flex size-5 items-center justify-center rounded-full bg-accent text-accent-ink shadow-1 ring-1 ring-page" aria-label="Target">
+              <TargetIcon size={13} />
+            </span>
+          ) : undefined,
           bottomRight: row.isNew ? <span className="rounded-full bg-accent px-1 text-[8px] font-bold text-accent-ink">NEW</span>
             : row.upgrades?.any ? <UpgradeMark /> : undefined,
         })}
