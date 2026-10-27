@@ -83,13 +83,13 @@ five rows of three connected by roads; each line gathers at its site, processes 
 making place (the Weapon Forge, Tome Forge and Charm Forge renamed and restyled); every step 36 → 24 minutes; the amounts
 stay. Both packets go to **ChatGPT, with full autonomy to merge and deploy**. H113's uma-art 2.14.0 is published
 ([platform #52](https://github.com/luismlorenzana/uma-platform/pull/52), D231); the owner authorized this session to
-publish it and close the art packet. H114 takes save v31, so R3–R5 move to saves v32–v34 when it lands.
+publish it and close the art packet. H114 is live on save v31, so R3–R5 use saves v32–v34.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H114 | **The trios live:** fifteen places and professions, three places a trade, refine only at the workbench and make only at the making place, equal steps (`stepMinutes`), save v31 (work settled), the map's fifteen spots, the screens by kind, the ledger, the manual, R3–R5 on saves v32–v34, a scratch migration in the pull request | ChatGPT | L | H113 | Ready (uma-art 2.14.0 published) |
+| H114 | **The trios live:** fifteen places and professions, three places a trade, refine only at the workbench and make only at the making place, equal steps (`stepMinutes`), save v31 (work settled), the map's fifteen spots, the screens by kind, the ledger, the manual, R3–R5 on saves v32–v34, a scratch migration in the pull request | ChatGPT | L | H113 | Done (`af04479`) |
 
-**Waves:** H113 and publication done → H114 ready.
+**Waves:** H113 and publication done → H114 done.
 
 **R3. Tier 2's weapons** (engine v18, save **v32**; its packets' "v29" reads v32, D221, D224, D230). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
@@ -233,6 +233,7 @@ for the fifth scenario (tiers T9).
 
 | Id | Task | Commit |
 |---|---|---|
+| H114 | **The Wilds' trios are live** (D232), by ChatGPT ([#63](https://github.com/luismlorenzana/uma-rpg/pull/63)): fifteen professions and places in five Gather → Process → Make rows; one kind per place; equal 36 → 24 minute steps; targets, screens, trade labels and ledger updated; save v31 settles v30 work and drops queues before the retired place ids disappear; R3–R5 moved to saves v32–v34; the literal v30 scratch migration and a full Metal-row playthrough are recorded in the pull request; deployed at `af04479` and verified through production health | `af04479` |
 | H113 | The Wilds' trios art (D231), delivered in uma-platform ([#52](https://github.com/luismlorenzana/uma-platform/pull/52)): five trade workbenches and Weapon, Tome and Charm Forges, 50 frames on a 288×432 sheet with all 42 older frames unchanged; contact sheet and fifteen-place mock at 1.5× reviewed; [uma-art 2.14.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40506089104). H114 owns the RPG pin and gameplay. | platform `84cc80f` |
 | H112 | **The farm by line is live** (D228), by the main session ([#60](https://github.com/luismlorenzana/uma-rpg/pull/60)): save v30 and `toV30` chained; R2's farm deleted (its catalog with tiers and bands, the ladder and cross-line recipes, single-kind places, its job kinds and env, the v28 request parse, its Exchange, targets and ledger paths, the Workbench grid and R2 What steps, `farmByLine`); the API test v29 → v30; the manual rewritten; R3–R5 on saves v31–v33; a full-shaped v29 scratch save migrated through the local API (before and after in the PR) and played: an Arms Gem and Tome Ink made and finished, a Tome raised with Tome Ink, a Katana with an Arms Gem | `53e8f61` |
 | H111 | The farm by line's screens, inert (D227), by the main session ([#59](https://github.com/luismlorenzana/uma-rpg/pull/59)): inside `PlaceV3`'s shell, a gathering place's ten raw tiles and a making place's Process tiles and Make chips (`place-view-v4.ts`, `PlaceV4.tsx`), the sheet's sizes by the picked job's kind with no kit change, the (i), header and quick look; the Exchange's line tabs by grade; the Warehouse's graded materials; the words, icons (Tome Ink on the essences' infusion frames) and `madeName`'s Arms Gem; checked locally with the switch applied by hand on a v29 scratch save | `2dea1d6` |
