@@ -1,5 +1,4 @@
-// H109: the farm by line's pacing ledger against farm-by-line.md FL9 and FL11 (Tier 1, Craft Lv 25's manual times,
-// before ×1.25): the same pace as R2's (forty Umas 1.27 maxed a day, twenty 0.54), every place within 75–83 hours.
+// H114: the Wilds' trios ledger against farm-by-line.md FL30 (Tier 1, Craft Lv 25's manual times, before ×1.25).
 import { describe, expect, it } from 'vitest'
 import { placeHoursV4, professionsReport, umaPiecesV4, umaRefinedByLine, umaRefinedV4 } from './professions-v4.sim'
 import { craftDay, FORTY, gradeDaysAt, placeSupplyOf, rosterRateOf, tradeHoursOf, TWENTY } from './professions.sim'
@@ -7,7 +6,7 @@ import { craftDay, FORTY, gradeDaysAt, placeSupplyOf, rosterRateOf, tradeHoursOf
 const total = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0)
 const near = (actual: number, want: number, within: number, label?: string) => expect(Math.abs(actual - want), label).toBeLessThanOrEqual(within)
 
-describe('the farm by line\'s pacing ledger (H109, FL9–FL11)', () => {
+describe('the Wilds\' trios pacing ledger (H114, FL30)', () => {
   it('one Uma: 110 pieces, 520 refined (528 with her moon), each line 100–110 (FL9)', () => {
     expect(total(umaPiecesV4())).toBe(110)
     expect(total(umaPiecesV4(true))).toBe(112)
@@ -21,13 +20,17 @@ describe('the farm by line\'s pacing ledger (H109, FL9–FL11)', () => {
     expect(umaRefinedV4()['cut-philosophers-stone']).toBe(12)
   })
 
-  it('783 hours (795 with her moon), every place 75.3–82.8, a trade\'s two places equal (FL10, FL11)', () => {
+  it('783.2 hours (795.2 with her moon), each trio\'s three places equal', () => {
     const hours = placeHoursV4()
     near(total(hours), 783.2, 0.1)
     near(total(placeHoursV4(true)), 795.2, 0.1)
-    for (const [gathering, making, h] of [['mine', 'forge', 79.1], ['forest', 'armorer', 75.3], ['fields', 'workbench', 79.1],
-      ['fishery', 'charm-shop', 75.3], ['monster-den', 'lapidary', 82.8]] as const) {
+    for (const [gathering, processing, making, h] of [
+      ['mine', 'mine-workbench', 'weapon-forge', 52.7], ['fields', 'fields-workbench', 'tome-forge', 52.7],
+      ['forest', 'forest-workbench', 'armorer', 50.2], ['fishery', 'fishery-workbench', 'charm-forge', 50.2],
+      ['monster-den', 'den-workbench', 'lapidary', 55.2],
+    ] as const) {
       near(hours[gathering], h, 0.05, gathering)
+      near(hours[processing], hours[gathering], 1e-9, processing)
       near(hours[making], hours[gathering], 1e-9, making)
     }
   })
@@ -40,9 +43,9 @@ describe('the farm by line\'s pacing ledger (H109, FL9–FL11)', () => {
       near(100 * t[trade as keyof typeof t].share, share, 0.05, trade)
     }
     const s = placeSupplyOf(placeHoursV4())
-    near(s['monster-den'], 1.45, 0.005); near(s.lapidary, 1.45, 0.005)
-    near(s.mine, 1.52, 0.005); near(s.workbench, 1.52, 0.005)
-    near(s.forest, 1.59, 0.005); near(s['charm-shop'], 1.59, 0.005)
+    for (const id of ['monster-den', 'den-workbench', 'lapidary'] as const) near(s[id], 2.17, 0.005)
+    for (const id of ['mine', 'mine-workbench', 'weapon-forge', 'fields', 'fields-workbench', 'tome-forge'] as const) near(s[id], 2.28, 0.005)
+    for (const id of ['forest', 'forest-workbench', 'armorer', 'fishery', 'fishery-workbench', 'charm-forge'] as const) near(s[id], 2.39, 0.005)
   })
 
   it('keeps R2\'s pace: forty 1.27 a day (Stone\'s seven bind), a run of twenty in 15.8 days; twenty 0.54; G10 held on day 22.5', () => {

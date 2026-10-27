@@ -22,7 +22,7 @@ describe('the Stable\'s Trade filter', () => {
   it('is a Trade group of five, named by their places, only from the switch', () => {
     const trade = stableFacets(true).at(-1)!
     expect([trade.group, trade.key, trade.options!.map((o) => o.label)]).toEqual(['Trade', 'trade', [
-      'Mine · Forge', 'Forest · Armorer', 'Fields · Workbench', 'Fishery · Charm Shop', 'Monster Den · Lapidary',
+      'Mine · Weapon Forge', 'Forest · Armorer', 'Fields · Tome Forge', 'Fishery · Charm Forge', 'Monster Den · Lapidary',
     ]])
     expect(stableFacets(false).some((f) => f.key === 'trade')).toBe(false)
   })

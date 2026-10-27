@@ -25,15 +25,17 @@ describe('targets (R2; the farm by line since H112)', () => {
     expect(total(plan.refined)).toBe(210 + 100 + 100 + 50 + 68)
     expect(total(plan.raw)).toBe(total(plan.refined))
     const lineOf = (key: string) => lineItem(key)?.line
-    const forge = facilityTargets(plan, 'forge')
+    const forge = facilityTargets(plan, 'weapon-forge')
     expect(forge.slice(0, 10).every((row) => row.key.startsWith('weapon-gem-'))).toBe(true)
-    expect(forge.slice(10).every((row) => lineOf(row.key) === 'metal' && lineItem(row.key)!.refined)).toBe(true)
+    expect(forge).toHaveLength(10)
+    expect(facilityTargets(plan, 'mine-workbench').every((row) => lineOf(row.key) === 'metal' && lineItem(row.key)!.refined)).toBe(true)
     expect(facilityTargets(plan, 'mine').every((row) => lineOf(row.key) === 'metal' && !lineItem(row.key)!.refined)).toBe(true)
     expect(facilityTargets(plan, 'armorer').slice(0, 10).every((row) => row.key.startsWith('armor-fittings-'))).toBe(true)
-    expect(facilityTargets(plan, 'charm-shop').slice(0, 10).every((row) => row.key.startsWith('accessory-setting-'))).toBe(true)
+    expect(facilityTargets(plan, 'charm-forge').slice(0, 10).every((row) => row.key.startsWith('accessory-setting-'))).toBe(true)
     expect(facilityTargets(plan, 'lapidary').slice(0, 10).every((row) => row.key.startsWith('jewel-'))).toBe(true)
-    // A Brawler holds no Tome: nothing for the Workbench or the Fields.
-    expect(facilityTargets(plan, 'workbench')).toEqual([])
+    // A Brawler holds no Tome: nothing for the Tome Forge, its Workbench or the Fields.
+    expect(facilityTargets(plan, 'tome-forge')).toEqual([])
+    expect(facilityTargets(plan, 'fields-workbench')).toEqual([])
     expect(facilityTargets(plan, 'fields')).toEqual([])
   })
 

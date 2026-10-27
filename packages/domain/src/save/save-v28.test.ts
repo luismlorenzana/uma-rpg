@@ -13,14 +13,13 @@ import { v15Replay, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
 type Raw = Record<string, unknown>
 type RawWorld = Raw & { umas: Record<string, Raw>; items: Record<string, number> }
-/** The rich save with every world through `toV28`, labelled v30 so no step runs (v29 and v30 keep v28's shape; v30's rules
- * read it since H112; D221's step would take the materials and D224's settle and convert), and `change` on Tier 1's
- * world. */
+/** The rich save with every world through `toV28`, labelled with the live schema so this file can exercise today's
+ * strict parser without re-running historical migrations, and `change` on Tier 1's world. */
 function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
   const raw = richV27Save()
   const tierWorlds = Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, toV28(w, Number(k))]))
   change(tierWorlds['1'] as RawWorld)
-  return JSON.parse(JSON.stringify({ ...raw, schemaVersion: 30, tierWorlds })) as Raw
+  return JSON.parse(JSON.stringify({ ...raw, schemaVersion: 31, tierWorlds })) as Raw
 }
 
 describe('save v28\'s parse (H78), the economy stage live', () => {
@@ -66,7 +65,7 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     refused(slots([{ grade: 0, family: 'orb', form: 'base' }]), /accessories\.0\.kind: expected one of the ten kinds/)
   })
 
-  it('reads v28\'s work: rows on the ten places, four slots, each request planned by its place\'s kind', () => {
+  it('reads current work: rows on the fifteen places, four slots, each request planned by its place\'s one kind', () => {
     const entry = (item: string, kind = 'gather') => ({ request: { kind, item, count: 1 }, seconds: [100], inputs: [[]], outputs: [{ item }], exp: [40],
       startedAt: 0, acceleratedMs: 0, collected: 0, speed: 1.25, fromQueue: false })
     const row = (building: string, slot: number, item: string, kind?: string) => ({ outfitId: '101', slot: { building, slot }, entries: [entry(item, kind)], queue: [], last: null, dropped: null })
@@ -75,11 +74,10 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     expect(() => parseSave(v28Save((w) => { w.work = { 101: row('ley-spring', 0, 'carrot') } }))).toThrow(/work\.101\.slot\.building: not a place/)
     expect(() => parseSave(v28Save((w) => { w.work = { 101: row('fields', 4, 'carrot') } }))).toThrow(/work\.101\.slot\.slot: no such slot/)
     expect(() => parseSave(v28Save((w) => { w.work = { 101: row('mine', 0, 'carrot') } }))).toThrow(/request\.item: not made at this place/)
-    expect(() => parseSave(v28Save((w) => { w.work = { 101: row('forge', 0, 'armor-fittings-g1', 'craft') } }))).toThrow(/request\.item: not made at this place/)
+    expect(() => parseSave(v28Save((w) => { w.work = { 101: row('weapon-forge', 0, 'armor-fittings-g1', 'craft') } }))).toThrow(/request\.item: not made at this place/)
     expect(parseSave(v28Save((w) => { w.work = { 101: row('lapidary', 0, 'jewel-moon-1', 'cut') } })).tierWorlds['1']!.work['101']!.slot).toEqual({ building: 'lapidary', slot: 0 })
-    // v30 (H112): a making place processes its own line, and only its own.
-    expect(parseSave(v28Save((w) => { w.work = { 101: row('forge', 1, 'copper-ingot', 'refine') } })).tierWorlds['1']!.work['101']!.entries[0]!.request.kind).toBe('refine')
-    expect(() => parseSave(v28Save((w) => { w.work = { 101: row('workbench', 0, 'copper-ingot', 'refine') } }))).toThrow(/request\.item: not made at this place/)
+    expect(parseSave(v28Save((w) => { w.work = { 101: row('mine-workbench', 1, 'copper-ingot', 'refine') } })).tierWorlds['1']!.work['101']!.entries[0]!.request.kind).toBe('refine')
+    expect(() => parseSave(v28Save((w) => { w.work = { 101: row('weapon-forge', 0, 'copper-ingot', 'refine') } }))).toThrow(/expected craft/)
   })
 
   it('makes new saves in v28\'s shape, which round-trip; a new Uma has no armor kinds', () => {

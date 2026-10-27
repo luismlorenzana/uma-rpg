@@ -2,35 +2,35 @@
 
 Everything an Uma gathers, processes or makes, and what it does. Lists are generated from `packages/domain/src/items/`
 (`lines.ts`, `made.ts`, `made-v4.ts`) and `economy/` (`places-v4.ts`, `grades.ts`, `accessories.ts`, `planet.ts`). How
-the jobs work is in [loops](loops.md#craft-level); the ten places in [sections](sections.md#wilds). This is the farm by
-line as it plays since H112 (save v30, D224; its design is
+the jobs work is in [loops](loops.md#craft-level); the fifteen places in [sections](sections.md#wilds). This is the farm by
+line as it plays since H114 (save v31, D230; its design is
 [farm-by-line.md](../design/tier-rework/farm-by-line.md)): every trade gathers, processes and makes its own line, on ten
 grades. The old game's eight families, crafted pieces and Star Gems, and R2's two types a line a tier, live on only in the
 save migrations that converted them (`toV28`, `toV30`, [architecture](architecture.md#save-history)).
 
 ## Lines
 
-Five lines, each one trade's (FL1): gathered at its gathering place, processed and made at its making place, and never
-touched by another place. Each line has **ten grades**, a raw item and its refined form each, all from one uma-art family;
+Five lines, each one trade's (FL31): gathered at its gathering place, processed at its workbench and made at its making
+place, and never touched by another place. Each line has **ten grades**, a raw item and its refined form each, all from one uma-art family;
 every world holds the same fifty types (FL8). Grade g opens at **Craft Lv 5g − 4** to gather, to process and to make (FL6).
 
 <!-- live:families -->
-| Line | Gathered by | Processed and made at | Makes | Raw, G1 → G10 |
-|---|---|---|---|---|
-| Metal | Mining, the Mine | the Forge (Arms Crafting) | Arms Gems | Copper Ore, Tin Ore, Iron Ore, Silver Ore, Cobalt Ore, Gold Ore, Platinum Ore, Titanium Ore, Mythril Ore, Orichalcum Ore |
-| Wood | Wood Chopping, the Forest | the Armorer (Armor Crafting) | Armor Fittings | Pine Log, Birch Log, Cedar Log, Maple Log, Oak Log, Cherry Log, Mahogany Log, Ebony Log, Elderwood Log, Yggdrasil Branch |
-| Vegetables | Farming, the Fields | the Workbench (Tome Crafting) | Tome Ink | Carrot, Potato, Cabbage, Onion, Tomato, Bell Pepper, Eggplant, Asparagus, Golden Carrot, Emperor Pumpkin |
-| Fish | Fishing, the Fishery | the Charm Shop (Accessory Crafting) | Accessory Settings | Carp, Trout, Sardine, Mackerel, Salmon, Sea Bream, Eel, Tuna, Silverfin, Rainbow Koi |
-| Stone | Hunting, the Monster Den | the Lapidary (Jewel Crafting) | Planet Jewels and Moon Jewels | Quartz, Amethyst, Citrine, Garnet, Emerald, Sapphire, Ruby, Diamond, Starstone, Philosopher's Stone |
+| Line | Gathered by | Processed at | Made at | Makes | Raw, G1 → G10 |
+|---|---|---|---|---|---|
+| Metal | Mining, the Mine | the Mine Workbench (Smelting) | the Weapon Forge (Arms Crafting) | Arms Gems | Copper Ore, Tin Ore, Iron Ore, Silver Ore, Cobalt Ore, Gold Ore, Platinum Ore, Titanium Ore, Mythril Ore, Orichalcum Ore |
+| Wood | Wood Chopping, the Forest | the Forest Workbench (Sawing) | the Armorer (Armor Crafting) | Armor Fittings | Pine Log, Birch Log, Cedar Log, Maple Log, Oak Log, Cherry Log, Mahogany Log, Ebony Log, Elderwood Log, Yggdrasil Branch |
+| Vegetables | Farming, the Fields | the Fields Workbench (Prepping) | the Tome Forge (Tome Crafting) | Tome Ink | Carrot, Potato, Cabbage, Onion, Tomato, Bell Pepper, Eggplant, Asparagus, Golden Carrot, Emperor Pumpkin |
+| Fish | Fishing, the Fishery | the Fishery Workbench (Filleting) | the Charm Forge (Accessory Crafting) | Accessory Settings | Carp, Trout, Sardine, Mackerel, Salmon, Sea Bream, Eel, Tuna, Silverfin, Rainbow Koi |
+| Stone | Hunting, the Monster Den | the Den Workbench (Stonecutting) | the Lapidary (Jewel Crafting) | Planet Jewels and Moon Jewels | Quartz, Amethyst, Citrine, Garnet, Emerald, Sapphire, Ruby, Diamond, Starstone, Philosopher's Stone |
 <!-- /live -->
 
-A raw item processes one for one into its refined form at its line's making place, in a quarter of a gather's time. A
-made item takes its own line's refined items of its own grade (FL7).
+A raw item processes one for one into its refined form at its line's workbench. A made item takes its own line's refined
+items of its own grade (FL7). Gathering one, processing one and each refined item in a recipe all take one equal step.
 
 ## Items by line
 
 <!-- live:items -->
-### Metal (Mining, the Mine; the Forge (Arms Crafting))
+### Metal (Mining, the Mine; the Mine Workbench (Smelting); the Weapon Forge (Arms Crafting))
 
 | Grade | Raw | Refined | Opens at Craft Lv |
 |---|---|---|---|
@@ -45,7 +45,7 @@ made item takes its own line's refined items of its own grade (FL7).
 | G9 | Mythril Ore (`mythril-ore`) | Mythril Ingot (`mythril-ingot`) | 41 |
 | G10 | Orichalcum Ore (`orichalcum-ore`) | Orichalcum Ingot (`orichalcum-ingot`) | 46 |
 
-### Wood (Wood Chopping, the Forest; the Armorer (Armor Crafting))
+### Wood (Wood Chopping, the Forest; the Forest Workbench (Sawing); the Armorer (Armor Crafting))
 
 | Grade | Raw | Refined | Opens at Craft Lv |
 |---|---|---|---|
@@ -60,7 +60,7 @@ made item takes its own line's refined items of its own grade (FL7).
 | G9 | Elderwood Log (`elderwood-log`) | Elderwood Plank (`elderwood-plank`) | 41 |
 | G10 | Yggdrasil Branch (`yggdrasil-branch`) | Yggdrasil Plank (`yggdrasil-plank`) | 46 |
 
-### Vegetables (Farming, the Fields; the Workbench (Tome Crafting))
+### Vegetables (Farming, the Fields; the Fields Workbench (Prepping); the Tome Forge (Tome Crafting))
 
 | Grade | Raw | Refined | Opens at Craft Lv |
 |---|---|---|---|
@@ -75,7 +75,7 @@ made item takes its own line's refined items of its own grade (FL7).
 | G9 | Golden Carrot (`golden-carrot`) | Golden Carrot Purée (`golden-carrot-puree`) | 41 |
 | G10 | Emperor Pumpkin (`emperor-pumpkin`) | Pumpkin Purée (`pumpkin-puree`) | 46 |
 
-### Fish (Fishing, the Fishery; the Charm Shop (Accessory Crafting))
+### Fish (Fishing, the Fishery; the Fishery Workbench (Filleting); the Charm Forge (Accessory Crafting))
 
 | Grade | Raw | Refined | Opens at Craft Lv |
 |---|---|---|---|
@@ -90,7 +90,7 @@ made item takes its own line's refined items of its own grade (FL7).
 | G9 | Silverfin (`silverfin`) | Silverfin Fillet (`silverfin-fillet`) | 41 |
 | G10 | Rainbow Koi (`rainbow-koi`) | Rainbow Koi Fillet (`rainbow-koi-fillet`) | 46 |
 
-### Stone (Hunting, the Monster Den; the Lapidary (Jewel Crafting))
+### Stone (Hunting, the Monster Den; the Den Workbench (Stonecutting); the Lapidary (Jewel Crafting))
 
 | Grade | Raw | Refined | Opens at Craft Lv |
 |---|---|---|---|
@@ -109,12 +109,12 @@ made item takes its own line's refined items of its own grade (FL7).
 ## Made items
 
 Each making place makes one thing from its own line (FL3):
-- **Arms Gem** (the Forge, from Ingots): raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade. It keeps
+- **Arms Gem** (the Weapon Forge, from Ingots): raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade. It keeps
   R2's Weapon Gem's ids (`weapon-gem-g1` …): a Weapon Gem made before save v30 is an Arms Gem.
-- **Tome Ink** (the Workbench, from vegetable cuts): raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade. Its
+- **Tome Ink** (the Tome Forge, from vegetable cuts): raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade. Its
   icon is uma-art's infusion bottles (FL15).
 - **Armor Fittings** (the Armorer, from Planks): raise an armor slot one grade.
-- **Accessory Setting** (the Charm Shop, from Fillets): raises her accessory slot one grade.
+- **Accessory Setting** (the Charm Forge, from Fillets): raises her accessory slot one grade.
 - **Planet and Moon Jewels** (the Lapidary, from cut stones): open her Extra Stats map's nodes
   ([loops](loops.md#extra-stats-and-gear)).
 
@@ -122,9 +122,8 @@ Each making place makes one thing from its own line (FL3):
 refined items, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4, all of the item's grade. A
 maxed Uma's work comes to about 100–110 refined items a line (her weapon slots are about half Arms, half Tomes).
 
-A made item of grade g opens at Craft Lv 5g − 4. Making one takes **three quarters of a gather** for each refined item in it
-(FL10), so each refined item costs its line's making place one gather (a quarter to process, three quarters to make), as it
-costs its gathering place one.
+A made item of grade g opens at Craft Lv 5g − 4. Making one takes one step for each refined item in it (FL28), while
+gathering and processing each item take one step at their own places.
 
 ### Jewels
 

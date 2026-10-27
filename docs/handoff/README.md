@@ -91,7 +91,7 @@ publish it and close the art packet. H114 takes save v31, so R3–R5 move to sav
 
 **Waves:** H113 and publication done → H114 ready.
 
-**R3. Tier 2's weapons** (engine v18, save **v31**; its packets' "v29" reads v31, D221, D224). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
+**R3. Tier 2's weapons** (engine v18, save **v32**; its packets' "v29" reads v32, D221, D224, D230). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -99,28 +99,28 @@ publish it and close the art packet. H114 takes save v31, so R3–R5 move to sav
 | H84 | Accessories, Tier 2: the second slot, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 | Waiting |
 | H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83 | Waiting |
 | H86 | The secondary profession from Tier 2 | Either | M | H82 | Ready |
-| H87 | Save v29 (dark): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
+| H87 | Save v32 (dark; packet's v29): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
 | H88 | R3's screens (inert): the G5 pick, accessory branches, the weapon moon, the secondary, armor halves | Either | L | H87 | Waiting |
 | H89 | R3's balance (dark): Pure against Dual, Full against Split, Tier 2's shields and most of its term, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85, H86 | Waiting |
-| H90 | **R3's switch:** engine v18 and save v29 live; the manual | Claude | M | H87, H88, H89 | Waiting |
+| H90 | **R3's switch:** engine v18 and save v32 live; the manual | Claude | M | H87, H88, H89 | Waiting |
 
 **Waves:** 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
 
-**R4. Tier 2's classes** (engine v19, save **v32**; its packets' "v30" reads v32, D221, D224):
+**R4. Tier 2's classes** (engine v19, save **v33**; its packets' "v30" reads v33, D221, D224, D230):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H91 | Engine v19 foundation and the class branches: the focus, Heavy, Lite, Elemental and Arcane, class skills, branch 2's presets, Tier 2's skill MP | Claude | L | H90 | Waiting |
 | H92 | Trees, Tier 2: line C, the Power or Break tip, the signature tip, ten equipped slots, LB+ at Bond 10 | Claude | L | H91 | Waiting |
 | H93 | Weaknesses by rank and the rest of Tier 2's term; the Rift's Tier 2 fronts; the pairings check | Claude | M | H91 | Waiting |
-| H94 | Save v30 (dark): a class branch per class, line C and tip picks | Claude | S–M | H91, H92 | Waiting |
+| H94 | Save v33 (dark; packet's v30): a class branch per class, line C and tip picks | Claude | S–M | H91, H92 | Waiting |
 | H95 | R4's screens (inert): the class tree, the branch pick, line C and the tips, ★ signature tip, the focus, the group names | Either | L | H93, H94 | Waiting |
 | H96 | R4's balance (dark): each class's two branches, the damage stack, the Tier 2 mirror, the pace with the term | Claude | L | H92, H93 | Waiting |
-| H97 | **R4's switch:** engine v19 and save v30 live; the manual | Claude | M | H94, H95, H96 | Waiting |
+| H97 | **R4's switch:** engine v19 and save v33 live; the manual | Claude | M | H94, H95, H96 | Waiting |
 
 **Waves:** 1) H91 → 2) H92, H93 → 3) H94, H96 → 4) H95 → 5) H97.
 
-**R5. Tier 3** (engine v20, save **v33**; its packets' "v31" reads v33, D221, D224):
+**R5. Tier 3** (engine v20, save **v34**; its packets' "v31" reads v34, D221, D224, D230):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -128,10 +128,10 @@ publish it and close the art packet. H114 takes save v31, so R3–R5 move to sav
 | H99 | Accessories, Tier 3 (the third slot and the step) and the second weapon moon | Claude | M | H98 | Waiting |
 | H100 | Trees, Tier 3, and the six masteries: depth 6, two lines held, the master slot | Claude | L | H98 | Waiting |
 | H101 | Weaknesses and Tier 3's term; boss shields 10; the secondary reaches Tier 2's work | Claude | M | H98 | Waiting |
-| H102 | Save v31 (dark): two lines, the master slot, Tier 3's branches, the third slot, the second moon | Claude | M | H99, H100 | Waiting |
+| H102 | Save v34 (dark; packet's v31): two lines, the master slot, Tier 3's branches, the third slot, the second moon | Claude | M | H99, H100 | Waiting |
 | H103 | R5's screens (inert) | Either | L | H102 | Waiting |
 | H104 | R5's balance (dark): the masteries, Keen against Tempered against Evolved, the stack's ceiling, the pace with Tier 3's term | Claude | L | H99, H100, H101 | Waiting |
-| H105 | **R5's switch:** engine v20 and save v31 live; the manual | Claude | M | H102, H103, H104 | Waiting |
+| H105 | **R5's switch:** engine v20 and save v34 live; the manual | Claude | M | H102, H103, H104 | Waiting |
 
 **Waves:** 1) H98 → 2) H99, H100, H101 → 3) H102, H104 → 4) H103 → 5) H105.
 
@@ -226,7 +226,7 @@ for the fifth scenario (tiers T9).
 - **Balance** waits on the owner's play: the [pacing ledger](../design/pacing.md#simulated) gives the numbers, Claude
   retunes.
 - **Releases:** the owner runs the [phone check](../testing/phone-check.md).
-- **Versions:** this game runs on engine v17 and save v29 (R2, live since H82; v29, the grant tickets only, D221), uma-kit 0.14.0, uma-art 2.13.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
+- **Versions:** this game runs on engine v17 and save v31 (the Wilds' trios, D230), uma-kit 0.14.0, uma-art 2.14.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server 0.2.0. The change
   protocol for one game or both is [change-protocol.md](../change-protocol.md).
 
 ## Done

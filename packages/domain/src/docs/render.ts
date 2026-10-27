@@ -2,9 +2,9 @@
 // can't drift from the game. A doc marks a block with `<!-- live:<key> -->` … `<!-- /live -->`; `pnpm docs:update` rewrites
 // them, and `docs.test.ts` fails when one is stale. Pure: no I/O (the test reads and writes the files).
 import {
-  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, itemMinutes, LATE_LAURELS, MAKE_SHARE_V4, makeMinutesV4, refineMinutes, MAX_JOB_COUNT,
+  BATTLE_LAURELS, EXP_PER_MINUTE, FIRST_CLEAR_LAURELS, LATE_LAURELS, makeMinutesV4, MAX_JOB_COUNT,
   POINT_EVASION, POINT_HP, POINT_LIMIT, REFINE_BATCHES, PROFESSION_MAX_LEVEL, professionExpToNext, REPLAY_SHARE,
-  SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN,
+  STEP_MINUTES, stepMinutes, SWEEP_TICKET_PRICE, TIME_TICKET_PRICE, TIME_TICKET_SPAN,
 } from '../economy/pacing'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
 import {
@@ -13,7 +13,7 @@ import {
 import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
 import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
 import { PLACE_SLOTS_V3, PLACE_SPEED_V3, professionById, TRADES } from '../economy/professions'
-import { isMakingPlaceV4, PLACES_V4 } from '../economy/places-v4'
+import { isMakingPlaceV4, isProcessingPlaceV4, PLACES_V4 } from '../economy/places-v4'
 import { stockName } from '../economy/stock'
 import { madeName } from '../items/made'
 import { madeRecipeV4, RECIPE_V4 } from '../items/made-v4'
@@ -401,12 +401,14 @@ const TIERS_123: readonly GearTier[] = [1, 2, 3]
 const LINE_NAME: Readonly<Record<MaterialLine, string>> = { metal: 'Metal', wood: 'Wood', vegetables: 'Vegetables', fish: 'Fish', stone: 'Stone' }
 const MADE_LINE_NAME: Readonly<Record<string, string>> = { 'weapon-gem': 'Arms Gems', 'tome-ink': 'Tome Ink', 'armor-fittings': 'Armor Fittings',
   'accessory-setting': 'Accessory Settings', 'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels' }
-/** A line's two places (FL1): its gathering place and profession, its making place and profession, and what it makes. */
-function lineHome(line: MaterialLine): { profession: string; place: string; maker: string; makes: string } {
-  const gather = PLACES_V4.find((p) => p.line === line && !isMakingPlaceV4(p))!
+/** A line's three places (FL31): gathering, processing and making, and what the last makes. */
+function lineHome(line: MaterialLine): { profession: string; place: string; processor: string; maker: string; makes: string } {
+  const gather = PLACES_V4.find((p) => p.line === line && p.kinds.includes('gather'))!
+  const process = PLACES_V4.find((p) => p.line === line && isProcessingPlaceV4(p))!
   const make = PLACES_V4.find((p) => p.line === line && isMakingPlaceV4(p))!
   return {
     profession: professionById(gather.profession)!.name, place: placeById(gather.id)?.name ?? gather.id,
+    processor: `the ${placeById(process.id)?.name ?? process.id} (${professionById(process.profession)!.name})`,
     maker: `the ${placeById(make.id)?.name ?? make.id} (${professionById(make.profession)!.name})`,
     makes: make.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and '),
   }
@@ -414,9 +416,9 @@ function lineHome(line: MaterialLine): { profession: string; place: string; make
 
 /** The five lines (FL1, FL5): who gathers each, where it's processed and made, and its ten raw items. */
 function families(): string {
-  return table(['Line', 'Gathered by', 'Processed and made at', 'Makes', 'Raw, G1 → G10'], MATERIAL_LINES.map((line) => {
+  return table(['Line', 'Gathered by', 'Processed at', 'Made at', 'Makes', 'Raw, G1 → G10'], MATERIAL_LINES.map((line) => {
     const home = lineHome(line)
-    return [LINE_NAME[line], `${home.profession}, the ${home.place}`, home.maker, home.makes, lineItems(line, false).map((m) => m.name).join(', ')]
+    return [LINE_NAME[line], `${home.profession}, the ${home.place}`, home.processor, home.maker, home.makes, lineItems(line, false).map((m) => m.name).join(', ')]
   }))
 }
 /** Every item, raw and refined, by line and grade (FL5, FL6): grade g opens at Craft Lv 5g − 4. */
@@ -424,7 +426,7 @@ function items(): string {
   const out: string[] = []
   for (const line of MATERIAL_LINES) {
     const home = lineHome(line)
-    out.push(`### ${LINE_NAME[line]} (${home.profession}, the ${home.place}; ${home.maker})`, '')
+    out.push(`### ${LINE_NAME[line]} (${home.profession}, the ${home.place}; ${home.processor}; ${home.maker})`, '')
     const refined = lineItems(line, true)
     out.push(table(['Grade', 'Raw', 'Refined', 'Opens at Craft Lv'], lineItems(line, false).map((m, i) => [
       `G${m.grade}`, `${m.name} (\`${m.id}\`)`, `${refined[i]!.name} (\`${refined[i]!.id}\`)`, gradeUnlockLevel(m.grade),
@@ -515,9 +517,8 @@ const minutes = (m: number): string => `${Number(m.toFixed(1))} min`
 const hours = (m: number): string => `${Number((m / 60).toFixed(1))} h`
 function jobs(): string {
   return table(['Setting', 'Value'], [
-    ['Gather one raw item', `any grade, by Craft Level: ${minutes(itemMinutes(1))} at Lv1, falling evenly to ${minutes(itemMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * itemMinutes(1))} and ${hours(10 * itemMinutes(PROFESSION_MAX_LEVEL))})`],
-    ['Process one item', `raw into refined, one for one, at her line's making place, a quarter of a gather: ${minutes(refineMinutes(1))} at Lv1, ${minutes(refineMinutes(PROFESSION_MAX_LEVEL))} at Lv${PROFESSION_MAX_LEVEL}`],
-    ['Make one item', `${MAKE_SHARE_V4 === 0.75 ? 'three quarters' : MAKE_SHARE_V4} of a gather for each refined item in it: an Arms Gem or Tome Ink ${RECIPE_V4['weapon-gem'].qty}, Armor Fittings ${RECIPE_V4['armor-fittings'].qty}, an Accessory Setting ${RECIPE_V4['accessory-setting'].qty}, a Planet Jewel ${RECIPE_V4['jewel-planet'].qty}, a Moon Jewel ${RECIPE_V4['jewel-moon'].qty} (an Arms Gem ${hours(makeMinutesV4(1, RECIPE_V4['weapon-gem'].qty))} at Lv1, ${hours(makeMinutesV4(PROFESSION_MAX_LEVEL, RECIPE_V4['weapon-gem'].qty))} at Lv${PROFESSION_MAX_LEVEL})`],
+    ['One step', `gather one raw or process one raw into one refined: ${STEP_MINUTES.atFirst} min at Craft Lv1, falling evenly to ${STEP_MINUTES.atMax} min at Lv${PROFESSION_MAX_LEVEL} (ten in ${hours(10 * stepMinutes(1))} and ${hours(10 * stepMinutes(PROFESSION_MAX_LEVEL))})`],
+    ['Make one item', `one step for each refined item in it: an Arms Gem or Tome Ink ${RECIPE_V4['weapon-gem'].qty}, Armor Fittings ${RECIPE_V4['armor-fittings'].qty}, an Accessory Setting ${RECIPE_V4['accessory-setting'].qty}, a Planet Jewel ${RECIPE_V4['jewel-planet'].qty}, a Moon Jewel ${RECIPE_V4['jewel-moon'].qty} (an Arms Gem ${hours(makeMinutesV4(1, RECIPE_V4['weapon-gem'].qty))} at Lv1, ${hours(makeMinutesV4(PROFESSION_MAX_LEVEL, RECIPE_V4['weapon-gem'].qty))} at Lv${PROFESSION_MAX_LEVEL})`],
     ['Opens', 'grade g at Craft Lv 5g − 4, to gather, to process and to make'],
     ['Craft EXP', `${EXP_PER_MINUTE} per minute of the job at her level, before the place's speed`],
     ['Outputs per job', `gathering and making 1–${MAX_JOB_COUNT}; processing ${REFINE_BATCHES.map((n) => `×${n}`).join(', ')}`],
@@ -537,19 +538,20 @@ function places(): string {
   }
   return out.join('\n').trimEnd()
 }
-/** The ten places (PP4, FL1–FL3) and the trades (PP2): who works each, and what it does. */
+/** The fifteen places (FL31) and the trades: who works each, and its one job. */
 function facilities(): string {
-  const trade = (profession: string) => TRADES.find((t) => t.gathering === profession || t.crafting === profession)!
+  const trade = (profession: string) => TRADES.find((t) => t.gathering === profession || t.processing === profession || t.crafting === profession)!
   const callings: Readonly<Record<string, string>> = { physical: 'Brawler', 'physical-hybrid': 'Spell Blade', healer: 'Paladin, Cleric', 'magical-hybrid': 'Summoner', magical: 'Mage' }
   const does = (id: string): string => {
     const spec = PLACES_V4.find((p) => p.id === id)!
-    if (!isMakingPlaceV4(spec)) return `Gathers ${LINE_NAME[spec.line].toLowerCase()}, G1–G10`
-    return `Processes ${LINE_NAME[spec.line].toLowerCase()}; makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
+    if (spec.kinds.includes('gather')) return `Gathers ${LINE_NAME[spec.line].toLowerCase()}, G1–G10`
+    if (isProcessingPlaceV4(spec)) return `Processes ${LINE_NAME[spec.line].toLowerCase()} raw into refined, one for one`
+    return `Makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
   }
   return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (callings)'], PLACES_V4.map((p) => {
     const profession = professionById(p.profession)!
     return [placeById(p.id)?.name ?? p.id, profession.name, cap(profession.kind), does(p.id), callings[trade(p.profession).id]!]
-  })) + `\n\nEvery place has ${PLACE_SLOTS_V3} slots at ×${PLACE_SPEED_V3} from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.`
+  })) + `\n\nEvery place has ${PLACE_SLOTS_V3} slots at ×${PLACE_SPEED_V3} from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.`
 }
 
 // --- The world ------------------------------------------------------------------------------------------------------

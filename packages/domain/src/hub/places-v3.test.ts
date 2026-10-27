@@ -1,5 +1,4 @@
-// R2's Wilds on the Hub (H77; profession-progression.md §4.1, PP4–PP6), on engine v17 (live since H82): the ten
-// places at today's side spots, and v1's eleven facilities and Town Hall byte for byte when asked for.
+// The Wilds' trios on the Hub (H114, FL32): fifteen places in five rows, and v1's eleven facilities byte for byte.
 import { describe, expect, it } from 'vitest'
 import { HUB_PAGES, learningPlaces, PLACES, placeById, placesOn, townPlaces, wildsPlaces, type Place } from './places'
 
@@ -20,24 +19,25 @@ describe('the Wilds by generation (H77)', () => {
       'workbench', 'forge', 'lapidary'])
   })
 
-  it('draws R2\'s ten places at the table\'s spots and frames, four slots each, from v17', () => {
+  it('draws fifteen places in five rows of three, workbenches on the trunk, four slots each', () => {
     expect(spots(wildsPlaces())).toEqual([
-      ['mine', 'gather-site', 0.24, 0.1, null, 4], ['forge', 'station', 0.74, 0.12, null, 4],
-      ['forest', 'gather-site', 0.2, 0.3, null, 4], ['armorer', 'station', 0.76, 0.32, 'lancers-barracks', 4],
-      ['fields', 'gather-site', 0.22, 0.51, 'vegetable-garden', 4], ['workbench', 'station', 0.78, 0.51, null, 4],
-      ['fishery', 'gather-site', 0.22, 0.71, null, 4], ['charm-shop', 'station', 0.78, 0.7, 'arcane-armory', 4],
-      ['monster-den', 'gather-site', 0.26, 0.9, null, 4], ['lapidary', 'station', 0.74, 0.9, null, 4],
+      ['mine', 'gather-site', 0.2, 0.15, null, 4], ['mine-workbench', 'station', 0.5, 0.15, null, 4], ['weapon-forge', 'station', 0.8, 0.15, null, 4],
+      ['fields', 'gather-site', 0.2, 0.31, 'vegetable-garden', 4], ['fields-workbench', 'station', 0.5, 0.31, null, 4], ['tome-forge', 'station', 0.8, 0.31, null, 4],
+      ['forest', 'gather-site', 0.2, 0.47, null, 4], ['forest-workbench', 'station', 0.5, 0.47, null, 4], ['armorer', 'station', 0.8, 0.47, 'lancers-barracks', 4],
+      ['fishery', 'gather-site', 0.2, 0.63, null, 4], ['fishery-workbench', 'station', 0.5, 0.63, null, 4], ['charm-forge', 'station', 0.8, 0.63, null, 4],
+      ['monster-den', 'gather-site', 0.2, 0.79, null, 4], ['den-workbench', 'station', 0.5, 0.79, null, 4], ['lapidary', 'station', 0.8, 0.79, null, 4],
     ])
     expect(placesOn('wilds')).toEqual(wildsPlaces(17))
     expect(wildsPlaces().every((p) => p.page === 'wilds' && !p.hidden && p.blurb.length > 0 && p.details.length > 0)).toBe(true)
     expect(placeById('mine')?.blurb).toBe('Mining: metal, G1–G10.')
-    expect(placeById('workbench')?.blurb).toBe('Tome Crafting: Tome Ink.')
-    expect(placeById('charm-shop')?.blurb).toBe('Accessory Crafting: Accessory Settings.')
+    expect(placeById('mine-workbench')?.blurb).toBe('Smelting: ores into ingots.')
+    expect(placeById('tome-forge')?.blurb).toBe('Tome Crafting: Tome Ink.')
+    expect(placeById('charm-forge')?.blurb).toBe('Accessory Crafting: Accessory Settings.')
   })
 
   it('has no place for the five removed ids, and the other pages as they were', () => {
     for (const id of ['ley-spring', 'crystal-cavern', 'quarry', 'meadow', 'fossil-dig']) expect(placeById(id), id).toBeUndefined()
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 7, 2, 10])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 7, 2, 15])
     expect(placesOn('learning')).toEqual(learningPlaces(16))
     expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale'])
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
@@ -50,7 +50,7 @@ describe('the Wilds by generation (H77)', () => {
     expect(townPlaces().filter((p) => p.id !== 'warehouse' && p.id !== 'exchange')).toEqual(townPlaces(16).filter((p) => p.id !== 'warehouse' && p.id !== 'exchange'))
   })
 
-  it('keeps the ten 44 pt apart on the smallest phone', () => {
+  it('keeps the fifteen 44 pt apart on the smallest phone', () => {
     const list = wildsPlaces()
     for (const a of list) for (const b of list) {
       if (a !== b) expect(Math.hypot((a.at.x - b.at.x) * 375, (a.at.y - b.at.y) * 500), `${a.id} ↔ ${b.id}`).toBeGreaterThanOrEqual(66)

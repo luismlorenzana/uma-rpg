@@ -201,12 +201,13 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v30 for a world of `tier` (its key; v28 doesn't read it, R3's v31 does, H87). */
+/** Every step to v31 for a world of `tier`. */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
   const v29 = version < 29 && isRecord(v28) ? toV29(v28) : v28
-  return version < 30 && isRecord(v29) ? toV30(v29) : v29
+  const v30 = version < 30 && isRecord(v29) ? toV30(v29) : v29
+  return version < 31 && isRecord(v30) ? toV31(v30) : v30
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -348,6 +349,22 @@ export function toV30(world: Record<string, unknown>): Record<string, unknown> {
   const stock: Record<string, number> = {}
   for (const [id, n] of Object.entries(items)) add(stock, V30_TYPES.get(id) ?? id, n)
   return { ...world, umas: isRecord(world.umas) ? umas : world.umas, items: stock, work: {} }
+}
+
+// --- v30 → v31 (D230): the Wilds' trios. Written and switched in H114 -----------------------------------------------
+
+/**
+ * The farm's ten places become fifteen places with one job kind each. Place ids live only in work rows, so every
+ * started v30 entry settles without a clock: uncollected outputs enter the Warehouse and pay their Craft EXP; queues
+ * drop and work starts empty. Everything else stays.
+ */
+export function toV31(world: Record<string, unknown>): Record<string, unknown> {
+  if (!isRecord(world.items)) return world
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  const items: Record<string, number> = {}
+  for (const [id, n] of Object.entries(world.items)) add(items, id, countOf(n))
+  settleWork(world, umas, (item) => add(items, item, 1))
+  return { ...world, umas: isRecord(world.umas) ? umas : world.umas, items, work: {} }
 }
 
 export interface TierGrant {

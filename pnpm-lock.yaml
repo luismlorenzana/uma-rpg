@@ -79,8 +79,8 @@ importers:
   apps/web:
     dependencies:
       '@luismlorenzana/uma-art':
-        specifier: 2.13.0
-        version: 2.13.0
+        specifier: 2.14.0
+        version: 2.14.0
       '@luismlorenzana/uma-data':
         specifier: 1.1.0
         version: 1.1.0
@@ -1370,8 +1370,8 @@ packages:
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
-  '@luismlorenzana/uma-art@2.13.0':
-    resolution: {integrity: sha512-yCVlU0jPcFqAETJBZu9rzsGlcd3cnVRpQWO3mP4Aapb8G06JtoYqE1RZGjcoWR3T3BkTvZUyR+8zlpXU+wkk6Q==, tarball: https://npm.pkg.github.com/download/@luismlorenzana/uma-art/2.13.0/c2c7d6a148c658ac24a073fcd43a61ae6ca6b41f}
+  '@luismlorenzana/uma-art@2.14.0':
+    resolution: {integrity: sha512-RKJ4XzqeVMawjZ7KmbkngTgmAxaihEPof6YMPcy9bRX4K1Hz8t7/lREp5yN019zn/3BBsR8drB9RLOV3dfeT5Q==, tarball: https://npm.pkg.github.com/download/@luismlorenzana/uma-art/2.14.0/f342a23ce4c827a6340feb85e5e0b65c94e0fcbc}
 
   '@luismlorenzana/uma-data@1.1.0':
     resolution: {integrity: sha512-0sWzgTFG1m2KN2kMNhuCX1ym7t4lTAMfYWv23BzDFf+UsHn2JKcvtlBzvNt5xdTN5Ky8rTQNnRYsLzTEDUZ/Ag==, tarball: https://npm.pkg.github.com/download/@luismlorenzana/uma-data/1.1.0/a6426b9baef7602dae0bf1bfea71862b4e7857cf}
@@ -6029,7 +6029,7 @@ snapshots:
   '@js-sdsl/ordered-map@4.4.2':
     optional: true
 
-  '@luismlorenzana/uma-art@2.13.0': {}
+  '@luismlorenzana/uma-art@2.14.0': {}
 
   '@luismlorenzana/uma-data@1.1.0': {}
 

@@ -11,10 +11,10 @@ const HOURS_A_DAY = 24
 const range = (n: number): number[] => Array.from({ length: n }, (_, i) => i + 1)
 const sum = (xs: Iterable<number>): number => { let n = 0; for (const x of xs) n += x; return n }
 
-/** A trade's two places (PP2, PP3). */
-export const tradePlaceIds = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3] => {
+/** A trade's three places (FL27). */
+export const tradePlaceIds = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3, PlaceIdV3] => {
   const t = TRADES.find((x) => x.id === trade)!
-  return [professionById(t.gathering)!.place, professionById(t.crafting)!.place]
+  return [professionById(t.gathering)!.place, professionById(t.processing)!.place, professionById(t.crafting)!.place]
 }
 
 /** Each trade's hours and share from each place's hours (§7.2). */
@@ -39,13 +39,13 @@ export type TradeSplit = readonly [number, number, number, number, number]
 export const FORTY: TradeSplit = [9, 8, 9, 7, 7]
 export const TWENTY: TradeSplit = [5, 4, 5, 3, 3]
 
-/** Maxed Umas a day a roster makes, and what binds it (§7.4): each trade's Umas work its two places (at most their eight
+/** Maxed Umas a day a roster makes, and what binds it (§7.4): each trade's Umas work its three places (at most twelve
  * slots), each place at most its four; the roster runs at its tightest trade or place. */
 export function rosterRateOf(split: TradeSplit, hours: Record<PlaceIdV3, number>): { rate: number; binds: string } {
   const trades = tradeHoursOf(hours)
   let rate = Infinity, binds = ''
   TRADES.forEach((t, i) => {
-    const workers = Math.min(split[i]!, 2 * PLACE_SLOTS_V3)
+    const workers = Math.min(split[i]!, 3 * PLACE_SLOTS_V3)
     const own = (workers * slotDay) / trades[t.id].hours
     if (own < rate) { rate = own; binds = `${t.id} (${split[i]} Umas)` }
     for (const p of tradePlaceIds(t.id)) {

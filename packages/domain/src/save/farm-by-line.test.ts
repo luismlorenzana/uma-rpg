@@ -35,9 +35,9 @@ function worldWith(tier: number, continents: readonly number[]): TierWorld {
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 
-describe('the farm by line (save v30)', () => {
+describe('the farm by line (save v31)', () => {
   it('is the live save', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(30)
+    expect(SAVE_SCHEMA_VERSION).toBe(31)
   })
 
   it('lets the Warehouse hold the hundred line items and Tome Ink (FL5, FL14)', () => {
@@ -52,23 +52,23 @@ describe('work on the farm by line\'s env (FL2, FL10)', () => {
     expect(liveWorkEnv(1).buildings).toBe(RPG_BUILDINGS_V4)
   })
 
-  it('starts a process at the Forge and a make after it: each job\'s kind follows its item', () => {
-    const save = startJob(one({ 'copper-ore': 8 }), 'forge', 0, { outfitId: '101' }, 'copper-ingot', 8, NOW)
+  it('starts a process at the Mine Workbench and a make at the Weapon Forge', () => {
+    const save = startJob(one({ 'copper-ore': 8 }), 'mine-workbench', 0, { outfitId: '101' }, 'copper-ingot', 8, NOW)
     const row = worldOf(save, '1').work['101']!
     expect(row.entries[0]!.request).toEqual({ kind: 'refine', item: 'copper-ingot', count: 8 })
     expect(worldOf(save, '1').items).toEqual({})
-    const made = startJob(one({ 'copper-ingot': 7 }), 'forge', 1, { outfitId: '101' }, 'weapon-gem-g1', 1, NOW)
+    const made = startJob(one({ 'copper-ingot': 7 }), 'weapon-forge', 1, { outfitId: '101' }, 'weapon-gem-g1', 1, NOW)
     expect(worldOf(made, '1').work['101']!.entries[0]!.request).toEqual({ kind: 'craft', item: 'weapon-gem-g1', count: 1 })
-    expect(() => startJob(one({ 'pine-log': 1 }), 'forge', 0, { outfitId: '101' }, 'pine-plank', 1, NOW)).toThrow("That isn't made here.")
+    expect(() => startJob(one({ 'pine-log': 1 }), 'mine-workbench', 0, { outfitId: '101' }, 'pine-plank', 1, NOW)).toThrow("That isn't made here.")
   })
 
   it('plans a job\'s item, inputs and gate for the pickers', () => {
     const world = gradedWorld({ umas: { '101': gradedUma() } })
-    const gem = planJob(world, 'forge', { outfitId: '101' }, 'weapon-gem-g1', 1)!
+    const gem = planJob(world, 'weapon-forge', { outfitId: '101' }, 'weapon-gem-g1', 1)!
     expect(gem.output).toEqual({ id: 'weapon-gem-g1', name: 'Arms Gem G1', grade: 1 })
     expect(gem.inputs).toEqual({ 'copper-ingot': 7 })
     expect(gem.block).toBe('Needs 7 Copper Ingot')
-    const ink = planJob(world, 'workbench', { outfitId: '101' }, 'tome-ink-g2', 1)!
+    const ink = planJob(world, 'tome-forge', { outfitId: '101' }, 'tome-ink-g2', 1)!
     expect(ink.output).toEqual({ id: 'tome-ink-g2', name: 'Tome Ink G2', grade: 2 })
     expect(ink.block).toBe('Needs Craft Lv6')
     expect(planJob(world, 'mine', { outfitId: '101' }, 'tin-ore', 1)!.output).toEqual({ id: 'tin-ore', name: 'Tin Ore', grade: 2 })
@@ -111,7 +111,7 @@ describe('targets by line (FL9, FL22)', () => {
   }
   const total = (rows: readonly { need: number }[]) => rows.reduce((sum, row) => sum + row.need, 0)
 
-  it('asks a Mage\'s Tomes for Tome Ink, down to vegetable cuts at the Workbench and vegetables at the Fields', () => {
+  it('asks a Mage\'s Tomes for Tome Ink, cuts at the Fields Workbench and vegetables at the Fields', () => {
     const plan = planFor('mage')
     expect(total(plan.made.filter((r) => r.key.startsWith('tome-ink-')))).toBe(30)
     expect(plan.made.some((r) => r.key.startsWith('weapon-gem-'))).toBe(false)
@@ -119,21 +119,21 @@ describe('targets by line (FL9, FL22)', () => {
     expect(total(plan.refined)).toBe(210 + 100 + 100 + 50 + 68)
     expect(total(plan.raw)).toBe(total(plan.refined))
     expect(plan.made.find((r) => r.key === 'tome-ink-g3')).toMatchObject({ name: 'Tome Ink G3', grade: 3, need: 3 })
-    const workbench = facilityTargets(plan, 'workbench')
-    expect(workbench.map((r) => r.key).slice(0, 10)).toEqual(Array.from({ length: 10 }, (_, i) => `tome-ink-g${i + 1}`))
-    expect(workbench.slice(10).map((r) => r.key)).toEqual(['chopped-carrot', 'diced-potato', 'shredded-cabbage', 'diced-onion', 'tomato-puree',
+    expect(facilityTargets(plan, 'tome-forge').map((r) => r.key)).toEqual(Array.from({ length: 10 }, (_, i) => `tome-ink-g${i + 1}`))
+    expect(facilityTargets(plan, 'fields-workbench').map((r) => r.key)).toEqual(['chopped-carrot', 'diced-potato', 'shredded-cabbage', 'diced-onion', 'tomato-puree',
       'sliced-bell-pepper', 'sliced-eggplant', 'trimmed-asparagus', 'golden-carrot-puree', 'pumpkin-puree'])
     expect(facilityTargets(plan, 'fields').map((r) => r.key)).toEqual(['carrot', 'potato', 'cabbage', 'onion', 'tomato', 'bell-pepper', 'eggplant',
       'asparagus', 'golden-carrot', 'emperor-pumpkin'])
-    expect(facilityTargets(plan, 'forge')).toEqual([])
+    expect(facilityTargets(plan, 'weapon-forge')).toEqual([])
   })
 
-  it('lists a Brawler\'s Arms Gems, then Ingots, at the Forge', () => {
-    const forge = facilityTargets(planFor('brawler'), 'forge')
+  it('lists a Brawler\'s Arms Gems at the Weapon Forge and Ingots at the Mine Workbench', () => {
+    const forge = facilityTargets(planFor('brawler'), 'weapon-forge')
     expect(forge[0]).toMatchObject({ key: 'weapon-gem-g1', name: 'Arms Gem G1', need: 3 })
     expect(forge.filter((r) => r.key.startsWith('weapon-gem-'))).toHaveLength(10)
-    expect(forge.slice(10).map((r) => r.key)[0]).toBe('copper-ingot')
-    expect(forge.find((r) => r.key === 'iron-ingot')).toMatchObject({ name: 'Iron Ingot', grade: 3, need: 21 })
+    expect(forge).toHaveLength(10)
+    expect(facilityTargets(planFor('brawler'), 'mine-workbench')[0]?.key).toBe('copper-ingot')
+    expect(facilityTargets(planFor('brawler'), 'mine-workbench').find((r) => r.key === 'iron-ingot')).toMatchObject({ name: 'Iron Ingot', grade: 3, need: 21 })
     expect(facilityTargets(planFor('brawler'), 'mine').map((r) => r.key)[1]).toBe('tin-ore')
   })
 })
@@ -169,9 +169,10 @@ describe('names and places (FL14, FL16)', () => {
 
   it('describes the Wilds\' places by line', () => {
     const places = Object.fromEntries(wildsPlaces().map((p) => [p.id, p]))
-    expect(places.forge!.blurb).toBe('Arms Crafting: Arms Gems.')
-    expect(places.workbench!.blurb).toBe('Tome Crafting: Tome Ink.')
+    expect(places['weapon-forge']!.blurb).toBe('Arms Crafting: Arms Gems.')
+    expect(places['fields-workbench']!.blurb).toBe('Prepping: vegetables into cuts.')
+    expect(places['tome-forge']!.blurb).toBe('Tome Crafting: Tome Ink.')
     expect(places.mine!.blurb).toBe('Mining: metal, G1–G10.')
-    expect(places.lapidary!.details[0]).toBe('Processes Stone, makes Planet and Moon Jewels I–V')
+    expect(places.lapidary!.details[0]).toBe('Makes Planet and Moon Jewels I–V')
   })
 })

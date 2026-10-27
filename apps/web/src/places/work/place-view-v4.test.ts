@@ -16,15 +16,16 @@ describe('the farm by line\'s What step (FL22)', () => {
     expect(gatherTilesV4('fish', 50).map((t) => t.id).slice(0, 3)).toEqual(['carp', 'trout', 'sardine'])
   })
 
-  it('gives a making place its line\'s refined tiles and its item\'s chips', () => {
+  it('gives a workbench its line\'s refined tiles and a making place its chips', () => {
     expect(processTilesV4('vegetables', 1).map((t) => t.id).slice(0, 3)).toEqual(['chopped-carrot', 'diced-potato', 'shredded-cabbage'])
-    const forge = makeGroupsV4('forge', 11)
+    expect(makeGroupsV4('mine-workbench', 11)).toEqual([])
+    const forge = makeGroupsV4('weapon-forge', 11)
     expect(forge).toHaveLength(1)
     expect(forge[0]!.chips.map((c) => c.id)).toEqual(Array.from({ length: 10 }, (_, i) => `weapon-gem-g${i + 1}`))
     expect(forge[0]!.chips.map((c) => c.locked === null)).toEqual([true, true, true, false, false, false, false, false, false, false])
-    expect(makeGroupsV4('workbench', 1)[0]!.chips[0]!.id).toBe('tome-ink-g1')
+    expect(makeGroupsV4('tome-forge', 1)[0]!.chips[0]!.id).toBe('tome-ink-g1')
     expect(makeGroupsV4('armorer', 1)[0]!.chips[9]!.id).toBe('armor-fittings-g10')
-    expect(makeGroupsV4('charm-shop', 1)[0]!.chips[0]!.id).toBe('accessory-setting-g1')
+    expect(makeGroupsV4('charm-forge', 1)[0]!.chips[0]!.id).toBe('accessory-setting-g1')
     const lapidary = makeGroupsV4('lapidary', 21)
     expect(lapidary.map((g) => [g.label, g.chips.map((c) => `${c.label}:${c.grade}:${c.locked === null}`)])).toEqual([
       ['Planet', ['I:1:true', 'II:3:true', 'III:5:true', 'IV:7:false', 'V:9:false']],
@@ -34,32 +35,33 @@ describe('the farm by line\'s What step (FL22)', () => {
   })
 
   it('tells each job\'s kind and sizes: process ×1 … ×40, make and gather 1–10', () => {
-    expect(['copper-ore', 'copper-ingot', 'weapon-gem-g1'].map((id) => jobKindAtV4('forge', id))).toEqual(['refine', 'refine', 'craft'])
+    expect(jobKindAtV4('mine-workbench', 'copper-ingot')).toBe('refine')
+    expect(jobKindAtV4('weapon-forge', 'weapon-gem-g1')).toBe('craft')
     expect(jobKindAtV4('mine', 'tin-ore')).toBe('gather')
     expect(jobKindAtV4('lapidary', 'jewel-planet-1')).toBe('cut')
-    expect(jobKindAtV4('lapidary', 'cut-ruby')).toBe('refine')
+    expect(jobKindAtV4('den-workbench', 'cut-ruby')).toBe('refine')
     expect(jobSizesV4('refine')).toBe(REFINE_BATCHES)
     expect(jobSizesV4('craft')).toBeUndefined()
     expect(jobSizesV4('gather')).toBeUndefined()
   })
 
   it('opens on the highest grade she can take', () => {
-    expect(initialJobV4('forge', 12)).toBe('weapon-gem-g3')
-    expect(initialJobV4('forge', 1)).toBe('weapon-gem-g1')
+    expect(initialJobV4('weapon-forge', 12)).toBe('weapon-gem-g3')
+    expect(initialJobV4('weapon-forge', 1)).toBe('weapon-gem-g1')
+    expect(initialJobV4('mine-workbench', 12)).toBe('iron-ingot')
     expect(initialJobV4('mine', 26)).toBe('gold-ore')
     expect(initialJobV4('lapidary', 16)).toBe('jewel-moon-2')
   })
 
   it('says what each place does (FL16) and shows it in the quick look', () => {
     expect(helpLinesV4('mine')[0]).toBe('Gathers metal, G1–G10. Grade g opens at Craft Lv 5g − 4.')
-    expect(helpLinesV4('forge').slice(0, 2)).toEqual([
-      'Processes its line’s raw items into refined ones, one for one, in a quarter of a gather.',
-      'Makes Arms Gems from Ingots, three quarters of a gather for each Ingot. Grade g opens at Craft Lv 5g − 4.',
-    ])
-    expect(helpLinesV4('workbench')[1]).toContain('Tome Ink from vegetable cuts')
+    expect(helpLinesV4('mine-workbench')[0]).toBe('Processes metal’s raw items into refined ones, one for one. Grade g opens at Craft Lv 5g − 4.')
+    expect(helpLinesV4('weapon-forge')[0]).toBe('Makes Arms Gems from Ingots, one step for each refined item in it. Grade g opens at Craft Lv 5g − 4.')
+    expect(helpLinesV4('tome-forge')[0]).toContain('Tome Ink from vegetable cuts')
     expect(peekV4('fields')).toEqual({ icons: ['carrot', 'potato', 'cabbage', 'onion', 'tomato', 'bell-pepper', 'eggplant', 'asparagus', 'golden-carrot', 'emperor-pumpkin'] })
-    const forge = peekV4('forge')
-    expect('process' in forge && forge.process).toBe('Processes Metal G1–G10')
+    expect(peekV4('mine-workbench')).toEqual({ icons: ['copper-ingot', 'tin-ingot', 'iron-ingot', 'silver-ingot', 'cobalt-ingot', 'gold-ingot',
+      'platinum-ingot', 'titanium-ingot', 'mythril-ingot', 'orichalcum-ingot'] })
+    const forge = peekV4('weapon-forge')
     expect('chips' in forge && forge.chips).toHaveLength(10)
     expect('chips' in peekV4('lapidary') && (peekV4('lapidary') as { chips: unknown[] }).chips).toHaveLength(10)
   })

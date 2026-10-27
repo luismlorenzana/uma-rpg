@@ -81,20 +81,24 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
 | Mine | `mine` | gather-site | 4 | Mining: metal, G1–G10. |
-| Forge | `forge` | station | 4 | Arms Crafting: Arms Gems. |
-| Forest | `forest` | gather-site | 4 | Wood Chopping: wood, G1–G10. |
-| Armorer | `armorer` | station | 4 | Armor Crafting: Armor Fittings. |
+| Mine Workbench | `mine-workbench` | station | 4 | Smelting: ores into ingots. |
+| Weapon Forge | `weapon-forge` | station | 4 | Arms Crafting: Arms Gems. |
 | Fields | `fields` | gather-site | 4 | Farming: vegetables, G1–G10. |
-| Workbench | `workbench` | station | 4 | Tome Crafting: Tome Ink. |
+| Fields Workbench | `fields-workbench` | station | 4 | Prepping: vegetables into cuts. |
+| Tome Forge | `tome-forge` | station | 4 | Tome Crafting: Tome Ink. |
+| Forest | `forest` | gather-site | 4 | Wood Chopping: wood, G1–G10. |
+| Forest Workbench | `forest-workbench` | station | 4 | Sawing: logs into planks. |
+| Armorer | `armorer` | station | 4 | Armor Crafting: Armor Fittings. |
 | Fishery | `fishery` | gather-site | 4 | Fishing: fish, G1–G10. |
-| Charm Shop | `charm-shop` | station | 4 | Accessory Crafting: Accessory Settings. |
+| Fishery Workbench | `fishery-workbench` | station | 4 | Filleting: fish into fillets. |
+| Charm Forge | `charm-forge` | station | 4 | Accessory Crafting: Accessory Settings. |
 | Monster Den | `monster-den` | gather-site | 4 | Hunting: stone, G1–G10. |
+| Den Workbench | `den-workbench` | station | 4 | Stonecutting: stones into cut stones. |
 | Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
 
-The Wilds hold the ten places (R2, PP4–PP6): one row a trade, its gathering place on the left and its making place on
-the right, the trunk road between (Mine and Forge, Forest and Armorer, Fields and Workbench, Fishery and Charm Shop,
-Monster Den and Lapidary), each with four slot pips. Town Hall keeps its four places in the corners around the
+The Wilds hold fifteen places (H114, FL31–FL32): five rows of three, one row a trade. Its gathering place is on the left,
+its processing workbench stands on the trunk road, and its making place is on the right; each has four slot pips. Town Hall keeps its four places in the corners around the
 plaza. The Battle page holds the Scenario Gate and the Rift on a drill ground of its own, with flagstone roads,
 banners, weapon racks, training dummies and torches (H31, D148). The Rift draws uma-art's `rift` building (its place keeps
 the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
@@ -104,31 +108,36 @@ the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
 
 ### Wilds
 
-The ten places, four slots each at ×1.25 from day one, with nothing to upgrade ([loops](loops.md#craft-level)). The
+The fifteen places have four slots each at ×1.25 from day one, with nothing to upgrade ([loops](loops.md#craft-level)). The
 halls seat Heroes instead ([Halls of Heroes](heroes.md)).
 
 <!-- live:facilities -->
 | Place | Profession | Job | What it does | Its trade (callings) |
 |---|---|---|---|---|
 | Mine | Mining | Gathering | Gathers metal, G1–G10 | Brawler |
-| Forge | Arms Crafting | Making | Processes metal; makes Arms Gems | Brawler |
-| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Spell Blade |
-| Armorer | Armor Crafting | Making | Processes wood; makes Armor Fittings | Spell Blade |
+| Mine Workbench | Smelting | Processing | Processes metal raw into refined, one for one | Brawler |
+| Weapon Forge | Arms Crafting | Making | Makes Arms Gems | Brawler |
 | Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Paladin, Cleric |
-| Workbench | Tome Crafting | Making | Processes vegetables; makes Tome Ink | Paladin, Cleric |
+| Fields Workbench | Prepping | Processing | Processes vegetables raw into refined, one for one | Paladin, Cleric |
+| Tome Forge | Tome Crafting | Making | Makes Tome Ink | Paladin, Cleric |
+| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Spell Blade |
+| Forest Workbench | Sawing | Processing | Processes wood raw into refined, one for one | Spell Blade |
+| Armorer | Armor Crafting | Making | Makes Armor Fittings | Spell Blade |
 | Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Summoner |
-| Charm Shop | Accessory Crafting | Making | Processes fish; makes Accessory Settings | Summoner |
+| Fishery Workbench | Filleting | Processing | Processes fish raw into refined, one for one | Summoner |
+| Charm Forge | Accessory Crafting | Making | Makes Accessory Settings | Summoner |
 | Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Mage |
-| Lapidary | Jewel Crafting | Making | Processes stone; makes Planet Jewels and Moon Jewels | Mage |
+| Den Workbench | Stonecutting | Processing | Processes stone raw into refined, one for one | Mage |
+| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Mage |
 
-Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's two places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
+Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
 
-**A place's page** (`places/work/FacilityPage.tsx` and `PlaceV3.tsx`), one page for all ten:
+**A place's page** (`places/work/FacilityPage.tsx` and `PlaceV3.tsx`), one page for all fifteen:
 - **Header:** "Mine · Mining · 4 slots · ×1.25", with **Collect here** when work is ready and **Finish all · 14 Speed
   Tickets** when two or more of its slots are running. Finish all asks "Finish 3 jobs for 14 Speed Tickets?", or says
   "Needs 14 Speed Tickets" when the wallet is short. A place whose trade has no Uma in the world says so under it:
-  "Open shop: no Brawler in this world" ("no Paladin or Cleric" at the Fields and the Workbench).
+  "Open shop: no Brawler in this world" ("no Paladin or Cleric" at every place in the vegetables row).
 - **One shared slot row per slot:** a free row starts a job; a working row shows its Uma, item, progress and queue.
   Ready work has **Collect** and **Repeat**. A running row has **Speed up** (−30m or Finish), **Queue next**, queue
   ordering and removal, and **Recall** with a preview of what is paid, returned or lost.
@@ -144,13 +153,13 @@ Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma w
 - **A gathering place's What step** (`PlaceV4.tsx`, `place-view-v4.ts`): its line's ten raw items as tiles, G1–G10 in two
   rows of five, a locked one saying "From Craft Lv 11"; the chosen item's card says "Metal · G3 · raw · Refines into Iron
   Ingot" and what's held.
-- **A making place's What step** (the Forge, the Armorer, the Workbench, the Charm Shop, the Lapidary): two groups,
-  **Process** (its line's ten refined items as tiles) and **Make** (its item's G1–G10 chips; the Lapidary's Planet I–V
-  and Moon I–V rows). Picking a tile processes, picking a chip makes, and the counts follow. A refined tile's card says
-  "Metal · G1 · refined · Refined from Copper Ore"; a chip's recipe card "Arms Gem G3 · Raises an Arms weapon one grade"
-  with "Iron Ingot ×7" and how many are held.
-- **Quick look:** "Forge · Arms Crafting · 4 slots · ×1.25", the open shop's line, a gathering place's ten icons or a
-  making place's G1–G10 chips with "Processes Metal G1–G10", and the four slots' rows.
+- **A workbench's What step:** its line's ten refined items as tiles. Picking one processes its raw form one for one;
+  counts are ×1, ×4, ×8, ×20 and ×40. A tile's card says "Metal · G1 · refined · Refined from Copper Ore".
+- **A making place's What step:** only its item's G1–G10 chips (the Lapidary has Planet I–V and Moon I–V rows), with
+  counts 1–10. A chip's recipe card says "Arms Gem G3 · Raises an Arms weapon one grade", "Iron Ingot ×7", and how
+  many are held.
+- **Quick look:** "Mine Workbench · Smelting · 4 slots · ×1.25", the open shop's line, a gathering or workbench's ten
+  icons, or a making place's chips, and the four slots' rows.
 
 **The Learning page** holds the six Halls of Heroes (D106; classes v2, H59), one page shared by all six
 (`places/halls/HallPage.tsx`). The mirrors face each other across the road: Brawler Dojo and Mage Tower, Spell Blade
@@ -179,7 +188,7 @@ Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
   - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class; can
     upgrade; a **Template** group after RPG (engine v16, UT15): Calling (six), Stride (three), Knack (five) and, from R2,
     Signature (Pendant, Orb, Bell, Insignia), an owned Uma's calling pick counting; and a **Trade** group (PP21): "Mine ·
-    Forge", "Forest · Armorer", "Fields · Workbench", "Fishery · Charm Shop", "Monster Den · Lapidary", each with its head
+    Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge", "Monster Den · Lapidary", each with its head
     count, locked outfits too. Search also finds her template's name ("ironhide" finds every Ironhide). "Can upgrade" is
     also the sheet's quick pick.
   - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and

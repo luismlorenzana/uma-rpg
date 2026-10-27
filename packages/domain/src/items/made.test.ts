@@ -15,7 +15,7 @@ describe('made items: names, places and grades', () => {
   })
 
   it('makes each line at its own place (FL3), a jewel at its node\'s grade and the Branch Gem at G5', () => {
-    expect(MADE_LINES.map((l) => madePlace(l))).toEqual(['forge', 'armorer', 'charm-shop', 'forge', 'lapidary', 'lapidary', 'workbench'])
+    expect(MADE_LINES.map((l) => madePlace(l))).toEqual(['weapon-forge', 'armorer', 'charm-forge', 'weapon-forge', 'lapidary', 'lapidary', 'tome-forge'])
     expect([1, 2, 3, 4, 5].map((n) => madeIdentity(jewelId('planet', n))!.grade)).toEqual([1, 3, 5, 7, 9])
     expect([1, 2, 3, 4, 5].map((n) => madeIdentity(jewelId('moon', n))!.grade)).toEqual([2, 4, 6, 8, 10])
     expect(madeIdentity('branch-gem')!.grade).toBe(5)

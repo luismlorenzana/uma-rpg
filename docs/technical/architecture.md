@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-26; save v29, engine v17 (the Tier rework's economy, R2, D218; the grant tickets only, D221).** The full running-system reference is
+> **Status: current, 2026-10-27; save v31, engine v17 (the farm by line, D224; the Wilds' trios, D230).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -21,11 +21,11 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v28** (`save/save.ts`), not the old v7/v8 snapshot:
+**Schema v31** (`save/save.ts`), not the old v7/v8 snapshot:
 - `account`: trainer name, timestamps, achievements, each Uma's tier history and the boss and sub-boss faces defeated
   in Rift fights, shared by every tier (D159, D171).
 - `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, its Warehouse (`items`: the five lines'
-  materials and the made items), per-Uma work rows (SC3) on the ten places, targets, Hall of Heroes seats, its Rift: runs
+  materials and the made items), per-Uma work rows (SC3) on the fifteen places, targets, Hall of Heroes seats, its Rift: runs
   (with each front's traces and the open Convergence attempt), Echo wins, the open Rift fight (replayed like the world
   map's) and its fight count (D161, D171), and the Tier rework's `grant` (D214).
 - An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for six classes, her calling pick
@@ -59,8 +59,10 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v27 the Tier rework's fight: three default weapons a class, side skills to lines, the loadout pruned, every Uma's calling pick open; open v15 fights replay on v15 | D205, D210 |
 | v28 the Tier rework's economy: work settled, Craft Levels to 1 and the Speed Ticket grant, gear and Star Gems to G0 grades and an empty map, upgrades refunded, the Warehouse converted to the five lines; open v15 and v16 fights replay on their engines | D214, D218 |
 | v29 the grant tickets only: a granted world's materials leave its Warehouse; made items, Laurels and tickets stay | D221 |
+| v30 the farm by line: old material stock converts to the five graded lines and old work settles; each making place processes its own line and makes its item | D224, D228 |
+| v31 the Wilds' trios: old work settles; each line moves to separate gathering, processing and making places | D230, D232 |
 
-`parseSave` accepts v1–v29 and returns v29; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v31 and returns v31; the earlier reset remains part of the migration chain.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in

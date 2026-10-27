@@ -1,5 +1,5 @@
-// uma-rpg's work env for the Wilds (D224; farm-by-line.md FL1–FL10; H109, live since H112): ten places of four slots at ×1.25,
-// each now one line's, with a making place taking two kinds of job (process and make). Speed Tickets, Craft EXP, Laurels
+// uma-rpg's work env for the Wilds (D224, D230; farm-by-line.md FL1–FL10, FL25–FL28): fifteen places of four slots at ×1.25,
+// each one line and one kind. Speed Tickets, Craft EXP, Laurels
 // and who may work are v1's (`env.ts`); the trade gate and the open shop are R2's. `liveWorkEnv` (`env-v3.ts`) picks it
 // from the economy stage.
 import { buildingTable, type WorkEnv } from '@luismlorenzana/uma-work'
@@ -12,7 +12,7 @@ import type { WorkContext } from './env-v3'
 import { makeV4 } from './kinds-v4/make'
 import { materialKindV4 } from './kinds-v4/material'
 
-/** The ten places as buildings, in the Wilds' order (the engine's tie-break order), as R2's. */
+/** The fifteen places as buildings, in the Wilds' order (the engine's tie-break order). */
 export const RPG_BUILDINGS_V4 = buildingTable(Object.fromEntries(PLACES_V4.map((p) => [p.id, { slots: [PLACE_SLOTS_V3], speed: [PLACE_SPEED_V3], upgrades: [] }])))
 
 /** The farm by line's env for a world of `tier` (the tier only gates R3's Branch Gem). */
