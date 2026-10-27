@@ -65,8 +65,17 @@ export const jobExp = (minutes: number): number => Math.round(minutes * EXP_PER_
 export const MAX_JOB_COUNT = 10
 /** Refining, at a quarter of the time, comes in these batches (D139): a ×40 refine takes as long as a 10-item gather. */
 export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
-/** The most items one new job of a kind makes. */
-export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number => (kind === 'refine' ? REFINE_BATCHES.at(-1)! : MAX_JOB_COUNT)
+/** The Wilds' job sizes (D233): with every step the same length (FL28), a job of n steps takes about n × 24 minutes at a
+ * place, so ×1 … ×20 run from about half an hour to about 8 hours (×2 one, ×5 two, ×10 four, ×20 eight). */
+export const JOB_SIZES = [1, 2, 3, 5, 10, 15, 20] as const
+/** A job's longest size, in steps: about 8 hours. */
+export const JOB_STEPS_MOST = 20
+/** The sizes offered for an item of `steps` steps (1 to gather or process; a made item's refined items): those up to
+ * about 8 hours, so an Arms Gem (7) offers 1, 2 and 3, an Accessory Setting (10) 1 and 2. */
+export const jobSizes = (steps: number): number[] => JOB_SIZES.filter((n) => n <= Math.max(1, Math.round(JOB_STEPS_MOST / steps)))
+/** The most items one new job of a kind makes (a gather 20 since D233; a process keeps v1's 40 for queued jobs). */
+export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number =>
+  kind === 'refine' ? REFINE_BATCHES.at(-1)! : kind === 'gather' ? JOB_SIZES.at(-1)! : MAX_JOB_COUNT
 
 // --- Facilities (§9) -------------------------------------------------------------------------------------------
 

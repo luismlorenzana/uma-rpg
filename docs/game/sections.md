@@ -29,8 +29,9 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 
 - Places are buttons over the map, each with:
   - a name pill;
-  - slot pips showing the working Umas' faces in progress rings;
-  - a "Ready" badge.
+  - slot pips showing the working Umas' faces in progress rings (on the Wilds, 28 pt in a half arch over the
+    building's top, each with her Craft Level on its lower left, D233);
+  - a "Ready" badge (on the Wilds, at the building's foot under the arch).
 - **Town Hall's plaza** (D150): up to five small chibis stand on the road, each bobbing on its own beat.
   - The featured Uma is in front. She is the one picked on this device, or else the highest Uma Level.
   - The active party's other members stand round her, then the next highest levels.
@@ -98,7 +99,8 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 <!-- /live -->
 
 The Wilds hold fifteen places (H114, FL31–FL32): five rows of three, one row a trade. Its gathering place is on the left,
-its processing workbench stands on the trunk road, and its making place is on the right; each has four slot pips. Town Hall keeps its four places in the corners around the
+its processing workbench stands on the trunk road, and its making place is on the right; each has four slot pips in an
+arch over its roof. The rows sit at y 0.155 … 0.795 so they keep an even spacing on a short screen (D233). Town Hall keeps its four places in the corners around the
 plaza. The Battle page holds the Scenario Gate and the Rift on a drill ground of its own, with flagstone roads,
 banners, weapon racks, training dummies and torches (H31, D148). The Rift draws uma-art's `rift` building (its place keeps
 the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
@@ -148,15 +150,18 @@ Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma w
 - **The shared job sheet:** Who → How many → What. A chosen amount stays selected while What changes (and clamps if a
   recipe allows less). Its Uma picker puts Craft Level on each face and opens her trade's Umas first (free, then highest
   Craft Level); the rest are greyed "Another trade", unless the place is an open shop. Locked Umas and workers show why
-  they cannot start. Fighting does not block work (D119). Counts follow the picked job (FL10): 1–10 to gather or make,
-  ×1, ×4, ×8, ×20 or ×40 to process. The sheet opens on the highest grade her Craft Level opens.
+  they cannot start. Fighting does not block work (D119). How many follows the picked job (D233), each size with its
+  time: ×1, ×2, ×3, ×5, ×10, ×15 or ×20 to gather or process (about half an hour to 8 hours); a make's sizes stop at
+  about 8 hours (Armor Fittings to ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet
+  Jewel ×2), plus the most she has inputs for. A targets link keeps its own count, up to the most. The sheet opens on the
+  highest grade her Craft Level opens.
 - **A gathering place's What step** (`PlaceV4.tsx`, `place-view-v4.ts`): its line's ten raw items as tiles, G1–G10 in two
   rows of five, a locked one saying "From Craft Lv 11"; the chosen item's card says "Metal · G3 · raw · Refines into Iron
   Ingot" and what's held.
 - **A workbench's What step:** its line's ten refined items as tiles. Picking one processes its raw form one for one;
-  counts are ×1, ×4, ×8, ×20 and ×40. A tile's card says "Metal · G1 · refined · Refined from Copper Ore".
+  sizes ×1 … ×20. A tile's card says "Metal · G1 · refined · Refined from Copper Ore".
 - **A making place's What step:** only its item's G1–G10 chips (the Lapidary has Planet I–V and Moon I–V rows), with
-  counts 1–10. A chip's recipe card says "Arms Gem G3 · Raises an Arms weapon one grade", "Iron Ingot ×7", and how
+  sizes up to about 8 hours. A chip's recipe card says "Arms Gem G3 · Raises an Arms weapon one grade", "Iron Ingot ×7", and how
   many are held.
 - **Quick look:** "Mine Workbench · Smelting · 4 slots · ×1.25", the open shop's line, a gathering or workbench's ten
   icons, or a making place's chips, and the four slots' rows.

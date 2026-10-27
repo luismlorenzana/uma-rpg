@@ -4,11 +4,12 @@
 // the picker. Its What step, sizes, (i) and quick look are `PlaceV4.tsx`'s. Rendered from the economy stage.
 import {
   activeClass, facilityTargets, finishAllCost, openShop, placeById, placeSpecV4, PROFESSION_NAMES_V4, SaveRuleError, targetPlan, TRADES,
-  tradeProfessions, type JobKind, type RpgWorkRequest, type TierWorld, type TradeOf,
+  tradeProfessions, type RpgWorkRequest, type TierWorld, type TradeOf,
 } from '@rpg/domain'
 import { workOrder } from '@luismlorenzana/uma-kit/roster'
 import {
-  JobSheet, jobQuery, PeekRow, readJobQuery, SlotRow, StoppedQueueCard, TargetsStrip, withoutJobQuery, useWorkView, type JobSelection,
+  JobSheet, jobQuery, PeekRow, readJobQuery, SlotRow, StoppedQueueCard, TargetsStrip, withoutJobQuery, useWorkView, type JobQuery, type JobSelection,
+  type SizeRule,
 } from '@luismlorenzana/uma-kit/work'
 import { useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router'
@@ -37,7 +38,6 @@ const statsLine = (placeId: string, slots: number, speed: number) =>
 export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterView; world: TierWorld; now: string; tier: number; placeId: string }) {
   const work = useWorkView()
   const cards = work.cards(placeId)
-  const spec = placeSpecV4(placeId)!
   const facility = work.facility(placeId)
   const location = useLocation()
   const navigate = useNavigate()
@@ -58,11 +58,6 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
   const stopped = Object.values(work.settled.work).filter((row) => row.dropped?.slot.building === placeId)
   const finish = finishAllCost(world, placeId, now, tier)
   const [finishing, setFinishing] = useState(false)
-  // FL22: a making place processes and makes, so the sheet's sizes follow the picked job's kind. The sheet opens on a make
-  // (or a gather), or on a deep link's own job.
-  const queryKey = JSON.stringify(query)
-  const [picked, setPicked] = useState<{ key: string; kind: JobKind } | null>(null)
-  const pickedKind: JobKind = picked?.key === queryKey ? picked.kind : query?.job ? jobKindAtV4(placeId, query.job) : spec.kinds.at(-1)!
   const levelOf = (outfitId: string | null) => (outfitId ? world.umas[outfitId]?.craft.level ?? 1 : 1)
   const closeJob = () => {
     if (query?.back) navigate(query.back, { replace: true })
@@ -126,7 +121,7 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
         rows={rows}
         request={(job, count): RpgWorkRequest => ({ kind: jobKindAtV4(placeId, job), item: job, count })}
         initialJob={(outfitId) => initialJobV4(placeId, levelOf(outfitId))}
-        sizeRule={sizeRuleOf(pickedKind)}
+        sizeRule={(job) => sizeRuleOf(job, query)}
         sizePlacement="before-what"
         preserveCountOnJobChange
         disabled={(row) => lockedReason(row) ?? who.reason(row.id)}
@@ -136,10 +131,7 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
             bottomRight: <span aria-label={`Craft Level ${row.workLevel}`} className="rounded-tl-sm bg-black/75 px-1 font-display text-[9px] font-bold leading-3.5">C{row.workLevel}</span>,
           } : undefined,
         }}
-        renderWhat={(selection) => <WhatV4 selection={selection} placeId={placeId} world={world} onPick={(job) => {
-          setPicked({ key: queryKey, kind: jobKindAtV4(placeId, job) })
-          selection.onChange(job)
-        }} />}
+        renderWhat={(selection) => <WhatV4 selection={selection} placeId={placeId} world={world} onPick={selection.onChange} />}
         onClose={closeJob}
         onDone={closeJob}
       />
@@ -182,10 +174,13 @@ function FinishAllSheet({ placeId, world, cost, onClose }: {
   )
 }
 
-/** The sizes a kind offers (FL10): ×1 … ×40 to process, 1–10 otherwise. */
-function sizeRuleOf(kind: JobKind): { mode: 'count'; sizes?: readonly number[] } {
-  const sizes = jobSizesV4(kind)
-  return sizes ? { mode: 'count', sizes } : { mode: 'count' }
+/** The sizes the picked job offers (D233), each with its time; a deep link's own count stays one of them. */
+function sizeRuleOf(job: string | null, query: JobQuery | null): SizeRule | undefined {
+  if (job === null) return undefined
+  const sizes = jobSizesV4(job)
+  const most = sizes.at(-1)!
+  const linked = query?.job === job && query.count !== null && query.count <= most ? [query.count] : []
+  return { mode: 'duration', sizes: [...sizes, ...linked], max: most }
 }
 
 /** A place's quick look (PP §4.2): its line, its types or grades, the open shop and its four slots' rows. */

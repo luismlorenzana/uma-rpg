@@ -62,13 +62,15 @@ const WILDS_LAYOUT_V1: readonly { x: number; y: number }[] = [
   { x: 0.26, y: 0.9 }, { x: 0.74, y: 0.9 },
 ]
 
-/** The Wilds' trios (FL32): five rows, gather left, workbench on the trunk, make right. */
+/** The Wilds' trios (FL32): five rows, gather left, workbench on the trunk, make right. Each row sits a hair below a
+ * sixth of the map so it snaps to the same tile spacing on a short screen (24 rows at 375×667), leaving room for the
+ * pips' arch (D233). */
 const WILDS_LAYOUT: readonly { x: number; y: number }[] = [
-  { x: 0.2, y: 0.15 }, { x: 0.5, y: 0.15 }, { x: 0.8, y: 0.15 },
-  { x: 0.2, y: 0.31 }, { x: 0.5, y: 0.31 }, { x: 0.8, y: 0.31 },
-  { x: 0.2, y: 0.47 }, { x: 0.5, y: 0.47 }, { x: 0.8, y: 0.47 },
-  { x: 0.2, y: 0.63 }, { x: 0.5, y: 0.63 }, { x: 0.8, y: 0.63 },
-  { x: 0.2, y: 0.79 }, { x: 0.5, y: 0.79 }, { x: 0.8, y: 0.79 },
+  { x: 0.2, y: 0.155 }, { x: 0.5, y: 0.155 }, { x: 0.8, y: 0.155 },
+  { x: 0.2, y: 0.315 }, { x: 0.5, y: 0.315 }, { x: 0.8, y: 0.315 },
+  { x: 0.2, y: 0.475 }, { x: 0.5, y: 0.475 }, { x: 0.8, y: 0.475 },
+  { x: 0.2, y: 0.635 }, { x: 0.5, y: 0.635 }, { x: 0.8, y: 0.635 },
+  { x: 0.2, y: 0.795 }, { x: 0.5, y: 0.795 }, { x: 0.8, y: 0.795 },
 ]
 
 interface SiteSpec {

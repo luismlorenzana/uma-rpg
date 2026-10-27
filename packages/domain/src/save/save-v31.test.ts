@@ -1,5 +1,7 @@
 // Save v31's strict work parse (H114): fifteen places, four slots, and exactly one job kind at each place.
 import { describe, expect, it } from 'vitest'
+import { HOUR, JOB_SIZES, jobSizes, MINUTE, stepMinutes } from '../economy/pacing'
+import { PLACE_SPEED_V3 } from '../economy/professions'
 import { gradedUma, gradedWorld } from './economy-v3.fixture'
 import { parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 import { startJob } from './work'
@@ -31,5 +33,18 @@ describe('save v31 work', () => {
     const make = json(startJob(base(), 'weapon-forge', 0, { outfitId: '101' }, 'weapon-gem-g1', 1, NOW)) as unknown as RawSave
     make.tierWorlds['1']!.work['101']!.slot.building = 'mine-workbench'
     expect(() => parseSave(make as unknown as Save)).toThrow('expected refine')
+  })
+
+  it('takes the Wilds\' job sizes: a gather or a process up to ×20, about 8 hours (D233)', () => {
+    expect(JOB_SIZES).toEqual([1, 2, 3, 5, 10, 15, 20])
+    expect([1, 2, 4, 7, 10].map(jobSizes)).toEqual([JOB_SIZES, [1, 2, 3, 5, 10], [1, 2, 3, 5], [1, 2, 3], [1, 2]])
+    // Twenty steps at Craft Lv 25 and the place's speed: about 8 hours.
+    expect((20 * stepMinutes(25) * MINUTE) / PLACE_SPEED_V3 / HOUR).toBeCloseTo(8, 1)
+    const gather = (count: number) => json(startJob(base(), 'mine', 0, { outfitId: '101' }, 'copper-ore', count, NOW))
+    expect(parseSave(gather(20)).tierWorlds['1']!.work['101']!.entries[0]!.request.count).toBe(20)
+    expect(() => startJob(base(), 'mine', 0, { outfitId: '101' }, 'copper-ore', 21, NOW)).toThrow()
+    const over = gather(20) as unknown as { tierWorlds: Record<string, { work: Record<string, { entries: { request: { count: number } }[] }> }> }
+    over.tierWorlds['1']!.work['101']!.entries[0]!.request.count = 21
+    expect(() => parseSave(over as unknown as Save)).toThrow('expected 1–20')
   })
 })

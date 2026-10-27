@@ -194,7 +194,10 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
     work is finished collects it first.
   - Every job runs in the shared work engine, `@luismlorenzana/uma-work`, the same code as uma-racer's; this game
     supplies its kinds (gather, process, make), its fifteen places and its Craft Level.
-  - **Batches (D139):** gathering and making 1–10; processing ×1, ×4, ×8, ×20 or ×40.
+  - **Sizes (D233):** every step takes the same time, so sizes are brackets of steps: ×1, ×2, ×3, ×5, ×10, ×15 or ×20
+    to gather or process, about half an hour, 1, 1½, 2, 4, 6 and 8 hours at mid Craft Level. A make offers the sizes
+    up to about 8 hours of its steps: Armor Fittings (2 steps) to ×10, a Moon Jewel (4) to ×5, an Arms Gem or Tome Ink
+    (7) to ×3, an Accessory Setting or a Planet Jewel (10) to ×2. Each size shows its time.
   - Inputs are reserved at the start. Made items and materials go to the Warehouse.
   - Craft EXP is 2 per minute of the job at her level, before the place's speed, so every job levels at the same rate
     per hour.
@@ -232,7 +235,7 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
 | Make one item | one step for each refined item in it: an Arms Gem or Tome Ink 7, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4 (an Arms Gem 4.2 h at Lv1, 2.8 h at Lv50) |
 | Opens | grade g at Craft Lv 5g − 4, to gather, to process and to make |
 | Craft EXP | 2 per minute of the job at her level, before the place's speed |
-| Outputs per job | gathering and making 1–10; processing ×1, ×4, ×8, ×20, ×40 |
+| Sizes | ×1, ×2, ×3, ×5, ×10, ×15, ×20 to gather or process; a make up to about 20 steps (8 h at Craft Lv25): Armor Fittings ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2 |
 | Jobs queued after it | 3 |
 | Places | 4 Uma slots each, speed ×1.25, from day one; no upgrades |
 | Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |

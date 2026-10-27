@@ -1,17 +1,5 @@
 @import 'tailwindcss';
 
-/* Fifteen Wilds buildings fit as five clean rows even on 375×667: keep the full 88 px building tap area, place the
-   name over its lower edge, and leave slot detail to the place page. The other, sparser Hub pages keep their pips. */
-[data-page='wilds'] [data-kit='place-targets'] [data-place] > span:nth-child(2) {
-  position: absolute;
-  top: 4.25rem;
-  z-index: 1;
-  margin-top: 0;
-}
-
-[data-page='wilds'] [data-kit='place-targets'] [data-place] [data-pips] {
-  display: none;
-}
 /* The shared theme of both games (uma-kit, uma-platform P48; D147): the "Paddock" tokens in light and dark under one set
    of names, base styles and utilities. Tailwind also reads the kit's own classes. */
 @import '@luismlorenzana/uma-kit/theme.css';
