@@ -20,6 +20,7 @@ const USE: Readonly<Record<Exclude<MadeLine, 'jewel-planet' | 'jewel-moon'>, str
   'armor-fittings': 'Raises an armor piece one grade',
   'accessory-setting': 'Raises an accessory one grade',
   'branch-gem': 'Picks a weapon’s branch',
+  'tome-ink': 'Raises a Tome one grade',
 }
 
 /** What a made item does: "Raises a weapon one grade", "Opens Planet III", "Opens a moon’s node II". */
@@ -45,5 +46,5 @@ export const LINE_WORD: Readonly<Record<MaterialLine, string>> = { metal: 'Metal
 /** The made lines' plural names, as their shelves and places say them. */
 export const MADE_PLURAL: Readonly<Record<MadeLine, string>> = {
   'weapon-gem': 'Weapon Gems', 'armor-fittings': 'Armor Fittings', 'accessory-setting': 'Accessory Settings', 'branch-gem': 'Branch Gems',
-  'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels',
+  'jewel-planet': 'Planet Jewels', 'jewel-moon': 'Moon Jewels', 'tome-ink': 'Tome Ink',
 }

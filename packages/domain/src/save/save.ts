@@ -53,10 +53,11 @@ import {
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
 } from '../rift/state'
 import { migrateWorld, toV26, type TierGrant } from './migrations'
+import { SAVE_SCHEMA_VERSION } from './version'
 
 export type { TierGrant } from './migrations'
 
-export const SAVE_SCHEMA_VERSION = 29
+export { FARM_BY_LINE_SAVE, farmByLine, SAVE_SCHEMA_VERSION } from './version'
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20

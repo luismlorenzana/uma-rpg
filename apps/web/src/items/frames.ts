@@ -34,7 +34,8 @@ const ITEM_ROW = new Map(ITEM_FAMILIES.map((f, i) => [f.id, WILDS_FIRST_ROW + i 
 const GEM_POSITION = new Map(GEM_IDENTITIES.map((g, i) => [g.id, { x: i % 10 * ATLAS_CELL, y: Math.floor(i / 10) * ATLAS_CELL }]))
 
 const MATERIAL_ROW = { fish: 4, vegetables: 8, ores: 20, crystals: 22, woods: 28 } as const
-const MADE_ROW = { 'weapon-gem': 34, 'armor-fittings': 35, 'accessory-setting': 36 } as const
+/** The made items' rows; Tome Ink (the farm by line, FL15) borrows uma-art's essences refined row, the infusion bottles. */
+const MADE_ROW = { 'weapon-gem': 34, 'armor-fittings': 35, 'accessory-setting': 36, 'tome-ink': 19 } as const
 const PLANET_JEWEL_ART = ['gem-sun-4', 'gem-sun-4', 'gem-sun-6', 'gem-sun-8', 'gem-sun-10'] as const
 const MOON_JEWEL_ART = ['gem-limit-2', 'gem-limit-4', 'gem-limit-6', 'gem-limit-8', 'gem-limit-10'] as const
 const BELL_ROW: Readonly<Record<RpgDamageKind, (typeof GEAR_ART_ROWS)[number]>> = {

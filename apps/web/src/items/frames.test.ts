@@ -37,10 +37,16 @@ describe('icon frames (P37–P38)', () => {
       expect(frame, material.id).toBeDefined()
       expect(iconFrame(material.id), material.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
     }
-    for (const made of MADE_IDENTITIES.filter((m) => !m.line.startsWith('jewel-'))) {
+    for (const made of MADE_IDENTITIES.filter((m) => !m.line.startsWith('jewel-') && m.line !== 'tome-ink')) {
       const frame = items.frames[made.id as keyof typeof items.frames]
       expect(frame, made.id).toBeDefined()
       expect(iconFrame(made.id), made.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
+    }
+    // Tome Ink (the farm by line, FL15) borrows the essences' refined row, the infusion bottles, at its grade.
+    const infusions = ITEM_FAMILIES.find((f) => f.id === 'essences')!.refined
+    for (const made of MADE_IDENTITIES.filter((m) => m.line === 'tome-ink')) {
+      const frame = items.frames[infusions[made.grade - 1]!.id as keyof typeof items.frames]
+      expect(iconFrame(made.id), made.id).toEqual({ sheet: 'items', x: frame.x, y: frame.y })
     }
     const jewelArt = {
       'jewel-planet-1': 'gem-sun-4', 'jewel-planet-2': 'gem-sun-4', 'jewel-planet-3': 'gem-sun-6',
