@@ -1,7 +1,6 @@
-// The Skills tab from engine v16 (H70, live since H72; class-progression.md §6.1, §6.2, CP23, CP32): three weapon tabs, a
-// tree a slot with its trunk and fork, her branch filled and the other dimmed, a closed depth faded with its gate, five rank
-// pips, and the branch sheet's "Take branch A" calling the save's `pickBranch`. Invented outfits; the store is the real one,
-// holding a test save.
+// The compact Skills tab (D224): class plus three icon tree tabs in one row; connected icon nodes whose tap sheet owns
+// their words and Equip action; her branch filled and the other dimmed; gates/ranks on the nodes; branch swaps unchanged.
+// Invented outfits; the store is the real one, holding a test save.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { configureKit, MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
 import { BATTLE_ENGINE_VERSION, newOwnedUma, newSave, rpgNode, withTrack, worldOf, type Save } from '@rpg/domain'
@@ -60,29 +59,34 @@ afterEach(() => {
 describe('the Skills tab as a tree (H70)', () => {
   it('runs with the Tier rework’s fight live (on 17 since H82)', () => expect(BATTLE_ENGINE_VERSION).toBe(17))
 
-  it('draws three tabs, her Lance on B filled, depth 4 faded with its gate, and Sunder\'s pips at Rank 2', async () => {
+  it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
     expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword, branch A', 'Axe, branch A', 'Lance, branch B'])
-    expect(screen.getAllByRole('button', { name: /^Weapon \d/ })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: 'Class: Brawler, Rank 22' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Change Greatsword' })).toBeDefined()
 
-    // The Greatsword tree: the trunk and A held to depth 3; Sunder at Rank 2 of 5, its next rank at Class Rank 24.
+    // The Greatsword tree: the trunk and A held to depth 3; the node is compact and its tap sheet owns the words.
     expect(rpgNode('brawler-greatsword.3')!.name).toBe('Sunder')
     expect(node('brawler-greatsword.3').dataset.held).toBe('true')
-    expect(within(node('brawler-greatsword.3')).getByRole('img', { name: 'Rank 2 of 5' })).toBeDefined()
-    expect(node('brawler-greatsword.3').textContent).toContain('Rank 2 · next at Class Rank 24')
-    expect(node('brawler-greatsword.1').textContent).toContain('Rank 5')
+    expect(node('brawler-greatsword.3').getAttribute('aria-label')).toBe('Sunder, Rank 2 · next at Class Rank 24, equipped')
+    expect(node('brawler-greatsword.1').getAttribute('aria-label')).toBe('Heavy Slash, Rank 5')
     expect(node('brawler-greatsword.3b').dataset.held).toBeUndefined()
+    fireEvent.click(node('brawler-greatsword.3'))
+    expect(await screen.findByRole('img', { name: 'Rank 2 of 5' })).toBeDefined()
+    expect(screen.getByText('Rank 2 · next at Class Rank 24')).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Unequip' })).toBeDefined()
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
 
     fireEvent.click(tabs[2]!)
     // Her Lance on B: B's depth-3 node is hers (the B column filled), A's dimmed; depth 4 is closed on both lines.
-    expect(within(branch(/^Branch B · Impale, hers$/)).getByRole('button', { name: 'B · Impale' }).className).toContain('bg-accent')
+    expect(within(branch(/^Branch B · Impale, hers$/)).getByRole('button', { name: 'Branch B · Impale, hers' }).className).toContain('bg-accent')
     expect(node('brawler-lance.3a').dataset.held).toBe('true')
     expect(node('brawler-lance.3').dataset.held).toBeUndefined()
     expect(node('brawler-lance.3').className).toContain('opacity-55')
     for (const id of ['brawler-lance.4a', 'brawler-lance.4']) {
-      expect(node(id).className).toContain('opacity-45')
-      expect(node(id).textContent).toContain('Class Rank 30')
+      expect(node(id).className).toContain('opacity-40')
+      expect(node(id).getAttribute('aria-label')).toMatch(/closed until Class Rank 30/)
     }
     // No points anywhere, and no Learn.
     expect(screen.queryByText(/point/)).toBeNull()
@@ -92,14 +96,14 @@ describe('the Skills tab as a tree (H70)', () => {
   it('takes branch A from its sheet, calling the save\'s pickBranch with A, and her tree follows', async () => {
     show(await brawler())
     fireEvent.click(within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')[2]!)
-    fireEvent.click(within(branch(/^Branch A$/)).getByRole('button', { name: 'A' }))
+    fireEvent.click(within(branch(/^Branch A$/)).getByRole('button', { name: 'Branch A' }))
     const take = await screen.findByRole('button', { name: 'Take branch A' })
     await act(async () => { fireEvent.click(take) })
     await waitFor(() => expect(vi.mocked(battle.pickBranch)).toHaveBeenCalledWith(expect.anything(), outfit, 'brawler', 'lance', 'A', expect.any(String), '1'))
     await waitFor(() => expect(node('brawler-lance.3').dataset.held).toBe('true'))
     expect(worldOf(useGame.getState().save!).umas[outfit.outfitId]!.classes.brawler!.lines).toEqual({})
     // The held branch's sheet has no button.
-    fireEvent.click(within(branch(/^Branch A, hers$/)).getByRole('button', { name: 'A' }))
+    fireEvent.click(within(branch(/^Branch A, hers$/)).getByRole('button', { name: 'Branch A, hers' }))
     expect(await screen.findByText('Her branch')).toBeDefined()
     expect(screen.queryByRole('button', { name: /^Take branch/ })).toBeNull()
   })
