@@ -4,10 +4,11 @@
 // rows and sheet (uma-platform P56, SD3); the Manuals stay this game's. From R2's switch (H80, PP17): raw materials by
 // line and pair, priced × the tier, the rest locked with the win that stocks them; Class Manuals only.
 import { ExchangeRows, type ExchangeRow } from '@luismlorenzana/uma-kit/places'
-import { UiMark } from '@luismlorenzana/uma-kit/ui'
+import { Tabs, UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
   ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
-  TIME_TICKET_PRICE, rpgRework, stockedGrades, stockedTypes, SWEEP_TICKET_PRICE, WEAPON_TYPES, type RankRef, type TierWorld,
+  TIME_TICKET_PRICE, farmByLine, MATERIAL_LINES, rpgRework, stockedGrades, stockedTypes, SWEEP_TICKET_PRICE, WEAPON_TYPES, type MaterialLine, type RankRef,
+  type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { CLASS_LABEL, WEAPON_LABEL } from '../../battle/labels'
@@ -23,7 +24,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, TicketIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
-import { rawRowsV3 } from './exchange-rows'
+import { rawRowsV3, rawRowsV4 } from './exchange-rows'
 
 export default function ExchangePage() {
   return <MasterGate>{(view) => <Exchange view={view} />}</MasterGate>
@@ -99,8 +100,44 @@ function Exchange({ view }: { view: MasterView }) {
 const marksLine = (world: TierWorld, economy: boolean) => economy ? `Class Marks ${world.wallet.classMarks.toLocaleString('en-US')}`
   : `Gear Marks ${(world.wallet.gearMarks ?? 0).toLocaleString('en-US')} · Class Marks ${world.wallet.classMarks.toLocaleString('en-US')}`
 
+const RAW_LINE_KEY = 'rpg.exchange.rawLine'
+function storedRawLine(): MaterialLine {
+  try {
+    const v = sessionStorage.getItem(RAW_LINE_KEY)
+    return (MATERIAL_LINES as readonly string[]).includes(v ?? '') ? (v as MaterialLine) : 'metal'
+  } catch {
+    return 'metal'
+  }
+}
+
+/** The farm by line's raw materials (FL12, FL23): one tab a line, its ten grades, locked until stocked. */
+function RawMaterialsV4({ world, tier, buy }: { world: TierWorld; tier: number; buy: (row: ExchangeRow, qty: number) => Promise<void> }) {
+  const [line, setLineState] = useState<MaterialLine>(storedRawLine)
+  const setLine = (v: MaterialLine) => {
+    setLineState(v)
+    try {
+      sessionStorage.setItem(RAW_LINE_KEY, v)
+    } catch {
+      // this session's convenience only
+    }
+  }
+  const rows = rawRowsV4(world, tier).find((g) => g.line === line)!.rows
+  return (
+    <section className="space-y-2" data-raw-v4>
+      <h3 className="text-micro">Raw materials</h3>
+      <Tabs<MaterialLine> label="Line" value={line} onChange={setLine} options={MATERIAL_LINES.map((l) => ({ value: l, label: LINE_WORD[l] }))} />
+      <ExchangeRows balance={world.wallet.laurels} onBuy={buy} rows={rows.map((row): ExchangeRow => ({
+        key: `item:${row.id}`, icon: <ItemIcon id={row.id} size={32} />, name: row.name, price: laurels(row.price),
+        detail: `G${row.grade}${row.have > 0 ? ` · have ${row.have.toLocaleString('en-US')}` : ''}`,
+        ...(row.locked ? { disabled: row.locked } : {}),
+      }))} />
+    </section>
+  )
+}
+
 /** R2's raw materials (PP17): a list a line, every type of the tier and below, low before high, locked until stocked. */
 function RawMaterials({ world, tier, buy }: { world: TierWorld; tier: number; buy: (row: ExchangeRow, qty: number) => Promise<void> }) {
+  if (farmByLine()) return <RawMaterialsV4 world={world} tier={tier} buy={buy} />
   return (
     <section className="space-y-3" data-raw-v3>
       <h3 className="text-micro -mb-1.5">Raw materials</h3>

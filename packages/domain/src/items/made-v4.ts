@@ -30,7 +30,8 @@ export function madeRecipeV4(id: string): Readonly<Record<string, number>> {
 /** A made item's refined count: its make time in three-quarter gathers (FL10). */
 export const madeRefinedV4 = (id: string): number => Object.values(madeRecipeV4(id)).reduce((a, b) => a + b, 0)
 
-/** "Arms Gem G3" (FL14: the Weapon Gem raises Arms only), "Tome Ink G3", the rest as R2 names them. */
+/** "Arms Gem G3" (FL14: the Weapon Gem raises Arms only), "Tome Ink G3", the rest as R2 names them, whatever the switch
+ * (`madeName` says Arms Gem only when it's on). */
 export function madeNameV4(id: string): string | undefined {
   const made = madeIdentity(id)
   return made?.line === 'weapon-gem' ? `Arms Gem G${made.grade}` : madeName(id)

@@ -1,10 +1,12 @@
 // R2's place pages (profession-progression.md §4.3–§4.4, PP4, PP9, PP13, PP16, PP25; H80): the same shared work page as
 // the facilities (`FacilityPage`'s provider, slot rows, job sheet and stopped queues), with a place's own header (its
 // profession, four slots, ×1.25, no Upgrade, the open shop, "Finish all"), What steps by the world's tier, recipe cards
-// from `madeRecipe`, and her trade first in the picker. Rendered only from the economy stage, on a v3 place.
+// from `madeRecipe`, and her trade first in the picker. Rendered only from the economy stage, on a v3 place. Under the
+// farm by line (H111) its What step, sizes, (i) and quick look are `PlaceV4.tsx`'s.
 import {
-  activeClass, facilityTargets, finishAllCost, madeName, madeRecipe, openShop, placeById, placeSpecV3, professionById, REFINE_BATCHES, SaveRuleError,
-  stockName, targetPlan, TRADES, tradeProfessions, type MadeLine, type MaterialTier, type RpgWorkRequest, type TierWorld, type TradeOf,
+  activeClass, facilityTargets, farmByLine, finishAllCost, madeName, madeRecipe, openShop, placeById, placeSpecV3, placeSpecV4, PROFESSION_NAMES_V4,
+  professionById, REFINE_BATCHES, SaveRuleError, stockName, targetPlan, TRADES, tradeProfessions, type JobKind, type MadeLine, type MaterialTier,
+  type RpgWorkRequest, type TierWorld, type TradeOf,
 } from '@rpg/domain'
 import { workOrder } from '@luismlorenzana/uma-kit/roster'
 import {
@@ -23,6 +25,8 @@ import { HelpButton } from '../../ui/HelpButton'
 import {
   gatherRows, gradeChips, jewelRows, peekTypes, whoAt, workbenchRows, type GradeChip, type TypeTile,
 } from './place-view'
+import { helpLinesV4, initialJobV4, jobKindAtV4, jobSizesV4 } from './place-view-v4'
+import { PeekLineV4, WhatV4 } from './PlaceV4'
 
 /** Tier 2's amber and Tier 3's violet: H36's dusk and night accents, fixed in every world so a chip says its material. */
 export const TIER_TINT: Readonly<Record<MaterialTier, string | null>> = { 1: null, 2: '#e08a3c', 3: '#9d86e8' }
@@ -36,10 +40,14 @@ function openShopLine(world: TierWorld, placeId: string, tradeOf: TradeOf): stri
 }
 
 /** The header's line: "Mine · Mining · 4 slots · ×1.25". */
-const statsLine = (placeId: string, slots: number, speed: number) =>
-  `${placeById(placeId)?.name ?? placeId} · ${professionById(placeSpecV3(placeId)!.profession)!.name} · ${slots} slots · ×${speed}`
+const statsLine = (placeId: string, slots: number, speed: number) => {
+  const profession = placeSpecV3(placeId)!.profession
+  const name = farmByLine() ? PROFESSION_NAMES_V4[profession] : professionById(profession)!.name
+  return `${placeById(placeId)?.name ?? placeId} · ${name} · ${slots} slots · ×${speed}`
+}
 
 function helpLines(placeId: string): string[] {
+  if (farmByLine()) return helpLinesV4(placeId)
   const spec = placeSpecV3(placeId)!
   const lines = ['Her trade’s Umas work here. In a world with none of them, anyone may: the open shop.']
   if (spec.kind === 'gather') return [`Gathers ${LINE_WORD[spec.line!].toLowerCase()}: each tier’s low type from Craft Lv 1, its high type from Craft Lv 26.`, ...lines]
@@ -71,6 +79,14 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
   const stopped = Object.values(work.settled.work).filter((row) => row.dropped?.slot.building === placeId)
   const finish = finishAllCost(world, placeId, now, tier)
   const [finishing, setFinishing] = useState(false)
+  // The farm by line (FL22): a making place processes and makes, so the sheet's sizes follow the picked job's kind. The
+  // sheet opens on a make (or a gather), or on a deep link's own job.
+  const farm = farmByLine()
+  const queryKey = JSON.stringify(query)
+  const [picked, setPicked] = useState<{ key: string; kind: JobKind } | null>(null)
+  const pickedKind: JobKind = picked?.key === queryKey ? picked.kind
+    : query?.job ? jobKindAtV4(placeId, query.job) : placeSpecV4(placeId)?.kinds.at(-1) ?? spec.kind
+  const levelOf = (outfitId: string | null) => (outfitId ? world.umas[outfitId]?.craft.level ?? 1 : 1)
   const closeJob = () => {
     if (query?.back) navigate(query.back, { replace: true })
     else navigate({ pathname: location.pathname, search: withoutJobQuery(location.search) }, { replace: true })
@@ -131,9 +147,9 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
         building={placeId}
         title={placeById(placeId)?.name ?? placeId}
         rows={rows}
-        request={(job, count): RpgWorkRequest => ({ kind: spec.kind, item: job, count })}
-        initialJob={() => initialJobV3(placeId)}
-        sizeRule={spec.kind === 'refine' ? { mode: 'count', sizes: REFINE_BATCHES } : { mode: 'count' }}
+        request={(job, count): RpgWorkRequest => ({ kind: farm ? jobKindAtV4(placeId, job) : spec.kind, item: job, count })}
+        initialJob={(outfitId) => (farm ? initialJobV4(placeId, levelOf(outfitId)) : initialJobV3(placeId))}
+        sizeRule={farm ? sizeRuleOf(pickedKind) : spec.kind === 'refine' ? { mode: 'count', sizes: REFINE_BATCHES } : { mode: 'count' }}
         sizePlacement="before-what"
         preserveCountOnJobChange
         disabled={(row) => lockedReason(row) ?? who.reason(row.id)}
@@ -143,7 +159,12 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
             bottomRight: <span aria-label={`Craft Level ${row.workLevel}`} className="rounded-tl-sm bg-black/75 px-1 font-display text-[9px] font-bold leading-3.5">C{row.workLevel}</span>,
           } : undefined,
         }}
-        renderWhat={(selection) => <WhatV3 selection={selection} placeId={placeId} world={world} tier={tier} />}
+        renderWhat={(selection) => farm
+          ? <WhatV4 selection={selection} placeId={placeId} world={world} onPick={(job) => {
+            setPicked({ key: queryKey, kind: jobKindAtV4(placeId, job) })
+            selection.onChange(job)
+          }} />
+          : <WhatV3 selection={selection} placeId={placeId} world={world} tier={tier} />}
         onClose={closeJob}
         onDone={closeJob}
       />
@@ -184,6 +205,12 @@ function FinishAllSheet({ placeId, world, cost, onClose }: {
       </div>
     </BottomSheet>
   )
+}
+
+/** The sizes a kind offers (FL10): ×1 … ×40 to process, 1–10 otherwise. */
+function sizeRuleOf(kind: JobKind): { mode: 'count'; sizes?: readonly number[] } {
+  const sizes = jobSizesV4(kind)
+  return sizes ? { mode: 'count', sizes } : { mode: 'count' }
 }
 
 function initialJobV3(placeId: string): string {
@@ -342,7 +369,7 @@ export function PlacePeekV3({ view, world, tier, placeId }: { view: MasterView; 
     <div className="space-y-2 p-4" data-place-peek-v3={placeId}>
       <p className="text-[12px] text-ink-soft">{statsLine(placeId, facility.slots, facility.speed)}</p>
       {shop && <p className="text-[12px] font-semibold text-accent">{shop}</p>}
-      <PeekLine placeId={placeId} tier={tier} kind={spec.kind} />
+      {farmByLine() ? <PeekLineV4 placeId={placeId} /> : <PeekLine placeId={placeId} tier={tier} kind={spec.kind} />}
       <ul className="space-y-1.5">
         {cards.map((card) => (
           <li key={card.slot.slot}>
