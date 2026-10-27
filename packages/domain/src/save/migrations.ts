@@ -201,11 +201,12 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v29 for a world of `tier` (its key; v28 doesn't read it, R3's v30 does, H87). */
+/** Every step to v30 for a world of `tier` (its key; v28 doesn't read it, R3's v31 does, H87). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
-  return version < 29 && isRecord(v28) ? toV29(v28) : v28
+  const v29 = version < 29 && isRecord(v28) ? toV29(v28) : v28
+  return version < 30 && isRecord(v29) ? toV30(v29) : v29
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -301,7 +302,7 @@ export function toV29(world: Record<string, unknown>): Record<string, unknown> {
   return { ...world, items, grant: { ...world.grant, back } }
 }
 
-// --- v29 → v30 (D224): the farm by line. Written dark in H110, chained by H112 with SAVE_SCHEMA_VERSION 30 ---------------
+// --- v29 → v30 (D224): the farm by line. Written dark in H110, chained by H112 with SAVE_SCHEMA_VERSION 30 (D228) --------
 
 /** R2's types by line and form (FL18): its low types (Tiers 1–3) become the line's G1 id, its high types its G6 id, the
  * grade that opens at the same Craft Level (1 and 26). Literals, as every step. */

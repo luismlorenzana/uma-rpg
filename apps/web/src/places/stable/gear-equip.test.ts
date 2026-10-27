@@ -52,9 +52,10 @@ describe('the Equip view (H107)', () => {
 describe('the Upgrade view (H107)', () => {
   it('lists her three weapons, five armor slots and the accessory, and counts what can raise now', () => {
     const grades = newGrades(1)
-    const rows = upgradeRows(grades, ['katana', 'lance', 'tome-lightning'], 'spellblade', 30, { 'weapon-gem-g1': 1, 'armor-fittings-g1': 1 }, 1, 'bell')
+    // Her Arms take Arms Gems and her Tome Tome Ink (FL4).
+    const rows = upgradeRows(grades, ['katana', 'lance', 'tome-lightning'], 'spellblade', 30, { 'weapon-gem-g1': 1, 'tome-ink-g1': 1, 'armor-fittings-g1': 1 }, 1, 'bell')
     expect(rows.map((r) => r.key)).toEqual(['katana', 'lance', 'tome-lightning', 'head', 'body', 'legs', 'arms', 'feet', 'accessory-0'])
-    expect(rows[0]!.upgrade).toMatchObject({ ready: true, label: 'G0 → G1 · 1 Weapon Gem G1' })
+    expect(rows[0]!.upgrade).toMatchObject({ ready: true, label: 'G0 → G1 · 1 Arms Gem G1' })
     expect(rows.at(-1)!.upgrade).toMatchObject({ ready: false })
     expect(readyCount(rows)).toBe(8)
   })

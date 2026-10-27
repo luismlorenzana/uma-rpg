@@ -9,7 +9,7 @@ import { type Save } from './save'
 
 const weapon: GradeTarget = { kind: 'weapon', weapon: 'greatsword' }
 const saveOf = (items: Record<string, number>, level = 1, gear = newGrades(1)): Save => ({
-  schemaVersion: 29,
+  schemaVersion: 30,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { '1': gradedWorld({ items, umas: { '101': gradedUma({ level, gear }) } }) },
 })
@@ -29,7 +29,7 @@ describe('graded Forge rules (R2)', () => {
     const grades = newGrades(1)
     grades.weapons.greatsword = { grade: 1 }
     expect(() => raiseGrade(saveOf({ 'weapon-gem-g2': 1 }, 5, grades), '101', weapon, NOW)).toThrow('Needs Lv 6')
-    expect(() => raiseGrade(saveOf({}, 6, grades), '101', weapon, NOW)).toThrow('Needs 1 Weapon Gem G2')
+    expect(() => raiseGrade(saveOf({}, 6, grades), '101', weapon, NOW)).toThrow('Needs 1 Arms Gem G2')
     expect(gradeOf(world(raiseGrade(saveOf({ 'weapon-gem-g2': 1 }, 6, grades), '101', weapon, NOW)).umas['101']!.gear as ReturnType<typeof newGrades>, weapon)).toBe(2)
   })
 
@@ -39,7 +39,7 @@ describe('graded Forge rules (R2)', () => {
     const stock = { 'weapon-gem-g2': 1, 'weapon-gem-g3': 1, 'weapon-gem-g4': 1 }
     expect(world(raiseGradeTo(saveOf(stock, 16, grades), '101', weapon, 4, NOW)).items).toEqual({})
     const missing = saveOf({ 'weapon-gem-g2': 1, 'weapon-gem-g4': 1 }, 16, grades)
-    expect(() => raiseGradeTo(missing, '101', weapon, 4, NOW)).toThrow('Needs Weapon Gems G3')
+    expect(() => raiseGradeTo(missing, '101', weapon, 4, NOW)).toThrow('Needs Arms Gems G3')
     expect(world(missing).items).toEqual({ 'weapon-gem-g2': 1, 'weapon-gem-g4': 1 })
     expect(gradeOf(world(missing).umas['101']!.gear as ReturnType<typeof newGrades>, weapon)).toBe(1)
   })

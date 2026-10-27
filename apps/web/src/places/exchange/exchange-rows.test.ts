@@ -1,35 +1,31 @@
-// R2's raw materials at the Exchange (H80, PP17): every type of the world's tier and below, line by line, the stocked
-// ones at 30 and 80 Laurels × the tier, the rest locked with the win that stocks them.
+// The farm by line's raw materials at the Exchange (H111; farm-by-line.md FL12, FL23): each
+// line's ten grades, G1–G5 at 30 and G6–G10 at 80 Laurels × the tier, stocked after the first win and continent 3.
 import { newTierWorld, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { rawRowsV3 } from './exchange-rows'
+import { rawRowsV4 } from './exchange-rows'
 
 const NOW = '2026-10-25T12:00:00.000Z'
-/** A world with a won stage on each of these continents (stage ids `w<band>-…`). */
 function wonOn(...bands: number[]): TierWorld {
   const base = newTierWorld(NOW, 0)
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: Object.fromEntries(bands.map((b) => [`w${b}-1`, 1])) } } }
 }
-const rowsOf = (world: TierWorld, tier: number, line = 'metal') => rawRowsV3(world, tier).find((g) => g.line === line)!.rows
-  .map((r) => [r.id, r.price, r.locked])
+const rowsOf = (world: TierWorld, tier: number, line = 'metal') => rawRowsV4(world, tier).find((g) => g.line === line)!.rows
 
-describe('the Exchange\'s raw materials', () => {
-  it('locks everything before the first win, saying which win stocks it', () => {
-    expect(rowsOf(wonOn(), 1)).toEqual([
-      ['copper-ore', 30, 'After the tier’s first win'], ['iron-ore', 80, 'After a win on continent 3'],
+describe('the Exchange\'s raw materials by grade (FL12)', () => {
+  it('lists each line\'s ten grades, locked until stocked', () => {
+    const rows = rowsOf(wonOn(), 1)
+    expect(rows.map((r) => [r.id, r.grade, r.price])).toEqual([
+      ['copper-ore', 1, 30], ['tin-ore', 2, 30], ['iron-ore', 3, 30], ['silver-ore', 4, 30], ['cobalt-ore', 5, 30],
+      ['gold-ore', 6, 80], ['platinum-ore', 7, 80], ['titanium-ore', 8, 80], ['mythril-ore', 9, 80], ['orichalcum-ore', 10, 80],
     ])
+    expect(new Set(rows.map((r) => r.locked))).toEqual(new Set(['After the tier’s first win', 'After a win on continent 3']))
   })
 
-  it('stocks the low type after the first win and the high after continent 3', () => {
-    expect(rowsOf(wonOn(1), 1)).toEqual([['copper-ore', 30, null], ['iron-ore', 80, 'After a win on continent 3']])
-    expect(rowsOf(wonOn(3), 1, 'stone')).toEqual([['quartz', 30, null], ['citrine', 80, null]])
-  })
-
-  it('prices × the tier and lists a later tier\'s pair from continent 2 and 4', () => {
-    expect(rowsOf(wonOn(7), 2)).toEqual([
-      ['copper-ore', 60, null], ['iron-ore', 160, 'After a win on continent 3'],
-      ['gold-ore', 60, null], ['titanium-ore', 160, 'After a win on continent 4'],
-    ])
-    expect(rawRowsV3(wonOn(), 3).map((g) => g.rows.length)).toEqual([6, 6, 6, 6, 6])
+  it('stocks G1–G5 after the first win and G6–G10 after continent 3, × the tier', () => {
+    expect(rowsOf(wonOn(1), 1, 'fish').map((r) => r.locked)).toEqual([null, null, null, null, null,
+      'After a win on continent 3', 'After a win on continent 3', 'After a win on continent 3', 'After a win on continent 3', 'After a win on continent 3'])
+    expect(rowsOf(wonOn(3), 1, 'stone').every((r) => r.locked === null)).toBe(true)
+    expect(rowsOf(wonOn(8), 2).map((r) => r.price)).toEqual([60, 60, 60, 60, 60, 160, 160, 160, 160, 160])
+    expect(rowsOf({ ...wonOn(1), items: { trout: 4 } }, 1, 'fish')[1]).toMatchObject({ id: 'trout', name: 'Trout', have: 4 })
   })
 })

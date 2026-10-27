@@ -1,4 +1,4 @@
-// Save v29: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v30 (D224,
+// Save v30: one snapshot document per account (D32, D45), shared by the web app (Dexie + store) and the API. v30 (D224,
 // written dark in H110, live from H112): the farm by line; work settles and R2's types convert by grade. v29 (D221):
 // the grant is tickets only: a granted world's materials leave its Warehouse. v28 (D214,
 // H78; live since H82, D218): R2, the Tier rework's economy: gear by grade, the Planet and three moons, the ten places and
@@ -22,10 +22,9 @@ import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL }
 import { ACCESSORY_FAMILIES, accessorySlotCount, GRADE_MAX, gradeGateLevel, newGrades, type AccessorySlotState, type GearTier, type UmaGrades } from '../economy/grades'
 import { emptyStarMap, isMapNode, MAP_NODES, mapNodeGate, nodeBody, nodeNumeral, type StarMap } from '../economy/planet'
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
-import { PLACE_SLOTS_V3, placeSpecV3 } from '../economy/professions'
+import { PLACE_SLOTS_V3 } from '../economy/professions'
 import { jobKindV4, placeSpecV4 } from '../economy/places-v4'
 import { madeIdentity } from '../items/made-id'
-import { materialIdentity } from '../items/materials-id'
 import { isStockItemId } from '../items/stock-id'
 import type { RpgWorkRequest } from '../work/request'
 import {
@@ -55,11 +54,11 @@ import {
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
 } from '../rift/state'
 import { migrateWorld, toV26, type TierGrant } from './migrations'
-import { farmByLine, SAVE_SCHEMA_VERSION } from './version'
+import { SAVE_SCHEMA_VERSION } from './version'
 
 export type { TierGrant } from './migrations'
 
-export { FARM_BY_LINE_SAVE, farmByLine, SAVE_SCHEMA_VERSION } from './version'
+export { SAVE_SCHEMA_VERSION } from './version'
 /** Umas marked as targets, whose gear and gems the facilities plan for (D100). */
 export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
@@ -362,15 +361,13 @@ function parseCraft(value: unknown, path: string): ProfessionLevel {
   return { level, exp: count(v.exp, `${path}.exp`) }
 }
 
-/** v28's Warehouse (H77, R2's build decision 5): the materials of the world's tier and below and the live made items. */
-function parseStock(value: unknown, path: string, tier: number): Record<string, number> {
+/** The economy stage's Warehouse (H77, R2's build decision 5; the farm by line, D224): the hundred line items, the same in
+ * every world, and the live made items. */
+function parseStock(value: unknown, path: string): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const items: Record<string, number> = {}
   for (const [id, n] of Object.entries(value)) {
     if (!isStockItemId(id)) throw new SaveParseError(`${path}.${id}`, 'unknown item')
-    // The farm by line (save v30) holds the same fifty types in every world (FL8); R2's were by tier.
-    const material = farmByLine() ? undefined : materialIdentity(id)
-    if (material && material.tier > tier) throw new SaveParseError(`${path}.${id}`, `a Tier ${material.tier} material in a Tier ${tier} world`)
     const c = count(n, `${path}.${id}`)
     if (c > 0) items[id] = c
   }
@@ -444,41 +441,14 @@ const v27Work = (buildings: Record<string, { level: number }>): WorkRules => ({
   slots: (building) => FACILITY_SLOTS[(buildings[building]?.level ?? 1) - 1]!,
 })
 
-/** v28's slot: one of the ten places (PP4), four slots each. */
+/** The Wilds' slot (v28 on): one of the ten places (PP4), four slots each. */
 function parseSlotV28(value: unknown, path: string): SlotRef {
   const o = object(value, path, ['building', 'slot'])
-  if (typeof o.building !== 'string' || !placeSpecV3(o.building)) throw new SaveParseError(`${path}.building`, 'not a place')
+  if (typeof o.building !== 'string' || !placeSpecV4(o.building)) throw new SaveParseError(`${path}.building`, 'not a place')
   const slot = count(o.slot, `${path}.slot`)
   if (slot >= PLACE_SLOTS_V3) throw new SaveParseError(`${path}.slot`, 'no such slot')
   return { building: o.building, slot }
 }
-
-/** Whether a v28 place's kind makes `item` in a world of `tier` (H77): a gathering place a raw material of its line, the
- * Workbench a refined one, of the world's tier or below; a making place a live made item of its lines (the Branch Gem
- * from R3's weapons, in a Tier 2 world or above). */
-function madeAtV28(placeId: string, item: string, tier: number): boolean {
-  const place = placeSpecV3(placeId)!
-  if (place.kind === 'gather' || place.kind === 'refine') {
-    const m = materialIdentity(item)
-    return !!m && m.refined === (place.kind === 'refine') && m.tier <= tier && (place.kind === 'refine' || m.line === place.line)
-  }
-  const made = madeIdentity(item)
-  return !!made && place.made.includes(made.line) && isStockItemId(item) && (made.line !== 'branch-gem' || tier >= 2)
-}
-
-function parseRequestV28(value: unknown, path: string, slot: SlotRef, tier: number): RpgWorkRequest {
-  const r = object(value, path, ['kind', 'item', 'count'])
-  const kind = placeSpecV3(slot.building)!.kind
-  if (r.kind !== kind) throw new SaveParseError(`${path}.kind`, `expected ${kind}`)
-  if (typeof r.item !== 'string' || !madeAtV28(slot.building, r.item, tier)) throw new SaveParseError(`${path}.item`, 'not made at this place')
-  const n = count(r.count, `${path}.count`)
-  if (n < 1 || n > maxJobCount(kind)) throw new SaveParseError(`${path}.count`, `expected 1–${maxJobCount(kind)}`)
-  return { kind, item: r.item, count: n }
-}
-
-const v28Work = (tier: number): WorkRules => ({
-  slot: parseSlotV28, request: (value, path, slot) => parseRequestV28(value, path, slot, tier), item: (id) => isStockItemId(id), slots: () => PLACE_SLOTS_V3,
-})
 
 /** Whether a v30 place makes `item` as a job of `kind` (D224, FL2; H110): a gathering place a raw item of its line, a
  * making place a refined item of its line (processing) or a live made item of its lines (the Branch Gem from R3's
@@ -1015,7 +985,7 @@ function parseGrant(value: unknown, path: string): TierGrant | null {
 }
 
 /** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant.
- * v30 (H110) keeps its shape; its work and stock read by the farm by line's rules. */
+ * v30 (H110, live since H112) keeps its shape; its work and stock read by the farm by line's rules. */
 function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant'])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
@@ -1023,7 +993,7 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
   return {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, true), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
-    items: parseStock(w.items, `${path}.items`, tier), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, farmByLine() ? v30Work(tier) : v28Work(tier)),
+    items: parseStock(w.items, `${path}.items`), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v30Work(tier)),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
     rift: parseRift(w.rift, `${path}.rift`, tier, umas, check), grant: parseGrant(w.grant, `${path}.grant`),
   }

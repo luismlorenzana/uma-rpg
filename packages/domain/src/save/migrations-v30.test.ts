@@ -1,12 +1,10 @@
-// Save v30's migration, written dark (H110; farm-by-line.md FL17–FL19): `toV30` settles work with no clock and converts
-// R2's sixty types to the farm by line's G1 and G6 by the Craft Level they opened at; everything else stays. Not chained
-// until H112, so `migrateWorld` still stops at v29.
+// Save v30's migration (H110, chained by H112; farm-by-line.md FL17–FL19): `toV30` settles work with no clock and
+// converts R2's sixty types to the farm by line's G1 and G6 by the Craft Level they opened at; everything else stays.
 import { describe, expect, it } from 'vitest'
 import { lineItem } from '../items/lines'
-import { MATERIAL_IDENTITIES } from '../items/materials-id'
 import { migrateWorld, settleWork, toV30, V30_TYPES } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type TierWorld } from './save'
-import { V29_ALL_STOCK, V29_MADE_STOCK, V29_MATERIAL_STOCK, V29_TIER2_STOCK, v29Save, v29World } from './v29.fixture'
+import { R2_TYPES, V29_ALL_STOCK, V29_MADE_STOCK, V29_MATERIAL_STOCK, V29_TIER2_STOCK, v29Save, v29World } from './v29.fixture'
 
 type Raw = Record<string, unknown>
 const raw = (world: TierWorld): Raw => JSON.parse(JSON.stringify(world)) as Raw
@@ -25,7 +23,7 @@ function converted(stock: Readonly<Record<string, number>>): Record<string, numb
 describe('V30_TYPES (FL18)', () => {
   it('sends each of R2\'s sixty ids to its line\'s G1 (a low type) or G6 (a high type), raw to raw, refined to refined', () => {
     expect(V30_TYPES.size).toBe(60)
-    for (const m of MATERIAL_IDENTITIES) {
+    for (const m of R2_TYPES) {
       const to = lineItem(V30_TYPES.get(m.id)!)!
       expect(to, m.id).toMatchObject({ line: m.line, refined: m.refined, grade: m.band === 'low' ? 1 : 6 })
     }
@@ -105,21 +103,21 @@ describe('toV30 (FL17–FL19)', () => {
   })
 })
 
-describe('not chained yet (H112 chains it)', () => {
-  it('stops the chain at v29 and parses a v29 save with R2\'s rules', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(29)
+describe('chained (H112)', () => {
+  it('runs once from v29 and once only: a v30 world is untouched', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(30)
     const world = raw(v29World())
-    expect(migrateWorld(world, 29)).toBe(world)
-    const parsed = parseSave(JSON.parse(JSON.stringify(v29Save())))
-    expect(parsed.tierWorlds['1']!.work['201']!.entries[0]!.collected).toBe(2)
+    expect(migrateWorld(world, 29)).toEqual(toV30(raw(v29World())))
+    const v30 = toV30(raw(v29World()))
+    expect(migrateWorld(v30, 30)).toBe(v30)
   })
 
-  it('refuses the farm by line\'s ids while the switch is off', () => {
-    const save = JSON.parse(JSON.stringify(v29Save()))
-    save.tierWorlds['1'].items['tome-ink-g3'] = 1
-    expect(() => parseSave(save)).toThrow('unknown item')
-    const tier = JSON.parse(JSON.stringify(v29Save()))
-    tier.tierWorlds['1'].items['mythril-ore'] = 1
-    expect(() => parseSave(tier)).toThrow('a Tier 3 material in a Tier 1 world')
+  it('parses a stored v29 save to v30: settled, converted, every world', () => {
+    const parsed = parseSave(JSON.parse(JSON.stringify(v29Save())))
+    expect(parsed.schemaVersion).toBe(30)
+    expect(parsed.tierWorlds['1']!.work).toEqual({})
+    expect(parsed.tierWorlds['1']!.items['gold-ingot']).toBe(V29_MATERIAL_STOCK['iron-ingot']! + 6)
+    expect(parsed.tierWorlds['2']!.items).toEqual({ 'copper-ore': 4, 'gold-ingot': 3, 'gold-ore': 2, 'carp-fillet': 5 })
+    expect(Object.keys(parsed.tierWorlds['3']!.items)).toHaveLength(20)
   })
 })

@@ -34,12 +34,12 @@ describe('the Warehouse icon grid', () => {
     }
   })
 
-  it('orders materials by line, raw then refined, tier by tier, with grade and highest groups from domain identity', () => {
+  it('orders materials by line, raw then refined, by grade, each with its grade (FL23)', () => {
     const materials = view.items.filter((i) => i.shelf === 'metal' || i.shelf === 'wood' || i.shelf === 'stone')
     expect(materials.map((i) => [i.id, i.line, i.grade, i.group])).toEqual([
-      ['copper-ore', 'Tier 1 · low · raw', null, 'metal-raw'], ['gold-ore', 'Tier 2 · low · raw', null, 'metal-raw'],
-      ['iron-ingot', 'Tier 1 · high · refined', null, 'metal-refined'], ['pine-log', 'Tier 1 · low · raw', null, 'wood-raw'],
-      ['cut-quartz', 'Tier 1 · low · refined', null, 'stone-refined'],
+      ['copper-ore', 'Metal · G1 · raw', 1, 'metal-raw'], ['gold-ore', 'Metal · G6 · raw', 6, 'metal-raw'],
+      ['iron-ingot', 'Metal · G3 · refined', 3, 'metal-refined'], ['pine-log', 'Wood · G1 · raw', 1, 'wood-raw'],
+      ['cut-quartz', 'Stone · G1 · refined', 1, 'stone-refined'],
     ])
     expect(materials.every((i) => i.sell === 'items')).toBe(true)
   })
@@ -47,7 +47,7 @@ describe('the Warehouse icon grid', () => {
   it('orders made items by line and grade, then Planet and Moon Jewels, with one group per line', () => {
     const made = view.items.filter((i) => i.shelf === 'made')
     expect(made.map((i) => [i.name, i.grade, i.line, i.group])).toEqual([
-      ['Weapon Gem G5', 5, 'Grade 5 · Raises a weapon one grade', 'weapon-gem'],
+      ['Arms Gem G5', 5, 'Grade 5 · Raises an Arms weapon one grade', 'weapon-gem'],
       ['Armor Fittings G1', 1, 'Grade 1 · Raises an armor piece one grade', 'armor-fittings'],
       ['Planet Jewel III', 5, 'Opens Planet III', 'jewel-planet'],
       ['Moon Jewel II', 4, 'Opens a moon’s node II', 'jewel-moon'],

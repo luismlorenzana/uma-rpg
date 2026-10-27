@@ -1,9 +1,12 @@
-// The farm by line's catalog (D224; farm-by-line.md FL5, FL8, FL14, FL15; H109): five lines of ten grades, each grade a
-// raw item and its refined form, the same fifty types in every world. Each line is one uma-art family of its `items`
-// atlas (ores, woods, vegetables, fish, crystals) and a grade its family's grade, so ids, names and icons are uma-art's
-// own. It holds R2's sixty ids (`materials-id.ts`) with their grades: Iron Ore is Metal G3 here, R2's Tier 1 high type
-// there. Dark beside R2's catalog until H112: the rules read it when `farmByLine()`.
-import { MATERIAL_LINES, type MaterialLine } from './materials-id'
+// The materials (D224; farm-by-line.md FL5, FL8, FL14, FL15; H109, live since H112): five lines of ten grades, each
+// grade a raw item and its refined form, the same fifty types in every world. Each line is one uma-art family of its
+// `items` atlas (ores, woods, vegetables, fish, crystals) and a grade its family's grade, so ids, names and icons are
+// uma-art's own. R2's sixty ids (save v28–v29) are among them; save v30's migration moved each to its line's G1 or G6
+// (`toV30`). Many ids are also legacy ids (`identity.ts`) with another meaning; the economy stage decides (D208).
+
+export const MATERIAL_LINES = ['metal', 'wood', 'vegetables', 'fish', 'stone'] as const
+/** A gathering profession's material: Mining metal, Wood Chopping wood, Farming vegetables, Fishing fish, Hunting stone. */
+export type MaterialLine = typeof MATERIAL_LINES[number]
 
 /** uma-art's item family a line's icons belong to (Farming's and Fishing's are the old farm's, gone since save v21). */
 export type MaterialArtFamily = 'ores' | 'woods' | 'vegetables' | 'fish' | 'crystals'

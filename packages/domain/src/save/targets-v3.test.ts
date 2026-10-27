@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { newGrades } from '../economy/grades'
-import { materialType } from '../items/materials-id'
+import { lineItem } from '../items/lines'
 import { facilityTargets, targetDemand, targetPlan } from './targets'
 import { gradedUma, gradedWorld, starMap } from './economy-v3.fixture'
 
@@ -11,7 +11,7 @@ const planAt = (tier: 1 | 2 = 1) => {
   return { world, plan: targetPlan(world, () => 'brawler', tier) }
 }
 
-describe('R2 targets', () => {
+describe('targets (R2; the farm by line since H112)', () => {
   it('plans exact fresh Tier 1 gear, jewels, refined and raw totals', () => {
     const { plan } = planAt(1)
     const count = (prefix: string) => total(plan.made.filter((row) => row.key.startsWith(prefix)))
@@ -20,19 +20,25 @@ describe('R2 targets', () => {
     expect(count('accessory-setting-')).toBe(10)
     expect(count('jewel-planet-')).toBe(5)
     expect(count('jewel-moon-')).toBe(17)
-    expect(total(plan.refined)).toBe(493)
-    expect(total(plan.raw)).toBe(493)
-    expect(facilityTargets(plan, 'forge').every((row) => row.key.startsWith('weapon-gem-'))).toBe(true)
-    expect(facilityTargets(plan, 'armorer').every((row) => row.key.startsWith('armor-fittings-'))).toBe(true)
-    expect(facilityTargets(plan, 'charm-shop').every((row) => row.key.startsWith('accessory-setting-'))).toBe(true)
-    expect(facilityTargets(plan, 'lapidary').every((row) => row.key.startsWith('jewel-'))).toBe(true)
-    expect(facilityTargets(plan, 'workbench')).toEqual(plan.refined.filter((row) => row.need > row.have))
+    // A Brawler's three Arms: 30 Arms Gems × 7 Ingots, 50 Fittings × 2 Planks, 10 Settings × 10 Fillets, 5 Planets × 10
+    // and 17 Moons × 4 cut stones (FL9).
+    expect(total(plan.refined)).toBe(210 + 100 + 100 + 50 + 68)
+    expect(total(plan.raw)).toBe(total(plan.refined))
+    const lineOf = (key: string) => lineItem(key)?.line
+    const forge = facilityTargets(plan, 'forge')
+    expect(forge.slice(0, 10).every((row) => row.key.startsWith('weapon-gem-'))).toBe(true)
+    expect(forge.slice(10).every((row) => lineOf(row.key) === 'metal' && lineItem(row.key)!.refined)).toBe(true)
+    expect(facilityTargets(plan, 'mine').every((row) => lineOf(row.key) === 'metal' && !lineItem(row.key)!.refined)).toBe(true)
+    expect(facilityTargets(plan, 'armorer').slice(0, 10).every((row) => row.key.startsWith('armor-fittings-'))).toBe(true)
+    expect(facilityTargets(plan, 'charm-shop').slice(0, 10).every((row) => row.key.startsWith('accessory-setting-'))).toBe(true)
+    expect(facilityTargets(plan, 'lapidary').slice(0, 10).every((row) => row.key.startsWith('jewel-'))).toBe(true)
+    // A Brawler holds no Tome: nothing for the Workbench or the Fields.
+    expect(facilityTargets(plan, 'workbench')).toEqual([])
+    expect(facilityTargets(plan, 'fields')).toEqual([])
   })
 
-  it('uses Tier 2 pairs for the G5 and G10 lines', () => {
-    const { plan } = planAt(2)
-    expect(plan.refined.some((row) => row.key === materialType('metal', 2, 'low').refined)).toBe(true)
-    expect(plan.refined.some((row) => row.key === materialType('metal', 2, 'high').refined)).toBe(true)
+  it('plans the same fifty types in a Tier 2 world (FL8)', () => {
+    expect(total(planAt(2).plan.refined)).toBe(total(planAt(1).plan.refined))
   })
 
   it('a G4 Greatsword asks only for its G5–G10 gems', () => {

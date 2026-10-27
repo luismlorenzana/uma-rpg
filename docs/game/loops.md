@@ -14,8 +14,8 @@ the Rift below it ascends twenty Umas ([the Rift](#the-rift); the page is in [se
    Uma Shards ─► Tickets                                      Exchange: raw materials, tickets
                                                                   │
                                                                   ▼
-                    gather (her trade's place) ─► process (the Workbench) ─► make (Weapon Gems, Armor Fittings,
-                                                                              Accessory Settings, Planet and Moon Jewels)
+                    gather (her line's gathering place) ─► process and make (her line's making place: Arms Gems,
+                                                              Tome Ink, Armor Fittings, Accessory Settings, jewels)
                                                                                     │
                                     grades raised, nodes opened ◄───────────────────┘
                                     └────────► a stronger party fights higher levels
@@ -121,31 +121,21 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 | Class Marks | Class EXP past Rank 50, at half rate | Class Manuals |
 
 <!-- live:prices -->
-| World | Raw materials | Stocked | Price (Laurels) |
-|---|---|---|---|
-| Tier 1 | Tier 1's low types | after the tier's first win | 30 |
-| Tier 1 | Tier 1's high types | after a win on continent 3 | 80 |
-| Tier 2 | Tier 1's low types | after the tier's first win | 60 |
-| Tier 2 | Tier 1's high types | after a win on continent 3 | 160 |
-| Tier 2 | Tier 2's low types | after a win on continent 2 | 60 |
-| Tier 2 | Tier 2's high types | after a win on continent 4 | 160 |
-| Tier 3 | Tier 1's low types | after the tier's first win | 90 |
-| Tier 3 | Tier 1's high types | after a win on continent 3 | 240 |
-| Tier 3 | Tier 2's low types | after a win on continent 2 | 90 |
-| Tier 3 | Tier 2's high types | after a win on continent 4 | 240 |
-| Tier 3 | Tier 3's low types | after a win on continent 2 | 90 |
-| Tier 3 | Tier 3's high types | after a win on continent 4 | 240 |
+| Raw materials | Stocked | Price (Laurels), × the world's tier |
+|---|---|---|
+| G1–G5, every line | after the tier's first win | 30 |
+| G6–G10, every line | after a win on continent 3 | 80 |
 
 | Thing | Price (Laurels) |
 |---|---|
 | Speed Ticket | 10 |
 | Sweep Ticket | 15 |
 
-A Speed Ticket takes 30 minutes off a running job. Selling, × the world's tier: a raw low type 6, a high type 16; refined twice that; a made item 6 + 6 × its grade. A Class Manual costs 1,000 Class Marks, not Laurels.
+A Speed Ticket takes 30 minutes off a running job. Selling, × the world's tier: a raw G1–G5 item 6, a G6–G10 one 16; refined twice that; a made item 6 + 6 × its grade. A Class Manual costs 1,000 Class Marks, not Laurels.
 <!-- /live -->
 
-The Exchange sells raw materials only, every tier's types up to the world's, by pair: a pair's low type once it's needed
-and its high type before G10. It sells up to 99 at a time; selling pays a few Laurels for any material or made item.
+The Exchange sells raw materials only, each line's ten grades in every world: G1–G5 from the tier's first win and G6–G10
+from a win on continent 3. It sells up to 99 at a time; selling pays a few Laurels for any material or made item.
 
 ### The Tier rework's grant
 
@@ -154,7 +144,18 @@ an empty map, and facility upgrades were refunded. The time the Umas worked came
 one per 30 minutes of the work their Craft EXP records, ⌈(EXP her level took + her bank) ÷ 60⌉ an Uma, never below what
 the deleted pieces and gems took to make. It was paid once into each world's wallet when the save became v28. The tickets
 already hold the stock's gathering, so save v29 (D221) took every material from a world that was paid: the grant is
-tickets only, and Craft Levels come back from the jobs they pay for.
+tickets only, and Craft Levels come back from the jobs they pay for. Save v30 (H112, D224) then moved R2's types to the
+farm by line's grades ([the farm by line](#the-farm-by-line-save-v30)).
+
+### The farm by line (save v30)
+
+The farm by line (H112, D224) gave every trade all three steps of its own line. The first time a save opens after it:
+- **Running jobs finish at once** into the Warehouse, with their Craft EXP; queued jobs drop.
+- **R2's types move to their line's grade that opens at the same Craft Level:** a low type of any tier to its line's G1, a
+  high type to its G6 (Iron Ore becomes Gold Ore, Cabbage Bell Pepper, Sardine Fillet Sea Bream Fillet, Citrine
+  Sapphire); Copper Ore, Pine Log, Carrot, Carp and Quartz stay as they are.
+- **Everything else stays:** made items (a Weapon Gem is an Arms Gem now), grades, jewels, Craft Levels, Laurels,
+  tickets.
 
 The first time each world opens after the update, the sheet **"The Wilds are rebuilt"** shows it: the grant ("+63,800
 Speed Tickets"), the hours it stands for, what went (gear pieces, Star Gems, facility upgrades), what came back (the upgrades'
@@ -167,17 +168,20 @@ close it for good; the Account's row "The Tier rework's grant" reopens it.
 Each Uma has one profession level, **Craft Level** (save key `craft`, D144), raised by every job in the Wilds' ten places
 ([sections](sections.md#wilds)).
 
-- **Her trade** (PP2): her calling names two professions, a gathering one and a crafting one, and their two places are
-  hers. A Brawler mines and makes Weapon Gems; a Spell Blade chops wood and makes Armor Fittings; a Paladin or a Cleric
-  farms and processes at the Workbench; a Summoner fishes and makes Accessory Settings; a Mage hunts and cuts jewels. Her
+- **Her trade** (PP2, FL1): her calling names one line, and its two places are hers: its gathering place and its making
+  place, which processes the line's raw items and makes its one item. A Brawler mines, then smelts and makes Arms Gems at
+  the Forge; a Spell Blade chops wood, then makes Armor Fittings at the Armorer; a Paladin or a Cleric farms, then makes
+  Tome Ink at the Workbench; a Summoner fishes, then makes Accessory Settings at the Charm Shop; a Mage hunts, then cuts
+  jewels at the Lapidary. No place touches another line. Her
   calling sets it, never her active class: a class switch moves no job. Another trade's places refuse her ("Another
   trade"), unless the world has no Uma of that trade: then the place is an **open shop** and takes everyone until one
   arrives.
-- **Types and grades** (PP13): a low type opens at Craft Lv 1 and a high type at Craft Lv 26; a made item of grade g at
-  Craft Lv 5g − 4 (1, 6, 11 … 46).
+- **Grades** (FL6): every line has ten, G1–G10; grade g opens at Craft Lv 5g − 4 (1, 6, 11 … 46) to gather, to process
+  and to make, and a made item of grade g takes its line's refined items of grade g.
 - **Speed (D139):** set by her Craft Level alone, the same for every type and grade. Aptitude doesn't matter.
   - Gathering one raw item takes 54 minutes at Lv1, falling evenly to 36 at Lv50, before the place's ×1.25.
-  - Processing takes a quarter of that; making takes a gather's time for each refined item in the made item.
+  - Processing takes a quarter of that; making takes three quarters of a gather for each refined item in the made item
+    (FL10). So a refined item costs one gather at each of its line's two places, and a trade's two places stay equally busy.
 - **Pace (D96):** a level takes 12 hours of work at Lv1, rising to 18 at Lv49 (88,200 EXP to Lv50). Batch size doesn't
   change it: EXP is paid per minute of work.
 - **A job:**
@@ -204,9 +208,10 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
   place finishes every running job there at once, each at ⌈remaining ÷ 30 minutes⌉, after a confirm naming the total
   ("Finish 3 jobs for 14 Speed Tickets?"); short of tickets it says "Needs 14 Speed Tickets".
 - **Targets:** mark up to ten Umas total on their profiles. Every place then lists what maxing them still takes from it:
-  - **The making places:** each grade still to raise on her three weapons, her five armor slots and her accessory slot,
-    and each jewel for a node she hasn't opened.
-  - **The Workbench and the gathering places:** the refined and raw materials those still need.
+  - **The making places:** each grade still to raise on her three weapons (an Arms weapon at the Forge, a Tome at the
+    Workbench), her five armor slots and her accessory slot, and each jewel for a node she hasn't opened; then the
+    refined items of their line those still need.
+  - **The gathering places:** the raw items of their line those still need.
   - **Each line** shows the total need, what's in the Warehouse and what's coming. It stays until the Warehouse holds
     enough, then goes.
   - **Cascade:** only what's still short (not in stock, not being made) reaches the materials, so when a line is
@@ -219,10 +224,10 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| Gather one raw item | any type, by Craft Level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
-| Process one item | raw into refined, one for one, a quarter of a gather: 13.5 min at Lv1, 9 min at Lv50 |
-| Make one item | a gather's time for each refined item in it: a Weapon Gem 4, Armor Fittings 2 or 3, an Accessory Setting 12, a Planet Jewel 12, a Moon Jewel 4 |
-| Opens | a low type at Craft Lv 1 and a high type at Lv 26; a made item of grade g at Craft Lv 5g − 4 |
+| Gather one raw item | any grade, by Craft Level: 54 min at Lv1, falling evenly to 36 min at Lv50 (ten in 9 h and 6 h) |
+| Process one item | raw into refined, one for one, at her line's making place, a quarter of a gather: 13.5 min at Lv1, 9 min at Lv50 |
+| Make one item | three quarters of a gather for each refined item in it: an Arms Gem or Tome Ink 7, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4 (an Arms Gem 4.7 h at Lv1, 3.1 h at Lv50) |
+| Opens | grade g at Craft Lv 5g − 4, to gather, to process and to make |
 | Craft EXP | 2 per minute of the job at her level, before the place's speed |
 | Outputs per job | gathering and making 1–10; processing ×1, ×4, ×8, ×20, ×40 |
 | Jobs queued after it | 3 |
@@ -258,7 +263,8 @@ Each Uma has one profession level, **Craft Level** (save key `craft`, D144), rai
 **Gear** ([materials](materials.md#gear)):
 - **Slots:** her class's three weapons, five armor slots (head, body, legs, arms, feet) and one accessory slot, each at a
   grade, G0 to G10. Grade g opens at Uma Lv 5g − 4.
-- **Raising a grade:** a made item of the next grade (a Weapon Gem, Armor Fittings, an Accessory Setting), from the
+- **Raising a grade:** a made item of the next grade (an Arms Gem for an Arms weapon, Tome Ink for a Tome, Armor Fittings,
+  an Accessory Setting), from the
   Warehouse, raises the slot one grade; a sheet can climb several grades at once when the Warehouse holds each one. The
   Gear tab's Upgrade view marks a slot she can raise now.
 - **What it does:** a weapon's Might on its hits; armor its slot's stat and ATK or M.ATK by her class's half; her

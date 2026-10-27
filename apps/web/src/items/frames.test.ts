@@ -2,7 +2,7 @@ import gear from '@luismlorenzana/uma-art/gear/atlas.json'
 import gems from '@luismlorenzana/uma-art/gems/atlas.json'
 import items from '@luismlorenzana/uma-art/items/atlas.json'
 import {
-  EQUIP_TYPES, gearId, GEM_IDENTITIES, GEMS, ITEM_FAMILIES, ITEMS, LINE_ITEMS, MADE_IDENTITIES, MATERIALS,
+  EQUIP_TYPES, gearId, GEM_IDENTITIES, GEMS, ITEM_FAMILIES, ITEMS, LINE_ITEMS, MADE_IDENTITIES,
   type AccessorySlotState,
 } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
@@ -31,18 +31,13 @@ describe('icon frames (P37–P38)', () => {
     expect(iconFrame('gem-unknown-1')).toBeNull()
   })
 
-  it('finds every R2 material, made item, jewel and accessory form', () => {
-    for (const material of MATERIALS) {
-      const frame = items.frames[material.id as keyof typeof items.frames]
-      expect(frame, material.id).toBeDefined()
-      expect(iconFrame(material.id), material.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
-    }
+  it('finds every material, made item, jewel and accessory form', () => {
     for (const made of MADE_IDENTITIES.filter((m) => !m.line.startsWith('jewel-') && m.line !== 'tome-ink')) {
       const frame = items.frames[made.id as keyof typeof items.frames]
       expect(frame, made.id).toBeDefined()
       expect(iconFrame(made.id), made.id).toEqual({ sheet: 'items', x: frame!.x, y: frame!.y })
     }
-    // The farm by line's hundred line items (FL15): each at its own frame in uma-art's atlas.
+    // The hundred line items (FL15): each at its own frame in uma-art's atlas.
     for (const m of LINE_ITEMS) {
       const frame = items.frames[m.id as keyof typeof items.frames]
       expect(frame, m.id).toBeDefined()

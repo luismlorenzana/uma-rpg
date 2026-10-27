@@ -63,8 +63,8 @@ describe('R2 gear grades (D193–D198)', () => {
     const grades = newGrades(1)
     grades.weapons.greatsword = { grade: 4 }
     expect(raiseBlock(grades, target, 20, { 'weapon-gem-g5': 1 })).toBe('Needs Lv 21')
-    expect(raiseBlock(grades, target, 21, {})).toBe('Needs 1 Weapon Gem G5')
-    expect(raiseBlock(grades, target, 31, {}, 7)).toBe('Needs Weapon Gems G5, G6 and G7')
+    expect(raiseBlock(grades, target, 21, {})).toBe('Needs 1 Arms Gem G5')
+    expect(raiseBlock(grades, target, 31, {}, 7)).toBe('Needs Arms Gems G5, G6 and G7')
     grades.weapons.greatsword = { grade: 10 }
     expect(raiseBlock(grades, target, 50, {})).toBe('Already G10')
   })

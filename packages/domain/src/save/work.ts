@@ -14,19 +14,14 @@ import {
 } from '@luismlorenzana/uma-work'
 import { facilitySpec, type JobKind } from '../economy/jobs'
 import { grantProfessionExp } from '../economy/pacing'
-import { workPlace } from '../economy/professions'
 import { stockName } from '../economy/stock'
 import { gearById } from '../economy/gear'
 import { gemById } from '../economy/gems'
 import { itemById, type ItemDef } from '../items/catalog'
 import { madeName } from '../items/made'
 import { madeIdentity } from '../items/made-id'
-import { materialById } from '../items/materials'
-import { materialGateGrade } from '../items/materials-id'
 import { lineItem } from '../items/lines'
-import { madeNameV4 } from '../items/made-v4'
 import { jobKindV4, placeSpecV4 } from '../economy/places-v4'
-import { farmByLine } from './version'
 import { rpgRework } from '../rpg/battle/caps'
 import { RPG_BUILDINGS, RPG_WORK_ENV, type CraftGain } from '../work/env'
 import { ANOTHER_TRADE, liveWorkEnv, TRADE_REFUSAL, type WorkContext } from '../work/env-v3'
@@ -84,12 +79,12 @@ const slotRef = (placeId: string, slot: number): SlotRef => ({ building: placeId
 /** A job's kind: its place's under R2 and before; under the farm by line, its item's at the place (a making place both
  * processes and makes, FL2). */
 const kindAt = (placeId: string, output: string): JobKind | null => {
-  if (farmByLine()) {
+  if (rpgRework('economy')) {
     const place = placeSpecV4(placeId)
     // An item the place doesn't work goes to its first kind, whose rules refuse it ("That isn't made here.").
     return place ? jobKindV4(placeId, output) ?? place.kinds[0]! : null
   }
-  return workPlace(placeId)?.kind ?? null
+  return facilitySpec(placeId)?.kind ?? null
 }
 const requestFor = (placeId: string, output: string, count: number): RpgWorkRequest => {
   const kind = kindAt(placeId, output)
@@ -126,15 +121,9 @@ export const facilityLevel = (world: TierWorld, placeId: string): number => worl
 /** What a job makes, by generation: a legacy item, gear piece or Star Gem to engine v16; from v17 a material (its grade
  * is the one its type opens at: 1 low, 6 high) or a made item. */
 function outputOf(id: string): { id: string; name: string; grade: number } | undefined {
-  if (farmByLine()) {
+  if (rpgRework('economy')) {
     const m = lineItem(id)
     if (m) return { id, name: m.name, grade: m.grade }
-    const made = madeIdentity(id)
-    return made ? { id, name: madeNameV4(id)!, grade: made.grade } : undefined
-  }
-  if (rpgRework('economy')) {
-    const material = materialById(id)
-    if (material) return { id, name: material.name, grade: materialGateGrade(id) }
     const made = madeIdentity(id)
     return made ? { id, name: madeName(id)!, grade: made.grade } : undefined
   }

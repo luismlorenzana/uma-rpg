@@ -1,9 +1,8 @@
 // The farm by line's recipes (D224; farm-by-line.md FL7, FL9, FL14; H109): a made item takes one line's refined items of
 // its own grade, the same amount at every grade (a jewel's grade is its node's: Planet n 2n − 1, Moon n 2n). An Arms Gem
 // (R2's Weapon Gem, renamed) or Tome Ink 7, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4;
-// each line carries about 100–110 refined items a maxed Uma (FL9). Dark beside R2's `made.ts` until H112.
-import type { MaterialLine } from './materials-id'
-import { lineItemId } from './lines'
+// each line carries about 100–110 refined items a maxed Uma (FL9). Live since H112 (save v30).
+import { lineItemId, type MaterialLine } from './lines'
 import { madeName } from './made'
 import { madeIdentity, type MadeLine } from './made-id'
 
@@ -30,9 +29,5 @@ export function madeRecipeV4(id: string): Readonly<Record<string, number>> {
 /** A made item's refined count: its make time in three-quarter gathers (FL10). */
 export const madeRefinedV4 = (id: string): number => Object.values(madeRecipeV4(id)).reduce((a, b) => a + b, 0)
 
-/** "Arms Gem G3" (FL14: the Weapon Gem raises Arms only), "Tome Ink G3", the rest as R2 names them, whatever the switch
- * (`madeName` says Arms Gem only when it's on). */
-export function madeNameV4(id: string): string | undefined {
-  const made = madeIdentity(id)
-  return made?.line === 'weapon-gem' ? `Arms Gem G${made.grade}` : madeName(id)
-}
+/** A made item's name: `madeName`, which reads Arms Gem for a Weapon Gem since the farm by line (FL14). */
+export const madeNameV4 = (id: string): string | undefined => madeName(id)

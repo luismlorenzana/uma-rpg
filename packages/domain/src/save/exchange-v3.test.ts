@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { pickCalling, type BattleOutfit } from './battle'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
-import { buyRawItem, buyTickets, rawPriceV3, sellPrice, sellStock, stockedTypes } from './exchange'
+import { buyRawItem, buyTickets, rawPriceV4, sellPrice, sellStock, stockedTypes } from './exchange'
 import { worldOf } from './rules'
 import type { Save, TierWorld } from './save'
 import { callingPickBlock, CALLING_WORKING } from './status'
@@ -19,60 +19,48 @@ function worldWith(tier: number, continents: readonly number[], overrides: Parti
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 const saveOf = (tier: number, world: TierWorld): Save => ({
-  schemaVersion: 29,
+  schemaVersion: 30,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { [String(tier)]: world },
 })
 
-describe('what the Exchange stocks (PP17)', () => {
-  it('opens Tier 1\'s low types after the first win and its high types after continent 3', () => {
+describe('what the Exchange stocks (PP17, FL12)', () => {
+  it('opens each line\'s G1–G5 after the tier\'s first win and G6–G10 after continent 3, in every tier', () => {
     expect(stockedTypes(worldWith(1, []), 1)).toEqual([])
-    expect(stockedTypes(worldWith(1, [1]), 1)).toEqual(['copper-ore', 'pine-log', 'carrot', 'carp', 'quartz'])
-    expect(stockedTypes(worldWith(1, [1, 2]), 1)).toEqual(['copper-ore', 'pine-log', 'carrot', 'carp', 'quartz'])
-    expect(stockedTypes(worldWith(1, [1, 2, 3]), 1)).toEqual(['copper-ore', 'iron-ore', 'pine-log', 'cedar-log', 'carrot', 'cabbage', 'carp', 'sardine',
-      'quartz', 'citrine'])
-    expect(stockedTypes(worldWith(1, [5]), 1)).toHaveLength(10)
-  })
-
-  it('adds Tier 2\'s pair in a Tier 2 world: low after continent 2, high after continent 4', () => {
-    expect(stockedTypes(worldWith(2, [1]), 2)).toEqual(['copper-ore', 'pine-log', 'carrot', 'carp', 'quartz'])
-    expect(stockedTypes(worldWith(2, [1, 2]), 2)).toEqual(['copper-ore', 'gold-ore', 'pine-log', 'cherry-log', 'carrot', 'bell-pepper', 'carp', 'sea-bream',
-      'quartz', 'sapphire'])
-    expect(stockedTypes(worldWith(2, [1, 2, 3]), 2)).toHaveLength(15)
-    expect(stockedTypes(worldWith(2, [1, 2, 3, 4]), 2)).toHaveLength(20)
-    expect(stockedTypes(worldWith(2, [1, 2, 3, 4]), 2)).not.toContain('mythril-ore')
-  })
-
-  it('adds Tier 3\'s pair beside Tier 2\'s in a Tier 3 world', () => {
-    expect(stockedTypes(worldWith(3, [1, 2]), 3).filter((id) => ['gold-ore', 'mythril-ore', 'titanium-ore', 'orichalcum-ore'].includes(id)))
-      .toEqual(['gold-ore', 'mythril-ore'])
-    expect(stockedTypes(worldWith(3, [1, 2, 3, 4]), 3)).toHaveLength(30)
+    const first = stockedTypes(worldWith(1, [1]), 1)
+    expect(first).toHaveLength(25)
+    expect(first.filter((id) => ['copper-ore', 'cobalt-ore', 'gold-ore'].includes(id))).toEqual(['copper-ore', 'cobalt-ore'])
+    expect(stockedTypes(worldWith(1, [1, 2]), 1)).toHaveLength(25)
+    expect(stockedTypes(worldWith(1, [1, 2, 3]), 1)).toHaveLength(50)
+    expect(stockedTypes(worldWith(2, [1]), 2)).toEqual(first)
+    expect(stockedTypes(worldWith(3, [5]), 3)).toHaveLength(50)
   })
 })
 
 describe('buying and selling (PP17)', () => {
-  it('sells a stocked raw type at 30 or 80 Laurels × the world\'s tier', () => {
-    expect([1, 2, 3].map((t) => [rawPriceV3('copper-ore', t), rawPriceV3('iron-ore', t), rawPriceV3('gold-ore', t), rawPriceV3('titanium-ore', t)]))
-      .toEqual([[30, 80, 30, 80], [60, 160, 60, 160], [90, 240, 90, 240]])
-    expect(rawPriceV3('copper-ingot', 1)).toBe(0)
+  it('sells a stocked raw item at 30 (G1–G5) or 80 (G6–G10) Laurels × the world\'s tier', () => {
+    expect([1, 2, 3].map((t) => [rawPriceV4('copper-ore', t), rawPriceV4('iron-ore', t), rawPriceV4('gold-ore', t), rawPriceV4('titanium-ore', t)]))
+      .toEqual([[30, 30, 80, 80], [60, 60, 160, 160], [90, 90, 240, 240]])
+    expect(rawPriceV4('copper-ingot', 1)).toBe(0)
     const world = worldWith(2, [1, 2], { wallet: { ...gradedWorld().wallet, laurels: 1000 } })
     const stocked = stockedTypes(world, 2)
-    const bought = buyRawItem(saveOf(2, world), 'gold-ore', 3, stocked, NOW, '2')
-    expect(worldOf(bought, '2').items).toEqual({ 'gold-ore': 3 })
+    const bought = buyRawItem(saveOf(2, world), 'tin-ore', 3, stocked, NOW, '2')
+    expect(worldOf(bought, '2').items).toEqual({ 'tin-ore': 3 })
     expect(worldOf(bought, '2').wallet.laurels).toBe(1000 - 3 * 60)
-    expect(() => buyRawItem(saveOf(2, world), 'iron-ore', 1, stocked, NOW, '2')).toThrow('Not stocked yet')
+    expect(() => buyRawItem(saveOf(2, world), 'gold-ore', 1, stocked, NOW, '2')).toThrow('Not stocked yet')
     expect(() => buyRawItem(saveOf(2, world), 'gold-ingot', 1, stocked, NOW, '2')).toThrow('raw items only')
-    expect(() => buyRawItem(saveOf(2, world), 'tin-ore', 1, stocked, NOW, '2')).toThrow('raw items only')
+    expect(() => buyRawItem(saveOf(2, world), 'weapon-gem-g1', 1, stocked, NOW, '2')).toThrow('raw items only')
     expect(() => buyRawItem(saveOf(2, world), 'carp', 17, stocked, NOW, '2')).toThrow('needs 1020 Laurels')
   })
 
   it('buys back materials and made items × the world\'s tier, and nothing off the retired shelves', () => {
     const prices = (tier: number) => ['carrot', 'cabbage', 'chopped-carrot', 'shredded-cabbage', 'weapon-gem-g1', 'weapon-gem-g10', 'jewel-moon-5', 'branch-gem']
       .map((id) => sellPrice('items', id, tier))
-    expect(prices(1)).toEqual([6, 16, 12, 32, 12, 66, 66, 36])
-    expect(prices(2)).toEqual([12, 32, 24, 64, 24, 132, 132, 72])
-    expect(prices(3)).toEqual([18, 48, 36, 96, 36, 198, 198, 108])
-    expect(sellPrice('items', 'tin-ore', 1)).toBe(0)
+    // Cabbage is G3 now: a low band's price, as Carrot's.
+    expect(prices(1)).toEqual([6, 6, 12, 12, 12, 66, 66, 36])
+    expect(prices(2)).toEqual([12, 12, 24, 24, 24, 132, 132, 72])
+    expect(prices(3)).toEqual([18, 18, 36, 36, 36, 198, 198, 108])
+    expect([sellPrice('items', 'eel', 1), sellPrice('items', 'tome-ink-g3', 1), sellPrice('items', 'nothing', 1)]).toEqual([16, 24, 0])
     expect(sellPrice('gems', 'moon-atk-1', 1)).toBe(0)
     const world = worldWith(2, [], { items: { 'cut-diamond': 2 } })
     const sold = sellStock(saveOf(2, world), 'items', 'cut-diamond', 2, NOW, '2')

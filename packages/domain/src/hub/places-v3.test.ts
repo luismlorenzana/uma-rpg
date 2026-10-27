@@ -30,7 +30,8 @@ describe('the Wilds by generation (H77)', () => {
     ])
     expect(placesOn('wilds')).toEqual(wildsPlaces(17))
     expect(wildsPlaces().every((p) => p.page === 'wilds' && !p.hidden && p.blurb.length > 0 && p.details.length > 0)).toBe(true)
-    expect(placeById('mine')?.blurb).toBe('Mining: ores into ingots.')
+    expect(placeById('mine')?.blurb).toBe('Mining: metal, G1–G10.')
+    expect(placeById('workbench')?.blurb).toBe('Tome Crafting: Tome Ink.')
     expect(placeById('charm-shop')?.blurb).toBe('Accessory Crafting: Accessory Settings.')
   })
 

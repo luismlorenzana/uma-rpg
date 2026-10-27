@@ -1,12 +1,11 @@
-// The farm by line's places (D224; farm-by-line.md FL1–FL3, FL14; H109): the same ten places, rows and trades as R2, but
-// every place belongs to one line. A gathering place gathers its line; a making place processes its own line's raw items
-// and makes its one item from its own refined ones: the Forge Arms Gems, the Armorer Armor Fittings, the Workbench Tome
-// Ink, the Charm Shop Accessory Settings, the Lapidary Planet and Moon Jewels. Professions keep their ids (nothing
-// stores them); the Forge's reads Arms Crafting and the Workbench's Tome Crafting. Dark beside `PLACES_V3` until H112.
-import { isLineItemId, lineItem } from '../items/lines'
+// The Wilds' places (D224; farm-by-line.md FL1–FL3, FL14; H109, live since H112): R2's ten places, rows and trades, every
+// place one line's. A gathering place gathers its line; a making place processes its own line's raw items and makes its
+// one item from its own refined ones: the Forge Arms Gems, the Armorer Armor Fittings, the Workbench Tome Ink, the Charm
+// Shop Accessory Settings, the Lapidary Planet and Moon Jewels.
+import { isLineItemId, lineItem, type MaterialLine } from '../items/lines'
 import { madeIdentity, type MadeLine } from '../items/made-id'
-import type { MaterialLine } from '../items/materials-id'
-import type { JobKind } from './jobs'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
+import { facilitySpec, type FacilitySpec, type JobKind } from './jobs'
 import { PROFESSIONS, type PlaceIdV3, type ProfessionId } from './professions'
 
 export interface PlaceSpecV4 {
@@ -42,9 +41,13 @@ export const placeSpecV4 = (placeId: string): PlaceSpecV4 | undefined => BY_ID.g
 /** Whether a place makes (and so processes) rather than gathers. */
 export const isMakingPlaceV4 = (place: PlaceSpecV4): boolean => place.kinds.includes('refine')
 
-/** The professions' names under the farm by line (FL14): the Forge's Arms Crafting, the Workbench's Tome Crafting. */
-export const PROFESSION_NAMES_V4: Readonly<Record<ProfessionId, string>> = Object.fromEntries(PROFESSIONS.map((p) => [p.id,
-  p.id === 'weapon-crafting' ? 'Arms Crafting' : p.id === 'processing' ? 'Tome Crafting' : p.name])) as Record<ProfessionId, string>
+/** The professions' names (FL14): the Forge's Arms Crafting, the Workbench's Tome Crafting. */
+export const PROFESSION_NAMES_V4: Readonly<Record<ProfessionId, string>> = Object.fromEntries(PROFESSIONS.map((p) => [p.id, p.name])) as Record<ProfessionId, string>
+
+/** The place a job runs at, by generation: today's facility to engine v16, the Wilds' place from v17. */
+export function workPlace(placeId: string, engine: number = BATTLE_ENGINE_VERSION): FacilitySpec | PlaceSpecV4 | undefined {
+  return rpgRework('economy', engine) ? placeSpecV4(placeId) : facilitySpec(placeId)
+}
 
 /** The kind of job an item is at a place: a gathering place's raw item `gather`; a making place's refined item `refine`
  * and its made item its making kind; null for anything the place doesn't work (FL2). */

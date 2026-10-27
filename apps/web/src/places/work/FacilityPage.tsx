@@ -4,7 +4,7 @@
 import {
   activeClass, BRIDGES, checkRestartStopped, CRAFT_LABEL, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, facilitySpec,
   facilityTargets, familyById, gearById, gearId, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
-  itemById, liveWorkEnv, placeById, placeSpecV3, REFINE_BATCHES, refusalText, rpgRework, stockName, targetPlan,
+  itemById, liveWorkEnv, placeById, placeSpecV4, REFINE_BATCHES, refusalText, rpgRework, stockName, targetPlan,
   type EquipType, type Gem, type GemKind, type RpgQueueInput, type RpgWorkRequest, type TierWorld,
 } from '@rpg/domain'
 import { workOrder } from '@luismlorenzana/uma-kit/roster'
@@ -46,7 +46,7 @@ function describe(placeId: string): { title: string; help: string[] } {
 const requestLabel = (request: RpgWorkRequest) => ({ name: outputView(request.item).name, item: request.item, count: request.count })
 
 /** Whether a place renders R2's page: from the economy stage, on one of its ten places. */
-const isPlaceV3 = (placeId: string): boolean => rpgRework('economy') && placeSpecV3(placeId) !== undefined
+const isPlaceV3 = (placeId: string): boolean => rpgRework('economy') && placeSpecV4(placeId) !== undefined
 
 /** The game-owned side of uma-kit/work: the kit never owns saves, clocks, rules or vocabulary. */
 function RpgWorkProvider({ view, world, now, tier, children }: { view: MasterView; world: TierWorld; now: string; tier: number; children: ReactNode }) {

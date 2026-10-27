@@ -1,5 +1,5 @@
-// R2's work over the save (H77; profession-progression.md §4–§5, PP4, PP12, PP16), on engine v17 (live since H82):
-// the live env per world tier, four slots a place, no levels, collects, Speed Tickets, the trade gate through the
+// The Wilds' work over the save (H77; profession-progression.md §4–§5, PP4, PP16; the farm by line since H112, D224),
+// on engine v17: the live env, four slots a place, no levels, collects, Speed Tickets, the trade gate through the
 // operations' context and none for settles.
 import { describe, expect, it } from 'vitest'
 import { itemMinutes, jobExp, MINUTE } from '../economy/pacing'
@@ -24,14 +24,14 @@ function saveOf(umas: Record<string, number>, items: Record<string, number> = {}
   const world = gradedWorld({ items, wallet: { ...base.wallet, ...wallet },
     umas: Object.fromEntries(Object.entries(umas).map(([id, level]) => [id, gradedUma({ craft: { level, exp: 0 } })])) })
   return {
-    schemaVersion: 29,
+    schemaVersion: 30,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { [tier]: world },
   }
 }
 const tradesOf = (callings: Record<string, RpgClass>) => ({ tradeOf: (id: string) => (callings[id] ? tradeOfCalling(callings[id]!) : null) })
 
-describe('R2\'s places over the save', () => {
+describe('the Wilds\' places over the save', () => {
   it('starts jobs in slots 0–3 of a place and refuses slot 4', () => {
     let save = saveOf({ 101: 1, 102: 1, 103: 1, 104: 1, 105: 1 })
     for (const [slot, id] of ['101', '102', '103', '104'].entries()) save = startJob(save, 'mine', slot, { outfitId: id }, 'copper-ore', 1, at(0))
@@ -59,12 +59,12 @@ describe('R2\'s places over the save', () => {
     expect(availableWorkers(worldOf(save), at(2 * GATHER_MS), 1).has('101')).toBe(true)
   })
 
-  it('makes a made item from the Warehouse and pays it back into it', () => {
-    let save = saveOf({ 101: 1 }, { 'copper-ingot': 2, 'pine-plank': 3 })
+  it('makes a made item from the Warehouse and pays it back into it: 7 Ingots, three quarters of a gather each (FL9, FL10)', () => {
+    let save = saveOf({ 101: 1 }, { 'copper-ingot': 8, 'pine-plank': 3 })
     save = startJob(save, 'forge', 0, { outfitId: '101' }, 'weapon-gem-g1', 1, at(0))
-    expect(worldOf(save).items).toEqual({ 'pine-plank': 1 })
-    const done = collectJob(save, 'forge', 0, at(4 * GATHER_MS)).save
-    expect(worldOf(done).items).toEqual({ 'pine-plank': 1, 'weapon-gem-g1': 1 })
+    expect(worldOf(save).items).toEqual({ 'copper-ingot': 1, 'pine-plank': 3 })
+    const done = collectJob(save, 'forge', 0, at(Math.ceil(7 * 0.75 * GATHER_MS))).save
+    expect(worldOf(done).items).toEqual({ 'copper-ingot': 1, 'pine-plank': 3, 'weapon-gem-g1': 1 })
     expect(worldOf(done).gear).toBeUndefined()
   })
 
@@ -76,17 +76,17 @@ describe('R2\'s places over the save', () => {
     expect(worldOf(save).wallet.timeTickets).toBe(1)
   })
 
-  it('plans by the world\'s tier: Gold Ore only in a Tier 2 world', () => {
-    expect(() => startJob(saveOf({ 101: 1 }), 'mine', 0, { outfitId: '101' }, 'gold-ore', 1, at(0))).toThrow("That isn't made here")
-    const tier2 = startJob(saveOf({ 201: 1 }, {}, '2'), 'mine', 0, { outfitId: '201' }, 'gold-ore', 1, at(0), '2')
+  it('plans the same grades in every world, each opening at Craft Lv 5g − 4 (FL6, FL8)', () => {
+    expect(() => startJob(saveOf({ 101: 1 }), 'mine', 0, { outfitId: '101' }, 'gold-ore', 1, at(0))).toThrow('Needs Craft Lv26')
+    const tier2 = startJob(saveOf({ 201: 26 }, {}, '2'), 'mine', 0, { outfitId: '201' }, 'gold-ore', 1, at(0), '2')
     expect(worldOf(tier2, '2').work['201']?.entries[0]?.request.item).toBe('gold-ore')
     const plan = planJob(worldOf(saveOf({ 101: 46 }, {}, '2'), '2'), 'lapidary', { outfitId: '101' }, 'jewel-moon-5', 1, 2)!
-    expect(plan.inputs).toEqual({ 'cut-diamond': 3, 'titanium-ingot': 1 })
+    expect(plan.inputs).toEqual({ 'cut-philosophers-stone': 4 })
     expect(plan.output).toEqual({ id: 'jewel-moon-5', name: 'Moon Jewel V', grade: 10 })
-    expect(plan.block).toBe('Needs 3 Cut Diamond')
+    expect(plan.block).toBe("Needs 4 Cut Philosopher's Stone")
     expect(plan.item).toBeNull()
     expect(planJob(worldOf(saveOf({ 101: 1 })), 'mine', { outfitId: '101' }, 'iron-ore')).toMatchObject({
-      output: { id: 'iron-ore', name: 'Iron Ore', grade: 6 }, itemMs: GATHER_MS, block: 'Needs Craft Lv26' })
+      output: { id: 'iron-ore', name: 'Iron Ore', grade: 3 }, itemMs: GATHER_MS, block: 'Needs Craft Lv11' })
   })
 
   it('gates a job by her trade when the caller says it, and never a settle or a queue start', () => {
@@ -96,9 +96,10 @@ describe('R2\'s places over the save', () => {
     expect(() => startJob(save, 'mine', 0, { outfitId: '101' }, 'copper-ore', 1, at(0), '1', context)).toThrow('Another trade')
     expect(planJob(worldOf(save), 'mine', { outfitId: '101' }, 'copper-ore', 1, 1, context)?.block).toBe('Another trade')
     // The Workbench is the healers' and the world has none: an open shop.
-    let running = startJob(save, 'workbench', 0, { outfitId: '101' }, 'copper-ingot', 1, at(0), '1', context)
+    let running = startJob({ ...save, tierWorlds: { '1': { ...worldOf(save), items: { ...worldOf(save).items, carrot: 2 } } } }, 'workbench', 0, { outfitId: '101' },
+      'chopped-carrot', 1, at(0), '1', context)
     running = startJob(running, 'mine', 0, { outfitId: '102' }, 'copper-ore', 1, at(0), '1', context)
-    expect(() => queueJob(running, 'mine', 0, { outfitId: '102' }, 'iron-ore', 1, at(0), '1', context)).toThrow('Needs Craft Lv26')
+    expect(() => queueJob(running, 'mine', 0, { outfitId: '102' }, 'iron-ore', 1, at(0), '1', context)).toThrow('Needs Craft Lv11')
     running = queueJob(running, 'mine', 0, { outfitId: '102' }, 'copper-ore', 1, at(0), '1', context)
     // Settled with no context, the queued job starts when the first ends.
     expect(slotJobOf(worldOf(running), '102', at(GATHER_MS + 1000))?.output).toBe('copper-ore')

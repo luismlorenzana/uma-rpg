@@ -125,19 +125,23 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     expect(count.compareDocumentPosition(what) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
   })
 
-  it('lays R2’s Workbench out as five line columns, a row a tier and band, and keeps the chosen quantity while the material changes', async () => {
-    for (const raw of ['copper-ore', 'pine-log', 'carrot', 'carp', 'quartz']) fixture.world.items[raw] = 100
+  it('lays the Workbench out as Process tiles and Make chips, its sizes following the picked job (FL22)', async () => {
+    for (const raw of ['carrot', 'potato']) fixture.world.items[raw] = 100
+    fixture.world.items['chopped-carrot'] = 70
     show(<FacilityPage {...page('workbench')} />)
     fireEvent.click(screen.getByRole('button', { name: /Start a job in slot 1/ }))
     const sheet = dialog()
+    // Its line's ten refined items to process and its ten Tome Ink grades to make; the sheet opens on a make.
+    expect(sheet.querySelectorAll('[data-line-tile]')).toHaveLength(10)
+    expect(sheet.querySelectorAll('[data-grade-chip]')).toHaveLength(10)
+    expect(sheet.querySelector('[data-recipe^="tome-ink-g"]')).not.toBeNull()
+    expect(within(sheet).queryByRole('radio', { name: /^×20,/ })).toBeNull()
+    // Picking a process offers ×1 … ×40.
+    fireEvent.click(sheet.querySelector('[data-line-tile="chopped-carrot"]')!)
     const twenty = within(sheet).getByRole('radio', { name: /^×20,/ })
     fireEvent.click(twenty)
     expect(twenty.getAttribute('aria-checked')).toBe('true')
-    // Tier 1's low and high types of the five lines; the high row opens at Craft Lv 26.
-    expect(sheet.querySelectorAll('[data-type-tile]')).toHaveLength(10)
-    fireEvent.click(sheet.querySelector('[data-type-tile="pine-plank"]')!)
-    expect(within(sheet).getByRole('radio', { name: /^×20,/ }).getAttribute('aria-checked')).toBe('true')
-    expect(sheet.querySelector('[data-selected-item="pine-plank"]')).not.toBeNull()
+    expect(sheet.querySelector('[data-selected-item="chopped-carrot"]')).not.toBeNull()
   })
 
   it('shows grades on the Farm wishlist icons', () => {

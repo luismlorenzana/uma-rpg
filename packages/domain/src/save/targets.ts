@@ -1,9 +1,9 @@
 // Targets (D100, D126, D144; docs/design/gear-and-targets.md §2): up to ten Umas the facilities plan for. For each,
 // everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the Star Gem of every
 // Extra Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top
-// level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones. Under
-// the farm by line (D224, H109) an Arms weapon asks for Arms Gems and a Tome for Tome Ink, every recipe is one line's, and
-// a making place lists its made items, then its line's refined items (FL22).
+// level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones. From
+// the economy stage (the farm by line since H112, D224) an Arms weapon asks for Arms Gems and a Tome for Tome Ink, every
+// recipe is one line's, and a making place lists its made items, then its line's refined items (FL22).
 import { planRequirements, type Requirement } from '@luismlorenzana/uma-work'
 import { gemById, nodeGem, STAR_NODES } from '../economy/gems'
 import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
@@ -11,21 +11,17 @@ import { facilitySpec } from '../economy/jobs'
 import { gradeItemId, gradeOf, type GradeTarget } from '../economy/grades'
 import { MAP_NODES, nodeJewel } from '../economy/planet'
 import { isMakingPlaceV4, placeSpecV4 } from '../economy/places-v4'
-import { placeSpecV3 } from '../economy/professions'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
 import { itemById } from '../items/catalog'
 import { madeIdentity } from '../items/made-id'
-import { madeName, madeRecipe } from '../items/made'
+import { madeName } from '../items/made'
 import { lineItem } from '../items/lines'
-import { madeNameV4, madeRecipeV4 } from '../items/made-v4'
-import { materialIdentity } from '../items/materials-id'
-import { materialName } from '../items/materials'
+import { madeRecipeV4 } from '../items/made-v4'
 import type { RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { boundGrade } from './forge'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
 import { gearStock, gearV1, gemStock, isGrades, isStarMap, MAX_TARGETS, slotKind, starsV1, type OwnedUma, type Save, type TierWorld } from './save'
-import { farmByLine } from './version'
 
 /** Marks or unmarks an owned Uma as a target, ten at most. */
 export function setTarget(save: Save, outfitId: string, on: boolean, now: string, tier = TIER_ONE): Save {
@@ -92,16 +88,11 @@ export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, numb
 }
 
 /** One item's recipe, per unit: a piece's or a gem's refined inputs, a refined item's raw one; a raw item has none. */
-function recipeOf(id: string, tier = 1, v3 = false): Readonly<Record<string, number>> | null {
-  if (v3 && farmByLine()) {
+function recipeOf(id: string, _tier = 1, v3 = false): Readonly<Record<string, number>> | null {
+  if (v3) {
     if (madeIdentity(id)) return madeRecipeV4(id)
     const m = lineItem(id)
     return m?.refined ? { [m.pair]: 1 } : null
-  }
-  if (v3) {
-    if (madeIdentity(id)) return madeRecipe(id, tier)
-    const material = materialIdentity(id)
-    return material?.refined ? { [material.pair]: 1 } : null
   }
   const made = gearById(id) ?? gemById(id)
   if (made) return made.inputs
@@ -147,17 +138,15 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
     demand, recipe: (id) => recipeOf(id, tier, v3),
     supply: (id) => ({ onHand: Math.max(0, owned(id) - (held.get(id) ?? 0)), coming: coming.get(id) ?? 0 }),
   })
-  const byLine = v3 && farmByLine()
   const line = (r: Requirement): TargetNeed => {
-    if (byLine) {
+    if (v3) {
       const made = madeIdentity(r.id), m = lineItem(r.id)
-      return { key: r.id, icon: r.id, name: made ? madeNameV4(r.id)! : m?.name ?? r.id, grade: made?.grade ?? m?.grade ?? 0,
+      return { key: r.id, icon: r.id, name: made ? madeName(r.id)! : m?.name ?? r.id, grade: made?.grade ?? m?.grade ?? 0,
         need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
     }
-    const madeV3 = v3 ? madeIdentity(r.id) : undefined, material = v3 ? materialIdentity(r.id) : undefined
-    const piece = !v3 ? gearById(r.id) : undefined, gem = !v3 ? gemById(r.id) : undefined, item = !v3 ? itemById(r.id) : undefined
-    const name = madeV3 ? madeName(r.id)! : material ? materialName(r.id)! : piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
-    return { key: r.id, icon: r.id, name, grade: madeV3?.grade ?? material?.tier ?? piece?.grade ?? gem?.grade ?? item?.grade ?? 0,
+    const piece = gearById(r.id), gem = gemById(r.id), item = itemById(r.id)
+    const name = piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
+    return { key: r.id, icon: r.id, name, grade: piece?.grade ?? gem?.grade ?? item?.grade ?? 0,
       need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
   }
   const lines = [...plan.values()].filter((r) => r.gross > 0).map(line)
@@ -167,28 +156,20 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
     gear: v3 ? [] : pick((k) => !!gearById(k)),
     gems: v3 ? [] : pick((k) => !!gemById(k)),
     made: v3 ? pick((k) => !!madeIdentity(k)) : [],
-    refined: pick((k) => byLine ? !!lineItem(k)?.refined : v3 ? !!materialIdentity(k)?.refined : !!itemById(k)?.refined),
-    raw: pick((k) => byLine ? lineItem(k)?.refined === false
-      : v3 ? !!materialIdentity(k) && !materialIdentity(k)!.refined : (() => { const i = itemById(k); return !!i && !i.refined })()),
+    refined: pick((k) => v3 ? !!lineItem(k)?.refined : !!itemById(k)?.refined),
+    raw: pick((k) => v3 ? lineItem(k)?.refined === false : (() => { const i = itemById(k); return !!i && !i.refined })()),
   }
 }
 
 /** The lines a facility makes: a site its family's raw items, the Workbench refined items, the Forge gear, the Lapidary
  * Star Gems. Each stays while the Warehouse holds fewer than the targets need. */
 export function facilityTargets(plan: TargetPlan, placeId: string): TargetNeed[] {
-  const v4 = plan.made.length > 0 && farmByLine() ? placeSpecV4(placeId) : undefined
+  const v4 = plan.made.length > 0 ? placeSpecV4(placeId) : undefined
   if (v4) {
     // FL22: a gathering place its line's raw items; a making place its made items, then its line's refined items.
     const ofLine = (n: TargetNeed) => lineItem(n.key)?.line === v4.line
     const lines = isMakingPlaceV4(v4) ? [...plan.made.filter((n) => v4.made.includes(madeIdentity(n.key)!.line)), ...plan.refined.filter(ofLine)]
       : plan.raw.filter(ofLine)
-    return lines.filter((n) => n.need > n.have)
-  }
-  const v3 = plan.made.length > 0 ? placeSpecV3(placeId) : undefined
-  if (v3) {
-    const lines = v3.kind === 'gather' ? plan.raw.filter((n) => materialIdentity(n.key)?.line === v3.line)
-      : v3.kind === 'refine' ? plan.refined
-        : plan.made.filter((n) => v3.made.includes(madeIdentity(n.key)!.line))
     return lines.filter((n) => n.need > n.have)
   }
   const spec = facilitySpec(placeId)

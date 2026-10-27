@@ -21,7 +21,7 @@ function saveWith(timeTickets: number): Save {
   const world = gradedWorld({ wallet: { ...base.wallet, timeTickets },
     umas: Object.fromEntries(['101', '102', '103'].map((id) => [id, gradedUma({ craft: { level: 1, exp: 0 } })])) })
   return {
-    schemaVersion: 29,
+    schemaVersion: 30,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { 1: world },
   }

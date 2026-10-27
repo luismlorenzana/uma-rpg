@@ -1,9 +1,8 @@
 // The farm by line's catalog (H109; farm-by-line.md FL5, FL14, FL15): five lines of ten grades from uma-art's families,
 // every name uma-art's own, and R2's sixty ids among them at the grades R2 drew them with.
 import { describe, expect, it } from 'vitest'
-import { isLineItemId, LINE_ITEMS, lineItem, lineItemId, lineItems } from './lines'
-import { MATERIALS } from './materials'
-import { MATERIAL_LINES } from './materials-id'
+import { R2_TYPES } from '../save/v29.fixture'
+import { isLineItemId, LINE_ITEMS, lineItem, lineItemId, lineItems, MATERIAL_LINES } from './lines'
 
 describe('the farm by line\'s catalog (FL5)', () => {
   it('holds a hundred ids, each line ten raw then ten refined by grade, each the other form\'s pair', () => {
@@ -45,9 +44,7 @@ describe('the farm by line\'s catalog (FL5)', () => {
     for (const m of LINE_ITEMS) expect(m.art, m.id).toEqual({ family: family[m.line], grade: m.grade })
   })
 
-  it('holds R2\'s sixty ids, each at the grade R2 drew its icon with', () => {
-    for (const m of MATERIALS) {
-      expect(lineItem(m.id), m.id).toMatchObject({ line: m.line, refined: m.refined, pair: m.pair, name: m.name, grade: m.art.grade })
-    }
+  it('holds R2\'s sixty ids on their own lines and forms (save v30 moved each to its line\'s G1 or G6)', () => {
+    for (const m of R2_TYPES) expect(lineItem(m.id), m.id).toMatchObject({ line: m.line, refined: m.refined })
   })
 })
