@@ -77,6 +77,20 @@ v30, so R3–R5 move to saves v31–v33 when it lands.
 
 **Waves:** 1) H109 → 2) H110 and H111 in parallel (domain save files against web files) → 3) H112.
 
+**The Wilds' trios** (the owner, 2026-10-27, D230; the design is
+[farm-by-line.md](../design/tier-rework/farm-by-line.md) §11, FL25–FL33, with the per-Uma review): fifteen places,
+five rows of three connected by roads; each line gathers at its site, processes at a new workbench and makes at its
+making place (the Weapon Forge, Tome Forge and Charm Forge renamed and restyled); every step 36 → 24 minutes; the amounts
+stay. Both packets go to **ChatGPT, with full autonomy to merge and deploy**; Claude publishes uma-art 2.14.0 between
+them. H114 takes save v31, so R3–R5 move to saves v32–v34 when it lands.
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H113 | **Art** (uma-platform): five workbenches in one family and the restyled Weapon, Tome and Charm Forges, eight frames appended to the buildings atlas (288×432, 50 frames) with a legacy guard; the preview's Wilds page with fifteen buildings; uma-art 2.14.0 | ChatGPT | M | — | Ready |
+| H114 | **The trios live:** fifteen places and professions, three places a trade, refine only at the workbench and make only at the making place, equal steps (`stepMinutes`), save v31 (work settled), the map's fifteen spots, the screens by kind, the ledger, the manual, R3–R5 on saves v32–v34, a scratch migration in the pull request | ChatGPT | L | H113 | Waiting |
+
+**Waves:** 1) H113 → Claude publishes uma-art 2.14.0 → 2) H114.
+
 **R3. Tier 2's weapons** (engine v18, save **v31**; its packets' "v29" reads v31, D221, D224). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
 | Id | Task | Who | Size | Needs | State |

@@ -220,3 +220,81 @@ New, beside R2's (R2's stay untouched until H112 deletes them):
 | `hub/places.ts` (extended) | the FL16 blurbs when `farmByLine()` |
 
 H110 adds `toV30` and the v30 parse; H111 the screens, shown when `farmByLine()`; H112 turns it on and deletes R2's farm.
+
+## 11. The trios: fifteen places (D230)
+
+> **The owner's request, 2026-10-27; the main session's design.** Built by H113 (art, uma-platform) and H114 (uma-rpg).
+> The owner, after playing the farm by line: "I really like the new loop of Farming → Processing → Crafting"; now each
+> step gets its own building, five rows of three, connected by roads.
+
+- **FL25 · A trio a line.** Each line works three places, left to right: its gathering place (exactly as today), a new
+  **workbench** that only processes, and its making place, which only makes and is renamed. The Wilds' rows follow the
+  owner's order: Metal, Vegetables, Wood, Fish, Stone.
+
+| Row (her trade) | 1 · Gather | 2 · Process (new) | 3 · Make |
+|---|---|---|---|
+| Metal (Brawler) | Mine `mine` · Mining | Mine Workbench `mine-workbench` · Smelting | Weapon Forge `weapon-forge` · Arms Crafting (was the Forge) |
+| Vegetables (Paladin, Cleric) | Fields `fields` · Farming | Fields Workbench `fields-workbench` · Prepping | Tome Forge `tome-forge` · Tome Crafting (was the Workbench) |
+| Wood (Spell Blade) | Forest `forest` · Wood Chopping | Forest Workbench `forest-workbench` · Sawing | Armorer `armorer` · Armor Crafting |
+| Fish (Summoner) | Fishery `fishery` · Fishing | Fishery Workbench `fishery-workbench` · Filleting | Charm Forge `charm-forge` · Accessory Crafting (was the Charm Shop) |
+| Stone (Mage) | Monster Den `monster-den` · Hunting | Den Workbench `den-workbench` · Stonecutting | Lapidary `lapidary` · Jewel Crafting |
+
+- **FL26 · Ids.** Three making places take new ids (`forge` → `weapon-forge`, `workbench` → `tome-forge`, `charm-shop` →
+  `charm-forge`), because `workbench` would now name the wrong thing; place ids live only in work rows, which save v31
+  settles (FL31). Five processing professions are new (`smelting`, `prepping`, `sawing`, `filleting`, `stonecutting`);
+  `weapon-crafting` becomes `arms-crafting` and `processing` becomes `tome-crafting` (no save holds a profession id).
+- **FL27 · Her trade works its three places** (PP2): a trade has twelve slots. The trade gate and the open shop work per
+  place as today.
+- **FL28 · Equal steps.** Every step takes the same time, `stepMinutes`: **36 minutes at Craft Lv 1, falling evenly to
+  24 at Lv 50**, to gather a raw item, to process one, and for each refined item in a made item. A refined item still
+  costs 108 minutes in all at Lv 1 (72 at Lv 50), as it does today (54 + 13½ + 40½), so a maxed Uma's hours and Craft
+  EXP don't move, and each building of a trio is exactly as busy as the other two. Today's split (process a quarter, make
+  three quarters) would leave the new workbenches idle three quarters of the time. Batches don't change (gather and make
+  1–10, process ×1 … ×40); v1's `itemMinutes` (54 → 36) stays for v1's rules and the migrations.
+- **FL29 · The amounts stay** (FL9): the review below.
+- **FL30 · The pace.** Per maxed Uma: 520 refined (528 with her moon), 783 hours (795), each trade 150.6–165.7 hours, as
+  today; each place 50.2–55.2 hours (step at Craft Lv 25, before ×1.25). A roster bound by its trades' head counts paces
+  as today (forty Umas 1.27 maxed a day, twenty 0.54); a trade with more than eight Umas now puts up to twelve to work, so
+  a large roster gears up to half again as fast (place supply 2.17–2.39 maxed Umas a day, up from 1.45–1.59).
+- **FL31 · Save v31.** Work settles as `toV30`'s did (`settleWork`, no clock; queued requests drop); nothing else
+  changes. R3, R4 and R5 take saves **v32, v33 and v34**.
+- **FL32 · The map.** Fifteen spots, five rows at today's heights (y 0.1 · 0.3 · 0.5 · 0.7 · 0.9); the gathering place on
+  the left (x ≈ 0.2), the workbench in the middle **on the trunk road** (x 0.5), the making place on the right (x ≈ 0.8,
+  clear of the stream). uma-kit lays the roads itself: a branch from each side building's door to the trunk, and a lane
+  round each building on it. At 375–390 px the map is 17 columns, the buildings at columns 3, 8 and 13, the three
+  112 px place links side by side; no kit change is expected.
+- **FL33 · Art** (H113): five new workbench buildings, one shared silhouette with each line's props, and three restyled
+  making buildings (Weapon Forge, Tome Forge, Charm Forge). The gathering places, the Armorer (`lancers-barracks`) and
+  the Lapidary keep their art.
+
+### The per-Uma review (D230)
+
+The owner asked whether one Uma's upgrades take equal amounts and times on every line, and whether splitting weapons and
+Tomes leaves two trades' Umas behind. What a maxed Uma takes (Tier 1, G1–G10):
+
+| Upgrade | Made items | Refined each | Refined in all | Line |
+|---|---|---|---|---|
+| 3 weapons (her slots: Arms or Tomes) | 30 | 7 | 210 | Metal for Arms, Vegetables for Tomes |
+| 5 armor slots | 50 | 2 | 100 | Wood |
+| 1 accessory slot | 10 | 10 | 100 | Fish |
+| The Sun (Planet I–V) | 5 | 10 | 50 | Stone |
+| The moons (three × I–V, and her moon's two) | 15 (17) | 4 | 60 (68) | Stone |
+
+By her class (refined items a line; time follows, 108 minutes of work a refined item at Craft Lv 1):
+
+| Her class (slots) | Metal | Vegetables | Wood | Fish | Stone |
+|---|---|---|---|---|---|
+| Brawler (3 Arms) | 210 | 0 | 100 | 100 | 118 |
+| Spell Blade, Paladin (2 Arms, 1 Tome) | 140 | 70 | 100 | 100 | 118 |
+| Summoner, Cleric (1 Arm, 2 Tomes) | 70 | 140 | 100 | 100 | 118 |
+| Mage (3 Tomes) | 0 | 210 | 100 | 100 | 118 |
+| Averaged over the 270 outfits (49% Arms) | 103 | 107 | 100 | 100 | 118 |
+
+- **Equal for one Uma?** Armor, accessory and jewels, yes, within 18% (Stone the heaviest). Her weapons, no: a pure
+  Brawler's or Mage's weapons put 210 on one line, twice her armor's work, and a hybrid's split 140 and 70.
+- **Do the Metal and Vegetables Umas fall behind?** No. A weapon item costs 7 because the 30 weapon items split over two
+  lines: averaged over a mixed roster each weapon line carries about 105 a maxed Uma, as Wood and Fish carry 100, so all
+  five trades get the same work and the same Craft EXP. Halving the weapon cost would even out one pure Uma but give the
+  two weapon trades half the others' work, and their Umas would level half as fast. **The amounts stay.**
+- **Stone** is the heaviest line by up to 18%; it stays, as the Mage is the most common calling (its trade has the most
+  hands).
