@@ -301,6 +301,54 @@ export function toV29(world: Record<string, unknown>): Record<string, unknown> {
   return { ...world, items, grant: { ...world.grant, back } }
 }
 
+// --- v29 → v30 (D224): the farm by line. Written dark in H110, chained by H112 with SAVE_SCHEMA_VERSION 30 ---------------
+
+/** R2's types by line and form (FL18): its low types (Tiers 1–3) become the line's G1 id, its high types its G6 id, the
+ * grade that opens at the same Craft Level (1 and 26). Literals, as every step. */
+const V30_TYPES_BY_LINE: readonly { low: readonly string[]; high: readonly string[]; g1: string; g6: string }[] = [
+  { low: ['copper-ore', 'gold-ore', 'mythril-ore'], high: ['iron-ore', 'titanium-ore', 'orichalcum-ore'], g1: 'copper-ore', g6: 'gold-ore' },
+  { low: ['copper-ingot', 'gold-ingot', 'mythril-ingot'], high: ['iron-ingot', 'titanium-ingot', 'orichalcum-ingot'], g1: 'copper-ingot', g6: 'gold-ingot' },
+  { low: ['pine-log', 'cherry-log', 'elderwood-log'], high: ['cedar-log', 'ebony-log', 'yggdrasil-branch'], g1: 'pine-log', g6: 'cherry-log' },
+  { low: ['pine-plank', 'cherry-plank', 'elderwood-plank'], high: ['cedar-plank', 'ebony-plank', 'yggdrasil-plank'], g1: 'pine-plank', g6: 'cherry-plank' },
+  { low: ['carrot', 'bell-pepper', 'golden-carrot'], high: ['cabbage', 'asparagus', 'emperor-pumpkin'], g1: 'carrot', g6: 'bell-pepper' },
+  { low: ['chopped-carrot', 'sliced-bell-pepper', 'golden-carrot-puree'], high: ['shredded-cabbage', 'trimmed-asparagus', 'pumpkin-puree'],
+    g1: 'chopped-carrot', g6: 'sliced-bell-pepper' },
+  { low: ['carp', 'sea-bream', 'silverfin'], high: ['sardine', 'tuna', 'rainbow-koi'], g1: 'carp', g6: 'sea-bream' },
+  { low: ['carp-fillet', 'sea-bream-fillet', 'silverfin-fillet'], high: ['sardine-fillet', 'tuna-fillet', 'rainbow-koi-fillet'], g1: 'carp-fillet', g6: 'sea-bream-fillet' },
+  { low: ['quartz', 'sapphire', 'starstone'], high: ['citrine', 'diamond', 'philosophers-stone'], g1: 'quartz', g6: 'sapphire' },
+  { low: ['cut-quartz', 'cut-sapphire', 'cut-starstone'], high: ['cut-citrine', 'cut-diamond', 'cut-philosophers-stone'], g1: 'cut-quartz', g6: 'cut-sapphire' },
+]
+/** Each of R2's sixty ids and the farm by line's id it becomes. */
+export const V30_TYPES: ReadonlyMap<string, string> = new Map(V30_TYPES_BY_LINE.flatMap((t) => [
+  ...t.low.map((id) => [id, t.g1] as const), ...t.high.map((id) => [id, t.g6] as const),
+]))
+
+/**
+ * v29 → v30 (D224; farm-by-line.md FL17–FL19): **the farm by line.** Written dark in H110 and chained by H112 with
+ * `SAVE_SCHEMA_VERSION` 30. Per world:
+ * 1. **Work settles** (`settleWork`, no clock): every started entry's outputs from `collected` on go into `items`, made
+ *    items too, with their Craft EXP; queued requests drop; `work` becomes `{}`. A job planned on R2's rules never runs
+ *    on the farm by line's.
+ * 2. **R2's types convert** by the Craft Level they opened at (`V30_TYPES`): a low type of any tier to its line's G1, a
+ *    high type to its G6, raw to raw and refined to refined. The new stock is built from the old in one pass, collisions
+ *    summed, so no id converts twice (Gold Ore is a source and a target).
+ * 3. **Everything else stays:** made items (a Weapon Gem reads Arms Gem), gear grades, set jewels, Craft Levels (after
+ *    step 1's EXP), the wallet, targets, parties, heroes, the Rift and `grant`.
+ * Literals only. It runs once, gated by the stored version in `migrateWorld`, and is **not idempotent by shape**: Gold Ore
+ * means R2's Tier 2 low type before it and Metal G6 after. A world whose `items` isn't an object is left for the strict
+ * parse.
+ */
+export function toV30(world: Record<string, unknown>): Record<string, unknown> {
+  if (!isRecord(world.items)) return world
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  const items: Record<string, number> = {}
+  for (const [id, n] of Object.entries(world.items)) add(items, id, countOf(n))
+  settleWork(world, umas, (item) => add(items, item, 1))
+  const stock: Record<string, number> = {}
+  for (const [id, n] of Object.entries(items)) add(stock, V30_TYPES.get(id) ?? id, n)
+  return { ...world, umas: isRecord(world.umas) ? umas : world.umas, items: stock, work: {} }
+}
+
 export interface TierGrant {
   /** Paid into `wallet.timeTickets`: the Umas' tickets summed, or the floor when higher. */
   tickets: number
@@ -341,6 +389,29 @@ const countOf = (n: unknown): number => (typeof n === 'number' && Number.isSafeI
  * `gems` and a `grant` key is v28 already: a second run would convert v3 ids by their legacy meaning). Anything malformed
  * is left for the strict parse.
  */
+/**
+ * Work settled with no clock (v22's rule; `toV28`'s step 1, `toV30`'s): every started entry's outputs from `collected` on
+ * go to `take` with its request's kind, and pay their `exp[i]` into her `craft` in `umas` (the caller's copy, updated in
+ * place). Queued requests take nothing and drop with the work, which the caller sets to `{}`. Anything malformed is
+ * skipped, for the strict parse.
+ */
+export function settleWork(world: Record<string, unknown>, umas: Record<string, unknown>, take: (item: string, kind: unknown) => void): void {
+  for (const row of isRecord(world.work) ? Object.values(world.work) : []) {
+    if (!isRecord(row) || !Array.isArray(row.entries)) continue
+    for (const entry of row.entries) {
+      if (!isRecord(entry) || !isRecord(entry.request) || !Array.isArray(entry.outputs) || !Array.isArray(entry.exp)) continue
+      let exp = 0
+      for (let i = countOf(entry.collected); i < entry.outputs.length; i++) {
+        const out = entry.outputs[i]
+        if (isRecord(out) && typeof out.item === 'string') take(out.item, entry.request.kind)
+        exp += countOf(entry.exp[i])
+      }
+      const uma = typeof row.outfitId === 'string' ? umas[row.outfitId] : undefined
+      if (exp > 0 && isRecord(uma) && isCraft(uma.craft)) umas[row.outfitId as string] = { ...uma, craft: grantProfessionExp(uma.craft, exp) }
+    }
+  }
+}
+
 export function toV28(world: Record<string, unknown>, _tier = 1): Record<string, unknown> {
   if (!('gems' in world) && 'grant' in world) return world
   const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
@@ -348,26 +419,11 @@ export function toV28(world: Record<string, unknown>, _tier = 1): Record<string,
   if (isRecord(world.items)) for (const [id, n] of Object.entries(world.items)) add(items, id, countOf(n))
   // 1. Settle work.
   const madePieces: string[] = [], madeGems: string[] = []
-  for (const row of isRecord(world.work) ? Object.values(world.work) : []) {
-    if (!isRecord(row) || !Array.isArray(row.entries)) continue
-    for (const entry of row.entries) {
-      if (!isRecord(entry) || !isRecord(entry.request) || !Array.isArray(entry.outputs) || !Array.isArray(entry.exp)) continue
-      const kind = entry.request.kind
-      let exp = 0
-      for (let i = countOf(entry.collected); i < entry.outputs.length; i++) {
-        const out = entry.outputs[i]
-        const item = isRecord(out) && typeof out.item === 'string' ? out.item : undefined
-        if (item !== undefined) {
-          if (kind === 'craft') madePieces.push(item)
-          else if (kind === 'cut') madeGems.push(item)
-          else add(items, item, 1)
-        }
-        exp += countOf(entry.exp[i])
-      }
-      const uma = typeof row.outfitId === 'string' ? umas[row.outfitId] : undefined
-      if (exp > 0 && isRecord(uma) && isCraft(uma.craft)) umas[row.outfitId as string] = { ...uma, craft: grantProfessionExp(uma.craft, exp) }
-    }
-  }
+  settleWork(world, umas, (item, kind) => {
+    if (kind === 'craft') madePieces.push(item)
+    else if (kind === 'cut') madeGems.push(item)
+    else add(items, item, 1)
+  })
   // 2. Each Uma's tickets, from her Craft Level and bank after the settle.
   const lines: TierGrant['umas'] = {}
   let fromUmas = 0, exp = 0
