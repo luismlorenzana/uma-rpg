@@ -101,7 +101,7 @@ engines v19–v21 when H116 lands; the Rift's fronts stay.
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | H115 | **The rule and its balance, dark** (engine v18's generation): one stage dealer for regions, capitals and scenario chapters; v17's generation frozen; WK12's checks with either healer; R2's delivery tables on v18 at 32 seeds; the Summoner's Tome 0.62 (WK13) | Claude | M | — | Done (`fa67766`) |
-| H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons without "Weak:"; the Summoner's Tome on her sheet; the manual; R3–R5 on engines v19–v21; deploy | Claude | M | H115 | Ready |
+| H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons without "Weak:"; the Summoner's Tome on her sheet; the manual; R3–R5 on engines v19–v21; deploy | ChatGPT (Claude validates) | M | H115 | Ready |
 
 **Waves:** 1) H115 → 2) H116.
 

@@ -1,6 +1,6 @@
 # H116 — Weaknesses v2 live: engine v18, the fight card's icons, the manual, R3–R5 on engines v19–v21
 
-**uma-rpg · Claude · M · Needs: H115 · Unblocks: R3 (H83, on engine v19)**
+**uma-rpg · ChatGPT · M · Needs: H115 (done, D236) · Unblocks: R3 (H83, on engine v19)**
 
 ## Why
 
@@ -60,5 +60,5 @@ releases one engine up.
 
 ## Deliver
 
-A pull request from `feat/h116-weaknesses-v2-live`, one commit `feat: weaknesses v2 live, engine v18 (H116)`; merge,
+A pull request from `feat/h116-weaknesses-v2-live`, one commit `feat: weaknesses v2 live, engine v18 (H116)`; ChatGPT merges it itself once green,
 watch the deploy (`gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`), flag it done.
