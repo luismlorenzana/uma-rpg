@@ -39,7 +39,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   - **H85:** `WEAPON_MOON_T1`, `weaponMoonNode`, `weaponMoonOffense(open, setting, tier)`, `weaponMoonPreset`,
     `observatoryNodeCount(tier, engine)`, `weaponMoonOpen(tier, engine)`, `setWeaponMoon`/`clearWeaponMoon`, node ids
     `weapon-moon-1:1–5`, **`stars.moons` stored only once she sets it, an empty list reading her preset**,
-    `BattleAlly.moon` (flat offense by kind; v18 refuses more than two kinds or a value above the tier's Full total).
+    `BattleAlly.moon` (flat offense by kind; v19 refuses more than two kinds or a value above the tier's Full total).
   - **H87:** promotion's accessory slots at G0 in base forms (Release 3: a branch needs its slot's G5); the parse.
   - **H91:** `classPreset(classId, …, branch)` (branch 2's sets, accessories and moons).
 - **The code:** the accessory and weapon-moon modules H84 and H85 wrote (beside H75's and H76's), `save/presets.ts`
@@ -50,12 +50,12 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Decisions made
 
 - **Tier 3 only, behind the stage.** Every rule below reads `rpgRework('t3', engine)` and the world's or ally's tier.
-  Before v20 a Tier 3 world keeps Release 3's two slots, branches at G5 and one moon.
-- **Slots** (WP19): `accessorySlots(tier, engine)` is **1 · 2 · 3** by tier from v20, untyped, **one accessory of each
+  Before v21 a Tier 3 world keeps Release 3's two slots, branches at G5 and one moon.
+- **Slots** (WP19): `accessorySlots(tier, engine)` is **1 · 2 · 3** by tier from v21, untyped, **one accessory of each
   family** (three of Pendant, Orb, Bell, Insignia in Tier 3). The third slot starts at G0 and rises on Accessory
   Settings like the others.
 - **Forms in Tier 3** (WP34, §5.3):
-  - **Every branch form is open in Tier 3 at any grade** (`accessoryFormOpen` from v20 in Tier 3). WP §5.3 says the
+  - **Every branch form is open in Tier 3 at any grade** (`accessoryFormOpen` from v21 in Tier 3). WP §5.3 says the
     forms stay known at promotion; an Uma reaches Tier 3 only through Tier 2's Rift at Lv 50, where an on-curve slot is
     G10, so what she opened is derived, never stored (README §9.3: "the accessory step derived from the slot's grade (no
     field)"). This replaces Release 3's interim for Tier 3 (a branch at its slot's G5).
@@ -81,7 +81,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   it (EP27). The sheet reads "Lance +177 (capped) · Lance moon +130".
 - **The second weapon moon** (EP26): node ids **`weapon-moon-2:1–5`**, Lv 6, 16, 26, 36, 46, Moon Jewels I–V, Full or
   Split at Tier 3's values (`weaponMoonNode`: Full +10, +18, +26, +34, +42 = +130; Split +7, +13, +18, +24, +29 = +91
-  on each kind). `observatoryNodeCount(3, engine)` is **30** from v20.
+  on each kind). `observatoryNodeCount(3, engine)` is **30** from v21.
   - **Every weapon moon on a different kind; at most one Split:** Full + Split (three kinds) or Full + Full (two);
     Split + Split refused ("One Split moon at most"); a kind the other moon holds refused ("Weapon moon 1 has the
     Lance"). Either moon may be the Full one.
@@ -96,11 +96,11 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   - **The jewel setter** in Tier 3 offers weapon moon 2 as a target; its "next moon" order puts it after weapon moon 1,
     the one furthest behind first (EP §12).
   - `weaponMoonOffense` sums both moons by kind; `weaponMoonPreset(…, tier, engine)` returns two settings in Tier 3.
-- **The engine** (v20, a Tier 3 ally only), no new rule:
+- **The engine** (v21, a Tier 3 ally only), no new rule:
   - accessories: up to **three**, one of each family, the step's numbers in the fields H84 freezes (a Toll Bell's `top`
     up to 0.25 a grade, Onslaught's and the Great Insignia's Tier 3 values), the flat forms capped at 177;
   - `BattleAlly.moon`: up to **three kinds** (Full + Split), each at most a Full moon's Tier 3 total (130).
-  Before v20, or on a Tier 1 or Tier 2 ally, v19's limits (`RangeError('Invalid battle ally')`).
+  Before v21, or on a Tier 1 or Tier 2 ally, v20's limits (`RangeError('Invalid battle ally')`).
 - **Tier 3's presets** (WP25, EP29), by class branch (H91's `classPreset(classId, tier, engine, branch)`), applied in one
   tap as Release 4's are (the branch's set, its accessories, its moons). The forms go to her slots highest grade first
   in the table's order (H84's rule); **no base fallback in Tier 3** (every branch is open). Moon 1 is the Full, moon 2
@@ -135,12 +135,12 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 1. **The accessory module:** slots by tier, `accessoryFormOpen` and `accessoryFormValue` with Tier 3's step, `kindCap(3)`.
 2. **The weapon-moon module:** weapon moon 2's nodes and values, the settings' checks, the derived second moon,
    `setWeaponMoon`'s `moon`, the jewel setter's target, `observatoryNodeCount`.
-3. **The engine's v20 validation** for a Tier 3 ally's three accessories and two moons.
+3. **The engine's v21 validation** for a Tier 3 ally's three accessories and two moons.
 4. **Presets:** Tier 3's table (both branches) through `classPreset`, with UT8.
 5. **The save actions** as decided, gated.
-6. **Tests** (beside H84's and H85's; mock with `capsAt(20, …)`):
-   - accessories: slots 1 · 2 · 3 (3 only from v20 in a Tier 3 world); one of each family; each step row above at G5
-     and G10 by the rule; a branch at a Tier 3 slot's G3 open at its Tier 2 share (and refused "Opens at G5" at v19); the
+6. **Tests** (beside H84's and H85's; mock with `capsAt(21, …)`):
+   - accessories: slots 1 · 2 · 3 (3 only from v21 in a Tier 3 world); one of each family; each step row above at G5
+     and G10 by the rule; a branch at a Tier 3 slot's G3 open at its Tier 2 share (and refused "Opens at G5" at v20); the
      base forms unchanged; the cap at 177 (a Great Orb and a Channel Pendant on one kind) and a Great Orb with a Great
      Pendant under it.
    - weapon moons: moon 2's node values at Lv 6, 26 and 46; Full + Split serves three kinds, Full + Full two; Split +
@@ -148,12 +148,12 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
      (a Split Fire + Ice → a Full on her third slotted kind); a moon kind not slotted adds nothing; 30 nodes in Tier 3.
    - `save/presets-t3.test.ts`: the twelve rows for Tier 3; every kind under the cap; a matched Uma with a Bell
      signature in a row without a Bell takes it in the least form's slot.
-   - `rpg/battle/engine-v20.test.ts` (H98's file): a Tier 3 ally with three accessories and three moon kinds plays a
-     round on Auto at v20; a fourth accessory, two of one family, a fourth moon kind or a moon above 130 throws `Invalid
-     battle ally`; the same ally at v19 or as a Tier 2 ally throws.
+   - `rpg/battle/engine-v21.test.ts` (H98's file): a Tier 3 ally with three accessories and three moon kinds plays a
+     round on Auto at v21; a fourth accessory, two of one family, a fourth moon kind or a moon above 130 throws `Invalid
+     battle ally`; the same ally at v20 or as a Tier 2 ally throws.
    - The actions: the third slot takes a form, a fourth family refused; setting moon 2; a Moon Jewel set on it;
      unmocked, a Tier 3 world keeps two slots and one moon.
-   - H98's v19 replay tests and every existing test pass unchanged.
+   - H98's v20 replay tests and every existing test pass unchanged.
 7. **Docs:** weapon-progression §5.3 and extra-stats-progression §5.1 gain "Built in H99 (D…), live from H105." Log the
    D-row (fetch `main` first). `pnpm docs:update` leaves no diff.
 8. **Check it locally** (your own ports; a desktop browser at 390×844; never the iOS Simulator), on a scratch save from
@@ -163,8 +163,8 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (gzip, of 230 KB).
-- [ ] The tests in step 6 pass; both v19 replay tests pass untouched.
-- [ ] `git diff` shows no switch (`BATTLE_ENGINE_VERSION` 19, `SAVE_SCHEMA_VERSION` 30).
+- [ ] The tests in step 6 pass; both v20 replay tests pass untouched.
+- [ ] `git diff` shows no switch (`BATTLE_ENGINE_VERSION` 20, `SAVE_SCHEMA_VERSION` 30).
 - [ ] `docs/game/` is unchanged, `pnpm docs:update` leaves no diff, the D-row is logged, the design docs have their
   lines.
 - [ ] The local check in step 8 was done and described. Nothing from the original games in git.

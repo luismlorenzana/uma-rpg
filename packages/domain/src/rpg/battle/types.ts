@@ -1,4 +1,4 @@
-// Campaign battle vocabulary, engine v17 (live since H82, D218; v16 from H72 to H82, D210; R2, D209: gear grades arrive as stats and Might, and
+// Campaign battle vocabulary, engine v18 (weaknesses v2 live since H116, D237; v17 from H82 to H116, D218; R2, D209: gear grades arrive as stats and Might, and
 // support fields retire; W3, D91: up to eight foes, dual elements, waves; D86 classes; Limit Breaks D311;
 // v8 ranks and gear, D102–D104; v9 Heroes and Learners, D106; v10 Limit Breaks only from the Halls of Heroes, D112;
 // v11 two accessories and their defensive effects, D124; v12 the combat balance rework, D141: a ratio damage formula,
@@ -9,6 +9,7 @@
 // trunk and one fork into lines A and B, Skill Ranks (H65), the base MP regen and the Flourish (H68, D204);
 // v17 the Tier rework's economy, D209, live since H82 (D218): gear grades arrive as stats and Might, and the ten supports are refused;
 // her accessory's base form arrives as `flat`, `bell` or `insignia` and her signature as `signature` (H75, D212);
+// v18 makes weaknesses v2's generated foe lists live (D235–D237; the battle rules themselves stay v17's);
 // docs/design/tier-rework/implementation.md). Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'

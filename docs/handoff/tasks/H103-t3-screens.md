@@ -59,7 +59,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   fight's own `engineVersion`. Nothing tests `BATTLE_ENGINE_VERSION` directly. Before H105 every world looks exactly as
   it does today; after it, only Tier 3 worlds change (and Tier 2's one look-ahead line).
 - **The local switch** (to preview; **never commit it**), exactly H105's change:
-  1. `packages/domain/src/rpg/battle/caps.ts`: `BATTLE_ENGINE_VERSION = 20`;
+  1. `packages/domain/src/rpg/battle/caps.ts`: `BATTLE_ENGINE_VERSION = 21`;
   2. `packages/domain/src/save/save.ts`: `SAVE_SCHEMA_VERSION = 31`;
   3. `packages/domain/src/save/migrations.ts`: chain `toV31(world, tier)` after `toV30` (`version < 31`).
   Restart the API and the web; a scratch v30 save in your worktree's `apps/api/.data` migrates on load.
@@ -113,16 +113,16 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 6. **Tests** (pure helpers with an explicit engine or tier, extracted where a component holds the logic):
    - the weapon sheet's doors: a Tier 3 Pure at G4 offers Keen and Tempered + its partner; a Dual Tempered and Evolved;
      Base Pure and Dual; re-forge offers its line's other door; the late step on a G7 Pure; a Tier 2 weapon's look-ahead
-     line names both doors; at engine 19 a Tier 3 world offers Release 4's doors and no look-ahead line;
-   - the accessory sheet: three slots in Tier 3 at engine 20 (two at 19); a Great Orb at a Tier 3 slot's G3 open at its
+     line names both doors; at engine 20 a Tier 3 world offers Release 4's doors and no look-ahead line;
+   - the accessory sheet: three slots in Tier 3 at engine 21 (two at 19); a Great Orb at a Tier 3 slot's G3 open at its
      Tier 2 share (1.2, × 2.6) and at G6 at the step's (1.3: +44); "(capped)" at 177;
    - the Observatory's pickers: a kind on the other moon and a second Split refused, Full + Full allowed, a derived moon
      marked "(preset)";
    - the Skills tab (`classTreeView` and the tree view's helper): two held lines, a third tap swaps the second, the
      signature tip offered at both forks of the lead tree only, depth 6 faded below Class Rank 50, the master slot
      listing only held capstones;
-   - `battle/battle-view.test.ts`: on a v20 state the master skill is on the bar and each mastery cue reads as decided;
-     a v19 state shows neither;
+   - `battle/battle-view.test.ts`: on a v21 state the master skill is on the bar and each mastery cue reads as decided;
+     a v20 state shows neither;
    - every existing web test passes unchanged.
 7. **Check it locally** (your own ports; a desktop browser; never the iOS Simulator), on a scratch v30 save from the CJS
    build with Tier 1, 2 and 3 worlds, the Tier 3 world in H102's fixture shapes (a Pure at G7, a Dual at G3, two
@@ -138,8 +138,8 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (gzip, of 230 KB).
-- [ ] The tests in step 6 pass; the domain's v19 replay tests stay green.
-- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 19, `SAVE_SCHEMA_VERSION` 30, `toV31` unchained.
+- [ ] The tests in step 6 pass; the domain's v20 replay tests stay green.
+- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 20, `SAVE_SCHEMA_VERSION` 30, `toV31` unchained.
 - [ ] Both local checks in step 7 were done and described. Nothing from the original games in git; screenshots with
   original art stay local.
 - [ ] `docs/game/` is unchanged and `pnpm docs:update` leaves no diff; the D-row is logged (fetch `main` first);

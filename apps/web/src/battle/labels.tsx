@@ -193,17 +193,32 @@ export function ShieldBadge({ value, broken = false, steeled = false }: { value:
   )
 }
 
-/** Weakness icons: elements first, then weapon kinds; from v16 (CP5, H70) a foe's twins, the Arm first, then the element
- * (Twilight: Bow, Katana), the twin sets' order. `engine` is the generation (a fight's own version on the fight screen). */
+/** Weakness icons: elements first, then weapon kinds; from v16 the Arms come first. From v18 a foe can carry up to four
+ * dealt kinds. `engine` is the generation (a fight's own version on the fight screen). */
 export function WeaknessIcons({ weaknesses, size = 14, engine = BATTLE_ENGINE_VERSION }: { weaknesses: BattleWeaknesses; size?: number; engine?: number }) {
   const arms = weaknesses.weapons.map((w) => <span key={w} className="inline-flex"><WeaponGlyph weapon={w} size={size} /></span>)
   const elements = weaknesses.elements.map((e) => <ElementGlyph key={e} element={e} size={size} />)
-  const twins = rpgRework('fight', engine)
+  const armsFirst = rpgRework('fight', engine)
   const armNames = weaknesses.weapons.map((w) => WEAPON_KIND_LABEL[w]), elementNames = weaknesses.elements.map((e) => ELEMENT_LABEL[e])
-  const names = twins ? [...armNames, ...elementNames] : [...elementNames, ...armNames]
+  const names = armsFirst ? [...armNames, ...elementNames] : [...elementNames, ...armNames]
+  const spoken = names.length < 2 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
   return (
-    <span className="inline-flex flex-wrap items-center justify-center gap-0.5" aria-label={`Weak to ${names.join(', ')}`}>
-      {twins ? <>{arms}{elements}</> : <>{elements}{arms}</>}
+    <span className="inline-flex flex-nowrap items-center justify-center gap-0.5" aria-label={`weak to ${spoken}`}>
+      {armsFirst ? <>{arms}{elements}</> : <>{elements}{arms}</>}
+    </span>
+  )
+}
+
+/** The compact line below a foe on the fight card. v16–v17 name the twin pair; v18's four dealt icons stand alone. */
+export function FightWeaknesses({ shield, broken = false, steeled = false, weaknesses, engine = BATTLE_ENGINE_VERSION }: {
+  shield: number; broken?: boolean; steeled?: boolean; weaknesses: BattleWeaknesses; engine?: number
+}) {
+  const named = rpgRework('fight', engine) && !rpgRework('weak', engine)
+  return (
+    <span className="inline-flex flex-nowrap items-center gap-1">
+      <ShieldBadge value={shield} broken={broken} steeled={steeled} />
+      {named && <span className="text-[9.5px] font-semibold leading-3 text-ink-soft">Weak:</span>}
+      <WeaknessIcons weaknesses={weaknesses} size={12} engine={engine} />
     </span>
   )
 }

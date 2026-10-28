@@ -47,8 +47,8 @@ import { balanceMember, onCurveGrade } from '../world/balance-party'
 import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS,
   RPG_CLASSES, RPG_DEPTH_GATES, RPG_SKILL_RANK_FACTOR, RPG_SKILL_RANK_MAX, RPG_SKILL_RANK_STEP, RPG_TIER_MAX_LEVEL,
-  RPG_TWIN_SETS, RPG_WEAPONS, rpgClasses, rpgClassWeapons, isRpgWeaponKind, rpgDefaultWeapons, rpgExpToNext, rpgHand,
-  rpgOpenDepth, rpgTwinsOf, rpgWeaponKind, type RpgClass, type RpgWeapon,
+  RPG_WEAPONS, rpgClasses, rpgClassWeapons, isRpgWeaponKind, rpgDefaultWeapons, rpgExpToNext, rpgHand,
+  rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
 import { RIFT_FRONT_SPECS, riftGuidedBuild, riftShape, riftTuning, type RiftSlot } from '../rift/fronts'
@@ -58,7 +58,7 @@ import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER
 import { ASCEND_PURSE, BANKED_EXP_PER_MARK, BANKED_MARKS_CAP, ECHO_RANK_PAY, echoFoeLevel } from '../save/rift'
 import { classPresetV3 } from '../save/presets'
 import { TIERS } from '../save/rules'
-import { BIOMES } from '../world/biomes'
+import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
   FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING,
   UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES, type UmaCallingRow,
@@ -391,7 +391,7 @@ function foeScaling(): string {
     ['Acting twice', `From tier Lv ${WORLD_BOSS_TWICE_FROM}: a lone region boss and an elite's sub-boss; a lone elite always`],
     ['Formations', `A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's`],
     ['Shields', `Regular ${t.regularShield} (by formation), sub-boss ${rpgFoeShields().subBoss}, boss ${rpgFoeShields().boss}`],
-    ['Weaknesses', 'Her twins: the element that beats hers on the ring and its twin Arm, or the Bow and the Katana (Twilight) for a Light + Dark foe; every foe, every rank (v16)'],
+    ['Weaknesses', 'Engine v18: a Tier 1 regular (including Keys and guards) gets 2 Arms + 2 elements; a sub-boss or boss gets 3 kinds, split 2 + 1. Each stage deals its Arms and element decks across foes, the ring answer first; Light + Dark draws Fire, Ice and Lightning. The Rift keeps its twin draws'],
   ])
 }
 
@@ -556,16 +556,16 @@ function facilities(): string {
 
 // --- The world ------------------------------------------------------------------------------------------------------
 
-/** A twin set by name: "Lightning twins" (Lance, Thunder Tome), or Twilight (Bow, Katana). */
-const twinName = (elements: readonly string[]): string => (elements[0] ? `${cap(elements[0])} twins` : 'Twilight')
-/** Engine v16: a signature's foes are weak to her twins (CP5); a pair's lead alternates by slot, so it may answer to two. */
+/** Engine v18: a signature still supplies the ring answer that leads each foe's dealt element list. */
 function biomes(): string {
-  const weakTo = (s: Parameters<typeof rpgTwinsOf>[0]) => [...new Set((s.length > 1 ? [0, 1] : [0]).map((slot) => twinName(rpgTwinsOf(s, slot).elements)))].join(' or ')
-  return table(['Biome', 'Id', 'Signatures (weak to)', 'Formations', 'Roles'], BIOMES.map((b) => [
-    b.name, `\`${b.id}\``, b.signatures.map((s) => `${s.join('+')} (${weakTo(s)})`).join('; '),
+  const answer = (s: Parameters<typeof signatureWeaknesses>[0]) => {
+    const ring = signatureWeaknesses(s)
+    return ring.length ? ring.map(cap).join(' / ') : 'Fire / Ice / Lightning dealt'
+  }
+  return table(['Biome', 'Id', 'Signatures (ring lead)', 'Formations', 'Roles'], BIOMES.map((b) => [
+    b.name, `\`${b.id}\``, b.signatures.map((s) => `${s.join('+')} (${answer(s)})`).join('; '),
     b.formations.join(', '), b.roles.join(', '),
-  ])) + `\n\nThe twin sets: ${Object.entries(RPG_TWIN_SETS).map(([set, kinds]) => `${set === 'twilight' ? 'Twilight' : `${cap(set)} twins`} ` +
-    `(${kinds.map((k) => WEAPON_LABEL[(isRpgWeaponKind(k) ? k : `tome-${k}`) as RpgWeapon]).join(', ')})`).join('; ')}.`
+  ])) + '\n\nThe ring lead is only the first element answer. Engine v18 deals the rest of each foe\'s Arms and elements from the stage decks, so neighbours differ.'
 }
 const FRANCHISE_NAME: Record<string, string> = { priconne: 'PriConne', azurlane: 'Azur Lane', nikke: 'NIKKE' }
 /** Whose units each continent's halves and capital show (D135). */

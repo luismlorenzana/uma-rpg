@@ -20,7 +20,7 @@ const STYLES = ['front', 'pace', 'late', 'end'] as const
 
 describe('the Paladin’s start (H58, §3.3)', () => {
   it('is a Late surger whose base Power beats her base Wit, from classes v2 only (and her calling from v16, live since H72)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(17)
+    expect(BATTLE_ENGINE_VERSION).toBe(18)
     const strong = outfit('1', 'late', 120, 100), even = outfit('2', 'late', 110, 110), wise = outfit('3', 'late', 100, 120)
     expect([strong, even, wise].map((o) => startingClass(o, 15))).toEqual(['paladin', 'cleric', 'cleric'])
     expect([strong, even, wise].map((o) => startingClass(o, 14))).toEqual(['cleric', 'cleric', 'cleric'])

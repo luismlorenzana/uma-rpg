@@ -16,7 +16,7 @@ owner's "more slots, more variety, branching paths similar to weapons":
 - **Tier 2's presets** for the default set (WP25, SB10's lead half, UT8's signature).
 
 Two forms are new rules in the engine (the Toll Bell's ring count, Onslaught's first act a wave); the rest are data on
-the paths Release 2 built. All of it is v18 and dark until H90.
+the paths Release 2 built. All of it is v19 and dark until H90.
 
 ## Context (read first)
 
@@ -110,9 +110,9 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
   channels ("Two Arms or two Tomes"), a slot beyond her tier's count. Changing a form or kind never touches the grade.
 - **The kind cap is applied where flat offense is computed** (the input builder and the sheet: `capKindOffense` over
   her Pendant and Orb forms' kinds, after adding them); the sheet shows "Lance +122 (capped)". The engine backstop from
-  v18: an ally whose accessory flat offense on any kind exceeds `kindCap(tier)` is refused. If H75 folded accessory
+  v19: an ally whose accessory flat offense on any kind exceeds `kindCap(tier)` is refused. If H75 folded accessory
   offense into `might`, the backstop reads `might[kind] ≤ 2 × G10 Might × tier` instead, and the delivery says which.
-- **The engine, v18** (dark; every earlier version unchanged):
+- **The engine, v19** (dark; every earlier version unchanged):
   - **validation:** accessories ≤ `accessorySlots(tier)`; one of each family; a branch form on a Tier 1 ally refused;
     the cap; all `RangeError('Invalid battle ally')`;
   - **the input** extends H75's accessory fields: a Bell gains `step` and `top` (a Toll Bell; a Bell or a Great Bell has
@@ -142,7 +142,7 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
 1. **The table module** as decided, beside H75's, with doc comments citing WP19–WP24, WP34, SB8.
 2. **The setter and the presets** in `save/` as decided, behind the stage.
 3. **The input builder** (`partyMembers` and the Rift's and the harness's builders): both slots, the new fields, the cap.
-4. **The engine:** v18 validation, the Toll Bell, Onslaught, the new fields; Auto.
+4. **The engine:** v19 validation, the Toll Bell, Onslaught, the new fields; Auto.
 5. **The sheet's rows** in `save/sheet.ts`.
 6. **Tests:**
    - `economy/accessory-forms.test.ts`: every Tier 2 value at G5 and G10 listed above (Great Bell 0.7 · 1.4; Toll Bell
@@ -150,11 +150,11 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
      Orb at G10 is 107 (41 × 2.6); branches open only at a slot's G5 and only in Tier 2+; one slot in Tier 1, two
      after; `kindCap` 68 · 122 · 177; a Great Orb (74) and a Channel Pendant (49) on the Lance cap at 122, a Twin Orb
      (49) and a Great Pendant (34) stay at 83.
-   - `rpg/battle/accessories-v18.test.ts` (inputs at `version: 18`): a G10 Toll Bell strikes at 0.5, 1.0, 1.5, 2.0, 2.0
+   - `rpg/battle/accessories-v19.test.ts` (inputs at `version: 19`): a G10 Toll Bell strikes at 0.5, 1.0, 1.5, 2.0, 2.0
      × her hand over five Attacks and a new fight starts at 0.5; a Great Bell stays 1.4; Onslaught lifts her first act
      in wave 1 and wave 2 only, in a two-wave fight, and a Guard spends it; a Great Insignia adds 20% on a boss and
      nothing on a regular; refused: two Bells, three accessories in Tier 2, two in Tier 1, a branch form on a Tier 1
-     ally, a kind over the cap, any of the new fields in a v17 input.
+     ally, a kind over the cap, any of the new fields in a v18 input.
    - `save/accessories-t2.test.ts` (mocking `caps.ts` to 18): the setter's refusals and a free form change; the presets
      for the six classes with slots at G7 and G3 (the first form on G7, the second's base on G3), both at G0 (two base
      forms) and both at G10 (the table); the UT8 table for every class and family above; the sheet's "(capped)".

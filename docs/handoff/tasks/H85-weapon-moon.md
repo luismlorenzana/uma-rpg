@@ -13,7 +13,7 @@ Planet and three moons for every tier. From Tier 2 the map gains **a weapon moon
 - **outside the kind cap**, never a heal, never a kind (EP27, EP10);
 - **preset** on her two most-used kinds, a hybrid's on her lead half (EP29, SB10).
 
-Measured in the design: +12–16% to her act in Tier 2 (+17–23% on its kinds' hits). It is engine v18 data on one new
+Measured in the design: +12–16% to her act in Tier 2 (+17–23% on its kinds' hits). It is engine v19 data on one new
 input field and an Observatory body, all dark until H90.
 
 ## Context (read first)
@@ -84,10 +84,10 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
 - **`setWeaponMoon(save, outfitId, setting, now, tier)`** and `clearWeaponMoon`: `{ mode: 'full', kinds: [a] }` or
   `{ mode: 'split', kinds: [a, b] }`, any kinds; refused in Tier 1 ("From Tier 2"), "Two different kinds", "Pick a kind".
   A change never touches open nodes or jewels.
-- **The input, v18:** `BattleAlly.weaponMoon?: Partial<Record<RpgDamageKind, number>>` (flat offense by kind, frozen at the
+- **The input, v19:** `BattleAlly.weaponMoon?: Partial<Record<RpgDamageKind, number>>` (flat offense by kind, frozen at the
   fight's start). In `battleDamage` it joins the offense in step 1 on a part whose own kind is a key, **after** the
   capped accessory offense and outside the cap check; Limit Break hits of the kind take it too (WP §3.10). Refused with
-  `RangeError('Invalid battle ally')`: any `weaponMoon` before v18; in a Tier 1 ally; more than two kinds; a value above the
+  `RangeError('Invalid battle ally')`: any `weaponMoon` before v19; in a Tier 1 ally; more than two kinds; a value above the
   tier's Full total (90 in Tier 2, 130 in Tier 3). The heal paths don't read it (they never read offense by kind).
 - **The battle sheet:** the Offense group's lines "Lance moon +90" or "Lance moon +63 · Greatsword moon +63", grey
   "No Bow in her slots" where it applies; her Extra Stats share (H79's green part) unchanged.
@@ -100,18 +100,18 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
 
 1. **The values module** and its functions, with doc comments citing EP24–EP27, EP29, SB10.
 2. **The jewel setter, `setWeaponMoon`, `clearWeaponMoon`** and the preset's clearing, behind the stage.
-3. **The input:** `BattleAlly.weaponMoon` from v18 in `partyMembers`, the Rift's and the harness's builders; the engine's
+3. **The input:** `BattleAlly.weaponMoon` from v19 in `partyMembers`, the Rift's and the harness's builders; the engine's
    validation and offense line.
 4. **The sheet's lines.**
 5. **Tests:**
    - `economy/weapon-moon.test.ts`: the four node rows above (Tier 2 and 3, Full and Split) and their totals; no moon in
-     Tier 1; `observatoryNodeCount` 20 · 25 (and 20 everywhere at v17); the preset for every class with §3.8's Duals
+     Tier 1; `observatoryNodeCount` 20 · 25 (and 20 everywhere at v18); the preset for every class with §3.8's Duals
      equals EP29's branch 1 column; with no Dual the Brawler's is Greatsword + Axe; a Spell Blade's and a Summoner's
      stay on their lead half whatever their Dual.
-   - `rpg/battle/moon-v18.test.ts` (inputs at `version: 18`): an Attack of the moon's kind deals exactly the damage of
+   - `rpg/battle/moon-v19.test.ts` (inputs at `version: 19`): an Attack of the moon's kind deals exactly the damage of
      her offense + the moon's value; a Dual Lance's hit gains nothing from a Katana moon; a mend and a Barrier are the
      same with and without a moon; with a capped Lance (Great Orb + Channel Pendant at 122) a +90 Lance moon still adds
-     90; refused: `weaponMoon` in a v17 input, in a Tier 1 ally, three kinds, a value of 91 in Tier 2.
+     90; refused: `weaponMoon` in a v18 input, in a Tier 1 ally, three kinds, a value of 91 in Tier 2.
    - `save/weapon-moon.test.ts` (mocking `caps.ts` to 18): Full and Split set and refused as decided; an empty list
      reads the preset and follows a weapon swap; the preset button clears a setting; Moon Jewel I opens
      `weapon-moon-1:1` at Lv 6, not before, and `:2` waits for `:1`; the default target order includes the weapon moon;

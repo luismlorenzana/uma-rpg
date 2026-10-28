@@ -58,9 +58,9 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
 
 - **Inert until the switch.** Every new screen state comes from the live stage (`rpgRework('t2Weapons')` through the
   domain's functions) or from a fight's own `engineVersion`. Before H90 the game looks exactly as it does today; an open
-  v17 fight after the switch shows no Toll Bell pips.
+  v18 fight after the switch shows no Toll Bell pips.
 - **The local switch** (to preview; **never commit it**), exactly H90's change:
-  1. `packages/domain/src/rpg/battle/caps.ts`: `BATTLE_ENGINE_VERSION = 18`;
+  1. `packages/domain/src/rpg/battle/caps.ts`: `BATTLE_ENGINE_VERSION = 19`;
   2. `packages/domain/src/save/save.ts`: `SAVE_SCHEMA_VERSION = 29`;
   3. `packages/domain/src/save/migrations.ts`: chain `toV29` after `toV28` (`version < 29`), passing the world's tier.
   Restart the API and the web; a scratch v28 save in your worktree's `apps/api/.data` migrates on load.
@@ -114,7 +114,7 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
   weapon at G5+ with no branch; **an accessory slot at G5+ still on its base form** (each Great branch beats its base
   everywhere, WP §5.7); a Moon Jewel she can set on her weapon moon. Each with its dot on the Gear tab or the
   Observatory as Release 2's are.
-- **The fight screen:** a Toll Bell's rings as pips on her chip (from the state's `tolls`, v18 fights only); target hints
+- **The fight screen:** a Toll Bell's rings as pips on her chip (from the state's `tolls`, v19 fights only); target hints
   read `battleWeakFor` so a Dual's partner-weak foe shows weak; no new cue or animation (a weak hit's cue is as today).
 - **Help** (one (i) each, only where it helps, D95): the weapon sheet's "Pure: weak hits ×1.5. Dual: its partner's
   foes are weak to it too (×1.3). One two-kind weapon in her slots in Tier 2." The accessory sheet's "From a slot's G5,
@@ -148,7 +148,7 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
    - `targetDemand`: a Tier 2 Uma's Branch Gem at G5 and none for a G7 weapon without a branch; five Moon Jewels for
      the weapon moon; two slots' Settings; `upgradesFor`: each of the four new cases, the switch mocked to 18 with
      H64's `capsAt` (`rpg/battle/caps-at.fixture.ts`);
-   - the fight chip's pips from a v18 state with `tolls`, and none on a v17 state;
+   - the fight chip's pips from a v19 state with `tolls`, and none on a v18 state;
    - every existing web test passes unchanged (the live screens are today's).
 7. **Check it locally** (your own ports; a desktop browser; never the iOS Simulator) on a scratch **v28 two-tier save**
    from the CJS build with: a Tier 2 Uma with the Lance at G4 and a Branch Gem in stock, one with a weapon at G7 and no
@@ -158,14 +158,14 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
      "Pick a branch" on the G7 weapon; two accessory rows, the sheet's trees, a Great Orb set and the cap; the
      Observatory's weapon moon, its chip, a Moon Jewel set on it; the Battle tab's moon line; the Work tab's eight tiles,
      a secondary picked free and changed for 2,000 Laurels; a place page's three groups and "Her main trade's work";
-     the planner's Branch Gem and moon jewels; "Can upgrade" dots; a v18 Tier 2 fight on Auto with a Toll Bell's pips.
+     the planner's Branch Gem and moon jewels; "Can upgrade" dots; a v19 Tier 2 fight on Auto with a Toll Bell's pips.
    Describe what you saw; say which screens touch the edges (the owner checks them on the phone after H90).
 
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (of 230 KB).
 - [ ] The tests in step 6 pass; every domain replay test stays green.
-- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 17, `SAVE_SCHEMA_VERSION` 28, `toV29` unchained.
+- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 18, `SAVE_SCHEMA_VERSION` 28, `toV29` unchained.
 - [ ] Both local checks in step 7 were done and described. Nothing from the original games in git; screenshots with
   original art stay local.
 - [ ] `docs/game/` is unchanged and `pnpm docs:update` leaves no diff; the D-decision is logged; weapon-progression §8,

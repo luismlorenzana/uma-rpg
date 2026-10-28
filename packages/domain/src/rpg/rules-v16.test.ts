@@ -38,11 +38,11 @@ const V16_ROWS = {
 } as const
 
 describe('the Tier rework’s switch (H64)', () => {
-  it('opens each release at its engine, the fight live since H72 and the economy since H82 on 17, the rest dark', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(17)
+  it('opens each release at its engine, weaknesses v2 live on 18 and the later releases dark', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(18)
     expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, weak: 18, t2Weapons: 19, t2Classes: 20, t3: 21 })
     const stages = Object.keys(RPG_REWORK_ENGINE) as RpgReworkStage[]
-    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, true, false, false, false])
     expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false, false])
     expect([rpgRework('fight', V16), rpgRework('economy', V16)]).toEqual([true, false])
     for (const s of stages) expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 21)], s).toEqual([false, true, true])
@@ -122,12 +122,12 @@ describe('class rules, v15 and v16 (H64)', () => {
     expect(validRpgWeapons('brawler', ['bow', 'katana', 'axe'], V15)).toBe(false)
   })
 
-  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, 0.50 (SB11; H71); her Tome still leads', () => {
+  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, and raises her live Tome on v18 (H116)', () => {
     const pick = (c: RpgClass, v?: number) => { const h = rpgHand({ classId: c }, v); return { arms: h.arms, tome: h.tome } }
     for (const c of RPG_ALL_CLASSES) {
       expect(pick(c, V15), c).toEqual(TODAY.hands[c])
       expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.58 } : TODAY.hands[c])
-      expect(pick(c), c).toEqual(pick(c, V16))
+      expect(pick(c), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.62 } : pick(c, V16))
       const [h15, h16] = [rpgHand({ classId: c }, V15), rpgHand({ classId: c }, V16)]
       expect({ ...h16, arms: h15.arms }, c).toEqual(h15)
     }

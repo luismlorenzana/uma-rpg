@@ -2,6 +2,11 @@
 
 **uma-rpg · Claude · L · Needs: H99, H100, H101 (and through them H98) · Unblocks: H105**
 
+> **H116 plan correction (D237): read [weaknesses-v2.md §7, WK8–WK10](../../design/tier-rework/weaknesses-v2.md#7-later-tiers-and-the-rift-wk8wk10) before measuring.**
+> Run all Tier 3 campaign and coverage tables against WK8's live three-kind world lists. Do not reconstruct the retired
+> one-kind/twin model, and do not change the Rift. Target 13's fixed answer counts are obsolete: report and pin the
+> measured WK8 baseline, then tune only the existing Tier 3 non-weakness knobs.
+
 ## Why
 
 Tier 3's numbers are drafts until fights set them ([stat-balance](../../design/tier-rework/stat-balance.md) §12, "final
@@ -9,8 +14,8 @@ tuning by fight simulation during implementation", D196; README §9.5's Tier 3 i
 Tier 3's toolbox at **+88% an act** at Lv 50 and sized **Tier 3's term** (×1.08 → ×1.48 on HP and DEF, offense +10%,
 bosses × 1.1) to bring a party's pace back within ±10% of Tier 1's, the model's edge **Tier 3 Lv 30 at 1.11**. The six
 masteries are CP27's shapes with draft numbers, "+8–15% where it applies". This packet measures all of it with the
-game's own rules on engine v20, tunes **Tier 3's knobs only**, in the order named below, and writes the results into the
-docs. All of it is v20-only and Tier 3-only, so the live game and Tiers 1–2 don't move.
+game's own rules on engine v21, tunes **Tier 3's knobs only**, in the order named below, and writes the results into the
+docs. All of it is v21-only and Tier 3-only, so the live game and Tiers 1–2 don't move.
 
 ## Context (read first)
 
@@ -19,7 +24,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 - `CLAUDE.md`, `AGENTS.md`. **How a balance packet ran:** `git show 5dd9f08:docs/handoff/tasks/H60-classes-v2-balance.md`
   and D186; **H89's and H96's packets and D-rows** (Release 3's and 4's balance: the harness options they added, the
   interim Tier 3 term a₃ and b₃, why WP §3.7's structural fallbacks weren't applied, their always-on files
-  `world/balance-v18.test.ts` and `world/balance-v19.test.ts`, the measured tables).
+  `world/balance-v19.test.ts` and `world/balance-v20.test.ts`, the measured tables).
 - H98's packet and D-rows (**Release 5's build decisions**), and H99, H100, H101's (every knob below is theirs).
 - **The design:**
   - stat-balance **§3** (the ceilings, the tuned peak, the toolboxes against the foes, where the gain comes from, the
@@ -37,7 +42,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   `engine`, tier, class branch and tips; `balanceMember`, `balanceParty`, `balanceStage`), `world/balance-play.ts`
   (`play`, `Played`), `world/balance.test.ts` (`simulate`, `run`; `SIM=1`, `SIM_ENGINE`, `SIM_LEVELS`),
   `rift/balance-sim.ts`, the coverage script.
-- **The knobs** (all v20, Tier 3):
+- **The knobs** (all v21, Tier 3):
   - H100: `BATTLE_UNSTOPPABLE_FACTOR` 0.6, `BATTLE_RESONANCE_SHARE` 0.3, `BATTLE_SPELLBIND_FACTOR` 1.2,
     `BATTLE_MENAGERIE_PAIRS` 2 (and the lingering summon's farewell share), `BATTLE_LAST_STAND_USES` 1,
     `BATTLE_OVERFLOW_CAP` 0.1; the twelve branch capstones' power and MP; Tier 3's ten slots;
@@ -47,13 +52,13 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 
 ## Decisions made
 
-- **Measure with explicit v20 inputs, never the switch.** `balanceMember` builds a **Tier 3** Uma on curve (lifetime
-  level 100 + ℓ) at engine 20: §3.8's Tier 3 picks (branch 1's set; branch 2's from §3.8's second table), H99's Tier 3
+- **Measure with explicit v21 inputs, never the switch.** `balanceMember` builds a **Tier 3** Uma on curve (lifetime
+  level 100 + ℓ) at engine 21: §3.8's Tier 3 picks (branch 1's set; branch 2's from §3.8's second table), H99's Tier 3
   preset (three accessories at the on-curve grade, both weapon moons Full + Split, opened by level), the full map × 2.6,
   her class branch (1 unless a check says otherwise) with its focus and class skills, both lines A and B held with Power
   tips, ten equipped skills, and at Class Rank 50 (the real pace: Class Rank 50 at Lv 34, SB16) her capstones, her
-  branch capstone in the master slot and her mastery. `balanceStage` takes version 20. **Every table H89 and H96 printed
-  prints the same with the defaults**, and the v19 replay fixture stays green.
+  branch capstone in the master slot and her mastery. `balanceStage` takes version 21. **Every table H89 and H96 printed
+  prints the same with the defaults**, and the v20 replay fixture stays green.
 - **What each target means here** (on Auto, first try, on curve, Tier 3 at Lv 30 and 50 unless said):
 
   | # | Target | Measured as |
@@ -93,7 +98,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 - **When a target can't be met** without breaking another, keep the closest and write why, as H51 did for Iron's wrong
   party; the owner prefers that to an open question.
 - **UT20** (the signature's dial) is not touched: it waits for the owner to ask after playing.
-- **Always-on checks** (v20, fixed seeds, fast), in a new `world/balance-v20.test.ts`:
+- **Always-on checks** (v21, fixed seeds, fast), in a new `world/balance-v21.test.ts`:
   - **the stack's factor:** one hit by a Tier 3 ally with a Keen weapon, her focus and an Onslaught Insignia at G10 with
     Tier 3's step on her wave's first act deals **×2.493** (± 0.5%) of the same hit with a base weapon, no focus and no
     Insignia on a foe not weak to it, the halving and statuses equal; with Spellbind on a Spell Blade's both-weak pair,
@@ -101,7 +106,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   - the default party on branch 1 wins a Tier 3 Lv 30 regular stage and a Tier 3 Lv 50 boss stage on Auto;
   - each mastery fires in a fixed fight built to trigger it (the cue appears, once for Last Stand);
   - the base regen at Class Rank 50 equals Class Rank 40's;
-  - the guard rail at v20: no class's best act (capstones and branch capstones included) Breaks a lone Tier 3 boss
+  - the guard rail at v21: no class's best act (capstones and branch capstones included) Breaks a lone Tier 3 boss
     (shield 10) in one act.
   Releases 1–4's always-on checks stay as they are.
 - **Docs:** class-progression §7.3 gains a "Measured (H104, D…)" column for the masteries (the tuned numbers), §15 a
@@ -112,11 +117,11 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 
 ## Do
 
-1. **The harness:** the Tier 3 member and party at engine 20 as decided; check that every H89 and H96 table prints the
+1. **The harness:** the Tier 3 member and party at engine 21 as decided; check that every H89 and H96 table prints the
    same with the defaults.
-2. **Measure** targets 1–13 (`SIM=1 SIM_ENGINE=20`, `SIM_LEVELS` while tuning). Save the raw tables in your delivery.
+2. **Measure** targets 1–13 (`SIM=1 SIM_ENGINE=21`, `SIM_LEVELS` while tuning). Save the raw tables in your delivery.
 3. **Tune** in the order decided; re-measure after each step; stop when every target holds or is explained.
-4. **Always-on checks** as decided, in `world/balance-v20.test.ts`.
+4. **Always-on checks** as decided, in `world/balance-v21.test.ts`.
 5. **Docs** as decided; log the D-row (fetch `main` first). `pnpm docs:update` leaves no diff.
 6. **Check it locally** with the local switch (never committed: `caps.ts` 20, `SAVE_SCHEMA_VERSION` 31, `toV31(world,
    tier)` chained, as H103 describes), on a scratch save from the CJS build with a Tier 3 world of real outfits on curve
@@ -129,7 +134,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   support). Say the number (gzip, of 230 KB).
 - [ ] Every target is met, or the delivery says which is closest and why; every knob changed is listed with its before
   and after; the raw tables are in the delivery.
-- [ ] H89's and H96's tables print unchanged with the defaults; Tier 1's and Tier 2's foe digests and the v19 replay
+- [ ] H89's and H96's tables print unchanged with the defaults; Tier 1's and Tier 2's foe digests and the v20 replay
   tests stay green; no Tier 1 or Tier 2 number changed.
 - [ ] The docs carry the measured results; the D-row is logged; `docs/game/` is unchanged and `pnpm docs:update` leaves
   no diff.
@@ -140,7 +145,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Deliver
 
 - **Claude, as a delegated worker:** a pull request from `feat/h104-t3-balance` with one commit,
-  `feat(domain): Release 5's balance, measured and tuned on engine v20 (H104)`; the body lists every number changed and
+  `feat(domain): Release 5's balance, measured and tuned on engine v21 (H104)`; the body lists every number changed and
   the measured tables. H102 edits the save at the same time; you share no files. Fetch `main` before you push. The main
   session reviews and merges it, then watches the deploy.
 - **Flag it done:** after the merge, a `docs(handoff): H104 done (D…)` commit deletes this file, sets H104 to Done in

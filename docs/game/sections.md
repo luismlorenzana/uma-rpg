@@ -335,7 +335,8 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
     open; "Give up").
   - **Stage:** foes on top, in two rows from six; the party below, as busts in spaced, bordered cards with solid dark
     backgrounds.
-  - **Foe cards:** each foe's element, a small "Weak:" and her weakness icons in the fight's own order, her shield.
+  - **Foe cards:** each foe's element, shield and up to four compact weakness icons in the fight's own order. Engine
+    v18 drops the visible "Weak:" word; an older fight keeps it.
   - **Controls:** a weapon row (her three weapons, in three columns), then **Attack**, **Skills** and **Guard**, and the
     **Limit Break** sheet. The line above says what a tap on a rival does:
     - a Spell Blade or a Summoner picks a pair, and the line names both halves, a Summoner's Tome half first ("Tap a
@@ -347,8 +348,9 @@ Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continen
     - her Flourish reads "Aster ★ +30 HP", Clean break's Barrier "Aster: ★ Barrier 37", and the round's MP back
       "+13 MP".
 
-    A fight keeps its own rules: one started before engine v17 keeps its pieces and supports; one before engine v16
-    still plays five weapons, v15's weaknesses ("weak" and its icons) and no base regen or Flourish; one before classes
+    A fight keeps its own rules: one started before engine v18 keeps its frozen weaknesses and visible "Weak:" label;
+    one before engine v17 keeps its pieces and supports; one before engine v16 still plays five weapons, v15's
+    weaknesses ("weak" and its icons) and no base regen or Flourish; one before classes
     v2 a one-half Summoner and v14's support.
 - **Result:** Victory or Defeated, Laurels, Class Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar,
   and her Class Rank bar with a line under it for each skill that rose ("Cleave reached Rank 3"; a depth that just

@@ -9,7 +9,7 @@ const replays = process.env.UPDATE_V16 ? regenerateV16Replays() : loadV16Replays
 
 describe('the frozen v16 replays (H82)', () => {
   it('runs with R2’s economy live (H82)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(17)
+    expect(BATTLE_ENGINE_VERSION).toBe(18)
     expect([rpgRework('economy'), rpgRework('t2Weapons')]).toEqual([true, false])
   })
 

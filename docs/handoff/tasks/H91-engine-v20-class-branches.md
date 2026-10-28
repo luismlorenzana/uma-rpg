@@ -1,6 +1,9 @@
-# H91 — Engine v19 foundation and the class branches: the focus, the groups, the sets and the class skills (dark)
+# H91 — Engine v20 foundation and the class branches: the focus, the groups, the sets and the class skills (dark)
 
 **uma-rpg · Claude · L · Needs: H90 · Unblocks: H92, H93 (and through them H94–H97)**
+
+> **H116 re-plan (D237):** R4 inherits weaknesses v2's live WK8 three-kind world lists and WK9 Rift lists. H93 no
+> longer narrows them; it verifies the live rule while adding the term, shields and non-weakness tuning.
 
 > **Versions re-planned by D221, D224 and D230 (2026-10-27):** saves v29 (tickets-only grant), v30 (the farm by line) and
 > v31 (the Wilds' trios, H114) are taken and live. Read this packet's save v29 as **v32**, v30 as **v33** and v31 as
@@ -11,14 +14,14 @@
 ## Why
 
 Release 4 of the Tier rework ([implementation.md](../../design/tier-rework/implementation.md), D198) is **Tier 2's
-classes**: engine v19 and save v30, built dark and turned on by H97. Its centre is the owner's second pass on class
+classes**: engine v20 and save v30, built dark and turned on by H97. Its centre is the owner's second pass on class
 progression: "I still don't like the class specializations in later tiers, feels like almost nothing changes." The
 answer he approved (D192, CP26, CP34, CP38–CP41) is a **class branch** a class from Tier 2: a **weapon-group focus**
 (+15% on the hits of one group's kinds), a **default or reverse weapon set**, and **three class skills** cast through a
 focus weapon.
 
 Every later R4 packet needs four things that don't exist yet:
-- engine v19, accepted dark, with v18's fights pinned so they replay byte for byte;
+- engine v20, accepted dark, with v19's fights pinned so they replay byte for byte;
 - the owner's weapon groups (**Heavy, Lite, Elemental, Arcane**) and the twelve branches as data every rule reads;
 - the focus as a factor in the damage stack's step 4, and in a healer's mend and Barrier shares;
 - the 36 class skills and the new engine rules they need (Frenzy, guards as skills, a damage cut, the Sage's new
@@ -54,8 +57,8 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 - **The format:** H53's packet (`git show 5dd9f08:docs/handoff/tasks/H53-engine-v15-foundation.md`), which did this for
   classes v2.
 - **What Releases 1–3 built** (read their packets' Done rows in `docs/handoff/README.md`, and their D-rows):
-  - H64: `rpgRework(stage, engine)` in `rpg/battle/caps.ts`, `RPG_REWORK_ENGINE = { fight: 16, economy: 17,
-    t2Weapons: 18, t2Classes: 19, t3: 20 }`; the three weapon slots by channel and the owner's defaults
+  - H64/H116: `rpgRework(stage, engine)` in `rpg/battle/caps.ts`, `RPG_REWORK_ENGINE = { fight: 16, economy: 17,
+    weak: 18, t2Weapons: 19, t2Classes: 20, t3: 21 }`; the three weapon slots by channel and the owner's defaults
     (`rpgDefaultWeapons`).
   - H64: `rpg/battle/caps-at.fixture.ts`'s `capsAt(version, caps)`, the shared mock every dark test uses, and the
     replay-fixture pattern (`v15-replays.fixture.ts`: the spec, `cueDigest`, the replay helper).
@@ -72,7 +75,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
     its branch forms, the weapon moon, Tier 2's presets for the default set. **H83's weapon branches are
     `BattleAlly.branches`**; H65's tree lines are `BattleAlly.lines` (the main session's naming, 2026-10-25). Use the names
     the code has after H90.
-  - H90: engine v18 and save v29 live.
+  - H90: engine v19 and save v29 live.
 - **The code:**
   - `rpg/battle/caps.ts`: `BATTLE_ENGINE_VERSION`, `rpgRework`, the shared constants the profile reads.
   - `rpg/battle/engine.ts`: `VERSIONS`, `MAX_FOES`, `validAlly`, `validateInput`, `battleDamage` (the stack), `strike`,
@@ -92,9 +95,9 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 
 **R4's build decisions** (the main session, 2026-10-25, for the owner, who prefers no open questions). Log them as one
 D-row before this packet's own (step 10):
-1. **One switch.** R4 is engine v19 and save v30, built dark: every R4 rule reads `rpgRework('t2Classes', engine)`, and
-   the deployed game stays on v18 and v29 until H97 flips `BATTLE_ENGINE_VERSION`, `SAVE_SCHEMA_VERSION` and chains
-   `toV30` in one commit. v6–v18 fights replay exactly, pinned by `v18-replays`.
+1. **One switch.** R4 is engine v20 and save v30, built dark: every R4 rule reads `rpgRework('t2Classes', engine)`, and
+   the deployed game stays on v19 and v29 until H97 flips `BATTLE_ENGINE_VERSION`, `SAVE_SCHEMA_VERSION` and chains
+   `toV30` in one commit. v6–v19 fights replay exactly, pinned by `v19-replays`.
 2. **Tier 2 and later only.** Every R4 piece (class branches, class skills, branch C, the tips, ten slots, LB+, Tier 2's
    weakness lists, shields and term) applies in worlds of tier 2 or more. Tier 1 plays exactly as after R3. Until R5,
    a Tier 3 world plays Tier 2's class shape, lists and shields, × tier (SB1 between releases), and keeps R3's interim
@@ -133,17 +136,17 @@ D-row before this packet's own (step 10):
    H96 balance → 4) H95 screens → 5) H97 the switch.
 
 **This packet's decisions:**
-- **Engine v19 is accepted, dark.** `BattleInput.version` and `BattleState.engineVersion` gain 19; `VERSIONS` and
-  `MAX_FOES` gain 19 (8 foes: the Tier 2 Horde's 5–7 a wave fits). The engine's header comment gains "v19 Tier 2's
+- **Engine v20 is accepted, dark.** `BattleInput.version` and `BattleState.engineVersion` gain 20; `VERSIONS` and
+  `MAX_FOES` gain 20 (8 foes: the Tier 2 Horde's 5–7 a wave fits). The engine's header comment gains "v20 Tier 2's
   classes (D…), dark until H97: class branches and the focus, class skills, branch C and the tips, LB+".
-- **v18 replays are pinned** by a frozen fixture, `rpg/battle/v18-replays.fixture.json` with its helpers in
-  `v18-replays.fixture.ts` (H64's pattern), generated on the engine **before** this packet's change: six v18 fights with their inputs, action logs, final `battleStateHash` and a cue digest (each cue's kind, actor, target,
+- **v19 replays are pinned** by a frozen fixture, `rpg/battle/v19-replays.fixture.json` with its helpers in
+  `v19-replays.fixture.ts` (H64's pattern), generated on the engine **before** this packet's change: six v19 fights with their inputs, action logs, final `battleStateHash` and a cue digest (each cue's kind, actor, target,
   amount, channel, element and weak flag, in order; never labels). The six: a Tier 1 world stage (R1's trees, Skill
   Ranks, the Flourish, the base regen, R2's gear and one accessory), two Tier 2 world stages (Pure and Dual weapons, a
   Split weapon moon, two accessory slots with a Toll Bell and an Onslaught Insignia), a Tier 2 capital Final, a Rift Duel
   stage and a Tier 2 Rift Horde stage, all on Auto with inherited Limit Breaks. Two tests replay it: under the live
-  engine, and in a file that mocks `caps.ts` to 19 with H64's `capsAt`. It regenerates only with `UPDATE_V18=1`, and
-  a third case asserts every input says `version: 18`. R1–R3's replay fixtures stay green.
+  engine, and in a file that mocks `caps.ts` to 20 with H64's `capsAt`. It regenerates only with `UPDATE_V19=1`, and
+  a third case asserts every input says `version: 19`. R1–R3's replay fixtures stay green.
 - **The groups** (`rpg/kinds.ts`): `RPG_WEAPON_GROUPS = ['heavy', 'lite', 'elemental', 'arcane']`, `RpgWeaponGroup`,
   `rpgWeaponGroup(kind)`; `RpgFocus = 'heavy-elemental' | 'lite-arcane'` and `rpgFocusKinds(focus)` (six kinds or
   four, **both channels**). Every twin pair of `RPG_KIND_PAIRS` sits in one focus. Labels (web, H95): `Heavy`, `Lite`,
@@ -157,23 +160,23 @@ D-row before this packet's own (step 10):
   - Their first slots are UT9's lead weapons (Greatsword, Fire, Katana, Dark, Greatsword, Light; Bow, Light, Katana,
     Fire, Bow, Light): a test pins them, since H92's signature tip reads the first slot.
 - **The focus in the damage stack** (WP31 step 4, CP39): `BATTLE_FOCUS_BONUS = 0.15` in `caps.ts` (the profile and the
-  Battle tab read it without the engine; H96 may take it to 0.10, CP39's fallback). In `battleDamage`, from v19, an ally
+  Battle tab read it without the engine; H96 may take it to 0.10, CP39's fallback). In `battleDamage`, from v20, an ally
   hit whose **own kind** (the `kind` argument: a weapon's first kind, never a Dual's partner) is in her branch's focus
   is ×1.15, after the weak multiplier, beside the Insignia's factor. It reaches every hit she makes: skills, Attacks,
   summons and farewells, splashes, a Bell's follow-up, class skills through their `via` weapon, and Limit Breaks (a hit
   of its own kinds: a Berserker's inherited Fire hit takes it, since one focus spans both channels). **The affinity
   never ships** (UT11): the focus is the only class factor in step 4.
-- **A healer's focus** (CP39, SB12): from v19 a Paladin's or Cleric's mend and Barrier shares are ×1.15 when the skill's
+- **A healer's focus** (CP39, SB12): from v20 a Paladin's or Cleric's mend and Barrier shares are ×1.15 when the skill's
   kind (its weapon's; a class skill's `via`) is in her focus, and **always for her class skills** (a utility class skill
   has no weapon to read; it is her branch's own). So the Guardian's Light Tome mends stay unboosted (SB12: Guardian ÷
   Bishop 0.935, inside ±10%).
-- **The class branch in the input:** `BattleAlly.classBranch?: 1 | 2` (absent means 1). From v19 only, and only for an
+- **The class branch in the input:** `BattleAlly.classBranch?: 1 | 2` (absent means 1). From v20 only, and only for an
   ally of tier 2 or more: anything else throws `Invalid battle ally`. The focus is derived from it, never frozen apart.
   `RpgProfile` gains `classBranch` (default 1).
 - **Class skills are nodes** of a class tree a branch: ids `<class>-<branch>.<depth>`, depths 3, 4, 5 at Class Rank 20,
   30, 40 (`brawler-berserker.3` … `cleric-oracle.5`; R5 adds `.6`). `node-identity.ts` and `RPG_ALL_NODES` know them, so
   the save and the engine validate them as they do weapon-tree nodes. `rpgHeldSkills` (H65) holds her branch's class
-  skills at open depths from tier 2 at v19, and `battleNodeDef` ranks them. They rank like any skill (CP32) and are equipped like any skill;
+  skills at open depths from tier 2 at v20, and `battleNodeDef` ranks them. They rank like any skill (CP32) and are equipped like any skill;
   18 held in Tier 2.
 - **The data is class-progression §7.2's twelve tables, exactly**, their Class Rank 20, 30 and 40 rows (the Tier 3 · CR
   50 rows are R5's capstones): power in single-target units before her hand, MP full-turn before her hand. The packet
@@ -193,13 +196,13 @@ D-row before this packet's own (step 10):
     carries its weapon tree's rider.
   - **MP:** the row's full-turn MP × her hand's MP (×0.6 a healer, ×1 the pure classes); a hybrid's pair class skill
     costs the row's MP once (two halves at ×0.5). Then × the tier factor below.
-- **New rules** (CP34's "a few rules", v19 only, each where the rows use it):
+- **New rules** (CP34's "a few rules", v20 only, each where the rows use it):
 
   | Rule | Skills | Resolves as |
   |---|---|---|
   | **Frenzy** | Frenzied Swing | A self status, 2 rounds: Brave 2 on her, and the damage she takes ×1.2 |
   | **A guard as a skill** | Vigil | She guards the Uma most threatened (the shown moves) for this round and the next, as the Guard action does for a round (`guardingFor`, a lapse round) |
-  | **A damage cut until her next act** | Rune Guard | The damage she takes ×0.7 until she next acts (a unit field set from v19 only) |
+  | **A damage cut until her next act** | Rune Guard | The damage she takes ×0.7 until she next acts (a unit field set from v20 only) |
   | **A Barrier on herself** | Vigil (36%) | `support.shield: 'self'`, the share × her scaling (H92's Long guard reuses it at a flat 10%) |
   | **A stance** | Honed Edge | A self status, 2 rounds: her Arms half's hits on a foe with a standing shield ×1.2 |
   | **A self status** | Attune (Faith 2), Frenzy (Brave 2) | On her, 2 rounds |
@@ -220,10 +223,10 @@ D-row before this packet's own (step 10):
   cleanse, pierce, ×1.3 on a Broken foe). tier2-classes §3 binds them all: no extra act, no Limit refund, no longer
   Break, no new damage kind, no party support from a Summoner. Name new status kinds `frenzy` and `honed` (the type
   forces label rows).
-- **Skill MP by tier** (A10, class-progression §6.6): from v19 a skill's MP is × 1 · 1.7 · 2.4 by tier, in place of
+- **Skill MP by tier** (A10, class-progression §6.6): from v20 a skill's MP is × 1 · 1.7 · 2.4 by tier, in place of
   today's × tier. If an earlier release already made it so (read `battleSkillFor`), there is nothing to do here; say so
   in the delivery.
-- **Auto** (`auto.ts`, from v19): a damaging class skill competes with her other skills on expected damage through its
+- **Auto** (`auto.ts`, from v20): a damaging class skill competes with her other skills on expected damage through its
   best `via` (the focus weapon that lands weak on the target, else her first focus weapon of the channel); a utility one
   is cast when its effect isn't already on the party (a buff, a stance) or when a shown move threatens an Uma for over a
   third of her HP (a guard, a Barrier, a damage cut), as Auto's support rule does today.
@@ -253,43 +256,43 @@ D-row before this packet's own (step 10):
    `RPG_REWORK_ENGINE` are H64's).
 2. **`rpg/kinds.ts`, `rpg/branches.ts`:** the groups, the focus, the branches and sets as decided.
 3. **`rpg/rules.ts`, `rpg/node-identity.ts`:** `RpgProfile.classBranch`; class-tree node ids; `rpgHeldSkills` with
-   class skills (tier 2 on, v19).
+   class skills (tier 2 on, v20).
 4. **`rpg/catalog.ts`** (or a `class-skills.ts` beside it): the 36 class skills from §7.2's tables, with summaries.
-5. **The engine** (`engine.ts`, `skills.ts`, `types.ts`): v19 accepted; `classBranch` and `via` validated; the focus
+5. **The engine** (`engine.ts`, `skills.ts`, `types.ts`): v20 accepted; `classBranch` and `via` validated; the focus
    factor and the healers' shares; the new rules of the table; the tier factor on skill MP. Every rules call passes the
    fight's version.
 6. **`auto.ts`:** class skills as decided.
 7. **`save/presets.ts`, `world/balance-party.ts`:** the branch argument (H96 builds balance parties by branch).
 8. **Tests:**
-   - `rpg/battle/v18-replays.test.ts`, `v18-replays-live19.test.ts` on the fixture; the `version: 18` case.
+   - `rpg/battle/v19-replays.test.ts`, `v19-replays-live20.test.ts` on the fixture; the `version: 19` case.
    - `rpg/branches.test.ts`: every kind in one group and one focus; each twin pair in one focus; the twelve branches and
-     their focuses as the table; both sets of every class are legal at engine 19 (`validRpgWeapons`) and lead with
+     their focuses as the table; both sets of every class are legal at engine 20 (`validRpgWeapons`) and lead with
      their channel; the twelve first slots equal UT9's list; every set keeps a legal Dual (R3's partner rule: a partner
      she doesn't already slot); `classPreset(…, 2)` dresses the reverse set at tier 2 and equals today's at tier 1.
-   - `rpg/battle/focus-v19.test.ts`: the same Sage Fire hit on a weak foe deals ×1.15 at v19 against v18; a Warlord's
+   - `rpg/battle/focus-v20.test.ts`: the same Sage Fire hit on a weak foe deals ×1.15 at v20 against v19; a Warlord's
      Greatsword hit is unboosted; a Warlord's Dual Bow + Greatsword hit is boosted on its Bow (its own kind) and a
      Berserker's Dual Lance + Katana is boosted on its Lance, never through the partner; an inherited Limit Break's Fire
      hit is boosted for a Berserker; a Guardian's Greatsword Barrier is ×1.15 and her Light Tome mend isn't; a Bishop's
-     Healing Circle is ×1.15; `classBranch` on a tier 1 ally at v19, or on any ally at v18, throws `Invalid battle ally`.
-   - `rpg/battle/class-skills-v19.test.ts`: table-driven over the 36: at Class Rank 40 in a tier 2 input each casts, its
+     Healing Circle is ×1.15; `classBranch` on a tier 1 ally at v20, or on any ally at v19, throws `Invalid battle ally`.
+   - `rpg/battle/class-skills-v20.test.ts`: table-driven over the 36: at Class Rank 40 in a tier 2 input each casts, its
      power units, hits, targets and MP (× hand × 1.7) as §7.2; `via` refused when it isn't hers, isn't of the channel, or
      isn't a focus weapon while she holds one; any weapon accepted when she holds no focus weapon of the channel; each
      new rule of the table on a fixed seed (Frenzy's Brave 2 and ×1.2 taken for 2 rounds; Vigil's guard over two rounds;
      Rune Guard's cut lifted at her next act; Shifting Spell twice in a row both +15%; Convergence's weak foe at full;
      Ravager's Wheel's tapped foe at full; Echoing Farewell twice; Lingering Call at 0.5; Unbroken Guard at 44%); no
      class skill refills the gauge or grants an act.
-   - `rpg/battle/auto-v19.test.ts`: Auto casts a Sage's Convergence through her Tome that lands weak; casts Rallying
+   - `rpg/battle/auto-v20.test.ts`: Auto casts a Sage's Convergence through her Tome that lands weak; casts Rallying
      Roar once, not again while Brave holds; Vigil when a shown move threatens over a third of an Uma's HP.
-   - `rpg/rules-v19.test.ts` (or R1's rules test): `rpgHeldSkills` holds her branch's class skills from tier 2 at
-     Class Rank 20, 30, 40, none in tier 1 and none at v18; skill MP × 1.7 in tier 2 at v19.
+   - `rpg/rules-v20.test.ts` (or R1's rules test): `rpgHeldSkills` holds her branch's class skills from tier 2 at
+     Class Rank 20, 30, 40, none in tier 1 and none at v19; skill MP × 1.7 in tier 2 at v20.
    - Every existing test passes unchanged; R1–R3's replay fixtures stay green.
 9. **Grep:** no rules call inside `rpg/battle/` relies on a default `engine`.
 10. **Docs:**
     - Log two D-rows (fetch `main` first; the next free numbers): R4's build decisions above, then this packet's.
     - [class-progression.md](../../design/tier-rework/class-progression.md) §7.2: "Built in H91 (D…): the groups with
-      the owner's names, the twelve branches, the focus in the stack, the sets and the class skills on engine v19, dark
+      the owner's names, the twelve branches, the focus in the stack, the sets and the class skills on engine v20, dark
       until H97."
-    - [architecture.md](../../game/architecture.md): the `battle/` line names v19 "built behind the switch, H97".
+    - [architecture.md](../../game/architecture.md): the `battle/` line names v20 "built behind the switch, H97".
     - `pnpm docs:update`: no diff.
 11. **Check it locally** in a desktop browser at 390×844 (never the iOS Simulator; your own ports, per the master
     prompt), on a scratch save: a Tier 1 and a Tier 2 world-map stage on Auto play as before, and the open fight in
@@ -298,7 +301,7 @@ D-row before this packet's own (step 10):
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass. Say the main JS number (gzip, of 230 KB).
-- [ ] The tests in step 8 pass, both v18 replay tests included; every existing test and R1–R3's replay tests pass
+- [ ] The tests in step 8 pass, both v19 replay tests included; every existing test and R1–R3's replay tests pass
   unchanged.
 - [ ] No rules call inside `rpg/battle/` relies on a default `engine`.
 - [ ] `docs/game/` is unchanged apart from architecture.md's line, `pnpm docs:update` leaves no diff, both D-rows are
@@ -309,8 +312,8 @@ D-row before this packet's own (step 10):
 
 ## Deliver
 
-- **Claude, as a delegated worker:** a pull request from `feat/h91-engine-v19-foundation` with one commit,
-  `feat(domain): engine v19 foundation and the class branches, dark (H91)`; the body says why (dark, one switch,
+- **Claude, as a delegated worker:** a pull request from `feat/h91-engine-v20-foundation` with one commit,
+  `feat(domain): engine v20 foundation and the class branches, dark (H91)`; the body says why (dark, one switch,
   replays pinned) and lists the build decisions. Fetch `main` before you push so the D-numbers are free. The main
   session reviews and merges it, then watches the deploy. Nothing on screen changes; nothing at the screen's edges.
 - **Flag it done:** after the merge, a `docs(handoff): H91 done (D…)` commit deletes this file, sets H91 to Done in

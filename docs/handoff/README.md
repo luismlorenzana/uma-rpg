@@ -1,7 +1,7 @@
 # Handoff: open work, ranked
 
-> **Status: 2026-10-26, after D218.** Classes v2 (H53–H63), the Rift (H44–H52) and the Tier rework's R1 and R2
-> (H64–H82: Tier 1's fight and economy, engine v17, save v28; v29 since D221) are built and live. The open work
+> **Status: 2026-10-28, after D237.** Classes v2, the Rift, the Tier rework's R1 and R2, and weaknesses v2
+> (engine v18, save v31) are built and live. The open work
 > is **the Tier rework's build**: six approved docs (D192–D197) shipping as five live releases, R1–R5, in 42 packets,
 > H64–H105 ([implementation.md](../design/tier-rework/implementation.md), D198). Each release is built dark behind its
 > own engine and save version and turned on by its own switch packet.
@@ -105,47 +105,47 @@ engines v19–v21 when H116 lands; the Rift's fronts stay.
 
 **Waves:** 1) H115 → 2) H116.
 
-**R3. Tier 2's weapons** (engine v18, save **v32**; its packets' "v29" reads v32, D221, D224, D230). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
+**R3. Tier 2's weapons** (engine v19, save **v32**; its packets' "v29" reads v32, D221, D224, D230). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H83 | Engine v18 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Ready |
+| H83 | Engine v19 foundation and weapon branches: Pure or Dual at G5, the partner table, a weak multiplier per weapon, the Branch Gem, re-forging; armor halves per piece | Claude | L | H82 | Ready |
 | H84 | Accessories, Tier 2: the second slot, the five branches, the kind cap, Tier 2's presets | Claude | M | H83 | Waiting |
 | H85 | The weapon moon: Full or Split, its jewels, outside the kind cap, the presets | Claude | M | H83 | Waiting |
 | H86 | The secondary profession from Tier 2 | Either | M | H82 | Ready |
 | H87 | Save v32 (dark; packet's v29): weapon branches, the second slot, the Branch Gem, the weapon moon, the secondary, armor halves | Claude | M | H83, H84, H85, H86 | Waiting |
 | H88 | R3's screens (inert): the G5 pick, accessory branches, the weapon moon, the secondary, armor halves | Either | L | H87 | Waiting |
 | H89 | R3's balance (dark): Pure against Dual, Full against Split, Tier 2's shields and most of its term, the Rift's Tier 2 fronts | Claude | L | H83, H84, H85, H86 | Waiting |
-| H90 | **R3's switch:** engine v18 and save v32 live; the manual | Claude | M | H87, H88, H89 | Waiting |
+| H90 | **R3's switch:** engine v19 and save v32 live; the manual | Claude | M | H87, H88, H89 | Waiting |
 
 **Waves:** 1) H83, H86 → 2) H84, H85 → 3) H87, H89 → 4) H88 → 5) H90.
 
-**R4. Tier 2's classes** (engine v19, save **v33**; its packets' "v30" reads v33, D221, D224, D230):
+**R4. Tier 2's classes** (engine v20, save **v33**; its packets' "v30" reads v33, D221, D224, D230):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H91 | Engine v19 foundation and the class branches: the focus, Heavy, Lite, Elemental and Arcane, class skills, branch 2's presets, Tier 2's skill MP | Claude | L | H90 | Waiting |
+| H91 | Engine v20 foundation and the class branches: the focus, Heavy, Lite, Elemental and Arcane, class skills, branch 2's presets, Tier 2's skill MP | Claude | L | H90 | Waiting |
 | H92 | Trees, Tier 2: line C, the Power or Break tip, the signature tip, ten equipped slots, LB+ at Bond 10 | Claude | L | H91 | Waiting |
-| H93 | Weaknesses by rank and the rest of Tier 2's term; the Rift's Tier 2 fronts; the pairings check | Claude | M | H91 | Waiting |
+| H93 | Weaknesses v2's WK8 split and the rest of Tier 2's term; the Rift's Tier 2 fronts; the pairings check | Claude | M | H91 | Waiting |
 | H94 | Save v33 (dark; packet's v30): a class branch per class, line C and tip picks | Claude | S–M | H91, H92 | Waiting |
 | H95 | R4's screens (inert): the class tree, the branch pick, line C and the tips, ★ signature tip, the focus, the group names | Either | L | H93, H94 | Waiting |
 | H96 | R4's balance (dark): each class's two branches, the damage stack, the Tier 2 mirror, the pace with the term | Claude | L | H92, H93 | Waiting |
-| H97 | **R4's switch:** engine v19 and save v33 live; the manual | Claude | M | H94, H95, H96 | Waiting |
+| H97 | **R4's switch:** engine v20 and save v33 live; the manual | Claude | M | H94, H95, H96 | Waiting |
 
 **Waves:** 1) H91 → 2) H92, H93 → 3) H94, H96 → 4) H95 → 5) H97.
 
-**R5. Tier 3** (engine v20, save **v34**; its packets' "v31" reads v34, D221, D224, D230):
+**R5. Tier 3** (engine v21, save **v34**; its packets' "v31" reads v34, D221, D224, D230):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H98 | Engine v20 foundation and Tier 3's weapons: Keen, Tempered, Evolved, the Tier 3 partners, re-forging | Claude | L | H97 | Waiting |
+| H98 | Engine v21 foundation and Tier 3's weapons: Keen, Tempered, Evolved, the Tier 3 partners, re-forging | Claude | L | H97 | Waiting |
 | H99 | Accessories, Tier 3 (the third slot and the step) and the second weapon moon | Claude | M | H98 | Waiting |
 | H100 | Trees, Tier 3, and the six masteries: depth 6, two lines held, the master slot | Claude | L | H98 | Waiting |
-| H101 | Weaknesses and Tier 3's term; boss shields 10; the secondary reaches Tier 2's work | Claude | M | H98 | Waiting |
+| H101 | Weaknesses v2's WK8 split and Tier 3's term; boss shields 10; the secondary reaches Tier 2's work | Claude | M | H98 | Waiting |
 | H102 | Save v34 (dark; packet's v31): two lines, the master slot, Tier 3's branches, the third slot, the second moon | Claude | M | H99, H100 | Waiting |
 | H103 | R5's screens (inert) | Either | L | H102 | Waiting |
 | H104 | R5's balance (dark): the masteries, Keen against Tempered against Evolved, the stack's ceiling, the pace with Tier 3's term | Claude | L | H99, H100, H101 | Waiting |
-| H105 | **R5's switch:** engine v20 and save v34 live; the manual | Claude | M | H102, H103, H104 | Waiting |
+| H105 | **R5's switch:** engine v21 and save v34 live; the manual | Claude | M | H102, H103, H104 | Waiting |
 
 **Waves:** 1) H98 → 2) H99, H100, H101 → 3) H102, H104 → 4) H103 → 5) H105.
 

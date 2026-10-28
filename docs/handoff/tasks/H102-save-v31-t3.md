@@ -10,7 +10,7 @@
 
 ## Why
 
-H98–H100 built Tier 3's toolbox as rules, engine v20 and save actions, with the save's types widened. The save itself
+H98–H100 built Tier 3's toolbox as rules, engine v21 and save actions, with the save's types widened. The save itself
 must hold it strictly and bring every existing world across:
 - **the shape** ([README](../../design/tier-rework/README.md) §9.3's "Tier 3's save", weapon-progression §11,
   extra-stats-progression §15, class-progression §14): two lines held a tree and the master slot;
@@ -72,7 +72,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   4. **Weapon moons:** `stars.moons` stays as it is. Empty reads Tier 3's preset (both moons); one entry is her moon 1
      and moon 2 reads its complement (H99). Her open `weapon-moon-1:*` nodes stay; `weapon-moon-2` opens none.
   5. Nothing else moves: Class Ranks, the class branch, the core map, jewels, wallets, parties, Bonds, the open
-     world-map fight (a v19 input replays and settles on v19).
+     world-map fight (a v20 input replays and settles on v20).
 - **Strict parsing, by tier** (each Tier 3 rule reads `rpgRework('t3')`, so before the switch a Tier 3 world parses as
   v30 does):
 
@@ -101,7 +101,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   twenty ascended Umas on Tier 2's shape, among them: a Brawler with Pure Greatsword at G7 and Dual Lance + Katana at G3;
   a Mage whose moon is Split Fire + Ice with four nodes open, slots Pendant and Insignia; a Spell Blade holding line C
   with a Break tip on one tree and the signature tip on her lead tree; a Cleric at Class Rank 50; an Uma with `moons: []`;
-  an open Tier 3 world-map fight at version 19, mid-round.
+  an open Tier 3 world-map fight at version 20, mid-round.
 - **The manual** is unchanged (H105 rewrites it). `pnpm docs:update` leaves no diff.
 
 ## Do
@@ -117,27 +117,27 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
      G0 by the rule (the Mage, wearing a Pendant and an Insignia, an Orb on her first weapon); `moons` unchanged (the
      Mage's one Split entry, the empty one); weapons, grades, open nodes, tips, Class Ranks and the open fight
      byte-identical; running `toV31` twice equals once; a malformed loadout or accessory list is left as it was.
-   - `save/save-v31.test.ts`, with `capsAt(20, …)`: the migrated fixture parses; its open v19 fight replays to the frozen
+   - `save/save-v31.test.ts`, with `capsAt(21, …)`: the migrated fixture parses; its open v20 fight replays to the frozen
      end; the Spell Blade's C tree holds C and A, her other trees A and B; unmigrated, the Tier 3 world fails on its
      accessory slots; each strict rule refuses its bad case (a `keen` in a Tier 2 world, a `keen` at G3, a `tempered`
      without `line`, a fourth slot, two of one family, two Split moons, a kind on both moons, a third moon entry, a
      second line equal to the first, a signature off her first slot's tree, a master slot holding a non-capstone or one
      also in her loadout, a master slot below Class Rank 50).
-   - `save/ascend-t3.test.ts`, with `capsAt(20, …)`: an Ascend from Tier 2 lands each of the twenty in Tier 3's shape
+   - `save/ascend-t3.test.ts`, with `capsAt(21, …)`: an Ascend from Tier 2 lands each of the twenty in Tier 3's shape
      (three slots keeping her forms, `moons: []`, the new loadout fields, branches carried, grades G0); unmocked, Ascend
      is Release 4's.
-   - H98's v19 replay tests and every existing test pass unchanged (the earlier migration tests included).
+   - H98's v20 replay tests and every existing test pass unchanged (the earlier migration tests included).
 6. **Docs:** weapon-progression §11, extra-stats-progression §15 and class-progression §14 gain "Save v31 built in H102
    (D…), live from H105." Log the D-row (fetch `main` first). `pnpm docs:update` leaves no diff.
 7. **Check it locally** (your own ports; a desktop browser at 390×844; never the iOS Simulator): load the fixture's
    shape as a scratch v30 save built from the CJS build; the API parses it and stores v30 unchanged; the Tier 3 world's
-   Stable, Gear tab, Observatory and world map read as before; its open fight continues on v19.
+   Stable, Gear tab, Observatory and world map read as before; its open fight continues on v20.
 
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (gzip, of 230 KB; `toV31` is in no chunk until
   H105 chains it).
-- [ ] The tests in step 5 pass; both v19 replay tests pass untouched.
+- [ ] The tests in step 5 pass; both v20 replay tests pass untouched.
 - [ ] `SAVE_SCHEMA_VERSION` is still 30 and `migrateWorld` doesn't call `toV31` (H105 does both); `BATTLE_ENGINE_VERSION`
   is 19.
 - [ ] `docs/game/` is unchanged, `pnpm docs:update` leaves no diff, the D-row is logged, the design docs have their

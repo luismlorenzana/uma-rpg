@@ -25,11 +25,11 @@ const halves = (a: BattleAction): string[] =>
 
 describe('the frozen v15 replays (H64)', () => {
   it('runs with the Tier rework’s fight and economy live (H72, H82)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(17)
+    expect(BATTLE_ENGINE_VERSION).toBe(18)
     expect([rpgV2(), rpgRework('fight'), rpgRework('economy'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
     expect(RPG_WEAPON_SLOTS).toBe(3)
     expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)
-    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.58 })
+    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.62 })
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {
