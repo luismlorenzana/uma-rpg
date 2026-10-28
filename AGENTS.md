@@ -8,10 +8,12 @@ as a Home Screen web app. Read this before changing anything.
 1. `docs/game/`: **the manual of the game as it is.** Look up any rule, list or screen there first. Its lists are
    generated from the code; after changing a rule, run `pnpm docs:update` and commit the result (CI fails on a stale page).
 2. `README.md`: status and the documentation map.
-3. Your task: a packet in `docs/handoff/tasks/`, or a slice spec in `docs/slices/` with its tasks in `docs/tasks/`.
+3. Your task: a packet in `docs/handoff/tasks/`. The current phase (Tier 1 hardening) and its queue are in
+   `docs/handoff/README.md`.
 4. `docs/design/` for the system you're changing: specs and intent. When a design changes a rule, update the manual in
-   the same change.
-5. `docs/decisions.md` (append-only), and the cross-game plan in uma-platform `docs/architecture.md`.
+   the same change. `docs/archive/` is history (old decisions, finished plans, superseded specs): never current rules.
+5. `docs/decisions.md` (append-only, from D238; D1–D237 are in `docs/archive/`), and the cross-game plan in uma-platform
+   `docs/architecture.md`.
 
 ## Hard rules
 

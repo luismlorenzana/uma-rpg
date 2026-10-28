@@ -1,11 +1,11 @@
 // Deterministic campaign battle reducer, engine v18 (weaknesses v2 live since H116, D237; v17 from H82 to H116, D218; W3, D91; classes
-// D86, docs/design/class-rework.md; Limit Breaks D311).
+// D86, docs/archive/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
 // next summons, a Cleric's skills carry a debuff or a buff, and an Orb adds its kind to every hit for weaknesses.
 // v7 adds up to eight foes, dual-element foes, solo elites that act twice and waves; v8 ranks, Might, Barrier and Regen
 // (D102–D104); v9 Heroes and their Learners' inherited Limit Breaks (D106); v10 drops the classes' own Limit Breaks (D112);
-// v11 two accessories (D124); v12 the combat balance rework (D141, docs/design/combat-balance.md): a ratio damage formula,
+// v11 two accessories (D124); v12 the combat balance rework (D141, docs/archive/design/combat-balance.md): a ratio damage formula,
 // Might as a share, Cleric and Summoner heals, Barriers and revives, Rally, charged foe moves with locks, Breaks that
 // strip foe buffs, and a breather between waves; v13 Might as D142's flat table again, on the v12 rules; v14 the Rift's
 // foe traits (D169, docs/design/rift.md §5): the ward, a third act and mixed lock sets, which only Rift foes carry;

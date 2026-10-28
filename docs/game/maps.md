@@ -1,10 +1,13 @@
 # The world map
 
-Where the fights are: a tier's world of five continents, each a map of 40 biome regions, each region a climb of five
-levels in twelve stages (D66, D71, D72, D91, D97). Everything is generated from fixed seeds, so ids and contents never move under
-a save. Lists here are generated from `packages/domain/src/world/` (`world.ts`, `biomes.ts`).
+Where the fights are: a tier's world of five continents, each a map of 40 biome regions and a capital, each region a
+climb of five levels in twelve stages (D66, D71, D72, D91, D97). Everything is generated from fixed seeds, so ids and
+contents never move under a save. Lists here are generated from `packages/domain/src/world/` (`world.ts`, `biomes.ts`,
+`capital.ts`, `roster.ts`); a stage's foes come from `rpg/campaign/enemies.ts` and their weaknesses from
+`rpg/campaign/weaknesses.ts`.
 
-The screens are in [sections](sections.md#scenario-gate), the fights in [combat](combat.md), and the pixel-art compositions in `docs/design/world/map-art.md`.
+The screens are in [sections](sections.md#scenario-gate), the fights in [combat](combat.md). The Rift's fights are
+generated apart and aren't on the map ([combat](combat.md#the-rifts-foes)).
 
 The World, Continent and Region screens default to pixel maps. **Map / List** in the sticky header remembers this
 device’s choice. Low levels are at the bottom; continents and regions open at the lowest uncleared frontier.
@@ -37,9 +40,7 @@ the start of its road and as **Spring · MP** in the header. It shares that Spri
 - **Progress belongs to the world**, not to a party: one world-wide record of wins per stage, MP per Uma, and one open
   fight at a time.
 - **Springs** refill the active party's MP, then recharge for two hours.
-- Each continent's **capital** (Lv 10 of its band) holds three authored Finals routes. All vanguards open immediately;
-  each champion opens after her own vanguard. Both have two escorts. Vanguards pay as sub-bosses, champions as bosses;
-  their EXP is halved so all three routes add about one level. Replays pay a quarter, and neither can be swept.
+- Each continent's **capital** (Lv 10 of its band) holds three authored Finals routes ([below](#capitals)).
 
 ## Biomes
 
@@ -73,18 +74,48 @@ The ring lead is only the first element answer. Engine v18 deals the rest of eac
 
 ### Element signatures
 
-A signature is one element, or a pair that each foe carries both of. From engine v18 it supplies the first element in
-her weakness list: the answer on **Fire > Ice > Lightning > Fire** and **Light ⇄ Dark**. The stage then deals the rest
-of her elements and her Arms from its two decks, so neighbouring foes differ while the stage stays fixed
-([combat](combat.md#weaknesses-shields-and-breaks)). A pair can lead with each ring answer. A **light+dark** foe has no
-ring answer outside her pair, so her elements are dealt from Fire, Ice and Lightning. The stage sheet shows her shield,
-`Weak:` and all three or four icons; the fight card uses the compact icons without the word.
+A signature is one element, or a pair that each foe carries both of. It sets her own elements, the ones her moves
+carry, and through them the first element of her weakness list: the ring's answer, on **Fire > Ice > Lightning > Fire**
+and **Light ⇄ Dark** (a Volcano's foes are weak to Lightning first). The stage deals the rest of her elements and her
+Arms ([below](#a-stages-foes)), so neighbouring foes differ while the stage stays fixed. A pair leads with each of its
+answers that isn't one of its own. A **light+dark** foe has no ring answer outside her pair, so her elements are dealt
+from Fire, Ice and Lightning.
+
+## A stage's foes
+
+How a region's stage makes its foes (`stageWaves` in `world/world.ts`):
+
+- **Count and HP:** a stage's formation sets how many foes stand and the HP they share, in regular foes' HP
+  ([formations](#formations-and-waves)); a stage in waves gives each wave a share of it.
+- **Rank:** every foe of a regular stage is regular rank. The elite (stage 11) is a sub-boss with two Key enemy guards;
+  the boss (stage 12) is two opening waves of regular-rank foes, then a boss (two on a continent's top row) with
+  sub-boss-faced guards.
+- **Role:** each formation foe's is drawn by the stage's seed from her biome's roles; an escort's leader is a striker,
+  and her guards, the elite's Keys and the boss's guards are guards. The elite's sub-boss is a captain, the boss a
+  champion ([combat](combat.md#foes)).
+- **Elements:** from the stage's signature. A pair signature gives every foe both, the lead alternating slot by slot
+  across the stage (Fire + Dark, then Dark + Fire, …), and her second element carries her second elemental move.
+- **Weaknesses** (engine v18, weaknesses v2, D235–D237): one dealer a stage hands out each foe's list in slot order
+  across its waves, from an Arms deck and an element deck shuffled by the stage's id. In Tier 1 a regular-rank foe (Keys
+  and guards too) is weak to 2 Arms + 2 elements, a sub-boss or a boss to 3 (2 + 1 or 1 + 2 by seed); in Tiers 2 and 3
+  every rank to 3, a regular by her role. Her elements lead with the ring's answer to her own; a foe never holds the
+  previous foe's Arms again while another card fits, so neighbours differ. The full rule is in
+  [combat](combat.md#weaknesses-shields-and-breaks).
+- **Shields:** by formation ([below](#formations-and-waves)); an elite's Key guards and a boss's guards 2, the sub-boss
+  6 and the boss 8.
+- **Acting twice:** a lone elite (`solo`) always; the elite's sub-boss and a lone boss from tier Lv 10 (D141).
+- **Strength:** each foe is `rpgFoe`'s for her role, rank and level ([combat](combat.md#foes)), × her share of the
+  formation's HP and the wave's; a regular foe gains 3.5% HP a tier level, and a region boss has half a champion's HP. A
+  formation foe's offense is the square root of her HP share against a pair's foe, at most a full foe's.
+- **Faces:** below.
 
 ### Faces
 
 Foes wear the faces of three private franchise packs (D135): PriConne, Azur Lane and NIKKE. The owner sorted every unit
-into a tier: Regular, Key enemy, Sub-boss or Boss. A region's franchise goes by level, not biome: PriConne holds the
-first continent, and Azur Lane and NIKKE alternate every five levels after it, roughly in proportion to their rosters.
+into a tier: Regular, Key enemy, Sub-boss or Boss. A region's franchise goes by level, not biome (`bandFranchise`),
+roughly in proportion to the packs' rosters: PriConne holds the first continent and Azur Lane the fifth, and on the
+second to the fourth Azur Lane takes the first five levels and NIKKE the last five. A capital's Finals take PriConne on
+the first continent, then Azur Lane on the even ones and NIKKE on the odd.
 
 <!-- live:faces -->
 | Continent | Rows 1–5 | Rows 6–10 | Capital |
@@ -141,18 +172,21 @@ Every unit has three images:
 | Boss (stage 12) | 3 | ×0.3, ×0.3, then the champion's wave in full |
 <!-- /live -->
 
-A region's twelve stages:
+A region's twelve stages (`stagePlan`):
 - **Levels:** stages 1–10 climb two at a time (1, 1, 2, 2 … 5, 5 in a Lv 1–5 region); the elite and the boss are at its
   top level.
-- **1–2:** teaching pairs.
-- **3–10:** the biome's formation × signature combinations, never twice in a row. Stage 7 is a crowd, 8–9 come in two
-  waves, and 10 is the biome's own formation.
-- **11:** the elite: a captain with two Key enemy guards (0.8 of a regular foe's HP, shield 2 each). She acts once a
-  round below tier Lv 10 and twice from tier Lv 10 (D135, D141, D170), and carries a charged move
-  ([combat](combat.md#charged-moves-v12)).
-- **12:** the boss: three waves ending with a champion and her two guards; from tier Lv 10 a lone champion acts twice
-  (D141). On a continent's top row (row 10) it's two champions, each with 55% of one champion's HP, acting once, and
-  one guard (D135).
+- **1–2:** teaching pairs, on the biome's first and second signatures.
+- **3–10:** the biome's formation × signature combinations in a seeded order, a formation never twice in a row while
+  another is left. Stage 7 is a crowd (a swarm, or a squad where the biome has none), 8–9 come in two waves (the second
+  in another of the biome's formations, on its next signature), and 10 is the biome's own formation on its first
+  signature.
+- **11:** the elite, on the biome's last signature: a captain with two Key enemy guards (0.8 of a regular foe's HP,
+  shield 2 each). She acts once a round below tier Lv 10 and twice from tier Lv 10 (D135, D141, D170), and carries a
+  charged move ([combat](combat.md#charged-moves)).
+- **12:** the boss, on the biome's first signature: two opening waves at 0.3 of a stage's HP each (the biome's own
+  formation, then a trio, each on a later signature), then a champion and her two guards (0.8 of a regular foe's HP,
+  shield 2); from tier Lv 10 a lone champion acts twice (D141). On a continent's top row (row 10) it's two champions,
+  each with 55% of one champion's HP, acting once, and one guard (D135).
 
 A stage in waves pays 1.5× EXP and Laurels.
 
@@ -176,6 +210,20 @@ Volcano `w1-4-2`, Lv 1–5:
 | 11 | 5 | sub-boss | Elite | fire | 3 | sub-boss |
 | 12 | 5 | boss | Volcano boss | fire + dark | 1 + 3 + 3 | acts twice, dual element, boss |
 <!-- /live -->
+
+## Capitals
+
+Each continent's capital (`world/capital.ts`) holds three authored Finals routes at Lv 10 of its band, each a vanguard
+and then a champion. All vanguards open at once; each champion opens after her own vanguard. Vanguards pay as sub-bosses,
+champions as bosses; their EXP is halved so all three routes add about one level. Replays pay a quarter, and neither can
+be swept.
+
+Its foes come from the scenario-chapter generator (`rpg/campaign/chapters.ts`), so they skip the region rules above:
+- a vanguard is a captain (sub-boss, shield 6) and a champion a champion (boss, shield 8), each with two escorts, regular
+  foes of the route's authored roles and elements, shield 3;
+- none of them acts twice, and they take neither the world's regular-foe HP step nor a region boss's half;
+- the sub-boss and the boss grow with the skill depth the continent's first level opens, as a region's do;
+- weaknesses v2 deals their lists as it does a stage's.
 
 ## Continents
 

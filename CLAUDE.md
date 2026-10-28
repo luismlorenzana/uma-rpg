@@ -4,10 +4,12 @@
   `roadmap.md` and `decisions.md` (also on GitHub at `luismlorenzana/uma-platform`).
 - **`docs/game/` is the manual of the game as built.** Read it first for any rule, list or screen. After a rule change,
   run `pnpm docs:update` so its generated lists match, and keep its hand-written pages in step with the code.
+- **The current phase is Tier 1 hardening** (from 2026-10-28): the queue and its packets are in
+  [docs/handoff/README.md](docs/handoff/README.md). Tier 2 and Tier 3 are deferred and will be re-planned after it.
+  `docs/archive/` is history (decisions D1–D237, finished plans and packets, superseded specs): never follow it as
+  current rules. New decisions go in `docs/decisions.md` from D238.
 - This game stands alone: its own save, rules, economy and Firebase/GCP project. It reads master data from uma-platform
   by stable IDs only, and never imports from uma-racer or uma-puzzle at runtime.
-- The RPG rules being ported live in uma-racer on `origin/main`: `packages/domain/src/rpg/`, `apps/web/src/screens/rpg/`,
-  `apps/web/src/ui/rpg/`, `apps/api/src/save/rpg-*`. The local uma-racer checkout may sit on an old branch.
 - Shared changes (master data schema, shared packages, original art) happen in a uma-platform session.
 - **One game or both:** [docs/change-protocol.md](docs/change-protocol.md). Changes to anything uma-kit draws (frame, bars,
   menu, side panel, sheets, Hub map, theme) go through uma-platform as a "Both apps:" request and a kit release, never a

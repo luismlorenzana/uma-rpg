@@ -41,7 +41,7 @@
 > "Follow-up to the profession flavor change, 2026-10-24".
 
 > **Authored 2026-10-24. Nothing here is built.** The fourth standalone doc of the Tier rework
-> ([README §5](README.md#5-the-plan), step 3.4). It absorbs [professions.md](professions.md) (the
+> ([README §5](README.md#5-the-plan), step 3.4). It absorbs [professions.md](../../archive/design/tier-rework/professions.md) (the
 > first round, as revised after the owner's first review), which stays as history, and supersedes every PR call
 > ([§16](#16-decisions) maps each one). Calls are **PP1–PP25**, each with a recommendation. No open questions.
 >
@@ -160,7 +160,7 @@ volume with every slot it can fill busy; the fighting party's next grade waits o
 ## 1. Today
 
 [Materials](../../game/materials.md), [loops](../../game/loops.md#craft-level) and
-[sections](../../game/sections.md#facilities) are the manual; [after the farm](../after-the-farm.md) (D144) is why it
+[sections](../../game/sections.md#wilds) are the manual; [after the farm](../../archive/design/after-the-farm.md) (D144) is why it
 looks this way. Code: `items/families.ts`, `economy/jobs.ts`, `economy/pacing.ts`, `save/work.ts`, `hub/places.ts`.
 
 | Piece | Today |
@@ -178,7 +178,7 @@ looks this way. Code: `items/families.ts`, `economy/jobs.ts`, `economy/pacing.ts
 | **What binds a roster** | **The Forge:** 120 crafts an Uma at two gathers each is 145 slot-hours; its five slots make 0.83 maxed Umas a day, whatever the roster |
 | **Each tier** | The same eleven facilities in its own world; Craft Level starts at 1 for an ascended Uma (`ascend` makes her a fresh `OwnedUma` and removes her from the old world, her gear left in its stock) |
 
-The Tier 2 proposal [second profession](../second-profession.md) (Q13) added Lore Level and three Tier 2 sites. This doc
+The Tier 2 proposal [second profession](../../archive/design/second-profession.md) (Q13) added Lore Level and three Tier 2 sites. This doc
 replaces it (PP18), as the first round did.
 
 ## 2. Profession types
@@ -621,7 +621,7 @@ grade gives × 1.8 the Might.
 
 | Option | One Uma, refined: Tier 2 · Tier 3 | A Tier 2 · 3 run of twenty | Verdict |
 |---|---|---|---|
-| **Amounts fixed; new pieces and the ladder only** (recommended) | **505 · 525** (+4.1%, +8.2%) | **28.5 · 29.7 days** | Inside a tenth; the run's four weeks are today's Tier 2 ([tier2-world §11](../tier2-world.md#11-a-runs-first-week)) |
+| **Amounts fixed; new pieces and the ladder only** (recommended) | **505 · 525** (+4.1%, +8.2%) | **28.5 · 29.7 days** | Inside a tenth; the run's four weeks are today's Tier 2 ([tier2-world §11](../../archive/design/tier2-world.md#11-a-runs-first-week)) |
 | Amounts × 1.8 and × 2.6 | 909 · 1,365 | About 51 · 77 days | Tier 3 takes two and a half months |
 | Times × 1.8 and × 2.6 (the same items, slower jobs) | Hours × 1.8 · × 2.6 | The same as above | The same cost, less visible |
 
@@ -969,7 +969,7 @@ Drawn in the [demand page](previews/prof-demand.html).
 *Versions re-planned by D198 (2026-10-25): the professions, the places and the compensation ship with **R2, Tier 1's
 economy (engine v17, save v28)**, so this section's "save v27" is v28 (the grant, Craft Levels to 1, the first launch's
 sheet; its switch packet runs the migration on a scratch copy of a full-shaped save first); the secondary's "v28" is
-**R3, Tier 2's weapons (v18, v29)**. See [implementation.md](implementation.md).*
+**R3, Tier 2's weapons (v18, v29)**. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 The Tier 1 rework's one migration, **save v27** ([README §9.3](README.md#93-save-v27-one-migration-every-world); v26 is
 taken on main, §13), every tier world alike, computed from the save alone. *Changed for the owner's direction,

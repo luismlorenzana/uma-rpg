@@ -1,4 +1,4 @@
-// RPG vocabulary (D86, docs/design/class-rework.md): ten weapons, ten damage kinds, five classes (six from classes v2,
+// RPG vocabulary (D86, docs/archive/design/class-rework.md): ten weapons, ten damage kinds, five classes (six from classes v2,
 // D179). Arms deal their own kind; a Tome deals its element. Every kind has one shape in every class: Greatsword and Fire
 // hit one foe hard, Axe and Ice every foe, Lance and Lightning random foes, Bow and Light one foe many times, Katana and
 // Dark twice.

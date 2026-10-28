@@ -1,4 +1,4 @@
-// The world map (D66, D71, D97; docs/design/world/): a tier's five continents, one per scenario and ten levels each, of 40
+// The world map (D66, D71, D97; docs/archive/design/world/): a tier's five continents, one per scenario and ten levels each, of 40
 // biome regions and five Springs. Each region is a climb of twelve stages over five levels: half a continent's regions
 // cover its first five levels, half its last five, so a party crosses a continent in two regions. Generated from
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the

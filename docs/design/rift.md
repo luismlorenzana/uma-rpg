@@ -2,7 +2,7 @@
 
 > **Approved 2026-10-21 (D161): every call as recommended. Built and live: H44–H52 (D168–D177), retuned for classes v2
 > in H60 and H63 (D186, D187).**
-> - The third of three linked docs, after [tiers](tiers.md) (what promotion does) and [classes v2](classes-v2.md) (the
+> - The third of three linked docs, after [tiers](../archive/design/tiers.md) (what promotion does) and [classes v2](../archive/design/classes-v2.md) (the
 >   classes the fronts are built around).
 > - It replaces the parked Tier Finale (H23, Q6) and its Gauntlet, Raid and Siege options.
 > - **Owner calls** are marked **R1**, **R2** and so on, with recommendations. [§12](#12-owner-calls) lists them all.
@@ -75,7 +75,7 @@ A **run** needs **twenty Lv 50 Umas**.
 2. **Clear the four fronts**, in any order. Each is a chain of stages taken in order (§5).
 3. **The Convergence:** once all four fronts are sealed, the final opens. It is four fights in a row, each a front's
    shape, each taken by a **different** party of the roster. All twenty Umas fight exactly once (§6).
-4. **Ascend:** the run is won. The twenty can ascend together to Tier t+1, as [tiers](tiers.md) §5 says.
+4. **Ascend:** the run is won. The twenty can ascend together to Tier t+1, as [tiers](../archive/design/tiers.md) §5 says.
 
 **Retries:**
 - Every Rift fight can be retried freely, with no attempt count, cost or deadline.
@@ -84,7 +84,7 @@ A **run** needs **twenty Lv 50 Umas**.
 
 **Built in H48 (D174):** the run rules in `save/rift.ts` (`@rpg/domain/rift`): opening, sign-up and an untouched run's
 cancel, the roster lock, one open Rift fight a world beside the world map's, fronts and seals, the Convergence's
-attempts, and Ascend ([tiers](tiers.md) §5). The manual's [Rift](../game/loops.md#the-rift) has the rules as played.
+attempts, and Ascend ([tiers](../archive/design/tiers.md) §5). The manual's [Rift](../game/loops.md#the-rift) has the rules as played.
 
 **Built in H50 (D175):** the page, `apps/web/src/places/rift/`, on the Battle page's `tier-finale` place, now "The Rift"
 with uma-art's `rift` building, open once the world has five Lv 50 Umas (`placeOpen`). It has sign-up, the fronts'
@@ -104,7 +104,7 @@ Tier sheet's Rift line is live. The screens are in the manual's [sections](../ga
 **Ward (R5).** On the Iron and Arcane fronts, damage from the wrong channel is halved again, **on top of** the unbroken
 halving. Off-composition parties can still win, slowly.
 - This is a soft wall. A hard immunity would make the fronts puzzles with one answer.
-- It's a foe trait in engine v14 (H44, D169), shipped ahead of classes v2 (engine v15, [classes v2](classes-v2.md) §8).
+- It's a foe trait in engine v14 (H44, D169), shipped ahead of classes v2 (engine v15, [classes v2](../archive/design/classes-v2.md) §8).
 
 **Each front's stages** (R3, the length):
 
@@ -135,7 +135,7 @@ the manual's [Rift's foes](../game/combat.md#the-rifts-foes). The Lv 55 Echo is 
 stops at Lv 50.
 
 **Tuned in H51 (D176):** every number against §11 with the balance simulation (`rift/balance.test.ts`, `SIM=1`). The
-measured results are in §11. The Duel's shields rose to 13–15 for [classes v2](classes-v2.md) §3.1's guard rail: today's
+measured results are in §11. The Duel's shields rose to 13–15 for [classes v2](../archive/design/classes-v2.md) §3.1's guard rail: today's
 best single act removes 12 points, a Limit Break any Uma can learn.
 
 **Classes v2 (H60, D186):** from engine v15 the generator reads `riftTuning(15)`, an override of `RIFT_TUNING` measured
@@ -189,10 +189,10 @@ With classes v2 a Spell Blade's and a Summoner's pair always deal both channels,
 party without them: Brawlers on Iron, Mages on Arcane, and a healer kept to her Arms blows (Iron) or her Tome spells
 (Arcane). They stay as harder titles (H60, D186).
 
-Achievements are **account-level** ([tiers](tiers.md) §3): earned once, shown in the Account, with the date and the
+Achievements are **account-level** ([tiers](../archive/design/tiers.md) §3): earned once, shown in the Account, with the date and the
 run. Each Uma of a winning run keeps the run's shared achievements in her history.
 
-**Promotion is the prize.** Ascending pays the new world its Ascension purse ([tiers](tiers.md) T5).
+**Promotion is the prize.** Ascending pays the new world its Ascension purse ([tiers](../archive/design/tiers.md) T5).
 
 ## 8. The Echoes: the repeatable farm
 
@@ -209,7 +209,7 @@ Rift is.
 
 **Why:** a Lv 50 Uma who switches class, say to Paladin for the Iron front, starts that class at Rank 1. Echoes are
 where she catches up, outside the promotion fights. They're also the "Lv 50 content" that
-[progression](progression.md) parked.
+[progression](../archive/design/progression.md) parked.
 
 **Sweeps** clear an Echo already won, with Sweep Tickets, as with stages.
 
@@ -219,7 +219,7 @@ adds pull but blocks a re-spec until the right day.
 **Built in H48 (D174):** Echo pay is a regular stage's EXP at the Echo's level for her, times two on her Class, Weapon,
 Armor and Accessory bars; Sweeps of a won Echo pay as wins, weapons even.
 
-**The save** (in v23, [tiers](tiers.md) §4), on each tier world:
+**The save** (in v23, [tiers](../archive/design/tiers.md) §4), on each tier world:
 ```
 rift: {
   runs: [{
@@ -277,11 +277,11 @@ every sub-boss has been met after three runs.
 
 | Piece | Where | Size |
 |---|---|---|
-| The tier foundation and save v23 | [tiers](tiers.md) §8 | M |
+| The tier foundation and save v23 | [tiers](../archive/design/tiers.md) §8 | M |
 | The ward, a third act and mixed locks (engine v14, H44) | `rpg/battle/` | M |
-| Classes v2 (engine v15) | [classes v2](classes-v2.md) | L |
+| Classes v2 (engine v15) | [classes v2](../archive/design/classes-v2.md) | L |
 | **The Rift generator:** fronts, stage chains, champions, the Convergence, Echoes, the cross-franchise picker that prefers new faces, levels and locks | `packages/domain/src/rift/` | L |
-| The run rules: sign-up, the roster lock, fights, seals, attempts, ascend (with [tiers](tiers.md) §5) | `save/rift.ts` | M |
+| The run rules: sign-up, the roster lock, fights, seals, attempts, ascend (with [tiers](../archive/design/tiers.md) §5) | `save/rift.ts` | M |
 | The Rift page: fronts and their chains, the Convergence assignment, Echoes, the run's roster, Ascend | `apps/web/src/places/rift/` | L |
 | Achievements: rules, the Account's list, cut-ins on earning one | domain + web | M |
 | **Art** (a ChatGPT packet, uma-art): the Rift building for the Battle page, four front crests, achievement badges in uma-art's `ui` atlas | uma-platform | M |
@@ -294,7 +294,7 @@ every sub-boss has been met after three runs.
 | The right party, on-curve with the matching classes, first try on Auto | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 96%, 98%, 87%; Arcane 100%, 100%, 99%; Duel 100%; Horde 98%, 91%, 94%. Champions: Iron 61%, Arcane 64%, Duel 68%, Horde 67% |
 | The wrong party (all-magic on Iron, all-physical on Arcane) | ≤ 30% a stage, ≤ 10% a champion | On Arcane, Iron's party: 0–1% a stage, 0% the champion. On Iron, Arcane's party: 60%, 98%, 89% a stage (**missed**, below), 7% the champion |
 | The Convergence, right parties | About 50% an attempt | 51% (49 of 96); its fights 76%, 91%, 79%, 99% |
-| The Duel's guard rail ([classes v2](classes-v2.md) §3.1) | Every class's best single act < the Duel's lowest shield | 12 against 13 (shields 13–15; drafted 10–12, which 12 broke) |
+| The Duel's guard rail ([classes v2](../archive/design/classes-v2.md) §3.1) | Every class's best single act < the Duel's lowest shield | 12 against 13 (shields 13–15; drafted 10–12, which 12 broke) |
 | A run's length, at the owner's pace | About 2–3 weeks: 52 fights, the retries, and Echo time to raise new classes | About 58 fights on Auto: 52 for the 48 stages and 6 for the Convergence's two attempts, plus Echo time |
 | Echo pacing | A Lv 50 Uma raises a fresh class to Rank 30 in about 40 Echo wins | 9 wins at Lv 50 and 55, 17 at Lv 45 (R6's 2×); Rank 50 in 20 and 40 (below) |
 | Echoes, how hard (drafted in H51) | Lv 45 ≥ 80% with one Uma re-specced; Lv 50 ≥ 80% and Lv 55 about 50% on curve | Lv 45: 100% on every front. Lv 50: 99–100%. Lv 55: Iron 98%, Arcane 100%, Duel 100%, Horde 36% (below) |
@@ -339,7 +339,7 @@ falls to 22% and the Horde to 0%. It stays at ×1.22, five levels' worth.
 These are the Rift's numbers as it plays: the same tables with classes v2's guided parties (D178 point 5: Iron 2 Brawler, 2 Spell Blade, Paladin; Arcane 2 Mage,
 2 Summoner, Cleric; Duel 2 Brawler, 2 Mage, Paladin; Horde 2 Spell Blade, 2 Summoner, Cleric) on curve at Lv 50 as v2
 Umas (`balanceMember(…, { engine: 15 })`), first try on Auto, 96 fights a stage, on the v15 numbers of §5 and classes
-v2's tuned classes ([classes v2](classes-v2.md) §9). H63's mirror (stronger Spell Blades, a lighter Summoner) took Iron's
+v2's tuned classes ([classes v2](../archive/design/classes-v2.md) §9). H63's mirror (stronger Spell Blades, a lighter Summoner) took Iron's
 champion from 66% to 75%; its champion scale went ×1.17 → ×1.2 (§5) and every number below is H63's, H60's in brackets.
 
 | Target | Value | Measured with classes v2 (H63, D187; H60's in brackets) |

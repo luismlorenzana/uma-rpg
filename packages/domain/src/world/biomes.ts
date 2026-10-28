@@ -1,4 +1,4 @@
-// The world map's biomes (D66, docs/design/world/regions.md): each sets the element signatures its foes carry, the
+// The world map's biomes (D66, docs/archive/design/world/regions.md): each sets the element signatures its foes carry, the
 // formations and roles it leans to, and its color on the map.
 import type { RpgElement } from '../rpg/kinds'
 import type { RpgFoeRole } from '../rpg/campaign/enemies'

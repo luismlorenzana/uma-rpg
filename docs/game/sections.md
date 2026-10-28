@@ -1,52 +1,76 @@
 # Game sections
 
-Every screen and what you do there. The place list is generated from `packages/domain/src/hub/places.ts`; screens live in
-`apps/web/src/places/<place>/`, registered in `places/registry.tsx`.
+Every screen and what is on it, as the game runs today (engine v18, save v31). This page says where things show; the
+rules and numbers behind them are on the other pages, linked from each section. The place list comes from
+`packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
+`places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
 
 ## Getting in
 
-The gates, in order: uma-kit's `BootGates` (uma-platform P56, SD3) with this game's steps (`apps/web/src/app/Root.tsx`):
+The kit's `BootGates` with this game's steps (`app/Root.tsx`):
 1. Splash.
-2. "Sign in with Google" (Firebase, through `uma-kit/auth`); after a failed redirect it says "Sign-in didn't finish".
-3. The boot: the device save, else the server's. If it fails, a retry.
-4. On first launch: pick a trainer name, then 20 Uma Tickets.
-5. The start page: the last Hub page viewed on this device, when the app opened at `/`. The boot also picks the tier
-   on screen ([Tiers](#tiers)).
+2. **Sign in with Google** (Firebase, through `uma-kit/auth`). A failed redirect says "Sign-in didn't finish. Try
+   again."
+3. The boot: the device save, else the server's. If it fails: "The game couldn't open on this phone." and Try again.
+4. First launch only: "Welcome, trainer", a trainer name (1–24 characters) and **Enter the Hub**. Tier 1 opens with 20
+   Uma Tickets.
+5. The start page: the last Hub page viewed on this device (`hub/start.ts`), Town Hall the first time. The boot also
+   picks the tier on screen ([Tiers](#tiers)).
 
-The kit's toast offers "Update ready · Restart" when a new build is out.
+Once master data and the save are both in, the calling repair (D220) runs once (`CallingRuleRepair`). The kit's
+`UpdateNotice` says "Update ready · Restart" when a new build is out.
 
 ## The Hub
 
 Four pages, in the bottom bar's order: **Town Hall**, **Learning**, **Battle** and **Wilds** (D147). Tap a tab or swipe
-sideways to the next page. Each page is a pixel-art map fitted to the screen (uma-kit's Hub scene, Phaser).
+sideways to the next page. Each page is a pixel-art map fitted to the screen (`hub/HubScreen.tsx` on uma-kit's `HubMap`,
+Phaser).
 
-The app runs in uma-kit's shell, the same as uma-racer's (`hub/Shell.tsx`, D147):
-- a fixed full-screen frame;
-- the account bar on top;
-- the bottom bar docked full width to the screen's bottom edge, its panel running under the home indicator (D149).
-
-Place pages open between the two bars and scroll inside them. A fight hides both bars.
-
-- Places are buttons over the map, each with:
-  - a name pill;
-  - slot pips showing the working Umas' faces in progress rings (on the Wilds, 28 pt in a half arch over the
-    building's top, each with her Craft Level on its lower left, D233);
-  - a "Ready" badge (on the Wilds, at the building's foot under the arch).
-- **Town Hall's plaza** (D150): up to five small chibis stand on the road, each bobbing on its own beat.
-  - The featured Uma is in front. She is the one picked on this device, or else the highest Uma Level.
+- **A place** is a button over its building: a name pill, its slot pips, a Ready badge when work waits, a lock while
+  shut.
+  - On the Wilds, four pips hang over each roof in a half arch: a free slot is a small dot, a working Uma her face in a
+    progress ring with her Craft Level on its lower left. The Ready badge sits at the building's foot (D233).
+  - A hall's four pips are its seats' Heroes. Town Hall's and Battle's places have none.
+- **Town Hall's plaza** (`hub/Featured.tsx`, D150): up to five small chibis stand on the road, each bobbing on its own
+  beat.
+  - The featured Uma is in front: the one picked on this device for this tier, else the highest Uma Level.
   - The active party's other members stand round her, then the next highest levels.
-  - Tap any of them for her sheet: Fight, Profile or "Feature another" (`?sheet=featured&uma=:id`).
   - An outfit without a chibi stands as a round token of her icon.
-- A floating **Collect all · N ready** button collects every finished job.
-- **Taps:** a place opens its **quick look** in the side panel (`/:page?peek=:id`). Its **Enter** button opens the
-  place's page (`/:page/:placeId/*`). The Scenario Gate skips the quick look and opens its page at once.
-  A Wilds place's quick look uses its compact live slot rows: start, collect, repeat and stopped-queue recovery stay two
-  or three taps from the map.
-- **Routes:**
-  - `/` returns to the last page you viewed.
-  - Every screen is a place (D31), with no other top-level routes.
-  - A link to a place under another page, such as an old link or a push, moves to the place's own page. A link to a
-    place R2 removed (the Ley Spring, Crystal Cavern, Quarry, Meadow or Fossil Dig) opens the Wilds page.
+  - Tap one for her sheet (`?sheet=featured&uma=:id`): her bust, level and title, **Fight** (the Scenario Gate),
+    **Profile**, and **Feature another**, a grid of the tier's Umas.
+- **Collect all · N ready** floats over the map while any job is done. It collects every finished job and says "+12
+  collected".
+- **A tap** opens the place's quick look in the side panel (`/:page?peek=:id`), with **Enter {place}** when it has a
+  page. The Scenario Gate skips its quick look and opens its page at once.
+- **Quick looks** (each place's `Peek`; a place without one shows its line):
+  - the Stable: Umas owned out of all, Uma Tickets (Tier 1) and the latest four unlocks;
+  - the Party Hall: full parties out of twenty, Umas placed out of owned;
+  - a hall: its four seats, each with its Hero's face, its Limit Break and "3/10" Learners or "Open";
+  - a Wilds place: [its compact page](#wilds);
+  - the Rift: [its line and fronts](#the-rift);
+  - the Warehouse, the Exchange and the Observatory: their line from the list below.
+- **Routes** (`app/router.tsx`): `/:page` and `/:page/:placeId/*`, nothing else (D31). `/` returns to the last page
+  viewed. A link to a place under another page (an old link, a push) moves to the place's own page. A link to a place
+  that no longer exists (the Ley Spring, the Quarry, the Workbench, the Forge, the Charm Shop…) opens the page it names,
+  without a quick look.
+
+**The pages' maps:**
+- **Town Hall:** the Stable and the Party Hall in the top corners, the Warehouse and the Exchange in the bottom ones,
+  the plaza between. The Account is a Town Hall place with no building.
+- **Learning:** the six Halls of Heroes face each other in pairs across the road (Brawler Dojo and Mage Tower, Spell
+  Blade Salle and Summoner Circle, the Paladin Bastion and the Cleric Chapel), with the Observatory below (H59).
+- **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
+  D148): the Scenario Gate above, the Rift below. The Rift keeps the Tier Finale's id, `tier-finale`, and draws
+  uma-art's `rift` building (`Place.frame`, H50).
+- **Wilds:** fifteen places in five rows of three, a row a line, in the order Metal, Vegetables, Wood, Fish and Stone.
+  The gathering place is on the left, its workbench on the trunk road, its making place on the right (D230, H114). The
+  rows sit at y 0.155 … 0.795 so they keep an even spacing on a short screen (D233).
+
+**A place can wait on its world** (`placeOpen` and `placeLock`): the Rift opens with five Lv 50 Umas in Tiers 1 and 2.
+Shut, its building carries a lock, its quick look says "Opens at five Lv 50 Umas · 3/5" (or "No Rift in this tier yet"
+in Tier 3), it has no Enter, the menu locks it, and a link to its page goes to the quick look.
+
+Every place, page by page. Its line shows in the place's (i), and is the quick look of a place without its own:
 
 <!-- live:places -->
 ### Town Hall (`town`)
@@ -98,20 +122,380 @@ Place pages open between the two bars and scroll inside them. A fight hides both
 | Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
 
-The Wilds hold fifteen places (H114, FL31–FL32): five rows of three, one row a trade. Its gathering place is on the left,
-its processing workbench stands on the trunk road, and its making place is on the right; each has four slot pips in an
-arch over its roof. The rows sit at y 0.155 … 0.795 so they keep an even spacing on a short screen (D233). Town Hall keeps its four places in the corners around the
-plaza. The Battle page holds the Scenario Gate and the Rift on a drill ground of its own, with flagstone roads,
-banners, weapon racks, training dummies and torches (H31, D148). The Rift draws uma-art's `rift` building (its place keeps
-the Tier Finale's id, `tier-finale`, and names its frame in `Place.frame`, H50).
-- **A place can wait on its world** (`placeOpen` and `placeLock`, `hub/places.ts`): the Rift opens with five Lv 50 Umas
-  in Tiers 1 and 2. Shut, its building carries a lock, its quick look says "Opens at five Lv 50 Umas · 3/5" (or "No
-  Rift in this tier yet" in Tier 3), it has no Enter, the menu locks it, and a link to its page goes to the quick look.
+### A place's page
 
-### Wilds
+`places/PlacePage.tsx`: uma-kit's place header over a scrolling body, between the bars.
+- **Back** returns to where the page was opened from: a sub-view to its place, a place to its Hub page.
+- The place's name and its (i), which shows its line.
+- A counter: Uma Tickets on the Stable (Tier 1 only), full parties out of twenty on the Party Hall, Laurels on the
+  Scenario Gate and the Exchange.
 
-The fifteen places have four slots each at ×1.25 from day one, with nothing to upgrade ([loops](loops.md#craft-level)). The
-halls seat Heroes instead ([Halls of Heroes](heroes.md)).
+A shut place's page sends you to its quick look.
+
+## Town Hall
+
+### Stable
+
+Routes: `/town/stable`, then `outfit/:id` (her profile) and `outfit/:id/skills` (her Skills alone, reached from the
+world map's party bar).
+
+**The roster** (`StablePage.tsx` on the kit's `AlbumChrome` and `AlbumGrid`; rows and facets in `album/rows.ts`):
+- "Stable" and "26/270 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
+  to unlock; a later tier lists only its own Umas ([Tiers](#tiers)).
+- **Views:** five columns of faces (the default), three columns of bust cards, or a one-column list. Under each face:
+  her title (or her rarity stars) and her best aptitudes; sorted by Craft Level or Class Rank, that number instead.
+- **Corner badges:** her class top left, a crosshair bottom left on a target, and bottom right **NEW** or the green
+  can-upgrade mark.
+- **Search** finds her name, title or template name ("ironhide" finds every Ironhide).
+- **Filters**, with a "Can upgrade" quick pick:
+  - Collection: rarity, real horse (mare, stallion or unknown), New, Free now;
+  - Aptitudes: surface, distance and running style at A or better;
+  - RPG: active class, Can upgrade;
+  - Template: Calling (six; an owned Uma's pick counts), Stride (three), Knack (five) and Signature (Pendant, Orb, Bell,
+    Insignia);
+  - Trade: "Mine · Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge" and "Monster Den ·
+    Lapidary", each with its head count, locked outfits too.
+- **Seven sorts:** Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
+  Class Rank. Owned Umas stay before locked in either direction; ties go to the newest release, then the name.
+- **Device preferences** (`album/preferences.ts`): the query and view, and up to 20 saved views. Nothing goes in the
+  save. **NEW** marks an outfit added since this device's first visit and not opened yet; the first visit marks the
+  catalogue of the day as seen.
+- **Can upgrade** (`upgradesFor`, as her active class; `album/upgrades.ts`): a weapon, armor or accessory slot she can
+  raise now (its made item in the Warehouse, her level allowing), an accessory slot at G1 or more with no family yet, or
+  a jewel in the Warehouse that opens one of her nodes now.
+
+**Her profile** (`OutfitProfile.tsx` in the kit's `ProfileFrame`; its layout rules are [profile
+UX](../design/profile-ux.md), D229):
+- **Header:** "All outfits" (back), her bust, her name and title, "Lv 50 Uma Level", her rarity stars and her **template
+  chip**, and the **target** icon top right (up to ten targets; the Wilds plan what maxing them takes, D100).
+- **The template chip** ("★ Clever Spellwright"; locked outfits too; a green dot while an owned Uma's calling is open)
+  opens **Her template** (`TemplateCard.tsx`, `template-view.ts`; [her calling and
+  template](classes.md#her-calling-and-her-template)):
+  - her name, then Calling, Stride and Knack, each with what it read ("Calling ← Pace A, Wit 102 ≥ Power 90", "←
+    picked"; "Stride ← Medium A"; "Knack ← Wit +20%");
+  - her trade: "Trade · Monster Den · Lapidary";
+  - her Flourish and its state: "★ Even pace · as a Mage · on", or "· no effect as Brawler" (a locked outfit's has no
+    state);
+  - on an owned Uma, her **Signature** ("Signature · Pendant · +10 now · worn", or "Wear a Pendant") and her **Moon**
+    ("Moon · I HP +20 (Lv 16) · II DEF +8 (open)").
+- **Under the header:** her EXP bar ("1,200 / 2,400 EXP", or "Max level · 300 EXP banked"), her calling pick card while
+  it is open, then one row of three: her class ("Mage · Rank 40"; opens Skills), "Craft · Lv 30", and "Party · Party 1",
+  "Working · Mine · 1h 20m", "Fighting · Open fight" or "Party · Free" (opens her place, or the Party Hall).
+- **The calling pick card** (CP29), for a Pace or Late Uma until her calling is confirmed:
+  - "Her calling · choose once" and two tiles: emblem and class, "★ {her name with that pick}", "★ Even pace as a Spell
+    Blade", the trade it gives and its head count in her world ("Forest · Armorer · 8 Umas"), and on the suggested one
+    "Suggested · Power 96 over Wit 88". Her pick is selected; tapping the other picks it.
+  - **Confirm**, and "Her first win confirms it." At Uma Lv 1 a pick moves her class too.
+  - While she has work started or queued, the other tile is off and the card says "Finish her work first": the pick
+    moves her trade.
+- **A locked outfit** shows **Unlock · 1 Ticket** and "20 Uma Tickets left", confirmed in the kit's `UnlockConfirm`
+  ("Unlock {name}?", Uma Tickets 20 → 19, "Unlocking is final.", **Unlock for 1 Ticket**), and only the Racing tab. An
+  outfit another tier's world owns shows "In Tier 2" instead; in a tier above 1, an outfit nobody owns shows "Unlocked
+  in Tier 1" (D5).
+- **Tabs:** Skills, Battle, Gear, Work and Racing; the last one opened is remembered on the device. Gear carries a green
+  dot while a slot can be raised or a jewel set.
+
+**Skills tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassPicker.tsx`, `WeaponSheet.tsx`; the rules are
+[classes](classes.md#skills-depths-lines-and-ranks) and [skill trees](skill-trees.md)):
+- **Class and trees**, one row of four: her class (emblem, name, "R40") and her three weapon trees (the weapon's glyph,
+  her line's letter A or B, the slot's grade "G3", and the green mark when it can be raised). A tree button shows that
+  tree below.
+- Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Mage" outside her
+  calling's class; her Class Rank bar and "Depths 1–3 open".
+- **The class button** opens **Class**: her root ("Spell Blade · Arms ×0.72 + Tome ×0.44" and her Flourish), then the
+  six classes in two rows of three, each with its emblem and Class Rank. Switching is free.
+- **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
+  rank; a tap unequips it. Empty squares are dashed. **Auto** while the game picks for her, else **Back to auto**.
+- **The tree** ("Lance tree", with **Change**): two trunk nodes, a fork, then branches A and B down to depth 5, each
+  under a square A or B button.
+  - A node is a circle with the skill's kind marks and a badge: its rank, or the Class Rank that opens a closed depth.
+  - Held nodes have an accent ring; equipped ones are filled, with a green dot. The other branch is dimmed and a closed
+    depth faded. The lines fill along her path.
+- **A node's sheet:** its name, five rank pips, "Rank 3 · next at Class Rank 14" ("Rank 5" at the top, "Class Rank 30"
+  while closed), "Depth 4 · Branch B", its line at her Skill Rank ("one foe · 2 hits · 1.4× · 12 MP · cuts through the
+  shield"), and **Equip** or **Unequip** on a held node at an open depth.
+- **A branch's sheet** ("Lance · B · Impale"): its three skills, each with "Depth 3 · Class Rank 20" and its line;
+  **Take branch B** (free; her equipped skills follow), or "Her branch".
+- **Change** opens the slot's sheet ("Slot 1 · Arm"): each weapon of the slot's channel with its grade line ("Lance · G2
+  · Might 4 · weak ×1.3"), Held or Hers, and "swaps with slot 2" when she holds it in another slot. Grades are raised on
+  the Gear tab.
+- Its (i) covers the class, switching, one healer a party, depths, the fork, Skill Ranks, equip slots and weapon grades.
+- Below: **Inheritance**, with her Hall seat as a Hero ("Brawler Hero · {Limit Break} · Bond 3/10"), or her Heroes'
+  Limit Breaks with "Bond 2/10 · 60%" (" · former Hero" for one she left), or "No inheritance yet"; each opens its hall.
+  Then **Class Ranks**: six cells, each class's rank and bar.
+
+**Battle tab** (`umaBattleSheet`, `packages/domain/src/save/sheet.ts`; the rules are
+[combat](combat.md#where-damage-comes-from)):
+- "Fights as Mage" with "5/7 skills · Party 1" (opens Skills).
+- Four groups in three columns, every row always listed, 0 included:
+  - **Offense:** ATK, M.ATK, Might for each of her three weapons ("Fire Tome +8"), Accessory ("Pendant: +2 on her three
+    kinds", "Orb: Fire +8", "Bell: Katana 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None"),
+    and Signature ("+10 ★") while she wears her family;
+  - **Defense:** DEF, M.DEF, Evasion;
+  - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), MP with what she
+    regains a round ("296 · +13 a round"), and ★ Flourish ("Even pace · 1% a round, up to 4%", or "No effect as
+    Brawler");
+  - **Other:** Limit Break head start ("1 / 12").
+- The six core battle stats show their total, then in brackets what gear adds (blue) and what Extra Stats add (green),
+  her moon's points starred. Its (i) gives the stat formula in words.
+- Then her five core stats (Speed, Stamina, Power, Guts, Wit) and the date she was unlocked.
+
+**Gear tab** (`GearCardV3.tsx`, `gear-equip.ts`, `gear-v3.ts`, `PresetButton.tsx`; H107, D223; the rules are
+[classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): two views,
+**Equip** first and **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), the choice remembered
+for the session.
+- **Equip**, what she wears:
+  - the standard preset: "Use standard preset · Spell Blade · Physical · Pendant", or "Standard preset on". It sets her
+    class's default weapons and puts her ★ family on its kind; no grade moves.
+  - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
+    armor" with the five slots' icons and grades. A slot at G0 is an empty frame.
+  - **Accessory · G4**: four family buttons in one row, her ★ family first, then Bell, Pendant, Orb and Insignia; the
+    one she wears is ringed. Below, the selected family only: its name; what it does at the slot's grade ("+2 on her
+    three kinds"; "From G1: …" at G0); "★ Her signature: ATK and M.ATK +10" on her family; "No Greatsword in her slots"
+    on a Bell or Orb left on a kind she no longer holds; for a Bell or an Orb, one kind button per weapon she holds; and
+    one button: **Equip**, **Equipped**, or "Switch to Lance".
+- **Upgrade**, what she spends:
+  - **Grades**, in three groups: Weapons ("Greatsword · G3 · Might 8 · weak ×1.3"), Armor ("Head · Helm · G2 · DEF +8")
+    and Accessory ("Pendant · G4 · +2 on her three kinds · ★ +10", "Bell · Katana · G0 · counts from G1", "Accessory ·
+    G0 · Pick a form"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
+    green mark, or says why not ("Needs Lv 16", "Needs 1 Arms Gem G4", "Already G10").
+  - A row's sheet: "Now · G3 · Might 8 · weak ×1.3", "Next · …", an armor slot's half ("Her class's half · Helm"), the
+    raise button, and **Up to G6** when the Warehouse holds several grades, which lists the items and asks Cancel or
+    Raise.
+  - **Extra Stats:** "3 to set" while jewels can be set, "8/22 open · map ›" (her Observatory map), and "Total with
+    armor: HP +55 · …".
+
+**Work tab:** her job ("Working at Mine", the item, "1/3" and the time left; opens the place), then "Craft Lv 30 · Mine
+· Weapon Forge" (her trade), "10 gathered in 7h 13m", her Craft EXP bar, and "grade 6 open · grade 7 at Craft Lv 31".
+The "10 gathered" time is still the old farm's gather (54 → 36 minutes an item, no ×1.25), not the trios' steps the
+places use ([loops](loops.md#craft-level)).
+
+**Racing tab:** her aptitudes (Surface, Distance and Style, each grade on a coloured chip), **Her template** (Calling,
+Stride, Knack and Flourish, each with its note: what it read or "Picked"; "Active" or "No effect as Brawler"; a locked
+outfit's "As a Mage"), her racing base stats and growth, and her unique skill (racing).
+
+### Party Hall
+
+Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
+- **The list:** twenty parties, each with its name, "5/5 · Edit" (green when full) and five faces with level, class and
+  her signature family ("★ Pendant"). The lead has an accent ring and a flag. A party with two healers says "One healer
+  a party" in the warning colour.
+- **The editor:** "All parties" (back), the name with **Rename**, then five slots (face, name and "Lead · Mage"; an
+  empty one "Slot 3 · add an Uma") and the healer note.
+- **An empty slot** opens the shared picker, "Choose an Uma": owned Umas, highest Uma Level first. One in another party
+  is dimmed with "Moves from Party 2" and moves here when picked (D46). "In this party" and "In a fight" are disabled.
+- **A filled slot** opens her sheet: **Make party lead** (or "Party lead"), **Swap with another Uma**, **View profile**,
+  "Recall from Mine · what's made is kept" while she works, and **Remove from Party 1**. Picking a lead never moves
+  anyone; a party without one leads with its first member. Working Umas fight like the rest (D119).
+
+### Warehouse
+
+`places/warehouse/` on the kit's `ShelfView` (H106, D222; what each item is: [materials](materials.md); prices:
+[loops](loops.md#the-exchange)):
+- "2,100 materials · 102 made items", then seven shelves: **All**, Metal, Wood, Vegetables, Fish, Stone and **Made
+  items**. Every stack is on All and on its own shelf.
+- An icon grid with counts: each line raw G1–G10, then refined G1–G10; made items by family (Arms Gems, Tome Ink, Armor
+  Fittings, Accessory Settings, Planet Jewels, Moon Jewels), grade by grade.
+- Grade chips on every shelf: Every grade, Highest, and one per grade held.
+- A stack's sheet: what it is ("Metal · G3 · raw · Refines into Iron Ingot", "Grade 5 · Raises an Arms weapon one
+  grade", "Opens Planet III", "Opens a moon's node II"), how many are held, and Sell ×1, ×10 or All for Laurels.
+
+### Exchange
+
+`ExchangePage.tsx` and `exchange-rows.ts` (prices: [loops](loops.md#the-exchange)):
+- The Laurels held, and "Speed 500 · Sweep 20".
+- **Tickets** (the kit's `ExchangeRows`): Speed Ticket, "30 minutes off any job", and Sweep Ticket, "Instant replay of a
+  cleared stage".
+- **Raw materials** behind five line tabs (Metal first; the tab is remembered for the session): the line's ten raw
+  grades, "G3 · have 12". One not stocked yet is locked with the win that stocks it: "After the tier's first win"
+  (G1–G5) or "After a win on continent 3" (G6–G10).
+- A row's sheet: ×1, ×5, ×10, ×25 or a typed amount, the total, and "Need N more" when the Laurels fall short.
+- **Manuals** (its (i): Class Marks bank past a max Class Rank, and a Manual's price and EXP): **Read a Class Manual**
+  with "Class Marks 3,000". It opens the shared picker (highest Uma Level first, locked Umas disabled), then "Which
+  bar?": her six classes' Class Rank bars, each with ×1 and ×5 (D102).
+
+### Account
+
+Reached from the top bar's initial (`/town/account`). `places/account/AccountPage.tsx` on the kit's `AccountPage`:
+- **Trainer name**, with Save.
+- **Tier n wallet**, the active tier's: Uma Tickets, Uma Shards and Laurels in Tier 1; Laurels, Speed Tickets and Sweep
+  Tickets in a tier above 1.
+- **Appearance:** System, Light or Dark, kept on this phone (D147).
+- **Notifications** ("Work and training done"): the switch, a note when it can't turn on (not the Home Screen app,
+  blocked, unsupported), and **Send a test** while it is on.
+- **The Tier rework's grant**, only in a world migrated through save v28: "The Tier rework's grant · 63,800 Speed
+  Tickets", which reopens "The Wilds are rebuilt".
+- **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "3 of 14", the earned ones
+  newest first with "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest dimmed with how each is earned. It
+  lists Tier 1's four seals and Rift Conquered, every other world's, and the nine titles; a seal reads "Iron Seal · Tier
+  1", and Untouched shows its front's crest.
+- **About:** Tier world, Trainer since, Umas unlocked in every world ("26 / 270"), Cloud save, Game data, App build.
+- "Update ready · Restart" while a new build waits, and **Sign out**.
+
+**"The Wilds are rebuilt"** (`grant/GrantSheet.tsx`, `grant-lines.ts`; the grant is in
+[loops](loops.md#the-tier-reworks-grant)): it opens by itself once per world with an unseen grant (never over a
+world-map fight), and from the Account's row (`?sheet=grant`). Its lead (still "Ten professions, each in its own
+place."), "+63,800 Speed Tickets" and the hours of work, then What went, What came back, What stays, and By Uma ("Craft
+Lv 30 → 1 · 1,470", with her trade). **To the Wilds** and **Later** both mark it seen.
+
+## Learning
+
+### Halls of Heroes
+
+The six halls share `places/halls/HallPage.tsx` (D106; the rules are [Halls of Heroes](heroes.md)).
+- "Brawler Hall of Heroes" with its (i), and "Four Heroes, each with her own Limit Break, and their Learners."
+- **Four seats**, each with: the Hero's bust (or **+ Hero**), "Seat 1 · Limit Break", its name and kind icons, the twin
+  sets it answers ("Answers Fire · Light", CP28), its line, and the Hero's name or "No Hero yet". Under a seated Hero:
+  "Learners 3/10", each a face with her Bond level and bar, and **+** to add one.
+- **The pickers** ("Hero for {Limit Break}", "Learner for {Limit Break}"; the shared picker, highest Uma Level first):
+  Umas that can't take the seat stay listed with why ("Locked", "Already seated here", "Already a Hero", "A Learner:
+  leave her Heroes first", "A Hero", "Already learning here", "Already has 2 Heroes", "10 Learners at most"). A Learner
+  candidate shows "Bond 2 · 1/2 Heroes" and the sets the seat adds to her weapons' ("Adds Light, Dark, Twilight").
+- **A Hero's sheet:** she uses the seat's Limit Break at full strength; her own Bond with the seat; **Change Hero**;
+  "Empty this seat (its 3 Learners leave; their Bonds stay)".
+- **A Learner's sheet:** "Bond 4/10 · 70% strength", its bar and the EXP to the next, "Inherits {Limit Break}, and
+  {another} from her other Hero.", and "Leave this Hero (her Bond stays)".
+
+### Observatory
+
+`places/observatory/ObservatoryPage.tsx`, route `/learning/observatory/:outfitId` (the rules are
+[loops](loops.md#extra-stats), [jewels](materials.md#jewels) and [Extra
+Stats](../design/tier-rework/extra-stats-progression.md)). It opens on the Uma its route names, else the highest Uma
+Level.
+- Her face and name with "Open 8 of 20 · ★ 1 of 2"; a tap opens the shared picker, "Observatory Uma" (locked Umas
+  disabled, working ones selectable).
+- **Extra Stats**, with its (i): "Each node opens with its jewel, in order. Every open node counts."
+- **Her map:** the Planet in the middle; Prowess, Vigor and Guard around it, five nodes each; and her own moon's two, "★
+  Longblade". An open node is filled. A tap opens its sheet: "Prowess II"; what it gives ("+4 to every stat", "as
+  Brawler ATK +6, M.ATK +0", "HP +30, MP +6", "DEF and M.DEF +6"; her moon's "Tireless · HP +20" and "DEF +8"); and its
+  jewel ("needs a Planet Jewel III · opens at Lv 21", or "Planet Jewel III · Open").
+- Prowess's split ("Prowess · Brawler 100/0: ATK +6, M.ATK +0"), then the six stats' totals, her moon's part starred.
+- **Set:** each jewel in the Warehouse that opens one of her nodes now ("Moon Jewel I ×4", "Opens Prowess I · …",
+  **Set**), or "No jewels ready." A jewel that fits several nodes asks which one.
+
+Its quick look and (i) show the place's line, which still reads "a Sun, eight planets and their moons".
+
+## Battle
+
+### Scenario Gate
+
+Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:continent` and `fight`
+(`places/scenario-gate/`; the world is [the world map](maps.md)).
+
+- **Every map screen's header:** its name and levels, **Map / List** (remembered on the device), the active party bar,
+  and **Resume the open fight** while one is open.
+- **The active party bar** (`ActiveParty.tsx`):
+  - "Party 1 · swap", which opens "Who fights?": every party with members, by its lead's face and its highest level
+    ("5/5 · Lv 50"). Off while a fight is open.
+  - **Edit parties** (the Party Hall), then "A fight needs five" or "One healer a party" when it applies.
+  - The five: face with "Lv 50", the MP she carries between stages (Springs refill it), her class. A tap opens her
+    Skills.
+- **World:** five islands on the map; in the list, "Tier 1 · five continents" ("four" for a partial tier), each
+  continent with its crest, "Lv 1–10" ("T2 Lv 1–10" in Tier 2) and "21/480 stages cleared". The tiers above with no
+  world yet show "Tier 2 locked".
+- **Continent:** forty regions in ten rows of four, climbing from the bottom, under two headings: its first five levels,
+  then its last five (D97). **Springs** sit between rows ("◆ Spring · refill the party's MP", or "recharges in 1h 20m";
+  off during a fight). The **Capital** shows "Capital · Lv 10" and "2/6". Each region shows its biome icon, name and
+  "5/12" or "Cleared ✓".
+- **Region:** "Lv 1–5 · 3/12 cleared", **Spring · MP** beside Map/List, and its twelve stages on a path or in a list.
+  Each stage: its number (a boss or elite stage, her leader's face), name with ★ (boss) or ♛ (elite), elements, "Lv 3 ·
+  2 waves · 9 foes", and "✓ ×3", "open" or "locked".
+- **Capital:** three routes, each with its name, its line, its elements and "1/2": a Vanguard ♛, then a Champion ★.
+- **The stage sheet:** "Lv 3 · Stage" ("Elite", "Region boss"; a capital's "Vanguard" and "Champion"), its elements and
+  waves, then the foes by wave (`battle/FoeRow.tsx`): face, elements, name, Boss or Elite, "Acts twice", and "Shield 4 ·
+  Weak:" with her weakness icons, Arms first (up to four, [combat](combat.md#weaknesses-shields-and-breaks)). Footer:
+  **Fight** ("Fight again" once cleared; "Locked", "Fight open" or "One healer a party", disabled), and on a cleared
+  regular stage **Sweep · 12** (the Sweep Tickets held).
+- **The Sweep sheet** ([Springs, replays and Sweeps](loops.md#springs-replays-and-sweeps)): the tickets held, its (i),
+  and ×1, ×5, ×10 or "All 12". Its result shows like a win ("Swept 5 times"), with **Sweep again · 7**.
+
+**The fight** (`FightScreen.tsx`, the Phaser stage in `battle/scene/BattleScene.ts`; the rules are
+[combat](combat.md#the-actions)). It fills the screen, dark in either appearance:
+- **Header:** Back (the fight stays open), the region and the stage, the wave chip ("W2/3"), "Round 4", **Auto**, the
+  speed (1×, 2×, 4×; both remembered on the device) and the menu (**Back to the map**, **Give up**).
+- **Stage:** the foes on top, six to eight in two rows; the party below as busts.
+- **Foe cards:** elements, the ward's mark (her front's crest, in the Rift), name, HP bar, the shield badge ("!" while
+  broken, pale while Steeled) and up to four weakness icons (no "Weak:" from engine v18; a v16 or v17 fight keeps it);
+  "Locks" and their kinds while she charges; and her intents ("{move} → all ~120", "Charging: {move}", "2/3"). With an
+  ally picked, the damage a tap would deal shows above each foe ("85 −1", "BREAK"; yellow when weak).
+- **The party:** HP and MP bars, "640 HP · Barrier 37" or "KO", status chips, and **LB** when her Limit Break is ready.
+- **Controls:** a line that says what a tap does ("{Uma}: tap a rival to attack with her Lance"; a pair's two halves,
+  "Tap a rival: Fire Tome Attack + Greatsword Attack · 16 MP", a Summoner's Tome half first; "Tap an ally for {Uma} to
+  guard"). While cues play it reads them ("{Uma} ★ +30 HP", "{Uma}: ★ Barrier 37", "{Uma} +13 MP", "{foe} BREAK!").
+  Below: her three weapons, then **Attack**, **Skills (n)** and **Guard**.
+- **The Skills sheet** ("{Uma} · 120 MP"): her equipped skills in weapon order, each with its weapon, kinds, reach,
+  hits, support ("heals the most hurt, Regen 2 rounds"), the foes weak to it, and its MP; one she can't afford is off.
+- **The Limit Break sheet:** her own, then "From her Heroes", each with its Hero's face and strength ("70%"), at 0 MP; a
+  pair picks an Arms and a Tome skill; "Ready on her next turn".
+- A fight keeps its own engine's rules and labels (`state.engineVersion`), so a fight opened before an engine change
+  finishes as it began.
+- **The result** (`FightResult.tsx`): the stage, **Victory!** or **Defeated**, "6 rounds · First clear!", chips for
+  Laurels, Uma Shards and Uma Tickets, and "+40 Class Marks". For each Uma: her EXP and level ("Level up! Lv 9 → 10"),
+  her Class Rank bar with a line for each skill that rose ("{skill} reached Rank 3", or "{skill} opened" for a new
+  depth), and her Bonds ("Bond up! 2 → 3"). A loss says "No penalty", with tips in its (i). Buttons: **Fight again** (or
+  **Retry**) and **Back to the map**.
+
+The fight screen plays a **fight source** (`battle/fight-source.ts`, H50): the world map's open fight, the region's
+title and biome, and foes sized by rank; the Rift hands it its own.
+
+### The Rift
+
+The end-of-tier event ([the Rift](../design/rift.md), H50; its rules in [loops](loops.md#the-rift) and
+[combat](combat.md#the-rifts-foes)). Routes: `/battle/tier-finale`, `front/:front` (and `front/:front/:stage`, its sheet
+open), `convergence`, `signup` and `fight`; screens in `places/rift/`. It opens once the tier's world has five Lv 50
+Umas (Tiers 1 and 2).
+- **Quick look:** the Rift's line ("The Rift is open", "Rift run · 2 of 4 fronts sealed", "Rift won · ready to ascend")
+  and "12 of 20 at Lv 50 to sign up", or the run's four fronts ("5/12", "Sealed").
+- **The Rift:**
+  - "Tier 1 · 21 Lv 50 Umas" (or "Tier 1 · Run 1 · 2 of 4 fronts sealed"), and **Resume the open fight** when a Rift
+    fight is open;
+  - no run: **Sign up twenty**, disabled with "12 of 20 at Lv 50" until twenty are;
+  - a run: its four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · 2 Spell Blade ·
+    Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", "Fight 2 of 4 ·
+    Arcane", "Won");
+  - a won run: **Ascend to Tier 2**;
+  - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, "✓" on each won;
+  - **Roster:** the run's twenty faces, with **Cancel sign-up** while the run is untouched.
+- **Sign up twenty:** **Four parties** (the party picker: four parties of five Lv 50 Umas) or **Twenty Umas** (the Uma
+  picker, twenty, "Below Lv 50" disabled), then a sheet of the twenty faces: "They fight this Rift together until it
+  ends." and **Sign up**.
+- **A front's chain:** its crest, name and count, its ward ("Wards Tomes" on Iron, "Wards Arms" on Arcane) and guidance,
+  then twelve stages ("Stage 1" to "Champion"), each with "Lv 50 · 3 waves · 15 foes" and its leaders' faces: cleared ✓,
+  the next ringed (the page opens on it), the rest locked. Any stage opens its **stage sheet**:
+  - the foes by wave as the fight will have them (`FoeRow`: tagged Boss or Elite by face, "Acts twice" or "Acts three
+    times", "Shield 6 · Weak:" and her icons, the ward);
+  - on the next stage, a party of the roster (the best fit for the front's guidance first; a party that can't fight
+    there, "One healer a party" among the reasons, is disabled), the **guided weapons** (each member's three build
+    weapons under her face, "—" where the build has no place for her; **Use the guided weapons** sets them in one save,
+    or "On the guided weapons"), and **Fight**.
+- **The Convergence:** four rows, Iron, Arcane, Duel and Horde, each with its fight's size, **Foes** and a party
+  (suggested from the fronts' guidance; a party picked for another row is disabled). **Begin** when the four cover the
+  twenty (else "Missing: …") starts the attempt and its first fight. With an attempt on: its four parties, "Won · 6
+  rounds", "Next" or "—", **Fight: Arcane** and **End this attempt** ("The next attempt starts from Iron.").
+- **An Echo's sheet** ("Iron Echo · Lv 55"): its foes, a party of five Lv 50 Umas, its guided weapons, and **Fight**
+  ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5** with the Sweep Tickets held; a Sweep's result shows
+  like a win.
+- **The fight:** the shared fight screen on the Twilight Rift's backdrop, titled "Iron front · Stage 5", "Convergence ·
+  Fight 2 of 4" or "Echo · Iron · Lv 55". Foes stand and are tagged by their face; a warded foe carries her front's
+  crest. Back and the menu return to the Rift ("Give up" ends a Convergence attempt).
+- **The result** (`RiftResult.tsx`): Victory! or Defeated and the rounds; then "Stage 5 cleared · 5/12", "Iron sealed",
+  "Fight 2 of 4 won", "The Rift is won!" or "The attempt is over"; each Uma's Class Rank bar and rank-up lines and the
+  Class Marks (no EXP line). Buttons: **Next stage** (the same five again while one party holds them, else the stage's
+  sheet), **Retry**, **Next: Arcane**, **Fight again** or **Sweep again · n**, and **Back to the Rift**. An achievement
+  earned plays its cut-in first, one at a time.
+- **The finale** (`RiftFinale.tsx`, H52): on the win that wins the run, before its achievements' cut-ins, a dark cut-in:
+  "Tier 1", "The Rift is won", the champions' faces four to a row, revealed one after another (at rest under reduced
+  motion), "Twenty Umas, four fronts, 14 champions" and **Continue**. The faces are every boss face of the four fronts'
+  champions, Iron to Horde, then of the Convergence's four fights, each once.
+- **Ascend** (`AscendSheet.tsx`): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their
+  gear returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", the reason
+  when it can't yet, and **Ascend**, which runs behind the tier veil and lands on the new tier's Town Hall.
+
+## Wilds
+
+The fifteen places, three to a line: each gathers, processes or makes, for the trade that works it
+([loops](loops.md#craft-level), [materials](materials.md#lines), [the farm by
+line](../design/tier-rework/farm-by-line.md)).
 
 <!-- live:facilities -->
 | Place | Profession | Job | What it does | Its trade (callings) |
@@ -135,338 +519,50 @@ halls seat Heroes instead ([Halls of Heroes](heroes.md)).
 Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
 
-**A place's page** (`places/work/FacilityPage.tsx` and `PlaceV3.tsx`), one page for all fifteen:
-- **Header:** "Mine · Mining · 4 slots · ×1.25", with **Collect here** when work is ready and **Finish all · 14 Speed
-  Tickets** when two or more of its slots are running. Finish all asks "Finish 3 jobs for 14 Speed Tickets?", or says
-  "Needs 14 Speed Tickets" when the wallet is short. A place whose trade has no Uma in the world says so under it:
-  "Open shop: no Brawler in this world" ("no Paladin or Cleric" at every place in the vegetables row).
-- **One shared slot row per slot:** a free row starts a job; a working row shows its Uma, item, progress and queue.
-  Ready work has **Collect** and **Repeat**. A running row has **Speed up** (−30m or Finish), **Queue next**, queue
-  ordering and removal, and **Recall** with a preview of what is paid, returned or lost.
-- **For your targets** (D100, D126): a horizontal strip of what the targets still need here. Each icon names its grade,
-  a badge is the short count, a check means work already covers it, and tapping a short item opens that job in a free slot.
-- **A stopped queue** (SC3): a card naming the Uma, the job that couldn't start and what it lacked, with **Restart** and
+**A place's page** is one page for all fifteen: `places/work/FacilityPage.tsx` (the provider: save, trade, words) and
+`PlaceV3.tsx` (the page), with `PlaceV4.tsx` and `place-view-v4.ts` (the What step, sizes, help and quick look), on the
+kit's `uma-kit/work`.
+- **Header:** "Mine · Mining · 4 slots · ×1.25" and its (i) (what the place does, "Grade g opens at Craft Lv 5g − 4",
+  and the open shop). A place whose trade has no Uma in the world says so: "Open shop: no Brawler in this world" ("no
+  Paladin or Cleric" on the Vegetables row). **Collect here** when work is done; **Finish all · 14 Speed Tickets** when
+  two or more slots run, which asks "Finish 3 jobs for 14 Speed Tickets?" (Yes, Not now), or says "Needs 14 Speed
+  Tickets".
+- **Four slot rows.** A free one ("Free") starts a job. A working one shows her face, the item, "· 1/3", and the time
+  left or "Done".
+  - Done work has **Collect** and **Repeat**.
+  - A running row has **Speed up**: **−30m** (one Speed Ticket), **Finish · 4**, or "Buy 2 and finish · 20" when short,
+    with a warning when a ticket's minutes would go unused.
+  - Its **More** sheet has **Queue next** (three at most, each movable earlier or removable) and **Recall**, which
+    previews what is collected, what comes back, the minutes lost and the queued jobs dropped ("Nothing is lost.").
+- **For your targets** (D100, D126): a strip of what the targets still need from this place, each icon with its grade
+  and short count. Tapping a short one opens that job in a free slot with that count.
+- **A stopped queue** (SC3): "{Uma}'s queue stopped", where and how long ago, what it lacked, **Restart** and
   **Dismiss**.
-- **The shared job sheet:** Who → How many → What. A chosen amount stays selected while What changes (and clamps if a
-  recipe allows less). Its Uma picker puts Craft Level on each face and opens her trade's Umas first (free, then highest
-  Craft Level); the rest are greyed "Another trade", unless the place is an open shop. Locked Umas and workers show why
-  they cannot start. Fighting does not block work (D119). How many follows the picked job (D233), each size with its
-  time: ×1, ×2, ×3, ×5, ×10, ×15 or ×20 to gather or process (about half an hour to 8 hours); a make's sizes stop at
-  about 8 hours (Armor Fittings to ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet
-  Jewel ×2), plus the most she has inputs for. A targets link keeps its own count, up to the most. The sheet opens on the
-  highest grade her Craft Level opens.
-- **A gathering place's What step** (`PlaceV4.tsx`, `place-view-v4.ts`): its line's ten raw items as tiles, G1–G10 in two
-  rows of five, a locked one saying "From Craft Lv 11"; the chosen item's card says "Metal · G3 · raw · Refines into Iron
-  Ingot" and what's held.
-- **A workbench's What step:** its line's ten refined items as tiles. Picking one processes its raw form one for one;
-  sizes ×1 … ×20. A tile's card says "Metal · G1 · refined · Refined from Copper Ore".
-- **A making place's What step:** only its item's G1–G10 chips (the Lapidary has Planet I–V and Moon I–V rows), with
-  sizes up to about 8 hours. A chip's recipe card says "Arms Gem G3 · Raises an Arms weapon one grade", "Iron Ingot ×7", and how
-  many are held.
-- **Quick look:** "Mine Workbench · Smelting · 4 slots · ×1.25", the open shop's line, a gathering or workbench's ten
-  icons, or a making place's chips, and the four slots' rows.
-
-**The Learning page** holds the six Halls of Heroes (D106; classes v2, H59), one page shared by all six
-(`places/halls/HallPage.tsx`). The mirrors face each other across the road: Brawler Dojo and Mage Tower, Spell Blade
-Salle and Summoner Circle, the **Paladin Bastion** (a stone keep with a blue banner) and the Cleric Chapel; the
-Observatory stands below. Each hall shows its four seats: the seat's Limit Break with its kinds and the twin sets it
-answers ("Answers Fire · Light"; engine v16, CP28), its Hero large on the left, and her Learners below with their Bond
-Levels. Tap an empty portrait to seat a Hero, a Hero to swap her or empty the seat, `+` to add a Learner, and a Learner
-to see her Bond or send her away. Its help says a Learner's inherited hits use the higher of her ATK and M.ATK. See
-[Halls of Heroes](heroes.md).
-
-Hero and Learner choices use the shared Uma picker, highest Uma Level first, then newest release and name. Ineligible
-Umas remain visible with their reason: locked, already seated, already a Hero or Learner, or a seat/parent limit. A
-Learner candidate's row adds the sets the seat answers that her active class's weapons miss ("Adds Light, Dark,
-Twilight"); one that adds none shows nothing.
-Small seats and Learners use faces; the large Hero portrait uses a bust. Eligibility and Bonds still come from the RPG.
-
-## Town
-
-### Stable
-
-Routes: `/town/stable`, then `outfit/:id` and `outfit/:id/skills`.
-
-- **Roster:**
-  - All, Owned and Locked tabs, with counts.
-  - Shared album views: **five columns of faces** by default, three columns of bust cards, or a one-column list.
-  - Search, and a Filters sheet: rarity; surface, distance or running style A+; sex; New; Free now; active class; can
-    upgrade; a **Template** group after RPG (engine v16, UT15): Calling (six), Stride (three), Knack (five) and, from R2,
-    Signature (Pendant, Orb, Bell, Insignia), an owned Uma's calling pick counting; and a **Trade** group (PP21): "Mine ·
-    Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge", "Monster Den · Lapidary", each with its head
-    count, locked outfits too. Search also finds her template's name ("ironhide" finds every Ironhide). "Can upgrade" is
-    also the sheet's quick pick.
-  - Seven sorts: Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
-    Class Rank. Owned Umas stay before locked in either direction. Level ties use newest release, then name.
-  - Corner badges: class top left, target bottom left, and bottom right New, or a green mark when
-    she can upgrade.
-  - Device preferences remember the query and view, plus up to **20 saved views**. The old Stable view and sort move
-    over once, then their v2 key is removed. Nothing is added to the game save.
-  - **New** means an outfit added since this device's first album visit, not seen yet. Opening its profile clears
-    the badge; today's catalogue is marked seen on the first visit.
-  - **Can upgrade** (H34): one tap makes her stronger now, as her active class. Making doesn't count.
-    - Gear: a made item in the Warehouse that raises one of her slots now (the next grade, her level allowing), or an
-      accessory slot at G1 or more with no family yet.
-    - Extra Stats: a jewel in the Warehouse that opens one of her nodes now.
-    - Skills never count: no skill costs points (engine v16, CP14).
-- **An Uma's profile:**
-  - **Header** (the kit's `ProfileFrame`, SD3): her bust, rarity and **template chip**, name, title and Uma Level, a
-    target toggle; then her EXP, her **calling pick card** while it's open, a class chip (her class, Class Rank and her
-    three weapons' icons), her Craft Level, and a Working or Party card. A locked one shows Unlock, confirmed in the
-    kit's `UnlockConfirm` (Uma Tickets N → N − 1).
-  - **The template chip** (engine v16, UT14): "★ Clever Spellwright" after her rarity stars, locked outfits too, a small
-    tag that wraps to two lines beside "Mark target"; a green dot while an owned Uma's calling is open. It opens **Her
-    template**: her name, the three readings with their sources ("Calling ← Pace A, Wit 102 ≥ Power 90", or "← picked";
-    "Stride ← Medium A"; "Knack ← Wit +20%"), then her Flourish and its state ("★ Even pace · as a Mage · on", "· no
-    effect as Brawler"; a locked outfit's has neither), her **Signature** (the family her knack names) and **Moon** lines,
-    and her trade: "Trade · Monster Den · Lapidary".
-  - **The calling pick card** (CP29): above her class chip, for a Pace or Late Uma until her calling is confirmed. "Her
-    calling · choose once", two class tiles (emblem, class, "★ Clever Spellfencer" her name with that pick, "★ Even pace
-    as a Spell Blade"), the suggested one marked ("Suggested · Power 96 over Wit 88") and her pick selected; tapping the
-    other picks it. Each tile names the trade it gives and its head count in her world ("Forest · Armorer · 8 Umas").
-    **Confirm**, and "Her first win confirms it." At Uma Lv 1 a pick moves her class too. While she has work started or
-    queued, the other tile is off and the card says "Finish her work first": the pick moves her trade.
-  - **Tabs:**
-    - Skills, with every Class Rank bar;
-    - Battle;
-    - Gear, two views (H107), **Equip** first and **Upgrade** ("Upgrade · 3" counts what can raise or be set):
-      - **Equip**, what she wears: "Use the standard preset" (or "Standard preset on"); her three weapons with their
-        grades and "Set on Skills ›"; her armor half and the five slots' grades ("Physical armor · Head G2 · Body G1 …");
-        then her accessory slot ("Accessory · G4") as four cards of one shape, her ★ family first, then Bell, Pendant,
-        Orb, Insignia: each says what it does at the slot's grade ("+2 on her three kinds"; "From G1: …" at G0), her
-        family's card adds "★ Her signature: ATK and M.ATK +10", a Bell's and an Orb's card pick one of her three weapons'
-        kinds ("Katana · Lance · Thunder Tome"), and every card has one button: **Equip**, **Equipped**, or "Switch to
-        Lance" on the one she wears. A Bell or Orb left on a kind she no longer holds says "No Greatsword in her slots".
-      - **Upgrade**, what she spends: her grade rows, three weapons ("Greatsword · G3 · Might 8"), five armor slots
-        ("Head · Helm · G2 · DEF +8") and her accessory ("Pendant · G4 · +2 on her three kinds · ★ +10"), each with a pill
-        that raises it ("G3 → G4 · 1 Arms Gem G4", or Tome Ink on a Tome) or says why not ("Needs Lv 16", "Already G10");
-        a row's sheet climbs
-        several grades at once when the Warehouse holds each. Then the Extra Stats link ("8/22 open · map ›");
-    - Work: her job, and her Craft Level with her trade: "Craft Lv 23 · Forest · Armorer";
-    - Racing: her aptitudes, **Her template** (Calling, Stride, Knack and Flourish, each with its note: the calling's
-      sources or "Picked", the Flourish's "Active" or "No effect as Brawler", a locked outfit's "As a Mage"), her racing
-      base stats and growth, and her unique skill.
-  - **Mark target**: up to ten Umas total; a target shows a crosshair in the Stable grid.
-  - **Can upgrade marks:** a green dot on Gear while a slot or Extra Stats can be upgraded (no skill costs points, so
-    Skills never dots). On the Gear tab's Upgrade view and the Skills tab's weapon slots, each slot she can raise now has
-    the green mark, and Extra Stats has a green "N to set" pill.
-  - **Battle tab:** every battle stat, always listed, 0 included, in four groups (D140):
-    - **Offense:** ATK, M.ATK, each weapon's Might, her accessory ("Pendant: +2 on her three kinds", "Orb: Fire +8",
-      "Bell: Greatsword 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None") and, while she wears
-      her family, her Signature ("+10 ★");
-    - **Defense:** DEF, M.DEF, Evasion, damage cuts, starting Barrier and Veil, Thorns, Mirror;
-    - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), HP Regen,
-      Lifesteal, MP with what she regains a round ("296 · +13 a round": the base regen by her Class Rank and her
-      Spring's), MP Steal, and **★ Flourish** ("Even pace · 1% a round, up to 4%", or "No effect as Brawler");
-    - **Other:** the Limit Break head start.
-
-    Its help names Guts in HP, her accessory and signature as offense, and the healers' ATK and M.ATK.
-
-    The six core stats show their total, then in brackets what gear adds (blue) and what Extra Stats add (green) (D99);
-    her moon's points are starred. Might counts only for the hits of its own weapon. The domain builds the sheet (`umaBattleSheet`).
-  - A locked outfit shows **Unlock · 1 Ticket**. An outfit another tier's world owns shows "In Tier n" instead, and in a
-    tier above 1 an outfit nobody owns shows "Unlocked in Tier 1" (D5).
-- **Skills page** (`SkillTree.tsx`, engine v16, H70; class-progression §6.1, CP23):
-  - **The root plate:** her class's emblem and name and her hand by her slots' halves ("Spell Blade · Arms ×0.72 + Tome
-    ×0.44"), then her ★ Flourish line ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "No effect as
-    Mage" outside her calling's class.
-  - Pick the **active class**, six in two rows of three, each with its emblem and Class Rank, then her **three weapon
-    slots**: kind, its grade ("G3"), her line's letter, and the green mark when she can raise it. A slot's sheet lists
-    each weapon of the slot's channel with its grade ("Lance · G2 · Might 4"); every class changes a slot's weapon within
-    its channel (CP12). Grades are raised on the Gear tab.
-  - The class's **Class Rank** bar, and the depths it opens (D102).
-  - **Equipped · 4/7**, her equipped skills as chips (tap to unequip), and "Back to auto" or "Auto". No points line.
-  - **The tree:** three tabs, one a slot (its kind and line letter), and the open tree drawn as a tree: depths 1–2 full
-    width (the trunk), then a fork into the A and B columns down to depth 5, joined by lines filled on her path. Her
-    line's nodes are outlined and the other's dimmed; a closed depth fades with its gate ("Class Rank 30"). Every node
-    shows five rank pips and "Rank 3 · next at Class Rank 14" ("Rank 5" at the top), its line at her rank, and
-    **Equip** on a held node at an open depth. Two columns at 375 pt.
-  - **A branch header** ("A", "B · Combo", "B · Pierce") opens a sheet with its three skills, depth and gate each, and
-    "Take branch B"; her equipped skills of that tree follow in place. Her own branch's sheet says "Her branch" and has
-    no button.
-  - The help explains her three slots, the trunk and fork, lines and Skill Ranks; the class help adds "A party fights
-    with one healer at most: a Paladin or a Cleric."
-
-### Party Hall
-
-Routes: `/town/party-hall` and `:n` (1–20).
-- The list shows 20 parties of five. Faces stay clear; Uma Level and class sit beneath each one. The chosen lead has a
-  thin accent ring and flag. Working members fight like the rest (D119).
-- **The editor:** rename the party, or tap a slot for the shared Uma picker, highest Uma Level first (newest release,
-  then name for ties). Unowned Umas are hidden. Current members and Umas in an open fight show a disabled reason; all
-  party members are gray, while a free Uma is full colour. A member of another party remains selectable and moves here
-  (D46). Working does not stop her fighting (D119).
-- Party slots show round outfit faces.
-- **A filled slot:** Make party lead, Swap, View profile, Recall from her job, Remove. Lead is independent of slot order:
-  choosing her never moves anybody. A party without one falls back to its first member.
-- **One healer a party:** a party with two healers (Paladins or Clerics) shows "One healer a party" in the warning
-  colour, on its card in the list and under the editor's slots. Picking Umas is never refused; the note goes once one
-  of them fights as a damage class.
-
-### Scenario Gate
-
-Routes: `/battle/scenario-gate`, `c/:continent`, `r/:region`, `capital/:continent` and `fight`. The world map ([maps](maps.md)).
-
-- **On every screen:**
-  - the **active party bar**: swap the whole party through the shared picker, see each Uma's face and MP. A party
-    uses its chosen lead's face and its highest member's level for ordering; partial parties stay selectable, empty ones
-    stay hidden. The current party is labelled Active party, and an open fight locks swapping. Edit parties opens the Party
-    Hall. A party with two healers shows "One healer a party" beside it;
-  - **Resume the open fight**, when there is one.
-- **Map / List:** pixel maps by default, with the full lists one tap away; the choice is remembered on the device.
-  The maps climb from low levels at the bottom, opening at the frontier. Biome icons also appear in the lists.
-- **World:** five islands for the active tier's continents with stages cleared, under "Tier n · five continents" (in
-  words: "four" for a partial tier). Levels read in their tier: "Lv 1–10" in Tier 1, "T2 Lv 1–10" in Tier 2. The tiers
-  above with no world yet are locked.
-- **Continent:**
-  - ten rows of four regions under two headings, the continent's first five levels and its last five (D97);
-  - **Spring** buttons between rows, ready or dry;
-  - the **capital marker** opens its three Finals routes.
-- **Region:**
-  - its level range, then twelve stages, each with its level, locked, open or cleared, its waves, ★ boss or ♛ elite.
-  - **The stage sheet:**
-    - foes by wave, elements, "Shield 4 · Weak:" and her twins' icons (the Arm first, then the element; Twilight's Bow
-      and Katana), "Acts twice";
-    - **Fight**: the first clear pays triple, replays pay a quarter. With two healers in the active party the button
-      reads "One healer a party", disabled;
-    - **Sweep** ×1, 5, 10 or All.
-- **Fight** (`FightScreen.tsx`, Phaser stage `battle/scene/BattleScene.ts`):
-  - **Header:** wave chip (W2/3), round, **Auto**, **speed** (1×, 2×, 4×) and a menu ("Back to the map" keeps the fight
-    open; "Give up").
-  - **Stage:** foes on top, in two rows from six; the party below, as busts in spaced, bordered cards with solid dark
-    backgrounds.
-  - **Foe cards:** each foe's element, shield and up to four compact weakness icons in the fight's own order. Engine
-    v18 drops the visible "Weak:" word; an older fight keeps it.
-  - **Controls:** a weapon row (her three weapons, in three columns), then **Attack**, **Skills** and **Guard**, and the
-    **Limit Break** sheet. The line above says what a tap on a rival does:
-    - a Spell Blade or a Summoner picks a pair, and the line names both halves, a Summoner's Tome half first ("Tap a
-      rival: Snow Sentinel + Shield Knight · 16 MP", "Tap a rival: Fire Tome Attack + Greatsword Attack");
-    - the Skills sheet counts a Spell Blade's extra hit on her Arms skills ("2 hits" for a one-hit cleave) and lists a
-      healer's support ("heals the most hurt, Regen 2 rounds, cleanses, revives the fallen");
-    - a lingering summon's farewell reads "<Uma>'s Snow Sentinel strikes every foe", then its hits land on each foe;
-      a Cleric's Regen reads "<Uma> +90 HP · Regen";
-    - her Flourish reads "Aster ★ +30 HP", Clean break's Barrier "Aster: ★ Barrier 37", and the round's MP back
-      "+13 MP".
-
-    A fight keeps its own rules: one started before engine v18 keeps its frozen weaknesses and visible "Weak:" label;
-    one before engine v17 keeps its pieces and supports; one before engine v16 still plays five weapons, v15's
-    weaknesses ("weak" and its icons) and no base regen or Flourish; one before classes
-    v2 a one-half Summoner and v14's support.
-- **Result:** Victory or Defeated, Laurels, Class Marks, Uma Shards and Uma Tickets; for each Uma her EXP and level bar,
-  and her Class Rank bar with a line under it for each skill that rose ("Cleave reached Rank 3"; a depth that just
-  opened, "Sunder opened"; none for a fight before v16).
-  Then "Fight again" or back to the map.
-- The fight screen plays a **fight source** (`battle/fight-source.ts`, H50): the world map's is its open fight, the
-  region's title and biome, and foes sized by rank; the Rift hands it its own ([The Rift](#the-rift)).
-
-### Warehouse
-
-The kit's `ShelfView` (SD3) as an icon grid with counts:
-- **Shelves:** All, Metal, Wood, Vegetables, Fish, Stone and Made items. Materials stay raw then refined, grade by grade;
-  made items stay line by line (Arms Gems, Tome Ink, Armor Fittings, Accessory Settings, the jewels) and grade by grade.
-- **Grade chips:** every grade, the highest of each line, or one grade, on every shelf (materials have grades since
-  H112).
-- The header counts both: "120 materials · 35 made items".
-- A stock sheet says what it is ("Metal · G3 · raw · Refines into Iron Ingot", "Grade 5 · Raises an Arms weapon one
-  grade", "Opens Planet III"), with Sell ×1, 10 or All for Laurels.
-
-### Exchange
-
-- Your Laurels and ticket counts.
-- **Buy** (the kit's `ExchangeRows`, SD3): Speed Tickets, Sweep Tickets, and **raw materials** behind the kit's `Tabs`,
-  one a line (Metal first, the tab remembered for the session), its ten grades ("G3 · have 12"); one not stocked yet is
-  locked with the win that stocks it ("After the tier's first win" for G1–G5, "After a win on continent 3" for G6–G10).
-  A row's sheet offers ×1, ×5, ×10, ×25 or a typed quantity, the total, and "Need N more" when short.
-- **Read a Class Manual** (D102): the shared Uma picker opens highest Uma Level first, with locked Umas disabled. Working
-  Umas remain selectable. Then pick one of her six classes; each Manual turns 1,000 Class Marks into 1,000 EXP on it.
-
-### Observatory
-
-- A face and Choose an Uma open the shared picker, highest Uma Level first (newest release, then name for ties),
-  with locked Umas disabled. Opens on the Uma named in its route, else the highest; working Umas remain selectable. The
-  face's line counts her open nodes ("Open 8 of 20 · ★ 1 of 2").
-- **Her map:** the Planet in the middle, Prowess, Vigor and Guard around it, five nodes each, and ★ her moon's two. Tap a
-  node for its sheet: what it gives ("+4 to every stat", "as Brawler ATK +6, M.ATK +0", "HP +30, MP +6") and its jewel
-  ("needs a Planet Jewel III · opens at Lv 21", or "Open"). Its help: "Each node opens with its jewel, in order. Every
-  open node counts."
-- Prowess's split ("Prowess · Brawler 100/0: ATK +6, M.ATK +0"), the six stats' totals with her moon's starred, and a
-  **Set** list of the jewels she can set now (a Moon Jewel asks which moon), or "No jewels ready"
-  ([loops](loops.md#extra-stats-and-gear)).
-
-### Account
-
-Reached from the account bar. The kit's `AccountPage` (SD3) with this game's content:
-- Rename your trainer.
-- **Tier n wallet**, the active tier's: Uma Tickets, Uma Shards and Laurels in Tier 1; Laurels, Speed Tickets and Sweep
-  Tickets in a tier above 1.
-- **Appearance:** System, Light or Dark, kept on this device (D147).
-- Notifications.
-- **The Tier rework's grant** (save v28, H80; tickets only since v29, D221): a row "The Tier rework's grant · 63,800 Speed Tickets" for a world with
-  a grant, which reopens "The Wilds are rebuilt" ([loops](loops.md#the-tier-reworks-grant)).
-- **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "n of N", then the earned
-  ones, newest first, each with its badge, name and "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest
-  in catalog order, badge dimmed, with how each is earned. It lists Tier 1's seals and Rift Conquered, every other
-  world's, and the nine titles; a seal reads "Iron Seal · Tier 1", and Untouched shows its front's crest beside it.
-- **Info rows:** the tier world on screen, trainer since, Umas unlocked in every world, cloud save, game data version,
-  app build.
-- Sign out.
-
-### The Rift
-
-The end-of-tier event ([loops](loops.md#the-rift), [the Rift](../design/rift.md), H50). Routes: `/battle/tier-finale`,
-`front/:front` (and `front/:front/:stage`, its sheet open), `convergence`, `signup` and `fight`. Screens in
-`apps/web/src/places/rift/`. Open once the tier's world has five Lv 50 Umas.
-- **Quick look:** the Rift's line, the Lv 50 count, or the run's four fronts ("5/12", "Sealed").
-- **The Rift:**
-  - "Tier 1 · Run 1 · 2 of 4 fronts sealed" (or the Lv 50 count), and "Resume the open fight" when a Rift fight is open;
-  - no run: **Sign up twenty**, disabled with "12 of 20 at Lv 50" until twenty are;
-  - a run: the four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · 2 Spell Blade ·
-    Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", or "Fight 2 of
-    4 · Arcane");
-  - a won run: **Ascend to Tier 2**;
-  - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, a ✓ on each won;
-  - **Roster:** the run's twenty faces, with "Cancel sign-up" while the run is untouched.
-- **Sign up twenty:** "Four parties" (the party picker, up to four, parties of five Lv 50 Umas) or "Twenty Umas" (the
-  shared Uma picker, twenty, Lv 50 only), then a sheet of the twenty faces: "They fight this Rift together until it
-  ends." · Sign up.
-- **A front's chain:** its crest and count, its ward ("Wards Tomes" on Iron, "Wards Arms" on Arcane) and guidance, then
-  twelve stages ("Stage 1" to "Champion"), each with its level, waves and foes and its leaders' faces: cleared ✓, the
-  next ringed (the page opens on it), the rest locked. Any stage opens its **stage sheet**: the foes by wave as the
-  fight will have them (face, elements, Boss or Elite by face, "Acts twice" or "Acts three times", shield, weaknesses,
-  the ward); on the next stage a party of the roster (the best fit for the front's guidance first, never one with two
-  healers; others disabled with the reason, "One healer a party" among them), the **guided weapons** (engine v16, CP7:
-  each member's three build weapons as icons under her face, "—" for one the build has no place for, and **Use the
-  guided weapons**, which sets them in one save, or "On the guided weapons") and **Fight**.
-- **The Convergence:** four slots, Iron, Arcane, Duel and Horde, each with its fight's "Foes" and a party (suggested
-  by the fronts' guidance); **Begin** when the four cover the twenty (else "Missing: …"), which starts the attempt and
-  its first fight. With an attempt on: its four parties, "Won · 6 rounds" or "Next", **Fight: Arcane** and "End this
-  attempt" (confirmed).
-- **An Echo's sheet:** the front and level, its foes, a party of five Lv 50 Umas, its guided weapons as on a stage
-  sheet, and **Fight**; once won, **Sweep ×1** and **Sweep ×5** with the Sweep Ticket count. A Sweep's result shows like
-  a win.
-- **Fight:** the shared fight screen on the Twilight Rift's backdrop, titled "Iron front · Stage 5", "Convergence ·
-  Fight 2 of 4" or "Echo · Iron · Lv 55". Foes stand and are tagged by their face ([combat](combat.md#the-rifts-foes));
-  a warded foe carries her front's crest. Back and the menu return to the Rift ("Give up" ends a Convergence attempt).
-- **Result:** Victory or Defeated and the rounds; then "Stage 5 cleared · 5/12" or "Iron sealed", "Fight 2 of 4 won",
-  "The Rift is won!" or "The attempt is over"; an Echo's rank bars and Marks, with no EXP line, and its rank-up lines as
-  on the world map's. Buttons: "Next stage"
-  (the same five again while one party holds them, else the stage's sheet), "Retry", "Next: Arcane", "Fight again" or
-  "Sweep again", and "Back to the Rift". An achievement earned plays its cut-in first, one at a time.
-- **The finale** (H52): on the win that wins the run, before its achievements' cut-ins, a dark cut-in: "Tier 1", "The
-  Rift is won", the champions' faces four to a row, revealed one after another (at rest under reduced motion), "Twenty
-  Umas, four fronts, 14 champions" and Continue. The faces are every boss face of the four fronts' champions, Iron to
-  Horde, then of the Convergence's four fights, each once: the faces the run fought.
-- **Ascend** (a sheet): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their gear
-  returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", and the reason
-  when it can't yet. Ascend runs behind the tier veil and lands on the new tier's Town Hall.
+- **The job sheet:** Who → How many → What, then "Start · ×5 · 1h 56m" (or **Queue next**), the inputs held/needed and
+  the Craft EXP it pays.
+  - **Who:** the shared Uma picker; her trade's Umas first (free ones, then the highest Craft Level), each face with her
+    Craft Level ("C30"). Anyone else is greyed "Another trade", unless the place is an open shop. Locked and busy Umas
+    say why. Fighting doesn't block work (D119).
+  - **How many** follows the picked job (D233), each size with its time: ×1, ×2, ×3, ×5, ×10, ×15 or ×20 to gather or
+    process (about half an hour to 8 hours); a make's sizes stop near 8 hours (Armor Fittings to ×10, a Moon Jewel ×5,
+    an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2). A targets link keeps its own count. A chosen
+    size stays while What changes.
+  - **What:** a gathering place's ten raw items, or a workbench's ten refined ones, G1–G10 in two rows of five (a locked
+    one "From Craft Lv 31"), with the picked item's card ("Gold Ore", "Have 40", "Metal · G6 · raw · Refines into Gold
+    Ingot"). A making place shows its item's ten grade chips (the Lapidary: Planet I–V and Moon I–V) and its recipe card
+    ("Arms Gem G3", "Raises an Arms weapon one grade", "Iron Ingot ×7 (12)"). The sheet opens on the highest grade her
+    Craft Level opens.
+- **Quick look:** the header's line, the open shop's line, the place's ten item icons (a making place's grade chips),
+  and the four slots as compact rows: start, collect, repeat and queue are two or three taps from the map, and a stopped
+  queue's card shows there too.
 
 ## Tiers
 
-Each tier is its own world, with its own Stable, parties, world map, Wilds, Warehouse, wallet and halls ([tiers](../design/tiers.md),
-D159). The account, its achievements and each Uma's tier history are shared.
-- **One world on screen at a time:** the active tier (`save/game.ts`, H35). Every screen reads its world and every
-  action writes to it. A tier's world exists once the Rift below it has ascended Umas.
-- **The tiers** (`TIERS`, `save/rules.ts`): three, as master data has, each with tiers.md §6's name and a look:
+Each tier is its own world, with its own Stable, parties, world map, Wilds, Warehouse, wallet and halls (D159). The
+account, its achievements and each Uma's tier history are shared.
+- **One world on screen at a time:** the active tier (`apps/web/src/save/game.ts`, `save/tier.ts`, H35). Every screen
+  reads its world and every action writes to it. A tier's world exists once the Rift below it has ascended Umas.
+- **The tiers** (`TIERS`, `packages/domain/src/save/rules.ts`): three, as master data has, each with a name and a look:
 
 <!-- live:tiers -->
 | Tier | Name | Look |
@@ -476,52 +572,57 @@ D159). The account, its achievements and each Uma's tier history are shared.
 | 3 | Master | Night |
 <!-- /live -->
 
-- **The Tier sheet** (`?sheet=tier`, `hub/TierSheet.tsx`, H36): the top bar's crest opens it over the current page, and
-  Back or ✕ closes it. One card per tier, 1 to 3:
-  - a tier with a world shows its crest, "Tier n · Name", its Uma count ("No Umas yet", "1 Uma", "12 Umas") and its
-    Rift (`riftLine`): "No Rift in this tier yet" (Tier 3), "The Rift opens at five Lv 50 Umas", "The Rift is open",
+- **The Tier sheet** (`?sheet=tier`, `hub/TierSheet.tsx`, H36): the top bar's crest opens it over the current page; Back
+  or ✕ closes it. One card per tier, 1 to 3:
+  - a tier with a world shows its crest, "Tier 1 · Apprentice", its Uma count ("No Umas yet", "1 Uma", "12 Umas") and
+    its Rift (`riftLine`): "No Rift in this tier yet" (Tier 3), "The Rift opens at five Lv 50 Umas", "The Rift is open",
     "Rift run · 2 of 4 fronts sealed" or "Rift won · ready to ascend". The active tier's card has an accent border, and
     tapping it just closes the sheet;
-  - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier n−1 Rift"
-    (Tiers 2 and 3 until a Rift ascends).
+  - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier 1 Rift".
 - **Picking another tier** fades a veil in the page colour over the screen (120 ms), switches the active tier and lands
-  on that tier's Town Hall in place of the sheet's entry, then fades the veil out (260 ms) once the new world has drawn
-  (`hub/TierVeil.tsx`, rendered outside the shell so it survives the remount). Under reduced motion the switch is
-  immediate, with no veil.
-- **The looks** (uma-kit's `tint`): Tier 1 is day, the theme as it is. Tier 2 is dusk, an amber accent and a warm wash
+  on that tier's Town Hall, then fades the veil out (260 ms) once the new world has drawn (`hub/TierVeil.tsx`, outside
+  the shell so it survives the remount). Under reduced motion the switch is immediate.
+- **The looks** (uma-kit's `tint`): Tier 1 is day, the theme as it is; Tier 2 is dusk, an amber accent and a warm wash
   over the Hub map; Tier 3 is night, a violet accent and a deep blue wash. Only the accent changes, in light and dark:
   the bars' disc and marker, buttons, borders and sheets follow it. Fights keep their own dark stage.
 - **Where the app opens:** a `?tier=n` link's tier, else the tier last viewed on this device (`rpg.tier`), else the
-  highest tier whose world has an Uma, else Tier 1. Only a tier the save has a world for.
-- **Switching** remounts the whole app on the new world, as a different app instance would: the bars, every place and
-  the Hub's map start fresh. Nothing from one tier's screens survives into another's.
+  highest tier whose world has an Uma, else Tier 1; only a tier the save has a world for.
+- **Switching** remounts the whole app on the new world (`hub/TierShell.tsx`): the bars, every place and the Hub's map
+  start fresh. Nothing from one tier's screens survives into another's.
 - **Links:** routes are the same in every tier. A link from outside carries `?tier=n` (a push notification's always
   does); the app switches to that tier when it has a world, then drops the param.
 - **One Uma, one world:** an Uma lives in one tier world, and the save refuses an outfit two worlds own. A tier's lists
-  and pickers show only its own Umas. Tier 1 also lists the outfits nobody owns, to unlock (D5); unlocking refuses an
-  outfit another world owns.
+  and pickers show only its own Umas; Tier 1 also lists the outfits nobody owns, to unlock (D5).
 - **Uma Tickets are Tier 1's** (D5): in a tier above 1 the top bar, the Stable's counter and its quick look show none.
 - **The featured Uma** on Town Hall's plaza is remembered per tier.
 
 ## Global UI
 
-- **Account bar** (top, `hub/Bars.tsx`):
+- **The frame** (`hub/Shell.tsx`, uma-kit's `AppFrame`, D147): a fixed full-screen frame with the top bar, the page
+  between, and the bottom bar. Place pages fill the space between the bars and scroll inside it. A fight fills the whole
+  screen.
+- **Top bar** (`hub/Bars.tsx`, the kit's `AccountBar`):
   - your initial, which opens the Account, with the active tier's crest beside it, which opens the Tier sheet;
   - the active world's chips: **Laurels**, **Speed Tickets**, and in Tier 1 **Uma Tickets** with the Uma Shards toward
-    the next (`N · s/5`). Laurels and Speed Tickets open the Exchange, and Uma Tickets the Stable;
-  - Offline or Sync paused, when it applies.
-- **Bottom bar:** Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked to the bottom edge
-  (D149). Battle is a disc in the tier's accent (gold in Tier 1) rising out of the bar. The active tab has a marker in
-  the tier's accent on the bar's top edge and a filled icon. The Wilds tab counts the active world's jobs ready to collect.
-- **Menu sheet** (`?sheet=menu`): every place by page, with a lock on locked ones, and the Account.
-- **Tier sheet** (`?sheet=tier`): one card per tier, opened by the top bar's crest (see [Tiers](#tiers)).
-- **Side panel:** a quick look slides in from the right. It closes with ✕, a swipe right, a backdrop tap, Escape or back.
-- **Place pages:** they fill the space between the bars, and Back returns to where you opened them from. Bottom sheets
-  are used for everything else (uma-kit's `Sheet`).
-- **Appearance:** light or dark follows the phone unless the Account sets one. Fights stay dark either way.
-- **Push notifications** (`apps/web/src/push/`, server `apps/api/src/push/`):
-  - A server tick every five minutes sends "Work done" or "N jobs done": one notification per tier world with news,
-    titled with its tier ("Tier 2 · Work done") when the save has several worlds.
-  - Tapping one opens the place on its tier (`?tier=n`).
+    the next ("34 · 2/5"). Laurels and Speed Tickets open the Exchange, Uma Tickets the Stable;
+  - "Offline" or "Sync paused", when it applies.
+- **Bottom bar** (the kit's `BottomBar`): Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked
+  full width to the screen's bottom edge, its panel running under the home indicator (D149). Battle is a disc in the
+  tier's accent (gold in Tier 1) rising out of the bar. The active tab has a marker in the tier's accent on the bar's
+  top edge and a filled icon. The Wilds tab counts the world's slots ready to collect.
+- **Menu sheet** (`?sheet=menu`, "Every place", `hub/MenuSheet.tsx`): every place by page, a lock on shut ones and a
+  count on ready ones, then the Account.
+- **Tier sheet** (`?sheet=tier`): see [Tiers](#tiers).
+- **Side panel** (the kit's `PeekPanel`): a quick look slides in from the right, with its (i) and Enter. It closes with
+  ✕, a swipe right, a backdrop tap, Escape or Back.
+- **Sheets:** everything else opens in a bottom sheet (the kit's `Sheet`, or `ui/BottomSheet.tsx`). An (i)
+  (`ui/HelpButton.tsx`) opens a sheet with a rule's words; screens keep labels short (D95).
+- **Appearance:** light or dark follows the phone unless the Account sets one. Fights and their results stay dark.
+- **Push notifications** (`apps/web/src/push/`; the API's `apps/api/src/push/`; the words in
+  `packages/domain/src/save/notify.ts`):
+  - A server tick every five minutes ([infrastructure](../technical/infrastructure.md)) sends one notification per tier
+    world with news: "Work done" ("Mine: Copper Ore ×3") or "3 jobs done" with up to four lines, titled with its tier
+    ("Tier 2 · Work done") when the save has several worlds.
+  - Tapping one opens its place (several jobs: the app) on its tier (`?tier=n`).
   - The app badge counts ready slots in every tier.
   - They need the Home Screen app on iOS.

@@ -1,52 +1,82 @@
 # Halls of Heroes and inheritance
 
-The Learning page's six class halls are its **Halls of Heroes** (D106), and the **only source of Limit Breaks** (D112):
-an Uma who is neither a Hero nor a Learner has none. Each hall has four seats, and each seat teaches one unique Limit
-Break (D107): 24 in all, with the Paladin Bastion's four (classes v2 §5, D181, live since H61). Code:
-`packages/domain/src/rpg/heroes.ts` (the Limit Breaks), `rpg/hero-id.ts` (ids and Bond numbers), `save/heroes.ts`
-(seats, Learners, Bonds), `rpg/battle/limit.ts` (casting), `apps/web/src/places/halls/HallPage.tsx` (the page).
+The six class halls on the Hub's Learning page are the **Halls of Heroes** (D106) and the **only source of Limit
+Breaks** (D112): an Uma who is neither a Hero nor a Learner has none, and her gauge fills with nothing to spend. Each
+hall has four seats, and each seat teaches its own Limit Break (D107): 24 in all, as engine v18 plays them.
+
+Code: `packages/domain/src/rpg/heroes.ts` (the Limit Breaks, their power and kinds), `rpg/hero-id.ts` (seat ids, halls,
+Bond numbers), `save/heroes.ts` (seats, Learners, Bonds, what a fight takes), `rpg/battle/limit.ts` (casting),
+`rpg/battle/auto.ts` (Auto's pick), `apps/web/src/places/halls/HallPage.tsx` and `hall-view.ts` (the page).
+
+## The six Halls
+
+| Hall | Class | Its Limit Breaks lean on |
+|---|---|---|
+| Brawler Dojo | Brawler | The five Arms |
+| Mage Tower | Mage | The five elements |
+| Spell Blade Salle | Spell Blade | An Arm and an element in one hit |
+| Cleric Chapel | Cleric | The five elements, with blessings, a curse and support |
+| Summoner Circle | Summoner | Beasts that strike with an Arm and its twin element |
+| Paladin Bastion | Paladin | Arms, two of them with Light or Dark, and support |
+
+A hall's class is its theme, not a rule: any owned Uma may sit in any hall, whatever class she fights as. On the Hub each
+hall shows four pips over its building, a seated Hero's face ringed in the accent color, an empty seat a dot.
 
 ## Heroes
 
 - **A seat's Hero** is any owned Uma who is not a Hero elsewhere and not a Learner. She sits in one seat at most.
 - **She has no menu:** her Limit Break is always her seat's, at full strength (100%), whatever class she fights as.
-  Its power is her own class's Limit Break power (about twice a turn's damage), shaped by the seat.
-- **Her own Bond:** every won fight raises a Hero's Bond with her own seat, as a Learner's (D112). Taken out of her
-  seat and put back as its Learner, she starts at the Bond she earned. The Hero's sheet in the hall shows it.
+- **Its power** is the Limit Break power of the class she fights as ([classes](classes.md#limit-breaks)), shaped by
+  the seat. Its hits use their own channel's offense, ATK for an Arm and M.ATK for an element, with her Might and flat
+  offense on each kind.
 - **Swapping a Hero** keeps the seat's Learners. **Emptying the seat** sends them away; their Bonds stay with them.
-- The halls appear on the Hub map with a gold ring for each seated Hero.
 
 ## Learners
 
 - **Up to ten Learners** sit under each Hero, and a Learner sits under **two Heroes at most**. A Hero is never a
-  Learner. The pickers hide anyone who can't take the seat: Heroes, and Learners who already have two Heroes.
-- **In a fight** her Limit Break menu lists her Heroes' Limit Breaks, with the Hero's face, the kinds it deals and its
-  strength. Picking one plays the Hero's bust in the cut-in. She has no class Limit Break of her own (D112).
+  Learner, and a Learner leaves her Heroes before she can be seated as one. The pickers grey out anyone who can't take
+  the seat and say why ("Already a Hero", "A Learner: leave her Heroes first", "A Hero", "Already has 2 Heroes", "10
+  Learners at most").
+- **In a fight** her Limit Break menu lists her Heroes' Limit Breaks, each with its Hero's face, the kinds it deals and
+  its strength; picking one plays the Hero's bust in the cut-in.
 - **Strength:** 50% at Bond 0, plus 5% a Bond Level, 100% at Bond 10. It keeps its whole shape at any strength: its
-  weapons and elements (even ones she doesn't carry), its number of hits, its targets and its statuses. A mend or
-  Barrier scales with the strength; a cleanse or a revive lands whole.
-- **Her offense** (C3): an inherited Limit Break hits with the higher of her ATK and M.ATK, whatever its kinds, and its
-  kinds still decide weaknesses and locks. A Mage can carry an Arms Limit Break to Break a foe weak only to Arms. A
-  Hero's own Limit Break hits with each kind's own offense.
-- **Her coverage** (CP28, engine v16): with three weapons, her two Heroes are the deliberate way to reach a twin set her
-  weapons miss. A seat in the hall reads the sets its Limit Break answers ("Answers Fire · Light"), and the Learner
-  picker the sets a seat would add to hers ("Adds Light, Dark, Twilight").
-- **Bond EXP:** every won fight, replays and Sweeps included, raises her Bond with each of her Heroes. A Bond is kept
-  when she leaves a Hero, so returning picks up where she was. On first clears alone, a Learner bonds fully with two
-  Heroes by about Lv 23 and with four by Lv 50.
-- Her profile's Skills tab lists her seat, or her Heroes and every Bond she has made.
+  weapons and elements (even ones she doesn't carry), its number of hits, its targets and its statuses. Its hits and a
+  mend or Barrier scale with the strength; a cleanse or a revive lands whole.
+- **Her offense** (C3): an inherited Limit Break hits with the higher of her ATK and M.ATK, whatever its kinds. Each kind
+  still decides weaknesses, shield chips and locks, and brings her Might and flat offense on that kind. A Mage can carry
+  an Arms Limit Break to Break a foe weak only to Arms.
+- **Her coverage** (CP28): an inherited Limit Break reaches kinds her three weapons miss. A seat in the hall reads the
+  twin sets its Limit Break answers ("Answers Fire · Light"), and the Learner picker the sets a seat would add to hers
+  ("Adds Light, Dark, Twilight"), by her active class's weapons ([classes](classes.md#weapons)).
+
+## Bonds
+
+- **A Bond** is an Uma's track with one seat, Bond Level 0–10 at 12 Bond EXP a level (120 to Bond 10). Past Bond 10 it
+  stops.
+- **Every won world fight** raises a Learner's Bond with each of her Heroes' seats, and a Hero's Bond with her own seat
+  (D112): 2 Bond EXP a stage, 3 an elite or a boss. Replays and Sweeps count; Rift fights pay no Bond. A region's first
+  clears pay 26, so Bond 10 takes about five regions, with both Heroes at once.
+- **A Bond stays with her** when she leaves a seat. A Hero's own Bond doesn't change her Limit Break (she has it at 100%),
+  but taken out of her seat and put back as its Learner she starts at the Bond she earned; the Hero's sheet in the hall
+  shows it.
+- **Her profile's Skills tab** has an Inheritance card: her seat and its Bond, or her Heroes and every Bond she has made,
+  each with its strength.
 
 ## The 24 Limit Breaks
 
-Four of them also tend the party: Dawn Hymn mends every Uma, Frost Sanctuary cleanses and Barriers every Uma, Rampart
-Charge Barriers every Uma, and Valkyrie Lances raises the first fallen. A mend or a Barrier is 66% × 0.4 of each Uma's
-max HP, × the caster's healing scale ([combat](combat.md#support)) and the cast's strength; the cleanse and the revive
-land at any strength. When the Paladin came (save v25), the
-Chapel's seats 3 and 4, Archangel's Verdict and Archdemon's Pact, moved to the Bastion's seats 1 and 2 with their
-Heroes, Learners and Bonds; the Chapel's seats 3 and 4 now teach Dawn Hymn and Frost Sanctuary. Since engine v16
-(CP35), so each hall's seats point at different twin sets, **Rampart Charge** charges with an Axe (it was a Greatsword)
-and **Choir of Angels** strikes with Light, then Lightning (it was Light twice). Limit Breaks don't rank: their power
-follows her open depth, never her Skill Ranks.
+- **Power:** at 100% a Limit Break is worth her class's Limit Break power × her open depth's single-target power (the
+  deepest depth her Class Rank opens), shared among its hits. Every-foe hits and splashes deal the area share (0.55 a
+  foe); random hits get the 1.05 bonus, as skills do. Limit Breaks never take a Skill Rank. The gauge, its charge and
+  the cost are in [combat](combat.md#limit-breaks).
+- **Kinds:** each hit carries one kind, or two at once (Twilight Eclipse, the Spell Blade Salle's four, Cinder Wyrm's
+  bite, Frost Behemoth, Archangel's Verdict and Archdemon's Pact's rends). A two-kind hit lands as two parts at half its
+  power, one of each kind, and each part is weak, chips a shield and breaks a lock on its own.
+- **Support:** four also tend the party. Dawn Hymn mends every Uma, Frost Sanctuary cleanses and Barriers every Uma,
+  Rampart Charge Barriers every Uma, and Valkyrie Lances raises the first fallen. A mend or a Barrier is 66% × 0.4 of
+  each Uma's max HP, × the caster's healing scale ([combat](combat.md#support)) and the cast's strength.
+- **Statuses:** Choir of Angels gives every ally Aegis 2, Legion of Demons hexes every foe before its claws, Archangel's
+  Verdict gives every ally Brave 2 and Faith 2, and Archdemon's Pact puts Armor Break 3 and Mind Break 3 on its foe
+  before its rends. A cast with no hits only casts its status.
 
 <!-- live:heroes -->
 | Hall | Seat | Limit Break | Kinds | What it does | Casts |
@@ -85,17 +115,14 @@ follows her open depth, never her Skill Ranks.
 | Bond EXP per won fight | 2 a stage, 3 an elite or boss, toward each of a Learner's Heroes, or a Hero's own seat; 12 a level (Sweeps and replays count) |
 <!-- /live -->
 
-## Rules in the engine
+## In the engine
 
-- Engine v9 (`BattleInput.version: 9`): an ally may carry `hero` (her seat) or `inherits` (one or two seats, each with
-  its Bond Level and the Hero's outfit id). A `limit` action may name `hero`.
-- Engine v10 (D112): the classes' own Limit Breaks are gone, so an ally with neither field has no Limit Break (her
-  gauge still fills; the "LB" badge never shows). Fights from v6–v9 replay with theirs.
-- Engine v15 (D181): the six halls' 24, the hybrids' power at 2.2×, a hall Limit Break's support at its cast's
-  strength, and a Learner's hits at her higher offense. Fights from v10–v14 replay with the five halls' twenty
-  (`heroLimitFor(id, version)`).
-- Engine v16 (D201): Rampart Charge's Axe and Choir of Angels' Lightning (`heroLimitFor(id, 16)`). Fights from v15
-  replay with the Greatsword and Light twice.
-- Every-foe hits and splashes deal the area share (0.55 a foe); random hits get the 1.05 bonus, as skills do.
-- A cast with no hits only casts its status (the Legion of Demons hexes every foe before its claws land).
-- Auto (`rpg/battle/auto.ts`) fires a Hero's own Limit Break, and a Learner's strongest Bond.
+- **A fight's input** (`BattleAlly`): an ally may carry `hero` (her seat) or `inherits` (one or two seats, each with
+  her Bond Level and the Hero's outfit id), never both; `save/heroes.ts`' `heroFields` builds them from the world when a
+  fight starts. A `limit` action names `hero`: a Hero only her own seat, a Learner one of hers.
+- **An ally with neither** has no Limit Break: her gauge fills, the "LB" badge never shows, and a `limit` action is
+  refused.
+- **Auto** (`rpg/battle/auto.ts`) fires a Hero's own Limit Break, and a Learner's with the strongest Bond (the first of
+  her seats on a tie), on the foe it scores best.
+- **Each seat by engine:** `heroLimitFor(id, version)` gives a seat's Limit Break in the fight's own engine, so fights
+  from older engines replay with their halls ([combat](combat.md)).

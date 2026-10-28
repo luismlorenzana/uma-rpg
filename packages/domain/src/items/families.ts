@@ -1,4 +1,4 @@
-// The item catalog (docs/design/items.md, D18–D20, D144): eight Wilds families, one per effect, ten grades, each raw item
+// The item catalog (docs/archive/design/items.md, D18–D20, D144): eight Wilds families, one per effect, ten grades, each raw item
 // with its one refined form. Ids match the icon atlas in @luismlorenzana/uma-art (P37); a web test keeps them in
 // step. Generated once from the atlas index; edit both together.
 

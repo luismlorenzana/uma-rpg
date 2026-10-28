@@ -1,4 +1,4 @@
-// Campaign foes: roles and level scaling (docs/design/battles.md), ported from uma-racer where a campaign sim tuned them.
+// Campaign foes: roles and level scaling (docs/archive/design/battles.md), ported from uma-racer where a campaign sim tuned them.
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
 import { TIER_SCALE_TENTHS } from '../../economy/grades'
 import { RPG_TIER_MAX_LEVEL, type RpgElement } from '../rules'

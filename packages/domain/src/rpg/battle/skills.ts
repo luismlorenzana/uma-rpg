@@ -1,4 +1,4 @@
-// Battle numbers and skill lookup, engine v6–v16 (D86, D102, D141, D169, D179; docs/design/class-rework.md, combat-balance.md;
+// Battle numbers and skill lookup, engine v6–v16 (D86, D102, D141, D169, D179; docs/archive/design/class-rework.md, combat-balance.md;
 // v16's held skills and Skill Ranks, H65).
 import { rpgNode, rpgNodeSkill, rpgRankedSkill, type RpgNode, type RpgSkillDef } from '../catalog'
 import { isRpgTome, RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, rpgSkillRankFactor,

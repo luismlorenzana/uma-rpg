@@ -21,7 +21,7 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v31** (`save/save.ts`), not the old v7/v8 snapshot:
+**Schema v31** (`save/version.ts`; the shape and parse in `save/save.ts`):
 - `account`: trainer name, timestamps, achievements, each Uma's tier history and the boss and sub-boss faces defeated
   in Rift fights, shared by every tier (D159, D171).
 - `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, its Warehouse (`items`: the five lines'
@@ -29,13 +29,13 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
   (with each front's traces and the open Convergence attempt), Echo wins, the open Rift fight (replayed like the world
   map's) and its fight count (D161, D171), and the Tier rework's `grant` (D214).
 - An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for six classes, her calling pick
-  (`calling`, D205), her Craft Level, Class Ranks, her Extra Stats map (`stars`: open nodes), her gear grades (three
-  weapons, five armor slots, one accessory slot with its family) and Bonds.
+  (`calling`, D205), her Craft Level, Class Ranks, her Extra Stats map (`stars`: open nodes), her gear grades (by weapon
+  kind, five armor slots, one accessory slot with its family and kind) and Bonds.
   There are no active `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
   runs retired in v11 (D72).
-- Wallet shortcuts are `timeTickets` and `sweepTickets` (D74); tokens live in item stock.
-- `targets`: up to five owned Umas the facilities plan for (D100, `save/targets.ts`).
+- Wallet shortcuts are `timeTickets` (Speed Tickets) and `sweepTickets` (D74).
+- `targets`: up to ten owned Umas the Wilds plan for (D100, `MAX_TARGETS`, `save/targets.ts`).
 
 | Migration | Decision |
 |---|---|
@@ -62,7 +62,8 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v30 the farm by line: old material stock converts to the five graded lines and old work settles; each making place processes its own line and makes its item | D224, D228 |
 | v31 the Wilds' trios: old work settles; each line moves to separate gathering, processing and making places | D230, D232 |
 
-`parseSave` accepts v1–v31 and returns v31; the earlier reset remains part of the migration chain.
+`parseSave` accepts v1–v31 and returns v31; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
+rest.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
 by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup are in
@@ -73,10 +74,13 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v18, weaknesses v2 (D235–D237): per-stage dealt Arms and element lists and the Summoner's ×0.62 Tome hand; on v17's economy and v16's fight; every older version replaying as it was; `caps.ts` holds the switch and `rpgRework` |
-| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
-| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v18's stage weakness dealer (D235–D237) over Tier 1's shields |
-| `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v18 (weaknesses v2, D235–D237) plays v17's rules with the Summoner's Tome hand ×0.62 (`rpg/rules.ts`), its foes' lists dealt per stage by `rpg/campaign/weaknesses.ts`; v17 is R2's economy on v16's fight; every older version replays as it was; `caps.ts` holds the switch and `rpgRework` |
+| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
+| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, from v18 with each foe's list from the stage dealer (`rpg/campaign/weaknesses.ts`, D235–D237) over Tier 1's shields |
+| `economy/`, `items/` | Professions and the fifteen places, times and prices, gear grades, accessories, the Planet, Class Ranks, points; the five lines' hundred items, the made items and their one-line recipes (D224, D230); v1's catalogs for the migrations |
+| `work/` | uma-rpg's kinds and env on `@luismlorenzana/uma-work` (SC3): gather, process and make, one kind a place, the trade gate |
+| `rift/`, `save/rift.ts` | The Rift's fronts, faces, fights and run rules, behind the lazy `@rpg/domain/rift` (D173, D174) |
+| `roster/`, `master/` | The master data adapter and the Uma Template's calling rule (D203, D220) |
 | `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |
 
 Regions reuse campaign battle-building helpers internally; this is not a second player-facing chapter system.
@@ -97,8 +101,8 @@ code-drawn art from uma-art, and DOM anchors share its grid (D64). Opening an ov
 not the game loop (D39). Screen labels stay short, with explanations behind `HelpButton` (D95).
 
 Jobs derive progress from timestamps, not interval counters. Queues start at the previous job's finish and pay only
-through domain collect rules (D55, D62). Seven Learning halls replace the four distance armories (D70).
-Gear uses material-only recipes; Mastery Tokens belong to gear-level training (D94).
+through domain collect rules (D55, D62). The Learning page holds the six class halls, which are the Halls of Heroes,
+and the Observatory (D106, D179). Gear is raised a grade at a time with made items from the Wilds (D209, D224).
 
 ## Content and deploy
 
@@ -113,12 +117,15 @@ Bucket paths, endpoints, caching, local directories and deploy stages are in
 
 ## Budgets
 
-Main JS ≤ 230 KB gzip (D56). H16 reduced the production entry from 195.96 to 133.15 KB gzip (measured when it merged onto main `888aeb2`).
-D147 (uma-kit's shell and Motion's sheets) raised it to about 161 KB gzip.
+Main JS ≤ 230 KB gzip (D56). On 2026-10-28 (`4f0a1bf`) the entry is 223.46 KB gzip and the whole initial JS is that
+one static chunk. Earlier marks: H16 brought it to 133.15 KB, D147 (uma-kit's shell and Motion's sheets) to about
+161 KB, and H62 back to about 201 KB from 227; the Tier rework's releases and the Wilds added the rest.
 `scripts/check-size.mjs`, run by the web build, measures the HTML entry and all its static JS dependencies from
 Vite's manifest. Both must fit the budget; putting code in an eagerly imported vendor chunk cannot hide it. It also
-fails when the initial JS renders a module that must load on demand (H62, below).
-Phaser (Hub and battle stage), Firebase, master data parsing, each place page and the fight engine remain lazy chunks.
+fails when the initial JS renders a module that must load on demand (H62, below). Dynamic chunks are outside the count,
+Dexie's among them, which every boot loads (below).
+Phaser (Hub and battle stage), Firebase Auth, Dexie, master data parsing, each place page and the fight engine remain
+lazy chunks.
 
 ### Boot and lazy domain boundaries (H16)
 
@@ -126,40 +133,45 @@ Phaser (Hub and battle stage), Firebase, master data parsing, each place page an
   snapshot; `items/identity.test.ts` compares every field to the authored catalog. Update that snapshot when changing
   item ids, families or sites. Skill, Star Gem and gear identities share exact grammar and constants with their catalogs,
   with exhaustive parity tests.
-- Device reads use `parseSaveAsync`: migrations load only for old versions, and the battle engine loads only when a
-  save contains a frozen fight. Every pending fight is replayed before the promise returns. There is no unchecked
-  intermediate save. The API keeps the synchronous, equally strict `parseSave` contract.
-- Gameplay commands dynamically import the domain's `battle`, `work`, `exchange`, `observatory` and `forge` entry points.
-  They read the latest save after loading, so overlapping cold commands cannot overwrite one another's changes.
-  Skill definitions, the world generator and full recipes load with their screens, not with an idle Hub.
-- Dexie initializes on the existing asynchronous device-I/O path. Its separate 32.49 KB gzip chunk is still required
-  at boot: entry plus device storage is about 165.6 KB, not 133.15 KB. The database, row format and fallback behavior are
-  unchanged. No manual vendor-chunk partition hides startup work.
+- Device reads use `parseSaveAsync`: the battle engine loads only when a save contains a frozen fight, and every
+  pending fight is replayed before the promise returns. There is no unchecked intermediate save. The API keeps the
+  synchronous, equally strict `parseSave` contract. `parseSaveAsync` also imports `save/migrations.ts` dynamically for
+  an old version, but `save/save.ts` imports it statically (`migrateWorld`, `toV26`), so the whole migration chain
+  renders in the entry.
+- Gameplay commands dynamically import the domain's `battle`, `rift`, `work`, `exchange`, `observatory`, `forge`,
+  `targets` and `heroes` entry points. They read the latest save after loading, so overlapping cold commands cannot
+  overwrite one another's changes. Skill definitions, the world generator and full recipes load with their screens, not
+  with an idle Hub. `work` and `forge` render in the entry, since the Hub reads them.
+- Dexie initializes on the existing asynchronous device-I/O path. Its separate 32.49 KB gzip chunk is required at boot,
+  so a cold boot loads about 256 KB of JS with the entry. The database, row format and fallback behavior are unchanged
+  since H16. No manual vendor-chunk partition hides startup work.
 - The service worker precaches every built JS chunk; a cold, uncached network pass is also required when changing
-  these boundaries. The H16 pass used 375×667, synthetic master data and rivals, all 34 open places, four Hub pages,
+  these boundaries. The H16 pass used 375×667, synthetic master data and rivals, every open place, four Hub pages,
   five continents, a region, profile tabs and a saved-fight reload under Fast 4G proxy shaping.
 
 ### The fight on demand (H62, D184)
 
 By classes v2 the engine had crept back into the entry: the store's `import('@rpg/domain/battle')` resolves to the same
 module the root index re-exports, and the Hub read `startingClass`, `activeClass` and `classOf` from it, so every export
-of `save/battle.ts`, and through it the engine, rendered in the main chunk. H62 took main JS from 226.48 to 200.54 KB
-gzip locally, and from 227.33 to 201.20 KB on CI.
+of `save/battle.ts`, and through it the engine, rendered in the main chunk. H62 split it out (main JS 227.33 to
+201.20 KB gzip on CI).
 
-- **What loads on demand:** the engine (`rpg/battle/engine.ts`, `limit.ts`, `skills.ts`: the `engine` chunk, about
-  11.7 KB gzip), Auto (`auto.ts`, in the `FightScreen` chunk, 11 KB), the world map's fight rules (`save/battle.ts`,
-  `rpg/campaign/run.ts`, `world/world.ts`: the `battle` chunk, 8 KB) and the skill catalog with the Halls' Limit Break
-  table (`rpg/catalog.ts`, `rpg/heroes.ts`: a shared chunk named after `heroes`, 6.3 KB). The world map, the Rift, the
-  Stable, the Halls and the Exchange import them statically, so they arrive with their page.
+- **What loads on demand** (gzip on 2026-10-28): the engine (`rpg/battle/engine.ts`, `limit.ts`, `skills.ts`: the
+  `engine` chunk, 12.6 KB), Auto (`auto.ts`, in the `FightScreen` chunk, 11.5 KB), the world map's fight rules
+  (`save/battle.ts`, `rpg/campaign/run.ts`, `rewards.ts`, `world/world.ts`: the `battle` chunk, 8.9 KB) and the skill
+  catalog with the Halls' Limit Break table (`rpg/catalog.ts`, `rpg/heroes.ts`: a shared chunk named after `heroes`,
+  6.9 KB). The world map, the Rift, the Stable, the Halls and the Exchange import them statically, so they arrive with
+  their page.
 - **What stays in the entry:** an Uma's class (`save/class.ts`: `startingClass`, `activeClass`, `classOf`, which
   `save/battle.ts` re-exports), the skill depth tables (`RPG_SKILL_POWER`, `RPG_SKILL_MP` in `rpg/node-identity.ts`,
-  which the catalog re-exports), the engine's types and caps, the save parser, and the work and forge rules (the Hub
-  reads them, so their dynamic imports don't split; a later trim, not a fight).
+  which the catalog re-exports), the engine's types and caps, the save parser and its migrations, the Uma Template
+  (`roster/template.ts`), the presets, and the work and forge rules (the Hub reads them, so their dynamic imports don't
+  split).
 - **The subpaths:** `@rpg/domain/engine` (`rpg/battle/index.ts`: the engine, Limit Breaks, Auto, their types; CJS
   `dist/cjs/rpg/battle/index.js`) is the only way to the engine's functions; the root index keeps its types, skill
   numbers and caps. `@rpg/domain/battle` holds the world map's fight rules, which the store's actions (`beginFight`,
-  `fightAction`, `leaveFight`, `sweep`, the class and Spring actions) load on first use. The API keeps the synchronous
-  `parseSave` through the CJS build.
+  `fightAction`, `leaveFight`, `sweep`, the class, line, calling and Spring actions) load on first use. The API keeps
+  the synchronous `parseSave` through the CJS build.
 - **Prefetch:** once the Hub has painted, `battle/prefetch.ts` loads `@rpg/domain/battle` and the fight screen while the
   browser is idle (a 500 ms timeout on Safari), so neither the world map nor a fight waits for them. A save with an open
   fight loads the engine at boot through `parseSaveAsync`, as before.

@@ -1,9 +1,9 @@
-// An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/design/class-rework.md). Every class
+// An Uma's battle profile: class, weapons, stats, EXP and skill trees (D86, docs/archive/design/class-rework.md). Every class
 // wields five weapons to v15, three from v16 (the Tier rework's fight), and has a tree per weapon; its Class Rank opens
 // the depths and, to v15, pays the points for side skills (D102), her Uma Level her stats and skill slots, and a hand per
 // class scales power and MP. From v16 a tree is a trunk and one free fork into line A or B, with no points, and every
 // skill she holds has a Skill Rank (H65, class-progression.md §6.1–§6.2).
-// Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/design/classes-v2.md) from v15, and
+// Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/archive/design/classes-v2.md) from v15, and
 // from v16 the Tier rework's fight (D200, docs/design/tier-rework/class-progression.md §3), a third row where it differs.
 // Each takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game
 // follows the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live

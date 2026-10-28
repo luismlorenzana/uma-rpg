@@ -1,5 +1,5 @@
 // One generated chapter per scenario: a top-to-bottom map of fights, camps, sub-bosses and three authored Finals routes
-// (design §2.1, docs/design/battles.md). Ported from uma-racer and re-cut to ten levels a chapter (D48). Layout and
+// (design §2.1, docs/archive/design/battles.md). Ported from uma-racer and re-cut to ten levels a chapter (D48). Layout and
 // numbers are code; the private PriConne cast only supplies the faces (names and portraits, D50).
 import { RPG_DEPTH_GATES, RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgElementWeakness, rpgTwinsOf, type RpgElement } from '../rules'
 import { RPG_SKILL_POWER } from '../node-identity'

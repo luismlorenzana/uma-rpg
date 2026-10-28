@@ -1,6 +1,6 @@
 // The place registry (D33, D144, D147): every place on the Hub's four pages, in the bottom bar's order (Town Hall ·
 // Learning · Battle · Wilds, the sibling apps' Home · Grow · Play · Work), one source for the map, the hit targets, the
-// global menu and the routes. Design: docs/design/game-design.md §9; slice spec docs/slices/S1-hub.md.
+// global menu and the routes. Design: docs/archive/design/game-design.md §9; slice spec docs/archive/build-history/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 
@@ -19,7 +19,7 @@ export type PlaceKind = 'gather-site' | 'station' | 'class-hall' | 'battle' | 't
 export const SLICES = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'] as const
 export type SliceId = (typeof SLICES)[number]
 
-/** One line per slice, for "Opens in S#" banners (docs/plan.md). */
+/** One line per slice, for "Opens in S#" banners (docs/archive/build-history/plan.md). */
 export const SLICE_GOALS: Record<SliceId, string> = {
   S1: 'The Hub and foundation',
   S2: 'Collection and parties: unlock Umas, build parties',

@@ -1,18 +1,19 @@
 # Materials, made items and gear
 
-Everything an Uma gathers, processes or makes, and what it does. Lists are generated from `packages/domain/src/items/`
-(`lines.ts`, `made.ts`, `made-v4.ts`) and `economy/` (`places-v4.ts`, `grades.ts`, `accessories.ts`, `planet.ts`). How
-the jobs work is in [loops](loops.md#craft-level); the fifteen places in [sections](sections.md#wilds). This is the farm by
-line as it plays since H114 (save v31, D230; its design is
-[farm-by-line.md](../design/tier-rework/farm-by-line.md)): every trade gathers, processes and makes its own line, on ten
-grades. The old game's eight families, crafted pieces and Star Gems, and R2's two types a line a tier, live on only in the
-save migrations that converted them (`toV28`, `toV30`, [architecture](architecture.md#save-history)).
+Everything an Uma gathers, processes or makes, and what the made items do. The lists are generated from
+`packages/domain/src/items/` (`lines.ts`, `made-id.ts`, `made.ts`, `made-v4.ts`) and `economy/` (`places-v4.ts`,
+`professions.ts`, `grades.ts`, `accessories.ts`, `planet.ts`). How a job runs, Craft Level and the trades are in
+[loops](loops.md#craft-level); prices in [loops](loops.md#the-exchange); the place pages in [sections](sections.md).
+This is the Wilds as they play since save v31 (H114, D230; the design is
+[farm-by-line.md](../design/tier-rework/farm-by-line.md)).
 
 ## Lines
 
-Five lines, each one trade's (FL31): gathered at its gathering place, processed at its workbench and made at its making
-place, and never touched by another place. Each line has **ten grades**, a raw item and its refined form each, all from one uma-art family;
-every world holds the same fifty types (FL8). Grade g opens at **Craft Lv 5g − 4** to gather, to process and to make (FL6).
+Five lines, each one trade's (FL25–FL27). A line is worked at three places in a row: its **gathering place** gathers raw
+items, its **workbench** processes them, and its **making place** makes the line's item from refined ones. Each place
+does one kind of job, and no place touches another line. Each line has **ten grades**, a raw item and its refined form
+each, from one uma-art family; every world, Tiers 2 and 3 included, uses the same fifty pairs (FL8). Grade g opens at
+**Craft Lv 5g − 4** to gather, to process and to make (FL6).
 
 <!-- live:families -->
 | Line | Gathered by | Processed at | Made at | Makes | Raw, G1 → G10 |
@@ -24,10 +25,17 @@ every world holds the same fifty types (FL8). Grade g opens at **Craft Lv 5g −
 | Stone | Hunting, the Monster Den | the Den Workbench (Stonecutting) | the Lapidary (Jewel Crafting) | Planet Jewels and Moon Jewels | Quartz, Amethyst, Citrine, Garnet, Emerald, Sapphire, Ruby, Diamond, Starstone, Philosopher's Stone |
 <!-- /live -->
 
-A raw item processes one for one into its refined form at its line's workbench. A made item takes its own line's refined
-items of its own grade (FL7). Gathering one, processing one and each refined item in a recipe all take one equal step.
+- **Processing** turns one raw item into its refined form.
+- **A made item of grade g** takes its line's refined items of grade g only (FL7). A jewel's grade is its node's.
+- **Every step is equal** (FL28): gathering one raw item, processing one, and each refined item in a recipe all take one
+  step, 36 minutes at Craft Lv 1 falling to 24 at Lv 50, before the place's ×1.25. A refined item costs three steps in
+  all: 108 minutes of work at Craft Lv 1, 72 at Lv 50.
 
 ## Items by line
+
+Ids are uma-art's own (its `items` atlas), each name comes from its id ("Tomato Purée"), and each icon is its family's
+frame at its grade. Save v30 moved R2's two types a line a tier onto these grades
+([loops](loops.md#the-farm-by-line-save-v30)).
 
 <!-- live:items -->
 ### Metal (Mining, the Mine; the Mine Workbench (Smelting); the Weapon Forge (Arms Crafting))
@@ -109,26 +117,56 @@ items of its own grade (FL7). Gathering one, processing one and each refined ite
 ## Made items
 
 Each making place makes one thing from its own line (FL3):
-- **Arms Gem** (the Weapon Forge, from Ingots): raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade. It keeps
-  R2's Weapon Gem's ids (`weapon-gem-g1` …): a Weapon Gem made before save v30 is an Arms Gem.
-- **Tome Ink** (the Tome Forge, from vegetable cuts): raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade. Its
-  icon is uma-art's infusion bottles (FL15).
-- **Armor Fittings** (the Armorer, from Planks): raise an armor slot one grade.
-- **Accessory Setting** (the Charm Forge, from Fillets): raises her accessory slot one grade.
-- **Planet and Moon Jewels** (the Lapidary, from cut stones): open her Extra Stats map's nodes
-  ([loops](loops.md#extra-stats-and-gear)).
 
-**One recipe an item, one line each, the same amount at every grade and in every world** (FL9): an Arms Gem or Tome Ink 7
-refined items, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4, all of the item's grade. A
-maxed Uma's work comes to about 100–110 refined items a line (her weapon slots are about half Arms, half Tomes).
+| Made item | Ids | Made at | From | Does |
+|---|---|---|---|---|
+| Arms Gem G1–G10 | `weapon-gem-g1` … `weapon-gem-g10` | Weapon Forge | 7 Ingots | Raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade |
+| Tome Ink G1–G10 | `tome-ink-g1` … `tome-ink-g10` | Tome Forge | 7 vegetable cuts | Raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade |
+| Armor Fittings G1–G10 | `armor-fittings-g1` … `armor-fittings-g10` | Armorer | 2 Planks | Raises an armor slot one grade |
+| Accessory Setting G1–G10 | `accessory-setting-g1` … `accessory-setting-g10` | Charm Forge | 10 Fillets | Raises her accessory slot one grade |
+| Planet Jewel I–V | `jewel-planet-1` … `jewel-planet-5` | Lapidary | 10 cut stones | Opens Planet I–V |
+| Moon Jewel I–V | `jewel-moon-1` … `jewel-moon-5` | Lapidary | 4 cut stones | Opens a moon's node I–V; II and IV also her moon's I and II |
 
-A made item of grade g opens at Craft Lv 5g − 4. Making one takes one step for each refined item in it (FL28), while
-gathering and processing each item take one step at their own places.
+- **One recipe an item, the same at every grade and in every world** (FL9, `RECIPE_V4`): the refined items of the item's
+  grade. Every recipe is listed under [jewels](#jewels) and [gear](#gear).
+- **The Arms Gem keeps R2's Weapon Gem ids:** it raises Arms only, and Tome Ink raises Tomes (FL4).
+- **Making one** takes one step for each refined item in it: an Arms Gem or Tome Ink 7, Armor Fittings 2, an Accessory
+  Setting or a Planet Jewel 10, a Moon Jewel 4. The job sizes follow from that ([loops](loops.md#craft-level)).
+- **Icons:** the gear rows of uma-art's `gear` atlas for a slot's grade, its `items` atlas for made items (Tome Ink
+  borrows the essences' infusion bottles, FL15).
+- Made items wait in the Warehouse with the materials until a grade is raised or a jewel is set. They sell for 6 + 6 ×
+  their grade Laurels, × the world's tier.
+
+### What a maxed Uma takes
+
+G0 to G10 on her three weapons, five armor slots and accessory slot, and the whole Extra Stats map (D230's per-Uma
+review; the ledger is `economy/professions-v4.sim.ts`):
+
+| Upgrade | Made items | Refined each | Refined in all | Line |
+|---|---|---|---|---|
+| Three weapons | 30 | 7 | 210 | Metal for an Arm, Vegetables for a Tome |
+| Five armor slots | 50 | 2 | 100 | Wood |
+| One accessory slot | 10 | 10 | 100 | Fish |
+| The Planet, I–V | 5 | 10 | 50 | Stone |
+| Three moons, I–V each, and her moon's two | 17 | 4 | 68 | Stone |
+
+By her class, in refined items a line:
+
+| Her class (her slots) | Metal | Vegetables | Wood | Fish | Stone |
+|---|---|---|---|---|---|
+| Brawler (3 Arms) | 210 | 0 | 100 | 100 | 118 |
+| Spell Blade, Paladin (2 Arms, 1 Tome) | 140 | 70 | 100 | 100 | 118 |
+| Summoner, Cleric (1 Arm, 2 Tomes) | 70 | 140 | 100 | 100 | 118 |
+| Mage (3 Tomes) | 0 | 210 | 100 | 100 | 118 |
+
+Averaged over a roster's classes, each weapon line carries about 105 refined items an Uma, close to Wood's and Fish's
+100, so the five trades get about the same work ([pacing](../design/pacing.md)).
 
 ### Jewels
 
-A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's n grade 2n. A Moon Jewel opens node n of any moon,
-picked when it's set; Moon Jewels II and IV also open her own moon's I and II.
+A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's node n grade 2n. A Moon Jewel opens node n of any of
+the three moons, picked when it's set; Moon Jewels II and IV can open her own moon's I and II instead. Setting one uses it
+up ([loops](loops.md#extra-stats-and-gear)).
 
 <!-- live:gems -->
 | Jewel | Id | Opens | Grade | Uma Lv | Recipe |
@@ -147,30 +185,36 @@ picked when it's set; Moon Jewels II and IV also open her own moon's I and II.
 
 ## Gear
 
-**Grades, not pieces** (WP2, WP3): every Uma has three weapon slots (her class's three weapons), five armor slots (head,
-body, legs, arms, feet) and one accessory slot, each at a grade from G0 to G10. A made item of the next grade raises a
-slot one grade; nothing is crafted, bound or worn, and gear has no ranks. Grade g opens at Uma Lv 5g − 4.
+**Grades, not pieces** (WP2, WP3; `economy/grades.ts`, `save/forge.ts`): every Uma holds a grade on each of the ten
+weapons, her five armor slots (head, body, legs, arms, feet) and her one accessory slot, from G0 to G10. A made item of
+the next grade raises one of them a grade; nothing is crafted, bound or worn out, and gear has no ranks (Weapon, Armor and
+Accessory Ranks retired in R2, D218).
 
-- **A weapon's Might:** its grade's value, added to the offense of hits made with that weapon, × the tier.
-- **What raises it** (FL4): an Arms weapon takes Arms Gems, a Tome Tome Ink, armor Armor Fittings, the accessory slot
-  Accessory Settings.
+- **The gate:** grade g opens at **Uma Lv 5g − 4** (1, 6, 11 … 46).
+- **What raises it** (FL4): an Arms weapon takes Arms Gems, a Tome Tome Ink, an armor slot Armor Fittings, the accessory
+  slot Accessory Settings, each of the grade it reaches. A climb of several grades at once takes each grade's item, and
+  says what's missing ("Needs Lv 26", "Needs 1 Arms Gem G3", "Needs Tome Ink G2 and G3").
+- **A weapon's Might:** its grade's value, added to the offense of her hits with that weapon, × the tier
+  ([combat](combat.md#damage)). She fights with her class's three weapons; a weapon she doesn't slot keeps its grade.
 - **Armor:** each slot adds its stat (head DEF, body HP, legs MP, arms M.DEF, feet Speed) and ATK or M.ATK by her class's
-  half: a physical class's armor gives ATK, a magical class's M.ATK. Switching class switches the half; the grades stay.
-- **The accessory slot:** its grade, and a family and form she sets freely outside fights (WP19). The four families, from
-  Tier 1, each in its base form: the **Pendant** (flat offense on her three weapons' kinds), the **Orb** (flat offense on
-  one kind she sets), the **Bell** (a follow-up strike when her act includes an Attack) and the **Insignia** (more damage
-  to sub-bosses and bosses). G0 does nothing.
-- **Her signature** (WP33, UT7): her knack names one family; while she wears it, her ATK and M.ATK rise 0.2 a level ×
-  the tier. The accessory sheet puts her family first, marked ★, and her standard preset wears it.
+  half: a physical class's armor gives ATK, a magical class's (Mage, Cleric, Summoner) M.ATK. Switching class switches the
+  half; the grades stay.
+- **The accessory slot:** its grade, and a family she sets freely (WP19, `setAccessoryForm`): the **Pendant** (flat
+  offense on her three weapons' kinds), the **Orb** (flat offense on one of them), the **Bell** (a follow-up strike with
+  her weapon of its kind when her act includes an Attack) or the **Insignia** (more damage to sub-bosses and bosses). An
+  Orb or a Bell takes one of her active class's three kinds (D223); one left on a kind she no longer holds stays set and
+  does nothing. G0 does nothing. A fight keeps the form and grades she had when it began.
+- **Her signature** (WP33, UT7): her knack names one family ([classes](classes.md#her-calling-and-her-template)). While
+  she wears it at G1 or above, her ATK and M.ATK rise 0.2 a level × the tier. The Gear tab puts that family first, marked
+  ★, and her standard preset wears it.
+- **On Ascend** every grade starts at G0 in the new tier, and the made items her grades used go back to the old world's
+  Warehouse ([loops](loops.md#the-rift)).
 
-Each grade's icon comes from uma-art's gear rows (H28), the made items' from its items atlas (uma-art 2.13.0, H73).
-**Colors by kind (D234, uma-art 2.15.0):** a Tome wears its element's color and an Arm its own, beside its twin
+**Colors by kind** (D234, uma-art 2.15.0): a Tome wears its element's color and an Arm its own, beside its twin
 element's: the Greatsword orange (Fire), the Lance green (Lightning), the Axe purple (Ice), the Bow pale jade (Light) and
-the Katana deep rose (Dark). The colour stays the same at every grade; the grade shows in its fittings: a Tome's gem
-fittings, an Arm's hilt, guard or tips in the grade's ingot (copper to orichalcum). An Arm's Orb wears the same colour. The
-small glyphs on every screen (the Skills tab's trees and skills, the Gear tab, the Bell and Orb chips, the fight, the
-"Weak:" icons, the halls, the Rift's guides) use the same colors: the art's tones in dark mode, deeper ones in light
-mode so the pale kinds read on white.
+the Katana deep rose (Dark). The color is the same at every grade; the grade shows in the fittings (a Tome's gem
+fittings; an Arm's hilt, guard or tips in the grade's ingot, copper to orichalcum). An Arm's Orb wears its color. The
+small kind glyphs on every screen use the same colors: the art's tones in dark mode, deeper ones in light mode.
 
 <!-- live:gear -->
 | Grade | Opens at Lv | Weapon Might (Tier 1 · 2 · 3) | Armor: offense a piece | Head DEF | Body HP | Legs MP | Arms M.DEF | Feet Speed |

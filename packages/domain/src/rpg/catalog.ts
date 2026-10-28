@@ -1,4 +1,4 @@
-// Every class tree, node and number (D86, docs/design/class-rework.md). One rule per class builds each tree, so a
+// Every class tree, node and number (D86, docs/archive/design/class-rework.md). One rule per class builds each tree, so a
 // rebalance changes a rule here, not a table of cells. Powers are full-turn units (a Brawler's Attack = 1.0) before the
 // class's hand (rules.ts) scales them. Every tree is one line of five depths: a core skill and two side skills (A, B)
 // at each. Each kind keeps one shape in every class: Greatsword and Fire hit one foe hard, Axe and Ice every foe, Lance

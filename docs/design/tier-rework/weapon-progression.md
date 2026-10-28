@@ -42,8 +42,8 @@
 > "Follow-up to D197 (Uma Templates), 2026-10-25".
 
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The second standalone
-> doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.2). It absorbs [gear.md](gear.md), which stays as
-> history, and adopts the research note's direction ([weapon-research.md](weapon-research.md), WR1–WR6). Calls are
+> doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.2). It absorbs [gear.md](../../archive/design/tier-rework/gear.md), which stays as
+> history, and adopts the research note's direction ([weapon-research.md](../../archive/design/tier-rework/weapon-research.md), WR1–WR6). Calls are
 > **WP1–WP34**, each with a recommendation ([§14](#14-decisions)); [§15](#15-the-first-rounds-calls-mapped) maps every
 > GE and WR call. No open questions.
 >
@@ -189,7 +189,7 @@ Manual: [classes](../../game/classes.md#weapons), [combat](../../game/combat.md#
 | **Crafting** | The Forge: 40 types × 10 grades; two refined items a piece, the pair rotating with the grade (D139); Craft Lv 5g − 4 |
 | **Wearing** | Binding from stock is for good, in order (D119); rank EXP past 10 banks as Gear Marks, which buy Manuals |
 | **One Uma, fully geared** | 120 pieces, 240 refined items (472 with her Star Gems) |
-| **The first round** | [gear.md](gear.md): grades owned at G0, raised by gems, fittings and settings; Dual or Pure at Tier 2's G5, Prism, Tempered or Keen at Tier 3's; a Support slot in Tier 1, an Orb in Tier 2, a second Support in Tier 3; today's armor numbers |
+| **The first round** | [gear.md](../../archive/design/tier-rework/gear.md): grades owned at G0, raised by gems, fittings and settings; Dual or Pure at Tier 2's G5, Prism, Tempered or Keen at Tier 3's; a Support slot in Tier 1, an Orb in Tier 2, a second Support in Tier 3; today's armor numbers |
 
 ## 2. The model
 
@@ -364,7 +364,7 @@ left with one holder; the Lightning twins first (Bow → Lance, Katana → Great
 
 **Why no third branch at a fork** (WR2): the kind axis has two directions, more kinds or harder weak hits. Every third
 candidate the research weighed (Break, lock, executioner, attunement, conversion, imbue) duplicates a tree's or a
-class's job or trivializes weaknesses ([weapon-research §4](weapon-research.md#4-the-options)).
+class's job or trivializes weaknesses ([weapon-research §4](../../archive/design/tier-rework/weapon-research.md#4-the-options)).
 
 ### 3.3 Tier 3: both lines fork again (WP9)
 
@@ -1172,7 +1172,7 @@ measured change (with the Summoner's Arms hand 0.48, SB11, and the Great Pendant
 
 - **What goes:** the Spring (10 MP a round) and the Siphon (8% of magical damage) on the balance party's Mage, Summoner
   and Cleric. Today a region on Auto ends with 4–10% of its MP through Lv 35 and 26–31% at Lv 45–50
-  ([tier2-world §7](../tier2-world.md)); without them the magical classes end it drier.
+  ([tier2-world §7](../../archive/design/tier2-world.md)); without them the magical classes end it drier.
 - **What comes:** armor's legs at +3 a grade (+30 at G10, +10 over today's), **Vigor's MP** (+30 × tier, with the
   Planet's +21 × tier: +51 an Uma at Lv 46 in Tier 1; extra-stats-progression EP4), **the base regen** (SB18: every Uma
   regains 0.8% of her max MP a round for each skill depth her class has open, 4% from Class Rank 40; a rule, never an
@@ -1456,7 +1456,7 @@ tickets-for-time grant above).
 
 *Versions re-planned by D198 (2026-10-25): every save row of this doc is gear, so its **save v27** below is **R2, Tier
 1's economy (engine v17, save v28)**; R1 (v16, v27) is the fight on today's gear. Its **save v28 (Tier 2)** is **R3,
-Tier 2's weapons (v18, v29)**; Tier 3's is **R5 (v20, v31)**. See [implementation.md](implementation.md).*
+Tier 2's weapons (v18, v29)**; Tier 3's is **R5 (v20, v31)**. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 **Save v27 (Tier 1, one migration, every world).** *Changed in cross-check (2026-10-24): v26 is taken on main (D190, the
 UI clarity pass), so the Tier 1 rework's migration is v27 and Tier 2's v28; the engine stays v16 and v17.*
@@ -1495,7 +1495,7 @@ branches, forms or the signature needs a refund:** they are new.
 *Versions re-planned by D198 (2026-10-25): every **v16** row below (armor, SB1 data, the supports, the four base forms,
 the Bell and the Insignia, the signature) ships with **R2, Tier 1's economy (engine v17)**; the **v17** rows split into
 **R3, Tier 2's weapons (v18)** (weapon branches, the two-kind cap, the second slot and its branches, the kind cap) and
-**R4, Tier 2's classes (v19)** (the focus in the stack); Tier 3's is **R5 (v20)**. See [implementation.md](implementation.md).*
+**R4, Tier 2's classes (v19)** (the focus in the stack); Tier 3's is **R5 (v20)**. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 | Change | Version | Kind |
 |---|---|---|

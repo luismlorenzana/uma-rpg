@@ -6,7 +6,7 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 |---|---|
 | GCP project | `uma-rpg` (number 727687479415), billing account `0101E5-D99B49-A8B713`, $5 budget alert |
 | Site | https://uma-rpg.web.app (Firebase Hosting, classic). `/api/**` is rewritten to Cloud Run, so the app is same-origin |
-| API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
+| API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, 512 MiB and 1 CPU, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
 | Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }` |
 | Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket |
 | Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the enemy release (D135), `enemies.json` and `enemies/<unit>-<face\|art\|splash>.<hash>.webp`, about 105 MB. The runtime service account reads it; `pnpm enemies:publish` writes it with the owner's gcloud login |
@@ -50,15 +50,16 @@ Never run `gcloud config set …`.
 
 ## Release
 
-Every push to `main` (outside docs) runs lint, test and build, then, with `DEPLOY_ENABLED=true`, builds the API image
-(the npm token passes as a BuildKit secret), deploys Cloud Run, builds the web app and deploys Hosting. The workflow
-verifies: `/api/health` 200, `/api/save` and `/api/content/enemies.json` 401 on Cloud Run, the same through Hosting, and
-the shell served `no-cache`.
+Every push to `main` (outside `docs/` and Markdown files) runs lint, test and build; pull requests run only those.
+On `main`, with `DEPLOY_ENABLED=true`, the workflow then builds the API image (the npm token passes as a BuildKit secret), deploys
+Cloud Run, builds the web app and deploys Hosting. It verifies Cloud Run (`/api/health` answers; `/api/save`,
+`/api/content/enemies.json` and `POST /api/push/tick` answer 401) and then Hosting (the shell served `no-cache`,
+`/api/health` through the rewrite, `/api/save` 401).
 
 The enemy release is published separately, by hand: `pnpm enemies:release && pnpm enemies:publish` (D135). The app
 picks a new release up on its next load.
 
 Watch a deploy: `gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`.
 
-The installed PWA shows **Update ready — Restart** for a new build. The Account shows the build id and the master data
+The installed PWA shows **Update ready · Restart** for a new build. The Account shows the build id and the master data
 release version.

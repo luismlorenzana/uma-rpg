@@ -1,8 +1,8 @@
 // Battle rules over the save (S3, D86, D102): classes, their weapons and skills, the world's fights and their rewards. A
 // win fills four bars: Uma Level, the Class Rank she fought as, her three weapons' and her five armor kinds' ranks, and her
 // accessories' kinds (D124). Pure
-// functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/design/battles.md,
-// docs/design/class-rework.md, docs/design/progression.md.
+// functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/archive/design/battles.md,
+// docs/archive/design/class-rework.md, docs/archive/design/progression.md.
 import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../rpg/battle/types'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'

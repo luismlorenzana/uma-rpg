@@ -871,9 +871,9 @@ call changes beyond the values below.
 | | **EP15** · §9 "Sustain", §16 | "MP moves from regen to the pool" → "**MP: the pool, and a base regen for every Uma** (SB18)"; knobs: **SB18's share a depth first**, then Vigor's MP rate, then legs, the Flourish's twists the template's; the Springs test measures region pace against today's |
 | | **EP16** · §10 | "Tier 2's term … now prices +12–16%" → the weapon moons are a quarter of Tier 2's toolbox (×1.14) and Tier 3's (×1.23), priced in **+27%** and **1.08 → 1.48** |
 | [profession-progression.md](profession-progression.md) | — | **No change:** no tuning moves an item, a recipe or a count |
-| [../tier2-world.md](../tier2-world.md) (history) | **Z4** | A note: superseded by SB3 (HP and DEF +27%, offense +10%) |
+| [../tier2-world.md](../../archive/design/tier2-world.md) (history) | **Z4** | A note: superseded by SB3 (HP and DEF +27%, offense +10%) |
 | | §7 (Z5) | A note: MP over a region now has SB18's base regen; Springs as they are |
-| [variance.md](variance.md) (the Uma Templates pass's input) | U12 | The measured budget (§8): signature +4.3–6.1%, matched affinity +2.1–4.7%, both 7–11%. **Decided in uma-templates.md (UT7, UT11, UT13)** (*follow-up to D197*) |
+| [variance.md](../../archive/design/tier-rework/variance.md) (the Uma Templates pass's input) | U12 | The measured budget (§8): signature +4.3–6.1%, matched affinity +2.1–4.7%, both 7–11%. **Decided in uma-templates.md (UT7, UT11, UT13)** (*follow-up to D197*) |
 | | U9 | The MP twists with SB18: each still adds 13–20 points of a region's coverage; a matched Mage reaches 100% (§7.2). **Decided in uma-templates.md (UT6):** the Flourish moved to HP (*follow-up to D197*) |
 | Pages | class-templates.html (hands), weapon-accessories.html (Toll Bell, Great Pendant, presets, viability; the retired supports' MP note), stars-maps.html and stars-grants.html (EP29's presets), class-weaknesses.html (shields), weapon-armor.html and classes-template-sheets.html (where MP comes from) | Redrawn to the values above |
 

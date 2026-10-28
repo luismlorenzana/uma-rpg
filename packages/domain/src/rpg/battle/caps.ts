@@ -11,7 +11,7 @@ export const BATTLE_HEAL_SCALE = 300
 
 // --- The one switch (H53, D179) ----------------------------------------------------------------------------------------
 //
-// Classes v2 (docs/design/classes-v2.md, D160) is engine v15, built dark in H53–H60 and live since H61 (D188): every v2
+// Classes v2 (docs/archive/design/classes-v2.md, D160) is engine v15, built dark in H53–H60 and live since H61 (D188): every v2
 // rule answers by generation, and H61 turned the whole of it on by changing BATTLE_ENGINE_VERSION alone (with save v25).
 // The pattern every v2 rule follows:
 // - a rule outside the engine takes an `engine` argument that defaults to BATTLE_ENGINE_VERSION, so the live game
@@ -21,7 +21,7 @@ export const BATTLE_HEAL_SCALE = 300
 // - the live lists and tables (`RPG_CLASSES`, `HERO_LIMIT_IDS`, `RPG_CLASS_SLOTS`…) are the default generation's.
 // `rpg/battle/v14-replays*.test.ts` proves it: v14 fights replay byte for byte under the live switch and with it at 15.
 //
-// The Tier rework's five releases (D198, docs/design/tier-rework/implementation.md) each open at their engine:
+// The Tier rework's five releases (D198, docs/archive/design/tier-rework/implementation.md) each open at their engine:
 // `rpgRework(stage, engine)`, the same pattern. Each is built dark and turned on by its switch packet, which moves
 // BATTLE_ENGINE_VERSION to the stage's engine: R1, Tier 1's fight, is engine v16, built in H64–H71 and live since H72
 // (D210); R2, Tier 1's economy, is engine v17, built in H73–H81 and live since H82 (D218); weaknesses v2 is engine v18,

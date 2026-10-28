@@ -26,7 +26,7 @@
 > slot. Each edited spot says "Follow-up to D197 (Uma Templates), 2026-10-25".
 
 > **Authored 2026-10-24; revised after the owner's review the same day. Nothing here is built.** The third standalone
-> doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](extra-stats.md),
+> doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.3). It absorbs [extra-stats.md](../../archive/design/tier-rework/extra-stats.md),
 > which stays as history, and supersedes every ES call ([§17](#17-decisions) maps each one). Calls are **EP1–EP29**,
 > each with a recommendation. No open questions.
 >
@@ -122,7 +122,7 @@
 
 ## 1. Today
 
-The Observatory, as built ([loops](../../game/loops.md#extra-stats-and-gear), [materials](../../game/materials.md#star-gems),
+The Observatory, as built ([loops](../../game/loops.md#extra-stats-and-gear), [materials](../../game/materials.md#jewels),
 [sections](../../game/sections.md#observatory); code: `economy/stars.ts`, `economy/bonus.ts`, `economy/pacing.ts`,
 `places/observatory/ObservatoryPage.tsx`, `world/balance-party.ts`).
 
@@ -155,7 +155,7 @@ The Observatory, as built ([loops](../../game/loops.md#extra-stats-and-gear), [m
   found Valor's +4 and Swiftness's +6% too small to feel. Her knack (Gritty, Fleet) and feet armor (12% at G10) keep them.
 - **The core is rebuilt at every promotion** (EP13): the new world's Uma starts with an empty map, as today (D15); the
   same bodies come back with the tier's values. Tiers add weapon moons, never nodes on the core.
-- **Extra Stats never adds a kind** ([weapon-research §2](weapon-research.md#2-who-owns-what)): a weapon moon is flat
+- **Extra Stats never adds a kind** ([weapon-research §2](../../archive/design/tier-rework/weapon-research.md#2-who-owns-what)): a weapon moon is flat
   offense on hits of a kind she already holds; weaknesses, locks and shields read only her weapons. **It never heals:**
   mends and Barriers read ATK or M.ATK without it (Prowess, which is ATK and M.ATK, does reach them).
 
@@ -459,7 +459,7 @@ its moons in the same tap.
 ## 6. Her moon: the template slot, in full
 
 **The owner (2026-10-24):** "I need more clarity on the Uma variance for stats, maybe flesh it out more as well."
-**Her moon** is the two-node moon of her Uma Template ([variance §8](variance.md#8-extra-stats-her-moon)) on its own
+**Her moon** is the two-node moon of her Uma Template ([variance §8](../../archive/design/tier-rework/variance.md#8-extra-stats-her-moon)) on its own
 small orbit, starred and named for her template ("Ironhide's moon"). This section states everything the map does with
 it; what the Uma Templates pass was to decide was marked **[for the pass]** (EP14), and is now decided: her moon's
 values as written, node II on defense ([uma-templates §3.6](uma-templates.md#36-her-moon-ut10), UT10; *follow-up to
@@ -974,7 +974,7 @@ One page, the same in every tier, growing with the map (EP19). Drawn in [the map
 *Versions re-planned by D198 (2026-10-25): the Planet, the three moons, her moon and the jewels ship with **R2, Tier 1's
 economy (engine v17, save v28)**, so this section's "save v27" is v28 and §13's engine "v16" (Prowess's split) is v17;
 the weapon moon's "save v28" and engine v17 are **R3, Tier 2's weapons (v18, v29)**; Tier 3's second weapon moon is **R5
-(v20, v31)**. See [implementation.md](implementation.md).*
+(v20, v31)**. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 **Deleted** (in every tier world):
 - Every Uma's `stars.unlocked` and `stars.active`: today's `moon:`, `bridge:` and `sun:` ids.

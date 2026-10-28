@@ -48,7 +48,7 @@
 >
 > **Authored 2026-10-23; revised after the owner's first review and again after his second pass, both 2026-10-24.
 > Nothing here is built.** The first standalone doc of the Tier rework ([README §5](README.md#5-the-plan), step 3.1). It absorbs
-> [classes.md](classes.md) and [skill-trees.md](skill-trees.md), which stay as history, and supersedes every CL and SK
+> [classes.md](../../archive/design/tier-rework/classes.md) and [skill-trees.md](../../archive/design/tier-rework/skill-trees.md), which stay as history, and supersedes every CL and SK
 > call ([§16](#16-decisions) maps each one). Calls are **CP1–CP43**, each with a recommendation. No open questions;
 > CP42 (the Spell Blade's branch B, Pierce) approved with the rest.
 >
@@ -81,7 +81,7 @@
 > **Owner change, 2026-10-24: Prism dropped.** Three kinds on one weapon "could trivialize the weakness concept". Weapon
 > growth becomes **branches**: from Tier 2 each weapon takes one at G5, **Pure** (weak hits harder; was "Specialized")
 > or **Dual** (a second kind of its own channel; one Dual in her slots in Tier 2, two in Tier 3, the Brawler and the
-> Mage one for good), no third; Tier 3 deepens it (Keen or Tempered). The [research note](weapon-research.md) (WR1–WR6)
+> Mage one for good), no third; Tier 3 deepens it (Keen or Tempered). The [research note](../../archive/design/tier-rework/weapon-research.md) (WR1–WR6)
 > recommends it and weapon-progression.md decides; gear.md's forms are first-round history
 > ([§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33)).
 >
@@ -119,7 +119,7 @@
 | Pace and Late: maybe choose between Mage and Spell Blade, once at Lv 1, on the Uma sheet (2026-10-22) | [§10](#10-the-calling-pick) |
 | Stat growth mustn't drift across tiers (SB1, 2026-10-23) | [§9](#9-class-stats-at-lv-50-under-sb1) |
 | **2026-10-24:** nothing happens between the 10s of Class Rank; can skills rank up every 2 Class Ranks, automatically? | **Yes: Skill Ranks** ([§6.1](#skill-ranks-cp32), CP32): every skill gains a rank every 2 Class Ranks after its depth opens, up to 5, balance-neutral; [the tree viewer](previews/class-trees.html) has a Class Rank slider |
-| **2026-10-24:** with 3 weapons kept, do DPS classes unlock specialized hits, or more damage types, later? If authored, link me | **Both, each with one home** ([§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33)): from Tier 2 each weapon takes a branch at G5, **Pure** (weak hits harder) or **Dual** (one more kind of its own channel, two at most); Tier 3 deepens it. Specialized hits also grow in the trees. **Owner, 2026-10-24: Prism dropped**; weapon-progression.md designs the branches (the [research note](weapon-research.md); first round: [gear §4.1](gear.md#41-weapons-the-first-fork)); [templates page](previews/class-templates.html#grows) |
+| **2026-10-24:** with 3 weapons kept, do DPS classes unlock specialized hits, or more damage types, later? If authored, link me | **Both, each with one home** ([§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33)): from Tier 2 each weapon takes a branch at G5, **Pure** (weak hits harder) or **Dual** (one more kind of its own channel, two at most); Tier 3 deepens it. Specialized hits also grow in the trees. **Owner, 2026-10-24: Prism dropped**; weapon-progression.md designs the branches (the [research note](../../archive/design/tier-rework/weapon-research.md); first round: [gear §4.1](../../archive/design/tier-rework/gear.md#41-weapons-the-first-fork)); [templates page](previews/class-templates.html#grows) |
 | **2026-10-24:** the owner's defaults: Brawler Greatsword, Axe, Lance · Mage Fire, Blizzard, Thunder · Spell Blade Katana, Lance, a Fire or Thunder Tome · Summoner Dark, Light, a Bow or Katana · Cleric Light, Blizzard, Bow · Paladin Greatsword, Axe, Light | **Adopted** ([§3.2](#32-the-default-weapons-cp3)); the two choices resolved (**Thunder**, **Bow**); every balance check re-run ([§4.5](#45-balanced-checked-cp4-cp7)) |
 | **2026-10-24:** let me know what you have authored for later tiers | [§0, later tiers at a glance](#later-tiers-at-a-glance) |
 | **2026-10-24:** passives alone may not be enough variation; maybe each class gets its own unique trees | Every class's weapon trees are already its own ([§6.5](#65-every-classs-trees)); and from Tier 2 each specialization is a **class branch** with three class skills, twelve branches authored (CP34). **Second pass:** its passive became the weapon-group focus ([§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41)) |
@@ -175,12 +175,12 @@ SB4*):
 |---|---|---|---|
 | **Class branches** (second pass: a weapon-group focus) | One of two a class, swapped freely: **Ring or Light/Dark focus, +15% on its kinds**, her default or reverse set, three class skills at Class Rank 20, 30, 40; **all twelve written**, party pairings drawn | The branch's capstone at Class Rank 50 and the class's mastery mechanic (six) | [§7.2](#72-class-branches-tier-2-the-weapon-group-focus-cp26-cp34-cp38cp41), [§7.3](#73-tier-3-the-branch-capstone-and-the-mastery-cp27); [tree viewer](previews/class-trees.html), [pairings](previews/class-templates.html#focus) |
 | **Weapon trees** | **Branch C** joins the fork (every class's third line); each tip forks **Power or Break** | **Capstones** at depth 6; **two branches held**; the master slot | [§6.3](#63-tier-2-branch-c-and-the-tip-fork-cp19), [§6.4](#64-tier-3-capstones-and-two-branches-held-cp20); every node named in [§6.5](#65-every-classs-trees) |
-| **Weapon branches** (owner, 2026-10-24: Prism dropped) | At G5: **Pure** (weak ×1.5) or **Dual** (its **fixed partner**, of its own channel and the other group); one Dual in her slots | Pure → **Keen** or **Tempered**, Dual → **Tempered** or **Evolved** (its Tier 3 partner); two two-kind weapons (Brawler, Mage one); never three kinds. *Follow-up to the weapon review, 2026-10-24* | [§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33); [weapon-research](weapon-research.md) WR1–WR6; decided in [weapon-progression §3](weapon-progression.md#3-weapons) (WP6–WP9, WP32) |
+| **Weapon branches** (owner, 2026-10-24: Prism dropped) | At G5: **Pure** (weak ×1.5) or **Dual** (its **fixed partner**, of its own channel and the other group); one Dual in her slots | Pure → **Keen** or **Tempered**, Dual → **Tempered** or **Evolved** (its Tier 3 partner); two two-kind weapons (Brawler, Mage one); never three kinds. *Follow-up to the weapon review, 2026-10-24* | [§3.5](#35-what-grows-on-her-three-weapons-tier-by-tier-cp33); [weapon-research](../../archive/design/tier-rework/weapon-research.md) WR1–WR6; decided in [weapon-progression §3](weapon-progression.md#3-weapons) (WP6–WP9, WP32) |
 | **Accessories** | A **second slot**; every family's **two branches** open at a slot's G5 (the four families are there from Tier 1) | A **third**; each branch **a step deeper**. *Follow-up to the weapon review, 2026-10-24* | [weapon-progression §5](weapon-progression.md#5-accessories) (WP17–WP25, WP34: damage only, one of each family) |
 | **Armor** | The four classes between **mix halves per piece**; armor carries all defense, × 1.8 | × 2.6 | [weapon-progression §4](weapon-progression.md#4-armor) (WP14–WP15) |
 | **Extra Stats** | **A weapon moon** (Full +90 on one kind or Split +63 on two: +50 × 1.8 Full), outside the kind cap. *Follow-up to D194 (Extra Stats), 2026-10-24: the Halo and Valor retire* | **A second weapon moon** (Full +130, Split +91); Full + Split serves all three weapons. *Follow-up to D194: the Halo's second kind and Swiftness retire* | [extra-stats-progression §4](extra-stats-progression.md#4-tier-2-a-weapon-moon), [§5](extra-stats-progression.md#5-tier-3-the-second-weapon-moon) |
 | **Her template** | The ★ **signature tip** on her lead weapon's tree (*follow-up to D197 (Uma Templates), 2026-10-25: was her affinity kind's tree; UT9*) | At both of its tip forks | [§6.7](#67-the-root-cp24), [uma-templates §3.5](uma-templates.md#35-the-signature-tip-ut9) |
-| **Limit Breaks** | **LB+** at Bond 10 (24 extra effects) | Kept | [§8](#8-halls-of-heroes-and-limit-breaks-cp28-cp35), [tier2-classes §7.2](../tier2-classes.md) |
+| **Limit Breaks** | **LB+** at Bond 10 (24 extra effects) | Kept | [§8](#8-halls-of-heroes-and-limit-breaks-cp28-cp35), [tier2-classes §7.2](../../archive/design/tier2-classes.md) |
 | **Foes** | Every rank has **three kinds**; regulars split by their weaker defense, elites by seed; shields +1 (Z2), bosses 9 (*follow-up to D196: was 8*) | Every rank keeps three; bosses' shields 10 (*was 9*) | [weaknesses v2 WK8](weaknesses-v2.md#wk8--tiers-2-and-3), [§4.4](#44-locks-and-shields-cp8) |
 | **Skill MP** | ×1.7; MP back a round as in Tier 1, a share of her bar (SB18, *follow-up to D196*) | ×2.4; the same | [§6.6](#66-new-nodes-by-rule) |
 
@@ -189,8 +189,8 @@ Not yet authored: Tier 3's numbers (its simulation sets them), and Tier 3's worl
 ## 1. Today
 
 Classes v2 (D160, live since H61, D188). Manual: [classes](../../game/classes.md), [skill trees](../../game/skill-trees.md),
-[heroes](../../game/heroes.md), [combat](../../game/combat.md). Design: [classes-v2](../classes-v2.md) (D186–D188),
-[tiers](../tiers.md), [tier2-classes](../tier2-classes.md), [the Rift](../rift.md) §5.
+[heroes](../../game/heroes.md), [combat](../../game/combat.md). Design: [classes-v2](../../archive/design/classes-v2.md) (D186–D188),
+[tiers](../../archive/design/tiers.md), [tier2-classes](../../archive/design/tier2-classes.md), [the Rift](../rift.md) §5.
 
 | Piece | Today |
 |---|---|
@@ -442,7 +442,7 @@ The [templates page](previews/class-templates.html#matrix) draws the matrix (cla
 
 The owner (2026-10-24): "If we keep 3 weapons through the tiers, do the DPS classes unlock specialized hits on the 3
 weapons, or more weapon damage types in later tiers?" **Both, and each has one home** (weapons own *which kinds* and
-*how hard a weak hit lands*; classes and trees own *how she hits*: the [research note](weapon-research.md), WR1):
+*how hard a weak hit lands*; classes and trees own *how she hits*: the [research note](../../archive/design/tier-rework/weapon-research.md), WR1):
 - **On the weapon: a branch from Tier 2** (WR2–WR5, decided in weapon-progression.md as WP6–WP9). At G5 each
   of her three weapons becomes **Pure** (one kind, weak hits ×1.5 instead of ×1.3; was "Specialized", renamed so it
   can't be read as a hit shape) or **Dual** (a second kind **of its own channel**, the weapon's **fixed partner**,
@@ -468,7 +468,7 @@ weapons, or more weapon damage types in later tiers?" **Both, and each has one h
 
 > **Owner, 2026-10-24: Prism dropped.** Three kinds on one weapon "could trivialize the weakness concept". The first
 > round's forms (Dual or Pure in Tier 2; Prism, Tempered or Keen in Tier 3) are
-> [gear.md §4.1, §5.1, §6](gear.md#41-weapons-the-first-fork), kept as history. **Second pass:** the research note's
+> [gear.md §4.1, §5.1, §6](../../archive/design/tier-rework/gear.md#41-weapons-the-first-fork), kept as history. **Second pass:** the research note's
 > two flags on this section are fixed: the Brawler drawn below held all five Arms in Tier 2 (the Prism problem a tier
 > early) and the templates page drew cross-channel Duals; both are redrawn to WR3 and WR4.
 
@@ -1782,7 +1782,7 @@ cross-check found nothing left, 2026-10-24*):
 version. This doc's **v27** rows are **R1, Tier 1's fight (engine v16, save v27)**, except the accessories, armor and
 crafted weapons (WP27), which move with **R2, Tier 1's economy (v17, v28)**; its "save v28 (Tier 2)" is **R4, Tier 2's
 classes (v19, v30)**; Tier 3's is **R5 (v20, v31)**. §13's engine row reads the same way (v16 R1; Tier 2's nodes,
-branches and tips v19). See [implementation.md](implementation.md).*
+branches and tips v19). See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 **Save v27 (the Tier 1 rework's one migration, every world).** *Changed in cross-check (2026-10-24): v26 is taken on main
 (D190, the UI clarity pass), so the rework's migration is v27 and Tier 2's v28; the engine stays v16 and v17.*

@@ -1,4 +1,4 @@
-// Each chapter's Finals (docs/design/battles.md): three authored routes, each a vanguard (a sub-boss) and then a
+// Each chapter's Finals (docs/archive/design/battles.md): three authored routes, each a vanguard (a sub-boss) and then a
 // champion, with their elements and escorts. Ported from uma-racer, where they were keyed by scenario slug; uma-rpg reads
 // them by release order (D48). Names and lines are original; the faces come from the private PriConne cast.
 import type { RpgElement } from '../rules'

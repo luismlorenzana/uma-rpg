@@ -1,4 +1,4 @@
-// Targets (D100, D126, D144; docs/design/gear-and-targets.md §2): up to ten Umas the facilities plan for. For each,
+// Targets (D100, D126, D144; docs/archive/design/gear-and-targets.md §2): up to ten Umas the facilities plan for. For each,
 // everything maxing her takes: every grade still to bind on each of her gear tracks, up to 10, and the Star Gem of every
 // Extra Stats node she hasn't opened. The requirements engine nets that demand against the Warehouse and the jobs, top
 // level first, and only what is still short flows down: pieces and gems to refined items, refined items to raw ones. From

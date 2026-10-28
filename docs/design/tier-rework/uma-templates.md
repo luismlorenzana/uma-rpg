@@ -3,7 +3,7 @@
 > **Approved by the owner, 2026-10-25 (D197): every call UT1–UT20 as written.** "One of those things that I prefer
 > testing in action." Its §12 follow-ups are applied to the other docs, the README and the pages
 > ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC30); the versions are re-planned by D198 (§9, §10,
-> [implementation.md](implementation.md)). Changes from here are follow-ups logged against it.
+> [implementation.md](../../archive/design/tier-rework/implementation.md)). Changes from here are follow-ups logged against it.
 >
 > **R1 live from H72, 2026-10-25 (D210)** (a follow-up, no decision changed): the template's name, chip and card, the
 > calling and its pick, the Flourish as her calling, the Racing tab's "Her template" and the Stable's Calling, Stride and
@@ -19,7 +19,7 @@
 > **For the owner's review, 2026-10-25. Nothing here is built.** The Tier rework's **Uma Templates pass**
 > ([README §5](README.md#5-the-plan), step 5), the centralization the owner asked for: "the Uma uniqueness page, part of
 > the centralization effort". Every piece that makes one Uma unique, from all four approved docs and the balancing, is
-> stated here once. It absorbs [variance.md](variance.md) (U1–U16), which stays as history, and decides what the four
+> stated here once. It absorbs [variance.md](../../archive/design/tier-rework/variance.md) (U1–U16), which stays as history, and decides what the four
 > approved docs left to this pass (CP24's tip anchor, CP36's affinity, WP33's family, EP14's values, SB15's budget). Calls
 > are **UT1–UT20**, each with a recommendation ([§13](#13-decisions)). No open questions. The approved docs and the README
 > are not edited here: what they need is in [§12, If approved](#12-if-approved-the-follow-ups-by-doc).
@@ -540,7 +540,7 @@ her tip on her Katana tree), the same Even pace and Insignia; Uma E as a Cleric 
 
 *Versions re-planned by D198 (2026-10-25): the calling pick (`OwnedUma.calling`) ships with **R1, Tier 1's fight (save
 v27)** as written; her moon's ids (`template:1–2`) with **R2, Tier 1's economy (save v28)**, where this table says v27;
-the tip pick with **R4, Tier 2's classes (save v30)**, where it says v28. See [implementation.md](implementation.md).*
+the tip pick with **R4, Tier 2's classes (save v30)**, where it says v28. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 **Only the calling pick is stored, as approved; everything else is derived** (U13 kept).
 
@@ -562,7 +562,7 @@ the tip pick with **R4, Tier 2's classes (save v30)**, where it says v28. See [i
 
 *Versions re-planned by D198 (2026-10-25): **the Flourish** ships in **R1, Tier 1's fight (engine v16)** as written;
 **the signature accessory** and **her moon** in **R2, Tier 1's economy (engine v17)**, where this table says v16; **the
-signature tips** in **R4, Tier 2's classes (engine v19)**, where it says v17. See [implementation.md](implementation.md).*
+signature tips** in **R4, Tier 2's classes (engine v19)**, where it says v17. See [implementation.md](../../archive/design/tier-rework/implementation.md).*
 
 | Change | Engine | Kind |
 |---|---|---|

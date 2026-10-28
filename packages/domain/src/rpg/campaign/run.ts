@@ -1,5 +1,5 @@
 // A party's run through one chapter: cleared nodes, carried MP and the open fight with its actions
-// (docs/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
+// (docs/archive/design/battles.md). Ported from uma-racer; uma-rpg keeps runs inside the tier world and replays a fight from its
 // actions, so a fight survives a reload and continues on another device (D52).
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, replayBattle, rpgRework, rpgV2 } from '../battle/engine'
 import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../battle/types'

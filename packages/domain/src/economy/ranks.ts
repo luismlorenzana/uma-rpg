@@ -1,4 +1,4 @@
-// The ranks (docs/design/progression.md, D102): beside her Uma Level, each Uma has a Class Rank for every class (1–50), a
+// The ranks (docs/archive/design/progression.md, D102): beside her Uma Level, each Uma has a Class Rank for every class (1–50), a
 // Weapon Rank for each of the ten weapons, an Armor Rank for each of the ten armor kinds and an Accessory Rank for each of
 // the four accessory kinds (1–10, D124). Winning fights fills them; past a max rank, EXP banks at half rate as Marks for
 // the whole world. Nothing is trained and no token is spent.

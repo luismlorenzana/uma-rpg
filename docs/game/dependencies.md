@@ -7,10 +7,11 @@ are listed by hand below.
 
 | Tool | Version |
 |---|---|
-| Node | 22 or later (`.nvmrc` 22) |
+| Node | 22 or later (`.nvmrc` 22; CI and the API image use 22) |
 | pnpm | 10 (`packageManager` in `package.json`) |
 | TypeScript | 5.9, strict, `noUncheckedIndexedAccess` |
 | Turbo | 2 |
+| Vitest | 3 |
 
 `@luismlorenzana/*` packages come from GitHub Packages and need a token to install:
 `NODE_AUTH_TOKEN=$(gh auth token) pnpm install`.
@@ -44,11 +45,11 @@ are listed by hand below.
 | Service | Used for | Where configured |
 |---|---|---|
 | Firebase Hosting (`uma-rpg`) | The web app, and `/api/**` rewritten to Cloud Run | `firebase.json`, `.firebaserc` |
-| Firebase Auth | Google sign-in; the API verifies ID tokens | `apps/web/.env.production`, `apps/api/src/auth/` |
-| Cloud Run (`rpg-api`) | The API | `.github/workflows/deploy.yml` |
+| Firebase Auth | Google sign-in; the API verifies ID tokens | `apps/web/.env.production`, `apps/web/src/app/firebase-config.ts`; the API's guard from `@luismlorenzana/uma-server/auth` in `apps/api/src/app.module.ts` |
+| Cloud Run (`rpg-api`) | The API | `.github/workflows/deploy.yml`, `apps/api/Dockerfile` |
 | Firestore | Saves, save backups, push subscriptions | `apps/api/src/save/`, `apps/api/src/push/` |
 | Cloud Storage | Master data (`uma-platform-master-data`), private cast (`uma-rpg-content`) | Repository variables |
-| Artifact Registry | API images | `deploy.yml` |
+| Artifact Registry | API images | `deploy.yml`, `infra/github-actions/bootstrap.sh` |
 | Cloud Scheduler | The push tick | `infra/push/setup.sh` |
 | Secret Manager | VAPID keys (`rpg-vapid`) | `infra/push/setup.sh` |
 | GitHub Actions + Packages | CI and deploy (WIF); the `@luismlorenzana` packages | `.github/workflows/`, `.npmrc` |
@@ -57,7 +58,12 @@ All values are in `docs/technical/infrastructure.md`. The budget alert is $5 a m
 
 ## From uma-platform
 
-| Package | Version | What uma-rpg takes from it |
+Their versions are in the generated list above.
+
+| Package | Used by | What uma-rpg takes from it |
 |---|---|---|
-| `@luismlorenzana/uma-data` | 1.0.0 | Master data types and the release client (web), test fixtures (domain) |
-| `@luismlorenzana/uma-art` | 2.8.0 | Item, gear, Star Gem, building, tile, world, battle-effect and UI atlases (its dish atlas and farm rows are uma-racer's, D144) |
+| `@luismlorenzana/uma-data` | web, domain (the API installs it for the domain) | Master data types and constants (stats, aptitude grades, the art index); test fixtures (`/testing`) |
+| `@luismlorenzana/uma-art` | web | Item, gear, gem, building, tile, world, battle-effect and UI atlases, among them the Wilds' fifteen buildings and each Arm's own color (`<arm>-hue` rows, D234); its dish atlas and farm rows are uma-racer's (D144) |
+| `@luismlorenzana/uma-kit` | web | The theme, primitives, shell and Hub map, sign-in, the content client, the place frames, the album and the work screens |
+| `@luismlorenzana/uma-work` | domain | The work engine every job runs on, in the web app and the API |
+| `@luismlorenzana/uma-server` | API | The auth guard and owner allowlist, the master data release proxy and the private pack routes |

@@ -7,16 +7,16 @@ code as it runs on https://uma-rpg.web.app. Specs, plans and history live elsewh
 
 | Page | Find there |
 |---|---|
-| [Architecture](architecture.md) | Repos, packages, the web app, the API, the save, private content, deploy, local setup |
+| [Architecture](architecture.md) | Repos, packages, the web app, the API, the save and its history, private content, deploy, local setup |
 | [Dependencies](dependencies.md) | Tooling, every package and version, cloud services, uma-platform packages |
-| [Game loops](loops.md) | Collection, leveling, ranks (Class, Weapon, Armor) and Marks, Laurels, currencies, Craft Level, Extra Stats and gear, Springs and Sweeps |
+| [Game loops](loops.md) | Collection and parties, leveling, Class Rank and Marks, Laurels and currencies, Speed Tickets, the Exchange and the Warehouse, the Tier rework's updates, Craft Level and trades, Extra Stats and gear, Springs and Sweeps, the Rift, achievements |
 | [Game sections](sections.md) | Every Hub page and place, every screen, the global UI |
-| [Combat](combat.md) | Rounds, actions, the damage formula, weaknesses and Breaks, statuses, Limit Breaks, foes, constants |
-| [Classes and weapons](classes.md) | The six classes, one healer a party, her calling and template, ten weapons, three weapon slots and armor slots, skill depths, lines and Skill Ranks, the four bars |
-| [Skill trees](skill-trees.md) | All 50 trees, every node with its line, MP and effect |
+| [Combat](combat.md) | Rounds, actions, the damage stack, her accessory and signature, weaknesses, shields and Breaks, statuses, support, MP and the Flourish, Limit Breaks, foes, the Rift's foes, constants |
+| [Classes and weapons](classes.md) | The six classes, her calling and template, ten weapons in three slots, armor and the accessory, presets, skill depths, lines and Skill Ranks, the four bars |
+| [Skill trees](skill-trees.md) | Every tree and node with its line, MP and effect; the lines at a glance; Pierce; equipped skills |
 | [Halls of Heroes](heroes.md) | Six halls: Heroes, Learners, Bonds and the 24 unique Limit Breaks |
-| [Materials](materials.md) | The 8 families and 160 items, the 100 Star Gems, the 40 gear types and their recipes |
-| [The world map](maps.md) | Biomes, signatures, formations and waves, continents and regions, faces |
+| [Materials](materials.md) | The lines and their G1–G10 materials, the fifteen Wilds places, the made items and their recipes, gear by grade |
+| [The world map](maps.md) | Biomes, signatures, a stage's foes, formations and waves, capitals, continents and regions |
 
 Looking for one thing? Search this folder first (`rg -n "Spring" docs/game`). Each page names the code it describes.
 
@@ -36,9 +36,9 @@ Looking for one thing? Search this folder first (`rg -n "Spring" docs/game`). Ea
 
 | Where | What it is |
 |---|---|
-| `docs/decisions.md` | The decision log (D-numbers): why things are the way they are |
-| `docs/design/` | Design specs and proposals; some describe plans or older rules |
-| `docs/handoff/` | Ranked open tasks as self-contained packets, for Claude or a delegated agent |
-| `docs/technical/` | Infrastructure values and older architecture notes |
-| `docs/slices/`, `docs/tasks/`, `docs/plan.md` | The build history, slice by slice |
+| `docs/handoff/` | The current phase (Tier 1 hardening, from 2026-10-28) and its packets |
+| `docs/decisions.md` | The decision log from D238 on (D1–D237 are in the archive) |
+| `docs/design/` | The Tier rework's approved designs (Tier 1 as designed, and the Tier 2 and 3 drafts the coming rework starts from), and the live specs of the Rift, the Uma profile, pacing and the enemy roster. Where they differ from this manual, the manual and the code win |
+| `docs/technical/`, `docs/testing/` | Infrastructure values, older architecture notes, the phone check |
+| `docs/archive/` | History: decisions D1–D237, finished plans and packets, superseded specs, the slices. Never current rules |
 | `AGENTS.md`, `CLAUDE.md` | How to work in this repo |

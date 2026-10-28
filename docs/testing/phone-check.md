@@ -1,127 +1,140 @@
 # Current phone check
 
-Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). The rules and lists are in the
-[game manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
+Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
+(engine v18, save v31); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
-Use your existing save; do not reset it. Start with five free Umas, an Uma at Lv5+ for side skills, and enough Laurels,
-raw/refined grade-1 items, Promotion and Mastery Tokens for the jobs below. Earn missing stock in fights or
-gather it; the Exchange trades tokens. Jobs can finish while you are away, or with the Speed Tickets in step 39 (do
-that step early if needed). Keep one regular stage's first-clear rewards to compare with its replay and Sweep.
+Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
+or more; a cleared regular stage; some Laurels, Speed Tickets and Sweep Tickets; and, for one Uma, a made item that
+raises one of her slots now and a jewel she can set (make them in steps 17–18 first if you have none). Raising grades,
+setting jewels and spending tickets are real progress on the save. Jobs finish while you are away, or with Speed Tickets
+(step 19).
 
-**Phone only** means an installed iPhone app or production service is required; local auth-off previews cannot check
-it. Check the other steps at 390×844, then repeat the busy screens at 375×667: Skills, fight, recipe, training and
-Exchange sheets. Every button and footer should remain reachable without horizontal page scrolling.
+**Phone only** means an installed iPhone app or the production service is required; local auth-off previews cannot check
+it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the Skills and Gear tabs,
+a Wilds job sheet, the fight and the Exchange. Every button and footer should stay reachable without horizontal page
+scrolling, in light and dark.
 
 1. **Phone only — install.** In Safari open the live game, tap Share → Add to Home Screen, then open Uma RPG from its
-   icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator.
-   After a status-bar metadata change, remove the existing Home Screen app first: iOS freezes that metadata when it is
-   installed. Expect an opaque status bar with no blur over the top bar.
-   **iPhone 15, 393×852 (D149):** the bottom bar is docked to the screen's bottom edge, with no empty band below it.
-   Its panel runs under the home indicator, and its tabs sit just above it. Place pages, the side panel and sheets
-   reach the bottom too. Place pages scroll inside the frame.
-   **Shell (D147):** the top bar shows your initial with the Tier crest, then Laurels, Speed Tickets and Uma Tickets
-   `N · s/5`. The bottom bar reads Town Hall · Learning · Battle (raised) · Wilds · Menu. In **Account → Appearance**,
-   Light and Dark switch the whole app at once and System follows the phone; a fight stays dark either way.
+   icon. Expect the app without Safari's address bar and with content clear of the notch and Home indicator. After a
+   status-bar metadata change, remove the existing Home Screen app first: iOS freezes that metadata when it is
+   installed. Expect an opaque status bar with no blur over the top bar. **iPhone 15, 393×852 (D149):** the bottom bar
+   is docked to the screen's bottom edge, with no empty band below it. Its panel runs under the home indicator, and its
+   tabs sit just above it. Place pages, the side panel and sheets reach the bottom too, and place pages scroll inside
+   the frame. **Shell (D147):** the top bar shows your initial with the Tier crest, then Laurels, Speed Tickets and, in
+   Tier 1, Uma Tickets `N · s/5`. The bottom bar reads Town Hall · Learning · Battle (raised) · Wilds · Menu. In
+   **Account → Appearance**, Light and Dark switch the whole app at once and System follows the phone; a fight stays
+   dark either way.
 2. **Phone only — sign in.** Tap **Sign in with Google** with the owner's account. On a new save, enter a trainer name
-   and tap **Enter the Hub**: expect an empty Stable and 20 Uma Tickets. On an existing save, expect your saved Hub.
-3. Tap the account bar, edit **Trainer name** and tap **Save**; reopen Account. Expect the name to persist and the
-   **App build** to identify the release. **Phone only:** if **Update ready** appears, tap **Restart to update** and
-   confirm the new build and your save after reopening.
-4. Tap **Town → Stable → Enter Stable**. On the first H30 load, expect **Uma level**, highest first; after that your
-   chosen controls persist. Owned Umas stay before locked with either arrow direction. The Party Hall slot picker,
-   Observatory tabs and Exchange's Manuals picker also open highest-level first; a direct Observatory link keeps its
-   selected Uma. Work pickers remain free first, then Craft Level.
-   Tap **Filters → Front → Show**, **Sort → Name**, then **List**. Expect Front A+
-   outfits in name order. Remove the **Front A** chip; expect the full list again.
-5. Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**, and repeat until you own at least five.
-   Expect one Ticket spent per unlock, an owned profile with Lv1, and the **Owned** count increased.
-6. Open **Party Hall**, select a party, edit **Party name → Rename**, then fill its five slots. Expect the chosen name
-   and **5/5** in the party list.
-7. Add one of those Umas to another party. Expect her to move out of the first party, never appear in both. Put her
-   back; expect the first party full again.
-8. Reload and reopen Stable and Party Hall. Expect the unlocks, name and slots to persist. **Phone only:** open the
-   live game in another signed-in browser and expect the same save after cloud sync.
-9. Open an owned Uma's **Skills** tab and switch **Brawler**, then **Mage**. Expect five fixed Arms (Greatsword, Axe,
-   Lance, Bow, Katana), then five fixed Tomes (Fire, Blizzard, Thunder, Light, Dark). Each has five tree tabs. (D86)
-10. Switch **Spell Blade**, **Summoner**, then **Cleric** and tap weapon slots. Expect three Arms/two Tomes, three
-    Tomes/two Arms, and any five respectively. Pick a replacement; expect the weapon and active trees to change,
-    with unequipped trees dimmed. Give the party one Uma of each class. (D86)
-11. Tap the **(i)** beside **Class** and close its sheet. Expect the explanation in the sheet, with short labels on
-    the profile. In a tree, expect depth-1 cores known at rank1/Lv1; depth2 waits for both rank2 and Lv10. Side skills
-    show **Opens at Lv5** on a fresh Uma. (D77, D86, D95)
-12. On an Uma at Lv5+, tap a depth-1 side's **Learn · 1 pt**, then **Swap out · refund** and learn the other side.
-    Expect one point spent and refunded, and only one side learned at that fork. (D86)
-13. Tap an equipped skill to remove it, then **Equip** on a known core or learned side. Expect the equipped count to
-    change without exceeding its slots. Tap **Back to auto**; expect **chosen for her** again. (D86, D95)
-14. Open **Scenario Gate** and select the full party in its party bar. Open the first continent and a Lv1 region.
-    Expect all five continents available, four regions per level, twelve stages in the region, and only the first
-    uncleared stage open. Progress is shared when you switch parties. (D72)
-15. Tap an open stage. Expect its level, foes, shields, weakness icons and **Fight**. Tap **Fight**: expect the five
-    party members at full HP, with their carried MP, and foe/party controls on one screen. (D72, D95)
-16. During a stage with the **Brawler**, tap an **Attack** weapon, then a foe; on her next turn use **Skills** and an
-    affordable Arms skill. Expect one act per turn and the selected weapon's hits; a weak hit chips a shield. Win
-    this stage, or continue the fight until her action can be seen. (D86)
-17. In the next stage use the **Mage**'s Tome **Attack**, then an affordable spell. Expect an elemental Attack with no
-    MP cost, and one spell act per turn with its listed MP spent. (D86)
-18. In the next stage use the **Spell Blade**: select an Arms skill and a Tome skill (reopen **Skills** for the second
-    half), then tap a foe. Expect the blade followed by the spell in one act, with both MP costs spent. A free Attack
-    also pairs an Arm and a Tome. (D86)
-19. In the next stage cast a **Summoner** skill, then another on her next turn. Expect the first summon to stay beside
-    her; when the second is cast, the waiting summon hits first, leaves, and the new one stays. (D86)
-20. In the next stage use the **Cleric**'s Arms skill, then a Tome skill. Expect a debuff on the struck foe, then a buff
-    on the party; these skills deal damage rather than heal. When any class's Limit gauge fills, tap it and use the
-    offered **Limit Break**: expect the full turn at 0 MP. (D86)
-21. Tap **Auto**, then cycle speed **1× → 2× → 4×**. Expect allies to act without input and effects to speed up. Tap
-    Auto off or a manual control; expect control back. Reload between fights; expect Auto and speed remembered. (D89)
-22. Start a fight, take an action, then use its menu's **Back to the map** and reload. Tap **Resume the open fight**;
-    expect the saved action, HP, MP and round. Use **Give up**; expect no rewards or stage clear, and pre-fight MP.
-23. Clear through stage8 and inspect its sheet, then fight it. Expect two waves listed, a wave transition and wave
-    chip, with party HP/MP carried into wave2. Inspect an elite for **Acts twice**, a dual-element foe for both
-    elements, and a swarm for 6–8 foes in two rows. The boss sheet lists three waves. (D91)
-24. After a first win, note **First clear!**, EXP, Laurels and tokens. Tap **Fight again** and win. Expect no
-    **First clear!** badge, about a quarter of first-clear EXP and Laurels, and tokens that are chance drops; the map keeps the
-    clear and increases its win count. (D79)
-25. At **Exchange**, tap **Sweep Ticket** and buy one. Expect 15 Laurels spent and the Sweep count increased. Return
-    to a cleared regular stage: expect **Sweep**; an uncleared stage or elite/boss offers no usable Sweep.
-26. With the full party idle and no open fight, tap **Sweep → ×1**. Expect one Ticket spent, a **Swept** result with
-    replay rewards (including Laurels and possible tokens), a counted win and unchanged MP. Tap the Sweep **(i)** to
-    read its rules; expect them in a sheet. (D79, D91, D95)
-27. Return to the continent and tap **Spring** with some MP spent. Expect the active party's MP refilled and a
-    recharge countdown of about two hours. It is disabled during an open fight or its recharge. (D72)
-28. The Hub has four pages: Town Hall, Learning, Battle and **Wilds**. At **Wilds → Monster Den**, assign a free Uma, choose a
-    grade-1 output, **×1 → Start**. Repeat at **Wilds → Mine** with another Uma. Expect both timers and progress rings
-    on the Hub, three slots each; higher grades show their Craft Level gate. (D144)
-29. Open Party Hall with a working member. Expect **Busy**; her party cannot start a fight. Recall her from her slot
-    or facility and expect her free. Finish the other job and tap **Collect**: expect stock and Craft EXP paid,
-    its slot freed, and its Hub Ready badge cleared.
-30. At **Workbench**, refine a raw material. Expect one raw input reserved per output on **Start**, then a refined item
-    and Craft EXP on **Collect**. Recall an unfinished refining job;
-    expect its unused inputs returned.
-31. At **Lapidary**, choose an Uma and a grade-1 moon gem (Quartz of …) from the icon grid; review its refined
-    material, then start and collect it. Expect the input spent and the gem on **Warehouse → Star Gems**. (D144)
-32. At **Observatory**, pick an Uma and tap the gem's **Set**. Expect one gem used and its first eligible node
-    opened. Tap that node off and on: expect the active count and stat total to change, within the displayed limit.
-33. At **Forge**, pick an Uma, a grade-1 **Arm**, and an accent. Expect exactly four refined materials: one each from
-    Ores, Stones, Woods and Hides & Scales, and **no token**. Start and collect it; expect gear and Craft EXP. (D86, D94)
-34. At the Forge inspect a **Tome** and an elemental **Orb**: expect Crystals, Fibers, Essences and Bones & Horns,
-    one each, with no token. Craft an Orb and a Garb; all ten weapon types and ten Orbs are selectable. (D86, D94)
-35. Open an Uma's **Gear** tab; equip the weapon, armor and Orb from stock. Expect five weapon slots plus Armor and
-    Accessory, the pieces marked **Worn/Hers**, and stock reduced as they bind. Take one off and re-equip it; it stays
-    hers. In a fight, expect the Orb's extra kind on her hits and a matching weakness to chip a shield. (D86)
-36. At a class hall, tap a free training slot and select **class rank**. Expect a **Promotion Token** in the Uma's
-    row. Start, finish and tap **Rank up**: expect rank2 in her Skills tab; depth2 still waits for Uma Lv10. (D77)
-37. In a class hall choose **Weapon Level**; also inspect **Armory → Armor Level** and **Jeweler → Accessory Level**.
-    Expect each next level to require the band's **Mastery Token**. Start one, check that the token leaves stock,
-    then **Recall** and check its refund. Start again, finish and **Rank up**: expect Level2 and grade2 gear wearable
-    in that track. Class rank and gear level remain separate. (D94)
-38. At **Exchange → Tokens**, open a band-1 token and tap **×1** in Sell twice, then buy one different kind in that band.
-    Expect +40 then −40 Laurels, with stock changed. Check **Warehouse → Tokens** can sell one for 20 Laurels too;
-    Mastery, Promotion and Cooking are the current kinds. (D80, D94)
-39. Buy **Speed Tickets** at the Exchange (10 Laurels each). On a running gather/refine/craft/cut job and a training
-    job, tap **−30m**: expect one Ticket spent and 30 minutes removed. Let the countdown refresh, then tap **Finish · N**
-    when more than one Ticket is needed (use **−30m** for the last one). Expect N Tickets spent, **Done**, and
-    **Collect/Rank up** still required to receive the output. (D74)
-40. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and
-    tap **Send a test**. Expect the test push. Leave a job or training near completion, close the app, and expect a
-    completion push within about five minutes of its end; tap it and expect its place, Ready state and app badge.
-
+   and tap **Enter the Hub**: expect an empty Stable and 20 Uma Tickets. On an existing save, expect your Hub on the
+   last page you viewed.
+3. **Account.** Tap your initial, edit **Trainer name** and tap **Save**; reopen the Account. Expect the name kept, the
+   **Tier 1 wallet**, the achievements list and the **App build** naming the release. In a world the Tier rework
+   migrated, **The Tier rework's grant** row reopens "The Wilds are rebuilt"; **Later** closes it. **Phone only:** if
+   **Update ready · Restart** appears, tap Restart and confirm the new build and your save after reopening.
+4. **The Hub.** Swipe through the four pages. Expect Town Hall's plaza (up to five chibis; tap one for her sheet with
+   **Fight**, **Profile** and **Feature another**, and feature another to see her step in front), Learning's six halls
+   and the Observatory, Battle's Scenario Gate and Rift (locked with "Opens at five Lv 50 Umas · n/5" until five are),
+   and the Wilds' fifteen buildings in five rows, each tappable on its own at 375×667. Tap the Stable: its quick look
+   opens in the side panel with **Enter Stable**; swipe it away. Tap the Scenario Gate: its page opens at once. Open
+   **Menu**: "Every place" by page, with locks and ready counts, then the Account.
+5. **Stable roster.** Tap **Town → Stable → Enter Stable**. Expect Uma Level, highest first, by default, with owned Umas
+   before locked in either sort direction. Open **Filters** and pick a **Calling**, then a **Trade** ("Mine · Weapon
+   Forge"): expect only matching Umas and a head count on each value. Search the last word of an Uma's template chip:
+   expect every Uma of that type. Switch faces → cards → list, save the view, reload: expect it kept.
+6. **Unlock** (Tier 1). Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**. Expect one Ticket spent,
+   her profile at Lv 1 and the **Owned** count up by one.
+7. **Profile.** Tap the template chip: expect **Her template** with Calling, Stride and Knack and what each read, her
+   trade, her Flourish and its state, her Signature and her Moon. On a Pace or Late Uma whose calling is open, expect
+   the calling card: two tiles, each with its trade and head count, the suggested one marked. Tap the other tile and
+   back; don't **Confirm** unless you mean it ("Her first win confirms it."). Mark her as a target and unmark her. Tap
+   the class cell (Skills opens) and the Party or Working cell (its place opens). (D206, D216, D229)
+8. **Skills tab.** Tap the class: the Class sheet lists six classes; switch to another and back, and expect each class
+   to keep its own weapons and skills. Tap each of the three tree buttons. Tap a held node: its sheet shows rank pips,
+   "Rank n · next at Class Rank n" and its line; **Equip** it, then tap it in **Equipped** to take it off. Tap the B
+   square and **Take branch B**: expect the tree's letter to read B and its equipped skills to follow; take A back. Tap
+   **Back to auto** if shown. Tap **Change**: the slot sheet lists the channel's weapons with their grades; pick
+   another, expect the tree to change, and put it back. (D201, D206, D229)
+9. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and
+   Signature while she wears her family), Defense, Sustain (HP, MP with "+n a round", ★ Flourish, or "No effect as …"
+   outside her calling's class) and Other; gear's part in blue and Extra Stats' in green. (D204, D217)
+10. **Gear → Equip.** Tap **Use standard preset**: expect "Standard preset on". Tap each accessory family: one detail at
+    a time, her ★ family first with its signature line. On a Bell or an Orb, the kind buttons are her three weapons';
+    **Equip** one, then pick another kind and tap "Switch to …". (D223)
+11. **Gear → Upgrade.** Expect "Upgrade · n" to match the green marks. Tap a ready pill: the grade goes up by one, one
+    made item is spent and the count drops. A blocked row says why ("Needs Lv …", "Needs 1 Arms Gem G…", "Already G10").
+    On a row with several grades in stock, open it, tap **Up to G…**, read the list and **Raise**. Tap **Extra Stats**:
+    her Observatory map opens. (D217, D223)
+12. **Work and Racing tabs.** Work shows her job, if any, and "Craft Lv n · {her trade}" with her Craft EXP bar. Racing
+    shows her aptitudes, **Her template**, her racing stats and her unique skill.
+13. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
+    list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
+    on another member: the ring and flag move and nobody reorders. Put two healers in one party: expect "One healer a
+    party" on its card and in the editor, and picking never refused. Restore the party.
+14. **Reload and sync.** Reload, then reopen the Stable and the Party Hall: expect the unlock, names, slots and grades
+    kept. **Phone only:** open the live game in another signed-in browser and expect the same save after cloud sync.
+15. **Halls of Heroes.** Open a hall: four seats, each with "Answers …". Seat a Hero with **+ Hero**, then tap **+** for
+    a Learner: the picker shows "Bond n · n/2 Heroes" and "Adds …", and Umas that can't sit there show why. Open the
+    Learner's sheet: her Bond, its strength and **Leave this Hero**. (D106, D206)
+16. **Observatory.** Pick an Uma: expect "Open n of 20 · ★ n of 2" and her map with "★ {her type}". Tap a closed node:
+    its sheet names its value and jewel. Tap **Set** on a ready jewel: the node fills, the counts and totals go up and
+    the jewel is spent. A Moon Jewel that fits several nodes asks which. (D217)
+17. **Wilds: gather.** At **Wilds → Mine** (or her trade's gathering place) tap a free slot. Expect Who → How many →
+    What: her trade's Umas first with "C{Craft Level}", others greyed "Another trade" (unless the header says "Open
+    shop: …"); sizes ×1, ×2, ×3, ×5, ×10, ×15 and ×20, each with its time, about half an hour to 8 hours; ten raw tiles,
+    the higher ones "From Craft Lv …". Start ×1. Expect her face in the arch over the Mine with her Craft Level and a
+    progress ring, and the job in its slot row. (D230, D233)
+18. **Wilds: process and make.** At the row's workbench, process a raw item: ten refined tiles. At its making place (the
+    Weapon Forge for Metal), pick an Arms Gem G1: the recipe card names its refined input, the count needed and what is
+    held, and the sizes stop near 8 hours. Start, finish and collect: expect the item under **Warehouse → Made items**
+    and Craft EXP paid. (D232)
+19. **Speed Tickets, Finish all, queues.** On a running job tap Speed up: **−30m** spends one Speed Ticket and cuts 30
+    minutes; **Finish · N** spends N (a warning when minutes would go unused). With two or more slots running, tap
+    **Finish all · N Speed Tickets** → "Finish n jobs for N Speed Tickets?" → **Yes**: expect every slot Done. Collect:
+    the Ready badge, the Collect all pill and the Wilds tab's count update. On a running job, **More → Queue next**
+    (three at most), then **Recall**: expect the preview of what is collected, what comes back, the minutes lost and the
+    queued jobs dropped. (D74, D216)
+20. **Targets.** With an Uma marked as a target, open her trade's places: **For your targets** lists what she still
+    needs there; tap a short icon and expect the job sheet on that item with that count. A queue that stopped for want
+    of inputs shows its card with **Restart** and **Dismiss**.
+21. **Warehouse.** Expect the header's two counts and seven shelves: All, Metal, Wood, Vegetables, Fish, Stone and Made
+    items, with Every grade, Highest and the grades held as chips. Open a stack: its line ("Metal · G1 · raw · Refines
+    into Copper Ingot"). Sell ×1: one fewer, Laurels up. (D222)
+22. **Exchange.** Buy one Speed Ticket (10 Laurels) and one Sweep Ticket (15): expect the counts up. Under **Raw
+    materials**, switch line tabs: G1–G5 open after the tier's first win and G6–G10 after a win on continent 3, else
+    locked with that reason; buy ×5 of an open one. If you have Class Marks, **Read a Class Manual** → an Uma → ×1 on a
+    class: 1,000 Class Marks for 1,000 EXP on that bar. (D102)
+23. **World map.** Open **Scenario Gate**. Expect **Map / List** remembered, and the party bar: "Party n · swap" opens
+    "Who fights?", **Edit parties** opens the Party Hall, and the five faces show their MP. Open a continent and a Lv 1
+    region: twelve stages, the first uncleared one open. Tap an open stage: its sheet lists the foes by wave, each with
+    "Shield n · Weak:" and her icons (in Tier 1 four kinds on a regular, three on an elite or boss), and **Fight**.
+    (D72, D237)
+24. **Fight.** Tap **Fight**. Expect the header (the wave chip on a multi-wave stage, Round, Auto, speed, menu), foe
+    cards with the shield badge and up to four weakness icons and no "Weak:" word, and the party's HP and MP bars. Pick
+    a weapon in the three-weapon row and tap a foe: its preview shows above it (yellow when weak), then the hit; a weak
+    hit chips the shield. Open **Skills**: each skill's MP and "weak: …"; cast one. With a Spell Blade or a Summoner,
+    the line above the buttons names both halves. Use **Guard** on an ally. When **LB** appears, open it and use a Limit
+    Break at 0 MP. (D206, D237)
+25. **Auto and speed.** Tap **Auto**, then the speed: 1× → 2× → 4×. Expect allies to act without input and effects to
+    speed up; a manual tap stops Auto. Reload between fights: expect Auto and the speed remembered. (D89)
+26. **Leave and resume.** Mid-fight, open the menu → **Back to the map**, then reload. Tap **Resume the open fight**:
+    expect the same round, HP and MP. Then **Give up**: expect no rewards, no clear and MP as before the fight.
+27. **Result.** Win a stage. Expect **Victory!**, the rounds and "First clear!" on a first win, the Laurels chip, and
+    for each Uma her EXP, her Class Rank bar and any "… reached Rank n" or "… opened" line; a Learner's Bond. Tap
+    **Fight again** and win: no "First clear!", a smaller pay, and the map keeps the clear and counts the win. (D79,
+    D206)
+28. **Sweep.** On a cleared regular stage tap **Sweep · n → ×1**. Expect one Sweep Ticket spent, a "Swept with a ticket"
+    result like a win, and MP unchanged. An elite, a boss or an uncleared stage offers no Sweep. (D79)
+29. **Spring.** With some MP spent, tap the region's **Spring · MP** (or a continent's Spring). Expect the party's MP
+    refilled and its recharge time; it is off during an open fight. (D72)
+30. **The Rift** (a tier with five Lv 50 Umas; skip otherwise). Open its quick look and page. Open an Echo: its foes
+    ("Shield n · Weak:" and the ward), a party, its guided weapons with **Use the guided weapons**, and **Fight**; win
+    or give up, and expect "Back to the Rift". If a run is on, open a front's chain (the next stage ringed), its stage
+    sheet and the Convergence card. Sign up twenty only for a run you mean to play. (H50, D206)
+31. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas
+    through the Tier n Rift". With a Tier 2 world, pick it: expect the veil, Tier 2's Town Hall in dusk amber and its
+    own wallet with no Uma Tickets chip; switch back. (H35, H36)
+32. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and tap
+    **Send a test**. Expect the test push. Leave a job near its end and close the app: expect "Work done" with its
+    place, item and count within about five minutes of the end; tap it and expect that place on its tier, its Ready
+    state and the app badge.

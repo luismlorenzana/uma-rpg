@@ -1,4 +1,4 @@
-// Equipment (S7, design §7, D59, D86, D124; docs/design/gear-and-targets.md): forty types in ten grades. A recipe is two
+// Equipment (S7, design §7, D59, D86, D124; docs/archive/design/gear-and-targets.md): forty types in ten grades. A recipe is two
 // refined items of its grade (D125), one from each half of the Wilds, the pair rotating with the grade so every Uma
 // uses all eight families alike (D139). Craft Level gates the grade made (5g − 4), and the matching rank the grade worn.
 // What a piece does, all flat (D104, D124): a weapon's Might (+4 a grade) adds to the offense of hits made with it; an

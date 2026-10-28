@@ -1,4 +1,4 @@
-// What a won fight pays (docs/design/battles.md): level-relative EXP for every entrant and Laurels for the world (D51).
+// What a won fight pays (docs/archive/design/battles.md): level-relative EXP for every entrant and Laurels for the world (D51).
 // EXP is uma-racer's rule re-weighted for ten-level chapters (D48); Laurels come from the pacing model (D54).
 import { BATTLE_LAURELS } from '../../economy/pacing'
 import { rpgExpToNext, RPG_TIER_MAX_LEVEL } from '../rules'
