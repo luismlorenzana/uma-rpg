@@ -3,6 +3,48 @@
 /* The shared theme of both games (uma-kit, uma-platform P48; D147): the "Paddock" tokens in light and dark under one set
    of names, base styles and utilities. Tailwind also reads the kit's own classes. */
 @import '@luismlorenzana/uma-kit/theme.css';
+
+/* Damage kinds' colors (D234), for the inline glyphs (`KIND_COLOR` in battle/labels.tsx): the elements as uma-art paints
+   their Tomes, each Arm beside its twin element's as uma-art 2.15.0 paints it. Dark mode keeps the art's light tones; light
+   mode takes deeper ones so the pale kinds (Light, Lightning, Ice, the Bow's jade) still read on a white panel. */
+:root {
+  --kind-fire: #e0562a;
+  --kind-ice: #2f8fd8;
+  --kind-lightning: #b98900;
+  --kind-light: #c08a1e;
+  --kind-dark: #9150d8;
+  --kind-greatsword: #d9761a;
+  --kind-axe: #5b4fd6;
+  --kind-lance: #2f9a43;
+  --kind-bow: #1f9e88;
+  --kind-katana: #c8346f;
+}
+[data-theme='dark'] {
+  --kind-fire: #ff8a5c;
+  --kind-ice: #8fd3ff;
+  --kind-lightning: #ffd84d;
+  --kind-light: #fff2b0;
+  --kind-dark: #c79bff;
+  --kind-greatsword: #f5a54a;
+  --kind-axe: #9a86f2;
+  --kind-lance: #62cf70;
+  --kind-bow: #7fe0cb;
+  --kind-katana: #ee6a9c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --kind-fire: #ff8a5c;
+    --kind-ice: #8fd3ff;
+    --kind-lightning: #ffd84d;
+    --kind-light: #fff2b0;
+    --kind-dark: #c79bff;
+    --kind-greatsword: #f5a54a;
+    --kind-axe: #9a86f2;
+    --kind-lance: #62cf70;
+    --kind-bow: #7fe0cb;
+    --kind-katana: #ee6a9c;
+  }
+}
 @source '../node_modules/@luismlorenzana/uma-kit/dist';
 
 /* Latin-only variable faces, loaded from the workspace; the kit's theme names them. */

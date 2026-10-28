@@ -22,8 +22,10 @@ describe('icon frames (P37–P38)', () => {
     }
     for (const t of EQUIP_TYPES) for (let g = 1; g <= 10; g++) {
       const art = gearArt(t)
-      expect(art, `${t}: borrowed art is not allowed`).toEqual({ row: t })
-      const f = gear.frames[`${t}-g${g}` as keyof typeof gear.frames]
+      // Every type its own row; the Arms their colored one (D234).
+      const own = ['greatsword', 'axe', 'lance', 'bow', 'katana'].includes(t) ? `${t}-hue` : t
+      expect(art, `${t}: borrowed art is not allowed`).toEqual({ row: own })
+      const f = gear.frames[`${own}-g${g}` as keyof typeof gear.frames]
       expect(f, `${t}: no art row ${art.row}`).toBeDefined()
       expect(iconFrame(gearId(t, g)), `${t}-g${g}`).toEqual({ sheet: 'gear', x: f.x, y: f.y, ...(art.kind ? { kind: art.kind } : {}) })
     }
@@ -70,7 +72,7 @@ describe('icon frames (P37–P38)', () => {
         ...Object.keys(bellRows).map(kind => slot('bell', grade, kind as AccessorySlotState['kind']))]
       for (const state of forms) {
         const row = state.family === 'pendant' ? 'charm' : state.family === 'insignia' ? 'ring'
-          : state.family === 'orb' ? `orb-${state.kind}` : bellRows[state.kind!]
+          : state.family === 'orb' ? (state.kind!.match(/^(greatsword|axe|lance|bow|katana)$/) ? `orb-${state.kind}-hue` : `orb-${state.kind}`) : bellRows[state.kind!]
         const frame = gear.frames[`${row}-g${grade}` as keyof typeof gear.frames]!
         expect(iconFrame(accessoryIconId(state))).toEqual({ sheet: 'gear', x: frame.x, y: frame.y,
           ...('kind' in state && state.kind ? { kind: state.kind } : {}) })

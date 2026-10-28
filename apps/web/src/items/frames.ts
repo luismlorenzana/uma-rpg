@@ -1,7 +1,7 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
 // the indexes never ship in the main chunk; frames.test.ts pins every position against them.
 import {
-  gearById, GEM_IDENTITIES, ITEM_FAMILIES, lineItem, madeIdentity, itemById,
+  gearById, GEM_IDENTITIES, isRpgWeaponKind, ITEM_FAMILIES, lineItem, madeIdentity, itemById,
   type AccessorySlotState, type EquipType, type RpgDamageKind,
 } from '@rpg/domain'
 
@@ -10,7 +10,8 @@ export type Sheet = 'items' | 'gear' | 'gems'
 export const SHEET_SIZE: Readonly<Record<Sheet, { w: number; h: number }>> = {
   // uma-art 2.13.0 appends R2's made items after the racer rows; no earlier frame moves.
   items: { w: 320, h: 1216 },
-  gear: { w: 320, h: 1472 },
+  // uma-art 2.15.0 appends each Arm and its Orb in its own color (D234).
+  gear: { w: 320, h: 1792 },
   gems: { w: 320, h: 320 },
 }
 
@@ -22,9 +23,15 @@ export const GEAR_ART_ROWS = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'to
   'garb', 'leather', 'mail', 'plate', 'ring', 'charm', 'orb-greatsword', 'orb-axe', 'orb-lance', 'orb-bow', 'orb-katana', 'orb-fire', 'orb-ice',
   'orb-lightning', 'orb-light', 'orb-dark', 'helm', 'cuirass', 'greaves', 'gauntlets', 'circlet', 'robe', 'leggings', 'bracers',
   'boots', 'slippers', 'talisman-vital', 'talisman-vampire', 'talisman-bulwark', 'talisman-iron', 'talisman-thorn',
-  'amulet-spring', 'amulet-siphon', 'amulet-veil', 'amulet-ward', 'amulet-mirror'] as const
+  'amulet-spring', 'amulet-siphon', 'amulet-veil', 'amulet-ward', 'amulet-mirror',
+  'greatsword-hue', 'axe-hue', 'lance-hue', 'bow-hue', 'katana-hue',
+  'orb-greatsword-hue', 'orb-axe-hue', 'orb-lance-hue', 'orb-bow-hue', 'orb-katana-hue'] as const
+/** The Arms draw uma-art's colored rows (D234): each in its own color at every grade, as a Tome wears its element. */
+const ARM_ROWS: Partial<Record<EquipType, (typeof GEAR_ART_ROWS)[number]>> = {
+  greatsword: 'greatsword-hue', axe: 'axe-hue', lance: 'lance-hue', bow: 'bow-hue', katana: 'katana-hue',
+}
 export function gearArt(type: EquipType): { row: (typeof GEAR_ART_ROWS)[number]; kind?: RpgDamageKind } {
-  return { row: type }
+  return { row: ARM_ROWS[type] ?? type }
 }
 
 /** uma-art keeps sixteen rows for uma-racer's families first; the eight Wilds families follow, a raw and a refined
@@ -56,7 +63,7 @@ function accessoryFrame(id: string): IconFrame | null | undefined {
   if (!family || !Number.isInteger(grade) || grade < 1 || grade > 10) return null
   const kind = kindWord !== 'none' ? kindWord as RpgDamageKind : undefined
   const row = family === 'pendant' ? 'charm' : family === 'insignia' ? 'ring'
-    : family === 'orb' && kind ? `orb-${kind}` as (typeof GEAR_ART_ROWS)[number]
+    : family === 'orb' && kind ? (isRpgWeaponKind(kind) ? `orb-${kind}-hue` : `orb-${kind}`) as (typeof GEAR_ART_ROWS)[number]
       : family === 'bell' && kind ? BELL_ROW[kind] : undefined
   if (!row) return null
   return { sheet: 'gear', x: (grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(row) * ATLAS_CELL, ...(kind ? { kind } : {}) }

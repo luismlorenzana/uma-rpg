@@ -164,6 +164,13 @@ slot one grade; nothing is crafted, bound or worn, and gear has no ranks. Grade 
   the tier. The accessory sheet puts her family first, marked ★, and her standard preset wears it.
 
 Each grade's icon comes from uma-art's gear rows (H28), the made items' from its items atlas (uma-art 2.13.0, H73).
+**Colors by kind (D234, uma-art 2.15.0):** a Tome wears its element's color and an Arm its own, beside its twin
+element's: the Greatsword orange (Fire), the Lance green (Lightning), the Axe purple (Ice), the Bow pale jade (Light) and
+the Katana deep rose (Dark). The colour stays the same at every grade; the grade shows in its fittings: a Tome's gem
+fittings, an Arm's hilt, guard or tips in the grade's ingot (copper to orichalcum). An Arm's Orb wears the same colour. The
+small glyphs on every screen (the Skills tab's trees and skills, the Gear tab, the Bell and Orb chips, the fight, the
+"Weak:" icons, the halls, the Rift's guides) use the same colors: the art's tones in dark mode, deeper ones in light
+mode so the pale kinds read on white.
 
 <!-- live:gear -->
 | Grade | Opens at Lv | Weapon Might (Tier 1 · 2 · 3) | Armor: offense a piece | Head DEF | Body HP | Legs MP | Arms M.DEF | Feet Speed |
