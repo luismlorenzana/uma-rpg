@@ -511,6 +511,10 @@ was 2.34).*
 
 ## 4. Foe weaknesses by tier
 
+> *Follow-up, 2026-10-28 (D235, proposed):* in play the twins gave every foe of a one-element stage the same two kinds,
+> and half the party nothing to break. [weaknesses-v2.md](weaknesses-v2.md) (WK1–WK12) replaces §4.1's twins and §4.2's
+> narrowing for the campaign from engine v18; §4.3's Rift fronts and §4.4's shields stay.
+
 The ten kinds are the weakness types. A foe's card shows her kinds as icons, nothing else: "Weak: [Lance] [Thunder]".
 
 ### 4.1 Tier 1: her twins (CP5)

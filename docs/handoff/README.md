@@ -91,6 +91,20 @@ publish it and close the art packet. H114 is live on save v31, so R3–R5 use sa
 
 **Waves:** H113 and publication done → H114 done.
 
+**Weaknesses v2** (the owner, 2026-10-28, D235, proposed; the design is
+[weaknesses-v2.md](../design/tier-rework/weaknesses-v2.md), WK1–WK12, and its review page
+[weaknesses-v2.html](../design/tier-rework/previews/weaknesses-v2.html)): every foe her own list, dealt from the stage's
+decks with the ring's answer first; regulars 2 Arms + 2 elements, elites and bosses 3 (2 + 1 or 1 + 2); Light + Dark foes
+take ring elements; shields and locks unchanged (the simulation brings back v15's pace). Engine v18, so R3–R5 move to
+engines v19–v21 when H116 lands; the Rift's fronts stay.
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H115 | **The rule and its balance, dark** (engine v18's generation): one stage dealer for regions, capitals and scenario chapters; v17's generation frozen; WK12's checks with either healer; R2's delivery tables on v18 at 32 seeds | Claude | M | — | Ready |
+| H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons without "Weak:"; the manual; R3–R5 on engines v19–v21; deploy | Claude | M | H115 | Waiting |
+
+**Waves:** 1) H115 → 2) H116.
+
 **R3. Tier 2's weapons** (engine v18, save **v32**; its packets' "v29" reads v32, D221, D224, D230). H83 (the Branch Gem's recipe), H84 (the Accessory Setting over two slots), H85 (Moon Jewels) and H86 (the secondary profession) re-read the farm by line ([farm-by-line.md](../design/tier-rework/farm-by-line.md)) first:
 
 | Id | Task | Who | Size | Needs | State |
