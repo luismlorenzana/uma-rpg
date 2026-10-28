@@ -100,8 +100,8 @@ engines v19–v21 when H116 lands; the Rift's fronts stay.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| H115 | **The rule and its balance, dark** (engine v18's generation): one stage dealer for regions, capitals and scenario chapters; v17's generation frozen; WK12's checks with either healer; R2's delivery tables on v18 at 32 seeds | Claude | M | — | Ready |
-| H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons without "Weak:"; the manual; R3–R5 on engines v19–v21; deploy | Claude | M | H115 | Waiting |
+| H115 | **The rule and its balance, dark** (engine v18's generation): one stage dealer for regions, capitals and scenario chapters; v17's generation frozen; WK12's checks with either healer; R2's delivery tables on v18 at 32 seeds; the Summoner's Tome 0.62 (WK13) | Claude | M | — | Done (`fa67766`) |
+| H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons without "Weak:"; the Summoner's Tome on her sheet; the manual; R3–R5 on engines v19–v21; deploy | Claude | M | H115 | Ready |
 
 **Waves:** 1) H115 → 2) H116.
 
@@ -247,6 +247,7 @@ for the fifth scenario (tiers T9).
 
 | Id | Task | Commit |
 |---|---|---|
+| H115 | Weaknesses v2 built dark on engine v18 (D236), by the main session ([#67](https://github.com/luismlorenzana/uma-rpg/pull/67)): one stage dealer (`rpg/campaign/weaknesses.ts`) for regions, scenario chapters and capitals, each foe her own list from the stage's Arms and element decks; v17's generation frozen by digest; WK12's checks with either healer; 32-seed tables against v17 wearing v15's own lists (rounds within 0.32, wins unchanged, region runs clear every stage, the Rift as v17's); the Summoner's Tome 0.58 → 0.62 on v18 for the hybrid mirror | `fa67766` |
 | H114 | **The Wilds' trios are live** (D232), by ChatGPT ([#63](https://github.com/luismlorenzana/uma-rpg/pull/63)): fifteen professions and places in five Gather → Process → Make rows; one kind per place; equal 36 → 24 minute steps; targets, screens, trade labels and ledger updated; save v31 settles v30 work and drops queues before the retired place ids disappear; R3–R5 moved to saves v32–v34; the literal v30 scratch migration and a full Metal-row playthrough are recorded in the pull request; deployed at `af04479` and verified through production health | `af04479` |
 | H113 | The Wilds' trios art (D231), delivered in uma-platform ([#52](https://github.com/luismlorenzana/uma-platform/pull/52)): five trade workbenches and Weapon, Tome and Charm Forges, 50 frames on a 288×432 sheet with all 42 older frames unchanged; contact sheet and fifteen-place mock at 1.5× reviewed; [uma-art 2.14.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40506089104). H114 owns the RPG pin and gameplay. | platform `84cc80f` |
 | H112 | **The farm by line is live** (D228), by the main session ([#60](https://github.com/luismlorenzana/uma-rpg/pull/60)): save v30 and `toV30` chained; R2's farm deleted (its catalog with tiers and bands, the ladder and cross-line recipes, single-kind places, its job kinds and env, the v28 request parse, its Exchange, targets and ledger paths, the Workbench grid and R2 What steps, `farmByLine`); the API test v29 → v30; the manual rewritten; R3–R5 on saves v31–v33; a full-shaped v29 scratch save migrated through the local API (before and after in the PR) and played: an Arms Gem and Tome Ink made and finished, a Tome raised with Tome Ink, a Katana with an Arms Gem | `53e8f61` |
