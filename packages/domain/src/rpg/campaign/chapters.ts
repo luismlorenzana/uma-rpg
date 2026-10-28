@@ -7,6 +7,7 @@ import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../battle/types'
 import { RPG_FOE_ROLES, RPG_FOE_TUNING, rpgFoe, rpgFoeShields, type RpgFoeRole } from './enemies'
 import { rpgFinals, type RpgFinalsRoute } from './finals'
+import { rpgStageWeaknesses } from './weaknesses'
 
 /** Ten levels a chapter (D48): Debut 1–3, Classic 4–6, Senior 7–9, Finals 10. Five chapters fill a tier's Lv1–50. */
 export const RPG_CHAPTER_LEVELS = 10
@@ -122,7 +123,7 @@ export function rpgChapterReach(levelStart: number): number {
   return RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]
 }
 
-function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], reach: number, engine: number): { enemies: BattleEnemy[]; lead: RpgCastMember | null } {
+function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], reach: number, engine: number, tier: number): { enemies: BattleEnemy[]; lead: RpgCastMember | null } {
   if (node.kind === 'camp') return { enemies: [], lead: null }
   const used = new Set<string>()
   const castFor = (slot: number): RpgCastMember => {
@@ -135,9 +136,12 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
   }
   // Weaknesses by rank: regulars 3 weapons + 2 elements (or 2 + 3), sub-bosses 2 + 2, champions 2 + 1 (or 1 + 2).
   // The first element is the one that beats the foe's own, so routes still read by element; its own never shows. From
-  // v16 (CP5, D202) every rank is weak to her twins: the element that beats hers and its twin Arm.
+  // v16 (CP5, D202) every rank is weak to her twins: the element that beats hers and its twin Arm. From v18 (D235) each foe
+  // her own list, dealt in slot order by the node's `rpgStageWeaknesses` (WK1–WK4, WK10).
   const twins = rpgRework('fight', engine)
-  const weaknesses = (slot: number, element: RpgElement, rank: EnemyRank): BattleWeaknesses => {
+  const dealer = rpgRework('weak', engine) ? rpgStageWeaknesses(`${chapterId}:${node.id}`, tier) : null
+  const weaknesses = (slot: number, element: RpgElement, rank: EnemyRank, role?: RpgFoeRole): BattleWeaknesses => {
+    if (dealer) return dealer.next({ rank, element, ...(role ? { role } : {}) })
     if (twins) return rpgTwinsOf([element], slot)
     const key = `${chapterId}:${node.id}:${slot}`
     const flip = hash(`${key}:split`) % 2 === 1
@@ -150,8 +154,9 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
   const shield = node.stage >= 2 ? RPG_FOE_TUNING.lateRegularShield : RPG_FOE_TUNING.regularShield
   const regular = (slot: number, element: RpgElement, role?: RpgFoeRole): BattleEnemy => {
     const member = castFor(slot)
+    const her = role ?? pick(RPG_FOE_ROLES, `${chapterId}:${node.id}:${slot}:role`)
     return rpgFoe({ id: `foe${slot + 1}`, castId: member.id, element, rank: 'regular', level: node.level, shield,
-      weaknesses: weaknesses(slot, element, 'regular'), role: role ?? pick(RPG_FOE_ROLES, `${chapterId}:${node.id}:${slot}:role`) }, engine)
+      weaknesses: weaknesses(slot, element, 'regular', her), role: her }, engine)
   }
   const others = (avoid: RpgElement, slot: number) => pick(RPG_ELEMENTS.filter((e) => e !== avoid), `${chapterId}:${node.id}:${slot}:el`)
   if (node.kind === 'fight') {
@@ -176,7 +181,7 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
   // A Finals route's escorts are authored; a stage sub-boss's are drawn from the seed.
   const authored = node.route ? (node.kind === 'boss' ? node.route.spec.champion : node.route.spec.vanguard).escorts : null
   const enemies = [rpgFoe({ id: 'foe1', castId: boss.id, element, rank, level: node.level, role: node.kind === 'boss' ? 'champion' : 'captain',
-    shield: rpgFoeShields(engine)[node.kind === 'boss' ? 'boss' : 'subBoss'], weaknesses: weaknesses(0, element, rank), reach }, engine),
+    shield: rpgFoeShields(engine)[node.kind === 'boss' ? 'boss' : 'subBoss'], weaknesses: weaknesses(0, element, rank, node.kind === 'boss' ? 'champion' : 'captain'), reach }, engine),
   ...Array.from({ length: minions }, (_, i) => authored ? regular(i + 1, authored[i]![1], authored[i]![0]) : regular(i + 1, others(element, i + 1)))]
   return { enemies, lead: boss }
 }
@@ -189,18 +194,20 @@ function nodeName(node: Layout, lead: RpgCastMember | null): string {
 }
 
 /** Deterministic for a chapter and cast; node ids stay stable across rebalances. Its foes are an engine's generation's
- * (D202): to v15 today's weaknesses and shields, from v16 her twins and Tier 1's shields; the live one by default. */
+ * (D202): to v15 today's weaknesses and shields, from v16 her twins and Tier 1's shields, from v18 weaknesses v2 (D235);
+ * the live one by default. */
 export function rpgCampaignChapter(source: RpgChapterSource, cast: readonly RpgCastMember[], engine: number = BATTLE_ENGINE_VERSION): RpgCampaignChapter {
   if (!Number.isSafeInteger(source.order) || source.order < 1) throw new RangeError(`Bad chapter order ${source.order}`)
   if (!cast.length) throw new RangeError('The campaign needs a cast')
   const id = String(source.scenarioId)
   const sorted = [...cast].sort((a, b) => a.id.localeCompare(b.id))
   const levelStart = rpgChapterLevelStart(source.order)
+  const tier = Math.ceil(source.order / 5)
   const nodes = layout(levelStart, source.order).map(({ route, ...node }) => {
-    const { enemies, lead } = foes(id, { ...node, route }, sorted, rpgChapterReach(levelStart), engine)
+    const { enemies, lead } = foes(id, { ...node, route }, sorted, rpgChapterReach(levelStart), engine, tier)
     return { ...node, name: nodeName({ ...node, route }, lead), note: route?.spec.line ?? null, enemies }
   })
-  return { id, order: source.order, tier: Math.ceil(source.order / 5), title: source.name, levelStart,
+  return { id, order: source.order, tier, title: source.name, levelStart,
     rows: Math.max(...nodes.map((n) => n.row)) + 1, nodes }
 }
 

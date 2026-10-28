@@ -45,7 +45,7 @@ export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpg
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'
 import { rpgRework, rpgV2 } from './caps'
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] as const
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const
 /** v16 (UT6): the three Flourishes, one by stride. */
 const FLOURISHES: readonly RpgFlourish[] = ['clean-break', 'even-pace', 'late-reserve']
 
@@ -213,7 +213,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {

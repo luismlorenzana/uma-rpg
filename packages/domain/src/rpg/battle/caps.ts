@@ -24,7 +24,8 @@ export const BATTLE_HEAL_SCALE = 300
 // The Tier rework's five releases (D198, docs/design/tier-rework/implementation.md) each open at their engine:
 // `rpgRework(stage, engine)`, the same pattern. Each is built dark and turned on by its switch packet, which moves
 // BATTLE_ENGINE_VERSION to the stage's engine: R1, Tier 1's fight, is engine v16, built in H64–H71 and live since H72
-// (D210); R2, Tier 1's economy, is engine v17, built in H73–H81 and live since H82 (D218). `rpg/battle/v15-replays.test.ts`
+// (D210); R2, Tier 1's economy, is engine v17, built in H73–H81 and live since H82 (D218); weaknesses v2 is engine v18,
+// only the foes' generation (D235), built dark in H115 and turned on by H116. `rpg/battle/v15-replays.test.ts`
 // and `v16-replays.test.ts` pin v15's and v16's fights under the live switch (H64, D200; H82); tests mock the switch with
 // `caps-at.fixture.ts`'s `capsAt`.
 
@@ -34,9 +35,9 @@ export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 17
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
 export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_V2_ENGINE
-/** The first engine of each Tier rework release (D198): R1 Tier 1's fight, R2 its economy, R3 Tier 2's weapons, R4 its
- * classes, R5 Tier 3. */
-export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, t2Weapons: 18, t2Classes: 19, t3: 20 } as const
+/** The first engine of each Tier rework release (D198): R1 Tier 1's fight, R2 its economy, weaknesses v2 (D235: every
+ * foe her own list, by rank, weaknesses-v2.md), R3 Tier 2's weapons, R4 its classes, R5 Tier 3. */
+export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, t2Weapons: 19, t2Classes: 20, t3: 21 } as const
 /** A Tier rework release, by its stage name. */
 export type RpgReworkStage = keyof typeof RPG_REWORK_ENGINE
 /** Whether an engine plays a Tier rework release's rules (H64, D200). Rules call it with their `engine` argument; rules
