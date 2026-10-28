@@ -53,9 +53,12 @@ export const CLASS_BLURB: Readonly<Record<RpgClass, string>> = classBlurbs()
 export const SLOT_LABEL = { arms: 'Arm', tome: 'Tome', any: 'Weapon' } as const
 /** The grade-0 weapon every Uma holds of each kind (D98): no stats, it opens the tree. */
 export const trainingName = (w: RpgWeapon): string => `Training ${WEAPON_LABEL[w]}`
-/** Element colors for the inline glyphs. */
-const ELEMENT_COLOR: Readonly<Record<RpgElement, string>> = {
-  fire: '#ff8a5c', ice: '#8fd3ff', lightning: '#ffd84d', light: '#fff2b0', dark: '#c79bff',
+/** Each damage kind's color for the inline glyphs (D234): `--kind-*` in index.css, the art's in dark mode and deeper in
+ * light mode. An Arm's sits beside its twin element's, as uma-art 2.15.0 paints it: the Greatsword orange by Fire, the
+ * Lance green by Lightning, the Axe purple by Ice, the Bow jade and the Katana rose for Light and Dark. */
+export const KIND_COLOR: Readonly<Record<RpgDamageKind, string>> = {
+  fire: 'var(--kind-fire)', ice: 'var(--kind-ice)', lightning: 'var(--kind-lightning)', light: 'var(--kind-light)', dark: 'var(--kind-dark)',
+  greatsword: 'var(--kind-greatsword)', axe: 'var(--kind-axe)', lance: 'var(--kind-lance)', bow: 'var(--kind-bow)', katana: 'var(--kind-katana)',
 }
 
 export const kindLabel = (kind: RpgDamageKind): string => (isRpgWeaponKind(kind) ? WEAPON_KIND_LABEL[kind] : ELEMENT_LABEL[kind])
@@ -118,7 +121,7 @@ const ELEMENT_PATH: Readonly<Record<RpgElement, string>> = {
 
 export function ElementGlyph({ element, size = 16 }: { element: RpgElement; size?: number }) {
   return (
-    <svg viewBox="0 0 20 20" width={size} height={size} fill="none" stroke={ELEMENT_COLOR[element]} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+    <svg viewBox="0 0 20 20" width={size} height={size} fill="none" style={{ stroke: KIND_COLOR[element] }} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
       <path d={ELEMENT_PATH[element]} />
     </svg>
   )
@@ -127,9 +130,9 @@ export function ElementGlyph({ element, size = 16 }: { element: RpgElement; size
 const line = { fill: 'none', stroke: 'currentColor', strokeLinecap: 'round' } as const
 /** A Tome: a book in its element's color, with a spine. */
 function tome(element: RpgElement): React.ReactNode {
-  return <g transform="rotate(-8 12 12)"><path fill={ELEMENT_COLOR[element]} d="M5 3.5C5 2.7 5.7 2 6.5 2h12c.8 0 1.5.7 1.5 1.5V19c0 .8-.7 1.5-1.5 1.5h-12C5.7 20.5 5 19.8 5 19Z" /><rect x="5" y="2" width="2.2" height="18.5" rx=".6" /></g>
+  return <g transform="rotate(-8 12 12)"><path style={{ fill: KIND_COLOR[element] }} d="M5 3.5C5 2.7 5.7 2 6.5 2h12c.8 0 1.5.7 1.5 1.5V19c0 .8-.7 1.5-1.5 1.5h-12C5.7 20.5 5 19.8 5 19Z" /><rect x="5" y="2" width="2.2" height="18.5" rx=".6" /></g>
 }
-/** Weapon silhouettes on a 24-unit grid, tilted: blades 45° (from uma-racer); Tomes in their element's color. */
+/** Weapon silhouettes on a 24-unit grid, tilted: blades 45° (from uma-racer); each in its kind's color (D234). */
 const WEAPON_ART: Readonly<Record<RpgWeapon, React.ReactNode>> = {
   greatsword: <g transform="rotate(45 12 12)"><path fillRule="evenodd" d="M12 .5 15 4v11H9V4Zm-.6 4v9h1.2v-9Z" /><rect x="4.5" y="15" width="15" height="2.2" rx="1.1" /><rect x="11" y="17.2" width="2" height="4.3" /><circle cx="12" cy="22.6" r="1.5" /></g>,
   lance: <g transform="rotate(45 12 12)"><path d="M12 .5c2.4 3 2.6 6.3.9 9.1h-1.8C9.4 6.8 9.6 3.5 12 .5Z" /><rect x="10.6" y="9.6" width="2.8" height="1.6" rx=".5" /><rect x="11.35" y="11.2" width="1.3" height="12.6" rx=".6" /></g>,
@@ -140,12 +143,13 @@ const WEAPON_ART: Readonly<Record<RpgWeapon, React.ReactNode>> = {
 }
 
 export function WeaponGlyph({ weapon, size = 16, className = '' }: { weapon: RpgWeapon; size?: number; className?: string }) {
-  return <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden className={`shrink-0 ${className}`}>{WEAPON_ART[weapon]}</svg>
+  return <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden className={`shrink-0 ${className}`}
+    style={isRpgWeaponKind(weapon) ? { color: KIND_COLOR[weapon] } : undefined}>{WEAPON_ART[weapon]}</svg>
 }
 
 /** Any damage kind: a weapon kind or an element. */
 export function KindMark({ kind, size = 16 }: { kind: RpgDamageKind; size?: number }) {
-  if (isRpgWeaponKind(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex text-ink"><WeaponGlyph weapon={kind} size={size} /></span>
+  if (isRpgWeaponKind(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex"><WeaponGlyph weapon={kind} size={size} /></span>
   if (isRpgElement(kind)) return <span role="img" aria-label={kindLabel(kind)} className="inline-flex"><ElementGlyph element={kind} size={size} /></span>
   return null
 }
@@ -192,7 +196,7 @@ export function ShieldBadge({ value, broken = false, steeled = false }: { value:
 /** Weakness icons: elements first, then weapon kinds; from v16 (CP5, H70) a foe's twins, the Arm first, then the element
  * (Twilight: Bow, Katana), the twin sets' order. `engine` is the generation (a fight's own version on the fight screen). */
 export function WeaknessIcons({ weaknesses, size = 14, engine = BATTLE_ENGINE_VERSION }: { weaknesses: BattleWeaknesses; size?: number; engine?: number }) {
-  const arms = weaknesses.weapons.map((w) => <span key={w} className="inline-flex text-ink-soft"><WeaponGlyph weapon={w} size={size} /></span>)
+  const arms = weaknesses.weapons.map((w) => <span key={w} className="inline-flex"><WeaponGlyph weapon={w} size={size} /></span>)
   const elements = weaknesses.elements.map((e) => <ElementGlyph key={e} element={e} size={size} />)
   const twins = rpgRework('fight', engine)
   const armNames = weaknesses.weapons.map((w) => WEAPON_KIND_LABEL[w]), elementNames = weaknesses.elements.map((e) => ELEMENT_LABEL[e])
