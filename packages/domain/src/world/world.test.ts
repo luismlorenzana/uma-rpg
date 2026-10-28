@@ -101,7 +101,7 @@ describe('the world map (D66, D71)', () => {
     expect(signatureWeaknesses(['ice', 'lightning'])).toEqual(['fire'])
     expect(signatureWeaknesses(['light', 'dark'])).toEqual([])
     const rift = worldContinent({ name: 'URA', order: 1 }).regions.find((r) => r.biome === 'rift')!
-    const foes = regionChapter(rift, cast).nodes.flatMap((n) => [n.enemies, ...(n.waves ?? [])].flat())
+    const foes = regionChapter(rift, cast, 17).nodes.flatMap((n) => [n.enemies, ...(n.waves ?? [])].flat())
     expect(foes.every((f) => f.weaknesses.elements.length === 0 && f.weaknesses.weapons.length >= 1)).toBe(true)
   })
 

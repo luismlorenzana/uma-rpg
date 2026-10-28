@@ -12,7 +12,7 @@ CP20, CP22, CP27) is where Tier 3's Class Ranks lead:
 - her class branch opens its **branch capstone** at Class Rank 50 and, with it, **the class's mastery**, the same for
   both branches: Unstoppable, Resonance, Spellbind, Menagerie, Last Stand, Overflow.
 
-This packet builds them as data and engine v20 rules, dark, for Tier 3 allies only. The masteries' numbers are drafts
+This packet builds them as data and engine v21 rules, dark, for Tier 3 allies only. The masteries' numbers are drafts
 H104 tunes to +8–15% where each applies.
 
 ## Context (read first)
@@ -36,7 +36,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 - **Releases 1 and 4's packets and D-rows:** H65 (trees with no points: the trunk, the fork, lines A and B, Pierce, R1's
   per-tree pick, equipped slots, Skill Ranks frozen into a fight's input), **H91** (R4's build decision 7: `classBranch`,
   R1's per-tree pick for the A/B/C line, R3's `branch` for Pure or Dual, `tips`, `via`; branch ids; class skills as nodes
-  `<class>-<branch>.<depth>`, "R5 adds `.6`"; skill MP × 1 · 1.7 · 2.4 by tier from v19; the new rules table), **H92**
+  `<class>-<branch>.<depth>`, "R5 adds `.6`"; skill MP × 1 · 1.7 · 2.4 by tier from v20; the new rules table), **H92**
   (C lines `.Dc`, the tip fork, `BattleAlly.tips` keyed by weapon, E6's chip cap, the signature tip on `weapons[0]`,
   `rpgActiveSlots(tier, level, engine)`, "until R5 tier 3 takes tier 2's"), **H94** (`ClassLoadout.classBranch`, `tips`,
   the setters, the sheet).
@@ -55,7 +55,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Decisions made
 
 - **Tier 3 only, behind the stage.** Depth 6, two lines held, the master slot, branch capstones and masteries exist for
-  a Tier 3 profile when `rpgRework('t3', engine)`; the engine accepts them from v20 for a Tier 3 ally. A Tier 1 or
+  a Tier 3 profile when `rpgRework('t3', engine)`; the engine accepts them from v21 for a Tier 3 ally. A Tier 1 or
   Tier 2 Uma at Class Rank 50 gains nothing new.
 - **Depth 6 at Class Rank 50** (CP16, CP20), Tier 3 only. `RPG_SKILL_POWER` gains **5.6** and `RPG_SKILL_MP` **30**
   (the depth table's next step; a core's full-turn MP, its tip's + 4).
@@ -73,7 +73,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
     Paladin), so nothing lists them before the switch.
 - **The 12 branch capstones** (CP27, §7.2's "Tier 3 · CR 50" rows): class skills `<class>-<branch>.6` at Class Rank 50,
   cast through `via` by H91's rules (a hybrid's pair at its hands, a healer's blow or spell at her half hand), power 5.6
-  (× the shape's share), MP as listed × her hand's MP × the tier's ×2.4 (H91's). Every effect is v19's vocabulary
+  (× the shape's share), MP as listed × her hand's MP × the tier's ×2.4 (H91's). Every effect is v20's vocabulary
   (Frenzy, a guard as a skill, the area share with weak foes at full, the tapped foe at full, a pierce, lingering at 0.5,
   Barriers, mends, Regen, statuses on every Uma); the only new part is "her Arms half ignores the unbroken halving"
   (Eclipse Cut), a pierce on one half:
@@ -88,7 +88,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   | Cleric | **Mercy Chorus:** a spell on every foe, 3.08 each; a mend on every Uma (48% × 0.4) and Regen. MP 34 | **Revelation:** a spell on one foe, 5.6; Brave 2, Aegis 2 and Breaker 2 on every Uma. MP 30 |
 
 - **Skill Ranks** (CP32): capstones and branch capstones **open whole (×1.00)** and never rank; everything else ranks as
-  H65 built it. **Skill MP** in Tier 3 is ×2.4, H91's (from v19); nothing changes here.
+  H65 built it. **Skill MP** in Tier 3 is ×2.4, H91's (from v20); nothing changes here.
 - **The base MP regen counts at most five depths** (the main session's ruling, 2026-10-25; SB18, built in H68): 0.8% of
   her max MP a round a depth open, **capped at 4% (Class Rank 40)**. Depth 6 opening at Class Rank 50 doesn't raise it to
   4.8%. Why: SB18 was sized on five depths (the party's late-region pace 0.94–1.05× today's); a sixth step would add MP
@@ -101,24 +101,24 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
   - **Shape:** R1's per-tree pick (`ClassLoadout.lines`) stays her first line; `ClassLoadout.second: Partial<Record<RpgWeapon, 'A' | 'B' | 'C'>>`
     (R1's line type; the second line a tree; absent: the default, A, or B when her first is A) and `ClassLoadout.secondTips` (H94's `tips`
     type, for the second line; absent: Power). Two lines a tree always differ.
-  - **The input**, from v20 for a Tier 3 ally: `BattleAlly.second` and `BattleAlly.secondTips` (H92's `tips` type),
-    beside R1's pick and H92's `tips`; refused before v20 or below Tier 3.
+  - **The input**, from v21 for a Tier 3 ally: `BattleAlly.second` and `BattleAlly.secondTips` (H92's `tips` type),
+    beside R1's pick and H92's `tips`; refused before v21 or below Tier 3.
   - **The signature tip at both forks** (UT9): on her first slot's tree, `tips` and `secondTips` may each hold the
     signature (one each at most, both on `weapons[0]`); H94's "the tip follows her first slot" moves both.
 - **Equipped: ten and a master slot** (CP22).
-  - `rpgActiveSlots(3, level, engine)` is **10 at every level** from v20. Why: CP22 reads "10 and a master slot", not
+  - `rpgActiveSlots(3, level, engine)` is **10 at every level** from v21. Why: CP22 reads "10 and a master slot", not
     "3 → 10" (she arrives having carried ten from Tier 2's Lv 40); early on the slots simply sit empty. If H104 finds
     Tier 3's first levels run more than 10% fast because of it, H92's ramp returns for Tier 3 (its knob, say so).
   - **The master slot** opens at **Class Rank 50** with the capstones: `ClassLoadout.master: string | null`, a capstone
     she holds (a depth 6 node of a held line, or her branch capstone), never also in her ten; **null means chosen for
-    her: her branch capstone.** The input gains `BattleAlly.master?: RpgNodeRef` from v20 (a Tier 3 ally at Class Rank
+    her: her branch capstone.** The input gains `BattleAlly.master?: RpgNodeRef` from v21 (a Tier 3 ally at Class Rank
     50); `battleActorSkill` and Auto treat it as one more equipped skill.
   - `rpgAutoLoadout` in Tier 3 fills ten from both lines, deepest first, round the three trees, then class skills.
 - **The masteries** (CP27): `RPG_MASTERY` by class; they **open at Class Rank 50 of Tier 3 with the branch capstone, the
-  same for both branches**. `BattleAlly.mastery?` from v20, frozen at the fight's start (a Tier 3 ally at Class Rank 50,
+  same for both branches**. `BattleAlly.mastery?` from v21, frozen at the fight's start (a Tier 3 ally at Class Rank 50,
   her class's, else refused). Draft constants in `rpg/battle/skills.ts`, H104's to tune:
 
-  | Class | Mastery | On screen | The rule (v20) | Constant |
+  | Class | Mastery | On screen | The rule (v21) | Constant |
   |---|---|---|---|---|
   | Brawler | **Unstoppable** | "Her hits lose less to a standing shield." | An unbroken foe takes ×0.6 from her hits, not ×0.5 | `BATTLE_UNSTOPPABLE_FACTOR` 0.6 |
   | Mage | **Resonance** | "Her deepest spells ring twice." | Her depth 5 and 6 spells and her Class Rank 40 and 50 skills strike again at 30% on the same targets that still stand | `BATTLE_RESONANCE_SHARE` 0.3 |
@@ -150,7 +150,7 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
     (×1.3); Spellbind by preferring a pair whose halves are both weak on the foe; Menagerie's summon at its two
     farewells; Overflow's Barrier in `battleSupportValue`; Last Stand needs no choice.
 - **The sheet** (`umaBattleSheet`) freezes `second`, `secondTips`, `master` (null resolved to her branch capstone) and
-  `mastery` for a v20 input in a Tier 3 world, and none of them otherwise.
+  `mastery` for a v21 input in a Tier 3 world, and none of them otherwise.
 - **The save actions** (H65's line setter, H94's `setTip`, a new `setMasterSlot(save, outfitId, classId, node, now,
   tier)`): the second line, its tip, the master slot, in a Tier 3 world while `rpgRework('t3')`; dark, Release 4's one
   line. The save's types widen here; H102 parses them strictly and migrates.
@@ -165,31 +165,31 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 2. **The rules:** depth 6's gate in Tier 3, two lines in `rpgLearnedSkills` and the tree checks, `second` and
    `secondTips`, the signature tip at both forks, ten slots, the master slot, `rpgAutoLoadout` in Tier 3, capstones at
    ×1.00.
-3. **The engine (v20):** `second`, `secondTips`, `master` and `mastery` accepted for a Tier 3 ally at Class Rank 50; the
+3. **The engine (v21):** `second`, `secondTips`, `master` and `mastery` accepted for a Tier 3 ally at Class Rank 50; the
    six mastery rules; `barrierBy` and Menagerie's list absent until used; Auto as decided; the sheet. Every rules call
    passes the fight's version.
 4. **The save actions** as decided, gated.
-5. **Tests** (mock with `capsAt(20, …)` where a live default matters):
+5. **Tests** (mock with `capsAt(21, …)` where a live default matters):
    - `rpg/trees-t3.test.ts`: 150 capstones and 12 branch capstones in `RPG_ALL_NODES`, none in the live `RPG_NODES`; a
      sample per class by §6.5's names; a capstone's power is its tip's × 5.6 ÷ 4.6, its MP the tip's + 4, its status one
      stack more (a tip at 3 lasts a round longer); a healer capstone's share 0.48; depth 6 opens at Class Rank 50 only for
-     a Tier 3 profile from v20; a Tier 2 Uma at Class Rank 50 holds 18 skills, a Tier 3 one 34; two lines held, two equal
+     a Tier 3 profile from v21; a Tier 2 Uma at Class Rank 50 holds 18 skills, a Tier 3 one 34; two lines held, two equal
      lines refused; the signature tip offered at both forks of the lead tree and nowhere else; ten slots at Tier 3 Lv 1;
      the master slot takes only a capstone she holds, not one in her ten, and only at Class Rank 50; capstones rank ×1.00
      at every Class Rank; a Tier 3 ally at Class Rank 50 regains 4% of her max MP a round, as at Class Rank 40 (not
      4.8%).
-   - `rpg/battle/masteries-v20.test.ts`, one small fixed fight each: Unstoppable's hit on an unbroken foe is ×0.6 ÷ ×0.5
+   - `rpg/battle/masteries-v21.test.ts`, one small fixed fight each: Unstoppable's hit on an unbroken foe is ×0.6 ÷ ×0.5
      of the same Brawler without it; Resonance's echo deals 30%, chips nothing, breaks no lock, adds no gauge, strikes
      only standing targets; Spellbind ×1.2 when both halves are weak on the tapped foe and not when one is; Menagerie's
      summon strikes two farewells and two can linger; Last Stand leaves an Uma under the Paladin's Barrier at 1 HP once a
      fight, not twice and not without her Barrier; Overflow's Barrier is the overflow, capped at 10%; each mastery is
-     refused at Class Rank 49, for a Tier 2 ally and before v20.
-   - `rpg/battle/engine-v20.test.ts` (H98's file): a Tier 3 party at Class Rank 50 holding A and B, capstones in their
-     loadouts, a master slot and their masteries, plays a full fight on Auto; `second` at v19 throws; a master slot on a
-     Tier 2 ally, before v20 or holding a non-capstone throws.
+     refused at Class Rank 49, for a Tier 2 ally and before v21.
+   - `rpg/battle/engine-v21.test.ts` (H98's file): a Tier 3 party at Class Rank 50 holding A and B, capstones in their
+     loadouts, a master slot and their masteries, plays a full fight on Auto; `second` at v20 throws; a master slot on a
+     Tier 2 ally, before v21 or holding a non-capstone throws.
    - The actions: holding A and C, a tip per line, the signature on both lines of the lead tree, setting and clearing the
      master slot; unmocked, a Tier 3 world keeps one line a tree.
-   - H98's v19 replay tests and every existing test pass unchanged.
+   - H98's v20 replay tests and every existing test pass unchanged.
 6. **Docs:** class-progression §6.4 and §7.3 gain "Built in H100 (D…), live from H105." Log the D-row (fetch `main`
    first). `pnpm docs:update` leaves no diff.
 7. **Check it locally** (your own ports; a desktop browser at 390×844; never the iOS Simulator), on a scratch save from
@@ -199,9 +199,9 @@ Code pointers are by file and function: Releases 1–4 move the lines. Re-read t
 ## Done when
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (gzip, of 230 KB).
-- [ ] The tests in step 5 pass; both v19 replay tests pass untouched.
+- [ ] The tests in step 5 pass; both v20 replay tests pass untouched.
 - [ ] No rules call inside `rpg/battle/` relies on a default `engine`.
-- [ ] `git diff` shows no switch (`BATTLE_ENGINE_VERSION` 19, `SAVE_SCHEMA_VERSION` 30).
+- [ ] `git diff` shows no switch (`BATTLE_ENGINE_VERSION` 20, `SAVE_SCHEMA_VERSION` 30).
 - [ ] `docs/game/` is unchanged, `pnpm docs:update` leaves no diff, the D-row is logged, the design docs have their
   lines.
 - [ ] The local check in step 7 was done and described. Nothing from the original games in git.

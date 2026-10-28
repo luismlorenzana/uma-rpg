@@ -1,12 +1,12 @@
 // A fight (S3, D53, D86): the Phaser stage shows the rivals and the party and plays every action; the DOM on top carries
 // taps, bars, shields, weaknesses and commands. Pick one of her weapons to attack with (five to v15, three from v16), or a
 // skill, then tap a rival; a Spell Blade picks an Arms half and a Tome half, and from v15 a Summoner too, her Tome half
-// first (the fight's own version decides, H59; from v16 a foe's twins read "Weak:", the Arm first, and her Flourish is a
-// ★ in the log, H70). Weak hits chip shields; a Break leaves the rival open for two
+// first (the fight's own version decides, H59; from v18 a foe's dealt Arms and elements sit beside her shield without a
+// label, H116, while a v16–v17 fight keeps "Weak:"). Her Flourish is a ★ in the log (H70). Weak hits chip shields; a Break leaves the rival open for two
 // rounds. Every action is saved as it's taken, so a fight survives a reload (D52). It plays a source (H50): the world
 // map's open fight, or the Rift's.
 import {
-  biomeById, isRpgTome, rpgRework, SaveRuleError, type BattleAction, type BattleCue, type BattleEnemy, type BattleState, type BattleUnit, type Biome,
+  biomeById, isRpgTome, SaveRuleError, type BattleAction, type BattleCue, type BattleEnemy, type BattleState, type BattleUnit, type Biome,
   type EnemyRank, type RpgNodeRef, type RpgWeapon,
 } from '@rpg/domain'
 import { autoAction, battleActionsLeft, battleBroken, battleFoe, battleIntentDamage, battleWaveCount, replayBattle } from '@rpg/domain/engine'
@@ -19,7 +19,7 @@ import {
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
 import { loadBattlePreferences, nextBattleSpeed, saveBattlePreferences } from '../../battle/battle-prefs'
-import { Bar, ElementGlyph, extraHit, KindMark, ShieldBadge, skillKinds, supportOf, supportText, WeaknessIcons, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, ElementGlyph, extraHit, FightWeaknesses, KindMark, skillKinds, supportOf, supportText, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import type { FightSource } from '../../battle/fight-source'
 import { StatusChips, WardMark } from '../../battle/pixel-icons'
 import type { StageSetup } from '../../battle/scene/BattleScene'
@@ -270,9 +270,6 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
   const allies = shown.units.filter((u) => u.side === 'ally')
   const layout = size.w > 0 ? stageLayout(size.w, size.h, enemies.map((u) => opened.rank(battleFoe(state, u.id)!)), allies.length) : null
   const waves = battleWaveCount(state.input)
-  // A v16 fight's foes are weak to their twins (CP5): "Weak:" and the Arm first.
-  const twins = rpgRework('fight', state.engineVersion)
-
   return (
     // The fight stays dark in both modes, as uma-racer's race stage does (D147).
     <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
@@ -343,11 +340,7 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
                   <span className="truncate">{name(unit.id)}</span>
                 </p>
                 <Bar className="w-full max-w-24" value={unit.hp} max={enemy.stats.hp} />
-                <div className="flex items-center gap-1">
-                  <ShieldBadge value={unit.shield} broken={broken} steeled={!!unit.steeled} />
-                  {twins && <span className="text-[9.5px] font-semibold leading-3 text-ink-soft">Weak:</span>}
-                  <WeaknessIcons weaknesses={enemy.weaknesses} size={12} engine={state.engineVersion} />
-                </div>
+                <FightWeaknesses shield={unit.shield} broken={broken} steeled={!!unit.steeled} weaknesses={enemy.weaknesses} engine={state.engineVersion} />
                 {unit.charging && unit.hp > 0 && (
                   // A charged move's locks (D141): each hit of a lock's kind breaks one; break them all to cancel it.
                   <p className="flex items-center gap-0.5 text-[9.5px] font-bold leading-3 text-[#ffd84d]" aria-label={`Charging, locks: ${unit.charging.locks.join(', ') || 'none'}`}>

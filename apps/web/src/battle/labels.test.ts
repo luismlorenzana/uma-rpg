@@ -1,16 +1,16 @@
 // The skill, support and class lines by generation (H59): classes v1's exactly as before, classes v2's from the engine's
 // own rules (each half's hand, the Spell Blade's extra hit, the Summoner's farewell, the healers' `support15`). Numbers
 // come from the domain, so H60's tuning moves them with it. Engine v16's (H70): a foe's twins Arm first, Pierce's words,
-// a Skill Rank's factor on the power, three weapons in the blurbs.
+// a Skill Rank's factor on the power, three weapons in the blurbs. Engine v18 drops the word from the four-kind card.
 import {
-  BATTLE_REGEN_ROUNDS, RPG_ALL_NODES, RPG_SKILL_RANK_FACTOR, rpgClasses, rpgHand, rpgNode, rpgNodeSkill, rpgTreeNodes, type RpgProfile, type RpgSkillDef,
+  BATTLE_REGEN_ROUNDS, RPG_ALL_NODES, RPG_SKILL_RANK_FACTOR, rpgClasses, rpgHand, rpgNode, rpgNodeSkill, rpgTreeNodes, type BattleWeaknesses, type RpgProfile, type RpgSkillDef,
   type RpgSupport,
 } from '@rpg/domain'
 import { battleExtraHit } from '@rpg/domain/engine'
 import { cleanup, render } from '@testing-library/react'
 import { createElement } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { CLASS_BLURB, classBlurbs, skillLine, supportText, WeaknessIcons } from './labels'
+import { CLASS_BLURB, classBlurbs, FightWeaknesses, skillLine, supportText, WeaknessIcons } from './labels'
 
 const STATUS: Record<string, string> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -113,11 +113,23 @@ describe('engine v16\'s lines and weaknesses (H70)', () => {
   }
 
   it('lists a foe\'s twins Arm first from v16, and today\'s order (elements first) before', () => {
-    expect(drawn(16)).toEqual({ icons: ['weapon', 'element'], label: 'Weak to Lance, Lightning' })
-    expect(drawn(15)).toEqual({ icons: ['element', 'weapon'], label: 'Weak to Lightning, Lance' })
+    expect(drawn(16)).toEqual({ icons: ['weapon', 'element'], label: 'weak to Lance and Lightning' })
+    expect(drawn(15)).toEqual({ icons: ['element', 'weapon'], label: 'weak to Lightning and Lance' })
     // Twilight: two Arms, Bow then Katana.
     const { container } = render(createElement(WeaknessIcons, { weaknesses: { weapons: ['bow', 'katana'], elements: [] }, engine: 16 }))
-    expect(container.firstElementChild!.getAttribute('aria-label')).toBe('Weak to Bow, Katana')
+    expect(container.firstElementChild!.getAttribute('aria-label')).toBe('weak to Bow and Katana')
+  })
+
+  it('fits four dealt kinds after the shield from v18, without the visible word', () => {
+    const weaknesses: BattleWeaknesses = { weapons: ['greatsword', 'katana'], elements: ['ice', 'lightning'] }
+    const { container } = render(createElement(FightWeaknesses, { shield: 3, weaknesses, engine: 18 }))
+    expect(container.textContent).toBe('3')
+    const icons = [...container.querySelector('[aria-label="weak to Greatsword, Katana, Ice and Lightning"]')!.querySelectorAll('svg')]
+      .map((svg) => (svg.getAttribute('fill') === 'currentColor' ? 'weapon' : 'element'))
+    expect(icons).toEqual(['weapon', 'weapon', 'element', 'element'])
+    cleanup()
+    const old = render(createElement(FightWeaknesses, { shield: 3, weaknesses, engine: 17 }))
+    expect(old.container.textContent).toContain('Weak:')
   })
 
   it('says a Pierce cuts through the shield from v16, and only then', () => {

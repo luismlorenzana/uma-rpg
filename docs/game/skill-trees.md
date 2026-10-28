@@ -429,7 +429,7 @@ Light one foe many times; Katana and Dark twice (the foe, then one other).
 
 ### Summoner
 
-10 trees; her three weapons choose three. Powers below are at Rank 3, before her hand (×0.5 on Arms, ×0.58 on Tomes) and her Skill Rank; MP is hers (×0.5).
+10 trees; her three weapons choose three. Powers below are at Rank 3, before her hand (×0.5 on Arms, ×0.62 on Tomes) and her Skill Rank; MP is hers (×0.5).
 
 #### Summoner · Greatsword (`summoner-greatsword`), B · Pack
 

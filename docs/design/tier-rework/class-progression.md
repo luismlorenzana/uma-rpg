@@ -143,7 +143,7 @@
 | **Default weapons** | Five | **The owner's three** (§3.2); off-default rare | **Her branch's set:** branch 1 the owner's three, branch 2 her **reverse set** (§7.2); off-default encouraged | The same |
 | **What grows on a weapon** | Ranks, Might | Its grade's Might | + a branch at G5: **Pure** (weak ×1.5) or **Dual** (+ its **fixed partner**, of its channel and the other group) | Pure → **Keen** (×1.7) or **Tempered**; Dual → **Tempered** or **Evolved**; never a third kind |
 | **Extra Stats beside her weapons** (*follow-up to D194, 2026-10-24*) | — | — | **A weapon moon:** Full +90 on one kind or Split +63 on two (EP24–EP25) | + **a second weapon moon**: Full + Split serves all three weapons (EP26) |
-| **Foes weak to** | 2–5 kinds, half drawn at random | **2: one Arm and its twin element**, every foe | Regulars **1**; sub-bosses and bosses 2 | Regulars and sub-bosses 1; **bosses 2** |
+| **Foes weak to** | 2–5 kinds, half drawn at random | **4** for regulars, **3** for elites and bosses, dealt per stage | **3**, split by role or seed | **3**, split by role or seed |
 | **Armor** | 5, a half per piece | 5, her class's half | 5, per piece for the four between | The same |
 | **Accessories** | 2: Damage, Support | **1 slot: one of four base forms** (Pendant, Orb, Bell, Insignia; weapon-progression WP18–WP19) | 2: all four families; **two branches each** from a slot's G5 | 3: each branch **a step deeper** |
 | **Trees she uses** | 5 (of 5 or 10) | 3 weapon trees | 3, + her class tree | 3, + her class tree |
@@ -181,7 +181,7 @@ SB4*):
 | **Extra Stats** | **A weapon moon** (Full +90 on one kind or Split +63 on two: +50 × 1.8 Full), outside the kind cap. *Follow-up to D194 (Extra Stats), 2026-10-24: the Halo and Valor retire* | **A second weapon moon** (Full +130, Split +91); Full + Split serves all three weapons. *Follow-up to D194: the Halo's second kind and Swiftness retire* | [extra-stats-progression §4](extra-stats-progression.md#4-tier-2-a-weapon-moon), [§5](extra-stats-progression.md#5-tier-3-the-second-weapon-moon) |
 | **Her template** | The ★ **signature tip** on her lead weapon's tree (*follow-up to D197 (Uma Templates), 2026-10-25: was her affinity kind's tree; UT9*) | At both of its tip forks | [§6.7](#67-the-root-cp24), [uma-templates §3.5](uma-templates.md#35-the-signature-tip-ut9) |
 | **Limit Breaks** | **LB+** at Bond 10 (24 extra effects) | Kept | [§8](#8-halls-of-heroes-and-limit-breaks-cp28-cp35), [tier2-classes §7.2](../tier2-classes.md) |
-| **Foes** | Regulars weak to **one kind**; shields +1 (Z2), bosses 9 (*follow-up to D196: was 8*) | Sub-bosses one kind too; bosses keep two, shields 10 (*was 9*) | [§4.2](#42-tiers-2-and-3-the-list-narrows-by-rank-cp6), [§4.4](#44-locks-and-shields-cp8) |
+| **Foes** | Every rank has **three kinds**; regulars split by their weaker defense, elites by seed; shields +1 (Z2), bosses 9 (*follow-up to D196: was 8*) | Every rank keeps three; bosses' shields 10 (*was 9*) | [weaknesses v2 WK8](weaknesses-v2.md#wk8--tiers-2-and-3), [§4.4](#44-locks-and-shields-cp8) |
 | **Skill MP** | ×1.7; MP back a round as in Tier 1, a share of her bar (SB18, *follow-up to D196*) | ×2.4; the same | [§6.6](#66-new-nodes-by-rule) |
 
 Not yet authored: Tier 3's numbers (its simulation sets them), and Tier 3's world beyond the weakness rule.
@@ -511,56 +511,22 @@ was 2.34).*
 
 ## 4. Foe weaknesses by tier
 
-> *Follow-up, 2026-10-28 (D235, proposed):* in play the twins gave every foe of a one-element stage the same two kinds,
-> and half the party nothing to break. [weaknesses-v2.md](weaknesses-v2.md) (WK1–WK12) replaces §4.1's twins and §4.2's
-> narrowing for the campaign from engine v18; §4.3's Rift fronts and §4.4's shields stay.
+> *Live from engine v18 (D235–D237):* [weaknesses-v2.md](weaknesses-v2.md) (WK1–WK12) replaces §4.1's twins and §4.2's
+> narrowing for the campaign. §4.3's Rift fronts and §4.4's shields stay.
 
 The ten kinds are the weakness types. A foe's card shows her kinds as icons, nothing else: "Weak: [Lance] [Thunder]".
 
-### 4.1 Tier 1: her twins (CP5)
+### 4.1 Tier 1: the stage deal (CP5)
 
-**Twins** are an Arm and the element that share a shape in the catalog (`RPG_KIND_PAIRS`, D86): **Greatsword and
-Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark.** A twin set is named by its element: "the
-Lightning twins" are the Lance and the Thunder Tome.
+The live Tier 1 rule is [weaknesses v2 WK1–WK6](weaknesses-v2.md#4-the-rule-wk1wk4). Regulars, Keys and guards receive two
+Arms and two elements; sub-bosses and bosses receive three kinds. The stage deals both decks in slot order, with the
+ring answer first and Light + Dark restricted to Fire, Ice and Lightning.
 
-**A Tier 1 foe is weak to one twin set: the element that beats hers on the ring, and its twin Arm.**
-- **The ring,** today's: Fire > Ice > Lightning > Fire; Light ⇄ Dark. A Fire foe is weak to Lightning and the Lance; an
-  Ice foe to Fire and the Greatsword; a Lightning foe to Ice and the Axe; a Light foe to Dark and the Katana; a Dark foe
-  to Light and the Bow.
-- **Two elements:** she reads her lead element first (a pair signature's lead alternates by slot, W3); if its answer is
-  one of her own, her second. A Fire + Lightning foe answers to Ice either way; an Ice + Light foe to Fire (lead Ice) or
-  Dark (lead Light).
-- **Light and Dark together** answer to no element: she's weak to the Arms of her own two, **the Bow and the Katana**
-  ("Twilight"), as today's Light + Dark foes break on weapons alone.
-- **Every foe, every rank:** regulars, sub-bosses, bosses and the capitals' Finals. Two kinds, one in each channel, one
-  rule. Today: 2–5 kinds, half drawn at random, five rules.
+### 4.2 Tiers 2 and 3: three kinds (CP6)
 
-**Over the world's 19 biomes and 48 signatures** (a pair's two leads count a half each): the Fire twins answer 11,
-the Ice twins 11, the Lightning twins 9.5, the Dark twins 8, the Light twins 6.5, Twilight 2. The
-[weaknesses page](previews/class-weaknesses.html#world) lists every biome.
-
-**Why twins:** the Arm is read from the element, so one ring teaches both channels; each channel always has an answer
-on every foe; a hybrid holding a twin set (a Lance and a Thunder Tome, the Spell Blade's default) lands both halves weak.
-
-### 4.2 Tiers 2 and 3: the list narrows by rank (CP6)
-
-| Foe | Tier 1 | Tier 2 | Tier 3 |
-|---|---|---|---|
-| **Regulars** and the elites' Keys | Her twins (2) | **One of them** | One |
-| **Sub-bosses** | Her twins | Her twins | **One of them** |
-| **Bosses** | Her twins | Her twins | Her twins |
-
-- **Which one:** the channel her weaker defense guards, read from her role (on her card). **Strikers and guards** (DEF
-  above M.DEF) are weak to **her element**; **casters and skirmishers** (DEF at or below M.DEF) to **her Arm**. A
-  Twilight foe keeps the Arm of her lead element (Light: Bow; Dark: Katana).
-- **Bosses keep both in every tier,** so every Uma, of any class, can answer a boss with the right weapon in one slot.
-- **The narrowing is Tier 2's and 3's depth:** a party covers kinds by its make-up and picks, and the weapons doc's
-  Dual branch (a second kind of its channel, its fixed partner; *follow-up to the weapon review, 2026-10-24*) answers it; the Pure branch pays off on the single kinds, and from Tier 2
-  her class branch's focus (+15% on a group, §7.2) on the kinds her party leans to.
-- **Regions lean:** 7 biomes are all casters or skirmishers (Arm-weak: Coast, Swamp, Geyser Basin, Storm Peaks,
-  Highlands, Sky Isles, Haunted Moor), 5 all strikers or guards (element-weak: Desert, Canyon, Tundra, Glacier, Ancient
-  Ruins), 7 mixed. In Tier 2 a party for the Coast brings Arms; one for the Canyon brings Tomes. Bosses keep both.
-- **The ring and the twins don't change:** a Tier 3 foe's one kind is still from her Tier 1 twins.
+The later-tier rule is [weaknesses v2 WK8](weaknesses-v2.md#7-later-tiers-and-the-rift-wk8wk10). Every rank has three kinds. A regular's
+1 + 2 split follows the channel guarded by her weaker defense; an elite or boss takes the seed's 2 + 1 split. R3–R5
+balance and coverage packets must read WK8 rather than reconstructing the retired narrowing table.
 
 ### 4.3 The Rift's fronts (CP7)
 

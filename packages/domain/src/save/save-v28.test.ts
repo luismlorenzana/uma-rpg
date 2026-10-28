@@ -24,7 +24,7 @@ function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
 
 describe('save v28\'s parse (H78), the economy stage live', () => {
   it('runs with R2\'s economy live in this file', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('economy')]).toEqual([17, true])
+    expect([BATTLE_ENGINE_VERSION, rpgRework('economy')]).toEqual([18, true])
   })
 
   it('parses the rich v27 save through toV28, and its open v15 fights replay to their frozen ends', () => {

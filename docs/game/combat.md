@@ -1,16 +1,18 @@
 # Combat
 
-How a fight works today: engine v17 (D218, the Tier rework's economy, [weapon progression](../design/tier-rework/weapon-progression.md)
+How a fight works today: engine v18 (D235–D237, [weaknesses v2](../design/tier-rework/weaknesses-v2.md): each world
+stage deals its own Arms and element lists across its foes, and the Summoner's Tome hand is ×0.62); engine v17 (D218,
+the Tier rework's economy, [weapon progression](../design/tier-rework/weapon-progression.md)
 and [Extra Stats progression](../design/tier-rework/extra-stats-progression.md): gear by grade, one accessory slot in the
 four families' base forms, her signature, the Planet and three moons; the ten supports retired); engine v16 (D210, the
 Tier rework's fight, [class progression](../design/tier-rework/class-progression.md): three weapons a class by channel, a trunk and one fork
-into lines A and B, Skill Ranks, Pierce, foes weak to their twins, the base MP regen and the Flourish as her calling;
+into lines A and B, Skill Ranks, Pierce, the base MP regen and the Flourish as her calling;
 D188, [classes v2](../design/classes-v2.md): six classes with the Paladin, the hybrids' mirrored hands, one healer a
 party at doubled shares from her ATK or M.ATK, flat Orbs in a Damage slot, Guts in HP, six halls of Limit Breaks; D169:
 the Rift's foe traits, the ward, a third act and mixed locks, which no campaign foe carries; D142: Might as fixed values
 by grade again; D141, [combat balance](../design/combat-balance.md): a ratio damage formula, support, Rally, charged foe
 moves with locks, Steel after a Break, a breather between waves; D124: two accessories; D112: Limit Breaks only from the
-Halls of Heroes; D106: Heroes and inherited Limit Breaks; D104: Class Ranks; v6–v16 fights still replay as they were, an
+Halls of Heroes; D106: Heroes and inherited Limit Breaks; D104: Class Ranks; v6–v17 fights still replay as they were, an
 open one included). Every number below comes from the code. The
 tables between `live` markers are generated (see [README](README.md#how-these-docs-stay-true)); the rest is written by
 hand and checked against the engine.
@@ -105,7 +107,7 @@ For each part of each hit:
    fights took Might as +6% a grade on the hit; before v12, `max(offense × 0.2, offense − defense × 0.5)`, with Might
    +4 a grade added to offense.) **Her Skill Rank** (v16) scales a skill's power ×0.95 to ×1.05
    ([classes](classes.md#skills-depths-lines-and-ranks)); Attacks and Limit Breaks don't rank.
-2. **Weak hit:** ×1.3 when the hit's kind is one of the foe's weaknesses (her twins, [below](#weaknesses-shields-and-breaks)),
+2. **Weak hit:** ×1.3 when the hit's kind is one of the foe's weaknesses ([below](#weaknesses-shields-and-breaks)),
    or it's Light or Dark against a Hexed foe. (To v14 an Uma's Orb added its kind to every hit for this check, without
    damage of its own.) Then **her Insignia** (v17): her hits on sub-bosses and bosses ×(1 + 1.5% a grade).
 3. **Statuses** (table below) raise or cut it.
@@ -182,17 +184,22 @@ The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, 
 
 ## Weaknesses, shields and Breaks
 
-- **Every foe is weak to her twins** (v16, CP5): the element that beats hers on the ring and its **twin Arm**, the Arm
-  that shares its shape (Greatsword and Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark). A Fire
-  foe is weak to the Lance and Lightning, an Ice foe to the Greatsword and Fire, a Lightning foe to the Axe and Ice, a
-  Light foe to the Katana and Dark, a Dark foe to the Bow and Light. Every foe of every rank: regulars, sub-bosses,
-  bosses and the capitals' Finals. Her card reads "Weak:" and the two icons, the Arm first.
-  - **Two elements** (from her signature, see [maps](maps.md#element-signatures)): she reads her lead element first, a
-    pair's lead alternating by slot; if its answer is one of her own, her second. A Fire + Lightning foe answers to Ice
-    either way; an Ice + Light foe to Fire (lead Ice) or Dark (lead Light).
-  - **Light and Dark together** answer to no element: she's weak to the Bow and the Katana, **Twilight**.
-  - **Older fights:** to v15 a foe was weak to one to three Arms kinds and up to two elements, drawn half at random; an
-    open v15 fight keeps its foes, and its cards read "weak" with the icons in its order.
+- **Weaknesses v2** (engine v18, WK1–WK6) gives every world foe her own fixed list when the stage is made:
+  - A Tier 1 regular, including a Key enemy or guard, is weak to **2 Arms + 2 elements**. A sub-boss or boss is weak to
+    **3 kinds**, either 2 Arms + 1 element or 1 Arm + 2 elements, chosen by the stage seed.
+  - Each stage has an Arms deck and an element deck. They are dealt in foe and wave order, use every Arm before the
+    deck repeats and never give neighbouring foes the same list. Reloading the stage never changes its deal.
+  - The foe's ring answer leads her elements: **Fire > Ice > Lightning > Fire** and **Light ⇄ Dark**. A two-element
+    foe can lead with each answer; the remaining element is dealt from the deck. A Light + Dark foe draws only from
+    Fire, Ice and Lightning.
+  - Both channels stay represented. From Tier 2 every rank has three kinds; a regular leans toward the channel guarded
+    by her weaker defense, while elites and bosses keep the seeded 2 + 1 split.
+  - The **Rift is unchanged**: its fronts still draw the twin sets Greatsword + Fire, Axe + Ice, Lance + Lightning,
+    Bow + Light and Katana + Dark, with Bow + Katana as Twilight.
+  - On a fight card the shield is followed by up to four 12 px icons, Arms first, with no visible "Weak:" label. The
+    stage sheet keeps `Shield n · Weak:` and the same icons.
+  - **Older fights:** engines v16–v17 keep their frozen twin lists and `Weak:` cards. To v15 a foe keeps the one to
+    three Arms kinds and up to two elements drawn when her fight opened, with `weak` and the icons in its order.
 - Every foe has a **shield** (1–8 points; Tier 1's sub-bosses 6, bosses 8). **Each weak hit removes one point.** A Cleric's Breaker charge makes a weak hit
   remove two, and Shatter removes points directly.
 - At zero the foe **Breaks**. She loses this round's and the next round's action, and takes full damage (×2 compared to
@@ -207,8 +214,8 @@ The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, 
   the share of its power in the warded channel, so the party reaches for the other channel first. It's a trait of the
   foe, not the Ward status below. On screen (H50): a warded foe carries her front's crest beside her element (Iron's
   for elements, Arcane's for Arms), the hit line reads "· warded", and foe lists show "Wards Tomes" or "Wards Arms".
-- Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**: the ring names
-  every foe's twins.
+- Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**. The ring leads
+  a world foe's dealt element list; it does not determine her whole weakness list.
 
 ## Statuses
 
@@ -368,7 +375,7 @@ unchanged.
 | Acting twice | From tier Lv 10: a lone region boss and an elite's sub-boss; a lone elite always |
 | Formations | A foe's offense is the square root of her HP share against a pair's foe, at most a full foe's |
 | Shields | Regular 2 (by formation), sub-boss 6, boss 8 |
-| Weaknesses | Her twins: the element that beats hers on the ring and its twin Arm, or the Bow and the Katana (Twilight) for a Light + Dark foe; every foe, every rank (v16) |
+| Weaknesses | Engine v18: a Tier 1 regular (including Keys and guards) gets 2 Arms + 2 elements; a sub-boss or boss gets 3 kinds, split 2 + 1. Each stage deals its Arms and element decks across foes, the ring answer first; Light + Dark draws Fire, Ice and Lightning. The Rift keeps its twin draws |
 <!-- /live -->
 
 ## The Rift's foes

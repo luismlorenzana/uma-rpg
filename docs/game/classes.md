@@ -1,7 +1,8 @@
 # Classes and weapons
 
 Six classes and ten weapons (D86; classes v2, D160, live since H61, D188; the Tier rework's fight, engine v16, live
-since H72, D210; its economy, engine v17, live since H82, D218). Every Uma has one **active class** at a time and can switch freely. She keeps each class's own three
+since H72, D210; its economy, engine v17, live since H82, D218; weaknesses v2 and the Summoner's ×0.62 Tome hand,
+engine v18, live since H116, D237). Every Uma has one **active class** at a time and can switch freely. She keeps each class's own three
 weapons, her line on each of its trees and her loadout. Classes and weapons are chosen on the Stable → an Uma →
 **Skills** page, six classes in two rows of three ([sections](sections.md#stable)).
 
@@ -55,7 +56,7 @@ Aegis, Axe Enfeeble and the Valkyries' revive, which moved to the Paladin and th
 | Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | 2.4× her open depth | Pace chasers, Wit at or over Power, or picked | Magical |
 | Spell Blade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | 2.2× her open depth | Pace chasers, Power over Wit, or picked | Physical |
 | Cleric | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | 1.5× her open depth | Late surgers, Wit at or over Power, or picked | Magical |
-| Summoner | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.58 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | Late + End closers; End closers | Magical |
+| Summoner | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.62 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | 2.2× her open depth | Late + End closers; End closers | Magical |
 | Paladin | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | 1.5× her open depth | Late surgers, Power over Wit, or picked | Physical |
 <!-- /live -->
 
@@ -130,8 +131,8 @@ filters by calling, stride and knack.
 Ten weapons: five **Arms** (physical kinds) and five **Tomes** (elements). Each kind keeps one shape in every class, so
 an Axe skill always reaches every foe, whoever swings it. A Paladin's or a Cleric's skills with that weapon carry the
 status listed: her blows on the foe they hit, her spells on every Uma. An Arm and the element that share its shape are
-**twins** (Greatsword and Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark): every foe is weak to
-one twin set ([combat](combat.md#weaknesses-shields-and-breaks)).
+**twins** (Greatsword and Fire, Axe and Ice, Lance and Lightning, Bow and Light, Katana and Dark). The Rift and older
+fights use those sets; engine v18's world stages deal broader per-foe lists ([combat](combat.md#weaknesses-shields-and-breaks)).
 
 <!-- live:weapons -->
 | Weapon | Id | Kind | Channel | Shape | Healer status | Classes |
@@ -185,8 +186,8 @@ Her lines stay; her equipped skills of a tree the preset takes out of her slots 
 
 The defaults pair up: the Brawler's and the Mage's are the ring (Fire, Ice and Lightning in each channel), and the
 Spell Blade's, the Summoner's and the Cleric's each hold a twin set in both channels (Lance and Thunder; Bow and Light;
-Bow and Light), so both halves of a hybrid's act land weak on it. The five fight types' defaults hold all ten kinds
-with either healer.
+Bow and Light). That gives each hybrid both channels against the stage's dealt lists. The five fight types' defaults
+hold all ten kinds with either healer.
 
 ## Skills: depths, lines and ranks
 

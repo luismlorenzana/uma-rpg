@@ -61,9 +61,9 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 ## Decisions made
 
 - **Inert until the switch.** Every new state reads the live engine and save (`rpgRework('t2Classes')`), the world's
-  tier, or a fight's own `engineVersion`. Before H97 the game looks exactly as it does today; an open v18 fight after
+  tier, or a fight's own `engineVersion`. Before H97 the game looks exactly as it does today; an open v19 fight after
   the switch shows no class skills.
-- **The local switch** (to preview; **never commit it**), exactly H97's change: `caps.ts` `BATTLE_ENGINE_VERSION = 19`;
+- **The local switch** (to preview; **never commit it**), exactly H97's change: `caps.ts` `BATTLE_ENGINE_VERSION = 20`;
   `save.ts` `SAVE_SCHEMA_VERSION = 30`; `migrations.ts` chains `toV30` after `toV29`. Restart the API and the web; a
   scratch v29 save in your worktree's `apps/api/.data` migrates on load.
 - **The words** (the owner's names, H91):
@@ -80,7 +80,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   - LB+: "{Limit Break}+" ("Arsenal Rush+").
   No "Ring" or "Light/Dark" anywhere. "Arcane" always with its noun, so it never reads as the Rift's front.
 - **The tree model stays the domain's** (H65's pattern: the web draws, the domain decides). `rpgTreeView` (`rpg/tree-view.ts`)
-  gains, from tier 2 at v19 and with the engine argument: her class tree (her branch, its focus and its three nodes with
+  gains, from tier 2 at v20 and with the engine argument: her class tree (her branch, its focus and its three nodes with
   gate, rank and next rank), the C line among each tree's lines, each held tip's options (Power, Break, and ★ her stride's
   tip only on `weapons[0]` as her calling's class, `umaTemplate` passed in), the picked tip, and each tree's focus mark.
   Tested in the domain, so the web stays thin and a ChatGPT worker needs no engine knowledge.
@@ -123,7 +123,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   build re-specs a member in one tap, in tier 2 that tap also sets her branch (`setClassBranch`). The suggestions
   (`bestParty`, `suggestConvergence`) are unchanged.
 - **The weapon moon's picker** (H88's, on the Observatory; H85: "R4 orders them by her class branch's groups"): from
-  tier 2 at v19 her three slotted kinds first, then her focus's other kinds, then the rest.
+  tier 2 at v20 her three slotted kinds first, then her focus's other kinds, then the rest.
 - **Help sheets** ((i), short): the focus, the class skills, branch C and the tips, the signature tip, LB+. Text chosen
   by the live predicate; tier 1's sheets are unchanged.
 - **The manual** stays as it is (it describes the deployed game); H97 rewrites it from what you built. Note in your
@@ -145,20 +145,20 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
    - `battle/labels.test.ts`: the focus label for each of the twelve branches (a Berserker's "Heavy Arms", a Sorcerer's
      "Arcane Tomes", a Rune Knight's "Heavy and Elemental", a Bishop's "Lite and Arcane"); the chip word by lead channel
      for all twelve; "Meteor Strike · Break"; "★ Quickstep"; "Arsenal Rush+"; no label contains "Ring" or "Light/Dark".
-   - `rpg/tree-view-v19.test.ts` (the domain): nothing new in tier 1 or at v18; at v19 in tier 2 her branch's three
+   - `rpg/tree-view-v20.test.ts` (the domain): nothing new in tier 1 or at v19; at v20 in tier 2 her branch's three
      class nodes at Class Rank 20, 30, 40, a Class Rank 34 Uma's at Ranks 5, 3 and locked; both branches with their
      focus and set (the Warlord's Bow, Katana, Axe); C among the lines; Power and Break on every held tip; ★ her
      stride's tip only on `weapons[0]` as her calling's class; the focus mark on her focus trees only.
    - `places/stable/` (the drawing): the plate's tiles and the switch sheet render from a tree-view fixture; the tip
      fork draws ★ dashed until picked.
-   - `battle/battle-view.test.ts`: on a v19 state, `skillChoices` include her class skills with their `via` options
+   - `battle/battle-view.test.ts`: on a v20 state, `skillChoices` include her class skills with their `via` options
      (her focus weapons of the channel; any weapon of it when she holds none); the default `via` lands weak on the
-     target; `actionFor` builds an action the engine accepts; `limitOptions` names LB+ at Bond 10; a v18 state is
+     target; `actionFor` builds an action the engine accepts; `limitOptions` names LB+ at Bond 10; a v19 state is
      unchanged.
    - `places/party-hall/kinds-note.test.ts`: a tier 2 party of a Berserker, a Rune Knight, a Sorcerer, a Conjurer and a
      Guardian reads "No Bow in this party"; with a Bishop for the Guardian, no note; three missing kinds read "Missing 3
      kinds"; tier 1, or the live game before the switch, no note.
-   - `places/halls/lb-plus.test.ts` (a pure helper): each seat's LB+ line in tier 2 at v19; none in tier 1.
+   - `places/halls/lb-plus.test.ts` (a pure helper): each seat's LB+ line in tier 2 at v20; none in tier 1.
    - Every existing web test passes unchanged; the domain's replay tests stay green.
 8. **Check it locally** (your own ports; a desktop browser; never the iOS Simulator), on a scratch v29 save with a Tier 2
    world holding: a Class Rank 34 Brawler whose calling is Brawler (Dash stride) with a Hero at Bond 10, a Spell Blade, a
@@ -167,7 +167,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
    - **with** it, at 390×844 and 375×667, light and dark: the plate's tiles, the switch sheet and "Switch and use the
      set" (her Gear tab then shows the reverse set), the Class tab and its pips, C on a fork, the tip fork with ★
      Quickstep dashed on her Greatsword tree and absent once she switches to Mage, the focus marks, the template card's
-     tip line, the Battle tab's focus and ★ rows, the chips and the Gear tab's group words; a v19 Tier 2 fight on Auto
+     tip line, the Battle tab's focus and ★ rows, the chips and the Gear tab's group words; a v20 Tier 2 fight on Auto
      and by hand, casting a class skill through a picked focus weapon, a Break tip's double chip, Frenzy's and Vigil's
      text and an LB+ cut-in; a hall's LB+ lines; the Party Hall's note and its (i); the Rift's guidance with branches.
    - Describe what you saw. Say which screens touch the edges (the owner checks them on the phone after H97).
@@ -176,7 +176,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 
 - [ ] `pnpm lint && pnpm test && pnpm build` pass; say the main JS number (of 230 KB).
 - [ ] The tests in step 7 pass; the domain's replay tests stay green.
-- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 18, `SAVE_SCHEMA_VERSION` 29, `toV30` unchained.
+- [ ] `git diff` has no switch: `BATTLE_ENGINE_VERSION` 19, `SAVE_SCHEMA_VERSION` 29, `toV30` unchained.
 - [ ] Both local checks in step 8 were done and described. Nothing from the original games in git; screenshots with
   original art stay local.
 - [ ] `docs/game/` is unchanged and `pnpm docs:update` leaves no diff; the D-row is logged; class-progression §6.7 and

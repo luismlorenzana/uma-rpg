@@ -2,14 +2,19 @@
 
 **uma-rpg · Claude · L · Needs: H92, H93 (and through them H91) · Unblocks: H97**
 
+> **H116 plan correction (D237): read [weaknesses-v2.md §7, WK8–WK10](../../design/tier-rework/weaknesses-v2.md#7-later-tiers-and-the-rift-wk8wk10) before measuring.**
+> Run every campaign balance and coverage table against the live three-kind WK8 world lists; do not reconstruct the
+> retired one-kind/twin model. The Rift remains on WK9. The `coverage 2.0` target below is obsolete: report and pin the
+> measured WK8 baseline instead, then tune only the packet's existing non-weakness knobs.
+
 ## Why
 
 The stat balancing (D196) is an analytic model: "the final tuning by simulation happens at implementation" (SB2). R3's
 balance (H89) measured Tier 2's weapon tools and priced their share of the term. This packet measures **Tier 2's whole
-toolbox** with the game's own rules on engine v19: the class branches and their focus, the class skills, branch C, the
-Break and signature tips, LB+, Tier 2's narrowed weaknesses, boss shields 9 and the full term. It tunes **R4's own
+toolbox** with the game's own rules on engine v20: the class branches and their focus, the class skills, branch C, the
+Break and signature tips, LB+, weaknesses v2's three-kind lists, boss shields 9 and the full term. It tunes **R4's own
 knobs first**, in the order the docs name, touches the Rift's tuning only where its bands break, and writes the measured
-numbers into the docs. All of it is v19-only, so the live game (v18) doesn't move until H97.
+numbers into the docs. All of it is v20-only, so the live game (v19) doesn't move until H97.
 
 ## Context (read first)
 
@@ -38,18 +43,18 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   - `world/balance-play.ts` (`play`, `Played`), `world/balance.test.ts` (`simulate`, `run`; `SIM=1`).
   - `rift/balance.test.ts`, `rift/balance-v15.test.ts` and R3's (`guided`, the guard rail, the always-on checks);
     `rift/fronts.ts` (`riftGuidedBuild`, `riftTuning(engine, tier)`), `rift/generate.ts` (`riftBattleInput`).
-- **The knobs** (all v19-only, so tuning them never moves a v18 fight): H91's class-skill data and `BATTLE_FOCUS_BONUS`
-  (0.15); H92's C lines, tips and LB+ data; H93's term rows (v19: Tier 2 0.27, 0.10, ×1.1; Tier 3 worlds H89's b₃ and
-  a₃ with the offense part and the boss tenth), the v19 shield row (`rpgFoeShields`: bosses 9, sub-bosses 7, regulars
-  Tier 1's + 1), and a `riftTuning(19, 2)` override.
+- **The knobs** (all v20-only, so tuning them never moves a v19 fight): H91's class-skill data and `BATTLE_FOCUS_BONUS`
+  (0.15); H92's C lines, tips and LB+ data; H93's term rows (v20: Tier 2 0.27, 0.10, ×1.1; Tier 3 worlds H89's b₃ and
+  a₃ with the offense part and the boss tenth), the v20 shield row (`rpgFoeShields`: bosses 9, sub-bosses 7, regulars
+  Tier 1's + 1), and a `riftTuning(20, 2)` override.
 
 ## Decisions made
 
-- **Measure with explicit v19 inputs, never the switch.** `BalanceOptions` gains each member's **class branch** and her
+- **Measure with explicit v20 inputs, never the switch.** `BalanceOptions` gains each member's **class branch** and her
   tips; `balanceMember` builds a tier 2 Uma on curve with R3's best picks (weapon-progression §3.8, or her reverse set's
   §3.8 picks), her preset by branch (WP25, EP29), **her three class skills equipped** among her ten, tips at Power unless a
   check says otherwise, and her first seat's LB+ when the check is about LB+. `balanceStage` and `riftBattleInput` take
-  version 19. Every number H89 printed must print the same with the defaults.
+  version 20. Every number H89 printed must print the same with the defaults.
 - **What each target means here** (on Auto, first try, on curve unless said; Tier 2 at Lv 30 and 50 unless said):
 
   | # | Target | Measured as |
@@ -67,7 +72,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   | 11 | **LB+**: each +15–25% of its Limit Break | Its damage or support with and without the plus, one fight a seat |
   | 12 | **The Rift's Tier 2 fronts** (rift §11, SB7): right parties ≥ 80% a stage and 60–70% a champion; wrong parties ≤ 30% and ≤ 10%; the Convergence about 50%; a tuned party about 1.6× the campaign's act; no single Uma Breaks a Duel boss in one act | H51's tables on a Tier 2 run with H93's guided parties and their branches; then each front with the swap §7.2's leans suggest (the Blademaster on Iron, the Templar on the Horde …), keeping the one with the higher champion win rate and recording both |
   | 13 | **MP** (SB18): the Springs test in Tier 2, skill MP ×1.7 and class skills on: a region's last four stages within ±10% of today's pace; no deep cast refunded by a round | README §9.5 item 5's test at Tier 2's Lv 30 and 50 |
-  | 14 | **R3's items with R4's tools on**: Pure against Dual within ±10%, coverage 2.0, Full against Split, every accessory branch someone's best | H89's tables re-run on v19: report the drift; tune only R4's knobs |
+  | 14 | **R3's items with R4's tools on**: Pure against Dual within ±10%, coverage 2.0, Full against Split, every accessory branch someone's best | H89's tables re-run on v20: report the drift; tune only R4's knobs |
   | 15 | **Tier 3 worlds on R4's shape** (between releases): rounds a fight within ±10% of Tier 1's, as H89 held them | `simulate` at Tier 3 Lv 10–50 with R4's tools on; the knob is the interim term's a₃ (then b₃). R5's H101 replaces it with SB4's |
 
 - **Tuning order** (smallest moves first; re-measure after each step):
@@ -80,20 +85,20 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   3. **The term's HP and DEF rate 0.27** within ±0.05 (SB3's knob); the offense +10% and the bosses' ×1.1 stay. Tier 3
      worlds' a₃ (then b₃) for target 15. A move updates H93's Tier 2 foe digest on purpose, said in the D-row.
   4. **Boss shields 9 ± 1** if target 8 misses (SB6).
-  5. **`riftTuning(19, 2)`** only where §11 still breaks after 1–4, as a v19 override read through the fight's version, so a
+  5. **`riftTuning(20, 2)`** only where §11 still breaks after 1–4, as a v20 override read through the fight's version, so a
      pre-switch Rift fight keeps its foes.
   **Never:** the hands and leans (Tier 1's balance), R3's weapon branches and partners, the accessories' and Insignias'
   values, the weapon moons, Tier 1's foes, or the owner's shapes (a focus on a group, the sets, the tips' kinds).
 - **When a target can't be met** without breaking another, keep the closest and write why, as H51 did for Iron's wrong
   party; the owner prefers that to an open question.
-- **Always-on checks** (v19, fixed seeds, fast), in `world/balance-v19.test.ts` and `rift/balance-v19.test.ts`:
+- **Always-on checks** (v20, fixed seeds, fast), in `world/balance-v20.test.ts` and `rift/balance-v20.test.ts`:
   - **the stack's factor:** one hit on a weak foe by a tier 2 ally with a Pure weapon, her focus and an Onslaught
     Insignia on her wave's first act deals **×2.156** (± 0.5%) of the same hit with a base weapon, no focus and no
     Insignia on a foe not weak to it, the unbroken halving and statuses equal; Tier 1's ×1.495 alongside (a base
     weapon's ×1.3 and a base Insignia's ×1.15, on a boss);
   - the default party on branch 1 wins a Tier 2 Lv 30 regular stage on Auto; Iron's Tier 2 guided party wins Iron's
     Tier 2 stage 1;
-  - **the guard rail at v19:** every class's best act (class skills, Break tips and LB+ included) removes fewer shield
+  - **the guard rail at v20:** every class's best act (class skills, Break tips and LB+ included) removes fewer shield
     points from a lone foe than the Tier 2 Duel's lowest shield;
   - the Rune Knight ↔ Conjurer ratio within ±5% on one fixed fight.
   R1–R3's always-on checks stay as they are.
@@ -104,8 +109,8 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 
 ## Do
 
-1. **The harness:** the branch, tips, class skills and LB+ in `balanceMember`; v19 inputs; a `SIM_ENGINE=19` switch on
-   the balance files (or v19 tables beside the v18 ones). Check that every H89 table prints the same with the defaults.
+1. **The harness:** the branch, tips, class skills and LB+ in `balanceMember`; v20 inputs; a `SIM_ENGINE=20` switch on
+   the balance files (or v20 tables beside the v19 ones). Check that every H89 table prints the same with the defaults.
 2. **Measure** targets 1–15 (`SIM=1`). Save the raw tables in your delivery.
 3. **Tune** in the order decided; re-measure after each step; stop when every target holds or is explained.
 4. **Always-on checks** as decided.
@@ -121,7 +126,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   support, the generator lazy). Say the number (gzip, of 230 KB).
 - [ ] Every target is met or the delivery says which is closest and why; the always-on checks pass; the raw tables are
   in the delivery.
-- [ ] H89's numbers print unchanged with the defaults; the replay fixture tests stay green; no v18 number changed.
+- [ ] H89's numbers print unchanged with the defaults; the replay fixture tests stay green; no v19 number changed.
 - [ ] class-progression §15, stat-balance §12, rift.md §11 and README §9.5 carry the measured results; the D-row is
   logged; `docs/game/` is unchanged and `pnpm docs:update` leaves no diff.
 - [ ] The local check in step 6 was done and described, and the switch undone (`git diff` shows none). Nothing from the
@@ -132,7 +137,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 ## Deliver
 
 - **Claude, as a delegated worker:** a pull request from `feat/h96-r4-balance` with one commit,
-  `feat(domain): R4's balance, measured and tuned on engine v19 (H96)`; the body lists every number changed and the
+  `feat(domain): R4's balance, measured and tuned on engine v20 (H96)`; the body lists every number changed and the
   measured tables. H94 edits the save at the same time; you may both touch `save/presets.ts` (rebase on whichever lands
   first). Fetch `main` before you push. The main session reviews and merges it, then watches the deploy.
 - **Flag it done:** after the merge, a `docs(handoff): H96 done (D…)` commit deletes this file, sets H96 to Done with a

@@ -19,7 +19,7 @@ have to live in the save, and the fight's input has to freeze them (CP31's v30 p
 - **a tip pick per tree:** Power (the default), Break, or the signature, "stored like every pick" (UT17).
 
 This packet writes save v30's rules **dark**: `toV30` written and tested but not chained, the parse and the setters
-behind the live predicate, the sheet freezing the picks into a v19 input. H97 chains `toV30`, sets
+behind the live predicate, the sheet freezing the picks into a v20 input. H97 chains `toV30`, sets
 `SAVE_SCHEMA_VERSION` to 30 and flips the engine in one commit. Nothing is deleted or converted, so there is no
 compensation.
 
@@ -66,7 +66,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
 - **`toV30(world, tier)`** in `migrations.ts` (the chain's signature since H87; it writes the same in every tier),
   exported, **not chained** (`SAVE_SCHEMA_VERSION` stays 29 and `migrateWorld` doesn't call it; H97 does both).
   Literals only. Per Uma, per class loadout: `classBranch: 1` and `tips: {}` where
-  absent. **Nothing else moves:** weapons, picks, loadouts, the open world-map and Rift fights (v18 inputs replay on v18),
+  absent. **Nothing else moves:** weapons, picks, loadouts, the open world-map and Rift fights (v19 inputs replay on v19),
   runs, wallets, Bonds. Running it twice equals running it once.
 - **The parse** (`parseLoadout`) reads the new fields only when v30 is live (`rpgRework('t2Classes')`, the live default),
   so before the switch it is today's parse, byte for byte. Under the switch: both fields required; in a tier 1 world
@@ -90,7 +90,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
   - **The tip follows her first slot** (UT9): when `setClassWeapons` or `holdWeapon` changes `weapons[0]`, a
     `'signature'` moves to the new first slot's tree (replacing its Power or Break) and the tree it left falls back to
     Power.
-- **The sheet** (`umaBattleSheet`), for a v19 input in a tier 2 or later world:
+- **The sheet** (`umaBattleSheet`), for a v20 input in a tier 2 or later world:
   - `classBranch` from her loadout;
   - `tips`: each `'break'` as is; a `'signature'` resolved to her stride's tip (Dash `'quickstep'`, Middle
     `'spillover'`, Stayer `'long-guard'`) **only when she fights as her calling's class and the tree is her
@@ -116,14 +116,14 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
      Rift fights are byte-identical; a world already carrying the fields is untouched.
    - `save/save-v30.test.ts`, the switch mocked to 19 with `capsAt`: a rich v29 world
      (tier 1 and tier 2 worlds, Duals, two accessory slots, a weapon moon, open fights) run through `toV30` parses, and
-     its open v18 fight replays; the same world unmigrated fails on `classBranch`; a tier 1 loadout with branch 2, a C
+     its open v19 fight replays; the same world unmigrated fails on `classBranch`; a tier 1 loadout with branch 2, a C
      line or any tip fails; a tier 2 loadout with branch 2, C lines, a Break tip and one signature parses; two
      signatures fail; a branch 1 loadout equipping a branch 2 class skill fails.
    - `save/branches-v30.test.ts`, mocked to 19: `setClassBranch` swaps equipped class skills depth for depth and is
      refused in tier 1; `wearClassPreset(…, 2)` dresses the reverse set; `pickBranch` takes C in tier 2 and refuses it
      in tier 1; `setTip('signature')` works only as her calling's class on her first slot's tree; reordering her slots
      moves the signature and returns the old tree to Power; `umaBattleSheet` freezes `classBranch`, `tips` (a Dash Uma's
-     signature as `'quickstep'`; none when she fights as another class) and `heroBond`, and a v19 fight from that sheet
+     signature as `'quickstep'`; none when she fights as another class) and `heroBond`, and a v20 fight from that sheet
      starts.
    - Unmocked: every existing save test passes unchanged; a new Uma's loadout has no `classBranch` before the switch.
 5. **Docs:** log the D-row (fetch `main` first); class-progression §14's line. `pnpm docs:update` leaves no diff.
@@ -132,7 +132,7 @@ Code pointers are by file and function: Releases 1–3 move the lines. Re-read t
    - without the switch, unlock an Uma, switch a class and start a world-map fight: all as before;
    - with the **local switch** (never committed: `caps.ts` 19, `SAVE_SCHEMA_VERSION` 30, `toV30` chained after `toV29`),
      restart the API: `apps/api/.data/save.json` reads `schemaVersion` 30, every class loadout has `classBranch: 1` and
-     `tips: {}`, the open fight still says `version: 18` and finishes. Then undo the switch.
+     `tips: {}`, the open fight still says `version: 19` and finishes. Then undo the switch.
 
 ## Done when
 

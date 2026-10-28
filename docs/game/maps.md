@@ -46,39 +46,39 @@ the start of its road and as **Spring · MP** in the header. It shares that Spri
 Nineteen biomes. Each sets the **element signatures** its foes carry, its **formation** lean and its foe **roles**.
 
 <!-- live:biomes -->
-| Biome | Id | Signatures (weak to) | Formations | Roles |
+| Biome | Id | Signatures (ring lead) | Formations | Roles |
 |---|---|---|---|---|
-| Meadow | `meadow` | fire (Lightning twins); ice (Fire twins); lightning (Ice twins) | squad, duo, trio | striker, caster, skirmisher, guard |
-| Forest | `forest` | lightning (Ice twins); light (Dark twins); dark (Light twins) | squad, trio, swarm | skirmisher, striker |
-| Coast | `coast` | ice+lightning (Fire twins); ice (Fire twins); lightning (Ice twins) | trio, squad | caster, skirmisher |
-| Swamp | `swamp` | lightning+dark (Ice twins or Light twins); dark (Light twins) | squad, trio | caster, skirmisher |
-| Jungle | `jungle` | fire+lightning (Ice twins); lightning (Ice twins) | swarm, squad | skirmisher, striker |
-| Desert | `desert` | fire+light (Lightning twins or Dark twins); fire (Lightning twins); light (Dark twins) | trio, duo | guard, striker |
-| Canyon | `canyon` | fire (Lightning twins); lightning (Ice twins); fire+lightning (Ice twins) | duo, solo, trio | striker |
-| Volcano | `volcano` | fire+dark (Lightning twins or Light twins); fire+light (Lightning twins or Dark twins); fire (Lightning twins) | solo, duo | striker, caster |
-| Geyser Basin | `geyser` | fire+ice (Lightning twins); ice (Fire twins); fire (Lightning twins) | trio, squad | caster |
-| Tundra | `tundra` | ice (Fire twins); ice+dark (Fire twins or Light twins) | squad, trio | guard, striker |
-| Glacier | `glacier` | ice+light (Fire twins or Dark twins); ice (Fire twins) | solo, duo | guard |
-| Storm Peaks | `peaks` | ice+lightning (Fire twins); lightning (Ice twins) | trio, squad | skirmisher |
-| Highlands | `highlands` | lightning+light (Ice twins or Dark twins); light (Dark twins) | duo, trio | caster |
-| Sky Isles | `sky` | fire+light (Lightning twins or Dark twins); ice+light (Fire twins or Dark twins); lightning+light (Ice twins or Dark twins) | trio, duo | caster |
-| Underworld | `underworld` | fire+dark (Lightning twins or Light twins); ice+dark (Fire twins or Light twins); lightning+dark (Ice twins or Light twins) | swarm, squad | striker, caster, skirmisher |
-| Haunted Moor | `moor` | dark (Light twins); ice+dark (Fire twins or Light twins) | swarm, squad | skirmisher, caster |
-| Crystal Caverns | `crystal` | ice+light (Fire twins or Dark twins); light (Dark twins) | squad, trio | guard, caster |
-| Ancient Ruins | `ruins` | light+dark (Twilight); fire (Lightning twins); ice (Fire twins); lightning (Ice twins) | escort, trio | guard |
-| Twilight Rift | `rift` | light+dark (Twilight) | solo | striker, caster |
+| Meadow | `meadow` | fire (Lightning); ice (Fire); lightning (Ice) | squad, duo, trio | striker, caster, skirmisher, guard |
+| Forest | `forest` | lightning (Ice); light (Dark); dark (Light) | squad, trio, swarm | skirmisher, striker |
+| Coast | `coast` | ice+lightning (Fire); ice (Fire); lightning (Ice) | trio, squad | caster, skirmisher |
+| Swamp | `swamp` | lightning+dark (Ice / Light); dark (Light) | squad, trio | caster, skirmisher |
+| Jungle | `jungle` | fire+lightning (Ice); lightning (Ice) | swarm, squad | skirmisher, striker |
+| Desert | `desert` | fire+light (Lightning / Dark); fire (Lightning); light (Dark) | trio, duo | guard, striker |
+| Canyon | `canyon` | fire (Lightning); lightning (Ice); fire+lightning (Ice) | duo, solo, trio | striker |
+| Volcano | `volcano` | fire+dark (Lightning / Light); fire+light (Lightning / Dark); fire (Lightning) | solo, duo | striker, caster |
+| Geyser Basin | `geyser` | fire+ice (Lightning); ice (Fire); fire (Lightning) | trio, squad | caster |
+| Tundra | `tundra` | ice (Fire); ice+dark (Fire / Light) | squad, trio | guard, striker |
+| Glacier | `glacier` | ice+light (Fire / Dark); ice (Fire) | solo, duo | guard |
+| Storm Peaks | `peaks` | ice+lightning (Fire); lightning (Ice) | trio, squad | skirmisher |
+| Highlands | `highlands` | lightning+light (Ice / Dark); light (Dark) | duo, trio | caster |
+| Sky Isles | `sky` | fire+light (Lightning / Dark); ice+light (Fire / Dark); lightning+light (Ice / Dark) | trio, duo | caster |
+| Underworld | `underworld` | fire+dark (Lightning / Light); ice+dark (Fire / Light); lightning+dark (Ice / Light) | swarm, squad | striker, caster, skirmisher |
+| Haunted Moor | `moor` | dark (Light); ice+dark (Fire / Light) | swarm, squad | skirmisher, caster |
+| Crystal Caverns | `crystal` | ice+light (Fire / Dark); light (Dark) | squad, trio | guard, caster |
+| Ancient Ruins | `ruins` | light+dark (Fire / Ice / Lightning dealt); fire (Lightning); ice (Fire); lightning (Ice) | escort, trio | guard |
+| Twilight Rift | `rift` | light+dark (Fire / Ice / Lightning dealt) | solo | striker, caster |
 
-The twin sets: Fire twins (Greatsword, Fire Tome); Ice twins (Axe, Blizzard Tome); Lightning twins (Lance, Thunder Tome); Light twins (Bow, Light Tome); Dark twins (Katana, Dark Tome); Twilight (Bow, Katana).
+The ring lead is only the first element answer. Engine v18 deals the rest of each foe's Arms and elements from the stage decks, so neighbours differ.
 <!-- /live -->
 
 ### Element signatures
 
-A signature is one element, or a pair that each foe carries both of. Since engine v16 (CP5) a foe is weak to her
-**twins**: the element that beats hers on the ring, **Fire > Ice > Lightning > Fire** and **Light ⇄ Dark**, and its twin
-Arm ([combat](combat.md#weaknesses-shields-and-breaks)):
-- A pair's foes read their lead element first, the lead alternating by slot; when its answer is one of her own, her
-  second. So a pair can answer to two twin sets ("Fire twins or Dark twins").
-- A **light+dark** foe answers to no element: the Bow and the Katana (**Twilight**).
+A signature is one element, or a pair that each foe carries both of. From engine v18 it supplies the first element in
+her weakness list: the answer on **Fire > Ice > Lightning > Fire** and **Light ⇄ Dark**. The stage then deals the rest
+of her elements and her Arms from its two decks, so neighbouring foes differ while the stage stays fixed
+([combat](combat.md#weaknesses-shields-and-breaks)). A pair can lead with each ring answer. A **light+dark** foe has no
+ring answer outside her pair, so her elements are dealt from Fire, Ice and Lightning. The stage sheet shows her shield,
+`Weak:` and all three or four icons; the fight card uses the compact icons without the word.
 
 ### Faces
 

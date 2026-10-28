@@ -1,4 +1,4 @@
-// Deterministic campaign battle reducer, engine v17 (live since H82, D218; v16 from H72 to H82, D210; W3, D91; classes
+// Deterministic campaign battle reducer, engine v18 (weaknesses v2 live since H116, D237; v17 from H82 to H116, D218; W3, D91; classes
 // D86, docs/design/class-rework.md; Limit Breaks D311).
 // Octopath Traveler breaks: each weak hit removes one shield point, and unbroken foes take half damage. Every class acts
 // once a round; a Spell Blade's act is an Arms half and a Tome half, a Summoner's summon lingers and acts again when she
@@ -16,6 +16,7 @@
 // v17 is R2's economy (D209, live since H82): gear grades arrive only as stats and Might, and support fields retire; her
 // accessory's base form and her signature join the damage stack (H75, D212): `flat` and `signature` in a hit's offense,
 // the Insignia a factor after the weak step, and the Bell's follow-up after an act with an Attack (`ring`).
+// v18 changes generated world-foe weakness lists and the Summoner's Tome hand; the reducer otherwise keeps v17's rules.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'

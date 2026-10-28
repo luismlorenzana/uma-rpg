@@ -15,7 +15,7 @@ const withUma = (uma: Partial<OwnedUma>, items: Record<string, number> = {}): Sa
 const umaOf = (save: Save) => worldOf(save).umas['101']!
 
 describe('setJewel (EP5, EP17)', () => {
-  it('runs with R2’s economy live', () => expect(BATTLE_ENGINE_VERSION).toBe(17))
+  it('runs with weaknesses v2 live over R2’s economy', () => expect(BATTLE_ENGINE_VERSION).toBe(18))
 
   it('a Lv 1 Uma sets a Planet Jewel I on Planet I: the node opens and the count falls', () => {
     const save = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 2 }), '101', 'jewel-planet-1', 'planet:1', '2026-10-25T13:00:00.000Z')

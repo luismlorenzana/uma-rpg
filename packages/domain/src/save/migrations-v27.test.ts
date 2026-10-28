@@ -21,7 +21,7 @@ const BRAWLER_ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana'
 
 describe('save v27’s migration (H69), chained by H72', () => {
   it('runs on every world before v27 and on none at v27, and v28’s step after it (H82)', () => {
-    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([31, 17])
+    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([31, 18])
     const raw = world() as unknown as Raw
     expect(migrateWorldToV27(raw, 27)).toBe(raw)
     expect(migrateWorldToV27(raw, 26)).toEqual(toV27(raw))

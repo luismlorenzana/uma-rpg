@@ -57,7 +57,7 @@ afterEach(() => {
 })
 
 describe('the Skills tab as a tree (H70)', () => {
-  it('runs with the Tier rework’s fight live (on 17 since H82)', () => expect(BATTLE_ENGINE_VERSION).toBe(17))
+  it('runs with weaknesses v2 live on engine 18 (H116)', () => expect(BATTLE_ENGINE_VERSION).toBe(18))
 
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())

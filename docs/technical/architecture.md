@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-27; save v31, engine v17 (the farm by line, D224; the Wilds' trios, D230).** The full running-system reference is
+> **Status: current, 2026-10-28; save v31, engine v18 (weaknesses v2, D235–D237).** The full running-system reference is
 > [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -73,9 +73,9 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v17, the Tier rework's economy (D209, live since H82, D218): gear grades as stats and Might, the four accessory families' base forms and the signature, the supports refused; on v16's fight (D200, live since H72, D210: the base MP regen and the Flourish, D204) and classes v2's (D179–D188); every older version replaying as it was; `caps.ts` holds the switch and `rpgRework` |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v18, weaknesses v2 (D235–D237): per-stage dealt Arms and element lists and the Summoner's ×0.62 Tome hand; on v17's economy and v16's fight; every older version replaying as it was; `caps.ts` holds the switch and `rpgRework` |
 | `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation and learning rules; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
-| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v16's twins and Tier 1's shields (D202), live since H72 |
+| `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, v18's stage weakness dealer (D235–D237) over Tier 1's shields |
 | `economy/`, `items/` | Jobs, ranks, tokens, recipes, points, timers, prices and the item catalog |
 | `hub/places.ts` | One place registry shared by routes, map targets and menus (D33) |
 

@@ -65,7 +65,7 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
        one tap of the standard preset dresses her class's Tier 2 forms (H84).
   3. **`stars.moons`** stays `[]`: an empty list reads her preset (H85).
   4. **`secondary`** stays absent.
-  5. **Open fights are untouched:** a v17 fight replays and settles on v17.
+  5. **Open fights are untouched:** a v18 fight replays and settles on v18.
   Idempotent; overwrites so a current save relabelled older still parses; malformed rows are left to the parse.
 - **The parse (strict), written now, live only with v29:**
   - **Weapons:** each kind `{ grade, branch? }`, grade 0–10. A branch only in Tier 2+ worlds; in a Tier 2 world only at
@@ -111,8 +111,8 @@ Code pointers are by file and function: Releases 1 and 2 move the lines. Re-read
      `branch-gem`; slot 2 is a Pendant at G0 (an Insignia when slot 1 is a Pendant); `stars.moons` stays `[]`; no
      `secondary`; running `toV29` twice equals once; the open world-map and Rift fights are byte-identical after it.
    - `save/save-v29.test.ts`, the switch mocked to 18 with H64's `capsAt` (`rpg/battle/caps-at.fixture.ts`): a rich
-     v28 two-tier world (Tier 1 and Tier 2, open v17 fights in both, a Forge queue, stock) run through `toV29` parses,
-     and its open v17 fights replay to their frozen ends; the same world unmigrated fails on its Tier 2 world's one
+     v28 two-tier world (Tier 1 and Tier 2, open v18 fights in both, a Forge queue, stock) run through `toV29` parses,
+     and its open v18 fights replay to their frozen ends; the same world unmigrated fails on its Tier 2 world's one
      accessory slot (Tier 2 needs two). Refused, each with its path: a branch in a Tier 1 world; a branch below G5 in
      a Tier 2 world; two Duals in one class's slots in Tier 2; a Dual whose partner the same class slots; a branch form
      below its slot's G5; two Bells; three slots in Tier 2, two in Tier 1; `weapon-moon-1:1` in a Tier 1 world and
