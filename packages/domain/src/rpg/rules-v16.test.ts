@@ -40,12 +40,12 @@ const V16_ROWS = {
 describe('the Tier rework’s switch (H64)', () => {
   it('opens each release at its engine, the fight live since H72 and the economy since H82 on 17, the rest dark', () => {
     expect(BATTLE_ENGINE_VERSION).toBe(17)
-    expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, t2Weapons: 18, t2Classes: 19, t3: 20 })
+    expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, weak: 18, t2Weapons: 19, t2Classes: 20, t3: 21 })
     const stages = Object.keys(RPG_REWORK_ENGINE) as RpgReworkStage[]
-    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, false, false, false])
-    expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false, false])
     expect([rpgRework('fight', V16), rpgRework('economy', V16)]).toEqual([true, false])
-    for (const s of stages) expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 20)], s).toEqual([false, true, true])
+    for (const s of stages) expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 21)], s).toEqual([false, true, true])
   })
 })
 

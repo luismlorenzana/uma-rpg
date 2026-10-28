@@ -30,10 +30,12 @@ releases one engine up.
    icons after the shield badge, Arms first, at 12 px; `WeaknessIcons`' VoiceOver line reads "weak to Greatsword, Katana,
    Ice and Lightning". The stage sheet keeps "Shield 3 · Weak:" and the icons. Check four icons fit a quarter-width card at
    375 px (two rows of four in an eight-foe swarm).
-3. **The manual:** combat.md's section rewritten as WK1–WK6 (counts by rank, the ring first, the decks, shields and locks
+3. **The Summoner's Tome 0.62 (WK13, H115):** her sheet's hand line and classes.md's hands table read v18's; the mirror's
+   numbers in the manual, if any, H115's (D236).
+4. **The manual:** combat.md's section rewritten as WK1–WK6 (counts by rank, the ring first, the decks, shields and locks
    unchanged, Light + Dark, Tiers 2 and 3 per WK8, the Rift unchanged), the twins kept as the Rift's vocabulary; the
    v16–v17 rule moves to "Older fights".
-4. **The re-plan (WK11):** R3, R4 and R5 read engines **v19, v20 and v21** ("read this packet's engine v18 as v19, v19 as
+5. **The re-plan (WK11):** R3, R4 and R5 read engines **v19, v20 and v21** ("read this packet's engine v18 as v19, v19 as
    v20, v20 as v21 (D235)"), saves unchanged (v32–v34); class-progression §4.1 and §4.2 point to weaknesses-v2.md; H93 and
    H101 (Tier 2's and Tier 3's weaknesses) and H96 and H104 (their balance) re-read WK8.
 
@@ -41,8 +43,8 @@ releases one engine up.
 
 1. Freeze v17's replays; flip the engine; the tests that pin the live engine move to 18.
 2. The fight card and `WeaknessIcons` (2); a web test that a four-kind foe's card has no "Weak:" and four icons in order.
-3. The manual (3); `pnpm docs:update`.
-4. The re-plan (4).
+3. The manual (3, 4); `pnpm docs:update`.
+4. The re-plan (5).
 5. **Check it locally** (your own ports, a desktop browser at phone width, never the iOS Simulator):
    - a Twilight Rift squad, a Meadow pair, a Forest elite and a Coast boss on the scratch API at 390×844 and 375×667,
      light and dark: four icons and the shield on each card, nothing clipped;

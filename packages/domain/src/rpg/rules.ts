@@ -233,7 +233,15 @@ const HANDS_V2: Readonly<Record<RpgClass, RpgHand>> = {
  * mirror's knob on the new maps: SB11's 0.48, set by R1's balance (H71, D207) to the top of SB11's 0.46–0.50, which brings
  * her split inside 70/30 ± 5 at Lv 50. Her Arms half is about a quarter of her damage, so the hand moves the mirror little
  * (0.48 → 0.56: Lv 50 92% → 94% of the Spell Blade, Lv 10 102% → 105%); R2 (H81) re-measures it on Prowess. */
-const handsOf = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58, 0.5, 0.58, 0.5, 0.3, true) })
+const handsV16 = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58, 0.5, 0.58, 0.5, 0.3, true) })
+/** Weaknesses v2 (v18, D235, H115): the Summoner's Tome 0.58 → 0.62. Her Tome summons strike every foe, which paid most when
+ * a stage's foes shared one list; with each foe her own, the Spell Blade's single-target hits find the weak foe and the
+ * mirror fell to 84–85% at Lv 30 and 50 (106% at Lv 10). 0.62 centres it, about 99% over Lv 10–50, her split still 70/30;
+ * her Arms hand would cost the split (0.60: 55–62% magical). */
+const handsOf = (engine: number): Readonly<Record<RpgClass, RpgHand>> => {
+  const older = handsV16(engine)
+  return rpgRework('weak', engine) ? { ...older, summoner: hand(0.62, 0.5, 0.62, 0.5, 0.3, true) } : older
+}
 export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
   return { ...handsOf(engine)[p.classId] }
 }

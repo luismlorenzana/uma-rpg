@@ -1,6 +1,6 @@
 # Weaknesses v2: every foe her own list, more on regulars, never fewer than three
 
-> **Proposed 2026-10-28 (D235), for the owner's review.** The owner's request after playing R1 + R2; the main session's
+> **Approved 2026-10-28 (D235); built dark in H115 (D236), on in H116.** The owner's request after playing R1 + R2; the main session's
 > design and measurements. It replaces [class-progression](class-progression.md) §4.1's twins (CP5) and §4.2's narrowing
 > (CP6) for the campaign; the Rift's fronts (CP7) stay. It is built in two packets: H115 (the rule and its balance, dark,
 > engine v18) and H116 (the switch). Each packet cites the calls below by number (WK1…WK12).
@@ -137,8 +137,25 @@ So:
   buys nothing the owner asked for.
 - **WK6 · Locks stay:** a charged move's 2–4 locks are drawn from her list. A longer list spreads them over more members.
 
-H115 re-runs R2's delivery tables on the v18 generation (32 seeds, the Paladin party, the region runs with MP carried,
-the Tier 2 and 3 worlds) before anything turns on.
+**Built and measured in H115 (D236), engine v18 on 32 seeds** (`world/balance-v18.test.ts`; the baseline is v17 wearing
+v15's own lists, slot for slot):
+- **Fights:** within 0.32 rounds of v15's lists at every level with either healer, 100% wins on curve; v17 → v18 a fight:
+  regulars 4.8 → 4.3, elites 5.3 → 4.9, bosses 8.3 → 7.5 at Lv 10; 4.8 → 4.1, 6.3 → 5.6, 8.4 → 7.9 at Lv 50.
+- **The first Break:** within ±0.5 of v15's lists everywhere but the elites at Lv 10–20 (+0.5, +0.56 with a Paladin at
+  Lv 10), which still break sooner than today's (3.1 → 2.8 at Lv 10). Fixing the elites' split at 2 + 1 (v15's) moved it
+  0.1–0.2; a shield of 5 would take Lv 50's elites past v15 the other way (H71's reason for 6), so the shields stay.
+- **Breaks:** bosses broken in 93–100% of fights (today 74–100%), regulars 95–100% (today 81–99%).
+- **Regions, MP carried:** all 12 stages cleared in 128 of 128 runs at Lv 10, 30 and 50 (today 116 of 128 at Lv 10); late
+  stages 8.6 · 5.5 · 6.7 rounds (today 9.6 · 6.2 · 7.4), MP's drag 1.54 · 1.49 · 1.18 (today 1.57 · 1.59 · 1.22).
+- **Tiers 2 and 3** (every rank 3 kinds, WK8): a fight within 0.91–1.06 of Tier 1's on the same engine.
+- **The Rift** (8 seeds, every front, the right and wrong parties): as v17's within noise.
+- **WK13 · The Summoner's Tome 0.58 → 0.62** (engine v18). Her Tome summons strike every foe, which paid most when a
+  stage's foes shared one list; with each foe her own, the Spell Blade's single-target hits find the weak foe, and the
+  mirror (Summoner ÷ Spell Blade on regular stages, CP9's ±5%) fell to 84 · 85% at Lv 30 · 50 (106% at Lv 10). At 0.62 it
+  reads **110 · 88 · 90%** at Lv 10 · 30 · 50 (today 103 · 103 · 93%; v15's lists 109 · 92 · 89%), about 99% across Lv
+  10–50, her split 71 · 66 · 71% magical. The spread by level is the lists' own (v15's show it too); her Arms hand would
+  narrow it only by breaking her split (0.60: 55–62% magical). Her damage a turn at Lv 10 · 30 · 50: 58 · 402 · 748 → 73
+  · 407 · 868.
 
 ## 6. Screens (WK7)
 
@@ -184,5 +201,5 @@ the Tier 2 and 3 worlds) before anything turns on.
 
 | Id | Task | Who | Size | Needs |
 |---|---|---|---|---|
-| H115 | **The rule and its balance, dark** (engine v18's generation): WK1–WK4 in one helper for regions, capitals and scenario chapters; shields and locks unchanged; v17's generation frozen; the WK12 checks; R2's delivery tables on v18 | Claude | M | — |
+| H115 | **The rule and its balance, dark** (engine v18's generation): WK1–WK4 in one helper for regions, capitals and scenario chapters; shields and locks unchanged; v17's generation frozen; the WK12 checks; R2's delivery tables on v18; WK13 | Claude | M | — |
 | H116 | **The switch:** engine v18 live, v17's replays frozen; the fight card's icons (WK7); the manual; R3–R5 on engines v19–v21; deploy | Claude | M | H115 |
