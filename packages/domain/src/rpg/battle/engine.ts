@@ -941,8 +941,13 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
       for (const foe of living(s, 'enemy')) { const r = strike(s, actor, foe, hit, scale, cues, false, options); note(r.receiver, hit, r.weak) }
     }
   } else if (def.target === 'random') {
+    // From v19 (Halls v2, HV-A; H129) a double's second hit (`follow`) aims at the foe the hit before it aimed at while she
+    // stands; else it draws as any random hit, by its own index, so no other hit's draw moves.
+    const follows = rpgRework('classes', s.engineVersion)
+    let aimed: BattleUnit | undefined
     def.hits.forEach((hit, i) => {
-      const foe = randomFoe(s, actor.id, i, salt)
+      const foe = follows && hit.follow && aimed && aimed.hp > 0 ? aimed : randomFoe(s, actor.id, i, salt)
+      aimed = foe
       if (!foe) return
       const r = strike(s, actor, foe, hit, scale, cues, false, options)
       note(r.receiver, hit, r.weak)

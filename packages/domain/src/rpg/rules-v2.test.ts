@@ -129,9 +129,10 @@ describe('class rules by generation (D179)', () => {
 })
 
 describe('the Paladin as an identity (D179)', () => {
-  it('has hero seats from v15: 24 in all and live, 20 in v14; the Paladin Bastion; her power; the live Limit Breaks, v1’s in v14', () => {
-    expect(ALL_HERO_LIMIT_IDS).toHaveLength(24)
-    expect(HERO_LIMIT_IDS).toEqual(ALL_HERO_LIMIT_IDS)
+  it('has hero seats from v15: 24 live, 20 in v14, 28 of every generation; the Paladin Bastion; her power; the live Limit Breaks, v1’s in v14', () => {
+    // Every generation's 28 (H129): v14's 20, the Paladin Bastion's four (v15–v18) and Halls v2's Healer Sanctum (v19).
+    expect(ALL_HERO_LIMIT_IDS).toHaveLength(28)
+    expect(HERO_LIMIT_IDS).toEqual(ALL_HERO_LIMIT_IDS.slice(0, 24))
     expect([isHeroLimitId('paladin-1'), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([true, false, true])
     expect(ALL_HERO_LIMIT_IDS.slice(0, 20).every((id) => isHeroLimitId(id, V1) && isHeroLimitId(id, V2))).toBe(true)
     expect(HERO_HALLS.paladin).toBe('paladin-bastion')

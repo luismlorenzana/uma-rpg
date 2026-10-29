@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { RPG_SKILL_POWER, RPG_SUPPORT_ALL } from '../catalog'
 import {
-  ALL_HERO_LIMIT_IDS, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitPower, heroLimitSkills, type HeroLimitId,
+  ALL_HERO_LIMIT_IDS, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitHall, heroLimitIds, heroLimitPower, heroLimitSkills,
+  type HeroLimitId,
 } from '../heroes'
 import { projectRpgStats, rpgDefaultWeapons, RPG_V2_CLASSES, rpgOpenDepth, type RpgClass, type RpgProfile } from '../rules'
 import { applyBattleAction, createBattle } from './engine'
@@ -60,14 +61,17 @@ describe('the six halls’ table (H56, §5)', () => {
   const table = (version: V) => ALL_HERO_LIMIT_IDS.map((id) => heroLimitFor(id, version)).filter((l) => !!l)
 
   it('gives v14 today’s 20, byte for byte, and v15 the six halls’ 24 in seat order', () => {
-    // Digests of `heroLimitFor(id, 14)` and its casts on main before H56 (`de4cecd`): today's table, unchanged.
+    // Digests of `heroLimitFor(id, 14)` and its casts on main before H56 (`de4cecd`): today's table, unchanged. Halls v2
+    // (H129) gives every Limit Break its `hall`, last, its id's prefix: the digest is of the rest.
     expect(table(14)).toHaveLength(20)
-    expect(sha(table(14))).toBe('72cb9b8facbc49012c92684942f1c9ae')
+    expect(table(14).every((l) => l.hall === heroLimitHall(l.id))).toBe(true)
+    expect(sha(table(14).map(({ hall: _, ...l }) => l))).toBe('72cb9b8facbc49012c92684942f1c9ae')
     expect(sha(table(14).map((l) => heroLimitSkills(l, 10)))).toBe('6f6d2c3e98ed23205d012a1319da59a8')
     // The live table is v16's since H72 (D210): v15's but Choir of Angels and Rampart Charge (H65, `trees-v16.test.ts`).
     expect(table(16)).toEqual(HERO_LIMITS)
     expect(HERO_LIMITS.filter((l) => l !== heroLimitFor(l.id, 15)).map((l) => l.id)).toEqual(['cleric-1', 'paladin-3'])
-    expect(table(15).map((l) => l.id)).toEqual(ALL_HERO_LIMIT_IDS)
+    expect(table(15).map((l) => l.id)).toEqual(heroLimitIds(15))
+    expect(ALL_HERO_LIMIT_IDS.slice(0, 24)).toEqual(heroLimitIds(15))
     expect(Object.fromEntries(table(15).map((l) => [l.id, l.name]))).toEqual({
       'brawler-1': 'Arsenal Rush', 'brawler-2': 'Iaido Cleave', 'brawler-3': 'Spear and Arrow Storm', 'brawler-4': 'Earthsplitter',
       'mage-1': 'Elemental Cascade', 'mage-2': 'Twilight Eclipse', 'mage-3': 'Trinity Storm', 'mage-4': 'Chaos Rain',
@@ -85,8 +89,8 @@ describe('the six halls’ table (H56, §5)', () => {
   it('moves Archangel’s Verdict and Archdemon’s Pact to the Bastion’s seats 1–2; the live table is v15’s', () => {
     expect(heroLimitFor('cleric-3', 14)!.name).toBe('Archangel’s Verdict')
     expect(heroLimitFor('cleric-3', 15)!.name).toBe('Dawn Hymn')
-    expect(heroLimitFor('paladin-1', 15)).toEqual({ ...heroLimitFor('cleric-3', 14)!, id: 'paladin-1', classId: 'paladin' })
-    expect(heroLimitFor('paladin-2', 15)).toEqual({ ...heroLimitFor('cleric-4', 14)!, id: 'paladin-2', classId: 'paladin' })
+    expect(heroLimitFor('paladin-1', 15)).toEqual({ ...heroLimitFor('cleric-3', 14)!, id: 'paladin-1', classId: 'paladin', hall: 'paladin' })
+    expect(heroLimitFor('paladin-2', 15)).toEqual({ ...heroLimitFor('cleric-4', 14)!, id: 'paladin-2', classId: 'paladin', hall: 'paladin' })
     expect(heroLimitFor('paladin-1', 14)).toBeUndefined()
     expect(heroLimit('cleric-3').name).toBe('Dawn Hymn')
     expect(heroLimit('paladin-1').name).toBe('Archangel’s Verdict')

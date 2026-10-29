@@ -45,7 +45,9 @@ export const RPG_SUPPORT_ALL = 0.4
 /** v15 (classes v2 §3.3, C8): one healer a party, so her shares double; before her ATK or M.ATK, ×0.4 on every Uma. */
 export const RPG_SUPPORT_SHARE_V15 = [0.28, 0.32, 0.36, 0.4, 0.44] as const
 export interface RpgPart { kind: RpgDamageKind; share: number }
-export interface RpgHit { power: number; parts: RpgPart[] }
+/** `follow` (Halls v2, HV-A; H129): a random double's second hit, which from v19 strikes the foe the hit before it aimed at
+ * while she stands. Only Halls v2's Limit Breaks carry it (`heroLimitSkills`); a `one` or `all` cast never reads it. */
+export interface RpgHit { power: number; parts: RpgPart[]; follow?: true }
 export type RpgSkillTarget = 'one' | 'all' | 'random'
 /** A Cleric skill's status (D86): an Arms blow debuffs the foe, a Tome spell buffs every ally. */
 export type RpgStatusKey = 'armor-break' | 'mind-break' | 'enfeeble' | 'shatter' | 'hex' | 'brave' | 'faith' | 'aegis' | 'breaker' | 'clarity'

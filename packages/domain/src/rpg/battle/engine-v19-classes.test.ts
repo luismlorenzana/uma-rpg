@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { rpgNode } from '../catalog'
-import { heroLimitPower } from '../heroes'
+import { heroLimitFor, heroLimitScale } from '../heroes'
 import {
   projectRpgStats, rpgBaseMpRegen, rpgDefaultWeapons, rpgHand, rpgOpenPower, RPG_TIER0_POWER, type RpgClass, type RpgProfile, type RpgWeapon,
 } from '../rules'
@@ -125,13 +125,15 @@ describe('engine v19: a Tier 0\'s one skill (CV6)', () => {
     expect(step.error).toBeUndefined()
   })
 
-  it('casts a Hero\'s Limit Break at her skill\'s power at her Class Rank (`rpgOpenPower`), × the interim class power', () => {
+  it('casts a Hero\'s Limit Break at her skill\'s power at her Class Rank (`rpgOpenPower`), × the Limit Break\'s own power', () => {
+    // Halls v2 (H129) replaced H126's interim class powers: from v19 the seat's own (Triad Onslaught's 2.5) × her scale (1).
     const total = (a: BattleAlly) => battleLimitPlan(a, { hero: 'brawler-1' as HeroLimitId }, V19)!.casts.reduce((n, c) => n + c.def.hits.reduce((m, h) => m + h.power, 0), 0)
     const recruit = { ...member('a3', 'recruit', { classRank: 7 }), hero: 'brawler-1' as HeroLimitId }
     expect(rpgOpenPower({ classId: 'recruit', classRank: 7 }, V19)).toBe(1.97)
-    expect(total(recruit)).toBeCloseTo(heroLimitPower('recruit', V19) * 1.97, 2)
+    expect(heroLimitFor('brawler-1', V19)!.power).toBe(2.5)
+    expect(total(recruit)).toBeCloseTo(2.5 * heroLimitScale('recruit', V19) * 1.97, 2)
     const brawler = { ...member('a3', 'brawler', { classRank: 10 }), hero: 'brawler-1' as HeroLimitId }
-    expect(total(brawler)).toBeCloseTo(heroLimitPower('brawler', V19) * 2.2, 2)
+    expect(total(brawler)).toBeCloseTo(2.5 * 2.2, 2)
     // It fires in a fight.
     const s = start(input(party(recruit)))
     unitOf(s, 'a3').limit = 12

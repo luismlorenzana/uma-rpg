@@ -104,6 +104,8 @@ What no longer fits:
 
 ## 2. The halls and seats
 
+Built in H129 (D248), live from H134.
+
 ### 2.1 Five halls, one per family (HV1)
 
 | Hall | The owner's hall · its Tier 0 | Home classes (Tier 1), seats | Lore: where the power comes from | Hall and place ids |
@@ -158,6 +160,8 @@ the real reduction: the healers' two halls become one.
   Paladin's two, then the Cleric's.
 
 ## 3. Power: a Limit Break's own (HV5–HV7)
+
+Built in H129 (D248), live from H134.
 
 ### 3.1 The formula (HV5)
 
@@ -255,6 +259,8 @@ ten**, against four in ten for a one-kind seat.
 | A healer's seat | 1.5× (a healer) with support | A deity | 1.5× (a healer), 2.0× (anyone else) with one stack |
 
 ## 4. Every Limit Break
+
+Built in H129 (D248), live from H134.
 
 Each hall's table, then each Limit Break's card. **Kinds** in the order they lead. **Split** is the share of the power
 each kind carries. A **double** (a Katana or Light strike) lands twice on its target at half the strike's share each.
@@ -627,7 +633,7 @@ still casts at 100%; the ten Learner places take B and nine of the other ten, by
 |---|---|
 | `tierWorlds[t].heroes` (every tier world) | Keys kept (`brawler-n`, `mage-n`, `spellblade-n`, `summoner-n`) or merged (`paladin-*`, `cleric-*` → `healer-*`) by §7.2 |
 | `tierWorlds[t].umas[id].bonds` | The same map; merged seats take the higher Bond |
-| Seat ids (`HeroLimitId`) | `${hall}-${1..4}` with hall `brawler`, `mage`, `spellblade`, `summoner`, `healer` (HV20), a hall type of its own, no longer a class; the save parser accepts `healer-*` from engine v19 and `paladin-*`, `cleric-*` before it |
+| Seat ids (`HeroLimitId`) | `${hall}-${1..4}` with hall `brawler`, `mage`, `spellblade`, `summoner`, `healer` (HV20), a hall type of its own, no longer a class; the save parser accepts `healer-*` from engine v19 and `paladin-*`, `cleric-*` before it. Built in H129 (D248), live from H134 |
 | Stored and open fights | **Unchanged:** a fight carries its engine version and its `hero` and `inherits` ids, and replays on its own generation's Limit Breaks (`heroLimitFor(id, version)`, D179) |
 | The migration's line | One line in Classes v3's `TierWorld.classesV3` record, shown on its one-time sheet |
 | Refunds | None: nothing in a hall is bought |

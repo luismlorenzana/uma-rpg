@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { buildRoster, type RosterOutfit } from '../master/roster'
 import { RPG_ALL_NODES, RPG_TOMEBLADE_DEPTHS, RPG_TOMEBLADE_SPELLS } from '../rpg/catalog'
 import { RPG_ROOT_NAME, RPG_TIER0_SKILL, rpgClassName } from '../rpg/class-tree'
+import { heroLimitFor, heroLimitIds } from '../rpg/heroes'
 import { RPG_TIER0_CLASSES, rpgClasses, type RpgV2Class } from '../rpg/kinds'
 import {
   FLOURISH_NAMES, UMA_FAMILIES, UMA_KNACK_WORDS, UMA_KNACKS, UMA_STRIDES, UMA_TYPE_NAMES, umaCalling, umaCallingPick, umaTemplate, type UmaCallingRow,
@@ -146,5 +147,21 @@ describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the l
     const inside = ours.filter((n) => [...taken].some((t) => t !== n.toLowerCase() && word(n).test(t)))
     console.log(`H128 names checked: ${ours.length} against ${taken.size} master-data strings; exact ${exact.length}, as a word inside ${inside.length}`)
     expect([exact.length, inside.length], 'a weapon shape name is in master data').toEqual([0, 0])
+  })
+
+  it('uses no master-data string for Halls v2\'s twenty Limit Breaks or five halls (H129), exactly or as a word inside', () => {
+    const taken = new Set<string>()
+    for (const set of ['characters', 'outfits', 'support-cards', 'skills', 'scenarios', 'races', 'tracks', 'courses', 'objectives']) strings(load(set), taken)
+    // Either apostrophe: the data's typographic one and a plain one.
+    const names = heroLimitIds(V19).map((id) => heroLimitFor(id, V19)!.name)
+    const ours = [...new Set([...names, ...names.map((n) => n.replace(/’/g, "'")),
+      'Warrior Dojo', 'Mage Tower', 'Spell Blade Salle', 'Summoner Circle', 'Healer Sanctum'])]
+    expect(names).toHaveLength(20)
+    const exact = ours.filter((n) => taken.has(n.toLowerCase()))
+    const escape = (n: string) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const word = (n: string) => new RegExp(`(^|[^a-z])${escape(n)}([^a-z]|$)`)
+    const inside = ours.filter((n) => [...taken].some((t) => t !== n.toLowerCase() && word(n).test(t)))
+    console.log(`H129 names checked: ${ours.length} against ${taken.size} master-data strings; exact ${exact.length}, as a word inside ${inside.length}`)
+    expect([exact.length, inside.length], 'a Halls v2 name is in master data').toEqual([0, 0])
   })
 })
