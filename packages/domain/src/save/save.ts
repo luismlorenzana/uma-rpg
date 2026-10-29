@@ -201,8 +201,6 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
 
 /** A Paladin Bastion or Cleric Chapel seat (engines v15–v18), as save v31 stores it. */
 export type HealerSeatV18 = `${'paladin' | 'cleric'}-${1 | 2 | 3 | 4}`
-/** A Healer Sanctum seat (Halls v2, HV18–HV20; engine v19). H129 widens `HeroLimitId` with them. */
-export type HealerSeatId = `healer-${1 | 2 | 3 | 4}`
 
 /**
  * Save v32's record of the class reset (H130, dark until H134; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19):
@@ -243,7 +241,8 @@ export interface HallMergeLine {
   outfitId: string
   /** Her v31 seat (a v18 id). */
   from: HealerSeatV18
-  to: HealerSeatId
+  /** Her Healer Sanctum seat (HV18). */
+  to: HeroLimitId
   was: 'hero' | 'learner'
   now: 'learner' | 'unseated'
   /** Her Bond Level with the new seat. */
@@ -795,17 +794,13 @@ function parseRanks(value: unknown, path: string): Ranks {
   return ranks
 }
 
-/** Halls v2's seat ids (HV20): the four halls that continue and the Healer Sanctum, four seats each, no Paladin or Cleric
- * seat. A local literal while Halls v2's ids are dark (H130); H129's `heroLimitIds(19)` replaces it. */
-const V32_SEATS: ReadonlySet<string> = new Set(['brawler', 'mage', 'spellblade', 'summoner', 'healer'].flatMap((hall) => [1, 2, 3, 4].map((n) => `${hall}-${n}`)))
-/** A Hero seat of the save's generation: save v32's from the classes stage (H130), the live engine's before. */
-const isSeatId = (id: string): id is HeroLimitId => (rpgRework('classes') ? V32_SEATS.has(id) : isHeroLimitId(id))
-
+/** A Hero seat of the live generation (`isHeroLimitId`): from the classes stage save v32's, Halls v2's `heroLimitIds(19)`
+ * (H129, H130), so a `paladin-*` or `cleric-*` seat or Bond is refused there and a `healer-*` one before it. */
 function parseBonds(value: unknown, path: string): Partial<Record<HeroLimitId, BondTrack>> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const bonds: Partial<Record<HeroLimitId, BondTrack>> = {}
   for (const [id, raw] of Object.entries(value)) {
-    if (!isSeatId(id)) throw new SaveParseError(`${path}.${id}`, 'not a Hero seat')
+    if (!isHeroLimitId(id)) throw new SaveParseError(`${path}.${id}`, 'not a Hero seat')
     const b = object(raw, `${path}.${id}`, ['level', 'exp'])
     const level = count(b.level, `${path}.${id}.level`)
     if (level > BOND_MAX_LEVEL) throw new SaveParseError(`${path}.${id}.level`, `expected 0–${BOND_MAX_LEVEL}`)
@@ -824,7 +819,7 @@ function parseHeroes(value: unknown, path: string, umas: Record<string, OwnedUma
   const parents = new Map<string, number>()
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
-    if (!isSeatId(id)) throw new SaveParseError(at, 'not a Hero seat')
+    if (!isHeroLimitId(id)) throw new SaveParseError(at, 'not a Hero seat')
     const seat = object(raw, at, ['hero', 'learners'])
     if (typeof seat.hero !== 'string' || !umas[seat.hero]) throw new SaveParseError(`${at}.hero`, 'expected an owned outfit')
     if (heroes.has(seat.hero)) throw new SaveParseError(`${at}.hero`, 'already a Hero in another seat')
@@ -1107,7 +1102,7 @@ function parseGrant(value: unknown, path: string): TierGrant | null {
 /** The class pick save v31 held (H130's record keeps it for the trade step). */
 const V31_PICKS: readonly string[] = ['spellblade', 'mage', 'paladin', 'cleric']
 /** The Healer Sanctum's seat for each old Paladin and Cleric seat (HV18). */
-const HEALER_OF: Readonly<Record<HealerSeatV18, HealerSeatId>> = {
+const HEALER_OF: Readonly<Record<HealerSeatV18, HeroLimitId>> = {
   'paladin-1': 'healer-1', 'paladin-4': 'healer-1', 'paladin-2': 'healer-2', 'paladin-3': 'healer-2',
   'cleric-1': 'healer-3', 'cleric-3': 'healer-3', 'cleric-2': 'healer-4', 'cleric-4': 'healer-4',
 }
