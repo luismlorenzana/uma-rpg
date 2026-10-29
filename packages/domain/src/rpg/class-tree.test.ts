@@ -16,7 +16,7 @@ const ranks = (classes: Partial<Record<RpgClass, number>>) =>
 describe('the class tree (CV1, §1)', () => {
   it('draws §1\'s parent matrix exactly: a hybrid has two parents, its All-Rounder Tier 0 and its channel\'s root class', () => {
     const matrix = Object.fromEntries(RPG_TIER1_CLASSES.map((c) => [c, RPG_TIER0_CLASSES.map((p) => (RPG_CLASS_PARENTS[c].includes(p) ? '●' : ''))]))
-    // Columns: Recruit, Duelist, Acolyte, Caller, Apprentice.
+    // Columns: Recruit, Duelist, Acolyte, Caller, Initiate.
     expect(matrix).toEqual({
       brawler: ['●', '', '', '', ''],
       spellblade: ['●', '●', '', '', ''],
@@ -91,7 +91,7 @@ describe('Tier 0 (CV5, CV6)', () => {
 
 describe('names and gates (CV3, CV4, CV8–CV10)', () => {
   it('names the classes by generation: v3\'s from v19, today\'s before', () => {
-    expect(rpgClasses(V19).map((c) => rpgClassName(c, V19))).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Apprentice', 'Brawler',
+    expect(rpgClasses(V19).map((c) => rpgClassName(c, V19))).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate', 'Brawler',
       'Arms Spellblade', 'Arms Summoner', 'Paladin', 'Cleric', 'Tome Summoner', 'Tome Spellblade', 'Sorcerer'])
     expect(rpgClasses(V18).map((c) => rpgClassName(c, V18))).toEqual(['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin'])
     // The live default is v18's until H134.
@@ -104,7 +104,7 @@ describe('names and gates (CV3, CV4, CV8–CV10)', () => {
     expect(rpgClassGate(fresh, 'armsummoner', 1, V19)).toBe('Opens with Recruit R10 or Caller R10')
     expect(RPG_TIER1_CLASSES.map(rpgClassClosedText)).toEqual([
       'Opens with Recruit R10', 'Opens with Recruit R10 or Duelist R10', 'Opens with Recruit R10 or Caller R10', 'Opens with Acolyte R10',
-      'Opens with Acolyte R10', 'Opens with Caller R10 or Apprentice R10', 'Opens with Duelist R10 or Apprentice R10', 'Opens with Apprentice R10',
+      'Opens with Acolyte R10', 'Opens with Caller R10 or Initiate R10', 'Opens with Duelist R10 or Initiate R10', 'Opens with Initiate R10',
     ])
     // Ready to promote: the gate names the parent; held from Rank 10.
     const ready = ranks({ recruit: 10 })

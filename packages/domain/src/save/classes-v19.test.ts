@@ -63,7 +63,7 @@ describe('the start and the switch (CV9, CV10, CV19)', () => {
       expect(her(save).classId).toBe(c)
     }
     expect(message(() => chooseClass(save, '101', 'armsummoner', T(2)))).toBe('Opens with Recruit R10 or Caller R10')
-    expect(message(() => chooseClass(save, '101', 'mage', T(2)))).toBe('Opens with Apprentice R10')
+    expect(message(() => chooseClass(save, '101', 'mage', T(2)))).toBe('Opens with Initiate R10')
     expect(message(() => chooseClass(track(save, '101', 'recruit', 10), '101', 'brawler', T(2)))).toBe('Promote from Recruit')
     expect(umaHeldClasses(her(save))).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'])
     expect(umaHeldClasses(her(track(save, '101', 'mage', 12)))).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'mage'])
@@ -170,8 +170,8 @@ describe('her class tree (§14.1, UP23)', () => {
       'recruit 0 on R10 +400', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3', 'apprentice 0 open R1',
       'brawler 1 ready R1 · Suggested', 'spellblade 1 ready R1', 'armsummoner 1 ready R1',
       'paladin 1 closed R1 · Opens with Acolyte R10', 'cleric 1 closed R1 · Opens with Acolyte R10',
-      'summoner 1 closed R1 · Opens with Caller R10 or Apprentice R10', 'tomeblade 1 closed R1 · Opens with Duelist R10 or Apprentice R10',
-      'mage 1 closed R1 · Opens with Apprentice R10',
+      'summoner 1 closed R1 · Opens with Caller R10 or Initiate R10', 'tomeblade 1 closed R1 · Opens with Duelist R10 or Initiate R10',
+      'mage 1 closed R1 · Opens with Initiate R10',
     ])
     save = promoteUma(save, '101', 'recruit', 'brawler', T(1))
     expect(tiles(save).slice(0, 8)).toEqual(['recruit 0 available R10', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3',

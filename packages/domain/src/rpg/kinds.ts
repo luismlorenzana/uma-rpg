@@ -23,7 +23,7 @@ export const RPG_DAMAGE_KINDS: readonly RpgDamageKind[] = [...RPG_WEAPON_KINDS, 
 export const RPG_V2_CLASSES = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin'] as const
 export type RpgV2Class = typeof RPG_V2_CLASSES[number]
 /** Classes v3's Tier 0 (CV3, CV5–CV7; engine v19): five introductory classes, in the tree's order (Warrior's Recruit, the
- * All-Rounder's Duelist, Acolyte and Caller, the Mage's Apprentice). Each promotes at Class Rank 10. */
+ * All-Rounder's Duelist, Acolyte and Caller, the Mage's Initiate). Each promotes at Class Rank 10. */
 export const RPG_TIER0_CLASSES = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'] as const
 export type RpgTier0Class = typeof RPG_TIER0_CLASSES[number]
 /** Every class of every generation (D179): classes v2 (engine v15) adds the Paladin, last, and Classes v3 (engine v19, D240)

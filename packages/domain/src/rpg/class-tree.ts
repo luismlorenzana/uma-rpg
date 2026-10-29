@@ -40,7 +40,7 @@ export const RPG_CLASS_PARENTS: Readonly<Record<RpgTier1Class, readonly RpgTier0
 }
 /** A Tier 0's family: itself and its children (CV21: her Flourish works as any of them). */
 export const rpgClassFamily = (tier0: RpgTier0Class): readonly RpgClass[] => [tier0, ...RPG_CLASS_CHILDREN[tier0]]
-/** The child carrying the Suggested badge (CV11): Recruit the Brawler, Apprentice the Sorcerer; for a two-way choice the
+/** The child carrying the Suggested badge (CV11): Recruit the Brawler, Initiate the Sorcerer; for a two-way choice the
  * Arms child (or the Paladin) when her base Power beats her base Wit, else the Tome child (or the Cleric). */
 export function rpgSuggestedPromotion(tier0: RpgTier0Class, stats: { power: number; wit: number }): RpgTier1Class {
   const arms = stats.power > stats.wit
@@ -90,7 +90,7 @@ export function rpgThirdsSplit(points: number, armsSlots: number): { atk: number
 
 const NAME_V2: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
-  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Apprentice',
+  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Initiate',
   armsummoner: 'Arms Summoner', tomeblade: 'Tome Spellblade',
 }
 /** Classes v3's names (§0): today's Mage is the Sorcerer, the Spell Blade the Arms Spellblade, the Summoner the Tome

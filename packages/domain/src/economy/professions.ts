@@ -69,7 +69,7 @@ export const TRADES: readonly Trade[] = [
 const TRADE_BY_ID = new Map(TRADES.map((t) => [t.id, t]))
 
 /** Her trade by calling (PP2); from v19 one a Tier 0 (CV20): the Recruit Metal, the Duelist Wood, the Acolyte Vegetables,
- * the Caller Fish, the Apprentice Stone, the fight types' slots in the same order. The `TradeId`s keep their names. */
+ * the Caller Fish, the Initiate Stone, the fight types' slots in the same order. The `TradeId`s keep their names. */
 const CALLING_TRADE: Readonly<Record<UmaCallingClass, TradeId>> = {
   brawler: 'physical', spellblade: 'physical-hybrid', paladin: 'healer', cleric: 'healer', summoner: 'magical-hybrid', mage: 'magical',
   recruit: 'physical', duelist: 'physical-hybrid', acolyte: 'healer', caller: 'magical-hybrid', apprentice: 'magical',
