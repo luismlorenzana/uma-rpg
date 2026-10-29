@@ -102,8 +102,9 @@ scrolling, in light and dark.
     into Copper Ingot"). Sell ×1: one fewer, Laurels up. (D222)
 22. **Exchange.** Buy one Speed Ticket (10 Laurels) and one Sweep Ticket (15): expect the counts up. Under **Raw
     materials**, switch line tabs: G1–G5 open after the tier's first win and G6–G10 after a win on continent 3, else
-    locked with that reason; buy ×5 of an open one. If you have Class Marks, **Read a Class Manual** → an Uma → ×1 on a
-    class: 1,000 Class Marks for 1,000 EXP on that bar. (D102)
+    locked with that reason; buy ×5 of an open one. If you have Class Marks, **Read a Class Manual** → an Uma: her class
+    bars with hers selected and the counts 1 · 5 · 10 · Max; tap a bar, keep 1, check the footer's before → after and
+    **Read 1 · 1,000 Class Marks**: 1,000 Class Marks for 1,000 EXP on that bar, the sheet still open. (D102, D250)
 23. **World map.** Open **Scenario Gate**. Expect **Map / List** remembered, and the party bar: "Party n · swap" opens
     "Who fights?", **Edit parties** opens the Party Hall, and the five faces show their MP. Open a continent and a Lv 1
     region: twelve stages, the first uncleared one open. Tap an open stage: its sheet lists the foes by wave, each with

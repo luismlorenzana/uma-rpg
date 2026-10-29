@@ -3,7 +3,7 @@ import { WorkArtProvider } from '@luismlorenzana/uma-kit/work'
 import { configureKit, MotionRoot } from '@luismlorenzana/uma-kit/ui'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { domAnimation } from 'motion/react'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Route, Routes, useParams } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { heroLimitsOf, placeById } from '@rpg/domain'
 import type { ReactNode } from 'react'
@@ -36,10 +36,14 @@ beforeEach(async () => {
   vi.clearAllMocks()
 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
-function show(node: ReactNode) {
-  return render(<MemoryRouter><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E' }}><WorkArtProvider art={{ Item: ({ id }) => <span>{id}</span> }}>{node}</WorkArtProvider></AlbumArtProvider></MotionRoot></MemoryRouter>)
+function show(node: ReactNode, at = '/') {
+  return render(<MemoryRouter initialEntries={[at]}><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E' }}><WorkArtProvider art={{ Item: ({ id }) => <span>{id}</span> }}>{node}</WorkArtProvider></AlbumArtProvider></MotionRoot></MemoryRouter>)
 }
 const page = (id: string, rest = '') => ({ place: placeById(id)!, rest })
+/** The Exchange at its route, as the Hub's place route gives it its sub-route. */
+function ExchangeAt() {
+  return <ExchangePage {...page('exchange', useParams()['*'] ?? '')} />
+}
 const dialog = () => screen.getByRole('dialog')
 
 describe('SB4 uses the shared album in every RPG choice', () => {
@@ -182,12 +186,12 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     await waitFor(() => expect(calls.hero).toHaveBeenCalledWith(heroLimitsOf('brawler')[1]!.id, '81005'))
   })
 
-  it('Class Manuals advance from the shared choice to the existing rank bars', async () => {
-    show(<ExchangePage />)
+  it('Class Manuals advance from the shared choice to her class bars', async () => {
+    show(<Routes><Route path="/town/exchange/*" element={<ExchangeAt />} /></Routes>, '/town/exchange')
     fireEvent.click(screen.getByRole('button', { name: /Read a Class Manual/ }))
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
-    await screen.findByRole('dialog', { name: 'Which bar?' })
-    expect(within(dialog()).getByRole('heading', { name: 'Classes' })).toBeDefined()
+    await waitFor(() => expect(document.querySelectorAll('[data-manual-bar]')).toHaveLength(6))
+    expect(within(dialog()).getByRole('list', { name: 'Classes' })).toBeDefined()
   })
 
   it('active-party choice still selects a party index, not a single Uma or a new party', async () => {
