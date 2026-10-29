@@ -3,8 +3,8 @@
 // generation's for the world's tier, with each Uma's trade (H80): R2's places render `PlaceV3`'s body from the switch.
 import {
   activeClass, BRIDGES, checkRestartStopped, CRAFT_LABEL, EFFECT_LABEL, EQUIP_LABEL, EQUIP_TYPES, facilitySpec,
-  facilityTargets, familyById, gearById, gearId, gemById, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
-  itemById, liveWorkEnv, placeById, placeSpecV4, REFINE_BATCHES, refusalText, rpgRework, stockName, targetPlan,
+  facilityTargets, familyById, familyNameV1, gearById, gearId, gemById, gemNameV1, GEMS, gemNodes, gradeUnlockLevel, ITEM_EFFECTS, ITEM_FAMILIES,
+  itemById, itemNameV1, liveWorkEnv, placeById, placeSpecV4, REFINE_BATCHES, refusalText, rpgRework, stockNameV1, targetPlan,
   type EquipType, type Gem, type GemKind, type RpgQueueInput, type RpgWorkRequest, type TierWorld,
 } from '@rpg/domain'
 import { workOrder } from '@luismlorenzana/uma-kit/roster'
@@ -37,7 +37,7 @@ function describe(placeId: string): { title: string; help: string[] } {
   const spec = facilitySpec(placeId)!
   const family = spec.family ? familyById(spec.family) : null
   const level = `Each job raises her ${CRAFT_LABEL}; grade g opens at ${CRAFT_LABEL} 5g − 4.`
-  if (family) return { title: family.name, help: [`Gathers ${family.name.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, in ten grades.`, level] }
+  if (family) return { title: familyNameV1(family.id)!, help: [`Gathers ${familyNameV1(family.id)!.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, in ten grades.`, level] }
   if (spec.kind === 'craft') return { title: 'Crafting', help: ['Crafts weapons, armor and accessories from two refined items of the same grade.', level] }
   if (spec.kind === 'cut') return { title: 'Cutting', help: ['Cuts Star Gems from refined materials. Set one at the Observatory to open its Extra Stats node.', level] }
   return { title: 'Refining', help: ['Refines raw materials one into one, in a quarter of their gathering time.', level] }
@@ -229,7 +229,7 @@ function ItemChoice({ id, selected, locked, dimmed, wanted, label, onPick }: {
   id: string; selected: boolean; locked: boolean; dimmed: boolean; wanted: number; label?: string; onPick: () => void
 }) {
   const item = itemById(id)!
-  const name = label ?? item.name
+  const name = label ?? itemNameV1(id)!
   return (
     <button type="button" disabled={locked} onClick={onPick} aria-pressed={selected} title={name}
       aria-label={`${name}, grade ${item.grade}${locked ? `, needs Craft Lv ${gradeUnlockLevel(item.grade)}` : ''}`}
@@ -250,12 +250,12 @@ function ItemSummary({ world, id }: { world: TierWorld; id: string }) {
     <div className="rounded-sm bg-raised p-2.5" data-selected-item={id}>
       <p className="flex items-center gap-2 text-[14px] font-semibold">
         <ItemIcon id={id} size={32} />
-        <span className="min-w-0 flex-1 truncate">{item.name} · G{item.grade}</span>
+        <span className="min-w-0 flex-1 truncate">{itemNameV1(id)} · G{item.grade}</span>
         <span className="text-[12px] font-normal text-ink-faint">Have {world.items[id] ?? 0}</span>
       </p>
       {item.refined && (
         <p className="mt-1.5 flex w-fit items-center gap-1 rounded-sm bg-panel px-2 py-1 text-[12px]">
-          <ItemIcon id={item.pair} size={18} />{stockName(item.pair)} ×1 <span className="text-ink-faint">({world.items[item.pair] ?? 0})</span>
+          <ItemIcon id={item.pair} size={18} />{stockNameV1(item.pair)} ×1 <span className="text-ink-faint">({world.items[item.pair] ?? 0})</span>
         </p>
       )}
     </div>
@@ -276,7 +276,7 @@ function RefinePicker({ job, level, world, queueing, wanted, onPick }: {
           const item = family.refined[picked.grade - 1]!
           return <ItemChoice key={family.id} id={item.id} selected={family.id === picked.family}
             locked={level < gradeUnlockLevel(item.grade)} dimmed={!queueing && makeable(world, { [item.pair]: 1 }) < 1}
-            wanted={wanted.get(item.id) ?? 0} label={family.name} onPick={() => chooseFamily(family)} />
+            wanted={wanted.get(item.id) ?? 0} label={familyNameV1(family.id)} onPick={() => chooseFamily(family)} />
         })}
       </div>
       <GradeChips level={level} grade={picked.grade} onPick={chooseGrade} />
@@ -409,7 +409,7 @@ function GemPicker({ world, level, job, queueing, wanted, onPick }: {
             <span className="w-12 shrink-0 text-[10.5px] font-semibold" style={{ color: row.color }}>{row.label}</span>
             <div className={`grid gap-0.5 ${kind === 'moon' ? 'flex-1 grid-cols-10' : kind === 'bridge' ? 'grid-cols-[repeat(2,2.25rem)]' : 'grid-cols-[repeat(4,2.25rem)]'}`}>
               {row.gems.map((gem) => (
-                <IconPick key={gem.id} id={gem.id} on={gem.id === shown.id} label={`${gem.name}, grade ${gem.grade}`}
+                <IconPick key={gem.id} id={gem.id} on={gem.id === shown.id} label={`${gemNameV1(gem.id)}, grade ${gem.grade}`}
                   disabled={level < gradeUnlockLevel(gem.grade)} dim={!queueing && makeable(world, gem.inputs) < 1}
                   badge={!!wanted.get(gem.id)} onClick={() => onPick(gem.id)} />
               ))}
@@ -427,12 +427,12 @@ function RecipeSummary({ world, id, line }: { world: TierWorld; id: string; line
   if (!made) return null
   return (
     <div className="rounded-sm bg-raised p-2.5">
-      <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={id} size={28} />{made.name} · G{made.grade}</p>
+      <p className="flex items-center gap-2 text-[14px] font-semibold"><ItemIcon id={id} size={28} />{stockNameV1(id)} · G{made.grade}</p>
       <p className="mt-0.5 text-[12px] text-ink-soft">{line}</p>
       <ul className="mt-1.5 flex flex-wrap gap-1.5 text-[12px]">
         {Object.entries(made.inputs).map(([input, count]) => (
           <li key={input} className="flex items-center gap-1 rounded-sm bg-panel px-2 py-1">
-            <ItemIcon id={input} size={18} />{stockName(input)} ×{count} <span className="text-ink-faint">({world.items[input] ?? 0})</span>
+            <ItemIcon id={input} size={18} />{stockNameV1(input)} ×{count} <span className="text-ink-faint">({world.items[input] ?? 0})</span>
           </li>
         ))}
       </ul>

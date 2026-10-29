@@ -3,6 +3,7 @@ import { regionChapter, worldContinent } from '../world/world'
 import { applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, equippedPoints, gearById, gearPoints, orbOffense, recipeFamilies, EQUIP_TYPES } from '../economy/gear'
 import { accessoryFightFields } from '../economy/gear-id'
+import { gearNameV1 } from '../items/names-v1'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { RPG_FOE_TUNING, rpgFoe, rpgFoeBudget, rpgFoeHitShare } from '../rpg/campaign/enemies'
 import { projectRpgStats } from '../rpg/rules'
@@ -32,12 +33,15 @@ const edit = (save: Save, fn: (w: ReturnType<typeof worldOf>) => ReturnType<type
 describe('gear (S7, D124, D125)', () => {
   it('names forty types in ten grades, all by grade; a recipe is two refined items, its pair turning with the grade (D139)', () => {
     expect(EQUIP_TYPES).toHaveLength(40)
-    expect(gearById('greatsword-g1')).toMatchObject({ name: 'Copper Greatsword', inputs: { 'pine-plank': 1, 'mist-infusion': 1 } })
+    expect(gearById('greatsword-g1')).toMatchObject({ inputs: { 'pine-plank': 1, 'mist-infusion': 1 } })
+    expect(gearNameV1('greatsword-g1')).toBe('Copper Greatsword')
     expect(gearById('greatsword-g2')!.inputs).toEqual({ 'boarling-leather': 1, 'ammonite-carving': 1 })
     expect(gearById('tome-fire-g1')!.inputs).toEqual({ 'puffbun-leather': 1, 'shell-carving': 1 })
-    expect(gearById('helm-g1')).toMatchObject({ name: 'Copper Helm', inputs: { 'limestone-block': 1, linen: 1 } })
-    expect(gearById('boots-g1')).toMatchObject({ name: 'Copper Boots' })
-    expect(gearById('talisman-vital-g1')).toMatchObject({ name: 'Copper Vital Talisman', inputs: { 'limestone-block': 1, linen: 1 } })
+    expect(gearById('helm-g1')).toMatchObject({ inputs: { 'limestone-block': 1, linen: 1 } })
+    expect(gearNameV1('helm-g1')).toBe('Copper Helm')
+    expect(gearNameV1('boots-g1')).toBe('Copper Boots')
+    expect(gearById('talisman-vital-g1')).toMatchObject({ inputs: { 'limestone-block': 1, linen: 1 } })
+    expect(gearNameV1('talisman-vital-g1')).toBe('Copper Vital Talisman')
     expect(gearById('amulet-mirror-g1')!.inputs).toEqual({ 'copper-ingot': 1, 'cut-quartz': 1 })
     for (const type of EQUIP_TYPES) for (let g = 1; g <= 10; g++) expect(new Set(recipeFamilies(type, g)).size).toBe(2)
     for (const bad of ['greatsword-g1-atk', 'helm-g1-atk', 'mail-g1', 'ring-g1', 'orb-fire-g1-hp', 'greatsword-g11', 'talisman-g1', 'amulet-heal-g1']) expect(gearById(bad), bad).toBeUndefined()

@@ -142,7 +142,8 @@ describe('gathering (S4)', () => {
 describe('refining (S4)', () => {
   it('reserves inputs, returns the ones for unmade items on recall, and loses the item in progress', () => {
     let save = give(withUmas('101'), { 'puffbun-pelt': 5 })
-    expect(() => startJob(save, 'workbench', 0, turfA, 'puffbun-leather', 6, at(0))).toThrow(/Short 1 Puffbun Pelt/)
+    // A refusal names a v1 item by its id since H136: its name ("Puffbun Pelt", `itemNameV1`) loads on demand.
+    expect(() => startJob(save, 'workbench', 0, turfA, 'puffbun-leather', 6, at(0))).toThrow(/Short 1 puffbun-pelt/)
     save = startJob(save, 'workbench', 0, turfA, 'puffbun-leather', 5, at(0))
     expect(worldOf(save).items['puffbun-pelt']).toBeUndefined()
     // Refining takes a quarter of gathering (D101): 2 done at 2½ items' time, the third half made.
@@ -424,9 +425,9 @@ describe('job queues (QoL, D62)', () => {
     expect(worldOf(short).items).toEqual({ 'puffbun-leather': 2 })
     const view = facilityView(worldOf(short), 'workbench', at(5 * U))
     expect(view.jobs[0]).toBeNull()
-    expect(view.stopped).toEqual([{ outfitId: '101', requests: [{ kind: 'refine', item: 'puffbun-leather', count: 2 }], why: 'short 2 Puffbun Pelt' }])
+    expect(view.stopped).toEqual([{ outfitId: '101', requests: [{ kind: 'refine', item: 'puffbun-leather', count: 2 }], why: 'short 2 puffbun-pelt' }])
     // Restarting it needs the inputs now; dismissing forgets it.
-    expect(() => restartStopped(short, '101', at(5 * U))).toThrow(/Short 2 Puffbun Pelt/)
+    expect(() => restartStopped(short, '101', at(5 * U))).toThrow(/Short 2 puffbun-pelt/)
     const restarted = restartStopped(give(short, { 'puffbun-pelt': 2 }), '101', at(5 * U))
     expect(facilityView(worldOf(restarted), 'workbench', at(5 * U))).toMatchObject({ stopped: [], jobs: [{ outfitId: '101', count: 2 }, null, null] })
     expect(facilityView(worldOf(dismissStopped(short, '101', at(5 * U))), 'workbench', at(5 * U)).stopped).toEqual([])

@@ -6,6 +6,8 @@ import test from 'node:test'
 import { checkSize, entrySrc, LAZY_MODULES, lazyInInitial } from './check-size.mjs'
 
 const ENGINE = '../../packages/domain/src/rpg/battle/engine.ts'
+const MIGRATIONS = '../../packages/domain/src/save/migrations.ts'
+const NAMES_V1 = ['../../packages/domain/src/items/families.ts', '../../packages/domain/src/items/names-v1.ts']
 
 async function fixture(fn, { entry = 'assets/main.js', imports = [], extra = {}, chunks } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'rpg-size-test-'))
@@ -57,6 +59,17 @@ test('refuses the fight engine in the entry, and allows it in a lazy chunk (H62)
   await fixture(async (root) => { assert.equal((await checkSize(root)).files.length, 1) },
     { chunks: { 'assets/main.js': ['src/main.tsx'], 'assets/phaser.js': [ENGINE] } })
 })
+test('refuses old saves\' migrations or the v1 names in the entry, and allows them in lazy chunks (H136)', async () => {
+  await fixture(async (root) => { await assert.rejects(checkSize(root), /\(H62, H136\).*save\/migrations\.ts \(assets\/main\.js\)/) },
+    { chunks: { 'assets/main.js': ['src/main.tsx', '../../packages/domain/src/save/save.ts', MIGRATIONS], 'assets/phaser.js': [] } })
+  for (const names of NAMES_V1) {
+    await fixture(async (root) => { await assert.rejects(checkSize(root), (error) => error.message.includes(`${names} (assets/main.js)`)) },
+      { chunks: { 'assets/main.js': ['src/main.tsx', '../../packages/domain/src/items/catalog.ts', names], 'assets/phaser.js': [] } })
+  }
+  await fixture(async (root) => { assert.equal((await checkSize(root)).files.length, 1) },
+    { chunks: { 'assets/main.js': ['src/main.tsx', '../../packages/domain/src/save/save.ts', '../../packages/domain/src/items/catalog.ts'],
+      'assets/phaser.js': [MIGRATIONS, ...NAMES_V1] } })
+})
 test('refuses a lazy module in a static import, and a build without its chunk map', async () => {
   const small = { file: 'assets/vendor.js' }
   await fixture(async (root) => {
@@ -70,4 +83,7 @@ test('matches whole module paths only', () => {
   assert.equal(lazyInInitial({ a: [ENGINE] }, ['a']).length, 1)
   assert.throws(() => lazyInInitial({}, ['a']), /missing a/)
   assert.ok(LAZY_MODULES.includes('packages/domain/src/rpg/battle/engine.ts'))
+  for (const path of ['save/migrations.ts', 'items/families.ts', 'items/names-v1.ts']) assert.ok(LAZY_MODULES.includes(`packages/domain/src/${path}`), path)
+  // The id-level catalog stays in the entry: only its names left (H136).
+  assert.deepEqual(lazyInInitial({ a: ['../../packages/domain/src/items/catalog.ts', '../../packages/domain/src/items/identity.ts'] }, ['a']), [])
 })

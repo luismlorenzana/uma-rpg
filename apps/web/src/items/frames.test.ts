@@ -2,7 +2,7 @@ import gear from '@luismlorenzana/uma-art/gear/atlas.json'
 import gems from '@luismlorenzana/uma-art/gems/atlas.json'
 import items from '@luismlorenzana/uma-art/items/atlas.json'
 import {
-  EQUIP_TYPES, gearId, GEM_IDENTITIES, GEMS, ITEM_FAMILIES, ITEMS, LINE_ITEMS, MADE_IDENTITIES,
+  EQUIP_TYPES, gearId, GEM_IDENTITIES, gemNameV1, GEMS, ITEM_FAMILIES, ITEMS, LINE_ITEMS, MADE_IDENTITIES,
   type AccessorySlotState,
 } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
@@ -17,7 +17,7 @@ describe('icon frames (P37–P38)', () => {
     expect(GEMS).toHaveLength(100)
     for (const g of GEMS) {
       const f = gems.frames[g.id as keyof typeof gems.frames]
-      expect(f, g.id).toMatchObject({ w: 32, h: 32, name: g.name, kind: g.kind, grade: g.grade, effects: g.effects })
+      expect(f, g.id).toMatchObject({ w: 32, h: 32, name: gemNameV1(g.id), kind: g.kind, grade: g.grade, effects: g.effects })
       expect(iconFrame(g.id), g.id).toEqual({ sheet: 'gems', x: f.x, y: f.y })
     }
     for (const t of EQUIP_TYPES) for (let g = 1; g <= 10; g++) {

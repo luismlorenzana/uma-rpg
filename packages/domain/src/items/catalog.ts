@@ -1,11 +1,13 @@
-// The item catalog as the rules use it: every raw and refined item with its family, effect and grade.
-import { FAMILY_SPECS, type ItemEffect } from './families'
+// The item catalog as the rules use it: every raw and refined item with its family, effect and grade. Built from the
+// id-only snapshot (identity.ts), so the 160 v1 names stay out of the main bundle: they load on demand with
+// `names-v1.ts`, the only module that reads `families.ts` (H136).
+import { ITEM_IDENTITIES } from './identity'
+import type { ItemEffect } from './kinds'
 
-export * from './families'
+export * from './kinds'
 
 export interface ItemDef {
   id: string
-  name: string
   family: string
   effect: ItemEffect
   grade: number
@@ -15,7 +17,6 @@ export interface ItemDef {
 }
 export interface ItemFamily {
   id: string
-  name: string
   effect: ItemEffect
   site: string
   raw: ItemDef[]
@@ -24,10 +25,10 @@ export interface ItemFamily {
 
 export const ITEM_GRADES = 10
 
-export const ITEM_FAMILIES: readonly ItemFamily[] = FAMILY_SPECS.map((f) => {
-  const make = (list: typeof f.raw, refined: boolean, other: typeof f.raw): ItemDef[] =>
-    list.map(([id, name], i) => ({ id, name, family: f.id, effect: f.effect, grade: i + 1, refined, pair: other[i]![0] }))
-  return { id: f.id, name: f.name, effect: f.effect, site: f.site, raw: make(f.raw, false, f.refined), refined: make(f.refined, true, f.raw) }
+export const ITEM_FAMILIES: readonly ItemFamily[] = ITEM_IDENTITIES.map((f) => {
+  const make = (list: readonly string[], refined: boolean, other: readonly string[]): ItemDef[] =>
+    list.map((id, i) => ({ id, family: f.id, effect: f.effect, grade: i + 1, refined, pair: other[i]! }))
+  return { id: f.id, effect: f.effect, site: f.site, raw: make(f.raw, false, f.refined), refined: make(f.refined, true, f.raw) }
 })
 
 export const ITEMS: readonly ItemDef[] = ITEM_FAMILIES.flatMap((f) => [...f.raw, ...f.refined])

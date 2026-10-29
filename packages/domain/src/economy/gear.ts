@@ -11,7 +11,7 @@ import { isRpgTome, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '..
 import { addPoints, noPoints, type Points } from './bonus'
 import { ACCESSORY_SLOTS, ARMOR_SLOT_STAT, ARMOR_SLOTS, armorSlotOf, isMagicalAccessory, isMagicalArmor } from './ranks'
 import {
-  accessoryKindOf, charmEffect, EQUIP_LABEL, EQUIP_TYPES, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
+  accessoryKindOf, charmEffect, EQUIP_TYPES, gearIdentity, isAccessory, isArmor, isOrb, isWeapon, noAccessoryEffects, orbKind,
   type AccessoryEffects, type AccessoryType, type AmuletEffect, type EquipType, type GearSlot, type TalismanEffect,
 } from './gear-id'
 export * from './gear-id'
@@ -33,18 +33,15 @@ const PAIRS = [['ores', 'crystals'], ['woods', 'essences'], ['hides-scales', 'bo
 export const recipeFamilies = (type: EquipType, grade: number): readonly string[] => PAIRS[(EQUIP_TYPES.indexOf(type) + grade) % PAIRS.length]!
 const familyOf = (id: string): ItemFamily => ITEM_FAMILIES.find((f) => f.id === id)!
 
+/** A v1 piece and its recipe; its name ("Copper Greatsword") is `gearNameV1`'s (items/names-v1.ts, H136). */
 export interface GearPiece {
   /** `<type>-g<grade>`, e.g. `lance-g3`, `helm-g3`, `talisman-vital-g3`. */
   id: string
   type: EquipType
   grade: number
-  name: string
   /** Refined materials, per piece. */
   inputs: Record<string, number>
 }
-/** A grade's prefix from its half's first family: "Copper", "Quartz". */
-const gradeWord = (type: EquipType, grade: number): string =>
-  familyOf(isMagicalGear(type) ? 'crystals' : 'ores').raw[grade - 1]!.name.replace(/ (Ore|Log|Pelt|Hide|Scale|Bundle|Crystal|Shard|Fiber|Essence|Bone|Horn|Stone)$/, '')
 /** The piece an id names, or undefined. Pieces aren't stored as a list: any type × grade exists. */
 export function gearById(id: string): GearPiece | undefined {
   const piece = gearIdentity(id)
@@ -52,7 +49,7 @@ export function gearById(id: string): GearPiece | undefined {
   const { type, grade } = piece
   const inputs: Record<string, number> = {}
   for (const family of recipeFamilies(type, grade)) inputs[familyOf(family).refined[grade - 1]!.id] = 1
-  return { id, type, grade, name: `${gradeWord(type, grade)} ${EQUIP_LABEL[type]}`, inputs }
+  return { id, type, grade, inputs }
 }
 
 // --- What a piece does (D104, D124) -------------------------------------------------------------------------------------

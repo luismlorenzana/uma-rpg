@@ -4,6 +4,7 @@ import { applyPoints, noPoints } from '../economy/bonus'
 import { gemById, gemNodes, GEMS, nodeGem, STAR_NODES, starPoints } from '../economy/gems'
 import { makeMinutes, MINUTE } from '../economy/pacing'
 import { ITEM_FAMILIES } from '../items/catalog'
+import { gemNameV1 } from '../items/names-v1'
 import { battleDamage, createBattle } from '../rpg/battle/engine'
 import { projectRpgStats } from '../rpg/rules'
 import { startFight, umaProfile } from './battle'
@@ -43,12 +44,14 @@ describe('Star Gems (D144)', () => {
     expect(STAR_NODES).toHaveLength(100)
     const used = new Set(GEMS.flatMap((g) => Object.keys(g.inputs)))
     expect(ITEM_FAMILIES.flatMap((f) => f.refined.map((i) => i.id)).every((id) => used.has(id))).toBe(true)
-    expect(gemById('gem-mp-1')).toMatchObject({ name: 'Quartz of Spirit', effects: ['mp'], inputs: { 'mist-infusion': 1 } })
+    expect(gemById('gem-mp-1')).toMatchObject({ effects: ['mp'], inputs: { 'mist-infusion': 1 } })
+    expect(gemNameV1('gem-mp-1')).toBe('Quartz of Spirit')
     // D65's structure: a side joins at grade 4, a second at grade 8.
-    expect(gemById('gem-atk-4')).toMatchObject({ name: 'Garnet of Strength', inputs: { 'silver-ingot': 1, 'cut-amethyst': 1 } })
+    expect(gemById('gem-atk-4')).toMatchObject({ inputs: { 'silver-ingot': 1, 'cut-amethyst': 1 } })
+    expect(gemNameV1('gem-atk-4')).toBe('Garnet of Strength')
     expect(Object.values(gemById('gem-mp-10')!.inputs).reduce((a, b) => a + b, 0)).toBe(3)
-    expect(gemById('gem-hp-def-3')!.name).toBe('Citrine of Vigor & Fortitude')
-    expect(gemById('gem-sun-4')!.name).toBe('Garnet of the Sun')
+    expect(gemNameV1('gem-hp-def-3')).toBe('Citrine of Vigor & Fortitude')
+    expect(gemNameV1('gem-sun-4')).toBe('Garnet of the Sun')
   })
 
   it('opens moons from the lowest up to the gem’s grade, bridges at grades 3 and 7, and the Sun with Sun gems', () => {

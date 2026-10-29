@@ -53,7 +53,8 @@ const REASON: Readonly<Record<string, SaveRuleReason>> = {
   'unknown-worker': 'not-owned',
 }
 
-const outputName = (id: string): string => itemById(id)?.name ?? gemById(id)?.name ?? gearById(id)?.name ?? stockName(id)
+/** A refusal's item: a v28+ world's names (a v1 id reads as itself; `stockNameV1` has its name, H136). */
+const outputName = stockName
 
 /** A refusal's sentence for a screen: names for ids, a duration for a time, uma-rpg's own words for the level gate. */
 export function refusalText(refusal: Refusal, now: number): string {
@@ -128,7 +129,7 @@ function outputOf(id: string): { id: string; name: string; grade: number } | und
     return made ? { id, name: madeName(id)!, grade: made.grade } : undefined
   }
   const made = itemById(id) ?? gearById(id) ?? gemById(id)
-  return made ? { id: made.id, name: made.name, grade: made.grade } : undefined
+  return made ? { id: made.id, name: stockName(made.id), grade: made.grade } : undefined
 }
 
 /** What a gather, refine, craft or cut job would be: its time for this Uma, its EXP, inputs and anything stopping it.

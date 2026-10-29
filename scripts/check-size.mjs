@@ -6,8 +6,10 @@ import { gzipSync } from 'node:zlib'
 
 export const MAIN_JS_BUDGET = 230_000
 // H62: the fight engine, the skill catalog and the Limit Break table it reads, and the world map's fight rules load on
-// demand. The build's chunk map (apps/web/vite.config.ts, `chunkModules`) says what each chunk renders; none of these
-// may render in the initial JS.
+// demand. H136: so do old saves' migration chain (`parseSaveAsync` imports it only for a save older than the current
+// version) and the v1 economy's names (no v28+ world holds a v1 id; only the v1 screens and tests read them). The build's
+// chunk map (apps/web/vite.config.ts, `chunkModules`) says what each chunk renders; none of these may render in the
+// initial JS.
 export const LAZY_MODULES = [
   'packages/domain/src/rpg/battle/engine.ts',
   'packages/domain/src/rpg/battle/auto.ts',
@@ -15,6 +17,9 @@ export const LAZY_MODULES = [
   'packages/domain/src/rpg/heroes.ts',
   'packages/domain/src/rpg/catalog.ts',
   'packages/domain/src/save/battle.ts',
+  'packages/domain/src/save/migrations.ts',
+  'packages/domain/src/items/families.ts',
+  'packages/domain/src/items/names-v1.ts',
 ]
 export function entrySrc(html) {
   const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => /\btype\s*=\s*["']module["']/i.test(tag))
@@ -69,7 +74,7 @@ export async function checkSize(distDir, budget = MAIN_JS_BUDGET, lazy = LAZY_MO
     throw new Error('Missing .vite/chunks.json (the chunkModules plugin in apps/web/vite.config.ts)')
   }
   const leaked = lazyInInitial(chunks, files, lazy)
-  if (leaked.length > 0) throw new Error(`Initial JS renders modules that load on demand (H62): ${leaked.join(', ')}`)
+  if (leaked.length > 0) throw new Error(`Initial JS renders modules that load on demand (H62, H136): ${leaked.join(', ')}`)
   return { entry, mainGzip, initialGzip, files: sizes, lazy: lazy.length }
 }
 
@@ -78,7 +83,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const result = await checkSize(resolve(process.argv[2] ?? 'dist'))
     console.log(`Main JS: ${(result.mainGzip / 1000).toFixed(2)} KB gzip / ${MAIN_JS_BUDGET / 1000} KB budget`)
     console.log(`Initial JS: ${(result.initialGzip / 1000).toFixed(2)} KB gzip across ${result.files.length} static chunk(s)`)
-    console.log(`On demand: none of ${result.lazy} lazy modules (the fight engine, catalog, Limit Breaks, fight rules) in it`)
+    console.log(`On demand: none of ${result.lazy} lazy modules (the fight engine, catalog, Limit Breaks, fight rules, old saves' migrations, v1 names) in it`)
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
     process.exitCode = 1

@@ -1,11 +1,7 @@
-// A display name for anything the Warehouse holds: items, Star Gems and gear; from R2 the materials and made items (H77;
-// the farm by line's hundred line items since H112). The ids both catalogs hold share uma-art's names ("Iron Ore" either
-// way), so the lookup needs no generation.
-import { itemById } from '../items/catalog'
+// A display name for anything a v28+ Warehouse holds: the farm by line's hundred line items (H112) and the made items
+// (H77). A v28+ world holds no v1 id (the parse refuses one, `isStockItemId`), so the v1 items', Star Gems' and gear's
+// names load on demand: `stockNameV1` (items/names-v1.ts, H136) is this chain with them, for the v1 screens and tests.
 import { lineItem } from '../items/lines'
 import { madeName } from '../items/made'
-import { gemById } from './gems'
-import { gearById } from './gear'
 
-export const stockName = (id: string): string =>
-  lineItem(id)?.name ?? madeName(id) ?? itemById(id)?.name ?? gemById(id)?.name ?? gearById(id)?.name ?? id
+export const stockName = (id: string): string => lineItem(id)?.name ?? madeName(id) ?? id
