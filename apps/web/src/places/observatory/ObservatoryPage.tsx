@@ -3,8 +3,9 @@
 import {
   activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemNameV1, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
   MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
-  umaTemplate, type GearTier, type OwnedUma,
+  umaTemplate, classOf, type GearTier, type MoonTemplate, type OwnedUma, type RpgClass, type RpgWeapon,
 } from '@rpg/domain'
+import { CLASS_LABEL } from '../../battle/labels'
 import { useState } from 'react'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
@@ -117,7 +118,8 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
   const world = useWorld()!
   const map = isStarMap(uma.stars) ? uma.stars : { open: [], moons: [] as [] }
   const outfit = view.roster.find((o) => o.outfitId === id)!
-  const classId = activeClass(outfit, uma)
+  const classId = activeClass(outfit, uma, tier)
+  const weapons = classOf(uma, classId).weapons
   const template = umaTemplate(outfit, uma.calling.pick)
   const moon = moonTemplate(outfit, uma.calling.pick)
   const [nodeOpen, setNodeOpen] = useState<string | null>(null)
@@ -135,8 +137,8 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
     if (nodes.length === 1) run(jewel, nodes[0]!)
     else setJewelPick({ jewel, nodes })
   }
-  const points = mapPoints(map.open, classId, tier, moon)
-  const prowess = mapPoints(map.open.filter((node) => node.startsWith('prowess:')), classId, tier)
+  const points = mapPoints(map.open, classId, tier, moon, weapons)
+  const prowess = mapPoints(map.open.filter((node) => node.startsWith('prowess:')), classId, tier, undefined, weapons)
   return <div className="space-y-3 p-3">
     <button type="button" onClick={() => setPicking(true)} aria-label="Choose an Uma" className="flex min-h-12 w-full items-center gap-3 rounded-md bg-raised p-2 text-left">
       <FaceTile outfitId={id} size={44} label={owned.find(row => row.id === id)?.name ?? 'Uma'} round />
@@ -152,7 +154,7 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
     <p className="rounded-sm bg-raised px-2 py-1.5 text-[12px] text-ink-soft">Prowess · {CLASS_NAME[classId]} {PROWESS[classId]}: ATK +{prowess.atk}, M.ATK +{prowess.matk}</p>
     <div className="grid grid-cols-3 gap-1 text-center text-[11px]">
       {(['hp', 'mp', 'atk', 'matk', 'def', 'mdef'] as const).map((stat) => {
-        const shared = mapPoints(map.open.filter((node) => !node.startsWith('template:')), classId, tier)[stat]
+        const shared = mapPoints(map.open.filter((node) => !node.startsWith('template:')), classId, tier, undefined, weapons)[stat]
         const star = points[stat] - shared
         return <span key={stat} className="rounded-xs bg-raised p-1"><span className="block font-semibold">{EFFECT_LABEL[stat]}</span>
           <span className="text-ink-soft">{pointText(stat, shared)}{star ? ` ★ ${pointText(stat, star)}` : ''}</span></span>
@@ -164,44 +166,51 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
         const node = jewelNodes(map, jewel, uma.level)[0]!
         return <li key={jewel}><button type="button" onClick={() => set(jewel)} className="flex min-h-12 w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
           <ItemIcon id={jewel} size={32} /><span className="min-w-0 flex-1"><span className="block text-[13px] font-semibold">{madeName(jewel)} ×{count}</span>
-            <span className="block text-[11px] text-ink-soft">Opens {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier)}</span></span>
+            <span className="block text-[11px] text-ink-soft">Opens {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier, weapons)}</span></span>
           <span className="rounded-sm bg-accent px-2 py-1 text-[12px] font-bold text-accent-ink">Set</span></button></li>
       })}</ul>}
     </section>
-    {nodeOpen && <NodeSheet node={nodeOpen} open={map.open.includes(nodeOpen)} classId={classId} knack={moon.knack} channel={moon.channel} tier={tier}
+    {nodeOpen && <NodeSheet node={nodeOpen} open={map.open.includes(nodeOpen)} classId={classId} weapons={weapons} knack={moon.knack} channel={moon.channel} tier={tier}
       type={template.type} onClose={() => setNodeOpen(null)} />}
     {jewelPick && <BottomSheet title={madeName(jewelPick.jewel) ?? 'Moon Jewel'} onClose={() => setJewelPick(null)}>
       <div className="space-y-2">{jewelPick.nodes.map((node) => <button key={node} type="button" onClick={() => run(jewelPick.jewel, node)} className="min-h-12 w-full rounded-sm bg-raised px-3 text-left text-[13px] font-semibold">
-        {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier)}
+        {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier, weapons)}
       </button>)}</div>
     </BottomSheet>}
   </div>
 }
 
-const CLASS_NAME = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' } as const
-const PROWESS = { brawler: '100/0', mage: '0/100', spellblade: '70/30', summoner: '30/70', paladin: '80/20', cleric: '20/80' } as const
+const CLASS_NAME = CLASS_LABEL
+/** Prowess's split by class (EP23); Classes v3's two new hybrids mirror their pair, a Tier 0 splits by her slots (H126). */
+const PROWESS: Readonly<Record<RpgClass, string>> = {
+  brawler: '100/0', mage: '0/100', spellblade: '70/30', summoner: '30/70', paladin: '80/20', cleric: '20/80', armsummoner: '70/30', tomeblade: '30/70',
+  recruit: 'by slot', duelist: 'by slot', acolyte: 'by slot', caller: 'by slot', apprentice: 'by slot',
+}
 
 function mapNodeTitle(id: string, type: string): string {
   const body = nodeBody(id), numeral = ROMAN[nodeNumeral(id) - 1]
   return body === 'template' ? `★ ${cap(type)}'s moon ${numeral}` : `${cap(body)} ${numeral}`
 }
 
-function mapNodeValue(id: string, classId: keyof typeof CLASS_NAME, knack: keyof typeof KNACK_LABEL, channel: 'physical' | 'magical', tier: GearTier): string {
+function mapNodeValue(id: string, classId: RpgClass, knack: keyof typeof KNACK_LABEL, channel: MoonTemplate['channel'], tier: GearTier,
+  weapons?: readonly RpgWeapon[]): string {
   const body = nodeBody(id), value = nodePoints(id, tier)
   if (body === 'planet') return `+${value} to every stat`
-  if (body === 'prowess') { const split = prowessSplit(value, classId); return `as ${CLASS_NAME[classId]} ATK +${split.atk}, M.ATK +${split.matk}` }
+  if (body === 'prowess') { const split = prowessSplit(value, classId, weapons); return `as ${CLASS_NAME[classId]} ATK +${split.atk}, M.ATK +${split.matk}` }
   if (body === 'vigor') return `HP +${value * 5}, MP +${value}`
   if (body === 'guard') return `DEF and M.DEF +${value}`
+  if (nodeNumeral(id) === 2 && channel === 'both') return `DEF +${Math.floor(value / 2)} · M.DEF +${value - Math.floor(value / 2)}`
   if (nodeNumeral(id) === 2) return `${channel === 'physical' ? 'DEF' : 'M.DEF'} +${value}`
   return knack === 'tireless' ? `Tireless · HP +${value * 5}` : knack === 'clever' ? `Clever · MP +${value}`
     : knack === 'mighty' ? `Mighty · DEF and M.DEF +${value}` : knack === 'fleet' ? 'Fleet · Evasion +2.4%' : 'Gritty · Limit +1.6'
 }
 
-function NodeSheet({ node, open, classId, knack, channel, tier, type, onClose }: {
-  node: string; open: boolean; classId: keyof typeof CLASS_NAME; knack: keyof typeof KNACK_LABEL; channel: 'physical' | 'magical'; tier: GearTier; type: string; onClose: () => void
+function NodeSheet({ node, open, classId, weapons, knack, channel, tier, type, onClose }: {
+  node: string; open: boolean; classId: RpgClass; weapons: readonly RpgWeapon[]; knack: keyof typeof KNACK_LABEL; channel: MoonTemplate['channel']
+  tier: GearTier; type: string; onClose: () => void
 }) {
   return <BottomSheet title={mapNodeTitle(node, type)} onClose={onClose}><div className="space-y-2 rounded-md bg-raised p-3 text-[13px]">
-    <p className="font-semibold">{mapNodeValue(node, classId, knack, channel, tier)}</p>
+    <p className="font-semibold">{mapNodeValue(node, classId, knack, channel, tier, weapons)}</p>
     <p className="text-ink-soft">{open ? `${madeName(nodeJewel(node))} · Open` : `needs a ${madeName(nodeJewel(node))} · opens at Lv ${mapNodeGate(node)}`}</p>
   </div></BottomSheet>
 }

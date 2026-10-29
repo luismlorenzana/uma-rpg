@@ -3,7 +3,7 @@
 // SB11; every v15 row is the game before H72 exactly, which a v15 fight still replays on.
 import { describe, expect, it } from 'vitest'
 import {
-  RPG_ALL_CLASSES, RPG_CLASS_SLOTS, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPON_SLOTS, rpgClassSlots, rpgClassWeapons, rpgDefaultWeapons, rpgHand,
+  RPG_V2_CLASSES, RPG_CLASS_SLOTS, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPON_SLOTS, rpgClassSlots, rpgClassWeapons, rpgDefaultWeapons, rpgHand,
   rpgPicksWeapons, rpgWeaponSlots, validRpgWeapons, type RpgClass, type RpgWeapon,
 } from './rules'
 import { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, rpgRework, type RpgReworkStage } from './battle/caps'
@@ -40,12 +40,17 @@ const V16_ROWS = {
 describe('the Tier rework’s switch (H64)', () => {
   it('opens each release at its engine, weaknesses v2 live on 18 and the later releases dark', () => {
     expect(BATTLE_ENGINE_VERSION).toBe(18)
-    expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, weak: 18, t2Weapons: 19, t2Classes: 20, t3: 21 })
+    // H126 (D244): Classes v3's stage at 19, dark until H134; R3–R5's stale stages gone, Tier 2's weapons at no engine.
+    expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, weak: 18, classes: 19, t2Weapons: Infinity })
     const stages = Object.keys(RPG_REWORK_ENGINE) as RpgReworkStage[]
-    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, true, false, false, false])
-    expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, true, false, false])
+    expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false])
+    expect(stages.map((s) => rpgRework(s, 19))).toEqual([true, true, true, true, false])
     expect([rpgRework('fight', V16), rpgRework('economy', V16)]).toEqual([true, false])
-    for (const s of stages) expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 21)], s).toEqual([false, true, true])
+    for (const s of stages.filter((x) => x !== 't2Weapons')) {
+      expect([rpgRework(s, RPG_REWORK_ENGINE[s] - 1), rpgRework(s, RPG_REWORK_ENGINE[s]), rpgRework(s, 21)], s).toEqual([false, true, true])
+    }
+    expect(rpgRework('t2Weapons', 1_000)).toBe(false)
   })
 })
 
@@ -56,7 +61,7 @@ describe('class rules, v15 and v16 (H64)', () => {
   })
 
   it('types the slots by channel from v16, the lead channel first; v15 is classes v2’s', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(rpgClassSlots(c, V15), c).toEqual(TODAY.slots[c])
       expect(rpgClassSlots(c, V16), c).toEqual(V16_ROWS.slots[c])
       expect(RPG_CLASS_SLOTS[c], c).toEqual(V16_ROWS.slots[c])
@@ -64,7 +69,7 @@ describe('class rules, v15 and v16 (H64)', () => {
   })
 
   it('starts every class on the owner’s three from v16; v15 is classes v2’s spreads', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(rpgDefaultWeapons(c, V15), c).toEqual(TODAY.weapons[c])
       expect(rpgDefaultWeapons(c, V16), c).toEqual(V16_ROWS.weapons[c])
       expect(rpgDefaultWeapons(c), c).toEqual(V16_ROWS.weapons[c])
@@ -75,7 +80,7 @@ describe('class rules, v15 and v16 (H64)', () => {
   })
 
   it('lets every class pick from v16 (CP12); to v15 the Brawler’s and the Mage’s are fixed', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(rpgPicksWeapons(c, V15), c).toBe(c !== 'brawler' && c !== 'mage')
       expect(rpgPicksWeapons(c, V16), c).toBe(true)
       expect(rpgPicksWeapons(c), c).toBe(true)
@@ -103,7 +108,7 @@ describe('class rules, v15 and v16 (H64)', () => {
     // Only her class's kinds: a Brawler has no Tome trees, a Mage no Arms.
     expect(validRpgWeapons('brawler', ['greatsword', 'axe', 'tome-fire'], V16)).toBe(false)
     // Every channel's kind fits every class that has that channel (CP12): each of a slot's kinds, in each slot.
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const slots = rpgClassSlots(c, V16)
       const defaults = rpgDefaultWeapons(c, V16)
       slots.forEach((kind, i) => {
@@ -124,7 +129,7 @@ describe('class rules, v15 and v16 (H64)', () => {
 
   it('keeps v2’s hands from v16 but the Summoner’s Arms hand, and raises her live Tome on v18 (H116)', () => {
     const pick = (c: RpgClass, v?: number) => { const h = rpgHand({ classId: c }, v); return { arms: h.arms, tome: h.tome } }
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(pick(c, V15), c).toEqual(TODAY.hands[c])
       expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.58 } : TODAY.hands[c])
       expect(pick(c), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.62 } : pick(c, V16))
@@ -145,7 +150,7 @@ describe('weapon EXP, E a weapon (H64)', () => {
 
   it('pays five weapons v15’s 5E exactly, whichever she used (an open v15 fight settles on five)', () => {
     expect([WEAPON_EXP_PER_WEAPON, WEAPON_EXP_SHARE]).toEqual([1, 3])
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const five = rpgDefaultWeapons(c, V15)
       for (let mask = 0; mask < 32; mask++) {
         const used = new Set(five.filter((_, i) => mask & (1 << i)))

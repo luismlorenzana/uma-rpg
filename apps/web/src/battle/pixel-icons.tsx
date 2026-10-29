@@ -1,6 +1,6 @@
 import atlas from '@luismlorenzana/uma-art/ui/atlas.json'
 import atlasUrl from '@luismlorenzana/uma-art/ui/atlas.png?url'
-import { achievementDef, FRONT_NAME, type BattleChannel, type BattleStatus, type RiftFront, type RpgClass } from '@rpg/domain'
+import { achievementDef, FRONT_NAME, RPG_TIER0_MODEL, type BattleChannel, type BattleStatus, type RiftFront, type RpgClass } from '@rpg/domain'
 import type { CSSProperties } from 'react'
 import { STATUS_LABEL } from './labels'
 
@@ -18,9 +18,12 @@ function PixelIcon({ frame, scale = 1, className = '', label }: { frame: string;
     imageRendering: 'pixelated',
   }} />
 }
+/** Until uma-art draws Classes v3's seven emblems (H127), each shows her model's (a Tier 0's child, a new hybrid's mirror). */
+const EMBLEM_FALLBACK: Readonly<Partial<Record<RpgClass, RpgClass>>> = { ...RPG_TIER0_MODEL, armsummoner: 'summoner', tomeblade: 'spellblade' }
 /** Decorative beside the full class name, not a replacement for it. */
 export function ClassEmblem({ classId }: { classId: RpgClass }) {
-  return <PixelIcon frame={'class/' + classId} />
+  const own = frames['class/' + classId] ? classId : EMBLEM_FALLBACK[classId] ?? classId
+  return <PixelIcon frame={'class/' + own} />
 }
 /** A Rift front's 16 px crest (uma-art 2.11.0), named "Iron front". */
 export function FrontCrest({ front, scale = 1 }: { front: RiftFront; scale?: PixelScale }) {

@@ -6,16 +6,17 @@ import { activeClass, classOf, SaveRuleError, type RiftFront, type RpgClass, typ
 import { useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import { WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
-import { wieldWeapons } from '../../save/game'
+import { useActiveTier, wieldWeapons } from '../../save/game'
 import { fullParty, guidedWeapons } from './rift-view'
 
 export function GuidedWeapons({ campaign, world, front, party }: { campaign: Campaign; world: TierWorld; front: RiftFront; party: number | null }) {
   const [error, setError] = useState<string | null>(null)
+  const tier = useActiveTier()
   const five = party === null ? null : fullParty(world, party)
   if (!five) return null
   const classes: (RpgClass | null)[] = five.map((id) => {
     const uma = world.umas[id], outfit = campaign.outfits.get(id)
-    return uma && outfit ? activeClass(outfit, uma) : null
+    return uma && outfit ? activeClass(outfit, uma, tier) : null
   })
   const guide = guidedWeapons(classes, front)
   const changes = five.flatMap((outfitId, i) => {

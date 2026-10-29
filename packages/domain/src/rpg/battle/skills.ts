@@ -1,7 +1,7 @@
 // Battle numbers and skill lookup, engine v6–v16 (D86, D102, D141, D169, D179; docs/archive/design/class-rework.md, combat-balance.md;
 // v16's held skills and Skill Ranks, H65).
 import { rpgNode, rpgNodeSkill, rpgRankedSkill, type RpgNode, type RpgSkillDef } from '../catalog'
-import { isRpgTome, RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, rpgSkillRankFactor,
+import { isRpgTome, RPG_DEPTH_GATES, rpgElementWeakness, rpgHand, rpgLearnedSkills, rpgNodeKey, rpgPhysical, rpgProfileTrees, rpgSkillFactor,
   type RpgDamageKind, type RpgElement, type RpgNodeRef } from '../rules'
 import type { BattleAlly, BattleChannel } from './types'
 
@@ -58,10 +58,11 @@ export function battleClassRank(ally: Pick<BattleAlly, 'classRank' | 'level' | '
 }
 
 /** A node's def as this ally casts it in a fight of `version` (H65): its generation's def (`rpgNodeSkill`), and from v16 at
- * the Skill Rank her Class Rank gives its depth (CP32), so the fight's input freezes it. The same def for a cast and for
- * a summon's farewell, which reads her summon as she cast it. */
+ * the Skill Rank her Class Rank gives its depth (CP32), so the fight's input freezes it; from v19 a Tier 0's node at her
+ * Class Rank's power (`rpgSkillFactor`, H126). The same def for a cast and for a summon's farewell, which reads her summon
+ * as she cast it. */
 export function battleNodeDef(ally: Pick<BattleAlly, 'classRank' | 'level' | 'maxDepth'>, node: RpgNode, version: number): RpgSkillDef {
-  return rpgRankedSkill(rpgNodeSkill(node, version), rpgSkillRankFactor(node.depth, battleClassRank(ally), version))
+  return rpgRankedSkill(rpgNodeSkill(node, version), rpgSkillFactor(node, battleClassRank(ally), version))
 }
 
 /** A known, equipped skill as this ally casts it in a fight of `version`: her hand of that generation scales its power

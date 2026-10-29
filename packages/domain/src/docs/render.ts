@@ -48,7 +48,7 @@ import {
   isRpgTome, RPG_ACTIVE_SLOT_GATES, RPG_BASE_ACTIVE_SLOTS, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS,
   RPG_CLASSES, RPG_DEPTH_GATES, RPG_SKILL_RANK_FACTOR, RPG_SKILL_RANK_MAX, RPG_SKILL_RANK_STEP, RPG_TIER_MAX_LEVEL,
   RPG_WEAPONS, rpgClasses, rpgClassWeapons, isRpgWeaponKind, rpgDefaultWeapons, rpgExpToNext, rpgHand,
-  rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgWeapon,
+  rpgOpenDepth, rpgWeaponKind, type RpgClass, type RpgTier1Class, type RpgWeapon,
 } from '../rpg/rules'
 import { ACHIEVEMENTS, type AchievementDef } from '../rift/achievements'
 import { RIFT_FRONT_SPECS, riftGuidedBuild, riftShape, riftTuning, type RiftSlot } from '../rift/fronts'
@@ -61,7 +61,7 @@ import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
   FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING,
-  UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES, type UmaCallingRow,
+  UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES, type UmaCallingClass, type UmaCallingRow,
 } from '../roster/template'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
@@ -82,6 +82,9 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
+  // Classes v3's seven (H126), their v19 names: no list prints them until H134 makes them live.
+  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Apprentice', armsummoner: 'Arms Summoner',
+  tomeblade: 'Tome Spellblade',
 }
 const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]
 const itemName = (id: string) => stockName(id)
@@ -100,6 +103,9 @@ const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
   cleric: `${BATTLE_LIMIT_NAMES.cleric}: a hit with each of her five weapons (${BATTLE_LIMIT_POWER.cleric}× in all), each status at 3 stacks`,
   summoner: `${BATTLE_LIMIT_NAMES.grand}: one summon at twice her strength that lingers at twice its share`,
   paladin: 'none: she came with engine v15',
+  recruit: 'none: she came with engine v19', duelist: 'none: she came with engine v19', acolyte: 'none: she came with engine v19',
+  caller: 'none: she came with engine v19', apprentice: 'none: she came with engine v19', armsummoner: 'none: she came with engine v19',
+  tomeblade: 'none: she came with engine v19',
 }
 /** The calling rule's rows in words (uma-templates §2.2, CP29), the first that fits. */
 const CALLING_ROW: Readonly<Record<UmaCallingRow, string>> = {
@@ -161,7 +167,7 @@ function templates(): string {
   const flourish = (f: (typeof STRIDE_FLOURISH)[keyof typeof STRIDE_FLOURISH]) => f === 'clean-break' ? `a Barrier of ${most} of her max HP at the start`
     : f === 'even-pace' ? `${pct(BATTLE_FLOURISH_RATE['even-pace'])} of her max HP at each round's end, up to ${most}`
     : `${pct(BATTLE_FLOURISH_RATE['late-reserve'])} of her max HP at each round's end from round ${BATTLE_FLOURISH_FROM}, up to ${most}`
-  return table(['Calling', ...UMA_STRIDES.map((s) => STRIDE_LABEL[s])], RPG_CLASSES.map((c) => [CLASS_NAME[c], ...UMA_STRIDES.map((s) => UMA_TYPE_NAMES[c][s])])) +
+  return table(['Calling', ...UMA_STRIDES.map((s) => STRIDE_LABEL[s])], RPG_CLASSES.map((c) => [CLASS_NAME[c], ...UMA_STRIDES.map((s) => UMA_TYPE_NAMES[c as UmaCallingClass][s])])) +
     '\n\n' + table(['Knack: her top growth rate', 'Word'], UMA_KNACKS.map((k) => [cap(KNACK_STAT[k]), UMA_KNACK_WORDS[k]])) +
     '\n\n' + table(['Stride: her longest distance at her best grade', 'Flourish', 'As her calling'], UMA_STRIDES.map((s) =>
       [`${STRIDE_LABEL[s]} (${s === 'dash' ? 'Sprint or Mile' : s === 'middle' ? 'Medium' : 'Long'})`, FLOURISH_NAMES[STRIDE_FLOURISH[s]], flourish(STRIDE_FLOURISH[s])]))
@@ -471,7 +477,7 @@ function starMap(): string {
   const n = [1, 2, 3, 4, 5]
   return table(['Body', 'Nodes', 'Opens at Lv', 'Points (Tier 1)', 'To'], [
     ['Planet', 'I–V', n.map((i) => gradeGateLevel(2 * i - 1)).join(', '), PLANET_T1.join(', '), 'all six core stats (HP 5 a point)'],
-    ['Prowess', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), `ATK and M.ATK by her active class: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${PROWESS_SPLIT[c]}/${100 - PROWESS_SPLIT[c]}`).join(', ')}`],
+    ['Prowess', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), `ATK and M.ATK by her active class: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${PROWESS_SPLIT[c as RpgTier1Class]}/${100 - PROWESS_SPLIT[c as RpgTier1Class]}`).join(', ')}`],
     ['Vigor', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'HP and MP'],
     ['Guard', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'DEF and M.DEF'],
     ['★ Her moon', 'I, II', `${gradeGateLevel(4)}, ${gradeGateLevel(8)}`, TEMPLATE_T1.join(', '), 'I: her knack\'s stat; II: her calling\'s channel\'s defense'],

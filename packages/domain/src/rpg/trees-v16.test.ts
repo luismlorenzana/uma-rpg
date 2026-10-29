@@ -7,9 +7,9 @@ import { BATTLE_ENGINE_VERSION } from './battle/caps'
 import { RPG_LINE_B_POWER_V16, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, rpgNode, rpgNodeSkill, rpgTreeOf, rpgValkyrieOathNode } from './catalog'
 import { HERO_LIMITS, heroLimit, heroLimitKinds } from './heroes'
 import {
-  RPG_ACTIVE_SLOT_GATES, RPG_ALL_CLASSES, RPG_BRANCH_B, RPG_BRANCH_B_NAME, RPG_MAX_ACTIVE_SLOTS, RPG_SKILL_RANK_FACTOR, rpgActiveSlots,
+  RPG_ACTIVE_SLOT_GATES, RPG_V2_CLASSES, RPG_BRANCH_B, RPG_BRANCH_B_NAME, RPG_MAX_ACTIVE_SLOTS, RPG_SKILL_RANK_FACTOR, rpgActiveSlots,
   rpgAutoLoadout, rpgBranchNode, rpgClassWeapons, rpgDefaultWeapons, rpgHeldSkills, rpgLearnedSkills, rpgNodeLine, rpgSkillRank,
-  rpgSkillRankFactor, rpgSkillRankNextAt, rpgSwapBranchLoadout, rpgUsableLoadout, type RpgClass, type RpgLines, type RpgProfile,
+  rpgSkillRankFactor, rpgSkillRankNextAt, rpgSwapBranchLoadout, rpgUsableLoadout, type RpgClass, type RpgV2Class, type RpgLines, type RpgProfile,
   type RpgWeapon,
 } from './rules'
 import { rpgSkillRankUps, rpgTreeView } from './tree-view'
@@ -24,7 +24,7 @@ const ids = (refs: readonly { id: string }[]) => refs.map((r) => r.id)
 const name = (id: string) => rpgNode(id)!.name
 
 /** Branch B at depth 3 on all 50 trees, by §6.5's tables. */
-const B_AT_3: Readonly<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, string>>>>> = {
+const B_AT_3: Readonly<Record<RpgV2Class, Readonly<Partial<Record<RpgWeapon, string>>>>> = {
   brawler: { greatsword: 'Triple Sunder', axe: 'Headsman\'s Cyclone', lance: 'Skewer', bow: 'Rain of Arrows', katana: 'Flash Draw' },
   mage: { 'tome-fire': 'Firaga Wave', 'tome-ice': 'Blizzaga Spike', 'tome-lightning': 'Thundaga Bolt', 'tome-light': 'Luxaga Cascade', 'tome-dark': 'Noxaga Pierce' },
   spellblade: { greatsword: 'Piercing Mystic Cleave', axe: 'Piercing Mystic Hew', lance: 'Piercing Mystic Thrust', bow: 'Piercing Mystic Shot',
@@ -38,7 +38,7 @@ const B_AT_3: Readonly<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, strin
   cleric: { greatsword: 'Heavy Rupture', axe: 'Heavy Maim', lance: 'Heavy Impale', bow: 'Heavy Fracture', katana: 'Heavy Hex',
     'tome-fire': 'Heavy Bravery', 'tome-ice': 'Heavy Bulwark', 'tome-lightning': 'Heavy Surge', 'tome-light': 'Rebirth', 'tome-dark': 'Heavy Clarity' },
 }
-const TREES = RPG_ALL_CLASSES.flatMap((c) => rpgClassWeapons(c).map((w) => [c, w] as const))
+const TREES = RPG_V2_CLASSES.flatMap((c) => rpgClassWeapons(c).map((w) => [c, w] as const))
 
 describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
   it('runs with the Tier rework’s fight live (on 18 since H116): seven equipped slots at most', () => {
@@ -226,7 +226,7 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     const loadout = rpgAutoLoadout(p)
     expect(ids(loadout)).toEqual(['brawler-greatsword.3', 'brawler-axe.3', 'brawler-lance.3a', 'brawler-greatsword.2', 'brawler-axe.2'])
     const view = rpgTreeView(p, loadout)!
-    expect(view.root).toEqual({ classId: 'brawler', hand: expect.objectContaining({ power: 1, pair: false }) })
+    expect(view.root).toEqual({ classId: 'brawler', tier: 1, hand: expect.objectContaining({ power: 1, pair: false }) })
     expect(view.trees.map((t) => [t.weapon, t.branch, t.bName])).toEqual([['greatsword', 'A', 'Combo'], ['axe', 'A', 'Reap'], ['lance', 'B', 'Impale']])
     const lance = view.trees[2]!
     expect(lance.tree).toBe('brawler-lance')

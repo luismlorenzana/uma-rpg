@@ -28,7 +28,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
   const run = worldRun(world)
   const fighting = !!openFightOf(world)
   // Classes v2 (C8, H59): one healer a party, or the world map's fights refuse it.
-  const healers = healerBlock(world, members, campaign.outfits)
+  const healers = healerBlock(world, members, campaign.outfits, undefined, tier)
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-2">
@@ -44,7 +44,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const uma = world.umas[id]!
           const outfit = campaign.outfits.get(id)
           if (!outfit) return null
-          const classId = activeClass(outfit, uma)
+          const classId = activeClass(outfit, uma, tier)
           const profile = umaProfile(outfit, uma, tier, classId)
           const points = umaPoints(uma, classId)
           const max = applyPoints(projectRpgStats(profile), points).stats.mp

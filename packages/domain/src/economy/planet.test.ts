@@ -9,7 +9,7 @@ import {
   CORE_NODES, isMapNode, MAP_NODES, mapNodeGate, mapNodeGrade, mapPoints, moonTemplate, nodeBody, nodeJewel, nodeNumeral, nodePoints,
   prowessSplit, type MoonTemplate,
 } from './planet'
-import { RPG_CLASSES, type RpgClass } from '../rpg/kinds'
+import { RPG_CLASSES, type RpgClass, type RpgV2Class } from '../rpg/kinds'
 import { templateOutfit, TEMPLATE_CASES } from '../save/economy-v3.fixture'
 
 const TIERS: readonly GearTier[] = [1, 2, 3]
@@ -94,11 +94,11 @@ describe('Prowess, split by her class (EP23, §3.3)', () => {
   })
 
   it('every class’s sums in Tiers 1–3, each node keeping its total', () => {
-    const expected: Record<RpgClass, string[]> = {
+    const expected: Record<RpgV2Class, string[]> = {
       brawler: ['30/0', '54/0', '78/0'], mage: ['0/30', '0/54', '0/78'], spellblade: ['21/9', '39/15', '55/23'],
       summoner: ['9/21', '15/39', '23/55'], paladin: ['24/6', '43/11', '63/15'], cleric: ['6/24', '11/43', '15/63'],
     }
-    for (const classId of RPG_CLASSES) expect(TIERS.map((t) => sums(classId, t))).toEqual(expected[classId])
+    for (const classId of RPG_CLASSES) expect(TIERS.map((t) => sums(classId, t))).toEqual(expected[classId as RpgV2Class])
     for (const classId of RPG_CLASSES) for (const points of [2, 4, 5, 7, 10, 11, 14, 16, 18, 21, 26]) {
       const split = prowessSplit(points, classId)
       expect(split.atk + split.matk).toBe(points)
@@ -155,14 +155,14 @@ describe('a full Tier 1 map (§3.3, §8.1)', () => {
   })
 
   it('every class at Lv 50 in Tiers 1–3 (§8.1’s grants)', () => {
-    const offense: Record<RpgClass, number[][]> = {
+    const offense: Record<RpgV2Class, number[][]> = {
       brawler: [[51, 21], [92, 38], [133, 55]], mage: [[21, 51], [38, 92], [55, 133]], spellblade: [[42, 30], [77, 53], [110, 78]],
       summoner: [[30, 42], [53, 77], [78, 110]], paladin: [[45, 27], [81, 49], [118, 70]], cleric: [[27, 45], [49, 81], [70, 118]],
     }
     for (const classId of RPG_CLASSES) for (const t of TIERS) {
       const p = mapPoints(CORE_NODES, classId, t)
       const stat = [51, 92, 133][t - 1]
-      expect([p.hp * 5, p.mp, p.atk, p.matk, p.def, p.mdef]).toEqual([[255, 460, 665][t - 1], stat, ...offense[classId][t - 1]!, stat, stat])
+      expect([p.hp * 5, p.mp, p.atk, p.matk, p.def, p.mdef]).toEqual([[255, 460, 665][t - 1], stat, ...offense[classId as RpgV2Class][t - 1]!, stat, stat])
     }
   })
 })

@@ -36,10 +36,19 @@ const PARTY_V2: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
   duel: ['brawler', 'brawler', 'mage', 'mage', 'paladin'],
   horde: ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
 }
+/** Classes v3's guidance (CV23; H126): each front's build is a family of the tree. Iron the Warrior side, Arcane the Mage
+ * side, Duel the Spellblades, Horde the Summoners; one healer each, the Paladin with the Arms-led, the Cleric with the
+ * Tome-led. A run's twenty hold all eight Tier 1 classes. */
+export const PARTY_V19: Readonly<Record<RiftFront, readonly RpgClass[]>> = {
+  iron: ['brawler', 'brawler', 'spellblade', 'armsummoner', 'paladin'],
+  arcane: ['mage', 'mage', 'tomeblade', 'summoner', 'cleric'],
+  duel: ['spellblade', 'spellblade', 'tomeblade', 'tomeblade', 'paladin'],
+  horde: ['armsummoner', 'armsummoner', 'summoner', 'summoner', 'cleric'],
+}
 /** A front's guided party in an engine's class generation (H60): the balance simulation asks by version, the screens
  * read the live one through `RIFT_FRONT_SPECS`. */
 export const riftParty = (front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] =>
-  (rpgV2(engine) ? PARTY_V2 : PARTY_V1)[front]
+  (rpgRework('classes', engine) ? PARTY_V19 : rpgV2(engine) ? PARTY_V2 : PARTY_V1)[front]
 
 /** The guided builds from v16 (CP7, class-progression.md §2.3, D202): classes v2's compositions (D178, point 5), the
  * second copy of a class re-specced to the kinds the first doesn't hold; `null` keeps her defaults (CP3). Each build answers
@@ -53,10 +62,25 @@ const BUILDS_V16: Readonly<Record<RiftFront, readonly (readonly [RpgClass, reado
   horde: [['spellblade', null], ['spellblade', ['greatsword', 'axe', 'tome-fire']], ['summoner', null], ['summoner', ['tome-ice', 'tome-fire', 'lance']],
     ['cleric', null]],
 }
+/** Classes v3's guided builds (CV23, §10.1; H126), in slot order: `PARTY_V19`'s members, a second copy of a class re-specced
+ * so each front holds its kinds twice (Iron Greatsword 2, Axe 4, Lance 2, Bow 2, Katana 2; Arcane Fire 2, Ice 3, Lightning
+ * 2, Light 3, Dark 2; the Duel and the Horde every twin set 2–3 times); `null` keeps her v19 defaults. */
+export const BUILDS_V19: Readonly<Record<RiftFront, readonly (readonly [RpgClass, readonly RpgWeapon[] | null])[]>> = {
+  iron: [['brawler', null], ['brawler', ['bow', 'katana', 'axe']], ['spellblade', null], ['armsummoner', null], ['paladin', null]],
+  arcane: [['mage', null], ['mage', ['tome-light', 'tome-dark', 'tome-fire']], ['tomeblade', null], ['summoner', null], ['cleric', null]],
+  duel: [['spellblade', null], ['spellblade', ['bow', 'greatsword', 'tome-fire']], ['tomeblade', null], ['tomeblade', ['tome-dark', 'tome-ice', 'axe']],
+    ['paladin', null]],
+  horde: [['armsummoner', null], ['armsummoner', ['lance', 'greatsword', 'tome-lightning']], ['summoner', null],
+    ['summoner', ['tome-fire', 'tome-lightning', 'katana']], ['cleric', null]],
+}
 /** A front's guided build in an engine's generation (CP7): five members and their weapons, in slot order. From v16 the
- * table above; before it the guided classes (`riftParty`) on their own defaults. The screen's one-tap use is H70's. */
+ * table above, from v19 Classes v3's (`BUILDS_V19`); before v16 the guided classes (`riftParty`) on their own defaults.
+ * The screen's one-tap use is H70's. */
 export function riftGuidedBuild(front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): RiftGuidedMember[] {
-  if (rpgRework('fight', engine)) return BUILDS_V16[front].map(([classId, weapons]) => ({ classId, weapons: weapons ? [...weapons] : rpgDefaultWeapons(classId, engine) }))
+  if (rpgRework('fight', engine)) {
+    return (rpgRework('classes', engine) ? BUILDS_V19 : BUILDS_V16)[front]
+      .map(([classId, weapons]) => ({ classId, weapons: weapons ? [...weapons] : rpgDefaultWeapons(classId, engine) }))
+  }
   return riftParty(front, engine).map((classId) => ({ classId, weapons: rpgDefaultWeapons(classId, engine) }))
 }
 

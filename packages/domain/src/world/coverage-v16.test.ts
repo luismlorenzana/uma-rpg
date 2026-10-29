@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   isRpgTome, isRpgWeaponKind, RPG_DAMAGE_KINDS, RPG_ELEMENTS, RPG_TWIN_SET_IDS, RPG_TWIN_SETS, RPG_WEAPON_KINDS, rpgAnsweredTwinSets,
   rpgClassSlots, rpgDefaultWeapons, rpgTomeOf, rpgTwinsOf, rpgWeaponKind, validRpgWeapons,
-  type RpgClass, type RpgDamageKind, type RpgTwinSet, type RpgWeapon,
+  type RpgClass, type RpgV2Class, type RpgDamageKind, type RpgTwinSet, type RpgWeapon,
 } from '../rpg/rules'
 import type { BattleWeaknesses } from '../rpg/battle/types'
 import { riftGuidedBuild, riftParty } from '../rift/fronts'
@@ -15,7 +15,7 @@ import { capitalChapter } from './capital'
 import { regionChapter, worldContinent } from './world'
 
 const V16 = 16
-const ALL_CLASSES: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'summoner', 'paladin', 'cleric']
+const ALL_CLASSES: readonly RpgV2Class[] = ['brawler', 'mage', 'spellblade', 'summoner', 'paladin', 'cleric']
 type Healer = 'cleric' | 'paladin'
 /** The five fight types on the owner's defaults: physical, magical, the two hybrids and a healer. */
 const defaultParty = (healer: Healer): RpgWeapon[][] =>
@@ -96,7 +96,7 @@ describe('the campaign’s four checks on the owner’s defaults (CP4)', () => {
       const held = rpgAnsweredTwinSets(rpgDefaultWeapons(classId, V16))
       return pct(sets.filter(([s]) => held.includes(s)).reduce((sum, [, w]) => sum + w, 0) / 48)
     }
-    const expected: Record<RpgClass, number> = { brawler: 66, mage: 66, paladin: 59, spellblade: 41, cleric: 41, summoner: 34 }
+    const expected: Record<RpgV2Class, number> = { brawler: 66, mage: 66, paladin: 59, spellblade: 41, cleric: 41, summoner: 34 }
     for (const classId of ALL_CLASSES) expect(Math.abs(share(classId) - expected[classId]), classId).toBeLessThanOrEqual(1)
   })
 

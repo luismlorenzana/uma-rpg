@@ -14,7 +14,7 @@ import { RegionMap } from './RegionMap'
 const NOW = '2026-10-13T12:00:00.000Z'
 let save = newSave('Test', NOW)
 const drink = vi.fn(async (id: string) => { save = useSpring(save, id, new Date().toISOString()) })
-vi.mock('../../save/game', () => ({ useWorld: () => worldOf(save), drinkAtSpring: (id: string) => drink(id), beginFight: vi.fn(), sweep: vi.fn() }))
+vi.mock('../../save/game', () => ({ useWorld: () => worldOf(save), useActiveTier: () => 1, drinkAtSpring: (id: string) => drink(id), beginFight: vi.fn(), sweep: vi.fn() }))
 vi.mock('./ActiveParty', () => ({ ActivePartyBar: () => null }))
 vi.mock('../../content/cast', () => ({ castArtUrl: vi.fn(async () => 'blob:synthetic') }))
 // Composition and real canvas have dedicated tests; exercise both semantic controls and stage sheets here.

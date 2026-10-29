@@ -15,7 +15,8 @@ import { LINE_ITEMS, lineItem } from '../items/lines'
 import { rpgRework } from '../rpg/battle/caps'
 import type { RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { activeClass, classOf, openFightOf, payEntrants, stageLaurels, worldRun, type BattleOutfit, type FightResult, type MemberGain, type RankGain } from './battle'
-import { grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
+import { grantClassTrack, grantTrack, MANUAL_EXP, MANUAL_PRICE, MARKS_SHARE, maxRankOf, trackOf, withTrack, type RankRef } from '../economy/ranks'
+import { RPG_TIER0_BANK, rpgClassGate, rpgClassMaxRank, rpgIsTier0 } from '../rpg/rules'
 import { stageBand, stagePay } from '../world/world'
 import { gearStock, gemStock, isGrades, PARTY_SIZE, type Save, type TierWorld } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -179,7 +180,7 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
   const entrants = (world.parties[world.world.activeParty]!.slots as string[]).map((id) => {
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
-    const classId = activeClass(outfit, world.umas[id]!)
+    const classId = activeClass(outfit, world.umas[id]!, tier)
     return { outfitId: id, classId, weapons: classOf(world.umas[id]!, classId).weapons, used: new Set<never>() }
   })
   const paid = payEntrants(world, entrants, 'fight', node.level, Math.round(stageLaurels('fight', chapter.tier, false, node.level) * pay), tier, REPLAY_SHARE * pay)
@@ -194,12 +195,18 @@ export function sweepFight(save: Save, chapter: RpgCampaignChapter, nodeId: stri
 
 // --- Manuals (D102): Marks for EXP on one bar of one Uma --------------------------------------------------------------
 
-/** Why she can't read Manuals for this bar now, or null. */
-export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, count = 1): string | null {
+/** Why she can't read Manuals for this bar now, or null. From v19 (Classes v3, CV8, CV9; H126) a class she can't fight as
+ * in her world (`tier`) is refused with its gate, and a Tier 0 at Rank 10 reads on until her waiting EXP's bank is full. */
+export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, count = 1, tier: number | string = TIER_ONE): string | null {
   const uma = world.umas[outfitId]
   if (!uma) return 'Not unlocked'
   if (isGrades(uma.gear) && ref.kind !== 'class') return 'Gear Manuals are retired'
-  if (trackOf(uma.ranks, ref).rank >= maxRankOf(ref.kind)) return 'Already at the top rank'
+  const gate = ref.kind === 'class' ? rpgClassGate(uma.ranks, ref.id, tier) : null
+  if (gate) return gate
+  const track = trackOf(uma.ranks, ref)
+  const top = ref.kind === 'class' ? rpgClassMaxRank(ref.id) : maxRankOf(ref.kind)
+  const banked = ref.kind === 'class' && rpgIsTier0(ref.id) && rpgClassMaxRank(ref.id) < maxRankOf('class')
+  if (track.rank >= top && (!banked || track.exp >= RPG_TIER0_BANK)) return 'Already at the top rank'
   const marks = ref.kind === 'class' ? world.wallet.classMarks : world.wallet.gearMarks ?? 0
   return marks < MANUAL_PRICE * count ? `Needs ${MANUAL_PRICE * count} ${ref.kind === 'class' ? 'Class' : 'Gear'} Marks` : null
 }
@@ -209,10 +216,11 @@ export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, co
 export function readManuals(save: Save, outfitId: string, ref: RankRef, count: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (!Number.isInteger(count) || count < 1 || count > MAX_PURCHASE) throw new SaveRuleError('bad-count', `read 1–${MAX_PURCHASE}`)
-  const block = manualBlock(world, outfitId, ref, count)
+  const block = manualBlock(world, outfitId, ref, count, tier)
   if (block) throw new SaveRuleError(block.startsWith('Needs') ? 'no-laurels' : 'bad-job', block)
   const uma = world.umas[outfitId]!
-  const r = grantTrack(trackOf(uma.ranks, ref), ref.kind, MANUAL_EXP * count)
+  const r = ref.kind === 'class' ? grantClassTrack(trackOf(uma.ranks, ref), ref.id, MANUAL_EXP * count)
+    : grantTrack(trackOf(uma.ranks, ref), ref.kind, MANUAL_EXP * count)
   const back = Math.floor(r.overflow * MARKS_SHARE)
   const key = ref.kind === 'class' ? 'classMarks' : 'gearMarks'
   const marks = world.wallet[key] ?? 0

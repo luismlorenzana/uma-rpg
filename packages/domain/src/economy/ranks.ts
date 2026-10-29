@@ -2,9 +2,9 @@
 // Weapon Rank for each of the ten weapons, an Armor Rank for each of the ten armor kinds and an Accessory Rank for each of
 // the four accessory kinds (1–10, D124). Winning fights fills them; past a max rank, EXP banks at half rate as Marks for
 // the whole world. Nothing is trained and no token is spent.
-import { rpgV2 } from '../rpg/battle/caps'
-import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_TOMES, RPG_WEAPONS, type RpgClass, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
-import { RPG_WEAPON_SLOTS } from '../rpg/rules'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
+import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_TOMES, RPG_WEAPONS, rpgIsTier0, type RpgClass, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
+import { RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_WEAPON_SLOTS, rpgTier0ExpToNext } from '../rpg/rules'
 
 export const CLASS_MAX_RANK = 50
 export const GEAR_MAX_RANK = 10
@@ -118,6 +118,27 @@ export function grantTrack(track: RankTrack, kind: RankKind, amount: number): { 
   }
   const overflow = rank >= max ? exp : 0
   return { track: { rank, exp: rank >= max ? 0 : exp }, ranksUp, overflow }
+}
+
+/**
+ * Adds EXP to her track in a class by its tier of class (Classes v3, H126): from v19 a Tier 0 ranks on her ladder to Class
+ * Rank 10 (CV5), then the rest waits in her track's `exp` for her next promotion, up to `RPG_TIER0_BANK` (CV8), and only
+ * what passes it returns as `overflow` (Marks at half rate, as any maxed class's); anyone else as `grantTrack` does.
+ */
+export function grantClassTrack(track: RankTrack, classId: RpgClass, amount: number, engine: number = BATTLE_ENGINE_VERSION):
+  { track: RankTrack; ranksUp: number; overflow: number } {
+  if (!rpgRework('classes', engine) || !rpgIsTier0(classId)) return grantTrack(track, 'class', amount)
+  let { rank } = track
+  let exp = track.exp + Math.max(0, Math.floor(amount))
+  let ranksUp = 0
+  while (rank < RPG_TIER0_MAX_RANK && exp >= rpgTier0ExpToNext(rank)) {
+    exp -= rpgTier0ExpToNext(rank)
+    rank += 1
+    ranksUp += 1
+  }
+  if (rank < RPG_TIER0_MAX_RANK) return { track: { rank, exp }, ranksUp, overflow: 0 }
+  const waiting = Math.min(exp, RPG_TIER0_BANK)
+  return { track: { rank, exp: waiting }, ranksUp, overflow: exp - waiting }
 }
 
 /** Sets a track in her ranks (a fresh rank-1 track is dropped, keeping the save small). */

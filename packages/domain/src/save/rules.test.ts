@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { armorHalf } from '../economy/grades'
-import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass } from '../rpg/rules'
+import { RPG_CLASS_ARMOR, RPG_CLASSES, type RpgClass, type RpgV2Class } from '../rpg/rules'
 import { newOwnedUma, newSave, newWallet, parseSave, PARTY_COUNT, SaveParseError, SAVE_SCHEMA_VERSION } from './save'
 import { addShards, isPartyFull, ownerTier, partyLead, partyOf, renameParty, savedTiers, SaveRuleError, setPartyLead, setPartySlot, TIER_ONE, tierKey, unlockUma, worldOf } from './rules'
 import { TIER2_LAURELS, TIER2_UMAS, withTierTwo } from './tiers.fixture'
@@ -36,7 +36,7 @@ describe('collection rules', () => {
   })
 
   it('starts a new Mage, Summoner or Cleric in magical armor and a Brawler, Spell Blade or Paladin in physical (D160, D180; v28: her class’s half, H82)', () => {
-    const want: Record<RpgClass, 'physical' | 'magical'> = { brawler: 'physical', mage: 'magical', spellblade: 'physical', cleric: 'magical', summoner: 'magical', paladin: 'physical' }
+    const want: Record<RpgV2Class, 'physical' | 'magical'> = { brawler: 'physical', mage: 'magical', spellblade: 'physical', cleric: 'magical', summoner: 'magical', paladin: 'physical' }
     const before = unlocked('100101')
     for (const c of RPG_CLASSES) {
       const save = unlockUma(before, '100201', T1, TIER_ONE, c)
@@ -44,7 +44,7 @@ describe('collection rules', () => {
       const uma = world.umas['100201']!
       // Every grade G0; her armor's half is her class's, so nothing about it is written.
       expect(uma.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
-      expect(armorHalf(uma.classId!)).toBe(want[c])
+      expect(armorHalf(uma.classId!)).toBe(want[c as RpgV2Class])
       // From v16 her start is written as her class (H67), whichever it is.
       expect(uma.classId).toBe(c)
       // The Umas already owned are untouched.

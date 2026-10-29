@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
+  BATTLE_ENGINE_VERSION, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -143,7 +143,7 @@ export async function seeGrant(): Promise<void> {
 /** Spends one Uma Ticket (final, D44); she starts in her starting class's armor (D160 §7). Throws SaveRuleError when it can't. */
 export async function unlock(outfit: Pick<BattleOutfit, 'outfitId'> & StartingOutfit): Promise<void> {
   const { save } = useGame.getState()
-  if (save) await commit(unlockUma(save, outfit.outfitId, nowIso(), activeKey(), startingClass(outfit)))
+  if (save) await commit(unlockUma(save, outfit.outfitId, nowIso(), activeKey(), startingClass(outfit, BATTLE_ENGINE_VERSION, activeKey())))
 }
 
 /** Puts an owned Uma in a party slot, moving her from any other (D46); null empties the slot. */

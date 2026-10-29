@@ -8,10 +8,14 @@
 // Pierce, and the Paladin's revive moves to her Light tree; R1's balance (H71) adds a B line's tuned power where it set
 // one (`RPG_LINE_B_POWER_V16`). Names and summaries are presentation: they follow the live
 // generation at module load, so an old fight may show a new name.
+// Classes v3 (engine v19, D240; H126) adds 210 nodes on new ids, so no older def moves: the Tome Spellblade's and the Arms
+// Summoner's ten trees of eight line nodes each (`addLineTree`), and the five Tier 0 classes' ten trees of one node each
+// (`addTier0Tree`). 960 in all; the live list stays 750 until H134.
 import {
-  isRpgTome, RPG_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
-  type RpgClass, type RpgDamageKind, type RpgStatusKind, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
+  isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
+  type RpgClass, type RpgDamageKind, type RpgElement, type RpgStatusKind, type RpgTier0Class, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
+import { RPG_TIER0_MP, RPG_TIER0_SKILL } from './class-tree'
 import { RPG_BRANCH_B, RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
 import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, rpgRework, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
@@ -470,9 +474,74 @@ for (const weapon of RPG_WEAPONS) {
       name: weapon === 'tome-light' ? "Valkyrie's Oath" : `Heavy ${at(names, d)}` } : undefined) })
 }
 
-/** Every node of every generation (750, D179): `rpgNode` finds any of them, the Paladin's included. */
+// --- Classes v3's new trees (engine v19, CV6, CV17; H126) ---------------------------------------------------------------
+
+/** A tree of the lines only (the two new hybrids: no older generation, so no unused side node): depths 1–2 the trunk's
+ * cores, 3–5 line A's cores and line B's side (`RPG_BRANCH_B`'s letter), eight nodes. Their `skill` is v19's def: H128
+ * changes it in place for the new weapon shapes. */
+interface LineTreeSpec {
+  classId: RpgClass
+  weapon: RpgWeapon
+  names: readonly string[]
+  b: readonly string[]
+  core: (d: number) => RpgSkillDef
+  lineB: (d: number) => RpgSkillDef
+}
+function addLineTree(spec: LineTreeSpec): void {
+  const tree = rpgTreeOf(spec.classId, spec.weapon)
+  const letter = RPG_BRANCH_B[spec.classId][spec.weapon]!
+  for (let d = 1; d <= 5; d += 1) {
+    const base = { tree, classId: spec.classId, weapon: spec.weapon, depth: d, cost: d }
+    const core = spec.core(d)
+    NODES.push({ ...base, id: `${tree}.${d}`, variant: null, name: at(spec.names, d), skill: core, summary: describe(core) })
+  }
+  for (let d = 3; d <= 5; d += 1) {
+    const skill = spec.lineB(d)
+    NODES.push({ tree, classId: spec.classId, weapon: spec.weapon, depth: d, cost: d, id: `${tree}.${d}${letter}`, variant: letter,
+      name: at(spec.b, d), skill, summary: describe(skill) })
+  }
+}
+
+/** The Tome Spellblade's names (CV17): a blade word for each depth, and a spell word for each element on her Tome trees
+ * (the Spell Blade's blade nouns on her Arms trees). None matches a master-data string. */
+export const RPG_TOMEBLADE_DEPTHS = ['Edged', 'Honed', 'Whetted', 'Gleaming', 'Sovereign'] as const
+export const RPG_TOMEBLADE_SPELLS: Readonly<Record<RpgElement, string>> = { fire: 'Pyre', ice: 'Frost', lightning: 'Volt', light: 'Lumen', dark: 'Umbra' }
+// The Tome Spellblade (CV15, CV17): the Spell Blade's rule (one foe, hits by kind, the same depth riders), her own names;
+// line B Pierce on every tree (one hit at `RPG_PIERCE_SCALE` × the depth's power, +2 MP, through the unbroken halving).
+for (const weapon of RPG_WEAPONS) {
+  const kind = rpgWeaponKind(weapon)
+  const word = isRpgTome(weapon) ? RPG_TOMEBLADE_SPELLS[kind as RpgElement] : BLADE_NOUN[kind]
+  const names = RPG_TOMEBLADE_DEPTHS.map((t) => `${t} ${word}`)
+  const one = (d: number, n: number, scale: number, extraMp = 0): RpgSkillDef =>
+    ({ target: 'one', hits: pure(n, scale * power(d), kind), mp: mp(d) + extraMp, primary: kind })
+  addLineTree({ classId: 'tomeblade', weapon, names, b: names.map((n) => `Piercing ${n}`),
+    core: (d) => ({ ...one(d, at(BLADE_HITS[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) }),
+    lineB: (d) => ({ ...one(d, 1, RPG_PIERCE_SCALE, 2), special: 'pierce' }) })
+}
+// The Arms Summoner (CV15, CV17): the Summoner's summons and riders on every kind, her lines mirrored: Bonded on her Arms
+// trees (the lingering summon at 0.4, +2 MP), Pack on her Tome trees (one more hit at ×0.95).
+for (const weapon of RPG_WEAPONS) {
+  const names = SUMMONS[weapon]
+  const tome = isRpgTome(weapon)
+  addLineTree({ classId: 'armsummoner', weapon, names, b: names.map((n) => (tome ? `${n} Pack` : `Bonded ${n}`)),
+    core: (d) => summon(weapon, d),
+    lineB: (d) => (tome ? summon(weapon, d, 1, 0.95) : plus(summon(weapon, d), { summon: { linger: 0.4 }, mp: summon(weapon, d).mp + 2 })) })
+}
+
+/** A Tier 0 tree (CV6): her class's one skill on one weapon, its one node at depth 1. One foe, one hit of the weapon's kind
+ * at power 1 (the fight scales it to her Class Rank's power, `rpgSkillFactor`), 10 MP; no rider, special, status or
+ * support. Named by the skill alone: a screen adds the weapon. */
+function addTier0Tree(classId: RpgTier0Class, weapon: RpgWeapon): void {
+  const tree = rpgTreeOf(classId, weapon)
+  const kind = rpgWeaponKind(weapon)
+  const skill: RpgSkillDef = { target: 'one', hits: [{ power: 1, parts: [{ kind, share: 1 }] }], mp: RPG_TIER0_MP, primary: kind }
+  NODES.push({ id: `${tree}.1`, tree, classId, weapon, depth: 1, variant: null, name: RPG_TIER0_SKILL[classId], cost: 1, skill, summary: describe(skill) })
+}
+for (const classId of RPG_TIER0_CLASSES) for (const weapon of RPG_WEAPONS) addTier0Tree(classId, weapon)
+
+/** Every node of every generation (960: 750 to v18, D179; Classes v3's 210 from v19, H126): `rpgNode` finds any of them. */
 export const RPG_ALL_NODES: readonly RpgNode[] = NODES
-/** The live generation's nodes: the five classes' 600 until the switch (H61), all 750 after. */
+/** The live generation's nodes: the five classes' 600 until the switch (H61), all 750 after; 960 from H134. */
 export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.includes(n.classId))
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)

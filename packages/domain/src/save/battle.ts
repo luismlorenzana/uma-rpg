@@ -15,13 +15,14 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  grantRpgExp, RPG_CLASS_SLOTS, RPG_CLASSES, rpgActiveSlots, rpgAutoLoadout, rpgClassWeapons, rpgLineOf,
-  rpgPicksWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef,
-  type RpgProfile, type RpgWeapon,
+  grantRpgExp, RPG_CLASS_CHILDREN, RPG_CLASS_SLOTS, RPG_CLASSES, RPG_TIER0_MAX_RANK, rpgActiveSlots, rpgAutoLoadout, rpgClassGate, rpgClassName,
+  rpgClassWeapons, rpgIsTier0, rpgLineOf, rpgOpenDepth, rpgPicksWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, TIER0_TIER1_ONLY,
+  validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef, type RpgProfile, type RpgTier0Class, type RpgTier1Class,
+  type RpgWeapon,
 } from '../rpg/rules'
 import {
-  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, grantTrack, MARKS_SHARE, trackOf, weaponExpShares,
-  withTrack, type RankRef, type RankTrack, type Ranks,
+  ACCESSORY_EXP_SHARE, ACCESSORY_SLOTS, ARMOR_EXP_SHARE, ARMOR_SLOTS, CLASS_EXP_SHARE, classRankOf, classTrack, grantClassTrack, grantTrack, MARKS_SHARE,
+  trackOf, weaponExpShares, withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
 import { addPoints, type Points } from '../economy/bonus'
@@ -42,7 +43,8 @@ import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFl
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
-// without this module and the engine.
+// without this module and the engine. Classes v3's class tree (`umaClassTree`, `umaHeldClasses`, H126) isn't re-exported
+// here: this subpath loads as a namespace, which would keep them in the main bundle before a screen reads them.
 export {
   activeClass, classOf, healerBlock, ONE_HEALER, startingClass, styleClass, withClassWeapons, type BattleOutfit, type StartingOutfit,
 } from './class'
@@ -61,7 +63,7 @@ function ownedOf(world: TierWorld, outfitId: string): OwnedUma {
 
 /** Her battle profile as a class (the active one by default); its Class Rank opens the depths and ranks her skills (D102,
  * CP25). No side skills (engine v16): her line on each of her class's trees (save v27's `lines`, H69). */
-export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgProfile {
+export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma, tier)): RpgProfile {
   const growth = (key: keyof BattleOutfit['growthRatePercents']) => Math.min(1, Math.max(0, outfit.growthRatePercents[key] / 100))
   const setup = classOf(uma, classId)
   return {
@@ -74,7 +76,7 @@ export function umaProfile(outfit: BattleOutfit, uma: OwnedUma, tier: number, cl
 }
 
 /** Her equipped skills as a class: the ones she picked that she can use, or, until she picks, chosen for her. */
-export function umaLoadout(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma)): RpgNodeRef[] {
+export function umaLoadout(outfit: BattleOutfit, uma: OwnedUma, tier: number, classId: RpgClass = activeClass(outfit, uma, tier)): RpgNodeRef[] {
   const profile = umaProfile(outfit, uma, tier, classId)
   const picked = classOf(uma, classId).loadout
   return picked === null ? rpgAutoLoadout(profile) : rpgUsableLoadout(profile, picked.map((id) => ({ tier, id })))
@@ -86,12 +88,77 @@ function withClass(save: Save, outfitId: string, classId: RpgClass, next: ClassL
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classes: { ...uma.classes, [classId]: next } } } }, now)
 }
 
-/** Switches the class she fights as. Free at any time; each class keeps its own weapons and skills. */
+/** Switches the class she fights as. Free at any time; each class keeps its own weapons and skills. From v19 (Classes v3,
+ * CV9) only to a class she holds: every Tier 0 in Tier 1's world, a Tier 1 class once promoted into; a closed one is
+ * refused with its gate ("Opens with Recruit R10 or Caller R10"). */
 export function chooseClass(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
   if (!RPG_CLASSES.includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
+  const gate = rpgClassGate(uma.ranks, classId, tier)
+  if (gate) throw new SaveRuleError('bad-class', gate)
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classId } } }, now)
+}
+
+// --- Promotion (Classes v3, CV8; H126) ---------------------------------------------------------------------------------
+
+/** What `promoteUma` and `promotionPlan` say. */
+export const NOT_HER_CHILD = 'Not one of her Tier 0’s children'
+export const ALREADY_HERS = 'Already hers'
+/** A promotion before she takes it (§14.2's before → after line): the child opens at Class Rank 10, then her Tier 0's
+ * waiting EXP flows in; `after` is where it lands, `depths` and `skills` what she holds there (three weapons a depth),
+ * `marks` the Class Marks EXP past Rank 50 banks; `block` why she can't now, or null. */
+export interface PromotionPlan {
+  from: RpgTier0Class
+  to: RpgTier1Class
+  opens: 10
+  waiting: number
+  after: RankTrack
+  depths: number
+  skills: number
+  marks: number
+  block: string | null
+}
+/** Why she can't promote from `from` into `to` now, or null (CV8, CV10): Tier 0 is Tier 1's; `to` must be one of `from`'s
+ * children she doesn't hold yet, and `from` at Class Rank 10. */
+function promotionBlock(uma: Pick<OwnedUma, 'ranks'>, from: RpgClass, to: RpgClass, tier: number | string, engine: number): string | null {
+  if (!rpgRework('classes', engine) || !rpgIsTier0(from)) return `no class ${from}`
+  if (Number(tier) !== 1) return TIER0_TIER1_ONLY
+  if (rpgIsTier0(to) || !RPG_CLASS_CHILDREN[from].includes(to)) return NOT_HER_CHILD
+  if ((uma.ranks.classes[to]?.rank ?? 0) >= RPG_TIER0_MAX_RANK) return ALREADY_HERS
+  if (classRankOf(uma.ranks, from) < RPG_TIER0_MAX_RANK) return `Needs ${rpgClassName(from, engine)} R${RPG_TIER0_MAX_RANK}`
+  return null
+}
+/** Her promotion from a Tier 0 into one of its children, before she takes it (§14.2): the child opens at Class Rank 10
+ * and her Tier 0's waiting EXP flows in, past 10 if it can (past 50 it banks as Marks). */
+export function promotionPlan(uma: Pick<OwnedUma, 'ranks'>, from: RpgTier0Class, to: RpgTier1Class, tier: number | string = TIER_ONE,
+  engine: number = BATTLE_ENGINE_VERSION): PromotionPlan {
+  const waiting = classRankOf(uma.ranks, from) >= RPG_TIER0_MAX_RANK ? classTrack(uma.ranks, from).exp : 0
+  const r = grantClassTrack({ rank: RPG_TIER0_MAX_RANK, exp: 0 }, to, waiting, engine)
+  const depths = rpgOpenDepth(r.track.rank)
+  return { from, to, opens: RPG_TIER0_MAX_RANK, waiting, after: r.track, depths, skills: 3 * depths,
+    marks: Math.floor(r.overflow * MARKS_SHARE), block: promotionBlock(uma, from, to, tier, engine) }
+}
+/**
+ * Promotes her from a Tier 0 at Class Rank 10 into one of its children (CV8): free. The child opens at Class Rank 10 and
+ * her Tier 0's waiting EXP flows into it at once (past Rank 50 it banks as Class Marks); her Tier 0 stays at Rank 10 with
+ * nothing waiting; she fights as the child, on its defaults (weapons, lines, equipped skills). A sibling later opens the
+ * same way, with whatever waits then. Never closes a class or moves her calling, trade or template. Refused outside Tier
+ * 1's world ("Tier 0 is Tier 1's"), for a class that isn't `from`'s child, a Tier 0 below 10 ("Needs Recruit R10") and a
+ * class she holds ("Already hers").
+ */
+export function promoteUma(save: Save, outfitId: string, from: RpgClass, to: RpgClass, now: string, tier = TIER_ONE): Save {
+  const world = worldOf(save, tier)
+  const uma = ownedOf(world, outfitId)
+  const block = promotionBlock(uma, from, to, tier, BATTLE_ENGINE_VERSION)
+  if (block) throw new SaveRuleError('bad-class', block)
+  const plan = promotionPlan(uma, from as RpgTier0Class, to as RpgTier1Class, tier)
+  const ranks = withTrack(withTrack(uma.ranks, { kind: 'class', id: to }, plan.after), { kind: 'class', id: from }, { rank: RPG_TIER0_MAX_RANK, exp: 0 })
+  const classes = { ...uma.classes }
+  delete classes[to]
+  const next: OwnedUma = { ...uma, classId: to, ranks, classes }
+  return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: next },
+    wallet: { ...world.wallet, classMarks: world.wallet.classMarks + plan.marks } }, now)
 }
 
 /** Sets the weapons a class wields, as the live generation's slots allow (`validRpgWeapons`). From v16 her equipped skills
@@ -185,7 +252,7 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
   if (working) throw new SaveRuleError('busy', working)
   let next: OwnedUma = { ...uma, calling: { pick, confirmed: false } }
   if (uma.level === 1) {
-    if (uma.classId === null || activeClass(outfit, uma) === umaCalling(outfit, uma.calling.pick)) next = { ...next, classId: pick }
+    if (uma.classId === null || activeClass(outfit, uma, tier) === umaCalling(outfit, uma.calling.pick)) next = { ...next, classId: pick }
     const gear = gearV1(uma)
     if (!isGrades(uma.gear) && !ARMOR_SLOTS.some((slot) => gear.equipped[slot])) next = { ...next, gear: { ...gear, kinds: startingArmorKinds(pick) } }
   }
@@ -193,18 +260,19 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
 }
 
 /** Confirms her calling, the card's Confirm (CP29): her pick, or her pre-selection when she has none, is final. Nothing
- * changes when it already is. */
+ * changes when it already is, nor from v19, which has no pick (CV19). */
 export function confirmCalling(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
-  if (uma.calling.confirmed) return save
+  if (uma.calling.confirmed || rpgRework('classes')) return save
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: callingConfirmed(uma) } }, now)
 }
 
 /** She after a won fight (CP29: her first win confirms her calling): her calling confirmed, the pick (or none) kept, on
- * every Uma (a fixed row's confirmed calling changes nothing). */
-export function callingConfirmed(uma: OwnedUma): OwnedUma {
-  if (uma.calling.confirmed) return uma
+ * every Uma (a fixed row's confirmed calling changes nothing). From v19 she as she is: no pick to confirm (CV19; save v32
+ * drops the field). */
+export function callingConfirmed(uma: OwnedUma, engine: number = BATTLE_ENGINE_VERSION): OwnedUma {
+  if (uma.calling.confirmed || rpgRework('classes', engine)) return uma
   return { ...uma, calling: { pick: uma.calling.pick, confirmed: true } }
 }
 
@@ -216,12 +284,14 @@ export function umaPoints(uma: OwnedUma, classId: RpgClass, tier: GearTier = 1, 
 }
 /** Her points apart: what her armor gives, and her Extra Stats: a v1 map's active nodes, or a v3 map's open nodes
  * (`mapPoints`: Prowess split by `classId`, her moon by `template`, values × `tier`; H76, D213). (Weapons add Might to
- * their hits instead.) */
+ * their hits instead.) A Tier 0's armor offense and Prowess split by her slots (CV7, H126): her class's weapons. */
 export function umaPointParts(uma: OwnedUma, classId: RpgClass = 'brawler', tier: GearTier = 1, template?: MoonTemplate): { gear: Points; extra: Points } {
+  const weapons = classOf(uma, classId).weapons
+  const thirds = rpgIsTier0(classId) ? weapons.filter((w) => !isRpgTome(w)).length : undefined
   const gear = isGrades(uma.gear)
-    ? gradePoints(gradesOf(uma), armorHalf(classId), tier)
+    ? gradePoints(gradesOf(uma), armorHalf(classId), tier, thirds)
     : equippedPoints(gearV1(uma).equipped)
-  const extra = isStarMap(uma.stars) ? mapPoints(uma.stars.open, classId, tier, template) : starPoints(starsV1(uma).active)
+  const extra = isStarMap(uma.stars) ? mapPoints(uma.stars.open, classId, tier, template, weapons) : starPoints(starsV1(uma).active)
   return { gear, extra }
 }
 
@@ -278,12 +348,12 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
 }
 
 /** Her Flourish as she fights (UT6, UT12): her template's, by her stride, while she fights as her calling's class (her
- * active one unless named), else null. `pick` is her calling pick, her stored one (save v27, H69) unless named; null is her
- * row's calling. Read from the template's two parts (`umaTemplate(outfit, pick)`'s `calling` and `flourish`), so its name
- * tables stay out of the main bundle. */
+ * active one unless named), else null; from v19 as any class of her Tier 0's family (CV21). `pick` is her calling pick, her
+ * stored one (save v27, H69) unless named; null is her row's calling. Read from the template's two parts
+ * (`umaTemplate(outfit, pick)`'s `calling` and `flourish`), so its name tables stay out of the main bundle. */
 export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' | 'calling'>, classId: RpgClass = activeClass(outfit, uma),
-  pick: RpgClass | null = uma.calling.pick): RpgFlourish | null {
-  return umaFlourishActive({ calling: umaCalling(outfit, pick) }, classId) ? STRIDE_FLOURISH[umaStride(outfit)] : null
+  pick: RpgClass | null = uma.calling.pick, engine: number = BATTLE_ENGINE_VERSION): RpgFlourish | null {
+  return umaFlourishActive({ calling: umaCalling(outfit, pick, engine) }, classId, engine) ? STRIDE_FLOURISH[umaStride(outfit)] : null
 }
 
 /** These Umas as they enter a fight, each as her active class: profile, equipped skills, stat points, her weapons' Might,
@@ -298,13 +368,13 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const outfit = outfits.get(id)
     if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
     const uma = ownedOf(world, id)
-    const classId = activeClass(outfit, uma)
+    const classId = activeClass(outfit, uma, tier, engine)
     // Her Flourish by her stored calling pick (save v27, H69): a Pace Uma who picked the Spell Blade has it as one.
-    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling.pick) : null
+    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling.pick, engine) : null
     const gearTier = Number(tier) as GearTier
     const weapons = classOf(uma, classId).weapons
     const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, uma.calling.pick)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
+      points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, uma.calling.pick, engine)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
       ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
     if (!isGrades(uma.gear)) return { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
     const grades = gradesOf(uma)
@@ -322,7 +392,7 @@ export function startFight(save: Save, region: RpgCampaignChapter, nodeId: strin
   if (!slots) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
   if (slots.some((s) => s === null) || slots.length !== PARTY_SIZE) throw new SaveRuleError('cannot-fight', 'a fight needs a full party of five')
   if (openFightOf(world)) throw new SaveRuleError('cannot-fight', 'a fight is already open')
-  const healers = healerBlock(world, slots as string[], outfits)
+  const healers = healerBlock(world, slots as string[], outfits, BATTLE_ENGINE_VERSION, tier)
   if (healers) throw new SaveRuleError('cannot-fight', healers)
   const members = partyMembers(world, slots as string[], outfits, tier)
   try {
@@ -424,9 +494,11 @@ export interface RankFill { ranks: Ranks; gains: RankGain[]; gearMarks: number; 
  * Fills her bars for a win worth `exp` Uma EXP (D102, D124), each times `scale` (an Echo pays 2×, R6): 2E to the class she
  * fought as, 5E over her five weapons (double for each she used), E to each of her five armor kinds and E to the kind of
  * each accessory she wears. EXP past a max rank banks at half rate as Marks: Class Marks from her class, Gear Marks from
- * the rest. Her level, EXP and Bonds are the caller's.
+ * the rest. Her level, EXP and Bonds are the caller's. Her class's bar by its tier of class (`grantClassTrack`, H126): from
+ * v19 a Tier 0's EXP past Rank 10 waits for her promotion, and only what passes her bank becomes Marks.
  */
-export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'weapons' | 'used'>, exp: number, scale = 1): RankFill {
+export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'weapons' | 'used'>, exp: number, scale = 1,
+  engine: number = BATTLE_ENGINE_VERSION): RankFill {
   let ranks: Ranks = uma.ranks
   let gearMarks = 0, classMarks = 0
   const gains: RankGain[] = []
@@ -434,7 +506,7 @@ export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'wea
     const amount = stage * scale
     if (amount <= 0) return
     const before = trackOf(ranks, ref)
-    const r = grantTrack(before, ref.kind, amount)
+    const r = ref.kind === 'class' ? grantClassTrack(before, ref.id, amount, engine) : grantTrack(before, ref.kind, amount)
     ranks = withTrack(ranks, ref, r.track)
     const marks = Math.floor(r.overflow * MARKS_SHARE)
     if (ref.kind === 'class') classMarks += marks

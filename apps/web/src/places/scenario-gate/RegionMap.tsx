@@ -10,7 +10,7 @@ import { CastFace } from '../../battle/CastFace'
 import { FoeRow } from '../../battle/FoeRow'
 import { ElementGlyph, formatLevel, formatLevels } from '../../battle/labels'
 import { useHubNavigation } from '../../hub/navigation'
-import { beginFight, drinkAtSpring, sweep, useWorld } from '../../save/game'
+import { beginFight, drinkAtSpring, sweep, useActiveTier, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { LockIcon } from '../../ui/icons'
@@ -42,6 +42,7 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   const [swept, setSwept] = useState<{ result: Result; nodeId: string } | null>(null)
   const [sweepFor, setSweepFor] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const tier = useActiveTier()
   const mapRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useMapView()
   const info = campaign.regionInfo(region.id)
@@ -62,7 +63,8 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   const run = worldRun(world)
   const fightOpen = openFightOf(world)
   // Classes v2 (C8): the active party fights with one healer at most; the button says why it can't (H59).
-  const healers = healerBlock(world, (world.parties[world.world.activeParty]?.slots ?? []).filter((s): s is string => s !== null), campaign.outfits)
+  const healers = healerBlock(world, (world.parties[world.world.activeParty]?.slots ?? []).filter((s): s is string => s !== null), campaign.outfits,
+    undefined, tier)
   const springLabel = readyAt ? `Spring, recharges in ${formatDuration(Date.parse(readyAt) - Date.parse(now))}` : 'Spring, refill party MP'
   const drink = async () => {
     if (!spring) return

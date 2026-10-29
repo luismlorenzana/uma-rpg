@@ -117,8 +117,8 @@ function bestHalf(state: BattleState, actor: BattleAlly, unit: BattleUnit, foes:
   return pick
 }
 
-/** A pair class's leading half: the stronger hand (a Spell Blade's Arms; from v15 a Summoner's Tome, D183). */
-const tomeLeads = (hand: RpgHand): boolean => hand.pair && hand.tome > hand.arms
+/** A pair class's leading half: her hand's `lead` (H126; a Spell Blade's Arms, from v15 a Summoner's Tome, D183). */
+const tomeLeads = (hand: RpgHand): boolean => hand.pair && hand.lead === 'tome'
 
 /** Her best act: one half, or for a pair class (her hand's `pair`) her best leading half, then her best other half
  * within the MP left, named lead first (D86; from v15 the Summoner too, D183). */

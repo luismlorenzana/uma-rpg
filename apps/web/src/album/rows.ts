@@ -91,7 +91,7 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
     // An Uma lives in one world: another tier's Uma is in no list here, and only Tier 1 shows the locked catalogue.
     if (!uma && (scope.tier !== 1 || scope.elsewhere.has(base.id))) return []
     const busy = uma !== null && !available.has(base.id)
-    const classId = uma ? activeClass(outfit, uma) : null
+    const classId = uma ? activeClass(outfit, uma, scope.tier) : null
     const isNew = !known.has(base.id)
     const top = (grades: Record<string, string>) => Object.keys(grades).filter(k => grades[k] === 'A' || grades[k] === 'S')
     const template = umaTemplateFacets(outfit, uma?.calling.pick ?? null)

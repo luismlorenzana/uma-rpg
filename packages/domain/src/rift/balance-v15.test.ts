@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest'
 import { AMULET_TYPES, TALISMAN_TYPES } from '../economy/gear-id'
 import type { BattleAction, BattleAlly, BattleCue, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
-import { RPG_ALL_CLASSES, type RpgClass } from '../rpg/rules'
+import { RPG_V2_CLASSES, type RpgClass } from '../rpg/rules'
 import { classPreset } from '../save/presets'
 import { BALANCE_KIT_V2, BALANCE_PARTY, balanceMember, balanceStage, type BalanceOptions } from '../world/balance-party'
 import { play, type PlayObserver } from '../world/balance-play'
@@ -159,7 +159,7 @@ function waveRun(plan: RiftFightPlan, allies: BattleAlly[], seed: number): { dea
 
 describe('classes v2\'s balance on engine v15 (H60)', () => {
   it('builds the v2 kit from the classes\' standard presets', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const preset = classPreset(c, V15)
       expect(BALANCE_KIT_V2[c].accessories, c).toEqual([preset.orb, preset.support])
       expect(BALANCE_KIT_V2[c].magical.every((m) => m === (preset.armor === 'magical')), c).toBe(true)
@@ -186,7 +186,7 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
 
   it('keeps all six classes\' best single act below the Duel\'s lowest v15 shield (the guard rail)', () => {
     const lowest = Math.min(...duelShields(V15))
-    for (const classId of RPG_ALL_CLASSES) {
+    for (const classId of RPG_V2_CLASSES) {
       const rail = guardRail(classId, V15)
       expect(rail.own.chips, `${classId}: ${rail.own.act}`).toBeLessThan(lowest)
       expect(rail.limit.chips, `${classId}: ${rail.limit.act}`).toBeLessThan(lowest)
@@ -272,7 +272,7 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
         line('World Lv 50, every stage, the balance party', w50.spellblade, w50.summoner)
         const all = [...RIFT_FRONTS.map((f) => fronts[f]), w50]
         line('All of them', mergeTallies(all.map((t) => t.spellblade)), mergeTallies(all.map((t) => t.summoner)))
-        rows.push(`World Lv 50's damage a turn: ${RPG_ALL_CLASSES.filter((c) => w50[c]).map((c) => `${c} ${f1(perTurn(w50[c]))}`).join(', ')}`)
+        rows.push(`World Lv 50's damage a turn: ${RPG_V2_CLASSES.filter((c) => w50[c]).map((c) => `${c} ${f1(perTurn(w50[c]))}`).join(', ')}`)
         rows.push(`Splits: Spell Blade ${RIFT_FRONTS.map((f) => `${f} ${pct(physicalShare(fronts[f].spellblade!).all)}`).join(', ')} physical; ` +
           `Summoner ${RIFT_FRONTS.map((f) => `${f} ${pct(1 - physicalShare(fronts[f].summoner!).all)}`).join(', ')} magical`)
         checks.push(() => expect(Math.abs(mirrorOf(w50) - 1), 'the world\'s Lv 50, every stage').toBeLessThanOrEqual(MIRROR))
@@ -377,7 +377,7 @@ describe('classes v2\'s balance on engine v15 (H60)', () => {
 
     if (want.has(10)) {
       rows.push('', `Target 10: class | best own act | best Limit Break | Duel shields ${duelShields(V15).join(', ')}`)
-      for (const classId of RPG_ALL_CLASSES) {
+      for (const classId of RPG_V2_CLASSES) {
         const rail = guardRail(classId, V15)
         rows.push(`${classId} | ${rail.own.chips}: ${rail.own.act} | ${rail.limit.chips}: ${rail.limit.act}`)
       }

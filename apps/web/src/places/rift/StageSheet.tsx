@@ -47,7 +47,7 @@ export function StageSheet({ campaign, place, front, plan, status, onClose }: {
   const { save, world, run, key, tier } = useRift()
   const nav = useHubNavigation()
   const [party, setParty] = useState<number | null>(() =>
-    world && run ? bestParty(world, front, campaign.outfits, (i) => frontPartyBlock(world, run, i)) : null)
+    world && run ? bestParty(world, front, campaign.outfits, (i) => frontPartyBlock(world, run, i), undefined, undefined, Number(tier)) : null)
   const [error, setError] = useState<string | null>(null)
   if (!save || !world || !run) return null
   const open = world.rift.battle !== null

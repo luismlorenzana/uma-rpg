@@ -7,8 +7,8 @@ import { ALL_HERO_LIMIT_IDS, hallClass, HERO_HALLS, HERO_LIMIT_IDS, HERO_LIMIT_P
   isHeroLimitId } from './heroes'
 import { rpgNodeIdentity } from './node-identity'
 import {
-  projectRpgStats, RPG_ALL_CLASSES, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_HEALERS, RPG_WEAPONS, rpgClasses,
-  rpgClassSlots, rpgClassStats, rpgClassWeapons, rpgDefaultWeapons, rpgHand, rpgIsHealer, validRpgWeapons, type RpgClass, type RpgWeapon,
+  projectRpgStats, RPG_ALL_CLASSES, RPG_V2_CLASSES, RPG_CLASS_ARMOR, RPG_CLASS_SLOTS, RPG_CLASS_STATS, RPG_CLASSES, RPG_HEALERS, RPG_WEAPONS, rpgClasses,
+  rpgClassSlots, rpgClassStats, rpgClassWeapons, rpgDefaultWeapons, rpgHand, rpgIsHealer, validRpgWeapons, type RpgClass, type RpgV2Class, type RpgWeapon,
 } from './rules'
 import { BATTLE_ENGINE_VERSION, BATTLE_HEAL_OFFENSE_SCALE, RPG_V2_ENGINE, rpgV2 } from './battle/caps'
 
@@ -25,14 +25,15 @@ describe('the one switch (D179)', () => {
 
   it('lists six live classes, the Paladin last; v1 had five', () => {
     expect(RPG_CLASSES).toEqual([...FIVE, 'paladin'])
-    expect(RPG_ALL_CLASSES).toEqual([...FIVE, 'paladin'])
+    // Classes v3's seven join every list last (H126), so no list's order moves.
+    expect(RPG_ALL_CLASSES.slice(0, 6)).toEqual([...FIVE, 'paladin'])
     expect(rpgClasses(V1)).toEqual(FIVE)
-    expect(rpgClasses(V2)).toEqual(RPG_ALL_CLASSES)
+    expect(rpgClasses(V2)).toEqual(RPG_V2_CLASSES)
     expect(RPG_HEALERS).toEqual(['paladin', 'cleric'])
     // A healer only from v15: a v1 Cleric shares the support with the Summoner.
-    expect(RPG_ALL_CLASSES.filter((c) => rpgIsHealer(c, V2))).toEqual(['cleric', 'paladin'])
-    expect(RPG_ALL_CLASSES.filter((c) => rpgIsHealer(c, V1))).toEqual([])
-    expect(RPG_ALL_CLASSES.filter((c) => rpgIsHealer(c))).toEqual(['cleric', 'paladin'])
+    expect(RPG_V2_CLASSES.filter((c) => rpgIsHealer(c, V2))).toEqual(['cleric', 'paladin'])
+    expect(RPG_V2_CLASSES.filter((c) => rpgIsHealer(c, V1))).toEqual([])
+    expect(RPG_V2_CLASSES.filter((c) => rpgIsHealer(c))).toEqual(['cleric', 'paladin'])
   })
 })
 
@@ -41,8 +42,8 @@ describe('class rules by generation (D179)', () => {
   it('gives the slots: today’s in v1, the Cleric 3 Tomes + 2 Arms and the Paladin her mirror in v2', () => {
     const v1 = { brawler: [A, A, A, A, A], mage: [T, T, T, T, T], spellblade: [A, A, A, T, T], cleric: ['any', 'any', 'any', 'any', 'any'],
       summoner: [T, T, T, A, A], paladin: [A, A, A, T, T] }
-    for (const c of RPG_ALL_CLASSES) expect(rpgClassSlots(c, V1), c).toEqual(v1[c])
-    for (const c of RPG_ALL_CLASSES) expect(rpgClassSlots(c, V2), c).toEqual(c === 'cleric' ? [T, T, T, A, A] : v1[c])
+    for (const c of RPG_V2_CLASSES) expect(rpgClassSlots(c, V1), c).toEqual(v1[c])
+    for (const c of RPG_V2_CLASSES) expect(rpgClassSlots(c, V2), c).toEqual(c === 'cleric' ? [T, T, T, A, A] : v1[c])
     // The live slots are the live generation's (v16's three since H72).
     expect(RPG_CLASS_SLOTS).toEqual(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassSlots(c)])))
     expect(RPG_CLASS_ARMOR.paladin).toBe('physical')
@@ -60,7 +61,7 @@ describe('class rules by generation (D179)', () => {
   })
 
   it('gives the default spreads: today’s in v1; the Cleric’s and the Paladin’s v2 spreads', () => {
-    const today: Record<Exclude<RpgClass, 'paladin'>, RpgWeapon[]> = {
+    const today: Record<Exclude<RpgV2Class, 'paladin'>, RpgWeapon[]> = {
       brawler: ['greatsword', 'axe', 'lance', 'bow', 'katana'], mage: ['tome-fire', 'tome-ice', 'tome-lightning', 'tome-light', 'tome-dark'],
       spellblade: ['greatsword', 'lance', 'katana', 'tome-fire', 'tome-lightning'], cleric: ['greatsword', 'axe', 'bow', 'tome-fire', 'tome-light'],
       summoner: ['tome-fire', 'tome-ice', 'tome-lightning', 'greatsword', 'lance'],
@@ -70,7 +71,7 @@ describe('class rules by generation (D179)', () => {
     expect(rpgDefaultWeapons('paladin', V2)).toEqual(['greatsword', 'axe', 'lance', 'tome-ice', 'tome-fire'])
     expect(rpgDefaultWeapons('paladin', V1)).toEqual(rpgDefaultWeapons('paladin', V2))
     for (const c of ['brawler', 'mage', 'spellblade', 'summoner'] as const) expect(rpgDefaultWeapons(c, V2), c).toEqual(today[c])
-    for (const c of RPG_ALL_CLASSES) for (const v of [V1, V2]) expect(validRpgWeapons(c, rpgDefaultWeapons(c, v), v), `${c} v${v}`).toBe(true)
+    for (const c of RPG_V2_CLASSES) for (const v of [V1, V2]) expect(validRpgWeapons(c, rpgDefaultWeapons(c, v), v), `${c} v${v}`).toBe(true)
     // A fresh copy each time (the live generation's three since H72).
     const spread = rpgDefaultWeapons('brawler')
     spread.pop()
@@ -118,11 +119,11 @@ describe('class rules by generation (D179)', () => {
     }
     for (const c of FIVE) {
       const t = today[c as keyof typeof today]
-      expect(rpgHand({ classId: c }, V1), c).toEqual({ ...t, arms: t.power, tome: t.power })
+      expect(rpgHand({ classId: c }, V1), c).toEqual({ ...t, arms: t.power, tome: t.power, lead: null, extra: false })
     }
-    expect(rpgHand({ classId: 'spellblade' }, V2)).toEqual({ power: 0.72, arms: 0.72, tome: 0.44, mp: 0.5, linger: 0, pair: true })
-    expect(rpgHand({ classId: 'summoner' }, V2)).toEqual({ power: 0.58, arms: 0.56, tome: 0.58, mp: 0.5, linger: 0.3, pair: true })
-    for (const c of ['paladin', 'cleric'] as const) expect(rpgHand({ classId: c }, V2), c).toEqual({ power: 0.5, arms: 0.5, tome: 0.5, mp: 0.6, linger: 0, pair: false })
+    expect(rpgHand({ classId: 'spellblade' }, V2)).toEqual({ power: 0.72, arms: 0.72, tome: 0.44, mp: 0.5, linger: 0, pair: true, lead: 'arms', extra: true })
+    expect(rpgHand({ classId: 'summoner' }, V2)).toEqual({ power: 0.58, arms: 0.56, tome: 0.58, mp: 0.5, linger: 0.3, pair: true, lead: 'tome', extra: false })
+    for (const c of ['paladin', 'cleric'] as const) expect(rpgHand({ classId: c }, V2), c).toEqual({ power: 0.5, arms: 0.5, tome: 0.5, mp: 0.6, linger: 0, pair: false, lead: null, extra: false })
     for (const c of ['brawler', 'mage'] as const) expect(rpgHand({ classId: c }, V2), c).toEqual(rpgHand({ classId: c }, V1))
   })
 })
@@ -145,8 +146,10 @@ describe('the Paladin as an identity (D179)', () => {
   })
 
   it('has ten trees of node identities; the live catalog lists the six classes’ 750', () => {
-    expect(RPG_ALL_NODES).toHaveLength(750)
-    expect(RPG_NODES).toEqual(RPG_ALL_NODES)
+    // Classes v3 adds 210 nodes (H126): 960 in all; the live list stays the six classes' 750.
+    expect(RPG_ALL_NODES).toHaveLength(960)
+    expect(RPG_NODES).toHaveLength(750)
+    expect(RPG_NODES).toEqual(RPG_ALL_NODES.filter((n) => RPG_CLASSES.includes(n.classId)))
     expect(RPG_NODES.filter((n) => n.classId === 'paladin')).toHaveLength(150)
     expect(rpgClassWeapons('paladin')).toEqual(RPG_WEAPONS)
     const ids = new Set(RPG_ALL_NODES.map((n) => n.id))

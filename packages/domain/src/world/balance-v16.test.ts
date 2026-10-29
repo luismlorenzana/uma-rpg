@@ -12,7 +12,7 @@ import { rpgNode, rpgNodeSkill } from '../rpg/catalog'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBranchNode, rpgTreeOf, type RpgLines } from '../rpg/node-identity'
 import {
-  isRpgTome, RPG_ALL_CLASSES, rpgBaseMpRegen, rpgDefaultWeapons, rpgHand, rpgHeldSkills, rpgOpenDepth,
+  isRpgTome, RPG_V2_CLASSES, rpgBaseMpRegen, rpgDefaultWeapons, rpgHand, rpgHeldSkills, rpgOpenDepth,
   type RpgClass, type RpgWeapon,
 } from '../rpg/rules'
 import { classPreset } from '../save/presets'
@@ -79,7 +79,7 @@ function deepActMp(a: BattleAlly, engine: number): number {
 /** The base regen's share of her deepest act, at a level on the balance party (R1's kit, the real Class Rank pace). */
 function refundAt(classId: RpgClass, level: number): { mp: number; regen: number; deep: number; share: number } {
   const a = balanceMember(classId, 0, level, { ...ON_CURVE, engine: V16 })
-  const regen = rpgBaseMpRegen(a.stats.mp, a.classRank!, V16)
+  const regen = rpgBaseMpRegen(a.stats.mp, { classId, classRank: a.classRank! }, V16)
   const deep = deepActMp(a, V16)
   return { mp: a.stats.mp, regen, deep, share: regen / deep }
 }
@@ -160,7 +160,7 @@ const lineIds = (c: LineCase, branch: 'A' | 'B') => [3, 4, 5].map((d) => (branch
 
 describe('R1\'s balance in the world on engine v16 (H71)', () => {
   it('builds R1\'s kit from the classes\' v16 presets: the Orb on her first slot\'s kind, today\'s supports', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const preset = classPreset(c, V16)
       expect(BALANCE_KIT_V16[c].accessories, c).toEqual([preset.orb, preset.support])
       expect(BALANCE_KIT_V16[c].magical.every((m) => m === (preset.armor === 'magical')), c).toBe(true)
@@ -189,7 +189,7 @@ describe('R1\'s balance in the world on engine v16 (H71)', () => {
   })
 
   it('never refunds a deep act by a round with the base regen alone, any class, Lv 1–50 (SB18)', () => {
-    for (const c of RPG_ALL_CLASSES) for (let level = 1; level <= 50; level++) {
+    for (const c of RPG_V2_CLASSES) for (let level = 1; level <= 50; level++) {
       const r = refundAt(c, level)
       expect(r.share, `${c} Lv ${level}: ${r.regen} of ${r.deep}`).toBeLessThan(1)
     }
@@ -299,7 +299,7 @@ describe('R1\'s balance in the world on engine v16 (H71)', () => {
         line('v16, no MP support (R2\'s preview)', bare)
       }
       rows.push('', 'Refund: class | MP, base regen a round, deepest act\'s MP, share at Lv 10 · 20 · 30 · 40 · 50 | the most, Lv 1–50')
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const at = [10, 20, 30, 40, 50].map((l) => refundAt(c, l))
         const most = Array.from({ length: 50 }, (_, k) => ({ level: k + 1, ...refundAt(c, k + 1) })).reduce((m, x) => (x.share > m.share ? x : m))
         rows.push(`${c} | ${at.map((x) => `${x.mp}, +${x.regen}, ${x.deep}, ${pct(x.share)}`).join(' · ')} | ${pct(most.share)} at Lv ${most.level}`)

@@ -127,7 +127,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         level={owned ? <>{formatLevel(owned.level)}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></> : undefined}
         chips={<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
-          <TemplateChip outfit={outfit} uma={owned} classId={owned ? activeClass(outfit, owned) : null} />
+          <TemplateChip outfit={outfit} uma={owned} classId={owned ? activeClass(outfit, owned, tier) : null} />
         </div>}
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
@@ -170,6 +170,7 @@ function TargetToggle({ outfitId, on }: { outfitId: string; on: boolean }) {
 
 /** Under the header: one EXP line, then the three facts/actions used most. */
 function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owned: OwnedUma; world: TierWorld; onClass: () => void }) {
+  const active = activeClass(outfit, owned, useActiveTier())
   const navigate = useNavigate()
   const now = useNow(30_000)
   const next = owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
@@ -184,12 +185,12 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
       </div>
       <CallingCard outfit={outfit} uma={owned} />
       <div className="grid grid-cols-[1.1fr_.8fr_1.1fr] gap-1">
-        <button type="button" onClick={onClass} aria-label={`${CLASS_LABEL[activeClass(outfit, owned)]}, Class Rank ${classRankOf(owned.ranks, activeClass(outfit, owned))}`}
+        <button type="button" onClick={onClass} aria-label={`${CLASS_LABEL[active]}, Class Rank ${classRankOf(owned.ranks, active)}`}
           className="flex min-h-12 min-w-0 items-center gap-1.5 rounded-sm bg-raised px-2 text-left">
-          <ClassEmblem classId={activeClass(outfit, owned)} />
+          <ClassEmblem classId={active} />
           <span className="min-w-0">
-            <span className="block truncate text-[11.5px] font-semibold leading-tight">{CLASS_LABEL[activeClass(outfit, owned)]}</span>
-            <span className="block text-[9.5px] leading-tight text-ink-faint">Rank {classRankOf(owned.ranks, activeClass(outfit, owned))}</span>
+            <span className="block truncate text-[11.5px] font-semibold leading-tight">{CLASS_LABEL[active]}</span>
+            <span className="block text-[9.5px] leading-tight text-ink-faint">Rank {classRankOf(owned.ranks, active)}</span>
           </span>
         </button>
         <div className="flex min-h-12 min-w-0 flex-col justify-center rounded-sm bg-raised px-2" aria-label={`${CRAFT_LABEL} ${owned.craft.level}, grade ${highestGrade(owned.craft.level)} open`}>
@@ -238,7 +239,7 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
 
 function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
   const tier = useActiveTier()
-  const classId = activeClass(outfit, uma)
+  const classId = activeClass(outfit, uma, tier)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId))
   // Every battle stat, always listed (combat-balance.md §6.0): the domain builds the sheet, so a rule change shows here.
   const sheet = umaBattleSheet(outfit, uma, classId, tier)
@@ -465,6 +466,7 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
 // --- Racing: the original's profile ---------------------------------------------------------------------------
 
 function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutfit; uma: OwnedUma | null }) {
+  const tier = useActiveTier()
   const [unique, setUnique] = useState<{ name: string; description: string } | null | 'loading'>('loading')
   useEffect(() => {
     let live = true
@@ -479,7 +481,7 @@ function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutf
     { name: 'Style', grades: outfit.aptitudes.strategy as Record<string, string> },
   ]
   // UT14: her template's readings and Flourish, what her aptitudes do here.
-  const template = racingTemplate(outfit, uma, uma ? activeClass(outfit, uma) : null)
+  const template = racingTemplate(outfit, uma, uma ? activeClass(outfit, uma, tier) : null)
   return (
     <div className="space-y-2.5">
       <div className="space-y-1.5 rounded-sm bg-raised p-2">

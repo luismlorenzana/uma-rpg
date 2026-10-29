@@ -4,7 +4,7 @@
 // engine that leaned on its default instead of the fight's version would move them. (Until H72 and H82 twin files
 // replayed them with `caps.ts` mocked to 16 and 17; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
-import { RPG_ALL_CLASSES, RPG_CLASS_SLOTS, RPG_WEAPON_SLOTS, rpgHand } from '../rules'
+import { RPG_V2_CLASSES, RPG_CLASS_SLOTS, RPG_WEAPON_SLOTS, rpgHand } from '../rules'
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, rpgRework, rpgV2 } from './engine'
 import type { BattleAction, BattleCue } from './types'
 import { loadV15Replays, regenerateV15Replays, replayV15, type V15Replay } from './v15-replays.fixture'
@@ -45,7 +45,7 @@ describe('the frozen v15 replays (H64)', () => {
     const all = replays.flatMap(steps)
     const cues = all.flatMap((s) => s.cues)
     // Every class of classes v2, both healers, and Learners.
-    expect(new Set(allies.map((a) => a.classId))).toEqual(new Set(RPG_ALL_CLASSES))
+    expect(new Set(allies.map((a) => a.classId))).toEqual(new Set(RPG_V2_CLASSES))
     expect(replays.filter((r) => r.input.allies.some((a) => a.classId === 'paladin')).length).toBeGreaterThanOrEqual(2)
     expect(replays.filter((r) => r.input.allies.some((a) => a.classId === 'cleric')).length).toBeGreaterThanOrEqual(3)
     expect(allies.some((a) => a.inherits?.length)).toBe(true)

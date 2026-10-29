@@ -7,7 +7,7 @@ import {
 } from '../rpg/battle/caps'
 import type { RpgFlourish } from '../rpg/battle/types'
 import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
-import { projectRpgStats, rpgBaseMpRegen, type RpgClass } from '../rpg/rules'
+import { projectRpgStats, rpgBaseMpRegen, rpgClassName, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
 import { accessoryFlatValue, accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
@@ -18,10 +18,6 @@ import { umaTemplate } from '../roster/template'
 import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
 import { gearV1, isGrades, starMapOf, type OwnedUma } from './save'
 
-/** The classes' names on the sheet ("No effect as Brawler"). */
-const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
-  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric',
-}
 const pct = (share: number) => `${Math.round(share * 1000) / 10}%`
 /** A Flourish in a few words (UT6), from the engine's own numbers: "Even pace · 1% a round, up to 4%". */
 export function flourishShort(flourish: RpgFlourish): string {
@@ -32,7 +28,7 @@ export function flourishShort(flourish: RpgFlourish): string {
 }
 /** The sheet's ★ Flourish row: hers as she fights now, or "No effect as Brawler" outside her calling's class. */
 export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClass): string =>
-  (flourish ? flourishShort(flourish) : `No effect as ${CLASS_NAME[classId]}`)
+  (flourish ? flourishShort(flourish) : `No effect as ${rpgClassName(classId)}`)
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
  * them (v16's MP: "+13 a round"). */
@@ -55,11 +51,14 @@ export function accessorySheetLine(slot: AccessorySlotState | undefined, weapons
 }
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).
  * Classes v2 (H57): her Orb's offense ("Fire Orb +34"), and a healer's mends from her ATK or M.ATK instead of Heal. */
-export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass = activeClass(outfit, uma), tier = 1,
+export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId?: RpgClass, tier = 1,
   engine: number = BATTLE_ENGINE_VERSION): SheetGroup[] {
+  return battleSheet(outfit, uma, classId ?? activeClass(outfit, uma, tier, engine), tier, engine)
+}
+function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tier: number, engine: number): SheetGroup[] {
   const v2 = rpgV2(engine)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId), engine)
-  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick))
+  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick, engine))
   const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
   const geared = applyPoints(base, parts.gear).stats
   const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>
@@ -79,13 +78,13 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: Rpg
   const mends: SheetRow[] = !v2 ? [{ label: 'Heal', value: `${heal} (mends ${times})` }]
     : rpgIsHealer(classId, engine) ? [{ label: 'Mends', value: `${times} (from ${by === 'atk' ? 'ATK' : 'M.ATK'})` }] : []
   // SB18, UT6: the MP she regains at each round's end, the base regen by her Class Rank and her Spring's; her Flourish.
-  const regen = rpgBaseMpRegen(boosted.stats.mp, classRankOf(uma.ranks, classId), engine) + a.mpRegen
+  const regen = rpgBaseMpRegen(boosted.stats.mp, { classId, classRank: classRankOf(uma.ranks, classId) }, engine) + a.mpRegen
   if (isGrades(uma.gear)) {
     const grades = uma.gear
     const gearTier = tier as GearTier
-    const template = moonTemplate(outfit, uma.calling.pick)
+    const template = moonTemplate(outfit, uma.calling.pick, engine)
     const map = starMapOf(uma)
-    const sharedPoints = mapPoints(map.open.filter((id) => !id.startsWith('template:')), classId, gearTier)
+    const sharedPoints = mapPoints(map.open.filter((id) => !id.startsWith('template:')), classId, gearTier, undefined, weapons)
     const sharedStats = applyPoints(base, addPoints(parts.gear, sharedPoints))
     const coreV3 = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow => ({
       label, value: String(boosted.stats[k]), gear: geared[k] - base[k],

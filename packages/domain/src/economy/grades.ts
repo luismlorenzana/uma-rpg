@@ -2,7 +2,7 @@
 import { gradeItem, type GradeLine } from '../items/made-id'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { isRpgElement, type RpgDamageKind } from '../rpg/kinds'
-import { RPG_CLASS_ARMOR, rpgWeaponKind, type RpgClass, type RpgWeapon } from '../rpg/rules'
+import { RPG_CLASS_ARMOR, rpgThirdsSplit, rpgWeaponKind, type RpgClass, type RpgWeapon } from '../rpg/rules'
 import type { UmaFamily } from '../roster/template'
 import { MIGHT_BY_GRADE } from './gear'
 import type { ArmorSlot } from './ranks'
@@ -76,13 +76,22 @@ export function armorValues(slot: ArmorSlot, grade: number, tier: GearTier): Arm
 
 export type ArmorHalf = 'physical' | 'magical'
 
-export function gradePoints(grades: UmaGrades, half: ArmorHalf, tier: GearTier): Points {
+/** Her armor's points: each slot's stat, and its offense to her class's channel (`half`). A Tier 0's offense (`armsThirds`,
+ * the Arms among her three slots; CV7, H126) splits on the five pieces' total instead, a third a slot to its channel, half
+ * up to ATK. */
+export function gradePoints(grades: UmaGrades, half: ArmorHalf, tier: GearTier, armsThirds?: number): Points {
   const points = noPoints()
+  let offense = 0
   for (const slot of Object.keys(grades.armor) as ArmorSlot[]) {
     const grade = grades.armor[slot]?.grade ?? 0
     const piece = armorValues(slot, grade, tier)
     points[piece.stat] += piece.stat === 'hp' ? piece.value / POINT_HP : piece.value
-    points[half === 'physical' ? 'atk' : 'matk'] += piece.offense
+    if (armsThirds === undefined) points[half === 'physical' ? 'atk' : 'matk'] += piece.offense
+    else offense += piece.offense
+  }
+  if (armsThirds !== undefined) {
+    const split = rpgThirdsSplit(offense, armsThirds)
+    points.atk += split.atk; points.matk += split.matk
   }
   return points
 }

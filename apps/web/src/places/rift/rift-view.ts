@@ -74,10 +74,10 @@ export function guidanceMatch(classes: readonly RpgClass[], front: RiftFront): n
 }
 
 /** Each member's active class. */
-export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>): RpgClass[] {
+export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = 1): RpgClass[] {
   return members.flatMap((id) => {
     const uma = world.umas[id], outfit = outfits.get(id)
-    return uma && outfit ? [activeClass(outfit, uma)] : []
+    return uma && outfit ? [activeClass(outfit, uma, tier)] : []
   })
 }
 
@@ -99,11 +99,11 @@ export function guidedWeapons(classes: readonly (RpgClass | null)[], front: Rift
 /** The open party that best fits a front's guidance (ties to the lower index), or null when none can fight. From classes
  * v2 it never proposes a party with two healers (`healerBlock`, H59); `engine` defaults to the live generation. */
 export function bestParty(world: Pick<TierWorld, 'parties' | 'umas'>, front: RiftFront, outfits: ReadonlyMap<string, BattleOutfit>,
-  block: (index: number) => string | null, taken: ReadonlySet<number> = new Set(), engine?: number): number | null {
+  block: (index: number) => string | null, taken: ReadonlySet<number> = new Set(), engine?: number, tier = 1): number | null {
   let best: number | null = null, score = -1
   for (let i = 0; i < world.parties.length; i += 1) {
-    if (taken.has(i) || block(i) !== null || healerBlock(world, fullParty(world, i) ?? [], outfits, engine) !== null) continue
-    const s = guidanceMatch(partyClassesOf(world, fullParty(world, i)!, outfits), front)
+    if (taken.has(i) || block(i) !== null || healerBlock(world, fullParty(world, i) ?? [], outfits, engine, tier) !== null) continue
+    const s = guidanceMatch(partyClassesOf(world, fullParty(world, i)!, outfits, tier), front)
     if (s > score) { best = i; score = s }
   }
   return best
@@ -112,10 +112,10 @@ export function bestParty(world: Pick<TierWorld, 'parties' | 'umas'>, front: Rif
 /** The Convergence's opening assignment: for each front in order, the best-fitting party of the roster not yet taken (from
  * classes v2, none with two healers). */
 export function suggestConvergence(world: Pick<TierWorld, 'parties' | 'umas'>, run: Pick<RiftRun, 'roster'>, outfits: ReadonlyMap<string, BattleOutfit>,
-  engine?: number): (number | null)[] {
+  engine?: number, tier = 1): (number | null)[] {
   const taken = new Set<number>()
   return RIFT_FRONTS.map((front) => {
-    const pick = bestParty(world, front, outfits, (i) => frontPartyBlock(world, run, i), taken, engine)
+    const pick = bestParty(world, front, outfits, (i) => frontPartyBlock(world, run, i), taken, engine, tier)
     if (pick !== null) taken.add(pick)
     return pick
   })

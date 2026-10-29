@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { gradeOf, newGrades, type GradeTarget } from '../economy/grades'
-import { RPG_ALL_CLASSES } from '../rpg/rules'
+import { RPG_V2_CLASSES } from '../rpg/rules'
 import { accessoryFormBlock, accessoryKinds, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
 import { classPresetV3 } from './presets'
 import { accessorySlot, ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
@@ -104,7 +104,7 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     expect(refusal(() => setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'dark', NOW))).toBe('bad-loadout: No Dark Tome in her slots')
     expect(refusal(() => setAccessoryForm(graded(), '101', 'mage', 0, 'orb', 'bow', NOW))).toBe('bad-loadout: No Bow in her slots')
     // Every class's preset Orb or Bell sits on one of her kinds.
-    for (const classId of RPG_ALL_CLASSES) {
+    for (const classId of RPG_V2_CLASSES) {
       const form = classPresetV3(classId).accessory
       if (form.kind) expect(accessoryKinds(world(graded()).umas['101']!, classId)).toContain(form.kind)
     }

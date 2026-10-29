@@ -2,6 +2,8 @@
 export * from './save/save'
 export * from './save/rules'
 export * from './save/battle'
+// Classes v3's class tree for the screens (H126, H120): from `save/class.ts` directly, so it stays out of the main bundle until read.
+export { umaClassTree, umaHeldClasses, type RpgClassTile, type RpgClassTileState } from './save/class'
 export * from './save/sheet'
 export * from './save/status'
 export * from './save/work'

@@ -11,7 +11,7 @@ import { albumRows } from '../../album/rows'
 import { PickerStep } from '../../album/PickerStep'
 import { CLASS_LABEL } from '../../battle/labels'
 import type { MasterView } from '../../master/master'
-import { leadParty, nameParty, recall, setSlot, useAlbumScope, useWorld } from '../../save/game'
+import { leadParty, nameParty, recall, setSlot, useActiveTier, useAlbumScope, useWorld } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon, FlagIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
@@ -56,10 +56,11 @@ function PartyPortrait({ view, outfitId, size, lead = false }: { view: MasterVie
 }
 
 function PartySlot({ view, world, outfitId, lead }: { view: MasterView; world: TierWorld; outfitId: string | null; lead: boolean }) {
+  const tier = useActiveTier()
   if (!outfitId) return <PartyPortrait view={view} outfitId={null} size={56} />
   const outfit = view.roster.find(o => o.outfitId === outfitId)
   const uma = world.umas[outfitId]
-  const classId = outfit && uma ? activeClass(outfit, uma) : null
+  const classId = outfit && uma ? activeClass(outfit, uma, tier) : null
   return (
     <span className="flex min-w-0 flex-col items-center gap-1">
       <PartyPortrait view={view} outfitId={outfitId} size={56} lead={lead} />
@@ -74,6 +75,7 @@ function PartySlot({ view, world, outfitId, lead }: { view: MasterView; world: T
 
 function PartyList({ view, world, place }: { view: MasterView; world: TierWorld; place: Place }) {
   const nav = useHubNavigation()
+  const tier = useActiveTier()
   const owned = Object.keys(world.umas).length
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return (
@@ -94,7 +96,7 @@ function PartyList({ view, world, place }: { view: MasterView; world: TierWorld;
               <PartySlot key={k} view={view} world={world} outfitId={s} lead={s !== null && s === partyLead(party)} />
             ))}
           </span>
-          <HealerNote note={healerNote(world, party, outfits)} className="mt-1.5" />
+          <HealerNote note={healerNote(world, party, outfits, undefined, tier)} className="mt-1.5" />
         </button>
       ))}
     </div>
@@ -136,7 +138,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
         {party.slots.map((outfitId, slot) => {
           const outfit = outfitId ? byId.get(outfitId) : undefined
           const uma = outfitId ? world.umas[outfitId] : undefined
-          const classId = outfit && uma ? activeClass(outfit, uma) : null
+          const classId = outfit && uma ? activeClass(outfit, uma, scope.tier) : null
           return (
             <li key={slot}>
               <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
@@ -156,7 +158,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
           )
         })}
       </ul>
-      <HealerNote note={healerNote(world, party, byId)} className="text-[13px]" />
+      <HealerNote note={healerNote(world, party, byId, undefined, scope.tier)} className="text-[13px]" />
       {error && <p className="text-[13px] text-danger">{error}</p>}
 
       {picking !== null && (

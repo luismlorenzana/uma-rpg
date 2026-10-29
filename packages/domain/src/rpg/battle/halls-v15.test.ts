@@ -8,7 +8,7 @@ import { RPG_SKILL_POWER, RPG_SUPPORT_ALL } from '../catalog'
 import {
   ALL_HERO_LIMIT_IDS, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitPower, heroLimitSkills, type HeroLimitId,
 } from '../heroes'
-import { projectRpgStats, rpgDefaultWeapons, RPG_ALL_CLASSES, rpgOpenDepth, type RpgClass, type RpgProfile } from '../rules'
+import { projectRpgStats, rpgDefaultWeapons, RPG_V2_CLASSES, rpgOpenDepth, type RpgClass, type RpgProfile } from '../rules'
 import { applyBattleAction, createBattle } from './engine'
 import { battleLimitPlan } from './limit'
 import { BATTLE_HEAL_OFFENSE_SCALE, BATTLE_REVIVE_SHARE } from './skills'
@@ -93,7 +93,7 @@ describe('the six halls’ table (H56, §5)', () => {
   })
 
   it('raises the hybrids’ power to 2.2× from v15', () => {
-    expect(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, [heroLimitPower(c, 14), heroLimitPower(c, 15)]]))).toEqual({
+    expect(Object.fromEntries(RPG_V2_CLASSES.map((c) => [c, [heroLimitPower(c, 14), heroLimitPower(c, 15)]]))).toEqual({
       brawler: [2, 2], mage: [2.4, 2.4], spellblade: [2, 2.2], cleric: [1.5, 1.5], summoner: [1.8, 2.2], paladin: [1.5, 1.5],
     })
     const level = RPG_SKILL_POWER[rpgOpenDepth(LEVEL) - 1]!
