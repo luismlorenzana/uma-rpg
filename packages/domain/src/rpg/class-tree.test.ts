@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import { classExpToNext } from '../economy/ranks'
 import {
-  RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS, RPG_ROOT_NAME, RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_MP, RPG_TIER0_POWER,
+  RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS, RPG_ROOT_NAME, RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_MP, RPG_TIER0_POWER, RPG_TIER0_POWER_FACTOR,
   RPG_TIER0_ROOT, RPG_TIER0_SKILL, RPG_TIER1_CLASSES, rpgClassClosedText, rpgClassFamily, rpgClassGate, rpgClassName, rpgClassOpen,
   rpgSuggestedPromotion, rpgThirdsSplit, rpgTier0ExpToNext, rpgTier0Power,
 } from './class-tree'
@@ -74,9 +74,10 @@ describe('Tier 0 (CV5, CV6)', () => {
     expect(3_600 + 2 * RPG_TIER0_BANK).toBe(50_960)
   })
 
-  it('casts one skill a class, its power by Class Rank 1.52 → 2.20, 10 MP', () => {
-    expect(RPG_TIER0_POWER).toEqual([1.52, 1.6, 1.67, 1.75, 1.82, 1.9, 1.97, 2.05, 2.12, 2.2])
-    expect([rpgTier0Power(1), rpgTier0Power(10), rpgTier0Power(14), rpgTier0Power(0)]).toEqual([1.52, 2.2, 2.2, 1.52])
+  it('casts one skill a class, its power by Class Rank §2.2\'s 1.52 → 2.20 × H131\'s 1.05 (D249), 10 MP', () => {
+    expect(RPG_TIER0_POWER_FACTOR).toBe(1.05)
+    expect(RPG_TIER0_POWER).toEqual([1.596, 1.68, 1.754, 1.838, 1.911, 1.995, 2.069, 2.153, 2.226, 2.31])
+    expect([rpgTier0Power(1), rpgTier0Power(10), rpgTier0Power(14), rpgTier0Power(0)]).toEqual([1.596, 2.31, 2.31, 1.596])
     expect(RPG_TIER0_MP).toBe(10)
     expect(RPG_TIER0_SKILL).toEqual({ recruit: 'Drill Strike', apprentice: 'Primer', duelist: 'Feint', caller: 'Beckon', acolyte: 'Vigil' })
   })

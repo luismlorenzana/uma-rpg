@@ -1,7 +1,7 @@
 // The Rift's balance simulation's support (rift.md §11, H51; classes v2 §9, H60): the guided parties, the fights, the
 // buckets and the Duel's guard rail, by engine, shared by `rift/balance.test.ts` (H51's tables, `SIM_ENGINE` picks the
-// generation), `rift/balance-v15.test.ts` (classes v2's targets) and `rift/balance-v16.test.ts` (R1's, H71). Test support
-// only: nothing in the game imports it.
+// generation), `rift/balance-v15.test.ts` (classes v2's targets), `rift/balance-v16.test.ts` (R1's, H71) and
+// `rift/balance-v19.test.ts` (Classes v3's, H131: `guardRailV19`). Test support only: nothing in the game imports it.
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import { applyBattleAction, createBattle } from '../rpg/battle/engine'
 import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
@@ -10,8 +10,8 @@ import { RPG_ALL_NODES, RPG_NODES, rpgNodeSkill, type RpgNode } from '../rpg/cat
 import { heroLimitIds, type HeroLimitId } from '../rpg/hero-id'
 import { isRpgElement } from '../rpg/kinds'
 import { rpgNodeLine, type RpgLines } from '../rpg/node-identity'
-import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, isRpgTome, rpgAutoLoadout, rpgClassSlots, rpgClassTrees, rpgHand, validRpgWeapons,
-  type RpgClass, type RpgNodeRef, type RpgWeapon } from '../rpg/rules'
+import { RPG_ELEMENTS, RPG_TIER0_MAX_RANK, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, isRpgTome, rpgAutoLoadout, rpgClassSlots, rpgClassTrees, rpgHand,
+  rpgIsTier0, validRpgWeapons, type RpgClass, type RpgNodeRef, type RpgWeapon } from '../rpg/rules'
 import { balanceMember, type BalanceOptions } from '../world/balance-party'
 import { play, type Played, type PlayObserver } from '../world/balance-play'
 import { riftGuidedBuild, riftParty, riftTuning } from './fronts'
@@ -27,16 +27,18 @@ export const ctx = (runId: string | null): RiftContext => ({ tier: 1, runId, ros
 
 /** A front's guided party (D168; v2 D178): its five classes in the engine's generation (`riftParty`), on curve at Lv 50;
  * from v16 (H71) its guided build (`riftGuidedBuild`, CP7): each member on her own three weapons. `respec` puts one member
- * at Class Rank 1 (a fresh class, the same gear), as an Uma who has just switched; `options` adds to each member's (H60: a
- * support accessory). */
+ * at a fresh class's Class Rank (the same gear), as an Uma who has just switched: Rank 1, and from v19 Rank 10, where a Tier 1
+ * class opens (CV8; H131's S9); `options` adds to each member's (H60: a support accessory). */
 export const guided = (front: RiftFront, engine: number = BATTLE_ENGINE_VERSION, respec?: number, options: BalanceOptions = {}): BattleAlly[] =>
   (rpgRework('fight', engine)
     ? riftGuidedBuild(front, engine).map((m, i) => balanceMember(m.classId, i, RPG_TIER_MAX_LEVEL,
-      { ...ON_CURVE, engine, weapons: m.weapons, ...options, ...(i === respec ? { classRank: 1 } : {}) }))
+      { ...ON_CURVE, engine, weapons: m.weapons, ...options, ...(i === respec ? { classRank: freshRank(engine) } : {}) }))
     : partyOf(riftParty(front, engine), engine, respec, options))
+/** A fresh class's Class Rank in an engine's generation: 1, and from v19 a Tier 1 class's 10 (CV8). */
+const freshRank = (engine: number): number => (rpgRework('classes', engine) ? RPG_TIER0_MAX_RANK : 1)
 /** Five classes on curve at Lv 50 in an engine's generation. */
 export const partyOf = (classes: readonly RpgClass[], engine: number = BATTLE_ENGINE_VERSION, respec?: number, options: BalanceOptions = {}): BattleAlly[] =>
-  classes.map((c, i) => balanceMember(c, i, RPG_TIER_MAX_LEVEL, { ...ON_CURVE, engine, ...options, ...(i === respec ? { classRank: 1 } : {}) }))
+  classes.map((c, i) => balanceMember(c, i, RPG_TIER_MAX_LEVEL, { ...ON_CURVE, engine, ...options, ...(i === respec ? { classRank: freshRank(engine) } : {}) }))
 /** The same Uma with the game's default loadout (`rpgAutoLoadout`: each weapon's deepest open cores), as a save fights
  * before the player picks her skills, in an engine's generation (from v16 her held skills on her `lines`, H71). The
  * balance party equips each weapon's deepest core and side skill instead (from v16 her deepest held ones). */
@@ -108,7 +110,7 @@ function withSkills(base: BattleAlly, nodes: readonly RpgNode[], engine: number)
 const railOthers = (engine: number): BattleAlly[] =>
   (rpgV2(engine) ? ['brawler', 'mage', 'spellblade', 'summoner'] as const : ['brawler', 'mage', 'cleric', 'summoner'] as const)
     .map((c, i) => balanceMember(c, i + 1, 50, { ...ON_CURVE, engine }))
-interface RailFight { chips: number; arms: number; tome: number }
+interface RailFight { chips: number; arms: number; tome: number; hits: number }
 /** The shield points one act removes from the rail boss, or null when the engine refuses the act; from v15 also split by
  * the kind of the hit each point followed (an Arms kind or an element). `linger` presets her own lingering summon (a
  * Summoner's earlier act), `limit` a full gauge. */
@@ -123,9 +125,10 @@ function railFight(ally: BattleAlly, action: (id: string, target: string) => Bat
   const before = foe.shield
   const step = applyBattleAction(state, action('100', foe.id))
   if (step.error) return null
-  let arms = 0, tome = 0, shield = before, last: BattleCue | null = null
+  let arms = 0, tome = 0, hits = 0, shield = before, last: BattleCue | null = null
   for (const c of step.cues) {
     if (c.kind === 'hit' && c.actorId === '100') last = c
+    if (c.kind === 'hit' && c.actorId === '100' && c.targetId === foe.id && c.channel !== 'status') hits++
     if (c.kind === 'shield' && c.targetId === foe.id && c.amount !== undefined) {
       const points = shield - c.amount
       shield = c.amount
@@ -133,11 +136,12 @@ function railFight(ally: BattleAlly, action: (id: string, target: string) => Bat
       else arms += points
     }
   }
-  return { chips: before - step.state.units.find((u) => u.side === 'enemy')!.shield, arms, tome }
+  return { chips: before - step.state.units.find((u) => u.side === 'enemy')!.shield, arms, tome, hits }
 }
 
 export interface RailAct { chips: number; act: string }
-export interface Rail { classId: RpgClass; own: RailAct; limit: RailAct }
+/** From v19 (H131) also the Limit Break that lands the most hits on the rail boss (HV15's ceiling, `HERO_LIMIT_MAX_HITS`). */
+export interface Rail { classId: RpgClass; own: RailAct; limit: RailAct; hits?: { hits: number; act: string } }
 const best = (list: readonly RailAct[]): RailAct => list.reduce((a, b) => (b.chips > a.chips ? b : a), { chips: 0, act: '—' })
 
 /**
@@ -149,6 +153,7 @@ const best = (list: readonly RailAct[]): RailAct => list.reduce((a, b) => (b.chi
  * at full strength. No buffs from others.
  */
 export function guardRail(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): Rail {
+  if (rpgRework('classes', engine)) return guardRailV19(classId, engine)
   return rpgRework('fight', engine) ? guardRailV16(classId, engine) : rpgV2(engine) ? guardRailV2(classId, engine) : guardRailV1(classId)
 }
 
@@ -333,6 +338,72 @@ function guardRailV16(classId: RpgClass, engine: number): Rail {
   const railChips = (ally: BattleAlly, action: (id: string, target: string) => BattleAction, setup?: (s: BattleState) => void): number | null =>
     railFight(ally, action, engine, others, setup)?.chips ?? null
   return { classId, own, limit: limitRail(base, heroLimitIds(engine), railChips) }
+}
+
+/**
+ * Classes v3's rail (v19, H131; classes-v3 §10.1, halls-v2 HV15): v16's at Class Rank 50, for all thirteen classes. A pair
+ * class's halves are credited by the kind of the hit each point followed, so her lead half's extra hit (`rpgHand(…, 19)`'s
+ * `lead` and `extra`) counts on whichever channel leads; her lingering farewell is her lead half's (the hand's `linger`: the
+ * Tome Summoner's Tome summons, the Arms Summoner's Arms ones), played before her best pair. A Tier 0 is a one-half class at
+ * Class Rank 10, her one skill on each of the ten weapons. Limit Breaks: Halls v2's twenty at full strength, each at her
+ * class's scale (`heroLimitScale`, read by the engine), and the most hits any lands on the boss (HV15: 10 at most).
+ */
+function guardRailV19(classId: RpgClass, engine: number): Rail {
+  const others = railOthers(engine)
+  const base = balanceMember(classId, 0, 50, { ...ON_CURVE, engine, classRank: rpgIsTier0(classId) ? RPG_TIER0_MAX_RANK : 50 })
+  const nodes = RPG_ALL_NODES.filter((n) => rpgClassTrees(classId).includes(n.tree) && rpgNodeLine(n.id) !== null)
+  const hand = rpgHand({ classId }, engine)
+  const pair = hand.pair
+  const acts: (RailAct & { tome: boolean })[] = []
+  const partner = (ally: BattleAlly, tome: boolean): BattleHalf => ({ weapon: ally.weapons.find((w) => isRpgTome(w) !== tome)! })
+  const credit = (r: RailFight | null, tome: boolean): number | null => (r === null ? null : pair ? (tome ? r.tome : r.arms) : r.chips)
+  for (const weapon of [...new Set([...base.weapons, ...nodes.map((n) => n.weapon)])]) {
+    const ally = withHeld(base, [], engine)
+    const armed = ally && weaponsWith(classId, ally.weapons, [weapon], engine)
+    if (!ally || !armed) continue
+    const a = { ...ally, weapons: armed }
+    const tome = isRpgTome(weapon)
+    const chips = credit(railFight(a, (id, target) => ({ kind: 'attack', actorId: id, targetId: target, weapon, ...(pair ? { pair: partner(a, tome) } : {}) }), engine, others), tome)
+    if (chips !== null) acts.push({ chips, act: `Attack (${weapon})`, tome })
+  }
+  for (const node of nodes) {
+    const ally = withHeld(base, [node], engine)
+    if (!ally) continue
+    const tome = isRpgTome(node.weapon)
+    const skill = { tier: 1, id: node.id }
+    const chips = credit(railFight(ally, (id, target) => ({ kind: 'skill', actorId: id, targetId: target, skill, ...(pair ? { pair: partner(ally, tome) } : {}) }), engine, others), tome)
+    if (chips !== null) acts.push({ chips, act: node.name, tome })
+  }
+  let own: RailAct
+  if (pair) {
+    const arms = best(acts.filter((a) => !a.tome)), tome = best(acts.filter((a) => a.tome))
+    own = { chips: arms.chips + tome.chips, act: `${arms.act} + ${tome.act}` }
+  } else own = best(acts)
+  if (pair && hand.linger > 0) {
+    // Her own earlier lead summon says farewell first (only the lead half lingers, Bonded's at 0.4): the best farewell.
+    const leadTome = hand.lead === 'tome'
+    const lingerers = nodes.filter((n) => rpgNodeSkill(n, engine).summon && isRpgTome(n.weapon) === leadTome)
+    const probe = withHeld(base, [], engine)!
+    const act = (id: string, target: string): BattleAction => ({ kind: 'attack', actorId: id, targetId: target,
+      weapon: probe.weapons.find((w) => isRpgTome(w) === leadTome)!, pair: partner(probe, leadTome) })
+    const plain = railFight(probe, act, engine, others)!.chips
+    const farewell = lingerers.reduce((m, l) => {
+      const r = railFight(probe, act, engine, others, (s) => { s.summons = [{ allyId: '100', ref: { tier: 1, id: l.id }, scale: rpgNodeSkill(l, engine).summon!.linger }] })
+      const c = (r?.chips ?? plain) - plain
+      return c > m.chips ? { chips: c, act: l.name } : m
+    }, { chips: 0, act: '—' })
+    own = { chips: own.chips + farewell.chips, act: `${own.act} (${farewell.act} lingering)` }
+  }
+  // Every Limit Break of Halls v2's twenty, fired by her as its Hero with a full gauge: the most chips and the most hits.
+  let limit: RailAct = { chips: 0, act: '—' }, hits = { hits: 0, act: '—' }
+  for (const hero of heroLimitIds(engine)) {
+    const { inherits: _, ...plain } = { ...base, hero }
+    const r = railFight(plain, (id, target) => ({ kind: 'limit', actorId: id, targetId: target }), engine, others,
+      (s) => { s.units.find((u) => u.id === '100')!.limit = BATTLE_LIMIT_MAX })
+    if (r && r.chips > limit.chips) limit = { chips: r.chips, act: `Limit Break ${hero}` }
+    if (r && r.hits > hits.hits) hits = { hits: r.hits, act: `Limit Break ${hero}` }
+  }
+  return { classId, own, limit, hits }
 }
 
 /** The Duel's shields, stage 1 to 12, in an engine's tuning. */

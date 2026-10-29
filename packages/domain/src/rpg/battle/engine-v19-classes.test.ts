@@ -92,7 +92,7 @@ describe('engine v19: who may fight as what (CV8, CV10)', () => {
 })
 
 describe('engine v19: a Tier 0\'s one skill (CV6)', () => {
-  it('lands a Recruit\'s Drill Strike at her Attack\'s damage × 1.52 at Rank 1 and × 2.20 at Rank 10, for 10 MP', () => {
+  it('lands a Recruit\'s Drill Strike at her Attack\'s damage × her Rank\'s power (§2.2 × H131\'s 1.05) at Rank 1 and 10, for 10 MP', () => {
     const strike = (classRank: number) => {
       const a3 = member('a3', 'recruit', { classRank, level: 30 })
       const s = start(input(party({ ...a3, stats: { ...a3.stats, atk: 3000 } })))
@@ -102,7 +102,7 @@ describe('engine v19: a Tier 0\'s one skill (CV6)', () => {
       const own = battleDamage(s, unitOf(s, 'a3'), unitOf(s, 'f1'), 'physical', RPG_TIER0_POWER[classRank - 1]!, 'greatsword').amount
       return { hits, attack, own, mp: unitOf(s, 'a3').mp - unitOf(step.state, 'a3').mp }
     }
-    for (const [rank, power] of [[1, 1.52], [10, 2.2]] as const) {
+    for (const [rank, power] of [[1, RPG_TIER0_POWER[0]!], [10, RPG_TIER0_POWER[9]!]] as const) {
       const r = strike(rank)
       expect(r.hits.map((h) => [h.element, h.weak]), `R${rank}`).toEqual([['greatsword', true]])
       expect(r.hits[0]!.amount, `R${rank}`).toBe(r.own)
@@ -129,11 +129,11 @@ describe('engine v19: a Tier 0\'s one skill (CV6)', () => {
     // Halls v2 (H129) replaced H126's interim class powers: from v19 the seat's own (Triad Onslaught's 2.5) × her scale (1).
     const total = (a: BattleAlly) => battleLimitPlan(a, { hero: 'brawler-1' as HeroLimitId }, V19)!.casts.reduce((n, c) => n + c.def.hits.reduce((m, h) => m + h.power, 0), 0)
     const recruit = { ...member('a3', 'recruit', { classRank: 7 }), hero: 'brawler-1' as HeroLimitId }
-    expect(rpgOpenPower({ classId: 'recruit', classRank: 7 }, V19)).toBe(1.97)
+    expect(rpgOpenPower({ classId: 'recruit', classRank: 7 }, V19)).toBe(RPG_TIER0_POWER[6])
     expect(heroLimitFor('brawler-1', V19)!.power).toBe(2.5)
-    expect(total(recruit)).toBeCloseTo(2.5 * heroLimitScale('recruit', V19) * 1.97, 2)
+    expect(total(recruit)).toBeCloseTo(2.5 * heroLimitScale('recruit', V19) * RPG_TIER0_POWER[6]!, 2)
     const brawler = { ...member('a3', 'brawler', { classRank: 10 }), hero: 'brawler-1' as HeroLimitId }
-    expect(total(brawler)).toBeCloseTo(2.5 * 2.2, 2)
+    expect(total(brawler)).toBeCloseTo(2.5 * heroLimitScale('brawler', V19) * 2.2, 2)
     // It fires in a fight.
     const s = start(input(party(recruit)))
     unitOf(s, 'a3').limit = 12

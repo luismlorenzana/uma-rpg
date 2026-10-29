@@ -1,7 +1,8 @@
 // What a fight did, read from its cues (R1's balance, H71): each Uma's damage by channel and turn, each skill half's casts,
 // a healer's mends and absorbed Barriers, the party's damage taken, rounds to each foe's first Break from her arrival,
-// and the foes' charged moves (armed, cancelled); from H81 each Uma's Attacks and Flourish mends. Shared by
-// `world/balance-v16.test.ts`, `rift/balance-v16.test.ts` and their v17 files
+// and the foes' charged moves (armed, cancelled); from H81 each Uma's Attacks and Flourish mends; from H131 each Uma's Limit
+// Break casts (the foes standing at each, their hits, weak and in her own kinds, and the damage on a Broken foe) and the damage
+// by tree. Shared by `world/balance-v16.test.ts`, `rift/balance-v16.test.ts`, their v17 files and the v19 ones
 // (H60's and H63's own tallies stay in `rift/balance-v15.test.ts`). Test support only: nothing in the game imports it.
 import type { BattleAction, BattleAlly, BattleCue, BattleState, BattleStep, EnemyRank } from '../rpg/battle/types'
 import { rpgNode } from '../rpg/catalog'
@@ -16,6 +17,11 @@ export interface UmaLog {
   big: number; bigTurns: number
   /** Her acts that were an Attack (an accessory Bell's trigger, H81), and the HP her Flourish mended her (UT6). */
   attacks: number; flourish: number
+  /** Her Limit Break acts, and how many foes stood at each: `limitFoes[n]` casts with n standing (Halls v2's H1, H131); its
+   * hits, those that landed weak, and the damage of those that landed on a Broken foe. */
+  limits: number; limitFoes: number[]; limitHits: number; limitWeak: number; limitBroken: number
+  /** Her Limit Break hits in a kind she wields (her weapons' Might and her accessory's flat offense ride them). */
+  limitOwn: number
 }
 /** A skill half's casts: how many, and the damage its kind's hits dealt (her farewell apart). */
 export interface CastLog { n: number; dmg: number }
@@ -35,7 +41,7 @@ export interface FightLog {
   charges: { armed: number; cancelled: number }
 }
 const umaLog = (classId: RpgClass): UmaLog => ({ classId, physical: 0, magical: 0, limitPhysical: 0, limitMagical: 0, farewell: 0, turns: 0, heal: 0,
-  big: 0, bigTurns: 0, attacks: 0, flourish: 0 })
+  big: 0, bigTurns: 0, attacks: 0, flourish: 0, limits: 0, limitFoes: [], limitHits: 0, limitWeak: 0, limitBroken: 0, limitOwn: 0 })
 const breakLog = (): BreakLog => ({ foes: 0, broke: 0, rounds: 0, roundsAll: 0 })
 export const fightLog = (): FightLog => ({ fights: 0, wins: 0, rounds: 0, umas: {}, casts: {}, absorbed: 0, taken: 0,
   breaks: { regular: breakLog(), 'sub-boss': breakLog(), boss: breakLog() }, charges: { armed: 0, cancelled: 0 } })
@@ -54,6 +60,7 @@ export function logFight(allies: readonly BattleAlly[], into: FightLog): { obser
   const arrived = new Map<string, number>()
   const broke = new Map<string, number>()
   const fell = new Map<string, number>()
+  const brokenNow = new Set<string>()
   const armed = new Set<string>()
   let last = 0
   const kindOf = (w: RpgWeapon | undefined): RpgDamageKind | null => (w ? rpgWeaponKind(w) : null)
@@ -66,6 +73,11 @@ export function logFight(allies: readonly BattleAlly[], into: FightLog): { obser
     const uma = into.umas[ally.id]!
     uma.turns++
     if (action.kind === 'attack') uma.attacks++
+    if (action.kind === 'limit') {
+      const n = before.units.filter((u) => u.side === 'enemy' && u.hp > 0).length
+      uma.limits++
+      uma.limitFoes[n] = (uma.limitFoes[n] ?? 0) + 1
+    }
     const bigFoes = new Set(before.units.filter((u) => u.side === 'enemy' && u.hp > 0 && (rankOf.get(u.id) ?? 'regular') !== 'regular').map((u) => u.id))
     if (bigFoes.size) uma.bigTurns++
     // The halves of her act and their kinds: a skill's primary kind, or an Attack's weapon's.
@@ -92,13 +104,22 @@ export function logFight(allies: readonly BattleAlly[], into: FightLog): { obser
         if (m) into.absorbed += Number(m[1])
       }
       if (c.kind === 'break' && !broke.has(c.targetId)) broke.set(c.targetId, before.round)
+      if (c.kind === 'break') brokenNow.add(c.targetId)
+      if (c.kind === 'recover') brokenNow.delete(c.targetId)
       if (c.kind === 'ko' && foes.has(c.targetId) && !fell.has(c.targetId)) fell.set(c.targetId, before.round)
       if (c.kind === 'cancel') into.charges.cancelled++
       if (c.kind === 'summon' && c.actorId === action.actorId) farewells = before.units.filter((u) => u.side === 'enemy' && u.hp > 0).length
       if (foePhase || c.kind !== 'hit' || c.actorId !== action.actorId || !foes.has(c.targetId) || c.channel === 'status') continue
       if (bigFoes.has(c.targetId)) uma.big += c.amount
       if (farewells > 0) { uma.farewell += c.amount; farewells--; uma[c.channel] += c.amount; continue }
-      if (action.kind === 'limit') { uma[c.channel === 'physical' ? 'limitPhysical' : 'limitMagical'] += c.amount; continue }
+      if (action.kind === 'limit') {
+        uma[c.channel === 'physical' ? 'limitPhysical' : 'limitMagical'] += c.amount
+        uma.limitHits++
+        if (c.weak) uma.limitWeak++
+        if (c.element && ally.weapons.some((w) => rpgWeaponKind(w) === c.element)) uma.limitOwn++
+        if (brokenNow.has(c.targetId)) uma.limitBroken += c.amount
+        continue
+      }
       uma[c.channel] += c.amount
       const half = halves.length === 1 ? halves[0] : halves.find((h) => h.kind === c.element)
       if (half?.id) into.casts[half.id]!.dmg += c.amount
@@ -131,6 +152,8 @@ const addUma = (m: UmaLog, u: UmaLog): void => {
   m.physical += u.physical; m.magical += u.magical; m.limitPhysical += u.limitPhysical; m.limitMagical += u.limitMagical
   m.farewell += u.farewell; m.turns += u.turns; m.heal += u.heal; m.big += u.big; m.bigTurns += u.bigTurns
   m.attacks += u.attacks; m.flourish += u.flourish
+  m.limits += u.limits; m.limitHits += u.limitHits; m.limitWeak += u.limitWeak; m.limitBroken += u.limitBroken; m.limitOwn += u.limitOwn
+  u.limitFoes.forEach((k, n) => { if (k) m.limitFoes[n] = (m.limitFoes[n] ?? 0) + k })
 }
 export function byClass(log: FightLog, classId: RpgClass): UmaLog | undefined {
   const list = Object.values(log.umas).filter((u) => u.classId === classId)
@@ -139,6 +162,14 @@ export function byClass(log: FightLog, classId: RpgClass): UmaLog | undefined {
   for (const u of list) addUma(m, u)
   return m
 }
+/** Her damage a turn without her Limit Breaks (H131's S6: Halls v2 raises them by design): her own acts' damage, farewells
+ * included, over her turns that were not a Limit Break. */
+export const actPerTurn = (u: UmaLog | undefined): number => (u && u.turns > u.limits ? (u.physical + u.magical) / (u.turns - u.limits) : 0)
+/** Her Limit Breaks' damage. */
+export const limitDamage = (u: UmaLog): number => u.limitPhysical + u.limitMagical
+/** The damage her casts of a tree's nodes dealt (H131's S6 shares: the Bow's and Dark's trees), farewells apart. */
+export const treeDamage = (log: FightLog, tree: string): number =>
+  Object.entries(log.casts).reduce((m, [id, c]) => (rpgNode(id)?.tree === tree ? m + c.dmg : m), 0)
 /** Her physical share of all her damage (H63's: farewells and Limit Breaks by their channel included). */
 export const physicalShare = (u: UmaLog): number => (u.physical + u.limitPhysical) / Math.max(1, damageOf(u))
 /** The casts of some nodes, merged. */

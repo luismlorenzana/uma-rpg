@@ -29,10 +29,19 @@ export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = rpgV2() ? PO
 export const HERO_LIMIT_SUPPORT_SHARE = 0.66
 /** Halls v2's class scale (HV5): her Limit Break's power × this, 1 for every class but the two healers (a Tier 0 is no
  * healer, CV22), who act at half power and carry the party's support: a healer on a Healer seat lands today's 1.5×. The
- * v19 table, for the screens and the manual; the engine reads `heroLimitScale(classId, version)`. */
+ * v19 table, for the screens and the manual; the engine reads `heroLimitScale(classId, version)`.
+ * H131 (D249) measured each class's Limit Break damage a fight against v18's on the balance party's world stages (Halls v2's
+ * HV-D, H1; 32 seeds) against §3.5's change at her casts (HV5's formula at the foes standing when she cast) and moved each
+ * scale to its band's edge toward it (the drafts 1 and 0.75; the bands 0.95–1.05 and 0.70–0.80). Measured ÷ the formula at
+ * the drafts, then at these: the Brawler 108% → 105% (met), the Sorcerer 115% → 111%, the Arms Spellblade 149% → 142%, the Tome
+ * Spellblade 138% → 133%, the Arms Summoner 151% → 145%, the Tome Summoner 158% → 150%, the Paladin 75% → 79%, the Cleric
+ * 83% → 88%. What no scale closes is offense: a Learner's first home seat now strikes in her own weapons' kinds (every hit, from
+ * 0% for the hybrids and two thirds for the Brawler and the Sorcerer), so her weapons' Might and her accessory's flat offense
+ * ride it, where the healers' seats moved off theirs (the Paladin 100% → 46%, the Cleric 52% → 0%). The Tier 0s keep 1 (no
+ * v18 to measure against). */
 export const HERO_LIMIT_SCALE: Readonly<Record<RpgClass, number>> = {
-  brawler: 1, mage: 1, spellblade: 1, cleric: 0.75, summoner: 1, paladin: 0.75,
-  recruit: 1, duelist: 1, acolyte: 1, caller: 1, apprentice: 1, armsummoner: 1, tomeblade: 1,
+  brawler: 0.95, mage: 0.95, spellblade: 0.95, cleric: 0.8, summoner: 0.95, paladin: 0.8,
+  recruit: 1, duelist: 1, acolyte: 1, caller: 1, apprentice: 1, armsummoner: 0.95, tomeblade: 0.95,
 }
 /** Her class's scale in an engine's generation: Halls v2's from v19, 1 before (her class's power is the whole of it). */
 export const heroLimitScale = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): number =>

@@ -64,9 +64,14 @@ export const RPG_TIER0_MODEL: Readonly<Record<RpgTier0Class, RpgTier1Class>> = {
 export const RPG_TIER0_SKILL: Readonly<Record<RpgTier0Class, string>> = {
   recruit: 'Drill Strike', apprentice: 'Primer', duelist: 'Feint', caller: 'Beckon', acolyte: 'Vigil',
 }
-/** Her skill's power by Class Rank 1–10 (§2.2): depth 1's first rank to depth 2's middle, in single-target units; no Skill
- * Rank on top. */
-export const RPG_TIER0_POWER = [1.52, 1.6, 1.67, 1.75, 1.82, 1.9, 1.97, 2.05, 2.12, 2.2] as const
+/** §2.2's draft power by Class Rank 1–10: depth 1's first rank to depth 2's middle. */
+const TIER0_POWER_DRAFT = [1.52, 1.6, 1.67, 1.75, 1.82, 1.9, 1.97, 2.05, 2.12, 2.2] as const
+/** The one factor on the draft (classes-v3 §12's S1 knob, inside ×0.9–1.1): H131 (D249) set ×1 → ×1.05. At ×1 the five Tier
+ * 0s on defaults took 1.07 rounds longer than v18's balance party on continent 1's boss stages (9.58 against 8.51, 32 seeds;
+ * the target ±1); at ×1.05 0.83 longer (its fights 0.57, its sub-bosses −0.05, the capital's Finals 0.38), every win 100%. */
+export const RPG_TIER0_POWER_FACTOR = 1.05
+/** Her skill's power by Class Rank 1–10 (§2.2 × `RPG_TIER0_POWER_FACTOR`), in single-target units; no Skill Rank on top. */
+export const RPG_TIER0_POWER: readonly number[] = TIER0_POWER_DRAFT.map((p) => Math.round(p * RPG_TIER0_POWER_FACTOR * 1000) / 1000)
 /** Her skill's MP at every rank, before her hand (×1): depth 1's. */
 export const RPG_TIER0_MP = 10
 /** A Tier 0's top Class Rank: she promotes there (CV8). */

@@ -297,10 +297,22 @@ const handsV16 = byRework(HANDS_V1, HANDS_V2, { ...HANDS_V2, summoner: hand(0.58
  * a stage's foes shared one list; with each foe her own, the Spell Blade's single-target hits find the weak foe and the
  * mirror fell to 84–85% at Lv 30 and 50 (106% at Lv 10). 0.62 centres it, about 99% over Lv 10–50, her split still 70/30;
  * her Arms hand would cost the split (0.60: 55–62% magical). */
-const handsOf = (engine: number): Readonly<Record<RpgClass, RpgHand>> => {
+const handsV18 = (engine: number): Readonly<Record<RpgClass, RpgHand>> => {
   const older = handsV16(engine)
   return rpgRework('weak', engine) ? { ...older, summoner: hand(0.62, 0.5, 0.62, 0.5, 0.3, true, 'tome') } : older
 }
+/** Classes v3's balance (v19, H131, D249; classes-v3 §12's S3–S5, measured on the world's regular stages against the Arms
+ * Spellblade, 32 seeds): the Tome Spellblade's Arms hand 0.44 → 0.48 (S3: her magical share 75–76% at Lv 10–20 at 0.44, her
+ * damage already 100% of the Arms Spellblade's; now 68–74%, 102–103%); the Arms Summoner's Tome hand 0.50 → 0.46 (S4: 107% of
+ * the Tome Summoner at Lv 40 at 0.50; now 96–103%); the Summoners' lead hand 0.62 → 0.57, both (S5: the Summoners 106–117% of
+ * the Spellblades at 0.62; now 98–104%, but the Tome Summoner's 114% at Lv 10, where v18's was 110%). */
+const HANDS_V19: Readonly<Partial<Record<RpgClass, RpgHand>>> = {
+  summoner: hand(0.57, 0.5, 0.57, 0.5, 0.3, true, 'tome'),
+  armsummoner: hand(0.57, 0.57, 0.46, 0.5, 0.3, true, 'arms'),
+  tomeblade: hand(0.72, 0.48, 0.72, 0.5, 0, true, 'tome', true),
+}
+const handsOf = (engine: number): Readonly<Record<RpgClass, RpgHand>> =>
+  (rpgRework('classes', engine) ? { ...handsV18(engine), ...HANDS_V19 } : handsV18(engine))
 export function rpgHand(p: Pick<RpgProfile, 'classId'>, engine: number = BATTLE_ENGINE_VERSION): RpgHand {
   return { ...handsOf(engine)[p.classId] }
 }

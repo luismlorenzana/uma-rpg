@@ -193,6 +193,10 @@ damage classes' 2.2× (Brawler 2.0, Mage 2.4, the hybrids 2.2). A Brawler on her
 2.45×, from 2.0×); a Sorcerer stays (2.45× from 2.4×); the Summoner keeps 2.2×; the Spell Blade gives up 9% (2.0×
 from 2.2×) for 8–10 hits; the healers keep 1.5×. The simulation confirms it (HV-D).
 
+**Measured by H131 (D249):** the ladder stands as drafted (no Limit Break's own power moves, §3.4); the class scale is **0.95**
+for the six Tier 1 damage classes and **0.8** for the Paladin and the Cleric (the drafts 1 and 0.75, each moved to its band's
+edge by H1, §3.5), and 1 for the Tier 0s, so a healer on a Healer seat lands 1.6×.
+
 ### 3.3 The damage order, with numbers
 
 At 100%, a damage class (scale 1), on a Broken foe (an unbroken one halves every row alike), before her stats; × her
@@ -257,6 +261,16 @@ ten**, against four in ten for a one-kind seat.
 | A Spell Blade's seat | 2.2×, fused two-kind hits | A pact | 2.0×, two kinds in turn at random |
 | A Summoner's seat | 2.2×, mostly random or one foe | A familiar | 2.2×, every foe ×3 |
 | A healer's seat | 1.5× (a healer) with support | A deity | 1.5× (a healer), 2.0× (anyone else) with one stack |
+
+**Measured by H131 (D249)** (HV-D; the balance party's Learners on their class's first home seat, world stages Lv 10–50, 32
+seeds): each class's Limit Break damage a fight, v19 ÷ v18, against this table's change at her own casts (the seat's power ×
+her scale × her open power × her Bond, by its shape at the foes standing), at the scales above: the Brawler **105%** (met),
+the Sorcerer 111%, the Arms Spellblade 142%, the Tome Spellblade 133%, the Arms Summoner 145%, the Tome Summoner 150%, the
+Paladin 79%, the Cleric 88% (at the drafts 108, 115, 149, 138, 151, 158, 75, 83%). What a scale can't close is offense: each
+class's home seats strike in her own weapons' kinds (every hit, from none for the hybrids and two thirds for the Brawler
+and the Sorcerer), so her weapons' Might and her accessory's flat offense ride them, and the healers' seats left theirs
+(the Paladin's hits in her kinds 100% → 46%, the Cleric's 52% → 0%). Party win rates (H2): 0 points off v18 at every
+level, with either healer.
 
 ## 4. Every Limit Break
 

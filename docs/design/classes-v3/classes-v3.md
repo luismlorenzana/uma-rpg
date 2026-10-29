@@ -215,6 +215,8 @@ label, never a class she fights as: it has no id, no rank and no rules.
 | **Power** | 1.52 | 1.60 | 1.67 | 1.75 | 1.82 | 1.90 | 1.97 | 2.05 | 2.12 | 2.20 |
 | Today at the same Uma Lv (her best skill: depth 1, then depth 2 from Lv 7) | 1.52 | 1.52 | 1.56 | 1.60 | 1.64 | 1.68 | 2.09 | 2.15 | 2.20 | 2.20 |
 
+- **Measured by H131 (D249):** ×1.05 on every rank (§12's S1, `RPG_TIER0_POWER_FACTOR`): 1.60 · 1.68 · 1.75 · 1.84 · 1.91 ·
+  2.00 · 2.07 · 2.15 · 2.23 · 2.31.
 - **MP 10 at every rank**, before her hand (×1): depth 1's full-turn cost. Her base MP regen is depth 1's, 1% of her max
   MP a round.
 - **What a row leaves out: nothing.** No rider, no special, no line, no fork. An Attack stays an Attack (1.0, one of her
@@ -305,6 +307,10 @@ their pair (CV15). "What changes" lists what an owner of today's class would not
 | Tome Summoner | Magical hybrid | 2 Tomes + 1 Arm | 30/70 | Tome 0.62 + Arms 0.50; MP ×0.5 a half | 1 0.95 1.1 1 1 1 | 30/70 | M.ATK | 10 | Bonded (Tomes), Pack (Arms) |
 | Tome Spellblade | Magical hybrid | 2 Tomes + 1 Arm | 30/70 | Tome 0.72 + Arms 0.44; MP ×0.5 a half | 1 0.95 1.1 1 1 1 | 30/70 | M.ATK | 10 | Pierce |
 | Sorcerer | Magical | 3 Tomes | 0/100 | ×1, MP ×1 | 0.9 0.9 1.15 0.9 1.1 1.3 | 0/100 | M.ATK | 5 | Wave, Spike, Bolt, **Pierce**, **Barrage** |
+
+**Measured by H131 (D249)** (§12's S3–S5; engine v19 only): the Tome Spellblade's hand is Tome 0.72 + Arms **0.48**, the
+Arms Summoner's Arms **0.57** + Tome **0.46**, the Tome Summoner's Tome **0.57** + Arms 0.50; and Halls v2's Limit Break scale
+is **0.95** for the six Tier 1 damage classes and **0.8** for the Paladin and the Cleric (H1; the sheets below give the drafts).
 
 **The two pairs' identities** (the owner: "remains with their multi-hit identity" and "their AoE identity"):
 - **Spellblades are multi-hit.** Every act is a pair; her **lead half lands one extra hit** (the same total); every skill
@@ -807,21 +813,29 @@ Spellblades and the Summoners. The Rift has four fronts. **Each front's guided b
 
 ## 12. Balance targets and the simulation
 
-What the balance packet (CV-C) measures on engine v19 with the existing sims (`world/balance-*.test.ts`,
-`rift/balance-*.test.ts`), and the knob for each (CV34):
+Built in H131 (D249), live from H134.
 
-| # | Check | Target | Knob, in order |
-|---|---|---|---|
-| S1 | **Tier 0 through continent 1:** a party of the five Tier 0s on defaults, at Tier 0 Rank = Uma Lv, over every region of continent 1 and its capital's Finals | Win rates and rounds within ±5 points and ±1 round of today's party at the same levels | Tier 0 power (1.52 → 2.20), then continent 1's regular-foe HP |
-| S2 | **The ladder:** `balanceClassRank` reads v3's pace (Tier 0, promoted at 10) | Depths 2–5 at Lv 10 · 16 · 22 · 29, never after the foes' reach | The Tier 0 curve |
-| S3 | **The Spellblade mirror:** Arms against Tome Spellblade a turn, Lv 10–50, world stages | Within ±5%; splits 70/30 ± 5 each way | The Tome Spellblade's hands, Arms half first |
-| S4 | **The Summoner mirror:** Arms against Tome Summoner | Within ±5%; splits 70/30 ± 5 | The Arms Summoner's Tome hand |
-| S5 | **The pairs:** Spellblades against Summoners | 90–110% (engine v18: 88–110%) | The Summoners' lead hand |
-| S6 | **The volley:** Bow and Dark trees' share of a holder's damage on 1-, 3- and 5-foe stages; the Brawler's and Sorcerer's party damage against v18 | Brawler and Sorcerer within ±5% of v18 on regular stages; the volley the best act on 2-foe stages | Splash 0.35 (0.30–0.40), then target 0.8. **Shared:** Halls v2's two volley seats read the same constants |
-| S7 | **Paladin against Cleric** sustain | ±10% (unchanged) | — |
-| S8 | **The Rift's four builds** at tier Lv 50, on curve | Each front's win rate within ±5 points of engine v18's; the Duel's guard rail (best single act ≤ 10 chips; shields 13+) | `riftTuning` per front, as H71 and H81 did |
-| S9 | **Echoes** with a fresh class (now Rank 10) | The Lv 45 Echo still won with one fresh Uma | — |
-| S10 | **Shield chips** on world stages with the volley's splash | Rounds to the Break within ±0.5 of v18 | The splash (plain hits already chip; a cap if needed) |
+What the balance packet (CV-C) measures on engine v19 with the existing sims (`world/balance-*.test.ts`,
+`rift/balance-*.test.ts`), and the knob for each (CV34). **Measured (H131)** is engine v19 against v18 on the same seeds,
+32 a stage, on curve, first try on Auto (`world/balance-v19.test.ts`, `rift/balance-v19.test.ts`, `SIM=1`); every knob moved
+is a v19 value, so no v18 fight changed.
+
+| # | Check | Target | Knob, in order | Measured (H131) |
+|---|---|---|---|---|
+| S1 | **Tier 0 through continent 1:** a party of the five Tier 0s on defaults, at Tier 0 Rank = Uma Lv, over every region of continent 1 and its capital's Finals | Win rates and rounds within ±5 points and ±1 round of today's party at the same levels | Tier 0 power (1.52 → 2.20), then continent 1's regular-foe HP | **Met** with Tier 0 power ×1.05 (`RPG_TIER0_POWER_FACTOR`: 1.60 → 2.31); foe HP unchanged. Every win 100% on both; rounds +0.57 on fights, −0.05 on sub-bosses, +0.83 on bosses, +0.38 on the Finals' three routes (at ×1 the bosses +1.07) |
+| S2 | **The ladder:** `balanceClassRank` reads v3's pace (Tier 0, promoted at 10) | Depths 2–5 at Lv 10 · 16 · 22 · 29, never after the foes' reach | The Tier 0 curve | **Met** on the curve as drafted (2 × (120 + 16 × rank)): depths 2–5 at Lv 10 · 16 · 22 · 29, Rank 50 at 36, each by its foes' reach. The curve didn't move, so the reset's refund stays "the first 1,800 again" |
+| S3 | **The Spellblade mirror:** Arms against Tome Spellblade a turn, Lv 10–50, world stages | Within ±5%; splits 70/30 ± 5 each way | The Tome Spellblade's hands, Arms half first | Tome ÷ Arms **102–103%** at Lv 10–50 (regular stages); the Tome Spellblade 68–74% magical, with her Arms hand 0.44 → **0.48** (75–76% at Lv 10–20 before). **Missed:** the Arms Spellblade 74% physical to Lv 20 and 79–80% from Lv 30 (v18 72–75%): her Shrike Pact is all Arms where v18's seat was half Fire, and her hands aren't this knob |
+| S4 | **The Summoner mirror:** Arms against Tome Summoner | Within ±5%; splits 70/30 ± 5 | The Arms Summoner's Tome hand | **Met:** 96–103%, with her Tome hand 0.50 → **0.46** (107% at Lv 40 before); the Arms Summoner 68–73% physical, the Tome Summoner 66–72% magical |
+| S5 | **The pairs:** Spellblades against Summoners | 90–110% (engine v18: 88–110%) | The Summoners' lead hand | Lead hand 0.62 → **0.57**, both (106–117% before): Tome Summoner ÷ Arms Spellblade 102–104% and Arms Summoner ÷ Tome Spellblade 98–106% at Lv 10–50, **but** the Tome Summoner's 114% at Lv 10 (v18's 110%; 0.55 would take her split under 65% at Lv 30) |
+| S6 | **The volley:** Bow and Dark trees' share of a holder's damage on 1-, 3- and 5-foe stages; the Brawler's and Sorcerer's party damage against v18 | Brawler and Sorcerer within ±5% of v18 on regular stages; the volley the best act on 2-foe stages | Splash 0.35 (0.30–0.40), then target 0.8. **Shared:** Halls v2's two volley seats read the same constants | Splash and target **unchanged** (0.35, 0.8). Every shape's act within 0.01 of §4.1's table on 1–6 foes; the volley the best at 2 (1.15). The Brawler and the Sorcerer a turn without Limit Breaks 101–102% and 99–102% of v18 at Lv 10, 40 and 50, 95% and 100% at Lv 30; **missed at Lv 20** (90%, 90%): S2's pace (depth 3 there, v18's 4), which no volley knob reaches. At Lv 50 on 1 · 3 · 5 foes the Bow tree deals 38 · 68 · 70% of a Brawler's damage (Greatsword, Axe, Bow; v18 80 · 62 · 20%) and Dark 31 · 66 · 69% of a Sorcerer's (Fire, Ice, Dark; v18 32 · 30 · 23%). **The lines (CV14):** the Dark Barrage met (her a turn B ÷ A 1.03 · 1.05 on the sub-bosses and bosses at Lv 30 · 50, 0.98 · 0.95 elsewhere); the Light Pierce 0.9 → **0.85** ties A (0.96 · 0.99 on shielded sub-bosses, 1.02 · 1.02 elsewhere; at 0.875–0.9 Auto casts it three times as often and it leads everywhere, 1.09–1.17 and 1.10); the Bow Barrage, kept at 1, ties its volley on the bosses (1.03 · 0.98) and leads elsewhere (1.06 · 1.05): both **missed**, the closest the band allows |
+| S7 | **Paladin against Cleric** sustain | ±10% (unchanged) | — | **Missed** (no knob): the Paladin's mends and absorbed Barriers a fight 89% of the Cleric's at Lv 10, 147% at Lv 30, 121% at Lv 50, 105% on the Lv 50 bosses; 117% in all (R1 and R2 111–112%) |
+| S8 | **The Rift's four builds** at tier Lv 50, on curve | Each front's win rate within ±5 points of engine v18's; the Duel's guard rail (best single act ≤ 10 chips; shields 13+) | `riftTuning` per front, as H71 and H81 did | **Met but one** with `RIFT_TUNING_V19` (Iron ×0.88 HP; the Duel ×1.3 HP; champions Iron ×1.13 HP ×1.08 offense, Arcane ×1.01 ×0.94, Duel ×1, Horde ×1.25), points off v18 by stages 1–4 · 5–8 · 9–11 · champion: Iron +3.9 · −1.3 · **+16.0** · +2.1, Arcane −2.1 · −1.8 · 0 · −2.1, Duel −0.5 · 0 · +4.5 · −4.2, Horde +0.5 · −2.1 · −1.0 · −4.2 ([rift.md §11](../rift.md#11-balance-targets)). The rail: every class's best own act 1–10 chips (the Summoners 10, the Spellblades 9), the best Limit Break 10 (Firefly Pact), at most 10 hits on one foe; shields 13–15 unchanged |
+| S9 | **Echoes** with a fresh class (now Rank 10) | The Lv 45 Echo still won with one fresh Uma | — | **Met:** 100% on every front with one Uma fresh at Class Rank 10 |
+| S10 | **Shield chips** on world stages with the volley's splash | Rounds to the Break within ±0.5 of v18 | The splash (plain hits already chip; a cap if needed) | **Met:** the worst 0.45 rounds (the Lv 50 boss, sooner); no splash rule added |
+
+Halls v2's two (HV-D), measured with these: **H1** each class's Limit Break against halls-v2 §3.5's change, and **H2** party
+win rates within ±3 points of v18's ([halls-v2 §3.2 and §3.5](halls-v2.md#35-against-today)): H2 0 points everywhere; H1
+met by the Brawler only, the class scales at their bands' edges (0.95, the healers 0.8).
 
 ## 13. Engine v19 and save v32
 

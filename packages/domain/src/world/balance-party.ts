@@ -7,7 +7,8 @@ import type { BattleAlly, BattleInput } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgIsTier0, rpgWeaponKind, type RpgDamageKind } from '../rpg/kinds'
-import { heroHallClass } from '../rpg/hero-id'
+import { heroHallClass, heroLimitHall, heroLimitIds, heroSeatHome, type HeroLimitId } from '../rpg/hero-id'
+import { RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL } from '../rpg/class-tree'
 import type { RpgLines } from '../rpg/node-identity'
 import {
   learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
@@ -98,14 +99,41 @@ const kitOf = (classId: RpgClass, engine: number): BalanceKit =>
  * Level's curve, so it is the highest rank whose total Class EXP from Rank 1 fits in twice her total Uma EXP to `level`:
  * Class Rank 20 at Lv 13, 30 at 20, 40 at 27, 50 at 34 (class-progression §7.1). From v16 the balance party reads it;
  * to v15 her Class Rank is her level, as H60 measured.
+ * From v19 (Classes v3, CV5, CV8; H131) a Tier 1 class's: she fought her Tier 0 to Rank 10 at Lv 10 (its 3,600, where the old
+ * Ranks 1–10 took 1,800) and opened her Tier 1 class at Rank 10, so it is Rank 10 until Lv 10, then the highest rank whose
+ * total from Rank 1 fits in 2 × her Uma EXP − 1,800: depths 2–5 at Lv 10 · 16 · 22 · 29, Rank 50 at 36 (§2.6's table). A
+ * Tier 0's is `balanceClassRankOf`'s.
  */
-export function balanceClassRank(level: number): number {
+export function balanceClassRank(level: number, engine: number = BATTLE_ENGINE_VERSION): number {
   let uma = 0
   for (let l = 1; l < level; l++) uma += rpgExpToNext(l)
-  const budget = CLASS_EXP_SHARE * uma
+  let budget = CLASS_EXP_SHARE * uma
+  if (rpgRework('classes', engine)) {
+    let old = 0
+    for (let r = 1; r < RPG_TIER0_MAX_RANK; r++) old += classExpToNext(r)
+    budget = Math.max(old, budget - old)
+  }
   let rank = 1, spent = 0
   while (rank < CLASS_MAX_RANK && spent + classExpToNext(rank) <= budget) { spent += classExpToNext(rank); rank++ }
   return rank
+}
+/** Her class's Class Rank at a level in an engine's generation (H131): from v19 a Tier 0's is her level up to 10 (CV5: Rank r
+ * with Uma Lv r when she fights as it from Lv 1), anyone else's `balanceClassRank`. */
+export const balanceClassRankOf = (classId: RpgClass, level: number, engine: number = BATTLE_ENGINE_VERSION): number =>
+  (rpgRework('classes', engine) && rpgIsTier0(classId) ? Math.min(level, RPG_TIER0_MAX_RANK) : balanceClassRank(level, engine))
+/**
+ * The seat she learns under (H131, decision 2): to v18 her class's hall's first, `${class}-1` (Classes v3's seven in their
+ * family hall's, `heroHallClass`, H126). From v19 her class's first home seat in Halls v2 (`heroSeatHome`: the Brawler
+ * `brawler-1`, the Sorcerer `mage-1`, the Arms Spellblade `spellblade-1`, the Tome Spellblade `spellblade-3`, the Arms
+ * Summoner `summoner-1`, the Tome Summoner `summoner-3`, the Paladin `healer-1`, the Cleric `healer-3`); a Tier 0, who has
+ * no home seat, her family hall's seat 1 (the hall of her model child's seats: the Recruit `brawler-1`, the Duelist
+ * `spellblade-1`, the Acolyte `healer-1`, the Caller `summoner-1`, the Apprentice `mage-1`). HV3's order makes seat 1 of a
+ * class's two her own, so v18 and v19 compare seat for seat (halls-v2 §3.5).
+ */
+export function balanceSeat(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): HeroLimitId {
+  if (!rpgRework('classes', engine)) return `${heroHallClass(classId)}-1`
+  const home = (c: RpgClass): HeroLimitId => heroLimitIds(engine).find((id) => heroSeatHome(id, engine) === c)!
+  return rpgIsTier0(classId) ? `${heroLimitHall(home(RPG_TIER0_MODEL[classId]))}-1` : home(classId)
 }
 
 /** Her active Extra Stats nodes: the moons her level and the gem grades allow, the best first, across her kit's stats.
@@ -201,7 +229,7 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   const lines: RpgLines | undefined = held.length ? Object.fromEntries(held) : undefined
   let profile: RpgProfile = { outfitId: `${100 + i}`, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
     growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0, wit: 0 }, classId, weapons, tier, level, exp: 0,
-    tree: [], legacy: [], classRank: options.classRank ?? (v16 ? balanceClassRank(level) : level), ...(lines ? { lines } : {}) }
+    tree: [], legacy: [], classRank: options.classRank ?? (v16 ? balanceClassRankOf(classId, level, engine) : level), ...(lines ? { lines } : {}) }
   // To v15 she learns the A side at every depth while her points last; from v16 nothing is learned (CP14).
   if (!rpgRework('fight', engine)) {
     for (let d = 5; d >= 1; d--) for (const tree of rpgProfileTrees(profile)) if (!rpgLearnBlock(profile, `${tree}.${d}a`)) profile = learnRpgNode(profile, `${tree}.${d}a`)
@@ -216,10 +244,10 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
     }
   }
   // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23);
-  // Classes v3's seven under their family hall's first (`heroHallClass`, H126).
+  // Classes v3's seven under their family hall's first (`heroHallClass`, H126); from v19 Halls v2's (`balanceSeat`, H131).
   const bond = Math.min(10, Math.floor(level / 2.3))
-  const hall = heroHallClass(classId)
-  const inherits = options.heroes && level >= 5 ? [{ limit: `${hall}-1` as const, bond, from: `hero-${hall}` }] : undefined
+  const seat = balanceSeat(classId, engine)
+  const inherits = options.heroes && level >= 5 ? [{ limit: seat, bond, from: `hero-${heroLimitHall(seat)}` }] : undefined
   if (rpgRework('economy', engine)) return v17Member(classId, profile, loadout, inherits, options, engine)
   const grade = onCurveGrade(level)
   const kit = kitOf(classId, engine)

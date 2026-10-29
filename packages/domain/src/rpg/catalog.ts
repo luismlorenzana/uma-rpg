@@ -213,10 +213,17 @@ export const RPG_LINE_B_POWER_V16: Readonly<Partial<Record<RpgClass, Readonly<Pa
  * v19 (CV14, H128): the B lines' power factor, read from v19 as `RPG_LINE_B_POWER_V16` is v16–v18. The Sorcerer's Pierce
  * moves from her Dark tree to her Light tree with its measured 0.9; the three moved lines (the Brawler's Bow Barrage, the
  * Sorcerer's Light Pierce and Dark Barrage) are the balance's knobs (H131, within 0.85–1.15), the Barrages starting at 1.
+ * H131 (D249) measured each alone on B against line A (H71's Target 4 at v19, 32 seeds; her damage a turn B ÷ A on the
+ * sub-bosses and bosses, or on the shielded sub-bosses, then elsewhere; Lv 30 · 50). Her Light Pierce 0.9 → 0.85: at 0.875
+ * (and 0.9) Auto casts it three times as often as A and it leads everywhere (1.09 · 1.17 in context, 1.10 · 1.10 elsewhere)
+ * while the party's sub-boss fights run 0.3–0.5 rounds longer; at the band's floor it ties A (0.96 · 0.99 in context, 1.02 ·
+ * 1.02 elsewhere), the closest to both bounds. The Barrages stay 1: the Sorcerer's Dark meets both (1.03 · 1.05 in context,
+ * 0.98 · 0.95 elsewhere); the Brawler's Bow ties its volley on the bosses (1.03 · 0.98) and leads elsewhere (1.06 · 1.05), and
+ * at 1.05 it still ties on Lv 50's (1.06 · 1.00) and leads further elsewhere (1.08 · 1.07).
  */
 export const RPG_LINE_B_POWER_V19: Readonly<Partial<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, number>>>>>> = {
   brawler: { lance: 0.95, katana: 0.9, bow: 1 },
-  mage: { 'tome-light': 0.9, 'tome-ice': 1.1, 'tome-dark': 1 },
+  mage: { 'tome-light': 0.85, 'tome-ice': 1.1, 'tome-dark': 1 },
 }
 /** A node of three generations: `skill` (v6–v15), `skill16` where v16–v18 play another def, `skill19` where v19 plays
  * another than v16–v18; its name and summary the live generation's. */

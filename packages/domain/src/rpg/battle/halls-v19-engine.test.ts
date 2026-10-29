@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { heroLimitFor, heroLimitIds, heroLimitScale, type HeroLimitId } from '../heroes'
-import { projectRpgStats, rpgDefaultWeapons, rpgOpenPower, type RpgClass, type RpgProfile } from '../rules'
+import { projectRpgStats, rpgDefaultWeapons, rpgOpenPower, RPG_TIER0_POWER, type RpgClass, type RpgProfile } from '../rules'
 import { applyBattleAction, createBattle } from './engine'
 import { battleLimitPlan } from './limit'
 import type { BattleAlly, BattleCue, BattleEnemy, BattleInherit, BattleInput, BattleState, BattleStep } from './types'
@@ -55,31 +55,33 @@ const total = (a: BattleAlly, seat: HeroLimitId) =>
 const refused = (i: BattleInput) => () => createBattle(i)
 
 describe('engine v19: a Limit Break’s own power × her class’s scale × her open power (HV5)', () => {
-  it('lands a Hero’s Ten Thousand Swings as one hit worth 2.9 × her open power', () => {
+  it('lands a Hero’s Ten Thousand Swings as one hit worth 2.9 × her class’s scale × her open power', () => {
     const a = hero('brawler-2')
     const open = rpgOpenPower({ classId: 'brawler', classRank: 20 }, V19)
     const plan = battleLimitPlan(a, {}, V19)!
     expect([plan.name, plan.casts.length, plan.casts[0]!.def.hits.length, plan.casts[0]!.scale]).toEqual(['Ten Thousand Swings', 1, 1, 1])
-    expect(plan.casts[0]!.def.hits[0]!.power).toBeCloseTo(2.9 * open, 2)
+    expect(plan.casts[0]!.def.hits[0]!.power).toBeCloseTo(2.9 * heroLimitScale('brawler', V19) * open, 2)
     const struck = hits(fire(fight(a), 'brawler-2').cues)
     expect(struck.map((c) => `${c.targetId}:${c.element}`)).toEqual(['f1:greatsword'])
   })
 
-  it('scales the same Limit Break ×0.75 from a Paladin Hero', () => {
+  it('scales the same Limit Break by a Paladin Hero’s scale (0.8 since H131; the draft 0.75)', () => {
     const open = rpgOpenPower({ classId: 'paladin', classRank: 20 }, V19)
-    expect(heroLimitScale('paladin', V19)).toBe(0.75)
-    expect(total(hero('brawler-2', 'paladin'), 'brawler-2')).toBeCloseTo(2.9 * 0.75 * open, 2)
+    const healer = heroLimitScale('paladin', V19)
+    expect(healer).toBe(0.8)
+    expect(total(hero('brawler-2', 'paladin'), 'brawler-2')).toBeCloseTo(2.9 * healer * open, 2)
     expect(total(hero('brawler-2', 'paladin'), 'brawler-2') / total(hero('brawler-2', 'brawler'), 'brawler-2'))
-      .toBeCloseTo(0.75 * open / rpgOpenPower({ classId: 'brawler', classRank: 20 }, V19), 3)
+      .toBeCloseTo(healer * open / (heroLimitScale('brawler', V19) * rpgOpenPower({ classId: 'brawler', classRank: 20 }, V19)), 3)
     // A Cleric's too; an Acolyte is no healer (CV22), so hers is whole.
-    expect(total(hero('brawler-2', 'cleric'), 'brawler-2')).toBeCloseTo(2.9 * 0.75 * rpgOpenPower({ classId: 'cleric', classRank: 20 }, V19), 2)
-    expect(total(hero('brawler-2', 'acolyte', { classRank: 10 }), 'brawler-2')).toBeCloseTo(2.9 * 2.2, 2)
+    expect(total(hero('brawler-2', 'cleric'), 'brawler-2')).toBeCloseTo(2.9 * heroLimitScale('cleric', V19) * rpgOpenPower({ classId: 'cleric', classRank: 20 }, V19), 2)
+    expect(total(hero('brawler-2', 'acolyte', { classRank: 10 }), 'brawler-2')).toBeCloseTo(2.9 * RPG_TIER0_POWER[9]!, 2)
   })
 
-  it('casts a Recruit Hero’s at her skill’s power at Class Rank 4: 1.75', () => {
-    expect(rpgOpenPower({ classId: 'recruit', classRank: 4 }, V19)).toBe(1.75)
-    expect(total(hero('brawler-2', 'recruit', { classRank: 4 }), 'brawler-2')).toBeCloseTo(2.9 * 1.75, 2)
-    expect(total(hero('summoner-3', 'recruit', { classRank: 4 }), 'summoner-3')).toBeCloseTo(2.2 * 1.75 * 0.55, 2)
+  it('casts a Recruit Hero’s at her skill’s power at Class Rank 4 (1.75 × H131’s 1.05)', () => {
+    const r4 = RPG_TIER0_POWER[3]!
+    expect(rpgOpenPower({ classId: 'recruit', classRank: 4 }, V19)).toBe(r4)
+    expect(total(hero('brawler-2', 'recruit', { classRank: 4 }), 'brawler-2')).toBeCloseTo(2.9 * r4, 2)
+    expect(total(hero('summoner-3', 'recruit', { classRank: 4 }), 'summoner-3')).toBeCloseTo(2.2 * r4 * 0.55, 2)
   })
 
   it('casts a Learner’s at 50% at Bond 0, and lands its whole stack', () => {
