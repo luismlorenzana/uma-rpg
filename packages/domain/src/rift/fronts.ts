@@ -217,11 +217,30 @@ const RIFT_TUNING_V17: RiftTuning = {
   champions: { ...RIFT_TUNING_V16.champions, iron: { hp: 1.15, offense: 1.15 }, horde: { hp: 1.4, offense: 1.4 } },
 }
 
+/**
+ * Classes v3's Rift, Tier 1 (engine v19; H131, D249): v17's numbers for Classes v3's four builds (CV23, `BUILDS_V19`), tuned
+ * against v18's builds on v17's numbers by stage group (classes-v3 §12's S8: ±5 points). On v17's numbers the v19 builds
+ * were −9, −5, +15 and −42 points off v18's on Iron (stages 1–4, 5–8, 9–11, the champion), −3, −3, 0, +13 on Arcane, 0, 0,
+ * +6, +33 on the Duel (its four Spellblades won the champion every time) and 0, −3, −1, −19 on the Horde: Iron ×0.88 HP (×1),
+ * the Duel ×1.3 HP (×1.1), and the champions Iron ×1.13 HP and ×1.08 offense (×1.15 both), Arcane ×1.01 and ×0.94 (×1 and
+ * ×0.92), the Duel ×1 (×0.8) and the Horde ×1.25 (×1.4). At 32 seeds every group is within ±5 points but Iron's stages 9–11
+ * (99% against 83%): one scale moves every Iron stage, and from ×1 to ×0.88 stages 1–4 went from 9 under to 4 over while
+ * 9–11 stayed 15–16 over (rift.md §11).
+ */
+const RIFT_TUNING_V19: RiftTuning = {
+  ...RIFT_TUNING_V17,
+  scale: { ...RIFT_TUNING_V17.scale, iron: { hp: 0.88, offense: 1.6 } },
+  duel: { ...RIFT_TUNING_V17.duel, hp: 1.3 },
+  champions: { iron: { hp: 1.13, offense: 1.08 }, arcane: { hp: 1.01, offense: 0.94 }, duel: { hp: 1, offense: 1 }, horde: { hp: 1.25, offense: 1.25 } },
+}
+
 /** The numbers a Rift fight's engine reads (H60): `RIFT_TUNING` to v14, classes v2's override from v15, the Tier rework's
- * from v16 (H66) and R2's from v17 (H81), read through the fight's version so a fight started before the switch keeps its generation's foes.
- * Faces, ranks and counts are the same in all, so the run's face allocation (`picker.ts`) holds for any. */
+ * from v16 (H66), R2's from v17 (H81) and Classes v3's from v19 (H131), read through the fight's version so a fight started
+ * before the switch keeps its generation's foes. Faces, ranks and counts are the same in all, so the run's face allocation
+ * (`picker.ts`) holds for any. */
 export const riftTuning = (engine: number = BATTLE_ENGINE_VERSION): RiftTuning =>
-  (rpgRework('economy', engine) ? RIFT_TUNING_V17 : rpgRework('fight', engine) ? RIFT_TUNING_V16 : rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
+  (rpgRework('classes', engine) ? RIFT_TUNING_V19 : rpgRework('economy', engine) ? RIFT_TUNING_V17 : rpgRework('fight', engine) ? RIFT_TUNING_V16
+    : rpgV2(engine) ? RIFT_TUNING_V15 : RIFT_TUNING)
 
 /** One foe of a Rift stage, before faces, weaknesses and levels. */
 export interface RiftSlot {

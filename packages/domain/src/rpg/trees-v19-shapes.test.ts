@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   RPG_ALL_NODES, RPG_LINE_B_POWER_V16, RPG_LINE_B_POWER_V19, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_VOLLEY, RPG_VOLLEY_MP,
-  rpgNode, rpgNodeSkill, type RpgHit, type RpgSkillDef,
+  rpgNode, rpgNodeSkill, rpgRankedSkill, type RpgHit, type RpgSkillDef,
 } from './catalog'
 import { RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchBName, rpgBranchNode, rpgClassWeapons } from './node-identity'
 import { isRpgTome, rpgClasses, RPG_WEAPONS, rpgIsTier0, type RpgClass, type RpgWeapon } from './kinds'
@@ -22,6 +22,8 @@ const coreHits = (tree: string, v: number) => DEPTHS.map((d) => def(`${tree}.${d
 /** A line B node's id at a depth. */
 const lineB = (c: RpgClass, w: RpgWeapon, d: number) => rpgBranchNode(c, w, d, 'B')
 const digest = (x: unknown) => createHash('sha256').update(JSON.stringify(x)).digest('hex')
+/** The three moved B lines' factors (H131, D249: the Light Pierce 0.9 → 0.85, the Barrages 1). */
+const BOW_B = RPG_LINE_B_POWER_V19.brawler!.bow!, LIGHT_B = RPG_LINE_B_POWER_V19.mage!['tome-light']!, DARK_B = RPG_LINE_B_POWER_V19.mage!['tome-dark']!
 
 /** A volley at depth `d`: `n` hits sharing `RPG_VOLLEY.target` × `scale` × the depth's power on one foe, one splash hit at
  * `RPG_VOLLEY.splash` × it, `RPG_VOLLEY_MP` over `baseMp`. */
@@ -55,7 +57,8 @@ describe('§4.2 at engine v19 against v18', () => {
     for (const d of [3, 4, 5]) {
       expect(lineB('brawler', 'bow', d)).toBe(`brawler-bow.${d}b`)
       expect(def(`brawler-bow.${d}b`, V18).splash, 'v18 Rain').toBeDefined()
-      expect(def(`brawler-bow.${d}b`, V19)).toEqual(def(`brawler-bow.${d}`, V18))
+      // The old core at H131's tuned factor (D249).
+      expect(def(`brawler-bow.${d}b`, V19)).toEqual(rpgRankedSkill(def(`brawler-bow.${d}`, V18), BOW_B))
       expect(def(`brawler-bow.${d}b`, V19)).toMatchObject({ target: 'one', mp: MP(d) })
       expect(def(`brawler-bow.${d}b`, V19).hits).toHaveLength([4, 4, 6][d - 3]!)
     }
@@ -81,7 +84,7 @@ describe('§4.2 at engine v19 against v18', () => {
       const pierce = def(`mage-tome-light.${d}b`, V19)
       expect(pierce).toMatchObject({ target: 'one', mp: MP(d) + 2, special: 'pierce', primary: 'light' })
       expect(pierce.hits).toHaveLength(1)
-      expect(pierce.hits[0]!.power).toBeCloseTo(RPG_PIERCE_SCALE * 0.9 * P(d), 3)
+      expect(pierce.hits[0]!.power).toBeCloseTo(RPG_PIERCE_SCALE * LIGHT_B * P(d), 3)
       expect(def(`mage-tome-light.${d}b`, V18).target).toBe('all')
     }
     expect(coreHits('mage-tome-dark', V18)).toEqual([2, 2, 2, 2, 2])
@@ -96,11 +99,12 @@ describe('§4.2 at engine v19 against v18', () => {
       const barrage = def(`mage-tome-dark.${d}a`, V19)
       expect(barrage).toMatchObject({ target: 'one', mp: MP(d), primary: 'dark' })
       expect(barrage.hits).toHaveLength([4, 4, 6][d - 3]!)
-      expect(sum(barrage.hits)).toBeCloseTo(P(d), 2)
+      expect(sum(barrage.hits)).toBeCloseTo(DARK_B * P(d), 2)
       expect([barrage.splash, barrage.special]).toEqual([undefined, d === 5 ? 'vs-wounded' : undefined])
-      // The Brawler's Bow B on Dark: the twins' B lines mirror.
+      // The Brawler's Bow B on Dark: the twins' B lines mirror, each at its own tuned factor (H131).
       const bow = def(`brawler-bow.${d}b`, V19)
-      expect([barrage.target, barrage.mp, barrage.hits.map((h) => h.power)]).toEqual([bow.target, bow.mp, bow.hits.map((h) => h.power)])
+      expect([barrage.target, barrage.mp, barrage.hits.length]).toEqual([bow.target, bow.mp, bow.hits.length])
+      barrage.hits.forEach((h, k) => expect(h.power / DARK_B).toBeCloseTo(bow.hits[k]!.power / BOW_B, 3))
       expect(def(`mage-tome-dark.${d}a`, V18).special).toBe('pierce')
     }
   })
@@ -180,8 +184,8 @@ describe('§4.2 at engine v19 against v18', () => {
 })
 
 describe('the B lines at v19 (CV14)', () => {
-  it('moves the Sorcerer\'s measured 0.9 from her Dark B to her Light B; the Barrages start at 1', () => {
-    expect(RPG_LINE_B_POWER_V19).toEqual({ brawler: { lance: 0.95, katana: 0.9, bow: 1 }, mage: { 'tome-light': 0.9, 'tome-ice': 1.1, 'tome-dark': 1 } })
+  it('moves the Sorcerer\'s Pierce from her Dark B to her Light B (0.85 since H131, D249); the Barrages stay at 1', () => {
+    expect(RPG_LINE_B_POWER_V19).toEqual({ brawler: { lance: 0.95, katana: 0.9, bow: 1 }, mage: { 'tome-light': 0.85, 'tome-ice': 1.1, 'tome-dark': 1 } })
     expect(RPG_LINE_B_POWER_V16).toEqual({ brawler: { lance: 0.95, katana: 0.9 }, mage: { 'tome-dark': 0.9, 'tome-ice': 1.1 } })
     // The lines that kept their factor play v16's tuned def.
     for (const id of ['brawler-lance.4a', 'brawler-katana.4a', 'mage-tome-ice.4a']) expect(def(id, V19)).toEqual(def(id, V18))

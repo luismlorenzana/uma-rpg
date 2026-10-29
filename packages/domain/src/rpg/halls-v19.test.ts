@@ -10,7 +10,7 @@ import {
   isHeroLimitId, type HeroHall, type HeroLimit, type HeroLimitId,
 } from './heroes'
 import {
-  RPG_ALL_CLASSES, RPG_DAMAGE_KINDS, rpgAnsweredTwinSets, rpgDefaultWeapons, rpgPhysical, type RpgClass, type RpgDamageKind, type RpgTwinSet,
+  RPG_ALL_CLASSES, RPG_DAMAGE_KINDS, rpgAnsweredTwinSets, rpgDefaultWeapons, rpgIsTier0, rpgPhysical, type RpgClass, type RpgDamageKind, type RpgTwinSet,
 } from './rules'
 import { BATTLE_STATUS_STEP } from './battle/skills'
 
@@ -208,10 +208,12 @@ describe('the twenty Limit Breaks (HV5–HV16, §4)', () => {
     }
   })
 
-  it('scales by class from v19: 1 for every class but the Paladin and the Cleric, 0.75 for those two', () => {
-    expect(Object.entries(HERO_LIMIT_SCALE).filter(([, s]) => s !== 1)).toEqual([['cleric', 0.75], ['paladin', 0.75]])
+  it('scales by class from v19: H131\'s (D249) 0.95 for the six Tier 1 damage classes and 0.8 for the healers, 1 for a Tier 0', () => {
+    // The drafts were 1 and 0.75 (HV5); H1 moved each to its band's edge (0.95–1.05, 0.70–0.80).
+    expect(Object.entries(HERO_LIMIT_SCALE).filter(([, s]) => s !== 1)).toEqual([['brawler', 0.95], ['mage', 0.95], ['spellblade', 0.95],
+      ['cleric', 0.8], ['summoner', 0.95], ['paladin', 0.8], ['armsummoner', 0.95], ['tomeblade', 0.95]])
     for (const c of RPG_ALL_CLASSES) {
-      expect(heroLimitScale(c, V19), c).toBe(c === 'paladin' || c === 'cleric' ? 0.75 : 1)
+      expect(heroLimitScale(c, V19), c).toBe(c === 'paladin' || c === 'cleric' ? 0.8 : rpgIsTier0(c) ? 1 : 0.95)
       expect(heroLimitScale(c, 18), c).toBe(1)
     }
   })

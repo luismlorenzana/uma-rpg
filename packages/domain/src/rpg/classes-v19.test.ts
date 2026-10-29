@@ -77,9 +77,12 @@ describe('each class\'s v19 row (§2.4, §3, §3.8)', () => {
     const shape = (c: RpgClass, v: number) => { const h = rpgHand({ classId: c }, v); return [h.arms, h.tome, h.mp, h.pair, h.lead, h.extra, h.linger] }
     for (const c of RPG_TIER0_CLASSES) expect(shape(c, V19), c).toEqual([1, 1, 1, false, null, false, 0])
     expect(shape('spellblade', V19)).toEqual([0.72, 0.44, 0.5, true, 'arms', true, 0])
-    expect(shape('tomeblade', V19)).toEqual([0.44, 0.72, 0.5, true, 'tome', true, 0])
-    expect(shape('armsummoner', V19)).toEqual([0.62, 0.5, 0.5, true, 'arms', false, 0.3])
-    expect(shape('summoner', V19)).toEqual([0.5, 0.62, 0.5, true, 'tome', false, 0.3])
+    // H131 (D249) tuned the mirrors' hands from these drafts: the Tome Spellblade's Arms 0.44 → 0.48, the Arms Summoner's
+    // Tome 0.50 → 0.46, the Summoners' lead 0.62 → 0.57 (the Tome Summoner's from v19 only).
+    expect(shape('tomeblade', V19)).toEqual([0.48, 0.72, 0.5, true, 'tome', true, 0])
+    expect(shape('armsummoner', V19)).toEqual([0.57, 0.46, 0.5, true, 'arms', false, 0.3])
+    expect(shape('summoner', V19)).toEqual([0.5, 0.57, 0.5, true, 'tome', false, 0.3])
+    expect(shape('summoner', 18)).toEqual([0.5, 0.62, 0.5, true, 'tome', false, 0.3])
     for (const c of ['brawler', 'mage'] as const) expect(shape(c, V19), c).toEqual([1, 1, 1, false, null, false, 0])
     for (const c of ['paladin', 'cleric'] as const) expect(shape(c, V19), c).toEqual([0.5, 0.5, 0.6, false, null, false, 0])
   })
@@ -149,10 +152,10 @@ describe('a Tier 0 in the fight\'s rules (CV6; Halls v2 §3.1)', () => {
 
   it('opens depth 1 only, whatever her rank; her open power is her skill\'s at her Class Rank', () => {
     expect([1, 5, 10].map((r) => rpgOpenDepthOf({ classId: 'recruit', classRank: r }, V19))).toEqual([1, 1, 1])
-    expect([1, 7, 10].map((r) => rpgOpenPower({ classId: 'recruit', classRank: r }, V19))).toEqual([1.52, 1.97, 2.2])
+    expect([1, 7, 10].map((r) => rpgOpenPower({ classId: 'recruit', classRank: r }, V19))).toEqual([1.596, 2.069, 2.31]) // §2.2's 1.52, 1.97, 2.20 × H131's 1.05
     expect([1, 10, 20].map((r) => rpgOpenDepthOf({ classId: 'brawler', classRank: r }, V19))).toEqual([1, 2, 3])
     expect([1, 10, 30].map((r) => rpgOpenPower({ classId: 'brawler', classRank: r }, V19))).toEqual([1.6, 2.2, 3.7])
-    expect(rpgSkillFactor({ classId: 'recruit', depth: 1 }, 4, V19)).toBe(1.75)
+    expect(rpgSkillFactor({ classId: 'recruit', depth: 1 }, 4, V19)).toBe(1.838)
     expect(rpgSkillFactor({ classId: 'brawler', depth: 1 }, 1, V19)).toBe(0.95)
   })
 

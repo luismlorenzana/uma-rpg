@@ -437,6 +437,32 @@ and boss more often (stages 5–8 86%). R1 found every setting that pushed it un
 **Paladin ÷ Cleric:** healing and absorbed Barriers 112% a fight across the world's Lv 50 bosses and each front's stage 8
 and champion (R1 111%).
 
+### Classes v3 (engine v19, H131, D249)
+
+*Follow-up to H131 (D249), 2026-10-29; dark until Classes v3's switch (H134).* The same tables with each front's Classes v3
+build ([classes-v3 §10.1](classes-v3/classes-v3.md#101-the-fronts-map-to-the-families): Iron the Warrior side, Arcane the
+Mage side, the Duel the Spellblades, the Horde the Summoners) on curve at Lv 50 as v19 Umas (`balanceMember(…, { engine: 19
+})`: Classes v3's hands and defaults, Halls v2's seats), first try on Auto, 96 fights a stage (three runs, 32 seeds),
+against v18's builds on the same seeds (classes-v3 §12's S8: each stage group within ±5 points). On v17's numbers the v19
+builds were −9, −5, +15 and −42 points off v18's on Iron (stages 1–4, 5–8, 9–11, the champion), −3, −3, 0, +13 on Arcane, 0,
+0, +6, +33 on the Duel (four Spellblades won its champion every time) and 0, −3, −1, −19 on the Horde. **`RIFT_TUNING_V19`**,
+v17's with Iron ×0.88 HP (×1), the Duel ×1.3 HP (×1.1), and the champions Iron ×1.13 HP and ×1.08 offense (×1.15 both),
+Arcane ×1.01 and ×0.94 (×1 and ×0.92), the Duel ×1 (×0.8), the Horde ×1.25 (×1.4); every face, rank, count and shield is
+v17's (a test). R2's in brackets.
+
+| Target | Value | Measured, Classes v3 (H131, D249) |
+|---|---|---|
+| The right party | ≥ 80% a front stage; 60–70% a champion | Stages 1–4, 5–8, 9–11: Iron 95%, 97%, 99% [91%, 98%, 83%]; Arcane 93%, 91%, 100% [95%, 93%, 100%]; Duel 99%, 100%, 97% [100%, 100%, 92%]; Horde 100%, 98%, 99% [99%, 100%, 100%]. Champions: Iron 67% [65%], Arcane 68% [69%], Duel 60% [65%], Horde 65% [67%]. Against v18 on the same seeds, every group within ±5 points but Iron's 9–11 (+16, below) |
+| The wrong party | ≤ 30% a stage, ≤ 10% a champion | On Iron, Arcane's party: 12%, **38%**, 30% a stage, 0% the champion (**missed** at 5–8). On Arcane, Iron's party: 10%, 22%, 19% a stage, 0% the champion: **met** (R2's miss, 36%, 86%, 52%, closes) |
+| The Convergence, right parties | About 50% an attempt | 50% (48 of 96) [51%]; its fights 69%, 89%, 83%, 97% |
+| The Duel's guard rail | Every class's best single act < the Duel's lowest shield | 10 against 13 for all thirteen classes (Halls v2's HV15 ceiling): the Summoners' best own acts 10, the Spellblades' 9, the Tier 0s' 1–2; the best Limit Break 10 (Firefly Pact; Wisp Pact's 10 hits too), no Limit Break over 10 hits on one foe; shields 13–15 unchanged |
+| A run's length | About 2–3 weeks | About 57 fights on Auto [58] |
+| Echoes, how hard | Lv 45 ≥ 80% re-specced; Lv 50 ≥ 80%, Lv 55 about 50% | Lv 45: 100% with one Uma fresh at Class Rank 10 (a Tier 1 class opens there, CV8). Lv 50: 97–100%. Lv 55: Iron 92–97%, Arcane 69–85%, Duel 100%, Horde 97–100% (one multiplier, as H51's) |
+
+**Iron's stages 9–11, the one miss against v18.** One scale moves every Iron stage: at ×1 Iron's stages 1–4 were 9 points
+under v18's and 9–11 15 over, and at ×0.88 4 over and 16 over, so the scale that levels stages 1–4 leaves 9–11 where it
+was. ×0.88 also lifts stage 1 alone to 92% (v18 94%; 79% at ×0.92); stages 9–11 stay at 99% (v18 83%), inside ≥ 80%.
+
 ## 12. Owner calls: decided 2026-10-21 (D161), all as recommended
 
 | Call | Question | Recommendation |
